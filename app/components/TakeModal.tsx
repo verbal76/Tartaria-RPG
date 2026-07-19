@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
   body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 10 },
-  empty: { color: '#7a705c', fontSize: 12, fontStyle: 'italic', lineHeight: 17, marginVertical: 14 },
+  empty: { color: '#a2977b', fontSize: 12, fontStyle: 'italic', lineHeight: 17, marginVertical: 14 },
   chipScroll: { maxHeight: 280 },
   chipList: { gap: 6, paddingVertical: 4 },
   chip: {
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     borderColor: '#3a342c',
     opacity: 0.55,
   },
-  chipTextConsumed: { color: '#7a705c', fontStyle: 'italic' },
+  chipTextConsumed: { color: '#a2977b', fontStyle: 'italic' },
   chipArrowConsumed: { color: '#5e5547' },
   stealthToggle: {
     paddingHorizontal: 12,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   stealthToggleActive: { borderColor: '#6a9bbf', backgroundColor: '#1c2a35' },
-  stealthToggleText: { color: '#7a705c', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  stealthToggleText: { color: '#a2977b', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   stealthToggleTextActive: { color: '#6a9bbf' },
   takeAllBtn: {
     marginTop: 10,

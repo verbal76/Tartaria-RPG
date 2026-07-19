@@ -772,7 +772,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabBtnActive: { borderColor: '#c9a86a' },
-  tabBtnText: { color: '#7a705c', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  tabBtnText: { color: '#a2977b', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   tabBtnTextActive: { color: '#c9a86a' },
   arbiterLine: { color: '#cdbf99', fontSize: 12, fontStyle: 'italic', marginBottom: 10, lineHeight: 17 },
   scroll: { flex: 1 },
@@ -788,7 +788,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   sectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 2 },
-  sectionCount: { color: '#7a705c', fontSize: 11 },
+  sectionCount: { color: '#a2977b', fontSize: 11 },
   recipeRow: {
     flexDirection: 'row',
     backgroundColor: '#13110f',
@@ -810,11 +810,11 @@ const styles = StyleSheet.create({
   // OTA-165 — stats line on REPAIR rows. Same style as RecipesView's
   // recipeStats so the REPAIR tab matches CRAFT / RECIPES visually.
   recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
-  recipeIng: { color: '#7a705c', fontSize: 11, marginTop: 4, lineHeight: 15 },
+  recipeIng: { color: '#a2977b', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeMissing: { color: '#e07a5f', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeCta: { color: '#9ec96a', fontSize: 10, marginTop: 6, fontStyle: 'italic', letterSpacing: 1 },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  empty: { color: '#a2977b', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
   // OTA-095 — Aethercraft discipline card styles. Mirrors the
   // recipe-row look but with a slightly cooler border tint to
   // visually mark these as not-quite-craft (spells, not items).
@@ -830,10 +830,10 @@ const styles = StyleSheet.create({
   aetherCardQueued: { borderColor: '#9ec96a' },
   aetherCardTitle: { color: '#cdbf99', fontSize: 14, fontWeight: '700', marginBottom: 4 },
   aetherCardBody: { color: '#a89a7a', fontSize: 12, lineHeight: 17, marginBottom: 6 },
-  aetherCardFuel: { color: '#7a705c', fontSize: 11, lineHeight: 15, marginBottom: 4 },
+  aetherCardFuel: { color: '#a2977b', fontSize: 11, lineHeight: 15, marginBottom: 4 },
   aetherCardFuelLabel: { color: '#9aaab0', fontWeight: '700' },
   fuelHave: { color: '#9ec96a', fontWeight: '700' },
-  aetherCardExamples: { color: '#7a705c', fontSize: 11, lineHeight: 15 },
+  aetherCardExamples: { color: '#a2977b', fontSize: 11, lineHeight: 15 },
   aetherCardExamplesLabel: { color: '#9aaab0', fontWeight: '700' },
   aetherCardQueuedHint: { color: '#9ec96a', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
   // OTA-111 — per-golem variant rows under the summon discipline
@@ -857,7 +857,7 @@ const styles = StyleSheet.create({
   golemVariantName: { color: '#cdbf99', fontSize: 12, fontWeight: '700' },
   golemVariantStats: { color: '#c9a86a', fontSize: 11, marginTop: 2 },
   golemVariantBlurb: { color: '#a89a7a', fontSize: 11, fontStyle: 'italic', marginTop: 2 },
-  golemVariantFuel: { color: '#7a705c', fontSize: 11, marginTop: 2, lineHeight: 15 },
+  golemVariantFuel: { color: '#a2977b', fontSize: 11, marginTop: 2, lineHeight: 15 },
   golemVariantFuelLabel: { color: '#9aaab0', fontWeight: '700' },
   golemVariantPhrase: { color: '#9ec96a', fontSize: 10, marginTop: 3, fontStyle: 'italic', letterSpacing: 1 },
   golemVariantsRequires: { color: '#9aaab0', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },

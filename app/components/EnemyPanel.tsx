@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   name: { color: '#e07a5f', fontSize: 14, fontWeight: '700', letterSpacing: 1, flexShrink: 1 },
-  rarity: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginLeft: 6 },
+  rarity: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginLeft: 6 },
   subhead: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -486,8 +486,8 @@ const styles = StyleSheet.create({
   },
   range: { fontSize: 9, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 2, borderWidth: 1, marginLeft: 6 },
   rangeIn: { color: '#9ec96a', borderColor: '#3d5a2c' },
-  rangeOut: { color: '#7a705c', borderColor: '#3a342c' },
-  subline: { color: '#7a705c', fontSize: 11, flexShrink: 1 },
+  rangeOut: { color: '#a2977b', borderColor: '#3a342c' },
+  subline: { color: '#a2977b', fontSize: 11, flexShrink: 1 },
   // OTA-897 (SA-5) — the enemy card's voice line: readable italic prose, set
   // above the stat grid.
   flavorLine: { color: '#b8a982', fontSize: 11, lineHeight: 15, fontStyle: 'italic', marginBottom: 6 },
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
   // the narrow column rather than spreading into a wide single row.
   statGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 },
   stat: { width: '50%', paddingVertical: 1 },
-  statLabel: { color: '#7a705c', fontSize: 9, letterSpacing: 1 },
+  statLabel: { color: '#a2977b', fontSize: 9, letterSpacing: 1 },
   statValue: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
   defs: { marginTop: 4, gap: 1 },
   defLine: { fontSize: 10, letterSpacing: 0.5 },

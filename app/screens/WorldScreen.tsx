@@ -193,7 +193,7 @@ export function WorldScreen() {
             const m = tides[f.id] ?? 0;
             const tag = tideLabel(m);
             const standing = standingOf(f.id);
-            const tagColor = m > 0 ? '#9ec96a' : m < 0 ? '#c98a6a' : '#7a705c';
+            const tagColor = m > 0 ? '#9ec96a' : m < 0 ? '#c98a6a' : '#a2977b';
             const standColor = standing >= 20 ? '#9ec96a' : standing >= 0 ? '#cdbf99' : standing >= -10 ? '#c9a86a' : '#e07a5f';
             // A little momentum meter: −5…+5 mapped to a 11-cell bar with the center marked.
             const cells = Array.from({ length: 11 }, (_, i) => i - 5);
@@ -315,11 +315,11 @@ const styles = StyleSheet.create({
   facTag: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
   meterRow: { flexDirection: 'row', alignItems: 'center', marginTop: 3 },
   meterCell: { color: '#3a342c', fontSize: 12, width: 11, textAlign: 'center' },
-  meterCenter: { color: '#7a705c' },
+  meterCenter: { color: '#a2977b' },
   meterOnPos: { color: '#9ec96a' },
   meterOnNeg: { color: '#c98a6a' },
   facStanding: { fontSize: 10, marginLeft: 8, letterSpacing: 0.3 },
-  footNote: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: 8, lineHeight: 14 },
+  footNote: { color: '#a2977b', fontSize: 10, fontStyle: 'italic', marginTop: 8, lineHeight: 14 },
   patrolNote: { color: '#c98a6a', fontSize: 11, fontStyle: 'italic', marginBottom: 4, paddingHorizontal: 4 },
   // OTA-855b — make the collapsible headers read clearly as tappable controls: a plate
   // with a border + gold left accent bar + a chevron and a "tap to show/hide" hint.
@@ -339,16 +339,16 @@ const styles = StyleSheet.create({
   },
   secChevron: { color: '#c9a86a', fontSize: 12, fontWeight: '900', width: 16, textAlign: 'center', marginRight: 4 },
   secHeaderLabel: { color: '#e6d8b3', fontSize: 11, letterSpacing: 3, fontWeight: '700', flex: 1 },
-  secHeaderHint: { color: '#7a705c', fontSize: 9, fontStyle: 'italic', letterSpacing: 0.5 },
+  secHeaderHint: { color: '#a2977b', fontSize: 9, fontStyle: 'italic', letterSpacing: 0.5 },
   grudgeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 4, borderBottomColor: '#1f1c18', borderBottomWidth: 1 },
   grudgeText: { color: '#cdbf99', fontSize: 12 },
   grudgeTag: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
   // OTA-867 — sub-headers splitting the grudges list from the alliances list.
-  relHead: { color: '#7a705c', fontSize: 10, fontWeight: '800', letterSpacing: 2, marginBottom: 4 },
+  relHead: { color: '#a2977b', fontSize: 10, fontWeight: '800', letterSpacing: 2, marginBottom: 4 },
   rumorRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingVertical: 4 },
   rumorGlyph: { fontSize: 12, width: 18, textAlign: 'center' },
   rumorText: { color: '#cdbf99', fontSize: 12, lineHeight: 17, flex: 1 },
-  empty: { color: '#7a705c', fontSize: 12, fontStyle: 'italic' },
+  empty: { color: '#a2977b', fontSize: 12, fontStyle: 'italic' },
   // OTA-850 — bounty card.
   bountyHead: { color: '#e6d8b3', fontSize: 13, fontWeight: '700', letterSpacing: 0.3, marginBottom: 3 },
   bountyBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },

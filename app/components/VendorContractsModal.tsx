@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   card: { width: '100%', maxWidth: 400, maxHeight: '82%', backgroundColor: '#13110f', borderColor: '#b98a4a', borderWidth: 1, borderRadius: 4, padding: 14 },
   title: { color: '#d8b271', fontSize: 14, fontWeight: '800', letterSpacing: 2 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
-  subtitle: { color: '#7a705c', fontSize: 11, letterSpacing: 1, marginBottom: 10 },
+  subtitle: { color: '#a2977b', fontSize: 11, letterSpacing: 1, marginBottom: 10 },
   empty: { color: '#cdbf99', fontSize: 13, lineHeight: 19, marginBottom: 6 },
   list: { flexGrow: 0 },
   listContent: { paddingBottom: 4 },

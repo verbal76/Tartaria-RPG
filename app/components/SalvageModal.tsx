@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
   // 2026-05-25 — removed dead style keys after the chip layout
   // migrated to the stacked chipFull pattern: chipRow, chipScrollRow,
   // chip, chipScene, chipText, chipTextScene — all unreferenced.
-  chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
+  chipLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
   // 2026-05-25 — stacked-list styles matching TakeModal so the
   // four ambient-noun modals share one visual pattern.
   chipScroll: { maxHeight: 280 },

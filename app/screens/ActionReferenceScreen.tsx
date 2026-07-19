@@ -461,9 +461,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   searchClear: { paddingLeft: 8, paddingVertical: 4 },
-  searchClearText: { color: '#7a705c', fontSize: 14, fontWeight: '700' },
+  searchClearText: { color: '#a2977b', fontSize: 14, fontWeight: '700' },
   intro: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 12,
     fontStyle: 'italic',
     marginBottom: 12,

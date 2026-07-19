@@ -16,6 +16,7 @@ import { visibleBuildingRooms } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS } from './tutorialSteps';
 import { useGameStore } from '../state/gameStore';
+import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 import { reachClassFor } from '../engine/combatRules';
@@ -243,9 +244,13 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // has `inputPulse: true` (name beat + rope beat). Pulses a border
   // colour animation; same Animated pattern as TutorialTarget.
   const inputPulse = currentTutStep?.inputPulse === true;
+  // OTA-898 (SA-6) — respect the reduce-motion preference: hold the tutorial
+  // input cue as a STATIC highlight instead of a looping pulse (the cue still
+  // reads; only the continuous motion is dropped).
+  const reduceMotion = useReduceMotion();
   const pulse = useRef(new Animated.Value(0)).current;
   useEffect(() => {
-    if (!inputPulse) {
+    if (!inputPulse || reduceMotion) {
       pulse.stopAnimation();
       pulse.setValue(0);
       return;
@@ -258,9 +263,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     );
     loop.start();
     return () => { loop.stop(); };
-  }, [inputPulse, pulse]);
+  }, [inputPulse, reduceMotion, pulse]);
   const inputBorderColor = inputPulse
-    ? pulse.interpolate({ inputRange: [0, 1], outputRange: ['#c9a86a', '#ffe28a'] })
+    ? (reduceMotion
+        ? '#ffe28a'  // static highlight — no motion, still clearly cued
+        : pulse.interpolate({ inputRange: [0, 1], outputRange: ['#c9a86a', '#ffe28a'] }))
     : '#3a342c';
 
   const handleSubmit = () => {
@@ -789,7 +796,15 @@ function QuickBtn({
     onPress();
   };
   return (
-    <TouchableOpacity style={containerStyle} onPress={handlePress}>
+    // OTA-898 (SA-6) — screen-reader support for the quick-action chips: each
+    // exposes a button role, its label, and a disabled state when blocked.
+    <TouchableOpacity
+      style={containerStyle}
+      onPress={handlePress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: !!blocked }}
+    >
       <Text style={textStyle}>{label.toUpperCase()}</Text>
     </TouchableOpacity>
   );
@@ -809,6 +824,9 @@ function TravelBtn({ label, onPress, blocked, active }: { label: string; onPress
       style={[styles.travelBtn, isDestination && styles.travelBtnDest, blocked && styles.travelBtnBlocked, active && styles.travelBtnActive]}
       onPress={handlePress}
       activeOpacity={blocked ? 1 : 0.7}
+      accessibilityRole="button"
+      accessibilityLabel={`${isDestination ? 'Travel to ' : ''}${label.replace(/^→\s*/, '')}${active ? ', current course' : ''}`}
+      accessibilityState={{ disabled: !!blocked, selected: !!active }}
     >
       <Text
         style={[styles.travelBtnText, isDestination && styles.travelBtnTextDest, active && styles.travelBtnTextActive]}
@@ -892,7 +910,7 @@ const styles = StyleSheet.create({
     minWidth: 56,
   },
   movesBadgeText: { color: '#9ec96a', fontSize: 16, fontWeight: '800', letterSpacing: 1, lineHeight: 18 },
-  movesBadgeSub: { color: '#7a705c', fontSize: 8, letterSpacing: 1, marginTop: 1 },
+  movesBadgeSub: { color: '#a2977b', fontSize: 8, letterSpacing: 1, marginTop: 1 },
   quick: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

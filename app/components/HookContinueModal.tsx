@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   title: { color: '#c9a86a', fontSize: 13, fontWeight: '800', letterSpacing: 3 },
-  subtitle: { color: '#7a705c', fontSize: 11, marginTop: 2, fontStyle: 'italic', letterSpacing: 1 },
+  subtitle: { color: '#a2977b', fontSize: 11, marginTop: 2, fontStyle: 'italic', letterSpacing: 1 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 8, marginBottom: 8 },
   stageScroll: { },
   stageList: { gap: 12, paddingVertical: 4 },

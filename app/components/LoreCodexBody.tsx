@@ -353,17 +353,17 @@ const styles = StyleSheet.create({
   tabs: { flexDirection: 'row', gap: 6, paddingRight: 8 },
   tab: { paddingVertical: 6, paddingHorizontal: 14, borderWidth: 1, borderColor: '#3a342c', borderRadius: 4, alignItems: 'center' },
   tabActive: { borderColor: '#c9a86a' },
-  tabText: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
+  tabText: { color: '#a2977b', fontSize: 11, letterSpacing: 1 },
   tabTextActive: { color: '#e6d8b3' },
   scroll: { flex: 1 },
   entry: { backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, padding: 10, borderRadius: 4, marginBottom: 8 },
   // OTA-837 — bestiary/lore chrome.
-  counter: { color: '#7a705c', fontSize: 10, letterSpacing: 2, marginBottom: 8, textTransform: 'uppercase' },
+  counter: { color: '#a2977b', fontSize: 10, letterSpacing: 2, marginBottom: 8, textTransform: 'uppercase' },
   entryLocked: { opacity: 0.5, borderStyle: 'dashed' },
   // OTA-845 — The Fallen memorial.
   fallenEntry: { borderLeftWidth: 3, borderLeftColor: '#6a5a4a' },
-  fallenEmpty: { color: '#7a705c', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
-  lockedName: { color: '#7a705c', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  fallenEmpty: { color: '#a2977b', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
+  lockedName: { color: '#a2977b', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   lockedSub: { color: '#5a5245', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
   name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   subtitle: { color: '#c9a86a', fontSize: 11, marginBottom: 4 },
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   // apart from the stat rows below it.
   flavorLine: { color: '#cdbf99', fontSize: 12, lineHeight: 18, fontStyle: 'italic', marginBottom: 4 },
   desc: { color: '#cdbf99', fontSize: 12, lineHeight: 18, marginTop: 2 },
-  meta: { color: '#7a705c', fontSize: 11, marginTop: 4 },
+  meta: { color: '#a2977b', fontSize: 11, marginTop: 4 },
   trait: { color: '#a89a78', fontSize: 11, marginTop: 2 },
   tapHint: { color: '#c9a86a', fontSize: 10, marginTop: 6, letterSpacing: 1 },
   modalScrim: {

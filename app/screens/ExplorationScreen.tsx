@@ -1879,7 +1879,7 @@ export function ExplorationScreen() {
 const styles = StyleSheet.create({
   // OTA-841 [did-you-mean] — tappable disambiguation chip row above the input.
   didYouMeanRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, paddingHorizontal: 4, paddingBottom: 4 },
-  didYouMeanLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1, fontStyle: 'italic' },
+  didYouMeanLabel: { color: '#a2977b', fontSize: 11, letterSpacing: 1, fontStyle: 'italic' },
   didYouMeanChip: { backgroundColor: '#1a1714', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, paddingHorizontal: 10, paddingVertical: 6 },
   didYouMeanChipText: { color: '#e6d8b3', fontSize: 12, letterSpacing: 0.5 },
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
@@ -1910,7 +1910,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   sceneText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1 },
-  timeText: { color: '#7a705c', fontSize: 9, letterSpacing: 1, marginTop: 1 },
+  timeText: { color: '#a2977b', fontSize: 9, letterSpacing: 1, marginTop: 1 },
   sceneBarBtns: { flexDirection: 'row', gap: 4, flexShrink: 0 },
   sceneBtn: { color: '#cdbf99', fontSize: 16, paddingHorizontal: 8 },
   // Compact bordered chips on the scene bar — 'ACTS' opens the action
@@ -1946,7 +1946,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 2,
     marginTop: 4,
   },
-  streamingPrefix: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
+  streamingPrefix: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
   streamingText: { color: '#cdbf99', fontSize: 13, lineHeight: 18 },
   streamingCursor: { color: '#c9a86a', fontSize: 13 },
   // v2.4.1 (OTA 048) — the bottom menu row (save & exit, copy/clear
@@ -1991,7 +1991,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   objectiveChipSubtitle: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 10,
     lineHeight: 14,
     marginTop: 2,
@@ -2034,7 +2034,7 @@ const styles = StyleSheet.create({
   vendorBannerStripe: { width: 4, backgroundColor: '#c9a86a', alignSelf: 'stretch' },
   vendorBannerBody: { flex: 1, paddingHorizontal: 10, paddingVertical: 6 },
   vendorBannerName: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
-  vendorBannerHint: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginTop: 1 },
+  vendorBannerHint: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginTop: 1 },
   vendorBannerArrow: { color: '#c9a86a', fontSize: 22, paddingHorizontal: 12 },
   // OTA-451 — Mission Board chip. Parchment/brown accent to distinguish from the
   // vendor's amber and the Crucible's purple.
@@ -2089,7 +2089,7 @@ const styles = StyleSheet.create({
   // arb152 — dismiss (✕) on the Fusing Crucible chip.
   crucibleDismiss: { paddingHorizontal: 14, paddingVertical: 8, alignSelf: 'center' },
   crucibleDismissText: { color: '#8a6fa8', fontSize: 16, fontWeight: '800' },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
 });
 
 // Build the chip pool the search / approach modals show.

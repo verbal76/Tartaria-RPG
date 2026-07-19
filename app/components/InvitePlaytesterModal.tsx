@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   ruleLine: { height: 1, backgroundColor: '#3a342c', marginTop: 6 },
   body: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 12 },
   sectionLabel: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 2,

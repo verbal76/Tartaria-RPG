@@ -1328,11 +1328,11 @@ const styles = StyleSheet.create({
   crest: { width: 180, height: 180, alignSelf: 'center', marginBottom: 8 },
   title: { fontSize: 36, color: '#e6d8b3', letterSpacing: 8, fontWeight: '800', textAlign: 'center' },
   subtitle: { fontSize: 14, color: '#c9a86a', letterSpacing: 14, marginTop: -4, textAlign: 'center' },
-  flavor: { color: '#7a705c', fontSize: 12, marginTop: 10, fontStyle: 'italic', textAlign: 'center', marginBottom: 14 },
+  flavor: { color: '#a2977b', fontSize: 12, marginTop: 10, fontStyle: 'italic', textAlign: 'center', marginBottom: 14 },
   list: { flex: 1 },
   listContent: { paddingVertical: 4 },
-  listLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 2, marginBottom: 6 },
-  empty: { color: '#7a705c', fontStyle: 'italic', fontSize: 12, textAlign: 'center', marginTop: 24, paddingHorizontal: 16 },
+  listLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 2, marginBottom: 6 },
+  empty: { color: '#a2977b', fontStyle: 'italic', fontSize: 12, textAlign: 'center', marginTop: 24, paddingHorizontal: 16 },
   slot: {
     backgroundColor: '#13110f',
     borderColor: '#3a342c',
@@ -1356,8 +1356,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 1,
   },
-  slotTime: { color: '#7a705c', fontSize: 11 },
-  slotMeta: { color: '#7a705c', fontSize: 12, marginTop: 2 },
+  slotTime: { color: '#a2977b', fontSize: 11 },
+  slotMeta: { color: '#a2977b', fontSize: 12, marginTop: 2 },
   // v2.4.1 (OTA 036) — RESUME OBJECTIVE line on each slot card.
   // Warm-gold to distinguish from the gray meta rows + signal it's
   // the main-quest beat.
@@ -1400,7 +1400,7 @@ const styles = StyleSheet.create({
   buildMarker: { fontSize: 11, fontWeight: '800', textAlign: 'center', marginBottom: 8, letterSpacing: 3 },
   // v2.4.1 (OTA 043) — completion-badges row styles.
   badgesContainer: { marginBottom: 8, paddingHorizontal: 8 },
-  badgesTag: { color: '#7a705c', fontSize: 10, letterSpacing: 2, textAlign: 'center', marginBottom: 6 },
+  badgesTag: { color: '#a2977b', fontSize: 10, letterSpacing: 2, textAlign: 'center', marginBottom: 6 },
   badgesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 4 },
   badge: {
     flexDirection: 'row',
@@ -1576,7 +1576,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   playStoreNagDismissText: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 11,
     fontStyle: 'italic',
   },
@@ -1758,7 +1758,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   kokoroBannerText: { color: '#c9a86a', fontSize: 12, letterSpacing: 1 },
-  kokoroBannerProgress: { color: '#7a705c', fontSize: 11, marginTop: 2 },
+  kokoroBannerProgress: { color: '#a2977b', fontSize: 11, marginTop: 2 },
 });
 
 // Surfaces the bundled-voice download state on the title screen so
@@ -1827,7 +1827,7 @@ function EndingBadgesRow(): React.ReactElement | null {
           const [factionId, ending] = id.split(':');
           const faction = FACTION_NAMES_FOR_BADGES[factionId ?? ''] ?? factionId;
           const glyph = ENDING_GLYPH[ending ?? ''] ?? '◯';
-          const color = ENDING_COLOR[ending ?? ''] ?? '#7a705c';
+          const color = ENDING_COLOR[ending ?? ''] ?? '#a2977b';
           return (
             <View key={id} style={[styles.badge, { borderColor: color }]}>
               <Text style={[styles.badgeGlyph, { color }]}>{glyph}</Text>

@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   stepCount: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 11,
   },
   rollLabel: {
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   context: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 12,
     marginBottom: 4,
   },
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   targetText: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 13,
     letterSpacing: 1,
   },
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   bonusLine: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 13,
   },
   divider: {
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   advancingHintText: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 12,
     fontStyle: 'italic',
     letterSpacing: 1,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   cancelText: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 11,
     letterSpacing: 1,
   },

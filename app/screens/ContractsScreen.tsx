@@ -66,7 +66,7 @@ const milestoneStyles = StyleSheet.create({
   cellActive: { borderColor: '#c9a86a', backgroundColor: '#1a1714' },
   value: { color: '#c9a86a', fontSize: 18, fontWeight: '700' },
   label: { color: '#cdbf99', fontSize: 11, letterSpacing: 1 },
-  next: { color: '#7a705c', fontSize: 9, marginTop: 2, textAlign: 'center' },
+  next: { color: '#a2977b', fontSize: 9, marginTop: 2, textAlign: 'center' },
   tapHint: { color: '#5a5448', fontSize: 8, marginTop: 1, letterSpacing: 1 },
 });
 
@@ -486,7 +486,7 @@ export function ContractsScreen() {
                     color = '#c9a86a';
                   } else {
                     status = '· not yet visited';
-                    color = '#7a705c';
+                    color = '#a2977b';
                   }
                   const capName = def?.capitalName ?? capId;
                   // 2026-05-24 — rows are now tappable to start a
@@ -737,7 +737,7 @@ export function ContractsScreen() {
                 const timerColor = tier === 'ok' ? '#9ec96a'
                   : tier === 'warn' ? '#d9b45f'
                   : tier === 'crit' || tier === 'lapsed' ? '#e07a5f'
-                  : '#7a705c';
+                  : '#a2977b';
                 const timerLabel = !hasClock ? 'no deadline'
                   : lapsed ? '⏳ LAPSED'
                   : `⏳ ${Math.ceil(left)}h left`;
@@ -1684,7 +1684,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   mainQuestEnded: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 11,
     fontStyle: 'italic',
     marginTop: 6,
@@ -1716,8 +1716,8 @@ const styles = StyleSheet.create({
   },
   mqTrackerCap: { color: '#e6d8b3', fontSize: 12, fontWeight: '700' },
   mqTrackerStatus: { fontSize: 11, marginTop: 1 },
-  mqTrackerGuardian: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: 1 },
-  mqTrackerFoot: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: 8, textAlign: 'center' },
+  mqTrackerGuardian: { color: '#a2977b', fontSize: 10, fontStyle: 'italic', marginTop: 1 },
+  mqTrackerFoot: { color: '#a2977b', fontSize: 10, fontStyle: 'italic', marginTop: 8, textAlign: 'center' },
   // 2026-05-24 — tap hint + confirm-modal styles for Capital
   // tap-to-travel. Visual language mirrors LoreCodexBody's modal.
   mqTrackerTap: { color: '#9ec96a', fontSize: 10, fontStyle: 'italic', letterSpacing: 1, marginTop: 2 },
@@ -1751,7 +1751,7 @@ const styles = StyleSheet.create({
     marginVertical: 1,
   },
   milestoneDetailEmpty: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 11,
     fontStyle: 'italic',
   },
@@ -1773,7 +1773,7 @@ const styles = StyleSheet.create({
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   title: { color: '#e6d8b3', letterSpacing: 4, fontSize: 14 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
   emptyWrap: {
     flex: 1,
     justifyContent: 'center',
@@ -1787,7 +1787,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: { color: '#c9a86a', fontSize: 16, fontWeight: '700', letterSpacing: 2, marginBottom: 8 },
   emptyBody: { color: '#cdbf99', fontSize: 13, textAlign: 'center', lineHeight: 19, marginBottom: 16 },
-  emptySub: { color: '#7a705c', fontSize: 11, textAlign: 'center', fontStyle: 'italic' },
+  emptySub: { color: '#a2977b', fontSize: 11, textAlign: 'center', fontStyle: 'italic' },
   scroll: { flex: 1 },
   content: { paddingBottom: 32 },
   section: { marginBottom: 14 },
@@ -1836,7 +1836,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#d8a43a',
     borderColor: '#d8a43a',
   },
-  cardFaction: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 4 },
+  cardFaction: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginBottom: 4 },
   cardLocation: { color: '#9ec96a', fontSize: 11, marginBottom: 4, letterSpacing: 0.5 },
   // arb-fix — "◈ N moves away" line under a card's location (teal, distinct from
   // the green 📍 place line so distance reads as its own datum).
@@ -1855,7 +1855,7 @@ const styles = StyleSheet.create({
   sortBarPressed: { opacity: 0.7 },
   sortBarText: { color: '#cdbf99', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
   sortBarTextOn: { color: '#7fb0a8' },
-  sortBarHint: { color: '#7a705c', fontSize: 9, letterSpacing: 0.5, marginTop: 2 },
+  sortBarHint: { color: '#a2977b', fontSize: 9, letterSpacing: 0.5, marginTop: 2 },
   // arb-fix — the Primary Objective box's header row (title + compact sort button).
   mqTrackerHeadRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   mqSortBtn: {
@@ -1883,13 +1883,13 @@ const styles = StyleSheet.create({
   bountyTimerFill: { height: 4, borderRadius: 2 },
   cardStageLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 2, fontWeight: '700', marginTop: 8, marginBottom: 2 },
   cardStageBody: { color: '#e6d8b3', fontSize: 12, lineHeight: 17, marginBottom: 4 },
-  whispersBlurb: { color: '#7a705c', fontSize: 11, fontStyle: 'italic', lineHeight: 15, marginBottom: 8 },
+  whispersBlurb: { color: '#a2977b', fontSize: 11, fontStyle: 'italic', lineHeight: 15, marginBottom: 8 },
   cardStageHint: { color: '#9ec96a', fontSize: 11, fontStyle: 'italic', marginTop: 2 },
   // OTA 020 — expanded contract card styles.
   expanded: { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#3a342c' },
-  expandedLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 2, marginTop: 8, marginBottom: 2 },
+  expandedLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 2, marginTop: 8, marginBottom: 2 },
   expandedBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
-  expandedStage: { color: '#7a705c', fontSize: 11, lineHeight: 16, paddingLeft: 4, marginBottom: 2 },
+  expandedStage: { color: '#a2977b', fontSize: 11, lineHeight: 16, paddingLeft: 4, marginBottom: 2 },
   expandedStageHint: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', lineHeight: 14, paddingLeft: 4, marginBottom: 6, letterSpacing: 0.5 },
   expandedStageDone: { color: '#9ec96a', textDecorationLine: 'line-through' },
   expandedStageCurrent: { color: '#c9a86a', fontWeight: '700' },
@@ -1944,13 +1944,13 @@ const styles = StyleSheet.create({
   discardBtn: {
     marginTop: 10,
     backgroundColor: 'transparent',
-    borderColor: '#7a705c',
+    borderColor: '#a2977b',
     borderWidth: 1,
     borderRadius: 3,
     paddingVertical: 10,
     alignItems: 'center',
   },
-  discardBtnText: { color: '#7a705c', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  discardBtnText: { color: '#a2977b', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   milestoneRow: { flexDirection: 'row', backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 10 },
   tabRow: {
     flexDirection: 'row',
@@ -1966,7 +1966,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
   },
   tabBtnActive: { borderBottomColor: '#c9a86a' },
-  tabBtnText: { color: '#7a705c', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
+  tabBtnText: { color: '#a2977b', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
   tabBtnTextActive: { color: '#c9a86a' },
   collectIntro: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 4 },
   collectCard: { marginBottom: 8 },
@@ -1999,6 +1999,6 @@ const styles = StyleSheet.create({
   fragTitleFound: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 4 },
   fragTitleMissing: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 1, fontStyle: 'italic', marginBottom: 4 },
   fragBody: { color: '#e6d8b3', fontSize: 12, lineHeight: 17 },
-  fragHint: { color: '#7a705c', fontSize: 11, fontStyle: 'italic', lineHeight: 16 },
+  fragHint: { color: '#a2977b', fontSize: 11, fontStyle: 'italic', lineHeight: 16 },
   completeBanner: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, fontWeight: '700', marginTop: 4 },
 });

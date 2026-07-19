@@ -16376,4 +16376,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // voice, canonical "Aether" throughout), surfaced in the codex bestiary (once recorded) and briefly on
 // the in-combat EnemyPanel. Pure flavor — never read by combat logic. Data + two thin UI renders; ships
 // over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-876-voice-the-bestiary';
+// 2026-07-19 OTA-877 (SA-6) — accessibility baseline (port of HAL OTA-898). REDUCE MOTION: a device-level
+// pref (own AsyncStorage key, off the save path) holding the UI's looping/flashing animations static
+// (low-HP flash + HP-bar fade, tutorial input pulse, tutorial highlight ring); toggle in Settings →
+// DISPLAY → ACCESSIBILITY, loaded at boot. SCREEN-READER LABELS: accessibilityRole/Label/State on the
+// quick-action chips + travel buttons + the reduce-motion switch. CONTRAST: the muted tan #7a705c
+// (~3.5:1) lifted to #a2977b (~5.9:1, clears WCAG AA) across the component/screen files that used it.
+// Text size stays on the OS font-size setting (allowFontScaling never disabled). UI + a tiny prefs store;
+// ships over-the-air. Covered by ota898Accessibility.
+export const OTA_BUILD_ID = '2026-07-19-877-accessibility-baseline';

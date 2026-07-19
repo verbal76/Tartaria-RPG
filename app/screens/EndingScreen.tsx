@@ -224,7 +224,7 @@ function HomewardSplash({
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent', padding: 16 },
   scroll: { paddingBottom: 32 },
-  tag: { color: '#7a705c', fontSize: 11, letterSpacing: 4, fontWeight: '700', marginTop: 16 },
+  tag: { color: '#a2977b', fontSize: 11, letterSpacing: 4, fontWeight: '700', marginTop: 16 },
   endingLabel: { fontSize: 36, letterSpacing: 6, fontWeight: '800', marginTop: 8 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 12, marginBottom: 12 },
   body: { color: '#e6d8b3', fontSize: 14, lineHeight: 22 },
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#1a1714',
     borderBottomWidth: 1,
   },
-  summaryKey: { color: '#7a705c', fontSize: 12, letterSpacing: 1 },
+  summaryKey: { color: '#a2977b', fontSize: 12, letterSpacing: 1 },
   summaryVal: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
   coresList: { color: '#cdbf99', fontSize: 11, fontStyle: 'italic', marginTop: 6 },
   btnRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 24, gap: 8 },
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   },
   btnPrimary: { backgroundColor: '#2a1f12' },
   btnText: { color: '#c9a86a', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80, fontSize: 14 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80, fontSize: 14 },
   // OTA-151 — Homeward splash. Full-black backdrop, large prose
   // centered vertically, slow fade.
   homewardContainer: {
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   homewardTag: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 18,
     letterSpacing: 8,
     textAlign: 'center',
