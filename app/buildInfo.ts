@@ -17888,4 +17888,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Now mounts on a reliable React focus signal (new store flag explorationInputActive, set onFocus);
 // height only positions it (cached across opens + screen-fraction fallback). Three retract paths
 // (submit / deferred hide / deferred blur) keep it from lingering. JS-only, OTA-safe.
-export const OTA_BUILD_ID = '2026-07-19-1159-keyboard-bar-focus-mount';
+// 2026-07-19 OTA-1160 — missions show distance in moves + sort-by-distance (port of HAL OTA-883).
+// Every mission entry (bounties, hunts, mysteries, storylines, faction quests, alliance broker
+// legs, whispers, leads, sigils) shows "◈ N moves away" to its target, and a SORT BY DISTANCE
+// toggle at the top of the missions scroll reorders entries nearest-first while keeping them
+// GROUPED BY TYPE (sorted within each section; placeless entries last). Distance =
+// canonicalDistanceFromGrid(gridX/gridY, targetLocationId). The Primary Objective box is engine's
+// own lore-agnostic STORYLINE model (not HAL's 9-Capital tracker), so the capital-list distance
+// sort in the box doesn't apply here — that part of the HAL change was intentionally not ported.
+export const OTA_BUILD_ID = '2026-07-19-1160-mission-distance-sort';
