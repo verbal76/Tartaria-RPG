@@ -17,12 +17,17 @@ const state = (coreCount: number, fired: string[] = []): MainQuestState => ({
 } as unknown as MainQuestState);
 
 describe('OTA-495 — Core-4 forge gate', () => {
-  it('every golem-armament recipe requires 4 Cores (3 types × 3 tiers = 9)', () => {
-    // OTA-720 — the armaments are now tiered (Crude/base/Elder for Sledge/
-    // Greatsword/Pike). Aether-Lance was retired. All 9 sit behind the same gate.
+  it('every golem-armament recipe sits behind a tiered Core gate (3 types × 3 tiers = 9)', () => {
+    // OTA-720 — the armaments are now TIERED (Crude/base/Elder for Sledge/
+    // Greatsword/Pike; Aether-Lance retired). All 9 sit behind the Core gate, but
+    // the count scales with the tier: Crude = 1, base = 2, Elder = 4. (The Core-4
+    // FORGE BEAT still fires at the 4th Core — see the beat test below.)
     const golem = RECIPES.filter((r) => (lookupCraftedItem(r.result).tags ?? []).includes('golem_weapon'));
     expect(golem).toHaveLength(9);
-    for (const r of golem) expect(r.coresRequired).toBe(4);
+    for (const r of golem) {
+      const expected = r.result.startsWith('Crude') ? 1 : r.result.startsWith('Elder') ? 4 : 2;
+      expect(r.coresRequired).toBe(expected);
+    }
   });
 
   it('no NON-golem recipe accidentally picked up a cores gate', () => {
