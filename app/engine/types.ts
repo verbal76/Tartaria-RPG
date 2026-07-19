@@ -254,6 +254,10 @@ export interface Enemy {
    *  might list ["sentinel", "guardian", "statue"] so `attack the sentinel`
    *  resolves to the canonical entity. Lowercase, no punctuation. */
   aliases?: string[];
+  /** OTA-897 (SA-5) — one-line codex "voice": a short, evocative field
+   *  description shown in the bestiary (once the foe is recorded) and, briefly,
+   *  on the combat enemy panel. Pure flavor — never read by combat logic. */
+  flavor?: string;
   /** Per-enemy perks layered on top of the macro type-resistance map.
    *  Supported ids live in engine/enemyTraits.ts; examples:
    *  - "armored"            (+2 AC)

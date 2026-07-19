@@ -17159,4 +17159,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (bosses now route through it instead of passing through fixed) plus the wasteland boss-swap and direct-
 // provoke spawn paths that bypass context scaling. Idempotent + no-op for Guardians/hunt targets/non-apex
 // via a trait stamp. Engine logic; ships over-the-air. Covered by ota896StaticBossScaling + ota816.
-export const OTA_BUILD_ID = '2026-07-19-896-static-boss-scaling';
+//
+// OTA-897 (SA-5 — voice the bestiary) — all 109 catalog enemies shipped with ZERO prose: the OTA-837
+// bestiary and the combat enemy panel showed a bare stat block (type • rarity • HP • dmg • traits) and
+// nothing about WHAT the thing actually is. Added a one-line "flavor" field to every enemy in
+// enemies.json — an evocative field description leaning on the foe's type/attack/traits and the
+// post-Mud-Flood Tartaria setting (canonical "Aether" throughout, per SA-2). Surfaced in two places: the
+// codex bestiary (once you've recorded the kill) and, briefly, the in-combat EnemyPanel — so a foe reads
+// as a described creature, not a spreadsheet row. Pure flavor: the field is never read by combat logic
+// (types.ts documents it as such). Data + two thin UI renders; ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-897-voice-the-bestiary';

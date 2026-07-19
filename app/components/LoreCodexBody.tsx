@@ -52,6 +52,8 @@ interface CodexEnemy {
   rarity?: string;
   traits?: string[];
   loot?: string[];
+  /** OTA-897 (SA-5) — one-line codex voice; shown once the foe is discovered. */
+  flavor?: string;
 }
 interface LoreConcept { id: string; title: string; answer: string }
 
@@ -226,6 +228,9 @@ export function LoreCodexBody() {
                 <View key={`${e.name}_${idx}`} style={styles.entry}>
                   <Text style={styles.name}>{e.name}</Text>
                   <Text style={styles.subtitle}>{e.type ?? 'Unknown'} • {e.rarity ?? 'Common'}</Text>
+                  {/* OTA-897 (SA-5) — the bestiary now has a VOICE: a one-line
+                      field description per foe, shown once you've recorded it. */}
+                  {!!e.flavor && <Text style={styles.flavorLine}>{e.flavor}</Text>}
                   <Text style={styles.meta}>COMBAT • HP {e.hp ?? '?'} • Dmg {e.damage ?? '?'}</Text>
                   {(e.traits ?? []).length > 0 && (
                     <Text style={styles.meta}>TRAITS • {(e.traits ?? []).join(', ')}</Text>
@@ -362,6 +367,9 @@ const styles = StyleSheet.create({
   lockedSub: { color: '#5a5245', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
   name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   subtitle: { color: '#c9a86a', fontSize: 11, marginBottom: 4 },
+  // OTA-897 (SA-5) — the bestiary voice line: readable prose, italic to set it
+  // apart from the stat rows below it.
+  flavorLine: { color: '#cdbf99', fontSize: 12, lineHeight: 18, fontStyle: 'italic', marginBottom: 4 },
   desc: { color: '#cdbf99', fontSize: 12, lineHeight: 18, marginTop: 2 },
   meta: { color: '#7a705c', fontSize: 11, marginTop: 4 },
   trait: { color: '#a89a78', fontSize: 11, marginTop: 2 },
