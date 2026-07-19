@@ -120,4 +120,25 @@ describe('attack opener names the weapon the swing actually uses', () => {
     await store.getState().submitPlayerAction('attack with the aetheric bolt gun');
     expect(opener().toLowerCase()).toContain('bolt gun');
   });
+
+  // The DAMAGE-OUTCOME lines (hit/miss/kill/knockout) used to pass the parser's
+  // resolvedNoun raw — which resolves to the ENEMY — so they named the enemy (or
+  // literal "null") as the weapon. Drive several attacks to resolution and assert
+  // the bug markers never appear, regardless of hit/miss RNG.
+  it('outcome lines never name the enemy or "null" as the weapon', async () => {
+    const store = await boot();
+    for (let i = 0; i < 6; i++) {
+      plant();
+      const enemyName = store.getState().currentScene!.enemies[0]!.name.toLowerCase();
+      // Mix natural attack phrasings — none should leak the enemy/null as the weapon.
+      const cmd = i % 3 === 0 ? 'attack' : i % 3 === 1 ? `attack the ${enemyName}` : 'hit it';
+      await store.getState().submitPlayerAction(cmd);
+      const pr = store.getState().pendingRolls;
+      if (pr) store.getState().concludeRolls(pr.steps, pr.actionText);
+      const log = store.getState().gameLog.map((e) => e.text).join('\n').toLowerCase();
+      expect(log).not.toContain('the null');
+      expect(log).not.toContain(`with the ${enemyName}`);
+      expect(log).not.toContain(`under the ${enemyName}`);
+    }
+  });
 });

@@ -10,7 +10,7 @@ import type {
   PlayerCharacter,
   WorldMemory,
 } from './types';
-import { withArticleCap } from './grammar';
+import { withArticle, withArticleCap } from './grammar';
 import { pick, chance, rotatingPick } from './rng';
 import openings from '../data/events/openings.json';
 // OTA-298 — mood, intent, location, and scene flavor JSON files are
@@ -834,7 +834,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
       `The Arbiter watches you and the ${n} both. "Your move."`,
       `"What you make of the ${n} is on you," the Arbiter says.`,
       `The Arbiter considers the ${n}. "Name your intent and I'll grade it."`,
-      `"You've got a ${n} and a question," the Arbiter says. "Pair them."`,
+      `"You've got ${withArticle(n)} and a question," the Arbiter says. "Pair them."`,
       `"The ${n} won't act for you," the Arbiter says, dry. "Choose a verb."`,
       `The Arbiter glances between you and the ${n}. "Decide while it's still yours to."`,
       `"I will know what you mean when you act on the ${n}," the Arbiter says.`,

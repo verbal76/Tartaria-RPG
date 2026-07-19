@@ -17094,4 +17094,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // verb — it only appears while you're carrying a torch — so it now sits in the always-visible primary
 // row (just before the MORE toggle) instead of inside the tray. The menus + rarer actions
 // (pickpocket / craft / inventory / missions / fuse) stay behind MORE. UI-only; ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-892-torch-primary-button';
+//
+// OTA-893 (NARRATION CONSISTENCY AUDIT SWEEP) — a full six-lens pass over every player-facing dynamic
+// string (combat, world/exploration, quests/vendors, global articles, formatting, pronouns/dedup).
+// Fixes the verified findings:
+//  • COMBAT weapon name [biggest]: the damage-outcome lines (hit/miss/kill/knockout/coating) passed the
+//    parser's resolvedNoun raw, which resolves to the ENEMY — so they named the enemy (or literal
+//    "null") as the weapon on nearly every natural "attack" command. Both the opener and the outcome
+//    now route through one shared swingWeaponNoun() (resolved-weapon → off-hand → bare-hand → main).
+//  • Throw fallback "a stone" → "stone" (was "The a stone hits").
+//  • DOT-sweep spam: "N attackers remain … now in your sights" fired once per CORPSE during an AoE/DOT
+//    wipe, naming the dead; now gated on a LIVE remaining enemy.
+//  • Indefinite articles: "an Rare/Legendary weapon" (hunt readiness), "A Eternal Dynasty warband/
+//    patrol/caravan" (worldEvents + raid/patrol intros), "a {enemy}" wasteland encounters (Aetheric
+//    Slug/bat/Worm), "a ${scene noun}" arbiter line, "a {noun}" ambient-flavor, "a ${type}" way-forward,
+//    single-enemy arrival "a raider" at sentence start — all routed through grammar helpers.
+//  • Definite-article DOUBLING: "the ${quest title}" where 17/18 hunt (and most mystery/storyline)
+//    titles already start "The" → "the The Bog Dragon…"; six accept/abandon sites + the broker relic
+//    ("the The Entombed's Prayer Tablet") + the investigate echo line, all via theLower().
+//  • Capitalization: combat "burn flares"/"poison sets in" now sentence-cased.
+//  • Pluralization: "1 turns left" (DOT tick), "(1 turns)" (look boosts), "(1 stacks)" (golem rot),
+//    "N turns" (DOT onset) — all get a singular branch.
+//  • "+0 rep" suppressed on the 18 zero-rep faction quests (log + board + Contracts card).
+// Verified-clean families (no fix needed): uninterpolated placeholders, ${} in quotes, number/sign,
+// empty-interp double-spaces, pronoun/gender (dog has a pronoun system), double-words. JS/data-only;
+// ships over-the-air. Covered by attackOpenerWeapon (outcome), grammar, healBatch, stealth, contract tests.
+export const OTA_BUILD_ID = '2026-07-19-893-narration-audit-sweep';
