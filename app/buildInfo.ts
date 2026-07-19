@@ -17909,4 +17909,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // narration reads as ON THE ROAD (never indoors) for both course types even when a stale hubRoomId
 // lingers from the departure hub. Genuine interiors still plant interior leads. Covered by the
 // existing indoorHooksTravel.test.ts (whisper-course case added). JS-only; ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-1162-indoor-leads-on-road';
+// 2026-07-19 OTA-1163 — doubled hunt hint + 'a Aetheric' article (port of HAL OTA-886). The 'Hunt
+// added to your slate' line no longer restates the location the hunt TITLE already names, and the
+// recipe-unlock / Construct-spawn / Crucible-forge lines use the shared grammar helper (withArticle
+// / anOrA) so a vowel-sound name or rarity reads 'an'. Engine keeps its getNarratorName() and
+// forgedKindWord. JS-only; ships over-the-air. Covered by grammar.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-1163-hunt-hint-and-article';

@@ -14,6 +14,15 @@ describe('a/an indefinite article', () => {
     expect(withArticle('Mud Harpy')).toBe('a Mud Harpy');
     expect(withArticle('Throwing Knife')).toBe('a Throwing Knife');
   });
+  it('vowel-initial RARITY takes "an" (the "a Uncommon Construct" report)', () => {
+    // Call sites read `${anOrA(rarity)} ${rarity} …` — the recipe-unlock line,
+    // the Construct spawn line, and the Crucible-forge line.
+    expect(anOrA('Uncommon')).toBe('an');
+    expect(anOrA('Rare')).toBe('a');
+    expect(anOrA('Legendary')).toBe('a');
+    expect(anOrA('Epic')).toBe('an');
+    expect(withArticle('Aetheric Crystal Blade')).toBe('an Aetheric Crystal Blade');
+  });
   it('sentence-start capitalizes the article', () => {
     expect(withArticleCap('Aetheric Raven')).toBe('An Aetheric Raven');
     expect(withArticleCap('Mud Harpy')).toBe('A Mud Harpy');

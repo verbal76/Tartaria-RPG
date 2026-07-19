@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { withArticle, withArticleCap, theCap, theLower } from '../engine/grammar';
+import { withArticle, withArticleCap, anOrA, theCap, theLower } from '../engine/grammar';
 import type {
   PlayerCharacter,
   WorldMemory,
@@ -9071,7 +9071,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               };
             });
             get().appendLog('world', `The ${nounTitle} was never dead — only waiting. Iron the size of a cart grinds and unfolds; a war-automaton older than the outpost surges upright and comes for you.`);
-            get().appendLog('combat', `${spawn.name} closes — a ${spawn.rarity} Construct. ${spawn.attack} ready, ${spawn.damage} on a hit. Plate turns blades; it seizes to a maul, a jolt, or a deep chill. (range: close)`);
+            get().appendLog('combat', `${spawn.name} closes — ${anOrA(spawn.rarity)} ${spawn.rarity} Construct. ${spawn.attack} ready, ${spawn.damage} on a hit. Plate turns blades; it seizes to a maul, a jolt, or a deep chill. (range: close)`);
             void get().persist();
             break;
           }
@@ -17652,7 +17652,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const r = newly[0]!;
       get().appendLog(
         'arbiter',
-        `The ${getNarratorName()} eyes your new pieces. "You could make a ${r.result} now, if you wanted."`,
+        `The ${getNarratorName()} eyes your new pieces. "You could make ${withArticle(r.result)} now, if you wanted."`,
       );
     }
 
@@ -23915,7 +23915,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const forgedKindWord = det.stats.kind === 'armor' ? 'piece of armor' : det.stats.kind === 'dog_armor' ? 'dog vest' : 'weapon';
     get().appendLog(
       'reward',
-      `✦ The Crucible forges a ${fused.rarity ?? 'Rare'} ${forgedKindWord} from your reserved pieces — and it's in your pack, still cooling.`,
+      `✦ The Crucible forges ${anOrA(fused.rarity ?? 'Rare')} ${fused.rarity ?? 'Rare'} ${forgedKindWord} from your reserved pieces — and it's in your pack, still cooling.`,
     );
     get().appendLog(
       'world',
@@ -25923,12 +25923,14 @@ function grantQuestHook(
     //   - world: explicit confirmation the slate now carries it
     // Locale + abandonment-affordance language are deliberately
     // direct — no flowery framing; this is a UX moment.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { biomeLabel: locBiomeLabel } = require('../engine/hunts');
-    const locLabel = def.targetLocationName ?? locBiomeLabel(def.biomeTag);
+    // OTA — the hunt TITLE already names the place ("The Sludge Behemoth at the
+    // Cradle of Dusk"), so appending "at <location>" here restated it, reading as
+    // a doubled hint ("…at the Cradle of Dusk (target: … at the Cradle of Dusk
+    // (feeding pool))"). Name just the target; the Arbiter line below points at
+    // Contracts → Hunts for the full staged location.
     get().appendLog(
       'reward',
-      `✦ Hunt added to your slate — ${def.title} (target: ${def.targetEnemyName} at ${locLabel}).`,
+      `✦ Hunt added to your slate — ${def.title} (target: ${def.targetEnemyName}).`,
     );
     get().appendLog(
       'arbiter',
