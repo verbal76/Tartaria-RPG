@@ -16317,4 +16317,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the missing HP isn't a multiple of the per-kit heal (First Aid Kit = 25). Added a primary 'Heal to
 // full ×N → max/max' button using ceil(gap / perKit) kits (capped at the stack); 'Use Max (no waste)'
 // stays as a de-emphasised secondary. JS-only; ships over-the-air. Covered by healBatch.test.ts.
-export const OTA_BUILD_ID = '2026-07-19-867-heal-to-full';
+// 2026-07-19 OTA-868 — stealth day/night made consistent + visible (port of HAL OTA-889). The +1-
+// night / −1-day modifier already on the pickpocket check now also folds into the in-combat stealth
+// opener + reset rolls, with a short world line surfacing it so the player can see the roll move
+// with the clock. Mechanic-consistency; no balance change to pickpocket. JS-only; ships over-the-
+// air. Covered by stealthTimeOfDay.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-868-stealth-daynight';
