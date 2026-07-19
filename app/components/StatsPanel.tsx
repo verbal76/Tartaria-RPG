@@ -7,6 +7,7 @@ import { coatedDisplayName } from '../engine/weaponCoating';
 import { ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
+import { useReduceMotion } from '../state/accessibility';
 
 // OTA-214 — Aetheric Vision Lens active indicator. Pure presence
 // readout: when the player has any item granting the detect_aether
@@ -139,7 +140,16 @@ export function StatsPanel({ player }: Props) {
   const animFrac = React.useRef(new Animated.Value(hpFrac)).current;
   const pulse = React.useRef(new Animated.Value(0)).current;
   const prevHp = React.useRef(player.hp);
+  // OTA-898 (SA-6) — reduce-motion: snap the HP bar to its new level and skip
+  // the red damage-flash entirely (the number still updates; no motion).
+  const reduceMotion = useReduceMotion();
   React.useEffect(() => {
+    if (reduceMotion) {
+      animFrac.setValue(hpFrac);
+      pulse.setValue(0);
+      prevHp.current = player.hp;
+      return;
+    }
     Animated.timing(animFrac, { toValue: hpFrac, duration: HP_FADE_MS, useNativeDriver: false }).start();
     if (player.hp < prevHp.current) {
       pulse.stopAnimation();
@@ -151,7 +161,7 @@ export function StatsPanel({ player }: Props) {
     }
     prevHp.current = player.hp;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [player.hp, player.hpMax]);
+  }, [player.hp, player.hpMax, reduceMotion]);
   // Card background follows the animated fraction across the full gradient.
   const animBg = React.useMemo(
     () => animFrac.interpolate({
@@ -340,10 +350,10 @@ const styles = StyleSheet.create({
   // companion vs the dog's warm-gold.
   golemRow: { flexDirection: 'row', justifyContent: 'flex-end' },
   golemName: { color: '#9888a8', fontSize: 12, fontWeight: '600', maxWidth: 200 },
-  subline: { color: '#7a705c', fontSize: 10, marginBottom: 2 },
+  subline: { color: '#a2977b', fontSize: 10, marginBottom: 2 },
   equipped: { color: '#c9a86a', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
-  tapHint: { color: '#7a705c', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
+  tapHint: { color: '#a2977b', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
   companion: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
   contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
   row: { flexDirection: 'row', gap: 4, marginTop: 3 },
@@ -353,6 +363,6 @@ const styles = StyleSheet.create({
   stat: { flex: 1, minWidth: 0, alignItems: 'center' },
   // OTA-744 — the wallet gets its own gold line, off the cramped vitals row.
   wallet: { color: '#e0b84a', fontSize: 12, fontWeight: '700', marginTop: 4, letterSpacing: 0.5 },
-  label: { color: '#7a705c', fontSize: 9, textAlign: 'center' },
+  label: { color: '#a2977b', fontSize: 9, textAlign: 'center' },
   value: { color: '#e6d8b3', fontSize: 12, fontWeight: '600', textAlign: 'center' },
 });

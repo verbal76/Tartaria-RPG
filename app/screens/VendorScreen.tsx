@@ -898,15 +898,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#2a2520',
     borderColor: '#c9a86a',
   },
-  tabText: { color: '#7a705c', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
+  tabText: { color: '#a2977b', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
   tabTextActive: { color: '#c9a86a' },
   sellPrice: { color: '#9ec96a', fontSize: 12, fontWeight: '700' },
   sortRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6, paddingHorizontal: 2 },
-  sortLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginRight: 4 },
+  sortLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginRight: 4 },
   sortTab: { paddingHorizontal: 8, paddingVertical: 3, borderColor: '#3a342c', borderWidth: 1, borderRadius: 2 },
   sortTabActive: { borderColor: '#c9a86a' },
   // arb121 — text is ALWAYS readable amber; the BORDER (sortTabActive) is the
-  // sole active indicator. Was a dim #7a705c on inactive that the player
+  // sole active indicator. Was a dim #a2977b on inactive that the player
   // couldn't read.
   sortTabText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   sortTabTextActive: { color: '#c9a86a' },
@@ -921,7 +921,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   vendorName: { color: '#c9a86a', fontSize: 15, fontWeight: '700', letterSpacing: 1 },
-  vendorTitle: { color: '#7a705c', fontSize: 11, letterSpacing: 1, marginTop: 1 },
+  vendorTitle: { color: '#a2977b', fontSize: 11, letterSpacing: 1, marginTop: 1 },
   vendorDesc: { color: '#cdbf99', fontSize: 12, marginTop: 6, lineHeight: 17, fontStyle: 'italic' },
   rapportBanner: { color: '#9ec96a', fontSize: 12, marginTop: 6, fontWeight: '700' },
   // arb103 — vendor Fusing Crucible offer.
@@ -941,7 +941,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     marginBottom: 6,
   },
-  walletLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
+  walletLabel: { color: '#a2977b', fontSize: 11, letterSpacing: 1 },
   corruptionMarkup: {
     color: '#e07a5f',
     fontSize: 10,
@@ -1037,16 +1037,16 @@ const styles = StyleSheet.create({
   // arb120 — loadout warning tag (bandolier / pouch) on a sellable row.
   loadoutTag: { color: '#e0a85f', fontSize: 11, fontWeight: '700' },
   offerPrice: { color: '#c9a86a', fontSize: 12, fontWeight: '700' },
-  offerPriceBroke: { color: '#7a705c' },
+  offerPriceBroke: { color: '#a2977b' },
   offerSubHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 2 },
-  offerKind: { color: '#7a705c', fontSize: 10, letterSpacing: 1, flex: 1 },
+  offerKind: { color: '#a2977b', fontSize: 10, letterSpacing: 1, flex: 1 },
   // arb-fix — right-hand stack: "×N in stock" over "you have N".
   offerCounts: { alignItems: 'flex-end', gap: 1 },
   offerOwned: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   offerStock: { color: '#7fb0a8', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   offerStats: { color: '#cdbf99', fontSize: 11, marginTop: 4 },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  empty: { color: '#a2977b', fontStyle: 'italic', textAlign: 'center', marginTop: 40 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
   // OTA 030 — steal button sits at the right edge of every BUY row.
   // Darker tone than BUY so the player reads it as the risky path.
   stealBtn: {

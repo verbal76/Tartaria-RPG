@@ -993,8 +993,8 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: 'center',
   },
-  resetText: { color: '#7a705c', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  resetText: { color: '#a2977b', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
 
   imageBox: {
     // OTA 055 — flex-filled. The previous aspect-locked sizing
@@ -1160,7 +1160,7 @@ const styles = StyleSheet.create({
   placeRowRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   placeName: { color: '#e6d8b3', fontSize: 13, fontWeight: '600' },
   placeNameHere: { color: '#e07a5f' },
-  placeType: { color: '#7a705c', fontSize: 10, marginTop: 1 },
+  placeType: { color: '#a2977b', fontSize: 10, marginTop: 1 },
   placeDanger: { color: '#cdbf99', fontSize: 10, letterSpacing: 0.5 },
   placeHereTag: { color: '#e07a5f', fontSize: 9, letterSpacing: 1.5, fontWeight: '700' },
   placeArrow: { color: '#c9a86a', fontSize: 16, fontWeight: '700' },

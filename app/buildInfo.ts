@@ -17168,4 +17168,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // codex bestiary (once you've recorded the kill) and, briefly, the in-combat EnemyPanel — so a foe reads
 // as a described creature, not a spreadsheet row. Pure flavor: the field is never read by combat logic
 // (types.ts documents it as such). Data + two thin UI renders; ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-897-voice-the-bestiary';
+//
+// OTA-898 (SA-6 — accessibility baseline) — first pass at a real a11y baseline:
+//  • REDUCE MOTION — a device-level pref (its own AsyncStorage key, off the save path) that holds the
+//    UI's looping / flashing animations static: the low-HP damage flash + HP-bar fade (StatsPanel), the
+//    tutorial input pulse (InputBox), and the tutorial highlight ring (TutorialTarget). Toggle lives in
+//    Settings → DISPLAY → ACCESSIBILITY, loaded once at boot.
+//  • SCREEN-READER LABELS — accessibilityRole/Label/State on the core interactive rows: the quick-action
+//    chips and the travel buttons (disabled + selected states exposed), plus the reduce-motion switch.
+//  • CONTRAST — the muted label tan #7a705c (≈3.5:1 on the parchment base, under WCAG AA) lifted to
+//    #a2977b (≈5.9:1) across all 35 component/screen files that used it — the 8-9px meta labels the audit
+//    flagged now clear AA.
+// Text SIZE is intentionally NOT a new in-app control: the app never disables allowFontScaling, so the OS
+// Dynamic-Type / font-size setting already scales every label; a second control would only drift from it.
+// UI + a tiny new prefs store; ships over-the-air. Covered by ota898Accessibility.
+export const OTA_BUILD_ID = '2026-07-19-898-accessibility-baseline';

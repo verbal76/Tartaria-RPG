@@ -1398,7 +1398,7 @@ const pouchStyles = StyleSheet.create({
     borderRadius: 4,
   },
   title: { color: '#c9a86a', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
-  hint: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
+  hint: { color: '#a2977b', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
   row: { flexDirection: 'row', gap: 6 },
   slot: { flex: 1 },
   slotFilled: {
@@ -1429,7 +1429,7 @@ const pouchStyles = StyleSheet.create({
     borderColor: '#c9a86a',
   },
   slotName: { color: '#e6d8b3', fontSize: 11, fontWeight: '700' },
-  slotAction: { color: '#7a705c', fontSize: 9, marginTop: 2 },
+  slotAction: { color: '#a2977b', fontSize: 9, marginTop: 2 },
   slotEmptyText: { color: '#9ec96a', fontSize: 10, fontWeight: '600', letterSpacing: 0.5 },
   slotEmptyTextActive: { color: '#c9a86a' },
 });
@@ -1502,7 +1502,7 @@ const bandolierStyles = StyleSheet.create({
     borderRadius: 4,
   },
   title: { color: '#e07a5f', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
-  hint: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
+  hint: { color: '#a2977b', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
   row: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   slot: { flexBasis: '18%', flexGrow: 1 },
   slotFilled: {
@@ -1524,7 +1524,7 @@ const bandolierStyles = StyleSheet.create({
   },
   slotEmptyActive: { backgroundColor: '#2a1a14', borderColor: '#e07a5f' },
   slotName: { color: '#e6d8b3', fontSize: 10, fontWeight: '700' },
-  slotAction: { color: '#7a705c', fontSize: 8, marginTop: 2 },
+  slotAction: { color: '#a2977b', fontSize: 8, marginTop: 2 },
   slotEmptyText: { color: '#9ec96a', fontSize: 9, fontWeight: '600', letterSpacing: 0.3, textAlign: 'center' },
   slotEmptyTextActive: { color: '#e07a5f' },
 });
@@ -1844,7 +1844,7 @@ const styles = StyleSheet.create({
   rowFusedMark: { fontSize: 12, fontWeight: '700' },
   rowQty: { color: '#cdbf99', fontSize: 12 },
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
-  rowMeta: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
+  rowMeta: { color: '#a2977b', fontSize: 10, letterSpacing: 1 },
   // arb87 — per-item stat line (AC / resists / bonuses / restores).
   rowStat: { color: '#bfa86a', fontSize: 11, marginTop: 3 },
   // arb87 — "slot already worn" red ✗ (combat-miss red).
@@ -1866,8 +1866,8 @@ const styles = StyleSheet.create({
   rowPouch: { color: '#c9a86a', fontWeight: '700' },
   rowBandolier: { color: '#e07a5f', fontWeight: '700' },
   rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },
+  rowEquippable: { color: '#a2977b', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
+  empty: { color: '#a2977b', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },
   // OTA-269 — callout shown above the inventory list when the player
   // has tapped an empty pouch slot. Tan accent bar + CANCEL chip so
   // the player always has a clear exit from the filter mode.
@@ -1903,6 +1903,6 @@ const styles = StyleSheet.create({
   },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   legendSwatch: { width: 10, height: 10, borderRadius: 2 },
-  legendText: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  legendText: { color: '#a2977b', fontSize: 10, letterSpacing: 1 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
 });

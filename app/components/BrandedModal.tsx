@@ -277,10 +277,10 @@ const styles = StyleSheet.create({
   },
   itemName: { color: '#e6d8b3', fontSize: 15, fontWeight: '700', flex: 1 },
   rarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  itemKind: { color: '#7a705c', fontSize: 11, letterSpacing: 1, marginTop: 1 },
+  itemKind: { color: '#a2977b', fontSize: 11, letterSpacing: 1, marginTop: 1 },
   statsBlock: { marginTop: 8, gap: 2 },
   statLine: { color: '#cdbf99', fontSize: 12 },
-  itemDesc: { color: '#7a705c', fontSize: 11, marginTop: 8, fontStyle: 'italic' },
+  itemDesc: { color: '#a2977b', fontSize: 11, marginTop: 8, fontStyle: 'italic' },
   body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 4 },
   // OTA-286 — quantity stepper row inside the action modal. Mirrors
   // the About screen's volume / rate / pitch row layout exactly so

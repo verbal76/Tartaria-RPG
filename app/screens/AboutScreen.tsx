@@ -19,6 +19,7 @@ import {
 } from '../ui/displaySettings';
 import { LoreCodexBody } from '../components/LoreCodexBody';
 import { useHintsDisabled, setHintsDisabled, resetAllFirstTimeHints } from '../components/useFirstTimeHint';
+import { useAccessibility } from '../state/accessibility';
 import { THIRD_PARTY_NOTICES, NOTICES_PREAMBLE, NOTICES_VERIFIED_AT } from '../data/thirdPartyNotices';
 import {
   flushLogWrites,
@@ -100,6 +101,9 @@ export function AboutScreen() {
   const [tab, setTab] = useState<'session' | 'sfx' | 'display' | 'lore' | 'about' | 'notices'>('session');
   // OTA-860 — global first-time-tips kill-switch (per-install, reactive).
   const hintsDisabled = useHintsDisabled();
+  // OTA-898 (SA-6) — device reduce-motion preference (reactive).
+  const reduceMotion = useAccessibility((s) => s.reduceMotion);
+  const setReduceMotion = useAccessibility((s) => s.setReduceMotion);
   const [tipsReset, setTipsReset] = useState(false);
   // arb78 — player-tunable background settings (live).
   const [display, setDisplay] = useState<DisplaySettings>(() => getDisplaySettings());
@@ -896,6 +900,45 @@ export function AboutScreen() {
         </View>
         )}
 
+        {/* OTA-898 (SA-6) — ACCESSIBILITY: reduce motion holds the UI's looping /
+            flashing animations (the low-HP damage flash, the tutorial pulse)
+            static. Text size is driven by the OS font-size setting — the app
+            respects it everywhere — so it isn't duplicated here. */}
+        {tab === 'display' && (
+        <View style={styles.musicCard}>
+          <View style={styles.musicHeader}>
+            <Text style={styles.musicTitle}>ACCESSIBILITY</Text>
+          </View>
+          <Text style={styles.sessionHint}>
+            Reduce motion holds pulsing and flashing effects still. Text size follows your
+            device&apos;s system font-size setting.
+          </Text>
+
+          <View
+            style={styles.musicRow}
+            accessible
+            accessibilityRole="switch"
+            accessibilityLabel="Reduce motion"
+            accessibilityState={{ checked: reduceMotion }}
+          >
+            <Text style={styles.musicLabel}>Reduce motion</Text>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={() => setReduceMotion(!reduceMotion)}
+              style={[styles.musicToggle, reduceMotion && styles.musicToggleOn]}
+              activeOpacity={0.7}
+              accessibilityRole="switch"
+              accessibilityLabel="Reduce motion"
+              accessibilityState={{ checked: reduceMotion }}
+            >
+              <Text style={[styles.musicToggleText, reduceMotion && styles.musicToggleTextOn]}>
+                {reduceMotion ? 'ON' : 'OFF'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        )}
+
         {tab === 'sfx' && (
         <View style={styles.musicCard}>
           <View style={styles.musicHeader}>
@@ -1420,7 +1463,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sessionFootnote: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 10,
     lineHeight: 14,
     fontStyle: 'italic',
@@ -1443,14 +1486,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   musicToggleOn: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
-  musicToggleText: { color: '#7a705c', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
+  musicToggleText: { color: '#a2977b', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
   musicToggleTextOn: { color: '#13110f' },
   musicRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  musicLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1, width: 60 },
+  musicLabel: { color: '#a2977b', fontSize: 11, letterSpacing: 1, width: 60 },
   // arb85 — color-wheel row (stacked + centered, full width).
   wheelRow: { alignItems: 'center', gap: 8, marginVertical: 6 },
-  wheelLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 2, textAlign: 'center' },
-  wheelHint: { color: '#7a705c', fontSize: 10, letterSpacing: 0.5, textAlign: 'center' },
+  wheelLabel: { color: '#a2977b', fontSize: 11, letterSpacing: 2, textAlign: 'center' },
+  wheelHint: { color: '#a2977b', fontSize: 10, letterSpacing: 0.5, textAlign: 'center' },
   musicValue: { color: '#cdbf99', fontSize: 11, fontVariant: ['tabular-nums'], width: 44, textAlign: 'right' },
   applyBtn: {
     marginTop: 10,
@@ -1464,7 +1507,7 @@ const styles = StyleSheet.create({
   applyBtnFlash: { backgroundColor: '#c9a86a' },
   applyBtnText: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
   applyBtnTextFlash: { color: '#13110f' },
-  voiceNote: { color: '#7a705c', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
+  voiceNote: { color: '#a2977b', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
   voiceCycleBtn: {
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -1490,7 +1533,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   noticesVerified: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 10,
     letterSpacing: 1,
     fontStyle: 'italic',
@@ -1534,7 +1577,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   noticeCopyright: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 11,
     lineHeight: 15,
     marginTop: 4,

@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
   statusDotLive: { backgroundColor: '#9ec96a' },
   statusDotIdle: { backgroundColor: '#3a342c' },
   statusDotError: { backgroundColor: '#c97a5f' },
-  statusText: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
+  statusText: { color: '#a2977b', fontSize: 11, letterSpacing: 1 },
   input: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

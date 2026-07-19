@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   //   hints, examples, chipRow, chipScrollRow, chip, chipScene,
   //   chipText, chipTextScene, chipConsumed, chipTextConsumed,
   //   chipRequiresText — all unreferenced after the rewrite.
-  chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
+  chipLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
   // 2026-05-25 — stacked-list styles matching TakeModal so the
   // four ambient-noun modals share one visual pattern. Bounded
   // scroll height keeps long lists from blowing past the screen

@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   ruleLine: { height: 1, backgroundColor: '#3a342c', marginTop: 6 },
   body: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 12 },
   sectionLabel: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 2,
@@ -270,8 +270,8 @@ const styles = StyleSheet.create({
   },
   slotLabel: { color: '#cdbf99', fontSize: 13 },
   slotLabelSelected: { color: '#e6d8b3', fontWeight: '700' },
-  slotSub: { color: '#7a705c', fontSize: 10, marginTop: 1 },
-  emptyHint: { color: '#7a705c', fontSize: 11, padding: 10, fontStyle: 'italic' },
+  slotSub: { color: '#a2977b', fontSize: 10, marginTop: 1 },
+  emptyHint: { color: '#a2977b', fontSize: 11, padding: 10, fontStyle: 'italic' },
   input: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
   },
   headerTitle: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
-  headerStep: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
+  headerStep: { color: '#a2977b', fontSize: 11, letterSpacing: 1 },
   stepTitle: {
     color: '#e6d8b3',
     fontSize: 12,
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   optionSelected: { borderColor: '#c9a86a' },
   optionName: { color: '#e6d8b3', fontWeight: '700', fontSize: 14 },
   optionDesc: { color: '#cdbf99', fontSize: 12, marginTop: 2 },
-  optionMeta: { color: '#7a705c', fontSize: 11, marginTop: 4, letterSpacing: 0.5 },
+  optionMeta: { color: '#a2977b', fontSize: 11, marginTop: 4, letterSpacing: 0.5 },
   optionMetaSub: { color: '#c9a86a', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
   optionTraits: { marginTop: 8, paddingLeft: 6, borderLeftColor: '#3a342c', borderLeftWidth: 2 },
   optionTrait: { color: '#9ec96a', fontSize: 11, lineHeight: 16, marginBottom: 2 },
