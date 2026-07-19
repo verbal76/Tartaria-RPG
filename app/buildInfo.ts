@@ -17119,4 +17119,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Verified-clean families (no fix needed): uninterpolated placeholders, ${} in quotes, number/sign,
 // empty-interp double-spaces, pronoun/gender (dog has a pronoun system), double-words. JS/data-only;
 // ships over-the-air. Covered by attackOpenerWeapon (outcome), grammar, healBatch, stealth, contract tests.
-export const OTA_BUILD_ID = '2026-07-19-893-narration-audit-sweep';
+//
+// OTA-894 (SA-2 — reconcile "Aether" vs "Etheric" in prose) — the central magic term shipped in two
+// spellings (~1600 Aether vs ~535 Ether), used interchangeably even inside a single faction entry
+// ("Aetheric knowledge" for the Order, "Etheric Power" for the Revivalists). Canonicalised to AETHER
+// across all PLAYER-FACING PROSE — faction/race flavor, lore/glossary/concepts, hazard + weather
+// names, quest narration, location flavor, arbiter titles, and the engine prose literals (hooks storm
+// leads, the Samarran "Aetheric Engine", the "Aetherbound Survivor" title + its combat display). A
+// field-aware converter left every id/key/tag untouched (etheric_storm_burst, etherbound_survivor,
+// etc. — matched by code) and never touched the real word "ethereal". CATALOG ITEM NAMES (weapons /
+// armor / materials / relics / loot) are deliberately NOT renamed here — that's a save-migration +
+// recipe/loot-linkage change and gets its own dedicated pass. Data/string-only; ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-894-aether-prose-reconcile';

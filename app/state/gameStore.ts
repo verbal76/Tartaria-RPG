@@ -7806,7 +7806,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         void Promise.resolve().then(() => handlePlayerDeath(get, set));
         return;
       }
-      // arb45 — survived an Etheric storm tick (the kind that notches
+      // arb45 — survived an Aetheric storm tick (the kind that notches
       // corruption). Records storm-survival (+companion variant for
       // Stormcaller) and the high-water corruption mark for Survivor of
       // Aetherstone. recordTitleProgress also runs the award check.
@@ -13298,7 +13298,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           let fallShaveTag = '';
           if (tPerksFall.envHazardSaveBonus > 0 && fallDamage > 1) {
             const shave = Math.min(fallDamage - 1, tPerksFall.envHazardSaveBonus);
-            if (shave > 0) { fallDamage -= shave; fallShaveTag = ` (Etherbound Survivor absorbs ${shave})`; }
+            if (shave > 0) { fallDamage -= shave; fallShaveTag = ` (Aetherbound Survivor absorbs ${shave})`; }
           }
           const newHp = Math.max(0, player.hp - fallDamage);
           // OTA-354 — vitals at the fall, so a log review can reconstruct a
@@ -27760,7 +27760,7 @@ export function damageModClause(opts: {
   const mods: string[] = [];
   if (opts.armorFraction && opts.armorFraction > 0) mods.push(`armor −${Math.round(opts.armorFraction * 100)}%`);
   if (opts.titleHalved) mods.push('title ½');
-  else if (opts.titleShaved && opts.titleShaved > 0) mods.push(`Etherbound −${opts.titleShaved}`);
+  else if (opts.titleShaved && opts.titleShaved > 0) mods.push(`Aetherbound −${opts.titleShaved}`);
   if (opts.raceTag) mods.push(strip(opts.raceTag));
   if (opts.shield) mods.push('shield ½');
   if (opts.wardTag) mods.push(strip(opts.wardTag));

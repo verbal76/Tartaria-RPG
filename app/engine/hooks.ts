@@ -1,7 +1,7 @@
 // Narrative hook engine — turns the random "feature sightings" and "casual
 // look" plants into stateful, multi-stage chains the player can pursue.
 // Hooks are drawn from canonical Tartaria Prima lore — half-buried spires,
-// Etheric storms, Aether Golem stirrings, Black Cloak shadows, etc.
+// Aetheric storms, Aether Golem stirrings, Black Cloak shadows, etc.
 
 export type HookKind =
   // Tier-1: atmospheric finds (the originals)
@@ -126,7 +126,7 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
     { line: "A buried dome's apex breaks the surface ahead, Aetherstone-glazed and humming faintly.", nouns: ['dome', 'apex', 'roof', 'building'] },
   ],
   etheric_storm: [
-    { line: 'The horizon cracks — blue and purple lightning, an Etheric storm walking on long legs across the plain.', nouns: ['storm', 'lightning', 'sky', 'horizon'] },
+    { line: 'The horizon cracks — blue and purple lightning, an Aetheric storm walking on long legs across the plain.', nouns: ['storm', 'lightning', 'sky', 'horizon'] },
     { line: 'Static gathers in your hair. The Aether is about to break weather on this ridge.', nouns: ['storm', 'static', 'sky', 'aether'] },
   ],
   pulsing_mud: [
@@ -494,9 +494,9 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       line: 'A bolt strikes a few paces from you — the Aetherstone in the soil holds the charge, and a hand-sized shard of stormglass crystallises around the impact.',
       arbiterLine: '"That does not happen for everyone," the Arbiter says.',
       effects: [
-        { type: 'damage', amount: 3, cause: 'an Etheric backlash' },
+        { type: 'damage', amount: 3, cause: 'an Aetheric backlash' },
         { type: 'grant_item', name: 'Energy Fragment' },
-        { type: 'memo', text: 'An Etheric storm gave you a fragment instead of killing you. That counts for something here.' },
+        { type: 'memo', text: 'An Aetheric storm gave you a fragment instead of killing you. That counts for something here.' },
       ],
       done: true,
     },
