@@ -79,7 +79,7 @@
     "type": "skirmish",
     "weight": 40,
     "matchers": ["mud", "outskirts", "open", "ruin", "borderlands"],
-    "narration": "Movement low and fast — a {enemy} cuts across your path. You're closer than either of you wanted to be.",
+    "narration": "Movement low and fast — {enemy} cuts across your path. You're closer than either of you wanted to be.",
     "enemyPool": ["Gutter Rat", "Aetheric Slug", "Mud Lurker", "Aetherbat", "Bog Hound", "Mud Spider", "Silt Serpent", "Aetheric Worm", "Rust Lurker", "Scrap Drone"],
     "loot": []
   },

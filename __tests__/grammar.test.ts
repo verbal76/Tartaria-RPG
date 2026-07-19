@@ -23,6 +23,19 @@ describe('a/an indefinite article', () => {
     expect(anOrA('Epic')).toBe('an');
     expect(withArticle('Aetheric Crystal Blade')).toBe('an Aetheric Crystal Blade');
   });
+  it('audit values: hunt rarity, Eternal Dynasty faction, Aetheric enemies', () => {
+    // hunt "recommended … weapon" — 15/18 hunts are Rare/Legendary
+    expect(withArticle('Rare')).toBe('a Rare');
+    expect(withArticle('Legendary')).toBe('a Legendary');
+    expect(withArticle('Uncommon')).toBe('an Uncommon');
+    // faction world-events / patrols — only "Eternal Dynasty" is vowel-onset
+    expect(withArticleCap('Eternal Dynasty')).toBe('An Eternal Dynasty');
+    expect(withArticleCap('Mud Monarchs')).toBe('A Mud Monarchs');
+    // wasteland encounter "{enemy} cuts across your path"
+    expect(withArticle('Aetheric Slug')).toBe('an Aetheric Slug');
+    expect(withArticle('Aetherbat')).toBe('an Aetherbat');
+    expect(withArticle('Silt Serpent')).toBe('a Silt Serpent');
+  });
   it('sentence-start capitalizes the article', () => {
     expect(withArticleCap('Aetheric Raven')).toBe('An Aetheric Raven');
     expect(withArticleCap('Mud Harpy')).toBe('A Mud Harpy');

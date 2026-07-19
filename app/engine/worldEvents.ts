@@ -14,6 +14,7 @@
 // index), so the world is reproducible and testable — no Math.random here.
 
 import type { FactionMeta } from './worldPulse';
+import { withArticleCap } from './grammar';
 
 const TIDE_MIN = -5, TIDE_MAX = 5;
 const clampTide = (v: number) => Math.max(TIDE_MIN, Math.min(TIDE_MAX, v));
@@ -129,8 +130,8 @@ const EVENTS: EventDef[] = [
       const f = seededPick(ascendant(ctx).filter((x) => (ctx.tides[x.id] ?? 0) >= 2), seed)!;
       return {
         kind: 'warband',
-        rumor: `A ${f.name} warband has taken to the roads in force.`,
-        arbiter: `"A ${f.name} warband is abroad," the Arbiter warns. "That is a fight, not a patrol."`,
+        rumor: `${withArticleCap(f.name)} warband has taken to the roads in force.`,
+        arbiter: `"${withArticleCap(f.name)} warband is abroad," the Arbiter warns. "That is a fight, not a patrol."`,
         effect: { musterPatrols: { factionId: f.id, count: 2 }, tideDelta: { [f.id]: 1 } },
       };
     },
@@ -180,7 +181,7 @@ const EVENTS: EventDef[] = [
       const ally = seededPick(favored(ctx), seed)!;
       return {
         kind: 'defector',
-        rumor: `A ${ally.name} agent brought you word — they count you a friend now.`,
+        rumor: `${withArticleCap(ally.name)} agent brought you word — they count you a friend now.`,
         effect: { repDelta: { factionId: ally.id, delta: 2 } },
       };
     },
@@ -196,7 +197,7 @@ const EVENTS: EventDef[] = [
     kind: 'caravan', weight: 6, eligible: () => true,
     build: (ctx, seed) => {
       const f = seededPick(ctx.factions, seed)!;
-      return { kind: 'caravan', rumor: `A ${f.name} caravan was sighted on the trade road, heavy with goods.`, effect: {} };
+      return { kind: 'caravan', rumor: `${withArticleCap(f.name)} caravan was sighted on the trade road, heavy with goods.`, effect: {} };
     },
   },
   {

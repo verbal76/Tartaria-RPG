@@ -16337,4 +16337,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "use aetheric torch should not be under the more button." USE TORCH only appears while carrying a
 // torch, so it moved out of the MORE ▾ tray into the always-visible primary row (before the MORE
 // toggle); the menus + rarer actions stay behind MORE. UI-only; ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-871-torch-primary-button';
+// 2026-07-19 OTA-872 — narration consistency audit sweep (port of HAL OTA-893). Six-lens pass over
+// player-facing dynamic strings. Biggest: combat damage-outcome lines named the ENEMY (or "null") as
+// the weapon because they passed the parser's resolvedNoun raw — opener + outcome now share
+// swingWeaponNoun(). Plus throw "a stone"→"stone", DOT-sweep "N attackers remain" spam gated on a live
+// enemy, an indefinite-article sweep (an Rare weapon / A Eternal Dynasty patrol / a {enemy} wasteland /
+// a {scene noun} / ambient-flavor / way-forward / arrival cap), definite-article title-doubling
+// ("the The …") via theLower() across 6 quest sites + broker + echo, "burn flares"/"poison sets in"
+// capitalization, plural singular-branches ("1 turns"/"1 stacks"/boosts), and "+0 rep" suppression.
+// JS/data-only; ships over-the-air. Covered by attackOpenerWeapon + grammar tests.
+export const OTA_BUILD_ID = '2026-07-19-872-narration-audit-sweep';
