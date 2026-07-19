@@ -3428,6 +3428,15 @@ interface GameStore {
   inputModalOpen: boolean;
   setInputModalOpen: (open: boolean) => void;
 
+  /** arb-fix — the player has tapped the in-flow exploration input to type. Set
+   *  true on that field's focus; the floating KeyboardInputBar mounts on THIS
+   *  (a reliable React focus signal) instead of on a keyboard-height event, which
+   *  the New Architecture drops on Android ~half the time (the "keyboard covers
+   *  the box" bug). Cleared when the floating bar loses focus / submits / the
+   *  keyboard hides. */
+  explorationInputActive: boolean;
+  setExplorationInputActive: (active: boolean) => void;
+
   hydrate: () => Promise<void>;
   setScreen: (screen: ScreenName) => void;
 
@@ -4170,6 +4179,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   otaBootResolved: false,
   pendingInputDraft: null,
   inputModalOpen: false,
+  explorationInputActive: false,
   cognitiveModelInfo: null,
 
   qwenStatus: 'idle',
@@ -4641,6 +4651,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setInputModalOpen(open) {
     if (get().inputModalOpen !== open) set({ inputModalOpen: open });
+  },
+
+  setExplorationInputActive(active) {
+    if (get().explorationInputActive !== active) set({ explorationInputActive: active });
   },
 
   // ── Enterable buildings (arb25) ──────────────────────────────────────

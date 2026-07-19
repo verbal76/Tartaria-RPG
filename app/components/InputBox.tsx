@@ -183,6 +183,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
 
   const consumeDraft = useGameStore((s) => s.consumeInputDraft);
   const pendingDraft = useGameStore((s) => s.pendingInputDraft);
+  // arb-fix — flag the floating KeyboardInputBar to appear the instant the player
+  // taps this field. A React focus event is reliable; the keyboard-height event
+  // the bar used to mount on is dropped ~half the time on Android's New
+  // Architecture, which left the bar absent and this field covered.
+  const setExplorationInputActive = useGameStore((s) => s.setExplorationInputActive);
   const playerInt = useGameStore((s) => s.player?.stats.intelligence ?? 0);
   const tutorialStep = useGameStore((s) => s.tutorialStep);
   const awaitingTutorialName = useGameStore((s) => s.awaitingTutorialName);
@@ -675,6 +680,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             style={styles.input}
             value={text}
             onChangeText={setText}
+            onFocus={() => setExplorationInputActive(true)}
             placeholder={
               awaitingTutorialName
                 ? 'Speak your name…'

@@ -17882,4 +17882,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // victim's OWN faction is angered too when they differ. Vendor carries faction=HOST (prices,
 // buy-rep, peace-break) + nativeFaction=real identity (Enemy.nativeFactionId); kill->standing and
 // caught-theft apply to both. Runtime-verified double penalty.
-export const OTA_BUILD_ID = '2026-07-19-1158-outpost-peace-penalty';
+// 2026-07-19 OTA-1159 — floating input bar mounts on focus, not the flaky keyboard-height event
+// (port of HAL OTA-882). The floating KeyboardInputBar only mounted on a keyboard-HEIGHT event,
+// which the New Architecture drops ~half the time on Android, leaving the in-flow field covered.
+// Now mounts on a reliable React focus signal (new store flag explorationInputActive, set onFocus);
+// height only positions it (cached across opens + screen-fraction fallback). Three retract paths
+// (submit / deferred hide / deferred blur) keep it from lingering. JS-only, OTA-safe.
+export const OTA_BUILD_ID = '2026-07-19-1159-keyboard-bar-focus-mount';
