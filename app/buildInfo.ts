@@ -16999,4 +16999,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // identity (Enemy.nativeFactionId); kill→standing and caught-theft both apply to the host AND the
 // native faction when they differ. Runtime-verified: robbing hosted-Tartarian Irma at a Stone
 // Builders outpost drops Stone Builders (peace) AND True Tartarians (member) by 10 each.
-export const OTA_BUILD_ID = '2026-07-19-881-outpost-peace-penalty';
+//
+// OTA-882 (floating input bar covers the box ~half the time) — the floating
+// KeyboardInputBar mounted only when a keyboard-HEIGHT event arrived, but the New
+// Architecture (Fabric) on Android drops keyboardDidShow ~half the time, so the
+// bar stayed unmounted and the in-flow field was left covered by the keyboard.
+// Fix (JS-only, OTA-safe): mount the bar on a reliable React FOCUS signal instead
+// — the in-flow input sets worldMemory-independent store flag explorationInputActive
+// onFocus. Height now only POSITIONS the bar; it's cached across opens
+// (lastKeyboardHeight) with a screen-fraction fallback, so the bar always sits
+// just above the keyboard even when the event never lands. Three retract paths
+// (submit / deferred keyboard-hide / deferred blur) keep it from lingering. The
+// autoFocus keeps the keyboard the field already raised (never pops it unbidden).
+export const OTA_BUILD_ID = '2026-07-19-882-keyboard-bar-focus-mount';
