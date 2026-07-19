@@ -39,6 +39,7 @@ jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
+import { buildTraderEnemy } from '../app/engine/vendors';
 
 describe('arb-fix — anchor vendor faction follows the host outpost', () => {
   beforeAll(() => {
@@ -47,7 +48,7 @@ describe('arb-fix — anchor vendor faction follows the host outpost', () => {
     console.error = () => {};
   });
 
-  it("Irma spawns tagged with the player's faction, not her hard-coded true_tartarians", async () => {
+  it("Irma spawns as the HOST faction (prices/peace) but keeps her real faction as nativeFaction (victim)", async () => {
     const store = useGameStore;
     await store.getState().hydrate();
     await store.getState().startNewGame({ name: 'Builder', raceId: 'tartarian_giant', factionId: 'stone_builders' });
@@ -55,15 +56,37 @@ describe('arb-fix — anchor vendor faction follows the host outpost', () => {
 
     // Force the player into the armory anchor room and re-roll the scene until a
     // peaceful scene lands Irma in the vendor slot (combat scenes carry no vendor).
-    let irmaFaction: string | null | undefined = undefined;
-    let sawIrma = false;
+    let irma: { faction?: string | null; nativeFaction?: string | null } | undefined;
     for (let i = 0; i < 60; i++) {
       useGameStore.setState((s) => ({ player: s.player ? { ...s.player, hubRoomId: 'outpost_armory' } : s.player }));
       await store.getState().beginScene?.();
       const v = store.getState().currentScene?.vendor;
-      if (v?.name === 'Irma Ironhand') { sawIrma = true; irmaFaction = v.faction; break; }
+      if (v?.name === 'Irma Ironhand') { irma = v; break; }
     }
-    expect(sawIrma).toBe(true);
-    expect(irmaFaction).toBe('stone_builders');
+    expect(irma).toBeDefined();
+    // Host faction drives prices, buy-rep, and the peace-break penalty.
+    expect(irma!.faction).toBe('stone_builders');
+    // Her real identity is preserved so harming her also angers True Tartarians.
+    expect(irma!.nativeFaction).toBe('true_tartarians');
+  });
+
+  it('buildTraderEnemy carries BOTH the host factionId and the native (victim) faction', () => {
+    const enemy = buildTraderEnemy({
+      id: 'irma', name: 'Irma Ironhand', title: 'Heavy Armorer',
+      faction: 'stone_builders', nativeFaction: 'true_tartarians', description: '',
+      offers: [{ itemName: 'Iron Spear', price: 30 }],
+    });
+    expect(enemy.factionId).toBe('stone_builders');       // host — peace broken
+    expect(enemy.nativeFactionId).toBe('true_tartarians'); // victim's own faction
+  });
+
+  it('a vendor whose nativeFaction == faction carries no separate native id', () => {
+    const enemy = buildTraderEnemy({
+      id: 'x', name: 'Local Smith', title: '', faction: 'stone_builders',
+      nativeFaction: 'stone_builders', description: '',
+      offers: [{ itemName: 'Iron Spear', price: 30 }],
+    });
+    expect(enemy.factionId).toBe('stone_builders');
+    expect(enemy.nativeFactionId).toBeUndefined();
   });
 });

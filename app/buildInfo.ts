@@ -16273,4 +16273,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // every faction's outpost but her template hard-codes faction 'true_tartarians'; when she spawns
 // as the home-hub anchor the scene now re-points her to the HOST faction (player.factionId), so
 // pricing, buy-rep, theft, and kill-standing attribute to the faction whose outpost it is.
-export const OTA_BUILD_ID = '2026-07-19-859-anchor-vendor-host-faction';
+// 2026-07-19 OTA-860 — outpost violence is a peace-break on the host + angers the victim's own
+// faction (port of HAL OTA-881, refines OTA-859). Killing/robbing someone inside a faction's
+// outpost is a PEACE violation owed to the HOST faction (regardless of the victim), and the
+// victim's OWN faction is angered too when they differ. Vendor carries faction=HOST (prices,
+// buy-rep, peace-break) + nativeFaction=real identity (Enemy.nativeFactionId); kill->standing and
+// caught-theft apply to both. Runtime-verified double penalty.
+export const OTA_BUILD_ID = '2026-07-19-860-outpost-peace-penalty';
