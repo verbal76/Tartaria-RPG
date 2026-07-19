@@ -17021,4 +17021,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // merge them; placeless entries like collectibles sort last / show no distance). Distance =
 // Manhattan tile count via canonicalDistanceFromGrid(player.gridX/gridY, targetLocationId) with a
 // map-offset then location-to-location fallback for legacy saves. UI-only; ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-883-mission-distance-sort';
+//
+// OTA-884 (adaptive quick-action row — MORE ▾ tray) — the out-of-combat quick row had grown to a
+// wall of buttons that ate the bottom of the screen. It now keeps the world-interaction verbs
+// (look / rest / ✦ ability / investigate / take / salvage / climb) always visible, and tucks the
+// menus + rarer actions (pickpocket / craft / inventory / missions / torch / fuse) behind a single
+// MORE ▾ / less ▴ toggle. Nothing is removed — MORE is always present — so every action stays one
+// tap (or two) away and the layout no longer jumps as context changes. During the tutorial the tray
+// is force-open so each beat can still point at its control. UI-only; ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-884-adaptive-quick-row';
