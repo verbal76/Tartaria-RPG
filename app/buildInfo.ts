@@ -16256,4 +16256,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // it now categorizes as a TOOL, with the other climbing implements (ropes, treads, grapplers, the
 // "Climbing Gear" item). Worn climb cost changed 0 → 1 stamina/tier (as cheap as a Reclaimer's
 // Rope, still never wears out or snaps — just no longer free). Rest-at-altitude unchanged.
-export const OTA_BUILD_ID = '2026-07-18-857-climbing-strap-gear';
+// 2026-07-19 OTA-858 — playtest-log bugfix sweep (port of HAL OTA-879). Nine fixes: (1) STEALTH
+// init contest used the D&D (ste-10)/2 modifier on a 0–10 stat scale, making STEALTH a penalty —
+// a passed sneak check still lost and surprised the player; now uses the raw stat. (2) Title
+// re-award loop — storm titles awarded mid-action were reverted by later writebacks, re-firing
+// the banner every fog tick and never sticking; new worldMemory.earnedTitleAnnounced ledger
+// announces once and persists the perk. (3) Stormcaller's passive description was a copy of
+// Aetheric Attuned's; reworded (also halves electrical). (4) "✓ HIT" then dodge now resolves the
+// dodge first → "✗ DODGED" (melee + thrown). (5) Quest arrival/exploration stages no longer
+// auto-advance mid-combat. (6) Killing a faction vendor now shifts standing (buildTraderEnemy
+// carries the faction). (7) World-sim drift frozen during the tutorial. (8) One off-hand weapon
+// no longer shows in both hand slots. (9) Parser respects a typed enemy ordinal; duplicate surge
+// fade deduped; CAUGHT theft roll label fixed (Stealth, not DEX).
+export const OTA_BUILD_ID = '2026-07-19-858-playtest-bugfix-sweep';

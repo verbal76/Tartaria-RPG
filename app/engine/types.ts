@@ -1703,6 +1703,13 @@ export interface WorldMemory {
    *  any standing change is logged, so the brief "what is faction standing" note
    *  (appended by logRepChanges) fires exactly once per save. */
   factionRepIntroShown?: boolean;
+  /** arb-fix — announce-once ledger for earned titles. Storm titles are awarded
+   *  mid-action (weather tick); later stale-`player` writebacks in the same
+   *  action revert earnedTitles, so the "You have earned a name to carry" banner
+   *  re-fired on every fog tick and the perk never stuck. This lives on
+   *  worldMemory (which player writebacks don't clobber): awardNewTitles announces
+   *  a title only once and re-folds any ledgered title back into earnedTitles. */
+  earnedTitleAnnounced?: string[];
   /** arb-fix — one-time make-good: a faction fused item the player should
    *  have received but didn't (the pre-fix faction catalyst never counted
    *  toward the gate). Granted once per save on load for dev names; this
