@@ -10,7 +10,7 @@ import type {
   PlayerCharacter,
   WorldMemory,
 } from './types';
-import { withArticleCap } from './grammar';
+import { withArticle, withArticleCap } from './grammar';
 import { pick, chance, rotatingPick } from './rng';
 import { getNarratorName, resolveFlavor, getWorldSetting, hasLoreOverride, hasWorldLore } from './contentPack';
 import { GENERIC_VARIANTS as INVESTIGATE_GENERIC, CREEPY_VARIANTS as INVESTIGATE_CREEPY, INVESTIGATE_LORE_DEFAULT } from './investigationTable';
@@ -905,7 +905,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
       `The ${getNarratorName()} watches you and the ${n} both. "Your move."`,
       `"What you make of the ${n} is on you," the ${getNarratorName()} says.`,
       `The ${getNarratorName()} considers the ${n}. "Name your intent and I'll grade it."`,
-      `"You've got a ${n} and a question," the ${getNarratorName()} says. "Pair them."`,
+      `"You've got ${withArticle(n)} and a question," the ${getNarratorName()} says. "Pair them."`,
       `"The ${n} won't act for you," the ${getNarratorName()} says, dry. "Choose a verb."`,
       `The ${getNarratorName()} glances between you and the ${n}. "Decide while it's still yours to."`,
       `"I will know what you mean when you act on the ${n}," the ${getNarratorName()} says.`,

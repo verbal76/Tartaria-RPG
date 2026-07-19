@@ -2645,7 +2645,7 @@ function maybeSpawnRaid(
   set((st) => ({ worldMemory: { ...st.worldMemory, lastRaidHour: hour } }));
   get().appendLog(
     'world',
-    `A ${plan.raiderName} war party crests the rise — ${plan.partySize} of them, blades already out. They've marked you for standing with the ${plan.provokedAllyName}.`,
+    `${withArticleCap(plan.raiderName)} war party crests the rise — ${plan.partySize} of them, blades already out. They've marked you for standing with the ${plan.provokedAllyName}.`,
   );
   get().appendLog(
     'arbiter',
@@ -2694,7 +2694,7 @@ function maybeInterceptPatrol(
   set((st) => ({ worldMemory: { ...st.worldMemory, lastRaidHour: hour } }));
   get().appendLog(
     'world',
-    `A ${holderName} patrol works the ground near their outpost — ${partySize} of them — and spots you closing in. They move to cut you off.`,
+    `${withArticleCap(holderName)} patrol works the ground near their outpost — ${partySize} of them — and spots you closing in. They move to cut you off.`,
   );
   get().appendLog(
     'arbiter',
@@ -2745,7 +2745,7 @@ function maybePatrolAmbush(
     patrols: (st.worldMemory.patrols ?? []).filter((p) => p !== hostile),
     lastRaidHour: hour,
   } }));
-  get().appendLog('world', `A ${name} patrol crosses your path in the open — and turns toward you.`);
+  get().appendLog('world', `${withArticleCap(name)} patrol crosses your path in the open — and turns toward you.`);
   get().appendLog('arbiter', `"${name} riders," the Arbiter says. "They've marked you. No outrunning this one."`);
 }
 
@@ -6959,7 +6959,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const groups = new Map<string, number>();
         for (const e of enemies) groups.set(e.name, (groups.get(e.name) ?? 0) + 1);
         const labels = Array.from(groups.entries()).map(([n, c]) => (c > 1 ? `${c} ${n}s` : withArticle(n.toLowerCase())));
-        presenceLine = `${labels.join(' and ')} ${enemies.length === 1 ? 'is' : 'are'} already here.`;
+        // arb-fix (narration audit) — this line opens a sentence ("It's dusk. <presence>"),
+        // but the single-enemy label uses withArticle ("a raider"), so it read "It's dusk. a
+        // raider is already here." Capitalise the sentence-leading first character.
+        const rawPresence = `${labels.join(' and ')} ${enemies.length === 1 ? 'is' : 'are'} already here.`;
+        presenceLine = rawPresence.charAt(0).toUpperCase() + rawPresence.slice(1);
       } else if (vendor) {
         presenceLine = `${vendor.name} is the only soul in sight.`;
       } else {
@@ -8984,28 +8988,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // thing ("the shattered tartarian relay is already moving…"). Use resolvedNoun
           // only when it's actually a weapon the player carries; else fall back to the
           // weapon the swing ACTUALLY uses.
-          // arb-fix (playtest) — a PUNCH and an OFF-HAND swing both fell back to
-          // equipped.main here, so "punch" and "attack with the off-hand mud-fist wraps"
-          // narrated "You bring the aetheric bolt gun to bear" — the main weapon the hand
-          // isn't even holding. Honour the resolved swing: bare-hand → no weapon noun (the
-          // fists flavor), off-hand swing → the off-hand slot, otherwise the main weapon.
+          // arb-fix (playtest + narration audit) — a PUNCH and an OFF-HAND swing both used to
+          // fall back to equipped.main here, naming "the aetheric bolt gun" for a punch. Both
+          // the opener AND the damage-outcome lines now route through swingWeaponNoun() (the
+          // shared resolved-weapon → off-hand → bare-hand → main precedence), so they always
+          // agree and never name the main weapon (or the enemy) for a swing that didn't use it.
           const openerP = get().player;
-          const rNoun = parsed.resolvedNoun;
-          const rNounIsWeapon = !!rNoun && (openerP?.inventory ?? []).some(
-            (it) => it.kind === 'weapon' && it.name.toLowerCase() === rNoun.toLowerCase(),
-          );
-          // Precedence: a resolved carried weapon wins (covers "attack with the
-          // off-hand mud-fist wraps" AND "attack with the aetheric bolt gun"); then an
-          // off-hand SWING names the off-hand slot even when its noun mis-resolved; then a
-          // genuine bare-hand strike (punch/kick) drops the weapon noun for the fists
-          // flavor instead of naming the main weapon; otherwise the main weapon. Note
-          // mud-fist wraps read bareHand=true, so barehand must sit BELOW the weapon /
-          // off-hand cases or the wraps would lose their name.
-          const openerWeapon =
-            rNounIsWeapon ? rNoun
-            : offHandSwing ? (openerP?.equipped?.off ?? null)
-            : barehand ? null
-            : (openerP?.equipped?.main ?? null);
+          const openerWeapon = swingWeaponNoun(openerP, trimmed, parsed.resolvedNoun);
           get().appendLog('world', attackOpener(targetEnemy.name, coatedWeaponNoun(openerP, openerWeapon)));
         } else {
           // No enemy — the player might have meant "kick the rubble"
@@ -13238,7 +13227,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // hit rate vs all enemies including bosses).
           const ac = Math.max(5, Math.min(18, 5 + parseEnemyAP(enemyHit)));
           let hit = total >= ac;
-          const projectile = itemUsed ? itemUsed.name.toLowerCase() : 'a stone';
+          // arb-fix (narration audit) — bare noun, not "a stone": the fallback is dropped
+          // into "The ${projectile} hits" / "sidesteps the ${projectile}", so "a stone" read
+          // as "The a stone hits" / "sidesteps the a stone".
+          const projectile = itemUsed ? itemUsed.name.toLowerCase() : 'stone';
           // arb-fix — resolve the agile/quick dodge BEFORE the outcome line so a
           // connecting throw the enemy then slips reads as one verdict (✗ DODGED)
           // instead of "✓ HIT" followed by "sidesteps". Same fix as the melee path.
@@ -16379,7 +16371,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       recentNouns: collectSceneNouns(currentScene),
       enemyPresent: true,
     });
-    const weaponName = coatedWeaponNoun(player, combatParse.resolvedNoun ?? null);
+    const weaponName = coatedWeaponNoun(player, swingWeaponNoun(player, actionText, combatParse.resolvedNoun ?? null));
 
     if (initiative) {
       get().appendLog('world', initiative.success
@@ -16608,7 +16600,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const roll = Math.max(1, rollFromNotation(dtc.dice ?? '1d4'));
           if (dtc.mode === 'on_hit') {
             dmg += roll;
-            get().appendLog('combat', `${weaponType} flares — +${roll} on hit${dtMatch === 'weak' ? ' (weak — it bites deep!)' : ''}.`);
+            get().appendLog('combat', `${weaponType.charAt(0).toUpperCase()}${weaponType.slice(1)} flares — +${roll} on hit${dtMatch === 'weak' ? ' (weak — it bites deep!)' : ''}.`);
           } else {
             dtDotProc = { dmgPerTurn: roll, rounds: Math.max(1, dtc.rounds ?? 3), source: weaponType };
           }
@@ -16966,7 +16958,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             statuses[activeIdx] = list;
             return { currentScene: { ...s.currentScene, enemyStatuses: statuses } };
           });
-          get().appendLog('combat', `${p.source} sets in — ${p.dmgPerTurn}/turn for ${p.rounds} turns.`, { combatOutcome: 'player_dmg' });
+          get().appendLog('combat', `${p.source.charAt(0).toUpperCase()}${p.source.slice(1)} sets in — ${p.dmgPerTurn}/turn for ${p.rounds} turn${p.rounds === 1 ? '' : 's'}.`, { combatOutcome: 'player_dmg' });
         }
         // engine_Dev — seed the onHit "exposed" AC debuff (refresh-by-replacing any prior one).
         if (exposedProc) {
@@ -16981,7 +16973,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             statuses[activeIdx] = list;
             return { currentScene: { ...s.currentScene, enemyStatuses: statuses } };
           });
-          get().appendLog('combat', `${enemy.name} is left exposed — −${p.acPenalty} AC for ${p.rounds} turns (easier to hit).`, { combatOutcome: 'player_dmg' });
+          get().appendLog('combat', `${enemy.name} is left exposed — −${p.acPenalty} AC for ${p.rounds} turn${p.rounds === 1 ? '' : 's'} (easier to hit).`, { combatOutcome: 'player_dmg' });
         }
         // After the player's strike, every still-living enemy that ISN'T
         // knocked out counter-attacks (runEnemyGroupCounters skips KO'd).
@@ -17525,11 +17517,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // your axe back mid-fight; fleeing instead forfeits them (the scene resets).
     if (!stillFighting) resolveThrownRecovery(get, set);
     if (stillFighting) {
-      const next = remainingEnemies[nextActiveIdx]!;
-      get().appendLog(
-        'combat',
-        `${remainingEnemies.length} attacker${remainingEnemies.length > 1 ? 's' : ''} remain${remainingEnemies.length === 1 ? 's' : ''}. ${next.name} now in your sights.`,
-      );
+      // arb-fix (narration audit) — during a DOT / AoE sweep, resolveEnemyDefeat runs once
+      // per corpse and remainingEnemies still holds the not-yet-resolved dead, so this line
+      // used to fire for each corpse ("2 attackers remain. Mud Wasp now in your sights." ×3)
+      // — spam AND factually wrong (those are bodies being looted this same beat). Only
+      // announce when a LIVE enemy (hp > 0) actually remains, and count / name the living.
+      const liveRemaining = remainingEnemies.filter((_, i) => (remainingHps[i] ?? 0) > 0);
+      if (liveRemaining.length > 0) {
+        const next = liveRemaining[0]!;
+        get().appendLog(
+          'combat',
+          `${liveRemaining.length} attacker${liveRemaining.length > 1 ? 's' : ''} remain${liveRemaining.length === 1 ? 's' : ''}. ${next.name} now in your sights.`,
+        );
+      }
     }
     if (hitMilestone) {
       get().appendLog(
@@ -19252,7 +19252,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const itemSuffix = grantedNames.length > 0 ? ` + ${grantedNames.join(', ')}` : '';
     get().appendLog(
       'reward',
-      `✦ Faction contract complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}, +${payRep} rep with ${fLabel}${itemSuffix}.`,
+      `✦ Faction contract complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${payRep > 0 ? `, +${payRep} rep with ${fLabel}` : ''}${itemSuffix}.`,
     );
     // OTA-1090 — completing a faction's rapport quest unlocks Charisma-scaled
     // vendor pricing with that faction. Announce the partner's rate you've earned.
@@ -19294,7 +19294,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     get().appendLog('world', `▣ ${factionLabel} Mission Board — open postings:`);
     for (const q of pool) {
-      get().appendLog('world', `• "${q.title}" — ${q.objective} (reward: ${q.reward.tc} TC, +${q.reward.rep} rep)`);
+      get().appendLog('world', `• "${q.title}" — ${q.objective} (reward: ${q.reward.tc} TC${q.reward.rep > 0 ? `, +${q.reward.rep} rep` : ''})`);
     }
     get().appendLog(
       'arbiter',
@@ -19342,7 +19342,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         bumpQuestsAccepted(get, set);
         get().appendLog(
           'arbiter',
-          `The ${getNarratorName()} nods. "You take the ${neutralMatch.title} on. Open the Contracts board to see the stages."`,
+          `The ${getNarratorName()} nods. "You take ${theLower(neutralMatch.title)} on. Open the Contracts board to see the stages."`,
         );
         void get().persist();
         return;
@@ -19446,12 +19446,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!hpOk && !weaponOk) {
           get().appendLog(
             'arbiter',
-            `The ${getNarratorName()} looks at you straight. "This one will kill you as you are right now. Train up, gear up, or come back with friends. Recommended: ${hunt.recommendedHp} HP and an ${hunt.recommendedWeaponRarity} weapon. You sit at ${livePlayerHunt?.hp ?? '?'} HP."`,
+            `The ${getNarratorName()} looks at you straight. "This one will kill you as you are right now. Train up, gear up, or come back with friends. Recommended: ${hunt.recommendedHp} HP and ${withArticle(hunt.recommendedWeaponRarity)} weapon. You sit at ${livePlayerHunt?.hp ?? '?'} HP."`,
           );
         } else if (!hpOk || !weaponOk) {
           get().appendLog(
             'arbiter',
-            `The ${getNarratorName()} taps the table. "Going to be tight. Recommended ${hunt.recommendedHp} HP and an ${hunt.recommendedWeaponRarity} weapon. ${!hpOk ? "Your HP is short of that — " : ''}${!weaponOk ? "Your weapon's a tier below — " : ''}take a beat before you commit."`,
+            `The ${getNarratorName()} taps the table. "Going to be tight. Recommended ${hunt.recommendedHp} HP and ${withArticle(hunt.recommendedWeaponRarity)} weapon. ${!hpOk ? "Your HP is short of that — " : ''}${!weaponOk ? "Your weapon's a tier below — " : ''}take a beat before you commit."`,
           );
         }
       }
@@ -19707,7 +19707,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         bumpQuestsAccepted(get, set);
         get().appendLog(
           'arbiter',
-          `The ${getNarratorName()} nods. "You take the ${neutralMatch.title} on. Open the Contracts board to see the stages."`,
+          `The ${getNarratorName()} nods. "You take ${theLower(neutralMatch.title)} on. Open the Contracts board to see the stages."`,
         );
         void get().persist();
         return;
@@ -20376,7 +20376,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           activeHunts: (s.player.activeHunts ?? []).filter((h) => h.id !== id),
         },
       } : s));
-      get().appendLog('world', `You set the ${def.title} aside. The poster goes back in the pack, edge-creased.`);
+      get().appendLog('world', `You set ${theLower(def.title)} aside. The poster goes back in the pack, edge-creased.`);
     } else if (kind === 'mystery') {
       const def = findMysteryById(id);
       const rec = (player.activeMysteries ?? []).find((m) => m.id === id);
@@ -20387,7 +20387,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== id),
         },
       } : s));
-      get().appendLog('world', `You let the ${def.title} go. Some questions Tartaria keeps.`);
+      get().appendLog('world', `You let ${theLower(def.title)} go. Some questions Tartaria keeps.`);
     } else if (kind === 'storyline') {
       const def = findStorylineById(id);
       const rec = (player.activeStorylines ?? []).find((s) => s.id === id);
@@ -20398,7 +20398,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           activeStorylines: (s.player.activeStorylines ?? []).filter((q) => q.id !== id),
         },
       } : s));
-      get().appendLog('world', `You step away from the ${def.title} chapter. The ${getNarratorName()} doesn't argue.`);
+      get().appendLog('world', `You step away from ${theLower(def.title)} chapter. The ${getNarratorName()} doesn't argue.`);
     } else if (kind === 'whisper') {
       const rec = (player.activeWhispers ?? []).find((w) => w.id === id);
       if (!rec) return;
@@ -20430,7 +20430,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           routedMission: s.player.routedMission?.id === id ? null : s.player.routedMission,
         },
       } : s));
-      get().appendLog('world', `You hand the ${def.title} contract back to the wind. The ${getNarratorName()} shrugs.`);
+      get().appendLog('world', `You hand ${theLower(def.title)} contract back to the wind. The ${getNarratorName()} shrugs.`);
     }
     void get().persist();
   },
@@ -27561,7 +27561,7 @@ function tickEnemyDotsAndMaybeEndFight(
                         : `${enemyName} convulses — infection bleeds ${dmg}.`;
             get().appendLog(
               'combat',
-              `${tickLine} (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} turns left)`,
+              `${tickLine} (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} turn${st.turnsRemaining - 1 === 1 ? '' : 's'} left)`,
             );
             if (st.turnsRemaining - 1 > 0) {
               remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });
@@ -28818,7 +28818,7 @@ function autoSubmitReadyFactionQuests(
     const stillActive = (get().player?.activeFactionQuestIds ?? []).includes(def.id);
     if (!stillActive) {
       lines.push(`✓ ${def.title}`);
-      rewards.push(`+${def.reward.tc} TC · +${def.reward.rep} rep`);
+      rewards.push(`+${def.reward.tc} TC${def.reward.rep > 0 ? ` · +${def.reward.rep} rep` : ''}`);
     }
   }
   if (lines.length > 0) {
@@ -29455,7 +29455,7 @@ function narrateCasualLook(
   if (player) {
     const active = (player.statusEffects ?? []).filter((e) => e.kind === 'food_buff' && e.buffBonus && e.buffStat);
     if (active.length > 0) {
-      const chips = active.map((e) => `+${e.buffBonus} ${e.buffStat!.toUpperCase().slice(0, 3)} (${e.remainingRounds} turns)`);
+      const chips = active.map((e) => `+${e.buffBonus} ${e.buffStat!.toUpperCase().slice(0, 3)} (${e.remainingRounds} turn${e.remainingRounds === 1 ? '' : 's'})`);
       parts.push(`Active boosts: ${chips.join(' · ')}.`);
     }
   }
@@ -29671,9 +29671,9 @@ function narratePossibleDirections(
   const humanizeType = (t: string | undefined): string =>
     (t ?? 'path').toLowerCase().replace(/_/g, ' ');
   const fragments: string[] = [];
-  fragments.push(`a ${humanizeType(first.type)} toward ${first.name}`);
+  fragments.push(`${withArticle(humanizeType(first.type))} toward ${first.name}`);
   if (second && second.id !== first.id) {
-    fragments.push(`a ${humanizeType(second.type)} toward ${second.name}`);
+    fragments.push(`${withArticle(humanizeType(second.type))} toward ${second.name}`);
   }
   get().appendLog('world', `You look for a way forward. The ${getNarratorName()} notes ${fragments.join(' and ')}.`);
   markPathExhausted();
@@ -30223,7 +30223,7 @@ function handleSidekickCommand(
       const extra = coatingFamily(golemCoatProc.kind) === 'acid'
         ? ` Its guard pits — easier to hit now (−${ACID_SHRED_PER_HIT} AC, ${total} total).`
         : coatingFamily(golemCoatProc.kind) === 'corruption'
-          ? ` The rot deepens (${get().currentScene?.enemyCorruptionStacks?.[targetIdx] ?? 1} stacks).`
+          ? ` The rot deepens (${get().currentScene?.enemyCorruptionStacks?.[targetIdx] ?? 1} stack${(get().currentScene?.enemyCorruptionStacks?.[targetIdx] ?? 1) === 1 ? '' : 's'}).`
           : '';
       get().appendLog(
         'combat',
@@ -32008,6 +32008,29 @@ function coatedWeaponNoun(
   );
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   return inst ? (require('../engine/weaponCoating').coatedDisplayName(inst) as string) : resolvedNoun;
+}
+
+/** arb-fix (narration audit) — resolve the weapon NOUN a swing actually uses, so the
+ *  pre-swing opener AND the damage-outcome lines agree and never fall back to a wrong
+ *  slot. Precedence: a resolved CARRIED weapon wins (covers "attack with the off-hand
+ *  mud-fist wraps" and "…with the aetheric bolt gun"), then an off-hand swing names the
+ *  off-hand slot, then a genuine bare-hand strike drops the noun (fists flavor),
+ *  otherwise the main weapon. The damage path used to pass parsed.resolvedNoun raw — but
+ *  the parser resolves the typed target to the ENEMY, so hit/miss/kill/knockout lines
+ *  named the enemy (or literal "null") as the weapon on every natural attack command. */
+function swingWeaponNoun(
+  player: PlayerCharacter | null | undefined,
+  actionText: string,
+  resolvedNoun: string | null | undefined,
+): string | null {
+  const rNoun = resolvedNoun ?? null;
+  const rNounIsWeapon = !!rNoun && (player?.inventory ?? []).some(
+    (it) => it.kind === 'weapon' && it.name.toLowerCase() === rNoun.toLowerCase(),
+  );
+  if (rNounIsWeapon) return rNoun;
+  if (/\boff[- ]?hand\b/i.test(actionText)) return player?.equipped?.off ?? null;
+  if (isBareHandAttack(actionText)) return null;
+  return player?.equipped?.main ?? null;
 }
 
 function weaponPhrase(weapon: string | null): string {

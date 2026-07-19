@@ -22,6 +22,7 @@
 import data from '../data/world/wasteland_encounters.json';
 import type { Location, Rarity } from './types';
 import { getWastelandOverride, getGenericWasteland } from './contentPack';
+import { withArticle } from './grammar';
 
 /** engine_Dev — wasteland loot. For encounter-ONLY items (not in any table), the
  *  optional stat fields give them real stats inline instead of relying on the
@@ -240,7 +241,7 @@ export function pickWastelandEncounter(
           ? archetype.bandit_pool[Math.floor(rng() * archetype.bandit_pool.length)] ?? null
           : null;
       let narration = archetype.narration;
-      if (enemyName) narration = narration.replace(/\{enemy\}/g, enemyName);
+      if (enemyName) narration = narration.replace(/\{enemy\}/g, withArticle(enemyName));
       const npcLine = (archetype.npc_lines && archetype.npc_lines.length > 0)
         ? archetype.npc_lines[Math.floor(rng() * archetype.npc_lines.length)] ?? null
         : null;
@@ -339,7 +340,7 @@ export function pickWastelandEncounter(
 
   // Narration — substitute {enemy} when present and we have one.
   let narration = archetype.narration;
-  if (enemyName) narration = narration.replace(/\{enemy\}/g, enemyName);
+  if (enemyName) narration = narration.replace(/\{enemy\}/g, withArticle(enemyName));
 
   const npcLine = (archetype.npc_lines && archetype.npc_lines.length > 0)
     ? archetype.npc_lines[Math.floor(rng() * archetype.npc_lines.length)] ?? null

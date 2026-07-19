@@ -12,6 +12,7 @@ import { findFaction } from '../engine/factions';
 import { startingLocationForFaction } from '../engine/character';
 import { getLocationById } from '../engine/encounter';
 import { missionObjectiveLocationId } from '../engine/missionRouting';
+import { theLower } from '../engine/grammar';
 import { computeAllProgress, getCharacterStories, allFragments } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
@@ -959,7 +960,7 @@ export function ContractsScreen() {
                         ))}
                         <Text style={styles.expandedLabel}>Reward</Text>
                         <Text style={styles.expandedBody}>
-                          {def.rewardTc} TC · +{def.rewardRep} rep with {factionLabel(def.factionId)}
+                          {def.rewardTc} TC{def.rewardRep > 0 ? ` · +${def.rewardRep} rep with ${factionLabel(def.factionId)}` : ''}
                         </Text>
                       </View>
                     )}
@@ -1116,7 +1117,7 @@ export function ContractsScreen() {
                         )}
                         <Text style={styles.expandedLabel}>Reward</Text>
                         <Text style={styles.expandedBody}>
-                          {def.reward.tc} TC · +{def.reward.rep} rep with {factionLabel(def.factionId)}
+                          {def.reward.tc} TC{def.reward.rep > 0 ? ` · +${def.reward.rep} rep with ${factionLabel(def.factionId)}` : ''}
                         </Text>
                         <Text style={styles.expandedLabel}>How to finish</Text>
                         <Text style={styles.expandedBody}>
@@ -1222,7 +1223,7 @@ export function ContractsScreen() {
                         </Pressable>
                       )}
                       {!inHand && here && (
-                        <Text style={styles.routeHereNote}>▸ You're here — recover the {l.itemName}.</Text>
+                        <Text style={styles.routeHereNote}>▸ You're here — recover {theLower(l.itemName)}.</Text>
                       )}
                     </View>
                   );
