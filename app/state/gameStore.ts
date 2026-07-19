@@ -5920,7 +5920,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const offers = facOffers.length > 0
           ? [...base.offers, ...facOffers.filter((o) => !have.has(o.itemName))]
           : base.offers;
-        return { ...base, faction: player.factionId, offers };
+        // faction → HOST (prices, buy-rep, and the peace-break penalty for
+        // fighting in their outpost). nativeFaction → who she actually is (a
+        // hosted guest), so harming her also angers HER faction, not just the host.
+        return { ...base, faction: player.factionId, nativeFaction: base.faction, offers };
       }
       return base;
     })();
@@ -17515,22 +17518,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // faction), and their strongest rival takes note in your favor (+1). Choosing
     // a side is a real allegiance, not a free-for-all. Gated on a real factionId
     // and NOT a neutral/rescue fight.
-    if (enemy.factionId && !enemy.factionNeutralFight) {
+    // arb-fix — a kill angers the victim's faction(s) and pleases each one's
+    // strongest rival. enemy.factionId is the HOST faction for an outpost anchor
+    // vendor (you broke their peace by fighting in their outpost); when
+    // enemy.nativeFactionId differs, that's the victim's OWN faction (a hosted
+    // guest, e.g. Irma the True Tartarian) — angered too for the harm to their
+    // member. Deltas accumulate so a faction that is both offended AND another
+    // victim's rival nets out sensibly.
+    const killFactionTargets = [enemy.factionId, enemy.nativeFactionId]
+      .filter((f): f is string => !!f)
+      .filter((f, i, arr) => arr.indexOf(f) === i);
+    if (killFactionTargets.length > 0 && !enemy.factionNeutralFight) {
       const killer = get().player;
       if (killer) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const facData = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { strongestRivalOf } = require('../engine/worldPulse') as typeof import('../engine/worldPulse');
-        const rivalId = strongestRivalOf(facData, enemy.factionId, killer.factionStanding);
         // Honor the design pick "down with them, up with rivals" — NOT the ally
-        // cascade applyRepChange() bakes in — with a local clamped update to just
-        // the two rows. Only touch/report factions the player already tracks.
+        // cascade applyRepChange() bakes in — with a local clamped update. Only
+        // touch/report factions the player already tracks.
         const KILL_REP = -3, RIVAL_REP = 1;
+        const deltaById = new Map<string, number>();
+        for (const fid of killFactionTargets) {
+          deltaById.set(fid, (deltaById.get(fid) ?? 0) + KILL_REP);
+          const rivalId = strongestRivalOf(facData, fid, killer.factionStanding);
+          if (rivalId) deltaById.set(rivalId, (deltaById.get(rivalId) ?? 0) + RIVAL_REP);
+        }
         const changed: { factionId: string; delta: number; newStanding: number }[] = [];
         const nextStanding = killer.factionStanding.map((row) => {
-          const raw = row.factionId === enemy.factionId ? KILL_REP
-            : (rivalId && row.factionId === rivalId) ? RIVAL_REP : 0;
+          const raw = deltaById.get(row.factionId) ?? 0;
           if (raw === 0) return row;
           const ns = Math.max(-100, Math.min(100, row.standing + raw));
           const realDelta = ns - row.standing;
@@ -18365,10 +18382,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Spin up an Enemy scaled to the vendor's tier and clear the
       // vendor slot. Faction-aligned vendors also tank rep on
       // detection.
+      // arb-fix — a caught theft in an outpost angers the HOST faction (you broke
+      // their peace / abused their protection) AND, when the vendor is a hosted
+      // guest whose own faction differs, THAT faction too (you tried to rob their
+      // member). applyRepChange cascades ally/rival for each; net the deltas from
+      // the original standing so a shared ally/rival isn't double-counted or
+      // double-logged.
       const vendorFaction = scene.vendor.faction;
-      const repResult = vendorFaction
-        ? applyRepChange(player.factionStanding, vendorFaction, -10)
-        : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+      const nativeFaction = scene.vendor.nativeFaction;
+      const origById = new Map(player.factionStanding.map((r) => [r.factionId, r.standing] as const));
+      let repStanding = player.factionStanding;
+      if (vendorFaction) repStanding = applyRepChange(repStanding, vendorFaction, -10).standing;
+      if (nativeFaction && nativeFaction !== vendorFaction) {
+        repStanding = applyRepChange(repStanding, nativeFaction, -10).standing;
+      }
+      const repResult = {
+        standing: repStanding,
+        changed: repStanding
+          .map((r) => ({ factionId: r.factionId, delta: r.standing - (origById.get(r.factionId) ?? r.standing), newStanding: r.standing }))
+          .filter((c) => c.delta !== 0),
+      };
       const enemy = buildTraderEnemy(scene.vendor);
       set((s) =>
         s.player && s.currentScene

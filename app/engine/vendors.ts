@@ -138,6 +138,12 @@ export interface VendorInstance {
   name: string;
   title: string;
   faction: string | null;
+  /** arb-fix — the vendor's OWN faction, when it differs from `faction`. For an
+   *  outpost anchor re-skinned into another faction's outpost, `faction` is the
+   *  HOST (drives prices, buy-rep, and the peace-break penalty) while
+   *  `nativeFaction` is who the vendor actually is (drives the "you harmed our
+   *  member" penalty on theft/kill). Unset when the vendor belongs to their host. */
+  nativeFaction?: string | null;
   description: string;
   offers: VendorOffer[];
   voiceId?: string;
@@ -704,6 +710,12 @@ export function buildTraderEnemy(vendor: VendorInstance): Enemy {
   // vendor was consequence-free). Roadside traders with no faction stay
   // undefined → no standing change, same as before.
   const factionId = vendor.faction ?? undefined;
+  // arb-fix — carry the vendor's OWN faction too (when a hosted guest differs from
+  // the host), so killing them also angers their own faction, not just the host
+  // whose peace was broken.
+  const nativeFactionId = vendor.nativeFaction && vendor.nativeFaction !== vendor.faction
+    ? vendor.nativeFaction
+    : undefined;
   if (tier === 'sketchy') {
     return {
       name: vendor.name,
@@ -716,6 +728,7 @@ export function buildTraderEnemy(vendor: VendorInstance): Enemy {
       loot,
       traits: ['quick', 'ambush_strike'],
       factionId,
+      nativeFactionId,
     };
   }
   if (tier === 'honest') {
@@ -729,6 +742,7 @@ export function buildTraderEnemy(vendor: VendorInstance): Enemy {
       rarity: 'Common',
       loot,
       factionId,
+      nativeFactionId,
     };
   }
   // Hub vendor — established merchant with help nearby.
@@ -743,6 +757,7 @@ export function buildTraderEnemy(vendor: VendorInstance): Enemy {
     loot,
     traits: ['armored'],
     factionId,
+    nativeFactionId,
   };
 }
 
