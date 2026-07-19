@@ -1,0 +1,81 @@
+name: CI
+
+# Quality gate for the JS/TS bundle — the thing that ships over-the-air to players.
+# The repo had NINE build/keystore/cert workflows but ZERO that ran tsc/jest, so a
+# whole class of regressions (and 201 test-fixture type errors) accumulated unseen.
+# This adds the missing gate:
+#   • typecheck (source)  — HARD BLOCK. app/ is strict-clean; any regression fails CI.
+#   • typecheck (tests)   — RATCHET. the pre-existing test-fixture debt is frozen at a
+#                            committed baseline; new/edited tests must typecheck (the
+#                            count can only shrink, never grow).
+#   • lint                — reported (non-blocking for now; flip to blocking once clean).
+#   • test                — jest, reported (non-blocking for now; flip once the known
+#                            failing suites are triaged).
+# Keeping the source typecheck + test ratchet as the required checks makes the gate
+# green on arrival while still stopping the exact silent-decay the audit flagged.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck-source:
+    name: typecheck (source · required)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Typecheck shipped source (strict, must be clean)
+        run: npm run typecheck:ci
+
+  typecheck-tests:
+    name: typecheck (tests · ratchet)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Ratchet — test typecheck errors may not grow past the baseline
+        run: npm run typecheck:tests
+
+  lint:
+    name: lint (reported)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint
+
+  test:
+    name: jest (reported)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm ci --no-audit --no-fund
+      - name: Run test suite
+        run: npm run test:ci -- --reporters=default
