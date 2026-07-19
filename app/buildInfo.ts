@@ -17130,4 +17130,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // etc. — matched by code) and never touched the real word "ethereal". CATALOG ITEM NAMES (weapons /
 // armor / materials / relics / loot) are deliberately NOT renamed here — that's a save-migration +
 // recipe/loot-linkage change and gets its own dedicated pass. Data/string-only; ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-894-aether-prose-reconcile';
+//
+// OTA-895 (SA-3 — re-tier contract rewards to a monotone formula) — the contract board had
+// reward/difficulty inversions (a tier-2 hunt paying more than a tier-3, a high-rep-gated mystery
+// paying less than an open one) that made the economy read as noise. Re-tiered on a monotone
+// formula: HUNTS pay by difficultyTier in non-overlapping bands (tier2 = 400, tier3 = 700-780,
+// tier4 = 1000-1080; a small id-hashed nudge stays inside the band so payouts stay distinct but
+// never cross a tier line). MYSTERIES are floored at 300 TC and their rep gate now RISES with the
+// reward (kills the "high gate / low reward" inversions). Crucially, only FACTION-POSTED contracts
+// gate on standing: acceptHunt/acceptMystery compute playerRep=0 for a null-faction ("open
+// contract") vendor, so a rep gate on an open contract was either unreachable via a faction vendor
+// or silently bypassed on the road — a self-contradicting gate. Open contracts now stay open (their
+// elevated tier-4 reward still reflects the difficulty); the two faction-posted tier-4 hunts and the
+// faction mysteries keep their standing gate. Each posterText's inline "N TC" prose was kept in sync
+// with the new reward. Data-only (hunts.json + mysteries.json); ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-895-contract-retier';
