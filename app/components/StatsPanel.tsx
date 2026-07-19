@@ -8,6 +8,7 @@ import { ARMOR_SLOTS, effectiveStats, displayStaminaMax } from '../engine/equipm
 import { formatEffectSummary } from '../engine/statusEffects';
 import { getCorruptionName } from '../engine/contentPack';
 import { findFactionQuestById } from '../engine/factionQuests';
+import { useReduceMotion } from '../state/accessibility';
 import { livingEscortPools } from '../engine/escort';
 
 // OTA-214 — Aetheric Vision Lens active indicator. Pure presence
@@ -144,7 +145,15 @@ export function StatsPanel({ player, fill }: Props) {
   const animFrac = React.useRef(new Animated.Value(hpFrac)).current;
   const pulse = React.useRef(new Animated.Value(0)).current;
   const prevHp = React.useRef(player.hp);
+  // OTA-1172 (SA-6) — reduce-motion: snap the HP bar and skip the damage flash.
+  const reduceMotion = useReduceMotion();
   React.useEffect(() => {
+    if (reduceMotion) {
+      animFrac.setValue(hpFrac);
+      pulse.setValue(0);
+      prevHp.current = player.hp;
+      return;
+    }
     Animated.timing(animFrac, { toValue: hpFrac, duration: HP_FADE_MS, useNativeDriver: false }).start();
     if (player.hp < prevHp.current) {
       pulse.stopAnimation();
@@ -156,7 +165,7 @@ export function StatsPanel({ player, fill }: Props) {
     }
     prevHp.current = player.hp;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [player.hp, player.hpMax]);
+  }, [player.hp, player.hpMax, reduceMotion]);
   // Card background follows the animated fraction across the full gradient.
   const animBg = React.useMemo(
     () => animFrac.interpolate({

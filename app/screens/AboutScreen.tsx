@@ -22,6 +22,7 @@ import {
 } from '../ui/displaySettings';
 import { LoreCodexBody } from '../components/LoreCodexBody';
 import { useHintsDisabled, setHintsDisabled, resetAllFirstTimeHints } from '../components/useFirstTimeHint';
+import { useAccessibility } from '../state/accessibility';
 import { THIRD_PARTY_NOTICES, NOTICES_PREAMBLE, NOTICES_VERIFIED_AT } from '../data/thirdPartyNotices';
 import {
   flushLogWrites,
@@ -112,6 +113,9 @@ export function AboutScreen() {
   }, [devMode, tab]);
   // OTA-860 — global first-time-tips kill-switch (per-install, reactive).
   const hintsDisabled = useHintsDisabled();
+  // OTA-1172 (SA-6) — device reduce-motion preference (reactive).
+  const reduceMotion = useAccessibility((s) => s.reduceMotion);
+  const setReduceMotion = useAccessibility((s) => s.setReduceMotion);
   const [tipsReset, setTipsReset] = useState(false);
   // arb78 — player-tunable background settings (live).
   const [display, setDisplay] = useState<DisplaySettings>(() => getDisplaySettings());
@@ -910,6 +914,44 @@ export function AboutScreen() {
           >
             <Text style={styles.sessionBtnSecondaryText}>{tipsReset ? 'TIPS RESET ✓' : 'SHOW ALL TIPS AGAIN'}</Text>
           </TouchableOpacity>
+        </View>
+        )}
+
+        {/* OTA-1172 (SA-6) — ACCESSIBILITY: reduce motion holds the UI's looping /
+            flashing animations static. Text size follows the OS font-size setting
+            (allowFontScaling is never disabled), so it isn't duplicated here. */}
+        {tab === 'display' && (
+        <View style={styles.musicCard}>
+          <View style={styles.musicHeader}>
+            <Text style={styles.musicTitle}>ACCESSIBILITY</Text>
+          </View>
+          <Text style={styles.sessionHint}>
+            Reduce motion holds pulsing and flashing effects still. Text size follows your
+            device&apos;s system font-size setting.
+          </Text>
+
+          <View
+            style={styles.musicRow}
+            accessible
+            accessibilityRole="switch"
+            accessibilityLabel="Reduce motion"
+            accessibilityState={{ checked: reduceMotion }}
+          >
+            <Text style={styles.musicLabel}>Reduce motion</Text>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={() => setReduceMotion(!reduceMotion)}
+              style={[styles.musicToggle, reduceMotion && styles.musicToggleOn]}
+              activeOpacity={0.7}
+              accessibilityRole="switch"
+              accessibilityLabel="Reduce motion"
+              accessibilityState={{ checked: reduceMotion }}
+            >
+              <Text style={[styles.musicToggleText, reduceMotion && styles.musicToggleTextOn]}>
+                {reduceMotion ? 'ON' : 'OFF'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
         )}
 

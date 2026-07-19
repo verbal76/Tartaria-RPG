@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   grudgeText: { color: '#bcd2db', fontSize: 12 },
   grudgeTag: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
   // OTA-867 — sub-headers splitting the grudges list from the alliances list.
-  relHead: { color: '#7a705c', fontSize: 10, fontWeight: '800', letterSpacing: 2, marginBottom: 4 },
+  relHead: { color: '#a2977b', fontSize: 10, fontWeight: '800', letterSpacing: 2, marginBottom: 4 },
   rumorRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingVertical: 4 },
   rumorGlyph: { fontSize: 12, width: 18, textAlign: 'center' },
   rumorText: { color: '#bcd2db', fontSize: 12, lineHeight: 17, flex: 1 },

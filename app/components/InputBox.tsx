@@ -17,6 +17,7 @@ import { visibleBuildingRooms } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS } from './tutorialSteps';
 import { useGameStore } from '../state/gameStore';
+import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, isLeaveHubCommand, roomHasWorldExit, hubDefinesWorldExit } from '../engine/hub';
 import { STARTING_AREA_WORLD_EXIT } from '../engine/contentPack';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
@@ -245,9 +246,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // has `inputPulse: true` (name beat + rope beat). Pulses a border
   // colour animation; same Animated pattern as TutorialTarget.
   const inputPulse = currentTutStep?.inputPulse === true;
+  // OTA-1172 (SA-6) — reduce-motion holds the tutorial input cue as a STATIC
+  // highlight instead of a looping pulse.
+  const reduceMotion = useReduceMotion();
   const pulse = useRef(new Animated.Value(0)).current;
   useEffect(() => {
-    if (!inputPulse) {
+    if (!inputPulse || reduceMotion) {
       pulse.stopAnimation();
       pulse.setValue(0);
       return;
@@ -260,9 +264,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     );
     loop.start();
     return () => { loop.stop(); };
-  }, [inputPulse, pulse]);
+  }, [inputPulse, reduceMotion, pulse]);
   const inputBorderColor = inputPulse
-    ? pulse.interpolate({ inputRange: [0, 1], outputRange: ['#6ab0c9', '#ffe28a'] })
+    ? (reduceMotion
+        ? '#ffe28a'  // static highlight — no motion, still clearly cued
+        : pulse.interpolate({ inputRange: [0, 1], outputRange: ['#6ab0c9', '#ffe28a'] }))
     : '#2b3a3e';
 
   const handleSubmit = () => {
@@ -801,7 +807,14 @@ function QuickBtn({
     onPress();
   };
   return (
-    <TouchableOpacity style={containerStyle} onPress={handlePress}>
+    // OTA-1172 (SA-6) — screen-reader support for the quick-action chips.
+    <TouchableOpacity
+      style={containerStyle}
+      onPress={handlePress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: !!blocked }}
+    >
       <Text style={textStyle}>{label.toUpperCase()}</Text>
     </TouchableOpacity>
   );
@@ -821,6 +834,9 @@ function TravelBtn({ label, onPress, blocked, active }: { label: string; onPress
       style={[styles.travelBtn, isDestination && styles.travelBtnDest, blocked && styles.travelBtnBlocked, active && styles.travelBtnActive]}
       onPress={handlePress}
       activeOpacity={blocked ? 1 : 0.7}
+      accessibilityRole="button"
+      accessibilityLabel={`${isDestination ? 'Travel to ' : ''}${label.replace(/^→\s*/, '')}${active ? ', current course' : ''}`}
+      accessibilityState={{ disabled: !!blocked, selected: !!active }}
     >
       <Text
         style={[styles.travelBtnText, isDestination && styles.travelBtnTextDest, active && styles.travelBtnTextActive]}

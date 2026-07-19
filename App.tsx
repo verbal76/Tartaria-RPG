@@ -8,6 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 // require returns null on those builds; the effect no-ops.
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGameStore } from './app/state/gameStore';
+import { useAccessibility } from './app/state/accessibility';
 import {
   loadMLHealth,
   shouldAttemptMLInit,
@@ -182,6 +183,12 @@ export default function App() {
   // Wordscapes / most full-screen games: gain the system bar real
   // estate, swipe up from the bottom (or down from the top) to peek
   // them back when needed. No-op on iOS.
+  // OTA-1172 (SA-6) — load device accessibility prefs (reduce-motion) once at
+  // boot, off the game-save path.
+  useEffect(() => {
+    void useAccessibility.getState().hydrateAccessibility();
+  }, []);
+
   useEffect(() => {
     if (Platform.OS !== 'android') return;
     const NB = loadNavigationBar();

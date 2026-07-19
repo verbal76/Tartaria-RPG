@@ -670,7 +670,7 @@ export function ContractsScreen() {
                 const timerColor = tier === 'ok' ? '#9ec96a'
                   : tier === 'warn' ? '#d9b45f'
                   : tier === 'crit' || tier === 'lapsed' ? '#e07a5f'
-                  : '#7a705c';
+                  : '#a2977b';
                 const timerLabel = !hasClock ? 'no deadline'
                   : lapsed ? '⏳ LAPSED'
                   : `⏳ ${Math.ceil(left)}h left`;
@@ -1821,7 +1821,7 @@ const styles = StyleSheet.create({
   sortBarPressed: { opacity: 0.7 },
   sortBarText: { color: '#cdbf99', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
   sortBarTextOn: { color: '#7fb0a8' },
-  sortBarHint: { color: '#7a705c', fontSize: 9, letterSpacing: 0.5, marginTop: 2 },
+  sortBarHint: { color: '#a2977b', fontSize: 9, letterSpacing: 0.5, marginTop: 2 },
   // arb-fix — the Primary Objective box's header row (title + compact sort button).
   mqTrackerHeadRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   mqSortBtn: {

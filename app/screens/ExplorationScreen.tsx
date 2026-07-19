@@ -1976,7 +1976,7 @@ export function ExplorationScreen() {
 const styles = StyleSheet.create({
   // OTA-841 [did-you-mean] — tappable disambiguation chip row above the input.
   didYouMeanRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, paddingHorizontal: 4, paddingBottom: 4 },
-  didYouMeanLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1, fontStyle: 'italic' },
+  didYouMeanLabel: { color: '#a2977b', fontSize: 11, letterSpacing: 1, fontStyle: 'italic' },
   didYouMeanChip: { backgroundColor: '#1a1714', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, paddingHorizontal: 10, paddingVertical: 6 },
   didYouMeanChipText: { color: '#e6d8b3', fontSize: 12, letterSpacing: 0.5 },
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.

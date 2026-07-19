@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   catBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1c1813', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 10, marginBottom: 6, marginTop: 4 },
   catChevron: { color: '#cdbf99', fontSize: 12, width: 18 },
   catLabel: { color: '#cdbf99', fontSize: 12, fontWeight: '700', letterSpacing: 2, flex: 1 },
-  catCount: { color: '#7a705c', fontSize: 11 },
+  catCount: { color: '#a2977b', fontSize: 11 },
   recipeRow: {
     flexDirection: 'row',
     backgroundColor: '#0e1618',
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   recipeIngLabel: { color: '#6c8088' },
   recipeIngHave: { color: '#9ec96a', fontWeight: '600' },
   recipeIngShort: { color: '#e07a5f', fontWeight: '600' },
-  recipeIngShortNote: { color: '#7a705c' },
+  recipeIngShortNote: { color: '#a2977b' },
   recipeMissing: { color: '#e07a5f', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeCta: { color: '#9ec96a', fontSize: 10, marginTop: 6, fontStyle: 'italic', letterSpacing: 1 },
   empty: { color: '#6c8088', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
