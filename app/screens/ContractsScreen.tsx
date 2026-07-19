@@ -18,6 +18,7 @@ import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMark
 import { openContractMarkers } from '../engine/contractMarkers';
 import { missionLegs } from '../engine/broker';
 import { carriedSigils } from '../engine/sigils';
+import { canonicalDistanceFromGrid, canonicalDistanceFromPlayer, canonicalDistance } from '../engine/worldMap';
 import {
   ensureMainQuest,
   phaseLabel,
@@ -100,6 +101,13 @@ export function ContractsScreen() {
   // 2026-05-25 — branded refusal modal for hub-room gate. Same
   // palette as the rest of the game; replaces native Alert.alert.
   const [tab, setTab] = useState<Tab>('contracts');
+  // arb-fix — SORT BY DISTANCE. When on, each mission section (and the Primary
+  // Objective's 9-Capital list) is ordered by how many MOVES it is to its target,
+  // nearest first — but sections stay grouped by TYPE (we only sort WITHIN each
+  // list, never merge them). One flag drives both the main screen toggle and the
+  // toggle inside the expanded Primary Objective box. Local state (view option),
+  // matching the screen's other toggles; not persisted.
+  const [sortByDistance, setSortByDistance] = useState(false);
   // OTA-606 — honor a deep-link tab request (e.g. the first-collectible popup
   // wants the Collectibles tab, not the default Contracts tab). Apply it once
   // on entry, then clear it so a later normal open lands on the default.
@@ -177,6 +185,49 @@ export function ContractsScreen() {
       </Pressable>
     );
   };
+  // arb-fix — DISTANCE (in MOVES = tiles) from the player to a mission's target
+  // location. player.gridX/gridY is the warp-proof absolute canon cell; fall back
+  // to the current-location + in-transit offset for legacy saves with no grid cell.
+  // Returns null when there's no target (placeless missions → no distance shown).
+  const movesTo = (locId: string | null | undefined): number | null => {
+    if (!locId || !player) return null;
+    let n: number;
+    if (typeof player.gridX === 'number' && typeof player.gridY === 'number') {
+      n = canonicalDistanceFromGrid(player.gridX, player.gridY, locId);
+    } else if (typeof player.mapX === 'number' && typeof player.mapY === 'number') {
+      n = canonicalDistanceFromPlayer(player.currentLocationId, player.mapX, player.mapY, locId);
+    } else {
+      n = canonicalDistance(player.currentLocationId, locId);
+    }
+    return Number.isFinite(n) ? n : null;
+  };
+  const movesLabel = (n: number): string =>
+    n <= 0 ? 'you are here' : n === 1 ? '1 move away' : `${n} moves away`;
+  // The marker anchor location id for a card whose place comes from the contract
+  // marker table (hunt / mystery / storyline / faction / lead). Direct-field types
+  // (bounty / whisper / broker leg / sigil) pass their own id to movesLine/movesTo.
+  const markerLocId = (toggleKey: string): string | null => {
+    const ck = toContractKey(toggleKey);
+    return (ck && contractMarkerByKey[ck]?.anchorId) || null;
+  };
+  // The "◈ N moves away" line shown under a card's location (or null when unknown).
+  const movesLine = (locId: string | null | undefined) => {
+    const m = movesTo(locId);
+    if (m === null) return null;
+    return <Text style={styles.cardMoves}>◈ {movesLabel(m)}</Text>;
+  };
+  // Sort a section's list by distance (nearest first) WHEN sortByDistance is on,
+  // else leave the order untouched. Placeless entries (null) sort last. Sections
+  // are never merged — this only reorders within one type, keeping the grouping.
+  const byMoves = <T,>(arr: readonly T[], locOf: (t: T) => string | null | undefined): T[] => {
+    if (!sortByDistance) return arr as T[];
+    const key = (t: T) => {
+      const m = movesTo(locOf(t));
+      return m === null ? Number.POSITIVE_INFINITY : m;
+    };
+    return [...arr].sort((a, b) => key(a) - key(b));
+  };
+
   // Uniform ACTIVATE / DEACTIVATE (pause) toggle for any contract kind, mirroring
   // the faction-quest button. `tracked` = currently active. Deactivating parks the
   // contract (⏸ PAUSED) without dropping it; ABANDON is the separate destructive drop.
@@ -385,13 +436,34 @@ export function ContractsScreen() {
             )}
             {mqExpanded && (
               <View style={styles.mqTracker}>
-                <Text style={styles.mqTrackerHead}>9 CAPITALS · {recoveredCount}/9 CORES</Text>
+                <View style={styles.mqTrackerHeadRow}>
+                  <Text style={styles.mqTrackerHead}>9 CAPITALS · {recoveredCount}/9 CORES</Text>
+                  {/* arb-fix — same SORT BY DISTANCE toggle, here for the Capital list.
+                      Reorders the 9 Capitals nearest-first (finished ones sink). */}
+                  <Pressable
+                    onPress={() => setSortByDistance((v) => !v)}
+                    hitSlop={6}
+                    style={({ pressed }) => [styles.mqSortBtn, sortByDistance && styles.mqSortBtnOn, pressed && styles.sortBarPressed]}
+                  >
+                    <Text style={[styles.mqSortText, sortByDistance && styles.sortBarTextOn]}>
+                      ◈ {sortByDistance ? 'BY DISTANCE' : 'SORT'}
+                    </Text>
+                  </Pressable>
+                </View>
                 {/* arb148 — the Primary Objective card sits in the FIXED region
                     above the tabs/scroll, so the expanded 9-Capital list pushed
                     the bottom Capital half off-screen. Cap it and let the rows
                     scroll internally (nestedScroll) so all nine are reachable. */}
                 <ScrollView style={styles.mqTrackerScroll} nestedScrollEnabled>
-                {LOST_CAPITAL_LOCATIONS.map((capId) => {
+                {(sortByDistance
+                  ? [...LOST_CAPITAL_LOCATIONS].sort((a, b) => {
+                      // Finished Capitals sink to the bottom; the rest go nearest-first.
+                      const done = (id: string) => (mq.coresRecovered.includes(id) ? 1 : 0);
+                      if (done(a) !== done(b)) return done(a) - done(b);
+                      return (movesTo(a) ?? Number.POSITIVE_INFINITY) - (movesTo(b) ?? Number.POSITIVE_INFINITY);
+                    })
+                  : LOST_CAPITAL_LOCATIONS
+                ).map((capId) => {
                   const def = GUARDIANS_BY_CAPITAL[capId];
                   const recovered = mq.coresRecovered.includes(capId);
                   const guardianDown = (mq.guardiansDefeated ?? []).includes(capId);
@@ -427,6 +499,7 @@ export function ContractsScreen() {
                       <Text style={styles.mqTrackerGuardian}>
                         Guardian: {def?.base.name ?? '—'}
                       </Text>
+                      {!here && movesLine(capId)}
                       {!here && (
                         <Text style={styles.mqTrackerTap}>▸ tap to travel</Text>
                       )}
@@ -513,6 +586,19 @@ export function ContractsScreen() {
         <CollectablesTab progress={progress} />
       ) : (
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        {/* arb-fix — SORT BY DISTANCE toggle. Reorders every mission section by
+            moves-to-target (nearest first) while keeping each type grouped. */}
+        <Pressable
+          onPress={() => setSortByDistance((v) => !v)}
+          style={({ pressed }) => [styles.sortBar, sortByDistance && styles.sortBarOn, pressed && styles.sortBarPressed]}
+        >
+          <Text style={[styles.sortBarText, sortByDistance && styles.sortBarTextOn]}>
+            {sortByDistance ? '◈ SORTED BY DISTANCE (grouped by type)' : '◈ SORT BY DISTANCE'}
+          </Text>
+          <Text style={[styles.sortBarHint, sortByDistance && styles.sortBarTextOn]}>
+            {sortByDistance ? 'tap for default order' : 'nearest first, within each type'}
+          </Text>
+        </Pressable>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>MILESTONES  ·  tap a cell to expand</Text>
           <View style={styles.milestoneRow}>
@@ -635,7 +721,7 @@ export function ContractsScreen() {
         {activeBounties.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>BOUNTIES</Text>
-              {activeBounties.map((b) => {
+              {byMoves(activeBounties, (b) => b.targetLocationId).map((b) => {
                 // OTA-866 — a prominent LIVE countdown on every accepted bounty. The window
                 // is in-game hours (only drains as you act), so it can't tick in real time —
                 // but the bar + colour make "how long have I got" unmistakable, and it
@@ -672,6 +758,7 @@ export function ContractsScreen() {
                     )}
                     <Text style={styles.cardFaction}>Hunt the {b.targetName}</Text>
                     <Text style={styles.cardLocation}>📍 {b.targetLocationName}</Text>
+                    {movesLine(b.targetLocationId)}
                     <Text style={styles.cardHint}>
                       {b.progress}/{b.count} put down · pays {b.rewardTc} TC + {b.giverName} standing · tap to set course
                     </Text>
@@ -684,7 +771,7 @@ export function ContractsScreen() {
         {hunts.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>HUNTS</Text>
-              {hunts.map(({ run, def }) => {
+              {byMoves(hunts, (h) => markerLocId(`h_${h.run.id}`)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `h_${run.id}`;
                 const open = !!expanded[key];
@@ -715,6 +802,7 @@ export function ContractsScreen() {
                     <Text style={styles.cardLocation}>
                       📍 {def.targetLocationName ?? biomeLabel(def.biomeTag)}
                     </Text>
+                    {movesLine(markerLocId(key))}
                     {/* 2026-05-26 OTA-055 — difficulty chip with traffic-
                         light coloring vs the player's current state.
                         Green when comfortably above both thresholds,
@@ -831,7 +919,7 @@ export function ContractsScreen() {
           {mysteries.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>MYSTERIES</Text>
-              {mysteries.map(({ run, def }) => {
+              {byMoves(mysteries, (m) => markerLocId(`m_${m.run.id}`)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `m_${run.id}`;
                 const open = !!expanded[key];
@@ -846,6 +934,7 @@ export function ContractsScreen() {
                       </Text>
                     </View>
                     {contractRoute(key)}
+                    {movesLine(markerLocId(key))}
                     {trackToggle('mystery', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {!open && def.stages[run.stage] && !ready && (
@@ -898,7 +987,7 @@ export function ContractsScreen() {
           {storylines.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>STORYLINES</Text>
-              {storylines.map(({ run, def }) => {
+              {byMoves(storylines, (sl) => markerLocId(`s_${sl.run.id}`)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `s_${run.id}`;
                 const open = !!expanded[key];
@@ -913,6 +1002,7 @@ export function ContractsScreen() {
                       </Text>
                     </View>
                     {contractRoute(key)}
+                    {movesLine(markerLocId(key))}
                     {trackToggle('storyline', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {!open && def.stages[run.stage] && !ready && (
@@ -965,7 +1055,7 @@ export function ContractsScreen() {
           {factionQuests.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>FACTION QUESTS</Text>
-              {factionQuests.map(({ rec, def }, i) => {
+              {byMoves(factionQuests, (fq) => fq.def ? (missionObjectiveLocationId(fq.def) ?? startingLocationForFaction(fq.def.factionId)) : null).map(({ rec, def }, i) => {
                 if (!def) return null;
                 const key = `q_${def.id}_${i}`;
                 const open = !!expanded[key];
@@ -1004,6 +1094,7 @@ export function ContractsScreen() {
                         the mission text, or the turn-in home if the work is done),
                         then auto-chains to turn-in. Routing makes this the single
                         active mission. */}
+                    {movesLine(readyToTurnIn ? startingLocationForFaction(def.factionId) : (missionObjectiveLocationId(def) ?? startingLocationForFaction(def.factionId)))}
                     {(() => {
                       const home = startingLocationForFaction(def.factionId);
                       const objId = readyToTurnIn ? home : (missionObjectiveLocationId(def) ?? home);
@@ -1153,6 +1244,7 @@ export function ContractsScreen() {
                           ? `✓ ${l.itemName} — in hand.`
                           : `○ ${l.itemName} — recover it at ${safeLocName(l.tileId)}.`}
                       </Text>
+                      {!inHand && movesLine(l.tileId)}
                       {!inHand && !here && (
                         <Pressable
                           style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
@@ -1173,6 +1265,7 @@ export function ContractsScreen() {
                     ? 'Both relics in hand. Return to the Parley Ground and SEAL THE ALLIANCE.'
                     : 'Bring both relics to the Parley Ground, then SEAL THE ALLIANCE.'}
                 </Text>
+                {movesLine('parley_ground')}
                 {player?.currentLocationId !== 'parley_ground' && (
                   <Pressable
                     style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
@@ -1199,7 +1292,7 @@ export function ContractsScreen() {
                 Tips overheard from non-vendor NPCs. No formal contract,
                 no faction rep — just rumour. Follow them or don't.
               </Text>
-              {whispers.map(({ rec, title, stageDesc }) => {
+              {byMoves(whispers, (w) => w.rec.targetLocationId).map(({ rec, title, stageDesc }) => {
                 // OTA-465 — whisper objectives live on map tiles, so offer a
                 // "set course" that walks the player there (the player kept
                 // losing where to go for Yulka's discs).
@@ -1220,6 +1313,7 @@ export function ContractsScreen() {
                     <Text style={styles.cardFaction}>Whisper · informal</Text>
                     <Text style={styles.cardStageLabel}>Next step</Text>
                     <Text style={styles.cardStageBody}>{stageDesc}</Text>
+                    {movesLine(rec.targetLocationId)}
                     {route && !here && tracked && (
                       <Pressable
                         style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
@@ -1255,7 +1349,7 @@ export function ContractsScreen() {
                 no objective marker — just the place and the deed. Go
                 find it.
               </Text>
-              {leads.map((q) => {
+              {byMoves(leads, (q) => q.location?.id).map((q) => {
                 const title = `${cap(q.objective.verb)} ${q.objective.target}`;
                 const reward = (q.reward.amount != null && q.reward.amount > 0)
                   ? `${q.reward.amount} ${q.reward.type === 'currency' ? 'TC' : q.reward.type}`
@@ -1270,6 +1364,7 @@ export function ContractsScreen() {
                       <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>{!tracked ? '⏸ PAUSED' : q.state}</Text>
                     </View>
                     <Text style={styles.cardFaction}>Lead · {q.location.name}</Text>
+                    {movesLine(q.location?.id)}
                     {contractRoute(key)}
                     {trackToggle('lead', q.id, tracked)}
                     {!open && (
@@ -1317,7 +1412,7 @@ export function ContractsScreen() {
                 Crests taken off the fallen. Carry each back to its faction's stake
                 and lay it down among their own — they honor the dead you bring home.
               </Text>
-              {carriedSigils(player.inventory).map((sg) => {
+              {byMoves(carriedSigils(player.inventory), (sg) => sg.tileId).map((sg) => {
                 // OTA-783 — the Hidden Market brokers any faction's sigil, so the
                 // RETURN button lights up there too, not only at the home stake.
                 const atMarket = player.currentLocationId === 'hidden_market';
@@ -1337,6 +1432,7 @@ export function ContractsScreen() {
                           ? `You're at ${safeLocName(sg.tileId)}. Lay the sigil down among their own.`
                           : `○ Return it at ${safeLocName(sg.tileId)} — or the Hidden Market — for +1 ${sg.factionName} standing.`}
                     </Text>
+                    {!here && movesLine(sg.tileId)}
                     {here ? (
                       <Pressable
                         style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
@@ -1741,6 +1837,36 @@ const styles = StyleSheet.create({
   },
   cardFaction: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 4 },
   cardLocation: { color: '#9ec96a', fontSize: 11, marginBottom: 4, letterSpacing: 0.5 },
+  // arb-fix — "◈ N moves away" line under a card's location (teal, distinct from
+  // the green 📍 place line so distance reads as its own datum).
+  cardMoves: { color: '#7fb0a8', fontSize: 11, marginBottom: 4, letterSpacing: 0.5 },
+  // arb-fix — SORT BY DISTANCE toggle bar (top of the missions scroll).
+  sortBar: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    marginBottom: 8,
+  },
+  sortBarOn: { borderColor: '#7fb0a8', backgroundColor: '#141d1c' },
+  sortBarPressed: { opacity: 0.7 },
+  sortBarText: { color: '#cdbf99', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  sortBarTextOn: { color: '#7fb0a8' },
+  sortBarHint: { color: '#7a705c', fontSize: 9, letterSpacing: 0.5, marginTop: 2 },
+  // arb-fix — the Primary Objective box's header row (title + compact sort button).
+  mqTrackerHeadRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  mqSortBtn: {
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    marginBottom: 6,
+  },
+  mqSortBtnOn: { borderColor: '#7fb0a8', backgroundColor: '#141d1c' },
+  mqSortText: { color: '#cdbf99', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
   // 2026-05-26 OTA-055 — difficulty chip below location, color-coded
   // vs player state. Same green / amber / red traffic light the rest
   // of the game uses.

@@ -17011,4 +17011,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // just above the keyboard even when the event never lands. Three retract paths
 // (submit / deferred keyboard-hide / deferred blur) keep it from lingering. The
 // autoFocus keeps the keyboard the field already raised (never pops it unbidden).
-export const OTA_BUILD_ID = '2026-07-19-882-keyboard-bar-focus-mount';
+//
+// OTA-883 (missions: distance-in-moves + sort by distance) — every mission entry on the
+// Contracts screen (bounties, hunts, mysteries, storylines, faction quests, alliance broker
+// legs, whispers, leads, sigils) now shows "◈ N moves away" to its target location, and each
+// Lost Capital row in the expanded PRIMARY OBJECTIVE box shows it too. A SORT BY DISTANCE toggle
+// sits at the top of the missions scroll AND inside the Primary Objective box (one shared flag).
+// When on, entries sort nearest-first but stay GROUPED BY TYPE (we sort within each section, never
+// merge them; placeless entries like collectibles sort last / show no distance). Distance =
+// Manhattan tile count via canonicalDistanceFromGrid(player.gridX/gridY, targetLocationId) with a
+// map-offset then location-to-location fallback for legacy saves. UI-only; ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-883-mission-distance-sort';
