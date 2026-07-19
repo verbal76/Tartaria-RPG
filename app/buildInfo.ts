@@ -17914,4 +17914,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // recipe-unlock / Construct-spawn / Crucible-forge lines use the shared grammar helper (withArticle
 // / anOrA) so a vowel-sound name or rarity reads 'an'. Engine keeps its getNarratorName() and
 // forgedKindWord. JS-only; ships over-the-air. Covered by grammar.test.ts.
-export const OTA_BUILD_ID = '2026-07-19-1163-hunt-hint-and-article';
+// 2026-07-19 OTA-1164 — multi-enemy gesture hint made legible (port of HAL OTA-887). The swipe-to-
+// target caption under the enemy carousel dots (2+ enemies) was shortened to 'swipe to aim · tap
+// for info' and bumped to a larger, tighter, brighter font (fontSize 9 → 12, letterSpacing 1 → 0.3).
+// Engine keeps its teal dot/hint palette. UI-only; ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-1164-enemy-hint-legible';

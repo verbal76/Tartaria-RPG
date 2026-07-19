@@ -253,7 +253,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
           {enemies.map((_, i) => (
             <View key={i} style={[styles.dot, i === activeIndex && styles.dotActive]} />
           ))}
-          <Text style={styles.hint}>swipe to target · tap for details</Text>
+          <Text style={styles.hint}>swipe to aim · tap for info</Text>
         </View>
       )}
     </View>
@@ -566,5 +566,8 @@ const styles = StyleSheet.create({
   },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#2b3a3e' },
   dotActive: { backgroundColor: '#6ab0c9' },
-  hint: { color: '#6c8088', fontSize: 9, letterSpacing: 1, marginLeft: 8 },
+  // OTA — playtest: the multi-enemy gesture hint read too long and too small.
+  // Shorter copy ("swipe to aim · tap for info") + a larger, tighter-tracked font.
+  // (engine keeps its teal palette — brighter than the base for legibility.)
+  hint: { color: '#8a9ea6', fontSize: 12, letterSpacing: 0.3, marginLeft: 8 },
 });
