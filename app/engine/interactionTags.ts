@@ -164,6 +164,11 @@ export function getInteractionTags(noun: string): Set<InteractionTag> {
 
 export function isClimbable(noun: string): boolean {
   if (getInteractionTags(noun).has('climbable')) return true;
+  // OTA-910 — great-climb props ("the Grand Spire of Etheria") are proper
+  // nouns the substring matcher doesn't cover; accept them as climb targets.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isGreatClimbNoun } = require('./greatClimbs');
+  if (isGreatClimbNoun(noun)) return true;
   // 2026-05-24 — curated climbable spawns (climbableSpawns.ts) carry
   // nouns like "ruined skyscraper" / "petrified mud wave" that don't
   // overlap the substring matcher above. Check the curated pool too

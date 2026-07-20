@@ -555,6 +555,7 @@ function pickLegendaryGear(category: 'weapons' | 'armor', existing: VendorOffer[
     const tags = (it.tags ?? []) as string[];
     return String(it.rarity).toLowerCase() === 'legendary'
       && !tags.includes('golem_weapon') && !tags.includes('faction_gear')
+      && !tags.includes('collect_only') // OTA-910 — Skyreacher set is climb-only, never for sale
       && (category !== 'weapons' || tags.includes('weapon')); // real weapons only
   });
   if (legs.length === 0) return null;

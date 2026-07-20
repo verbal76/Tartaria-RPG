@@ -42,6 +42,15 @@ function heightPatternMatches(noun: string, pattern: string): boolean {
 }
 
 export function climbHeightFor(noun: string): number {
+  // OTA-910 — great climbs (11–15 tiers) take precedence over EVERYTHING.
+  // Their proper-noun props ("the Grand Spire of Etheria") can substring-
+  // collide with a generic curated climbable ("grand spire capacitor" → 4),
+  // so the great-climb lookup — keyed on distinctive tokens — runs first and
+  // returns the real 11–15 tier count.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { greatClimbHeight } = require('./greatClimbs');
+  const great = greatClimbHeight(noun);
+  if (great != null) return great;
   // 2026-05-24 — curated spawn pool (climbableSpawns.ts) takes
   // precedence over the substring matcher. Player-spec heights for
   // the 15 new props land first; the legacy substring table catches

@@ -71,6 +71,10 @@ export interface TitleProgress {
   relicsPreserved: number;
   /** Guild Broker — faction alliances brokered. */
   alliancesBrokered: number;
+  // ── Skyreacher (OTA-910) ──────────────────────────────────────────────
+  /** Distinct great climbs crested (of 5). At 5 the Skyreacher title lands
+   *  and the Skyreacher armor set is complete. */
+  greatClimbsCompleted: number;
 }
 
 export const EMPTY_TITLE_PROGRESS: TitleProgress = {
@@ -89,6 +93,7 @@ export const EMPTY_TITLE_PROGRESS: TitleProgress = {
   trapCleanDives: 0,
   relicsPreserved: 0,
   alliancesBrokered: 0,
+  greatClimbsCompleted: 0,
 };
 
 export function withTitleProgress(p?: Partial<TitleProgress>): TitleProgress {
@@ -120,6 +125,9 @@ export interface TitlePerks {
   stealthBonus: number;         // Shadow Diver (+1 Stealth)
   pathfinder: boolean;          // Wayfarer (read the true path)
   machineSpeech: boolean;       // Speaker (commune with Tartarian machines/relics)
+  // ── Skyreacher (OTA-910) ──────────────────────────────────────────────
+  climbFallHalved: boolean;     // Skyreacher — halves climb-fall damage
+  dexterityBonus: number;       // Skyreacher — passive +DEX (folds into effectiveStats)
 }
 
 export const EMPTY_TITLE_PERKS: TitlePerks = {
@@ -129,6 +137,7 @@ export const EMPTY_TITLE_PERKS: TitlePerks = {
   corruptionResist: false, ethericShield: false, ethericSurge: false,
   ruinsDefenseBonus: 0, diplomacyBonus: 0, stealthBonus: 0,
   pathfinder: false, machineSpeech: false,
+  climbFallHalved: false, dexterityBonus: 0,
 };
 
 interface TitleDef {
@@ -260,6 +269,16 @@ export const WIRED_TITLES: TitleDef[] = [
     earned: (_pl, p) => p.relicsPreserved >= 1,
     perk: (a) => { a.ruinsDefenseBonus += 1; },
   },
+  // ── Skyreacher (OTA-910) — top all five great climbs (11–15 tiers) to
+  //    complete the Skyreacher armor set and earn the name. The perk is a
+  //    climber's mastery of height: falls hurt half as much, and the hands
+  //    that made those summits are quicker (+2 DEX, always on). Earnable on
+  //    HAL + golem, where the great climbs live.
+  {
+    id: 'skyreacher',
+    earned: (_pl, p) => p.greatClimbsCompleted >= 5,
+    perk: (a) => { a.climbFallHalved = true; a.dexterityBonus += 2; },
+  },
 ];
 
 export const WIRED_TITLE_IDS: ReadonlySet<string> = new Set(WIRED_TITLES.map((t) => t.id));
@@ -294,6 +313,8 @@ export const TITLE_PASSIVE_PERK: Record<string, string> = {
   warden_of_the_old_world: 'Passive: +1 AC while in ruins / constructed places (stacks with Protector).',
   speaker_of_forgotten_tongues: 'Passive: +2 when investigating relics & Tartarian machines.',
   wayfarer_of_the_lost_paths: 'Passive: cardinal travel costs less stamina (2 → 1.5); +1 Stealth (you move the lost paths unseen).',
+  // OTA-910 — Skyreacher (top all five great climbs).
+  skyreacher: 'Passive: climbing falls deal half damage; +2 DEX, always on (the surest hands in the Reaches).',
 };
 
 /** Every wired title whose requirement the player currently meets. */

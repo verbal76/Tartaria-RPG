@@ -6205,6 +6205,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // be dinged if you extort them.
       return makeWanderer(seed, FACTIONS.map((f) => f.id));
     })();
+    // OTA-910 — great climbs. At each of the five landmark locations, force the
+    // landmark's great-climb prop (11–15 tiers) into the scene noun pool so the
+    // ascent is always there to attempt and always shows in look-around / the
+    // CLIMB modal. It's a defining feature of the place, not a rolled spawn, so
+    // it bypasses the curated picker + consumed-noun filter entirely. Gated to
+    // the open landmark (not its interior hub rooms). Height, the strap-gate,
+    // scaling falls, and the guaranteed Skyreacher drop are handled in the climb
+    // verb + climbHeight/greatClimbs.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { greatClimbForLocation } = require('../engine/greatClimbs');
+      const gcLoc = location?.id ?? player?.currentLocationId;
+      const gc = greatClimbForLocation(gcLoc);
+      if (gc && !get().player?.hubRoomId && !hasEnemies) {
+        sceneAmbientNouns = Array.from(new Set([gc.noun, ...sceneAmbientNouns]));
+        sceneDisplayedNouns = Array.from(new Set([gc.noun, ...sceneDisplayedNouns]));
+      }
+    }
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
       vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, microMicroId,
@@ -11379,13 +11397,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // loops) OR a worn Hardened Climbing Strap (a harness you can hang
             // and doze in).
             const wearsClimbStrapForRest = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
+            // OTA-910 — on a GREAT climb the rope isn't enough. Only the
+            // Hardened Climbing Strap's harness is rated to hold you for a doze
+            // at this altitude — and since a great climb is too tall to top in
+            // one push, that rest is exactly what makes the strap mandatory to
+            // finish. On ordinary climbs a Reclaimer's Rope still anchors a rest.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { greatClimbFor: gcRest } = require('../engine/greatClimbs');
+            const onGreatClimb = !!gcRest(currentScene.elevatedOn.noun, player.currentLocationId);
             const hasReclaimersRopeForRest = player.inventory.some(
               (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
-            ) || wearsClimbStrapForRest;
-            if (!hasReclaimersRopeForRest) {
+            );
+            const canRestElevated = wearsClimbStrapForRest || (!onGreatClimb && hasReclaimersRopeForRest);
+            if (!canRestElevated) {
               get().appendLog(
                 'arbiter',
-                `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
+                onGreatClimb
+                  ? `The Arbiter cranes to look up the ${currentScene.elevatedOn.noun}. "This high, only a Hardened Climbing Strap will hold you for a rest — a rope won't do it. Climb down, or come back wearing one."`
+                  : `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
               );
               break;
             }
@@ -13289,6 +13318,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { climbHeightFor, climbTierLabel, rollClimbTopLoot, maxClimbedTier, sameClimbNoun } = require('../engine/climbHeight');
         const totalTiers: number = climbHeightFor(tgt);
+        // OTA-910 — is this one of the five landmark great climbs (11–15 tiers)?
+        // Great climbs cost more stamina per tier (no rope discount), gate the
+        // top ten-plus tiers behind the Hardened Climbing Strap, fall harder,
+        // and pay a guaranteed Skyreacher armor piece at the summit.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { greatClimbFor } = require('../engine/greatClimbs');
+        const greatClimb = greatClimbFor(tgt, player.currentLocationId);
         const climbRoom = get().worldMemory.visitedRooms?.[climbRoomKey];
         const climbMarks = climbRoom?.searchedAmbientNouns ?? [];
         // OTA-462 — when the player is CURRENTLY up on this climb, the live
@@ -13353,7 +13389,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // cheap as a Reclaimer's Rope, and the strap never wears out or snaps, but
         // it's no longer a free climb.
         const wearsClimbStrap = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
-        const climbStaminaCost = wearsClimbStrap ? 1 : (hasReclaimersRope ? 1 : 2);
+        // OTA-910 — great climbs cost a flat 2 stamina/tier with NO rope/strap
+        // discount: they're gruelling by design, so the pool can't cover the
+        // full 11–15 tiers and the player MUST rest partway up. The strap's
+        // value on a great climb isn't cheaper tiers — it's that its harness is
+        // what LETS you rest at altitude (see the rest gate + strap wall below).
+        const climbStaminaCost = greatClimb ? 2 : (wearsClimbStrap ? 1 : (hasReclaimersRope ? 1 : 2));
         // Active rope instance for wear/snap tracking. Reclaimer's takes
         // precedence; falls back to Climbing Rope. We pick the highest-
         // durability instance among matches so the freshest copy gets used
@@ -13384,16 +13425,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
           combatReason: string,
           worldReason: string,
         ): void => {
-          let fallDamage = Math.max(1, Math.floor(player.hpMax * 0.2));
+          // OTA-910 — fall damage now SCALES with how high you'd climbed. A
+          // stumble off the first hold barely stings; a fall from the top of a
+          // fifteen-tier great climb nearly kills. floor(hpMax × (0.12 + 0.055 ×
+          // tierFallenFrom)), capped at 0.9× hpMax. tierFallenFrom = the highest
+          // tier you'd cleared (maxCleared) — you fall from where you stood. A
+          // 2-tier wall lands near the old flat ~20%; great climbs punish height.
+          const tierFallenFrom = Math.max(1, maxCleared);
+          const fallFrac = Math.min(0.9, 0.12 + 0.055 * tierFallenFrom);
+          let fallDamage = Math.max(1, Math.floor(player.hpMax * fallFrac));
           // arb-fix — Etherbound Survivor ("survive environmental hazards")
           // passively shaves its save bonus off a climbing fall — a real,
           // always-on effect for what was flavor-only text.
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const tPerksFall = require('../engine/titles').titlePerkModifiers(player);
           let fallShaveTag = '';
+          // OTA-910 — Skyreacher halves climb-fall damage (a master climber
+          // rides a fall). Applied BEFORE the Etherbound Survivor flat shave.
+          if (tPerksFall.climbFallHalved && fallDamage > 1) {
+            fallDamage = Math.max(1, Math.floor(fallDamage / 2));
+            fallShaveTag = ' (Skyreacher halves the fall)';
+          }
           if (tPerksFall.envHazardSaveBonus > 0 && fallDamage > 1) {
             const shave = Math.min(fallDamage - 1, tPerksFall.envHazardSaveBonus);
-            if (shave > 0) { fallDamage -= shave; fallShaveTag = ` (Aetherbound Survivor absorbs ${shave})`; }
+            if (shave > 0) { fallDamage -= shave; fallShaveTag += ` (Aetherbound Survivor absorbs ${shave})`; }
           }
           const newHp = Math.max(0, player.hp - fallDamage);
           // OTA-354 — vitals at the fall, so a log review can reconstruct a
@@ -13456,6 +13511,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
             handlePlayerDeath(get, set as Parameters<typeof handlePlayerDeath>[1]);
           }
         };
+        // OTA-910 — great-climb strap wall. Every great climb tops out above
+        // ten tiers, higher than grip and stamina carry you: past the tenth
+        // hold there's nowhere to anchor a rest without a Hardened Climbing
+        // Strap (a Reclaimer's Rope's belay loops aren't rated this high). Try
+        // to push past tier 10 without the strap and the height takes you — you
+        // fall from where you stand, and a great-climb fall scales brutally
+        // (climbFall above). Below tier 11 a great climb behaves normally, so a
+        // player can attempt it, feel the wall, and come back wearing the strap.
+        if (greatClimb && currentTier > 10 && !wearsClimbStrap) {
+          const alreadyUpGreat = !!get().currentScene?.elevatedOn;
+          if (!alreadyUpGreat) {
+            // Resuming a banked great climb from the ground (previously strap-
+            // climbed to tier 10+, then left) — nothing to fall off yet. Refuse.
+            get().appendLog(
+              'arbiter',
+              `The Arbiter eyes ${tgt}. "That's a great climb — past the tenth hold there's no resting without a Hardened Climbing Strap. Bring one, or it'll bring you down."`,
+            );
+            get().appendLog(
+              'combat',
+              `Great climb ${tgt} (tier ${currentTier}/${totalTiers}) — no Hardened Climbing Strap past tier 10. (refused — on the ground; equip the strap first)`,
+            );
+            break;
+          }
+          climbFall(
+            `Great climb ${tgt} (tier ${currentTier}/${totalTiers}) — no Hardened Climbing Strap past tier 10. ✗ YOU FALL.`,
+            `You reach for the next hold on ${tgt}, but this high there's nothing to anchor a rest and nothing left in your arms — without a Hardened Climbing Strap the height peels you off.`,
+          );
+          break;
+        }
         // OTA 23-007 — if the player doesn't have enough stamina to
         // finish this tier, they fall. Lose 20% of max HP and clear
         // the elevation flag. This is the only place climbing can
@@ -13651,6 +13735,64 @@ export const useGameStore = create<GameStore>((set, get) => ({
               'world',
               `You reach the top of the ${tgt} (tier ${currentTier}/${totalTiers}). The view changes; the room reads differently from here.`,
             );
+            // OTA-910 — great-climb summit: a GUARANTEED Skyreacher armor piece,
+            // once per climb. The five pieces (one per landmark) make the
+            // Legendary Skyreacher set — AC+4, three heavy resistances each; it
+            // can't be crafted or bought, only collected up these summits. The
+            // crest is banked in worldMemory.greatClimbsCrested (distinct set),
+            // which both prevents a re-grant and drives the Skyreacher title
+            // (greatClimbsCompleted = distinct climbs crested; earned at 5).
+            if (greatClimb) {
+              const crested: string[] = get().worldMemory.greatClimbsCrested ?? [];
+              const alreadyCrested = crested.includes(greatClimb.id);
+              const nextCrested = alreadyCrested ? crested : [...crested, greatClimb.id];
+              if (!alreadyCrested) {
+                set((s) => ({ worldMemory: { ...s.worldMemory, greatClimbsCrested: nextCrested } }));
+              }
+              const pieceName: string = greatClimb.rewardArmor;
+              const livePlayerTop = get().player;
+              const holdsPiece =
+                (livePlayerTop?.inventory ?? []).some((i) => i.name === pieceName && i.quantity > 0) ||
+                Object.values(livePlayerTop?.equipped ?? {}).some(
+                  (n) => (n ?? '').toLowerCase() === pieceName.toLowerCase(),
+                );
+              if (!alreadyCrested && !holdsPiece) {
+                const pieceLookup = lookupCraftedItem(pieceName);
+                const grant: InventoryItem = stampDurability({
+                  id: freshInstanceId('skyreacher'),
+                  name: pieceName,
+                  kind: pieceLookup.kind,
+                  rarity: 'Legendary',
+                  quantity: 1,
+                  tags: Array.from(new Set([...pieceLookup.tags, 'climb_top', 'skyreacher', 'collect_only', 'legendary'])),
+                });
+                set((s) =>
+                  s.player
+                    ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, grant) } }
+                    : s,
+                );
+                get().appendLog('reward', `✦ ${pieceName} (Legendary) — ${greatClimb.summitFlavor}`);
+                const setCount = nextCrested.length;
+                if (setCount < 5) {
+                  get().appendLog(
+                    'world',
+                    `That's ${setCount} of the 5 Skyreacher pieces. The set is only ever collected atop the great climbs — top all five and the Arbiter will have a name for you.`,
+                  );
+                }
+              } else if (!alreadyCrested) {
+                // Crested a NEW great climb but already holds this piece (rare —
+                // re-obtained after dropping it): count the crest, no duplicate.
+                get().appendLog('world', greatClimb.summitFlavor);
+              } else {
+                get().appendLog(
+                  'world',
+                  `You crest ${tgt} again. The Skyreacher piece that waited up here is already yours.`,
+                );
+              }
+              // Title progress — count DISTINCT great climbs crested; Skyreacher
+              // is earned at 5. maxes (not delta) so re-cresting can't inflate it.
+              recordTitleProgress(get, set, undefined, { greatClimbsCompleted: nextCrested.length });
+            } else {
             // Top reached — roll the chance-based loot. Tall climbs
             // (tier ≥ 4) widen the pool to include Reclaimer's Rope,
             // which someone once anchored up here and left.
@@ -13684,6 +13826,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     : `✦ ${drop.name} (${drop.rarity}) — tucked into a crack at the top of the ${tgt}.`;
               get().appendLog('reward', flavor);
             }
+            } // end non-great-climb RNG-loot branch (OTA-910)
           } else {
             get().appendLog(
               'world',

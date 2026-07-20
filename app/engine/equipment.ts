@@ -520,11 +520,18 @@ export function effectiveStats(
   // aether under your skin actually costs you something.
   const tier = corruptionTierOf(player.corruption ?? 0);
   const corrPen = corruptionStatPenalty(tier);
+  // OTA-910 — Skyreacher (all five great climbs crested) grants a passive +DEX.
+  // Read via the title-perk aggregate so it flows through every effectiveStats
+  // call site (combat, dodge, climb, checks). Lazy require avoids a static
+  // import cycle and is module-cached.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const titlePerks = require('./titles').titlePerkModifiers(player);
+  const titleDex = titlePerks.dexterityBonus ?? 0;
   // engine_Dev — floor every effective stat at 1 so stacked debuffs (weather + corruption + damage-
   // type onHit) can't drive a roll stat to 0 or negative.
   return {
     strength: Math.max(1, player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0) + (racial.strength ?? 0) + (corrPen.strength ?? 0)),
-    dexterity: Math.max(1, player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0) + (corrPen.dexterity ?? 0)),
+    dexterity: Math.max(1, player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0) + (corrPen.dexterity ?? 0) + titleDex),
     intelligence: Math.max(1, player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (curious.intelligence ?? 0) + (corrPen.intelligence ?? 0)),
     wisdom: Math.max(1, player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (curious.wisdom ?? 0) + (corrPen.wisdom ?? 0)),
     charisma: Math.max(1, player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (corrPen.charisma ?? 0)),

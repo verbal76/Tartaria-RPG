@@ -20,6 +20,7 @@
     { "id": "warden_of_the_old_world", "title": "Warden of the Old World", "requirement": "Preserve an ancient Tartarian relic or building from destruction", "perk": "+1 to all Defense rolls when in or around ancient ruins.", "tags": ["warden", "preservation", "old world"] },
     { "id": "speaker_of_forgotten_tongues", "title": "Speaker of Forgotten Tongues", "requirement": "Learn to fluently speak the ancient Tartarian language", "perk": "Once per session, communicate with Tartarian machines or relics.", "tags": ["language", "tartarian", "speaker"] },
     { "id": "stormcaller", "title": "Stormcaller", "requirement": "Survive or navigate through an Aetheric storm and save a party member", "perk": "Once per day, create a small Aetheric shield that deflects energy attacks.", "tags": ["storm", "shield", "rescue"] },
-    { "id": "guild_broker", "title": "Guild Broker", "requirement": "Successfully negotiate a truce or alliance between two factions", "perk": "+1 to Diplomacy and a reroll once per day when brokering peace or deals.", "tags": ["diplomacy", "alliance", "factions"] }
+    { "id": "guild_broker", "title": "Guild Broker", "requirement": "Successfully negotiate a truce or alliance between two factions", "perk": "+1 to Diplomacy and a reroll once per day when brokering peace or deals.", "tags": ["diplomacy", "alliance", "factions"] },
+    { "id": "skyreacher", "title": "Skyreacher", "requirement": "Crest all five great climbs and complete the Skyreacher armor set", "perk": "Climbing falls deal half damage; +2 Dexterity, always on.", "tags": ["climb", "height", "legendary", "skyreacher", "mastery"] }
   ]
 }

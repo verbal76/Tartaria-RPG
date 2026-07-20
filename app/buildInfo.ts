@@ -17342,4 +17342,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 'ready'. The watchdog reinitializing is CORRECT (OTA-222/797). Reworded the line to name the dormant case
 // distinctly (isDormant() branch) vs a genuine idle/failed reinit. Pure log-string change, no behavior/logic
 // change. Verified: typecheck:ci + lint clean. Ships all three lines.
-export const OTA_BUILD_ID = '2026-07-20-909-qwen-watchdog-log-clarity';
+//
+// OTA-910 (THE GREAT CLIMBS + the Skyreacher armor set — new content, HAL + golem only) — five landmark
+// "great climbs" of 11–15 tiers: the Grand Spire of Etheria (15), the buried spire of Asgardar (14), the
+// Great Obsidian Monolith (13), Thametan's Tower (12), and the Great Fang of Zharak (11). New engine module
+// greatClimbs.ts registers each (locationId → distinctive prop noun → tiers → reward piece); climbHeightFor
+// + isClimbable recognise them (token-matched so they never collide with the generic curated climbables that
+// share a location — "grand spire capacitor", "obsidian pillar", "zharak's teeth spire"). beginScene forces
+// the great-climb prop into the landmark's scene nouns so the ascent is always there. Climb-verb wiring:
+// (a) great climbs cost a flat 2 stamina/tier (no rope discount) so the pool can't cover the full height and
+// you MUST rest partway up; (b) mid-climb rest on a great climb needs the Hardened Climbing Strap specifically
+// — a Reclaimer's Rope won't anchor a doze this high; (c) a HARD strap wall past tier 10: try to push past the
+// tenth hold without the strap and you FALL; (d) fall damage now SCALES with height —
+// floor(hpMax × (0.12 + 0.055 × tierFallenFrom)), capped 0.9× (short climbs barely change from the old flat
+// 20%, great-climb falls near-kill). Summit pays a GUARANTEED Skyreacher piece, once per climb (banked in
+// worldMemory.greatClimbsCrested). Skyreacher armor set = 5 Legendary pieces (head/chest/legs/feet/hands —
+// cloak left free for the strap), AC+4, THREE heavy authored resistances each (the only armor authored with
+// three resist slots), collect_only: no recipe, excluded from vendor legendary rolls, sells for a nominal 1 TC.
+// New "Skyreacher" title (titles.ts + arbiter-titles.json): earned at 5 distinct great climbs crested — perk
+// halves climb-fall damage + a passive +2 DEX (folded into effectiveStats). Verified: greatClimbs +21 new
+// assertions; titles/arbiterTitlesScreen/canonFacts retargeted (20 → 21 titles); climbRopeMechanics fall
+// damage retargeted to the scaled formula; typecheck:ci + typecheck:tests (200 baseline, no growth) + lint
+// clean; full fast suite 469/469 (3972). Content → HAL + golem only, NOT engine (lore-agnostic).
+export const OTA_BUILD_ID = '2026-07-20-910-great-climbs-skyreacher-set';

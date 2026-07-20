@@ -9722,6 +9722,187 @@
         "crafted"
       ],
       "description": "A mantle forged around a boss-heart core, humming with bound Aether. Legendary crafted cloak."
+    },
+    {
+      "name": "Skyreacher Crown",
+      "slot": "head",
+      "acBonus": 4,
+      "resistances": [
+        "aetheric",
+        "cold",
+        "burn"
+      ],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 8,
+      "tcBuy": 0,
+      "tcSell": 0,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "skyreacher",
+        "legendary",
+        "collect_only"
+      ],
+      "description": "Skyreacher Crown. Storm-blued alloy, cold to the touch even in still air — the crown of the Skyreacher set, taken only from the peak of the Grand Spire of Etheria. Cannot be forged or bought; it is earned one climb at a time."
+    },
+    {
+      "name": "Skyreacher Cuirass",
+      "slot": "chest",
+      "acBonus": 4,
+      "resistances": [
+        "bludgeoning",
+        "slashing",
+        "piercing"
+      ],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 3
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 8,
+      "tcBuy": 0,
+      "tcSell": 0,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "chest",
+        "skyreacher",
+        "legendary",
+        "collect_only"
+      ],
+      "description": "Skyreacher Cuirass. Giant-forged plate re-sized for a climber's back, the core of the Skyreacher set — collected only atop the buried spire of Asgardar. Cannot be forged or bought."
+    },
+    {
+      "name": "Skyreacher Greaves",
+      "slot": "legs",
+      "acBonus": 4,
+      "resistances": [
+        "piercing",
+        "bludgeoning",
+        "cold"
+      ],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 8,
+      "tcBuy": 0,
+      "tcSell": 0,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "legs",
+        "skyreacher",
+        "legendary",
+        "collect_only"
+      ],
+      "description": "Skyreacher Greaves. Wind-scoured dark plate from the crown of the Great Obsidian Monolith, part of the Skyreacher set. Cannot be forged or bought; only the climb yields them."
+    },
+    {
+      "name": "Skyreacher Treads",
+      "slot": "feet",
+      "acBonus": 4,
+      "resistances": [
+        "slashing",
+        "poison",
+        "cold"
+      ],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 8,
+      "tcBuy": 0,
+      "tcSell": 0,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "feet",
+        "skyreacher",
+        "legendary",
+        "collect_only"
+      ],
+      "description": "Skyreacher Treads. Boots that never lost their grip on anything, waiting at the top of Thametan's Tower — the footing of the Skyreacher set. Cannot be forged or bought."
+    },
+    {
+      "name": "Skyreacher Gauntlets",
+      "slot": "hands",
+      "acBonus": 4,
+      "resistances": [
+        "burn",
+        "aetheric",
+        "poison"
+      ],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 8,
+      "tcBuy": 0,
+      "tcSell": 0,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "hands",
+        "skyreacher",
+        "legendary",
+        "collect_only"
+      ],
+      "description": "Skyreacher Gauntlets. Storm-proof grips jammed into the summit cleft of the Great Fang of Zharak, the hands of the Skyreacher set. Cannot be forged or bought."
     }
   ]
 }
