@@ -49,7 +49,7 @@ function scanFile(file: string): number {
 // Remaining entries are the live de-lore worklist; drive each toward 0.
 const BASELINE: Record<string, number> = {
   'app/state/gameStore.ts': 55,
-  'app/engine/itemAliases.ts': 52,
+  'app/engine/itemAliases.ts': 0,
   'app/engine/hooks.ts': 50,
   'app/engine/areaSearch.ts': 13,
   'app/engine/character.ts': 7,
