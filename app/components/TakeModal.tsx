@@ -65,11 +65,11 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
       onRequestClose={onCancel}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim}>
+      <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>TAKE</Text>
+              <Text style={styles.title} accessibilityRole="header">TAKE</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
                 Items in the scene you can pick up. Tap one — it goes straight
@@ -88,6 +88,8 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
                   pressed && styles.chipPressed,
                 ]}
                 onPress={() => setUseStealth((s) => !s)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: useStealth }}
               >
                 <Text style={[styles.stealthToggleText, useStealth && styles.stealthToggleTextActive]}>
                   {useStealth ? '✓ USE STEALTH (DEX roll)' : 'USE STEALTH (off)'}
@@ -118,6 +120,8 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
                       ]}
                       disabled={consumed}
                       onPress={() => (useStealth ? onStealthTake(noun) : onTake(noun))}
+                      accessibilityRole="button"
+                      accessibilityState={{ disabled: consumed }}
                     >
                       <Text style={[styles.chipText, consumed && styles.chipTextConsumed]}>
                         {noun}
@@ -156,6 +160,7 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
                   <Pressable
                     style={({ pressed }) => [styles.takeAllBtn, pressed && styles.btnPressed]}
                     onPress={() => onTakeAll(grabbable)}
+                    accessibilityRole="button"
                   >
                     <Text style={styles.takeAllText}>
                       TAKE ALL ({grabbable.length})
@@ -168,6 +173,7 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
                 <Pressable
                   style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
                   onPress={onCancel}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnText}>CLOSE</Text>
                 </Pressable>

@@ -112,9 +112,10 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
       onRequestClose={onCancel}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
+      <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
         <KeyboardAvoidingView
           style={styles.scrim}
+          accessibilityViewIsModal={true}
           // OTA 022 — see ExplorationScreen comment. 'height' on
           // Android double-shrinks; 'padding' keeps the scrim full
           // size and only pushes the card up to avoid the keyboard.
@@ -122,7 +123,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
         >
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>INVESTIGATE</Text>
+              <Text style={styles.title} accessibilityRole="header">INVESTIGATE</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
                 Name a thing in the scene to examine. Be specific —
@@ -182,6 +183,8 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                           ]}
                           disabled={c.consumed}
                           onPress={() => tapToSearch(c.noun)}
+                          accessibilityRole="button"
+                          accessibilityState={{ disabled: c.consumed }}
                         >
                           <Text
                             style={[
@@ -228,6 +231,8 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                   ]}
                   onPress={handleSubmit}
                   disabled={!text.trim()}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: !text.trim() }}
                 >
                   <Text style={text.trim() ? styles.btnTextPrimary : styles.btnTextNeutral}>
                     INVESTIGATE
@@ -236,6 +241,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={onCancel}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
                 </Pressable>

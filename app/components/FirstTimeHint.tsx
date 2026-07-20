@@ -44,12 +44,13 @@ export function FirstTimeHint({ id, title, body }: Props) {
     // dismissable again when the modal closes.
     <Pressable style={styles.scrim} onPress={dismiss}>
       <View style={styles.card} onStartShouldSetResponder={() => true}>
-        <Text style={styles.title}>{title}</Text>
+        <Text accessibilityRole="header" style={styles.title}>{title}</Text>
         <Text style={styles.body}>{body}</Text>
         <View style={styles.footerRow}>
           {/* OTA-860 — one-tap escape hatch: kill every future tip and close this one.
               Mirrors the Settings toggle (both write the same global flag). */}
           <TouchableOpacity
+            accessibilityRole="button"
             onPress={() => { void setHintsDisabled(true); dismiss(); }}
             style={styles.linkBtn}
             activeOpacity={0.6}
@@ -58,7 +59,7 @@ export function FirstTimeHint({ id, title, body }: Props) {
             <Text style={styles.linkText}>Turn off tips</Text>
           </TouchableOpacity>
           <View style={{ flex: 1 }} />
-          <TouchableOpacity onPress={dismiss} style={styles.btn} activeOpacity={0.7}>
+          <TouchableOpacity accessibilityRole="button" onPress={dismiss} style={styles.btn} activeOpacity={0.7}>
             <Text style={styles.btnText}>Got it</Text>
           </TouchableOpacity>
         </View>

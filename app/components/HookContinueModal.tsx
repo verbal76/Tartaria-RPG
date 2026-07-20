@@ -112,10 +112,10 @@ export function HookContinueModal({
           behind it doesn't need to stay readable. Bigger card so
           long stages have room to breathe. */}
       <TouchableWithoutFeedback onPress={onAbandon}>
-        <View style={styles.scrim}>
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>
+              <Text style={styles.title} accessibilityRole="header">
                 {completed ? '★★ STORY THREAD COMPLETE' : '★ STORY THREAD'}
               </Text>
               <Text style={styles.subtitle}>at the {noun}</Text>
@@ -154,6 +154,7 @@ export function HookContinueModal({
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
                   onPress={onContinue}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextPrimary}>CONTINUE →</Text>
                 </Pressable>
@@ -161,6 +162,7 @@ export function HookContinueModal({
                   <Pressable
                     style={({ pressed }) => [styles.btn, styles.btnTrade, pressed && styles.btnPressed]}
                     onPress={onTrade}
+                    accessibilityRole="button"
                   >
                     <Text style={styles.btnTextTrade}>TRADE NOW</Text>
                   </Pressable>
@@ -168,6 +170,7 @@ export function HookContinueModal({
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={onAbandon}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>ABANDON</Text>
                 </Pressable>

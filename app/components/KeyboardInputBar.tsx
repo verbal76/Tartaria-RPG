@@ -229,7 +229,7 @@ export function KeyboardInputBar() {
           autoComplete="off"
           textContentType="none"
         />
-        <TouchableOpacity style={styles.send} onPress={handleSubmit}>
+        <TouchableOpacity accessibilityRole="button" style={styles.send} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
         </TouchableOpacity>
       </View>

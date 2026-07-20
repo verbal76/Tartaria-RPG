@@ -167,7 +167,7 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
       {/* Action button (pre-roll only — post-roll auto-resolves) */}
       {rolledValues === null ? (
         <Animated.View style={{ transform: [{ scale }] }}>
-          <TouchableOpacity style={styles.rollBtn} onPress={handleRoll} activeOpacity={0.7}>
+          <TouchableOpacity accessibilityRole="button" style={styles.rollBtn} onPress={handleRoll} activeOpacity={0.7}>
             <Text style={styles.rollBtnText}>ROLL {diceLabel.toUpperCase()}</Text>
           </TouchableOpacity>
         </Animated.View>
@@ -183,7 +183,7 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
         </View>
       )}
 
-      <TouchableOpacity onPress={onCancel} style={styles.cancelBtn}>
+      <TouchableOpacity accessibilityRole="button" onPress={onCancel} style={styles.cancelBtn}>
         <Text style={styles.cancelText}>cancel</Text>
       </TouchableOpacity>
     </View>

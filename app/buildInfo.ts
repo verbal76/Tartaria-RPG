@@ -17229,4 +17229,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //    Story's outcome bands to ±~5σ around the TRUE design (0.75 hook family → 0.375/0.225/0.15, not the
 //    stale ~30%), correcting the misleading "60% hook share" comment in areaSearch.
 // Test-harness + CI-config only; the one source touch (areaSearch) is a comment. No shipped gameplay change.
-export const OTA_BUILD_ID = '2026-07-20-901-jest-blocking-gate';
+//
+// OTA-902 (accessibility sweep — every screen + every interactive component) — the full a11y pass on top
+// of the OTA-898 baseline (which only labelled the quick-action chips, travel buttons, and reduce-motion
+// switch). This walks all 15 screens and all 39 components and gives EVERY interactive element proper
+// screen-reader / switch-access semantics:
+//  • ROLE — accessibilityRole="button" on ~230 touchables that lacked one (and "header" on ~60 screen/
+//    section titles) so a screen reader announces what each control IS and lets heading-navigation jump
+//    between sections.
+//  • LABEL — accessibilityLabel on every icon- or symbol-only control (the ✕ dismisses, ◀/▶ voice cyclers,
+//    +/− steppers, the crucible-dismiss, the map reset, the ★ SUMMON chip, back arrows, …) so they no
+//    longer read as an unlabelled "button".
+//  • STATE — accessibilityState reused from the EXACT conditions already in code: selected on tabs /
+//    one-of-a-set option rows (BUY/SELL, race/faction pick, sort toggles, fusion kind), disabled on gated
+//    buttons (SEND when empty, SAVE while saving, blocked travel), expanded on the collapsible section
+//    cards. Nothing invented.
+//  • MODAL — accessibilityViewIsModal on ~20 modal/overlay backdrops so focus is trapped in the dialog.
+//  • IMAGES — decorative art (splash poster, crest, atlas overlay glyphs) hidden from the reader; the few
+//    meaningful images (colour wheel, atlas map) get a label instead.
+//  • EnemyPanel now reads the foe's name/type/rarity/HP/AC/range as one grouped label instead of a
+//    scattered pile of numbers.
+// Text size still rides the OS Dynamic-Type setting (allowFontScaling is never disabled). UI-only,
+// additive accessibility props — no behaviour, layout, styling, logic, or copy changed (verified: source
+// tsc clean, full fast jest suite 467/467, and every removed diff line is pure JSX-tag reflow). 46 files.
+export const OTA_BUILD_ID = '2026-07-20-902-accessibility-sweep';

@@ -89,7 +89,7 @@ export function EndingScreen() {
     return (
       <View style={styles.container}>
         <Text style={styles.placeholder}>No ending recorded. Returning to title.</Text>
-        <TouchableOpacity style={styles.btn} onPress={() => setScreen('title')} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.btn} onPress={() => setScreen('title')} activeOpacity={0.7} accessibilityRole="button">
           <Text style={styles.btnText}>BACK TO TITLE</Text>
         </TouchableOpacity>
       </View>
@@ -113,14 +113,14 @@ export function EndingScreen() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={[styles.tag, { color: endingColor }]}>YOU CHOSE</Text>
-        <Text style={[styles.endingLabel, { color: endingColor }]}>{endingLabel}</Text>
+        <Text style={[styles.endingLabel, { color: endingColor }]} accessibilityRole="header">{endingLabel}</Text>
         <View style={styles.rule} />
 
         <Text style={styles.body}>{line}</Text>
 
         <View style={[styles.rule, { marginTop: 28 }]} />
 
-        <Text style={styles.tag}>RUN SUMMARY</Text>
+        <Text style={styles.tag} accessibilityRole="header">RUN SUMMARY</Text>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryKey}>Character</Text>
           <Text style={styles.summaryVal}>{player.name}</Text>
@@ -156,13 +156,14 @@ export function EndingScreen() {
         </View>
 
         <View style={styles.btnRow}>
-          <TouchableOpacity style={styles.btn} onPress={() => setScreen('title')} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.btn} onPress={() => setScreen('title')} activeOpacity={0.7} accessibilityRole="button">
             <Text style={styles.btnText}>BACK TO TITLE</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.btn, styles.btnPrimary]}
             onPress={() => setStage('homeward')}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={styles.btnText}>HEAD HOME ▸</Text>
           </TouchableOpacity>
@@ -216,6 +217,8 @@ function HomewardSplash({
         style={styles.skipOverlay}
         onPress={onDone}
         activeOpacity={1}
+        accessibilityRole="button"
+        accessibilityLabel="Skip to title screen"
       />
     </View>
   );

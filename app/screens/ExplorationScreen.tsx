@@ -539,6 +539,8 @@ export function ExplorationScreen() {
           <TouchableOpacity
             onPress={() => setScreen('character')}
             activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Open player sheet"
             onLayout={(e) => {
               const h = e.nativeEvent.layout.height;
               if (h > 0 && Math.abs(h - statsColH) > 0.5) setStatsColH(h);
@@ -563,11 +565,11 @@ export function ExplorationScreen() {
             // Both vanish the instant an enemy is staged (the panel flips to
             // EnemyPanel), so they never cost permanent space or clutter combat.
             <>
-              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('world')}>
+              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('world')} accessibilityRole="button">
                 <Text style={styles.crestNavText}>⚑ WORLD</Text>
               </TouchableOpacity>
               <CrestPlaceholder />
-              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('lore')}>
+              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('lore')} accessibilityRole="button">
                 <Text style={styles.crestNavText}>◈ LORE</Text>
               </TouchableOpacity>
             </>
@@ -608,6 +610,8 @@ export function ExplorationScreen() {
             }}
             hitSlop={8}
             style={[styles.sceneBarBtn, tutLock && styles.sceneBarBtnBlocked]}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: tutLock }}
           >
             <Text style={styles.sceneBarBtnText}>MAP</Text>
           </TouchableOpacity>
@@ -617,6 +621,7 @@ export function ExplorationScreen() {
             onPress={() => setScreen('about')}
             hitSlop={8}
             style={styles.sceneBarBtn}
+            accessibilityRole="button"
             accessibilityLabel="Settings"
           >
             <Text style={styles.sceneBarGear}>⚙</Text>
@@ -680,6 +685,7 @@ export function ExplorationScreen() {
           <TutorialTarget area="objective-chip">
           <TouchableOpacity
             style={styles.objectiveChip}
+            accessibilityRole="button"
             onPress={() => {
               // Tungsten Spire — advance the main_quest tutorial beat
               // when the player taps the MAIN QUEST chip, then route
@@ -705,6 +711,7 @@ export function ExplorationScreen() {
                   onPress={() => useGameStore.getState().summonCoreGuardian()}
                   activeOpacity={0.7}
                   hitSlop={8}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.objectiveChipSummonText}>★ SUMMON</Text>
                 </TouchableOpacity>
@@ -731,6 +738,7 @@ export function ExplorationScreen() {
           style={styles.vendorBanner}
           onPress={() => setScreen('vendor')}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <View style={styles.vendorBannerStripe} />
           <View style={styles.vendorBannerBody}>
@@ -755,6 +763,7 @@ export function ExplorationScreen() {
           style={styles.missionBoardBanner}
           onPress={() => setMissionBoardOpen(true)}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <View style={styles.missionBoardStripe} />
           <View style={styles.vendorBannerBody}>
@@ -774,6 +783,7 @@ export function ExplorationScreen() {
           style={styles.wandererBanner}
           onPress={() => submit(`talk to ${currentScene.wanderer!.name}`)}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <View style={styles.wandererStripe} />
           <View style={styles.vendorBannerBody}>
@@ -842,6 +852,7 @@ export function ExplorationScreen() {
           style={styles.fusionBanner}
           onPress={fireCrucible}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <View style={styles.fusionBannerStripe} />
           <View style={styles.vendorBannerBody}>
@@ -862,6 +873,8 @@ export function ExplorationScreen() {
             onPress={() => setCrucibleChipDismissedKey(crucibleViewKey)}
             hitSlop={10}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Dismiss Fusing Crucible"
           >
             <Text style={styles.crucibleDismissText}>✕</Text>
           </TouchableOpacity>
@@ -906,6 +919,7 @@ export function ExplorationScreen() {
                   style={styles.didYouMeanChip}
                   activeOpacity={0.7}
                   onPress={() => submit(s)}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.didYouMeanChipText}>{s}</Text>
                 </TouchableOpacity>

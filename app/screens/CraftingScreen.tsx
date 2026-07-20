@@ -347,10 +347,11 @@ export function CraftingScreen() {
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>
+        <Text style={styles.title} accessibilityRole="header">
           {tab === 'craft' ? 'CRAFTING'
             : tab === 'repair' ? 'REPAIR'
             : tab === 'recipes' ? 'RECIPES'
@@ -364,6 +365,8 @@ export function CraftingScreen() {
           onPress={() => setTab('craft')}
           style={[styles.tabBtn, tab === 'craft' && styles.tabBtnActive]}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: tab === 'craft' }}
         >
           <Text style={[styles.tabBtnText, tab === 'craft' && styles.tabBtnTextActive]}>
             CRAFT {craftableCounts.craft > 0 ? `(${craftableCounts.craft})` : ''}
@@ -373,6 +376,8 @@ export function CraftingScreen() {
           onPress={() => setTab('repair')}
           style={[styles.tabBtn, tab === 'repair' && styles.tabBtnActive]}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: tab === 'repair' }}
         >
           <Text style={[styles.tabBtnText, tab === 'repair' && styles.tabBtnTextActive]}>
             REPAIR {repairReady > 0 ? `(${repairReady})` : ''}
@@ -382,6 +387,8 @@ export function CraftingScreen() {
           onPress={() => setTab('recipes')}
           style={[styles.tabBtn, tab === 'recipes' && styles.tabBtnActive]}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: tab === 'recipes' }}
         >
           <Text style={[styles.tabBtnText, tab === 'recipes' && styles.tabBtnTextActive]}>
             RECIPES {craftableCounts.recipes > 0 ? `(${craftableCounts.recipes})` : ''}
@@ -391,6 +398,8 @@ export function CraftingScreen() {
           onPress={() => setTab('aetheric')}
           style={[styles.tabBtn, tab === 'aetheric' && styles.tabBtnActive]}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: tab === 'aetheric' }}
         >
           <Text style={[styles.tabBtnText, tab === 'aetheric' && styles.tabBtnTextActive]}>
             AETHERIC {craftableCounts.aetheric > 0 ? `(${craftableCounts.aetheric})` : ''}
@@ -463,6 +472,7 @@ export function CraftingScreen() {
               return (
                 <Pressable
                   key={d.id}
+                  accessibilityRole="button"
                   style={({ pressed }) => [
                     styles.aetherCard,
                     pressed && styles.aetherCardPressed,
@@ -515,6 +525,7 @@ export function CraftingScreen() {
                         return (
                           <Pressable
                             key={g.kind}
+                            accessibilityRole="button"
                             style={({ pressed }) => [
                               styles.golemVariantRow,
                               pressed && styles.golemVariantRowPressed,
@@ -596,6 +607,8 @@ export function CraftingScreen() {
                     activeOpacity={r.available ? 0.7 : 1}
                     disabled={!r.available}
                     onPress={() => repairInventoryItem(r.item.id)}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: !r.available }}
                   >
                     <View style={[styles.recipeStripe, { backgroundColor: stripeColor }]} />
                     <View style={styles.recipeBody}>
