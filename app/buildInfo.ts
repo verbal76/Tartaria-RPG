@@ -17471,4 +17471,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // balance leaks, not crashes; the sweep found no corruption/crash/state-integrity failures. Verified:
 // ota916AuditFixes (bank + floor) + retargeted ota805RapportDiscount; typecheck:ci + typecheck:tests (200
 // baseline) + lint clean; full fast suite green. Fixes → HAL + golem only, NOT engine.
-export const OTA_BUILD_ID = '2026-07-20-916-audit-fixes-spawn-bank-sell-floor';
+//
+// OTA-917 (BALANCE TUNE — reward-monotonicity fix from the balance/economy audit — content, HAL + golem only) —
+// "The Reclaimer Relic Run" storyline was the confirmed reward outlier of all 14: 7 stages (tied 2nd-most) but
+// the LOWEST payout — 1000 TC / 20 rep and a COMMON reward item (Echoing Steps Boots, tcSell 7), while the other
+// 13 all pay a Rare item + 1200-2000 TC + 22-30 rep. Worse, that item is the Reclaimer race's own STARTER
+// (RACE_STARTER_EXPLORATION), so for its likeliest runners the reward was a duplicate worth nothing. Re-tiered to
+// sit monotone with the 7-stage tier: rewardTc 1000→1400, rewardRep 20→24, rewardItem Echoing Steps Boots →
+// Explorer's Aetheric Greaves (Rare, tcSell 48, feet, explorer-themed, not any race starter); posterText TC
+// updated. Data-only. (The audit's other confirmed mis-tune — gear resale clamped to scrap because
+// RARITY_BUY_FLOOR shadows GEAR_RARITY_BASE — is deferred: the safe fix must be per-item buy-grounded, since a
+// flat gear floor reopens bare-Common-weapon arbitrage.) Verified: contractUIRewards + echoingBootsArmor green;
+// JSON valid. Content → HAL + golem only, NOT engine.
+export const OTA_BUILD_ID = '2026-07-20-917-reclaimer-relic-run-reward-retier';
