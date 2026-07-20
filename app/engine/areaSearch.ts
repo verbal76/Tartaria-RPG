@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 // Area-search engine — when the player searches a generic SPATIAL or
 // MATERIAL target ("the mud", "the rubble", "the doorway", "behind me",
 // "to my left"), the engine rolls an outcome on the spot. No reprompt,
@@ -95,123 +96,9 @@ export type AreaSearchOutcome =
 // forage path). A mix of Uncommon materials + Uncommon gear — gear names are
 // granted through the caller's lookupCraftedItem, so they land as real
 // weapons/armor, not inert misc.
-const RARE_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
-  // rare materials
-  { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 6 },
-  { name: 'Mud Essence', rarity: 'Uncommon', weight: 5 },
-  { name: 'Drone Core', rarity: 'Uncommon', weight: 4 },
-  { name: 'Energy Fragment', rarity: 'Uncommon', weight: 4 },
-  // OTA-446 — [playability] richer found-gear so WANDERING actually upgrades you.
-  // A playtester cleared the start area + walked to the first city and arrived
-  // "still pretty average" — the investigate pool yielded only 1–2 Uncommon
-  // pieces. Uncommon gear weights bumped (3→4 / 2→3), and two low-weight RARE
-  // pieces added so a LUCKY wanderer can find a real upgrade (the "if you're
-  // lucky, you can make it" curve). Materials still dominate the pool.
-  // rare gear — weapons
-  { name: 'Mud-Rend Blade', rarity: 'Uncommon', weight: 4 },
-  { name: 'Aetheric Crystal Blade', rarity: 'Uncommon', weight: 3 },
-  { name: 'Storm Rod', rarity: 'Uncommon', weight: 3 },
-  { name: 'Bone Crossbow', rarity: 'Uncommon', weight: 3 },
-  { name: 'Sentinel Cleaver', rarity: 'Rare', weight: 1 },
-  // rare gear — armor
-  { name: "Salvager's Intuition Band", rarity: 'Uncommon', weight: 3 },
-  { name: "Aether-Seeker's Cap", rarity: 'Uncommon', weight: 3 },
-  { name: "Architect's Sight Enhancer", rarity: 'Uncommon', weight: 3 },
-  { name: "Spirit-Caller's Helm", rarity: 'Uncommon', weight: 3 },
-  { name: "Aether-Seeker's Hood", rarity: 'Rare', weight: 1 },
-];
+const RARE_FINDS: { name: string; rarity: Rarity; weight: number }[] = require('../data/search/find-pools.json').rare;
 
-const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
-  // Rocks / sticks / scrap — the "normal stuff you'd find on the
-  // ground." Highest weights so the player keeps stocking the
-  // cheap-kit pool the rulebook promises.
-  { name: 'Mud Fragment', rarity: 'Common', weight: 12 },
-  { name: 'Aether Residue', rarity: 'Common', weight: 8 },
-  // OTA-444 — [playability] golem-fuel + recipe-staple aether mats bumped. A
-  // playtester cleared the start area + reached the first city able to craft
-  // almost nothing and rarely summon a golem; these are the bottleneck inputs
-  // (Aether Mud / Crystal feed every golem; Aether Dust feeds 11 recipes but was
-  // UNFORAGEABLE; Aetheric Shard feeds 10). Bumped within the material niche only
-  // — food, mushrooms, and the (capped) rocks/sticks are untouched.
-  { name: 'Aether Mud', rarity: 'Common', weight: 8 },
-  { name: 'Aether Dust', rarity: 'Common', weight: 4 },
-  // OTA-447 — Mudstone forageable at a LOW weight. It's the last Mud-Golem fuel
-  // gap: pre-fix it dropped only from mud-enemy kills / mud-stone scrap, so a
-  // combat-light wanderer couldn't summon even the baseline golem. Low weight
-  // keeps it a deliberate gather, not a flood (it's the Rare-tier mud stock).
-  { name: 'Mudstone', rarity: 'Rare', weight: 3 },
-  // OTA 021 — rocks / sticks bumped HARD because the playtester
-  // hadn't seen a Big Rock in their session at all. These are the
-  // rulebook-promised cheap-stock items every starter relies on
-  // for clubs / spears / improvised throwing. After the OTA 012
-  // food additions diluted the pool, rocks+sticks dropped to ~28%
-  // of material drops; the bumps below put them back at ~40%.
-  { name: 'Small Rock', rarity: 'Common', weight: 40 },
-  { name: 'Big Rock', rarity: 'Common', weight: 22 },
-  { name: 'Stick', rarity: 'Common', weight: 38 },
-  // OTA 227 — Firewood drops fairly often from look-around / area
-  // search. Weightless, single-purpose (campfire fuel).
-  { name: 'Firewood', rarity: 'Common', weight: 18 },
-  { name: 'Spider Silk', rarity: 'Common', weight: 6 },
-  { name: 'Patched Cloth', rarity: 'Common', weight: 6 },
-  // OTA-444 — Aether Crystal (golem fuel, 9 recipes) 4→7; Aetheric Shard
-  // (10 recipes, 1–3 per craft) 2→4. Still well under the food-tier weights.
-  { name: 'Aether Crystal', rarity: 'Common', weight: 7 },
-  { name: 'Bone Bolt', rarity: 'Common', weight: 4 },
-  { name: 'Trail Rations', rarity: 'Common', weight: 3 },
-  { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 4 },
-
-  // OTA 002 — wild foods. Playtester: "I want to find wild onions,
-  // wild carrots... blueberries, raspberries, grapes picked from a
-  // vine. these foods need to be eaten or drank and they should
-  // all give you health back to varying degrees." Per-item HP /
-  // stamina lives in the catalog effect; eat handler reads it.
-  // Common foods (5-9 weight each — ~30% of all material drops
-  // combined). Uncommon fruits + protein at lower weight, rare
-  // Wild Chicken sparingly.
-  { name: 'Wild Onion', rarity: 'Common', weight: 8 },
-  { name: 'Wild Carrot', rarity: 'Common', weight: 8 },
-  { name: 'Wild Lettuce', rarity: 'Common', weight: 6 },
-  { name: 'Rhubarb Stalk', rarity: 'Common', weight: 5 },
-  { name: 'Wild Oats', rarity: 'Common', weight: 7 },
-  { name: 'Speckled Egg', rarity: 'Uncommon', weight: 3 },
-  { name: 'Blueberries', rarity: 'Uncommon', weight: 4 },
-  { name: 'Raspberries', rarity: 'Uncommon', weight: 4 },
-  { name: 'Wild Grapes', rarity: 'Uncommon', weight: 3 },
-  { name: 'Wild Chicken', rarity: 'Rare', weight: 1 },
-
-  // Colored mushrooms — Phase 4 will combine these in the craft
-  // tab for color-coded potions. Eaten raw, they give minimal
-  // healing — the real value comes from cooking / distilling.
-  { name: 'Red Cap Mushroom', rarity: 'Common', weight: 5 },
-  { name: 'Blue Cap Mushroom', rarity: 'Common', weight: 5 },
-  { name: 'Violet Cap Mushroom', rarity: 'Uncommon', weight: 2 },
-  { name: 'Orange Sporecap', rarity: 'Common', weight: 5 },
-
-  // Empty bottles — water-bottle Phase 3 (OTA 004). Low weight so
-  // the player has to do some looking before bottle stock outpaces
-  // the new fill-bottle verb's water-source detection.
-  { name: 'Empty Water Bottle', rarity: 'Common', weight: 4 },
-
-  // Rare trinkets — "every now and then you'll find a trinket
-  // like a locket or ring or something good but rarely."
-  { name: 'Aetheric Locket', rarity: 'Common', weight: 1 },
-
-  // OTA 029 — improvised / found weapons. Playtester request: the
-  // wasteland should occasionally cough up a rusted blade-thing the
-  // player can pick up and swing. Low weights so weapons stay a
-  // happy surprise, not a flood. Mix of common improvised
-  // (cudgel/stone spear/pocket knife/bone shiv), faction-flavored
-  // commons (bone knife/rust dagger) and one uncommon aetheric.
-  { name: 'Cudgel', rarity: 'Common', weight: 3 },
-  { name: 'Stone Spear', rarity: 'Common', weight: 3 },
-  { name: 'Pocket Knife', rarity: 'Common', weight: 2 },
-  { name: 'Bone Shiv', rarity: 'Common', weight: 2 },
-  { name: 'Bone Knife', rarity: 'Common', weight: 2 },
-  { name: 'Rust Dagger', rarity: 'Common', weight: 2 },
-  { name: 'Aetherium Spear', rarity: 'Common', weight: 1 },
-  { name: 'Aether-Shard Spear', rarity: 'Uncommon', weight: 1 },
-];
+const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = require('../data/search/find-pools.json').small;
 
 // Empty-search narration. Per the playtest "Lockbox/Wagon"
 // feedback, this line MUST be definitive — players were rolling
