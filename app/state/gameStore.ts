@@ -4262,7 +4262,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const itemDefaults = require('../engine/itemDefaults');
       if (typeof itemDefaults.setOnInferred === 'function') {
         itemDefaults.setOnInferred((label: string) => {
-          try { console.log(`[Tartaria][inferred-stats] ${label}`); } catch { /* ignore */ }
+          try { console.log(`[engine][inferred-stats] ${label}`); } catch { /* ignore */ }
         });
       }
     } catch { /* ignore — module is small + always present */ }
@@ -5017,7 +5017,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().beginScene();
         // OTA-416 — narrate the interrupted-death case as a revival, not silence.
         if (wasInterruptedDeath) {
-          const here = get().currentScene?.location?.name ?? 'Tartaria';
+          const here = get().currentScene?.location?.name ?? getWorldName();
           get().appendLog(
             'reward',
             `✦ You claw back from the brink — the ${getEnergyMaterial()} hauls the breath back into you. Restored, you stand again in ${here}.`,
@@ -11279,7 +11279,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (player.raceId === 'unknowing_mass' && !player.curiousMindAwakened && (relicTarget || inRuins)) {
           set((s) => s.player ? { player: { ...s.player, curiousMindAwakened: true } } : s);
           void Promise.resolve().then(() =>
-            get().appendLog('reward', `✦ Curious Mind — Tartaria's secrets crack open before you, and something in your head clicks awake. (+2 INT and +2 WIS, from here on.)`),
+            get().appendLog('reward', `✦ Curious Mind — ${getWorldName()}'s secrets crack open before you, and something in your head clicks awake. (+2 INT and +2 WIS, from here on.)`),
           );
         }
         const steps = buildSkillSteps(parsed.intent, player, {
@@ -12635,7 +12635,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             || /\bdescribe\s+(you|yourself|the\s+arbiter)\b/.test(introQ)) {
           get().appendLog(
             'arbiter',
-            `The ${getNarratorName()} watches you for a moment. "I am the ${getNarratorName()}. I walk Tartaria with whoever the buried country lets through next. I do not bleed. I do not sleep. I remember the world above and the world below — and what the dust did to the seam between them."`,
+            `The ${getNarratorName()} watches you for a moment. "I am the ${getNarratorName()}. I walk ${getWorldName()} with whoever the buried country lets through next. I do not bleed. I do not sleep. I remember the world above and the world below — and what the dust did to the seam between them."`,
           );
           break;
         }
@@ -12689,7 +12689,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : ' No contracts on your slate yet; the world will offer some when you let it.';
           get().appendLog(
             'arbiter',
-            `The ${getNarratorName()} speaks slowly. "Tartaria buried itself before you were born; you walk it because the ${fac?.name ?? player.factionId} asked, and because you said yes. The work is to dig, to remember, to decide what stays.${contractLine}"`,
+            `The ${getNarratorName()} speaks slowly. "${getWorldName()} buried itself before you were born; you walk it because the ${fac?.name ?? player.factionId} asked, and because you said yes. The work is to dig, to remember, to decide what stays.${contractLine}"`,
           );
           break;
         }
@@ -14297,7 +14297,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set({ player: advanceTime(spendStamina(player, 1), 0.1) });
         get().appendLog(
           'arbiter',
-          `The ${getNarratorName()} shrugs. "Tartaria forgot mounts a long time ago. The frame is here for when a beast worth riding shows up — until then it costs half your Speed to climb on nothing."`,
+          `The ${getNarratorName()} shrugs. "${getWorldName()} forgot mounts a long time ago. The frame is here for when a beast worth riding shows up — until then it costs half your Speed to climb on nothing."`,
         );
         break;
       }
@@ -20407,7 +20407,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== id),
         },
       } : s));
-      get().appendLog('world', `You let ${theLower(def.title)} go. Some questions Tartaria keeps.`);
+      get().appendLog('world', `You let ${theLower(def.title)} go. Some questions ${getWorldName()} keeps.`);
     } else if (kind === 'storyline') {
       const def = findStorylineById(id);
       const rec = (player.activeStorylines ?? []).find((s) => s.id === id);
@@ -21573,7 +21573,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           `You step ${dir}. Somewhere distant, something settles — a stone giving up, or a structure remembering it once stood.`,
           `You push ${dir}. The wind has a voice today; mostly it just murmurs old syllables you don't quite catch.`,
           // Smell / atmosphere
-          `You head ${dir}. The air smells like wet iron and forge ash. Tartaria's signature.`,
+          `You head ${dir}. The air smells like wet iron and forge ash. ${getWorldName()}'s signature.`,
           `You strike out ${dir}. Whatever ferments under the mud sends up a sweet, wrong note as you cross it.`,
           // Distance / perception
           `You move ${dir}. After a while the road stops counting itself. You take it on faith you've made progress.`,
@@ -24833,7 +24833,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `You sit for ${hoursSlept} hours. Nothing in you wants healing; you watch the light shift instead.`,
       `You sit for ${hoursSlept} hours. The body is at peace. The mind keeps walking on without you.`,
       `You sit for ${hoursSlept} hours. You came back to yourself at the same place you set out from.`,
-      `You sit for ${hoursSlept} hours. Tartaria did not change in any of them you can see.`,
+      `You sit for ${hoursSlept} hours. ${getWorldName()} did not change in any of them you can see.`,
     ];
     if (stamRoom <= 0 && hungerTicks === 0 && weatherHpDamage === 0 && weatherStamDamage === 0 && !ambushTriggered) {
       set((s) => (s.player ? { player: { ...s.player, hoursElapsed: newHours } } : s));
@@ -26431,7 +26431,7 @@ const BURST_START_LINES = [
   `The ${getNarratorName()} nods. "On the board it goes."`,
   `"Adding another," the ${getNarratorName()} says, dry. "Make good on it."`,
   `The ${getNarratorName()} glances at the page. "Promise made. Hold yourself to it."`,
-  `"Another contract," the ${getNarratorName()} says. "Tartaria notes."`,
+  `"Another contract," the ${getNarratorName()} says. "${getWorldName()} notes."`,
 ];
 const BURST_STACKING_LINES = [
   `The ${getNarratorName()} raises an eyebrow. "You're stacking promises. They don't pay until the work does."`,
@@ -26441,7 +26441,7 @@ const BURST_STACKING_LINES = [
 ];
 const BURST_SLOW_DOWN_LINES = [
   `The ${getNarratorName()}'s voice cools. "Slow down. The work is real. You can only walk one road at a time."`,
-  `"Five on the slate," the ${getNarratorName()} says. "Tartaria does not negotiate down a list you over-bought."`,
+  `"Five on the slate," the ${getNarratorName()} says. "${getWorldName()} does not negotiate down a list you over-bought."`,
   `The ${getNarratorName()} sighs. "Every contract is a debt. You're stacking debts faster than legs to walk them."`,
   `"That's a lot of promises," the ${getNarratorName()} says quietly. "Plan your route, or you'll forget half."`,
 ];
@@ -28416,10 +28416,10 @@ function handlePlayerDeath(
   const player = state.player;
   if (!player || player.dead) return; // already handled
 
-  const locName = state.currentScene?.location.name ?? 'Tartaria';
+  const locName = state.currentScene?.location.name ?? getWorldName();
   const epitaph = pick([
     `${player.name} falls in ${locName}. The ${getEnergyMaterial()} grows dim and does not lift.`,
-    `The buried world claims ${player.name}. Tartaria keeps the body count.`,
+    `The buried world claims ${player.name}. ${getWorldName()} keeps the body count.`,
     `${player.name}'s breath leaves. The dust settles back into its old patterns.`,
     `An end at ${locName}. The ${getNarratorName()} watches and says nothing.`,
     `${player.name} does not rise. The ruins remember another.`,
@@ -28451,7 +28451,7 @@ function handlePlayerDeath(
     };
     void recordFallen(hero).then((total) => {
       if (total > 1) {
-        get().appendLog('system', `You join the Fallen of Tartaria — ${total} names the buried world keeps now. Read the roll from the Lore Codex.`);
+        get().appendLog('system', `You join the Fallen of ${getWorldName()} — ${total} names the buried world keeps now. Read the roll from the Lore Codex.`);
       }
     }).catch(() => { /* the graveyard is a keepsake, never block death on it */ });
   }
@@ -28976,7 +28976,7 @@ const REST_PULL_LINES: RestPull[] = [
 // type 'what is X'. Rate kept low so it doesn't spam over a long
 // walk; one beat every ~20 steps on average.
 const TRAVEL_LORE_BEATS = [
-  `The ${getNarratorName()}, walking with you: "Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it."`,
+  `The ${getNarratorName()}, walking with you: "${getWorldName()} was a continent once. A flood older than any honest map drowned it. We are crossing the top of it."`,
   `The ${getNarratorName()}, half to themselves: "The Aether you breathe out here is the same Aether the pre-flood engineers stored. Most of it is theirs, leaking back."`,
   `The ${getNarratorName()}: "The Reclaimers tag, recover, return. The Forgotten Order kneels. The Mud Monarchs collect. The Aetherborn watch. Five answers to one buried country."`,
   `The ${getNarratorName()} glances at the horizon. "Buried cities under us. The flood didn't bury them all at once — some sank slowly enough that the people inside knew."`,
@@ -29038,7 +29038,7 @@ function narrateAmbientFind(
   const aroundPronoun = isPlural ? 'them' : 'it';
   const inHub = !!get().player?.hubRoomId;
   const neutral = [
-    `You examine the ${noun}. Tartaria has not given up its secrets here.`,
+    `You examine the ${noun}. ${getWorldName()} has not given up its secrets here.`,
     `You study the ${noun}. The Aetheric haze around ${aroundPronoun} thickens, then settles.`,
     `You inspect the ${noun}. Whatever was here once, this is what remains.`,
   ];
@@ -29669,7 +29669,7 @@ function narratePossibleDirections(
 
   const others = allLocations.filter((l) => l.id !== scene.location.id && l.discoverable !== false);
   if (others.length === 0) {
-    get().appendLog('world', 'You scan for a way forward. Tartaria does not advertise its directions.');
+    get().appendLog('world', 'You scan for a way forward. ${getWorldName()} does not advertise its directions.');
     markPathExhausted();
     return;
   }
