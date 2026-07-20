@@ -17203,4 +17203,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // chainedNarrative injects the face-to-face vendor completeContractFromUI requires (OTA-810); and two
 // heavy stress sims (thousandDayStressSim 180→90 days, combatStress 700→250 days) are bounded to their
 // stable range (the engine's world/persist layer grows super-linearly in the tail).
-export const OTA_BUILD_ID = '2026-07-19-900-fetch-courier-gate';
+//
+// OTA-901 (jest gate → BLOCKING + RNG-flake hardening) — the jest suite is now a REQUIRED CI gate,
+// split into two jobs so the block is real without being hostage to a known engine characteristic:
+//  • jest (fast · required)   — the 467 deterministic unit/integration suites (~3950 tests). The real
+//    regression ratchet; BLOCKING.
+//  • jest (heavy sims · reported) — the 27 stress/balance/long-run sims (700-day sims, chaos sweeps,
+//    balance probes). NON-blocking: they exercise the engine's known super-linear world/persist tail-
+//    growth and are memory/time-sensitive by nature, so gating every PR on that flagged-but-unfixed
+//    characteristic would be the wrong gate. They run serially with aggressive worker recycling and
+//    surface as an informational signal.
+// Making the fast gate merge-safe meant killing a class of latent RNG flakes that only tripped
+// intermittently (a different ~1 test per full run — weather chips, variety checks, outcome bands):
+//  • DETERMINISTIC PRNG (the general fix) — jest.setup.js seeds Math.random with a fixed mulberry32,
+//    reset per test file, so every run is byte-identical: one green run is green forever and the tail of
+//    statistical/variety checks can't surprise a merge. Coverage is unchanged — tests still drive real
+//    code with a full pseudo-random sequence; it's just reproducible. Tests that need a specific value
+//    still override Math.random locally. Product code is untouched.
+//  • INCIDENTAL WEATHER (kept, for intent) — tickWeather rolls an HP/stamina chip on EVERY action; the
+//    setup also pins incidental scene weather (pickWeather) to Eerie Calm so vital-exact assertions read
+//    clean regardless of seed. Tests that exercise weather set it explicitly; weatherEffects calls
+//    tickWeather directly — both unaffected.
+//  • FIXTURE FRAGILITY — pinned hpMax in the climb-rope / heal-batch fixtures that assumed a fixed
+//    starting HP (some races roll hpMax < the hardcoded value), and recalibrated directionalFindAndCool
+//    Story's outcome bands to ±~5σ around the TRUE design (0.75 hook family → 0.375/0.225/0.15, not the
+//    stale ~30%), correcting the misleading "60% hook share" comment in areaSearch.
+// Test-harness + CI-config only; the one source touch (areaSearch) is a comment. No shipped gameplay change.
+export const OTA_BUILD_ID = '2026-07-20-901-jest-blocking-gate';

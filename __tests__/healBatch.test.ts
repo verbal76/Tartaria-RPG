@@ -85,8 +85,10 @@ describe('useHealBatch store action (OTA-693)', () => {
   it('SELF: applies N kits at once, clamped to missing HP, spends N', async () => {
     const store = await freshGame();
     const p = store.getState().player!;
-    // First Aid Kit heals 25. Set hp 30/ (hpMax). gap = hpMax-30.
-    store.setState({ player: { ...p, hp: 30, inventory: [...p.inventory, firstAidKit('fak', 5)] } });
+    // First Aid Kit heals 25. Pin hpMax to 100 so the "hp 30, positive gap"
+    // premise holds regardless of the race's rolled hpMax (some starting races
+    // roll hpMax < 30, which left hp:30 ABOVE max and flaked the <= maxHp check).
+    store.setState({ player: { ...p, hp: 30, hpMax: 100, inventory: [...p.inventory, firstAidKit('fak', 5)] } });
     const maxHp = store.getState().player!.hpMax;
     const gap = maxHp - 30;
     const n = healBatchCount(25, gap, 5);
@@ -127,9 +129,9 @@ describe('useHealBatch store action (OTA-693)', () => {
     // count tops off in one tap, the last kit's surplus clamped at hpMax.
     const store = await freshGame();
     const p = store.getState().player!;
-    const maxHp = p.hpMax;
+    const maxHp = 100; // pin so hp = maxHp - 55 stays positive regardless of the rolled hpMax
     const gap = 55; // not a multiple of 25
-    store.setState({ player: { ...p, hp: maxHp - gap, inventory: [...p.inventory, firstAidKit('fak', 5)] } });
+    store.setState({ player: { ...p, hp: maxHp - gap, hpMax: maxHp, inventory: [...p.inventory, firstAidKit('fak', 5)] } });
     const noWaste = healBatchCount(25, gap, 5);           // floor(55/25) = 2 → stops at -5 short
     const toFull = Math.min(5, Math.ceil(gap / 25));       // ceil(55/25) = 3 → reaches full
     expect(noWaste).toBe(2);
