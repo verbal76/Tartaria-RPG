@@ -17267,4 +17267,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "use" verb — useHealBatch, useInventoryItem — which the rule mis-reads as React hooks) and no-useless-
 // assignment (false-positives on defensive try/catch fallback inits). Dev-tooling + CI-config only; no app
 // code, behaviour, or shipped bundle changed.
-export const OTA_BUILD_ID = '2026-07-20-903-lint-blocking-gate';
+//
+// OTA-904 (Aetherstone Thesis — flavor, first tranche) — first use of the owner's new canon doc
+// (docs/aetherstone-thesis.docx/.md): the mechanistic origin story for the whole world. Additive lore,
+// no retcon — Zalmar, Thametan's Tower, the Forgotten Order, Aetherstone, and Mud Golems were all already
+// in-game; this fills in the "how". Two edits: (1) a new discoverable concept `zalmar_overload` — the
+// radiative-Aether-harvest → vacuum-seal-shatter → substratum-liquefaction → Mud Flood → Aetherstone-
+// calcification chain, keyworded to the questions the narrator already teases ("why the water rose",
+// "what it left buried") and weaving in the doc's new proper nouns (the Grand Spire of Etheria, the Hwang
+// Radiative Principles, the Soldani Crystalline Theorems, "quintessence"); plus a one-clause enrichment of
+// the thin `aetherstone` concept (it's calcified flood-mud with trapped Etherium). (2) the Mud Golem
+// bestiary flavor line now carries its canonical origin (woke where the trapped Etheric charge ran hottest
+// — "a scrap of the empire's own thermodynamic hubris"). Terminology follows the doc's deliberate 3-way
+// scheme — Aether (the force), Etheric (the machinery/phenomena), Etherium (the crystallized shards) —
+// additively, no mass-rename of existing "Aetheric" text. Data-only; Tartaria canon → HAL + golem only,
+// never engine. Covered by ota837CodexData + ota839LoreAccuracy + ambientLoreReach (all green).
+export const OTA_BUILD_ID = '2026-07-20-904-aetherstone-thesis-flavor';

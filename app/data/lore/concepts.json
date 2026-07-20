@@ -144,7 +144,13 @@
       "id": "aetherstone",
       "keywords": ["aetherstone", "aetherstone", "stone"],
       "title": "Aetherstone",
-      "answer": "Crystallized Aether — the buried world's currency, weapon stock, and battery. Hums when something resonates with it. Most relics are built around an Aetherstone core."
+      "answer": "Crystallized Aether — the buried world's currency, weapon stock, and battery. It is the flood-mud itself, flash-calcified by the Zalmar Overload into a matrix harder than any natural rock, with pockets of raw Etherium still trapped and vibrating inside. Hums when something resonates with it. Most relics are built around an Aetherstone core."
+    },
+    {
+      "id": "zalmar_overload",
+      "keywords": ["zalmar overload", "the overload", "why the water rose", "what caused the flood", "how the flood happened", "how did the flood happen", "thermodynamic", "waste heat", "radiator", "vacuum seal", "etheric grid", "etheric grids", "grand spire", "grand spire of etheria", "quintessence", "how aetherstone formed", "how did aetherstone form", "what it left buried"],
+      "title": "The Zalmar Overload",
+      "answer": "The deep answer to why the water rose. Old Tartaria ran on Aether — the fifth force, the quintessence — harvested from the sun and the cold night sky at once, its waste heat vented into the black of space through vacuum-sealed radiators, then multiplied through oriented crystal arrays until it could lift citadels and wake sentinels. Elior Zalmar tried to hold the entire planetary grid at that screaming peak from Thametan's Tower. The resonance shook the vacuum seals of the Etheric Grids apart, and with nowhere left to dump the heat, the engines poured it down into the bedrock instead. The ground ionized and rose as Ether-charged mud — the Great Mud Flood — then flash-calcified into Aetherstone, sealing the cities and their Entombed where they stood and trapping the Etherium shards, the temporal loops, and the Etheric storms the Reclaimers pick through to this day. (Archived by the Forgotten Order's Department of Aetheric Engineering; cross-read the Zalmar Texts, the Hwang Radiative Principles, and the Soldani Crystalline Theorems.)"
     },
     {
       "id": "tartaria",
