@@ -16537,4 +16537,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Greaves (Rare, tcSell 48, feet, not a race starter); posterText TC updated. Data-only; JSON valid;
 // contractUIRewards + echoingBootsArmor green. (Gear-resale-as-scrap mis-tune deferred — needs a per-item
 // buy-grounded fix to avoid reopening arbitrage.) Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-894-reclaimer-relic-run-reward-retier';
+// OTA-895 (BALANCE TUNE — summit bosses to a real boss tier + weakness de-dup; port of HAL OTA-918) — the five
+// Great-Climb summit bosses guard the biggest reward but sat at the lightest boss tier and double-dipped their
+// electrical weakness. (1) Base HP 270-320 → 440-500 (Ossika 440, Draugveil 460, Aurenthal/Zalmar 470, Magnetar
+// 500). (2) Removed redundant `vulnerable:electrical` (Automation/Mechanism are type-weak to electrical, and
+// concordant type+trait stacks 1.5x*1.5x=2.25x; electrical stays a clean 1.5x via the type map). (3) Kept
+// `vulnerable:acid` (not a type weakness — the trait is the intended single source for the Boltcaster's acid).
+// Verified: skyreacherRewards retargeted + greatClimbs/climbEncounters/skyreacherFullRun/ota915 green;
+// typecheck:ci + typecheck:tests + lint clean; full fast suite green. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-895-summit-boss-hp-and-weakness-dedup';

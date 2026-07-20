@@ -29,10 +29,23 @@ describe('OTA-912 — summit bosses', () => {
   });
 
   it('bosses read as vulnerable to the anti-machine elements the Boltcaster deals', () => {
+    // OTA-918 — electrical weakness now comes from the Automation/Mechanism TYPE map
+    // (a single 1.5x); the explicit vulnerable:electrical trait was removed because it
+    // double-dipped (type-weak x trait-vuln = 2.25x). Acid is NOT a type weakness, so
+    // its trait is the intended single source that makes the Boltcaster's acid rider bite.
     for (const b of SUMMIT_BOSSES) {
       const traits = b.base.traits ?? [];
-      expect(traits).toContain('vulnerable:electrical');
+      expect(['Automation', 'Mechanism']).toContain(b.base.type); // type map carries the electrical weakness
+      expect(traits).not.toContain('vulnerable:electrical'); // no double-dip
       expect(traits).toContain('vulnerable:acid');
+    }
+  });
+
+  it('summit bosses sit at a real boss HP tier (guarding the biggest reward)', () => {
+    // OTA-918 — raised from 270-320 (~46% of the story-boss floor) to a real Legendary
+    // boss tier so the game's largest reward package isn't behind its lightest fight.
+    for (const b of SUMMIT_BOSSES) {
+      expect(b.base.hp).toBeGreaterThanOrEqual(440);
     }
   });
 
