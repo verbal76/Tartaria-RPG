@@ -1083,7 +1083,7 @@
       "tartarian_giant",
       "wardrobe"
     ],
-    "description": "Climbing support sized for large bodies. Supports heavy weights and prevents falls in rugged terrain.",
+    "description": "A giant-forged climbing harness — belay loops, thigh straps, and a load-bearing anchor plate. Worn on the LEGS (it takes the legs-armor slot). On an ordinary climb it takes the weight off your arms so each pitch costs less. On a great climb it is mandatory: only its anchor lets you rest at altitude and fight mid-climb — without it you can only trade blows at the top or the bottom, and the height itself will eventually pull you off. Pairs with a Reclaimer's Rope, whose line is the only one that outlasts a great ascent. The old Reclaimers say these were rigged for the crews who serviced the Aether-collector towers — the sky-antennas of the grid that drowned the world.",
     "effect": {
       "kind": "gate",
       "unlocks": "climb_steep"

@@ -1201,7 +1201,7 @@ export function ExplorationScreen() {
               const hasReclaimersRope = player.inventory.some(
                 (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
               );
-              const wearsClimbStrap = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
+              const wearsClimbStrap = (player.equipped?.legs ?? '').toLowerCase() === 'hardened climbing strap';
               const ropeName = hasReclaimersRope ? "Reclaimer's Rope" : 'Climbing Rope';
               const ropeInstances = player.inventory.filter(
                 (i) => i.name === ropeName && i.quantity > 0 && i.durability != null,

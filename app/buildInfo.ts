@@ -16466,4 +16466,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // only armor authored with three resist slots, collect_only: no craft/vendor, nominal 1 TC sell). New
 // "Skyreacher" title earned at 5 great climbs crested — halves climb-fall damage + passive +2 DEX. Verified:
 // typecheck:ci + typecheck:tests + lint clean; full fast suite green.
-export const OTA_BUILD_ID = '2026-07-20-887-great-climbs-skyreacher-set';
+// OTA-888 (GREAT CLIMBS — mountaineering rework; port of HAL OTA-911) — the five great climbs are the
+// Aether-collector towers of the old grid, defended still by winged sentinels + collector drones (new
+// engine/climbEncounters.ts) that ambush you mid-climb 2–5 times scaling with height. The Hardened Climbing
+// Strap moved to the LEGS slot (a harness); the Skyreacher legs piece moved to the freed cloak slot as the
+// "Skyreacher Mantle" so the full set + strap coexist. A great climb now requires, from the ground, BOTH the
+// strap (legs) AND a Reclaimer's Rope long enough to outlast it. On a climb: dodge & flee are refused
+// (inventory + drinking still work), you can't climb past a live fight, and mid-climb fighting needs the
+// strap. The golem can't climb — benched at the base like the dog. Verified: typecheck:ci + typecheck:tests
+// + lint clean; full fast suite green. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-888-great-climbs-mountaineering-rework';

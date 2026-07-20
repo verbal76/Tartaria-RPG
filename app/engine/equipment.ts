@@ -54,11 +54,13 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   if (exp?.effect?.kind === 'scanner') {
     return [exp.effect.slot]; // currently always 'off'
   }
-  // arb102 — `wardrobe`-tagged worn gear that isn't catalog armor (the
-  // Hardened Climbing Strap) equips in the cloak / outer-layer slot, so it's
-  // worn like apparel rather than stowed as a tool.
+  // arb102 / OTA-911 — `wardrobe`-tagged worn gear that isn't catalog armor
+  // (the Hardened Climbing Strap) equips in the LEGS slot: it's a harness rigged
+  // around the hips and thighs, so it displaces leg armor while worn. (Was the
+  // cloak slot pre-OTA-911; moved to legs per the mountaineering rework so the
+  // strap is worn like a climbing harness, not a mantle.)
   if (item.tags?.some((t) => t.toLowerCase() === 'wardrobe')) {
-    return ['cloak'];
+    return ['legs'];
   }
   const armor = findArmorByName(item.name);
   if (armor) {

@@ -7987,6 +7987,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const isGolemDismiss = /^(dismiss|release|unbind)\s+(the\s+)?golem\b/i.test(lower);
       if (isGolemCommand || isGolemDismiss) {
         get().appendLog('player', trimmed);
+        // OTA-911 — the golem can't climb, so it can't be commanded while you're
+        // up on a climb: it's holding the ground at the base. Dismiss still works.
+        if (isGolemCommand && get().currentScene?.elevatedOn) {
+          get().appendLog(
+            'world',
+            `Your golem is at the base of the ${get().currentScene?.elevatedOn?.noun ?? 'climb'} — it can't climb, and it can't reach anything up here. You're on your own until you're back on the ground.`,
+          );
+          void get().persist();
+          return;
+        }
         if (isGolemDismiss) {
           handleGolemDismiss(get, set);
         } else {
@@ -8006,6 +8016,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         void get().persist();
         return;
+      }
+    }
+    // OTA-911 — DODGE and FLEE don't work while you're on a climb. Both hands are
+    // on the rock: there's no footing to weave a parry, and nowhere to flee to but
+    // straight down. (Inventory use and drinking still work — those go through
+    // their own verbs and modal, which aren't gated here.) Intercept BEFORE the
+    // parser so no roll, time, or stamina is spent on the refused action.
+    {
+      const elevNow = get().currentScene?.elevatedOn;
+      if (elevNow) {
+        const lowerAct = trimmed.toLowerCase().trim();
+        const isDodgeAct = /^(dodge|parry|block|deflect)\b/.test(lowerAct);
+        const isFleeAct = /^(flee|run|escape|retreat|withdraw|disengage)\b/.test(lowerAct);
+        if (isDodgeAct || isFleeAct) {
+          get().appendLog('player', trimmed);
+          get().appendLog(
+            'world',
+            isDodgeAct
+              ? `You can't dodge on the ${elevNow.noun} — both hands are on the rock and there's no footing to weave a parry. Set your feet and swing, or climb clear first.`
+              : `There's nowhere to run but straight down. You hold your place on the ${elevNow.noun} — fight it out or climb, those are the ways off a wall.`,
+          );
+          void get().persist();
+          return;
+        }
       }
     }
     // OTA-120 — Dog Companion: three-step Arbiter onboarding takeover.
@@ -11359,7 +11393,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // arb102 — rest while elevated needs a Reclaimer's Rope (belay
             // loops) OR a worn Hardened Climbing Strap (a harness you can hang
             // and doze in).
-            const wearsClimbStrapForRest = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
+            const wearsClimbStrapForRest = (player.equipped?.legs ?? '').toLowerCase() === 'hardened climbing strap';
             // OTA-910 — on a GREAT climb the rope isn't enough. Only the
             // Hardened Climbing Strap's harness is rated to hold you for a doze
             // at this altitude — and since a great climb is too tall to top in
@@ -13264,6 +13298,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // an Uncommon-skewed item — chance-based so not every climb
         // pays out).
         const tgt = climbTarget || 'the surface in front of you';
+        // OTA-911 — you can't climb past a fight. When guardians are on you
+        // (including a mid-climb ambush), the climb verb is refused: deal with
+        // them first. This also stops the player skipping a climb-encounter by
+        // tapping straight past it.
+        if (currentScene.enemies.length > 0) {
+          get().appendLog(
+            'world',
+            `Not while they're on you — you can't climb with enemies in reach. Put them down, or hold your ground.`,
+          );
+          break;
+        }
         const climbRoomKey = makeRoomKey(
           player.currentLocationId,
           currentScene.microMicroId,
@@ -13350,7 +13395,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the weight off your arms: climbing costs 1 stamina while it's worn — as
         // cheap as a Reclaimer's Rope, and the strap never wears out or snaps, but
         // it's no longer a free climb.
-        const wearsClimbStrap = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
+        // OTA-911 — the strap is worn in the LEGS slot now (a climbing harness),
+        // not the cloak.
+        const wearsClimbStrap = (player.equipped?.legs ?? '').toLowerCase() === 'hardened climbing strap';
         // OTA-910 — great climbs cost a flat 2 stamina/tier with NO rope/strap
         // discount: they're gruelling by design, so the pool can't cover the
         // full 11–15 tiers and the player MUST rest partway up. The strap's
@@ -13378,6 +13425,54 @@ export const useGameStore = create<GameStore>((set, get) => ({
           return { id: top.id, name: top.name, current: top.durability!.current };
         };
         const ROPE_WEAR_PER_TIER = 15;
+        // OTA-911 — great-climb entry requirements, enforced from the GROUND
+        // (before you leave the base). To make a great climb you must have BOTH:
+        //   (1) the Hardened Climbing Strap anchored in your legs slot — its
+        //       harness is what lets you rest at altitude and fight mid-climb;
+        //   (2) a Reclaimer's Rope with enough line left to outlast the WHOLE
+        //       climb (totalTiers × wear). A plain Climbing Rope frays through;
+        //       only the Reclaimer's line holds a great ascent.
+        // The mid-climb strap wall + rest gate below remain as backstops if the
+        // strap is stripped after you're already up.
+        if (greatClimb && !get().currentScene?.elevatedOn) {
+          if (!wearsClimbStrap) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter sizes up ${tgt}. "That's a great climb — ${totalTiers} pitches of it. You don't leave the ground for it without a Hardened Climbing Strap anchored to your legs. Without it the height will have you."`,
+            );
+            get().appendLog(
+              'combat',
+              `Great climb ${tgt} — refused: no Hardened Climbing Strap equipped (legs). Requires the strap + a whole Reclaimer's Rope.`,
+            );
+            break;
+          }
+          const neededRope = totalTiers * ROPE_WEAR_PER_TIER;
+          const reclRope = player.inventory
+            .filter((i) => i.name === "Reclaimer's Rope" && i.quantity > 0 && i.durability != null)
+            .sort((a, b) => (b.durability!.current - a.durability!.current))[0];
+          if (!reclRope) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter shakes his head at ${tgt}. "A plain line won't last a great climb — it'll fray through halfway up and drop you. Carry a Reclaimer's Rope, and a whole one."`,
+            );
+            get().appendLog(
+              'combat',
+              `Great climb ${tgt} — refused: no Reclaimer's Rope (need ${neededRope} durability to outlast ${totalTiers} tiers).`,
+            );
+            break;
+          }
+          if ((reclRope.durability?.current ?? 0) < neededRope) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter runs the ${reclRope.name.toLowerCase()} through his hands. "Too worn — ${reclRope.durability?.current ?? 0} of line left, and ${tgt} will eat ${neededRope}. It won't outlast the climb. Splice or replace it before you trust your weight to it."`,
+            );
+            get().appendLog(
+              'combat',
+              `Great climb ${tgt} — refused: Reclaimer's Rope durability ${reclRope.durability?.current ?? 0} < ${neededRope} required.`,
+            );
+            break;
+          }
+        }
         // Local fall helper — single source of truth for the climb-fall
         // narration + HP deduction + elevation reset + death check.
         // Both the stamina-fall and rope-snap paths call this so the
@@ -13844,6 +13939,62 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   `${dog.name} eyes the ${tgt}, then settles at its base. {Pronoun} {isOrAre} not built for the climb.`,
                   dog.sex.pronoun,
                 ),
+              );
+            }
+          }
+          // OTA-911 — the golem can't climb either. It's a walking slab of
+          // Aetherstone; there's no getting it up a rope face. Narrate it holding
+          // the base on the FIRST pitch (once), and its combat command is refused
+          // while you're elevated (see the golem intercept). It's "back" the
+          // moment you touch ground again — no rejoin bookkeeping needed since the
+          // gate is simply `currentScene.elevatedOn`.
+          if (currentTier === 1) {
+            const liveGolemer = get().player;
+            if (liveGolemer?.golem && liveGolemer.golem.hp > 0) {
+              get().appendLog(
+                'world',
+                `${liveGolemer.golem.name} sets its stone feet at the base of ${tgt} and will climb no further — the construct holds the ground while you go up alone.`,
+              );
+            }
+          }
+          // OTA-911 — great-climb guardian ambush. The collector towers are still
+          // defended: winged sentinels and drones peel off to drive you back, more
+          // of them the higher you go (closer to the live resonance apparatus at
+          // the crown). Fires only mid-climb (never the summit) on the scheduled
+          // pitches, and only when you're anchored by the strap — you can't fight
+          // on a bare rope face. Enemies drop into the scene; the "can't climb past
+          // a fight" guard above then forces you to clear them before the next
+          // pitch. Dodge/flee are already blocked while elevated.
+          if (greatClimb && wearsClimbStrap && !isTop) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { climbEncounterAtTier, buildClimbEncounter } = require('../engine/climbEncounters');
+            const sceneNow = get().currentScene;
+            if (sceneNow && sceneNow.enemies.length === 0 && climbEncounterAtTier(currentTier, totalTiers)) {
+              const enc = buildClimbEncounter(currentTier, totalTiers);
+              const livePl = get().player ?? player;
+              const climbPower = enemyScalePower(
+                Math.max(livePl.stats.strength, livePl.stats.dexterity, livePl.stats.intelligence),
+                livePl.hpMax,
+              );
+              const climbDanger = sceneNow.location?.danger ?? 3;
+              const scaledEnc = scaleEncounterForContext(enc.enemies, climbDanger, climbPower);
+              const scaledEncHps = scaledEnc.map((e) => e.hp);
+              set((s) => (s.currentScene ? {
+                currentScene: {
+                  ...s.currentScene,
+                  enemies: scaledEnc,
+                  enemyHps: scaledEncHps,
+                  activeEnemyIdx: 0,
+                  range: 'mid',
+                  enemyAmbushUsed: scaledEnc.map(() => false),
+                  enemyKnockedOut: scaledEnc.map(() => false),
+                  stealthOpenerUsed: false,
+                },
+              } : s));
+              get().appendLog('world', enc.intro);
+              get().appendLog(
+                'combat',
+                `Climb ambush at tier ${currentTier}/${totalTiers}: ${scaledEnc.map((e) => e.name).join(', ')}. (dodge & flee are off while you're on the wall — fight or hold.)`,
               );
             }
           }

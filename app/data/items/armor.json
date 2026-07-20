@@ -9798,8 +9798,8 @@
       "description": "Skyreacher Cuirass. Giant-forged plate re-sized for a climber's back, the core of the Skyreacher set — collected only atop the buried spire of Asgardar. Cannot be forged or bought."
     },
     {
-      "name": "Skyreacher Greaves",
-      "slot": "legs",
+      "name": "Skyreacher Mantle",
+      "slot": "cloak",
       "acBonus": 4,
       "resistances": [
         "piercing",
@@ -9827,12 +9827,12 @@
       "baseDurability": 65,
       "tags": [
         "armor",
-        "legs",
+        "cloak",
         "skyreacher",
         "legendary",
         "collect_only"
       ],
-      "description": "Skyreacher Greaves. Wind-scoured dark plate from the crown of the Great Obsidian Monolith, part of the Skyreacher set. Cannot be forged or bought; only the climb yields them."
+      "description": "Skyreacher Mantle. A wind-scoured dark mantle taken from the crown of the Great Obsidian Monolith, worn across the shoulders so the legs stay free for a climbing harness. Part of the Skyreacher set — cannot be forged or bought; only the climb yields it."
     },
     {
       "name": "Skyreacher Treads",
