@@ -169,9 +169,11 @@ edits won't touch it. If a tool stages it: `git checkout HEAD -- app.json`.
      = the memory-hungry sims, non-blocking / reported everywhere — Open Item #2.)
    - `npm run lint` — ESLint 9 flat config (`eslint.config.js`), a lean high-
      signal rule set; must be 0 errors.
-   NOTE — on **engine_Dev** the fast-jest and lint jobs are **reported, not
-   blocking** yet (Open Item #1: engine's own ~16-suite backlog). Still run them;
-   just don't be surprised the pre-existing engine reds are red.
+   NOTE — on **engine_Dev** the `test:ci:fast` (jest) job is **reported, not
+   blocking** yet (Open Item #1: engine's own ~16-suite backlog); still run it,
+   just don't be surprised the pre-existing engine reds are red. Lint IS blocking
+   on engine too (it's green there). typecheck:ci + typecheck:tests are blocking
+   on all three lines.
 3. Bump `app/buildInfo.ts` `OTA_BUILD_ID` to the next `YYYY-MM-DD-NNN-desc` for
    that line, with a short comment block explaining the change.
 4. Update this `HANDOFF.md` (open-issues / recent-OTAs) in the same commit when
