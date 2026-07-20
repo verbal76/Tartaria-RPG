@@ -133,7 +133,7 @@ describe('OTA 23-007 — climb mechanics', () => {
   });
 
   describe('stamina-depletion fall', () => {
-    it('plain rope, stamina < 2: player falls, loses 20% max HP, elevation cleared', async () => {
+    it('plain rope, stamina < 2: player falls, loses height-scaled HP, elevation cleared', async () => {
       const store = await setupClimber('Climbing Rope', {
         hp: 30, hpMax: 30, stamina: 1, staminaMax: 10,
       });
@@ -143,8 +143,9 @@ describe('OTA 23-007 — climb mechanics', () => {
       });
       store.getState().submitPlayerAction('climb wall');
       const after = store.getState().player!;
-      // 20% of 30 HP = 6 damage
-      expect(after.hp).toBe(30 - 6);
+      // OTA-910 — fall damage scales with the tier fallen from. From tier 1:
+      // floor(30 × (0.12 + 0.055×1)) = floor(30 × 0.175) = 5.
+      expect(after.hp).toBe(30 - 5);
       expect(store.getState().currentScene?.elevatedOn).toBeNull();
       const logs = store.getState().gameLog.map((e) => e.text).join('\n');
       expect(logs).toMatch(/YOU FALL/);
@@ -160,8 +161,8 @@ describe('OTA 23-007 — climb mechanics', () => {
       });
       store.getState().submitPlayerAction('climb wall');
       const after = store.getState().player!;
-      // 20% of 50 HP = 10 damage
-      expect(after.hp).toBe(50 - 10);
+      // OTA-910 — from tier 1: floor(50 × 0.175) = 8.
+      expect(after.hp).toBe(50 - 8);
     });
 
     it('fall damage floors at 1 even on a low-HP-max character', async () => {

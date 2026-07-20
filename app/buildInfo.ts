@@ -16455,4 +16455,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 2026-07-20 OTA-886 (qwen-watchdog log clarity — port of HAL OTA-909) — the dormancy watchdog logged
 // "Qwen not ready (status='ready')" which reads as a bug; it isn't (dormant = status ready but native
 // context released on app-background). Reworded to name the dormant case via isDormant(). Log-string only.
-export const OTA_BUILD_ID = '2026-07-20-886-qwen-watchdog-log-clarity';
+//
+// OTA-887 (THE GREAT CLIMBS + the Skyreacher armor set — new content; port of HAL OTA-910) — five landmark
+// great climbs of 11–15 tiers (Grand Spire of Etheria 15, buried spire of Asgardar 14, Great Obsidian
+// Monolith 13, Thametan's Tower 12, Great Fang of Zharak 11). greatClimbs.ts registers each; they need the
+// Hardened Climbing Strap to finish (flat 2 stamina/tier forces a mid-climb rest; rest at altitude needs the
+// strap specifically; a hard strap wall past tier 10 drops you). Fall damage now scales with height —
+// floor(hpMax × (0.12 + 0.055 × tierFallenFrom)), capped 0.9×. Each summit grants a guaranteed piece of the
+// Legendary Skyreacher set (5 pieces, head/chest/legs/feet/hands, AC+4, three heavy resistances each — the
+// only armor authored with three resist slots, collect_only: no craft/vendor, nominal 1 TC sell). New
+// "Skyreacher" title earned at 5 great climbs crested — halves climb-fall damage + passive +2 DEX. Verified:
+// typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+export const OTA_BUILD_ID = '2026-07-20-887-great-climbs-skyreacher-set';

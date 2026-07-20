@@ -35,8 +35,8 @@ describe('OTA-232 — canon data files load with the expected shapes', () => {
     }
   });
 
-  it('arbiter-titles.json has all 20 titles', () => {
-    expect(ARBITER_TITLES.length).toBe(20);
+  it('arbiter-titles.json has all 21 titles', () => {
+    expect(ARBITER_TITLES.length).toBe(21);
     for (const t of ARBITER_TITLES) {
       expect(t.id).toMatch(/^[a-z0-9_]+$/);
       expect(t.requirement.length).toBeGreaterThan(5);

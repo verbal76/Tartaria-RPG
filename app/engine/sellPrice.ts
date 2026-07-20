@@ -116,6 +116,13 @@ export function sellPriceFor(
 ): number {
   const withRapport = (price: number) =>
     rapportBonus > 0 ? Math.max(1, Math.round(price * (1 + rapportBonus))) : price;
+  // OTA-910 — collect-only gear (the Skyreacher set) can't be crafted, bought,
+  // OR sold: it's only ever earned atop a great climb, and a merchant can't put
+  // a price on something that can't be replaced. Nominal 1 TC so the sell UI
+  // stays consistent without turning the reward into a cash pump.
+  if ((item.tags ?? []).some((t) => t.toLowerCase() === 'collect_only')) {
+    return 1;
+  }
   // OTA-802 (B1b) — bottleneck crafting materials price as near-worthless AT
   // VENDORS (crafting-only value), checked BEFORE the vendor-offer match so a
   // materials stall that lists them can't reopen the fuse→scrap→sell money pump.

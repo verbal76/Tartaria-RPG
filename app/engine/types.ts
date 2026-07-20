@@ -1720,6 +1720,10 @@ export interface WorldMemory {
    *  worldMemory (which player writebacks don't clobber): awardNewTitles announces
    *  a title only once and re-folds any ledgered title back into earnedTitles. */
   earnedTitleAnnounced?: string[];
+  /** OTA-910 — distinct great-climb ids the player has crested. Drives the
+   *  one-time Skyreacher armor grant (no re-award on re-cresting) and the
+   *  Skyreacher title (greatClimbsCompleted = this set's size; earned at 5). */
+  greatClimbsCrested?: string[];
   /** arb-fix — one-time make-good: a faction fused item the player should
    *  have received but didn't (the pre-fix faction catalyst never counted
    *  toward the gate). Granted once per save on load for dev names; this
