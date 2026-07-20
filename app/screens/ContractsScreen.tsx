@@ -12,6 +12,7 @@ import { FACTIONS } from '../engine/factions';
 import { startingLocationForFaction } from '../engine/character';
 import { missionObjectiveLocationId } from '../engine/missionRouting';
 import { getLocationById } from '../engine/encounter';
+import { GREAT_CLIMBS } from '../engine/greatClimbs';
 import { theLower } from '../engine/grammar';
 import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
@@ -621,6 +622,41 @@ export function ContractsScreen() {
             {sortByDistance ? 'tap for default order' : 'nearest first, within each type'}
           </Text>
         </Pressable>
+        {(() => {
+          // OTA-912 — great-climb missions. A climb becomes a listed mission once
+          // its Skyreacher Chart is used (id in unlockedGreatClimbs); it clears
+          // when its summit boss falls (id in summitBossesDefeated).
+          const unlocked = worldMemory.unlockedGreatClimbs ?? [];
+          const bossesDown = worldMemory.summitBossesDefeated ?? [];
+          const climbMissions = GREAT_CLIMBS.filter((c) => unlocked.includes(c.id));
+          if (climbMissions.length === 0) return null;
+          const doneCount = climbMissions.filter((c) => bossesDown.includes(c.id)).length;
+          return (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle} accessibilityRole="header">
+                THE GREAT CLIMBS  ·  {doneCount}/5 towers taken
+              </Text>
+              {climbMissions.map((c) => {
+                const done = bossesDown.includes(c.id);
+                return (
+                  <View key={c.id} style={styles.card}>
+                    <Text style={styles.cardTitle}>
+                      {done ? '✓ ' : '⚑ '}{c.noun} — {c.tiers} tiers
+                    </Text>
+                    <Text style={styles.routeBody}>
+                      {done
+                        ? 'Crown taken — its Skyreacher piece is claimed.'
+                        : 'Climb it (Hardened Climbing Strap + a whole Reclaimer\'s Rope) and beat the summit guardian for its Skyreacher piece and an Aether Collection Beacon.'}
+                    </Text>
+                  </View>
+                );
+              })}
+              <Text style={styles.mainQuestHint}>
+                Collect all five Aether Collection Beacons to re-link the Skyreacher Boltcaster.
+              </Text>
+            </View>
+          );
+        })()}
         <View style={styles.section}>
           <Text style={styles.sectionTitle} accessibilityRole="header">MILESTONES  ·  tap a cell to expand</Text>
           <View style={styles.milestoneRow}>

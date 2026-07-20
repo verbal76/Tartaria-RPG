@@ -16475,4 +16475,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (inventory + drinking still work), you can't climb past a live fight, and mid-climb fighting needs the
 // strap. The golem can't climb — benched at the base like the dog. Verified: typecheck:ci + typecheck:tests
 // + lint clean; full fast suite green. Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-888-great-climbs-mountaineering-rework';
+// OTA-889 (GREAT CLIMBS — maps, summit bosses, the Skyreacher Boltcaster; port of HAL OTA-912) — the five
+// great climbs become a quest chain: they ARE the Aether-collector towers of the grid that drowned the
+// world. Access is gated on five "Skyreacher Chart (N of 5)" map items sold ONCE each by roadside traders
+// (soldMapIds ledger); using a chart unlocks + reveals + logs the climb, and only then does its prop spawn.
+// Each summit holds a NAMED boss (greatClimbs.SUMMIT_BOSSES, machines vulnerable to electrical + acid) — you
+// claim the Skyreacher piece by beating it; climbing down resets the boss. Each boss drops an Aether
+// Collection Beacon; the fifth re-links into the Skyreacher Boltcaster (Legendary, electrical + baked-in acid)
+// plus legendary materials. Skyreacher armor now resists COLD baseline only (ladder suppressed), leaving 3
+// OPEN player-choosable coating slots; the armor + Boltcaster are Crucible-upgrade-locked (collect_only).
+// Climbs listed as missions in Contracts. Verified: greatClimbs/skyreacherRewards/climbEncounters/
+// skyreacherChartUnlock + retargeted ladder/weaponDefense tests; typecheck:ci + typecheck:tests + lint clean;
+// full fast suite green. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-889-great-climbs-maps-bosses-boltcaster';

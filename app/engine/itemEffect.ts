@@ -96,6 +96,17 @@ export type ItemEffect =
     }
   | { kind: 'gate'; unlocks: GateKind }
   | {
+      /** OTA-912 — a Skyreacher Chart. Using it from the pack unlocks a great
+       *  climb (adds greatClimb.id to worldMemory.unlockedGreatClimbs so its
+       *  climbable prop starts spawning at the landmark), reveals + routes to the
+       *  landmark, and logs the climb as an active mission. Consumed on use.
+       *  `climbId` matches a GREAT_CLIMBS id; index/total drive the "N of 5" copy. */
+      kind: 'map';
+      climbId: string;
+      index: number;
+      total: number;
+    }
+  | {
       /** Off-hand equippable scanner — a Geiger-counter analog
        *  that biases search outcomes toward a tagged loot pool
        *  when the player is searching physical features. Three

@@ -871,6 +871,85 @@ function recordTitleProgress(
   awardNewTitles(getStore, setStore);
 }
 
+// OTA-912 — Skyreacher Charts: the five maps that UNLOCK the great climbs. Sold
+// only by roadside traders, each chart exactly ONCE ever (worldMemory.soldMapIds),
+// and never a chart for a climb already unlocked. climbId matches a GREAT_CLIMBS id.
+const SKYREACHER_CHARTS: readonly { name: string; climbId: string; price: number }[] = [
+  { name: 'Skyreacher Chart (1 of 5)', climbId: 'grand_spire',       price: 110 },
+  { name: 'Skyreacher Chart (2 of 5)', climbId: 'asgardar_spire',    price: 100 },
+  { name: 'Skyreacher Chart (3 of 5)', climbId: 'obsidian_monolith', price: 95 },
+  { name: 'Skyreacher Chart (4 of 5)', climbId: 'thametan_tower',    price: 90 },
+  { name: 'Skyreacher Chart (5 of 5)', climbId: 'zharak_fang',       price: 85 },
+];
+/** Names of the five charts — used by the buy path to stamp soldMapIds. */
+const SKYREACHER_CHART_NAMES: ReadonlySet<string> = new Set(SKYREACHER_CHARTS.map((c) => c.name));
+
+/** OTA-912 — the shared "use a Skyreacher Chart" effect: unlock the great climb
+ *  (so its prop spawns at the landmark), reveal + log the landmark, and consume
+ *  one chart. Called from BOTH the inventory USE button (useInventoryItem) and
+ *  the typed `use` verb, so it doesn't depend on the parser resolving the chart's
+ *  parenthesised name. Returns true if it handled the item. */
+function unlockGreatClimbFromChart(
+  getStore: () => GameStore,
+  setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
+  item: { id: string; name: string },
+  climbId: string,
+): boolean {
+  const player = getStore().player;
+  if (!player) return false;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { greatClimbById } = require('../engine/greatClimbs');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { discoverLocation } = require('../engine/worldMemory');
+  const gc = greatClimbById(climbId);
+  if (!gc) {
+    getStore().appendLog('world', `The ${item.name} is too weather-worn to make out. Nothing comes of it.`);
+    return true;
+  }
+  const already = (getStore().worldMemory.unlockedGreatClimbs ?? []).includes(gc.id);
+  // Consume one chart — spent fixing the route.
+  setStore((s) => (s.player
+    ? { player: { ...s.player, inventory: s.player.inventory
+        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => i.quantity > 0) } }
+    : s));
+  setStore((s) => ({
+    worldMemory: {
+      ...discoverLocation(s.worldMemory, gc.locationId),
+      unlockedGreatClimbs: Array.from(new Set([...(s.worldMemory.unlockedGreatClimbs ?? []), gc.id])),
+    },
+  }));
+  getStore().appendLog(
+    'world',
+    already
+      ? `You spread the ${item.name} again. ${theCap(gc.noun)} is already fixed on your route.`
+      : `You unroll the ${item.name} and trace the giant-drawn lines. ${theCap(gc.noun)} settles onto your atlas — the great climb is open, and a new charge stands on your board. Travel there, bring the Hardened Climbing Strap and a whole Reclaimer's Rope, and make the ascent.`,
+  );
+  if (!already) {
+    getStore().appendLog(
+      'arbiter',
+      `"A collector tower," the Arbiter murmurs. "One of the sky-antennas that drank the heavens dry. Its guardian still holds the crown. Climb into the heart of it, ${player.name}, if you mean to."`,
+    );
+  }
+  void getStore().persist();
+  return true;
+}
+
+/** ~18% of eligible roadside stalls carry one not-yet-sold, not-yet-unlocked
+ *  chart. Returns the vendor (possibly) augmented with a single chart offer. */
+function withSkyreacherChartOffer(vendor: VendorInstance | null, wm: WorldMemory): VendorInstance | null {
+  if (!vendor || !vendor.id.startsWith('roadside_')) return vendor; // roadside traders only
+  if (Math.random() >= 0.18) return vendor;
+  const sold = wm.soldMapIds ?? [];
+  const unlocked = wm.unlockedGreatClimbs ?? [];
+  const already = new Set(vendor.offers.map((o) => o.itemName));
+  const pick = SKYREACHER_CHARTS.find(
+    (c) => !sold.includes(c.name) && !unlocked.includes(c.climbId) && !already.has(c.name),
+  );
+  if (!pick) return vendor;
+  return { ...vendor, offers: [...vendor.offers, { itemName: pick.name, price: pick.price, quantity: 1 }] };
+}
+
 // arb48 — Labyrinth of Shadows (Wayfarer of the Lost Paths). Both helpers are
 // store-driving wrappers around the pure engine in engine/labyrinth.ts.
 type StoreGet = () => GameStore;
@@ -5682,7 +5761,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : (findVendorByName(hubRoom.anchorNpc) ?? null))
           // OTA-411 — a capital never falls to the roadside roll; it always
           // gets a NAMED vendor below. Only NON-capital outdoor tiles roll roadside.
-          : (!hasEnemies && !hubRoom && !atCoreCapital && Math.random() < roadsideRate ? pickRoadsideTrader() : null);
+          : (!hasEnemies && !hubRoom && !atCoreCapital && Math.random() < roadsideRate ? withSkyreacherChartOffer(pickRoadsideTrader(), get().worldMemory) : null);
       // OTA-410/411 — capital named-vendor greeting. RNG-rolled which non-defeated
       // VENDORS entry arrives, re-rolled each arrival (intended). Always fires at a
       // capital (the roadside roll above is suppressed there), so a capital begin-
@@ -6184,7 +6263,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const { greatClimbForLocation } = require('../engine/greatClimbs');
       const gcLoc = location?.id ?? player?.currentLocationId;
       const gc = greatClimbForLocation(gcLoc);
-      if (gc && !get().player?.hubRoomId && !hasEnemies) {
+      // OTA-912 — access is gated on the CHART: the great-climb prop only spawns
+      // once the player has used that climb's Skyreacher Chart (its id is in
+      // worldMemory.unlockedGreatClimbs). Before that the landmark reads as an
+      // ordinary place — you can stand at Asgardar and never see the climb until
+      // a chart puts it on your route.
+      const gcUnlocked = !!gc && (get().worldMemory.unlockedGreatClimbs ?? []).includes(gc.id);
+      if (gc && gcUnlocked && !get().player?.hubRoomId && !hasEnemies) {
         sceneAmbientNouns = Array.from(new Set([gc.noun, ...sceneAmbientNouns]));
         sceneDisplayedNouns = Array.from(new Set([gc.noun, ...sceneDisplayedNouns]));
       }
@@ -11135,6 +11220,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
               );
               break;
             }
+            // OTA-912 — a Skyreacher Chart. Using it UNLOCKS the great climb (its
+            // prop starts spawning at the landmark), reveals the landmark on the
+            // atlas, and logs the climb as an active mission. Consumed on use.
+            if (fx?.kind === 'map') {
+              unlockGreatClimbFromChart(get, set, used, fx.climbId);
+              break;
+            }
           }
         }
         // Legacy path — generic 1d6 heal for catalog-kind consumables
@@ -13198,6 +13290,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const rawActionLower = trimmed.toLowerCase();
         const wantsDown = /\b(down|descend)\b/.test(rawActionLower);
         if (wantsDown && currentScene.elevatedOn) {
+          // OTA-912 — climbing down from a summit BREAKS OFF a summit-boss fight:
+          // the boss doesn't pursue you down the tower, and (like a Core Guardian)
+          // it fully resets — you'll face it fresh at full HP on the next ascent.
+          // This is the deliberate escape valve for a summit boss (dodge & flee
+          // are off up there). Clear the scene enemies on the way down.
+          if (currentScene.enemies.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { summitClimbIdFromEnemy } = require('../engine/greatClimbs');
+            const hasSummitBoss = currentScene.enemies.some((e) => summitClimbIdFromEnemy(e) != null);
+            if (hasSummitBoss) {
+              set((s) => (s.currentScene
+                ? { currentScene: { ...s.currentScene, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
+                : s));
+              get().appendLog(
+                'world',
+                `You break off and climb down. The guardian at the crown does not follow — it settles back to its post, whole again. You will have to face it fresh if you come back up.`,
+              );
+            }
+          }
           // OTA 033 — tolerate the OTA 031 schema where elevatedOn
           // was a bare string. Old saves loaded into 032+ would
           // print "back down the undefined" because .noun on a
@@ -13800,55 +13911,51 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // which both prevents a re-grant and drives the Skyreacher title
             // (greatClimbsCompleted = distinct climbs crested; earned at 5).
             if (greatClimb) {
-              const crested: string[] = get().worldMemory.greatClimbsCrested ?? [];
-              const alreadyCrested = crested.includes(greatClimb.id);
-              const nextCrested = alreadyCrested ? crested : [...crested, greatClimb.id];
-              if (!alreadyCrested) {
-                set((s) => ({ worldMemory: { ...s.worldMemory, greatClimbsCrested: nextCrested } }));
-              }
-              const pieceName: string = greatClimb.rewardArmor;
-              const livePlayerTop = get().player;
-              const holdsPiece =
-                (livePlayerTop?.inventory ?? []).some((i) => i.name === pieceName && i.quantity > 0) ||
-                Object.values(livePlayerTop?.equipped ?? {}).some(
-                  (n) => (n ?? '').toLowerCase() === pieceName.toLowerCase(),
-                );
-              if (!alreadyCrested && !holdsPiece) {
-                const pieceLookup = lookupCraftedItem(pieceName);
-                const grant: InventoryItem = stampDurability({
-                  id: freshInstanceId('skyreacher'),
-                  name: pieceName,
-                  kind: pieceLookup.kind,
-                  rarity: 'Legendary',
-                  quantity: 1,
-                  tags: Array.from(new Set([...pieceLookup.tags, 'climb_top', 'skyreacher', 'collect_only', 'legendary'])),
-                });
-                set((s) =>
-                  s.player
-                    ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, grant) } }
-                    : s,
-                );
-                get().appendLog('reward', `✦ ${pieceName} (Legendary) — ${greatClimb.summitFlavor}`);
-                const setCount = nextCrested.length;
-                if (setCount < 5) {
+              // OTA-912 — the summit holds a NAMED BOSS: the tower's master
+              // guardian, still awake at the crown. Reaching the top SPAWNS it
+              // (once, until beaten). The Skyreacher armor piece + the Aether
+              // Collection Beacon are paid out when it FALLS (see the summit-boss
+              // branch in the enemy-defeat handler), not for merely cresting. If
+              // the boss is already down, the crown is quiet.
+              const bossesDown: string[] = get().worldMemory.summitBossesDefeated ?? [];
+              if (!bossesDown.includes(greatClimb.id)) {
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { buildSummitBoss, summitBossFor } = require('../engine/greatClimbs');
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { scaleStaticBoss } = require('../engine/coreGuardians');
+                const bossDef = summitBossFor(greatClimb.id);
+                const bossBase = buildSummitBoss(greatClimb.id);
+                if (bossDef && bossBase) {
+                  const livePlTop = get().player ?? player;
+                  const bossPower = enemyScalePower(
+                    Math.max(livePlTop.stats.strength, livePlTop.stats.dexterity, livePlTop.stats.intelligence),
+                    livePlTop.hpMax,
+                  );
+                  const boss = scaleStaticBoss(bossPower, bossBase);
+                  set((s) => (s.currentScene ? {
+                    currentScene: {
+                      ...s.currentScene,
+                      enemies: [...s.currentScene.enemies, boss],
+                      enemyHps: [...s.currentScene.enemyHps, boss.hp],
+                      activeEnemyIdx: s.currentScene.enemies.length,
+                      range: 'mid',
+                      enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+                      enemyKnockedOut: [...(s.currentScene.enemyKnockedOut ?? []), false],
+                      stealthOpenerUsed: false,
+                    },
+                  } : s));
+                  get().appendLog('world', bossDef.approachLine);
                   get().appendLog(
-                    'world',
-                    `That's ${setCount} of the 5 Skyreacher pieces. The set is only ever collected atop the great climbs — top all five and the Arbiter will have a name for you.`,
+                    'combat',
+                    `Summit boss — ${boss.name} (${boss.hp} HP). Dodge & flee are off up here — fight it out, or CLIMB DOWN to break off (it resets and heals, like a Core Guardian).`,
                   );
                 }
-              } else if (!alreadyCrested) {
-                // Crested a NEW great climb but already holds this piece (rare —
-                // re-obtained after dropping it): count the crest, no duplicate.
-                get().appendLog('world', greatClimb.summitFlavor);
               } else {
                 get().appendLog(
                   'world',
-                  `You crest ${tgt} again. The Skyreacher piece that waited up here is already yours.`,
+                  `You crest ${tgt} again. Its guardian is long dead and the tower's crown is quiet; the relic it kept is already yours.`,
                 );
               }
-              // Title progress — count DISTINCT great climbs crested; Skyreacher
-              // is earned at 5. maxes (not delta) so re-cresting can't inflate it.
-              recordTitleProgress(get, set, undefined, { greatClimbsCompleted: nextCrested.length });
             } else {
             // Top reached — roll the chance-based loot. Tall climbs
             // (tier ≥ 4) widen the pool to include Reclaimer's Rope,
@@ -17847,6 +17954,80 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
+    // OTA-912 — summit-boss defeat. The tower's master guardian falls: grant the
+    // Aether Collection Beacon + this climb's Skyreacher piece (once), bank the
+    // crest (drives the Skyreacher title), and once all five towers are done,
+    // re-link the beacons into the Skyreacher Boltcaster + a legendary cache.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const gc912 = require('../engine/greatClimbs');
+      const summitClimbId: string | null = gc912.summitClimbIdFromEnemy(enemy);
+      if (summitClimbId) {
+        const climb = gc912.greatClimbById(summitClimbId);
+        const bossDef = gc912.summitBossFor(summitClimbId);
+        const wm912 = get().worldMemory;
+        const alreadyDown = (wm912.summitBossesDefeated ?? []).includes(summitClimbId);
+        if (climb && !alreadyDown) {
+          const nextDefeated = [...(wm912.summitBossesDefeated ?? []), summitClimbId];
+          const nextCrested = Array.from(new Set([...(wm912.greatClimbsCrested ?? []), summitClimbId]));
+          set((s) => ({ worldMemory: { ...s.worldMemory, summitBossesDefeated: nextDefeated, greatClimbsCrested: nextCrested } }));
+          if (bossDef) get().appendLog('arbiter', bossDef.defeatLine);
+          // (1) guaranteed Aether Collection Beacon
+          const beacon: InventoryItem = {
+            id: freshInstanceId('beacon'), name: 'Aether Collection Beacon', kind: 'misc',
+            rarity: 'Legendary', quantity: 1, tags: ['beacon', 'skyreacher', 'quest', 'collect_only'],
+          };
+          // (2) guaranteed Skyreacher armor piece for this climb
+          const pieceName: string = climb.rewardArmor;
+          const pieceLookup = lookupCraftedItem(pieceName);
+          const armorPiece: InventoryItem = stampDurability({
+            id: freshInstanceId('skyreacher'), name: pieceName, kind: pieceLookup.kind, rarity: 'Legendary',
+            quantity: 1, tags: Array.from(new Set([...pieceLookup.tags, 'climb_top', 'skyreacher', 'collect_only', 'legendary'])),
+          });
+          set((s) => (s.player ? { player: { ...s.player, inventory: mergeOrPushItem(mergeOrPushItem(s.player.inventory, beacon), armorPiece) } } : s));
+          get().appendLog('reward', `✦ Aether Collection Beacon — prised from the still-humming heart of the collector tower. (${nextDefeated.length} of 5)`);
+          get().appendLog('reward', `✦ ${pieceName} (Legendary) — ${climb.summitFlavor}`);
+          recordTitleProgress(get, set, undefined, { greatClimbsCompleted: nextCrested.length });
+          if (nextCrested.length < 5) {
+            get().appendLog('world', `That's ${nextCrested.length} of the 5 Skyreacher pieces. Top all five great climbs and the Arbiter will have a name for you — and the beacons will have somewhere to go.`);
+          }
+          // (3) all five towers cleared → Skyreacher Boltcaster + legendary cache (once)
+          if (nextDefeated.length >= 5 && !get().worldMemory.skyreacherBoltcasterGranted) {
+            const boltcaster: InventoryItem = stampDurability({
+              id: freshInstanceId('boltcaster'), name: 'Skyreacher Boltcaster', kind: 'weapon', rarity: 'Legendary',
+              quantity: 1, tags: ['weapon', 'ranged', 'boltcaster', 'skyreacher', 'legendary', 'collect_only'],
+              // OTA-912 — the acid rider is a permanent baked-in coating; the catalog
+              // weapon deals electrical, and this makes it electrical + acid at once.
+              coating: { kind: 'acid', dice: '2d6', label: 'Acid' },
+            });
+            const mats: InventoryItem[] = [
+              { id: freshInstanceId('mat'), name: 'Throne Shard', kind: 'misc', rarity: 'Legendary', quantity: 2, tags: ['material', 'legendary'] },
+              { id: freshInstanceId('mat'), name: 'Iron Core', kind: 'misc', rarity: 'Legendary', quantity: 2, tags: ['material', 'legendary'] },
+              { id: freshInstanceId('mat'), name: 'Aether Shard', kind: 'misc', rarity: 'Rare', quantity: 3, tags: ['material', 'rare'] },
+            ];
+            set((s) => {
+              if (!s.player) return s;
+              let inv = s.player.inventory;
+              // re-link (consume) up to five beacons into the weapon
+              let toConsume = 5;
+              inv = inv.map((i) => {
+                if (i.name === 'Aether Collection Beacon' && toConsume > 0) {
+                  const take = Math.min(i.quantity, toConsume); toConsume -= take;
+                  return { ...i, quantity: i.quantity - take };
+                }
+                return i;
+              }).filter((i) => i.quantity > 0);
+              inv = mergeOrPushItem(inv, boltcaster);
+              for (const m of mats) inv = mergeOrPushItem(inv, m);
+              return { player: { ...s.player, inventory: inv }, worldMemory: { ...s.worldMemory, skyreacherBoltcasterGranted: true } };
+            });
+            get().appendLog('reward', `✦✦ The five Aether Collection Beacons re-link with a shriek of live current — the SKYREACHER BOLTCASTER (Legendary): a bolt-thrower that arcs electrical AND acid at once, the two elements every Tartarian machine dreads. With it, a cache of legendary materials.`);
+            get().appendLog('arbiter', `"You climbed into the heart of every tower that drowned the world," the Arbiter says quietly, "and carried its heart back down. Nothing built will stand easy in front of that."`);
+          }
+        }
+      }
+    }
+
     // OTA 454 — Resurrection Gem drop sources:
     //  • boss kill → guaranteed (existing)
     //  • every 50th non-boss kill → pity timer (so any long campaign
@@ -18250,6 +18431,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ...s.currentScene,
           vendor: { ...s.currentScene.vendor, offers: newOffers },
         },
+        // OTA-912 — a Skyreacher Chart sells ONCE, ever. Stamp it into the
+        // persistent ledger so no other roadside stall can ever offer it again.
+        ...(SKYREACHER_CHART_NAMES.has(offer.itemName)
+          ? { worldMemory: { ...s.worldMemory, soldMapIds: Array.from(new Set([...(s.worldMemory.soldMapIds ?? []), offer.itemName])) } }
+          : {}),
       };
     });
     const markupNote = mult > 1 ? ` (${offer.price} base + ${Math.round((mult - 1) * 100)}% corruption)` : '';
@@ -21397,7 +21583,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // it, pacing two tiles re-spawned a FRESH stall every step (unlimited rare
       // stock). Now a stall only appears on ground you haven't just walked.
       if (outdoorPeaceful && !inAnyHubRoom && tileIsNovel && Math.random() < 0.20) {
-        const stall = pickRoadsideTrader();
+        const stall = withSkyreacherChartOffer(pickRoadsideTrader(), get().worldMemory)!;
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
         get().appendLog(
           'world',
@@ -23414,6 +23600,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().submitPlayerAction(`use ${item.name}`);
       return;
     }
+    // OTA-912 — a Skyreacher Chart. Applied DIRECTLY (not through the parser,
+    // whose item resolution stumbles on the "(N of 5)" name): unlock the great
+    // climb + reveal + log the mission + consume one chart.
+    if (fxLookup && fxLookup.kind === 'map') {
+      get().appendLog('player', `use ${item.name}`);
+      unlockGreatClimbFromChart(get, set, item, fxLookup.climbId);
+      return;
+    }
     // Consumables → eat (HP recovery + time advance + quantity
     // decrement). Routed through submitPlayerAction so the existing
     // rest-with-resolvedItemId path handles all the state mutations.
@@ -23984,6 +24178,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { findArmorByName } = require('../engine/crafting') as typeof import('../engine/crafting');
     const piece = player.inventory.find((i) => i.id === itemId);
     if (!piece) return;
+    // OTA-912 — the Skyreacher armor set and the Skyreacher Boltcaster are the
+    // reward for the great climbs: they CANNOT be upgraded/fused at a Crucible.
+    // The `collect_only` tag (already on every Skyreacher piece + the Boltcaster)
+    // is the single lock. They still take coating vials (the 3 open resist slots),
+    // just never a Crucible slot-upgrade.
+    if ((piece.tags ?? []).some((t) => t.toLowerCase() === 'collect_only')) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter waves you back from the Crucible. "That was earned on the great climbs, not forged — the Crucible has no purchase on it. Coat it if you like, but it cannot be upgraded here."`,
+      );
+      return;
+    }
     // OTA-873 fix — never upgrade a STACK. Stamping coatingSlots / resistCapBonus on a
     // quantity>1 row would upgrade every copy for one 5-piece cost. The picker only
     // offers quantity===1 pieces, so this is a belt-and-suspenders guard on the action.

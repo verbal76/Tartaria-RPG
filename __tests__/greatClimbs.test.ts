@@ -78,13 +78,13 @@ describe('OTA-910 — the Skyreacher armor set', () => {
     for (const p of pieces) expect(p).not.toBeNull();
   });
 
-  it('each piece is Legendary AC+4 with exactly three authored resistances', () => {
+  it('each piece is Legendary AC+4 that resists cold as its baseline (OTA-912)', () => {
     for (const p of pieces) {
       expect(p!.rarity).toBe('Legendary');
       expect(p!.acBonus).toBe(4);
-      expect(p!.resistances).toHaveLength(3);
-      // no duplicate resist types within a piece
-      expect(new Set(p!.resistances).size).toBe(3);
+      // OTA-912 — baseline cold only; the other resist slots are left OPEN for
+      // the player to fill by choice (coating vials → up to 3 addedResists).
+      expect(p!.resistances).toEqual(['cold']);
       // collect-only, uncraftable, unbuyable. tcBuy is read loosely because the
       // engine-line CatalogArmor type doesn't declare it; the data carries it.
       expect(p!.tags).toContain('collect_only');
@@ -101,17 +101,16 @@ describe('OTA-910 — the Skyreacher armor set', () => {
     expect(slots).not.toContain('legs');
   });
 
-  it('the effective (mitigating) resist list keeps all three — the Legendary ladder does not overwrite them', () => {
+  it('the Legendary ladder is SUPPRESSED for Skyreacher — effective resist stays just cold, leaving slots open', () => {
     for (const p of pieces) {
-      const eff = armorResistances(p!);
-      expect(eff).toHaveLength(3);
-      for (const r of p!.resistances) expect(eff).toContain(r);
+      // OTA-912 — armorResistances returns only the authored baseline (cold); the
+      // rarity ladder does NOT top it up, so the 3 coating slots stay choosable.
+      expect(armorResistances(p!)).toEqual(['cold']);
     }
-  });
-
-  it('is the ONLY armor authored with three resistance slots', () => {
-    const threeSlot = ARMOR.filter((a) => (a.resistances ?? []).length >= 3);
-    expect(threeSlot.map((a) => a.name).sort()).toEqual([...SKYREACHER_SET].sort());
+    // A non-Skyreacher Legendary still gets laddered up to its full 3 fixed resists.
+    const otherLeg = ARMOR.find((a) => a.rarity === 'Legendary' && !(a.tags ?? []).some((t) => t.toLowerCase() === 'skyreacher'));
+    expect(otherLeg).toBeDefined();
+    expect(armorResistances(otherLeg!).length).toBeGreaterThanOrEqual(3);
   });
 
   it('collect-only gear cannot be meaningfully sold (nominal 1 TC)', () => {
