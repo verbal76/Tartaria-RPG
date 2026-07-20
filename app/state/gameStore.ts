@@ -10389,10 +10389,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               const { playerHasScannerEquipped } = require('../engine/equipment');
               if (playerHasScannerEquipped(player, req.scannerBias)) {
                 const scannerLabel = req.scannerBias === 'pulse' ? 'Pulse Scanner'
-                  : req.scannerBias === 'aetheric' ? 'Aetheric Scanner'
+                  : req.scannerBias === 'aetheric' ? `${getEnergyAdjective()} Scanner`
                   : 'Mud Scanner';
                 const traceLabel = req.scannerBias === 'pulse' ? 'pulse trace'
-                  : req.scannerBias === 'aetheric' ? 'Aether trace'
+                  : req.scannerBias === 'aetheric' ? `${getEnergyName()} trace`
                   : 'buried trace';
                 const roll = rollDie(20);
                 if (roll >= 12) {
@@ -10401,34 +10401,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   // from the pool entries at that tier (with a fallback
                   // down a tier if the tier is empty).
                   type ScanFind = { name: string; qty: [number, number]; rarity: 'Common' | 'Uncommon' | 'Rare' };
-                  const PULSE_FINDS: ScanFind[] = [
-                    { name: 'Automaton Circuit', qty: [1, 2], rarity: 'Common' },
-                    { name: 'Scrap Metal',       qty: [1, 2], rarity: 'Common' },
-                    { name: 'Bent Nail',         qty: [1, 3], rarity: 'Common' },
-                    { name: 'Sentinel Core Plate', qty: [1, 1], rarity: 'Uncommon' },
-                    { name: 'Drone Core',        qty: [1, 1], rarity: 'Uncommon' },
-                    { name: 'Energy Fragment',   qty: [1, 1], rarity: 'Uncommon' },
-                    { name: 'Iron Core',         qty: [1, 1], rarity: 'Rare' },
-                  ];
-                  const AETHER_FINDS: ScanFind[] = [
-                    { name: 'Aether Crystal',  qty: [1, 2], rarity: 'Common' },
-                    { name: 'Aether Residue',  qty: [1, 2], rarity: 'Common' },
-                    { name: 'Aether Dust',     qty: [1, 2], rarity: 'Common' },
-                    { name: 'Aetheric Shard',  qty: [1, 1], rarity: 'Uncommon' },
-                    { name: 'Aetheric Dust',   qty: [1, 1], rarity: 'Uncommon' },
-                    { name: 'Aether Shard',    qty: [1, 1], rarity: 'Rare' },
-                    { name: 'Aetheric Cloth',  qty: [1, 1], rarity: 'Rare' },
-                    { name: 'Aetheric Song',   qty: [1, 1], rarity: 'Rare' },
-                  ];
-                  const MUD_FINDS: ScanFind[] = [
-                    { name: 'Aether Mud',      qty: [1, 3], rarity: 'Common' },
-                    { name: 'Aetheric Sludge', qty: [1, 2], rarity: 'Common' },
-                    { name: 'Mud Fragment',    qty: [1, 2], rarity: 'Common' },
-                    { name: 'Mud Essence',     qty: [1, 1], rarity: 'Uncommon' },
-                    { name: 'Mudstone',        qty: [1, 1], rarity: 'Rare' },
-                    { name: 'Hardened Mudstone', qty: [1, 1], rarity: 'Rare' },
-                    { name: 'Mud Gem',         qty: [1, 1], rarity: 'Rare' },
-                  ];
+                  // engine_Dev — built-in (default-pack) scan pools live in data now
+                  // (app/data/scan/scan-find-pools.json) so no setting-specific names
+                  // are hard-coded in engine source. A reskin ignores these entirely
+                  // (the isReskinActive branch below derives from the pack's materials).
+                  // eslint-disable-next-line @typescript-eslint/no-require-imports
+                  const SCAN_POOLS = require('../data/scan/scan-find-pools.json') as { pulse: ScanFind[]; aetheric: ScanFind[]; mud: ScanFind[] };
+                  const PULSE_FINDS: ScanFind[] = SCAN_POOLS.pulse;
+                  const AETHER_FINDS: ScanFind[] = SCAN_POOLS.aetheric;
+                  const MUD_FINDS: ScanFind[] = SCAN_POOLS.mud;
                   // engine_Dev — for a non-Tartaria pack, build the scanner pool
                   // from the pack's OWN materials (tiered by rarity) instead of the
                   // hardcoded Aether/Mud/Pulse lists, so a scan never grants a
