@@ -7949,11 +7949,14 @@ Consolidated for convenience; each also appears inline above.
   - Factions/vendors: Faction Points as a currency; the multi-gate join requirements
     (TC assets, relic ownership, join-titles, skill minimums); Persuasion & Hidden
     Inventory; the one-time ephemeral Camp Vendor; the black-market Relic Trade economy.
-  - Titles: the 6 Tier-C titles (Speaker of Forgotten Tongues, Wayfarer of the Lost
-    Paths, Guild Broker, Protector of the Forgotten, Shadow Diver, Warden of the Old
-    World) and their location challenges (Labyrinth of Shadows clean run, learning the
-    Tartarian language, defending a True Tartarian settlement, trap-free ruin dives) —
-    fully authored but shipped switched OFF behind a feature flag.
+  - Titles: (NOW SHIPPED — arb54/arb55, OTA-907) all 6 Tier-C titles are LIVE and
+    earnable: Speaker of Forgotten Tongues (decipher the Red Tower runes), Wayfarer of
+    the Lost Paths (a clean Labyrinth of Shadows run), Guild Broker (broker a two-relic
+    faction alliance at the Parley Ground), Warden of the Old World (shore the Sinking
+    Cathedral), Protector of the Forgotten (hold the breach at the Sunken Enclave —
+    one-shot d20+STR), and Shadow Diver (three clean d20+DEX trap-dives on the Endless
+    Stair). No longer behind the feature flag; TIER_C_ENABLED + all 6 per-challenge
+    switches are on. Their passive perks are wired in engine/titles.ts.
   - Lore: the Entombed reburial ritual (lore only); the dated 1280-2023 timeline (lore
     only, no event mechanic); discrete terraforming / city-leveling war-relics
     (abstracted into the Cores).

@@ -16438,4 +16438,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "how aetherstone formed"). Audit confirmed the flavor work changed only description/answer/flavor text +
 // new concepts — no item name/id/recipe/collectable/weapon/armor touched, all integrity suites green.
 // Data-only; Tartaria canon.
-export const OTA_BUILD_ID = '2026-07-20-883-thesis-keyword-collision-fix';
+// 2026-07-20 OTA-884 (arb54/arb55 — the last two Tier-C challenges go LIVE — port of HAL OTA-907) — all six
+// Tier-C Arbiter titles are now earnable. PROTECTOR OF THE FORGOTTEN (defense_of_the_enclave @ The Sunken
+// Enclave): one-shot d20+STR vs DC 15 hold-the-breach on the shared handleTitleChallenge path, generalized
+// to prefer the def's own successLine/failLine (never the Warden cathedral fallback); enclave tile made
+// discoverable, stale disabled_challenge tag removed. SHADOW DIVER (trap_dives_of_the_stair @ the Endless
+// Stair): new retryable handleTrapDive — d20+DEX vs DC 13, three clean dives earn the title, a miss springs
+// a non-lethal 1d6 and banks nothing. locationChallenges: both enabled:true / needsLayout:false. Game
+// MECHANIC + Tartaria canon. Verified: challenge suites + tierCNewChallenges store integration green;
+// typecheck + lint clean; full fast suite green.
+export const OTA_BUILD_ID = '2026-07-20-884-tier-c-protector-shadow-diver-live';

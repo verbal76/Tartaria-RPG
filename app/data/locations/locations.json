@@ -1765,10 +1765,9 @@
       "settlement",
       "true_tartarians",
       "underground",
-      "enclave",
-      "disabled_challenge"
+      "enclave"
     ],
-    "discoverable": false,
+    "discoverable": true,
     "aliases": [
       "the enclave",
       "sunken enclave",

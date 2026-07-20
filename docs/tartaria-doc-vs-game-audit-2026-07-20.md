@@ -60,8 +60,9 @@ but **re-mechanized most of the rules layer** and **added a dozen whole systems*
     creation** (the single largest doc→game gap).
 
 **Preserve list (planned canon, shipped-but-off or lore-only)** is consolidated at
-the end — the most important being the **6 Tier-C titles + their location
-challenges**, fully authored but gated off behind `TIER_C_ENABLED`.
+the end. NOTE (arb54/arb55, OTA-907): the **6 Tier-C titles + their location
+challenges** — previously the headline shipped-but-off item — are now ALL LIVE and
+earnable; that entry has moved from "preserve/off" to shipped.
 
 ---
 
@@ -334,11 +335,14 @@ recap; **corruption-as-content / "losing is fun"**.
 These are designed/authored in the doc (or in shipped-but-off scaffolding) with no
 live implementation. The owner explicitly wants them kept.
 
-- **6 Tier-C titles** (`speaker_of_forgotten_tongues, wayfarer_of_the_lost_paths,
-  guild_broker, protector_of_the_forgotten, shadow_diver, warden_of_the_old_world`)
-  **and their Tier-C location challenges** (Labyrinth of Shadows clean run, learning
-  the Tartarian language, defending a True Tartarian settlement, trap-free ruin
-  dives) — fully authored, gated off behind `TIER_C_ENABLED`.
+- ~~**6 Tier-C titles**~~ **(NOW SHIPPED — arb54/arb55, OTA-907)** All six
+  (`speaker_of_forgotten_tongues, wayfarer_of_the_lost_paths, guild_broker,
+  protector_of_the_forgotten, shadow_diver, warden_of_the_old_world`) **and their
+  location challenges** (Labyrinth of Shadows clean run, learning the Tartarian
+  language, brokering a faction alliance, shoring the Sinking Cathedral, holding the
+  breach at the Sunken Enclave, three clean trap-dives on the Endless Stair) are LIVE
+  and earnable. `TIER_C_ENABLED` + all 6 per-challenge switches are on. No longer a
+  preserve-list item — kept here only for the audit trail.
 - **Instants** — the free-reaction ability system.
 - **Faction Points** as the loyalty currency, and the **multi-gate join requirements**
   (TC assets, relic ownership, join-titles, skill minimums) they denominate.
