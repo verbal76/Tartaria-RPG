@@ -18011,4 +18011,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // react-hooks/rules-of-hooks (store "use"-verb action methods) and no-useless-assignment (try/catch
 // fallback inits). Dev-tooling + CI-config only; no app code or shipped bundle changed. Verified: npm run
 // lint exits 0. (Also syncs HANDOFF.md.)
-export const OTA_BUILD_ID = '2026-07-20-1175-lint-blocking-gate';
+// 2026-07-20 OTA-1176 (dodge-outcome CLARITY — port of HAL OTA-908) — device-playtest: "there should be
+// something saying dodge failed." Two lore-neutral world beats in applyEnemyCounter: (a) a MISREAD dodge
+// gets a visceral "you stumble into it / lose your balance" beat (skips the nat-20 pierce); (b) a SUCCESSFUL
+// dodge with other live enemies names that a dodge reads one attacker while the rest press in. Pure
+// narration, setting-neutral; no mechanics change. dodgeParry +2 tests → 6/6; typecheck:ci + lint clean.
+// (The engine-line de-lore — tartariaLeakScanner 320→93 — remains in progress on this branch; see HANDOFF.)
+export const OTA_BUILD_ID = '2026-07-20-1176-dodge-outcome-clarity';
