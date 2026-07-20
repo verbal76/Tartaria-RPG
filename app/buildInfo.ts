@@ -16447,4 +16447,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // a non-lethal 1d6 and banks nothing. locationChallenges: both enabled:true / needsLayout:false. Game
 // MECHANIC + Tartaria canon. Verified: challenge suites + tierCNewChallenges store integration green;
 // typecheck + lint clean; full fast suite green.
-export const OTA_BUILD_ID = '2026-07-20-884-tier-c-protector-shadow-diver-live';
+// 2026-07-20 OTA-885 (dodge-outcome CLARITY — port of HAL OTA-908) — device-playtest: "it looked like I
+// lost a few and took damage, there should be something saying dodge failed." Two new world beats in
+// applyEnemyCounter: (a) a MISREAD dodge gets a visceral "you stumble into it / lose your balance" beat
+// (skips the nat-20 pierce); (b) a SUCCESSFUL dodge with other live enemies names that a dodge reads one
+// attacker while the rest press in. Pure narration; no mechanics change. dodgeParry +2 tests → 6/6.
+export const OTA_BUILD_ID = '2026-07-20-885-dodge-outcome-clarity';
