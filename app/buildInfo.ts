@@ -17300,4 +17300,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Three-way terminology (Aether / Etheric / Etherium) used additively per the doc. Data-only; Tartaria
 // canon → HAL + golem only, never engine. Verified: ota837CodexData + ota839LoreAccuracy + ambientLoreReach
 // + mapIntegrityAudit green; full fast suite 467/467.
-export const OTA_BUILD_ID = '2026-07-20-905-aetherstone-thesis-flavor-2';
+//
+// OTA-906 (thesis-flavor follow-up — keyword-collision fix) — the OTA-904 `zalmar_overload` concept had
+// claimed the keywords "grand spire" / "grand spire of etheria", which the `cap_asgardar` concept already
+// owns; an audit (no name/id/recipe/collectable/weapon/armor was ever touched — all the flavor edits were
+// description/answer/flavor TEXT only) turned up that one real regression: "grand spire" would now route
+// ambiguously. Dropped those two keywords from zalmar_overload (it's still reachable via "why the water
+// rose", "the overload", "how aetherstone formed", etc.). Concept keyword set is now collision-clean for
+// all four new thesis concepts. Data-only; Tartaria canon → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-906-thesis-keyword-collision-fix';
