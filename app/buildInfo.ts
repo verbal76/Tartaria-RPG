@@ -17428,4 +17428,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // skyreacherFullRun retargeted (5th boss no longer auto-builds; USING a beacon builds it) + a "hums early"
 // guard test; skyreacherRewards renamed; typecheck:ci + typecheck:tests (200 baseline) + lint clean; full
 // fast suite 474/474 (3991). Content → HAL + golem only, NOT engine.
-export const OTA_BUILD_ID = '2026-07-20-913-beacon-rifle-built-from-beacons';
+//
+// OTA-914 (THE AETHERKIN — a new enemy type: the mud-mummified flood-dead — content, HAL + golem only) — the
+// Aetherkin are the Tartarians the Great Mud Flood sealed under, drowned and mummified in silt, reanimated by
+// the Aether they died steeped in. They are NOT zombies: they are AFRAID — reanimated with basic memories of
+// who they were and a muscle-memory of fright-or-flight. They don't hunt; they cringe and defend themselves if
+// pressed (authored `skittish`, so CALM is the talk-down key). Two defensive variants join enemies.json:
+// Drowned Aetherkin (Common, hp 45) and Mud-Wracked Aetherkin (Uncommon, hp 95), both carrying an `aetherkin`
+// marker trait; the older power-hall "Aetherkin" (Rare) also reads as one by name. New app/engine/aetherkin.ts
+// builds a RANDOMIZED encounter — emergence → an Arbiter beat naming them ("these are the Aetherkin you've
+// heard about") → who they were / might have been / why they're here → how they carry themselves. They can
+// spawn on entering a discovered HOME or SHED (never an outpost/market) and can claw up out of open, novel mud
+// as a roadside encounter. Reverence has teeth: DESTROYING one lowers standing with the four factions that hold
+// the flood-dead sacred (true_tartarians, servants_of_giants, tartarian_revivalists, eternal_dynasty); TALKING
+// one down raises it. Verified: ota914Aetherkin (module + data + kill-lowers / calm-raises store tests);
+// typecheck:ci + typecheck:tests (200 baseline) + lint clean; full fast suite green. Content → HAL + golem, NOT engine.
+export const OTA_BUILD_ID = '2026-07-20-914-the-aetherkin-flood-dead';
