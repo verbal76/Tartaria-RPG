@@ -2240,7 +2240,7 @@ function expireBounties(
   const lapsed = slate.filter((b) => bountyExpired(b, hour));
   set((s) => (s.player ? { player: { ...s.player, activeBounties: kept, activeBounty: undefined } } : s));
   for (const b of lapsed) {
-    get().appendLog('arbiter', `"The ${b.giverName} contract on the ${b.targetName} has lapsed," the Arbiter says. "You were too slow. The offer's off the board."`);
+    get().appendLog('arbiter', `"The ${b.giverName} contract on the ${b.targetName} has lapsed," the ${getNarratorName()} says. "You were too slow. The offer's off the board."`);
   }
 }
 
@@ -2300,7 +2300,7 @@ function worldTideCheck(
     // ambient world churn stays on the board so it never clutters play.
     if (ev.effect.musterPatrols) musterPatrols(get, set, factions, ev.effect.musterPatrols.factionId, ev.effect.musterPatrols.count);
     if (ev.effect.offerBounty) {
-      get().appendLog('arbiter', `"There's coin on the board for a willing blade," the Arbiter says. "Read the World."`);
+      get().appendLog('arbiter', `"There's coin on the board for a willing blade," the ${getNarratorName()} says. "Read the World."`);
     }
   }
   // Roaming patrols: keep the fielded count in line with each faction's power, then let
@@ -2649,7 +2649,7 @@ function maybeSpawnRaid(
   );
   get().appendLog(
     'arbiter',
-    `"The ${plan.raiderName} do not forgive a friend of the ${plan.provokedAllyName}," the Arbiter murmurs. "Stand, or run — but decide now."`,
+    `"The ${plan.raiderName} do not forgive a friend of the ${plan.provokedAllyName}," the ${getNarratorName()} murmurs. "Stand, or run — but decide now."`,
   );
 }
 
@@ -2698,7 +2698,7 @@ function maybeInterceptPatrol(
   );
   get().appendLog(
     'arbiter',
-    `"You're on ${holderName} ground now," the Arbiter says low. "Their patrols don't ask why you came."`,
+    `"You're on ${holderName} ground now," the ${getNarratorName()} says low. "Their patrols don't ask why you came."`,
   );
 }
 
@@ -2746,7 +2746,7 @@ function maybePatrolAmbush(
     lastRaidHour: hour,
   } }));
   get().appendLog('world', `${withArticleCap(name)} patrol crosses your path in the open — and turns toward you.`);
-  get().appendLog('arbiter', `"${name} riders," the Arbiter says. "They've marked you. No outrunning this one."`);
+  get().appendLog('arbiter', `"${name} riders," the ${getNarratorName()} says. "They've marked you. No outrunning this one."`);
 }
 
 // Milestone thresholds. Hit one of these counters and the character gets a
@@ -5103,7 +5103,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (rumors.length > 0 || (get().worldMemory.patrols ?? []).length > 0) {
               get().appendLog(
                 'arbiter',
-                `"While you were gone, the waste did not sleep," the Arbiter says. "Blood was spilled and ground changed hands. Read the World for the account."`,
+                `"While you were gone, the waste did not sleep," the ${getNarratorName()} says. "Blood was spilled and ground changed hands. Read the World for the account."`,
                 { skipDedup: true },
               );
             }
@@ -17655,7 +17655,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } } : s));
           logRepChanges(get, rep.changed);
           get().appendLog('reward', `✦ Bounty complete — the ${b.giverName} pay out ${b.rewardTc} TC.`);
-          get().appendLog('arbiter', `"The ${b.giverName} will hear of this," the Arbiter says. "You've done what they could not."`);
+          get().appendLog('arbiter', `"The ${b.giverName} will hear of this," the ${getNarratorName()} says. "You've done what they could not."`);
         }
       }
     }
@@ -20493,8 +20493,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog(
       'arbiter',
       hadCourse
-        ? `"Another contract," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down around ${bounty.targetLocationName}. Added to your slate — your current course holds."`
-        : `"A contract, then," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — and they'll be thick around ${bounty.targetLocationName}. Setting your course there now."`,
+        ? `"Another contract," the ${getNarratorName()} says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down around ${bounty.targetLocationName}. Added to your slate — your current course holds."`
+        : `"A contract, then," the ${getNarratorName()} says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — and they'll be thick around ${bounty.targetLocationName}. Setting your course there now."`,
     );
     // Route the player to the quarry's outpost — but only if they weren't already on a
     // bounty course. Stacking a second contract must not yank you off the first one's road.
@@ -24031,7 +24031,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const atOutpostCrucible = !!player.hubRoomId && hasLeftOutpost;
     const atMarketCrucible = get().activeBuildingId === 'market';
     if (!player.fusionPending && !atOutpostCrucible && !atMarketCrucible) {
-      get().appendLog('arbiter', `"There's no Crucible here," the Arbiter says. "Find one — an outpost or a ruin — then bring your reserved pieces and the piece to upgrade."`);
+      get().appendLog('arbiter', `"There's no Crucible here," the ${getNarratorName()} says. "Find one — an outpost or a ruin — then bring your reserved pieces and the piece to upgrade."`);
       return;
     }
     // Gate 2 — the target must be an eligible, not-yet-upgraded piece: a coatable
