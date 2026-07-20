@@ -1,0 +1,51 @@
+{
+  "top": [
+    {
+      "name": "Aetheric Locket",
+      "rarity": "Common",
+      "weight": 4
+    },
+    {
+      "name": "Aetheric Shard",
+      "rarity": "Uncommon",
+      "weight": 6
+    },
+    {
+      "name": "Speckled Egg",
+      "rarity": "Uncommon",
+      "weight": 5
+    },
+    {
+      "name": "Bioluminescent Fungus",
+      "rarity": "Uncommon",
+      "weight": 3
+    },
+    {
+      "name": "First Aid Kit",
+      "rarity": "Uncommon",
+      "weight": 4
+    },
+    {
+      "name": "Aether Crystal",
+      "rarity": "Common",
+      "weight": 8
+    },
+    {
+      "name": "Drone Core",
+      "rarity": "Uncommon",
+      "weight": 2
+    },
+    {
+      "name": "Aetheric Cloth",
+      "rarity": "Rare",
+      "weight": 1
+    }
+  ],
+  "tall": [
+    {
+      "name": "Reclaimer's Rope",
+      "rarity": "Uncommon",
+      "weight": 2
+    }
+  ]
+}

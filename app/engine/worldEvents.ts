@@ -15,6 +15,7 @@
 
 import type { FactionMeta } from './worldPulse';
 import { withArticleCap } from './grammar';
+import { getNarratorName } from './contentPack';
 
 const TIDE_MIN = -5, TIDE_MAX = 5;
 const clampTide = (v: number) => Math.max(TIDE_MIN, Math.min(TIDE_MAX, v));
@@ -94,7 +95,7 @@ const EVENTS: EventDef[] = [
       return {
         kind: 'setback',
         rumor: `The ${nameOf(ctx, rival)} took a hard loss near the frontier — and the ${ally.name} are paying good coin to press the advantage.`,
-        arbiter: `"The ${ally.name} have work for a willing hand," the Arbiter notes. "The board will show it."`,
+        arbiter: `"The ${ally.name} have work for a willing hand," the ${getNarratorName()} notes. "The board will show it."`,
         effect: { tideDelta: { [rival]: -1 }, offerBounty: true },
       };
     },
@@ -119,7 +120,7 @@ const EVENTS: EventDef[] = [
       return {
         kind: 'muster',
         rumor: `The ${f.name} are mustering — more of their patrols on the roads now.`,
-        arbiter: `"The ${f.name} ride in numbers lately," the Arbiter says. "Mind the open country."`,
+        arbiter: `"The ${f.name} ride in numbers lately," the ${getNarratorName()} says. "Mind the open country."`,
         effect: { musterPatrols: { factionId: f.id, count: 1 } },
       };
     },
@@ -131,7 +132,7 @@ const EVENTS: EventDef[] = [
       return {
         kind: 'warband',
         rumor: `${withArticleCap(f.name)} warband has taken to the roads in force.`,
-        arbiter: `"${withArticleCap(f.name)} warband is abroad," the Arbiter warns. "That is a fight, not a patrol."`,
+        arbiter: `"${withArticleCap(f.name)} warband is abroad," the ${getNarratorName()} warns. "That is a fight, not a patrol."`,
         effect: { musterPatrols: { factionId: f.id, count: 2 }, tideDelta: { [f.id]: 1 } },
       };
     },
@@ -143,7 +144,7 @@ const EVENTS: EventDef[] = [
       return {
         kind: 'bounty',
         rumor: `The ${ally.name} have posted a bounty on the board.`,
-        arbiter: `"The ${ally.name} want a debt collected," the Arbiter says. "Read the World if you'd take it."`,
+        arbiter: `"The ${ally.name} want a debt collected," the ${getNarratorName()} says. "Read the World if you'd take it."`,
         effect: { offerBounty: true },
       };
     },
@@ -204,7 +205,7 @@ const EVENTS: EventDef[] = [
     kind: 'relic', weight: 6, eligible: () => true,
     build: (_ctx, seed) => {
       const rumors = [
-        'A prospector swears a Tartarian relic surfaced after the last storm.',
+        'A prospector swears an old-world relic surfaced after the last storm.',
         'Old machines are stirring beneath the dunes, they say.',
         'A buried door was found ajar in the deep waste.',
       ];
@@ -226,7 +227,7 @@ const EVENTS: EventDef[] = [
     kind: 'omen', weight: 5, eligible: () => true,
     build: (_ctx, seed) => {
       const rumors = [
-        'The Aether burned strange colors over the horizon last night.',
+        'The sky burned strange colors over the horizon last night.',
         'The wind carried voices no one could place. An omen, the old ones say.',
         'A dead spire lit for a heartbeat, then went dark.',
       ];

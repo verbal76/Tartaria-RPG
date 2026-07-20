@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 // OTA 030 — variable-height climb tiers. The OTA 027 climb verb was a
 // single DEX vs DC 12 roll that resolved the whole climb in one tap.
 // Playtester wanted real height — a wall is quick, a tower or cliff
@@ -145,25 +146,14 @@ export function isClimbCleared(noun: string, marks: readonly string[]): boolean 
 // nothing (preserves the RNG-driven incentive the playtester asked
 // for); the other ~50% rolls one item from a pool that's chunkier
 // than ground-search (Uncommon-skewed, with a thin Rare tail).
-export const CLIMB_TOP_LOOT: { name: string; rarity: Rarity; weight: number }[] = [
-  { name: 'Aetheric Locket',       rarity: 'Common',   weight: 4 },
-  { name: 'Aetheric Shard',        rarity: 'Uncommon', weight: 6 },
-  { name: 'Speckled Egg',          rarity: 'Uncommon', weight: 5 },
-  { name: 'Bioluminescent Fungus', rarity: 'Uncommon', weight: 3 },
-  { name: 'First Aid Kit',         rarity: 'Uncommon', weight: 4 },
-  { name: 'Aether Crystal',        rarity: 'Common',   weight: 8 },
-  { name: 'Drone Core',            rarity: 'Uncommon', weight: 2 },
-  { name: 'Aetheric Cloth',        rarity: 'Rare',     weight: 1 },
-];
+export const CLIMB_TOP_LOOT: { name: string; rarity: Rarity; weight: number }[] = require('../data/search/climb-top-loot.json').top;
 
 // OTA 23-013 — tall-climb-only additions. On tier ≥ 4 climbs
 // (towers, spires, cliffs) somebody once anchored a piton up there
 // and left their rope behind. Folded into the same chance roll so
 // the overall drop frequency doesn't shift; the rope just edges
 // into the weighted pool on tall targets.
-const TALL_CLIMB_TOP_LOOT: { name: string; rarity: Rarity; weight: number }[] = [
-  { name: "Reclaimer's Rope", rarity: 'Uncommon', weight: 2 },
-];
+const TALL_CLIMB_TOP_LOOT: { name: string; rarity: Rarity; weight: number }[] = require('../data/search/climb-top-loot.json').tall;
 
 // engine_Dev — in a RE-SKIN the hardcoded CLIMB_TOP_LOOT pool above is all
 // Tartaria names (Aetheric Shard, Aether Crystal, …) that don't exist in the
