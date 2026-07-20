@@ -27563,6 +27563,31 @@ function applyEnemyCounter(
   if (dodgeLine) {
     get().appendLog('combat', dodgeLine, dodgeWin ? { combatOutcome: 'enemy_miss' } : undefined);
   }
+  // OTA-908 — dodge-outcome CLARITY (playtest: "it looked like I lost a few and
+  // took damage, there should be something saying dodge failed"). The mechanics
+  // are right; the feedback was buried in the [combat] roll line.
+  //   (a) A MISREAD dodge now gets a visceral world beat — you stumbled into it —
+  //       instead of only the terse roll line. (Skips the nat-20 pierce, which
+  //       already has its own "perfect strike lands through" line.)
+  //   (b) A SUCCESSFUL dodge only reads ONE attacker; in a crowd the others still
+  //       swing, so "I dodged but took damage" read like a failure. Name it.
+  if (dodgeWin === false && !enemyCrit) {
+    const misreadLines = [
+      'You misread the swing. Your feet tangle and you stumble straight into it — no armor between you and the blow now.',
+      'You commit the wrong way. The arc you leaned into is the one that lands, and it lands twice as hard.',
+      'Your read comes a beat late — you duck into the strike instead of away, out of position and wide open.',
+      'You lose your balance on the slip and pitch forward. The blow catches you square, past any guard.',
+    ];
+    get().appendLog('world', misreadLines[rollDie(misreadLines.length) - 1]!);
+  } else if (dodgeWin === true) {
+    const sc = get().currentScene;
+    const otherLive = (sc?.enemies ?? []).filter(
+      (e, i) => e !== enemy && (sc?.enemyHps?.[i] ?? e.hp) > 0,
+    ).length;
+    if (otherLive >= 1) {
+      get().appendLog('world', `You slip ${enemy.name}'s arc clean — but a dodge reads one attacker; the rest press in while you're committed.`);
+    }
+  }
   if (dodgeWin === true) {
     // The read paid off — train DEX (and STEALTH when stealth gear is worn;
     // both carried over from the old parry's training rules). OTA-796 — capped

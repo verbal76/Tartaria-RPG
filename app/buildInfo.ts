@@ -17323,4 +17323,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // updated (all 6 live). This is game MECHANIC + Tartaria-canon content → HAL + golem only, never engine.
 // Verified: locationChallenges + titleChallenges + tierCNewChallenges (store integration, 6 tests) green;
 // typecheck:ci + typecheck:tests (200 baseline, no growth) + lint clean; full fast suite 468/468 (3958).
-export const OTA_BUILD_ID = '2026-07-20-907-tier-c-protector-shadow-diver-live';
+//
+// OTA-908 (dodge-outcome CLARITY — device-playtest feedback: "it looked like I lost a few and took damage,
+// there should be something saying dodge failed, maybe a you lost balance and fell") — the dodge MECHANICS
+// were right (incl. the OTA-815 nat-20-pierces fix), but the outcome feedback was buried in the [combat]
+// roll line, and — the real source of confusion — a SUCCESSFUL dodge in a multi-enemy fight still takes hits
+// from the OTHER attackers (a dodge reads ONE swing), which read like a failed dodge. Two new world beats in
+// applyEnemyCounter (gameStore): (a) a MISREAD dodge now gets a visceral "you stumble into it / lose your
+// balance" beat from a 4-line pool (skips the nat-20 pierce, which keeps its own line); (b) a SUCCESSFUL
+// dodge with other live enemies names it — "you slip X's arc clean, but a dodge reads one attacker; the rest
+// press in while you're committed." Pure narration; no mechanics change. Verified: dodgeParry +2 tests
+// (deterministic via pinned dice) → 6/6; full fast suite 468/468 (3960). Ships all three lines.
+export const OTA_BUILD_ID = '2026-07-20-908-dodge-outcome-clarity';
