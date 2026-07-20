@@ -17252,4 +17252,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Text size still rides the OS Dynamic-Type setting (allowFontScaling is never disabled). UI-only,
 // additive accessibility props — no behaviour, layout, styling, logic, or copy changed (verified: source
 // tsc clean, full fast jest suite 467/467, and every removed diff line is pure JSX-tag reflow). 46 files.
-export const OTA_BUILD_ID = '2026-07-20-902-accessibility-sweep';
+//
+// OTA-903 (lint → BLOCKING — the last non-blocking quality gate closed) — the `lint` CI job existed since
+// SA-1 but was `continue-on-error`, and in fact it NEVER RAN: the repo had no ESLint config, and under
+// ESLint 9+ (flat-config only) `eslint .` just errored "couldn't find eslint.config.js". This adds a real
+// ESLint 9 flat config (eslint.config.js) plus the pinned toolchain (eslint, @eslint/js, typescript-eslint,
+// eslint-plugin-react-hooks) as devDependencies, and flips the job to REQUIRED. The rule set is
+// deliberately LEAN and high-signal: it enforces only genuine-bug rules the tree already passes (no-dupe-
+// keys, no-unreachable, use-isnan, valid-typeof, no-fallthrough, no-constant-binary-expression, no-self-
+// compare, no-misused-new, …) and turns OFF stylistic / whole-tree-churn rules (no-explicit-any, no-unused-
+// vars, exhaustive-deps) so the gate is green today and blocks real regressions going forward — the same
+// "start where the code is, ratchet later" model as the test-typecheck gate. Two rules are OFF for
+// codebase-fit, not to hide bugs: react-hooks/rules-of-hooks (the store's ACTION methods are named with the
+// "use" verb — useHealBatch, useInventoryItem — which the rule mis-reads as React hooks) and no-useless-
+// assignment (false-positives on defensive try/catch fallback inits). Dev-tooling + CI-config only; no app
+// code, behaviour, or shipped bundle changed.
+export const OTA_BUILD_ID = '2026-07-20-903-lint-blocking-gate';
