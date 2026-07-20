@@ -51,9 +51,25 @@ describe('TITLE_CHALLENGES config', () => {
     expect(w.requirement.consumeOnAttempt).toBe(true);
   });
 
+  it('Protector is skill-gated with no material: one-shot d20+STR, own narration', () => {
+    const p = TITLE_CHALLENGES.defense_of_the_enclave!;
+    expect(p.locationId).toBe('tartarian_enclave');
+    expect(p.counter).toBe('settlementsDefended');
+    expect(p.requirement.itemName).toBe('');
+    expect(p.requirement.quantity).toBe(0);
+    expect(p.requirement.recoverOnScout).toBe(false);
+    expect(p.requirement.consumeOnAttempt).toBe(false);
+    expect(p.check.stat).toBe('strength');
+    expect(p.check.dc).toBe(15);
+    // per-challenge narration so the generic handler doesn't fall back to Warden text
+    expect(p.successLine).toBeTruthy();
+    expect(p.failLine).toBeTruthy();
+  });
+
   it('challengeForLocation maps tiles to their challenge (and nothing elsewhere)', () => {
     expect(challengeForLocation('red_tower_of_nimari')?.id).toBe('tongue_of_the_red_tower');
     expect(challengeForLocation('sinking_cathedral')?.id).toBe('warden_of_the_cathedral');
+    expect(challengeForLocation('tartarian_enclave')?.id).toBe('defense_of_the_enclave');
     expect(challengeForLocation('tartarian_outskirts')).toBeNull();
   });
 
@@ -68,5 +84,12 @@ describe('TITLE_CHALLENGES config', () => {
     expect(w.scoutVerb.test('inspect the cathedral')).toBe(true);
     expect(w.attemptVerb.test('stabilize the cathedral')).toBe(true);
     expect(w.attemptVerb.test('inspect the cathedral')).toBe(false);
+
+    const p = TITLE_CHALLENGES.defense_of_the_enclave!;
+    expect(p.scoutVerb.test('scout the breach')).toBe(true);
+    expect(p.attemptVerb.test('defend the enclave')).toBe(true);
+    expect(p.attemptVerb.test('hold the line')).toBe(true);
+    // scouting must not match the committing verb
+    expect(p.attemptVerb.test('scout the breach')).toBe(false);
   });
 });

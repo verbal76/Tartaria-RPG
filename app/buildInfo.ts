@@ -17308,4 +17308,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ambiguously. Dropped those two keywords from zalmar_overload (it's still reachable via "why the water
 // rose", "the overload", "how aetherstone formed", etc.). Concept keyword set is now collision-clean for
 // all four new thesis concepts. Data-only; Tartaria canon → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-906-thesis-keyword-collision-fix';
+//
+// OTA-907 (arb54/arb55 — the last two Tier-C challenges go LIVE) — all six Tier-C Arbiter titles are now
+// earnable. The four that shipped earlier (Wayfarer/Speaker/Warden/Guild Broker) are joined by:
+//  • PROTECTOR OF THE FORGOTTEN (defense_of_the_enclave @ The Sunken Enclave) — a one-shot d20 + STR vs DC 15
+//    "hold the breach against the raiders." SCOUT THE BREACH reads the fight for free; DEFEND THE ENCLAVE is
+//    your single stand (pass → settlementsDefended, fail → spent). Runs on the shared handleTitleChallenge
+//    path, generalized so the def's own successLine/failLine are used instead of the Warden cathedral
+//    fallback. The enclave tile is now discoverable (was hidden), stale `disabled_challenge` tag removed.
+//  • SHADOW DIVER (trap_dives_of_the_stair @ the Endless Stair) — a RETRYABLE d20 + DEX vs DC 13 gauntlet:
+//    three CLEAN dives (trapCleanDives) earn the title, a miss springs a non-lethal 1d6 and banks nothing so
+//    you can dive again. New store handler handleTrapDive + an endless_stair scout/dive interceptor.
+// locationChallenges: both flipped enabled:true / needsLayout:false; module header + [PLANNED] doc register
+// updated (all 6 live). This is game MECHANIC + Tartaria-canon content → HAL + golem only, never engine.
+// Verified: locationChallenges + titleChallenges + tierCNewChallenges (store integration, 6 tests) green;
+// typecheck:ci + typecheck:tests (200 baseline, no growth) + lint clean; full fast suite 468/468 (3958).
+export const OTA_BUILD_ID = '2026-07-20-907-tier-c-protector-shadow-diver-live';

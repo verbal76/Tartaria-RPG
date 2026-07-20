@@ -969,9 +969,11 @@ function handleTitleChallenge(getStore: StoreGet, setStore: StoreSet, trimmed: s
     const status = getStore().player?.challengeAttempts?.[def.id];
     if (status === 'succeeded') { getStore().appendLog('world', `You have already mastered this — the title is yours.`); return; }
     if (status === 'failed') { getStore().appendLog('world', `Your one attempt here is spent.`); return; }
-    const haveLine = have >= req.quantity
-      ? `You have what you need (${reqLine}).`
-      : `You still need ${req.hint}.`;
+    const haveLine = req.quantity === 0
+      ? 'No supplies to gather — this trial asks only what you are.'
+      : have >= req.quantity
+        ? `You have what you need (${reqLine}).`
+        : `You still need ${req.hint}.`;
     getStore().appendLog(
       'world',
       `${haveLine} The trial is ${def.check.trialLabel}: a single d20 + ${def.check.statLabel} (yours: ${intVal}) against DC ${def.check.dc}. ` +
@@ -1008,19 +1010,75 @@ function handleTitleChallenge(getStore: StoreGet, setStore: StoreSet, trimmed: s
   setStore((s) => (s.player ? { player: { ...s.player, inventory: inv, challengeAttempts: attempts } } : s));
   const rollLine = `(d20 ${r.roll} + ${def.check.statLabel} ${intVal} = ${r.total} vs DC ${r.dc})`;
   if (r.success) {
-    if (def.id === 'tongue_of_the_red_tower') {
+    if (def.successLine) {
+      getStore().appendLog('world', `${def.successLine} ${rollLine}`);
+    } else if (def.id === 'tongue_of_the_red_tower') {
       getStore().appendLog('world', `The glyphs resolve under the Glyph-Key's tongue — meaning pours in. You can read the dead language now. ${rollLine}`);
     } else {
       getStore().appendLog('world', `The braces hold. The nave groans, settles, and stands. You've kept a piece of the old world from the dark. ${rollLine}`);
     }
     recordTitleProgress(getStore, setStore, { [def.counter]: 1 });
   } else {
-    if (def.id === 'tongue_of_the_red_tower') {
+    if (def.failLine) {
+      getStore().appendLog('world', `${def.failLine} ${rollLine}`);
+    } else if (def.id === 'tongue_of_the_red_tower') {
       getStore().appendLog('world', `The glyphs blur and scatter; the reading collapses into noise. ${rollLine}`);
     } else {
       getStore().appendLog('world', `The braces buckle. A section of the nave caves in with a roar of stone — the shoring is wasted. ${rollLine}`);
     }
     getStore().appendLog('arbiter', `"One chance, and it's gone. Some trials don't forgive."`);
+  }
+}
+
+// arb55 — Trap Dives of the Endless Stair (Shadow Diver). Unlike the one-shot
+// title trials this is a RETRYABLE DEX gauntlet: each dive is a single d20 + DEX
+// vs DC 13. A CLEAN dive (pass) banks one of the three you need — trapCleanDives
+// accumulates persistently on the player, so the three can be earned across
+// separate visits. A tripped trap (fail) springs for 1d6 (never lethal — the
+// stair lets you try again) and banks nothing. Scouting is free and reports the
+// DC + clean dives banked. At three clean dives recordTitleProgress awards
+// Shadow Diver. `isDive` = the player committed a dive; otherwise it's a scout.
+function handleTrapDive(getStore: StoreGet, setStore: StoreSet, isDive: boolean): void {
+  const player = getStore().player;
+  if (!player) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const tc = require('../engine/titleChallenges');
+  const dex = effectiveStats(player).dexterity ?? 0;
+  const dc = 13;
+  const banked = player.titleProgress?.trapCleanDives ?? 0;
+
+  if (banked >= 3) {
+    getStore().appendLog('world', 'You have run the stair clean three times over — its traps hold no more names for you. (Shadow Diver is already yours.)');
+    return;
+  }
+
+  // ── SCOUT (free) ──────────────────────────────────────────────────────────
+  if (!isDive) {
+    getStore().appendLog(
+      'world',
+      `The stair drops away into trap-laced dark. Each dive is a single d20 + DEX (yours: ${dex}) against DC ${dc} — read the pressure-plates and time the fall. ` +
+      `Clean dives banked: ${banked}/3. (DIVE THE STAIR to attempt one — a miss springs the trap but costs you no run; you can dive again.)`,
+    );
+    return;
+  }
+
+  // ── DIVE (retryable) ──────────────────────────────────────────────────────
+  const r = tc.rollCheck(dex, dc);
+  const rollLine = `(d20 ${r.roll} + DEX ${dex} = ${r.total} vs DC ${dc})`;
+  if (r.success) {
+    const nowBanked = banked + 1;
+    if (nowBanked >= 3) {
+      getStore().appendLog('world', `You read the last plate a heartbeat before it reads you and roll clear onto the landing. Three dives, none sprung — you move through this place like it was built for you. ${rollLine}`);
+    } else {
+      getStore().appendLog('world', `You thread the dive clean — plates unsprung, rope true. That's ${nowBanked}/3. ${rollLine}`);
+    }
+    recordTitleProgress(getStore, setStore, { trapCleanDives: 1 });
+  } else {
+    const dmg = 1 + Math.floor(Math.random() * 6);
+    const newHp = Math.max(1, player.hp - dmg); // non-lethal — the stair lets you try again
+    setStore((s) => (s.player ? { player: { ...s.player, hp: newHp } } : s));
+    getStore().appendLog('world', `A plate gives under your heel — a whir of darts, a dropped step. The trap springs for ${dmg} (${newHp}/${player.hpMax} HP). Still ${banked}/3 clean; steady yourself and dive again. ${rollLine}`);
+    checkLowHpWarning(player.hp, newHp, player.hpMax ?? 1, getStore, setStore);
   }
 }
 
@@ -7376,6 +7434,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (def && challengeActive(def.id) && (def.scoutVerb.test(trimmed) || def.attemptVerb.test(trimmed))) {
           if (!_opts?.silent) get().appendLog('player', trimmed);
           handleTitleChallenge(get, set, trimmed, def);
+          return;
+        }
+      }
+    }
+
+    // arb55 — Trap Dives of the Endless Stair (Shadow Diver). Retryable DEX
+    // gauntlet — SCOUT (free) reports the DC + banked dives; DIVE rolls one.
+    // Intercept the scout/dive verbs at the tile before the world parser.
+    {
+      const pl = get().player;
+      if (
+        pl && !pl.labyrinthRun &&
+        pl.currentLocationId === 'endless_stair' &&
+        challengeActive('trap_dives_of_the_stair')
+      ) {
+        const diveVerb = /\b(dive|descend|drop|plunge|leap|run)\b.*\b(stair|stairs|step|steps|descent|dark|trap|traps)\b|^(dive|dive\s+the\s+stair)\b/i;
+        const scoutVerb = /\b(examine|inspect|assess|scout|survey|read|study|look\s+at)\b.*\b(stair|stairs|step|steps|plate|plates|trap|traps|descent)\b/i;
+        if (diveVerb.test(trimmed) || scoutVerb.test(trimmed)) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          handleTrapDive(get, set, diveVerb.test(trimmed));
           return;
         }
       }
@@ -16815,6 +16893,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('world',
           done ? 'The Parley Ground is quiet; the alliance you brokered here holds.'
           : 'Two faction banners stand on the neutral flats of the Parley Ground, their leaders waiting. (PARLEY to hear their demands; SEAL THE ALLIANCE once you hold both relics.)');
+      } else if (ch.id === 'defense_of_the_enclave') {
+        get().appendLog('world',
+          attempt === 'succeeded' ? 'The enclave you held still stands, its walls patched where the raiders broke against them.'
+          : attempt === 'failed' ? 'The breach you failed to hold gapes cold and empty; the enclave has moved on without you.'
+          : 'Raiders mass at the Sunken Enclave\'s breached wall while the elders and their children shelter behind you. (SCOUT THE BREACH to read the fight — free — then DEFEND THE ENCLAVE for your one stand.)');
+      } else if (ch.id === 'trap_dives_of_the_stair') {
+        const banked = get().player?.titleProgress?.trapCleanDives ?? 0;
+        get().appendLog('world',
+          banked >= 3 ? 'The Endless Stair drops away trap-laced as ever — but you have already run it clean three times over.'
+          : `The Endless Stair falls into trap-laced dark, pressure-plates hidden in every landing (${banked}/3 clean dives banked). (EXAMINE THE STAIR to read the traps — free — then DIVE THE STAIR; three clean dives earn the name.)`);
       } else {
         get().appendLog('world', `A path opens here: ${ch.note}`);
       }
