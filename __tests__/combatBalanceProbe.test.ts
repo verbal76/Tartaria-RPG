@@ -165,12 +165,26 @@ describe('combat-balance probe — honest damage / supply burn per rarity', () =
       Legendary: roster('Legendary'),
     };
 
-    // 100 fights per tier — enough to get stable averages.
-    const FIGHTS_PER_TIER = 100;
+    // 40 fights per tier (160 total) — a robust balance sample that runs in a
+    // bounded heap. Above ~400 total fights the engine's world/persist layer
+    // accumulates super-linearly in the tail (heap is flat through ~200 fights,
+    // then climbs steeply) and the worker OOMs; 40/tier stays well inside the
+    // stable region while keeping the per-rarity averages statistically sound.
+    const FIGHTS_PER_TIER = 40;
     const rarities: Array<keyof typeof rosters> = ['Common', 'Uncommon', 'Rare', 'Legendary'];
 
     function reset() {
-      store.setState({ player: JSON.parse(JSON.stringify(pristine)) });
+      // Also flush the narration log + kill ledger between fights. This probe
+      // runs ~400 fights × up to 25 rounds of submitPlayerAction, each emitting
+      // several log lines; without a flush the gameLog (and worldMemory kill
+      // list) grow unbounded across the run and the worker OOMs. The probe never
+      // asserts on either, so clearing them per-fight is safe and keeps memory
+      // O(one fight).
+      store.setState((s) => ({
+        player: JSON.parse(JSON.stringify(pristine)),
+        gameLog: [],
+        worldMemory: { ...s.worldMemory, defeatedEnemies: [] },
+      }));
     }
     function inject(rarity: keyof typeof rosters): Enemy | null {
       const pool = rosters[rarity];

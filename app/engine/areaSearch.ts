@@ -434,7 +434,8 @@ export function rollAreaSearch(
     return { kind: 'tc', amount, line: format(pick(TC_LINES), target) };
   }
   // OTA-216 — when investigate fires a hook outcome, split the
-  // 60% hook share three ways:
+  // hook share (0.75 of total after arb61 cut the item drop to ~7%)
+  // three ways:
   //   - 50% → scene hook chain (the existing 2-3 step narrative
   //           that lives on currentScene.hooks)
   //   - 30% → directional find (schedules a real encounter the

@@ -16384,4 +16384,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (~3.5:1) lifted to #a2977b (~5.9:1, clears WCAG AA) across the component/screen files that used it.
 // Text size stays on the OS font-size setting (allowFontScaling never disabled). UI + a tiny prefs store;
 // ships over-the-air. Covered by ota898Accessibility.
-export const OTA_BUILD_ID = '2026-07-19-877-accessibility-baseline';
+// 2026-07-20 OTA-878 (jest gate → BLOCKING + triage/flake hardening — port of HAL OTA-899…901) — brings
+// the golem line up to HAL's blocking jest gate in one hop. SHIPPED FIXES carried over: accessibility.ts
+// now LAZY-loads AsyncStorage inside its helpers (importing the store no longer pulls the native module,
+// which was crashing transitive importers in a bare JS/test env); and turnInFactionQuest's `remote`
+// parameter — declared but unused — could courier a FETCH faction quest remotely (completed without
+// in-person delivery), now refused (OTA-456 "you can't mail the goods" enforced). CI: the jest suite is a
+// REQUIRED gate, split into jest (fast · required) = the deterministic unit/integration suites, and jest
+// (heavy sims · reported) = the stress/balance/long-run sims (non-blocking; they exercise the engine's
+// known super-linear world/persist tail-growth). A new jest.setup.js seeds Math.random (fixed mulberry32,
+// per file) so runs are byte-identical, and pins incidental scene weather to Eerie Calm so per-action
+// HP/stamina chips can't flake vital-exact assertions — test harness only, product weather unchanged. The
+// rest is test triage: stale-expectation/harness-drift fixes across ~20 suites, fixture hpMax pins, and a
+// recalibrated investigate outcome-split band (±5σ around the true 0.75 hook family). One source touch
+// (areaSearch) is a comment. No shipped gameplay change beyond the two fixes named above.
+export const OTA_BUILD_ID = '2026-07-20-878-jest-blocking-gate';

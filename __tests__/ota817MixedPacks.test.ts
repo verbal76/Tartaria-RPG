@@ -60,10 +60,14 @@ describe('OTA-817 — pack scaled as one shared, boss-capped budget', () => {
     expect(viaBatch.hp).toBe(viaSolo.hp);
   });
 
-  it('a boss mixed into a pack is left untouched and does not share the budget', () => {
+  it('a boss mixed into a pack scales solo (static-boss scaler), not via the pack budget', () => {
     const scaled = scaleEncounterForContext([boss(), bat(), bat()], 4, ENDGAME);
     const scaledBoss = scaled.find((e) => e.boss)!;
-    expect(scaledBoss.hp).toBe(80);   // boss HP unchanged
+    // OTA-896 (SA-4) — bosses now scale to player power via scaleStaticBoss
+    // instead of passing through fixed, but STILL independently of the pack HP
+    // budget. Sentinel (80 HP) at end-game power hits the boss cap (1.4×) → 112,
+    // the same value it gets when scaled solo — proving it never shared the pack.
+    expect(scaledBoss.hp).toBe(112);
   });
 
   it('distributes by base-HP weight — a brute out-bulks a rat in the same pack', () => {

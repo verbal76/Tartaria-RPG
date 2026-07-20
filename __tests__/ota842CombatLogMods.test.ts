@@ -57,8 +57,9 @@ describe('OTA-842 — damageModClause', () => {
     expect(c).toBe(' [Aetherstone Vulnerability — +50% dmg]');
   });
 
-  it('Etherbound flat shave shows when no title-halve fired', () => {
-    expect(damageModClause({ titleShaved: 4 })).toBe(' [Etherbound −4]');
+  it('Aetherbound flat shave shows when no title-halve fired', () => {
+    // OTA-894 (SA-2) canonicalised the title's prose to "Aetherbound".
+    expect(damageModClause({ titleShaved: 4 })).toBe(' [Aetherbound −4]');
   });
 
   it('title-halve takes precedence over the flat shave (they never both list)', () => {

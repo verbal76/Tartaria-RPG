@@ -74,9 +74,17 @@ describe('OTA-779 — rope usable to its last point (graceful break, warn low, f
         ...store.getState().currentScene!,
         ambientNouns: ['wall', 'tower'],
         elevatedOn: elevated ? { noun: 'wall', tier: 1, totalTiers: 3 } : null,
+        // Pin weather to Eerie Calm: these assert on ROPE behaviour (no fall,
+        // exact HP), and tickWeather() rolls an RNG chip on every action
+        // regardless of whether the climb succeeds or is refused. Without
+        // pinning, a stray glass-hail/etheric-storm roll nicks 1 HP and flakes
+        // the exact-HP checks. Calm has prob-0 effects (always a zero tick), so
+        // the rope path is deterministic. The dedicated weather-cooldown block
+        // below sets its own damaging weather explicitly.
+        weather: { id: 'calm', name: 'Eerie Calm', description: 'Not even wind.', visibility: 0, travelPenalty: 0, corruptionChance: 0, tags: ['calm'] },
       },
       player: {
-        ...p0, hp: 40, hpMax: 40, stamina: 10, staminaMax: 10,
+        ...p0, hp: 40, hpMax: 40, stamina: 10, staminaMax: 10, weatherTickCooldown: 0,
         inventory: [...p0.inventory.filter((i) => i.name !== 'Climbing Rope' && i.name !== "Reclaimer's Rope"), rope],
       },
     });

@@ -467,12 +467,17 @@ describe('Quest progression audit', () => {
         if (!cur) break;
         if (cur.stage >= h.stages.length) { bossKilled = true; break; }
         store.getState().advanceHunt(h.id);
-        const updated = (store.getState().player?.activeHunts ?? []).find((r) => r.id === h.id);
-        if (!updated) break;
-        if (h.stages[updated.stage - 1]?.checkKind === 'boss') {
+        // OTA-796 — the FINAL boss stage FREEZES the hunt (advanceHunt spawns the
+        // boss but does NOT increment the stage; only the kill advances it). So a
+        // stage-delta check misses it — detect the spawned boss by a LIVE enemy in
+        // the scene instead. This covers both the mid-hunt boss (which increments
+        // on spawn) and the frozen final boss (which doesn't).
+        const scene = store.getState().currentScene;
+        const liveEnemy = !!scene && scene.enemies.some((_, idx) => (scene.enemyHps[idx] ?? 0) > 0);
+        if (liveEnemy) {
           bossSpawned = true;
-          // Boss scene was set by advanceHunt; zero its HP so resolveEnemyDefeat
-          // registers the kill (and advances the hunt iff it's the final boss).
+          // Zero its HP so resolveEnemyDefeat registers the kill (and advances the
+          // hunt iff it's the final boss).
           store.setState((s) => {
             if (!s.currentScene) return s;
             return {
@@ -485,7 +490,7 @@ describe('Quest progression audit', () => {
           });
           store.getState().resolveEnemyDefeat();
           const finalRec = (store.getState().player?.activeHunts ?? []).find((r) => r.id === h.id);
-          if (finalRec && finalRec.stage >= h.stages.length) bossKilled = true;
+          if (!finalRec || finalRec.stage >= h.stages.length) bossKilled = true;
         }
       }
       if (!bossSpawned || !bossKilled) {
