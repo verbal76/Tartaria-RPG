@@ -17443,4 +17443,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the flood-dead sacred (true_tartarians, servants_of_giants, tartarian_revivalists, eternal_dynasty); TALKING
 // one down raises it. Verified: ota914Aetherkin (module + data + kill-lowers / calm-raises store tests);
 // typecheck:ci + typecheck:tests (200 baseline) + lint clean; full fast suite green. Content → HAL + golem, NOT engine.
-export const OTA_BUILD_ID = '2026-07-20-914-the-aetherkin-flood-dead';
+//
+// OTA-915 (GREAT CLIMBS — codex + title discovery-gating — content, HAL + golem only) — three codex gaps closed:
+//   (1) LORE › PLACES — the five Great-Climb tower locations now mask as "?" ("unknown — a chart will lead you
+//       here", no route affordance) until you USE that tower's Skyreacher Chart (unlockedGreatClimbs). Ordinary
+//       locations are never map-gated. (isGreatClimbLocationLocked in greatClimbs.ts.)
+//   (2) BESTIARY — the five summit bosses (Aurenthal / Draugveil / Magnetar / Zalmar's Cascade-Wraith / Ossika)
+//       are now catalogued, gated on DEFEAT like every foe. They are deliberately NOT added to enemies.json
+//       (that pool is rolled for random wild spawns — a unique tower boss must never ambush you in open waste);
+//       instead they're projected into the codex from greatClimbs.SUMMIT_BOSS_BASES (single source of truth),
+//       each given a one-line codex flavor. Their built name matches the projection so a kill lights the entry.
+//   (3) TITLES — the Skyreacher title now stays hidden as "??? — undiscovered" until you've found the questline
+//       (bought a chart / unlocked / crested — greatClimbLoreDiscovered); earned always shows. (isHiddenTitle.)
+// Aetherkin were already bestiary-gated (they live in enemies.json) — no change needed there. Verified:
+// ota915GreatClimbCodex (summit-boss projection + name-match, location mask, hidden-title gate); typecheck:ci +
+// typecheck:tests (200 baseline) + lint clean; full fast suite green. Content → HAL + golem only, NOT engine.
+export const OTA_BUILD_ID = '2026-07-20-915-great-climb-codex-gating';

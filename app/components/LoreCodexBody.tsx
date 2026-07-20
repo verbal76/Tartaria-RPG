@@ -32,6 +32,7 @@ import conceptsData from '../data/lore/concepts.json';
 import type { Faction, Race, Location, TimelineEvent } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../engine/hiddenLocations';
+import { isGreatClimbLocationLocked, SUMMIT_BOSS_BASES } from '../engine/greatClimbs';
 import { loadFallen, type FallenHero } from '../engine/saveSystem';
 
 // OTA-837 — Tier-1 QoL #2: the codex now includes a discovery-gated BESTIARY (fills
@@ -70,6 +71,10 @@ export function LoreCodexBody() {
   const appendLog = useGameStore((s) => s.appendLog);
   // OTA-498 — hidden locations (the Hidden Market) read as "?" here too until visited.
   const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
+  // OTA-915 — the five Great-Climb towers stay masked as "?" until you use their
+  // Skyreacher Chart (unlockedGreatClimbs), so the tower locations are a mystery
+  // the roadside maps sell you.
+  const unlockedClimbs = useGameStore((s) => s.worldMemory?.unlockedGreatClimbs);
   // OTA-837 — the bestiary reveals an enemy once you've DEFEATED its type (its name is
   // recorded in worldMemory.defeatedEnemies). Undiscovered foes read as "??? — undiscovered".
   const defeatedEnemies = useGameStore((s) => s.worldMemory?.defeatedEnemies);
@@ -79,7 +84,13 @@ export function LoreCodexBody() {
   );
   // OTA-838 — damage-type intel you've LEARNED by fighting each enemy (name-keyed).
   const enemyIntel = useGameStore((s) => s.worldMemory?.enemyIntel);
-  const enemyCatalog = enemiesData as CodexEnemy[];
+  // OTA-915 — the five Great-Climb SUMMIT BOSSES aren't in enemies.json (that pool
+  // is rolled for random wild spawns), so project them in from greatClimbs.ts as
+  // codex-only entries. They still gate on defeat like every other foe.
+  const enemyCatalog = React.useMemo(
+    () => [...(enemiesData as CodexEnemy[]), ...(SUMMIT_BOSS_BASES as unknown as CodexEnemy[])],
+    [],
+  );
   const beatenCount = enemyCatalog.filter((e) => defeatedSet.has(e.name.toLowerCase())).length;
   const concepts = (conceptsData as { concepts: LoreConcept[] }).concepts;
   // OTA-845 [The Fallen] — install-wide roll of the dead, loaded async from the global
@@ -175,21 +186,30 @@ export function LoreCodexBody() {
         {section === 'places' && (locationsData as Location[]).map((l) => {
           const atHere = canPlanRoute && l.id === here;
           const hidden = isHiddenLocation(l.id) && !isLocationRevealed(l.id, discoveredIds);
+          // OTA-915 — a Great-Climb tower stays masked until you've charted it.
+          const climbLocked = isGreatClimbLocationLocked(l.id, { unlockedGreatClimbs: unlockedClimbs });
+          const masked = hidden || climbLocked;
+          const displayName = climbLocked ? '?' : revealedLocationName(l.id, l.name, discoveredIds);
+          const subtitle = climbLocked ? 'unknown — a chart will lead you here'
+            : hidden ? 'unknown — travel to reveal' : l.type;
+          const desc = climbLocked ? 'A great climb the roadside cartographers keep off the common maps. Buy and read its Skyreacher Chart to put it on yours.'
+            : hidden ? 'A place that keeps no name on any map until you find it yourself.' : l.description;
           const content = (
             <>
-              <Text style={styles.name}>{revealedLocationName(l.id, l.name, discoveredIds)}</Text>
-              <Text style={styles.subtitle}>{hidden ? 'unknown — travel to reveal' : l.type}</Text>
-              <Text style={styles.desc}>{hidden ? 'A place that keeps no name on any map until you find it yourself.' : l.description}</Text>
+              <Text style={styles.name}>{displayName}</Text>
+              <Text style={styles.subtitle}>{subtitle}</Text>
+              <Text style={styles.desc}>{desc}</Text>
               <Text style={styles.meta}>Danger {l.danger}/5</Text>
-              {canPlanRoute ? (
+              {canPlanRoute && !climbLocked ? (
                 <Text style={styles.tapHint}>
                   {atHere ? '· you are here ·' : '▸ tap to plan a route'}
                 </Text>
               ) : null}
             </>
           );
-          if (!canPlanRoute || atHere) {
-            return <View key={l.id} style={styles.entry}>{content}</View>;
+          // A masked climb can't be routed to until charted.
+          if (!canPlanRoute || atHere || climbLocked) {
+            return <View key={l.id} style={[styles.entry, climbLocked ? styles.entryLocked : null]}>{content}</View>;
           }
           return (
             <TouchableOpacity

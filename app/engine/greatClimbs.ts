@@ -184,6 +184,7 @@ export const SUMMIT_BOSSES: readonly SummitBoss[] = [
     climbId: 'grand_spire',
     base: {
       name: 'Aurenthal, the Crown-Sentinel',
+      flavor: 'The last sentinel the grid built to guard its highest collector — a war-scale automaton that has not stood down in an age.',
       type: 'Automation',
       abilityPoint: 'Strength 10',
       attack: 'Choir-Lance',
@@ -202,6 +203,7 @@ export const SUMMIT_BOSSES: readonly SummitBoss[] = [
     climbId: 'asgardar_spire',
     base: {
       name: 'Draugveil, the Drowned Warden',
+      flavor: "The warden of Asgardar's buried spire, caked in a thousand years of mud, its collector-heart still turning behind its ribs.",
       type: 'Automation',
       abilityPoint: 'Strength 9',
       attack: 'Silt-Hammer',
@@ -220,6 +222,7 @@ export const SUMMIT_BOSSES: readonly SummitBoss[] = [
     climbId: 'obsidian_monolith',
     base: {
       name: 'Magnetar, the Obsidian Colossus',
+      flavor: 'An entire obsidian pillar folded into one dormant machine — it drags every loose blade and buckle toward its lodestone heart.',
       type: 'Mechanism',
       abilityPoint: 'Strength 10',
       attack: 'Lodestone Slam',
@@ -238,6 +241,7 @@ export const SUMMIT_BOSSES: readonly SummitBoss[] = [
     climbId: 'thametan_tower',
     base: {
       name: "Zalmar's Cascade-Wraith",
+      flavor: "A guardian caught mid-catastrophe atop Thametan's Tower, still screaming the resonance that drowned an empire.",
       type: 'Automation',
       abilityPoint: 'Dexterity 10',
       attack: 'Resonance Cascade',
@@ -256,6 +260,7 @@ export const SUMMIT_BOSSES: readonly SummitBoss[] = [
     climbId: 'zharak_fang',
     base: {
       name: 'Ossika, the Fang-Sentinel',
+      flavor: "The machine the mud-sirens have sung to for centuries, still holding the crown of Zharak's tallest fang.",
       type: 'Automation',
       abilityPoint: 'Dexterity 9',
       attack: 'Siren-Talon',
@@ -298,4 +303,41 @@ export function buildSummitBoss(climbId: string): Enemy | null {
 export function summitClimbIdFromEnemy(enemy: { traits?: readonly string[] } | null | undefined): string | null {
   const t = (enemy?.traits ?? []).find((x) => x.startsWith(SUMMIT_BOSS_TRAIT_PREFIX));
   return t ? t.slice(SUMMIT_BOSS_TRAIT_PREFIX.length) : null;
+}
+
+// OTA-915 — codex + lore-gating support for the Great Climbs.
+
+/** The summit bosses as plain enemy records for the BESTIARY. They are NOT in
+ *  enemies.json (that pool is rolled for random wild encounters, which would let
+ *  a unique tower boss ambush you in open waste); this is the single source of
+ *  truth, projected into the codex so a boss catalogues on defeat like any foe.
+ *  Uses the un-stamped `base` (no summit_climb trait) so the codex traits stay clean. */
+export const SUMMIT_BOSS_BASES: readonly Enemy[] = SUMMIT_BOSSES.map((b) => b.base);
+
+/** True once the player has encountered the Skyreacher questline at all — bought a
+ *  chart (soldMapIds), used one to unlock a climb (unlockedGreatClimbs), or crested
+ *  one (greatClimbsCrested). Used to keep the Skyreacher title hidden until then. */
+export function greatClimbLoreDiscovered(
+  wm: {
+    soldMapIds?: readonly string[];
+    unlockedGreatClimbs?: readonly string[];
+    greatClimbsCrested?: readonly string[];
+  } | null | undefined,
+): boolean {
+  if (!wm) return false;
+  return (wm.soldMapIds?.length ?? 0) > 0
+    || (wm.unlockedGreatClimbs?.length ?? 0) > 0
+    || (wm.greatClimbsCrested?.length ?? 0) > 0;
+}
+
+/** True when a location hosts a great climb the player has NOT yet unlocked with
+ *  its chart — the codex should mask it as "?" until the map reveals it. Returns
+ *  false for ordinary (non-climb) locations, which are never map-gated. */
+export function isGreatClimbLocationLocked(
+  locationId: string | null | undefined,
+  wm: { unlockedGreatClimbs?: readonly string[] } | null | undefined,
+): boolean {
+  const climb = greatClimbForLocation(locationId);
+  if (!climb) return false;
+  return !((wm?.unlockedGreatClimbs ?? []).includes(climb.id));
 }
