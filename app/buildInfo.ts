@@ -17334,4 +17334,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dodge with other live enemies names it — "you slip X's arc clean, but a dodge reads one attacker; the rest
 // press in while you're committed." Pure narration; no mechanics change. Verified: dodgeParry +2 tests
 // (deterministic via pinned dice) → 6/6; full fast suite 468/468 (3960). Ships all three lines.
-export const OTA_BUILD_ID = '2026-07-20-908-dodge-outcome-clarity';
+//
+// OTA-909 (qwen-watchdog log clarity — device-log review) — the dormancy-recovery watchdog logged
+// "Qwen not ready (status='ready') — forceReinitialize()" which reads as a self-contradicting BUG. It isn't:
+// dormant = engine status==='ready' but the native llama context was released (dispose() frees the ~398MB
+// context on app-BACKGROUND; the JS status field isn't notified), so isReady() is false while getStatus() is
+// 'ready'. The watchdog reinitializing is CORRECT (OTA-222/797). Reworded the line to name the dormant case
+// distinctly (isDormant() branch) vs a genuine idle/failed reinit. Pure log-string change, no behavior/logic
+// change. Verified: typecheck:ci + lint clean. Ships all three lines.
+export const OTA_BUILD_ID = '2026-07-20-909-qwen-watchdog-log-clarity';
