@@ -318,6 +318,7 @@ export function ActionReferenceScreen() {
           queued && styles.cardQueued,
         ]}
         onPress={() => handleCardTap(id, examples)}
+        accessibilityRole="button"
       >
         <Text style={styles.cardTitle}>{c.title}</Text>
         <Text style={styles.cardBody}>{explanationFor(c)}</Text>
@@ -363,10 +364,12 @@ export function ActionReferenceScreen() {
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>ACTIONS</Text>
+        <Text style={styles.title} accessibilityRole="header">ACTIONS</Text>
         <View style={{ width: 80 }} />
       </View>
       {/* arb88 — search box. Filters every card by name / what-it-does /
@@ -383,7 +386,7 @@ export function ActionReferenceScreen() {
           returnKeyType="search"
         />
         {query.length > 0 && (
-          <TouchableOpacity onPress={() => setQuery('')} hitSlop={8} style={styles.searchClear}>
+          <TouchableOpacity onPress={() => setQuery('')} hitSlop={8} style={styles.searchClear} accessibilityRole="button" accessibilityLabel="Clear search">
             <Text style={styles.searchClearText}>✕</Text>
           </TouchableOpacity>
         )}
@@ -395,7 +398,7 @@ export function ActionReferenceScreen() {
             <Text style={styles.intro}>No action matches “{query.trim()}”.</Text>
           ) : (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>{searchResults.length} MATCH{searchResults.length === 1 ? '' : 'ES'}</Text>
+              <Text style={styles.sectionTitle} accessibilityRole="header">{searchResults.length} MATCH{searchResults.length === 1 ? '' : 'ES'}</Text>
               {searchResults.map(({ id }) => renderCard(id))}
             </View>
           )
@@ -410,7 +413,7 @@ export function ActionReferenceScreen() {
             </Text>
             {orderedSections.map((section) => (
               <View key={section.title} style={styles.section}>
-                <Text style={styles.sectionTitle}>{section.title}</Text>
+                <Text style={styles.sectionTitle} accessibilityRole="header">{section.title}</Text>
                 {section.ids.map((id) => renderCard(id))}
               </View>
             ))}

@@ -197,7 +197,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
   const [detailView, setDetailView] = useState<EnemyView | null>(null);
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
-    <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(item)}>
+    <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={() => setDetailView(item)}>
       {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(item.enemy.name)} />)}
     </TouchableOpacity>
   );
@@ -211,7 +211,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
         // Single enemy: no pager (nothing to scroll horizontally), just the card —
         // capped to the corner height and vertically scrollable when it's tall.
         // arb146 — tappable to open the full-detail popup.
-        <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)}>
+        <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)}>
           {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(enemies[0]!.enemy.name)} />)}
         </TouchableOpacity>
       ) : (
@@ -333,7 +333,10 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed }: { view: E
   const dealsType = enemyDamageType(view.enemy);
 
   return (
-    <View style={[styles.card, { width: cardWidth }]}>
+    <View
+      style={[styles.card, { width: cardWidth }]}
+      accessibilityLabel={`${view.enemy.name}, ${view.enemy.type}, ${view.enemy.rarity}. HP ${view.currentHp} of ${view.enemy.hp}, AC ${ac}, ${inRange ? 'in range' : 'out of range'}`}
+    >
       <View style={styles.head}>
         <Text style={styles.name} numberOfLines={1}>
           {view.enemy.name}

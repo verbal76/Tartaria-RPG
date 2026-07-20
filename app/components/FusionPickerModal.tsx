@@ -117,11 +117,11 @@ export function FusionPickerModal() {
 
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onClose}>
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.backdrop}>
+      <TouchableWithoutFeedback onPress={onClose} accessibilityRole="button" accessibilityLabel="Close">
+        <View style={styles.backdrop} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback onPress={() => { /* swallow inner taps */ }}>
             <View style={styles.card}>
-              <Text style={styles.title}>Fusing Crucible</Text>
+              <Text style={styles.title} accessibilityRole="header">Fusing Crucible</Text>
 
               {stage === 'weapon' ? (
                 // OTA-873 — upgrade stage 2: choose which piece gains the coating channel.
@@ -140,7 +140,7 @@ export function FusionPickerModal() {
                           ? `${(w.addedResists ?? []).length} resist${(w.addedResists ?? []).length === 1 ? '' : 's'} → +1 slot`
                           : w.coating ? `has ${w.coating.label.toLowerCase()} → +1 slot` : 'no coating yet → +1 slot';
                         return (
-                          <Pressable key={w.id} onPress={() => onPickPiece(w.id)} style={[styles.row, styles.rowOn]}>
+                          <Pressable key={w.id} onPress={() => onPickPiece(w.id)} style={[styles.row, styles.rowOn]} accessibilityRole="button">
                             <Text style={styles.rowName} numberOfLines={1}>{armor ? w.name : coatedDisplayName(w)}</Text>
                             <Text style={styles.rowType} numberOfLines={1}>{detail}</Text>
                           </Pressable>
@@ -149,7 +149,7 @@ export function FusionPickerModal() {
                     </ScrollView>
                   )}
                   <View style={styles.actions}>
-                    <Pressable onPress={() => setStage('pick')} style={[styles.actBtn, styles.actNeutral]}>
+                    <Pressable onPress={() => setStage('pick')} style={[styles.actBtn, styles.actNeutral]} accessibilityRole="button">
                       <Text style={styles.actNeutralTxt}>← Back</Text>
                     </Pressable>
                   </View>
@@ -182,7 +182,7 @@ export function FusionPickerModal() {
                         // wood / …) next to the name. Fusion needs DIFFERENT materials, so the
                         // type is the info the player actually picks on; rarity is secondary.
                         return (
-                          <Pressable key={it.id} onPress={() => toggle(it.id)} style={[styles.row, on && styles.rowOn, dim && styles.rowDim]}>
+                          <Pressable key={it.id} onPress={() => toggle(it.id)} style={[styles.row, on && styles.rowOn, dim && styles.rowDim]} accessibilityRole="button" accessibilityState={{ selected: on, disabled: dim }}>
                             <Text style={[styles.check, on && styles.checkOn]}>{on ? '☑' : '☐'}</Text>
                             <Text style={styles.rowName} numberOfLines={1}>{it.name}</Text>
                             <Text style={styles.rowType} numberOfLines={1}>{fusionTypeLabel(it)}</Text>
@@ -200,7 +200,7 @@ export function FusionPickerModal() {
                       {catalysts.map((c) => {
                         const on = catalystId === c.id;
                         return (
-                          <Pressable key={c.id} onPress={() => setCatalystId(on ? null : c.id)} style={[styles.row, on && styles.rowOn]}>
+                          <Pressable key={c.id} onPress={() => setCatalystId(on ? null : c.id)} style={[styles.row, on && styles.rowOn]} accessibilityRole="button" accessibilityState={{ selected: on }}>
                             <Text style={[styles.check, on && styles.checkOn]}>{on ? '◉' : '○'}</Text>
                             <Text style={styles.rowName} numberOfLines={1}>{c.name}</Text>
                             <Text style={styles.rowType} numberOfLines={1}>{fusionTypeLabel(c)}</Text>
@@ -212,27 +212,27 @@ export function FusionPickerModal() {
 
                   <Text style={styles.catLabel}>{isUpgrade ? 'Mode' : 'Forge as'}</Text>
                   <View style={styles.kindRow}>
-                    <Pressable onPress={() => setKind('weapon')} style={[styles.kindBtn, kind === 'weapon' && styles.kindOn]}>
+                    <Pressable onPress={() => setKind('weapon')} style={[styles.kindBtn, kind === 'weapon' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'weapon' }}>
                       <Text style={[styles.kindTxt, kind === 'weapon' && styles.kindTxtOn]}>⚔ Weapon</Text>
                     </Pressable>
-                    <Pressable onPress={() => setKind('armor')} style={[styles.kindBtn, kind === 'armor' && styles.kindOn]}>
+                    <Pressable onPress={() => setKind('armor')} style={[styles.kindBtn, kind === 'armor' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'armor' }}>
                       <Text style={[styles.kindTxt, kind === 'armor' && styles.kindTxtOn]}>🛡 Armor</Text>
                     </Pressable>
                     {/* OTA-757 — third forge shape: a one-of-a-kind DOG VEST. */}
-                    <Pressable onPress={() => setKind('dog_armor')} style={[styles.kindBtn, kind === 'dog_armor' && styles.kindOn]}>
+                    <Pressable onPress={() => setKind('dog_armor')} style={[styles.kindBtn, kind === 'dog_armor' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'dog_armor' }}>
                       <Text style={[styles.kindTxt, kind === 'dog_armor' && styles.kindTxtOn]}>🐕 Dog</Text>
                     </Pressable>
                     {/* OTA-873 — fourth mode: upgrade an existing weapon with a 2nd coating slot. */}
-                    <Pressable onPress={() => { setKind('upgrade'); setPicked((cur) => cur.slice(0, UPGRADE_PICK)); }} style={[styles.kindBtn, kind === 'upgrade' && styles.kindOn]}>
+                    <Pressable onPress={() => { setKind('upgrade'); setPicked((cur) => cur.slice(0, UPGRADE_PICK)); }} style={[styles.kindBtn, kind === 'upgrade' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'upgrade' }}>
                       <Text style={[styles.kindTxt, kind === 'upgrade' && styles.kindTxtOn]}>⬆ Upgrade</Text>
                     </Pressable>
                   </View>
 
                   <View style={styles.actions}>
-                    <Pressable onPress={onClose} style={[styles.actBtn, styles.actNeutral]}>
+                    <Pressable onPress={onClose} style={[styles.actBtn, styles.actNeutral]} accessibilityRole="button">
                       <Text style={styles.actNeutralTxt}>Cancel</Text>
                     </Pressable>
-                    <Pressable onPress={onFuse} disabled={!canFuse} style={[styles.actBtn, styles.actPrimary, !canFuse && styles.actDisabled]}>
+                    <Pressable onPress={onFuse} disabled={!canFuse} style={[styles.actBtn, styles.actPrimary, !canFuse && styles.actDisabled]} accessibilityRole="button" accessibilityState={{ disabled: !canFuse }}>
                       <Text style={styles.actPrimaryTxt}>
                         {isUpgrade ? `Choose piece → ${picked.length}/${UPGRADE_PICK}` : `Fuse ${picked.length > 0 ? `(${picked.length})` : ''}`}
                       </Text>

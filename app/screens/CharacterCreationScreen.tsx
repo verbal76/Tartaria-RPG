@@ -57,10 +57,10 @@ export function CharacterCreationScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>NEW EXPEDITION</Text>
+        <Text style={styles.headerTitle} accessibilityRole="header">NEW EXPEDITION</Text>
         <Text style={styles.headerStep}>Step {stepIndex + 1} of {STEP_ORDER.length}</Text>
       </View>
-      <Text style={styles.stepTitle}>{STEP_TITLE[step]}</Text>
+      <Text style={styles.stepTitle} accessibilityRole="header">{STEP_TITLE[step]}</Text>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {step === 'race' && races.map((r) => {
@@ -74,6 +74,8 @@ export function CharacterCreationScreen() {
               style={[styles.option, raceId === r.id && styles.optionSelected]}
               onPress={() => setRaceId(r.id)}
               activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityState={{ selected: raceId === r.id }}
             >
               <Text style={styles.optionName}>{r.name}</Text>
               <Text style={styles.optionDesc}>{r.description}</Text>
@@ -114,6 +116,8 @@ export function CharacterCreationScreen() {
                 style={[styles.option, factionId === f.id && styles.optionSelected]}
                 onPress={() => setFactionId(f.id)}
                 activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityState={{ selected: factionId === f.id }}
               >
                 <Text style={styles.optionName}>{f.name}</Text>
                 <Text style={styles.optionDesc}>{f.subtitle}</Text>
@@ -141,6 +145,7 @@ export function CharacterCreationScreen() {
           onPress={goBack}
           activeOpacity={0.7}
           hitSlop={8}
+          accessibilityRole="button"
         >
           <Text style={styles.backBtnText}>← BACK</Text>
         </TouchableOpacity>
@@ -149,6 +154,7 @@ export function CharacterCreationScreen() {
           onPress={goNext}
           activeOpacity={0.7}
           hitSlop={8}
+          accessibilityRole="button"
         >
           <Text style={styles.nextBtnText}>{nextLabel}</Text>
         </TouchableOpacity>

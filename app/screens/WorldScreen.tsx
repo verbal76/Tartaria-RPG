@@ -26,7 +26,7 @@ export function WorldScreen() {
   // collapsed (the feed is the point); tap a header to fold/unfold, like the inventory.
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({ power: true, grudges: true });
   const sectionHeader = (key: string, label: string) => (
-    <TouchableOpacity style={styles.secHeader} activeOpacity={0.6} onPress={() => setCollapsed((s) => ({ ...s, [key]: !s[key] }))}>
+    <TouchableOpacity style={styles.secHeader} activeOpacity={0.6} onPress={() => setCollapsed((s) => ({ ...s, [key]: !s[key] }))} accessibilityRole="button" accessibilityState={{ expanded: !collapsed[key] }}>
       <Text style={styles.secChevron}>{collapsed[key] ? '▸' : '▾'}</Text>
       <Text style={styles.secHeaderLabel}>{label}</Text>
       <Text style={styles.secHeaderHint}>{collapsed[key] ? 'tap to show' : 'tap to hide'}</Text>
@@ -111,10 +111,10 @@ export function WorldScreen() {
         body="This board is alive — factions fight, gain, and lose ground on their own. Take bounties here; tap a header to unfold the standings."
       />
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => setScreen('exploration')} style={styles.backBtn} hitSlop={8} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => setScreen('exploration')} style={styles.backBtn} hitSlop={8} activeOpacity={0.7} accessibilityRole="button">
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>THE WORLD</Text>
+        <Text style={styles.title} accessibilityRole="header">THE WORLD</Text>
         <View style={{ width: 80 }} />
       </View>
 
@@ -125,7 +125,7 @@ export function WorldScreen() {
         </Text>
 
         {/* ── FACTION BOUNTY BOARD ──────────────────────────────── */}
-        <Text style={styles.sectionLabel}>FACTION BOUNTY BOARD</Text>
+        <Text style={styles.sectionLabel} accessibilityRole="header">FACTION BOUNTY BOARD</Text>
 
         {/* Contracts the player currently carries — kills grind ALL of these at once. */}
         {activeBounties.map((b) => (
@@ -139,6 +139,7 @@ export function WorldScreen() {
               style={styles.bountySecondaryBtn}
               activeOpacity={0.8}
               onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
+              accessibilityRole="button"
             >
               <Text style={styles.bountySecondaryText}>SET COURSE TO {b.targetLocationName.toUpperCase()} ›</Text>
             </TouchableOpacity>
@@ -166,6 +167,7 @@ export function WorldScreen() {
                 style={styles.bountyBtn}
                 activeOpacity={0.8}
                 onPress={() => { useGameStore.getState().acceptBounty(offer); setScreen('exploration'); }}
+                accessibilityRole="button"
               >
                 <Text style={styles.bountyBtnText}>
                   {activeBounties.length > 0 ? 'ACCEPT (STACK) ›' : 'ACCEPT & SET COURSE ›'}
@@ -242,7 +244,7 @@ export function WorldScreen() {
             {sectionHeader('grudges', 'GRUDGES & ALLIANCES')}
             {!collapsed.grudges && (
             <View style={styles.card}>
-              {grudges.length > 0 && <Text style={styles.relHead}>⚔ GRUDGES</Text>}
+              {grudges.length > 0 && <Text style={styles.relHead} accessibilityRole="header">⚔ GRUDGES</Text>}
               {grudges.map((g, i) => {
                 const lab = relationLabel(g.relation);
                 return (
@@ -252,7 +254,7 @@ export function WorldScreen() {
                   </View>
                 );
               })}
-              {alliances.length > 0 && <Text style={[styles.relHead, { marginTop: grudges.length > 0 ? 10 : 0 }]}>🤝 ALLIANCES</Text>}
+              {alliances.length > 0 && <Text style={[styles.relHead, { marginTop: grudges.length > 0 ? 10 : 0 }]} accessibilityRole="header">🤝 ALLIANCES</Text>}
               {alliances.map((g, i) => {
                 const lab = relationLabel(g.relation);
                 return (
@@ -270,7 +272,7 @@ export function WorldScreen() {
         )}
 
         {/* ── THE BOARD (world events) ──────────────────────────── */}
-        <Text style={styles.sectionLabel}>THE BOARD — THE WAR, AS IT HAPPENS</Text>
+        <Text style={styles.sectionLabel} accessibilityRole="header">THE BOARD — THE WAR, AS IT HAPPENS</Text>
         {patrolCount > 0 && (
           <Text style={styles.patrolNote}>⚑ {patrolCount} faction patrol{patrolCount === 1 ? '' : 's'} abroad in the waste.</Text>
         )}

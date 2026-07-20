@@ -669,15 +669,18 @@ export function MapScreen() {
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>ATLAS</Text>
+        <Text style={styles.title} accessibilityRole="header">ATLAS</Text>
         <TouchableOpacity
           onPress={resetTransform}
           style={styles.resetBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Reset map zoom and position"
         >
           <Text style={styles.resetText}>RESET</Text>
         </TouchableOpacity>
@@ -701,6 +704,8 @@ export function MapScreen() {
             source={mapSource}
             style={styles.atlas}
             resizeMode="contain"
+            accessibilityRole="image"
+            accessibilityLabel={showingOutpost ? 'Outpost interior map' : 'World atlas map'}
           />
           {/* OTA-498 — the Hidden Market. It has no icon painted into the atlas
               art, so this overlay both marks it and explains the blank: a
@@ -760,7 +765,7 @@ export function MapScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerHere}>WHERE YOU ARE</Text>
+        <Text style={styles.footerHere} accessibilityRole="header">WHERE YOU ARE</Text>
         <Text style={styles.footerWhere}>{whereLine}</Text>
         {whereaboutsLine ? (
           <Text style={styles.footerNear}>{whereaboutsLine}</Text>
@@ -793,7 +798,7 @@ export function MapScreen() {
           info / confirm path; this just gives a fast alternative
           one tap from the home screen's MAP button. */}
       <View style={styles.placesPanel}>
-        <Text style={styles.placesPanelTitle}>TRAVEL TO ▸ tap a place</Text>
+        <Text style={styles.placesPanelTitle} accessibilityRole="header">TRAVEL TO ▸ tap a place</Text>
         <ScrollView
           style={styles.placesScroll}
           contentContainerStyle={styles.placesContent}
@@ -809,7 +814,7 @@ export function MapScreen() {
               so each contract carries its own name + type. */}
           {contractMarkers.length > 0 && (
             <>
-              <Text style={styles.contractSectionTitle}>◆ OPEN CONTRACTS</Text>
+              <Text style={styles.contractSectionTitle} accessibilityRole="header">◆ OPEN CONTRACTS</Text>
               {contractMarkers.map((cm) => {
                 const info = placesView.find((p) => p.id === cm.anchorId);
                 const isHere = player?.currentLocationId === cm.anchorId;
@@ -819,6 +824,7 @@ export function MapScreen() {
                     key={cm.key}
                     style={[styles.placeRow, styles.contractRow, isHere && styles.placeRowHere]}
                     activeOpacity={0.7}
+                    accessibilityRole="button"
                     onPress={() => {
                       if (!player) return;
                       // OTA-616 — standing on the contract's anchor (its turn-in
@@ -884,7 +890,7 @@ export function MapScreen() {
                   </TouchableOpacity>
                 );
               })}
-              <Text style={styles.contractSectionTitle}>ALL PLACES</Text>
+              <Text style={styles.contractSectionTitle} accessibilityRole="header">ALL PLACES</Text>
             </>
           )}
           {placesView.map((p) => {
@@ -905,6 +911,8 @@ export function MapScreen() {
                 style={[styles.placeRow, isHere && styles.placeRowHere]}
                 activeOpacity={isHere ? 1 : 0.7}
                 disabled={isHere}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: isHere }}
                 onPress={() => {
                   if (!player) return;
                   if (player.hubRoomId) {

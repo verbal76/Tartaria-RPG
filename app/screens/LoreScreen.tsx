@@ -26,10 +26,12 @@ export function LoreScreen() {
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Back"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>LORE CODEX</Text>
+        <Text style={styles.title} accessibilityRole="header">LORE CODEX</Text>
         <View style={{ width: 80 }} />
       </View>
 

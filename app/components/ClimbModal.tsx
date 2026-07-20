@@ -55,11 +55,11 @@ export function ClimbModal({
       onRequestClose={onCancel}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim}>
+      <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>CLIMB</Text>
+              <Text style={styles.title} accessibilityRole="header">CLIMB</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
                 Pick something to climb. Each tap clears one tier; bigger
@@ -101,6 +101,8 @@ export function ClimbModal({
                           pressed && !isCleared && styles.rowPressed,
                         ]}
                         onPress={() => tapTo(noun)}
+                        accessibilityRole="button"
+                        accessibilityState={{ disabled: isCleared }}
                       >
                         <Text
                           style={[styles.rowName, isCleared && styles.rowNameCleared]}
@@ -123,6 +125,7 @@ export function ClimbModal({
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={onCancel}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
                 </Pressable>

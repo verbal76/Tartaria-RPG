@@ -96,8 +96,8 @@ export function ApproachModal({
       <TouchableWithoutFeedback onPress={onCancel}>
         <KeyboardAvoidingView style={styles.scrim} behavior="padding">
           <TouchableWithoutFeedback>
-            <View style={styles.card}>
-              <Text style={styles.title}>APPROACH</Text>
+            <View style={styles.card} accessibilityViewIsModal={true}>
+              <Text style={styles.title} accessibilityRole="header">APPROACH</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
                 Name a person, enemy, door, or feature to close on. In combat
@@ -131,6 +131,7 @@ export function ApproachModal({
                         key={`enemy-${e}`}
                         style={({ pressed }) => [styles.chip, styles.chipEnemy, pressed && styles.btnPressed]}
                         onPress={() => tapToApproach(e)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.chipTextEnemy} numberOfLines={1}>{e}</Text>
                       </Pressable>
@@ -152,6 +153,7 @@ export function ApproachModal({
                         key={`vendor-${vendorName}`}
                         style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
                         onPress={() => tapToApproach(vendorName)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.chipTextScene} numberOfLines={1}>{vendorName}</Text>
                       </Pressable>
@@ -161,6 +163,7 @@ export function ApproachModal({
                         key={`scene-${h}`}
                         style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
                         onPress={() => tapToApproach(h)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.chipTextScene} numberOfLines={1}>{h}</Text>
                       </Pressable>
@@ -176,6 +179,7 @@ export function ApproachModal({
                     key={`common-${h}`}
                     style={({ pressed }) => [styles.chip, pressed && styles.btnPressed]}
                     onPress={() => tapToApproach(h)}
+                    accessibilityRole="button"
                   >
                     <Text style={styles.chipText} numberOfLines={1}>{h}</Text>
                   </Pressable>
@@ -186,6 +190,7 @@ export function ApproachModal({
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={onCancel}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
                 </Pressable>
@@ -198,6 +203,8 @@ export function ApproachModal({
                   ]}
                   onPress={handleSubmit}
                   disabled={!text.trim()}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: !text.trim() }}
                 >
                   <Text style={styles.btnTextPrimary}>APPROACH</Text>
                 </Pressable>

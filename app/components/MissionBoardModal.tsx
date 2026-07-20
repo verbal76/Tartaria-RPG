@@ -57,11 +57,11 @@ export function MissionBoardModal({ visible, onClose }: Props) {
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.scrim}>
+      <TouchableWithoutFeedback onPress={onClose} accessibilityRole="button" accessibilityLabel="Close">
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>⚑ {factionLabel.toUpperCase()} MISSION BOARD</Text>
+              <Text style={styles.title} accessibilityRole="header">⚑ {factionLabel.toUpperCase()} MISSION BOARD</Text>
               <View style={styles.rule} />
               {postings.length === 0 ? (
                 <Text style={styles.empty}>
@@ -83,6 +83,7 @@ export function MissionBoardModal({ visible, onClose }: Props) {
                           <Pressable
                             style={({ pressed }) => [styles.acceptBtn, pressed && styles.btnPressed]}
                             onPress={() => acceptFactionQuest(q.title)}
+                            accessibilityRole="button"
                           >
                             <Text style={styles.acceptBtnText}>ACCEPT</Text>
                           </Pressable>
@@ -95,6 +96,7 @@ export function MissionBoardModal({ visible, onClose }: Props) {
               <Pressable
                 style={({ pressed }) => [styles.closeBtn, pressed && styles.btnPressed]}
                 onPress={onClose}
+                accessibilityRole="button"
               >
                 <Text style={styles.closeBtnText}>CLOSE</Text>
               </Pressable>

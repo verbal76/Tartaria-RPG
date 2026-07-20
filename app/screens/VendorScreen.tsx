@@ -110,6 +110,7 @@ export function VendorScreen() {
           style={styles.backBtn}
           onPress={() => setScreen('exploration')}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← DEAL WITH YOUR CHOICES</Text>
         </TouchableOpacity>
@@ -354,6 +355,8 @@ export function VendorScreen() {
       style={[styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }]}
       activeOpacity={0.7}
       onPress={() => setCollapsedSections((s) => ({ ...s, [key]: !(s[key] ?? true) }))}
+      accessibilityRole="button"
+      accessibilityState={{ expanded: !collapsed }}
     >
       <View style={styles.sectionHeaderLeft}>
         <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>{collapsed ? '▾' : '▴'}</Text>
@@ -376,15 +379,17 @@ export function VendorScreen() {
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>SHOP</Text>
+        <Text style={styles.title} accessibilityRole="header">SHOP</Text>
         <TouchableOpacity
           onPress={openDismiss}
           style={styles.dismissBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.dismissText}>DISMISS</Text>
         </TouchableOpacity>
@@ -415,6 +420,7 @@ export function VendorScreen() {
             style={styles.crucibleBtn}
             onPress={() => { useVendorCrucible(); setScreen('exploration'); }}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={styles.crucibleBtnText}>★★ USE CRUCIBLE · 25 TC</Text>
           </TouchableOpacity>
@@ -456,6 +462,8 @@ export function VendorScreen() {
           style={[styles.tab, mode === 'buy' && styles.tabActive]}
           onPress={() => setMode('buy')}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: mode === 'buy' }}
         >
           <Text style={[styles.tabText, mode === 'buy' && styles.tabTextActive]}>BUY</Text>
         </TouchableOpacity>
@@ -463,6 +471,8 @@ export function VendorScreen() {
           style={[styles.tab, mode === 'sell' && styles.tabActive]}
           onPress={() => setMode('sell')}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: mode === 'sell' }}
         >
           <Text style={[styles.tabText, mode === 'sell' && styles.tabTextActive]}>SELL</Text>
         </TouchableOpacity>
@@ -474,6 +484,7 @@ export function VendorScreen() {
             style={styles.tab}
             onPress={() => setContractsOpen(true)}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={styles.tabText}>CONTRACTS ▸</Text>
           </TouchableOpacity>
@@ -532,6 +543,7 @@ export function VendorScreen() {
                     style={[styles.offerBody, !canAfford && styles.offerRowBroke]}
                     onPress={() => openBuy(o.itemName, effPrice)}
                     activeOpacity={0.7}
+                    accessibilityRole="button"
                   >
                     <View style={styles.offerHead}>
                       <Text style={styles.offerName} numberOfLines={1}>{o.itemName}</Text>
@@ -568,6 +580,7 @@ export function VendorScreen() {
                       style={styles.stealBtn}
                       hitSlop={6}
                       activeOpacity={0.7}
+                      accessibilityRole="button"
                     >
                       <Text style={styles.stealText}>STEAL</Text>
                       <Text style={styles.stealDc}>DC {stealDc}</Text>
@@ -594,6 +607,8 @@ export function VendorScreen() {
                   style={[styles.sectionHeader, { borderLeftColor: RECIPE_ACCENT }]}
                   activeOpacity={0.7}
                   onPress={() => setCollapsedSections((s) => ({ ...s, [secKey]: !(s[secKey] ?? false) }))}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: !collapsed }}
                 >
                   <View style={styles.sectionHeaderLeft}>
                     <Text style={[styles.sectionChevron, { color: RECIPE_ACCENT }]}>{collapsed ? '▾' : '▴'}</Text>
@@ -611,6 +626,7 @@ export function VendorScreen() {
                         style={[styles.offerBody, !canAfford && styles.offerRowBroke]}
                         onPress={() => openLearnRecipe(o.result, o.price)}
                         activeOpacity={0.7}
+                        accessibilityRole="button"
                       >
                         <View style={styles.offerHead}>
                           <Text style={styles.offerName} numberOfLines={1}>{o.result}</Text>
@@ -641,6 +657,8 @@ export function VendorScreen() {
                     onPress={() => setSellSort(s)}
                     style={[styles.sortTab, sellSort === s && styles.sortTabActive]}
                     activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: sellSort === s }}
                   >
                     <Text style={[styles.sortTabText, sellSort === s && styles.sortTabTextActive]}>
                       {s === 'value' ? 'VALUE' : s === 'rarity' ? 'RARITY' : 'NAME'}
@@ -679,6 +697,7 @@ export function VendorScreen() {
                   style={styles.offerRow}
                   onPress={() => openSell(item.name, price, item.id)}
                   activeOpacity={0.7}
+                  accessibilityRole="button"
                 >
                   <View style={[styles.offerStripe, { backgroundColor: rarityColor(preview.rarity) }]} />
                   <View style={styles.offerBody}>

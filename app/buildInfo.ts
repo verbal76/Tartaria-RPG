@@ -16398,4 +16398,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // rest is test triage: stale-expectation/harness-drift fixes across ~20 suites, fixture hpMax pins, and a
 // recalibrated investigate outcome-split band (±5σ around the true 0.75 hook family). One source touch
 // (areaSearch) is a comment. No shipped gameplay change beyond the two fixes named above.
-export const OTA_BUILD_ID = '2026-07-20-878-jest-blocking-gate';
+// 2026-07-20 OTA-879 (accessibility sweep — port of HAL OTA-902) — the full a11y pass on top of the
+// OTA-877 baseline. Walks all 15 screens + all 39 components and gives every interactive element proper
+// screen-reader / switch-access semantics: accessibilityRole="button" on ~230 touchables (+"header" on
+// ~60 titles for heading navigation), accessibilityLabel on every icon-/symbol-only control (✕, ◀/▶ voice
+// cyclers, +/− steppers, map reset, ★ SUMMON, back arrows), accessibilityState (selected/disabled/expanded)
+// reused verbatim from the conditions already in code, accessibilityViewIsModal on ~20 modal backdrops,
+// decorative art hidden from the reader (meaningful images labelled), and EnemyPanel now reads the foe's
+// name/type/rarity/HP/AC/range as one grouped label. Text size still rides the OS Dynamic-Type setting.
+// UI-only, additive accessibility props — no behaviour/layout/styling/logic/copy change. Verified: source
+// tsc clean + fast jest 467/467. 46 files.
+export const OTA_BUILD_ID = '2026-07-20-879-accessibility-sweep';

@@ -46,10 +46,10 @@ export function CraftRefusalModal({ visible, message, onContinue, onClose }: Pro
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onContinue}>
-        <View style={styles.scrim}>
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>◆ NOT YET</Text>
+              <Text style={styles.title} accessibilityRole="header">◆ NOT YET</Text>
               <View style={styles.rule} />
               <ScrollView
                 style={[styles.bodyScroll, { maxHeight: BODY_SCROLL_MAX_HEIGHT }]}
@@ -62,12 +62,14 @@ export function CraftRefusalModal({ visible, message, onContinue, onClose }: Pro
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
                   onPress={onContinue}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextPrimary}>KEEP CRAFTING</Text>
                 </Pressable>
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={onClose}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CLOSE MENU</Text>
                 </Pressable>
