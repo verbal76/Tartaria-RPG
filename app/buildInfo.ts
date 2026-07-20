@@ -18003,4 +18003,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // from HAL; the 8 files whose JSX diverges on this lore-agnostic line were swept against the engine's OWN
 // versions (labels kept lore-neutral). Text size still rides the OS Dynamic-Type setting. UI-only,
 // additive accessibility props — no behaviour/layout/styling/logic/copy change. Verified: source tsc clean.
-export const OTA_BUILD_ID = '2026-07-20-1174-accessibility-sweep';
+// 2026-07-20 OTA-1175 (lint → BLOCKING — port of HAL OTA-903) — the `lint` CI job never actually ran (no
+// ESLint flat config; ESLint 9+ errored). Adds a real ESLint 9 flat config (eslint.config.js) + the pinned
+// toolchain as devDependencies, and flips the job to REQUIRED. The lean high-signal rule set is GREEN on
+// this line's divergent tree too, so lint blocks here even though the fast-jest job stays reported (Open
+// Item: engine's own ~16-suite backlog). Two rules off for codebase-fit (documented in the config):
+// react-hooks/rules-of-hooks (store "use"-verb action methods) and no-useless-assignment (try/catch
+// fallback inits). Dev-tooling + CI-config only; no app code or shipped bundle changed. Verified: npm run
+// lint exits 0. (Also syncs HANDOFF.md.)
+export const OTA_BUILD_ID = '2026-07-20-1175-lint-blocking-gate';

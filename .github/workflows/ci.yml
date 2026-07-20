@@ -8,7 +8,8 @@ name: CI
 #   • typecheck (tests)   — RATCHET. the pre-existing test-fixture debt is frozen at a
 #                            committed baseline; new/edited tests must typecheck (the
 #                            count can only shrink, never grow).
-#   • lint                — reported (non-blocking for now; flip to blocking once clean).
+#   • lint                — BLOCKING. ESLint 9 flat config (eslint.config.js), lean
+#                            high-signal rule set — green on this line's tree too.
 #   • test (fast)         — jest, REPORTED (non-blocking) ON THIS LINE. The
 #                            deterministic unit/integration suites. The harness is now
 #                            merge-grade: jest.setup.js seeds Math.random (fixed
@@ -71,9 +72,8 @@ jobs:
         run: npm run typecheck:tests
 
   lint:
-    name: lint (reported)
+    name: lint (required)
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -81,7 +81,11 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - run: npm run lint
+      # ESLint 9 flat config (eslint.config.js), lean high-signal rule set. GREEN
+      # on this line's (divergent) tree too, so it's BLOCKING here even though the
+      # fast-jest job below stays reported (engine's own ~16-suite backlog).
+      - name: Lint (blocking)
+        run: npm run lint
 
   test:
     name: jest (fast · reported)
