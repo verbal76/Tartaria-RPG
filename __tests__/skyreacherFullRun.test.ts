@@ -149,16 +149,12 @@ describe('OTA-912 — clear all five towers and hand in for the Boltcaster', () 
       expect(inv.some((i) => i.name === climb.rewardArmor && i.quantity > 0)).toBe(true);
       armorSeen.push(climb.rewardArmor);
 
+      // (4) a beacon dropped and accumulates — the Rifle is NOT auto-built (the
+      // player builds it later by USING a beacon). All five stay in the pack.
       const beaconQty = inv.filter((i) => i.name === 'Aether Collection Beacon').reduce((s, i) => s + i.quantity, 0);
-      if (towerIdx < 5) {
-        // (4a) a beacon dropped and is accumulating
-        expect(beaconQty).toBe(towerIdx);
-        // ...and the Boltcaster is NOT yet granted
-        expect(inv.some((i) => i.name === 'Skyreacher Boltcaster')).toBe(false);
-      } else {
-        // (4b) the fifth beacon re-links into the Boltcaster — the five are consumed
-        expect(beaconQty).toBe(0);
-      }
+      expect(beaconQty).toBe(towerIdx);
+      expect(inv.some((i) => i.name === 'Beacon Rifle')).toBe(false);
+      expect(store.getState().worldMemory.skyreacherBoltcasterGranted).toBeFalsy();
     }
 
     // all five DISTINCT Skyreacher pieces were awarded
@@ -167,16 +163,37 @@ describe('OTA-912 — clear all five towers and hand in for the Boltcaster', () 
       'Skyreacher Crown', 'Skyreacher Cuirass', 'Skyreacher Gauntlets', 'Skyreacher Mantle', 'Skyreacher Treads',
     ].sort());
 
-    // the Boltcaster: Legendary, electrical + a permanent acid coating (electrical + acid)
+    // OTA-913 — five beacons in hand, none consumed yet; USING one now breaks the
+    // arrays down and builds the Beacon Rifle.
+    expect(store.getState().player!.inventory.filter((i) => i.name === 'Aether Collection Beacon').reduce((s, i) => s + i.quantity, 0)).toBe(5);
+    store.getState().useInventoryItem('Aether Collection Beacon');
+
     const finalInv = store.getState().player!.inventory;
-    const bolt = finalInv.find((i) => i.name === 'Skyreacher Boltcaster');
+    const bolt = finalInv.find((i) => i.name === 'Beacon Rifle');
     expect(bolt).toBeDefined();
     expect(bolt!.rarity).toBe('Legendary');
-    expect((bolt as unknown as { coating?: { kind: string } }).coating?.kind).toBe('acid');
+    expect((bolt as unknown as { coating?: { kind: string } }).coating?.kind).toBe('acid'); // electrical + acid
+    // the five collector-arrays were consumed in the build
+    expect(finalInv.filter((i) => i.name === 'Aether Collection Beacon').reduce((s, i) => s + i.quantity, 0)).toBe(0);
     // legendary material cache landed
     expect(finalInv.some((i) => i.name === 'Throne Shard')).toBe(true);
     expect(finalInv.some((i) => i.name === 'Iron Core')).toBe(true);
     // one-time flag set
     expect(store.getState().worldMemory.skyreacherBoltcasterGranted).toBe(true);
+  });
+
+  it('using a beacon before all five towers are cleared just hums (no build)', async () => {
+    const store = await boot('Early');
+    const p0 = store.getState().player!;
+    store.setState({
+      player: { ...p0, inventory: [...p0.inventory,
+        { id: 'b1', name: 'Aether Collection Beacon', kind: 'misc', rarity: 'Legendary', quantity: 2, tags: ['beacon', 'skyreacher', 'quest', 'collect_only'] } as InventoryItem,
+      ] },
+    });
+    store.getState().useInventoryItem('Aether Collection Beacon');
+    // no rifle, beacons untouched
+    expect(store.getState().player!.inventory.some((i) => i.name === 'Beacon Rifle')).toBe(false);
+    expect(store.getState().player!.inventory.filter((i) => i.name === 'Aether Collection Beacon').reduce((s, i) => s + i.quantity, 0)).toBe(2);
+    expect(store.getState().worldMemory.skyreacherBoltcasterGranted).toBeFalsy();
   });
 });

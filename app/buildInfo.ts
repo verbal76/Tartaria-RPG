@@ -17415,4 +17415,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Verified: greatClimbs + skyreacherRewards + climbEncounters + skyreacherChartUnlock (integration) tests;
 // armorResistanceLadder + weaponDefense + greatClimbs retargeted; typecheck:ci + typecheck:tests (200
 // baseline, no growth) + lint clean; full fast suite 473/473 (3987). Content → HAL + golem only, NOT engine.
-export const OTA_BUILD_ID = '2026-07-20-912-great-climbs-maps-bosses-boltcaster';
+// OTA-913 (GREAT CLIMBS — the Beacon Rifle is now BUILT, not handed in — content, HAL + golem only) — the
+// five Aether Collection Beacons no longer auto-assemble on the fifth boss. Instead, when all five towers
+// fall the Arbiter SUGGESTS the play: the beacons were never weapons — they were built to COLLECT Aether,
+// to pull charge out of the empty air and send it down the grid; broken down, their arrays make a rifle that
+// does the same and throws it. The player triggers it by USING a beacon from the pack (new `beacon` item
+// effect on the Aether Collection Beacon → assembleBeaconRifle): it disassembles the five collector-arrays,
+// consumes them, and builds the BEACON RIFLE (renamed from "Skyreacher Boltcaster"; Legendary ranged,
+// electrical + a permanent acid rider) plus the legendary material cache — with an in-voice build beat.
+// Using a beacon before all five towers are cleared just hums (no build); once built, further nodes are
+// spent shells. Fusion-lock (collect_only) + the Contracts hint updated for the rename. Verified:
+// skyreacherFullRun retargeted (5th boss no longer auto-builds; USING a beacon builds it) + a "hums early"
+// guard test; skyreacherRewards renamed; typecheck:ci + typecheck:tests (200 baseline) + lint clean; full
+// fast suite 474/474 (3991). Content → HAL + golem only, NOT engine.
+export const OTA_BUILD_ID = '2026-07-20-913-beacon-rifle-built-from-beacons';

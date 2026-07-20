@@ -107,6 +107,12 @@ export type ItemEffect =
       total: number;
     }
   | {
+      /** OTA-913 — an Aether Collection Beacon. Using it once all five towers
+       *  are cleared breaks the five collector-arrays down and builds the Beacon
+       *  Rifle (see assembleBeaconRifle). Before that it just hums. */
+      kind: 'beacon';
+    }
+  | {
       /** Off-hand equippable scanner — a Geiger-counter analog
        *  that biases search outcomes toward a tagged loot pool
        *  when the player is searching physical features. Three

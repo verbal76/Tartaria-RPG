@@ -50,13 +50,13 @@ describe('OTA-912 — summit bosses', () => {
 });
 
 describe('OTA-912 — the reward chain (Boltcaster + charts + beacon)', () => {
-  it('the Skyreacher Boltcaster is a collect-only Legendary electrical weapon', () => {
-    const bolt = findWeaponByName('Skyreacher Boltcaster');
+  it('the Beacon Rifle is a collect-only Legendary electrical weapon', () => {
+    const bolt = findWeaponByName('Beacon Rifle');
     expect(bolt).not.toBeNull();
     expect(bolt!.rarity).toBe('Legendary');
-    expect(bolt!.damageType).toBe('electrical'); // acid rider is a permanent baked-in coating at grant
+    expect(bolt!.damageType).toBe('electrical'); // acid rider is a permanent baked-in coating at build
     expect(bolt!.tags).toContain('collect_only');
-    expect(bolt!.tags).toContain('boltcaster');
+    expect(bolt!.tags).toContain('beacon_rifle');
   });
 
   it('the Aether Collection Beacon exists as a collect-only quest item', () => {
