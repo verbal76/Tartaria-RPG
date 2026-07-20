@@ -17392,4 +17392,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Verified: climbEncounters (+10 assertions) + climbCombatGates integration (dodge/flee refusal) + greatClimbs
 // retargeted (Mantle/cloak, strap→legs); typecheck:ci + typecheck:tests (200 baseline, no growth) + lint clean;
 // full fast suite 471/471. Content → HAL + golem only, NOT engine.
-export const OTA_BUILD_ID = '2026-07-20-911-great-climbs-mountaineering-rework';
+// OTA-912 (GREAT CLIMBS — maps, summit bosses, the Skyreacher Boltcaster — content, HAL + golem only) —
+// the great climbs become a full quest chain, framed on the canon: they ARE the Aether-collector towers of
+// the grid that drowned the world (the Grand Spire "channeled cosmic Aether into the city grid"; Thametan's
+// Tower is ground zero of the Zalmar Overload). Changes:
+// (1) ACCESS via MAPS. Five "Skyreacher Chart (N of 5)" items (gear.json, new `map` ItemEffect) are sold ONE
+//     time each by roadside traders (worldMemory.soldMapIds ledger; ~18% of eligible stalls). Using a chart
+//     (unlockGreatClimbFromChart) unlocks that climb (worldMemory.unlockedGreatClimbs), reveals + logs the
+//     landmark, and consumes the chart. The great-climb prop now ONLY spawns once its chart is used — access
+//     is gated on the maps.
+// (2) SUMMIT BOSSES. Five named bosses (greatClimbs.SUMMIT_BOSSES, boss:true, scaled via scaleStaticBoss)
+//     spawn at the top tier — you fight into the heart of the disaster. Machines vulnerable to electrical +
+//     acid. Climbing DOWN breaks off the fight and fully resets the boss (the escape valve, since dodge/flee
+//     are off up there). The Skyreacher armor piece is now claimed by BEATING the boss, not merely cresting.
+// (3) BEACONS → BOLTCASTER. Each boss guaranteed-drops an Aether Collection Beacon; the fifth re-links into
+//     the SKYREACHER BOLTCASTER (Legendary ranged, electrical damage + a permanent baked-in acid coating =
+//     electrical + acid) plus a legendary material cache. One-time (worldMemory flags).
+// (4) ARMOR REWORK. Skyreacher pieces now resist COLD baseline only (rarity ladder SUPPRESSED for the
+//     `skyreacher` tag), leaving their 3 resist slots OPEN for the player to fill by choice via coating vials.
+// (5) FUSION-LOCK. Skyreacher armor + the Boltcaster (all `collect_only`) cannot be upgraded at a Crucible.
+// (6) Great climbs listed as missions in Contracts (unlocked-but-uncrowned) with a 0/5 tower tally.
+// Verified: greatClimbs + skyreacherRewards + climbEncounters + skyreacherChartUnlock (integration) tests;
+// armorResistanceLadder + weaponDefense + greatClimbs retargeted; typecheck:ci + typecheck:tests (200
+// baseline, no growth) + lint clean; full fast suite 473/473 (3987). Content → HAL + golem only, NOT engine.
+export const OTA_BUILD_ID = '2026-07-20-912-great-climbs-maps-bosses-boltcaster';

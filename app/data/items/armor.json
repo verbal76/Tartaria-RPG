@@ -9728,9 +9728,7 @@
       "slot": "head",
       "acBonus": 4,
       "resistances": [
-        "aetheric",
-        "cold",
-        "burn"
+        "cold"
       ],
       "statBonus": {
         "stat": "wisdom",
@@ -9765,9 +9763,7 @@
       "slot": "chest",
       "acBonus": 4,
       "resistances": [
-        "bludgeoning",
-        "slashing",
-        "piercing"
+        "cold"
       ],
       "statBonus": {
         "stat": "constitution",
@@ -9802,8 +9798,6 @@
       "slot": "cloak",
       "acBonus": 4,
       "resistances": [
-        "piercing",
-        "bludgeoning",
         "cold"
       ],
       "statBonus": {
@@ -9839,8 +9833,6 @@
       "slot": "feet",
       "acBonus": 4,
       "resistances": [
-        "slashing",
-        "poison",
         "cold"
       ],
       "statBonus": {
@@ -9872,9 +9864,7 @@
       "slot": "hands",
       "acBonus": 4,
       "resistances": [
-        "burn",
-        "aetheric",
-        "poison"
+        "cold"
       ],
       "statBonus": {
         "stat": "strength",

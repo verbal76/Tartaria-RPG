@@ -775,6 +775,13 @@ function ladderResistances(name: string, rarity: Rarity, seed: readonly string[]
  *  rarity/material top-up). Used by combat (aggregateArmor) AND the item preview
  *  so what the player SEES is what actually mitigates. Deterministic. */
 export function armorResistances(piece: CatalogArmor): string[] {
+  // OTA-912 — the Skyreacher set is the exception to the rarity ladder: it
+  // resists only its authored baseline (cold) and leaves the rest of its resist
+  // capacity OPEN for the player to fill by choice (coating vials → addedResists,
+  // up to the standard 3-slot cap). Other Legendaries still auto-fill to 3.
+  if ((piece.tags ?? []).some((t) => t.toLowerCase() === 'skyreacher')) {
+    return [...(piece.resistances ?? [])];
+  }
   return ladderResistances(piece.name, piece.rarity, piece.resistances ?? [], piece.tags ?? []);
 }
 

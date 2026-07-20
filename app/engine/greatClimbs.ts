@@ -14,6 +14,15 @@
 // Detection is by the prop's distinctive noun token, so a great climb never
 // collides with the generic curated climbables (an "obsidian pillar", a
 // "grand spire capacitor") that can share a location.
+//
+// OTA-912 — each summit holds a NAMED BOSS: the tower's master guardian, still
+// awake at the crown. You climb into the heart of the disaster. Beating it drops
+// an Aether Collection Beacon and hands you that climb's Skyreacher piece; all
+// five beacons re-link into the Skyreacher Boltcaster. The bosses are Tartarian
+// machines built into the collector towers, so they read as vulnerable to the
+// anti-machine elements (electrical + acid) — exactly what the Boltcaster deals.
+
+import type { Enemy } from './types';
 
 export interface GreatClimb {
   /** Stable id. */
@@ -101,6 +110,13 @@ export function greatClimbForLocation(locationId: string | null | undefined): Gr
   return GREAT_CLIMBS.find((c) => c.locationId === locationId) ?? null;
 }
 
+/** Look up a great climb by its stable id (used by the Skyreacher Chart map
+ *  effect and the summit-boss / beacon plumbing). */
+export function greatClimbById(id: string | null | undefined): GreatClimb | null {
+  if (!id) return null;
+  return GREAT_CLIMBS.find((c) => c.id === id) ?? null;
+}
+
 /** Resolve a climbed noun to its great climb, if any. Matches the canonical
  *  noun exactly OR any of its distinctive tokens as a substring, so the
  *  parser's shortened/article-stripped forms still resolve. Optionally
@@ -144,4 +160,142 @@ export function greatClimbHeight(noun: string | null | undefined): number | null
  *  target even though its proper-noun form isn't in the substring matcher). */
 export function isGreatClimbNoun(noun: string | null | undefined): boolean {
   return greatClimbFor(noun) != null;
+}
+
+// ── Summit bosses (OTA-912) ────────────────────────────────────────────────
+
+export interface SummitBoss {
+  /** GREAT_CLIMBS id this boss guards. */
+  climbId: string;
+  /** The base boss enemy (boss:true). Scaled to the player at spawn time. */
+  base: Enemy;
+  /** In-voice beat when the boss unfolds at the summit. */
+  approachLine: string;
+  /** In-voice beat when it falls. */
+  defeatLine: string;
+}
+
+/** Trait prefix that marks a summit boss and carries its climb id, so the
+ *  defeat handler can recover which climb it belonged to. */
+export const SUMMIT_BOSS_TRAIT_PREFIX = 'summit_climb:';
+
+export const SUMMIT_BOSSES: readonly SummitBoss[] = [
+  {
+    climbId: 'grand_spire',
+    base: {
+      name: 'Aurenthal, the Crown-Sentinel',
+      type: 'Automation',
+      abilityPoint: 'Strength 10',
+      attack: 'Choir-Lance',
+      damage: '4D8',
+      hp: 300,
+      rarity: 'Legendary',
+      boss: true,
+      loot: [],
+      aliases: ['aurenthal', 'crown-sentinel', 'crown sentinel', 'sentinel'],
+      traits: ['armored', 'aerial', 'savage', 'fast_regen', 'concussive', 'resist:slashing', 'resist:piercing', 'vulnerable:electrical', 'vulnerable:acid'],
+    },
+    approachLine: 'At the needle-tip of the Grand Spire the wind dies. A war-scale sentinel unfolds from the weathervane socket — AURENTHAL, the Crown-Sentinel, the last thing the grid built to guard its highest collector. It has not stood down in an age. It does not intend to start now.',
+    defeatLine: 'Aurenthal comes apart along its seams and slides off the spire into the cloud-deck below. The collector\'s crown is finally quiet.',
+  },
+  {
+    climbId: 'asgardar_spire',
+    base: {
+      name: 'Draugveil, the Drowned Warden',
+      type: 'Automation',
+      abilityPoint: 'Strength 9',
+      attack: 'Silt-Hammer',
+      damage: '4D6',
+      hp: 285,
+      rarity: 'Legendary',
+      boss: true,
+      loot: [],
+      aliases: ['draugveil', 'drowned warden', 'warden'],
+      traits: ['armored', 'slow', 'savage', 'fast_regen', 'resist:slashing', 'resist:piercing', 'vulnerable:electrical', 'vulnerable:acid'],
+    },
+    approachLine: 'The buried spire\'s crown breaks the silt-line, and something rises with it — DRAUGVEIL, the Drowned Warden, caked in a thousand years of Asgardar\'s mud, its collector-heart still turning behind its ribs.',
+    defeatLine: 'Draugveil sinks back into the silt it climbed out of, its heart going dark at last.',
+  },
+  {
+    climbId: 'obsidian_monolith',
+    base: {
+      name: 'Magnetar, the Obsidian Colossus',
+      type: 'Mechanism',
+      abilityPoint: 'Strength 10',
+      attack: 'Lodestone Slam',
+      damage: '4D8',
+      hp: 320,
+      rarity: 'Legendary',
+      boss: true,
+      loot: [],
+      aliases: ['magnetar', 'obsidian colossus', 'colossus'],
+      traits: ['armored', 'slow', 'concussive', 'fast_regen', 'resist:slashing', 'resist:piercing', 'resist:bludgeoning', 'vulnerable:electrical', 'vulnerable:acid'],
+    },
+    approachLine: 'The crown of the Great Obsidian Monolith is a single slab of black glass — and it stands up. MAGNETAR, the Obsidian Colossus, drags every loose blade and buckle toward it as it turns; the whole pillar was one dormant machine.',
+    defeatLine: 'Magnetar\'s magnetic heart stutters and dies; the pull lets go and the colossus topples into stillness.',
+  },
+  {
+    climbId: 'thametan_tower',
+    base: {
+      name: "Zalmar's Cascade-Wraith",
+      type: 'Automation',
+      abilityPoint: 'Dexterity 10',
+      attack: 'Resonance Cascade',
+      damage: '4D8',
+      hp: 300,
+      rarity: 'Legendary',
+      boss: true,
+      loot: [],
+      aliases: ['cascade-wraith', 'cascade wraith', 'wraith', 'zalmar'],
+      traits: ['armored', 'savage', 'fast_regen', 'concussive', 'resist:aetheric', 'resist:piercing', 'vulnerable:electrical', 'vulnerable:acid'],
+    },
+    approachLine: "You top Thametan's Tower — ground zero, where the world drowned. The Aetheric Engine below still hums, and its guardian still runs the loop that killed an empire: ZALMAR'S CASCADE-WRAITH, a machine caught mid-catastrophe, screaming the same resonance that broke the radiators' seals.",
+    defeatLine: "The Cascade-Wraith's loop finally breaks. For the first time in a very long time, the hum under Thametan's Tower goes quiet.",
+  },
+  {
+    climbId: 'zharak_fang',
+    base: {
+      name: 'Ossika, the Fang-Sentinel',
+      type: 'Automation',
+      abilityPoint: 'Dexterity 9',
+      attack: 'Siren-Talon',
+      damage: '3D10',
+      hp: 270,
+      rarity: 'Legendary',
+      boss: true,
+      loot: [],
+      aliases: ['ossika', 'fang-sentinel', 'fang sentinel', 'sentinel'],
+      traits: ['armored', 'aerial', 'quick', 'savage', 'fast_regen', 'resist:slashing', 'resist:piercing', 'vulnerable:electrical', 'vulnerable:acid'],
+    },
+    approachLine: 'The tallest fang of Zharak ends in a nest of dead antennae, and one of them turns to face you — OSSIKA, the Fang-Sentinel, the machine the mud-sirens have sung to for centuries, still holding the crown of its tower.',
+    defeatLine: "Ossika's wings fold and it drops from the fang into the shallows below; the sirens' song falters, then stops.",
+  },
+] as const;
+
+const SUMMIT_BOSS_BY_ID: Record<string, SummitBoss> = Object.fromEntries(
+  SUMMIT_BOSSES.map((b) => [b.climbId, b]),
+);
+
+/** The summit boss guarding a given great climb (or null). */
+export function summitBossFor(climbId: string | null | undefined): SummitBoss | null {
+  if (!climbId) return null;
+  return SUMMIT_BOSS_BY_ID[climbId] ?? null;
+}
+
+/** A fresh boss Enemy for the climb, stamped with the summit-climb trait so the
+ *  defeat handler can recover which climb it belonged to. Returns null if the
+ *  climb has no boss. The caller scales it (scaleStaticBoss) before spawning. */
+export function buildSummitBoss(climbId: string): Enemy | null {
+  const def = summitBossFor(climbId);
+  if (!def) return null;
+  return {
+    ...def.base,
+    traits: [...(def.base.traits ?? []), `${SUMMIT_BOSS_TRAIT_PREFIX}${climbId}`],
+  };
+}
+
+/** Recover a summit boss's climb id from a defeated enemy's traits, or null. */
+export function summitClimbIdFromEnemy(enemy: { traits?: readonly string[] } | null | undefined): string | null {
+  const t = (enemy?.traits ?? []).find((x) => x.startsWith(SUMMIT_BOSS_TRAIT_PREFIX));
+  return t ? t.slice(SUMMIT_BOSS_TRAIT_PREFIX.length) : null;
 }

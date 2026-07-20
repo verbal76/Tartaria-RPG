@@ -1725,6 +1725,19 @@ export interface WorldMemory {
    *  one-time Skyreacher armor grant (no re-award on re-cresting) and the
    *  Skyreacher title (greatClimbsCompleted = this set's size; earned at 5). */
   greatClimbsCrested?: string[];
+  /** OTA-912 — Skyreacher Chart ids sold by roadside vendors, ever (sell-once
+   *  ledger; each of the 5 charts can be sold a single time across the game). */
+  soldMapIds?: string[];
+  /** OTA-912 — great-climb ids UNLOCKED by using their chart. The climbable prop
+   *  only spawns at a landmark once its id is in here (access is gated on maps). */
+  unlockedGreatClimbs?: string[];
+  /** OTA-912 — distinct great-climb ids whose SUMMIT BOSS has been defeated.
+   *  Gates the one-time Skyreacher armor + Aether Collection Beacon grant, and at
+   *  size 5 unlocks the Skyreacher Boltcaster + legendary material cache. */
+  summitBossesDefeated?: string[];
+  /** OTA-912 — one-time flag: the Skyreacher Boltcaster (+ materials) was granted
+   *  after all five summit bosses fell. Prevents a re-grant. */
+  skyreacherBoltcasterGranted?: boolean;
   /** arb-fix — one-time make-good: a faction fused item the player should
    *  have received but didn't (the pre-fix faction catalyst never counted
    *  toward the gate). Granted once per save on load for dev names; this

@@ -6146,6 +6146,26 @@
       "description": "A lance of bound Aether keyed to a construct's frame; it strikes with the same charge that animates the golem. Coatings ride the discharge.",
       "statRequirement": null,
       "tc": 0
+    },
+    {
+      "name": "Skyreacher Boltcaster",
+      "weaponKind": "ranged",
+      "damageType": "electrical",
+      "damageDice": "3d8",
+      "stat": "dexterity",
+      "rarity": "Legendary",
+      "defense": 0,
+      "statRequirement": null,
+      "tc": 0,
+      "tags": [
+        "weapon",
+        "ranged",
+        "boltcaster",
+        "skyreacher",
+        "legendary",
+        "collect_only"
+      ],
+      "description": "A giant-forged bolt-thrower reassembled from the hearts of the five Aether-collector towers. It arcs a live electrical bolt sheathed in a caustic acid load — the two elements every Tartarian machine and tower-guardian dreads most. Assembled only by whoever carried all five Aether Collection Beacons back down from the great climbs. Cannot be forged, bought, or upgraded at a Crucible."
     }
   ]
 }
