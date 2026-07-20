@@ -1479,9 +1479,18 @@ function startQwenWatchdog(
       // transient memory-pressure failure doesn't strand Qwen for the session.
       qwenReinitAttempts += 1;
       qwenReinitInFlightSince = Date.now();
+      // OTA-909 — name the DORMANT case distinctly so the log doesn't read as a
+      // self-contradiction. Dormant = status==='ready' but the native llama
+      // context was released (dispose() on app-BACKGROUND frees the ~398MB
+      // context to reclaim memory; the JS status field isn't notified). That's
+      // the watchdog working AS DESIGNED, not a "ready-but-not-ready" bug — the
+      // old wording ("Qwen not ready (status='ready')") looked like a defect.
+      const dormant = typeof q.isDormant === 'function' && q.isDormant();
       get().appendLog(
         'debug',
-        `qwen-watchdog: Qwen not ready (status='${st}') — forceReinitialize() attempt #${qwenReinitAttempts}.`,
+        dormant
+          ? `qwen-watchdog: Qwen dormant (status='${st}' but the native context was released — usually app-backgrounding); reinitializing (attempt #${qwenReinitAttempts}).`
+          : `qwen-watchdog: Qwen not ready (status='${st}'); reinitializing (attempt #${qwenReinitAttempts}).`,
       );
       void q.forceReinitialize()
         .then(() => { qwenReinitInFlightSince = 0; })

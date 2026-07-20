@@ -18017,4 +18017,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dodge with other live enemies names that a dodge reads one attacker while the rest press in. Pure
 // narration, setting-neutral; no mechanics change. dodgeParry +2 tests → 6/6; typecheck:ci + lint clean.
 // (The engine-line de-lore — tartariaLeakScanner 320→93 — remains in progress on this branch; see HANDOFF.)
-export const OTA_BUILD_ID = '2026-07-20-1176-dodge-outcome-clarity';
+// 2026-07-20 OTA-1177 (qwen-watchdog log clarity — port of HAL OTA-909) — dormancy watchdog line reworded to
+// name the dormant case (status ready but native context released on app-background) via isDormant(),
+// instead of the misleading "Qwen not ready (status='ready')". Log-string only; no behavior change.
+export const OTA_BUILD_ID = '2026-07-20-1177-qwen-watchdog-log-clarity';
