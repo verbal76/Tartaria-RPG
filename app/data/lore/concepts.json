@@ -153,6 +153,24 @@
       "answer": "The deep answer to why the water rose. Old Tartaria ran on Aether — the fifth force, the quintessence — harvested from the sun and the cold night sky at once, its waste heat vented into the black of space through vacuum-sealed radiators, then multiplied through oriented crystal arrays until it could lift citadels and wake sentinels. Elior Zalmar tried to hold the entire planetary grid at that screaming peak from Thametan's Tower. The resonance shook the vacuum seals of the Etheric Grids apart, and with nowhere left to dump the heat, the engines poured it down into the bedrock instead. The ground ionized and rose as Ether-charged mud — the Great Mud Flood — then flash-calcified into Aetherstone, sealing the cities and their Entombed where they stood and trapping the Etherium shards, the temporal loops, and the Etheric storms the Reclaimers pick through to this day. (Archived by the Forgotten Order's Department of Aetheric Engineering; cross-read the Zalmar Texts, the Hwang Radiative Principles, and the Soldani Crystalline Theorems.)"
     },
     {
+      "id": "zalmar_texts",
+      "keywords": ["zalmar texts", "the zalmar texts", "zalmar's texts", "zalmar's notes", "zalmar's papers"],
+      "title": "The Zalmar Texts",
+      "answer": "Elior Zalmar's own working papers — the resonance mathematics that lifted Tartaria and the same mathematics, pushed one column too far, that drowned it. The Forgotten Order keeps what survived under lock; copies surface in the ruins with pages missing exactly where the reader most wants them. Those who read the whole of it, the Order says, tend to start hearing the Engine's note in quiet rooms."
+    },
+    {
+      "id": "hwang_radiative_principles",
+      "keywords": ["hwang", "hwang radiative principles", "the hwang radiative principles", "radiative principles"],
+      "title": "The Hwang Radiative Principles",
+      "answer": "The foundational treatise on how the empire shed its waste heat — the vacuum-shielded radiators that dumped every unused erg into the 3-kelvin cold of the night sky so the cities would not cook in their own power. Sound engineering, and honoured right up until Zalmar's resonance shook the seals apart. The Reclaimers who can read it prize it: a working radiator plate is still worth a season's dig."
+    },
+    {
+      "id": "soldani_crystalline_theorems",
+      "keywords": ["soldani", "soldani crystalline theorems", "the soldani crystalline theorems", "crystalline theorems"],
+      "title": "The Soldani Crystalline Theorems",
+      "answer": "The amplification bible: how a raw Aetheric beam, fired true along the grain of an oriented heavy-metal crystal, could be multiplied a thousandfold into the current that woke the sentinels. Every runecaster and every Aetherstone core still leans on Soldani's angles, whether the smith who cut it knows the name or not. Misalign the crystal and the theorems turn on you — that misalignment is what the flood was, written large."
+    },
+    {
       "id": "tartaria",
       "keywords": ["tartaria", "the world"],
       "title": "Tartaria",

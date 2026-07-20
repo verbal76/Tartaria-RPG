@@ -16424,4 +16424,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "quintessence"), a one-clause enrichment of the thin `aetherstone` concept (trapped Etherium), and the
 // Mud Golem bestiary line's canonical origin (thermodynamic hubris). Three-way terminology (Aether /
 // Etheric / Etherium) used additively. Data-only; Tartaria canon. Verified: lore tests green.
-export const OTA_BUILD_ID = '2026-07-20-881-aetherstone-thesis-flavor';
+// 2026-07-20 OTA-882 (Aetherstone Thesis flavor, tranche 2 — port of HAL OTA-905) — finishes threading the
+// owner's canon doc through the world data, all additive: shard-family item descriptions name their
+// Etherium origin; the two lightning weathers gain their real cause (buried Etheric fields / trapped
+// Etherium discharging); the Grand Spire and Thametan's Tower descriptions carry the radiative-harvest and
+// vacuum-seal-failure mechanisms (+ two ambient location-flavor lines); and three new discoverable codex
+// entries cover the cited works (Zalmar Texts, Hwang Radiative Principles, Soldani Crystalline Theorems).
+// Three-way terminology (Aether / Etheric / Etherium) additive. Data-only; Tartaria canon. Verified: lore +
+// map tests green.
+export const OTA_BUILD_ID = '2026-07-20-882-aetherstone-thesis-flavor-2';
