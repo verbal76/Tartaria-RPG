@@ -5,6 +5,7 @@
 
 import huntsData from '../data/quests/hunts.json';
 import type { PlayerCharacter, Enemy, Location } from './types';
+import { getEnergyName } from './contentPack';
 import enemiesData from '../data/enemies/enemies.json';
 import locationsData from '../data/locations/locations.json';
 import { resolveMissions, resolveTable } from './contentPack';
@@ -115,7 +116,7 @@ export function checkKindLabel(kind: HuntCheckKind): string | null {
     case 'stealth': return 'use stealth';
     case 'diplomacy': return 'talk it out';
     case 'escape': return 'escape / disengage';
-    case 'cast': return 'use Aethercraft';
+    case 'cast': return `use ${getEnergyName()}craft`;
     case 'attack_provoke': return 'attack to provoke';
     case 'boss': return 'defeat in combat';
     default: return null;

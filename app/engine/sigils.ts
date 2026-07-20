@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 // sigils.ts — OTA-691. Found faction SIGILS: a slain member's mark — a pendant or
 // token hammered thin and etched with a faction's crest. Returning one to that
 // faction's frontier stake HONORS their dead and earns a small standing bump.
@@ -14,17 +15,7 @@ import { startingLocationForFaction } from './character';
 export const SIGIL_STANDING_REWARD = 1;
 
 /** factionId → the sigil item name (authored in gear.json). */
-export const FACTION_SIGIL_NAME: Record<string, string> = {
-  forgotten_order: 'Forgotten Order Sigil',
-  mud_monarchs: 'Mud Monarch Sigil',
-  reclaimers_guild: 'Reclaimer Sigil',
-  true_tartarians: 'True Tartarian Sigil',
-  eternal_dynasty: 'Eternal Dynasty Sigil',
-  conspiracy_architects: 'Architect Sigil',
-  servants_of_giants: "Giants' Servant Sigil",
-  stone_builders: 'Stone Builder Sigil',
-  tartarian_revivalists: 'Revivalist Sigil',
-};
+export const FACTION_SIGIL_NAME: Record<string, string> = require('../data/factions/faction-sigil-names.json');
 
 // Distinctive name keywords → faction, so a faction-named humanoid ("Mud Monarch
 // Purifier", "Reclaimer Ambusher") drops ITS OWN crest. First match wins.

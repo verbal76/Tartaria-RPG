@@ -32,6 +32,7 @@
 // effectiveStats's passive-bonus sum.
 
 import type { Stats } from './types';
+import { getEnergyAdjective } from './contentPack';
 
 /** Hard cap on inventory-passive stat bonuses, applied per stat.
  *  Equipped gear (armor / amulet / ring statBonus) is unaffected
@@ -262,9 +263,9 @@ export function searchRequirementFor(noun: string): NounSearchRequirement | null
   const aether = /\b(vent fissure|fissure|aether|aetheric|etheric|ether|glyph|rune|crystal|conduit|ley[- ]?line|sigil|leystone|aetherstone|obelisk|monolith)\b/i;
   if (aether.test(noun)) {
     return {
-      hint: `Equip an Aetheric Scanner in your off hand to search the ${noun}.`,
+      hint: `Equip an ${getEnergyAdjective()} Scanner in your off hand to search the ${noun}.`,
       scannerBias: 'aetheric',
-      shortLabel: 'requires Aetheric scanner',
+      shortLabel: `requires ${getEnergyAdjective()} scanner`,
     };
   }
   return null;
