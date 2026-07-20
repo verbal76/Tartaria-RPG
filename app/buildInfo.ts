@@ -16452,4 +16452,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // applyEnemyCounter: (a) a MISREAD dodge gets a visceral "you stumble into it / lose your balance" beat
 // (skips the nat-20 pierce); (b) a SUCCESSFUL dodge with other live enemies names that a dodge reads one
 // attacker while the rest press in. Pure narration; no mechanics change. dodgeParry +2 tests → 6/6.
-export const OTA_BUILD_ID = '2026-07-20-885-dodge-outcome-clarity';
+// 2026-07-20 OTA-886 (qwen-watchdog log clarity — port of HAL OTA-909) — the dormancy watchdog logged
+// "Qwen not ready (status='ready')" which reads as a bug; it isn't (dormant = status ready but native
+// context released on app-background). Reworded to name the dormant case via isDormant(). Log-string only.
+export const OTA_BUILD_ID = '2026-07-20-886-qwen-watchdog-log-clarity';
