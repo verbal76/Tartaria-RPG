@@ -6,6 +6,14 @@ _Generated 2026-07-20 from the balance/economy multi-agent audit (`tartaria-bala
 - **UNVERIFIED** — a finder flagged it but its second-opinion did not return this run. Re-verify first.
 - **DEFENSIBLE** — second-opinion judged it intended / compensated elsewhere. Recorded for your call; likely no action.
 - **DONE** — already shipped.
+## Update log
+- **2026-07-20 — final report landed** (workflow finished all 27 agents): **4** confirmed mis-tunes, not 2.
+  - **DONE** OTA-917/894 — Reclaimer Relic Run reward re-tier.
+  - **DONE** OTA-918/895 — summit bosses raised to a real boss HP tier (270-320 → 440-500) + removed the redundant `vulnerable:electrical` double-dip (electrical stays 1.5x via the Automation/Mechanism type map; `vulnerable:acid` kept).
+  - **OPEN** — gear resale clamped to scrap (`sellPrice.ts`): needs a design decision (authored Common-armor `tcSell` is 3-9, not the formula's 11) **and** a per-item buy-grounded impl (`estimatedStallValue × 0.8`); a flat gear floor reopens bare-Common-weapon arbitrage, so this is not a quick fix.
+  - **OPEN** — combat to-hit saturation (`combatRules.ts:384`): the `min(18)` AC clamp is applied before the boss/scale terms, silently defeating the Guardian/SA-4 AC scaler. Fix: apply `min(18)` before the scale terms OR exempt scaled/guardian/boss enemies; soft-cap the to-hit stat contribution above ~+12. Do NOT globally raise `min(18)→24`.
+  - **PLAYTEST** — leads currency reward danger-weighting; flat repair-cost sink. (See rows below.)
+
 ## Bug/exploit sweep (separate audit)
 - Both confirmed leaks are **DONE** (OTA-916/893): Aetherkin building-spawn farm (banked per tile) and sell-floor-after-multipliers arbitrage (floor clamps last). No open items from that sweep.
 **This run:** 19 findings — CONFIRMED 1, DEFENSIBLE 9, DONE 1, PLAYTEST 2, UNVERIFIED 6.

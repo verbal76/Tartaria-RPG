@@ -17483,4 +17483,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // RARITY_BUY_FLOOR shadows GEAR_RARITY_BASE — is deferred: the safe fix must be per-item buy-grounded, since a
 // flat gear floor reopens bare-Common-weapon arbitrage.) Verified: contractUIRewards + echoingBootsArmor green;
 // JSON valid. Content → HAL + golem only, NOT engine.
-export const OTA_BUILD_ID = '2026-07-20-917-reclaimer-relic-run-reward-retier';
+//
+// OTA-918 (BALANCE TUNE — summit bosses to a real boss tier + weakness de-dup, from the balance audit — content,
+// HAL + golem only) — the five Great-Climb summit bosses guard the game's biggest reward (5 guaranteed Legendary
+// Skyreacher pieces + the Beacon Rifle) but sat at the LIGHTEST boss tier: base HP 270-320 (~46% of the
+// ~458 story-boss floor), AND they carried an explicit `vulnerable:electrical` trait that DOUBLE-DIPPED with the
+// Automation/Mechanism type-map electrical weakness — combineDamageTypeMatch stacks concordant type+trait
+// (1.5x * 1.5x = 2.25x), so any electrical hit did 2.25x, roughly halving their effective HP again. Fix: (1)
+// remove `vulnerable:electrical` from all 5 (electrical stays a clean 1.5x via the type map — verified combat
+// applies the type map to bosses at gameStore.ts:16863,16873); (2) KEEP `vulnerable:acid` (acid is NOT a type
+// weakness, so the trait is the intended single 1.5x that makes the Boltcaster's acid rider bite); (3) raise
+// base HP to a real Legendary tier preserving the spread — Ossika 270->440, Draugveil 285->460, Aurenthal/Zalmar
+// 300->470, Magnetar 320->500. Altitude lethality (scaling falls, dodge/flee off mid-climb) stays the extra
+// counterweight. Verified: skyreacherRewards retargeted (electrical-via-type, no double-dip, HP>=440) +
+// greatClimbs/climbEncounters/skyreacherFullRun/ota915 green; typecheck:ci + typecheck:tests (200) + lint clean;
+// full fast suite green. Content → HAL + golem only, NOT engine.
+export const OTA_BUILD_ID = '2026-07-20-918-summit-boss-hp-and-weakness-dedup';
