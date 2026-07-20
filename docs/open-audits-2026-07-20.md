@@ -20,6 +20,20 @@ _Generated 2026-07-20 from the balance/economy multi-agent audit (`tartaria-bala
 ## Bug/exploit sweep (separate audit)
 - Both confirmed leaks are **DONE** (OTA-916/893): Aetherkin building-spawn farm (banked per tile) and sell-floor-after-multipliers arbitrage (floor clamps last). No open items from that sweep.
 **This run:** 19 findings — CONFIRMED 1, DEFENSIBLE 9, DONE 1, PLAYTEST 2, UNVERIFIED 6.
+## Future audit batches (not yet run)
+
+Dimensions the two big sweeps (bug/exploit, balance/economy) did NOT cover. Each is a small, self-contained batch — run when tokens allow. Ranked by likelihood of catching a real issue.
+
+1. **New-content wiring / integrity sweep** *(small · highest value)* — verify this session's additions resolve end-to-end: the Aetherkin loot names (`Aetherstone Fragment`, `Veil of Peace`, `Aether Mud`) resolve to real items or intended misc; the 5 summit-boss codex projections actually render + their `enemyIntel` keys match the built-boss names; new `worldMemory` fields (`aetherkinRolledBuildings`, `unlockedGreatClimbs`, `soldMapIds`, `greatClimbsCrested`) survive save → hydrate on an OLD save; the swapped storyline reward (`Explorer's Aetheric Greaves`) is grantable.
+2. **Accessibility of new UI surfaces** *(small · known gap)* — the hidden-title "??? — undiscovered" row I added is a plain `View` with no `accessibilityRole`/label; also check the climb-locked "?" places rows and the bestiary boss entries for screen-reader labels + contrast, against the SA-6 baseline.
+3. **Narration / tone consistency of new text** *(small · quality)* — Aetherkin identity/emergence/character pools, summit-boss flavor lines, the "?" placeholder copy, great-climb beats — hold them to the `docs/literary-audit-on-device.md` standard (voice, repetition, grammar, "a Aetheric"-class article bugs).
+4. **Lore / canon consistency of new content** *(small · quality)* — Aetherkin (etheric undead surfaced as "the Aetherkin you've heard about") vs `concepts.json`/`glossary.json`; great climbs = the flood's antenna/collector towers; the reverence bloc — check against SA-2 and `docs/lore-compliance-*`.
+5. **HAL ↔ golem parity check** *(small · integrity)* — diff the two trees across the session's OTAs; confirm only intended lore-data differences remain and no logic drifted between lines.
+6. **Content reachability / dead-content sweep** *(medium)* — the balance run found ONE dead reward (Reclaimer Relic Run); a dedicated pass — every item obtainable, every quest completable, every enemy spawnable, every title earnable — would likely surface more. Extends `questProgressionAudit`/`mapIntegrityAudit`.
+7. **On-device performance / save-size sweep** *(medium)* — the game runs on phones and `gameStore.ts` is ~31k lines; check per-step cost, re-render churn, and save-blob size with the new fields (there's `saveTrim`, but the new fields weren't measured).
+
+Not an audit: the paused engine-line de-lore effort (see the plan file) is separate, engine-only, and large.
+
 ## Balance/economy audit findings
 ### [DONE] (HIGH · rewards · mid) Storyline-tier loot inversion: The Reclaimer Relic Run pays a Common reward in a Rare-reward tier
 - **Observation:** faction-storylines.json:113-120 — 'The Reclaimer Relic Run' is a 7-stage storyline gated at minRep 5, paying rewardTc 1000 + rewardRep 20 + rewardItem 'Echoing Steps Boots'. Echoing Steps Boots (app/data/items/armor.json) is Common, tcBuy 18 / tcSell 7, +1 AC / +1 DEX. Every other storyline awards Rare gear: Runic Mantle (armor.json, Rare, tcBuy 180 / tcSell 72, +2 AC / +2 INT), Tartarian Stoneband (rings.json, Rare, +2 STR), Aetheric Cloth / Aetheric Pelt (materials.json, Rare), Mud Monarch Seal (rings.json, Rare). It is also the lowest rewardTc (1000; next is 1200, most 1300-2000) and lowest rewardRep (20) of all 14 storylines, while tying for second-most stages (7).
