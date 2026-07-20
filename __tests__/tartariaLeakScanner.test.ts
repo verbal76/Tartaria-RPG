@@ -48,7 +48,7 @@ function scanFile(file: string): number {
 // Aetherstone → getEnergyName()/getEnergyAdjective()/getEnergyMaterial(), 150→128).
 // Remaining entries are the live de-lore worklist; drive each toward 0.
 const BASELINE: Record<string, number> = {
-  'app/state/gameStore.ts': 60,
+  'app/state/gameStore.ts': 55,
   'app/engine/itemAliases.ts': 52,
   'app/engine/hooks.ts': 50,
   'app/engine/areaSearch.ts': 13,

@@ -11753,7 +11753,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? parts.join(', ') + ' recovered.'
             : hungerCapped
               ? 'Hunger has capped your wind — sleep can\'t lift it. Eat something to recover the rest.'
-              : 'Whole already — the Aetherstone hums steady.';
+              : `Whole already — the ${getEnergyMaterial()} hums steady.`;
           get().appendLog('world', `You rest for ${hours} hours. ${tail} (${describeTime(newHours)})`);
           // 2026-05-25 — ambush spawn. Rest completes (HP / stamina
           // granted above), then the encounter fires AFTER recovery
@@ -12879,7 +12879,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : onlyFeet ? 'feet' : onlyAmulet ? 'amulet' : onlyRing ? 'ring' : null;
           if (targetSlot) {
             if (eqNow[targetSlot]) get().unequipSlot(targetSlot);
-            else get().appendLog('arbiter', `The Arbiter glances at you. "Nothing in that slot to take off."`);
+            else get().appendLog('arbiter', `The ${getNarratorName()} glances at you. "Nothing in that slot to take off."`);
           } else {
             // No specific target — clear hands (both, if held).
             const hadMain = !!eqNow.main;
@@ -12887,7 +12887,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (hadMain) get().unequipSlot('main');
             if (hadOff) get().unequipSlot('off');
             if (!hadMain && !hadOff) {
-              get().appendLog('arbiter', `The Arbiter looks at your empty hands. "Nothing to put away."`);
+              get().appendLog('arbiter', `The ${getNarratorName()} looks at your empty hands. "Nothing to put away."`);
             }
           }
           break;
@@ -28924,7 +28924,7 @@ const REST_PULL_LINES: RestPull[] = [
   { kind: 'world', line: `You dream the same dream three times in the night — a corridor, a door, your own hand reaching for the handle.` },
   { kind: 'world', line: `Half-asleep, you hear voices somewhere down the road. By the time you sit up they're gone.` },
   { kind: 'world', line: `A bird you can't name lands a foot from where you slept, looks at you, takes off again.` },
-  { kind: 'world', line: `You wake briefly. The Aetheric haze has cleared enough that for a heartbeat you can see further than usual.` },
+  { kind: 'world', line: `You wake briefly. The ${getEnergyAdjective()} haze has cleared enough that for a heartbeat you can see further than usual.` },
   { kind: 'world', line: `Wind in the dust overnight. Patterns in the mud around your camp — boot prints not yours, walked around you and away.` },
   { kind: 'trinket', line: `You shake out your cloak in the morning. Something small falls free that you don't remember picking up.` },
   { kind: 'trinket', line: `Pre-dawn light catches a glint near your boots. The dust offered you something while you weren't looking.` },
@@ -28999,7 +28999,7 @@ function narrateAmbientFind(
   const inHub = !!get().player?.hubRoomId;
   const neutral = [
     `You examine the ${noun}. ${getWorldName()} has not given up its secrets here.`,
-    `You study the ${noun}. The Aetheric haze around ${aroundPronoun} thickens, then settles.`,
+    `You study the ${noun}. The ${getEnergyAdjective()} haze around ${aroundPronoun} thickens, then settles.`,
     `You inspect the ${noun}. Whatever was here once, this is what remains.`,
   ];
   const wilderness = [
