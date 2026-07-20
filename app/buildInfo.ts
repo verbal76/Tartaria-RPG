@@ -16416,4 +16416,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Two rules off for codebase-fit (documented in the config): react-hooks/rules-of-hooks (store action
 // methods named with the "use" verb) and no-useless-assignment (try/catch fallback inits). Dev-tooling +
 // CI-config only; no app code or shipped bundle changed. Verified: npm run lint exits 0.
-export const OTA_BUILD_ID = '2026-07-20-880-lint-blocking-gate';
+// 2026-07-20 OTA-881 (Aetherstone Thesis flavor — port of HAL OTA-904) — first use of the owner's new
+// canon doc (docs/aetherstone-thesis). Additive lore, no retcon: a new discoverable concept
+// `zalmar_overload` (the radiative-Aether-harvest → vacuum-seal-shatter → substratum-liquefaction → Mud
+// Flood → Aetherstone-calcification chain, keyworded to "why the water rose" / "what it left buried",
+// weaving in the Grand Spire of Etheria, the Hwang Radiative Principles, the Soldani Crystalline Theorems,
+// "quintessence"), a one-clause enrichment of the thin `aetherstone` concept (trapped Etherium), and the
+// Mud Golem bestiary line's canonical origin (thermodynamic hubris). Three-way terminology (Aether /
+// Etheric / Etherium) used additively. Data-only; Tartaria canon. Verified: lore tests green.
+export const OTA_BUILD_ID = '2026-07-20-881-aetherstone-thesis-flavor';

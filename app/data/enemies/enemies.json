@@ -750,7 +750,7 @@
   },
   {
     "name": "Mud Golem",
-    "flavor": "A slab of packed clay walking on borrowed purpose; blunt force cracks what blades cannot.",
+    "flavor": "A slab of packed clay walking on borrowed purpose — flood-sludge that woke where the trapped Etheric charge ran hottest, a scrap of the empire's own thermodynamic hubris up on its feet. Blunt force cracks what blades cannot.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 8",
     "attack": "Slam",
