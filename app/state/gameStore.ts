@@ -28643,36 +28643,19 @@ function shuffleSliceSeeded<T>(arr: readonly T[], n: number, seed: number): T[] 
 // the player wouldn't have noticed on a casual pass. Pure flavour —
 // no inventory grant — but lands the "search wall for secret writing"
 // promise from the design call.
-const HIDDEN_TEXT_LINES = [
-  `You run a hand along the ${`{noun}`}. Etched faint under the dust: old Tartarian, three lines, the first word a name you do not know.`,
-  `You crouch low. A symbol surfaces under the dust on the ${`{noun}`} — the Aetheric eye, open. Whoever marked it left in a hurry.`,
-  `You feel the ${`{noun}`} with the flat of your palm. Carved into it, fine as a knife-cut: a date older than every kingdom on every honest map.`,
-  `You catch a glint on the ${`{noun}`}. A single character pressed deep, then crossed out by a second hand. Someone disagreed with the first one.`,
-  `You tilt your head. Light strikes the ${`{noun}`} at an angle the casual pass missed — a map fragment scratched in, four lines, a route to nowhere named.`,
-  `You wipe the ${`{noun}`}. Underneath, a child's name written badly, then a second hand has written 'rest now' in old Tartarian beneath it.`,
-  // 2026-05-25 OTA-039 — variety pass so repeat investigates don't
-  // recycle the same six lines. Each line is one beat: a scrap of
-  // history, a glimpse of who passed through, a clue the world
-  // never bothered to clean up.
-  `You brush dust off the ${`{noun}`}. Tally marks — fourteen of them. The fifteenth scratch starts but doesn't finish.`,
-  `You squint at the ${`{noun}`}. Two faction sigils overlap — Reclaimer and Forgotten Order — and someone's hammered a third on top, blunting both.`,
-  `You press your thumb to the ${`{noun}`}. Warm. Aetheric, faint, the way old crystal stays warm long after the field around it dies.`,
-  `You read the ${`{noun}`} slowly. "Buried but listening." The hand that wrote it pressed hard enough to crack the underlay.`,
-  `You find a maker's mark on the ${`{noun}`} — a stylised crown over an open hand. Mud Monarch, but the older kind. Pre-flood, before they fell to the dust.`,
-  `You lift dust off the ${`{noun}`}. Underneath, a price: '3 TC, no haggling.' The shop it belonged to is buried under whatever stands here now.`,
-  `You catch the ${`{noun}`} at the right angle. Aetheric residue clings to it in a pattern — a hand-print, slightly larger than yours, fingers spread.`,
-  `You trace the ${`{noun}`}. Numbers run along its edge: coordinates, in the old Tartarian grid the Reclaimers stopped using two centuries back.`,
-  `You find a hairline crack in the ${`{noun}`} and follow it. A single coin is wedged inside, mud-stuck. You leave it there. Some traditions you do not break.`,
-  `You read the ${`{noun}`}: a name list, twenty-three entries. Twenty-two are struck through. The twenty-third has a fresh question mark beside it.`,
-  // 2026-05-25 OTA-041 — indoor-friendly variants. Playtester noted
-  // the brick / hub-furniture lines were thin: "what can a brick ever
-  // tell you?" Three new beats keep the indoor reveals concrete:
-  // hollow walls, hidden seams, mortar marks. Each works on hub
-  // furniture without claiming "mud below" (which only fits outdoors).
-  `You tap the ${`{noun}`}. Hollow. The wall behind it carries a void someone meant to find — they marked the mortar with a single dot.`,
-  `You find a seam in the ${`{noun}`}. A folded slip of paper has been pressed into it, edge-first, where it would survive every flood that came through here.`,
-  `You catch a finger-smear of red mortar on the ${`{noun}`}. The Reclaimers paint this colour on the back of every relic they catalog. Someone tagged this and walked away.`,
-];
+const HIDDEN_TEXT_LINES: string[] = ((): string[] => {
+  // engine_Dev — built-in (Tartaria) hidden-text beats live in data now
+  // (app/data/lore/hidden-text-lines.json); only used in built-in mode
+  // (activeHiddenText() serves GENERIC_HIDDEN_TEXT_LINES to reskins). {noun} is
+  // substituted by the consumer; a pack overrides via the 'hiddenText' flavor key.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const data = require('../data/lore/hidden-text-lines.json') as { lines?: string[] };
+    return Array.isArray(data.lines) ? data.lines : [];
+  } catch {
+    return [];
+  }
+})();
 
 // engine_Dev — content-neutral hidden-text beats for NON-Tartaria packs. The
 // pool above is steeped in Tartaria proper nouns (old Tartarian, the Aetheric
