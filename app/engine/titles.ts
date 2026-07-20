@@ -283,6 +283,18 @@ export const WIRED_TITLES: TitleDef[] = [
 
 export const WIRED_TITLE_IDS: ReadonlySet<string> = new Set(WIRED_TITLES.map((t) => t.id));
 
+// OTA-915 — HIDDEN titles: shown on the titles screen as an undiscovered "?" until
+// the player has run into the questline that can earn them (so a fresh character
+// doesn't see a spoiler goal they've never heard of). Skyreacher is hidden until you
+// find your first Skyreacher Chart (see greatClimbs.greatClimbLoreDiscovered). An
+// earned title is always shown regardless.
+export const HIDDEN_TITLE_IDS: ReadonlySet<string> = new Set(['skyreacher']);
+
+/** True if this title is hidden until its questline is discovered. */
+export function isHiddenTitle(id: string): boolean {
+  return HIDDEN_TITLE_IDS.has(id);
+}
+
 // arb-fix — the canon `arbiter-titles.json` perk strings are tabletop lore
 // ("Once per day, …") and DON'T match the shipped implementation (passive,
 // always-on). This map is what the CharacterScreen shows for an EARNED title:

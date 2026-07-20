@@ -20,7 +20,8 @@ import { buildChronicle } from '../engine/chronicle';
 import { tideLabel } from '../engine/worldPulse';
 import { decayedMenace, menaceTier } from '../engine/menace';
 import arbiterTitlesData from '../data/lore/arbiter-titles.json';
-import { TITLE_PASSIVE_PERK, describeTitleEarned } from '../engine/titles';
+import { TITLE_PASSIVE_PERK, describeTitleEarned, isHiddenTitle } from '../engine/titles';
+import { greatClimbLoreDiscovered } from '../engine/greatClimbs';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { weatherStatModifiers } from '../engine/weatherEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -686,6 +687,9 @@ export function CharacterScreen() {
           {(() => {
             const allTitles = (arbiterTitlesData as { titles: Array<{ id: string; title: string; requirement: string; perk: string }> }).titles;
             const earned = new Set(player.earnedTitles ?? []);
+            // OTA-915 — a HIDDEN title (Skyreacher) reads as an undiscovered "?" until
+            // you've found its questline (your first Skyreacher Chart). Earned always shows.
+            const climbLoreKnown = greatClimbLoreDiscovered(worldMemory);
             // OTA-848 — provenance lookup: id → when it was earned.
             const logMap = new Map((player.titleLog ?? []).map((e) => [e.id, e]));
             const sorted = [...allTitles].sort((a, b) => {
@@ -704,6 +708,16 @@ export function CharacterScreen() {
                 </Text>
                 {sorted.map((t) => {
                   const isEarned = earned.has(t.id);
+                  // OTA-915 — mask a hidden, not-yet-discovered title as "???" so a fresh
+                  // character sees a slot to chase but not a spoiler name/requirement.
+                  if (isHiddenTitle(t.id) && !isEarned && !climbLoreKnown) {
+                    return (
+                      <View key={t.id} style={styles.titleRow}>
+                        <Text style={[styles.titleName, styles.titleNameLocked]}>◇ ??? — undiscovered</Text>
+                        <Text style={styles.titleRequirement}>A title whose path you haven&apos;t crossed yet.</Text>
+                      </View>
+                    );
+                  }
                   const isOpen = openTitle === t.id;
                   // OTA-848 — each title is singly tappable: expands to show HOW it
                   // was earned (the requirement / deed) and, for earned titles, WHEN

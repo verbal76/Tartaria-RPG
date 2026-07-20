@@ -16509,4 +16509,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // encounter. Reverence has teeth: destroying one lowers standing with the four revering factions; talking one
 // down raises it. Verified: ota914Aetherkin (module + data + kill-lowers / calm-raises store tests);
 // typecheck:ci + typecheck:tests + lint clean; full fast suite green. Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-891-the-aetherkin-flood-dead';
+// OTA-892 (GREAT CLIMBS — codex + title discovery-gating; port of HAL OTA-915) — three codex gaps closed:
+//   (1) LORE › PLACES — the five Great-Climb tower locations mask as "?" until you USE that tower's Skyreacher
+//       Chart (unlockedGreatClimbs); route affordance suppressed. Ordinary locations are never gated.
+//   (2) BESTIARY — the five summit bosses (Aurenthal / Draugveil / Magnetar / Zalmar's Cascade-Wraith / Ossika)
+//       are catalogued, gated on DEFEAT. NOT added to enemies.json (that pool is rolled for random wild spawns —
+//       a unique tower boss must never ambush you in open waste); projected from greatClimbs.SUMMIT_BOSS_BASES
+//       with a codex flavor each; built name matches so a kill lights the entry.
+//   (3) TITLES — Skyreacher stays hidden as "??? — undiscovered" until the questline is found (bought a chart /
+//       unlocked / crested — greatClimbLoreDiscovered); earned always shows.
+// Aetherkin were already bestiary-gated. Verified: ota915GreatClimbCodex; typecheck:ci + typecheck:tests + lint
+// clean; full fast suite green. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-892-great-climb-codex-gating';
