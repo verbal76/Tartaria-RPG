@@ -85,9 +85,10 @@ describe('OTA-910 — the Skyreacher armor set', () => {
       expect(p!.resistances).toHaveLength(3);
       // no duplicate resist types within a piece
       expect(new Set(p!.resistances).size).toBe(3);
-      // collect-only, uncraftable, unbuyable
+      // collect-only, uncraftable, unbuyable. tcBuy is read loosely because the
+      // engine-line CatalogArmor type doesn't declare it; the data carries it.
       expect(p!.tags).toContain('collect_only');
-      expect(p!.tcBuy).toBe(0);
+      expect((p as unknown as { tcBuy?: number }).tcBuy).toBe(0);
     }
   });
 
