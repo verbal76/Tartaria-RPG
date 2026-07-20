@@ -16408,4 +16408,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // name/type/rarity/HP/AC/range as one grouped label. Text size still rides the OS Dynamic-Type setting.
 // UI-only, additive accessibility props — no behaviour/layout/styling/logic/copy change. Verified: source
 // tsc clean + fast jest 467/467. 46 files.
-export const OTA_BUILD_ID = '2026-07-20-879-accessibility-sweep';
+// 2026-07-20 OTA-880 (lint → BLOCKING — port of HAL OTA-903) — the `lint` CI job never actually ran (no
+// ESLint flat config existed; under ESLint 9+ `eslint .` errored). Adds a real ESLint 9 flat config
+// (eslint.config.js) + the pinned toolchain (eslint, @eslint/js, typescript-eslint, eslint-plugin-react-
+// hooks) as devDependencies, and flips the job from continue-on-error to REQUIRED. The rule set is lean
+// and high-signal — only genuine-bug rules the tree already passes; stylistic/whole-tree-churn rules off.
+// Two rules off for codebase-fit (documented in the config): react-hooks/rules-of-hooks (store action
+// methods named with the "use" verb) and no-useless-assignment (try/catch fallback inits). Dev-tooling +
+// CI-config only; no app code or shipped bundle changed. Verified: npm run lint exits 0.
+export const OTA_BUILD_ID = '2026-07-20-880-lint-blocking-gate';
