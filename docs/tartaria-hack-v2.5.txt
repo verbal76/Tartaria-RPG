@@ -1,3 +1,21 @@
+================================================================================
+SHIPPED-STATE RECONCILIATION  —  updated 2026-07-20
+================================================================================
+This outline has been brought up to date with the SHIPPED APP, which has deviated
+significantly from this original design. Nothing here has been deleted. Current
+behaviour is inserted inline in marked blocks:
+
+   >>> SHIPPED 2026-07-20 — <topic> >>> ... <<< end SHIPPED
+        How the mechanic actually works in the app now. Where it conflicts with
+        the prose around it, the SHIPPED block wins (shipped code is canonical).
+   [PLANNED]
+        Design that is described here but NOT in the app yet — preserved, not built.
+
+Systems the app added that this outline never described are appended at the very
+end under 'SHIPPED SYSTEMS NOT IN THE ORIGINAL OUTLINE'. A full section-by-section
+drift audit lives in docs/tartaria-doc-vs-game-audit-2026-07-20.md.
+================================================================================
+
 Tartaria PrimaLife After the FloodWhat if the world we know is built upon the buried ruins of a civilization so advanced it mastered the very forces of nature?  Kevin ErnstHot Attic GamesTartaria PrimaLife After the FloodWhat if the world we know is built upon the buried ruins of a civilization so advanced it mastered the very forces of nature?  Kevin ErnstHot Attic GamesDO NOT COPYDO NOT COPY
 Tartaria Prima
 Life After the Flood
@@ -322,6 +340,17 @@ Superhuman feats, testing the very limits of reality.
 30+
 Surviving a fall from a great height with last-second intervention, battling an ancient Aetheric entity.
 Advantages and Disadvantages -
+
+>>> SHIPPED 2026-07-20 — Advantage / Disadvantage dice >>>>>>>>
+The app does NOT use D20+D6 / D10+D6. Advantage = roll 2d20, keep the HIGHER;
+Disadvantage = roll 2d20, keep the LOWER (both sides of combat). It is granted
+only by specific states, not a general Arbiter call: aiming -> advantage on the
+next attack, surprised -> disadvantage, cover -> the defender has advantage.
+On top of that the app layers a flat status-modifier pool the outline never had
+(aim +2, sprinting -2, cover +4/+8, quick-fire +2, distract +4, readied +2,
+stealthed +5, tired -1, exhausted -2, power-attack +2, defensive +2, poisoned -2).
+<<<<<<<< end SHIPPED
+
 During gameplay, The Arbiter, certain situations, abilities, or environmental factors may grant your character an advantage or disadvantage on an action. These mechanics affect how you roll for success:
 Advantage: When you have an advantage, you roll a D20 and a D6. You add the result of both dice and attribute modifiers to determine the total. This increases your chances of success by giving you a bonus die.
 Disadvantage: When you have a disadvantage, you roll a D10 and a D6 instead of a D20. The smaller dice combination imposes a 4-point handicap because the maximum total is lower. You still add any relevant modifiers, but your overall chance of success is reduced due to the smaller dice pool.
@@ -330,6 +359,20 @@ If you have an advantage on a roll to sneak past a guard, you roll a D20 and a D
 If you have a disadvantage, roll a D10 and a D6. If you roll a 7 on the D10 and a 2 on the D6, with the same +2 modifier, your total would be 11, making success less likely.
 These mechanics add strategic depth, rewarding players for gaining an advantage and making overcoming challenges harder when they’re at a disadvantage.
 Damage Types
+
+>>> SHIPPED 2026-07-20 — Damage types (13, not 10) + which ones actually proc >>>>>>>>
+The app ships 13 damage types: the 10 here plus COLD, ACID, CORRUPTION, and
+PSYCHIC (psychic resolves as aetheric; acid/corruption are coating-only). Only 6
+of the 10 original types carry a status proc in the app, with app-set chances:
+piercing->bleed (1d6-2/rd), slashing->armor_severed (-2 AC), burn->burn_scar
+(+aetheric vulnerability), electrical->paralyzed, stun->stun, poison->poisoned;
+cold->chilled (-DEX). [PLANNED] Degradation, Bludgeoning, Aetheric, and Radiation
+keep their described effects but currently proc NOTHING (resistance/flavor only).
+The app also adds damage aliases (force->aetheric, frost/ice->cold, shock->
+electrical), an armor resistance ladder, and per-enemy weakness rolls (x1.5 weak
+/ x0.5 soft / x0.25 wall).
+<<<<<<<< end SHIPPED
+
 Degradation: Corrosive damage caused by Etheric-charged mud or sludge, rapidly decaying organic matter, armor, and weapons. Degradation effects often weaken defenses, reducing armor effectiveness or weapon durability by one step per prolonged exposure (typically lasting until the affected item is repaired). Victims with degradation damage feel a weakening sensation, and their gear may require maintenance after encountering significant degradation damage.
 Bludgeoning: Physical impact damage from blunt force, such as falling debris, collapsing tunnels, or blunt relic weapons. Bludgeoning damage can knock creatures prone, preventing movement until they use half their movement to stand. In severe cases (Arbiter’s discretion), bludgeoning can temporarily daze a creature, causing a disadvantage on Dexterity-based attacks and checks for 1 round due to disorientation.
 Burn: Intense Aetheric heat damage caused by overloaded relics or high-energy Etherstone. Burn effects can leave residual Etheric scars that weaken a creature’s resistance to further Etheric effects for 1d6 rounds. During this time, creatures are particularly vulnerable to burn or aetheric attacks, and their natural healing may be halved until they rest for an hour or use magical healing.
@@ -341,6 +384,18 @@ Radiation: Intense Etheric light and cosmic energy from Etheric cores or relics,
 Slashing: Physical cutting damage from sharp edges, relic blades, or constructs with slicing appendages. Slashing damage from Etheric constructs can sever armor straps or slice through bindings, lowering armor class by 2 points until repaired. A creature with slashing injuries takes an additional 1d6 damage each turn if it attempts any action that requires a dexterity check.
 Stun: Non-lethal shock or Etheric disruption that causes temporary incapacitation, often lasting 1 round. While stunned, a creature cannot move, speak, or take physical actions, and runecasting is impossible due to disrupted concentration. Stunned creatures automatically fail Dexterity saving throws, have a disadvantage on all other saves, and cannot react or use instants until the stun effect wears off.
  Combat Order of Actions  
+
+>>> SHIPPED 2026-07-20 — Combat order — nat-20, and Initiative is cosmetic >>>>>>>>
+Structure matches (declare -> d20 vs AC -> damage -> the opposition counters).
+Two changes: a natural 20 AUTO-HITS and DOUBLES the damage dice (both player and
+enemy); a natural 1 auto-misses. INITIATIVE is still rolled (a d10 vs d10 each
+swing) but is now PURELY COSMETIC — it only prints "you seize the initiative" /
+"the enemy moves first"; it does NOT gate turn order (the enemy counter always
+follows the player's action). The app also adds enemy dodge traits, boss bonuses
+(+6 AC, +1d6/hit), and multi-enemy pack scaling with target-swiping.
+[PLANNED] group initiative and the "Quick Events" challenge (single-player app).
+<<<<<<<< end SHIPPED
+
 In Tartaria Prima, combat is structured to flow smoothly while allowing for tactical decisions, flexibility, and dynamic action. The following outlines the order of actions during a typical combat encounter.
 1. Roll Initiative & Set the Scene
 Before combat begins, both sides roll for initiative to determine which group acts first in each round. The Arbiter rolls for the enemy, and one player rolls on behalf of the group. The higher roll determines whether the players or enemies go first throughout the encounter.
@@ -369,6 +424,13 @@ Once all attacks and actions are rolled, their effects are resolved:
 Damage: Players roll damage dice for their successful attacks. The enemy takes damage, adjusted for any immunities or resistances (e.g., the Mud Golem may be immune to non-magical physical damage).
 Non-Combat Actions: If a player attempts a non-combat action (e.g., collapsing rubble or climbing), they roll against the difficulty set by the Arbiter. If successful, the action is resolved and may affect the battlefield (e.g., creating obstacles or dealing with environmental damage).
 Instants: Some abilities or powers can be triggered at any point during the round. Players can use instants during their turn or in reaction to an enemy’s action.
+
+>>> SHIPPED 2026-07-20 — Instants >>>>>>>>
+[PLANNED] The Instants system (free reaction abilities usable at any time,
+regardless of turn) is NOT implemented in the app. The nearest shipped analogues
+(readied/held strike, quick-fire) are turn-cost actions, not free reactions.
+<<<<<<<< end SHIPPED
+
 Example: The Mage successfully casts Etheric Pulse and rolls for damage, but the Mud Golem’s resistance to magic reduces the final damage taken.
 5. Opposition’s Turn
 After the players’ turn is complete, the enemies act. The Arbiter controls the enemies, rolling for their attacks, saves, or special abilities.
@@ -451,6 +513,18 @@ Group Initiative: When a fight begins, the players roll group initiative to dete
 Player-Determined Turn Order: After rolling initiative, players decide among themselves the order in which they will take their turns. This allows them to coordinate their actions and create strategic plans to deal with enemies.
 Quick Events: For sudden, jump-scare-like events initiated by the Arbiter, only one player rolls initiative for the team. If they pass, the group can react to the event before being automatically affected by it; if they fail, the event happens before they can respond. The player must let the arbiter know they want to challenge the quick event, and the Arbiter must agree that this is possible. The player that challenged and ONLY the player that challenged describes his plan and rolls against it.
 In-Game Distances
+
+>>> SHIPPED 2026-07-20 — Distance bands (4, renamed, no feet) >>>>>>>>
+The app uses FOUR range bands and no foot measurements: DISTANT / FAR / MID /
+CLOSE (the old Arm's Reach maps to CLOSE, old Close to MID, old Far to FAR, plus
+a new outermost DISTANT). Weapons carry a reach class tied to the bands: ranged /
+runecaster reach from distant inward; throwables from far inward; long/reach melee
+(spear, pike, halberd, glaive, lance) from mid inward; ordinary melee and bare
+hands are close-only. Combat opens at the farthest band any combatant can act
+from; "approach" steps one band closer. An out-of-reach swing takes -5 (a blind
+swing); a point-blank ranged shot gets +2.
+<<<<<<<< end SHIPPED
+
 Arm’s Reach:
 Description: 1-10 feet. This is when characters are in immediate proximity to each other—within striking distance for melee attacks or interactions with objects. In Combat: Melee combat happens at this range. Weapons like swords, knives, and fists are used. Grappling or other close-quarters abilities can be performed.
 Movement: Moving within Arm’s Reach requires no special action; it’s instantaneous since you’re next to your target.
@@ -488,6 +562,14 @@ Example:
 If your Strength is 6, you can use an Uncommon two-handed weapon but not a Rare or Legendary one. Until you reach the required Strength score, higher-tier weapons are unusable.
 Also:
 Skilled Weapon Usage Mechanic
+
+>>> SHIPPED 2026-07-20 — Skilled Weapon Usage >>>>>>>>
+[PLANNED] The "stat = double the weapon's requirement -> upgrade one dice tier"
+mechanic is NOT implemented. Also [PLANNED]: statRequirement does not lock/gate
+equipping in the app (it is carried as data but unused), and the switching
+penalty (empty-handed for one turn when swapping weapon/runecaster) is not built.
+<<<<<<<< end SHIPPED
+
 Weapons are bound to a character’s ability scores, determining the damage they can inflict. If a character has an ability score that doubles the required amount to wield a weapon, they can wield that weapon with a heightened level of proficiency, unlocking a higher damage roll.
 Example Rule:You are considered highly skilled if a weapon requires 5 Dexterity and your character has 10 Dexterity. Instead of using the standard damage dice for its tier (e.g., rolling 2d6 for an uncommon dagger), you can upgrade to the next tier of dice (e.g., rolling 1d20 as if it were a Rare weapon). This reflects mastery over the weapon’s use, allowing for more powerful attacks.
 Limitations:
@@ -497,6 +579,17 @@ This applies only to physical weapons, not runecasters or magical items.
 Runecasters
 If you use Aetheric power, your character will wield runecasters to channel Aetheric energy. Runecasters allow Aetheric wielders to manipulate the Aetheric energy left behind by the fallen Tartarian Empire. These powers are tied to your Intelligence score, and like weapons, runecasters are divided into Common, Uncommon, Rare, and Legendary tiers.
 Spell Tiers by Intelligence:
+
+>>> SHIPPED 2026-07-20 — Spell tiers / casting >>>>>>>>
+The tiered spell list is NOT wired in the shipped app — casting is resolved as a
+single flat INT skill check at DC 12 (Mud Dwellers +2 INT to cast; Aetherborn and
+Mud Dwellers get Aethercraft DC modifiers). The runecasters players actually use
+are ordinary weapons of kind "runecaster" (no per-tier INT gate). [PLANNED] the
+INT 1-4 / 5-8 / 9-10 / 11-12 tier ladder here (and the separate tiered spells data
+file, which is present but imported nowhere). See also the new AETHERCRAFT section
+appended at the end for the discipline the app actually ships.
+<<<<<<<< end SHIPPED
+
 Common (1-4 Intelligence): Basic powers with small effects or limited damage. Used in arm’s reach and close ranges.
 Uncommon (5-8 Intelligence): More versatile powers with moderate damage, used in arm’s reach and close ranges.
 Rare (9-10 Intelligence): Powerful Aetheric energy with complex effects, used in all three ranges; effects diminish at far range; utilize an even/odd roll with a d6 to see if it lands.
@@ -524,6 +617,14 @@ You can take any action your character’s hands could perform, except using a w
 Example:
 If you’re switching from a rune caster to a bow, you could spend the turn throwing a handful of dirt at an enemy to blind them or grabbing a ledge to hang out of range. You can still defend yourself but can’t attack with a weapon or cast a spell during this turn.
 Runecaster Crafting Process and Ingredients
+
+>>> SHIPPED 2026-07-20 — Runecaster crafting >>>>>>>>
+Shipped recipes are: 1x "Blank Runecaster Casing (rarity)" + two ordinary reagents
+(e.g. Flame of Aether = casing + Aether Mud + Spider Silk), gated at effective
+INT 11 (the INT-11 gate MATCHES the outline). [PLANNED] the relic + transmutative-
+material structure described here survives only in an unused data file.
+<<<<<<<< end SHIPPED
+
 Runecaster crafting is a scientific process in Tartaria Prima, using ancient Tartarian techniques to harness the Aetheric energy infused worldwide. Aetheric energy acts like radiation, emanating from materials left behind after the empire’s fall. By placing these materials into a blank rune caster casing, you can transmute that energy into specific effects, such as fire, lightning, or force.
 Runecaster Crafting Components:
 A blank rune caster casing (Common, Uncommon, Rare, or Legendary).
@@ -540,6 +641,20 @@ Rare/Legendary Weapons: These often come with instant abilities, such as switchi
 Upgrading weapons with runecasters makes them more powerful, giving you unique combat advantages without directly boosting your character’s offensive and defensive power.
 Parrying an Attack  
 Parry System in Tartaria Prima
+
+>>> SHIPPED 2026-07-20 — Parry -> Dodge (wholesale replacement) >>>>>>>>
+The entire parry ruleset below is [PLANNED]/superseded. In the app, parry / block
+/ deflect / shield all route to a single DODGE gamble: an opposed d20 + DEX vs the
+enemy's full attack total. WIN -> take zero damage (even against a blow that beat
+your AC) and gain "perfect opening" (your next strike deals x2 damage dice). LOSE
+-> you "dodge into it" and the blow lands at x2 damage. An enemy natural 20 pierces
+the dodge; an enemy fumble auto-wins it. Dodge costs 1 stamina + 6 minutes and
+trains DEX/STE (capped 3 per scene). There is NO weapon-durability breakage roll
+and NO damage-subtraction — the doc's style dice (1h 1d10 / ranged 1d6 / dual +
+runecaster 1d6 twice), the best-of-3 odd/even-d20 breakage, and the runecaster-
+breaks-permanently rules are all [PLANNED], not shipped.
+<<<<<<<< end SHIPPED
+
 The parry system in Tartaria Prima allows players to reduce incoming damage from physical attacks by attempting to deflect or block with their weapon. Parrying is available to characters using single-handed weapons, ranged weapons, dual-wielders, and even rune caster users, but there are risks involved—each parry comes with a chance that your weapon will break. This makes parrying a strategic decision, as overuse can lead to losing important gear.
 Who Can Parry?
 Single-Handed Weapon Users: Characters using single-handed melee weapons.
@@ -571,6 +686,14 @@ Core Components: You can retrieve the Aetheric relic or any additional magical i
 Example:
 You parry with a powerful rune caster and reduce an incoming 8-point physical attack to 2 points of damage. However, after the parry, you roll three times on a d20 for durability and get 6, 17, and 13 results. Since two of the rolls are odd, your rune caster breaks. You can no longer use the rune caster; salvage the aetheric core and crystal used to create it.
 Weapon Repair and Rune caster Salvage
+
+>>> SHIPPED 2026-07-20 — Repair cost >>>>>>>>
+Repair is NOT "half the weapon's cost". The app uses either 1 TC per missing
+durability point (with an "Architect's Eye" -5%/rank discount) at a vendor, or a
+material repair costing 2x the item's scrap output at the crafting bench. See the
+new DURABILITY & TEMPER section appended at the end.
+<<<<<<<< end SHIPPED
+
 If a weapon breaks after a failed durability roll, it can be repaired by either:
 Vendor Repair: Take the weapon to a vendor and pay a fee equal to half the weapon’s cost in Tartarian coins.
 Party Repair: A party member with the necessary skills can repair the weapon, but you still lose half the weapon’s value in Tartarian coins (deducted from your total, not paid to the party member).
@@ -612,6 +735,14 @@ Roll for Parry: Since you are a rune caster user, you roll 1d6 twice, getting a 
 Roll for Durability: After the parry, you roll your d20 three times, getting results of 11, 19, and 6. Two of the three rolls are odd, so your rune caster breaks.
 Salvage the Rune caster: You cannot repair the rune caster, but you recover its Aetheric core and a crystal shard, which you can store for future crafting.
 Armor Class (AC) Mechanics for Tartaria Prima
+
+>>> SHIPPED 2026-07-20 — AC — formula matches, enemy AC is computed >>>>>>>>
+Total AC = Base + Armor + Shield + Racial/Environmental — MATCHES. Two additions:
+enemy AC is COMPUTED, not authored flat — base = clamp(5 + abilityPoint, 5, 18) +
+trait bonus + (boss ? 6 : 0); and combat statuses shift AC (armor_severed -2,
+cover +4/+8, stone ward +4, a title ruins-defense bonus).
+<<<<<<<< end SHIPPED
+
 Armor Class (AC) represents a character's ability to avoid being hit in combat. It combines natural agility, racial traits, and any armor or shields they wear. Enemies will roll attack rolls against the player's AC to determine if their attacks land successfully.
 Base AC by Race
 Each race in Tartaria Prima starts with a base AC, representing their natural defenses before accounting for armor, shields, or environmental bonuses. Players can reference the Base AC Table to determine their starting AC based on their race:
@@ -675,6 +806,14 @@ If the attack roll meets or exceeds the character's AC, the attack hits, and the
 If the attack roll is lower than the character's AC, the attack misses.
 For example, the attack hits if an enemy rolls a 15 to hit Taryn, whose AC is 11. If the same enemy rolls against Vesper's AC of 16, the attack will miss unless the roll is 16 or higher.
 Barehanded Combat in Tartaria Prima
+
+>>> SHIPPED 2026-07-20 — Barehanded damage (follow the table) >>>>>>>>
+The app follows the TABLE, not the contradictory "Explanation" prose: Sentinel
+1d10 (lands only on an even natural roll), Aetherborn 1d6-2, Giant 1d6+2, Unknowing
+1d6, Mud Dweller 1d6-3, Reclaimer 1d6, Mud Golem 1d6. [PLANNED] the "barehanded =
+disadvantaged" attack-roll penalty is not applied.
+<<<<<<<< end SHIPPED
+
 A character may resort to barehanded combat when left without weapons or runecasters. This is the least effective form of fighting, used when no other options are available. Each race has a base damage they can deal with when fighting with their fists, feet, or body.
 Base Barehanded Damage by Race
 Race
@@ -716,6 +855,19 @@ Barehanded attacks do not trigger special abilities (such as bonus damage or mag
 Barehanded attacks do not scale with rarity and can’t be modified with runecasters or relics.
 Characters fighting barehanded are disadvantaged (not at a disadvantage), encouraging them to find another weapon or rune caster quickly.
 Resting to Recover HP –
+
+>>> SHIPPED 2026-07-20 — Rest restores STAMINA only — food heals HP >>>>>>>>
+Rest in the app restores STAMINA ONLY and NEVER heals HP ("rest grants no HP").
+HP is recovered exclusively by EATING FOOD. Parser-routed rest advances 8 hours;
+the store rest advances 4-7 hours. The ambush check is a probability (8% in safe
+zones, 22% in the wild, x a time-of-day multiplier) and fires AFTER you recover
+(you wake at full stamina, then face it), and the ambush enemy's rarity is capped
+by your HP so a starter can't draw a Legendary. A clean rest also sheds 1
+corruption; rest is refused when there is nothing to recover; weather can chip you
+per hour while resting. [PLANNED] the 2h/24h rest choice, the 2d6 / full-HP heals,
+and group rest (single-player app).
+<<<<<<<< end SHIPPED
+
 Group Rest: When a player chooses to rest, the entire group must rest together. This keeps the party moving and recovering together, maintaining balance within the group.
 Two Types of Rest:
 2-Hour Rest:
@@ -741,6 +893,19 @@ Better Gear: Players will seek out and acquire more powerful weapons, armor, and
 Titles and Faction Affiliations: Characters can earn titles or join factions, which provide special bonuses and abilities, giving them access to resources, special abilities, or even unique powers depending on the organization they ally with.
 This system allows for a unique form of progression, where instead of traditional leveling, players enhance their survivability and power through gear, titles, and attribute boosts, gaining HP through Strength and Intelligence increases.
 Character Creation  
+
+>>> SHIPPED 2026-07-20 — Character creation — extra stat, stamina, kit, factions >>>>>>>>
+The app adds pieces the outline never had: a SIXTH core stat, STEALTH (STE),
+rolled at creation with a per-race die (Giant 0, Mud Golem 1d4, Sentinel/Unknowing
+1d6, Aetherborn 1d8, Mud Dweller 1d10, Reclaimer 1d12) — here Stealth was a DEX
+skill, not an attribute; starting STAMINA (12 + STR/2); a UNIVERSAL starter kit
+given to everyone (Aetheric Torch, Trail Rations x3, Water Bottle, Aetheric
+Locket); a per-FACTION starter knife; a per-race auto-equipped primary weapon (the
+app replaced the player's weapon-choice step with a fixed grant); and, at faction
+choice, NINE factions (see The Five Factions) plus a per-faction starting tile and
+a seeded starting standing.
+<<<<<<<< end SHIPPED
+
 Use the Character Creation Sheet             
 Character creation is completed in a few simple steps:
 Choose your character's Name.
@@ -808,6 +973,16 @@ Eternal Dynasty
 OverviewThe Eternal Dynasty is the oldest and most secretive faction, composed of Aetherborn—descendants of Tartaria’s noble bloodlines whose genes have awakened Aetheric powers. These individuals believe themselves to be the rightful rulers of the world and view the collapse of Tartaria as a divine test of their purity. The Dynasty has operated from the shadows for centuries, manipulating world events to ensure their bloodline survives and flourishes. Their ultimate goal is to reclaim Tartaria’s lost cities, reactivate the ancient Aetheric cores, and reshape the world under their rule.
 Aetherborn possess supernatural abilities—such as telekinetic control, energy manipulation, and even temporal shifts—making them formidable in battle and political maneuvering. However, not every descendant carries the awakened Aetheric gene, so the Dynasty constantly searches for those with potential. Only the most powerful and pure can rise within the ranks, while the weak or unworthy are cast aside, sometimes sacrificed to fuel the Dynasty’s Aetheric machines.
 Roll for Starting abilities:
+
+>>> SHIPPED 2026-07-20 — Starting rolls >>>>>>>>
+Starting TC (Nd6 x 10 per race) and Starting HP (5d10, +15 Giant / +10 Mud Golem)
+MATCH the app. The app additionally rolls the STEALTH stat (per-race die, above)
+and sets starting stamina. [PLANNED] the full ~20-skill list (Prowess, Acrobatics,
+Chicanery, Aetheria, Investigation, First Aid, Woodsman, Whisperer, Insight, …):
+the app keeps no per-skill scores — race traits map to ad-hoc per-action bonuses
+instead. [PLANNED] "+10 HP per Strength increase" growth rule.
+<<<<<<<< end SHIPPED
+
 Players roll 1D10 for each of the following core attributes:
 Strength: Determines physical power and affects HP gain; +10 HP for every Strength increase outside of this initial roll. HP bonuses are gained even from item modifiers.
 Dexterity: Influences agility, balance, and reflexes.
@@ -918,6 +1093,15 @@ Architectural Sentinels
 10
 +1 AC when wearing Aaetheric gear
 Explanation of Base AC by Race
+
+>>> SHIPPED 2026-07-20 — Base AC by race (shipped values) >>>>>>>>
+Shipped baseAC: Tartarian Giant 12, Aetherborn 11, Reclaimer 10, Architectural
+Sentinel 10, Unknowing Masses 10, Mud Dweller 10, Mud Golem 8. (Only Mud Golem
+matches this doc; the old 5-9 spread is raised/compressed to 8-12.) Conditional
+bonuses mostly hold, but the Sentinel runic-gear bonus is +2 (not +1). The
+contradictory "Explanation" prose below should be read as superseded by these.
+<<<<<<<< end SHIPPED
+
 True Tartarians (Base AC: 10):Tartarians start with a standard AC but gain a +1 bonus when using Aetheric relics, making them more powerful as they attune to ancient gear. Early on, they need basic armor for protection but become formidable with relic-based gear.
 Aetherborn (Base AC: 11):Aetherborn have a slight natural AC advantage due to their connection to Aetheric energy. They gain a +1 bonus when using Aetheric powers or runecasters, reflecting their magical nature.
 Tartarian Giants (Base AC: 12):Giants have the highest natural AC due to their sheer size and strength, making them tougher than most. Their massive bodies make them harder to hit but can be balanced by slower movement or fewer armor options early on.
@@ -1136,6 +1320,17 @@ Basic field repair kit.
 Tools for mending basic machines and gear.
 20 TC
 Starting Clothing / Armor  
+
+>>> SHIPPED 2026-07-20 — Starter wardrobe >>>>>>>>
+[PLANNED] This 7-slot starter wardrobe (Headgear / Mask / Torso / Leg / Outerwear /
+Footwear / Gloves, each +1 to a stat) is DESIGNED but NOT granted at character
+creation in the app — the item definitions exist in the armor data, but nothing
+equips or inventories them at creation. The only worn starter pieces a new
+character actually receives are the 1-2 boots/masks/gloves that come through the
+per-race exploration starter items. This is the single largest creation-time gap.
+[PLANNED] the enforced 10-slot "Player's Backpack" cap.
+<<<<<<<< end SHIPPED
+
 Write down your race starter clothing and stats on your character creation sheet. This is your starter clothing and can be sold to the first vendor. After your starter clothing and armor, you can wear any race clothing or armor you can obtain. Sizing is not a concern. Record your starter gear from 6 tables below; each table is a unique area where the gear is worn.
 Player’s Backpack
 Each player begins with a Player’s Backpack, a standard-issue backpack worn on the back. This backpack can hold up to ten items, providing essential storage for adventurers in Tartaria. The backpack is sturdy but simple, designed for survival and exploration without offering extra protection or enhanced features. Importantly, this is the only backpack available in the game and cannot be upgraded or replaced.
@@ -3107,11 +3302,28 @@ Legendary (11-12 Intelligence)
 Crafting and Distribution: Players with 11 Intelligence can craft and share runecasters with others, giving the party greater access to magical abilities. Those possessing these runecasters can use the powers, provided they have the necessary Intelligence.
 This structure emphasizes the importance of Intelligence for spellcasting while providing flexibility in how players access and utilize their abilities.
 Acquiring Items from NPC Vendors
+
+>>> SHIPPED 2026-07-20 — Vendors >>>>>>>>
+The app ships ~30 vendors (this outline promises 20): the named vendors here are
+carried, plus one faction-tagged and several race-tagged vendors were added. See
+also the new WANDERING NPCS note under Reputation. [PLANNED] the one-time ephemeral
+"camp vendor" rule (settle your loadout, never heard from again).
+<<<<<<<< end SHIPPED
+
 Before leaving camp for the first time, there will be an NPC vendor with a limited selection of items selected by the Arbiter. You may sell unwanted gear and use those funds and your starter funds for items to complete your loadout before leaving camp. This vendor is never heard from again in the game, and all items sold to them or offered by them are gone for the remainder of the campaign.
 Additional NPC vendors found in the game world
 Players can acquire new weapons, armor, and gear from NPC vendors or find them during exploration. Any item listed in this guide's various weapons, armor, and gear tables can be found and purchased, provided the Arbiter (the game master) determines that the vendor has it in stock.
 NPC vendors are scattered worldwide, and players will encounter them in villages, cities, marketplaces, and even hidden outposts. These vendors offer a wide variety of items for sale, ranging from common everyday gear to rare and legendary artifacts.
 Persuasion and Hidden Inventory
+
+>>> SHIPPED 2026-07-20 — Persuasion / hidden inventory >>>>>>>>
+[PLANNED] The 1d20 + CHA persuasion roll to make a vendor "look in the back" and
+reveal hidden stock is NOT implemented. The app's Charisma-vendor levers are
+instead a per-faction rapport quest that unlocks a CHA-scaled price discount, and
+an adversarial "steal from vendor" path (caught theft costs standing). See the new
+REPUTATION & STANDING section appended at the end.
+<<<<<<<< end SHIPPED
+
 While many vendors may have a limited stock based on their specialty, players can sometimes persuade them to look in the back for additional or hidden items. If the vendor doesn’t immediately have the item the player is looking for, the Arbiter can allow the player to attempt Persuasion; this is based on an Arbiter's difficulty roll. Success on the roll may convince the vendor to reveal hidden or rarer items they weren’t initially offered. These rolls are a 1d20, and only a charisma modifier may be added.
 The difficulty of the Arbiter assessment can vary based on the item's rarity, the relationship with the vendor faction, and the specific situation.
 On a successful difficulty roll, the vendor should find a rare or uncommon item and offer it to the player for a negotiated price.
@@ -3304,6 +3516,16 @@ Daily Life (After Awakening):Once the Aetherborn begin to manifest their powers,
 In their search for answers, the Aetherborn realize they may be the last of Tartaria’s royal bloodlines, heir to a throne buried under centuries of mud and rubble. With this knowledge comes great responsibility—and great danger. Whether they embrace their destiny or flee from it, their actions will ripple through the world, for better or worse.
 Role in the World:The Aetherborn are hidden heirs to Tartaria’s throne, torn between their ordinary upbringing and extraordinary destiny. As players, they must navigate the complexities of their dual heritage, facing the challenges of their newfound powers while uncovering the secrets of their noble lineage. Whether they embrace their birthright or forge a new path in the modern world, their decisions will have far-reaching consequences, and their powers may change the fate of Tartaria itself.
 The Five Factions:
+
+>>> SHIPPED 2026-07-20 — Factions — NINE now, not five >>>>>>>>
+The app ships NINE joinable factions: the five here (Mud Monarchs, Eternal Dynasty,
+Forgotten Order, Reclaimers Guild, True Tartarians) PLUS four promoted from lore to
+full factions: CONSPIRACY ARCHITECTS, SERVANTS OF THE GIANTS, STONE BUILDERS, and
+TARTARIAN REVIVALISTS (led by Sasha Ironheart). Faction mottos are not carried in
+the app data. See the new REPUTATION & STANDING section for how standing, joining,
+rivalries, and rapport actually work.
+<<<<<<<< end SHIPPED
+
 Mud Monarchs: Architects of a False World Order
 Faction Name: Mud MonarchsMotto: "In shadow, we reign. In silence, we shape the world."
 OverviewThe Mud Monarchs are the secretive rulers of the modern world, descended from Tartaria’s noble class. They survived the Great Mud Flood by taking refuge in the highest, untouched remnants of the empire’s cities. Within these towering citadels, they preserved fragments of Tartaria’s Aetheric technology and used it to manipulate history, erasing Tartaria’s existence from the world’s collective memory. Over centuries, they established themselves as the global elite, pulling the strings of governments, economies, and societies while the world below forgot its true heritage.
@@ -3329,6 +3551,16 @@ Aetheric Hoarder: Gain a +2 bonus when interacting with Aetheric devices. Your c
 Master of Shadows: Gain a +2 bonus to Deception and Persuasion. You have been trained to manipulate others without their awareness.
 Relic Keeper Knowledge: Once per session, tap into the Monarchs’ archives to gain critical information on Aetheric technology or political matters.
 Requirements to Join the Mud Monarchs
+
+>>> SHIPPED 2026-07-20 — Joining a faction (all factions) >>>>>>>>
+The app does NOT enforce the per-faction multi-gate requirements (TC assets,
+Faction Points, owning a relic, an earned title, skill minimums). Joining ANY
+faction requires ONE thing: reputation STANDING >= 20 with it. [PLANNED] FACTION
+POINTS as a currency, and the title / skill / asset join-gates below — none are
+wired. Standing is earned/lost through play (quests, kills, honest spending,
+theft); see the new REPUTATION & STANDING section.
+<<<<<<<< end SHIPPED
+
 Wealth or Resources: Must control an organization, city, or faction worth at least 10,000 TC in assets, proving your influence in the modern world.
 Faction Points: Accumulate 10 faction points by completing covert missions that undermine rival factions, retrieve Aetheric relics, or silence those threatening to expose Tartaria’s true history.
 Aetheric Knowledge: You must possess or have exclusive access to at least one functioning Aetheric relic or device, showcasing your understanding of Tartaria’s technology.
@@ -4967,6 +5199,18 @@ Legendary
 +4 Dexterity, +3 Strength
 55/20
 Monsters and Enemies  
+
+>>> SHIPPED 2026-07-20 — Bestiary (~120, this roster carried in order) >>>>>>>>
+The app carries this bestiary EXACTLY and in order (Mud Boar … Steam Spider), then
+appends a whole high tier the outline never lists (~120 enemies total): Mud Drake,
+Aether Golem, Bog Dragon, Metal Hydra, Mud Titan, Obsidian Sentinel, Mud Monarch,
+Iron Titan, Aetheric Phoenix/Leviathan/Kraken, Mud Lich, Aetherkin, Reclaimer
+Ambusher, Black Cloak Agent ("the Hollow Edge"), Hollow King, Voidspawn Matriarch,
+Tartarian Reaver, Disc Hijacker, Mud Monarch Purifier, and the nine Core Guardian
+high-priests (see the new CORE GUARDIANS section). Each shipped enemy also carries
+a one-line flavor entry surfaced in the in-game discovery codex.
+<<<<<<<< end SHIPPED
+
 Name
 Type
 Ability Points (AP)
@@ -7227,6 +7471,19 @@ In the most active Etheric zones, storms of pure energy rage across the landscap
 Explorers caught in these storms have reported hallucinations, where reality seems to shift and buckle under the pressure of the Etheric energy. Some see glimpses of Tartaria's past, ghostly figures walking through the ruins from another time, carrying out their long-forgotten tasks as if unaware of the world’s collapse. Others experience intense mental and physical strain, their minds overwhelmed by the raw energy that pulses through the storm. There are stories of entire teams of explorers disappearing without a trace, swallowed by the Etheric energy, and never seen again.
 Yet despite these dangers, Etheric storms are often seen as opportunities. When these storms rage, they sometimes expose hidden entrances to buried Tartarian vaults or reveal energy signatures that point to long-lost Etheric cores, the most coveted relics of Tartaria's past. Some believe these storms are the last vestiges of the ancient defenses that once protected Tartaria, meant to keep intruders away from the empire’s secrets. But others believe the storms are a natural consequence of the Etheric energy trying to reconnect with its source, a sign that the old technology is waking up again.
 The Guardians of the Ether: Automated Defenses and Dormant Constructs
+
+>>> SHIPPED 2026-07-20 — The Guardians -> the Aether-Born Order >>>>>>>>
+In the app the ambient "Guardians of the Ether" (automated defenses / dormant
+constructs) still exist as the Architectural Sentinel / Aether Golem / Mud Golem
+ENEMIES. But "the Guardians" as a proper noun now means the AETHER-BORN ORDER: nine
+hand-authored BOSS high-priests (Sentinel-Priest Vaelka, Heir Atalan-Drowned, Iron
+Litany Brother Konrad, Mother Drakovna, Voronov-Beneath High Cantor, Sealwarden
+Tobiel, Hierophant Mara-of-Yuldra, Riverbinder Ostros, Veilkeeper Inarra), each
+kept alive by a Core and gating a Lost-Capital Core in the main quest. They scale
+by kill-count tiers T1-T9, drop a unique weapon+armor set, and can be fled and
+restored. See the new CORE GUARDIANS section.
+<<<<<<<< end SHIPPED
+
 The deeper explorers venture into the ruins of Tartaria, the more they encounter the ancient defenses that still guard the empire’s secrets. Once designed to protect Tartaria’s most sensitive locations, these automated systems remain active, even after centuries of dormancy. Etheric constructs, mechanical guardians powered by the energy that destroyed the empire, patrol the forgotten corridors and streets of Tartaria’s buried cities. Some are humanoid in form, resembling ancient warriors clad in gleaming Etheric armor, while others are more alien, their designs meant to intimidate and overwhelm any who dare to intrude. These constructs are not simple machines—they are sentient guardians programmed to defend Tartaria’s treasures.
 One of the most feared of these ancient defenses is the Mud Golem—a massive creature said to be born of the Etheric-charged mud that swallowed Tartaria’s cities. These beings are not mere legends; they are living remnants of the empire’s collapse, shaped by the forces that destroyed it. Mud Golems rise from the hardened Etheric mud like ancient titans, their bodies crackling with the same energy that destroyed the empire. Their massive forms blend seamlessly with their surroundings, making them nearly impossible to detect until too late. They relentlessly pursue intruders, their bodies impervious to most modern weapons, and they wield Etheric power to devastating effect. Some scholars believe that these creatures were created during the final days of Tartaria as a desperate attempt to control the mud that had consumed the empire. But whatever their origin, they now serve as uncompromising guardians, patrolling the depths of Tartaria’s buried cities, ensuring that no one disturbs the ancient technology.
 Other, less fearsome defenses are no less dangerous. Automated traps lie dormant in the ruins, waiting to spring into action at the slightest disturbance. Some release bursts of Etheric energy capable of disintegrating an intruder in seconds. In contrast, others manipulate the environment around them, causing walls to shift and floors to collapse, trapping explorers in inescapable death traps. These defense mechanisms are so advanced that they seem almost magical to the modern world. Still, they are nothing more than the remnants of a civilization that once mastered the art of manipulating reality.
@@ -7283,6 +7540,20 @@ The Etheric Field: A Living Energy Network
 Central to Tartaria’s scientific doctrine was that Aether constituted a “living” energy field. Tartarian scholars posited that this force could modulate its density and vibration in response to environmental conditions, both amplifying and neutralizing physical forces, from gravitational shifts to magnetic fields. Elior Zalmar, one of Tartaria’s most revolutionary Etheric scientists, further advanced this notion through his work on Etheric frequency resonance. According to Zalmar, Aether’s structure allowed it to behave as a medium for light and sound and as an active participant in physical phenomena. His calculations suggested that Aether was capable of localized excitation—essentially vibrating at frequencies that could affect matter at an atomic level, potentially even altering time-space metrics within localized regions of high Etheric concentration.
 Zalmar's theoretical framework took inspiration from early concepts of the luminiferous ether but extended them into what he called resonant Etheric fields. His Etheric models suggested that Aether particles—known as "Aetherons"—oscillated at different frequencies, allowing Tartarian technology to selectively manipulate these particles using complex oscillatory fields. By adjusting the vibrational alignment of Aetherons, Tartarian devices could theoretically produce massive bursts of energy without fuel depletion. This principle of dynamic resonance modulation was core to his experiments, especially those conducted at Thametan’s Tower in Samarran, which housed a colossal device known as the Etheric Engine. This engine, Zalmar claimed, could exploit the naturally oscillating fields of Aether to produce self-sustaining energy cycles—potentially rendering Tartaria’s entire empire effectively energy-independent​​.
 The Great Mud Flood: Aetheric Overload and Catastrophe
+
+>>> SHIPPED 2026-07-20 — Mud Flood / Aether cosmology (expanded canon) >>>>>>>>
+This cosmology is kept and EXPANDED by the 2026 "Aetherstone Thesis" canon (see
+docs/aetherstone-thesis.docx/.md): the catastrophe is now named THE ZALMAR OVERLOAD
+and given a mechanism — Aether was harvested from the sun and the cold night sky
+and its waste heat vented to space through vacuum-sealed radiators; Zalmar's
+resonance shook those seals apart, the heat poured into the bedrock, the ground
+liquefied into the Mud Flood and flash-calcified into Aetherstone, trapping the
+Etherium shards, temporal loops, and Etheric storms. New cited works: the Zalmar
+Texts, the Hwang Radiative Principles, the Soldani Crystalline Theorems. The app
+uses a three-way vocabulary: AETHER (the force) / ETHERIC (the machinery & storms)
+/ ETHERIUM (the crystallized shards).
+<<<<<<<< end SHIPPED
+
 However, in a bid to expand Aether’s potential beyond the constraints of existing Etheric Grids, Zalmar’s experiments with the Etheric Engine led to an uncontrollable resonance cascade—a phenomenon Tartarian records describe as an Aetheric Overload. In lay terms, the Etheric Engine inadvertently “overclocked” the field density of Aether within the material plane, drawing excessive energy from both terrestrial and cosmic sources. This energy surge destabilized the atmospheric balance of Tartaria and released a catastrophic pulse that interacted unpredictably with the geological substratum beneath Tartaria. The outcome was the Great Mud Flood, a geological cataclysm marked by the sudden uprising of Ether-charged mud, a dense, electrically reactive sludge that spread across Tartaria in waves.
 This event buried Tartaria under layers of mud infused with Etheric fields that continue to emit charged particles and energy pulses. The mud now hardened to a state resembling Aetherstone, forms an impenetrable barrier that distorts electromagnetic fields and scrambles modern excavation technology. Scholars have likened the phenomenon to a constant-state Aetheric “field lock,” where the Etheric charge within the mud acts almost like an unbreakable atomic bond, rendering Tartarian sites beneath it impervious to standard tools and creating the Etheric anomalies that plague explorers to this day​​.
 The Rise of the Mud Monarchs: Custodians of Suppression
@@ -7317,6 +7588,15 @@ Now, centuries later, the True Tartarians—descendants of those who survived in
 The Entombed bodies are often found lying in rooms or seated at tables, remnants of daily life frozen in place. Bones and scraps of ancient cloth remain, but each discovery is treated with the utmost respect. The True Tartarians carefully relocate these remains, reburying the bones on shelves carved into tunnel walls stretching miles beneath the earth. These catacombs serve as solemn memorials, where thousands upon thousands of skeletal remains line the passages, honoring the Entombed as though they were guardians of the past. Their placement in the catacombs is a ritual of remembrance, celebrating them as ancestral heroes who gave their lives to preserve the legacy of Tartaria.
 For the True Tartarians, each excavation is more than a practical expansion; it is a spiritual journey. Every uncovered home, every skeleton, and every artifact represents a piece of Tartaria’s rich, enduring culture. Through these excavations, they seek to honor their ancestors, rediscover lost heritage, and, ultimately, reconnect to the legacy of a world buried yet unbroken beneath the mud.
 The Arbiter’s Guide
+
+>>> SHIPPED 2026-07-20 — The Arbiter is now the on-device narrator >>>>>>>>
+In the app the Arbiter is not a human GM you role-play — it IS the on-device LLM
+narrator: a first-person, weathered, cryptic voice (system-prompt persona: "never
+cheerful, never modern, never chatty") that narrates scenes, answers lore when
+asked, and communicates difficulty in-fiction. The tone guidance in this chapter
+survives as that narrator's voice; the DM-coaching role does not apply.
+<<<<<<<< end SHIPPED
+
 Overview
 The Arbiter in Tartaria Prima is more than a Game Master or narrator; they are a living mystery woven into the story, a guide who travels with the players as a semi-enigmatic figure. The Arbiter knows Tartaria’s landscape, lore, and secrets and is a helpful, if cryptic, companion with deep insight and timeless wisdom. They are a storyteller, guide, and subtle force for players to lean on without fully understanding who or what they are.
 This guide will help you understand how to act as the Arbiter, what your role entails, and how to bring this unique character to life in an immersive and engaging way for your players.
@@ -7481,3 +7761,199 @@ scene-bar shows the area's danger tier (1 Calm / 2 Uneasy / 3 Dangerous / 4 Dead
 5 Lethal). Wandering into a deep capital under-leveled is a deliberate risk, not an
 ambush the engine forces on a beginner.
 
+
+================================================================================
+SHIPPED SYSTEMS NOT IN THE ORIGINAL OUTLINE  (added 2026-07-20)
+================================================================================
+These chapters document systems the app ships that this outline never described.
+They are canonical to the app as it stands. Written from the shipped
+implementation; numbers may be tuned over time (the app is the source of truth).
+
+--------------------------------------------------------------------------------
+S1. REPUTATION & STANDING (replaces Faction Points)
+--------------------------------------------------------------------------------
+Every faction tracks a bounded STANDING with you, from -100 to +100 (some start
+negative: Mud Monarchs -10, Conspiracy Architects -20, Tartarian Revivalists -5).
+Standing moves through play and cascades: a change of +N to one faction applies
+about +N/2 to its allies and -N/2 to its rivals (clamped).
+  - Joining a faction requires STANDING >= 20 with it (the only join gate).
+  - Kill a faction's member -> that faction -3, its strongest rival +1.
+  - Honest spending buys standing: ~+1 per 500 TC spent at that faction's vendors
+    (so joining ~= 10,000 TC of trade, if you never quest).
+  - Getting caught stealing from / killing a vendor: -10 to the host faction AND
+    -10 to the vendor's native faction (each cascading).
+  - Shaking down an NPC in parley also costs standing.
+An inter-faction GRUDGE MATRIX (seeded from the faction lore) decides who fights
+whom on sight: hostile at <= -20, friendly at >= +20.
+RAPPORT: completing a faction's rapport quest unlocks a Charisma-scaled price
+discount at its vendors (2% per CHA point over 10, capped 20%, on buy and sell).
+WANDERING NPCS / ROADSIDE TRADERS: travelers you can greet or persuade on the road
+for a tip, coin, or a small standing nudge — gated to fresh ground so they can't
+be farmed.
+
+--------------------------------------------------------------------------------
+S2. CONTRACTS — the quest layer
+--------------------------------------------------------------------------------
+The app's "quests" are five parallel contract systems, all posted at a faction
+Outpost's MISSION BOARD (the central-square parchment screen) or picked up in the
+world:
+  - FACTION QUESTS (4 per faction): staged tasks, some FETCH (bring N items,
+    consumed on turn-in), reputation-gated, paying TC + standing.
+  - HUNTS: track-and-kill contracts with 5-9 prep stages then a boss, scaled to
+    your power, difficulty tiers Greenhorn / Seasoned / Veteran / Apex.
+  - MYSTERIES: 3-5 step artifact-recovery chains (no boss; a trophy at the end).
+  - STORYLINES: 5-10 stage faction arcs with bigger rewards, reputation-gated.
+  - FACTION BOUNTIES: a favored faction pays you to kill a rival's members at the
+    rival's outpost; deadlines are distance-aware (24h + ~1h per tile); a faction
+    that dislikes you demands more kills but pays more standing ("the road back
+    into good graces").
+COURIER TURN-IN: most contracts can be closed remotely by courier for a reduced
+(half) cut — but a physical FETCH/delivery cannot ("you can't mail the goods").
+
+--------------------------------------------------------------------------------
+S3. CORRUPTION (Aetheric taint as content)
+--------------------------------------------------------------------------------
+A 0-plus meter with four tiers and escalating consequences:
+  - CLEAN (0-10): no penalty.
+  - TAINTED (11-30): -1 CHA; encounters slightly more frequent.
+  - CORRUPTED (31-60): -1 to ALL stats; +15% encounters; +15% vendor prices.
+  - HOLLOWED (61+): -2 to all stats; +30% encounters; +30% prices; and the Mud
+    Monarch Purifiers hunt you.
+Corruption RISES from Aetheric self-healing, drinking unpurified water, aetheric
+weather, provoking relics, and channel backlash; it FALLS from clean rest, tonics,
+and coating-remedy cleansing. Penalties fold into every skill check. (It is capped
+at 50 through most paths; Hollowed is reachable only via relic-channel backlash.)
+
+--------------------------------------------------------------------------------
+S4. AETHERCRAFT (the player discipline)
+--------------------------------------------------------------------------------
+Distinct from runecasters: a channeled discipline with three paths, chosen at the
+crafting bench's AETHERIC tab, each an attribute check that consumes Aether-tagged
+fuel on success or failure:
+  - SHAPE (INT, DC 12): raise a ward or shape a throwable shard.
+  - SUMMON (INT, DC 13-19 by golem kind): call a golem ally (see Companions).
+  - MEND (WIS, DC 12): heal HP — but casting it adds corruption.
+Race modifiers apply (Mud Dwellers cast easiest and get +2 INT to it; Aetherborn
+take a small DC penalty; others more). In the original outline "Aethercraft" is
+True-Tartarian lore only, never a player subsystem.
+
+--------------------------------------------------------------------------------
+S5. ITEM FUSION (the Reclaimer's Fusing Crucible)
+--------------------------------------------------------------------------------
+Reserve 3 or more scrap items spanning 3 or more material types and fuse them into
+a one-of-a-kind item. Rarity comes from the type count (3 -> Rare, 4+ -> Legendary);
+stats are clamped (weapon 1d4-2d8, AC <= 6, durability <= 30). Fused items are
+named from a theme-word (by dominant material) plus a suffix drawn from a fixed
+pool (Cleaver, Edge, Spike, Reaver, Fang, ...). Fused items are stamped
+self-crafted and are UNSELLABLE (they exist to equip, not to arbitrage).
+
+--------------------------------------------------------------------------------
+S6. WEAPON COATINGS
+--------------------------------------------------------------------------------
+Paint a physical weapon (never a runecaster) with one of six coatings — poison,
+acid, corruption, electrical, burn, cold — for a damage-over-time rider and a
+type effect (acid shreds armor, corruption stacks taint, etc.). A weapon holds
+1-2 coats, which prefix its display name ("Corrupted Venomous Battle Axe") and
+last until it breaks. The same vials are also drinkable as ailment cures. Looted
+weapons arrive pre-coated ~18% of the time.
+
+--------------------------------------------------------------------------------
+S7. DURABILITY & TEMPER
+--------------------------------------------------------------------------------
+Every weapon/armor instance has durability (default max 25) that depletes with use;
+at 0 it breaks, splicing out of your pack and leaving a salvage drop. Each instance
+also rolls a TEMPER at creation — fragile (0) or sturdy (1) — that scales its max
+durability (roughly x0.4 to x1.8) and inversely scales a small perk budget: a
+glass-cannon (fragile, more perk) vs a workhorse (sturdy, less). Repair: 1 TC per
+missing durability point at a vendor, or 2x the scrap value in materials at the
+bench. (This replaces the outline's parry-driven odd/even breakage entirely.)
+
+--------------------------------------------------------------------------------
+S8. COMPANIONS — DOG & GOLEM
+--------------------------------------------------------------------------------
+DOG: acquired by rescuing one in a scripted scene (smelter / wagon / cellar /
+snare), one per save. It has loyalty (a feed costs 1 loyalty; treats/scratch/speak
+raise it), fights alongside you (bite / distract), and grows its stats on your
+training curve. It can wear dog armor.
+GOLEM: summoned via Aethercraft (Mud / Iron / Aether / Crystal, each with a fuel
+cost and summon DC). A golem trains POWER and RESILIENCE by fighting and surviving,
+and is REPAIRED by feeding it its constituent parts (its own material mends it
+fully; a weaker elemental match mends a little; the wrong part does nothing).
+Neither companion existed in the outline (which had Aether Golems only as NPC
+guardians, and no dog at all).
+
+--------------------------------------------------------------------------------
+S9. CORE GUARDIANS — the Aether-Born Order
+--------------------------------------------------------------------------------
+The main-quest boss line. Nine named high-priests of the Aether-Born Order, each
+kept alive by a Core and each gating a Lost-Capital Core: Sentinel-Priest Vaelka,
+Heir Atalan-Drowned, Iron Litany Brother Konrad, Mother Drakovna, Voronov-Beneath
+High Cantor, Sealwarden Tobiel, Hierophant Mara-of-Yuldra, Riverbinder Ostros,
+Veilkeeper Inarra. They scale to your power by kill-count tiers (T1-T9), each drops
+a unique weapon + armor set, and a Guardian you flee can be faced again later.
+(The outline's ambient "Guardians of the Ether" still exist as the Sentinel /
+Aether Golem / Mud Golem enemies.)
+
+--------------------------------------------------------------------------------
+S10. WORLD MAP & TRAVEL
+--------------------------------------------------------------------------------
+The world is a procedural grid, seeded per save, that you cross by cardinal-
+direction travel; canon Lost-Capital locations (Asgardar, Samarran, Nimari,
+Varakush, Drakova, Thametan's Tower, the Grand Spire of Etheria, ...) are plotted
+into it. Travel spends stamina and time, surfaces wander scenes and roadside
+encounters, and drives distance-aware deadlines for bounties and courier pay.
+
+--------------------------------------------------------------------------------
+S11. WEATHER
+--------------------------------------------------------------------------------
+Eight weather states plus Eerie Calm, each with real mechanical effects on a
+per-action probability: Aetheric Storm, Aether Lightning, Ash Storm, Black Rain,
+Iron Fog, Glass Hail, Whisper Fog, Silent Blizzard. Effects chip HP or stamina,
+notch corruption, cut visibility, and slow travel/repositioning. (The outline has
+"Etheric Storms" as narrative flavor only.) See the Aetherstone Thesis for their
+in-world cause: the trapped Etheric fields discharging where the old grid shorts.
+
+--------------------------------------------------------------------------------
+S12. DISCOVERY CODEX & CHARACTER CHRONICLE
+--------------------------------------------------------------------------------
+CODEX / BESTIARY: the game records each distinct enemy type you defeat and each
+location you discover, filling in a codex (with the enemy flavor lines) as you play.
+CHARACTER CHRONICLE: a per-hero "Chronicle of <name>" — a headline, notable deeds,
+and a glyph-tagged timeline assembled from your memorable events (a legends log).
+Both are meta layers the outline never had.
+
+--------------------------------------------------------------------------------
+S13. WORLD-PULSE & OFFLINE RECAP
+--------------------------------------------------------------------------------
+The world is not static between sessions. Factions rise and fall on a war "tide"
+between your actions and reach you as rumours; patrols muster and clash off-screen.
+Real time spent away is converted into bounded world pulses (tide shifts, musters,
+reputation nudges, fresh bounty offers), and the Arbiter recaps what changed when
+you return ("while you were away ...").
+
+================================================================================
+[PLANNED] REGISTER — designed here, NOT in the app yet (do not delete)
+================================================================================
+Consolidated for convenience; each also appears inline above.
+  - Combat: Instants (free reactions); group initiative + "Quick Events"; the full
+    parry ruleset (style dice, damage subtraction, odd/even-d20 breakage,
+    runecaster-permanent-break); "barehanded = disadvantaged"; the four unimplemented
+    damage-type procs (Degradation, Bludgeoning, Aetheric, Radiation).
+  - Weapons/magic: Skilled-Weapon-Usage dice upgrade; statRequirement equip-locking;
+    weapon/spell exclusivity + one-turn switching penalty; runecaster-into-weapon
+    engraving/slotting (Rune Engraving Kit); the INT 1-12 spell-tier ladder; the
+    relic + transmutative runecaster-crafting structure.
+  - Character: the full ~20-skill list (no per-skill scores exist); the 7-slot starter
+    wardrobe at creation; the enforced 10-slot backpack cap; "+10 HP per STR increase";
+    the ~2 remaining doc starter items per race (deferred to vendors/loot).
+  - Factions/vendors: Faction Points as a currency; the multi-gate join requirements
+    (TC assets, relic ownership, join-titles, skill minimums); Persuasion & Hidden
+    Inventory; the one-time ephemeral Camp Vendor; the black-market Relic Trade economy.
+  - Titles: the 6 Tier-C titles (Speaker of Forgotten Tongues, Wayfarer of the Lost
+    Paths, Guild Broker, Protector of the Forgotten, Shadow Diver, Warden of the Old
+    World) and their location challenges (Labyrinth of Shadows clean run, learning the
+    Tartarian language, defending a True Tartarian settlement, trap-free ruin dives) —
+    fully authored but shipped switched OFF behind a feature flag.
+  - Lore: the Entombed reburial ritual (lore only); the dated 1280-2023 timeline (lore
+    only, no event mechanic); discrete terraforming / city-leveling war-relics
+    (abstracted into the Cores).
