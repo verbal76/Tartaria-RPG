@@ -265,18 +265,39 @@ Key invariants worth knowing:
 
 - **OPEN ITEMS (2026-07-20) — carried forward from the studio-level / CI-hardening
   session. Two tracked threads, neither blocking day-to-day work:**
-  1. **Engine's own red-suite backlog (~16 suites).** Separate from the HAL jest
-     triage. Engine-specific content/data failures — `collectables` (10-story
-     fragment data), `outpostMapAssets` (per-faction map PNGs on disk),
-     `blackCloakAgent`/`characterScreen` codex lore, `tartariaLeakScanner`
-     baselines, `saveSnapshot`/`crashSaveCapture`/`inventorySnapshot` BEGIN/END
-     envelope stamps, `devAccessAndPublish` (the "Verbal" backdoor),
-     `starterWeaponDataDriven`, `companionTypeParity`, `ambientNounVariety`,
-     `theftNarrationGuard`, `enemyTraits`, `ota1102MixedPacks`, `exploitFixes
-     Hardening`. These are why engine's `jest (fast)` job is **reported, not
-     blocking** (HAL + golem are blocking). Triaging them → flip engine's fast
-     job to `required`, matching HAL. (This session already greened 12 engine
-     suites, 28 → 16, as a side effect of the harness port.)
+  1. **Engine's own red-suite backlog (~15 suites).** Separate from the HAL jest
+     triage. Engine-specific content/data failures —
+     `collectables` (10-story fragment data), `outpostMapAssets` (per-faction map
+     PNGs on disk), `blackCloakAgent`/`characterScreen` codex lore,
+     `saveSnapshot`/`crashSaveCapture`/`inventorySnapshot` BEGIN/END envelope
+     stamps, `devAccessAndPublish` (the "Verbal" backdoor), `starterWeaponDataDriven`,
+     `companionTypeParity`, `ambientNounVariety`, `theftNarrationGuard`,
+     `enemyTraits`, `ota1102MixedPacks`, `exploitFixesHardening`. These are why
+     engine's `jest (fast)` job is **reported, not blocking** (HAL + golem are
+     blocking). Triaging them → flip engine's fast job to `required`, matching HAL.
+     (This session greened 12 engine suites, 28 → 16, as a side effect of the
+     harness port; then the 2026-07-20 de-lore work — below — greened
+     **`tartariaLeakScanner`** (its baselines had drifted red; re-anchored + now
+     ratcheting), 16 → 15.)
+  1b. **De-lore — strip hardcoded Tartaria from engine SOURCE (in progress).**
+     Drive `tartariaLeakScanner` (its own goal: `BASELINE_TOTAL → 0`) down by
+     extracting hardcoded setting content out of `.ts/.tsx` into JSON read through
+     the content-pack seam, or into `getEnergyName()/getWorldName()/getNarratorName()`
+     accessors (which resolve to Aether/Tartaria/Arbiter in built-in/test mode, so
+     the built-in game + tests are unchanged; a reskin no longer leaks). **Progress:
+     scanner total 320 → 93 (71%), 13 commits, zero test regressions.** Whole files
+     cleared to 0: itemAliases, hooks (HOOK_PLANTS+CHAINS→JSON), areaSearch,
+     climbHeight, worldEvents, character, raceAbilities, raceMechanics, combatRules,
+     hunts, itemEffect, sigils; gameStore 163 → 55. New data under
+     `app/data/{aliases,hooks,search,scan,lore,character,factions}/`. **Remaining
+     (~93):** gameStore's catalog-coupled tail (item/quest names, `Reclaimer's Rope`
+     name-equality, Yulka quest, power/enemy names), ~18 small screen/misc files,
+     and the Tier-C excision. **Decision pending:** some leftovers are FUNCTIONAL,
+     not player-facing (narrativeGenerator/arbiterFrame legacy-`Arbiter` regex
+     matchers, crafting resistance-profile keys, `contentPack` `DEFAULT_WORLD_NAME=
+     'Tartaria'` / `DEFAULT_ENERGY` last-resort defaults tests rely on) — driving
+     those to 0 means genericizing the built-in defaults + retargeting ~380
+     Tartaria-asserting tests, a deliberate call, not a mechanical swap.
   2. **Engine world/persist super-linear tail-growth.** The heaviest stress /
      balance / long-run sims (700-day sims, chaos sweeps, balance probes) grow
      memory super-linearly over a single very long run and OOM / time out past
