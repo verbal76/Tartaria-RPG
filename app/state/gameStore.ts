@@ -77,6 +77,7 @@ import { sentenceNamesOffCanonEntity, buildEntityAllowList, normalizeEntity } fr
 import { isQuestLockedItem } from '../engine/questItems';
 import { revealedLocationName } from '../engine/hiddenLocations';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
+import { AETHERKIN_REVERING_FACTIONS, isAetherkin, buildAetherkinEncounter, type AetherkinContext } from '../engine/aetherkin';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
 import {
@@ -3039,6 +3040,97 @@ function patchSceneForBuildingRoom(
   });
 }
 
+// OTA-914 — the Aetherkin. Buildings the flood sealed (a house, a shack, a
+// shed — never an outpost) can hold one of the mud-mummified flood-dead; open
+// mud can give one back mid-journey ("crawl up out of the silt"). They are NOT
+// aggressive hunters — see aetherkin.ts — so they spawn like any wild encounter
+// but the narration frames them as frightened, defensive, and identifiable as
+// "the Aetherkin you've heard about." Killing one angers the factions that hold
+// them sacred; talking one down pleases those factions (see resolveEnemyDefeat
+// and runParleyOutcome). HAL + golem only; never ported to the engine line.
+
+/** Building templates that can harbour an Aetherkin: homes and outbuildings the
+ *  flood drowned people inside. Explicitly NOT the outpost (a garrison, not a
+ *  home) or the market (the Hidden Market bazaar). */
+const AETHERKIN_BUILDING_IDS: ReadonlySet<string> = new Set(['flooded_house', 'shack', 'shed']);
+/** Chance an eligible building holds an Aetherkin on entry. */
+const AETHERKIN_BUILDING_CHANCE = 0.28;
+/** Chance an open, novel outdoor tile gives one back from the mud. */
+const AETHERKIN_MUD_CHANCE = 0.07;
+
+/** Spawn a scaled Aetherkin into the current (peaceful) scene and narrate the
+ *  emergence + identification + who-they-were + how-they-carry-themselves beats.
+ *  No-op if the scene already has a foe. Returns true if one was spawned. */
+function spawnAetherkin(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  where: AetherkinContext,
+): boolean {
+  const scene = get().currentScene;
+  const player = get().player;
+  if (!scene || !player) return false;
+  if (scene.enemies && scene.enemies.length > 0) return false;
+  const enc = buildAetherkinEncounter(where);
+  const base = (enemiesData as Enemy[]).find((e) => e.name === enc.enemyName);
+  if (!base) return false;
+  const power = enemyScalePower(
+    Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence),
+    player.hpMax,
+  );
+  const danger = scene.location?.danger ?? 0;
+  const scaled = scaleEncounterForContext([{ ...base }], danger, power);
+  const hps = scaled.map((e) => e.hp);
+  set((s) => (s.currentScene ? {
+    currentScene: {
+      ...s.currentScene,
+      enemies: scaled,
+      enemyHps: hps,
+      activeEnemyIdx: 0,
+      range: 'mid',
+      enemyAmbushUsed: scaled.map(() => false),
+      enemyKnockedOut: scaled.map(() => false),
+      stealthOpenerUsed: false,
+    },
+  } : s));
+  // Emergence + who-they-were as world flavor; the identification beat is the
+  // Arbiter naming them for the player ("these are the Aetherkin you've heard
+  // about"), per the design note that the Arbiter or flavor tells you what they are.
+  get().appendLog('world', enc.emergence);
+  get().appendLog('arbiter', enc.identification);
+  get().appendLog('world', enc.identity);
+  get().appendLog('world', enc.character);
+  return true;
+}
+
+/** Apply a reverence standing shift to every Aetherkin-revering faction the
+ *  player already tracks. Local clamped update (NOT the ally/rival cascade) so a
+ *  kill/spare only ever moves the four revering factions, mirroring the
+ *  faction-kill block. Returns the changed rows for logRepChanges. */
+function applyAetherkinReverenceDelta(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  delta: number,
+): { factionId: string; delta: number; newStanding: number }[] {
+  const p = get().player;
+  if (!p || delta === 0) return [];
+  const revered = new Set(AETHERKIN_REVERING_FACTIONS);
+  const changed: { factionId: string; delta: number; newStanding: number }[] = [];
+  const next = p.factionStanding.map((row) => {
+    if (!revered.has(row.factionId)) return row;
+    const ns = Math.max(-100, Math.min(100, row.standing + delta));
+    const realDelta = ns - row.standing;
+    if (realDelta !== 0) changed.push({ factionId: row.factionId, delta: realDelta, newStanding: ns });
+    return { ...row, standing: ns };
+  });
+  if (changed.length > 0) set((s) => (s.player ? { player: { ...s.player, factionStanding: next } } : s));
+  return changed;
+}
+
+/** Standing the revering factions lose when you destroy one of the flood-dead. */
+const AETHERKIN_KILL_REP = -3;
+/** Standing the revering factions gain when you talk one down instead. */
+const AETHERKIN_SPARE_REP = 2;
+
 // Tungsten Spire — default-name generator for a player who skips the
 // tutorial before the Arbiter's name beat. Pairs a random flavor
 // adjective with the singular form of their race (e.g. "Dusty Reclaimer",
@@ -4578,6 +4670,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog('world', `You step inside ${b.name.toLowerCase()}, into ${entry.name.toLowerCase()}.`);
     get().appendLog('world', entry.description);
     patchSceneForBuildingRoom(get, set, buildingId, entry.id);
+    // OTA-914 — a home or outbuilding the flood sealed can still hold one of its
+    // dead: an Aetherkin set into the mud where they died. Roll only for homes /
+    // sheds (never the outpost garrison or the market bazaar), and never on top
+    // of a stall's wares. patchSceneForBuildingRoom just cleared enemies, so the
+    // scene is peaceful here and the spawn lands cleanly on the entry room.
+    if (AETHERKIN_BUILDING_IDS.has(buildingId) && Math.random() < AETHERKIN_BUILDING_CHANCE) {
+      spawnAetherkin(get, set, 'building');
+    }
     // OTA-786 — market stalls are shops: stepping into one opens its wares
     // immediately. Back (← BACK) returns to the stall, where the stall tabs +
     // EXIT live. Only market stalls carry a vendor, so this never fires for
@@ -17849,6 +17949,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
+    // OTA-914 — destroying an Aetherkin (the mud-mummified flood-dead) angers the
+    // factions that hold them sacred. They carry no factionId in data, so the
+    // faction-kill block above never touches them; this is their own reverence
+    // penalty, applied only to revering factions the player already tracks.
+    if (isAetherkin(enemy)) {
+      const revChanged = applyAetherkinReverenceDelta(get, set, AETHERKIN_KILL_REP);
+      if (revChanged.length > 0) {
+        logRepChanges(get, revChanged);
+        get().appendLog('system', 'Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.');
+      }
+    }
+
     // OTA-850/859 [faction bounty] — a kill of a quarry ticks progress on EVERY active
     // bounty whose target it matches (grind several at once). Each bounty that completes
     // pays out (TC + standing with its giver) and drops off the slate; the rest carry on.
@@ -21734,6 +21846,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
         }
+      }
+    }
+
+    // OTA-914 — the mud gives one back. On open, novel ground (not in a hub, not
+    // inside a building, nothing already in front of you) an Aetherkin can claw
+    // up out of the silt for a random encounter. Gated on tileIsNovel like the
+    // roadside-stall / wasteland rolls so pacing a tile doesn't re-spawn one every
+    // step. HAL + golem only.
+    {
+      const liveScene = get().currentScene;
+      const livePlayer = get().player;
+      const openPeaceful = !!liveScene
+        && (!liveScene.enemies || liveScene.enemies.length === 0)
+        && !liveScene.vendor;
+      if (openPeaceful && livePlayer && !livePlayer.hubRoomId && !get().activeBuildingId
+        && tileIsNovel && Math.random() < AETHERKIN_MUD_CHANCE) {
+        spawnAetherkin(get, set, 'mud');
       }
     }
 
@@ -31339,6 +31468,9 @@ function runParleyOutcome(
   const scene = get().currentScene;
   if (!ctx || !player || !scene) return;
   const { kind, temperament, targetName } = ctx;
+  // OTA-914 — is this a frightened Aetherkin you're talking down? Captured up
+  // front because the success branches clear scene.enemies before we can check.
+  const parleyingAetherkin = scene.enemies.some((e) => isAetherkin(e));
 
   const stats = effectiveStats(player);
   const cha = stats.charisma;
@@ -31478,6 +31610,16 @@ function runParleyOutcome(
         get().appendLog('system', `Word spreads that you strong-armed one of theirs. (−${PARLEY_EXTORT_REP} standing with the ${factionLabel(faction)})`);
       }
       if (repChanged.length) logRepChanges(get, repChanged);
+    }
+    // OTA-914 — talking a frightened Aetherkin down (rather than destroying it)
+    // pleases the factions that hold the flood-dead sacred. Any successful
+    // disengage counts — you reached the person still inside and let them rest.
+    if (parleyingAetherkin) {
+      const revChanged = applyAetherkinReverenceDelta(get, set, AETHERKIN_SPARE_REP);
+      if (revChanged.length > 0) {
+        get().appendLog('system', `You let the Aetherkin sink back into its rest, unharmed. Those who revere the flood-dead take note. (+${AETHERKIN_SPARE_REP} standing with each)`);
+        logRepChanges(get, revChanged);
+      }
     }
     if (trained.leveled) get().appendLog('reward', `Charisma ${trained.leveled.from} → ${trained.leveled.to}.`);
     return;

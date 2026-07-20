@@ -16495,4 +16495,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "Skyreacher Boltcaster"; Legendary, electrical + acid) + legendary materials, with a build beat. Using a
 // beacon early just hums. Fusion-lock + Contracts hint follow the rename. Verified: retargeted skyreacher
 // tests; typecheck:ci + typecheck:tests + lint clean; full fast suite green. Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-890-beacon-rifle-built-from-beacons';
+// OTA-891 (THE AETHERKIN — the mud-mummified flood-dead as a new enemy type; port of HAL OTA-914) — the
+// Aetherkin are the Tartarians the Great Mud Flood sealed under: drowned, mummified in silt, reanimated by the
+// Aether they died steeped in. They are NOT zombies — they are AFRAID, reanimated with basic memories and a
+// muscle-memory of fright-or-flight; they don't hunt, they cringe and defend themselves if pressed (authored
+// `skittish`, so CALM is the talk-down key). New app/engine/aetherkin.ts: the revering bloc (true_tartarians,
+// servants_of_giants, tartarian_revivalists, eternal_dynasty), an isAetherkin matcher, and a randomized
+// encounter that narrates emergence → an Arbiter beat naming them ("the Aetherkin you've heard about") → who
+// they were / might have been / why they're here → how they carry themselves. Two defensive variants join
+// enemies.json: Drowned Aetherkin (Common, hp 45) and Mud-Wracked Aetherkin (Uncommon, hp 95), both with the
+// `aetherkin` marker trait; the legacy power-hall Aetherkin reads as one by name. They can spawn on entering a
+// discovered HOME or SHED (never an outpost/market) and can claw up out of open, novel mud as a roadside
+// encounter. Reverence has teeth: destroying one lowers standing with the four revering factions; talking one
+// down raises it. Verified: ota914Aetherkin (module + data + kill-lowers / calm-raises store tests);
+// typecheck:ci + typecheck:tests + lint clean; full fast suite green. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-891-the-aetherkin-flood-dead';

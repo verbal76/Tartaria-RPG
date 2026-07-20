@@ -2445,5 +2445,67 @@
       "quick",
       "resist:aetheric"
     ]
+  },
+  {
+    "name": "Drowned Aetherkin",
+    "flavor": "One of the Aetherkin — a Tartarian the flood sealed under and the Aether would not let rest. Reanimated, frightened, running on the muscle-memory of a life it half-remembers. It defends itself; it does not hunt.",
+    "type": "Etheric Undead",
+    "abilityPoint": "Strength 3",
+    "attack": "Frightened Lash",
+    "damage": "2D6 Aetheric",
+    "hp": 45,
+    "rarity": "Common",
+    "temperament": "skittish",
+    "loot": [
+      "Aetherstone Fragment",
+      "Veil of Peace"
+    ],
+    "aliases": [
+      "aetherkin",
+      "drowned aetherkin",
+      "the dead",
+      "risen",
+      "the kin",
+      "flood-dead"
+    ],
+    "traits": [
+      "aetherkin",
+      "slow",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:burn"
+    ]
+  },
+  {
+    "name": "Mud-Wracked Aetherkin",
+    "flavor": "One of the Aetherkin, caked in the mud that mummified it — the flood-dead of old Tartaria, awake and afraid. Slow and defensive; dangerous only to those who press it.",
+    "type": "Etheric Undead",
+    "abilityPoint": "Strength 5",
+    "attack": "Silt-Heavy Grasp",
+    "damage": "2D8 Aetheric",
+    "hp": 95,
+    "rarity": "Uncommon",
+    "temperament": "skittish",
+    "loot": [
+      "Aetherstone Fragment",
+      "Aether Mud",
+      "Veil of Peace"
+    ],
+    "aliases": [
+      "aetherkin",
+      "mud-wracked aetherkin",
+      "the dead",
+      "risen",
+      "the kin",
+      "flood-dead"
+    ],
+    "traits": [
+      "aetherkin",
+      "slow",
+      "resist:slashing",
+      "resist:piercing",
+      "resist:bludgeoning",
+      "vulnerable:burn"
+    ]
   }
 ]
