@@ -204,6 +204,8 @@ export function RecipesView({
             return (
               <TouchableOpacity
                 key={e.recipe.result}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: !e.available }}
                 style={[styles.recipeRow, !e.available && styles.recipeRowMuted]}
                 activeOpacity={e.available ? 0.7 : 1}
                 disabled={!e.available}
@@ -325,6 +327,8 @@ export function RecipesView({
             return (
               <View key={g.key}>
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: !isCollapsed }}
                   style={styles.catBanner}
                   activeOpacity={0.7}
                   onPress={() => setCollapsed((c) => ({ ...c, [g.key]: !(c[g.key] ?? true) }))}

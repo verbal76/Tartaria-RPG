@@ -64,10 +64,10 @@ export function CraftResultModal({ visible, items, onContinue, onClose }: Props)
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onContinue}>
-        <View style={styles.scrim}>
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>✓ CRAFTED</Text>
+              <Text style={styles.title} accessibilityRole="header">✓ CRAFTED</Text>
               <View style={styles.rule} />
               <Text style={styles.lead}>Added to your inventory:</Text>
 
@@ -91,12 +91,14 @@ export function CraftResultModal({ visible, items, onContinue, onClose }: Props)
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
                   onPress={onContinue}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextPrimary}>CONTINUE CRAFTING</Text>
                 </Pressable>
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={onClose}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CLOSE MENU</Text>
                 </Pressable>

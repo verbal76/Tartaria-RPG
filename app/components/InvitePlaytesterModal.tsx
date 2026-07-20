@@ -73,7 +73,7 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim}>
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -81,7 +81,7 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
             >
               <View style={styles.card}>
                 <View style={styles.headerRow}>
-                  <Text style={styles.title}>INVITE A PLAYTESTER</Text>
+                  <Text style={styles.title} accessibilityRole="header">INVITE A PLAYTESTER</Text>
                   <View style={styles.ruleLine} />
                 </View>
 
@@ -126,6 +126,7 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
                       pressed && styles.btnPressed,
                     ]}
                     onPress={onCancel}
+                    accessibilityRole="button"
                   >
                     <Text style={[styles.btnText, styles.btnTextNeutral]}>CANCEL</Text>
                   </Pressable>
@@ -137,6 +138,8 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
                     ]}
                     onPress={handleSend}
                     disabled={!valid}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: !valid }}
                   >
                     <Text
                       style={[

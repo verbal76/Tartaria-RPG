@@ -670,11 +670,12 @@ export function TitleScreen() {
 
   const renderItem = ({ item }: { item: SlotSummary }) => (
     <SwipeableRow onDelete={() => confirmDelete(item)}>
-      <TouchableOpacity
+      <TouchableOpacity accessibilityRole="button"
         style={[styles.slot, item.dead && styles.slotDead, !bootGateOpen && styles.btnDisabled]}
         onPress={() => onSlotTap(item)}
         activeOpacity={0.7}
         disabled={!bootGateOpen}
+        accessibilityState={{ disabled: !bootGateOpen }}
       >
         <View style={styles.slotHead}>
           <View style={styles.slotNameRow}>
@@ -726,7 +727,7 @@ export function TitleScreen() {
           // SHARE routes through Android's Share intent so apps that
           // truncate large pastes get the full payload anyway.
           <View style={styles.deadActions}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.copyLogBtn}
               onPress={(e) => {
                 e.stopPropagation?.();
@@ -754,7 +755,7 @@ export function TitleScreen() {
                 })()}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.shareLogBtn}
               onPress={(e) => {
                 e.stopPropagation?.();
@@ -779,7 +780,7 @@ export function TitleScreen() {
         style={styles.crest}
         resizeMode="contain"
       />
-      <Text style={styles.title}>{getGameTitle().toUpperCase()}</Text>
+      <Text style={styles.title} accessibilityRole="header">{getGameTitle().toUpperCase()}</Text>
       <Text style={[styles.flavor, { color: mutedColor }]}>{getGameTagline()}</Text>
       {(() => {
         // arb132 — build-line marker, right above the gem line, so the
@@ -890,13 +891,13 @@ export function TitleScreen() {
               fixes, and OTA-update compatibility.
             </Text>
             <View style={styles.playStoreNagButtons}>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.playStoreNagPrimary}
                 onPress={openPlayStore}
               >
                 <Text style={styles.playStoreNagPrimaryText}>OPEN PLAY STORE</Text>
               </TouchableOpacity>
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 style={styles.playStoreNagDismiss}
                 onPress={() => setPlayStoreNagDismissed(true)}
               >
@@ -936,7 +937,7 @@ export function TitleScreen() {
                 was pulled per playtester: "the download doesn't work,
                 the go-to-url does work. Make the URL the main way to
                 update." Styled as the primary action (was secondary). */}
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.apkBannerInstallBtn}
               activeOpacity={0.7}
               onPress={() => {
@@ -952,7 +953,7 @@ export function TitleScreen() {
               On the release page, tap the .apk file under Assets to download. If your browser blocks it, use COPY URL and paste into a desktop browser.
             </Text>
 
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.apkBannerCopyBtn}
               activeOpacity={0.7}
               onPress={() => {
@@ -971,10 +972,11 @@ export function TitleScreen() {
       })()}
 
       {pendingOTAUpdate && (
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.updateBanner}
           activeOpacity={0.8}
           disabled={applyingOTA !== null}
+          accessibilityState={{ disabled: applyingOTA !== null }}
           // OTA-405 — the staged bundle applies AUTOMATICALLY the next time
           // the app is opened (expo ON_LOAD → boot-front apply, before any
           // native module starts). So this tap is optional: "apply now"
@@ -1029,11 +1031,12 @@ export function TitleScreen() {
         }
         ListFooterComponent={
           <View style={styles.footerActions}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={[styles.primaryBtn, !bootGateOpen && styles.btnDisabled]}
               onPress={() => setScreen('character_creation')}
               activeOpacity={0.7}
               disabled={!bootGateOpen}
+              accessibilityState={{ disabled: !bootGateOpen }}
             >
               <Text style={styles.primaryBtnText}>
                 {bootGateOpen ? 'New Player' : `${bootGateReason}`}
@@ -1050,9 +1053,10 @@ export function TitleScreen() {
                 full fetch+apply pipeline so a single tap pulls AND
                 applies in one go. Disabled while an apply is already
                 in flight to avoid a double-fetch. */}
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={[styles.secondaryBtn, (applyingOTA !== null || modelsLoading) && styles.btnDisabled]}
               disabled={applyingOTA !== null || modelsLoading}
+              accessibilityState={{ disabled: applyingOTA !== null || modelsLoading }}
               onPress={() => {
                 // OTA-294 — should be unreachable because disabled=true
                 // when modelsLoading, but guard defensively. Killing
@@ -1118,7 +1122,7 @@ export function TitleScreen() {
           for UI uniformity with the in-game ExplorationScreen, which
           places its gear in the same spot. The footer text (version
           + build) stays at the bottom as a quiet diagnostic strip. */}
-      <TouchableOpacity
+      <TouchableOpacity accessibilityRole="button"
         style={styles.cornerGear}
         onPress={() => setScreen('about')}
         activeOpacity={0.7}
@@ -1130,7 +1134,7 @@ export function TitleScreen() {
       {/* engine_Dev — developer content-pack console. Hidden once the game is
           PUBLISHED, so a shipped game shows no developer affordance. */}
       {!devPublished && (
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.devPill}
           onPress={() => { setDevMode(true); setScreen('about'); }}
           activeOpacity={0.7}
@@ -1160,7 +1164,7 @@ export function TitleScreen() {
               address and opens a mailto draft to
               hotatticgames@gmail.com with subject "New
               Playtester" for owner-side whitelisting. */}
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.inviteBtn}
             activeOpacity={0.7}
             onPress={() => setInviteOpen(true)}
@@ -1175,7 +1179,7 @@ export function TitleScreen() {
               which collects a character + description and
               stages the full report on the clipboard before
               opening mailto. */}
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.bugReportBtn}
             activeOpacity={0.7}
             onPress={() => setBugReportOpen(true)}
@@ -1196,7 +1200,7 @@ export function TitleScreen() {
               terminates the app, even if the underlying call is a
               no-op. Wrapped the button in Platform.OS === 'android'. */}
           {Platform.OS === 'android' && (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.exitBtn}
               activeOpacity={0.7}
               onPress={() => setPendingAction({ kind: 'exit' })}
@@ -1889,7 +1893,7 @@ function LastCrashLine(): React.ReactElement | null {
   if (!crash) return null;
   const ageMin = Math.max(1, Math.floor((Date.now() - crash.timestamp) / 60000));
   return (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       onPress={() => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -1957,10 +1961,10 @@ function CopyCrashedSaveLine(): React.ReactElement | null {
         ⎘ CRASHED SAVE CAPTURED · {capture.stage} · {ageMin}m ago · {bytes} bytes
       </Text>
       <View style={crashSaveStyles.row}>
-        <TouchableOpacity onPress={() => void doCopy()} activeOpacity={0.7} style={crashSaveStyles.btn}>
+        <TouchableOpacity accessibilityRole="button" onPress={() => void doCopy()} activeOpacity={0.7} style={crashSaveStyles.btn}>
           <Text style={crashSaveStyles.btnText}>{copied ? '✓ COPIED' : 'COPY CRASHED SAVE'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={() => { void clearCrashSave(); setCapture(null); }}
           activeOpacity={0.7}
           style={[crashSaveStyles.btn, crashSaveStyles.btnGhost]}

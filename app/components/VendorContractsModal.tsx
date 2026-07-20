@@ -146,11 +146,11 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.scrim}>
+      <TouchableWithoutFeedback onPress={onClose} accessibilityRole="button" accessibilityLabel="Close">
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>⚑ {vendor.name.toUpperCase()} · CONTRACTS</Text>
+              <Text style={styles.title} accessibilityRole="header">⚑ {vendor.name.toUpperCase()} · CONTRACTS</Text>
               <View style={styles.rule} />
               {empty ? (
                 <Text style={styles.empty}>
@@ -163,7 +163,7 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
                   <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
                     {sections.map((sec) => (
                       <View key={sec.label} style={styles.section}>
-                        <Text style={styles.sectionTitle}>{sec.label}</Text>
+                        <Text style={styles.sectionTitle} accessibilityRole="header">{sec.label}</Text>
                         {sec.postings.map((p) => (
                           <View key={p.key} style={styles.posting}>
                             <View style={[styles.stripe, { backgroundColor: p.accent }]} />
@@ -177,6 +177,7 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
                                 <Pressable
                                   style={({ pressed }) => [styles.acceptBtn, pressed && styles.btnPressed]}
                                   onPress={p.onAccept}
+                                  accessibilityRole="button"
                                 >
                                   <Text style={styles.acceptBtnText}>ACCEPT</Text>
                                 </Pressable>
@@ -192,6 +193,7 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
               <Pressable
                 style={({ pressed }) => [styles.closeBtn, pressed && styles.btnPressed]}
                 onPress={onClose}
+                accessibilityRole="button"
               >
                 <Text style={styles.closeBtnText}>CLOSE</Text>
               </Pressable>

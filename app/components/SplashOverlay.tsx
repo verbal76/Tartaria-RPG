@@ -73,11 +73,13 @@ export function SplashOverlay() {
   // which read as "too big / edges cut off". The inset gives the whole poster
   // breathing room; the near-black overlay behind it hides the margin.
   return (
-    <View style={styles.overlay} pointerEvents="auto">
+    <View style={styles.overlay} pointerEvents="auto" accessibilityViewIsModal={true}>
       <Image
         source={require('../../assets/splash-art.jpg')}
         style={[styles.poster, posterInset]}
         resizeMode="contain"
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no-hide-descendants"
       />
       <View style={styles.barWrap}>
         <View style={styles.barTrack}>

@@ -17992,4 +17992,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // carries ~16 pre-existing red suites — its own content/data backlog (collectables, outpost map assets,
 // codex lore, leak-scanner baselines, save-envelope stamps, …), separate from the HAL triage and NOT
 // regressions from this change. Flip the fast job to blocking once that backlog is triaged, matching HAL.
-export const OTA_BUILD_ID = '2026-07-20-1173-jest-blocking-gate';
+// 2026-07-20 OTA-1174 (accessibility sweep — port of HAL OTA-902) — the full a11y pass on top of the
+// OTA-1172 baseline. Walks all screens + components and gives every interactive element proper screen-
+// reader / switch-access semantics: accessibilityRole="button" on the touchables that lacked one
+// (+"header" on the screen/section titles for heading navigation), accessibilityLabel on every icon-/
+// symbol-only control (✕, ◀/▶ cyclers, +/− steppers, map reset, back arrows), accessibilityState
+// (selected/disabled/expanded) reused verbatim from the conditions already in code, accessibilityView
+// IsModal on the modal/overlay backdrops, decorative art hidden from the reader (meaningful images
+// labelled), and EnemyPanel reads the foe's stat block as one grouped label. Most files ported cleanly
+// from HAL; the 8 files whose JSX diverges on this lore-agnostic line were swept against the engine's OWN
+// versions (labels kept lore-neutral). Text size still rides the OS Dynamic-Type setting. UI-only,
+// additive accessibility props — no behaviour/layout/styling/logic/copy change. Verified: source tsc clean.
+export const OTA_BUILD_ID = '2026-07-20-1174-accessibility-sweep';

@@ -107,6 +107,8 @@ export function CharacterScreen() {
       style={styles.sectionHeaderBar}
       activeOpacity={0.7}
       onPress={() => setCollapsed((s) => ({ ...s, [key]: !s[key] }))}
+      accessibilityRole="button"
+      accessibilityState={{ expanded: !collapsed[key] }}
     >
       <Text style={styles.sectionChevron}>{collapsed[key] ? '▾' : '▴'}</Text>
       <Text style={styles.sectionHeaderLabel}>{label}</Text>
@@ -126,10 +128,11 @@ export function CharacterScreen() {
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>CHARACTER</Text>
+        <Text style={styles.title} accessibilityRole="header">CHARACTER</Text>
         <View style={{ width: 80 }} />
       </View>
 
@@ -215,6 +218,8 @@ export function CharacterScreen() {
             style={styles.kvRow}
             activeOpacity={acBd.sources.length > 0 ? 0.7 : 1}
             onPress={() => acBd.sources.length > 0 && setAcOpen((v) => !v)}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: acOpen }}
           >
             <Text style={styles.kvKey}>
               Armor Class{acBd.sources.length > 0 && <Text style={styles.tapHint}>  {acOpen ? '▾' : '▸'}</Text>}
@@ -353,7 +358,7 @@ export function CharacterScreen() {
             you meet their vendors.
           </Text>
           {/* OTA-849 — jump to the WORLD view: the full balance of power + rumours. */}
-          <TouchableOpacity style={styles.worldLink} activeOpacity={0.7} onPress={() => setScreen('world')}>
+          <TouchableOpacity style={styles.worldLink} activeOpacity={0.7} onPress={() => setScreen('world')} accessibilityRole="button">
             <Text style={styles.worldLinkText}>◆ THE WORLD — balance of power & rumours ›</Text>
           </TouchableOpacity>
         </View>
@@ -448,6 +453,7 @@ export function CharacterScreen() {
                 style={styles.card}
                 onPress={() => useGameStore.getState().openCallDogModal()}
                 activeOpacity={0.8}
+                accessibilityRole="button"
               >
                 <Text style={styles.name}>
                   {dog.name} <Text style={{ color: '#6ab0c9' }}>{sexGlyph}</Text>
@@ -623,7 +629,7 @@ export function CharacterScreen() {
           <>
             {sectionHeader('contracts', 'ACTIVE CONTRACTS')}
             {!collapsed.contracts && (
-            <TouchableOpacity style={styles.card} onPress={() => setScreen('contracts')} activeOpacity={0.8}>
+            <TouchableOpacity style={styles.card} onPress={() => setScreen('contracts')} activeOpacity={0.8} accessibilityRole="button">
               {(player.activeFactionQuestIds ?? []).map((id) => {
                 const q = findFactionQuestById(id);
                 if (!q) return null;
@@ -728,6 +734,8 @@ export function CharacterScreen() {
                       style={styles.titleRow}
                       activeOpacity={0.7}
                       onPress={() => setOpenTitle((cur) => (cur === t.id ? null : t.id))}
+                      accessibilityRole="button"
+                      accessibilityState={{ expanded: isOpen }}
                     >
                       <Text style={[styles.titleName, isEarned ? styles.titleNameEarned : styles.titleNameLocked]}>
                         {isEarned ? '◆ ' : '◇ '}{t.title}
@@ -795,6 +803,8 @@ function StatRow({
       style={styles.statRow}
       activeOpacity={hasDetail ? 0.7 : 1}
       onPress={() => hasDetail && setExpanded((v) => !v)}
+      accessibilityRole="button"
+      accessibilityState={{ expanded }}
     >
       <Text style={styles.statKey}>{label}</Text>
       <View style={styles.statBody}>

@@ -47,7 +47,7 @@ function MilestoneStat({
   );
   if (!onPress) return body;
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={{ flex: 1 }}>
+    <TouchableOpacity accessibilityRole="button" onPress={onPress} activeOpacity={0.7} style={{ flex: 1 }}>
       {body}
     </TouchableOpacity>
   );
@@ -172,7 +172,7 @@ export function ContractsScreen() {
       return <Text style={styles.routeHereNote}>▸ {info.number}◆ You're at {info.anchorName}.</Text>;
     }
     return (
-      <Pressable
+      <Pressable accessibilityRole="button"
         style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
         onPress={() => setPendingRoute({ id: info.anchorId, name: info.anchorName })}
       >
@@ -231,8 +231,9 @@ export function ContractsScreen() {
     id: string,
     tracked: boolean,
   ) => (
-    <Pressable
+    <Pressable accessibilityRole="button"
       style={({ pressed }) => [styles.trackBtn, !tracked && styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+      accessibilityState={{ selected: tracked }}
       onPress={() => setContractActive(kind, id, !tracked)}
     >
       <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
@@ -343,7 +344,7 @@ export function ContractsScreen() {
         body="Everything you've taken on lives here — hunts, faction work, and bounties. Tap one to set a course or check your progress."
       />
       <View style={styles.header}>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={() => setScreen('exploration')}
           style={styles.backBtn}
           hitSlop={8}
@@ -351,7 +352,7 @@ export function ContractsScreen() {
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>CONTRACTS</Text>
+        <Text style={styles.title} accessibilityRole="header">CONTRACTS</Text>
         <View style={{ width: 80 }} />
       </View>
 
@@ -406,10 +407,11 @@ export function ContractsScreen() {
           const canSummonBoss = !!bossHere && !bossInScene;
           const storyActive = player.mainQuestActive !== false;
           return (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               style={styles.mainQuestCard}
               onPress={() => setMqExpanded((v) => !v)}
               activeOpacity={0.85}
+              accessibilityState={{ expanded: mqExpanded }}
             >
               <Text style={styles.mainQuestTag}>STORYLINE MISSION — {title.toUpperCase()}  {mqExpanded ? '▴' : '▾'}</Text>
               <Text style={styles.mainQuestHint}>{objLine}  ·  {done}/{total} parts</Text>
@@ -417,8 +419,9 @@ export function ContractsScreen() {
                   contract toggles). Activating it stands every contract down; off just
                   unfocuses it — the story keeps advancing either way. Nested Pressable
                   handles its own tap so it doesn't expand/collapse the card. */}
-              <Pressable
+              <Pressable accessibilityRole="button"
                 style={[styles.trackBtn, { marginTop: 8 }, !storyActive && styles.trackBtnOff]}
+                accessibilityState={{ selected: storyActive }}
                 onPress={() => setMainQuestActive(!storyActive)}
               >
                 <Text style={[styles.trackBtnText, !storyActive && styles.trackBtnTextOff]}>
@@ -426,7 +429,7 @@ export function ContractsScreen() {
                 </Text>
               </Pressable>
               {canSummonBoss && (
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={styles.summonChip}
                   onPress={() => useGameStore.getState().summonMainQuestBoss()}
                   activeOpacity={0.7}
@@ -466,7 +469,7 @@ export function ContractsScreen() {
                         return <View key={step.id ?? `step${i}`} style={styles.mqTrackerRow}>{rowContent}</View>;
                       }
                       return (
-                        <TouchableOpacity
+                        <TouchableOpacity accessibilityRole="button"
                           key={step.id ?? `step${i}`}
                           style={styles.mqTrackerRow}
                           activeOpacity={0.7}
@@ -496,19 +499,21 @@ export function ContractsScreen() {
       })()}
 
       <View style={styles.tabRow}>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={() => setTab('contracts')}
           style={[styles.tabBtn, tab === 'contracts' && styles.tabBtnActive]}
           activeOpacity={0.7}
+          accessibilityState={{ selected: tab === 'contracts' }}
         >
           <Text style={[styles.tabBtnText, tab === 'contracts' && styles.tabBtnTextActive]}>
             CONTRACTS
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={() => setTab('collectables')}
           style={[styles.tabBtn, tab === 'collectables' && styles.tabBtnActive]}
           activeOpacity={0.7}
+          accessibilityState={{ selected: tab === 'collectables' }}
         >
           <Text style={[styles.tabBtnText, tab === 'collectables' && styles.tabBtnTextActive]}>
             COLLECTIBLES {totalFragments > 0 ? `(${totalFragmentsFound}/${totalFragments})` : ''}
@@ -522,9 +527,10 @@ export function ContractsScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         {/* arb-fix — SORT BY DISTANCE toggle. Reorders every mission section by
             moves-to-target (nearest first) while keeping each type grouped. */}
-        <Pressable
+        <Pressable accessibilityRole="button"
           onPress={() => setSortByDistance((v) => !v)}
           style={({ pressed }) => [styles.sortBar, sortByDistance && styles.sortBarOn, pressed && styles.sortBarPressed]}
+          accessibilityState={{ selected: sortByDistance }}
         >
           <Text style={[styles.sortBarText, sortByDistance && styles.sortBarTextOn]}>
             {sortByDistance ? '◈ SORTED BY DISTANCE (grouped by type)' : '◈ SORT BY DISTANCE'}
@@ -675,7 +681,7 @@ export function ContractsScreen() {
                   : lapsed ? '⏳ LAPSED'
                   : `⏳ ${Math.ceil(left)}h left`;
                 return (
-                  <Pressable
+                  <Pressable accessibilityRole="button"
                     key={`b_${bountyKey(b)}`}
                     onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
                     style={styles.card}
@@ -712,7 +718,7 @@ export function ContractsScreen() {
                 const ready = run.stage >= def.stages.length;
                 const tracked = run.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
+                  <Pressable accessibilityRole="button" key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityState={{ expanded: open }}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
                       <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>
@@ -824,7 +830,7 @@ export function ContractsScreen() {
                       </View>
                     )}
                     {open && ready && (
-                      <Pressable
+                      <Pressable accessibilityRole="button"
                         style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
                         onPress={() => completeContractFromUI('hunt', def.id)}
                       >
@@ -837,7 +843,7 @@ export function ContractsScreen() {
                         dropped from the slate. Always visible when
                         the card is expanded. */}
                     {open && (
-                      <Pressable
+                      <Pressable accessibilityRole="button"
                         style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
                         onPress={() => abandonContract('hunt', def.id)}
                       >
@@ -860,7 +866,7 @@ export function ContractsScreen() {
                 const ready = run.stage >= def.stages.length;
                 const tracked = run.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
+                  <Pressable accessibilityRole="button" key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityState={{ expanded: open }}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
                       <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>
@@ -897,7 +903,7 @@ export function ContractsScreen() {
                       </View>
                     )}
                     {open && ready && (
-                      <Pressable
+                      <Pressable accessibilityRole="button"
                         style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
                         onPress={() => completeContractFromUI('mystery', def.id)}
                       >
@@ -905,7 +911,7 @@ export function ContractsScreen() {
                       </Pressable>
                     )}
                     {open && (
-                      <Pressable
+                      <Pressable accessibilityRole="button"
                         style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
                         onPress={() => abandonContract('mystery', def.id)}
                       >
@@ -928,7 +934,7 @@ export function ContractsScreen() {
                 const ready = run.stage >= def.stages.length;
                 const tracked = run.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
+                  <Pressable accessibilityRole="button" key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityState={{ expanded: open }}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
                       <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>
@@ -965,7 +971,7 @@ export function ContractsScreen() {
                       </View>
                     )}
                     {open && ready && (
-                      <Pressable
+                      <Pressable accessibilityRole="button"
                         style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
                         onPress={() => completeContractFromUI('storyline', def.id)}
                       >
@@ -973,7 +979,7 @@ export function ContractsScreen() {
                       </Pressable>
                     )}
                     {open && (
-                      <Pressable
+                      <Pressable accessibilityRole="button"
                         style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
                         onPress={() => abandonContract('storyline', def.id)}
                       >
@@ -1011,7 +1017,7 @@ export function ContractsScreen() {
                 const tracked = rec.tracked !== false;
                 const escortParty = rec.escort && rec.escort.hp > 0 ? rec.escort : null;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
+                  <Pressable accessibilityRole="button" key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityState={{ expanded: open }}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
                       <Text style={[styles.stagePill, readyToTurnIn && styles.stagePillReady, !tracked && styles.stagePillPaused]}>
@@ -1030,8 +1036,9 @@ export function ContractsScreen() {
                         stages stop advancing and an escort party stands down (off the
                         HUD, no combat damage) so escortees don't trail you onto
                         unrelated missions. Re-activate to resume. */}
-                    <Pressable
+                    <Pressable accessibilityRole="button"
                       style={({ pressed }) => [styles.trackBtn, !tracked && styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+                      accessibilityState={{ selected: tracked }}
                       onPress={() => setFactionQuestActive(def.id, !tracked)}
                     >
                       <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
@@ -1070,7 +1077,7 @@ export function ContractsScreen() {
                         );
                       }
                       return (
-                        <Pressable
+                        <Pressable accessibilityRole="button"
                           style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                           onPress={() => setPendingRoute({ id: objId, name: objName, missionId: def.id })}
                         >
@@ -1153,7 +1160,7 @@ export function ContractsScreen() {
                         );
                       }
                       return (
-                        <Pressable
+                        <Pressable accessibilityRole="button"
                           style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                           onPress={() => setPendingRoute({ id: dest, name: destName })}
                         >
@@ -1162,7 +1169,7 @@ export function ContractsScreen() {
                       );
                     })()}
                     {open && readyToTurnIn && (
-                      <Pressable
+                      <Pressable accessibilityRole="button"
                         style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
                         onPress={() => completeContractFromUI('faction_quest', def.id)}
                       >
@@ -1170,7 +1177,7 @@ export function ContractsScreen() {
                       </Pressable>
                     )}
                     {open && (
-                      <Pressable
+                      <Pressable accessibilityRole="button"
                         style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
                         onPress={() => abandonContract('faction_quest', def.id)}
                       >
@@ -1215,7 +1222,7 @@ export function ContractsScreen() {
                       </Text>
                       {!inHand && movesLine(l.tileId)}
                       {!inHand && !here && (
-                        <Pressable
+                        <Pressable accessibilityRole="button"
                           style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                           onPress={() => setPendingRoute({ id: l.tileId, name: safeLocName(l.tileId) })}
                         >
@@ -1236,7 +1243,7 @@ export function ContractsScreen() {
                 </Text>
                 {movesLine('parley_ground')}
                 {player?.currentLocationId !== 'parley_ground' && (
-                  <Pressable
+                  <Pressable accessibilityRole="button"
                     style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                     onPress={() => setPendingRoute({ id: 'parley_ground', name: safeLocName('parley_ground') })}
                   >
@@ -1244,7 +1251,7 @@ export function ContractsScreen() {
                   </Pressable>
                 )}
                 {trackToggle('broker', 'broker', !brokerMission.paused)}
-                <Pressable
+                <Pressable accessibilityRole="button"
                   style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
                   onPress={() => abandonContract('broker', 'broker')}
                 >
@@ -1284,7 +1291,7 @@ export function ContractsScreen() {
                     <Text style={styles.cardStageBody}>{stageDesc}</Text>
                     {movesLine(rec.targetLocationId)}
                     {route && !here && tracked && (
-                      <Pressable
+                      <Pressable accessibilityRole="button"
                         style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                         onPress={() => {
                           setWhisperCourse(route.mapX, route.mapY, route.label);
@@ -1298,7 +1305,7 @@ export function ContractsScreen() {
                       <Text style={styles.routeHereNote}>▸ You're here — {route.label} should be at this tile.</Text>
                     )}
                     {trackToggle('whisper', rec.id, tracked)}
-                    <Pressable
+                    <Pressable accessibilityRole="button"
                       style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
                       onPress={() => abandonContract('whisper', rec.id)}
                     >
@@ -1327,7 +1334,7 @@ export function ContractsScreen() {
                 const open = !!expanded[key];
                 const tracked = q.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
+                  <Pressable accessibilityRole="button" key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityState={{ expanded: open }}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{title}</Text>
                       <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>{!tracked ? '⏸ PAUSED' : q.state}</Text>
@@ -1357,7 +1364,7 @@ export function ContractsScreen() {
                       </View>
                     )}
                     {open && (
-                      <Pressable
+                      <Pressable accessibilityRole="button"
                         style={({ pressed }) => [styles.discardBtn, pressed && styles.completeBtnPressed]}
                         onPress={() => discardLead(q.id)}
                       >
@@ -1401,14 +1408,14 @@ export function ContractsScreen() {
                     </Text>
                     {!here && movesLine(sg.tileId)}
                     {here ? (
-                      <Pressable
+                      <Pressable accessibilityRole="button"
                         style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                         onPress={() => turnInSigil(sg.item.id)}
                       >
                         <Text style={styles.routeBtnText}>▸ RETURN THE SIGIL (+1 {sg.factionName.toUpperCase()})</Text>
                       </Pressable>
                     ) : (
-                      <Pressable
+                      <Pressable accessibilityRole="button"
                         style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                         onPress={() => setPendingRoute({ id: sg.tileId, name: safeLocName(sg.tileId) })}
                       >
@@ -1433,20 +1440,20 @@ export function ContractsScreen() {
       >
         <View style={styles.routeScrim}>
           <View style={styles.routeCard}>
-            <Text style={styles.routeTitle}>Set Course</Text>
+            <Text style={styles.routeTitle} accessibilityRole="header">Set Course</Text>
             <View style={styles.routeRule} />
             <Text style={styles.routeBody}>
               Set course for {pendingRoute?.name}? The Arbiter will start
               charting tile-by-tile travel from your current position.
             </Text>
             <View style={styles.routeBtnRow}>
-              <Pressable
+              <Pressable accessibilityRole="button"
                 style={styles.routeBtnNeutral}
                 onPress={() => setPendingRoute(null)}
               >
                 <Text style={styles.routeBtnTextNeutral}>CANCEL</Text>
               </Pressable>
-              <Pressable
+              <Pressable accessibilityRole="button"
                 style={styles.routeBtnPrimary}
                 onPress={() => {
                   if (!pendingRoute || !player) return;
@@ -1522,9 +1529,10 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
         const pct = Math.round(fraction * 100);
         return (
           <View key={story.id} style={[styles.card, styles.collectCard]}>
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               onPress={() => setOpenId(isOpen ? null : story.id)}
               activeOpacity={0.7}
+              accessibilityState={{ expanded: isOpen }}
             >
               <View style={styles.cardHead}>
                 <Text style={styles.cardTitle}>{story.characterName}</Text>

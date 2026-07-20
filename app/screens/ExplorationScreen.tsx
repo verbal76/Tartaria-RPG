@@ -608,7 +608,7 @@ export function ExplorationScreen() {
           {/* OTA 040 — tap the stats panel to open the full Player
               Sheet. Wrapped INSIDE the TutorialTarget so the overlay
               still measures the same layout box. */}
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             // In combat the panel shows lean vitals + the escort party, not the
             // full sheet — so tapping it to open the character screen is disabled
             // until the fight is over (it stays a live, glanceable combat readout).
@@ -641,11 +641,11 @@ export function ExplorationScreen() {
             // is staged (panel flips to EnemyPanel). After a fight the top-right reverts
             // to the crest; the KO'd body is still lootable via the input row.
             <>
-              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('world')}>
+              <TouchableOpacity accessibilityRole="button" style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('world')}>
                 <Text style={styles.crestNavText}>⚑ WORLD</Text>
               </TouchableOpacity>
               <CrestPlaceholder />
-              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('lore')}>
+              <TouchableOpacity accessibilityRole="button" style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('lore')}>
                 <Text style={styles.crestNavText}>◈ LORE</Text>
               </TouchableOpacity>
             </>
@@ -682,7 +682,7 @@ export function ExplorationScreen() {
               here so the map is always one tap away. Inside an outpost the
               Map screen shows your outpost interior; out in the world it
               shows the world atlas. */}
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             onPress={() => {
               if (tutLock) {
                 // arb109 — double-pulse "wrong" buzz + Arbiter nudge (the old
@@ -695,11 +695,12 @@ export function ExplorationScreen() {
             }}
             hitSlop={8}
             style={[styles.sceneBarBtn, tutLock && styles.sceneBarBtnBlocked]}
+            accessibilityState={{ disabled: tutLock }}
           >
             <Text style={styles.sceneBarBtnText}>MAP</Text>
           </TouchableOpacity>
           {/* OTA-748 — settings gear, relocated here from the enemy card. */}
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             onPress={() => setScreen('about')}
             hitSlop={8}
             style={styles.sceneBarBtn}
@@ -753,7 +754,7 @@ export function ExplorationScreen() {
         );
         if (!bossHere || bossInScene) return null;
         return (
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={[styles.objectiveChipSummon, { alignSelf: 'flex-start', marginBottom: 4 }]}
             onPress={() => useGameStore.getState().summonMainQuestBoss()}
             activeOpacity={0.7}
@@ -771,7 +772,7 @@ export function ExplorationScreen() {
       {/* OTA-775 — suppress the top "approach vendor" banner while inside a
           building; the stall's own Trade + Crucible render inside the room. */}
       {currentScene?.vendor && !inCombat && !activeBuildingId && currentScene?.location?.id !== 'hidden_market' && (
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.vendorBanner}
           onPress={() => setScreen('vendor')}
           activeOpacity={0.7}
@@ -786,11 +787,12 @@ export function ExplorationScreen() {
               chip's ✕), instead of opening the stall just to tap DISMISS. The vendor
               leaves the scene; a new one comes from the next vendor who shows up.
               Nested touchable handles its own tap, so it doesn't open the stall. */}
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.crucibleDismiss}
             onPress={() => useGameStore.getState().dismissVendor()}
             hitSlop={10}
             activeOpacity={0.7}
+            accessibilityLabel="Dismiss vendor"
           >
             <Text style={styles.crucibleDismissText}>✕</Text>
           </TouchableOpacity>
@@ -807,7 +809,7 @@ export function ExplorationScreen() {
           the feed (the rep-0 starter quests + anything the player qualifies for)
           so a brand-new character has an immediate quest on-ramp. */}
       {currentScene?.missionBoard && missionBoardHasPostings && (
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.missionBoardBanner}
           onPress={() => setMissionBoardOpen(true)}
           activeOpacity={0.7}
@@ -826,7 +828,7 @@ export function ExplorationScreen() {
           engine's wanderer talk-check (a d20 + CHA read for a tip / coins / a rare
           standing nudge). Hidden in combat. */}
       {currentScene?.wanderer && !inCombat && (
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.wandererBanner}
           onPress={() => submit(`talk to ${currentScene.wanderer!.name}`)}
           activeOpacity={0.7}
@@ -894,7 +896,7 @@ export function ExplorationScreen() {
         const readyName = `★★ ${getCrucibleName()} ready`;
         const readyHint = 'tap to fuse · spends your ♥ reserved items';
         return (
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.fusionBanner}
           onPress={fireCrucible}
           activeOpacity={0.7}
@@ -913,11 +915,12 @@ export function ExplorationScreen() {
           {/* arb152 — dismiss the Crucible chip for this visit if you don't need
               it. Nested touchable handles its own tap (doesn't fire the fuse);
               'fuse' can still be typed, and re-entering re-shows the chip. */}
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.crucibleDismiss}
             onPress={() => setCrucibleChipDismissedKey(crucibleViewKey)}
             hitSlop={10}
             activeOpacity={0.7}
+            accessibilityLabel="Dismiss crucible"
           >
             <Text style={styles.crucibleDismissText}>✕</Text>
           </TouchableOpacity>
@@ -971,7 +974,7 @@ export function ExplorationScreen() {
             <View style={styles.didYouMeanRow}>
               <Text style={styles.didYouMeanLabel}>Did you mean…</Text>
               {parseSuggestions.map((s) => (
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   key={s}
                   style={styles.didYouMeanChip}
                   activeOpacity={0.7}

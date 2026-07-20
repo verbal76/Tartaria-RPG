@@ -94,10 +94,10 @@ export function CharacterCreationScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>NEW EXPEDITION</Text>
+        <Text style={styles.headerTitle} accessibilityRole="header">NEW EXPEDITION</Text>
         <Text style={styles.headerStep}>Step {stepIndex + 1} of {STEP_ORDER.length}</Text>
       </View>
-      <Text style={styles.stepTitle}>{STEP_TITLE[step]}</Text>
+      <Text style={styles.stepTitle} accessibilityRole="header">{STEP_TITLE[step]}</Text>
       <Text style={[styles.packLine, (step === 'race' ? racesCustom : factionsCustom) ? styles.packLineOn : styles.packLineOff]}>
         {packLine}
       </Text>
@@ -112,11 +112,12 @@ export function CharacterCreationScreen() {
             .filter(([, v]) => (v ?? 0) !== 0)
             .map(([k, v]) => `${v! > 0 ? '+' : ''}${v} ${k.slice(0, 3).toUpperCase()}`);
           return (
-            <TouchableOpacity
+            <TouchableOpacity accessibilityRole="button"
               key={r.id}
               style={[styles.option, raceId === r.id && styles.optionSelected]}
               onPress={() => setRaceId(r.id)}
               activeOpacity={0.7}
+              accessibilityState={{ selected: raceId === r.id }}
             >
               <Text style={styles.optionName}>{r.name}</Text>
               <Text style={styles.optionDesc}>{r.description}</Text>
@@ -152,11 +153,12 @@ export function CharacterCreationScreen() {
           <>
             <Text style={styles.contextLine}>Race: {selectedRace.name}</Text>
             {factions.map((f) => (
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 key={f.id}
                 style={[styles.option, factionId === f.id && styles.optionSelected]}
                 onPress={() => setFactionId(f.id)}
                 activeOpacity={0.7}
+                accessibilityState={{ selected: factionId === f.id }}
               >
                 <Text style={styles.optionName}>{f.name}</Text>
                 <Text style={styles.optionDesc}>{f.subtitle}</Text>
@@ -179,7 +181,7 @@ export function CharacterCreationScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.backBtn}
           onPress={goBack}
           activeOpacity={0.7}
@@ -187,7 +189,7 @@ export function CharacterCreationScreen() {
         >
           <Text style={styles.backBtnText}>← BACK</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.nextBtn}
           onPress={goNext}
           activeOpacity={0.7}

@@ -80,7 +80,7 @@ export function BrandedModal({
   const cardChildren = (
     <>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>{title.toUpperCase()}</Text>
+        <Text style={styles.title} accessibilityRole="header">{title.toUpperCase()}</Text>
         <View style={styles.ruleLine} />
       </View>
 
@@ -149,6 +149,7 @@ export function BrandedModal({
               pressed && styles.btnPressed,
             ]}
             onPress={b.onPress}
+            accessibilityRole="button"
           >
             <Text style={[styles.btnText, toneText(b.tone)]}>{b.label.toUpperCase()}</Text>
           </Pressable>
@@ -162,7 +163,7 @@ export function BrandedModal({
   if (inline) {
     if (!visible) return null;
     return (
-      <View style={styles.inlineScrim} pointerEvents="box-none">
+      <View style={styles.inlineScrim} pointerEvents="box-none" accessibilityViewIsModal={true}>
         <TouchableWithoutFeedback onPress={onRequestClose}>
           <KeyboardAvoidingView style={styles.scrim} behavior="padding">
             <TouchableWithoutFeedback>
@@ -186,7 +187,7 @@ export function BrandedModal({
             the soft keyboard so an open text field is always visible. */}
         <KeyboardAvoidingView style={styles.scrim} behavior="padding">
           <TouchableWithoutFeedback>
-            <View style={styles.card}>{cardChildren}</View>
+            <View style={styles.card} accessibilityViewIsModal={true}>{cardChildren}</View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>

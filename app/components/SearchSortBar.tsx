@@ -77,6 +77,8 @@ export function SearchSortBar({
         />
         {query.length > 0 && (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Clear search"
             onPress={() => onQueryChange('')}
             style={styles.clearBtn}
             hitSlop={6}
@@ -95,6 +97,8 @@ export function SearchSortBar({
             return (
               <TouchableOpacity
                 key={opt.key}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
                 onPress={() => handleSortTap(opt.key)}
                 style={[styles.sortBtn, active && styles.sortBtnActive]}
                 activeOpacity={0.7}

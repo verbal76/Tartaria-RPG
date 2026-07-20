@@ -37,11 +37,11 @@ export function TorchProbeModal({ visible, leads, onSubmit, onCancel }: Props) {
       onRequestClose={onCancel}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim}>
+      <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>AIM THE TORCH</Text>
+              <Text style={styles.title} accessibilityRole="header">AIM THE TORCH</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
                 Fix the torch&apos;s light on one lead. It reveals and takes that
@@ -60,6 +60,7 @@ export function TorchProbeModal({ visible, leads, onSubmit, onCancel }: Props) {
                       key={`lead-${lead.id}-${i}`}
                       style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
                       onPress={() => onSubmit(lead.id)}
+                      accessibilityRole="button"
                     >
                       <Text style={styles.rowName} numberOfLines={1}>{lead.noun}</Text>
                       <Text style={styles.rowTag}>AIM ›</Text>
@@ -72,6 +73,7 @@ export function TorchProbeModal({ visible, leads, onSubmit, onCancel }: Props) {
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={onCancel}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
                 </Pressable>

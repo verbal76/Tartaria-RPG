@@ -106,7 +106,7 @@ export function VendorScreen() {
     return (
       <View style={styles.container}>
         <Text style={styles.placeholder}>You're not as fast as you think you are.</Text>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={styles.backBtn}
           onPress={() => setScreen('exploration')}
           activeOpacity={0.7}
@@ -345,9 +345,10 @@ export function VendorScreen() {
     } as InventoryItem);
   };
   const renderSectionHeader = (key: string, cat: InventoryCategory, count: number, collapsed: boolean) => (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       style={[styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }]}
       activeOpacity={0.7}
+      accessibilityState={{ expanded: !collapsed }}
       onPress={() => setCollapsedSections((s) => ({ ...s, [key]: !(s[key] ?? true) }))}
     >
       <View style={styles.sectionHeaderLeft}>
@@ -366,7 +367,7 @@ export function VendorScreen() {
         body="Buy and sell here. Prices swing with the seller's faction power and your standing — a favored trader deals kinder."
       />
       <View style={styles.header}>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={() => setScreen('exploration')}
           style={styles.backBtn}
           hitSlop={8}
@@ -374,7 +375,7 @@ export function VendorScreen() {
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>SHOP</Text>
+        <Text style={styles.title} accessibilityRole="header">SHOP</Text>
         {/* engine_Dev — the in-stall DISMISS button moved to a ✕ on the vendor chip
             (exploration screen). Empty spacer keeps SHOP centered in the 3-col row. */}
         <View style={{ width: 64 }} />
@@ -401,7 +402,7 @@ export function VendorScreen() {
         {isCrucibleEnabled() && !(player?.fusionPending
           || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1)
           || activeBuildingId === 'market') && (
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.crucibleBtn}
             onPress={() => { useVendorCrucible(); setScreen('exploration'); }}
             activeOpacity={0.7}
@@ -442,17 +443,19 @@ export function VendorScreen() {
       )}
 
       <View style={styles.tabRow}>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={[styles.tab, mode === 'buy' && styles.tabActive]}
           onPress={() => setMode('buy')}
           activeOpacity={0.7}
+          accessibilityState={{ selected: mode === 'buy' }}
         >
           <Text style={[styles.tabText, mode === 'buy' && styles.tabTextActive]}>BUY</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           style={[styles.tab, mode === 'sell' && styles.tabActive]}
           onPress={() => setMode('sell')}
           activeOpacity={0.7}
+          accessibilityState={{ selected: mode === 'sell' }}
         >
           <Text style={[styles.tabText, mode === 'sell' && styles.tabTextActive]}>SELL</Text>
         </TouchableOpacity>
@@ -460,7 +463,7 @@ export function VendorScreen() {
           // arb151 — CONTRACTS now opens a mission-board-style popup instead of
           // an inline tab (player preferred the Mission Board modal). It's a
           // button, not a tab, so it never holds the active state.
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             style={styles.tab}
             onPress={() => setContractsOpen(true)}
             activeOpacity={0.7}
@@ -518,10 +521,11 @@ export function VendorScreen() {
                   style={styles.offerRow}
                 >
                   <View style={[styles.offerStripe, { backgroundColor: rarityColor(itemPreview.rarity) }]} />
-                  <TouchableOpacity
+                  <TouchableOpacity accessibilityRole="button"
                     style={[styles.offerBody, !canAfford && styles.offerRowBroke]}
                     onPress={() => openBuy(o.itemName, effPrice)}
                     activeOpacity={0.7}
+                    accessibilityState={{ disabled: !canAfford }}
                   >
                     <View style={styles.offerHead}>
                       <Text style={styles.offerName} numberOfLines={1}>{o.itemName}</Text>
@@ -553,7 +557,7 @@ export function VendorScreen() {
                   {/* OTA 030 — STEAL button. DC stamped on the chip so the
                       player knows the risk before tapping. */}
                   {!tutorialDemoVendor && (
-                    <TouchableOpacity
+                    <TouchableOpacity accessibilityRole="button"
                       onPress={() => openSteal(o.itemName)}
                       style={styles.stealBtn}
                       hitSlop={6}
@@ -580,9 +584,10 @@ export function VendorScreen() {
             const RECIPE_ACCENT = '#c9a86a';
             return (
               <View style={styles.section}>
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   style={[styles.sectionHeader, { borderLeftColor: RECIPE_ACCENT }]}
                   activeOpacity={0.7}
+                  accessibilityState={{ expanded: !collapsed }}
                   onPress={() => setCollapsedSections((s) => ({ ...s, [secKey]: !(s[secKey] ?? false) }))}
                 >
                   <View style={styles.sectionHeaderLeft}>
@@ -597,10 +602,11 @@ export function VendorScreen() {
                   return (
                     <View key={`recipe_${o.result}`} style={styles.offerRow}>
                       <View style={[styles.offerStripe, { backgroundColor: rarityColor(preview.rarity) }]} />
-                      <TouchableOpacity
+                      <TouchableOpacity accessibilityRole="button"
                         style={[styles.offerBody, !canAfford && styles.offerRowBroke]}
                         onPress={() => openLearnRecipe(o.result, o.price)}
                         activeOpacity={0.7}
+                        accessibilityState={{ disabled: !canAfford }}
                       >
                         <View style={styles.offerHead}>
                           <Text style={styles.offerName} numberOfLines={1}>{o.result}</Text>
@@ -626,11 +632,12 @@ export function VendorScreen() {
               <View style={styles.sortRow}>
                 <Text style={styles.sortLabel}>Sort:</Text>
                 {(['value', 'rarity', 'name'] as const).map((s) => (
-                  <TouchableOpacity
+                  <TouchableOpacity accessibilityRole="button"
                     key={s}
                     onPress={() => setSellSort(s)}
                     style={[styles.sortTab, sellSort === s && styles.sortTabActive]}
                     activeOpacity={0.7}
+                    accessibilityState={{ selected: sellSort === s }}
                   >
                     <Text style={[styles.sortTabText, sellSort === s && styles.sortTabTextActive]}>
                       {s === 'value' ? 'VALUE' : s === 'rarity' ? 'RARITY' : 'NAME'}
@@ -664,7 +671,7 @@ export function VendorScreen() {
               // stat line to avoid printing it twice.
               const statLine = preview.stats.filter((s) => !s.startsWith('Durability:'));
               return (
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   key={`sell_${item.id}`}
                   style={styles.offerRow}
                   onPress={() => openSell(item.name, price, item.id)}

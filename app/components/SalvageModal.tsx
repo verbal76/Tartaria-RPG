@@ -244,13 +244,13 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
       onRequestClose={onCancel}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
-        <KeyboardAvoidingView style={styles.scrim} behavior="padding">
+      <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
+        <KeyboardAvoidingView style={styles.scrim} behavior="padding" accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
               {phase === 'results' ? (
                 <>
-                  <Text style={styles.title}>SALVAGE — RESULT</Text>
+                  <Text style={styles.title} accessibilityRole="header">SALVAGE — RESULT</Text>
                   <View style={styles.rule} />
                   {results.length > 0 ? (
                     <>
@@ -277,6 +277,7 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
                     <Pressable
                       style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
                       onPress={onCancel}
+                      accessibilityRole="button"
                     >
                       <Text style={styles.btnTextPrimary}>CLOSE</Text>
                     </Pressable>
@@ -284,7 +285,7 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
                 </>
               ) : (
                 <>
-                  <Text style={styles.title}>SALVAGE</Text>
+                  <Text style={styles.title} accessibilityRole="header">SALVAGE</Text>
                   <View style={styles.rule} />
                   <Text style={styles.body}>
                     Pull a core, strip the plating, pry the circuits — name the
@@ -323,6 +324,7 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
                             key={`scene-${h}`}
                             style={({ pressed }) => [styles.chipFull, styles.chipFullScene, pressed && styles.btnPressed]}
                             onPress={() => tapToSalvage(h)}
+                            accessibilityRole="button"
                           >
                             <Text style={styles.chipFullText} numberOfLines={1}>{h}</Text>
                             <Text style={styles.chipFullArrow}>→ salvage</Text>
@@ -346,6 +348,7 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
                     <Pressable
                       style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed, { marginTop: 8 }]}
                       onPress={() => onSalvageAll(sceneHints)}
+                      accessibilityRole="button"
                     >
                       <Text style={styles.btnTextPrimary}>SALVAGE ALL ({sceneHints.length})</Text>
                     </Pressable>
@@ -372,6 +375,8 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
                       ]}
                       onPress={handleSubmit}
                       disabled={!text.trim()}
+                      accessibilityRole="button"
+                      accessibilityState={{ disabled: !text.trim() }}
                     >
                       <Text style={text.trim() ? styles.btnTextPrimary : styles.btnTextNeutral}>
                         SALVAGE
@@ -380,6 +385,7 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
                     <Pressable
                       style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                       onPress={onCancel}
+                      accessibilityRole="button"
                     >
                       <Text style={styles.btnTextNeutral}>CANCEL</Text>
                     </Pressable>

@@ -1140,10 +1140,11 @@ export function InventoryScreen() {
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>INVENTORY</Text>
+        <Text style={styles.title} accessibilityRole="header">INVENTORY</Text>
       </View>
 
       <Text style={styles.tc}>TC: {player.tc}</Text>
@@ -1181,7 +1182,7 @@ export function InventoryScreen() {
             <Text style={styles.pouchFilterText}>
               Tap a throwable below to rack it on your bandolier.
             </Text>
-            <TouchableOpacity onPress={() => setBandolierFilterActive(false)} style={styles.pouchFilterCancel}>
+            <TouchableOpacity onPress={() => setBandolierFilterActive(false)} style={styles.pouchFilterCancel} accessibilityRole="button">
               <Text style={styles.pouchFilterCancelText}>CANCEL</Text>
             </TouchableOpacity>
           </View>
@@ -1195,7 +1196,7 @@ export function InventoryScreen() {
             <Text style={styles.pouchFilterText}>
               Tap a tool below to stow it on your belt.
             </Text>
-            <TouchableOpacity onPress={() => setPouchFilterActive(false)} style={styles.pouchFilterCancel}>
+            <TouchableOpacity onPress={() => setPouchFilterActive(false)} style={styles.pouchFilterCancel} accessibilityRole="button">
               <Text style={styles.pouchFilterCancelText}>CANCEL</Text>
             </TouchableOpacity>
           </View>
@@ -1217,6 +1218,8 @@ export function InventoryScreen() {
                 style={[styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }]}
                 activeOpacity={0.7}
                 onPress={() => setCollapsedSections((s) => ({ ...s, [cat]: !(s[cat] ?? true) }))}
+                accessibilityRole="button"
+                accessibilityState={{ expanded: !collapsed }}
               >
                 <View style={styles.sectionHeaderLeft}>
                   <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>
@@ -1382,6 +1385,7 @@ function ToolPouchBanner({
                 style={pouchStyles.slotFilled}
                 activeOpacity={0.7}
                 onPress={() => unpouchItem(slot.name!, slot.id ?? undefined)}
+                accessibilityRole="button"
               >
                 <Text style={pouchStyles.slotName} numberOfLines={1}>{slot.name}</Text>
                 <Text style={pouchStyles.slotAction}>tap to unstow</Text>
@@ -1394,6 +1398,7 @@ function ToolPouchBanner({
                 ]}
                 activeOpacity={0.7}
                 onPress={onTapEmptySlot}
+                accessibilityRole="button"
               >
                 <Text style={[
                   pouchStyles.slotEmptyText,
@@ -1490,6 +1495,7 @@ function BandolierBanner({
                 style={bandolierStyles.slotFilled}
                 activeOpacity={0.7}
                 onPress={() => removeFromBandolier(slot.name!, slot.id ?? undefined)}
+                accessibilityRole="button"
               >
                 <Text style={bandolierStyles.slotName} numberOfLines={1}>
                   {slot.name}{slot.qty > 1 ? ` ×${slot.qty}` : ''}
@@ -1501,6 +1507,7 @@ function BandolierBanner({
                 style={[bandolierStyles.slotEmpty, filterActive && bandolierStyles.slotEmptyActive]}
                 activeOpacity={0.7}
                 onPress={onTapEmptySlot}
+                accessibilityRole="button"
               >
                 <Text style={[bandolierStyles.slotEmptyText, filterActive && bandolierStyles.slotEmptyTextActive]}>
                   {filterActive ? 'pick a throwable ↓' : '+ rack throw'}
@@ -1630,6 +1637,7 @@ function ItemRow({
       style={[styles.row, highlight && styles.rowHighlighted]}
       onPress={onPress}
       activeOpacity={0.7}
+      accessibilityRole="button"
     >
       {/* OTA-485 — faint diagonal hatching behind the row for companion-edible/
           usable items. Rendered FIRST so it sits behind the rarity stripe + the

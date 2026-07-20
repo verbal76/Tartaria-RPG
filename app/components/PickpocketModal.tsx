@@ -75,11 +75,11 @@ export function PickpocketModal({
       onRequestClose={onCancel}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
-        <KeyboardAvoidingView style={styles.scrim} behavior="padding">
+      <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
+        <KeyboardAvoidingView style={styles.scrim} behavior="padding" accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>PICKPOCKET</Text>
+              <Text style={styles.title} accessibilityRole="header">PICKPOCKET</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
                 {vendorName
@@ -113,6 +113,7 @@ export function PickpocketModal({
                         key={`offer-${o}`}
                         style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
                         onPress={() => tapTarget(o)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.chipTextScene} numberOfLines={1}>{o}</Text>
                       </Pressable>
@@ -134,6 +135,7 @@ export function PickpocketModal({
                         key={`npc-${h}`}
                         style={({ pressed }) => [styles.chip, pressed && styles.btnPressed]}
                         onPress={() => tapTarget(h)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.chipText} numberOfLines={1}>{h}</Text>
                       </Pressable>
@@ -146,6 +148,7 @@ export function PickpocketModal({
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={onCancel}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
                 </Pressable>
@@ -158,6 +161,8 @@ export function PickpocketModal({
                   ]}
                   onPress={handleSubmit}
                   disabled={!text.trim()}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: !text.trim() }}
                 >
                   <Text style={styles.btnTextPrimary}>LIFT</Text>
                 </Pressable>

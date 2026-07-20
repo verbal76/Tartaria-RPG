@@ -27,11 +27,12 @@ export function TutorialOverlay() {
   if (!locked) return null;
 
   return (
-    <View style={styles.root} pointerEvents="box-none">
+    <View style={styles.root} pointerEvents="box-none" accessibilityViewIsModal={true}>
       <Pressable
         style={({ pressed }) => [styles.pill, pressed && styles.pillPressed]}
         onPress={skipTutorial}
         hitSlop={8}
+        accessibilityRole="button"
       >
         <Text style={styles.pillText}>SKIP TUTORIAL ▸</Text>
       </Pressable>

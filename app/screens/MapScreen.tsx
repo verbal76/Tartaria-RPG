@@ -784,7 +784,7 @@ export function MapScreen() {
         body="Tap a known place to set a course; travel burns stamina and time. Your dot shows where you stand."
       />
       <View style={styles.header}>
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={() => setScreen('exploration')}
           style={styles.backBtn}
           hitSlop={8}
@@ -792,8 +792,8 @@ export function MapScreen() {
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>ATLAS</Text>
-        <TouchableOpacity
+        <Text style={styles.title} accessibilityRole="header">ATLAS</Text>
+        <TouchableOpacity accessibilityRole="button"
           onPress={resetTransform}
           style={styles.resetBtn}
           hitSlop={8}
@@ -822,6 +822,8 @@ export function MapScreen() {
               source={mapSource}
               style={styles.atlas}
               resizeMode="contain"
+              accessibilityElementsHidden={true}
+              importantForAccessibility="no-hide-descendants"
             />
           )}
           {/* engine_Dev — fill the player's current grid square (under the lines). */}
@@ -907,7 +909,7 @@ export function MapScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerHere}>WHERE YOU ARE</Text>
+        <Text style={styles.footerHere} accessibilityRole="header">WHERE YOU ARE</Text>
         <Text style={styles.footerWhere}>{hereLabel}</Text>
         {nearestRef ? (
           <Text style={styles.footerNear}>{nearestRef}</Text>
@@ -942,7 +944,7 @@ export function MapScreen() {
           info / confirm path; this just gives a fast alternative
           one tap from the home screen's MAP button. */}
       <View style={styles.placesPanel}>
-        <Text style={styles.placesPanelTitle}>TRAVEL TO ▸ tap a place</Text>
+        <Text style={styles.placesPanelTitle} accessibilityRole="header">TRAVEL TO ▸ tap a place</Text>
         <ScrollView
           style={styles.placesScroll}
           contentContainerStyle={styles.placesContent}
@@ -964,7 +966,7 @@ export function MapScreen() {
                 const isHere = player?.currentLocationId === cm.anchorId;
                 const anchorName = info?.name ?? cm.label;
                 return (
-                  <TouchableOpacity
+                  <TouchableOpacity accessibilityRole="button"
                     key={cm.key}
                     style={[styles.placeRow, styles.contractRow, isHere && styles.placeRowHere]}
                     activeOpacity={0.7}
@@ -1052,11 +1054,12 @@ export function MapScreen() {
               ? (rowName === '?' ? `${qNum}?` : `${qNum}?  ${rowName}`)
               : (locNum ? `${locNum}. ${rowName}` : rowName);
             return (
-              <TouchableOpacity
+              <TouchableOpacity accessibilityRole="button"
                 key={p.id}
                 style={[styles.placeRow, isHere && styles.placeRowHere]}
                 activeOpacity={isHere ? 1 : 0.7}
                 disabled={isHere}
+                accessibilityState={{ disabled: isHere }}
                 onPress={() => {
                   if (!player) return;
                   if (player.hubRoomId) {

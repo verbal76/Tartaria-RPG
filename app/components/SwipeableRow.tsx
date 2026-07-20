@@ -60,6 +60,7 @@ export function SwipeableRow({ onDelete, children, deleteLabel = 'Delete' }: Pro
     <View style={styles.wrap}>
       <View style={styles.deleteLayer}>
         <TouchableOpacity
+          accessibilityRole="button"
           onPress={() => {
             close();
             onDelete();

@@ -132,6 +132,8 @@ export function LoreCodexBody() {
             key={s}
             onPress={() => setSection(s)}
             style={[styles.tab, section === s && styles.tabActive]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: section === s }}
           >
             <Text style={[styles.tabText, section === s && styles.tabTextActive]} numberOfLines={1}>
               {s === 'bestiary' ? 'beasts' : s}
@@ -197,6 +199,7 @@ export function LoreCodexBody() {
               style={styles.entry}
               activeOpacity={0.7}
               onPress={() => setPendingRoute(l)}
+              accessibilityRole="button"
             >
               {content}
             </TouchableOpacity>
@@ -275,7 +278,7 @@ export function LoreCodexBody() {
       >
         <View style={styles.modalScrim}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>PLAN A ROUTE</Text>
+            <Text style={styles.modalTitle} accessibilityRole="header">PLAN A ROUTE</Text>
             <Text style={styles.modalBody}>
               Set course for {pendingRoute?.name}? The {getNarratorName()} will
               start the walk and the travel row will replace your cardinal
@@ -286,6 +289,7 @@ export function LoreCodexBody() {
                 style={[styles.modalBtn, styles.modalBtnGhost]}
                 onPress={() => setPendingRoute(null)}
                 activeOpacity={0.7}
+                accessibilityRole="button"
               >
                 <Text style={styles.modalBtnGhostText}>CANCEL</Text>
               </TouchableOpacity>
@@ -293,6 +297,7 @@ export function LoreCodexBody() {
                 style={[styles.modalBtn, styles.modalBtnGo]}
                 onPress={confirmRoute}
                 activeOpacity={0.7}
+                accessibilityRole="button"
               >
                 <Text style={styles.modalBtnGoText}>SET COURSE</Text>
               </TouchableOpacity>

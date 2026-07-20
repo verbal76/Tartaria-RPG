@@ -10,6 +10,8 @@ export function CrestPlaceholder() {
         source={require('../../assets/icon.png')}
         style={styles.crest}
         resizeMode="contain"
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no-hide-descendants"
       />
     </View>
   );

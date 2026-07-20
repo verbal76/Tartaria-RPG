@@ -128,10 +128,11 @@ export function LogScreen() {
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>FULL GAME LOG</Text>
+        <Text style={styles.title} accessibilityRole="header">FULL GAME LOG</Text>
         <View style={{ width: 80 }} />
       </View>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
@@ -146,12 +147,12 @@ export function LogScreen() {
         </Text>
       ) : null}
       <View style={styles.btnRow}>
-        <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7} accessibilityRole="button">
           <Text style={styles.copyText}>
             {copied ? `COPIED ${charCount.toLocaleString()} CHARS` : `COPY ALL · ${charCount.toLocaleString()}`}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.shareBtn} onPress={handleShare} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.shareBtn} onPress={handleShare} activeOpacity={0.7} accessibilityRole="button">
           <Text style={styles.shareText}>{shared ? 'SHARED' : 'SHARE'}</Text>
         </TouchableOpacity>
       </View>
@@ -162,7 +163,7 @@ export function LogScreen() {
           ~25KB pieces of the log; each piece has its own
           BEGIN/END PART markers so receiver can reassemble. */}
       {diskLog.length > CHUNK_SIZE && (
-        <TouchableOpacity style={styles.chunkBtn} onPress={handleChunk} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.chunkBtn} onPress={handleChunk} activeOpacity={0.7} accessibilityRole="button">
           <Text style={styles.chunkText}>
             {chunkCopiedAt != null && Date.now() - chunkCopiedAt < 2500
               ? `COPIED PART ${chunkIndex} / ${totalChunks} — TAP FOR NEXT`

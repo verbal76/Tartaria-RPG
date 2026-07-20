@@ -212,7 +212,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
   const [detailView, setDetailView] = useState<EnemyView | null>(null);
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
-    <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(item)} style={fill ? styles.fillTouch : undefined}>
+    <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={() => setDetailView(item)} style={fill ? styles.fillTouch : undefined}>
       {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} fill={fill} canRead={canReadDefenses} observed={intelFor(item.enemy.name)} />)}
     </TouchableOpacity>
   );
@@ -229,7 +229,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
         // Single enemy: no pager (nothing to scroll horizontally), just the card —
         // capped to the corner height and vertically scrollable when it's tall.
         // arb146 — tappable to open the full-detail popup.
-        <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)} style={fill ? styles.fillTouch : undefined}>
+        <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)} style={fill ? styles.fillTouch : undefined}>
           {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} fill={fill} canRead={canReadDefenses} observed={intelFor(enemies[0]!.enemy.name)} />)}
         </TouchableOpacity>
       ) : (
@@ -351,7 +351,10 @@ function EnemyCard({ view, cardWidth, hpBarWidth, fill, canRead, observed }: { v
   const dealsType = enemyDamageType(view.enemy);
 
   return (
-    <View style={[styles.card, { width: cardWidth }, fill ? styles.cardFill : null]}>
+    <View
+      style={[styles.card, { width: cardWidth }, fill ? styles.cardFill : null]}
+      accessibilityLabel={`${view.enemy.name}, ${view.enemy.type}, ${view.enemy.rarity}. HP ${view.currentHp} of ${view.enemy.hp}, AC ${ac}, attack ${atkLabel}, damage ${view.enemy.damage}. ${inRange ? 'In range' : 'Out of range'}`}
+    >
       <View style={styles.head}>
         <Text style={styles.name} numberOfLines={1}>
           {view.enemy.name}
