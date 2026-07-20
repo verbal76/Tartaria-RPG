@@ -16487,4 +16487,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Climbs listed as missions in Contracts. Verified: greatClimbs/skyreacherRewards/climbEncounters/
 // skyreacherChartUnlock + retargeted ladder/weaponDefense tests; typecheck:ci + typecheck:tests + lint clean;
 // full fast suite green. Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-889-great-climbs-maps-bosses-boltcaster';
+// OTA-890 (GREAT CLIMBS — the Beacon Rifle is BUILT, not handed in; port of HAL OTA-913) — the five Aether
+// Collection Beacons no longer auto-assemble on the fifth boss. When all five towers fall the Arbiter
+// suggests breaking them down: they were built to COLLECT Aether (pull charge from empty air), so their
+// arrays make a rifle that does the same and throws it. The player USES a beacon from the pack (new `beacon`
+// item effect → assembleBeaconRifle) to disassemble the five arrays and build the BEACON RIFLE (renamed from
+// "Skyreacher Boltcaster"; Legendary, electrical + acid) + legendary materials, with a build beat. Using a
+// beacon early just hums. Fusion-lock + Contracts hint follow the rename. Verified: retargeted skyreacher
+// tests; typecheck:ci + typecheck:tests + lint clean; full fast suite green. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-890-beacon-rifle-built-from-beacons';

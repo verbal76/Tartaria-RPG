@@ -6148,7 +6148,7 @@
       "tc": 0
     },
     {
-      "name": "Skyreacher Boltcaster",
+      "name": "Beacon Rifle",
       "weaponKind": "ranged",
       "damageType": "electrical",
       "damageDice": "3d8",
@@ -6160,12 +6160,12 @@
       "tags": [
         "weapon",
         "ranged",
-        "boltcaster",
+        "beacon_rifle",
         "skyreacher",
         "legendary",
         "collect_only"
       ],
-      "description": "A giant-forged bolt-thrower reassembled from the hearts of the five Aether-collector towers. It arcs a live electrical bolt sheathed in a caustic acid load — the two elements every Tartarian machine and tower-guardian dreads most. Assembled only by whoever carried all five Aether Collection Beacons back down from the great climbs. Cannot be forged, bought, or upgraded at a Crucible."
+      "description": "Built by breaking down the five Aether Collection Beacons and re-wiring their collector-arrays to fire instead of feed. It grabs Aether-charge out of empty air and throws it as an electrical bolt sheathed in a caustic acid load — the two elements every Tartarian machine and tower-guardian dreads most. Cannot be forged, bought, or upgraded at a Crucible."
     }
   ]
 }

@@ -652,7 +652,7 @@ export function ContractsScreen() {
                 );
               })}
               <Text style={styles.mainQuestHint}>
-                Collect all five Aether Collection Beacons to re-link the Skyreacher Boltcaster.
+                Carry all five Aether Collection Beacons down, then USE one to break the arrays down and build the Beacon Rifle.
               </Text>
             </View>
           );

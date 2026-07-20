@@ -1260,8 +1260,10 @@
         "quest",
         "collect_only"
       ],
-      "effect": null,
-      "description": "A still-humming node prised from the heart of a collector tower after its guardian fell. Five of them, carried down from all five great climbs, can be re-linked into something that remembers how the sky was tapped. On its own it only hums, and points upward."
+      "effect": {
+        "kind": "beacon"
+      },
+      "description": "A folded collector-array prised from the heart of a tower after its guardian fell — a throat of resonant crystal built to swallow Aether out of thin air and send it on down the grid. It only hums and points upward on its own. Carry all five down from the great climbs, then USE one: you'll break the arrays down and build a rifle from their parts."
     },
     {
       "name": "Skyreacher Chart (1 of 5)",

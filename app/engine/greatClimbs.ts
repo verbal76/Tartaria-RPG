@@ -18,7 +18,7 @@
 // OTA-912 — each summit holds a NAMED BOSS: the tower's master guardian, still
 // awake at the crown. You climb into the heart of the disaster. Beating it drops
 // an Aether Collection Beacon and hands you that climb's Skyreacher piece; all
-// five beacons re-link into the Skyreacher Boltcaster. The bosses are Tartarian
+// five beacons break down into the Beacon Rifle (OTA-913). The bosses are Tartarian
 // machines built into the collector towers, so they read as vulnerable to the
 // anti-machine elements (electrical + acid) — exactly what the Boltcaster deals.
 

@@ -1732,10 +1732,11 @@ export interface WorldMemory {
   unlockedGreatClimbs?: string[];
   /** OTA-912 — distinct great-climb ids whose SUMMIT BOSS has been defeated.
    *  Gates the one-time Skyreacher armor + Aether Collection Beacon grant, and at
-   *  size 5 unlocks the Skyreacher Boltcaster + legendary material cache. */
+   *  size 5, using a beacon builds the Beacon Rifle (OTA-913). */
   summitBossesDefeated?: string[];
-  /** OTA-912 — one-time flag: the Skyreacher Boltcaster (+ materials) was granted
-   *  after all five summit bosses fell. Prevents a re-grant. */
+  /** OTA-912/913 — one-time flag: the Beacon Rifle (+ materials) has been built
+   *  from the five beacons. Prevents a re-build. (Legacy field name retained for
+   *  save compatibility.) */
   skyreacherBoltcasterGranted?: boolean;
   /** arb-fix — one-time make-good: a faction fused item the player should
    *  have received but didn't (the pre-fix faction catalyst never counted

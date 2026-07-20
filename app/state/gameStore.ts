@@ -936,6 +936,69 @@ function unlockGreatClimbFromChart(
   return true;
 }
 
+/** OTA-913 — build the Beacon Rifle by breaking down the Aether Collection
+ *  Beacons. Triggered by USING a beacon once all five towers are cleared: the
+ *  collector-arrays are re-purposed into a rifle that pulls charge from the air
+ *  and throws it (electrical + a permanent acid rider). One-time. Returns true
+ *  when it handled the use (always, once resolved to a beacon). */
+function assembleBeaconRifle(
+  getStore: () => GameStore,
+  setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
+): boolean {
+  const player = getStore().player;
+  if (!player) return false;
+  const wm = getStore().worldMemory;
+  if (wm.skyreacherBoltcasterGranted) {
+    getStore().appendLog('world', `The arrays are already spent — the Beacon Rifle is built. This node is an empty shell now.`);
+    return true;
+  }
+  const bossesDown = (wm.summitBossesDefeated ?? []).length;
+  const heldBeacons = player.inventory
+    .filter((i) => i.name === 'Aether Collection Beacon')
+    .reduce((s, i) => s + i.quantity, 0);
+  if (bossesDown < 5 || heldBeacons < 5) {
+    getStore().appendLog(
+      'world',
+      `A single collector-node hums in your hand, its needle swinging toward the sky. On its own it does nothing — you'd need all five, one carried down from each great climb, before there's anything to build.`,
+    );
+    return true;
+  }
+  const rifle: InventoryItem = stampDurability({
+    id: freshInstanceId('beacon_rifle'), name: 'Beacon Rifle', kind: 'weapon', rarity: 'Legendary',
+    quantity: 1, tags: ['weapon', 'ranged', 'beacon_rifle', 'skyreacher', 'legendary', 'collect_only'],
+    // electrical (catalog) + a permanent acid rider → electrical AND acid at once.
+    coating: { kind: 'acid', dice: '2d6', label: 'Acid' },
+  });
+  const mats: InventoryItem[] = [
+    { id: freshInstanceId('mat'), name: 'Throne Shard', kind: 'misc', rarity: 'Legendary', quantity: 2, tags: ['material', 'legendary'] },
+    { id: freshInstanceId('mat'), name: 'Iron Core', kind: 'misc', rarity: 'Legendary', quantity: 2, tags: ['material', 'legendary'] },
+    { id: freshInstanceId('mat'), name: 'Aether Shard', kind: 'misc', rarity: 'Rare', quantity: 3, tags: ['material', 'rare'] },
+  ];
+  setStore((s) => {
+    if (!s.player) return s;
+    let inv = s.player.inventory;
+    let toConsume = 5; // disassemble the five collector-arrays
+    inv = inv.map((i) => {
+      if (i.name === 'Aether Collection Beacon' && toConsume > 0) {
+        const take = Math.min(i.quantity, toConsume); toConsume -= take;
+        return { ...i, quantity: i.quantity - take };
+      }
+      return i;
+    }).filter((i) => i.quantity > 0);
+    inv = mergeOrPushItem(inv, rifle);
+    for (const m of mats) inv = mergeOrPushItem(inv, m);
+    return { player: { ...s.player, inventory: inv }, worldMemory: { ...s.worldMemory, skyreacherBoltcasterGranted: true } };
+  });
+  getStore().appendLog(
+    'world',
+    `You crack the five beacons open across your knees and read how they were made: each is a folded collector-array — a throat of resonant crystal built to swallow Aether out of thin air and push it on down the grid. You strip the arrays, splice the five throats into a single barrel, and re-wire the intake to fire instead of feed. It takes the better part of a day. When you seat the last crystal the whole thing wakes with a shriek of live current: a rifle that grabs charge from an empty sky and throws it.`,
+  );
+  getStore().appendLog('reward', `✦✦ BEACON RIFLE (Legendary) — built from the five collector-arrays. Fires an electrical bolt sheathed in acid, the two elements every Tartarian machine dreads. With it, a cache of legendary materials.`);
+  getStore().appendLog('arbiter', `"You climbed into the heart of every tower that drowned the world," the Arbiter says quietly, "and made the thing that drank the sky spit it back out. Nothing built will stand easy in front of that."`);
+  void getStore().persist();
+  return true;
+}
+
 /** ~18% of eligible roadside stalls carry one not-yet-sold, not-yet-unlocked
  *  chart. Returns the vendor (possibly) augmented with a single chart offer.
  *  Exported for the OTA-912 full-run verification test. */
@@ -11229,6 +11292,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               unlockGreatClimbFromChart(get, set, used, fx.climbId);
               break;
             }
+            // OTA-913 — using an Aether Collection Beacon, once all five towers
+            // are cleared, breaks the arrays down and builds the Beacon Rifle.
+            if (fx?.kind === 'beacon') {
+              assembleBeaconRifle(get, set);
+              break;
+            }
           }
         }
         // Legacy path — generic 1d6 heal for catalog-kind consumables
@@ -17959,7 +18028,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-912 — summit-boss defeat. The tower's master guardian falls: grant the
     // Aether Collection Beacon + this climb's Skyreacher piece (once), bank the
     // crest (drives the Skyreacher title), and once all five towers are done,
-    // re-link the beacons into the Skyreacher Boltcaster + a legendary cache.
+    // (the Beacon Rifle itself is built later, by USING a beacon — OTA-913).
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const gc912 = require('../engine/greatClimbs');
@@ -17993,38 +18062,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (nextCrested.length < 5) {
             get().appendLog('world', `That's ${nextCrested.length} of the 5 Skyreacher pieces. Top all five great climbs and the Arbiter will have a name for you — and the beacons will have somewhere to go.`);
           }
-          // (3) all five towers cleared → Skyreacher Boltcaster + legendary cache (once)
+          // (3) OTA-913 — all five towers cleared: the Arbiter SUGGESTS the play.
+          // The beacons were never weapons — they were built to COLLECT Aether,
+          // to pull charge out of empty air and send it down the grid. Broken
+          // down, their arrays make a rifle that does the same and throws it. The
+          // player triggers the build by USING a beacon from the pack (see
+          // assembleBeaconRifle); it is NOT auto-assembled here.
           if (nextDefeated.length >= 5 && !get().worldMemory.skyreacherBoltcasterGranted) {
-            const boltcaster: InventoryItem = stampDurability({
-              id: freshInstanceId('boltcaster'), name: 'Skyreacher Boltcaster', kind: 'weapon', rarity: 'Legendary',
-              quantity: 1, tags: ['weapon', 'ranged', 'boltcaster', 'skyreacher', 'legendary', 'collect_only'],
-              // OTA-912 — the acid rider is a permanent baked-in coating; the catalog
-              // weapon deals electrical, and this makes it electrical + acid at once.
-              coating: { kind: 'acid', dice: '2d6', label: 'Acid' },
-            });
-            const mats: InventoryItem[] = [
-              { id: freshInstanceId('mat'), name: 'Throne Shard', kind: 'misc', rarity: 'Legendary', quantity: 2, tags: ['material', 'legendary'] },
-              { id: freshInstanceId('mat'), name: 'Iron Core', kind: 'misc', rarity: 'Legendary', quantity: 2, tags: ['material', 'legendary'] },
-              { id: freshInstanceId('mat'), name: 'Aether Shard', kind: 'misc', rarity: 'Rare', quantity: 3, tags: ['material', 'rare'] },
-            ];
-            set((s) => {
-              if (!s.player) return s;
-              let inv = s.player.inventory;
-              // re-link (consume) up to five beacons into the weapon
-              let toConsume = 5;
-              inv = inv.map((i) => {
-                if (i.name === 'Aether Collection Beacon' && toConsume > 0) {
-                  const take = Math.min(i.quantity, toConsume); toConsume -= take;
-                  return { ...i, quantity: i.quantity - take };
-                }
-                return i;
-              }).filter((i) => i.quantity > 0);
-              inv = mergeOrPushItem(inv, boltcaster);
-              for (const m of mats) inv = mergeOrPushItem(inv, m);
-              return { player: { ...s.player, inventory: inv }, worldMemory: { ...s.worldMemory, skyreacherBoltcasterGranted: true } };
-            });
-            get().appendLog('reward', `✦✦ The five Aether Collection Beacons re-link with a shriek of live current — the SKYREACHER BOLTCASTER (Legendary): a bolt-thrower that arcs electrical AND acid at once, the two elements every Tartarian machine dreads. With it, a cache of legendary materials.`);
-            get().appendLog('arbiter', `"You climbed into the heart of every tower that drowned the world," the Arbiter says quietly, "and carried its heart back down. Nothing built will stand easy in front of that."`);
+            get().appendLog(
+              'arbiter',
+              `The Arbiter turns one of the beacons over in the light. "Five of them now — and not one was ever meant to fight. They were built to COLLECT, ${player.name}: to pull Aether out of the empty air and send it on down the grid. Break them down. Their arrays would make a rifle that grabs the charge from nothing and throws it. Use one from your pack when you're ready to build it."`,
+            );
           }
         }
       }
@@ -23610,6 +23658,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       unlockGreatClimbFromChart(get, set, item, fxLookup.climbId);
       return;
     }
+    // OTA-913 — using an Aether Collection Beacon builds the Beacon Rifle once
+    // all five towers are cleared (applied directly, like the chart).
+    if (fxLookup && fxLookup.kind === 'beacon') {
+      get().appendLog('player', `use ${item.name}`);
+      assembleBeaconRifle(get, set);
+      return;
+    }
     // Consumables → eat (HP recovery + time advance + quantity
     // decrement). Routed through submitPlayerAction so the existing
     // rest-with-resolvedItemId path handles all the state mutations.
@@ -24180,11 +24235,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { findArmorByName } = require('../engine/crafting') as typeof import('../engine/crafting');
     const piece = player.inventory.find((i) => i.id === itemId);
     if (!piece) return;
-    // OTA-912 — the Skyreacher armor set and the Skyreacher Boltcaster are the
-    // reward for the great climbs: they CANNOT be upgraded/fused at a Crucible.
-    // The `collect_only` tag (already on every Skyreacher piece + the Boltcaster)
-    // is the single lock. They still take coating vials (the 3 open resist slots),
-    // just never a Crucible slot-upgrade.
+    // OTA-912/913 — the Skyreacher armor set and the Beacon Rifle are the reward
+    // for the great climbs: they CANNOT be upgraded/fused at a Crucible. The
+    // `collect_only` tag (on every Skyreacher piece + the Beacon Rifle) is the
+    // single lock. They still take coating vials (the 3 open resist slots), just
+    // never a Crucible slot-upgrade.
     if ((piece.tags ?? []).some((t) => t.toLowerCase() === 'collect_only')) {
       get().appendLog(
         'arbiter',
