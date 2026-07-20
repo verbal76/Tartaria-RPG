@@ -16432,4 +16432,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // entries cover the cited works (Zalmar Texts, Hwang Radiative Principles, Soldani Crystalline Theorems).
 // Three-way terminology (Aether / Etheric / Etherium) additive. Data-only; Tartaria canon. Verified: lore +
 // map tests green.
-export const OTA_BUILD_ID = '2026-07-20-882-aetherstone-thesis-flavor-2';
+// 2026-07-20 OTA-883 (thesis-flavor follow-up — keyword-collision fix — port of HAL OTA-906) — the new
+// `zalmar_overload` concept had claimed "grand spire" / "grand spire of etheria", already owned by
+// `cap_asgardar`; dropped those two keywords (still reachable via "why the water rose" / "the overload" /
+// "how aetherstone formed"). Audit confirmed the flavor work changed only description/answer/flavor text +
+// new concepts — no item name/id/recipe/collectable/weapon/armor touched, all integrity suites green.
+// Data-only; Tartaria canon.
+export const OTA_BUILD_ID = '2026-07-20-883-thesis-keyword-collision-fix';
