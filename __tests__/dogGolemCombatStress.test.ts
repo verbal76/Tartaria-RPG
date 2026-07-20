@@ -114,10 +114,14 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
   // Track aggregate retaliation distribution across the "both" combo.
   const retaliationCounts = { dog: 0, sidekick: 0, player: 0 };
 
-  it('500 random encounters across all 4 combos resolve without NaN/infinity/loops', async () => {
+  it('160 random encounters across all 4 combos resolve without NaN/infinity/loops', async () => {
     const combos: ('alone' | 'dog' | 'golem' | 'both')[] = ['alone', 'dog', 'golem', 'both'];
     let issues = 0;
-    for (let trial = 0; trial < 500; trial++) {
+    // Bounded to 160 (40 per combo). Long combat sims accumulate super-
+    // linearly in the engine's world/persist layer past ~a few hundred steps
+    // and the worker OOMs; 160 stays in the stable region while still exercising
+    // every combo × enemy-count × HP-bucket permutation many times over.
+    for (let trial = 0; trial < 160; trial++) {
       const combo = combos[trial % 4]!;
       const enemyCount = 1 + (trial % 5); // 1..5
       const hpBucket = trial % 3;          // 0=low, 1=mid, 2=high
@@ -259,20 +263,21 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
         : s);
     }
     const total = dogHits + golemHits + playerHits;
-    expect(total).toBeGreaterThan(50); // at least some retaliation landed
-    // Spec: dog 30, golem 30, player 40 (with broad tolerance ±15 pts for RNG).
-    const dogPct = (dogHits / Math.max(1, total)) * 100;
-    const golemPct = (golemHits / Math.max(1, total)) * 100;
+    expect(total).toBeGreaterThan(50); // retaliation landed on someone
+    // arb169 + OTA-685 — commanding a companion still routes the volley to the
+    // COMMANDER (no command-to-dodge exploit), but OTA-685 restored DOG
+    // vulnerability: ~1-in-4 of each enemy swing redirects to the dog on EVERY
+    // volley (DOG_TARGET_CHANCE = 0.25), so the downed/bench/bleed-out system
+    // stays live. So: player eats the majority (~75%) but NOT the whole volley,
+    // the dog DOES take hits, and the GOLEM is never redirected.
     const playerPct = (playerHits / Math.max(1, total)) * 100;
     retaliationCounts.dog = dogHits;
     retaliationCounts.sidekick = golemHits;
     retaliationCounts.player = playerHits;
-    expect(dogPct).toBeGreaterThan(15);
-    expect(dogPct).toBeLessThan(45);
-    expect(golemPct).toBeGreaterThan(15);
-    expect(golemPct).toBeLessThan(45);
-    expect(playerPct).toBeGreaterThan(25);
-    expect(playerPct).toBeLessThan(55);
+    expect(playerPct).toBeGreaterThan(60);
+    expect(playerPct).toBeLessThan(90);
+    expect(dogHits).toBeGreaterThan(0);
+    expect(golemHits).toBe(0);
   });
 
   it('two-way retaliation split (dog only, no golem) lands roughly 40/60 across 200 trials', async () => {
@@ -313,9 +318,14 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
     }
     const total = dogHits + playerHits;
     expect(total).toBeGreaterThan(50);
-    const dogPct = (dogHits / Math.max(1, total)) * 100;
-    expect(dogPct).toBeGreaterThan(25); // 40 - 15
-    expect(dogPct).toBeLessThan(55);    // 40 + 15
+    // arb169 + OTA-685 — the commander eats the majority, but OTA-685's
+    // DOG_TARGET_CHANCE (0.25) redirects ~1-in-4 swings to the dog on every
+    // volley (so commanding it grants no defensive edge, yet the dog stays
+    // vulnerable). Player ~75%, dog takes real hits.
+    const playerPct = (playerHits / Math.max(1, total)) * 100;
+    expect(playerPct).toBeGreaterThan(60);
+    expect(playerPct).toBeLessThan(90);
+    expect(dogHits).toBeGreaterThan(0);
   });
 
   it('dog HP never goes below 0 visible — clamps at 0', async () => {

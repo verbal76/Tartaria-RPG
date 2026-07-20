@@ -60,7 +60,9 @@ function plantEnemy(name = 'Mud Boar') {
       enemies: [enemy],
       enemyHps: [enemy.hp],
       activeEnemyIdx: 0,
-      range: 'arm',
+      // OTA-550 — the melee band is 'close' ('arm' is not a CombatRange; the old
+      // value silently failed enemyCanReach, so no enemy counter ever fired).
+      range: 'close',
       enemyAmbushUsed: [false],
     },
   });

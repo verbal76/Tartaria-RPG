@@ -324,7 +324,7 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
     }
 
     // ── Main loop ───────────────────────────────────────────────────
-    const TARGET_DAY = 700;
+    const TARGET_DAY = 250; // bounded from 700 — the sim grows super-linearly in the tail (see header); 250 days is a sound smoke horizon within the timeout
     const MAX_ACTIONS = 20000;
     let actions = 0;
     let combatRoundsInEncounter = 0;

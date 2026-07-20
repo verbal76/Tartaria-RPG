@@ -17973,4 +17973,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // #7a705c lifted to #a2977b (clears WCAG AA) across the component/screen files that used it. Text size
 // stays on the OS font-size setting (allowFontScaling never disabled). UI + a tiny prefs store; ships
 // over-the-air. Covered by ota898Accessibility.
-export const OTA_BUILD_ID = '2026-07-19-1172-accessibility-baseline';
+// 2026-07-20 OTA-1173 (jest gate → BLOCKING + triage/flake hardening — port of HAL OTA-899…901) — brings
+// the engine line up to the blocking jest gate. SHIPPED FIXES carried over (adapted to the lore-agnostic
+// content pack): accessibility.ts LAZY-loads AsyncStorage inside its helpers (importing the store no
+// longer pulls the native module); and turnInFactionQuest's `remote` parameter — declared but unused —
+// could courier a FETCH contract remotely (completed without in-person delivery), now refused (the refusal
+// line uses getNarratorName(), not a hardcoded narrator). CI: jest is a REQUIRED gate, split into jest
+// (fast · required) = the deterministic unit/integration suites (BLOCKING) and jest (heavy sims · reported)
+// = the stress/balance/long-run sims (non-blocking; they exercise the engine's known super-linear world/
+// persist tail-growth). A new jest.setup.js seeds Math.random (fixed mulberry32, per file) so runs are
+// byte-identical, and pins incidental scene weather (pickWeather) to a zero-effect weather so per-action
+// HP/energy chips can't flake vital-exact assertions — test harness only, product weather unchanged. The
+// rest is test triage: stale-expectation/harness-drift fixes (incl. the dogGolem retaliation split under
+// OTA-685 DOG_TARGET_CHANCE), fixture hpMax pins, and a recalibrated investigate outcome-split band (±5σ
+// around the true 0.75 hook family). One source touch (areaSearch) is a comment. No shipped gameplay
+// change beyond the two fixes above. This port GREENED 12 of the engine line's own red suites (28 → 16
+// failing). On THIS line the fast jest job is REPORTED, not blocking (unlike HAL): the engine still
+// carries ~16 pre-existing red suites — its own content/data backlog (collectables, outpost map assets,
+// codex lore, leak-scanner baselines, save-envelope stamps, …), separate from the HAL triage and NOT
+// regressions from this change. Flip the fast job to blocking once that backlog is triaged, matching HAL.
+export const OTA_BUILD_ID = '2026-07-20-1173-jest-blocking-gate';

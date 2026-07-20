@@ -1,11 +1,12 @@
 import { pickRoadsideTrader, buildTraderEnemy } from '../app/engine/vendors';
 
 describe('roadside trader procedural generation', () => {
-  it('produces 3-6 offers with prices inside each entry range', () => {
+  it('produces 3-7 offers with prices inside each entry range', () => {
+    // Base 3-6 offers, plus an OPTIONAL premium ware (OTA-729) → up to 7.
     for (let i = 0; i < 50; i++) {
       const t = pickRoadsideTrader();
       expect(t.offers.length).toBeGreaterThanOrEqual(3);
-      expect(t.offers.length).toBeLessThanOrEqual(6);
+      expect(t.offers.length).toBeLessThanOrEqual(7);
       for (const o of t.offers) {
         expect(o.price).toBeGreaterThan(0);
       }

@@ -121,9 +121,13 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
         maxPower = Math.max(maxPower, pow);
         prevPower = pow; prevRes = res;
       }
-      // Keep the dummy alive + topped up, and TRIM the gameLog so memory stays flat.
-      store.setState((s) => (s.currentScene ? {
+      // Keep the dummy alive + topped up, TRIM the gameLog so memory stays flat,
+      // AND keep the PLAYER alive: the dummy's counter-swing lands on the
+      // COMMANDER, so without a top-up the ~30-HP player dies within a dozen
+      // rounds and 'golem attack' stops training the golem entirely.
+      store.setState((s) => (s.currentScene && s.player ? {
         gameLog: s.gameLog.slice(-20),
+        player: { ...s.player, hp: s.player.hpMax, dead: false },
         currentScene: { ...s.currentScene, enemyHps: [100000], range: 'close' as const },
       } : { gameLog: s.gameLog.slice(-20) }));
     }

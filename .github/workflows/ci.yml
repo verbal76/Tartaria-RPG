@@ -9,10 +9,29 @@ name: CI
 #                            committed baseline; new/edited tests must typecheck (the
 #                            count can only shrink, never grow).
 #   • lint                — reported (non-blocking for now; flip to blocking once clean).
-#   • test                — jest, reported (non-blocking for now; flip once the known
-#                            failing suites are triaged).
-# Keeping the source typecheck + test ratchet as the required checks makes the gate
-# green on arrival while still stopping the exact silent-decay the audit flagged.
+#   • test (fast)         — jest, REPORTED (non-blocking) ON THIS LINE. The
+#                            deterministic unit/integration suites. The harness is now
+#                            merge-grade: jest.setup.js seeds Math.random (fixed
+#                            mulberry32, per file) so runs are byte-identical, and pins
+#                            incidental scene weather so per-action HP/energy chips can't
+#                            flake vital-exact assertions. This port also GREENED 12 of
+#                            the engine line's own red suites. It stays REPORTED (not yet
+#                            a hard block) because the engine line still carries a
+#                            separate backlog of ~16 pre-existing red suites — its own
+#                            content/data debt (collectables, outpost map assets, codex
+#                            lore, leak-scanner baselines, save-envelope stamps, …), NOT
+#                            regressions from this change. Flip to BLOCKING once that
+#                            backlog is triaged, exactly as the HAL line did.
+#   • test (heavy sims)   — jest, REPORTED (non-blocking). The stress / balance /
+#                            long-run simulations (long-day sims, chaos sweeps, balance
+#                            probes). An EXPLORATORY signal: the engine's world/persist
+#                            layer grows super-linearly over a single very long run, so
+#                            the heaviest sims are memory- and time-sensitive by nature;
+#                            they run serially with worker recycling and surface as a
+#                            signal instead of a per-PR blocker.
+# The source typecheck and the test-typecheck ratchet are the REQUIRED gates on this
+# line today; both jest jobs are reported until the engine's own red-suite backlog is
+# triaged (then the fast job flips to blocking, matching HAL).
 
 on:
   push:
@@ -65,7 +84,7 @@ jobs:
       - run: npm run lint
 
   test:
-    name: jest (reported)
+    name: jest (fast · reported)
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -77,5 +96,42 @@ jobs:
       - env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
         run: npm ci --no-audit --no-fund
-      - name: Run test suite
-        run: npm run test:ci -- --reporters=default
+      # The deterministic unit/integration suites (excludes the heavy sims:
+      # Stress/stressMode/Chaos/Probe/Smoke/Sweep/Sim). The harness is now
+      # merge-grade — Math.random is seeded and incidental weather is pinned in
+      # jest.setup.js, so it no longer flakes — and this change greened 12 of the
+      # engine line's own red suites. It stays REPORTED (continue-on-error) only
+      # because the engine line still carries ~16 pre-existing red suites (its own
+      # content/data backlog, not regressions from this change). Flip to blocking
+      # once that backlog is triaged, matching the HAL line.
+      - name: Run fast test suite (reported)
+        env:
+          NODE_OPTIONS: '--max-old-space-size=3072'
+        run: npm run test:ci:fast -- --reporters=default
+
+  test-heavy:
+    name: jest (heavy sims · reported)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm ci --no-audit --no-fund
+      # The 27 stress / balance / long-run simulations. REPORTED, not blocking:
+      # they exercise the engine's known super-linear world/persist tail-growth,
+      # so the heaviest ones are memory- and time-sensitive by nature. They run
+      # serially (--maxWorkers=1) with aggressive worker recycling
+      # (--workerIdleMemoryLimit) so each mega-sim gets a near-fresh process and
+      # they don't collectively OOM the runner. Extra old-space headroom for the
+      # single biggest balance probe. This job's status is informational — the
+      # tail-growth finding is tracked separately as the thing to fix before
+      # these can become a required gate.
+      - name: Run heavy simulation suite (reported)
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+        run: npm run test:ci:heavy -- --reporters=default
