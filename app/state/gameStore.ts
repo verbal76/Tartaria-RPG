@@ -28956,23 +28956,19 @@ const REST_PULL_LINES: RestPull[] = [
 // beats. Surfaces the 158-concept lore layer for players who never
 // type 'what is X'. Rate kept low so it doesn't spam over a long
 // walk; one beat every ~20 steps on average.
-const TRAVEL_LORE_BEATS = [
-  `The ${getNarratorName()}, walking with you: "${getWorldName()} was a continent once. A flood older than any honest map drowned it. We are crossing the top of it."`,
-  `The ${getNarratorName()}, half to themselves: "The Aether you breathe out here is the same Aether the pre-flood engineers stored. Most of it is theirs, leaking back."`,
-  `The ${getNarratorName()}: "The Reclaimers tag, recover, return. The Forgotten Order kneels. The Mud Monarchs collect. The Aetherborn watch. Five answers to one buried country."`,
-  `The ${getNarratorName()} glances at the horizon. "Buried cities under us. The flood didn't bury them all at once — some sank slowly enough that the people inside knew."`,
-  `The ${getNarratorName()}: "Aetherstone holds light. It holds heat. It holds memory, sometimes. The cores you'll find are not always inert."`,
-  `The ${getNarratorName()}: "Mud-glass is dust fused under Aetheric pressure during the flood. It traps what it traps. Don't break it without a reason."`,
-  `The ${getNarratorName()}, quieter: "Tartarian Giants walked here. Their footprints are in the mud-glass under your boots, if you know what to look for."`,
-  `The ${getNarratorName()}: "Etheric Undead are not the same as dead. They are people the Aether kept past the threshold. They remember. That is the cruelty."`,
-  `The ${getNarratorName()}: "The Red Tower in the Order's keeping has forty-seven visible rings. It had more, once. Each ring was a doctrine the Order forgot or denied."`,
-  `The ${getNarratorName()}: "Drakova is south. Old Drakova is south, and under. The new Drakova lives on top of its grave and rarely admits it."`,
-  `The ${getNarratorName()}: "The Mud Seas are not seas. They are dust over the Cradle of Dusk, and the storms there are Aetheric, not weather."`,
-  `The ${getNarratorName()}: "Reclaimer code: salvage the relic, return the body, leave the place better than you found it. Most of them keep two of three."`,
-  `The ${getNarratorName()}: "Aetherstone Sentinels — the architectural ones — patrol the buried passes. Some have been awake for a thousand years. You will know them when they speak."`,
-  `The ${getNarratorName()}: "Tartary above and Tartaria below — same name, different country. We are walking on the one most maps refuse to name."`,
-  `The ${getNarratorName()}, half-amused: "The Monarchs say the buried world is theirs by right. The buried world hasn't responded yet."`,
-];
+const TRAVEL_LORE_BEATS: string[] = ((): string[] => {
+  // engine_Dev — built-in travel-lore beats live in data (app/data/lore/
+  // travel-lore-beats.json) with {narrator}/{world}/{energy} tokens resolved by
+  // appendLog's fillContentPlaceholders. A reskin overrides via the Flavor
+  // block's `travelBeats` key (resolveFlavor, author → generic → this built-in).
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const data = require('../data/lore/travel-lore-beats.json') as { lines?: string[] };
+    return Array.isArray(data.lines) ? data.lines : [];
+  } catch {
+    return [];
+  }
+})()
 
 // Ambient lore pool — surfaced on a 25% chance from every search,
 // regardless of whether the noun is in the hidden-text writing-surface
