@@ -74,7 +74,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, getCorruptionName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, isWeatherEnabled, isVendorsEnabled, resolveTable, resolveFlavor, isReskinActive, getWorldName, getEnergyMaterial, getEnergyName, getNarratorPersona, getWorldTone, getWorldSetting } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, getCorruptionName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, isWeatherEnabled, isVendorsEnabled, resolveTable, resolveFlavor, isReskinActive, getWorldName, getEnergyMaterial, getEnergyName, getEnergyAdjective, getNarratorPersona, getWorldTone, getWorldSetting } from '../engine/contentPack';
 import { sentenceNamesOffCanonEntity, buildEntityAllowList } from '../engine/entityGuard';
 import { loadLoreConceptBank } from '../engine/loreConceptBank';
 import { useContentPackStore } from './contentPackStore';
@@ -5020,7 +5020,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const here = get().currentScene?.location?.name ?? 'Tartaria';
           get().appendLog(
             'reward',
-            `✦ You claw back from the brink — the Aetherstone hauls the breath back into you. Restored, you stand again in ${here}.`,
+            `✦ You claw back from the brink — the ${getEnergyMaterial()} hauls the breath back into you. Restored, you stand again in ${here}.`,
             { skipDedup: true },
           );
         }
@@ -8092,7 +8092,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (crossLine && CORR_ORDER.indexOf(toTier) > CORR_ORDER.indexOf(fromTier)) {
           recordMemorableEvent(get, set, {
             kind: 'corruption_tier',
-            text: `The Aether takes deeper root — you cross into ${tierLabel(toTier)}.`,
+            text: `The ${getEnergyName()} takes deeper root — you cross into ${tierLabel(toTier)}.`,
             hoursElapsed: get().player?.hoursElapsed ?? 0,
           });
         }
@@ -8274,7 +8274,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => (s.player && s.player.sidekick
           ? { pendingSidekickNaming: false, player: { ...s.player, sidekick: { ...s.player.sidekick, name } } }
           : { pendingSidekickNaming: false }));
-        get().appendLog('world', `${name}. The name takes hold in the Aetherstone.`);
+        get().appendLog('world', `${name}. The name takes hold in the ${getEnergyMaterial()}.`);
         get().appendLog('arbiter', `The ${getNarratorName()} nods. "${name}, then."`);
       }
       void get().persist();
@@ -9446,7 +9446,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             });
             break;
           }
-          get().appendLog('world', 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.');
+          get().appendLog('world', `Nothing in arm's reach answers your blade. The motion echoes off ${getEnergyMaterial()}.`);
         }
         break;
       }
@@ -11583,7 +11583,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               'arbiter',
               hungerCappedRefuse
                 ? `The ${getNarratorName()} shakes their head. "Sleep won't fill you when it's food you're missing — your wind is choked by hunger, not weariness. Eat, then rest will mean something."`
-                : `The ${getNarratorName()} shakes their head. "Your wind is full and the Aether carries no shadow on you. Sleep won't knit wounds — eat for that. Save the hours."`,
+                : `The ${getNarratorName()} shakes their head. "Your wind is full and the ${getEnergyName()} carries no shadow on you. Sleep won't knit wounds — eat for that. Save the hours."`,
             );
             break;
           }
@@ -12666,7 +12666,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : hpPct >= 30 ? 'hurt, and the hurt shows'
             : 'bleeding the day away — find shelter';
           const corrLine = (player.corruption ?? 0) > 0
-            ? ` The Aether sits ${player.corruption} deep in you.`
+            ? ` The ${getEnergyName()} sits ${player.corruption} deep in you.`
             : '';
           get().appendLog(
             'arbiter',
@@ -16182,7 +16182,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           case 'cast':
-            get().appendLog('world', 'You shape the Aether around your hand. A pale violet glow answers, steady and true.');
+            get().appendLog('world', `You shape the ${getEnergyName()} around your hand. A pale violet glow answers, steady and true.`);
             break;
           case 'use_relic': {
             // Concrete feedback per relic + target. Playtest: trying
@@ -16206,7 +16206,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             let line: string;
             if (/torch|lantern|lamp/.test(lc)) {
               line = tgt
-                ? `You raise the ${itemName} to the ${tgt}. Aetheric flame licks across its surface — for a heartbeat, hidden detail flares into view, then fades.`
+                ? `You raise the ${itemName} to the ${tgt}. ${getEnergyAdjective()} flame licks across its surface — for a heartbeat, hidden detail flares into view, then fades.`
                 : `You hold the ${itemName} high. The flame steadies, and dim corners of the scene reveal what was hiding.`;
             } else if (/locket|amulet|pendant/.test(lc)) {
               line = tgt
@@ -16214,8 +16214,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 : `The ${itemName} grows warm. A faint resonance threads through your bones — something nearby is also listening.`;
             } else if (/lens|monocle|glass/.test(lc)) {
               line = tgt
-                ? `You bring the ${itemName} up and peer through it at the ${tgt}. Layers shift — Aetheric grain, structural lines, the ghost of a maker's mark.`
-                : `Through the ${itemName} the room shifts. Aetheric grain becomes visible in the air itself.`;
+                ? `You bring the ${itemName} up and peer through it at the ${tgt}. Layers shift — ${getEnergyAdjective()} grain, structural lines, the ghost of a maker's mark.`
+                : `Through the ${itemName} the room shifts. ${getEnergyAdjective()} grain becomes visible in the air itself.`;
             } else if (/compass|sextant/.test(lc)) {
               line = tgt
                 ? `The needle of the ${itemName} swings toward the ${tgt} and locks. Whatever's there matters.`
@@ -16295,7 +16295,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const focusF = reparsedF.resolvedNoun ?? reparsedF.target ?? currentScene.location.name;
             get().appendLog(
               'world',
-              `You sift the ${focusF} but it gives up nothing. The Aetherstone keeps its silence here.`,
+              `You sift the ${focusF} but it gives up nothing. The ${getEnergyMaterial()} keeps its silence here.`,
             );
             const focusFKey = focusF.toLowerCase();
             const investFRoomKey = makeRoomKey(
@@ -16337,7 +16337,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           case 'cast':
-            get().appendLog('world', 'The Aether slips through your focus. The glow flickers and dies.');
+            get().appendLog('world', `The ${getEnergyName()} slips through your focus. The glow flickers and dies.`);
             break;
           case 'use_relic':
             // Frame the failure as the player's fumble, not the relic's
@@ -16584,7 +16584,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (coatingProc2) dmg += coatingProc2.rolled;
       }
       if (surgeBonus > 0) {
-        get().appendLog('combat', `✦ Aetheric surge — your awakened blood detonates for +${surgeBonus} on ${enemy.name}.`);
+        get().appendLog('combat', `✦ ${getEnergyAdjective()} surge — your awakened blood detonates for +${surgeBonus} on ${enemy.name}.`);
       }
       // engine_Dev — DAMAGE-TYPE COMBAT PROC. If the weapon's damage type has an
       // author-configured combat effect, roll its apply-chance (raised when the
@@ -23952,7 +23952,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // name (Qwen's, or the deterministic fallback) when the Aether finishes.
     const formingResult = {
       name: 'Cooling Crucible-Work',
-      description: 'Still cooling on the pedestal — the Aether has not settled its name. It will announce itself when fully formed.',
+      description: 'Still cooling on the pedestal — the ${getEnergyName()} has not settled its name. It will announce itself when fully formed.',
       stats: det.stats,
     };
     const { inventory: newInv, fused } = fusion.applyFusion(
@@ -23986,7 +23986,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     get().appendLog(
       'world',
-      `The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet — let it finish. You'll know it the moment it announces itself.`,
+      `The Crucible exhales slow. The shape is set, but the ${getEnergyName()} hasn't named it yet — let it finish. You'll know it the moment it announces itself.`,
     );
     void get().persist();
 
@@ -24131,12 +24131,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const rarity = item.rarity ?? 'Rare';
     get().appendLog(
       'reward',
-      `✦ The forging finishes — the Aether names it ${name} (${rarity}).`,
+      `✦ The forging finishes — the ${getEnergyName()} names it ${name} (${rarity}).`,
     );
     set({
       discoveryReveal: {
         title: 'Your forging has formed',
-        body: `The Aether settles, and the Crucible's work takes its name:\n\n${name}\n\n${rarity} · it's in your pack now, fully formed.`,
+        body: `The ${getEnergyName()} settles, and the Crucible's work takes its name:\n\n${name}\n\n${rarity} · it's in your pack now, fully formed.`,
         // 2026-07-05-975 — inventory sections default COLLAPSED, so "View in inventory"
         // used to drop the player onto a folded pack with the new piece hidden.
         // Carry the fused kind (weapon / armor / dog_armor — same id as the
@@ -24305,7 +24305,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the day's charge is never spent on a no-op.
         const powerUp = () => {
           set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []), { kind: 'food_buff' as const, remainingRounds: 3, buffStat: 'strength' as const, buffBonus: 2, label: 'Legacy of Power' }] } } : s);
-          get().appendLog('reward', `✦ ${def.name} — Aether floods your limbs. +2 STR for 3 rounds.`);
+          get().appendLog('reward', `✦ ${def.name} — ${getEnergyName()} floods your limbs. +2 STR for 3 rounds.`);
         };
         const channel = rollDie(3);
         if (channel === 1) {
@@ -24329,7 +24329,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } else {
             const item = player.inventory[worstIdx]!;
             set((s) => s.player ? { player: { ...s.player, inventory: s.player.inventory.map((it, i) => i === worstIdx && it.durability ? { ...it, durability: { ...it.durability, current: it.durability.max } } : it) } } : s);
-            get().appendLog('reward', `✦ ${def.name} — you channel Aether into the ${item.name}. It mends to full.`);
+            get().appendLog('reward', `✦ ${def.name} — you channel ${getEnergyName()} into the ${item.name}. It mends to full.`);
           }
         } else if (channel === 2) {
           powerUp();
@@ -24348,18 +24348,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } else if (surge === 3) {
             const cleanse = rollDie(6);
             set((s) => s.player ? { player: { ...s.player, corruption: Math.max(0, (s.player.corruption ?? 0) - cleanse) } } : s);
-            get().appendLog('reward', `✦ ${def.name} — the Aether runs clean and washes ${cleanse} corruption from your veins.`);
+            get().appendLog('reward', `✦ ${def.name} — the ${getEnergyName()} runs clean and washes ${cleanse} corruption from your veins.`);
           } else {
             const backlash = rollDie(4);
             set((s) => s.player ? { player: { ...s.player, corruption: Math.min(100, (s.player.corruption ?? 0) + backlash) } } : s);
-            get().appendLog('world', `✦ ${def.name} — the channel turns on you. The Aether spikes and leaves +${backlash} corruption behind.`);
+            get().appendLog('world', `✦ ${def.name} — the channel turns on you. The ${getEnergyName()} spikes and leaves +${backlash} corruption behind.`);
           }
         }
         break;
       }
       case 'defensive_protocols': {
         set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []).filter((e) => e.kind !== 'shielded'), { kind: 'shielded' as const, remainingRounds: 3, label: 'Defensive Protocols' }] } } : s);
-        get().appendLog('reward', `✦ ${def.name} — an Aetheric shield flares around you. Incoming damage halved for 3 rounds.`);
+        get().appendLog('reward', `✦ ${def.name} — an ${getEnergyAdjective()} shield flares around you. Incoming damage halved for 3 rounds.`);
         break;
       }
       case 'regenerative_core': {
@@ -24388,7 +24388,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const prevHp = liveScene.enemyHps[idx] ?? target.hp;
         const newHp = Math.max(0, prevHp - dmg);
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: s.currentScene.enemyHps.map((h, i) => i === idx ? newHp : h) } } : s);
-        get().appendLog('reward', `✦ ${def.name} — shaped Aetherstone slams ${target.name} for ${dmg} aetheric${eleTag}. (${newHp} HP left)`);
+        get().appendLog('reward', `✦ ${def.name} — shaped ${getEnergyMaterial()} slams ${target.name} for ${dmg} aetheric${eleTag}. (${newHp} HP left)`);
         // OTA-625 — run the defeat resolver when this proc is the killing blow.
         // idx is the active enemy, so resolveEnemyDefeat() targets the right one
         // (same guard pattern the normal attack paths use). Pre-fix the enemy sat
@@ -24405,7 +24405,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!liveScene || liveScene.enemies.length === 0) { applied = false; break; }
         const soak = rollDie(6);
         set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []).filter((e) => e.kind !== 'stone_ward'), { kind: 'stone_ward' as const, remainingRounds: 10, absorb: soak, label: `Elemental Ward (soak ${soak})` }] } } : s);
-        get().appendLog('reward', `✦ ${def.name} — shaped Aetherstone hardens before you. It soaks the next ${soak} damage.`);
+        get().appendLog('reward', `✦ ${def.name} — shaped ${getEnergyMaterial()} hardens before you. It soaks the next ${soak} damage.`);
         break;
       }
       case 'beginners_luck': {
@@ -24829,7 +24829,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Also rotates 5 lines of "you sat for a while" narration so the
     // feed doesn't read identical on repeat rests.
     const FULL_HP_REST_LINES = [
-      `You sit for ${hoursSlept} hours. Whole already — the Aetherstone hums steady.`,
+      `You sit for ${hoursSlept} hours. Whole already — the ${getEnergyMaterial()} hums steady.`,
       `You sit for ${hoursSlept} hours. Nothing in you wants healing; you watch the light shift instead.`,
       `You sit for ${hoursSlept} hours. The body is at peace. The mind keeps walking on without you.`,
       `You sit for ${hoursSlept} hours. You came back to yourself at the same place you set out from.`,
@@ -28418,7 +28418,7 @@ function handlePlayerDeath(
 
   const locName = state.currentScene?.location.name ?? 'Tartaria';
   const epitaph = pick([
-    `${player.name} falls in ${locName}. The Aetherstone grows dim and does not lift.`,
+    `${player.name} falls in ${locName}. The ${getEnergyMaterial()} grows dim and does not lift.`,
     `The buried world claims ${player.name}. Tartaria keeps the body count.`,
     `${player.name}'s breath leaves. The dust settles back into its old patterns.`,
     `An end at ${locName}. The ${getNarratorName()} watches and says nothing.`,
@@ -29770,7 +29770,7 @@ function runAethercraft(
     if (missing.length > 0) {
       get().appendLog(
         'arbiter',
-        `"The Aether asks for what you don't carry," the ${getNarratorName()} says. "Need: ${missing.join(', ')}."`,
+        `"The ${getEnergyName()} asks for what you don't carry," the ${getNarratorName()} says. "Need: ${missing.join(', ')}."`,
       );
       return;
     }
@@ -29789,7 +29789,7 @@ function runAethercraft(
     if (!fuelItem) {
       get().appendLog(
         'arbiter',
-        `"The Aether reaches for you," the ${getNarratorName()} says, "finds nothing to pull on, and returns to itself."`,
+        `"The ${getEnergyName()} reaches for you," the ${getNarratorName()} says, "finds nothing to pull on, and returns to itself."`,
       );
       return;
     }
@@ -29938,13 +29938,13 @@ function runAethercraft(
     if (inCombat) {
       const ward: StatusEffect = { kind: 'shaped_stone_ward', remainingRounds: 1, label: 'shaped stone ward (+4 AC)' };
       set((s) => s.player ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], ward) } } : s);
-      get().appendLog('world', `You shape Aetherstone into a curving ward around your stance. +4 AC for the next round.`);
+      get().appendLog('world', `You shape ${getEnergyMaterial()} into a curving ward around your stance. +4 AC for the next round.`);
     } else {
       // Convert a Small Rock to a Shaped Aetheric Shard.
       const livePlayer = get().player ?? player;
       const rock = livePlayer.inventory.find((i) => i.name === 'Small Rock' && i.quantity > 0);
       if (!rock) {
-        get().appendLog('world', `You shape the Aetherstone but have no Small Rock to bind it to. The shape dissipates.`);
+        get().appendLog('world', `You shape the ${getEnergyMaterial()} but have no Small Rock to bind it to. The shape dissipates.`);
       } else {
         const consumedRock = livePlayer.inventory
           .map((i) => i.id === rock.id ? { ...i, quantity: i.quantity - 1 } : i)
@@ -30373,7 +30373,7 @@ function handleSidekickDismiss(
   if (!player.sidekick) {
     get().appendLog(
       'arbiter',
-      `"Nothing to dismiss," the ${getNarratorName()} says. "The Aether is quiet here."`,
+      `"Nothing to dismiss," the ${getNarratorName()} says. "The ${getEnergyName()} is quiet here."`,
     );
     return;
   }
@@ -30381,7 +30381,7 @@ function handleSidekickDismiss(
   set((s) => s.player ? { player: { ...s.player, sidekick: null } } : s);
   get().appendLog(
     'world',
-    `${name} stills, then dissolves. The Aether returns to itself, indifferent.`,
+    `${name} stills, then dissolves. The ${getEnergyName()} returns to itself, indifferent.`,
   );
   void get().persist();
 }
@@ -31112,8 +31112,8 @@ function applyItemToGolem(
   get().appendLog(
     'world',
     isSub
-      ? `You pack the ${item.name} into ${golem.name}'s frame. It's not true fuel — the Aetherstone takes it grudgingly, but the worst cracks close. (+${heal} HP, ${newHp}/${golem.hpMax})`
-      : `You work the ${item.name} into ${golem.name}'s frame. It fuses into the Aetherstone and the cracks seal over. (+${heal} HP, ${newHp}/${golem.hpMax})`,
+      ? `You pack the ${item.name} into ${golem.name}'s frame. It's not true fuel — the ${getEnergyMaterial()} takes it grudgingly, but the worst cracks close. (+${heal} HP, ${newHp}/${golem.hpMax})`
+      : `You work the ${item.name} into ${golem.name}'s frame. It fuses into the ${getEnergyMaterial()} and the cracks seal over. (+${heal} HP, ${newHp}/${golem.hpMax})`,
   );
   return true;
 }
@@ -32135,9 +32135,9 @@ function attackMiss(weapon: string | null, enemyName: string): string {
 function attackKill(weapon: string | null, enemyName: string, dmg: number): string {
   const wp = weaponPhrase(weapon);
   return pick([
-    `Your blow${wp} lands clean — ${dmg} damage. ${enemyName} crumples in the dust. The Aetherstone settles.`,
+    `Your blow${wp} lands clean — ${dmg} damage. ${enemyName} crumples in the dust. The ${getEnergyMaterial()} settles.`,
     `${enemyName} folds${wp ? ` under the ${weapon!.toLowerCase()}` : ''}. ${dmg} damage was enough. The room exhales.`,
-    `Final strike${wp} for ${dmg}. ${enemyName} is still. The Aetherstone hums on, indifferent.`,
+    `Final strike${wp} for ${dmg}. ${enemyName} is still. The ${getEnergyMaterial()} hums on, indifferent.`,
     `The killing blow${wp}: ${dmg}. ${enemyName} drops where it stood.`,
   ]);
 }

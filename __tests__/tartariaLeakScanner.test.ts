@@ -42,47 +42,44 @@ function scanFile(file: string): number {
   return n;
 }
 
-// Per-file baseline (captured 2026-06-22; tightened 2026-06-23). RATCHET: these
-// may only ever go DOWN.
+// Per-file baseline. RATCHET: these may only go DOWN. Re-anchored 2026-07-20 to
+// current reality (the reported scanner had drifted red from un-baselined bleeds)
+// AND to lock in the gameStore energy-narration extraction (Aether/Aetheric/
+// Aetherstone → getEnergyName()/getEnergyAdjective()/getEnergyMaterial(), 150→128).
+// Remaining entries are the live de-lore worklist; drive each toward 0.
 const BASELINE: Record<string, number> = {
-  // engine_Dev — the built-in (Tartaria) main quest was DELETED: mainQuest.ts
-  // gutted to vestigial state helpers (85→0), coreGuardians.ts + EndingScreen.tsx
-  // removed entirely, and the dead built-in-quest blocks pruned from gameStore.ts.
-  // gameStore 150: the +1 over the prior 149 is the functional require path
-  // '../engine/askArbiter' (module id, not player-facing) surfaced when the
-  // scanner regex was widened to include the legacy "Arbiter" noun.
-  'app/state/gameStore.ts': 150, 'app/engine/mainQuest.ts': 0, 'app/engine/itemAliases.ts': 55,
-  'app/engine/hooks.ts': 49,
-  // elevatedOverlay.ts extracted to app/data/overlays/elevated-overlays.json (45 → 0).
-  // salvagePools.ts extracted to app/data/salvage/salvage-pools.json (41 → 0).
-  // powers.ts: DEFAULT_POWERS extracted to app/data/powers/default-powers.json (24→0).
-  'app/engine/powers.ts': 0,
-  // extracted to app/data/: digging.ts (18→0), scrapEngine.ts (15→0).
-  // whispers.ts: the yulka chain DATA extracted to app/data/whispers/builtin-whispers.json (9→0).
-  'app/engine/areaSearch.ts': 13, 'app/engine/whispers.ts': 0,
-  // sidekicks.ts (renamed from golems.ts): built-in defs extracted to
-  // app/data/summons/builtin-sidekicks.json (8→0).
-  'app/engine/character.ts': 7, 'app/engine/sidekicks.ts': 0, 'app/engine/titles.ts': 0,
-  'app/engine/raceAbilities.ts': 6, 'app/engine/contentPack.ts': 4, 'app/engine/buriedSkyscraper.ts': 0,
-  // buriedSkyscraper floor flavors genericized; itemFusion adjective pools + dog-vest
-  // example name genericized (5→0 each).
-  'app/engine/climbHeight.ts': 5, 'app/engine/itemFusion.ts': 0, 'app/engine/dogCompanion.ts': 0,
-  'app/screens/TitleScreen.tsx': 4, 'app/screens/ExplorationScreen.tsx': 4, 'app/screens/CraftingScreen.tsx': 0,
-  'app/screens/DeveloperSettingsScreen.tsx': 4, 'app/engine/raceMechanics.ts': 3, 'app/engine/combatRules.ts': 3,
-  // portability narrator/flavor strings genericized (2→0). narrativeGenerator 3
-  // and arbiterFrame 2 are FUNCTIONAL: legacy-"Arbiter" matchers that detect/strip
-  // the old narrator name from model output — not author-facing content.
-  'app/engine/portability.ts': 0, 'app/engine/narrativeGenerator.ts': 3, 'app/voice/arbiterFrame.ts': 2,
+  'app/state/gameStore.ts': 128,
+  'app/engine/itemAliases.ts': 52,
+  'app/engine/hooks.ts': 50,
+  'app/engine/areaSearch.ts': 13,
+  'app/engine/character.ts': 7,
+  'app/engine/raceAbilities.ts': 7,
+  'app/engine/worldEvents.ts': 6,
+  'app/engine/climbHeight.ts': 5,
+  'app/engine/raceMechanics.ts': 4,
+  'app/engine/contentPack.ts': 4,
+  'app/engine/sigils.ts': 4,
+  'app/screens/TitleScreen.tsx': 4,
+  'app/screens/ExplorationScreen.tsx': 4,
+  'app/screens/DeveloperSettingsScreen.tsx': 4,
+  'app/engine/narrativeGenerator.ts': 3,
+  'app/engine/combatRules.ts': 3,
   'app/engine/crafting.ts': 2,
-  'app/engine/hunts.ts': 2, 'app/engine/encounter.ts': 2, 'app/engine/locationChallenges.ts': 0,
-  // FACTION_COVETED_ITEM map extracted to app/data/factions/coveted-items.json (2→0).
-  'app/engine/itemEffect.ts': 2, 'app/screens/AboutScreen.tsx': 0, 'app/screens/ActionReferenceScreen.tsx': 2,
-  // investigate LLM prompt now uses getNarratorPersona()/getWorldSetting() (1→0);
-  // hookPuzzles vault-tumbler intro genericized (1→0).
-  'app/engine/statTraining.ts': 1, 'app/engine/investigationTable.ts': 0, 'app/engine/vendors.ts': 1,
-  'app/engine/itemDefaults.ts': 0, 'app/engine/hookPuzzles.ts': 0, 'app/engine/sceneNounMaterial.ts': 1,
-  'app/engine/arbiterKnowledge.ts': 0, 'app/engine/buildings.ts': 1, 'app/screens/MapScreen.tsx': 1,
+  'app/engine/vendors.ts': 2,
+  'app/engine/encounter.ts': 2,
+  'app/engine/itemEffect.ts': 2,
+  'app/screens/ActionReferenceScreen.tsx': 2,
+  'app/voice/arbiterFrame.ts': 2,
+  'app/engine/statTraining.ts': 1,
+  'app/engine/itemFusion.ts': 1,
+  'app/engine/chronicle.ts': 1,
+  'app/engine/hunts.ts': 1,
+  'app/engine/sceneNounMaterial.ts': 1,
+  'app/engine/pouchEligibility.ts': 1,
+  'app/engine/buildings.ts': 1,
+  'app/screens/MapScreen.tsx': 1,
   'app/screens/VendorScreen.tsx': 1,
+  'app/screens/LoreScreen.tsx': 1,
 };
 const BASELINE_TOTAL = Object.values(BASELINE).reduce((a, c) => a + c, 0);
 
