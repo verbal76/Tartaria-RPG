@@ -199,7 +199,7 @@ import {
   resolveBuildingRoom,
   secretRoomRevealedBy,
 } from '../engine/buildings';
-import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
+import { sellPriceFor, isUnsellable, applySellCaps } from '../engine/sellPrice';
 import { vendorPriceMod, rapportQuestId, chaPriceDiscount } from '../engine/factionRapport';
 import { isTalkDownBlocked } from '../engine/talkDown';
 import { makeWanderer, wandererCagey, type Wanderer } from '../engine/wanderers';
@@ -4675,8 +4675,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // sheds (never the outpost garrison or the market bazaar), and never on top
     // of a stall's wares. patchSceneForBuildingRoom just cleared enemies, so the
     // scene is peaceful here and the spawn lands cleanly on the entry room.
-    if (AETHERKIN_BUILDING_IDS.has(buildingId) && Math.random() < AETHERKIN_BUILDING_CHANCE) {
-      spawnAetherkin(get, set, 'building');
+    // OTA-916 — bank the roll per building-tile. enter/exit is free and returns
+    // you to the same spot, so an unbanked re-roll made the spawn a standing/loot
+    // farm (audit finding). Resolve the roll ONCE per structure, banked whether or
+    // not one spawned, so re-entering a cleared home never re-rolls.
+    {
+      const pl = get().player;
+      if (pl && AETHERKIN_BUILDING_IDS.has(buildingId)) {
+        const tileKey = `${pl.currentLocationId}:${pl.mapX}:${pl.mapY}`;
+        const rolled = get().worldMemory.aetherkinRolledBuildings ?? [];
+        if (!rolled.includes(tileKey)) {
+          set((s) => ({
+            worldMemory: {
+              ...s.worldMemory,
+              aetherkinRolledBuildings: [...(s.worldMemory.aetherkinRolledBuildings ?? []), tileKey],
+            },
+          }));
+          if (Math.random() < AETHERKIN_BUILDING_CHANCE) spawnAetherkin(get, set, 'building');
+        }
+      }
     }
     // OTA-786 — market stalls are shops: stepping into one opens its wares
     // immediately. Back (← BACK) returns to the stall, where the stall tabs +
@@ -18714,9 +18731,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const tPerksSell = require('../engine/titles').titlePerkModifiers(player);
     const isRelicTrade = item.kind === 'relic';
-    const price = (isRelicTrade && tPerksSell.tradeBonus > 0)
+    const multiplied = (isRelicTrade && tPerksSell.tradeBonus > 0)
       ? Math.round(basePrice * (1 + 0.05 * tPerksSell.tradeBonus))
       : basePrice;
+    // OTA-916 — re-clamp to the arbitrage floor as the LAST operation, so the
+    // war-heat + relic-title multipliers (like rapport) can lift the price toward
+    // but never above the cheapest-buy cap. Without this a rapport'd, war-heated
+    // relic stall paid ABOVE the floor on unstocked items — a buy-cheap-sell-here loop.
+    const price = applySellCaps(item, multiplied);
     if (price <= 0) {
       get().appendLog('system', `${scene.vendor.name} won't pay for ${item.name} — no resale value.`);
       return;

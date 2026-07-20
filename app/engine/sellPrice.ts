@@ -106,11 +106,13 @@ function selfCraftedSellCap(item: InventoryItem): number | null {
 export function sellPriceFor(
   item: InventoryItem,
   vendor: VendorInstance | null | undefined,
-  // OTA-805 — Charisma-scaled faction rapport BONUS (0..0.20). Applied to the FINAL
-  // sell price (after the B1 caps) so an earned, high-CHA merchant genuinely sells
-  // higher at a faction they've built rapport with. It's an earned exception to the
-  // generic RARITY_BUY_FLOOR cap; the SELL_FRACTION (0.4) gap keeps buy-then-sell a
-  // loss so it's a merchant perk, not arbitrage. Bottleneck crafting mats are
+  // OTA-805 — Charisma-scaled faction rapport BONUS (0..0.20). Lifts the sell price
+  // toward — but never above — the arbitrage cap: rapport is applied BEFORE the B1
+  // caps (applySellCaps), so an earned, high-CHA merchant sells higher, but the
+  // RARITY_BUY_FLOOR still binds. OTA-916 — this used to apply AFTER the caps as an
+  // "earned exception," but you can buy an item from a CHEAP stall and sell it at a
+  // rapport'd stall for more than you paid; the fraction gap only protects the
+  // same-stall case, so the floor must clamp last. Bottleneck crafting mats are
   // exempt (they stay crafting-only). Callers pass vendorPriceMod(...); default 0.
   rapportBonus = 0,
 ): number {
@@ -138,7 +140,7 @@ export function sellPriceFor(
     if (offer) {
       const dur = durabilityFraction(item);
       raw = Math.max(1, Math.round(offer.price * SELL_FRACTION * dur));
-      return withRapport(applySellCaps(item, raw));
+      return applySellCaps(item, withRapport(raw));
     }
   }
   if (!item.rarity) {
@@ -153,14 +155,16 @@ export function sellPriceFor(
   const base = baseTable[item.rarity] ?? 5;
   const dur = durabilityFraction(item);
   raw = Math.max(1, Math.round(base * SELL_FRACTION * dur));
-  return withRapport(applySellCaps(item, raw));
+  return applySellCaps(item, withRapport(raw));
 }
 
 /** OTA-802 — apply the B1 sell caps to a computed base sell price:
  *  (a) a self-crafted item never sells above its ingredient value (+Legendary
  *      bump); (c) nothing sells above the cheapest realistic buy for its rarity
- *  (RARITY_BUY_FLOOR), closing cross-stall arbitrage. */
-function applySellCaps(item: InventoryItem, raw: number): number {
+ *  (RARITY_BUY_FLOOR), closing cross-stall arbitrage.
+ *  OTA-916 — exported so the store can re-apply it as the FINAL step after the
+ *  war-heat / relic-title sell multipliers, keeping the floor the last word. */
+export function applySellCaps(item: InventoryItem, raw: number): number {
   let price = raw;
   if (item.selfCrafted) {
     const cap = selfCraftedSellCap(item);
