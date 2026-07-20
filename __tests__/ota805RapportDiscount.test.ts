@@ -46,7 +46,7 @@ import { useGameStore } from '../app/state/gameStore';
 import {
   chaPriceDiscount, hasFactionRapport, vendorPriceMod, rapportQuestId,
 } from '../app/engine/factionRapport';
-import { sellPriceFor } from '../app/engine/sellPrice';
+import { sellPriceFor, applySellCaps } from '../app/engine/sellPrice';
 import type { InventoryItem } from '../app/engine/types';
 
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
@@ -70,11 +70,17 @@ describe('OTA-805 — rapport pricing helpers', () => {
     expect(vendorPriceMod(20, ['fq_reclaimers_guild_rapport'], 'reclaimers_guild')).toBeCloseTo(0.20);
     expect(vendorPriceMod(20, ['fq_reclaimers_guild_rapport'], null)).toBe(0); // no faction
   });
-  it('sellPriceFor applies the rapport bonus on top of the base sell', () => {
+  it('sellPriceFor lifts the sell price with rapport, but never past the arbitrage floor', () => {
+    // OTA-916 — rapport (like war-heat / relic-title) now clamps to RARITY_BUY_FLOOR
+    // LAST, so it can raise a below-floor sell but can't open buy-cheap-sell-here
+    // arbitrage. A Common vest already sits AT its floor, so rapport can't lift it —
+    // that's the fix, not a regression.
     const gear = { id: 'g', name: 'Iron Vest', kind: 'armor', rarity: 'Common', quantity: 1, tags: ['armor'] } as InventoryItem;
     const base = sellPriceFor(gear, null, 0);
     const bonused = sellPriceFor(gear, null, 0.20);
-    expect(bonused).toBeGreaterThan(base);
+    const floor = applySellCaps(gear, 1_000_000); // huge input → the floor itself
+    expect(bonused).toBeGreaterThanOrEqual(base); // helps, or is already capped
+    expect(bonused).toBeLessThanOrEqual(floor);   // never above the arbitrage floor
   });
 });
 

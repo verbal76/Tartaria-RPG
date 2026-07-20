@@ -17458,4 +17458,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Aetherkin were already bestiary-gated (they live in enemies.json) — no change needed there. Verified:
 // ota915GreatClimbCodex (summit-boss projection + name-match, location mask, hidden-title gate); typecheck:ci +
 // typecheck:tests (200 baseline) + lint clean; full fast suite green. Content → HAL + golem only, NOT engine.
-export const OTA_BUILD_ID = '2026-07-20-915-great-climb-codex-gating';
+//
+// OTA-916 (AUDIT FIXES — two economy/faction leaks from a game-wide bug/exploit sweep) — (1) the OTA-914
+// Aetherkin BUILDING spawn re-rolled on every enter() — and enter/exit is free and returns you to the same
+// tile, so a home/shed was a repeatable faction-standing (+2 reverence ×4 factions per spare) AND loot farm.
+// The roll is now BANKED per building-tile (worldMemory.aetherkinRolledBuildings): one roll per structure,
+// banked whether or not one spawned, mirroring the mud spawn's tileIsNovel gate. (2) The rapport / war-heat /
+// relic-title SELL multipliers stacked ON TOP of the RARITY_BUY_FLOOR cap on unstocked items, letting a
+// rapport'd stall pay above the cheapest-buy floor (buy-cheap-elsewhere → sell-here loop). applySellCaps is now
+// applied as the FINAL step (exported; re-clamped in the store after war/title, and rapport moved before the cap
+// inside sellPriceFor), so the floor is always the last word; rapport still lifts a below-floor sell. Both are
+// balance leaks, not crashes; the sweep found no corruption/crash/state-integrity failures. Verified:
+// ota916AuditFixes (bank + floor) + retargeted ota805RapportDiscount; typecheck:ci + typecheck:tests (200
+// baseline) + lint clean; full fast suite green. Fixes → HAL + golem only, NOT engine.
+export const OTA_BUILD_ID = '2026-07-20-916-audit-fixes-spawn-bank-sell-floor';

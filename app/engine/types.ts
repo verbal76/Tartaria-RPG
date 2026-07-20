@@ -1739,6 +1739,11 @@ export interface WorldMemory {
    *  from the five beacons. Prevents a re-build. (Legacy field name retained for
    *  save compatibility.) */
   skyreacherBoltcasterGranted?: boolean;
+  /** OTA-916 — building-tile keys ("loc:x:y") whose Aetherkin spawn roll has
+   *  already been resolved. enter/exit is free and doesn't move you, so without
+   *  this a home/shed re-rolls its 28% Aetherkin every entry — a faction-standing
+   *  + loot farm. One roll per structure; banked whether or not one spawned. */
+  aetherkinRolledBuildings?: string[];
   /** arb-fix — one-time make-good: a faction fused item the player should
    *  have received but didn't (the pre-fix faction catalyst never counted
    *  toward the gate). Granted once per save on load for dev names; this
