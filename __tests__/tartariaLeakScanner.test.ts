@@ -50,7 +50,7 @@ function scanFile(file: string): number {
 const BASELINE: Record<string, number> = {
   'app/state/gameStore.ts': 55,
   'app/engine/itemAliases.ts': 0,
-  'app/engine/hooks.ts': 50,
+  'app/engine/hooks.ts': 0,
   'app/engine/areaSearch.ts': 13,
   'app/engine/character.ts': 7,
   'app/engine/raceAbilities.ts': 7,

@@ -1,0 +1,550 @@
+{
+  "smoke": [
+    {
+      "line": "A column of smoke or steam rises in the distance, thin and straight.",
+      "nouns": [
+        "smoke",
+        "steam",
+        "column",
+        "plume"
+      ]
+    },
+    {
+      "line": "A faint smell of burning old bedrock drifts from somewhere north.",
+      "nouns": [
+        "smoke",
+        "fire",
+        "burning",
+        "smell"
+      ]
+    }
+  ],
+  "footprints": [
+    {
+      "line": "A thread of footprints, not yours, crosses your path and trails off.",
+      "nouns": [
+        "footprints",
+        "tracks",
+        "prints",
+        "trail"
+      ]
+    },
+    {
+      "line": "Boot impressions press deep into the dirt, heading toward the rise.",
+      "nouns": [
+        "footprints",
+        "boots",
+        "tracks",
+        "prints"
+      ]
+    }
+  ],
+  "obelisk": [
+    {
+      "line": "A toppled obelisk lies on its side, runes faded but not yet silent.",
+      "nouns": [
+        "obelisk",
+        "pillar",
+        "runes",
+        "stone"
+      ]
+    },
+    {
+      "line": "A standing stone juts from the mud, its face cut with old old glyphs.",
+      "nouns": [
+        "stone",
+        "glyphs",
+        "pillar",
+        "obelisk"
+      ]
+    }
+  ],
+  "wagon": [
+    {
+      "line": "A wagon, abandoned and broken-axled, leans into the mud ahead.",
+      "nouns": [
+        "wagon",
+        "cart",
+        "wreck",
+        "caravan"
+      ]
+    }
+  ],
+  "arch": [
+    {
+      "line": "You spot what looks like a stone arch, half-swallowed by old mud.",
+      "nouns": [
+        "arch",
+        "gate",
+        "archway",
+        "doorway",
+        "ruin",
+        "workroom",
+        "work-room",
+        "work room",
+        "hollow",
+        "passage"
+      ]
+    }
+  ],
+  "glint": [
+    {
+      "line": "A glint of metal — too small to name yet — lies in the rubble.",
+      "nouns": [
+        "glint",
+        "metal",
+        "shine",
+        "rubble"
+      ]
+    }
+  ],
+  "handprint": [
+    {
+      "line": "A handprint pressed into old bedrock dust, recent enough to still hold shape.",
+      "nouns": [
+        "handprint",
+        "print",
+        "mark",
+        "dust"
+      ]
+    }
+  ],
+  "thread": [
+    {
+      "line": "A thread of cold air leaks from somewhere behind the rubble.",
+      "nouns": [
+        "cold",
+        "air",
+        "draft",
+        "breeze"
+      ]
+    }
+  ],
+  "resonance": [
+    {
+      "line": "A faint resonance pulses from the south. Something there is awake.",
+      "nouns": [
+        "resonance",
+        "pulse",
+        "hum",
+        "vibration"
+      ]
+    },
+    {
+      "line": "The strange haze thickens around one specific spot. You cannot tell why.",
+      "nouns": [
+        "haze",
+        "thickening",
+        "spot",
+        "aether"
+      ]
+    }
+  ],
+  "half_buried_spire": [
+    {
+      "line": "Half an old spire juts from the mud like the bone of a long-dead beast, the top three storeys still defiant.",
+      "nouns": [
+        "spire",
+        "tower",
+        "top",
+        "building"
+      ]
+    },
+    {
+      "line": "A buried dome's apex breaks the surface ahead, glass-glazed and humming faintly.",
+      "nouns": [
+        "dome",
+        "apex",
+        "roof",
+        "building"
+      ]
+    }
+  ],
+  "etheric_storm": [
+    {
+      "line": "The horizon cracks — blue and purple lightning, an charged storm walking on long legs across the plain.",
+      "nouns": [
+        "storm",
+        "lightning",
+        "sky",
+        "horizon"
+      ]
+    },
+    {
+      "line": "Static gathers in your hair. The strangeness is about to break weather on this ridge.",
+      "nouns": [
+        "storm",
+        "static",
+        "sky",
+        "aether"
+      ]
+    }
+  ],
+  "pulsing_mud": [
+    {
+      "line": "A patch of mud just off the path pulses with a faint blue glow, in time with nothing you can hear.",
+      "nouns": [
+        "mud",
+        "glow",
+        "patch",
+        "aetherstone"
+      ]
+    }
+  ],
+  "frozen_statue": [
+    {
+      "line": "A figure stands ahead, perfectly still — until you realise the hardened glass froze them mid-step, generations ago.",
+      "nouns": [
+        "statue",
+        "figure",
+        "frozen",
+        "body"
+      ]
+    }
+  ],
+  "sentinel_patrol": [
+    {
+      "line": "Far to the east, a patrol construct paces a ruined wall — patrol pattern, by the book, never deviating.",
+      "nouns": [
+        "sentinel",
+        "machine",
+        "patrol",
+        "automaton"
+      ]
+    }
+  ],
+  "mud_golem_stir": [
+    {
+      "line": "The mud over there is bulging in a way mud does not bulge unaided. Something is reforming itself.",
+      "nouns": [
+        "mud",
+        "bulge",
+        "golem",
+        "mound"
+      ]
+    }
+  ],
+  "temporal_eddy": [
+    {
+      "line": "For a half-second the light shifts — sunset, then dawn, then now. A temporal eddy, the kind scavengers warn about.",
+      "nouns": [
+        "eddy",
+        "time",
+        "light",
+        "distortion"
+      ]
+    }
+  ],
+  "spatial_warp": [
+    {
+      "line": "The way you came is not where it should be. The landscape has folded slightly while your back was turned.",
+      "nouns": [
+        "warp",
+        "fold",
+        "landscape",
+        "distance",
+        "path"
+      ]
+    }
+  ],
+  "whisper_crystal": [
+    {
+      "line": "A crystal embedded in a half-broken pillar whispers — actual words, almost — when you pass within arm's reach.",
+      "nouns": [
+        "crystal",
+        "whisper",
+        "whispers",
+        "pillar",
+        "voice"
+      ]
+    }
+  ],
+  "black_cloak": [
+    {
+      "line": "Someone in a long black coat is two ridges back, matching your pace. They have been there for a while.",
+      "nouns": [
+        "cloak",
+        "coat",
+        "figure",
+        "follower",
+        "agent"
+      ]
+    }
+  ],
+  "giant_silhouette": [
+    {
+      "line": "On the far ridge — for the space of a held breath — a figure too tall to be human watches you. Then it isn't there.",
+      "nouns": [
+        "giant",
+        "silhouette",
+        "figure",
+        "ridge",
+        "shadow"
+      ]
+    }
+  ],
+  "bioluminescent_path": [
+    {
+      "line": "A line of pale-blue fungus blooms across the ground ahead — the first walkers grow this where they walk often.",
+      "nouns": [
+        "fungus",
+        "mushroom",
+        "glow",
+        "path",
+        "fungi"
+      ]
+    }
+  ],
+  "wreck_construct": [
+    {
+      "line": "An strange construct lies half-toppled in the mud, one arm still flexing weakly, its core dim but unbroken.",
+      "nouns": [
+        "construct",
+        "automaton",
+        "machine",
+        "wreck",
+        "arm"
+      ]
+    }
+  ],
+  "submerged_steeple": [
+    {
+      "line": "The top of a flooded old cathedral pierces the standing water ahead — steeple intact, the rest drowned.",
+      "nouns": [
+        "steeple",
+        "cathedral",
+        "spire",
+        "water",
+        "church"
+      ]
+    }
+  ],
+  "black_market_lantern": [
+    {
+      "line": "A green lantern hangs at the mouth of a culvert — the marsh-folk mark their hidden markets with that exact green.",
+      "nouns": [
+        "lantern",
+        "culvert",
+        "market",
+        "green",
+        "sign"
+      ]
+    }
+  ],
+  "aether_grid_hum": [
+    {
+      "line": "Under your boots the ground hums steadily — an old strange grid line, still alive, running east.",
+      "nouns": [
+        "grid",
+        "hum",
+        "line",
+        "ley",
+        "ground"
+      ]
+    }
+  ],
+  "sealed_vault_door": [
+    {
+      "line": "A circular old vault door, mud-pasted but intact, lies recessed into the slope. The locking glyphs are dim — but not gone.",
+      "nouns": [
+        "vault",
+        "door",
+        "gate",
+        "seal",
+        "glyphs"
+      ]
+    }
+  ],
+  "preserved_corpse": [
+    {
+      "line": "An old body lies in the dirt, the hardened glass having frozen them at the moment they fell — robes still pristine, satchel still buckled.",
+      "nouns": [
+        "body",
+        "corpse",
+        "robes",
+        "satchel",
+        "tartarian"
+      ]
+    }
+  ],
+  "loose_floorboard": [
+    {
+      "line": "One floorboard sits proud of the rest, its nails backed half out — lifted and re-laid more than once.",
+      "nouns": [
+        "floorboard",
+        "board",
+        "plank",
+        "floor",
+        "nails"
+      ]
+    }
+  ],
+  "hidden_compartment": [
+    {
+      "line": "The wainscoting has a seam where there should be none — a panel, cut to the size of a hand.",
+      "nouns": [
+        "panel",
+        "wainscoting",
+        "seam",
+        "wall",
+        "compartment"
+      ]
+    }
+  ],
+  "watching_portrait": [
+    {
+      "line": "A portrait hangs crooked on the wall. The painted eyes have been scratched out — recently, the bare canvas beneath still pale.",
+      "nouns": [
+        "portrait",
+        "painting",
+        "eyes",
+        "frame",
+        "canvas"
+      ]
+    }
+  ],
+  "bricked_doorway": [
+    {
+      "line": "A doorway in the far wall has been bricked up, the mortar still pale. Whatever room it led to, someone wanted it shut.",
+      "nouns": [
+        "doorway",
+        "bricks",
+        "brickwork",
+        "wall",
+        "mortar"
+      ]
+    }
+  ],
+  "bloodstain_rug": [
+    {
+      "line": "A rug lies dead-centre on the floor — wrong for the room. The boards along its edge are dark with something old that soaked in.",
+      "nouns": [
+        "rug",
+        "carpet",
+        "stain",
+        "boards",
+        "floor"
+      ]
+    }
+  ],
+  "open_ledger": [
+    {
+      "line": "A ledger lies open on the table, a column of names half of them struck through. The ink on the last entry is not yet dry.",
+      "nouns": [
+        "ledger",
+        "book",
+        "names",
+        "register",
+        "page"
+      ]
+    }
+  ],
+  "childs_drawing": [
+    {
+      "line": "A child's drawing is pinned to the wall — a tall figure, all angles, standing over small stick people. Crayon, but the proportions are exact.",
+      "nouns": [
+        "drawing",
+        "picture",
+        "sketch",
+        "crayon",
+        "paper"
+      ]
+    }
+  ],
+  "stopped_clock": [
+    {
+      "line": "A clock on the mantel has stopped — not wound down, stopped, hands frozen at a single minute as if the moment itself jammed.",
+      "nouns": [
+        "clock",
+        "mantel",
+        "hands",
+        "timepiece",
+        "pendulum"
+      ]
+    }
+  ],
+  "scratched_door": [
+    {
+      "line": "The inside of the door is raked with scratch marks — fingernails, low down, frantic. Someone was shut in here and did not want to be.",
+      "nouns": [
+        "door",
+        "scratches",
+        "marks",
+        "gouges",
+        "wood"
+      ]
+    }
+  ],
+  "warm_chair": [
+    {
+      "line": "The hearth is cold but swept clean, and a single chair faces it, angled as if someone just rose. The seat is still warm.",
+      "nouns": [
+        "chair",
+        "hearth",
+        "seat",
+        "fireplace",
+        "stool"
+      ]
+    }
+  ],
+  "crooked_shelf": [
+    {
+      "line": "One shelf of books doesn't match the others — same spines, no dust, and they don't quite sit flush against the wall.",
+      "nouns": [
+        "shelf",
+        "bookshelf",
+        "books",
+        "spines",
+        "shelves"
+      ]
+    }
+  ],
+  "ceiling_drip": [
+    {
+      "line": "Water beads and falls from one spot in the ceiling, steady, though no storm has touched this place in years. Above is meant to be sealed.",
+      "nouns": [
+        "ceiling",
+        "drip",
+        "water",
+        "leak",
+        "rafters"
+      ]
+    }
+  ],
+  "bolted_strongbox": [
+    {
+      "line": "A strongbox sits bolted to the floor in the corner, its lock an old tumbler — dim, but not dead.",
+      "nouns": [
+        "strongbox",
+        "box",
+        "lock",
+        "chest",
+        "tumbler"
+      ]
+    }
+  ],
+  "aether_tang": [
+    {
+      "line": "The air in this room tastes of the strangeness — sharp, metallic, the way it does near a working core. Nothing here should hum, and yet.",
+      "nouns": [
+        "air",
+        "aether",
+        "smell",
+        "hum",
+        "tang"
+      ]
+    }
+  ],
+  "barefoot_prints": [
+    {
+      "line": "A set of footprints crosses the dust on the floor — small, bare — and they stop dead in the middle of the room. They do not come back.",
+      "nouns": [
+        "footprints",
+        "prints",
+        "dust",
+        "tracks",
+        "steps"
+      ]
+    }
+  ]
+}
