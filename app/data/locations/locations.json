@@ -183,7 +183,7 @@
     "name": "Grand Spire of Etheria",
     "type": "tower",
     "parent": "asgardar",
-    "description": "A monumental tower in Asgardar that drew Aether from celestial realms. Said to be one of the most powerful Aetheric structures ever built.",
+    "description": "A monumental tower in Asgardar that drew Aether from celestial realms — harvesting the sun and the cold night sky at once, venting its waste heat through vacuum-sealed radiators into the black between the stars. Said to be one of the most powerful Aetheric structures ever built.",
     "danger": 5,
     "tags": [
       "tower",
@@ -296,7 +296,7 @@
     "name": "Thametan's Tower",
     "type": "tower",
     "parent": "samarran",
-    "description": "Houses the catastrophic Aetheric Engine. Site of Elior Zalmar's final resonance cascade. The walls still hum.",
+    "description": "Houses the catastrophic Aetheric Engine. Site of Elior Zalmar's final resonance cascade — the day the vibration shook the radiators' vacuum seals apart and the trapped heat, with nowhere left to vent, poured down into the bedrock. The walls still hum.",
     "danger": 5,
     "tags": [
       "tower",

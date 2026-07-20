@@ -17282,4 +17282,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // scheme — Aether (the force), Etheric (the machinery/phenomena), Etherium (the crystallized shards) —
 // additively, no mass-rename of existing "Aetheric" text. Data-only; Tartaria canon → HAL + golem only,
 // never engine. Covered by ota837CodexData + ota839LoreAccuracy + ambientLoreReach (all green).
-export const OTA_BUILD_ID = '2026-07-20-904-aetherstone-thesis-flavor';
+//
+// OTA-905 (Aetherstone Thesis — flavor, second tranche: items, weather, locations, referenced works) —
+// finishes threading the owner's canon doc through the world data, all additive, no retcon:
+//  • ITEMS (materials.json) — the shard family now names its origin: Aether Crystal is "a pocket of
+//    Etherium the calcification never quite let cool"; the Aetheric/Aether Shards carry the trapped
+//    Etheric charge / slow-cooled-whole Etherium.
+//  • WEATHER (weather.json) — the two lightning weathers gain their real cause: Aetheric Storm is the
+//    buried Etheric fields discharging where the old grid shorts; Aether Lightning is trapped Etherium
+//    venting a charge held since the calcification.
+//  • LOCATIONS (locations.json) — the Grand Spire of Etheria's description now carries the radiative heat-
+//    sink mechanism (harvest sun + cold sky, vent waste heat to the stars); Thametan's Tower's carries the
+//    vacuum-seal failure that dumped the heat into the bedrock. Two matching ambient lines added to
+//    location-flavors.json (Spire radiators gone dark; Thametan frost-line where the cold stopped coming).
+//  • REFERENCED WORKS (concepts.json) — three new discoverable codex entries for the thesis's cited works:
+//    the Zalmar Texts, the Hwang Radiative Principles, the Soldani Crystalline Theorems.
+// Three-way terminology (Aether / Etheric / Etherium) used additively per the doc. Data-only; Tartaria
+// canon → HAL + golem only, never engine. Verified: ota837CodexData + ota839LoreAccuracy + ambientLoreReach
+// + mapIntegrityAudit green; full fast suite 467/467.
+export const OTA_BUILD_ID = '2026-07-20-905-aetherstone-thesis-flavor-2';
