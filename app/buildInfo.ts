@@ -17364,4 +17364,32 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // assertions; titles/arbiterTitlesScreen/canonFacts retargeted (20 → 21 titles); climbRopeMechanics fall
 // damage retargeted to the scaled formula; typecheck:ci + typecheck:tests (200 baseline, no growth) + lint
 // clean; full fast suite 469/469 (3972). Content → HAL + golem only, NOT engine (lore-agnostic).
-export const OTA_BUILD_ID = '2026-07-20-910-great-climbs-skyreacher-set';
+// OTA-911 (GREAT CLIMBS — mountaineering rework: guardians, gear, combat rules — HAL + golem only) —
+// heavy-lore follow-up to OTA-910. The five great climbs are the Aether-collector towers of the old
+// planetary grid — the sky-antennas that drew Aether from sun + cold night into the cities (the Grand Spire
+// "channeled cosmic Aether into the city grid"), the same grid whose resonance cascade at Thametan's Tower
+// drowned the world. Their automated defenders never stood down (canon etheric_guardians: "drones to war-
+// scale machines... defend the Tartarian sites since before the Flood"). Changes:
+// (1) NEW engine module climbEncounters.ts — winged sentinels + collector drones ambush you mid-climb,
+//     2–5 times scaling with height (~floor(tiers/3), spread across the middle pitches, tougher band the
+//     higher you go); scaled to the player via scaleEncounterForContext. Injected from the climb handler.
+// (2) STRAP → LEGS SLOT: the Hardened Climbing Strap is now a legs-slot harness (was cloak; `wardrobe`-tag
+//     routing in equipment.ts → ['legs'], all equipped.cloak strap checks → equipped.legs, ExplorationScreen
+//     too). Description rewritten (legs harness; rest + fight anchor; great-climb-mandatory; collector-tower
+//     lore). The Skyreacher legs piece (Greaves) moved to the freed CLOAK slot as the "Skyreacher Mantle" so
+//     the full set + strap are worn together during the guardian fights (set now head/chest/cloak/feet/hands).
+// (3) GREAT-CLIMB ENTRY GATE: from the ground you now need BOTH the strap equipped (legs) AND a Reclaimer's
+//     Rope with enough line to outlast the whole climb (totalTiers × 15 wear; a fresh 300-durability rope
+//     clears the 15-tier Spire). Refused at the base otherwise. Mid-climb strap-wall + rest-gate stay as
+//     backstops if the strap is stripped after you're up.
+// (4) COMBAT RULES ON A CLIMB: dodge & flee are refused while elevated (early intercept — no roll/stamina
+//     spent; inventory + drinking still work). You can't climb past a live fight (forces you to clear a
+//     climb-ambush before the next pitch). Mid-climb encounters only fire WITH the strap (you can't fight a
+//     bare rope face — "without the strap you fight only at top or bottom"). UI: dodge/flee/golem buttons
+//     hidden while elevated.
+// (5) COMPANIONS: the golem can't climb — benched narratively at the base on the first pitch, its command
+//     refused while you're elevated (mirrors the dog's existing bench). Both "return" on descent.
+// Verified: climbEncounters (+10 assertions) + climbCombatGates integration (dodge/flee refusal) + greatClimbs
+// retargeted (Mantle/cloak, strap→legs); typecheck:ci + typecheck:tests (200 baseline, no growth) + lint clean;
+// full fast suite 471/471. Content → HAL + golem only, NOT engine.
+export const OTA_BUILD_ID = '2026-07-20-911-great-climbs-mountaineering-rework';

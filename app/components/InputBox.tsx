@@ -499,7 +499,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             </View>
 
             <View style={styles.quickRowLine}>
-              {golem && golem.hp > 0 ? (
+              {golem && golem.hp > 0 && !elevatedOn ? (
+                // OTA-911 — the golem is benched at the climb base (it can't
+                // climb), so its command is hidden while you're elevated.
                 <QuickBtn label={`golem (${golem.hp}/${golem.hpMax})`} onPress={() => onSubmit('use golem')} tone="ready" />
               ) : null}
               {dog && dog.hp > 0 ? (
@@ -533,13 +535,16 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {raceAbilityReady && onOpenRaceAbilities ? (
                 <QuickBtn label="✦ ability" onPress={onOpenRaceAbilities} tone="ready" />
               ) : null}
-              <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
+              {/* OTA-911 — dodge and flee are off while you're on a climb: no
+                  footing to weave a parry, nowhere to flee but straight down.
+                  Hidden here (the engine also refuses them defensively). */}
+              {!elevatedOn ? <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} /> : null}
               {/* OTA-847 (STEALTH SYSTEM) — in-combat STEALTH. First action of the
                   fight = SNEAK ATTACK (free STE check for the drop); mid-combat =
                   BACKSTAB attempt (costs your turn, STE initiative race). The
                   'sneak' verb routes to the stealth intent handler either way. */}
               <QuickBtn label="stealth" defensive onPress={() => onSubmit('sneak')} />
-              <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} />
+              {!elevatedOn ? <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} /> : null}
               {/* OTA-361 — loot a knocked-out humanoid. One tap strips their
                   kit (damaged) + drops + TC and clears them from the fight. */}
               {knockedOutPresent ? (

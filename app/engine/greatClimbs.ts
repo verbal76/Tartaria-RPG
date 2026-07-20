@@ -61,9 +61,9 @@ export const GREAT_CLIMBS: readonly GreatClimb[] = [
     noun: 'the Great Obsidian Monolith',
     tokens: ['obsidian monolith', 'great obsidian', 'monolith'],
     tiers: 13,
-    rewardArmor: 'Skyreacher Greaves',
+    rewardArmor: 'Skyreacher Mantle',
     summitFlavor:
-      'The tallest of the black pillars ends in a flat, wind-scoured crown. A pair of dark greaves stands upright in the glass as if their owner had simply stepped out of them and off the edge.',
+      'The tallest of the black pillars ends in a flat, wind-scoured crown. A dark mantle is furled around the old antenna-stump here, snapping in the updraft as if it had been waiting for shoulders to settle on.',
   },
   {
     id: 'thametan_tower',

@@ -65,9 +65,9 @@ describe('weapon coatings get their own Coatings section', () => {
 });
 
 describe('the Hardened Climbing Strap is climbing gear (Tools), not Armor', () => {
-  // It's worn in the cloak slot (`wardrobe` tag) but carries no AC — it opens the
-  // climb_steep gate like a rope. It should list under Tools with the other
-  // climbing implements, NOT masquerade as defensive Armor.
+  // It's worn in the legs slot (`wardrobe` tag → a climbing harness, OTA-911) but
+  // carries no AC — it opens the climb_steep gate like a rope. It should list under
+  // Tools with the other climbing implements, NOT masquerade as defensive Armor.
   it('the strap categorizes as tool, not armor', () => {
     expect(categoriesForItem(mk('Hardened Climbing Strap', ['exploration', 'wardrobe'], 'exploration'))).toEqual(['tool']);
   });

@@ -92,10 +92,13 @@ describe('OTA-910 — the Skyreacher armor set', () => {
     }
   });
 
-  it('covers head/chest/legs/feet/hands and NEVER the cloak (reserved for the strap)', () => {
+  it('covers head/chest/cloak/feet/hands and NEVER legs (left free for the climbing strap)', () => {
+    // OTA-911 — the Hardened Climbing Strap now occupies the LEGS slot, so the
+    // set piece that used to be legs (Greaves) moved to the cloak slot (Mantle).
+    // The full set + strap can then be worn together during the climb.
     const slots = pieces.map((p) => p!.slot).sort();
-    expect(slots).toEqual(['chest', 'feet', 'hands', 'head', 'legs']);
-    expect(slots).not.toContain('cloak');
+    expect(slots).toEqual(['chest', 'cloak', 'feet', 'hands', 'head']);
+    expect(slots).not.toContain('legs');
   });
 
   it('the effective (mitigating) resist list keeps all three — the Legendary ladder does not overwrite them', () => {
