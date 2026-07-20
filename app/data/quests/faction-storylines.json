@@ -112,12 +112,12 @@
     {
       "id": "story_reclaimer_relic_run",
       "title": "The Reclaimer Relic Run",
-      "posterText": "Reclaimers Guild Speaker offers a five-stop relic run — five hidden caches, five takes, no questions. 1000 TC, Guild standing, and a permanent slot on the haul board.",
+      "posterText": "Reclaimers Guild Speaker offers a five-stop relic run — five hidden caches, five takes, no questions. 1400 TC, Guild standing, and a permanent slot on the haul board.",
       "factionId": "reclaimers_guild",
       "minRep": 5,
-      "rewardTc": 1000,
-      "rewardItem": "Echoing Steps Boots",
-      "rewardRep": 20,
+      "rewardTc": 1400,
+      "rewardItem": "Explorer's Aetheric Greaves",
+      "rewardRep": 24,
       "stages": [
         {
           "narration": "The Speaker hands you a sealed map with five marks. \"Each is a relic cache. Hit them in order. You keep nothing of the haul beyond a finder's cut — but you walk out a name in the Guild.\"",

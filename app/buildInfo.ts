@@ -16530,4 +16530,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //       below-floor sell. Both are balance leaks, not crashes; sweep found no corruption/crash/state failures.
 // Verified: ota916AuditFixes + retargeted ota805RapportDiscount; typecheck:ci + typecheck:tests + lint clean;
 // full fast suite green. Fixes → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-893-audit-fixes-spawn-bank-sell-floor';
+// OTA-894 (BALANCE TUNE — reward-monotonicity fix from the balance/economy audit; port of HAL OTA-917) — "The
+// Reclaimer Relic Run" was the reward outlier of all 14 storylines: 7 stages but the lowest payout (1000 TC /
+// 20 rep + a Common item that is the Reclaimer race's own starter — a worthless duplicate for its runners).
+// Re-tiered monotone: rewardTc 1000→1400, rewardRep 20→24, rewardItem Echoing Steps Boots → Explorer's Aetheric
+// Greaves (Rare, tcSell 48, feet, not a race starter); posterText TC updated. Data-only; JSON valid;
+// contractUIRewards + echoingBootsArmor green. (Gear-resale-as-scrap mis-tune deferred — needs a per-item
+// buy-grounded fix to avoid reopening arbitrage.) Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-894-reclaimer-relic-run-reward-retier';
