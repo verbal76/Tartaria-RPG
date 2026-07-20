@@ -156,20 +156,30 @@ edits won't touch it. If a tool stages it: `git checkout HEAD -- app.json`.
 ## 3. The change loop (every code change)
 
 1. Edit code under `app/` in that line's worktree.
-2. `npx tsc --noEmit` — the **app/** source must be clean. (The repo has many
-   pre-existing **test-file** type errors — `stealth` stat drift, `createAsync`
-   self-ref, etc. — that are NOT yours; filter to `app/…` when judging clean.)
-3. Run the touched jest suites. Heavy stress probes (`combatBalanceProbe`,
-   `dogGolemCombatStress`, `*Stress`) **OOM the ~8 GB CI container** — that's
-   environmental, not a regression; exclude them.
-4. Bump `app/buildInfo.ts` `OTA_BUILD_ID` to the next `YYYY-MM-DD-NNN-desc` for
+2. **CI gates (all BLOCKING on HAL + golem — run before pushing; a red gate now
+   fails the PR):**
+   - `npm run typecheck:ci` — **app/** source, strict-clean (0 errors).
+   - `npm run typecheck:tests` — the test-typecheck RATCHET: pre-existing test-
+     file type debt is frozen at `.ci-typecheck-tests-baseline`; new/edited tests
+     must typecheck, the count may only shrink. If you clear some, lower the
+     baseline (`node scripts/ci-typecheck-tests.mjs --update-baseline`).
+   - `npm run test:ci:fast` — the 467 deterministic suites (the real jest
+     ratchet). `jest.setup.js` seeds Math.random + pins incidental weather, so
+     runs are deterministic — a failure here is real, not a flake. (`test:ci:heavy`
+     = the memory-hungry sims, non-blocking / reported everywhere — Open Item #2.)
+   - `npm run lint` — ESLint 9 flat config (`eslint.config.js`), a lean high-
+     signal rule set; must be 0 errors.
+   NOTE — on **engine_Dev** the fast-jest and lint jobs are **reported, not
+   blocking** yet (Open Item #1: engine's own ~16-suite backlog). Still run them;
+   just don't be surprised the pre-existing engine reds are red.
+3. Bump `app/buildInfo.ts` `OTA_BUILD_ID` to the next `YYYY-MM-DD-NNN-desc` for
    that line, with a short comment block explaining the change.
-5. Update this `HANDOFF.md` (open-issues / recent-OTAs) in the same commit when
+4. Update this `HANDOFF.md` (open-issues / recent-OTAs) in the same commit when
    the change is notable.
-6. Commit with the trailers in §6, then push that line's branch (`git push -u
+5. Commit with the trailers in §6, then push that line's branch (`git push -u
    origin <branch>`). All three worktrees are now checked out ON their branches
    (no detached HEAD). Retry network failures with exponential backoff.
-7. After pushing, ensure an **open draft PR** exists for the branch (create one if
+6. After pushing, ensure an **open draft PR** exists for the branch (create one if
    not). PRs already exist for the standing lines (#2 HaL2001, #7 golem-line,
    #13 engine_Dev, etc.).
 
@@ -250,6 +260,29 @@ Key invariants worth knowing:
   Legendary), NOT input rarity. Variety matters, not rarity.
 
 ## 8. Open issues / watch list (current)
+
+- **OPEN ITEMS (2026-07-20) — carried forward from the studio-level / CI-hardening
+  session. Two tracked threads, neither blocking day-to-day work:**
+  1. **Engine's own red-suite backlog (~16 suites).** Separate from the HAL jest
+     triage. Engine-specific content/data failures — `collectables` (10-story
+     fragment data), `outpostMapAssets` (per-faction map PNGs on disk),
+     `blackCloakAgent`/`characterScreen` codex lore, `tartariaLeakScanner`
+     baselines, `saveSnapshot`/`crashSaveCapture`/`inventorySnapshot` BEGIN/END
+     envelope stamps, `devAccessAndPublish` (the "Verbal" backdoor),
+     `starterWeaponDataDriven`, `companionTypeParity`, `ambientNounVariety`,
+     `theftNarrationGuard`, `enemyTraits`, `ota1102MixedPacks`, `exploitFixes
+     Hardening`. These are why engine's `jest (fast)` job is **reported, not
+     blocking** (HAL + golem are blocking). Triaging them → flip engine's fast
+     job to `required`, matching HAL. (This session already greened 12 engine
+     suites, 28 → 16, as a side effect of the harness port.)
+  2. **Engine world/persist super-linear tail-growth.** The heaviest stress /
+     balance / long-run sims (700-day sims, chaos sweeps, balance probes) grow
+     memory super-linearly over a single very long run and OOM / time out past
+     ~400–1000 steps. This is why the `jest (heavy sims)` job is **reported, not
+     blocking on ALL three lines**, and why several sims are bounded to their
+     stable range. Root-causing the accumulation in the world/persist layer would
+     let the heavy sims become a required gate everywhere. Deepest of the open
+     threads — an engine investigation, not a quick fix.
 
 - **PUNCH LIST (2026-07-14) — 12 items, worked in order, nothing else until it's
   clear.** From the multi-agent exploit sweep + the 2026-07-13 device-log
@@ -551,8 +584,38 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-16-845`**,
-**golem-line `…-825`**, **engine_Dev `…-1126`** (843–845 = the complete Tier-3
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-20-903`**,
+**golem-line `…-879`**, **engine_Dev `…-1174`**.
+
+- **STUDIO-LEVEL / CI-HARDENING BATCH (2026-07-19 → 20).** Six items SA-1…SA-6
+  plus three CI/quality closes, shipped across the three lines (HAL 895–903,
+  golem 874–879, engine 1171–1174; engine skips SA-5 content per the lore-neutral
+  rule). SA-1 CI gate (tsc + test-typecheck ratchet + jest + lint scaffolding);
+  SA-2 Aether/Etheric lore reconcile; SA-3 monotone contract-reward re-tier;
+  SA-4 static bosses + Legendaries routed through the Guardian over-level scaler
+  (HAL+golem); SA-5 voiced the bestiary (HAL+golem); SA-6 accessibility baseline.
+  Then the CI hardening:
+  • **jest → BLOCKING** (HAL OTA-901 / golem 878). Split into `jest (fast ·
+    required)` = 467 deterministic suites (~3950 tests, the real regression
+    ratchet, verified 467/467) and `jest (heavy sims · reported)` = the 27 stress/
+    balance sims (non-blocking; they exercise the tail-growth finding — Open Item
+    #2). Killed a class of latent RNG flakes at the source: a seeded Math.random
+    (jest.setup.js), an incidental-weather pin, fixture hpMax pins, and a
+    recalibrated outcome-split band. Engine (OTA-1173) got the same harness and
+    greened 12 of its own red suites (28 → 16); its fast job stays reported
+    (Open Item #1).
+  • **a11y sweep → every screen + component** (HAL 902 / golem 879 / engine 1174).
+    On top of the SA-6 baseline: ~230 button roles, ~60 header roles, labels on
+    every icon-only control, selected/disabled/expanded state reused from existing
+    conditions, modal focus-traps, decorative-image hiding, grouped EnemyPanel
+    label. Purely additive props — tsc clean, fast jest 467/467.
+  • **lint → BLOCKING** (HAL 903 / golem / engine). The `lint` job never actually
+    ran (no ESLint flat config existed; ESLint 9 errored out). Added a lean, high-
+    signal ESLint 9 flat config (`eslint.config.js`) + pinned toolchain; green on
+    the current tree; job flipped from `continue-on-error` to required.
+  See Section 8 "OPEN ITEMS (2026-07-20)" for the two threads left open.
+
+- (843–845 = the complete Tier-3
 emergent-depth batch, all three lines. 845 = The Fallen (cross-character death memorial).
 844 = World Pulse (factions drift offscreen + rumours), ships to all three.
 843 = Tier-3 depth #1, Character Chronicle — new engine/chronicle.ts + a Character-sheet section, ships to all three.
