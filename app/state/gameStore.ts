@@ -874,7 +874,8 @@ function recordTitleProgress(
 // OTA-912 — Skyreacher Charts: the five maps that UNLOCK the great climbs. Sold
 // only by roadside traders, each chart exactly ONCE ever (worldMemory.soldMapIds),
 // and never a chart for a climb already unlocked. climbId matches a GREAT_CLIMBS id.
-const SKYREACHER_CHARTS: readonly { name: string; climbId: string; price: number }[] = [
+// Exported for the OTA-912 full-run verification test.
+export const SKYREACHER_CHARTS: readonly { name: string; climbId: string; price: number }[] = [
   { name: 'Skyreacher Chart (1 of 5)', climbId: 'grand_spire',       price: 110 },
   { name: 'Skyreacher Chart (2 of 5)', climbId: 'asgardar_spire',    price: 100 },
   { name: 'Skyreacher Chart (3 of 5)', climbId: 'obsidian_monolith', price: 95 },
@@ -936,8 +937,9 @@ function unlockGreatClimbFromChart(
 }
 
 /** ~18% of eligible roadside stalls carry one not-yet-sold, not-yet-unlocked
- *  chart. Returns the vendor (possibly) augmented with a single chart offer. */
-function withSkyreacherChartOffer(vendor: VendorInstance | null, wm: WorldMemory): VendorInstance | null {
+ *  chart. Returns the vendor (possibly) augmented with a single chart offer.
+ *  Exported for the OTA-912 full-run verification test. */
+export function withSkyreacherChartOffer(vendor: VendorInstance | null, wm: WorldMemory): VendorInstance | null {
   if (!vendor || !vendor.id.startsWith('roadside_')) return vendor; // roadside traders only
   if (Math.random() >= 0.18) return vendor;
   const sold = wm.soldMapIds ?? [];
