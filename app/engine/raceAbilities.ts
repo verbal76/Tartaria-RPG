@@ -5,7 +5,7 @@
 // registry + availability/cooldown logic.
 
 import type { PlayerCharacter, Race, Faction, ActivatableAbility } from './types';
-import { resolveTable } from './contentPack';
+import { resolveTable, getEnergyName, getEnergyMaterial, getEnergyAdjective } from './contentPack';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 
@@ -39,28 +39,28 @@ export const RACE_ABILITIES: RaceAbilityDef[] = [
     id: 'legacy_of_power',
     raceId: 'tartarian_giant',
     name: 'Legacy of Power',
-    description: 'Channel Aether — either fully repairs your most-worn gear, empowers you (+2 STR/3 rounds), or triggers an unexpected surge (a heal, a windfall, or a spike of corruption).',
+    description: `Channel ${getEnergyName()} — either fully repairs your most-worn gear, empowers you (+2 STR/3 rounds), or triggers an unexpected surge (a heal, a windfall, or a spike of corruption).`,
     cooldown: 'day',
   },
   {
     id: 'defensive_protocols',
     raceId: 'architectural_sentinel',
     name: 'Defensive Protocols',
-    description: 'Raise an Aetheric shield — halves all incoming damage for 3 rounds.',
+    description: `Raise an ${getEnergyAdjective()} shield — halves all incoming damage for 3 rounds.`,
     cooldown: 'day',
   },
   {
     id: 'regenerative_core',
     raceId: 'mud_golem',
     name: 'Regenerative Core',
-    description: 'Draw on nearby Aetherstone — recharge 1d10 HP.',
+    description: `Draw on nearby ${getEnergyMaterial()} — recharge 1d10 HP.`,
     cooldown: 'day',
   },
   {
     id: 'elemental_control',
     raceId: 'mud_golem',
     name: 'Elemental Control — Strike',
-    description: 'Hurl shaped Aetherstone at your foe — 1d6 aetheric damage.',
+    description: `Hurl shaped ${getEnergyMaterial()} at your foe — 1d6 aetheric damage.`,
     cooldown: 'day',
     combatOnly: true,
   },
@@ -68,7 +68,7 @@ export const RACE_ABILITIES: RaceAbilityDef[] = [
     id: 'elemental_ward',
     raceId: 'mud_golem',
     name: 'Elemental Control — Ward',
-    description: 'Shape Aetherstone into a ward — soaks the next 1d6 incoming damage before it reaches you.',
+    description: `Shape ${getEnergyMaterial()} into a ward — soaks the next 1d6 incoming damage before it reaches you.`,
     cooldown: 'day',
     combatOnly: true,
   },
@@ -76,14 +76,14 @@ export const RACE_ABILITIES: RaceAbilityDef[] = [
     id: 'latent_powers',
     raceId: 'aetherborn',
     name: 'Latent Powers',
-    description: 'Surge of Aetheric energy — +2 Strength for 3 rounds.',
+    description: `Surge of ${getEnergyAdjective()} energy — +2 Strength for 3 rounds.`,
     cooldown: 'day',
   },
   {
     id: 'noble_heritage',
     raceId: 'aetherborn',
     name: 'Noble Heritage',
-    description: 'Aetheric presence — +3 Charisma for 3 rounds (persuasion / intimidation).',
+    description: `${getEnergyAdjective()} presence — +3 Charisma for 3 rounds (persuasion / intimidation).`,
     cooldown: 'day',
   },
   {

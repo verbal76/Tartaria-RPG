@@ -1,0 +1,47 @@
+{
+  "racePrimary": {
+    "tartarian_giants": "Mud-fist Wraps",
+    "true_tartarians": "Mud-fist Wraps",
+    "reclaimers": "Rusted Blade",
+    "architectural_sentinels": "Tartarian Spear",
+    "unknowing_masses": "Rusted Blade",
+    "aetherborn": "Pyric Wand"
+  },
+  "factionKnife": {
+    "reclaimers_guild": "Reclaimer's Trowel",
+    "forgotten_order": "Order Letter-Opener",
+    "true_tartarians": "Bone Shiv",
+    "mud_monarchs": "Pocket Knife",
+    "eternal_dynasty": "Pocket Knife"
+  },
+  "raceStarterExploration": {
+    "tartarian_giant": [
+      "Aetheric Vision Lens",
+      "Hardened Climbing Strap"
+    ],
+    "mud_dweller": [
+      "Cavern Sound Stones",
+      "Aether-Breath Mask"
+    ],
+    "reclaimer": [
+      "Reclaimer's Rope",
+      "Echoing Steps Boots"
+    ],
+    "architectural_sentinel": [
+      "Aetheric Circuit Repair Kit",
+      "Pulse Scanner"
+    ],
+    "mud_golem": [
+      "Golemstone Stabilizer",
+      "Mud-Rend Blade"
+    ],
+    "unknowing_mass": [
+      "Lost Echo Compass",
+      "Field Crafter's Kit"
+    ],
+    "aetherborn": [
+      "Aetheric Harmonics Tuner",
+      "Glyph-Sealed Scroll"
+    ]
+  }
+}

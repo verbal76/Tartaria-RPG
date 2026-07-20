@@ -1,5 +1,6 @@
 import type { RollStep, PlayerCharacter, Enemy, Stats, StatusEffect, WeaponReachClass } from './types';
 import { rollDie } from './rng';
+import { getEnergyName, getEnergyAdjective } from './contentPack';
 import { findWeaponByName, type CatalogWeapon } from './crafting';
 import { effectiveStats } from './equipment';
 import { traitACBonus } from './enemyTraits';
@@ -55,12 +56,12 @@ function raceSkillBonus(
   // line too would double-count.
   if (intent === 'investigate' && ctx?.relicTarget) {
     if (r === 'tartarian_giant') add(1, 'Ancient Insight');
-    else if (r === 'aetherborn') add(2, 'Aetheric Awakening');
+    else if (r === 'aetherborn') add(2, `${getEnergyAdjective()} Awakening`);
     else if (r === 'reclaimer') add(1, 'Ruins Specialist');
     else if (r === 'mud_dweller') add(2, 'Relic Savvy');
   }
   // Aethercraft = the CAST discipline. Mud Dwellers (True Tartarians) trained it.
-  if (intent === 'cast' && r === 'mud_dweller') add(2, 'Aethercraft Mastery');
+  if (intent === 'cast' && r === 'mud_dweller') add(2, `${getEnergyName()}craft Mastery`);
   // Reclaimers move like ghosts through ruins.
   if (intent === 'stealth' && ctx?.inRuins && r === 'reclaimer') add(2, 'Urban Explorer');
   return { bonus, label: parts.length ? ` + ${bonus} (race: ${parts.join('/')})` : '' };
@@ -598,7 +599,7 @@ export function buildCombatSteps(
       bonus: damageBonus + aetherSurge,
       bonusLabel: [
         damageBonus !== 0 ? `${damageBonus > 0 ? '+' : ''}${damageBonus} (race)` : '',
-        aetherSurge > 0 ? `+${aetherSurge} (Aetheric surge 1d6)` : '',
+        aetherSurge > 0 ? `+${aetherSurge} (${getEnergyAdjective()} surge 1d6)` : '',
       ].filter(Boolean).join(' '),
       context: `damage dealt to ${enemy.name}${damageTypeNote}${perfectOpening ? ' — PERFECT OPENING (double dice)' : backstab ? ' — BACKSTAB (double dice)' : ''}`,
       // no target — always applies if the attack hit

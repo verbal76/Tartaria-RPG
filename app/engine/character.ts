@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import type { Race, Faction, PlayerCharacter, Stats, FactionStanding, InventoryItem } from './types';
 import { rollDie, rollDice, rollFromNotation } from './rng';
 import { resolveTable, resolveFlavor, startingAreaForFaction, isReskinActive } from './contentPack';
@@ -28,14 +29,7 @@ import { initMainQuest } from './mainQuest';
 // Mask; a Reclaimer carries a Rusted Blade, a Trowel, a Reclaimer's Rope
 // + Echoing Steps Boots. Etc.
 
-const RACE_PRIMARY: Record<string, string> = {
-  tartarian_giants: 'Mud-fist Wraps', // their bare-hand combat tradition
-  true_tartarians: 'Mud-fist Wraps',
-  reclaimers: 'Rusted Blade',
-  architectural_sentinels: 'Tartarian Spear',
-  unknowing_masses: 'Rusted Blade',
-  aetherborn: 'Pyric Wand',
-};
+const RACE_PRIMARY: Record<string, string> = require('../data/character/starter-maps.json').racePrimary;
 
 // engine_Dev — the starter weapon. Priority: a race's own `startingWeapon`
 // field (authors can set it on the uploaded race row) → the built-in
@@ -53,13 +47,7 @@ function starterWeaponName(race: Race): string {
   return pick?.name ?? 'Rusted Blade';
 }
 
-const FACTION_KNIFE: Record<string, string> = {
-  reclaimers_guild: "Reclaimer's Trowel",
-  forgotten_order: 'Order Letter-Opener',
-  true_tartarians: 'Bone Shiv',
-  mud_monarchs: 'Pocket Knife',
-  eternal_dynasty: 'Pocket Knife',
-};
+const FACTION_KNIFE: Record<string, string> = require('../data/character/starter-maps.json').factionKnife;
 
 // Each race ships with TWO items from their rulebook starter table —
 // kept tight so the default 10-slot Player's Backpack still has room for
@@ -67,15 +55,7 @@ const FACTION_KNIFE: Record<string, string> = {
 // the primary weapon + faction knife. Total = 7 slots used. Remaining
 // items from the table live in exploration.json and can be acquired from
 // vendors / loot pools.
-export const RACE_STARTER_EXPLORATION: Record<string, string[]> = {
-  tartarian_giant: ['Aetheric Vision Lens', 'Hardened Climbing Strap'],
-  mud_dweller: ['Cavern Sound Stones', 'Aether-Breath Mask'],
-  reclaimer: ["Reclaimer's Rope", 'Echoing Steps Boots'],
-  architectural_sentinel: ['Aetheric Circuit Repair Kit', 'Pulse Scanner'],
-  mud_golem: ['Golemstone Stabilizer', 'Mud-Rend Blade'],
-  unknowing_mass: ['Lost Echo Compass', "Field Crafter's Kit"],
-  aetherborn: ['Aetheric Harmonics Tuner', 'Glyph-Sealed Scroll'],
-};
+export const RACE_STARTER_EXPLORATION: Record<string, string[]> = require('../data/character/starter-maps.json').raceStarterExploration;
 
 interface CatalogExplorationItem {
   name: string;

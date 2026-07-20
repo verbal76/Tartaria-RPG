@@ -11,7 +11,7 @@
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import type { PlayerCharacter, Race, Faction, Stats } from './types';
-import { resolveTable } from './contentPack';
+import { resolveTable, getEnergyMaterial, getEnergyAdjective } from './contentPack';
 
 // Structural-typed scene snapshot. CurrentScene lives inline in
 // gameStore.ts and isn't exported; we accept any object with the
@@ -319,14 +319,14 @@ export function raceResistLabel(raceId: string | undefined, mult: number): strin
   if (mult === 1) return '';
   if (mult > 1) {
     const pct = Math.round((mult - 1) * 100);
-    const wName = raceId === 'mud_golem' ? 'Aetherstone Vulnerability' : 'racial vulnerability';
+    const wName = raceId === 'mud_golem' ? `${getEnergyMaterial()} Vulnerability` : 'racial vulnerability';
     return ` (${wName} — +${pct}% dmg)`;
   }
   const pct = Math.round((1 - mult) * 100);
   const name =
-    raceId === 'mud_dweller' ? 'Aetherstone Resilience'
-    : raceId === 'architectural_sentinel' ? 'Aetheric Constitution'
-    : raceId === 'mud_golem' ? 'Aetherstone Resilience'
+    raceId === 'mud_dweller' ? `${getEnergyMaterial()} Resilience`
+    : raceId === 'architectural_sentinel' ? `${getEnergyAdjective()} Constitution`
+    : raceId === 'mud_golem' ? `${getEnergyMaterial()} Resilience`
     : 'racial resilience';
   return ` (${name} absorbs ${pct}%)`;
 }
