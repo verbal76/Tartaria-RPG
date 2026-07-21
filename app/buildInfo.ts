@@ -16578,4 +16578,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // monotone early→late, novelty rotation preserved (location now picked before the reward). The combat-AC / to-hit
 // item stays open as a genuine playtest call (not shipped blind). typecheck:ci + typecheck:tests + lint clean;
 // full fast suite green. Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-900-repair-rarity-scale-reward-danger-lean';
+// OTA-901 (BALANCE — apex-fight ~12-round convergence; port of HAL OTA-924). Player damage is weapon/coating/
+// weakness-driven and hard-caps ~30-40 DPS by design, so boss HP is the sole knob for fight length. The two
+// boss-HP systems had diverged badly (static summit/wild bosses = 16-26 round HP-sponge slogs; Core Guardian
+// late tiers = ~5-round trivial). Converge both onto a ~12-round tense race for a correctly-built character:
+// summit bosses 440-500 → 300-350, 8 wild Legendaries 458-700 → 300-345, Core Guardian late hpMult raised
+// (T7 2.7→4.0, T8 2.9→5.5, T9 3.1→7.0). typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+// Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-901-apex-fights-12-round-convergence';

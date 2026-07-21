@@ -2037,7 +2037,7 @@
     "abilityPoint": "Strength 10",
     "attack": "Aether Smash",
     "damage": "4D10",
-    "hp": 458,
+    "hp": 300,
     "rarity": "Legendary",
     "loot": [
       "Behemoth Heart",
@@ -2159,7 +2159,7 @@
     "abilityPoint": "Intelligence 13",
     "attack": "Soul Drain",
     "damage": "3D8 Aetheric",
-    "hp": 520,
+    "hp": 330,
     "rarity": "Legendary",
     "loot": [
       "Lich Phylactery",
@@ -2189,7 +2189,7 @@
     "abilityPoint": "Strength 13",
     "attack": "Sovereign Crush",
     "damage": "4D8",
-    "hp": 640,
+    "hp": 345,
     "rarity": "Legendary",
     "loot": [
       "Tyrant's Crown",
@@ -2219,7 +2219,7 @@
     "abilityPoint": "Strength 12",
     "attack": "Hollow Cleave",
     "damage": "3D10",
-    "hp": 580,
+    "hp": 330,
     "rarity": "Legendary",
     "loot": [
       "Hollow Crown",
@@ -2249,7 +2249,7 @@
     "abilityPoint": "Strength 13",
     "attack": "Coiling Crush",
     "damage": "4D6",
-    "hp": 700,
+    "hp": 345,
     "rarity": "Legendary",
     "loot": [
       "Worm Plating",
@@ -2281,7 +2281,7 @@
     "abilityPoint": "Dexterity 11",
     "attack": "Wyrm Bite",
     "damage": "3D8",
-    "hp": 540,
+    "hp": 320,
     "rarity": "Legendary",
     "loot": [
       "Wyrm Fang",
@@ -2313,7 +2313,7 @@
     "abilityPoint": "Intelligence 12",
     "attack": "Voidspawn Spittle",
     "damage": "3D8 Aetheric",
-    "hp": 560,
+    "hp": 330,
     "rarity": "Legendary",
     "loot": [
       "Matriarch's Carapace",
@@ -2346,7 +2346,7 @@
     "abilityPoint": "Strength 12",
     "attack": "Reaver's Sweep",
     "damage": "3D8",
-    "hp": 480,
+    "hp": 310,
     "rarity": "Legendary",
     "loot": [
       "Reaver's Greatsword",

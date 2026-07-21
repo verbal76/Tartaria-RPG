@@ -41,11 +41,15 @@ describe('OTA-912 — summit bosses', () => {
     }
   });
 
-  it('summit bosses sit at a real boss HP tier (guarding the biggest reward)', () => {
-    // OTA-918 — raised from 270-320 (~46% of the story-boss floor) to a real Legendary
-    // boss tier so the game's largest reward package isn't behind its lightest fight.
+  it('summit bosses are sized for a ~12-round fight at the weapon-capped DPS ceiling', () => {
+    // OTA-924 — re-tuned from OTA-918's 440-500 (which, at the ~35 net-DPS ceiling,
+    // read as a 16-20 round HP-sponge SLOG) down to a ~12-round band. Player damage is
+    // weapon/coating/weakness-driven and hard-caps ~30-40, so base ~300-350 × the
+    // static-boss scaler (~1.3) lands ~400-460 scaled → ~12 rounds for a correctly-
+    // built character. Real boss tier, tense race — not a sponge.
     for (const b of SUMMIT_BOSSES) {
-      expect(b.base.hp).toBeGreaterThanOrEqual(440);
+      expect(b.base.hp).toBeGreaterThanOrEqual(290);
+      expect(b.base.hp).toBeLessThanOrEqual(380);
     }
   });
 
