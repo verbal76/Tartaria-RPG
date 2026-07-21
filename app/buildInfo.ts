@@ -17498,4 +17498,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // counterweight. Verified: skyreacherRewards retargeted (electrical-via-type, no double-dip, HP>=440) +
 // greatClimbs/climbEncounters/skyreacherFullRun/ota915 green; typecheck:ci + typecheck:tests (200) + lint clean;
 // full fast suite green. Content → HAL + golem only, NOT engine.
-export const OTA_BUILD_ID = '2026-07-20-918-summit-boss-hp-and-weakness-dedup';
+//
+// OTA-919 (AUDIT BATCH 1 — new-content wiring/integrity sweep — content, HAL + golem only) — verified this arc's
+// additions resolve end-to-end and found one real gap: `Veil of Peace`, dropped by all three Aetherkin variants,
+// was never an authored item — it fell through as a bare misc name with no flavor or value (a phantom reward;
+// it predated this arc on the legacy Aetherkin and was propagated to the two new variants). Authored it as a
+// real Uncommon Aether relic in materials.json. Everything else checked clean: the other Aetherkin loot
+// (Aetherstone Fragment, Aether Mud) is authored; the 5 summit-boss codex projections' names match the built
+// boss (so a defeat catalogues them) and don't collide with enemies.json; the swapped storyline reward
+// (Explorer's Aetheric Greaves) exists; and the new worldMemory fields (aetherkinRolledBuildings, etc.) are
+// save-safe (hydrate spreads ...saved.worldMemory and reads guard with ?? []). New test ota919NewContentWiring
+// locks all of it. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-919-veil-of-peace-authored-wiring-sweep';

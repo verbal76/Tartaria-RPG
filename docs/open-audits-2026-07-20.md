@@ -20,6 +20,8 @@ _Generated 2026-07-20 from the balance/economy multi-agent audit (`tartaria-bala
 ## Bug/exploit sweep (separate audit)
 - Both confirmed leaks are **DONE** (OTA-916/893): Aetherkin building-spawn farm (banked per tile) and sell-floor-after-multipliers arbitrage (floor clamps last). No open items from that sweep.
 **This run:** 19 findings — CONFIRMED 1, DEFENSIBLE 9, DONE 1, PLAYTEST 2, UNVERIFIED 6.
+- **2026-07-20 — batch 1 (new-content wiring) RAN → OTA-919/896.** Found + fixed one real gap: `Veil of Peace` (dropped by all 3 Aetherkin) was never an authored item — now a real Uncommon Aether relic in materials.json. All else clean: other Aetherkin loot authored; 5 summit-boss codex names match the built boss + no enemies.json collision; `Explorer's Aetheric Greaves` exists; new worldMemory fields save-safe. Locked by `ota919NewContentWiring`. **Batch 1 done — 6 future batches remain (2-7).**
+
 ## Future audit batches (not yet run)
 
 Dimensions the two big sweeps (bug/exploit, balance/economy) did NOT cover. Each is a small, self-contained batch — run when tokens allow. Ranked by likelihood of catching a real issue.
