@@ -17656,4 +17656,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "Sile…". Line 1 now ends after danger (+ any hazard); the weather is appended to line 2 next to the day/time
 // ("Day 4 · evening · Silent Blizzard"). No new line added. ExplorationScreen scene-bar only. typecheck:ci +
 // typecheck:tests (200) + lint clean; full fast suite green. UI -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-933-weather-on-day-line';
+// OTA-934 (MECHANIC — a frost/cold coating on armour counters COLD weather). Owner: "coatings should be able to
+// counter weather effects." A frost coating worked into armour (or any cold-resistant armour) puts 'cold' in the
+// piece's resistances; now that cold resistance CANCELS a cold-tagged weather's effects (Silent Blizzard): the
+// -2 attack penalty, the -1 DEX / -1 STR stat mod, the per-action HP/stamina drain, and the movement slow all go
+// to neutral. Wired via a coldResist param on weatherStatModifiers/weatherAttackPenalty/weatherRepositionCost/
+// tickWeather + an exported playerColdResist(player); applied at every combat/skill/tick/reposition site and mirrored
+// on the character sheet. Non-cold weather (Iron Fog etc.) is unaffected. New ota934 test. typecheck:ci +
+// typecheck:tests (200) + lint clean; full fast suite green. Mechanic -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-934-cold-coating-cancels-cold-weather';
