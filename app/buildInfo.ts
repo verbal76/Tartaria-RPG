@@ -17634,4 +17634,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // outmatched; neutral gold out of combat. Both numbers now tell the same story at a glance. Tutorial 'power_number'
 // copy updated to say BOTH numbers colour by the matchup. StatsPanel + ExplorationScreen; no formula change.
 // typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. UI feature -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-930-player-badge-matchup-color';
+// OTA-931 (BUGFIX + BALANCE — a weapon's own name no longer forces a bare-hand swing; Giant starter buffed). The
+// engine lets a player deliberately punch by saying "punch/kick/fist/…", trading damage for the bludgeoning type.
+// But the Tartarian Giant's starter weapon is "Mud-fist Wraps" — the "fist" in its NAME tripped that override, so
+// "attack with the mud-fist wraps" silently dropped the weapon and swung bare-handed (also making the equipped
+// Power reading disagree with real combat). Fix: strip the equipped weapon's own name before the bare-hand check
+// (a standalone "punch it" still punches). Also, Mud-fist Wraps read 1d4 — WEAKER than the Giant's own 1d6+2
+// fists — so its damage is bumped 1d4 -> 1d10 (note: parseDamageDice ignores flat +N, so pure dice; with its
+// existing +2 defense, wielding it now clearly beats punching). New ota931 test. typecheck:ci + typecheck:tests
+// (200) + lint clean; full fast suite green. Content + generic combat fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-931-fist-weapon-name-barehand-fix';

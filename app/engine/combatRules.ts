@@ -440,9 +440,20 @@ export function buildCombatSteps(
   // regardless of what's equipped — lets the player choose to sacrifice
   // damage in exchange for the bludgeoning damage type or to spare the
   // weapon's durability.
-  const forcesBarehand = isBareHandAttack(actionText);
   const prefersOff = /\boff[- ]?hand\b/.test(actionText.toLowerCase());
-  const equipped = forcesBarehand ? null : getEquippedWeapon(player, prefersOff ? 'off' : 'main');
+  // OTA-931 — a bare-hand keyword (punch/kick/FIST/knee/elbow/headbutt) lets the player
+  // deliberately punch INSTEAD of using their weapon. But it must NOT fire when the keyword
+  // is part of the EQUIPPED weapon's OWN name — the Tartarian Giant's starter "Mud-fist
+  // Wraps" contains "fist", so "attack with the mud-fist wraps" wrongly dropped the weapon
+  // and swung bare-handed. Strip the equipped weapon's name before the bare-hand check; a
+  // standalone "punch it" still punches.
+  const candidateWeapon = getEquippedWeapon(player, prefersOff ? 'off' : 'main');
+  const normText = (s: string) => s.toLowerCase().replace(/[-_]/g, ' ').replace(/\s+/g, ' ');
+  const barehandText = candidateWeapon?.name
+    ? normText(actionText).split(normText(candidateWeapon.name)).join(' ')
+    : normText(actionText);
+  const forcesBarehand = isBareHandAttack(barehandText);
+  const equipped = forcesBarehand ? null : candidateWeapon;
   const wc: WeaponClass = equipped?.weaponKind ?? detectWeaponClass(actionText);
   // Stat used for the attack roll factors in any equipped accessory bonuses
   // (rings/amulets boosting STR/DEX/INT/WIS/CHA) PLUS the active weather's
