@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import type { Enemy } from '../engine/types';
 import { describeTrait, traitACBonus, traitDefenses } from '../engine/enemyTraits';
+import { enemyPowerScore, powerMatchup } from '../engine/powerRating';
 import { enemyTypeDefenses } from '../engine/crafting';
 import { enemyDamageType } from '../engine/damageTypes';
 import { BrandedModal } from './BrandedModal';
@@ -70,6 +71,8 @@ interface Props {
    *  lowercased enemy name. Even below the Wisdom read-threshold, a type you've SEEN
    *  bite (weak) or wash off (resist) is revealed on the portrait. */
   enemyIntel?: Record<string, { weak: string[]; resist: string[] }>;
+  /** OTA-928 — the player's Power rating, to colour each enemy's Power badge by matchup. */
+  playerPower?: number;
 }
 
 // OTA-382 — fallback width only. The panel lives in the top-right column
@@ -143,7 +146,7 @@ const RESIST_FLAVOR: Record<string, string> = {
   aetheric: 'aether slides off it unheeded',
 };
 
-export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, playerWisdom, enemyIntel }: Props) {
+export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, playerWisdom, enemyIntel, playerPower }: Props) {
   const canReadDefenses = (playerWisdom ?? 0) >= WEAKNESS_READ_WIS;
   // OTA-838 — per-enemy observed intel lookup (lowercased name). Passed to each card
   // so an already-learned weakness shows even for a low-Wisdom character.
@@ -198,7 +201,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
     <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={() => setDetailView(item)}>
-      {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(item.enemy.name)} />)}
+      {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(item.enemy.name)} playerPower={playerPower} />)}
     </TouchableOpacity>
   );
 
@@ -212,7 +215,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
         // capped to the corner height and vertically scrollable when it's tall.
         // arb146 — tappable to open the full-detail popup.
         <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)}>
-          {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(enemies[0]!.enemy.name)} />)}
+          {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(enemies[0]!.enemy.name)} playerPower={playerPower} />)}
         </TouchableOpacity>
       ) : (
         <FlatList
@@ -309,7 +312,7 @@ function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { weak: s
   return lines.join('\n');
 }
 
-function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed }: { view: EnemyView; cardWidth: number; hpBarWidth: number; canRead: boolean; observed?: { weak: string[]; resist: string[] } }) {
+function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower }: { view: EnemyView; cardWidth: number; hpBarWidth: number; canRead: boolean; observed?: { weak: string[]; resist: string[] }; playerPower?: number }) {
   // OTA-419 — mirror combatRules.enemyAC EXACTLY so the panel's AC matches what
   // combat uses to hit: pull the number out of "Strength 4" (parseInt got NaN →
   // the panel showed a flat AC 5 and never added the boss +6). NaN falls back to
@@ -331,6 +334,9 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed }: { view: E
   // shown under RESIST/WEAK so the portrait answers "what hits me?" for the
   // resistance-minded player without reading the combat log.
   const dealsType = enemyDamageType(view.enemy);
+  // OTA-928 — this enemy's Power rating, faced against the player's for the colour.
+  const enemyPower = enemyPowerScore(view.enemy);
+  const matchup = typeof playerPower === 'number' ? powerMatchup(playerPower, enemyPower) : 'even';
 
   return (
     <View
@@ -338,9 +344,19 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed }: { view: E
       accessibilityLabel={`${view.enemy.name}, ${view.enemy.type}, ${view.enemy.rarity}. HP ${view.currentHp} of ${view.enemy.hp}, AC ${ac}, ${inRange ? 'in range' : 'out of range'}`}
     >
       <View style={styles.head}>
-        <Text style={styles.name} numberOfLines={1}>
-          {view.enemy.name}
-        </Text>
+        <View style={styles.headLeft}>
+          {/* OTA-928 — enemy Power rating, top-left; faces the player's Power (top-right
+              of the stats panel). Colour by matchup: red = it outclasses you. */}
+          <Text
+            style={[styles.enemyPower, matchup === 'danger' ? styles.enemyPowerDanger : matchup === 'favored' ? styles.enemyPowerFavored : styles.enemyPowerEven]}
+            accessibilityLabel={`Enemy power rating ${enemyPower}`}
+          >
+            ◆ {enemyPower}
+          </Text>
+          <Text style={styles.name} numberOfLines={1}>
+            {view.enemy.name}
+          </Text>
+        </View>
         <Text style={styles.rarity}>{view.enemy.rarity}</Text>
       </View>
       <View style={styles.subhead}>
@@ -481,6 +497,12 @@ const styles = StyleSheet.create({
   },
   name: { color: '#e07a5f', fontSize: 14, fontWeight: '700', letterSpacing: 1, flexShrink: 1 },
   rarity: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginLeft: 6 },
+  // OTA-928 — enemy Power badge (top-left of the card head), coloured by matchup.
+  headLeft: { flexDirection: 'row', alignItems: 'baseline', gap: 5, flexShrink: 1 },
+  enemyPower: { fontSize: 12, fontWeight: '800', letterSpacing: 0.5 },
+  enemyPowerDanger: { color: '#e07a5f' },
+  enemyPowerFavored: { color: '#9ec96a' },
+  enemyPowerEven: { color: '#d9b45b' },
   subhead: {
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -16611,4 +16611,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // detect_aether passive + HUD 'scanning' badge are equip-gated via equipment.aethericVisionEquipped(player).
 // backfillPlayer auto-equips a carried gadget into an empty lens slot (no silent loss). USE on a gate-lens nudges
 // 'equip it'. New ota927 test. typecheck:ci + typecheck:tests + lint clean; full fast suite green. HAL + golem.
-export const OTA_BUILD_ID = '2026-07-21-904-aetheric-lens-equip-slot';
+// OTA-905 (FEATURE — the POWER rating HUD; port of HAL OTA-928). A single at-a-glance number so the player FEELS
+// growth with no character art. New app/engine/powerRating.ts computes one comparable score for the player AND each
+// enemy from the same four terms (best effective combat stat + avg weapon damage/hit + effective AC + HP/10), so
+// training a stat or upgrading a weapon/armour visibly moves it. Player Power shows top-right of the stats panel;
+// each enemy's Power shows top-left of its combat card, so they FACE each other; the enemy badge is coloured by
+// matchup (green = you outclass it, gold = even, red = it outclasses you). A first-fight FirstTimeHint introduces
+// it. Power is a GAUGE, not a replacement. New powerRating test. typecheck:ci + typecheck:tests + lint clean; full
+// fast suite green. UI feature -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-21-905-power-rating-hud';

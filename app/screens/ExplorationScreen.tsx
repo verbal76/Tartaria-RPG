@@ -9,6 +9,7 @@ import { AdventureFeed } from '../components/AdventureFeed';
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
+import { playerPowerScore } from '../engine/powerRating';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
 import { SalvageModal, isSalvageable as isSalvageableForModal } from '../components/SalvageModal';
@@ -531,6 +532,15 @@ export function ExplorationScreen() {
           body="Type what you do — strike, aim, or use a skill. You can also STEALTH for a sneak hit, or try to talk a foe down or scare them off."
         />
       )}
+      {/* OTA-928 — introduce the Power rating the first time a fight is on-screen, when
+          both the player badge (top-right) and the enemy badge (top-left) are visible. */}
+      {(currentScene?.enemies?.length ?? 0) > 0 && (
+        <FirstTimeHint
+          id="power_number"
+          title="Power rating"
+          body="The ◆ number by your name is your Power — a quick gauge built from your stats, weapon, armour, and health. Each foe shows its own ◆ Power facing yours: green means you outclass it, gold is an even fight, red means it outclasses you. Your individual stats still matter — Power just tells you at a glance where you stand. Make your character stronger and watch it climb."
+        />
+      )}
       <View style={styles.topRow}>
         <TutorialTarget area="top-left-stats" style={styles.statsCol}>
           {/* OTA 040 — tap the stats panel to open the full Player
@@ -558,6 +568,7 @@ export function ExplorationScreen() {
               maxHeight={statsColH}
               playerWisdom={player?.stats?.wisdom}
               enemyIntel={worldMemory?.enemyIntel}
+              playerPower={player ? playerPowerScore(player) : undefined}
             />
           ) : (
             // OTA-852 — the crest square is idle real estate when peaceful, so it
