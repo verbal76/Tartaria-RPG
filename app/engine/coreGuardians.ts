@@ -127,6 +127,19 @@ const TIER_PROFILES: Record<GuardianTier, TierProfile> = {
 // after a real final-boss playtest.
 const FINAL_GUARDIAN_HP = 660;
 
+// OTA-926 — the Guardians are the game's main antagonists, and the run is meant to get
+// steadily harder: fight N should be a bit tougher than fight N-1. Difficulty is keyed
+// to KILL-COUNT, not the Capital (see the header) — but HP was `Capital.base.hp ×
+// hpMult`, and base.hp varies 30-50 across Capitals. Since the player picks the ORDER,
+// that leaked the Capital into difficulty and could INVERT the ramp (e.g. Cantor(50) at
+// tier 1 = 70 HP, then Vaelka(30) at tier 2 = 48 HP — the 2nd fight easier than the 1st).
+// So HP now uses a single Capital-independent canonical base × the tier's hpMult, giving
+// a strictly monotonic curve (T1→T8 ≈ 59/67/76/84/92/101/168/231, then the T9 final wall
+// at FINAL_GUARDIAN_HP). Damage die + AC already ramp by tier; this closes the HP leak so
+// EVERY Guardian is reliably tougher than the last. Per-Capital flavor still lives in the
+// weakness/resistance/damage-type/approach-line — just not in raw HP.
+const CANON_BASE_HP = 42;
+
 // OTA-815 — PLAYER-POWER SCALING. The kill-count tier sets the AUTHORED floor for
 // each Guardian, but difficulty was keyed to that alone: a player who over-levels on
 // side content (deep stats + a big HP pool) walked through the early Guardians
@@ -177,11 +190,12 @@ export function spawnGuardianForCapital(
   // HP scales with the tier profile AND the player's real power, so an over-leveled
   // player can't two-round an early Guardian.
   const over = guardianOverLevel(player, tier);
-  // OTA-925 — the final Guardian (last Core in the run) is the game's last boss: a
-  // fixed ~20-round wall, Capital-independent so it doesn't matter which seat the
-  // player saved for last. Every earlier Guardian keeps the tier's base.hp × hpMult
-  // apex curve. Over-level applies to both (upward-only).
-  const baseHp = isFinalGuardian(coresCount) ? FINAL_GUARDIAN_HP : def.base.hp * profile.hpMult;
+  // OTA-925/926 — HP is Capital-INDEPENDENT so the run ramps monotonically by tier
+  // (each Guardian a bit tougher than the last, regardless of fight order): earlier
+  // Guardians use a canonical base × the tier's hpMult; the final Guardian (last Core
+  // in the run) is the game's last boss — a fixed ~20-round wall. Over-level applies to
+  // both (upward-only), so an over-prepared player still meets a real fight.
+  const baseHp = isFinalGuardian(coresCount) ? FINAL_GUARDIAN_HP : CANON_BASE_HP * profile.hpMult;
   const hp = Math.round(baseHp * over);
   // Bump the abilityPoint number — engine's enemyAC() derives base
   // AC from `5 + apNum`, so increasing the AP by the tier's
