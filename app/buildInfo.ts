@@ -17627,4 +17627,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // red ▼ -6) flashes under the ◆ PWR number for ~2.5s, so a gear choice gives instant "did that help?" feedback. It
 // fires for any Power move (weapon/armour swap, stat tick, buff on/off). StatsPanel-only; no formula change.
 // typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. UI feature -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-929-power-delta-flash';
+// OTA-930 (FEATURE — the player's OWN Power badge now recolours by the matchup, not just the enemy's). Playtest
+// confusion: a weak enemy (22) showed green while the player's strong 74 stayed a static gold, reading backwards.
+// Now StatsPanel takes the active target's Power (threaded from ExplorationScreen) and colours the player badge by
+// the same verdict as the enemy badge — green when you outclass your target, gold on an even fight, red when
+// outmatched; neutral gold out of combat. Both numbers now tell the same story at a glance. Tutorial 'power_number'
+// copy updated to say BOTH numbers colour by the matchup. StatsPanel + ExplorationScreen; no formula change.
+// typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. UI feature -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-930-player-badge-matchup-color';
