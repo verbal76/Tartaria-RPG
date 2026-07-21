@@ -16645,4 +16645,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // end of line 1 where it truncated to "Sile…"; line 1 now ends after danger (+ any hazard), and the weather is
 // appended to line 2 next to the day/time ("Day 4 · evening · Silent Blizzard"). No new line added. ExplorationScreen
 // scene-bar only. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
-export const OTA_BUILD_ID = '2026-07-21-910-weather-on-day-line';
+// OTA-911 (MECHANIC — a frost/cold coating on armour counters COLD weather; port of HAL OTA-934). A frost coating
+// worked into armour (or any cold-resistant armour) puts 'cold' in the piece's resistances; that cold resistance now
+// CANCELS a cold-tagged weather's effects (Silent Blizzard): the -2 attack penalty, the -1 DEX / -1 STR stat mod,
+// the per-action HP/stamina drain, and the movement slow. Wired via a coldResist param on the four weather funcs +
+// an exported playerColdResist(player), applied at every combat/skill/tick/reposition site and the character sheet.
+// Non-cold weather unaffected. New ota934 test. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+export const OTA_BUILD_ID = '2026-07-21-911-cold-coating-cancels-cold-weather';

@@ -110,8 +110,10 @@ const WEATHER_EFFECTS: Record<
 
 // Roll the weather's effect on this action. Returns a zero tick if nothing
 // triggered.
-export function tickWeather(weather: WeatherEntry | null, player: PlayerCharacter): WeatherTick {
+export function tickWeather(weather: WeatherEntry | null, player: PlayerCharacter, coldResist = false): WeatherTick {
   if (!weather) return ZERO_TICK;
+  // OTA-934 — a frost/cold coating (or cold resistance) on armour shrugs off cold weather.
+  if (coldResist && (weather.tags ?? []).includes('cold')) return ZERO_TICK;
   const cfg = WEATHER_EFFECTS[weather.id];
   if (!cfg) return ZERO_TICK;
   if (Math.random() > cfg.prob) return ZERO_TICK;
@@ -133,8 +135,9 @@ export function weatherBlocksRepositioning(weather: WeatherEntry | null): boolea
  * Silent Blizzard). The scene tracks partial progress so the player can
  * see they're making headway across multiple turns.
  */
-export function weatherRepositionCost(weather: WeatherEntry | null): number {
+export function weatherRepositionCost(weather: WeatherEntry | null, coldResist = false): number {
   if (!weather) return 1;
+  if (coldResist && (weather.tags ?? []).includes('cold')) return 1;
   if (weather.id === 'iron_fog' || weather.id === 'silent_blizzard') return 2;
   return 1;
 }
@@ -144,8 +147,9 @@ export function weatherRepositionCost(weather: WeatherEntry | null): number {
  * weather. Iron fog blinds, ash storm chokes, etc. Stacks with the
  * existing blindSwing penalty when both apply.
  */
-export function weatherAttackPenalty(weather: WeatherEntry | null): number {
+export function weatherAttackPenalty(weather: WeatherEntry | null, coldResist = false): number {
   if (!weather) return 0;
+  if (coldResist && (weather.tags ?? []).includes('cold')) return 0;
   switch (weather.id) {
     case 'iron_fog': return 2;       // can barely see the target
     case 'whisper_fog': return 1;    // mild visibility loss
@@ -175,8 +179,9 @@ export interface StatModifier {
  *
  * Stacks with race / faction / equipment bonuses in effectiveStats().
  */
-export function weatherStatModifiers(weather: WeatherEntry | null): StatModifier {
+export function weatherStatModifiers(weather: WeatherEntry | null, coldResist = false): StatModifier {
   if (!weather) return {};
+  if (coldResist && (weather.tags ?? []).includes('cold')) return {};
   switch (weather.id) {
     case 'iron_fog':         return { dexterity: -1 };
     case 'silent_blizzard':  return { dexterity: -1, strength: -1 };
