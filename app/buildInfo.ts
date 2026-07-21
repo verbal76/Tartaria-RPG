@@ -17643,4 +17643,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fists — so its damage is bumped 1d4 -> 1d10 (note: parseDamageDice ignores flat +N, so pure dice; with its
 // existing +2 defense, wielding it now clearly beats punching). New ota931 test. typecheck:ci + typecheck:tests
 // (200) + lint clean; full fast suite green. Content + generic combat fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-931-fist-weapon-name-barehand-fix';
+// OTA-932 (BUGFIX + UI — a HAND weapon is never treated as, or offered as, a bare-fist/kick swing). OTA-931 stopped
+// a weapon's NAME from forcing barehanded; this closes the rest. (a) combatRules: any weapon tagged 'barehanded'
+// (the Mud-fist Wraps, the Aetherstone/Shock/Graviton Gauntlets, the Giant Bone Knuckles) IS the player's fist, so
+// "punch"/"kick" now swings THAT weapon instead of bare skin (deliberately punching while holding a NON-hand weapon
+// like a sword still drops to fists; empty-handed still punches). (b) InputBox: the bare-hand PUNCH/KICK quick
+// buttons are HIDDEN when a hand weapon is equipped — you're not going to take the gauntlets off to punch, so just
+// the weapon button shows. No weapon can fall into the bare-hand trap anymore. ota931 test extended. typecheck:ci +
+// typecheck:tests (200) + lint clean; full fast suite green. Combat/UI fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-932-hand-weapons-not-barehand';

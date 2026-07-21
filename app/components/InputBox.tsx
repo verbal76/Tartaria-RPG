@@ -478,14 +478,24 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
         {inCombat ? (
           <>
             <View style={styles.quickRowLine}>
-              {(() => {
-                const punchT = weaponTone(null, range, playerInt, inventory);
-                return <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={punchT} outOfRange={punchT === 'needs-approach'} />;
-              })()}
-              {(() => {
-                const kickT = weaponTone(null, range, playerInt, inventory);
-                return <QuickBtn label="kick" onPress={() => onSubmit('kick')} tone={kickT} outOfRange={kickT === 'needs-approach'} />;
-              })()}
+              {/* OTA-932 — hide the bare-hand PUNCH/KICK buttons when a HAND weapon (gauntlets,
+                  wraps, knuckles — tagged 'barehanded') is equipped: those hands ARE the weapon,
+                  so you wouldn't take it off to punch. The weapon button below covers the swing. */}
+              {!(
+                !!resolveDisplayWeaponByName(equippedMain ?? '', inventory)?.tags?.includes('barehanded') ||
+                !!resolveDisplayWeaponByName(equippedOff ?? '', inventory)?.tags?.includes('barehanded')
+              ) && (
+                <>
+                  {(() => {
+                    const punchT = weaponTone(null, range, playerInt, inventory);
+                    return <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={punchT} outOfRange={punchT === 'needs-approach'} />;
+                  })()}
+                  {(() => {
+                    const kickT = weaponTone(null, range, playerInt, inventory);
+                    return <QuickBtn label="kick" onPress={() => onSubmit('kick')} tone={kickT} outOfRange={kickT === 'needs-approach'} />;
+                  })()}
+                </>
+              )}
               {equippedMain ? (() => {
                 const mainT = weaponTone(equippedMain, range, playerInt, inventory);
                 const coat = equippedMainCoating ? `${equippedMainCoating.toLowerCase()} ` : '';
