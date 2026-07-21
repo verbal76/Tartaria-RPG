@@ -17651,4 +17651,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // buttons are HIDDEN when a hand weapon is equipped — you're not going to take the gauntlets off to punch, so just
 // the weapon button shows. No weapon can fall into the bare-hand trap anymore. ota931 test extended. typecheck:ci +
 // typecheck:tests (200) + lint clean; full fast suite green. Combat/UI fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-932-hand-weapons-not-barehand';
+// OTA-933 (UI — weather moved onto the day-counter line so it's actually readable). The scene bar showed weather at
+// the END of line 1 ("Flooded House · Kitchen · Danger 5 (Lethal) / Silent Blizzard"), where it truncated to
+// "Sile…". Line 1 now ends after danger (+ any hazard); the weather is appended to line 2 next to the day/time
+// ("Day 4 · evening · Silent Blizzard"). No new line added. ExplorationScreen scene-bar only. typecheck:ci +
+// typecheck:tests (200) + lint clean; full fast suite green. UI -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-933-weather-on-day-line';

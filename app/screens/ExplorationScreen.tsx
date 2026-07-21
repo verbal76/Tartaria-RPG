@@ -596,11 +596,11 @@ export function ExplorationScreen() {
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={styles.sceneText} numberOfLines={1} ellipsizeMode="tail">
             {currentScene
-              ? `${currentScene.transitArea ?? currentScene.location.name} · ${dangerLabel(currentScene.location.danger)}  /  ${currentScene.weather.name}${currentScene.hazard ? `  /  ${currentScene.hazard.name}` : ''}`
+              ? `${currentScene.transitArea ?? currentScene.location.name} · ${dangerLabel(currentScene.location.danger)}${currentScene.hazard ? `  /  ${currentScene.hazard.name}` : ''}`
               : 'No scene'}
           </Text>
           <Text style={styles.timeText} numberOfLines={1}>
-            {describeTime(player.hoursElapsed ?? 0)}
+            {describeTime(player.hoursElapsed ?? 0)}{currentScene?.weather ? ` · ${currentScene.weather.name}` : ''}
           </Text>
         </View>
         <View style={styles.sceneBarBtns}>
