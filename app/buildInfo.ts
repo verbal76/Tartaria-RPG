@@ -17604,4 +17604,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Per-Capital flavor still lives in weakness/resistance/damage-type/approach-line, just not raw HP. New monotonic
 // ramp test (different Capital each tier). typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green.
 // TUNING values — revisit after playtest. Content → HAL + golem only, NOT engine.
-export const OTA_BUILD_ID = '2026-07-21-926-core-guardians-monotonic-ramp';
+// OTA-927 (FEATURE — the Aetheric Vision Lens gets a dedicated equip slot + is equip-gated). The tool pouch became
+// scanner-only (OTA-778), leaving the Lens (and the 9 other detect_aether aether-sight gadgets: goggles, beacons,
+// locators, analyzer, compass, tuner) homeless and confusingly "active while merely carried" with no equip button.
+// Now: a new `lens` EquipSlot (its own worn slot, never competes with a weapon/off-hand). validSlotsForItem returns
+// ['lens'] for any detect_aether gate item, so the Equip (Lens) button appears automatically. The detect_aether
+// passive (search hook +15pp, fusion-bench encounter bias) + the HUD 'scanning' badge are now equip-gated via
+// equipment.aethericVisionEquipped(player) instead of "in inventory". backfillPlayer auto-equips a carried gadget
+// into an empty lens slot (no silent loss on update). USE on a gate-lens now nudges 'equip it'. New ota927 test.
+// typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Content-agnostic UI/equip feature —
+// ships HAL + golem (NOT engine: Tartaria item names).
+export const OTA_BUILD_ID = '2026-07-21-927-aetheric-lens-equip-slot';

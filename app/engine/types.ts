@@ -735,7 +735,8 @@ export type EquipSlot =
   | 'feet'
   | 'cloak'
   | 'amulet'
-  | 'ring';
+  | 'ring'
+  | 'lens';
 
 export interface PlayerEquipped {
   /** Catalog name of the weapon in the main (dominant) hand.
@@ -750,6 +751,10 @@ export interface PlayerEquipped {
   legs?: string;
   feet?: string;
   cloak?: string;
+  /** OTA-927 — the Aetheric Vision Lens (and sibling aether-sight gadgets)
+   *  equip here. Equip-gated: the detect_aether passive is active only while
+   *  one is worn in this dedicated slot (was: active merely by being carried). */
+  lens?: string;
   amulet?: string;
   /** OTA-239 — three concurrent ring slots. `ring` is the legacy first
    *  slot (kept for back-compat); `ring2` and `ring3` are the new
@@ -772,6 +777,7 @@ export interface PlayerEquipped {
   legsId?: string;
   feetId?: string;
   cloakId?: string;
+  lensId?: string;
   amuletId?: string;
   ringId?: string;
   ring2Id?: string;

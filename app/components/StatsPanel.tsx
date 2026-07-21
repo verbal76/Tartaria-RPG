@@ -4,7 +4,7 @@ import type { PlayerCharacter } from '../engine/types';
 import racesData from '../data/races/races.json';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { coatedDisplayName } from '../engine/weaponCoating';
-import { ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
+import { ARMOR_SLOTS, effectiveStats, aethericVisionEquipped } from '../engine/equipment';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
 import { useReduceMotion } from '../state/accessibility';
@@ -16,18 +16,11 @@ import { useReduceMotion } from '../state/accessibility';
 // Without this the lens worked silently and the player had no way
 // to verify it was active beyond the rare OTA-200 hook narration.
 function AethericVisionBadge({ player }: Props) {
+  // OTA-927 — the badge tracks the EQUIPPED Lens slot (equip-gated), not mere carry.
+  // Depends on equipped (the slot) + inventory (resolveEquippedItem reads the instance).
   const active = React.useMemo(() => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { aethericVisionActive } = require('../engine/itemEffect');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
-      return !!aethericVisionActive(
-        player.inventory.map((i) => i.name),
-        [findExplorationItemByName, findGearByName, findMaterialByName],
-      );
-    } catch { return false; }
-  }, [player.inventory]);
+    try { return !!aethericVisionEquipped(player); } catch { return false; }
+  }, [player.equipped, player.inventory]);
   if (!active) return null;
   return (
     <Text style={lensBadgeStyle.badge}>◉ AETHERIC LENS · scanning</Text>
