@@ -17583,4 +17583,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // unchanged (no stat-to-damage). Verified: skyreacherRewards HP assertion re-tuned + coreGuardians/greatClimbs/
 // climbEncounters/skyreacherFullRun green; typecheck:ci + typecheck:tests (200) + lint clean; full fast suite
 // green. TUNING values — revisit after real playtest. Content → HAL + golem only, NOT engine.
-export const OTA_BUILD_ID = '2026-07-20-924-apex-fights-12-round-convergence';
+// OTA-925 (BALANCE — THE FINAL GUARDIAN is the game's last boss → a ~20-round wall, not the 12-round apex race).
+// The storyline needs all 9 Cores and Guardian difficulty is keyed to kill-count, so the 9th Guardian (whichever
+// Capital the player saved for last) is the literal endgame fight. Two problems keying that off the tier-9 hpMult:
+// authored base.hp varies 30-50 across Capitals (so "which seat is last" swung final HP ~210→350), and 20 vs 12
+// rounds is a deliberate step up. Fix: coreGuardians.isFinalGuardian(coresRecovered) detects the last fight
+// order-independently, and spawnGuardianForCapital OVERRIDES HP to a fixed, Capital-independent FINAL_GUARDIAN_HP
+// (660 — ~20 rounds at the weapon-capped ~30-40 net-DPS ceiling; tier-9 regen + double-counter pressure carries
+// felt length past 20). Over-level still applies upward-only, so an over-grinder faces an even longer wall. AC /
+// damage / traits unchanged (tier-9 profile). coreGuardians test extended (final-fight HP fixed + Capital-
+// independent + > tier 8); typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. TUNING value
+// — revisit after a real final-boss playtest. Content → HAL + golem only, NOT engine.
+export const OTA_BUILD_ID = '2026-07-21-925-final-guardian-20-round-wall';

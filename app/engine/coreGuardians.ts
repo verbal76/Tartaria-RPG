@@ -52,6 +52,16 @@ export function tierForKills(coresRecovered: number): GuardianTier {
   return t as GuardianTier;
 }
 
+// OTA-925 — THE FINAL GUARDIAN. The storyline needs every Core (mainQuest gates
+// `descent` on coresRecovered.length >= 9), and difficulty is keyed to kill-count,
+// so the Guardian whose defeat grants the LAST Core is the literal last boss of the
+// game — whichever Capital the player saved for last. Detected order-independently
+// by kill-count: the player already holds every Capital's Core but the one they're
+// standing in.
+export function isFinalGuardian(coresRecovered: number): boolean {
+  return coresRecovered >= LOST_CAPITAL_LOCATIONS.length - 1;
+}
+
 /** Per-tier multipliers + ability descriptors. Stays gentle on
  *  Tier 1 so a player who never trained can still beat it; the
  *  curve ramps steadily through T5, then plateaus on raw stats
@@ -97,8 +107,25 @@ const TIER_PROFILES: Record<GuardianTier, TierProfile> = {
   // a touch under the 12-round apex target and still out-threaten a summit boss.
   7: { hpMult: 4.0, acBonus: 3,  damage: '2d6+4',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
   8: { hpMult: 5.5, acBonus: 4,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
+  // OTA-925 — tier 9 is ONLY ever the final Guardian (9 Capitals, tier caps at 9), and
+  // the final fight OVERRIDES HP to a fixed ~20-round wall (see FINAL_GUARDIAN_HP in
+  // spawnGuardianForCapital), so this hpMult is now a defensive fallback only. AC /
+  // damage / traits still come from here.
   9: { hpMult: 7.0, acBonus: 5,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder', 'ambush_strike'] },
 };
+
+// OTA-925 — the last boss of the storyline is a ~20-round WALL, not the ~12-round apex
+// race the other bosses target (owner: "he is the last boss of the game… make him the
+// 20 not a 12"). Keying that off the tier-9 hpMult alone breaks two ways: (a) authored
+// base.hp varies 30-50 across Capitals, so "which Capital is last" would swing the
+// final HP ~210→350; (b) 20 vs 12 rounds is a deliberate step up. So the final fight
+// IGNORES base.hp × hpMult and uses this fixed, Capital-independent floor sized for
+// ~20 rounds at the weapon-capped ~30-40 net-DPS ceiling (12 rounds ≈ 430 scaled →
+// ×20/12 ≈ 700; trimmed to 660 because the tier-9 regen + double-counter pressure
+// stretches felt length past the raw round count). The upward-only over-level factor
+// still applies, so an over-grinder faces an even longer wall. Tuning value — revisit
+// after a real final-boss playtest.
+const FINAL_GUARDIAN_HP = 660;
 
 // OTA-815 — PLAYER-POWER SCALING. The kill-count tier sets the AUTHORED floor for
 // each Guardian, but difficulty was keyed to that alone: a player who over-levels on
@@ -150,7 +177,12 @@ export function spawnGuardianForCapital(
   // HP scales with the tier profile AND the player's real power, so an over-leveled
   // player can't two-round an early Guardian.
   const over = guardianOverLevel(player, tier);
-  const hp = Math.round(def.base.hp * profile.hpMult * over);
+  // OTA-925 — the final Guardian (last Core in the run) is the game's last boss: a
+  // fixed ~20-round wall, Capital-independent so it doesn't matter which seat the
+  // player saved for last. Every earlier Guardian keeps the tier's base.hp × hpMult
+  // apex curve. Over-level applies to both (upward-only).
+  const baseHp = isFinalGuardian(coresCount) ? FINAL_GUARDIAN_HP : def.base.hp * profile.hpMult;
+  const hp = Math.round(baseHp * over);
   // Bump the abilityPoint number — engine's enemyAC() derives base
   // AC from `5 + apNum`, so increasing the AP by the tier's
   // acBonus (+ the player-power bonus) pipes the scaling through the
