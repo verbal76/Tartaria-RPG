@@ -22,8 +22,9 @@ function weightByMemory(tags: readonly string[], memory: WorldMemory, baseWeight
 export function generateQuest(memory: WorldMemory, preferredLocationId?: string): Quest {
   const objective = pickWeighted(objectives, (o) => weightByMemory(o.tags, memory));
   const complication = pickWeighted(complications, (c) => weightByMemory(c.tags, memory));
-  const reward = pickWeighted(rewards, (r) => weightByMemory(r.tags, memory));
 
+  // Location is chosen BEFORE the reward now, so the reward tier can lean on its
+  // danger (OTA-923).
   let location: Location;
   if (preferredLocationId) {
     const found = locations.find((l) => l.id === preferredLocationId);
@@ -34,6 +35,19 @@ export function generateQuest(memory: WorldMemory, preferredLocationId?: string)
       (l) => weightByMemory(l.tags, memory) + (memory.discoveredLocationIds.includes(l.id) ? 0 : 2),
     );
   }
+
+  // OTA-923 — bias the currency-reward TIER by the quest location's danger, so a
+  // trivial early-zone quest doesn't roll a 400-TC jackpot as often as a 30-TC one,
+  // and a deep dangerous quest leans large — a monotone early→late cash lean. This
+  // only NUDGES the size-tag weight; the anti-repetition novelty rotation
+  // (weightByMemory) still drives variety, so rewards feel fresh, not on rails.
+  const dangerRewardBias = (tags: readonly string[]): number => {
+    const d = location.danger;
+    if (tags.includes('small')) return d <= 2 ? 3 : d >= 4 ? -2 : 0;
+    if (tags.includes('large')) return d >= 4 ? 3 : d <= 2 ? -2 : 0;
+    return 0; // 'medium' + non-currency rewards stay novelty-only
+  };
+  const reward = pickWeighted(rewards, (r) => Math.max(0.1, weightByMemory(r.tags, memory) + dangerRewardBias(r.tags)));
 
   return {
     // OTA 011 — was Math.floor(Math.random() * 1000) which

@@ -16572,4 +16572,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 14→~26, Rare 40→60, Legendary 112→128; weapons/fused/collect-only keep the flat floor. A flat gear floor was
 // rejected (cheapest Common armor buys at 8, so flat 11 reopens arbitrage). Tests: ota922GearResale. typecheck:ci
 // + typecheck:tests + lint clean; full fast suite green. Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-899-armor-resale-per-item-buy-floor';
+// OTA-900 (BALANCE — rarity-scaled repair cost + danger-leaned quest reward tier; port of HAL OTA-923). (1) Repair
+// cost now scales gently by rarity (×1/1.5/2/3, not 1/2/4/8) so upkeep is a real late-game sink; composes with the
+// Architect's Eye discount. (2) Quest currency reward tier leans by location.danger (small ≤2, large ≥4) —
+// monotone early→late, novelty rotation preserved (location now picked before the reward). The combat-AC / to-hit
+// item stays open as a genuine playtest call (not shipped blind). typecheck:ci + typecheck:tests + lint clean;
+// full fast suite green. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-900-repair-rarity-scale-reward-danger-lean';
