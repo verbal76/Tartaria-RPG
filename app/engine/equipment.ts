@@ -54,6 +54,14 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   if (exp?.effect?.kind === 'scanner') {
     return [exp.effect.slot]; // currently always 'off'
   }
+  // OTA-927 — the aether-sight gadgets (Aetheric Vision Lens, Aether Goggles, the
+  // beacons/locators/analyzer/compass/tuner) all grant the `detect_aether` gate.
+  // They equip into the dedicated `lens` slot and the detect_aether passive is
+  // active ONLY while one is worn (was: active just by being carried). Its own slot
+  // so it never competes with an off-hand weapon/scanner.
+  if (exp?.effect?.kind === 'gate' && exp.effect.unlocks === 'detect_aether') {
+    return ['lens'];
+  }
   // arb102 / OTA-911 — `wardrobe`-tagged worn gear that isn't catalog armor
   // (the Hardened Climbing Strap) equips in the LEGS slot: it's a harness rigged
   // around the hips and thighs, so it displaces leg armor while worn. (Was the
@@ -148,6 +156,7 @@ export const SLOT_LABEL: Record<EquipSlot, string> = {
   cloak: 'Cloak',
   amulet: 'Amulet',
   ring: 'Ring',
+  lens: 'Lens',
 };
 
 /** Slots that hold armor pieces (used to aggregate AC + resistances). */
@@ -156,7 +165,7 @@ export const ARMOR_SLOTS: readonly EquipSlot[] = ['head', 'chest', 'hands', 'leg
 /** Map an equip slot to its corresponding `*Id` key on PlayerEquipped.
  *  When set, the id key identifies the exact inventory instance bound
  *  to that slot (important when the player holds two of the same item). */
-export const SLOT_ID_KEY: Record<EquipSlot, 'mainId' | 'offId' | 'headId' | 'chestId' | 'handsId' | 'legsId' | 'feetId' | 'cloakId' | 'amuletId' | 'ringId'> = {
+export const SLOT_ID_KEY: Record<EquipSlot, 'mainId' | 'offId' | 'headId' | 'chestId' | 'handsId' | 'legsId' | 'feetId' | 'cloakId' | 'amuletId' | 'ringId' | 'lensId'> = {
   main: 'mainId',
   off: 'offId',
   head: 'headId',
@@ -167,6 +176,7 @@ export const SLOT_ID_KEY: Record<EquipSlot, 'mainId' | 'offId' | 'headId' | 'che
   cloak: 'cloakId',
   amulet: 'amuletId',
   ring: 'ringId',
+  lens: 'lensId',
 };
 
 /** Resolve the InventoryItem currently equipped in the named slot.
@@ -283,6 +293,17 @@ export function aggregateInventoryPassiveStatBonuses(player: PlayerCharacter): P
  *  'breathe_toxic'); we'll scan the player's inventory for any
  *  item whose effect.unlocks matches and return true on the first
  *  hit. False if no item grants it. */
+/** OTA-927 — the aether-sight passive (`detect_aether`) is equip-gated now: true only
+ *  while an aether-sight gadget is worn in the dedicated `lens` slot. Mirrors the
+ *  scanner-in-off-hand pattern; used by the search bonuses + the HUD 'scanning' badge. */
+export function aethericVisionEquipped(player: PlayerCharacter): boolean {
+  const worn = resolveEquippedItem(player, 'lens');
+  if (!worn) return false;
+  const exp = findExplorationItemByName(worn.name);
+  if (exp?.effect?.kind === 'gate' && exp.effect.unlocks === 'detect_aether') return true;
+  return false;
+}
+
 export function playerHasGate(player: PlayerCharacter, gate: GateKind): boolean {
   const names = (player.inventory ?? []).map((i) => i.name);
   return inventoryHasGate(names, gate, EFFECT_RESOLVERS);

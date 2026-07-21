@@ -1857,6 +1857,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     legs: eq.legs,
     feet: eq.feet,
     cloak: eq.cloak,
+    lens: eq.lens,
     amulet: eq.amulet,
     ring: eq.ring,
     // OTA-239 — three concurrent ring slots. Legacy saves with only
@@ -1871,6 +1872,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     legsId: eq.legsId ?? findFirstId(eq.legs),
     feetId: eq.feetId ?? findFirstId(eq.feet),
     cloakId: eq.cloakId ?? findFirstId(eq.cloak),
+    lensId: eq.lensId ?? findFirstId(eq.lens),
     amuletId: eq.amuletId ?? findFirstId(eq.amulet),
     ringId: eq.ringId ?? findFirstId(eq.ring),
     ring2Id: eq.ring2Id ?? findFirstId(eq.ring2),
@@ -1883,6 +1885,20 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // racks throwables via the InventoryScreen BANDOLIER section.
     bandolierIds: Array.isArray(eq.bandolierIds) ? eq.bandolierIds : [],
   };
+  // OTA-927 — the Aetheric Vision Lens (and sibling aether-sight gadgets) moved from
+  // "active while carried" to a dedicated equip-gated `lens` slot. One-time migration:
+  // if the lens slot is empty and the player carries an aether-sight gadget, auto-equip
+  // the first one so nobody silently loses their detect_aether passive on update.
+  if (equipped && !equipped.lens) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findExplorationItemByName: _findExpLens } = require('../engine/crafting');
+    const _wornLens = inventory.find((i) => {
+      if ((i.quantity ?? 0) <= 0) return false;
+      const _e = _findExpLens(i.name);
+      return _e?.effect?.kind === 'gate' && _e.effect.unlocks === 'detect_aether';
+    });
+    if (_wornLens) { equipped.lens = _wornLens.name; equipped.lensId = _wornLens.id; }
+  }
   // v2.4.1 (OTA 029) — never let currentLocationId be undefined.
   // The hub system, scene rebuild, mapX/mapY math, atlas marker
   // positioning, and several quest paths all key off it. A missing
@@ -11396,10 +11412,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // the player knows it's working and doesn't keep trying
             // to consume it.
             if (fx?.kind === 'gate') {
-              get().appendLog(
-                'arbiter',
-                `The Arbiter's eyes flick to the ${used.name} in your hand. "Already at work — keep it on your person, and it will do its part. Nothing more to 'use'."`,
-              );
+              // OTA-927 — aether-sight gadgets are equip-gated now; point the player at
+              // the Lens slot. Other gate items (Climbing Rope, etc.) stay carried-active.
+              if (fx.unlocks === 'detect_aether') {
+                get().appendLog(
+                  'arbiter',
+                  `The Arbiter taps the ${used.name}. "That's a Lens — fit it in your Lens slot and it works while you wear it. Equip it; there's nothing to 'use'."`,
+                );
+              } else {
+                get().appendLog(
+                  'arbiter',
+                  `The Arbiter's eyes flick to the ${used.name} in your hand. "Already at work — keep it on your person, and it will do its part. Nothing more to 'use'."`,
+                );
+              }
               break;
             }
             // OTA-912 — a Skyreacher Chart. Using it UNLOCKS the great climb (its
@@ -27542,14 +27567,11 @@ function wearEquippedItem(
 function hasAethericVision(player: PlayerCharacter | null): boolean {
   if (!player) return false;
   try {
+    // OTA-927 — equip-gated now: the detect_aether passive fires only while an
+    // aether-sight gadget is worn in the dedicated `lens` slot (was: while carried).
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { aethericVisionActive } = require('../engine/itemEffect');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
-    return !!aethericVisionActive(
-      player.inventory.map((i) => i.name),
-      [findExplorationItemByName, findGearByName, findMaterialByName],
-    );
+    const { aethericVisionEquipped } = require('../engine/equipment');
+    return !!aethericVisionEquipped(player);
   } catch { return false; }
 }
 
