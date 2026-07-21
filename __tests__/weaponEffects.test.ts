@@ -107,7 +107,7 @@ describe('effectConditionMatches — enemy classification', () => {
   });
 
   it('aetheric matches Aetherkin / Aetheric Mutation signatures', () => {
-    expect(effectConditionMatches('aetheric', enemy({ name: 'Aetherkin', type: 'Etheric Undead' }))).toBe(true);
+    expect(effectConditionMatches('aetheric', enemy({ name: 'Aetherkin', type: 'Aetheric Undead' }))).toBe(true);
     expect(effectConditionMatches('aetheric', enemy({ name: 'Aetheric Hound', type: 'Aetheric Mutation' }))).toBe(true);
   });
 

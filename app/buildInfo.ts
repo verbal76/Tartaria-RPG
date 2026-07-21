@@ -17525,4 +17525,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // combat-critical change across enemies.json + the crafting.ts AND encounter.ts weakness-lookup maps — pre-existing
 // drift on 3 legacy enemies, not this arc's, and unsafe to rush. Verified: typecheck:ci + typecheck:tests (200) +
 // lint clean; full fast suite green. Content → HAL + golem only, NOT engine.
-export const OTA_BUILD_ID = '2026-07-20-920-audit-batches-2-7-a11y-narration-save';
+//
+// OTA-921 (LORE — "Etheric Undead" → "Aetheric Undead" enemy-type rename, closing the last open audit item;
+// content, HAL + golem only) — SA-2 reconciled Aether vs Etheric across the lore, but the enemy `type` taxonomy
+// key stayed the pre-reconciliation "Etheric Undead" while the canon banks (glossary/concepts/ambient-flavor) all
+// spell it "Aetheric" — so the codex/EnemyPanel showed the un-reconciled label. Renamed as ONE atomic change so
+// the weakness lookups never desync: the 5 enemy `type` fields (enemies.json), BOTH type-keyed weakness maps —
+// crafting.ts TYPE_RESISTANCE_MAP['Etheric Undead'] and encounter.ts THEMATIC_DEFENSE_POOLS['etheric undead']
+// (the lowercased key the batch-4 agent missed) — plus the crafting/gameStore comments and the Arbiter flavor
+// line. Values unchanged, so combat behavior is identical — only the display string + lookup key moved. Retargeted
+// 5 tests (ota827/knockoutThreshold/weaponEffects/ambientLoreReach/ota914Aetherkin). Verified: damageTypes +
+// ota827 + weaponEffects (weakness resolution) green; typecheck:ci + typecheck:tests (200) + lint clean; full
+// fast suite green. Pre-existing drift (3 legacy enemies) + this arc's 2 Aetherkin. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-921-etheric-to-aetheric-undead-rename';

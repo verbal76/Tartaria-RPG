@@ -24726,7 +24726,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const target = liveScene.enemies[idx]!;
         // OTA-826 [Group-K audit] — this proc's log says "aetheric" but the damage
         // was typeless: full damage against the many aetheric-RESISTANT foes
-        // (Aetheric Mutation/Creature, Automation, Mechanism, Etheric Undead) and
+        // (Aetheric Mutation/Creature, Automation, Mechanism, Aetheric Undead) and
         // no bonus vs a vulnerable:aetheric enemy. Apply the aetheric type modifier
         // so the named element actually interacts with the weakness system.
         const rawEle = rollDie(6);
@@ -29128,7 +29128,7 @@ const TRAVEL_LORE_BEATS = [
   `The Arbiter: "Aetherstone holds light. It holds heat. It holds memory, sometimes. The cores you'll find are not always inert."`,
   `The Arbiter: "Mud-glass is silt fused under Aetheric pressure during the flood. It traps what it traps. Don't break it without a reason."`,
   `The Arbiter, quieter: "Tartarian Giants walked here. Their footprints are in the mud-glass under your boots, if you know what to look for."`,
-  `The Arbiter: "Etheric Undead are not the same as dead. They are people the Aether kept past the threshold. They remember. That is the cruelty."`,
+  `The Arbiter: "Aetheric Undead are not the same as dead. They are people the Aether kept past the threshold. They remember. That is the cruelty."`,
   `The Arbiter: "The Red Tower in the Order's keeping has forty-seven visible rings. It had more, once. Each ring was a doctrine the Order forgot or denied."`,
   `The Arbiter: "Drakova is south. Old Drakova is south, and under. The new Drakova lives on top of its grave and rarely admits it."`,
   `The Arbiter: "The Mud Seas are not seas. They are silt over the Cradle of Dusk, and the storms there are Aetheric, not weather."`,

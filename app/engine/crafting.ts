@@ -874,7 +874,7 @@ export function fuzzyFindArmor(text: string): CatalogArmor | null {
 // answer. Pre-OTA, bludgeoning was the weakness for Aetheric Mutation + Aetheric
 // Creature + Automation — the three most common types in the aetheric wasteland
 // (56 of 109 enemies) — so every fight rewarded the same blunt weapon. And four
-// bestiary types (Human, Mechanism, Etheric Undead, Mech-Construct) had NO row, so
+// bestiary types (Human, Mechanism, Aetheric Undead, Mech-Construct) had NO row, so
 // they showed no weakness at all. Now each type leans a distinct way (bludgeoning
 // stays the CONSTRUCT/heavy-mutation answer, aether-forms take a slashing edge,
 // machines short-circuit to electrical, mud/undead burn, beasts/humans pierce) and
@@ -882,7 +882,7 @@ export function fuzzyFindArmor(text: string): CatalogArmor | null {
 const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> = {
   // OTA-827 [Group-K] — `poison` is now anti-ORGANIC: venom/toxin bites living
   // flesh (Animal, Human, the fleshy Aetheric Mutation) but is still RESISTED by
-  // machines and the undead below (Automation/Mechanism/Etheric Undead) — nothing
+  // machines and the undead below (Automation/Mechanism/Aetheric Undead) — nothing
   // to poison. Pre-fix no enemy was ever vulnerable:poison, so poison weapons/
   // coatings could only ever land neutral or halved.
   // OTA-874 — acid + corruption are now first-class types. Acid corrodes metal, so
@@ -902,7 +902,7 @@ const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> 
   Automation: { resist: ['poison', 'aetheric', 'corruption'], weak: ['electrical', 'cold', 'acid'] },
   Mechanism: { resist: ['poison', 'aetheric', 'corruption'], weak: ['electrical', 'cold', 'acid'] },
   'Mech-Construct': { resist: ['slashing', 'piercing', 'corruption'], weak: ['electrical', 'bludgeoning', 'cold', 'acid'] },
-  'Etheric Undead': { resist: ['poison', 'aetheric', 'corruption'], weak: ['burn', 'radiation'] },
+  'Aetheric Undead': { resist: ['poison', 'aetheric', 'corruption'], weak: ['burn', 'radiation'] },
   Construct: { resist: ['slashing', 'piercing', 'corruption'], weak: ['bludgeoning', 'electrical', 'cold', 'acid'] },
 };
 

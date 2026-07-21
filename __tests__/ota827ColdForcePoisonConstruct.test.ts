@@ -54,7 +54,7 @@ describe('OTA-827 (poison) — poison is anti-organic', () => {
     expect(applyDamageTypeModifier(10, 'poison', 'Animal').match).toBe('weak');
     expect(applyDamageTypeModifier(10, 'poison', 'Aetheric Mutation').match).toBe('weak');
     expect(applyDamageTypeModifier(10, 'poison', 'Automation').match).toBe('resist');
-    expect(applyDamageTypeModifier(10, 'poison', 'Etheric Undead').match).toBe('resist');
+    expect(applyDamageTypeModifier(10, 'poison', 'Aetheric Undead').match).toBe('resist');
   });
 });
 
