@@ -712,7 +712,13 @@ export function CharacterScreen() {
                   // character sees a slot to chase but not a spoiler name/requirement.
                   if (isHiddenTitle(t.id) && !isEarned && !climbLoreKnown) {
                     return (
-                      <View key={t.id} style={styles.titleRow}>
+                      <View
+                        key={t.id}
+                        style={styles.titleRow}
+                        accessible
+                        accessibilityRole="text"
+                        accessibilityLabel="Undiscovered title. A title whose path you haven't crossed yet."
+                      >
                         <Text style={[styles.titleName, styles.titleNameLocked]}>◇ ??? — undiscovered</Text>
                         <Text style={styles.titleRequirement}>A title whose path you haven&apos;t crossed yet.</Text>
                       </View>

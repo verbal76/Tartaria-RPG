@@ -47,7 +47,7 @@ export function isAetherkin(enemy: { name?: string; traits?: readonly string[] }
 
 /** Who they were in life — read off what the mud left behind. */
 const FORMER_LIVES: readonly string[] = [
-  'a baker — flour still ghosts the creases of what were once their sleeves',
+  'a baker, flour still ghosts the creases of what were once their sleeves',
   'a child, no taller than your hip, one small hand closed around nothing',
   'a ward-sister of some drowned infirmary, a splint still lashed to their own arm',
   'a machinist, one hand fused half-around a wrench that rusted into the bone',

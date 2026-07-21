@@ -17509,4 +17509,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (Explorer's Aetheric Greaves) exists; and the new worldMemory fields (aetherkinRolledBuildings, etc.) are
 // save-safe (hydrate spreads ...saved.worldMemory and reads guard with ?? []). New test ota919NewContentWiring
 // locks all of it. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-919-veil-of-peace-authored-wiring-sweep';
+//
+// OTA-920 (AUDIT BATCHES 2-7 — accessibility / narration / lore / parity / reachability / perf-save over the new
+// content — content, HAL + golem only). Parity + reachability came back CLEAN (no logic drift between lines; no
+// phantom reward items). Fixes applied: (a11y, batch 2) the locked codex rows dimmed the whole container with
+// `opacity: 0.5`, which group-composited every child's text below WCAG AA — dropped the opacity (dashed border +
+// already-muted colors carry the "locked" read) and raised `lockedSub` #5a5245 (2.45:1) → #9a8f79; the hidden
+// "??? — undiscovered" title row (a plain View) got `accessible`/`accessibilityRole`/`accessibilityLabel` so a
+// screen reader announces one coherent node instead of "white diamond, question question question". (narration,
+// batch 3) the baker former-life carried an internal em-dash that collided with the identity template's own
+// " — ", stacking 2-3 dashes in one sentence → changed to a comma. (perf/save, batch 7) `aetherkinRolledBuildings`
+// grew unbounded (one key per building tile, never pruned, absent from saveTrim) → bounded to the last 300 under
+// save-size pressure only (regenerable; banking intact in all normal play). DEFERRED (recorded in
+// docs/open-audits): the enemy `type` "Etheric Undead" → "Aetheric Undead" rename (SA-2 canon), a coordinated
+// combat-critical change across enemies.json + the crafting.ts AND encounter.ts weakness-lookup maps — pre-existing
+// drift on 3 legacy enemies, not this arc's, and unsafe to rush. Verified: typecheck:ci + typecheck:tests (200) +
+// lint clean; full fast suite green. Content → HAL + golem only, NOT engine.
+export const OTA_BUILD_ID = '2026-07-20-920-audit-batches-2-7-a11y-narration-save';

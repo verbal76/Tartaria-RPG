@@ -384,12 +384,15 @@ const styles = StyleSheet.create({
   entry: { backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, padding: 10, borderRadius: 4, marginBottom: 8 },
   // OTA-837 — bestiary/lore chrome.
   counter: { color: '#a2977b', fontSize: 10, letterSpacing: 2, marginBottom: 8, textTransform: 'uppercase' },
-  entryLocked: { opacity: 0.5, borderStyle: 'dashed' },
+  // OTA-920 — a dashed border marks a locked row; do NOT dim the whole container
+  // with opacity (group-opacity halved every child's contrast below WCAG AA — the
+  // muted lockedName/lockedSub colors already read as "locked" vs the bright unlocked names).
+  entryLocked: { borderStyle: 'dashed' },
   // OTA-845 — The Fallen memorial.
   fallenEntry: { borderLeftWidth: 3, borderLeftColor: '#6a5a4a' },
   fallenEmpty: { color: '#a2977b', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
   lockedName: { color: '#a2977b', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
-  lockedSub: { color: '#5a5245', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
+  lockedSub: { color: '#9a8f79', fontSize: 10, marginTop: 2, fontStyle: 'italic' }, // OTA-920 — was #5a5245 (2.45:1, failed WCAG AA)
   name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   subtitle: { color: '#c9a86a', fontSize: 11, marginBottom: 4 },
   // OTA-897 (SA-5) — the bestiary voice line: readable prose, italic to set it
