@@ -17622,4 +17622,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // it, gold = even, red = it outclasses you). A first-fight FirstTimeHint ('power_number') introduces it. Power is a
 // GAUGE, not a replacement — every underlying stat still matters. New powerRating test. typecheck:ci + typecheck:tests
 // (200) + lint clean; full fast suite green. UI feature -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-928-power-rating-hud';
+// OTA-929 (FEATURE — Power-change flash: see the number move). Building on OTA-928's Power rating, the stats-panel
+// badge now shows a transient signed delta whenever your Power changes — swap your main weapon and a green ▲ +8 (or
+// red ▼ -6) flashes under the ◆ PWR number for ~2.5s, so a gear choice gives instant "did that help?" feedback. It
+// fires for any Power move (weapon/armour swap, stat tick, buff on/off). StatsPanel-only; no formula change.
+// typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. UI feature -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-929-power-delta-flash';
