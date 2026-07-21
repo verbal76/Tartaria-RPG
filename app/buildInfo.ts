@@ -17568,4 +17568,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //       to-hit soft-cap ripples through the combat-log display; not shipped blind (see docs/open-audits).
 // Verified: durability/questGenerator/repair tests green; typecheck:ci + typecheck:tests (200) + lint clean;
 // full fast suite green. These are TUNING values — easy to revisit after playtest. Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-923-repair-rarity-scale-reward-danger-lean';
+//
+// OTA-924 (BALANCE — apex fights converged to ~12-round tense races; content, HAL + golem only). A time-to-kill
+// analysis found apex fights were BOTH failure modes at once: player DPS is weapon/coating/weakness-driven (per
+// design — stat only feeds to-hit) and hard-caps ~30-40, but the two boss-HP systems diverged ~4×. scaleStaticBoss
+// bosses were HP-sponge SLOGS (summit 440-500 → ~615 scaled → ~19 rounds after my own OTA-918 over-swing; wild
+// Legendaries 458-700 → up to ~920 scaled → 24-26 rounds), while Core Guardians were TRIVIAL (base 30-50 × hpMult
+// 3.1 → ~95-155 scaled → ~5 rounds). Owner's target: ~12-round fights where you must BUILD FOR THE FIGHT (right
+// weapon + coating for the foe's weakness); wrong build = longer, by design. Converged all apex HP toward a
+// ~400-460 scaled band (~12 rounds at the ~35-DPS ceiling): (1) summit bosses base 300-350 (greatClimbs.ts —
+// re-tunes OTA-918 down, still a real boss tier by TTK); (2) wild Legendary bosses base 300-345 (enemies.json,
+// 8 entries — Iron Worm/Mud Tyrant were the worst); (3) Core Guardian late tiers hpMult 2.7/2.9/3.1 → 4.0/5.5/7.0
+// (T7-T9 only; early tiers 1-6 stay smoothed/approachable) → the CLIMAX Guardians now a ~9-11 round fight. Damage
+// unchanged (no stat-to-damage). Verified: skyreacherRewards HP assertion re-tuned + coreGuardians/greatClimbs/
+// climbEncounters/skyreacherFullRun green; typecheck:ci + typecheck:tests (200) + lint clean; full fast suite
+// green. TUNING values — revisit after real playtest. Content → HAL + golem only, NOT engine.
+export const OTA_BUILD_ID = '2026-07-20-924-apex-fights-12-round-convergence';

@@ -89,9 +89,15 @@ const TIER_PROFILES: Record<GuardianTier, TierProfile> = {
   4: { hpMult: 2.0, acBonus: 0,  damage: '1d10+4', counters: 2, extraTraits: ['armored', 'quick'] },
   5: { hpMult: 2.2, acBonus: 1,  damage: '1d10+5', counters: 2, extraTraits: ['armored', 'quick', 'regenerate'] },
   6: { hpMult: 2.4, acBonus: 2,  damage: '1d10+5', counters: 2, extraTraits: ['armored', 'quick', 'regenerate'] },
-  7: { hpMult: 2.7, acBonus: 3,  damage: '2d6+4',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
-  8: { hpMult: 2.9, acBonus: 4,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
-  9: { hpMult: 3.1, acBonus: 5,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder', 'ambush_strike'] },
+  // OTA-924 — late-tier hpMult raised (was 2.7/2.9/3.1) so the CLIMAX Guardians are a
+  // real ~9-11 round fight instead of a ~5 round romp. Player DPS is weapon-capped at
+  // ~30-40, so the old scaled ~95-155 HP fell in a handful of rounds. Early tiers
+  // (1-6) are UNCHANGED — they were deliberately smoothed down (see comment above) and
+  // must stay approachable. Guardians hit twice per round + regen/bleed, so they land
+  // a touch under the 12-round apex target and still out-threaten a summit boss.
+  7: { hpMult: 4.0, acBonus: 3,  damage: '2d6+4',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
+  8: { hpMult: 5.5, acBonus: 4,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
+  9: { hpMult: 7.0, acBonus: 5,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder', 'ambush_strike'] },
 };
 
 // OTA-815 — PLAYER-POWER SCALING. The kill-count tier sets the AUTHORED floor for
