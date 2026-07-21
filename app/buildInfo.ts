@@ -16636,4 +16636,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // still punches). Also Mud-fist Wraps read 1d4 — weaker than the Giant's own 1d6+2 fists — bumped 1d4 -> 1d10
 // (parseDamageDice ignores flat +N, so pure dice; with its +2 defence, wielding it now clearly beats punching).
 // New ota931 test. typecheck:ci + typecheck:tests + lint clean; full fast suite green. HAL + golem.
-export const OTA_BUILD_ID = '2026-07-21-908-fist-weapon-name-barehand-fix';
+// OTA-909 (BUGFIX + UI — a HAND weapon is never treated as, or offered as, a bare-fist/kick swing; port of HAL
+// OTA-932). (a) combatRules: any weapon tagged 'barehanded' (Mud-fist Wraps, the gauntlets, Giant Bone Knuckles)
+// IS the player's fist, so "punch"/"kick" swings THAT weapon, not bare skin (a sword still lets you punch bare;
+// empty-handed still punches). (b) InputBox: the PUNCH/KICK quick buttons are HIDDEN when a hand weapon is equipped.
+// ota931 test extended. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+export const OTA_BUILD_ID = '2026-07-21-909-hand-weapons-not-barehand';

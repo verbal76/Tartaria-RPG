@@ -452,7 +452,12 @@ export function buildCombatSteps(
   const barehandText = candidateWeapon?.name
     ? normText(actionText).split(normText(candidateWeapon.name)).join(' ')
     : normText(actionText);
-  const forcesBarehand = isBareHandAttack(barehandText);
+  // OTA-932 — a HAND weapon (tagged 'barehanded' — the Mud-fist Wraps, the gauntlets, the
+  // Giant Bone Knuckles) IS your fist, so "punch"/"kick" should swing IT, not bare skin.
+  // Only force an unarmed strike when the equipped weapon is NOT a hand-weapon (e.g. you
+  // deliberately punch while holding a sword, for the bludgeoning type / to spare durability).
+  const wieldsHandWeapon = (candidateWeapon?.tags ?? []).some((t) => t.toLowerCase() === 'barehanded');
+  const forcesBarehand = isBareHandAttack(barehandText) && !wieldsHandWeapon;
   const equipped = forcesBarehand ? null : candidateWeapon;
   const wc: WeaponClass = equipped?.weaponKind ?? detectWeaponClass(actionText);
   // Stat used for the attack roll factors in any equipped accessory bonuses
