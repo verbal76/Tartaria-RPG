@@ -3,6 +3,7 @@
     { "name": "Aether Residue", "rarity": "Common", "tags": ["aether"], "description": "A thin film left behind by Aetheric reactions. Smells faintly of ozone and damp stone." },
     { "name": "Aether Crystal", "rarity": "Common", "tags": ["aether", "crystal"], "description": "A small shard of crystallized Aetherstone — a pocket of Etherium the calcification never quite let cool. Hums when held against the ear." },
     { "name": "Aether Mud", "rarity": "Common", "tags": ["mud", "aether"], "description": "Mud thick with dissolved Aetheric particulates. Useful for sealing and binding." },
+    { "name": "Veil of Peace", "rarity": "Uncommon", "tags": ["aether", "relic"], "description": "A gossamer film of Aetherstone that clings to the flood-dead — a scrap of the ethereal calm they were sealed in, torn loose when their rest is broken. It hums with a peace that was never yours to take." },
     { "name": "Aetheric Sludge", "rarity": "Common", "tags": ["mud", "aether"], "description": "Half-fluid Aetherstone in slurry form. Excellent reagent for low-tier alchemy." },
     { "name": "Spider Silk", "rarity": "Common", "tags": ["organic", "fiber"], "description": "Tough silken thread from Tartaria's mud-spiders. Strong enough to bind metal." },
     { "name": "Aether Wing", "rarity": "Common", "tags": ["organic", "aether"], "description": "A chitinous wing from an Aetheric creature, faintly luminescent." },

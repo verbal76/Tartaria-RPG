@@ -16545,4 +16545,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `vulnerable:acid` (not a type weakness — the trait is the intended single source for the Boltcaster's acid).
 // Verified: skyreacherRewards retargeted + greatClimbs/climbEncounters/skyreacherFullRun/ota915 green;
 // typecheck:ci + typecheck:tests + lint clean; full fast suite green. Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-895-summit-boss-hp-and-weakness-dedup';
+// OTA-896 (AUDIT BATCH 1 — new-content wiring/integrity sweep; port of HAL OTA-919) — verified this arc's
+// additions resolve end-to-end. One real gap: `Veil of Peace` (dropped by all 3 Aetherkin variants) was never an
+// authored item — it fell through as a bare misc name. Authored it as a real Uncommon Aether relic in
+// materials.json. Else clean: other Aetherkin loot authored; summit-boss codex names match the built boss + no
+// enemies.json collision; Explorer's Aetheric Greaves exists; new worldMemory fields save-safe. Locked by
+// ota919NewContentWiring. typecheck:ci + typecheck:tests + lint clean; full fast suite green. HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-896-veil-of-peace-authored-wiring-sweep';
