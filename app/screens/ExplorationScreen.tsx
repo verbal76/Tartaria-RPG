@@ -9,7 +9,7 @@ import { AdventureFeed } from '../components/AdventureFeed';
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
-import { playerPowerScore } from '../engine/powerRating';
+import { playerPowerScore, enemyPowerScore } from '../engine/powerRating';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
 import { SalvageModal, isSalvageable as isSalvageableForModal } from '../components/SalvageModal';
@@ -538,7 +538,7 @@ export function ExplorationScreen() {
         <FirstTimeHint
           id="power_number"
           title="Power rating"
-          body="The ◆ number by your name is your Power — a quick gauge built from your stats, weapon, armour, and health. Each foe shows its own ◆ Power facing yours: green means you outclass it, gold is an even fight, red means it outclasses you. Your individual stats still matter — Power just tells you at a glance where you stand. Make your character stronger and watch it climb."
+          body="The ◆ number by your name is your Power — a quick gauge built from your stats, weapon, armour, and health. In a fight, your number AND each foe's are coloured by the matchup: green means you outclass it, gold is an even fight, red means it outclasses you. Your individual stats still matter — Power just tells you at a glance where you stand. Make your character stronger and watch it climb."
         />
       )}
       <View style={styles.topRow}>
@@ -556,7 +556,7 @@ export function ExplorationScreen() {
               if (h > 0 && Math.abs(h - statsColH) > 0.5) setStatsColH(h);
             }}
           >
-            <StatsPanel player={player} />
+            <StatsPanel player={player} enemyPower={inCombat && enemyViews[activeIdx] ? enemyPowerScore(enemyViews[activeIdx]!.enemy) : undefined} />
           </TouchableOpacity>
         </TutorialTarget>
         <TutorialTarget area="top-right-enemy" style={styles.rightCol}>

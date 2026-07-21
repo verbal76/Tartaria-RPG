@@ -5,7 +5,7 @@ import racesData from '../data/races/races.json';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { coatedDisplayName } from '../engine/weaponCoating';
 import { ARMOR_SLOTS, effectiveStats, aethericVisionEquipped } from '../engine/equipment';
-import { playerPowerScore } from '../engine/powerRating';
+import { playerPowerScore, powerMatchup } from '../engine/powerRating';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
 import { useReduceMotion } from '../state/accessibility';
@@ -74,7 +74,7 @@ const coresBadgeStyle = StyleSheet.create({
   badge: { color: '#d8b46a', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginTop: 3 },
 });
 
-interface Props { player: PlayerCharacter; }
+interface Props { player: PlayerCharacter; enemyPower?: number; }
 
 // OTA-632 — health-tinted player card. The HP readout is a tiny number in the
 // top-left card; a playtester died (broken-ladder fall) partly because it's so
@@ -121,7 +121,7 @@ const HP_PULSE_FALL_MS = 320;    // settle slower — can't be missed
 const HP_PULSE_MAX_OPACITY = 0.45;
 const HP_PULSE_COLOR = 'rgb(220, 64, 52)';
 
-export function StatsPanel({ player }: Props) {
+export function StatsPanel({ player, enemyPower }: Props) {
   const race = (racesData as { id: string; name: string }[]).find((r) => r.id === player.raceId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
   // OTA-632 — HP fraction drives the card tint + HP-number colour.
@@ -188,6 +188,10 @@ export function StatsPanel({ player }: Props) {
   // OTA-928 — the player's Power rating (best combat stat + weapon avg + AC + HP/10),
   // shown top-right; faces each enemy's Power on its card as a quick matchup gauge.
   const pwrRating = playerPowerScore(player);
+  // OTA-930 — colour the player's OWN Power badge by the current-target matchup so a
+  // fight you dominate lights your number green (gold = even, red = outmatched). Neutral
+  // gold out of combat (no enemyPower passed). Mirrors the colour on the enemy's badge.
+  const playerMatch = typeof enemyPower === 'number' ? powerMatchup(pwrRating, enemyPower) : null;
   // OTA-929 — flash the UP/DOWN movement of Power when it changes (swapping your main
   // weapon, upgrading armour, a stat tick, a buff), so a gear choice gives instant
   // "did that help?" feedback. Shows the signed delta for ~2.5s, then fades.
@@ -249,7 +253,7 @@ export function StatsPanel({ player }: Props) {
         <View style={styles.nameRowRight}>
           {/* OTA-928 — the player's Power rating, top-right corner; faces each enemy's
               Power (top-left of its card) across the HUD gap as a quick matchup gauge. */}
-          <Text style={styles.powerBadge} accessibilityLabel={`Your power rating ${pwrRating}`}>
+          <Text style={[styles.powerBadge, playerMatch === 'favored' ? styles.powerFavored : playerMatch === 'danger' ? styles.powerDanger : null]} accessibilityLabel={`Your power rating ${pwrRating}`}>
             ◆ {pwrRating} PWR
           </Text>
           {powerDelta !== null && powerDelta !== 0 && (
@@ -374,6 +378,10 @@ const styles = StyleSheet.create({
   // OTA-928 — right group: Power rating badge stacked above the dog name, right-aligned.
   nameRowRight: { alignItems: 'flex-end', flexShrink: 0 },
   powerBadge: { color: '#d9b45b', fontSize: 12, fontWeight: '800', letterSpacing: 0.5 },
+  // OTA-930 — the player badge recolours by the current-target matchup (green favoured,
+  // red outmatched); gold stays the even / no-target default.
+  powerFavored: { color: '#9ec96a' },
+  powerDanger: { color: '#e07a5f' },
   // OTA-929 — transient up/down Power-change flash, under the Power badge.
   powerDelta: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
   powerUp: { color: '#9ec96a' },

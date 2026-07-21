@@ -16623,4 +16623,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // shows a transient signed delta whenever your Power changes — swap your main weapon and a green up-arrow +8 (or red
 // down-arrow -6) flashes under the PWR number for ~2.5s. Fires for any Power move (weapon/armour swap, stat tick,
 // buff). StatsPanel-only; no formula change. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
-export const OTA_BUILD_ID = '2026-07-21-906-power-delta-flash';
+// OTA-907 (FEATURE — the player's OWN Power badge recolours by the matchup, not just the enemy's; port of HAL
+// OTA-930). Playtest confusion: a weak enemy (22) showed green while the player's strong 74 stayed static gold,
+// reading backwards. Now StatsPanel takes the active target's Power (threaded from ExplorationScreen) and colours
+// the player badge by the same verdict as the enemy badge — green when you outclass your target, gold on an even
+// fight, red when outmatched; neutral gold out of combat. Tutorial 'power_number' copy updated. StatsPanel +
+// ExplorationScreen; no formula change. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+export const OTA_BUILD_ID = '2026-07-21-907-player-badge-matchup-color';
