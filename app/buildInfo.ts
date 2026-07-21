@@ -16565,4 +16565,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // + encounter.ts THEMATIC_DEFENSE_POOLS lowercase key) + comments + the Arbiter flavor line + 5 retargeted tests.
 // Values unchanged → combat behavior identical. typecheck:ci + typecheck:tests + lint clean; full fast suite
 // green. Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-898-etheric-to-aetheric-undead-rename';
+// OTA-899 (BALANCE — armor resale grounded per-item; port of HAL OTA-922). GEAR_RARITY_BASE resale was dead code:
+// applySellCaps clamped it to the bonus-less RARITY_BUY_FLOOR, so Uncommon+ armor sold at scrap price. Fix: for
+// kind==='armor', cap resale at 0.8 × the piece's OWN tcBuy (findArmorByName) instead of the flat floor —
+// bonus-aware, provably arbitrage-safe (sell ≤ 0.8×tcBuy < tcBuy across all catalogued pieces). Lifts Uncommon
+// 14→~26, Rare 40→60, Legendary 112→128; weapons/fused/collect-only keep the flat floor. A flat gear floor was
+// rejected (cheapest Common armor buys at 8, so flat 11 reopens arbitrage). Tests: ota922GearResale. typecheck:ci
+// + typecheck:tests + lint clean; full fast suite green. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-899-armor-resale-per-item-buy-floor';

@@ -158,10 +158,28 @@ export function sellPriceFor(
   return applySellCaps(item, withRapport(raw));
 }
 
+/** OTA-922 — per-item arbitrage floor for ARMOR. RARITY_BUY_FLOOR is the cheapest
+ *  buy of a BONUS-LESS item, so it undervalues stat/AC-carrying armor — it clamped
+ *  every Uncommon+ piece to the same scrap price as raw materials, making the
+ *  intended GEAR_RARITY_BASE resale (→ 11/26/60/128) dead code. A specific armor
+ *  piece's cheapest realistic buy is 0.8 × its own catalog tcBuy (same 0.8 haggle
+ *  factor RARITY_BUY_FLOOR uses); cap there instead, so a piece sells for its worth
+ *  while never clearing its own buy price — no cross-stall arbitrage. Returns
+ *  undefined for weapons, fused/renamed armor not in the catalog, and collect-only
+ *  pieces (tcBuy 0), which all keep the flat floor. */
+function armorBuyFloor(item: InventoryItem): number | undefined {
+  if (item.kind !== 'armor') return undefined;
+  const cat = findArmorByName(item.name);
+  const tcBuy = cat ? (cat as unknown as { tcBuy?: number }).tcBuy : undefined;
+  if (typeof tcBuy !== 'number' || tcBuy <= 0) return undefined;
+  return Math.round(tcBuy * 0.8);
+}
+
 /** OTA-802 — apply the B1 sell caps to a computed base sell price:
  *  (a) a self-crafted item never sells above its ingredient value (+Legendary
- *      bump); (c) nothing sells above the cheapest realistic buy for its rarity
- *  (RARITY_BUY_FLOOR), closing cross-stall arbitrage.
+ *      bump); (c) nothing sells above the cheapest realistic buy — RARITY_BUY_FLOOR
+ *  for most items, or the piece's OWN 0.8×tcBuy for catalogued armor (OTA-922) —
+ *  closing cross-stall arbitrage.
  *  OTA-916 — exported so the store can re-apply it as the FINAL step after the
  *  war-heat / relic-title sell multipliers, keeping the floor the last word. */
 export function applySellCaps(item: InventoryItem, raw: number): number {
@@ -171,7 +189,8 @@ export function applySellCaps(item: InventoryItem, raw: number): number {
     if (cap != null) price = Math.min(price, cap);
   }
   if (item.rarity) {
-    price = Math.min(price, RARITY_BUY_FLOOR[item.rarity] ?? price);
+    const floor = armorBuyFloor(item) ?? RARITY_BUY_FLOOR[item.rarity] ?? price;
+    price = Math.min(price, floor);
   }
   return Math.max(1, price);
 }
