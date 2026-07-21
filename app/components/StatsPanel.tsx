@@ -5,6 +5,7 @@ import racesData from '../data/races/races.json';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { coatedDisplayName } from '../engine/weaponCoating';
 import { ARMOR_SLOTS, effectiveStats, aethericVisionEquipped } from '../engine/equipment';
+import { playerPowerScore } from '../engine/powerRating';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
 import { useReduceMotion } from '../state/accessibility';
@@ -184,6 +185,9 @@ export function StatsPanel({ player }: Props) {
   // Stats with accessory + armor bonuses folded in so the player sees the
   // numbers combat will actually use.
   const eff = effectiveStats(player);
+  // OTA-928 — the player's Power rating (best combat stat + weapon avg + AC + HP/10),
+  // shown top-right; faces each enemy's Power on its card as a quick matchup gauge.
+  const pwrRating = playerPowerScore(player);
 
   // Compose a single-line summary of every filled slot so the panel
   // stays compact even with eight slots tracked.
@@ -227,11 +231,18 @@ export function StatsPanel({ player }: Props) {
       <Animated.View pointerEvents="none" style={[styles.pulseOverlay, { opacity: pulseOpacity }]} />
       <View style={styles.nameRow}>
         <Text style={styles.name} numberOfLines={1}>{player.name}</Text>
-        {dogShows && player.dog ? (
-          <Text style={styles.dogName} numberOfLines={1}>
-            {player.dog.name} ({player.dog.hp}/{player.dog.hpMax})
+        <View style={styles.nameRowRight}>
+          {/* OTA-928 — the player's Power rating, top-right corner; faces each enemy's
+              Power (top-left of its card) across the HUD gap as a quick matchup gauge. */}
+          <Text style={styles.powerBadge} accessibilityLabel={`Your power rating ${pwrRating}`}>
+            ◆ {pwrRating} PWR
           </Text>
-        ) : null}
+          {dogShows && player.dog ? (
+            <Text style={styles.dogName} numberOfLines={1}>
+              {player.dog.name} ({player.dog.hp}/{player.dog.hpMax})
+            </Text>
+          ) : null}
+        </View>
       </View>
       {golemShows && player.golem ? (
         <View style={styles.golemRow}>
@@ -337,6 +348,9 @@ const styles = StyleSheet.create({
   // OTA-145 — row holds player name (left, growing) + dog name
   // (right, fixed). flex layout pins the dog to the right edge.
   nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
+  // OTA-928 — right group: Power rating badge stacked above the dog name, right-aligned.
+  nameRowRight: { alignItems: 'flex-end', flexShrink: 0 },
+  powerBadge: { color: '#d9b45b', fontSize: 12, fontWeight: '800', letterSpacing: 0.5 },
   dogName: { color: '#c9a86a', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
   // OTA-145 — golem row sits right-aligned beneath the dog name row.
   // Slightly muted color (slate-mauve) so it reads as a secondary

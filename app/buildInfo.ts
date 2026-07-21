@@ -17614,4 +17614,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // into an empty lens slot (no silent loss on update). USE on a gate-lens now nudges 'equip it'. New ota927 test.
 // typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Content-agnostic UI/equip feature —
 // ships HAL + golem (NOT engine: Tartaria item names).
-export const OTA_BUILD_ID = '2026-07-21-927-aetheric-lens-equip-slot';
+// OTA-928 (FEATURE — the POWER rating: a single at-a-glance number so the player FEELS growth with no character art).
+// New app/engine/powerRating.ts computes one comparable score for the player AND each enemy from the same four terms
+// (best effective combat stat + avg weapon damage/hit + effective AC + HP/10), so training a stat or upgrading a
+// weapon/armour visibly moves it. The player's Power shows top-right of the stats panel; each enemy's Power shows
+// top-left of its combat card, so they FACE each other; the enemy badge is coloured by matchup (green = you outclass
+// it, gold = even, red = it outclasses you). A first-fight FirstTimeHint ('power_number') introduces it. Power is a
+// GAUGE, not a replacement — every underlying stat still matters. New powerRating test. typecheck:ci + typecheck:tests
+// (200) + lint clean; full fast suite green. UI feature -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-928-power-rating-hud';
