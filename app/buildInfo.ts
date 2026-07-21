@@ -16551,4 +16551,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // materials.json. Else clean: other Aetherkin loot authored; summit-boss codex names match the built boss + no
 // enemies.json collision; Explorer's Aetheric Greaves exists; new worldMemory fields save-safe. Locked by
 // ota919NewContentWiring. typecheck:ci + typecheck:tests + lint clean; full fast suite green. HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-896-veil-of-peace-authored-wiring-sweep';
+// OTA-897 (AUDIT BATCHES 2-7 — a11y / narration / lore / parity / reachability / perf-save; port of HAL OTA-920).
+// Parity + reachability CLEAN. Fixes: locked codex rows dropped group `opacity: 0.5` (WCAG-failing) + raised
+// `lockedSub` #5a5245→#9a8f79; the hidden "??? — undiscovered" title row got accessible/accessibilityRole/Label;
+// the baker former-life em-dash → comma (was colliding with the identity template's " — "); and
+// `aetherkinRolledBuildings` bounded via saveTrim slice(-300) under save-size pressure (was unbounded). DEFERRED
+// (in docs/open-audits): the "Etheric Undead" → "Aetheric Undead" enemy-type rename (coordinated across
+// enemies.json + crafting.ts + encounter.ts weakness maps; pre-existing, combat-critical). typecheck:ci +
+// typecheck:tests + lint clean; full fast suite green. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-897-audit-batches-2-7-a11y-narration-save';
