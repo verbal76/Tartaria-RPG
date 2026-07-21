@@ -16585,4 +16585,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // summit bosses 440-500 → 300-350, 8 wild Legendaries 458-700 → 300-345, Core Guardian late hpMult raised
 // (T7 2.7→4.0, T8 2.9→5.5, T9 3.1→7.0). typecheck:ci + typecheck:tests + lint clean; full fast suite green.
 // Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-901-apex-fights-12-round-convergence';
+// OTA-902 (BALANCE — THE FINAL GUARDIAN is the game's last boss -> a ~20-round wall; port of HAL OTA-925). The
+// storyline needs all 9 Cores and Guardian difficulty is keyed to kill-count, so the 9th Guardian (whichever
+// Capital the player saved for last) is the literal endgame fight. Keying that off the tier-9 hpMult alone broke
+// two ways: authored base.hp varies 30-50 across Capitals (so "which seat is last" swung final HP ~210->350), and
+// 20 vs 12 rounds is a deliberate step up. Fix: coreGuardians.isFinalGuardian(coresRecovered) detects the last
+// fight order-independently, and spawnGuardianForCapital OVERRIDES HP to a fixed, Capital-independent
+// FINAL_GUARDIAN_HP (660 - ~20 rounds at the weapon-capped ~30-40 net-DPS ceiling; tier-9 regen + double-counter
+// pressure carries felt length past 20). Over-level still applies upward-only. AC/damage/traits unchanged.
+// coreGuardians test extended; typecheck:ci + typecheck:tests + lint clean; full fast suite green. TUNING value
+// - revisit after a real final-boss playtest. Content -> HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-21-902-final-guardian-20-round-wall';
