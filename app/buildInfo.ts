@@ -16641,4 +16641,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // IS the player's fist, so "punch"/"kick" swings THAT weapon, not bare skin (a sword still lets you punch bare;
 // empty-handed still punches). (b) InputBox: the PUNCH/KICK quick buttons are HIDDEN when a hand weapon is equipped.
 // ota931 test extended. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
-export const OTA_BUILD_ID = '2026-07-21-909-hand-weapons-not-barehand';
+// OTA-910 (UI — weather moved onto the day-counter line so it's readable; port of HAL OTA-933). Weather was at the
+// end of line 1 where it truncated to "Sile…"; line 1 now ends after danger (+ any hazard), and the weather is
+// appended to line 2 next to the day/time ("Day 4 · evening · Silent Blizzard"). No new line added. ExplorationScreen
+// scene-bar only. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+export const OTA_BUILD_ID = '2026-07-21-910-weather-on-day-line';
