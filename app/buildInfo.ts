@@ -16559,4 +16559,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (in docs/open-audits): the "Etheric Undead" → "Aetheric Undead" enemy-type rename (coordinated across
 // enemies.json + crafting.ts + encounter.ts weakness maps; pre-existing, combat-critical). typecheck:ci +
 // typecheck:tests + lint clean; full fast suite green. Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-897-audit-batches-2-7-a11y-narration-save';
+// OTA-898 (LORE — "Etheric Undead" → "Aetheric Undead" enemy-type rename; port of HAL OTA-921) — closes the last
+// open audit item. SA-2 canon spells it "Aetheric" but the enemy `type` key stayed "Etheric Undead". Renamed as
+// one atomic change: 5 enemies.json type fields + BOTH type-keyed weakness maps (crafting.ts TYPE_RESISTANCE_MAP
+// + encounter.ts THEMATIC_DEFENSE_POOLS lowercase key) + comments + the Arbiter flavor line + 5 retargeted tests.
+// Values unchanged → combat behavior identical. typecheck:ci + typecheck:tests + lint clean; full fast suite
+// green. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-898-etheric-to-aetheric-undead-rename';

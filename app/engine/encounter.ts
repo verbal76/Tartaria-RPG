@@ -109,7 +109,7 @@ const THEMATIC_DEFENSE_POOLS: Record<string, DefensePool> = {
   'animal':            { weak: ['piercing', 'poison', 'cold', 'slashing'], resist: ['aetheric'] },
   'human':             { weak: ['piercing', 'poison', 'burn', 'slashing'], resist: ['aetheric'] },
   // an unbound husk — burn it, irradiate it, or unmake it with aether; poison/cold do little.
-  'etheric undead':    { weak: ['burn', 'radiation', 'aetheric'], resist: ['poison', 'cold'] },
+  'aetheric undead':   { weak: ['burn', 'radiation', 'aetheric'], resist: ['poison', 'cold'] },
 };
 const FALLBACK_DEFENSE_POOL: DefensePool = { weak: ['slashing', 'piercing', 'burn', 'bludgeoning'], resist: ['aetheric'] };
 

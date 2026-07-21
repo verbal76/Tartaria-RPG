@@ -2063,7 +2063,7 @@
   {
     "name": "Aetherkin",
     "flavor": "The un-dead of the old power-halls, animated by the Aether they died steeped in.",
-    "type": "Etheric Undead",
+    "type": "Aetheric Undead",
     "abilityPoint": "Strength 7",
     "attack": "Etheric Burst",
     "damage": "3D6 Aetheric",
@@ -2155,7 +2155,7 @@
   {
     "name": "Aetheric Lich",
     "flavor": "An arch-undead sustained by a core of stolen souls, its drain colder than the grave it left.",
-    "type": "Etheric Undead",
+    "type": "Aetheric Undead",
     "abilityPoint": "Intelligence 13",
     "attack": "Soul Drain",
     "damage": "3D8 Aetheric",
@@ -2215,7 +2215,7 @@
   {
     "name": "Hollow King",
     "flavor": "A crowned husk on a rotted throne, hollow of all but the will to make the world hollow too.",
-    "type": "Etheric Undead",
+    "type": "Aetheric Undead",
     "abilityPoint": "Strength 12",
     "attack": "Hollow Cleave",
     "damage": "3D10",
@@ -2449,7 +2449,7 @@
   {
     "name": "Drowned Aetherkin",
     "flavor": "One of the Aetherkin — a Tartarian the flood sealed under and the Aether would not let rest. Reanimated, frightened, running on the muscle-memory of a life it half-remembers. It defends itself; it does not hunt.",
-    "type": "Etheric Undead",
+    "type": "Aetheric Undead",
     "abilityPoint": "Strength 3",
     "attack": "Frightened Lash",
     "damage": "2D6 Aetheric",
@@ -2479,7 +2479,7 @@
   {
     "name": "Mud-Wracked Aetherkin",
     "flavor": "One of the Aetherkin, caked in the mud that mummified it — the flood-dead of old Tartaria, awake and afraid. Slow and defensive; dangerous only to those who press it.",
-    "type": "Etheric Undead",
+    "type": "Aetheric Undead",
     "abilityPoint": "Strength 5",
     "attack": "Silt-Heavy Grasp",
     "damage": "2D8 Aetheric",

@@ -92,11 +92,11 @@ describe('OTA-914 — aetherkin module', () => {
 describe('OTA-914 — enemy data', () => {
   const byName = (n: string) => (enemiesData as Enemy[]).find((e) => e.name === n);
 
-  it('the two defensive variants exist as Etheric Undead, marked + skittish', () => {
+  it('the two defensive variants exist as Aetheric Undead, marked + skittish', () => {
     for (const name of ['Drowned Aetherkin', 'Mud-Wracked Aetherkin']) {
       const e = byName(name);
       expect(e).toBeDefined();
-      expect(e!.type).toBe('Etheric Undead');
+      expect(e!.type).toBe('Aetheric Undead');
       expect(e!.traits ?? []).toContain('aetherkin');
       expect(e!.temperament).toBe('skittish'); // "calm" is the talk-down key
       expect(isAetherkin(e!)).toBe(true);
@@ -113,7 +113,7 @@ describe('OTA-914 — enemy data', () => {
 
 function aetherkin(): Enemy {
   return {
-    name: 'Drowned Aetherkin', type: 'Etheric Undead', abilityPoint: 'Strength 3',
+    name: 'Drowned Aetherkin', type: 'Aetheric Undead', abilityPoint: 'Strength 3',
     attack: 'Frightened Lash', damage: '2D6 Aetheric', hp: 45, rarity: 'Common',
     loot: [], traits: ['aetherkin', 'slow'], temperament: 'skittish',
   };
