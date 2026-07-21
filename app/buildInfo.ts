@@ -17537,4 +17537,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 5 tests (ota827/knockoutThreshold/weaponEffects/ambientLoreReach/ota914Aetherkin). Verified: damageTypes +
 // ota827 + weaponEffects (weakness resolution) green; typecheck:ci + typecheck:tests (200) + lint clean; full
 // fast suite green. Pre-existing drift (3 legacy enemies) + this arc's 2 Aetherkin. Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-921-etheric-to-aetheric-undead-rename';
+//
+// OTA-922 (BALANCE — armor resale grounded per-item; closes the last confirmed balance mis-tune — content, HAL +
+// golem only). The gear re-level (GEAR_RARITY_BASE → intended sell 11/26/60/128) was dead code: applySellCaps
+// clamped it to RARITY_BUY_FLOOR (5/14/40/112), which is the cheapest buy of a BONUS-LESS item, so every
+// Uncommon+ armor sold at the same scrap price as raw materials. Fix (the audit-verifier's per-item, buy-grounded
+// approach, using authored catalog data): for kind==='armor', cap resale at 0.8 × the piece's OWN tcBuy
+// (findArmorByName) instead of the flat floor — the same 0.8 haggle factor the flat floor uses, but bonus-aware.
+// A specific piece thus sells for its worth yet never clears its own cheapest buy (arbitrage stays closed; a data
+// test proves sell ≤ 0.8×tcBuy < tcBuy across all ~130 catalogued Common-through-Legendary pieces). Effect:
+// Uncommon armor 14→~26, Rare 40→60, Legendary 112→128, pricier Commons 5→up to 11; cheap/low-AC Commons stay
+// low (correct — their own buy is low). Weapons (no authored tcSell, arbitrage-prone bare Commons), fused/renamed
+// armor not in the catalog, and collect-only pieces (Skyreacher, tcBuy 0) all keep the flat floor. A FLAT gear
+// floor was rejected: the cheapest Common armor buys at 8, so a flat 11 would reopen buy-8-sell-11 arbitrage —
+// only the per-item cap is safe. Verified: ota922GearResale (per-item cap + Uncommon/Rare lift + weapon/fused
+// fallback); typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-922-armor-resale-per-item-buy-floor';
