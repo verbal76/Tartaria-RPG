@@ -28,6 +28,8 @@ _Generated 2026-07-20 from the balance/economy multi-agent audit (`tartaria-bala
 
 - **2026-07-20 — gear-resale DEFERRAL DONE → OTA-922/899.** Resolved the design fork with the catalog data: authored armor `tcSell` is always < `tcBuy`, and the cheapest Common armor buys at 8 (so a flat floor of 11 IS arbitrage — the audit's "intended 11" was a coarse-table mirage). Implemented the verifier's per-item fix: for armor, cap resale at 0.8 × the piece's OWN tcBuy (findArmorByName) instead of the bonus-less flat RARITY_BUY_FLOOR. Un-clobbers GEAR_RARITY_BASE for Uncommon (14→~26) / Rare (40→60) / Legendary (112→128); pricier Commons rise (5→up to 11); cheap Commons stay low. Weapons + fused + collect-only keep the flat floor. Proven arbitrage-safe across all ~130 catalogued pieces (ota922GearResale). **Only remaining open item: combat-AC (playtest rebalance).**
 
+- **2026-07-20 — two PLAYTEST items DONE → OTA-923/900.** (1) Repair cost now scales gently by rarity (×1/1.5/2/3, not 1/2/4/8) so upkeep is a real late-game sink; composes with Architect's Eye. (2) Quest currency reward tier now leans by location.danger (small at ≤2, large at ≥4) — monotone early→late lean, novelty rotation preserved. These are TUNING values, easy to revisit after playtest. **Only combat-AC / to-hit remains — held as a genuine playtest call (audit synthesis judged boss AC well-shaped; the to-hit soft-cap ripples through the combat-log display and needs feel-testing, so NOT shipped blind).**
+
 ## Future audit batches (not yet run)
 
 Dimensions the two big sweeps (bug/exploit, balance/economy) did NOT cover. Each is a small, self-contained batch — run when tokens allow. Ranked by likelihood of catching a real issue.

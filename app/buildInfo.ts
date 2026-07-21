@@ -17552,4 +17552,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // floor was rejected: the cheapest Common armor buys at 8, so a flat 11 would reopen buy-8-sell-11 arbitrage —
 // only the per-item cap is safe. Verified: ota922GearResale (per-item cap + Uncommon/Rare lift + weapon/fused
 // fallback); typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Content → HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-20-922-armor-resale-per-item-buy-floor';
+//
+// OTA-923 (BALANCE — the two remaining PLAYTEST tuning items from the balance audit; content, HAL + golem only).
+//   (1) REPAIR COST (durability.ts) — was a flat 1 TC / missing point, rarity-blind, so mending a Legendary cost
+//       the same as a Common cudgel and upkeep was a negligible late-game sink. Now scales GENTLY by rarity
+//       (×1 / 1.5 / 2 / 3 — deliberately NOT 1/2/4/8, which overshoots): a full Legendary repair ~65 → ~195 TC,
+//       a real wealth sink but not punishing vs late income. Composes with the Architect's Eye discount (applied
+//       on top at the call site).
+//   (2) LEADS / QUEST CURRENCY REWARD (questGenerator.ts) — the 30/120/400 currency tiers were flat-weighted, so
+//       a trivial early quest rolled a 400-TC jackpot as often as a 30-TC one, with no early→late lean. Location
+//       is now chosen BEFORE the reward, and the size-tag weight leans by location.danger (bias 'small' at
+//       danger≤2, 'large' at danger≥4) — a monotone early→late cash lean that PRESERVES the anti-repetition
+//       novelty rotation (weightByMemory still drives variety; this only nudges the tier). The combat-AC / to-hit
+//       item stays OPEN as a genuine playtest call — the audit's own synthesis judged boss AC well-shaped and the
+//       to-hit soft-cap ripples through the combat-log display; not shipped blind (see docs/open-audits).
+// Verified: durability/questGenerator/repair tests green; typecheck:ci + typecheck:tests (200) + lint clean;
+// full fast suite green. These are TUNING values — easy to revisit after playtest. Content → HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-20-923-repair-rarity-scale-reward-danger-lean';
