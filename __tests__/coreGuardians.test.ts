@@ -177,6 +177,27 @@ describe('Core Guardians', () => {
       expect(lastIsVaelka.hp).toBeGreaterThan(eighth.hp);
     });
 
+    // OTA-926 — the Guardians are the game's main antagonists and must ramp
+    // monotonically: each fight tougher than the last, regardless of which Capital the
+    // player fights in which ORDER. HP is now Capital-independent, so spawning a
+    // different Capital at each tier still yields a strictly increasing HP curve.
+    it('HP ramps strictly upward tier 1→9, independent of Capital/order', () => {
+      const caps = LOST_CAPITAL_LOCATIONS;
+      const hps: number[] = [];
+      for (let tier = 1; tier <= 9; tier++) {
+        // Fixed, at-curve player power (over-level = 1.0 at every tier) so the ramp
+        // reflects the authored tier curve, not player scaling. Spawn a DIFFERENT
+        // Capital each tier — the seat must not change the HP.
+        const p = makePlayer({ mainQuest: { phase: 'cores', coresRecovered: caps.slice(0, tier - 1) } });
+        hps.push(spawnGuardianForCapital(p, caps[tier - 1]!)!.hp);
+      }
+      for (let i = 1; i < hps.length; i++) {
+        expect(hps[i]).toBeGreaterThan(hps[i - 1]!);
+      }
+      // The final Guardian is the biggest wall in the run.
+      expect(hps[8]).toBe(Math.max(...hps));
+    });
+
     it('HP scales up with player hpMax', () => {
       const lowHp = makePlayer({ hpMax: 30 });
       const highHp = makePlayer({ hpMax: 80 });

@@ -16595,4 +16595,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // pressure carries felt length past 20). Over-level still applies upward-only. AC/damage/traits unchanged.
 // coreGuardians test extended; typecheck:ci + typecheck:tests + lint clean; full fast suite green. TUNING value
 // - revisit after a real final-boss playtest. Content -> HAL + golem only.
-export const OTA_BUILD_ID = '2026-07-21-902-final-guardian-20-round-wall';
+// OTA-903 (BALANCE — Core Guardians ramp monotonically; each main antagonist a bit tougher than the last; port
+// of HAL OTA-926). Guardians scale by KILL-COUNT not Capital (design intent), but HP was Capital.base.hp x hpMult
+// and base.hp varies 30-50 across Capitals. Since the player picks the fight ORDER, that leaked the Capital into
+// difficulty and could INVERT the ramp (Cantor(50) @ tier1 = 70 HP, then Vaelka(30) @ tier2 = 48 HP - 2nd fight
+// EASIER than the 1st). Fix: HP now uses one Capital-independent canonical base (CANON_BASE_HP=42) x the tier's
+// hpMult -> a strictly monotonic curve (T1->T8 ~ 59/67/76/84/92/101/168/231, then the T9 final wall at 660).
+// Per-Capital flavor still lives in weakness/resistance/damage-type/approach-line, just not raw HP. New monotonic
+// ramp test. typecheck:ci + typecheck:tests + lint clean; full fast suite green. TUNING values. Content -> HAL + golem only.
+export const OTA_BUILD_ID = '2026-07-21-903-core-guardians-monotonic-ramp';
