@@ -16619,4 +16619,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // matchup (green = you outclass it, gold = even, red = it outclasses you). A first-fight FirstTimeHint introduces
 // it. Power is a GAUGE, not a replacement. New powerRating test. typecheck:ci + typecheck:tests + lint clean; full
 // fast suite green. UI feature -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-21-905-power-rating-hud';
+// OTA-906 (FEATURE — Power-change flash: see the number move; port of HAL OTA-929). The stats-panel Power badge now
+// shows a transient signed delta whenever your Power changes — swap your main weapon and a green up-arrow +8 (or red
+// down-arrow -6) flashes under the PWR number for ~2.5s. Fires for any Power move (weapon/armour swap, stat tick,
+// buff). StatsPanel-only; no formula change. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+export const OTA_BUILD_ID = '2026-07-21-906-power-delta-flash';

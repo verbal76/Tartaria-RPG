@@ -188,6 +188,21 @@ export function StatsPanel({ player }: Props) {
   // OTA-928 — the player's Power rating (best combat stat + weapon avg + AC + HP/10),
   // shown top-right; faces each enemy's Power on its card as a quick matchup gauge.
   const pwrRating = playerPowerScore(player);
+  // OTA-929 — flash the UP/DOWN movement of Power when it changes (swapping your main
+  // weapon, upgrading armour, a stat tick, a buff), so a gear choice gives instant
+  // "did that help?" feedback. Shows the signed delta for ~2.5s, then fades.
+  const [powerDelta, setPowerDelta] = React.useState<number | null>(null);
+  const prevPowerRef = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    const prev = prevPowerRef.current;
+    prevPowerRef.current = pwrRating;
+    if (prev !== null && prev !== pwrRating) {
+      setPowerDelta(pwrRating - prev);
+      const t = setTimeout(() => setPowerDelta(null), 2500);
+      return () => clearTimeout(t);
+    }
+    return undefined;
+  }, [pwrRating]);
 
   // Compose a single-line summary of every filled slot so the panel
   // stays compact even with eight slots tracked.
@@ -237,6 +252,14 @@ export function StatsPanel({ player }: Props) {
           <Text style={styles.powerBadge} accessibilityLabel={`Your power rating ${pwrRating}`}>
             ◆ {pwrRating} PWR
           </Text>
+          {powerDelta !== null && powerDelta !== 0 && (
+            <Text
+              style={[styles.powerDelta, powerDelta > 0 ? styles.powerUp : styles.powerDown]}
+              accessibilityLabel={`Power ${powerDelta > 0 ? 'up' : 'down'} ${Math.abs(powerDelta)}`}
+            >
+              {powerDelta > 0 ? `▲ +${powerDelta}` : `▼ ${powerDelta}`}
+            </Text>
+          )}
           {dogShows && player.dog ? (
             <Text style={styles.dogName} numberOfLines={1}>
               {player.dog.name} ({player.dog.hp}/{player.dog.hpMax})
@@ -351,6 +374,10 @@ const styles = StyleSheet.create({
   // OTA-928 — right group: Power rating badge stacked above the dog name, right-aligned.
   nameRowRight: { alignItems: 'flex-end', flexShrink: 0 },
   powerBadge: { color: '#d9b45b', fontSize: 12, fontWeight: '800', letterSpacing: 0.5 },
+  // OTA-929 — transient up/down Power-change flash, under the Power badge.
+  powerDelta: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
+  powerUp: { color: '#9ec96a' },
+  powerDown: { color: '#e07a5f' },
   dogName: { color: '#c9a86a', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
   // OTA-145 — golem row sits right-aligned beneath the dog name row.
   // Slightly muted color (slate-mauve) so it reads as a secondary
