@@ -16728,4 +16728,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // same: a full piece (base cap 3 + Crucible bonus) opens a which-resist-to-strip picker instead of flatly refusing.
 // applyCoating gained an optional replaceSlot; applyCoatingToArmor an optional replaceResist. UI + store + tests only,
 // no engine change.
-export const OTA_BUILD_ID = '2026-07-21-922-coating-slot-replace-picker';
+// OTA-923 (combat correctness — weather resist + stealth contradiction guard). (1) WEATHER now respects the player's
+// armour coatings: a matching-element resist shrugs off that element's weather (electrical coating vs Aether-lightning,
+// etc.), generalising the OTA-934 cold rule to every element via tickWeather(resistKinds). Weather with no coatable
+// counterpart (physical hail, ash, psychic fog) still bites. (2) STEALTH-in-combat no longer logs a self-contradicting
+// "PASS" before the break-away init race that can end in "surprised": a reusable CONTRADICTION GUARD suppresses the
+// generic skill-check verdict whenever a handler owns the real outcome (HANDLER_OWNED_IN_COMBAT). The failed-disengage
+// penalty is preserved (single authoritative verdict from the handler, not coddled). No engine change to combat math.
+// Golem port of HAL OTA-946. No engine change to combat math.
+export const OTA_BUILD_ID = '2026-07-21-923-weather-resist-stealth-contradiction';

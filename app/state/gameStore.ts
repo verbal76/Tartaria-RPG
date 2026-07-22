@@ -8202,7 +8202,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const wtick = weatherCooldown > 0
       ? { hpDelta: 0, staminaDelta: 0, corruptionDelta: 0, line: null as string | null }
-      : tickWeather(get().currentScene?.weather ?? null, player, playerColdResist(player));
+      : tickWeather(get().currentScene?.weather ?? null, player, playerArmorResistKinds(player));
     if (wtick.line) {
       // Rate-limit the weather-tick line: don't print the SAME line if
       // it already appeared within the last 30 log entries. The
@@ -16237,9 +16237,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // check (and every other) fires with the right governing stat + DC.
       {
         const d20 = (skill.total ?? 0) - (skill.bonus ?? 0);
+        // OTA-923 — CONTRADICTION GUARD. A "handler-owned" intent resolves itself below with its
+        // own authoritative outcome line. For STEALTH in combat that outcome is a SECOND roll —
+        // the break-away initiative race, which can fail — so also stamping a generic "PASS"
+        // here produced a self-contradicting log ("stealth … PASS" immediately followed by
+        // "… surprised"). When a handler owns the result, log the roll WITHOUT a PASS/FAIL
+        // verdict so the handler's line is the single source of truth. Add intents to
+        // HANDLER_OWNED_IN_COMBAT as other re-resolving handlers are found — the guard scales.
+        const HANDLER_OWNED_IN_COMBAT = new Set(['stealth']);
+        const handlerOwnsOutcome = !!skill.success
+          && (currentScene.enemies?.length ?? 0) > 0
+          && HANDLER_OWNED_IN_COMBAT.has(intent);
+        const verdict = handlerOwnsOutcome ? '(resolved below)' : (skill.success ? 'PASS' : 'FAIL');
         get().appendLog(
           'debug',
-          `skillcheck: ${intent} d20=${d20} ${skill.bonusLabel ?? ''} = ${skill.total} vs ${skill.targetLabel ?? `DC ${skill.target}`} → ${skill.success ? 'PASS' : 'FAIL'}`,
+          `skillcheck: ${intent} d20=${d20} ${skill.bonusLabel ?? ''} = ${skill.total} vs ${skill.targetLabel ?? `DC ${skill.target}`} → ${verdict}`,
         );
         const live = get().player;
         if (live) get().appendLog('debug', debugLoadout(live));
@@ -25285,7 +25297,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { tickWeather } = require('../engine/weatherEffects');
       for (let h = 0; h < hoursSlept; h++) {
-        const tick = tickWeather(weatherForRest, player, playerColdResist(player));
+        const tick = tickWeather(weatherForRest, player, playerArmorResistKinds(player));
         if (tick.hpDelta < 0) weatherHpDamage += -tick.hpDelta;
         if (tick.staminaDelta < 0) weatherStamDamage += -tick.staminaDelta;
       }
@@ -27774,6 +27786,14 @@ function hasAethericVision(player: PlayerCharacter | null): boolean {
 export function playerColdResist(player: PlayerCharacter | null): boolean {
   if (!player) return false;
   return aggregateArmor(player).resistances.some((r) => r.toLowerCase() === 'cold');
+}
+
+// OTA-923 — the player's full armour resist kinds (lowercased). tickWeather uses this to
+// cancel a weather whose element the player's coatings resist (cold, electrical, burn …),
+// generalising playerColdResist beyond cold only.
+export function playerArmorResistKinds(player: PlayerCharacter | null): string[] {
+  if (!player) return [];
+  return aggregateArmor(player).resistances.map((r) => r.toLowerCase());
 }
 
 function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances: string[]; resistSlots: ArmorSlotResist[] } {
