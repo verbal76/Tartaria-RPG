@@ -449,6 +449,36 @@ Key invariants worth knowing:
       31-AC target more than 5%; (b) cap/curve AC contribution; (c) leave it (defense IS
       the reward for stacking AC, and offense is already gated by resistances). Do NOT
       change anything until the user picks a direction — this is a balance/feel call.
+      **UPDATE 2026-07-22 — DIRECTION PICKED, PASS 1 SHIPPED (HAL OTA-947 / golem 924).** The user chose
+      (b)+(a-lite) but REFRAMED the intent: the fast fusion loop is SACRED (keep the dramatic early scaling
+      + the "I got something" hit) — the real problem is raw AC dominating ONE uncounterable axis, which
+      switches the DEFENSIVE half of combat off. Three named, tunable levers ('defense de-runaway'), all in
+      `gameStore.applyEnemyCounter` + a shared `equipment.trimStandingAc` (used by BOTH combat and the
+      StatsPanel, so shown AC = fought AC):
+        · **LIGHT AC TAIL-TRIM** — standing AC climbs untouched to `AC_TRIM_KNEE`=22, then ×`AC_TRIM_RATE`=0.4
+          per point (raw ~37 → ~28). Every piece still adds AC; only the runaway tail bends.
+        · **ENEMY HIT FLOOR** — cap the natural d20 an enemy needs at `ENEMY_HIT_NEEDED_CAP`=13 (~40% floor),
+          so NO AC buys literal immunity. Below the cap it is the IDENTICAL old AC math → low-AC / early
+          fights are unchanged (that's why the full suite stayed green).
+        · **GLOBAL MITIGATION FLOOR** — a landed hit always deals ≥ `MITIGATION_FLOOR`=0.30 of its RAW roll,
+          so stacked resists soak MOST of a matched hit but never ALL — a MISMATCHED resist visibly leaks.
+          (The shaped-stone WARD is a spent absorb pool, not a passive resist, so it still runs after this
+          and may legitimately zero a hit.)
+      **KNOBS for adjusting fire downrange (all named constants):** `ENEMY_HIT_NEEDED_CAP` (lower = hit more;
+      11 ≈ 50%), `MITIGATION_FLOOR`, and the trim `knee`/`rate`. A design artifact (charts + full model) was
+      produced this session; the user signed off on light-tail-trim + the legibility layer.
+      **STILL OPEN — passes 2 & 3 (planned, NOT yet shipped):**
+        · **OTA-948 'matched progression'** — fold worn armour into the enemy POWER metric. `enemyScalePower`
+          (encounter.ts) and `guardianPlayerPower` (coreGuardians.ts) today read only `bestStat + HP/10` and
+          are BLIND to armour, so a tank reads as LOW power and the world scales DOWN (Guardian tiers 1–2 even
+          SUBTRACT to-hit). Fix: add the armour AC term so as you gear up, enemy HP + damage climb to match
+          ("the world climbs with you"). One-directional (spawn-time read of the player, never re-fed → NO
+          feedback loop). Invasive: threads armour through ~8 `enemyScalePower` call sites → do in isolation.
+        · **OTA-949 'legibility layer'** — make gear/resists VISIBLE: resist/weakness call-out on the hit
+          (strengthen the OTA-838 tags + OTA-197 swap-nudge to NAME a type the player carries); coating-soak
+          feedback (extend the OTA-946 weather-resist "0 damage" line to combat hits); a "hit leaked — missing
+          resist" cue. Once-per-encounter, no spam.
+      Recommendation on record: playtest pass 1 BEFORE stacking pass 2 (combat changes compound).
   - **C. UX / polish — ~~DONE 801/781/1086~~.**
     - ~~C1 [#11] Fusion material-type UX.~~ **FIXED:** firing the Crucible with
       reserved-but-insufficient pieces opens the PICKER (which already surfaces
@@ -607,8 +637,29 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-20-903`**,
-**golem-line `…-879`**, **engine_Dev `…-1174`**.
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-22-947`**,
+**golem-line `…-924`**, **engine_Dev `…-1174`**.
+
+- **COMBAT-FEEL SESSION (2026-07-22) — coatings, weather/stealth correctness, defense de-runaway.**
+  HAL **940–947** / golem **917–924** (engine_Dev EXCLUDED — all of this is combat/content tuning, not
+  engine-level; the levers are documented in §8.B3 so it can be ported later if wanted).
+  • **940** — barehanded-weapon coatings fire now: `isBareHandAttack` tripped on a weapon NAME containing
+    a body word ("Mud-FIST Wraps") → the whole coating block was skipped. Now strips the equipped weapon
+    name before the bare-hand test. + fixed the stale downed-dog Arbiter line.
+  • **941/942/943** — one-time OWNER-SCOPED Mud Siren rematch (name 'Verbal' + ≥1 recovered Core): refund
+    the consumables/throwables spent under the 940 bug, re-stage a scaled Mud Siren, clean pre-fight
+    restore (full HP/stam, gear repaired, throwables topped up). Latch-gated via grantTestSupplyGiftOnce.
+  • **944/945** — coating UX: a coat that REPLACES an existing coating routes through a destructive-toned
+    confirm; on a FULL multi-slot weapon (or a full armor resist piece) it opens a which-to-replace PICKER
+    (empty slots fill first). applyCoating gained `replaceSlot`; applyCoatingToArmor gained `replaceResist`.
+    + a coating2 save-round-trip regression lock.
+  • **946** — WEATHER respects armour resists: a matching-element coating shrugs off that element's weather
+    (electrical coat vs Aether-lightning), generalising the OTA-934 cold rule (tickWeather now takes the
+    player's full resist list). + STEALTH contradiction GUARD: a "stealth … PASS" no longer precedes a
+    "surprised"; a reusable guard (`HANDLER_OWNED_IN_COMBAT`) suppresses the generic skill-check verdict
+    when a handler owns the real outcome. The failed-disengage penalty itself is preserved.
+  • **947** — DEFENSE DE-RUNAWAY (combat rebalance **I of III**). Full lever list + the planned passes 2
+    (matched progression) & 3 (legibility) live in **§8.B3**. The fusion/acquisition loop is UNTOUCHED.
 
 - **STUDIO-LEVEL / CI-HARDENING BATCH (2026-07-19 → 20).** Six items SA-1…SA-6
   plus three CI/quality closes, shipped across the three lines (HAL 895–903,
