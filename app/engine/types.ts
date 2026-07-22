@@ -1320,6 +1320,9 @@ export interface PlayerCharacter {
    *  in loadSlotIntoGame). See DogCompanion interface above and the
    *  framework spec in HANDOFF.md §0.A. */
   dog?: DogCompanion | null;
+  /** OTA-938 — latches the one-time dead/abandoned-dog revive migration so it fires exactly
+   *  once ever. A dog lost AFTER this OTA stays lost (death mechanic intact going forward). */
+  dogRevivedOta938?: boolean;
 }
 
 /** OTA-120 — Dog Companion. A one-at-a-time canine sidekick the player
@@ -1371,6 +1374,9 @@ export interface DogCompanion {
    *  Arbiter reminder so it fires once per down-event, not every tick.
    *  Cleared alongside downedAtHour when the dog is healed back up. */
   bleedWarned?: boolean;
+  /** OTA-938 — how many escalating bleed-out beats have fired this down-event (0..3, at
+   *  1/4, 1/2, 3/4 of the window). Latches so each fires once. Cleared when healed back up. */
+  bleedWarnStage?: number;
   /** Poplar Anvil — lowest loyalty band already warned about (50/30/15).
    *  Latches so each escalating "your dog is drifting" Arbiter beat
    *  fires once per crossing, not every tick. undefined = none warned

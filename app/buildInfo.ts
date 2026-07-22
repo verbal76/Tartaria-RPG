@@ -17688,4 +17688,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // spacing survives the slight compression. And the weather moved onto the day-counter line kept the thin faded
 // day-count color — now it renders in its own span with the LOCATION line's bright gold + a bold weight so it stands
 // out. Pure styling; typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. UI -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-937-equal-cards-weather-pop';
+// OTA-938 (DOG — one-time revive + surface the bleed-out HARD). Owner: a downed dog quietly bleeds out in 24h and
+// there's no second dog until the very endgame, but that 24h window was near-invisible (one mid-window line, no
+// clock) and a dog killed outright (you dying in the same fight) had no way back. Fixes: (1) a one-time migration
+// revives a DEAD/ABANDONED dog once, at full HP with loyalty floored (dogRevivedOta938 latch — a dog lost AFTER this
+// stays lost). (2) The StatsPanel dog-name row now shows a live "⏳ Nh — feed to save" countdown while downed, in
+// urgent red. (3) tickDogStatus fires escalating Arbiter beats at 1/4, 1/2, 3/4 of the window — each once, each
+// stating the hours left (bleedWarnStage latch). New ota938 test. typecheck:ci + typecheck:tests (200) + lint clean;
+// full fast suite green. Dog mechanic/UI -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-938-dog-revive-bleedout-countdown';

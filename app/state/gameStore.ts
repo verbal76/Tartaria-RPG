@@ -1964,6 +1964,19 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { grandfatheredKnownRecipes: _gkr } = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
   const knownRecipes = _gkr(_allRecipes, inventory.map((i) => i.name), p.knownRecipes);
+  // OTA-938 — one-time dog revive. Feedback: a dog that DIED (or walked off) had no way back
+  // before the very-endgame second dog, and the 24h bleed-out window was invisible — players
+  // lost their companion without a fair shot. This brings a dead/abandoned dog back ONCE, at
+  // full HP with loyalty floored so the reunion isn't instantly starving. The dogRevivedOta938
+  // latch fires it exactly once ever; a dog lost after this OTA stays lost.
+  const revivedDog = (() => {
+    const d = p.dog;
+    if (p.dogRevivedOta938) return d ?? null;
+    if (d && (d.status === 'dead' || d.status === 'abandoned')) {
+      return { ...d, status: 'with_player' as const, hp: d.hpMax, loyalty: Math.max(d.loyalty ?? 0, 60), downedAtHour: undefined, bleedWarned: false, bleedWarnStage: 0 };
+    }
+    return d ?? null;
+  })();
   return {
     ...p,
     stats,
@@ -2099,7 +2112,9 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // OTA-120 — Dog Companion default for legacy saves. null = no
     // dog acquired yet; rescue hooks fire normally on the player's
     // next investigation of a matching scene archetype.
-    dog: p.dog ?? null,
+    dog: revivedDog,
+    // OTA-938 — latch the one-time revive migration (see revivedDog above) so it never re-fires.
+    dogRevivedOta938: true,
     // OTA-143 — migrate pre-OTA-126 travelTargets. Older saves stored
     // travelTarget as { locationId } with no distanceRemaining field.
     // The ExplorationScreen badge fell to its legacy Manhattan-recompute
@@ -31957,20 +31972,31 @@ export function tickDogStatus(
       return;
     }
     const downFor = now - dog.downedAtHour;
-    // Mid-window urgent reminder — once, past the halfway mark — so the
-    // player gets a second, sharper nudge before the dog is gone for good.
-    if (downFor >= DOG_BLEED_OUT_HOURS / 2 && downFor < DOG_BLEED_OUT_HOURS && !dog.bleedWarned) {
-      set((s) => s.player?.dog
-        ? { player: { ...s.player, dog: { ...s.player.dog, bleedWarned: true } } }
-        : s);
-      get().appendLog(
-        'arbiter',
-        applyDogPronouns(
-          `The Arbiter's voice drops. "${dog.name} is fading. Feed {pronoun} or work a poultice now — wait much longer and {pronoun} is gone forever."`,
-          dog.sex.pronoun,
-        ),
-      );
-      return;
+    // OTA-938 — surface the bleed-out HARD. Before, one mid-window line was the only warning
+    // and there was no running clock, so players lost the dog without a fair shot. Now
+    // escalating Arbiter beats fire at 1/4, 1/2, 3/4 of the window — each once — and every beat
+    // states the hours left (StatsPanel also shows a live "⏳ Nh" countdown by the dog's name).
+    if (downFor < DOG_BLEED_OUT_HOURS) {
+      const hoursLeft = Math.max(1, Math.ceil(DOG_BLEED_OUT_HOURS - downFor));
+      const marks = [DOG_BLEED_OUT_HOURS * 0.25, DOG_BLEED_OUT_HOURS * 0.5, DOG_BLEED_OUT_HOURS * 0.75];
+      const lines = [
+        `${dog.name} is down and bleeding — about ${hoursLeft}h before {pronoun} is gone for good. Feed {object} or work a poultice to bring {object} back up.`,
+        `${dog.name} is fading — only about ${hoursLeft}h left. {Pronoun} needs food or a poultice, soon.`,
+        `The Arbiter grips your arm. "${dog.name} has maybe ${hoursLeft}h. Last window — feed {object} now or {pronoun} does not get up again."`,
+      ];
+      let stage = dog.bleedWarnStage ?? 0;
+      let fired = false;
+      while (stage < marks.length && downFor >= marks[stage]!) {
+        get().appendLog('arbiter', applyDogPronouns(lines[stage]!, dog.sex.pronoun));
+        stage++;
+        fired = true;
+      }
+      if (fired) {
+        set((s) => s.player?.dog
+          ? { player: { ...s.player, dog: { ...s.player.dog, bleedWarnStage: stage, bleedWarned: true } } }
+          : s);
+        return;
+      }
     }
     if (downFor >= DOG_BLEED_OUT_HOURS) {
       set((s) => s.player?.dog
@@ -31997,9 +32023,9 @@ export function tickDogStatus(
 
   // Healed back above 0 since a down — clear the bleed-out stamp + warn
   // latch so a later knockdown starts a fresh clock.
-  if (dog.downedAtHour != null || dog.bleedWarned) {
+  if (dog.downedAtHour != null || dog.bleedWarned || (dog.bleedWarnStage ?? 0) > 0) {
     set((s) => s.player?.dog
-      ? { player: { ...s.player, dog: { ...s.player.dog, downedAtHour: undefined, bleedWarned: false } } }
+      ? { player: { ...s.player, dog: { ...s.player.dog, downedAtHour: undefined, bleedWarned: false, bleedWarnStage: 0 } } }
       : s);
   }
 
