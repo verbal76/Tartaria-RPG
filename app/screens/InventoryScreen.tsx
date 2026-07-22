@@ -234,10 +234,16 @@ export function InventoryScreen() {
   // for a second, explicit confirm. Applying a coating to a weapon with no open second
   // slot silently overwrote slot 1 on a single tap — that is how a coating "disappears".
   const [coatReplace, setCoatReplace] = useState<
-    { coatId: string; coatName: string; weaponId: string; weaponName: string; oldLabel: string } | null
+    { coatId: string; coatName: string; weaponId: string; weaponName: string;
+      slots: Array<{ slot: 'coating' | 'coating2'; label: string }> } | null
   >(null);
   // engine_Dev — armor-coating picker: the vial being worked into a piece of armor.
   const [armorCoatTarget, setArmorCoatTarget] = useState<InventoryItem | null>(null);
+  // OTA-922 — a FULL armor piece (all resist slots used) stages a which-resist-to-replace
+  // picker here instead of silently refusing.
+  const [armorResistReplace, setArmorResistReplace] = useState<
+    { coatId: string; coatName: string; armorId: string; armorName: string; coatType: string; resists: string[] } | null
+  >(null);
 
   if (!player) {
     return (
@@ -1018,13 +1024,17 @@ export function InventoryScreen() {
             label,
             onPress: () => {
               if (isReplace) {
-                // OTA-921 — never scrub off a coating on one tap. Stage a confirm.
+                // OTA-921/922 — never scrub off a coating on one tap. Stage a picker of
+                // the filled slots so the player chooses WHICH coating to replace.
+                const filled: Array<{ slot: 'coating' | 'coating2'; label: string }> = [];
+                if (w.coating) filled.push({ slot: 'coating', label: w.coating.label });
+                if (w.coating2) filled.push({ slot: 'coating2', label: w.coating2.label });
                 setCoatReplace({
                   coatId: coatTarget.id,
                   coatName: coatTarget.name,
                   weaponId: w.id,
                   weaponName: w.name,
-                  oldLabel: w.coating!.label,
+                  slots: filled,
                 });
                 setCoatTarget(null);
                 return;
@@ -1067,16 +1077,38 @@ export function InventoryScreen() {
         armorPickerBody = 'You have no armor to work the vial into. Pick up a piece first.';
       } else {
         armorPickerBody = `Work the ${armorCoatTarget.name.toLowerCase()} into which armor? It gains permanent ${coatType} resist until the piece is lost or destroyed.`;
-        armorPickerButtons = armorItems.map((a: InventoryItem) => ({
-          label: (a.addedResists ?? []).map((r) => r.toLowerCase()).includes(coatType.toLowerCase())
-            ? `${a.name} — already resists ${coatType}`
-            : `${a.name}${(a.addedResists ?? []).length ? ` (+${(a.addedResists ?? []).join('/')})` : ''}`,
-          onPress: () => {
-            applyCoatingToArmor(armorCoatTarget.id, a.id);
-            setArmorCoatTarget(null);
-          },
-          tone: 'primary' as const,
-        }));
+        armorPickerButtons = armorItems.map((a: InventoryItem) => {
+          const arList = a.addedResists ?? [];
+          const alreadyType = arList.map((r) => r.toLowerCase()).includes(coatType.toLowerCase());
+          // OTA-922 — mirror the store's cap: base 3 + the Crucible resistCapBonus.
+          const arCap = 3 + (a.resistCapBonus ?? 0);
+          const atCap = arList.length >= arCap;
+          return {
+            label: alreadyType
+              ? `${a.name} — already resists ${coatType}`
+              : atCap
+                ? `${a.name} — full (${arList.join('/')}) · replace one`
+                : `${a.name}${arList.length ? ` (+${arList.join('/')})` : ''}`,
+            onPress: () => {
+              if (!alreadyType && atCap) {
+                // OTA-922 — full piece: pick which resist to strip instead of refusing.
+                setArmorResistReplace({
+                  coatId: armorCoatTarget.id,
+                  coatName: armorCoatTarget.name,
+                  armorId: a.id,
+                  armorName: a.name,
+                  coatType,
+                  resists: arList,
+                });
+                setArmorCoatTarget(null);
+                return;
+              }
+              applyCoatingToArmor(armorCoatTarget.id, a.id);
+              setArmorCoatTarget(null);
+            },
+            tone: !alreadyType && atCap ? ('destructive' as const) : ('primary' as const),
+          };
+        });
       }
     } catch {
       armorPickerBody = 'Could not read your armor just now.';
@@ -1316,25 +1348,32 @@ export function InventoryScreen() {
         buttons={coatPickerButtons}
         onRequestClose={() => setCoatTarget(null)}
       />
-      {/* OTA-921 — confirm before a coat REPLACES (scrubs off) an existing coating. The
-          weapon has no open 2nd slot, so this is a destroy-and-replace, not an add. */}
+      {/* OTA-921/922 — every coating slot is full. Ask WHICH coating to scrub off and
+          replace (a picker), so one is never blindly overwritten. A single-slot weapon
+          shows exactly one option (its lone coating). */}
       <BrandedModal
         visible={coatReplace !== null}
-        title={coatReplace ? `Replace the ${coatReplace.oldLabel.toLowerCase()} coating?` : ''}
+        title={coatReplace
+          ? (coatReplace.slots.length > 1
+              ? 'All coating slots are full'
+              : `Replace the ${(coatReplace.slots[0]?.label ?? '').toLowerCase()} coating?`)
+          : ''}
         body={coatReplace
-          ? `The ${coatReplace.weaponName} already carries a ${coatReplace.oldLabel.toLowerCase()} coating and has no open second slot, so working the ${coatReplace.coatName.toLowerCase()} in will scrub the ${coatReplace.oldLabel.toLowerCase()} off for good. Crucible-upgrade the weapon first if you want it to carry TWO coatings.`
+          ? (coatReplace.slots.length > 1
+              ? `The ${coatReplace.weaponName} already carries ${coatReplace.slots.map((sl) => sl.label.toLowerCase()).join(' + ')} and every slot is full. Pick which coating to scrub off and replace with the ${coatReplace.coatName.toLowerCase()}.`
+              : `The ${coatReplace.weaponName} already carries a ${(coatReplace.slots[0]?.label ?? '').toLowerCase()} coating and has no open second slot, so working the ${coatReplace.coatName.toLowerCase()} in will scrub the ${(coatReplace.slots[0]?.label ?? '').toLowerCase()} off for good. Crucible-upgrade the weapon first if you want it to carry more than one coating.`)
           : undefined}
         buttons={coatReplace
           ? [
-              {
-                label: `Scrub off ${coatReplace.oldLabel} & replace`,
+              ...coatReplace.slots.map((sl) => ({
+                label: `Scrub off ${sl.label} & replace`,
                 onPress: () => {
-                  applyCoating(coatReplace.coatId, coatReplace.weaponId);
+                  applyCoating(coatReplace.coatId, coatReplace.weaponId, sl.slot);
                   setCoatReplace(null);
                 },
                 tone: 'destructive' as const,
-              },
-              { label: `Keep ${coatReplace.oldLabel}`, onPress: () => setCoatReplace(null), tone: 'neutral' as const },
+              })),
+              { label: 'Cancel', onPress: () => setCoatReplace(null), tone: 'neutral' as const },
             ]
           : []}
         onRequestClose={() => setCoatReplace(null)}
@@ -1346,6 +1385,29 @@ export function InventoryScreen() {
         body={armorPickerBody}
         buttons={armorPickerButtons}
         onRequestClose={() => setArmorCoatTarget(null)}
+      />
+      {/* OTA-922 — the armor piece is FULL. Ask which worked-in resist to strip so the
+          new one can take its place, rather than silently refusing. */}
+      <BrandedModal
+        visible={armorResistReplace !== null}
+        title={armorResistReplace ? `${armorResistReplace.armorName} is full — replace which resist?` : ''}
+        body={armorResistReplace
+          ? `The ${armorResistReplace.armorName} already turns aside ${armorResistReplace.resists.join(', ')} and every slot is worked. Pick which resist to strip so it can take ${armorResistReplace.coatType} instead. Crucible-upgrade the piece to hold one more.`
+          : undefined}
+        buttons={armorResistReplace
+          ? [
+              ...armorResistReplace.resists.map((r) => ({
+                label: `Strip ${r} & take ${armorResistReplace.coatType}`,
+                onPress: () => {
+                  applyCoatingToArmor(armorResistReplace.coatId, armorResistReplace.armorId, r);
+                  setArmorResistReplace(null);
+                },
+                tone: 'destructive' as const,
+              })),
+              { label: 'Cancel', onPress: () => setArmorResistReplace(null), tone: 'neutral' as const },
+            ]
+          : []}
+        onRequestClose={() => setArmorResistReplace(null)}
       />
     </View>
   );

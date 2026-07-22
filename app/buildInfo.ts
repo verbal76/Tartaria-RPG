@@ -16722,4 +16722,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // overwrote slot 1 on a SINGLE tap with a friendly 'primary' tone. Harden it — the replace pick is now destructive-toned
 // and routes through an explicit confirm ("scrub off X for good / keep X"), so a coating can never be lost by a mis-tap.
 // UI + test only, no engine change. Golem port of HAL OTA-944.
-export const OTA_BUILD_ID = '2026-07-21-921-coating-replace-confirm';
+// OTA-922 (coating-slot replace picker). Golem port of HAL OTA-945. A coating stays until the weapon/armor breaks or is
+// replaced. A weapon FILLS empty coating slots first; when every slot is full, tapping a coat opens a picker of the filled
+// slots so you choose WHICH coating to scrub off (a 1-slot weapon shows its lone coating). ARMOR resist channels work the
+// same: a full piece (base cap 3 + Crucible bonus) opens a which-resist-to-strip picker instead of flatly refusing.
+// applyCoating gained an optional replaceSlot; applyCoatingToArmor an optional replaceResist. UI + store + tests only,
+// no engine change.
+export const OTA_BUILD_ID = '2026-07-21-922-coating-slot-replace-picker';
