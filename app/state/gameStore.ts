@@ -4979,6 +4979,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         } catch { loadPlayer = { ...player, mudSirenRematchOta941: true }; }
       }
+      // OTA-919 — broaden the one-time rematch prep into a clean pre-fight state: full HP + stamina,
+      // every worn/carried weapon & armor repaired to full durability, and the key throwables /
+      // consumables topped up — so the Mud Siren re-fight (staged by OTA-941) is a fair
+      // apples-to-apples comparison now that coatings work. Same owner-only gate; its own latch.
+      if (
+        !loadPlayer.mudSirenRematchOta942
+        && loadPlayer.name === 'Verbal'
+        && (loadPlayer.mainQuest?.coresRecovered?.length ?? 0) >= 1
+      ) {
+        try {
+          const floors: Record<string, number> = {
+            'Acid Flask': 4, 'Disease Sample': 4, 'Throwing Knife': 4,
+            'First Aid Kit': 5, 'Trail Rations': 10, 'Smoke-Cured Jerky Strip': 16,
+          };
+          const prepped = loadPlayer.inventory.map((i) => {
+            const repaired = i.durability ? { ...i, durability: { ...i.durability, current: i.durability.max } } : i;
+            const floor = floors[i.name];
+            return floor && repaired.quantity < floor ? { ...repaired, quantity: floor } : repaired;
+          });
+          loadPlayer = {
+            ...loadPlayer,
+            inventory: prepped,
+            hp: loadPlayer.hpMax,
+            stamina: loadPlayer.staminaMax ?? loadPlayer.stamina,
+            mudSirenRematchOta942: true,
+          };
+          rematchFired = rematchFired || true;
+        } catch { loadPlayer = { ...loadPlayer, mudSirenRematchOta942: true }; }
+      }
       set({
         player: { ...loadPlayer, hasSeenIntro: true },
         worldMemory: migratedWorldMemory,

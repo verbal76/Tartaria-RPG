@@ -16703,4 +16703,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // once (latch) and only for the owner's real deep save (name 'Verbal' + at least one recovered Core), fully guarded so
 // it can never brick a load. No engine change. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite
 // green. Save fixup -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-918-mud-siren-rematch-refund';
+// OTA-919 (broaden the one-time owner rematch prep; port of HAL OTA-942). Pairs with OTA-941: on the same one-time load, restores a clean
+// pre-fight state so the Mud Siren re-fight is apples-to-apples now that barehanded coatings work (OTA-940): full HP +
+// stamina, every worn/carried weapon & armor repaired to full durability, and the key throwables/consumables topped up
+// (Acid Flask/Disease Sample/Throwing Knife/First Aid Kit/Trail Rations/Jerky floors). Same owner-only gate (name +
+// recovered Core), own latch, fully guarded. No engine change. typecheck:ci + typecheck:tests (200) + lint clean; full
+// fast suite green. Save fixup -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-919-rematch-clean-slate-restore';

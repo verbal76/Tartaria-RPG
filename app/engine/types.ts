@@ -1324,6 +1324,9 @@ export interface PlayerCharacter {
   dogRevivedOta915?: boolean;
   /** OTA-918 — latches the one-time owner Mud Siren rematch (refund + re-stage) so it fires once. */
   mudSirenRematchOta941?: boolean;
+  /** OTA-919 — latches the one-time owner clean-slate prep (full HP/stamina, gear repaired,
+   *  throwables/consumables topped up) that pairs with the OTA-941 rematch. */
+  mudSirenRematchOta942?: boolean;
 }
 
 /** OTA-120 — Dog Companion. A one-at-a-time canine sidekick the player
