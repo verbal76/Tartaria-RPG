@@ -886,7 +886,10 @@ export type StatusEffectKind =
   // OTA-795 — successful dodge payoff: the player's NEXT attack deals double
   // damage dice (buildCombatSteps peeks it; rollMods consumes it on the swing,
   // hit or miss — the window closes either way).
-  | 'perfect_opening';
+  | 'perfect_opening'
+  // OTA-936 — successful-dodge GROUP defense: while you're still moving off a read, the
+  // OTHER attackers this volley swing at +3 to your AC. Lasts one volley, then clears.
+  | 'evasive';
 
 export interface StatusEffect {
   kind: StatusEffectKind;

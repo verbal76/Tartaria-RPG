@@ -77,7 +77,16 @@ describe('OTA-828 — a climb fall restarts the climb from the ground', () => {
     expect(store.getState().currentScene?.elevatedOn).not.toBeNull();
     expect(climbMarks(store).some((m) => m.startsWith('climbed:tower'))).toBe(true);
 
-    store.setState({ player: { ...store.getState().player!, stamina: 0 } });
+    // OTA-936 — a stamina shortfall no longer drops you; trigger a REAL fall (a rope worn
+    // through to nothing) to exercise the OTA-828 climb-reset instead.
+    store.setState({
+      player: {
+        ...store.getState().player!,
+        inventory: store.getState().player!.inventory.map((i) =>
+          i.name === "Reclaimer's Rope" ? { ...i, durability: { current: 0, max: 90 } } : i,
+        ),
+      },
+    });
     await store.getState().submitPlayerAction('climb tower');
 
     expect(climbMarks(store).some((m) => m.startsWith('climbed:tower'))).toBe(false);

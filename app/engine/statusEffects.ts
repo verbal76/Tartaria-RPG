@@ -209,6 +209,8 @@ export function statusAcAdjustment(current: readonly StatusEffect[] | undefined)
     // OTA 039 — Aethercraft 'shape stone' applies a one-round +4 AC
     // ward from raised Aetherstone.
     if (e.kind === 'shaped_stone_ward') adj += 4;
+    // OTA-936 — successful-dodge group defense: harder for the rest of the volley to land.
+    if (e.kind === 'evasive') adj += 3;
     // 'dodging' deliberately NOT here as of 2026-05-21 — the dodge
     // rework moved it from a passive +4 AC into an active post-hit
     // parry roll handled in applyEnemyCounter. The roll itself is

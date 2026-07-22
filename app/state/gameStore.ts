@@ -527,6 +527,9 @@ interface CurrentScene {
    *  re-triggered every round (the ranged sneak→fire loop). Resets with the
    *  scene (a fresh encounter = a fresh drop). */
   stealthOpenerUsed?: boolean;
+  /** OTA-936 — set once the sneak-odds warning has fired this encounter (throttle: a
+   *  failed close-range sneak warns about the free-hit cost only once per scene). */
+  sneakOddsWarned?: boolean;
   /** arb168 — set once a spontaneous investigate-ambush has sprung in this
    *  room. Bounds the farm: a room springs at most ONE ambush per visit, so the
    *  player can't sit on a tile spamming `investigate` to mint free trivial
@@ -12589,7 +12592,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog(
           'world',
           currentScene.enemies.length > 0
-            ? `You commit to the dodge. Slip ${activeEnemy(currentScene)?.name ?? 'the attacker'}'s swing and your next strike lands double — read it wrong and the blow finds you past any armor, twice as hard.`
+            ? `You commit to the dodge. Slip ${activeEnemy(currentScene)?.name ?? 'the attacker'}'s swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.`
             : `You shift into a dodge-ready stance. Nothing tests it.`,
         );
         if (currentScene.enemies.length > 0) {
@@ -13983,9 +13986,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             break;
           }
-          climbFall(
-            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina ${player.stamina} < ${climbStaminaCost} required. ✗ YOU FALL.`,
-            `Your grip gives out on the ${tgt}.`,
+          // OTA-936 — a stamina shortfall while UP no longer DROPS you (playtest: pressing
+          // 'climb' at stamina 1/2 cost 26 HP with no warning). You hold your anchored hold
+          // and the game refuses the HIGHER haul, pointing you down or to rest — the same
+          // "warn, don't punish a mistake the UI saw coming" rule the rope-durability path
+          // already follows. Only a real hazard (a rope snap, below) still causes a fall.
+          get().appendLog(
+            'arbiter',
+            `The Arbiter's voice tightens. "You've no haul left in you — don't reach higher. Climb DOWN while you can still grip, then rest on solid ground."`,
+          );
+          get().appendLog(
+            'combat',
+            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina ${player.stamina} < ${climbStaminaCost} required. (held — too spent to climb higher; climb down or rest)`,
           );
           break;
         }
@@ -16141,6 +16153,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         const live = get().player;
         if (live) get().appendLog('debug', debugLoadout(live));
+      }
+      // OTA-936 — SNEAK odds signal. A failed sneak at arm's reach is a quiet trap: it burns
+      // the turn AND the whole enemy group swings free. When the check is a long shot for this
+      // character's STEALTH, say so ONCE per encounter so the player can choose to fight or
+      // break to range instead of bleeding HP into a coin-flip.
+      if (intent === 'stealth' && !skill.success && (currentScene.enemies?.length ?? 0) > 0) {
+        const need = (skill.target ?? 0) - (skill.bonus ?? 0);         // d20 must meet/exceed this
+        const passChance = Math.max(0, Math.min(20, 21 - need)) / 20;  // rough; ignores nat rules
+        const sc = get().currentScene;
+        if (passChance <= 0.55 && !sc?.sneakOddsWarned) {
+          set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, sneakOddsWarned: true } } : s));
+          get().appendLog('arbiter', passChance <= 0.25
+            ? `The Arbiter keeps his voice low. "Your stealth won't carry you past a foe at arm's reach — not here. Every try just buys them a free swing. Fight it out, or break to distance first."`
+            : `The Arbiter keeps his voice low. "Slipping away at arm's reach is a coin-flip with your stealth — and a miss lets the whole pack swing free. Weigh it against just fighting."`);
+        }
       }
       if (skill.success) {
         // arb-fix — quest ARRIVAL/exploration stages (investigate/stealth/
@@ -28266,7 +28293,7 @@ function applyEnemyCounter(
       // (preserves the OTA-796 balance). So no matter how much DEX/AC you stack,
       // an enemy still lands ~1 swing in 20.
       dodgeWin = false;
-      dodgeLine = `Dodge — ${enemy.name} rolls a NAT 20. No read beats a perfect strike; it lands through your dodge (2× damage).`;
+      dodgeLine = `Dodge — ${enemy.name} rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.`;
     } else if (enemyFumble) {
       dodgeWin = true;
       dodgeLine = `Dodge — ${enemy.name} overcommits past you. ✓ Free opening (next strike ×2 dice).`;
@@ -28276,7 +28303,7 @@ function applyEnemyCounter(
       dodgeWin = dRoll === 20 ? true : dRoll === 1 ? false : dTotal >= atkTotal;
       dodgeLine = dodgeWin
         ? `Dodge — d20 → ${dRoll} + DEX ${dexStats.dexterity} = ${dTotal} vs ATK ${atkTotal}. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).`
-        : `Dodge — d20 → ${dRoll} + DEX ${dexStats.dexterity} = ${dTotal} vs ATK ${atkTotal}. ✗ Read it wrong — you dodge INTO the blow (2× damage; armor can't save you).`;
+        : `Dodge — d20 → ${dRoll} + DEX ${dexStats.dexterity} = ${dTotal} vs ATK ${atkTotal}. ✗ You misread it — no opening, and the blow lands as it normally would (armor still counts).`;
     }
     // The stance is spent by this swing, win or lose.
     set((s) => (s.player ? {
@@ -28286,18 +28313,19 @@ function applyEnemyCounter(
       },
     } : s));
   }
-  const hit = dodgeWin != null
-    ? !dodgeWin
+  // OTA-936 — a WON dodge negates the hit; a LOST dodge is now just a NORMAL to-hit
+  // (armor counts again, no auto-land) instead of the old AC-bypass. Only the perfect
+  // OPENING is at stake on the read, not double damage.
+  const hit = dodgeWin === true
+    ? false
     : enemyFumble ? false : enemyCrit ? true : atkTotal >= effectiveAc;
   const outcomeTag = dodgeWin === true
     ? '✗ EVADED'
-    : dodgeWin === false
-      ? (enemyCrit ? '✓ CRITICAL HIT (out of position)' : '✓ HIT (out of position)')
-      : enemyCrit
-        ? '✓ CRITICAL HIT'
-        : enemyFumble
-          ? '✗ FUMBLE'
-          : hit ? '✓ HIT' : '✗ MISS';
+    : enemyCrit
+      ? '✓ CRITICAL HIT'
+      : enemyFumble
+        ? '✗ FUMBLE'
+        : hit ? '✓ HIT' : '✗ MISS';
 
   // OTA 221 — tag enemy whiffs so AdventureFeed can color the
   // outcome marker (MISS / FUMBLE) green at the end of the line.
@@ -28320,20 +28348,31 @@ function applyEnemyCounter(
   //   (b) A SUCCESSFUL dodge only reads ONE attacker; in a crowd the others still
   //       swing, so "I dodged but took damage" read like a failure. Name it.
   if (dodgeWin === false && !enemyCrit) {
-    const misreadLines = [
-      'You misread the swing. Your feet tangle and you stumble straight into it — no armor between you and the blow now.',
-      'You commit the wrong way. The arc you leaned into is the one that lands, and it lands twice as hard.',
-      'Your read comes a beat late — you duck into the strike instead of away, out of position and wide open.',
-      'You lose your balance on the slip and pitch forward. The blow catches you square, past any guard.',
-    ];
-    get().appendLog('world', misreadLines[rollDie(misreadLines.length) - 1]!);
+    // OTA-936 — a misread no longer pitches you INTO the blow for 2×; the read just fails
+    // and the swing resolves normally (it can still miss on its own).
+    get().appendLog('world', hit
+      ? 'Your read is a beat off — you fail to make the opening, and the swing lands the way it always meant to.'
+      : 'Your read is a beat off — no opening this time — but the swing goes wide on its own.');
   } else if (dodgeWin === true) {
     const sc = get().currentScene;
     const otherLive = (sc?.enemies ?? []).filter(
       (e, i) => e !== enemy && (sc?.enemyHps?.[i] ?? e.hp) > 0,
     ).length;
     if (otherLive >= 1) {
-      get().appendLog('world', `You slip ${enemy.name}'s arc clean — but a dodge reads one attacker; the rest press in while you're committed.`);
+      // OTA-936 — a good read no longer leaves you flat-footed to the pack: while you're
+      // still moving off the dodge, the OTHER attackers this volley swing at +3 to your AC
+      // (evasive, one volley). Fixes "I dodged but got mobbed at full anyway."
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          statusEffects: applyEffect(s.player.statusEffects ?? [], {
+            kind: 'evasive' as const,
+            remainingRounds: 1,
+            label: 'evasive — harder to hit',
+          }),
+        },
+      } : s));
+      get().appendLog('world', `You slip ${enemy.name}'s arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.`);
     }
   }
   if (dodgeWin === true) {
@@ -28383,7 +28422,10 @@ function applyEnemyCounter(
     // dodge contest resolved this swing: the contest replaced the to-hit roll,
     // and stacking the crit reroll under the failed-dodge ×2 made dodging vs a
     // nat-20 FOUR times as deadly as standing still (exploit-sweep finding).
-    if (enemyCrit && dodgeWin == null) {
+    // OTA-936 — a nat-20 that pierces a dodge is a NORMAL crit now (2× dice), the same as
+    // a nat-20 vs a standing player. (The failed-dodge flat 2× this guard balanced against
+    // is retired, so crit-doubling no longer needs suppressing on a pierced dodge.)
+    if (enemyCrit && dodgeWin !== true) {
       rawDmg += rollFromNotation(String(enemy.damage)) || rollDie(6);
     }
     // Boss-tier bonus damage — +1d6 on every connecting swing on top
@@ -28479,14 +28521,9 @@ function applyEnemyCounter(
       }
     }
 
-    // OTA-795 — failed dodge: out of position. The swing already landed via
-    // the opposed contest above (AC bypassed); after every resistance has had
-    // its say, it lands twice as hard. (The old ACTIVE PARRY that lived here —
-    // negate + instant 2×-dice riposte, boxing exception, 2-durability cost —
-    // is retired; the dodge gamble replaces it.)
-    if (dodgeWin === false) {
-      dmg *= 2;
-    }
+    // OTA-936 — the failed-dodge flat 2× (out-of-position) is retired: a misread dodge is
+    // now just a normal hit resolved against AC above. Only the perfect OPENING is at stake
+    // on the read — so a low-DEX dodger is no longer punished DOUBLE for a bad gamble.
 
     // OTA-835 — Elemental Control WARD (Mud Golem defensive half): a shaped-stone
     // ward soaks a flat pool of damage before it reaches HP. Runs LAST, on the

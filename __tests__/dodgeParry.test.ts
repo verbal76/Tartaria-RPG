@@ -171,7 +171,7 @@ describe('dodge rework — active parry', () => {
       });
       store.getState().submitPlayerAction('dodge');
       const feed = store.getState().gameLog.map((e) => e.text).join('\n');
-      expect(feed).toMatch(/slip .*'s arc clean — but a dodge reads one attacker; the rest press in/);
+      expect(feed).toMatch(/slip .*'s arc clean and stay light on your feet — the rest of the pack still swings/);
     } finally {
       Math.random = realRandom;
     }
@@ -206,7 +206,7 @@ describe('dodge rework — active parry', () => {
       });
       store.getState().submitPlayerAction('dodge');
       const feed = store.getState().gameLog.map((e) => e.text).join('\n');
-      expect(feed).toMatch(/stumble straight into it|arc you leaned into|duck into the strike|balance on the slip/i);
+      expect(feed).toMatch(/read is a beat off/i);
     } finally {
       Math.random = realRandom;
     }
