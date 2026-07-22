@@ -16651,4 +16651,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the per-action HP/stamina drain, and the movement slow. Wired via a coldResist param on the four weather funcs +
 // an exported playerColdResist(player), applied at every combat/skill/tick/reposition site and the character sheet.
 // Non-cold weather unaffected. New ota934 test. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
-export const OTA_BUILD_ID = '2026-07-21-911-cold-coating-cancels-cold-weather';
+// OTA-912 (UX + BALANCE — elevated-fight indicator + the agile-dodge feel fix; port of HAL OTA-935). Playtest: an
+// elevated (climb-top) fight silently hid dodge/flee + benched the dog, and an 'agile' foe's flat 25% dodge negated
+// even a 29-vs-AC-7 swing ("rolled 29 and whiffed") — a long, stonewalled Rare fight. Fixes: (1) InputBox shows an
+// "⛰ ELEVATED — no dodge/flee · companions below" chip in combat so the missing options read as a rule, not a bug.
+// (2) enemyTraits: a CRIT never dodges and beating AC by >= DODGE_BEATEN_MARGIN (8) always lands (enemyDodgesHit) — so
+// a solid roll can't be twisted clear; only marginal hits face the dodge, and the base rate is trimmed (agile
+// 0.25->0.18, quick 0.15->0.12). Applied at the melee + thrown dodge sites. New ota935 test. typecheck:ci +
+// typecheck:tests + lint clean; full fast suite green. Combat/UI fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-912-elevated-hud-agile-dodge-fix';
