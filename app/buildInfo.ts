@@ -16659,4 +16659,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // a solid roll can't be twisted clear; only marginal hits face the dodge, and the base rate is trimmed (agile
 // 0.25->0.18, quick 0.15->0.12). Applied at the melee + thrown dodge sites. New ota935 test. typecheck:ci +
 // typecheck:tests + lint clean; full fast suite green. Combat/UI fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-912-elevated-hud-agile-dodge-fix';
+// OTA-913 (BALANCE + UX — dodge de-trap + two combat-QoL signals; port of HAL OTA-936). Playtest of a long Samarran run: (1) player
+// DODGE was a DEX-scaled trap — a failed read auto-landed through armor for 2x (20-dmg spikes at DEX 4-7) and in a
+// crowd only evaded ONE attacker while the rest hit full (mobbed to death by a 5-raider war party). Fix: a misread
+// dodge is now just a NORMAL to-hit (armor counts, no auto-land, no 2x); success still grants the perfect opening AND
+// now applies 'evasive' (+3 AC vs the rest of that volley) so a good read isn't punished by the pack; a nat-20 still
+// pierces (as a normal crit). (2) SNEAK at arm's reach silently wasted turns + gave free hits (7 straight fails at
+// STE 0) — a once-per-encounter Arbiter signal now flags the poor odds. (3) A climb with too little stamina DROPPED
+// you for big damage (26 HP) — it now HOLDS you and says to climb down / rest, matching the rope-durability rule. New
+// ota936 test; dodgeParry assertions updated. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green.
+// Combat/UX -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-913-dodge-detrap-sneak-climb-signals';
