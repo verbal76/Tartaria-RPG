@@ -230,6 +230,12 @@ export function InventoryScreen() {
   // the second modal lists the coatable weapons in the pack as
   // pick buttons. Cleared on apply or cancel.
   const [coatTarget, setCoatTarget] = useState<InventoryItem | null>(null);
+  // OTA-921 — a coat that would REPLACE (scrub off) an existing coating is staged here
+  // for a second, explicit confirm. Applying a coating to a weapon with no open second
+  // slot silently overwrote slot 1 on a single tap — that is how a coating "disappears".
+  const [coatReplace, setCoatReplace] = useState<
+    { coatId: string; coatName: string; weaponId: string; weaponName: string; oldLabel: string } | null
+  >(null);
   // engine_Dev — armor-coating picker: the vial being worked into a piece of armor.
   const [armorCoatTarget, setArmorCoatTarget] = useState<InventoryItem | null>(null);
 
@@ -1007,13 +1013,26 @@ export function InventoryScreen() {
             : slot === 'replace'
               ? `${coatedDisplayName(w)} — replaces ${w.coating!.label.toLowerCase()}`
               : w.name;
+          const isReplace = slot === 'replace';
           return {
             label,
             onPress: () => {
+              if (isReplace) {
+                // OTA-921 — never scrub off a coating on one tap. Stage a confirm.
+                setCoatReplace({
+                  coatId: coatTarget.id,
+                  coatName: coatTarget.name,
+                  weaponId: w.id,
+                  weaponName: w.name,
+                  oldLabel: w.coating!.label,
+                });
+                setCoatTarget(null);
+                return;
+              }
               applyCoating(coatTarget.id, w.id);
               setCoatTarget(null);
             },
-            tone: 'primary' as const,
+            tone: isReplace ? ('destructive' as const) : ('primary' as const),
           };
         });
       }
@@ -1296,6 +1315,29 @@ export function InventoryScreen() {
         body={coatPickerBody}
         buttons={coatPickerButtons}
         onRequestClose={() => setCoatTarget(null)}
+      />
+      {/* OTA-921 — confirm before a coat REPLACES (scrubs off) an existing coating. The
+          weapon has no open 2nd slot, so this is a destroy-and-replace, not an add. */}
+      <BrandedModal
+        visible={coatReplace !== null}
+        title={coatReplace ? `Replace the ${coatReplace.oldLabel.toLowerCase()} coating?` : ''}
+        body={coatReplace
+          ? `The ${coatReplace.weaponName} already carries a ${coatReplace.oldLabel.toLowerCase()} coating and has no open second slot, so working the ${coatReplace.coatName.toLowerCase()} in will scrub the ${coatReplace.oldLabel.toLowerCase()} off for good. Crucible-upgrade the weapon first if you want it to carry TWO coatings.`
+          : undefined}
+        buttons={coatReplace
+          ? [
+              {
+                label: `Scrub off ${coatReplace.oldLabel} & replace`,
+                onPress: () => {
+                  applyCoating(coatReplace.coatId, coatReplace.weaponId);
+                  setCoatReplace(null);
+                },
+                tone: 'destructive' as const,
+              },
+              { label: `Keep ${coatReplace.oldLabel}`, onPress: () => setCoatReplace(null), tone: 'neutral' as const },
+            ]
+          : []}
+        onRequestClose={() => setCoatReplace(null)}
       />
       {/* engine_Dev — armor-coating picker: works a vial's resist into a piece. */}
       <BrandedModal

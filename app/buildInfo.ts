@@ -16715,4 +16715,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Throwing Knife x4, Sentinel Core Plate x2, Acid Flask x4, Corruption Tonic x1) via the existing grantItem +
 // grantTestSupplyGiftOnce one-time-per-slot infra, correct catalog kind/rarity + forced throwable tags. Owner-name
 // gated. No engine change. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Save fixup -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-920-rematch-throwable-restock';
+// OTA-921 (protect a weapon's coatings). Investigation of "the corruption coating vanished from a dual-coated weapon":
+// persistence is provably clean (applyCoating slot-write, Crucible slot-grant, backfill/restamp/durability, JSON save
+// round-trip, and saveTrim all preserve coating2 — pinned by a new round-trip regression test). The one path that
+// DESTROYS a coating is the apply flow's 'replace' branch: coating a weapon with no open 2nd slot (not Crucible-upgraded)
+// overwrote slot 1 on a SINGLE tap with a friendly 'primary' tone. Harden it — the replace pick is now destructive-toned
+// and routes through an explicit confirm ("scrub off X for good / keep X"), so a coating can never be lost by a mis-tap.
+// UI + test only, no engine change. Golem port of HAL OTA-944.
+export const OTA_BUILD_ID = '2026-07-21-921-coating-replace-confirm';
