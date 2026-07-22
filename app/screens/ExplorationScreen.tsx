@@ -600,7 +600,10 @@ export function ExplorationScreen() {
               : 'No scene'}
           </Text>
           <Text style={styles.timeText} numberOfLines={1}>
-            {describeTime(player.hoursElapsed ?? 0)}{currentScene?.weather ? ` · ${currentScene.weather.name}` : ''}
+            {describeTime(player.hoursElapsed ?? 0)}
+            {currentScene?.weather ? (
+              <Text style={styles.weatherText}>{` · ${currentScene.weather.name}`}</Text>
+            ) : null}
           </Text>
         </View>
         <View style={styles.sceneBarBtns}>
@@ -1903,7 +1906,7 @@ const styles = StyleSheet.create({
   // clipped the bottom rows behind the scene bar. Letting the row grow
   // to fit content keeps every stat visible.
   topRow: { flexDirection: 'row', gap: 6, minHeight: 165 },
-  statsCol: { flex: 1.2 },
+  statsCol: { flex: 1 },
   rightCol: { flex: 1, position: 'relative' },
   // OTA-852 — WORLD / LORE nav buttons bracketing the peaceful crest.
   crestNavBtn: { backgroundColor: '#1a1714', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, paddingVertical: 5, alignItems: 'center', marginVertical: 3 },
@@ -1926,6 +1929,9 @@ const styles = StyleSheet.create({
   },
   sceneText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1 },
   timeText: { color: '#a2977b', fontSize: 9, letterSpacing: 1, marginTop: 1 },
+  // OTA-937 — weather pops on the day line: the location line's bright gold + a bold weight,
+  // instead of inheriting the faded day-counter color.
+  weatherText: { color: '#c9a86a', fontWeight: '700' },
   sceneBarBtns: { flexDirection: 'row', gap: 4, flexShrink: 0 },
   sceneBtn: { color: '#cdbf99', fontSize: 16, paddingHorizontal: 8 },
   // Compact bordered chips on the scene bar — 'ACTS' opens the action
