@@ -16690,4 +16690,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the real scene object was unreachable. Fix: normalizeForCompare now strips the possessive 's (+ stray apostrophes),
 // so any possessive prop ("Zalmar's tower", "reclaimer's cache") resolves. Applied symmetrically, so equality holds.
 // New ota939 test. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Parser fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-916-possessive-scene-noun-resolve';
+// OTA-917 (COMBAT BUG + narration; port of HAL OTA-940). (1) COATINGS were DEAD on barehanded weapons: a coated Mud-fist Wraps (or any
+// 'barehanded'-tag weapon — gauntlets, knuckles) dealt ZERO coating damage. gameStore re-derived barehand=true from
+// the weapon NAME ("mud-FIST") and skipped the entire coating block. Now bare-hand detection strips the swung weapon's
+// name first and treats a barehanded-tag weapon as a real, coatable weapon (mirrors combatRules' OTA-931/932). (2) A
+// combat-DOWNED dog (waiting_at_base, player on the ground) wrongly showed the climb-only "come down to fight at his
+// side" line when tapped; it now shows a recovery message ('downed' reason). New ota940 test. typecheck:ci +
+// typecheck:tests (200) + lint clean; full fast suite green. Combat/UI fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-917-barehand-coatings-downed-dog-line';

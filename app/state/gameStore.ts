@@ -16848,7 +16848,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
       const rawDmg = damage?.total ?? rollDie(6);
-      const barehand = isBareHandAttack(actionText);
+      // OTA-917 — robust bare-hand detection (mirrors combatRules' OTA-931/932 fix). A weapon
+      // whose NAME contains a body word ("Mud-FIST Wraps") tripped isBareHandAttack(actionText)
+      // -> barehand=true, which nulled `equipped` and SKIPPED the whole coating block below — so a
+      // coated barehanded-tag weapon dealt ZERO coating damage even though combatRules used its
+      // dice. Strip the swung weapon's name before the check, and treat a 'barehanded'-tag weapon
+      // as a real (coatable) weapon.
+      const usedOffHandForDmg = /\boff[- ]?hand\b/.test(actionText.toLowerCase());
+      const swungInstForBare = (() => {
+        const id = usedOffHandForDmg
+          ? (player.equipped?.offId ?? null)
+          : (player.equipped?.mainId ?? player.equipped?.offId ?? null);
+        return id ? (player.inventory.find((i) => i.id === id) ?? null) : null;
+      })();
+      const wieldsHandWeapon = !!swungInstForBare && (swungInstForBare.tags ?? []).includes('barehanded');
+      const barehandText = swungInstForBare?.name
+        ? actionText.toLowerCase().split(swungInstForBare.name.toLowerCase()).join(' ')
+        : actionText;
+      const barehand = isBareHandAttack(barehandText) && !wieldsHandWeapon;
       // OTA 041 — Architectural Sentinel barehand hit-gate. The lorebook
       // says a Sentinel's stone fist only lands on an even roll of the
       // damage die (1d10 even = land, odd = whiff). Pre-OTA-041 the gate
@@ -16883,12 +16900,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // play. Without this hint, getEquippedWeapon defaults to the
       // main-hand and every off-hand swing was being scored against
       // main-hand resistances.
-      const usedOffHandForDmg = /\boff[- ]?hand\b/.test(actionText.toLowerCase());
       const equipped = barehand ? null : getEquippedWeapon(player, usedOffHandForDmg ? 'off' : 'main');
       // Bare-hand strikes are bludgeoning by default so the player can
       // exploit Aetheric Mutation / Construct / Automation bludgeoning
       // weaknesses without sacrificing their weapon's durability.
-      const weaponType = barehand ? 'bludgeoning' : (equipped?.damageType ?? null);
+      const weaponType = barehand ? 'bludgeoning' : (equipped?.damageType ?? (wieldsHandWeapon ? 'bludgeoning' : null));
       const mod = applyDamageTypeModifier(rawDmg, weaponType, enemy.type);
       // Layer per-enemy trait modifiers on top of the type-resistance map.
       // Stacks multiplicatively — an Iron Spider with "resist:slashing"
