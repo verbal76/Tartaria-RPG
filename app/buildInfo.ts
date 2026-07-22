@@ -17710,4 +17710,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // combat-DOWNED dog (waiting_at_base, player on the ground) wrongly showed the climb-only "come down to fight at his
 // side" line when tapped; it now shows a recovery message ('downed' reason). New ota940 test. typecheck:ci +
 // typecheck:tests (200) + lint clean; full fast suite green. Combat/UI fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-940-barehand-coatings-downed-dog-line';
+// OTA-941 (one-time owner Mud Siren rematch). The Mud Siren fight was won with the barehanded-coating bug live
+// (fixed in OTA-940). On the next load this refunds the consumables spent in that fight (Acid Flask x2, Smoke-Cured
+// Jerky Strip x8) and re-stages a fresh, scaled Mud Siren so it can be re-fought with working coatings. Fires exactly
+// once (latch) and only for the owner's real deep save (name 'Verbal' + at least one recovered Core), fully guarded so
+// it can never brick a load. No engine change. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite
+// green. Save fixup -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-941-mud-siren-rematch-refund';

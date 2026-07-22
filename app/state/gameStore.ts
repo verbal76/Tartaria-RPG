@@ -5012,8 +5012,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
         enemyIntel: saved.worldMemory.enemyIntel
           ?? backfillEnemyIntelFromDefeats(saved.worldMemory.defeatedEnemies),
       };
+      // OTA-941 — one-time, owner-only Mud Siren rematch. That fight was won with the
+      // barehanded-coating bug live (fixed in OTA-940), so refund the consumables spent and
+      // re-stage a fresh Mud Siren on THIS load. Gated to fire EXACTLY ONCE and ONLY for the
+      // owner's real deep save (latch + character name + at least one recovered Core — no test
+      // or other player meets all three). Fully guarded: any hiccup just latches and skips.
+      let loadPlayer = player;
+      let rematchFired = false;
+      if (
+        !loadPlayer.mudSirenRematchOta941
+        && loadPlayer.name === 'Verbal'
+        && (loadPlayer.mainQuest?.coresRecovered?.length ?? 0) >= 1
+      ) {
+        try {
+          const refundInv = loadPlayer.inventory.map((i) => ({ ...i }));
+          const bump = (nm: string, qty: number, make: () => InventoryItem) => {
+            const row = refundInv.find((i) => i.name === nm);
+            if (row) row.quantity += qty; else refundInv.push(make());
+          };
+          bump('Acid Flask', 2, () => stampDurability({ id: 'refund_acid_flask_941', name: 'Acid Flask', kind: 'consumable', quantity: 2, rarity: 'Uncommon', tags: ['potion', 'weapon_coating', 'acid', 'crafted'] } as InventoryItem));
+          bump('Smoke-Cured Jerky Strip', 8, () => stampDurability({ id: 'refund_jerky_941', name: 'Smoke-Cured Jerky Strip', kind: 'consumable', quantity: 8, tags: ['food', 'treat', 'dog_treat', 'gift'] } as InventoryItem));
+          loadPlayer = { ...loadPlayer, inventory: refundInv, mudSirenRematchOta941: true };
+          const proto = findEnemyByName('Mud Siren');
+          const liveFoe = (restoredScene?.enemies ?? []).some((e, i) => (restoredScene?.enemyHps?.[i] ?? e.hp) > 0);
+          if (proto && restoredScene && !liveFoe) {
+            const siren = scaledEnemyForContext(
+              JSON.parse(JSON.stringify(proto)) as typeof proto,
+              restoredScene.location?.danger ?? 2,
+              enemyScalePower(Math.max(loadPlayer.stats.strength, loadPlayer.stats.dexterity, loadPlayer.stats.intelligence), loadPlayer.hpMax),
+            );
+            restoredScene = {
+              ...restoredScene,
+              enemies: [siren], enemyHps: [siren.hp], enemyAmbushUsed: [false],
+              enemyKnockedOut: [false], enemyStatuses: [[]], enemyArmorShred: [0],
+              enemyCorruptionStacks: [0], activeEnemyIdx: 0, range: 'far',
+            };
+            rematchFired = true;
+          }
+        } catch { loadPlayer = { ...player, mudSirenRematchOta941: true }; }
+      }
       set({
-        player: { ...player, hasSeenIntro: true },
+        player: { ...loadPlayer, hasSeenIntro: true },
         worldMemory: migratedWorldMemory,
         gameLog: saved.gameLog,
         currentScreen: 'exploration',
@@ -5077,6 +5116,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         get().appendLog('debug', `OTA session start: ${OTA_BUILD_ID}.`);
       } catch { /* hardened: never block slot load on a debug log failure */ }
+      // OTA-941 — narrate the one-time Mud Siren rematch staged above the set().
+      if (rematchFired) {
+        try {
+          get().appendLog('arbiter', `The Arbiter presses what you spent back into your hands. "The Mud Siren didn't count — your coatings never bit. Take back what you burned. It comes again, and your gear works now."`);
+          get().appendLog('world', `A Mud Siren rises out of the dark, close and deliberate. Settle it.`);
+        } catch { /* narration is best-effort */ }
+      }
       // arb89 — proactive dev-name Resurrection Gem. The death-handler
       // perk (DEV_REVIVE_NAMES) already revives Verbal / Sasmooch on
       // death without a restart; this grants the gem UP FRONT the first
