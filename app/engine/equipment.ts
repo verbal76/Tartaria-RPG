@@ -456,6 +456,16 @@ export function aggregateEquippedRegen(player: PlayerCharacter): { stamina: numb
 // equip/unequip handlers bake this delta into `player.hpMax` (Option B: hpMax
 // is read in 100+ sites, so adjusting it on equip is simpler + drift-free vs an
 // effective-max computed everywhere).
+// OTA-947 — LIGHT AC TAIL-TRIM. Raw standing AC climbs untouched up to `knee`; every
+// point past it counts at `rate`, so a fully-fused Legendary set stays strong (a raw ~37
+// lands ~28) without buying literal immunity — a d20+atk vs AC 37 could only ever land on
+// a natural 20. Every equipped piece still adds AC; only the runaway tail bends. Shared by
+// the combat resolver (applyEnemyCounter) and the StatsPanel so the shown AC = the fought AC.
+export function trimStandingAc(rawAc: number, knee = 22, rate = 0.4): number {
+  if (rawAc <= knee) return rawAc;
+  return Math.round(knee + (rawAc - knee) * rate);
+}
+
 export function armorHpBonus(name: string | null | undefined): number {
   if (!name) return 0;
   const piece = findArmorByName(name);
