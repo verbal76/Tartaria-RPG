@@ -1237,7 +1237,10 @@ export function ExplorationScreen() {
               const d = player?.dog;
               if (!d || d.hp <= 0) return null;
               // Benched at the base of a climb — can't follow you up.
-              if (d.status === 'waiting_at_base') return 'elevated';
+              // OTA-940 — 'waiting_at_base' covers BOTH a climb-benched dog (player elevated)
+              // AND a combat-downed dog (recovering on the ground). Only the former should read
+              // as "come down to fight" — a downed dog gets its own message.
+              if (d.status === 'waiting_at_base') return currentScene?.elevatedOn ? 'elevated' : 'downed';
               // At your side, but the active target flies out of reach.
               const activeEnemy = currentScene?.enemies?.[activeIdx];
               if (d.status === 'with_player' && enemyIsAerial(activeEnemy)) return 'aerial';

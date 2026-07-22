@@ -128,7 +128,7 @@ interface Props {
   // shows in combat; when blocked, tapping it buzzes and the engine drops the
   // matching Arbiter line ('elevated' = benched at a climb base — hasn't
   // learned to climb; 'aerial' = target flies — can't jump that high).
-  dogBlocked?: 'elevated' | 'aerial' | null;
+  dogBlocked?: 'elevated' | 'aerial' | 'downed' | null;
   // arb-fix — a once/day race ability is available → show the ✦ ability chip.
   raceAbilityReady?: boolean;
   onOpenRaceAbilities?: () => void;
@@ -540,7 +540,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                         'arbiter',
                         dogBlocked === 'aerial'
                           ? `"${dog.name} can't reach what's in the air," the Arbiter says. "Bring it down, or fight it yourself."`
-                          : `"${dog.name} is holding the ground below," the Arbiter says. "Dogs don't climb — come down to fight at ${dog.name}'s side."`,
+                          : dogBlocked === 'downed'
+                            ? `"${dog.name} is still down from that last fight," the Arbiter says. "Feed the dog to bring it up, then rest somewhere safe and it will fall in at your side."`
+                            : `"${dog.name} is holding the ground below," the Arbiter says. "Dogs don't climb — come down to fight at ${dog.name}'s side."`,
                       );
                       return;
                     }
