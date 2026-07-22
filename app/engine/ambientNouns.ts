@@ -194,7 +194,18 @@ export function extractAmbientNouns(description: string | undefined | null): str
 // ambient string is still what we return so display + downstream
 // logic stays untouched.
 export function normalizeForCompare(s: string): string {
-  return s.toLowerCase().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
+  // OTA-939 — strip the possessive 's (and any stray apostrophes) so a possessive scene
+  // noun ("scribe's quill") matches the parser's apostrophe-stripped tokens ("scribe quill").
+  // Without this, `salvage scribe's quill` missed the scene noun entirely and fell through to
+  // a fuzzy INVENTORY match (the owner's "Phoenix Feather Quill"), dead-ending the salvage on
+  // an already-worked item. Applied to both sides of every compare, so equality is preserved.
+  return s
+    .toLowerCase()
+    .replace(/[-_]+/g, ' ')
+    .replace(/['\u2019]s\b/g, '')     // possessive 's  ("scribe's" -> "scribe")
+    .replace(/['\u2019`\u00b4]/g, '') // any remaining apostrophe
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 export function matchAmbientNoun(target: string, ambient: readonly string[]): string | null {

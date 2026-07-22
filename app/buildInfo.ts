@@ -17696,4 +17696,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // urgent red. (3) tickDogStatus fires escalating Arbiter beats at 1/4, 1/2, 3/4 of the window — each once, each
 // stating the hours left (bleedWarnStage latch). New ota938 test. typecheck:ci + typecheck:tests (200) + lint clean;
 // full fast suite green. Dog mechanic/UI -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-938-dog-revive-bleedout-countdown';
+// OTA-939 (PARSER — possessive scene nouns resolve). Device log: `salvage scribe's quill` in the Tartarian Archives
+// kept dead-ending on "You've already worked over the Phoenix Feather Quill. Nothing more to find." The scene noun
+// "scribe's quill" never matched the parser's apostrophe-stripped tokens ("scribe quill"), so the salvage fell through
+// to a FUZZY inventory match on the owner's Phoenix Feather Quill (shared word "quill") — an already-worked item — and
+// the real scene object was unreachable. Fix: normalizeForCompare now strips the possessive 's (+ stray apostrophes),
+// so any possessive prop ("Zalmar's tower", "reclaimer's cache") resolves. Applied symmetrically, so equality holds.
+// New ota939 test. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Parser fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-939-possessive-scene-noun-resolve';
