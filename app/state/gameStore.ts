@@ -5236,6 +5236,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
           void get().persist();
         });
       }
+      // OTA-943 — the OTA-941/942 rematch prep UNDER-COUNTED the throwables. Disease Sample,
+      // Throwing Knife, and Sentinel Core Plate are consumed ONE-PER-THROW ("attack with the
+      // off-hand X" throws + consumes them — that's why the bandolier came up empty), and the
+      // Acid Flasks + Corruption Tonic were spent too. Restock them with correct catalog
+      // kind/rarity (lookupCraftedItem) + forced essential tags, exactly once per slot.
+      if (player.name.trim().toLowerCase() === 'verbal') {
+        void grantTestSupplyGiftOnce(`${slotId}:verbal-mud-siren-throwables-943`).then((res) => {
+          if (!res.granted) return;
+          const restock: { name: string; qty: number; tags: string[] }[] = [
+            { name: 'Disease Sample', qty: 4, tags: ['organic', 'alchemy', 'vermin', 'throwable', 'loot'] },
+            { name: 'Throwing Knife', qty: 4, tags: ['throwable', 'weapon', 'ranged', 'knife', 'thrown'] },
+            { name: 'Sentinel Core Plate', qty: 2, tags: ['automation', 'tech', 'salvage', 'scrap', 'throwable'] },
+            { name: 'Acid Flask', qty: 4, tags: ['potion', 'weapon_coating', 'acid', 'crafted'] },
+            { name: 'Corruption Tonic', qty: 1, tags: ['potion', 'weapon_coating', 'corruption', 'crafted'] },
+          ];
+          set((s) => {
+            if (!s.player) return s;
+            let inv = s.player.inventory;
+            for (const { name, qty, tags } of restock) {
+              const look = lookupCraftedItem(name);
+              inv = grantItem(inv, {
+                id: `verbalrematch943_${Date.now()}_${name.replace(/\s+/g, '').toLowerCase()}`,
+                name,
+                kind: look.kind,
+                rarity: look.rarity,
+                quantity: qty,
+                tags: Array.from(new Set([...(look.tags ?? []), ...tags])),
+              }).inventory;
+            }
+            return { player: { ...s.player, inventory: inv } };
+          });
+          get().appendLog(
+            'reward',
+            `✦ Bandolier restocked for the rematch: Disease Sample ×4, Throwing Knife ×4, Sentinel Core Plate ×2, Acid Flask ×4, Corruption Tonic ×1.`,
+          );
+          void get().persist();
+        });
+      }
       // OTA-353 — REMOVED: the one-time faction-catalyst fusion-compensation
       // make-good ("Eternal Dynasty Heir's Aegis"). It was a dev-name-only
       // repayment for the pre-OTA-336 fusion-gate bug; the devs have theirs
