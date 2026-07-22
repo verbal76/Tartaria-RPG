@@ -212,7 +212,7 @@ import {
 import {
   raiseMenace, decayedMenace, menaceIntimidateDcBonus, menaceEncounterBonus,
 } from '../engine/menace';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
@@ -28373,7 +28373,10 @@ function applyEnemyCounter(
     }
   }
   // racialAC already includes player.ac; add the gear stack on top.
-  const acFromGear = racialAC + armorPieces.acBonus + titleRuinsAc;
+  // OTA-924 — LIGHT AC TAIL-TRIM (see equipment.trimStandingAc). Trim the standing gear AC
+  // so a fully-fused build is strong but not untouchable; tactical status/cover mods (dodge,
+  // cover, ward) apply on top of the trimmed base at full value.
+  const acFromGear = trimStandingAc(racialAC + armorPieces.acBonus + titleRuinsAc);
   const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));
   // Natural 1 / natural 20 rule — same floor and ceiling that applies
   // to the player. A nat-1 forces a miss regardless of bonuses; a nat-20
@@ -28431,9 +28434,16 @@ function applyEnemyCounter(
   // OTA-913 — a WON dodge negates the hit; a LOST dodge is now just a NORMAL to-hit
   // (armor counts again, no auto-land) instead of the old AC-bypass. Only the perfect
   // OPENING is at stake on the read, not double damage.
+  // OTA-924 — NOTHING IS UNTOUCHABLE. Cap the natural d20 an enemy needs to land, so an
+  // arbitrarily high AC can never buy literal immunity. Below the cap this is the identical
+  // AC math (atkTotal >= effectiveAc); it only bites a maxed-out defensive build, floating
+  // its hit chance up to ~P(d20 >= ENEMY_HIT_NEEDED_CAP). AC still matters — it pushes the
+  // needed roll UP toward the cap (fewer hits), it just can't push it past. Adjustable knob.
+  const ENEMY_HIT_NEEDED_CAP = 13; // d20>=13 -> ~40% floor hit chance vs any AC
+  const acHitNat = Math.max(2, Math.min(ENEMY_HIT_NEEDED_CAP, effectiveAc - (atkTotal - atkRoll)));
   const hit = dodgeWin === true
     ? false
-    : enemyFumble ? false : enemyCrit ? true : atkTotal >= effectiveAc;
+    : enemyFumble ? false : enemyCrit ? true : atkRoll >= acHitNat;
   const outcomeTag = dodgeWin === true
     ? '✗ EVADED'
     : enemyCrit
@@ -28617,6 +28627,18 @@ function applyEnemyCounter(
     if (dmg > 1 && (player.statusEffects ?? []).some((e) => e.kind === 'shielded')) {
       dmg = Math.max(1, Math.ceil(dmg / 2));
       shieldTag = ' (Defensive Protocols shield)';
+    }
+    // OTA-924 — GLOBAL MITIGATION FLOOR. The resist/halving layers (armor <=80%, title 1/2,
+    // race 1/2, shield 1/2) multiply with only a per-step floor of 1, so a focused build
+    // stacked them to ~1 damage and switched the defensive half of combat off. Clamp the
+    // post-stack number so a LANDED hit always delivers at least MITIGATION_FLOOR of its raw
+    // roll: resists still soak MOST of a matched hit, but a MISMATCHED one visibly leaks
+    // damage. The stone ward below is a spent absorb pool (not a passive resist), so it still
+    // runs after this and may legitimately zero a hit. Adjustable knob.
+    const MITIGATION_FLOOR = 0.30;
+    if (dmg > 0) {
+      const mitFloor = Math.round(rawDmg * MITIGATION_FLOOR);
+      if (mitFloor > dmg) dmg = mitFloor;
     }
     // engine_Dev (Combat-Parity II) — enemy TYPED on-hit proc on the player. Only EXPLICITLY-typed
     // enemies proc at full chance; an inferred (bare-dice) type procs at 0.4× — so the ~95 enemies

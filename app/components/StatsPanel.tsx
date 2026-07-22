@@ -4,7 +4,7 @@ import type { PlayerCharacter } from '../engine/types';
 import racesData from '../data/races/races.json';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { coatedDisplayName } from '../engine/weaponCoating';
-import { ARMOR_SLOTS, effectiveStats, aethericVisionEquipped } from '../engine/equipment';
+import { ARMOR_SLOTS, effectiveStats, aethericVisionEquipped, trimStandingAc } from '../engine/equipment';
 import { playerPowerScore, powerMatchup } from '../engine/powerRating';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -180,7 +180,8 @@ export function StatsPanel({ player, enemyPower }: Props) {
     if (!name) continue;
     armorAc += resolveDisplayArmorByName(name, player.inventory)?.acBonus ?? 0;
   }
-  const effectiveAc = player.ac + armorAc;
+  // OTA-924 — show the trimmed standing AC so the panel matches what combat resolves against.
+  const effectiveAc = trimStandingAc(player.ac + armorAc);
 
   // Stats with accessory + armor bonuses folded in so the player sees the
   // numbers combat will actually use.

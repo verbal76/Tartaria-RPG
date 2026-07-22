@@ -16736,4 +16736,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // generic skill-check verdict whenever a handler owns the real outcome (HANDLER_OWNED_IN_COMBAT). The failed-disengage
 // penalty is preserved (single authoritative verdict from the handler, not coddled). No engine change to combat math.
 // Golem port of HAL OTA-946. No engine change to combat math.
-export const OTA_BUILD_ID = '2026-07-21-923-weather-resist-stealth-contradiction';
+// OTA-924 (combat rebalance I of III — defense de-runaway). The build/fusion loop is UNTOUCHED; this only stops raw
+// defense from switching combat off. (1) LIGHT AC TAIL-TRIM: standing AC climbs untouched to 22, then each point counts
+// 0.4x, so a full Legendary set lands ~28 not ~37 (equipment.trimStandingAc, shared by combat + StatsPanel). (2) ENEMY
+// HIT FLOOR: cap the natural d20 an enemy needs (ENEMY_HIT_NEEDED_CAP=13 -> ~40% floor), so no AC buys literal immunity;
+// identical to the old AC math below the cap. (3) GLOBAL MITIGATION FLOOR: a landed hit always deals >=30% of its raw
+// roll, so stacked resists soak MOST but never ALL — a mismatched resist visibly leaks. Named knobs for downrange tuning.
+// Matched-progression HP/damage scaling + the legibility layer follow in OTA-925/926. typecheck:ci + typecheck:tests +
+// lint clean; full fast suite green. Golem port of HAL OTA-947.
+export const OTA_BUILD_ID = '2026-07-21-924-defense-de-runaway';
