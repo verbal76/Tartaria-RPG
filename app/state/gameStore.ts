@@ -63,8 +63,6 @@ import {
   addResurrectionGems,
   recordFallen,
   ensureFirstInstallSeed,
-  grantDevGemOnce,
-  grantTestSupplyGiftOnce,
   getLastSaveWriteError,
   consumeSaveReclaimedFlag,
   type SlotSummary,
@@ -397,7 +395,7 @@ function freshInstanceId(prefix: string): string {
 }
 
 // arb89 — dev character names that get the Resurrection-Gem perk: a gem
-// granted up front on load (grantDevGemOnce) AND another on every death.
+// granted once at new-character creation (the name beat) AND another on every death.
 // Case-insensitive, trimmed. Shared by loadSlotIntoGame + handlePlayerDeath.
 const DEV_REVIVE_NAMES = ['verbal', 'sasmooch'];
 
@@ -5012,76 +5010,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         enemyIntel: saved.worldMemory.enemyIntel
           ?? backfillEnemyIntelFromDefeats(saved.worldMemory.defeatedEnemies),
       };
-      // OTA-941 — one-time, owner-only Mud Siren rematch. That fight was won with the
-      // barehanded-coating bug live (fixed in OTA-940), so refund the consumables spent and
-      // re-stage a fresh Mud Siren on THIS load. Gated to fire EXACTLY ONCE and ONLY for the
-      // owner's real deep save (latch + character name + at least one recovered Core — no test
-      // or other player meets all three). Fully guarded: any hiccup just latches and skips.
-      let loadPlayer = player;
-      let rematchFired = false;
-      if (
-        !loadPlayer.mudSirenRematchOta941
-        && loadPlayer.name === 'Verbal'
-        && (loadPlayer.mainQuest?.coresRecovered?.length ?? 0) >= 1
-      ) {
-        try {
-          const refundInv = loadPlayer.inventory.map((i) => ({ ...i }));
-          const bump = (nm: string, qty: number, make: () => InventoryItem) => {
-            const row = refundInv.find((i) => i.name === nm);
-            if (row) row.quantity += qty; else refundInv.push(make());
-          };
-          bump('Acid Flask', 2, () => stampDurability({ id: 'refund_acid_flask_941', name: 'Acid Flask', kind: 'consumable', quantity: 2, rarity: 'Uncommon', tags: ['potion', 'weapon_coating', 'acid', 'crafted'] } as InventoryItem));
-          bump('Smoke-Cured Jerky Strip', 8, () => stampDurability({ id: 'refund_jerky_941', name: 'Smoke-Cured Jerky Strip', kind: 'consumable', quantity: 8, tags: ['food', 'treat', 'dog_treat', 'gift'] } as InventoryItem));
-          loadPlayer = { ...loadPlayer, inventory: refundInv, mudSirenRematchOta941: true };
-          const proto = findEnemyByName('Mud Siren');
-          const liveFoe = (restoredScene?.enemies ?? []).some((e, i) => (restoredScene?.enemyHps?.[i] ?? e.hp) > 0);
-          if (proto && restoredScene && !liveFoe) {
-            const siren = scaledEnemyForContext(
-              JSON.parse(JSON.stringify(proto)) as typeof proto,
-              restoredScene.location?.danger ?? 2,
-              enemyScalePower(Math.max(loadPlayer.stats.strength, loadPlayer.stats.dexterity, loadPlayer.stats.intelligence), loadPlayer.hpMax),
-            );
-            restoredScene = {
-              ...restoredScene,
-              enemies: [siren], enemyHps: [siren.hp], enemyAmbushUsed: [false],
-              enemyKnockedOut: [false], enemyStatuses: [[]], enemyArmorShred: [0],
-              enemyCorruptionStacks: [0], activeEnemyIdx: 0, range: 'far',
-            };
-            rematchFired = true;
-          }
-        } catch { loadPlayer = { ...player, mudSirenRematchOta941: true }; }
-      }
-      // OTA-942 — broaden the one-time rematch prep into a clean pre-fight state: full HP + stamina,
-      // every worn/carried weapon & armor repaired to full durability, and the key throwables /
-      // consumables topped up — so the Mud Siren re-fight (staged by OTA-941) is a fair
-      // apples-to-apples comparison now that coatings work. Same owner-only gate; its own latch.
-      if (
-        !loadPlayer.mudSirenRematchOta942
-        && loadPlayer.name === 'Verbal'
-        && (loadPlayer.mainQuest?.coresRecovered?.length ?? 0) >= 1
-      ) {
-        try {
-          const floors: Record<string, number> = {
-            'Acid Flask': 4, 'Disease Sample': 4, 'Throwing Knife': 4,
-            'First Aid Kit': 5, 'Trail Rations': 10, 'Smoke-Cured Jerky Strip': 16,
-          };
-          const prepped = loadPlayer.inventory.map((i) => {
-            const repaired = i.durability ? { ...i, durability: { ...i.durability, current: i.durability.max } } : i;
-            const floor = floors[i.name];
-            return floor && repaired.quantity < floor ? { ...repaired, quantity: floor } : repaired;
-          });
-          loadPlayer = {
-            ...loadPlayer,
-            inventory: prepped,
-            hp: loadPlayer.hpMax,
-            stamina: loadPlayer.staminaMax ?? loadPlayer.stamina,
-            mudSirenRematchOta942: true,
-          };
-          rematchFired = rematchFired || true;
-        } catch { loadPlayer = { ...loadPlayer, mudSirenRematchOta942: true }; }
-      }
       set({
-        player: { ...loadPlayer, hasSeenIntro: true },
+        player: { ...player, hasSeenIntro: true },
         worldMemory: migratedWorldMemory,
         gameLog: saved.gameLog,
         currentScreen: 'exploration',
@@ -5145,143 +5075,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         get().appendLog('debug', `OTA session start: ${OTA_BUILD_ID}.`);
       } catch { /* hardened: never block slot load on a debug log failure */ }
-      // OTA-941 — narrate the one-time Mud Siren rematch staged above the set().
-      if (rematchFired) {
-        try {
-          get().appendLog('arbiter', `The Arbiter presses what you spent back into your hands. "The Mud Siren didn't count — your coatings never bit. Take back what you burned. It comes again, and your gear works now."`);
-          get().appendLog('world', `A Mud Siren rises out of the dark, close and deliberate. Settle it.`);
-        } catch { /* narration is best-effort */ }
-      }
-      // arb89 — proactive dev-name Resurrection Gem. The death-handler
-      // perk (DEV_REVIVE_NAMES) already revives Verbal / Sasmooch on
-      // death without a restart; this grants the gem UP FRONT the first
-      // time such a character is loaded, so they hold one before ever
-      // dying. Idempotent per slot (grantDevGemOnce records the key), so
-      // resuming the same save never stacks more. No effect for other
-      // names.
-      if (DEV_REVIVE_NAMES.includes(player.name.trim().toLowerCase())) {
-        void grantDevGemOnce(`${slotId}:${player.name.trim().toLowerCase()}`).then((res) => {
-          if (res.granted) {
-            set({ resurrectionGems: res.gems });
-            get().appendLog(
-              'reward',
-              `✦ A Resurrection Gem is set aside for ${player.name} — the buried world keeps its own. (${res.gems} held)`,
-            );
-          }
-        });
-      }
-      // OTA-461 — one-time playtest-supply gift for the dev character "Verbal".
-      // A standing crash-test kit so the dog-fungus repro (and general testing)
-      // doesn't burn the player's own consumables. Idempotent per slot via
-      // grantTestSupplyGiftOnce — resuming the same save never restacks it. No
-      // effect for any other name.
-      if (player.name.trim().toLowerCase() === 'verbal') {
-        void grantTestSupplyGiftOnce(`${slotId}:verbal`).then((res) => {
-          if (!res.granted) return;
-          const gift: Array<{ name: string; qty: number }> = [
-            { name: 'First Aid Kit', qty: 10 },
-            { name: 'Trail Rations', qty: 20 },
-            { name: 'Smoke-Cured Jerky Strip', qty: 20 },
-            { name: 'Bioluminescent Fungus', qty: 20 },
-            { name: 'Water Bottle', qty: 1 },
-          ];
-          set((s) => {
-            if (!s.player) return s;
-            let inv = s.player.inventory;
-            for (const { name, qty } of gift) {
-              const look = lookupCraftedItem(name);
-              inv = grantItem(inv, {
-                id: `verbalgift_${Date.now()}_${name.replace(/\s+/g, '').toLowerCase()}`,
-                name,
-                kind: look.kind,
-                rarity: look.rarity,
-                quantity: qty,
-                tags: [...look.tags, 'gift'],
-              }).inventory;
-            }
-            return { player: { ...s.player, inventory: inv } };
-          });
-          get().appendLog(
-            'reward',
-            `✦ A crash-test kit lands in ${player.name}'s pack: 10 First Aid Kits, 20 Trail Rations, 20 Smoke-Cured Jerky Strips, 20 Bioluminescent Fungus, 1 Water Bottle. Test freely.`,
-          );
-          void get().persist();
-        });
-      }
-      // OTA-766 — one-time refund for the dev character "Verbal": two Corruption Tonics
-      // were wasted dosing corruption on the pre-OTA-764 dead drink route (the coating-
-      // drink counter didn't fire, so they vanished for nothing). Now that drinking a
-      // corruption coating cleanses corruption, repay the pair. Distinct slot key so it
-      // fires exactly once and never restacks; no effect for any other name.
-      if (player.name.trim().toLowerCase() === 'verbal') {
-        void grantTestSupplyGiftOnce(`${slotId}:verbal-corruption-refund-765`).then((res) => {
-          if (!res.granted) return;
-          set((s) => {
-            if (!s.player) return s;
-            const look = lookupCraftedItem('Corruption Tonic');
-            const inv = grantItem(s.player.inventory, {
-              id: `verbalrefund_${Date.now()}_corruptiontonic`,
-              name: 'Corruption Tonic',
-              kind: look.kind,
-              rarity: look.rarity,
-              quantity: 2,
-              tags: [...look.tags],
-            }).inventory;
-            return { player: { ...s.player, inventory: inv } };
-          });
-          get().appendLog(
-            'reward',
-            `✦ Two Corruption Tonics are refunded to ${player.name}'s pack — repayment for the pair spent before drinking a coating actually did anything.`,
-          );
-          void get().persist();
-        });
-      }
-      // OTA-943 — the OTA-941/942 rematch prep UNDER-COUNTED the throwables. Disease Sample,
-      // Throwing Knife, and Sentinel Core Plate are consumed ONE-PER-THROW ("attack with the
-      // off-hand X" throws + consumes them — that's why the bandolier came up empty), and the
-      // Acid Flasks + Corruption Tonic were spent too. Restock them with correct catalog
-      // kind/rarity (lookupCraftedItem) + forced essential tags, exactly once per slot.
-      if (player.name.trim().toLowerCase() === 'verbal') {
-        void grantTestSupplyGiftOnce(`${slotId}:verbal-mud-siren-throwables-943`).then((res) => {
-          if (!res.granted) return;
-          const restock: { name: string; qty: number; tags: string[] }[] = [
-            { name: 'Disease Sample', qty: 4, tags: ['organic', 'alchemy', 'vermin', 'throwable', 'loot'] },
-            { name: 'Throwing Knife', qty: 4, tags: ['throwable', 'weapon', 'ranged', 'knife', 'thrown'] },
-            { name: 'Sentinel Core Plate', qty: 2, tags: ['automation', 'tech', 'salvage', 'scrap', 'throwable'] },
-            { name: 'Acid Flask', qty: 4, tags: ['potion', 'weapon_coating', 'acid', 'crafted'] },
-            { name: 'Corruption Tonic', qty: 1, tags: ['potion', 'weapon_coating', 'corruption', 'crafted'] },
-          ];
-          set((s) => {
-            if (!s.player) return s;
-            let inv = s.player.inventory;
-            for (const { name, qty, tags } of restock) {
-              const look = lookupCraftedItem(name);
-              inv = grantItem(inv, {
-                id: `verbalrematch943_${Date.now()}_${name.replace(/\s+/g, '').toLowerCase()}`,
-                name,
-                kind: look.kind,
-                rarity: look.rarity,
-                quantity: qty,
-                tags: Array.from(new Set([...(look.tags ?? []), ...tags])),
-              }).inventory;
-            }
-            return { player: { ...s.player, inventory: inv } };
-          });
-          get().appendLog(
-            'reward',
-            `✦ Bandolier restocked for the rematch: Disease Sample ×4, Throwing Knife ×4, Sentinel Core Plate ×2, Acid Flask ×4, Corruption Tonic ×1.`,
-          );
-          void get().persist();
-        });
-      }
       // OTA-353 — REMOVED: the one-time faction-catalyst fusion-compensation
       // make-good ("Eternal Dynasty Heir's Aegis"). It was a dev-name-only
       // repayment for the pre-OTA-336 fusion-gate bug; the devs have theirs
       // (worldMemory.fusionCompensationGranted is set on their saves), and the
       // bug it compensated for has been fixed since OTA-336. It was re-firing on
       // any FUTURE dev-named save (observed in a live bug-report load), so per
-      // the HANDOFF open issue it's stripped. The dev-name Resurrection-Gem
-      // grant above (grantDevGemOnce) is a separate, kept feature.
+      // the HANDOFF open issue it's stripped. The dev-name Resurrection-Gem grant
+      // (now at new-character creation) + the on-death revive are separate, kept features.
       // Only fall back to beginScene when the save predates scene
       // capture. New saves restore the exact scene above and skip this.
       if (!restoredScene) {
@@ -7742,6 +7543,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
           awaitingTutorialName: false,
         } : { awaitingTutorialName: false }));
         get().appendLog('arbiter', `"Well met, ${cleanName}. To business."`);
+        // OTA-948 — DEV STARTER GRANT (new-character only). The dev names get their test
+        // scaffolding at CREATION, not retroactively on every load: a Resurrection Gem up
+        // front (Verbal/Sasmooch) + a crash-test supply kit (Verbal). This is the single
+        // point a brand-new character is named; an existing save never re-enters it.
+        const devStartName = cleanName.trim().toLowerCase();
+        if (DEV_REVIVE_NAMES.includes(devStartName)) {
+          void addResurrectionGems(1).then((total) => {
+            set({ resurrectionGems: total });
+            get().appendLog('reward', `✦ A Resurrection Gem is set aside for ${cleanName} — the buried world keeps its own. (${total} held)`);
+          });
+        }
+        if (devStartName === 'verbal') {
+          const devKit: Array<{ name: string; qty: number }> = [
+            { name: 'First Aid Kit', qty: 10 },
+            { name: 'Trail Rations', qty: 20 },
+            { name: 'Smoke-Cured Jerky Strip', qty: 20 },
+            { name: 'Bioluminescent Fungus', qty: 20 },
+            { name: 'Water Bottle', qty: 1 },
+          ];
+          set((s) => {
+            if (!s.player) return s;
+            let inv = s.player.inventory;
+            for (const { name, qty } of devKit) {
+              const look = lookupCraftedItem(name);
+              inv = grantItem(inv, {
+                id: `verbalgift_${Date.now()}_${name.replace(/\s+/g, '').toLowerCase()}`,
+                name, kind: look.kind, rarity: look.rarity, quantity: qty,
+                tags: [...look.tags, 'gift'],
+              }).inventory;
+            }
+            return { player: { ...s.player, inventory: inv } };
+          });
+          get().appendLog('reward', `✦ A crash-test kit lands in ${cleanName}'s pack: 10 First Aid Kits, 20 Trail Rations, 20 Smoke-Cured Jerky Strips, 20 Bioluminescent Fungus, 1 Water Bottle. Test freely.`);
+        }
+        void get().persist();
         get().maybeAdvanceTutorial('name');
         return;
       }

@@ -17759,4 +17759,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // roll, so stacked resists soak MOST but never ALL — a mismatched resist visibly leaks. Named knobs for downrange tuning.
 // Matched-progression HP/damage scaling + the legibility layer follow in OTA-948/949. typecheck:ci + typecheck:tests +
 // lint clean; full fast suite green. Combat tuning -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-947-defense-de-runaway';
+// OTA-948 (dev-grant cleanup). Retires the spent one-time debug grants that fired on the owner's load: the OTA-766
+// corruption-tonic refund, and the OTA-941/942/943 Mud Siren rematch (refund + clean-slate restore + throwable restock)
+// are all removed. The two grants worth keeping — the up-front Resurrection Gem (Verbal/Sasmooch) and the crash-test
+// supply kit (Verbal) — MOVE to the new-character name beat so they land exactly once at CREATION, never retroactively on
+// an existing save's load. The on-death DEV_REVIVE gem is untouched. No engine change. typecheck:ci + typecheck:tests +
+// lint clean; full fast suite green. Save/dev fixup -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-22-948-dev-grant-cleanup';
