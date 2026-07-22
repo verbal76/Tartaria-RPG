@@ -16709,4 +16709,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (Acid Flask/Disease Sample/Throwing Knife/First Aid Kit/Trail Rations/Jerky floors). Same owner-only gate (name +
 // recovered Core), own latch, fully guarded. No engine change. typecheck:ci + typecheck:tests (200) + lint clean; full
 // fast suite green. Save fixup -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-919-rematch-clean-slate-restore';
+// OTA-920 (finish the rematch refund — the THROWABLES; port of HAL OTA-943). OTA-941/942 under-counted: Disease Sample, Throwing Knife,
+// and Sentinel Core Plate are consumed one-per-throw ("attack with the off-hand X" throws + consumes them — hence the
+// empty bandolier), and the Acid Flasks + Corruption Tonic were spent too. This restocks them (Disease Sample x4,
+// Throwing Knife x4, Sentinel Core Plate x2, Acid Flask x4, Corruption Tonic x1) via the existing grantItem +
+// grantTestSupplyGiftOnce one-time-per-slot infra, correct catalog kind/rarity + forced throwable tags. Owner-name
+// gated. No engine change. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Save fixup -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-920-rematch-throwable-restock';
