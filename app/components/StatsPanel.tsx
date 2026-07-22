@@ -243,6 +243,19 @@ export function StatsPanel({ player, enemyPower }: Props) {
   // character box."
   const golemShows = !!player.golem && player.golem.hp > 0;
 
+  // OTA-915 — a downed dog (benched at 0 HP, bleed-out clock running) shows a live
+  // "⏳ Nh — feed to save" countdown by its name instead of the plain HP, so the 24h
+  // window is impossible to miss. Healthy/climb-benched dogs keep the normal HP readout.
+  // 24 = gameStore's DOG_BLEED_OUT_HOURS (hardcoded to keep this component store-free).
+  const DOG_BLEED_OUT_HOURS = 24;
+  const dogDowned = !!player.dog
+    && player.dog.status === 'waiting_at_base'
+    && player.dog.hp <= 0
+    && player.dog.downedAtHour != null;
+  const dogHoursLeft = dogDowned
+    ? Math.max(0, Math.ceil(DOG_BLEED_OUT_HOURS - ((player.hoursElapsed ?? 0) - (player.dog!.downedAtHour ?? 0))))
+    : null;
+
   return (
     <Animated.View style={[styles.container, { backgroundColor: animBg }]}>
       {/* OTA-633 — damage pulse: a red wash that flashes in fast and fades out,
@@ -265,9 +278,15 @@ export function StatsPanel({ player, enemyPower }: Props) {
             </Text>
           )}
           {dogShows && player.dog ? (
-            <Text style={styles.dogName} numberOfLines={1}>
-              {player.dog.name} ({player.dog.hp}/{player.dog.hpMax})
-            </Text>
+            dogDowned ? (
+              <Text style={styles.dogDown} numberOfLines={1} accessibilityLabel={`${player.dog.name} is down — about ${dogHoursLeft} hours to feed before it dies`}>
+                {player.dog.name} ⏳ {dogHoursLeft}h — feed to save
+              </Text>
+            ) : (
+              <Text style={styles.dogName} numberOfLines={1}>
+                {player.dog.name} ({player.dog.hp}/{player.dog.hpMax})
+              </Text>
+            )
           ) : null}
         </View>
       </View>
@@ -387,6 +406,8 @@ const styles = StyleSheet.create({
   powerUp: { color: '#9ec96a' },
   powerDown: { color: '#e07a5f' },
   dogName: { color: '#c9a86a', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
+  // OTA-915 — downed-dog bleed-out countdown: urgent red, wider to fit the "feed to save" call.
+  dogDown: { color: '#e5484d', fontSize: 12, fontWeight: '700', flexShrink: 0, maxWidth: 200 },
   // OTA-145 — golem row sits right-aligned beneath the dog name row.
   // Slightly muted color (slate-mauve) so it reads as a secondary
   // companion vs the dog's warm-gold.
