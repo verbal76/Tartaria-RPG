@@ -16669,4 +16669,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // you for big damage (26 HP) — it now HOLDS you and says to climb down / rest, matching the rope-durability rule. New
 // ota936 test; dodgeParry assertions updated. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green.
 // Combat/UX -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-913-dodge-detrap-sneak-climb-signals';
+// OTA-914 (UI — equal portrait cards + weather pops on the day line; port of HAL OTA-937). Owner playtest: the character card was
+// visibly WIDER than the enemy card (statsCol flex 1.2 vs 1, a leftover from the stat-spacing pass) — now both are
+// flex:1 so each is half the screen; the stat row's cells are already equal-flex (styles.stat flex:1) so the even
+// spacing survives the slight compression. And the weather moved onto the day-counter line kept the thin faded
+// day-count color — now it renders in its own span with the LOCATION line's bright gold + a bold weight so it stands
+// out. Pure styling; typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. UI -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-914-equal-cards-weather-pop';
