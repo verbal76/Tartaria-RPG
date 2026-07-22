@@ -17736,4 +17736,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and routes through an explicit confirm ("scrub off X for good / keep X"), so a coating can never be lost by a mis-tap.
 // UI + test only, no engine change. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green.
 // Save/UX fixup -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-21-944-coating-replace-confirm';
+// OTA-945 (coating-slot replace picker). Extends OTA-944 into the full model the owner asked for: a coating stays until
+// the weapon/armor breaks or is replaced. A weapon FILLS empty coating slots first; when every slot is full, tapping a
+// coat opens a picker of the filled slots so you choose WHICH coating to scrub off (a 1-slot weapon shows its lone
+// coating). ARMOR resist channels work the same: a full piece (base cap 3 + Crucible bonus) now opens a which-resist-to-
+// strip picker instead of flatly refusing. applyCoating gained an optional replaceSlot; applyCoatingToArmor an optional
+// replaceResist. UI + store + tests only, no engine change. typecheck:ci + typecheck:tests (200) + lint clean; full fast
+// suite green. Coating UX -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-21-945-coating-slot-replace-picker';

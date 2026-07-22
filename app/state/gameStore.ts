@@ -3877,12 +3877,12 @@ interface GameStore {
    *  lost on break). Re-coating an already-coated weapon replaces
    *  the prior coating. Returns nothing; surfaces success/refusal
    *  via the log. */
-  applyCoating: (coatingItemId: string, weaponId: string) => void;
+  applyCoating: (coatingItemId: string, weaponId: string, replaceSlot?: 'coating' | 'coating2') => void;
   /** engine_Dev — work a coating vial into an ARMOR piece for a permanent
    *  damage-type resist (the vial's damage type). Stored on the armor instance's
    *  addedResists; aggregateArmor + applyArmorResistance reduce incoming damage of
    *  that type while it's worn. Capped at 3 resists per piece. */
-  applyCoatingToArmor: (coatingItemId: string, armorId: string) => void;
+  applyCoatingToArmor: (coatingItemId: string, armorId: string, replaceResist?: string) => void;
   /** OTA-361 — loot a knocked-out humanoid. Transfers the enemy's
    *  `carries` kit (weapons + armor, DAMAGED — durability scaled to how
    *  hurt they were), the full `loot` drop list, and a little TC into
@@ -24252,7 +24252,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  applyCoating(coatingItemId, weaponId) {
+  applyCoating(coatingItemId, weaponId, replaceSlot) {
     const player = get().player;
     if (!player) return;
     const coatItem = player.inventory.find((i) => i.id === coatingItemId);
@@ -24282,7 +24282,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // (adds a SECOND coating rather than replacing); 'replace' = both usable slots
     // full, so it overwrites slot 1.
     const coatSlot: 'coating' | 'coating2' | 'replace' = nextCoatSlot(weapon);
-    const replaced = coatSlot === 'replace' ? weapon.coating : null;
+    // OTA-945 — when every usable slot is full, the UI sends WHICH slot to overwrite
+    // (a picker), so a coating is never blindly scrubbed off slot 1. Default to slot 1
+    // for safety / older callers.
+    const replaceField: 'coating' | 'coating2' = replaceSlot === 'coating2' ? 'coating2' : 'coating';
+    const replaced = coatSlot === 'replace' ? (weapon[replaceField] ?? weapon.coating) : null;
     const addedSecond = coatSlot === 'coating2';
     set((s) => {
       if (!s.player) return s;
@@ -24291,7 +24295,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const coatingSpec = { kind: spec.kind, dice: spec.dice, label: spec.label, ...(spec.statBonus ? { statBonus: spec.statBonus } : {}) };
       // The field to stamp: slot 2 only when nextCoatSlot chose it; 'replace' and a
       // fresh coat both write slot 1 (`coating`).
-      const coatField: 'coating' | 'coating2' = coatSlot === 'coating2' ? 'coating2' : 'coating';
+      const coatField: 'coating' | 'coating2' =
+        coatSlot === 'coating2' ? 'coating2'
+          : coatSlot === 'replace' ? replaceField
+            : 'coating';
       let inv: InventoryItem[];
       let equipped = s.player.equipped;
       if (target.quantity > 1) {
@@ -24332,7 +24339,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const resultCoatings = addedSecond
       ? { coating: weapon.coating, coating2: { ...spec } }
       : coatSlot === 'replace'
-        ? { coating: { ...spec }, coating2: weapon.coating2 }
+        ? (replaceField === 'coating2'
+            ? { coating: weapon.coating, coating2: { ...spec } }
+            : { coating: { ...spec }, coating2: weapon.coating2 })
         : { coating: { ...spec }, coating2: weapon.coating2 };
     const display = coatedDisplayName({ name: weapon.name, ...resultCoatings });
     get().appendLog(
@@ -24348,7 +24357,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  applyCoatingToArmor(coatingItemId, armorId) {
+  applyCoatingToArmor(coatingItemId, armorId, replaceResist) {
     const player = get().player;
     if (!player) return;
     const coatItem = player.inventory.find((i) => i.id === coatingItemId);
@@ -24390,29 +24399,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // coating channel, the armor parallel to a weapon's 2nd coating slot).
     const ADDED_RESIST_CAP = 3;
     const effectiveCap = ADDED_RESIST_CAP + (armor.resistCapBonus ?? 0);
-    if (already.length >= effectiveCap) {
-      get().appendLog('world', `The ${armor.name} is already worked with ${already.length} resists (${(armor.addedResists ?? []).join(', ')}). It can't hold another — strip it down, upgrade it at a Crucible, or use a different piece.`);
+    // OTA-945 — a FULL piece no longer just refuses. The UI opens a picker and sends
+    // which existing resist to strip; honour it here. Without a valid replaceResist
+    // (older caller / no pick), keep the refusal.
+    const replaceLower = replaceResist?.toLowerCase();
+    const willReplace = already.length >= effectiveCap;
+    if (willReplace && (!replaceLower || !already.includes(replaceLower))) {
+      get().appendLog('world', `The ${armor.name} is already worked with ${already.length} resists (${(armor.addedResists ?? []).join(', ')}). It can't hold another — strip one first, upgrade it at a Crucible, or use a different piece.`);
       return;
     }
     set((s) => {
       if (!s.player) return s;
       const target = s.player.inventory.find((i) => i.id === armorId);
       if (!target) return s;
+      // OTA-945 — on a full piece, strip the picked resist first; otherwise just append.
+      const withResist = (base: string[]) => {
+        const stripped = willReplace && replaceLower ? base.filter((r) => r.toLowerCase() !== replaceLower) : base;
+        return [...stripped, type];
+      };
       let inv: InventoryItem[];
       if (target.quantity > 1) {
         // OTA-800 — same anti-dupe as applyCoating: peel one piece off the stack
         // so a single vial can't work its resist into all N copies at once.
         inv = s.player.inventory.map((i) => (i.id === armorId ? { ...i, quantity: i.quantity - 1 } : i));
-        inv.push({ ...target, id: freshInstanceId('coat'), quantity: 1, addedResists: [...(target.addedResists ?? []), type] });
+        inv.push({ ...target, id: freshInstanceId('coat'), quantity: 1, addedResists: withResist(target.addedResists ?? []) });
       } else {
-        inv = s.player.inventory.map((i) => (i.id === armorId ? { ...i, addedResists: [...(i.addedResists ?? []), type] } : i));
+        inv = s.player.inventory.map((i) => (i.id === armorId ? { ...i, addedResists: withResist(i.addedResists ?? []) } : i));
       }
       inv = inv
         .map((i) => (i.id === coatingItemId ? { ...i, quantity: i.quantity - 1 } : i))
         .filter((i) => !(i.id === coatingItemId && i.quantity <= 0));
       return { player: { ...s.player, inventory: inv } };
     });
-    get().appendLog('reward', `You work the ${coatItem.name.toLowerCase()} into the ${armor.name}. It now turns aside ${type} damage — for good, until the piece is lost or destroyed.`);
+    get().appendLog('reward', willReplace && replaceResist
+      ? `You strip the ${replaceResist.toLowerCase()} channel off the ${armor.name} and work the ${coatItem.name.toLowerCase()} in its place. It now turns aside ${type} damage instead — for good, until the piece is lost or destroyed.`
+      : `You work the ${coatItem.name.toLowerCase()} into the ${armor.name}. It now turns aside ${type} damage — for good, until the piece is lost or destroyed.`);
     void get().persist();
   },
 
