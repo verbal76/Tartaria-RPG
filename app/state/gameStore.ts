@@ -284,7 +284,7 @@ import {
   fuzzyFindStoryline,
 } from '../engine/factionStorylines';
 import { tickWeather, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
-import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, traitDodgeChance, enemyIsAerial, combineDamageTypeMatch } from '../engine/enemyTraits';
+import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, enemyDodgesHit, enemyIsAerial, combineDamageTypeMatch } from '../engine/enemyTraits';
 import { parseWeaponEffect, rollEffectBonusDamage } from '../engine/weaponEffects';
 import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
@@ -13426,8 +13426,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // instead of "✓ HIT" followed by "sidesteps". Same fix as the melee path.
           let thrownDodged = false;
           if (hit) {
-            const dodgeChance = traitDodgeChance(enemyHit.traits);
-            if (dodgeChance > 0 && Math.random() < dodgeChance) thrownDodged = true;
+            // OTA-935 — same crit / margin-beats-dodge rule as the melee path.
+            thrownDodged = enemyDodgesHit(enemyHit.traits, total, ac, false);
           }
           get().appendLog(
             'combat',
@@ -16800,9 +16800,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // guaranteed hit that missed. Roll the dodge once, up front, and fold it
     // into the single outcome verdict (✗ DODGED). Damage math is unchanged.
     let enemyDodged = false;
-    if (attack?.success) {
-      const dodgeChance = traitDodgeChance(enemy.traits);
-      if (dodgeChance > 0 && Math.random() < dodgeChance) enemyDodged = true;
+    if (attack?.success && typeof attack.total === 'number' && typeof attack.target === 'number') {
+      // OTA-935 — a crit or a crushing margin always lands; only a marginal hit can be
+      // twisted clear (at the reduced trait rate).
+      enemyDodged = enemyDodgesHit(enemy.traits, attack.total, attack.target, !!attack.critical);
     }
 
     if (attack && typeof attack.total === 'number' && attack.target !== undefined) {

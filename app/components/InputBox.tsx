@@ -509,6 +509,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             </View>
 
             <View style={styles.quickRowLine}>
+              {/* OTA-935 — while ELEVATED (fighting atop a climb) dodge, flee, and the golem
+                  are unavailable and companions are benched below. Say so, so the missing
+                  buttons read as a rule, not a bug. */}
+              {elevatedOn ? (
+                <Text style={styles.elevatedNote}>⛰ ELEVATED — no dodge / flee · companions below</Text>
+              ) : null}
               {golem && golem.hp > 0 && !elevatedOn ? (
                 // OTA-911 — the golem is benched at the climb base (it can't
                 // climb), so its command is hidden while you're elevated.
@@ -847,6 +853,8 @@ const styles = StyleSheet.create({
   quickRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   quickRowColumn: { flexDirection: 'column', gap: 6 },
   quickRowLine: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  // OTA-935 — elevated-fight notice chip (why dodge/flee/companions are gone).
+  elevatedNote: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 0.3, paddingVertical: 4, paddingHorizontal: 2 },
   dogPicker: { flexDirection: 'row', gap: 8, marginTop: 6 },
   dogPickerBtn: {
     flex: 1,

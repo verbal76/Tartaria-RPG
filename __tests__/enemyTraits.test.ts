@@ -94,13 +94,13 @@ describe('traitRegen + traitAmbushBonus', () => {
 
 describe('traitDodgeChance — agile / quick enemies dodge', () => {
   it('agile returns the strongest dodge', () => {
-    expect(traitDodgeChance(['agile'])).toBe(0.25);
+    expect(traitDodgeChance(['agile'])).toBe(0.18); // OTA-935 — trimmed from 0.25
   });
   it('quick alone returns a slimmer dodge', () => {
-    expect(traitDodgeChance(['quick'])).toBe(0.15);
+    expect(traitDodgeChance(['quick'])).toBe(0.12); // OTA-935 — trimmed from 0.15
   });
   it('agile + quick takes the higher value', () => {
-    expect(traitDodgeChance(['quick', 'agile'])).toBe(0.25);
+    expect(traitDodgeChance(['quick', 'agile'])).toBe(0.18); // OTA-935 — trimmed from 0.25
   });
   it('returns 0 for nothing matching', () => {
     expect(traitDodgeChance(['armored', 'slow'])).toBe(0);

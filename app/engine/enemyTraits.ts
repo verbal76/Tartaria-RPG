@@ -169,10 +169,30 @@ export function traitDodgeChance(traits: readonly string[] | undefined): number 
   if (!traits) return 0;
   let chance = 0;
   for (const t of traits) {
-    if (t === 'agile') chance = Math.max(chance, 0.25);
-    else if (t === 'quick') chance = Math.max(chance, 0.15);
+    // OTA-935 — trimmed (agile 0.25->0.18, quick 0.15->0.12) so a slippery foe slips the
+    // odd blow without stonewalling a long fight.
+    if (t === 'agile') chance = Math.max(chance, 0.18);
+    else if (t === 'quick') chance = Math.max(chance, 0.12);
   }
   return chance;
+}
+
+/** OTA-935 — a CRUSHING blow can't be twisted clear. A crit never dodges, and beating the
+ *  enemy's AC by DODGE_BEATEN_MARGIN or more always lands (no more "rolled 29, whiffed").
+ *  Only marginal hits face the (reduced) trait dodge chance. */
+export const DODGE_BEATEN_MARGIN = 8;
+export function enemyDodgesHit(
+  traits: readonly string[] | undefined,
+  attackTotal: number,
+  enemyAc: number,
+  isCrit: boolean,
+  rng: () => number = Math.random,
+): boolean {
+  if (isCrit) return false;
+  const chance = traitDodgeChance(traits);
+  if (chance <= 0) return false;
+  if (attackTotal - enemyAc >= DODGE_BEATEN_MARGIN) return false;
+  return rng() < chance;
 }
 
 /** Human-readable trait summary for the EnemyPanel. Shortens to badges
