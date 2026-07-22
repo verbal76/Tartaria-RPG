@@ -1322,6 +1322,8 @@ export interface PlayerCharacter {
   /** OTA-915 — latches the one-time dead/abandoned-dog revive migration so it fires exactly
    *  once ever. A dog lost AFTER this OTA stays lost (death mechanic intact going forward). */
   dogRevivedOta915?: boolean;
+  /** OTA-918 — latches the one-time owner Mud Siren rematch (refund + re-stage) so it fires once. */
+  mudSirenRematchOta941?: boolean;
 }
 
 /** OTA-120 — Dog Companion. A one-at-a-time canine sidekick the player
