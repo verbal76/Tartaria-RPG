@@ -108,12 +108,31 @@ const WEATHER_EFFECTS: Record<
   calm: { prob: 0, build: () => ZERO_TICK },
 };
 
+// OTA-946 — a weather's ELEMENT (read off its tags) maps to the armour-coating resist
+// kind that counters it. Generalises the OTA-934 cold rule to every element: an
+// electrical coating shrugs off an Aether-lightning storm exactly as a cold coating
+// shrugs off a blizzard. Weather with no elemental counterpart (physical hail, ash,
+// psychic fog) is unaffected — you can't coat armour against those.
+const WEATHER_RESIST_ELEMENT: Record<string, string> = {
+  cold: 'cold',
+  lightning: 'electrical',
+  flame: 'burn',
+  burn: 'burn',
+};
+
 // Roll the weather's effect on this action. Returns a zero tick if nothing
-// triggered.
-export function tickWeather(weather: WeatherEntry | null, player: PlayerCharacter, coldResist = false): WeatherTick {
+// triggered. `resistKinds` is the player's armour resist list (lowercased); a match
+// against this weather's element cancels its bite.
+export function tickWeather(weather: WeatherEntry | null, player: PlayerCharacter, resistKinds: string[] = []): WeatherTick {
   if (!weather) return ZERO_TICK;
-  // OTA-934 — a frost/cold coating (or cold resistance) on armour shrugs off cold weather.
-  if (coldResist && (weather.tags ?? []).includes('cold')) return ZERO_TICK;
+  // OTA-934/946 — a matching armour resist (coating) shrugs off this weather's element.
+  if (resistKinds.length) {
+    const resisted = new Set(resistKinds.map((k) => k.toLowerCase()));
+    for (const tag of weather.tags ?? []) {
+      const el = WEATHER_RESIST_ELEMENT[tag];
+      if (el && resisted.has(el)) return ZERO_TICK;
+    }
+  }
   const cfg = WEATHER_EFFECTS[weather.id];
   if (!cfg) return ZERO_TICK;
   if (Math.random() > cfg.prob) return ZERO_TICK;
