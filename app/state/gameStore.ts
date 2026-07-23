@@ -1922,19 +1922,9 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { grandfatheredKnownRecipes: _gkr } = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
   const knownRecipes = _gkr(_allRecipes, inventory.map((i) => i.name), p.knownRecipes);
-  // OTA-915 — one-time dog revive. Feedback: a dog that DIED (or walked off) had no way back
-  // before the very-endgame second dog, and the 24h bleed-out window was invisible — players
-  // lost their companion without a fair shot. This brings a dead/abandoned dog back ONCE, at
-  // full HP with loyalty floored so the reunion isn't instantly starving. The dogRevivedOta915
-  // latch fires it exactly once ever; a dog lost after this OTA stays lost.
-  const revivedDog = (() => {
-    const d = p.dog;
-    if (p.dogRevivedOta915) return d ?? null;
-    if (d && (d.status === 'dead' || d.status === 'abandoned')) {
-      return { ...d, status: 'with_player' as const, hp: d.hpMax, loyalty: Math.max(d.loyalty ?? 0, 60), downedAtHour: undefined, bleedWarned: false, bleedWarnStage: 0 };
-    }
-    return d ?? null;
-  })();
+  // OTA-926 — the OTA-915 one-time dog-revive migration is RETIRED (spent make-good). A dead or
+  // abandoned dog is no longer auto-restored on load; the dog loads exactly as saved. The
+  // `dogRevivedOta915` flag on old saves is now inert.
   return {
     ...p,
     stats,
@@ -2049,9 +2039,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // OTA-120 — Dog Companion default for legacy saves. null = no
     // dog acquired yet; rescue hooks fire normally on the player's
     // next investigation of a matching scene archetype.
-    dog: revivedDog,
-    // OTA-915 — latch the one-time revive migration (see revivedDog above) so it never re-fires.
-    dogRevivedOta915: true,
+    dog: p.dog ?? null,
     // OTA-143 — migrate pre-OTA-126 travelTargets. Older saves stored
     // travelTarget as { locationId } with no distanceRemaining field.
     // The ExplorationScreen badge fell to its legacy Manhattan-recompute
@@ -7539,7 +7527,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('arbiter', `"Well met, ${cleanName}. To business."`);
         // OTA-925 — DEV STARTER GRANT (new-character only). The dev names get their test
         // scaffolding at CREATION, not retroactively on every load: a Resurrection Gem up
-        // front (Verbal/Sasmooch) + a crash-test supply kit (Verbal). This is the single
+        // front (Verbal/Sasmooch) + a crash-test supply kit (both dev names). This is the single
         // point a brand-new character is named; an existing save never re-enters it.
         const devStartName = cleanName.trim().toLowerCase();
         if (DEV_REVIVE_NAMES.includes(devStartName)) {
@@ -7548,7 +7536,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog('reward', `✦ A Resurrection Gem is set aside for ${cleanName} — the buried world keeps its own. (${total} held)`);
           });
         }
-        if (devStartName === 'verbal') {
+        if (DEV_REVIVE_NAMES.includes(devStartName)) {
           const devKit: Array<{ name: string; qty: number }> = [
             { name: 'First Aid Kit', qty: 10 },
             { name: 'Trail Rations', qty: 20 },
