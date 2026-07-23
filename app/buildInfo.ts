@@ -17784,4 +17784,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Keyboard.metrics() over the first ~1s after focus and snaps to the true settled height the moment it lands (then
 // stops). Purely additive over the existing event/estimate path; no native/soft-input change (that isn't OTA-updatable).
 // typecheck:ci + typecheck:tests + lint clean; full fast suite green. UI fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-23-951-input-bar-keyboard-metrics-poll';
+// OTA-952 (enemy portrait no longer blanks after a kill in a group fight). Playtest: "mid fight on a group of four,
+// after I beat one of them the enemy portrait went blank." A kill removes the fallen foe from currentScene.enemies and
+// REINDEXES the array, but the EnemyPanel pager (FlatList) keyed cells on the array INDEX and kept a stale scroll
+// offset, so it recycled to a blank/wrong page. The pager is now keyed on the enemy ROSTER (names) so a kill remounts a
+// fresh list (HP ticks keep updating in place via extraData), and it reopens on the ACTIVE enemy via initialScrollIndex
+// + getItemLayout. UI only, no engine change. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+// UI fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-23-952-enemy-portrait-reindex-fix';
