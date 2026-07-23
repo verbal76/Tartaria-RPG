@@ -29634,8 +29634,16 @@ function narrateCasualLook(
   // Strip climb markers — a noun that's only been CLIMBED shouldn't
   // get hidden from the "You see:" list.
   const lookSearched = nonClimbMarkers(lookRoom?.searchedAmbientNouns).map((n) => n.toLowerCase());
+  // OTA-950 — a noun INVESTIGATED for flavor ("already worked over — nothing more to find") is
+  // cleared just like a searched/taken one, so drop it from the "You see:" list too. Playtest:
+  // "look around sees things I have already investigated and cleared." The look-around filter only
+  // honored searchedAmbientNouns (the take/salvage path); it never consulted flavorExhaustedNouns
+  // (the investigate/flavor path). A flavor-exhausted noun is pure flavor — no re-takeable catalog
+  // item — so once cleared it stays hidden (no self-heal branch needed).
+  const lookFlavor = nonClimbMarkers(lookRoom?.flavorExhaustedNouns).map((n) => n.toLowerCase());
   const isConsumedForLook = (displayNoun: string): boolean => {
     const lower = displayNoun.toLowerCase();
+    if (lookFlavor.some((s) => s === lower || s.includes(lower) || lower.includes(s))) return true;
     // (1) bidirectional substring against searchedAmbientNouns.
     const recorded = lookSearched.some(
       (s) => s === lower || s.includes(lower) || lower.includes(s),

@@ -17771,4 +17771,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dog is no longer auto-restored on load; the dog loads as saved. The dogRevivedOta938 flag is now inert (kept
 // deprecated for save/test back-compat); the OTA-938 dedicated test is removed. No engine change. typecheck:ci +
 // typecheck:tests + lint clean; full fast suite green. Save/dev fixup -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-23-949-devgrant-cleanup-ii';
+// OTA-950 (look-around honors investigated nouns). Playtest: "look around sees things I have already investigated and
+// cleared." The look-around "You see:" list filtered out nouns SEARCHED/TAKEN (searchedAmbientNouns) but never the ones
+// INVESTIGATED for flavor (flavorExhaustedNouns — the "already worked over, nothing more to find" set), so a cleared
+// prop kept re-listing. Now the look filter also drops flavor-exhausted nouns (bidirectional substring, climb markers
+// stripped); pure flavor, so no re-take self-heal. No engine change. typecheck:ci + typecheck:tests + lint clean; full
+// fast suite green. Content/UX fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-23-950-look-honors-investigated';
