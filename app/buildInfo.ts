@@ -17765,4 +17765,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // supply kit (Verbal) — MOVE to the new-character name beat so they land exactly once at CREATION, never retroactively on
 // an existing save's load. The on-death DEV_REVIVE gem is untouched. No engine change. typecheck:ci + typecheck:tests +
 // lint clean; full fast suite green. Save/dev fixup -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-22-948-dev-grant-cleanup';
+// OTA-949 (dev-grant cleanup II). (1) SASMOOCH now gets the crash-test supply kit at new-character creation too — she
+// already got the up-front Resurrection Gem via DEV_REVIVE_NAMES, so both dev names now land exactly grants #1 + #2 at
+// CREATION and nothing else. (2) The OTA-938 one-time DOG-REVIVE migration is RETIRED (spent make-good): a dead/abandoned
+// dog is no longer auto-restored on load; the dog loads as saved. The dogRevivedOta938 flag is now inert (kept
+// deprecated for save/test back-compat); the OTA-938 dedicated test is removed. No engine change. typecheck:ci +
+// typecheck:tests + lint clean; full fast suite green. Save/dev fixup -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-23-949-devgrant-cleanup-ii';
