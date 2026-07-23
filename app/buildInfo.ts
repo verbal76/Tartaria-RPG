@@ -17777,4 +17777,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // prop kept re-listing. Now the look filter also drops flavor-exhausted nouns (bidirectional substring, climb markers
 // stripped); pure flavor, so no re-take self-heal. No engine change. typecheck:ci + typecheck:tests + lint clean; full
 // fast suite green. Content/UX fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-23-950-look-honors-investigated';
+// OTA-951 (input bar reliably rises above the keyboard). Playtest: "the text box still doesn't always get pushed to
+// the top of the keyboard when I tap in." The floating in-flow bar positions itself from the keyboardDidShow/changeFrame
+// HEIGHT event, which Fabric/Android drops ~half the time — so it fell back to a screen-fraction estimate at the wrong
+// height. Native keyboard state stays correct even when the JS event is lost, so KeyboardInputBar now POLLS
+// Keyboard.metrics() over the first ~1s after focus and snaps to the true settled height the moment it lands (then
+// stops). Purely additive over the existing event/estimate path; no native/soft-input change (that isn't OTA-updatable).
+// typecheck:ci + typecheck:tests + lint clean; full fast suite green. UI fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-23-951-input-bar-keyboard-metrics-poll';

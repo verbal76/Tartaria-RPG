@@ -156,8 +156,27 @@ export function KeyboardInputBar() {
       }
     } catch { /* metrics API not available on this RN — fine */ }
 
+    // OTA-951 — RELIABILITY POLL. keyboardDidShow / changeFrame are dropped ~half the time
+    // under the New Architecture (Fabric) on Android, which left the bar on the screen-fraction
+    // ESTIMATE (wrong height → not pushed to the top of the keyboard). The NATIVE keyboard state
+    // is correct even when the JS event is lost, so poll Keyboard.metrics() over the first ~1s
+    // after focus and SNAP to the true settled height the instant it reports one. Purely additive
+    // — if metrics never reports (older RN), we keep the existing event + estimate path.
+    let polls = 0;
+    const pollTimer = setInterval(() => {
+      polls += 1;
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const k = Keyboard as any;
+        const m = typeof k.metrics === 'function' ? k.metrics() : null;
+        if (m?.height && m.height > 0) { applyHeight(m.height); clearInterval(pollTimer); return; }
+      } catch { /* metrics unavailable — fall through to events/estimate */ }
+      if (polls >= 10) clearInterval(pollTimer); // ~1s cap
+    }, 100);
+
     return () => {
       if (hideTimer) clearTimeout(hideTimer);
+      clearInterval(pollTimer);
       showSub.remove();
       hideSub.remove();
       changeFrameSub?.remove();
