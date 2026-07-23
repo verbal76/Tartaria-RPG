@@ -220,6 +220,15 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
       ) : (
         <FlatList
           data={enemies}
+          // OTA-929 — BLANK-PORTRAIT-AFTER-A-KILL fix. A kill removes the fallen enemy from
+          // currentScene.enemies and REINDEXES it, but this pager keyed cells on the array INDEX
+          // and kept its stale scroll offset — so after "you beat one of them" the visible card
+          // recycled to a blank/wrong page. Key the pager on the enemy ROSTER (names) so a kill
+          // remounts a FRESH list (HP ticks don't change the roster, so they still update in place
+          // via extraData), and reopen it on the ACTIVE enemy (the next target) rather than page 0.
+          key={enemies.map((v) => v.enemy.name).join('|')}
+          getItemLayout={(_, index) => ({ length: cardWidth, offset: cardWidth * index, index })}
+          initialScrollIndex={Math.min(activeIndex, Math.max(0, enemies.length - 1))}
           // OTA 197 — extraData forces FlatList to re-render the visible cells
           // when a value not present in `data` changes (HP ticking down).
           extraData={`${cardWidth}|${enemies.map((v) => `${v.currentHp}/${v.enemy.hp}/${(v.statuses ?? []).map((s) => `${s.kind}:${s.turnsRemaining}`).join(',')}`).join('|')}`}
