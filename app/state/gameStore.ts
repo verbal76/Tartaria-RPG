@@ -286,6 +286,7 @@ import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitSt
 import { parseWeaponEffect, rollEffectBonusDamage } from '../engine/weaponEffects';
 import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
+import { nounTokensMatch } from '../engine/ambientNounMatch';
 import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
 import { classifyNoun, rollBreakLoot } from '../engine/sceneNounMaterial';
@@ -2058,7 +2059,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     travelTarget: (() => {
       const t = p.travelTarget;
       if (!t) return undefined;
-      // OTA — re-seed the resumed journey from the player's LIVE absolute cell
+      // OTA-930 — re-seed the resumed journey from the player's LIVE absolute cell
       // (gridX/gridY via playerGridCell), NOT the departure city. The old
       // canonicalDistance(currentLocationId, target) re-seeded the FULL
       // city→target distance every load, so if the OS reclaimed the process
@@ -9742,12 +9743,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           const ambushRoom = get().worldMemory.visitedRooms?.[ambushRoomKey];
           const ambushPrior = ambushRoom?.flavorExhaustedNouns ?? [];
-          const alreadyClearedNoun = ambushPrior.some(
-            (n) =>
-              n === investAmbushTarget
-              || investAmbushTarget.includes(n)
-              || n.includes(investAmbushTarget),
-          );
+          // OTA-930 — word-level match (raw substrings cross-hid unrelated nouns).
+          const alreadyClearedNoun = ambushPrior.some((n) => nounTokensMatch(n, investAmbushTarget));
           if (alreadyClearedNoun) {
             // OTA-256 — neutral wording. The prior line "there was
             // nothing of use in it" contradicted itself on nouns
@@ -10564,8 +10561,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               nonClimbMarkers(searchPrior?.searchedAmbientNouns).some(
                 (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
               ) ||
+              // OTA-930 — flavor half is word-level; the searched half above keeps the
+              // historical loose substring rule (its catalog self-heal escape depends on it).
               nonClimbMarkers(searchPrior?.flavorExhaustedNouns).some(
-                (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
+                (n) => nounTokensMatch(n, ambientLower),
               );
             if (alreadySearched) {
               get().appendLog(
@@ -10792,8 +10791,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const previewNoun = (rawTarget || invItem.name).toLowerCase().trim();
             const previewRoom = get().worldMemory.visitedRooms?.[previewRoomKey];
             const previewExhausted = (previewRoom?.flavorExhaustedNouns ?? []).map((n) => n.toLowerCase());
+            // OTA-930 — word-level match (raw substrings cross-hid unrelated nouns).
             const alreadyPreviewed = previewNoun.length > 0 && previewExhausted.some(
-              (n) => n.length > 0 && (n === previewNoun || previewNoun.includes(n) || n.includes(previewNoun)),
+              (n) => nounTokensMatch(n, previewNoun),
             );
             if (alreadyPreviewed) {
               get().appendLog(
@@ -16456,9 +16456,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             const investRoom = get().worldMemory.visitedRooms?.[investRoomKey];
             const investPrior = investRoom?.flavorExhaustedNouns ?? [];
-            const alreadyExamined = investPrior.some(
-              (n) => n === focusKey || focusKey.includes(n) || n.includes(focusKey),
-            );
+            // OTA-930 — word-level match (was raw bidirectional substrings, which refused
+            // "cracked terminal" after a mere "rack" was flavor-exhausted).
+            const alreadyExamined = investPrior.some((n) => nounTokensMatch(n, focusKey));
             if (alreadyExamined) {
               // OTA-084 refuseAmbient pattern — atomic log +
               // dedup mark, idempotent on the second touch.
@@ -16576,7 +16576,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // text for the resolved item + target so the narration names
             // what's actually in your hand and what you aimed it at.
             const useParse = parseInput(actionText, { inventory: player.inventory });
-            // OTA — fallback is the BARE noun (no article): templates prepend "The "/"the"
+            // OTA-930 — fallback is the BARE noun (no article): templates prepend "The "/"the"
             // themselves, so 'the relic' doubled to "The the relic responds…".
             const itemName = useParse.resolvedNoun ?? 'relic';
             const tgtTokens = (useParse.target ?? '').split(/\s+/).filter(Boolean);
@@ -23148,7 +23148,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     const player = state.player;
     if (!player) return;
-    // OTA — resolve the EXACT instance the caller picked by its unique id when
+    // OTA-930 — resolve the EXACT instance the caller picked by its unique id when
     // given (the inventory UI passes it), so a stack of same-name items with
     // different durability/instance stats equips the ONE the player selected — not
     // just the first row that happens to share the name. Falls back to name-match
@@ -23745,7 +23745,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           currentScene: { ...s.currentScene, enemyHps: s.currentScene.enemyHps.map((h, i) => (i === idx ? newHp : h)), activeEnemyIdx: idx },
         };
       });
-      // OTA — the leading number is the ACTUAL damage (after the target's type
+      // OTA-930 — the leading number is the ACTUAL damage (after the target's type
       // weakness/resistance + traits). The parenthetical shows the coating's own
       // math (perTurn × turns); when the target scaled it, name the reason so the
       // two numbers reconcile instead of looking like a bug ("5 … (1/turn × 3)").
@@ -24869,7 +24869,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   scrapInventoryItem(itemName, itemId) {
     const player = get().player;
     if (!player) return;
-    // OTA — scrap the EXACT instance the caller picked by its unique id when given
+    // OTA-930 — scrap the EXACT instance the caller picked by its unique id when given
     // (the inventory UI passes it). A player with several same-name items of
     // different durability who selects the worst must break down THAT one — not
     // whichever row sorts first by name. Falls back to name-match for typed commands.
@@ -26368,7 +26368,7 @@ function grantQuestHook(
     //   - world: explicit confirmation the slate now carries it
     // Locale + abandonment-affordance language are deliberately
     // direct — no flowery framing; this is a UX moment.
-    // OTA — the hunt TITLE already names the place ("The Sludge Behemoth at the
+    // OTA-930 — the hunt TITLE already names the place ("The Sludge Behemoth at the
     // Cradle of Dusk"), so appending "at <location>" here restated it, reading as
     // a doubled hint ("…at the Cradle of Dusk (target: … at the Cradle of Dusk
     // (feeding pool))"). Name just the target; the Arbiter line below points at
@@ -29601,7 +29601,11 @@ function narrateCasualLook(
   const lookFlavor = nonClimbMarkers(lookRoom?.flavorExhaustedNouns).map((n) => n.toLowerCase());
   const isConsumedForLook = (displayNoun: string): boolean => {
     const lower = displayNoun.toLowerCase();
-    if (lookFlavor.some((s) => s === lower || s.includes(lower) || lower.includes(s))) return true;
+    // OTA-930 — WORD-level match, not raw substrings (see nounTokensMatch). The substring rule
+    // hid unrelated nouns sharing letters: investigating a "rack" hid "cRACKed terminal";
+    // "vat" hid "obserVATion window". Partial phrasing of the SAME prop still hides
+    // ("rack" vs "armor rack").
+    if (lookFlavor.some((s) => nounTokensMatch(s, lower))) return true;
     // (1) bidirectional substring against searchedAmbientNouns.
     const recorded = lookSearched.some(
       (s) => s === lower || s.includes(lower) || lower.includes(s),
@@ -30409,7 +30413,7 @@ function handleGolemCommand(
       // reward + progression. resolveEnemyDefeat is a pure resolver (no recursive
       // submitPlayerAction), splices all six per-enemy arrays, awards, and
       // persists; we just point the active index at the golem's target first.
-      // OTA — golem.name is a proper noun ("Bob") everywhere else ("Bob attacks",
+      // OTA-930 — golem.name is a proper noun ("Bob") everywhere else ("Bob attacks",
       // "Bob lands …"), so no leading article — "Bob's assault", not "the Bob's assault".
       get().appendLog('world', `${target.name} crumbles under ${golem.name}'s assault.`);
       // OTA-467 — persist the POWER training the killing strike earned BEFORE the

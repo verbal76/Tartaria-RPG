@@ -16776,4 +16776,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fresh list (HP ticks keep updating in place via extraData), and it reopens on the ACTIVE enemy via initialScrollIndex
 // + getItemLayout. UI only, no engine change. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
 // Golem port of HAL OTA-952.
-export const OTA_BUILD_ID = '2026-07-23-929-enemy-portrait-reindex-fix';
+// OTA-930 (flavor-exhausted noun matching is word-level; port of HAL OTA-953). The OTA-927 look-around filter — and
+// the older investigate-refusal matchers on the same flavorExhaustedNouns list — compared raw bidirectional SUBSTRINGS,
+// so one investigated noun hid/refused unrelated nouns sharing mere letters ("rack" hid "cRACKed terminal"; "vat" hid
+// "obserVATion window"; the authored rooms carry 10 such letter-collision pairs across 5 rooms). New
+// ambientNounMatch.nounTokensMatch matches whole WORDS over normNoun (possessive/of/hyphen folds + light plural fold):
+// same-prop phrasing tolerance survives ("rack" vs "armor rack", "obelisk" vs "cracked obelisk" behave as before) but a
+// match can never cross word boundaries. Applied to all five flavor-list matchers in gameStore and the
+// ExplorationScreen chip mirror (merged pool split; searched keeps its historical loose rule + self-heal). Sweep: all
+// 10 letter collisions eliminated, 0 new cross-prop matches. Dedicated test added. typecheck:ci + typecheck:tests +
+// lint clean; full fast suite green. Content/UX fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-930-flavor-noun-word-match';

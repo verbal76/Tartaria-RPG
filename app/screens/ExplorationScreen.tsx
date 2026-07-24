@@ -23,7 +23,7 @@ import { WhisperCompleteModal } from '../components/WhisperCompleteModal';
 // The component file stays on disk for potential re-introduction.
 import { isClimbable, isSalvageable } from '../engine/interactionTags';
 import { climbBlockReason } from '../engine/climbReadiness';
-import { isNounConsumed } from '../engine/ambientNounMatch';
+import { isNounConsumed, isNounFlavorExhausted } from '../engine/ambientNounMatch';
 import { getLocationById } from '../engine/encounter';
 import { revealedLocationName } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
@@ -258,25 +258,21 @@ export function ExplorationScreen() {
   const stealthTakeAmbientNoun = useGameStore((s) => s.stealthTakeAmbientNoun);
   const worldMemory = useGameStore((s) => s.worldMemory);
 
-  // Per-room dedup list — drives the "already taken" gating on the
-  // TAKE modal chips. Two tightenings vs the first cut at this:
-  //
-  //   1. EXACT name match only, not bidirectional substring. The
-  //      engine's substring match was greying out chips for nouns
-  //      that weren't actually blocked (e.g. a save with "rope" in
-  //      searchedAmbientNouns also greyed an unrelated "scrap pile"
-  //      because some entries cross-matched). UI errs on the side
-  //      of green; if the engine actually rejects on tap, the log
-  //      line surfaces it.
-  //
-  //   2. Self-healing: the chip only greys when the player ACTUALLY
-  //      has the catalog item for that noun in their inventory. If
-  //      the dedup entry exists but the item isn't in the pack, the
-  //      noun was either (a) marked consumed by the OTA<=172 salvage
-  //      bug that wrote on 'nothing' outcomes, or (b) the player
-  //      sold / lost the item. Either way, the chip should be
-  //      re-tappable so the player isn't stuck.
-  const consumedAmbientNouns = useMemo(() => {
+  // OTA-930 — the old merged consumedAmbientNouns memo (searched + flavor in ONE set) is gone:
+  // the two pools now match differently (searched keeps the historical loose substring rule;
+  // flavor-exhausted matches whole WORDS via isNounFlavorExhausted, so an investigated "rack"
+  // no longer greys an unrelated "cracked terminal"), so every consumer reads the split sets
+  // below and applies the right matcher per pool. [POLISH-3]'s intent is preserved — flavor
+  // exhaustion still greys/sorts Search-modal chips — via the flavor half at each call site.
+
+  // 2026-05-25 — split sets for cross-modal removal. The user wants
+  // any noun that was PRODUCTIVELY consumed (take / salvage with
+  // loot / investigate that yielded an item) to disappear from
+  // every modal, including Investigate. Flavor-only investigate
+  // results stay visible in Investigate (grayed + sorted right per
+  // POLISH-3) because the noun is still investigable for narrative
+  // re-color but shouldn't clutter the actionable list.
+  const productivelyConsumedSet = useMemo(() => {
     if (!player || !currentScene) return new Set<string>();
     // OTA-164 — use canonical makeRoomKey so hub interiors map to
     // the same key the action handlers write to. Pre-OTA-164 the
@@ -289,42 +285,6 @@ export function ExplorationScreen() {
     // bulk action → engine emitted "Already worked over: ..." each
     // time because the action's read DID use makeRoomKey and saw
     // the consumed marks the UI couldn't.
-    const roomKey = makeRoomKey(
-      player.currentLocationId,
-      currentScene.microMicroId,
-      player.mapX,
-      player.mapY,
-      player.hubRoomId,
-    );
-    const room = worldMemory.visitedRooms?.[roomKey];
-    // 2026-05-25 [POLISH-3] — include flavor-exhausted nouns so the
-    // Search modal chip renders greyed + sorted right after a
-    // nothing-yields-from-investigate outcome too (not only after a
-    // production-yielding investigate). Other verbs (take/salvage/
-    // break) don't read flavorExhaustedNouns so the cross-verb chain
-    // continues to work.
-    return new Set([
-      ...(room?.searchedAmbientNouns ?? []).map((n) => n.toLowerCase()),
-      ...(room?.flavorExhaustedNouns ?? []).map((n) => n.toLowerCase()),
-    ]);
-  }, [
-    player?.currentLocationId,
-    player?.mapX,
-    player?.mapY,
-    currentScene?.microMicroId,
-    worldMemory.visitedRooms,
-  ]);
-
-  // 2026-05-25 — split sets for cross-modal removal. The user wants
-  // any noun that was PRODUCTIVELY consumed (take / salvage with
-  // loot / investigate that yielded an item) to disappear from
-  // every modal, including Investigate. Flavor-only investigate
-  // results stay visible in Investigate (grayed + sorted right per
-  // POLISH-3) because the noun is still investigable for narrative
-  // re-color but shouldn't clutter the actionable list.
-  const productivelyConsumedSet = useMemo(() => {
-    if (!player || !currentScene) return new Set<string>();
-    // OTA-164 — see consumedAmbientNouns above. Same hub-key bug.
     const roomKey = makeRoomKey(
       player.currentLocationId,
       currentScene.microMicroId,
@@ -351,7 +311,7 @@ export function ExplorationScreen() {
   ]);
   const flavorExhaustedSet = useMemo(() => {
     if (!player || !currentScene) return new Set<string>();
-    // OTA-164 — see consumedAmbientNouns above. Same hub-key bug.
+    // OTA-164 — see productivelyConsumedSet above. Same hub-key bug.
     const roomKey = makeRoomKey(
       player.currentLocationId,
       currentScene.microMicroId,
@@ -383,7 +343,11 @@ export function ExplorationScreen() {
     // too. Self-heal logic below stays intact (only treat as
     // consumed if the catalog item is in inventory, otherwise
     // ungrey so the player isn't stuck on a sold/lost item).
-    if (!isFuzzyConsumed(noun, consumedAmbientNouns)) return false;
+    // OTA-930 — split pools: searched keeps the loose fuzzy rule, flavor is word-level.
+    if (
+      !isFuzzyConsumed(noun, productivelyConsumedSet)
+      && !isNounFlavorExhausted(noun, flavorExhaustedSet)
+    ) return false;
     if (!player) return true;
     const cat = findCatalogItem(noun);
     if (!cat) return true; // not a catalog item; honor engine dedup as-is
@@ -1084,7 +1048,7 @@ export function ExplorationScreen() {
               // subtracting cleared ones, leaving the button green
               // after the player had topped everything in the scene.
               const sceneNouns = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
-              // OTA-164 — see consumedAmbientNouns above. Same hub-key bug.
+              // OTA-164 — see productivelyConsumedSet above. Same hub-key bug.
               const roomKey = makeRoomKey(
                 player?.currentLocationId ?? '',
                 currentScene?.microMicroId,
@@ -1139,12 +1103,12 @@ export function ExplorationScreen() {
                   // pools, mirroring the engine's accept/refuse
                   // decision. Was exact set.has(n.toLowerCase()).
                   if (isFuzzyConsumed(n, productivelyConsumedSet)) return false;
-                  if (isFuzzyConsumed(n, flavorExhaustedSet)) return false;
+                  if (isNounFlavorExhausted(n, flavorExhaustedSet)) return false;
                   const req = searchRequirementFor(n);
                   if (req && player && !playerHasScannerEquipped(player, req.scannerBias)) {
                     return false;
                   }
-                  // OTA — elevation gate, mirroring the SearchModal chip logic
+                  // OTA-930 — elevation gate, mirroring the SearchModal chip logic
                   // (see the chips map ~"climb down to reach"). While the player is
                   // climbed onto a feature with no elevated overlay, every GROUND
                   // noun except the climbed one refuses with "climb down to reach"
@@ -1486,7 +1450,7 @@ export function ExplorationScreen() {
                 // bench" vs chip "bench") per OTA-070's pattern.
                 consumed:
                   isFuzzyConsumed(n, productivelyConsumedSet) ||
-                  isFuzzyConsumed(n, flavorExhaustedSet),
+                  isNounFlavorExhausted(n, flavorExhaustedSet),
                 unmetRequirement,
               };
             }),
@@ -1561,7 +1525,9 @@ export function ExplorationScreen() {
                 // consumed state directly (searched + flavor-exhausted),
                 // NOT isAmbientConsumed's self-heal, which fuzzy-matched
                 // catalog items the player didn't own and kept chips lit.
-                consumed: isFuzzyConsumed(n, consumedAmbientNouns),
+                consumed:
+                  isFuzzyConsumed(n, productivelyConsumedSet) ||
+                  isNounFlavorExhausted(n, flavorExhaustedSet),
               }))
         }
         onSubmit={(target) => {
@@ -1649,7 +1615,7 @@ export function ExplorationScreen() {
         const sceneNouns = (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? []);
         const climbables = sceneNouns.filter((n) => isClimbable(n));
         const heights = climbables.map((n) => climbHeightFor(n));
-        // OTA-164 — see consumedAmbientNouns above. Same hub-key bug.
+        // OTA-164 — see productivelyConsumedSet above. Same hub-key bug.
         const roomKey = makeRoomKey(
           player?.currentLocationId ?? '',
           currentScene?.microMicroId,
