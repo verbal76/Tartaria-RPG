@@ -16903,4 +16903,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // { aliases: false } opt-out; the ambient PICKUP path is unchanged (default on). Regression tests lock both leaks
 // shut + pickup behavior. typecheck:ci + typecheck:tests + lint clean; full fast suite green. Loot fix -> HAL + golem
 // (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-942-loot-alias-precedence';
+// OTA-943 (v2-audit knobs 1+2: mid-tier windfalls closed + trophy sell discount (port of HAL OTA-966)). (1) Four sub-Legendary
+// enemies had promoted-LEGENDARY materials in their loot lists — a lottery ticket in a mid fight (Sky-Warden 215 EV at
+// power 45 via TWO Legendary cores). All four re-tiered to Rare machine/beast materials: Golem Knight Aether Core ->
+// Clockwork Core; Aetheric Lion Aether Core -> Beast Fang; Resonance Sentinel Sentinel Core -> Crystal Core;
+// Sky-Warden Sentinel+Guardian Cores -> Steam + Clockwork Cores. A sweep test locks the rule: no sub-Legendary enemy
+// may drop a Legendary material. (2) TROPHY DISCOUNT: rarity-priced trophies made every Legendary non-boss converge on
+// the same ~382 TC/kill (~7x the old faucet). Trophy-tagged parts now SELL at half a real material's rate — genuine
+// materials (Dragon Scale, Titan Core...) keep full value, so which monster you hunt matters again. typecheck:ci +
+// typecheck:tests + lint clean; full fast suite green. Loot tuning -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-943-windfall-trophy-discount';
