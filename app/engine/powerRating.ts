@@ -7,7 +7,7 @@
 // so training a stat or upgrading a weapon/armour visibly moves the number. Player and
 // enemy use the same four terms so "yours 46 vs its 38" reads as "you're favoured".
 import type { Enemy, PlayerCharacter } from './types';
-import { effectiveStats, ARMOR_SLOTS } from './equipment';
+import { effectiveStats, ARMOR_SLOTS, trimStandingAc } from './equipment';
 import { getEquippedWeapon } from './combatRules';
 import { traitACBonus } from './enemyTraits';
 import { resolveDisplayArmorByName } from './itemResolution';
@@ -38,7 +38,18 @@ export function playerPowerScore(player: PlayerCharacter): number {
     if (!name) continue;
     armorAc += resolveDisplayArmorByName(name, player.inventory ?? [])?.acBonus ?? 0;
   }
-  const ac = (player.ac ?? 10) + armorAc;
+  // OTA-932 — the gauge's AC term runs through the OTA-947 standing-AC trim so it equals
+  // the AC the player SEES (StatsPanel) and FIGHTS with (applyEnemyCounter) exactly.
+  // Pre-OTA it summed the raw stack, so a tank's Power kept quoting the untrimmed
+  // number the rebalance retired ("my AC dropped but my Power didn't") and the
+  // favored/danger badge overstated the tank's real standing. Enemy Power stays raw
+  // on purpose: enemy combat AC is never trimmed, and each side's gauge mirrors the
+  // AC that side actually fights with. (Combat additionally counts scene-conditional
+  // racial/title AC that a scene-free gauge can't; that pre-existing 1-2pt display
+  // drift near the knee is out of scope here.) The correction lands SILENTLY across
+  // an update: the OTA-929 delta flash seeds its prev-ref on mount, so a value that
+  // changed between sessions never fires it — only in-session gear/stat moves do.
+  const ac = trimStandingAc((player.ac ?? 10) + armorAc);
   const weapon = getEquippedWeapon(player, 'main');
   const dmg = weapon ? avgDamageNotation(weapon.damageDice) : 2;
   const hp = player.hpMax ?? 10;
