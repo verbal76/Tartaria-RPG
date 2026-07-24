@@ -1,0 +1,87 @@
+name: Run PEPK (Play Signing Key Upload)
+
+# Decodes ANDROID_KEYSTORE_BASE64, runs Google's PEPK tool against
+# it with the app-specific encryption_public_key.pem, and produces
+# output.zip that Play Console accepts under "Export and upload a
+# key from Java keystore" during Play App Signing setup.
+#
+# Trigger: edit this file and push.
+
+on:
+  push:
+    paths:
+      - '.github/workflows/run-pepk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pepk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Download PEPK tool
+        run: |
+          set -euo pipefail
+          # Try the compiled runnable jar first; fall back to source jar.
+          for url in \
+              "https://www.gstatic.com/play-apps-publisher-rapid/signing-tool/prod/pepk.jar" \
+              "https://www.gstatic.com/play-apps-publisher-rapid/signing-tool/prod/pepk-src.jar"
+          do
+              echo "Trying: $url"
+              if curl -fsSL -o pepk.jar "$url"; then
+                  echo "Downloaded from $url"
+                  ls -la pepk.jar
+                  break
+              fi
+          done
+          if [ ! -f pepk.jar ]; then
+              echo "::error::Could not download PEPK from any known URL. Commit pepk.jar to .github/pepk/ and reference it directly."
+              exit 1
+          fi
+
+      - name: Decode keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > keystore.jks
+          echo "Keystore: $(stat -c%s keystore.jks) bytes"
+
+      - name: Run PEPK
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          # PEPK prompts for keystore password then key password on stdin.
+          # Pipe both.
+          printf "%s\n%s\n" "$ANDROID_KEYSTORE_PASSWORD" "$ANDROID_KEY_PASSWORD" | \
+            java -jar pepk.jar \
+              --keystore=keystore.jks \
+              --alias="$ANDROID_KEY_ALIAS" \
+              --output=output.zip \
+              --include-cert \
+              --rsa-aes-encryption \
+              --encryption-key-path=.github/pepk/encryption_public_key.pem
+
+          echo ""
+          echo "=== output.zip generated ==="
+          ls -la output.zip
+          unzip -l output.zip
+
+      - name: Upload output.zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: pepk-output
+          path: output.zip
+          retention-days: 30
