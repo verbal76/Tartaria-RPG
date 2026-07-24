@@ -3850,7 +3850,9 @@ interface GameStore {
    *  tap on `isInferredItem`. Reserved items are excluded from the
    *  OTA-193 auto-substitute drain so they survive for the fusion
    *  bench. Looked up by InventoryItem.id to disambiguate stacks. */
-  toggleReserveForFusion: (itemId: string) => void;
+  /** OTA-968 — `count` moves that many units across the save/free boundary in ONE call
+   *  (clamped to the stack). Omitted = 1 (the original tap-peels-one behavior). */
+  toggleReserveForFusion: (itemId: string, count?: number) => void;
   /** OTA-872 — "Save for quest" earmark toggle for an ordinary item (food,
    *  materials, loot) the player was told to bring for a turn-in. Sets the soft
    *  reservedForQuest flag: the item moves to the Quest Items section and drops out
@@ -24111,7 +24113,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     setCanonExtraLocations(after.canonLocations ?? []);
   },
 
-  toggleReserveForFusion(itemId) {
+  toggleReserveForFusion(itemId, count) {
     const player = get().player;
     if (!player) return;
     const item = player.inventory.find((i) => i.id === itemId);
@@ -24162,23 +24164,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
       && !a.coating && !b.coating
       && !a.instanceStats && !b.instanceStats
       && !a.uniqueStats && !b.uniqueStats;
+    // OTA-968 — move `count` units in one call (the "Save all xN" button); clamped to the
+    // stack. Moving the WHOLE stack just flips the row's flag (merging into an
+    // existing same-state stack if one exists) — no churn through N single peels.
+    const moveN = Math.max(1, Math.min(count ?? 1, qty));
+    if (moveN >= qty) {
+      set((s) => {
+        if (!s.player) return s;
+        let inv = s.player.inventory;
+        const dest = inv.find(
+          (i) => i.id !== itemId && sameUnit(i, item) && (i.reservedForFusion === true) === reserving,
+        );
+        if (dest) {
+          inv = inv
+            .filter((i) => i.id !== itemId)
+            .map((i) => (i.id === dest.id ? { ...i, quantity: (i.quantity ?? 1) + qty } : i));
+        } else {
+          inv = inv.map((i) => (i.id === itemId ? { ...i, reservedForFusion: reserving } : i));
+        }
+        return { player: { ...s.player, inventory: inv } };
+      });
+      return;
+    }
     set((s) => {
       if (!s.player) return s;
-      // Drop one off the tapped stack (remove the row if it empties).
+      // Drop `moveN` off the tapped stack (remove the row if it empties).
       let inv = s.player.inventory
-        .map((i) => (i.id === itemId ? { ...i, quantity: (i.quantity ?? 1) - 1 } : i))
+        .map((i) => (i.id === itemId ? { ...i, quantity: (i.quantity ?? 1) - moveN } : i))
         .filter((i) => (i.quantity ?? 1) > 0);
       // Merge the peeled unit into an existing opposite-state stack, else add a row.
       const destIdx = inv.findIndex(
         (i) => i.id !== itemId && sameUnit(i, item) && (i.reservedForFusion === true) === reserving,
       );
       if (destIdx >= 0) {
-        inv = inv.map((i, idx) => (idx === destIdx ? { ...i, quantity: (i.quantity ?? 1) + 1 } : i));
+        inv = inv.map((i, idx) => (idx === destIdx ? { ...i, quantity: (i.quantity ?? 1) + moveN } : i));
       } else {
         inv = [...inv, {
           ...item,
           id: `${item.name.replace(/\s+/g, '_')}_${reserving ? 'rsv' : 'free'}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-          quantity: 1,
+          quantity: moveN,
           reservedForFusion: reserving,
         }];
       }

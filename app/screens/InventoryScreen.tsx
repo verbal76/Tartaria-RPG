@@ -896,9 +896,12 @@ export function InventoryScreen() {
     const alreadyReserved = pending.item.reservedForFusion === true;
     if (isForgeReservableItem(pending.item) || alreadyReserved || isFactionCatalyst) {
       const reserved = pending.item.reservedForFusion === true;
+      const stackQty = pending.item.quantity ?? 1;
       const label = isFactionCatalyst
         ? (reserved ? '♥ Reserved as faction catalyst' : '♡ Save as faction catalyst')
-        : (reserved ? '♥ Reserved for fusion' : '♡ Save for fusion');
+        : reserved
+          ? (stackQty > 1 ? '♥ Free 1 from fusion' : '♥ Reserved for fusion')
+          : (stackQty > 1 ? '♡ Save 1 for fusion' : '♡ Save for fusion');
       buttons.push({
         label,
         onPress: () => {
@@ -907,6 +910,21 @@ export function InventoryScreen() {
         },
         tone: 'neutral',
       });
+      // OTA-968 — whole-stack reserve in ONE tap. Owner: reserving a x5 stack meant
+      // reopening this modal five times, one peel per tap. "Save all xN" (and its
+      // "Free all" mirror) moves the entire stack across the boundary at once;
+      // the single-unit button stays for partial counts. Catalysts stay 1-at-a-time
+      // (one catalyst themes one fuse).
+      if (stackQty > 1 && !isFactionCatalyst) {
+        buttons.push({
+          label: reserved ? `♥ Free all ×${stackQty}` : `♡ Save all ×${stackQty} for fusion`,
+          onPress: () => {
+            toggleReserveForFusion(pending.item.id, stackQty);
+            closeModal();
+          },
+          tone: 'neutral',
+        });
+      }
     }
     // OTA-872 — SAVE FOR QUEST. A soft earmark for an ordinary item (food,
     // materials, loot) the player was told to bring for a turn-in. Sets
@@ -960,7 +978,7 @@ export function InventoryScreen() {
       : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
         ? 'This item cannot be equipped, but you can still keep, sell, or use it.'
         : undefined;
-  // OTA — fusion info block: for a fusable/reservable item, name the material it
+  // OTA-968 — fusion info block: for a fusable/reservable item, name the material it
   // contributes and how diversity drives output rarity (a common playtest question:
   // "does what I put in change the quality?" — yes: DIFFERENT materials, not rarity).
   const fusionHint = pending && (isForgeReservableItem(pending.item) || (pending.item.tags ?? []).includes('faction_gear'))
