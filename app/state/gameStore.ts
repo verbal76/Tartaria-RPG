@@ -289,6 +289,8 @@ import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { nounTokensMatch } from '../engine/ambientNounMatch';
 import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
 import { resolveLootItem } from '../engine/crafting';
+import { rollBossSpoils } from '../engine/bossLoot';
+import { enemyPowerScore } from '../engine/powerRating';
 import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
 import { classifyNoun, rollBreakLoot } from '../engine/sceneNounMaterial';
@@ -18010,6 +18012,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
+    // OTA-963 — BOSS SPOILS (owner spec): every boss kill pays out high-end materials on
+    // top of its authored drops — never mud cloth — and a non-apex boss can add one
+    // RARE (deliberately not Legendary) weapon or armor. Core Guardians and
+    // summit/tower bosses take the materials half only: their Legendary signature
+    // gear is already the deterministic reward of their own tables. Recipes ride the
+    // OTA-718 hard-won roll below, boosted for bosses.
+    if (enemy.boss) {
+      const bossSpoils = rollBossSpoils(enemy, enemyPowerScore(enemy));
+      if (bossSpoils.length > 0) {
+        const spoilsStamp = Date.now();
+        set((s2) => {
+          if (!s2.player) return s2;
+          let inv = s2.player.inventory;
+          bossSpoils.forEach((spoilName, si) => {
+            const r = resolveLootItem(spoilName, enemy.rarity);
+            inv = mergeOrPushItem(inv, {
+              id: `boss_spoils_${spoilsStamp}_${si}`,
+              name: r.name,
+              kind: r.kind,
+              rarity: r.rarity,
+              quantity: 1,
+              tags: [...r.tags, 'loot'],
+              ...(r.baseDurability && (r.kind === 'weapon' || r.kind === 'armor')
+                ? { durability: { current: r.baseDurability, max: r.baseDurability } }
+                : {}),
+            });
+          });
+          return { player: { ...s2.player, inventory: inv } };
+        });
+        get().appendLog('reward', `✦ Boss spoils: ${bossSpoils.join(', ')}.`);
+      }
+    }
+
     // OTA-716 — hard-won spoils. A long/tough fight occasionally coughs up a
     // GOOD material ON TOP of the normal loot (never instead of it) — a
     // Fallout-4-ish sprinkle that rewards the grind without touching the
@@ -18040,7 +18075,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const { isHardWonFight } = require('../engine/bonusDrops') as typeof import('../engine/bonusDrops');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const rd = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
-      if (isHardWonFight(enemy) && Math.random() < rd.HARD_WON_RECIPE_CHANCE) {
+      // OTA-963 — bosses are the recipe-bearers (owner spec: "some good recipes"): a boss
+      // kill triples the hard-won recipe chance, capped at 60%.
+      const recipeChance = enemy.boss
+        ? Math.min(0.6, rd.HARD_WON_RECIPE_CHANCE * 3)
+        : rd.HARD_WON_RECIPE_CHANCE;
+      if (isHardWonFight(enemy) && Math.random() < recipeChance) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { RECIPES } = require('../engine/crafting') as typeof import('../engine/crafting');
         const learned = rd.pickRecipeToLearn(RECIPES, get().player?.knownRecipes);

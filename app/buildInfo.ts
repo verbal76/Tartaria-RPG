@@ -17891,4 +17891,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "84 alias candidates" heuristic was overridden as too loose). Tests pin all 35 promotions + both aliases + one
 // stays-a-trophy control. typecheck:ci + typecheck:tests + lint clean; full fast suite green. Content -> HAL + golem
 // (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-962-trophy-curation';
+// OTA-963 (BOSS SPOILS TABLE). Owner spec: no boss fight ends in mud cloth and scrap metal — bosses drop
+// high-end materials, good recipes, and Rare (NOT Legendary) gear; Guardians/tower bosses keep their own Legendary
+// signature tables. New engine/bossLoot.ts rolls ON TOP of authored drops for every boss-flagged kill: 2 materials
+// (3 at power >= 80), each Rare with a Legendary chance scaling with the fight (apex 50% / heavy 30% / boss 15%), and
+// non-apex bosses add one Rare weapon/armor 60% of the time (collect_only excluded). APEX bosses (core_guardian /
+// summit_climb: traits) take the materials half ONLY. Pools are live catalog views, so the OTA-962 promoted trophies
+// (Dragon Scale, Titan Core...) are automatically in stock; floors are STRUCTURAL — every pool is Rare+, so a sub-Rare
+// boss payout is impossible by construction. Recipes: the OTA-718 hard-won recipe roll is tripled for bosses (cap 60%).
+// Tests: apex exclusion, tier counts, structural floor, pool stocking. typecheck:ci + typecheck:tests + lint clean;
+// full fast suite green. Loot system -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-963-boss-spoils-table';
