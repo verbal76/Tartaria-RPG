@@ -17829,4 +17829,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New engine/keyboardPoll.ts + unit tests for every tick decision. On-device verify: tap in / dismiss fast / tap in
 // again — bar rises every time, never lingers. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
 // UI fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-956-keyboard-poll-per-focus';
+// OTA-957 (correctness batch): (1) FULL WEATHER SYMMETRY — OTA-946 only generalised the DAMAGE tick, so an
+// electrical coat cancelled Aether-lightning's zap but not its stat mods / attack penalty / slow, while a cold coat
+// cancelled everything about a blizzard. The penalty/stat helpers now take the full resist list (shared
+// weatherCounteredByResists; ~16 call sites pass playerArmorResistKinds): the RIGHT coating fully neutralises its
+// weather — you can plan for and escape it. Buffs survive the counter (insulated players keep the Aether +INT); psychic
+// fog / iron fog stay uncounterable by design. Black rain's 'tainted' tag now maps to the corruption resist (it never
+// did — a corruption coat silently did nothing). (2) applyCoating VALIDATES replaceSlot: a programmatic 'coating2' on a
+// 1-slot weapon used to stamp an illegal dual coat combat honored; the store now refuses (vial not consumed). (3) the
+// reach-lookup + log-noun bare-hand tests get the OTA-940 name-strip ("attack with the Mud-FIST Wraps" is a weapon
+// swing, not a punch, for reach too). New batch test; ota934 test retargeted to the list signature. typecheck:ci +
+// typecheck:tests + lint clean; full fast suite green. Combat/content fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-957-correctness-batch';

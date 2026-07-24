@@ -9,18 +9,18 @@ const fog = { id: 'iron_fog', name: 'Iron Fog', description: '', visibility: -2,
 describe('OTA-934 — cold resistance cancels COLD weather', () => {
   it('cancels the stat penalty', () => {
     expect(weatherStatModifiers(blizzard)).toEqual({ dexterity: -1, strength: -1 });
-    expect(weatherStatModifiers(blizzard, true)).toEqual({});
+    expect(weatherStatModifiers(blizzard, ['cold'])).toEqual({});
   });
   it('cancels the attack penalty', () => {
     expect(weatherAttackPenalty(blizzard)).toBe(2);
-    expect(weatherAttackPenalty(blizzard, true)).toBe(0);
+    expect(weatherAttackPenalty(blizzard, ['cold'])).toBe(0);
   });
   it('cancels the movement slow', () => {
     expect(weatherRepositionCost(blizzard)).toBe(2);
-    expect(weatherRepositionCost(blizzard, true)).toBe(1);
+    expect(weatherRepositionCost(blizzard, ['cold'])).toBe(1);
   });
   it('does NOT affect non-cold weather (Iron Fog)', () => {
-    expect(weatherStatModifiers(fog, true)).toEqual({ dexterity: -1 });
-    expect(weatherAttackPenalty(fog, true)).toBe(2);
+    expect(weatherStatModifiers(fog, ['cold'])).toEqual({ dexterity: -1 });
+    expect(weatherAttackPenalty(fog, ['cold'])).toBe(2);
   });
 });
