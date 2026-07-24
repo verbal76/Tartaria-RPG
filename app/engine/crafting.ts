@@ -231,6 +231,34 @@ export function lookupCraftedItem(resultName: string): {
   return { kind: 'misc', rarity: 'Common', tags: [] };
 }
 
+/** OTA-961 — canonical loot-name resolution for every drop path (kill roll, knockout
+ *  strip, hard-won bonus). The audit found 136 authored loot names in NO catalog:
+ *  the exact-match lookupCraftedItem chain silently minted each as a 2-TC tagless
+ *  Common misc, so a Legendary beast's trophy was worth the same as a Mud Boar's
+ *  scrap and the organic-vs-machine Legendary tier inverted. Resolution order:
+ *    1. findCatalogItem — case-insensitive + alias-aware — so a miscapitalized or
+ *       variant name lands on the REAL catalog row (canonical name -> it STACKS).
+ *    2. The exact lookupCraftedItem chain (covers dog gear + anything the catalog
+ *       helper doesn't index).
+ *    3. An unknown name mints as a TROPHY at the ENEMY'S OWN rarity — a Legendary
+ *       hide prices like a Legendary find, not junk. Trophies carry the 'trophy'
+ *       tag (sellable + identifiable; no recipe consumes them). The curated pass
+ *       deciding which trophies become REAL items builds on top of this. */
+export function resolveLootItem(rawName: string, enemyRarity?: Rarity): {
+  name: string;
+  kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc' | 'dog_armor';
+  rarity: Rarity;
+  tags: string[];
+  baseDurability?: number;
+} {
+  const cat = findCatalogItem(rawName);
+  if (cat) return cat;
+  const look = lookupCraftedItem(rawName);
+  const isMintedFallback = look.kind === 'misc' && look.rarity === 'Common' && look.tags.length === 0;
+  if (!isMintedFallback) return { name: rawName, ...look };
+  return { name: rawName, kind: 'misc', rarity: enemyRarity ?? 'Common', tags: ['trophy'] };
+}
+
 /** Case-insensitive catalog match. Returns the canonical (title-case)
  *  name + kind + rarity + tags when the input maps to a REAL catalog
  *  item — weapon, armor, gear, amulet, ring, or material. Returns

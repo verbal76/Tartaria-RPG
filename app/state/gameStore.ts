@@ -288,6 +288,7 @@ import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { nounTokensMatch } from '../engine/ambientNounMatch';
 import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
+import { resolveLootItem } from '../engine/crafting';
 import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
 import { classifyNoun, rollBreakLoot } from '../engine/sceneNounMaterial';
@@ -17831,8 +17832,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       : enemy.rarity === 'Uncommon' ? 2 + Math.floor(Math.random() * 2)
       : 1 + Math.floor(Math.random() * 2);
     const lootDrops: string[] = [];
+    // OTA-961 — canonicalize each rolled name (resolveLootItem: case/alias-tolerant catalog
+    // match) so the summary line and the granted item agree on the REAL, stackable name.
     for (let i = 0; i < lootRollCount && lootPool.length > 0; i++) {
-      lootDrops.push(lootPool[Math.floor(Math.random() * lootPool.length)]!);
+      const pick = lootPool[Math.floor(Math.random() * lootPool.length)]!;
+      lootDrops.push(resolveLootItem(pick, enemy.rarity).name);
     }
     // OTA-603 — occasional dog-vest drop (the vests were authored but never
     // sourced). Rarity-weighted + low-rate; the Reclaimer Pattern Vest only
@@ -17926,7 +17930,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           hpMax: newHpMax,
           inventory: lootDrops.reduce(
             (inv, lootName, i) => {
-              const lootLookup = lookupCraftedItem(lootName);
+              // OTA-961 — resolveLootItem: catalog-canonical when known, TROPHY at the
+              // enemy's own rarity when not (never a 2-TC tagless Common again).
+              const lootLookup = resolveLootItem(lootName, enemy.rarity);
               // OTA-363 — a dropped coatable weapon occasionally arrives
               // pre-coated. Coated weapons mint as a distinct instance
               // (grantItem refuses to merge them) with a full durability
@@ -18011,13 +18017,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     {
       const combatBonus = maybeCombatBonus(enemy);
       if (combatBonus) {
-        const look = lookupCraftedItem(combatBonus.name);
+        // OTA-961 — same canonical/trophy resolution as the kill path.
+        const look = resolveLootItem(combatBonus.name, enemy.rarity);
         set((s) => (s.player ? {
           player: {
             ...s.player,
             inventory: mergeOrPushItem(s.player.inventory, {
               id: `bonus_${Date.now()}`,
-              name: combatBonus.name,
+              name: look.name,
               kind: look.kind,
               rarity: look.rarity,
               quantity: 1,
@@ -18512,10 +18519,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // The enemy's drop list comes over in FULL (not the partial kill
     // roll) — you're picking the body clean.
     for (const lootName of enemy.loot ?? []) {
-      const lk = lookupCraftedItem(lootName);
+      // OTA-961 — same canonical/trophy resolution as the kill path.
+      const lk = resolveLootItem(lootName, enemy.rarity);
       grants.push({
         id: `ko_${stamp}_${n++}`,
-        name: lootName,
+        name: lk.name,
         kind: lk.kind,
         rarity: lk.rarity,
         quantity: 1,
