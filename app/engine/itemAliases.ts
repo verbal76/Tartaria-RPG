@@ -15,6 +15,10 @@
 // as a scene feature → salvage redirect path.
 
 const ALIAS_MAP: Record<string, string> = {
+  // OTA-938 — loot-name near-duplicate: the Aetheric Phoenix authored 'Aetherwing' while
+  // the catalog's material is 'Aether Wing'; the split minted a phantom Common item.
+  'aetherwing': 'Aether Wing',
+
   // Light / illumination — all variants collapse to Aetheric Torch
   'lantern': 'Aetheric Torch',
   'aether lantern': 'Aetheric Torch',

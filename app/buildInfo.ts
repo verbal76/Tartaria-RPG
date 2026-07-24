@@ -16856,4 +16856,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // worn floor (0.15 durability vs KO's HP-scaled 0.15-0.85) — mercy keeps its edge, lethal stops being a loot tax.
 // (4) The never-implemented Rare "one item upgraded" promise is deleted from the roll comment (candidate feature, see
 // HANDOFF). typecheck:ci + typecheck:tests + lint clean; full fast suite green. Loot fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-937-loot-bug-batch';
+// OTA-938 (loot audit fixes II of II — canonical resolution + rarity-aware trophies (port of HAL OTA-961)). The audit's SEV-1: 136
+// of ~190 authored loot names exist in NO catalog, and the exact-match chain minted each as a 2-TC tagless Common misc
+// — every trophy from a big kill was identical junk, inverting the Legendary tier (organic Legendaries ~54 TC EV vs
+// machine ~164-204). New crafting.resolveLootItem, used by ALL drop paths (kill roll, knockout strip, hard-won bonus):
+// (1) findCatalogItem first — case-insensitive + alias-aware — so variant names land on the REAL catalog row with the
+// canonical, STACKABLE name; the Aetherwing/'Aether Wing' split is healed by alias. (2) The exact chain still covers
+// dog gear. (3) An unknown name mints as a TROPHY at the ENEMY'S OWN rarity ('trophy' tag; sellable, no recipe uses
+// it) — a Legendary hide prices like a Legendary find. Roll-time canonicalization keeps the summary line and the
+// granted item in agreement. A data SWEEP test locks the epidemic shut: no loot name from a non-Common enemy can mint
+// the old tagless-Common fallback again. The morning's curated pass decides which trophies become REAL items.
+// typecheck:ci + typecheck:tests + lint clean; full fast suite green. Loot fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-938-loot-resolution';
