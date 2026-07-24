@@ -16867,4 +16867,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // granted item in agreement. A data SWEEP test locks the epidemic shut: no loot name from a non-Common enemy can mint
 // the old tagless-Common fallback again. The morning's curated pass decides which trophies become REAL items.
 // typecheck:ci + typecheck:tests + lint clean; full fast suite green. Loot fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-938-loot-resolution';
+// OTA-939 (curated trophy pass — the audit's 136 uncatalogued names, dispositioned (port of HAL OTA-962)). 35 iconic boss/creature
+// trophies PROMOTED to real authored materials in materials.json — 20 Legendary (Dragon Scale, Titan Core, Phoenix
+// Feather, Kraken Ink, Sentinel Core, the core/heart family...) and 15 Rare (Drake Scale, Serpent Fang, Clockwork
+// Core...), each with rarity, thematic tags, and in-voice descriptions; big hunts now feed real, catalog-priced stock
+// (materials 51 -> 86; Rare pool 9 -> 24, Legendary 8 -> 28 — this is also the stock the boss spoils table draws from).
+// 2 PROVABLE synonyms aliased (Aetheric Residue/Crystal -> their Aether-prefixed catalog rows). Everything else stays a
+// deliberately rarity-priced trophy: sharing one word does not make two items the same thing (the earlier table's
+// "84 alias candidates" heuristic was overridden as too loose). Tests pin all 35 promotions + both aliases + one
+// stays-a-trophy control. typecheck:ci + typecheck:tests + lint clean; full fast suite green. Content -> HAL + golem
+// (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-939-trophy-curation';
