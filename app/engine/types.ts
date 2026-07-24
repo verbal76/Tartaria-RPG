@@ -1326,9 +1326,13 @@ export interface PlayerCharacter {
    *  inert (kept for save/test back-compat only; nothing reads it). */
   dogRevivedOta938?: boolean;
   /** OTA-941 — latches the one-time owner Mud Siren rematch (refund + re-stage) so it fires once. */
+  /** @deprecated OTA-948 — the rematch was reverted and its load-path wiring removed; this
+   *  flag is inert (kept for save back-compat only; nothing reads or writes it). */
   mudSirenRematchOta941?: boolean;
   /** OTA-942 — latches the one-time owner clean-slate prep (full HP/stamina, gear repaired,
    *  throwables/consumables topped up) that pairs with the OTA-941 rematch. */
+  /** @deprecated OTA-948 — the rematch was reverted and its load-path wiring removed; this
+   *  flag is inert (kept for save back-compat only; nothing reads or writes it). */
   mudSirenRematchOta942?: boolean;
 }
 

@@ -17840,4 +17840,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reach-lookup + log-noun bare-hand tests get the OTA-940 name-strip ("attack with the Mud-FIST Wraps" is a weapon
 // swing, not a punch, for reach too). New batch test; ota934 test retargeted to the list signature. typecheck:ci +
 // typecheck:tests + lint clean; full fast suite green. Combat/content fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-957-correctness-batch';
+// OTA-958 (hygiene batch — audit dead-code retire + dev-grant test backfill). No behavior change. (1)
+// saveSystem's arb89 grantDevGemOnce + OTA-461 grantTestSupplyGiftOnce DELETED — zero callers since the OTA-948/949
+// dev-grant cleanup (stash FIELDS kept for old-save back-compat); a test locks them retired. (2) the inert
+// mudSirenRematchOta941/942 latch fields get the same @deprecated treatment as dogRevivedOta938. (3) coreGuardians
+// drops the never-read `counters` tier field and corrects the stale five-guardian docs (there are NINE Lost Capitals;
+// gear set is 9 weapons / 9 armors; "always 5" -> 9). (4) TEST BACKFILL for OTA-948/949, which shipped without tests:
+// the dev starter grants (gem + crash-test kit) fire at the tutorial NAME-COMMIT exactly once, dev names only; a
+// re-submit re-grants nothing; a non-dev name gets nothing. typecheck:ci + typecheck:tests + lint clean; full fast
+// suite green. Hygiene -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-958-hygiene-batch';
