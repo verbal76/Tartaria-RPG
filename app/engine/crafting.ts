@@ -244,6 +244,14 @@ export function lookupCraftedItem(resultName: string): {
  *       hide prices like a Legendary find, not junk. Trophies carry the 'trophy'
  *       tag (sellable + identifiable; no recipe consumes them). The curated pass
  *       deciding which trophies become REAL items builds on top of this. */
+/** OTA-942 — loot-name synonyms (provable only). Deliberately NOT the ambient pickup
+ *  alias map: pickup aliases assume scene-noun context and misfire on loot names. */
+const LOOT_NAME_ALIASES: Record<string, string> = {
+  'aetherwing': 'Aether Wing',
+  'aetheric residue': 'Aether Residue',
+  'aetheric crystal': 'Aether Crystal',
+};
+
 export function resolveLootItem(rawName: string, enemyRarity?: Rarity): {
   name: string;
   kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc' | 'dog_armor';
@@ -251,8 +259,17 @@ export function resolveLootItem(rawName: string, enemyRarity?: Rarity): {
   tags: string[];
   baseDurability?: number;
 } {
-  const cat = findCatalogItem(rawName);
-  if (cat) return cat;
+  // OTA-942 — exact (case-insensitive, alias-FREE) catalog membership always wins: a
+  // real catalog name must never be rerouted by a pickup alias (v2 audit SEV-2).
+  const direct = findCatalogItem(rawName, { aliases: false });
+  if (direct) return direct;
+  // Loot-name aliases are their own SHORT list — provable synonyms only, separate
+  // from the ambient pickup map whose entries assume scene-noun context.
+  const lootAlias = LOOT_NAME_ALIASES[rawName.trim().toLowerCase()];
+  if (lootAlias) {
+    const cat = findCatalogItem(lootAlias, { aliases: false });
+    if (cat) return cat;
+  }
   const look = lookupCraftedItem(rawName);
   const isMintedFallback = look.kind === 'misc' && look.rarity === 'Common' && look.tags.length === 0;
   if (!isMintedFallback) return { name: rawName, ...look };
@@ -265,7 +282,7 @@ export function resolveLootItem(rawName: string, enemyRarity?: Rarity): {
  *  null for scene features that aren't pickupable items (pillar,
  *  arch, fountain, lever, fissure, etc.). Used by pickup-on-ambient
  *  to decide: grant a real item, or redirect to salvage. */
-export function findCatalogItem(name: string): {
+export function findCatalogItem(name: string, opts?: { aliases?: boolean }): {
   name: string;
   kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc';
   rarity: Rarity;
@@ -278,7 +295,13 @@ export function findCatalogItem(name: string): {
   // harpoon') map to a single canonical catalog item. Aliases
   // give the pickup path 30+ extra recognisable nouns without
   // authoring new catalog entries.
-  const aliased = resolveItemAlias(name);
+  // OTA-942 — opts.aliases === false skips the ambient-noun alias layer. The v2 loot
+  // audit caught why that matters: those aliases were authored for scene PICKUPS
+  // ('rope coil' -> 'Climbing Rope'), and running LOOT names through them backfired —
+  // the old 'aether residue' -> 'Aether Dust' pickup alias silently converted the
+  // REAL recipe material Aether Residue on every drop, and 'Obsidian Shard' ->
+  // 'Aetheric Shard' turned a Legendary enemy's drop into a 3-TC shard.
+  const aliased = opts?.aliases === false ? null : resolveItemAlias(name);
   const q = (aliased ?? name).trim().toLowerCase();
   if (!q) return null;
   const w = WEAPONS.find((x) => x.name.toLowerCase() === q);

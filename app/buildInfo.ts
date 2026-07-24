@@ -16894,4 +16894,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // enemies — the scale materials came from their own loot lists; renaming that family is a separate owner lore call,
 // not taken here.) typecheck:ci + typecheck:tests + lint clean; full fast suite green. Content -> HAL + golem (NOT
 // engine).
-export const OTA_BUILD_ID = '2026-07-24-941-iron-spider-materials';
+// OTA-942 (loot alias precedence — v2 audit SEV-2 regression fix (port of HAL OTA-965)). The OTA-961 resolver reused the
+// AMBIENT-NOUN alias map, whose pickup-oriented entries misfire on loot names: the old 'aether residue' -> 'Aether
+// Dust' pickup alias silently converted the REAL recipe material Aether Residue on every drop (6 enemy sources dead),
+// and 'Obsidian Shard' -> 'Aetheric Shard' turned the Obsidian Sentinel's Legendary drop into a 3-TC shard. Fix:
+// resolveLootItem checks EXACT (case-insensitive, alias-free) catalog membership FIRST — a real catalog name can never
+// be rerouted — and keeps its own short LOOT_NAME_ALIASES list (provable synonyms only). findCatalogItem gains an
+// { aliases: false } opt-out; the ambient PICKUP path is unchanged (default on). Regression tests lock both leaks
+// shut + pickup behavior. typecheck:ci + typecheck:tests + lint clean; full fast suite green. Loot fix -> HAL + golem
+// (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-942-loot-alias-precedence';
