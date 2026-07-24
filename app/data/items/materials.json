@@ -85,6 +85,8 @@
     { "name": "Silt Heart", "rarity": "Rare", "tags": ["mud", "organic"], "description": "The muscle-dense heart of a silt-born creature, gray as the flood that made it. Still warm. Always still warm." },
     { "name": "Siren Scale", "rarity": "Rare", "tags": ["organic", "scale", "aether"], "description": "A Mud Siren's throat-scale, thin as glass. It rings a clean note when struck — the last of her song, keeping." },
     { "name": "Steam Core", "rarity": "Rare", "tags": ["machine", "core"], "description": "A sealed boiler-core from pre-flood steamworks, pressure needle frozen just under the red. Handle warm-side out." },
+    { "name": "Iron Fangs", "rarity": "Uncommon", "tags": ["machine", "fang"], "description": "The paired mandible-blades of an Iron Spider, still edged from the factory that never stopped honing them. Salvagers snap them off matched — a set cuts wire, cable, and arguments." },
+    { "name": "Spider Mechanism", "rarity": "Uncommon", "tags": ["machine", "core"], "description": "The gait-engine of an Iron Spider — eight cam-shafts around a single mud-iron spindle. Wind it and it walks nowhere, patiently, forever. Tinkerers call it the honest heart." },
     { "name": "Wraith Essence", "rarity": "Rare", "tags": ["aether", "organic"], "description": "Condensed residue of an unquiet thing, kept in whatever jar was nearest. It fogs the glass from the inside." }
   ]
 }

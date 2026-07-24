@@ -16887,4 +16887,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // boss payout is impossible by construction. Recipes: the OTA-718 hard-won recipe roll is tripled for bosses (cap 60%).
 // Tests: apex exclusion, tier counts, structural floor, pool stocking. typecheck:ci + typecheck:tests + lint clean;
 // full fast suite green. Loot system -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-940-boss-spoils-table';
+// OTA-941 (Iron Spider materials — owner request (port of HAL OTA-964)). "I'd prefer to get something based off of the Iron
+// Spider." The Iron Spider (Uncommon Automation) authored two drops — Iron Fangs + Spider Mechanism — that the OTA-962
+// curation left as generic trophies; both are now real Uncommon MACHINE materials at the spider's own tier, with
+// in-voice descriptions. (Bestiary fact surfaced in review: Bog Dragon / Mud Drake / Aetheric Wyvern ARE authored
+// enemies — the scale materials came from their own loot lists; renaming that family is a separate owner lore call,
+// not taken here.) typecheck:ci + typecheck:tests + lint clean; full fast suite green. Content -> HAL + golem (NOT
+// engine).
+export const OTA_BUILD_ID = '2026-07-24-941-iron-spider-materials';
