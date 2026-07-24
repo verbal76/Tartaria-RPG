@@ -6,7 +6,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useGameStore, effectiveACBreakdown, playerColdResist } from '../state/gameStore';
+import { useGameStore, effectiveACBreakdown, playerArmorResistKinds } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
@@ -77,7 +77,7 @@ export function CharacterScreen() {
   const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.25 ? '#c9a86a' : '#e07a5f';
   const stamColor = stamPct > 0.4 ? '#9ec96a' : '#c9a86a';
 
-  const breakdown = effectiveStatsBreakdown(player, weatherStatModifiers(scene?.weather ?? null, playerColdResist(player)));
+  const breakdown = effectiveStatsBreakdown(player, weatherStatModifiers(scene?.weather ?? null, playerArmorResistKinds(player)));
   // OTA-836 — full AC breakdown (base + armor + title + stance), matching what
   // the combat resolver actually stands on (the old sheet showed only race base +
   // context, dropping equipped armor). The DEFENSE card renders acBd.total + chips.

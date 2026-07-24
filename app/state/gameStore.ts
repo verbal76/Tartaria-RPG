@@ -4597,7 +4597,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // day). Per playtester: night = better cover, daytime = exposed.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { stealthTimeBonus } = require('../engine/timeOfDay');
-    const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerColdResist(player)));
+    const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerArmorResistKinds(player)));
     const timeBonus = stealthTimeBonus(player.hoursElapsed);
     const roll = rollDie(20);
     // OTA-348 — pickpocket / sleight-of-hand now rolls Stealth (was DEX).
@@ -9115,7 +9115,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
           const range = currentScene.range ?? 'close';
-          const barehand = isBareHandAttack(trimmed);
+          // OTA-934 — same fix as the damage site (OTA-940), which this reach lookup missed:
+          // a swung weapon whose NAME contains a body word ("Mud-FIST Wraps") tripped the
+          // bare-hand test and resolved reach as Bare hands. Strip the equipped weapon's
+          // name from the text first, and honor the 'barehanded' tag as a real weapon.
+          const reachOffHand = /\boff[- ]?hand\b/i.test(trimmed);
+          const reachSwungInst = (() => {
+            const id = reachOffHand
+              ? (player.equipped?.offId ?? null)
+              : (player.equipped?.mainId ?? player.equipped?.offId ?? null);
+            return id ? (player.inventory.find((i) => i.id === id) ?? null) : null;
+          })();
+          const reachHandWeapon = !!reachSwungInst && (reachSwungInst.tags ?? []).includes('barehanded');
+          const reachBareText = reachSwungInst?.name
+            ? trimmed.toLowerCase().split(reachSwungInst.name.toLowerCase()).join(' ')
+            : trimmed;
+          const barehand = isBareHandAttack(reachBareText) && !reachHandWeapon;
           // OTA 027 — when the player typed "off-hand" / "off hand"
           // / "offhand" in the attack target, route the reach lookup
           // to the off-hand slot so reach.label + bands reflect the
@@ -9173,7 +9188,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
-          const visPenalty = weatherAttackPenalty(currentScene.weather, playerColdResist(player));
+          const visPenalty = weatherAttackPenalty(currentScene.weather, playerArmorResistKinds(player));
           if (visPenalty > 0) {
             // Announce the swing penalty only the FIRST time this weather
             // bites in the current fight. It doesn't change round-to-round,
@@ -9208,7 +9223,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const steps = buildCombatSteps(trimmed, player, targetEnemy, {
             visibilityPenalty: visPenalty,
             visibilityLabel: currentScene.weather?.name,
-            weatherMod: weatherStatModifiers(currentScene.weather, playerColdResist(player)),
+            weatherMod: weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)),
             statusMods,
             pointBlankBonus,
             // OTA-362 — acid-coating armor shred on the active enemy.
@@ -9512,7 +9527,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 break;
               }
               // Sturdy — STR roll vs DC 12. Stamina + time burn either way.
-              const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerColdResist(player)));
+              const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
               const roll = rollDie(20);
               const total = roll + stats.strength;
               const success = total >= 12;
@@ -10856,7 +10871,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const invRelicTarget = /relic|ancient|tartarian|statue|sentinel|aetherstone|artifact|rune|monument|obelisk|automaton|machine|spire|throne|giant/.test(invCtxNoun);
           const invInRuins = (currentScene?.location?.tags ?? []).some((t) => /ruin|buried|capital|cathedral|tomb|vault|dig|labyrinth/.test(String(t).toLowerCase()));
           const steps = buildSkillSteps('investigate', player, {
-            weatherMod: weatherStatModifiers(currentScene.weather, playerColdResist(player)),
+            weatherMod: weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)),
             companionAssist: !!player.companion,
             raceCtx: { relicTarget: invRelicTarget, inRuins: invInRuins },
           });
@@ -11481,7 +11496,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
         const steps = buildSkillSteps(parsed.intent, player, {
-          weatherMod: weatherStatModifiers(currentScene.weather, playerColdResist(player)),
+          weatherMod: weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)),
           companionAssist: !!player.companion,
           raceCtx: { relicTarget, inRuins },
         });
@@ -13354,7 +13369,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (enemyHit) {
           // Improvised ranged attack at -2. Quick narration, no full dice
           // prompt — this is a desperate action, not a primary attack mode.
-          const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerColdResist(player)));
+          const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
           const roll = rollDie(20);
           const total = roll + stats.dexterity - 2;
           // 2026-05-25 — use parseEnemyAP. parseInt of "Strength 4"
@@ -13668,7 +13683,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        const climbStats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerColdResist(player)));
+        const climbStats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { inventoryHasGate: ihg } = require('../engine/itemEffect');
         // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -14775,7 +14790,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the roll instead of vanishing silently.
         const liveFx = get().player?.statusEffects;
         const steps = buildSkillSteps(maneuverKind, player, {
-          weatherMod: weatherStatModifiers(currentScene.weather, playerColdResist(player)),
+          weatherMod: weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)),
           companionAssist: !!player.companion,
           statusMods: rollMods(liveFx, 'skill'),
         });
@@ -14850,7 +14865,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'world',
           `You squeeze ${burstCount} shots out of the ${equipped.name}. Each takes a stacking penalty die.`,
         );
-        const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerColdResist(player)));
+        const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
         const statVal = stats[equipped.stat];
         const statLabel = equipped.stat.slice(0, 3).toUpperCase();
         let livingHp = currentScene.enemyHps[currentScene.activeEnemyIdx] ?? targetEnemy.hp;
@@ -15481,7 +15496,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? matchAmbientNoun(stealTarget, currentScene.ambientNouns ?? [])
           : null;
         if (ambient) {
-          const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerColdResist(player)));
+          const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
           const roll = rollDie(20);
           const total = roll + stats.stealth; // OTA-348 — sleight-of-hand rolls Stealth
           const success = total >= 10;
@@ -18894,7 +18909,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const prevAttempts = Math.max(scene.vendor.stealAttempts ?? 0, decayedStealHeat);
     const dc = baseDc + prevAttempts * 2;
     // Use effectiveStats so buffs / equipment / weather count.
-    const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerColdResist(player)));
+    const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerArmorResistKinds(player)));
     const roll = rollDie(20);
     const total = roll + stats.stealth; // OTA-348 — vendor theft rolls Stealth
     const success = total >= dc;
@@ -24071,7 +24086,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { isCoatableItem, coatedDisplayName, nextCoatSlot } = require('../engine/weaponCoating');
+    const { isCoatableItem, coatedDisplayName, nextCoatSlot, coatingCapacity } = require('../engine/weaponCoating');
     // OTA-453 — instance-aware: a FUSED weapon is catalog-absent (its stats live
     // on the instance), so the old name-only isCoatableWeapon always refused it.
     if (!isCoatableItem(weapon)) {
@@ -24086,6 +24101,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-922 — when every usable slot is full, the UI sends WHICH slot to overwrite
     // (a picker), so a coating is never blindly scrubbed off slot 1. Default to slot 1
     // for safety / older callers.
+    // OTA-934 — the store validates the caller's slot choice instead of trusting it: a
+    // programmatic replaceSlot: 'coating2' on a 1-slot weapon would stamp an illegal
+    // dual coat that combat honors (the UI can't send it — its picker only offers
+    // slots that exist — but "default to slot 1 for safety" must actually be enforced).
+    if (replaceSlot === 'coating2' && coatingCapacity(weapon) < 2) {
+      get().appendLog('world', `The ${weapon.name} has no second coating slot to fill.`);
+      return;
+    }
     const replaceField: 'coating' | 'coating2' = replaceSlot === 'coating2' ? 'coating2' : 'coating';
     const replaced = coatSlot === 'replace' ? (weapon[replaceField] ?? weapon.coating) : null;
     const addedSecond = coatSlot === 'coating2';
@@ -24940,7 +24963,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = get().currentScene;
     const scrapStats = effectiveStats(
       get().player!,
-      weatherStatModifiers(scene?.weather ?? null, playerColdResist(player)),
+      weatherStatModifiers(scene?.weather ?? null, playerArmorResistKinds(player)),
     );
     const successP = scrapSuccessChance(scrapStats.intelligence, scrapStats.dexterity);
     let rolled = Math.random() < successP;
@@ -26181,7 +26204,7 @@ function runMoveCombatRange(
   scene: CurrentScene,
   direction: 'advance' | 'retreat',
 ): void {
-  const cost = weatherRepositionCost(scene.weather, playerColdResist(player));
+  const cost = weatherRepositionCost(scene.weather, playerArmorResistKinds(player));
   get().appendLog(
     'debug',
     `move: ${direction} from range=${scene.range ?? '-'} enemies=${scene.enemies.length} weather=${scene.weather?.name ?? '-'} cost=${cost} partial=${scene.repositionPartial ?? 0}`,
@@ -30041,7 +30064,7 @@ function runAethercraft(
   const { effectiveStats } = require('../engine/equipment');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { weatherStatModifiers } = require('../engine/weatherEffects');
-  const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerColdResist(player)));
+  const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerArmorResistKinds(player)));
   const racialBonus = aethercraftStatBonus(player.raceId);
   const stat: keyof PlayerCharacter['stats'] = discipline === 'mend' ? 'wisdom' : 'intelligence';
   const statValue = stats[stat] + (racialBonus[stat] ?? 0);
@@ -32233,7 +32256,13 @@ function swingWeaponNoun(
   );
   if (rNounIsWeapon) return rNoun;
   if (/\boff[- ]?hand\b/i.test(actionText)) return player?.equipped?.off ?? null;
-  if (isBareHandAttack(actionText)) return null;
+  // OTA-934 — strip equipped weapon names before the bare-hand test (same class of bug as
+  // OTA-940): "attack with the mud-fist wraps" is a weapon swing, not a punch.
+  let bareNounText = actionText.toLowerCase();
+  for (const n of [player?.equipped?.main, player?.equipped?.off]) {
+    if (n) bareNounText = bareNounText.split(n.toLowerCase()).join(' ');
+  }
+  if (isBareHandAttack(bareNounText)) return null;
   return player?.equipped?.main ?? null;
 }
 

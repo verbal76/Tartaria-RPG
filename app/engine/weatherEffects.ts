@@ -118,7 +118,27 @@ const WEATHER_RESIST_ELEMENT: Record<string, string> = {
   lightning: 'electrical',
   flame: 'burn',
   burn: 'burn',
+  // OTA-934 — black rain's bite is a corruption notch, and corruption has been a first-class
+  // armour resist since OTA-874; its 'tainted' tag was simply never mapped, so a
+  // corruption-coated piece silently did nothing against it. Plain 'rain' stays unmapped
+  // (wetness is not an element), and psychic fog stays uncounterable BY DESIGN — some
+  // weather you can only endure.
+  tainted: 'corruption',
 };
+
+/** OTA-934 — does the player's armour resist list counter this weather's element? ANY mapped
+ *  tag covered cancels — the same rule tickWeather has applied since OTA-946, now shared
+ *  by the penalty/stat helpers too, so preparation defeats the WHOLE weather, not just
+ *  its damage tick ("I coated for the storm — why am I still slowed?"). */
+export function weatherCounteredByResists(weather: WeatherEntry | null, resistKinds: string[]): boolean {
+  if (!weather || resistKinds.length === 0) return false;
+  const resisted = new Set(resistKinds.map((k) => k.toLowerCase()));
+  for (const tag of weather.tags ?? []) {
+    const el = WEATHER_RESIST_ELEMENT[tag];
+    if (el && resisted.has(el)) return true;
+  }
+  return false;
+}
 
 // Roll the weather's effect on this action. Returns a zero tick if nothing
 // triggered. `resistKinds` is the player's armour resist list (lowercased); a match
@@ -126,13 +146,7 @@ const WEATHER_RESIST_ELEMENT: Record<string, string> = {
 export function tickWeather(weather: WeatherEntry | null, player: PlayerCharacter, resistKinds: string[] = []): WeatherTick {
   if (!weather) return ZERO_TICK;
   // OTA-934/946 — a matching armour resist (coating) shrugs off this weather's element.
-  if (resistKinds.length) {
-    const resisted = new Set(resistKinds.map((k) => k.toLowerCase()));
-    for (const tag of weather.tags ?? []) {
-      const el = WEATHER_RESIST_ELEMENT[tag];
-      if (el && resisted.has(el)) return ZERO_TICK;
-    }
-  }
+  if (weatherCounteredByResists(weather, resistKinds)) return ZERO_TICK;
   const cfg = WEATHER_EFFECTS[weather.id];
   if (!cfg) return ZERO_TICK;
   if (Math.random() > cfg.prob) return ZERO_TICK;
@@ -154,9 +168,10 @@ export function weatherBlocksRepositioning(weather: WeatherEntry | null): boolea
  * Silent Blizzard). The scene tracks partial progress so the player can
  * see they're making headway across multiple turns.
  */
-export function weatherRepositionCost(weather: WeatherEntry | null, coldResist = false): number {
+export function weatherRepositionCost(weather: WeatherEntry | null, resistKinds: string[] = []): number {
   if (!weather) return 1;
-  if (coldResist && (weather.tags ?? []).includes('cold')) return 1;
+  // OTA-934 — was cold-only; now any matching element resist moves freely in its weather.
+  if (weatherCounteredByResists(weather, resistKinds)) return 1;
   if (weather.id === 'iron_fog' || weather.id === 'silent_blizzard') return 2;
   return 1;
 }
@@ -166,9 +181,10 @@ export function weatherRepositionCost(weather: WeatherEntry | null, coldResist =
  * weather. Iron fog blinds, ash storm chokes, etc. Stacks with the
  * existing blindSwing penalty when both apply.
  */
-export function weatherAttackPenalty(weather: WeatherEntry | null, coldResist = false): number {
+export function weatherAttackPenalty(weather: WeatherEntry | null, resistKinds: string[] = []): number {
   if (!weather) return 0;
-  if (coldResist && (weather.tags ?? []).includes('cold')) return 0;
+  // OTA-934 — was cold-only; now any matching element resist sees clearly in its weather.
+  if (weatherCounteredByResists(weather, resistKinds)) return 0;
   switch (weather.id) {
     case 'iron_fog': return 2;       // can barely see the target
     case 'whisper_fog': return 1;    // mild visibility loss
@@ -198,9 +214,7 @@ export interface StatModifier {
  *
  * Stacks with race / faction / equipment bonuses in effectiveStats().
  */
-export function weatherStatModifiers(weather: WeatherEntry | null, coldResist = false): StatModifier {
-  if (!weather) return {};
-  if (coldResist && (weather.tags ?? []).includes('cold')) return {};
+function baseWeatherStatModifiers(weather: WeatherEntry): StatModifier {
   switch (weather.id) {
     case 'iron_fog':         return { dexterity: -1 };
     case 'silent_blizzard':  return { dexterity: -1, strength: -1 };
@@ -213,6 +227,21 @@ export function weatherStatModifiers(weather: WeatherEntry | null, coldResist = 
     case 'calm':             return { wisdom: 1 };
     default: return {};
   }
+}
+
+export function weatherStatModifiers(weather: WeatherEntry | null, resistKinds: string[] = []): StatModifier {
+  if (!weather) return {};
+  const base = baseWeatherStatModifiers(weather);
+  if (!weatherCounteredByResists(weather, resistKinds)) return base;
+  // OTA-934 — a matching resist shrugs off the weather's PENALTIES only. Its buffs (the
+  // Aether-resonance +INT under an electrical storm) are not harm to be soaked — an
+  // insulated player keeps them. All-negative weathers (a blizzard vs a cold coat)
+  // reduce to {} exactly as the old cold-only rule did.
+  const kept: StatModifier = {};
+  for (const [k, v] of Object.entries(base) as [keyof StatModifier, number][]) {
+    if (v > 0) kept[k] = v;
+  }
+  return kept;
 }
 
 /** Human-readable summary of the active weather modifiers for the UI. */
