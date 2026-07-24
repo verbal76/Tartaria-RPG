@@ -17799,17 +17799,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // good rare." Roll count scales with rarity:
     //   Common    → 1-2 items
     //   Uncommon  → 2-3 items
-    //   Rare      → 2-3 items (one upgraded to next rarity if pool allows)
+    //   Rare      → 2-3 items
     //   Legendary → 3-4 items
     // Picks WITH replacement so we can roll dupes (a wagon-driver
     // dropping two patched cloths reads honest).
-    const lootPool = enemy.loot.length > 0 ? enemy.loot : ['Aether dust'];
+    // OTA-937 — an EMPTY loot list on a BOSS is intentional (its rewards are deterministic
+    // overlays: Core + signature gear, Beacon + Skyreacher piece, the stash-side
+    // Resurrection Gem) — the dust fallback was minting 3-4 junk items at the game's
+    // climax. It now only pads lazily-authored NON-boss lists, and mints the catalog's
+    // real, stackable 'Aether Dust' (the old lowercase string could never stack).
+    const lootPool = enemy.loot.length > 0 ? enemy.loot : enemy.boss ? [] : ['Aether Dust'];
     const lootRollCount = enemy.rarity === 'Legendary' ? 3 + Math.floor(Math.random() * 2)
       : enemy.rarity === 'Rare' ? 2 + Math.floor(Math.random() * 2)
       : enemy.rarity === 'Uncommon' ? 2 + Math.floor(Math.random() * 2)
       : 1 + Math.floor(Math.random() * 2);
     const lootDrops: string[] = [];
-    for (let i = 0; i < lootRollCount; i++) {
+    for (let i = 0; i < lootRollCount && lootPool.length > 0; i++) {
       lootDrops.push(lootPool[Math.floor(Math.random() * lootPool.length)]!);
     }
     // OTA-603 — occasional dog-vest drop (the vests were authored but never
@@ -17832,7 +17837,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .map(([n, q]) => (q > 1 ? `${n} ×${q}` : n))
         .join(', ');
     })();
-    get().appendLog('reward', `${enemy.name} defeated. You recover ${lootSummary}.`);
+    // OTA-937 — nothing rolled (boss with an intentionally-empty pool, before its
+    // deterministic reward lines print from their own grants) -> no empty "You recover".
+    if (lootDrops.length > 0) {
+      get().appendLog('reward', `${enemy.name} defeated. You recover ${lootSummary}.`);
+    } else {
+      get().appendLog('reward', `${enemy.name} defeated.`);
+    }
     // OTA-366 — a signature weapon (the Order's Hollow Edge) can't be taken,
     // even off a corpse; surface why and leave it. Deduped per scene (arb-fix).
     if (enemy.signatureWeapon) {
@@ -17919,6 +17930,61 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       };
     });
+    // OTA-937 — KILL/KO PARITY. The kit a humanoid VISIBLY fought with (carries: weapons /
+    // armor / TC) transferred only on the KNOCKOUT loot path — killing IGNORED it, so a
+    // lethal run was strictly poorer against humans and KO was the only rational play.
+    // A kill now strips the body too, at the WORN floor: the KO path scales looted
+    // durability by the foe's remaining HP (0.15-0.85 of max — a barely-subdued foe
+    // yields the best kit); a corpse's kit took the whole fight, so it lands at that
+    // scale's floor (0.15). Mercy keeps a real edge; lethal stops being a loot tax.
+    // TC transfers only when authored — no bonus roll (the kill rolled its loot above).
+    {
+      const carries = enemy.carries ?? {};
+      const kitNames = [...(carries.weapons ?? []), ...(carries.armor ?? [])];
+      const kitTc = carries.tc ?? 0;
+      if (kitNames.length > 0 || kitTc > 0) {
+        const stamp = Date.now();
+        let kn = 0;
+        const kitGrants: InventoryItem[] = [];
+        for (const wName of carries.weapons ?? []) {
+          const w = findWeaponByName(wName) ?? inferWeapon(wName);
+          const base = w.baseDurability ?? 10;
+          kitGrants.push({
+            id: `kill_kit_${stamp}_${kn++}`,
+            name: wName,
+            kind: 'weapon',
+            rarity: w.rarity,
+            quantity: 1,
+            tags: [...(w.tags ?? []), 'loot'],
+            durability: { current: Math.max(1, Math.round(base * 0.15)), max: base },
+          });
+        }
+        for (const aName of carries.armor ?? []) {
+          const a = findArmorByName(aName) ?? inferArmor(aName);
+          const base = a?.baseDurability ?? 10;
+          kitGrants.push({
+            id: `kill_kit_${stamp}_${kn++}`,
+            name: aName,
+            kind: 'armor',
+            rarity: a?.rarity,
+            quantity: 1,
+            tags: [...(a?.tags ?? []), 'loot'],
+            durability: { current: Math.max(1, Math.round(base * 0.15)), max: base },
+          });
+        }
+        set((s2) => {
+          if (!s2.player) return s2;
+          let inv = s2.player.inventory;
+          for (const kg of kitGrants) inv = mergeOrPushItem(inv, kg);
+          return { player: { ...s2.player, inventory: inv, tc: s2.player.tc + kitTc } };
+        });
+        get().appendLog(
+          'reward',
+          `You strip the body: ${kitNames.join(', ') || 'nothing worth keeping'}${kitTc > 0 ? ` (+${kitTc} TC)` : ''}. The kit took the fight badly.`,
+        );
+      }
+    }
+
     // OTA-699 — hard-won spoils. A long/tough fight occasionally coughs up a
     // GOOD material ON TOP of the normal loot (never instead of it) — a
     // Fallout-4-ish sprinkle that rewards the grind without touching the
