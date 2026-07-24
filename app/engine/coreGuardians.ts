@@ -174,6 +174,43 @@ export function guardianOverLevel(player: PlayerCharacter, tier: GuardianTier): 
   return Math.min(1.9, Math.max(1, guardianPlayerPower(player) / expected));
 }
 
+/** OTA-954 — MONOTONE STAGING FLOOR. At a FIXED player power, the next tier's bigger
+ *  expected-power divisor makes `over` DROP, and in the early tiers it drops faster
+ *  than the tier's hpMult step climbs — so an over-leveled player could meet a NEXT
+ *  Guardian that staged out WEAKER (e.g. power 20: T1 = 69 HP, T2 = 67), and the AP
+ *  delta could dip 2 while acBonus rose only 1 — inverting the OTA-926 "each fight a
+ *  bit tougher than the last" promise (its test held power fixed, so a power × tier
+ *  sweep never ran; a review simulation found 134 inverting cells over power 10-60).
+ *  Rather than retune hpMult/acBonus (the authored curve is deliberate), each tier
+ *  stages as the RUNNING MAX over all tiers up to it at the SAME power: on-curve
+ *  fights stage byte-identically (at over = 1 the authored curve is already
+ *  monotone); only the small dip cells get lifted, by exactly enough (HP strictly
+ *  +1 over the previous tier). Still a spawn-time read of the player — no loop. */
+export function monotoneTierHp(player: PlayerCharacter, tier: GuardianTier): number {
+  let run = 0;
+  for (let k = 1; k <= tier; k++) {
+    const t = k as GuardianTier;
+    const hpK = Math.round(CANON_BASE_HP * TIER_PROFILES[t].hpMult * guardianOverLevel(player, t));
+    run = k === 1 ? hpK : Math.max(hpK, run + 1);
+  }
+  return run;
+}
+
+/** OTA-954 — the same floor for the tier's AP delta (acBonus + over-level power bonus).
+ *  AC and attack-to-hit BOTH derive from abilityPoint, so this keeps the Guardian's
+ *  threat monotone across tiers too. Non-strict (AP is coarse; equal threat across a
+ *  tier boundary is acceptable — HP already strictly climbs). */
+export function monotoneTierApDelta(player: PlayerCharacter, tier: GuardianTier): number {
+  let run = 0;
+  for (let k = 1; k <= tier; k++) {
+    const t = k as GuardianTier;
+    const over = guardianOverLevel(player, t);
+    const d = TIER_PROFILES[t].acBonus + Math.round((over - 1) * 8);
+    run = k === 1 ? d : Math.max(d, run);
+  }
+  return run;
+}
+
 /** Returns the live-fight Enemy for the Guardian at this Capital,
  *  scaled to the player's current kill count AND actual power. Returns
  *  null when the locationId is not a Lost Capital. */
@@ -195,8 +232,12 @@ export function spawnGuardianForCapital(
   // Guardians use a canonical base × the tier's hpMult; the final Guardian (last Core
   // in the run) is the game's last boss — a fixed ~20-round wall. Over-level applies to
   // both (upward-only), so an over-prepared player still meets a real fight.
-  const baseHp = isFinalGuardian(coresCount) ? FINAL_GUARDIAN_HP : CANON_BASE_HP * profile.hpMult;
-  const hp = Math.round(baseHp * over);
+  // OTA-954 — non-final tiers stage through the monotone floor (see monotoneTierHp);
+  // the final wall is already far above tier 8's ceiling, so it keeps its direct
+  // override (the floor would be a no-op there).
+  const hp = isFinalGuardian(coresCount)
+    ? Math.round(FINAL_GUARDIAN_HP * over)
+    : monotoneTierHp(player, tier);
   // Bump the abilityPoint number — engine's enemyAC() derives base
   // AC from `5 + apNum`, so increasing the AP by the tier's
   // acBonus (+ the player-power bonus) pipes the scaling through the
@@ -206,9 +247,9 @@ export function spawnGuardianForCapital(
   const apMatch = apStr.match(/^(\w+)\s+(\d+)/);
   const statName = apMatch ? apMatch[1] : 'Strength';
   const apNum = apMatch ? parseInt(apMatch[2]!, 10) : 6;
-  // +0 at/under the tier curve, up to +7 for a heavily over-leveled player.
-  const powerBonus = Math.round((over - 1) * 8);
-  const scaledAp = `${statName} ${apNum + profile.acBonus + powerBonus}`;
+  // OTA-954 — tier acBonus + over-level power bonus (+0 at/under the curve, up to +7
+  // heavily over-leveled), floored monotone across tiers via monotoneTierApDelta.
+  const scaledAp = `${statName} ${apNum + monotoneTierApDelta(player, tier)}`;
   // Merge traits: signature + tier extras. Deduped.
   const traits = Array.from(new Set([
     CORE_GUARDIAN_TRAIT,

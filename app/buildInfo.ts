@@ -17801,4 +17801,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ExplorationScreen chip mirror (merged pool split; searched keeps its historical loose rule + self-heal). Sweep: all
 // 10 letter collisions eliminated, 0 new cross-prop matches. Dedicated test added. typecheck:ci + typecheck:tests +
 // lint clean; full fast suite green. Content/UX fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-953-flavor-noun-word-match';
+// OTA-954 (Guardian ramp is monotone at every power, not just on-curve). Review sim found 134 power-x-tier cells where
+// the NEXT Guardian staged out WEAKER (power 20: T1 69 HP -> T2 67; AP dips of 1-2): at fixed power the next tier's
+// bigger expected-power divisor shrinks the over-level factor faster than the early hpMult/acBonus steps grow —
+// inverting OTA-926's "each fight tougher than the last" (its test held power fixed). Fix is a MONOTONE STAGING FLOOR,
+// not a retune: each tier stages as the running max over all tiers at the same power (HP strictly +1 over the previous
+// tier, AP non-decreasing). On-curve fights stage byte-identically to the authored curve (test-locked 59/67/76/84/92/
+// 101/168/231); only the 1-3 point dip cells lift. Final-wall override, over-level cap 1.9, and all tuning knobs
+// untouched; still a spawn-time read (no feedback loop). New power-x-tier sweep test covers the missed dimension.
+// typecheck:ci + typecheck:tests + lint clean; full fast suite green. Balance fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-954-guardian-monotone-staging';
