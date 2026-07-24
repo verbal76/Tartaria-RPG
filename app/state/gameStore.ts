@@ -287,6 +287,7 @@ import { parseWeaponEffect, rollEffectBonusDamage } from '../engine/weaponEffect
 import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { nounTokensMatch } from '../engine/ambientNounMatch';
+import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
 import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
 import { classifyNoun, rollBreakLoot } from '../engine/sceneNounMaterial';
@@ -3322,6 +3323,10 @@ interface GameStore {
    *  Resets on: scene change, weapon change, non-resisted hit, miss, or
    *  attack against a different enemy. Not persisted. */
   weaponResistStreak: { enemyName: string; damageType: string; count: number } | null;
+  /** OTA-959 — once-per-encounter latch for the combat legibility cues (soak praise / leak
+   *  warning — see engine/combatCues). Keyed by the fight's tile so each encounter gets
+   *  each cue at most once; a new fight re-arms them. Not persisted. */
+  combatCues: { key: string; soak: boolean; leak: boolean } | null;
   /** Set when a slot load fails — UI surfaces this and offers recovery. */
   slotLoadError: string | null;
   /** arb38 — ids of slots that crashed the app on load last session
@@ -4221,6 +4226,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   hydrated: false,
   lowHpWarned: false,
   weaponResistStreak: null,
+  combatCues: null,
   aetherStatPickerOpen: false,
   fusionPickerOpen: false,
   pendingFusionSelection: null,
@@ -17083,6 +17089,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // slashing-resistant foe. Prefer types it's outright weak to.
               const weakTypes = new Set<string>();
               const neutralTypes = new Set<string>();
+              // OTA-959 — remember a concrete carried weapon per suggested type so the
+              // nudge can NAME it ("Swap to the Boltcaster") instead of leaving the
+              // player to grep their own pack for "something electrical".
+              const nameByType = new Map<string, string>();
               try {
                 for (const it of player.inventory) {
                   if (it.kind !== 'weapon') continue;
@@ -17093,14 +17103,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     applyDamageTypeModifier(1, w.damageType, enemy.type).match,
                     traitDamageMultiplier(enemy.traits, w.damageType).match,
                   );
-                  if (alt.match === 'weak') weakTypes.add(w.damageType);
-                  else if (alt.match === 'normal') neutralTypes.add(w.damageType);
+                  if (alt.match === 'weak') {
+                    weakTypes.add(w.damageType);
+                    if (!nameByType.has(w.damageType)) nameByType.set(w.damageType, it.name);
+                  } else if (alt.match === 'normal') {
+                    neutralTypes.add(w.damageType);
+                    if (!nameByType.has(w.damageType)) nameByType.set(w.damageType, it.name);
+                  }
                   // 'resist' → skip; never suggest a type the enemy resists.
                 }
               } catch { /* ignore — hint stays generic */ }
               const altTypes = weakTypes.size > 0 ? weakTypes : neutralTypes;
-              const hint = altTypes.size > 0
-                ? `Try something ${Array.from(altTypes).slice(0, 2).join(' or ')} — you have it in your pack.`
+              const altArr = Array.from(altTypes).slice(0, 2);
+              // OTA-959 — name the weapon when we know one; the type-only phrasing stays
+              // as the fallback for a type carried only in odd forms.
+              const namedPick = altArr.map((t) => nameByType.get(t)).find(Boolean);
+              const hint = altArr.length > 0
+                ? namedPick
+                  ? `Swap to the ${namedPick} — ${altArr.join(' or ')} will bite where ${weaponType} won't.`
+                  : `Try something ${altArr.join(' or ')} — you have it in your pack.`
                 : `Find another weapon — ${weaponType} isn't biting.`;
               get().appendLog(
                 'arbiter',
@@ -28667,6 +28688,35 @@ function applyEnemyCounter(
       }
       return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
+
+    // OTA-959 — LEGIBILITY CUES (once per encounter, after the damage line). A matched
+    // resist that soaked >=40% earns one plain-language callout; an elemental hit that
+    // NOTHING in the loadout touched earns one "that's a hole" warning. The bracket
+    // clause on every hit stays the terse record — these are the legible sentence.
+    if (!killed) {
+      const cueKey = `${player.currentLocationId}|${player.mapX},${player.mapY}|${player.hubRoomId ?? ''}`;
+      const prevCues = get().combatCues;
+      const cues = prevCues && prevCues.key === cueKey
+        ? prevCues
+        : { key: cueKey, soak: false, leak: false };
+      const cue = incomingHitCue({
+        rawDmg,
+        dmg,
+        armorBlocked: resisted.blocked,
+        armorFraction: resisted.fraction,
+        otherLayerFired: titleAethericHalved || titleHazardShaved > 0 || !!raceResistTag || !!shieldTag || !!wardTag,
+        damageType: enemyDamageType,
+      });
+      if (cue === 'soak' && !cues.soak) {
+        set(() => ({ combatCues: { ...cues, soak: true } }));
+        void Promise.resolve().then(() => get().appendLog('combat', soakCueLine(enemyDamageType, rawDmg, dmg)));
+      } else if (cue === 'leak' && !cues.leak) {
+        set(() => ({ combatCues: { ...cues, leak: true } }));
+        void Promise.resolve().then(() => get().appendLog('combat', leakCueLine(enemyDamageType)));
+      } else if (!prevCues || prevCues.key !== cueKey) {
+        set(() => ({ combatCues: cues }));
+      }
+    }
 
     if (newEffect) {
       const verb = newEffect.isNew ? 'inflicts' : 'refreshes';

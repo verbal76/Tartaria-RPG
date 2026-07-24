@@ -17849,4 +17849,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the dev starter grants (gem + crash-test kit) fire at the tutorial NAME-COMMIT exactly once, dev names only; a
 // re-submit re-grants nothing; a non-dev name gets nothing. typecheck:ci + typecheck:tests + lint clean; full fast
 // suite green. Hygiene -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-958-hygiene-batch';
+// OTA-959 (LEGIBILITY LAYER — combat rebalance pass III of III; pass II 'matched progression' is deliberately
+// HELD, see HANDOFF 8.B3). Owner brief: players should SEE their builds/gear/resists doing something — forefront of
+// mind, not micromanaged. Three cues, all once-per-encounter (new transient combatCues latch keyed by the fight's
+// tile): (1) SOAK praise — when a matched armor/coating resist eats >=40% of a hit, one plain-language line names the
+// resist and the numbers ("that's your cold resist working — 3 of 10 got through"); the terse [armor -40%] bracket
+// stays the per-hit record. (2) LEAK warning — when an elemental hit lands that NOTHING in the loadout touched (no
+// armor match, no title/race/shield/ward) and it actually hurt (>=4), one line names the missing resist and points at
+// coatings. Physical hits never nag (unresisted physical is normal combat). (3) The OTA-197 swap-nudge now NAMES a
+// carried weapon ("Swap to the Boltcaster — electrical will bite where piercing won't") instead of just a type. Pure
+// decision rules live in new engine/combatCues.ts with unit tests. typecheck:ci + typecheck:tests + lint clean; full
+// fast suite green. Combat-feel -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-959-legibility-layer';
