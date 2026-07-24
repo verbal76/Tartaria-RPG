@@ -166,36 +166,12 @@ export async function ensureFirstInstallSeed(): Promise<{ seeded: boolean; gems:
   return { seeded: true, gems: stash.resurrectionGems };
 }
 
-/** arb89 — one-time proactive Resurrection Gem for a dev character
- *  (Verbal / Sasmooch). Grants a gem the first time that specific slot
- *  is recognized as a dev name, so the dev (or the dev's spouse playing
- *  Sasmooch) has a gem in hand WITHOUT dying first and WITHOUT restarting
- *  the character. Idempotent per slot key — re-loading the same save
- *  never re-grants. */
-export async function grantDevGemOnce(slotKey: string): Promise<{ granted: boolean; gems: number }> {
-  const stash = await loadGlobalStash();
-  const already = stash.devGemGrantedSlots ?? [];
-  if (already.includes(slotKey)) {
-    return { granted: false, gems: stash.resurrectionGems };
-  }
-  stash.devGemGrantedSlots = [...already, slotKey];
-  stash.resurrectionGems = (stash.resurrectionGems ?? 0) + 1;
-  await saveGlobalStash(stash);
-  return { granted: true, gems: stash.resurrectionGems };
-}
-
-/** OTA-461 — one-time playtest-supply gift for the dev character "Verbal".
- *  Records the slot key so the kit is granted exactly once per slot (a
- *  resume never restacks it). The caller does the actual inventory push;
- *  this only gates the once-per-slot bookkeeping. */
-export async function grantTestSupplyGiftOnce(slotKey: string): Promise<{ granted: boolean }> {
-  const stash = await loadGlobalStash();
-  const already = stash.testGiftGrantedSlots ?? [];
-  if (already.includes(slotKey)) return { granted: false };
-  stash.testGiftGrantedSlots = [...already, slotKey];
-  await saveGlobalStash(stash);
-  return { granted: true };
-}
+// OTA-935 — arb89 grantDevGemOnce + OTA-461 grantTestSupplyGiftOnce are RETIRED. The
+// OTA-948/949 dev-grant cleanup moved the dev gem + supply kit to the tutorial
+// name-commit (creation-only) and removed every load-path grant, which left these
+// once-per-slot latch functions with zero callers. The devGemGrantedSlots /
+// testGiftGrantedSlots stash FIELDS stay declared for save back-compat — an old
+// stash carrying them still loads; nothing writes them anymore.
 
 /** v2.4.1 (OTA 043) — record a completed (faction, ending) combo.
  *  Idempotent: re-recording an existing badge is a no-op. Returns

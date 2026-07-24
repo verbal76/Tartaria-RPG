@@ -3,7 +3,7 @@
 // Lore: a sub-faction (non-playable). A semi-religious order of
 // Aether-born initiates dedicated to guarding the Tartarian Cores
 // that keep the underground tartarian cities' grid alive. Each of
-// the five Lost Capitals has a Guardian — their high priest from
+// the nine Lost Capitals has a Guardian — their high priest from
 // before the Mud Flood, kept living by the Core they swore to
 // protect. To them, extracting a Core is sacrilege.
 //
@@ -14,9 +14,9 @@
 // - Difficulty scales by your kill-count, NOT by the Capital. The
 //   first Guardian you fight is "Tier 1" no matter which Capital
 //   you hit first. So the player's choice of order is preserved
-//   but the curve is fixed: T1 → T2 → T3 → T4 → T5.
+//   but the curve is fixed: T1 → T2 → … → T9.
 // - Each Guardian drops a unique signature weapon + armor (the
-//   Core Guardian set — 5 weapons, 5 armors, all hand-authored)
+//   Core Guardian set — 9 weapons, 9 armors, all hand-authored)
 //   on top of the Core itself + the existing boss Res Gem.
 // - Flee is allowed. The Guardian fully restores (HP + AC + any
 //   gear damage) the next time the player triggers the gate. The
@@ -74,10 +74,6 @@ interface TierProfile {
   acBonus: number;
   /** Damage die replacement when the base is "1d8" etc. */
   damage: string;
-  /** Number of counter-attacks per round. The engine already
-   *  gives bosses 2 counters; T1/T2 stay at 2, T3+ get extra
-   *  traits that act like a third hit. */
-  counters: number;
   /** Extra traits layered on top of the Guardian's signature
    *  trait — applied to scale-up the fight per tier. */
   extraTraits: string[];
@@ -93,25 +89,25 @@ interface TierProfile {
 // (+3/+4/+5). HP, damage, and the trait layering are unchanged, so the fight
 // still has teeth and the late-game stays demanding.
 const TIER_PROFILES: Record<GuardianTier, TierProfile> = {
-  1: { hpMult: 1.4, acBonus: -3, damage: '1d8+3',  counters: 2, extraTraits: [] },
-  2: { hpMult: 1.6, acBonus: -2, damage: '1d8+4',  counters: 2, extraTraits: ['armored'] },
-  3: { hpMult: 1.8, acBonus: -1, damage: '1d10+4', counters: 2, extraTraits: ['armored', 'quick'] },
-  4: { hpMult: 2.0, acBonus: 0,  damage: '1d10+4', counters: 2, extraTraits: ['armored', 'quick'] },
-  5: { hpMult: 2.2, acBonus: 1,  damage: '1d10+5', counters: 2, extraTraits: ['armored', 'quick', 'regenerate'] },
-  6: { hpMult: 2.4, acBonus: 2,  damage: '1d10+5', counters: 2, extraTraits: ['armored', 'quick', 'regenerate'] },
+  1: { hpMult: 1.4, acBonus: -3, damage: '1d8+3',  extraTraits: [] },
+  2: { hpMult: 1.6, acBonus: -2, damage: '1d8+4',  extraTraits: ['armored'] },
+  3: { hpMult: 1.8, acBonus: -1, damage: '1d10+4', extraTraits: ['armored', 'quick'] },
+  4: { hpMult: 2.0, acBonus: 0,  damage: '1d10+4', extraTraits: ['armored', 'quick'] },
+  5: { hpMult: 2.2, acBonus: 1,  damage: '1d10+5', extraTraits: ['armored', 'quick', 'regenerate'] },
+  6: { hpMult: 2.4, acBonus: 2,  damage: '1d10+5', extraTraits: ['armored', 'quick', 'regenerate'] },
   // OTA-924 — late-tier hpMult raised (was 2.7/2.9/3.1) so the CLIMAX Guardians are a
   // real ~9-11 round fight instead of a ~5 round romp. Player DPS is weapon-capped at
   // ~30-40, so the old scaled ~95-155 HP fell in a handful of rounds. Early tiers
   // (1-6) are UNCHANGED — they were deliberately smoothed down (see comment above) and
   // must stay approachable. Guardians hit twice per round + regen/bleed, so they land
   // a touch under the 12-round apex target and still out-threaten a summit boss.
-  7: { hpMult: 4.0, acBonus: 3,  damage: '2d6+4',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
-  8: { hpMult: 5.5, acBonus: 4,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
+  7: { hpMult: 4.0, acBonus: 3,  damage: '2d6+4',  extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
+  8: { hpMult: 5.5, acBonus: 4,  damage: '2d6+5',  extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
   // OTA-925 — tier 9 is ONLY ever the final Guardian (9 Capitals, tier caps at 9), and
   // the final fight OVERRIDES HP to a fixed ~20-round wall (see FINAL_GUARDIAN_HP in
   // spawnGuardianForCapital), so this hpMult is now a defensive fallback only. AC /
   // damage / traits still come from here.
-  9: { hpMult: 7.0, acBonus: 5,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder', 'ambush_strike'] },
+  9: { hpMult: 7.0, acBonus: 5,  damage: '2d6+5',  extraTraits: ['armored', 'quick', 'regenerate', 'bleeder', 'ambush_strike'] },
 };
 
 // OTA-925 — the last boss of the storyline is a ~20-round WALL, not the ~12-round apex
@@ -998,7 +994,7 @@ export function hasUndefeatedGuardian(player: PlayerCharacter, capitalId: string
   return !mq.coresRecovered.includes(capitalId);
 }
 
-/** Lightweight ref for tests + tooling. Always 5 in production. */
+/** Lightweight ref for tests + tooling. Always 9 in production (one per Lost Capital). */
 export function totalGuardiansCount(): number {
   return Object.keys(GUARDIANS_BY_CAPITAL).length;
 }
