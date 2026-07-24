@@ -4615,7 +4615,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const total = roll + stats.stealth + timeBonus;
     const success = total >= 10;
     const timeNote = timeBonus !== 0 ? ` ${timeBonus > 0 ? '+' : ''}${timeBonus} (${timeBonus > 0 ? 'night' : 'day'})` : '';
-    set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+    set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
     get().appendLog(
       'combat',
       `You — sleight of hand on ${ambientHit} → d20 ${roll} + STE ${stats.stealth}${timeNote} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
@@ -7994,6 +7994,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // dodging 2r → 1r) never persisted their decrement, so counters
     // were frozen until the array changed shape. Now: whenever the
     // player has ANY status going in, write the ticked result back.
+    // OTA-946 — and the write must STAY written: 26 action paths charged time+stamina
+    // via set({ player: advanceTime(spendStamina(player, ...)) }) built from the
+    // pre-tick snapshot below, silently restoring pre-tick statusEffects/HP. On
+    // dice-modal actions (every attack) timed buffs therefore NEVER ticked — a
+    // 3-round +2 STR ran the whole fight, fading only on non-roll actions
+    // (playtest: four "Legacy of Power fades" lines while STR stayed buffed).
+    // Every charge now derives from the LIVE player (functional set), so ticks,
+    // DOTs, and weather writes survive the action body.
     // skipPreChecks: the LLM parse-fallback re-submits a canonical
     // rephrasing of the same player input, and we don't want to tick
     // statuses twice for one action. The first pass already ran the
@@ -8782,7 +8790,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (hook && !hook.resolved) {
         get().appendLog('debug', `route: hook intercept (kind=${hook.kind}, target="${targetText}") — original intent=${parsed.intent}`);
         // Small stamina cost for engaging a hook (same as a skill check).
-        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
         // OTA-129 — hook puzzle gate. If this hook's kind has a
         // PUZZLE_DEFINITIONS entry AND the hook is still at stage 0
         // AND the player's intent matches the puzzle's intentList,
@@ -9073,7 +9081,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const ctaNoun = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
       // A small stamina/time cost so the gesture reads as a real beat,
       // matching the hook-engage cost above.
-      set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.1) });
+      set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.1) } : sLive));
       get().appendLog('world', callToActionLine(parsed.matchedVerb, ctaNoun));
       void get().persist();
       return;
@@ -9198,7 +9206,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             break;
           }
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.attack), 0.1) } : sLive));
           const visPenalty = weatherAttackPenalty(currentScene.weather, playerArmorResistKinds(player));
           if (visPenalty > 0) {
             // Announce the swing penalty only the FIRST time this weather
@@ -9600,7 +9608,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
               biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
             });
-            set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+            set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
             // OTA-200 — visible lens cue. When the player carries the
             // Aetheric Vision Lens AND the outcome is a hook, narrate
             // the lens picking up the trace. Players couldn't tell the
@@ -9967,7 +9975,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               get().appendLog('world', `You've already worked over the ${harvestAmbient} here. Nothing more to find.`);
               break;
             }
-            set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+            set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
             // 2026-05-25 OTA-040 — collectable substitution. Salvage now
             // has the same 8% biome-gated chance as container loot and
             // wasteland encounters to surface a character-story fragment
@@ -10876,7 +10884,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // stat training. (Scene-noun investigate below still rolls.)
             break;
           }
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
           // arb-fix — race-context for the investigated target (ancient relic?).
           const invCtxNoun = String(parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase();
           const invRelicTarget = /relic|ancient|tartarian|statue|sentinel|aetherstone|artifact|rune|monument|obelisk|automaton|machine|spire|throne|giant/.test(invCtxNoun);
@@ -10929,7 +10937,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             break;
           }
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
           // OTA-213 — investigate gets a hook-heavy distribution
           // (10% nothing / 15% mat / 15% TC / 60% hook) so the
           // verb actually rewards story-seeking. Playtester:
@@ -11490,7 +11498,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           hoursElapsed: player.hoursElapsed ?? 0,
           stamina: player.stamina,
         };
-        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
         // arb-fix — context for the conditional RACE skill bonuses: is the
         // target an ancient relic, and are we in ruins?
         const ctxNoun = String(parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase();
@@ -12488,12 +12496,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : null;
         const intraSceneNoun = ambientHit ?? hookHit?.nouns[0] ?? enemyHit?.name ?? null;
         if (intraSceneNoun) {
-          set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.25) } : sLive));
           get().appendLog('world', approachLine(intraSceneNoun));
           break;
         }
         // Fall-through: wander.
-        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.wander), 1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.wander), 1) } : sLive));
         narrateWanderingJourney(get, set, currentScene);
         break;
       }
@@ -12609,7 +12617,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : null;
           const noun = ambient ?? hookHit?.nouns[0] ?? vendorHit;
           if (noun) {
-            set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+            set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.25) } : sLive));
             get().appendLog('world', approachLine(noun));
             break;
           }
@@ -13450,7 +13458,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } else {
             get().appendLog('world', `The ${projectile} skitters past ${enemyHit.name} and lands in the silt.`);
           }
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.attack), 0.1) } : sLive));
           // OTA-825 — exploit close (reverify workflow, CONFIRMED high-severity). A
           // thrown attack is a PLAYER TURN, but this path never let the enemy group
           // act, so throwing was a COUNTER-FREE ranged attack that ALSO skipped enemy
@@ -13569,7 +13577,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 },
               };
             });
-            set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+            set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.25) } : sLive));
             get().appendLog(
               'world',
               `You climb down from the ${overlayMeta.overlayId === 'open_sky' ? 'lookout' : overlayMeta.overlayId.replace(/_/g, ' ')} and rejoin the ground beside the ${climbedName}. Boots back on the ground.`,
@@ -13582,7 +13590,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           set((s) => s.currentScene ? { currentScene: { ...s.currentScene, elevatedOn: null } } : s);
-          set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.25) } : sLive));
           get().appendLog(
             'world',
             `You make your way back down the ${downFrom}. Boots back on the ground.`,
@@ -14027,7 +14035,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        set({ player: advanceTime(spendStamina(player, climbStaminaCost), 0.5) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, climbStaminaCost), 0.5) } : sLive));
         // Wear the rope by ROPE_WEAR_PER_TIER per tier cleared. The
         // wearItemById helper handles clamping; we ignore the broken
         // flag here because the next tier's snap-check above will fire
@@ -14494,7 +14502,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        set({ player: advanceTime(spendStamina(player, 2), 0.5) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 2), 0.5) } : sLive));
         const tgt = swimTarget || 'the water';
         get().appendLog(
           'world',
@@ -14503,7 +14511,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'jump': {
-        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.1) } : sLive));
         const tgt = parsed.target ?? '';
         // OTA-800 — resolve the jump target against REAL scene nouns (ambient /
         // hook / enemy / vendor), the same way the advance case does. Pre-fix,
@@ -14626,7 +14634,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'help': {
-        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.1) } : sLive));
         const tgt = parsed.target ?? parsed.resolvedNoun ?? 'the nearest ally';
         // OTA-365 — the 'helping' status was stamped here but nothing ever
         // consumed it (single-player has no ally to roll at Advantage), so
@@ -14639,7 +14647,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'ready': {
-        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.1) } : sLive));
         const tgt = parsed.target ?? 'whatever moves next';
         const readying: StatusEffect = {
           kind: 'ready',
@@ -14661,7 +14669,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'mount': {
-        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.1) } : sLive));
         get().appendLog(
           'arbiter',
           `The Arbiter shrugs. "Tartaria forgot mounts a long time ago. The frame is here for when a beast worth riding shows up — until then it costs half your Speed to climb on nothing."`,
@@ -14742,7 +14750,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'reload': {
-        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.1) } : sLive));
         const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
         if (!equipped || equipped.weaponKind === 'melee') {
           get().appendLog(
@@ -14791,7 +14799,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : s,
           );
         }
-        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.1) } : sLive));
         // Route the maneuver to the right stat per the action card —
         // disarm/trip/sweep/hook → DEX; grapple/shove/pin → STR.
         const maneuverKind = classifyManeuver(trimmed);
@@ -14871,7 +14879,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Burst count: bolt-caster / handgun = 2, automatic-tagged = 3.
         const tags = equipped.tags ?? [];
         const burstCount = tags.includes('firearm') ? 3 : 2;
-        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack + 1), 0.15) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.attack + 1), 0.15) } : sLive));
         get().appendLog(
           'world',
           `You squeeze ${burstCount} shots out of the ${equipped.name}. Each takes a stacking penalty die.`,
@@ -15233,7 +15241,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const { puzzleFor } = require('../engine/hookPuzzles') as typeof import('../engine/hookPuzzles');
             if (pickupHook && !pickupHook.resolved && !puzzleFor(pickupHook.kind)) {
               get().appendLog('debug', `route: hook intercept via pickup (kind=${pickupHook.kind}, target="${target}")`);
-              set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+              set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
               resolveHookOneStep(pickupHook, get, set, target.toLowerCase());
               void get().persist();
               break;
@@ -15534,7 +15542,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } else {
             get().appendLog('world', `Your hand slips on the ${ambient}. It stays where it was.`);
           }
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
           break;
         }
         get().appendLog('arbiter', `The Arbiter watches the empty path. "Nothing to steal here."`);
@@ -27781,6 +27789,15 @@ function wearEquippedItem(
     // handles stacking with any existing copies of that material.
     let dropMsg = '';
     if (result.salvageDrop) {
+      // OTA-946 — the drop phrase used to be a hardcoded "A length of ..." (rope-flavored)
+      // for EVERY remnant: "A length of Small Rock comes free in your hand." Pick a
+      // noun that fits the material instead.
+      const dn = result.salvageDrop.name;
+      const dropPrefix = /rope|cord|line/i.test(dn) ? 'A length of'
+        : /cloth|fiber|silk|hide|leather|patched/i.test(dn) ? 'A scrap of'
+        : /rock|stone|shard|glass/i.test(dn) ? 'A chunk of'
+        : /metal|iron|nail|gear|part|scrap/i.test(dn) ? 'A twist of'
+        : 'A piece of';
       const dropItem: InventoryItem = {
         id: `broken_${result.brokenName.replace(/\s+/g, '_')}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         name: result.salvageDrop.name,
@@ -27790,7 +27807,7 @@ function wearEquippedItem(
         tags: ['salvage', 'broken_item'],
       };
       finalInventory = mergeOrPushItem(finalInventory, dropItem);
-      dropMsg = ` A length of ${result.salvageDrop.name} comes free in your hand.`;
+      dropMsg = ` ${dropPrefix} ${result.salvageDrop.name} comes free in your hand.`;
     }
     // Defer the log so the caller's main set() lands first.
     void Promise.resolve().then(() => {

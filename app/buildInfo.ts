@@ -16929,4 +16929,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fuse — never eaten wholesale. Store tests: default single peel unchanged, 3-of-5 split, save-all no-split, free-all
 // re-merge, oversized-count clamp. typecheck:ci + typecheck:tests + lint clean; full fast suite green. UX -> HAL +
 // golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-945-fusion-reserve-count';
+// OTA-946 (the stale-charge clobber — buffs/DOTs now actually tick in combat (port of HAL OTA-969)). Playtest: "Legacy of Power
+// fades" printed FOUR times while STR stayed buffed. Diagnosed by store-level repro: the status-effect tick at the top
+// of every action ran fine, but 26 action paths charged time+stamina via set({ player: advanceTime(spendStamina(
+// player, ...)) }) built from the PRE-TICK snapshot — silently restoring pre-tick statusEffects/HP. On dice-modal
+// actions (every attack) timed buffs therefore NEVER ticked: a 3-round +2 STR ran the whole fight, and the same
+// clobber could swallow DOT and weather writes. All 26 charges now derive from the LIVE player (functional set).
+// Repro-locked: a 3-round buff driven through REAL dice-modal attacks ticks 3 -> 2 -> 1 -> gone with exactly ONE fade
+// line, and the charge still spends stamina/advances time. ALSO: armor-shatter remnant text picks a material-fitting
+// noun ("A chunk of Small Rock", "A scrap of Patched Cloth") instead of rope-flavored "A length of" for everything.
+// Dice audit from the same playtest: enemy group rolls verified independent (rollDie(20) per enemy per swing) — the
+// triple-nat-20 round was real variance, not shared rolls; no change. typecheck:ci + typecheck:tests + lint clean;
+// full fast suite green. Combat fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-946-stale-charge-clobber';
