@@ -17818,4 +17818,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // tank's number corrects once, SILENTLY — the OTA-929 delta flash seeds on mount and never fires on a between-session
 // change (verified). New test locks the AC term to trimStandingAc. typecheck:ci + typecheck:tests + lint clean; full
 // fast suite green. UI-consistency fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-955-power-gauge-trimmed-ac';
+// OTA-956 (keyboard reliability poll reworked: Android-only, per-focus, hide always wins). Audit found two
+// flaws in the first cut: (1) the poll ran once at component MOUNT, not per focus — a keyboard opened any later never
+// got the net ("still doesn't always get pushed up"); (2) it called the event path's applyHeight, which CANCELS the
+// pending hide retract, so tap-in + quick dismiss could read a stale mid-dismiss metrics height and strand the bar
+// mid-screen. Now: the poll re-arms for EVERY typing session (keyed on the bar's `active` state), runs on Android only
+// (Fabric drops height events there; iOS events are reliable and its metrics lie during dismissal), each tick routes
+// through the pure keyboardPollAction helper (confirmed-hidden -> stop untouched; settled height -> snap; else keep
+// polling to a ~1s cap), and the poll lives OUTSIDE the hideTimer closure so it structurally cannot cancel a retract.
+// New engine/keyboardPoll.ts + unit tests for every tick decision. On-device verify: tap in / dismiss fast / tap in
+// again — bar rises every time, never lingers. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+// UI fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-956-keyboard-poll-per-focus';

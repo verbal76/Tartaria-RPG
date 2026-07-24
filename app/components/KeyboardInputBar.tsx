@@ -52,6 +52,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { keyboardPollAction } from '../engine/keyboardPoll';
 
 // arb-fix — cache the last real keyboard height ACROSS mounts/opens. The New
 // Architecture (Fabric) on Android drops the keyboardDidShow height event ~half
@@ -156,32 +157,49 @@ export function KeyboardInputBar() {
       }
     } catch { /* metrics API not available on this RN — fine */ }
 
-    // OTA-951 — RELIABILITY POLL. keyboardDidShow / changeFrame are dropped ~half the time
-    // under the New Architecture (Fabric) on Android, which left the bar on the screen-fraction
-    // ESTIMATE (wrong height → not pushed to the top of the keyboard). The NATIVE keyboard state
-    // is correct even when the JS event is lost, so poll Keyboard.metrics() over the first ~1s
-    // after focus and SNAP to the true settled height the instant it reports one. Purely additive
-    // — if metrics never reports (older RN), we keep the existing event + estimate path.
-    let polls = 0;
-    const pollTimer = setInterval(() => {
-      polls += 1;
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const k = Keyboard as any;
-        const m = typeof k.metrics === 'function' ? k.metrics() : null;
-        if (m?.height && m.height > 0) { applyHeight(m.height); clearInterval(pollTimer); return; }
-      } catch { /* metrics unavailable — fall through to events/estimate */ }
-      if (polls >= 10) clearInterval(pollTimer); // ~1s cap
-    }, 100);
-
     return () => {
       if (hideTimer) clearTimeout(hideTimer);
-      clearInterval(pollTimer);
       showSub.remove();
       hideSub.remove();
       changeFrameSub?.remove();
     };
   }, []);
+
+  // OTA-956 — RELIABILITY POLL, reworked from the first cut (which armed it once on MOUNT, so
+  // a keyboard opened any later never got the net — "still doesn't always get pushed up").
+  // Android-only: Fabric drops the height events ~half the time there, while iOS events
+  // are reliable AND iOS metrics() reports a stale non-zero height during the dismiss
+  // animation (the arb71 quirk), so polling iOS could strand the bar. Re-armed for EVERY
+  // typing session (keyed on `active`), each tick decided by the pure keyboardPollAction
+  // helper: a hide in flight stops the poll before it can act; a settled height snaps the
+  // bar; silence keeps polling to a ~1s cap. Living OUTSIDE the event effect, this path
+  // structurally CANNOT cancel the hide retract (no access to hideTimer) — it only
+  // positions the bar, so even a stale read that slips the visibility check is harmless.
+  useEffect(() => {
+    if (!active || Platform.OS !== 'android') return undefined;
+    let polls = 0;
+    const pollTimer = setInterval(() => {
+      polls += 1;
+      let action: ReturnType<typeof keyboardPollAction> = 'continue';
+      let height = 0;
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const k = Keyboard as any;
+        const visible = typeof k.isVisible === 'function' ? k.isVisible() : null;
+        const m = typeof k.metrics === 'function' ? k.metrics() : null;
+        height = m?.height ?? 0;
+        action = keyboardPollAction(visible, height);
+      } catch { /* metrics unavailable — keep waiting for the event path */ }
+      if (action === 'apply') {
+        lastKeyboardHeight = height;
+        setKeyboardOffset(height);
+        clearInterval(pollTimer);
+        return;
+      }
+      if (action === 'stop' || polls >= 10) clearInterval(pollTimer); // hide won, or ~1s cap
+    }, 100);
+    return () => clearInterval(pollTimer);
+  }, [active]);
 
   // Only render on the Exploration screen. Other screens have their
   // own input fields that aren't covered by the keyboard, so a
