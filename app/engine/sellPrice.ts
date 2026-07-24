@@ -154,7 +154,14 @@ export function sellPriceFor(
   const baseTable = GEAR_KINDS.has(item.kind) ? GEAR_RARITY_BASE : RARITY_BASE;
   const base = baseTable[item.rarity] ?? 5;
   const dur = durabilityFraction(item);
-  raw = Math.max(1, Math.round(base * SELL_FRACTION * dur));
+  // OTA-966 — TROPHY DISCOUNT. Uncatalogued monster-part drops mint at the enemy's own
+  // rarity (the fix for "a Legendary hide worth 2 TC"), but at FULL rate every
+  // Legendary non-boss converged on the same ~382 TC/kill — flat and ~7x the old
+  // faucet. Trophies (flavor parts no recipe consumes) sell at HALF a real
+  // material's rate: enemies that drop genuine materials are worth seeking out,
+  // trophy-only kills still pay respectably, the tier spreads back out.
+  const trophyMult = (item.tags ?? []).includes('trophy') ? 0.5 : 1;
+  raw = Math.max(1, Math.round(base * SELL_FRACTION * dur * trophyMult));
   return applySellCaps(item, withRapport(raw));
 }
 

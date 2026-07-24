@@ -78,7 +78,9 @@ const HIGH_GUARDIANS: readonly Enemy[] = [
     hp: 78,
     rarity: 'Rare',
     traits: ['armored', 'aerial', 'savage', 'resist:slashing', 'resist:piercing', 'vulnerable:burn'],
-    loot: ['Sentinel Core', 'Aetheric Shard', 'Relic Shard'],
+    // OTA-966 — was 'Sentinel Core' (a Legendary material since the trophy promotion):
+    // a Rare climb guardian paying Legendary was the audit's mid-tier windfall.
+    loot: ['Crystal Core', 'Aetheric Shard', 'Relic Shard'],
   },
   {
     name: 'Sky-Warden of the Antenna',
@@ -89,7 +91,9 @@ const HIGH_GUARDIANS: readonly Enemy[] = [
     hp: 88,
     rarity: 'Rare',
     traits: ['armored', 'aerial', 'savage', 'concussive', 'resist:slashing', 'vulnerable:burn'],
-    loot: ['Sentinel Core', 'Guardian Core', 'Relic Shard'],
+    // OTA-966 — was two LEGENDARY cores (Sentinel + Guardian) on a Rare enemy — the
+    // audit's worst windfall (215 EV at power 45). Both swapped to Rare machine cores.
+    loot: ['Steam Core', 'Clockwork Core', 'Relic Shard'],
   },
 ];
 
