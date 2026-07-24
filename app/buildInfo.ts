@@ -17810,4 +17810,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 101/168/231); only the 1-3 point dip cells lift. Final-wall override, over-level cap 1.9, and all tuning knobs
 // untouched; still a spawn-time read (no feedback loop). New power-x-tier sweep test covers the missed dimension.
 // typecheck:ci + typecheck:tests + lint clean; full fast suite green. Balance fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-954-guardian-monotone-staging';
+// OTA-955 (the Power gauge respects the OTA-947 AC trim). playerPowerScore predated the defense rebalance and
+// summed RAW standing AC, so a tank saw AC 28 on the panel but a Power built from raw ~37 — inflated exactly where the
+// trim bent the tail, and the favored/even/danger badge (+/-15% bands) shifted with it. The gauge's AC term now runs
+// through trimStandingAc — identical formula + inputs to the StatsPanel readout, so shown AC, fought AC, and gauged AC
+// agree. Enemy Power stays raw by design (enemy combat AC is never trimmed). Below the knee (22) nothing changes; a
+// tank's number corrects once, SILENTLY — the OTA-929 delta flash seeds on mount and never fires on a between-session
+// change (verified). New test locks the AC term to trimStandingAc. typecheck:ci + typecheck:tests + lint clean; full
+// fast suite green. UI-consistency fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-955-power-gauge-trimmed-ac';
