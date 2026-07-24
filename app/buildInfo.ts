@@ -16920,4 +16920,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // transfers with the kit only; loot keeps the Pauldron. A sweep test generalizes the rule: an item may live in carries
 // OR loot, never both, for ANY enemy. typecheck:ci + typecheck:tests + lint clean; full fast suite green. Loot tuning
 // -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-944-mercy-premium-reaver-dedup';
+// OTA-945 (stack-sized fusion reserve (port of HAL OTA-968)). Owner: reserving a x5 stack for the Crucible meant reopening the
+// item modal five times — one peel per tap. toggleReserveForFusion now takes a COUNT (clamped to the stack; whole-stack
+// moves flip the row's flag and merge into a same-state stack instead of churning N peels), and the inventory modal
+// adds "Save all xN for fusion" / "Free all xN" next to the single-unit button for any stack > 1 (catalysts stay
+// one-at-a-time — one catalyst themes one fuse). Safety NOTE verified during this review: the Crucible drains exactly
+// ONE unit per reserved row and un-reserves the survivors (arb168), so a reserved x4 stack contributes one bolt per
+// fuse — never eaten wholesale. Store tests: default single peel unchanged, 3-of-5 split, save-all no-split, free-all
+// re-merge, oversized-count clamp. typecheck:ci + typecheck:tests + lint clean; full fast suite green. UX -> HAL +
+// golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-945-fusion-reserve-count';
