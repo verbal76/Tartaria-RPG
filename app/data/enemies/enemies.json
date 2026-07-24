@@ -2042,8 +2042,7 @@
     "loot": [
       "Behemoth Heart",
       "Behemoth Plate",
-      "Aetheric Shard",
-      "Resurrection Gem"
+      "Aetheric Shard"
     ],
     "aliases": [
       "behemoth",
@@ -2164,8 +2163,7 @@
     "loot": [
       "Lich Phylactery",
       "Lich-Bone Mantle",
-      "Aetherstone Heart",
-      "Resurrection Gem"
+      "Aetherstone Heart"
     ],
     "aliases": [
       "lich",
@@ -2193,8 +2191,7 @@
     "rarity": "Legendary",
     "loot": [
       "Tyrant's Crown",
-      "Mud-Iron Heart",
-      "Resurrection Gem"
+      "Mud-Iron Heart"
     ],
     "aliases": [
       "tyrant",
@@ -2223,8 +2220,7 @@
     "rarity": "Legendary",
     "loot": [
       "Hollow Crown",
-      "Throne Shard",
-      "Resurrection Gem"
+      "Throne Shard"
     ],
     "aliases": [
       "king",
@@ -2254,7 +2250,6 @@
     "loot": [
       "Worm Plating",
       "Iron Core",
-      "Resurrection Gem",
       "Blank Runecaster Casing (Legendary)"
     ],
     "aliases": [
@@ -2286,8 +2281,7 @@
     "loot": [
       "Wyrm Fang",
       "Wyrm-Scale Hide",
-      "Bog-Heart Pearl",
-      "Resurrection Gem"
+      "Bog-Heart Pearl"
     ],
     "aliases": [
       "wyrm",
@@ -2317,8 +2311,7 @@
     "rarity": "Legendary",
     "loot": [
       "Matriarch's Carapace",
-      "Voidspawn Egg",
-      "Resurrection Gem"
+      "Voidspawn Egg"
     ],
     "aliases": [
       "matriarch",
@@ -2350,8 +2343,7 @@
     "rarity": "Legendary",
     "loot": [
       "Reaver's Greatsword",
-      "Reaver's Pauldron",
-      "Resurrection Gem"
+      "Reaver's Pauldron"
     ],
     "aliases": [
       "reaver",

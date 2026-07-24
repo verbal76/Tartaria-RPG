@@ -17860,4 +17860,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // carried weapon ("Swap to the Boltcaster — electrical will bite where piercing won't") instead of just a type. Pure
 // decision rules live in new engine/combatCues.ts with unit tests. typecheck:ci + typecheck:tests + lint clean; full
 // fast suite green. Combat-feel -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-959-legibility-layer';
+// OTA-960 (loot audit fixes I of II — the outright bugs, no balance opinions). (1) The 8 "Resurrection Gem"
+// entries in boss loot pools were FAKES — the real gem is a separate stash grant — each minting a useless Common brick
+// ~60-70% of kills and stealing a drop slot from the boss's real rolls; deleted, with a data test locking them out.
+// (2) An EMPTY loot list on a BOSS is intentional (deterministic overlays carry the reward) — the "Aether dust"
+// fallback no longer fires there (no more junk dust at the game's climax), only pads non-boss lists, and now mints the
+// catalog's real stackable 'Aether Dust'. (3) KILL/KO PARITY: a humanoid's carries kit (weapons/armor/TC) transferred
+// only on the knockout path — killing ignored it, making KO strictly dominant. A kill now strips the body too, at the
+// worn floor (0.15 durability vs KO's HP-scaled 0.15-0.85) — mercy keeps its edge, lethal stops being a loot tax.
+// (4) The never-implemented Rare "one item upgraded" promise is deleted from the roll comment (candidate feature, see
+// HANDOFF). typecheck:ci + typecheck:tests + lint clean; full fast suite green. Loot fix -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-960-loot-bug-batch';
