@@ -18570,7 +18570,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         tags: [...lk.tags, 'loot'],
       });
     }
-    const tcGained = carries.tc ?? (rollDie(6) + 2);
+    // OTA-967 — MERCY PREMIUM (v2-audit knob 3). After kill/KO parity, a kill collects the
+    // kit AND its rolled loot, leaving knockout strictly cash-dominated. A live capture
+    // now adds a rarity-scaled bounty on top of the carried purse — the pockets come
+    // easier when nobody bled on them: 2d6 x tier (Common x1 ... Legendary x4).
+    const mercyRank = enemy.rarity === 'Legendary' ? 4
+      : enemy.rarity === 'Rare' ? 3
+      : enemy.rarity === 'Uncommon' ? 2
+      : 1;
+    const tcGained = (carries.tc ?? (rollDie(6) + 2)) + (rollDie(6) + rollDie(6)) * mercyRank;
     // Splice the looted enemy out of the scene — keep every index-parallel
     // per-enemy array aligned (hps / KO / status DOTs / acid shred /
     // corruption stacks / ambush flags).

@@ -17926,4 +17926,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the same ~382 TC/kill (~7x the old faucet). Trophy-tagged parts now SELL at half a real material's rate — genuine
 // materials (Dragon Scale, Titan Core...) keep full value, so which monster you hunt matters again. typecheck:ci +
 // typecheck:tests + lint clean; full fast suite green. Loot tuning -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-966-windfall-trophy-discount';
+// OTA-967 (v2-audit knobs 3+4: KO mercy premium + Reaver double-dip). (3) After kill/KO parity, a kill
+// collects the carried kit AND its rolled loot, leaving knockout strictly cash-dominated vs humans. A live capture now
+// adds a rarity-scaled bounty on top of the carried purse: 2d6 x tier (Common x1 ... Legendary x4) — the pockets come
+// easier when nobody bled on them. (4) The Tartarian Reaver authored "Reaver's Greatsword" in BOTH carries and loot, so
+// a kill paid it twice (the loot roll could even duplicate it) — 812 TC EV, 30% above any boss. The Greatsword now
+// transfers with the kit only; loot keeps the Pauldron. A sweep test generalizes the rule: an item may live in carries
+// OR loot, never both, for ANY enemy. typecheck:ci + typecheck:tests + lint clean; full fast suite green. Loot tuning
+// -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-24-967-mercy-premium-reaver-dedup';
