@@ -6436,9 +6436,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
         sceneDisplayedNouns = Array.from(new Set([gc.noun, ...sceneDisplayedNouns]));
       }
     }
+    // OTA-951 — Phase B of real heights: seed PERCHES onto taller climbables
+    // (a nest at tier 2 of the tower). Deterministic per room — the hash of
+    // (roomKey, structure) decides everything, so leaving and re-entering a
+    // scene can never reroll the loot. Already-harvested perches (marked in
+    // the room's searchedAmbientNouns) stay gone. Outdoors only.
+    let scenePerchPlacements: CurrentScene['nounPlacements'];
+    if (!get().player?.hubRoomId) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { seedPerches } = require('../engine/perches') as typeof import('../engine/perches');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { climbHeightFor: chPerch } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+      const perchRoomKey = makeRoomKey(
+        player?.currentLocationId ?? '', microMicroId, player?.mapX, player?.mapY, player?.hubRoomId,
+      );
+      const climbables = sceneAmbientNouns
+        .filter((n) => isClimbable(n))
+        .map((n) => ({ noun: n, tiers: chPerch(n) }));
+      const seeded = seedPerches(perchRoomKey, climbables);
+      const perchConsumed = roomConsumedSet(get().worldMemory, perchRoomKey);
+      const liveNouns = seeded.nouns.filter((n) => !isConsumedNoun(perchConsumed, n));
+      if (liveNouns.length > 0) {
+        sceneAmbientNouns = Array.from(new Set([...sceneAmbientNouns, ...liveNouns]));
+        sceneDisplayedNouns = Array.from(new Set([...sceneDisplayedNouns, ...liveNouns]));
+        scenePerchPlacements = Object.fromEntries(liveNouns.map((n) => [n, seeded.placements[n]!]));
+      }
+    }
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
       vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, microMicroId,
+      nounPlacements: scenePerchPlacements,
       missionBoard,
       wanderer,
       sceneBuilding,
@@ -9371,6 +9398,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // attack-fallback. "break the wagon" should harvest the
           // wagon, not silently miss because 'wagon' isn't in
           // AREA_TOKENS.
+          // OTA-951 — Phase B of real heights: placed (perched) nouns can't be
+          // attacked from the ground or the wrong tier — same rule as the
+          // investigate gate, so attack can't become a reach-anything side
+          // door. At the perch itself, harvesting is investigate's job.
+          {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { placementFor: pfAtk, sameClimbNoun: scnAtk } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+            const placedAtk = rawTarget ? pfAtk(rawTarget.toLowerCase(), currentScene.nounPlacements) : null;
+            if (placedAtk) {
+              const elevAtk = currentScene.elevatedOn;
+              const atPerch = !!elevAtk && !currentScene.elevatedOverlayMeta
+                && placedAtk.tier === elevAtk.tier
+                && scnAtk(placedAtk.structure, elevAtk.noun);
+              if (!atPerch) {
+                get().appendLog(
+                  'arbiter',
+                  `The Arbiter follows your gaze up. "${theCap(rawTarget)} is up on the ${placedAtk.structure}, tier ${placedAtk.tier}. Climb for it."`,
+                  { skipDedup: true },
+                );
+              } else {
+                get().appendLog('world', `Up here you don't swing at the ${rawTarget} — you take it. (Investigate or salvage it.)`);
+              }
+              break;
+            }
+          }
           const ambientHitInAttack = rawTarget
             ? matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? [])
             : null;
@@ -9926,7 +9978,67 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 );
                 break;
               }
-              // At your tier on your structure — reachable. Fall through.
+              // OTA-951 — Phase B of real heights: at your tier on your structure,
+              // investigating the perch HARVESTS it — catalog-resolved loot
+              // (no invented items), tier-gated pool, once per room.
+              {
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { perchTemplateFor, rollPerchLoot } = require('../engine/perches') as typeof import('../engine/perches');
+                const perchRoomKey = makeRoomKey(
+                  player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId,
+                );
+                const perchKeyNoun = Object.keys(currentScene.nounPlacements ?? {}).find((k) => sameClimbNoun(k, tgtLower)) ?? tgtLower;
+                const perchMarks = get().worldMemory.visitedRooms?.[perchRoomKey]?.searchedAmbientNouns ?? [];
+                if (perchMarks.includes(perchKeyNoun.toLowerCase())) {
+                  get().appendLog('world', `You've already picked the ${perchKeyNoun} clean. Only the wind holds it now.`);
+                  break;
+                }
+                get().appendLog(
+                  'world',
+                  `You work the ${perchKeyNoun} loose one-handed, the other hand keeping the ${currentScene.elevatedOn.noun}.`,
+                );
+                const perchTpl = perchTemplateFor(perchKeyNoun);
+                const perchLoot = perchTpl ? rollPerchLoot(perchTpl, placedT.tier, rollDie) : null;
+                if (perchLoot) {
+                  const perchCat = findCatalogItem(perchLoot.name);
+                  const perchItem: InventoryItem = stampDurability({
+                    id: freshInstanceId('perch'),
+                    name: perchLoot.name,
+                    kind: perchCat?.kind ?? 'misc',
+                    rarity: perchCat?.rarity ?? 'Common',
+                    quantity: perchLoot.qty,
+                    tags: perchCat?.tags ?? [],
+                  });
+                  const perchGrant = grantItem(get().player?.inventory ?? player.inventory, perchItem);
+                  set((sp) => (sp.player ? { player: { ...sp.player, inventory: perchGrant.inventory } } : sp));
+                  if (perchGrant.accepted > 0) {
+                    get().appendLog('reward', `✦ ${perchLoot.name}${perchLoot.qty > 1 ? ` x${perchLoot.qty}` : ''} (${perchCat?.rarity ?? 'Common'}).`);
+                  } else {
+                    get().appendLog('world', `${perchLoot.name} comes free — and your pack can't hold it. It falls, and the ground keeps it.`);
+                  }
+                } else {
+                  get().appendLog('world', `Empty. Whatever lived or was stashed up here is long gone.`);
+                }
+                set((sp) => {
+                  const room = sp.worldMemory.visitedRooms?.[perchRoomKey] ?? {
+                    firstVisitAt: Date.now(), lastVisitAt: Date.now(), visitCount: 1,
+                  };
+                  return {
+                    worldMemory: {
+                      ...sp.worldMemory,
+                      visitedRooms: {
+                        ...(sp.worldMemory.visitedRooms ?? {}),
+                        [perchRoomKey]: {
+                          ...room,
+                          searchedAmbientNouns: [...(room.searchedAmbientNouns ?? []), perchKeyNoun.toLowerCase()],
+                        },
+                      },
+                    },
+                  };
+                });
+                set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.2) } : sLive));
+                break;
+              }
             } else {
               get().appendLog(
                 'arbiter',
@@ -14354,6 +14466,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : s.currentScene,
             };
           });
+          // OTA-951 — Phase B of real heights: cresting a tier that holds a perch
+          // announces the find. This is the discovery moment that teaches the
+          // player mid-climb stops are worth making.
+          {
+            const plCrest = get().currentScene?.nounPlacements ?? {};
+            for (const [perchNoun, pp] of Object.entries(plCrest)) {
+              if (pp.tier === currentTier && sameClimbNoun(pp.structure, tgt)) {
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { perchTemplateFor: ptfCrest } = require('../engine/perches') as typeof import('../engine/perches');
+                get().appendLog(
+                  'world',
+                  ptfCrest(perchNoun)?.discoverLine
+                    ?? `Beside your handhold: a ${perchNoun}, wedged where only climbers reach.`,
+                );
+              }
+            }
+          }
           // Tutorial climb beat does NOT advance on the way up — it ends
           // when the player has climbed back DOWN to ground level (see the
           // climb-down handler), so they finish the full climb first.

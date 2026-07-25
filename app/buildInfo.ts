@@ -16984,4 +16984,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // scenarios incl. no-placements regression. Phase B (seeder, perch pools, tier-crest discovery lines, height-scaled
 // loot) ships separately. typecheck:ci + typecheck:tests + lint clean; full fast suite green. -> HAL + golem (NOT
 // engine).
-export const OTA_BUILD_ID = '2026-07-25-950-heights-skeleton';
+// OTA-951 (real heights, Phase B: PERCHES; golem port of HAL OTA-974). Climbing is now exploration, not a top-only lottery. New engine
+// module perches.ts: 8 themed perch templates (nest / prayer flags / service box / satchel / wasp gall / gull roost /
+// climbing cache / signal lamp) matched to structure material via classifyNoun. Seeder runs at scene build for
+// outdoor climbables with 3+ tiers: ~35% chance, tier 1..N-1 (NEVER the apex — that stays overlay turf), one perch
+// per structure, DETERMINISTIC per (roomKey, structure) hash — leaving and re-entering can never reroll; harvested
+// perches stay gone via the room's consumed marks. Cresting a perch's tier prints its discovery line (the "mid-climb
+// stops are worth it" teach). Investigating it AT its tier harvests once: catalog-resolved loot (findCatalogItem —
+// no invented items), tier-gated pool (rarer entries need minTier 3-4), stamina + 0.2h charge, then "picked clean".
+// Attack gate: perched nouns can't be attacked from the ground/wrong tier (same gaze-up refusal as investigate) so
+// attack isn't a reach-anything side door; at the perch you're told to take it, not swing. 11 tests: catalog
+// validator on every loot name, low-tier-never-empty, determinism, tier bounds, tier gating, harvest-once flow,
+// ground-attack refusal, scene-build smoke. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+// -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-25-951-perches';
