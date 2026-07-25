@@ -13675,7 +13675,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the top tier rolls the climb-top loot pool (50% chance of
         // an Uncommon-skewed item — chance-based so not every climb
         // pays out).
-        const tgt = climbTarget || 'the surface in front of you';
+        // OTA-972 — bare `climb` while already up continues the climb you're ON.
+        const tgt = climbTarget || currentScene.elevatedOn?.noun || 'the surface in front of you';
         // OTA-911 — you can't climb past a fight. When guardians are on you
         // (including a mid-climb ambush), the climb verb is refused: deal with
         // them first. This also stops the player skipping a climb-encounter by
@@ -13722,11 +13723,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // still showed (1/3). On an active climb the two now agree; the marker scan
         // only governs a fresh climb started from the ground.
         const elev = currentScene.elevatedOn;
-        const onThisClimb = !!elev && (() => {
-          const a = elev.noun.toLowerCase();
-          const b = tgt.toLowerCase();
-          return a === b || a.includes(b) || b.includes(a);
-        })();
+        // OTA-972 — anchored head-noun match (sameClimbNoun) instead of the loose
+        // bidirectional includes: typing "stone" must not read as being on the
+        // "stone pillar"'s climb, and vice versa.
+        const onThisClimb = !!elev && sameClimbNoun(elev.noun, tgt);
+        // OTA-972 — ONE CLIMB AT A TIME. Owner: "if there is more climbs than one,
+        // an elevated event on one climb isn't able to be triggered if the
+        // elevation is the same but the player is on a different climb."
+        // There was no rule connecting your feet to the thing you climb next:
+        // from the top of the pillar, "climb the tower" just started climbing
+        // the tower — a mid-air teleport that overwrote the pillar's elevated
+        // state. While elevatedOn is set, any climb target that isn't the
+        // structure under your feet is refused — always audibly (skipDedup).
+        if (elev && !onThisClimb) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter measures the gap. "You're up on the ${elev.noun}. The ${tgt} is its own climb. Down first, then up."`,
+            { skipDedup: true },
+          );
+          break;
+        }
         const effectiveTotalTiers = onThisClimb && elev ? elev.totalTiers : totalTiers;
         const maxCleared: number = onThisClimb && elev ? elev.tier : maxClimbedTier(tgt, climbMarks);
         const currentTier = maxCleared + 1;
