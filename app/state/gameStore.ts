@@ -11925,11 +11925,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             const canRestElevated = wearsClimbStrapForRest || (!onGreatClimb && hasReclaimersRopeForRest);
             if (!canRestElevated) {
+              // OTA-975 — skipDedup: the pillar log showed rest retries 2-4 dedup-
+              // swallowed into silence. A refusal always answers.
               get().appendLog(
                 'arbiter',
                 onGreatClimb
                   ? `The Arbiter cranes to look up the ${currentScene.elevatedOn.noun}. "This high, only a Hardened Climbing Strap will hold you for a rest — a rope won't do it. Climb down, or come back wearing one."`
                   : `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
+                { skipDedup: true },
               );
               break;
             }
@@ -13744,6 +13747,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const downFrom = typeof elev === 'string'
             ? elev
             : (elev as { noun?: string }).noun ?? 'the height';
+          // OTA-975 — descending on EMPTY arms is a half-climb, half-fall slide:
+          // half the scaled fall damage for your tier, then the descent itself
+          // proceeds normally. Owner: at zero stamina the wall is done with
+          // you — up drops you outright, down at least lets you steer the
+          // landing. Eating first (ungated mid-climb) avoids it entirely.
+          if ((get().player?.stamina ?? player.stamina) <= 0) {
+            const slideTier = typeof elev === 'object' && elev !== null
+              ? Math.max(1, (elev as { tier?: number }).tier ?? 1)
+              : 1;
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { computeClimbFallBase: cfbSlide } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const tPerksSlide = require('../engine/titles').titlePerkModifiers(player);
+            let slideDmg = Math.max(1, Math.floor(cfbSlide(player.hpMax, slideTier) / 2));
+            if (tPerksSlide.climbFallHalved && slideDmg > 1) {
+              slideDmg = Math.max(1, Math.floor(slideDmg / 2));
+            }
+            const liveHpSlide = get().player?.hp ?? player.hp;
+            const newHpSlide = Math.max(0, liveHpSlide - slideDmg);
+            set((sp) => (sp.player ? { player: { ...sp.player, hp: newHpSlide } } : sp));
+            get().appendLog(
+              'world',
+              `Your arms are done — the last stretch off the ${downFrom} is a half-climb, half-fall. -${slideDmg} HP (${newHpSlide}/${player.hpMax}).`,
+            );
+            if (newHpSlide <= 0) {
+              handlePlayerDeath(get, set as Parameters<typeof handlePlayerDeath>[1]);
+              break;
+            }
+          }
           // 2026-05-27 OTA-089 — elevated overlay descent. When
           // the player is in an overlay scene (mini-area at
           // the apex), climb-down restores the preserved base
@@ -13862,7 +13894,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the OTA 037 marker-length guard; both preserved in the
         // helper.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { climbHeightFor, climbTierLabel, rollClimbTopLoot, maxClimbedTier, sameClimbNoun } = require('../engine/climbHeight');
+        const { climbHeightFor, climbTierLabel, rollClimbTopLoot, maxClimbedTier, sameClimbNoun, computeClimbFallBase } = require('../engine/climbHeight');
         const totalTiers: number = climbHeightFor(tgt);
         // OTA-910 — is this one of the five landmark great climbs (11–15 tiers)?
         // Great climbs cost more stamina per tier (no rope discount), gate the
@@ -14043,8 +14075,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // tier you'd cleared (maxCleared) — you fall from where you stood. A
           // 2-tier wall lands near the old flat ~20%; great climbs punish height.
           const tierFallenFrom = Math.max(1, maxCleared);
-          const fallFrac = Math.min(0.9, 0.12 + 0.055 * tierFallenFrom);
-          let fallDamage = Math.max(1, Math.floor(player.hpMax * fallFrac));
+          // OTA-975 — formula lives in climbHeight.computeClimbFallBase now, shared
+          // with the zero-stamina descent slide (half rate). Same numbers.
+          let fallDamage = computeClimbFallBase(player.hpMax, tierFallenFrom);
           // arb-fix — Etherbound Survivor ("survive environmental hazards")
           // passively shaves its save bonus off a climbing fall — a real,
           // always-on effect for what was flavor-only text.
@@ -14175,18 +14208,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             break;
           }
-          // OTA-936 — a stamina shortfall while UP no longer DROPS you (playtest: pressing
-          // 'climb' at stamina 1/2 cost 26 HP with no warning). You hold your anchored hold
-          // and the game refuses the HIGHER haul, pointing you down or to rest — the same
-          // "warn, don't punish a mistake the UI saw coming" rule the rope-durability path
-          // already follows. Only a real hazard (a rope snap, below) still causes a fall.
+          // OTA-975 — zero on the wall means GRAVITY, not a parking spot. Owner
+          // (from the pillar log, 11 held climb presses while a storm chipped
+          // him): "you shouldn't be stuck on a climb at zero ... you fall and
+          // take damage." The OTA-936 no-unwarned-drops rule survives as ONE
+          // clear warning: the first zero-stamina reach is held with explicit
+          // stakes; the next one falls (climbFall — scaled damage, progress
+          // wiped). Eating mid-climb is ungated and restores stamina — that's
+          // the escape hatch, and the warning says so. PARTIAL stamina (some,
+          // but under the haul cost) keeps the safe hold.
+          if (player.stamina <= 0) {
+            const gripWarnedRecently = get().gameLog
+              .slice(-14)
+              .some((e) => e.text.includes('the next reach UP will drop you'));
+            if (!gripWarnedRecently) {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter's voice cracks like a whip. "Zero left in your arms. Eat something where you hang, or take the rough slide down — the next reach UP will drop you."`,
+                { skipDedup: true },
+              );
+              get().appendLog(
+                'combat',
+                `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina 0. GRIP FAILING: one more empty reach and you fall.`,
+              );
+              break;
+            }
+            climbFall(
+              `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina 0. Your grip gives out.`,
+              `You reach with nothing left in your arms. The ${tgt} sheds you.`,
+            );
+            break;
+          }
           get().appendLog(
             'arbiter',
-            `The Arbiter's voice tightens. "You've no haul left in you — don't reach higher. Climb DOWN while you can still grip, then rest on solid ground."`,
+            `The Arbiter's voice tightens. "You've no haul left for the next pull. Climb DOWN while you can still grip — or eat something where you hang."`,
+            { skipDedup: true },
           );
           get().appendLog(
             'combat',
-            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina ${player.stamina} < ${climbStaminaCost} required. (held — too spent to climb higher; climb down or rest)`,
+            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina ${player.stamina} < ${climbStaminaCost} required. (held — too spent to haul higher; climb down, or eat to recover)`,
           );
           break;
         }

@@ -181,6 +181,14 @@ export function reachableWhileElevated(
   });
 }
 
+// OTA-975 — base climb-fall damage (pre-title-perk shaves), extracted from the
+// gameStore climbFall helper so the zero-stamina descent SLIDE can share the
+// exact same math at half rate. floor(hpMax × (0.12 + 0.055 × tier)), cap 0.9.
+export function computeClimbFallBase(hpMax: number, tierFallenFrom: number): number {
+  const fallFrac = Math.min(0.9, 0.12 + 0.055 * Math.max(1, tierFallenFrom));
+  return Math.max(1, Math.floor(hpMax * fallFrac));
+}
+
 export function maxClimbedTier(noun: string, marks: readonly string[]): number {
   const nounLower = noun.toLowerCase();
   let max = 0;
