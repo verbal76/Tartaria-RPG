@@ -27,7 +27,7 @@ import { isNounConsumed, isNounFlavorExhausted } from '../engine/ambientNounMatc
 import { getLocationById } from '../engine/encounter';
 import { revealedLocationName } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
-import { climbHeightFor, isClimbCleared } from '../engine/climbHeight';
+import { climbHeightFor, isClimbCleared, reachableWhileElevated } from '../engine/climbHeight';
 import { findCatalogItem } from '../engine/crafting';
 import { isOversized } from '../engine/portability';
 import { playerHasScannerEquipped } from '../engine/equipment';
@@ -1021,7 +1021,16 @@ export function ExplorationScreen() {
               // NOT buildChipPool. buildChipPool re-slices to 5 for the
               // investigate row, which dropped reserved salvage nouns off
               // the end and left this count (and the SALVAGE modal) empty.
-              const salvSource = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
+              // OTA-971 — the button glowed green from the top of a pillar while
+              // the engine refused every ground salvage ("The shelf is down
+              // there. Climb down to reach it."). Filter to nouns actually
+              // REACHABLE at this elevation first — the same rule as the
+              // engine's elevated-investigate gate, via one shared helper.
+              const salvSource = reachableWhileElevated(
+                currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
+                currentScene?.elevatedOn?.noun ?? null,
+                !!currentScene?.elevatedOverlayMeta,
+              );
               return salvSource.filter(
                 (n) => !isAmbientConsumed(n) && isSalvageableForModal(n),
               ).length + (tutBeat === 'scrap' ? 1 : 0); // tutorial chest-plate prop
@@ -1508,7 +1517,14 @@ export function ExplorationScreen() {
         chips={
           tutBeat === 'scrap'
             ? [{ noun: 'broken chest plate', consumed: false }]
-            : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? []).map((n) => ({
+            // OTA-971 — same elevation filter as the button count above: while up
+            // on a climb the picker lists only what you can actually reach,
+            // instead of ground nouns every tap would get refused on.
+            : reachableWhileElevated(
+                currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
+                currentScene?.elevatedOn?.noun ?? null,
+                !!currentScene?.elevatedOverlayMeta,
+              ).map((n) => ({
                 noun: n,
                 // OTA-167 — salvage chip greys on the engine's per-room
                 // consumed state directly (searched + flavor-exhausted),

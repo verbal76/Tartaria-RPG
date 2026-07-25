@@ -126,6 +126,21 @@ export function sameClimbNoun(a: string, b: string): boolean {
   return longer.endsWith(' ' + shorter);
 }
 
+// OTA-971 — the engine's elevated-investigate gate (gameStore) refuses any ambient
+// noun that isn't the thing you're standing on while elevatedOn is set and no
+// rooftop overlay is active. This is that SAME rule as a pure filter, so UI
+// affordances (the SALVAGE button tone, the salvage picker) agree with the
+// engine instead of advertising ground nouns the engine will refuse. Owner,
+// from a pillar: "the color of the button tells me there is [something]".
+export function reachableWhileElevated(
+  nouns: readonly string[],
+  elevatedNoun: string | null | undefined,
+  overlayActive: boolean,
+): string[] {
+  if (!elevatedNoun || overlayActive) return [...nouns];
+  return nouns.filter((n) => sameClimbNoun(n, elevatedNoun));
+}
+
 export function maxClimbedTier(noun: string, marks: readonly string[]): number {
   const nounLower = noun.toLowerCase();
   let max = 0;
