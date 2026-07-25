@@ -572,6 +572,10 @@ interface CurrentScene {
    *  investigate keeps the same per-noun find chance, the odds of a
    *  given room showing the player SOMETHING actually hold up. */
   displayedAmbientNouns?: string[];
+  /** OTA-950 — Phase A of real heights: optional per-noun elevation placements
+   *  (noun → structure + tier). Absent/empty = everything is on the ground,
+   *  which is every scene until the Phase-B seeder ships. */
+  nounPlacements?: Record<string, { structure: string; tier: number }>;
   /** When this Location maps to a Macro biome in worldLadder.json, the
    *  scene picks a specific Micro-Micro room to flavor the Arbiter's
    *  narration. Stored here (not regenerated each turn) so a single
@@ -9898,12 +9902,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // down" when you were on a *different* thing. Anchored matching keeps
           // legit short↔full forms while killing the cross-prop false-positive.
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { sameClimbNoun } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+          const { sameClimbNoun, placementFor } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
           const isClimbedNoun = sameClimbNoun(tgtLower, climbedNoun);
           const isGroundNoun = (currentScene.ambientNouns ?? []).some((n) =>
             sameClimbNoun(n.toLowerCase(), tgtLower),
           );
-          if (isGroundNoun && !isClimbedNoun) {
+          // OTA-950 — Phase A of real heights. A PLACED noun (structure + tier)
+          // resolves by where it hangs, not by scene membership: at your grip
+          // (your structure, your tier) it falls through to normal handling;
+          // wrong tier or wrong structure gets a specific refusal. All
+          // refusals answer every retry (skipDedup).
+          const placedT = placementFor(tgtLower, currentScene.nounPlacements);
+          if (placedT && !isClimbedNoun) {
+            const elevTierNow = currentScene.elevatedOn.tier;
+            if (sameClimbNoun(placedT.structure, climbedNoun)) {
+              if (placedT.tier !== elevTierNow) {
+                get().appendLog(
+                  'arbiter',
+                  placedT.tier > elevTierNow
+                    ? `"Higher," the Arbiter says. "${theCap(rawTarget)} waits at tier ${placedT.tier}. Keep climbing."`
+                    : `"You climbed past it," the Arbiter says. "${theCap(rawTarget)} sits at tier ${placedT.tier}, below your grip. Down, then back up."`,
+                  { skipDedup: true },
+                );
+                break;
+              }
+              // At your tier on your structure — reachable. Fall through.
+            } else {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter measures the gap. "${theCap(rawTarget)} hangs on the ${placedT.structure}, not the ${currentScene.elevatedOn.noun}. Its own climb."`,
+                { skipDedup: true },
+              );
+              break;
+            }
+          } else if (isGroundNoun && !isClimbedNoun) {
             // OTA-947 — a refusal must ALWAYS answer. Playtest: eight identical
             // salvage attempts from atop a shelf — the Arbiter answered ONCE,
             // then the arbiter-channel dedup swallowed every repeat ("dedup:
@@ -9922,6 +9954,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ? `"Still up on the ${currentScene.elevatedOn.noun}," the Arbiter says. "Still down there. Climb down first."`
                 : `The Arbiter just points down, over the edge, and waits.`;
             get().appendLog('arbiter', line, { skipDedup: true });
+            break;
+          }
+        }
+        // OTA-950 — Phase A of real heights, ground side: a noun placed up on a
+        // structure is visible from below but not touchable. The Arbiter says
+        // where it is and how to get it, every time (skipDedup).
+        if (!currentScene.elevatedOn && !currentScene.elevatedOverlayMeta && rawTarget) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { placementFor: pfGround } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+          const placedG = pfGround(rawTarget.toLowerCase(), currentScene.nounPlacements);
+          if (placedG) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter follows your gaze up. "${theCap(rawTarget)} is up on the ${placedG.structure}, tier ${placedG.tier}. Climb for it."`,
+              { skipDedup: true },
+            );
             break;
           }
         }
