@@ -16997,4 +16997,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // validator on every loot name, low-tier-never-empty, determinism, tier bounds, tier gating, harvest-once flow,
 // ground-attack refusal, scene-build smoke. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
 // -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-25-951-perches';
+// OTA-952 (zero grip means gravity; golem port of HAL OTA-975). Owner, after 11 held climb-presses at stamina 0 while a storm chipped
+// him on the pillar: "you shouldn't be stuck on a climb at zero — you fall and take damage." VERIFIED first: eating
+// mid-climb is UNGATED (the strap/rope gate only guards sleeping; strap only demanded on great climbs) and food
+// restores stamina — so the escape hatch exists and the warnings now name it. New rules: at stamina 0 while UP, the
+// first empty reach gets ONE whip-crack warning (OTA-936's no-unwarned-drops rule, kept); the NEXT empty reach UP
+// falls — full scaled climbFall damage, progress wiped. Climbing DOWN on empty arms is a half-climb-half-fall SLIDE:
+// half the scaled damage for your tier (Skyreacher still halves), then you're on the ground. PARTIAL stamina keeps
+// the safe hold, its text now teaching the eat option. Fall math extracted to climbHeight.computeClimbFallBase
+// (identical numbers, one source of truth). ALSO: the rest-on-wall refusal now skipDedups — the same log showed rest
+// retries 2-4 swallowed into silence. 7 tests: formula parity, warn-then-fall, slide, partial hold, mid-climb eat,
+// rest retries always answer. typecheck:ci + typecheck:tests + lint clean; full fast suite green. -> HAL + golem
+// (NOT engine).
+export const OTA_BUILD_ID = '2026-07-25-952-zero-grip-gravity';
