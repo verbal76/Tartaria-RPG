@@ -16961,4 +16961,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // rooftop overlays and ground-level play are untouched. Locked with unit tests on the helper (climbed-noun
 // head-anchoring included). typecheck:ci + typecheck:tests + lint clean; full fast suite green. UI truthfulness fix
 // -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-25-948-elevated-salvage-button';
+// OTA-949 (one climb at a time; golem port of HAL OTA-972). Owner: with two climbs in a scene, being up on one must not let you
+// trigger or touch the other at the same height. There was NO rule connecting your feet to the thing you climb next:
+// from the top of the pillar, "climb the tower" just STARTED climbing the tower — a mid-air teleport that overwrote
+// the pillar's elevated state. Now while elevatedOn is set, any climb target that isn't the structure under your
+// feet is refused ("The tower is its own climb. Down first, then up." — always audible, skipDedup). Also: the
+// on-this-climb check upgraded from loose bidirectional includes to the anchored sameClimbNoun, and bare `climb`
+// while elevated continues the CURRENT climb by name instead of inventing "the surface in front of you" as a fresh
+// target. Locked with store tests: cross-climb refusal + untouched elevated state, refusal answers every retry,
+// same-structure climb unblocked, bare-climb continuation, other-structure investigate stays refused, reachability
+// helper excludes the other climb. typecheck:ci + typecheck:tests + lint clean; full fast suite green. Correctness
+// -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-25-949-one-climb-at-a-time';
