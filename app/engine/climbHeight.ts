@@ -132,13 +132,53 @@ export function sameClimbNoun(a: string, b: string): boolean {
 // affordances (the SALVAGE button tone, the salvage picker) agree with the
 // engine instead of advertising ground nouns the engine will refuse. Owner,
 // from a pillar: "the color of the button tells me there is [something]".
+// OTA-973 — Phase A of the real-heights model. A scene noun can be PLACED on a
+// climbable structure at a tier (a nest at tier 2 of the tower). Placements
+// live on CurrentScene.nounPlacements; a noun with no placement is on the
+// ground, which is every noun in every scene until the Phase-B seeder ships —
+// so this is a pure skeleton with zero behavior change for existing content.
+export interface NounPlacement {
+  /** The climbable structure the noun hangs on (canonical scene noun). */
+  structure: string;
+  /** 1-based tier on that structure. Never the apex — the top belongs to
+   *  the elevated-overlay system. */
+  tier: number;
+}
+export type NounPlacements = Record<string, NounPlacement>;
+
+/** Find the placement for a typed target, honoring short forms the same way
+ *  climbs do ("satchel" finds the "wax-sealed satchel" placement). */
+export function placementFor(
+  target: string,
+  placements: NounPlacements | null | undefined,
+): NounPlacement | null {
+  if (!placements) return null;
+  for (const [noun, p] of Object.entries(placements)) {
+    if (sameClimbNoun(noun, target)) return p;
+  }
+  return null;
+}
+
 export function reachableWhileElevated(
   nouns: readonly string[],
   elevatedNoun: string | null | undefined,
   overlayActive: boolean,
+  placements?: NounPlacements | null,
+  currentTier?: number,
 ): string[] {
-  if (!elevatedNoun || overlayActive) return [...nouns];
-  return nouns.filter((n) => sameClimbNoun(n, elevatedNoun));
+  if (overlayActive) return [...nouns];
+  if (!elevatedNoun) {
+    // On the ground: placed nouns are visible up there, not touchable.
+    return nouns.filter((n) => !placementFor(n, placements));
+  }
+  return nouns.filter((n) => {
+    // The structure under your feet is always workable.
+    if (sameClimbNoun(n, elevatedNoun)) return true;
+    // A placed noun is reachable only on YOUR structure at YOUR tier —
+    // the same height on a different climb is never reachable.
+    const p = placementFor(n, placements);
+    return !!p && sameClimbNoun(p.structure, elevatedNoun) && p.tier === (currentTier ?? -1);
+  });
 }
 
 export function maxClimbedTier(noun: string, marks: readonly string[]): number {

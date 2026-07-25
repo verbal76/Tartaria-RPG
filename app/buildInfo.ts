@@ -17986,4 +17986,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // same-structure climb unblocked, bare-climb continuation, other-structure investigate stays refused, reachability
 // helper excludes the other climb. typecheck:ci + typecheck:tests + lint clean; full fast suite green. Correctness
 // -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-25-972-one-climb-at-a-time';
+// OTA-973 (real heights, Phase A: the skeleton). Owner-approved plan: objects will be able to live PARTWAY
+// UP structures (a nest at tier 2 of the tower). This ships the model with zero content: (1) CurrentScene.
+// nounPlacements — optional noun -> {structure, tier} side-table; absent = ground, so every existing scene is
+// unchanged. (2) climbHeight.placementFor (short-form aware) + reachableWhileElevated extended: a placed noun is
+// reachable ONLY on its own structure at exactly your tier; from the ground it's visible-but-refused; same height on
+// a DIFFERENT structure is never reachable; overlays untouched. (3) Engine investigate gates route placed nouns by
+// where they hang — ground: "up on the ${structure}, tier N. Climb for it."; wrong tier: "Keep climbing." / "below
+// your grip"; wrong structure: "Its own climb." — all always-audible (skipDedup). (4) SALVAGE button + picker pass
+// placements through the shared helper. 13 tests: placement lookup, 6-case reachability matrix, 6 store-level gate
+// scenarios incl. no-placements regression. Phase B (seeder, perch pools, tier-crest discovery lines, height-scaled
+// loot) ships separately. typecheck:ci + typecheck:tests + lint clean; full fast suite green. -> HAL + golem (NOT
+// engine).
+export const OTA_BUILD_ID = '2026-07-25-973-heights-skeleton';

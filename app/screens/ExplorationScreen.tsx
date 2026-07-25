@@ -1030,6 +1030,10 @@ export function ExplorationScreen() {
                 currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
                 currentScene?.elevatedOn?.noun ?? null,
                 !!currentScene?.elevatedOverlayMeta,
+                // OTA-973 — Phase A of real heights: placed nouns count only at
+                // their own structure + tier (and never from the ground).
+                currentScene?.nounPlacements ?? null,
+                currentScene?.elevatedOn?.tier ?? 0,
               );
               return salvSource.filter(
                 (n) => !isAmbientConsumed(n) && isSalvageableForModal(n),
@@ -1524,6 +1528,8 @@ export function ExplorationScreen() {
                 currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
                 currentScene?.elevatedOn?.noun ?? null,
                 !!currentScene?.elevatedOverlayMeta,
+                currentScene?.nounPlacements ?? null,
+                currentScene?.elevatedOn?.tier ?? 0,
               ).map((n) => ({
                 noun: n,
                 // OTA-167 — salvage chip greys on the engine's per-room
