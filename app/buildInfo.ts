@@ -16952,4 +16952,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // on repeats (8 salvage tries, 1 answer, 7 dead silences) — refusals now always answer, rotating short firm variants.
 // Repro-locked on the literal playtest scene (chart + arch in the same room). typecheck:ci + typecheck:tests + lint
 // clean; full fast suite green. Fixes -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-25-947-arch-fuel-snark-refusal';
+// OTA-948 (the salvage button that lied from a pillar; golem port of HAL OTA-971). Owner, standing on a pillar: "the salvage button
+// [is] still green ... but there is nothing at my elevation to salvage." The engine's elevated-investigate gate
+// refuses every ambient noun that isn't the thing you're standing on (elevatedOn set, no rooftop overlay) — but the
+// SALVAGE button's green tone and the salvage picker counted the GROUND nouns anyway, advertising salvage the engine
+// would refuse. New pure helper climbHeight.reachableWhileElevated (the gate's rule as a filter) now feeds BOTH the
+// button count and the picker chips: up top with nothing reachable, the button greys and the picker lists nothing;
+// rooftop overlays and ground-level play are untouched. Locked with unit tests on the helper (climbed-noun
+// head-anchoring included). typecheck:ci + typecheck:tests + lint clean; full fast suite green. UI truthfulness fix
+// -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-25-948-elevated-salvage-button';
