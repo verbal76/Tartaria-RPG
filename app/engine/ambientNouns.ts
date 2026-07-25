@@ -230,18 +230,35 @@ export function matchAmbientNoun(target: string, ambient: readonly string[]): st
   for (const noun of sorted) {
     if (normalizeForCompare(noun) === t) return noun;
   }
-  // Pass 2: target contains the noun ("the wall" → "wall").
+  // OTA-970 — passes 2 + 3 rebuilt at the WORD level. The old passes were raw
+  // substring checks, and substrings don't respect word edges: with no "arch"
+  // in the scene, pass 3's n.includes(t) happily found the "arch" hiding
+  // INSIDE "research chart" — so "attack the arch" swung at a paper chart
+  // across the room. Tokens now compare whole words (with a light plural
+  // fold); a short form may PREFIX a longer word ("tele" → "telescope")
+  // but can never match from the middle of one.
+  const tokEq = (a: string, b: string) => a === b || a === `${b}s` || `${a}s` === b;
+  const tTokens = t.split(' ').filter(Boolean);
+  // Pass 2: every word of the noun appears in the target ("the wall" → "wall").
   for (const noun of sorted) {
-    const n = normalizeForCompare(noun);
-    if (t.includes(n)) return noun;
+    const nTokens = normalizeForCompare(noun).split(' ').filter(Boolean);
+    if (nTokens.length > 0 && nTokens.every((nw) => tTokens.some((tw) => tokEq(tw, nw)))) {
+      return noun;
+    }
   }
-  // Pass 3: noun contains the target — only when target is
-  // meaningfully long (3+ chars) so common short words don't
-  // accidentally match longer nouns.
+  // Pass 3: typed shorter than canonical — every typed word must match a
+  // noun word exactly (plural-folded) or as a 3+ char word PREFIX. Only when
+  // the whole target is meaningfully long (3+ chars).
   if (t.length >= 3) {
     for (const noun of sorted) {
-      const n = normalizeForCompare(noun);
-      if (n.includes(t)) return noun;
+      const nTokens = normalizeForCompare(noun).split(' ').filter(Boolean);
+      if (
+        tTokens.every((tw) =>
+          nTokens.some((nw) => tokEq(tw, nw) || (tw.length >= 3 && nw.startsWith(tw))),
+        )
+      ) {
+        return noun;
+      }
     }
   }
   return null;

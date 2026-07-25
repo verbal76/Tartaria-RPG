@@ -9411,12 +9411,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // 5.01% HP drops below the threshold silently.
               const prevHpBruise = player.hp;
               const hpMaxBruise = player.hpMax ?? 1;
+              // OTA-970 — weapon swings at huge inert scenery now cost 1-2 HP AND
+              // say so (the old strike line silently hid the HP tick), with a
+              // rotating deadpan so the lesson lands. Owner: "you should get
+              // small damage ... 'that wasn't your brightest move'". Bruises
+              // can't kill: floor at 1 HP — no dying to an arch you punched.
+              const bruiseDmg = isBodyVerb ? 1 : rollDie(2);
+              const SCENERY_SNARK = [
+                `That wasn't your brightest move.`,
+                `Uh — why did you do that?`,
+                `The Arbiter pretends not to have seen that.`,
+                `Somewhere, a bard decides not to write this down.`,
+              ];
+              const snark = SCENERY_SNARK[rollDie(SCENERY_SNARK.length) - 1]!;
               set((s) =>
                 s.player
                   ? {
                       player: advanceTime(
                         spendStamina(
-                          { ...s.player, hp: Math.max(0, s.player.hp - 1) },
+                          { ...s.player, hp: Math.max(1, s.player.hp - bruiseDmg) },
                           STAMINA_COSTS.attack,
                         ),
                         0.1,
@@ -9424,12 +9437,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     }
                   : s,
               );
-              checkLowHpWarning(prevHpBruise, Math.max(0, prevHpBruise - 1), hpMaxBruise, get, set);
+              checkLowHpWarning(prevHpBruise, Math.max(1, prevHpBruise - bruiseDmg), hpMaxBruise, get, set);
               get().appendLog(
                 'world',
                 isBodyVerb
                   ? `You ${past} the ${targetForNarration}. It does not care. Your ${part} does. -1 HP, briefly heroic.`
-                  : `Your strike scrapes the ${targetForNarration}. ${material === 'stone' ? 'Stone' : material === 'metal' ? 'Aetherstone-cast metal' : 'It'} does not concede.`,
+                  : `Your strike scrapes the ${targetForNarration}. ${material === 'stone' ? 'Stone' : material === 'metal' ? 'Aetherstone-cast metal' : 'It'} does not concede. -${bruiseDmg} HP. ${snark}`,
               );
             };
 
@@ -9898,10 +9911,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
             sameClimbNoun(n.toLowerCase(), tgtLower),
           );
           if (isGroundNoun && !isClimbedNoun) {
-            get().appendLog(
-              'arbiter',
-              `The Arbiter glances down. "You're up on the ${currentScene.elevatedOn.noun}. ${theCap(rawTarget)} is down there. Climb down to reach it."`,
-            );
+            // OTA-970 — a refusal must ALWAYS answer. Playtest: eight identical
+            // salvage attempts from atop a shelf — the Arbiter answered ONCE,
+            // then the arbiter-channel dedup swallowed every repeat ("dedup:
+            // suppressed arbiter repeat") and the player retried into dead
+            // silence, which reads as a hang. skipDedup forces the reply
+            // through; once the full explanation was given recently, repeats
+            // rotate short, firmer variants instead of the same paragraph.
+            const fullLine = `The Arbiter glances down. "You're up on the ${currentScene.elevatedOn.noun}. ${theCap(rawTarget)} is down there. Climb down to reach it."`;
+            const toldRecently = get().gameLog
+              .filter((e) => e.channel === 'arbiter')
+              .slice(-12)
+              .some((e) => e.text.includes('Climb down to reach it.'));
+            const line = !toldRecently
+              ? fullLine
+              : rollDie(2) === 1
+                ? `"Still up on the ${currentScene.elevatedOn.noun}," the Arbiter says. "Still down there. Climb down first."`
+                : `The Arbiter just points down, over the edge, and waits.`;
+            get().appendLog('arbiter', line, { skipDedup: true });
             break;
           }
         }
@@ -30275,16 +30302,23 @@ function runAethercraft(
     }
   } else {
     // shape / mend — legacy single-item Aether fuel logic.
-    const AETHER_FUEL_NAMES = [
-      'Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue',
-      'Golem Core', 'Aetheric Locket',
-    ];
+    // OTA-970 — two fuel-picker fixes from a playtest where "shape stone"
+    // silently ate the player's EQUIPPED Aetheric Locket:
+    //  1) The Aetheric Locket is a wearable amulet (detection relic), not
+    //     fuel. It's out of the list entirely — a cast can never consume it.
+    //  2) Fuel is picked cheapest-first (Common residue/mud/crystal before
+    //     the Uncommon shard before a whole Rare Golem Core), not in raw
+    //     inventory order — the cast reaches for the cheapest thing that
+    //     works instead of whatever happens to sit first in the pack.
     const allowed: string[] = discipline === 'shape'
-      ? AETHER_FUEL_NAMES
-      : ['Aetheric Shard', 'Aether Crystal']; // mend
-    fuelItem = player.inventory.find(
-      (i) => i.quantity > 0 && allowed.some((name) => name.toLowerCase() === i.name.toLowerCase()),
-    ) ?? null;
+      ? ['Aether Residue', 'Aether Mud', 'Aether Crystal', 'Aetheric Shard', 'Golem Core']
+      : ['Aether Crystal', 'Aetheric Shard']; // mend
+    for (const name of allowed) {
+      const found = player.inventory.find(
+        (i) => i.quantity > 0 && i.name.toLowerCase() === name.toLowerCase(),
+      );
+      if (found) { fuelItem = found; break; }
+    }
     if (!fuelItem) {
       get().appendLog(
         'arbiter',
