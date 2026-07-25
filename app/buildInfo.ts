@@ -16941,4 +16941,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Dice audit from the same playtest: enemy group rolls verified independent (rollDie(20) per enemy per swing) — the
 // triple-nat-20 round was real variance, not shared rolls; no change. typecheck:ci + typecheck:tests + lint clean;
 // full fast suite green. Combat fix -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-24-946-stale-charge-clobber';
+// OTA-947 (playtest batch: the arch that was actually a chart; golem port of HAL OTA-970). Four fixes from one log. (1) "attack the
+// arch" swung at the RESEARCH CHART: ambient matching used raw substrings and "research chart" contains "arch"
+// mid-word ("reseARCH") — passes 2+3 of matchAmbientNoun rebuilt at the WORD level (whole-token compare, light plural
+// fold, 3+ char word-PREFIX allowed, mid-word never). (2) "shape stone" ate the player's EQUIPPED Aetheric Locket:
+// the locket (a wearable amulet) sat in the Aether fuel list and fuel was taken in inventory order — locket removed,
+// fuel now picked cheapest-first (Common residue/mud/crystal -> Uncommon shard -> Rare Golem Core). (3) Owner ask:
+// weapon swings at hard scenery now cost 1-2 HP and SAY so, with rotating deadpan ("That wasn't your brightest
+// move."); bruises floor at 1 HP — a wall can't kill you. (4) The elevated "climb down" refusal was dedup-swallowed
+// on repeats (8 salvage tries, 1 answer, 7 dead silences) — refusals now always answer, rotating short firm variants.
+// Repro-locked on the literal playtest scene (chart + arch in the same room). typecheck:ci + typecheck:tests + lint
+// clean; full fast suite green. Fixes -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-25-947-arch-fuel-snark-refusal';
