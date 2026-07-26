@@ -18111,4 +18111,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // tradeoff, and single-piece wear already makes a low roll livable. Tests: 3-piece set loses exactly
 // one point per landed hit over 10 rounds; the 4-durability piece warns at 3. typecheck:ci +
 // typecheck:tests + lint clean; full fast suite green. Combat economy -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-982-durability-rebalance';
+// OTA-983 (elevated combat). Owner's design, replacing the incoherent "raiders spawn and
+// punch you two tiers up a pillar": "you can be attacked by airborn creatures and with shots from
+// below, so you need a ranged weapon to fire down at the ground and any weapon to attack airborn
+// enemies." A timed ambush that arrives while you're UP a climb now masses at the BASE (new scene
+// flag enemiesAtBase, stamped by injectFactionParty when elevatedOn is set — so summit/wall fights
+// spawned AT your level keep ordinary melee). While besieged: grounded MELEE members bench (skip
+// counters; one narrated "circle the base" line per volley, deduped), grounded RANGED members shoot
+// up (isRangedEnemy), AIRBORNE members (new enemyIsAirborne: wing/fly/drone/wasp/bat/wyvern/... on
+// name+type+traits) fight you level. Player side mirrors: a grounded target needs a weapon reaching
+// far/distant (caster / throwable) — a melee swing at the base is a FREE refusal naming the fix; an
+// airborne target meets any weapon. Tests: melee-vs-base refused + caster allowed, airborne melee
+// both ways, benched-brute + firing-slinger volley, summit fight (flag off) unchanged. typecheck:ci
+// + typecheck:tests + lint clean; full fast suite green. Combat model -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-983-elevated-combat';

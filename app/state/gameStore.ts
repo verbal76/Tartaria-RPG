@@ -663,6 +663,13 @@ interface CurrentScene {
     tier: number;
     totalTiers: number;
   } | null;
+  /** OTA-983 — set by the timed ambush spawner when the party arrives while the
+   *  player is UP a climb: these enemies mass at the BASE, not at your level.
+   *  Grounded melee members can't reach you (and you need a weapon that
+   *  SHOOTS to reach them); airborne + ranged members fight across the gap.
+   *  Wall/summit encounters (spawned at your level) leave this false, so
+   *  summit brawls stay ordinary melee. */
+  enemiesAtBase?: boolean;
   /** 2026-05-27 OTA-089 — elevated overlay state. When the
    *  player crests a multi-tier climb and the overlay roll
    *  hits, this scene becomes a mini-area (nook / vantage /
@@ -2605,6 +2612,10 @@ function injectFactionParty(
       range: 'mid',
       enemyAmbushUsed: scaled.map(() => false),
       stealthOpenerUsed: false,
+      // OTA-983 — a party that crests the rise while you're UP a climb masses at
+      // the BASE (drives the elevation combat gates); on level ground the
+      // flag clears so a stale siege can't linger into the next fight.
+      enemiesAtBase: !!st.currentScene.elevatedOn,
     },
   } : st));
   return true;
@@ -9245,6 +9256,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
               { skipDedup: true },
             );
             break;
+          }
+          // OTA-983 — ELEVATION, player side: a grounded target massed at the base
+          // needs a weapon that truly SHOOTS (reaches far/distant) to be hit
+          // from up a climb; an AIRBORNE foe comes to you — any weapon meets
+          // it. Free refusal, mirroring the reach gate above. (Owner: "you
+          // need a ranged weapon to fire down at the ground and any weapon to
+          // attack airborn enemies.")
+          if (sceneAfterDots.elevatedOn && sceneAfterDots.enemiesAtBase && !enemyIsAirborne(targetEnemy)) {
+            const firesDown = reach.bands.includes('far') || reach.bands.includes('distant');
+            if (!firesDown) {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter glances over the edge. "${targetEnemy.name} is down at the base — ${reach.label} won't reach from up here. Use something that SHOOTS (or a throwable), or climb down and meet them."`,
+                { skipDedup: true },
+              );
+              break;
+            }
           }
           set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.attack), 0.1) } : sLive));
           const visPenalty = weatherAttackPenalty(currentScene.weather, playerArmorResistKinds(player));
@@ -26925,6 +26953,14 @@ function runMoveCombatRange(
 // Venom / Burst attacks (Bog Dragon, Architectural Sentinel, Aetheric
 // Cyclops, …) were classified melee and could NEVER counter at far range —
 // the exploit sweep's "kite the hardest non-boss monsters risk-free" finding.
+// OTA-983 — an AIRBORNE enemy ignores the ground: it reaches an elevated player
+// (and can be met with ANY weapon) as if you stood level. Matched on name /
+// type / traits, same spirit as isRangedEnemy below.
+const AIRBORNE_RE = /\b(wing|winged|fly|flying|flier|aerial|airborne|drone|wasp|hornet|bat|bird|raptor|harpy|wyvern|drake|moth|swarm|gull|vulture|hawk|owl)\b/i;
+function enemyIsAirborne(enemy: Enemy): boolean {
+  return AIRBORNE_RE.test(`${enemy.name} ${enemy.type ?? ''} ${(enemy.traits ?? []).join(' ')}`);
+}
+
 function isRangedEnemy(enemy: Enemy): boolean {
   const sig = `${enemy.attack ?? ''} ${enemy.damage ?? ''} ${enemy.abilityPoint ?? ''}`.toLowerCase();
   return /(bow|arrow|crossbow|ranged|projectile|firearm|sling|dart|laser|beam|breath|burst|venom|bolt|blast|aetheric|pulse|spit|spine|quill)/.test(sig);
@@ -28645,6 +28681,7 @@ export function runEnemyGroupCounters(
   // Snapshot the enemies up-front so a death mid-volley (player killing
   // one by reaction, etc) doesn't reshape the iteration.
   const attackers = [...scene.enemies];
+  const benchedBelow: string[] = [];
   for (let i = 0; i < attackers.length; i++) {
     const enemy = attackers[i]!;
     // Skip enemies that died earlier this round (HP <= 0 in the live
@@ -28678,6 +28715,16 @@ export function runEnemyGroupCounters(
       applyEnemyCounterToDog(enemy, get, set);
       continue;
     }
+    // OTA-983 — ELEVATION: a grounded melee enemy massed at the BASE cannot swing
+    // at a player who is up the climb. Airborne enemies fight you level;
+    // grounded RANGED enemies still shoot up from below. (Owner: "you can be
+    // attacked by airborn creatures and with shots from below.") Summit/wall
+    // fights (enemiesAtBase unset) are untouched.
+    if (liveScene.elevatedOn && liveScene.enemiesAtBase
+        && !enemyIsAirborne(enemy) && !isRangedEnemy(enemy)) {
+      benchedBelow.push(enemy.name);
+      continue;
+    }
     // Pass live index so applyEnemyCounter can resolve ambush_strike
     // (one-shot +2 to the first counter for enemies with the trait).
     applyEnemyCounter(enemy, livePlayer ?? fallbackPlayer, get, set, liveIdx);
@@ -28696,6 +28743,18 @@ export function runEnemyGroupCounters(
         applyEnemyCounter(enemy, liveAfter, get, set, liveIdx, true);
       }
     }
+  }
+  // OTA-983 — the grounded melee pack that can't reach an elevated player gets ONE
+  // line, not silence (and not five). Standard dedup keeps repeats quiet.
+  if (benchedBelow.length > 0 && (get().player?.hp ?? 0) > 0) {
+    const first = benchedBelow[0]!;
+    const rest = benchedBelow.length - 1;
+    get().appendLog(
+      'world',
+      rest > 0
+        ? `Below, ${first} and ${rest} other${rest > 1 ? 's' : ''} circle the base — nothing down there can reach you.`
+        : `Below, ${first} circles the base — it cannot reach you up here.`,
+    );
   }
 }
 
