@@ -10,10 +10,14 @@
 //   - TakeModal chip filter (hides oversized chips so the modal
 //     stays honest about what it's promising)
 //
-// Substring-based on purpose; one rule covers a family of nouns
-// ('wagon', 'buried wagon', 'mud cart', 'rusted sled' all match
-// the same vehicle rule). Refusal lines rotate to keep the
-// blocked-take from reading as a flat error.
+// Matching is WORD-BOUNDARY based ('wagon', 'buried wagon', 'mud cart' all
+// match the vehicle rule) with an exact CATALOG-ITEM exemption — raw
+// substring matching over-excluded: 'mud' swallowed every Mud-* weapon and
+// armor name, 'arch' swallowed "Architect's" gear, 'rain' matched
+// "training". An exact catalog item is by definition pocketable; true
+// substances and masses ("wet mud", "fog bank", "ash drift") stay put.
+// Refusal lines rotate to keep the blocked-take from reading as a flat
+// error.
 
 interface PortabilityRule {
   /** Substring patterns that flag the noun as oversized. */
@@ -127,6 +131,30 @@ const RULES: PortabilityRule[] = [
   },
 ];
 
+const WORD_RE_CACHE = new Map<string, RegExp>();
+function ruleMatches(lower: string, pat: string): boolean {
+  let re = WORD_RE_CACHE.get(pat);
+  if (!re) {
+    re = new RegExp(`\\b${pat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+    WORD_RE_CACHE.set(pat, re);
+  }
+  return re.test(lower);
+}
+
+/** True when the noun is the exact name of a catalog item — which is by
+ *  definition pocketable, whatever words its name contains. */
+function isExactCatalogItem(lower: string): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { findWeaponByName, findArmorByName, findGearByName, findExplorationItemByName, findMaterialByName } = require('./crafting');
+  for (const look of [findWeaponByName, findArmorByName, findGearByName, findExplorationItemByName, findMaterialByName]) {
+    try {
+      const row = look(lower);
+      if (row && String(row.name).toLowerCase() === lower) return true;
+    } catch { /* catalog unavailable — fall through to the rules */ }
+  }
+  return false;
+}
+
 function pickLine(lines: string[]): string {
   return lines[Math.floor(Math.random() * lines.length)] ?? lines[0]!;
 }
@@ -137,9 +165,10 @@ function pickLine(lines: string[]): string {
 export function isOversized(noun: string): boolean {
   if (!noun) return false;
   const lower = noun.toLowerCase();
+  if (isExactCatalogItem(lower)) return false;
   for (const rule of RULES) {
     for (const pat of rule.patterns) {
-      if (lower.includes(pat)) return true;
+      if (ruleMatches(lower, pat)) return true;
     }
   }
   return false;
@@ -153,7 +182,7 @@ export function refusalLine(noun: string): string {
   let matched: PortabilityRule | null = null;
   for (const rule of RULES) {
     for (const pat of rule.patterns) {
-      if (lower.includes(pat)) {
+      if (ruleMatches(lower, pat)) {
         matched = rule;
         break;
       }
