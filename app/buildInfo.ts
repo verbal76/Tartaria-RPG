@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.11';
+export const DISPLAY_VERSION = '4.28.12';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17278,4 +17278,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ("architect sigil" -> Architect Sigil), rolled across the nine otherwise; the OTA-691 turn-in
 // economy (+1 standing at that faction's agent, SIGILS section auto-route) takes it from there.
 // DISPLAY_VERSION 4.28.11. 3 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-977-sigil-salvage';
+// OTA-978 (light healing; golem port of HAL OTA-1001). Task #120, owner: "keep its fix numbers on the lighter
+// side." Root cause: heal numbers were FLAT in a game where hpMax scales (kit 25 / ration ~6 vs
+// 133 hpMax), and rest restored stamina only — HP recovery existed solely through a pile of
+// consumables. Category fix: one scaler, scaledHealHP(flat, hpMax) — kit-grade (flat>=20) heals
+// max(flat, 15% hpMax), snack-grade max(flat, 4%) — wired at ALL three consumable apply sites +
+// the InventoryScreen button math; rest now knits ~15% hpMax per full sleep (supersedes arb37),
+// and the full-rest refusal counts open wounds as a reason to sleep. Floors keep the early game
+// identical. DISPLAY_VERSION 4.28.12. 2 tests. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-978-light-healing';
