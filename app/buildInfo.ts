@@ -18153,4 +18153,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // on — "▮▮ DEACTIVATE (stand down your Surveyors)" / "▶ SET ACTIVE (recall your Surveyors)" — via
 // the new testable escort.escortToggleLabel helper; non-escort contracts keep the plain labels
 // verbatim. 2 tests. typecheck + lint clean; full fast suite green. UI polish -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-986-escort-toggle-label';
+// OTA-987 (escort pay model + content pass). Owner: scaled pay for most escorts,
+// all_or_nothing for the higher tier + 3 normal / 2 hard flavors per faction. escort.mode 'scaled'
+// (default) pays the TC fee times the party's remaining pool fraction at delivery (floor 10%; rep
+// pays FULL); 'all_or_nothing' drop-offs skip scaling: alive = full fee, dead pool = total failure.
+// Delivery narration names the state ("battered, but breathing — 50% pay"). 16 new contracts so each
+// escort faction fields 3 scaled + 2 all_or_nothing. Tests: tier coverage per faction, half-strength
+// scaled pays ~half + says so, bloodied all_or_nothing pays full. typecheck + lint clean; full fast
+// suite green. Mission economy -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-987-escort-pay-tiers';

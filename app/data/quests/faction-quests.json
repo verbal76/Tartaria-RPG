@@ -869,6 +869,166 @@
       "requirement": { "rep": 10 },
       "reward": { "tc": 85, "rep": 9 },
       "escort": { "count": 2, "label": "Scholars" }
+    },
+    {
+      "id": "fq_stone_builders_mason_crew_escort",
+      "factionId": "stone_builders",
+      "title": "Mason Crew to the Face",
+      "description": "Three masons with their tools and their opinions need walking to the new cut. The tools are the valuable part; they would disagree.",
+      "objective": "Escort the masons to a Stone Builders agent. Pay scales with how many of them arrive standing.",
+      "requirement": { "rep": 8 },
+      "reward": { "tc": 75, "rep": 8 },
+      "escort": { "count": 3, "label": "Masons" }
+    },
+    {
+      "id": "fq_stone_builders_chainmen_escort",
+      "factionId": "stone_builders",
+      "title": "The Chainmen",
+      "description": "Two chainmen carry the measure of a claim no one has filed yet. Plenty of people would like it to stay unfiled.",
+      "objective": "Escort the chainmen to a Stone Builders agent. Pay scales with the state you deliver them in.",
+      "requirement": { "rep": 12 },
+      "reward": { "tc": 90, "rep": 9 },
+      "escort": { "count": 2, "label": "Chainmen" }
+    },
+    {
+      "id": "fq_stone_builders_founders_bones_escort",
+      "factionId": "stone_builders",
+      "title": "The Founder's Bones",
+      "description": "Two bearers carry a founder home to the stone that was promised. The Builders will not pay for a partial funeral.",
+      "objective": "ALL OR NOTHING: deliver the bearers alive to a Stone Builders agent for full pay — if the party is cut down, you get nothing.",
+      "requirement": { "rep": 18 },
+      "reward": { "tc": 160, "rep": 12 },
+      "escort": { "count": 2, "label": "Bearers", "mode": "all_or_nothing" }
+    },
+    {
+      "id": "fq_stone_builders_charter_signatories_escort",
+      "factionId": "stone_builders",
+      "title": "Charter Signatories",
+      "description": "Three signatories, one charter, and every rival with an interest in fewer signatures. The Builders need every hand that can hold a pen.",
+      "objective": "ALL OR NOTHING: deliver all three signatories alive to a Stone Builders agent — full pay or none.",
+      "requirement": { "rep": 22 },
+      "reward": { "tc": 200, "rep": 14 },
+      "escort": { "count": 3, "label": "Signatories", "mode": "all_or_nothing" }
+    },
+    {
+      "id": "fq_forgotten_order_novices_escort",
+      "factionId": "forgotten_order",
+      "title": "Novices on the Road",
+      "description": "Three novices walking their first circuit of the buried country. Their faith is new; the dangers are not.",
+      "objective": "Escort the novices to a Forgotten Order agent. Pay scales with how many arrive standing.",
+      "requirement": { "rep": 5 },
+      "reward": { "tc": 65, "rep": 7 },
+      "escort": { "count": 3, "label": "Novices" }
+    },
+    {
+      "id": "fq_forgotten_order_almoners_escort",
+      "factionId": "forgotten_order",
+      "title": "The Almoners' Walk",
+      "description": "Two almoners carry the Order\u2019s giving out to the far camps. Coin draws knives; kindness draws crowds.",
+      "objective": "Escort the almoners to a Forgotten Order agent. Pay scales with the state you deliver them in.",
+      "requirement": { "rep": 12 },
+      "reward": { "tc": 90, "rep": 9 },
+      "escort": { "count": 2, "label": "Almoners" }
+    },
+    {
+      "id": "fq_forgotten_order_relic_bearers_escort",
+      "factionId": "forgotten_order",
+      "title": "Relic Bearers",
+      "description": "Two bearers carry a thing the Order does not name in the open. What they carry cannot arrive at all if it does not arrive whole.",
+      "objective": "ALL OR NOTHING: deliver the relic bearers alive to a Forgotten Order agent for full pay — or nothing.",
+      "requirement": { "rep": 18 },
+      "reward": { "tc": 170, "rep": 12 },
+      "escort": { "count": 2, "label": "Relic Bearers", "mode": "all_or_nothing" }
+    },
+    {
+      "id": "fq_forgotten_order_confessor_escort",
+      "factionId": "forgotten_order",
+      "title": "The Abbot's Confessor",
+      "description": "One confessor, carrying every secret the Abbot could not keep. The Order would rather lose the road than lose the man.",
+      "objective": "ALL OR NOTHING: deliver the confessor alive to a Forgotten Order agent — full pay or none.",
+      "requirement": { "rep": 22 },
+      "reward": { "tc": 210, "rep": 15 },
+      "escort": { "count": 1, "label": "Confessor", "mode": "all_or_nothing" }
+    },
+    {
+      "id": "fq_eternal_dynasty_census_takers_escort",
+      "factionId": "eternal_dynasty",
+      "title": "Census Takers",
+      "description": "Three census takers with ledgers of who lives where. In the waste, being counted has enemies.",
+      "objective": "Escort the census takers to an Eternal Dynasty agent. Pay scales with how many arrive standing.",
+      "requirement": { "rep": 8 },
+      "reward": { "tc": 80, "rep": 8 },
+      "escort": { "count": 3, "label": "Census Takers" }
+    },
+    {
+      "id": "fq_eternal_dynasty_ledgermen_escort",
+      "factionId": "eternal_dynasty",
+      "title": "The Tax Ledgermen",
+      "description": "Two ledgermen carrying the season\u2019s assessments. No one loves them. The Dynasty pays for them anyway.",
+      "objective": "Escort the ledgermen to an Eternal Dynasty agent. Pay scales with the state you deliver them in.",
+      "requirement": { "rep": 12 },
+      "reward": { "tc": 95, "rep": 9 },
+      "escort": { "count": 2, "label": "Ledgermen" }
+    },
+    {
+      "id": "fq_eternal_dynasty_heirs_tutor_escort",
+      "factionId": "eternal_dynasty",
+      "title": "The Heir's Tutor",
+      "description": "One tutor who knows what the heir must learn and what the heir must never learn. Both lists make him a target.",
+      "objective": "ALL OR NOTHING: deliver the tutor alive to an Eternal Dynasty agent — full pay or none.",
+      "requirement": { "rep": 18 },
+      "reward": { "tc": 180, "rep": 13 },
+      "escort": { "count": 1, "label": "Tutor", "mode": "all_or_nothing" }
+    },
+    {
+      "id": "fq_eternal_dynasty_treaty_scribes_escort",
+      "factionId": "eternal_dynasty",
+      "title": "Treaty Scribes",
+      "description": "Two scribes carrying a treaty that exists in exactly two copies. The Dynasty holds the other one.",
+      "objective": "ALL OR NOTHING: deliver both scribes alive to an Eternal Dynasty agent for full pay — or nothing.",
+      "requirement": { "rep": 22 },
+      "reward": { "tc": 200, "rep": 14 },
+      "escort": { "count": 2, "label": "Scribes", "mode": "all_or_nothing" }
+    },
+    {
+      "id": "fq_tartarian_revivalists_cataloguers_escort",
+      "factionId": "tartarian_revivalists",
+      "title": "Field Cataloguers",
+      "description": "Three cataloguers bound for a dig with empty crates and full notebooks. The road reads neither.",
+      "objective": "Escort the cataloguers to a Tartarian Revivalists agent. Pay scales with how many arrive standing.",
+      "requirement": { "rep": 6 },
+      "reward": { "tc": 70, "rep": 8 },
+      "escort": { "count": 3, "label": "Cataloguers" }
+    },
+    {
+      "id": "fq_tartarian_revivalists_glyph_readers_escort",
+      "factionId": "tartarian_revivalists",
+      "title": "The Glyph Readers",
+      "description": "Two readers who can hear the old stones. What they hear is worth more than what they carry.",
+      "objective": "Escort the glyph readers to a Tartarian Revivalists agent. Pay scales with the state you deliver them in.",
+      "requirement": { "rep": 12 },
+      "reward": { "tc": 90, "rep": 9 },
+      "escort": { "count": 2, "label": "Glyph Readers" }
+    },
+    {
+      "id": "fq_tartarian_revivalists_first_stone_keepers_escort",
+      "factionId": "tartarian_revivalists",
+      "title": "Keepers of the First Stone",
+      "description": "Two keepers carry a shard of the First Stone between shrines. The Revivalists count its arrival in whole shards only.",
+      "objective": "ALL OR NOTHING: deliver the keepers alive to a Tartarian Revivalists agent for full pay — or nothing.",
+      "requirement": { "rep": 18 },
+      "reward": { "tc": 175, "rep": 12 },
+      "escort": { "count": 2, "label": "Keepers", "mode": "all_or_nothing" }
+    },
+    {
+      "id": "fq_tartarian_revivalists_ashfall_pilgrimage_escort",
+      "factionId": "tartarian_revivalists",
+      "title": "Sister Ashfall's Pilgrimage",
+      "description": "Sister Ashfall walks to the drowned shrine she has read about her whole life. The Revivalists will not accept a version of her that does not arrive.",
+      "objective": "ALL OR NOTHING: deliver Sister Ashfall alive to a Tartarian Revivalists agent — full pay or none.",
+      "requirement": { "rep": 22 },
+      "reward": { "tc": 220, "rep": 15 },
+      "escort": { "count": 1, "label": "Sister Ashfall", "mode": "all_or_nothing" }
     }
   ]
 }

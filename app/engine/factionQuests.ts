@@ -51,7 +51,12 @@ export interface FactionQuestDef {
    *  takes real collateral damage in the player's fights — deliver them alive
    *  or the contract FAILS. `count` (1-5) sets party size, default 2-3;
    *  `label` is the one-word party name ("Surveyors"). */
-  escort?: { count?: number; label?: string };
+  escort?: { count?: number; label?: string;
+    /** OTA-987 — pay model. 'scaled' (the default): the TC reward tracks the
+     *  fraction of the party still standing at delivery ("delivered 2 of 3,
+     *  get 2/3 pay"). 'all_or_nothing': the higher-tier drop-offs — deliver
+     *  them alive for FULL pay, or lose everything when the pool dies. */
+    mode?: 'scaled' | 'all_or_nothing' };
   /** Optional explicit ROUTE destination for this contract's objective (a
    *  location id). When present it overrides the engine's text-derived guess for
    *  "ROUTE TO"; absent → the engine infers it from the mission text, falling

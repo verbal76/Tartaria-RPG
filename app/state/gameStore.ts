@@ -20448,7 +20448,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // B2 — full pay in person + a long-haul TC bonus scaled to how far you carried it.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.reward.tc);
-    const payTc = candidate.reward.tc + journeyTc;
+    // OTA-987 — ESCORT pay model (owner: "go with the scaled party for most
+    // escorts, but make the higher tier escorts all or nothing"). Scaled
+    // escorts pay the TC fee times the fraction of the party still standing
+    // (floored at 10% — you did walk them there); all_or_nothing drop-offs
+    // skip the scaling entirely. Rep pays in full either way — the faction
+    // credits the delivery itself.
+    let escortPayMult = 1;
+    if (activeRecord?.escort && candidate.escort?.mode !== 'all_or_nothing') {
+      const e = activeRecord.escort;
+      if (e.hpMax > 0) escortPayMult = Math.max(0.1, Math.min(1, e.hp / e.hpMax));
+    }
+    const payTc = Math.max(1, Math.round((candidate.reward.tc + journeyTc) * escortPayMult));
     const payRep = candidate.reward.rep;
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, payRep);
     set((s) =>
@@ -20490,7 +20501,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const eMod = require('../engine/escort') as typeof import('../engine/escort');
       const dSpec = eMod.escortSpecForQuest(candidate);
-      if (dSpec) get().appendLog('reward', `You delivered your ${dSpec.label} safely. They peel off with a nod.`);
+      if (dSpec) {
+        get().appendLog('reward', escortPayMult < 1
+          ? `You delivered your ${dSpec.label} — battered, but breathing. The fee reflects the shape you brought them in (${Math.round(escortPayMult * 100)}% pay).`
+          : `You delivered your ${dSpec.label} safely. They peel off with a nod.`);
+      }
     }
     plantNextContractHint(get, candidate.factionId, 'faction_quest');
     void get().persist();
