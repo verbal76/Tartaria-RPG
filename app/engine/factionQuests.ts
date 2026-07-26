@@ -93,6 +93,24 @@ export function factionQuestReady(
   return true;
 }
 
+/** OTA-961 — item names an ACCEPTED fetch contract still wants (active OR paused —
+ *  a paused contract stays on the slate and the player may gather for it).
+ *  Drives the inventory's CONTEXT-AWARE "Save for quest" earmark: the button
+ *  only appears for items a live "gather N, bring them back" contract
+ *  actually names. Owner: "I would only like it to say save for quest when
+ *  you actually have an active quest that needs them" — specific objective
+ *  items are hard-locked automatically and never need the earmark. */
+export function activeFetchItemNames(
+  active: ReadonlyArray<{ id: string }> | null | undefined,
+): Set<string> {
+  const names = new Set<string>();
+  for (const a of active ?? []) {
+    const def = findFactionQuestById(a.id);
+    if (def?.fetch) names.add(def.fetch.itemName.toLowerCase());
+  }
+  return names;
+}
+
 // Quests offered by `factionId` that the player has not yet accepted or
 // completed, and where the player meets the rep requirement.
 export function availableFactionQuests(
