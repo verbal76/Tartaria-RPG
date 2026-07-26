@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.12';
+export const DISPLAY_VERSION = '4.28.13';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18300,4 +18300,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the InventoryScreen button math; rest now knits ~15% hpMax per full sleep (supersedes arb37),
 // and the full-rest refusal counts open wounds as a reason to sleep. Floors keep the early game
 // identical. DISPLAY_VERSION 4.28.12. 2 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-1001-light-healing';
+// OTA-1002 (offer budget + rep floors). Task #121. Root cause: the scene-entry
+// vendor block has FOUR independent offer emitters (contract / bounty board / mystery notice /
+// thick scroll), each firing whenever its pool was stocked — no aggregate budget, so a mid-game
+// player got pitched all four every visit. Category fix at the shared block: agents pitch TWO
+// rotating categories per macro visit (keyed on macroVisitSeq, walks one step per visit — every
+// category surfaces within two stops); turn-in hints stay unbudgeted. Plus: the all_or_nothing
+// escort tier (full pay or lose EVERYTHING) sat at rep 18-22 — a newcomer trap; all 8 floored
+// at rep 25. DISPLAY_VERSION 4.28.13. 4 tests. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-1002-offer-budget';
