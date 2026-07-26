@@ -34,6 +34,9 @@ export type HookKind =
   | 'sealed_vault_door'
   | 'preserved_corpse'
   | 'stranded_traveler'
+  // OTA-1004 — The Hollowed: a rumour of one of this install's fallen, walking.
+  // Spawner-planted only (weight 0), like stranded_traveler.
+  | 'fallen_whisper'
   // OTA-418 — Tier-3: INTERIOR finds (indoors-only). Planted by the indoor
   // hook pool when the player investigates / looks around inside a hub room or
   // a building, so a candle in a house surfaces an interior lead (a loose
@@ -184,6 +187,12 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
     { line: 'Someone is sitting on their pack at the edge of the path — no party, no fire, and a long way from anywhere. They stand when they see you.',
       nouns: ['traveler', 'traveller', 'stranger', 'stranded', 'figure', 'person', 'walker'] },
   ],
+  // OTA-1004 — THE HOLLOWED rumour. Planted only by the stepDirection spawner
+  // (weight 0): a trail sign that one of the install's fallen is walking.
+  fallen_whisper: [
+    { line: 'Someone has driven a broken blade into the mud at the verge, hilt up, the way the road-people mark a killing. A strip of cloth is knotted around the guard — a warband colour, faded, and far too well-kept to have been left long.',
+      nouns: ['blade', 'marker', 'hilt', 'cloth', 'strip', 'sword', 'sign', 'grave', 'rumor', 'rumour', 'whisper'] },
+  ],
   // OTA-418 — INTERIOR finds. Each plants something you'd notice INSIDE a room.
   loose_floorboard: [
     { line: 'One floorboard sits proud of the rest, its nails backed half out — lifted and re-laid more than once.', nouns: ['floorboard', 'board', 'plank', 'floor', 'nails'] },
@@ -275,7 +284,10 @@ export type HookEffect =
   // OTA-988 — HOOK ESCORT: start a faction escort contract from the wild, no
   // vendor. Resolves a rep-0 `_stranded_escort` def the player doesn't already
   // hold, spawns the shared pool, pushes the activeFactionQuests record.
-  | { type: 'start_escort_contract'; idSuffix: string };
+  | { type: 'start_escort_contract'; idSuffix: string }
+  // OTA-1004 — THE HOLLOWED: call one of this install's un-avenged fallen out of
+  // the mud as a revenant BOSS in the current scene. Empty pool = cold trail.
+  | { type: 'spawn_fallen_revenant' };
 
 // OTA-185 — minimal vendor-spec for hook-spawned traders. Mirrors
 // the VendorInstance fields the engine needs to render + serve a
@@ -815,6 +827,23 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       done: true,
     },
   ],
+  // OTA-1004 — THE HOLLOWED rumour chain. Beat 1 reads the marker and names what
+  // it means; beat 2 is the answer walking out of the mud. Two beats so a
+  // player who wants no part of it can ABANDON at the sign.
+  fallen_whisper: [
+    {
+      line: 'You crouch by the marker. The cloth is not weathered enough for the blade it is tied to, and the mud around the hilt is churned — something has stood here more than once. Whoever set this was warning the road, not mourning.',
+      arbiterLine: '"They mark where a thing walks, not where a body lies," the Arbiter says. "CONTINUE and you call it. ABANDON and you leave it to the next traveller."',
+      effects: [],
+      done: false,
+      addNouns: ['marker', 'blade', 'hilt', 'cloth', 'mud', 'warning', 'it', 'thing'],
+    },
+    {
+      line: 'You put your hand on the hilt and say what you know into the wet air — a name, if you have one, and a challenge if you do not.',
+      effects: [{ type: 'spawn_fallen_revenant' }],
+      done: true,
+    },
+  ],
   // OTA-418 — INTERIOR chains. Two beats each: examine reveals more, then a
   // modest interior payoff (a stash, a memo, a coin or scrap, a small heal).
   loose_floorboard: [
@@ -998,6 +1027,7 @@ export const HOOK_WEIGHTS: Record<HookKind, number> = {
   sealed_vault_door: 3, // mostly chained
   preserved_corpse: 6,
   stranded_traveler: 0, // OTA-988 — spawner-planted only, never randomly drawn
+  fallen_whisper: 0, // OTA-1004 — The Hollowed: spawner-planted only
 
   // OTA-418 — interior weights (only ever drawn by the INDOOR picker below).
   loose_floorboard: 8,
@@ -1042,7 +1072,7 @@ function pickWeightedHookKind(include: (k: HookKind) => boolean, fallback: HookK
 
 /** OUTDOOR random hook — excludes the interior kinds. */
 export function pickRandomHookKind(): HookKind {
-  return pickWeightedHookKind((k) => !INDOOR_HOOK_KINDS.has(k) && k !== 'stranded_traveler', 'glint');
+  return pickWeightedHookKind((k) => !INDOOR_HOOK_KINDS.has(k) && k !== 'stranded_traveler' && k !== 'fallen_whisper', 'glint');
 }
 
 /** OTA-418 — INDOOR random hook — only the interior kinds. */
