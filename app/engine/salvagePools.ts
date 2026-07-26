@@ -401,6 +401,26 @@ function pickWeighted(items: PoolEntry[], rng: () => number): PoolEntry {
  *  JUNK_POOL so the player always walks away with at least one
  *  item; the empty outcome is gone from this path. */
 export function rollSalvagePool(noun: string, rng: () => number = Math.random): SalvageOutcome | null {
+  // OTA-1000 — a SIGIL/CREST noun is a faction's mark, not scrap (owner: "a pried
+  // sigil awards coin? it should give me a faction sigil"). Faction inferred
+  // from the noun's own words (the sigils.ts keyword map — "architect sigil"
+  // → Architect Sigil), otherwise rolled across the nine. The turn-in economy
+  // (sigils.ts, +1 standing at that faction's agent) takes it from there.
+  if (/\b(sigil|crest)\b/i.test(noun)) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { FACTION_SIGIL_NAME, inferEnemyFaction } = require('./sigils') as typeof import('./sigils');
+    const fids = Object.keys(FACTION_SIGIL_NAME);
+    const fid = inferEnemyFaction(noun) ?? fids[Math.floor(rng() * fids.length)]!;
+    const sigilName = FACTION_SIGIL_NAME[fid]!;
+    return {
+      kind: 'material',
+      poolId: 'sigil',
+      itemName: sigilName,
+      rarity: 'Uncommon',
+      quantity: 1,
+      line: `You work the ${noun} free of the stone. A faction's mark, whole — someone will pay standing to see it come home.`,
+    };
+  }
   const pool = pickPool(noun);
   if (!pool) return null;
   if (rng() < NOTHING_CHANCE) {
