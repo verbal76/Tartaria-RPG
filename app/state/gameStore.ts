@@ -16772,6 +16772,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : `The Arbiter keeps his voice low. "Slipping away at arm's reach is a coin-flip with your stealth — and a miss lets the whole pack swing free. Weigh it against just fighting."`);
         }
       }
+      // OTA-976 — a CLOSE failed stealth check teaches a little while STE is
+      // still finding its feet (cold-start band only; see trainStatNearMiss).
+      if (intent === 'stealth' && !skill.success) {
+        const liveNm = get().player;
+        if (liveNm) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { trainStatNearMiss } = require('../engine/statTraining') as typeof import('../engine/statTraining');
+          const nm = trainStatNearMiss(liveNm, 'stealth', skill.total ?? 0, skill.target ?? 0);
+          if (nm.player !== liveNm) {
+            set((s2) => (s2.player ? { player: nm.player } : s2));
+            get().appendLog('debug', `train: stealth near-miss → progress ${nm.player.statProgress?.stealth ?? '?'}/100`);
+            if (nm.leveled) {
+              get().appendLog('reward', `✦ Even the misses teach. +1 STE (${statNowClause(get().player, 'stealth', nm.leveled.to)}).`);
+            }
+          }
+        }
+      }
       if (skill.success) {
         // arb-fix — quest ARRIVAL/exploration stages (investigate/stealth/
         // diplomacy/escape/cast) must not auto-advance mid-combat: a stealth

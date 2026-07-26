@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.9';
+export const DISPLAY_VERSION = '4.28.10';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17261,4 +17261,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // marker trait/name — locked by test); the sentimental put-to-rest close writes the memorial:
 // "put to rest by <avenger>" shows in the FALLEN codex, install-wide. New engine/fallenRevenants.ts.
 // Hint-mission rumor pickup ships next OTA. DISPLAY_VERSION 4.28.9. 4 tests. HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-975-the-hollowed';
+// OTA-976 (stealth cold start; golem port of HAL OTA-999). Owner: "why does STE build so slowly... my character is
+// still at 0" — root cause: stealth is the only stat that can START at 0 (others 5-13), the
+// success-gated curve needed ~34 successful sneaks for the FIRST point, failures taught nothing
+// (and in combat punished the attempt), and only three deliberate thief actions train it at all.
+// Owner picked (a)+(b-low): a stat in the 0-2 band earns DOUBLE progress (+6/success, first points
+// in ~17 uses); NEAR-MISS learning is deliberately the LOWER road — only while the stat is <= 5,
+// only a failure within 3 of the DC, flat +1 (a sixth of a cold-start success) — so nothing
+// snowballs once the needle moves. Wired stealth-only at the failed-check site. DISPLAY_VERSION
+// 4.28.10. 3 tests + curve retarget. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-976-stealth-cold-start';
