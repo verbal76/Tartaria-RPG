@@ -4503,26 +4503,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', sceneFeatureRefusalLine(ambientHit));
       return;
     }
-    // Self-healing dedup: a noun is "really consumed" only when the
-    // matching catalog item is currently in inventory. Without that,
-    // the searchedAmbientNouns entry is most likely a pre-OTA-173
-    // salvage-on-nothing bug-write, OR the player sold / dropped the
-    // item — either way they should be able to take from the scene
-    // again. This unsticks corrupted save state without breaking
-    // legitimate dedup for normal takes.
+    // OTA-958 — a scene noun grants its item ONCE per room, PERIOD. The old
+    // "self-healing dedup" re-allowed the take whenever the item was no longer
+    // in the pack (meant for sold/dropped copies + pre-OTA-173 corrupt
+    // markers) — but USING an item also removes it from the pack, so
+    // take -> use -> take was an infinite farm for any takeable consumable
+    // (owner's log: the same Aetheric Torch taken twice, 19 seconds apart).
+    // The shelf does not regrow.
     const alreadyConsumed = nonClimbMarkers(room?.searchedAmbientNouns).some(
       (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
     );
     if (alreadyConsumed) {
-      const catNameLower = cat.name.toLowerCase();
-      const ownsCatalogItem = player.inventory.some(
-        (i) => i.name.toLowerCase() === catNameLower && i.quantity > 0,
-      );
-      if (ownsCatalogItem) {
-        get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
-        return;
-      }
-      // Fall through to grant — the entry is corrupt / stale.
+      get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
+      return;
     }
     const newItem: InventoryItem = stampDurability({
       id: `take_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
@@ -15416,27 +15409,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 break;
               }
               const cat = findCatalogItem(ambientHit);
-              // Self-healing dedup — see takeAmbientNoun (~line 960)
-              // for full rationale. Treat consumed-but-not-in-pack
-              // entries as stale.
+              // OTA-958 — once per room, PERIOD (see takeAmbientNoun): the
+              // owned-check "self-heal" made take -> use -> take an infinite
+              // farm for any takeable consumable.
               const alreadyConsumed = nonClimbMarkers(ambientRoom?.searchedAmbientNouns).some(
                 (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
               );
-              if (alreadyConsumed && cat) {
-                const catNameLower = cat.name.toLowerCase();
-                const ownsCatalogItem = player.inventory.some(
-                  (i) => i.name.toLowerCase() === catNameLower && i.quantity > 0,
-                );
-                if (ownsCatalogItem) {
-                  get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
-                  break;
-                }
-                // Fall through — stale entry, allow the grant.
-              } else if (alreadyConsumed && !cat) {
-                // Non-catalog scene feature already consumed (e.g. an
-                // ambient noun the player searched on). Preserve the
-                // old behavior since there's no catalog item to
-                // gate self-heal against.
+              if (alreadyConsumed) {
                 get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
                 break;
               }
@@ -21594,11 +21573,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const ev = WE.pickWorldEvent(ctx, rt);
       if (ev) {
         const tides = WE.applyTideDelta(get().worldMemory.factionTides ?? {}, ev.effect.tideDelta);
-        if (ev.effect.repDelta) {
-          const rep = applyRepChange(get().player!.factionStanding, ev.effect.repDelta.factionId, ev.effect.repDelta.delta);
-          set((st) => (st.player ? { player: { ...st.player, factionStanding: rep.standing } } : st));
-          logRepChanges(get, rep.changed);
-        }
+        // OTA-958 — NO repDelta here. This copy of worldTideCheck's clause made
+        // player-facing faction STANDING move every ~36 real seconds — roughly
+        // 10x the intended in-game 2-hour cadence — including while idle. And
+        // since the rep-carrying events (defector / windfall) are only
+        // eligible once a faction likes you (standing >= 10) and are strictly
+        // positive for it, leaving the app open ratcheted standing toward the
+        // cap for free. The heartbeat now moves tides / patrols / the board
+        // only, matching the offline catch-up path's restraint; standing moves
+        // solely on the in-game pulse.
         set((st) => ({ worldMemory: {
           ...st.worldMemory,
           factionTides: tides,
@@ -30280,27 +30263,11 @@ function narrateCasualLook(
     const recorded = lookSearched.some(
       (s) => s === lower || s.includes(lower) || lower.includes(s),
     );
-    if (recorded) {
-      // Honor engine dedup; but if the noun resolves to a real
-      // catalog item AND the player no longer owns it (dropped /
-      // sold), allow the noun back as re-takeable. Mirrors the
-      // self-heal in takeAmbientNoun.
-      const cat = findCatalogItem(displayNoun);
-      if (!cat) return true;
-      const ownsIt = !!player && player.inventory.some(
-        (i) => i.name.toLowerCase() === cat.name.toLowerCase() && i.quantity > 0,
-      );
-      return ownsIt;
-    }
-    // (2) inventory self-heal — searchedAmbientNouns may have missed
-    // a write (pre-fix bundle, race, etc.); if the player is already
-    // carrying the catalog item this noun would grant, treat as
-    // consumed so the "You see:" list stays honest.
-    const cat = findCatalogItem(displayNoun);
-    if (!cat || !player) return false;
-    return player.inventory.some(
-      (i) => i.name.toLowerCase() === cat.name.toLowerCase() && i.quantity > 0,
-    );
+    // OTA-958 — taken is taken (mirrors the engine's once-per-room rule; the
+    // owned-check un-grey re-opened the take farm). And an UN-taken noun shows
+    // regardless of what the pack holds — owning a torch from elsewhere must
+    // not hide a fresh one the engine would happily grant.
+    return recorded;
   };
   const interactables: string[] = [];
   const source = scene.displayedAmbientNouns ?? (scene.ambientNouns ?? []).slice(0, 8);

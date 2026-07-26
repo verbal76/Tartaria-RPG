@@ -348,14 +348,11 @@ export function ExplorationScreen() {
       !isFuzzyConsumed(noun, productivelyConsumedSet)
       && !isNounFlavorExhausted(noun, flavorExhaustedSet)
     ) return false;
-    if (!player) return true;
-    const cat = findCatalogItem(noun);
-    if (!cat) return true; // not a catalog item; honor engine dedup as-is
-    const targetName = cat.name.toLowerCase();
-    const owns = player.inventory.some(
-      (i) => i.name.toLowerCase() === targetName && i.quantity > 0,
-    );
-    return owns;
+    // OTA-958 — taken is taken. The ownership tail un-greyed the chip the moment
+    // the item left the pack — but USING it also empties the pack, so the chip
+    // re-lit and take -> use -> take farmed forever. Mirrors the engine's
+    // once-per-room rule exactly (a lit chip must never earn a refusal).
+    return true;
   };
 
   // 2026-05-26 OTA-070 — substring-fuzzy consumed check. Mirrors

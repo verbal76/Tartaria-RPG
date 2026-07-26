@@ -17071,4 +17071,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // holstered Bolt-Caster; it now reads the swung hand. Tests: mid-fight DOT kill, throw settle/cancel,
 // point-blank slot; retargeted bandolierThrowConsumes + dotKillEndsCombat to the new semantics.
 // typecheck:ci + typecheck:tests + lint clean; full fast suite green. Combat core -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-957-combat-truth';
+// OTA-958 (exploit batch; golem port of HAL OTA-981). Two closures from the playtest-log audit. (1) STANDING DRIP:
+// the 6s wall-clock world heartbeat (worldRealtimeTick) carried a copy of worldTideCheck's repDelta
+// clause, so player-facing faction standing moved every ~36 real seconds — ~10x the intended in-game
+// 2-hour cadence, idle included — and since the rep events (defector/windfall) are only eligible for
+// a faction at standing >= 10 and are strictly positive for it, leaving the app open ratcheted rep
+// toward the cap for free. The heartbeat now moves tides/patrols/board only. (2) TAKE FARM: the
+// ground-take "self-heal" re-granted a scene item whenever it was absent from the pack — meant for
+// sold/dropped copies, but USING an item also empties the pack, so take->use->take farmed any takeable
+// consumable forever (owner's log: the same Aetheric Torch taken twice, 19s apart). A scene noun now
+// grants ONCE per room, period, across all four sites: takeAmbientNoun, the typed pickup fallback,
+// the look-around "You see:" filter, and the TAKE-chip grey-out (a lit chip never earns a refusal).
+// Tests: 120 heartbeat ticks leave standing untouched (board still scrolls); take->use->take refused
+// on both take paths. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+// World-sim + economy integrity -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-958-exploit-batch';
