@@ -79,11 +79,13 @@ describe('OTA-911 — dodge / flee are off while elevated on a climb', () => {
     expect(logs).toMatch(/can't dodge on the tower|no footing to weave/i);
   });
 
-  it('flee is refused mid-climb', async () => {
+  it('flee with NOTHING chasing you is still refused mid-climb', async () => {
     const store = await bootElevated();
     await store.getState().submitPlayerAction('flee');
     const logs = store.getState().gameLog.map((e) => e.text).join('\n');
-    expect(logs).toMatch(/nowhere to run but straight down|hold your place/i);
+    // OTA-976 — flee IS legal in wall FIGHTS now (rolled; see the wall-flee suite);
+    // with no enemies it stays refused, with the pointer at plain climbing down.
+    expect(logs).toMatch(/Nothing up here is chasing you/i);
   });
 
   it('on the ground the same verbs are NOT intercepted by the climb gate', async () => {

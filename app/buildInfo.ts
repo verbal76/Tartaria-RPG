@@ -18023,4 +18023,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // retries 2-4 swallowed into silence. 7 tests: formula parity, warn-then-fall, slide, partial hold, mid-climb eat,
 // rest retries always answer. typecheck:ci + typecheck:tests + lint clean; full fast suite green. -> HAL + golem
 // (NOT engine).
-export const OTA_BUILD_ID = '2026-07-25-975-zero-grip-gravity';
+// OTA-976 (wall flee: dive for the base). Owner: "when I summit some climbs [I] immediately get thrust into
+// a fight with up to five enemies. there is no way to flee." FLEE is now legal in wall fights: the OTA-911 intercept
+// keeps blocking DODGE (and fleeing NOTHING on a wall), but flee with enemies present runs the NORMAL escape roll.
+// SUCCESS = one-tap dive for the base from ANY tier: enemies left behind (summit boss resets like a break-off; an
+// apex overlay restores its preserved base scene), descent costs DOUBLE stamina per tier, and if the tank empties
+// partway the tiers your arms couldn't cover are a FALL (computeClimbFallBase for the remaining height; Skyreacher
+// halves). FAILURE keeps you on the wall and the enemy group takes its opening (the standard failed-flee volley), with
+// the follow-up hint rewritten for walls (no dodge advice up there). UI: the flee QuickBtn now shows while elevated;
+// the ⛰ ELEVATED notice + ambush/summit banners say flee is on the menu. NOTE: the OTA-455 first-steps flee grace
+// applies on walls too — a brand-new character's failed wall-flee still nudges to success. 5 tests (internal-d20
+// outcomes observed across fresh boots): won-flee clean descent + double burn, won-flee stamina shortfall -> scaled
+// fall, failed flee holds the wall + enemy opening + wall-aware hint, dodge still refused, flee-with-no-enemies still
+// refused. typecheck:ci + typecheck:tests + lint clean; full fast suite green. -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-976-wall-flee';
