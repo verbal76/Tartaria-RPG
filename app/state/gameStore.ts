@@ -22597,6 +22597,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (stallBlurb) get().appendLog('world', stallBlurb);
       }
     }
+    // OTA-988 — HOOK ESCORT spawner: a stranded traveler on novel wild ground
+    // offers an escort. Patterned on the roadside-stall roll above; anti-farm
+    // mirrors the wanderer bank (one roll per tile, ever, 120-tile window).
+    {
+      const liveScene = get().currentScene;
+      const livePlayer = get().player;
+      const peacefulWild = !!liveScene
+        && (!liveScene.enemies || liveScene.enemies.length === 0)
+        && !liveScene.vendor && !liveScene.wanderer
+        && !livePlayer?.hubRoomId;
+      // One escort party at a time — never stack a second stranded traveler
+      // on top of a live one.
+      const hasLiveEscort = (livePlayer?.activeFactionQuests ?? [])
+        .some((q) => q.escort && q.escort.hp > 0);
+      const sTileKey = livePlayer ? `${livePlayer.currentLocationId}:${livePlayer.mapX}:${livePlayer.mapY}` : '';
+      const sRolled = get().worldMemory.strandedEscortRolledTiles ?? [];
+      if (peacefulWild && !hasLiveEscort && tileIsNovel && sTileKey && !sRolled.includes(sTileKey)) {
+        set((s2) => ({ worldMemory: {
+          ...s2.worldMemory,
+          strandedEscortRolledTiles: [...(s2.worldMemory.strandedEscortRolledTiles ?? []), sTileKey].slice(-120),
+        } }));
+        if (Math.random() < 0.06) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { plantHookByKind } = require('../engine/hooks') as typeof import('../engine/hooks');
+          const h = plantHookByKind('stranded_traveler');
+          set((s2) => (s2.currentScene
+            ? { currentScene: { ...s2.currentScene, hooks: [...(s2.currentScene.hooks ?? []), h] } }
+            : s2));
+          get().appendLog('world', h.plantedLine);
+          get().appendLog('system', `Try "talk to the traveler" — they want something from you.`);
+        }
+      }
+    }
 
     // arb36 — per-tile enterable structure. Deterministic for the tile, so
     // it persists on revisit and clears as you walk off; narrate only when
@@ -26708,6 +26741,44 @@ function applyHookEffect(
       } catch {
         return { inlineSummary: 'a quiet knowing', fatal: false };
       }
+    }
+    // OTA-988 — HOOK ESCORT: take a field escort from a stranded traveler. Picks a
+    // rep-0 `_stranded_escort` def the player doesn't hold, spawns the shared
+    // pool, and pushes the record — same shape acceptFactionQuest writes, so
+    // collateral / fail / pay / turn-in all work unchanged.
+    case 'start_escort_contract': {
+      const p = get().player;
+      if (!p) return { inlineSummary: null, fatal: false };
+      const activeIds = p.activeFactionQuestIds ?? [];
+      const doneIds = p.completedFactionQuestIds ?? [];
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { FACTION_QUESTS } = require('../engine/factionQuests') as typeof import('../engine/factionQuests');
+      const pool = FACTION_QUESTS.filter((q) =>
+        q.id.endsWith(effect.idSuffix) && !activeIds.includes(q.id) && !doneIds.includes(q.id));
+      if (pool.length === 0) return { inlineSummary: 'no one who needs walking, today', fatal: false };
+      const def = pool[Math.floor(Math.random() * pool.length)]!;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const escortMod = require('../engine/escort') as typeof import('../engine/escort');
+      const spec = escortMod.escortSpecForQuest(def);
+      const escort = spec ? escortMod.spawnEscortPool(spec.count, p.hpMax ?? 20, spec.label) : null;
+      const hasActiveOther = (p.activeFactionQuests ?? []).some((q) => q.tracked !== false);
+      const newTracked = !hasActiveOther;
+      set((s2) => (s2.player ? {
+        player: {
+          ...s2.player,
+          activeFactionQuestIds: [...(s2.player.activeFactionQuestIds ?? []), def.id],
+          activeFactionQuests: [
+            ...(s2.player.activeFactionQuests ?? []),
+            { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now(), tracked: newTracked, ...(escort ? { escort } : {}) },
+          ],
+        },
+      } : s2));
+      bumpQuestsAccepted(get, set);
+      get().appendLog('reward', `✦ Contract taken in the field — ${def.title}. ${def.objective}`);
+      get().appendLog('arbiter', newTracked
+        ? `The Arbiter marks it. "Turn it in to any ${def.factionId.replace(/_/g, ' ')} agent. Open Contracts to route there."`
+        : `The Arbiter marks it. "Parked — you're already running one. Activate it in Contracts when you're ready."`);
+      return { inlineSummary: escort ? `${escort.label} in your care (${escort.hp} HP)` : def.title, fatal: false };
     }
   }
 }
