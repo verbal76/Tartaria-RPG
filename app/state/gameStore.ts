@@ -9205,44 +9205,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `attack: target=${targetEnemy.name} range=${range} reach.bands=[${reach.bands.join(',')}] reach.label=${reach.label} bareHand=${barehand}`,
           );
           if (!reach.bands.includes(range)) {
-            // Don't strand the player on a refusal — close the gap (or
-            // pull back) automatically and treat THIS turn as the
-            // movement. Iron Fog / Silent Blizzard slow the move to two
-            // turns each but no longer block entirely, so the auto-move
-            // always makes progress.
-            // OTA-550 — reach bands are contiguous in RANGE_ORDER (a band +
-            // every band closer). Compare ordinals: if the current range is
-            // FARTHER than the weapon's farthest reachable band, advance
-            // (close the gap); if it's CLOSER than the nearest band (a ranged
-            // weapon shoved into arm's reach), retreat.
+            // OTA-977 — NO INVOLUNTARY FOOTWORK. OTA-550 auto-converted an
+            // out-of-range attack into a MOVE: the player typed "attack", got
+            // no attack, was walked into range, and the enemy answered the
+            // approach with a free swing. Owner, after his fused Resonant
+            // Spike (close-only — fused weapons carry no catalog reach, so
+            // they resolve as melee) dragged him from mid into a crit: "I
+            // didn't move closer, using the weapon moved me closer." The turn
+            // is now REFUSED — no stamina, no time, no enemy counters — with
+            // the weapon's true reach named, and moving left as the player's
+            // own explicit call ('advance' / 'retreat', or swap weapons).
             const curIdx = RANGE_ORDER.indexOf(range);
             const reachIdxs = reach.bands.map((b) => RANGE_ORDER.indexOf(b));
             const nearest = Math.min(...reachIdxs); // farthest band (smallest idx)
-            const farthestClose = Math.max(...reachIdxs); // closest band (largest idx)
-            if (curIdx < nearest) {
-              get().appendLog(
-                'arbiter',
-                `The Arbiter nods at the distance. "${reach.label} needs you closer — closing the gap for you."`,
-              );
-              runMoveCombatRange(get, set, player, currentScene, 'advance');
-              break;
-            }
-            if (curIdx > farthestClose) {
-              get().appendLog(
-                'arbiter',
-                `The Arbiter steps back with you. "${reach.label} needs space — pulling you back."`,
-              );
-              runMoveCombatRange(get, set, player, currentScene, 'retreat');
-              break;
-            }
-            // Last-resort refusal (shouldn't happen for contiguous bands) —
-            // keep a clear diagnosis, exempt from dedup so it shows each try.
-            const remedy = curIdx > farthestClose
-              ? `type 'retreat' to step back for a ranged shot`
-              : `type 'advance' to close in`;
+            const tooFar = curIdx < nearest;
+            const reachSpan = reach.bands.length === 1
+              ? `${RANGE_LABEL[reach.bands[0]!]} range only`
+              : `${RANGE_LABEL[reach.bands[0]!]} range and closer`;
             get().appendLog(
               'arbiter',
-              `The Arbiter holds up a hand. "${reach.label} can't reach at ${RANGE_LABEL[range]} range. ${remedy[0]!.toUpperCase()}${remedy.slice(1)}."`,
+              tooFar
+                ? `The Arbiter holds up a hand. "${reach.label} works at ${reachSpan} — you're at ${RANGE_LABEL[range]}. ADVANCE to close in (they'll answer the approach), or attack with something that reaches."`
+                : `The Arbiter holds up a hand. "${reach.label} needs space — you're at ${RANGE_LABEL[range]}. RETREAT to open the gap (they'll answer the step), or use something that works in tight."`,
               { skipDedup: true },
             );
             break;
