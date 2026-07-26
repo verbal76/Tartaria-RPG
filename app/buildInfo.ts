@@ -18099,4 +18099,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Tests: 120 heartbeat ticks leave standing untouched (board still scrolls); take->use->take refused
 // on both take paths. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
 // World-sim + economy integrity -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-981-exploit-batch';
+// OTA-982 (durability rebalance). Owner's log: a freshly crafted 5-piece set shattered
+// inside ONE ~10-min pack fight (AC 24 -> 17). Audit verdict: not a bug — every landed enemy hit
+// chipped EVERY worn armor slot, so a 5-piece set spent 5 durability per blow and the whole set held
+// ~22 landed hits of life; the numbers were tuned for 1v1 before 5-raider packs and defensive-verb
+// volleys existed. Fixes: (1) a landed blow now chips ONE worn piece (random among worn slots) — more
+// armor means the set lasts LONGER, not dies faster; expected set life vs a 5-pack rises ~5x. (2) the
+// rope's fraying courtesy extends to armor + weapons: at 3 durability the piece warns ("coming apart —
+// mend it or lose it") instead of jumping straight to "shatters from wear. It is gone." The temper
+// roll's fragile floor (0.4x, strong perks) is deliberately UNTOUCHED — it's the glass-cannon
+// tradeoff, and single-piece wear already makes a low roll livable. Tests: 3-piece set loses exactly
+// one point per landed hit over 10 rounds; the 4-durability piece warns at 3. typecheck:ci +
+// typecheck:tests + lint clean; full fast suite green. Combat economy -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-982-durability-rebalance';
