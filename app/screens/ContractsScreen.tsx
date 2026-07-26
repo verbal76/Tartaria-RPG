@@ -8,6 +8,7 @@ import { getItemPreview } from '../components/itemPreview';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
 import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
 import { findFactionQuestById, FACTION_QUESTS, factionQuestReady } from '../engine/factionQuests';
+import { escortToggleLabel } from '../engine/escort';
 import { FACTIONS } from '../engine/factions';
 import { startingLocationForFaction } from '../engine/character';
 import { missionObjectiveLocationId } from '../engine/missionRouting';
@@ -1204,7 +1205,8 @@ export function ContractsScreen() {
                       accessibilityState={{ selected: tracked }}
                     >
                       <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
-                        {tracked ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE — the mission you’re on'}
+                        {/* OTA-963 — name the party the toggle stands down / recalls. */}
+                        {escortToggleLabel(tracked, rec.escort && rec.escort.hp > 0 ? rec.escort : null)}
                       </Text>
                     </Pressable>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
