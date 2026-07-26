@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.6';
+export const DISPLAY_VERSION = '4.28.7';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18248,4 +18248,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // whisper hunt/mystery grants) park the newcomer when anything is live, with the same "paused —
 // you're already on another contract" line. Debug breadcrumbs: every accept logs kind/id/tracked.
 // DISPLAY_VERSION 4.28.6. 2 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-995-accept-unify';
+// OTA-996 (polish trio + observability). Review item #119. (a) Ambient takeable gear
+// gets a cross-tile variety window: pickTakeableGearForScene was independent uniform draws over one
+// 128-name pool with ZERO cross-scene memory — "Rail Saber x3 in 90s" was a birthday collision by
+// construction. worldMemory.recentTakeableGearNames (last 10) now feeds an exclude window;
+// guard-capped so it degrades, never starves. (b) The climb-down line names the PERCH, never the
+// person (overlayDescentNoun — overlay ids doubled as labels and trader/lookout overlays are named
+// after their occupant). (c) The Buried Strip Mall becomes the Buried Market Row (climbable +
+// worldLadder display strings; room id kept for save continuity) + an Americana lock test. Debug
+// breadcrumbs: scene-build state (loc/hub/arrival/passing) + gear-spawn rolls on the debug channel.
+// DISPLAY_VERSION 4.28.7. 4 tests. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-996-polish-trio';

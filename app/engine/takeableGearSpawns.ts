@@ -61,7 +61,14 @@ export function mulberry32(a: number): () => number {
 /** 1–3 common catalog gear names (real names, so the take handler resolves
  *  them), deterministic for a given `seedKey`. ~1-in-50 picks upgrades to an
  *  Uncommon so the loop stays mostly-common per the design. */
-export function pickTakeableGearForScene(seedKey: string): string[] {
+export function pickTakeableGearForScene(
+  seedKey: string,
+  // OTA — #119a: recently-spawned names (lowercase) to avoid — the caller
+  // keeps a small cross-tile ring so adjacent tiles stop rolling the same
+  // gear. The guard cap below prevents a large exclude set from starving
+  // the loop; worst case a tile offers fewer picks, never an infinite spin.
+  exclude?: ReadonlySet<string>,
+): string[] {
   if (COMMON_GEAR.length === 0) return [];
   const rng = mulberry32(hashSeed(`take-gear:${seedKey}`));
   const count = 1 + Math.floor(rng() * 3); // 1..3
@@ -74,6 +81,7 @@ export function pickTakeableGearForScene(seedKey: string): string[] {
     const pool = uncommon ? UNCOMMON_GEAR : COMMON_GEAR;
     const name = pool[Math.floor(rng() * pool.length)];
     if (!name || seen.has(name)) continue;
+    if (exclude?.has(name.toLowerCase())) continue; // OTA — #119a
     seen.add(name);
     picks.push(name);
   }

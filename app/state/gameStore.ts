@@ -5958,6 +5958,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s) => (s.player ? { player: { ...s.player, hubRoomId } } : s));
     }
     const hubRoom = inHub && hubRoomId ? hubRoomFor(hubRoomId, player.factionId) : null;
+    get().appendLog('debug', `scene: loc=${location.id} hub=${hubRoomId ?? '-'} arrival=${opts?.arrivalFromName ? 'y' : 'n'} opening=${opts?.isOpening ? 'y' : 'n'} passing=${passingThrough ? 'y' : 'n'}`);
     if (!inHub && hubRoomId) {
       // Player left the hub — clear the hubRoomId.
       set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
@@ -6393,8 +6394,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the room's consumed set (the take handler's searchedAmbientNouns) here
     // makes a taken piece stay gone for that tile, on hub AND wild tiles.
     const gearConsumed = roomConsumedSet(get().worldMemory, candidateKey);
-    const sceneGearNouns: string[] = pickTakeableGearForScene(candidateKey)
+    // OTA-996 — #119a: cross-tile variety window — exclude the last ~10 rolled
+    // gear names so a short walk stops repeating the same items.
+    const recentGearNames = new Set((worldMemory.recentTakeableGearNames ?? []).map((n) => n.toLowerCase()));
+    const sceneGearNouns: string[] = pickTakeableGearForScene(candidateKey, recentGearNames)
       .filter((n: string) => !isConsumedNoun(gearConsumed, n));
+    if (sceneGearNouns.length > 0) {
+      get().appendLog('debug', `spawn: gear=[${sceneGearNouns.join(', ')}] window=${recentGearNames.size}`);
+      set((s2) => ({
+        worldMemory: {
+          ...s2.worldMemory,
+          recentTakeableGearNames: [...(s2.worldMemory.recentTakeableGearNames ?? []), ...sceneGearNouns].slice(-10),
+        },
+      }));
+    }
     // OTA-375 — water sources for refilling the Water Bottle. Outdoor
     // tiles get a stable, per-room water source surfaced in look-around so
     // 'fill bottle' has somewhere to draw. Seeded off the room key (stable
@@ -14089,7 +14102,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.25) } : sLive));
             get().appendLog(
               'world',
-              `You climb down from the ${overlayMeta.overlayId === 'open_sky' ? 'lookout' : overlayMeta.overlayId.replace(/_/g, ' ')} and rejoin the ground beside the ${climbedName}. Boots back on the ground.`,
+              `You climb down from the ${(() => {
+                // OTA-996 — #119b: place-word per overlay — "climb down from the
+                // forgotten scholar" read as climbing down off a PERSON.
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { overlayDescentNoun } = require('../engine/elevatedOverlay');
+                return overlayDescentNoun(overlayMeta.overlayId);
+              })()} and rejoin the ground beside the ${climbedName}. Boots back on the ground.`,
             );
             // OTA-120 Phase 3 — dog auto-rejoins on climb-down.
             rejoinDogOnDescent(get, set);
