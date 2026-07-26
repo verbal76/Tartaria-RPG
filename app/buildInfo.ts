@@ -10611,8 +10611,15 @@
 //   - When the next AAB ships, app.json expo.version flips up to
 //     DISPLAY_VERSION and the two are synced again.
 //
-// Bump this for marketing-visible version changes.
-export const DISPLAY_VERSION = '4.1.0';
+// OTA-969 — REACTIVATED 2026-07-26 (owner: "let's reactivate it and catch it
+// up"). This is the GAME version the player sees (character-select footer +
+// About) — a knowledge tracker, not a build number. It froze at 4.1.0 back at
+// OTA-602; the catch-up replayed the changelog through VERSION.md's rules:
+// 27 significant feature waves since the freeze -> MINOR 28, then PATCH counts
+// OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
+// RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
+// closes a significant feature wave · MAJOR only on a milestone/lineage jump.
+export const DISPLAY_VERSION = '4.28.3';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17191,4 +17198,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // legacy charts rename on load (backfillPlayer) and legacy names in the sell-once ledger still
 // block re-offers. 4 new tests + 3 suites retargeted. typecheck + lint clean; full fast suite
 // green. Gameplay fix -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-968-skyreacher-maps';
+// OTA-969 (game version 4.28.3; golem port of HAL OTA-992). Owner: the character-select version is a knowledge
+// tracker, not a build number — "let's reactivate it and catch it up." DISPLAY_VERSION had frozen at
+// 4.1.0 back at OTA-602; the catch-up replayed the changelog through VERSION.md's rules (MAJOR =
+// lineage jump, MINOR = significant feature wave, PATCH = every OTA since the last wave): 27 waves
+// since the freeze -> 4.28.3 (full wave ledger written into VERSION.md). VERSION.md's workflow now
+// names DISPLAY_VERSION (the old APP_SEMVER field died in a rework); HANDOFF section-3 change loop
+// gains the per-OTA bump step so the tracker never freezes again. 2 tests. Gameplay-visible ->
+// HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-969-game-version';

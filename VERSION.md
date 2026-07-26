@@ -27,8 +27,11 @@ There are two version numbers and only one moves on an OTA:
 
 ### Workflow
 
-- **Per OTA push:** PATCH += 1 → update `NEXT` below, update
-  `APP_SEMVER` in `app/buildInfo.ts`, bump `OTA_BUILD_ID`, add a log row.
+- **Per OTA push:** PATCH += 1 → update `DISPLAY_VERSION` in
+  `app/buildInfo.ts` (the character-select / About game version) in the same
+  edit as the `OTA_BUILD_ID` bump. (The old `APP_SEMVER` field never survived
+  the buildInfo rework — `DISPLAY_VERSION` is the carrier now.) Log rows here
+  are for MINOR/MAJOR moves and native builds, not every PATCH.
 - **Significant feature:** MINOR += 1, PATCH = 0.
 - **Native APK/AAB build:** stamp `app.json` `version` with the value in
   `NEXT`, then continue OTAs from there.
@@ -39,10 +42,11 @@ There are two version numbers and only one moves on an OTA:
 
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
-- **NEXT — value to stamp on the next native build:** `3.0.0`
-  (the HaL-lineage promotion AAB — MAJOR jump to the new AI-restructured
-  engine)
-- **Current logical version (post-promotion baseline):** `3.0.0`
+- **NEXT — value to stamp on the next native build:** whatever
+  `DISPLAY_VERSION` reads at build time (`4.28.3` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.3` — REACTIVATED
+  2026-07-26 after freezing at `4.1.0` (OTA-602). See the catch-up ledger
+  below for how the number was reconstructed.
 
 > Builds before `3.0.0` (the `2.x` series) predate this ledger and were
 > numbered ad hoc. The scheme starts cleanly at the `3.0.0` promotion.
@@ -52,3 +56,40 @@ There are two version numbers and only one moves on an OTA:
 | Logical | OTA_BUILD_ID | Kind | Notes |
 |---|---|---|---|
 | 3.0.0 | (set at promotion) | AAB | HaL-lineage promotion → Play internal test. Package `com.hotatticgames.tartarprim`, key `tartaria-upload`, versionCode = CI run number. New AI stack (Qwen item-synthesis / MiniLM / Kokoro). |
+| 3.4.11 → 4.1.0 | OTA-602 | OTA | Last bump before the tracker froze (title-screen relabel era). Everything after shipped without moving the number. |
+| 4.28.3 | 2026-07-26-992-game-version | OTA | TRACKER REACTIVATED — caught up 389 frozen OTAs via the wave ledger below. From here: PATCH every OTA, MINOR per feature wave. |
+
+## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
+
+MAJOR stayed **4**: same engine lineage since the AI-restructure promotion.
+MINOR: 1 (at the freeze) + **27 significant feature waves** shipped between
+OTA-603 and OTA-991 = **28**. PATCH: OTAs after the last wave closed (escorts,
+OTA-989) → 990, 991, 992 = **3**. The waves, in ship order:
+
+1. OTA-630–631 — instant Crucible forging (background naming)
+2. OTA-636–637 — typed-damage combat rework (procs/DOTs, weak/resist gating)
+3. OTA-642 — single-active mission system + auto-routing
+4. OTA-643–646 — weapon coatings (+ armor resists)
+5. OTA-650–655 — fusion picker + crafting-screen overhaul
+6. OTA-668–673 — mission tracking + universal contract pause
+7. OTA-675/690/707 — throwables & bandolier overhaul
+8. OTA-691–692 — faction sigils
+9. OTA-710–712 — gesture intent + provokable encounters
+10. OTA-716–724/731 — found-only recipe discovery + Rare/Legendary expansion
+11. OTA-726–730 — economy/gold-sink wave (paid services, premium stock)
+12. OTA-~740–789 — the Hidden Market (square nav, all-faction brokering, rotation)
+13. OTA-795 — dodge rework (opposed-contest AC-bypass gamble)
+14. OTA-806–809 — social rework: parley + menace
+15. OTA-815–819 — engaging-combat rework (scaling, packs, per-spawn weaknesses)
+16. OTA-835 — race abilities become real mechanics
+17. OTA-836–838 — visible-depth QoL (tap-to-explain, codex/bestiary)
+18. OTA-843–845 — emergent depth (Chronicle, World Pulse, The Fallen)
+19. OTA-847 — stealth system
+20. OTA-849–868 — the LIVING WORLD war arc
+21. OTA-869–870 — authored-questline content sprint (all 9 factions arced)
+22. OTA-910–915 — the Great Climbs + Skyreacher drop + the Aetherkin
+23. OTA-927–930 — the POWER rating + lens slot
+24. OTA-947/959 — combat rebalance (defense de-runaway + legibility)
+25. OTA-960–967 — loot audit + boss spoils table
+26. OTA-973–978 — real-heights climbing arc + reach
+27. OTA-985–989 — escort missions
