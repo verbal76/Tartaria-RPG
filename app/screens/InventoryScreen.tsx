@@ -642,7 +642,9 @@ export function InventoryScreen() {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { findGearByName, findExplorationItemByName, findMaterialByName } = require('../engine/crafting');
       const fx = resolveItemEffect(pending.item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
-      return fx?.kind === 'consumable' ? (fx.healHP ?? 0) : 0;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { scaledHealHP: shp } = require('../engine/itemEffect') as typeof import('../engine/itemEffect');
+      return fx?.kind === 'consumable' ? shp(fx.healHP ?? 0, player?.hpMax ?? 0) : 0; // OTA-1001 — #120
     })() : 0;
     const stackQty = pending.item.quantity;
     // Self batch-heal. Two offers:

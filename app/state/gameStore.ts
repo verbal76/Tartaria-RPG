@@ -296,6 +296,7 @@ import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSear
 import { classifyNoun, rollBreakLoot } from '../engine/sceneNounMaterial';
 import { isClimbable, isSwimmable, isSearchable } from '../engine/interactionTags';
 import { rollSalvagePool } from '../engine/salvagePools';
+import { scaledHealHP } from '../engine/itemEffect';
 import { isOversized, refusalLine, sceneFeatureRefusalLine } from '../engine/portability';
 import { bestDigTool, rollDig, DIG_SPOT_PRODUCTIVE_CAP } from '../engine/digging';
 import {
@@ -11796,7 +11797,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               }
               if (fx.healHP) {
                 const room = Math.max(0, p.hpMax - p.hp);
-                const amt = Math.min(room, fx.healHP);
+                const amt = Math.min(room, scaledHealHP(fx.healHP, p.hpMax)); // OTA-1001 — #120
                 p = { ...p, hp: p.hp + amt };
                 // OTA-618 — when the gain is capped by your max HP (you were near
                 // full), flag it. A "+5" off a 6-HP ration then reads as "topped
@@ -12074,7 +12075,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const hpRoom = player.hpMax - player.hp;
           const stamRoom = effectiveStaminaMax(player) - player.stamina;
           const heal = fx
-            ? Math.min(Math.max(0, hpRoom), fx.healHP ?? 0)
+            ? Math.min(Math.max(0, hpRoom), scaledHealHP(fx.healHP ?? 0, player.hpMax)) // OTA-1001 — #120
             : Math.min(Math.max(0, hpRoom), rollDie(6) + rollDie(6));
           const stamGain = fx
             ? Math.min(Math.max(0, stamRoom), fx.restoreStamina ?? 0)
@@ -12266,7 +12267,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // give the RIGHT reason — a hunger-capped player's wind isn't "full",
           // it's choked; point them at food, not sleep.
           const nothingToRest =
-            stamRoom <= 0 && (player.corruption ?? 0) === 0 && !dogToRecall;
+            stamRoom <= 0 && (player.corruption ?? 0) === 0 && !dogToRecall
+            // OTA-1001 — #120: rest heals now, so open wounds are a reason to sleep.
+            && player.hp >= player.hpMax;
           if (nothingToRest) {
             const hungerCappedRefuse =
               (player.hungerStaminaPenalty ?? 0) > 0 && player.stamina < player.staminaMax;
@@ -12274,7 +12277,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               'arbiter',
               hungerCappedRefuse
                 ? `The Arbiter shakes their head. "Sleep won't fill you when it's food you're missing — your wind is choked by hunger, not weariness. Eat, then rest will mean something."`
-                : `The Arbiter shakes their head. "Your wind is full and the Aether carries no shadow on you. Sleep won't knit wounds — eat for that. Save the hours."`,
+                : `The Arbiter shakes their head. "Your wind is full, your wounds are closed, and the Aether carries no shadow on you. Save the hours."`,
             );
             break;
           }
@@ -12315,7 +12318,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const restAmbush = Math.random() < restAmbushChance;
           const hours = 8;
           // arb37 — rest grants NO HP. Stamina only: ~1/hr, up to 8.
-          const heal = 0;
+          // OTA-1001 — #120: rest heals again, LIGHT — ~15% of max HP for a full sleep,
+    // mirroring how escorts already mend on rest. The old no-HP rule (arb37 /
+    // OTA-187) is superseded by the owner's call.
+    const heal = Math.min(Math.max(0, player.hpMax - player.hp), Math.ceil(player.hpMax * 0.15));
           // OTA-614 — clamp to >= 0. stamRoom = effectiveStaminaMax - stamina,
           // and effectiveStaminaMax is the raw cap MINUS the hunger penalty. When
           // hunger has shrunk the effective cap below current stamina, stamRoom
@@ -24729,7 +24735,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // self / dog use the item's fixed consumable heal.
     const fx = resolveItemEffect(item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
-    const perHP = fx?.kind === 'consumable' ? (fx.healHP ?? 0) : 0;
+    const perHP = fx?.kind === 'consumable' ? scaledHealHP(fx.healHP ?? 0, player.hpMax) : 0; // OTA-1001 — #120
     if (perHP <= 0) { get().appendLog('arbiter', `The Arbiter studies the ${item.name}. "That won't mend anything in bulk."`); return; }
 
     if (target === 'dog') {
@@ -26364,7 +26370,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // and lets the player top HP to full by eating, never by sleeping.
     // Each rest still rolls an ambush + advances the clock, so stamina
     // recovery keeps a real cost.
-    const heal = 0;
+    // OTA-1001 — #120: rest heals again, LIGHT — ~15% of max HP for a full sleep,
+    // mirroring how escorts already mend on rest. The old no-HP rule (arb37 /
+    // OTA-187) is superseded by the owner's call.
+    const heal = Math.min(Math.max(0, player.hpMax - player.hp), Math.ceil(player.hpMax * 0.15));
     const stamGain = Math.min(stamRoom, rollDie(4));
     const prevHpRest = player.hp;
     const hpMaxRest = player.hpMax;

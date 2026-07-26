@@ -226,10 +226,12 @@ describe('OTA 23-007 — climb mechanics', () => {
       });
       store.getState().submitPlayerAction('rest');
       const after = store.getState().player!;
-      // arb37 — rest restores STAMINA only (HP is healed by eating).
-      // 8h rest: gain min(10, 8) = 8 stamina; HP stays put.
+      // OTA-1001 — #120: a full sleep restores stamina AND knits a light share of
+      // max HP (arb37's HP-free rest is superseded by the owner's call).
+      // 8h rest: gain min(10, 8) = 8 stamina; HP climbs ~15% of 30.
       expect(after.stamina).toBeGreaterThan(0);
-      expect(after.hp).toBe(10);
+      expect(after.hp).toBeGreaterThan(10);
+      expect(after.hp).toBeLessThanOrEqual(10 + Math.ceil(30 * 0.15));
     });
   });
 
