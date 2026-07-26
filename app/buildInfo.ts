@@ -18124,4 +18124,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // airborne target meets any weapon. Tests: melee-vs-base refused + caster allowed, airborne melee
 // both ways, benched-brute + firing-slinger volley, summit fight (flag off) unchanged. typecheck:ci
 // + typecheck:tests + lint clean; full fast suite green. Combat model -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-983-elevated-combat';
+// OTA-984 (context-aware Save-for-quest). Owner: the earmark exists for BULK fetch
+// materials ("go get me 15 rusted metal") — specific objective items hard-lock automatically and
+// never need it — "I would only like it to say save for quest when you actually have an active quest
+// that needs them." New engine helper factionQuests.activeFetchItemNames returns the item names
+// ACCEPTED fetch contracts (active OR paused — a paused contract stays on the slate) still want;
+// the inventory modal shows "Save for quest" only when the tapped item's exact name is in that set.
+// An already-flagged item ALWAYS shows "Saved for quest" so a stale earmark can be released after
+// the quest resolves. 5 tests: fetch surfaces its item lowercased, empty/null slates want nothing,
+// staged contracts want nothing, unknown ids ignored, multiple fetches union. typecheck:ci +
+// typecheck:tests + lint clean; full fast suite green. Inventory UX -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-984-quest-earmark-context';

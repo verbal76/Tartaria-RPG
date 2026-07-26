@@ -24,6 +24,7 @@ import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
 import { wornDogVestInstanceId } from '../engine/dogCompanion';
+import { activeFetchItemNames } from '../engine/factionQuests';
 import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon, golemRepairHeal, golemSubstituteHeal } from '../engine/golems';
 import { healBatchCount, HEAL_BATCH_NOTE } from '../engine/healBatch';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -341,6 +342,9 @@ export function InventoryScreen() {
   // dog.equipped.vest, NOT in the player's equip slots), so it never lit the
   // EQUIPPED badge and you couldn't tell which vest was on him. Mark ONE matching
   // inventory instance equipped so the Dog Armor row reads "EQUIPPED (on <dog>)".
+  // OTA-984 — items an ACCEPTED fetch contract still wants, by exact name.
+  // Drives the context-aware "Save for quest" earmark in the item modal.
+  const activeFetchWanted = activeFetchItemNames(player.activeFactionQuests);
   const dogForVest = player.dog;
   // OTA-979 — one shared resolver (wornDogVestInstanceId): id-first, then a
   // name match that also accepts uniqueStats.kind === 'dog_armor' (fused
@@ -955,14 +959,24 @@ export function InventoryScreen() {
     // player releases the fusion reserve first, then can save it for a quest.
     if (!pending.item.reservedForFusion) {
       const savedForQuest = pending.item.reservedForQuest === true;
-      buttons.push({
-        label: savedForQuest ? '⚑ Saved for quest' : '⚐ Save for quest',
-        onPress: () => {
-          toggleReserveForQuest(pending.item.id);
-          closeModal();
-        },
-        tone: 'neutral',
-      });
+      // OTA-984 — CONTEXT-AWARE earmark (owner: "I would only like it to say save
+      // for quest when you actually have an active quest that needs them").
+      // The button now shows only when an accepted fetch contract names this
+      // exact item — the "gather N, bring them back" case the earmark was
+      // invented for. Specific objective items hard-lock automatically and
+      // never need it. An already-flagged item ALWAYS shows the release
+      // button, so a stale earmark can be cleared after the quest resolves.
+      const questWantsIt = activeFetchWanted.has(pending.item.name.toLowerCase());
+      if (savedForQuest || questWantsIt) {
+        buttons.push({
+          label: savedForQuest ? '⚑ Saved for quest' : '⚐ Save for quest',
+          onPress: () => {
+            toggleReserveForQuest(pending.item.id);
+            closeModal();
+          },
+          tone: 'neutral',
+        });
+      }
     }
     // DROP — always available unless the item is currently equipped.
     // Drop handler in the engine also refuses equipped items, but
