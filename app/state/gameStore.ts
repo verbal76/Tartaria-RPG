@@ -20467,7 +20467,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `✦ You've earned dealing with the ${fLabel}. From now their vendors cut you the partner's rate — currently ${pct}% off buys and +${pct}% on sell-backs (it grows with your Charisma).`,
       );
     }
-    maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
+    // OTA-966 — escorts pay in coin and care, not schematics: the recipe roll
+    // belongs to salvage-and-spoils contracts. Escort turn-ins instead press
+    // HEALTH supplies into your hands (below), so their loot is only TC +
+    // healing — the owner's rule for these missions.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const eModPay = require('../engine/escort') as typeof import('../engine/escort');
+    if (!eModPay.escortSpecForQuest(candidate)) {
+      maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils');
+    }
     logRepChanges(get, repResult.changed);
     // OTA-962 — delivered the escort party alive (a dead pool fails + drops the
     // quest before it can ever reach turn-in), so name them in the win.
@@ -20479,6 +20487,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('reward', escortPayMult < 1
           ? `You delivered your ${dSpec.label} — battered, but breathing. The fee reflects the shape you brought them in (${Math.round(escortPayMult * 100)}% pay).`
           : `You delivered your ${dSpec.label} safely. They peel off with a nod.`);
+        // OTA-966 — the delivered party presses HEALTH supplies on you with the
+        // fee (2 kits on an all-or-nothing drop-off, 1 otherwise). This is the
+        // whole of an escort's item loot: TC + healing, nothing else.
+        const medLook = lookupCraftedItem('First Aid Kit');
+        const medQty = candidate.escort?.mode === 'all_or_nothing' ? 2 : 1;
+        set((s2) => (s2.player ? {
+          player: {
+            ...s2.player,
+            inventory: mergeOrPushItem(s2.player.inventory, stampDurability({
+              id: `escmed_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              name: 'First Aid Kit', kind: medLook.kind, rarity: medLook.rarity,
+              quantity: medQty, tags: [...medLook.tags, 'loot'],
+            })),
+          },
+        } : s2));
+        get().appendLog('reward', `✦ ${medQty > 1 ? `${medQty}× ` : ''}First Aid Kit — pressed into your hands with the fee.`);
       }
     }
     plantNextContractHint(get, candidate.factionId, 'faction_quest');

@@ -14,8 +14,14 @@ const DEFAULT_ESCORT_LABEL = 'Escort party';
 
 /** Fraction of the player's combat damage the escort party takes as collateral each
  *  time the player is hit. EXTRA damage on the party pool — never subtracted from
- *  the player's own hit. Tune here. */
-export const ESCORT_COLLATERAL_FRACTION = 0.30;
+ *  the player's own hit.
+ *  OTA-966 — tuned 0.30 -> 0.20 after running the missions through their paces:
+ *  at 0.30 a SOLO party (the stranded travelers, the Envoy, the Confessor —
+ *  pool ~42-45 at current player HP) failed inside ~1 hard pack fight
+ *  (~15-25 landed hits x 2-3 collateral), which made every solo contract a
+ *  coin flip. At 0.20 a solo party holds ~1.5-2 pack fights plus rest heals,
+ *  and a 3-member party ~4 — long escorts stay tense without being a lottery. */
+export const ESCORT_COLLATERAL_FRACTION = 0.20;
 
 /** Fraction of the party's MAX pool restored per rest (capped at the deficit). Kept
  *  modest so it can't outpace combat bleed — a careless player still loses them. */
