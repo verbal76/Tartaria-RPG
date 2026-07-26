@@ -163,7 +163,7 @@ edits won't touch it. If a tool stages it: `git checkout HEAD -- app.json`.
      file type debt is frozen at `.ci-typecheck-tests-baseline`; new/edited tests
      must typecheck, the count may only shrink. If you clear some, lower the
      baseline (`node scripts/ci-typecheck-tests.mjs --update-baseline`).
-   - `npm run test:ci:fast` — the 467 deterministic suites (the real jest
+   - `npm run test:ci:fast` — the deterministic suites (530 as of 2026-07-26; the real jest
      ratchet). `jest.setup.js` seeds Math.random + pins incidental weather, so
      runs are deterministic — a failure here is real, not a flake. (`test:ci:heavy`
      = the memory-hungry sims, non-blocking / reported everywhere — Open Item #2.)
@@ -262,6 +262,17 @@ Key invariants worth knowing:
   Legendary), NOT input rarity. Variety matters, not rarity.
 
 ## 8. Open issues / watch list (current)
+
+- **ESCORT SYSTEM — new live subsystem (2026-07-26, HAL 985–989 / golem 962–966; §9).** Knobs if the feel
+  needs tuning after on-device play: `ESCORT_COLLATERAL_FRACTION` (0.20), `ESCORT_REST_HEAL_FRACTION`
+  (0.10), escortee HP ≈35% player hpMax (clamp 8–45), party clamp 1–5, stranded-hook spawn ~6% on novel
+  peaceful wild tiles. Watch on-device: bleed feel across long multi-pack escort runs, hook spawn cadence,
+  all-or-nothing tier difficulty. Sources: faction boards/vendors (`FactionQuestDef.escort`), 9 rep-0
+  stranded contracts, the wild `stranded_traveler` hook.
+
+- **INTENTIONAL EXPLOITS ON RECORD (owner calls, 2026-07-26 — do NOT "fix"):** the early-game KO-loot
+  money loop and the torch-vendor buyback loop are KEPT as known early-game money faucets. The temper
+  floor 0.4 (glass-cannon tempering) is design, not a bug.
 
 - **OPEN ITEMS (2026-07-20) — carried forward from the studio-level / CI-hardening
   session. Two tracked threads, neither blocking day-to-day work:**
@@ -616,8 +627,98 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-22-947`**,
-**golem-line `…-924`**, **engine_Dev `…-1174`**.
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-26-991`**,
+**golem-line `2026-07-26-968`** (parity offset now HAL − 23, still stable —
+every gameplay OTA ships to both in the same pass), **engine_Dev
+`2026-07-20-1177`** (engine skipped the whole 948–991 run by design: all of it
+is Tartaria combat/content tuning or content the engine already has natively —
+the escort feature was ported FROM engine_Dev, not to it).
+
+- **SKYREACHER MAPS + OUTPOST CRUCIBLE FEE (2026-07-26).** HAL **990–991** / golem **967–968**.
+  • **990/967** — the OUTPOST Crucible now charges the roadside vendor's **25 TC per fire** (fuse AND the
+    extra-channel upgrade). Fee is taken only AFTER every gate passes and before any consume, so a refusal
+    or cancelled picker never costs a coin; vendor fires + wild benches (`fusionPending`) stay pre-paid; the
+    Hidden Market cauldron keeps its free-fire perk. Helper `chargeOutpostCrucibleFee` (gameStore). Owner:
+    "make the outpost run the same as a roadside vendor" — closes the free-mint faucet from the playtest log.
+  • **991/968** — 'Skyreacher Chart (N of 5)' → **'Skyreacher Map N of 5 — <tower>'** (gameStore
+    `SKYREACHER_CHARTS` + gear.json rows/descriptions; owner: "it's not a chart. we should call it a map").
+    The inventory modal wires a DEDICATED always-on Use button for the maps ("Use — add the location to your
+    MAP") instead of the generic effect-resolution gate — the owner's device showed NO Use button on a bought
+    chart, and the generic gate runs three catalog lookups inside the render path where any hiccup silently
+    eats the button. A fresh unlock pops "✦ Skyreacher location added to your MAP and MISSION LOG — <tower>".
+    OLD SAVES MIGRATE: `backfillPlayer` renames held legacy charts on load; legacy names in the `soldMapIds`
+    sell-once ledger still block re-offers (`LEGACY_SKYREACHER_CHART_NAMES`). `ota915GreatClimbCodex` keeps a
+    legacy-name ledger assert ON PURPOSE as the migration-tolerance proof.
+
+- **ESCORT MISSIONS (2026-07-25 → 26) — engine_Dev's shared-pool model, ported to Tartaria as a full
+  feature.** HAL **985–989** / golem **962–966**. New `app/engine/escort.ts`: an `EscortPool`
+  {label,hp,hpMax,count} rides on the accepted faction-quest record; escortee HP ≈35% of player hpMax
+  (clamp 8–45), party size 1–5; HUD rows in StatsPanel (`livingEscortPools`, parked pools hidden); the
+  Contracts toggle NAMES the party it stands down/recalls (`escortToggleLabel`). **Combat is UNTOUCHED** —
+  escorts only take COLLATERAL: after a landed enemy counter, `applyEscortDamage` bleeds
+  `ESCORT_COLLATERAL_FRACTION`=**0.20** of the final post-mitigation damage into the active pool (tuned
+  down from 0.30 — a solo escortee survives ~1.5–2 pack fights, a 3-member party ~4). Rest heals pools 10%
+  (`healEscortsOnRest`, wired into BOTH rest resolvers); a dead pool fails the contract (`failEscortQuests`,
+  fired from the same sweep that kills the escortees). **PAY MODEL (owner call):** scaled-by-survivors
+  (pool hp/hpMax, floor 0.1) is the DEFAULT; top-tier contracts are **all_or_nothing** (full pay or
+  nothing; rep is always full either way). Delivery grants First Aid Kits (2 aon / 1 scaled); escort loot
+  = **TC + health items ONLY** (the recipe roll is gated off for escort kills). **29 escort contracts** in
+  faction-quests.json (`FactionQuestDef.escort` {count,label,mode}; `_escort` id suffix also recognized),
+  incl. 9 rep-0 `fq_<faction>_stranded_escort` field contracts at 55 TC with per-faction authored flavor
+  (3 normal + 2 all-or-nothing hard flavors per faction on the board tiers). **HOOK SOURCE:** new
+  `stranded_traveler` hook kind (hooks.ts; weight-0, spawner-driven) — ~6% roll on novel peaceful wild
+  tiles in `stepDirection`, 2-beat accept chain (CONTINUE), never while a live escort is out
+  (`worldMemory.strandedEscortRolledTiles` 120-tile window). **989/966** = the escort gauntlet suite:
+  every acceptance source (board, vendor, hook) run through combat to delivery in both pay modes; the
+  0.20 bleed and the TC-worth were tuned against those runs.
+
+- **PLAYTEST SWEEP (2026-07-26) — 10-finding device log: 6 fixed, 4 ruled on.** HAL **979–984** /
+  golem **956–961**.
+  • **979/956** — dog-vest equipped visibility: one resolver, truthful modal, renames follow the vest.
+  • **980/957** — combat truth batch: DOTs at 0 HP actually KILL (per-dead-enemy `resolveEnemyDefeat` in
+    the tick sweep, live-scene reads); a thrown weapon's transient equip SETTLES before the roll resolves
+    (`throwSettlement` — no more wrong-weapon narration); point-blank +2 follows the SWUNG hand.
+  • **981/958** — exploit batch: the `worldRealtimeTick` standing drip (+rep every 36 s of real time,
+    the "recurring 4-faction standing block" in the log) is DELETED; the take-use-take ambient-item farm
+    is closed (take-once-per-room, absolute, across all 4 take sites).
+  • **982/959** — durability rebalance: one landed hit chips ONE worn piece (`wornSlotHit`), not the whole
+    set; armor frays OUT LOUD at durability 3. The temper floor 0.4 is KEPT deliberately — glass-cannon
+    tempering is the intended tradeoff, not a bug.
+  • **983/960** — elevated combat, owner's design: the `enemiesAtBase` model — AIRBORNE enemies reach you
+    mid-climb (and any weapon can hit them back), grounded shooters fire UP at you, and firing DOWN at the
+    ground party requires a weapon that actually shoots. Summit/wall fights (enemies WITH you) unchanged.
+  • **984/961** — "Save for quest" shows ONLY when an accepted fetch contract wants that item
+    (`activeFetchItemNames`); specific quest items keep hard-locking automatically. (The button was the
+    owner's bulk-fetch idea — "go get me 15 rusted metal" — not a blanket hint.)
+  **DESIGN CALLS ON RECORD:** the early-game KO-loot money loop stays (owner: known exploit, used for
+  early healing money); the torch-vendor buyback loop stays (same call); mid-climb melee ambush → the
+  983 model; the standing-block cadence WAS the 981 drip.
+
+- **REAL-HEIGHTS CLIMBING ARC + REACH (2026-07-24 → 25).** HAL **968–978** / golem **945–955**.
+  968 stack-sized fusion reserve (one tap reserves the pile); 969 stale-charge clobber (buffs/DOTs tick in
+  combat again); 970 playtest batch (word-level targeting, honest Aether fuel, scenery snark, refusals
+  always answer); 971 the salvage button that lied from a pillar; 972 one climb at a time (no mid-air
+  hops); **973–976 = the climbing arc** — placements + reachability skeleton, perches as exploration,
+  zero grip means gravity (fall at empty, slide down, eat where you hang), one-tap wall flee; **977** an
+  out-of-range attack REFUSES — it never auto-moves you; **978** fused weapons get real reach bands
+  (+ old-save recheck).
+
+- **LOOT AUDIT BATCH (2026-07-23 → 24).** HAL **960–967** / golem **937–944**. A multi-agent loot audit,
+  then: 960/961 the outright bugs + canonical resolution (rarity trophies); 962 curated trophy pass
+  (35 real materials + provable aliases); 963 boss spoils table (every boss pays out like a boss);
+  964 Iron Spider materials become the real thing; 965/942 loot alias precedence (exact catalog names
+  always win); 966/967 v2-audit knobs (mid-tier windfalls closed, trophy sell discount, KO mercy premium,
+  the Reaver stops double-dipping).
+
+- **QoL / CORRECTNESS TAIL (2026-07-23).** HAL **948–959** / golem **925–936**. Dev-grant cleanup I+II
+  (948/949 — retire spent one-time drops, keepers to creation); look-around hides investigated-and-cleared
+  nouns (950); input-bar keyboard fixes (951, then the 956 Android-only per-focus poll rework — hide always
+  wins); enemy portrait no longer blanks after a group-fight kill (952); flavor-exhausted noun matching
+  goes word-level (953); Guardian ramp monotone at every player power (954); the Power gauge respects the
+  OTA-947 AC trim (955); correctness batch (957 — full weather symmetry, coating-slot guard, barehand
+  reach); hygiene batch (958); **959 = the legibility layer — combat rebalance III of III COMPLETE**
+  (resist/weakness callouts on the hit, coating-soak feedback, "hit leaked — missing resist" cue; closes
+  the §8.B3 pass-3 plan; pass 2 'matched progression' remains open).
 
 - **COMBAT-FEEL SESSION (2026-07-22) — coatings, weather/stealth correctness, defense de-runaway.**
   HAL **940–947** / golem **917–924** (engine_Dev EXCLUDED — all of this is combat/content tuning, not
