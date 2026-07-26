@@ -18173,4 +18173,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // / 5 rep, solo traveler, scaled pay). Tests: defs valid per faction, random picker never draws the
 // kind, full talk->CONTINUE->record E2E. typecheck + lint clean; full fast suite green.
 // Mission content + world encounters -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-988-hook-escorts';
+// OTA-989 (escort gauntlet). Owner: "develop a new test suite and fully run escort
+// missions through their paces ... tune the 30% damage bleed ... make sure the authoring is complete
+// ... make sure the TC is worth it, and have these missions only drop TC and health items for loot."
+// (1) BLEED TUNED 0.30 -> 0.20: at 30% a solo party (pool ~42-45) died inside one hard pack fight —
+// every solo contract was a coin flip; at 20% solo holds ~1.5-2 fights + rest heals, 3-member ~4.
+// (2) LOOT RULE: escort turn-ins never roll the recipe reward (gated on escortSpecForQuest) and
+// instead press First Aid Kits into your hands with the fee (2 on all_or_nothing, 1 otherwise) —
+// escort loot is TC + healing, nothing else. (3) ECONOMICS: stranded field escorts 45 -> 55 TC;
+// guards assert scaled >= 55, hard >= 160, rep >= 5. (4) AUTHORING: the nine stranded objectives
+// rewritten with per-faction voice (no copy-paste template); guard asserts every escort title /
+// description / objective is unique. NEW SUITE ota-EscortGauntlet: all 29 contracts accepted +
+// delivered E2E (loot verified TC+healing only), vendor + board + hook pickups, 20% collateral in a
+// real fight, parked party untouched, dead pool fails un-completed. typecheck + lint clean; full
+// fast suite green. Mission QA + economy -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-989-escort-gauntlet';

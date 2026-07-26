@@ -1035,9 +1035,9 @@
       "factionId": "mud_monarchs",
       "title": "The Stranded Courtier",
       "description": "A Monarch courtier separated from their retinue, silt to the knees and pride mostly intact.",
-      "objective": "Walk them to any mud monarchs agent. If they fall, the contract fails. (Field contract — pay scales with the shape you deliver them in.)",
+      "objective": "See the courtier to any mud monarchs agent with pulse and dignity both intact — the Court pays for the pair. (Field contract — pay scales with the shape you deliver them in.)",
       "requirement": { "rep": 0 },
-      "reward": { "tc": 45, "rep": 5 },
+      "reward": { "tc": 55, "rep": 5 },
       "escort": { "count": 1, "label": "Stranded Traveler" }
     },
     {
@@ -1045,9 +1045,9 @@
       "factionId": "forgotten_order",
       "title": "The Stranded Pilgrim",
       "description": "An Order pilgrim who walked a day past their water and two past their map.",
-      "objective": "Walk them to any forgotten order agent. If they fall, the contract fails. (Field contract — pay scales with the shape you deliver them in.)",
+      "objective": "The Order counts every pilgrim who comes home. Bring this one to any forgotten order agent and be counted with them. (Field contract — pay scales with the shape you deliver them in.)",
       "requirement": { "rep": 0 },
-      "reward": { "tc": 45, "rep": 5 },
+      "reward": { "tc": 55, "rep": 5 },
       "escort": { "count": 1, "label": "Stranded Traveler" }
     },
     {
@@ -1055,9 +1055,9 @@
       "factionId": "reclaimers_guild",
       "title": "The Stranded Reclaimer",
       "description": "A Reclaimer whose crew left with the haul and, apparently, the directions.",
-      "objective": "Walk them to any reclaimers guild agent. If they fall, the contract fails. (Field contract — pay scales with the shape you deliver them in.)",
+      "objective": "Haul the Reclaimer back to any reclaimers guild agent — the Guild retrieves its own, and pays retrieval rates. (Field contract — pay scales with the shape you deliver them in.)",
       "requirement": { "rep": 0 },
-      "reward": { "tc": 45, "rep": 5 },
+      "reward": { "tc": 55, "rep": 5 },
       "escort": { "count": 1, "label": "Stranded Traveler" }
     },
     {
@@ -1065,9 +1065,9 @@
       "factionId": "true_tartarians",
       "title": "The Stranded Keeper",
       "description": "A True Tartarian keeper of old names, far from anyone who still speaks them.",
-      "objective": "Walk them to any true tartarians agent. If they fall, the contract fails. (Field contract — pay scales with the shape you deliver them in.)",
+      "objective": "Walk the keeper to any true tartarians agent. The old names die if the people who hold them do. (Field contract — pay scales with the shape you deliver them in.)",
       "requirement": { "rep": 0 },
-      "reward": { "tc": 45, "rep": 5 },
+      "reward": { "tc": 55, "rep": 5 },
       "escort": { "count": 1, "label": "Stranded Traveler" }
     },
     {
@@ -1075,9 +1075,9 @@
       "factionId": "eternal_dynasty",
       "title": "The Stranded Clerk",
       "description": "A Dynasty clerk with a satchel of stamped papers and no idea which way the border sits.",
-      "objective": "Walk them to any eternal dynasty agent. If they fall, the contract fails. (Field contract — pay scales with the shape you deliver them in.)",
+      "objective": "Deliver the clerk — and the satchel they will not let you carry — to any eternal dynasty agent. (Field contract — pay scales with the shape you deliver them in.)",
       "requirement": { "rep": 0 },
-      "reward": { "tc": 45, "rep": 5 },
+      "reward": { "tc": 55, "rep": 5 },
       "escort": { "count": 1, "label": "Stranded Traveler" }
     },
     {
@@ -1085,9 +1085,9 @@
       "factionId": "conspiracy_architects",
       "title": "The Stranded Watcher",
       "description": "An Architect who watched the wrong road and got left on it.",
-      "objective": "Walk them to any conspiracy architects agent. If they fall, the contract fails. (Field contract — pay scales with the shape you deliver them in.)",
+      "objective": "Get the watcher to any conspiracy architects agent. Ask nothing about what they watched; they will pay you not to. (Field contract — pay scales with the shape you deliver them in.)",
       "requirement": { "rep": 0 },
-      "reward": { "tc": 45, "rep": 5 },
+      "reward": { "tc": 55, "rep": 5 },
       "escort": { "count": 1, "label": "Stranded Traveler" }
     },
     {
@@ -1095,9 +1095,9 @@
       "factionId": "servants_of_giants",
       "title": "The Stranded Servant",
       "description": "A Servant of the Giants, small under the sky and far from the bones they tend.",
-      "objective": "Walk them to any servants of giants agent. If they fall, the contract fails. (Field contract — pay scales with the shape you deliver them in.)",
+      "objective": "Guide the servant back to any servants of giants agent and the bones they tend. Small steps; long road. (Field contract — pay scales with the shape you deliver them in.)",
       "requirement": { "rep": 0 },
-      "reward": { "tc": 45, "rep": 5 },
+      "reward": { "tc": 55, "rep": 5 },
       "escort": { "count": 1, "label": "Stranded Traveler" }
     },
     {
@@ -1105,9 +1105,9 @@
       "factionId": "stone_builders",
       "title": "The Stranded Mason",
       "description": "A Stone Builders hand who lost their party in open silt and has been walking the wrong way for a day.",
-      "objective": "Walk them to any stone builders agent. If they fall, the contract fails. (Field contract — pay scales with the shape you deliver them in.)",
+      "objective": "Point the mason at any stone builders agent and keep them upright the whole way — the Builders pay by the standing worker. (Field contract — pay scales with the shape you deliver them in.)",
       "requirement": { "rep": 0 },
-      "reward": { "tc": 45, "rep": 5 },
+      "reward": { "tc": 55, "rep": 5 },
       "escort": { "count": 1, "label": "Stranded Traveler" }
     },
     {
@@ -1115,9 +1115,9 @@
       "factionId": "tartarian_revivalists",
       "title": "The Stranded Scholar",
       "description": "A Revivalist scholar who followed a glyph rubbing right off the edge of their own map.",
-      "objective": "Walk them to any tartarian revivalists agent. If they fall, the contract fails. (Field contract — pay scales with the shape you deliver them in.)",
+      "objective": "Return the scholar to any tartarian revivalists agent, rubbings and all. The map they followed was wrong; be the map that isn't. (Field contract — pay scales with the shape you deliver them in.)",
       "requirement": { "rep": 0 },
-      "reward": { "tc": 45, "rep": 5 },
+      "reward": { "tc": 55, "rep": 5 },
       "escort": { "count": 1, "label": "Stranded Traveler" }
     }
   ]
