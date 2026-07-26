@@ -1,5 +1,29 @@
 # Tartaria-RPG — Working Notes
 
+## FIX RULE — kill the CATEGORY'S root cause, never just the incident
+
+Owner directive (2026-07-26): every fix must target the ROOT CAUSE of the
+issue's whole CATEGORY whenever possible — we are eliminating the causes of
+CLASSES of errors, not patching the specific incident that got reported.
+For every bug report:
+
+1. **Find the root cause and PROVE it** — instrument / probe the live code
+   path if reading isn't conclusive. Never patch the symptom you can see.
+2. **Name the category** the report is one instance of ("every stat
+   level-up toast", "any takeable item as a climb target", "every offer
+   surface for this contract kind"), then fix at the CHOKE POINT all
+   instances share — one helper, one gate function, one pool — so the whole
+   class dies at once, not just the call site that appeared in the log.
+3. **Verify coverage mechanically** — grep for every other instance of the
+   pattern and assume your first search was incomplete. (Case on record:
+   the 2026-07-26 stat-toast fix found 7 sites; the verification pass the
+   owner demanded found 22.)
+4. **Lock the category shut** where practical: a regression test that fails
+   if the pattern ever reappears (see `ota994StatToastLock`'s source-scan
+   lock) and/or a ship-script grep guard.
+5. **Report honestly** whether the fix is category-complete or has NAMED
+   residuals — never imply category coverage that wasn't verified.
+
 ## Canon precedence (lore vs. gameplay vs. shipped code)
 
 When reconciling content from the design docs against shipped game

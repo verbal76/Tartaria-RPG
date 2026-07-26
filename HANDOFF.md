@@ -155,6 +155,14 @@ edits won't touch it. If a tool stages it: `git checkout HEAD -- app.json`.
 
 ## 3. The change loop (every code change)
 
+**ROOT-CAUSE RULE (owner directive, 2026-07-26) — read before fixing anything:**
+every fix targets the root cause of the issue's whole CATEGORY whenever
+possible, eliminating the class of errors rather than the reported incident.
+Prove the root cause (instrument if needed), fix at the shared choke point,
+grep-verify every other instance of the pattern, add a category-lock test
+where practical, and report category-complete vs named residuals. Full
+checklist: CLAUDE.md "FIX RULE".
+
 1. Edit code under `app/` in that line's worktree.
 2. **CI gates (all BLOCKING on HAL + golem — run before pushing; a red gate now
    fails the PR):**
