@@ -18,11 +18,13 @@ and its own full `HANDOFF.md` (read that branch's handoff once you're on it).
    `ios-preview`). Treat it as production: only ship vetted changes, and only when
    the user says to.
 
-2. **`golem-line` — the TESTING branch for HAL.**
-   Where improvements to the HAL game are trialed first (on the test phone) before
-   they're promoted to `HaL2001`. Same game as HAL, but a separate app id/channel
-   (`golem-line`) so it installs side-by-side. This is usually where HAL work
-   starts.
+2. **`golem-line` — HAL's WARM STANDBY (role clarified 2026-07-13).**
+   Not a trial scratch pad: golem must STAY CURRENT with HAL. Minor changes and
+   upgrades land on BOTH `HaL2001` and `golem-line` in the same pass (per-line OTA
+   bumps, one commit + push per line) so the parity gap never widens. Its purpose:
+   when a major, potentially engine-breaking change begins, development forks onto
+   golem so production Tartaria is never at risk. Same game as HAL, separate app
+   id/channel (`golem-line`), installs side-by-side.
 
 3. **`engine_Dev` — a SEPARATE project.**
    The lore-agnostic RPG **Engine** (content is upload/pack-driven) — *not* the
@@ -30,9 +32,9 @@ and its own full `HANDOFF.md` (read that branch's handoff once you're on it).
    product with its own app id/channel (`engine_Dev`). Don't conflate it with the
    Tartaria game; a "HAL improvement" does not automatically belong here.
 
-> Typical flow for a Tartaria-game change: build & test it on **golem-line**, then
-> promote the same change to **HaL2001** when the user approves. An engine change
-> belongs on **engine_Dev** and stands alone.
+> Typical flow for a Tartaria-game change: ship it to **HaL2001 AND golem-line in
+> the same pass** (golem-as-trial is reserved for changes the user explicitly wants
+> staged). An engine change belongs on **engine_Dev** and stands alone.
 
 ## Every line is isolated — no cross-pollination
 
