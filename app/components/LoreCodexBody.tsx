@@ -192,7 +192,7 @@ export function LoreCodexBody() {
           const displayName = climbLocked ? '?' : revealedLocationName(l.id, l.name, discoveredIds);
           const subtitle = climbLocked ? 'unknown — a chart will lead you here'
             : hidden ? 'unknown — travel to reveal' : l.type;
-          const desc = climbLocked ? 'A great climb the roadside cartographers keep off the common maps. Buy and read its Skyreacher Chart to put it on yours.'
+          const desc = climbLocked ? 'A great climb the roadside cartographers keep off the common maps. Buy and read its Skyreacher Map to put it on yours.'
             : hidden ? 'A place that keeps no name on any map until you find it yourself.' : l.description;
           const content = (
             <>

@@ -1266,7 +1266,7 @@
       "description": "A folded collector-array prised from the heart of a tower after its guardian fell — a throat of resonant crystal built to swallow Aether out of thin air and send it on down the grid. It only hums and points upward on its own. Carry all five down from the great climbs, then USE one: you'll break the arrays down and build a rifle from their parts."
     },
     {
-      "name": "Skyreacher Chart (1 of 5)",
+      "name": "Skyreacher Map 1 of 5 — Grand Spire",
       "kind": "misc",
       "rarity": "Rare",
       "tags": [
@@ -1280,10 +1280,10 @@
         "index": 1,
         "total": 5
       },
-      "description": "One of five giant-drawn charts to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to Grand Spire of Etheria and opens its great climb. Use it from your pack to fix the way and unlock the ascent (1 of 5). Four more charts are out there, sold by roadside traders who don't know what they're holding."
+      "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to Grand Spire of Etheria and opens its great climb. Use it from your pack to fix the way and unlock the ascent (1 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
     },
     {
-      "name": "Skyreacher Chart (2 of 5)",
+      "name": "Skyreacher Map 2 of 5 — Asgardar Spire",
       "kind": "misc",
       "rarity": "Rare",
       "tags": [
@@ -1297,10 +1297,10 @@
         "index": 2,
         "total": 5
       },
-      "description": "One of five giant-drawn charts to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to the buried spire of Asgardar and opens its great climb. Use it from your pack to fix the way and unlock the ascent (2 of 5). Four more charts are out there, sold by roadside traders who don't know what they're holding."
+      "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to the buried spire of Asgardar and opens its great climb. Use it from your pack to fix the way and unlock the ascent (2 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
     },
     {
-      "name": "Skyreacher Chart (3 of 5)",
+      "name": "Skyreacher Map 3 of 5 — Obsidian Monolith",
       "kind": "misc",
       "rarity": "Rare",
       "tags": [
@@ -1314,10 +1314,10 @@
         "index": 3,
         "total": 5
       },
-      "description": "One of five giant-drawn charts to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to the Great Obsidian Monolith and opens its great climb. Use it from your pack to fix the way and unlock the ascent (3 of 5). Four more charts are out there, sold by roadside traders who don't know what they're holding."
+      "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to the Great Obsidian Monolith and opens its great climb. Use it from your pack to fix the way and unlock the ascent (3 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
     },
     {
-      "name": "Skyreacher Chart (4 of 5)",
+      "name": "Skyreacher Map 4 of 5 — Thametan Tower",
       "kind": "misc",
       "rarity": "Rare",
       "tags": [
@@ -1331,10 +1331,10 @@
         "index": 4,
         "total": 5
       },
-      "description": "One of five giant-drawn charts to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to Thametan's Tower and opens its great climb. Use it from your pack to fix the way and unlock the ascent (4 of 5). Four more charts are out there, sold by roadside traders who don't know what they're holding."
+      "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to Thametan's Tower and opens its great climb. Use it from your pack to fix the way and unlock the ascent (4 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
     },
     {
-      "name": "Skyreacher Chart (5 of 5)",
+      "name": "Skyreacher Map 5 of 5 — Zharak Fang",
       "kind": "misc",
       "rarity": "Rare",
       "tags": [
@@ -1348,7 +1348,7 @@
         "index": 5,
         "total": 5
       },
-      "description": "One of five giant-drawn charts to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to the Great Fang of Zharak and opens its great climb. Use it from your pack to fix the way and unlock the ascent (5 of 5). Four more charts are out there, sold by roadside traders who don't know what they're holding."
+      "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to the Great Fang of Zharak and opens its great climb. Use it from your pack to fix the way and unlock the ascent (5 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
     }
   ]
 }

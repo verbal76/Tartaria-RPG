@@ -608,8 +608,18 @@ export function InventoryScreen() {
     // the dedicated Equip button only.
     // OTA-746 — a coat-only coating (acid: no player ailment to counter) shows no
     // Use/Drink button; the "Coat a weapon" / "Coat armor" buttons below still appear.
+    // OTA-968 — the Skyreacher Maps get a dedicated, always-on Use button. The
+    // owner bought one on-device and "there's no use button" — the generic gate
+    // above resolves the item's effect through three catalog lookups inside the
+    // render path, so any resolution hiccup silently eats the button. The maps
+    // are too important for that: match on the name and wire Use directly.
+    // (Legacy 'Skyreacher Chart' names are renamed on load, but match them too.)
+    const isSkyMap = /^Skyreacher (Map|Chart)\b/.test(pending.item.name);
     const useIsRealAction = (isConsumable || hasEffect || (offEligible && isThrowableItem)) && coatingItemDrinkable(pending.item);
-    if (useIsRealAction) {
+    if (isSkyMap) {
+      buttons.push({ label: 'Use — add the location to your MAP', onPress: doUse, tone: 'primary' });
+    }
+    if (useIsRealAction && !isSkyMap) {
       // arb106 — show YOUR current HP on the eat/drink button so you can see at a
       // glance whether you actually need it (player ask).
       const hpTag = isConsumable && player ? `  ${player.hp}/${player.hpMax}` : '';

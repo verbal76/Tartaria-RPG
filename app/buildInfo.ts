@@ -17183,4 +17183,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (fusionPending) stay pre-paid; the Hidden Market cauldron keeps its free-fire perk. 4 tests: fee
 // lands and forges, broke = nothing consumed + price named, pre-paid never double-charged, market
 // still free. typecheck + lint clean; full fast suite green. Economy -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-967-crucible-fee';
+// OTA-968 (skyreacher maps; golem port of HAL OTA-991). Owner on-device: bought a chart, "I click on it and
+// there's no use button... it's not a chart. we should call it a map." The five items are now
+// 'Skyreacher Map N of 5 — <tower>'; the inventory modal wires a dedicated always-on Use button
+// for them (no catalog-lookup gate to silently fail); a fresh unlock pops an explicit reward line
+// "Skyreacher location added to your MAP and MISSION LOG — <tower>". Old saves migrate: held
+// legacy charts rename on load (backfillPlayer) and legacy names in the sell-once ledger still
+// block re-offers. 4 new tests + 3 suites retargeted. typecheck + lint clean; full fast suite
+// green. Gameplay fix -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-968-skyreacher-maps';
