@@ -37,6 +37,15 @@ For every bug report:
 5. **Report honestly** whether the fix is category-complete or has NAMED
    residuals — never imply category coverage that wasn't verified.
 
+**Why this rule replaced the old batch-≥5 push cap (owner, 2026-07-26):**
+the batching era was quick-fired minor fixes — bandaids on incidents, not
+root causes — and every push burned GitHub Actions build minutes, so pushes
+were rationed. Root-cause category fixes are the real cure: one meaty OTA
+kills the whole class instead of five bandaids trickling out, which calms
+the push volume on its own. If OTAs start quick-firing again, that's a
+signal the fixes have drifted back to bandaids — tighten the category
+discipline, don't reinstate the cap.
+
 ## Canon precedence (lore vs. gameplay vs. shipped code)
 
 When reconciling content from the design docs against shipped game
