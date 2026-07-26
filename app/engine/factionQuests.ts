@@ -133,6 +133,12 @@ export function availableFactionQuests(
   return FACTION_QUESTS.filter(
     (q) =>
       q.factionId === factionId &&
+      // OTA-970 — #117: field-rescue escorts (the `_stranded_` contracts) are
+      // HOOK-sourced only — you find the stranded soul in the wild and take
+      // the charge there (owner: "give the missions at the appropriate
+      // location"). An outpost board never posts one; the stranded_traveler
+      // hook grants them straight from FACTION_QUESTS by id suffix.
+      !/_stranded_/.test(q.id) &&
       playerRep >= q.requirement.rep &&
       !active.includes(q.id) &&
       !completed.includes(q.id),

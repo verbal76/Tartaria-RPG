@@ -301,7 +301,34 @@ describe('Quest progression audit', () => {
       const titleSnippet = q.title.split(' ').slice(0, 3).join(' ');
 
       // Accept via direct store action — engine path under test.
-      store.getState().acceptFactionQuest(q.id);
+      // OTA-970 (#117) — stranded escorts are HOOK-granted only: boards, vendors,
+      // and acceptFactionQuest refuse them by design (you find the stranded
+      // soul in the wild). Seed the active record the way applyHookEffect's
+      // start_escort_contract does, then walk stages + turn-in exactly like
+      // every other contract. The hook ACCEPT path itself is covered by
+      // ota988HookEscort and the escort gauntlet suite.
+      if (/_stranded_/.test(q.id)) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const escortMod = require('../app/engine/escort');
+        const spec = escortMod.escortSpecForQuest(q);
+        const escort = spec ? escortMod.spawnEscortPool(spec.count, store.getState().player?.hpMax ?? 20, spec.label) : null;
+        store.setState((s) => {
+          if (!s.player) return s;
+          return {
+            ...s,
+            player: {
+              ...s.player,
+              activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), q.id],
+              activeFactionQuests: [
+                ...(s.player.activeFactionQuests ?? []),
+                { id: q.id, stage: 0, postedByFaction: q.factionId, acceptedAt: Date.now(), tracked: true, ...(escort ? { escort } : {}) },
+              ],
+            },
+          };
+        });
+      } else {
+        store.getState().acceptFactionQuest(q.id);
+      }
       let active = (store.getState().player?.activeFactionQuestIds ?? []);
       if (!active.includes(q.id)) {
         acceptFailures.push({ id: q.id, title: q.title, kind: 'fq',
