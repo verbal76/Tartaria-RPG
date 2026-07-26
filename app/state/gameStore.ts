@@ -2645,6 +2645,30 @@ function failEscortQuests(
 // OTA-985 — the escort party patches up while the player rests — modest (~10% of
 // pool max) so it can't outpace combat bleed. Only ACTIVE escorts heal; a
 // parked party is safe and doesn't need it. Called from BOTH rest resolvers.
+// OTA-990 — the outpost Crucible now runs like the roadside vendor's: 25 TC a
+// fire (owner: "make the outpost run the same as a roadside vendor"). A
+// vendor fire or a wild fusion bench arrives with fusionPending already set
+// (paid / granted), and the Hidden Market cauldron keeps its perk — both skip
+// the fee. Called AFTER every gate and BEFORE any consume, so a refusal or a
+// cancelled picker never costs a coin, and the fee can never fire without the
+// fuse. Returns false (and narrates) when the player can't cover it.
+function chargeOutpostCrucibleFee(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): boolean {
+  const p = get().player;
+  if (!p) return false;
+  if (p.fusionPending || get().activeBuildingId === 'market') return true;
+  const FEE = 25;
+  if (p.tc < FEE) {
+    get().appendLog('system', `The Crucible costs ${FEE} TC to fire; you have ${p.tc}.`);
+    return false;
+  }
+  set((s2) => (s2.player ? { player: { ...s2.player, tc: s2.player.tc - FEE } } : s2));
+  get().appendLog('reward', `The outpost Crucible takes its fee. (−${FEE} TC)`);
+  return true;
+}
+
 function healEscortsOnRest(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -25169,6 +25193,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // synthesizeFusionDeterministic which produces a clamped valid
     // result from the input tag profile. Less varied than Qwen-
     // synthesized but always serviceable.
+    // OTA-990 — outpost fires cost coin now, same as the roadside vendor's rig.
+    if (!chargeOutpostCrucibleFee(get, set)) { set({ pendingFusionSelection: null }); return; }
     get().appendLog(
       'world',
       `You set your reserved pieces on the three pedestals. The Crucible takes them in.`,
@@ -25358,6 +25384,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Crucible cools. "An upgrade takes five reserved pieces — you set ${chosen.length}."`);
       return;
     }
+    // OTA-990 — the upgrade channel pays the same outpost fee as a fuse.
+    if (!chargeOutpostCrucibleFee(get, set)) return;
     // Consume one unit of each chosen input and clear its reservation (mirrors
     // applyFusion's drain), then stamp the upgrade on the chosen piece.
     const chosenIds = new Set(chosen.map((i) => i.id));
