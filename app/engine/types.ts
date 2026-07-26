@@ -1704,6 +1704,9 @@ export interface WorldMemory {
    *  hook. Same one-roll-per-tile, sliding-window anti-farm as
    *  wandererRolledTiles. */
   strandedEscortRolledTiles?: string[];
+  /** OTA-998 — the Hollowed revenant currently standing in the scene (the fallen
+   *  record it was built from); cleared when put to rest. */
+  activeRevenant?: { name: string; ts: number; raceName: string; epitaph: string; locationName: string; kills: number; corruption: string; hours: number; gearNames?: string[]; avengedBy?: string; avengedTs?: number };
   /** HANDOFF #15b — hub rooms the player has visited at least once.
    *  Used by hub fast-travel to gate "jump to the workshop" against
    *  rooms the player actually knows. Stored separately from

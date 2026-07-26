@@ -302,6 +302,9 @@ export function LoreCodexBody() {
                   <Text style={styles.subtitle}>{h.raceName} • fell at {h.locationName}</Text>
                   <Text style={styles.desc}>{h.epitaph}</Text>
                   <Text style={styles.meta}>{h.kills} foes bested • {h.hours}h in Tartaria • {h.corruption}</Text>
+                  {h.avengedBy ? (
+                    <Text style={styles.meta}>— put to rest by {h.avengedBy}</Text>
+                  ) : null}
                 </View>
               ))}
             </>

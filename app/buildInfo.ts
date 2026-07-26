@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.8';
+export const DISPLAY_VERSION = '4.28.9';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18265,4 +18265,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // exemption (a catalog item is by definition pocketable; true substances/masses — "wet mud",
 // "fog bank", "ash drift" — stay put). Mud-* gear provably returns to the spawn pool (test probe).
 // DISPLAY_VERSION 4.28.8. 3 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-997-portable-words';
+// OTA-998 (THE HOLLOWED). Owner feature: the install's Fallen roll made flesh — a dead
+// character can return as a one-time Aetherkin-revenant BOSS event. Violent where the other
+// Aetherkin are afraid: it remembers being a warrior ({kills} feed its strength) and wears the
+// custom kit it died in (captured at death going forward via FallenHero.gearNames; pre-998 records
+// get a seeded Rare+ kit). Wild spawner beside the stranded-traveler roll (power-gated hpMax>=60,
+// 4% on novel peaceful tiles, backfills the existing install roll automatically); standard loot
+// rolls draw from the died-in kit; the kill is EXEMPT from the Aetherkin reverence penalty (no
+// marker trait/name — locked by test); the sentimental put-to-rest close writes the memorial:
+// "put to rest by <avenger>" shows in the FALLEN codex, install-wide. New engine/fallenRevenants.ts.
+// Hint-mission rumor pickup ships next OTA. DISPLAY_VERSION 4.28.9. 4 tests. HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-998-the-hollowed';

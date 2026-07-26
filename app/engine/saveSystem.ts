@@ -103,6 +103,13 @@ export interface FallenHero {
   hours: number;
   /** Wall-clock death time (for ordering / recency). */
   ts: number;
+  /** OTA-998 — display names of the gear they died wearing: the Hollowed
+   *  revenant's kit + drop pool. Absent on pre-998 records — the revenant
+   *  builder synthesizes a seeded kit instead. */
+  gearNames?: string[];
+  /** OTA-998 — set once their Hollowed revenant is put to rest. */
+  avengedBy?: string;
+  avengedTs?: number;
 }
 
 const FALLEN_CAP = 25;
@@ -114,6 +121,13 @@ export async function recordFallen(hero: FallenHero): Promise<number> {
   const next = [...(stash.fallen ?? []), hero].slice(-FALLEN_CAP);
   await saveGlobalStash({ ...stash, fallen: next });
   return next.length;
+}
+
+/** OTA-998 — mark a fallen entry (matched by death ts) put to rest. Install-wide. */
+export async function markFallenAvenged(ts: number, by: string): Promise<void> {
+  const stash = await loadGlobalStash();
+  const next = (stash.fallen ?? []).map((f) => (f.ts === ts ? { ...f, avengedBy: by, avengedTs: Date.now() } : f));
+  await saveGlobalStash({ ...stash, fallen: next });
 }
 
 /** OTA-845 — read the roll of the Fallen (newest last). */
