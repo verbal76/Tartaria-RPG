@@ -28167,6 +28167,19 @@ function wearEquippedItem(
   const result = boundId
     ? wearItemById(player.inventory, boundId)
     : wearItemByName(player.inventory, itemName);
+  // OTA-959 — fraying warning. The rope warns before it fails; armor and weapons
+  // never did — the first thing the player heard was "shatters from wear. It
+  // is gone." When the piece this blow/swing just chipped is down to its last
+  // few points, say so (wear is always 1, so current === 3 fires exactly once
+  // per decline).
+  if (!result.broken) {
+    const wornInst = boundId
+      ? result.inventory.find((i) => i.id === boundId)
+      : result.inventory.find((i) => i.name.toLowerCase() === itemName.toLowerCase() && i.durability);
+    if (wornInst?.durability && wornInst.durability.current === 3) {
+      get().appendLog('system', `⚠ Your ${wornInst.name} is coming apart — a few more hits will finish it. Mend it or lose it.`);
+    }
+  }
   let equipped = player.equipped ?? {};
   let finalInventory = result.inventory;
   if (result.broken && result.brokenName) {
@@ -29162,19 +29175,25 @@ function applyEnemyCounter(
     // stack with a type-based status.
     const traitHit = traitOnHitStatus(enemy.traits);
 
-    // Armor wear: every armor piece that actually contributes to the
-    // player's defence chips one point. Pieces with 0 durability or no
-    // catalog entry are skipped.
+    // OTA-959 — armor wear: a landed blow chips ONE worn piece, not the whole
+    // set. The old loop wore EVERY slot per hit, so a 5-piece set spent 5
+    // durability per blow and a 5-raider pack ate a freshly crafted set inside
+    // one fight (owner's log: cap, gloves, trousers, wraps, brow guard all
+    // shattered in ~10 minutes, AC 24 -> 17). One blow lands somewhere; that
+    // piece takes the wear — so MORE armor now means the set lasts LONGER,
+    // instead of dying faster the better-equipped you are.
     const wornSlots = ARMOR_SLOTS.filter((s) => !!player.equipped?.[s]);
+    const wornSlotHit = wornSlots.length > 0
+      ? wornSlots[Math.floor(Math.random() * wornSlots.length)]!
+      : null;
 
     let killed = false;
     set((s) => {
       if (!s.player) return {};
       let nextPlayer = s.player;
-      for (const slot of wornSlots) {
-        const name = nextPlayer.equipped?.[slot];
-        if (!name) continue;
-        nextPlayer = wearEquippedItem(nextPlayer, name, get);
+      if (wornSlotHit) {
+        const name = nextPlayer.equipped?.[wornSlotHit];
+        if (name) nextPlayer = wearEquippedItem(nextPlayer, name, get);
       }
       const newHp = Math.max(0, nextPlayer.hp - dmg);
       killed = newHp <= 0;
