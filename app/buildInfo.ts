@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.4';
+export const DISPLAY_VERSION = '4.28.5';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18232,4 +18232,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (base + gear) instead of the bare base. #117 stranded-traveler escorts are hook-only — boards
 // and vendors never post them. DISPLAY_VERSION 4.28.4 (PATCH rule). 6 tests. Gameplay ->
 // HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-993-playtest-truth';
+// OTA-994 (stat-toast category completion). The owner's category-verification pass on
+// review item #116 caught the truth-batch fix short: 11 MORE reward toasts (persuade/haggle CHA,
+// pickpocket/stealth STE, the travel-tick WIS/STR/CHA trio, scrap-eye INT, resist-training STR,
+// water-reflex DEX, aether-exposure generic) still printed the bare BASE stat beside a sheet showing
+// base + gear. All now route through statNowClause — 18 sites total — and a source-scanning category
+// LOCK test fails any future toast written the old way, so the class can't regrow. DISPLAY_VERSION
+// 4.28.5. 2 tests. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-994-stat-toast-lock';
