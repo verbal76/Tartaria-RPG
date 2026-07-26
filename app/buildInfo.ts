@@ -17033,4 +17033,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // refusal leaves range/HP/stamina untouched with no roll started, retries always answer, advance-then-attack works,
 // ranged-from-mid regression, melee-at-close regression. typecheck:ci + typecheck:tests + lint clean; full fast
 // suite green. -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-954-no-involuntary-footwork';
+// OTA-955 (the Crucible forges REACH; golem port of HAL OTA-978). Owner: "let's have the crucible add the appropriate range to
+// weapons, have it recheck and fix old saves as well." Until now EVERY fused weapon collapsed to close-only (no
+// catalog row -> melee fallback — the Resonant Spike surprise). Now: (1) FORGE — weapons pick a reach class first
+// (60% melee / 20% long / 20% ranged, hash-seeded = deterministic per input set) and the form noun MATCHES it
+// (Spike/Maul = melee; Spear/Pike/Glaive = long, mid+close; Bow/Caster/Launcher = ranged, every band), stamped into
+// uniqueStats.reachClass; the description and forge announcement state the reach in plain words. (2) SETTLE — if the
+// Qwen namer's final name clearly reads ranged/long, reach follows the DISPLAYED name (one shared inferReachFromName).
+// (3) OLD SAVES — backfillPlayer runs the reach recheck on load: legacy "…Bow" forges become ranged, "…Spear" become
+// long, melee-named stay honest; idempotent. (4) COMBAT — playerWeaponReach reads the stamp (then name/tag class)
+// before the melee fallback, so a fused Bow fires from mid with no ADVANCE refusal. 6 tests: inference table,
+// noun/reach coherence + all 3 classes across 60 forges, plain-words description, forge determinism, legacy
+// back-stamp + idempotence, fused-Bow-fires-from-mid. typecheck:ci + typecheck:tests + lint clean; full fast suite
+// green. -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-955-crucible-reach';

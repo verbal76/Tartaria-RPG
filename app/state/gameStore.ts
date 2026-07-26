@@ -1804,6 +1804,17 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     if (item.uniqueStats && !isGuardianReward && !(item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) {
       item = { ...item, tags: [...(item.tags ?? []), 'fused'] };
     }
+    // OTA-955 — reach recheck for already-forged weapons (owner: "have it recheck
+    // and fix old saves as well"). Every fused weapon now carries an explicit
+    // reachClass; older forges get it inferred from their name on load — a
+    // legacy "Humming Bow" shoots from distance, a "Cairn Spear" reaches to
+    // mid, and a "Resonant Spike" is honestly close-quarters. Idempotent:
+    // items already stamped are skipped.
+    if (item.uniqueStats && !isGuardianReward && item.uniqueStats.kind === 'weapon' && !item.uniqueStats.reachClass) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { inferReachFromName: irnSweep } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+      item = { ...item, uniqueStats: { ...item.uniqueStats, reachClass: irnSweep(item.name) ?? 'melee' } };
+    }
     // OTA-225 — repair the OTA-221 deterministic-synth name bug. A
     // signed-shift bug produced fused items named "Resonant
     // undefined" / "<Theme> undefined" before OTA-224 fixed the
@@ -24939,7 +24950,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog(
       'reward',
       // OTA-688 — name the ACTUAL kind the player chose (was hard-coded "weapon").
-      `✦ The Crucible forges ${anOrA(fused.rarity ?? 'Rare')} ${fused.rarity ?? 'Rare'} ${sel.kind === 'armor' ? 'piece of armor' : sel.kind === 'dog_armor' ? 'piece of dog armor' : 'weapon'} from your reserved pieces — and it's in your pack, still cooling.`,
+      `✦ The Crucible forges ${anOrA(fused.rarity ?? 'Rare')} ${fused.rarity ?? 'Rare'} ${sel.kind === 'armor' ? 'piece of armor' : sel.kind === 'dog_armor' ? 'piece of dog armor' : det.stats.reachClass === 'ranged' ? 'RANGED weapon' : det.stats.reachClass === 'long' ? 'reach weapon (mid range and closer)' : 'close-quarters weapon'} from your reserved pieces — and it's in your pack, still cooling.`,
     );
     get().appendLog(
       'world',
@@ -25085,13 +25096,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // The forging may have been scrapped / sold / consumed before it formed — if
     // it's gone, don't resurrect it; just skip the reveal.
     if (!item) return;
+    // OTA-955 — reach follows the DISPLAYED name. The Qwen namer only settles the
+    // name/description; if the final name clearly reads ranged or long
+    // ("...Bow", "...Spear"), re-stamp reachClass so the weapon behaves the
+    // way it reads. Reach-neutral names keep the forge-time class.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { inferReachFromName: irnSettle } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+    const settledReach = irnSettle(name);
     set((s) => (s.player
       ? {
           player: {
             ...s.player,
             inventory: s.player.inventory.map((i) =>
               i.id === itemId
-                ? { ...i, name, description, materializing: undefined, formingName: undefined, formingDesc: undefined }
+                ? {
+                    ...i, name, description, materializing: undefined, formingName: undefined, formingDesc: undefined,
+                    uniqueStats: i.uniqueStats && i.uniqueStats.kind === 'weapon' && settledReach && i.uniqueStats.reachClass !== settledReach
+                      ? { ...i.uniqueStats, reachClass: settledReach }
+                      : i.uniqueStats,
+                  }
                 : i,
             ),
           },
@@ -28054,7 +28077,17 @@ function playerWeaponReach(
     return { bands: reachBandsFor('throwable'), label: throwInst.name };
   }
   const w = findWeaponByName(wpName);
-  if (!w) return { bands: reachBandsFor('melee'), label: wpName };
+  if (!w) {
+    // OTA-955 — a weapon with no catalog row (Crucible forges) reads reach from
+    // its OWN identity: the forge-stamped uniqueStats.reachClass first, then
+    // name/tag classification, then the old melee fallback. This is what let
+    // the "Resonant Spike" era happen — every fused weapon silently collapsed
+    // to close-only regardless of what the forge said it was.
+    const inst = (player.inventory ?? []).find((it) => it.name.toLowerCase() === wpName.toLowerCase());
+    const stamped = inst?.uniqueStats?.reachClass;
+    const cls = stamped ?? reachClassFor({ name: wpName, tags: inst?.tags });
+    return { bands: reachBandsFor(cls), label: wpName };
+  }
   const cls = reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
   // OTA-550 — preserve the legacy runecaster INT gate: a low-INT caster
   // (Common/Uncommon, INT < 9) can't reach the outermost 'distant' band;

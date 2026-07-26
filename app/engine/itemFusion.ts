@@ -633,6 +633,18 @@ function buildNamePrompt(
  *  are picked from the dominant material tag; stats scale with input
  *  count and rarity. The result has less narrative variety than
  *  Qwen-generated but is always serviceable. */
+// OTA-955 — read a weapon's reach from its NAME. Used three ways: the Qwen-settle
+// path re-stamps reach when the final name clearly reads ranged/long (the
+// displayed name is the truth the player sees), the hydrate sweep back-stamps
+// older forges, and tests validate noun/reach coherence. Returns null for
+// reach-neutral names (Fang, Edge, ...) — callers keep the forge-time class.
+export function inferReachFromName(name: string): 'ranged' | 'long' | null {
+  const n = name.toLowerCase();
+  if (/\b(bow|caster|launcher|slinger|repeater|arbalest|thrower|rifle|cannon|gun|pistol|blaster|sling|bolt-rig)\b/.test(n)) return 'ranged';
+  if (/\b(spear|pike|lance|harpoon|glaive|halberd|javelin|polearm|warstaff|prong)\b/.test(n)) return 'long';
+  return null;
+}
+
 export function synthesizeFusionDeterministic(
   inputs: readonly InventoryItem[],
   tagProfile: string[],
@@ -788,9 +800,27 @@ export function synthesizeFusionDeterministic(
     }
     armorSlot = VALID_ARMOR_SLOTS[slotIdx]!;
   }
+  // OTA-955 — weapons pick their REACH first, then a form noun that matches it —
+  // the same pick-the-identity-then-the-noun pattern OTA-832 gave armor slots.
+  // Owner (after his fused "Resonant Spike" turned out close-only): "let's
+  // have the crucible add the appropriate range to weapons." 60% melee, 20%
+  // long (spears: mid+close), 20% ranged (every band), hash-seeded so the
+  // same inputs always forge the same thing.
+  const WEAPON_REACH_NOUNS: Record<'melee' | 'long' | 'ranged', string[]> = {
+    melee: suffixPool.weapon!,
+    long: ['Spear', 'Pike', 'Lance', 'Harpoon', 'Glaive', 'Halberd', 'Prong', 'Warstaff'],
+    ranged: ['Bow', 'Caster', 'Launcher', 'Slinger', 'Repeater', 'Arbalest', 'Thrower', 'Bolt-Rig'],
+  };
+  let weaponReach: 'melee' | 'long' | 'ranged' | undefined;
+  if (kind === 'weapon') {
+    const reachRoll = (hash >>> 8) % 10;
+    weaponReach = reachRoll < 6 ? 'melee' : reachRoll < 8 ? 'long' : 'ranged';
+  }
   const suffix = kind === 'armor' && armorSlot
     ? (ARMOR_SLOT_NOUNS[armorSlot] ?? suffixPool.armor!)
-    : (suffixPool[kind] ?? suffixPool.weapon!);
+    : kind === 'weapon' && weaponReach
+      ? WEAPON_REACH_NOUNS[weaponReach]
+      : (suffixPool[kind] ?? suffixPool.weapon!);
   // OTA-224 — playtest fix: a previous synth named the result
   // "Resonant undefined" because `hash >> 4` is a SIGNED 32-bit
   // right shift in JavaScript. For hashes ≥ 2^31, the shift returns
@@ -823,6 +853,8 @@ export function synthesizeFusionDeterministic(
     baseStats.damageDice = dice;
     baseStats.damageType = dmgType;
     baseStats.scalesWith = scale;
+    // OTA-955 — the forge-chosen reach identity (form noun above matches it).
+    baseStats.reachClass = weaponReach ?? 'melee';
   } else {
     // OTA-445 — Legendary AC +5 / Rare AC +3 (was 4 / 2).
     baseStats.acBonus = rarity === 'Legendary' ? 5 : 3;
@@ -851,7 +883,14 @@ export function synthesizeFusionDeterministic(
     baseStats.statBonus = { stat: 'stealth', amount: rarity === 'Legendary' ? 2 : 1 };
   }
   baseStats.special = `Field-forged from ${inputs.length} reclaimer scraps. The Crucible answered.`;
-  const description = `A ${rarity.toLowerCase()} ${kind === 'dog_armor' ? 'dog vest' : kind} hammered together from your reserved pieces. The seams still hum with the Crucible's last breath.`;
+  const reachPhrase = kind === 'weapon'
+    ? (weaponReach === 'ranged'
+      ? 'ranged weapon — it strikes from any distance'
+      : weaponReach === 'long'
+        ? 'reach weapon — it strikes from mid range and closer'
+        : 'close-quarters weapon')
+    : kind === 'dog_armor' ? 'dog vest' : kind;
+  const description = `A ${rarity.toLowerCase()} ${reachPhrase}, hammered together from your reserved pieces. The seams still hum with the Crucible's last breath.`;
   return { name, description, stats: baseStats };
 }
 
