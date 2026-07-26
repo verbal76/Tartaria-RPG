@@ -7575,13 +7575,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       // Faction vendors may offer a contract the player qualifies for.
       if (vendor.faction) {
+        // OTA-979 — #121: offer budget. Four offer emitters live below (contract,
+        // bounty board, mystery notice, thick scroll) and each used to fire
+        // whenever stocked — an offer firehose. Agents now pitch only TWO
+        // rotating categories per macro visit; the rotation walks one step
+        // each visit so every category surfaces within two stops. Turn-in
+        // hints are exempt — owed work always gets a word.
+        const offerCats = ['fq', 'hunt', 'mystery', 'storyline'] as const;
+        const offerRot = (player.macroVisitSeq ?? 0) % 4;
+        const offerAllowed = new Set<string>([
+          offerCats[offerRot]!,
+          offerCats[(offerRot + 1) % 4]!,
+        ]);
         const pool = availableFactionQuests(
           vendor.faction,
           getStanding(player.factionStanding, vendor.faction),
           player.activeFactionQuestIds ?? [],
           player.completedFactionQuestIds ?? [],
         );
-        if (pool.length > 0) {
+        if (offerAllowed.has('fq') && pool.length > 0) {
           const q = pool[0]!;
           // Short summary line — playtest feedback: "the arbiter
           // shouldn't read the contracts. he can just say contract
@@ -7610,7 +7622,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           (player.activeHunts ?? []).map((h) => h.id),
           player.completedHuntIds ?? [],
         );
-        if (huntPool.length > 0) {
+        if (offerAllowed.has('hunt') && huntPool.length > 0) {
           const h = huntPool[0]!;
           get().appendLog(
             'world',
@@ -7636,7 +7648,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           (player.activeMysteries ?? []).map((m) => m.id),
           player.completedMysteryIds ?? [],
         );
-        if (mysteryPool.length > 0) {
+        if (offerAllowed.has('mystery') && mysteryPool.length > 0) {
           const m = mysteryPool[0]!;
           get().appendLog(
             'world',
@@ -7661,7 +7673,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           (player.activeStorylines ?? []).map((s) => s.id),
           player.completedStorylineIds ?? [],
         );
-        if (storyPool.length > 0) {
+        if (offerAllowed.has('storyline') && storyPool.length > 0) {
           const s = storyPool[0]!;
           get().appendLog(
             'arbiter',

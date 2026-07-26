@@ -836,9 +836,17 @@
       "title": "The Survey Line",
       "description": "Three Stone Builder surveyors need to walk their chain-and-transit line home through open silt. The waste does not care about their instruments.",
       "objective": "Escort the surveyors safely back to a Stone Builders agent. If the party is cut down, the contract fails.",
-      "requirement": { "rep": 5 },
-      "reward": { "tc": 70, "rep": 8 },
-      "escort": { "count": 3, "label": "Surveyors" }
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 70,
+        "rep": 8
+      },
+      "escort": {
+        "count": 3,
+        "label": "Surveyors"
+      }
     },
     {
       "id": "fq_forgotten_order_pilgrims_escort",
@@ -846,9 +854,17 @@
       "title": "Pilgrims of the Buried Road",
       "description": "Two pilgrims of the Order mean to walk the buried country and arrive breathing. Faith stops mud, not blades.",
       "objective": "Escort the pilgrims safely to a Forgotten Order agent. If the party is cut down, the contract fails.",
-      "requirement": { "rep": 8 },
-      "reward": { "tc": 80, "rep": 8 },
-      "escort": { "count": 2, "label": "Pilgrims" }
+      "requirement": {
+        "rep": 8
+      },
+      "reward": {
+        "tc": 80,
+        "rep": 8
+      },
+      "escort": {
+        "count": 2,
+        "label": "Pilgrims"
+      }
     },
     {
       "id": "fq_eternal_dynasty_envoy_escort",
@@ -856,9 +872,17 @@
       "title": "The Envoy's Road",
       "description": "A Dynasty envoy travels with sealed terms and no sword arm. What the seal is worth, others have already guessed.",
       "objective": "Escort the envoy safely to an Eternal Dynasty agent. If the envoy falls, the contract fails.",
-      "requirement": { "rep": 5 },
-      "reward": { "tc": 90, "rep": 10 },
-      "escort": { "count": 1, "label": "Envoy" }
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 90,
+        "rep": 10
+      },
+      "escort": {
+        "count": 1,
+        "label": "Envoy"
+      }
     },
     {
       "id": "fq_tartarian_revivalists_scholars_escort",
@@ -866,9 +890,17 @@
       "title": "Scholars Into the Ruins",
       "description": "Two Revivalist scholars want to read the old stones with their own eyes. The road between them and the stones has opinions.",
       "objective": "Escort the scholars safely to a Tartarian Revivalists agent. If the party is cut down, the contract fails.",
-      "requirement": { "rep": 10 },
-      "reward": { "tc": 85, "rep": 9 },
-      "escort": { "count": 2, "label": "Scholars" }
+      "requirement": {
+        "rep": 10
+      },
+      "reward": {
+        "tc": 85,
+        "rep": 9
+      },
+      "escort": {
+        "count": 2,
+        "label": "Scholars"
+      }
     },
     {
       "id": "fq_stone_builders_mason_crew_escort",
@@ -876,9 +908,17 @@
       "title": "Mason Crew to the Face",
       "description": "Three masons with their tools and their opinions need walking to the new cut. The tools are the valuable part; they would disagree.",
       "objective": "Escort the masons to a Stone Builders agent. Pay scales with how many of them arrive standing.",
-      "requirement": { "rep": 8 },
-      "reward": { "tc": 75, "rep": 8 },
-      "escort": { "count": 3, "label": "Masons" }
+      "requirement": {
+        "rep": 8
+      },
+      "reward": {
+        "tc": 75,
+        "rep": 8
+      },
+      "escort": {
+        "count": 3,
+        "label": "Masons"
+      }
     },
     {
       "id": "fq_stone_builders_chainmen_escort",
@@ -886,9 +926,17 @@
       "title": "The Chainmen",
       "description": "Two chainmen carry the measure of a claim no one has filed yet. Plenty of people would like it to stay unfiled.",
       "objective": "Escort the chainmen to a Stone Builders agent. Pay scales with the state you deliver them in.",
-      "requirement": { "rep": 12 },
-      "reward": { "tc": 90, "rep": 9 },
-      "escort": { "count": 2, "label": "Chainmen" }
+      "requirement": {
+        "rep": 12
+      },
+      "reward": {
+        "tc": 90,
+        "rep": 9
+      },
+      "escort": {
+        "count": 2,
+        "label": "Chainmen"
+      }
     },
     {
       "id": "fq_stone_builders_founders_bones_escort",
@@ -896,9 +944,18 @@
       "title": "The Founder's Bones",
       "description": "Two bearers carry a founder home to the stone that was promised. The Builders will not pay for a partial funeral.",
       "objective": "ALL OR NOTHING: deliver the bearers alive to a Stone Builders agent for full pay — if the party is cut down, you get nothing.",
-      "requirement": { "rep": 18 },
-      "reward": { "tc": 160, "rep": 12 },
-      "escort": { "count": 2, "label": "Bearers", "mode": "all_or_nothing" }
+      "requirement": {
+        "rep": 25
+      },
+      "reward": {
+        "tc": 160,
+        "rep": 12
+      },
+      "escort": {
+        "count": 2,
+        "label": "Bearers",
+        "mode": "all_or_nothing"
+      }
     },
     {
       "id": "fq_stone_builders_charter_signatories_escort",
@@ -906,9 +963,18 @@
       "title": "Charter Signatories",
       "description": "Three signatories, one charter, and every rival with an interest in fewer signatures. The Builders need every hand that can hold a pen.",
       "objective": "ALL OR NOTHING: deliver all three signatories alive to a Stone Builders agent — full pay or none.",
-      "requirement": { "rep": 22 },
-      "reward": { "tc": 200, "rep": 14 },
-      "escort": { "count": 3, "label": "Signatories", "mode": "all_or_nothing" }
+      "requirement": {
+        "rep": 25
+      },
+      "reward": {
+        "tc": 200,
+        "rep": 14
+      },
+      "escort": {
+        "count": 3,
+        "label": "Signatories",
+        "mode": "all_or_nothing"
+      }
     },
     {
       "id": "fq_forgotten_order_novices_escort",
@@ -916,19 +982,35 @@
       "title": "Novices on the Road",
       "description": "Three novices walking their first circuit of the buried country. Their faith is new; the dangers are not.",
       "objective": "Escort the novices to a Forgotten Order agent. Pay scales with how many arrive standing.",
-      "requirement": { "rep": 5 },
-      "reward": { "tc": 65, "rep": 7 },
-      "escort": { "count": 3, "label": "Novices" }
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 65,
+        "rep": 7
+      },
+      "escort": {
+        "count": 3,
+        "label": "Novices"
+      }
     },
     {
       "id": "fq_forgotten_order_almoners_escort",
       "factionId": "forgotten_order",
       "title": "The Almoners' Walk",
-      "description": "Two almoners carry the Order\u2019s giving out to the far camps. Coin draws knives; kindness draws crowds.",
+      "description": "Two almoners carry the Order’s giving out to the far camps. Coin draws knives; kindness draws crowds.",
       "objective": "Escort the almoners to a Forgotten Order agent. Pay scales with the state you deliver them in.",
-      "requirement": { "rep": 12 },
-      "reward": { "tc": 90, "rep": 9 },
-      "escort": { "count": 2, "label": "Almoners" }
+      "requirement": {
+        "rep": 12
+      },
+      "reward": {
+        "tc": 90,
+        "rep": 9
+      },
+      "escort": {
+        "count": 2,
+        "label": "Almoners"
+      }
     },
     {
       "id": "fq_forgotten_order_relic_bearers_escort",
@@ -936,9 +1018,18 @@
       "title": "Relic Bearers",
       "description": "Two bearers carry a thing the Order does not name in the open. What they carry cannot arrive at all if it does not arrive whole.",
       "objective": "ALL OR NOTHING: deliver the relic bearers alive to a Forgotten Order agent for full pay — or nothing.",
-      "requirement": { "rep": 18 },
-      "reward": { "tc": 170, "rep": 12 },
-      "escort": { "count": 2, "label": "Relic Bearers", "mode": "all_or_nothing" }
+      "requirement": {
+        "rep": 25
+      },
+      "reward": {
+        "tc": 170,
+        "rep": 12
+      },
+      "escort": {
+        "count": 2,
+        "label": "Relic Bearers",
+        "mode": "all_or_nothing"
+      }
     },
     {
       "id": "fq_forgotten_order_confessor_escort",
@@ -946,9 +1037,18 @@
       "title": "The Abbot's Confessor",
       "description": "One confessor, carrying every secret the Abbot could not keep. The Order would rather lose the road than lose the man.",
       "objective": "ALL OR NOTHING: deliver the confessor alive to a Forgotten Order agent — full pay or none.",
-      "requirement": { "rep": 22 },
-      "reward": { "tc": 210, "rep": 15 },
-      "escort": { "count": 1, "label": "Confessor", "mode": "all_or_nothing" }
+      "requirement": {
+        "rep": 25
+      },
+      "reward": {
+        "tc": 210,
+        "rep": 15
+      },
+      "escort": {
+        "count": 1,
+        "label": "Confessor",
+        "mode": "all_or_nothing"
+      }
     },
     {
       "id": "fq_eternal_dynasty_census_takers_escort",
@@ -956,19 +1056,35 @@
       "title": "Census Takers",
       "description": "Three census takers with ledgers of who lives where. In the waste, being counted has enemies.",
       "objective": "Escort the census takers to an Eternal Dynasty agent. Pay scales with how many arrive standing.",
-      "requirement": { "rep": 8 },
-      "reward": { "tc": 80, "rep": 8 },
-      "escort": { "count": 3, "label": "Census Takers" }
+      "requirement": {
+        "rep": 8
+      },
+      "reward": {
+        "tc": 80,
+        "rep": 8
+      },
+      "escort": {
+        "count": 3,
+        "label": "Census Takers"
+      }
     },
     {
       "id": "fq_eternal_dynasty_ledgermen_escort",
       "factionId": "eternal_dynasty",
       "title": "The Tax Ledgermen",
-      "description": "Two ledgermen carrying the season\u2019s assessments. No one loves them. The Dynasty pays for them anyway.",
+      "description": "Two ledgermen carrying the season’s assessments. No one loves them. The Dynasty pays for them anyway.",
       "objective": "Escort the ledgermen to an Eternal Dynasty agent. Pay scales with the state you deliver them in.",
-      "requirement": { "rep": 12 },
-      "reward": { "tc": 95, "rep": 9 },
-      "escort": { "count": 2, "label": "Ledgermen" }
+      "requirement": {
+        "rep": 12
+      },
+      "reward": {
+        "tc": 95,
+        "rep": 9
+      },
+      "escort": {
+        "count": 2,
+        "label": "Ledgermen"
+      }
     },
     {
       "id": "fq_eternal_dynasty_heirs_tutor_escort",
@@ -976,9 +1092,18 @@
       "title": "The Heir's Tutor",
       "description": "One tutor who knows what the heir must learn and what the heir must never learn. Both lists make him a target.",
       "objective": "ALL OR NOTHING: deliver the tutor alive to an Eternal Dynasty agent — full pay or none.",
-      "requirement": { "rep": 18 },
-      "reward": { "tc": 180, "rep": 13 },
-      "escort": { "count": 1, "label": "Tutor", "mode": "all_or_nothing" }
+      "requirement": {
+        "rep": 25
+      },
+      "reward": {
+        "tc": 180,
+        "rep": 13
+      },
+      "escort": {
+        "count": 1,
+        "label": "Tutor",
+        "mode": "all_or_nothing"
+      }
     },
     {
       "id": "fq_eternal_dynasty_treaty_scribes_escort",
@@ -986,9 +1111,18 @@
       "title": "Treaty Scribes",
       "description": "Two scribes carrying a treaty that exists in exactly two copies. The Dynasty holds the other one.",
       "objective": "ALL OR NOTHING: deliver both scribes alive to an Eternal Dynasty agent for full pay — or nothing.",
-      "requirement": { "rep": 22 },
-      "reward": { "tc": 200, "rep": 14 },
-      "escort": { "count": 2, "label": "Scribes", "mode": "all_or_nothing" }
+      "requirement": {
+        "rep": 25
+      },
+      "reward": {
+        "tc": 200,
+        "rep": 14
+      },
+      "escort": {
+        "count": 2,
+        "label": "Scribes",
+        "mode": "all_or_nothing"
+      }
     },
     {
       "id": "fq_tartarian_revivalists_cataloguers_escort",
@@ -996,9 +1130,17 @@
       "title": "Field Cataloguers",
       "description": "Three cataloguers bound for a dig with empty crates and full notebooks. The road reads neither.",
       "objective": "Escort the cataloguers to a Tartarian Revivalists agent. Pay scales with how many arrive standing.",
-      "requirement": { "rep": 6 },
-      "reward": { "tc": 70, "rep": 8 },
-      "escort": { "count": 3, "label": "Cataloguers" }
+      "requirement": {
+        "rep": 6
+      },
+      "reward": {
+        "tc": 70,
+        "rep": 8
+      },
+      "escort": {
+        "count": 3,
+        "label": "Cataloguers"
+      }
     },
     {
       "id": "fq_tartarian_revivalists_glyph_readers_escort",
@@ -1006,9 +1148,17 @@
       "title": "The Glyph Readers",
       "description": "Two readers who can hear the old stones. What they hear is worth more than what they carry.",
       "objective": "Escort the glyph readers to a Tartarian Revivalists agent. Pay scales with the state you deliver them in.",
-      "requirement": { "rep": 12 },
-      "reward": { "tc": 90, "rep": 9 },
-      "escort": { "count": 2, "label": "Glyph Readers" }
+      "requirement": {
+        "rep": 12
+      },
+      "reward": {
+        "tc": 90,
+        "rep": 9
+      },
+      "escort": {
+        "count": 2,
+        "label": "Glyph Readers"
+      }
     },
     {
       "id": "fq_tartarian_revivalists_first_stone_keepers_escort",
@@ -1016,9 +1166,18 @@
       "title": "Keepers of the First Stone",
       "description": "Two keepers carry a shard of the First Stone between shrines. The Revivalists count its arrival in whole shards only.",
       "objective": "ALL OR NOTHING: deliver the keepers alive to a Tartarian Revivalists agent for full pay — or nothing.",
-      "requirement": { "rep": 18 },
-      "reward": { "tc": 175, "rep": 12 },
-      "escort": { "count": 2, "label": "Keepers", "mode": "all_or_nothing" }
+      "requirement": {
+        "rep": 25
+      },
+      "reward": {
+        "tc": 175,
+        "rep": 12
+      },
+      "escort": {
+        "count": 2,
+        "label": "Keepers",
+        "mode": "all_or_nothing"
+      }
     },
     {
       "id": "fq_tartarian_revivalists_ashfall_pilgrimage_escort",
@@ -1026,9 +1185,18 @@
       "title": "Sister Ashfall's Pilgrimage",
       "description": "Sister Ashfall walks to the drowned shrine she has read about her whole life. The Revivalists will not accept a version of her that does not arrive.",
       "objective": "ALL OR NOTHING: deliver Sister Ashfall alive to a Tartarian Revivalists agent — full pay or none.",
-      "requirement": { "rep": 22 },
-      "reward": { "tc": 220, "rep": 15 },
-      "escort": { "count": 1, "label": "Sister Ashfall", "mode": "all_or_nothing" }
+      "requirement": {
+        "rep": 25
+      },
+      "reward": {
+        "tc": 220,
+        "rep": 15
+      },
+      "escort": {
+        "count": 1,
+        "label": "Sister Ashfall",
+        "mode": "all_or_nothing"
+      }
     },
     {
       "id": "fq_mud_monarchs_stranded_escort",
@@ -1036,9 +1204,17 @@
       "title": "The Stranded Courtier",
       "description": "A Monarch courtier separated from their retinue, silt to the knees and pride mostly intact.",
       "objective": "See the courtier to any mud monarchs agent with pulse and dignity both intact — the Court pays for the pair. (Field contract — pay scales with the shape you deliver them in.)",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 55, "rep": 5 },
-      "escort": { "count": 1, "label": "Stranded Traveler" }
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 55,
+        "rep": 5
+      },
+      "escort": {
+        "count": 1,
+        "label": "Stranded Traveler"
+      }
     },
     {
       "id": "fq_forgotten_order_stranded_escort",
@@ -1046,9 +1222,17 @@
       "title": "The Stranded Pilgrim",
       "description": "An Order pilgrim who walked a day past their water and two past their map.",
       "objective": "The Order counts every pilgrim who comes home. Bring this one to any forgotten order agent and be counted with them. (Field contract — pay scales with the shape you deliver them in.)",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 55, "rep": 5 },
-      "escort": { "count": 1, "label": "Stranded Traveler" }
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 55,
+        "rep": 5
+      },
+      "escort": {
+        "count": 1,
+        "label": "Stranded Traveler"
+      }
     },
     {
       "id": "fq_reclaimers_guild_stranded_escort",
@@ -1056,9 +1240,17 @@
       "title": "The Stranded Reclaimer",
       "description": "A Reclaimer whose crew left with the haul and, apparently, the directions.",
       "objective": "Haul the Reclaimer back to any reclaimers guild agent — the Guild retrieves its own, and pays retrieval rates. (Field contract — pay scales with the shape you deliver them in.)",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 55, "rep": 5 },
-      "escort": { "count": 1, "label": "Stranded Traveler" }
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 55,
+        "rep": 5
+      },
+      "escort": {
+        "count": 1,
+        "label": "Stranded Traveler"
+      }
     },
     {
       "id": "fq_true_tartarians_stranded_escort",
@@ -1066,9 +1258,17 @@
       "title": "The Stranded Keeper",
       "description": "A True Tartarian keeper of old names, far from anyone who still speaks them.",
       "objective": "Walk the keeper to any true tartarians agent. The old names die if the people who hold them do. (Field contract — pay scales with the shape you deliver them in.)",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 55, "rep": 5 },
-      "escort": { "count": 1, "label": "Stranded Traveler" }
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 55,
+        "rep": 5
+      },
+      "escort": {
+        "count": 1,
+        "label": "Stranded Traveler"
+      }
     },
     {
       "id": "fq_eternal_dynasty_stranded_escort",
@@ -1076,9 +1276,17 @@
       "title": "The Stranded Clerk",
       "description": "A Dynasty clerk with a satchel of stamped papers and no idea which way the border sits.",
       "objective": "Deliver the clerk — and the satchel they will not let you carry — to any eternal dynasty agent. (Field contract — pay scales with the shape you deliver them in.)",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 55, "rep": 5 },
-      "escort": { "count": 1, "label": "Stranded Traveler" }
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 55,
+        "rep": 5
+      },
+      "escort": {
+        "count": 1,
+        "label": "Stranded Traveler"
+      }
     },
     {
       "id": "fq_conspiracy_architects_stranded_escort",
@@ -1086,9 +1294,17 @@
       "title": "The Stranded Watcher",
       "description": "An Architect who watched the wrong road and got left on it.",
       "objective": "Get the watcher to any conspiracy architects agent. Ask nothing about what they watched; they will pay you not to. (Field contract — pay scales with the shape you deliver them in.)",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 55, "rep": 5 },
-      "escort": { "count": 1, "label": "Stranded Traveler" }
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 55,
+        "rep": 5
+      },
+      "escort": {
+        "count": 1,
+        "label": "Stranded Traveler"
+      }
     },
     {
       "id": "fq_servants_of_giants_stranded_escort",
@@ -1096,9 +1312,17 @@
       "title": "The Stranded Servant",
       "description": "A Servant of the Giants, small under the sky and far from the bones they tend.",
       "objective": "Guide the servant back to any servants of giants agent and the bones they tend. Small steps; long road. (Field contract — pay scales with the shape you deliver them in.)",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 55, "rep": 5 },
-      "escort": { "count": 1, "label": "Stranded Traveler" }
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 55,
+        "rep": 5
+      },
+      "escort": {
+        "count": 1,
+        "label": "Stranded Traveler"
+      }
     },
     {
       "id": "fq_stone_builders_stranded_escort",
@@ -1106,9 +1330,17 @@
       "title": "The Stranded Mason",
       "description": "A Stone Builders hand who lost their party in open silt and has been walking the wrong way for a day.",
       "objective": "Point the mason at any stone builders agent and keep them upright the whole way — the Builders pay by the standing worker. (Field contract — pay scales with the shape you deliver them in.)",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 55, "rep": 5 },
-      "escort": { "count": 1, "label": "Stranded Traveler" }
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 55,
+        "rep": 5
+      },
+      "escort": {
+        "count": 1,
+        "label": "Stranded Traveler"
+      }
     },
     {
       "id": "fq_tartarian_revivalists_stranded_escort",
@@ -1116,9 +1348,17 @@
       "title": "The Stranded Scholar",
       "description": "A Revivalist scholar who followed a glyph rubbing right off the edge of their own map.",
       "objective": "Return the scholar to any tartarian revivalists agent, rubbings and all. The map they followed was wrong; be the map that isn't. (Field contract — pay scales with the shape you deliver them in.)",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 55, "rep": 5 },
-      "escort": { "count": 1, "label": "Stranded Traveler" }
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 55,
+        "rep": 5
+      },
+      "escort": {
+        "count": 1,
+        "label": "Stranded Traveler"
+      }
     }
   ]
 }
