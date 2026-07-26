@@ -53,13 +53,13 @@ describe('OTA-912 — Skyreacher Chart unlocks a great climb', () => {
     store.getState().skipTutorial?.();
     const p0 = store.getState().player!;
     const chart: InventoryItem = {
-      id: 'chart1', name: 'Skyreacher Chart (1 of 5)', kind: 'misc', rarity: 'Rare', quantity: 1, tags: ['map', 'skyreacher_chart', 'chart'],
+      id: 'chart1', name: 'Skyreacher Map 1 of 5 — Grand Spire', kind: 'misc', rarity: 'Rare', quantity: 1, tags: ['map', 'skyreacher_chart', 'chart'],
     };
     store.setState({ player: { ...p0, inventory: [...p0.inventory, chart] } });
 
     expect((store.getState().worldMemory.unlockedGreatClimbs ?? [])).not.toContain('grand_spire');
     // The real player path — tapping USE on the chart in the inventory.
-    store.getState().useInventoryItem('Skyreacher Chart (1 of 5)');
+    store.getState().useInventoryItem('Skyreacher Map 1 of 5 — Grand Spire');
 
     const wm = store.getState().worldMemory;
     expect(wm.unlockedGreatClimbs ?? []).toContain('grand_spire');

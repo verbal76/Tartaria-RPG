@@ -69,7 +69,7 @@ describe('OTA-912 — every Skyreacher Chart is purchasable exactly once', () =>
       const offered: string[] = [];
       for (let i = 0; i < 5; i++) {
         const stall = withSkyreacherChartOffer(roadside(), wm)!;
-        const chart = stall.offers.find((o) => o.itemName.startsWith('Skyreacher Chart'));
+        const chart = stall.offers.find((o) => /^Skyreacher Map/.test(o.itemName));
         expect(chart).toBeDefined();
         offered.push(chart!.itemName);
         // simulate the sale — the ledger blocks re-offers of that chart
@@ -78,7 +78,7 @@ describe('OTA-912 — every Skyreacher Chart is purchasable exactly once', () =>
       expect(new Set(offered).size).toBe(5); // all five distinct charts surfaced
       // with all five sold, no stall offers one again
       const none = withSkyreacherChartOffer(roadside(), wm)!;
-      expect(none.offers.some((o) => o.itemName.startsWith('Skyreacher Chart'))).toBe(false);
+      expect(none.offers.some((o) => /^Skyreacher Map/.test(o.itemName))).toBe(false);
     } finally {
       Math.random = orig;
     }
@@ -89,11 +89,11 @@ describe('OTA-912 — every Skyreacher Chart is purchasable exactly once', () =>
     const p0 = store.getState().player!;
     store.setState({
       player: { ...p0, tc: 500 },
-      currentScene: { ...store.getState().currentScene!, vendor: roadside([{ itemName: 'Skyreacher Chart (2 of 5)', price: 100, quantity: 1 }]) },
+      currentScene: { ...store.getState().currentScene!, vendor: roadside([{ itemName: 'Skyreacher Map 2 of 5 — Asgardar Spire', price: 100, quantity: 1 }]) },
     });
-    await store.getState().buyFromVendor('Skyreacher Chart (2 of 5)', 1);
-    expect(store.getState().player!.inventory.some((i) => i.name === 'Skyreacher Chart (2 of 5)')).toBe(true);
-    expect(store.getState().worldMemory.soldMapIds ?? []).toContain('Skyreacher Chart (2 of 5)');
+    await store.getState().buyFromVendor('Skyreacher Map 2 of 5 — Asgardar Spire', 1);
+    expect(store.getState().player!.inventory.some((i) => i.name === 'Skyreacher Map 2 of 5 — Asgardar Spire')).toBe(true);
+    expect(store.getState().worldMemory.soldMapIds ?? []).toContain('Skyreacher Map 2 of 5 — Asgardar Spire');
   });
 });
 

@@ -894,14 +894,22 @@ function recordTitleProgress(
 // and never a chart for a climb already unlocked. climbId matches a GREAT_CLIMBS id.
 // Exported for the OTA-912 full-run verification test.
 export const SKYREACHER_CHARTS: readonly { name: string; climbId: string; price: number }[] = [
-  { name: 'Skyreacher Chart (1 of 5)', climbId: 'grand_spire',       price: 110 },
-  { name: 'Skyreacher Chart (2 of 5)', climbId: 'asgardar_spire',    price: 100 },
-  { name: 'Skyreacher Chart (3 of 5)', climbId: 'obsidian_monolith', price: 95 },
-  { name: 'Skyreacher Chart (4 of 5)', climbId: 'thametan_tower',    price: 90 },
-  { name: 'Skyreacher Chart (5 of 5)', climbId: 'zharak_fang',       price: 85 },
+  { name: 'Skyreacher Map 1 of 5 — Grand Spire',       climbId: 'grand_spire',       price: 110 },
+  { name: 'Skyreacher Map 2 of 5 — Asgardar Spire',    climbId: 'asgardar_spire',    price: 100 },
+  { name: 'Skyreacher Map 3 of 5 — Obsidian Monolith', climbId: 'obsidian_monolith', price: 95 },
+  { name: 'Skyreacher Map 4 of 5 — Thametan Tower',    climbId: 'thametan_tower',    price: 90 },
+  { name: 'Skyreacher Map 5 of 5 — Zharak Fang',       climbId: 'zharak_fang',       price: 85 },
 ];
 /** Names of the five charts — used by the buy path to stamp soldMapIds. */
 const SKYREACHER_CHART_NAMES: ReadonlySet<string> = new Set(SKYREACHER_CHARTS.map((c) => c.name));
+// OTA-991 — the maps were named 'Skyreacher Chart (N of 5)' before this build
+// (owner: "it's not a chart. we should call it a map" — and the name should say
+// where it leads). Old saves still carry the chart names in inventories and in
+// the sell-once ledger (soldMapIds stores NAMES): backfillPlayer renames held
+// items on load, and the roadside offer filter treats a legacy ledger entry as
+// sold. Index i here pairs with SKYREACHER_CHARTS[i].
+export const LEGACY_SKYREACHER_CHART_NAMES: readonly string[] =
+  [1, 2, 3, 4, 5].map((n) => `Skyreacher Chart (${n} of 5)`);
 
 /** OTA-912 — the shared "use a Skyreacher Chart" effect: unlock the great climb
  *  (so its prop spawns at the landmark), reveal + log the landmark, and consume
@@ -945,6 +953,9 @@ function unlockGreatClimbFromChart(
       : `You unroll the ${item.name} and trace the giant-drawn lines. ${theCap(gc.noun)} settles onto your atlas — the great climb is open, and a new charge stands on your board. Travel there, bring the Hardened Climbing Strap and a whole Reclaimer's Rope, and make the ascent.`,
   );
   if (!already) {
+    // OTA-991 — say plainly what just happened (owner: "a text pops up saying that
+    // you've added the skyreacher location ... to the map and mission logs").
+    getStore().appendLog('reward', `✦ Skyreacher location added to your MAP and MISSION LOG — ${theCap(gc.noun)}.`);
     getStore().appendLog(
       'arbiter',
       `"A collector tower," the Arbiter murmurs. "One of the sky-antennas that drank the heavens dry. Its guardian still holds the crown. Climb into the heart of it, ${player.name}, if you mean to."`,
@@ -1027,7 +1038,10 @@ export function withSkyreacherChartOffer(vendor: VendorInstance | null, wm: Worl
   const unlocked = wm.unlockedGreatClimbs ?? [];
   const already = new Set(vendor.offers.map((o) => o.itemName));
   const pick = SKYREACHER_CHARTS.find(
-    (c) => !sold.includes(c.name) && !unlocked.includes(c.climbId) && !already.has(c.name),
+    // OTA-991 — a pre-rename sale wrote the old 'Skyreacher Chart (N of 5)' name
+    // into the ledger; that map is still sold-once, never offered again.
+    (c, i) => !sold.includes(c.name) && !sold.includes(LEGACY_SKYREACHER_CHART_NAMES[i]!)
+      && !unlocked.includes(c.climbId) && !already.has(c.name),
   );
   if (!pick) return vendor;
   return { ...vendor, offers: [...vendor.offers, { itemName: pick.name, price: pick.price, quantity: 1 }] };
@@ -1746,6 +1760,18 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   if (!out.dead && (out.hp ?? 0) <= 0) {
     const safeMax = out.hpMax && out.hpMax > 0 ? out.hpMax : 1;
     out = { ...out, hp: safeMax, stamina: out.staminaMax ?? out.stamina ?? 0 };
+  }
+  // OTA-991 — 'Skyreacher Chart (N of 5)' became 'Skyreacher Map N of 5 — <tower>'.
+  // Rename legacy charts sitting in old saves so the catalog row — and with it
+  // the Use effect that unlocks the great climb — resolves again.
+  if (out.inventory?.some((i) => LEGACY_SKYREACHER_CHART_NAMES.includes(i.name))) {
+    out = {
+      ...out,
+      inventory: out.inventory.map((i) => {
+        const at = LEGACY_SKYREACHER_CHART_NAMES.indexOf(i.name);
+        return at >= 0 ? { ...i, name: SKYREACHER_CHARTS[at]!.name } : i;
+      }),
+    };
   }
   return out;
 }

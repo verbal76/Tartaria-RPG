@@ -84,8 +84,15 @@ describe('OTA-912 — the reward chain (Boltcaster + charts + beacon)', () => {
 
   it('all five Skyreacher Charts carry a map effect pointing at a real great climb', () => {
     const seen = new Set<string>();
+    const NAMES = [
+      'Skyreacher Map 1 of 5 — Grand Spire',
+      'Skyreacher Map 2 of 5 — Asgardar Spire',
+      'Skyreacher Map 3 of 5 — Obsidian Monolith',
+      'Skyreacher Map 4 of 5 — Thametan Tower',
+      'Skyreacher Map 5 of 5 — Zharak Fang',
+    ];
     for (let i = 1; i <= 5; i++) {
-      const chart = findGearByName(`Skyreacher Chart (${i} of 5)`);
+      const chart = findGearByName(NAMES[i - 1]!);
       expect(chart).not.toBeNull();
       const fx = chart!.effect as { kind: string; climbId: string; index: number; total: number } | undefined;
       expect(fx?.kind).toBe('map');
