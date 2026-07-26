@@ -19523,7 +19523,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (tr.leveled) {
           get().appendLog(
             'reward',
-            `✦ You read them well. +1 CHA (now ${tr.leveled.to}).`,
+            `✦ You read them well. +1 CHA (${statNowClause(get().player, 'charisma', tr.leveled.to)}).`,
           );
         }
       }
@@ -19652,7 +19652,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (tr.leveled) {
           get().appendLog(
             'reward',
-            `✦ You named your price and held it. +1 CHA (now ${tr.leveled.to}).`,
+            `✦ You named your price and held it. +1 CHA (${statNowClause(get().player, 'charisma', tr.leveled.to)}).`,
           );
         }
       }
@@ -19803,7 +19803,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (tr.leveled) {
           get().appendLog(
             'reward',
-            `✦ Light hands. +1 STE (now ${tr.leveled.to}).`,
+            `✦ Light hands. +1 STE (${statNowClause(get().player, 'stealth', tr.leveled.to)}).`,
           );
         }
       }
@@ -20257,7 +20257,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (chaLeveled != null) {
         get().appendLog(
           'reward',
-          `✦ They handed you the contract. +1 CHA (now ${chaLeveled}).`,
+          `✦ They handed you the contract. +1 CHA (${statNowClause(get().player, 'charisma', chaLeveled)}).`,
         );
       }
       // OTA-057 — accepting a contract is an active CHA push; the
@@ -20852,7 +20852,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (chaLeveled != null) {
         get().appendLog(
           'reward',
-          `✦ The hunt is yours to take. +1 CHA (now ${chaLeveled}).`,
+          `✦ The hunt is yours to take. +1 CHA (${statNowClause(get().player, 'charisma', chaLeveled)}).`,
         );
       }
       // OTA-057 — accepting a hunt is an active CHA push; the matching
@@ -21177,7 +21177,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (chaLeveled != null) {
         get().appendLog(
           'reward',
-          `✦ They confide the mystery to you. +1 CHA (now ${chaLeveled}).`,
+          `✦ They confide the mystery to you. +1 CHA (${statNowClause(get().player, 'charisma', chaLeveled)}).`,
         );
       }
       // OTA-057 — accepting a mystery is an active CHA push; the WIS
@@ -21429,7 +21429,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (chaLeveled != null) {
         get().appendLog(
           'reward',
-          `✦ The storyline opens to you. +1 CHA (now ${chaLeveled}).`,
+          `✦ The storyline opens to you. +1 CHA (${statNowClause(get().player, 'charisma', chaLeveled)}).`,
         );
       }
       // OTA-057 — accepting a storyline is an active CHA push; WIS
@@ -22574,7 +22574,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (trWis.leveled) {
             get().appendLog(
               'reward',
-              `✦ The road teaches you. +1 WIS (now ${trWis.leveled.to}).`,
+              `✦ The road teaches you. +1 WIS (${statNowClause(get().player, 'wisdom', trWis.leveled.to)}).`,
             );
           }
         }
@@ -22595,7 +22595,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (trStr.leveled) {
               get().appendLog(
                 'reward',
-                `✦ The pack on your back makes you stronger. +1 STR (now ${trStr.leveled.to}).`,
+                `✦ The pack on your back makes you stronger. +1 STR (${statNowClause(get().player, 'strength', trStr.leveled.to)}).`,
               );
             }
           }
@@ -22619,7 +22619,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (trCha.leveled) {
               get().appendLog(
                 'reward',
-                `✦ Your bearing reads. +1 CHA (now ${trCha.leveled.to}).`,
+                `✦ Your bearing reads. +1 CHA (${statNowClause(get().player, 'charisma', trCha.leveled.to)}).`,
               );
             }
           }
@@ -25993,7 +25993,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (tr.leveled) {
           get().appendLog(
             'reward',
-            `✦ Your eye for parts sharpens. +1 INT (now ${tr.leveled.to}).`,
+            `✦ Your eye for parts sharpens. +1 INT (${statNowClause(get().player, 'intelligence', tr.leveled.to)}).`,
           );
         }
       }
@@ -29188,7 +29188,7 @@ function applyEnemyCounter(
           if (tr.leveled) {
             get().appendLog(
               'reward',
-              `✦ Strength remembers itself. +1 STR (now ${tr.leveled.to}).`,
+              `✦ Strength remembers itself. +1 STR (${statNowClause(get().player, 'strength', tr.leveled.to)}).`,
             );
           }
         }
@@ -29446,7 +29446,7 @@ function applyEnemyCounter(
       const tr = trainStat(liveParrier, 'dexterity', true);
       set((s) => (s.player ? { player: tr.player } : s));
       if (tr.leveled) {
-        get().appendLog('reward', `✦ Reflex like water. +1 DEX (now ${tr.leveled.to}).`);
+        get().appendLog('reward', `✦ Reflex like water. +1 DEX (${statNowClause(get().player, 'dexterity', tr.leveled.to)}).`);
       }
     }
     const liveSte = mayTrain ? get().player : null;
@@ -29454,7 +29454,7 @@ function applyEnemyCounter(
       const trS = trainStat(liveSte, 'stealth', true);
       set((s) => (s.player ? { player: trS.player } : s));
       if (trS.leveled) {
-        get().appendLog('reward', `✦ The shadows move with you. +1 STE (now ${trS.leveled.to}).`);
+        get().appendLog('reward', `✦ The shadows move with you. +1 STE (${statNowClause(get().player, 'stealth', trS.leveled.to)}).`);
       }
     }
     // Grant the opening. remainingRounds 2 so the round tick at the end of
@@ -31221,7 +31221,7 @@ function runAethercraft(
       if (tr.leveled) {
         get().appendLog(
           'reward',
-          `✦ The aether teaches you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (now ${tr.leveled.to}).`,
+          `✦ The aether teaches you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (${statNowClause(get().player, tr.leveled.stat, tr.leveled.to)}).`,
         );
       }
     }
