@@ -8,6 +8,7 @@ import { ARMOR_SLOTS, effectiveStats, aethericVisionEquipped, trimStandingAc } f
 import { playerPowerScore, powerMatchup } from '../engine/powerRating';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
+import { livingEscortPools } from '../engine/escort';
 import { useReduceMotion } from '../state/accessibility';
 
 // OTA-214 — Aetheric Vision Lens active indicator. Pure presence
@@ -298,6 +299,17 @@ export function StatsPanel({ player, enemyPower }: Props) {
           </Text>
         </View>
       ) : null}
+      {/* OTA-962 — escort party the player is protecting: ONE row per active escort
+          (shared pool), color by remaining fraction. Parked parties are hidden. */}
+      {livingEscortPools(player.activeFactionQuests).map((p, i) => {
+        const frac = p.hpMax > 0 ? p.hp / p.hpMax : 0;
+        const col = frac <= 0.34 ? '#e07a5f' : frac <= 0.67 ? '#d9b15f' : '#7fae8a';
+        return (
+          <Text key={`esc_${i}`} style={[styles.escortName, { color: col }]} numberOfLines={1}>
+            ↳ {p.label} ({p.hp}/{p.hpMax})
+          </Text>
+        );
+      })}
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
       {/* OTA-744 — vitals row. TC moved OUT to its own wallet line below: with 5
           cells a 3-digit HP ("109/109") overflowed its 1/5 slot and wrapped a
@@ -377,6 +389,11 @@ function Stat({ label, value, valueColor }: { label: string; value: string; valu
 }
 
 const styles = StyleSheet.create({
+  escortName: {
+    fontSize: 11,
+    fontFamily: 'monospace',
+    marginTop: 1,
+  },
   container: {
     backgroundColor: '#13110f',
     borderColor: '#3a342c',

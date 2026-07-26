@@ -46,6 +46,12 @@ export interface FactionQuestDef {
    *  quests (a real "gather N, bring them back" on-ramp). Quests with a
    *  `fetch` requirement carry no stages — the fetch IS the objective. */
   fetch?: { itemName: string; quantity: number };
+  /** OTA-962 — ESCORT contract (engine_Dev model). When present (or when the quest
+   *  id ends in `_escort`), accepting spawns a shared-pool escort party that
+   *  takes real collateral damage in the player's fights — deliver them alive
+   *  or the contract FAILS. `count` (1-5) sets party size, default 2-3;
+   *  `label` is the one-word party name ("Surveyors"). */
+  escort?: { count?: number; label?: string };
   /** Optional explicit ROUTE destination for this contract's objective (a
    *  location id). When present it overrides the engine's text-derived guess for
    *  "ROUTE TO"; absent → the engine infers it from the mission text, falling
