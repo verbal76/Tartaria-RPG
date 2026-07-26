@@ -527,7 +527,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   are unavailable and companions are benched below. Say so, so the missing
                   buttons read as a rule, not a bug. */}
               {elevatedOn ? (
-                <Text style={styles.elevatedNote}>⛰ ELEVATED — no dodge / flee · companions below</Text>
+                <Text style={styles.elevatedNote}>⛰ ELEVATED — no dodge · companions below · flee dives for the base</Text>
               ) : null}
               {golem && golem.hp > 0 && !elevatedOn ? (
                 // OTA-911 — the golem is benched at the climb base (it can't
@@ -576,7 +576,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   BACKSTAB attempt (costs your turn, STE initiative race). The
                   'sneak' verb routes to the stealth intent handler either way. */}
               <QuickBtn label="stealth" defensive onPress={() => onSubmit('sneak')} />
-              {!elevatedOn ? <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} /> : null}
+              {/* OTA — flee is legal in wall fights now: one tap, normal flee
+                  roll, success dives for the base (double stamina per tier). */}
+              <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} />
               {/* OTA-361 — loot a knocked-out humanoid. One tap strips their
                   kit (damaged) + drops + TC and clears them from the fight. */}
               {knockedOutPresent ? (

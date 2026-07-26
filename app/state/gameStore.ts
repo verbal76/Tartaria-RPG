@@ -8335,24 +8335,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
     }
-    // OTA-911 — DODGE and FLEE don't work while you're on a climb. Both hands are
-    // on the rock: there's no footing to weave a parry, and nowhere to flee to but
-    // straight down. (Inventory use and drinking still work — those go through
-    // their own verbs and modal, which aren't gated here.) Intercept BEFORE the
-    // parser so no roll, time, or stamina is spent on the refused action.
+    // OTA-911 — DODGE doesn't work while you're on a climb (no footing to weave
+    // a parry). OTA — FLEE now DOES work in a wall fight. Owner: "when I summit
+    // some climbs [I] immediately get thrust into a fight with up to five
+    // enemies. there is no way to flee." It runs the NORMAL flee roll; success
+    // resolves as a one-tap dive for the base — double stamina per tier, and if
+    // the tank empties partway you fall the rest (see the escape resolution).
+    // Flee with NO enemies on the wall is still refused — nothing is chasing
+    // you; that's just climbing down.
     {
       const elevNow = get().currentScene?.elevatedOn;
       if (elevNow) {
         const lowerAct = trimmed.toLowerCase().trim();
         const isDodgeAct = /^(dodge|parry|block|deflect)\b/.test(lowerAct);
         const isFleeAct = /^(flee|run|escape|retreat|withdraw|disengage)\b/.test(lowerAct);
-        if (isDodgeAct || isFleeAct) {
+        const wallEnemies = (get().currentScene?.enemies?.length ?? 0) > 0;
+        if (isDodgeAct || (isFleeAct && !wallEnemies)) {
           get().appendLog('player', trimmed);
           get().appendLog(
             'world',
             isDodgeAct
               ? `You can't dodge on the ${elevNow.noun} — both hands are on the rock and there's no footing to weave a parry. Set your feet and swing, or climb clear first.`
-              : `There's nowhere to run but straight down. You hold your place on the ${elevNow.noun} — fight it out or climb, those are the ways off a wall.`,
+              : `Nothing up here is chasing you. If you want down, climb down.`,
           );
           void get().persist();
           return;
@@ -14449,7 +14453,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   get().appendLog('world', bossDef.approachLine);
                   get().appendLog(
                     'combat',
-                    `Summit boss — ${boss.name} (${boss.hp} HP). Dodge & flee are off up here — fight it out, or CLIMB DOWN to break off (it resets and heals, like a Core Guardian).`,
+                    `Summit boss — ${boss.name} (${boss.hp} HP). Dodge is off up here — fight it out, FLEE to dive for the base, or CLIMB DOWN to break off (it resets and heals, like a Core Guardian).`,
                   );
                 }
               } else {
@@ -14620,7 +14624,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               get().appendLog('world', enc.intro);
               get().appendLog(
                 'combat',
-                `Climb ambush at tier ${currentTier}/${totalTiers}: ${scaledEnc.map((e) => e.name).join(', ')}. (dodge & flee are off while you're on the wall — fight or hold.)`,
+                `Climb ambush at tier ${currentTier}/${totalTiers}: ${scaledEnc.map((e) => e.name).join(', ')}. (dodge is off on the wall — fight, hold, or FLEE to dive for the base.)`,
               );
             }
           }
@@ -16688,6 +16692,69 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           case 'escape': {
+            // OTA-953 — WALL FLEE resolution. A successful flee while elevated is
+            // a one-tap dive for the base, whatever tier you're on: enemies
+            // are left behind (a summit boss resets exactly like a break-off),
+            // and the descent costs DOUBLE stamina per tier. If the tank
+            // empties partway down, the tiers your arms couldn't cover are a
+            // FALL — scaled damage for that remaining height.
+            const elevFlee = get().currentScene?.elevatedOn;
+            if (elevFlee) {
+              const fleeTier = Math.max(1, elevFlee.tier);
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { computeClimbFallBase: cfbFlee } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const tPerksFlee = require('../engine/titles').titlePerkModifiers(player);
+              const livePl = get().player ?? player;
+              const fullCost = fleeTier * 2;
+              const paid = Math.min(livePl.stamina, fullCost);
+              const tiersCovered = Math.floor(paid / 2);
+              const tiersShort = Math.max(0, fleeTier - tiersCovered);
+              let fleeFallDmg = 0;
+              let fleeShaveTag = '';
+              if (tiersShort > 0) {
+                fleeFallDmg = cfbFlee(livePl.hpMax, tiersShort);
+                if (tPerksFlee.climbFallHalved && fleeFallDmg > 1) {
+                  fleeFallDmg = Math.max(1, Math.floor(fleeFallDmg / 2));
+                  fleeShaveTag = ' (Skyreacher halves the fall)';
+                }
+              }
+              const newHpFlee = Math.max(0, livePl.hp - fleeFallDmg);
+              get().appendLog(
+                'world',
+                `You kick off the ${elevFlee.noun} and take the wall in one desperate line — ${fleeTier} tier${fleeTier > 1 ? 's' : ''} at double burn (-${paid} stamina).`,
+              );
+              if (tiersShort > 0) {
+                get().appendLog(
+                  'world',
+                  `${tiersCovered > 0 ? `Your arms last ${tiersCovered} tier${tiersCovered > 1 ? 's' : ''} — then` : 'Your arms are already empty —'} the last ${tiersShort} tier${tiersShort > 1 ? 's' : ''} are a fall. -${fleeFallDmg} HP${fleeShaveTag} (${newHpFlee}/${livePl.hpMax}).`,
+                );
+              } else {
+                get().appendLog('world', `You hit the ground moving. Whatever was up there keeps the height.`);
+              }
+              set((sf) => {
+                if (!sf.currentScene) return sf;
+                const preservedF = sf.currentScene.preservedSceneOnDescent;
+                const baseScene = sf.currentScene.elevatedOverlayMeta && preservedF
+                  ? { ...preservedF, preservedSceneOnDescent: undefined, elevatedOverlayMeta: undefined }
+                  : sf.currentScene;
+                return {
+                  currentScene: {
+                    ...baseScene,
+                    elevatedOn: null,
+                    enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null,
+                  },
+                  player: sf.player
+                    ? { ...sf.player, hp: newHpFlee, stamina: Math.max(0, sf.player.stamina - paid) }
+                    : sf.player,
+                };
+              });
+              void get().persist();
+              if (newHpFlee <= 0) {
+                handlePlayerDeath(get, set as Parameters<typeof handlePlayerDeath>[1]);
+              }
+              break;
+            }
             // v2.4.1 (OTA 052) — Core Guardian flee path. If a
             // Guardian is in the scene the rebuke fires + the
             // Guardian de-spawns (fully restored on next gate
@@ -16948,7 +17015,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // what else is on the table.
             const inCombat = currentScene.enemies.length > 0;
             const hint = inCombat
-              ? " Try 'dodge' to set a parry, 'attack' to commit, or another 'retreat' to break contact."
+              ? (get().currentScene?.elevatedOn
+                ? ' No parry up here — swing back, or try the flee again.'
+                : " Try 'dodge' to set a parry, 'attack' to commit, or another 'retreat' to break contact.")
               : ' The way out is blocked for now — try a different direction, or rest before pushing through.';
             get().appendLog(
               'world',
