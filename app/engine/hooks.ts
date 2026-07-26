@@ -33,6 +33,7 @@ export type HookKind =
   | 'aether_grid_hum'
   | 'sealed_vault_door'
   | 'preserved_corpse'
+  | 'stranded_traveler'
   // OTA-418 — Tier-3: INTERIOR finds (indoors-only). Planted by the indoor
   // hook pool when the player investigates / looks around inside a hub room or
   // a building, so a candle in a house surfaces an interior lead (a loose
@@ -177,6 +178,12 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
   preserved_corpse: [
     { line: 'A Tartarian body lies in the silt, the mud-glass having frozen them at the moment they fell — robes still pristine, satchel still buckled.', nouns: ['body', 'corpse', 'robes', 'satchel', 'tartarian'] },
   ],
+  // OTA-965 — HOOK ESCORT. Planted only by the stepDirection spawner (weight 0),
+  // never by the random picker: a stranded traveler offers a field escort.
+  stranded_traveler: [
+    { line: 'Someone is sitting on their pack at the edge of the path — no party, no fire, and a long way from anywhere. They stand when they see you.',
+      nouns: ['traveler', 'traveller', 'stranger', 'stranded', 'figure', 'person', 'walker'] },
+  ],
   // OTA-418 — INTERIOR finds. Each plants something you'd notice INSIDE a room.
   loose_floorboard: [
     { line: 'One floorboard sits proud of the rest, its nails backed half out — lifted and re-laid more than once.', nouns: ['floorboard', 'board', 'plank', 'floor', 'nails'] },
@@ -264,7 +271,11 @@ export type HookEffect =
   // happen"). The handler picks a random unfired hook from the
   // pool and routes through grantQuestHook so the entry lands in
   // player.activeQuests with the canonical arbiter narration.
-  | { type: 'grant_random_quest_hook'; pool: 'hunt' | 'mystery' | 'any' };
+  | { type: 'grant_random_quest_hook'; pool: 'hunt' | 'mystery' | 'any' }
+  // OTA-965 — HOOK ESCORT: start a faction escort contract from the wild, no
+  // vendor. Resolves a rep-0 `_stranded_escort` def the player doesn't already
+  // hold, spawns the shared pool, pushes the activeFactionQuests record.
+  | { type: 'start_escort_contract'; idSuffix: string };
 
 // OTA-185 — minimal vendor-spec for hook-spawned traders. Mirrors
 // the VendorInstance fields the engine needs to render + serve a
@@ -788,6 +799,22 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       done: true,
     },
   ],
+  // OTA-965 — HOOK ESCORT chain: beat 1 is the offer (CONTINUE accepts, ABANDON
+  // declines via the existing hook modal); beat 2 takes the contract.
+  stranded_traveler: [
+    {
+      line: 'They keep their hands where you can see them. "I was with a party. I am not, now. I can pay — my people pay — if you walk me to one of our agents."',
+      arbiterLine: '"That is a contract, not a favour," the Arbiter says. "Take it and they are yours to keep breathing. CONTINUE to agree; ABANDON to walk on."',
+      effects: [],
+      done: false,
+      addNouns: ['traveler', 'traveller', 'stranger', 'them', 'they', 'offer', 'escort'],
+    },
+    {
+      line: 'You take the work. They fall in a half-step behind your shoulder and match your pace without being told.',
+      effects: [{ type: 'start_escort_contract', idSuffix: '_stranded_escort' }],
+      done: true,
+    },
+  ],
   // OTA-418 — INTERIOR chains. Two beats each: examine reveals more, then a
   // modest interior payoff (a stash, a memo, a coin or scrap, a small heal).
   loose_floorboard: [
@@ -942,7 +969,7 @@ export function matchAnyHookNoun(target: string | undefined, hooks: readonly Hoo
 // Atmospheric hooks plant less often so chains feel earned. The lore-heavy
 // ones (Sentinel, Giant, Black Cloak, Storm) are deliberately rarer so they
 // land like events.
-const HOOK_WEIGHTS: Record<HookKind, number> = {
+export const HOOK_WEIGHTS: Record<HookKind, number> = {
   smoke: 12,
   footprints: 12,
   obelisk: 8,
@@ -970,6 +997,8 @@ const HOOK_WEIGHTS: Record<HookKind, number> = {
   aether_grid_hum: 6,
   sealed_vault_door: 3, // mostly chained
   preserved_corpse: 6,
+  stranded_traveler: 0, // OTA-965 — spawner-planted only, never randomly drawn
+
   // OTA-418 — interior weights (only ever drawn by the INDOOR picker below).
   loose_floorboard: 8,
   hidden_compartment: 7,
@@ -1013,7 +1042,7 @@ function pickWeightedHookKind(include: (k: HookKind) => boolean, fallback: HookK
 
 /** OUTDOOR random hook — excludes the interior kinds. */
 export function pickRandomHookKind(): HookKind {
-  return pickWeightedHookKind((k) => !INDOOR_HOOK_KINDS.has(k), 'glint');
+  return pickWeightedHookKind((k) => !INDOOR_HOOK_KINDS.has(k) && k !== 'stranded_traveler', 'glint');
 }
 
 /** OTA-418 — INDOOR random hook — only the interior kinds. */

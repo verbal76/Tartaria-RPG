@@ -1699,6 +1699,10 @@ export interface WorldMemory {
    *  bloats the save — a tile older than the window can roll again, which requires
    *  crossing that many fresh tiles first, so it's still not a practical farm. */
   wandererRolledTiles?: string[];
+  /** OTA-965 — outdoor tiles that already rolled for a stranded-traveler escort
+   *  hook. Same one-roll-per-tile, sliding-window anti-farm as
+   *  wandererRolledTiles. */
+  strandedEscortRolledTiles?: string[];
   /** HANDOFF #15b — hub rooms the player has visited at least once.
    *  Used by hub fast-travel to gate "jump to the workshop" against
    *  rooms the player actually knows. Stored separately from

@@ -17147,4 +17147,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // escort faction fields 3 scaled + 2 all_or_nothing. Tests: tier coverage per faction, half-strength
 // scaled pays ~half + says so, bloodied all_or_nothing pays full. typecheck + lint clean; full fast
 // suite green. Mission economy -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-964-escort-pay-tiers';
+// OTA-965 (hook escorts; golem port of HAL OTA-988). Owner: "we need hook escort missions." A STRANDED TRAVELER can
+// now appear on novel, peaceful wild ground (6% roll per never-before-rolled tile in stepDirection —
+// mirrors the roadside-stall + wanderer anti-farm patterns; never while a live escort party is out;
+// new worldMemory.strandedEscortRolledTiles bank). Talking/investigating them opens a 2-beat hook
+// chain (new kind stranded_traveler, weight 0 — spawner-planted only): beat 1 is the offer (the hook
+// modal's CONTINUE accepts, ABANDON declines), beat 2 fires the new start_escort_contract hook
+// effect — picks a rep-0 `_stranded_escort` def the player doesn't hold, spawns the shared pool, and
+// pushes the SAME record shape acceptFactionQuest writes, so collateral/fail/scaled-pay/turn-in all
+// work unchanged (turn in at any same-faction agent). 9 new field contracts, one per faction (45 TC
+// / 5 rep, solo traveler, scaled pay). Tests: defs valid per faction, random picker never draws the
+// kind, full talk->CONTINUE->record E2E. typecheck + lint clean; full fast suite green.
+// Mission content + world encounters -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-965-hook-escorts';
