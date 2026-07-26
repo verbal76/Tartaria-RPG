@@ -1617,6 +1617,10 @@ export interface CanonLocation {
 
 export interface WorldMemory {
   tagCounts: Record<string, number>;
+  /** OTA — #122: the CURRENT local sky. Weather persists per location visit —
+   *  a scene rebuild at the same spot inside ~6 game-hours reuses this instead
+   *  of re-rolling, so conditions read as weather, not a slot machine. */
+  sceneWeather?: { id: string; locationId: string; rolledAtHours: number };
   discoveredLocationIds: string[];
   /** OTA-500 — install-canon locations registered from dynamic mentions. */
   canonLocations?: CanonLocation[];
