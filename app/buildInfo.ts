@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.7';
+export const DISPLAY_VERSION = '4.28.8';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18258,4 +18258,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // worldLadder display strings; room id kept for save continuity) + an Americana lock test. Debug
 // breadcrumbs: scene-build state (loc/hub/arrival/passing) + gear-spawn rolls on the debug channel.
 // DISPLAY_VERSION 4.28.7. 4 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-996-polish-trio';
+// OTA-997 (the missing names). #119-completion, owner: "complete 119 missing names."
+// Root cause: the portability filter matched raw SUBSTRINGS, so 'mud' banned every Mud-* weapon
+// and armor (~58 Common names) from ambient spawns AND pickup, 'arch' banned "Architect's" gear,
+// 'rain' matched "training". Category fix: word-boundary matching plus an exact catalog-item
+// exemption (a catalog item is by definition pocketable; true substances/masses — "wet mud",
+// "fog bank", "ash drift" — stay put). Mud-* gear provably returns to the spawn pool (test probe).
+// DISPLAY_VERSION 4.28.8. 3 tests. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-997-portable-words';
