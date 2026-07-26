@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.5';
+export const DISPLAY_VERSION = '4.28.6';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17225,4 +17225,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // base + gear. All now route through statNowClause — 18 sites total — and a source-scanning category
 // LOCK test fails any future toast written the old way, so the class can't regrow. DISPLAY_VERSION
 // 4.28.5. 2 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-971-stat-toast-lock';
+// OTA-972 (one accept behavior for every contract kind; golem port of HAL OTA-995). Review item #118: hunts,
+// mysteries, and storylines auto-ACTIVATED on accept while faction quests auto-parked — the owner
+// hand-deactivated nine contracts in one board-browsing session. Root cause: only
+// acceptFactionQuest had single-active park logic, and it scanned only its OWN kind. Now
+// anyTrackedContract() is the one shared cross-kind predicate; all EIGHT accept/grant sites
+// (faction accept, hook escort grant, faction+neutral hunt, faction+neutral mystery, storyline,
+// whisper hunt/mystery grants) park the newcomer when anything is live, with the same "paused —
+// you're already on another contract" line. Debug breadcrumbs: every accept logs kind/id/tracked.
+// DISPLAY_VERSION 4.28.6. 2 tests. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-972-accept-unify';

@@ -2649,6 +2649,19 @@ export function qwenRephraseRejection(
   return null;
 }
 
+/** OTA-972 — #118: ONE definition of "already running a contract", across ALL
+ *  FOUR kinds (faction quests, hunts, mysteries, storylines). tracked===false
+ *  is parked; anything else counts as live. Root cause of the accept-behavior
+ *  split: only acceptFactionQuest had single-active park logic, and it scanned
+ *  only its OWN kind — the other three accepts never set `tracked` at all, so
+ *  batch-accepting a board made everything live at once (device log: the owner
+ *  hand-deactivated NINE contracts). Exported for tests. */
+export function anyTrackedContract(p: PlayerCharacter | null | undefined): boolean {
+  if (!p) return false;
+  const live = (rs?: readonly { tracked?: boolean }[]) => (rs ?? []).some((r) => r.tracked !== false);
+  return live(p.activeFactionQuests) || live(p.activeHunts) || live(p.activeMysteries) || live(p.activeStorylines);
+}
+
 function chargeOutpostCrucibleFee(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -20184,7 +20197,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // SINGLE-ACTIVE — a new contract joins ACTIVE only if you aren't already
     // running one; otherwise it's parked, so batch-accepting from the board
     // doesn't make everything live at once. You activate it when you're ready.
-    const hasActiveOther = (player.activeFactionQuests ?? []).some((q) => q.tracked !== false);
+    const hasActiveOther = anyTrackedContract(player); // OTA-972 — #118: cross-kind
     const newTracked = !hasActiveOther;
     // OTA-962 — ESCORT contract: accepting spawns the shared-pool party (engine_Dev
     // model). It rides on the quest record; collateral damage + failure live in
@@ -20708,12 +20721,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const alreadyDone = neutralMatch
         && (player.completedHuntIds ?? []).includes(neutralMatch.id);
       if (neutralMatch && !alreadyActive && !alreadyDone) {
+        const neutralTracked = !anyTrackedContract(player); // OTA-972 — #118
+        get().appendLog('debug', `accept: neutral ${neutralMatch.id} tracked=${neutralTracked}`);
         set((s) => (s.player ? {
           player: {
             ...s.player,
             activeHunts: [
               ...(s.player.activeHunts ?? []),
-              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now() },
+              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked },
             ],
           },
         } : s));
@@ -20722,6 +20737,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'arbiter',
           `The Arbiter nods. "You take ${theLower(neutralMatch.title)} on. Open the Contracts board to see the stages."`,
         );
+        if (!neutralTracked) {
+          get().appendLog('world', `${neutralMatch.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+        }
         void get().persist();
         return;
       }
@@ -20773,6 +20791,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const hunt = matchedHunt;
+    // OTA-972 — #118: same single-active rule as faction quests — accepting while
+    // ANY contract (any kind) is live PARKS the new one instead of
+    // auto-activating it.
+    const huntTracked = !anyTrackedContract(player);
+    get().appendLog('debug', `accept: hunt ${hunt.id} tracked=${huntTracked}`);
     set((s) =>
       s.player
         ? {
@@ -20780,7 +20803,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...s.player,
               activeHunts: [
                 ...(s.player.activeHunts ?? []),
-                { id: hunt.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now() },
+                { id: hunt.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: huntTracked },
               ],
             },
           }
@@ -20792,6 +20815,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const stage0 = hunt.stages[0];
     if (stage0) {
       get().appendLog('reward', `✦ Hunt accepted — ${hunt.title}. ${hunt.posterText}`);
+      if (!huntTracked) {
+        get().appendLog('world', `${hunt.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+      }
       get().appendLog('world', stage0.narration);
       // 2026-05-26 OTA-053 — playtester ask: "I get handed a poster.
       // It doesn't give me an idea of where I'm supposed to go."
@@ -21077,12 +21103,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const alreadyDone = neutralMatch
         && (player.completedMysteryIds ?? []).includes(neutralMatch.id);
       if (neutralMatch && !alreadyActive && !alreadyDone) {
+        const neutralTracked = !anyTrackedContract(player); // OTA-972 — #118
+        get().appendLog('debug', `accept: neutral ${neutralMatch.id} tracked=${neutralTracked}`);
         set((s) => (s.player ? {
           player: {
             ...s.player,
             activeMysteries: [
               ...(s.player.activeMysteries ?? []),
-              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now() },
+              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked },
             ],
           },
         } : s));
@@ -21091,6 +21119,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'arbiter',
           `The Arbiter nods. "You take ${theLower(neutralMatch.title)} on. Open the Contracts board to see the stages."`,
         );
+        if (!neutralTracked) {
+          get().appendLog('world', `${neutralMatch.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+        }
         void get().persist();
         return;
       }
@@ -21139,6 +21170,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const m = matchedMystery;
+    const mysteryTracked = !anyTrackedContract(player); // OTA-972 — #118
+    get().appendLog('debug', `accept: mystery ${m.id} tracked=${mysteryTracked}`);
     set((s) =>
       s.player
         ? {
@@ -21146,7 +21179,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...s.player,
               activeMysteries: [
                 ...(s.player.activeMysteries ?? []),
-                { id: m.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now() },
+                { id: m.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: mysteryTracked },
               ],
             },
           }
@@ -21157,6 +21190,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const stage0 = m.stages[0];
     if (stage0) {
       get().appendLog('reward', `✦ Mystery accepted — ${m.title}. ${m.posterText}`);
+      if (!mysteryTracked) {
+        get().appendLog('world', `${m.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+      }
       get().appendLog('world', stage0.narration);
     }
     set((s) =>
@@ -21391,6 +21427,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const s = matchedStoryline;
+    const storyTracked = !anyTrackedContract(player); // OTA-972 — #118
+    get().appendLog('debug', `accept: storyline ${s.id} tracked=${storyTracked}`);
     set((st) =>
       st.player
         ? {
@@ -21398,7 +21436,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...st.player,
               activeStorylines: [
                 ...(st.player.activeStorylines ?? []),
-                { id: s.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now() },
+                { id: s.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: storyTracked },
               ],
             },
           }
@@ -21409,6 +21447,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const stage0 = s.stages[0];
     if (stage0) {
       get().appendLog('reward', `✦ Storyline accepted — ${s.title}. ${s.posterText}`);
+      if (!storyTracked) {
+        get().appendLog('world', `${s.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+      }
       get().appendLog('world', stage0.narration);
     }
     set((st) =>
@@ -26888,7 +26929,7 @@ function applyHookEffect(
       const escortMod = require('../engine/escort') as typeof import('../engine/escort');
       const spec = escortMod.escortSpecForQuest(def);
       const escort = spec ? escortMod.spawnEscortPool(spec.count, p.hpMax ?? 20, spec.label) : null;
-      const hasActiveOther = (p.activeFactionQuests ?? []).some((q) => q.tracked !== false);
+      const hasActiveOther = anyTrackedContract(p); // OTA-972 — #118: cross-kind
       const newTracked = !hasActiveOther;
       set((s2) => (s2.player ? {
         player: {
@@ -27359,6 +27400,7 @@ function grantQuestHook(
     const active = (player.activeHunts ?? []).some((h) => h.id === def.id);
     const done = (player.completedHuntIds ?? []).includes(def.id);
     if (active || done) return;
+    const grantTracked = !anyTrackedContract(player); // OTA-972 — #118
     set((s) =>
       s.player
         ? {
@@ -27366,7 +27408,7 @@ function grantQuestHook(
               ...s.player,
               activeHunts: [
                 ...(s.player.activeHunts ?? []),
-                { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now() },
+                { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now(), tracked: grantTracked },
               ],
             },
           }
@@ -27404,6 +27446,7 @@ function grantQuestHook(
   const active = (player.activeMysteries ?? []).some((m) => m.id === def.id);
   const done = (player.completedMysteryIds ?? []).includes(def.id);
   if (active || done) return;
+  const grantTracked = !anyTrackedContract(player); // OTA-972 — #118
   set((s) =>
     s.player
       ? {
@@ -27411,7 +27454,7 @@ function grantQuestHook(
             ...s.player,
             activeMysteries: [
               ...(s.player.activeMysteries ?? []),
-              { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now() },
+              { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now(), tracked: grantTracked },
             ],
           },
         }
