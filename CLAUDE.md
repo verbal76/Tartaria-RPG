@@ -1,4 +1,17 @@
-# Tartaria-RPG — Working Notes
+# Tartaria-RPG — Working Notes (CLAUDE.md)
+
+> **HANDOFF.md is the operational source of truth — it took over most of what
+> used to live here.** The multi-line operating model (HaL2001 / golem-line /
+> engine_Dev), cold-start worktree setup, CI gates, the per-OTA change loop,
+> push cadence + authorization, cross-line parity, native-build rules,
+> commit/PR conventions, the open-issues watch list, and the OTA history all
+> live in **HANDOFF.md** on each branch — read its §0–§3 before doing
+> anything. This file keeps only the standing JUDGMENT rules that aren't
+> process: how to fix, how to weigh canon, and the paste-triage workflows.
+> Rules below that contradict HANDOFF are wrong — HANDOFF wins. (Rewritten
+> 2026-07-26 at the owner's direction; the retired sections — "batch ≥5
+> before pushing", codename-first commit titles, the old Open/Closed-issues
+> HANDOFF format — are gone, not merely deprecated.)
 
 ## FIX RULE — kill the CATEGORY'S root cause, never just the incident
 
@@ -54,154 +67,33 @@ are LORE COPIES of the doc tables — they feed Qwen narration and the
 Ask the Arbiter MiniLM lookup. Treat them as authoritative for what
 the ARBITER knows, not for what the engine does.
 
-## Shipping rule: OTA-only, and BATCH the push (min 5)
+## Shipping quick-truths (details: HANDOFF §2–§6)
 
-Every change is shipped as an **OTA update** unless a native build
-is the only way to accomplish it. Default flow per change:
+- **Everything ships as an OTA** unless it genuinely needs a native build
+  (new native module, `app.json`/runtime change, `ios/`/`android/` edits,
+  SDK bump — full list in HANDOFF §5; confirm with the owner first).
+  Default to OTA.
+- **Push cadence: each OTA is pushed as it lands** on the line branches the
+  owner authorized this session — pushing IS shipping for the mobile lines.
+  Never push a line without that session's authorization. (The old
+  "batch ≥5, owner triggers the push" rule is retired.)
+- **Commit titles:** `OTA-NNN — <short description>` (+ `[build-*]` markers
+  first only when a native build is truly intended). The codename-first
+  title convention is retired. Trailers per HANDOFF §6.
+- **Every OTA bumps `OTA_BUILD_ID` AND `DISPLAY_VERSION`** (PATCH +1 per
+  OTA; MINOR on a feature wave — scheme + ledger in VERSION.md).
+- **All gates before every push:** typecheck:ci, lint, typecheck:tests
+  ratchet, targeted jest, full fast suite (HANDOFF §3).
 
-1. Edit code in `app/` / `__tests__/` / `docs/` etc.
-2. Bump `OTA_BUILD_ID` in `app/buildInfo.ts` (`YYYY-MM-DD-NNN`
-   format; increment NNN per change)
-3. `git add -A && git commit` to `HaL2001` — **commit locally, do
-   NOT push yet** (see batching rule below).
+## Playtest-log triage
 
-### Batching rule — accumulate ≥5, the USER triggers the push
-
-We do **not** push singular OTAs anymore. Pushing 60 OTAs in a day
-is what set up the OTA-338 brick (a mid-session OTA apply during a
-double-reload corrupted the live save). The rule now:
-
-- **Minimum 5 OTAs per batch before a push.** Build + commit each
-  change locally on `HaL2001` (its own OTA id + Anvil codename), and
-  keep a running **"Next Batch — staging list"** at the top of
-  HANDOFF.md §0 so the queued-but-unpushed OTAs are legible at a
-  glance.
-- **The push command comes from the USER.** Never `git push HaL2001`
-  on your own — pushing IS the ship (it publishes the OTA to phones).
-  Stage the work, report "N/5 staged," and wait for the user to say
-  push.
-- **Exceptions (push before 5 is allowed):** (a) the user explicitly
-  overrides ("push now"), or (b) we hit a state that forces a native
-  build / store submit (`[build-aab]` / `[build-ios]` / `[submit-ios]`)
-  — in which case the batch ships alongside the build per the user's
-  call.
-- After a user-approved push, clear the staging list and reset the
-  count for the next batch.
-
-**Native build is only required when:**
-- Adding a new native module / Expo plugin (camera, BLE, etc.)
-- Changing `app.json` / `app.config.js` runtime version
-- Modifying native iOS/Android files under `ios/` or `android/`
-- Bumping the Expo SDK version
-- Anything that changes the JS engine, Hermes config, or
-  native permissions manifest
-
-For everything else — engine logic, JSON catalog edits, UI
-component changes, screens, hooks, tests, assets that are
-bundled JS-side — OTA is the only path. Don't suggest
-`eas build` / native rebuilds for changes that fit in the JS
-bundle.
-
-If unsure whether a change requires a build, default to OTA and
-let the harness reject if it can't be applied — it's faster than
-the round trip of a native rebuild.
-
-## OTA commit title convention — codename FIRST
-
-Every OTA commit's first-line title MUST start with the build
-codename (from `app/buildCodename.ts` / `docs/build-codenames.md`),
-followed by an em-dash, then the `OTA-NNN` identifier, then the
-description. Format:
-
-```
-<Codename> — OTA-NNN — <short description>
-```
-
-Examples:
-
-- `Smoke Anvil — OTA-267 — Build codename obfuscation layer`
-- `Tin Tine — OTA-268 — Vendor: gift verb routing fix`
-- `[build-ios] [submit-ios] Cinder Drift — OTA-266 — Info.plist...`
-  (build/submit markers stay as the absolute first tokens; the
-  codename slots in right after them)
-
-**Why:** the user views commits on a phone where titles truncate at
-~30-40 characters. With the codename leading, a truncated title
-("Smoke Anvil — OTA-267 — Build cod...") still tells them which
-build the commit corresponds to at a glance. The codename-only
-prefix means they don't have to expand each title to figure out
-which OTA they're looking at when triaging or referencing builds
-later.
-
-**Codename selection:** when bumping `OTA_BUILD_ID` in
-`app/buildInfo.ts`, also add a new entry to the `CODENAMES` map in
-`app/buildCodename.ts` drawing from the next unused name in
-`docs/build-codenames.md`'s reserved pool. Move that name from the
-reserved pool up into the current-mapping table in the doc. The
-commit then uses that fresh codename as its title prefix.
-
-## HANDOFF.md — the build timeline
-
-`HANDOFF.md` is the canonical record of every issue tracked
-against this project. Two sections only: **Open Issues** and
-**Closed Issues**. The file is the dev-facing source of truth
-for "what's been fixed, by which OTA, how, and what's still
-broken." Read it before planning ANY fix.
-
-### Workflow per OTA / APK push
-
-Every time you ship an OTA or APK, the same commit must
-update HANDOFF.md:
-
-1. **If the OTA closes a tracked Open Issue:**
-   - Remove the entry from the Open Issues section.
-   - Add an entry to Closed Issues at the top of the
-     "fixed" list with: **OTA-NNN** (or APK#) · **what was
-     broken** (the playtester's symptom or the design ask) ·
-     **how it was fixed** (the actual code change in one
-     paragraph) · **why this approach** (one line).
-
-2. **If the OTA closes an issue that wasn't tracked as Open
-   (you noticed it in a log, opportunistic fix, etc.):**
-   - Add it directly to Closed Issues with the same WHO /
-     WHAT / WHEN / WHERE / WHY structure. Skip the "Open"
-     phase.
-
-3. **If the OTA introduces a NEW open issue** (you noticed
-   something but couldn't fix in this OTA, or shipped a
-   feature with known limitations):
-   - Add it to Open Issues.
-
-4. **Commit HANDOFF.md alongside the code change.** Same
-   commit. No "I'll update the doc later."
-
-### Before planning any fix
-
-Burn through HANDOFF.md first. Two things to look for:
-- **Is this issue already closed?** If yes, the fix exists —
-  check whether it's working, whether it regressed, or
-  whether the user wants a tweak. Don't reinvent.
-- **Will my plan break a previously-closed fix?** The Closed
-  section names which fix touched which code path. If your
-  plan crosses one of those paths, factor in that constraint
-  before writing the new fix.
-
-### Periodic "what's open" requests
-
-The user will periodically ask for a list of open issues.
-That's the Open Issues section, top to bottom. Keep entries
-tight: one-line title + 2-3 line description + last-known
-state ("blocked on X", "needs design call", "deferred — low
-priority").
-
-### Why this matters
-
-Without HANDOFF.md as the running timeline, every session has
-to re-derive history from `buildInfo.ts` comments and `git
-log`. That works but it's slow and error-prone — agents
-will sometimes propose fixes that resurrect old bugs because
-they didn't grep deep enough. The Open/Closed structure makes
-the state of the world legible at a glance.
+When the owner pastes a device log (the `=== TARTARIA LOG · PART N ===`
+envelope): DIAGNOSE FIRST. Produce observations — bugs, exploits, balance
+evidence, lore/narration incoherence, things working as intended — and do
+NOT code fixes until the owner rules on each finding. When fixes are
+approved, apply the FIX RULE above per item, and keep the owner's design
+calls (intentional exploits, kept tradeoffs) on record in HANDOFF §8 so a
+future session doesn't "fix" them.
 
 ## Inventory snapshot triage
 
