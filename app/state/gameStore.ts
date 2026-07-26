@@ -3585,6 +3585,11 @@ interface GameStore {
   submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean; silent?: boolean }) => void;
   resolveRollStep: (values: number[]) => void;
   cancelPendingRolls: () => void;
+  // OTA-957 — a bandolier throw transiently equips the throwable to the off hand
+  // while its dice modal is open. This records what to put back (and the
+  // spend-exactly-one snapshot) until the roll RESOLVES or CANCELS.
+  throwSettlement: { itemId: string; qtyAtThrow: number; prevOff?: string; prevOffId?: string } | null;
+  settleThrowRestore: (outcome: 'resolved' | 'cancelled') => void;
   concludeRolls: (steps: RollStep[], actionText: string) => void;
   /** OTA-259 — advance a multi-stage investigation hook to its next
    *  step without re-opening the investigate menu. Called by the
@@ -4139,6 +4144,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   currentScreen: 'title',
   currentScene: null,
   pendingRolls: null,
+  throwSettlement: null,
   parseSuggestions: [],
   pendingHookContinue: null,
   pendingWhisperComplete: null,
@@ -9144,7 +9150,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // runEnemyGroupCounters; the attack path passes skipDotTick to its
         // counter calls below so DOTs don't double-tick.
         if (tickEnemyDotsAndMaybeEndFight(get, set)) return;
-        const targetEnemy = activeEnemy(currentScene);
+        // OTA-957 — the tick can now resolve individual DOT-killed enemies
+        // (splicing the scene arrays), so the target must come from the LIVE
+        // scene, not the pre-tick snapshot.
+        const sceneAfterDots = get().currentScene;
+        if (!sceneAfterDots) return;
+        const targetEnemy = activeEnemy(sceneAfterDots);
         if (targetEnemy) {
           // OTA 205 — Phase 2 args migration. If the player named an
           // instrument explicitly ("attack the drone with the bolt-
@@ -9260,7 +9271,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // surprise, etc.) so the dice prompt and the final attack
           // total honor every action-card buff/penalty the player
           // earned. Ranged attacks get aim bonus, melee don't.
-          const isRangedAttack = !barehand && (playerWeaponReach(player).bands.length > 1);
+          // OTA-957 — read the SWUNG hand. This was main-hand-only, so an off-hand
+          // melee swing while a ranged main was holstered still rolled as
+          // "ranged": aim mods applied and "+2 (point blank)" landed on a blade
+          // (owner's log: the Mud Executioner's Blade at close rolled point-
+          // blank because the Bolt-Caster sat in the main hand).
+          const isRangedAttack = !barehand && (playerWeaponReach(player, offHandSwing ? 'off' : 'main').bands.length > 1);
           const statusMods = rollMods(player.statusEffects, isRangedAttack ? 'attack_ranged' : 'attack_melee');
           // Point-blank bonus: ranged weapon at arm's reach is a bonus
           // die on the attack roll (offset by the disarm/melee risk
@@ -9276,7 +9292,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             statusMods,
             pointBlankBonus,
             // OTA-362 — acid-coating armor shred on the active enemy.
-            acReduction: currentScene.enemyArmorShred?.[currentScene.activeEnemyIdx] ?? 0,
+            acReduction: sceneAfterDots.enemyArmorShred?.[sceneAfterDots.activeEnemyIdx] ?? 0,
           });
           // OTA-796 — one-shot statuses consumed by this roll (aiming burns on
           // use) are now stripped when the ATTACK STEP RESOLVES, not at prompt
@@ -16271,6 +16287,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       set({ pendingRolls: null, pendingHookContinue: null });
       get().concludeRolls(updatedSteps, state.actionText);
+      // OTA-957 — settle a bandolier throw only after the WHOLE swing resolved, so
+      // the damage phase read the thrown item, not the restored off hand.
+      get().settleThrowRestore('resolved');
     }
   },
 
@@ -16359,6 +16378,53 @@ export const useGameStore = create<GameStore>((set, get) => ({
       };
     });
     get().appendLog('system', refund ? 'Action cancelled. Time and stamina refunded.' : 'Action cancelled.');
+    // OTA-957 — a cancelled bandolier throw unwinds the transient off-hand equip
+    // and spends nothing (same spirit as the refund above).
+    get().settleThrowRestore('cancelled');
+  },
+
+  settleThrowRestore(outcome) {
+    const ts = get().throwSettlement;
+    if (!ts) return;
+    set({ throwSettlement: null });
+    const p = get().player;
+    if (!p) return;
+    if (outcome === 'resolved') {
+      // The spend-exactly-one guarantee, moved to settle time: one unit per
+      // COMPLETED throw. A landed hit already consumed one via the equipped-
+      // throwable path; top up only when it didn't (a miss).
+      const cur = p.inventory.find((i) => i.id === ts.itemId);
+      const alreadySpent = !cur || cur.quantity < ts.qtyAtThrow;
+      if (!alreadySpent) {
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            inventory: s.player.inventory
+              .map((i) => (i.id === ts.itemId ? { ...i, quantity: i.quantity - 1 } : i))
+              .filter((i) => i.quantity > 0),
+          },
+        } : s));
+      }
+    }
+    const after = get().player;
+    const stillHas = !!after?.inventory.some((i) => i.id === ts.itemId && i.quantity > 0);
+    set((s) => {
+      if (!s.player) return s;
+      const eq = { ...(s.player.equipped ?? {}) };
+      // Unwind only if the hand still holds the transient throwable (or the
+      // hit-consume already emptied the slot). A deliberate re-equip in
+      // between wins over the unwind.
+      if (eq.offId !== undefined && eq.offId !== ts.itemId) return s;
+      const danglingSpent = ts.prevOffId === ts.itemId && !stillHas;
+      if (ts.prevOff && !danglingSpent) eq.off = ts.prevOff; else delete eq.off;
+      if (ts.prevOffId && !danglingSpent) eq.offId = ts.prevOffId; else delete eq.offId;
+      // Clear the slot off the bandolier once the stack is empty.
+      if (!stillHas) {
+        eq.bandolierIds = (eq.bandolierIds ?? []).filter((id) => id !== ts.itemId);
+      }
+      return { player: { ...s.player, equipped: eq } };
+    });
+    void get().persist();
   },
 
   concludeRolls(steps: RollStep[], actionText: string) {
@@ -24289,43 +24355,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => s.player
       ? { player: { ...s.player, equipped: { ...(s.player.equipped ?? {}), off: item.name, offId: item.id } } }
       : s);
-    const beforeThrowQty = item.quantity;
+    // OTA-957 — the restore (and the spend-exactly-one guarantee) used to run RIGHT
+    // HERE, synchronously — written when combat resolved in the same tick. With
+    // the dice modal the damage phase runs SECONDS later and read the RESTORED
+    // weapon: owner's log shows a thrown Sentinel Core Plate rolling as itself
+    // but LANDING as the Mud-fist Wraps (wraps damage type, wraps coatings
+    // burned, wraps wear — and the plate never spent). Both now wait in
+    // throwSettlement until the roll RESOLVES (restore + spend) or CANCELS
+    // (restore, nothing spent — same spirit as the cancel time/stamina refund).
+    set({ throwSettlement: { itemId: item.id, qtyAtThrow: item.quantity, prevOff, prevOffId } });
     get().submitPlayerAction(`attack with the off-hand ${item.name}`);
-    // OTA-604 — guarantee a bandolier throw spends EXACTLY ONE unit. The
-    // off-hand attack only consumes the throwable on a HIT (the consume logic
-    // is bundled into the hit-only weapon-wear path), so a MISS left the axe in
-    // hand forever — the player threw a single axe ~50 times. If the attack
-    // didn't already decrement the stack, spend one here; if it did (a hit
-    // already consumed it), don't double-spend.
-    const midItem = get().player?.inventory.find((i) => i.id === item.id);
-    const alreadySpent = !midItem || midItem.quantity < beforeThrowQty;
-    if (!alreadySpent) {
-      set((s) => s.player ? {
-        player: {
-          ...s.player,
-          inventory: s.player.inventory
-            .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
-            .filter((i) => i.quantity > 0),
-        },
-      } : s);
-    }
-    // Did the stack survive the throw?
-    const after = get().player;
-    const stillHas = !!after?.inventory.some((i) => i.id === item.id && i.quantity > 0);
-    // Restore the prior off hand — unless what was there IS the now-spent throwable
-    // (it's gone from inventory), in which case leave the hand empty.
-    set((s) => {
-      if (!s.player) return s;
-      const eq = { ...(s.player.equipped ?? {}) };
-      const danglingSpent = prevOffId === item.id && !stillHas;
-      if (prevOff && !danglingSpent) eq.off = prevOff; else delete eq.off;
-      if (prevOffId && !danglingSpent) eq.offId = prevOffId; else delete eq.offId;
-      // Clear the slot off the bandolier once the stack is empty.
-      if (!stillHas) {
-        eq.bandolierIds = (eq.bandolierIds ?? []).filter((id) => id !== item.id);
-      }
-      return { player: { ...s.player, equipped: eq } };
-    });
+    // A swing that never opened the dice modal (a refusal, or a synchronous
+    // resolution whose hit-consume already spent the unit) settles NOW —
+    // 'cancelled' restores the hand and spends nothing extra.
+    if (!get().pendingRolls) get().settleThrowRestore('cancelled');
     void get().persist();
   },
 
@@ -28508,25 +28551,35 @@ function tickEnemyDotsAndMaybeEndFight(
         : s);
     }
   }
-  // OTA-429 — a DOT tick that drops the LAST living enemy must still end
-  // the fight. Pre-OTA, DOT kills were left at 0 HP for "the next attack
-  // to clean up" — but if the DOT kills the final enemy the player has
-  // nothing left to swing at, so the fight hung (range stayed set, no
-  // loot, no victory line). When EVERY enemy is now dead from the tick,
-  // sweep them all through resolveEnemyDefeat (loot + kill bookkeeping +
-  // combat-end, which persists). Mixed fights (at least one enemy still
-  // alive) keep the old behavior so mid-fight targeting isn't perturbed.
+  // OTA-957 — (was: last-enemy-only) a DOT tick that drops ANY enemy to 0 kills it
+  // NOW. The old sweep only fired when EVERY enemy was dead; in a MIXED fight
+  // the corpse was left standing at 0 HP "for the next attack to clean up" —
+  // owner's log shows a raider at 0/28 hanging around until a whole extra swing
+  // formally killed it, while a solo-fight Aetherkin died instantly from the
+  // same tick. Every dead index now routes through resolveEnemyDefeat (loot,
+  // kill bookkeeping, bounty credit), and the player's living TARGET is
+  // re-pointed afterward so the sweep never silently retargets them.
   {
     const swept = get().currentScene;
-    if (swept && swept.enemies.length > 0 && swept.enemyHps.every((h) => (h ?? 0) <= 0)) {
-      set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: 0 } } : s));
+    if (swept && swept.enemies.length > 0 && swept.enemyHps.some((h) => (h ?? 0) <= 0)) {
+      const targetBefore = swept.enemies[swept.activeEnemyIdx] ?? null;
       let guard = 0;
       while (++guard <= 16) {
         const sc = get().currentScene;
         if (!sc || sc.enemies.length === 0) break;
+        const deadIdx = sc.enemyHps.findIndex((h) => (h ?? 0) <= 0);
+        if (deadIdx < 0) break;
+        set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: deadIdx } } : s));
         get().resolveEnemyDefeat();
       }
-      return true;
+      const scEnd = get().currentScene;
+      if (!scEnd || scEnd.enemies.length === 0) return true;
+      if (targetBefore) {
+        const keep = scEnd.enemies.indexOf(targetBefore);
+        if (keep >= 0 && keep !== scEnd.activeEnemyIdx) {
+          set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: keep } } : s));
+        }
+      }
     }
   }
   return false;

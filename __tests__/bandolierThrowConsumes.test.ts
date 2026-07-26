@@ -63,7 +63,7 @@ function plantEnemy(name = 'Mud Boar') {
       enemies: [enemy],
       enemyHps: [enemy.hp],
       activeEnemyIdx: 0,
-      range: 'arm',
+      range: 'close',
       enemyAmbushUsed: [false],
     },
   });
@@ -91,20 +91,26 @@ async function bootWithAxe(qty: number) {
   return store;
 }
 
-describe('OTA-604 — bandolier throw consumes the throwable', () => {
+describe('bandolier throw consumes the throwable — settled when the roll closes', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
-  it('one throw spends exactly one unit (hit OR miss), and resolves synchronously', async () => {
+  function drain(store: typeof useGameStore) {
+    let guard = 0;
+    while (store.getState().pendingRolls) {
+      if (guard++ > 50) throw new Error('roll loop did not terminate');
+      const pr = store.getState().pendingRolls!;
+      const step = pr.steps[pr.currentStep]!;
+      store.getState().resolveRollStep(Array.from({ length: step.count ?? 1 }, () => 20));
+    }
+  }
+
+  it('one COMPLETED throw spends exactly one unit and puts the real hand back', async () => {
     const store = await bootWithAxe(2);
-    const before = store.getState().player!.inventory.find((i) => i.id === 'axe_1')!.quantity;
-    expect(before).toBe(2);
-
     store.getState().throwFromBandolier(AXE);
-
-    // No dangling dice prompt — the off-hand attack auto-resolves; otherwise the
-    // top-up consumption would race a deferred hit and double-spend.
-    expect(store.getState().pendingRolls).toBeFalsy();
-
+    // The dice modal owns the throw now — the spend + off-hand restore settle
+    // when it closes, so the damage phase reads the AXE, not the restored hand.
+    expect(store.getState().pendingRolls).toBeTruthy();
+    drain(store);
     const after = store.getState().player!.inventory.find((i) => i.id === 'axe_1');
     expect(after?.quantity ?? 0).toBe(1); // exactly one spent — not 0, not 2
   });
@@ -112,9 +118,8 @@ describe('OTA-604 — bandolier throw consumes the throwable', () => {
   it('the last unit clears the bandolier slot', async () => {
     const store = await bootWithAxe(1);
     expect(store.getState().player!.equipped?.bandolierIds ?? []).toContain('axe_1');
-
     store.getState().throwFromBandolier(AXE);
-
+    drain(store);
     const gone = !store.getState().player!.inventory.some((i) => i.id === 'axe_1');
     expect(gone).toBe(true);
     expect(store.getState().player!.equipped?.bandolierIds ?? []).not.toContain('axe_1');
