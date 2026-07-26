@@ -25139,6 +25139,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // The forging may have been scrapped / sold / consumed before it formed — if
     // it's gone, don't resurrect it; just skip the reveal.
     if (!item) return;
+    // OTA-979 — if the piece being renamed is the vest the DOG is currently
+    // wearing (equipped while still cooling), keep dog.equipped.vest in step
+    // with the new display name — the vestId already matches, but the stored
+    // NAME is what narration and legacy fallbacks read.
+    const dogWearsThis = get().player?.dog?.equipped?.vestId === itemId;
+    if (dogWearsThis) {
+      set((s) => (s.player && s.player.dog
+        ? {
+            player: {
+              ...s.player,
+              dog: { ...s.player.dog, equipped: { ...s.player.dog.equipped, vest: name } },
+            },
+          }
+        : s));
+    }
     // OTA-978 — reach follows the DISPLAYED name. The Qwen namer only settles the
     // name/description; if the final name clearly reads ranged or long
     // ("...Bow", "...Spear"), re-stamp reachClass so the weapon behaves the

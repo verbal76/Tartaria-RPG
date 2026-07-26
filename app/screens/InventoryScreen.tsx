@@ -23,6 +23,7 @@ import { computeInventoryDelta, type InventoryDelta } from '../components/invent
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
+import { wornDogVestInstanceId } from '../engine/dogCompanion';
 import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon, golemRepairHeal, golemSubstituteHeal } from '../engine/golems';
 import { healBatchCount, HEAL_BATCH_NOTE } from '../engine/healBatch';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -341,20 +342,12 @@ export function InventoryScreen() {
   // EQUIPPED badge and you couldn't tell which vest was on him. Mark ONE matching
   // inventory instance equipped so the Dog Armor row reads "EQUIPPED (on <dog>)".
   const dogForVest = player.dog;
-  const dogVestName = dogForVest && dogForVest.status !== 'dead' && dogForVest.status !== 'abandoned'
-    ? dogForVest.equipped?.vest ?? null
-    : null;
-  if (dogVestName) {
-    // OTA-696 — badge the EXACT worn instance (by id) so the right piece reads
-    // "EQUIPPED (on <dog>)" when you own two same-named vests; name-fallback for
-    // legacy saves that predate vestId.
-    const vestId = dogForVest?.equipped?.vestId ?? null;
-    const vestOwner = (vestId ? player.inventory.find((it) => it.id === vestId && it.quantity > 0) : undefined)
-      ?? player.inventory.find(
-        (it) => it.kind === 'dog_armor' && it.name === dogVestName && it.quantity > 0,
-      );
-    if (vestOwner) equippedItemIds.add(vestOwner.id);
-  }
+  // OTA-979 — one shared resolver (wornDogVestInstanceId): id-first, then a
+  // name match that also accepts uniqueStats.kind === 'dog_armor' (fused
+  // vests whose stored kind drifted). Owner: "dog vests don't show which one
+  // is equipped in the inventory."
+  const wornVestId = wornDogVestInstanceId(player);
+  if (wornVestId) equippedItemIds.add(wornVestId);
 
   // arb-fix — which SLOT(s) an equipped instance occupies, so the row can show
   // "EQUIPPED (main hand)" / "(off hand)" / "(both hands)" for weapons instead
@@ -375,8 +368,10 @@ export function InventoryScreen() {
   }
   const equippedSlotLabelFor = (item: InventoryItem): string => {
     // OTA-685 — a dog vest reads "(on <dogname>)", since it's worn on the dog,
-    // not in a player slot.
-    if (item.kind === 'dog_armor' && dogVestName && item.name === dogVestName) {
+    // not in a player slot. OTA — matched by INSTANCE ID via the shared
+    // resolver (name comparison broke when a still-cooling fused vest was
+    // renamed by the settle).
+    if (wornVestId && item.id === wornVestId) {
       return dogForVest?.name ? `on ${dogForVest.name}` : 'on your dog';
     }
     let slots = equippedSlotsById.get(item.id);
@@ -684,7 +679,31 @@ export function InventoryScreen() {
     const dogActive = !!player?.dog
       && player.dog.status !== 'abandoned'
       && player.dog.status !== 'dead';
-    if (dogActive && pending.item.kind === 'dog_armor') {
+    const pendingIsDogArmor = pending.item.kind === 'dog_armor'
+      || pending.item.uniqueStats?.kind === 'dog_armor';
+    // OTA-979 — the details modal now SAYS when this exact vest is the one the
+    // dog is wearing, and offers to take it off — before this, every vest
+    // read the same "Equip on dog", so you couldn't tell them apart here.
+    if (dogActive && pendingIsDogArmor && wornVestId && pending.item.id === wornVestId) {
+      buttons.push({
+        label: `Unequip (worn by ${player?.dog?.name ?? 'your dog'})`,
+        onPress: () => {
+          const pDog = useGameStore.getState().player;
+          if (!pDog?.dog) { closeModal(); return; }
+          useGameStore.setState((s) => s.player && s.player.dog
+            ? {
+                player: {
+                  ...s.player,
+                  dog: { ...s.player.dog, equipped: { vest: null, vestId: null } },
+                },
+              }
+            : s);
+          useGameStore.getState().appendLog('world', `You unbuckle the ${pending.item.name} from ${pDog.dog.name}.`);
+          closeModal();
+        },
+        tone: 'neutral',
+      });
+    } else if (dogActive && pendingIsDogArmor) {
       buttons.push({
         label: 'Equip on dog',
         onPress: () => {

@@ -18060,4 +18060,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // noun/reach coherence + all 3 classes across 60 forges, plain-words description, forge determinism, legacy
 // back-stamp + idempotence, fused-Bow-fires-from-mid. typecheck:ci + typecheck:tests + lint clean; full fast suite
 // green. -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-978-crucible-reach';
+// OTA-979 (dog-vest equipped visibility). Owner: "dog vests don't show which one is equipped in the
+// inventory." The EQUIPPED badge (OTA-685/696) existed but three holes could hide the worn state: the details MODAL
+// showed the same "Equip on dog" on every vest (no worn indicator, no way to take one off), the badge's name-fallback
+// and the equip button demanded item.kind === 'dog_armor' EXACTLY (fused vests whose stored kind drifted fell
+// through), and equipping a still-cooling Crucible vest broke the "(on <dog>)" label when the settle renamed it (name
+// comparison). Fixes: ONE shared resolver dogCompanion.wornDogVestInstanceId (vestId first, then name match accepting
+// uniqueStats.kind === 'dog_armor') feeds the badge, the label (now by instance id), and the modal — which now reads
+// "Unequip (worn by <dog>)" on the worn vest and can take it off. settleFusion keeps dog.equipped.vest in step with
+// the settled name. 5 tests: id-exact with same-named twins, legacy name fallback, kind-drift acceptance, gone/dead
+// nulls, rename-follow through a real settleFusion. typecheck:ci + typecheck:tests + lint clean; full fast suite
+// green. UI truthfulness -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-979-dog-vest-visibility';
