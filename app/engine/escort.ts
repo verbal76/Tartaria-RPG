@@ -79,3 +79,12 @@ export function livingEscortPools(
   }
   return out;
 }
+
+/** OTA-986 — Contracts-screen toggle label (engine_Dev's polish, owner-approved):
+ *  when the contract carries a LIVING escort party, the ACTIVATE / DEACTIVATE
+ *  button names what it does to them — "stand down your Surveyors" / "recall
+ *  your Surveyors" — instead of a bare toggle. */
+export function escortToggleLabel(tracked: boolean, party: { label: string } | null | undefined): string {
+  if (tracked) return party ? `▮▮ DEACTIVATE (stand down your ${party.label})` : '▮▮ DEACTIVATE';
+  return party ? `▶ SET ACTIVE (recall your ${party.label})` : '▶ SET ACTIVE — the mission you’re on';
+}

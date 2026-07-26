@@ -18148,4 +18148,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Pilgrims x2, Envoy x1, Scholars x2 across Stone Builders / Forgotten Order / Eternal Dynasty /
 // Revivalists). 6 tests: spec/pool/HUD-filter units, collateral, fail-at-0, rest heal. typecheck +
 // lint clean; full fast suite green. Mission content + combat wiring -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-985-escort-missions';
+// OTA-986 (escort toggle label). Owner-approved engine_Dev polish: the Contracts
+// screen's ACTIVATE / DEACTIVATE toggle on an escort contract now NAMES the living party it acts
+// on — "▮▮ DEACTIVATE (stand down your Surveyors)" / "▶ SET ACTIVE (recall your Surveyors)" — via
+// the new testable escort.escortToggleLabel helper; non-escort contracts keep the plain labels
+// verbatim. 2 tests. typecheck + lint clean; full fast suite green. UI polish -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-986-escort-toggle-label';
