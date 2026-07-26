@@ -22942,6 +22942,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog('world', beats.identity);
             get().appendLog('combat', `⚔ BOSS EVENT — ${foe.name}. ${beats.character}`);
             get().appendLog('debug', `spawn: revenant ${fr.name}@${fr.ts} pool=${rvPool.length}`);
+          } else if (rvPool.length > 0 && Math.random() < 0.05) {
+            // OTA-981 — the HINT route (owner: "hint missions that can be picked
+            // up AND random encounters"). No boss yet — a marker on the verge
+            // naming one of the fallen, which the player may follow or leave.
+            const fr = rvPool[Math.floor(Math.random() * rvPool.length)]!;
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { plantHookByKind: plantFallenHook } = require('../engine/hooks') as typeof import('../engine/hooks');
+            const fw = plantFallenHook('fallen_whisper');
+            set((s2) => (s2.currentScene
+              ? { currentScene: { ...s2.currentScene, hooks: [...(s2.currentScene.hooks ?? []), fw] } }
+              : s2));
+            get().appendLog('world', fw.plantedLine);
+            get().appendLog(
+              'world',
+              `A trader's tale clings to this stretch: something in warrior's plate haunts ${fr.locationName}, killing for the joy it half-remembers. The tale gives it a name — ${fr.name}.`,
+            );
+            get().appendLog('system', `Try "examine the marker" — the road is warning you about something.`);
+            get().appendLog('debug', `spawn: fallen_whisper rumor ${fr.name}@${fr.ts} pool=${rvPool.length}`);
           }
         }
       }
@@ -27072,6 +27090,37 @@ function applyHookEffect(
     // rep-0 `_stranded_escort` def the player doesn't hold, spawns the shared
     // pool, and pushes the record — same shape acceptFactionQuest writes, so
     // collateral / fail / pay / turn-in all work unchanged.
+    // OTA-981 — THE HOLLOWED, hint route. The rumour marker's second beat calls
+    // the revenant out of the mud: same pool, same boss, same put-to-rest as
+    // the OTA-998 random-encounter spawn — only the doorway differs. An empty
+    // or fully-avenged pool reads as a cold trail rather than a dead end.
+    case 'spawn_fallen_revenant': {
+      const rp = get().player;
+      if (!rp) return { inlineSummary: null, fatal: false };
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const rev = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+      const pool = rev.cachedFallen().filter((f) => !f.avengedTs);
+      if (pool.length === 0) {
+        return { inlineSummary: 'the trail is cold — whatever walked here has been put down already', fatal: false };
+      }
+      const fr = pool[Math.floor(Math.random() * pool.length)]!;
+      const foe = rev.revenantFromFallen(fr, rp.hpMax);
+      set((s2) => (s2.currentScene ? {
+        currentScene: {
+          ...s2.currentScene,
+          enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
+          enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
+        },
+        worldMemory: { ...s2.worldMemory, activeRevenant: { ...fr } },
+      } : s2));
+      const beats = rev.revenantIntroBeats(fr, fr.name === rp.name);
+      get().appendLog('world', beats.emergence);
+      get().appendLog('arbiter', beats.identification);
+      get().appendLog('world', beats.identity);
+      get().appendLog('combat', `⚔ BOSS EVENT — ${foe.name}. ${beats.character}`);
+      get().appendLog('debug', `hook: fallen_whisper answered ${fr.name}@${fr.ts} pool=${pool.length}`);
+      return { inlineSummary: `${fr.name} answers the name`, fatal: false };
+    }
     case 'start_escort_contract': {
       const p = get().player;
       if (!p) return { inlineSummary: null, fatal: false };

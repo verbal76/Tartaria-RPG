@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.14';
+export const DISPLAY_VERSION = '4.28.15';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17303,4 +17303,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // x3), (2) the rolled sky PERSISTS per location for ~6 game-hours (worldMemory.sceneWeather —
 // rebuilds reuse, travel drift updates it), (3) no weather bite INDOORS (hubRoomId /
 // activeBuildingId), (4) chip gap 2 -> 5. DISPLAY_VERSION 4.28.14. 4 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-980-weather-locality';
+// OTA-981 (Hollowed rumour hooks; golem port of HAL OTA-1004). THE HOLLOWED part 2 — the HINT route the owner
+// asked for alongside the random encounters ("make these all hint missions that can be picked up
+// AND from random encounters"). OTA-998 shipped only the direct door: a 4% wild roll spawns the
+// revenant boss outright. This adds the pickup-able lead — when that roll misses, a 5% roll
+// instead plants a 'fallen_whisper' hook (a blade driven hilt-up at the verge, warband cloth
+// knotted to the guard) plus a trader's tale naming the fallen and where they walk. Following it
+// two beats calls the SAME revenant from the SAME un-avenged pool through a new
+// spawn_fallen_revenant hook effect; an install with nothing un-avenged reads as a cold trail.
+// DISPLAY_VERSION 4.28.15. 4 tests. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-981-hollowed-rumor';
