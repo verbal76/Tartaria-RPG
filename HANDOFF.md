@@ -281,6 +281,20 @@ Key invariants worth knowing:
   all-or-nothing tier difficulty. Sources: faction boards/vendors (`FactionQuestDef.escort`), 9 rep-0
   stranded contracts, the wild `stranded_traveler` hook.
 
+- **THE HOLLOWED — new live subsystem (2026-07-26, HAL 998 + 1004 / golem 975 + 981; §9).** Knobs:
+  direct wild boss spawn **4%** and rumour plant **5%** (both on novel peaceful wild tiles in
+  `stepDirection`), power gate **hpMax ≥ 60**, revenant HP band and drop chance in
+  `app/engine/fallenRevenants.ts`. Watch on-device: how often a revenant surfaces once the Fallen roll is
+  deep, whether the boss band stays a fight and not a wall at mid hpMax, and that a put-to-rest fallen
+  never returns (`avengedTs` filters BOTH doors).
+
+- **HEALING / OFFERS / WEATHER — tuned this session, verify by feel (HAL 1001–1003 / golem 978–980; §9).**
+  Knobs: `scaledHealHP` percentages (15% kit / 4% meal / no-scale under flat 5) in
+  `app/engine/itemEffect.ts`; rest heal **15%** of hpMax in both rest resolvers; the offer rotation is
+  2-of-4 keyed on `macroVisitSeq`; `WEATHER_LOCALE_BIAS` multipliers in `app/engine/encounter.ts`, the
+  ~6-game-hour weather persistence window, and `WEATHER_TICK_GAP` (**5**). All owner-directed numbers —
+  change only on an owner call.
+
 - **INTENTIONAL EXPLOITS ON RECORD (owner calls, 2026-07-26 — do NOT "fix"):** the early-game KO-loot
   money loop and the torch-vendor buyback loop are KEPT as known early-game money faucets. The temper
   floor 0.4 (glass-cannon tempering) is design, not a bug.
@@ -638,12 +652,87 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-26-991`**,
-**golem-line `2026-07-26-968`** (parity offset now HAL − 23, still stable —
-every gameplay OTA ships to both in the same pass), **engine_Dev
-`2026-07-20-1177`** (engine skipped the whole 948–991 run by design: all of it
-is Tartaria combat/content tuning or content the engine already has natively —
-the escort feature was ported FROM engine_Dev, not to it).
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-26-1004`**,
+**golem-line `2026-07-26-981`** (parity offset still HAL − 23 — every gameplay
+OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
+skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
+tuning or content the engine already has natively — the escort feature was
+ported FROM engine_Dev, not to it).
+
+**GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
+on the character-select screen. It is a KNOWLEDGE version, not a build number:
+**PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
+re-architecture. Currently **4.28.15**; ledger in `VERSION.md`.
+
+- **LATE SESSION (2026-07-26) — device-log root-cause run + two owner features.** HAL **992–1004** /
+  golem **969–981**. Every fix in this run followed the FIX RULE (§3): prove the cause, fix the shared
+  choke point, grep the whole category, add a category-lock test.
+  • **992/969** — the game-version tracker is LIVE again. `DISPLAY_VERSION` had been frozen at 4.1.0 for
+    ~27 OTA waves; a wave-by-wave census recomputed it to **4.28.3**, and the per-OTA PATCH bump rule +
+    `VERSION.md` ledger keep it honest from here.
+  • **993/970 — TRUTH BATCH** (playtest findings #112–#117, all root-caused at shared choke points):
+    the arrival scene now states WHERE you are before the room's Paths line (#112 — hub auto-entry raced
+    the outdoor narration); takeable catalog items are no longer climbable perches, with great-climb
+    nouns taking precedence over same-named weapons (#113 — "the Great Fang of Zharak" is both);
+    `qwenRephraseRejection` validates the local narrator's typo-repair against the ACTUAL resolved noun
+    and intent instead of accepting any rewrite (#114); the ranged refusal reads for the weapon in EITHER
+    hand and answers in ranged words (#115); stranded-escort contracts are hook-sourced ONLY and never
+    posted on a board (#117 — 5 surfaces filtered).
+  • **994/971 — #116 stat toasts.** Every "+1 STAT (now N)" toast printed the BASE stat while the sheet
+    showed the EFFECTIVE one. One helper, `statNowClause(p, stat, base)`, now feeds **22** toast sites,
+    and `ota994StatToastLock` SOURCE-SCANS gameStore.ts so a 23rd can never regress (the `+1 max HP` /
+    `+1 max stamina` toasts are exempt — no gear duality there).
+  • **995/972 — #118 accept parity.** Hunts/mysteries/storylines auto-ACTIVATED while faction contracts
+    auto-PAUSED. All four kinds now carry `tracked?: boolean` and consult one predicate,
+    `anyTrackedContract(p)`, across **8** grant/accept sites; a parked contract says so and points at
+    the Contracts screen.
+  • **996–997/973–974 — #119 polish + the missing names.** Ambient gear spawns keep a 10-name variety
+    window (`worldMemory.recentTakeableGearNames`); "climb down from the scholar" became a real descent
+    noun per overlay; Buried Market Row lost its strip-mall reading (id kept for save continuity). Then
+    the CATEGORY cause behind the missing names: portability matched by RAW SUBSTRING, so `mud` banned
+    every Mud-* weapon and armor (~58 Common names) from spawns AND pickup, `arch` banned "Architect's"
+    gear, `rain` matched "training". Now word-boundary matching everywhere plus an exact-catalog-item
+    exemption — a real item is by definition pocketable, while substances ("wet mud", "fog bank") stay put.
+  • **998/975 + 1004/981 — THE HOLLOWED (owner feature).** Characters lost to this install's Fallen roll
+    return as violent Aetherkin REVENANT boss events wearing the gear they died in, with a chance to drop
+    it and a sentimental put-to-rest line that credits the avenger. New `app/engine/fallenRevenants.ts`;
+    `FallenHero` gained `gearNames` / `avengedBy` / `avengedTs` (pre-998 records get a stable SEEDED kit,
+    so the existing install backfills itself); the kill is EXEMPT from the Aetherkin reverence penalty;
+    the codex memorial marks them rested. **Both doors, per the owner:** a ~4% roll on novel peaceful wild
+    tiles spawns the boss outright (power-gated at hpMax ≥ 60), and when that misses, a ~5% roll plants a
+    `fallen_whisper` rumour marker naming the fallen — follow it two beats and the same revenant answers
+    (`spawn_fallen_revenant` hook effect; empty pool = cold trail).
+  • **999/976 — stealth stops standing still.** Owner: "my STE is still at 0." Two causes: the progress
+    curve gave a stat with nothing invested the same crumbs as a mastered one, and only SUCCESSES taught
+    anything. Cold-start band (trained ≤ 2 → **+6** per success) plus `trainStatNearMiss` — a failed check
+    within **3** of its DC awards **+1**, the deliberately lower road the owner asked for ("don't let it
+    snowball once the needle starts moving").
+  • **1000/977 — a pried sigil is a sigil.** Owner: "a pried sigil awards coin?" Every salvage yield —
+    pry, strip, break, bulk — flows through `rollSalvagePool`, which had no sigil awareness, so the noun
+    fell to the junk table. That one choke point now yields a REAL faction sigil, faction read from the
+    noun's own words via the `sigils.ts` keyword map, and the OTA-691 turn-in economy takes it from there.
+  • **1001/978 — #120 healing, LIGHT (owner: "keep its fix numbers on the lighter side").** Heal numbers
+    were FLAT in a game where hpMax scales. One scaler, `scaledHealHP(flat, hpMax)`: kit-grade (flat ≥ 20)
+    heals max(flat, **15%** hpMax), meal-grade max(flat, **4%**), and a NIBBLE (flat < 5) never scales.
+    Wired at all three consumable apply sites AND the InventoryScreen button math. Rest knits **15%** of
+    max HP per full sleep — this SUPERSEDES arb37's "rest never heals"; the two suites that pinned the old
+    rule were retargeted, not weakened. Being wounded is now a reason to sleep; the "save the hours"
+    refusal fires only when you are genuinely whole.
+  • **1002/979 — #121 the offer firehose.** Four independent offer emitters (contract / bounty board /
+    mystery notice / thick scroll) each fired whenever stocked. Agents now pitch **two rotating
+    categories** per macro visit, keyed on `macroVisitSeq`, walking one step per visit so nothing is ever
+    unreachable; turn-in hints stay unbudgeted. The **all_or_nothing** escort tier (full pay or lose
+    everything) sat at rep 18–22 — all 8 floored at **rep 25**.
+  • **1003/980 — #122 weather learns geography.** `pickWeather` weighed only NOVELTY: no location linkage,
+    no persistence, so a scene rebuild re-rolled the sky and a spire hailed like a mud flat. Locale keyword
+    bias at that single chooser (aether/spire → Aether Lightning + Aetheric Storm ×3; mud/marsh → Black
+    Rain ×3, Whisper Fog ×2; ash → Ash Storm ×3; frost → Silent Blizzard ×3), the rolled sky PERSISTS per
+    location ~6 game-hours (`worldMemory.sceneWeather`), weather no longer bites INDOORS, and the chip gap
+    went 2 → **5** (owner: "so you're not trying to re-spec your armor every 2 seconds").
+  • **DEBUG BREADCRUMBS (owner-approved, debug channel only — never player-facing):** `scene: loc=… hub=…
+    arrival=… opening=… passing=…`, `accept: <kind> <id> tracked=<bool>`, `spawn: gear=[…] window=N`,
+    `spawn: revenant <name>@<ts> pool=N`, `spawn: fallen_whisper rumor …`, `hook: fallen_whisper answered …`,
+    `revenant: <name>@<ts> put to rest`.
 
 - **SKYREACHER MAPS + OUTPOST CRUCIBLE FEE (2026-07-26).** HAL **990–991** / golem **967–968**.
   • **990/967** — the OUTPOST Crucible now charges the roadside vendor's **25 TC per fire** (fuse AND the
