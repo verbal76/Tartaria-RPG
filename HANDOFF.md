@@ -175,7 +175,10 @@ edits won't touch it. If a tool stages it: `git checkout HEAD -- app.json`.
    on engine too (it's green there). typecheck:ci + typecheck:tests are blocking
    on all three lines.
 3. Bump `app/buildInfo.ts` `OTA_BUILD_ID` to the next `YYYY-MM-DD-NNN-desc` for
-   that line, with a short comment block explaining the change.
+   that line, with a short comment block explaining the change. In the SAME
+   edit, bump `DISPLAY_VERSION` (reactivated at 4.28.3, OTA-992/969): PATCH +1
+   every OTA; MINOR +1 with PATCH→0 when the OTA closes a significant feature
+   wave (log MINOR/MAJOR moves in `VERSION.md`, scheme + catch-up ledger there).
 4. Update this `HANDOFF.md` (open-issues / recent-OTAs) in the same commit when
    the change is notable.
 5. Commit with the trailers in §6, then push that line's branch (`git push -u
