@@ -80,6 +80,7 @@ import { createCharacter, getRaces, getFactions, type CreateCharacterInput } fro
 import { generateQuest } from '../engine/questGenerator';
 import {
   pickWeather,
+  weatherById,
   pickHazardForLocation,
   pickEnemyForLocation,
   rollEncounter,
@@ -1639,6 +1640,17 @@ const BODY_VERB_PART: Record<string, string> = {
  *  surfaced 7868 over 10 in-game days. 50 keeps it a meaningful
  *  gameplay signal (and within the range the narration / Arbiter
  *  remarks were authored to react to). */
+/** OTA — #122: hub rooms that are OPEN AIR. The hub graph mixes exterior
+ *  spaces (the gate, the square, the culvert descent) with genuinely roofed
+ *  ones (armory, mess, workshop, quarters, lab, vault, chapel) and the buried
+ *  level below. Only these stay exposed to weather; being anywhere else in a
+ *  hub — or inside a building — means a roof. */
+const OPEN_AIR_HUB_ROOMS: ReadonlySet<string> = new Set([
+  'outpost_gate',
+  'outpost_central',
+  'outpost_culvert_descent',
+]);
+
 const CORRUPTION_MAX = 50;
 const TRAVEL_MIN_STAMINA = STAMINA_COSTS.travel;
 
@@ -5924,7 +5936,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { player, worldMemory } = get();
     if (!player) return;
     const location = getLocationById(player.currentLocationId);
-    const weather = pickWeather(worldMemory);
+    // OTA-980 — #122: weather is a LOCAL, PERSISTENT condition. Reuse the sky
+    // rolled for this location within the last ~6 game-hours (scene rebuilds
+    // stop re-rolling it); otherwise roll fresh WITH locale bias and store.
+    const storedSky = worldMemory.sceneWeather;
+    const skyHoursNow = player.hoursElapsed ?? 0;
+    const storedSkyEntry =
+      storedSky && storedSky.locationId === location.id && skyHoursNow - storedSky.rolledAtHours < 6
+        ? weatherById(storedSky.id)
+        : null;
+    const weather = storedSkyEntry ?? pickWeather(worldMemory, location);
+    if (!storedSkyEntry) {
+      set((s) => ({
+        worldMemory: {
+          ...s.worldMemory,
+          sceneWeather: { id: weather.id, locationId: location.id, rolledAtHours: skyHoursNow },
+        },
+      }));
+    }
     const hazard = pickHazardForLocation(location);
     // HANDOFF #15b — hub mode. When player is at the hub location AND
     // has a hubRoomId set (or default to entry), render the hub room
@@ -8343,12 +8372,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // every action, un-escapable). After any damaging tick we arm a gap so the
     // next WEATHER_TICK_GAP actions are weather-free → at most one hit per
     // (GAP+1) actions. The hazard stays felt, but periodic rather than relentless.
-    const WEATHER_TICK_GAP = 2;
+    // OTA-980 — #122: gap 2 -> 5 (owner: stop the armor re-spec treadmill) and no
+    // weather bite at all while INDOORS — a roof is a roof.
+    const WEATHER_TICK_GAP = 5;
     const weatherCooldown = get().player?.weatherTickCooldown ?? 0;
     if (weatherCooldown > 0) {
       set((s) => (s.player ? { player: { ...s.player, weatherTickCooldown: weatherCooldown - 1 } } : s));
     }
-    const wtick = weatherCooldown > 0
+    // OTA-980 — #122: a roof is a roof — weather doesn't bite indoors. But the hub
+    // graph is not all interior: the gate, the square and the culvert descent
+    // are OPEN AIR and stay exposed (standing at the gate in glass hail should
+    // still cost you). Everything else in a hub — armory, mess, workshop,
+    // quarters, lab, vault, chapel, and the whole buried level — is sheltered,
+    // as is any building you've stepped inside.
+    const hubRoomNow = get().player?.hubRoomId ?? null;
+    const underRoof =
+      !!get().activeBuildingId ||
+      (!!hubRoomNow && !OPEN_AIR_HUB_ROOMS.has(hubRoomNow));
+    const wtick = weatherCooldown > 0 || underRoof
       ? { hpDelta: 0, staminaDelta: 0, corruptionDelta: 0, line: null as string | null }
       : tickWeather(get().currentScene?.weather ?? null, player, playerArmorResistKinds(player));
     if (wtick.line) {
@@ -22603,9 +22644,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // hit the crash. Fix: use the already-imported pickWeather
         // reference, no require needed.
         const liveWorldMem = get().worldMemory;
-        const newWeather = pickWeather(liveWorldMem);
+        // OTA-980 — #122: the open road carries no locale bias (null location) and
+        // the drift updates the persisted sky so arrival doesn't re-roll it.
+        const newWeather = pickWeather(liveWorldMem, null);
+        const driftHours = get().player?.hoursElapsed ?? 0;
+        const driftLocId = get().player?.currentLocationId ?? '';
         set((s) => s.currentScene
-          ? { currentScene: { ...s.currentScene, weather: newWeather } }
+          ? {
+              currentScene: { ...s.currentScene, weather: newWeather },
+              worldMemory: {
+                ...s.worldMemory,
+                sceneWeather: { id: newWeather.id, locationId: driftLocId, rolledAtHours: driftHours },
+              },
+            }
           : s);
       }
       // arb28 — RE-PLOT the distance to the plotted city from the NEW tile.

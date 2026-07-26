@@ -35,10 +35,41 @@ const rarityWeights: Record<Rarity, number> = {
   Legendary: 1,
 };
 
-export function pickWeather(memory: WorldMemory): WeatherEntry {
+// OTA-980 — #122: LOCALE BIAS. Weather reads the ground it falls on: Aetheric
+// country draws its own lightning, mud country its black rain, ash country its
+// storms, the frozen reaches their blizzards. Keyword match over the
+// location's id + name; biased ids get their novelty weight multiplied, so
+// local color dominates without ever locking the sky to one entry.
+const WEATHER_LOCALE_BIAS: Array<{ re: RegExp; bias: Record<string, number> }> = [
+  { re: /aether|etheric|spire|monolith|grid/i, bias: { aether_lightning: 3, etheric_storm: 3 } },
+  { re: /mud|silt|marsh|bog|sunken|drowned/i, bias: { black_rain: 3, whisper_fog: 2 } },
+  { re: /ash|cinder|burn/i, bias: { ash_storm: 3 } },
+  { re: /frost|ice|north|blizzard|glacier/i, bias: { silent_blizzard: 3 } },
+];
+
+/** Resolve a weather table entry by id (used to rehydrate persisted scene
+ *  weather without re-rolling). */
+export function weatherById(id: string): WeatherEntry | null {
+  return weather.find((w) => w.id === id) ?? null;
+}
+
+export function pickWeather(
+  memory: WorldMemory,
+  location?: { id: string; name: string } | null,
+): WeatherEntry {
+  const key = location ? `${location.id} ${location.name}`.toLowerCase() : '';
+  const bias: Record<string, number> = {};
+  if (key) {
+    for (const row of WEATHER_LOCALE_BIAS) {
+      if (!row.re.test(key)) continue;
+      for (const id of Object.keys(row.bias)) {
+        bias[id] = Math.max(bias[id] ?? 1, row.bias[id]!);
+      }
+    }
+  }
   return pickWeighted(weather, (w) => {
     const seen = memory.tagCounts[w.id] ?? 0;
-    return Math.max(1, 5 - seen);
+    return Math.max(1, 5 - seen) * (bias[w.id] ?? 1);
   });
 }
 

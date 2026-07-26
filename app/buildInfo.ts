@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.13';
+export const DISPLAY_VERSION = '4.28.14';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17294,4 +17294,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // category surfaces within two stops); turn-in hints stay unbudgeted. Plus: the all_or_nothing
 // escort tier (full pay or lose EVERYTHING) sat at rep 18-22 — a newcomer trap; all 8 floored
 // at rep 25. DISPLAY_VERSION 4.28.13. 4 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-979-offer-budget';
+// OTA-980 (weather locality; golem port of HAL OTA-1003). Task #122, owner: keep weather LOCATION-RELEVANT
+// "so you're not trying to re-spec your armor every 2 seconds." Root cause: pickWeather weighed
+// only NOVELTY — no location linkage, no persistence — so every scene rebuild could re-roll the
+// sky and an Aetheric spire hailed as readily as a mud flat. Category fix at the single chooser
+// + both call sites: (1) locale keyword bias (aether/spire -> Aether Lightning + Aetheric Storm
+// x3; mud/marsh -> Black Rain x3 + Whisper Fog x2; ash -> Ash Storm x3; frost -> Silent Blizzard
+// x3), (2) the rolled sky PERSISTS per location for ~6 game-hours (worldMemory.sceneWeather —
+// rebuilds reuse, travel drift updates it), (3) no weather bite INDOORS (hubRoomId /
+// activeBuildingId), (4) chip gap 2 -> 5. DISPLAY_VERSION 4.28.14. 4 tests. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-980-weather-locality';

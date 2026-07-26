@@ -197,12 +197,12 @@ describe('OTA-625 #3 — weather damage cannot fire on back-to-back actions', ()
       store.getState().submitPlayerAction('look around');
       const afterHit = store.getState().player!;
       expect(afterHit.hp).toBe(39); // glass_hail chips exactly 1
-      expect(afterHit.weatherTickCooldown).toBe(2); // cooldown armed
+      expect(afterHit.weatherTickCooldown).toBe(5); // OTA-980 — #122: gap 2 -> 5
 
       store.getState().submitPlayerAction('look around');
       const afterGap = store.getState().player!;
       expect(afterGap.hp).toBe(39); // no second hit back-to-back
-      expect(afterGap.weatherTickCooldown).toBe(1); // counted down
+      expect(afterGap.weatherTickCooldown).toBe(4); // counted down
     } finally {
       rnd.mockRestore();
     }
