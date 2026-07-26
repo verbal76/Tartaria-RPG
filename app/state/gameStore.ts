@@ -2575,6 +2575,95 @@ const RAID_TRIGGER_CHANCE = 0.3; // per eligible action, once past the cooldown
 // both field a group of that faction's soldiers, tagged with factionId (so kills shift
 // standing + tick a bounty) and scaled/escalated by the faction's World-Pulse tide.
 // Returns true if a party actually landed. Caller does the gating + the log lines.
+// OTA-985 — ESCORT collateral (engine_Dev model). Every enemy swing that CONNECTS on
+// the player also bleeds the shared escort pool: a fixed fraction of the FINAL
+// post-mitigation damage, EXTRA (never absorbed off the player), so a clean
+// parry that zeroes the hit spares the party too. Pool at 0 = the escort FAILS
+// on the spot. Parked (deactivated) parties are out of the fight.
+function applyEscortDamage(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  baseDmg: number,
+  enemyName: string,
+): void {
+  const player = get().player;
+  if (!player || baseDmg <= 0) return;
+  const active = player.activeFactionQuests ?? [];
+  if (!active.some((q) => q.escort && q.escort.hp > 0 && q.tracked !== false)) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { ESCORT_COLLATERAL_FRACTION } = require('../engine/escort') as typeof import('../engine/escort');
+  const collateral = Math.max(1, Math.round(baseDmg * ESCORT_COLLATERAL_FRACTION));
+  const hurt: { label: string; dmg: number; hp: number; hpMax: number }[] = [];
+  const failed: string[] = [];
+  const next = active.map((q) => {
+    if (!q.escort || q.tracked === false || q.escort.hp <= 0) return q;
+    const hp = Math.max(0, q.escort.hp - collateral);
+    if (hp <= 0) failed.push(q.id);
+    else hurt.push({ label: q.escort.label, dmg: collateral, hp, hpMax: q.escort.hpMax });
+    return { ...q, escort: { ...q.escort, hp } };
+  });
+  if (hurt.length === 0 && failed.length === 0) return;
+  set((s) => (s.player ? { player: { ...s.player, activeFactionQuests: next } } : s));
+  for (const h of hurt) {
+    void Promise.resolve().then(() =>
+      get().appendLog('combat', `${enemyName} catches your ${h.label} — ${h.dmg} damage (${h.hp}/${h.hpMax} HP).`),
+    );
+  }
+  if (failed.length > 0) failEscortQuests(get, set, failed);
+}
+
+// Drop one or more failed escort contracts: pulled from the active lists (NOT
+// marked completed), and announce who fell. The party is gone with the quest
+// record, so the HUD clears automatically.
+function failEscortQuests(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  failedIds: string[],
+): void {
+  const ids = new Set(failedIds);
+  set((s) => {
+    if (!s.player) return {};
+    return {
+      player: {
+        ...s.player,
+        activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => !ids.has(q.id)),
+        activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((id) => !ids.has(id)),
+      },
+    };
+  });
+  for (const id of failedIds) {
+    const def = findFactionQuestById(id);
+    const title = def?.title ?? id;
+    const label = def?.escort?.label ?? 'escort party';
+    const isAre = def?.escort?.count === 1 ? 'is' : 'are';
+    void Promise.resolve().then(() =>
+      get().appendLog('combat', `Your ${label} ${isAre} cut down. The escort "${title}" has failed — you couldn't keep them alive.`),
+    );
+  }
+}
+
+// OTA-985 — the escort party patches up while the player rests — modest (~10% of
+// pool max) so it can't outpace combat bleed. Only ACTIVE escorts heal; a
+// parked party is safe and doesn't need it. Called from BOTH rest resolvers.
+function healEscortsOnRest(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const escActive = get().player?.activeFactionQuests ?? [];
+  if (!escActive.some((q) => q.escort && q.tracked !== false && q.escort.hp > 0 && q.escort.hp < q.escort.hpMax)) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { ESCORT_REST_HEAL_FRACTION } = require('../engine/escort') as typeof import('../engine/escort');
+  let healedLabel: string | null = null;
+  const nextQ = escActive.map((q) => {
+    if (!q.escort || q.tracked === false || q.escort.hp <= 0 || q.escort.hp >= q.escort.hpMax) return q;
+    const heal = Math.min(q.escort.hpMax - q.escort.hp, Math.max(1, Math.round(q.escort.hpMax * ESCORT_REST_HEAL_FRACTION)));
+    healedLabel = q.escort.label;
+    return { ...q, escort: { ...q.escort, hp: q.escort.hp + heal } };
+  });
+  set((st) => (st.player ? { player: { ...st.player, activeFactionQuests: nextQ } } : st));
+  if (healedLabel) get().appendLog('world', `Your ${healedLabel} rest too — they look steadier.`);
+}
+
 function injectFactionParty(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -12188,6 +12277,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? 'Hunger has capped your wind — sleep can\'t lift it. Eat something to recover the rest.'
               : 'Whole already — the Aetherstone hums steady.';
           get().appendLog('world', `You rest for ${hours} hours. ${tail} (${describeTime(newHours)})`);
+          healEscortsOnRest(get, set);
           // 2026-05-25 — ambush spawn. Rest completes (HP / stamina
           // granted above), then the encounter fires AFTER recovery
           // so the player wakes at full strength but with a problem
@@ -19980,6 +20070,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // doesn't make everything live at once. You activate it when you're ready.
     const hasActiveOther = (player.activeFactionQuests ?? []).some((q) => q.tracked !== false);
     const newTracked = !hasActiveOther;
+    // OTA-985 — ESCORT contract: accepting spawns the shared-pool party (engine_Dev
+    // model). It rides on the quest record; collateral damage + failure live in
+    // applyEscortDamage / failEscortQuests.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const escortMod = require('../engine/escort') as typeof import('../engine/escort');
+    const escortSpec = escortMod.escortSpecForQuest(quest);
+    const escort = escortSpec
+      ? escortMod.spawnEscortPool(escortSpec.count, player.hpMax ?? 20, escortSpec.label)
+      : null;
     set((s) =>
       s.player
         ? {
@@ -19988,7 +20087,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), quest.id],
               activeFactionQuests: [
                 ...(s.player.activeFactionQuests ?? []),
-                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: newTracked },
+                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: newTracked, ...(escort ? { escort } : {}) },
               ],
             },
           }
@@ -19996,6 +20095,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     if (!newTracked) {
       get().appendLog('world', `${quest.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+    }
+    if (escort) {
+      const fallsV = escort.count === 1 ? 'falls' : 'fall';
+      const standsV = escort.count === 1 ? 'stands' : 'stand';
+      get().appendLog(
+        'world',
+        newTracked
+          ? `Your ${escort.label} ${fallsV} in beside you (${escort.hp} HP). Keep them alive — if the party is cut down, the escort fails.`
+          : `Your ${escort.label} (${escort.hp} HP) ${standsV} by for ${quest.title}. They'll fall in when you ACTIVATE this contract.`,
+      );
     }
     bumpQuestsAccepted(get, set);
     // First-quest milestone — Arbiter can reference "the first
@@ -20063,9 +20172,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const def = findFactionQuestById(id);
     const title = def?.title ?? id;
     const pausedNote = othersPaused > 0 ? ` (${othersPaused} other contract${othersPaused > 1 ? 's' : ''} paused.)` : '';
-    get().appendLog('world', nextActive
-      ? `Now on ${title}. It's the contract you're running.${pausedNote}`
-      : `Paused ${title}. It won't advance until you re-activate it.`);
+    // OTA-985 — an escort's party PARKS when its contract is deactivated (off the
+    // HUD, no combat damage) and falls back in on re-activate.
+    const party = rec.escort && rec.escort.hp > 0 ? rec.escort : null;
+    const partyFalls = party && party.count === 1 ? 'falls' : 'fall';
+    const partyWaits = party && party.count === 1 ? 'waits' : 'wait';
+    if (nextActive) {
+      get().appendLog('world', (party
+        ? `Now on ${title}. Your ${party.label} ${partyFalls} in beside you.`
+        : `Now on ${title}. It's the contract you're running.`) + pausedNote);
+    } else {
+      get().appendLog('world', party
+        ? `Stood down from ${title}. Your ${party.label} ${partyFalls} back to safety and ${partyWaits}; they'll rejoin when you re-activate it.`
+        : `Paused ${title}. It won't advance until you re-activate it.`);
+    }
     // Switching the active contract (or pausing the routed one) drops a route
     // chain that no longer matches the mission you're on.
     if (get().player?.routedMission && get().player?.routedMission?.id !== id) {
@@ -20364,6 +20484,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-724 — finishing a contract can also turn up a rare/legendary recipe.
     maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils');
     logRepChanges(get, repResult.changed);
+    // OTA-985 — delivered the escort party alive (a dead pool fails + drops the
+    // quest before it can ever reach turn-in), so name them in the win.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const eMod = require('../engine/escort') as typeof import('../engine/escort');
+      const dSpec = eMod.escortSpecForQuest(candidate);
+      if (dSpec) get().appendLog('reward', `You delivered your ${dSpec.label} safely. They peel off with a nod.`);
+    }
     plantNextContractHint(get, candidate.factionId, 'faction_quest');
     void get().persist();
   },
@@ -25930,6 +26058,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'world',
       `You rest for ${hoursSlept} hours. ${parts.length ? parts.join(', ') + ' recovered/spent' : 'time passes'}. (${describeTime(newHours)})`,
     );
+    healEscortsOnRest(get, set);
     if (newHungerPenalty >= 3 && (player.hungerStaminaPenalty ?? 0) < 3) {
       get().appendLog(
         'arbiter',
@@ -29346,6 +29475,11 @@ function applyEnemyCounter(
       }
       return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
+
+    // OTA-985 — the same connecting swing can catch the escort party the player is
+    // protecting. Uses the final post-mitigation damage, so a clean parry
+    // (dmg 0) shields them too.
+    applyEscortDamage(get, set, dmg, enemy.name);
 
     // OTA-959 — LEGIBILITY CUES (once per encounter, after the damage line). A matched
     // resist that soaked >=40% earns one plain-language callout; an elemental hit that

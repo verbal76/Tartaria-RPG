@@ -18134,4 +18134,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the quest resolves. 5 tests: fetch surfaces its item lowercased, empty/null slates want nothing,
 // staged contracts want nothing, unknown ids ignored, multiple fetches union. typecheck:ci +
 // typecheck:tests + lint clean; full fast suite green. Inventory UX -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-984-quest-earmark-context';
+// OTA-985 (escort missions). Owner: "I want to add escort missions to this game like
+// [engine_Dev] has. it has a very specific way of doing it that I like." Ported the engine's
+// SHARED-POOL model: an escort faction contract (FactionQuestDef.escort {count,label} or an
+// _escort id) spawns ONE pooled party health bar on accept (sum of ~35%-of-player-hpMax members,
+// clamped 8-45 each). The party rides the active-quest record, shows as "↳ Surveyors (54/81)" under
+// the HUD vitals, and takes COLLATERAL damage — 30% of the player's final post-mitigation hit,
+// EXTRA, never absorbed — every time an enemy connects (a clean parry spares them). Pool at 0 =
+// contract FAILS on the spot (record dropped, loss narrated). Rest heals active parties ~10% of
+// pool max (both rest resolvers, shared helper). Deactivating the contract PARKS the party (off
+// HUD, no damage) and re-activating recalls them; delivering alive narrates the win at turn-in.
+// New app/engine/escort.ts + EscortPool type + 4 authored Tartaria contracts (Surveyors x3,
+// Pilgrims x2, Envoy x1, Scholars x2 across Stone Builders / Forgotten Order / Eternal Dynasty /
+// Revivalists). 6 tests: spec/pool/HUD-filter units, collateral, fail-at-0, rest heal. typecheck +
+// lint clean; full fast suite green. Mission content + combat wiring -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-985-escort-missions';

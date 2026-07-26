@@ -10,8 +10,16 @@ import {
 } from '../app/engine/factionQuests';
 
 describe('faction-quests.json schema', () => {
-  it('every quest is either a staged quest (>=2 beats) or a fetch quest', () => {
+  it('every quest is a staged quest (>=2 beats), a fetch quest, or an escort', () => {
     for (const q of FACTION_QUESTS) {
+      // OTA-985 — ESCORT contracts are the third kind: no stages, no fetch — the
+      // journey IS the objective (deliver the party alive to turn in).
+      if (q.escort || /_escort$/.test(q.id)) {
+        expect((q.escort?.label ?? '').length).toBeGreaterThan(0);
+        expect(q.escort?.count ?? 2).toBeGreaterThanOrEqual(1);
+        expect(q.escort?.count ?? 2).toBeLessThanOrEqual(5);
+        continue;
+      }
       // OTA-450 — the generic per-faction STARTER quests carry no stages; the
       // `fetch` requirement IS their objective (gather N, bring them back).
       if (q.fetch) {

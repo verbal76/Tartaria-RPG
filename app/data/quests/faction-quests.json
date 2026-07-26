@@ -829,6 +829,46 @@
         "itemName": "Golem Core",
         "quantity": 1
       }
+    },
+    {
+      "id": "fq_stone_builders_survey_escort",
+      "factionId": "stone_builders",
+      "title": "The Survey Line",
+      "description": "Three Stone Builder surveyors need to walk their chain-and-transit line home through open silt. The waste does not care about their instruments.",
+      "objective": "Escort the surveyors safely back to a Stone Builders agent. If the party is cut down, the contract fails.",
+      "requirement": { "rep": 5 },
+      "reward": { "tc": 70, "rep": 8 },
+      "escort": { "count": 3, "label": "Surveyors" }
+    },
+    {
+      "id": "fq_forgotten_order_pilgrims_escort",
+      "factionId": "forgotten_order",
+      "title": "Pilgrims of the Buried Road",
+      "description": "Two pilgrims of the Order mean to walk the buried country and arrive breathing. Faith stops mud, not blades.",
+      "objective": "Escort the pilgrims safely to a Forgotten Order agent. If the party is cut down, the contract fails.",
+      "requirement": { "rep": 8 },
+      "reward": { "tc": 80, "rep": 8 },
+      "escort": { "count": 2, "label": "Pilgrims" }
+    },
+    {
+      "id": "fq_eternal_dynasty_envoy_escort",
+      "factionId": "eternal_dynasty",
+      "title": "The Envoy's Road",
+      "description": "A Dynasty envoy travels with sealed terms and no sword arm. What the seal is worth, others have already guessed.",
+      "objective": "Escort the envoy safely to an Eternal Dynasty agent. If the envoy falls, the contract fails.",
+      "requirement": { "rep": 5 },
+      "reward": { "tc": 90, "rep": 10 },
+      "escort": { "count": 1, "label": "Envoy" }
+    },
+    {
+      "id": "fq_tartarian_revivalists_scholars_escort",
+      "factionId": "tartarian_revivalists",
+      "title": "Scholars Into the Ruins",
+      "description": "Two Revivalist scholars want to read the old stones with their own eyes. The road between them and the stones has opinions.",
+      "objective": "Escort the scholars safely to a Tartarian Revivalists agent. If the party is cut down, the contract fails.",
+      "requirement": { "rep": 10 },
+      "reward": { "tc": 85, "rep": 9 },
+      "escort": { "count": 2, "label": "Scholars" }
     }
   ]
 }

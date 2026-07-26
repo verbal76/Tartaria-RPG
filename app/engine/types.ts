@@ -663,6 +663,17 @@ export interface FactionStanding { factionId: string; standing: number; }
  *  (when to go), and a stage that advances as the player follows it.
  *  Expire on their own after `expiresAtHour` so the Whispers panel
  *  doesn't pile up forever. */
+/** A SHARED-POOL escort party (engine_Dev model). All-or-nothing: one health bar
+ *  for the whole group; it bleeds collateral in fights and the escort fails when
+ *  it hits 0. `label` is the one-word cargo name shown in the HUD. */
+export interface EscortPool {
+  label: string;
+  hp: number;
+  hpMax: number;
+  /** Party size — drives singular/plural verb agreement in escort log lines. */
+  count?: number;
+}
+
 export interface WhisperRecord {
   /** Unique chain id (e.g. 'yulka_discs'). Each whisper has authored
    *  text + spawn rules in the engine; this field is the lookup key. */
@@ -1198,7 +1209,7 @@ export interface PlayerCharacter {
   /** Active faction quests with per-stage progress. Mirrors activeHunts
    *  / activeMysteries / activeStorylines so all four contract types
    *  share the same accept / advance / turn-in flow. */
-  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; tracked?: boolean }[];
+  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; escort?: EscortPool; tracked?: boolean }[];
   /** Mission ROUTE CHAIN in progress (set by ROUTE TO on a contract). The engine
    *  courses to the objective, then auto-courses to the turn-in once the work is
    *  done. Cleared on turn-in, abandon, deactivate, or a manual divert. */
