@@ -18071,4 +18071,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the settled name. 5 tests: id-exact with same-named twins, legacy name fallback, kind-drift acceptance, gone/dead
 // nulls, rename-follow through a real settleFusion. typecheck:ci + typecheck:tests + lint clean; full fast suite
 // green. UI truthfulness -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-979-dog-vest-visibility';
+// OTA-980 (combat truth batch). Three fixes from one playtest log. (1) A DOT tick that
+// drops an enemy to 0 in a MIXED fight now kills it on the spot (resolveEnemyDefeat: loot, bounty,
+// standing) instead of leaving a 0-HP corpse standing until a whole extra swing formally killed it —
+// the sweep previously fired only when EVERY enemy was dead. The player's living target is re-pointed
+// after the sweep, and the attack case reads the post-tick LIVE scene. (2) A bandolier throw used to
+// restore the real off hand SYNCHRONOUSLY after building the dice prompt, so the damage phase (seconds
+// later) read the restored weapon: a thrown Sentinel Core Plate rolled as itself but landed as the
+// Mud-fist Wraps — wraps damage type, wraps coatings burned, wraps wear, plate never spent. The
+// restore + spend-exactly-one guarantee now live in throwSettlement and settle when the roll RESOLVES
+// (spend + restore) or CANCELS (restore only, nothing spent). (3) isRangedAttack read the MAIN hand
+// even for off-hand swings, so a melee blade inherited "+2 (point blank)" + ranged aim mods from a
+// holstered Bolt-Caster; it now reads the swung hand. Tests: mid-fight DOT kill, throw settle/cancel,
+// point-blank slot; retargeted bandolierThrowConsumes + dotKillEndsCombat to the new semantics.
+// typecheck:ci + typecheck:tests + lint clean; full fast suite green. Combat core -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-980-combat-truth';
