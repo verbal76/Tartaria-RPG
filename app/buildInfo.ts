@@ -17022,4 +17022,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // outcomes observed across fresh boots): won-flee clean descent + double burn, won-flee stamina shortfall -> scaled
 // fall, failed flee holds the wall + enemy opening + wall-aware hint, dodge still refused, flee-with-no-enemies still
 // refused. typecheck:ci + typecheck:tests + lint clean; full fast suite green. -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-953-wall-flee';
+// OTA-954 (no involuntary footwork; golem port of HAL OTA-977). Playtest: "attack with the resonant spike" at MID range auto-walked the
+// player to CLOSE ("closing the gap for you"), the attack never happened, and the Aetherkin answered the approach
+// with an 18+6 hit — owner: "I didn't move closer, using the weapon moved me closer." Root cause pair: (1) the
+// Resonant Spike is a FUSED weapon — fused weapons aren't in the weapon catalog, so playerWeaponReach falls back to
+// melee/close-only regardless of what was fused; (2) OTA-550's auto-move converted any out-of-range attack into a
+// MOVE that provokes the enemy group's free swing. Fix: an out-of-range attack now REFUSES — zero cost (no stamina,
+// no time, no enemy counters, no roll), names the weapon's actual reach band ("works at close range only — you're at
+// mid"), and leaves ADVANCE/RETREAT as the player's own explicit tap. skipDedup so every retry answers. 5 tests:
+// refusal leaves range/HP/stamina untouched with no roll started, retries always answer, advance-then-attack works,
+// ranged-from-mid regression, melee-at-close regression. typecheck:ci + typecheck:tests + lint clean; full fast
+// suite green. -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-954-no-involuntary-footwork';
