@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.3';
+export const DISPLAY_VERSION = '4.28.4';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18220,4 +18220,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // names DISPLAY_VERSION (the old APP_SEMVER field died in a rework); HANDOFF section-3 change loop
 // gains the per-OTA bump step so the tracker never freezes again. 2 tests. Gameplay-visible ->
 // HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-992-game-version';
+// OTA-993 (playtest truth batch). Six fixes from the 2026-07-26 device log, per the
+// owner's per-item directions. #112 arrival at a hub location narrates the walk through the gate
+// BEFORE the room Paths line (the arrival branch replaced scene text with the outdoor paragraph
+// while auto-enter had already put the player indoors). #113 isClimbable refuses nouns that
+// exact-match a catalog item ("climb Rail Saber" was a tier-1 perch with summit loot). #114 the
+// Qwen parse-fallback rephrase is validated (qwenRephraseRejection) — it must keep the player's
+// resolved noun and may not invent a wait; rejected rephrases get the soft refusal + chips.
+// #115 the empty-swing refusal checks BOTH hands and words itself for the shot when a ranged
+// weapon is equipped. #116 every stat level-up toast shows the sheet's number via statNowClause
+// (base + gear) instead of the bare base. #117 stranded-traveler escorts are hook-only — boards
+// and vendors never post them. DISPLAY_VERSION 4.28.4 (PATCH rule). 6 tests. Gameplay ->
+// HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-993-playtest-truth';

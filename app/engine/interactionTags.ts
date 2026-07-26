@@ -163,12 +163,32 @@ export function getInteractionTags(noun: string): Set<InteractionTag> {
 }
 
 export function isClimbable(noun: string): boolean {
-  if (getInteractionTags(noun).has('climbable')) return true;
-  // OTA-910 — great-climb props ("the Grand Spire of Etheria") are proper
-  // nouns the substring matcher doesn't cover; accept them as climb targets.
+  // OTA-993 — #113: great-climb props are checked FIRST — "the Great Fang of
+  // Zharak" is BOTH the climb and a Legendary weapon row, and the climb
+  // outranks the item-name collision below.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { isGreatClimbNoun } = require('./greatClimbs');
   if (isGreatClimbNoun(noun)) return true;
+  // OTA-993 — #113: a takeable ITEM lying in the scene is never a wall (owner:
+  // "make sure it is something actually climbable first"). "Rail Saber"
+  // word-matched the climbable patterns and became a tier-1 perch with
+  // summit loot. Exclusion is by EXACT full-name catalog match only, so
+  // structural nouns that merely contain an item word ("rope bridge",
+  // plain "rope") keep their grip.
+  {
+    const n = (noun ?? '').trim().toLowerCase();
+    if (n) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { findWeaponByName, findArmorByName, findGearByName, findExplorationItemByName } = require('./crafting');
+      for (const look of [findWeaponByName, findArmorByName, findGearByName, findExplorationItemByName]) {
+        try {
+          const row = look(noun);
+          if (row && String(row.name).toLowerCase() === n) return false;
+        } catch { /* catalog unavailable — fall through to the tag rules */ }
+      }
+    }
+  }
+  if (getInteractionTags(noun).has('climbable')) return true;
   // 2026-05-24 — curated climbable spawns (climbableSpawns.ts) carry
   // nouns like "ruined skyscraper" / "petrified mud wave" that don't
   // overlap the substring matcher above. Check the curated pool too

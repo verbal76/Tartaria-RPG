@@ -2678,6 +2678,38 @@ function failEscortQuests(
 // the fee. Called AFTER every gate and BEFORE any consume, so a refusal or a
 // cancelled picker never costs a coin, and the fee can never fire without the
 // fuse. Returns false (and narrates) when the player can't cover it.
+/** OTA-993 — #116: the level-up toast shows the number the CHARACTER SHEET shows
+ *  (owner: "display the appropriate stat"). The sheet displays base + gear;
+ *  the toast used to print the bare base — "+1 DEX (now 7)" beside a sheet
+ *  reading 11. When no gear rides the stat the two agree and the short form
+ *  stands. Pure; exported for tests. */
+export function statNowClause(p: PlayerCharacter | null | undefined, stat: string, base: number): string {
+  if (!p) return `now ${base}`;
+  const eff = (effectiveStats(p) as unknown as Record<string, number>)[stat] ?? base;
+  return eff === base ? `now ${base}` : `base ${base}, ${eff} with your gear on`;
+}
+
+/** OTA-993 — #114: pure guard for the Qwen parse-fallback (owner: "resolve intent
+ *  cleaner"). Returns a short rejection reason when the rephrase stopped being
+ *  about what the player typed, or null when it's usable. Case on record:
+ *  "clomb into the warp" (resolved noun `warp`) came back as "wait the
+ *  reclaimer stake" — an invented do-nothing verb aimed at a noun from
+ *  nowhere. Exported for tests. */
+export function qwenRephraseRejection(
+  resolvedNoun: string | null | undefined,
+  intent: string,
+  rephrasing: string,
+  rawText: string,
+): string | null {
+  const noun = (resolvedNoun ?? '').trim().toLowerCase();
+  const reph = (rephrasing ?? '').toLowerCase();
+  if (noun && !reph.includes(noun)) return `dropped the player's noun "${noun}"`;
+  if (intent === 'wait' && !/\b(wait|hold|stay|linger|pause|bide)\b/i.test(rawText)) {
+    return 'invented a wait the player never asked for';
+  }
+  return null;
+}
+
 function chargeOutpostCrucibleFee(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -7208,6 +7240,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `It's ${timePhrase}. ${presenceLine} ` +
         bearingsLine;
       get().appendLog('world', arrival);
+      // OTA-993 — #112: reference the location before speaking of its rooms.
+      // Arrival at a hub location auto-enters the outpost interior (hubRoomId
+      // was set above), but this branch REPLACES the scene text with the
+      // OUTDOOR arrival paragraph — so the "Paths:" room line further down
+      // named rooms no narration had established (device log: open-ground
+      // arrival at Reclaimer's Stake, then a room list out of nowhere). Now
+      // the walk through the gate is narrated, so the room list that follows
+      // has its referent.
+      if (hubRoom) {
+        get().appendLog(
+          'world',
+          `You pass through the gate into ${hubNameForFaction(player.factionId)} — ${hubRoom.name}. ${hubRoom.description}`,
+        );
+      }
     } else {
       get().appendLog('world', sceneText);
     }
@@ -8886,6 +8932,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'debug',
             `parse-fallback: qwen → intent=${result.intent} target="${result.target}" rephrase="${result.rephrasing}"`,
           );
+          // OTA-993 — #114: before re-dispatching, hold the rephrase to what the
+          // player actually said. A rejected rephrase gets the same soft
+          // refusal + did-you-mean chips as "no usable result" — never an
+          // invented action.
+          const rejection = qwenRephraseRejection(parsed.resolvedNoun, result.intent, result.rephrasing, trimmed);
+          if (rejection) {
+            get().appendLog('debug', `parse-fallback: qwen rephrase rejected (${rejection}) → soft refusal`);
+            const lastCogR = get().cognitiveLastResponse;
+            get().appendLog(
+              'arbiter',
+              buildSoftArbiterFallback({
+                parsed,
+                inventory: player.inventory,
+                enemy: activeEnemy(currentScene),
+                location: currentScene.location,
+                hazard: currentScene.hazard,
+                playerHpFraction: player.hpMax > 0 ? player.hp / player.hpMax : 1,
+                mood: lastCogR?.inferredEmotions[0],
+                lastInteractedNoun: get().lastInteractedNoun,
+                rawText: trimmed,
+              }),
+            );
+            if (parsed.suggestions.length) {
+              get().appendLog('system', `Try: ${parsed.suggestions.slice(0, 3).join(' · ')}`);
+              set({ parseSuggestions: parsed.suggestions.slice(0, 3) });
+            }
+            void get().persist();
+            return;
+          }
           // Re-dispatch through the dictionary parser. skipPreChecks
           // prevents meta-guard re-evaluation + status-tick double-fire.
           get().submitPlayerAction(result.rephrasing, { skipPreChecks: true });
@@ -9962,7 +10037,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
             });
             break;
           }
-          get().appendLog('world', 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.');
+          {
+            // OTA-993 — #115: the refusal checks BOTH hands for a weapon with the
+            // range the motion implies (owner call). "shoot the warp" with a
+            // Bolt-Caster in the main hand used to answer with "arm's reach"
+            // and "your blade" — melee words for a ranged swing at scenery.
+            const eqHands = player.equipped ?? {};
+            const handRanged = [eqHands.mainId, eqHands.offId].some((hid) => {
+              const w = hid ? player.inventory.find((i) => i.id === hid) : undefined;
+              return (w?.tags ?? []).some((t) => /^ranged$/i.test(t));
+            });
+            get().appendLog(
+              'world',
+              handRanged
+                ? 'Nothing out there answers the shot. The bolt sails wide and Aetherstone swallows the report.'
+                : 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.',
+            );
+          }
         }
         break;
       }
@@ -12463,7 +12554,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               if (trWis.leveled) {
                 get().appendLog(
                   'reward',
-                  `✦ The watch sharpens your sense of the dark. +1 WIS (now ${trWis.leveled.to}).`,
+                  `✦ The watch sharpens your sense of the dark. +1 WIS (${statNowClause(get().player, 'wisdom', trWis.leveled.to)}).`,
                 );
               }
             }
@@ -14569,7 +14660,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (trDex.leveled) {
               get().appendLog(
                 'reward',
-                `✦ Your grip remembers. +1 DEX (now ${trDex.leveled.to}).`,
+                `✦ Your grip remembers. +1 DEX (${statNowClause(get().player, 'dexterity', trDex.leveled.to)}).`,
               );
             }
             const liveClimber2 = get().player;
@@ -14579,7 +14670,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               if (trStr.leveled) {
                 get().appendLog(
                   'reward',
-                  `✦ The haul wears in. +1 STR (now ${trStr.leveled.to}).`,
+                  `✦ The haul wears in. +1 STR (${statNowClause(get().player, 'strength', trStr.leveled.to)}).`,
                 );
               }
             }
@@ -15015,7 +15106,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (tr.leveled) {
               get().appendLog(
                 'reward',
-                `✦ Lighter on your feet. +1 DEX (now ${tr.leveled.to}).`,
+                `✦ Lighter on your feet. +1 DEX (${statNowClause(get().player, 'dexterity', tr.leveled.to)}).`,
               );
             }
           }
@@ -15089,7 +15180,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (tr.leveled) {
               get().appendLog(
                 'reward',
-                `✦ Footwork sharper than yesterday. +1 DEX (now ${tr.leveled.to}).`,
+                `✦ Footwork sharper than yesterday. +1 DEX (${statNowClause(get().player, 'dexterity', tr.leveled.to)}).`,
               );
             }
           }
@@ -16762,7 +16853,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (trainResult.leveled) {
           get().appendLog(
             'reward',
-            `✦ Practice sharpens you. +1 ${trainResult.leveled.stat.toUpperCase().slice(0, 3)} (now ${trainResult.leveled.to}). [${newChecks} checks succeeded]`,
+            `✦ Practice sharpens you. +1 ${trainResult.leveled.stat.toUpperCase().slice(0, 3)} (${statNowClause(get().player, trainResult.leveled.stat, trainResult.leveled.to)}). [${newChecks} checks succeeded]`,
           );
         }
         switch (intent) {
@@ -16885,7 +16976,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   const tr = trainStat(liveSneaker, 'stealth', true);
                   set((s) => (s.player ? { player: tr.player } : s));
                   if (tr.leveled) {
-                    get().appendLog('reward', `✦ Moving unseen sharpens you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (now ${tr.leveled.to}).`);
+                    get().appendLog('reward', `✦ Moving unseen sharpens you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (${statNowClause(get().player, tr.leveled.stat, tr.leveled.to)}).`);
                   }
                 }
               }
@@ -17825,7 +17916,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (tr.leveled) {
             get().appendLog(
               'reward',
-              `✦ The work hones you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (now ${tr.leveled.to}).`,
+              `✦ The work hones you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (${statNowClause(get().player, tr.leveled.stat, tr.leveled.to)}).`,
             );
           }
         }
