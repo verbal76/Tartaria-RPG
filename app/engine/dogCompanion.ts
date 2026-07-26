@@ -280,6 +280,34 @@ export function createDogCompanion(args: {
   };
 }
 
+// OTA-956 — the ONE way to answer "which inventory instance is the vest the dog
+// is wearing?". Owner: "dog vests don't show which one is equipped in the
+// inventory." The screen used to re-derive this ad hoc: the badge required
+// item.kind === 'dog_armor' exactly (fused/odd-kind vests fell through the
+// name fallback) and the slot label compared by NAME (broken the moment a
+// still-cooling Crucible vest got renamed by the settle). Resolution order:
+// exact instance id, then name match on anything that IS dog armor by kind
+// OR by uniqueStats.kind. Returns null when no dog / nothing worn / vest gone.
+export function wornDogVestInstanceId(player: {
+  dog?: { status?: string; equipped?: { vest?: string | null; vestId?: string | null } } | null;
+  inventory?: ReadonlyArray<{ id: string; name: string; kind?: string; quantity?: number; uniqueStats?: { kind?: string } }>;
+}): string | null {
+  const dog = player.dog;
+  if (!dog || dog.status === 'dead' || dog.status === 'abandoned') return null;
+  const vestName = dog.equipped?.vest ?? null;
+  const vestId = dog.equipped?.vestId ?? null;
+  const inv = player.inventory ?? [];
+  if (vestId) {
+    const byId = inv.find((it) => it.id === vestId && (it.quantity ?? 1) > 0);
+    if (byId) return byId.id;
+  }
+  if (!vestName) return null;
+  const isDogArmor = (it: { kind?: string; uniqueStats?: { kind?: string } }): boolean =>
+    it.kind === 'dog_armor' || it.uniqueStats?.kind === 'dog_armor';
+  const byName = inv.find((it) => isDogArmor(it) && it.name === vestName && (it.quantity ?? 1) > 0);
+  return byName?.id ?? null;
+}
+
 /** Pick a default fall-back name from the breed for players who skip
  *  the name stage. Three flavor names rotate per session. */
 export function defaultDogName(): string {
