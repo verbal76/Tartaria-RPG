@@ -17173,4 +17173,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // delivered E2E (loot verified TC+healing only), vendor + board + hook pickups, 20% collateral in a
 // real fight, parked party untouched, dead pool fails un-completed. typecheck + lint clean; full
 // fast suite green. Mission QA + economy -> HAL + golem (NOT engine).
-export const OTA_BUILD_ID = '2026-07-26-966-escort-gauntlet';
+// OTA-967 (outpost Crucible fee; golem port of HAL OTA-990). Owner's design call on the Crucible faucet: "make the
+// outpost run the same as a roadside vendor." Every outpost's free-unlimited Crucible (arb103) was
+// an infinite guaranteed-Legendary faucet (3 material types = Rare, 4+ = Legendary, junk inputs
+// accepted, no fee/cooldown) — it zeroed the vendor's 25 TC fee and devalued found/crafted/boss
+// gear. New shared chargeOutpostCrucibleFee: outpost fires (fuse AND the extra-channel upgrade) now
+// cost the vendor's 25 TC, charged AFTER every gate and BEFORE any consume — a refusal, a cancelled
+// picker, or an empty purse never costs a coin or an item. Vendor fires + wild fusion benches
+// (fusionPending) stay pre-paid; the Hidden Market cauldron keeps its free-fire perk. 4 tests: fee
+// lands and forges, broke = nothing consumed + price named, pre-paid never double-charged, market
+// still free. typecheck + lint clean; full fast suite green. Economy -> HAL + golem (NOT engine).
+export const OTA_BUILD_ID = '2026-07-26-967-crucible-fee';
