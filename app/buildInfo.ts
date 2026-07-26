@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.10';
+export const DISPLAY_VERSION = '4.28.11';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17270,4 +17270,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // only a failure within 3 of the DC, flat +1 (a sixth of a cold-start success) — so nothing
 // snowballs once the needle moves. Wired stealth-only at the failed-check site. DISPLAY_VERSION
 // 4.28.10. 3 tests + curve retarget. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-976-stealth-cold-start';
+// OTA-977 (sigil salvage; golem port of HAL OTA-1000). Owner: "a pried sigil awards coin? it should give me a
+// faction sigil." Root cause: EVERY salvage yield (pry/strip/break/bulk) flows through
+// rollSalvagePool, which had no sigil awareness — a 'scout sigil' noun fell to the junk table
+// (coins). Category fix at that one choke point: any sigil/crest noun now yields a REAL faction
+// sigil item — faction read from the noun's own words via the existing sigils.ts keyword map
+// ("architect sigil" -> Architect Sigil), rolled across the nine otherwise; the OTA-691 turn-in
+// economy (+1 standing at that faction's agent, SIGILS section auto-route) takes it from there.
+// DISPLAY_VERSION 4.28.11. 3 tests. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-26-977-sigil-salvage';
