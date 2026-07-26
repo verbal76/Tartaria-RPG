@@ -584,6 +584,11 @@ export interface UniqueItemStats {
    *  (applied by aggregateEquippedStatBonuses' fused-item pass). Fusion
    *  inherits a stealth bonus when the inputs include stealthy gear. */
   statBonus?: { stat: keyof Stats; amount: number };
+  /** OTA-978 — weapon reach identity, chosen at forge time (the form noun is
+   *  picked to MATCH it: Spike/Maul = melee, Spear/Pike = long, Bow/Caster =
+   *  ranged). melee = close only; long = mid+close; ranged = every band.
+   *  Older forges are back-stamped on load from their name. */
+  reachClass?: 'melee' | 'long' | 'ranged';
 }
 
 // OTA-550 — four-band combat range model. Ordered farthest → closest.
