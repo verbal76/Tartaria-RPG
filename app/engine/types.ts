@@ -1776,6 +1776,11 @@ export interface WorldMemory {
   /** OTA-912 — great-climb ids UNLOCKED by using their chart. The climbable prop
    *  only spawns at a landmark once its id is in here (access is gated on maps). */
   unlockedGreatClimbs?: string[];
+  /** OTA — #119a: last ~10 ambient takeable gear names rolled into scenes,
+   *  newest last. Fed back into pickTakeableGearForScene as an exclude window
+   *  so adjacent tiles stop offering the same Rail Saber three times in a
+   *  ninety-second walk. */
+  recentTakeableGearNames?: string[];
   /** OTA-912 — distinct great-climb ids whose SUMMIT BOSS has been defeated.
    *  Gates the one-time Skyreacher armor + Aether Collection Beacon grant, and at
    *  size 5, using a beacon builds the Beacon Rifle (OTA-913). */

@@ -187,10 +187,10 @@
             },
             {
               "id": "buried_strip_mall",
-              "name": "Buried Strip Mall",
-              "environmental_description": "A row of storefronts, plate glass long since shattered, signage half-erased. The hardware shop has been picked over but not stripped — somebody comes back for these supplies.",
+              "name": "Buried Market Row",
+              "environmental_description": "A row of shopfronts, glass long since shattered, signage half-erased. The tool-monger\u2019s stall has been picked over but not stripped — somebody comes back for these supplies.",
               "exits": [
-                "out to the parking lot",
+                "out to the wagon court",
                 "behind the counter",
                 "through the loading dock"
               ],

@@ -33,7 +33,7 @@ export const OUTSIDE_CLIMBABLES: ClimbableSpawn[] = [
   { name: 'petrified mud wave',         context: 'outside', height: 2 },
   { name: 'obsidian pillar',            context: 'outside', height: 3 },
   { name: 'submerged giant statue',     context: 'outside', height: 3 },
-  { name: 'buried strip mall rooftop',  context: 'outside', height: 2 },
+  { name: 'buried market row rooftop',  context: 'outside', height: 2 },
   { name: 'endless stair landing',      context: 'outside', height: 4 },
   { name: "zharak's teeth spire",       context: 'outside', height: 4 },
   // 2026-05-25 [CONTENT-1] — watchtower as a 4-step outside climbable.
