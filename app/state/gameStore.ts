@@ -18870,6 +18870,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // factions that hold them sacred. They carry no factionId in data, so the
     // faction-kill block above never touches them; this is their own reverence
     // penalty, applied only to revering factions the player already tracks.
+    // OTA-975 — THE HOLLOWED put to rest. Deliberately NOT isAetherkin (no
+    // 'aetherkin' in name or traits, on purpose) so the reverence penalty
+    // below never fires — every faction understands the mercy.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const rev998 = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+      if (rev998.isRevenant(enemy)) {
+        const fr = get().worldMemory.activeRevenant;
+        if (fr) {
+          const closing = rev998.revenantDefeatLines(fr, get().player?.name ?? 'a wanderer');
+          get().appendLog('world', closing.world);
+          get().appendLog('reward', closing.reward);
+          rev998.markAvenged(fr.ts, get().player?.name ?? 'a wanderer');
+          set((s2) => ({ worldMemory: { ...s2.worldMemory, activeRevenant: undefined } }));
+          get().appendLog('debug', `revenant: ${fr.name}@${fr.ts} put to rest`);
+        }
+      }
+    }
     if (isAetherkin(enemy)) {
       const revChanged = applyAetherkinReverenceDelta(get, set, AETHERKIN_KILL_REP);
       if (revChanged.length > 0) {
@@ -22809,6 +22827,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // on top of a live one.
       const hasLiveEscort = (livePlayer?.activeFactionQuests ?? [])
         .some((q) => q.escort && q.escort.hp > 0);
+      // OTA-975 — THE HOLLOWED (owner feature): a fallen character of this
+      // install surfaces as a one-time Aetherkin-revenant BOSS event. Power-
+      // gated so a fresh character never stumbles into one; the pool is the
+      // install's un-avenged Fallen. Kill = put to rest (resolveEnemyDefeat).
+      {
+        const rvPlayer = get().player;
+        const rvScene = get().currentScene;
+        if (rvPlayer && rvScene && peacefulWild && tileIsNovel
+            && (rvScene.enemies ?? []).length === 0 && (rvPlayer.hpMax ?? 0) >= 60) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const rev = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+          const rvPool = rev.cachedFallen().filter((f) => !f.avengedTs);
+          if (rvPool.length > 0 && Math.random() < 0.04) {
+            const fr = rvPool[Math.floor(Math.random() * rvPool.length)]!;
+            const foe = rev.revenantFromFallen(fr, rvPlayer.hpMax);
+            set((s2) => (s2.currentScene ? {
+              currentScene: {
+                ...s2.currentScene,
+                enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
+                enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
+              },
+              worldMemory: { ...s2.worldMemory, activeRevenant: { ...fr } },
+            } : s2));
+            const beats = rev.revenantIntroBeats(fr, fr.name === rvPlayer.name);
+            get().appendLog('world', beats.emergence);
+            get().appendLog('arbiter', beats.identification);
+            get().appendLog('world', beats.identity);
+            get().appendLog('combat', `⚔ BOSS EVENT — ${foe.name}. ${beats.character}`);
+            get().appendLog('debug', `spawn: revenant ${fr.name}@${fr.ts} pool=${rvPool.length}`);
+          }
+        }
+      }
       const sTileKey = livePlayer ? `${livePlayer.currentLocationId}:${livePlayer.mapX}:${livePlayer.mapY}` : '';
       const sRolled = get().worldMemory.strandedEscortRolledTiles ?? [];
       if (peacefulWild && !hasLiveEscort && tileIsNovel && sTileKey && !sRolled.includes(sTileKey)) {
@@ -29933,6 +29983,11 @@ function handlePlayerDeath(
       kills: player.milestones?.enemiesDefeated ?? 0,
       corruption: tierLabel(corruptionTierOf(player.corruption ?? 0)),
       hours: Math.floor(player.hoursElapsed ?? 0),
+      // OTA-975 — the kit they died in, for the Hollowed revenant they may yet
+      // become (slot display names; the *Id fields are instance ids, skipped).
+      gearNames: Array.from(new Set(Object.entries((player.equipped ?? {}) as Record<string, string | undefined>)
+        .filter(([k, v]) => !!v && !k.endsWith('Id'))
+        .map(([, v]) => String(v)))).slice(0, 6),
       ts: Date.now(),
     };
     void recordFallen(hero).then((total) => {
