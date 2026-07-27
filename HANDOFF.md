@@ -317,10 +317,64 @@ all one of these shapes:
 
 - Did I PROVE the cause, or infer it? (If inferred: go prove it.)
 - Did I grep for siblings twice, with two patterns?
+- Any snapshot read answering an IDENTITY question? (§F — identity reads canonical.)
 - Does my lock test fail on the OLD code? (Actually check — `git stash` the
   fix and run it, or assert the old shape's absence.)
 - Ran the exploit lens (§B) over what I just changed?
 - Both lines shipped, gates green, versions bumped, §8/§9 updated?
+
+### F. THE SNAPSHOT LESSON (owner-named category, 2026-07-27) — read before ANY item/save code
+
+The owner's framing, verbatim, because it is the clearest statement of the
+category: *"the code was utilizing a shortcut by looking at the snapshot
+image, not the full definition of the item — and that's what broke it."*
+
+Saves persist SNAPSHOTS: an item's tags/kind/rarity/description are frozen at
+the moment it was minted; equipped slot names, the golem's armament, known
+recipe names and every world-memory ledger are frozen at write time. The
+catalogs and defs keep moving with every OTA. Any DECISION read from the
+snapshot silently diverges on an old install — and the owner's install is
+months old, so every divergence is LIVE for the one player who matters.
+One bandolier refusal unraveled into ~50 verified sites (OTA-1020, then the
+five-batch audit 1021–1025 / golem 997–1002).
+
+**THE RULE — identity vs provenance:**
+- An IDENTITY question ("what KIND of thing is this?") is answered by the
+  LIVE definition: `canonicalItemTags` / `canonicalItemKind` /
+  `canonicalItemRarity` (crafting.ts — uniqueStats → catalog-by-name →
+  instance), or a routed predicate (`isWeaponCoatingItem`, `itemIsThrowable`,
+  `isQuestLockedItem`, `isSigilItem`). NEVER raw `item.tags` / `item.kind` /
+  `item.rarity` in a decision.
+- A PROVENANCE question ("what happened to THIS copy?") is answered by the
+  instance and must STAY that way: `loot`/`bonus` stamps, `stolen`,
+  `selfCrafted`, `fused`/`uniqueStats`, durability, coating, instanceStats
+  AMOUNTS. Canonicalizing these would erase real per-copy history.
+- REMOVAL semantics: a union can only ADD tags. When the catalog RETIRES a
+  marking (the `trophy` case), the check must be catalog-AUTHORITATIVE
+  ("row absent?"), not a union.
+
+**REVIEW TRIGGER:** any new code reading `item.tags` / `item.kind ===` /
+`item.rarity` inside a decision, or comparing a persisted name/id against
+current defs, gets the question "identity or provenance?" BEFORE it merges.
+Same for any new persisted collection keyed on a content name/id — plan its
+rename story on day one.
+
+**LOAD HEALS DO NOT ABSOLVE DECISION SITES:** the kind heal is upgrade-only
+(a demotion never applies), rarity is NEVER healed anywhere, and the
+stack-merge spreads a stale row onto every new copy of the same name.
+Decision sites read canonical regardless of what the heals did.
+
+**RENAMES:** the binding policy above (§D) — a retired catalog name without a
+`LEGACY_ITEM_RENAMES` entry in the same OTA fails the catalog-name ratchet
+test. That ratchet pattern (committed snapshot + refresh script + lock test)
+is the TEMPLATE if any other keyed namespace — enemy names, location ids —
+ever gets its first rename.
+
+**HOW THE CATEGORY WAS FOUND** (repeatable): three parallel read-only audits —
+(1) every tag-read classified identity vs provenance, (2) every kind/rarity
+read with a stale-instance scenario, (3) every persisted name/id vs its live
+def, cross-checked against the actual `git log` of `app/data/**` to separate
+LIVE divergence from latent. Every claim hand-verified before fixing.
 
 ## 4. Cross-line parity rule
 
