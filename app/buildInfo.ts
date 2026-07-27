@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.27';
+export const DISPLAY_VERSION = '4.28.28';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17493,4 +17493,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (6) Dog heals scale by the DOG's hpMax on both feed paths. (7) Great-climb precedence requires
 // the exact landmark noun — the Skyreacher Maps are paper again; the curly-apostrophe hole closed.
 // DISPLAY_VERSION 4.28.27. 13 tests. Gameplay -> HAL + golem; golem port of HAL OTA-1016.
-export const OTA_BUILD_ID = '2026-07-27-993-studsdown-inputworld';
+// OTA-994 — THE RESIDUALS, CLOSED (owner: "complete 1-4 that were left open").
+// (1) THE RECLAIM: the kit is captured as FULL ITEM COPIES at death; a Hollowed
+// put to rest hands back the died-in WEAPON outright and armor rides the normal
+// rolls as the REAL items — pristine, fused stats intact — never look-alike
+// trophies. KO-strips count as put to rest (no rise-again kit farm). Legacy
+// seeded kits PIN at first generation (catalog edits can't re-dress a named
+// fallen). (2) itemPreview heals promise the #120-scaled value for YOUR frame.
+// (3) The sky is remembered PER LOCATION (self-pruning map; legacy slot
+// migrates) — leave-and-return keeps the origin's weather. (4) Hollowed polish:
+// proven-progress gate (10 kills or 12h) beside the HP bar, per-tile roll bank,
+// retried memorial write, and the rumour can't spawn the boss over a live fight.
+export const OTA_BUILD_ID = '2026-07-27-994-residuals-closed';

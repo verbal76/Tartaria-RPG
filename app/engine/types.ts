@@ -417,6 +417,11 @@ export interface TimelineEvent {
   summary: string;
 }
 
+/** OTA-994 — the actual kit a fallen character died in: full item copies (minus
+ *  instance id / stack count, slot kept) so a Hollowed revenant can give back
+ *  the REAL gear — fused stats and all — instead of a look-alike or trophy. */
+export type FallenGearPiece = Omit<InventoryItem, 'id' | 'quantity'> & { slot: string };
+
 export interface InventoryItem {
   id: string;
   name: string;
@@ -1620,6 +1625,10 @@ export interface WorldMemory {
    *  a scene rebuild at the same spot inside ~6 game-hours reuses this instead
    *  of re-rolling, so conditions read as weather, not a slot machine. */
   sceneWeather?: { id: string; locationId: string; rolledAtHours: number };
+  /** OTA-994 — #122 completed: the sky is remembered PER LOCATION (the single slot
+   *  above is legacy — read once as migration, no longer written). Entries
+   *  self-prune once stale (>= 6 game-hours old). */
+  sceneWeatherByLoc?: Record<string, { id: string; rolledAtHours: number }>;
   discoveredLocationIds: string[];
   /** OTA-500 — install-canon locations registered from dynamic mentions. */
   canonLocations?: CanonLocation[];
@@ -1707,9 +1716,12 @@ export interface WorldMemory {
    *  hook. Same one-roll-per-tile, sliding-window anti-farm as
    *  wandererRolledTiles. */
   strandedEscortRolledTiles?: string[];
+  /** OTA-994 — ground already diced for a Hollowed door never re-rolls (mirrors the
+   *  stranded-escort tile bank; tileIsNovel alone re-arms after 50 tiles). */
+  revenantRolledTiles?: string[];
   /** OTA-975 — the Hollowed revenant currently standing in the scene (the fallen
    *  record it was built from); cleared when put to rest. */
-  activeRevenant?: { name: string; ts: number; raceName: string; epitaph: string; locationName: string; kills: number; corruption: string; hours: number; gearNames?: string[]; avengedBy?: string; avengedTs?: number };
+  activeRevenant?: { name: string; ts: number; raceName: string; epitaph: string; locationName: string; kills: number; corruption: string; hours: number; gearNames?: string[]; gear?: FallenGearPiece[]; avengedBy?: string; avengedTs?: number };
   /** HANDOFF #15b — hub rooms the player has visited at least once.
    *  Used by hub fast-travel to gate "jump to the workshop" against
    *  rooms the player actually knows. Stored separately from

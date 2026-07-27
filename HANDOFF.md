@@ -786,9 +786,33 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.27**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.28**; ledger in `VERSION.md`.
 
-- **THE STUDS-DOWN TEARDOWN (2026-07-27, latest).** HAL **1013–1016** / golem **990–993**. Owner:
+- **THE RESIDUALS, CLOSED (2026-07-27, latest).** HAL **1017** / golem **994**. Owner: "complete
+  1-4 that were left open. ask design questions where required." Owner's design calls (via
+  AskUserQuestion): reclaimed gear returns PRISTINE; the died-in WEAPON is a GUARANTEED drop while
+  armor stays on the chance rolls; the Hollowed door gains a proven-progress gate (10 kills OR 12
+  in-game hours) beside the HP bar. Shipped, 15 tests:
+  • **THE RECLAIM** — `FallenGearPiece` snapshots (full item copies, instance stats intact) captured
+    at death (`buildFallenGearSnapshot`); put-to-rest grants the weapon outright
+    (`revenantReclaimWeapon` → `reconstructFallenPiece`, durability restored to max) and the chance
+    rolls grant REAL snapshot pieces instead of misc trophies; the guaranteed weapon sits OUT of the
+    roll pool (no dupes); KO-strips count as put to rest (closes the rise-again kit farm); legacy
+    seeded kits PIN at first generation (`pinFallenGearNames`) so catalog edits can't re-dress a
+    named fallen.
+  • **itemPreview** heals promise the #120-scaled value for the live frame (`effectiveHealAmount`,
+    lazy store require; flat value stands outside a live game). The effect-less 2d6 default is
+    genuinely unscaled in the engine — its preview line was already honest and is untouched.
+  • **WEATHER** — `worldMemory.sceneWeatherByLoc` per-location map (self-pruning at 6 game-hours;
+    legacy `sceneWeather` slot reads once as migration, never written again; drift stamps
+    'open-road' as a map key). `ota1003WeatherLocality` retargeted — its pin now exercises the
+    migration path.
+  • **HOLLOWED POLISH** — proven-progress gate; `revenantRolledTiles` per-tile bank (slice -120,
+    mirrors stranded escorts); the memorial write retries ×3 with backoff; the rumour marker can no
+    longer spawn the boss over a live fight (the spawn clobbered the enemies array — pool keeps, the
+    Hollowed rises at a later door).
+
+- **THE STUDS-DOWN TEARDOWN (2026-07-27).** HAL **1013–1016** / golem **990–993**. Owner:
   "take all of opus fixes down to the studs and verify root cause and proper implementation of new
   systems." Five parallel read-only audits re-derived every OTA-992..1004 claimed root cause against
   PRE-fix code (git-archaeology, not summaries), verified all 13 golem ports patch-identical, and
@@ -798,17 +822,10 @@ re-architecture. Currently **4.28.27**; ledger in `VERSION.md`.
   contracts+toasts, 1016 input+world (see VERSION.md row + buildInfo for the full inventories).
   **DOCUMENTED RESIDUALS (known, deliberate, or deferred):**
   • Whisper/lead/broker are AMBIENT-TIER — exempt from single-active by design, test-locked.
-  • A revenant killed for its gear drops non-catalog (fused/synthesized) names as Legendary misc
-    TROPHIES, not equippables — real fix needs gear SNAPSHOTS on the FallenHero record (feature).
-  • The pre-998 seeded revenant kit is stable per BUILD, not per install — a Rare+ catalog edit
-    reshuffles old fallen's gear.
-  • worldMemory.sceneWeather is a single slot — leave-and-return within 6 game-hours re-rolls the
-    origin's sky (a per-location map is the upgrade if it ever bites on device).
-  • itemPreview's "Restores: +N HP" shows the flat catalog value (under-promises vs the scaled Use
-    button on the same screen).
-  • Hollowed door-1 has no per-tile rolled-bank (re-rollable on ground revisited after 50 tiles) and
-    the hpMax>=60 gate admits ~0.25% of fresh Giants; markAvenged's disk write is optimistic;
-    continueHook lacks an in-combat guard (latent, no repro).
+  • ALL FOUR DEFERRED RESIDUALS BELOW WERE CLOSED BY THE NEXT ENTRY (HAL 1017 / golem 994) —
+    kept here only as the audit's record: gear-snapshot reclaim (trophies + per-BUILD seeded kits),
+    per-location weather map, scaled heal preview, and the Hollowed polish set (tile bank, gate,
+    optimistic markAvenged, continueHook guard).
 
 - **THE TRUST BATCH + ROOT-CAUSE AUDIT (2026-07-27, later).** HAL **1008–1012** / golem **985–989**.
   • **1008/985** — the voice-crash counter is scoped to the BUILD that produced it (stamped with

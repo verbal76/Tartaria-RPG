@@ -80,13 +80,17 @@ describe('OTA-980 — weather reads the ground it falls on', () => {
     await new Promise((r) => setTimeout(r, 25));
     const st = store.getState();
     const locId = st.player!.currentLocationId;
-    // The boot scene stored its roll.
-    expect(st.worldMemory.sceneWeather?.locationId).toBe(locId);
+    // The boot scene stored its roll — in the PER-LOCATION map (the single
+    // slot is legacy: read once as migration, never written again).
+    expect(Object.keys(st.worldMemory.sceneWeatherByLoc ?? {})).toContain(locId);
     // Pin a stored sky and rebuild the scene: it must REUSE, not re-roll
     // (the test-harness pickWeather mock would return calm on any re-roll).
     store.setState((s) => ({
       worldMemory: {
         ...s.worldMemory,
+        // The pin goes through the LEGACY slot with an empty map, so this
+        // reuse also proves the old-save migration path.
+        sceneWeatherByLoc: {},
         sceneWeather: { id: 'glass_hail', locationId: locId, rolledAtHours: s.player!.hoursElapsed ?? 0 },
       },
     }));
@@ -100,7 +104,7 @@ describe('OTA-980 — weather reads the ground it falls on', () => {
     (store.getState() as any)._beginSceneCore({});
     await new Promise((r) => setTimeout(r, 25));
     expect(store.getState().currentScene?.weather?.id).toBe('calm');
-    expect(store.getState().worldMemory.sceneWeather?.id).toBe('calm');
+    expect((store.getState().worldMemory.sceneWeatherByLoc ?? {})[locId]?.id).toBe('calm');
   });
 
   it('category lock: roof suppression + gap 5 + biased call sites are wired in source', () => {

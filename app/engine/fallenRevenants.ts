@@ -6,7 +6,7 @@
 // fear. Each is a one-time BOSS event; putting one down is a mercy every
 // faction understands (no Aetherkin reverence penalty — see isRevenant), and
 // the Fallen memorial marks them "put to rest".
-import type { Enemy } from './types';
+import type { Enemy, FallenGearPiece, InventoryItem } from './types';
 import type { FallenHero } from './saveSystem';
 
 function hashSeed(s: string): number {
@@ -60,7 +60,14 @@ export function markAvenged(ts: number, by: string): void {
   }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { markFallenAvenged } = require('./saveSystem') as typeof import('./saveSystem');
-  void markFallenAvenged(ts, by).catch(() => { /* memorial write is best-effort */ });
+  // OTA-994 — the memorial write RETRIES. Fire-and-forget meant one failed disk
+  // write let a put-to-rest revenant rise again after an app restart.
+  void (async () => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try { await markFallenAvenged(ts, by); return; }
+      catch { await new Promise((r) => setTimeout(r, 400 * (attempt + 1))); }
+    }
+  })();
 }
 
 /** The kit they died in. Post-998 deaths record it; pre-998 records get a
@@ -95,6 +102,7 @@ export function revenantGearNames(f: FallenHero): string[] {
  *  the died-in kit (the "chance to drop what they wore"). */
 export function revenantFromFallen(f: FallenHero, playerHpMax: number): Enemy {
   const gear = revenantGearNames(f);
+  pinSeededKit(f, gear);
   const kills = Math.max(0, Math.floor(f.kills || 0));
   const hp = Math.max(60, Math.min(Math.round(Math.max(40, playerHpMax) * 2.5), 90 + kills * 2));
   const damage = kills >= 150 ? '3d8' : kills >= 60 ? '2d8' : '2d6';
@@ -131,4 +139,80 @@ export function revenantDefeatLines(f: FallenHero, by: string): { world: string;
     world: `The hunger goes out of them first. Then the light. For one clear breath the mud lets go, and it is only ${f.name} again — ${f.raceName}, ${f.kills} foes to the name, the warrior the roll remembers. They rest now. The Aether does not get this one back.`,
     reward: `✦ ${f.name} is at rest. The Fallen roll marks them: put to rest by ${by}.`,
   };
+}
+
+// ---- OTA — THE RECLAIM. The kit is captured as FULL ITEM COPIES at death and
+// handed back as REAL gear when the Hollowed falls: the WEAPON is guaranteed
+// (a one-time boss — losing the signature piece to a dice roll could never be
+// retried), armor pieces ride the normal chance rolls, and everything returns
+// PRISTINE — the mud kept it as it was carried (owner's calls, 2026-07-27).
+
+/** Capture the equipped kit as full item copies (id/quantity stripped, slot
+ *  kept, weapon first). Prefers the exact INSTANCE via the equipped `<slot>Id`
+ *  pointer so a fused piece keeps its rolled stats; falls back to name match. */
+export function buildFallenGearSnapshot(p: {
+  equipped?: object | null;
+  inventory?: InventoryItem[] | null;
+}): FallenGearPiece[] {
+  const eq = (p.equipped ?? {}) as Record<string, string | undefined>;
+  const inv = p.inventory ?? [];
+  const slotPrio = ['main', 'off', 'chest', 'head', 'legs', 'feet', 'amulet', 'ring', 'ring2', 'ring3'];
+  const out: FallenGearPiece[] = [];
+  const slots = Object.keys(eq)
+    .filter((k) => !!eq[k] && !k.endsWith('Id'))
+    .sort((a, b) => {
+      const ia = slotPrio.indexOf(a); const ib = slotPrio.indexOf(b);
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    });
+  for (const slot of slots.slice(0, 6)) {
+    const name = String(eq[slot]);
+    const instId = eq[`${slot}Id`];
+    const item = (instId ? inv.find((i) => i.id === instId) : undefined) ?? inv.find((i) => i.name === name);
+    if (item) {
+      const copy = JSON.parse(JSON.stringify(item)) as Omit<InventoryItem, 'id' | 'quantity'> & { id?: string; quantity?: number };
+      delete copy.id;
+      delete copy.quantity;
+      out.push({ ...(copy as Omit<InventoryItem, 'id' | 'quantity'>), name: item.name, slot });
+    } else {
+      // Equipped name with no live inventory row (legacy save shapes) — keep
+      // the name so the kit still reads right; kind from the slot.
+      out.push({ name, kind: slot === 'main' || slot === 'off' ? 'weapon' : 'armor', tags: [], slot } as FallenGearPiece);
+    }
+  }
+  return out;
+}
+
+/** Rebuild a snapshot piece as a live, PRISTINE inventory item: fresh instance
+ *  id, single copy, durability restored to max (owner's call — the mud kept it
+ *  whole). Instance stats, coatings and unique rolls ride the copy through. */
+export function reconstructFallenPiece(piece: FallenGearPiece, id: string): InventoryItem {
+  const { slot: _slot, ...rest } = piece;
+  const dur = rest.durability ? { current: rest.durability.max, max: rest.durability.max } : undefined;
+  return {
+    ...(rest as Omit<InventoryItem, 'id' | 'quantity'>),
+    id,
+    quantity: 1,
+    tags: Array.from(new Set([...(rest.tags ?? []), 'loot'])),
+    ...(dur ? { durability: dur } : {}),
+  };
+}
+
+/** The guaranteed reclaim: the weapon they died holding (slot 'main', else the
+ *  first snapshot piece). Null when the record predates snapshots. */
+export function revenantReclaimWeapon(f: Pick<FallenHero, 'gear'>): FallenGearPiece | null {
+  const gear = f.gear ?? [];
+  return gear.find((g) => g.slot === 'main') ?? gear[0] ?? null;
+}
+
+/** OTA-994 — pin a SYNTHESIZED (pre-snapshot) kit at first generation: cache now,
+ *  disk best-effort. Without this the kit was only stable per BUILD — a Rare+
+ *  catalog edit silently re-dressed every legacy fallen. */
+export function pinSeededKit(f: FallenHero, names: string[]): void {
+  if (f.gearNames && f.gearNames.length > 0) return;
+  if (FALLEN_CACHE) {
+    FALLEN_CACHE = FALLEN_CACHE.map((x) => (x.ts === f.ts ? { ...x, gearNames: names } : x));
+  }
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { pinFallenGearNames } = require('./saveSystem') as typeof import('./saveSystem');
+  void pinFallenGearNames(f.ts, names).catch(() => { /* pinned in cache; disk is best-effort */ });
 }
