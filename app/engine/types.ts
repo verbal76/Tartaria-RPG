@@ -1793,6 +1793,9 @@ export interface WorldMemory {
    *  a place once, then the noun yields rubble coin. Closes the round-trip
    *  sigil farm the OTA-1000 guaranteed-yield branch opened. */
   salvagedSigilKeys?: string[];
+  /** OTA-993 — how many times an agent has actually PITCHED offers. Keys the
+   *  category rotation; travel-count keying phase-locked circuit routes. */
+  offerPitchSeq?: number;
   /** OTA-912 — distinct great-climb ids whose SUMMIT BOSS has been defeated.
    *  Gates the one-time Skyreacher armor + Aether Collection Beacon grant, and at
    *  size 5, using a beacon builds the Beacon Rifle (OTA-913). */

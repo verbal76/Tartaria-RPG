@@ -162,6 +162,18 @@ export function isGreatClimbNoun(noun: string | null | undefined): boolean {
   return greatClimbFor(noun) != null;
 }
 
+/** OTA-993 — true only when the noun IS one of a climb's authored nouns (article-
+ *  stripped, exact), not merely a phrase containing its token. The token
+ *  matcher made "Skyreacher Map 2 of 5 — Asgardar Spire" (a purchasable map)
+ *  climbable because it contains "asgardar". */
+export function isGreatClimbExactNoun(noun: string | null | undefined): boolean {
+  const n = (noun ?? '').trim().toLowerCase().replace(/^(?:the|a|an)\s+/, '');
+  if (!n) return false;
+  return GREAT_CLIMBS.some((c) => c.noun.toLowerCase() === n
+    || c.noun.toLowerCase() === `the ${n}`
+    || c.noun.toLowerCase().replace(/^(?:the|a|an)\s+/, '') === n);
+}
+
 // ── Summit bosses (OTA-912) ────────────────────────────────────────────────
 
 export interface SummitBoss {

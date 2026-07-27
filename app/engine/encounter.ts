@@ -43,8 +43,8 @@ const rarityWeights: Record<Rarity, number> = {
 const WEATHER_LOCALE_BIAS: Array<{ re: RegExp; bias: Record<string, number> }> = [
   { re: /aether|etheric|spire|monolith|grid/i, bias: { aether_lightning: 3, etheric_storm: 3 } },
   { re: /mud|silt|marsh|bog|sunken|drowned/i, bias: { black_rain: 3, whisper_fog: 2 } },
-  { re: /ash|cinder|burn/i, bias: { ash_storm: 3 } },
-  { re: /frost|ice|north|blizzard|glacier/i, bias: { silent_blizzard: 3 } },
+  { re: /\b(ash|ashfall|cinder|burnt?|ember)\b/i, bias: { ash_storm: 3 } },
+  { re: /\b(frost|frozen|ice|icebound|blizzard|glacier|tundra)\b/i, bias: { silent_blizzard: 3 } },
 ];
 
 /** Resolve a weather table entry by id (used to rehydrate persisted scene
@@ -55,9 +55,15 @@ export function weatherById(id: string): WeatherEntry | null {
 
 export function pickWeather(
   memory: WorldMemory,
-  location?: { id: string; name: string } | null,
+  location?: { id: string; name: string; tags?: readonly string[] } | null,
 ): WeatherEntry {
-  const key = location ? `${location.id} ${location.name}`.toLowerCase() : '';
+  // OTA-993 — the location's TAGS carry its climate (yuldra_tul's frost, the ten
+  // borderlands outposts' mud, the spires' aetheric cores). Matching id+name
+  // alone left 31 of 36 locations with an unbiased sky and the frost/ash rows
+  // matching nothing at all.
+  const key = location
+    ? `${location.id} ${location.name} ${(location.tags ?? []).join(' ')}`.toLowerCase()
+    : '';
   const bias: Record<string, number> = {};
   if (key) {
     for (const row of WEATHER_LOCALE_BIAS) {

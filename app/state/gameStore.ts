@@ -2656,7 +2656,40 @@ export function qwenRephraseRejection(
 ): string | null {
   const noun = (resolvedNoun ?? '').trim().toLowerCase();
   const reph = (rephrasing ?? '').toLowerCase();
-  if (noun && !reph.includes(noun)) return `dropped the player's noun "${noun}"`;
+  if (noun) {
+    // OTA-993 — word-level, not whole-string: the resolvedNoun is the CATALOG name
+    // ("Aetheric Torch"), and an honest repair like "use the torch" must pass.
+    const nounWords = noun.split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
+    if (nounWords.length > 0 && !nounWords.some((w) => reph.includes(w))) {
+      return `dropped the player's noun "${noun}"`;
+    }
+  } else {
+    // OTA-993 — NO resolved noun is the dangerous case (the parser's empty-token /
+    // rejected-validation exits carry none), and the old guard checked nothing
+    // here beyond 'wait' — a fabricated "attack the vendor" from garbled input
+    // dispatched clean. A repair must share at least one significant word
+    // (exact, containment, or one typo) with what the player actually TYPED;
+    // otherwise it is an invention, not a repair.
+    const near = (a: string, b: string): boolean => {
+      if (a === b || a.includes(b) || b.includes(a)) return true;
+      if (Math.abs(a.length - b.length) > 1) return false;
+      let i = 0; let j = 0; let edits = 0;
+      while (i < a.length && j < b.length) {
+        if (a[i] === b[j]) { i++; j++; continue; }
+        edits++; if (edits > 1) return false;
+        if (a.length > b.length) i++;
+        else if (b.length > a.length) j++;
+        else { i++; j++; }
+      }
+      return edits + (a.length - i) + (b.length - j) <= 1;
+    };
+    const rawWords = (rawText ?? '').toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 4);
+    const rephWords = reph.split(/[^a-z0-9]+/).filter((w) => w.length >= 4);
+    if (rawWords.length > 0 && rephWords.length > 0
+        && !rephWords.some((rw) => rawWords.some((aw) => near(rw, aw)))) {
+      return 'invented an action unrelated to what the player typed';
+    }
+  }
   if (intent === 'wait' && !/\b(wait|hold|stay|linger|pause|bide)\b/i.test(rawText)) {
     return 'invented a wait the player never asked for';
   }
@@ -7639,11 +7672,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // each visit so every category surfaces within two stops. Turn-in
         // hints are exempt — owed work always gets a word.
         const offerCats = ['fq', 'hunt', 'mystery', 'storyline'] as const;
-        const offerRot = (player.macroVisitSeq ?? 0) % 4;
+        // OTA-993 — pitch-keyed (see worldMemory.offerPitchSeq): travel-count keying
+        // phase-locked any vendor on a circuit whose hop count was ≡ 0 (mod 4)
+        // to the same two categories forever, world-wide. The ×2 step makes
+        // consecutive pitches cover all four categories (the old +1 walk
+        // covered three, despite the "within two stops" claim its own test
+        // quietly contradicted). Number() + isFinite guards a corrupted save
+        // (NaN previously suppressed all four categories permanently).
+        const rawPitch = Number(get().worldMemory.offerPitchSeq ?? 0);
+        const pitchSeq = Number.isFinite(rawPitch) ? Math.max(0, Math.floor(rawPitch)) : 0;
+        const offerRot = (pitchSeq * 2) % 4;
         const offerAllowed = new Set<string>([
           offerCats[offerRot]!,
           offerCats[(offerRot + 1) % 4]!,
         ]);
+        set((s2) => ({ worldMemory: { ...s2.worldMemory, offerPitchSeq: pitchSeq + 1 } }));
         const pool = availableFactionQuests(
           vendor.faction,
           getStanding(player.factionStanding, vendor.faction),
@@ -10144,16 +10187,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // Bolt-Caster in the main hand used to answer with "arm's reach"
             // and "your blade" — melee words for a ranged swing at scenery.
             const eqHands = player.equipped ?? {};
-            const handRanged = [eqHands.mainId, eqHands.offId].some((hid) => {
+            // OTA-993 — classify by REACH CLASS (the resolver combat itself uses),
+            // not one tag: runecasters fire to distant with no 'ranged' tag,
+            // throwables reach far, and empty hands are neither shot nor
+            // blade. The verb the player TYPED wins when the hands disagree.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { reachClassFor } = require('../engine/combatRules') as typeof import('../engine/combatRules');
+            const handClass = (hid?: string): string | null => {
               const w = hid ? player.inventory.find((i) => i.id === hid) : undefined;
-              return (w?.tags ?? []).some((t) => /^ranged$/i.test(t));
-            });
-            get().appendLog(
-              'world',
-              handRanged
-                ? 'Nothing out there answers the shot. The bolt sails wide and Aetherstone swallows the report.'
-                : 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.',
-            );
+              if (!w) return null;
+              // Inventory copies don't always carry weaponKind — the tags do.
+              const tagged = (w.tags ?? []).map((t) => t.toLowerCase());
+              const kind = (w as { weaponKind?: 'melee' | 'ranged' | 'runecaster' }).weaponKind
+                ?? (tagged.includes('runecaster') ? 'runecaster'
+                  : tagged.includes('ranged') ? 'ranged'
+                    : tagged.includes('melee') ? 'melee' : undefined);
+              return reachClassFor({
+                weaponKind: kind, name: w.name, tags: w.tags,
+                throwable: (w as { throwable?: boolean }).throwable,
+              });
+            };
+            const classes = [handClass(eqHands.mainId), handClass(eqHands.offId)];
+            const farHand = classes.some((c) => c === 'ranged' || c === 'runecaster' || c === 'throwable');
+            const nearHand = classes.some((c) => c === 'melee' || c === 'long');
+            const bareHands = classes.every((c) => c === null);
+            const verbRanged = /\b(shoot|fire|blast|snipe|loose|cast|hurl|throw|zap)\b/i.test(trimmed);
+            const verbMelee = /\b(slash|swing|stab|cut|chop|cleave|smash|bash|strike|punch|kick)\b/i.test(trimmed);
+            const SHOT = 'Nothing out there answers the shot. The bolt sails wide and Aetherstone swallows the report.';
+            const BLADE = 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.';
+            const FISTS = 'Nothing in arm\'s reach answers your fists. The motion echoes off Aetherstone.';
+            let refusal: string;
+            if (verbRanged && farHand) refusal = SHOT;
+            else if (verbMelee) refusal = bareHands ? FISTS : BLADE;
+            else if (bareHands) refusal = FISTS;
+            else if (farHand && !nearHand) refusal = SHOT;
+            else refusal = BLADE;
+            get().appendLog('world', refusal);
           }
         }
         break;
@@ -22160,6 +22229,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     const scene = get().currentScene;
     if (!player || !scene) return;
+    // OTA-993 — a course begins OUTSIDE. Two engine callers (routeMission, the
+    // bounty board) reach here from indoors with no gate, and a surviving
+    // hubRoomId re-attached the DEPARTURE room to the ARRIVAL outpost ("you
+    // pass through the gate into <new outpost> — Workshop"). One clear at the
+    // one choke point every caller shares.
+    if (player.hubRoomId || get().activeBuildingId) {
+      set((s2) => (s2.player ? { player: { ...s2.player, hubRoomId: null }, activeBuildingId: null } : s2));
+      get().appendLog('world', 'You step out under open sky and take your bearings.');
+    }
     // arb47 — block only when the player is ACTUALLY standing on the target's
     // fixed canon cell. (You can have wandered paces away from your home location
     // in open ground — currentLocationId still reads it — and re-route back to it
@@ -24907,7 +24985,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const dog = player.dog;
       if (!dog || dog.status === 'dead' || dog.status === 'abandoned') { get().appendLog('arbiter', `The Arbiter glances at your side. "No dog to tend."`); return; }
       const gap = Math.max(0, dog.hpMax - dog.hp);
-      const heal = Math.min(gap, perHP * use);
+      // OTA-993 — the dog's meal scales by the DOG's hpMax, not the player's.
+      const dogPer = fx?.kind === 'consumable' ? scaledHealHP(fx.healHP ?? 0, dog.hpMax) : 0;
+      const heal = Math.min(gap, dogPer * use);
       const isTreat = (item.tags ?? []).includes('dog_treat');
       const loyPer = isTreat ? 40 : fx?.kind === 'consumable' ? 20 : 5;
       const loyalty = Math.min(100, dog.loyalty + loyPer * use);
@@ -32763,7 +32843,8 @@ function applyItemToDog(
   const hpRoom = Math.max(0, dog.hpMax - dog.hp);
   const healAmount = (() => {
     if (fx && fx.kind === 'consumable') {
-      return Math.min(hpRoom, (fx as { healHP?: number }).healHP ?? 0);
+      // OTA-993 — scaled by the DOG's own frame, matching the batch path below.
+      return Math.min(hpRoom, scaledHealHP((fx as { healHP?: number }).healHP ?? 0, dog.hpMax));
     }
     // No structured effect, but it IS food/consumable → default food heal.
     const isFoodish = isConsumable || (item.tags ?? []).includes('food');

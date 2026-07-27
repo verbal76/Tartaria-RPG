@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.26';
+export const DISPLAY_VERSION = '4.28.27';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17483,4 +17483,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "with your gear on" blamed gear for all of them). The toast lock test is HARDENED (it was green
 // over eight live offenders). DISPLAY_VERSION 4.28.26. 8 tests. Gameplay -> HAL + golem; golem port
 // of HAL OTA-1015.
-export const OTA_BUILD_ID = '2026-07-27-992-studsdown-contracts';
+// OTA-993 (studs-down corrections, batch 3: input + world). (1) The qwen typo-repair guard is
+// word-level in both directions — fabricated actions with no resolvedNoun are rejected; honest
+// catalog-name repairs pass. (2) The scenery refusal classifies by reachClassFor (runecasters/
+// throwables answer as shots, bare hands as fists, the typed verb wins). (3) setTravelCourse clears
+// hubRoomId/activeBuildingId — the departure room can no longer re-attach to an arrival outpost.
+// (4) Offer rotation is pitch-keyed with a ×2 step: full 4-category coverage in two pitches, no
+// circuit phase-lock, NaN-guarded. (5) Weather bias reads location TAGS + word-anchored rows.
+// (6) Dog heals scale by the DOG's hpMax on both feed paths. (7) Great-climb precedence requires
+// the exact landmark noun — the Skyreacher Maps are paper again; the curly-apostrophe hole closed.
+// DISPLAY_VERSION 4.28.27. 13 tests. Gameplay -> HAL + golem; golem port of HAL OTA-1016.
+export const OTA_BUILD_ID = '2026-07-27-993-studsdown-inputworld';
