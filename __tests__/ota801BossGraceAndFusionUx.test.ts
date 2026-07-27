@@ -76,12 +76,15 @@ describe('OTA-801 C3 — post-boss grace window', () => {
   });
 });
 
-describe('OTA-801 C1 — Crucible with reserved-but-insufficient pieces opens the picker', () => {
-  it('opens the picker instead of dead-ending on a refusal line', async () => {
+describe('OTA-801 C1 — Crucible with reserved-but-insufficient pieces REFUSES (superseded by OTA-1007)', () => {
+  it('does NOT open a picker it cannot act in — it names the shortfall and closes', async () => {
     const store = await boot('Forger');
     const p0 = store.getState().player!;
-    // Reserve ONE eligible inferred piece — below the 3-item gate, so the gate
-    // fails. Pre-801 this refused; now it opens the picker (material buckets).
+    // Reserve ONE eligible piece — below the 3-item gate, so the gate fails.
+    // OTA-801 opened the picker here to dodge refusal spam; OTA-1007 reverses that
+    // (owner: "if you don't have enough to fuse, don't have you still go
+    // through the menu"). A menu with a dead FUSE button and NO log line read
+    // on device as "I thought I was fusing" for ten minutes.
     const scrap: InventoryItem = {
       id: 'scrap1', name: 'Shrike Claw', kind: 'misc', rarity: 'Common', quantity: 1,
       tags: ['organic'], reservedForFusion: true,
@@ -96,6 +99,11 @@ describe('OTA-801 C1 — Crucible with reserved-but-insufficient pieces opens th
     });
     expect(store.getState().fusionPickerOpen).toBeFalsy();
     await store.getState().fuseAtCrucible();
-    expect(store.getState().fusionPickerOpen).toBe(true);
+    // The picker stays shut...
+    expect(store.getState().fusionPickerOpen).toBe(false);
+    // ...and the Crucible says why, in words the player can act on.
+    const notice = store.getState().fusionBlockedNotice;
+    expect(notice).toBeTruthy();
+    expect(notice!.body).toMatch(/three pieces/i);
   });
 });
