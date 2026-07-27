@@ -1,4 +1,4 @@
-// OTA — "travel to <place>" must find the place the player NAMED, not the place
+// OTA-1012 — "travel to <place>" must find the place the player NAMED, not the place
 // they punctuated correctly. Owner: "'travel to the location name' should start
 // an auto route as long as the name matches."
 //
@@ -113,9 +113,16 @@ export function matchLocationByName<T extends MatchableLocation>(
     //    containing name so a fragment lands on the most specific place rather
     //    than whichever row happened to sort first.
     const partials = locations.filter((l) => tightKey(l.name).includes(q));
-    if (partials.length > 0) {
-      return partials.reduce((best, l) =>
-        tightKey(l.name).length < tightKey(best.name).length ? l : best);
+    if (partials.length === 1) return partials[0]!;
+    if (partials.length > 1) {
+      // OTA-1012 — multiple owners is a REFUSAL here too, same as the alias and typo
+      // tiers ("camp" names three real places; walking the player to whichever
+      // sorted shortest is a wrong multi-day trek). One carve-out: when a single
+      // candidate is the BASE NAME the others merely extend — "Nimari" inside
+      // "Red Tower of Nimari" — the base is unambiguous intent and resolves.
+      const base = partials.find((l) =>
+        partials.every((o) => tightKey(o.name).includes(tightKey(l.name))));
+      return base ?? null;
     }
     // 5. Partial alias — one owner or none, same reasoning as the exact tier.
     const partialAliasOwners = locations.filter(

@@ -23588,13 +23588,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let made = 0;
     try {
       for (let i = 0; i < want; i += 1) {
-        const before = (get().player?.inventory ?? []).reduce((n, it) => n + (it.quantity ?? 0), 0);
+        // OTA-1012 — count the RESULT, not the whole pack. The old total-quantity
+        // delta was a proxy that LIES when a recipe consumes as much as it
+        // produces (the Club: 1 Stick -> 1 Club, net zero), reading a
+        // successful craft as a refusal — one silent club, made === 0, no
+        // summary. A success always raises the result's own count by one.
+        const countResult = () => (get().player?.inventory ?? [])
+          .filter((it) => it.name === recipeName)
+          .reduce((n, it) => n + (it.quantity ?? 0), 0);
+        const before = countResult();
         get().submitPlayerAction(`craft ${recipeName}`, { silent: true });
         // The substitution-confirm prompt owns the flow from here — stop rather
         // than firing more crafts behind a modal the player hasn't answered.
         if (get().craftSubstitutionPrompt) break;
-        const after = (get().player?.inventory ?? []).reduce((n, it) => n + (it.quantity ?? 0), 0);
-        if (after === before) break; // refused / pack full / out of materials
+        if (countResult() <= before) break; // refused / pack full / out of materials
         made += 1;
       }
     } finally {
