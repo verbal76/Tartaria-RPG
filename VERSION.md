@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.35` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.35` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.36` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.36` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -70,6 +70,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.32 → 4.28.33 | 2026-07-27-1022 | OTA | FAIL-OPEN HOLES CLOSED (snapshot-audit batch B): quest-lock, forge blocklists, substitute-drain rarity guard, collect_only — all canonical (instance ∪ catalog / catalog-first). New canonicalItemKind + canonicalItemRarity; tag union widened to amulets/rings/dog gear. Whole-catalog fail-closed sweeps locked in tests. |
 | 4.28.33 → 4.28.34 | 2026-07-27-1023 | OTA | ECONOMY CANONICAL (snapshot-audit batch C): sell/scrap/repair/golem-feed/coating-drink resolve kind/rarity/tags against the live catalog; trophy discount is catalog-authoritative (dies on promotion); stale-vs-fresh parity locked in tests. |
 | 4.28.34 → 4.28.35 | 2026-07-27-1024 | OTA | IDENTITY TAIL (snapshot-audit batch D): ~25 remaining sites canonical (sections, throwable cluster, sigils, tools, substitution, digging, racial gear, faction catalysts, rope/treat/torch/barehand/food/repair-perk) + fused-kind load guard + CHA stat-channel heal + exact-ingredient substitution exclusion. |
+| 4.28.35 → 4.28.36 | 2026-07-27-1025 | OTA | GUARD-RAILS (snapshot-audit batch E, closes the audit): catalog-name ratchet (snapshot + script + build-failing lock on unmigrated removals), orphan-safe ABANDON, def-resolving contract count, staged-record turn-in gate, loud location fallback, canonical deep-link/relic-perk/trade-away. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

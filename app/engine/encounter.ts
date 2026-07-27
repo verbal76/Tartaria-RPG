@@ -437,7 +437,15 @@ export function getLocationById(id: string): Location {
   // silently falling back to locations[0].
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { allKnownLocations } = require('./worldMap') as typeof import('./worldMap');
-  return allKnownLocations().find((l) => l.id === id) ?? locations[0]!;
+  const known = allKnownLocations().find((l) => l.id === id);
+  if (!known) {
+    // OTA-1025 — a persisted id that no longer resolves silently rendered
+    // locations[0] while the grid math used a hash-phantom cell. Make it loud
+    // so a future rename/removal is caught in the first playtest log.
+    // eslint-disable-next-line no-console
+    console.warn(`getLocationById: unknown id '${id}' — falling back to '${locations[0]!.id}'`);
+  }
+  return known ?? locations[0]!;
 }
 
 // ---------------------------------------------------------------------------

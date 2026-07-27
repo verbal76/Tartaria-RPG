@@ -215,6 +215,7 @@ import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
 import { applyLegacyItemRenames } from '../engine/itemMigrations';
+import { categorizeItem } from '../components/InventoryCategorize';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
 import { leaveEmptyWaterBottle } from '../engine/waterBottle';
 import { consumeVerb } from '../engine/consumeVerb';
@@ -19955,7 +19956,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // arb45 — Relic Trader perk: sharper coin when bartering relics.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const tPerksSell = require('../engine/titles').titlePerkModifiers(player);
-    const isRelicTrade = item.kind === 'relic';
+    const isRelicTrade = canonicalItemKind(item) === 'relic';
     const multiplied = (isRelicTrade && tPerksSell.tradeBonus > 0)
       ? Math.round(basePrice * (1 + 0.05 * tPerksSell.tradeBonus))
       : basePrice;
@@ -20875,7 +20876,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-456 — the agent name shown in the flow. Remote turn-ins have no vendor
     // present, so a "runner" stands in.
     const sourceLabel = turnSourceName ?? 'A runner';
-    const active = player.activeFactionQuestIds ?? [];
+    // OTA-1025 — the STAGED records are the truth; the legacy id mirror alone
+    // refused READY contracts whenever a path wrote only the records.
+    const active = Array.from(new Set([
+      ...(player.activeFactionQuestIds ?? []),
+      ...(player.activeFactionQuests ?? []).map((q) => q.id),
+    ]));
     // Direct id, then fuzzy title across active list.
     const direct = findFactionQuestById(titleOrId);
     const candidate = direct ?? fuzzyFindFactionQuest(
@@ -22173,36 +22179,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (kind === 'hunt') {
       const def = findHuntById(id);
       const rec = (player.activeHunts ?? []).find((h) => h.id === id);
-      if (!def || !rec) return;
+      // OTA-1025 — a record whose def was RETIRED must still be droppable (the
+      // ABANDON button was a silent no-op on an orphan — a permanent slate entry).
+      if (!rec) return;
       set((s) => (s.player ? {
         player: {
           ...s.player,
           activeHunts: (s.player.activeHunts ?? []).filter((h) => h.id !== id),
         },
       } : s));
-      get().appendLog('world', `You set ${theLower(def.title)} aside. The poster goes back in the pack, edge-creased.`);
+      get().appendLog('world', `You set ${def ? theLower(def.title) : 'the hunt'} aside. The poster goes back in the pack, edge-creased.`);
     } else if (kind === 'mystery') {
       const def = findMysteryById(id);
       const rec = (player.activeMysteries ?? []).find((m) => m.id === id);
-      if (!def || !rec) return;
+      if (!rec) return;
       set((s) => (s.player ? {
         player: {
           ...s.player,
           activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== id),
         },
       } : s));
-      get().appendLog('world', `You let ${theLower(def.title)} go. Some questions Tartaria keeps.`);
+      get().appendLog('world', `You let ${def ? theLower(def.title) : 'the mystery'} go. Some questions Tartaria keeps.`);
     } else if (kind === 'storyline') {
       const def = findStorylineById(id);
       const rec = (player.activeStorylines ?? []).find((s) => s.id === id);
-      if (!def || !rec) return;
+      if (!rec) return;
       set((s) => (s.player ? {
         player: {
           ...s.player,
           activeStorylines: (s.player.activeStorylines ?? []).filter((q) => q.id !== id),
         },
       } : s));
-      get().appendLog('world', `You step away from ${theLower(def.title)} chapter. The Arbiter doesn't argue.`);
+      get().appendLog('world', `You step away from ${def ? theLower(def.title) : 'the'} chapter. The Arbiter doesn't argue.`);
     } else if (kind === 'whisper') {
       const rec = (player.activeWhispers ?? []).find((w) => w.id === id);
       if (!rec) return;
@@ -22224,7 +22232,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       const def = findFactionQuestById(id);
       const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
-      if (!def || !rec) return;
+      if (!rec) return;
       set((s) => (s.player ? {
         player: {
           ...s.player,
@@ -22234,7 +22242,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           routedMission: s.player.routedMission?.id === id ? null : s.player.routedMission,
         },
       } : s));
-      get().appendLog('world', `You hand ${theLower(def.title)} contract back to the wind. The Arbiter shrugs.`);
+      get().appendLog('world', `You hand ${def ? theLower(def.title) : 'the'} contract back to the wind. The Arbiter shrugs.`);
     }
     void get().persist();
   },
@@ -26158,7 +26166,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // section) so the screen unfolds that row on arrival, AND the instance id so
         // the screen scrolls to + briefly highlights the exact piece (a forged weapon
         // can sort anywhere in a long list, so expanding the section isn't enough).
-        cta: { label: 'View in inventory', screen: 'inventory', inventoryCategory: item.kind, inventoryItemId: itemId },
+        cta: { label: 'View in inventory', screen: 'inventory', inventoryCategory: categorizeItem(item), inventoryItemId: itemId },
       },
     });
     void get().persist();
@@ -33937,10 +33945,10 @@ function triggerPuppyVendor(
   // Pick a Common-rarity, non-equipped, non-weapon/armor item.
   const candidates = player.inventory.filter(
     (i) =>
-      i.rarity === 'Common' &&
+      canonicalItemRarity(i) === 'Common' &&
       i.quantity >= 1 &&
-      i.kind !== 'weapon' &&
-      i.kind !== 'armor' &&
+      canonicalItemKind(i) !== 'weapon' &&
+      canonicalItemKind(i) !== 'armor' &&
       i.id !== player.equipped?.mainId &&
       i.id !== player.equipped?.offId &&
       i.id !== player.equipped?.chestId &&

@@ -307,6 +307,12 @@ all one of these shapes:
   synthetic item misses, and `ARMOR_SLOTS` excludes `amulet`.
 - **Full gates before every push** (§3) in BOTH worktrees; push-per-OTA;
   `DISPLAY_VERSION` PATCH +1 every OTA; parity per §4.
+- **RENAME POLICY (binding, OTA-1025):** never rename or remove a catalog item
+  name (or content id) without a `LEGACY_ITEM_RENAMES` entry in the SAME OTA,
+  and refresh `catalog-names.snapshot.json` (`node scripts/
+  update-catalog-name-snapshot.mjs`) in the same commit as any content add.
+  The ota1025 ratchet test fails the build on an unmigrated removal — that is
+  the lock that makes the Boltcaster class of silent loss unrepeatable.
 
 ### E. Self-audit before declaring done (the 60-second gate)
 
@@ -786,7 +792,7 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.35**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.36**; ledger in `VERSION.md`.
 
 - **THE SNAPSHOT AUDIT, BATCH A — RESTITUTION (2026-07-27, latest).** HAL **1021** / golem **998**.
   Owner approved all five batches (A–E) from the 3-agent stale-snapshot sweep (~50 verified sites;
@@ -825,9 +831,20 @@ re-architecture. Currently **4.28.35**; ledger in `VERSION.md`.
   catalog's stat. canonicalItemTags hardened for nameless shims. Fixture retargets:
   inventorySnapshot (Sentinel Core Plate IS a catalog throwable — equips hands, never chest),
   sigilTurnIn (nameless negative shim gets a name).
-  REMAINING: batch E (guard-rails + rename policy + catalog-name ratchet + kind-routing tail:
-  use/eat handlers, itemWeight, parseValidator, CTA deep-link, trade-away filter, relic-trade
-  perk, display rarity labels/stripes/sorts).
+  **BATCH E SHIPPED — THE AUDIT IS CLOSED** (HAL 1025 / golem 1002): THE CATALOG-NAME RATCHET —
+  `catalog-names.snapshot.json` (committed, 9 catalogs) + `scripts/update-catalog-name-snapshot.mjs`
+  + a lock test: any name leaving the catalogs WITHOUT a LEGACY_ITEM_RENAMES entry fails the build
+  (refresh the snapshot in the same commit as content adds). RENAME POLICY (binding): never
+  rename/remove a catalog name or content id without a migration entry in the SAME OTA — see
+  §3a-D. Also: abandonContract orphan-safe (all 4 def-gated kinds droppable + honest fallback
+  titles), Contracts header counts only def-resolving records, faction turn-in reads the staged-
+  record union, getLocationById fallback is LOUD, CTA deep-link files via categorizeItem,
+  Relic-Trader perk + trade-away filter canonical.
+  ACCEPTED RESIDUALS (display/latent, documented): rarity label+stripe+sort read the instance
+  snapshot; itemWeight/parseValidator kind fallbacks (name regexes cover first); use/eat handler
+  kind routing (visibility gate already name-canonical); hubRoomId has no removed-room guard (no
+  hub room ever removed); worldMemory name-keyed ledgers have no rename remap (no enemy/location
+  rename has ever shipped — the ratchet pattern is the template if one ever does).
 
 - **EVERY COATING RACKS (2026-07-27).** HAL **1020** / golem **997**. Owner: "there were
   coatings that I couldn't load into my bandolier." Root cause CATEGORY: identity-by-instance-tag-
