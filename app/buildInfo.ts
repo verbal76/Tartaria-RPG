@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.37';
+export const DISPLAY_VERSION = '4.28.38';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17604,4 +17604,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // lookup (identical semantics incl. inferred-row fallbacks; catalogs are
 // static per process). Probe: kill beat 281ms -> baseline ~25ms in the
 // harness; on-device the freeze collapses proportionally.
-export const OTA_BUILD_ID = '2026-07-27-1003-killbeat-freeze-fixed';
+// OTA-1004 — THE CRAFT SCREEN STOPS STALLING (owner: opening CRAFT took
+// seconds; each repairs-tab tap was "tap, wait 20 seconds, stutter"). Root
+// cause was PRE-EXISTING (not the audit batches — bisect-proven ~900ms both
+// before and after): ingredientShortfall annotated the ENTIRE inventory
+// (canonical tags + substitutability + catalog lookups) PER RECIPE, and the
+// craft badge runs it for all 130 recipes on every open AND on every
+// inventory change — each repair tap re-paid the whole bill. Fix: a WeakMap
+// annotation cache keyed on the immutable inventory array (self-invalidates
+// on any change); per-recipe allocation copies only the qty. Harness:
+// 900ms -> ~15ms. BONUS parity fix: canCraft's shortfall now carries the
+// same exact-ingredient substitution exclusion the preview/drain loops
+// gained, so approve and drain can never disagree (the OTA-613 hazard).
+export const OTA_BUILD_ID = '2026-07-27-1004-craftscreen-stall-fixed';

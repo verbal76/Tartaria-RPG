@@ -845,9 +845,15 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.37**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.38**; ledger in `VERSION.md`.
 
-- **THE KILL-BEAT FREEZE (2026-07-27, latest).** HAL **1026** / golem **1003**. Owner: the final
+- **THE CRAFT-SCREEN STALL (2026-07-27, latest).** HAL **1027** / golem **1004**. Pre-existing
+  (bisect-proven): ingredientShortfall annotated the whole inventory PER RECIPE; the craft badge
+  runs 130 recipes per open and per inventory change — seconds per repairs-tab tap on device.
+  Fix: SHORTFALL_META WeakMap on the immutable inventory array; 900ms → 3-23ms. Plus canCraft
+  gains the exact-ingredient exclusion parity with preview/drain.
+
+- **THE KILL-BEAT FREEZE (2026-07-27).** HAL **1026** / golem **1003**. Owner: the final
   blow hung "resolving" 7-8s — kills only. Root cause: the snapshot-audit batches' canonical
   helpers were uncached linear catalog scans, multiplied by the kill path's inventory loops into a
   blocked JS thread (kills touch inventory; ordinary rolls don't). Bisect-proven (22ms pre-audit →
