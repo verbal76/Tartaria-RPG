@@ -659,8 +659,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-27-1012`**,
-**golem-line `2026-07-27-989`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-27-1016`**,
+**golem-line `2026-07-27-993`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -669,7 +669,29 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.23**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.27**; ledger in `VERSION.md`.
+
+- **THE STUDS-DOWN TEARDOWN (2026-07-27, latest).** HAL **1013–1016** / golem **990–993**. Owner:
+  "take all of opus fixes down to the studs and verify root cause and proper implementation of new
+  systems." Five parallel read-only audits re-derived every OTA-992..1004 claimed root cause against
+  PRE-fix code (git-archaeology, not summaries), verified all 13 golem ports patch-identical, and
+  adversarially probed the seams. 13 OTAs: **5 held clean** (992 version tracker, 999 stealth, 1001
+  healing core, 993-E escort board filter, 1003 mechanics), **8 had defects** (~30 findings), all
+  verified by hand before fixing. Shipped in three batches — 1014 exploits+spawns, 1015
+  contracts+toasts, 1016 input+world (see VERSION.md row + buildInfo for the full inventories).
+  **DOCUMENTED RESIDUALS (known, deliberate, or deferred):**
+  • Whisper/lead/broker are AMBIENT-TIER — exempt from single-active by design, test-locked.
+  • A revenant killed for its gear drops non-catalog (fused/synthesized) names as Legendary misc
+    TROPHIES, not equippables — real fix needs gear SNAPSHOTS on the FallenHero record (feature).
+  • The pre-998 seeded revenant kit is stable per BUILD, not per install — a Rare+ catalog edit
+    reshuffles old fallen's gear.
+  • worldMemory.sceneWeather is a single slot — leave-and-return within 6 game-hours re-rolls the
+    origin's sky (a per-location map is the upgrade if it ever bites on device).
+  • itemPreview's "Restores: +N HP" shows the flat catalog value (under-promises vs the scaled Use
+    button on the same screen).
+  • Hollowed door-1 has no per-tile rolled-bank (re-rollable on ground revisited after 50 tiles) and
+    the hpMax>=60 gate admits ~0.25% of fresh Giants; markAvenged's disk write is optimistic;
+    continueHook lacks an in-combat guard (latent, no repro).
 
 - **THE TRUST BATCH + ROOT-CAUSE AUDIT (2026-07-27, later).** HAL **1008–1012** / golem **985–989**.
   • **1008/985** — the voice-crash counter is scoped to the BUILD that produced it (stamped with
