@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.15';
+export const DISPLAY_VERSION = '4.28.16';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18326,4 +18326,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // two beats calls the SAME revenant from the SAME un-avenged pool through a new
 // spawn_fallen_revenant hook effect; an install with nothing un-avenged reads as a cold trail.
 // DISPLAY_VERSION 4.28.15. 4 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-26-1004-hollowed-rumor';
+// OTA-1005 (the curio valve). Owner asked why the Fusing Crucible was built; the notes
+// answered it: OTA-193/194/195, from the owner's own challenge — "we are generating an endless
+// stream of items that will never have a real use." The Crucible exists to give catalog-ABSENT
+// "inferred" junk a destiny, and inferred-only is the FEATURE (owner: "burning junk devalues the
+// fuse crucible"). But two later cleanups starved it: arb61 filtered salvage output down to
+// materials.json names — all catalog items — so salvage produced ZERO fuel, structurally; and the
+// standing inferred-stats BACKFILL practice kept converting the remainder into catalog rows. A
+// device session salvaging for hours yielded ONE fusable item. Fix at the single salvage choke
+// point (rollSalvagePool): a new 50-name curio pool, deliberately catalog-absent and spanning all
+// seven material families, drops at CURIO_CHANCE = 18% (owner's number) IN PLACE of the material
+// that would have dropped. `salvage all` calls that function once per noun, so all ten things roll
+// independently. Measured: 18.0%, ~1.8 curios per ten-noun sweep. The suite LOCKS the drain shut —
+// if a curio ever gains a catalog row, it goes red. DISPLAY_VERSION 4.28.16. 8 tests. -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-27-1005-curio-valve';

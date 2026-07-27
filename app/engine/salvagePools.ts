@@ -11,6 +11,7 @@
 
 import type { Rarity } from './types';
 import materialsData from '../data/items/materials.json';
+import curiosData from '../data/relics/curios.json';
 
 // arb61 — salvage yields MATERIALS ONLY (player verb-economy: take = gear,
 // salvage = materials, investigate = clues/hooks). The hand-authored pools
@@ -311,6 +312,30 @@ const POOLS: SalvagePool[] = [
 // still return that kind, and the gameStore salvage handler at
 // :3878 unions both outcomes via the shared kind discriminator.
 
+// OTA-1005 — CURIOS: the Fusing Crucible's fuel. Catalog-ABSENT names (that absence
+// is what makes them inferred, and inferred is the only thing the Crucible
+// accepts). Salvage rolls one instead of a catalog material CURIO_CHANCE of the
+// time. Because the bulk `salvage all` path calls rollSalvagePool ONCE PER NOUN,
+// every item in a ten-noun sweep gets its own independent roll — the owner's
+// ask: "if there's 10 things that I'm salvaging all then all 10 things should
+// have a random chance to drop inferred items."
+//
+// KNOB: 18% (owner's number). Each curio roll REPLACES a catalog material that
+// would have fed crafting/repair, so this is the dial between the two economies
+// — raise it if fusion still feels gated, lower it if repair starts pinching.
+const CURIO_CHANCE = 0.18;
+const CURIOS = (curiosData as { curios: { name: string; rarity: string }[] }).curios;
+
+// The curio's own flavor — it should read as an oddity, not as stock material,
+// so the player can feel the difference between "this feeds the forge" and
+// "this feeds a recipe".
+const CURIO_LINES = [
+  'You lever something loose from {target} — not standard salvage. Odd enough that the Crucible would know what to do with it.',
+  'Tucked inside {target}: an oddment that matches no quartermaster\'s list. The kind of thing that fuses well.',
+  'You work {target} apart and come away with a curiosity — no catalog name, but real weight in the hand.',
+  '{target} gives up something irregular. Nobody authored this piece; the forge will take it all the same.',
+];
+
 const MATERIAL_LINES = [
   'You strip {target} carefully. Something usable comes free in your hand.',
   'You break {target} apart. Among the pieces, something worth keeping.',
@@ -433,6 +458,25 @@ export function rollSalvagePool(noun: string, rng: () => number = Math.random): 
       rarity: junk.rarity,
       quantity: 1,
       line,
+    };
+  }
+  // OTA-1005 — the CURIO VALVE (see CURIO_CHANCE). Rolled AFTER the nothing-branch
+  // (that one is the failure path) and BEFORE the ordinary material pick, so a
+  // curio REPLACES the material you would otherwise have got — the take per
+  // salvage is unchanged, only its nature. Effective rate is CURIO_CHANCE of
+  // the YIELDING rolls, ~17% of all salvages once the 5% consolation path is
+  // excluded. The ordering also keeps the existing constant-rng suites honest:
+  // they drive this function with a fixed LOW rng to force the consolation
+  // branch, and a curio roll placed first would intercept them.
+  if (rng() < CURIO_CHANCE) {
+    const curio = CURIOS[Math.floor(rng() * CURIOS.length)]!;
+    return {
+      kind: 'material',
+      poolId: 'curio',
+      itemName: curio.name,
+      rarity: (curio.rarity as Rarity) ?? 'Common',
+      quantity: 1,
+      line: format(CURIO_LINES, noun, rng),
     };
   }
   // arb61 — restrict to true materials; fall back to the all-material junk
