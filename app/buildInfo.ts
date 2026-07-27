@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.26';
+export const DISPLAY_VERSION = '4.28.27';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18532,4 +18532,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // gear on"). The OTA-994 lock test is HARDENED: it was green over eight live offenders because its
 // filter required the exact `(now ${` shape on one line; it now pins the helper's statNowClause
 // routing and bans the raw X->Y form. DISPLAY_VERSION 4.28.26. 8 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-27-1015-studsdown-contracts';
+// OTA-1016 (studs-down corrections, batch 3: input + world). (1) The qwen typo-repair guard was
+// INERT in its most dangerous cases — the parser's unknown-exits carry no resolvedNoun, so a
+// fabricated non-'wait' action ("attack the vendor" from garbled input) dispatched clean; and the
+// whole-string containment REJECTED honest repairs ("Aetheric Torch" resolved vs "use the torch").
+// Now word-level in both directions: a repair must keep a significant word of the resolved noun, or
+// — with no noun — share a significant word (exact/containment/one-typo) with what the player TYPED.
+// (2) The scenery-attack refusal classified by a single /^ranged$/ tag — all 55 runecasters (same
+// reach as ranged, no tag) and every throwable read "arm's reach ... your blade"; bare hands read
+// "your blade"; melee+ranged dual-wield narrated a shot for a sword swing. Now classified by
+// reachClassFor (the resolver combat itself uses, tag-aware), the typed VERB wins on disagreement,
+// and empty hands answer with fists. (3) routeMission and the bounty board start courses from
+// INDOORS with no gate — the surviving hubRoomId re-attached the departure room to the ARRIVAL
+// outpost ("you pass through the gate into <new outpost> — Workshop", the stale-room #112 named);
+// setTravelCourse (the choke point every caller shares) now clears hubRoomId/activeBuildingId.
+// (4) Offer rotation re-keyed on PITCHES (worldMemory.offerPitchSeq): macroVisitSeq keying phase-
+// locked any vendor on a ≡0 (mod 4) circuit to the same two categories forever, world-wide; the ×2
+// step makes consecutive pitches cover all four (the old +1 walk covered three while claiming two-
+// stop coverage — its own test asserted union=3 under a name claiming 2); NaN-guarded. (5) Weather
+// locale bias reads the location's TAGS (31 of 36 locations had an unbiased sky; the frost row
+// matched NOTHING — Yuldra-Tul's frost lives in tags) and the short-word rows are word-anchored.
+// (6) Dog heals agree: 'feed dog' healed FLAT while 'Feed Max' scaled by the PLAYER's hpMax — both
+// now scale by the DOG's own frame. (7) Great-climb precedence in isClimbable requires the noun to
+// BE the landmark (exact authored noun): the token match made the three purchasable Skyreacher Maps
+// climbable paper (#113 reopened through its own fix); the Great Fang of Zharak still climbs; the
+// curly-apostrophe hole in the catalog exclusion is closed. DISPLAY_VERSION 4.28.27. 13 tests.
+// Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-27-1016-studsdown-inputworld';

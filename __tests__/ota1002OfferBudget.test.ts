@@ -29,8 +29,12 @@ describe('OTA-1002 — offer budget + all_or_nothing rep floors', () => {
       path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'),
       'utf8',
     );
-    // The rotation exists once, keyed on macroVisitSeq.
-    expect(src).toMatch(/offerRot = \(player\.macroVisitSeq \?\? 0\) % 4/);
+    // OTA-1016 — the rotation is keyed on PITCHES (offerPitchSeq), not travel:
+    // macroVisitSeq keying phase-locked any vendor on a 4-hop circuit to the
+    // same two categories forever. The x2 step makes two consecutive pitches
+    // cover all four categories, honestly this time.
+    expect(src).toMatch(/offerRot = \(pitchSeq \* 2\) % 4/);
+    expect(src).toContain('offerPitchSeq: pitchSeq + 1');
     // Each of the four offer pools is wrapped in the budget…
     expect(src).toContain("offerAllowed.has('fq') && pool.length > 0");
     expect(src).toContain("offerAllowed.has('hunt') && huntPool.length > 0");
@@ -49,12 +53,15 @@ describe('OTA-1002 — offer budget + all_or_nothing rep floors', () => {
   it('the rotation covers every category within two consecutive visits', () => {
     const cats = ['fq', 'hunt', 'mystery', 'storyline'];
     for (let seq = 0; seq < 8; seq++) {
-      const rot = seq % 4;
+      const rot = (seq * 2) % 4;
+      const nextRot = ((seq + 1) * 2) % 4;
       const now = new Set([cats[rot]!, cats[(rot + 1) % 4]!]);
-      const next = new Set([cats[(rot + 1) % 4]!, cats[(rot + 2) % 4]!]);
+      const next = new Set([cats[nextRot]!, cats[(nextRot + 1) % 4]!]);
       expect(now.size).toBe(2);
       const union = new Set([...now, ...next]);
-      expect(union.size).toBe(3); // walks one step — fresh category every visit
+      // OTA-1016 — the old +1 walk covered only 3-of-4 here while this very test's
+      // NAME claimed two-visit coverage. The x2 step delivers all four.
+      expect(union.size).toBe(4);
     }
   });
 });
