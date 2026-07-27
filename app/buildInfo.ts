@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.23';
+export const DISPLAY_VERSION = '4.28.24';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17446,4 +17446,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // alias/typo tiers, with the base-name carve-out ("Nimari" in "Red Tower of Nimari") preserved.
 // Both fixes source-locked. DISPLAY_VERSION 4.28.23. 7 tests. Gameplay -> HAL + golem; golem port
 // of HAL OTA-1012.
-export const OTA_BUILD_ID = '2026-07-27-989-audit-fixes';
+// OTA-990 (extended audit: the full Opus span, HAL 992-1004 / golem 969-981). The owner asked
+// whether the 12-hour audit had covered ALL of the session's OTAs — it had not; the 13 earlier OTAs
+// fell outside the window. EXTENDED AUDIT: all 13 port patches verified line-identical across both
+// lines (delta 0 modulo OTA numbers); sigil-vs-curio ordering in rollSalvagePool SAFE (sigil branch
+// first); stealth near-miss cannot double-award; scaledHealHP bands verified. ONE REAL DEFECT: the
+// OTA-974 portability fix exempts exact CATALOG items from the substance-word ban, but OTA-982's
+// curios are deliberately catalog-absent — the Mud-Frosted Bead (word "mud") could be salvaged into
+// the pack yet REFUSED on re-pickup once dropped. Fix at the same choke point: isExactCatalogItem now
+// consults the curio roster too; category-locked by a roster-sweeping test; real substances still
+// refuse. DISPLAY_VERSION 4.28.24. 3 tests. Gameplay -> HAL + golem; golem port of HAL OTA-1013.
+export const OTA_BUILD_ID = '2026-07-27-990-curio-portability';
