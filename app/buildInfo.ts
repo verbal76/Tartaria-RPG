@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.19';
+export const DISPLAY_VERSION = '4.28.20';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17371,4 +17371,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (shouldAttemptBundledTTS is an unconditional `return true`) and known to over-count, so clearing it
 // forgives nothing and re-enables nothing. DISPLAY_VERSION 4.28.19. 8 tests. -> HAL + golem;
 // golem port of HAL OTA-1008.
-export const OTA_BUILD_ID = '2026-07-27-985-voice-count-build-scope';
+// OTA-986 (charisma is not a to-hit stat). From the device log: `attack with the off-hand mud
+// executioner's blade` -> "You — d20 -> 8 + CHA 9". A SWORD swinging on the SOCIAL stat. ROOT CAUSE,
+// and it is DATA not code: attackStatFor() cannot return charisma at all, but it is only consulted
+// when NO weapon is held — with one equipped the roll uses `equipped.stat` from the catalog row, and
+// the catalog assigned that field BY GRIP with the single_handed bucket set to charisma wholesale.
+// 37/37 single-handed melee and 5/5 single-handed ranged, zero exceptions: 42 weapons, 7 of them
+// LEGENDARY. For a STR-14 / CHA-9 character that is a silent -5 to hit on every one-handed weapon,
+// so the best one-handed gear in the game was quietly the worst. WHY IT SURVIVED AN EARLIER FIX: we
+// logged this exact symptom before ("melee blade rolls CHA") and patched a CODE path; the row was
+// never touched, so it came straight back — a band-aid on a data bug. THE REPLACEMENT STAT IS
+// DERIVED, NOT INVENTED: six weapons appear TWICE under different grips and only the single_handed
+// row was charisma (Giant Bone Spear strength / (Single) charisma; Plasma Pistol dexterity /
+// (Single) charisma; Energy Blade (Legendary) dexterity / Energy Blade charisma; and three more).
+// Those twins are the intent, and the owner chose to match them: heavy one-handers (blade/axe/
+// hammer/spear) -> STRENGTH like the two-handed rows of their own family; knives, batons, rods and
+// thrown pieces -> DEXTERITY like the dual-wield rows of theirs; one-handed pistols -> DEXTERITY like
+// the Plasma Pistol they vary. Untouched grips verified unchanged (two-handed still STR, dual-wield
+// still DEX). Two authored non-charisma exceptions are named and preserved, not swept up: the Order
+// Letter-Opener (a scholar's tool, INT) and the Golem Aether-Lance (channels, INT). CATEGORY LOCKED
+// two ways — a suite that fails if ANY catalog weapon carries charisma, and a runtime backstop
+// (isValidAttackStat) so a bad row falls back to the weapon-class default instead of being obeyed.
+// DISPLAY_VERSION 4.28.20. 9 tests. Gameplay -> HAL + golem; golem port of HAL OTA-1009.
+export const OTA_BUILD_ID = '2026-07-27-986-onehand-tohit-stat';
