@@ -307,6 +307,11 @@ all one of these shapes:
   synthetic item misses, and `ARMOR_SLOTS` excludes `amulet`.
 - **Full gates before every push** (§3) in BOTH worktrees; push-per-OTA;
   `DISPLAY_VERSION` PATCH +1 every OTA; parity per §4.
+- **RENAME POLICY (binding, OTA-1002):** never rename or remove a catalog item
+  name (or content id) without a `LEGACY_ITEM_RENAMES` entry in the SAME OTA,
+  and refresh `catalog-names.snapshot.json` (`node scripts/
+  update-catalog-name-snapshot.mjs`) in the same commit as any content add.
+  The ota1002 ratchet test fails the build on an unmigrated removal.
 
 ### E. Self-audit before declaring done (the 60-second gate)
 
@@ -786,7 +791,7 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.35**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.36**; ledger in `VERSION.md`.
 
 - **THE SNAPSHOT AUDIT, BATCH A — RESTITUTION (2026-07-27, latest).** HAL **1021** / golem **998**.
   Owner approved all five batches (A–E) from the 3-agent stale-snapshot sweep (~50 verified sites;
@@ -814,7 +819,12 @@ re-architecture. Currently **4.28.35**; ledger in `VERSION.md`.
   exposed), digging, racial gear, faction catalysts, rope/treat/torch/barehand/food/repair-perk —
   all canonical; fused-kind load guard; CHA stat-channel heal; canonicalItemTags nameless-shim
   guard; inventorySnapshot + sigilTurnIn fixtures retargeted.
-  REMAINING: batch E (guard-rails + rename policy + catalog-name ratchet + kind-routing tail).
+  **BATCH E SHIPPED — THE AUDIT IS CLOSED** (HAL 1025 / golem 1002): THE CATALOG-NAME RATCHET
+  (snapshot + refresh script + build-failing lock on unmigrated removals), orphan-safe ABANDON,
+  def-resolving contract count, staged-record turn-in gate, loud location fallback, canonical
+  deep-link/relic-perk/trade-away. RENAME POLICY binding in §3a-D. Accepted residuals documented
+  (display-only rarity label/stripe/sort, itemWeight/parseValidator kind fallbacks, use/eat kind
+  routing, latent ledger renames).
 
 - **EVERY COATING RACKS (2026-07-27).** HAL **1020** / golem **997**. Owner: "there were
   coatings that I couldn't load into my bandolier." Root cause CATEGORY: identity-by-instance-tag-

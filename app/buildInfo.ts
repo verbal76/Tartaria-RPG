@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.35';
+export const DISPLAY_VERSION = '4.28.36';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17579,4 +17579,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // skips fused pieces (a fused armor named like a catalog weapon flipped to
 // 'weapon' every load), and pre-retarget CHA stat-channels on weapon
 // instanceStats re-point at the catalog's current stat.
-export const OTA_BUILD_ID = '2026-07-27-1001-identity-tail';
+// OTA-1002 — GUARD-RAILS (snapshot-audit batch E, the recurrence lock). (1) A
+// committed catalog-name SNAPSHOT + refresh script + lock test: a name that
+// leaves the catalogs without a LEGACY_ITEM_RENAMES entry now FAILS THE BUILD
+// — the Boltcaster class of loss can never ship again (HANDOFF §3a rename
+// policy). (2) abandonContract is orphan-safe: a record whose def was retired
+// is still droppable (was a silent no-op — a permanent slate entry). (3) The
+// Contracts header counts only records whose def resolves (agrees with the
+// cards). (4) The faction turn-in gate reads the STAGED records union, not
+// the legacy id mirror alone. (5) getLocationById's fallback is LOUD. (6) The
+// last routing reads canonical: the View-in-inventory deep-link files by
+// categorizeItem, the Relic-Trader perk and the trade-away filter read
+// canonical kind/rarity. Accepted residuals (display-only): rarity label/
+// stripe/sort read the instance; itemWeight/parseValidator kind fallbacks;
+// use/eat handler kind routing (visibility already name-canonical).
+export const OTA_BUILD_ID = '2026-07-27-1002-guardrails';

@@ -332,8 +332,14 @@ export function ContractsScreen() {
     (player.inventory ?? []).some((i) => i.name === name && (i.quantity ?? 1) > 0);
   const brokerReady = brokerLegs.length > 0 && brokerLegs.every((l) => hasRelic(l.itemName));
 
+  // OTA-1002 — count only records whose DEF still resolves: the cards filter
+  // orphans out, and the header must agree (never "6 ACTIVE" over 5 cards).
   const totalActive =
-    hunts.length + mysteries.length + storylines.length + factionQuests.length + whispers.length + leads.length
+    hunts.filter((h) => h.def).length
+    + mysteries.filter((m) => m.def).length
+    + storylines.filter((st) => st.def).length
+    + factionQuests.filter((q) => q.def).length
+    + whispers.length + leads.length
     + (brokerMission ? 1 : 0) + activeBounties.length;
 
   // Lifetime milestone counters — surfaced here so players have a single
