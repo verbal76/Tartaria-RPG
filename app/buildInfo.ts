@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.22';
+export const DISPLAY_VERSION = '4.28.23';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17432,4 +17432,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // article-added / alias / id forms plus a single-character deletion at every position and
 // substitutions, and assert the refusals still hold for non-places, sub-4-character scraps and
 // ambiguous near-misses. DISPLAY_VERSION 4.28.22. Gameplay -> HAL + golem; golem port of HAL OTA-1011.
-export const OTA_BUILD_ID = '2026-07-27-988-travel-by-name';
+// OTA-989 (the root-cause audit's own findings). Owner: "run a root cause analysis of all fixes
+// done in the last 12 hours ... thoroughly test everything." The audit re-verified all seven OTAs
+// (HAL 1005-1011 / golem 982-988): commit-for-commit parity across both lines confirmed (only
+// OTA-number comments differ), every claimed root cause re-checked against the code, fusion-made
+// weapons proven safe under the OTA-986 backstop (no to-hit stat -> class default). TWO REAL DEFECTS
+// FOUND — both introduced by this session's fixes, both the species those fixes hunt: a PROXY
+// standing in for the truth. (1) craftRecipeBatch judged success by TOTAL pack quantity; the Club
+// (1 Stick -> 1 Club) nets ZERO, read as refusal — one silent club, made === 0, no summary. Found by
+// sweeping all 130 recipes for consumed == produced. Fix: count the RESULT item itself. (2) OTA-988
+// preached "ambiguity refuses" but the partial-name tier kept shortest-name-wins: "travel to camp"
+// matched THREE real places and silently chose one. Fix: multiple partial owners refuse like the
+// alias/typo tiers, with the base-name carve-out ("Nimari" in "Red Tower of Nimari") preserved.
+// Both fixes source-locked. DISPLAY_VERSION 4.28.23. 7 tests. Gameplay -> HAL + golem; golem port
+// of HAL OTA-1012.
+export const OTA_BUILD_ID = '2026-07-27-989-audit-fixes';
