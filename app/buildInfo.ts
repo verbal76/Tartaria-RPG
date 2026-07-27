@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.23';
+export const DISPLAY_VERSION = '4.28.24';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18466,4 +18466,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the combined run (ota1006CraftQuantity, ota1011TravelByName) were re-run serially and pass — the
 // combined-run failures were jest parallel-load timeouts, not regressions. DISPLAY_VERSION 4.28.23.
 // 7 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-27-1012-audit-fixes';
+// OTA-1013 (extended audit: the full Opus span, 992-1004). The owner asked whether the 12-hour
+// audit had covered ALL of the session's OTAs — it had not: OTA-992..1004 (13 OTAs, 2026-07-26) fell
+// outside the window. EXTENDED AUDIT RESULTS: all 13 HAL commits verified against their golem ports
+// PATCH-FOR-PATCH (excluding buildInfo/tests, every port is line-identical modulo OTA numbers, delta
+// 0 on all 13); the file-level drift in gameStore/InventoryScreen predates the run (comment-only).
+// Adversarial probes: sigil-vs-curio ordering in rollSalvagePool SAFE (the OTA-1000 sigil branch runs
+// before the OTA-1005 curio roll, so a pried sigil can never become a curio); stealth near-miss
+// (OTA-999) cannot double-award on success (missBy <= 0 returns first); scaledHealHP (OTA-1001)
+// bands verified (nibble floor first, max() never heals below authored, hpMax guarded). ONE REAL
+// DEFECT: OTA-997 exempts exact CATALOG items from the substance-word portability ban, but OTA-1005's
+// curios are deliberately catalog-absent — the Mud-Frosted Bead (word "mud") could be salvaged into
+// the pack yet REFUSED on re-pickup once dropped. Fix at the same choke point: the curio roster is a
+// catalog too, so isExactCatalogItem now consults it — any future curio named with a substance word
+// is covered the day it is authored. Category-locked by a test sweeping the live roster; the ban
+// itself still refuses real substances ("wet mud", "fog bank"). DISPLAY_VERSION 4.28.24. 3 tests.
+// Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-27-1013-curio-portability';

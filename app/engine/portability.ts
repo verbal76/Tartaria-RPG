@@ -152,7 +152,24 @@ function isExactCatalogItem(lower: string): boolean {
       if (row && String(row.name).toLowerCase() === lower) return true;
     } catch { /* catalog unavailable — fall through to the rules */ }
   }
+  // OTA-1013 — the CURIO roster is a catalog too, just deliberately absent from the
+  // quartermaster's lists (that absence is what makes it Crucible fuel). Without
+  // this, a curio whose name carries a substance word fell through to the word
+  // ban: the Mud-Frosted Bead could be salvaged into the pack but never picked
+  // back up once dropped. Every curio is a pocket oddity by definition.
+  try {
+    if (curioNameSet().has(lower)) return true;
+  } catch { /* roster unavailable — fall through to the rules */ }
   return false;
+}
+
+let _curioNames: Set<string> | null = null;
+function curioNameSet(): Set<string> {
+  if (_curioNames) return _curioNames;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const data = require('../data/relics/curios.json') as { curios: { name: string }[] };
+  _curioNames = new Set(data.curios.map((c) => c.name.toLowerCase()));
+  return _curioNames;
 }
 
 function pickLine(lines: string[]): string {
