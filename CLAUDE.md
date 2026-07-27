@@ -34,6 +34,12 @@ For every bug report:
 4. **Lock the category shut** where practical: a regression test that fails
    if the pattern ever reappears (see `ota994StatToastLock`'s source-scan
    lock) and/or a ship-script grep guard.
+
+**Full step-by-step playbook** — bug-report intake, the exploit lens, how to
+build additions, and the ship-mechanics traps that burned prior sessions —
+is `HANDOFF.md` **§3a ROOT-CAUSE PLAYBOOK**. Work its checklists VERBATIM for
+every bug report, every fix, and every new system; run its §E self-audit
+before declaring anything done.
 5. **Report honestly** whether the fix is category-complete or has NAMED
    residuals — never imply category coverage that wasn't verified.
 
