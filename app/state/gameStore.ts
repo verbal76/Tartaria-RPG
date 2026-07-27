@@ -4061,6 +4061,11 @@ interface GameStore {
   fuseAtCrucible: () => Promise<void>;
   fusionPickerOpen: boolean;
   pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor' | 'dog_armor'; catalystId?: string } | null;
+  /** OTA — the Crucible refused, and says why. Rendered by FusionBlockedModal,
+   *  which HOLDS until dismissed so the player actually reads it (owner's ask).
+   *  Set only on the gate-fail path, which also closes the picker outright. */
+  fusionBlockedNotice: { title: string; body: string; hint?: string } | null;
+  clearFusionBlockedNotice: () => void;
   closeFusionPicker: () => void;
   confirmFusionSelection: (itemIds: string[], kind: 'weapon' | 'armor' | 'dog_armor', catalystId?: string) => void;
   /** OTA-873 — Crucible "Upgrade" mode. Spend exactly 5 reserved pieces to add a
@@ -4397,6 +4402,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   combatCues: null,
   aetherStatPickerOpen: false,
   fusionPickerOpen: false,
+  fusionBlockedNotice: null,
   pendingFusionSelection: null,
   pendingAetherFoodId: null,
   surgeCombatToken: null,
@@ -20164,6 +20170,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', `The Crucible costs ${COST} TC to fire; you have ${player.tc}.`);
       return;
     }
+    // OTA-984 — don't sell a fire that can't light. Pre-fix this charged the fee and
+    // THEN discovered the pack couldn't fuse, so the player paid for a dead menu.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const preFuse = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+      const eqIds = new Set(
+        Object.values(player.equipped ?? {}).filter((v): v is string => typeof v === 'string'),
+      );
+      const cat = preFuse.findFactionCatalyst(player.inventory, eqIds);
+      if (!preFuse.gateFusion(player.inventory, cat).ok) {
+        get().appendLog(
+          'arbiter',
+          `${scene.vendor.name} looks over your pack and shakes their head. "Nothing in there to work with. Come back when you've odd salvage to spare — I'll not take your coin for a cold bowl."`,
+        );
+        return;
+      }
+    }
     set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc - COST, fusionPending: true } } : s));
     get().appendLog('reward', `${scene.vendor.name} fires up a portable Crucible for you. (−${COST} TC)`);
     void get().fuseAtCrucible();
@@ -25441,24 +25464,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
           return;
         }
       }
-      // OTA-801 — fusion UX: if the player has reserved ANY eligible pieces (just
-      // not a passing set — too few, or too alike), OPEN THE PICKER instead of
-      // dead-ending on a refusal line. The picker surfaces each piece's material
-      // bucket + a live "N materials → need 3+ DIFFERENT" readout, so the player
-      // SEES what they have and what's missing and can fix it — rather than tapping
-      // FUSE again and again into the same arbiter refusal (the repeat-refusal
-      // spam). Only when NOTHING eligible is reserved do we fall back to the
-      // arbiter refusal (there's nothing to show).
-      const anyReserved = fusion.eligibleInputs(player.inventory).length > 0
-        || fusion.findFactionCatalyst(player.inventory, equippedIdSet);
-      if (anyReserved) {
-        set({ fusionPickerOpen: true });
-        return;
-      }
-      get().appendLog(
-        'arbiter',
-        `The Crucible hums, then cools. "${gate.reason ?? 'Not yet.'}"`,
+      // OTA-984 — SUPERSEDES OTA-801. That fix opened the picker on a FAILED gate so
+      // the player wouldn't hit a repeated refusal line; the cure was worse than
+      // the disease — a menu you cannot act in, emitting NOTHING to the log, read
+      // on device as "I'm fusing" for ten minutes. A Crucible that can't fire now
+      // says so plainly, holds the message until it's read, and closes.
+      const shortInputs = fusion.eligibleInputs(player.inventory);
+      const shortMats = Array.from(
+        new Set(shortInputs.flatMap((i: InventoryItem) => fusion.fusionMaterialTags(i) as string[])),
       );
+      const hasCat = !!fusion.findFactionCatalyst(player.inventory, equippedIdSet);
+      // Plain English — no "inferred", which is an engine word the player can't
+      // act on. The pieces the Crucible eats are odd salvage: the finds that
+      // carry no quartermaster's name.
+      let blockBody: string;
+      if (shortInputs.length === 0 && !hasCat) {
+        blockBody = "You haven't set anything aside for the forge. Odd salvage — the pieces that answer to no catalogue — can be saved for fusing from your pack.";
+      } else if (shortInputs.length < 3) {
+        blockBody = `The forge wants three pieces and you've set aside ${shortInputs.length}. Save more odd salvage for fusing.`;
+      } else {
+        blockBody = `The forge wants three DIFFERENT materials. Your ${shortInputs.length} pieces are all ${shortMats.join(' and ')}. Set aside something of another make — metal, bone, stone, cloth, wood, crystal.`;
+      }
+      set({
+        fusionPickerOpen: false,
+        pendingFusionSelection: null,
+        fusionBlockedNotice: {
+          title: 'The Crucible stays cold',
+          body: blockBody,
+          hint: 'Reserved pieces carry a ♥ in your pack.',
+        },
+      });
+      get().appendLog('arbiter', `The Crucible hums, then cools. "${blockBody}"`);
+      get().appendLog('debug', `fuse: refused pieces=${shortInputs.length} mats=[${shortMats.join(',')}] catalyst=${hasCat}`);
       return;
     }
     const sel = get().pendingFusionSelection;
@@ -25595,6 +25632,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   closeFusionPicker() { set({ fusionPickerOpen: false, pendingFusionSelection: null }); },
+
+  clearFusionBlockedNotice() { set({ fusionBlockedNotice: null }); },
 
   confirmFusionSelection(itemIds, kind, catalystId) {
     set({ pendingFusionSelection: { itemIds, kind, catalystId }, fusionPickerOpen: false });

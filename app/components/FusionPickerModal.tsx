@@ -1,4 +1,4 @@
-// OTA — Fusion picker. The Crucible used to consume the player's ENTIRE reserved
+// OTA-984 — Fusion picker. The Crucible used to consume the player's ENTIRE reserved
 // (♥) pool on one item. Now firing it opens this picker: choose 3–5 of your reserved
 // pieces, optionally add a reserved faction catalyst (separate theme slot), pick
 // whether to forge a WEAPON or ARMOR, then fuse — spending only what you selected.
@@ -92,9 +92,13 @@ export function FusionPickerModal() {
   const visibleScraps = visibleFusionInputs(scraps, picked, isUpgrade ? UPGRADE_PICK : MIN_PICK);
   const predicted = nMats >= 4 ? 'Legendary' : nMats >= 3 ? 'Rare' : null;
   // OTA-873 — upgrade needs EXACTLY 5; a normal forge needs 3–5.
+  // OTA-984 — ...AND the diversity rule the STORE enforces on confirm. Gating on
+  // count alone let the button light on three same-material pieces, which then
+  // bounced off gateFusion ("The Crucible cools") — a lit button that doesn't
+  // fuse. A lit FUSE now always fuses.
   const canFuse = isUpgrade
     ? picked.length === UPGRADE_PICK
-    : picked.length >= MIN_PICK && picked.length <= MAX_PICK;
+    : picked.length >= MIN_PICK && picked.length <= MAX_PICK && nMats >= 3;
 
   const reset = () => { setPicked([]); setCatalystId(null); setKind('weapon'); setStage('pick'); };
 

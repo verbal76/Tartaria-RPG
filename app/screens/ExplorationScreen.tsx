@@ -38,6 +38,7 @@ import { ApproachModal } from '../components/ApproachModal';
 import { PickpocketModal } from '../components/PickpocketModal';
 import { MissionBoardModal } from '../components/MissionBoardModal';
 import { FusionPickerModal } from '../components/FusionPickerModal';
+import { FusionBlockedModal } from '../components/FusionBlockedModal';
 import { ParleyModal } from '../components/ParleyModal';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
@@ -1583,6 +1584,7 @@ export function ExplorationScreen() {
       />
 
       <FusionPickerModal />
+      <FusionBlockedModal />
 
       {/* OTA-808 — the two-button parley chooser (self-mounts off pendingParley). */}
       <ParleyModal />

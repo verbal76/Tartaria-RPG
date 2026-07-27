@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.16';
+export const DISPLAY_VERSION = '4.28.17';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17325,4 +17325,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // that would have dropped. `salvage all` calls that function once per noun, so all ten things roll
 // independently. Measured: 18.0%, ~1.8 curios per ten-noun sweep. The suite LOCKS the drain shut —
 // if a curio ever gains a catalog row, it goes red. DISPLAY_VERSION 4.28.16. 8 tests. -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-27-982-curio-valve';
+// OTA-984 (the Crucible refuses out loud; golem port of HAL OTA-1007). Owner: "if you don't have enough to fuse,
+// don't let it have you still go through the menu ... I honestly thought I was fusing all those
+// things." ROOT CAUSE, and it was a band-aid we shipped: OTA-801 made a FAILED gate OPEN THE
+// PICKER anyway to dodge repeat-refusal spam. That swapped a visible annoyance for an invisible
+// one — a menu you cannot act in that logs NOTHING. Reproduced from the device log: three `fuse`
+// commands, one line each (the player's own echo), ten minutes of a dead FUSE button. This OTA
+// REMOVES the OTA-801 patch instead of layering on it. All three Crucible doors funnel through
+// fuseAtCrucible, so one choke point covers the category: the picker opens ONLY when a fusion is
+// genuinely possible; otherwise a modal names exactly what is short (plain English — the word
+// "inferred" is gone from player copy), HOLDS until dismissed, and the Crucible closes. Also: the
+// vendor's portable rig now checks BEFORE taking its 25 TC (was: pay, then get a dead menu), the
+// FUSE button gates on the real rule so a lit button always fuses, and the stale selection is
+// cleared on refusal. DISPLAY_VERSION 4.28.17. 7 tests. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-27-984-fuse-honesty';
