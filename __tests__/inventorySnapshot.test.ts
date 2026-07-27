@@ -159,8 +159,11 @@ describe('OTA-202 — buildInventorySnapshot', () => {
     };
     const out = buildInventorySnapshot(mkPlayer({ inventory: [plate] }));
     const acts = out.match(/Sentinel Core Plate[^\n]*\n[^\n]*actions:\s*([^\n]+)/)?.[1] ?? '';
-    expect(acts).not.toMatch(/equip:/);
-    expect(acts).not.toMatch(/use/);
+    expect(acts).not.toMatch(/equip:chest/);
+    // The Plate IS a catalog THROWABLE (materials.json carries the tag);
+    // canonical identity now offers the hand slots + off-hand throw. The
+    // original intent (never an ARMOR slot from the 'Plate' name) still holds.
+    expect(acts).toMatch(/equip:main/);
   });
 
   it('OTA-208 — Shaped Aetheric Shard surfaces equip:main/equip:off (it IS a weapon now)', () => {

@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.34';
+export const DISPLAY_VERSION = '4.28.35';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17566,4 +17566,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // while the name is catalog-ABSENT, so promoted parts shed the discount (a
 // union can add tags but never retire one). selfCrafted/fused/stolen stay
 // instance-read by design.
-export const OTA_BUILD_ID = '2026-07-27-1000-economy-canonical';
+// OTA-1001 — THE IDENTITY TAIL (snapshot-audit batch D, ~25 sites). Inventory
+// sections (coatings finally file under COATINGS; throwables/wardrobe/dog
+// gear canonical), the whole throwable cluster (equip routing, one-shot
+// ranged synth, consume-on-throw, reach bands, USE button — a stale Shard
+// swung bare-handed and was never consumed), sigils (visible + faction-typed
+// again), itemIsTool (pouch + TOOLS section), crafting material substitution
+// + shortfall, dig-tool scoring, racial gear conditions, faction-catalyst
+// cluster (incl. the un-themed-burn faction-id read), rope free-mend guard,
+// dog treats, torch/lantern detection, barehanded gauntlets, dog food heal,
+// ancient-repair perk — all canonical. PLUS two load heals: the kind heal now
+// skips fused pieces (a fused armor named like a catalog weapon flipped to
+// 'weapon' every load), and pre-retarget CHA stat-channels on weapon
+// instanceStats re-point at the catalog's current stat.
+export const OTA_BUILD_ID = '2026-07-27-1001-identity-tail';

@@ -65,7 +65,7 @@ export function isCoatableItem(item: Pick<InventoryItem, 'name' | 'kind' | 'uniq
   // construct smears/channels the substance however it strikes), so a coated golem
   // weapon can be the late-game armor-breaker for ANY golem kind — not just the
   // slashing/piercing ones the normal melee gate allows.
-  if ((item.tags ?? []).includes('golem_weapon')) return true;
+  if (canonicalItemTags(item).includes('golem_weapon')) return true;
   return isCoatableWeapon(item.name);
 }
 

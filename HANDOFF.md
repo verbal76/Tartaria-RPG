@@ -786,7 +786,7 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.34**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.35**; ledger in `VERSION.md`.
 
 - **THE SNAPSHOT AUDIT, BATCH A — RESTITUTION (2026-07-27, latest).** HAL **1021** / golem **998**.
   Owner approved all five batches (A–E) from the 3-agent stale-snapshot sweep (~50 verified sites;
@@ -809,7 +809,12 @@ re-architecture. Currently **4.28.34**; ledger in `VERSION.md`.
   scrap gate/yields, repair cost, golem substitute feeding (×3 call sites), coating-drink potency.
   'trophy' is catalog-AUTHORITATIVE (applies only while the name is catalog-ABSENT). golemCompanion
   fixture retargeted to a catalog-absent name. 8-test lock incl. stale-vs-fresh parity sweeps.
-  REMAINING: batches D (~25 identity sites), E (guard-rails + rename policy + catalog-name ratchet).
+  **BATCH D SHIPPED** (HAL 1024 / golem 1001): the identity TAIL (~25 sites) — sections, throwable
+  cluster, sigils, itemIsTool, crafting substitution (+ the exact-ingredient exclusion canonical
+  exposed), digging, racial gear, faction catalysts, rope/treat/torch/barehand/food/repair-perk —
+  all canonical; fused-kind load guard; CHA stat-channel heal; canonicalItemTags nameless-shim
+  guard; inventorySnapshot + sigilTurnIn fixtures retargeted.
+  REMAINING: batch E (guard-rails + rename policy + catalog-name ratchet + kind-routing tail).
 
 - **EVERY COATING RACKS (2026-07-27).** HAL **1020** / golem **997**. Owner: "there were
   coatings that I couldn't load into my bandolier." Root cause CATEGORY: identity-by-instance-tag-

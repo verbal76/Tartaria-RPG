@@ -145,10 +145,14 @@ export function detectACContexts(
   for (const slotItem of Object.values(equipped)) {
     if (!slotItem) continue;
     const item = player.inventory.find((i) => i.name === slotItem);
-    const tags = item?.tags ?? [];
+    // OTA-1001 — canonical: a stale equipped piece silently dropped its racial
+    // conditional bonus (the sheet implied protection combat didn't grant).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { canonicalItemKind: rmk, canonicalItemTags: rmt } = require('./crafting') as typeof import('./crafting');
+    const tags = item ? rmt(item) : [];
     if (tags.some((t) => /runic/i.test(t))) set.add('runic_gear');
     if (tags.some((t) => /aether/i.test(t))) set.add('aether_powers');
-    if (item?.kind === 'relic' && tags.some((t) => /armor|plate|chest|head|legs/i.test(t))) {
+    if (item && rmk(item) === 'relic' && tags.some((t) => /armor|plate|chest|head|legs/i.test(t))) {
       set.add('relic_armor');
     }
   }

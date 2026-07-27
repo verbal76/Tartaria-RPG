@@ -1,6 +1,7 @@
 import type { InventoryItem, EquipSlot, PlayerCharacter, Stats } from './types';
-import { findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
+import { canonicalItemKind, canonicalItemTags, findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
 import { isWeaponCoatingItem } from './weaponCoating';
+import { itemIsThrowable } from './bandolierEligibility';
 import { aggregateInventoryPassives, inventoryHasGate, isScanner, type EffectResolver, type GateKind, type ScannerBias } from './itemEffect';
 import { racialStatBonusesFor } from './raceMechanics';
 import { corruptionTierOf, corruptionStatPenalty } from './corruption';
@@ -16,7 +17,7 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   // equip-on-dog affordance instead. Returning [] here ensures the
   // generic "vest" regex below (which would otherwise route to
   // 'chest') doesn't grab them onto the player.
-  if (item.kind === 'dog_armor') return [];
+  if (canonicalItemKind(item) === 'dog_armor') return [];
   // OTA-496 — weapon-coating consumables (Poison Vial, Acid Flask, Searing Paste,
   // …) are APPLIED to a weapon via the "Coat a weapon" flow, never equipped. Guard
   // here so a coating never gets an equip slot — e.g. "Sea·RING· Paste" matched the
@@ -43,7 +44,7 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   // throw; treating them as ranged weapons lets the player equip,
   // attack, and the engine knows to throw + consume. UX matches the
   // player's mental model: "equip it, use it from combat, it's gone."
-  if ((item.tags ?? []).some((t) => /throwable/i.test(t))) {
+  if (itemIsThrowable(item)) {
     return ['main', 'off'];
   }
   // OTA 193 — exploration items with effect.kind='scanner' (Pulse
@@ -68,7 +69,7 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   // around the hips and thighs, so it displaces leg armor while worn. (Was the
   // cloak slot pre-OTA-911; moved to legs per the mountaineering rework so the
   // strap is worn like a climbing harness, not a mantle.)
-  if (item.tags?.some((t) => t.toLowerCase() === 'wardrobe')) {
+  if (canonicalItemTags(item).includes('wardrobe')) {
     return ['legs'];
   }
   const armor = findArmorByName(item.name);

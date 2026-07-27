@@ -528,7 +528,11 @@ export function previewSubstitutionsList(
     for (const item of inventory) {
       if (stillNeed <= 0) break;
       if (!isSubstitutable(item)) continue;
-      if (!(item.tags ?? []).some((t) => tagSet.has(t.toLowerCase()))) continue;
+      // OTA-1001 — an item that IS one of the recipe's exact ingredients never
+      // doubles as a tag substitute for another slot (canonical tags widened
+      // eligibility and exposed this: the recipe's own Stick fed the rock slot).
+      if (ingredients.some((ig) => ig.name.toLowerCase() === item.name.toLowerCase())) continue;
+      if (!canonicalItemTags(item).some((t) => tagSet.has(t))) continue;
       const alreadyTaken = consumed.get(item.id) ?? 0;
       const available = item.quantity - alreadyTaken;
       if (available <= 0) continue;
@@ -581,7 +585,9 @@ export function consumeIngredientsList(
       if (need <= 0) break;
       if (item.quantity <= 0) continue;
       if (!isSubstitutable(item)) continue;
-      if (!(item.tags ?? []).some((t) => tagSet.has(t.toLowerCase()))) continue;
+      // OTA-1001 — mirror of the preview loop's exact-ingredient exclusion.
+      if (ingredients.some((ig) => ig.name.toLowerCase() === item.name.toLowerCase())) continue;
+      if (!canonicalItemTags(item).some((t) => tagSet.has(t))) continue;
       const take = Math.min(item.quantity, need);
       item.quantity -= take;
       need -= take;
@@ -605,7 +611,7 @@ function ingredientShortfall(
 ): Array<{ name: string; quantity: number }> {
   const pool = inventory.map((i) => ({
     name: i.name.toLowerCase(),
-    tags: (i.tags ?? []).map((t) => t.toLowerCase()),
+    tags: canonicalItemTags(i),
     qty: i.quantity,
     sub: isSubstitutable(i),
   }));
@@ -933,6 +939,7 @@ export function findMaterialByName(name: string): CatalogMaterial | null {
  *  snapshot alone. Lowercased. Non-catalog names (fused gear) return own tags. */
 export function canonicalItemTags(item: { name: string; tags?: readonly string[] }): string[] {
   const own = (item.tags ?? []).map((t) => t.toLowerCase());
+  if (!item.name) return own;
   const row = findWeaponByName(item.name) ?? findArmorByName(item.name) ?? findGearByName(item.name)
     ?? findExplorationItemByName(item.name) ?? findMaterialByName(item.name)
     ?? findAmuletByName(item.name) ?? findRingByName(item.name) ?? findDogGearByName(item.name) ?? null;

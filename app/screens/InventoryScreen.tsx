@@ -13,9 +13,9 @@ import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isFusedInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
-import { isBandolierEligible } from '../engine/bandolierEligibility';
+import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
 import { isWeaponCoatingItem } from '../engine/weaponCoating';
-import { canonicalItemRarity } from '../engine/crafting';
+import { canonicalItemRarity, canonicalItemTags } from '../engine/crafting';
 import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
@@ -54,7 +54,7 @@ const INV_SORT_OPTIONS = [
 // only fuses non-catalog items) OR it's faction gear (a reservable catalyst).
 // Mirrors the eligibility gate in gameStore.toggleReserveForFusion exactly.
 function isFusionEligible(item: InventoryItem): boolean {
-  if ((item.tags ?? []).includes('faction_gear')) return true;
+  if (canonicalItemTags(item).includes('faction_gear')) return true;
   return isForgeReservableItem(item);
 }
 const RARITY_RANK: Record<string, number> = {
@@ -595,7 +595,7 @@ export function InventoryScreen() {
     // off-hand eligibility light up the USE button for throwables — otherwise a
     // regular weapon wrongly showed both "Use (off hand)" AND "Equip (Off hand)"
     // (player: "you don't use the weapon, you equip it").
-    const isThrowableItem = (pending.item.tags ?? []).some((t) => /^throwable$/i.test(t));
+    const isThrowableItem = itemIsThrowable(pending.item);
     const anySlotFree = pending.slots.some((s) => !equippedInSlots.includes(s));
     // OTA-214 — fix the redundant USE button on equip-only items.
     // Player ask: "I don't think you can have both equip and use on
@@ -918,7 +918,7 @@ export function InventoryScreen() {
     // arb105 — faction-gear items can ALSO be reserved, as a fusion
     // CATALYST: reserving one themes the next Crucible output into a
     // unique faction item (it doesn't count toward the 3-scrap gate).
-    const isFactionCatalyst = (pending.item.tags ?? []).includes('faction_gear');
+    const isFactionCatalyst = canonicalItemTags(pending.item).includes('faction_gear');
     // OTA-737 — show the reserve toggle when the item is forge-reservable (2a: no
     // weapons/armor; 1a: 'loot' reagents included) OR it's already reserved (so a
     // piece stranded by the new rule can still be released) OR it's a faction catalyst.
@@ -1020,9 +1020,9 @@ export function InventoryScreen() {
   // OTA-945 — fusion info block: for a fusable/reservable item, name the material it
   // contributes and how diversity drives output rarity (a common playtest question:
   // "does what I put in change the quality?" — yes: DIFFERENT materials, not rarity).
-  const fusionHint = pending && (isForgeReservableItem(pending.item) || (pending.item.tags ?? []).includes('faction_gear'))
+  const fusionHint = pending && (isForgeReservableItem(pending.item) || canonicalItemTags(pending.item).includes('faction_gear'))
     ? (() => {
-        if ((pending.item.tags ?? []).includes('faction_gear')) {
+        if (canonicalItemTags(pending.item).includes('faction_gear')) {
           return 'Fusion: a faction catalyst — themes the Crucible\'s output (a separate slot; doesn\'t count toward the 3–5 materials).';
         }
         const mats = fusionMaterialTags(pending.item);

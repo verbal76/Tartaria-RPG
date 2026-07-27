@@ -303,7 +303,10 @@ export function getEquippedWeapon(
   // consume-on-hit + auto-unequip is handled in gameStore's
   // attack path (look for the 'throwable' tag branch).
   for (const it of player.inventory) {
-    if (!(it.tags ?? []).some((t) => /throwable/i.test(t))) continue;
+    // OTA-1001 — canonical: a stale Shaped Aetheric Shard swung BARE-HANDED here
+    // while the consume-on-throw path spared it (asymmetric snapshot reads).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    if (!(require('./bandolierEligibility') as typeof import('./bandolierEligibility')).itemIsThrowable(it)) continue;
     if (it.name.toLowerCase() !== name.toLowerCase()) continue;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { throwDamageNotation } = require('./itemWeight');

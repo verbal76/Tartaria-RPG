@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { itemIsThrowable } from '../engine/bandolierEligibility';
 import {
   View,
   TextInput,
@@ -35,7 +36,7 @@ function bandsReachRange(
   if (!weaponName) return reachBandsFor('barehanded').includes(range);
   // A throwable inventory item equipped to a hand throws from 'far' inward.
   const throwInst = inventory.find(
-    (it) => it.name.toLowerCase() === weaponName.toLowerCase() && (it.tags ?? []).some((t) => /throwable/i.test(t)),
+    (it) => it.name.toLowerCase() === weaponName.toLowerCase() && itemIsThrowable(it),
   );
   if (throwInst) return reachBandsFor('throwable').includes(range);
   const w = resolveDisplayWeaponByName(weaponName, inventory);

@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { itemIsThrowable } from '../engine/bandolierEligibility';
+import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey } from '../state/gameStore';
@@ -402,7 +404,7 @@ export function ExplorationScreen() {
     // long/melee). A throwable inventory item reaches from 'far' inward.
     const w = mainName ? resolveDisplayWeaponByName(mainName, player?.inventory ?? []) : null;
     const throwInst = mainName
-      ? (player?.inventory ?? []).find((it) => it.name.toLowerCase() === mainName.toLowerCase() && (it.tags ?? []).some((t) => /throwable/i.test(t)))
+      ? (player?.inventory ?? []).find((it) => it.name.toLowerCase() === mainName.toLowerCase() && itemIsThrowable(it))
       : undefined;
     let canHit: boolean;
     if (throwInst) {
@@ -968,11 +970,11 @@ export function ExplorationScreen() {
             onOpenTake={() => { Keyboard.dismiss(); setTakeOpen(true); }}
             onOpenClimb={() => setClimbOpen(true)}
             onFuse={activeBuildingId === 'market' ? () => useGameStore.getState().submitPlayerAction('fuse') : undefined}
-            hasTorch={!!(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && (i.tags ?? []).includes('light') && i.quantity > 0)}
-            torchLabel={(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && (i.tags ?? []).includes('light') && i.quantity > 0)?.name?.toLowerCase()}
+            hasTorch={!!(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && canonicalItemTags(i).includes('light') && i.quantity > 0)}
+            torchLabel={(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && canonicalItemTags(i).includes('light') && i.quantity > 0)?.name?.toLowerCase()}
             torchReady={(currentScene?.hooks ?? []).some((h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged)}
             onOpenTorch={() => {
-              const torch = (player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && (i.tags ?? []).includes('light') && i.quantity > 0);
+              const torch = (player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && canonicalItemTags(i).includes('light') && i.quantity > 0);
               if (!torch) return;
               const chargeable = (currentScene?.hooks ?? []).filter((h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged);
               if (chargeable.length > 1) setTorchChooserOpen(true);
