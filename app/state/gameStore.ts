@@ -293,6 +293,7 @@ import { resolveLootItem } from '../engine/crafting';
 import { rollBossSpoils } from '../engine/bossLoot';
 import { enemyPowerScore } from '../engine/powerRating';
 import { levenshtein } from '../engine/editDistance';
+import { matchLocationByName } from '../engine/locationMatch';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
 import { classifyNoun, rollBreakLoot } from '../engine/sceneNounMaterial';
 import { isClimbable, isSwimmable, isSearchable } from '../engine/interactionTags';
@@ -12976,31 +12977,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // a substring hit. We now ONLY accept alias.includes(target),
         // and require target ≥ 3 chars so single-letter typos don't
         // brute-force a hit either.
-        let candidate = target
-          ? allLocations.find((l) =>
-              l.name.toLowerCase().includes(target)
-              || l.id === target
-              || (target.length >= 3 && ((l as { aliases?: string[] }).aliases ?? []).some((a) => {
-                const al = a.toLowerCase();
-                return al === target || al.includes(target);
-              }))
-            )
+        // OTA-1011 — one punctuation-insensitive matcher (app/engine/locationMatch.ts)
+        // replaces the raw-string find + word-wise typo pass that used to live
+        // here. The old code required the player to reproduce every apostrophe
+        // and hyphen an author typed: measured against the live catalog, exact
+        // typing resolved 36/36 but punctuation-free typing FAILED on 7 real
+        // places (Zharak's Teeth, Reclaimer's Stake, Thametan's Tower, The
+        // Architect's Blind, The Monarch's Waystation, Builders' Survey Camp,
+        // Giant-Watch Shrine) with a flat "I don't know a place called that".
+        // The typo fallback could not rescue them either — it compared single
+        // WORDS of the name against the player's WHOLE phrase and skipped
+        // anything differing in length by more than one. Owner: "'travel to the
+        // location name' should start an auto route as long as the name matches."
+        const candidate = target
+          ? matchLocationByName(target, allLocations) ?? undefined
           : undefined;
-        if (!candidate && target && target.length >= 5) {
-          let bestDist = 2;
-          for (const l of allLocations) {
-            const lname = l.name.toLowerCase();
-            const words = lname.split(/\s+/);
-            for (const w of words) {
-              if (Math.abs(w.length - target.length) > 1) continue;
-              const d = levenshtein(target, w);
-              if (d < bestDist) {
-                bestDist = d;
-                candidate = l;
-              }
-            }
-          }
-        }
         if (candidate) {
           // v2.4.1 (OTA 049) — `travel to <city>` no longer teleports.
           // Sets a course and takes ONE step toward the target's

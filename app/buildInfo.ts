@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.21';
+export const DISPLAY_VERSION = '4.28.22';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18423,4 +18423,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // popups fighting. LOCKED TWO WAYS: a category test pinning all 7 call sites + every job kind, and a
 // SOURCE lock that fails the build if any completion is ever written straight to the feed again.
 // DISPLAY_VERSION 4.28.21. 7 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-27-1010-mission-complete-notice';
+// OTA-1011 (travel-by-name finds the place you NAMED, not the one you punctuated right). Owner:
+// "'travel to the location name' should start an auto route as long as the name matches." Auto-routing
+// itself was fine (OTA-049: match -> setTravelCourse, one tile at a time). The MATCHER was not.
+// ROOT CAUSE: it compared RAW strings, so every apostrophe and hyphen an author typed had to be
+// reproduced exactly on a phone keyboard. MEASURED against the live 36-location catalog: exact typing
+// resolved 36/36, punctuation-free typing FAILED on 7 real places — Zharak's Teeth, Reclaimer's Stake,
+// Thametan's Tower, The Architect's Blind, The Monarch's Waystation, Builders' Survey Camp,
+// Giant-Watch Shrine — with a flat "I don't know a place called that" for somewhere the player had
+// already been. The typo fallback could not rescue them: it compared single WORDS of the name against
+// the player's WHOLE phrase and skipped anything differing in length by more than one, so "zharaks
+// teeth" (13) was measured against "zharak's" (8) and "teeth" (5) and both were rejected before the
+// spell-check ran. FIX: one shared matcher, app/engine/locationMatch.ts, normalising BOTH sides to
+// letters-and-digits — which collapses apostrophes, hyphens AND spaces together, so "Giant-Watch
+// Shrine" answers to "giant-watch shrine", "giantwatch shrine" and "giant watch shrine" alike. Article
+// handling is symmetric (keysFor): stripping "the" off the player's words but not off the authored
+// name was why "The Hidden Market" only resolved by luck (it happens to carry a matching alias) and
+// why "the engine" — an exact alias of Thametan's Tower — missed. Tiers run most-precise-first
+// (id, exact name, exact alias, partial name, partial alias, whole-name typo budget) and AMBIGUITY
+// REFUSES rather than guessing: five places share the alias "city" and three share "tower", so
+// "travel to the city" now gets the honest refusal + destination list instead of a silent walk to
+// whichever row sorted first. 18 tests drive EVERY location through exact / lowercased / shouted /
+// padded / punctuation-dropped / punctuation-spaced / article-added / alias / id forms plus a
+// single-character deletion at every position and substitutions, and assert the refusals still hold
+// for non-places, sub-4-character scraps and ambiguous near-misses. DISPLAY_VERSION 4.28.22.
+// Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-27-1011-travel-by-name';
