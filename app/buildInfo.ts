@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.36';
+export const DISPLAY_VERSION = '4.28.37';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18659,4 +18659,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // canonical kind/rarity. Accepted residuals (display-only): rarity label/
 // stripe/sort read the instance; itemWeight/parseValidator kind fallbacks;
 // use/eat handler kind routing (visibility already name-canonical).
-export const OTA_BUILD_ID = '2026-07-27-1025-guardrails';
+// OTA-1026 — THE KILL-BEAT FREEZE, FIXED (owner: the final blow "hangs on
+// resolving for a good 7-8 seconds"). Root cause: OUR OWN snapshot-audit
+// batches — the canonical identity helpers ran up to nine linear catalog
+// scans per call with no cache, and the kill path (loot grants, quest-lock
+// checks, substitution scans over the whole inventory) multiplied that into
+// a blocked JS thread. Kills touch the inventory; ordinary damage rolls
+// don't — which is exactly why only the killing roll hung. Fix at the choke
+// point: per-name memo caches inside canonicalItemTags + the kind/rarity row
+// lookup (identical semantics incl. inferred-row fallbacks; catalogs are
+// static per process). Probe: kill beat 281ms -> baseline ~25ms in the
+// harness; on-device the freeze collapses proportionally.
+export const OTA_BUILD_ID = '2026-07-27-1026-killbeat-freeze-fixed';
