@@ -372,6 +372,19 @@ function attackStatFor(
   }
 }
 
+/** OTA-1009 — CHARISMA IS NOT A TO-HIT STAT. It is the social stat; nothing you
+ *  swing, fire or throw rolls it. The weapon catalog once carried `charisma` on
+ *  every single_handed row (42 weapons, 7 of them Legendary) — a silent penalty
+ *  for any character whose CHA trailed their STR, and invisible because nothing
+ *  outside the combat log names the stat a weapon uses. The data is fixed; this
+ *  is the runtime backstop so a bad row can never quietly cost a fight again.
+ *  A weapon that somehow arrives carrying charisma falls back to the class
+ *  default (STR melee / DEX ranged / INT runecaster) instead of being obeyed. */
+export function isValidAttackStat(stat: string | undefined): boolean {
+  return stat === 'strength' || stat === 'dexterity'
+    || stat === 'intelligence' || stat === 'wisdom';
+}
+
 function enemyAC(enemy: Enemy): number {
   // OTA-419 — `abilityPoint` is stored as "Strength 4" / "Dexterity 6" etc., so
   // parseInt() returned NaN and EVERY enemy collapsed to the AC-8 fallback (bosses
@@ -465,7 +478,10 @@ export function buildCombatSteps(
   // stat modifiers (Iron Fog −1 DEX etc.) so the world's mood is in every
   // swing.
   const stats = effectiveStats(player, opts?.weatherMod);
-  const stat = equipped
+  // OTA-1009 — trust the row only if it names a stat you can actually fight with.
+  // See isValidAttackStat: charisma on a weapon is always an authoring error,
+  // and obeying it costs the player the fight silently.
+  const stat = equipped && isValidAttackStat(equipped.stat)
     ? { value: stats[equipped.stat], label: STAT_LABEL[equipped.stat] }
     : attackStatFor(wc, stats);
   // OTA-362 — acid armor shred lowers the target's effective AC (floored
