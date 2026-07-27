@@ -48,6 +48,12 @@ export function cachedFallen(): FallenHero[] {
   return FALLEN_CACHE;
 }
 export function _setFallenCacheForTests(f: FallenHero[] | null): void { FALLEN_CACHE = f; }
+/** OTA-1014 — a death recorded THIS session joins the pool immediately. The cache
+ *  was primed once per process and only markAvenged wrote to it, so a fallen
+ *  predecessor could not rise for a successor until app restart. */
+export function appendFallenToCache(f: FallenHero): void {
+  if (FALLEN_CACHE) FALLEN_CACHE = [...FALLEN_CACHE, f];
+}
 export function markAvenged(ts: number, by: string): void {
   if (FALLEN_CACHE) {
     FALLEN_CACHE = FALLEN_CACHE.map((f) => (f.ts === ts ? { ...f, avengedBy: by, avengedTs: Date.now() } : f));

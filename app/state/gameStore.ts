@@ -10586,7 +10586,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // Try the per-noun salvage pool first (drone → automaton
             // circuit, wagon → rations + rope, etc.). Falls through to
             // the generic area-search pool when no pool matches.
-            const salvage = rollSalvagePool(harvestAmbient);
+            const salvage = ledgeredSalvage(get, set, harvestAmbient);
             const outcome = salvage ?? rollAreaSearch(harvestAmbient, {
               hookBonus: hasAethericVision(player) ? 0.15 : 0,
               rareLootBias: raceLootBias(player, get().currentScene),
@@ -19004,7 +19004,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
     }
-    if (isAetherkin(enemy)) {
+    // OTA-1014 — putting a revenant to rest is a mercy, never a hunt. Guarded by
+    // the fallen_revenant TRAIT (isRevenant), not by name-matching, so a
+    // character literally named "Aetherkin" is not punished for avenging
+    // themselves when their own Hollowed rises.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const revExempt = (require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants')).isRevenant(enemy);
+    if (!revExempt && isAetherkin(enemy)) {
       const revChanged = applyAetherkinReverenceDelta(get, set, AETHERKIN_KILL_REP);
       if (revChanged.length > 0) {
         logRepChanges(get, revChanged);
@@ -22718,7 +22724,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the drift updates the persisted sky so arrival doesn't re-roll it.
         const newWeather = pickWeather(liveWorldMem, null);
         const driftHours = get().player?.hoursElapsed ?? 0;
-        const driftLocId = get().player?.currentLocationId ?? '';
+        // OTA-1014 — 'open-road' is a sentinel: during transit currentLocationId
+        // still names the ORIGIN, and stamping the unbiased road roll under a
+        // real location id overwrote + locked out that location's biased sky.
+        const driftLocId = 'open-road';
         set((s) => s.currentScene
           ? {
               currentScene: { ...s.currentScene, weather: newWeather },
@@ -22978,7 +22987,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const peacefulWild = !!liveScene
         && (!liveScene.enemies || liveScene.enemies.length === 0)
         && !liveScene.vendor && !liveScene.wanderer
-        && !livePlayer?.hubRoomId;
+        && !livePlayer?.hubRoomId
+        && !get().activeBuildingId;
       // One escort party at a time — never stack a second stranded traveler
       // on top of a live one.
       const hasLiveEscort = (livePlayer?.activeFactionQuests ?? [])
@@ -22987,15 +22997,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // install surfaces as a one-time Aetherkin-revenant BOSS event. Power-
       // gated so a fresh character never stumbles into one; the pool is the
       // install's un-avenged Fallen. Kill = put to rest (resolveEnemyDefeat).
+      let revenantBeatFired = false;
       {
         const rvPlayer = get().player;
         const rvScene = get().currentScene;
-        if (rvPlayer && rvScene && peacefulWild && tileIsNovel
+        if (rvPlayer && rvScene && peacefulWild && tileIsNovel && !hasLiveEscort
             && (rvScene.enemies ?? []).length === 0 && (rvPlayer.hpMax ?? 0) >= 60) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const rev = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
           const rvPool = rev.cachedFallen().filter((f) => !f.avengedTs);
           if (rvPool.length > 0 && Math.random() < 0.04) {
+            revenantBeatFired = true;
             const fr = rvPool[Math.floor(Math.random() * rvPool.length)]!;
             const foe = rev.revenantFromFallen(fr, rvPlayer.hpMax);
             set((s2) => (s2.currentScene ? {
@@ -23016,10 +23028,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // OTA-1004 — the HINT route (owner: "hint missions that can be picked
             // up AND random encounters"). No boss yet — a marker on the verge
             // naming one of the fallen, which the player may follow or leave.
+            revenantBeatFired = true;
             const fr = rvPool[Math.floor(Math.random() * rvPool.length)]!;
             // eslint-disable-next-line @typescript-eslint/no-require-imports
             const { plantHookByKind: plantFallenHook } = require('../engine/hooks') as typeof import('../engine/hooks');
-            const fw = plantFallenHook('fallen_whisper');
+            const fw = plantFallenHook('fallen_whisper', `fallen:${fr.ts}`);
             set((s2) => (s2.currentScene
               ? { currentScene: { ...s2.currentScene, hooks: [...(s2.currentScene.hooks ?? []), fw] } }
               : s2));
@@ -23035,7 +23048,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       const sTileKey = livePlayer ? `${livePlayer.currentLocationId}:${livePlayer.mapX}:${livePlayer.mapY}` : '';
       const sRolled = get().worldMemory.strandedEscortRolledTiles ?? [];
-      if (peacefulWild && !hasLiveEscort && tileIsNovel && sTileKey && !sRolled.includes(sTileKey)) {
+      if (peacefulWild && !revenantBeatFired && !hasLiveEscort && tileIsNovel && sTileKey && !sRolled.includes(sTileKey)) {
         set((s2) => ({ worldMemory: {
           ...s2.worldMemory,
           strandedEscortRolledTiles: [...(s2.worldMemory.strandedEscortRolledTiles ?? []), sTileKey].slice(-120),
@@ -24194,7 +24207,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         continue;
       }
 
-      const outcome = rollSalvagePool(noun);
+      const outcome = ledgeredSalvage(get, set, noun);
       if (!outcome) {
         // No pool matched. Track for the fallback emit + breadcrumb
         // so the player doesn't see a silent no-op.
@@ -27065,6 +27078,7 @@ function applyHookEffect(
   effect: HookEffect,
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  hook?: Hook,
 ): { inlineSummary: string | null; fatal: boolean } {
   switch (effect.type) {
     case 'grant_tc': {
@@ -27253,7 +27267,18 @@ function applyHookEffect(
       if (pool.length === 0) {
         return { inlineSummary: 'the trail is cold — whatever walked here has been put down already', fatal: false };
       }
-      const fr = pool[Math.floor(Math.random() * pool.length)]!;
+      // OTA-1014 — the rumour NAMED a fallen (chainId carries `fallen:<ts>`); the
+      // thing that rises must be that fallen, not a random pool draw. Put to
+      // rest in the meantime → a cold trail, never a stand-in.
+      const namedTs = /^fallen:(\d+)$/.exec(hook?.chainId ?? '')?.[1];
+      let fr = pool[Math.floor(Math.random() * pool.length)]!;
+      if (namedTs) {
+        const named = rev.cachedFallen().find((f) => f.ts === Number(namedTs));
+        if (!named || named.avengedTs) {
+          return { inlineSummary: 'the trail is cold — the one the tale named has been put down already', fatal: false };
+        }
+        fr = named;
+      }
       const foe = rev.revenantFromFallen(fr, rp.hpMax);
       set((s2) => (s2.currentScene ? {
         currentScene: {
@@ -27366,7 +27391,7 @@ function resolveHookOneStep(
   let fatal = false;
   const inlineSummaries: string[] = [];
   for (const eff of outcome.effects) {
-    const r = applyHookEffect(eff, get, set);
+    const r = applyHookEffect(eff, get, set, hook);
     if (r.fatal) fatal = true;
     if (r.inlineSummary) inlineSummaries.push(r.inlineSummary);
   }
@@ -28662,6 +28687,29 @@ export function makeRoomKey(
  *  Pass `{to}` placeholder in the line; we substitute the new stat
  *  value before emit. Safe no-op if no player or trainStat returns
  *  no leveled record. */
+function ledgeredSalvage(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  noun: string,
+): ReturnType<typeof rollSalvagePool> {
+  const out = rollSalvagePool(noun);
+  if (!out || out.poolId !== 'sigil') return out;
+  const key = `${get().player?.currentLocationId ?? ''}:${noun.trim().toLowerCase()}`;
+  const taken = get().worldMemory.salvagedSigilKeys ?? [];
+  if (taken.includes(key)) {
+    return {
+      kind: 'material', poolId: 'relic_site', itemName: 'Worn Tartarian Coin',
+      rarity: 'Common', quantity: 1,
+      line: `You work the ${noun} over again, but the mark itself is long gone — a worn coin in the rubble is all that's left.`,
+    };
+  }
+  set((s2) => ({ worldMemory: {
+    ...s2.worldMemory,
+    salvagedSigilKeys: [...(s2.worldMemory.salvagedSigilKeys ?? []), key].slice(-200),
+  } }));
+  return out;
+}
+
 function applyTrainAndLog(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -30287,11 +30335,23 @@ function handlePlayerDeath(
       hours: Math.floor(player.hoursElapsed ?? 0),
       // OTA-998 — the kit they died in, for the Hollowed revenant they may yet
       // become (slot display names; the *Id fields are instance ids, skipped).
-      gearNames: Array.from(new Set(Object.entries((player.equipped ?? {}) as Record<string, string | undefined>)
-        .filter(([k, v]) => !!v && !k.endsWith('Id'))
-        .map(([, v]) => String(v)))).slice(0, 6),
+      gearNames: (() => {
+        const slotPrio = ['main', 'off', 'chest', 'head', 'legs', 'feet', 'amulet', 'ring', 'ring2', 'ring3'];
+        return Array.from(new Set(Object.entries((player.equipped ?? {}) as Record<string, string | undefined>)
+          .filter(([k, v]) => !!v && !k.endsWith('Id'))
+          .sort(([a], [b]) => {
+            const ia = slotPrio.indexOf(a); const ib = slotPrio.indexOf(b);
+            return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+          })
+          .map(([, v]) => String(v)))).slice(0, 6);
+      })(),
       ts: Date.now(),
     };
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const revCache = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+      revCache.appendFallenToCache(hero);
+    }
     void recordFallen(hero).then((total) => {
       if (total > 1) {
         get().appendLog('system', `You join the Fallen of Tartaria — ${total} names the buried world keeps now. Read the roll from the Lore Codex.`);

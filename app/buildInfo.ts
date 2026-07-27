@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.24';
+export const DISPLAY_VERSION = '4.28.25';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18482,4 +18482,35 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // is covered the day it is authored. Category-locked by a test sweeping the live roster; the ban
 // itself still refuses real substances ("wet mud", "fog bank"). DISPLAY_VERSION 4.28.24. 3 tests.
 // Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-27-1013-curio-portability';
+// OTA-1014 (studs-down corrections, batch 1: exploits + spawns). Owner: "take all of opus fixes
+// down to the studs and verify root cause and proper implementation of new systems." Five parallel
+// audits re-derived every OTA-992..1004 root cause against PRE-fix code; 13 OTAs audited, 5 clean,
+// 8 with defects, ~30 findings. This batch fixes the exploit-class + spawn-system tier: (1) OTA-996's
+// variety window reopened the leave-and-return GEAR FARM — the exclusion check sat inside the seeded
+// draw loop, so skipped picks shifted the RNG stream and a rotating window dealt the same tile fresh
+// gear; the window now filters AFTER the draw (hide, never substitute), with a pool-size guard.
+// (2) OTA-1000's sigil branch fired on ANY noun containing sigil/crest ("sigil floor", the sealed-
+// door perch's "sigil-etched door") at 100% yield on nouns that RESPAWN after any round-trip — an
+// unbounded +standing / permanent trade-rapport farm; now HEAD-NOUN gated ("seal sigil" yes, "sigil
+// floor" no) and a permanent worldMemory.salvagedSigilKeys ledger (deliberately NOT wiped by the
+// arb105 restock) makes a faction's mark come off a place ONCE — repeats find a coin; both grant
+// sites funnel through one ledgeredSalvage helper. (3) The Hollowed spawn ignored activeBuildingId
+// (both sibling spawners check it) and live escorts — a 90-150 HP no-parley boss could land mid-
+// escort and shred the shared pool; both revenant doors now gate on !hasLiveEscort + the building
+// check. (4) A revenant beat claims its step — the stranded-traveler roll yields instead of planting
+// a mute traveler behind a boss. (5) The Aetherkin reverence exemption was an ACCIDENT of name-
+// matching ("Hollowed X" happens not to match /aetherkin/i); a character named "Aetherkin" would eat
+// the four-faction penalty for avenging themselves — now guarded on the fallen_revenant TRAIT.
+// (6) FALLEN_CACHE was primed once per process, so a mid-session death could not rise for a
+// successor until app restart — death now appends to the live pool. (7) The revenant's kit/attack
+// followed first-equip HISTORY (a boots-first character produced a "Mud-Caked Boots (remembered)"
+// boss); gearNames now sort by slot priority, weapons first. (8) The travel drift persisted its
+// deliberately UNBIASED road roll under the ORIGIN location's id (currentLocationId switches only on
+// arrival), overwriting and LOCKING OUT the locale-biased sky for 6 game-hours — the exact "spire
+// hails like a mud flat" symptom OTA-1003 fixed; the drift now stamps the 'open-road' sentinel.
+// (9) The door-2 rumour NAMED one fallen and the effect re-drew at random (tale says Verbal,
+// Sasmooch rises 4-in-5 with a pool of five); the named fallen now rides the hook's chainId
+// (`fallen:<ts>`), and one put to rest in the meantime reads as a cold trail, never a stand-in.
+// Contracts/toasts and input/world correction batches follow. DISPLAY_VERSION 4.28.25. 10 tests.
+// Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-27-1014-studsdown-exploits';

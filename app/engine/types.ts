@@ -1617,7 +1617,7 @@ export interface CanonLocation {
 
 export interface WorldMemory {
   tagCounts: Record<string, number>;
-  /** OTA — #122: the CURRENT local sky. Weather persists per location visit —
+  /** OTA-1014 — #122: the CURRENT local sky. Weather persists per location visit —
    *  a scene rebuild at the same spot inside ~6 game-hours reuses this instead
    *  of re-rolling, so conditions read as weather, not a slot machine. */
   sceneWeather?: { id: string; locationId: string; rolledAtHours: number };
@@ -1784,11 +1784,16 @@ export interface WorldMemory {
   /** OTA-912 — great-climb ids UNLOCKED by using their chart. The climbable prop
    *  only spawns at a landmark once its id is in here (access is gated on maps). */
   unlockedGreatClimbs?: string[];
-  /** OTA — #119a: last ~10 ambient takeable gear names rolled into scenes,
+  /** OTA-1014 — #119a: last ~10 ambient takeable gear names rolled into scenes,
    *  newest last. Fed back into pickTakeableGearForScene as an exclude window
    *  so adjacent tiles stop offering the same Rail Saber three times in a
    *  ninety-second walk. */
   recentTakeableGearNames?: string[];
+  /** OTA-1014 — location:noun keys of faction sigils already pried. PERMANENT — the
+   *  arb105 restock deliberately does not clear it; a faction's mark comes off
+   *  a place once, then the noun yields rubble coin. Closes the round-trip
+   *  sigil farm the OTA-1000 guaranteed-yield branch opened. */
+  salvagedSigilKeys?: string[];
   /** OTA-912 — distinct great-climb ids whose SUMMIT BOSS has been defeated.
    *  Gates the one-time Skyreacher armor + Aether Collection Beacon grant, and at
    *  size 5, using a beacon builds the Beacon Rifle (OTA-913). */

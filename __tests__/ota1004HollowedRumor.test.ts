@@ -118,7 +118,9 @@ describe('OTA-1004 — the Hollowed leave a trail', () => {
 
   it('category lock: the wild spawner offers BOTH doors — direct boss and rumour', () => {
     const src = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
-    expect(src).toContain("plantFallenHook('fallen_whisper')");
+    // OTA-1014 — the plant now CARRIES the named fallen (chainId `fallen:<ts>`), so
+    // the thing that rises is the thing the tale named.
+    expect(src).toContain("plantFallenHook('fallen_whisper', `fallen:${fr.ts}`)");
     expect(src).toContain("spawn: fallen_whisper rumor");
     expect(src).toContain("case 'spawn_fallen_revenant': {");
     // both routes draw from the same un-avenged pool
