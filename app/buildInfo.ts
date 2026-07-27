@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.25';
+export const DISPLAY_VERSION = '4.28.26';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18513,4 +18513,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (`fallen:<ts>`), and one put to rest in the meantime reads as a cold trail, never a stand-in.
 // Contracts/toasts and input/world correction batches follow. DISPLAY_VERSION 4.28.25. 10 tests.
 // Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-27-1014-studsdown-exploits';
+// OTA-1015 (studs-down corrections, batch 2: contracts + toasts). The OTA-995 audit found the
+// single-active invariant enforced only on ACCEPT: the Contracts screen's SET ACTIVE toggle flipped
+// one record and paused NOTHING — two taps left several contracts live at once forever after, and
+// every later accept then parked "because you're busy" against contracts the player couldn't see
+// were both live. FIX: activation now stands every other routed contract down, ACROSS kinds (hunts,
+// mysteries, storylines, faction quests — setContractActive sweep + a mirror in
+// setFactionQuestActive); deactivation touches only its target. Whispers, leads and the parley are
+// ambient-tier breadcrumbs and deliberately exempt (test-locked as a design decision, not an
+// omission). Hook-granted hunts/mysteries that park now SAY SO (they parked in silence — a
+// regression on the very OTA-054 "I didn't even know I had the hunt" lesson cited three lines
+// below the grant). The OTA-994 audit found EIGHT player-facing stat toasts still printing the BASE
+// stat: seven routed through applyTrainAndLog's raw {to} substitution (the hunt/mystery/storyline
+// completion toasts — verbatim #116 in the exact paths the fix was for) and the parley's raw
+// "Charisma X -> Y". One helper edit wires all seven through statNowClause; the parley line joins
+// them. The clause's "with your gear on" became "as you stand" — effectiveStats folds in race, food
+// and corruption, and the old wording blamed gear for all of them (a naked Giant read "10 with your
+// gear on"). The OTA-994 lock test is HARDENED: it was green over eight live offenders because its
+// filter required the exact `(now ${` shape on one line; it now pins the helper's statNowClause
+// routing and bans the raw X->Y form. DISPLAY_VERSION 4.28.26. 8 tests. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-27-1015-studsdown-contracts';

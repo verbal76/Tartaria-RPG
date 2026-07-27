@@ -2700,7 +2700,7 @@ function failEscortQuests(
 export function statNowClause(p: PlayerCharacter | null | undefined, stat: string, base: number): string {
   if (!p) return `now ${base}`;
   const eff = (effectiveStats(p) as unknown as Record<string, number>)[stat] ?? base;
-  return eff === base ? `now ${base}` : `base ${base}, ${eff} with your gear on`;
+  return eff === base ? `now ${base}` : `base ${base}, ${eff} as you stand`;
 }
 
 /** OTA-993 — #114: pure guard for the Qwen parse-fallback (owner: "resolve intent
@@ -20478,6 +20478,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...s.player,
         activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) =>
           q.id === id ? { ...q, tracked: nextActive } : (nextActive ? { ...q, tracked: false } : q)),
+        // OTA-1015 — cross-kind: "the mission you're on" means across ALL routed
+        // kinds, not just this list. See setContractActive's mirror sweep.
+        activeHunts: nextActive ? (s.player.activeHunts ?? []).map((h) => ({ ...h, tracked: false })) : (s.player.activeHunts ?? []),
+        activeMysteries: nextActive ? (s.player.activeMysteries ?? []).map((m) => ({ ...m, tracked: false })) : (s.player.activeMysteries ?? []),
+        activeStorylines: nextActive ? (s.player.activeStorylines ?? []).map((st) => ({ ...st, tracked: false })) : (s.player.activeStorylines ?? []),
       },
     } : s));
     const def = findFactionQuestById(id);
@@ -20562,6 +20567,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       changed = true;
     }
     if (!changed) return;
+    // OTA-1015 — SINGLE-ACTIVE, enforced at ACTIVATION. The accept-side parking was
+    // trivially undone by two taps of SET ACTIVE, leaving several contracts
+    // live at once forever after (every later accept then parked "because
+    // you're busy" against contracts the player couldn't see were both live).
+    // Activating a routed contract stands every other routed contract down,
+    // across kinds. Whispers, leads and the parley are ambient-tier: they are
+    // breadcrumbs, not routes, and deliberately do not participate.
+    if (changed && nextActive && (kind === 'hunt' || kind === 'mystery' || kind === 'storyline')) {
+      set((s2) => (s2.player ? {
+        player: {
+          ...s2.player,
+          activeHunts: (s2.player.activeHunts ?? []).map((h) => (kind === 'hunt' && h.id === id ? h : { ...h, tracked: false })),
+          activeMysteries: (s2.player.activeMysteries ?? []).map((m) => (kind === 'mystery' && m.id === id ? m : { ...m, tracked: false })),
+          activeStorylines: (s2.player.activeStorylines ?? []).map((st) => (kind === 'storyline' && st.id === id ? st : { ...st, tracked: false })),
+          activeFactionQuests: (s2.player.activeFactionQuests ?? []).map((q) => ({ ...q, tracked: false })),
+        },
+      } : s2));
+    }
     // Staged contracts + leads truly FREEZE when paused (auto-advance / auto-complete
     // gated); whispers + the parley just drop off the standing reminders.
     const reminderOnly = kind === 'whisper' || kind === 'broker';
@@ -27811,6 +27834,12 @@ function grantQuestHook(
         : s,
     );
     bumpQuestsAccepted(get, set);
+    // OTA-1015 — a parked grant says so (the accept sites and the escort hook
+    // already do). Silence here meant a hunt that would not advance and no
+    // line explaining why.
+    if (!grantTracked) {
+      get().appendLog('world', `Parked — you're already running a contract. Activate it in Contracts → Hunts when you're ready.`);
+    }
     // 2026-05-26 OTA-054 — playtester: "I didn't even know I had the
     // hunt let alone that I had accepted it." Field auto-grants
     // (mini-dungeon questHook path) previously emitted a single
@@ -27857,6 +27886,10 @@ function grantQuestHook(
       : s,
   );
   bumpQuestsAccepted(get, set);
+  // OTA-1015 — a parked grant says so; see the hunt branch.
+  if (!grantTracked) {
+    get().appendLog('world', `Parked — you're already running a contract. Activate it in Contracts → Mysteries when you're ready.`);
+  }
   // 2026-05-26 OTA-054 — same OTA-054 louder-grant treatment for the
   // mystery branch.
   get().appendLog(
@@ -28723,7 +28756,9 @@ function applyTrainAndLog(
   if (tr.leveled) {
     get().appendLog(
       'reward',
-      rewardLineWithPlaceholder.replace('{to}', String(tr.leveled.to)),
+      rewardLineWithPlaceholder
+        .replace('(now {to})', `(${statNowClause(get().player, stat, tr.leveled.to)})`)
+        .replace('{to}', String(tr.leveled.to)),
     );
   }
 }
@@ -33368,7 +33403,7 @@ function runParleyOutcome(
         logRepChanges(get, revChanged);
       }
     }
-    if (trained.leveled) get().appendLog('reward', `Charisma ${trained.leveled.from} → ${trained.leveled.to}.`);
+    if (trained.leveled) get().appendLog('reward', `✦ Your words carried it. +1 CHA (${statNowClause(get().player, 'charisma', trained.leveled.to)}).`);
     return;
   }
 

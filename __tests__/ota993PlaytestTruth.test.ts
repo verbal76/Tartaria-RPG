@@ -90,7 +90,7 @@ describe('OTA-993 — playtest truth batch', () => {
     const store = await boot('Trainer');
     const p = store.getState().player!;
     expect(statNowClause(null, 'dexterity', 5)).toBe('now 5');
-    expect(statNowClause(p, 'dexterity', 7)).toMatch(/^(now 7|base 7, \d+ with your gear on)$/);
+    expect(statNowClause(p, 'dexterity', 7)).toMatch(/^(now 7|base 7, \d+ as you stand)$/);
   });
 
   it('#112 — arrival at a hub location narrates the gate BEFORE the room Paths line', async () => {
