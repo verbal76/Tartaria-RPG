@@ -1,5 +1,6 @@
 import type { InventoryItem, EquipSlot, PlayerCharacter, Stats } from './types';
 import { findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
+import { isWeaponCoatingItem } from './weaponCoating';
 import { aggregateInventoryPassives, inventoryHasGate, isScanner, type EffectResolver, type GateKind, type ScannerBias } from './itemEffect';
 import { racialStatBonusesFor } from './raceMechanics';
 import { corruptionTierOf, corruptionStatPenalty } from './corruption';
@@ -20,7 +21,7 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   // …) are APPLIED to a weapon via the "Coat a weapon" flow, never equipped. Guard
   // here so a coating never gets an equip slot — e.g. "Sea·RING· Paste" matched the
   // ring regex below and wrongly offered "Equip (Ring)".
-  if ((item.tags ?? []).some((t) => t.toLowerCase() === 'weapon_coating')) return [];
+  if (isWeaponCoatingItem(item)) return [];
   // OTA-224 — fused items carry uniqueStats but their names are
   // synthesized (e.g. "Resonant Cleaver") and won't appear in any
   // catalog. validSlotsForItem used to short-circuit to [] for them

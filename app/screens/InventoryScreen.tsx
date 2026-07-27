@@ -14,6 +14,7 @@ import { findWeaponByName, isFusedInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
+import { isWeaponCoatingItem } from '../engine/weaponCoating';
 import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
@@ -838,7 +839,7 @@ export function InventoryScreen() {
     // aren't drunk: they paint onto a chosen weapon instance. Opening
     // the picker stashes the coating item in coatTarget; the second
     // modal lists the coatable weapons in the pack.
-    if ((pending.item.tags ?? []).includes('weapon_coating')) {
+    if (isWeaponCoatingItem(pending.item)) {
       buttons.push({
         label: 'Coat a weapon',
         onPress: () => {

@@ -19,7 +19,7 @@
 // pure DOT, acid = DOT + armor shred, corruption = DOT + corruption stacks.
 
 import type { InventoryItem, WeaponCoating } from './types';
-import { findWeaponByName } from './crafting';
+import { canonicalItemTags, findWeaponByName } from './crafting';
 
 /** True iff a weapon by this name can carry a coating. Resolves the
  *  weapon via the same catalog/inference path combat uses, then
@@ -225,4 +225,14 @@ export function coatingDotPerTurn(
     return rolled + Math.max(0, stacksAfter - 1) * CORRUPTION_STACK_BONUS;
   }
   return rolled;
+}
+
+/** OTA-1020 — THE ONE ANSWER to "is this item a weapon coating?". Reads canonical
+ *  (instance-union-catalog) tags, because inventory instances persist stale tag
+ *  snapshots — the owner's pre-tag vials refused to rack on the bandolier while
+ *  identical newly-minted ones racked fine. Every consumer (bandolier gate,
+ *  throw burst, coat-a-weapon button, equip guard, drinkable gate) routes
+ *  through here so the category can never split again. */
+export function isWeaponCoatingItem(item: { name: string; tags?: readonly string[] }): boolean {
+  return canonicalItemTags(item).includes('weapon_coating');
 }

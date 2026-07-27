@@ -25162,7 +25162,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // whole vial bursts on impact for that full total UP FRONT (perTurn × turns) of
     // the coating's damage type, then it's spent. (A player ask: "3 burn/turn for 3
     // turns → 9 burn on the throw.") No lingering DOT / shred / stacks — one and done.
-    if ((item.tags ?? []).some((t) => /^weapon_coating$/i.test(t))) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isWeaponCoatingItem: iwciThrow } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
+    if (iwciThrow(item)) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { resolveItemEffect: rieThrow } = require('../engine/itemEffect');
       // eslint-disable-next-line @typescript-eslint/no-require-imports

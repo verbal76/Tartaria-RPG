@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.30';
+export const DISPLAY_VERSION = '4.28.31';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18581,4 +18581,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // edge and effectively did not exist unless the player happened to swipe the
 // row. The row now WRAPS onto a second line: every tab always visible, no
 // hidden state. Category rule: content that exists must be discoverable.
-export const OTA_BUILD_ID = '2026-07-27-1019-codex-tabs-visible';
+// OTA-1020 — EVERY COATING RACKS (owner: "there were coatings that I couldn't
+// load into my bandolier"). Root cause: five sites asked "is this a coating?"
+// by reading the INSTANCE's tag snapshot, and instances keep the tags they
+// were minted with forever — vials acquired before a catalog tag existed
+// failed the bandolier gate (and the coat-a-weapon button, equip guard,
+// drinkable gate, throw burst) while identical new ones passed. One canonical
+// reader now answers for all of them: canonicalItemTags (instance UNION
+// catalog row, by name) + isWeaponCoatingItem; the bandolier's throwable and
+// spear tests read the same canonical tags. Non-catalog (fused) names keep
+// instance-only behavior.
+export const OTA_BUILD_ID = '2026-07-27-1020-coatings-always-rack';
