@@ -15,6 +15,7 @@ import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { isWeaponCoatingItem } from '../engine/weaponCoating';
+import { canonicalItemRarity } from '../engine/crafting';
 import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
@@ -799,7 +800,7 @@ export function InventoryScreen() {
         if (!full) {
           const golemPer = isGolemRepairPart(golem.kind, pending.item.name)
             ? golemRepairHeal(golem.kind)
-            : golemSubstituteHeal(golem.kind, pending.item.rarity);
+            : golemSubstituteHeal(golem.kind, canonicalItemRarity(pending.item));
           const n = healBatchCount(golemPer, golem.hpMax - golem.hp, stackQty);
           if (n >= 2) {
             buttons.push({

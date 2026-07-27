@@ -341,8 +341,11 @@ describe('MECHANIC-1b — golem sidekick', () => {
       const store = await bootstrap([
         // Common garbage aether loot — NOT aether-golem fuel, but shares the element.
         { id: 'ad', name: 'Aether Dust', kind: 'misc', rarity: 'Common', quantity: 2, tags: ['aether', 'dust'] } as never,
-        // An Uncommon aether material for the half tier.
-        { id: 'ar', name: 'Aether Residue', kind: 'misc', rarity: 'Uncommon', quantity: 2, tags: ['aether'] } as never,
+        // An Uncommon aether material for the half tier. CATALOG-ABSENT name on
+        // purpose: 'Aether Residue' is a real Common materials.json row, and the
+        // feed path now reads CANONICAL rarity (catalog wins for catalog names) —
+        // only an uncatalogued instance can carry a synthetic Uncommon tier.
+        { id: 'ar', name: 'Umbral Aether Slurry', kind: 'misc', rarity: 'Uncommon', quantity: 2, tags: ['aether'] } as never,
       ]);
       const p0 = store.getState().player!;
       const golem = { ...makeCompanion(GOLEM_DEFINITIONS.aether_golem), hp: 1 };
@@ -352,7 +355,7 @@ describe('MECHANIC-1b — golem sidekick', () => {
       expect(store.getState().player!.golem!.hp).toBe(3); // 1 + 2 (Common = quarter)
       expect((store.getState().player!.inventory.find((i) => i.name === 'Aether Dust')?.quantity) ?? 0).toBe(1);
       // Uncommon substitute = floor(11 * 0.5) = 5.
-      store.getState().submitPlayerAction('feed golem aether residue');
+      store.getState().submitPlayerAction('feed golem umbral aether slurry');
       expect(store.getState().player!.golem!.hp).toBe(8); // 3 + 5 (Uncommon = half)
     });
 

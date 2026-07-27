@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.33` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.33` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.34` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.34` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -68,6 +68,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.30 → 4.28.31 | 2026-07-27-997 | OTA | Every coating racks (owner: bandolier refused some coatings). Category: identity-by-instance-tag-snapshot — old instances keep minted tags forever. canonicalItemTags (instance ∪ catalog) + isWeaponCoatingItem; bandolier gate, throw burst, coat-a-weapon, equip guard, drinkable gate all routed; whole-catalog sweep locked in tests. |
 | 4.28.31 → 4.28.32 | 2026-07-27-998 | OTA | RESTITUTION (snapshot-audit batch A): legacy catalog-name migrations (Boltcaster→Beacon Rifle, Greaves→Mantle w/ slot move, torches, golem armaments) applied on every load to inventory/equipped/golem/recipes; golem armament joins the load heal passes; resurrection loads migrated worldMemory + canon-location resync. |
 | 4.28.32 → 4.28.33 | 2026-07-27-999 | OTA | FAIL-OPEN HOLES CLOSED (snapshot-audit batch B): quest-lock, forge blocklists, substitute-drain rarity guard, collect_only — all canonical. New canonicalItemKind + canonicalItemRarity; tag union widened to amulets/rings/dog gear. Whole-catalog fail-closed sweeps locked in tests. |
+| 4.28.33 → 4.28.34 | 2026-07-27-1000 | OTA | ECONOMY CANONICAL (snapshot-audit batch C): sell/scrap/repair/golem-feed/coating-drink resolve kind/rarity/tags against the live catalog; trophy discount is catalog-authoritative (dies on promotion); stale-vs-fresh parity locked in tests. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 
