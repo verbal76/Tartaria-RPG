@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.25';
+export const DISPLAY_VERSION = '4.28.26';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17470,4 +17470,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // unbiased road roll; (9) the door-2 rumour's NAMED fallen rides the hook chainId — the thing that
 // rises is the thing the tale named, or a cold trail. DISPLAY_VERSION 4.28.25. 10 tests.
 // Gameplay -> HAL + golem; golem port of HAL OTA-1014.
-export const OTA_BUILD_ID = '2026-07-27-991-studsdown-exploits';
+// OTA-992 (studs-down corrections, batch 2: contracts + toasts). The audit found the single-active
+// invariant enforced only on ACCEPT: SET ACTIVE flipped one record and paused NOTHING — two taps
+// left several contracts live at once forever after. Activation now stands every other routed
+// contract down ACROSS kinds (setContractActive sweep + a mirror in setFactionQuestActive);
+// deactivation touches only its target; whispers/leads/parley are ambient-tier and deliberately
+// exempt (test-locked design decision). Hook-granted hunts/mysteries that park now SAY SO (they
+// parked in silence — a regression on the OTA-054 lesson). EIGHT stat toasts still printed the BASE
+// stat (seven via applyTrainAndLog's raw {to} substitution — the completion toasts — plus the
+// parley's raw "Charisma X -> Y"); one helper edit wires all seven through statNowClause, the parley
+// joins them, and the clause reads "as you stand" (effectiveStats folds in race/food/corruption —
+// "with your gear on" blamed gear for all of them). The toast lock test is HARDENED (it was green
+// over eight live offenders). DISPLAY_VERSION 4.28.26. 8 tests. Gameplay -> HAL + golem; golem port
+// of HAL OTA-1015.
+export const OTA_BUILD_ID = '2026-07-27-992-studsdown-contracts';
