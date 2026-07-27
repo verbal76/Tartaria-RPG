@@ -214,6 +214,7 @@ import {
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
+import { applyLegacyItemRenames } from '../engine/itemMigrations';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
 import { leaveEmptyWaterBottle } from '../engine/waterBottle';
 import { consumeVerb } from '../engine/consumeVerb';
@@ -1716,14 +1717,39 @@ function acceptKeyword(title: string): string {
 // instead of failing the load to .bak / a slot-load error.
 // Exported for the OTA-486 regression test (equipped hands/cloak must survive a
 // load). The save/load round-trip funnels every load through this migration.
+/** OTA-998 — ONE worldMemory load-migration for every door into a save. It was a
+ *  literal inside loadSlotIntoGame only, so resurrectSlot loaded RAW memory:
+ *  no canon-location resync — a whole revived session of missing atlas pins
+ *  and dead contract markers. */
+export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
+  return {
+    ...wm,
+    puppyVendorOwed: wm.puppyVendorOwed ?? false,
+    puppyVendorUsed: wm.puppyVendorUsed ?? false,
+    gemBossDefeatedKeys: wm.gemBossDefeatedKeys ?? [],
+    puppyVendorQueued: wm.puppyVendorQueued ?? false,
+    dogGolemCoActivated: wm.dogGolemCoActivated ?? false,
+    dogAerialNoticeShown: wm.dogAerialNoticeShown ?? [],
+    dogClimbNoticeShown: wm.dogClimbNoticeShown ?? false,
+    factionRepIntroShown: wm.factionRepIntroShown ?? false,
+    earnedTitleAnnounced: wm.earnedTitleAnnounced ?? [],
+    fusionCompensationGranted: wm.fusionCompensationGranted ?? false,
+    pendingDogOnboarding: wm.pendingDogOnboarding ?? null,
+  };
+}
+
 export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
+  // OTA-998 — retire legacy catalog names FIRST so every later pass (kind/tag
+  // restamp, durability, equip pointers) works on names the catalog still
+  // knows. See itemMigrations.LEGACY_ITEM_RENAMES.
+  const pm = applyLegacyItemRenames(p);
   let out: PlayerCharacter;
   try {
-    out = backfillPlayerInner(p);
+    out = backfillPlayerInner(pm);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn('backfillPlayer: save-upgrade migration threw; loading the raw saved player (degraded-safe)', e);
-    out = p;
+    out = pm;
   }
   // OTA-416 — a LIVE character can never legitimately sit at hp<=0 (that IS
   // death; death is gated by the `dead` flag, not by hp). If a save loads
@@ -1746,6 +1772,11 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
         return at >= 0 ? { ...i, name: SKYREACHER_CHARTS[at]!.name } : i;
       }),
     };
+  }
+  // OTA-998 — the golem's held armament lives OUTSIDE the inventory array and
+  // never met the restamp/durability passes. Heal it like any pack item.
+  if (out.golem?.weapon) {
+    out = { ...out, golem: { ...out.golem, weapon: restampInventoryItem(stampDurability(out.golem.weapon)) } };
   }
   return out;
 }
@@ -5207,20 +5238,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // OTA-120 — Dog Companion world-memory flag migration. Both
       // default to false on legacy saves so the safety net only
       // engages once the player actually loses a dog in combat.
-      const migratedWorldMemory = {
-        ...saved.worldMemory,
-        puppyVendorOwed: saved.worldMemory.puppyVendorOwed ?? false,
-        puppyVendorUsed: saved.worldMemory.puppyVendorUsed ?? false,
-        gemBossDefeatedKeys: saved.worldMemory.gemBossDefeatedKeys ?? [],
-        puppyVendorQueued: saved.worldMemory.puppyVendorQueued ?? false,
-        dogGolemCoActivated: saved.worldMemory.dogGolemCoActivated ?? false,
-        dogAerialNoticeShown: saved.worldMemory.dogAerialNoticeShown ?? [],
-        dogClimbNoticeShown: saved.worldMemory.dogClimbNoticeShown ?? false,
-        factionRepIntroShown: saved.worldMemory.factionRepIntroShown ?? false,
-        earnedTitleAnnounced: saved.worldMemory.earnedTitleAnnounced ?? [],
-        fusionCompensationGranted: saved.worldMemory.fusionCompensationGranted ?? false,
-        pendingDogOnboarding: saved.worldMemory.pendingDogOnboarding ?? null,
-      };
+      const migratedWorldMemory = migrateLoadedWorldMemory(saved.worldMemory);
       set({
         player: { ...player, hasSeenIntro: true },
         worldMemory: migratedWorldMemory,
@@ -5484,9 +5502,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       await saveSlot(slotId, { ...saved, player: revived });
       const remainingGems = await addResurrectionGems(-1);
       await setActiveSlot(slotId);
+      // OTA-998 — resurrection goes through the SAME load migrations as a normal
+      // slot load (it read raw memory before; see migrateLoadedWorldMemory).
+      const revivedWorldMemory = migrateLoadedWorldMemory(saved.worldMemory);
+      setCanonExtraLocations(revivedWorldMemory.canonLocations ?? []);
       set({
         player: revived,
-        worldMemory: saved.worldMemory,
+        worldMemory: revivedWorldMemory,
         gameLog: saved.gameLog,
         currentScreen: 'exploration',
         activeSlotId: slotId,

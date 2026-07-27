@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.31';
+export const DISPLAY_VERSION = '4.28.32';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17526,4 +17526,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // catalog row, by name) + isWeaponCoatingItem; the bandolier's throwable and
 // spear tests read the same canonical tags. Non-catalog (fused) names keep
 // instance-only behavior.
-export const OTA_BUILD_ID = '2026-07-27-997-coatings-always-rack';
+// OTA-998 — RESTITUTION (snapshot-audit batch A). Catalog renames had shipped
+// with NO save migration, so months-old saves held names the catalog no longer
+// knows and every by-name resolution silently degraded them to inferred
+// Commons: the renamed endgame rifle (with the build latch blocking a redo),
+// the re-slotted Skyreacher legs piece (crest ledger blocking a re-earn), two
+// retired torches, and the four original golem armaments. LEGACY_ITEM_RENAMES
+// (itemMigrations.ts) now maps every retired name to its surviving row and
+// backfillPlayer applies it to inventory + equipped slots (incl. the
+// legs->cloak move) + the golem's armament + knownRecipes on every load. The
+// golem's held weapon also joins the restamp/durability heal passes it had
+// been excluded from. And resurrection now runs the SAME worldMemory load
+// migration as a normal slot load (migrateLoadedWorldMemory + canon-location
+// resync) — a gem revival no longer strips the atlas and contract pins.
+export const OTA_BUILD_ID = '2026-07-27-998-restitution-migrations';
