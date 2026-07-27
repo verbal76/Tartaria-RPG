@@ -6004,20 +6004,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-1003 — #122: weather is a LOCAL, PERSISTENT condition. Reuse the sky
     // rolled for this location within the last ~6 game-hours (scene rebuilds
     // stop re-rolling it); otherwise roll fresh WITH locale bias and store.
-    const storedSky = worldMemory.sceneWeather;
+    // OTA-1017 — #122 COMPLETED: the memory is a PER-LOCATION map. The single slot
+    // meant leave-and-return inside the window re-rolled the origin's sky.
+    // The legacy slot reads once as migration; entries self-prune when stale.
     const skyHoursNow = player.hoursElapsed ?? 0;
-    const storedSkyEntry =
-      storedSky && storedSky.locationId === location.id && skyHoursNow - storedSky.rolledAtHours < 6
-        ? weatherById(storedSky.id)
-        : null;
+    const skyMap = worldMemory.sceneWeatherByLoc ?? {};
+    const legacySky = worldMemory.sceneWeather;
+    const skyHit = skyMap[location.id]
+      ?? (legacySky && legacySky.locationId === location.id
+        ? { id: legacySky.id, rolledAtHours: legacySky.rolledAtHours }
+        : undefined);
+    const storedSkyEntry = skyHit && skyHoursNow - skyHit.rolledAtHours < 6 ? weatherById(skyHit.id) : null;
     const weather = storedSkyEntry ?? pickWeather(worldMemory, location);
     if (!storedSkyEntry) {
-      set((s) => ({
-        worldMemory: {
-          ...s.worldMemory,
-          sceneWeather: { id: weather.id, locationId: location.id, rolledAtHours: skyHoursNow },
-        },
-      }));
+      set((s) => {
+        const prevMap = s.worldMemory.sceneWeatherByLoc ?? {};
+        const pruned: Record<string, { id: string; rolledAtHours: number }> = {};
+        for (const [locKey, entry] of Object.entries(prevMap)) {
+          if (skyHoursNow - entry.rolledAtHours < 6) pruned[locKey] = entry;
+        }
+        pruned[location.id] = { id: weather.id, rolledAtHours: skyHoursNow };
+        return { worldMemory: { ...s.worldMemory, sceneWeatherByLoc: pruned } };
+      });
     }
     const hazard = pickHazardForLocation(location);
     // HANDOFF #15b — hub mode. When player is at the hub location AND
@@ -18684,7 +18692,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Resurrection Gem) — the dust fallback was minting 3-4 junk items at the game's
     // climax. It now only pads lazily-authored NON-boss lists, and mints the catalog's
     // real, stackable 'Aether Dust' (the old lowercase string could never stack).
-    const lootPool = enemy.loot.length > 0 ? enemy.loot : enemy.boss ? [] : ['Aether Dust'];
+    // OTA-1017 — THE RECLAIM (owner's calls): a Hollowed's died-in WEAPON is granted
+    // outright at the put-to-rest block below, so it sits out the chance rolls
+    // (no dupes); armor pieces stay on the rolls but grant the REAL snapshot
+    // item — pristine, fused stats intact — never a look-alike trophy.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const revMod = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+    const revFr = revMod.isRevenant(enemy) ? get().worldMemory.activeRevenant : undefined;
+    const revKit = revFr?.gear ?? [];
+    const revWeaponName = revFr
+      ? (revMod.revenantReclaimWeapon({ gear: revKit })?.name
+        ?? ((revFr.gearNames && revFr.gearNames.length > 0)
+          ? revFr.gearNames
+          : revMod.cachedFallen().find((x) => x.ts === revFr.ts)?.gearNames ?? [])[0]
+        ?? null)
+      : null;
+    const basePool = enemy.loot.length > 0 ? enemy.loot : enemy.boss ? [] : ['Aether Dust'];
+    const lootPool = revWeaponName ? basePool.filter((n) => n !== revWeaponName) : basePool;
     const lootRollCount = enemy.rarity === 'Legendary' ? 3 + Math.floor(Math.random() * 2)
       : enemy.rarity === 'Rare' ? 2 + Math.floor(Math.random() * 2)
       : enemy.rarity === 'Uncommon' ? 2 + Math.floor(Math.random() * 2)
@@ -18790,6 +18814,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             (inv, lootName, i) => {
               // OTA-961 — resolveLootItem: catalog-canonical when known, TROPHY at the
               // enemy's own rarity when not (never a 2-TC tagless Common again).
+              const revPiece = revKit.find((g) => g.name === lootName);
+              if (revPiece) {
+                return mergeOrPushItem(inv, revMod.reconstructFallenPiece(revPiece, `loot_${Date.now()}_${i}`));
+              }
               const lootLookup = resolveLootItem(lootName, enemy.rarity);
               // OTA-363 — a dropped coatable weapon occasionally arrives
               // pre-coated. Coated weapons mint as a distinct instance
@@ -19067,6 +19095,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const closing = rev998.revenantDefeatLines(fr, get().player?.name ?? 'a wanderer');
           get().appendLog('world', closing.world);
           get().appendLog('reward', closing.reward);
+          // OTA-1017 — the GUARANTEED reclaim (owner's call): a one-time boss must
+          // not lose the signature piece to a dice roll that can never rerun.
+          {
+            const wp = rev998.revenantReclaimWeapon(fr);
+            if (wp) {
+              const back = rev998.reconstructFallenPiece(wp, `reclaim_${Date.now()}`);
+              set((s2) => (s2.player ? { player: { ...s2.player, inventory: mergeOrPushItem(s2.player.inventory, back) } } : s2));
+              get().appendLog('reward', `✦ ${back.name} comes free of the mud — carried to the end, and yours now to carry on.`);
+            } else {
+              const pinnedNames = (fr.gearNames && fr.gearNames.length > 0)
+                ? fr.gearNames
+                : rev998.cachedFallen().find((x) => x.ts === fr.ts)?.gearNames ?? [];
+              const wname = pinnedNames[0];
+              if (wname) {
+                const lk = resolveLootItem(wname, 'Legendary');
+                set((s2) => (s2.player ? { player: { ...s2.player, inventory: mergeOrPushItem(s2.player.inventory, {
+                  id: `reclaim_${Date.now()}`, name: lk.name, kind: lk.kind, rarity: lk.rarity, quantity: 1, tags: [...lk.tags, 'loot'],
+                }) } } : s2));
+                get().appendLog('reward', `✦ ${lk.name} comes free of the mud — carried to the end, and yours now to carry on.`);
+              }
+            }
+          }
           rev998.markAvenged(fr.ts, get().player?.name ?? 'a wanderer');
           set((s2) => ({ worldMemory: { ...s2.worldMemory, activeRevenant: undefined } }));
           get().appendLog('debug', `revenant: ${fr.name}@${fr.ts} put to rest`);
@@ -19438,7 +19488,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // The enemy's drop list comes over in FULL (not the partial kill
     // roll) — you're picking the body clean.
+    // OTA-1017 — a knocked-out Hollowed picked clean gives back the REAL died-in
+    // kit too, and the stripping COUNTS as put to rest — otherwise the same
+    // pristine kit could be farmed off every re-rise.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const koRev = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+    const koKit = koRev.isRevenant(enemy) ? (get().worldMemory.activeRevenant?.gear ?? []) : [];
+    if (koRev.isRevenant(enemy)) {
+      const koFr = get().worldMemory.activeRevenant;
+      if (koFr) {
+        koRev.markAvenged(koFr.ts, get().player?.name ?? 'a wanderer');
+        set((s2) => ({ worldMemory: { ...s2.worldMemory, activeRevenant: undefined } }));
+        get().appendLog('world', `Stripped and still, the mud lets ${koFr.name} go. They rest now.`);
+      }
+    }
     for (const lootName of enemy.loot ?? []) {
+      const koPiece = koKit.find((g) => g.name === lootName);
+      if (koPiece) { grants.push(koRev.reconstructFallenPiece(koPiece, `ko_${stamp}_${n++}`)); continue; }
       // OTA-961 — same canonical/trophy resolution as the kill path.
       const lk = resolveLootItem(lootName, enemy.rarity);
       grants.push({
@@ -22834,7 +22900,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScene: { ...s.currentScene, weather: newWeather },
               worldMemory: {
                 ...s.worldMemory,
-                sceneWeather: { id: newWeather.id, locationId: driftLocId, rolledAtHours: driftHours },
+                sceneWeatherByLoc: {
+                  ...(s.worldMemory.sceneWeatherByLoc ?? {}),
+                  [driftLocId]: { id: newWeather.id, rolledAtHours: driftHours },
+                },
               },
             }
           : s);
@@ -23102,11 +23171,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       {
         const rvPlayer = get().player;
         const rvScene = get().currentScene;
+        // OTA-1017 — the power gate needs PROVEN PROGRESS beside raw HP (a fresh
+        // Giant starts near 60 hpMax — no day-one bosses for any race), and
+        // diced ground BANKS so a revisit can't re-arm the door.
+        const rvTileKey = rvPlayer ? `${rvPlayer.currentLocationId}:${rvPlayer.mapX}:${rvPlayer.mapY}` : '';
+        const rvRolled = get().worldMemory.revenantRolledTiles ?? [];
+        const rvProven = ((rvPlayer?.milestones?.enemiesDefeated ?? 0) >= 10) || ((rvPlayer?.hoursElapsed ?? 0) >= 12);
         if (rvPlayer && rvScene && peacefulWild && tileIsNovel && !hasLiveEscort
-            && (rvScene.enemies ?? []).length === 0 && (rvPlayer.hpMax ?? 0) >= 60) {
+            && (rvScene.enemies ?? []).length === 0 && (rvPlayer.hpMax ?? 0) >= 60
+            && rvProven && !rvRolled.includes(rvTileKey)) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const rev = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
           const rvPool = rev.cachedFallen().filter((f) => !f.avengedTs);
+          if (rvPool.length > 0) {
+            set((s2) => ({ worldMemory: {
+              ...s2.worldMemory,
+              revenantRolledTiles: [...(s2.worldMemory.revenantRolledTiles ?? []), rvTileKey].slice(-120),
+            } }));
+          }
           if (rvPool.length > 0 && Math.random() < 0.04) {
             revenantBeatFired = true;
             const fr = rvPool[Math.floor(Math.random() * rvPool.length)]!;
@@ -27364,6 +27446,12 @@ function applyHookEffect(
     case 'spawn_fallen_revenant': {
       const rp = get().player;
       if (!rp) return { inlineSummary: null, fatal: false };
+      // OTA-1017 — never over a live fight: the spawn replaces the enemies array,
+      // which would erase combatants mid-swing. The tale keeps; the pool
+      // keeps; the Hollowed can still rise at a later door.
+      if ((get().currentScene?.enemies ?? []).length > 0) {
+        return { inlineSummary: 'the mud stays shut while blades are already out — the tale keeps, and the Hollowed still walks', fatal: false };
+      }
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const rev = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
       const pool = rev.cachedFallen().filter((f) => !f.avengedTs);
@@ -30460,6 +30548,10 @@ function handlePlayerDeath(
           })
           .map(([, v]) => String(v)))).slice(0, 6);
       })(),
+      // OTA-1017 — THE RECLAIM: full item copies too, so the revenant can give the
+      // REAL gear back (fused stats intact), not a look-alike or a trophy.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      gear: (require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants')).buildFallenGearSnapshot(player),
       ts: Date.now(),
     };
     {

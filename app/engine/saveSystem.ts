@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { SaveState } from './types';
+import type { FallenGearPiece, SaveState } from './types';
 import { capDiskLog } from './diskLogCap';
 
 // v2 schema: multi-slot. Each character is its own keyed save with its
@@ -107,6 +107,9 @@ export interface FallenHero {
    *  revenant's kit + drop pool. Absent on pre-998 records — the revenant
    *  builder synthesizes a seeded kit instead. */
   gearNames?: string[];
+  /** OTA-1017 — full copies of the died-in kit (instance stats and all), so the
+   *  revenant hands back the REAL gear. Absent on records that predate it. */
+  gear?: FallenGearPiece[];
   /** OTA-998 — set once their Hollowed revenant is put to rest. */
   avengedBy?: string;
   avengedTs?: number;
@@ -127,6 +130,16 @@ export async function recordFallen(hero: FallenHero): Promise<number> {
 export async function markFallenAvenged(ts: number, by: string): Promise<void> {
   const stash = await loadGlobalStash();
   const next = (stash.fallen ?? []).map((f) => (f.ts === ts ? { ...f, avengedBy: by, avengedTs: Date.now() } : f));
+  await saveGlobalStash({ ...stash, fallen: next });
+}
+
+/** OTA-1017 — pin a SYNTHESIZED (pre-snapshot) revenant kit onto its record the
+ *  first time it is generated, so a later catalog edit can never reshuffle the
+ *  gear a named fallen wears. Never overwrites a real recorded kit. */
+export async function pinFallenGearNames(ts: number, gearNames: string[]): Promise<void> {
+  const stash = await loadGlobalStash();
+  const next = (stash.fallen ?? []).map((f) =>
+    (f.ts === ts && !(f.gearNames && f.gearNames.length > 0) ? { ...f, gearNames } : f));
   await saveGlobalStash({ ...stash, fallen: next });
 }
 

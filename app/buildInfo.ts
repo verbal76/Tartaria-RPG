@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.27';
+export const DISPLAY_VERSION = '4.28.28';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18558,4 +18558,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // climbable paper (#113 reopened through its own fix); the Great Fang of Zharak still climbs; the
 // curly-apostrophe hole in the catalog exclusion is closed. DISPLAY_VERSION 4.28.27. 13 tests.
 // Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-27-1016-studsdown-inputworld';
+// OTA-1017 — THE RESIDUALS, CLOSED (owner: "complete 1-4 that were left open").
+// (1) THE RECLAIM: the kit is captured as FULL ITEM COPIES at death; a Hollowed
+// put to rest hands back the died-in WEAPON outright and armor rides the normal
+// rolls as the REAL items — pristine, fused stats intact — never look-alike
+// trophies. KO-strips count as put to rest (no rise-again kit farm). Legacy
+// seeded kits PIN at first generation (catalog edits can't re-dress a named
+// fallen). (2) itemPreview heals promise the #120-scaled value for YOUR frame.
+// (3) The sky is remembered PER LOCATION (self-pruning map; legacy slot
+// migrates) — leave-and-return keeps the origin's weather. (4) Hollowed polish:
+// proven-progress gate (10 kills or 12h) beside the HP bar, per-tile roll bank,
+// retried memorial write, and the rumour can't spawn the boss over a live fight.
+export const OTA_BUILD_ID = '2026-07-27-1017-residuals-closed';
