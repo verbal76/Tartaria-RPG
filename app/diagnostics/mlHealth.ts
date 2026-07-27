@@ -42,6 +42,9 @@
 // when the last attempt/success was.
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// OTA-985 — the build stamp the voice-crash count is scoped to. buildInfo imports
+// nothing, so this cannot cycle.
+import { OTA_BUILD_ID } from '../buildInfo';
 
 const KEY_ATTEMPTED = 'tartaria.ml.lastInitAttempt';
 const KEY_SUCCEEDED = 'tartaria.ml.lastInitSuccess';
@@ -95,6 +98,11 @@ const QWEN_PERMA_DISABLE_AT = 3;
 const KEY_TTS_IN_PROGRESS = 'tartaria.ml.ttsInProgress';
 const KEY_TTS_CRASH_COUNT = 'tartaria.ml.ttsCrashCount';
 const KEY_TTS_DISABLED = 'tartaria.ml.ttsDisabledByCrash';
+// OTA-985 — which build the voice-crash count was accumulated under. When this stops
+// matching OTA_BUILD_ID the count is describing code that is no longer installed,
+// so it is re-zeroed. See the block in loadMLHealth for why this is safe here and
+// deliberately NOT done for the Qwen / init guards.
+const KEY_TTS_COUNT_BUILD = 'tartaria.ml.ttsCrashCountBuild';
 
 // OTA-414 — AUTO-RETRY with backoff for the Qwen completion guard. The disable is
 // no longer permanent: once it trips, Qwen gets another attempt after a cooldown
@@ -134,6 +142,10 @@ interface MLHealthState {
   /** The breadcrumb label (voice id) that was in-flight when the process died
    *  last session, if a TTS crash was detected this boot. */
   lastTtsOpBeforeCrash: string | null;
+  /** OTA-985 — this boot is the first on a new build, so the voice-crash count was
+   *  re-zeroed (it described the previous build's code). Surfaced in the
+   *  diagnostic so a reset is visible rather than silent. */
+  ttsCountResetThisBoot: boolean;
   // OTA-414 — Qwen auto-retry/backoff state (for the diagnostic + UX).
   /** This boot is a scheduled retry of a crash-disabled Qwen. */
   qwenRetryingThisBoot: boolean;
@@ -170,12 +182,13 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   let ttsInProgress: string | null = null;
   let ttsCrashCountStr: string | null = null;
   let ttsDisabledStr: string | null = null;
+  let ttsCountBuildStr: string | null = null;
   let bootCountStr: string | null = null;
   let qwenRetryAtStr: string | null = null;
   let qwenRetryPendingStr: string | null = null;
   let qwenBackoffStr: string | null = null;
   try {
-    [attempted, succeeded, crashCountStr, disabledStr, completionInProgress, qwenCrashCountStr, qwenDisabledStr, ttsInProgress, ttsCrashCountStr, ttsDisabledStr, bootCountStr, qwenRetryAtStr, qwenRetryPendingStr, qwenBackoffStr] = await Promise.all([
+    [attempted, succeeded, crashCountStr, disabledStr, completionInProgress, qwenCrashCountStr, qwenDisabledStr, ttsInProgress, ttsCrashCountStr, ttsDisabledStr, ttsCountBuildStr, bootCountStr, qwenRetryAtStr, qwenRetryPendingStr, qwenBackoffStr] = await Promise.all([
       AsyncStorage.getItem(KEY_ATTEMPTED),
       AsyncStorage.getItem(KEY_SUCCEEDED),
       AsyncStorage.getItem(KEY_CRASH_COUNT),
@@ -186,6 +199,7 @@ export async function loadMLHealth(): Promise<MLHealthState> {
       AsyncStorage.getItem(KEY_TTS_IN_PROGRESS),
       AsyncStorage.getItem(KEY_TTS_CRASH_COUNT),
       AsyncStorage.getItem(KEY_TTS_DISABLED),
+      AsyncStorage.getItem(KEY_TTS_COUNT_BUILD),
       AsyncStorage.getItem(KEY_BOOT_COUNT),
       AsyncStorage.getItem(KEY_QWEN_RETRY_AT),
       AsyncStorage.getItem(KEY_QWEN_RETRY_PENDING),
@@ -332,6 +346,24 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   // survived to this boot, a voice utterance crashed the process last session.
   let ttsCrashCount = Number.parseInt(ttsCrashCountStr ?? '0', 10);
   if (!Number.isFinite(ttsCrashCount) || ttsCrashCount < 0) ttsCrashCount = 0;
+  // OTA-985 — a new build means the count describes code that is no longer here, so
+  // it starts over. The surviving breadcrumb is dropped in the same breath: the
+  // reload that APPLIED the OTA is the textbook benign termination this counter
+  // cannot distinguish from a crash (OTA-464's whole reason for pulling the voice
+  // auto-disable), so counting it would immediately re-inflate the number we just
+  // reset. Anything the voice does wrong on the new build is counted normally
+  // from the next utterance onward.
+  let ttsCountResetThisBoot = false;
+  if (ttsCountBuildStr !== OTA_BUILD_ID) {
+    ttsCountResetThisBoot = ttsCrashCount > 0 || !!ttsInProgress;
+    ttsCrashCount = 0;
+    ttsInProgress = null;
+    try {
+      await AsyncStorage.removeItem(KEY_TTS_CRASH_COUNT);
+      await AsyncStorage.removeItem(KEY_TTS_IN_PROGRESS);
+      await AsyncStorage.setItem(KEY_TTS_COUNT_BUILD, OTA_BUILD_ID);
+    } catch { /* retried next boot — the stamp write is the only durable part */ }
+  }
   let detectedTtsCrashThisBoot = false;
   let lastTtsOpBeforeCrash: string | null = null;
   // OTA-464 — voice auto-disable REVERTED to detection-only (was OTA-463). The
@@ -382,6 +414,7 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     detectedTtsCrashThisBoot,
     ttsDisabledByCrash,
     lastTtsOpBeforeCrash,
+    ttsCountResetThisBoot,
     qwenRetryingThisBoot,
     qwenRecoveredThisBoot,
     qwenNextRetryInBoots,
@@ -598,6 +631,9 @@ export async function resetMLHealth(): Promise<void> {
       AsyncStorage.removeItem(KEY_TTS_CRASH_COUNT),
       AsyncStorage.removeItem(KEY_TTS_IN_PROGRESS),
       AsyncStorage.removeItem(KEY_TTS_DISABLED),
+      // OTA-985 — drop the build stamp as well, so the next load re-stamps against
+      // the running build instead of leaving a count scoped to nothing.
+      AsyncStorage.removeItem(KEY_TTS_COUNT_BUILD),
       // OTA-414 — clear the Qwen auto-retry/backoff schedule.
       AsyncStorage.removeItem(KEY_QWEN_RETRY_AT),
       AsyncStorage.removeItem(KEY_QWEN_RETRY_PENDING),
@@ -614,6 +650,7 @@ export async function resetMLHealth(): Promise<void> {
     cached.qwenPermaDisabled = false;
     cached.ttsCrashCount = 0;
     cached.detectedTtsCrashThisBoot = false;
+    cached.ttsCountResetThisBoot = false;
     cached.ttsDisabledByCrash = false;
     cached.lastTtsOpBeforeCrash = null;
     cached.qwenRetryingThisBoot = false;
@@ -672,9 +709,12 @@ export function mlHealthSummary(): string {
   if (state.detectedTtsCrashThisBoot) {
     ttsStatus = `⚠ VOICE CRASH detected on previous launch (${state.ttsCrashCount} total)${state.lastTtsOpBeforeCrash ? ` — last voice: ${state.lastTtsOpBeforeCrash}` : ''}`;
   } else if (state.ttsCrashCount > 0) {
-    ttsStatus = `${state.ttsCrashCount} voice crash(es) this install`;
+    ttsStatus = `${state.ttsCrashCount} voice crash(es) on this build`;
+  } else if (state.ttsCountResetThisBoot) {
+    // OTA-985 — say so out loud, so a reset reads as a reset and not as luck.
+    ttsStatus = `clean (count reset — it described a previous build)`;
   } else {
-    ttsStatus = `clean (no voice crashes)`;
+    ttsStatus = `clean (no voice crashes on this build)`;
   }
   return [
     `ML runtime health`,
