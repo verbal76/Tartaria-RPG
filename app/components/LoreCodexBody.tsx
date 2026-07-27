@@ -129,13 +129,11 @@ export function LoreCodexBody() {
   return (
     <View style={styles.bodyWrap}>
       {/* OTA-852 — the 7 codex tabs no longer cram into the width and word-wrap;
-          the row scrolls horizontally and each tab sizes to its (one-line) label. */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.tabsScroll}
-        contentContainerStyle={styles.tabs}
-      >
+          each tab sizes to its one-line label. UPDATED: the row now
+          WRAPS instead of scrolling — the hidden horizontal scroll (indicator off,
+          no cue) cut FALLEN and LORE off past the right edge on the owner's device;
+          a tab that exists must be visible. */}
+      <View style={styles.tabs}>
         {(['races', 'factions', 'places', 'timeline', 'bestiary', 'lore', 'fallen'] as Section[]).map((s) => (
           <TouchableOpacity
             key={s}
@@ -149,7 +147,7 @@ export function LoreCodexBody() {
             </Text>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 24 }}>
         {section === 'races' && (racesData as Race[]).map((r) => {
@@ -385,8 +383,7 @@ export function LoreCodexBody() {
 
 const styles = StyleSheet.create({
   bodyWrap: { flex: 1 },
-  tabsScroll: { flexGrow: 0, marginBottom: 8 },
-  tabs: { flexDirection: 'row', gap: 6, paddingRight: 8 },
+  tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 },
   tab: { paddingVertical: 6, paddingHorizontal: 14, borderWidth: 1, borderColor: '#3a342c', borderRadius: 4, alignItems: 'center' },
   tabActive: { borderColor: '#c9a86a' },
   tabText: { color: '#a2977b', fontSize: 11, letterSpacing: 1 },

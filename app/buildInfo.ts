@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.29';
+export const DISPLAY_VERSION = '4.28.30';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18575,4 +18575,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // still out in the mud as risable Hollowed. Un-avenged entries now carry an
 // amber "STILL WALKING" line, and the header counts them ("N remembered *
 // M still walking").
-export const OTA_BUILD_ID = '2026-07-27-1018-fallen-walking-marker';
+// OTA-1019 — THE CODEX TABS ARE ALWAYS ON SCREEN (owner screenshot: "there is
+// no fallen tab under lore"). The 7-tab row was a horizontal ScrollView with
+// the indicator hidden and no affordance — FALLEN and LORE sat past the right
+// edge and effectively did not exist unless the player happened to swipe the
+// row. The row now WRAPS onto a second line: every tab always visible, no
+// hidden state. Category rule: content that exists must be discoverable.
+export const OTA_BUILD_ID = '2026-07-27-1019-codex-tabs-visible';
