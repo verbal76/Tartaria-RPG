@@ -786,9 +786,22 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.31**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.32**; ledger in `VERSION.md`.
 
-- **EVERY COATING RACKS (2026-07-27, latest).** HAL **1020** / golem **997**. Owner: "there were
+- **THE SNAPSHOT AUDIT, BATCH A — RESTITUTION (2026-07-27, latest).** HAL **1021** / golem **998**.
+  Owner approved all five batches (A–E) from the 3-agent stale-snapshot sweep (~50 verified sites;
+  the OTA-1020 category generalized: code trusting persisted snapshots over live definitions).
+  A ships: `itemMigrations.ts` `LEGACY_ITEM_RENAMES` — every retired catalog name maps to its
+  surviving row (Boltcaster→Beacon Rifle, Greaves→Mantle incl. the legs→cloak slot move, 2 torches,
+  4 original golem armaments) — applied by backfillPlayer on every load to inventory + equipped +
+  golem armament + knownRecipes; the golem's held weapon joins the restamp/durability passes it was
+  excluded from; `migrateLoadedWorldMemory` extracted and used by BOTH load doors, so a gem
+  resurrection no longer strips canon locations / contract pins / bestiary intel for the session.
+  Lock: every map key must be dead in the raw catalogs and every value alive (6 tests).
+  REMAINING: batches B (fail-open loss holes), C (economy), D (~25 identity sites), E (guard-rails
+  + rename policy + catalog-name ratchet) — full findings in the three audit reports, session log.
+
+- **EVERY COATING RACKS (2026-07-27).** HAL **1020** / golem **997**. Owner: "there were
   coatings that I couldn't load into my bandolier." Root cause CATEGORY: identity-by-instance-tag-
   snapshot — five sites asked "is this a coating?" from the instance's tags, and instances keep the
   tag set they were MINTED with, so vials acquired before a catalog tag existed failed the bandolier
