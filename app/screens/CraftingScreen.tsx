@@ -1,10 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
 import { missingIngredientsList, craftableRecipeCounts } from '../engine/crafting';
 import { RecipesView } from '../components/RecipesView';
-import { CraftResultModal } from '../components/CraftResultModal';
 import { CraftRefusalModal } from '../components/CraftRefusalModal';
 import { BrandedModal } from '../components/BrandedModal';
 import type { InventoryDelta } from '../components/inventoryDelta';
@@ -150,7 +149,7 @@ function ownedQty(inventory: InventoryItem[], name: string): number {
     .reduce((s, i) => s + i.quantity, 0);
 }
 
-// OTA — confirm popup for the NON-golem disciplines (shape / mend), mirroring the
+// OTA-1006 — confirm popup for the NON-golem disciplines (shape / mend), mirroring the
 // golem summon confirm. Tapping the card no longer copies a phrase to the clipboard
 // for the player to paste back — it opens this confirm, and on Cast it dispatches
 // the action and bounces to exploration so the roll plays out live.
@@ -223,6 +222,12 @@ export function CraftingScreen() {
   // Empty / null delta = craft failed or no-op'd — the world feed
   // narrates the failure; no popup, screen stays on tab.
   const [craftResult, setCraftResult] = useState<InventoryDelta[] | null>(null);
+  // OTA-1006 — the haul banner clears itself; there is no button to hunt for.
+  useEffect(() => {
+    if (craftResult === null) return;
+    const t = setTimeout(() => setCraftResult(null), 2600);
+    return () => clearTimeout(t);
+  }, [craftResult]);
   // OTA-833 — refusal popup message. Set when a craft did nothing and wasn't a
   // substitution-confirm (gated on Cores / missing ingredients / pack full). Renders
   // the CraftRefusalModal so a gated tap isn't a silent no-op.
@@ -232,7 +237,7 @@ export function CraftingScreen() {
   // exploration. Now it opens a confirm → on Summon it dispatches the action and
   // bounces to exploration, where the d20+INT roll plays out live.
   const [golemConfirm, setGolemConfirm] = useState<GolemConfirm | null>(null);
-  // OTA — confirm popup for shape/mend (Aetherstone Manipulation / Aetheric
+  // OTA-1006 — confirm popup for shape/mend (Aetherstone Manipulation / Aetheric
   // Healing). Same UX as the golem summon: tap the card → confirm → cast (no
   // clipboard copy-paste).
   const [disciplineConfirm, setDisciplineConfirm] = useState<DisciplineConfirm | null>(null);
@@ -479,7 +484,7 @@ export function CraftingScreen() {
                   ]}
                   onPress={() => {
                     // OTA-629 — the SUMMON card opens the golem confirm popup.
-                    // OTA — shape (Aetherstone Manipulation) and mend (Aetheric
+                    // OTA-1006 — shape (Aetherstone Manipulation) and mend (Aetheric
                     // Healing) now open their OWN confirm popup too, instead of
                     // copying a phrase to the clipboard for the player to paste
                     // back. No copy-paste anywhere in the aetheric flow.
@@ -549,7 +554,7 @@ export function CraftingScreen() {
                     </View>
                   )}
                   <Text style={styles.aetherCardExamples}>
-                    {/* OTA — every discipline card opens a confirm popup on tap
+                    {/* OTA-1006 — every discipline card opens a confirm popup on tap
                         (golem, shape, mend). No copy-to-input; the phrasings are
                         just the equivalent things you could type. */}
                     <Text style={styles.aetherCardExamplesLabel}>
@@ -648,20 +653,20 @@ export function CraftingScreen() {
         </>
       )}
 
-      {/* OTA-264 — post-craft confirmation popup. Renders whenever
-          craftResult is non-null (set by RecipesView's onAfterCraft
-          for both Craft and Recipes tabs). CONTINUE CRAFTING clears
-          the state and keeps the screen on the active tab; CLOSE
-          MENU clears state AND navigates back to exploration. */}
-      <CraftResultModal
-        visible={craftResult !== null}
-        items={craftResult ?? []}
-        onContinue={() => setCraftResult(null)}
-        onClose={() => {
-          setCraftResult(null);
-          setScreen('exploration');
-        }}
-      />
+      {/* OTA-1006 — SUPERSEDES OTA-264's popup. That modal asked "CONTINUE CRAFTING
+          or CLOSE MENU" after every single craft — a question whose answer was
+          always the same (owner: "assume they always want to continue crafting,
+          never close the crafting menu till they hit a back button"). The count
+          is chosen up front now, so all that's left is to say what was made.
+          This banner does that and fades itself; nothing to dismiss, and the
+          menu stays exactly where it was. */}
+      {craftResult !== null && (
+        <View style={styles.craftBanner} accessibilityRole="alert">
+          <Text style={styles.craftBannerText} numberOfLines={2}>
+            ✦ {craftResult.map((d) => `${d.name}${d.quantity > 1 ? ` ×${d.quantity}` : ''}`).join(', ')} added
+          </Text>
+        </View>
+      )}
 
       {/* OTA-833 — craft-REFUSAL popup. A gated / unaffordable craft used to do
           nothing visible (silent fail); now the engine's refusal narration surfaces
@@ -727,7 +732,7 @@ export function CraftingScreen() {
         onRequestClose={() => setGolemConfirm(null)}
       />
 
-      {/* OTA — shape (Aetherstone Manipulation) + mend (Aetheric Healing) confirm.
+      {/* OTA-1006 — shape (Aetherstone Manipulation) + mend (Aetheric Healing) confirm.
           Same UX as the golem summon: confirm dispatches the cast and returns to
           exploration so the roll plays out live. No clipboard copy-paste. */}
       <BrandedModal
@@ -760,6 +765,14 @@ export function CraftingScreen() {
 }
 
 const styles = StyleSheet.create({
+  // OTA-1006 — the post-craft haul banner that replaced the "continue crafting?"
+  // question. Sits over the list, says what landed, and fades on its own.
+  craftBanner: {
+    position: 'absolute', top: 8, left: 12, right: 12,
+    backgroundColor: '#1d2416', borderWidth: 1, borderColor: '#9ec96a',
+    borderRadius: 4, paddingVertical: 10, paddingHorizontal: 14, zIndex: 20,
+  },
+  craftBannerText: { color: '#9ec96a', fontSize: 13, lineHeight: 18 },
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
   header: {
     flexDirection: 'row',

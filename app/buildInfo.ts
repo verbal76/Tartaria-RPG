@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.17';
+export const DISPLAY_VERSION = '4.28.18';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18352,4 +18352,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // vendor's portable rig now checks BEFORE taking its 25 TC (was: pay, then get a dead menu), the
 // FUSE button gates on the real rule so a lit button always fuses, and the stale selection is
 // cleared on refusal. DISPLAY_VERSION 4.28.17. 7 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-27-1007-fuse-honesty';
+// OTA-1006 (how many, not "do you want to continue?"). Owner: "instead of having the continue
+// crafting, let's assume they always want to continue crafting — never close the crafting menu
+// till they hit a back button. So that pop-up becomes how many of that item do we want to craft
+// ... plus and minus buttons or Craft Max ... and then it just completes that crafting task and
+// stays in the crafting menu." ROOT CAUSE: OTA-264 put the decision AFTER the work. A tap crafted
+// exactly one, then a modal asked CONTINUE CRAFTING / CLOSE MENU — a question whose answer was
+// always the same, so ten stews cost twenty taps and ten identical prompts, and the modal could
+// take the menu away. The step moves to the FRONT: tapping a recipe opens a quantity picker
+// (- / + stepper and MAX), the batch runs, and the menu stays exactly where it was. MAX is honest
+// — maxCraftableCount simulates the real drain one craft at a time through the same
+// substitution-aware consumeIngredientsList the craft uses, rather than dividing and hoping, and
+// is capped at MAX_CRAFT_BATCH = 20. craftRecipeBatch mirrors salvageAllAmbient's proven shape:
+// every pass is an ordinary craft with every gate intact (so it can never over-consume), it stops
+// on a refusal / full pack / the substitution prompt, and emits ONE aggregated reward line instead
+// of N. The OTA-264 modal is retired for a self-clearing haul banner. DISPLAY_VERSION 4.28.18.
+// 5 tests. Gameplay -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-27-1006-craft-quantity';
