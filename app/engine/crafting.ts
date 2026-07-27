@@ -605,16 +605,36 @@ export function consumeIngredientsList(
  *  consumed it once, so the craft went through paying one material short. This
  *  allocates each item to the first ingredient that claims it, exactly as the
  *  drain does, so canCraft can never approve a craft the drain would underpay. */
+// OTA-1027 — PER-INVENTORY annotation cache. ingredientShortfall annotated every
+// item (canonical tags + substitutability + catalog lookups) PER RECIPE, so
+// the craft badge and every repairs-tab re-render paid
+// O(recipes x inventory x catalog) — ~900ms in the harness, seconds-per-tap
+// on device ("tap, wait 20 seconds, stutter"). The store's inventory array is
+// immutable (every set() replaces it), so a WeakMap keyed on array identity
+// self-invalidates on any inventory change. Only the qty is copied per call
+// (the allocation below consumes it).
+const SHORTFALL_META = new WeakMap<object, ReadonlyArray<{ name: string; tags: readonly string[]; qty: number; sub: boolean }>>();
+
 function ingredientShortfall(
   ingredients: ReadonlyArray<{ name: string; quantity: number }>,
   inventory: readonly InventoryItem[],
 ): Array<{ name: string; quantity: number }> {
-  const pool = inventory.map((i) => ({
-    name: i.name.toLowerCase(),
-    tags: canonicalItemTags(i),
-    qty: i.quantity,
-    sub: isSubstitutable(i),
-  }));
+  let meta = SHORTFALL_META.get(inventory as unknown as object);
+  if (!meta) {
+    meta = inventory.map((i) => ({
+      name: i.name.toLowerCase(),
+      tags: canonicalItemTags(i),
+      qty: i.quantity,
+      sub: isSubstitutable(i),
+    }));
+    SHORTFALL_META.set(inventory as unknown as object, meta);
+  }
+  const pool = meta.map((e) => ({ name: e.name, tags: e.tags, qty: e.qty, sub: e.sub }));
+  // OTA-1027 — parity with the preview/drain loops' exact-ingredient exclusion: an
+  // item that IS one of the recipe's exact ingredients never doubles as a tag
+  // substitute for another slot. canCraft kept the old rule after the loops
+  // gained it, so approve and drain could disagree (the OTA-613 hazard).
+  const exactIngredientNames = new Set(ingredients.map((ig) => ig.name.toLowerCase()));
   const out: Array<{ name: string; quantity: number }> = [];
   for (const ing of ingredients) {
     let need = ing.quantity;
@@ -631,7 +651,7 @@ function ingredientShortfall(
       const tagSet = new Set(tags);
       for (const p of pool) {
         if (need <= 0) break;
-        if (p.qty <= 0 || !p.sub || p.name === target) continue;
+        if (p.qty <= 0 || !p.sub || exactIngredientNames.has(p.name)) continue;
         if (!p.tags.some((t) => tagSet.has(t))) continue;
         const take = Math.min(p.qty, need); p.qty -= take; need -= take;
       }

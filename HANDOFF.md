@@ -846,9 +846,20 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.37**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.38**; ledger in `VERSION.md`.
 
-- **THE KILL-BEAT FREEZE (2026-07-27, latest).** HAL **1026** / golem **1003**. Owner: the final
+- **THE CRAFT-SCREEN STALL (2026-07-27, latest).** HAL **1027** / golem **1004**. Owner: CRAFT took
+  seconds to open; each repairs-tab tap was "tap, wait 20 seconds, stutter". Root cause was
+  PRE-EXISTING (bisect probe: ~900ms both before and after the audit batches):
+  `ingredientShortfall` annotated the ENTIRE inventory (canonical tags + substitutability +
+  catalog scans) PER RECIPE, and the craft badge runs all 130 recipes on every screen open AND on
+  every inventory change — each repair tap re-paid the whole bill. Fix: `SHORTFALL_META` WeakMap
+  keyed on the immutable inventory array (self-invalidates on change); per-recipe allocation
+  copies only qty. Harness 900ms → 23ms first / 3ms warm. BONUS parity fix: canCraft's shortfall
+  gained the same exact-ingredient substitution exclusion as the preview/drain loops (OTA-1024
+  had left the third copy behind — approve/drain could disagree, the OTA-613 hazard).
+
+- **THE KILL-BEAT FREEZE (2026-07-27).** HAL **1026** / golem **1003**. Owner: the final
   blow "hangs on resolving for a good 7-8 seconds" — only on kills. Root cause: OUR OWN snapshot-
   audit batches — the canonical helpers ran up to nine LINEAR catalog scans per call, uncached, and
   the kill path (loot grants, quest-lock, substitution scans over the whole inventory) multiplied it
