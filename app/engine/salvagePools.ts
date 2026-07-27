@@ -431,7 +431,10 @@ export function rollSalvagePool(noun: string, rng: () => number = Math.random): 
   // from the noun's own words (the sigils.ts keyword map — "architect sigil"
   // → Architect Sigil), otherwise rolled across the nine. The turn-in economy
   // (sigils.ts, +1 standing at that faction's agent) takes it from there.
-  if (/\b(sigil|crest)\b/i.test(noun)) {
+  // OTA-991 — HEAD-NOUN gate: the thing being salvaged must BE the sigil/crest
+  // ("seal sigil", "mud crest"), not merely mention one ("sigil floor",
+  // "sigil-etched door"). Prying a floor should yield floor scrap.
+  if (/(?:^|[\s-])(sigil|crest)s?\s*$/i.test(noun.trim())) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { FACTION_SIGIL_NAME, inferEnemyFaction } = require('./sigils') as typeof import('./sigils');
     const fids = Object.keys(FACTION_SIGIL_NAME);

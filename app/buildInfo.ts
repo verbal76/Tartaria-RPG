@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.24';
+export const DISPLAY_VERSION = '4.28.25';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17456,4 +17456,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the pack yet REFUSED on re-pickup once dropped. Fix at the same choke point: isExactCatalogItem now
 // consults the curio roster too; category-locked by a roster-sweeping test; real substances still
 // refuse. DISPLAY_VERSION 4.28.24. 3 tests. Gameplay -> HAL + golem; golem port of HAL OTA-1013.
-export const OTA_BUILD_ID = '2026-07-27-990-curio-portability';
+// OTA-991 (studs-down corrections, batch 1: exploits + spawns). Owner: "take all of opus fixes
+// down to the studs." Five parallel audits re-derived every root cause of the 13-OTA run (HAL
+// 992-1004 / golem 969-981) against PRE-fix code: 5 clean, 8 with defects, ~30 findings. This batch:
+// (1) gear-farm regression closed — the variety window filters AFTER the seeded draw (hide, never
+// substitute), restoring per-tile determinism; (2) sigil farm closed — HEAD-NOUN gate ("seal sigil"
+// yes, "sigil floor" no) + permanent salvagedSigilKeys ledger, restock never wipes it, both grant
+// sites funnel through ledgeredSalvage; (3) revenant doors gate on !hasLiveEscort + activeBuildingId;
+// (4) a revenant beat claims its step — the stranded roll yields; (5) reverence exemption guarded on
+// the fallen_revenant TRAIT, not name-matching; (6) a mid-session death appends to the live fallen
+// cache; (7) revenant kit sorts by slot priority, weapons first; (8) the travel drift stamps the
+// 'open-road' sentinel instead of the origin id, so a locale-biased sky is never overwritten by an
+// unbiased road roll; (9) the door-2 rumour's NAMED fallen rides the hook chainId — the thing that
+// rises is the thing the tale named, or a cold trail. DISPLAY_VERSION 4.28.25. 10 tests.
+// Gameplay -> HAL + golem; golem port of HAL OTA-1014.
+export const OTA_BUILD_ID = '2026-07-27-991-studsdown-exploits';
