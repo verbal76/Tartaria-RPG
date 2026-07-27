@@ -786,7 +786,7 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.32**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.33**; ledger in `VERSION.md`.
 
 - **THE SNAPSHOT AUDIT, BATCH A — RESTITUTION (2026-07-27, latest).** HAL **1021** / golem **998**.
   Owner approved all five batches (A–E) from the 3-agent stale-snapshot sweep (~50 verified sites;
@@ -799,8 +799,14 @@ re-architecture. Currently **4.28.32**; ledger in `VERSION.md`.
   resurrection no longer strips canon locations / contract pins for the session (NOTE: golem's
   helper has no enemyIntel line — the intel backfill is HAL-only).
   Lock: every map key must be dead in the raw catalogs and every value alive (6 tests).
-  REMAINING: batches B (fail-open loss holes), C (economy), D (~25 identity sites), E (guard-rails
-  + rename policy + catalog-name ratchet).
+  **BATCH B SHIPPED** (HAL 1022 / golem 999): the four FAIL-OPEN loss holes now fail CLOSED —
+  quest-lock canonical (one predicate, all doors + the two raw sibling reads routed), forge
+  blocklists canonical ('loot' provenance stamp stays instance-read by design), the substitute-
+  drain guard reads canonicalItemRarity, collect_only canonical at both the sell pin and the
+  Crucible upgrade gate. NEW: canonicalItemKind + canonicalItemRarity; canonicalItemTags union
+  widened to amulets/rings/dog gear. 8-test lock incl. whole-catalog fail-closed sweeps.
+  REMAINING: batches C (economy), D (~25 identity sites), E (guard-rails + rename policy +
+  catalog-name ratchet).
 
 - **EVERY COATING RACKS (2026-07-27).** HAL **1020** / golem **997**. Owner: "there were
   coatings that I couldn't load into my bandolier." Root cause CATEGORY: identity-by-instance-tag-

@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.32';
+export const DISPLAY_VERSION = '4.28.33';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17539,4 +17539,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // been excluded from. And resurrection now runs the SAME worldMemory load
 // migration as a normal slot load (migrateLoadedWorldMemory + canon-location
 // resync) — a gem revival no longer strips the atlas and contract pins.
-export const OTA_BUILD_ID = '2026-07-27-998-restitution-migrations';
+// OTA-999 — THE FAIL-OPEN HOLES, CLOSED (snapshot-audit batch B). Four
+// protections read the instance tag/rarity snapshot and silently failed OPEN
+// for items acquired before the catalog marking shipped: (1) the quest-item
+// lock (one predicate, now canonical — drop/sell/scrap/gift/section all
+// route through it, the two raw sibling reads routed too) let a main-quest
+// key be scrapped into an unwinnable run; (2) the forge blocklists let stale
+// sigils/vials/quest cores read as reservable junk and applyFusion CONSUMED
+// them; (3) the substitute-drain rarity guard read mint-time rarity — NEVER
+// healed on load — so a stale-Common Titan Core vanished into low-tier
+// recipes; (4) collect_only let unreplaceable Skyreacher rewards sell at
+// full Legendary rate or feed the Crucible. NEW: canonicalItemKind +
+// canonicalItemRarity beside canonicalItemTags (whose catalog union now also
+// spans amulets/rings/dog gear). 'loot' and other provenance stamps stay
+// instance-read by design.
+export const OTA_BUILD_ID = '2026-07-27-999-failopen-holes-closed';
