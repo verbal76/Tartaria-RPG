@@ -291,6 +291,7 @@ import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { nounTokensMatch } from '../engine/ambientNounMatch';
 import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
 import { resolveLootItem } from '../engine/crafting';
+import { canonicalItemRarity } from '../engine/crafting';
 import { rollBossSpoils } from '../engine/bossLoot';
 import { enemyPowerScore } from '../engine/powerRating';
 import { levenshtein } from '../engine/editDistance';
@@ -12058,7 +12059,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   get().appendLog('arbiter', `The ${used.name} is a coating, not a draught — nothing in you for its ${fx.coating.kind} to counter. Work it into a weapon or a piece of armor instead.`);
                   break;
                 }
-                const remedy = coatingDrinkRemedy(p, fx.coating.kind, used.rarity);
+                const remedy = coatingDrinkRemedy(p, fx.coating.kind, canonicalItemRarity(used));
                 p = remedy.player;
                 messages.push(...remedy.messages);
                 if (remedy.corruptionAfter < remedy.corruptionBefore) {
@@ -25096,7 +25097,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const perHP = isGolemRepairPart(golem.kind, item.name)
         ? golemRepairHeal(golem.kind)
         : isGolemSubstitutePart(golem.kind, item)
-          ? golemSubstituteHeal(golem.kind, item.rarity)
+          ? golemSubstituteHeal(golem.kind, canonicalItemRarity(item))
           : 0;
       if (perHP <= 0) { get().appendLog('arbiter', `The Arbiter shakes their head. "${item.name} won't feed the Aetherstone."`); return; }
       const gap = Math.max(0, golem.hpMax - golem.hp);
@@ -33105,7 +33106,7 @@ function applyItemToGolem(
   }
   const heal = Math.min(
     golem.hpMax - golem.hp,
-    (isSub ? golemSubstituteHeal(golem.kind, item.rarity) : golemRepairHeal(golem.kind)) as number,
+    (isSub ? golemSubstituteHeal(golem.kind, canonicalItemRarity(item)) : golemRepairHeal(golem.kind)) as number,
   );
   const newInventory = player.inventory
     .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))

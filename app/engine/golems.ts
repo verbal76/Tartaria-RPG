@@ -314,10 +314,15 @@ export function isGolemSubstitutePart(
   kind: GolemKind,
   item: { name: string; kind?: string; tags?: readonly string[] },
 ): boolean {
-  if (item.kind && item.kind !== 'misc') return false; // materials/loot only
+  // OTA-1023 — canonical kind + tags: a stale aether material fed the golem and
+  // NOTHING happened (element tag missing from the snapshot), while the
+  // name-based exact-fuel sibling check worked — two rules, one item.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { canonicalItemKind: cik, canonicalItemTags: cit } = require('./crafting') as typeof import('./crafting');
+  if (cik(item as Parameters<typeof cik>[0]) !== 'misc') return false; // materials/loot only
   if (isGolemRepairPart(kind, item.name)) return false; // exact fuel → full-heal path
   const el = GOLEM_ELEMENT_TAGS[kind] ?? [];
-  return (item.tags ?? []).some((t) => el.includes(t.toLowerCase()));
+  return cit(item).some((t) => el.includes(t));
 }
 
 /** arb122 — HP a SUBSTITUTE material restores, SCALED BY RARITY so a pinch of

@@ -15,7 +15,7 @@
 
 import type { InventoryItem, Rarity } from './types';
 import type { VendorInstance } from './vendors';
-import { canonicalItemTags, findRecipeByResult, findMaterialByName, findWeaponByName, findArmorByName, findGearByName } from './crafting';
+import { canonicalItemKind, canonicalItemRarity, canonicalItemTags, findCatalogItem, findRecipeByResult, findMaterialByName, findWeaponByName, findArmorByName, findGearByName } from './crafting';
 import { isQuestLockedItem } from './questItems';
 
 // Approximate "fair" base price per rarity tier, in TC. Matches the
@@ -99,7 +99,7 @@ function selfCraftedSellCap(item: InventoryItem): number | null {
     (sum, ing) => sum + rawSellValueByName(ing.name) * ing.quantity,
     0,
   );
-  const bump = item.rarity === 'Legendary' ? 1.25 : 1;
+  const bump = canonicalItemRarity(item) === 'Legendary' ? 1.25 : 1;
   return Math.max(1, Math.round(ingredientValue * bump));
 }
 
@@ -145,16 +145,21 @@ export function sellPriceFor(
       return applySellCaps(item, withRapport(raw));
     }
   }
-  if (!item.rarity) {
+  // OTA-1023 — canonical kind + rarity: the snapshot is mint-frozen (kind heals
+  // upgrade-only, rarity never), so a promoted material sold at its old tier
+  // forever — and the stack-merge spread the stale row onto every new copy.
+  const sellKind = canonicalItemKind(item);
+  const sellRarity = canonicalItemRarity(item);
+  if (!sellRarity) {
     // Untiered raw stuff still has a small base value via kind.
-    if (item.kind === 'consumable') return withRapport(3);
-    if (item.kind === 'misc') return withRapport(2);
+    if (sellKind === 'consumable') return withRapport(3);
+    if (sellKind === 'misc') return withRapport(2);
     return withRapport(1);
   }
   // arb149 — equippable gear uses the higher gear base; everything else (relics,
   // materials, consumables-with-a-tier) keeps the generic base.
-  const baseTable = GEAR_KINDS.has(item.kind) ? GEAR_RARITY_BASE : RARITY_BASE;
-  const base = baseTable[item.rarity] ?? 5;
+  const baseTable = GEAR_KINDS.has(sellKind) ? GEAR_RARITY_BASE : RARITY_BASE;
+  const base = baseTable[sellRarity] ?? 5;
   const dur = durabilityFraction(item);
   // OTA-966 — TROPHY DISCOUNT. Uncatalogued monster-part drops mint at the enemy's own
   // rarity (the fix for "a Legendary hide worth 2 TC"), but at FULL rate every
@@ -162,7 +167,12 @@ export function sellPriceFor(
   // faucet. Trophies (flavor parts no recipe consumes) sell at HALF a real
   // material's rate: enemies that drop genuine materials are worth seeking out,
   // trophy-only kills still pay respectably, the tier spreads back out.
-  const trophyMult = (item.tags ?? []).includes('trophy') ? 0.5 : 1;
+  // OTA-1023 — catalog-AUTHORITATIVE trophy: the stamp marks a catalog-ABSENT part;
+  // once the name is promoted into the catalog the discount must die with it
+  // (a tag union can only add, never retire — and the merged stack kept
+  // halving every new correctly-minted copy).
+  const trophyMult = (item.tags ?? []).includes('trophy')
+    && !findCatalogItem(item.name, { aliases: false }) ? 0.5 : 1;
   raw = Math.max(1, Math.round(base * SELL_FRACTION * dur * trophyMult));
   return applySellCaps(item, withRapport(raw));
 }
@@ -177,7 +187,7 @@ export function sellPriceFor(
  *  undefined for weapons, fused/renamed armor not in the catalog, and collect-only
  *  pieces (tcBuy 0), which all keep the flat floor. */
 function armorBuyFloor(item: InventoryItem): number | undefined {
-  if (item.kind !== 'armor') return undefined;
+  if (canonicalItemKind(item) !== 'armor') return undefined;
   const cat = findArmorByName(item.name);
   const tcBuy = cat ? (cat as unknown as { tcBuy?: number }).tcBuy : undefined;
   if (typeof tcBuy !== 'number' || tcBuy <= 0) return undefined;
@@ -197,8 +207,9 @@ export function applySellCaps(item: InventoryItem, raw: number): number {
     const cap = selfCraftedSellCap(item);
     if (cap != null) price = Math.min(price, cap);
   }
-  if (item.rarity) {
-    const floor = armorBuyFloor(item) ?? RARITY_BUY_FLOOR[item.rarity] ?? price;
+  const capRarity = canonicalItemRarity(item);
+  if (capRarity) {
+    const floor = armorBuyFloor(item) ?? RARITY_BUY_FLOOR[capRarity] ?? price;
     price = Math.min(price, floor);
   }
   return Math.max(1, price);

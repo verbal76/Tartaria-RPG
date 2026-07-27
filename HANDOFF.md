@@ -786,7 +786,7 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.33**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.34**; ledger in `VERSION.md`.
 
 - **THE SNAPSHOT AUDIT, BATCH A — RESTITUTION (2026-07-27, latest).** HAL **1021** / golem **998**.
   Owner approved all five batches (A–E) from the 3-agent stale-snapshot sweep (~50 verified sites;
@@ -806,8 +806,16 @@ re-architecture. Currently **4.28.33**; ledger in `VERSION.md`.
   and the Crucible upgrade gate. NEW canonical helpers: canonicalItemKind + canonicalItemRarity
   (uniqueStats → catalog-by-name → instance); canonicalItemTags union widened to amulets/rings/
   dog gear. 8-test lock incl. whole-catalog quest + collect_only fail-closed sweeps.
-  REMAINING: batches C (economy), D (~25 identity sites), E (guard-rails + rename policy +
-  catalog-name ratchet) — full findings in the three audit reports, session log.
+  **BATCH C SHIPPED** (HAL 1023 / golem 1000): the ECONOMY reads canonical values — sell price
+  (base table + kind fallbacks + self-crafted bump + arbitrage floor + armor-floor gate), scrap
+  gate/yields, repair cost, golem substitute feeding (gate + element tags + heal tier ×3 call
+  sites), coating-drink potency. 'trophy' is catalog-AUTHORITATIVE (applies only while the name
+  is catalog-ABSENT — a union can add tags but never retire one). golemCompanion fixture
+  retargeted (its 'Aether Residue' fixture minted a synthetic Uncommon over a Common catalog row
+  — canonical correctly overrode it; now uses a catalog-absent name). 8-test lock incl.
+  stale-vs-fresh price/scrap/repair parity sweeps.
+  REMAINING: batches D (~25 identity sites), E (guard-rails + rename policy + catalog-name
+  ratchet) — full findings in the three audit reports, session log.
 
 - **EVERY COATING RACKS (2026-07-27).** HAL **1020** / golem **997**. Owner: "there were
   coatings that I couldn't load into my bandolier." Root cause CATEGORY: identity-by-instance-tag-

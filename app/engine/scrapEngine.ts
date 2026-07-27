@@ -11,6 +11,7 @@
 // roughly one common dig.
 
 import type { InventoryItem } from './types';
+import { canonicalItemKind, canonicalItemRarity, canonicalItemTags } from './crafting';
 
 export interface ScrapOutput {
   /** Materials granted to the player. */
@@ -30,13 +31,16 @@ export function canScrap(item: InventoryItem): boolean {
   // OTA-1022 — the ONE quest-lock predicate (canonical tags), not a raw snapshot read.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   if ((require('./questItems') as typeof import('./questItems')).isQuestLockedItem(item)) return false;
-  if (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'relic') return true;
+  // OTA-1023 — canonical kind: the load heal is upgrade-only, so a demoted piece
+  // (relic->misc Climbing Rope) kept its old action set forever.
+  const scrapKind = canonicalItemKind(item);
+  if (scrapKind === 'weapon' || scrapKind === 'armor' || scrapKind === 'relic') return true;
   // OTA-742 — a weapon/armor bought from a vendor could mint as kind 'misc'
   // (buyFromVendor mis-stamp, fixed there + healed on load). Treat anything
   // TAGGED as gear as scrappable too, so an already-bought Rust Dagger / Bone
   // Shiv scraps immediately instead of only after the next reload.
   {
-    const t = item.tags ?? [];
+    const t = canonicalItemTags(item);
     if (t.includes('weapon') || t.includes('armor')) return true;
   }
   // Some gear (compass, torch, rope) carries useful base materials —
@@ -46,7 +50,7 @@ export function canScrap(item: InventoryItem): boolean {
   // keyword in the name) still pass the scrap predicate. scrapOutputFor
   // already routes 'improvised' to Small Rock; this just keeps the
   // gate consistent with the output table.
-  if (item.kind === 'misc' && (item.tags ?? []).some((t) =>
+  if (scrapKind === 'misc' && canonicalItemTags(item).some((t) =>
     /metal|wood|stone|aether|crystal|fiber|cloth|plate|scaled|improvised|organic/i.test(t),
   )) {
     // Materials with these tags already ARE the scrap output — refuse
@@ -87,15 +91,18 @@ function rarityScrapBonus(rarity: InventoryItem['rarity']): number {
  *  needing a manual mapping. OTA-443 — yields 2–3+ REPRESENTATIVE
  *  materials geared to crafting / repair / golem fuel, scaled by rarity. */
 export function scrapOutputFor(item: InventoryItem): ScrapOutput {
-  const tags = new Set((item.tags ?? []).map((t) => t.toLowerCase()));
+  const tags = new Set(canonicalItemTags(item));
   const grants: Array<{ name: string; quantity: number }> = [];
-  const rb = rarityScrapBonus(item.rarity);
+  // OTA-1023 — canonical rarity (never healed on load): a stale-Common piece
+  // scrapped at rb=0 forever and never yielded the Golem Core it owes.
+  const rb = rarityScrapBonus(canonicalItemRarity(item));
   const half = Math.floor(rb / 2);
   // OTA-742 — a bought weapon/armor may be mis-stamped kind 'misc' (see canScrap).
   // Derive gear-ness from the kind OR the tag so the yield branches below still
   // fire (a Rust Dagger gives Scrap Metal + Stick, not the bare junk fallback).
-  const isWeaponLike = item.kind === 'weapon' || tags.has('weapon');
-  const isArmorLike = item.kind === 'armor' || tags.has('armor') || item.kind === 'dog_armor';
+  const outKind = canonicalItemKind(item);
+  const isWeaponLike = outKind === 'weapon' || tags.has('weapon');
+  const isArmorLike = outKind === 'armor' || tags.has('armor') || outKind === 'dog_armor';
   // OTA-756 — a FUSED weapon/armor is a one-of-a-kind Crucible forge. Breaking one
   // down should never hand back Commons: the player spent scarce reserved inputs to
   // make it, so it yields Uncommon/Rare aether stock scaled by the forge's rarity.

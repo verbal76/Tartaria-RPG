@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.33';
+export const DISPLAY_VERSION = '4.28.34';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18619,4 +18619,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // canonicalItemRarity beside canonicalItemTags (whose catalog union now also
 // spans amulets/rings/dog gear). 'loot' and other provenance stamps stay
 // instance-read by design.
-export const OTA_BUILD_ID = '2026-07-27-1022-failopen-holes-closed';
+// OTA-1023 — THE ECONOMY READS CANONICAL VALUES (snapshot-audit batch C). Sell
+// price (base table, kind fallbacks, self-crafted bump, arbitrage floor +
+// armor-floor gate), scrap gate + yields (kind/tags/rarity — a stale-Common
+// piece never yielded its Golem Core), repair cost, golem substitute feeding
+// (kind gate + element tags + heal tier at all three call sites) and
+// coating-drink potency now resolve kind/rarity/tags canonically instead of
+// trusting the mint-frozen instance snapshot (kind heals upgrade-only; rarity
+// is NEVER healed; stack-merges spread a stale row onto every new copy — a
+// pre-promotion Beast Fang sold at 5 TC where a fresh one sells 36, forever).
+// The 'trophy' half-price stamp is now catalog-AUTHORITATIVE: it only applies
+// while the name is catalog-ABSENT, so promoted parts shed the discount (a
+// union can add tags but never retire one). selfCrafted/fused/stolen stay
+// instance-read by design.
+export const OTA_BUILD_ID = '2026-07-27-1023-economy-canonical';
