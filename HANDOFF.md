@@ -845,9 +845,17 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.36**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.37**; ledger in `VERSION.md`.
 
-- **THE SNAPSHOT AUDIT, BATCH A — RESTITUTION (2026-07-27, latest).** HAL **1021** / golem **998**.
+- **THE KILL-BEAT FREEZE (2026-07-27, latest).** HAL **1026** / golem **1003**. Owner: the final
+  blow hung "resolving" 7-8s — kills only. Root cause: the snapshot-audit batches' canonical
+  helpers were uncached linear catalog scans, multiplied by the kill path's inventory loops into a
+  blocked JS thread (kills touch inventory; ordinary rolls don't). Bisect-proven (22ms pre-audit →
+  281ms at batch D). Fix: per-name memo caches (CANON_TAG_CACHE / CANON_ROW_CACHE) — identical
+  semantics, probe back to 25-33ms. LESSON for §3a-F: canonical identity MUST be O(1) — a helper
+  that N call sites route through inherits the sum of their hot loops.
+
+- **THE SNAPSHOT AUDIT, BATCH A — RESTITUTION (2026-07-27).** HAL **1021** / golem **998**.
   Owner approved all five batches (A–E) from the 3-agent stale-snapshot sweep (~50 verified sites;
   the coating-rack category generalized: code trusting persisted snapshots over live definitions).
   A ships: `itemMigrations.ts` `LEGACY_ITEM_RENAMES` — every retired catalog name maps to its

@@ -937,14 +937,41 @@ export function findMaterialByName(name: string): CatalogMaterial | null {
  *  were MINTED, so an item acquired before a catalog tag existed carries a
  *  stale set forever — identity checks must read the catalog, never trust the
  *  snapshot alone. Lowercased. Non-catalog names (fused gear) return own tags. */
+// OTA-1003 — PER-NAME MEMO. The canonical helpers went from micro to macro cost
+// when the snapshot audit routed ~40 sites through them: each call ran up to
+// NINE linear catalog scans, and loops (substitution drains, per-item loot
+// filters) multiplied that into a blocked JS thread on the KILL beat — the
+// owner's 7-8 second "resolving" freeze on the final blow (kills touch the
+// inventory; ordinary rolls don't, which is why only kills hung). Catalogs
+// are static per process, so the finder-chain RESULT is cached per name —
+// identical semantics (including the inferred-row fallbacks), O(1) repeats.
+const CANON_TAG_CACHE = new Map<string, readonly string[]>();
+const CANON_ROW_CACHE = new Map<string, ReturnType<typeof findCatalogItem>>();
+
 export function canonicalItemTags(item: { name: string; tags?: readonly string[] }): string[] {
   const own = (item.tags ?? []).map((t) => t.toLowerCase());
   if (!item.name) return own;
-  const row = findWeaponByName(item.name) ?? findArmorByName(item.name) ?? findGearByName(item.name)
-    ?? findExplorationItemByName(item.name) ?? findMaterialByName(item.name)
-    ?? findAmuletByName(item.name) ?? findRingByName(item.name) ?? findDogGearByName(item.name) ?? null;
-  const cat = ((row?.tags ?? []) as readonly string[]).map((t) => t.toLowerCase());
+  let cat = CANON_TAG_CACHE.get(item.name);
+  if (cat === undefined) {
+    const row = findWeaponByName(item.name) ?? findArmorByName(item.name) ?? findGearByName(item.name)
+      ?? findExplorationItemByName(item.name) ?? findMaterialByName(item.name)
+      ?? findAmuletByName(item.name) ?? findRingByName(item.name) ?? findDogGearByName(item.name) ?? null;
+    cat = ((row?.tags ?? []) as readonly string[]).map((t) => t.toLowerCase());
+    CANON_TAG_CACHE.set(item.name, cat);
+  }
+  if (cat.length === 0) return own;
   return Array.from(new Set([...own, ...cat]));
+}
+
+/** OTA-1003 — memoized findCatalogItem for the kind/rarity helpers (same
+ *  aliases:false semantics; catalogs are static per process). */
+function canonicalRowFor(name: string): ReturnType<typeof findCatalogItem> {
+  let row = CANON_ROW_CACHE.get(name);
+  if (row === undefined) {
+    row = findCatalogItem(name, { aliases: false });
+    CANON_ROW_CACHE.set(name, row);
+  }
+  return row;
 }
 
 /** OTA-999 — canonical KIND: fused pieces stay instance-authoritative
@@ -957,7 +984,7 @@ export function canonicalItemKind(
 ): InventoryItem['kind'] {
   const u = item.uniqueStats?.kind;
   if (u === 'weapon' || u === 'armor' || u === 'dog_armor') return u;
-  const row = findCatalogItem(item.name, { aliases: false });
+  const row = item.name ? canonicalRowFor(item.name) : null;
   if (row) return row.kind;
   return item.kind ?? 'misc';
 }
@@ -971,7 +998,7 @@ export function canonicalItemRarity(
 ): Rarity | undefined {
   const u = item.uniqueStats?.rarity;
   if (u) return u;
-  const row = findCatalogItem(item.name, { aliases: false });
+  const row = item.name ? canonicalRowFor(item.name) : null;
   return row?.rarity ?? item.rarity;
 }
 
