@@ -786,7 +786,7 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.28**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.29**; ledger in `VERSION.md`.
 
 - **THE RESIDUALS, CLOSED (2026-07-27, latest).** HAL **1017** / golem **994**. Owner: "complete
   1-4 that were left open. ask design questions where required." Owner's design calls (via
@@ -807,6 +807,9 @@ re-architecture. Currently **4.28.28**; ledger in `VERSION.md`.
     legacy `sceneWeather` slot reads once as migration, never written again; drift stamps
     'open-road' as a map key). `ota1003WeatherLocality` retargeted — its pin now exercises the
     migration path.
+  • **THE MARKER** (follow-up, HAL 1018 / golem 995): the Fallen roll now labels every
+    un-avenged entry "— STILL WALKING" in amber and counts them in the header, so the
+    player can see at a glance which of their dead are still out there as risable Hollowed.
   • **HOLLOWED POLISH** — proven-progress gate; `revenantRolledTiles` per-tile bank (slice -120,
     mirrors stranded escorts); the memorial write retries ×3 with backoff; the rumour marker can no
     longer spawn the boss over a live fight (the spawn clobbered the enemies array — pool keeps, the

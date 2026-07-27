@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.28';
+export const DISPLAY_VERSION = '4.28.29';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18569,4 +18569,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // migrates) — leave-and-return keeps the origin's weather. (4) Hollowed polish:
 // proven-progress gate (10 kills or 12h) beside the HP bar, per-tile roll bank,
 // retried memorial write, and the rumour can't spawn the boss over a live fight.
-export const OTA_BUILD_ID = '2026-07-27-1017-residuals-closed';
+// OTA-1018 — THE FALLEN ROLL MARKS THE STILL-WALKING (owner: "push the marker").
+// The Lore Codex memorial showed "put to rest by X" on avenged entries and
+// NOTHING on the rest — the player couldn't tell which of their dead were
+// still out in the mud as risable Hollowed. Un-avenged entries now carry an
+// amber "STILL WALKING" line, and the header counts them ("N remembered *
+// M still walking").
+export const OTA_BUILD_ID = '2026-07-27-1018-fallen-walking-marker';

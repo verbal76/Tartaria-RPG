@@ -295,7 +295,13 @@ export function LoreCodexBody() {
             <Text style={styles.fallenEmpty}>No one has fallen yet. Tartaria is patient.</Text>
           ) : (
             <>
-              <Text style={styles.counter}>{fallen.length} remembered</Text>
+              {/* OTA-1018 — the header counts the ones still out there. */}
+              <Text style={styles.counter}>
+                {fallen.length} remembered
+                {fallen.some((h) => !h.avengedBy)
+                  ? ` • ${fallen.filter((h) => !h.avengedBy).length} still walking`
+                  : ''}
+              </Text>
               {fallen.map((h, i) => (
                 <View key={`${h.name}_${h.ts}_${i}`} style={[styles.entry, styles.fallenEntry]}>
                   <Text style={styles.name}>† {h.name}</Text>
@@ -304,7 +310,9 @@ export function LoreCodexBody() {
                   <Text style={styles.meta}>{h.kills} foes bested • {h.hours}h in Tartaria • {h.corruption}</Text>
                   {h.avengedBy ? (
                     <Text style={styles.meta}>— put to rest by {h.avengedBy}</Text>
-                  ) : null}
+                  ) : (
+                    <Text style={styles.fallenWalking}>— STILL WALKING. Something in warrior's plate wears their name out in the mud.</Text>
+                  )}
                 </View>
               ))}
             </>
@@ -394,6 +402,8 @@ const styles = StyleSheet.create({
   // OTA-845 — The Fallen memorial.
   fallenEntry: { borderLeftWidth: 3, borderLeftColor: '#6a5a4a' },
   fallenEmpty: { color: '#a2977b', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
+  // OTA-1018 — un-avenged entries carry a live warning, amber against the memorial browns.
+  fallenWalking: { color: '#d9a441', fontSize: 12, fontStyle: 'italic', marginTop: 2 },
   lockedName: { color: '#a2977b', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   lockedSub: { color: '#9a8f79', fontSize: 10, marginTop: 2, fontStyle: 'italic' }, // OTA-920 — was #5a5245 (2.45:1, failed WCAG AA)
   name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
