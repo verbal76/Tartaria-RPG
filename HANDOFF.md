@@ -786,9 +786,20 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.30**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.31**; ledger in `VERSION.md`.
 
-- **THE RESIDUALS, CLOSED (2026-07-27, latest).** HAL **1017** / golem **994**. Owner: "complete
+- **EVERY COATING RACKS (2026-07-27, latest).** HAL **1020** / golem **997**. Owner: "there were
+  coatings that I couldn't load into my bandolier." Root cause CATEGORY: identity-by-instance-tag-
+  snapshot — five sites asked "is this a coating?" from the instance's tags, and instances keep the
+  tag set they were MINTED with, so vials acquired before a catalog tag existed failed the bandolier
+  gate / coat-a-weapon button / equip guard / drinkable gate / throw burst forever while identical
+  new ones passed. Fix at the choke point: `canonicalItemTags` (crafting.ts — instance UNION catalog
+  row by name, lowercased; fused non-catalog names keep instance-only behavior) +
+  `isWeaponCoatingItem` (weaponCoating.ts, THE one answer); all five consumers routed, the
+  bandolier's throwable/spear tests canonicalized too. 7-test lock incl. a whole-catalog sweep
+  (every coating racks as a stale tagless instance) and a stale-vs-fresh drinkability parity sweep.
+
+- **THE RESIDUALS, CLOSED (2026-07-27).** HAL **1017** / golem **994**. Owner: "complete
   1-4 that were left open. ask design questions where required." Owner's design calls (via
   AskUserQuestion): reclaimed gear returns PRISTINE; the died-in WEAPON is a GUARANTEED drop while
   armor stays on the chance rolls; the Hollowed door gains a proven-progress gate (10 kills OR 12

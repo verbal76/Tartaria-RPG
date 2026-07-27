@@ -12,6 +12,8 @@ export type CoatingKind = 'poison' | 'acid' | 'corruption' | 'electrical' | 'bur
 
 /** Every damage element a coating can carry (drinkable or not). Used to read a
  *  coating's element off an inventory item's tags. */
+import { canonicalItemTags } from './crafting';
+
 export const COATING_ELEMENTS: readonly CoatingKind[] = ['poison', 'acid', 'corruption', 'electrical', 'burn', 'cold'];
 
 /** Which coating elements have a player-side counter you can DRINK for. acid has none
@@ -35,8 +37,12 @@ export function coatingElementFromTags(tags: readonly string[] | undefined): Coa
  *  gated here (returns true — normal consume rules apply). A weapon_coating is drinkable
  *  only when its element has a counter (isCoatingDrinkable). Drives whether the
  *  inventory offers a "Use/Drink" action at all. */
-export function coatingItemDrinkable(item: { tags?: readonly string[] }): boolean {
-  const tags = (item.tags ?? []).map((t) => t.toLowerCase());
+export function coatingItemDrinkable(item: { name?: string; tags?: readonly string[] }): boolean {
+  // OTA-997 — canonical tags when the caller passes a real item (stale instance
+  // snapshots otherwise let an old vial present as freely drinkable).
+  const tags = item.name
+    ? canonicalItemTags({ name: item.name, tags: item.tags })
+    : (item.tags ?? []).map((t) => t.toLowerCase());
   if (!tags.includes('weapon_coating')) return true;
   return isCoatingDrinkable(coatingElementFromTags(tags));
 }

@@ -921,6 +921,20 @@ export function findMaterialByName(name: string): CatalogMaterial | null {
 
 /** Same for gear — small catalog (6 items as of OTA 192) but the
  *  effect resolver needs a uniform lookup interface. */
+/** OTA-997 — CANONICAL tags for an inventory item: its own instance tags UNION
+ *  the catalog row's (matched by name across weapons/armor/gear/exploration/
+ *  materials). Inventory instances persist the tag set from the moment they
+ *  were MINTED, so an item acquired before a catalog tag existed carries a
+ *  stale set forever — identity checks must read the catalog, never trust the
+ *  snapshot alone. Lowercased. Non-catalog names (fused gear) return own tags. */
+export function canonicalItemTags(item: { name: string; tags?: readonly string[] }): string[] {
+  const own = (item.tags ?? []).map((t) => t.toLowerCase());
+  const row = findWeaponByName(item.name) ?? findArmorByName(item.name) ?? findGearByName(item.name)
+    ?? findExplorationItemByName(item.name) ?? findMaterialByName(item.name);
+  const cat = ((row?.tags ?? []) as readonly string[]).map((t) => t.toLowerCase());
+  return Array.from(new Set([...own, ...cat]));
+}
+
 export function findGearByName(name: string): CatalogGear | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
