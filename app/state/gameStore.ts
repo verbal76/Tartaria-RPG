@@ -15813,7 +15813,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // bound to the player until the final act. The Order would
         // hunt the player to the ends of Tartaria for leaving one
         // in the silt. Refuse the drop with an in-character line.
-        if ((item.tags ?? []).includes('quest')) {
+        if (isQuestLockedItem(item)) {
           get().appendLog(
             'arbiter',
             `The Arbiter folds your fingers back over the ${item.name}. "Not this one. It does not leave your pack until the end of the road."`,
@@ -25998,7 +25998,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // `collect_only` tag (on every Skyreacher piece + the Beacon Rifle) is the
     // single lock. They still take coating vials (the 3 open resist slots), just
     // never a Crucible slot-upgrade.
-    if ((piece.tags ?? []).some((t) => t.toLowerCase() === 'collect_only')) {
+    // OTA-1022 — canonical: a stale Skyreacher piece fed the slot-upgrade and was
+    // consumed. Same gate, catalog-aware.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    if ((require('../engine/crafting') as typeof import('../engine/crafting')).canonicalItemTags(piece).includes('collect_only')) {
       get().appendLog(
         'arbiter',
         `The Arbiter waves you back from the Crucible. "That was earned on the great climbs, not forged — the Crucible has no purchase on it. Coat it if you like, but it cannot be upgraded here."`,

@@ -434,7 +434,11 @@ function isSubstitutable(item: InventoryItem): boolean {
   // Patched Cloth, a Golem Core for an Aetheric Shard). The exact-named material still
   // crafts; this only stops a valuable mat vanishing into a low-tier recipe via the
   // tag drain. Common/Uncommon materials (the intended junk-fills-junk pool) still flow.
-  if (item.rarity === 'Rare' || item.rarity === 'Legendary') return false;
+  // OTA-1022 — canonical rarity: a stale-Common instance of a since-promoted
+  // Legendary (Titan Core, Dragon Scale...) defeated this guard entirely and
+  // the tag drain ATE it into a low-tier recipe with no confirmation.
+  const subRarity = canonicalItemRarity(item);
+  if (subRarity === 'Rare' || subRarity === 'Legendary') return false;
   // OTA-424 — [audit fix #6] BOUGHT weapons/armor are stored kind:'misc' (so they
   // stack), but they are NOT raw material. If the item's name resolves to a real
   // weapon/armor catalog entry — or it carries a coating (a real weapon) — never
@@ -930,9 +934,38 @@ export function findMaterialByName(name: string): CatalogMaterial | null {
 export function canonicalItemTags(item: { name: string; tags?: readonly string[] }): string[] {
   const own = (item.tags ?? []).map((t) => t.toLowerCase());
   const row = findWeaponByName(item.name) ?? findArmorByName(item.name) ?? findGearByName(item.name)
-    ?? findExplorationItemByName(item.name) ?? findMaterialByName(item.name);
+    ?? findExplorationItemByName(item.name) ?? findMaterialByName(item.name)
+    ?? findAmuletByName(item.name) ?? findRingByName(item.name) ?? findDogGearByName(item.name) ?? null;
   const cat = ((row?.tags ?? []) as readonly string[]).map((t) => t.toLowerCase());
   return Array.from(new Set([...own, ...cat]));
+}
+
+/** OTA-1022 — canonical KIND: fused pieces stay instance-authoritative
+ *  (uniqueStats.kind), catalog rows answer by name, and only a non-catalog
+ *  name falls back to the persisted snapshot. The load-time kind heal is
+ *  UPGRADE-only (never applies a demotion to 'misc'), so decision sites must
+ *  never trust item.kind alone. */
+export function canonicalItemKind(
+  item: { name: string; kind?: InventoryItem['kind']; uniqueStats?: { kind?: string } | null },
+): InventoryItem['kind'] {
+  const u = item.uniqueStats?.kind;
+  if (u === 'weapon' || u === 'armor' || u === 'dog_armor') return u;
+  const row = findCatalogItem(item.name, { aliases: false });
+  if (row) return row.kind;
+  return item.kind ?? 'misc';
+}
+
+/** OTA-1022 — canonical RARITY. Instance rarity is NEVER healed on load anywhere,
+ *  so a since-promoted material still reads its mint-time tier forever (and
+ *  the stack-merge spreads it to every new copy). Catalog wins for catalog
+ *  names; fused/uncatalogued instances keep their own. */
+export function canonicalItemRarity(
+  item: { name: string; rarity?: Rarity; uniqueStats?: { rarity?: Rarity } | null },
+): Rarity | undefined {
+  const u = item.uniqueStats?.rarity;
+  if (u) return u;
+  const row = findCatalogItem(item.name, { aliases: false });
+  return row?.rarity ?? item.rarity;
 }
 
 export function findGearByName(name: string): CatalogGear | null {

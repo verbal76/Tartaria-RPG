@@ -27,7 +27,9 @@ export function canScrap(item: InventoryItem): boolean {
   // bound to the character until the final act. Block scrap up
   // front so the player can't accidentally feed a Core to the
   // forge.
-  if ((item.tags ?? []).includes('quest')) return false;
+  // OTA-1022 — the ONE quest-lock predicate (canonical tags), not a raw snapshot read.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  if ((require('./questItems') as typeof import('./questItems')).isQuestLockedItem(item)) return false;
   if (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'relic') return true;
   // OTA-742 — a weapon/armor bought from a vendor could mint as kind 'misc'
   // (buyFromVendor mis-stamp, fixed there + healed on load). Treat anything

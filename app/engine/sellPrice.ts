@@ -15,7 +15,7 @@
 
 import type { InventoryItem, Rarity } from './types';
 import type { VendorInstance } from './vendors';
-import { findRecipeByResult, findMaterialByName, findWeaponByName, findArmorByName, findGearByName } from './crafting';
+import { canonicalItemTags, findRecipeByResult, findMaterialByName, findWeaponByName, findArmorByName, findGearByName } from './crafting';
 import { isQuestLockedItem } from './questItems';
 
 // Approximate "fair" base price per rarity tier, in TC. Matches the
@@ -122,7 +122,9 @@ export function sellPriceFor(
   // OR sold: it's only ever earned atop a great climb, and a merchant can't put
   // a price on something that can't be replaced. Nominal 1 TC so the sell UI
   // stays consistent without turning the reward into a cash pump.
-  if ((item.tags ?? []).some((t) => t.toLowerCase() === 'collect_only')) {
+  // OTA-1022 — canonical: a Skyreacher piece earned before the tag shipped sold at
+  // full Legendary rate — an unreplaceable climb reward turned into a cash pump.
+  if (canonicalItemTags(item).includes('collect_only')) {
     return 1;
   }
   // OTA-802 (B1b) — bottleneck crafting materials price as near-worthless AT

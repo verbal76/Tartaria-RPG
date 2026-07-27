@@ -22,7 +22,7 @@
 // refusal instead of crafting a degenerate item.
 
 import type { InventoryItem, UniqueItemStats } from './types';
-import { isInferredItem, isRecipeIngredientName, findWeaponByName, findArmorByName } from './crafting';
+import { canonicalItemTags, isInferredItem, isRecipeIngredientName, findWeaponByName, findArmorByName } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
 
 /** Minimal Qwen interface — matches itemSynthesisQwen.ts so tests can
@@ -87,7 +87,7 @@ export interface FusionGate {
  *  so a reserved material you could SEE (♥) didn't actually count. */
 const FUSION_EQUIP_KINDS = ['weapon', 'armor', 'accessory', 'amulet', 'ring'];
 const FUSION_EDIBLE_TAG = /food|drink|healing|potion|weapon_coating|edible|ration|alcohol|treat|forag/i;
-/** OTA — the material tag(s) an item contributes to a fusion, for the info block.
+/** OTA-1022 — the material tag(s) an item contributes to a fusion, for the info block.
  *  Output RARITY is driven by how many DISTINCT materials the chosen inputs span
  *  (3 different → Rare, 4+ → Legendary), NOT by the inputs' own rarity. */
 export function fusionMaterialTags(item: { name: string; tags?: readonly string[] }): string[] {
@@ -136,7 +136,10 @@ export function isForgeableLootReagent(item: { name: string; kind?: string; tags
   const tags = (item.tags ?? []).map((t) => t.toLowerCase());
   if (!tags.includes('loot')) return false;
   if (FUSION_EQUIP_KINDS.includes(item.kind ?? '')) return false;
-  if (tags.some((t) => FUSION_EDIBLE_TAG.test(t) || FORGE_LOOT_BLOCK_TAGS.test(t))) return false;
+  // OTA-1022 — the BLOCKLISTS read canonical tags: a stale sigil/vial/quest core
+  // read as reservable junk and applyFusion CONSUMED it. ('loot' above stays
+  // instance-read — it is a provenance stamp on this copy, not identity.)
+  if (canonicalItemTags(item).some((t) => FUSION_EDIBLE_TAG.test(t) || FORGE_LOOT_BLOCK_TAGS.test(t))) return false;
   if (isRecipeIngredientName(item.name)) return false;
   return true;
 }
@@ -158,7 +161,7 @@ export function isForgeReservableItem(
 ): boolean {
   if (item.uniqueStats) return false;
   if (FUSION_EQUIP_KINDS.includes(item.kind ?? '')) return false;
-  if ((item.tags ?? []).some((t) => FUSION_EDIBLE_TAG.test(t))) return false;
+  if (canonicalItemTags(item).some((t) => FUSION_EDIBLE_TAG.test(t))) return false;
   // OTA-829 — block protected kinds (quest / relic / sigil / currency / keepsake /
   // throwable) BEFORE the inferred-item shortcut. Pre-fix a catalog-absent quest
   // item — e.g. the Legendary Capital "Cores" (tags: quest, aetheric_core,
@@ -167,7 +170,7 @@ export function isForgeReservableItem(
   // block already guarded the 'loot' reagent path (isForgeableLootReagent); it must
   // guard the inferred path too. (relic KIND is also out — a relic is never fodder.)
   if (item.kind === 'relic') return false;
-  if ((item.tags ?? []).some((t) => FORGE_LOOT_BLOCK_TAGS.test(t))) return false;
+  if (canonicalItemTags(item).some((t) => FORGE_LOOT_BLOCK_TAGS.test(t))) return false;
   if (isInferredItem(item.name)) return true;
   return isForgeableLootReagent(item);
 }
