@@ -699,6 +699,28 @@ export function consumeIngredients(
   return consumeIngredientsList(inventory, recipe.ingredients);
 }
 
+/** OTA-983 — how many of this recipe the pack can actually make RIGHT NOW.
+ *  Simulates the real drain one craft at a time (substitution-aware, because
+ *  consumeIngredientsList runs the same canonical-first / substitute-tag passes
+ *  the craft does), so "MAX" is an honest number rather than a division that
+ *  ignores which substitutes get eaten first. Capped so a pack full of scrap
+ *  can't spin this into a long loop — nobody batches more than a stack anyway. */
+export const MAX_CRAFT_BATCH = 20;
+export function maxCraftableCount(
+  recipe: Recipe,
+  inventory: readonly InventoryItem[],
+  cap: number = MAX_CRAFT_BATCH,
+): number {
+  let n = 0;
+  let inv: InventoryItem[] = inventory.map((i) => ({ ...i }));
+  while (n < cap) {
+    if (missingIngredientsList(recipe.ingredients, inv).length !== 0) break;
+    inv = consumeIngredientsList(inv, recipe.ingredients);
+    n += 1;
+  }
+  return n;
+}
+
 // Catalog lookup helpers — find an item entry by name across the four
 // catalog buckets. Used by the equip flow and combat damage resolution.
 //

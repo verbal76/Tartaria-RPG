@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { CraftQuantityModal } from './CraftQuantityModal';
+import { maxCraftableCount } from '../engine/crafting';
 import { RECIPES, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
 import { recipeIsUnlockedFor } from '../engine/recipeDiscovery';
 import { getItemPreview } from './itemPreview';
@@ -104,6 +106,10 @@ export function RecipesView({
 }: RecipesViewProps) {
   const player = useGameStore((s) => s.player);
   const craftRecipe = useGameStore((s) => s.craftRecipe);
+  const craftRecipeBatch = useGameStore((s) => s.craftRecipeBatch);
+  // OTA-983 — the recipe awaiting a COUNT. Tapping a row no longer crafts; it asks
+  // how many, then makes them all and leaves the menu open (owner's ask).
+  const [qtyFor, setQtyFor] = React.useState<Recipe | null>(null);
 
   const evaluated = useMemo(() => {
     if (!player) return [] as RecipeStatus[];
@@ -164,14 +170,21 @@ export function RecipesView({
   // craft's outcome. Empty delta means the engine refused / no-op'd
   // — caller keeps the menu open and lets the world feed surface
   // the failure narration.
-  const handleCraft = (recipe: Recipe) => {
+  // OTA-983 — step one: ask how many. The old body (craft + diff + refusal
+  // surfacing) moves to runCraft below, which the quantity modal calls.
+  const handleCraft = (recipe: Recipe) => setQtyFor(recipe);
+
+  const runCraft = (recipe: Recipe, count: number) => {
     const preInv = (useGameStore.getState().player?.inventory ?? []).map((i) => ({ ...i }));
     const preLogLen = useGameStore.getState().gameLog.length;
-    craftRecipe(recipe.result);
+    if (count > 1) craftRecipeBatch(recipe.result, count);
+    else craftRecipe(recipe.result);
     const state = useGameStore.getState();
     const postInv = state.player?.inventory ?? [];
     const delta = computeInventoryDelta(preInv, postInv);
     if (delta.length > 0) {
+      // OTA-983 — report the haul for the screen's transient banner. It is NOT a
+      // question any more: the crafting menu stays open until BACK.
       onAfterCraft?.(delta);
       return;
     }
@@ -301,6 +314,15 @@ export function RecipesView({
 
   return (
     <>
+      {/* OTA-983 — the quantity step. MAX is substitution-aware, so it never
+          promises more than the pack can actually pay for. */}
+      <CraftQuantityModal
+        visible={qtyFor !== null}
+        recipeName={qtyFor?.result ?? ''}
+        max={qtyFor ? Math.max(1, maxCraftableCount(qtyFor, player?.inventory ?? [])) : 1}
+        onCancel={() => setQtyFor(null)}
+        onConfirm={(n) => { const r = qtyFor; setQtyFor(null); if (r) runCraft(r, n); }}
+      />
       <Text style={styles.arbiterLine}>{arbiterLine}</Text>
 
       <View style={styles.countLine}>

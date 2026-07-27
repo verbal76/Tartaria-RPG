@@ -1640,7 +1640,7 @@ const BODY_VERB_PART: Record<string, string> = {
  *  surfaced 7868 over 10 in-game days. 50 keeps it a meaningful
  *  gameplay signal (and within the range the narration / Arbiter
  *  remarks were authored to react to). */
-/** OTA — #122: hub rooms that are OPEN AIR. The hub graph mixes exterior
+/** OTA-983 — #122: hub rooms that are OPEN AIR. The hub graph mixes exterior
  *  spaces (the gate, the square, the culvert descent) with genuinely roofed
  *  ones (armory, mess, workshop, quarters, lab, vault, chapel) and the buried
  *  level below. Only these stay exposed to weather; being anywhere else in a
@@ -3959,6 +3959,12 @@ interface GameStore {
   setActiveEnemyIdx: (idx: number) => void;
   /** Craft a specific recipe directly (used by the CraftingScreen list). */
   craftRecipe: (recipeName: string) => void;
+  /** OTA-983 — craft the same recipe COUNT times in one go. Each pass runs the
+   *  ordinary craft (every gate intact), so a batch can never consume more than
+   *  the pack holds; it stops the moment a pass produces nothing — pack full,
+   *  a refusal, or the substitution prompt taking over — and reports how many
+   *  it actually made. Returns the count crafted. */
+  craftRecipeBatch: (recipeName: string, count: number) => number;
   dismissVendor: () => void;
   /** OTA-776 — aim the Aetheric Torch at a chosen open lead and CHARGE it.
    *  Consumes one torch, reveals + marks the lead (torchCharged), and the lead
@@ -4059,9 +4065,12 @@ interface GameStore {
    *  weapon / armor / dog vest, clamps the response, mints the fused
    *  InventoryItem in place. */
   fuseAtCrucible: () => Promise<void>;
+  /** OTA-983 — set while craftRecipeBatch runs so the per-craft reward line stays
+   *  quiet and the batch can emit a single aggregated one instead. */
+  craftBatchQuiet: boolean;
   fusionPickerOpen: boolean;
   pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor' | 'dog_armor'; catalystId?: string } | null;
-  /** OTA — the Crucible refused, and says why. Rendered by FusionBlockedModal,
+  /** OTA-983 — the Crucible refused, and says why. Rendered by FusionBlockedModal,
    *  which HOLDS until dismissed so the player actually reads it (owner's ask).
    *  Set only on the gate-fail path, which also closes the picker outright. */
   fusionBlockedNotice: { title: string; body: string; hint?: string } | null;
@@ -4401,6 +4410,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   weaponResistStreak: null,
   combatCues: null,
   aetherStatPickerOpen: false,
+  craftBatchQuiet: false,
   fusionPickerOpen: false,
   fusionBlockedNotice: null,
   pendingFusionSelection: null,
@@ -16363,7 +16373,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => ({
           player: s.player ? { ...s.player, inventory: craftGrant.inventory } : s.player,
         }));
-        get().appendLog('reward', `✦ Crafted ${recipe.result}. The Arbiter watches you set the last piece.`);
+        // OTA-983 — a batch emits ONE summary line at the end instead of N of these.
+        if (!get().craftBatchQuiet) {
+          get().appendLog('reward', `✦ Crafted ${recipe.result}. The Arbiter watches you set the last piece.`);
+        }
         break;
       }
     }
@@ -23530,6 +23543,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // typed `craft <name>` via submitPlayerAction.
   craftRecipe(recipeName: string) {
     get().submitPlayerAction(`craft ${recipeName}`);
+  },
+
+  craftRecipeBatch(recipeName, count) {
+    const want = Math.max(1, Math.min(Math.floor(count), 20));
+    if (want === 1) { get().submitPlayerAction(`craft ${recipeName}`); return 1; }
+    // Quiet the per-craft reward line; ONE summary lands at the end. Same
+    // deferred-narration shape salvageAllAmbient uses for `salvage all`.
+    set({ craftBatchQuiet: true });
+    let made = 0;
+    try {
+      for (let i = 0; i < want; i += 1) {
+        const before = (get().player?.inventory ?? []).reduce((n, it) => n + (it.quantity ?? 0), 0);
+        get().submitPlayerAction(`craft ${recipeName}`, { silent: true });
+        // The substitution-confirm prompt owns the flow from here — stop rather
+        // than firing more crafts behind a modal the player hasn't answered.
+        if (get().craftSubstitutionPrompt) break;
+        const after = (get().player?.inventory ?? []).reduce((n, it) => n + (it.quantity ?? 0), 0);
+        if (after === before) break; // refused / pack full / out of materials
+        made += 1;
+      }
+    } finally {
+      set({ craftBatchQuiet: false });
+    }
+    if (made > 0) {
+      get().appendLog(
+        'reward',
+        made === want
+          ? `✦ Crafted ${recipeName} ×${made}. The Arbiter watches you set the last piece.`
+          : `✦ Crafted ${recipeName} ×${made} of ${want} — the materials ran out (or your pack did).`,
+      );
+    }
+    return made;
   },
 
   clearSlotLoadError() {
