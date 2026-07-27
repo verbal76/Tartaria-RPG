@@ -43,10 +43,10 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.15` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.15` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.18` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.18` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
-  ledger below), then PATCH +1 per OTA through the 993–1004 run.
+  ledger below), then PATCH +1 per OTA through the 993–1007 run.
 
 > Builds before `3.0.0` (the `2.x` series) predate this ledger and were
 > numbered ad hoc. The scheme starts cleanly at the `3.0.0` promotion.
@@ -59,6 +59,7 @@ There are two version numbers and only one moves on an OTA:
 | 3.4.11 → 4.1.0 | OTA-602 | OTA | Last bump before the tracker froze (title-screen relabel era). Everything after shipped without moving the number. |
 | 4.28.3 | 2026-07-26-992-game-version | OTA | TRACKER REACTIVATED — caught up 389 frozen OTAs via the wave ledger below. From here: PATCH every OTA, MINOR per feature wave. |
 | 4.28.4 → 4.28.15 | 2026-07-26-993 … -1004 | OTA | The device-log root-cause run (truth batch, stat toasts, accept parity, portable words) plus two owner features: THE HOLLOWED (998 + 1004) and the healing / offer-budget / weather-locality tuning (1001–1003). PATCH per OTA as the rule says. **The Hollowed is wave-sized** — fold it into the next MINOR bump rather than renumbering builds already on devices. |
+| 4.28.16 → 4.28.18 | 2026-07-27-1005 … -1007 | OTA | The Crucible batch, all three from one device session. **1005** opened the salvage valve — a 50-name catalog-absent curio pool drops at 18% per salvaged noun, so the fuse Crucible finally has fuel (it had been structurally starved since arb61 filtered salvage down to catalog names). **1007** made a Crucible that can't fire say so: the OTA-801 consolation-picker is removed, a modal names the shortfall and holds until read, and the vendor rig checks before charging. **1006** moved the crafting decision to the front — a quantity picker with −/+ and MAX replaces OTA-264's "continue crafting?" question, and the menu stays open until BACK. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

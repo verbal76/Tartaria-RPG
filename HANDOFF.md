@@ -295,6 +295,13 @@ Key invariants worth knowing:
   ~6-game-hour weather persistence window, and `WEATHER_TICK_GAP` (**5**). All owner-directed numbers —
   change only on an owner call.
 
+- **CRUCIBLE FUEL RATE — verify by feel (HAL 1005 / golem 982; §9).** `CURIO_CHANCE = 0.18` in
+  `app/engine/salvagePools.ts` is the owner's starting number, not a settled one; the standing offer is
+  to recount from the next device log (actual salvage rolls per journey) and retune to the fusion cadence
+  they want. Note the effective rate against ALL rolls is a touch under 18% because the curio branch sits
+  behind the nothing/consolation path. **`app/data/relics/curios.json` must stay catalog-absent** — a
+  backfill silently re-starves the Crucible and the OTA-1005 suite will go red.
+
 - **INTENTIONAL EXPLOITS ON RECORD (owner calls, 2026-07-26 — do NOT "fix"):** the early-game KO-loot
   money loop and the torch-vendor buyback loop are KEPT as known early-game money faucets. The temper
   floor 0.4 (glass-cannon tempering) is design, not a bug.
@@ -652,8 +659,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-26-1004`**,
-**golem-line `2026-07-26-981`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-27-1006`**,
+**golem-line `2026-07-27-983`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -662,7 +669,43 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.15**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.18**; ledger in `VERSION.md`.
+
+- **THE CRUCIBLE BATCH (2026-07-27) — feed it, then make it honest.** HAL **1005–1007** / golem
+  **982–984**. All three came out of one device session where the owner sat in the fuse menu for ten
+  minutes believing they were fusing. FIX RULE throughout: prove the cause, fix the choke point, grep
+  the category, lock it with a test.
+  • **1005/982 — the salvage valve (owner's number: 18%).** The Crucible eats ONLY catalog-ABSENT
+    "inferred" items — that is the FEATURE, not a limitation (it exists to give junk a destiny; owner:
+    "burning junk devalues the fuse crucible"). Two later cleanups had starved it: arb61 filtered
+    salvage output down to `materials.json` names — every one of them catalog — so salvage produced
+    ZERO fuel structurally, and the standing inferred-stats BACKFILL practice converted the remainder
+    into catalog rows. Fix at the single salvage choke point `rollSalvagePool`: a new
+    `app/data/relics/curios.json` — **50** deliberately catalog-absent names spanning all seven material
+    families — drops at `CURIO_CHANCE = 0.18` IN PLACE of the material that would have dropped. `salvage
+    all` calls that function once per noun, so all ten things roll independently. Measured 18.0%, ~1.8
+    curios per ten-noun sweep. The suite LOCKS the drain shut: if a curio ever gains a catalog row it
+    goes red. **Do NOT backfill curios.json into materials.json** — the header says so too.
+  • **1007/984 — the Crucible refuses out loud.** ROOT CAUSE was a band-aid WE shipped: OTA-801 made a
+    FAILED gate OPEN THE PICKER anyway to dodge repeat-refusal spam, trading a visible annoyance for an
+    invisible one — a menu you cannot act in that logs NOTHING (reproduced from the log: three `fuse`
+    commands, one line each, the player's own echo). This OTA REMOVES that patch rather than layering on
+    it. All three Crucible doors funnel through `fuseAtCrucible`, so one choke point covers the category:
+    the picker opens ONLY when a fusion is genuinely possible; otherwise `fusionBlockedNotice` +
+    `FusionBlockedModal` name exactly what is short in plain English (the engine word "inferred" is gone
+    from player copy), HOLD until dismissed, and the Crucible closes. Also: the vendor's portable rig
+    checks BEFORE taking its 25 TC, the FUSE button gates on the real rule (`nMats >= 3`) so a lit button
+    always fuses, and the stale `pendingFusionSelection` is cleared on refusal.
+  • **1006/983 — crafting asks HOW MANY.** OTA-264 put the decision AFTER the work: a tap crafted exactly
+    one, then a modal asked CONTINUE CRAFTING / CLOSE MENU — a question whose answer was always the same,
+    so ten stews cost twenty taps and the modal could take the menu away. The step moves to the FRONT:
+    `CraftQuantityModal` (−/+ stepper and MAX), the batch runs, the menu stays open until BACK. MAX is
+    honest — `maxCraftableCount` simulates the real drain one craft at a time through the same
+    substitution-aware `consumeIngredientsList` the craft uses, capped at `MAX_CRAFT_BATCH = 20`.
+    `craftRecipeBatch` mirrors `salvageAllAmbient`'s shape: every pass is an ordinary craft with every
+    gate intact (so it can never over-consume), it stops on a refusal / full pack / substitution prompt,
+    and emits ONE aggregated reward line instead of N. The OTA-264 modal is retired for a self-clearing
+    haul banner.
 
 - **LATE SESSION (2026-07-26) — device-log root-cause run + two owner features.** HAL **992–1004** /
   golem **969–981**. Every fix in this run followed the FIX RULE (§3): prove the cause, fix the shared
