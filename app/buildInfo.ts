@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.18';
+export const DISPLAY_VERSION = '4.28.19';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18368,4 +18368,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // on a refusal / full pack / the substitution prompt, and emits ONE aggregated reward line instead
 // of N. The OTA-264 modal is retired for a self-clearing haul banner. DISPLAY_VERSION 4.28.18.
 // 5 tests. Gameplay -> HAL + golem.
-export const OTA_BUILD_ID = '2026-07-27-1006-craft-quantity';
+// OTA-1008 (the voice crash count belongs to a BUILD, not an install). Owner: "can we reset the
+// crash counter to 0 for my install? those are a few hundred fixes ago." ROOT CAUSE of the whole
+// category — a stale verdict against code that no longer exists: the voice count is
+// install-lifetime, so a number banked hundreds of OTAs back is still reported as if it described
+// the build running today. And it is inflated by the very act of shipping fixes: OTA-464 pulled the
+// voice auto-disable precisely because the breadcrumb CANNOT distinguish a real Kokoro SIGSEGV from
+// a benign termination, and an OTA reload mid-utterance is exactly that. Fix: stamp the count with
+// OTA_BUILD_ID and re-zero when the build changes, dropping the surviving breadcrumb in the same
+// breath (the reload that applied the OTA must not become "1 voice crash"). The diagnostic now reads
+// "on this build" and says "count reset" out loud. SCOPE IS DELIBERATE AND TEST-LOCKED: this
+// forgives the VOICE counter only. arb128 removed the OTA-560 blanket amnesty after it forgave a
+// genuinely-incapable device, re-enabled Qwen and produced a crash-to-home loop — so the Qwen
+// completion guard and the ML-init guard keep their install-lifetime counts and their manual-only
+// reset (About -> RESET AI NARRATION). The voice counter is the only one that is BOTH detection-only
+// (shouldAttemptBundledTTS is an unconditional `return true`) and known to over-count, so clearing it
+// forgives nothing and re-enables nothing. DISPLAY_VERSION 4.28.19. 8 tests. -> HAL + golem.
+export const OTA_BUILD_ID = '2026-07-27-1008-voice-count-build-scope';
