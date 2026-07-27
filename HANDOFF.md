@@ -35,7 +35,7 @@ git worktree add /tmp/hal-eng7 engine_Dev
 - **Working style:** the user playtests on-device (Android, OTA-delivered) and
   pastes in-game logs. For a bug report, DIAGNOSE first — root cause + proposed
   fix, briefly — and implement only after approval (unless the message says
-  "fix it"). Use AskUserQuestion for genuine UX forks with 2-4 options.
+  "fix it"). ALL diagnosis + fixing follows the §3a ROOT-CAUSE PLAYBOOK. Use AskUserQuestion for genuine UX forks with 2-4 options.
 - **Judging "clean":** filter typecheck output to `app/**`, and additionally
   ignore the pre-existing `expo-document-picker` errors in engine_Dev app
   source (3 of them) plus the long-standing test-file type errors on all lines
@@ -199,6 +199,123 @@ checklist: CLAUDE.md "FIX RULE".
 **Docs-only safety:** `**.md`, `docs/**`, `.github/**`, `app.json`, lockfiles etc.
 are in every `eas-update.yml`'s `paths-ignore`, so a HANDOFF/docs-only push does
 **NOT** publish an OTA — safe to push freely, even on the live line.
+
+## 3a. ROOT-CAUSE PLAYBOOK (owner directive, 2026-07-27) — WORK THESE CHECKLISTS VERBATIM
+
+Distilled from the studs-down teardown of OTAs 992–1004 (§9): 13 OTAs audited,
+5 fully correct, 8 shipped with real defects — and every defect fell into one
+of the failure patterns below. Following these steps mechanically is what
+closes the quality gap between sessions. Do NOT skip a step because a fix
+"looks obvious"; every defective OTA looked obvious to the session that
+shipped it.
+
+### A. Bug / error report intake (owner logs, screenshots, playtest text)
+
+1. **Find the emitting line first.** Grep the EXACT player-facing string from
+   the report (or a distinctive fragment) across `app/` — that line is the
+   entry point. Never start from where you assume the feature lives.
+2. **Walk the code path backwards** from the emitting line to the state that
+   fed it, reading every branch on the way. The cause is proven only when you
+   can say "value X came from Y, therefore the line printed Z." If reading is
+   not conclusive, prove it with a probe or a failing test FIRST. Never fix on
+   a hunch, and never let a signal that pattern-matches a known failure stand
+   in for proof — same symptom, different cause is common here.
+3. **Check whether a previous OTA already "fixed" this** (`git log -S` the
+   string/helper, grep §9). If a fix exists and the bug recurred, the fix was
+   site-local — the real job is the sibling sites it missed. Case on record:
+   the stat-toast fix covered 1 emitting site; the teardown found 8 more, and
+   the lock test was green the whole time because it only asserted the one
+   fixed shape.
+4. **Name the CATEGORY** the report is one instance of ("every stat level-up
+   toast", "any takeable item as a climb target"), then enumerate the sibling
+   sites mechanically: grep the PATTERN (helper name, log channel, placeholder
+   shape), not the literal string. Assume the first grep is incomplete —
+   re-grep with a second, looser pattern and reconcile the two lists.
+5. **Fix at the shared choke point** — one helper, one gate, one pool — so
+   every site inherits the fix. If the sites don't share a choke point, that
+   is itself a finding: CREATE one and route them through it
+   (`statNowClause`, `announceMissionComplete`, `ledgeredSalvage` all exist
+   because of this rule).
+6. **Grep-verify AFTER the fix:** the old pattern's count must be 0, or every
+   survivor individually named and justified in the commit + HANDOFF.
+7. **Category-lock test**, house pattern: a source-scan test that asserts the
+   NEW shape exists **AND** asserts the OLD shape is GONE
+   (`expect(src).not.toMatch(...)` / `not.toContain`). A lock that only
+   asserts the new shape goes green over every sibling you missed — this is
+   exactly how the teardown's defective locks failed. Behavior tests beat
+   source scans where practical; use both for the big categories.
+8. **Report** category-complete vs named residuals. Residuals go in §8 with a
+   reason — never silently dropped.
+
+### B. Exploit lens — run on EVERY fix and addition
+
+Ask "how would a player farm or bypass this?" The teardown's worst finds were
+all one of these shapes:
+- **A wipeable ledger:** dedup/exclusion state that a restock, reroll, or
+  respawn cycle clears → farm. Persistence that must survive cycles lives in
+  `worldMemory` as a permanent ledger, never keyed to a respawnable container.
+- **One guarded door of several:** an invariant enforced on one mutation path
+  but not another (single-active was enforced on ACCEPT but not on SET
+  ACTIVE — two taps defeated the whole system). Enumerate EVERY path that
+  mutates the guarded state and gate all of them.
+- **A filter that starves:** an exclusion filter inside an RNG pick loop
+  degrades or deadlocks as the exclusion set grows → post-filter the picked
+  results instead, with an all-excluded escape hatch.
+- **Loose string matching as a gate:** substring/suffix tests where head-noun
+  matching is meant (the "sigil" gate matched any noun containing the word)
+  → anchor the pattern (`(?:^|[\s-])` + word + `s?\s*$` style).
+
+### C. Additions / new systems
+
+1. **One predicate per invariant** (`anyTrackedContract`, `isRevenant`) and
+   every consumer routes through it — never re-derive the condition inline.
+2. **No silent state changes.** If the system parks, defers, caps, skips, or
+   swallows something, it SAYS so in the log. Silent parking was a regression
+   class of its own.
+3. **Reuse the existing choke points** (`appendLog`, `statNowClause`,
+   `announceMissionComplete`, the salvage/train helpers) instead of building a
+   parallel path — parallel paths are where the next category bug is born.
+4. **Interaction gates are part of the design:** a new spawn / encounter /
+   hook must explicitly decide its behavior vs buildings
+   (`activeBuildingId`), live escorts, climbs, and combat. The default of
+   "fires anywhere" is almost always wrong (revenants ambushed players inside
+   houses and mid-escort until gated).
+5. **Carry identity in payloads.** If a hook/rumour/beat refers to a specific
+   entity, put that entity's id in the payload (`Hook.chainId`-style channel)
+   — never re-pick "some matching entity" at resolution time (the rumour
+   named already-avenged revenants this way).
+6. **Test end to end,** not just the units: the happy path AND each
+   interaction gate. The Hollowed defects were all wiring gaps between
+   individually-correct pieces.
+
+### D. Ship-mechanics traps (each of these burned a prior session)
+
+- **Golem port:** golem OTA number = HAL − 23. Ported code COMMENTS carry
+  golem's renumbering, so python-transform anchors must be CODE-ONLY text.
+  Golem test files may be RENAMED (ota994→ota971 etc.) — pass test paths as
+  transform args, never hardcode them.
+- **Transforms:** every `edit(old,new,n)` count-asserted. A count mismatch
+  means the anchor drifted — re-read the file and fix the anchor; NEVER loosen
+  the assert or fall back to a blind replace.
+- **jest harness:** `jest.setup.js` globally mocks `pickWeather` → 'calm';
+  tests measuring real weather need `jest.requireActual`. Store-boot tests
+  need the standard AsyncStorage/onnx/llama/expo mock block AND explicit
+  30000ms timeouts (cold-cache flake reads as a real failure otherwise —
+  verify suspected flakes with a serial re-run before believing them).
+- **Fixtures use REAL catalog items** (e.g. `Lightstone Amulet`), not
+  synthetic ones — `effectiveStats` reads catalog + instance paths a
+  synthetic item misses, and `ARMOR_SLOTS` excludes `amulet`.
+- **Full gates before every push** (§3) in BOTH worktrees; push-per-OTA;
+  `DISPLAY_VERSION` PATCH +1 every OTA; parity per §4.
+
+### E. Self-audit before declaring done (the 60-second gate)
+
+- Did I PROVE the cause, or infer it? (If inferred: go prove it.)
+- Did I grep for siblings twice, with two patterns?
+- Does my lock test fail on the OLD code? (Actually check — `git stash` the
+  fix and run it, or assert the old shape's absence.)
+- Ran the exploit lens (§B) over what I just changed?
+- Both lines shipped, gates green, versions bumped, §8/§9 updated?
 
 ## 4. Cross-line parity rule
 
