@@ -6,6 +6,7 @@
 import React, { useMemo, useState } from 'react';
 import { Modal, View, Text, StyleSheet, ScrollView, Pressable, TouchableWithoutFeedback } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { canonicalItemTags } from '../engine/crafting';
 import { eligibleInputs, fusionMaterialTags, visibleFusionInputs } from '../engine/itemFusion';
 import { isCoatableItem, coatingCapacity, coatedDisplayName } from '../engine/weaponCoating';
 import type { InventoryItem } from '../engine/types';
@@ -38,7 +39,7 @@ export function FusionPickerModal() {
     [inventory],
   );
   const catalysts = useMemo<InventoryItem[]>(
-    () => (inventory ?? []).filter((i) => i.reservedForFusion && (i.tags ?? []).includes('faction_gear')),
+    () => (inventory ?? []).filter((i) => i.reservedForFusion && canonicalItemTags(i).includes('faction_gear')),
     [inventory],
   );
   // OTA-873 — pieces eligible for a coating-channel upgrade. A single-instance

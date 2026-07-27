@@ -76,9 +76,13 @@ const WEAPON_TAGS = ['weapon', 'throwable', 'thrown'] as const;
  *  not explicitly tagged wardrobe, AND either a tool kind (exploration/relic)
  *  or a tool tag (scanner/light/lens/pry/…). */
 export function itemIsTool(item: InventoryItem): boolean {
-  const kind = (item.kind ?? '').toLowerCase();
+  // OTA-1024 — canonical kind + tags: a stale Climbing Rope vanished from TOOLS and
+  // a stale Shard lost its weapon-signal and mis-filed as a tool.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { canonicalItemKind: pk, canonicalItemTags: pt } = require('./crafting') as typeof import('./crafting');
+  const kind = pk(item).toLowerCase();
   if ((NON_TOOL_KINDS as readonly string[]).includes(kind)) return false;
-  const tags = (item.tags ?? []).map((t) => t.toLowerCase());
+  const tags = pt(item);
   if (tags.some((t) => (NON_TOOL_TAGS as readonly string[]).includes(t))) return false;
   // OTA-491 — a thrown/throwable weapon is never a tool, even if its kind is
   // 'misc' and an auto-tag (e.g. 'aetheric' from the name) would otherwise match.

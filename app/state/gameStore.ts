@@ -213,7 +213,7 @@ import {
 } from '../engine/menace';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
-import { isBandolierEligible } from '../engine/bandolierEligibility';
+import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
 import { applyLegacyItemRenames } from '../engine/itemMigrations';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
 import { leaveEmptyWaterBottle } from '../engine/waterBottle';
@@ -291,7 +291,7 @@ import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { nounTokensMatch } from '../engine/ambientNounMatch';
 import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
 import { resolveLootItem } from '../engine/crafting';
-import { canonicalItemRarity } from '../engine/crafting';
+import { canonicalItemKind, canonicalItemRarity, canonicalItemTags } from '../engine/crafting';
 import { rollBossSpoils } from '../engine/bossLoot';
 import { enemyPowerScore } from '../engine/powerRating';
 import { levenshtein } from '../engine/editDistance';
@@ -1815,6 +1815,20 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
       }),
     };
   }
+  // OTA-1024 — instanceStats stat CHANNELS freeze at mint; when the catalog
+  // retargeted the 42 charisma-stat weapons, old instances kept granting the
+  // dead CHA channel forever. Re-point those bonuses at the catalog's current
+  // stat (fused pieces excluded — instance-authoritative).
+  if (out.inventory?.some((i) => (i.instanceStats?.statBonuses ?? []).some((b) => b.stat === 'charisma') && !i.uniqueStats && !(i.tags ?? []).includes('fused'))) {
+    out = { ...out, inventory: out.inventory.map((i) => {
+      const sb = i.instanceStats?.statBonuses;
+      if (!sb || i.uniqueStats || (i.tags ?? []).includes('fused')) return i;
+      const chaCat = findWeaponByName(i.name);
+      if (!chaCat || !chaCat.stat || chaCat.stat === 'charisma') return i;
+      const fixed = sb.map((b) => (b.stat === 'charisma' ? { ...b, stat: chaCat.stat! } : b));
+      return fixed.some((b, ix) => b !== sb[ix]) ? { ...i, instanceStats: { ...i.instanceStats, statBonuses: fixed } } : i;
+    }) };
+  }
   // OTA-1021 — the golem's held armament lives OUTSIDE the inventory array and
   // never met the restamp/durability passes. Heal it like any pack item.
   if (out.golem?.weapon) {
@@ -1879,7 +1893,10 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     }
     let item = stampDurability(i);
     const lookup = lookupCraftedItem(item.name);
-    if (lookup.kind !== 'misc' && item.kind !== lookup.kind) {
+    // OTA-1024 — fused pieces are kind-authoritative (mirrors restampInventoryItem's
+    // guard): a fused ARMOR sharing a name with a catalog weapon row flipped to
+    // 'weapon' on every load.
+    if (!item.uniqueStats && !(item.tags ?? []).includes('fused') && lookup.kind !== 'misc' && item.kind !== lookup.kind) {
       item = { ...item, kind: lookup.kind };
       // Kind change can unlock durability tracking — re-stamp so the
       // newly-eligible item picks up its baseDurability on this load.
@@ -9603,7 +9620,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : (player.equipped?.mainId ?? player.equipped?.offId ?? null);
             return id ? (player.inventory.find((i) => i.id === id) ?? null) : null;
           })();
-          const reachHandWeapon = !!reachSwungInst && (reachSwungInst.tags ?? []).includes('barehanded');
+          const reachHandWeapon = !!reachSwungInst && canonicalItemTags(reachSwungInst).includes('barehanded');
           const reachBareText = reachSwungInst?.name
             ? trimmed.toLowerCase().split(reachSwungInst.name.toLowerCase()).join(' ')
             : trimmed;
@@ -17755,7 +17772,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : (player.equipped?.mainId ?? player.equipped?.offId ?? null);
         return id ? (player.inventory.find((i) => i.id === id) ?? null) : null;
       })();
-      const wieldsHandWeapon = !!swungInstForBare && (swungInstForBare.tags ?? []).includes('barehanded');
+      const wieldsHandWeapon = !!swungInstForBare && canonicalItemTags(swungInstForBare).includes('barehanded');
       const barehandText = swungInstForBare?.name
         ? actionText.toLowerCase().split(swungInstForBare.name.toLowerCase()).join(' ')
         : actionText;
@@ -18057,7 +18074,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? player.inventory.find((i) => i.id === equippedId)
             : undefined)
             ?? player.inventory.find((i) => i.name.toLowerCase() === weaponInUse.toLowerCase());
-          const isThrowable = (equippedItem?.tags ?? []).some((t) => /throwable/i.test(t));
+          const isThrowable = !!equippedItem && itemIsThrowable(equippedItem);
           if (isThrowable && equippedItem) {
             set((s) => {
               if (!s.player) return s;
@@ -20274,7 +20291,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { isResonanceLantern } = require('../engine/resonanceLantern') as typeof import('../engine/resonanceLantern');
     const torch = player.inventory.find(
-      (i) => isResonanceLantern(i) && (i.tags ?? []).includes('light') && i.quantity > 0,
+      (i) => isResonanceLantern(i) && canonicalItemTags(i).includes('light') && i.quantity > 0,
     );
     if (!torch) {
       get().appendLog('arbiter', 'You have no torch to aim.');
@@ -20350,7 +20367,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // arb-fix — equipped faction catalyst would complete it → ask first
       // (charge happens on confirm, not now).
       const equippedReservedFaction = player.inventory.find(
-        (i) => i.reservedForFusion && (i.tags ?? []).includes('faction_gear') && vendorEquippedIds.has(i.id),
+        (i) => i.reservedForFusion && canonicalItemTags(i).includes('faction_gear') && vendorEquippedIds.has(i.id),
       );
       if (equippedReservedFaction && fusion.gateFusion(player.inventory, equippedReservedFaction).ok) {
         const slot = slotOfEquippedId(player.equipped, equippedReservedFaction.id);
@@ -20430,7 +20447,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // arb45 — Architect's Eye perk: cheaper mends on relic / ancient gear.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const tPerksRep = require('../engine/titles').titlePerkModifiers(player);
-    const isAncientItem = item.kind === 'relic' || (item.tags ?? []).some((t: string) => /ancient|relic|tartarian/i.test(t));
+    const isAncientItem = canonicalItemKind(item) === 'relic' || canonicalItemTags(item).some((t) => /ancient|relic|tartarian/i.test(t));
     const cost = (isAncientItem && tPerksRep.repairBonus > 0)
       ? Math.max(1, Math.round(baseCost * (1 - 0.05 * tPerksRep.repairBonus)))
       : baseCost;
@@ -25122,7 +25139,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // OTA-1016 — the dog's meal scales by the DOG's hpMax, not the player's.
       const dogPer = fx?.kind === 'consumable' ? scaledHealHP(fx.healHP ?? 0, dog.hpMax) : 0;
       const heal = Math.min(gap, dogPer * use);
-      const isTreat = (item.tags ?? []).includes('dog_treat');
+      const isTreat = canonicalItemTags(item).includes('dog_treat');
       const loyPer = isTreat ? 40 : fx?.kind === 'consumable' ? 20 : 5;
       const loyalty = Math.min(100, dog.loyalty + loyPer * use);
       set((s) => (s.player?.dog
@@ -25390,7 +25407,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // reserved as a fusion CATALYST — reserving one themes the fused
     // output into a unique faction item (see findFactionCatalyst /
     // applyFusion). They still don't count toward the 3-scrap gate.
-    const isFactionCatalyst = (item.tags ?? []).includes('faction_gear');
+    const isFactionCatalyst = canonicalItemTags(item).includes('faction_gear');
     // OTA-756 — forge reservability is now one shared predicate (isForgeReservableItem):
     // (2a) a weapon/armor can't be freshly reserved anymore — reserving one used to
     // show a ♥ the Crucible then silently ignored; (1a) a 'loot' reagent with no
@@ -25767,7 +25784,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // complete the fusion, ASK before burning it (don't silently eat worn
       // gear). On confirm we unequip it (freeing the slot) and fuse.
       const equippedReservedFaction = player.inventory.find(
-        (i) => i.reservedForFusion && (i.tags ?? []).includes('faction_gear') && equippedIdSet.has(i.id),
+        (i) => i.reservedForFusion && canonicalItemTags(i).includes('faction_gear') && equippedIdSet.has(i.id),
       );
       if (equippedReservedFaction && fusion.gateFusion(player.inventory, equippedReservedFaction).ok) {
         const slot = slotOfEquippedId(player.equipped, equippedReservedFaction.id);
@@ -25872,7 +25889,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const catalyst = selCatalyst;
     let factionTheme: import('../engine/itemFusion').FactionTheme | null = null;
     if (catalyst) {
-      const fac = FACTIONS.find((f) => (catalyst.tags ?? []).includes(f.id));
+      // OTA-1024 — canonical: the item passed the faction_gear gate but a stale
+      // faction-id tag nulled the theme — the catalyst burned un-themed.
+      const fac = FACTIONS.find((f) => canonicalItemTags(catalyst).includes(f.id));
       if (fac) {
         const facRarity: 'Rare' | 'Legendary' = selGate.tagProfile.length >= 4 ? 'Legendary' : 'Rare';
         factionTheme = { id: fac.id, label: fac.name, catalystId: catalyst.id, rarity: facRarity };
@@ -26237,7 +26256,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // the most beating of anything in the pack (every climb tier), so it was
             // ALWAYS the most-worn item — making this mend an infinite-rope engine:
             // free, eternal climbing. Skip ropes so the mend lands on real gear.
-            if ((it.tags ?? []).includes('rope')) return;
+            // OTA-1024 — canonical: a stale rope re-opened the arb141 free-mend farm.
+            if (canonicalItemTags(it).includes('rope')) return;
             if (d && d.max > 0 && d.current < d.max) {
               const f = d.current / d.max;
               if (f < worstFrac) { worstFrac = f; worstIdx = i; }
@@ -29220,7 +29240,7 @@ function playerWeaponReach(
   // to a hand throws from 'far' inward even though it's not in the weapon
   // catalog. Detect it off the inventory tags before the catalog lookup.
   const throwInst = (player.inventory ?? []).find(
-    (it) => it.name.toLowerCase() === wpName.toLowerCase() && (it.tags ?? []).some((t) => /throwable/i.test(t)),
+    (it) => it.name.toLowerCase() === wpName.toLowerCase() && itemIsThrowable(it),
   );
   if (throwInst) {
     return { bands: reachBandsFor('throwable'), label: throwInst.name };
@@ -33000,7 +33020,7 @@ function applyItemToDog(
       return Math.min(hpRoom, scaledHealHP((fx as { healHP?: number }).healHP ?? 0, dog.hpMax));
     }
     // No structured effect, but it IS food/consumable → default food heal.
-    const isFoodish = isConsumable || (item.tags ?? []).includes('food');
+    const isFoodish = isConsumable || canonicalItemTags(item).includes('food');
     return isFoodish ? Math.min(hpRoom, rollDie(6) + rollDie(6)) : 0;
   })();
   // Consume 1 of the item.

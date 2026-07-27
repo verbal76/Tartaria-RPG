@@ -104,8 +104,9 @@ export function digScoreFor(item: InventoryItem): number {
   if (explicit !== undefined) return explicit;
   // Heuristic from tags (max wins so an "armor plate" outscores "armor cloth").
   let best = 0;
-  for (const t of item.tags ?? []) {
-    const s = TAG_DIG_SCORE[t.toLowerCase()];
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  for (const t of (require('./crafting') as typeof import('./crafting')).canonicalItemTags(item)) {
+    const s = TAG_DIG_SCORE[t];
     if (s !== undefined && s > best) best = s;
   }
   return best;

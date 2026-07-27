@@ -64,7 +64,7 @@ const standingOf = (store: typeof useGameStore, fid: string) =>
 describe('sigil helpers (OTA-691)', () => {
   it('detects a sigil and resolves its faction', () => {
     expect(isSigilItem(orderSigil())).toBe(true);
-    expect(isSigilItem({ tags: ['ring', 'forgotten_order'] })).toBe(false);
+    expect(isSigilItem({ name: 'Signet Band', tags: ['ring', 'forgotten_order'] })).toBe(false);
     expect(sigilFaction(orderSigil())).toEqual({ id: 'forgotten_order', name: 'Forgotten Order' });
   });
 

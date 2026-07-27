@@ -786,7 +786,7 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.34**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.35**; ledger in `VERSION.md`.
 
 - **THE SNAPSHOT AUDIT, BATCH A — RESTITUTION (2026-07-27, latest).** HAL **1021** / golem **998**.
   Owner approved all five batches (A–E) from the 3-agent stale-snapshot sweep (~50 verified sites;
@@ -814,8 +814,20 @@ re-architecture. Currently **4.28.34**; ledger in `VERSION.md`.
   retargeted (its 'Aether Residue' fixture minted a synthetic Uncommon over a Common catalog row
   — canonical correctly overrode it; now uses a catalog-absent name). 8-test lock incl.
   stale-vs-fresh price/scrap/repair parity sweeps.
-  REMAINING: batches D (~25 identity sites), E (guard-rails + rename policy + catalog-name
-  ratchet) — full findings in the three audit reports, session log.
+  **BATCH D SHIPPED** (HAL 1024 / golem 1001): the identity TAIL (~25 sites) — inventory sections
+  (coatings file under COATINGS; throwables/wardrobe/dog gear canonical), the whole throwable
+  cluster (equip routing, one-shot ranged synth, consume-on-throw, reach bands, USE), sigils,
+  itemIsTool, crafting substitution + shortfall (PLUS a latent bug canonical exposed: an exact
+  recipe ingredient can no longer double as a tag substitute for another slot — preview and drain
+  in lockstep), digging, racial gear conditions, faction-catalyst cluster, rope mend guard, dog
+  treats, torch detection, barehanded, dog food, ancient-repair perk. Two load heals: the kind
+  heal skips fused pieces; pre-retarget CHA stat-channels on weapon instanceStats re-point at the
+  catalog's stat. canonicalItemTags hardened for nameless shims. Fixture retargets:
+  inventorySnapshot (Sentinel Core Plate IS a catalog throwable — equips hands, never chest),
+  sigilTurnIn (nameless negative shim gets a name).
+  REMAINING: batch E (guard-rails + rename policy + catalog-name ratchet + kind-routing tail:
+  use/eat handlers, itemWeight, parseValidator, CTA deep-link, trade-away filter, relic-trade
+  perk, display rarity labels/stripes/sorts).
 
 - **EVERY COATING RACKS (2026-07-27).** HAL **1020** / golem **997**. Owner: "there were
   coatings that I couldn't load into my bandolier." Root cause CATEGORY: identity-by-instance-tag-
