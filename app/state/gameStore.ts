@@ -4073,6 +4073,16 @@ interface GameStore {
   /** OTA-983 — the Crucible refused, and says why. Rendered by FusionBlockedModal,
    *  which HOLDS until dismissed so the player actually reads it (owner's ask).
    *  Set only on the gate-fail path, which also closes the picker outright. */
+  /** OTA-987 — a job just finished: the modal names it and holds until dismissed.
+   *  Set ONLY by announceMissionComplete, the single choke point every
+   *  completion path funnels through. */
+  missionCompleteNotice: { kind: string; title: string; rewards: string[] } | null;
+  clearMissionCompleteNotice: () => void;
+  /** OTA-987 — the one way a mission/contract/thread ends. Writes the feed line AND
+   *  raises the holding notice, so no completion can be silent again. Repeated
+   *  calls for the SAME title merge (a thread's finale plus its bonus drop read
+   *  as one result, not two popups fighting each other). */
+  announceMissionComplete: (kind: string, title: string, body: string) => void;
   fusionBlockedNotice: { title: string; body: string; hint?: string } | null;
   clearFusionBlockedNotice: () => void;
   closeFusionPicker: () => void;
@@ -4412,6 +4422,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   aetherStatPickerOpen: false,
   craftBatchQuiet: false,
   fusionPickerOpen: false,
+  missionCompleteNotice: null,
   fusionBlockedNotice: null,
   pendingFusionSelection: null,
   pendingAetherFoodId: null,
@@ -19024,7 +19035,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             factionStanding: rep.standing,
           } } : s));
           logRepChanges(get, rep.changed);
-          get().appendLog('reward', `✦ Bounty complete — the ${b.giverName} pay out ${b.rewardTc} TC.`);
+          get().announceMissionComplete('Bounty', `${b.giverName} bounty`, `✦ Bounty complete — the ${b.giverName} pay out ${b.rewardTc} TC.`);
           get().appendLog('arbiter', `"The ${b.giverName} will hear of this," the Arbiter says. "You've done what they could not."`);
         }
       }
@@ -20755,8 +20766,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : s,
     );
     const fLabel = candidate.factionId.replace(/_/g, ' ');
-    get().appendLog(
-      'reward',
+    get().announceMissionComplete(
+      'Contract',
+      candidate.title,
       `✦ Faction contract complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${payRep > 0 ? `, +${payRep} rep with ${fLabel}` : ''}.`,
     );
     // OTA-805 — RAPPORT unlocked. Turning in a faction's rapport quest opens
@@ -21213,8 +21225,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    get().appendLog(
-      'reward',
+    get().announceMissionComplete(
+      'Hunt',
+      candidate.title,
       `✦ Hunt complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
     );
     maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
@@ -21509,8 +21522,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    get().appendLog(
-      'reward',
+    get().announceMissionComplete(
+      'Mystery',
+      candidate.title,
       `✦ Mystery complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
     );
     applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
@@ -21744,8 +21758,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    get().appendLog(
-      'reward',
+    get().announceMissionComplete(
+      'Storyline',
+      candidate.title,
       `✦ Storyline complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
     );
     maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
@@ -21826,8 +21841,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           completedHuntIds: [...(s.player.completedHuntIds ?? []), def.id],
         },
       } : s));
-      get().appendLog(
-        'reward',
+      get().announceMissionComplete(
+        'Hunt',
+        def.title,
         `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${huntPayTc} TC${huntJourneyTc > 0 ? ` (incl. +${huntJourneyTc} long-haul)` : ''}${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
       maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
@@ -25680,6 +25696,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   clearFusionBlockedNotice() { set({ fusionBlockedNotice: null }); },
 
+  clearMissionCompleteNotice() { set({ missionCompleteNotice: null }); },
+
+  announceMissionComplete(kind, title, body) {
+    // The feed line is unchanged — the log stays a complete record, and anything
+    // that greps it (chronicle, bug reports) keeps working.
+    get().appendLog('reward', body);
+    const prev = get().missionCompleteNotice;
+    set({
+      missionCompleteNotice: prev && prev.title === title
+        ? { ...prev, rewards: [...prev.rewards, body.replace(/^✦\s*/, '')] }
+        : { kind, title, rewards: [body.replace(/^✦\s*/, '')] },
+    });
+  },
+
   confirmFusionSelection(itemIds, kind, catalystId) {
     set({ pendingFusionSelection: { itemIds, kind, catalystId }, fusionPickerOpen: false });
     void get().fuseAtCrucible();
@@ -27313,12 +27343,22 @@ function resolveHookOneStep(
   // Stage numbers surface so the player knows where they are in the
   // chain: "★ STORY THREAD (step 2) — ..." If `outcome.done` is set,
   // we mark the line as a finale: "★★ STORY THREAD COMPLETE — ..."
+  // OTA-987 — threads are unnamed content; the notice still needs something the
+  // player recognises, so use the hook's own kind as a readable title.
+  const hookTitleFor = (h: { kind?: string }) =>
+    String(h.kind ?? 'story thread').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const stageLabel = outcome.done
     ? '★★ STORY THREAD COMPLETE'
     : `★ STORY THREAD (step ${hook.stage + 1})`;
   get().appendLog('world', `${stageLabel} — ${outcome.line}`);
   if (inlineSummaries.length > 0) {
-    get().appendLog('reward', `✦ ${inlineSummaries.join(', ')}.`);
+    // OTA-987 — a FINISHED thread raises the holding notice; a mid-chain step stays
+    // an ordinary feed line (the player is still playing it, not finishing it).
+    if (outcome.done) {
+      get().announceMissionComplete('Story thread', hookTitleFor(hook), `✦ ${inlineSummaries.join(', ')}.`);
+    } else {
+      get().appendLog('reward', `✦ ${inlineSummaries.join(', ')}.`);
+    }
   }
   // OTA-699 — reward for reading. Completing an easy-to-miss STORY THREAD
   // occasionally yields a GOOD material on top of the thread's own payout —

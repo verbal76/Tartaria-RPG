@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.20';
+export const DISPLAY_VERSION = '4.28.21';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17393,4 +17393,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // two ways — a suite that fails if ANY catalog weapon carries charisma, and a runtime backstop
 // (isValidAttackStat) so a bad row falls back to the weapon-class default instead of being obeyed.
 // DISPLAY_VERSION 4.28.20. 9 tests. Gameplay -> HAL + golem; golem port of HAL OTA-1009.
-export const OTA_BUILD_ID = '2026-07-27-986-onehand-tohit-stat';
+// OTA-987 (finishing a job is an EVENT, not a log line). Owner: "there needs to be a pop-up that
+// hangs for a second to let you read that says that you completed a mission and give the name and the
+// reward. I didn't even realize I completed the mission except for that the name of my escort was off
+// the screen." On device a STORY THREAD paid Trail Rations, Mud Essence AND a Rare Golem Core — all of
+// it feed lines that scrolled away behind ambient chatter. ROOT CAUSE OF THE CATEGORY: "a mission
+// completed" did not EXIST as a concept in this codebase — only SEVEN independent sites that each
+// hand-built a reward string and dropped it in the log (bounty, faction contract, hunt board turn-in,
+// hunt pack turn-in, mystery, storyline, story-thread finale). Patching the one the owner happened to
+// hit would have left six others exactly as missable. So this OTA CREATES the missing concept:
+// announceMissionComplete(kind, title, body) is now the one way a job ends — it writes the same feed
+// line it always did (the log stays a complete record for the chronicle and bug reports) AND raises
+// missionCompleteNotice, which MissionCompleteModal renders and HOLDS until dismissed (AUTO_CLOSE_MS
+// 12s is a safety valve, not a timed toast). All seven sites funnel through it. Repeated calls for the
+// SAME title MERGE, so a thread's finale and its persistence bonus read as one result instead of two
+// popups fighting. LOCKED TWO WAYS: a category test pinning all 7 call sites + every job kind, and a
+// SOURCE lock that fails the build if any completion is ever written straight to the feed again.
+// DISPLAY_VERSION 4.28.21. 7 tests. Gameplay -> HAL + golem; golem port of HAL OTA-1010.
+export const OTA_BUILD_ID = '2026-07-27-987-mission-complete-notice';
