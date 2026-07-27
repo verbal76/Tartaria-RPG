@@ -89,7 +89,7 @@ describe('OTA-1012 — audit findings stay fixed', () => {
       .filter((e) => e.channel === 'reward' && /Crafted Club/.test(e.text));
     expect(rewards.length).toBe(1);
     expect(rewards[0]!.text).toContain('×3');
-  });
+  }, 30000); // full store boot — cold jest caches have exceeded the 5s default
 
   it('a normal multi-ingredient batch still works (no regression from the recount)', async () => {
     const store = useGameStore;
@@ -120,7 +120,7 @@ describe('OTA-1012 — audit findings stay fixed', () => {
     const made = store.getState().craftRecipeBatch(target.result, 2);
     await new Promise((r) => setTimeout(r, 60));
     expect(made).toBe(2);
-  });
+  }, 30000);
 
   it('AMBIGUOUS PARTIALS refuse: "camp" names three places, so no silent trek', () => {
     // Pre-fix these silently resolved to whichever name was shortest.

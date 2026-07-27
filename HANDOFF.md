@@ -659,8 +659,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-27-1006`**,
-**golem-line `2026-07-27-983`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-27-1012`**,
+**golem-line `2026-07-27-989`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -669,7 +669,33 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.18**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.23**; ledger in `VERSION.md`.
+
+- **THE TRUST BATCH + ROOT-CAUSE AUDIT (2026-07-27, later).** HAL **1008–1012** / golem **985–989**.
+  • **1008/985** — the voice-crash counter is scoped to the BUILD that produced it (stamped with
+    OTA_BUILD_ID, re-zeroed on build change; the OTA reload that delivers a fix can no longer count as
+    a crash). Confirmed live on the owner's device. The Qwen/init guards deliberately keep their
+    install-lifetime counts (arb128's crash-to-home lesson) — test-locked scope.
+  • **1009/986** — CHARISMA IS NOT A TO-HIT STAT: the weapon catalog had assigned `stat` BY GRIP and
+    the whole single_handed bucket carried charisma (37/37 melee + 5/5 ranged = 42 weapons, 7
+    Legendary). Retargeted from the six sibling-pair rows that revealed intent (heavy one-handers →
+    STR, knives/batons/thrown → DEX, pistols → DEX). Runtime backstop `isValidAttackStat` + a suite
+    that fails the build if any weapon ever carries charisma. The earlier "melee rolls CHA" fix had
+    patched a CODE path; the DATA was the cause — never again.
+  • **1010/987** — a finished mission ANNOUNCES itself: `announceMissionComplete` is the one way a job
+    ends (7 sites funneled: bounty, contract, hunt ×2, mystery, storyline, story-thread finale), raising
+    a holding modal with kind + name + rewards; merge-by-title folds a finale and its bonus into one
+    popup. SOURCE lock: a completion written straight to the feed fails the build.
+  • **1011/988** — travel-by-name matches what the player TYPED: `app/engine/locationMatch.ts`
+    normalises both sides (punctuation, spaces, leading articles), fixing 7 unreachable punctuated
+    names (Zharak's Teeth et al.). Ambiguity REFUSES (five places alias "city", three "tower").
+  • **1012/989 — THE AUDIT.** Owner: "run a root cause analysis of all fixes done in the last 12
+    hours and thoroughly test everything." Re-verified all seven OTAs, byte-parity across lines,
+    adversarial probes. Found TWO defects in this session's own fixes, both lying-proxy shaped:
+    craftRecipeBatch judged success by TOTAL pack delta (the Club, 1 Stick → 1 Club, nets zero → one
+    silent club, made=0, no summary; only 1-in-1-out recipe of 130) — now counts the RESULT item; and
+    the partial-name tier still silently picked shortest on ambiguity ("camp" names 3 places) — now
+    refuses, with the base-name carve-out ("Nimari" in "Red Tower of Nimari"). Both source-locked.
 
 - **THE CRUCIBLE BATCH (2026-07-27) — feed it, then make it honest.** HAL **1005–1007** / golem
   **982–984**. All three came out of one device session where the owner sat in the fuse menu for ten
