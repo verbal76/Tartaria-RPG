@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.41';
+export const DISPLAY_VERSION = '4.28.42';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18718,4 +18718,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // button (no CONTINUE, no ABANDON — the thread is already done), and scrim
 // taps / back route through COMPLETE so the payout notice can't be dropped.
 // Mid-thread stages keep CONTINUE / ABANDON exactly as before.
-export const OTA_BUILD_ID = '2026-07-28-1030-hook-complete-flow';
+// OTA-1031 — WHICH ONE AM I HOLDING? (owner: "when you are applying coatings to
+// weapons or armor, it should show you which one you have equipped at that
+// time"). The two coating pickers (paint a vial onto a weapon; work a resist
+// vial into armor) listed candidates by bare name — with two same-named
+// weapons, or a pack full of armor, nothing said which piece was actually on
+// your body. Each picker row is now tagged "· EQUIPPED (main hand)" /
+// "(off hand)" / "(chest)" etc. through the SAME instance-id resolver that
+// drives the inventory EQUIPPED badge (equippedSlotLabelFor — id-first,
+// legacy name fallback), so the tag lands on the exact instance you're
+// wearing, never a duplicate, and the pickers can't drift from the badge.
+export const OTA_BUILD_ID = '2026-07-28-1031-coat-picker-equipped';

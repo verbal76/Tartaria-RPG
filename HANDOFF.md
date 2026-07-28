@@ -846,9 +846,20 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.41**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.42**; ledger in `VERSION.md`.
 
-- **THE POPUP THAT COULDN'T WAIT — STORY-THREAD COMPLETE FLOW (2026-07-28, latest).** HAL
+- **WHICH ONE AM I HOLDING — COATING PICKERS TAG THE EQUIPPED PIECE (2026-07-28, latest).**
+  HAL **1031** / golem **1008**. Owner: "when you are applying coatings to weapons or armor,
+  it should show you which one you have equipped at that time." Both coating pickers (paint a
+  vial onto a weapon; work a resist vial into armor) listed candidates by bare name. Each row
+  now appends `· EQUIPPED (main hand)` / `(off hand)` / `(chest)` etc. via a tiny
+  `withEquippedTag` helper that rides `equippedSlotLabelFor` — the SAME instance-id resolver
+  (id-first, legacy name fallback) that drives the inventory EQUIPPED badge. One source of
+  truth, per the §3a-B divergent-copies lens: the pickers can never disagree with the badge,
+  and with two same-named weapons the tag lands on the exact worn instance. Category-lock
+  test pins one definition + two call sites and that the helper reads equippedSlotLabelFor.
+
+- **THE POPUP THAT COULDN'T WAIT — STORY-THREAD COMPLETE FLOW (2026-07-28).** HAL
   **1030** / golem **1007**. Owner: "as soon as you hit the last part of the story hook, it
   immediately pops up a completion pop-up... the last part is completed, so it shouldn't say
   continue or abandon — it should only say complete, and when you hit complete the pop-up
