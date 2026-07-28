@@ -4061,6 +4061,13 @@ interface GameStore {
     kind: 'hunt' | 'mystery' | 'storyline' | 'faction_quest',
     id: string,
   ) => void;
+  /** OTA-1037 — internal body of completeContractFromUI; the public name is a
+   *  wrapper that surfaces refusals to the Contracts screen's strip. UI code
+   *  keeps calling completeContractFromUI. */
+  completeContractFromUIInner: (
+    kind: 'hunt' | 'mystery' | 'storyline' | 'faction_quest',
+    id: string,
+  ) => void;
   /** OTA 020 — drop a procedurally-generated lead from the active
    *  list. Leads auto-complete on kill (OTA 011) but the player
    *  may want to abandon one that isn't worth chasing. */
@@ -4255,6 +4262,13 @@ interface GameStore {
    *  completion path funnels through. */
   missionCompleteNotice: { kind: string; title: string; rewards: string[] } | null;
   clearMissionCompleteNotice: () => void;
+  /** OTA-1037 — Contracts-screen refusal strip. A COMPLETE tap that does NOT end in
+   *  the completion popup surfaces the Arbiter's refusal line here — the
+   *  turn-in guards speak to the world feed, which the Contracts screen never
+   *  renders, so a refused tap read as "the button does nothing" (owner tapped
+   *  a READY contract ~15× against a wrong-faction hall into silence). */
+  contractsNotice: { text: string; ts: number } | null;
+  clearContractsNotice: () => void;
   /** OTA-1010 — the one way a mission/contract/thread ends. Writes the feed line AND
    *  raises the holding notice, so no completion can be silent again. Repeated
    *  calls for the SAME title merge (a thread's finale plus its bonus drop read
@@ -4605,6 +4619,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   craftBatchQuiet: false,
   fusionPickerOpen: false,
   missionCompleteNotice: null,
+  contractsNotice: null,
   fusionBlockedNotice: null,
   pendingFusionSelection: null,
   pendingAetherFoodId: null,
@@ -22051,7 +22066,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // Player tapped on purpose; no need to walk to a vendor first.
   // Still validates stage / boss-kill criteria, still grants the
   // same reward.
+  // OTA-1037 — WRAPPER: a COMPLETE tap must ANSWER ON THIS SCREEN. The typed
+  // turn-ins the body delegates to guard with Arbiter lines (wrong faction, no
+  // agent in scene, work not done) spoken to the world feed — which the
+  // Contracts screen doesn't render. Owner's report: a READY faction contract's
+  // green COMPLETE tapped ~15× while standing in another faction's hall "did
+  // nothing" — the log shows 7 invisible wrong-faction refusals plus dedup
+  // crumbs. If the tap doesn't raise the completion popup, the freshest
+  // Arbiter line — or, when the arbiter dedup swallowed a repeat, the line it
+  // suppressed — is surfaced as contractsNotice for the screen's strip.
   completeContractFromUI(kind, id) {
+    const logBefore = get().gameLog;
+    const lastIdBefore = logBefore[logBefore.length - 1]?.id ?? null;
+    const noticeBefore = get().missionCompleteNotice;
+    get().completeContractFromUIInner(kind, id);
+    if (get().missionCompleteNotice !== noticeBefore) {
+      // Completed — the popup tells the story; drop any stale refusal.
+      if (get().contractsNotice) set({ contractsNotice: null });
+      return;
+    }
+    const logAfter = get().gameLog;
+    let refusal: string | null = null;
+    for (let i = logAfter.length - 1; i >= 0; i--) {
+      const e = logAfter[i];
+      if (!e || e.id === lastIdBefore) break;
+      if (e.channel === 'arbiter') { refusal = e.text; break; }
+    }
+    if (!refusal) {
+      // No fresh line and no popup: the arbiter dedup ate a repeat refusal.
+      // Surface the newest arbiter line — on a repeat tap that IS the refusal.
+      for (let i = logAfter.length - 1; i >= 0; i--) {
+        const e = logAfter[i];
+        if (e?.channel === 'arbiter') { refusal = e.text; break; }
+      }
+    }
+    if (refusal) set({ contractsNotice: { text: refusal, ts: Date.now() } });
+  },
+
+  completeContractFromUIInner(kind, id) {
     const player = get().player;
     if (!player) return;
     if (kind === 'hunt') {
@@ -22665,8 +22717,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // back to currentScene.location.name on the next render. Player
     // tapped STOP TRAVEL; they're now standing where they stopped,
     // not "near X."
+    // OTA-1037 — quit-navigating also stands down mission auto-routing. routedMission
+    // used to survive this, so the Contracts card kept its "Auto-routing" note
+    // (which replaces the ROUTE button) with no course left to chain — a wedged
+    // card whose only way out was deactivate → reactivate (the owner's
+    // accidental workaround). Same fix in stopWhisperCourse below.
     set((s) => (s.player ? {
-      player: { ...s.player, travelTarget: undefined },
+      player: { ...s.player, travelTarget: undefined, routedMission: null },
       currentScene: s.currentScene ? { ...s.currentScene, transitArea: null } : s.currentScene,
     } : s));
     get().appendLog(
@@ -22755,7 +22812,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   stopWhisperCourse() {
     const player = get().player;
     if (!player || !player.whisperCourse) return;
-    set((s) => (s.player ? { player: { ...s.player, whisperCourse: null } } : s));
+    // OTA-1037 — see stopTravel: cancelling the course cancels the route chain too.
+    set((s) => (s.player ? { player: { ...s.player, whisperCourse: null, routedMission: null } } : s));
     get().appendLog('world', 'You set the course aside. Cardinal direction is yours again.');
   },
 
@@ -26040,6 +26098,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   clearFusionBlockedNotice() { set({ fusionBlockedNotice: null }); },
 
   clearMissionCompleteNotice() { set({ missionCompleteNotice: null }); },
+
+  clearContractsNotice() { set({ contractsNotice: null }); },
 
   announceMissionComplete(kind, title, body) {
     // The feed line is unchanged — the log stays a complete record, and anything
