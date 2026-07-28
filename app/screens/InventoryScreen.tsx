@@ -394,6 +394,15 @@ export function InventoryScreen() {
     const labels = [...new Set(slots.map((s) => SLOT_LABEL[s] ?? s))];
     return labels.join(' + ');
   };
+  // OTA-1008 — the coating pickers (weapon vials AND armor vials) tag each candidate
+  // that is CURRENTLY EQUIPPED, via the same resolver as the EQUIPPED badge —
+  // one source of truth, no divergent copy. Owner: "when you are applying
+  // coatings to weapons or armor, it should show you which one you have
+  // equipped at that time."
+  const withEquippedTag = (label: string, item: InventoryItem): string => {
+    const where = equippedSlotLabelFor(item);
+    return where ? `${label} · EQUIPPED (${where})` : label;
+  };
   // arb-fix — the slot an item FILLS, shown on every equippable row (esp. armor:
   // "Chest", "Head", "Feet"…) whether worn or not, so the player can see where a
   // piece goes at a glance. Weapons collapse to "Hand" / "Two-handed".
@@ -1086,7 +1095,7 @@ export function InventoryScreen() {
               : w.name;
           const isReplace = slot === 'replace';
           return {
-            label,
+            label: withEquippedTag(label, w),
             onPress: () => {
               if (isReplace) {
                 // OTA-921/922 — never scrub off a coating on one tap. Stage a picker of
@@ -1149,11 +1158,14 @@ export function InventoryScreen() {
           const arCap = 3 + (a.resistCapBonus ?? 0);
           const atCap = arList.length >= arCap;
           return {
-            label: alreadyType
-              ? `${a.name} — already resists ${coatType}`
-              : atCap
-                ? `${a.name} — full (${arList.join('/')}) · replace one`
-                : `${a.name}${arList.length ? ` (+${arList.join('/')})` : ''}`,
+            label: withEquippedTag(
+              alreadyType
+                ? `${a.name} — already resists ${coatType}`
+                : atCap
+                  ? `${a.name} — full (${arList.join('/')}) · replace one`
+                  : `${a.name}${arList.length ? ` (+${arList.join('/')})` : ''}`,
+              a,
+            ),
             onPress: () => {
               if (!alreadyType && atCap) {
                 // OTA-922 — full piece: pick which resist to strip instead of refusing.
