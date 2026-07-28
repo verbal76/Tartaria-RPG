@@ -845,9 +845,15 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.38**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.39**; ledger in `VERSION.md`.
 
-- **THE CRAFT-SCREEN STALL (2026-07-27, latest).** HAL **1027** / golem **1004**. Pre-existing
+- **THE WEDGED BANDOLIER — GHOST EQUIP REFERENCES (2026-07-27, latest).** HAL **1028** / golem
+  **1005**. Racked/stowed instance ids whose items left the pack by any path other than
+  throw/unrack rendered as EMPTY slots that still counted against the cap — unfillable and
+  unclearable. Ghost sweep in backfillPlayer + live-id cap checks (bandolier AND tool pouch).
+  The REFERENCE sibling of §3a-F: persisted instance-id indexes must validate against inventory.
+
+- **THE CRAFT-SCREEN STALL (2026-07-27).** HAL **1027** / golem **1004**. Pre-existing
   (bisect-proven): ingredientShortfall annotated the whole inventory PER RECIPE; the craft badge
   runs 130 recipes per open and per inventory change — seconds per repairs-tab tap on device.
   Fix: SHORTFALL_META WeakMap on the immutable inventory array; 900ms → 3-23ms. Plus canCraft

@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.38';
+export const DISPLAY_VERSION = '4.28.39';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17616,4 +17616,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 900ms -> ~15ms. BONUS parity fix: canCraft's shortfall now carries the
 // same exact-ingredient substitution exclusion the preview/drain loops
 // gained, so approve and drain can never disagree (the OTA-613 hazard).
-export const OTA_BUILD_ID = '2026-07-27-1004-craftscreen-stall-fixed';
+// OTA-1005 — THE WEDGED BANDOLIER (owner screenshot: "no matter what I do I
+// cannot add anything to those last 2 bandolier slots"). Root cause category:
+// GHOST EQUIP REFERENCES — bandolierIds/toolPouchIds index inventory
+// instances, but only THROW and UNRACK cleaned them; selling/scrapping/
+// drinking/gifting/fusing/fully-using a racked item left its id behind. A
+// ghost renders as an EMPTY slot yet still counts against the cap, so the
+// rack refuses ("Five loops, five throws") with nothing visible to pull —
+// permanently wedged. Fix: a ghost sweep on every load (heals wedged saves
+// on first boot) + the two stow cap checks count only LIVE ids so a
+// mid-session ghost can never wedge the bandolier or the tool pouch again.
+export const OTA_BUILD_ID = '2026-07-27-1005-ghost-equip-refs';
