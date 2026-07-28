@@ -859,9 +859,23 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.46**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.47**; ledger in `VERSION.md`.
 
-- **THE LEAK THAT ATE THE SIMS — ROOT-CAUSED AND KILLED (2026-07-28, latest).** HAL **1035**
+- **THE TC GHOST — INVESTIGATED, PRECONDITIONS ELIMINATED, TRIPWIRE ARMED (2026-07-28,
+  latest).** HAL **1036** / golem **1013**. Owner: "work towards the root cause, do this one
+  last." The intermittent `tc.challengeForLocation is not a function` crash (2 combatStress
+  runs, 232/370 hits each, all during raid windows) was investigated to its evidence floor:
+  single call site (gameStore ~8161), export intact, no module cycle, no mock interference —
+  and BOTH crashing runs sat at 6-8 GB heap under the since-fixed OTA-1035 mock leak, while
+  every low-heap run (4 clean full runs + 3 ARMED reproduction attempts at the exact original
+  configuration) shows zero recurrence. VERDICT: not conclusively provable, but the strongest
+  reading is V8 misbehavior under near-OOM pressure, and the pressure itself is gone.
+  The watch item converts to a SELF-DIAGNOSING one: combatStress's crash catch now carries a
+  permanent tripwire — any future `challengeForLocation` crash records the stack, the live
+  module's export list + typeof, and heap size to the report and `/tmp/tartaria-tc-ghost.txt`.
+  If the weekly heavy gate ever trips it, the diagnosis writes itself. Costs nothing healthy.
+
+- **THE LEAK THAT ATE THE SIMS — ROOT-CAUSED AND KILLED (2026-07-28).** HAL **1035**
   / golem **1012**. Owner: "do the root cause dig." Done — the §8 "world/persist super-linear
   tail-growth" open item (the deepest open thread, deferred since 2026-07-20) is CLOSED. The
   heap-snapshot autopsy of metaNavStress found the retained gigabytes were HUNDREDS of copies
@@ -930,8 +944,9 @@ re-architecture. Currently **4.28.46**; ledger in `VERSION.md`.
     the <1% stall-rate + zero-crash floors stay.
   • **VERIFIED GREEN** end-to-end: 20 000 actions, 0 crashes, 0.8% stalls, 98 kills. The
     intermittent raid-window `tc.challengeForLocation` crash seen in two early runs did NOT
-    recur across three consecutive full runs — unexplained mechanically, watch the canary;
-    if it resurfaces, capture `e.stack` at the throw (the probe pattern is in §9's record).
+    recur across three consecutive full runs — RESOLVED-WITH-TRIPWIRE — see the OTA-1013 entry above:
+    preconditions (mock-leak heap pressure) eliminated, armed stack-capture now permanent in
+    the canary's crash catch.
   • RULE GOING FORWARD: run the heavy gate (`npm run test:ci:heavy`) after any combat-loop
     OTA, or at least weekly — a red canary hid a real bug for 8 days.
 

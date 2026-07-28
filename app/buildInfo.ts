@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.46';
+export const DISPLAY_VERSION = '4.28.47';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17719,4 +17719,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // prior OTA's claim that mysteries/storylines still turn in remotely was
 // wrong — all contract kinds already turn in face-to-face; docs + a stale
 // "remote HALF option" comment fixed.
-export const OTA_BUILD_ID = '2026-07-28-1012-persist-leak-root-cause';
+// OTA-1013 — THE TC GHOST, CLOSED WITH A TRIPWIRE (owner: "work towards the root
+// cause, do this one last"). The intermittent raid-window
+// `tc.challengeForLocation is not a function` crash was chased to its
+// evidence floor: one call site, intact export, no cycle, no mock — and both
+// crashing runs sat at 6-8 GB heap under the mock leak OTA-1035 killed, while
+// 3 armed reproduction attempts at the exact original configuration plus 4
+// clean full runs since show zero recurrence. Strongest reading: V8 under
+// near-OOM pressure; the pressure is gone. The combat canary's crash catch
+// now carries a permanent self-diagnosing tripwire — any recurrence records
+// the stack, the module's live export list, and heap size on the spot.
+// Test-only change; no gameplay code touched.
+export const OTA_BUILD_ID = '2026-07-28-1013-tc-ghost-tripwire';
