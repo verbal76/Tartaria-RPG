@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.42` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.42` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.43` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.43` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -77,6 +77,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.39 → 4.28.40 | 2026-07-28-1006 | OTA | THE GREEN LIE FIXED (divergent reach copies): the weapon quick-button highlight and the enemy panel re-derived reach locally and missed the forge-stamped reach class on fused weapons — a close-only fused weapon glowed green at mid range while the attack gate refused. One exported resolver (playerWeaponReach) now feeds the gate, the button tones, and the in-range flag; category-lock test forbids new local copies. |
 | 4.28.40 → 4.28.41 | 2026-07-28-1007 | OTA | STORY-THREAD COMPLETE FLOW: the completion popup used to mount the instant the final thread stage resolved, on top of the thread text still being read. The notice is now stashed and raised only when the player taps the new single COMPLETE button on the terminal stage (mid-thread stages keep CONTINUE/ABANDON); scrim/back route through COMPLETE so the payout notice can't be dropped. |
 | 4.28.41 → 4.28.42 | 2026-07-28-1008 | OTA | COATING PICKERS SHOW THE EQUIPPED PIECE: weapon- and armor-coating pickers now tag each candidate that is currently worn (· EQUIPPED (main hand) / (chest) etc.) through the same instance-id resolver as the inventory EQUIPPED badge, so the tag hits the exact worn instance even among same-named duplicates. |
+| 4.28.42 → 4.28.43 | 2026-07-28-1009 | OTA | CONTESTED FLEE (owner: never lost a flee roll — proven: flat DC 9 vs growing DEX made failure impossible at DEX 8+). Escapes in combat are now opposed by the fastest live pursuer's d20 + speed (bestiary AP + quick/agile/aerial/slow traits, clamp 0-14); ties go to the runner; hounds and winged things are hard to outrun, titans easy. Trap/stage escapes keep DC 9; new-character flee grace untouched. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

@@ -116,7 +116,7 @@ import { pickWastelandEncounter } from '../engine/wastelandEncounters';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
-import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies } from '../engine/combatRules';
+import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies, escapePursuit } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
@@ -12224,10 +12224,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog('reward', `✦ Curious Mind — Tartaria's secrets crack open before you, and something in your head clicks awake. (+2 INT and +2 WIS, from here on.)`),
           );
         }
+        // OTA-1009 — CONTESTED FLEE: with live enemies in the scene, the fastest
+        // pursuer sets the escape bar (its d20 + speed) instead of the flat
+        // DC 9 that a grown DEX could never fail against. No pursuer (trap /
+        // stage escapes, cleared scenes) keeps the flat DC.
+        const fleePursuers = parsed.intent === 'escape'
+          ? (currentScene.enemies ?? []).filter((e, ei) => (currentScene.enemyHps?.[ei] ?? e.hp) > 0)
+          : [];
         const steps = buildSkillSteps(parsed.intent, player, {
           weatherMod: weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)),
           companionAssist: !!player.companion,
           raceCtx: { relicTarget, inRuins },
+          pursuit: fleePursuers.length > 0 ? escapePursuit(fleePursuers) : null,
         });
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, refundOnCancel } });
         break;
