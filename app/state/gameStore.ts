@@ -9628,8 +9628,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const currentMain = player.equipped?.main;
             // Also skip if the named instrument IS the off-hand instance — attacking
             // by an off-hand weapon's name shouldn't yank it into the main slot.
+            // OTA-1033 — id-first, NAME fallback when the off slot carries no id (a
+            // hand-built state that never passed backfillPlayer's id stamp): the
+            // id-only test fell through and the promotion bound ONE instance to
+            // BOTH hands (main=off, the same item), silently evicting the real
+            // main weapon. Real saves get ids healed at load; this is the belt.
             const isOffHandInstance =
-              !!instrumentArg.resolvedItemId && instrumentArg.resolvedItemId === player.equipped?.offId;
+              (!!instrumentArg.resolvedItemId && instrumentArg.resolvedItemId === player.equipped?.offId)
+              || (!player.equipped?.offId && !!swapTo && !!player.equipped?.off
+                  && swapTo.name.toLowerCase() === player.equipped.off.toLowerCase());
             if (
               swapTo &&
               swapTo.name !== currentMain &&

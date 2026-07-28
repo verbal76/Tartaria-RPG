@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.43';
+export const DISPLAY_VERSION = '4.28.44';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18742,4 +18742,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // hook stages) keep the flat DC, and the first-3-steps flee grace for
 // brand-new characters is untouched. The dice line names the chase:
 // "Pursuit 17 — Mud Hound (d20 12 + SPD 5)".
-export const OTA_BUILD_ID = '2026-07-28-1032-contested-flee';
+// OTA-1033 — THE DEAD CANARY (owner: "is the preexisting issue something we need
+// to look at?" — yes). The heavy combatStress sim had been red since ~Jul 20
+// (the heavy gate isn't part of the per-OTA fast gates), hiding two findings.
+// REAL BUG (fixed here): "attack <enemy> with <weapon>" promotes the named
+// weapon into the MAIN hand; its off-hand protection compared INSTANCE IDS
+// only, so an equipped state carrying name-only slots (anything that never
+// passed backfillPlayer's id stamp) fell through — the promotion bound ONE
+// off-hand instance to BOTH hands and silently evicted the real main weapon.
+// Real saves get ids healed at load; the guard now falls back to NAME when the
+// off slot has no id (the codebase's own id-first-name-fallback rule). SIM
+// FIXTURE DRIFT (repaired in the test): the fixture equipped name-only slots
+// (triggering the above), and living-world patrols/raids — newer than the
+// harness — arrive outside its injector, leaving its verb rotation stuck
+// mid-beatdown attack-spamming a close-only knife from mid-range into the
+// 25-round stall guard on every engine-spawned fight (the 10% "win rate").
+export const OTA_BUILD_ID = '2026-07-28-1033-offhand-promotion-guard';
