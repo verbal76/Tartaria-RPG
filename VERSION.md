@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.40` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.40` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.41` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.41` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -75,6 +75,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.37 → 4.28.38 | 2026-07-27-1027 | OTA | CRAFT-SCREEN STALL FIXED (pre-existing): ingredientShortfall annotated the whole inventory per recipe — 130× per open and per repair tap; WeakMap annotation cache on the immutable inventory array → 900ms → 3-23ms. Plus canCraft/drain exact-ingredient exclusion parity. |
 | 4.28.38 → 4.28.39 | 2026-07-27-1028 | OTA | WEDGED BANDOLIER FIXED (ghost equip references): racked/stowed ids whose items left the pack by any path other than throw/unrack rendered as empty-but-cap-counting slots; ghost sweep on load + live-id cap checks for bandolier AND tool pouch. |
 | 4.28.39 → 4.28.40 | 2026-07-28-1029 | OTA | THE GREEN LIE FIXED (divergent reach copies): the weapon quick-button highlight and the enemy panel re-derived reach locally and missed the forge-stamped reach class on fused weapons — a close-only fused weapon glowed green at mid range while the attack gate refused. One exported resolver (playerWeaponReach) now feeds the gate, the button tones, and the in-range flag; category-lock test forbids new local copies. |
+| 4.28.40 → 4.28.41 | 2026-07-28-1030 | OTA | STORY-THREAD COMPLETE FLOW: the completion popup used to mount the instant the final thread stage resolved, on top of the thread text still being read. The notice is now stashed and raised only when the player taps the new single COMPLETE button on the terminal stage (mid-thread stages keep CONTINUE/ABANDON); scrim/back route through COMPLETE so the payout notice can't be dropped. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

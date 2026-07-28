@@ -33,6 +33,12 @@ import type { HookContinueStage } from '../engine/types';
 //     resolved. The title flips to "★★ STORY THREAD COMPLETE" so
 //     the player knows tapping CONTINUE means "I'm done reading."
 //
+// OTA-1030 — the terminal stage shows a single COMPLETE button (owner: "the
+// last part of the story thread is completed, so it shouldn't say continue
+// or abandon — it should only say complete"). COMPLETE dismisses the arc
+// and THEN raises the mission-complete popup, which used to mount over
+// this modal the moment the final stage resolved.
+//
 // The previous stage's narration also goes to the world feed (log)
 // via resolveHookOneStep's existing appendLog calls, so the player
 // has a permanent record. The popup is the in-flight experience.
@@ -51,6 +57,11 @@ interface Props {
   completed: boolean;
   onContinue: () => void;
   onAbandon: () => void;
+  /** OTA-1030 — COMPLETE on the terminal stage. Dismisses the thread AND raises
+   *  the held completion popup (wire to dismissHookContinue). On a completed
+   *  thread this is the ONLY button — nothing left to continue or abandon —
+   *  and scrim taps / the back button route here too. */
+  onComplete: () => void;
   /** OTA-284 — vendor name when the current scene has a spawned
    *  vendor (typically from a spawn_vendor effect fired by THIS
    *  thread, e.g. the Roadfire Reclaimer campfire). When set, a
@@ -81,6 +92,7 @@ export function HookContinueModal({
   completed,
   onContinue,
   onAbandon,
+  onComplete,
   vendorName,
   onTrade,
 }: Props) {
@@ -104,14 +116,14 @@ export function HookContinueModal({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onAbandon}
+      onRequestClose={completed ? onComplete : onAbandon}
       statusBarTranslucent
     >
       {/* OTA-263 — scrim restored to normal opacity (0.7) since the
           modal now contains the full thread text and the world feed
           behind it doesn't need to stay readable. Bigger card so
           long stages have room to breathe. */}
-      <TouchableWithoutFeedback onPress={onAbandon}>
+      <TouchableWithoutFeedback onPress={completed ? onComplete : onAbandon}>
         <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
@@ -151,29 +163,41 @@ export function HookContinueModal({
                   hook — player can re-investigate the noun to
                   resume) and navigates to the vendor screen. */}
               <View style={styles.btnRow}>
-                <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
-                  onPress={onContinue}
-                  accessibilityRole="button"
-                >
-                  <Text style={styles.btnTextPrimary}>CONTINUE →</Text>
-                </Pressable>
-                {vendorName && onTrade ? (
+                {completed ? (
                   <Pressable
-                    style={({ pressed }) => [styles.btn, styles.btnTrade, pressed && styles.btnPressed]}
-                    onPress={onTrade}
+                    style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
+                    onPress={onComplete}
                     accessibilityRole="button"
                   >
-                    <Text style={styles.btnTextTrade}>TRADE NOW</Text>
+                    <Text style={styles.btnTextPrimary}>COMPLETE ✦</Text>
                   </Pressable>
-                ) : null}
-                <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
-                  onPress={onAbandon}
-                  accessibilityRole="button"
-                >
-                  <Text style={styles.btnTextNeutral}>ABANDON</Text>
-                </Pressable>
+                ) : (
+                  <>
+                    <Pressable
+                      style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
+                      onPress={onContinue}
+                      accessibilityRole="button"
+                    >
+                      <Text style={styles.btnTextPrimary}>CONTINUE →</Text>
+                    </Pressable>
+                    {vendorName && onTrade ? (
+                      <Pressable
+                        style={({ pressed }) => [styles.btn, styles.btnTrade, pressed && styles.btnPressed]}
+                        onPress={onTrade}
+                        accessibilityRole="button"
+                      >
+                        <Text style={styles.btnTextTrade}>TRADE NOW</Text>
+                      </Pressable>
+                    ) : null}
+                    <Pressable
+                      style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+                      onPress={onAbandon}
+                      accessibilityRole="button"
+                    >
+                      <Text style={styles.btnTextNeutral}>ABANDON</Text>
+                    </Pressable>
+                  </>
+                )}
               </View>
             </View>
           </TouchableWithoutFeedback>
