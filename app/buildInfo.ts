@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.40';
+export const DISPLAY_VERSION = '4.28.41';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17639,4 +17639,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // copies are deleted, and a category-lock test forbids a reachClassFor
 // derivation from reappearing in either screen. Buttons now glow exactly when
 // the swing they fire would land.
-export const OTA_BUILD_ID = '2026-07-28-1006-reach-highlight-unified';
+// OTA-1007 — THE POPUP THAT COULDN'T WAIT (owner: "as soon as you hit the last
+// part of the story hook, it immediately pops up a completion pop-up... when
+// you dismiss the last section, THAT's when it should show you the
+// completion"). The story-thread completion notice was raised synchronously
+// inside resolveHookOneStep the instant the terminal stage resolved — the
+// MissionCompleteModal mounted ON TOP of the thread modal the player was
+// still reading. Story threads are the only completion with a reading modal
+// in front, which is why only they misbehaved. Fix: the notice payload is
+// STASHED on pendingHookContinue and raised by dismissHookContinue when the
+// player closes the arc; the terminal stage now shows a single COMPLETE
+// button (no CONTINUE, no ABANDON — the thread is already done), and scrim
+// taps / back route through COMPLETE so the payout notice can't be dropped.
+// Mid-thread stages keep CONTINUE / ABANDON exactly as before.
+export const OTA_BUILD_ID = '2026-07-28-1007-hook-complete-flow';

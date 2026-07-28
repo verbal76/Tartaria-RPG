@@ -845,9 +845,28 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.40**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.41**; ledger in `VERSION.md`.
 
-- **THE GREEN LIE — DIVERGENT REACH COPIES (2026-07-28, latest).** HAL **1029** / golem
+- **THE POPUP THAT COULDN'T WAIT — STORY-THREAD COMPLETE FLOW (2026-07-28, latest).** HAL
+  **1030** / golem **1007**. Owner: "as soon as you hit the last part of the story hook, it
+  immediately pops up a completion pop-up... the last part is completed, so it shouldn't say
+  continue or abandon — it should only say complete, and when you hit complete the pop-up
+  should pop up." Root cause: the story-thread completion notice was raised SYNCHRONOUSLY
+  inside `resolveHookOneStep` the instant the terminal stage resolved — the
+  MissionCompleteModal mounted ON TOP of the HookContinueModal the player was still reading.
+  Story threads are the only completion with a reading modal in front, which is why only they
+  misbehaved. Fix: the payload is STASHED on `pendingHookContinue.completionNotice` and raised
+  by `dismissHookContinue` via the new `raiseMissionCompleteNotice` (the notice-only half of
+  the OTA-1010 choke point — announceMissionComplete now delegates to it). The terminal stage
+  renders a single **COMPLETE ✦** button (no CONTINUE, no ABANDON); scrim taps and the back
+  button route through COMPLETE too, and the stale-CONTINUE defensive branch closes via the
+  dismiss path, so a held payout can never be silently dropped. Mid-thread stages keep
+  CONTINUE / ABANDON unchanged. Category-lock test (`ota1007HookCompleteFlow`) drives a real
+  footprints thread end-to-end (stash held, popup deferred, raise on dismiss) and pins the
+  modal's completed-branch; the OTA-1010 choke-point lock is retargeted (6 direct announce
+  sites + the stash path).
+
+- **THE GREEN LIE — DIVERGENT REACH COPIES (2026-07-28).** HAL **1029** / golem
   **1006**. Owner: "why is the Resonant Spike glowing green if I'm out of range? make sure
   that all weapons correctly reflect that they are active at their appropriate range." Root
   cause category: DIVERGENT COPIES of a resolver (§3a-B lens). The attack gate rolls with

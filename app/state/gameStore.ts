@@ -3556,6 +3556,11 @@ interface GameStore {
     noun: string;
     stageHistory: HookContinueStage[];
     completed: boolean;
+    /** OTA-1007 — completion-popup payload STASHED when the terminal stage resolves
+     *  and raised only when the player taps COMPLETE (dismissHookContinue).
+     *  The popup used to mount the instant the last stage fired — landing on
+     *  top of the thread text the player was still reading. */
+    completionNotice?: { kind: string; title: string; body: string } | null;
   } | null;
   /** arb120 — completion popup for a finished side-contract (whisper). Set when
    *  a whisper pays out so the reward lands in a modal the player can read,
@@ -4188,6 +4193,11 @@ interface GameStore {
    *  calls for the SAME title merge (a thread's finale plus its bonus drop read
    *  as one result, not two popups fighting each other). */
   announceMissionComplete: (kind: string, title: string, body: string) => void;
+  /** OTA-1007 — the notice-only half of announceMissionComplete (no feed line);
+   *  merges into any same-title notice already showing. Used by
+   *  dismissHookContinue to raise a completion stashed at terminal-stage
+   *  resolution. */
+  raiseMissionCompleteNotice: (kind: string, title: string, body: string) => void;
   fusionBlockedNotice: { title: string; body: string; hint?: string } | null;
   clearFusionBlockedNotice: () => void;
   closeFusionPicker: () => void;
@@ -16796,9 +16806,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!pending || !state.currentScene) return;
     const hook = state.currentScene.hooks?.find((h) => h.id === pending.hookId);
     if (!hook || hook.resolved) {
-      // Hook already terminated (e.g., player tapped CONTINUE on a
-      // popup whose final-stage flag was already true); just close.
-      set({ pendingHookContinue: null });
+      // Hook already terminated (stale tap on a popup whose final-stage flag
+      // was already true). Close via the dismiss path so a stashed completion
+      // notice still raises instead of being dropped.
+      get().dismissHookContinue();
       return;
     }
     // Do NOT clear pendingHookContinue here — resolveHookOneStep
@@ -16812,7 +16823,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // state). Just clears the popup state; the hook is already
   // resolved at this point.
   dismissHookContinue() {
+    // OTA-1007 — COMPLETE on the final stage: raise the completion notice STASHED at
+    // terminal-stage resolution, now that the player has read the arc and
+    // closed it. TRADE NOW routes here too, so a finished thread's payout is
+    // never silently dropped.
+    const stash = get().pendingHookContinue?.completionNotice;
     set({ pendingHookContinue: null });
+    if (stash) get().raiseMissionCompleteNotice(stash.kind, stash.title, stash.body);
   },
 
   dismissWhisperComplete() {
@@ -25975,6 +25992,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // The feed line is unchanged — the log stays a complete record, and anything
     // that greps it (chronicle, bug reports) keeps working.
     get().appendLog('reward', body);
+    get().raiseMissionCompleteNotice(kind, title, body);
+  },
+
+  raiseMissionCompleteNotice(kind, title, body) {
     const prev = get().missionCompleteNotice;
     set({
       missionCompleteNotice: prev && prev.title === title
@@ -27646,13 +27667,18 @@ function resolveHookOneStep(
     ? '★★ STORY THREAD COMPLETE'
     : `★ STORY THREAD (step ${hook.stage + 1})`;
   get().appendLog('world', `${stageLabel} — ${outcome.line}`);
+  // OTA-1007 — the completion POPUP is deferred. It used to mount the instant the
+  // terminal stage resolved, landing ON TOP of the thread modal the player was
+  // still reading. The payload is stashed on pendingHookContinue below and
+  // raised by dismissHookContinue when the player taps COMPLETE on the final
+  // stage. The feed line stays immediate either way — the log remains a
+  // complete record.
+  let doneNotice: { kind: string; title: string; body: string } | null = null;
   if (inlineSummaries.length > 0) {
-    // OTA-987 — a FINISHED thread raises the holding notice; a mid-chain step stays
-    // an ordinary feed line (the player is still playing it, not finishing it).
+    const body = `✦ ${inlineSummaries.join(', ')}.`;
+    get().appendLog('reward', body);
     if (outcome.done) {
-      get().announceMissionComplete('Story thread', hookTitleFor(hook), `✦ ${inlineSummaries.join(', ')}.`);
-    } else {
-      get().appendLog('reward', `✦ ${inlineSummaries.join(', ')}.`);
+      doneNotice = { kind: 'Story thread', title: hookTitleFor(hook), body };
     }
   }
   // OTA-699 — reward for reading. Completing an easy-to-miss STORY THREAD
@@ -27772,6 +27798,7 @@ function resolveHookOneStep(
         noun: triggerNoun ?? hook.nouns[0] ?? 'this',
         stageHistory: [...existing, stageEntry],
         completed: outcome.done,
+        completionNotice: doneNotice,
       },
     };
   });

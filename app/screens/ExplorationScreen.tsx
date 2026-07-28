@@ -1303,8 +1303,9 @@ export function ExplorationScreen() {
           stage's text in-place (stageHistory) so the player sees the
           full thread arc without fighting the scrim; LATER replaced
           with ABANDON (which marks the hook resolved — explicit
-          walk-away); CLOSE shown when the terminal stage fires
-          (completed: true). */}
+          walk-away). OTA-1007 — the terminal stage shows COMPLETE
+          alone; it dismisses the arc and THEN raises the held
+          completion popup (dismissHookContinue). */}
       <HookContinueModal
         visible={pendingHookContinue !== null}
         noun={pendingHookContinue?.noun ?? ''}
@@ -1312,6 +1313,7 @@ export function ExplorationScreen() {
         completed={pendingHookContinue?.completed ?? false}
         onContinue={continueHook}
         onAbandon={abandonHook}
+        onComplete={dismissHookContinue}
         // OTA-284 — when a vendor is in the scene (typically spawned
         // by the hook itself via spawn_vendor effect — Roadfire
         // Reclaimer is the canonical case), show the TRADE NOW button
