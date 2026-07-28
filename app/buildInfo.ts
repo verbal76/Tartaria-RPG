@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.45';
+export const DISPLAY_VERSION = '4.28.46';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18771,4 +18771,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and one deliberate residual surfaced for an owner call: mysteries and
 // storylines still advance stages anywhere and keep the remote courier cut
 // (only hunts were made face-to-face, per the owner's earlier call).
-export const OTA_BUILD_ID = '2026-07-28-1034-heavy-gate-hygiene';
+// OTA-1035 — THE LEAK THAT ATE THE SIMS, ROOT-CAUSED (owner: "do the root cause
+// dig"). The deepest open item — "world/persist super-linear tail growth",
+// deferred since Jul 20 — is closed. Heap-snapshot autopsy: the retained
+// gigabytes were hundreds of copies of the capped ~400 KB disk game-log.
+// TEST-SIDE: the official AsyncStorage jest mock's jest.fn() methods retain
+// every call's arguments forever — every log rewrite payload — until V8's
+// 8 GB wall; replaced via moduleNameMapper with a plain no-recording mock
+// (12 000-action proof run: dead flat 249 MB, was OOM by ~9 750). APP-SIDE:
+// appendLogToDisk did a full ~400 KB read-modify-write PER LOG LINE (several
+// per action = megabytes of bridge traffic per action on device); now batched
+// into one read + one write per burst, order preserved. Also corrected: the
+// prior OTA's claim that mysteries/storylines still turn in remotely was
+// wrong — all contract kinds already turn in face-to-face; docs + a stale
+// "remote HALF option" comment fixed.
+export const OTA_BUILD_ID = '2026-07-28-1035-persist-leak-root-cause';

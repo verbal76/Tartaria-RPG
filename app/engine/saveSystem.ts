@@ -525,14 +525,29 @@ export function clearLastLogWriteError(): void {
   lastLogWriteError = null;
 }
 
+// OTA-1035 — BATCHED. The per-line version did a FULL read-modify-write of the
+// capped ~400 KB disk log for EVERY line — and one player action emits
+// several lines, so a full log cost megabytes of AsyncStorage bridge traffic
+// per action on device. Lines now land in a pending buffer; ONE chain link
+// drains the whole buffer per flush (one read + one write per burst). Order
+// is preserved (the buffer is drained FIFO into a single join), the cap and
+// error stamping are unchanged, and flushLogWrites() still waits out the
+// chain — the flush link is scheduled synchronously with the first pending
+// line, so the chain always covers every appended line.
+let pendingLogLines: string[] = [];
 export function appendLogToDisk(line: string): Promise<void> {
   if (!activeSlotId) return Promise.resolve();
+  pendingLogLines.push(line);
+  // A flush link is already queued and hasn't drained yet — ride along.
+  if (pendingLogLines.length > 1) return logWriteChain;
   logWriteChain = logWriteChain.then(async () => {
-    if (!activeSlotId) return;
+    const lines = pendingLogLines;
+    pendingLogLines = [];
+    if (!activeSlotId || lines.length === 0) return;
     try {
       const key = slotLogKey(activeSlotId);
       const existing = (await AsyncStorage.getItem(key)) ?? '';
-      await AsyncStorage.setItem(key, capDiskLog(existing + line + '\n'));
+      await AsyncStorage.setItem(key, capDiskLog(existing + lines.join('\n') + '\n'));
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.warn('appendLogToDisk failed', e);

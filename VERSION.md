@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.45` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.45` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.46` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.46` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -80,6 +80,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.42 → 4.28.43 | 2026-07-28-1032 | OTA | CONTESTED FLEE (owner: never lost a flee roll — proven: flat DC 9 vs growing DEX made failure impossible at DEX 8+). Escapes in combat are now opposed by the fastest live pursuer's d20 + speed (bestiary AP + quick/agile/aerial/slow traits, clamp 0-14); ties go to the runner; hounds and winged things are hard to outrun, titans easy. Trap/stage escapes keep DC 9; new-character flee grace untouched. |
 | 4.28.43 → 4.28.44 | 2026-07-28-1033 | OTA | OFF-HAND PROMOTION GUARD (found via the dead combatStress canary): 'attack with <weapon>' could bind the one off-hand instance to BOTH hands on name-only equipped states, silently evicting the main weapon — the guard is now id-first with a name fallback. The heavy combat sim itself repaired (living-world fights, honest floors, real time budget) and verified green end-to-end: 20k actions, 0 crashes, <1% stalls. |
 | 4.28.44 → 4.28.45 | 2026-07-28-1034 | OTA | HEAVY-GATE HYGIENE: test:ci:heavy was never runnable (unquoted shell pattern) — fixed; first full sweep 24/27, the 3 red repaired (stale source-anchor window, outgrown 240s budget, metaNav OOM bounded to measured-stable 4000 with a hard leak characterization: ~1 MB/action module-scope heap growth from ~action 2000 — logged as the entry point for the world/persist open item). HANDOFF §8 reconciled (stale punch-list/backlog items struck; one deliberate residual surfaced: mysteries/storylines still turn in remotely). |
+| 4.28.45 → 4.28.46 | 2026-07-28-1035 | OTA | PERSIST LEAK ROOT-CAUSED (the deepest open item, closed): sim OOMs were the jest.fn AsyncStorage mock retaining every ~400 KB disk-log rewrite (plain mock via moduleNameMapper; 12k-action proof run flat at 249 MB vs 8 GB OOM before); on device, appendLogToDisk's per-line full read-modify-write is now BATCHED — one read+write per burst instead of megabytes of bridge traffic per action. Plus corrections: all contract kinds were already face-to-face; docs and a stale comment fixed. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

@@ -501,8 +501,11 @@ Key invariants worth knowing:
      hard characterization from a metaNavStress heap probe — flat ~220 MB to ~action 2000,
      then a deterministic ~1 MB/action pure-heap leak (large strings, V8 dies in
      StringSubstring at 8 GB); AsyncStorage (~1 MB) and store state both exonerated, so the
-     holder is module-scope JS. Next step for whoever picks this up: v8.writeHeapSnapshot at
-     ~action 3000 in that sim and diff retainers. The heaviest stress /
+     holder is module-scope JS. CLOSED 2026-07-28 (OTA-1035): the snapshot dig found the retainer —
+     the jest.fn AsyncStorage mock recording every ~400 KB disk-log rewrite argument
+     (test-only), stacked on appendLogToDisk's per-line full read-modify-write (real
+     on-device I/O amplification). Plain mock via moduleNameMapper + batched appends;
+     12 000-action proof run holds flat at ~249 MB. Heavy sims may be un-bounded at will. The heaviest stress /
      balance / long-run sims (700-day sims, chaos sweeps, balance probes) grow
      memory super-linearly over a single very long run and OOM / time out past
      ~400–1000 steps. This is why the `jest (heavy sims)` job is **reported, not
@@ -713,10 +716,11 @@ Key invariants worth knowing:
 
 - **Exploit-sweep backlog (2026-07-13) — RECONCILED 2026-07-28: every group below was
   subsequently closed (economy re-tiering B1 802/782; item dupes A2 800/780; water bounce +
-  small bugs A1 800/780; HUNT turn-in gating 810/790) EXCEPT one deliberate slice: mysteries +
-  storylines still advance stages from anywhere and keep the 15% remote courier cut — the owner
-  called out hunts only ("hunts are a face to face turn in"). That slice is an OWNER DESIGN
-  CALL, not a bug. Original record kept below for the audit trail.**
+  small bugs A1 800/780; HUNT turn-in gating 810/790) — and CORRECTION OTA-1035: the earlier claim here that mysteries + storylines
+  still turned in remotely was WRONG; a later B2 pass made ALL kinds face-to-face
+  (turnInMystery/turnInStoryline require an agent in scene, the UI COMPLETE delegates to
+  them, typed couriers refused). Nothing in this backlog remains open. Original record kept
+  below for the audit trail.**
   A multi-agent audit surfaced ~33 findings; the confirmed criticals/highs with
   contained fixes shipped this OTA. Still open, grouped by why they were deferred:
   - **Economy re-tiering (needs a design call on numbers):** (a) self-crafted
@@ -856,9 +860,34 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.45**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.46**; ledger in `VERSION.md`.
 
-- **HEAVY-GATE HYGIENE — THE WHOLE AVIARY (2026-07-28, latest).** HAL **1034** / golem
+- **THE LEAK THAT ATE THE SIMS — ROOT-CAUSED AND KILLED (2026-07-28, latest).** HAL **1035**
+  / golem **1012**. Owner: "do the root cause dig." Done — the §8 "world/persist super-linear
+  tail-growth" open item (the deepest open thread, deferred since 2026-07-20) is CLOSED. The
+  heap-snapshot autopsy of metaNavStress found the retained gigabytes were HUNDREDS of copies
+  of the capped ~400 KB DISK GAME-LOG buffer. Two stacked causes:
+  • **TEST-SIDE (the OOM):** the official AsyncStorage jest mock wraps every method in
+    jest.fn(), and jest.fn RETAINS EVERY CALL'S ARGUMENTS forever — every disk-log rewrite's
+    ~400 KB payload, kept until V8's 8 GB wall. Fixed at one choke point:
+    `jest.moduleNameMapper` resolves the official mock path to a PLAIN mock
+    (`test-utils/asyncStorageMock.js`, same API, no recording) — the 100+ per-file
+    `jest.mock(...)` blocks pick it up with zero edits. PROOF: the metaNav leak probe re-run
+    at 12 000 actions holds DEAD FLAT at ~249 MB (was 8 GB OOM by ~9 750). Sim horizon
+    bounds (metaNav 4000 etc.) are now purely wall-clock budgets — raise freely.
+  • **APP-SIDE (real on-device cost):** `appendLogToDisk` did a FULL read-modify-write of the
+    whole capped log for EVERY line — several lines per action ≈ megabytes of AsyncStorage
+    bridge traffic per player action once the log is full. Now BATCHED: pending lines drain
+    in ONE read + ONE write per flush (order preserved, cap + error stamp unchanged,
+    flushLogWrites still covers everything).
+  • **CORRECTIONS (2026-07-28):** the OTA-1034 reconciliation wrongly claimed mysteries +
+    storylines still turn in remotely — WRONG, and corrected below: a later B2 pass already
+    made ALL contract kinds face-to-face (turnInMystery/turnInStoryline hard-require an agent
+    in scene; completeContractFromUI delegates to them; typed couriers are refused for every
+    kind). The owner's "face to face like the rest" call was already satisfied in the live
+    game. The stale arb171 comment claiming a "remote HALF option" is also fixed in-code.
+
+- **HEAVY-GATE HYGIENE — THE WHOLE AVIARY (2026-07-28).** HAL **1034** / golem
   **1011**. Owner: "are there any other preexistings listed in any doc that still exist?" The
   audit ran the FULL heavy gate for the first time ever — and found `npm run test:ci:heavy`
   itself had NEVER been runnable: the package.json script's `(Stress|…)` pattern was unquoted,
