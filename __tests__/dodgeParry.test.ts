@@ -142,6 +142,76 @@ describe('dodge rework — active parry', () => {
     expect([23, 25]).toContain(blade?.durability?.current);
   });
 
+  it('OTA-908 — a SUCCESSFUL dodge in a multi-enemy fight names that the others still press in', async () => {
+    const store = useGameStore;
+    await store.getState().hydrate();
+    const race = getRaces()[0]!;
+    const fac = getFactions()[0]!;
+    await store.getState().startNewGame({ name: 'Reader', raceId: race.id, factionId: fac.id });
+    store.getState().skipTutorial?.();
+    // Pin every d20 to 10 (0.47 → 1 + floor(9.4)) so no nat-20 pierce / nat-1;
+    // with sky-high DEX the dodge contest is a clean WIN, deterministically.
+    const realRandom = Math.random;
+    Math.random = () => 0.47;
+    try {
+      const proto = findEnemyByName('Mud Boar')!;
+      const e1 = JSON.parse(JSON.stringify(proto));
+      const e2 = JSON.parse(JSON.stringify(proto));
+      const p0 = store.getState().player!;
+      store.setState({
+        player: { ...p0, hp: 500, hpMax: 500, stats: { ...p0.stats, dexterity: 20 } },
+        currentScene: {
+          ...store.getState().currentScene!,
+          enemies: [e1, e2],
+          enemyHps: [e1.hp, e2.hp],
+          activeEnemyIdx: 0,
+          range: 'close',
+          enemyAmbushUsed: [false, false],
+        },
+      });
+      store.getState().submitPlayerAction('dodge');
+      const feed = store.getState().gameLog.map((e) => e.text).join('\n');
+      expect(feed).toMatch(/slip .*'s arc clean and stay light on your feet — the rest of the pack still swings/);
+    } finally {
+      Math.random = realRandom;
+    }
+  });
+
+  it('OTA-908 — a MISREAD dodge emits a visceral "stumbled into it" world beat', async () => {
+    const store = useGameStore;
+    await store.getState().hydrate();
+    const race = getRaces()[0]!;
+    const fac = getFactions()[0]!;
+    await store.getState().startNewGame({ name: 'Misreader', raceId: race.id, factionId: fac.id });
+    store.getState().skipTutorial?.();
+    // Pin d20 to 10 (no nat-20 pierce) but DEX 0 + a hard-hitting enemy so the
+    // opposed contest LOSES → a misread (not the nat-20 pierce path).
+    const realRandom = Math.random;
+    Math.random = () => 0.47;
+    try {
+      const proto = findEnemyByName('Mud Boar')!;
+      const e1 = JSON.parse(JSON.stringify(proto));
+      e1.attackBonus = 30; // atkTotal 40 >> dodge total 10 → misread
+      const p0 = store.getState().player!;
+      store.setState({
+        player: { ...p0, hp: 500, hpMax: 500, stats: { ...p0.stats, dexterity: 0 } },
+        currentScene: {
+          ...store.getState().currentScene!,
+          enemies: [e1],
+          enemyHps: [e1.hp],
+          activeEnemyIdx: 0,
+          range: 'close',
+          enemyAmbushUsed: [false],
+        },
+      });
+      store.getState().submitPlayerAction('dodge');
+      const feed = store.getState().gameLog.map((e) => e.text).join('\n');
+      expect(feed).toMatch(/read is a beat off/i);
+    } finally {
+      Math.random = realRandom;
+    }
+  });
+
   it('dodge outside combat sets the status but does NOT trigger a phantom enemy attack', async () => {
     const store = useGameStore;
     await store.getState().hydrate();

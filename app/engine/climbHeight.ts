@@ -42,6 +42,15 @@ function heightPatternMatches(noun: string, pattern: string): boolean {
 }
 
 export function climbHeightFor(noun: string): number {
+  // OTA-910 — great climbs (11–15 tiers) take precedence over EVERYTHING.
+  // Their proper-noun props ("the Grand Spire of Etheria") can substring-
+  // collide with a generic curated climbable ("grand spire capacitor" → 4),
+  // so the great-climb lookup — keyed on distinctive tokens — runs first and
+  // returns the real 11–15 tier count.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { greatClimbHeight } = require('./greatClimbs');
+  const great = greatClimbHeight(noun);
+  if (great != null) return great;
   // 2026-05-24 — curated spawn pool (climbableSpawns.ts) takes
   // precedence over the substring matcher. Player-spec heights for
   // the 15 new props land first; the legacy substring table catches
@@ -115,6 +124,69 @@ export function sameClimbNoun(a: string, b: string): boolean {
   if (x === y) return true;
   const [shorter, longer] = x.length <= y.length ? [x, y] : [y, x];
   return longer.endsWith(' ' + shorter);
+}
+
+// OTA-971 — the engine's elevated-investigate gate (gameStore) refuses any ambient
+// noun that isn't the thing you're standing on while elevatedOn is set and no
+// rooftop overlay is active. This is that SAME rule as a pure filter, so UI
+// affordances (the SALVAGE button tone, the salvage picker) agree with the
+// engine instead of advertising ground nouns the engine will refuse. Owner,
+// from a pillar: "the color of the button tells me there is [something]".
+// OTA-973 — Phase A of the real-heights model. A scene noun can be PLACED on a
+// climbable structure at a tier (a nest at tier 2 of the tower). Placements
+// live on CurrentScene.nounPlacements; a noun with no placement is on the
+// ground, which is every noun in every scene until the Phase-B seeder ships —
+// so this is a pure skeleton with zero behavior change for existing content.
+export interface NounPlacement {
+  /** The climbable structure the noun hangs on (canonical scene noun). */
+  structure: string;
+  /** 1-based tier on that structure. Never the apex — the top belongs to
+   *  the elevated-overlay system. */
+  tier: number;
+}
+export type NounPlacements = Record<string, NounPlacement>;
+
+/** Find the placement for a typed target, honoring short forms the same way
+ *  climbs do ("satchel" finds the "wax-sealed satchel" placement). */
+export function placementFor(
+  target: string,
+  placements: NounPlacements | null | undefined,
+): NounPlacement | null {
+  if (!placements) return null;
+  for (const [noun, p] of Object.entries(placements)) {
+    if (sameClimbNoun(noun, target)) return p;
+  }
+  return null;
+}
+
+export function reachableWhileElevated(
+  nouns: readonly string[],
+  elevatedNoun: string | null | undefined,
+  overlayActive: boolean,
+  placements?: NounPlacements | null,
+  currentTier?: number,
+): string[] {
+  if (overlayActive) return [...nouns];
+  if (!elevatedNoun) {
+    // On the ground: placed nouns are visible up there, not touchable.
+    return nouns.filter((n) => !placementFor(n, placements));
+  }
+  return nouns.filter((n) => {
+    // The structure under your feet is always workable.
+    if (sameClimbNoun(n, elevatedNoun)) return true;
+    // A placed noun is reachable only on YOUR structure at YOUR tier —
+    // the same height on a different climb is never reachable.
+    const p = placementFor(n, placements);
+    return !!p && sameClimbNoun(p.structure, elevatedNoun) && p.tier === (currentTier ?? -1);
+  });
+}
+
+// OTA-975 — base climb-fall damage (pre-title-perk shaves), extracted from the
+// gameStore climbFall helper so the zero-stamina descent SLIDE can share the
+// exact same math at half rate. floor(hpMax × (0.12 + 0.055 × tier)), cap 0.9.
+export function computeClimbFallBase(hpMax: number, tierFallenFrom: number): number {
+  const fallFrac = Math.min(0.9, 0.12 + 0.055 * Math.max(1, tierFallenFrom));
+  return Math.max(1, Math.floor(hpMax * fallFrac));
 }
 
 export function maxClimbedTier(noun: string, marks: readonly string[]): number {

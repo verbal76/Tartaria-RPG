@@ -75,10 +75,21 @@ describe('titles — earning engine', () => {
     expect(newlyEarnedTitles(p)).not.toContain('bane_of_sentinels');
   });
 
-  it('wires all 20 titles (14 Tier-A/B + 6 Tier-C)', () => {
-    expect(WIRED_TITLE_IDS.size).toBe(20);
+  it('wires all 21 titles (14 Tier-A/B + 6 Tier-C + Skyreacher)', () => {
+    expect(WIRED_TITLE_IDS.size).toBe(21);
     expect(WIRED_TITLE_IDS.has('guild_broker')).toBe(true);
     expect(WIRED_TITLE_IDS.has('speaker_of_forgotten_tongues')).toBe(true);
+    expect(WIRED_TITLE_IDS.has('skyreacher')).toBe(true);
+  });
+
+  it('Skyreacher earns at 5 great climbs and grants half-fall + DEX', () => {
+    const notYet = mk({ titleProgress: withTitleProgress({ greatClimbsCompleted: 4 }) });
+    expect(evaluateEarnedTitles(notYet)).not.toContain('skyreacher');
+    const done = mk({ titleProgress: withTitleProgress({ greatClimbsCompleted: 5 }) });
+    expect(evaluateEarnedTitles(done)).toContain('skyreacher');
+    const perks = titlePerkModifiers(mk({ earnedTitles: ['skyreacher'] }));
+    expect(perks.climbFallHalved).toBe(true);
+    expect(perks.dexterityBonus).toBe(2);
   });
 
   it('Tier-C titles never auto-earn while their counters sit at zero', () => {

@@ -1,7 +1,7 @@
 // Narrative hook engine — turns the random "feature sightings" and "casual
 // look" plants into stateful, multi-stage chains the player can pursue.
 // Hooks are drawn from canonical Tartaria Prima lore — half-buried spires,
-// Etheric storms, Aether Golem stirrings, Black Cloak shadows, etc.
+// Aetheric storms, Aether Golem stirrings, Black Cloak shadows, etc.
 
 export type HookKind =
   // Tier-1: atmospheric finds (the originals)
@@ -33,6 +33,10 @@ export type HookKind =
   | 'aether_grid_hum'
   | 'sealed_vault_door'
   | 'preserved_corpse'
+  | 'stranded_traveler'
+  // OTA-1004 — The Hollowed: a rumour of one of this install's fallen, walking.
+  // Spawner-planted only (weight 0), like stranded_traveler.
+  | 'fallen_whisper'
   // OTA-418 — Tier-3: INTERIOR finds (indoors-only). Planted by the indoor
   // hook pool when the player investigates / looks around inside a hub room or
   // a building, so a candle in a house surfaces an interior lead (a loose
@@ -71,6 +75,15 @@ export interface Hook {
    *  so the player can come back to a half-solved tumbler and pick
    *  up where they left off. Undefined on hooks without a puzzle. */
   puzzleProgress?: import('./hookPuzzles').PuzzleProgress;
+  /** OTA-773 — legacy flag from the random-gamble torch (kept for old saves). */
+  torchProbed?: boolean;
+  /** OTA-776 — the player aimed the Aetheric Torch at this lead and CHARGED it.
+   *  The torch reveals + takes over a chosen open lead (stage 0, unresolved);
+   *  this flag rides the hook until it resolves, where it pays out an upgraded,
+   *  WISDOM-scaled Rare/Legendary drop on top of the lead's normal reward. It
+   *  does NOT resolve the hook — the lead's own content still plays when the
+   *  player works it. Set once; a charged lead can't be re-charged. */
+  torchCharged?: boolean;
 }
 
 // Plant lines, paired with the nouns that should resolve to that hook kind.
@@ -117,7 +130,7 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
     { line: "A buried dome's apex breaks the surface ahead, Aetherstone-glazed and humming faintly.", nouns: ['dome', 'apex', 'roof', 'building'] },
   ],
   etheric_storm: [
-    { line: 'The horizon cracks — blue and purple lightning, an Etheric storm walking on long legs across the plain.', nouns: ['storm', 'lightning', 'sky', 'horizon'] },
+    { line: 'The horizon cracks — blue and purple lightning, an Aetheric storm walking on long legs across the plain.', nouns: ['storm', 'lightning', 'sky', 'horizon'] },
     { line: 'Static gathers in your hair. The Aether is about to break weather on this ridge.', nouns: ['storm', 'static', 'sky', 'aether'] },
   ],
   pulsing_mud: [
@@ -167,6 +180,18 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
   ],
   preserved_corpse: [
     { line: 'A Tartarian body lies in the silt, the mud-glass having frozen them at the moment they fell — robes still pristine, satchel still buckled.', nouns: ['body', 'corpse', 'robes', 'satchel', 'tartarian'] },
+  ],
+  // OTA-988 — HOOK ESCORT. Planted only by the stepDirection spawner (weight 0),
+  // never by the random picker: a stranded traveler offers a field escort.
+  stranded_traveler: [
+    { line: 'Someone is sitting on their pack at the edge of the path — no party, no fire, and a long way from anywhere. They stand when they see you.',
+      nouns: ['traveler', 'traveller', 'stranger', 'stranded', 'figure', 'person', 'walker'] },
+  ],
+  // OTA-1004 — THE HOLLOWED rumour. Planted only by the stepDirection spawner
+  // (weight 0): a trail sign that one of the install's fallen is walking.
+  fallen_whisper: [
+    { line: 'Someone has driven a broken blade into the mud at the verge, hilt up, the way the road-people mark a killing. A strip of cloth is knotted around the guard — a warband colour, faded, and far too well-kept to have been left long.',
+      nouns: ['blade', 'marker', 'hilt', 'cloth', 'strip', 'sword', 'sign', 'grave', 'rumor', 'rumour', 'whisper'] },
   ],
   // OTA-418 — INTERIOR finds. Each plants something you'd notice INSIDE a room.
   loose_floorboard: [
@@ -255,7 +280,14 @@ export type HookEffect =
   // happen"). The handler picks a random unfired hook from the
   // pool and routes through grantQuestHook so the entry lands in
   // player.activeQuests with the canonical arbiter narration.
-  | { type: 'grant_random_quest_hook'; pool: 'hunt' | 'mystery' | 'any' };
+  | { type: 'grant_random_quest_hook'; pool: 'hunt' | 'mystery' | 'any' }
+  // OTA-988 — HOOK ESCORT: start a faction escort contract from the wild, no
+  // vendor. Resolves a rep-0 `_stranded_escort` def the player doesn't already
+  // hold, spawns the shared pool, pushes the activeFactionQuests record.
+  | { type: 'start_escort_contract'; idSuffix: string }
+  // OTA-1004 — THE HOLLOWED: call one of this install's un-avenged fallen out of
+  // the mud as a revenant BOSS in the current scene. Empty pool = cold trail.
+  | { type: 'spawn_fallen_revenant' };
 
 // OTA-185 — minimal vendor-spec for hook-spawned traders. Mirrors
 // the VendorInstance fields the engine needs to render + serve a
@@ -394,14 +426,17 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   glint: [
     {
-      line: 'You pick the metal out of the rubble. A pendant — Tartarian make, hammered thin, etched with a sigil you do not recognise.',
-      effects: [{ type: 'grant_item', name: 'Aetheric Locket' }],
+      line: 'You pick the metal out of the rubble. A pendant — Tartarian make, hammered thin, etched with a faction crest.',
+      effects: [{ type: 'grant_item', name: 'Forgotten Order Sigil' }],
       done: false,
     },
     {
       line: 'You turn the pendant over. Whoever wore it last bled out clutching it — a faint rust-brown line still runs along the inside of the chain.',
-      arbiterLine: '"That sigil belongs to someone," the Arbiter says. "Someone who is going to want it back."',
-      effects: [{ type: 'memo', text: 'A bloodstained pendant marks an old debt you have not yet collected.' }],
+      // OTA-691 — the "someone will want it back" foreshadowing now PAYS OFF. The
+      // crest reads as the Forgotten Order's; returning the sigil to their stake
+      // honors their dead (+1 standing), tracked + routable in the Contracts SIGILS section.
+      arbiterLine: '"That crest is the Forgotten Order\'s," the Arbiter says. "Carry it to their people and lay it down. They honor the ones who bring their dead home."',
+      effects: [{ type: 'memo', text: 'A bloodstained Forgotten Order sigil — return it to their stake at Varakush to honor their dead.' }],
       done: true,
     },
   ],
@@ -482,9 +517,9 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       line: 'A bolt strikes a few paces from you — the Aetherstone in the soil holds the charge, and a hand-sized shard of stormglass crystallises around the impact.',
       arbiterLine: '"That does not happen for everyone," the Arbiter says.',
       effects: [
-        { type: 'damage', amount: 3, cause: 'an Etheric backlash' },
+        { type: 'damage', amount: 3, cause: 'an Aetheric backlash' },
         { type: 'grant_item', name: 'Energy Fragment' },
-        { type: 'memo', text: 'An Etheric storm gave you a fragment instead of killing you. That counts for something here.' },
+        { type: 'memo', text: 'An Aetheric storm gave you a fragment instead of killing you. That counts for something here.' },
       ],
       done: true,
     },
@@ -776,6 +811,39 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       done: true,
     },
   ],
+  // OTA-988 — HOOK ESCORT chain: beat 1 is the offer (CONTINUE accepts, ABANDON
+  // declines via the existing hook modal); beat 2 takes the contract.
+  stranded_traveler: [
+    {
+      line: 'They keep their hands where you can see them. "I was with a party. I am not, now. I can pay — my people pay — if you walk me to one of our agents."',
+      arbiterLine: '"That is a contract, not a favour," the Arbiter says. "Take it and they are yours to keep breathing. CONTINUE to agree; ABANDON to walk on."',
+      effects: [],
+      done: false,
+      addNouns: ['traveler', 'traveller', 'stranger', 'them', 'they', 'offer', 'escort'],
+    },
+    {
+      line: 'You take the work. They fall in a half-step behind your shoulder and match your pace without being told.',
+      effects: [{ type: 'start_escort_contract', idSuffix: '_stranded_escort' }],
+      done: true,
+    },
+  ],
+  // OTA-1004 — THE HOLLOWED rumour chain. Beat 1 reads the marker and names what
+  // it means; beat 2 is the answer walking out of the mud. Two beats so a
+  // player who wants no part of it can ABANDON at the sign.
+  fallen_whisper: [
+    {
+      line: 'You crouch by the marker. The cloth is not weathered enough for the blade it is tied to, and the mud around the hilt is churned — something has stood here more than once. Whoever set this was warning the road, not mourning.',
+      arbiterLine: '"They mark where a thing walks, not where a body lies," the Arbiter says. "CONTINUE and you call it. ABANDON and you leave it to the next traveller."',
+      effects: [],
+      done: false,
+      addNouns: ['marker', 'blade', 'hilt', 'cloth', 'mud', 'warning', 'it', 'thing'],
+    },
+    {
+      line: 'You put your hand on the hilt and say what you know into the wet air — a name, if you have one, and a challenge if you do not.',
+      effects: [{ type: 'spawn_fallen_revenant' }],
+      done: true,
+    },
+  ],
   // OTA-418 — INTERIOR chains. Two beats each: examine reveals more, then a
   // modest interior payoff (a stash, a memo, a coin or scrap, a small heal).
   loose_floorboard: [
@@ -930,7 +998,7 @@ export function matchAnyHookNoun(target: string | undefined, hooks: readonly Hoo
 // Atmospheric hooks plant less often so chains feel earned. The lore-heavy
 // ones (Sentinel, Giant, Black Cloak, Storm) are deliberately rarer so they
 // land like events.
-const HOOK_WEIGHTS: Record<HookKind, number> = {
+export const HOOK_WEIGHTS: Record<HookKind, number> = {
   smoke: 12,
   footprints: 12,
   obelisk: 8,
@@ -958,6 +1026,9 @@ const HOOK_WEIGHTS: Record<HookKind, number> = {
   aether_grid_hum: 6,
   sealed_vault_door: 3, // mostly chained
   preserved_corpse: 6,
+  stranded_traveler: 0, // OTA-988 — spawner-planted only, never randomly drawn
+  fallen_whisper: 0, // OTA-1004 — The Hollowed: spawner-planted only
+
   // OTA-418 — interior weights (only ever drawn by the INDOOR picker below).
   loose_floorboard: 8,
   hidden_compartment: 7,
@@ -1001,7 +1072,7 @@ function pickWeightedHookKind(include: (k: HookKind) => boolean, fallback: HookK
 
 /** OUTDOOR random hook — excludes the interior kinds. */
 export function pickRandomHookKind(): HookKind {
-  return pickWeightedHookKind((k) => !INDOOR_HOOK_KINDS.has(k), 'glint');
+  return pickWeightedHookKind((k) => !INDOOR_HOOK_KINDS.has(k) && k !== 'stranded_traveler' && k !== 'fallen_whisper', 'glint');
 }
 
 /** OTA-418 — INDOOR random hook — only the interior kinds. */

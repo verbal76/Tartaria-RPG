@@ -1,6 +1,7 @@
 import type { InventoryItem, Rarity, DamageType } from './types';
 import type { ItemEffect } from './itemEffect';
 import { levenshtein } from './editDistance';
+import { canonicalDamageType } from './damageTypes';
 import { resolveItemAlias } from './itemAliases';
 import materialsData from '../data/items/materials.json';
 import weaponsData from '../data/items/weapons.json';
@@ -135,6 +136,11 @@ export interface CatalogAccessory {
   name: string;
   rarity: Rarity;
   statBonus?: { stat: string; amount: number };
+  /** OTA-730 — optional flat AC bonus, so a ring/amulet can be defensive.
+   *  Summed into the player's AC alongside armor (aggregateArmor). Safe: a
+   *  natural-20 enemy attack always hits regardless of AC, so no stack of these
+   *  makes the player unhittable. */
+  acBonus?: number;
   resistances: string[];
   baseDurability?: number;
   tags: string[];
@@ -225,13 +231,58 @@ export function lookupCraftedItem(resultName: string): {
   return { kind: 'misc', rarity: 'Common', tags: [] };
 }
 
+/** OTA-961 — canonical loot-name resolution for every drop path (kill roll, knockout
+ *  strip, hard-won bonus). The audit found 136 authored loot names in NO catalog:
+ *  the exact-match lookupCraftedItem chain silently minted each as a 2-TC tagless
+ *  Common misc, so a Legendary beast's trophy was worth the same as a Mud Boar's
+ *  scrap and the organic-vs-machine Legendary tier inverted. Resolution order:
+ *    1. findCatalogItem — case-insensitive + alias-aware — so a miscapitalized or
+ *       variant name lands on the REAL catalog row (canonical name -> it STACKS).
+ *    2. The exact lookupCraftedItem chain (covers dog gear + anything the catalog
+ *       helper doesn't index).
+ *    3. An unknown name mints as a TROPHY at the ENEMY'S OWN rarity — a Legendary
+ *       hide prices like a Legendary find, not junk. Trophies carry the 'trophy'
+ *       tag (sellable + identifiable; no recipe consumes them). The curated pass
+ *       deciding which trophies become REAL items builds on top of this. */
+/** OTA-965 — loot-name synonyms (provable only). Deliberately NOT the ambient pickup
+ *  alias map: pickup aliases assume scene-noun context and misfire on loot names. */
+const LOOT_NAME_ALIASES: Record<string, string> = {
+  'aetherwing': 'Aether Wing',
+  'aetheric residue': 'Aether Residue',
+  'aetheric crystal': 'Aether Crystal',
+};
+
+export function resolveLootItem(rawName: string, enemyRarity?: Rarity): {
+  name: string;
+  kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc' | 'dog_armor';
+  rarity: Rarity;
+  tags: string[];
+  baseDurability?: number;
+} {
+  // OTA-965 — exact (case-insensitive, alias-FREE) catalog membership always wins: a
+  // real catalog name must never be rerouted by a pickup alias (v2 audit SEV-2).
+  const direct = findCatalogItem(rawName, { aliases: false });
+  if (direct) return direct;
+  // Loot-name aliases are their own SHORT list — provable synonyms only, separate
+  // from the ambient pickup map whose entries assume scene-noun context.
+  const lootAlias = LOOT_NAME_ALIASES[rawName.trim().toLowerCase()];
+  if (lootAlias) {
+    const cat = findCatalogItem(lootAlias, { aliases: false });
+    if (cat) return cat;
+  }
+  const look = lookupCraftedItem(rawName);
+  const isMintedFallback = look.kind === 'misc' && look.rarity === 'Common' && look.tags.length === 0;
+  if (!isMintedFallback) return { name: rawName, ...look };
+  return { name: rawName, kind: 'misc', rarity: enemyRarity ?? 'Common', tags: ['trophy'] };
+}
+
 /** Case-insensitive catalog match. Returns the canonical (title-case)
  *  name + kind + rarity + tags when the input maps to a REAL catalog
  *  item — weapon, armor, gear, amulet, ring, or material. Returns
  *  null for scene features that aren't pickupable items (pillar,
  *  arch, fountain, lever, fissure, etc.). Used by pickup-on-ambient
  *  to decide: grant a real item, or redirect to salvage. */
-export function findCatalogItem(name: string): {
+export function findCatalogItem(name: string, opts?: { aliases?: boolean }): {
   name: string;
   kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc';
   rarity: Rarity;
@@ -244,7 +295,13 @@ export function findCatalogItem(name: string): {
   // harpoon') map to a single canonical catalog item. Aliases
   // give the pickup path 30+ extra recognisable nouns without
   // authoring new catalog entries.
-  const aliased = resolveItemAlias(name);
+  // OTA-965 — opts.aliases === false skips the ambient-noun alias layer. The v2 loot
+  // audit caught why that matters: those aliases were authored for scene PICKUPS
+  // ('rope coil' -> 'Climbing Rope'), and running LOOT names through them backfired —
+  // the old 'aether residue' -> 'Aether Dust' pickup alias silently converted the
+  // REAL recipe material Aether Residue on every drop, and 'Obsidian Shard' ->
+  // 'Aetheric Shard' turned a Legendary enemy's drop into a 3-TC shard.
+  const aliased = opts?.aliases === false ? null : resolveItemAlias(name);
   const q = (aliased ?? name).trim().toLowerCase();
   if (!q) return null;
   const w = WEAPONS.find((x) => x.name.toLowerCase() === q);
@@ -297,6 +354,32 @@ export function isInferredInventoryItem(item: { name: string; uniqueStats?: unkn
   return isInferredItem(item.name);
 }
 
+/** OTA-688 — a Crucible-forged item. applyFusion is the ONLY thing that stamps
+ *  `uniqueStats`, and it also tags the piece `fused`; either marks a one-of-a-kind
+ *  forge. Used to badge these with a magical glyph in the inventory (distinct from
+ *  the ◆ inferred diamond) and to backfill the `fused` tag on older forges. */
+export function isFusedInventoryItem(item: { uniqueStats?: unknown; tags?: readonly string[] }): boolean {
+  if (item.uniqueStats) return true;
+  return (item.tags ?? []).some((t) => t.toLowerCase() === 'fused');
+}
+
+/** OTA-756 — is this name used as a recipe INGREDIENT anywhere in the book?
+ *  Drives the forge's "junk loot only" gate (1a): an authored 'loot' reagent
+ *  that feeds a recipe stays protected from the Crucible, so fusing can never
+ *  cannibalize your crafting stock. Name-exact + lowercased; memoized because
+ *  RECIPES is static. */
+let _recipeIngredientNames: Set<string> | null = null;
+export function isRecipeIngredientName(name: string): boolean {
+  if (!name) return false;
+  if (!_recipeIngredientNames) {
+    _recipeIngredientNames = new Set();
+    for (const r of RECIPES) {
+      for (const ing of r.ingredients) _recipeIngredientNames.add(ing.name.toLowerCase());
+    }
+  }
+  return _recipeIngredientNames.has(name.toLowerCase().trim());
+}
+
 function totalQuantity(inventory: readonly InventoryItem[], materialName: string): number {
   const target = materialName.toLowerCase();
   let total = 0;
@@ -324,6 +407,14 @@ const MATERIAL_SUBSTITUTE_TAGS: Record<string, string[]> = {
   'small rock': ['stone', 'mudstone', 'improvised'],
   'aetheric shard': ['aether', 'crystal'],
   'bone shard': ['organic', 'bone'],
+  // OTA-763 — mud recipes (the Common Mud Scanner, the starter Mud Golem, …) now
+  // accept any cheap mud-tagged material the player actually forages, so a pack full
+  // of Mud Essence / Aetheric Sludge / Aether Mud satisfies an "Aether Mud" or
+  // "Mud Fragment" slot instead of demanding those exact names. The rarity guard in
+  // isSubstitutable keeps Rare mud (Mudstone / Mud Gem / Hardened Mudstone) OUT of
+  // these low-tier slots, so a valuable stone is never spent on a Common scanner.
+  'aether mud': ['mud'],
+  'mud fragment': ['mud'],
 };
 
 /** Is this inventory item eligible to be auto-consumed as a substitute
@@ -338,6 +429,16 @@ function isSubstitutable(item: InventoryItem): boolean {
   if (item.kind !== 'misc') return false;
   if (item.stolen) return false;
   if (item.reservedForFusion) return false;
+  // OTA-763 — never auto-consume a Rare/Legendary material as a cheap-slot substitute
+  // (a Rare Mudstone standing in for a Common Mud Fragment, an Aetheric Cloth for
+  // Patched Cloth, a Golem Core for an Aetheric Shard). The exact-named material still
+  // crafts; this only stops a valuable mat vanishing into a low-tier recipe via the
+  // tag drain. Common/Uncommon materials (the intended junk-fills-junk pool) still flow.
+  // OTA-1022 — canonical rarity: a stale-Common instance of a since-promoted
+  // Legendary (Titan Core, Dragon Scale...) defeated this guard entirely and
+  // the tag drain ATE it into a low-tier recipe with no confirmation.
+  const subRarity = canonicalItemRarity(item);
+  if (subRarity === 'Rare' || subRarity === 'Legendary') return false;
   // OTA-424 — [audit fix #6] BOUGHT weapons/armor are stored kind:'misc' (so they
   // stack), but they are NOT raw material. If the item's name resolves to a real
   // weapon/armor catalog entry — or it carries a coating (a real weapon) — never
@@ -370,6 +471,33 @@ export function missingIngredientsList(
   return ingredientShortfall(ingredients, inventory);
 }
 
+/** OTA-708 — how many CRAFT-tab (non-consumable results) and RECIPES-tab
+ *  (consumable results) blueprints the player can make RIGHT NOW, i.e. with every
+ *  ingredient/substitute already in hand. Mirrors RecipesView's exact per-tab split
+ *  (result kind === 'consumable' → recipes, else craft) + its availability rule
+ *  (missing list empty), so the crafting-screen tab badges show what's actually
+ *  makeable — not the total blueprint count. */
+export function craftableRecipeCounts(
+  inventory: readonly InventoryItem[],
+  // OTA-718 — recipes the player has learned. A rare/legendary-result recipe
+  // that isn't yet known is LOCKED and doesn't count as makeable. Omit to
+  // count every recipe (legacy behavior).
+  knownRecipes?: readonly string[],
+): { craft: number; recipes: number } {
+  const known = knownRecipes ? new Set(knownRecipes) : null;
+  let craft = 0;
+  let recipes = 0;
+  for (const r of RECIPES) {
+    const look = lookupCraftedItem(r.result);
+    // Locked (rare/legendary-result) recipe not yet learned → not makeable.
+    if (known && (look.rarity === 'Rare' || look.rarity === 'Legendary') && !known.has(r.result)) continue;
+    if (missingIngredientsList(r.ingredients, inventory).length !== 0) continue;
+    if (look.kind === 'consumable') recipes += 1;
+    else craft += 1;
+  }
+  return { craft, recipes };
+}
+
 /** OTA-193 — list ingredients still short after both name + substitute
  *  drains. Returns the missing-quantity-by-name shape the craft caller
  *  needs to surface a "you still need X" arbiter line. */
@@ -400,7 +528,11 @@ export function previewSubstitutionsList(
     for (const item of inventory) {
       if (stillNeed <= 0) break;
       if (!isSubstitutable(item)) continue;
-      if (!(item.tags ?? []).some((t) => tagSet.has(t.toLowerCase()))) continue;
+      // OTA-1024 — an item that IS one of the recipe's exact ingredients never
+      // doubles as a tag substitute for another slot (canonical tags widened
+      // eligibility and exposed this: the recipe's own Stick fed the rock slot).
+      if (ingredients.some((ig) => ig.name.toLowerCase() === item.name.toLowerCase())) continue;
+      if (!canonicalItemTags(item).some((t) => tagSet.has(t))) continue;
       const alreadyTaken = consumed.get(item.id) ?? 0;
       const available = item.quantity - alreadyTaken;
       if (available <= 0) continue;
@@ -453,7 +585,9 @@ export function consumeIngredientsList(
       if (need <= 0) break;
       if (item.quantity <= 0) continue;
       if (!isSubstitutable(item)) continue;
-      if (!(item.tags ?? []).some((t) => tagSet.has(t.toLowerCase()))) continue;
+      // OTA-1024 — mirror of the preview loop's exact-ingredient exclusion.
+      if (ingredients.some((ig) => ig.name.toLowerCase() === item.name.toLowerCase())) continue;
+      if (!canonicalItemTags(item).some((t) => tagSet.has(t))) continue;
       const take = Math.min(item.quantity, need);
       item.quantity -= take;
       need -= take;
@@ -471,16 +605,36 @@ export function consumeIngredientsList(
  *  consumed it once, so the craft went through paying one material short. This
  *  allocates each item to the first ingredient that claims it, exactly as the
  *  drain does, so canCraft can never approve a craft the drain would underpay. */
+// OTA-1027 — PER-INVENTORY annotation cache. ingredientShortfall annotated every
+// item (canonical tags + substitutability + catalog lookups) PER RECIPE, so
+// the craft badge and every repairs-tab re-render paid
+// O(recipes x inventory x catalog) — ~900ms in the harness, seconds-per-tap
+// on device ("tap, wait 20 seconds, stutter"). The store's inventory array is
+// immutable (every set() replaces it), so a WeakMap keyed on array identity
+// self-invalidates on any inventory change. Only the qty is copied per call
+// (the allocation below consumes it).
+const SHORTFALL_META = new WeakMap<object, ReadonlyArray<{ name: string; tags: readonly string[]; qty: number; sub: boolean }>>();
+
 function ingredientShortfall(
   ingredients: ReadonlyArray<{ name: string; quantity: number }>,
   inventory: readonly InventoryItem[],
 ): Array<{ name: string; quantity: number }> {
-  const pool = inventory.map((i) => ({
-    name: i.name.toLowerCase(),
-    tags: (i.tags ?? []).map((t) => t.toLowerCase()),
-    qty: i.quantity,
-    sub: isSubstitutable(i),
-  }));
+  let meta = SHORTFALL_META.get(inventory as unknown as object);
+  if (!meta) {
+    meta = inventory.map((i) => ({
+      name: i.name.toLowerCase(),
+      tags: canonicalItemTags(i),
+      qty: i.quantity,
+      sub: isSubstitutable(i),
+    }));
+    SHORTFALL_META.set(inventory as unknown as object, meta);
+  }
+  const pool = meta.map((e) => ({ name: e.name, tags: e.tags, qty: e.qty, sub: e.sub }));
+  // OTA-1027 — parity with the preview/drain loops' exact-ingredient exclusion: an
+  // item that IS one of the recipe's exact ingredients never doubles as a tag
+  // substitute for another slot. canCraft kept the old rule after the loops
+  // gained it, so approve and drain could disagree (the OTA-613 hazard).
+  const exactIngredientNames = new Set(ingredients.map((ig) => ig.name.toLowerCase()));
   const out: Array<{ name: string; quantity: number }> = [];
   for (const ing of ingredients) {
     let need = ing.quantity;
@@ -497,7 +651,7 @@ function ingredientShortfall(
       const tagSet = new Set(tags);
       for (const p of pool) {
         if (need <= 0) break;
-        if (p.qty <= 0 || !p.sub || p.name === target) continue;
+        if (p.qty <= 0 || !p.sub || exactIngredientNames.has(p.name)) continue;
         if (!p.tags.some((t) => tagSet.has(t))) continue;
         const take = Math.min(p.qty, need); p.qty -= take; need -= take;
       }
@@ -524,6 +678,15 @@ export function findRecipeByResult(target: string): Recipe | null {
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
   const t = norm(target);
   if (!t) return null;
+  // Pass 0 — EXACT normalized-name match wins. OTA-702: "craft Mudstone" used to
+  // substring-match the FIRST recipe containing "mudstone" — "Mudstone Bulwark"
+  // (which needs 2× Hardened Mudstone) — instead of the recipe whose result IS
+  // "Mudstone" (the 3-Mud-Fragment refine the player can actually forage toward).
+  // Any time the player types a recipe's exact result name, that recipe wins over a
+  // longer one that merely contains the word.
+  for (const r of RECIPES) {
+    if (norm(r.result) === t) return r;
+  }
   // Pass 1 — substring match either direction. Cheap, covers most cases.
   for (const r of RECIPES) {
     const rn = norm(r.result);
@@ -564,6 +727,28 @@ export function consumeIngredients(
   recipe: Recipe,
 ): InventoryItem[] {
   return consumeIngredientsList(inventory, recipe.ingredients);
+}
+
+/** OTA-1006 — how many of this recipe the pack can actually make RIGHT NOW.
+ *  Simulates the real drain one craft at a time (substitution-aware, because
+ *  consumeIngredientsList runs the same canonical-first / substitute-tag passes
+ *  the craft does), so "MAX" is an honest number rather than a division that
+ *  ignores which substitutes get eaten first. Capped so a pack full of scrap
+ *  can't spin this into a long loop — nobody batches more than a stack anyway. */
+export const MAX_CRAFT_BATCH = 20;
+export function maxCraftableCount(
+  recipe: Recipe,
+  inventory: readonly InventoryItem[],
+  cap: number = MAX_CRAFT_BATCH,
+): number {
+  let n = 0;
+  let inv: InventoryItem[] = inventory.map((i) => ({ ...i }));
+  while (n < cap) {
+    if (missingIngredientsList(recipe.ingredients, inv).length !== 0) break;
+    inv = consumeIngredientsList(inv, recipe.ingredients);
+    n += 1;
+  }
+  return n;
 }
 
 // Catalog lookup helpers — find an item entry by name across the four
@@ -693,6 +878,13 @@ function ladderResistances(name: string, rarity: Rarity, seed: readonly string[]
  *  rarity/material top-up). Used by combat (aggregateArmor) AND the item preview
  *  so what the player SEES is what actually mitigates. Deterministic. */
 export function armorResistances(piece: CatalogArmor): string[] {
+  // OTA-912 — the Skyreacher set is the exception to the rarity ladder: it
+  // resists only its authored baseline (cold) and leaves the rest of its resist
+  // capacity OPEN for the player to fill by choice (coating vials → addedResists,
+  // up to the standard 3-slot cap). Other Legendaries still auto-fill to 3.
+  if ((piece.tags ?? []).some((t) => t.toLowerCase() === 'skyreacher')) {
+    return [...(piece.resistances ?? [])];
+  }
   return ladderResistances(piece.name, piece.rarity, piece.resistances ?? [], piece.tags ?? []);
 }
 
@@ -759,6 +951,77 @@ export function findMaterialByName(name: string): CatalogMaterial | null {
 
 /** Same for gear — small catalog (6 items as of OTA 192) but the
  *  effect resolver needs a uniform lookup interface. */
+/** OTA-1020 — CANONICAL tags for an inventory item: its own instance tags UNION
+ *  the catalog row's (matched by name across weapons/armor/gear/exploration/
+ *  materials). Inventory instances persist the tag set from the moment they
+ *  were MINTED, so an item acquired before a catalog tag existed carries a
+ *  stale set forever — identity checks must read the catalog, never trust the
+ *  snapshot alone. Lowercased. Non-catalog names (fused gear) return own tags. */
+// OTA-1026 — PER-NAME MEMO. The canonical helpers went from micro to macro cost
+// when the snapshot audit routed ~40 sites through them: each call ran up to
+// NINE linear catalog scans, and loops (substitution drains, per-item loot
+// filters) multiplied that into a blocked JS thread on the KILL beat — the
+// owner's 7-8 second "resolving" freeze on the final blow (kills touch the
+// inventory; ordinary rolls don't, which is why only kills hung). Catalogs
+// are static per process, so the finder-chain RESULT is cached per name —
+// identical semantics (including the inferred-row fallbacks), O(1) repeats.
+const CANON_TAG_CACHE = new Map<string, readonly string[]>();
+const CANON_ROW_CACHE = new Map<string, ReturnType<typeof findCatalogItem>>();
+
+export function canonicalItemTags(item: { name: string; tags?: readonly string[] }): string[] {
+  const own = (item.tags ?? []).map((t) => t.toLowerCase());
+  if (!item.name) return own;
+  let cat = CANON_TAG_CACHE.get(item.name);
+  if (cat === undefined) {
+    const row = findWeaponByName(item.name) ?? findArmorByName(item.name) ?? findGearByName(item.name)
+      ?? findExplorationItemByName(item.name) ?? findMaterialByName(item.name)
+      ?? findAmuletByName(item.name) ?? findRingByName(item.name) ?? findDogGearByName(item.name) ?? null;
+    cat = ((row?.tags ?? []) as readonly string[]).map((t) => t.toLowerCase());
+    CANON_TAG_CACHE.set(item.name, cat);
+  }
+  if (cat.length === 0) return own;
+  return Array.from(new Set([...own, ...cat]));
+}
+
+/** OTA-1026 — memoized findCatalogItem for the kind/rarity helpers (same
+ *  aliases:false semantics; catalogs are static per process). */
+function canonicalRowFor(name: string): ReturnType<typeof findCatalogItem> {
+  let row = CANON_ROW_CACHE.get(name);
+  if (row === undefined) {
+    row = findCatalogItem(name, { aliases: false });
+    CANON_ROW_CACHE.set(name, row);
+  }
+  return row;
+}
+
+/** OTA-1022 — canonical KIND: fused pieces stay instance-authoritative
+ *  (uniqueStats.kind), catalog rows answer by name, and only a non-catalog
+ *  name falls back to the persisted snapshot. The load-time kind heal is
+ *  UPGRADE-only (never applies a demotion to 'misc'), so decision sites must
+ *  never trust item.kind alone. */
+export function canonicalItemKind(
+  item: { name: string; kind?: InventoryItem['kind']; uniqueStats?: { kind?: string } | null },
+): InventoryItem['kind'] {
+  const u = item.uniqueStats?.kind;
+  if (u === 'weapon' || u === 'armor' || u === 'dog_armor') return u;
+  const row = item.name ? canonicalRowFor(item.name) : null;
+  if (row) return row.kind;
+  return item.kind ?? 'misc';
+}
+
+/** OTA-1022 — canonical RARITY. Instance rarity is NEVER healed on load anywhere,
+ *  so a since-promoted material still reads its mint-time tier forever (and
+ *  the stack-merge spreads it to every new copy). Catalog wins for catalog
+ *  names; fused/uncatalogued instances keep their own. */
+export function canonicalItemRarity(
+  item: { name: string; rarity?: Rarity; uniqueStats?: { rarity?: Rarity } | null },
+): Rarity | undefined {
+  const u = item.uniqueStats?.rarity;
+  if (u) return u;
+  const row = item.name ? canonicalRowFor(item.name) : null;
+  return row?.rarity ?? item.rarity;
+}
+
 export function findGearByName(name: string): CatalogGear | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
@@ -781,13 +1044,40 @@ export function fuzzyFindArmor(text: string): CatalogArmor | null {
   return ARMOR.find((a) => a.name.toLowerCase().includes(t) || t.includes(a.name.toLowerCase())) ?? null;
 }
 
+// OTA-762 — spread the WEAKNESSES so no single damage type is the near-universal
+// answer. Pre-OTA, bludgeoning was the weakness for Aetheric Mutation + Aetheric
+// Creature + Automation — the three most common types in the aetheric wasteland
+// (56 of 109 enemies) — so every fight rewarded the same blunt weapon. And four
+// bestiary types (Human, Mechanism, Aetheric Undead, Mech-Construct) had NO row, so
+// they showed no weakness at all. Now each type leans a distinct way (bludgeoning
+// stays the CONSTRUCT/heavy-mutation answer, aether-forms take a slashing edge,
+// machines short-circuit to electrical, mud/undead burn, beasts/humans pierce) and
+// every type in the JSON is covered. Resists are largely unchanged.
 const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> = {
-  Animal: { resist: [], weak: ['piercing'] },
+  // OTA-827 [Group-K] — `poison` is now anti-ORGANIC: venom/toxin bites living
+  // flesh (Animal, Human, the fleshy Aetheric Mutation) but is still RESISTED by
+  // machines and the undead below (Automation/Mechanism/Aetheric Undead) — nothing
+  // to poison. Pre-fix no enemy was ever vulnerable:poison, so poison weapons/
+  // coatings could only ever land neutral or halved.
+  // OTA-874 — acid + corruption are now first-class types. Acid corrodes metal, so
+  // constructs/machines are WEAK to it; the aetheric oozes that spit it are made of it
+  // and RESIST it. Corruption rots the living, so flesh (Animal / Human / the fleshy
+  // Aetheric Mutation) is WEAK to it, while machines and the already-hollow undead RESIST
+  // it. (Enemy weakness/resist to these types also gates whether an acid/corruption COATING
+  // "takes" on that foe.)
+  Animal: { resist: [], weak: ['piercing', 'poison', 'corruption'] },
+  Human: { resist: [], weak: ['piercing', 'slashing', 'poison', 'corruption'] },
   'Mud Creature': { resist: ['slashing', 'piercing'], weak: ['burn', 'radiation'] },
-  'Aetheric Mutation': { resist: ['aetheric', 'radiation'], weak: ['bludgeoning'] },
-  'Aetheric Creature': { resist: ['aetheric', 'electrical'], weak: ['bludgeoning'] },
-  Automation: { resist: ['poison', 'aetheric'], weak: ['electrical', 'bludgeoning'] },
-  Construct: { resist: ['slashing', 'piercing'], weak: ['bludgeoning', 'electrical'] },
+  'Aetheric Mutation': { resist: ['aetheric', 'radiation', 'acid'], weak: ['bludgeoning', 'poison', 'corruption'] },
+  'Aetheric Creature': { resist: ['aetheric', 'electrical', 'acid'], weak: ['slashing'] },
+  // OTA-827 [Group-K] — `cold` seizes machinery: the metal contracts, joints
+  // lock, coolant freezes. It's the anti-machine element (alongside electrical),
+  // and the marquee use is the provokable Roused Construct boss.
+  Automation: { resist: ['poison', 'aetheric', 'corruption'], weak: ['electrical', 'cold', 'acid'] },
+  Mechanism: { resist: ['poison', 'aetheric', 'corruption'], weak: ['electrical', 'cold', 'acid'] },
+  'Mech-Construct': { resist: ['slashing', 'piercing', 'corruption'], weak: ['electrical', 'bludgeoning', 'cold', 'acid'] },
+  'Aetheric Undead': { resist: ['poison', 'aetheric', 'corruption'], weak: ['burn', 'radiation'] },
+  Construct: { resist: ['slashing', 'piercing', 'corruption'], weak: ['bludgeoning', 'electrical', 'cold', 'acid'] },
 };
 
 export type DamageMatch = 'normal' | 'weak' | 'resist';
@@ -811,7 +1101,11 @@ export function applyDamageTypeModifier(
   if (!weaponDamageType || !enemyType) return { damage: rawDamage, match: 'normal' };
   const map = TYPE_RESISTANCE_MAP[enemyType];
   if (!map) return { damage: rawDamage, match: 'normal' };
-  const wt = weaponDamageType.toLowerCase();
+  // OTA-827 [Group-K] — canonicalize through the shared alias table so a `force`
+  // weapon reconciles as aetheric and a `frost` weapon as cold (pre-fix this used
+  // a bare lower-case, so aliased types stayed permanently type-neutral here even
+  // though the proc layer already aliased them).
+  const wt = canonicalDamageType(weaponDamageType);
   if (map.weak.includes(wt)) return { damage: Math.ceil(rawDamage * 1.5), match: 'weak' };
   if (map.resist.includes(wt)) return { damage: Math.max(1, Math.floor(rawDamage / 2)), match: 'resist' };
   return { damage: rawDamage, match: 'normal' };

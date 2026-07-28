@@ -4,7 +4,7 @@
     {
       "id": "story_zalmar_cascade",
       "characterName": "Elior Zalmar",
-      "characterBlurb": "The Etheric Engine's chief architect. His personal logs trace the empire's last week from triumph to mud, sentence by sentence.",
+      "characterBlurb": "The Aetheric Engine's chief architect. His personal logs trace the empire's last week from triumph to mud, sentence by sentence.",
       "fragments": [
         {
           "id": "zalmar_01",
@@ -400,7 +400,7 @@
           "title": "Entry 4 — the Core",
           "kind": "journal",
           "body": "An Aetheric Core, intact, still warm. I have never seen one outside a museum exhibit, and the museum exhibits are fake. The thing hums. I held it. I have been holding it too long. There is a rash on my arm I did not have yesterday.",
-          "discoveryHint": "Found inside an Etheric Chamber",
+          "discoveryHint": "Found inside an Aetheric Chamber",
           "biomeTags": [
             "etheric_anomaly",
             "ruin"
@@ -408,10 +408,10 @@
         },
         {
           "id": "reclaimer_05",
-          "title": "Entry 5 — Etheric Rot",
+          "title": "Entry 5 — Aetheric Rot",
           "kind": "journal",
           "body": "My skin is changing. It is not painful. It is not even unpleasant. The texture is mud. I can press a thumbprint into my own forearm. I hear voices — soft, polite, plural — telling me to rest. I do not know if they are mine. I do not know if I am.",
-          "discoveryHint": "Found in an Etheric Rot zone",
+          "discoveryHint": "Found in an Aetheric Rot zone",
           "biomeTags": [
             "etheric_anomaly",
             "mud"
@@ -597,7 +597,7 @@
           "id": "siege_03",
           "title": "Oct 15",
           "kind": "journal",
-          "body": "Three-day siege has begun. The air in the tunnels is full of thin blue lightning that crackles when you breathe. Etheric Pulse, the lieutenant calls it. Says it scrambles thoughts. He has stopped giving orders, which is its own kind of order.",
+          "body": "Three-day siege has begun. The air in the tunnels is full of thin blue lightning that crackles when you breathe. Aetheric Pulse, the lieutenant calls it. Says it scrambles thoughts. He has stopped giving orders, which is its own kind of order.",
           "discoveryHint": "Found at a tunnel choke point",
           "biomeTags": [
             "buried",
@@ -684,7 +684,7 @@
           "title": "Verse Four",
           "kind": "fragment",
           "body": "The Aether glows deep / where the silence is kept, / calling the secrets / the Entombed have wept.",
-          "discoveryHint": "Found near an Etheric anomaly",
+          "discoveryHint": "Found near an Aetheric anomaly",
           "biomeTags": [
             "etheric_anomaly"
           ]
@@ -693,7 +693,7 @@
           "id": "siren_05",
           "title": "Verse Five",
           "kind": "fragment",
-          "body": "I trade my breath / for a Phoenix Feather, / and drift away / on the Etheric weather.",
+          "body": "I trade my breath / for a Phoenix Feather, / and drift away / on the Aetheric weather.",
           "discoveryHint": "Found in the Mud Seas",
           "biomeTags": [
             "mud",

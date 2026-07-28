@@ -85,9 +85,9 @@ const MECHANISMS = [
   // Exploration
   'look', 'search_area', 'investigate', 'dig', 'travel', 'go_dir',
   'rest', 'eat', 'inspect', 'ask',
-  // Vendor / social
+  // Vendor / social  (OTA-803 — 'gift' removed: gifting deleted)
   'accept_quest', 'turn_in_quest', 'buy', 'sell',
-  'gift', 'steal', 'repair', 'recruit', 'join_faction',
+  'steal', 'repair', 'recruit', 'join_faction',
   // Inventory
   'equip', 'unequip', 'use_relic', 'craft_named',
   // World systems we want to confirm fire
@@ -269,7 +269,6 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       [/Contract complete|turn in.*delivered|reported back/i, 'turn_in_quest'],
       [/You buy|purchased.*for \d+|paid \d+ TC/i, 'buy'],
       [/You sell|sold .* for|earned \d+ TC/i, 'sell'],
-      [/You gift|gave .* to|presented .* to/i, 'gift'],
       [/✓ HIT.*Stealth|✗ CAUGHT|You pocket|You pilfer/i, 'steal'],
       [/You repair|repaired the/i, 'repair'],
       [/joins you|follows you|recruited/i, 'recruit'],
@@ -498,9 +497,7 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
           const sellable = p.inventory.find((it) => it.kind !== 'relic') ?? p.inventory[0]!;
           return `sell ${sellable.name}`;
         }
-        if (p.inventory.length > 0 && tryOnce('gift')) {
-          return `gift ${p.inventory[0]!.name}`;
-        }
+        // OTA-803 — gifting removed.
         if (v.offers && v.offers.length > 0 && tryOnce('steal')) {
           return `steal ${(v.offers[0] as any).itemName}`;
         }

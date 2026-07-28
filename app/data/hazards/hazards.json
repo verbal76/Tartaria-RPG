@@ -2,7 +2,7 @@
   {
     "id": "temporal_loop",
     "name": "Temporal Loop",
-    "description": "You walk the same corridor and find yourself walking it again. The Etheric field has caught the moment in a fold.",
+    "description": "You walk the same corridor and find yourself walking it again. The Aetheric field has caught the moment in a fold.",
     "severity": 4,
     "effect": "Lose 1d6 hours of forward progress; risk of disorientation roll.",
     "tags": ["aetheric", "time", "psychological"],
@@ -19,7 +19,7 @@
   },
   {
     "id": "etheric_storm_burst",
-    "name": "Etheric Storm Burst",
+    "name": "Aetheric Storm Burst",
     "description": "A localized burst of pure Aether discharge. Reality buckles for a moment.",
     "severity": 5,
     "effect": "1d10 Aetheric damage to all in close range; technology may be temporarily disabled.",
@@ -40,7 +40,7 @@
     "name": "Aetherstone Seal",
     "description": "Hardened Aether-mud, stronger than stone. No standard tool will pierce it.",
     "severity": 3,
-    "effect": "Blocks access to a chamber until Mold Ether or specialized relic is used.",
+    "effect": "Blocks access to a chamber until Mold Aether or specialized relic is used.",
     "tags": ["barrier", "aetherstone"],
     "source": "manual"
   },
@@ -94,7 +94,7 @@
     "name": "Awakening Defenses",
     "description": "Dormant Tartarian sentinels register your heat signature. Old gears begin to grind.",
     "severity": 4,
-    "effect": "Triggers a Sentinel / Etheric Guardian encounter.",
+    "effect": "Triggers a Sentinel / Aetheric Guardian encounter.",
     "tags": ["construct", "encounter_trigger"],
     "source": "manual"
   }

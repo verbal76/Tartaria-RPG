@@ -57,10 +57,10 @@ export function CharacterCreationScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>NEW EXPEDITION</Text>
+        <Text style={styles.headerTitle} accessibilityRole="header">NEW EXPEDITION</Text>
         <Text style={styles.headerStep}>Step {stepIndex + 1} of {STEP_ORDER.length}</Text>
       </View>
-      <Text style={styles.stepTitle}>{STEP_TITLE[step]}</Text>
+      <Text style={styles.stepTitle} accessibilityRole="header">{STEP_TITLE[step]}</Text>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {step === 'race' && races.map((r) => {
@@ -74,6 +74,8 @@ export function CharacterCreationScreen() {
               style={[styles.option, raceId === r.id && styles.optionSelected]}
               onPress={() => setRaceId(r.id)}
               activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityState={{ selected: raceId === r.id }}
             >
               <Text style={styles.optionName}>{r.name}</Text>
               <Text style={styles.optionDesc}>{r.description}</Text>
@@ -93,9 +95,6 @@ export function CharacterCreationScreen() {
                   {r.traits.map((t, i) => (
                     <Text key={i} style={styles.optionTrait}>· {t}</Text>
                   ))}
-                  <Text style={styles.optionTraitNote}>
-                    (Per-day powers and immunities arrive in a follow-up update.)
-                  </Text>
                 </View>
               )}
               <Text style={styles.optionMeta}>
@@ -117,6 +116,8 @@ export function CharacterCreationScreen() {
                 style={[styles.option, factionId === f.id && styles.optionSelected]}
                 onPress={() => setFactionId(f.id)}
                 activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityState={{ selected: factionId === f.id }}
               >
                 <Text style={styles.optionName}>{f.name}</Text>
                 <Text style={styles.optionDesc}>{f.subtitle}</Text>
@@ -144,6 +145,7 @@ export function CharacterCreationScreen() {
           onPress={goBack}
           activeOpacity={0.7}
           hitSlop={8}
+          accessibilityRole="button"
         >
           <Text style={styles.backBtnText}>← BACK</Text>
         </TouchableOpacity>
@@ -152,6 +154,7 @@ export function CharacterCreationScreen() {
           onPress={goNext}
           activeOpacity={0.7}
           hitSlop={8}
+          accessibilityRole="button"
         >
           <Text style={styles.nextBtnText}>{nextLabel}</Text>
         </TouchableOpacity>
@@ -169,7 +172,7 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
   },
   headerTitle: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
-  headerStep: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
+  headerStep: { color: '#a2977b', fontSize: 11, letterSpacing: 1 },
   stepTitle: {
     color: '#e6d8b3',
     fontSize: 12,
@@ -192,11 +195,10 @@ const styles = StyleSheet.create({
   optionSelected: { borderColor: '#c9a86a' },
   optionName: { color: '#e6d8b3', fontWeight: '700', fontSize: 14 },
   optionDesc: { color: '#cdbf99', fontSize: 12, marginTop: 2 },
-  optionMeta: { color: '#7a705c', fontSize: 11, marginTop: 4, letterSpacing: 0.5 },
+  optionMeta: { color: '#a2977b', fontSize: 11, marginTop: 4, letterSpacing: 0.5 },
   optionMetaSub: { color: '#c9a86a', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
   optionTraits: { marginTop: 8, paddingLeft: 6, borderLeftColor: '#3a342c', borderLeftWidth: 2 },
   optionTrait: { color: '#9ec96a', fontSize: 11, lineHeight: 16, marginBottom: 2 },
-  optionTraitNote: { color: '#c9a86a', fontSize: 10, marginTop: 4, fontStyle: 'italic' },
   optionFlavor: {
     color: '#a89776',
     fontSize: 12,

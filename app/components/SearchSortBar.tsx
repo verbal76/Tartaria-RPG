@@ -77,6 +77,8 @@ export function SearchSortBar({
         />
         {query.length > 0 && (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Clear search"
             onPress={() => onQueryChange('')}
             style={styles.clearBtn}
             hitSlop={6}
@@ -95,6 +97,8 @@ export function SearchSortBar({
             return (
               <TouchableOpacity
                 key={opt.key}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
                 onPress={() => handleSortTap(opt.key)}
                 style={[styles.sortBtn, active && styles.sortBtnActive]}
                 activeOpacity={0.7}
@@ -132,7 +136,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  clearText: { color: '#7a705c', fontSize: 18, fontWeight: '700' },
+  clearText: { color: '#a2977b', fontSize: 18, fontWeight: '700' },
   sortRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -141,7 +145,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   sortLabel: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 10,
     letterSpacing: 2,
     fontWeight: '700',
@@ -157,7 +161,7 @@ const styles = StyleSheet.create({
   },
   sortBtnActive: { borderColor: '#c9a86a' },
   sortBtnText: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,

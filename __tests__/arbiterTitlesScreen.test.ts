@@ -21,8 +21,8 @@ interface ArbiterTitle {
 const TITLES = (arbiterTitlesData as { titles: ArbiterTitle[] }).titles;
 
 describe('OTA-236 — Arbiter Titles render contract', () => {
-  it('arbiter-titles.json has 20 entries', () => {
-    expect(TITLES.length).toBe(20);
+  it('arbiter-titles.json has 21 entries', () => {
+    expect(TITLES.length).toBe(21);
   });
 
   it('every title has the fields the CharacterScreen section reads', () => {
@@ -56,7 +56,7 @@ describe('OTA-236 — Arbiter Titles render contract', () => {
     const earnedCount = TITLES.filter((t) => earned.has(t.id)).length;
     const lockedCount = TITLES.filter((t) => !earned.has(t.id)).length;
     expect(earnedCount).toBe(1);
-    expect(lockedCount).toBe(19);
+    expect(lockedCount).toBe(20);
   });
 
   it('sort puts earned titles first then alphabetical (mirrors render path)', () => {

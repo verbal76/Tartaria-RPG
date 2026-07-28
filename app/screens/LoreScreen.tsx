@@ -7,6 +7,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 import { LoreCodexBody } from '../components/LoreCodexBody';
 
 export function LoreScreen() {
@@ -14,16 +15,23 @@ export function LoreScreen() {
 
   return (
     <View style={styles.container}>
+      <FirstTimeHint
+        id="lore_first_open"
+        title="The codex"
+        body="Your reference for Tartaria's factions, races, and history. New entries unlock here as you discover them in play."
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('title')}
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Back"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>LORE CODEX</Text>
+        <Text style={styles.title} accessibilityRole="header">LORE CODEX</Text>
         <View style={{ width: 80 }} />
       </View>
 

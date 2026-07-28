@@ -50,6 +50,14 @@ const TYPE_TO_EFFECT: Record<string, EffectRule> = {
     duration: () => rollDie(6),
     label: 'poisoned',
   },
+  // OTA-831 — a cold hit can leave you `chilled`: a timed −DEX slow (applied in
+  // effectiveStats). The warming counter is drinking a cold coating.
+  cold: {
+    kind: 'chilled',
+    procChance: 0.3,
+    duration: () => rollDie(4),
+    label: 'chilled',
+  },
 };
 
 export interface AppliedEffect {
@@ -146,6 +154,9 @@ const COMBAT_ONLY_STATUSES: ReadonlySet<StatusEffectKind> = new Set([
   'ready', 'surprised', 'fighting_back', 'quick_fire',
   'stealthed', 'shielded', 'shaped_stone_ward', 'power_attack_pending',
   'defensive_stance', 'distracted',
+  // OTA-835 — the Mud Golem's Elemental Control ward is a per-encounter block;
+  // clear any unspent soak when the fight ends so it never carries into the next.
+  'stone_ward',
 ]);
 const STAMINA_GATED_STATUSES: ReadonlySet<StatusEffectKind> = new Set(['tired', 'exhausted']);
 
@@ -198,6 +209,8 @@ export function statusAcAdjustment(current: readonly StatusEffect[] | undefined)
     // OTA 039 — Aethercraft 'shape stone' applies a one-round +4 AC
     // ward from raised Aetherstone.
     if (e.kind === 'shaped_stone_ward') adj += 4;
+    // OTA-936 — successful-dodge group defense: harder for the rest of the volley to land.
+    if (e.kind === 'evasive') adj += 3;
     // 'dodging' deliberately NOT here as of 2026-05-21 — the dodge
     // rework moved it from a passive +4 AC into an active post-hit
     // parry roll handled in applyEnemyCounter. The roll itself is

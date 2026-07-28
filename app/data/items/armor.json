@@ -9416,6 +9416,483 @@
       "description": "Reduces visibility in fog and Aetheric disturbances.",
       "abilityReq": "Dexterity Level 6",
       "staminaRegen": 2
+    },
+    {
+      "name": "Aetherforged Greaves",
+      "slot": "legs",
+      "raceAffinity": null,
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 0,
+      "tcBuy": 130,
+      "tcSell": 52,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "legs",
+        "aether",
+        "aetherforged",
+        "crafted"
+      ],
+      "description": "Aether-tempered plate greaves, forged light. Rare crafted leg armor."
+    },
+    {
+      "name": "Aetherforged Gauntlets",
+      "slot": "hands",
+      "raceAffinity": null,
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 0,
+      "tcBuy": 130,
+      "tcSell": 52,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "hands",
+        "aether",
+        "aetherforged",
+        "crafted"
+      ],
+      "description": "Aether-tempered gauntlets that grip like a vise. Rare crafted hand armor."
+    },
+    {
+      "name": "Aetherforged Treads",
+      "slot": "feet",
+      "raceAffinity": null,
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 0,
+      "tcBuy": 130,
+      "tcSell": 52,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "feet",
+        "aether",
+        "aetherforged",
+        "crafted"
+      ],
+      "description": "Aether-tempered treads, sure on broken ground. Rare crafted foot armor."
+    },
+    {
+      "name": "Aetherforged Mantle",
+      "slot": "cloak",
+      "raceAffinity": null,
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 2
+        },
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 0,
+      "tcBuy": 130,
+      "tcSell": 52,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "cloak",
+        "aether",
+        "aetherforged",
+        "crafted"
+      ],
+      "description": "A mantle woven through with Aether thread. Rare crafted cloak."
+    },
+    {
+      "name": "Titanforged Cuirass",
+      "slot": "chest",
+      "raceAffinity": null,
+      "acBonus": 5,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 3
+        },
+        {
+          "stat": "hp",
+          "amount": 40
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 0,
+      "tcBuy": 270,
+      "tcSell": 108,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "chest",
+        "aether",
+        "titanforged",
+        "crafted"
+      ],
+      "description": "A cuirass hammered around a boss-heart core — it shrugs off what would fell a lesser frame. Legendary crafted chest armor."
+    },
+    {
+      "name": "Titanforged Greaves",
+      "slot": "legs",
+      "raceAffinity": null,
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 0,
+      "tcBuy": 270,
+      "tcSell": 108,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "legs",
+        "aether",
+        "titanforged",
+        "crafted"
+      ],
+      "description": "Greaves forged around a boss-heart core; they never tire. Legendary crafted leg armor."
+    },
+    {
+      "name": "Titanforged Gauntlets",
+      "slot": "hands",
+      "raceAffinity": null,
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 3
+        },
+        {
+          "stat": "dexterity",
+          "amount": 2
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 0,
+      "tcBuy": 270,
+      "tcSell": 108,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "hands",
+        "aether",
+        "titanforged",
+        "crafted"
+      ],
+      "description": "Gauntlets forged around a boss-heart core; they crush and hold. Legendary crafted hand armor."
+    },
+    {
+      "name": "Titanforged Treads",
+      "slot": "feet",
+      "raceAffinity": null,
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 0,
+      "tcBuy": 270,
+      "tcSell": 108,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "feet",
+        "aether",
+        "titanforged",
+        "crafted"
+      ],
+      "description": "Treads forged around a boss-heart core; the ground yields, not you. Legendary crafted foot armor."
+    },
+    {
+      "name": "Titanforged Mantle",
+      "slot": "cloak",
+      "raceAffinity": null,
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 3
+        },
+        {
+          "stat": "wisdom",
+          "amount": 2
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 0,
+      "tcBuy": 270,
+      "tcSell": 108,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "cloak",
+        "aether",
+        "titanforged",
+        "crafted"
+      ],
+      "description": "A mantle forged around a boss-heart core, humming with bound Aether. Legendary crafted cloak."
+    },
+    {
+      "name": "Skyreacher Crown",
+      "slot": "head",
+      "acBonus": 4,
+      "resistances": [
+        "cold"
+      ],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 8,
+      "tcBuy": 0,
+      "tcSell": 0,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "skyreacher",
+        "legendary",
+        "collect_only"
+      ],
+      "description": "Skyreacher Crown. Storm-blued alloy, cold to the touch even in still air — the crown of the Skyreacher set, taken only from the peak of the Grand Spire of Etheria. Cannot be forged or bought; it is earned one climb at a time."
+    },
+    {
+      "name": "Skyreacher Cuirass",
+      "slot": "chest",
+      "acBonus": 4,
+      "resistances": [
+        "cold"
+      ],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 3
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 8,
+      "tcBuy": 0,
+      "tcSell": 0,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "chest",
+        "skyreacher",
+        "legendary",
+        "collect_only"
+      ],
+      "description": "Skyreacher Cuirass. Giant-forged plate re-sized for a climber's back, the core of the Skyreacher set — collected only atop the buried spire of Asgardar. Cannot be forged or bought."
+    },
+    {
+      "name": "Skyreacher Mantle",
+      "slot": "cloak",
+      "acBonus": 4,
+      "resistances": [
+        "cold"
+      ],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 8,
+      "tcBuy": 0,
+      "tcSell": 0,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "cloak",
+        "skyreacher",
+        "legendary",
+        "collect_only"
+      ],
+      "description": "Skyreacher Mantle. A wind-scoured dark mantle taken from the crown of the Great Obsidian Monolith, worn across the shoulders so the legs stay free for a climbing harness. Part of the Skyreacher set — cannot be forged or bought; only the climb yields it."
+    },
+    {
+      "name": "Skyreacher Treads",
+      "slot": "feet",
+      "acBonus": 4,
+      "resistances": [
+        "cold"
+      ],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 8,
+      "tcBuy": 0,
+      "tcSell": 0,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "feet",
+        "skyreacher",
+        "legendary",
+        "collect_only"
+      ],
+      "description": "Skyreacher Treads. Boots that never lost their grip on anything, waiting at the top of Thametan's Tower — the footing of the Skyreacher set. Cannot be forged or bought."
+    },
+    {
+      "name": "Skyreacher Gauntlets",
+      "slot": "hands",
+      "acBonus": 4,
+      "resistances": [
+        "cold"
+      ],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 8,
+      "tcBuy": 0,
+      "tcSell": 0,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "hands",
+        "skyreacher",
+        "legendary",
+        "collect_only"
+      ],
+      "description": "Skyreacher Gauntlets. Storm-proof grips jammed into the summit cleft of the Great Fang of Zharak, the hands of the Skyreacher set. Cannot be forged or bought."
     }
   ]
 }

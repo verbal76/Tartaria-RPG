@@ -18,6 +18,9 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'shatter', 'break', 'destroy', 'crush', 'bash',
     // From the overwhelm action card — semantically a flavour of attack.
     'overwhelm', 'press the attack',
+    // OTA-770 — rousing a dormant guardian ("wake the knight") IS a hostile act:
+    // route it to attack so an animate scene noun stands up and fights.
+    'wake', 'rouse', 'awaken', 'stir', 'provoke', 'disturb',
   ],
   diplomacy: [
     'convince', 'persuade', 'negotiate', 'parley', 'bargain', 'plead', 'speak', 'talk',
@@ -33,6 +36,22 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // collides with the 'call dog' parser intercept.
     // Social + performance card verbs.
     'intimidate', 'perform', 'sing', 'play',
+    // OTA-808 — parley verbs. Threat + gentle approaches route through diplomacy so
+    // the two-button parley opens (soothe an animal / persuade a person, or
+    // intimidate either). 'calm'/'settle' are deliberately NOT here — they collide
+    // with the self-directed "calm down" / "settle down" (which are ready/rest); the
+    // unambiguous gentle verbs below cover the animal read, and the two-button modal
+    // (opened by a generic "talk to / approach") always offers "Calm it" by tap.
+    'threaten', 'menace', 'coerce', 'coax',
+    'soothe', 'pacify', 'tame',
+    // OTA-854 — a wider net of LEADING verbs so natural talk-down phrasings route to
+    // diplomacy ("shout at them to go away", "browbeat the patrol"). The phrasal
+    // target-commands ("back off", "go away") are NOT here — they collide with retreat
+    // as bare input; detectParleyChoice reads them once a parley is underway.
+    'shout', 'yell', 'holler', 'bellow', 'roar', 'snarl', 'growl', 'scare', 'frighten',
+    'bully', 'terrify', 'browbeat', 'scowl', 'spook', 'daunt',
+    // PERSUASION reads (reason): defuse the standoff with words.
+    'reason', 'appeal', 'defuse', 'deescalate', 'de-escalate', 'reconcile', 'placate',
   ],
   escape: [
     'run', 'flee', 'retreat', 'escape', 'withdraw', 'bolt', 'scram',
@@ -42,6 +61,10 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'look', 'examine', 'inspect', 'search', 'study', 'check', 'investigate', 'scan',
     'observe', 'view', 'read', 'probe', 'survey', 'find', 'scavenge', 'hunt',
     'peruse', 'scrutinise', 'scrutinize', 'comb',
+    // OTA-698 — 'listen'/'hear' are sensory investigation. A whispering-crystal
+    // hook invites "listen to the whispers"; without this it demoted to unknown and
+    // dead-ended. Investigate is hook-eligible, so it now advances the hook.
+    'listen', 'hear',
     // 'salvage' / 'strip' / 'pry' — playtest caught "salvage the
     // construct" failing to advance the wreck_construct hook because
     // there was no salvage verb. Investigate is hook-eligible, so
@@ -76,6 +99,17 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   press: ['press', 'depress', 'mash'],
   push: ['push', 'shove', 'nudge'],
   pull: ['pull', 'tug', 'yank'],
+  // OTA-710 — call-to-action gestures. Evocative verbs the scene prose
+  // invites but which aren't mechanical puzzle inputs. Kept OUT of this
+  // list: 'greet'/'hail'/'sing'/'play' (already claimed by diplomacy),
+  // 'call' (deliberately removed earlier — too greedy). When one of these
+  // lands on an active hook the resolver runs; otherwise the store emits a
+  // backstory-fill flavor line so the action always DOES something.
+  gesture: [
+    'ring', 'pray', 'touch', 'tilt', 'whistle', 'shout', 'chant', 'kneel',
+    'hum', 'stroke', 'caress', 'salute', 'beckon', 'sound', 'signal',
+    'answer', 'respond', 'feel', 'bang', 'strike a note', 'clap',
+  ],
   inventory: [
     // 'bag' removed — too greedy: "bag the goblin" / "tea bag" / "sandbag"
     // all routed here. 'pack' kept; players who type just "pack" are
@@ -116,7 +150,10 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // pouch; `unpouch <item>` / `unstow <item>` takes it out.
   stow_pouch: ['stow', 'pouch', 'belt'],
   unpouch: ['unpouch', 'unstow', 'unbelt'],
-  gift: ['gift', 'give', 'offer', 'hand', 'bestow', 'donate', 'tender', 'grant', 'pass'],
+  // OTA-803 — the `gift` intent was removed (gifting deleted). Faction standing is
+  // earned through mission completions + sigil/pendant turn-ins, not by handing
+  // vendors loot; the gift-for-rep side door undercut that, so the whole verb +
+  // action is gone. Its verbs (give/offer/hand/…) now fall through to unknown.
   // 'pocket' removed — clashes with the noun "pockets" / "in his pocket"
   // and the inventory channel. 'grab' kept (genuine steal verb).
   steal: ['steal', 'pilfer', 'lift', 'pinch', 'swipe', 'snatch', 'filch', 'nick', 'grab'],
@@ -246,6 +283,12 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   pickup: ['pickup', 'pick up', 'retrieve', 'collect', 'scoop up', 'take'],
   open: [
     'open', 'unlock', 'crack', 'pry open', 'lift the lid', 'breach', 'disarm', 'disable', 'dismantle', 'deactivate', 'take apart',
+    // OTA-741 — "empty"/"dump out"/"clean out" a container routes to the open
+    // (loot) intent. Playtest: "empty the trunk" fell to the LLM as unknown even
+    // though "open the trunk" worked, so a natural phrasing hit a dead-end.
+    // ("rummage" is intentionally NOT here — "rummage in the rubble" reads as
+    // investigate/search, not open a container.)
+    'empty', 'empty out', 'dump out', 'clean out',
     // Lockpicking — multi-word so 'pick' alone doesn't conflict with
     // pickup intent.
     'pick the lock', 'pick a lock', 'lockpick', 'pick lock',
@@ -518,15 +561,35 @@ const JUNK_NOUNS = new Set([
   'way', 'place', 'side',
 ]);
 
+// OTA-737 — an instrument preposition ends the DIRECT OBJECT: everything after
+// "with" / "using" / "by" is the TOOL, not the target. Without this, "with the"
+// was merely stopword-filtered, so "shatter the rune glass with the prybar"
+// dropped "with"/"the" but KEPT "prybar" — the target resolved to the mangled
+// "rune glass prybar" instead of "rune glass". (The richer OTA-204 arg system
+// already segments these into instrument roles; this is the legacy target/
+// resolvedNoun path that handlers still read.)
+const INSTRUMENT_BOUNDARY_PREPS = new Set(['with', 'using', 'by']);
+
 function extractTargetTokens(tokens: string[], verbIdx: number): string[] {
   const after = tokens.slice(verbIdx + 1);
-  return after.filter(
-    (t) =>
-      !STOPWORDS.has(t) &&
-      !QUESTION_WORDS.has(t) &&
-      !JUNK_NOUNS.has(t) &&
-      !FILLER_DESCRIPTORS.has(t),
-  );
+  const out: string[] = [];
+  for (const t of after) {
+    // Stop collecting the direct object at "with/using/by" — but ONLY once we
+    // already have a target noun, so a tool-only command with no direct object
+    // ("attack with the off-hand blade") keeps its existing behavior (the prep
+    // is just skipped as a stopword and the weapon noun is collected).
+    if (INSTRUMENT_BOUNDARY_PREPS.has(t) && out.length > 0) break;
+    if (
+      STOPWORDS.has(t) ||
+      QUESTION_WORDS.has(t) ||
+      JUNK_NOUNS.has(t) ||
+      FILLER_DESCRIPTORS.has(t)
+    ) {
+      continue;
+    }
+    out.push(t);
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -846,19 +909,40 @@ function resolveItem(
   return undefined;
 }
 
-function resolveContextNoun(targetTokens: string[], recentNouns: string[]): string | undefined {
+function resolveContextNoun(
+  targetTokens: string[],
+  recentNouns: string[],
+  preferred?: string | null,
+): string | undefined {
   if (!targetTokens.length || !recentNouns.length) return undefined;
-  for (const noun of recentNouns) {
-    const nounLower = noun.toLowerCase();
-    if (targetTokens.some((t) => nounLower.includes(t))) return noun;
-  }
-  for (const noun of recentNouns) {
-    const words = noun.toLowerCase().split(/\s+/);
-    for (const t of targetTokens) {
-      if (words.some((w) => fuzzyEqual(t, w))) return noun;
+  const preferLower = (preferred ?? '').toLowerCase().trim();
+  // OTA-699 — recency tiebreak. When several scene nouns match the same ambiguous
+  // target (a room with a "drain hatch" AND an "observation hatch", target "hatch"),
+  // the old code returned the FIRST in array order — so "look inside the hatch" hit
+  // the wrong one. Prefer the noun the player MOST RECENTLY interacted with; fall
+  // back to array-order first-match (unchanged behavior when there's no preference).
+  const preferFrom = (matches: string[]): string | undefined => {
+    if (!matches.length) return undefined;
+    if (preferLower) {
+      const recent = matches.find((n) => {
+        const nl = n.toLowerCase();
+        return nl === preferLower || nl.includes(preferLower) || preferLower.includes(nl);
+      });
+      if (recent) return recent;
     }
-  }
-  return undefined;
+    return matches[0];
+  };
+  const substrMatches = recentNouns.filter((noun) => {
+    const nounLower = noun.toLowerCase();
+    return targetTokens.some((t) => nounLower.includes(t));
+  });
+  const substrHit = preferFrom(substrMatches);
+  if (substrHit) return substrHit;
+  const fuzzyMatches = recentNouns.filter((noun) => {
+    const words = noun.toLowerCase().split(/\s+/);
+    return targetTokens.some((t) => words.some((w) => fuzzyEqual(t, w)));
+  });
+  return preferFrom(fuzzyMatches);
 }
 
 export interface ParseContext {
@@ -880,6 +964,10 @@ export interface ParseContext {
   /** Ambient nouns extracted from the scene paragraph. Used to
    *  classify the player's input as a generic-area target. */
   ambientNouns?: string[];
+  /** OTA-699 — the noun the player most recently interacted with (from the
+   *  store's lastInteractedNoun). Recency tiebreak so an ambiguous bare noun
+   *  ("the hatch" in a room with two hatches) resolves to the one just touched. */
+  lastInteractedNoun?: string | null;
   /** Name of the vendor currently in the scene, if any. Lets the
    *  suggester offer 'trade with X' / 'buy from X' style verbs. */
   vendorName?: string;
@@ -1054,7 +1142,18 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
       // 'use torch on X' only if the player carries one.
       if (hasTorch) suggestIfAllowed('use torch on');
     }
-    if (item) suggestions.push(`use ${item.name.toLowerCase()}`);
+    // OTA-711 — guard the "use <item>" suggestion against loose fuzzy
+    // matches. resolveItem will map "aetherkin" → "Flame of Aether" on the
+    // shared "aether" fragment, producing a nonsensical "Try: use flame of
+    // aether" nudge (playtest log). Only offer the item when the player's
+    // noun shares a WHOLE, non-trivial word with the item name.
+    if (item) {
+      const itemWords = new Set(
+        item.name.toLowerCase().split(/\s+/).filter((w) => w.length > 2 && !STOPWORDS.has(w)),
+      );
+      const nounSharesWord = cleanTokens.some((w) => w.length > 2 && itemWords.has(w));
+      if (nounSharesWord) suggestions.push(`use ${item.name.toLowerCase()}`);
+    }
     // arb167 — 'sneak' (not 'hide') so the stealth tactic reads as an offensive
     // setup: mid-range it's the unseen opener, close-range the initiative gamble.
     if (context.enemyPresent) suggestions.push('attack', 'dodge', 'advance', 'retreat', 'sneak', 'parley');
@@ -1091,7 +1190,20 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
   const enemyNamesLower = (context.enemyNames ?? []).map((n) => n.toLowerCase());
   let enemyHit: string | undefined = undefined;
   if (enemyNamesLower.length > 0 && targetTokens.length > 0) {
+    // arb-fix — respect an explicit trailing ordinal ("raider 3") BEFORE the
+    // loose any-token match. Numbered enemies share every word except the
+    // number ("Conspiracy Architects Raider 2/3"), so the any-token loop below
+    // matched on "conspiracy" and returned the FIRST enemy regardless of the
+    // typed number (so "approach raider 3" resolved to raider 2 once 1 died).
+    const ordinalTok = targetTokens.find((t) => /^\d+$/.test(t));
+    if (ordinalTok) {
+      const numbered = (context.enemyNames ?? []).find((e) =>
+        new RegExp(`\\b${ordinalTok}\\b\\s*$`).test(e.toLowerCase().trim()),
+      );
+      if (numbered) enemyHit = numbered;
+    }
     // Exact substring first.
+    if (!enemyHit)
     for (const eRaw of context.enemyNames ?? []) {
       const e = eRaw.toLowerCase();
       if (targetTokens.some((t) => e.includes(t) || t.includes(e))) {
@@ -1167,7 +1279,7 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
   const item = enemyHit || ambientStrongMatch
     ? undefined
     : resolveItem(targetTokens, inventory, context.equippedOffHand ?? null);
-  const noun = enemyHit ?? ambientStrongMatch ?? (item ? undefined : resolveContextNoun(targetTokens, recentNouns));
+  const noun = enemyHit ?? ambientStrongMatch ?? (item ? undefined : resolveContextNoun(targetTokens, recentNouns, context.lastInteractedNoun));
 
   // Confidence: 1.0 exact verb, falls off with distance; small boost from resolved target.
   const verbConfidence = Math.max(0.4, 1 - bestMatch.distance * 0.18);

@@ -62,7 +62,7 @@ export function BugReportModal({ visible, slots, onCancel, onSend }: Props) {
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim}>
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -70,7 +70,7 @@ export function BugReportModal({ visible, slots, onCancel, onSend }: Props) {
             >
               <View style={styles.card}>
                 <View style={styles.headerRow}>
-                  <Text style={styles.title}>REPORT A BUG</Text>
+                  <Text style={styles.title} accessibilityRole="header">REPORT A BUG</Text>
                   <View style={styles.ruleLine} />
                 </View>
 
@@ -130,6 +130,7 @@ export function BugReportModal({ visible, slots, onCancel, onSend }: Props) {
                       pressed && styles.btnPressed,
                     ]}
                     onPress={onCancel}
+                    accessibilityRole="button"
                   >
                     <Text style={[styles.btnText, styles.btnTextNeutral]}>CANCEL</Text>
                   </Pressable>
@@ -141,6 +142,8 @@ export function BugReportModal({ visible, slots, onCancel, onSend }: Props) {
                     ]}
                     onPress={handleSend}
                     disabled={!canSend}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: !canSend }}
                   >
                     <Text
                       style={[
@@ -175,6 +178,8 @@ function SlotRow({
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
       style={({ pressed }) => [
         styles.slotRow,
         selected && styles.slotRowSelected,
@@ -228,7 +233,7 @@ const styles = StyleSheet.create({
   ruleLine: { height: 1, backgroundColor: '#3a342c', marginTop: 6 },
   body: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 12 },
   sectionLabel: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 2,
@@ -270,8 +275,8 @@ const styles = StyleSheet.create({
   },
   slotLabel: { color: '#cdbf99', fontSize: 13 },
   slotLabelSelected: { color: '#e6d8b3', fontWeight: '700' },
-  slotSub: { color: '#7a705c', fontSize: 10, marginTop: 1 },
-  emptyHint: { color: '#7a705c', fontSize: 11, padding: 10, fontStyle: 'italic' },
+  slotSub: { color: '#a2977b', fontSize: 10, marginTop: 1 },
+  emptyHint: { color: '#a2977b', fontSize: 11, padding: 10, fontStyle: 'italic' },
   input: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

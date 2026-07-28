@@ -21,7 +21,10 @@ describe('race abilities — registry + cooldown logic', () => {
 
   it('ownedRaceAbilities returns only the player race', () => {
     const owned = ownedRaceAbilities(player({ raceId: 'mud_golem' }));
-    expect(owned.length).toBe(2); // Regenerative Core + Elemental Control
+    // OTA-835 — Elemental Control gained its defensive half (elemental_ward),
+    // so the Mud Golem now owns 3: Regenerative Core + Elemental Control (Strike)
+    // + Elemental Control (Ward).
+    expect(owned.length).toBe(3);
     expect(owned.every((a) => a.raceId === 'mud_golem')).toBe(true);
   });
 

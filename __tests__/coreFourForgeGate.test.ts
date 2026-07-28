@@ -7,7 +7,7 @@ import {
   fourCoreForgeLine,
   markTwistFired,
 } from '../app/engine/mainQuest';
-import { RECIPES } from '../app/engine/crafting';
+import { RECIPES, lookupCraftedItem } from '../app/engine/crafting';
 import type { MainQuestState } from '../app/engine/types';
 
 const state = (coreCount: number, fired: string[] = []): MainQuestState => ({
@@ -17,17 +17,22 @@ const state = (coreCount: number, fired: string[] = []): MainQuestState => ({
 } as unknown as MainQuestState);
 
 describe('OTA-495 — Core-4 forge gate', () => {
-  it('the four golem-armament recipes require 4 Cores', () => {
-    const golem = RECIPES.filter((r) =>
-      ['Golem Sledge', 'Golem Greatsword', 'Golem Pike', 'Golem Aether-Lance'].includes(r.result),
-    );
-    expect(golem).toHaveLength(4);
-    for (const r of golem) expect(r.coresRequired).toBe(4);
+  it('every golem-armament recipe sits behind a tiered Core gate (3 types × 3 tiers = 9)', () => {
+    // OTA-720 — the armaments are now TIERED (Crude/base/Elder for Sledge/
+    // Greatsword/Pike; Aether-Lance retired). All 9 sit behind the Core gate, but
+    // the count scales with the tier: Crude = 1, base = 2, Elder = 4. (The Core-4
+    // FORGE BEAT still fires at the 4th Core — see the beat test below.)
+    const golem = RECIPES.filter((r) => (lookupCraftedItem(r.result).tags ?? []).includes('golem_weapon'));
+    expect(golem).toHaveLength(9);
+    for (const r of golem) {
+      const expected = r.result.startsWith('Crude') ? 1 : r.result.startsWith('Elder') ? 4 : 2;
+      expect(r.coresRequired).toBe(expected);
+    }
   });
 
   it('no NON-golem recipe accidentally picked up a cores gate', () => {
     const gated = RECIPES.filter((r) => typeof r.coresRequired === 'number');
-    expect(gated.every((r) => r.result.startsWith('Golem '))).toBe(true);
+    expect(gated.every((r) => (lookupCraftedItem(r.result).tags ?? []).includes('golem_weapon'))).toBe(true);
   });
 
   it('the forge beat fires exactly once, at the 4th Core', () => {
@@ -45,7 +50,10 @@ describe('OTA-495 — Core-4 forge gate', () => {
     expect(twice.twistsFired!.filter((t) => t === 'four_core_forge')).toHaveLength(1);
   });
 
-  it('the unlock line mentions golem armaments', () => {
-    expect(fourCoreForgeLine()).toMatch(/golem armaments can now be forged/i);
+  it('the unlock line announces the basics + hints at stronger ones in the world', () => {
+    const line = fourCoreForgeLine();
+    expect(line).toMatch(/golem armaments can now be forged/i);
+    expect(line).toMatch(/basic patterns are yours/i);
+    expect(line).toMatch(/uncover stronger ones|master schematics/i);
   });
 });

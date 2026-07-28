@@ -2,7 +2,7 @@ import type { RollStep, PlayerCharacter, Enemy, Stats, StatusEffect, WeaponReach
 import { rollDie } from './rng';
 import { findWeaponByName, type CatalogWeapon } from './crafting';
 import { effectiveStats } from './equipment';
-import { traitACBonus } from './enemyTraits';
+import { traitACBonus, enemyIsAerial } from './enemyTraits';
 import { barehandDamageFor } from './raceMechanics';
 import { titlePerkModifiers, type TitlePerks } from './titles';
 
@@ -47,14 +47,17 @@ function raceSkillBonus(
   const parts: string[] = [];
   const add = (v: number, name: string) => { bonus += v; parts.push(name); };
   // Ancient/relic INVESTIGATE — Giants, Aetherborn, Reclaimers each read the
-  // old world better; Mud Dwellers handle the tech (Relic Savvy, DEX); Unknowing
-  // Masses' Curious Mind sharpens on Tartaria's secrets once they've seen them.
+  // old world better; Mud Dwellers handle the tech (Relic Savvy, DEX).
+  // OTA-835 — the Unknowing Masses' "Curious Mind" line was removed here: it no
+  // longer fires as a per-roll investigate bonus. It now AWAKENS a persistent
+  // +2 INT / +2 WIS the first time they touch a relic/ruin (curiousMindAwakened,
+  // applied in effectiveStats), which already lifts these rolls — keeping the
+  // line too would double-count.
   if (intent === 'investigate' && ctx?.relicTarget) {
     if (r === 'tartarian_giant') add(1, 'Ancient Insight');
     else if (r === 'aetherborn') add(2, 'Aetheric Awakening');
     else if (r === 'reclaimer') add(1, 'Ruins Specialist');
     else if (r === 'mud_dweller') add(2, 'Relic Savvy');
-    else if (r === 'unknowing_mass') add(2, 'Curious Mind');
   }
   // Aethercraft = the CAST discipline. Mud Dwellers (True Tartarians) trained it.
   if (intent === 'cast' && r === 'mud_dweller') add(2, 'Aethercraft Mastery');
@@ -143,6 +146,15 @@ export function rollMods(
           bonus += 4;
           sources.push('distract +4');
           consume.push('distracted');
+        }
+        break;
+      // OTA-795 — perfect opening (successful dodge): no to-hit change; the
+      // window is CONSUMED by this swing whether it lands or not. The damage
+      // doubling itself rides on buildCombatSteps' peek of the same status.
+      case 'perfect_opening':
+        if (action === 'attack_ranged' || action === 'attack_melee') {
+          sources.push('perfect opening (2× dice)');
+          consume.push('perfect_opening');
         }
         break;
       case 'dodging':
@@ -291,7 +303,10 @@ export function getEquippedWeapon(
   // consume-on-hit + auto-unequip is handled in gameStore's
   // attack path (look for the 'throwable' tag branch).
   for (const it of player.inventory) {
-    if (!(it.tags ?? []).some((t) => /throwable/i.test(t))) continue;
+    // OTA-1024 — canonical: a stale Shaped Aetheric Shard swung BARE-HANDED here
+    // while the consume-on-throw path spared it (asymmetric snapshot reads).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    if (!(require('./bandolierEligibility') as typeof import('./bandolierEligibility')).itemIsThrowable(it)) continue;
     if (it.name.toLowerCase() !== name.toLowerCase()) continue;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { throwDamageNotation } = require('./itemWeight');
@@ -358,6 +373,19 @@ function attackStatFor(
     case 'runecaster': return { value: stats.intelligence, label: 'INT' };
     default: return { value: stats.strength, label: 'STR' };
   }
+}
+
+/** OTA-1009 — CHARISMA IS NOT A TO-HIT STAT. It is the social stat; nothing you
+ *  swing, fire or throw rolls it. The weapon catalog once carried `charisma` on
+ *  every single_handed row (42 weapons, 7 of them Legendary) — a silent penalty
+ *  for any character whose CHA trailed their STR, and invisible because nothing
+ *  outside the combat log names the stat a weapon uses. The data is fixed; this
+ *  is the runtime backstop so a bad row can never quietly cost a fight again.
+ *  A weapon that somehow arrives carrying charisma falls back to the class
+ *  default (STR melee / DEX ranged / INT runecaster) instead of being obeyed. */
+export function isValidAttackStat(stat: string | undefined): boolean {
+  return stat === 'strength' || stat === 'dexterity'
+    || stat === 'intelligence' || stat === 'wisdom';
 }
 
 function enemyAC(enemy: Enemy): number {
@@ -428,16 +456,35 @@ export function buildCombatSteps(
   // regardless of what's equipped — lets the player choose to sacrifice
   // damage in exchange for the bludgeoning damage type or to spare the
   // weapon's durability.
-  const forcesBarehand = isBareHandAttack(actionText);
   const prefersOff = /\boff[- ]?hand\b/.test(actionText.toLowerCase());
-  const equipped = forcesBarehand ? null : getEquippedWeapon(player, prefersOff ? 'off' : 'main');
+  // OTA-931 — a bare-hand keyword (punch/kick/FIST/knee/elbow/headbutt) lets the player
+  // deliberately punch INSTEAD of using their weapon. But it must NOT fire when the keyword
+  // is part of the EQUIPPED weapon's OWN name — the Tartarian Giant's starter "Mud-fist
+  // Wraps" contains "fist", so "attack with the mud-fist wraps" wrongly dropped the weapon
+  // and swung bare-handed. Strip the equipped weapon's name before the bare-hand check; a
+  // standalone "punch it" still punches.
+  const candidateWeapon = getEquippedWeapon(player, prefersOff ? 'off' : 'main');
+  const normText = (s: string) => s.toLowerCase().replace(/[-_]/g, ' ').replace(/\s+/g, ' ');
+  const barehandText = candidateWeapon?.name
+    ? normText(actionText).split(normText(candidateWeapon.name)).join(' ')
+    : normText(actionText);
+  // OTA-932 — a HAND weapon (tagged 'barehanded' — the Mud-fist Wraps, the gauntlets, the
+  // Giant Bone Knuckles) IS your fist, so "punch"/"kick" should swing IT, not bare skin.
+  // Only force an unarmed strike when the equipped weapon is NOT a hand-weapon (e.g. you
+  // deliberately punch while holding a sword, for the bludgeoning type / to spare durability).
+  const wieldsHandWeapon = (candidateWeapon?.tags ?? []).some((t) => t.toLowerCase() === 'barehanded');
+  const forcesBarehand = isBareHandAttack(barehandText) && !wieldsHandWeapon;
+  const equipped = forcesBarehand ? null : candidateWeapon;
   const wc: WeaponClass = equipped?.weaponKind ?? detectWeaponClass(actionText);
   // Stat used for the attack roll factors in any equipped accessory bonuses
   // (rings/amulets boosting STR/DEX/INT/WIS/CHA) PLUS the active weather's
   // stat modifiers (Iron Fog −1 DEX etc.) so the world's mood is in every
   // swing.
   const stats = effectiveStats(player, opts?.weatherMod);
-  const stat = equipped
+  // OTA-1009 — trust the row only if it names a stat you can actually fight with.
+  // See isValidAttackStat: charisma on a weapon is always an authoring error,
+  // and obeying it costs the player the fight silently.
+  const stat = equipped && isValidAttackStat(equipped.stat)
     ? { value: stats[equipped.stat], label: STAT_LABEL[equipped.stat] }
     : attackStatFor(wc, stats);
   // OTA-362 — acid armor shred lowers the target's effective AC (floored
@@ -478,6 +525,21 @@ export function buildCombatSteps(
   // both bonuses on the SAME swing — the player's first attack after the
   // dog distracts gets initiative +1 AND attack +4.
   const distractBonus = (player.statusEffects ?? []).some((e) => e.kind === 'distracted') ? 1 : 0;
+  // OTA-795 — perfect opening (successful dodge). Peek only; rollMods consumes
+  // the status on the attack step, so the window is spent by this swing whether
+  // it lands or not. Doubles the damage DICE — the same treatment as a crit,
+  // and they stack (a crit through a perfect opening is 4× dice).
+  const perfectOpening = (player.statusEffects ?? []).some((e) => e.kind === 'perfect_opening');
+  // OTA-847 (STEALTH SYSTEM) — BACKSTAB. Striking from stealth (the `stealthed`
+  // buff, earned via the first-action SNEAK ATTACK opener or a mid-combat
+  // re-stealth) with a FINESSE / thrown weapon (stat 'dexterity') doubles the
+  // damage dice — the rogue payoff. A HEAVY weapon striking from stealth still
+  // gets the +5 to-hit from `stealthed` (rollMods), but no dice-doubling — a
+  // plain SNEAK STRIKE, so heavy builds can still use the button, they just
+  // don't get the multiplier. Peek only; the +5 consume happens in rollMods,
+  // the same peek/consume split perfect_opening uses, so one swing gets both.
+  const backstab = (player.statusEffects ?? []).some((e) => e.kind === 'stealthed')
+    && equipped?.stat === 'dexterity';
   // OTA-403 — manual weapon-coating damage roll. If the swinging weapon
   // instance carries a coating, append a 4th 'coating' step so the player
   // ROLLS the coating's bonus damage themselves (it was auto-rolled inside
@@ -494,6 +556,9 @@ export function buildCombatSteps(
       : (player.equipped?.mainId ?? player.equipped?.offId ?? null);
   const coatInst = coatSlotId ? (player.inventory ?? []).find((i) => i.id === coatSlotId) : null;
   const coating = coatInst?.coating ?? null;
+  // OTA-873 — a Crucible-upgraded weapon carries a SECOND coating that also rolls
+  // and applies on every landing hit (staged as its own 'coating2' roll step below).
+  const coating2 = coatInst?.coating2 ?? null;
 
   const steps: RollStep[] = [
     {
@@ -559,13 +624,13 @@ export function buildCombatSteps(
       id: 'damage',
       label: 'Roll for DAMAGE',
       sides: dmg.sides,
-      count: dmg.count,
+      count: (perfectOpening || backstab) ? dmg.count * 2 : dmg.count,
       bonus: damageBonus + aetherSurge,
       bonusLabel: [
         damageBonus !== 0 ? `${damageBonus > 0 ? '+' : ''}${damageBonus} (race)` : '',
         aetherSurge > 0 ? `+${aetherSurge} (Aetheric surge 1d6)` : '',
       ].filter(Boolean).join(' '),
-      context: `damage dealt to ${enemy.name}${damageTypeNote}`,
+      context: `damage dealt to ${enemy.name}${damageTypeNote}${perfectOpening ? ' — PERFECT OPENING (double dice)' : backstab ? ' — BACKSTAB (double dice)' : ''}`,
       // no target — always applies if the attack hit
     },
   ];
@@ -581,6 +646,20 @@ export function buildCombatSteps(
       bonusLabel: '',
       context: `${coating.label} coating — extra ${coating.kind} damage to ${enemy.name}`,
       // no target — bonus damage that applies whenever the strike landed
+    });
+  }
+  // OTA-873 — the second coating on an upgraded weapon rolls its own step, so the
+  // player sees (and rolls) BOTH coatings landing on the strike.
+  if (coating2) {
+    const cd2 = parseDamageDice(coating2.dice);
+    steps.push({
+      id: 'coating2',
+      label: `Roll for ${coating2.label.toUpperCase()} COATING`,
+      sides: cd2.sides,
+      count: cd2.count,
+      bonus: 0,
+      bonusLabel: '',
+      context: `${coating2.label} coating — extra ${coating2.kind} damage to ${enemy.name}`,
     });
   }
 
@@ -610,6 +689,37 @@ export function parseDamageDice(notation: string): { sides: number; count: numbe
 export const FLEE_GRACE_STEPS = 3;
 export function fleeGraceApplies(intent: string, skillSucceeded: boolean, tilesSeen: number): boolean {
   return intent === 'escape' && !skillSucceeded && tilesSeen <= FLEE_GRACE_STEPS;
+}
+
+/** OTA-1032 — CONTESTED FLEE. The fastest live enemy opposes an in-combat escape:
+ *  its d20 + speed sets the bar the player's d20 + DEX must meet. Speed reads
+ *  the DATA the bestiary already declares — the AP number, then the movement
+ *  traits (quick +2, agile +2, aerial +3, slow -3), clamped 0..14. Only the
+ *  single fastest pursuer matters: you only need to outrun the one who can
+ *  catch you. The flat DC 9 below still governs escapes with no pursuer
+ *  (traps, hook escape stages) — but a growing DEX had outrun it in combat:
+ *  at DEX 8+, d20 min 1 + 8 >= 9 meant a flee could NEVER fail. */
+export interface EscapePursuit {
+  bonus: number;
+  label: string;
+  /** Test injection for the pursuer's d20; production rolls it live. */
+  d20?: number;
+}
+export function escapePursuit(enemies: readonly Enemy[]): EscapePursuit | null {
+  let best: EscapePursuit | null = null;
+  for (const e of enemies) {
+    const apMatch = String(e.abilityPoint ?? '').match(/\d+/);
+    const ap = apMatch ? parseInt(apMatch[0], 10) : 3;
+    const t = e.traits ?? [];
+    let speed = ap;
+    if (t.includes('quick')) speed += 2;
+    if (t.includes('agile')) speed += 2;
+    if (enemyIsAerial(e)) speed += 3;
+    if (t.includes('slow')) speed -= 3;
+    speed = Math.max(0, Math.min(14, speed));
+    if (!best || speed > best.bonus) best = { bonus: speed, label: e.name };
+  }
+  return best;
 }
 
 const SKILL_DC: Record<string, number> = {
@@ -685,7 +795,7 @@ const INTENT_ACTION_VERB: Record<string, string> = {
 export function buildSkillSteps(
   intent: string,
   player: PlayerCharacter,
-  opts?: { weatherMod?: Partial<Stats>; companionAssist?: boolean; statusMods?: RollMods; raceCtx?: RaceSkillContext },
+  opts?: { weatherMod?: Partial<Stats>; companionAssist?: boolean; statusMods?: RollMods; raceCtx?: RaceSkillContext; pursuit?: EscapePursuit | null },
 ): RollStep[] {
   const statKey = SKILL_STAT[intent] ?? 'wisdom';
   const stats = effectiveStats(player, opts?.weatherMod);
@@ -693,6 +803,13 @@ export function buildSkillSteps(
   const statLabel = STAT_LABEL[statKey];
   const dc = SKILL_DC[intent] ?? 12;
   const dcName = DC_NAME[dc] ?? '';
+  // OTA-1032 — contested flee (see escapePursuit above): a live pursuer's rolled
+  // d20 + speed replaces the flat DC. Ties go to the runner (success is
+  // total >= target), and the first-steps flee grace still nudges a failed
+  // roll for brand-new characters exactly as before.
+  const pursuit = intent === 'escape' ? opts?.pursuit ?? null : null;
+  const pursuitD20 = pursuit ? (pursuit.d20 ?? 1 + Math.floor(Math.random() * 20)) : 0;
+  const target = pursuit ? pursuitD20 + pursuit.bonus : dc;
   const verb = INTENT_ACTION_VERB[intent] ?? intent.toUpperCase();
   const label = `Roll to ${verb}`;
   // Companion assist — +2 bonus when a companion is present. Stacks
@@ -720,8 +837,12 @@ export function buildSkillSteps(
     count: 1,
     bonus: statVal + assistBonus + statusNet + perkBonus,
     bonusLabel: `${statLabel} ${statVal}${assistLabel}${perkLabel}${statusLabel}`,
-    target: dc,
-    targetLabel: `DC ${dc}${dcName ? ` — ${dcName}` : ''}`,
-    context: `d20 + ${statLabel}${assistLabel}${perkLabel}${statusLabel} vs ${dcName || 'DC'} ${dc}`,
+    target,
+    targetLabel: pursuit
+      ? `Pursuit ${target} — ${pursuit.label} (d20 ${pursuitD20} + SPD ${pursuit.bonus})`
+      : `DC ${dc}${dcName ? ` — ${dcName}` : ''}`,
+    context: pursuit
+      ? `d20 + ${statLabel}${assistLabel}${perkLabel}${statusLabel} vs ${pursuit.label} — contested chase`
+      : `d20 + ${statLabel}${assistLabel}${perkLabel}${statusLabel} vs ${dcName || 'DC'} ${dc}`,
   }];
 }

@@ -31,6 +31,17 @@ import type { PlayerCharacter, Stats } from './types';
  *  the per-use AMOUNT that varies. */
 export const LEVEL_UP_THRESHOLD = 100;
 
+// OTA-800 — hard training ceiling. Before this, a stat trained forever (the
+// 23+ tier still awards 0.1/use), so a patient grind against a pet weak enemy
+// could push a stat into the hundreds and trivialize the game (damage/AC/skill
+// DCs all key off the raw stat). 30 is the design's own stated peak — the curve
+// comment above calls "30 STR ... still grindable in a long enough session" the
+// late-game target, and the 23+ tier costs ~1000 uses per point, so reaching 30
+// is already an extreme commitment; nobody hits it in normal play, but it bounds
+// the exploit. Tunable design knob — mirrored on the dog (dogCompanion.ts) and
+// golem (golems.ts) training twins so no companion out-scales it either.
+export const MAX_TRAINED_STAT = 30;
+
 export type StatKey = keyof Stats;
 
 /** How much progress one successful use awards, given the current
@@ -38,6 +49,12 @@ export type StatKey = keyof Stats;
  *  costs more than the last, with a floor at 0.1 so 30 STR is
  *  still grindable in a long enough session. */
 export function progressAwardFor(currentStat: number): number {
+  // OTA-999 — COLD START (owner: "why does STE build so slowly... still at 0").
+  // Stealth is the only stat that can start at 0, and 100-progress bars at
+  // +3/use meant ~34 successful sneaks for the FIRST point. A stat still in
+  // the 0-2 band earns double, so the first points come in ~17 uses; the
+  // normal curve resumes at 3.
+  if (currentStat <= 2)  return 6;
   if (currentStat <= 5)  return 3;
   if (currentStat <= 10) return 2;
   if (currentStat <= 14) return 1;
@@ -68,17 +85,61 @@ export function trainStat(
 ): TrainResult {
   if (!success) return { player, leveled: null };
   const baseStat = player.stats[stat];
+  // OTA-800 — at the ceiling the stat can't climb; stop training it (and don't
+  // bank progress that could never cash out).
+  if (baseStat >= MAX_TRAINED_STAT) return { player, leveled: null };
   const amount = progressAwardFor(baseStat);
   if (amount <= 0) return { player, leveled: null };
   const prevProgress = player.statProgress?.[stat] ?? 0;
   let progress = prevProgress + amount;
   let next = baseStat;
   let leveled: TrainResult['leveled'] = null;
-  while (progress >= LEVEL_UP_THRESHOLD) {
+  while (progress >= LEVEL_UP_THRESHOLD && next < MAX_TRAINED_STAT) {
     progress -= LEVEL_UP_THRESHOLD;
     const before = next;
     next = before + 1;
     if (!leveled) leveled = { stat, from: before, to: next };
+  }
+  // Just hit the ceiling — flush leftover progress so the bar reads full-and-done
+  // instead of stranding a partial that can never level.
+  if (next >= MAX_TRAINED_STAT) progress = 0;
+  return {
+    player: {
+      ...player,
+      stats: { ...player.stats, [stat]: next },
+      statProgress: { ...(player.statProgress ?? {}), [stat]: progress },
+    },
+    leveled,
+  };
+}
+
+/** OTA-999 — NEAR-MISS learning, deliberately the LOWER road (owner: "make
+ *  failure a lower route — I don't want it to snowball once the needle starts
+ *  moving"). Only while the stat sits in the cold-start band (<= 5), and only
+ *  a CLOSE failure (missed the DC by 1..3) pays — a flat +1, a sixth of a
+ *  cold-start success. Past the band, only real successes train, so the late
+ *  curve is untouched. Wired stealth-only at the call site. */
+export const NEAR_MISS_MARGIN = 3;
+export const NEAR_MISS_AWARD = 1;
+export const NEAR_MISS_MAX_STAT = 5;
+export function trainStatNearMiss(
+  player: PlayerCharacter,
+  stat: StatKey,
+  totalRolled: number,
+  dcNeeded: number,
+): TrainResult {
+  const base = player.stats[stat];
+  if (base > NEAR_MISS_MAX_STAT || base >= MAX_TRAINED_STAT) return { player, leveled: null };
+  const missBy = dcNeeded - totalRolled;
+  if (missBy <= 0 || missBy > NEAR_MISS_MARGIN) return { player, leveled: null };
+  const prevProgress = player.statProgress?.[stat] ?? 0;
+  let progress = prevProgress + NEAR_MISS_AWARD;
+  let next = base;
+  let leveled: TrainResult['leveled'] = null;
+  if (progress >= LEVEL_UP_THRESHOLD) {
+    progress -= LEVEL_UP_THRESHOLD;
+    next = base + 1;
+    leveled = { stat, from: base, to: next };
   }
   return {
     player: {
@@ -176,13 +237,17 @@ export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
     'Punch / kick attacks',
     'Landing melee attacks in combat',
     'Two-handed weapon swings',
+    'Winning a Fight-Back struggle',
     'Climbing (per tier)',
-    'Heavy salvage / breaking',
     'Carrying 20+ items in your pouch (passive, on new ground)',
   ],
   dexterity: [
+    'Landing hits with a finesse / ranged weapon',
+    'Dodging an attack in combat',
     'Climbing (per tier)',
-    'Parry / dodge in combat',
+    'Jumping to reach a resolved target',
+    'Disengaging under pressure',
+    'Escaping a trap / grapple (skill check)',
   ],
   intelligence: [
     'Scrapping items in your pack',
@@ -200,9 +265,10 @@ export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
     'Surviving wasteland encounters',
   ],
   charisma: [
+    'Talking a foe down in combat (persuade / intimidate)',
+    'Passing a diplomacy check in a hunt / mystery / storyline stage',
     'Buying from a vendor',
     'Selling to a vendor',
-    'Gifting to a vendor',
     'Accepting a hunt / mystery / storyline / faction contract',
     'Wearing named armor / wielding named weapon (passive, on new ground)',
     'Completing a storyline chapter',
@@ -210,8 +276,10 @@ export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
   // OTA-348 — Stealth's own activities (moved off DEX). Starting value is a
   // race-proportional roll; these grow it from there.
   stealth: [
-    'A successful STEALTH approach (the APPROACH "use stealth" toggle)',
-    'Stealing from vendors',
-    'Sleight-of-hand / pickpocket takes',
+    'A successful in-combat STEALTH — sneak attack or backstab (the STEALTH button)',
+    'A passed STEALTH skill check (hunt / mystery / storyline stage)',
+    'Pickpocketing a mark or vendor (the PICKPOCKET button)',
+    'Sleight-of-hand / opportunistic takes',
+    'Weathering a hit while cloaked in stealth gear (passive)',
   ],
 };

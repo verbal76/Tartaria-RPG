@@ -10,11 +10,23 @@
 // call site can either branch on the boolean or surface the reason.
 
 import type { InventoryItem, PlayerCharacter } from './types';
+// OTA-1020 — tag tests read canonical (instance-union-catalog) tags. Instances mint
+// with a tag SNAPSHOT; vials acquired before a catalog tag existed carried a
+// stale set forever and refused to rack while identical new ones racked fine.
+import { canonicalItemTags } from './crafting';
 
 /** True for a deliberate one-shot throwable (the `throwable` tag, anchored so a
  *  plain `thrown` rock never qualifies). Pure, item-only. */
 export function itemIsThrowable(item: InventoryItem): boolean {
-  return (item.tags ?? []).some((t) => /^throwable$/i.test(t));
+  return canonicalItemTags(item).includes('throwable');
+}
+
+/** OTA-690 — a weapon-coating vial (poison / acid / burn / electrical / corruption)
+ *  is also rackable as a ONE-SHOT throwable: hurled, it bursts for the coating's
+ *  full damage-over-time up front (per-turn × COATING_DOT_TURNS) instead of being
+ *  painted onto a weapon. Detected by the `weapon_coating` tag. */
+export function itemIsThrowableCoating(item: InventoryItem): boolean {
+  return canonicalItemTags(item).includes('weapon_coating');
 }
 
 export interface BandolierEligibility {
@@ -30,15 +42,15 @@ export function isBandolierEligible(
   if ((eq.bandolierIds ?? []).includes(item.id)) {
     return { eligible: false, reason: "that's already on your bandolier" };
   }
-  if (!itemIsThrowable(item)) {
-    return { eligible: false, reason: "that's not a throwable — the bandolier only holds one-shot throwables" };
+  if (!itemIsThrowable(item) && !itemIsThrowableCoating(item)) {
+    return { eligible: false, reason: "that's not a throwable — the bandolier holds one-shot throwables and coating vials" };
   }
   // OTA-605 — a bandolier racks SMALL ordnance (throwing knives, hand axes,
   // shards, vials). Long thrown shafts — javelins and throwing spears, which
   // all carry the `spear` tag — are one-shot throwables but too long to sit on
   // a bandolier; you carry those in hand. They stay throwable-from-hand (and
   // still spend on a throw); they're just not rackable here.
-  if ((item.tags ?? []).some((t) => /^spear$/i.test(t))) {
+  if (canonicalItemTags(item).includes('spear')) {
     return { eligible: false, reason: "a javelin or spear is too long for the bandolier — carry it in hand" };
   }
   // Mirror the pouch's off-hand guard: an item you're currently wielding can't also

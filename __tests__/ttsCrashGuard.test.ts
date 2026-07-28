@@ -14,6 +14,10 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 const KEY_TTS_IN_PROGRESS = 'tartaria.ml.ttsInProgress';
 const KEY_TTS_COUNT = 'tartaria.ml.ttsCrashCount';
 const KEY_TTS_DISABLED = 'tartaria.ml.ttsDisabledByCrash';
+// OTA-1008 — the count is scoped to the build that produced it, so a test about
+// counting has to say WHICH build it is counting on.
+const KEY_TTS_COUNT_BUILD = 'tartaria.ml.ttsCrashCountBuild';
+const THIS_BUILD = (require('../app/buildInfo') as typeof import('../app/buildInfo')).OTA_BUILD_ID;
 
 async function setup(seed: Record<string, string> = {}) {
   jest.resetModules();
@@ -34,6 +38,9 @@ describe('OTA-464 — voice (TTS) guard is detection-only (no auto-disable)', ()
 
   it('a surviving voice breadcrumb is COUNTED + NAMED but does NOT disable Kokoro', async () => {
     const { AS, m } = await setup({
+      // OTA-1008 — on the SAME build the breadcrumb still counts; only a build CHANGE
+      // forgives it (the reload that applies an OTA leaves this same crumb).
+      [KEY_TTS_COUNT_BUILD]: THIS_BUILD,
       [KEY_TTS_IN_PROGRESS]: JSON.stringify({ label: 'kokoro:am_michael', at: new Date().toISOString() }),
     });
     // Still counted for diagnostics...

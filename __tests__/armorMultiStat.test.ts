@@ -22,8 +22,9 @@ describe('multi-stat armor applies ALL base stats', () => {
     // constitution + hp are not PlayerCharacter base stats → not in the result.
     expect((b as Record<string, number>).constitution).toBeUndefined();
     expect((b as Record<string, number>).hp).toBeUndefined();
-    // hp is applied separately, to hpMax.
-    expect(armorHpBonus("Golem-Wielder's Helm")).toBe(10);
+    // hp is applied separately, to hpMax — and canonicalStatKey routes
+    // constitution → hp, so the helm's +10 hp and +1 constitution sum to 11.
+    expect(armorHpBonus("Golem-Wielder's Helm")).toBe(11);
   });
 
   it('empty equip yields no bonuses', () => {

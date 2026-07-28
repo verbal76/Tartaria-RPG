@@ -1,6 +1,7 @@
 [
   {
     "name": "Mud Boar",
+    "flavor": "A tusked scavenger fattened on drowned roots, it charges anything that disturbs its wallow.",
     "type": "Animal",
     "abilityPoint": "Strength 4",
     "attack": "Tusk Charge",
@@ -25,6 +26,7 @@
   },
   {
     "name": "Mud Wasp",
+    "flavor": "Its sting carries the sour rot of the flood-marsh; a swarm can drop a pack-strider in minutes.",
     "type": "Animal",
     "abilityPoint": "Dexterity 3",
     "attack": "Poison Sting",
@@ -42,6 +44,7 @@
   },
   {
     "name": "Swamp Crab",
+    "flavor": "Armored in silt-cemented shell, it waits half-buried until a foot strays within claw reach.",
     "type": "Animal",
     "abilityPoint": "Strength 2",
     "attack": "Claw Pinch",
@@ -60,6 +63,7 @@
   },
   {
     "name": "Gutter Rat",
+    "flavor": "Bred fat in the drowned undercities, it fears nothing that bleeds and travels in the dozens.",
     "type": "Animal",
     "abilityPoint": "Dexterity 2",
     "attack": "Bite",
@@ -82,6 +86,7 @@
   },
   {
     "name": "Bog Hound",
+    "flavor": "A lean marsh-runner that hunts in coordinated packs, driving prey into the sucking mud.",
     "type": "Animal",
     "abilityPoint": "Dexterity 3",
     "attack": "Pack Attack",
@@ -106,6 +111,7 @@
   },
   {
     "name": "Mudling",
+    "flavor": "A crude thing of animate silt, barely more than a grasping fist given the will to grasp.",
     "type": "Mud Creature",
     "abilityPoint": "Dexterity 4",
     "attack": "Mud Whip",
@@ -128,6 +134,7 @@
   },
   {
     "name": "Aetheric Ooze",
+    "flavor": "A puddle of dissolving hunger, its acids fed by leaking Aether from a cracked conduit below.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Intelligence 3",
     "attack": "Acidic Dissolve",
@@ -152,6 +159,7 @@
   },
   {
     "name": "Aetherbat",
+    "flavor": "Blind and shrieking, it navigates the buried halls by a sonar keyed to Aetheric resonance.",
     "type": "Aetheric Creature",
     "abilityPoint": "Dexterity 3",
     "attack": "Sonic Scream",
@@ -176,6 +184,7 @@
   },
   {
     "name": "Mud Strider",
+    "flavor": "Long-legged and quick, it skates the flood-flats on splayed feet and stabs from a distance.",
     "type": "Mud Creature",
     "abilityPoint": "Dexterity 4",
     "attack": "Spear Jab",
@@ -193,6 +202,7 @@
   },
   {
     "name": "Aetheric Leech",
+    "flavor": "It fastens on and drinks the warmth from you — and the charge, if you carry any.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Dexterity 4",
     "attack": "Energy Drain",
@@ -210,6 +220,7 @@
   },
   {
     "name": "Mud Tortoise",
+    "flavor": "Ancient and patient, its shell has turned aside blades since before the waters rose.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 5",
     "attack": "Shell Smash",
@@ -230,6 +241,7 @@
   },
   {
     "name": "Aetheric Spider",
+    "flavor": "Its web hums faintly with stored charge; the strands cling, and the bite burns cold.",
     "type": "Aetheric Creature",
     "abilityPoint": "Dexterity 3",
     "attack": "Web Trap",
@@ -255,6 +267,7 @@
   },
   {
     "name": "Scrap Drone",
+    "flavor": "A salvage automaton gone feral, still running the last order it was ever given: clear the area.",
     "type": "Automation",
     "abilityPoint": "Dexterity 3",
     "attack": "Drill Arm",
@@ -282,6 +295,7 @@
   },
   {
     "name": "Aetheric Worm",
+    "flavor": "It bores through packed silt on a trail of hissing acid, surfacing only to feed.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Dexterity 4",
     "attack": "Acid Spit",
@@ -299,6 +313,7 @@
   },
   {
     "name": "Mud Imp",
+    "flavor": "A spiteful little marsh-sprite that strikes from cover and vanishes before you turn.",
     "type": "Mud Creature",
     "abilityPoint": "Dexterity 3",
     "attack": "Sneak Attack",
@@ -316,6 +331,7 @@
   },
   {
     "name": "Aetheric Slug",
+    "flavor": "Slow as tar and twice as ruinous, it leaves a smoking track that etches stone.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Dexterity 3",
     "attack": "Acid Trail",
@@ -334,6 +350,7 @@
   },
   {
     "name": "Mud Spider",
+    "flavor": "It spins snares between drowned pillars and waits, patient, for the strands to tremble.",
     "type": "Mud Creature",
     "abilityPoint": "Dexterity 4",
     "attack": "Web Trap",
@@ -358,6 +375,7 @@
   },
   {
     "name": "Aetheric Raven",
+    "flavor": "A carrion bird that roosts on dead conduits, its feathers oil-slicked with Aetheric residue.",
     "type": "Aetheric Creature",
     "abilityPoint": "Dexterity 4",
     "attack": "Beak Peck",
@@ -381,6 +399,7 @@
   },
   {
     "name": "Mud Lurker",
+    "flavor": "It lies flat in the shallows as harmless ground until the mud itself rears up and swings.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 5",
     "attack": "Mud Smash",
@@ -403,6 +422,7 @@
   },
   {
     "name": "Silt Serpent",
+    "flavor": "A coil of muscle and venom that swims the flood-channels, striking before the ripple reaches you.",
     "type": "Mud Creature",
     "abilityPoint": "Dexterity 5",
     "attack": "Coil Crush",
@@ -427,6 +447,7 @@
   },
   {
     "name": "Aetheric Drone",
+    "flavor": "A war-era sentry still on patrol, its lens sweeping the dark for anything that moves.",
     "type": "Automation",
     "abilityPoint": "Dexterity 4",
     "attack": "Laser Beam",
@@ -454,6 +475,7 @@
   },
   {
     "name": "Silt Stalker",
+    "flavor": "It reads the tremor of your steps through the mud and opens the throat before you see it.",
     "type": "Mud Creature",
     "abilityPoint": "Dexterity 5",
     "attack": "Quick Claw",
@@ -472,6 +494,7 @@
   },
   {
     "name": "Mud Viper",
+    "flavor": "Small, drab, and lethal — its bite floods the blood with marsh-rot in a single beat.",
     "type": "Animal",
     "abilityPoint": "Dexterity 4",
     "attack": "Venom Strike",
@@ -490,6 +513,7 @@
   },
   {
     "name": "Dust Fiend",
+    "flavor": "A whirl of grit and stale Aether given shape, it flays exposed skin with razoring wind.",
     "type": "Aetheric Creature",
     "abilityPoint": "Dexterity 5",
     "attack": "Wind Slash",
@@ -508,6 +532,7 @@
   },
   {
     "name": "Rust Lurker",
+    "flavor": "A corroded machine that hunts by heat, dragging its seized joints toward anything warm.",
     "type": "Automation",
     "abilityPoint": "Dexterity 4",
     "attack": "Claw Slash",
@@ -533,6 +558,7 @@
   },
   {
     "name": "Bog Creeper",
+    "flavor": "A tangle of animate vine that reaches from the reeds; cut it and it only grows a new lash.",
     "type": "Mud Creature",
     "abilityPoint": "Dexterity 4",
     "attack": "Vine Lash",
@@ -551,6 +577,7 @@
   },
   {
     "name": "Mud Hound Alpha",
+    "flavor": "Scarred and cunning, it leads the pack from the front and takes the killing bite for itself.",
     "type": "Animal",
     "abilityPoint": "Strength 5",
     "attack": "Alpha Strike",
@@ -570,6 +597,7 @@
   },
   {
     "name": "Plague Moth",
+    "flavor": "Its wing-dust chokes the lungs and blooms with sickness; the swarm follows the dying.",
     "type": "Animal",
     "abilityPoint": "Dexterity 3",
     "attack": "Dust Cloud",
@@ -587,6 +615,7 @@
   },
   {
     "name": "Aetheric Salamander",
+    "flavor": "It nests in vent-heat and breathes it back out, indifferent to fire and hungry for flesh.",
     "type": "Aetheric Creature",
     "abilityPoint": "Dexterity 5",
     "attack": "Fire Breath",
@@ -604,6 +633,7 @@
   },
   {
     "name": "Aetheric Scarab",
+    "flavor": "An armored beetle the size of a shield, its carapace crackling with siphoned charge.",
     "type": "Aetheric Creature",
     "abilityPoint": "Dexterity 4",
     "attack": "Energy Spike",
@@ -621,6 +651,7 @@
   },
   {
     "name": "Aetheric Shrike",
+    "flavor": "It impales its kills on broken rebar and comes back for them between hunts.",
     "type": "Aetheric Creature",
     "abilityPoint": "Dexterity 5",
     "attack": "Talon Slash",
@@ -639,6 +670,7 @@
   },
   {
     "name": "Iron Spider",
+    "flavor": "A clockwork weaver whose legs end in drills, ticking as it circles for the soft angle.",
     "type": "Automation",
     "abilityPoint": "Dexterity 5",
     "attack": "Metal Bite",
@@ -659,6 +691,7 @@
   },
   {
     "name": "Mud Spirit",
+    "flavor": "The lingering will of something drowned, it passes through steel and chills the blood to touch.",
     "type": "Mud Creature",
     "abilityPoint": "Intelligence 5",
     "attack": "Spirit Touch",
@@ -677,6 +710,7 @@
   },
   {
     "name": "Mud Harpy",
+    "flavor": "A shrieking flood-scavenger that stoops from the rafters, all talons and stinking wings.",
     "type": "Mud Creature",
     "abilityPoint": "Dexterity 5",
     "attack": "Claw Attack",
@@ -695,6 +729,7 @@
   },
   {
     "name": "Shifting Shade",
+    "flavor": "A smear of living dark that thins and reforms, always a half-step from where you strike.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Dexterity 6",
     "attack": "Shadow Strike",
@@ -715,6 +750,7 @@
   },
   {
     "name": "Mud Golem",
+    "flavor": "A slab of packed clay walking on borrowed purpose — flood-sludge that woke where the trapped Etheric charge ran hottest, a scrap of the empire's own thermodynamic hubris up on its feet. Blunt force cracks what blades cannot.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 8",
     "attack": "Slam",
@@ -735,6 +771,7 @@
   },
   {
     "name": "Aetheric Hound",
+    "flavor": "A beast rebuilt by leaking Aether — too many teeth, and a hunger that never banks.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Dexterity 7",
     "attack": "Bite",
@@ -754,6 +791,7 @@
   },
   {
     "name": "Mud Siren",
+    "flavor": "Its song bends the will toward the deep water; sailors of the flood-roads carry wax for a reason.",
     "type": "Mud Creature",
     "abilityPoint": "Intelligence 6",
     "attack": "Siren Song",
@@ -772,6 +810,7 @@
   },
   {
     "name": "Aetheric Apparition",
+    "flavor": "A half-there thing of cold light, it swipes with hands that pass through armor to the nerve.",
     "type": "Aetheric Creature",
     "abilityPoint": "Dexterity 6",
     "attack": "Aethereal Swipe",
@@ -791,6 +830,7 @@
   },
   {
     "name": "Steam Walker",
+    "flavor": "A pressure-driven war-frame venting scalding clouds, slow but ruinous when it connects.",
     "type": "Mechanism",
     "abilityPoint": "Strength 8",
     "attack": "Steam Blast",
@@ -811,6 +851,7 @@
   },
   {
     "name": "Rock Basilisk",
+    "flavor": "Its flat gaze stiffens the muscles to stone; hunters learn to strike by sound alone.",
     "type": "Mud Creature",
     "abilityPoint": "Intelligence 6",
     "attack": "Stone Gaze",
@@ -830,6 +871,7 @@
   },
   {
     "name": "Steel Hound",
+    "flavor": "A guard-machine with a beast's ferocity, its jaws rated to shear through plate.",
     "type": "Automation",
     "abilityPoint": "Strength 7",
     "attack": "Bite",
@@ -851,6 +893,7 @@
   },
   {
     "name": "Shifting Phantom",
+    "flavor": "It phases between the layers of the ruin, landing blows from angles that shouldn't exist.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Dexterity 7",
     "attack": "Phase Claw",
@@ -871,6 +914,7 @@
   },
   {
     "name": "Flesh Weaver",
+    "flavor": "A ruin of grafted meat that knits its wounds shut mid-fight and reaches for more material.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Dexterity 8",
     "attack": "Flesh Rip",
@@ -890,6 +934,7 @@
   },
   {
     "name": "Jade Serpent",
+    "flavor": "Beautiful and quiet, its green scales hide a venom that stops the heart three beats later.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Dexterity 7",
     "attack": "Poison Strike",
@@ -908,6 +953,7 @@
   },
   {
     "name": "Mud Cyclops",
+    "flavor": "A one-eyed brute of hardened silt whose gaze focuses the light into a searing lance.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 8",
     "attack": "Eye Beam",
@@ -926,6 +972,7 @@
   },
   {
     "name": "Crystalline Entity",
+    "flavor": "A lattice of grown Aether-crystal that rings when struck and shatters into cutting shards.",
     "type": "Aetheric Creature",
     "abilityPoint": "Intelligence 7",
     "attack": "Crystal Shard",
@@ -945,6 +992,7 @@
   },
   {
     "name": "Aether Serpent",
+    "flavor": "It swims the charged air of dead reactor halls, its bite delivering a killing jolt.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Dexterity 6",
     "attack": "Electric Bite",
@@ -963,6 +1011,7 @@
   },
   {
     "name": "Steam Golem",
+    "flavor": "A boiler on legs, each hammer-blow announced by a shriek of escaping pressure.",
     "type": "Automation",
     "abilityPoint": "Strength 8",
     "attack": "Steam Hammer",
@@ -984,6 +1033,7 @@
   },
   {
     "name": "Aetheric Harpy",
+    "flavor": "Its shriek alone can stagger a line; the talons that follow finish the work.",
     "type": "Aetheric Creature",
     "abilityPoint": "Dexterity 6",
     "attack": "Shriek",
@@ -1002,6 +1052,7 @@
   },
   {
     "name": "Clockwork Knight",
+    "flavor": "A dueling automaton still keeping its ancient forms, precise, tireless, and merciless.",
     "type": "Automation",
     "abilityPoint": "Strength 9",
     "attack": "Sword Slash",
@@ -1023,6 +1074,7 @@
   },
   {
     "name": "Mud Wraith",
+    "flavor": "A drowned shade wearing a crust of silt, it claws with hands that were once a person's.",
     "type": "Mud Creature",
     "abilityPoint": "Dexterity 7",
     "attack": "Wraith Claw",
@@ -1043,6 +1095,7 @@
   },
   {
     "name": "Aetheric Ghost",
+    "flavor": "It slips inside the unwary and turns their own hands against the rest of the party.",
     "type": "Aetheric Creature",
     "abilityPoint": "Intelligence 5",
     "attack": "Possession",
@@ -1063,6 +1116,7 @@
   },
   {
     "name": "Mud Ogre",
+    "flavor": "A hill of a creature that swings a wrenched-off pillar like a club and rarely misses twice.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 7",
     "attack": "Club Smash",
@@ -1082,6 +1136,7 @@
   },
   {
     "name": "Stone Warden",
+    "flavor": "A gate-sentinel of the old cities, still standing its post ages after the gate rotted away.",
     "type": "Mechanism",
     "abilityPoint": "Strength 8",
     "attack": "Stone Punch",
@@ -1103,6 +1158,7 @@
   },
   {
     "name": "Golem Knight",
+    "flavor": "A war-construct forged for the sieges before the Flood, its edge undulled by the centuries.",
     "type": "Automation",
     "abilityPoint": "Strength 8",
     "attack": "Sword Strike",
@@ -1111,7 +1167,7 @@
     "rarity": "Rare",
     "loot": [
       "Golem Armor",
-      "Aether Core",
+      "Clockwork Core",
       "Blank Runecaster Casing (Rare)"
     ],
     "traits": [
@@ -1124,6 +1180,7 @@
   },
   {
     "name": "Aetheric Gargoyle",
+    "flavor": "It roosts as a statue until you pass beneath, then drops with the weight of carved stone.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Dexterity 6",
     "attack": "Stone Crush",
@@ -1144,6 +1201,7 @@
   },
   {
     "name": "Silt Horror",
+    "flavor": "A mass of flailing tentacles that hauls itself from the mire, regrowing every limb you sever.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 7",
     "attack": "Tentacle Whip",
@@ -1163,6 +1221,7 @@
   },
   {
     "name": "Aetheric Lion",
+    "flavor": "A maned predator remade by the Aether, its roar a physical blow before the claws land.",
     "type": "Aetheric Creature",
     "abilityPoint": "Strength 7",
     "attack": "Roar",
@@ -1171,7 +1230,7 @@
     "rarity": "Rare",
     "loot": [
       "Lion Mane",
-      "Aether Core"
+      "Beast Fang"
     ],
     "traits": [
       "savage",
@@ -1182,6 +1241,7 @@
   },
   {
     "name": "Mud Serpent",
+    "flavor": "It buries itself in the bank and erupts around your legs, tightening with every breath.",
     "type": "Mud Creature",
     "abilityPoint": "Dexterity 6",
     "attack": "Constrict",
@@ -1200,6 +1260,7 @@
   },
   {
     "name": "Aetheric Cyclops",
+    "flavor": "A towering mutant whose single lensed eye gathers stray Aether into a cutting beam.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Intelligence 8",
     "attack": "Laser Beam",
@@ -1219,6 +1280,7 @@
   },
   {
     "name": "Steam Spider",
+    "flavor": "A boiler-fed weaver that vents scalding bursts and skitters faster than its bulk suggests.",
     "type": "Automation",
     "abilityPoint": "Strength 6",
     "attack": "Steam Burst",
@@ -1239,6 +1301,7 @@
   },
   {
     "name": "Aetheric Banshee",
+    "flavor": "Its wail carries grief loud enough to bruise; the sound arrives before the shape does.",
     "type": "Aetheric Creature",
     "abilityPoint": "Intelligence 8",
     "attack": "Wail",
@@ -1259,6 +1322,7 @@
   },
   {
     "name": "Mud Drake",
+    "flavor": "A lesser flood-dragon that breathes a choking gout of superheated silt, then wades in.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 7",
     "attack": "Mud Breath",
@@ -1278,6 +1342,7 @@
   },
   {
     "name": "Clockwork Serpent",
+    "flavor": "A segmented brass coil that constricts with mechanical patience and never tires.",
     "type": "Automation",
     "abilityPoint": "Dexterity 7",
     "attack": "Coil Crush",
@@ -1299,6 +1364,7 @@
   },
   {
     "name": "Silt Guardian",
+    "flavor": "A monument-beast set to defend a drowned vault, it answers trespass with an earth-splitting slam.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 6",
     "attack": "Earth Slam",
@@ -1319,6 +1385,7 @@
   },
   {
     "name": "Aetheric Beast",
+    "flavor": "A nameless thing the Aether made, all speed and appetite, gone before its wounds can be counted.",
     "type": "Aetheric Creature",
     "abilityPoint": "Strength 7",
     "attack": "Aether Claw",
@@ -1338,6 +1405,7 @@
   },
   {
     "name": "Architectural Sentinel",
+    "flavor": "A colossal guard-frame woven into the ruin itself; it wakes only for the gravest intrusion.",
     "type": "Automation",
     "abilityPoint": "Strength 9",
     "attack": "Laser Blast",
@@ -1369,6 +1437,7 @@
   },
   {
     "name": "Mud Elemental",
+    "flavor": "The flood given a body — tons of animate silt that reforms faster than steel can carve it.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 10",
     "attack": "Mud Quake",
@@ -1391,6 +1460,7 @@
   },
   {
     "name": "Aether Golem",
+    "flavor": "A construct built around a caged Aether core, its blows landing with the weight of a collapse.",
     "type": "Aetheric Creature",
     "abilityPoint": "Strength 9",
     "attack": "Aether Blast",
@@ -1411,6 +1481,7 @@
   },
   {
     "name": "Bog Dragon",
+    "flavor": "The apex of the drowned marsh, its breath a searing torrent and its hide a wall of scale.",
     "type": "Aetheric Creature",
     "abilityPoint": "Strength 10",
     "attack": "Breath Attack",
@@ -1432,6 +1503,7 @@
   },
   {
     "name": "Metal Hydra",
+    "flavor": "A many-headed war-machine that grows a new head for every one you take; aim for the body.",
     "type": "Automation",
     "abilityPoint": "Dexterity 9",
     "attack": "Multi-Headed Strike",
@@ -1454,6 +1526,7 @@
   },
   {
     "name": "Storm Walker",
+    "flavor": "A lightning-throwing colossus of the old grid, thunder answering each of its slow strides.",
     "type": "Mechanism",
     "abilityPoint": "Strength 8",
     "attack": "Thunder Punch",
@@ -1475,6 +1548,7 @@
   },
   {
     "name": "Aetheric Wyvern",
+    "flavor": "A charge-veined flyer that stoops from the dark with a tail that cracks like a whip.",
     "type": "Aetheric Creature",
     "abilityPoint": "Strength 9",
     "attack": "Tail Swipe",
@@ -1495,6 +1569,7 @@
   },
   {
     "name": "Mud Titan",
+    "flavor": "A moving hill of the Flood's own making, each footfall a small quake felt through the floor.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 10",
     "attack": "Ground Slam",
@@ -1517,6 +1592,7 @@
   },
   {
     "name": "Mech Sentinel",
+    "flavor": "A pre-Flood defense platform, its beam-cannon still zeroed on the corridor it has held for ages.",
     "type": "Automation",
     "abilityPoint": "Dexterity 9",
     "attack": "Beam Cannon",
@@ -1539,6 +1615,7 @@
   },
   {
     "name": "Mud Elemental Spawn",
+    "flavor": "A shard of a greater Elemental, sent ahead as a wave of grasping, reforming silt.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 9",
     "attack": "Mud Wave",
@@ -1560,6 +1637,7 @@
   },
   {
     "name": "Obsidian Sentinel",
+    "flavor": "Carved from volcanic glass and older than the cities, it strikes with edges that never chip.",
     "type": "Mechanism",
     "abilityPoint": "Strength 10",
     "attack": "Obsidian Strike",
@@ -1582,6 +1660,7 @@
   },
   {
     "name": "Mud Monarch",
+    "flavor": "A crowned aberration that rules a drowned court, its every slash trailing regal contempt.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Intelligence 7",
     "attack": "Royal Slash",
@@ -1602,6 +1681,7 @@
   },
   {
     "name": "Stone Chimera",
+    "flavor": "Three beasts fused in stone by a failed working, each head hunting on its own cruel logic.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 9",
     "attack": "Triple Attack",
@@ -1622,6 +1702,7 @@
   },
   {
     "name": "Iron Titan",
+    "flavor": "A siege-frame the size of a tower gate, its fist rated to fold a bulkhead in a single blow.",
     "type": "Automation",
     "abilityPoint": "Strength 10",
     "attack": "Iron Fist",
@@ -1646,6 +1727,7 @@
   },
   {
     "name": "Mud Siren Queen",
+    "flavor": "Her song does not lure — it despairs, draining the will to lift a blade as she closes.",
     "type": "Mud Creature",
     "abilityPoint": "Intelligence 9",
     "attack": "Song of Despair",
@@ -1666,6 +1748,7 @@
   },
   {
     "name": "Aetheric Guardian",
+    "flavor": "A relic warden humming with barely-caged power, sworn to a vault whose owners are dust.",
     "type": "Automation",
     "abilityPoint": "Intelligence 9",
     "attack": "Arcane Blast",
@@ -1694,6 +1777,7 @@
   },
   {
     "name": "Aetheric Phoenix",
+    "flavor": "It dies in fire and rises from its own ash; only cutting it down between rebirths will do.",
     "type": "Aetheric Creature",
     "abilityPoint": "Dexterity 10",
     "attack": "Rebirth Flame",
@@ -1714,6 +1798,7 @@
   },
   {
     "name": "Sludge Behemoth",
+    "flavor": "A slow avalanche of living muck whose every stomp buckles the ground for yards around.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 8",
     "attack": "Quake Stomp",
@@ -1735,6 +1820,7 @@
   },
   {
     "name": "Aetheric Horror",
+    "flavor": "A shape the mind refuses to hold, its touch flaying thought as readily as flesh.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Intelligence 9",
     "attack": "Mind Flay",
@@ -1754,6 +1840,7 @@
   },
   {
     "name": "Aetheric Minotaur",
+    "flavor": "A charging horror of Aether-warped muscle, its great axe swung with earth-splitting force.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Strength 9",
     "attack": "Axe Swing",
@@ -1774,6 +1861,7 @@
   },
   {
     "name": "Aetheric Leviathan",
+    "flavor": "A titan of the flooded deeps that surfaces to crush, dragging whole spans down with it.",
     "type": "Aetheric Creature",
     "abilityPoint": "Strength 10",
     "attack": "Water Crush",
@@ -1795,6 +1883,7 @@
   },
   {
     "name": "Mud Leviathan",
+    "flavor": "A wave with a will, it rears from the flood-channel and comes down like a broken dam.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 9",
     "attack": "Wave Slam",
@@ -1816,6 +1905,7 @@
   },
   {
     "name": "Aetheric Chimera",
+    "flavor": "A blur of fused predators, striking from three angles before the first wound registers.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Strength 10",
     "attack": "Multi-Strike",
@@ -1836,6 +1926,7 @@
   },
   {
     "name": "Mud Demon",
+    "flavor": "A malice given a mud-and-sinew body, it opens wounds faster than they can be bound.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 8",
     "attack": "Claw Slash",
@@ -1856,6 +1947,7 @@
   },
   {
     "name": "Aetheric Kraken",
+    "flavor": "It reaches from the drowned dark with tentacles that crush stone and never lose their grip.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Strength 10",
     "attack": "Tentacle Smash",
@@ -1876,6 +1968,7 @@
   },
   {
     "name": "Mud Lich",
+    "flavor": "A drowned sorcerer that refused the water's peace, pulsing dark Aether from a silt-caked crown.",
     "type": "Mud Creature",
     "abilityPoint": "Intelligence 9",
     "attack": "Dark Pulse",
@@ -1896,6 +1989,7 @@
   },
   {
     "name": "Mud Giant",
+    "flavor": "A brute the height of a ruin's second floor, its stomp enough to throw a party off its feet.",
     "type": "Mud Creature",
     "abilityPoint": "Strength 10",
     "attack": "Stomp",
@@ -1917,6 +2011,7 @@
   },
   {
     "name": "Aetheric Necromancer",
+    "flavor": "It draws the warmth from the living to mend itself, and the dead rise where it walks.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Intelligence 9",
     "attack": "Life Drain",
@@ -1937,17 +2032,17 @@
   },
   {
     "name": "Aetheric Behemoth",
+    "flavor": "A slow-moving cataclysm of caged Aether, each smash landing with the finality of a rockfall.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Strength 10",
     "attack": "Aether Smash",
     "damage": "4D10",
-    "hp": 458,
+    "hp": 300,
     "rarity": "Legendary",
     "loot": [
       "Behemoth Heart",
       "Behemoth Plate",
-      "Aetheric Shard",
-      "Resurrection Gem"
+      "Aetheric Shard"
     ],
     "aliases": [
       "behemoth",
@@ -1966,7 +2061,8 @@
   },
   {
     "name": "Aetherkin",
-    "type": "Etheric Undead",
+    "flavor": "The un-dead of the old power-halls, animated by the Aether they died steeped in.",
+    "type": "Aetheric Undead",
     "abilityPoint": "Strength 7",
     "attack": "Etheric Burst",
     "damage": "3D6 Aetheric",
@@ -1994,6 +2090,7 @@
   },
   {
     "name": "Reclaimer Ambusher",
+    "flavor": "A scavenger-guild raider who fires from cover and fades before the bolt's echo dies.",
     "type": "Human",
     "carries": { "weapons": ["Bone Crossbow"], "armor": ["Reclaimer's Salvage Vest"], "tc": 8 },
     "abilityPoint": "Dexterity 5",
@@ -2019,6 +2116,7 @@
   },
   {
     "name": "Black Cloak Agent",
+    "flavor": "A blade-for-hire of the hidden orders, working from shadow with a poisoned edge.",
     "type": "Human",
     "carries": { "armor": ["Mud-Bound Cloak"], "tc": 15 },
     "signatureWeapon": {
@@ -2055,17 +2153,17 @@
   },
   {
     "name": "Aetheric Lich",
-    "type": "Etheric Undead",
+    "flavor": "An arch-undead sustained by a core of stolen souls, its drain colder than the grave it left.",
+    "type": "Aetheric Undead",
     "abilityPoint": "Intelligence 13",
     "attack": "Soul Drain",
     "damage": "3D8 Aetheric",
-    "hp": 520,
+    "hp": 330,
     "rarity": "Legendary",
     "loot": [
       "Lich Phylactery",
       "Lich-Bone Mantle",
-      "Aetherstone Heart",
-      "Resurrection Gem"
+      "Aetherstone Heart"
     ],
     "aliases": [
       "lich",
@@ -2084,16 +2182,16 @@
   },
   {
     "name": "Mud Tyrant",
+    "flavor": "A self-made sovereign of the drowned wastes, ruling by the crush of an armored fist.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Strength 13",
     "attack": "Sovereign Crush",
     "damage": "4D8",
-    "hp": 640,
+    "hp": 345,
     "rarity": "Legendary",
     "loot": [
       "Tyrant's Crown",
-      "Mud-Iron Heart",
-      "Resurrection Gem"
+      "Mud-Iron Heart"
     ],
     "aliases": [
       "tyrant",
@@ -2113,16 +2211,16 @@
   },
   {
     "name": "Hollow King",
-    "type": "Etheric Undead",
+    "flavor": "A crowned husk on a rotted throne, hollow of all but the will to make the world hollow too.",
+    "type": "Aetheric Undead",
     "abilityPoint": "Strength 12",
     "attack": "Hollow Cleave",
     "damage": "3D10",
-    "hp": 580,
+    "hp": 330,
     "rarity": "Legendary",
     "loot": [
       "Hollow Crown",
-      "Throne Shard",
-      "Resurrection Gem"
+      "Throne Shard"
     ],
     "aliases": [
       "king",
@@ -2142,16 +2240,16 @@
   },
   {
     "name": "Iron Worm",
+    "flavor": "A boring-machine turned monster, its segmented body grinding through wall and warrior alike.",
     "type": "Mech-Construct",
     "abilityPoint": "Strength 13",
     "attack": "Coiling Crush",
     "damage": "4D6",
-    "hp": 700,
+    "hp": 345,
     "rarity": "Legendary",
     "loot": [
       "Worm Plating",
       "Iron Core",
-      "Resurrection Gem",
       "Blank Runecaster Casing (Legendary)"
     ],
     "aliases": [
@@ -2173,17 +2271,17 @@
   },
   {
     "name": "Bog Wyrm",
+    "flavor": "A venom-fanged serpent-drake of the deep marsh, quick as a struck match and twice as ruinous.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Dexterity 11",
     "attack": "Wyrm Bite",
     "damage": "3D8",
-    "hp": 540,
+    "hp": 320,
     "rarity": "Legendary",
     "loot": [
       "Wyrm Fang",
       "Wyrm-Scale Hide",
-      "Bog-Heart Pearl",
-      "Resurrection Gem"
+      "Bog-Heart Pearl"
     ],
     "aliases": [
       "wyrm",
@@ -2204,16 +2302,16 @@
   },
   {
     "name": "Voidspawn Matriarch",
+    "flavor": "The brood-mother of the void-touched, spitting corrosive young that hatch as they land.",
     "type": "Aetheric Mutation",
     "abilityPoint": "Intelligence 12",
     "attack": "Voidspawn Spittle",
     "damage": "3D8 Aetheric",
-    "hp": 560,
+    "hp": 330,
     "rarity": "Legendary",
     "loot": [
       "Matriarch's Carapace",
-      "Voidspawn Egg",
-      "Resurrection Gem"
+      "Voidspawn Egg"
     ],
     "aliases": [
       "matriarch",
@@ -2235,17 +2333,16 @@
   },
   {
     "name": "Tartarian Reaver",
+    "flavor": "A warlord of the old bloodlines, armored and merciless, cutting a red sweep through any line.",
     "type": "Human",
     "carries": { "weapons": ["Reaver's Greatsword"], "armor": ["Vest of the Forgotten Hero"], "tc": 60 },
     "abilityPoint": "Strength 12",
     "attack": "Reaver's Sweep",
     "damage": "3D8",
-    "hp": 480,
+    "hp": 310,
     "rarity": "Legendary",
     "loot": [
-      "Reaver's Greatsword",
-      "Reaver's Pauldron",
-      "Resurrection Gem"
+      "Reaver's Pauldron"
     ],
     "aliases": [
       "reaver",
@@ -2265,6 +2362,7 @@
   },
   {
     "name": "Silt Thief",
+    "flavor": "A quick-fingered marsh-rat who'd rather cut your purse than your throat — but will do both.",
     "type": "Human",
     "carries": { "weapons": ["Bone Knife"], "armor": ["Mud-Warden's Vest"], "tc": 6 },
     "abilityPoint": "Dexterity 5",
@@ -2290,6 +2388,7 @@
   },
   {
     "name": "Disc Hijacker",
+    "flavor": "A road-brigand who clubs travelers senseless and makes off with their Discs and their boots.",
     "type": "Human",
     "carries": { "weapons": ["Cudgel"], "armor": ["Reclaimer's Salvage Vest"], "tc": 10 },
     "abilityPoint": "Strength 4",
@@ -2314,6 +2413,7 @@
   },
   {
     "name": "Mud Monarch Purifier",
+    "flavor": "A zealot-knight of a drowned faith, wielding a lance of channeled radiance against the unclean.",
     "type": "Human",
     "carries": { "weapons": ["Iron Spear"], "armor": ["Mud-Warden's Vest"], "tc": 20 },
     "abilityPoint": "Wisdom 5",
@@ -2335,6 +2435,68 @@
     "traits": [
       "quick",
       "resist:aetheric"
+    ]
+  },
+  {
+    "name": "Drowned Aetherkin",
+    "flavor": "One of the Aetherkin — a Tartarian the flood sealed under and the Aether would not let rest. Reanimated, frightened, running on the muscle-memory of a life it half-remembers. It defends itself; it does not hunt.",
+    "type": "Aetheric Undead",
+    "abilityPoint": "Strength 3",
+    "attack": "Frightened Lash",
+    "damage": "2D6 Aetheric",
+    "hp": 45,
+    "rarity": "Common",
+    "temperament": "skittish",
+    "loot": [
+      "Aetherstone Fragment",
+      "Veil of Peace"
+    ],
+    "aliases": [
+      "aetherkin",
+      "drowned aetherkin",
+      "the dead",
+      "risen",
+      "the kin",
+      "flood-dead"
+    ],
+    "traits": [
+      "aetherkin",
+      "slow",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:burn"
+    ]
+  },
+  {
+    "name": "Mud-Wracked Aetherkin",
+    "flavor": "One of the Aetherkin, caked in the mud that mummified it — the flood-dead of old Tartaria, awake and afraid. Slow and defensive; dangerous only to those who press it.",
+    "type": "Aetheric Undead",
+    "abilityPoint": "Strength 5",
+    "attack": "Silt-Heavy Grasp",
+    "damage": "2D8 Aetheric",
+    "hp": 95,
+    "rarity": "Uncommon",
+    "temperament": "skittish",
+    "loot": [
+      "Aetherstone Fragment",
+      "Aether Mud",
+      "Veil of Peace"
+    ],
+    "aliases": [
+      "aetherkin",
+      "mud-wracked aetherkin",
+      "the dead",
+      "risen",
+      "the kin",
+      "flood-dead"
+    ],
+    "traits": [
+      "aetherkin",
+      "slow",
+      "resist:slashing",
+      "resist:piercing",
+      "resist:bludgeoning",
+      "vulnerable:burn"
     ]
   }
 ]

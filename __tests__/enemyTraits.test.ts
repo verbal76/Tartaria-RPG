@@ -94,13 +94,13 @@ describe('traitRegen + traitAmbushBonus', () => {
 
 describe('traitDodgeChance — agile / quick enemies dodge', () => {
   it('agile returns the strongest dodge', () => {
-    expect(traitDodgeChance(['agile'])).toBe(0.25);
+    expect(traitDodgeChance(['agile'])).toBe(0.18); // OTA-935 — trimmed from 0.25
   });
   it('quick alone returns a slimmer dodge', () => {
-    expect(traitDodgeChance(['quick'])).toBe(0.15);
+    expect(traitDodgeChance(['quick'])).toBe(0.12); // OTA-935 — trimmed from 0.15
   });
   it('agile + quick takes the higher value', () => {
-    expect(traitDodgeChance(['quick', 'agile'])).toBe(0.25);
+    expect(traitDodgeChance(['quick', 'agile'])).toBe(0.18); // OTA-935 — trimmed from 0.25
   });
   it('returns 0 for nothing matching', () => {
     expect(traitDodgeChance(['armored', 'slow'])).toBe(0);
@@ -136,10 +136,11 @@ describe('resist/weakness surfacing (EnemyPanel)', () => {
   });
 
   it('enemyTypeDefenses returns the macro type-resistance row', () => {
-    // Construct: resists slashing/piercing, weak to bludgeoning/electrical.
+    // Construct (metal-bodied): resists slashing/piercing + shrugs off corruption;
+    // weak to bludgeoning/electrical and — as a rigid, brittle frame — cold/acid.
     expect(enemyTypeDefenses('Construct')).toEqual({
-      resist: ['slashing', 'piercing'],
-      weak: ['bludgeoning', 'electrical'],
+      resist: ['slashing', 'piercing', 'corruption'],
+      weak: ['bludgeoning', 'electrical', 'cold', 'acid'],
     });
     // Unknown / missing type → empty (no crash).
     expect(enemyTypeDefenses('Nonexistent Type')).toEqual({ resist: [], weak: [] });

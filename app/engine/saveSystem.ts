@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { SaveState } from './types';
+import type { FallenGearPiece, SaveState } from './types';
 import { capDiskLog } from './diskLogCap';
 
 // v2 schema: multi-slot. Each character is its own keyed save with its
@@ -47,6 +47,11 @@ export interface SlotSummary {
    *  abandoned / dead dogs leave these fields undefined. */
   dogName?: string;
   dogBreed?: string;
+  /** OTA-725 — golem companion snapshot, mirroring the dog fields. Only
+   *  populated when the save carries a living golem (hp > 0), so the slot tile
+   *  shows the whole party at a glance and never dangles a crumbled golem. */
+  golemName?: string;
+  golemKind?: string;
 }
 
 // Install-wide stash (not per-character). Stores resources that persist
@@ -74,6 +79,73 @@ export interface GlobalStash {
   // rations / dog jerky / fungus / water). Idempotent per slot so a
   // resume never restacks it.
   testGiftGrantedSlots?: string[];
+  // OTA-845 [The Fallen] — install-wide roll of dead characters. Every character
+  // who falls is appended here (capped, newest last), so a death is never wiped
+  // clean: later characters inherit a graveyard of predecessors to remember (and,
+  // in future, to encounter in the world). "Losing is fun" — the run ends, the
+  // legend persists.
+  fallen?: FallenHero[];
+}
+
+/** OTA-845 — a character who died. Persisted install-wide in the GlobalStash. */
+export interface FallenHero {
+  name: string;
+  raceName: string;
+  /** The death-screen epitaph line. */
+  epitaph: string;
+  /** Where they fell (location name). */
+  locationName: string;
+  /** Lifetime foes bested. */
+  kills: number;
+  /** Corruption tier at death (label). */
+  corruption: string;
+  /** In-game hours survived. */
+  hours: number;
+  /** Wall-clock death time (for ordering / recency). */
+  ts: number;
+  /** OTA-998 — display names of the gear they died wearing: the Hollowed
+   *  revenant's kit + drop pool. Absent on pre-998 records — the revenant
+   *  builder synthesizes a seeded kit instead. */
+  gearNames?: string[];
+  /** OTA-1017 — full copies of the died-in kit (instance stats and all), so the
+   *  revenant hands back the REAL gear. Absent on records that predate it. */
+  gear?: FallenGearPiece[];
+  /** OTA-998 — set once their Hollowed revenant is put to rest. */
+  avengedBy?: string;
+  avengedTs?: number;
+}
+
+const FALLEN_CAP = 25;
+
+/** OTA-845 — append a fallen character to the install-wide roll (capped). Returns the
+ *  new total number of fallen ever recorded within the cap window. */
+export async function recordFallen(hero: FallenHero): Promise<number> {
+  const stash = await loadGlobalStash();
+  const next = [...(stash.fallen ?? []), hero].slice(-FALLEN_CAP);
+  await saveGlobalStash({ ...stash, fallen: next });
+  return next.length;
+}
+
+/** OTA-998 — mark a fallen entry (matched by death ts) put to rest. Install-wide. */
+export async function markFallenAvenged(ts: number, by: string): Promise<void> {
+  const stash = await loadGlobalStash();
+  const next = (stash.fallen ?? []).map((f) => (f.ts === ts ? { ...f, avengedBy: by, avengedTs: Date.now() } : f));
+  await saveGlobalStash({ ...stash, fallen: next });
+}
+
+/** OTA-1017 — pin a SYNTHESIZED (pre-snapshot) revenant kit onto its record the
+ *  first time it is generated, so a later catalog edit can never reshuffle the
+ *  gear a named fallen wears. Never overwrites a real recorded kit. */
+export async function pinFallenGearNames(ts: number, gearNames: string[]): Promise<void> {
+  const stash = await loadGlobalStash();
+  const next = (stash.fallen ?? []).map((f) =>
+    (f.ts === ts && !(f.gearNames && f.gearNames.length > 0) ? { ...f, gearNames } : f));
+  await saveGlobalStash({ ...stash, fallen: next });
+}
+
+/** OTA-845 — read the roll of the Fallen (newest last). */
+export async function loadFallen(): Promise<FallenHero[]> {
+  return (await loadGlobalStash()).fallen ?? [];
 }
 
 export async function loadGlobalStash(): Promise<GlobalStash> {
@@ -87,6 +159,7 @@ export async function loadGlobalStash(): Promise<GlobalStash> {
       installSeeded: parsed.installSeeded ?? false,
       devGemGrantedSlots: parsed.devGemGrantedSlots ?? [],
       testGiftGrantedSlots: parsed.testGiftGrantedSlots ?? [],
+      fallen: parsed.fallen ?? [],
     };
   } catch {
     return { resurrectionGems: 0, endingBadges: [], installSeeded: false, devGemGrantedSlots: [], testGiftGrantedSlots: [] };
@@ -120,36 +193,12 @@ export async function ensureFirstInstallSeed(): Promise<{ seeded: boolean; gems:
   return { seeded: true, gems: stash.resurrectionGems };
 }
 
-/** arb89 — one-time proactive Resurrection Gem for a dev character
- *  (Verbal / Sasmooch). Grants a gem the first time that specific slot
- *  is recognized as a dev name, so the dev (or the dev's spouse playing
- *  Sasmooch) has a gem in hand WITHOUT dying first and WITHOUT restarting
- *  the character. Idempotent per slot key — re-loading the same save
- *  never re-grants. */
-export async function grantDevGemOnce(slotKey: string): Promise<{ granted: boolean; gems: number }> {
-  const stash = await loadGlobalStash();
-  const already = stash.devGemGrantedSlots ?? [];
-  if (already.includes(slotKey)) {
-    return { granted: false, gems: stash.resurrectionGems };
-  }
-  stash.devGemGrantedSlots = [...already, slotKey];
-  stash.resurrectionGems = (stash.resurrectionGems ?? 0) + 1;
-  await saveGlobalStash(stash);
-  return { granted: true, gems: stash.resurrectionGems };
-}
-
-/** OTA-461 — one-time playtest-supply gift for the dev character "Verbal".
- *  Records the slot key so the kit is granted exactly once per slot (a
- *  resume never restacks it). The caller does the actual inventory push;
- *  this only gates the once-per-slot bookkeeping. */
-export async function grantTestSupplyGiftOnce(slotKey: string): Promise<{ granted: boolean }> {
-  const stash = await loadGlobalStash();
-  const already = stash.testGiftGrantedSlots ?? [];
-  if (already.includes(slotKey)) return { granted: false };
-  stash.testGiftGrantedSlots = [...already, slotKey];
-  await saveGlobalStash(stash);
-  return { granted: true };
-}
+// OTA-958 — arb89 grantDevGemOnce + OTA-461 grantTestSupplyGiftOnce are RETIRED. The
+// OTA-948/949 dev-grant cleanup moved the dev gem + supply kit to the tutorial
+// name-commit (creation-only) and removed every load-path grant, which left these
+// once-per-slot latch functions with zero callers. The devGemGrantedSlots /
+// testGiftGrantedSlots stash FIELDS stay declared for save back-compat — an old
+// stash carrying them still loads; nothing writes them anymore.
 
 /** v2.4.1 (OTA 043) — record a completed (faction, ending) combo.
  *  Idempotent: re-recording an existing badge is a no-op. Returns
@@ -421,6 +470,12 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
       dogBreed: state.player.dog && state.player.dog.status !== 'abandoned' && state.player.dog.status !== 'dead'
         ? state.player.dog.breed
         : undefined,
+      // OTA-725 — golem snapshot. Only when a living golem is bound (hp > 0), so
+      // a summoned/kept golem shows on the slot tile beside the dog.
+      golemName: state.player.golem && state.player.golem.hp > 0 ? state.player.golem.name : undefined,
+      golemKind: state.player.golem && state.player.golem.hp > 0
+        ? state.player.golem.kind.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+        : undefined,
     };
     await upsertIndexEntry(summary);
   }
@@ -470,14 +525,29 @@ export function clearLastLogWriteError(): void {
   lastLogWriteError = null;
 }
 
+// OTA-1035 — BATCHED. The per-line version did a FULL read-modify-write of the
+// capped ~400 KB disk log for EVERY line — and one player action emits
+// several lines, so a full log cost megabytes of AsyncStorage bridge traffic
+// per action on device. Lines now land in a pending buffer; ONE chain link
+// drains the whole buffer per flush (one read + one write per burst). Order
+// is preserved (the buffer is drained FIFO into a single join), the cap and
+// error stamping are unchanged, and flushLogWrites() still waits out the
+// chain — the flush link is scheduled synchronously with the first pending
+// line, so the chain always covers every appended line.
+let pendingLogLines: string[] = [];
 export function appendLogToDisk(line: string): Promise<void> {
   if (!activeSlotId) return Promise.resolve();
+  pendingLogLines.push(line);
+  // A flush link is already queued and hasn't drained yet — ride along.
+  if (pendingLogLines.length > 1) return logWriteChain;
   logWriteChain = logWriteChain.then(async () => {
-    if (!activeSlotId) return;
+    const lines = pendingLogLines;
+    pendingLogLines = [];
+    if (!activeSlotId || lines.length === 0) return;
     try {
       const key = slotLogKey(activeSlotId);
       const existing = (await AsyncStorage.getItem(key)) ?? '';
-      await AsyncStorage.setItem(key, capDiskLog(existing + line + '\n'));
+      await AsyncStorage.setItem(key, capDiskLog(existing + lines.join('\n') + '\n'));
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.warn('appendLogToDisk failed', e);

@@ -1,0 +1,62 @@
+{
+  "_comment": "CURIOS — the Fusing Crucible's fuel supply. Every name here is deliberately ABSENT from every item catalog (materials.json, gear.json, weapons.json, armor.json). That absence is the whole point: `isInferredItem` returns true only for catalog-absent names, and the Crucible has accepted inferred items ONLY since OTA-194/195 — the feature exists to give procedurally-named junk a destiny. DO NOT backfill these into materials.json. The standing 'backfill inferred-stats items into the catalog' practice is what starved the Crucible in the first place (see HANDOFF §8); `curiosStayInferred.test.ts` fails loudly if any name here ever gains a catalog row. Names are built from the vocabulary `inferGearTagPack` reads, so each one carries the material family it looks like it should. The multi-material entries at the end are diversity powerhouses — the Crucible needs 3 DIFFERENT materials, and one of those covers two or three of them alone.",
+  "curios": [
+    { "name": "Brass Cog Cluster", "rarity": "Common" },
+    { "name": "Corroded Hinge Set", "rarity": "Common" },
+    { "name": "Bent Shackle Pin", "rarity": "Common" },
+    { "name": "Verdigris Bell Fragment", "rarity": "Common" },
+    { "name": "Tin Valve Housing", "rarity": "Common" },
+    { "name": "Copper Wire Spool", "rarity": "Uncommon" },
+
+    { "name": "Knotted Sinew Braid", "rarity": "Common" },
+    { "name": "Frayed Rigging Twine", "rarity": "Common" },
+    { "name": "Tar-Black Lashing", "rarity": "Common" },
+    { "name": "Coiled Snare Thread", "rarity": "Common" },
+    { "name": "Waxed Yarn Bundle", "rarity": "Common" },
+    { "name": "Salvager's Tether Loop", "rarity": "Uncommon" },
+
+    { "name": "Cracked Carapace Curl", "rarity": "Common" },
+    { "name": "Yellowed Tusk Stub", "rarity": "Common" },
+    { "name": "Brittle Antler Fork", "rarity": "Common" },
+    { "name": "Dried Tendon Coil", "rarity": "Common" },
+    { "name": "Beetle-Chitin Flake", "rarity": "Common" },
+    { "name": "Hollow Quill Sheaf", "rarity": "Uncommon" },
+
+    { "name": "Clouded Lens Blank", "rarity": "Common" },
+    { "name": "Mud-Frosted Bead", "rarity": "Common" },
+    { "name": "Fractured Geode Half", "rarity": "Common" },
+    { "name": "Smoked Glass Chip", "rarity": "Common" },
+    { "name": "Amber Droplet", "rarity": "Uncommon" },
+    { "name": "Chipped Phial Neck", "rarity": "Common" },
+
+    { "name": "Flint Core Nodule", "rarity": "Common" },
+    { "name": "Mortar-Bound Cobble", "rarity": "Common" },
+    { "name": "Split Slate Piece", "rarity": "Common" },
+    { "name": "Obsidian Chip", "rarity": "Common" },
+    { "name": "Weathered Granite Knob", "rarity": "Common" },
+    { "name": "River-Worn Pebble Set", "rarity": "Common" },
+
+    { "name": "Splintered Haft End", "rarity": "Common" },
+    { "name": "Salt-Cured Dowel", "rarity": "Common" },
+    { "name": "Warped Plank Offcut", "rarity": "Common" },
+    { "name": "Charred Twig Bundle", "rarity": "Common" },
+    { "name": "Driftwood Sliver", "rarity": "Common" },
+    { "name": "Reed Shaft Cutting", "rarity": "Common" },
+
+    { "name": "Oil-Stained Sash", "rarity": "Common" },
+    { "name": "Moth-Eaten Felt Scrap", "rarity": "Common" },
+    { "name": "Faded Ribbon Coil", "rarity": "Common" },
+    { "name": "Coarse Canvas Patch", "rarity": "Common" },
+    { "name": "Tattered Gauze Roll", "rarity": "Common" },
+    { "name": "Stiffened Leather Offcut", "rarity": "Uncommon" },
+
+    { "name": "Bone-Handled Rivet", "rarity": "Uncommon" },
+    { "name": "Flint-and-Twine Bundle", "rarity": "Common" },
+    { "name": "Glass-Beaded Strap", "rarity": "Uncommon" },
+    { "name": "Web-Silk Wadding", "rarity": "Common" },
+    { "name": "Iron-Pinned Plank Shard", "rarity": "Uncommon" },
+    { "name": "Slate-Weighted Netting", "rarity": "Common" },
+    { "name": "Horn-Capped Dowel", "rarity": "Common" },
+    { "name": "Copper-Threaded Veil", "rarity": "Uncommon" }
+  ]
+}

@@ -1,5 +1,7 @@
 import type { InventoryItem, EquipSlot, PlayerCharacter, Stats } from './types';
-import { findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
+import { canonicalItemKind, canonicalItemTags, findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
+import { isWeaponCoatingItem } from './weaponCoating';
+import { itemIsThrowable } from './bandolierEligibility';
 import { aggregateInventoryPassives, inventoryHasGate, isScanner, type EffectResolver, type GateKind, type ScannerBias } from './itemEffect';
 import { racialStatBonusesFor } from './raceMechanics';
 import { corruptionTierOf, corruptionStatPenalty } from './corruption';
@@ -15,12 +17,12 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   // equip-on-dog affordance instead. Returning [] here ensures the
   // generic "vest" regex below (which would otherwise route to
   // 'chest') doesn't grab them onto the player.
-  if (item.kind === 'dog_armor') return [];
+  if (canonicalItemKind(item) === 'dog_armor') return [];
   // OTA-496 — weapon-coating consumables (Poison Vial, Acid Flask, Searing Paste,
   // …) are APPLIED to a weapon via the "Coat a weapon" flow, never equipped. Guard
   // here so a coating never gets an equip slot — e.g. "Sea·RING· Paste" matched the
   // ring regex below and wrongly offered "Equip (Ring)".
-  if ((item.tags ?? []).some((t) => t.toLowerCase() === 'weapon_coating')) return [];
+  if (isWeaponCoatingItem(item)) return [];
   // OTA-224 — fused items carry uniqueStats but their names are
   // synthesized (e.g. "Resonant Cleaver") and won't appear in any
   // catalog. validSlotsForItem used to short-circuit to [] for them
@@ -42,7 +44,7 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   // throw; treating them as ranged weapons lets the player equip,
   // attack, and the engine knows to throw + consume. UX matches the
   // player's mental model: "equip it, use it from combat, it's gone."
-  if ((item.tags ?? []).some((t) => /throwable/i.test(t))) {
+  if (itemIsThrowable(item)) {
     return ['main', 'off'];
   }
   // OTA 193 — exploration items with effect.kind='scanner' (Pulse
@@ -54,11 +56,21 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   if (exp?.effect?.kind === 'scanner') {
     return [exp.effect.slot]; // currently always 'off'
   }
-  // arb102 — `wardrobe`-tagged worn gear that isn't catalog armor (the
-  // Hardened Climbing Strap) equips in the cloak / outer-layer slot, so it's
-  // worn like apparel rather than stowed as a tool.
-  if (item.tags?.some((t) => t.toLowerCase() === 'wardrobe')) {
-    return ['cloak'];
+  // OTA-927 — the aether-sight gadgets (Aetheric Vision Lens, Aether Goggles, the
+  // beacons/locators/analyzer/compass/tuner) all grant the `detect_aether` gate.
+  // They equip into the dedicated `lens` slot and the detect_aether passive is
+  // active ONLY while one is worn (was: active just by being carried). Its own slot
+  // so it never competes with an off-hand weapon/scanner.
+  if (exp?.effect?.kind === 'gate' && exp.effect.unlocks === 'detect_aether') {
+    return ['lens'];
+  }
+  // arb102 / OTA-911 — `wardrobe`-tagged worn gear that isn't catalog armor
+  // (the Hardened Climbing Strap) equips in the LEGS slot: it's a harness rigged
+  // around the hips and thighs, so it displaces leg armor while worn. (Was the
+  // cloak slot pre-OTA-911; moved to legs per the mountaineering rework so the
+  // strap is worn like a climbing harness, not a mantle.)
+  if (canonicalItemTags(item).includes('wardrobe')) {
+    return ['legs'];
   }
   const armor = findArmorByName(item.name);
   if (armor) {
@@ -146,6 +158,7 @@ export const SLOT_LABEL: Record<EquipSlot, string> = {
   cloak: 'Cloak',
   amulet: 'Amulet',
   ring: 'Ring',
+  lens: 'Lens',
 };
 
 /** Slots that hold armor pieces (used to aggregate AC + resistances). */
@@ -154,7 +167,7 @@ export const ARMOR_SLOTS: readonly EquipSlot[] = ['head', 'chest', 'hands', 'leg
 /** Map an equip slot to its corresponding `*Id` key on PlayerEquipped.
  *  When set, the id key identifies the exact inventory instance bound
  *  to that slot (important when the player holds two of the same item). */
-export const SLOT_ID_KEY: Record<EquipSlot, 'mainId' | 'offId' | 'headId' | 'chestId' | 'handsId' | 'legsId' | 'feetId' | 'cloakId' | 'amuletId' | 'ringId'> = {
+export const SLOT_ID_KEY: Record<EquipSlot, 'mainId' | 'offId' | 'headId' | 'chestId' | 'handsId' | 'legsId' | 'feetId' | 'cloakId' | 'amuletId' | 'ringId' | 'lensId'> = {
   main: 'mainId',
   off: 'offId',
   head: 'headId',
@@ -165,6 +178,7 @@ export const SLOT_ID_KEY: Record<EquipSlot, 'mainId' | 'offId' | 'headId' | 'che
   cloak: 'cloakId',
   amulet: 'amuletId',
   ring: 'ringId',
+  lens: 'lensId',
 };
 
 /** Resolve the InventoryItem currently equipped in the named slot.
@@ -192,6 +206,28 @@ export function resolveEquippedItem(
   return inventory.find(
     (i) => i.name.toLowerCase() === name.toLowerCase() && i.quantity > 0,
   ) ?? null;
+}
+
+/** OTA-687 — the exact inventory instance ids the player currently has equipped.
+ *  Built on resolveEquippedItem per slot, so it honors the id-bound instance AND
+ *  the legacy first-by-name fallback, plus the extra ring2/ring3 instance slots.
+ *  Lets the vendor sell list exclude ONLY worn gear (by instance) without hiding
+ *  spare copies of the same name — before, one equipped "Stone-Grip Gloves" hid
+ *  every copy you owned from the shop. */
+export function equippedInstanceIds(player: PlayerCharacter): Set<string> {
+  const ids = new Set<string>();
+  const eq = player.equipped;
+  if (!eq) return ids;
+  for (const slot of Object.keys(SLOT_ID_KEY) as EquipSlot[]) {
+    const it = resolveEquippedItem(player, slot);
+    if (it) ids.add(it.id);
+  }
+  // ring2 / ring3 are id-only extra ring slots (no name field / SLOT_ID_KEY entry).
+  for (const idKey of ['ring2Id', 'ring3Id'] as const) {
+    const id = eq[idKey];
+    if (id) ids.add(id);
+  }
+  return ids;
 }
 
 // Stat names the equipment system can boost. Includes 'constitution' for
@@ -259,6 +295,17 @@ export function aggregateInventoryPassiveStatBonuses(player: PlayerCharacter): P
  *  'breathe_toxic'); we'll scan the player's inventory for any
  *  item whose effect.unlocks matches and return true on the first
  *  hit. False if no item grants it. */
+/** OTA-927 — the aether-sight passive (`detect_aether`) is equip-gated now: true only
+ *  while an aether-sight gadget is worn in the dedicated `lens` slot. Mirrors the
+ *  scanner-in-off-hand pattern; used by the search bonuses + the HUD 'scanning' badge. */
+export function aethericVisionEquipped(player: PlayerCharacter): boolean {
+  const worn = resolveEquippedItem(player, 'lens');
+  if (!worn) return false;
+  const exp = findExplorationItemByName(worn.name);
+  if (exp?.effect?.kind === 'gate' && exp.effect.unlocks === 'detect_aether') return true;
+  return false;
+}
+
 export function playerHasGate(player: PlayerCharacter, gate: GateKind): boolean {
   const names = (player.inventory ?? []).map((i) => i.name);
   return inventoryHasGate(names, gate, EFFECT_RESOLVERS);
@@ -338,6 +385,8 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
     // bonus (+1 stealth / charisma / …) while it's wielded, on top of whatever
     // the weapon itself grants. Applies independent of the catalog/instance perks.
     if (inst?.coating?.statBonus) add(inst.coating.statBonus.stat, inst.coating.statBonus.amount);
+    // OTA-873 — a dual-coat weapon's SECOND coating grants its passive stat bonus too.
+    if (inst?.coating2?.statBonus) add(inst.coating2.statBonus.stat, inst.coating2.statBonus.amount);
     if (inst?.instanceStats?.statBonuses) {
       for (const b of inst.instanceStats.statBonuses) add(b.stat, b.amount);
       continue;
@@ -409,6 +458,16 @@ export function aggregateEquippedRegen(player: PlayerCharacter): { stamina: numb
 // equip/unequip handlers bake this delta into `player.hpMax` (Option B: hpMax
 // is read in 100+ sites, so adjusting it on equip is simpler + drift-free vs an
 // effective-max computed everywhere).
+// OTA-947 — LIGHT AC TAIL-TRIM. Raw standing AC climbs untouched up to `knee`; every
+// point past it counts at `rate`, so a fully-fused Legendary set stays strong (a raw ~37
+// lands ~28) without buying literal immunity — a d20+atk vs AC 37 could only ever land on
+// a natural 20. Every equipped piece still adds AC; only the runaway tail bends. Shared by
+// the combat resolver (applyEnemyCounter) and the StatsPanel so the shown AC = the fought AC.
+export function trimStandingAc(rawAc: number, knee = 22, rate = 0.4): number {
+  if (rawAc <= knee) return rawAc;
+  return Math.round(knee + (rawAc - knee) * rate);
+}
+
 export function armorHpBonus(name: string | null | undefined): number {
   if (!name) return 0;
   const piece = findArmorByName(name);
@@ -468,6 +527,12 @@ export function effectiveStats(
     if (eff.kind !== 'food_buff' || !eff.buffStat || !eff.buffBonus) continue;
     food[eff.buffStat] = (food[eff.buffStat] ?? 0) + eff.buffBonus;
   }
+  // OTA-831 — a `chilled` status (from a cold-typed hit) slows the hands: −2 DEX while
+  // it lasts. Folds into the food-buff bucket so it flows through the ≥1 floor below.
+  // Cleared by a warming coating drink (coatingDrinkRemedy) or by expiry.
+  if ((player.statusEffects ?? []).some((e) => e.kind === 'chilled')) {
+    food.dexterity = (food.dexterity ?? 0) - 2;
+  }
   // OTA-211 — Aether Dust food additive grants +3 to a player-chosen
   // stat for 5 real-world minutes. Stored on player.aetherBuff with a
   // wall-clock expiresAtMs; we apply IF still active. Stacks on top
@@ -478,18 +543,32 @@ export function effectiveStats(
   const w = weatherMod ?? {};
   // OTA 038 — race-derived always-on stat bonuses.
   const racial = racialStatBonusesFor(player.raceId);
+  // OTA-835 — Unknowing Masses "Curious Mind": a persistent +2 INT / +2 WIS that
+  // AWAKENS the first time the character is exposed to Tartaria's secrets (a relic
+  // or a ruin sets player.curiousMindAwakened). Flat-static racialStatBonusesFor
+  // can't express a flag-gated bonus, so it folds in here.
+  const curious = player.raceId === 'unknowing_mass' && player.curiousMindAwakened
+    ? { intelligence: 2, wisdom: 2 }
+    : {};
   // OTA 039 — corruption tier penalty. Tainted=-1 CHA, Corrupted=-1
   // all, Hollowed=-2 all. Subtracts at every skill-check site so the
   // aether under your skin actually costs you something.
   const tier = corruptionTierOf(player.corruption ?? 0);
   const corrPen = corruptionStatPenalty(tier);
+  // OTA-910 — Skyreacher (all five great climbs crested) grants a passive +DEX.
+  // Read via the title-perk aggregate so it flows through every effectiveStats
+  // call site (combat, dodge, climb, checks). Lazy require avoids a static
+  // import cycle and is module-cached.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const titlePerks = require('./titles').titlePerkModifiers(player);
+  const titleDex = titlePerks.dexterityBonus ?? 0;
   // engine_Dev — floor every effective stat at 1 so stacked debuffs (weather + corruption + damage-
   // type onHit) can't drive a roll stat to 0 or negative.
   return {
     strength: Math.max(1, player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0) + (racial.strength ?? 0) + (corrPen.strength ?? 0)),
-    dexterity: Math.max(1, player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0) + (corrPen.dexterity ?? 0)),
-    intelligence: Math.max(1, player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (corrPen.intelligence ?? 0)),
-    wisdom: Math.max(1, player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (corrPen.wisdom ?? 0)),
+    dexterity: Math.max(1, player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0) + (corrPen.dexterity ?? 0) + titleDex),
+    intelligence: Math.max(1, player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (curious.intelligence ?? 0) + (corrPen.intelligence ?? 0)),
+    wisdom: Math.max(1, player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (curious.wisdom ?? 0) + (corrPen.wisdom ?? 0)),
     charisma: Math.max(1, player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (corrPen.charisma ?? 0)),
     // OTA-348 — stealth. `?? 0` guards a pre-backfill in-memory player. Floored at 0, not 1: unlike the
     // five core attributes (which always have a positive base, so the ≥1 clamp only ever catches debuff
@@ -530,6 +609,10 @@ export function effectiveStatsBreakdown(
     });
   }
   const racial = racialStatBonusesFor(player.raceId);
+  // OTA-835 — Curious Mind persistent +2 INT/+2 WIS (see effectiveStats).
+  const curious: Partial<Stats> = player.raceId === 'unknowing_mass' && player.curiousMindAwakened
+    ? { intelligence: 2, wisdom: 2 }
+    : {};
   const tier = corruptionTierOf(player.corruption ?? 0);
   const corrPen = corruptionStatPenalty(tier);
   const w = weatherMod ?? {};
@@ -538,6 +621,7 @@ export function effectiveStatsBreakdown(
     const base = player.stats[stat] ?? 0; // OTA-348 — guard pre-backfill stealth
     const sources: StatSource[] = [];
     if ((racial[stat] ?? 0) !== 0) sources.push({ label: 'race', delta: racial[stat]! });
+    if ((curious[stat] ?? 0) !== 0) sources.push({ label: 'Curious Mind', delta: curious[stat]! });
     if ((bonus[stat] ?? 0) !== 0) sources.push({ label: 'equipped', delta: bonus[stat]! });
     if ((inv[stat] ?? 0) !== 0) sources.push({ label: 'pack passive', delta: inv[stat]! });
     for (const fb of foodBuffs) {

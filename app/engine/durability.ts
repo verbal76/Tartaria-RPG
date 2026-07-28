@@ -1,4 +1,4 @@
-import type { InventoryItem } from './types';
+import type { InventoryItem, Rarity } from './types';
 import {
   findWeaponByName,
   findArmorByName,
@@ -56,11 +56,17 @@ function lookupBaseDurability(name: string): number | null {
   // 'weapon' / 'armor' as durability-tracked.
   const nameLower = name.toLowerCase();
   const g = GEAR.find((x) => x.name.toLowerCase() === nameLower);
-  if (g && g.kind === 'relic') {
-    // GEAR rows don't currently declare baseDurability, but the door
-    // is open for them to do so. Honor it if present.
+  if (g) {
+    // OTA-677 — honor a GEAR row's DECLARED baseDurability regardless of kind. The
+    // old rule only tracked `relic`-kind rows, so when OTA-666 reclassified the
+    // Climbing Rope relic→misc it stopped resolving its base (150) — leaving the
+    // rope's durability un-anchored (a stale tempered max couldn't be healed, and a
+    // fresh misc rope got no durability at all). A relic row with no declared base
+    // still falls back to DEFAULT_DURABILITY (unchanged); a plain misc row without
+    // baseDurability falls through to null (not durability-tracked).
     const gAny = g as typeof g & { baseDurability?: number };
-    return gAny.baseDurability ?? DEFAULT_DURABILITY;
+    if (gAny.baseDurability != null) return gAny.baseDurability;
+    if (g.kind === 'relic') return DEFAULT_DURABILITY;
   }
   // Exploration catalog: Reclaimer's Rope (and any future durability-tracked
   // exploration item) carries baseDurability now that rope is wear-tracked.
@@ -174,6 +180,16 @@ export function stampDurability(item: InventoryItem): InventoryItem {
   if (item.durability) return item;
   const base = lookupBaseDurability(item.name);
   if (base == null) return item;
+  // OTA-677 — the TEMPER roll (variable durability + rolled perks: the
+  // "glass-cannon vs workhorse" tradeoff) is a WEAPON / ARMOR mechanic. A utility
+  // item that merely carries a baseDurability (a Climbing Rope, a Pry Bar, and other
+  // misc / relic tools) must NOT be tempered: it was getting a RANDOM max of
+  // base × [0.4, 1.8] — a 150-durability rope rolling as high as ~270 ("almost 300")
+  // — plus nonsensical rolled stat perks, and every fresh instance re-rolled it.
+  // Non-weapon/armor items now stamp a FIXED max = base, no perks: stable + sensible.
+  if (item.kind !== 'weapon' && item.kind !== 'armor') {
+    return { ...item, durability: { current: base, max: base } };
+  }
   const temper = Math.random(); // 0 = fragile (strong perks), 1 = sturdy (weak perks)
   const max = Math.max(1, Math.round(base * lerp(0.4, 1.8, temper)));
   const instanceStats = rollInstancePerks(item, temper);
@@ -182,6 +198,19 @@ export function stampDurability(item: InventoryItem): InventoryItem {
     durability: { current: max, max },
     ...(instanceStats ? { instanceStats } : {}),
   };
+}
+
+/** OTA-677 — heal a non-weapon/armor item whose durability MAX drifted off its
+ *  catalog base, from the pre-gate temper roll that never should have applied to a
+ *  utility tool (a Climbing Rope stamped at ~270 instead of 150). Resets max to the
+ *  catalog base and clamps current. Weapons/armor are untouched (their tempered
+ *  band is intended). Idempotent — a correct item is returned unchanged. Run on
+ *  load so existing saves self-correct. */
+export function resealUtilityDurability(item: InventoryItem): InventoryItem {
+  if (!item.durability || item.kind === 'weapon' || item.kind === 'armor') return item;
+  const base = lookupBaseDurability(item.name);
+  if (base == null || item.durability.max === base) return item;
+  return { ...item, durability: { max: base, current: Math.min(item.durability.current, base) } };
 }
 
 // Reduce one inventory item's durability by `amount`. Matches by name; the
@@ -238,12 +267,27 @@ export function wearItemById(
   return { inventory: next, broken: false, brokenName: null, salvageDrop: null };
 }
 
-// Compute the TC cost to fully restore an item's durability. Convention:
-// 1 TC per point missing, with a minimum of 1.
+// OTA-923 — repair cost scales GENTLY with rarity so upkeep stays a meaningful
+// wealth sink on expensive late kit instead of a flat rounding error. Was a flat
+// 1 TC / missing point, rarity-blind (a Legendary blade cost the same to mend as a
+// Common cudgel). Conservative multipliers (1 / 1.5 / 2 / 3, NOT 1/2/4/8 which
+// overshoots) — a full Legendary repair goes ~65 → ~195 TC, real but not punishing
+// against late income. Composes with the Architect's Eye repair discount, which is
+// applied on top of this at the call site.
+const REPAIR_RARITY_MULT: Record<Rarity, number> = { Common: 1, Uncommon: 1.5, Rare: 2, Legendary: 3 };
+
+// Compute the TC cost to fully restore an item's durability. Base 1 TC per point
+// missing, scaled by the item's rarity, with a minimum of 1.
 export function repairCost(item: InventoryItem): number {
   if (!item.durability) return 0;
   const missing = item.durability.max - item.durability.current;
-  return Math.max(1, missing);
+  if (missing <= 0) return 0;
+  // OTA-1023 — canonical rarity: a stale-Common instance of a promoted piece
+  // repaired at 1/3 the intended TC sink while fighting with CURRENT stats.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const repairRarity = (require('./crafting') as typeof import('./crafting')).canonicalItemRarity(item);
+  const mult = repairRarity ? (REPAIR_RARITY_MULT[repairRarity] ?? 1) : 1;
+  return Math.max(1, Math.round(missing * mult));
 }
 
 // Restore an item's durability to max in place. Returns a fresh inventory.

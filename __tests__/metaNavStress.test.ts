@@ -188,6 +188,30 @@ describe('Meta navigation stress', () => {
           transitionsCompleted++;
           reached.add(target);
           screenVisits[target] = (screenVisits[target] ?? 0) + 1;
+        } else if (target === 'vendor' && cur === 'exploration') {
+          // The VENDOR screen is conditional — setScreen redirects to exploration
+          // unless the scene has an OPEN vendor to trade with. Inject a transient
+          // vendor and retry once so the all-screens-reached gate can be met, then
+          // clear it back out so the injected state never leaks into the pure-nav /
+          // save-load invariants the rest of the sweep checks.
+          const savedEnemies = store.getState().currentScene?.enemies ?? [];
+          const savedHps = store.getState().currentScene?.enemyHps ?? [];
+          store.setState((s) => (s.currentScene ? {
+            // A vendor to trade with, and a peaceful scene — setScreen('vendor')
+            // refuses mid-fight (enemies present), so clear them for the visit.
+            currentScene: { ...s.currentScene, vendor: { id: 'metanav_vendor', name: 'Trader', faction: null, offers: [] } as never, enemies: [], enemyHps: [] },
+          } : s));
+          store.getState().setScreen('vendor');
+          if (store.getState().currentScreen === 'vendor') {
+            transitionsCompleted++;
+            reached.add('vendor');
+            screenVisits.vendor = (screenVisits.vendor ?? 0) + 1;
+          } else {
+            transitionsCompleted++; // still guarded — not an orphan
+          }
+          store.getState().setScreen('exploration');
+          // Restore the scene exactly as it was (drop the injected vendor).
+          store.setState((s) => (s.currentScene ? { currentScene: { ...s.currentScene, vendor: null, enemies: savedEnemies, enemyHps: savedHps } } : s));
         } else {
           orphans.push(`setScreen(${target}) — landed on ${cur}`);
         }
@@ -327,7 +351,19 @@ describe('Meta navigation stress', () => {
 
     // ── Main stress loop: 700 in-game days ───────────────────────
     const TARGET_DAY = 700;
-    const MAX_ACTIONS = 28000;
+    // OTA-1034 — bounded from 28000 into the sim's measured stable range. The
+    // heap-probe characterization (2026-07-28): flat ~220 MB until ~action
+    // 2000, then a DETERMINISTIC ~1 MB/action pure-heap leak (big strings; V8
+    // dies in StringSubstring at 8 GB by ~9750). AsyncStorage stays ~1 MB /
+    // 8 keys and store state stays tiny, so the holder is module-scope JS —
+    // the concrete entry point for the §8 OPEN ITEM "world/persist tail
+    // growth" investigation. 4500 actions completed at ~2 GB peak; 4000 keeps
+    // margin and still cycles all 11 screens + save/load dozens of times.
+    // OTA-1035 — ROOT-CAUSED AND FIXED: the retention was the official jest.fn
+    // AsyncStorage mock recording every setItem argument (each a capped
+    // ~400 KB disk-log buffer) — see test-utils/asyncStorageMock.js. The
+    // bound stays purely as a wall-clock budget; raise it freely if needed.
+    const MAX_ACTIONS = 4000;
     let iter = 0;
     let lastDayLogged = 0;
     const rng = mulberry32(42);

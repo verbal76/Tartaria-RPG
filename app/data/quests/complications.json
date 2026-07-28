@@ -3,7 +3,7 @@
   { "id": "rival_reclaimer", "text": "while a rival Reclaimer crew tries to beat you to it", "severity": 2, "tags": ["faction:reclaimers", "competition"] },
   { "id": "forgotten_order_observing", "text": "while a Forgotten Order observer takes careful notes", "severity": 2, "tags": ["faction:forgotten_order", "witnessed"] },
   { "id": "dynasty_assassin", "text": "without alerting the Eternal Dynasty assassin who has been shadowing you", "severity": 4, "tags": ["faction:eternal_dynasty", "stealth"] },
-  { "id": "approaching_storm", "text": "before the Etheric storm rolls in", "severity": 3, "tags": ["weather", "time_pressure"] },
+  { "id": "approaching_storm", "text": "before the Aetheric storm rolls in", "severity": 3, "tags": ["weather", "time_pressure"] },
   { "id": "before_collapse", "text": "before the chamber collapses on itself", "severity": 4, "tags": ["structural", "time_pressure"] },
   { "id": "alerted_sentinel", "text": "without waking the Sentinel sleeping in the next room", "severity": 4, "tags": ["construct", "stealth"] },
   { "id": "temporal_loop", "text": "while caught in a recurring temporal loop", "severity": 4, "tags": ["aetheric", "time"] },
