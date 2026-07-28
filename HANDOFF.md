@@ -846,9 +846,19 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.38**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.39**; ledger in `VERSION.md`.
 
-- **THE CRAFT-SCREEN STALL (2026-07-27, latest).** HAL **1027** / golem **1004**. Owner: CRAFT took
+- **THE WEDGED BANDOLIER — GHOST EQUIP REFERENCES (2026-07-27, latest).** HAL **1028** / golem
+  **1005**. Owner screenshot: two bandolier slots rendering "+ rack throw" that refused everything.
+  Root cause category: bandolierIds/toolPouchIds index inventory INSTANCES, but only THROW and
+  UNRACK cleaned them — selling/scrapping/drinking/gifting/fusing/fully-using a racked item left
+  its id behind. A ghost renders as an EMPTY slot yet still counts against the cap ("Five loops,
+  five throws" with nothing visible to pull) and there is no affordance to clear it. Fix: ghost
+  sweep in backfillPlayer (wedged saves heal on first load) + both stow cap checks count only
+  LIVE ids (a mid-session ghost can never wedge again). This is the REFERENCE sibling of the §3a-F
+  snapshot lesson: persisted instance-id indexes must be validated against the live inventory.
+
+- **THE CRAFT-SCREEN STALL (2026-07-27).** HAL **1027** / golem **1004**. Owner: CRAFT took
   seconds to open; each repairs-tab tap was "tap, wait 20 seconds, stutter". Root cause was
   PRE-EXISTING (bisect probe: ~900ms both before and after the audit batches):
   `ingredientShortfall` annotated the ENTIRE inventory (canonical tags + substitutability +

@@ -1835,6 +1835,27 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   if (out.golem?.weapon) {
     out = { ...out, golem: { ...out.golem, weapon: restampInventoryItem(stampDurability(out.golem.weapon)) } };
   }
+  // OTA-1028 — GHOST EQUIP REFERENCES. bandolierIds / toolPouchIds index inventory
+  // INSTANCES, but only THROW and UNRACK cleaned them — selling, scrapping,
+  // drinking, gifting, fusing or fully using a racked item left its id behind
+  // forever. A ghost RENDERS as an empty slot yet still counts against the
+  // cap: the owner's bandolier showed two "+ rack throw" slots that refused
+  // everything ("Five loops, five throws") — permanently wedged, with no
+  // affordance to clear them. Sweep on every load; the stow cap checks also
+  // count only LIVE ids so a mid-session ghost can never wedge a rack again.
+  {
+    const ghostInvIds = new Set((out.inventory ?? []).map((i) => i.id));
+    const eqRef = out.equipped;
+    const deadBand = (eqRef?.bandolierIds ?? []).some((id) => !ghostInvIds.has(id));
+    const deadPouch = (eqRef?.toolPouchIds ?? []).some((id) => !ghostInvIds.has(id));
+    if (eqRef && (deadBand || deadPouch)) {
+      out = { ...out, equipped: {
+        ...eqRef,
+        bandolierIds: (eqRef.bandolierIds ?? []).filter((id) => ghostInvIds.has(id)),
+        toolPouchIds: (eqRef.toolPouchIds ?? []).filter((id) => ghostInvIds.has(id)),
+      } };
+    }
+  }
   return out;
 }
 
@@ -24878,7 +24899,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     const player = state.player;
     if (!player) return;
-    const current = player.equipped?.toolPouchIds ?? [];
+    // OTA-1028 — LIVE ids only (mirrors the bandolier ghost guard): a stowed tool
+    // that left the pack by sale/scrap/use must never eat a pouch slot.
+    const current = (player.equipped?.toolPouchIds ?? []).filter((id) => player.inventory.some((i) => i.id === id));
     // OTA-695 — pouch the first UN-POUCHED instance of this name (mirrors the
     // OTA-690 bandolier fix). The old first-by-name find re-grabbed an already-
     // pouched copy, so isPouchEligible bounced with "already on your belt" and you
@@ -24966,7 +24989,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const BANDOLIER_MAX = 5;
     const player = get().player;
     if (!player) return;
-    const current = player.equipped?.bandolierIds ?? [];
+    // OTA-1028 — count LIVE ids only: a ghost (racked item that left the pack by a
+    // path other than throwing) must never eat a loop.
+    const current = (player.equipped?.bandolierIds ?? []).filter((id) => player.inventory.some((i) => i.id === id));
     // OTA-690 — rack the first UN-RACKED instance of this name. The old find
     // grabbed the first-by-name instance regardless — so once one throwing knife
     // was racked, every "stow Throwing Knife" re-found that SAME (already-racked)
