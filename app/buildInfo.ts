@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.39';
+export const DISPLAY_VERSION = '4.28.40';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17626,4 +17626,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // permanently wedged. Fix: a ghost sweep on every load (heals wedged saves
 // on first boot) + the two stow cap checks count only LIVE ids so a
 // mid-session ghost can never wedge the bandolier or the tool pouch again.
-export const OTA_BUILD_ID = '2026-07-27-1005-ghost-equip-refs';
+// OTA-1006 — THE GREEN LIE (owner: "why is the Resonant Spike glowing green if
+// I'm out of range? make sure that all weapons correctly reflect that they are
+// active at their appropriate range"). Root cause category: DIVERGENT COPIES
+// of the reach resolver. The attack gate rolls with playerWeaponReach
+// (throwable instance → catalog row → forge-stamped uniqueStats.reachClass for
+// fused weapons → runecaster INT gate), but the weapon quick-button tone
+// (InputBox) and the enemy panel's in-range flag (ExplorationScreen) each kept
+// a LOCAL re-derivation that missed the forge stamp — so the fused close-only
+// Resonant Spike glowed green at mid range while the gate refused every swing.
+// Fix: playerWeaponReach is exported and BOTH consumers read it; the local
+// copies are deleted, and a category-lock test forbids a reachClassFor
+// derivation from reappearing in either screen. Buttons now glow exactly when
+// the swing they fire would land.
+export const OTA_BUILD_ID = '2026-07-28-1006-reach-highlight-unified';

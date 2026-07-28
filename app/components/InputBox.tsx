@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { itemIsThrowable } from '../engine/bandolierEligibility';
 import {
   View,
   TextInput,
@@ -16,46 +15,29 @@ import { TutorialTarget } from './TutorialTarget';
 import { visibleBuildingRooms } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS } from './tutorialSteps';
-import { useGameStore } from '../state/gameStore';
+import { playerWeaponReach, useGameStore } from '../state/gameStore';
 import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
-import { reachClassFor } from '../engine/combatRules';
 import { reachBandsFor } from '../engine/types';
-import type { InventoryItem, CombatRange } from '../engine/types';
+import type { InventoryItem, CombatRange, PlayerCharacter } from '../engine/types';
 
-/** OTA 207 / OTA-550 — do the bands a weapon reaches include the current
- *  combat range? Resolves the weapon's four-band reach class (ranged /
- *  throwable / long / melee / runecaster) and checks band membership. */
-function bandsReachRange(
-  weaponName: string | null | undefined,
-  range: CombatRange,
-  intelligence: number,
-  inventory: ReadonlyArray<InventoryItem>,
-): boolean {
-  if (!weaponName) return reachBandsFor('barehanded').includes(range);
-  // A throwable inventory item equipped to a hand throws from 'far' inward.
-  const throwInst = inventory.find(
-    (it) => it.name.toLowerCase() === weaponName.toLowerCase() && itemIsThrowable(it),
-  );
-  if (throwInst) return reachBandsFor('throwable').includes(range);
-  const w = resolveDisplayWeaponByName(weaponName, inventory);
-  if (!w) return reachBandsFor('melee').includes(range);
-  const cls = reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
-  let bands = reachBandsFor(cls);
-  if (cls === 'runecaster' && intelligence < 9) bands = reachBandsFor('throwable');
-  return bands.includes(range);
-}
-
-/** OTA 207 — does the equipped weapon reach the current combat range? */
+/** OTA-1006 — the quick-button highlight reads reach from the SAME resolver the
+ *  attack gate rolls with (playerWeaponReach: throwable instance → catalog
+ *  row → forge-stamped uniqueStats.reachClass on fused weapons → runecaster
+ *  INT gate). The local copy this replaces re-derived reach from the display
+ *  catalog and missed the forge stamp, so a close-only fused weapon glowed
+ *  green at mid range while the gate refused every swing. Bare hands
+ *  (punch/kick, hand = null) stay a fixed barehanded check regardless of
+ *  what's equipped. */
 function weaponTone(
-  weaponName: string | null | undefined,
+  player: PlayerCharacter | null,
+  hand: 'main' | 'off' | null,
   range: CombatRange | null | undefined,
-  intelligence: number,
-  inventory: ReadonlyArray<InventoryItem>,
 ): 'ready' | 'needs-approach' | undefined {
   if (!range) return undefined;
-  return bandsReachRange(weaponName, range, intelligence, inventory) ? 'ready' : 'needs-approach';
+  const bands = hand && player ? playerWeaponReach(player, hand).bands : reachBandsFor('barehanded');
+  return bands.includes(range) ? 'ready' : 'needs-approach';
 }
 
 interface Props {
@@ -197,7 +179,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // the bar used to mount on is dropped ~half the time on Android's New
   // Architecture, which left the bar absent and this field covered.
   const setExplorationInputActive = useGameStore((s) => s.setExplorationInputActive);
-  const playerInt = useGameStore((s) => s.player?.stats.intelligence ?? 0);
+  // OTA-1006 — the whole player, for the shared reach resolver behind the weapon
+  // quick-button tones (replaces the old intelligence-only read).
+  const reachPlayer = useGameStore((s) => s.player ?? null);
   const tutorialStep = useGameStore((s) => s.tutorialStep);
   const awaitingTutorialName = useGameStore((s) => s.awaitingTutorialName);
   const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
@@ -502,22 +486,22 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               ) && (
                 <>
                   {(() => {
-                    const punchT = weaponTone(null, range, playerInt, inventory);
+                    const punchT = weaponTone(reachPlayer, null, range);
                     return <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={punchT} outOfRange={punchT === 'needs-approach'} />;
                   })()}
                   {(() => {
-                    const kickT = weaponTone(null, range, playerInt, inventory);
+                    const kickT = weaponTone(reachPlayer, null, range);
                     return <QuickBtn label="kick" onPress={() => onSubmit('kick')} tone={kickT} outOfRange={kickT === 'needs-approach'} />;
                   })()}
                 </>
               )}
               {equippedMain ? (() => {
-                const mainT = weaponTone(equippedMain, range, playerInt, inventory);
+                const mainT = weaponTone(reachPlayer, 'main', range);
                 const coat = equippedMainCoating ? `${equippedMainCoating.toLowerCase()} ` : '';
                 return <QuickBtn label={`${coat}${shortWeaponLabel(equippedMain).toLowerCase()}`} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
               })() : null}
               {equippedOff ? (() => {
-                const offT = weaponTone(equippedOff, range, playerInt, inventory);
+                const offT = weaponTone(reachPlayer, 'off', range);
                 const coat = equippedOffCoating ? `${equippedOffCoating.toLowerCase()} ` : '';
                 return <QuickBtn label={`off: ${coat}${shortWeaponLabel(equippedOff).toLowerCase()}`} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
               })() : null}

@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { itemIsThrowable } from '../engine/bandolierEligibility';
 import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { useGameStore, makeRoomKey } from '../state/gameStore';
+import { playerWeaponReach, useGameStore, makeRoomKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -47,8 +46,6 @@ import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { TUTORIAL_STEPS } from '../components/tutorialSteps';
-import { resolveDisplayWeaponByName } from '../engine/itemResolution';
-import { reachClassFor } from '../engine/combatRules';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
 import type { CombatRange } from '../engine/types';
 
@@ -395,28 +392,14 @@ export function ExplorationScreen() {
     if (!currentScene || currentScene.enemies.length === 0) return [];
     const range: CombatRange = currentScene.range ?? 'mid';
     const rangeLabel = RANGE_LABELS[range];
-    const mainName = player?.equipped?.main ?? player?.equipped?.weaponName;
-    // OTA-227 — resolveDisplayWeaponByName so fused weapons (catalog-
-    // absent, uniqueStats-bearing) get their actual weaponKind instead
-    // of barehand-only fallback. Resonant Edge (aetheric → runecaster)
-    // now reports in-range at close, not just arm's reach.
-    // OTA-550 — four-band reach via the shared resolver (ranged/throwable/
-    // long/melee). A throwable inventory item reaches from 'far' inward.
-    const w = mainName ? resolveDisplayWeaponByName(mainName, player?.inventory ?? []) : null;
-    const throwInst = mainName
-      ? (player?.inventory ?? []).find((it) => it.name.toLowerCase() === mainName.toLowerCase() && itemIsThrowable(it))
-      : undefined;
-    let canHit: boolean;
-    if (throwInst) {
-      canHit = reachBandsFor('throwable').includes(range);
-    } else if (!w) {
-      canHit = reachBandsFor('barehanded').includes(range);
-    } else {
-      const cls = reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
-      let bands = reachBandsFor(cls);
-      if (cls === 'runecaster' && (player?.stats?.intelligence ?? 0) < 9) bands = reachBandsFor('throwable');
-      canHit = bands.includes(range);
-    }
+    // OTA-1006 — in-range comes from the SAME resolver the attack gate rolls with
+    // (playerWeaponReach: throwable instance → catalog row → forge-stamped
+    // uniqueStats.reachClass on fused weapons → runecaster INT gate). The
+    // local copy this replaces missed the forge stamp, so a close-only fused
+    // weapon read as in-range at mid while every swing bounced.
+    const canHit = player
+      ? playerWeaponReach(player, 'main').bands.includes(range)
+      : reachBandsFor('barehanded').includes(range);
     return currentScene.enemies.map((e, i) => ({
       enemy: e,
       currentHp: currentScene.enemyHps[i] ?? e.hp,

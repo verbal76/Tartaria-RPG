@@ -29221,7 +29221,13 @@ function enemyBuildScore(enemy: Enemy): number {
   return Math.max(1, Math.min(10, ap + hpTier));
 }
 
-function playerWeaponReach(
+// OTA-1006 — EXPORTED: the weapon quick-button tone (InputBox) and the enemy
+// panel's in-range flag (ExplorationScreen) now read reach from THIS resolver
+// — the same one the attack gate rolls with — instead of keeping local
+// re-derivations. The copies missed the forge stamp (uniqueStats.reachClass),
+// so a close-only fused weapon glowed green at mid range while the gate
+// refused every swing.
+export function playerWeaponReach(
   player: PlayerCharacter,
   // OTA 027 — optional slot override. When the player typed
   // "attack with the off-hand X", the caller passes 'off' so the
