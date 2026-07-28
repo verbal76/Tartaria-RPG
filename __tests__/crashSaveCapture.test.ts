@@ -101,7 +101,8 @@ describe('crashSave — lifecycle + never-throw contract', () => {
     // call — no spyOn/mockRestore (which doesn't restore the async-storage mock
     // cleanly, since getItem is already a jest.fn, and would leak undefined into
     // the next test).
-    (AsyncStorage.getItem as jest.Mock).mockImplementationOnce(() => Promise.reject(new Error('boom')));
+    // OTA-1012 — suite-scoped spy over the plain shared mock (calls through after the once).
+    jest.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(() => Promise.reject(new Error('boom')));
     await expect(captureActiveCrashSave('x')).resolves.toBeUndefined();
   });
 });

@@ -30916,7 +30916,9 @@ function atFactionTurnInBuilding(get: () => GameStore, factionId: string): boole
  *  present, auto-turn-in every active faction quest whose WORK is done (staged →
  *  all stages; fetch → items in hand), at FULL reward, and surface a completion
  *  popup. This is the "submit on arrival at the routed spot" the player asked for
- *  — couriering from afar (the Contracts COMPLETE button) stays the HALF option. */
+ *  — OTA correction: the Contracts COMPLETE button is NOT a remote half option
+ *  anymore; it delegates to the same face-to-face typed turn-ins (see
+ *  completeContractFromUI — "in person or not at all"). */
 function autoSubmitReadyFactionQuests(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,

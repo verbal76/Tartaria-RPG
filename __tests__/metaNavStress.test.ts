@@ -359,6 +359,10 @@ describe('Meta navigation stress', () => {
     // the concrete entry point for the §8 OPEN ITEM "world/persist tail
     // growth" investigation. 4500 actions completed at ~2 GB peak; 4000 keeps
     // margin and still cycles all 11 screens + save/load dozens of times.
+    // OTA-1012 — ROOT-CAUSED AND FIXED: the retention was the official jest.fn
+    // AsyncStorage mock recording every setItem argument (each a capped
+    // ~400 KB disk-log buffer) — see test-utils/asyncStorageMock.js. The
+    // bound stays purely as a wall-clock budget; raise it freely if needed.
     const MAX_ACTIONS = 4000;
     let iter = 0;
     let lastDayLogged = 0;

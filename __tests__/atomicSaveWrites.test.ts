@@ -93,7 +93,9 @@ describe('atomic saveSlot — failure leaves the live save intact, never throws'
     // Make the verify read-back return the WRONG bytes on BOTH stage attempts
     // (the initial stage AND the OTA-406 post-reclaim retry) — a persistent
     // truncated/quota-capped staged write, so the save genuinely can't land.
-    (AsyncStorage.getItem as jest.Mock)
+    // OTA-1012 — the shared AsyncStorage mock is PLAIN now (no global jest.fn
+    // retention); failure injection uses a suite-scoped spy that calls through.
+    jest.spyOn(AsyncStorage, 'getItem')
       .mockImplementationOnce(() => Promise.resolve('garbage-not-the-payload'))
       .mockImplementationOnce(() => Promise.resolve('garbage-not-the-payload'));
 
@@ -111,7 +113,7 @@ describe('atomic saveSlot — failure leaves the live save intact, never throws'
     // (never throw) and record the error. Two one-shot rejections cover both
     // setItem stage calls, then the default mock impl is preserved for the
     // next test.
-    (AsyncStorage.setItem as jest.Mock)
+    jest.spyOn(AsyncStorage, 'setItem')
       .mockImplementationOnce(() => Promise.reject(new Error('quota')))
       .mockImplementationOnce(() => Promise.reject(new Error('quota')));
     await expect(saveSlot(SLOT, mkState('Verbal'))).resolves.toBeUndefined();
@@ -131,7 +133,7 @@ describe('OTA-406 — storage-full self-heal: purge the copy-log + retry', () =>
     // The FIRST setItem (staging to the temp key) rejects as if the DB were
     // full; every subsequent setItem uses the default mock (stores normally) —
     // mirroring the removeItem having freed enough space for the retry.
-    (AsyncStorage.setItem as jest.Mock).mockImplementationOnce(() =>
+    jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(() =>
       Promise.reject(new Error('database or disk is full')),
     );
 
