@@ -199,6 +199,13 @@ function golemProgressAwardFor(currentStat: number): number {
 }
 
 const GOLEM_LEVEL_UP_THRESHOLD = 100;
+// OTA-800 — hard training ceiling, mirroring the player's MAX_TRAINED_STAT
+// (statTraining.ts) and the dog twin. Power fed to-hit + damage with no cap and
+// each level also bumped max HP by 3, so a patiently-ground golem climbed both
+// without bound. The resist cap kept its DEFENSE mortal, but nothing bounded its
+// OFFENSE or HP; this does. Reaching 30 is still an extreme grind (~1000 uses/
+// point at the top tier).
+const GOLEM_MAX_TRAINED_STAT = 30;
 
 /** Read a trained golem stat, tolerating golems summoned before OTA-467. */
 export function golemStatBonus(golem: Companion, key: GolemStatKey): number {
@@ -232,23 +239,26 @@ export function trainGolemStat(
   const stats = golem.stats ?? { power: 0, resilience: 0 };
   const statProgress = golem.statProgress ?? { power: 0, resilience: 0 };
   const baseStat = stats[stat];
+  // OTA-800 — ceiling reached: stop training (see GOLEM_MAX_TRAINED_STAT).
+  if (baseStat >= GOLEM_MAX_TRAINED_STAT) return { golem, leveled: null };
   const award = golemProgressAwardFor(baseStat);
   if (award <= 0) return { golem, leveled: null };
   let progress = statProgress[stat] + award;
   let next = baseStat;
   let leveled: GolemTrainResult['leveled'] = null;
-  while (progress >= GOLEM_LEVEL_UP_THRESHOLD) {
+  while (progress >= GOLEM_LEVEL_UP_THRESHOLD && next < GOLEM_MAX_TRAINED_STAT) {
     progress -= GOLEM_LEVEL_UP_THRESHOLD;
     const before = next;
     next = before + 1;
     if (!leveled) leveled = { stat, from: before, to: next };
   }
+  if (next >= GOLEM_MAX_TRAINED_STAT) progress = 0;
   // arb170 — TRAINABLE HP: a stat level-up also toughens the frame (+3 max HP,
   // healed to keep the ratio). Power trains on attacking, resilience on surviving
   // a hit, so this is the "trash/mid fights grow it for the boss" loop the player
-  // asked for — HP and resist both climb through use. (No cap here; the resist
-  // cap + min-1-damage + big boss hits keep a maxed golem mortal — see
-  // golemDamageResist and the retaliation rule.)
+  // asked for — HP and resist both climb through use. OTA-800 — now bounded by
+  // GOLEM_MAX_TRAINED_STAT: HP stops climbing once the stat hits the ceiling
+  // (the resist cap + min-1-damage + big boss hits already kept it mortal).
   const HP_PER_LEVEL = 3;
   const hpBump = leveled ? HP_PER_LEVEL : 0;
   return {
@@ -304,10 +314,15 @@ export function isGolemSubstitutePart(
   kind: GolemKind,
   item: { name: string; kind?: string; tags?: readonly string[] },
 ): boolean {
-  if (item.kind && item.kind !== 'misc') return false; // materials/loot only
+  // OTA-1023 — canonical kind + tags: a stale aether material fed the golem and
+  // NOTHING happened (element tag missing from the snapshot), while the
+  // name-based exact-fuel sibling check worked — two rules, one item.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { canonicalItemKind: cik, canonicalItemTags: cit } = require('./crafting') as typeof import('./crafting');
+  if (cik(item as Parameters<typeof cik>[0]) !== 'misc') return false; // materials/loot only
   if (isGolemRepairPart(kind, item.name)) return false; // exact fuel → full-heal path
   const el = GOLEM_ELEMENT_TAGS[kind] ?? [];
-  return (item.tags ?? []).some((t) => el.includes(t.toLowerCase()));
+  return cit(item).some((t) => el.includes(t));
 }
 
 /** arb122 — HP a SUBSTITUTE material restores, SCALED BY RARITY so a pinch of

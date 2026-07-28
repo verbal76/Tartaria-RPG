@@ -86,20 +86,17 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
     Keyboard.dismiss();
     onSubmit(target);
   };
-  // 2026-05-25 [POLISH-3] — show consumed chips at the FAR RIGHT
-  // instead of hiding them. User wanted a visible record of what's
-  // already been investigated/taken/salvaged, while keeping the
-  // actionable items on the left so the longer slidable list reads
-  // "things to do" → "things tried" left-to-right. Consumed chips
-  // already render greyed + ✓ via the existing styling below; only
-  // the sort order needed to change. alwaysShow chips (like 'the
-  // ground') keep their inherent ordering — they were never in the
-  // filtered-out bucket anyway.
-  const visibleChips = [...(chips ?? [])].sort((a, b) => {
-    const aDone = a.consumed ? 1 : 0;
-    const bDone = b.consumed ? 1 : 0;
-    return aDone - bDone;
-  });
+  // OTA-767 — a CONSUMED chip always leaves the list, INCLUDING the pinned surface
+  // chip ('the ground' / 'floor' / 'mud'). Player ask: every other investigated noun
+  // vanishes, so the surface shouldn't linger as a disabled greyed ✓ either (a consumed
+  // chip is `disabled`, so keeping it was a dead, space-taking row). It still stays
+  // PINNED while it's actionable — alwaysShow keeps it in the pool until investigating
+  // it marks it consumed, and only THEN does it disappear, exactly like a one-shot prop.
+  // LOCKED chips (unmetRequirement, not yet consumed) still remain so the player sees
+  // what needs a scanner / climb-down.
+  const visibleChips = (chips ?? [])
+    .filter((c) => !c.consumed)
+    .sort((a, b) => (a.consumed ? 1 : 0) - (b.consumed ? 1 : 0));
   // 2026-05-25 — Common-hints section removed. Per playtester:
   // the canned chips ("the wall" / "the rubble" / "the silt" /
   // "the doorway") cluttered the modal without adding value once
@@ -115,9 +112,10 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
       onRequestClose={onCancel}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
+      <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
         <KeyboardAvoidingView
           style={styles.scrim}
+          accessibilityViewIsModal={true}
           // OTA 022 — see ExplorationScreen comment. 'height' on
           // Android double-shrinks; 'padding' keeps the scrim full
           // size and only pushes the card up to avoid the keyboard.
@@ -125,7 +123,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
         >
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>INVESTIGATE</Text>
+              <Text style={styles.title} accessibilityRole="header">INVESTIGATE</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
                 Name a thing in the scene to examine. Be specific —
@@ -185,6 +183,8 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                           ]}
                           disabled={c.consumed}
                           onPress={() => tapToSearch(c.noun)}
+                          accessibilityRole="button"
+                          accessibilityState={{ disabled: c.consumed }}
                         >
                           <Text
                             style={[
@@ -231,6 +231,8 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                   ]}
                   onPress={handleSubmit}
                   disabled={!text.trim()}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: !text.trim() }}
                 >
                   <Text style={text.trim() ? styles.btnTextPrimary : styles.btnTextNeutral}>
                     INVESTIGATE
@@ -239,6 +241,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={onCancel}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
                 </Pressable>
@@ -286,7 +289,7 @@ const styles = StyleSheet.create({
   //   hints, examples, chipRow, chipScrollRow, chip, chipScene,
   //   chipText, chipTextScene, chipConsumed, chipTextConsumed,
   //   chipRequiresText — all unreferenced after the rewrite.
-  chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
+  chipLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
   // 2026-05-25 — stacked-list styles matching TakeModal so the
   // four ambient-noun modals share one visual pattern. Bounded
   // scroll height keeps long lists from blowing past the screen

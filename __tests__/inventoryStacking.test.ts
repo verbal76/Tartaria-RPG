@@ -237,3 +237,46 @@ describe('OTA-441 — junk-commodity caps bound the forage flood', () => {
     expect(capacityFor('Small Rock')).toBeGreaterThanOrEqual(40);
   });
 });
+
+// ---------------------------------------------------------------------------
+// OTA-717 — a durability-tracked TOOL (misc kind) must NOT merge a fresh copy
+// into a worn stack. Regression for: "I crafted a fresh 150/150 Climbing Rope
+// but still couldn't climb" — the new rope folded into a 15/150 stack and its
+// full durability was silently discarded.
+// ---------------------------------------------------------------------------
+
+describe('OTA-717 — durability misc tools follow the pristine-only merge rule', () => {
+  it('does NOT merge a fresh full Climbing Rope into a worn one', () => {
+    const worn = makeItem({ name: 'Climbing Rope', kind: 'misc', tags: ['utility', 'rope'], durability: { current: 15, max: 150 } });
+    const fresh = makeItem({ name: 'Climbing Rope', kind: 'misc', tags: ['utility', 'rope'], durability: { current: 150, max: 150 } });
+    const out = mergeOrPushItem([worn], fresh);
+    expect(out).toHaveLength(2); // stays a separate row — durability preserved
+    const best = out.reduce((a, b) => (b.durability!.current > a.durability!.current ? b : a));
+    expect(best.durability!.current).toBe(150); // the fresh rope survives at full
+  });
+
+  it('DOES merge two full Climbing Ropes (pristine stack stays tidy)', () => {
+    const a = makeItem({ name: 'Climbing Rope', kind: 'misc', durability: { current: 150, max: 150 } });
+    const b = makeItem({ name: 'Climbing Rope', kind: 'misc', durability: { current: 150, max: 150 } });
+    const out = mergeOrPushItem([a], b);
+    expect(out).toHaveLength(1);
+    expect(out[0]!.quantity).toBe(2);
+  });
+
+  it('keeps ×N full torches merged (no clutter regression)', () => {
+    const stack = makeItem({ name: 'Aetheric Torch', kind: 'misc', quantity: 21, durability: { current: 25, max: 25 } });
+    const fresh = makeItem({ name: 'Aetheric Torch', kind: 'misc', durability: { current: 25, max: 25 } });
+    const out = mergeOrPushItem([stack], fresh);
+    expect(out).toHaveLength(1);
+    expect(out[0]!.quantity).toBe(22);
+  });
+
+  it('non-durability misc still stacks freely', () => {
+    const out = mergeOrPushItem(
+      [makeItem({ name: 'Scrap Metal', kind: 'misc', quantity: 3 })],
+      makeItem({ name: 'Scrap Metal', kind: 'misc', quantity: 2 }),
+    );
+    expect(out).toHaveLength(1);
+    expect(out[0]!.quantity).toBe(5);
+  });
+});

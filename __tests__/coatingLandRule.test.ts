@@ -17,8 +17,11 @@
 // the "fails to take" combat-log line.
 //
 // Poison relationships used (TYPE_RESISTANCE_MAP in app/engine/crafting.ts):
-//   Automation (Scrap Drone) RESISTS poison.
-//   Animal     (Mud Boar)    NEUTRAL  to poison.
+//   Automation  (Scrap Drone) RESISTS poison.
+//   Mud Creature (Mudling)    NEUTRAL  to poison.
+//   Animal      (Mud Boar)    WEAK to poison — OTA-827 made poison anti-ORGANIC, so
+//                             living flesh (Animal / Human / fleshy Aetheric Mutation)
+//                             is vulnerable to it.
 //   Mud Boar + injected trait vulnerable:poison → WEAK to poison.
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -140,11 +143,14 @@ function observe() {
 
 // Sanity: confirm the relationships we rely on actually hold in the engine.
 describe('coating-rule preconditions (relationship sanity)', () => {
-  it('Automation RESISTS poison; Animal is NEUTRAL; vulnerable:poison trait is WEAK', () => {
+  it('Automation RESISTS poison; Mud Creature is NEUTRAL; Animal is WEAK; vulnerable:poison trait is WEAK', () => {
     expect(applyDamageTypeModifier(1, 'poison', 'Automation').match).toBe('resist');
-    expect(applyDamageTypeModifier(1, 'poison', 'Animal').match).toBe('normal');
+    // OTA-827 — poison is anti-organic, so Mud Creatures (inorganic) stay NEUTRAL…
+    expect(applyDamageTypeModifier(1, 'poison', 'Mud Creature').match).toBe('normal');
+    // …but living flesh (Animal) is WEAK to it.
+    expect(applyDamageTypeModifier(1, 'poison', 'Animal').match).toBe('weak');
     expect(traitDamageMultiplier(['vulnerable:poison'], 'poison').match).toBe('vulnerable');
-    // Animal carries no poison resist/weak trait by default.
+    // A creature with no poison-relevant trait resolves neutral at the trait layer.
     expect(traitDamageMultiplier(['savage', 'ambush_strike'], 'poison').match).toBe('normal');
   });
 });
@@ -187,12 +193,12 @@ describe('engine_Dev coating-landing rule — REAL store combat', () => {
 
   it('CASE 3 — NEUTRAL to poison + Math.random HIGH (0.99): coating LANDS (no gate)', async () => {
     const store = await boot('CoatRule3');
-    plant('Mud Boar'); // Animal → neutral to poison
+    plant('Mudling'); // Mud Creature → NEUTRAL to poison (inorganic; OTA-827 poison is anti-organic)
     equipCoatedWeapon();
     pinRandom(0.99); // would fail IF the gate wrongly applied
     await attackResolvingAll();
     const { hasPoisonCoat, failsLogged } = observe();
-    expect(store.getState().currentScene?.enemies[0]?.type).toBe('Animal');
+    expect(store.getState().currentScene?.enemies[0]?.type).toBe('Mud Creature');
     expect(hasPoisonCoat).toBe(true);    // lands anyway
     expect(failsLogged).toBe(false);     // gate must NOT apply to neutral
   });
@@ -234,7 +240,7 @@ describe('engine_Dev coating-landing rule — REAL store combat', () => {
     let neutralLands = 0;
     for (let i = 0; i < TRIALS; i++) {
       await boot(`CoatRule5b-${i}`);
-      plant('Mud Boar');
+      plant('Mudling'); // Mud Creature → genuinely NEUTRAL to poison
       equipCoatedWeapon();
       pinRandom(0.99);
       await attackResolvingAll();

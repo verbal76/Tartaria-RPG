@@ -1,8 +1,8 @@
 [
   {
     "id": "etheric_storm",
-    "name": "Etheric Storm",
-    "description": "Blue and violet lightning crackles across the horizon, flashing through the sky in unnatural colors. Electronics fail. The air tastes like copper.",
+    "name": "Aetheric Storm",
+    "description": "Blue and violet lightning crackles across the horizon, flashing through the sky in unnatural colors — the Etheric fields the Overload buried still discharging where the old grid shorts against itself. Electronics fail. The air tastes like copper.",
     "visibility": -3,
     "travelPenalty": 4,
     "corruptionChance": 3,
@@ -12,7 +12,7 @@
   {
     "id": "aether_lightning",
     "name": "Aether Lightning",
-    "description": "Bolts of blue-purple energy strike without thunder. Each flash leaves an afterimage burned onto the eye.",
+    "description": "Bolts of blue-purple energy strike without thunder — trapped Etherium venting a charge it has held since the calcification. Each flash leaves an afterimage burned onto the eye.",
     "visibility": -2,
     "travelPenalty": 2,
     "corruptionChance": 2,

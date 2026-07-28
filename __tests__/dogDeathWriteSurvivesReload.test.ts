@@ -75,7 +75,7 @@ describe('dog death/abandon WRITE survives a cold reload (338 close-out)', () =>
     const slotId = store.getState().activeSlotId!;
     // A downed, benched dog past the bleed-out window.
     store.setState((s) => ({
-      player: { ...s.player!, hoursElapsed: DOG_BLEED_OUT_HOURS, dog: mkDog({ status: 'waiting_at_base', hp: 0, downedAtHour: 0 }) },
+      player: { ...s.player!, hoursElapsed: DOG_BLEED_OUT_HOURS, dogRevivedOta938: true, dog: mkDog({ status: 'waiting_at_base', hp: 0, downedAtHour: 0 }) },
     }));
 
     // Drive the REAL death write path (sets status 'dead' + persists).
@@ -102,7 +102,7 @@ describe('dog death/abandon WRITE survives a cold reload (338 close-out)', () =>
     const store = await bootBase();
     const slotId = store.getState().activeSlotId!;
     store.setState((s) => ({
-      player: { ...s.player!, hoursElapsed: 100, dog: mkDog({ status: 'with_player', hp: 12, loyalty: 0 }) },
+      player: { ...s.player!, hoursElapsed: 100, dogRevivedOta938: true, dog: mkDog({ status: 'with_player', hp: 12, loyalty: 0 }) },
     }));
 
     tickDogStatus(store.getState, store.setState);

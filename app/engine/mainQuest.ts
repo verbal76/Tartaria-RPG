@@ -307,7 +307,7 @@ const CORE_RECOVERED_LINE = (factionId: string, capitalId: string, recoveredCoun
   return `${line} ${tail}`;
 };
 
-const LOST_CAPITAL_NAMES: Record<string, string> = {
+export const LOST_CAPITAL_NAMES: Record<string, string> = {
   asgardar: 'Asgardar',
   samarran: 'Samarran',
   nimari: 'Nimari',
@@ -332,7 +332,7 @@ const CAPITAL_ARRIVAL_SIGNATURES: Record<string, string> = {
   asgardar:
     'Asgardar announces itself before you crest the rise: the Grand Spire of Etheria, snapped a third of the way up, still hums a single sub-audible note that you feel in your teeth more than hear. Aether-light crawls the old channel-grooves like slow lightning that forgot how to strike.',
   samarran:
-    'Samarran is all broken glass and cold arithmetic. Thametan\'s Tower leans over a plaza of shattered lenses, and the dead Etheric Engine at its heart still ticks — one wrong, patient click every few seconds, like a clock counting down to something that already happened.',
+    'Samarran is all broken glass and cold arithmetic. Thametan\'s Tower leans over a plaza of shattered lenses, and the dead Aetheric Engine at its heart still ticks — one wrong, patient click every few seconds, like a clock counting down to something that already happened.',
   nimari:
     'Half of Nimari is under the silt; the half that isn\'t is red. The Red Tower throws a long rust-coloured shadow across drowned streets, and somewhere inside it a working Aetheric core pulses warm enough that the mud around your boots steams faintly.',
   drakova:
@@ -737,14 +737,23 @@ export function shouldFireFourCoreForge(state: MainQuestState): boolean {
   return true;
 }
 
-/** The narrative beat that unlocks golem-armament crafting at the 4th Core. */
+/** The narrative beat that unlocks golem-armament crafting at the 4th Core.
+ *  OTA-720 — the moment the craft opens, the player is handed the CRUDE (basic)
+ *  working for every armament type; the stronger Rare/Legendary schematics are
+ *  left out in the world to be uncovered. */
 export function fourCoreForgeLine(): string {
   return (
     'The Arbiter watches the fourth Core settle into your pack, and something in '
-    + 'the buried country shifts. "Four. The old grid kept a forging from common '
-    + 'hands — war-arms a golem can carry into the dark. Bring its Core and the '
-    + 'metal, and I will guide your hands. You have earned the schematics." '
-    + '(Golem armaments can now be forged.)'
+    + 'the buried country shifts. "Four. That’s the threshold — the old grid '
+    + 'kept this forging from common hands, and now your hands know it. You’ve '
+    + 'learned the shaping of a golem’s war-arms: bring the Core and the metal '
+    + 'and you can hammer out a crude Sledge, Greatsword, or Pike for your '
+    + 'construct. But these are the plain patterns. Somewhere out in the dark lie '
+    + 'the master schematics — sharper, surer, and a few that were never meant for '
+    + 'mortal forges at all. Find them, and your golem will carry something far '
+    + 'worse into the fight." '
+    + '(Golem armaments can now be forged — the basic patterns are yours; uncover '
+    + 'stronger ones in your travels.)'
   );
 }
 

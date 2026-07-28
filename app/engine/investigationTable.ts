@@ -1,3 +1,4 @@
+import { withArticle, theCap, theLower } from './grammar';
 // OTA-071 — Per-room investigation table. Every ambient noun
 // added to a scene gets a persistent entry with attributes
 // (category, lore line, yield, hook potential, consumed flag,
@@ -423,16 +424,50 @@ function pickCreepyVariant(pool: readonly string[], category: NounCategory): str
 // per noun via nounSeed. Same noun always resolves to the same
 // line (player sanity), different nouns get different beats
 // (immersion).
+// OTA-714 — the catch-all pool is now fully POSTURE-NEUTRAL. The FIXED_
+// FEATURE classifier (OTA-711) can only whitelist so many architecture
+// nouns, and the playtest still caught gaps — "investigate floorboards" →
+// "you turn the floorboards in your hands", "investigate ladder" → "you
+// let it go". Since this pool is the fallback for UNCLASSIFIED nouns (which
+// skew toward things you look at, not hold), it must never assume the noun
+// is a small held object. Every line here reads correctly whether the noun
+// is a pebble or a staircase — no "turn in your hands", "weigh", "let it go".
 const GENERIC_VARIANTS: readonly string[] = [
-  'You look the {noun} over. Nothing about it sings, nothing about it warns — Tartaria is full of objects waiting to be remembered.',
-  'You turn the {noun} in your hands and find no answer. The silence here is patient; whatever it knew, it has decided to keep.',
-  'The {noun} reads as ordinary, which in Tartaria is a small kind of relief. You let it go.',
-  'You weigh the {noun} and consider it. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.',
+  'You look the {noun} over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.',
+  'You study the {noun} and find no answer. The silence here is patient; whatever it knew, it has decided to keep.',
+  'The {noun} reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.',
+  'You take the measure of the {noun}. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.',
   'You give the {noun} your full attention. It returns the gesture by being exactly what it appears to be.',
   'The {noun} resists your reading. Not hostile — just closed. Some things in the buried world don\'t open for the curious.',
   'You study the {noun}. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.',
   'The {noun} sits the way ordinary things sit. The Arbiter does not lean in. You move on.',
 ];
+
+// OTA-711 — fixed-feature generic pool. The GENERIC_VARIANTS above lean on
+// HANDHELD phrasing ("turn the {noun} in your hands", "weigh the {noun}",
+// "you let it go") which reads as nonsense on architecture the player can't
+// pick up — playtest log: `investigate stair` → "You turn the stair in your
+// hands." Nouns that classify as fixed features (a stair, wall, hatch,
+// landing, anchor bolt, doorframe …) draw from this posture-agnostic pool
+// instead: every line works whether the thing is a pebble or a staircase.
+const FIXED_FEATURE_VARIANTS: readonly string[] = [
+  'You look the {noun} over where it sits. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.',
+  'You study the {noun} and find no answer. The silence here is patient; whatever it knew, it has decided to keep.',
+  'The {noun} reads as ordinary, which down here is a small kind of relief. You leave it be.',
+  'You run a hand along the {noun}. Cold, set fast in place, and about as talkative as the rest of the buried world.',
+  'You give the {noun} a long look. It returns the gesture by being exactly what it appears to be — no more, no less.',
+  'The {noun} resists your reading. Not hostile — just closed. Some things in the buried world don\'t open for the curious.',
+  'You study the {noun}. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.',
+  'The {noun} keeps its silence, and it isn\'t going anywhere for you to press it. The Arbiter does not lean in. You move on.',
+];
+
+// Architecture / terrain / fixed-in-place features — things you investigate
+// but cannot lift. Substring match on the lowered noun so "mud-glazed engine
+// room toolbench" and "warped hatch frame" both classify. Kept deliberately
+// broad; a false positive just means a fixed-feature-flavored line for a
+// portable object, which still reads fine (the reverse — handheld phrasing on
+// a wall — is the bug we're closing).
+const FIXED_FEATURE_RE = /\b(stair|stairs|stairway|stairwell|step|steps|landing|wall|walls|floor|ceiling|roof|dome|vault|arch|archway|pillar|column|colonnade|buttress|beam|girder|scaffold|scaffolding|rafter|threshold|doorway|doorframe|door|gate|gateway|portcullis|hatch|frame|hinge|lintel|alcove|niche|ledge|shelf|banister|balustrade|railing|rail|ramp|bridge|shaft|well|cistern|basin|trough|hearth|chimney|flue|furnace|forge|kiln|anvil|toolbench|workbench|bench|counter|altar|dais|plinth|pedestal|statue|monument|mural|fresco|relief|carving|engraving|inscription|glyph[- ]?wall|bolt|anchor|rivet|bracket|clamp|coil|pipe|conduit|duct|vent|grate|grille|drain|sluice|gap|crack|fissure|crevice|rubble|masonry|brickwork|stonework|foundation|slab|flagstone|cobble|tile|floortile|paving|road|path|track|trail|ground|earth|silt|mud|bank|embankment|wall-panel|panel|bulkhead|corridor|passage|tunnel|chamber|room|floorplate|platform|tower|spire|steeple|floorboard|floorboards|board|boards|plank|planks|peg|pegs|ladder|bell|cord|wire|cable|lever|valve|gauge|dial|switch|knob|handle|crank|winch|chain|cog|gear|spindle|pulley|scaffold)\b/i;
 
 /** Resolve the lore line for an entry. Returns the cached
  *  loreLine if set; otherwise picks from the category's
@@ -460,8 +495,14 @@ export function resolveLore(entry: InvestigationEntry): string {
   } else if (entry.category === 'generic') {
     // OTA-125 — generic-category variant pool. Deterministic per
     // noun so the same noun stays consistent across re-reads.
-    const idx = nounSeed(entry.noun.toLowerCase()) % GENERIC_VARIANTS.length;
-    line = GENERIC_VARIANTS[idx]!;
+    // OTA-711 — fixed features (stair, wall, hatch …) draw from the
+    // posture-agnostic pool so we never narrate "you turn the stair in
+    // your hands." Portable/unclassified nouns keep the original pool.
+    const pool = FIXED_FEATURE_RE.test(entry.noun.toLowerCase())
+      ? FIXED_FEATURE_VARIANTS
+      : GENERIC_VARIANTS;
+    const idx = nounSeed(entry.noun.toLowerCase()) % pool.length;
+    line = pool[idx]!;
   } else {
     line = tmpl.fallbackLore;
   }
@@ -479,30 +520,30 @@ export function resolveLore(entry: InvestigationEntry): string {
 // the variety budget is acceptable.
 
 const CALLBACK_ITEM_LINES: Array<(noun: string, item: string) => string> = [
-  (n, i) => `You've already turned the ${n} over here. The ${i.toLowerCase()} was the only thing of value.`,
-  (n, i) => `The ${n} is empty now — you took the ${i.toLowerCase()} on your first pass.`,
-  (n, i) => `Nothing more in the ${n}. The ${i.toLowerCase()} you found was tucked deep.`,
-  (n, i) => `You've already worked the ${n}. The ${i.toLowerCase()} was the harvest.`,
-  (n, i) => `The ${n} keeps its silence now. The ${i.toLowerCase()} was the prize.`,
+  (n, i) => `You've already turned ${theLower(n)} over here. The ${i.toLowerCase()} was the only thing of value.`,
+  (n, i) => `${theCap(n)} is empty now — you took the ${i.toLowerCase()} on your first pass.`,
+  (n, i) => `Nothing more in ${theLower(n)}. The ${i.toLowerCase()} you found was tucked deep.`,
+  (n, i) => `You've already worked ${theLower(n)}. The ${i.toLowerCase()} was the harvest.`,
+  (n, i) => `${theCap(n)} keeps its silence now. The ${i.toLowerCase()} was the prize.`,
 ];
 
 const CALLBACK_FLAVOR_LINES: Array<(noun: string) => string> = [
-  (n) => `You've already turned the ${n} over here. It keeps its lore but offers nothing new.`,
-  (n) => `The ${n} has surrendered what it can to your attention. Nothing fresh.`,
-  (n) => `You read the ${n} the same way you did before. Same story, no addendum.`,
-  (n) => `Your hands settle on the ${n} again. It's still telling the same quiet story.`,
-  (n) => `The ${n} is familiar now. Whatever it had to say to a stranger, it already said.`,
+  (n) => `You've already turned ${theLower(n)} over here. It keeps its lore but offers nothing new.`,
+  (n) => `${theCap(n)} has surrendered what it can to your attention. Nothing fresh.`,
+  (n) => `You read ${theLower(n)} the same way you did before. Same story, no addendum.`,
+  (n) => `Your hands settle on ${theLower(n)} again. It's still telling the same quiet story.`,
+  (n) => `${theCap(n)} is familiar now. Whatever it had to say to a stranger, it already said.`,
 ];
 
 const CALLBACK_HOOK_LINES: Array<(noun: string) => string> = [
-  (n) => `You've already studied the ${n} carefully. The thread you pulled is still warm in your mind.`,
-  (n) => `Looking at the ${n} again brings the lead back into focus, but nothing new.`,
-  (n) => `The ${n} suggested its thread on your first pass — it isn't suggesting another.`,
+  (n) => `You've already studied ${theLower(n)} carefully. The thread you pulled is still warm in your mind.`,
+  (n) => `Looking at ${theLower(n)} again brings the lead back into focus, but nothing new.`,
+  (n) => `${theCap(n)} suggested its thread on your first pass — it isn't suggesting another.`,
 ];
 
 const CALLBACK_DEFAULT_LINES: Array<(noun: string) => string> = [
-  (n) => `You've already turned the ${n} over here. The lore stays put.`,
-  (n) => `Whatever the ${n} held, you've already pulled it loose.`,
+  (n) => `You've already turned ${theLower(n)} over here. The lore stays put.`,
+  (n) => `Whatever ${theLower(n)} held, you've already pulled it loose.`,
 ];
 
 // Lazy require to avoid circular import. rotatingPick lives in
@@ -567,7 +608,7 @@ export function rollOutcome(
     return {
       kind: 'item',
       detail: entry.yield.itemName,
-      line: `${lore} Tucked into the seam: a ${entry.yield.itemName.toLowerCase()}.`,
+      line: `${lore} Tucked into the seam: ${withArticle(entry.yield.itemName.toLowerCase())}.`,
     };
   }
   return {
@@ -744,10 +785,10 @@ export function buildEchoHookLine(entry: InvestigationEntry): string {
   const noun = entry.noun;
   if (entry.result?.kind === 'item') {
     const item = entry.result.detail.toLowerCase();
-    return `You think back to the ${noun} from earlier — the ${item} you pulled from it. Something here reminds you of it.`;
+    return `You think back to ${theLower(noun)} from earlier — the ${item.toLowerCase()} you pulled from it. Something here reminds you of it.`;
   }
   if (entry.result?.kind === 'hook') {
-    return `The ${noun} from a room back surfaces in memory. The thread you pulled is still warm — and now it's tugging again.`;
+    return `${theCap(noun)} from a room back surfaces in memory. The thread you pulled is still warm — and now it's tugging again.`;
   }
-  return `The ${noun} from earlier comes back to mind. You're not sure why — but the connection is real.`;
+  return `${theCap(noun)} from earlier comes back to mind. You're not sure why — but the connection is real.`;
 }

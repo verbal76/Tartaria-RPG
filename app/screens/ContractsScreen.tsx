@@ -1,19 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Dimensions } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { FirstTimeHint } from '../components/FirstTimeHint';
+import { bountyKey, bountyHoursLeft, BOUNTY_DEADLINE_HOURS } from '../engine/factionBounty';
 import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
 import { getItemPreview } from '../components/itemPreview';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
 import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
 import { findFactionQuestById, FACTION_QUESTS, factionQuestReady } from '../engine/factionQuests';
+import { escortToggleLabel } from '../engine/escort';
 import { FACTIONS } from '../engine/factions';
 import { startingLocationForFaction } from '../engine/character';
 import { missionObjectiveLocationId } from '../engine/missionRouting';
 import { getLocationById } from '../engine/encounter';
+import { GREAT_CLIMBS } from '../engine/greatClimbs';
+import { theLower } from '../engine/grammar';
 import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
 import { openContractMarkers } from '../engine/contractMarkers';
+import { missionLegs } from '../engine/broker';
+import { carriedSigils } from '../engine/sigils';
+import { canonicalDistanceFromGrid, canonicalDistanceFromPlayer, canonicalDistance } from '../engine/worldMap';
 import {
   ensureMainQuest,
   phaseLabel,
@@ -49,7 +57,7 @@ function MilestoneStat({
   );
   if (!onPress) return body;
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={{ flex: 1 }}>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={{ flex: 1 }} accessibilityRole="button" accessibilityState={{ selected: active }}>
       {body}
     </TouchableOpacity>
   );
@@ -60,7 +68,7 @@ const milestoneStyles = StyleSheet.create({
   cellActive: { borderColor: '#c9a86a', backgroundColor: '#1a1714' },
   value: { color: '#c9a86a', fontSize: 18, fontWeight: '700' },
   label: { color: '#cdbf99', fontSize: 11, letterSpacing: 1 },
-  next: { color: '#7a705c', fontSize: 9, marginTop: 2, textAlign: 'center' },
+  next: { color: '#a2977b', fontSize: 9, marginTop: 2, textAlign: 'center' },
   tapHint: { color: '#5a5448', fontSize: 8, marginTop: 1, letterSpacing: 1 },
 });
 
@@ -68,6 +76,10 @@ function factionLabel(factionId: string | null | undefined): string {
   if (!factionId) return 'Unaffiliated';
   const f = FACTIONS.find((x) => x.id === factionId);
   return f?.name ?? factionId.replace(/_/g, ' ');
+}
+
+function safeLocName(id: string): string {
+  try { return getLocationById(id).name ?? id; } catch { return id; }
 }
 
 type Tab = 'contracts' | 'collectables';
@@ -78,8 +90,10 @@ export function ContractsScreen() {
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
   const abandonContract = useGameStore((s) => s.abandonContract);
   const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
+  const setContractActive = useGameStore((s) => s.setContractActive);
   const routeMission = useGameStore((s) => s.routeMission);
   const discardLead = useGameStore((s) => s.discardLead);
+  const turnInSigil = useGameStore((s) => s.turnInSigil);
   // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
   // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
   const setTravelCourse = useGameStore((s) => s.setTravelCourse);
@@ -90,6 +104,13 @@ export function ContractsScreen() {
   // 2026-05-25 — branded refusal modal for hub-room gate. Same
   // palette as the rest of the game; replaces native Alert.alert.
   const [tab, setTab] = useState<Tab>('contracts');
+  // arb-fix — SORT BY DISTANCE. When on, each mission section (and the Primary
+  // Objective's 9-Capital list) is ordered by how many MOVES it is to its target,
+  // nearest first — but sections stay grouped by TYPE (we only sort WITHIN each
+  // list, never merge them). One flag drives both the main screen toggle and the
+  // toggle inside the expanded Primary Objective box. Local state (view option),
+  // matching the screen's other toggles; not persisted.
+  const [sortByDistance, setSortByDistance] = useState(false);
   // OTA-606 — honor a deep-link tab request (e.g. the first-collectible popup
   // wants the Collectibles tab, not the default Contracts tab). Apply it once
   // on entry, then clear it so a later normal open lands on the default.
@@ -162,11 +183,74 @@ export function ContractsScreen() {
       <Pressable
         style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
         onPress={() => setPendingRoute({ id: info.anchorId, name: info.anchorName })}
+        accessibilityRole="button"
       >
         <Text style={styles.routeBtnText}>▸ {info.number}◆ ROUTE TO {info.anchorName.toUpperCase()}</Text>
       </Pressable>
     );
   };
+  // arb-fix — DISTANCE (in MOVES = tiles) from the player to a mission's target
+  // location. player.gridX/gridY is the warp-proof absolute canon cell; fall back
+  // to the current-location + in-transit offset for legacy saves with no grid cell.
+  // Returns null when there's no target (placeless missions → no distance shown).
+  const movesTo = (locId: string | null | undefined): number | null => {
+    if (!locId || !player) return null;
+    let n: number;
+    if (typeof player.gridX === 'number' && typeof player.gridY === 'number') {
+      n = canonicalDistanceFromGrid(player.gridX, player.gridY, locId);
+    } else if (typeof player.mapX === 'number' && typeof player.mapY === 'number') {
+      n = canonicalDistanceFromPlayer(player.currentLocationId, player.mapX, player.mapY, locId);
+    } else {
+      n = canonicalDistance(player.currentLocationId, locId);
+    }
+    return Number.isFinite(n) ? n : null;
+  };
+  const movesLabel = (n: number): string =>
+    n <= 0 ? 'you are here' : n === 1 ? '1 move away' : `${n} moves away`;
+  // The marker anchor location id for a card whose place comes from the contract
+  // marker table (hunt / mystery / storyline / faction / lead). Direct-field types
+  // (bounty / whisper / broker leg / sigil) pass their own id to movesLine/movesTo.
+  const markerLocId = (toggleKey: string): string | null => {
+    const ck = toContractKey(toggleKey);
+    return (ck && contractMarkerByKey[ck]?.anchorId) || null;
+  };
+  // The "◈ N moves away" line shown under a card's location (or null when unknown).
+  const movesLine = (locId: string | null | undefined) => {
+    const m = movesTo(locId);
+    if (m === null) return null;
+    return <Text style={styles.cardMoves}>◈ {movesLabel(m)}</Text>;
+  };
+  // Sort a section's list by distance (nearest first) WHEN sortByDistance is on,
+  // else leave the order untouched. Placeless entries (null) sort last. Sections
+  // are never merged — this only reorders within one type, keeping the grouping.
+  const byMoves = <T,>(arr: readonly T[], locOf: (t: T) => string | null | undefined): T[] => {
+    if (!sortByDistance) return arr as T[];
+    const key = (t: T) => {
+      const m = movesTo(locOf(t));
+      return m === null ? Number.POSITIVE_INFINITY : m;
+    };
+    return [...arr].sort((a, b) => key(a) - key(b));
+  };
+
+  // Uniform ACTIVATE / DEACTIVATE (pause) toggle for any contract kind, mirroring
+  // the faction-quest button. `tracked` = currently active. Deactivating parks the
+  // contract (⏸ PAUSED) without dropping it; ABANDON is the separate destructive drop.
+  const trackToggle = (
+    kind: 'hunt' | 'mystery' | 'storyline' | 'whisper' | 'lead' | 'broker',
+    id: string,
+    tracked: boolean,
+  ) => (
+    <Pressable
+      style={({ pressed }) => [styles.trackBtn, !tracked && styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+      onPress={() => setContractActive(kind, id, !tracked)}
+      accessibilityRole="button"
+      accessibilityState={{ selected: tracked }}
+    >
+      <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
+        {tracked ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE'}
+      </Text>
+    </Pressable>
+  );
 
   if (!player) {
     return (
@@ -175,6 +259,12 @@ export function ContractsScreen() {
       </View>
     );
   }
+
+  // OTA-862 — bounties the player currently carries (migrating the legacy single slot).
+  const activeBounties = (player.activeBounties && player.activeBounties.length > 0)
+    ? player.activeBounties
+    : player.activeBounty ? [player.activeBounty] : [];
+  const bountyNowHour = player.hoursElapsed ?? 0;
 
   // Resolve every active contract via its catalog lookup so we always
   // have a current title + stage count even after lore edits.
@@ -229,8 +319,28 @@ export function ContractsScreen() {
     (q) => q.state === 'open' || q.state === 'in_progress',
   );
 
+  // Parley of Factions (broker) — the two-relic alliance mission. Previously it
+  // lived only in the log + as grid "?" markers, so a player who wandered into it
+  // (or parleyed once) had a live mission with NO card here — "I don't even think
+  // that mission is on my list." Now it's a first-class, trackable contract like
+  // the rest: both demanded relics, their source tiles, in-hand progress, a SET
+  // COURSE to each unmet relic, and the SEAL step at the Parley Ground.
+  const brokerMission =
+    player.brokerMission && !player.brokerMission.done ? player.brokerMission : null;
+  const brokerLegs = brokerMission ? (missionLegs(brokerMission) ?? []) : [];
+  const hasRelic = (name: string) =>
+    (player.inventory ?? []).some((i) => i.name === name && (i.quantity ?? 1) > 0);
+  const brokerReady = brokerLegs.length > 0 && brokerLegs.every((l) => hasRelic(l.itemName));
+
+  // OTA-1025 — count only records whose DEF still resolves: the cards filter
+  // orphans out, and the header must agree (never "6 ACTIVE" over 5 cards).
   const totalActive =
-    hunts.length + mysteries.length + storylines.length + factionQuests.length + whispers.length + leads.length;
+    hunts.filter((h) => h.def).length
+    + mysteries.filter((m) => m.def).length
+    + storylines.filter((st) => st.def).length
+    + factionQuests.filter((q) => q.def).length
+    + whispers.length + leads.length
+    + (brokerMission ? 1 : 0) + activeBounties.length;
 
   // Lifetime milestone counters — surfaced here so players have a single
   // place to see progress toward stat bumps (every 10 checks succeeded
@@ -244,16 +354,23 @@ export function ContractsScreen() {
 
   return (
     <View style={styles.container}>
+      <FirstTimeHint
+        id="contracts_first_open"
+        title="Your missions"
+        body="Everything you've taken on lives here — hunts, faction work, and bounties. Tap one to set a course or check your progress."
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Back"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>CONTRACTS</Text>
+        <Text style={styles.title} accessibilityRole="header">CONTRACTS</Text>
         <View style={{ width: 80 }} />
       </View>
 
@@ -306,6 +423,8 @@ export function ContractsScreen() {
             style={styles.mainQuestCard}
             onPress={() => setMqExpanded((v) => !v)}
             activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: mqExpanded }}
           >
             <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE  {mqExpanded ? '▴' : '▾'}</Text>
             <Text style={styles.mainQuestPhase}>{phaseLabel(mq.phase)}</Text>
@@ -327,19 +446,44 @@ export function ContractsScreen() {
                 onPress={() => useGameStore.getState().summonCoreGuardian()}
                 activeOpacity={0.7}
                 hitSlop={6}
+                accessibilityRole="button"
+                accessibilityLabel="Summon Guardian"
               >
                 <Text style={styles.summonChipText}>★ SUMMON</Text>
               </TouchableOpacity>
             )}
             {mqExpanded && (
               <View style={styles.mqTracker}>
-                <Text style={styles.mqTrackerHead}>9 CAPITALS · {recoveredCount}/9 CORES</Text>
+                <View style={styles.mqTrackerHeadRow}>
+                  <Text style={styles.mqTrackerHead}>9 CAPITALS · {recoveredCount}/9 CORES</Text>
+                  {/* arb-fix — same SORT BY DISTANCE toggle, here for the Capital list.
+                      Reorders the 9 Capitals nearest-first (finished ones sink). */}
+                  <Pressable
+                    onPress={() => setSortByDistance((v) => !v)}
+                    hitSlop={6}
+                    style={({ pressed }) => [styles.mqSortBtn, sortByDistance && styles.mqSortBtnOn, pressed && styles.sortBarPressed]}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: sortByDistance }}
+                  >
+                    <Text style={[styles.mqSortText, sortByDistance && styles.sortBarTextOn]}>
+                      ◈ {sortByDistance ? 'BY DISTANCE' : 'SORT'}
+                    </Text>
+                  </Pressable>
+                </View>
                 {/* arb148 — the Primary Objective card sits in the FIXED region
                     above the tabs/scroll, so the expanded 9-Capital list pushed
                     the bottom Capital half off-screen. Cap it and let the rows
                     scroll internally (nestedScroll) so all nine are reachable. */}
                 <ScrollView style={styles.mqTrackerScroll} nestedScrollEnabled>
-                {LOST_CAPITAL_LOCATIONS.map((capId) => {
+                {(sortByDistance
+                  ? [...LOST_CAPITAL_LOCATIONS].sort((a, b) => {
+                      // Finished Capitals sink to the bottom; the rest go nearest-first.
+                      const done = (id: string) => (mq.coresRecovered.includes(id) ? 1 : 0);
+                      if (done(a) !== done(b)) return done(a) - done(b);
+                      return (movesTo(a) ?? Number.POSITIVE_INFINITY) - (movesTo(b) ?? Number.POSITIVE_INFINITY);
+                    })
+                  : LOST_CAPITAL_LOCATIONS
+                ).map((capId) => {
                   const def = GUARDIANS_BY_CAPITAL[capId];
                   const recovered = mq.coresRecovered.includes(capId);
                   const guardianDown = (mq.guardiansDefeated ?? []).includes(capId);
@@ -361,7 +505,7 @@ export function ContractsScreen() {
                     color = '#c9a86a';
                   } else {
                     status = '· not yet visited';
-                    color = '#7a705c';
+                    color = '#a2977b';
                   }
                   const capName = def?.capitalName ?? capId;
                   // 2026-05-24 — rows are now tappable to start a
@@ -375,6 +519,7 @@ export function ContractsScreen() {
                       <Text style={styles.mqTrackerGuardian}>
                         Guardian: {def?.base.name ?? '—'}
                       </Text>
+                      {!here && movesLine(capId)}
                       {!here && (
                         <Text style={styles.mqTrackerTap}>▸ tap to travel</Text>
                       )}
@@ -391,6 +536,7 @@ export function ContractsScreen() {
                       style={styles.mqTrackerRow}
                       activeOpacity={0.7}
                       onPress={() => setPendingRoute({ id: capId, name: capName })}
+                      accessibilityRole="button"
                     >
                       {rowContent}
                     </TouchableOpacity>
@@ -408,6 +554,7 @@ export function ContractsScreen() {
                   style={[styles.mainQuestChoiceBtn, { borderColor: '#5a6b8a' }]}
                   onPress={() => useGameStore.getState().chooseEndingMainQuest('seal')}
                   activeOpacity={0.7}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.mainQuestChoiceText}>SEAL</Text>
                 </TouchableOpacity>
@@ -415,6 +562,7 @@ export function ContractsScreen() {
                   style={[styles.mainQuestChoiceBtn, { borderColor: '#a85a3a' }]}
                   onPress={() => useGameStore.getState().chooseEndingMainQuest('unleash')}
                   activeOpacity={0.7}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.mainQuestChoiceText}>UNLEASH</Text>
                 </TouchableOpacity>
@@ -422,6 +570,7 @@ export function ContractsScreen() {
                   style={[styles.mainQuestChoiceBtn, { borderColor: '#7a8a5a' }]}
                   onPress={() => useGameStore.getState().chooseEndingMainQuest('preserve')}
                   activeOpacity={0.7}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.mainQuestChoiceText}>PRESERVE</Text>
                 </TouchableOpacity>
@@ -441,6 +590,8 @@ export function ContractsScreen() {
           onPress={() => setTab('contracts')}
           style={[styles.tabBtn, tab === 'contracts' && styles.tabBtnActive]}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: tab === 'contracts' }}
         >
           <Text style={[styles.tabBtnText, tab === 'contracts' && styles.tabBtnTextActive]}>
             CONTRACTS
@@ -450,6 +601,8 @@ export function ContractsScreen() {
           onPress={() => setTab('collectables')}
           style={[styles.tabBtn, tab === 'collectables' && styles.tabBtnActive]}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: tab === 'collectables' }}
         >
           <Text style={[styles.tabBtnText, tab === 'collectables' && styles.tabBtnTextActive]}>
             COLLECTIBLES {totalFragments > 0 ? `(${totalFragmentsFound}/${totalFragments})` : ''}
@@ -461,8 +614,58 @@ export function ContractsScreen() {
         <CollectablesTab progress={progress} />
       ) : (
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        {/* arb-fix — SORT BY DISTANCE toggle. Reorders every mission section by
+            moves-to-target (nearest first) while keeping each type grouped. */}
+        <Pressable
+          onPress={() => setSortByDistance((v) => !v)}
+          style={({ pressed }) => [styles.sortBar, sortByDistance && styles.sortBarOn, pressed && styles.sortBarPressed]}
+          accessibilityRole="button"
+          accessibilityState={{ selected: sortByDistance }}
+        >
+          <Text style={[styles.sortBarText, sortByDistance && styles.sortBarTextOn]}>
+            {sortByDistance ? '◈ SORTED BY DISTANCE (grouped by type)' : '◈ SORT BY DISTANCE'}
+          </Text>
+          <Text style={[styles.sortBarHint, sortByDistance && styles.sortBarTextOn]}>
+            {sortByDistance ? 'tap for default order' : 'nearest first, within each type'}
+          </Text>
+        </Pressable>
+        {(() => {
+          // OTA-912 — great-climb missions. A climb becomes a listed mission once
+          // its Skyreacher Chart is used (id in unlockedGreatClimbs); it clears
+          // when its summit boss falls (id in summitBossesDefeated).
+          const unlocked = worldMemory.unlockedGreatClimbs ?? [];
+          const bossesDown = worldMemory.summitBossesDefeated ?? [];
+          const climbMissions = GREAT_CLIMBS.filter((c) => unlocked.includes(c.id));
+          if (climbMissions.length === 0) return null;
+          const doneCount = climbMissions.filter((c) => bossesDown.includes(c.id)).length;
+          return (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle} accessibilityRole="header">
+                THE GREAT CLIMBS  ·  {doneCount}/5 towers taken
+              </Text>
+              {climbMissions.map((c) => {
+                const done = bossesDown.includes(c.id);
+                return (
+                  <View key={c.id} style={styles.card}>
+                    <Text style={styles.cardTitle}>
+                      {done ? '✓ ' : '⚑ '}{c.noun} — {c.tiers} tiers
+                    </Text>
+                    <Text style={styles.routeBody}>
+                      {done
+                        ? 'Crown taken — its Skyreacher piece is claimed.'
+                        : 'Climb it (Hardened Climbing Strap + a whole Reclaimer\'s Rope) and beat the summit guardian for its Skyreacher piece and an Aether Collection Beacon.'}
+                    </Text>
+                  </View>
+                );
+              })}
+              <Text style={styles.mainQuestHint}>
+                Carry all five Aether Collection Beacons down, then USE one to break the arrays down and build the Beacon Rifle.
+              </Text>
+            </View>
+          );
+        })()}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>MILESTONES  ·  tap a cell to expand</Text>
+          <Text style={styles.sectionTitle} accessibilityRole="header">MILESTONES  ·  tap a cell to expand</Text>
           <View style={styles.milestoneRow}>
             <MilestoneStat
               label="Enemies"
@@ -578,23 +781,78 @@ export function ContractsScreen() {
           </View>
         ) : null}
 
+        {/* OTA-862 — bounties are timed contracts, so they lead the board. Each shows
+            progress + how much in-game time is left, and re-routes on tap. */}
+        {activeBounties.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle} accessibilityRole="header">BOUNTIES</Text>
+              {byMoves(activeBounties, (b) => b.targetLocationId).map((b) => {
+                // OTA-866 — a prominent LIVE countdown on every accepted bounty. The window
+                // is in-game hours (only drains as you act), so it can't tick in real time —
+                // but the bar + colour make "how long have I got" unmistakable, and it
+                // updates the moment the clock moves.
+                const left = bountyHoursLeft(b, bountyNowHour);
+                const deadline = b.deadlineHours ?? BOUNTY_DEADLINE_HOURS;
+                const hasClock = Number.isFinite(left);
+                const lapsed = hasClock && left <= 0;
+                const frac = hasClock ? Math.max(0, Math.min(1, left / deadline)) : 1;
+                // Green with lots of room → amber → red as it runs down.
+                const tier = !hasClock ? 'none' : lapsed ? 'lapsed' : left <= 6 ? 'crit' : left <= 12 ? 'warn' : 'ok';
+                const timerColor = tier === 'ok' ? '#9ec96a'
+                  : tier === 'warn' ? '#d9b45f'
+                  : tier === 'crit' || tier === 'lapsed' ? '#e07a5f'
+                  : '#a2977b';
+                const timerLabel = !hasClock ? 'no deadline'
+                  : lapsed ? '⏳ LAPSED'
+                  : `⏳ ${Math.ceil(left)}h left`;
+                return (
+                  <Pressable
+                    key={`b_${bountyKey(b)}`}
+                    onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
+                    style={styles.card}
+                    accessibilityRole="button"
+                  >
+                    <View style={styles.cardHead}>
+                      <Text style={styles.cardTitle}>{b.giverName} bounty</Text>
+                      <Text style={[styles.bountyTimerPill, { color: timerColor, borderColor: timerColor }]}>{timerLabel}</Text>
+                    </View>
+                    {/* Draining time bar — the fraction of the window left. */}
+                    {hasClock && (
+                      <View style={styles.bountyTimerTrack}>
+                        <View style={[styles.bountyTimerFill, { width: `${Math.round(frac * 100)}%`, backgroundColor: timerColor }]} />
+                      </View>
+                    )}
+                    <Text style={styles.cardFaction}>Hunt the {b.targetName}</Text>
+                    <Text style={styles.cardLocation}>📍 {b.targetLocationName}</Text>
+                    {movesLine(b.targetLocationId)}
+                    <Text style={styles.cardHint}>
+                      {b.progress}/{b.count} put down · pays {b.rewardTc} TC + {b.giverName} standing · tap to set course
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+        )}
+
         {hunts.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>HUNTS</Text>
-              {hunts.map(({ run, def }) => {
+              <Text style={styles.sectionTitle} accessibilityRole="header">HUNTS</Text>
+              {byMoves(hunts, (h) => markerLocId(`h_${h.run.id}`)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `h_${run.id}`;
                 const open = !!expanded[key];
                 const ready = run.stage >= def.stages.length;
+                const tracked = run.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityRole="button" accessibilityState={{ expanded: open }}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
-                      <Text style={styles.stagePill}>
-                        {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>
+                        {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
                     {contractRoute(key)}
+                    {trackToggle('hunt', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {/* 2026-05-26 OTA-053 — playtester ask: hunt card
                         didn't tell them where to go or what to do.
@@ -610,6 +868,7 @@ export function ContractsScreen() {
                     <Text style={styles.cardLocation}>
                       📍 {def.targetLocationName ?? biomeLabel(def.biomeTag)}
                     </Text>
+                    {movesLine(markerLocId(key))}
                     {/* 2026-05-26 OTA-055 — difficulty chip with traffic-
                         light coloring vs the player's current state.
                         Green when comfortably above both thresholds,
@@ -691,7 +950,7 @@ export function ContractsScreen() {
                         <Text style={styles.expandedLabel}>How to finish</Text>
                         <Text style={styles.expandedBody}>
                           {ready
-                            ? 'Boss slain. Tap COMPLETE to claim the bounty.'
+                            ? 'Boss slain. A bounty is paid FACE TO FACE — stand in front of a vendor or the posting faction\'s agent, then tap COMPLETE to hand over the trophy and claim it. No courier.'
                             : `Travel to ${def.targetLocationName ?? biomeLabel(def.biomeTag)} and defeat the ${def.targetEnemyName}. Each stage above auto-advances when you perform the matching action there.`}
                         </Text>
                       </View>
@@ -700,6 +959,7 @@ export function ContractsScreen() {
                       <Pressable
                         style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
                         onPress={() => completeContractFromUI('hunt', def.id)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
                       </Pressable>
@@ -713,6 +973,7 @@ export function ContractsScreen() {
                       <Pressable
                         style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
                         onPress={() => abandonContract('hunt', def.id)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.abandonBtnText}>ABANDON</Text>
                       </Pressable>
@@ -725,21 +986,24 @@ export function ContractsScreen() {
 
           {mysteries.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>MYSTERIES</Text>
-              {mysteries.map(({ run, def }) => {
+              <Text style={styles.sectionTitle} accessibilityRole="header">MYSTERIES</Text>
+              {byMoves(mysteries, (m) => markerLocId(`m_${m.run.id}`)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `m_${run.id}`;
                 const open = !!expanded[key];
                 const ready = run.stage >= def.stages.length;
+                const tracked = run.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityRole="button" accessibilityState={{ expanded: open }}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
-                      <Text style={styles.stagePill}>
-                        {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>
+                        {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
                     {contractRoute(key)}
+                    {movesLine(markerLocId(key))}
+                    {trackToggle('mystery', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {!open && def.stages[run.stage] && !ready && (
                       <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
@@ -770,6 +1034,7 @@ export function ContractsScreen() {
                       <Pressable
                         style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
                         onPress={() => completeContractFromUI('mystery', def.id)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
                       </Pressable>
@@ -778,6 +1043,7 @@ export function ContractsScreen() {
                       <Pressable
                         style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
                         onPress={() => abandonContract('mystery', def.id)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.abandonBtnText}>ABANDON</Text>
                       </Pressable>
@@ -790,21 +1056,24 @@ export function ContractsScreen() {
 
           {storylines.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>STORYLINES</Text>
-              {storylines.map(({ run, def }) => {
+              <Text style={styles.sectionTitle} accessibilityRole="header">STORYLINES</Text>
+              {byMoves(storylines, (sl) => markerLocId(`s_${sl.run.id}`)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `s_${run.id}`;
                 const open = !!expanded[key];
                 const ready = run.stage >= def.stages.length;
+                const tracked = run.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityRole="button" accessibilityState={{ expanded: open }}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
-                      <Text style={styles.stagePill}>
-                        {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>
+                        {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
                     {contractRoute(key)}
+                    {movesLine(markerLocId(key))}
+                    {trackToggle('storyline', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {!open && def.stages[run.stage] && !ready && (
                       <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
@@ -827,7 +1096,7 @@ export function ContractsScreen() {
                         ))}
                         <Text style={styles.expandedLabel}>Reward</Text>
                         <Text style={styles.expandedBody}>
-                          {def.rewardTc} TC · +{def.rewardRep} rep with {factionLabel(def.factionId)}
+                          {def.rewardTc} TC{def.rewardRep > 0 ? ` · +${def.rewardRep} rep with ${factionLabel(def.factionId)}` : ''}
                         </Text>
                       </View>
                     )}
@@ -835,6 +1104,7 @@ export function ContractsScreen() {
                       <Pressable
                         style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
                         onPress={() => completeContractFromUI('storyline', def.id)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
                       </Pressable>
@@ -843,6 +1113,7 @@ export function ContractsScreen() {
                       <Pressable
                         style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
                         onPress={() => abandonContract('storyline', def.id)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.abandonBtnText}>ABANDON</Text>
                       </Pressable>
@@ -855,8 +1126,8 @@ export function ContractsScreen() {
 
           {factionQuests.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>FACTION QUESTS</Text>
-              {factionQuests.map(({ rec, def }, i) => {
+              <Text style={styles.sectionTitle} accessibilityRole="header">FACTION QUESTS</Text>
+              {byMoves(factionQuests, (fq) => fq.def ? (missionObjectiveLocationId(fq.def) ?? startingLocationForFaction(fq.def.factionId)) : null).map(({ rec, def }, i) => {
                 if (!def) return null;
                 const key = `q_${def.id}_${i}`;
                 const open = !!expanded[key];
@@ -876,7 +1147,7 @@ export function ContractsScreen() {
                 // false = paused (parked, doesn't auto-advance, never dropped).
                 const tracked = rec.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityRole="button" accessibilityState={{ expanded: open }}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
                       <Text style={[styles.stagePill, readyToTurnIn && styles.stagePillReady, !tracked && styles.stagePillPaused]}>
@@ -895,6 +1166,7 @@ export function ContractsScreen() {
                         the mission text, or the turn-in home if the work is done),
                         then auto-chains to turn-in. Routing makes this the single
                         active mission. */}
+                    {movesLine(readyToTurnIn ? startingLocationForFaction(def.factionId) : (missionObjectiveLocationId(def) ?? startingLocationForFaction(def.factionId)))}
                     {(() => {
                       const home = startingLocationForFaction(def.factionId);
                       const objId = readyToTurnIn ? home : (missionObjectiveLocationId(def) ?? home);
@@ -921,6 +1193,7 @@ export function ContractsScreen() {
                         <Pressable
                           style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                           onPress={() => setPendingRoute({ id: objId, name: objName, missionId: def.id })}
+                          accessibilityRole="button"
                         >
                           <Text style={styles.routeBtnText}>
                             ▸ {readyToTurnIn ? `ROUTE TO TURN-IN (${objName.toUpperCase()})` : `ROUTE TO ${objName.toUpperCase()}`}
@@ -934,9 +1207,12 @@ export function ContractsScreen() {
                     <Pressable
                       style={({ pressed }) => [styles.trackBtn, !tracked && styles.trackBtnOff, pressed && styles.trackBtnPressed]}
                       onPress={() => setFactionQuestActive(def.id, !tracked)}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: tracked }}
                     >
                       <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
-                        {tracked ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE — the mission you’re on'}
+                        {/* OTA-986 — name the party the toggle stands down / recalls. */}
+                        {escortToggleLabel(tracked, rec.escort && rec.escort.hp > 0 ? rec.escort : null)}
                       </Text>
                     </Pressable>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
@@ -976,7 +1252,7 @@ export function ContractsScreen() {
                         )}
                         <Text style={styles.expandedLabel}>Reward</Text>
                         <Text style={styles.expandedBody}>
-                          {def.reward.tc} TC · +{def.reward.rep} rep with {factionLabel(def.factionId)}
+                          {def.reward.tc} TC{def.reward.rep > 0 ? ` · +${def.reward.rep} rep with ${factionLabel(def.factionId)}` : ''}
                         </Text>
                         <Text style={styles.expandedLabel}>How to finish</Text>
                         <Text style={styles.expandedBody}>
@@ -996,6 +1272,7 @@ export function ContractsScreen() {
                       <Pressable
                         style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
                         onPress={() => completeContractFromUI('faction_quest', def.id)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
                       </Pressable>
@@ -1004,6 +1281,7 @@ export function ContractsScreen() {
                       <Pressable
                         style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
                         onPress={() => abandonContract('faction_quest', def.id)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.abandonBtnText}>ABANDON</Text>
                       </Pressable>
@@ -1014,14 +1292,88 @@ export function ContractsScreen() {
             </View>
           )}
 
+          {brokerMission && brokerLegs.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle} accessibilityRole="header">ALLIANCE</Text>
+              <Text style={styles.whispersBlurb}>
+                A parley you opened on neutral ground. Recover each faction's
+                demanded relic, then return to the Parley Ground and SEAL THE
+                ALLIANCE.
+              </Text>
+              <View style={[styles.card, brokerMission.paused && styles.cardPaused]}>
+                <View style={styles.cardHead}>
+                  <Text style={styles.cardTitle}>Broker an Alliance</Text>
+                  <Text style={[styles.stagePill, brokerMission.paused && styles.stagePillPaused]}>
+                    {brokerMission.paused
+                      ? '⏸ PAUSED'
+                      : `${brokerLegs.filter((l) => hasRelic(l.itemName)).length}/${brokerLegs.length}`}
+                  </Text>
+                </View>
+                <Text style={styles.cardFaction}>Parley of Factions · neutral ground</Text>
+                {brokerLegs.map((l) => {
+                  const inHand = hasRelic(l.itemName);
+                  const here =
+                    player?.currentLocationId === l.tileId;
+                  return (
+                    <View key={`broker_${l.factionId}`} style={{ marginTop: 8 }}>
+                      <Text style={styles.cardStageLabel}>{l.factionName}</Text>
+                      <Text style={styles.cardStageBody}>
+                        {inHand
+                          ? `✓ ${l.itemName} — in hand.`
+                          : `○ ${l.itemName} — recover it at ${safeLocName(l.tileId)}.`}
+                      </Text>
+                      {!inHand && movesLine(l.tileId)}
+                      {!inHand && !here && (
+                        <Pressable
+                          style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                          onPress={() => setPendingRoute({ id: l.tileId, name: safeLocName(l.tileId) })}
+                          accessibilityRole="button"
+                        >
+                          <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName(l.tileId).toUpperCase()}</Text>
+                        </Pressable>
+                      )}
+                      {!inHand && here && (
+                        <Text style={styles.routeHereNote}>▸ You're here — recover {theLower(l.itemName)}.</Text>
+                      )}
+                    </View>
+                  );
+                })}
+                <Text style={[styles.cardStageLabel, { marginTop: 10 }]}>How to finish</Text>
+                <Text style={styles.cardStageBody}>
+                  {brokerReady
+                    ? 'Both relics in hand. Return to the Parley Ground and SEAL THE ALLIANCE.'
+                    : 'Bring both relics to the Parley Ground, then SEAL THE ALLIANCE.'}
+                </Text>
+                {movesLine('parley_ground')}
+                {player?.currentLocationId !== 'parley_ground' && (
+                  <Pressable
+                    style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                    onPress={() => setPendingRoute({ id: 'parley_ground', name: safeLocName('parley_ground') })}
+                    accessibilityRole="button"
+                  >
+                    <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName('parley_ground').toUpperCase()}</Text>
+                  </Pressable>
+                )}
+                {trackToggle('broker', 'broker', !brokerMission.paused)}
+                <Pressable
+                  style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                  onPress={() => abandonContract('broker', 'broker')}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.abandonBtnText}>ABANDON</Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
+
           {whispers.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>WHISPERS</Text>
+              <Text style={styles.sectionTitle} accessibilityRole="header">WHISPERS</Text>
               <Text style={styles.whispersBlurb}>
                 Tips overheard from non-vendor NPCs. No formal contract,
                 no faction rep — just rumour. Follow them or don't.
               </Text>
-              {whispers.map(({ rec, title, stageDesc }) => {
+              {byMoves(whispers, (w) => w.rec.targetLocationId).map(({ rec, title, stageDesc }) => {
                 // OTA-465 — whisper objectives live on map tiles, so offer a
                 // "set course" that walks the player there (the player kept
                 // losing where to go for Yulka's discs).
@@ -1032,22 +1384,25 @@ export function ContractsScreen() {
                 // arb99 — if this objective is plotted as a numbered "?" on the
                 // atlas, lead the SET COURSE block with the same number.
                 const qNum = route ? questionNumbers[mentionIdForLabel(route.label)] : undefined;
+                const tracked = rec.tracked !== false;
                 return (
-                  <View key={`w_${rec.id}`} style={styles.card}>
+                  <View key={`w_${rec.id}`} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{title}</Text>
-                      <Text style={styles.stagePill}>{rec.stage}</Text>
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>{!tracked ? '⏸ PAUSED' : rec.stage}</Text>
                     </View>
                     <Text style={styles.cardFaction}>Whisper · informal</Text>
                     <Text style={styles.cardStageLabel}>Next step</Text>
                     <Text style={styles.cardStageBody}>{stageDesc}</Text>
-                    {route && !here && (
+                    {movesLine(rec.targetLocationId)}
+                    {route && !here && tracked && (
                       <Pressable
                         style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                         onPress={() => {
                           setWhisperCourse(route.mapX, route.mapY, route.label);
                           setScreen('exploration');
                         }}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.routeBtnText}>▸ {qNum ? `${qNum}? ` : ''}SET COURSE TO {route.label.toUpperCase()}</Text>
                       </Pressable>
@@ -1055,6 +1410,14 @@ export function ContractsScreen() {
                     {route && here && (
                       <Text style={styles.routeHereNote}>▸ You're here — {route.label} should be at this tile.</Text>
                     )}
+                    {trackToggle('whisper', rec.id, tracked)}
+                    <Pressable
+                      style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                      onPress={() => abandonContract('whisper', rec.id)}
+                      accessibilityRole="button"
+                    >
+                      <Text style={styles.abandonBtnText}>ABANDON</Text>
+                    </Pressable>
                   </View>
                 );
               })}
@@ -1063,27 +1426,30 @@ export function ContractsScreen() {
 
           {leads.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>LEADS</Text>
+              <Text style={styles.sectionTitle} accessibilityRole="header">LEADS</Text>
               <Text style={styles.whispersBlurb}>
                 Tips picked up by investigating the world. No tracker,
                 no objective marker — just the place and the deed. Go
                 find it.
               </Text>
-              {leads.map((q) => {
+              {byMoves(leads, (q) => q.location?.id).map((q) => {
                 const title = `${cap(q.objective.verb)} ${q.objective.target}`;
                 const reward = (q.reward.amount != null && q.reward.amount > 0)
                   ? `${q.reward.amount} ${q.reward.type === 'currency' ? 'TC' : q.reward.type}`
                   : q.reward.label;
                 const key = `lead_${q.id}`;
                 const open = !!expanded[key];
+                const tracked = q.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityRole="button" accessibilityState={{ expanded: open }}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{title}</Text>
-                      <Text style={styles.stagePill}>{q.state}</Text>
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>{!tracked ? '⏸ PAUSED' : q.state}</Text>
                     </View>
                     <Text style={styles.cardFaction}>Lead · {q.location.name}</Text>
+                    {movesLine(q.location?.id)}
                     {contractRoute(key)}
+                    {trackToggle('lead', q.id, tracked)}
                     {!open && (
                       <>
                         <Text style={styles.cardStageLabel}>Complication</Text>
@@ -1108,11 +1474,67 @@ export function ContractsScreen() {
                       <Pressable
                         style={({ pressed }) => [styles.discardBtn, pressed && styles.completeBtnPressed]}
                         onPress={() => discardLead(q.id)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.discardBtnText}>DISCARD LEAD</Text>
                       </Pressable>
                     )}
                   </Pressable>
+                );
+              })}
+            </View>
+          )}
+
+          {/* OTA-691 — CARRIED SIGILS. A slain faction member's crest, returnable to
+              that faction's stake to honor their dead (+1 standing). One row per
+              carried sigil: faction, reward, turn-in tile, and an auto-routable
+              SET COURSE — or a RETURN button when you're standing on the tile. */}
+          {player && carriedSigils(player.inventory).length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle} accessibilityRole="header">SIGILS</Text>
+              <Text style={styles.whispersBlurb}>
+                Crests taken off the fallen. Carry each back to its faction's stake
+                and lay it down among their own — they honor the dead you bring home.
+              </Text>
+              {byMoves(carriedSigils(player.inventory), (sg) => sg.tileId).map((sg) => {
+                // OTA-783 — the Hidden Market brokers any faction's sigil, so the
+                // RETURN button lights up there too, not only at the home stake.
+                const atMarket = player.currentLocationId === 'hidden_market';
+                const here = player.currentLocationId === sg.tileId || atMarket;
+                const qty = sg.item.quantity > 1 ? ` ×${sg.item.quantity}` : '';
+                return (
+                  <View key={`sigil_${sg.item.id}`} style={styles.card}>
+                    <View style={styles.cardHead}>
+                      <Text style={styles.cardTitle}>{sg.item.name}{qty}</Text>
+                      <Text style={styles.stagePill}>+1</Text>
+                    </View>
+                    <Text style={styles.cardFaction}>{sg.factionName} · honor their dead</Text>
+                    <Text style={styles.cardStageBody}>
+                      {atMarket
+                        ? `The Hidden Market brokers it — turn it in here for +1 ${sg.factionName} standing.`
+                        : here
+                          ? `You're at ${safeLocName(sg.tileId)}. Lay the sigil down among their own.`
+                          : `○ Return it at ${safeLocName(sg.tileId)} — or the Hidden Market — for +1 ${sg.factionName} standing.`}
+                    </Text>
+                    {!here && movesLine(sg.tileId)}
+                    {here ? (
+                      <Pressable
+                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        onPress={() => turnInSigil(sg.item.id)}
+                        accessibilityRole="button"
+                      >
+                        <Text style={styles.routeBtnText}>▸ RETURN THE SIGIL (+1 {sg.factionName.toUpperCase()})</Text>
+                      </Pressable>
+                    ) : (
+                      <Pressable
+                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        onPress={() => setPendingRoute({ id: sg.tileId, name: safeLocName(sg.tileId) })}
+                        accessibilityRole="button"
+                      >
+                        <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName(sg.tileId).toUpperCase()}</Text>
+                      </Pressable>
+                    )}
+                  </View>
                 );
               })}
             </View>
@@ -1128,7 +1550,7 @@ export function ContractsScreen() {
         animationType="fade"
         onRequestClose={() => setPendingRoute(null)}
       >
-        <View style={styles.routeScrim}>
+        <View style={styles.routeScrim} accessibilityViewIsModal={true}>
           <View style={styles.routeCard}>
             <Text style={styles.routeTitle}>Set Course</Text>
             <View style={styles.routeRule} />
@@ -1140,11 +1562,13 @@ export function ContractsScreen() {
               <Pressable
                 style={styles.routeBtnNeutral}
                 onPress={() => setPendingRoute(null)}
+                accessibilityRole="button"
               >
                 <Text style={styles.routeBtnTextNeutral}>CANCEL</Text>
               </Pressable>
               <Pressable
                 style={styles.routeBtnPrimary}
+                accessibilityRole="button"
                 onPress={() => {
                   if (!pendingRoute || !player) return;
                   const id = pendingRoute.id;
@@ -1208,7 +1632,7 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>CHARACTER STORIES</Text>
+        <Text style={styles.sectionTitle} accessibilityRole="header">CHARACTER STORIES</Text>
         <Text style={styles.collectIntro}>
           Notes, letters, and journal pages from ten people who walked Tartaria
           before you. Find every fragment to read each story end to end.
@@ -1222,6 +1646,8 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
             <TouchableOpacity
               onPress={() => setOpenId(isOpen ? null : story.id)}
               activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityState={{ expanded: isOpen }}
             >
               <View style={styles.cardHead}>
                 <Text style={styles.cardTitle}>{story.characterName}</Text>
@@ -1347,7 +1773,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   mainQuestEnded: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 11,
     fontStyle: 'italic',
     marginTop: 6,
@@ -1379,8 +1805,8 @@ const styles = StyleSheet.create({
   },
   mqTrackerCap: { color: '#e6d8b3', fontSize: 12, fontWeight: '700' },
   mqTrackerStatus: { fontSize: 11, marginTop: 1 },
-  mqTrackerGuardian: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: 1 },
-  mqTrackerFoot: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: 8, textAlign: 'center' },
+  mqTrackerGuardian: { color: '#a2977b', fontSize: 10, fontStyle: 'italic', marginTop: 1 },
+  mqTrackerFoot: { color: '#a2977b', fontSize: 10, fontStyle: 'italic', marginTop: 8, textAlign: 'center' },
   // 2026-05-24 — tap hint + confirm-modal styles for Capital
   // tap-to-travel. Visual language mirrors LoreCodexBody's modal.
   mqTrackerTap: { color: '#9ec96a', fontSize: 10, fontStyle: 'italic', letterSpacing: 1, marginTop: 2 },
@@ -1414,7 +1840,7 @@ const styles = StyleSheet.create({
     marginVertical: 1,
   },
   milestoneDetailEmpty: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 11,
     fontStyle: 'italic',
   },
@@ -1436,7 +1862,7 @@ const styles = StyleSheet.create({
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   title: { color: '#e6d8b3', letterSpacing: 4, fontSize: 14 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
   emptyWrap: {
     flex: 1,
     justifyContent: 'center',
@@ -1450,7 +1876,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: { color: '#c9a86a', fontSize: 16, fontWeight: '700', letterSpacing: 2, marginBottom: 8 },
   emptyBody: { color: '#cdbf99', fontSize: 13, textAlign: 'center', lineHeight: 19, marginBottom: 16 },
-  emptySub: { color: '#7a705c', fontSize: 11, textAlign: 'center', fontStyle: 'italic' },
+  emptySub: { color: '#a2977b', fontSize: 11, textAlign: 'center', fontStyle: 'italic' },
   scroll: { flex: 1 },
   content: { paddingBottom: 32 },
   section: { marginBottom: 14 },
@@ -1499,8 +1925,38 @@ const styles = StyleSheet.create({
     backgroundColor: '#d8a43a',
     borderColor: '#d8a43a',
   },
-  cardFaction: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 4 },
+  cardFaction: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginBottom: 4 },
   cardLocation: { color: '#9ec96a', fontSize: 11, marginBottom: 4, letterSpacing: 0.5 },
+  // arb-fix — "◈ N moves away" line under a card's location (teal, distinct from
+  // the green 📍 place line so distance reads as its own datum).
+  cardMoves: { color: '#7fb0a8', fontSize: 11, marginBottom: 4, letterSpacing: 0.5 },
+  // arb-fix — SORT BY DISTANCE toggle bar (top of the missions scroll).
+  sortBar: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    marginBottom: 8,
+  },
+  sortBarOn: { borderColor: '#7fb0a8', backgroundColor: '#141d1c' },
+  sortBarPressed: { opacity: 0.7 },
+  sortBarText: { color: '#cdbf99', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  sortBarTextOn: { color: '#7fb0a8' },
+  sortBarHint: { color: '#a2977b', fontSize: 9, letterSpacing: 0.5, marginTop: 2 },
+  // arb-fix — the Primary Objective box's header row (title + compact sort button).
+  mqTrackerHeadRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  mqSortBtn: {
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    marginBottom: 6,
+  },
+  mqSortBtnOn: { borderColor: '#7fb0a8', backgroundColor: '#141d1c' },
+  mqSortText: { color: '#cdbf99', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
   // 2026-05-26 OTA-055 — difficulty chip below location, color-coded
   // vs player state. Same green / amber / red traffic light the rest
   // of the game uses.
@@ -1510,15 +1966,19 @@ const styles = StyleSheet.create({
   difficultyChipDangerous: { color: '#e07a5f' },
   cardBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
   cardHint: { color: '#c9a86a', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
+  // OTA-866 — bounty countdown: a bordered time pill + a draining bar.
+  bountyTimerPill: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, borderWidth: 1, borderRadius: 3, paddingHorizontal: 6, paddingVertical: 2, overflow: 'hidden' },
+  bountyTimerTrack: { height: 4, borderRadius: 2, backgroundColor: 'rgba(122,112,92,0.25)', marginTop: 6, marginBottom: 2, overflow: 'hidden' },
+  bountyTimerFill: { height: 4, borderRadius: 2 },
   cardStageLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 2, fontWeight: '700', marginTop: 8, marginBottom: 2 },
   cardStageBody: { color: '#e6d8b3', fontSize: 12, lineHeight: 17, marginBottom: 4 },
-  whispersBlurb: { color: '#7a705c', fontSize: 11, fontStyle: 'italic', lineHeight: 15, marginBottom: 8 },
+  whispersBlurb: { color: '#a2977b', fontSize: 11, fontStyle: 'italic', lineHeight: 15, marginBottom: 8 },
   cardStageHint: { color: '#9ec96a', fontSize: 11, fontStyle: 'italic', marginTop: 2 },
   // OTA 020 — expanded contract card styles.
   expanded: { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#3a342c' },
-  expandedLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 2, marginTop: 8, marginBottom: 2 },
+  expandedLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 2, marginTop: 8, marginBottom: 2 },
   expandedBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
-  expandedStage: { color: '#7a705c', fontSize: 11, lineHeight: 16, paddingLeft: 4, marginBottom: 2 },
+  expandedStage: { color: '#a2977b', fontSize: 11, lineHeight: 16, paddingLeft: 4, marginBottom: 2 },
   expandedStageHint: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', lineHeight: 14, paddingLeft: 4, marginBottom: 6, letterSpacing: 0.5 },
   expandedStageDone: { color: '#9ec96a', textDecorationLine: 'line-through' },
   expandedStageCurrent: { color: '#c9a86a', fontWeight: '700' },
@@ -1573,13 +2033,13 @@ const styles = StyleSheet.create({
   discardBtn: {
     marginTop: 10,
     backgroundColor: 'transparent',
-    borderColor: '#7a705c',
+    borderColor: '#a2977b',
     borderWidth: 1,
     borderRadius: 3,
     paddingVertical: 10,
     alignItems: 'center',
   },
-  discardBtnText: { color: '#7a705c', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  discardBtnText: { color: '#a2977b', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   milestoneRow: { flexDirection: 'row', backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 10 },
   tabRow: {
     flexDirection: 'row',
@@ -1595,7 +2055,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
   },
   tabBtnActive: { borderBottomColor: '#c9a86a' },
-  tabBtnText: { color: '#7a705c', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
+  tabBtnText: { color: '#a2977b', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
   tabBtnTextActive: { color: '#c9a86a' },
   collectIntro: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 4 },
   collectCard: { marginBottom: 8 },
@@ -1628,6 +2088,6 @@ const styles = StyleSheet.create({
   fragTitleFound: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 4 },
   fragTitleMissing: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 1, fontStyle: 'italic', marginBottom: 4 },
   fragBody: { color: '#e6d8b3', fontSize: 12, lineHeight: 17 },
-  fragHint: { color: '#7a705c', fontSize: 11, fontStyle: 'italic', lineHeight: 16 },
+  fragHint: { color: '#a2977b', fontSize: 11, fontStyle: 'italic', lineHeight: 16 },
   completeBanner: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, fontWeight: '700', marginTop: 4 },
 });

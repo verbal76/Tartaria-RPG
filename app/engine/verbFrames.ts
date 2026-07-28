@@ -89,14 +89,7 @@ export const VERB_FRAMES: Partial<Record<Intent, VerbFrame>> = {
     requireRoles: ['direct'],
     withRole: 'instrument',
   },
-  // J&M ditransitive but command-form uses PPto: "give locket to
-  // Yulka". DITRANS without prep ("give Yulka the locket") falls
-  // through; the segmenter folds the second NP into direct.
-  gift: {
-    type: 'TRANS_PP_TO',
-    acceptRoles: ['direct', 'recipient', 'manner'],
-    requireRoles: ['direct'],
-  },
+  // OTA-803 — the `gift` verb-frame was removed (gifting deleted).
   // J&M frame: NP — search the X. No "with" semantics — we use a
   // separate scanner-equipped check for that, not an instrument arg.
   investigate: {

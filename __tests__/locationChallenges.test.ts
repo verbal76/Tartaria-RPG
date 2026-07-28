@@ -8,25 +8,30 @@ import {
   AFFILIATED_STANDING,
 } from '../app/engine/locationChallenges';
 
-describe('Tier-C location challenges — 4 LIVE (Labyrinth/Speaker/Warden/Broker), 2 still OFF (arb53)', () => {
-  const LIVE = ['labyrinth_of_shadows', 'tongue_of_the_red_tower', 'warden_of_the_cathedral', 'parley_of_factions'];
-  const OFF = ['trap_dives_of_the_stair', 'defense_of_the_enclave'];
+describe('Tier-C location challenges — all 6 LIVE (arb54/arb55)', () => {
+  const LIVE = [
+    'labyrinth_of_shadows', 'tongue_of_the_red_tower', 'warden_of_the_cathedral',
+    'parley_of_factions', 'trap_dives_of_the_stair', 'defense_of_the_enclave',
+  ];
 
   it('master switch is ON', () => {
     expect(TIER_C_ENABLED).toBe(true);
   });
 
-  it('registers 6 Tier-C challenges; exactly the 3 built ones are enabled', () => {
+  it('registers 6 Tier-C challenges; all 6 are enabled', () => {
     expect(LOCATION_CHALLENGES).toHaveLength(6);
     const enabled = LOCATION_CHALLENGES.filter((c) => c.enabled).map((c) => c.id).sort();
     expect(enabled).toEqual([...LIVE].sort());
   });
 
-  it('challengeActive is true for the 3 built challenges, false for the 3 deferred', () => {
+  it('challengeActive is true for all 6 built challenges', () => {
     for (const c of LOCATION_CHALLENGES) {
-      expect(challengeActive(c.id)).toBe(LIVE.includes(c.id));
+      expect(challengeActive(c.id)).toBe(true);
     }
-    for (const id of OFF) expect(challengeActive(id)).toBe(false);
+  });
+
+  it('no challenge still needs a layout', () => {
+    for (const c of LOCATION_CHALLENGES) expect(c.needsLayout).toBe(false);
   });
 
   it('each challenge targets a distinct title and a location id', () => {
@@ -37,14 +42,13 @@ describe('Tier-C location challenges — 4 LIVE (Labyrinth/Speaker/Warden/Broker
     }
   });
 
-  it('activeChallengesAt surfaces each live challenge at its tile, nothing for the OFF ones', () => {
+  it('activeChallengesAt surfaces each live challenge at its tile', () => {
     expect(activeChallengesAt('iskan_veil').map((c) => c.id)).toEqual(['labyrinth_of_shadows']);
     expect(activeChallengesAt('red_tower_of_nimari').map((c) => c.id)).toEqual(['tongue_of_the_red_tower']);
     expect(activeChallengesAt('sinking_cathedral').map((c) => c.id)).toEqual(['warden_of_the_cathedral']);
     expect(activeChallengesAt('parley_ground').map((c) => c.id)).toEqual(['parley_of_factions']);
-    for (const c of LOCATION_CHALLENGES) {
-      if (OFF.includes(c.id)) expect(activeChallengesAt(c.locationId)).toHaveLength(0);
-    }
+    expect(activeChallengesAt('endless_stair').map((c) => c.id)).toEqual(['trap_dives_of_the_stair']);
+    expect(activeChallengesAt('tartarian_enclave').map((c) => c.id)).toEqual(['defense_of_the_enclave']);
   });
 
   it('challengeActive is false for unknown ids', () => {

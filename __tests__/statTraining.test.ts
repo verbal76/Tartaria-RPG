@@ -58,8 +58,10 @@ describe('OTA 058 — trainStat: success gate', () => {
 describe('OTA 058 — tiered cost curve', () => {
   // 2026-05-25 OTA-031 — progressive 6-step ramp so high stats
   // take real commitment to advance.
-  it('stat 1-5 awards +3 per use', () => {
-    expect(progressAwardFor(1)).toBe(3);
+  it('stat 0-2 awards +6 per use (OTA cold-start band), 3-5 awards +3', () => {
+    expect(progressAwardFor(0)).toBe(6);
+    expect(progressAwardFor(2)).toBe(6);
+    expect(progressAwardFor(3)).toBe(3);
     expect(progressAwardFor(5)).toBe(3);
   });
   it('stat 6-10 awards +2 per use', () => {

@@ -22,7 +22,7 @@
 // refusal instead of crafting a degenerate item.
 
 import type { InventoryItem, UniqueItemStats } from './types';
-import { isInferredItem } from './crafting';
+import { canonicalItemTags, isInferredItem, isRecipeIngredientName, findWeaponByName, findArmorByName } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
 
 /** Minimal Qwen interface — matches itemSynthesisQwen.ts so tests can
@@ -87,7 +87,7 @@ export interface FusionGate {
  *  so a reserved material you could SEE (♥) didn't actually count. */
 const FUSION_EQUIP_KINDS = ['weapon', 'armor', 'accessory', 'amulet', 'ring'];
 const FUSION_EDIBLE_TAG = /food|drink|healing|potion|weapon_coating|edible|ration|alcohol|treat|forag/i;
-/** OTA — the material tag(s) an item contributes to a fusion, for the info block.
+/** OTA-1022 — the material tag(s) an item contributes to a fusion, for the info block.
  *  Output RARITY is driven by how many DISTINCT materials the chosen inputs span
  *  (3 different → Rare, 4+ → Legendary), NOT by the inputs' own rarity. */
 export function fusionMaterialTags(item: { name: string; tags?: readonly string[] }): string[] {
@@ -97,15 +97,91 @@ export function fusionMaterialTags(item: { name: string; tags?: readonly string[
   return Array.from(out);
 }
 
+/** OTA-682 — which reserved inputs the Fusing Crucible picker should SHOW given
+ *  the current selection. Hides same-material duplicates (an input that adds no
+ *  material the picked set doesn't already cover) to steer toward diversity — BUT
+ *  never hides so much that the player can't reach `minPick` items. A single
+ *  material-rich input (an Aetheric Cog = metal + improvised + aether) can cover a
+ *  whole reserved pool's materials in just two picks; without this escape hatch the
+ *  remaining filler vanishes and the Fuse button can never light — a hard deadlock
+ *  the player reads as "I still can't fuse." When short of `minPick` with nothing
+ *  left that adds a new material, the redundant filler is revealed so the batch can
+ *  complete. Reaching that state means the picked set already spans every material
+ *  the pool has (so it already clears the diversity gate); the filler only pads the
+ *  count. `pickedIds` may include ids not in `scraps` (already-spent) — harmless. */
+export function visibleFusionInputs(
+  scraps: readonly InventoryItem[],
+  pickedIds: readonly string[],
+  minPick: number,
+): InventoryItem[] {
+  const pickedSet = new Set(pickedIds);
+  const pickedMats = new Set(
+    scraps.filter((i) => pickedSet.has(i.id)).flatMap((i) => fusionMaterialTags(i)),
+  );
+  const addsNew = (it: InventoryItem) => fusionMaterialTags(it).some((m) => !pickedMats.has(m));
+  const freshCount = scraps.filter((it) => !pickedSet.has(it.id) && addsNew(it)).length;
+  const needFiller = pickedIds.length < minPick && freshCount === 0;
+  return scraps.filter((it) => pickedSet.has(it.id) || addsNew(it) || needFiller);
+}
+
+/** OTA-756 (1a) — an AUTHORED catalog reagent that the forge should accept.
+ *  The Crucible was inferred-only, so junk loot with a real catalog row (Rat Fur,
+ *  Crystalline Echo, …) could never be reserved even though it's exactly the kind
+ *  of throwaway material a player wants to melt. Opt those in — but ONLY 'loot'-
+ *  tagged reagents that (a) aren't equip gear / edible / throwable / keepsake and
+ *  (b) are NOT used in any recipe, so recipe-critical loot (Aetheric Cloth, Drone
+ *  Core, …) stays protected and fusing never cannibalizes crafting. */
+const FORGE_LOOT_BLOCK_TAGS = /throwable|keepsake|quest|sigil|currency|relic/i;
+export function isForgeableLootReagent(item: { name: string; kind?: string; tags?: readonly string[] }): boolean {
+  const tags = (item.tags ?? []).map((t) => t.toLowerCase());
+  if (!tags.includes('loot')) return false;
+  if (FUSION_EQUIP_KINDS.includes(item.kind ?? '')) return false;
+  // OTA-1022 — the BLOCKLISTS read canonical tags: a stale sigil/vial/quest core
+  // read as reservable junk and applyFusion CONSUMED it. ('loot' above stays
+  // instance-read — it is a provenance stamp on this copy, not identity.)
+  if (canonicalItemTags(item).some((t) => FUSION_EDIBLE_TAG.test(t) || FORGE_LOOT_BLOCK_TAGS.test(t))) return false;
+  if (isRecipeIngredientName(item.name)) return false;
+  return true;
+}
+
+/** OTA-756 — the single source of truth for "can this item be reserved for and
+ *  consumed by the Fusing Crucible?". Every fusion surface (the reserve toggle,
+ *  the ◆ diamond, the save-for-fusion action, eligibleInputs) routes through this
+ *  so what the UI advertises and what the bench accepts can never drift apart.
+ *   - a fused one-of-a-kind (uniqueStats) is never re-fusible;
+ *   - (2a) equip kinds — weapon / armor / accessory / amulet / ring — are OUT, so
+ *     reserving a weapon no longer shows a ♥ the Crucible then silently ignores;
+ *   - edible items are OUT;
+ *   - catalog-absent inferred junk is IN (the original path);
+ *   - (1a) authored 'loot' reagents with no recipe use are IN.
+ *  Faction catalysts are handled separately by callers (they theme output rather
+ *  than count as a normal input). */
+export function isForgeReservableItem(
+  item: { name: string; kind?: string; tags?: readonly string[]; uniqueStats?: unknown },
+): boolean {
+  if (item.uniqueStats) return false;
+  if (FUSION_EQUIP_KINDS.includes(item.kind ?? '')) return false;
+  if (canonicalItemTags(item).some((t) => FUSION_EDIBLE_TAG.test(t))) return false;
+  // OTA-829 — block protected kinds (quest / relic / sigil / currency / keepsake /
+  // throwable) BEFORE the inferred-item shortcut. Pre-fix a catalog-absent quest
+  // item — e.g. the Legendary Capital "Cores" (tags: quest, aetheric_core,
+  // main_quest) — fell through to `isInferredItem` and read as reservable junk, so
+  // the FUSABLE filter listed the player's un-fusible main-quest Cores. The same
+  // block already guarded the 'loot' reagent path (isForgeableLootReagent); it must
+  // guard the inferred path too. (relic KIND is also out — a relic is never fodder.)
+  if (item.kind === 'relic') return false;
+  if (canonicalItemTags(item).some((t) => FORGE_LOOT_BLOCK_TAGS.test(t))) return false;
+  if (isInferredItem(item.name)) return true;
+  return isForgeableLootReagent(item);
+}
+
 export function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
   const out: InventoryItem[] = [];
   for (const it of inventory) {
     if (it.stolen) continue;
     if (!it.reservedForFusion) continue;
-    if (!isInferredItem(it.name)) continue;
     if (it.quantity <= 0) continue;
-    if (FUSION_EQUIP_KINDS.includes(it.kind)) continue;
-    if ((it.tags ?? []).some((t) => FUSION_EDIBLE_TAG.test(t))) continue;
+    if (!isForgeReservableItem(it)) continue;
     out.push(it);
   }
   return out;
@@ -413,6 +489,54 @@ export async function synthesizeFusionViaQwen(
   }
 }
 
+/** OTA-761 — a forged name is "low quality" when it reads like a prompt echo or a
+ *  stat dump instead of an evocative 2-4 word name. The small on-device model
+ *  sometimes parrots the naming PROMPT back ("A Rare Dog Armor (+3 AC)") or emits a
+ *  bare "<theme> Armor". A good name has NO leading article, NO rarity word, NO
+ *  generic kind word, and NO digits/parens (a stat echo like "(+3 AC)" or "2d8").
+ *  Used to (a) reject such a Qwen name so the deterministic name stands, AND (b)
+ *  re-name already-forged items that carry one from before this guard existed. */
+export function isLowQualityForgeName(name: string): boolean {
+  if (!name) return true;
+  const n = name.toLowerCase();
+  return /^(a|an|the)\b/i.test(name)
+    || /\b(common|uncommon|rare|legendary)\b/i.test(name)
+    || /^(common|uncommon|rare|legendary)/.test(n)   // "RareArmor" — no space between the words
+    || /[()\d]/.test(name)
+    || /\b(armou?r|weapon)\b/i.test(name)
+    || /(armou?r|weapon)$/.test(n);                  // "RareArmor" / "…Armor" ending in a kind word
+}
+
+/** OTA-801 — soft / non-weapon head-nouns that read as textile, ethereal, or
+ *  botanical rather than something you'd swing or fire. A forged WEAPON named
+ *  "Aetheric Thread" / "Resonant Veil" / "Humming Wisp" passed every other gate
+ *  (no article, no rarity word, no digits, no "weapon" kind-word, no catalog
+ *  collision) yet reads as anything but a weapon — the player report behind this
+ *  fix. When the Qwen namer lands one of these as the LAST word of a weapon name,
+ *  we reject it so the deterministic weapon pool (Cleaver / Edge / Reaver / …)
+ *  supplies a name that actually reads as a weapon. */
+const WEAPON_SOFT_TAIL_NOUNS = new Set([
+  'thread', 'threads', 'veil', 'wisp', 'silk', 'gauze', 'ribbon', 'lace',
+  'gossamer', 'filament', 'strand', 'fluff', 'down', 'mist', 'whisper', 'sigh',
+  'petal', 'bloom', 'feather', 'cloth', 'cloak', 'scarf', 'shawl', 'quilt',
+  'shroud', 'drape', 'weave', 'fringe', 'tassel',
+  // OTA-814 — item/material/abstract nouns that read as a THING, not a weapon.
+  // Playtest: a forged weapon got named "Aether Core" (a core isn't a weapon), which
+  // the player had to re-roll by hand. These end-nouns now push a weapon back to the
+  // deterministic suffix pool (Cleaver / Edge / Reaver / …). Armor keeps them.
+  'core', 'orb', 'eye', 'heart', 'crystal', 'essence', 'stone', 'rune', 'sigil',
+  'dust', 'seed', 'husk', 'shell', 'node', 'glow', 'echo', 'hum',
+]);
+
+/** True when a forged WEAPON name ends in a soft / non-weapon noun (see the set
+ *  above) — used to reject a Qwen weapon name that doesn't read as a weapon so the
+ *  deterministic weapon-suffix pool stands instead. Only meaningful for weapons;
+ *  armor/dog_armor pass through (a "Veil" or "Shroud" is a fine armor name). */
+export function fusedWeaponNameReadsSoft(name: string): boolean {
+  const last = name.trim().toLowerCase().split(/\s+/).pop() ?? '';
+  return WEAPON_SOFT_TAIL_NOUNS.has(last);
+}
+
 /** OTA-631 — name + description ONLY for an already-stat-balanced fused item.
  *  The deterministic synth has already decided the kind / rarity / stats; this
  *  asks Qwen for JUST the flavor (a 2-4 word name + one-line description), which
@@ -445,6 +569,24 @@ export async function synthesizeFusionNameViaQwen(
     const name = typeof parsed.name === 'string' ? parsed.name.trim() : '';
     const description = typeof parsed.description === 'string' ? parsed.description.trim().slice(0, 200) : '';
     if (!name || name.length > 40 || !description) return null;
+    // OTA-704 — reject a lazy/colliding Qwen name so the distinct deterministic name
+    // (theme + kind suffix, e.g. "Resonant Aegis") stands instead. Two failure modes
+    // seen in play: (a) the model returns a bare "<theme> Armor"/"Weapon" — generic
+    // and, worse, "Aetheric Armor" is ALSO an authored runecaster WEAPON, so the
+    // collision re-typed the forged armor; (b) any name that resolves to a CATALOG
+    // item of a different kind than the forge. Fall back (return null) in both cases.
+    const kindWord = stats.kind === 'weapon' ? 'weapon' : 'armor';
+    const endsWithKindWord = new RegExp(`\\b${kindWord}$`, 'i').test(name);
+    const collidesCrossKind = stats.kind === 'weapon'
+      ? !!findArmorByName(name)
+      : !!findWeaponByName(name); // armor/dog_armor forge must not be named like a catalog weapon
+    // OTA-761 — also reject an ECHOED / low-quality name (see isLowQualityForgeName)
+    // so the evocative deterministic name (theme + kind suffix, e.g. "Humming Vest")
+    // stands instead.
+    // OTA-801 — and reject a WEAPON name that ends in a soft / non-weapon noun
+    // ("Aetheric Thread", "Resonant Veil") so the deterministic weapon pool names it.
+    const weaponReadsSoft = stats.kind === 'weapon' && fusedWeaponNameReadsSoft(name);
+    if (endsWithKindWord || collidesCrossKind || isLowQualityForgeName(name) || weaponReadsSoft) return null;
     return { name, description };
   } catch {
     return null;
@@ -496,27 +638,68 @@ function buildNamePrompt(
  *  are picked from the dominant material tag; stats scale with input
  *  count and rarity. The result has less narrative variety than
  *  Qwen-generated but is always serviceable. */
+// OTA-978 — read a weapon's reach from its NAME. Used three ways: the Qwen-settle
+// path re-stamps reach when the final name clearly reads ranged/long (the
+// displayed name is the truth the player sees), the hydrate sweep back-stamps
+// older forges, and tests validate noun/reach coherence. Returns null for
+// reach-neutral names (Fang, Edge, ...) — callers keep the forge-time class.
+export function inferReachFromName(name: string): 'ranged' | 'long' | null {
+  const n = name.toLowerCase();
+  if (/\b(bow|caster|launcher|slinger|repeater|arbalest|thrower|rifle|cannon|gun|pistol|blaster|sling|bolt-rig)\b/.test(n)) return 'ranged';
+  if (/\b(spear|pike|lance|harpoon|glaive|halberd|javelin|polearm|warstaff|prong)\b/.test(n)) return 'long';
+  return null;
+}
+
 export function synthesizeFusionDeterministic(
   inputs: readonly InventoryItem[],
   tagProfile: string[],
-  forcedKind?: 'weapon' | 'armor',
+  forcedKind?: 'weapon' | 'armor' | 'dog_armor',
+  // OTA-739 — the armor slots forged most recently (newest first). The slot
+  // picker steps past these so the Crucible rotates through slots instead of
+  // handing back the same one twice in a row (playtest: three forges → three
+  // head pieces, because the slot used a fixed cloth?chest:head default).
+  recentSlots?: readonly string[],
 ): { name: string; description: string; stats: UniqueItemStats } {
   const tagSet = new Set(tagProfile);
-  // Dominant material — first match wins. Drives kind + theme.
-  const dominantTag =
-    tagSet.has('aether') ? 'aether'
-    : tagSet.has('crystal') ? 'aether'
-    : tagSet.has('blade') ? 'metal'
-    : tagSet.has('metal') ? 'metal'
-    : tagSet.has('iron') ? 'metal'
-    : tagSet.has('plate') ? 'metal'
-    : tagSet.has('cloth') ? 'cloth'
-    : tagSet.has('fiber') ? 'cloth'
-    : tagSet.has('organic') ? 'organic'
-    : tagSet.has('bone') ? 'organic'
-    : tagSet.has('wood') ? 'wood'
-    : tagSet.has('stone') ? 'stone'
-    : 'improvised';
+  // OTA-759 — dominant material by COUNT across the actual inputs, NOT the old
+  // fixed aether-first priority. That priority tested `aether`/`crystal` FIRST, so
+  // a single aether-tagged input — and Tartaria fusion loot is aether-heavy — made
+  // EVERY fusion aether-dominant → always 'aetheric' resist + aether theme/damage
+  // ("all my fused dog vests are aetheric resist"). Now we tally how many of your
+  // reserved pieces carry each canonical material and take the most common; ties
+  // break on the input hash so different sets diverge (an organic/fur-heavy pool
+  // forges poison-resist, a metal-heavy one degradation, an aether one aetheric).
+  const CANON_MAT: Record<string, string> = {
+    aether: 'aether', crystal: 'aether',
+    blade: 'metal', metal: 'metal', iron: 'metal', plate: 'metal',
+    cloth: 'cloth', fiber: 'cloth',
+    organic: 'organic', bone: 'organic',
+    wood: 'wood', stone: 'stone', mudstone: 'stone',
+  };
+  const MAT_ORDER = ['aether', 'metal', 'cloth', 'organic', 'wood', 'stone'] as const;
+  const matCounts = new Map<string, number>();
+  for (const it of inputs) {
+    // fusionMaterialTags dedupes per item, so each piece adds at most 1 to a bucket
+    // → the count is "how many of your pieces are metal / organic / aether / …".
+    for (const t of fusionMaterialTags(it)) {
+      const c = CANON_MAT[t];
+      if (c) matCounts.set(c, (matCounts.get(c) ?? 0) + 1);
+    }
+  }
+  const domSeed = parseInt(fusionInputHash(inputs).substring(0, 8), 16) || 0;
+  const dominantTag = (() => {
+    // Rotate the tiebreak order by the input hash so equal-count materials don't
+    // always resolve to the same bucket across different reserved sets.
+    const rot = domSeed % MAT_ORDER.length;
+    const order = [...MAT_ORDER.slice(rot), ...MAT_ORDER.slice(0, rot)];
+    let best: string | null = null;
+    let bestN = 0;
+    for (const c of order) {
+      const n = matCounts.get(c) ?? 0;
+      if (n > bestN) { bestN = n; best = c; }
+    }
+    return best ?? 'improvised';
+  })();
   // Kind from the dominant tag — OVERRIDDEN by the player's explicit weapon/armor
   // choice from the fusion picker when provided (the material still drives theme +
   // stats, but the SHAPE is the player's call).
@@ -591,9 +774,61 @@ export function synthesizeFusionDeterministic(
       'Saddle', 'Collar', 'Vest', 'Cover',
     ],
   };
+  // OTA-832 — slot-appropriate armor nouns. A fused armor piece used to pull its
+  // NOUN from a flat pool (Girdle/Harness/Plating/…) while its SLOT was chosen
+  // separately, so a "Girdle" (a waist word) or a "Harness" (a torso word) would
+  // land on the FEET slot (player report). Pick the slot FIRST, then a noun that
+  // fits it — feet get Boots/Sabatons, legs get Girdle/Greaves, chest gets
+  // Plate/Cuirass, head gets Helm/Crown.
+  const ARMOR_SLOT_NOUNS: Record<string, string[]> = {
+    head: ['Helm', 'Crown', 'Hood', 'Visor', 'Coif', 'Cowl', 'Casque', 'Circlet'],
+    chest: ['Plate', 'Cuirass', 'Mantle', 'Carapace', 'Bastion', 'Aegis', 'Harness', 'Bulwark'],
+    legs: ['Girdle', 'Greaves', 'Faulds', 'Kilt', 'Legguards', 'Tassets', 'Brace'],
+    feet: ['Boots', 'Sabatons', 'Treads', 'Stompers', 'Warboots', 'Footguards', 'Striders'],
+  };
   const hash = parseInt(fusionInputHash(inputs).substring(0, 8), 16);
   const theme = themePool[dominantTag] ?? themePool.improvised!;
-  const suffix = suffixPool[kind] ?? suffixPool.weapon!;
+  // Compute the forged armor slot up front (kind === 'armor'), so the noun can
+  // match it. Same rotation logic as before: hash-seeded start (cloth leans chest),
+  // then step past any slot forged in the last couple of fusions so the Crucible
+  // never returns the same slot back-to-back.
+  let armorSlot: (typeof VALID_ARMOR_SLOTS)[number] | undefined;
+  if (kind === 'armor') {
+    const startIdx = dominantTag === 'cloth'
+      ? VALID_ARMOR_SLOTS.indexOf('chest')
+      : Math.abs(hash) % VALID_ARMOR_SLOTS.length;
+    const avoid = new Set((recentSlots ?? []).map((s) => s.toLowerCase()));
+    let slotIdx = startIdx < 0 ? 0 : startIdx;
+    for (
+      let step = 0;
+      step < VALID_ARMOR_SLOTS.length && avoid.has(VALID_ARMOR_SLOTS[slotIdx]!);
+      step++
+    ) {
+      slotIdx = (slotIdx + 1) % VALID_ARMOR_SLOTS.length;
+    }
+    armorSlot = VALID_ARMOR_SLOTS[slotIdx]!;
+  }
+  // OTA-978 — weapons pick their REACH first, then a form noun that matches it —
+  // the same pick-the-identity-then-the-noun pattern OTA-832 gave armor slots.
+  // Owner (after his fused "Resonant Spike" turned out close-only): "let's
+  // have the crucible add the appropriate range to weapons." 60% melee, 20%
+  // long (spears: mid+close), 20% ranged (every band), hash-seeded so the
+  // same inputs always forge the same thing.
+  const WEAPON_REACH_NOUNS: Record<'melee' | 'long' | 'ranged', string[]> = {
+    melee: suffixPool.weapon!,
+    long: ['Spear', 'Pike', 'Lance', 'Harpoon', 'Glaive', 'Halberd', 'Prong', 'Warstaff'],
+    ranged: ['Bow', 'Caster', 'Launcher', 'Slinger', 'Repeater', 'Arbalest', 'Thrower', 'Bolt-Rig'],
+  };
+  let weaponReach: 'melee' | 'long' | 'ranged' | undefined;
+  if (kind === 'weapon') {
+    const reachRoll = (hash >>> 8) % 10;
+    weaponReach = reachRoll < 6 ? 'melee' : reachRoll < 8 ? 'long' : 'ranged';
+  }
+  const suffix = kind === 'armor' && armorSlot
+    ? (ARMOR_SLOT_NOUNS[armorSlot] ?? suffixPool.armor!)
+    : kind === 'weapon' && weaponReach
+      ? WEAPON_REACH_NOUNS[weaponReach]
+      : (suffixPool[kind] ?? suffixPool.weapon!);
   // OTA-224 — playtest fix: a previous synth named the result
   // "Resonant undefined" because `hash >> 4` is a SIGNED 32-bit
   // right shift in JavaScript. For hashes ≥ 2^31, the shift returns
@@ -626,11 +861,15 @@ export function synthesizeFusionDeterministic(
     baseStats.damageDice = dice;
     baseStats.damageType = dmgType;
     baseStats.scalesWith = scale;
+    // OTA-978 — the forge-chosen reach identity (form noun above matches it).
+    baseStats.reachClass = weaponReach ?? 'melee';
   } else {
     // OTA-445 — Legendary AC +5 / Rare AC +3 (was 4 / 2).
     baseStats.acBonus = rarity === 'Legendary' ? 5 : 3;
     if (kind === 'armor') {
-      baseStats.armorSlot = dominantTag === 'cloth' ? 'chest' : 'head';
+      // OTA-739/OTA-832 — the forged slot is now computed up front (see above) so
+      // the item's NOUN can be chosen to match it; just apply it here.
+      baseStats.armorSlot = armorSlot;
     }
   }
   // OTA-445 — a fused piece always carries a real perk: +2 (Legendary) / +1
@@ -652,8 +891,93 @@ export function synthesizeFusionDeterministic(
     baseStats.statBonus = { stat: 'stealth', amount: rarity === 'Legendary' ? 2 : 1 };
   }
   baseStats.special = `Field-forged from ${inputs.length} reclaimer scraps. The Crucible answered.`;
-  const description = `A ${rarity.toLowerCase()} ${kind === 'dog_armor' ? 'dog vest' : kind} hammered together from your reserved pieces. The seams still hum with the Crucible's last breath.`;
+  const reachPhrase = kind === 'weapon'
+    ? (weaponReach === 'ranged'
+      ? 'ranged weapon — it strikes from any distance'
+      : weaponReach === 'long'
+        ? 'reach weapon — it strikes from mid range and closer'
+        : 'close-quarters weapon')
+    : kind === 'dog_armor' ? 'dog vest' : kind;
+  const description = `A ${rarity.toLowerCase()} ${reachPhrase}, hammered together from your reserved pieces. The seams still hum with the Crucible's last breath.`;
   return { name, description, stats: baseStats };
+}
+
+// OTA-706 — compact theme/suffix banks for RE-naming already-forged fused items whose
+// stored name collides with a catalog row. Kept separate from the synth's richer banks
+// so this migration path is self-contained; every entry is fantasy flavor that won't
+// itself equal a catalog weapon/armor name.
+const RENAME_THEME: Record<string, string[]> = {
+  aether: ['Resonant', 'Humming', 'Aether-Veined', 'Stormcalled', 'Pulse-Woven', 'Ghost-Charged', 'Witchlit', 'Halcyon'],
+  metal: ['Iron-Bound', 'Tempered', 'Forge-Black', 'Anvil-Struck', 'Slag-Cast', 'Galvanized', 'Foundry-Born', 'Cold-Drawn'],
+  cloth: ['Woven', 'Veil-Stitched', 'Shroud-Spun', 'Loom-Bound', 'Quilted', 'Weft-Knit', 'Gauze-Wrapped'],
+  organic: ['Marrow-Etched', 'Sinew-Wrapped', 'Chitin-Plated', 'Hide-Bound', 'Vein-Threaded', 'Scale-Lapped', 'Tendon-Lashed'],
+  stone: ['Cairn', 'Slate', 'Granite-Cut', 'Flint-Knapped', 'Basalt', 'Quarry-Hewn', 'Shale-Split'],
+  wood: ['Hardwood', 'Rooted', 'Knot-Grained', 'Bog-Oak', 'Bark-Lashed', 'Timberbound', 'Sap-Sealed'],
+  improvised: ['Field-Forged', 'Reclaimed', 'Salt-Worn', 'Jury-Rigged', 'Roadworn', 'Cobbled', 'Pieced', 'Castoff'],
+};
+const RENAME_SUFFIX: Record<string, string[]> = {
+  weapon: ['Cleaver', 'Edge', 'Reaver', 'Render', 'Brand', 'Gouge', 'Talon', 'Sunder'],
+  armor: ['Brace', 'Vigil', 'Mantle', 'Bulwark', 'Ward', 'Aegis', 'Bastion', 'Cuirass'],
+  dog_armor: ['Wrap', 'Pattern', 'Barding', 'Hide', 'Collar', 'Cover'],
+};
+function fnvHash(s: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+  return h >>> 0;
+}
+
+type NamedFusedRef = { id: string; name: string; tags?: string[]; uniqueStats?: UniqueItemStats };
+
+/** True when a fused item's stored name resolves to a CATALOG item of a DIFFERENT
+ *  kind than the forge chose — the "Aetheric Armor" trap (a forged armor sharing a
+ *  name with an authored runecaster weapon). */
+export function fusedNameCollidesCrossKind(item: NamedFusedRef): boolean {
+  const u = item.uniqueStats;
+  if (!u) return false;
+  return u.kind === 'weapon' ? !!findArmorByName(item.name) : !!findWeaponByName(item.name);
+}
+
+/** OTA-706 — a distinct, structured, catalog-safe name for a fused item, derived
+ *  deterministically from its id (so it's stable across loads) + its uniqueStats
+ *  theme/kind. Salts until the generated name does NOT itself cross-kind-collide, so
+ *  the load migration is idempotent. */
+export function deterministicFusedName(item: NamedFusedRef): string {
+  const u = item.uniqueStats;
+  const kind = u?.kind === 'weapon' ? 'weapon' : u?.kind === 'dog_armor' ? 'dog_armor' : 'armor';
+  const tags = new Set((item.tags ?? []).map((t) => t.toLowerCase()));
+  const themeKey =
+    (u?.damageType === 'aetheric' || u?.resistance === 'aetheric' || tags.has('aether') || tags.has('aetheric') || tags.has('crystal')) ? 'aether'
+    : (u?.damageType === 'slashing' || u?.resistance === 'degradation' || tags.has('metal') || tags.has('iron')) ? 'metal'
+    : (tags.has('cloth') || tags.has('fiber')) ? 'cloth'
+    : (tags.has('organic') || tags.has('bone')) ? 'organic'
+    : tags.has('stone') ? 'stone'
+    : tags.has('wood') ? 'wood'
+    : 'improvised';
+  const theme = RENAME_THEME[themeKey]!;
+  const suffix = RENAME_SUFFIX[kind]!;
+  for (let salt = 0; salt < 12; salt++) {
+    const h = fnvHash(salt ? `${item.id}#${salt}` : item.id);
+    const candidate = `${theme[h % theme.length]!} ${suffix[(h >>> 5) % suffix.length]!}`;
+    if (!fusedNameCollidesCrossKind({ ...item, name: candidate })) return candidate;
+  }
+  return `${theme[0]!} ${suffix[0]!}`;
+}
+
+/** OTA-706 — one-time load migration: rename a fused item whose stored name
+ *  cross-kind-collides with the catalog. Idempotent (a clean name is returned as-is). */
+export function migrateFusedName(item: InventoryItem): InventoryItem {
+  // OTA-761 — re-mint the name when it cross-kind-collides with a catalog row OR is
+  // low-quality (a prompt echo like "A Rare Dog Armor (+3 AC)" or a bare "<theme>
+  // Armor" that predates the namer guard). Guarded to fused items via uniqueStats so
+  // deterministicFusedName (which reads uniqueStats) always has real data. Idempotent:
+  // a clean name is left alone next load.
+  if (!item.uniqueStats) return item;
+  // OTA-801 — also re-mint a WEAPON whose stored name ends in a soft / non-weapon
+  // noun ("Aetheric Thread") so old saves heal to a proper weapon name.
+  const weaponReadsSoft = item.uniqueStats.kind === 'weapon' && fusedWeaponNameReadsSoft(item.name);
+  return (fusedNameCollidesCrossKind(item) || isLowQualityForgeName(item.name) || weaponReadsSoft)
+    ? { ...item, name: deterministicFusedName(item) }
+    : item;
 }
 
 export function applyFusion(

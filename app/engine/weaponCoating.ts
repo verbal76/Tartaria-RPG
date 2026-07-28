@@ -19,7 +19,7 @@
 // pure DOT, acid = DOT + armor shred, corruption = DOT + corruption stacks.
 
 import type { InventoryItem, WeaponCoating } from './types';
-import { findWeaponByName } from './crafting';
+import { canonicalItemTags, findWeaponByName } from './crafting';
 
 /** True iff a weapon by this name can carry a coating. Resolves the
  *  weapon via the same catalog/inference path combat uses, then
@@ -65,16 +65,37 @@ export function isCoatableItem(item: Pick<InventoryItem, 'name' | 'kind' | 'uniq
   // construct smears/channels the substance however it strikes), so a coated golem
   // weapon can be the late-game armor-breaker for ANY golem kind — not just the
   // slashing/piercing ones the normal melee gate allows.
-  if ((item.tags ?? []).includes('golem_weapon')) return true;
+  if (canonicalItemTags(item).includes('golem_weapon')) return true;
   return isCoatableWeapon(item.name);
 }
 
 /** The player-facing name for an item, prefixed with the coating
- *  adjective when one is applied ("Corrupted Battle Axe"). The
- *  underlying InventoryItem.name is never mutated. */
-export function coatedDisplayName(item: Pick<InventoryItem, 'name' | 'coating'>): string {
-  if (item.coating?.label) return `${item.coating.label} ${item.name}`;
+ *  adjective(s) when one is applied ("Corrupted Battle Axe"). OTA-873 — a
+ *  dual-coat weapon shows BOTH adjectives ("Corrupted Venomous Battle Axe").
+ *  The underlying InventoryItem.name is never mutated. */
+export function coatedDisplayName(item: Pick<InventoryItem, 'name' | 'coating' | 'coating2'>): string {
+  const parts = [item.coating?.label, item.coating2?.label].filter(Boolean);
+  if (parts.length) return `${parts.join(' ')} ${item.name}`;
   return item.name;
+}
+
+/** OTA-873 — coating capacity of THIS weapon instance: 2 if the Crucible upgrade
+ *  granted a second slot, else 1. */
+export function coatingCapacity(item: Pick<InventoryItem, 'coatingSlots'>): number {
+  return item.coatingSlots && item.coatingSlots >= 2 ? 2 : 1;
+}
+
+/** OTA-873 — which coating slot the next "coat a weapon" application should fill:
+ *   · 'coating'  — slot 1 is empty (or the weapon is single-slot: always slot 1)
+ *   · 'coating2' — slot 1 is full and this is a dual-slot weapon with slot 2 empty
+ *   · 'replace'  — both usable slots are full; a new coat replaces slot 1
+ *  Lets the apply flow and its UI copy agree on what a fresh coat will do. */
+export function nextCoatSlot(
+  item: Pick<InventoryItem, 'coating' | 'coating2' | 'coatingSlots'>,
+): 'coating' | 'coating2' | 'replace' {
+  if (!item.coating) return 'coating';
+  if (coatingCapacity(item) >= 2 && !item.coating2) return 'coating2';
+  return 'replace';
 }
 
 /** Short combat/log description of what a coating does, keyed by
@@ -91,6 +112,8 @@ export function coatingBlurb(kind: WeaponCoating['kind']): string {
       return 'arcs electrical damage into the target (counts as electrical — extra-effective vs constructs/automatons)';
     case 'burn':
       return 'sears burn damage into the target (counts as burn — extra-effective vs mud creatures and other burn-weak foes)';
+    case 'cold':
+      return 'sinks a biting frost into the target (counts as cold — extra-effective vs constructs/automatons and other cold-weak foes)';
   }
 }
 
@@ -149,8 +172,8 @@ export function corruptionStackCap(enemy: { boss?: boolean } | null | undefined)
 /** The enemyStatuses `kind` string a coating lands as a DOT. */
 export function coatingStatusKind(
   kind: WeaponCoating['kind'],
-): 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' {
-  return `${kind}_coat` as 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat';
+): 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'cold_coat' {
+  return `${kind}_coat` as 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'cold_coat';
 }
 
 // ─── OTA-363 — occasional coated-weapon loot ───────────────────────
@@ -168,10 +191,11 @@ const LOOT_COATING_LABELS: Record<WeaponCoating['kind'], string> = {
   poison: 'Poisoned',
   acid: 'Acid-Etched',
   corruption: 'Corrupted',
-  // Electrical/etheric + burn coatings are craft-only (not in the loot `kinds`
-  // roll below), but the label map stays exhaustive over the union.
+  // Electrical/etheric + burn + cold coatings are craft-only (not in the loot
+  // `kinds` roll below), but the label map stays exhaustive over the union.
   electrical: 'Charged',
   burn: 'Burning',
+  cold: 'Frost-Rimed',
 };
 
 /** Roll whether a looted weapon arrives pre-coated. Returns the coating
@@ -201,4 +225,14 @@ export function coatingDotPerTurn(
     return rolled + Math.max(0, stacksAfter - 1) * CORRUPTION_STACK_BONUS;
   }
   return rolled;
+}
+
+/** OTA-1020 — THE ONE ANSWER to "is this item a weapon coating?". Reads canonical
+ *  (instance-union-catalog) tags, because inventory instances persist stale tag
+ *  snapshots — the owner's pre-tag vials refused to rack on the bandolier while
+ *  identical newly-minted ones racked fine. Every consumer (bandolier gate,
+ *  throw burst, coat-a-weapon button, equip guard, drinkable gate) routes
+ *  through here so the category can never split again. */
+export function isWeaponCoatingItem(item: { name: string; tags?: readonly string[] }): boolean {
+  return canonicalItemTags(item).includes('weapon_coating');
 }

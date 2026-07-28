@@ -237,6 +237,40 @@
       ]
     },
     {
+      "result": "Frost Paste",
+      "ingredients": [
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Rime Draught",
+      "ingredients": [
+        {
+          "name": "Aetheric Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
       "result": "Climbing Rope",
       "ingredients": [
         {
@@ -506,7 +540,7 @@
       ]
     },
     {
-      "_note": "OTA-603 \u2014 dog-vest (kind 'dog_armor') craft recipes. The vests were authored in dogGear.json but had no source; these make the three open-market tiers craftable (the Legendary Reclaimer Pattern Vest stays drop-only from Reclaimer-aligned kills, per its catalog note). Result names match DOG_GEAR; lookupCraftedItem resolves them to kind 'dog_armor' so the crafted item is equippable on the dog.",
+      "_note": "OTA-603 — dog-vest (kind 'dog_armor') craft recipes. The vests were authored in dogGear.json but had no source; these make the three open-market tiers craftable (the Legendary Reclaimer Pattern Vest stays drop-only from Reclaimer-aligned kills, per its catalog note). Result names match DOG_GEAR; lookupCraftedItem resolves them to kind 'dog_armor' so the crafted item is equippable on the dog.",
       "result": "Burlap Vest",
       "ingredients": [
         {
@@ -918,7 +952,7 @@
       ]
     },
     {
-      "_note": "MECHANIC-2 (2026-05-25) \u2014 scanner recipes so the player can craft the off-hand search tools that gate investigate of mechanical / Aetheric / mud features. Pulse Scanner (Common, INT 3, bias=pulse) reads Sentinel and automaton signatures. Aetheric Scanner (Uncommon, INT 4, bias=aetheric) reads pre-flood Aetheric phenomena. Mud Scanner (Common, INT 3, bias=mud) reads buried mud and silt signatures. Each gates its own noun pool and its own loot pool \u2014 OTA-033.",
+      "_note": "MECHANIC-2 (2026-05-25) — scanner recipes so the player can craft the off-hand search tools that gate investigate of mechanical / Aetheric / mud features. Pulse Scanner (Common, INT 3, bias=pulse) reads Sentinel and automaton signatures. Aetheric Scanner (Uncommon, INT 4, bias=aetheric) reads pre-flood Aetheric phenomena. Mud Scanner (Common, INT 3, bias=mud) reads buried mud and silt signatures. Each gates its own noun pool and its own loot pool — OTA-033.",
       "result": "Pulse Scanner",
       "ingredients": [
         {
@@ -1249,7 +1283,7 @@
     },
     {
       "result": "Golem Sledge",
-      "coresRequired": 4,
+      "coresRequired": 2,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1266,8 +1300,44 @@
       ]
     },
     {
-      "result": "Golem Greatsword",
+      "result": "Crude Golem Sledge",
+      "coresRequired": 1,
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 3
+        },
+        {
+          "name": "Big Rock",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Elder Golem Sledge",
       "coresRequired": 4,
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 6
+        },
+        {
+          "name": "Big Rock",
+          "quantity": 3
+        },
+        {
+          "name": "Golem Core",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Golem Greatsword",
+      "coresRequired": 2,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1284,8 +1354,40 @@
       ]
     },
     {
-      "result": "Golem Pike",
+      "result": "Crude Golem Greatsword",
+      "coresRequired": 1,
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 4
+        },
+        {
+          "name": "Big Rock",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Elder Golem Greatsword",
       "coresRequired": 4,
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 6
+        },
+        {
+          "name": "Golem Core",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Golem Pike",
+      "coresRequired": 2,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1302,25 +1404,43 @@
       ]
     },
     {
-      "result": "Golem Aether-Lance",
-      "coresRequired": 4,
+      "result": "Crude Golem Pike",
+      "coresRequired": 1,
       "ingredients": [
         {
-          "name": "Aether Crystal",
-          "quantity": 2
+          "name": "Scrap Metal",
+          "quantity": 3
         },
         {
-          "name": "Aetheric Shard",
-          "quantity": 1
-        },
-        {
-          "name": "Golem Core",
+          "name": "Big Rock",
           "quantity": 1
         }
       ]
     },
     {
-      "_note": "arb119 \u2014 REFINE path. Mudstone is Rare and was the hard wall on the starter mud golem + Mud Scanner (both re-tiered to Common mud). Compressing 3 Common Mud Fragments into 1 Mudstone gives every higher-tier mud recipe (Mudstone Bulwark, Hardened-Mudstone gear) a craftable path from the mud you actually forage, instead of an RNG wall.",
+      "result": "Elder Golem Pike",
+      "coresRequired": 4,
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 5
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 3
+        },
+        {
+          "name": "Golem Core",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "arb119 — REFINE path. Mudstone is Rare and was the hard wall on the starter mud golem + Mud Scanner (both re-tiered to Common mud). Compressing 3 Common Mud Fragments into 1 Mudstone gives every higher-tier mud recipe (Mudstone Bulwark, Hardened-Mudstone gear) a craftable path from the mud you actually forage, instead of an RNG wall.",
       "result": "Mudstone",
       "ingredients": [
         {
@@ -1330,7 +1450,21 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA-703 — Hardened Mudstone had NO recipe (loot-only), walling Mudstone Bulwark + 8 other Hardened-Mudstone recipes behind drops despite the Mudstone refine note promising a craftable path. Per the material's own lore ('Mudstone fused under Etheric pressure'): 2 Mudstone + 1 Aether Dust → 1 Hardened Mudstone, completing Mud Fragment -> Mudstone -> Hardened Mudstone -> gear.",
+      "result": "Hardened Mudstone",
+      "ingredients": [
+        {
+          "name": "Mudstone",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Dust",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Reclaimer's Salvage Cap",
       "ingredients": [
         {
@@ -1344,7 +1478,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Reclaimer's Salvage Vest",
       "ingredients": [
         {
@@ -1358,7 +1492,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Reclaimer's Trousers",
       "ingredients": [
         {
@@ -1372,7 +1506,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Reclaimer's Boots",
       "ingredients": [
         {
@@ -1390,7 +1524,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Reclaimer's Gloves",
       "ingredients": [
         {
@@ -1404,7 +1538,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Reclaimer's Cloak",
       "ingredients": [
         {
@@ -1418,7 +1552,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Scrap-Forged Breastplate",
       "ingredients": [
         {
@@ -1432,7 +1566,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Mud-Stalker Leggings",
       "ingredients": [
         {
@@ -1446,7 +1580,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Mud-Lurker Boots",
       "ingredients": [
         {
@@ -1460,7 +1594,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Mud-Seer's Hood",
       "ingredients": [
         {
@@ -1474,7 +1608,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Mud-Claw Gloves",
       "ingredients": [
         {
@@ -1488,7 +1622,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Mud-Bound Cloak",
       "ingredients": [
         {
@@ -1502,7 +1636,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Aether-Reinforced Armor",
       "ingredients": [
         {
@@ -1520,7 +1654,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
+      "_note": "OTA — armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Aetheric Swiftstep Greaves",
       "ingredients": [
         {
@@ -1538,7 +1672,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "_note": "OTA — high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
       "result": "Aether Bolt-Caster",
       "ingredients": [
         {
@@ -1556,7 +1690,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "_note": "OTA — high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
       "result": "Aetherstone Gauntlet",
       "ingredients": [
         {
@@ -1574,7 +1708,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "_note": "OTA — high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
       "result": "Mire Stave",
       "ingredients": [
         {
@@ -1592,7 +1726,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "_note": "OTA — high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
       "result": "Gravity Pike",
       "ingredients": [
         {
@@ -1610,7 +1744,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "_note": "OTA — high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
       "result": "Aetheric Spear (Legendary)",
       "ingredients": [
         {
@@ -1628,7 +1762,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "_note": "OTA — high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
       "result": "Aether-Seeker's Hood",
       "ingredients": [
         {
@@ -1646,7 +1780,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "_note": "OTA — high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
       "result": "Aetheric Analyzer Helm",
       "ingredients": [
         {
@@ -1664,7 +1798,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "_note": "OTA — high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
       "result": "Helm of the Great Architect",
       "ingredients": [
         {
@@ -1682,7 +1816,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "_note": "OTA — high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
       "result": "Crown of the Deep",
       "ingredients": [
         {
@@ -1700,7 +1834,7 @@
       ]
     },
     {
-      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "_note": "OTA — high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
       "result": "Aetheric Crown of the Giants",
       "ingredients": [
         {
@@ -1713,6 +1847,330 @@
         },
         {
           "name": "Hardened Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA-675 - craftable throwables: give the bandolier a crafting supply line (previously loot/vendor only). Each output is an existing throwable-tagged, bandolier-eligible weapon.",
+      "result": "Throwing Knife",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        },
+        {
+          "name": "Stick",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Tartarian Hand Axe (Throw)",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        },
+        {
+          "name": "Smooth Stone",
+          "quantity": 1
+        },
+        {
+          "name": "Stick",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Mud Throwing Knife",
+      "ingredients": [
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Bone Throwing Axe",
+      "ingredients": [
+        {
+          "name": "Wyrm Fang",
+          "quantity": 1
+        },
+        {
+          "name": "Stick",
+          "quantity": 1
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aetherforged Greaves",
+      "ingredients": [
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aetherforged Gauntlets",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aetherforged Treads",
+      "ingredients": [
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aetherforged Mantle",
+      "ingredients": [
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Titanforged Cuirass",
+      "ingredients": [
+        {
+          "name": "Behemoth Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Titanforged Greaves",
+      "ingredients": [
+        {
+          "name": "Mud-Iron Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Titanforged Gauntlets",
+      "ingredients": [
+        {
+          "name": "Iron Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Titanforged Treads",
+      "ingredients": [
+        {
+          "name": "Aetherstone Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Titanforged Mantle",
+      "ingredients": [
+        {
+          "name": "Throne Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aetherstone Signet",
+      "ingredients": [
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Titan's Iron Band",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Mud Gem",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Ring of the Deep Current",
+      "ingredients": [
+        {
+          "name": "Aetherstone Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Amulet of the Silt Warden",
+      "ingredients": [
+        {
+          "name": "Mudstone",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Dust",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Reclaimer's Aegis Pendant",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Heart of the Aetherstorm",
+      "ingredients": [
+        {
+          "name": "Behemoth Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
           "quantity": 1
         }
       ]

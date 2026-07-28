@@ -8,6 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 // require returns null on those builds; the effect no-ops.
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGameStore } from './app/state/gameStore';
+import { useAccessibility } from './app/state/accessibility';
 import {
   loadMLHealth,
   shouldAttemptMLInit,
@@ -31,6 +32,7 @@ import { CraftingScreen } from './app/screens/CraftingScreen';
 import { VendorScreen } from './app/screens/VendorScreen';
 import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
 import { ContractsScreen } from './app/screens/ContractsScreen';
+import { WorldScreen } from './app/screens/WorldScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
 import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
@@ -172,6 +174,13 @@ export default function App() {
   // Wordscapes / most full-screen games: gain the system bar real
   // estate, swipe up from the bottom (or down from the top) to peek
   // them back when needed. No-op on iOS.
+  // OTA-898 (SA-6) — load device accessibility prefs (reduce-motion) once at
+  // boot, off the game-save path. Cheap single AsyncStorage read; failure falls
+  // back to defaults.
+  useEffect(() => {
+    void useAccessibility.getState().hydrateAccessibility();
+  }, []);
+
   useEffect(() => {
     if (Platform.OS !== 'android') return;
     const NB = loadNavigationBar();
@@ -525,6 +534,22 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
+  // OTA-857 — the world's REAL-TIME heartbeat. The war used to advance only when
+  // the player took actions that burned in-game hours, so a player who opened the
+  // World board and watched saw a frozen feed ("still nothing populating"). This
+  // wall-clock timer ticks the sim on its own, no matter what screen is open, so
+  // patrols roam + clash + get mauled continuously and the board is a live scroll.
+  // worldRealtimeTick() self-guards (no player / title / creation / ending → no-op)
+  // and does NOT persist (the 90s autosave + player actions flush worldMemory), so
+  // it's cheap to fire unconditionally.
+  useEffect(() => {
+    const WORLD_HEARTBEAT_MS = 6_000;
+    const timer = setInterval(() => {
+      useGameStore.getState().worldRealtimeTick();
+    }, WORLD_HEARTBEAT_MS);
+    return () => clearInterval(timer);
+  }, []);
+
   if (!hydrated) {
     return (
       <View style={styles.loading}>
@@ -787,6 +812,7 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           {screen === 'vendor' && <VendorScreen />}
           {screen === 'actions' && <ActionReferenceScreen />}
           {screen === 'contracts' && <ContractsScreen />}
+          {screen === 'world' && <WorldScreen />}
           {screen === 'ending' && <EndingScreen />}
         </View>
       </View>

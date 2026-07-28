@@ -93,9 +93,10 @@ describe('Tungsten Spire — tutorial play loop (TUTORIAL_STEPS)', () => {
     }
   });
 
-  it('the rope beat demos typed input (draftText pre-fills "take rope")', () => {
+  it('the rope beat demos typed input — the player types it themselves (OTA-861: no pre-fill)', () => {
     const rope = TUTORIAL_STEPS.find((s) => s.id === 'rope')!;
-    expect(rope.draftText).toBe('take rope');
+    expect(rope.draftText).toBeUndefined();
+    expect(rope.body.toLowerCase()).toContain('type');
     expect(rope.inputPulse).toBe(true);
   });
 });

@@ -55,11 +55,11 @@ export function ClimbModal({
       onRequestClose={onCancel}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim}>
+      <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>CLIMB</Text>
+              <Text style={styles.title} accessibilityRole="header">CLIMB</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
                 Pick something to climb. Each tap clears one tier; bigger
@@ -101,6 +101,8 @@ export function ClimbModal({
                           pressed && !isCleared && styles.rowPressed,
                         ]}
                         onPress={() => tapTo(noun)}
+                        accessibilityRole="button"
+                        accessibilityState={{ disabled: isCleared }}
                       >
                         <Text
                           style={[styles.rowName, isCleared && styles.rowNameCleared]}
@@ -123,6 +125,7 @@ export function ClimbModal({
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={onCancel}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
                 </Pressable>
@@ -141,7 +144,7 @@ const styles = StyleSheet.create({
   title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
   body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 10 },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', paddingVertical: 20, fontSize: 13 },
+  empty: { color: '#a2977b', fontStyle: 'italic', textAlign: 'center', paddingVertical: 20, fontSize: 13 },
   scroll: { maxHeight: 280 },
   scrollContent: { paddingVertical: 2 },
   row: {

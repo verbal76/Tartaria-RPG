@@ -43,6 +43,20 @@ describe('OTA 204 — argument extraction (J&M §12.3.5 frames)', () => {
     expect(p.resolvedNoun).toMatch(/Drone/i);
   });
 
+  it('OTA-737 — an instrument tool does NOT leak into the legacy target string', () => {
+    // Playtest: "shatter the rune glass with the prybar" resolved the legacy
+    // target to the mangled "rune glass prybar" (the tool merged in) because
+    // extractTargetTokens only stopword-filtered "with the". The direct object
+    // must end at the instrument preposition.
+    const p = parseInput('shatter the drone with the bolt-caster', {
+      inventory: [BOLT],
+      enemyNames: ['Aetheric Drone'],
+      enemyPresent: true,
+    });
+    expect(p.target).toMatch(/drone/i);
+    expect(p.target).not.toMatch(/bolt|caster/i); // tool must not be in the target
+  });
+
   it('attack with implicit target: instrument-only is legal (combat defaults to active enemy)', () => {
     const p = parseInput('attack with the bolt-caster', {
       inventory: [BOLT],
@@ -54,17 +68,9 @@ describe('OTA 204 — argument extraction (J&M §12.3.5 frames)', () => {
     expect(instr?.resolvedItemId).toBe('bc1');
   });
 
-  it('gift with PPto recipient: args has direct + recipient', () => {
-    const p = parseInput('give the locket to Yulka', {
-      inventory: [LOCKET],
-      recentNouns: ['Yulka'],
-    });
-    expect(p.intent).toBe('gift');
-    const direct = p.args?.find((a) => a.role === 'direct');
-    const recip  = p.args?.find((a) => a.role === 'recipient');
-    expect(direct?.resolvedItemId).toBe('lck1');
-    expect(recip?.text.toLowerCase()).toContain('yulka');
-  });
+  // OTA-803 — the `gift` intent was removed (gifting deleted). "give the locket
+  // to Yulka" no longer parses to a gift; the prepositional-arg extraction is
+  // still covered by the throw/other PP-recipient cases above.
 
   it('search with adverb: args has direct + manner', () => {
     const p = parseInput('search the trap carefully', {

@@ -21,6 +21,7 @@
 
 import data from '../data/world/wasteland_encounters.json';
 import type { Location } from './types';
+import { withArticle } from './grammar';
 
 export interface WastelandLootEntry {
   name: string;
@@ -63,6 +64,30 @@ export interface WastelandArchetype {
    *  user's explicit ask: "we need a way to start quests" that
    *  isn't tied to a faction vendor. */
   quest_hook?: { kind: 'hunt' | 'mystery'; id: string };
+  /** OTA-712 — provocable NPC encounter. When a `type:'npc'` archetype
+   *  carries a `provoke` block, its lore_note is a real dare ("reach for a
+   *  coin and you will not reach it twice"). The engine arms the temptation
+   *  when the encounter lands; a provoking verb (take/reach/steal/disturb/
+   *  attack) aimed at one of `nouns` MAKES GOOD ON THE THREAT — spawns the
+   *  named `enemy` (drawn from the enemies data), applies `corruption`, and
+   *  narrates `line` (+ optional `system_line`). Fully data-driven so the
+   *  engine holds no encounter-specific enemy name or prose — a content
+   *  pack authors the whole thing here. */
+  provoke?: EncounterProvoke;
+}
+
+/** OTA-712 — data-driven provoke payload for a provocable NPC encounter. */
+export interface EncounterProvoke {
+  /** Enemy name to spawn on provocation (resolved via findEnemyByName). */
+  enemy: string;
+  /** Corruption inflicted as "payment" (0 / omitted = none). */
+  corruption?: number;
+  /** Player-noun triggers — the coins / the kin / the silhouettes, etc. */
+  nouns: string[];
+  /** World-channel narration shown when the player provokes it. */
+  line: string;
+  /** Optional system-channel line (e.g. the corruption note). */
+  system_line?: string;
 }
 
 // Filter out the "_description" key from the JSON.
@@ -90,6 +115,8 @@ export interface WastelandEncounter {
   /** Mini-dungeon only — quest to auto-add to the player's active
    *  board. Null when the dungeon is loot-only. */
   questHook: { kind: 'hunt' | 'mystery'; id: string } | null;
+  /** OTA-712 — provoke payload for a provocable NPC encounter, else null. */
+  provoke: EncounterProvoke | null;
 }
 
 interface PickOptions {
@@ -128,7 +155,21 @@ interface PickOptions {
    *  Curve: 1.0× at 0–2 steps, 2.0× at 3–4, 4.0× at 5+. Reset
    *  to 0 in stepDirection when an enemy actually spawns. */
   stepsSinceCombat?: number;
+  /** OTA-713 — auto-route variety bias. When the player is on a plotted
+   *  course (setTravelCourse / continueTravel), the NON-combat archetypes
+   *  (treasure / npc / fusion_bench — the "different encounters") get a
+   *  small weight multiplier so a route feels a little more eventful and
+   *  varied WITHOUT adding fights. Combat archetypes (skirmish / mini_
+   *  dungeon) are untouched, so this raises variety while nudging the
+   *  combat FRACTION down, not up — no extra high-level fights. */
+  autoTravel?: boolean;
 }
+
+/** OTA-713 — how hard auto-route favors non-combat variety. Deliberately
+ *  small ("only slightly more"): 1.3× lifts the treasure/npc/fusion-bench
+ *  share a few points without swamping the combat rotation, which the
+ *  combat-starvation curve still pulls back after a peaceful stretch. */
+const AUTO_TRAVEL_VARIETY_MULT = 1.3;
 
 /**
  * Maybe roll an encounter for the current scene's location. Returns
@@ -159,7 +200,7 @@ export function pickWastelandEncounter(
           ? archetype.bandit_pool[Math.floor(rng() * archetype.bandit_pool.length)] ?? null
           : null;
       let narration = archetype.narration;
-      if (enemyName) narration = narration.replace(/\{enemy\}/g, enemyName);
+      if (enemyName) narration = narration.replace(/\{enemy\}/g, withArticle(enemyName));
       const npcLine = (archetype.npc_lines && archetype.npc_lines.length > 0)
         ? archetype.npc_lines[Math.floor(rng() * archetype.npc_lines.length)] ?? null
         : null;
@@ -175,6 +216,7 @@ export function pickWastelandEncounter(
         loreNote: archetype.lore_note ?? null,
         enemyName,
         questHook: archetype.quest_hook ?? null,
+        provoke: archetype.provoke ?? null,
       };
     }
     // If the archetype id is unknown (stale save / archetype removed),
@@ -223,6 +265,9 @@ export function pickWastelandEncounter(
     if (opts.aethericVision && a.type === 'fusion_bench') mult *= 2.0;
     // OTA-218 — combat-starvation bias.
     if (isCombat(a.type)) mult *= combatStarvationMult;
+    // OTA-713 — auto-route variety bias. Lift the NON-combat archetypes so
+    // a plotted course brings in more different (non-fight) encounters.
+    if (opts.autoTravel && !isCombat(a.type)) mult *= AUTO_TRAVEL_VARIETY_MULT;
     return mult;
   };
   // Weighted pick among eligible archetypes (bias-adjusted).
@@ -251,7 +296,7 @@ export function pickWastelandEncounter(
 
   // Narration — substitute {enemy} when present and we have one.
   let narration = archetype.narration;
-  if (enemyName) narration = narration.replace(/\{enemy\}/g, enemyName);
+  if (enemyName) narration = narration.replace(/\{enemy\}/g, withArticle(enemyName));
 
   const npcLine = (archetype.npc_lines && archetype.npc_lines.length > 0)
     ? archetype.npc_lines[Math.floor(rng() * archetype.npc_lines.length)] ?? null
@@ -270,6 +315,7 @@ export function pickWastelandEncounter(
     loreNote: archetype.lore_note ?? null,
     enemyName,
     questHook: archetype.quest_hook ?? null,
+    provoke: archetype.provoke ?? null,
   };
 }
 

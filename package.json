@@ -11,7 +11,12 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "lint": "eslint . --ext .ts,.tsx",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "typecheck:ci": "tsc -p tsconfig.ci.json --noEmit",
+    "typecheck:tests": "node scripts/ci-typecheck-tests.mjs",
+    "test:ci": "npm run test:ci:fast && npm run test:ci:heavy",
+    "test:ci:fast": "jest --ci --testPathIgnorePatterns /node_modules/ Stress stressMode Chaos Probe Smoke Sweep Sim",
+    "test:ci:heavy": "jest --ci --maxWorkers=1 --workerIdleMemoryLimit=200MB --testPathPattern \"(Stress|stressMode|Chaos|Probe|Smoke|Sweep|Sim)\""
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.23.1",
@@ -41,17 +46,27 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",
+    "@eslint/js": "9.39.0",
     "@types/jest": "^29.5.13",
     "@types/react": "~18.3.12",
+    "eslint": "9.39.5",
+    "eslint-plugin-react-hooks": "7.1.1",
     "jest": "^29.7.0",
     "jest-expo": "~52.0.0",
     "patch-package": "^8.0.1",
-    "typescript": "~5.3.3"
+    "typescript": "~5.3.3",
+    "typescript-eslint": "8.64.0"
   },
   "jest": {
     "preset": "jest-expo",
+    "setupFiles": [
+      "<rootDir>/jest.setup.js"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^@react-native-async-storage/async-storage/jest/async-storage-mock$": "<rootDir>/test-utils/asyncStorageMock.js"
+    }
   }
 }

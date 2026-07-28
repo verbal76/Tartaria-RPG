@@ -8,6 +8,7 @@
 // nothing dominate.
 
 import type { Rarity } from './types';
+import { materialMatchesBiome, BIOME_FORAGE_BOOST } from './digging';
 
 // Phrases that count as a generic area / surface / direction search.
 // Anything in here triggers an outcome roll instead of "I don't see X".
@@ -249,6 +250,29 @@ function pickWeighted<T extends { weight: number }>(arr: T[]): T {
   return arr[arr.length - 1]!;
 }
 
+// OTA-741 — biome-aware weighted pick. A foraged material that shares a tag with
+// the current tile's biome (mud material on a 'mud' tile) is BIOME_FORAGE_BOOST×
+// more likely, so the Mud Seas actually yields mud stock instead of the flat
+// everywhere-pool. materialMatchesBiome reads the pool item's tags from the
+// material catalog, so no lore lives here.
+function pickWeightedBiome<T extends { weight: number; name: string }>(
+  arr: T[],
+  biomeTags: readonly string[] | undefined,
+): T {
+  if (!biomeTags || biomeTags.length === 0) return pickWeighted(arr);
+  const boosted = arr.map((x) => ({
+    x,
+    w: materialMatchesBiome(x.name, biomeTags) ? x.weight * BIOME_FORAGE_BOOST : x.weight,
+  }));
+  const total = boosted.reduce((s, b) => s + b.w, 0);
+  let r = Math.random() * total;
+  for (const b of boosted) {
+    r -= b.w;
+    if (r <= 0) return b.x;
+  }
+  return arr[arr.length - 1]!;
+}
+
 // arb-fix — rarity ordering for the race loot-luck "best of two" draw.
 const RARITY_RANK: Record<string, number> = {
   Common: 0, Uncommon: 1, Rare: 2, Epic: 3, Legendary: 4,
@@ -352,7 +376,7 @@ function format(line: string, target: string): string {
  *  threads, not loot they could grind from search. */
 export function rollAreaSearch(
   target: string,
-  opts?: { hookBonus?: number; intent?: 'search' | 'investigate' | 'harvest'; rareLootBias?: number },
+  opts?: { hookBonus?: number; intent?: 'search' | 'investigate' | 'harvest'; rareLootBias?: number; biomeTags?: readonly string[] },
 ): AreaSearchOutcome {
   const bonus = Math.max(0, Math.min(0.4, opts?.hookBonus ?? 0));
   // arb-fix — race loot-luck (Reclaimer / Aetherborn always; Mud Dweller
@@ -386,15 +410,15 @@ export function rollAreaSearch(
   }
   if (r < findCutoff) {
     const pool = isInvestigate ? RARE_FINDS : SMALL_FINDS;
-    let found = pickWeighted(pool);
+    let found = pickWeightedBiome(pool, opts?.biomeTags);
     // arb-fix — race loot-luck quality bias. On a plain search there's a
     // chance to surface the rare Aetheric gear pool outright; otherwise keep
     // the rarer of two draws so finds skew toward Aetheric loot.
     if (loot > 0) {
       if (!isInvestigate && Math.random() < loot * 2) {
-        found = pickWeighted(RARE_FINDS);
+        found = pickWeightedBiome(RARE_FINDS, opts?.biomeTags);
       } else {
-        const alt = pickWeighted(pool);
+        const alt = pickWeightedBiome(pool, opts?.biomeTags);
         if (rarityRank(alt.rarity) > rarityRank(found.rarity)) found = alt;
       }
     }
@@ -410,7 +434,8 @@ export function rollAreaSearch(
     return { kind: 'tc', amount, line: format(pick(TC_LINES), target) };
   }
   // OTA-216 — when investigate fires a hook outcome, split the
-  // 60% hook share three ways:
+  // hook share (0.75 of total after arb61 cut the item drop to ~7%)
+  // three ways:
   //   - 50% → scene hook chain (the existing 2-3 step narrative
   //           that lives on currentScene.hooks)
   //   - 30% → directional find (schedules a real encounter the

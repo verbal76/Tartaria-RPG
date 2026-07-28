@@ -227,10 +227,28 @@ function previewArmor(a: CatalogArmor): ItemPreview {
 
 function previewAccessory(x: CatalogAccessory, kind: 'Amulet' | 'Ring'): ItemPreview {
   const stats: string[] = [];
+  if (x.acBonus) stats.push(`AC +${x.acBonus}`); // OTA-730 — defensive accessories
   if (x.statBonus) stats.push(`${x.statBonus.stat.toUpperCase().slice(0, 3)} +${x.statBonus.amount}`);
   if (x.resistances.length > 0) stats.push(`Resists: ${x.resistances.join(', ')}`);
   if (x.baseDurability !== undefined) stats.push(`Durability: ${x.baseDurability}`);
   return { name: x.name, kindLabel: kind, rarity: x.rarity, description: x.description, stats };
+}
+
+/** OTA-1017 — the preview promises what USE will actually deliver: the #120-scaled
+ *  heal for the live character's frame. Outside a live game (no player yet)
+ *  the flat catalog value stands. Lazy store require — gameStore imports this
+ *  module, so a static import would cycle. */
+export function effectiveHealAmount(flatHeal: number): { amount: number; scaled: boolean } {
+  let hpMax = 0;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { useGameStore } = require('../state/gameStore') as typeof import('../state/gameStore');
+    hpMax = useGameStore.getState().player?.hpMax ?? 0;
+  } catch { /* no live store (cold boot) — the flat value stands */ }
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { scaledHealHP } = require('../engine/itemEffect') as typeof import('../engine/itemEffect');
+  const amount = hpMax > 0 ? scaledHealHP(flatHeal, hpMax) : flatHeal;
+  return { amount, scaled: amount !== flatHeal };
 }
 
 function previewGear(g: CatalogGear): ItemPreview {
@@ -254,7 +272,10 @@ function previewGear(g: CatalogGear): ItemPreview {
   // effect.{healHP,restoreStamina,reduceCorruption,buffStat/Bonus/Duration,cureBleed}.
   if (g.effect && g.effect.kind === 'consumable') {
     const restoreParts: string[] = [];
-    if (g.effect.healHP) restoreParts.push(`+${g.effect.healHP} HP`);
+    if (g.effect.healHP) {
+      const heal = effectiveHealAmount(g.effect.healHP);
+      restoreParts.push(`+${heal.amount} HP${heal.scaled ? ' (your frame)' : ''}`);
+    }
     if (g.effect.restoreStamina) restoreParts.push(`+${g.effect.restoreStamina} stamina`);
     if (g.effect.reduceCorruption) restoreParts.push(`−${g.effect.reduceCorruption} corruption`);
     if (g.effect.extendLight) restoreParts.push(`+${g.effect.extendLight} light`);
@@ -267,6 +288,17 @@ function previewGear(g: CatalogGear): ItemPreview {
     }
     if (g.effect.cureBleed) stats.push('Cures: bleed');
     if (g.effect.revealScene) stats.push('Reveals hidden scene hooks');
+    // OTA-721 — surface a WEAPON-COATING's actual output so the RECIPES-tab
+    // card shows what it does, not just "Tags: weapon_coating, burn". Playtester
+    // ask: "you have incendiary AND another fire coating — I can't tell which
+    // has the better output, I'm picking by cooler name." Now each coating row
+    // reads e.g. "Coats weapon: +1d6 poison (Festering)" or "+1d4 burn, +1 STR
+    // while coated (Searing)" so higher-dice / stat-bonus variants are legible.
+    if (g.effect.coating) {
+      const c = g.effect.coating;
+      const bonus = c.statBonus ? `, +${c.statBonus.amount} ${c.statBonus.stat.toUpperCase().slice(0, 3)} while coated` : '';
+      stats.push(`Coats weapon: +${c.dice} ${c.kind}${bonus} (${c.label})`);
+    }
   }
   // arb-fix — effect-LESS food/consumables (Trail Rations and any other
   // consumable authored without a structured effect block) don't declare a

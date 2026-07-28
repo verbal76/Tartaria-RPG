@@ -1,30 +1,34 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { useGameStore, makeRoomKey } from '../state/gameStore';
+import { playerWeaponReach, useGameStore, makeRoomKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 import { AdventureFeed } from '../components/AdventureFeed';
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
+import { playerPowerScore, enemyPowerScore } from '../engine/powerRating';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
 import { SalvageModal, isSalvageable as isSalvageableForModal } from '../components/SalvageModal';
 import { BrandedModal } from '../components/BrandedModal';
 import { TakeModal } from '../components/TakeModal';
 import { ClimbModal } from '../components/ClimbModal';
+import { TorchProbeModal } from '../components/TorchProbeModal';
 import { HookContinueModal } from '../components/HookContinueModal';
 import { WhisperCompleteModal } from '../components/WhisperCompleteModal';
 // OTA-180 — FeedbackModal import dropped along with the 📝 button.
 // The component file stays on disk for potential re-introduction.
 import { isClimbable, isSalvageable } from '../engine/interactionTags';
 import { climbBlockReason } from '../engine/climbReadiness';
-import { isNounConsumed } from '../engine/ambientNounMatch';
+import { isNounConsumed, isNounFlavorExhausted } from '../engine/ambientNounMatch';
 import { getLocationById } from '../engine/encounter';
 import { revealedLocationName } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
-import { climbHeightFor, isClimbCleared } from '../engine/climbHeight';
+import { climbHeightFor, isClimbCleared, reachableWhileElevated } from '../engine/climbHeight';
 import { findCatalogItem } from '../engine/crafting';
 import { isOversized } from '../engine/portability';
 import { playerHasScannerEquipped } from '../engine/equipment';
@@ -32,14 +36,16 @@ import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
 import { enemyIsAerial } from '../engine/enemyTraits';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
+import { PickpocketModal } from '../components/PickpocketModal';
 import { MissionBoardModal } from '../components/MissionBoardModal';
 import { FusionPickerModal } from '../components/FusionPickerModal';
+import { FusionBlockedModal } from '../components/FusionBlockedModal';
+import { MissionCompleteModal } from '../components/MissionCompleteModal';
+import { ParleyModal } from '../components/ParleyModal';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { TUTORIAL_STEPS } from '../components/tutorialSteps';
-import { resolveDisplayWeaponByName } from '../engine/itemResolution';
-import { reachClassFor } from '../engine/combatRules';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
 import type { CombatRange } from '../engine/types';
 
@@ -112,6 +118,9 @@ export function ExplorationScreen() {
     && !tutorialExploreChosen;
   const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
+  // OTA-841 [did-you-mean] — runnable command suggestions from the last low-confidence
+  // parse, rendered as a tappable chip row above the input.
+  const parseSuggestions = useGameStore((s) => s.parseSuggestions);
   const pendingHookContinue = useGameStore((s) => s.pendingHookContinue);
   const pendingWhisperComplete = useGameStore((s) => s.pendingWhisperComplete);
   const dismissWhisperComplete = useGameStore((s) => s.dismissWhisperComplete);
@@ -121,6 +130,9 @@ export function ExplorationScreen() {
   const pendingTravelConfirm = useGameStore((s) => s.pendingTravelConfirm);
   const confirmLeaveAndTravel = useGameStore((s) => s.confirmLeaveAndTravel);
   const cancelTravelConfirm = useGameStore((s) => s.cancelTravelConfirm);
+  const pendingMissionOffer = useGameStore((s) => s.pendingMissionOffer);
+  const acceptMissionOffer = useGameStore((s) => s.acceptMissionOffer);
+  const declineMissionOffer = useGameStore((s) => s.declineMissionOffer);
   const resolveRollStep = useGameStore((s) => s.resolveRollStep);
   const cancelPendingRolls = useGameStore((s) => s.cancelPendingRolls);
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
@@ -131,6 +143,8 @@ export function ExplorationScreen() {
   const [statsColH, setStatsColH] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [approachOpen, setApproachOpen] = useState(false);
+  // OTA-847 (STEALTH SYSTEM) — PICKPOCKET picker (replaces the peaceful APPROACH).
+  const [pickpocketOpen, setPickpocketOpen] = useState(false);
   // OTA-239 — Ask the Arbiter modal. Opens via the new ASK ARBITER
   // quick-row button; submits `ask the arbiter about <input>` so
   // OTA-233's parser fallback fires the MiniLM lore lookup.
@@ -154,17 +168,26 @@ export function ExplorationScreen() {
   }, [currentScene?.missionBoard, player]);
   // arb152 — a per-location dismiss for the Fusing Crucible chip (X on the chip).
   // Reset whenever the location or building changes (re-entering re-shows it).
-  const [crucibleDismissed, setCrucibleDismissed] = useState(false);
+  // arb-fix — the dismiss lives in the STORE (crucibleChipDismissedKey), NOT local
+  // useState: entering a vendor UNMOUNTS this screen (App.tsx renders exploration vs
+  // vendor by a flag), so a local flag was lost on the round-trip and the chip popped
+  // back on return. Keying the stored dismiss to the view-key still auto-re-shows the
+  // chip when you actually move to a different location (key mismatch).
   // arb154 — include activeBuildingRoomId: moving between ROOMS of a building
   // (market stalls etc.) changes only this, not activeBuildingId — so without it
   // a dismiss in one room stuck for the whole building ("disabled in all rooms").
   const crucibleViewKey = `${currentScene?.location.id ?? ''}|${activeBuildingId ?? ''}|${activeBuildingRoomId ?? ''}|${player?.hubRoomId ?? ''}`;
-  useEffect(() => { setCrucibleDismissed(false); }, [crucibleViewKey]);
+  const crucibleDismissedKey = useGameStore((s) => s.crucibleChipDismissedKey);
+  const setCrucibleChipDismissedKey = useGameStore((s) => s.setCrucibleChipDismissedKey);
+  const crucibleDismissed = !!crucibleDismissedKey && crucibleDismissedKey === crucibleViewKey;
   const [takeOpen, setTakeOpen] = useState(false);
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
   // <noun>` which resolves one tier in the climb handler.
   const [climbOpen, setClimbOpen] = useState(false);
+  // OTA-776 — the "aim the torch" lead chooser (opens when a room holds more
+  // than one open lead so the player picks which one to reveal + take over).
+  const [torchChooserOpen, setTorchChooserOpen] = useState(false);
   // Tell the floating KeyboardInputBar to stand down whenever a popup
   // that owns its own (keyboard-avoided) text field is open, so the bar
   // can't mount behind the modal and steal focus from the visible field.
@@ -236,25 +259,21 @@ export function ExplorationScreen() {
   const stealthTakeAmbientNoun = useGameStore((s) => s.stealthTakeAmbientNoun);
   const worldMemory = useGameStore((s) => s.worldMemory);
 
-  // Per-room dedup list — drives the "already taken" gating on the
-  // TAKE modal chips. Two tightenings vs the first cut at this:
-  //
-  //   1. EXACT name match only, not bidirectional substring. The
-  //      engine's substring match was greying out chips for nouns
-  //      that weren't actually blocked (e.g. a save with "rope" in
-  //      searchedAmbientNouns also greyed an unrelated "scrap pile"
-  //      because some entries cross-matched). UI errs on the side
-  //      of green; if the engine actually rejects on tap, the log
-  //      line surfaces it.
-  //
-  //   2. Self-healing: the chip only greys when the player ACTUALLY
-  //      has the catalog item for that noun in their inventory. If
-  //      the dedup entry exists but the item isn't in the pack, the
-  //      noun was either (a) marked consumed by the OTA<=172 salvage
-  //      bug that wrote on 'nothing' outcomes, or (b) the player
-  //      sold / lost the item. Either way, the chip should be
-  //      re-tappable so the player isn't stuck.
-  const consumedAmbientNouns = useMemo(() => {
+  // OTA-953 — the old merged consumedAmbientNouns memo (searched + flavor in ONE set) is gone:
+  // the two pools now match differently (searched keeps the historical loose substring rule;
+  // flavor-exhausted matches whole WORDS via isNounFlavorExhausted, so an investigated "rack"
+  // no longer greys an unrelated "cracked terminal"), so every consumer reads the split sets
+  // below and applies the right matcher per pool. [POLISH-3]'s intent is preserved — flavor
+  // exhaustion still greys/sorts Search-modal chips — via the flavor half at each call site.
+
+  // 2026-05-25 — split sets for cross-modal removal. The user wants
+  // any noun that was PRODUCTIVELY consumed (take / salvage with
+  // loot / investigate that yielded an item) to disappear from
+  // every modal, including Investigate. Flavor-only investigate
+  // results stay visible in Investigate (grayed + sorted right per
+  // POLISH-3) because the noun is still investigable for narrative
+  // re-color but shouldn't clutter the actionable list.
+  const productivelyConsumedSet = useMemo(() => {
     if (!player || !currentScene) return new Set<string>();
     // OTA-164 — use canonical makeRoomKey so hub interiors map to
     // the same key the action handlers write to. Pre-OTA-164 the
@@ -267,42 +286,6 @@ export function ExplorationScreen() {
     // bulk action → engine emitted "Already worked over: ..." each
     // time because the action's read DID use makeRoomKey and saw
     // the consumed marks the UI couldn't.
-    const roomKey = makeRoomKey(
-      player.currentLocationId,
-      currentScene.microMicroId,
-      player.mapX,
-      player.mapY,
-      player.hubRoomId,
-    );
-    const room = worldMemory.visitedRooms?.[roomKey];
-    // 2026-05-25 [POLISH-3] — include flavor-exhausted nouns so the
-    // Search modal chip renders greyed + sorted right after a
-    // nothing-yields-from-investigate outcome too (not only after a
-    // production-yielding investigate). Other verbs (take/salvage/
-    // break) don't read flavorExhaustedNouns so the cross-verb chain
-    // continues to work.
-    return new Set([
-      ...(room?.searchedAmbientNouns ?? []).map((n) => n.toLowerCase()),
-      ...(room?.flavorExhaustedNouns ?? []).map((n) => n.toLowerCase()),
-    ]);
-  }, [
-    player?.currentLocationId,
-    player?.mapX,
-    player?.mapY,
-    currentScene?.microMicroId,
-    worldMemory.visitedRooms,
-  ]);
-
-  // 2026-05-25 — split sets for cross-modal removal. The user wants
-  // any noun that was PRODUCTIVELY consumed (take / salvage with
-  // loot / investigate that yielded an item) to disappear from
-  // every modal, including Investigate. Flavor-only investigate
-  // results stay visible in Investigate (grayed + sorted right per
-  // POLISH-3) because the noun is still investigable for narrative
-  // re-color but shouldn't clutter the actionable list.
-  const productivelyConsumedSet = useMemo(() => {
-    if (!player || !currentScene) return new Set<string>();
-    // OTA-164 — see consumedAmbientNouns above. Same hub-key bug.
     const roomKey = makeRoomKey(
       player.currentLocationId,
       currentScene.microMicroId,
@@ -329,7 +312,7 @@ export function ExplorationScreen() {
   ]);
   const flavorExhaustedSet = useMemo(() => {
     if (!player || !currentScene) return new Set<string>();
-    // OTA-164 — see consumedAmbientNouns above. Same hub-key bug.
+    // OTA-164 — see productivelyConsumedSet above. Same hub-key bug.
     const roomKey = makeRoomKey(
       player.currentLocationId,
       currentScene.microMicroId,
@@ -361,15 +344,16 @@ export function ExplorationScreen() {
     // too. Self-heal logic below stays intact (only treat as
     // consumed if the catalog item is in inventory, otherwise
     // ungrey so the player isn't stuck on a sold/lost item).
-    if (!isFuzzyConsumed(noun, consumedAmbientNouns)) return false;
-    if (!player) return true;
-    const cat = findCatalogItem(noun);
-    if (!cat) return true; // not a catalog item; honor engine dedup as-is
-    const targetName = cat.name.toLowerCase();
-    const owns = player.inventory.some(
-      (i) => i.name.toLowerCase() === targetName && i.quantity > 0,
-    );
-    return owns;
+    // OTA-953 — split pools: searched keeps the loose fuzzy rule, flavor is word-level.
+    if (
+      !isFuzzyConsumed(noun, productivelyConsumedSet)
+      && !isNounFlavorExhausted(noun, flavorExhaustedSet)
+    ) return false;
+    // OTA-981 — taken is taken. The ownership tail un-greyed the chip the moment
+    // the item left the pack — but USING it also empties the pack, so the chip
+    // re-lit and take -> use -> take farmed forever. Mirrors the engine's
+    // once-per-room rule exactly (a lit chip must never earn a refusal).
+    return true;
   };
 
   // 2026-05-26 OTA-070 — substring-fuzzy consumed check. Mirrors
@@ -408,28 +392,14 @@ export function ExplorationScreen() {
     if (!currentScene || currentScene.enemies.length === 0) return [];
     const range: CombatRange = currentScene.range ?? 'mid';
     const rangeLabel = RANGE_LABELS[range];
-    const mainName = player?.equipped?.main ?? player?.equipped?.weaponName;
-    // OTA-227 — resolveDisplayWeaponByName so fused weapons (catalog-
-    // absent, uniqueStats-bearing) get their actual weaponKind instead
-    // of barehand-only fallback. Resonant Edge (aetheric → runecaster)
-    // now reports in-range at close, not just arm's reach.
-    // OTA-550 — four-band reach via the shared resolver (ranged/throwable/
-    // long/melee). A throwable inventory item reaches from 'far' inward.
-    const w = mainName ? resolveDisplayWeaponByName(mainName, player?.inventory ?? []) : null;
-    const throwInst = mainName
-      ? (player?.inventory ?? []).find((it) => it.name.toLowerCase() === mainName.toLowerCase() && (it.tags ?? []).some((t) => /throwable/i.test(t)))
-      : undefined;
-    let canHit: boolean;
-    if (throwInst) {
-      canHit = reachBandsFor('throwable').includes(range);
-    } else if (!w) {
-      canHit = reachBandsFor('barehanded').includes(range);
-    } else {
-      const cls = reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
-      let bands = reachBandsFor(cls);
-      if (cls === 'runecaster' && (player?.stats?.intelligence ?? 0) < 9) bands = reachBandsFor('throwable');
-      canHit = bands.includes(range);
-    }
+    // OTA-1029 — in-range comes from the SAME resolver the attack gate rolls with
+    // (playerWeaponReach: throwable instance → catalog row → forge-stamped
+    // uniqueStats.reachClass on fused weapons → runecaster INT gate). The
+    // local copy this replaces missed the forge stamp, so a close-only fused
+    // weapon read as in-range at mid while every swing bounced.
+    const canHit = player
+      ? playerWeaponReach(player, 'main').bands.includes(range)
+      : reachBandsFor('barehanded').includes(range);
     return currentScene.enemies.map((e, i) => ({
       enemy: e,
       currentHp: currentScene.enemyHps[i] ?? e.hp,
@@ -500,6 +470,25 @@ export function ExplorationScreen() {
       // text line we are typing into?"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      {/* OTA-860 — combat is where most of the un-tutorialized systems live (stealth,
+          backstab, talking a foe down, parley). Fire this the first time a fight is
+          actually on-screen, not on first exploration. */}
+      {(currentScene?.enemies?.length ?? 0) > 0 && (
+        <FirstTimeHint
+          id="combat_first_fight"
+          title="In a fight"
+          body="Type what you do — strike, aim, or use a skill. You can also STEALTH for a sneak hit, or try to talk a foe down or scare them off."
+        />
+      )}
+      {/* OTA-928 — introduce the Power rating the first time a fight is on-screen, when
+          both the player badge (top-right) and the enemy badge (top-left) are visible. */}
+      {(currentScene?.enemies?.length ?? 0) > 0 && (
+        <FirstTimeHint
+          id="power_number"
+          title="Power rating"
+          body="The ◆ number by your name is your Power — a quick gauge built from your stats, weapon, armour, and health. In a fight, your number AND each foe's are coloured by the matchup: green means you outclass it, gold is an even fight, red means it outclasses you. Your individual stats still matter — Power just tells you at a glance where you stand. Make your character stronger and watch it climb."
+        />
+      )}
       <View style={styles.topRow}>
         <TutorialTarget area="top-left-stats" style={styles.statsCol}>
           {/* OTA 040 — tap the stats panel to open the full Player
@@ -508,12 +497,14 @@ export function ExplorationScreen() {
           <TouchableOpacity
             onPress={() => setScreen('character')}
             activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Open player sheet"
             onLayout={(e) => {
               const h = e.nativeEvent.layout.height;
               if (h > 0 && Math.abs(h - statsColH) > 0.5) setStatsColH(h);
             }}
           >
-            <StatsPanel player={player} />
+            <StatsPanel player={player} enemyPower={inCombat && enemyViews[activeIdx] ? enemyPowerScore(enemyViews[activeIdx]!.enemy) : undefined} />
           </TouchableOpacity>
         </TutorialTarget>
         <TutorialTarget area="top-right-enemy" style={styles.rightCol}>
@@ -523,29 +514,29 @@ export function ExplorationScreen() {
               activeIndex={activeIdx}
               onSelectActive={setActiveEnemyIdx}
               maxHeight={statsColH}
+              playerWisdom={player?.stats?.wisdom}
+              enemyIntel={worldMemory?.enemyIntel}
+              playerPower={player ? playerPowerScore(player) : undefined}
             />
           ) : (
-            <CrestPlaceholder />
+            // OTA-852 — the crest square is idle real estate when peaceful, so it
+            // becomes the codex hub: WORLD above, LORE below, bracketing the crest.
+            // Both vanish the instant an enemy is staged (the panel flips to
+            // EnemyPanel), so they never cost permanent space or clutter combat.
+            <>
+              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('world')} accessibilityRole="button">
+                <Text style={styles.crestNavText}>⚑ WORLD</Text>
+              </TouchableOpacity>
+              <CrestPlaceholder />
+              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('lore')} accessibilityRole="button">
+                <Text style={styles.crestNavText}>◈ LORE</Text>
+              </TouchableOpacity>
+            </>
           )}
-          {/* v2.4.1 (OTA 048) — gear icon overlaid in the right column.
-              Replaces the bottom-row gear, which was the only thing
-              left there after the session controls moved into the gear
-              screen. The gear floats over whichever right-col content
-              is showing (EnemyPanel or CrestPlaceholder).
-              OTA-174 — moved from top-right to BOTTOM-right per
-              playtest ask: "I wanted the settings gear moved from the
-              top right of the enemy box to the bottom right of the
-              enemy box." Bottom-right keeps the enemy name + range tag
-              at top fully visible (no more truncation around the gear)
-              and groups the secondary navigation in one corner. */}
-          <TouchableOpacity
-            onPress={() => setScreen('about')}
-            hitSlop={8}
-            style={styles.cornerGear}
-            accessibilityLabel="Settings"
-          >
-            <Text style={styles.gear}>⚙</Text>
-          </TouchableOpacity>
+          {/* OTA-748 — the settings gear moved OUT of the enemy card. Overlaid
+              bottom-right, it sat on top of the enemy's trait tags ("Vuln Burn"
+              etc.). It now lives in the top scene bar next to MAP — the
+              navigation row — where it covers no game content. */}
         </TutorialTarget>
       </View>
 
@@ -553,11 +544,14 @@ export function ExplorationScreen() {
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={styles.sceneText} numberOfLines={1} ellipsizeMode="tail">
             {currentScene
-              ? `${currentScene.transitArea ?? currentScene.location.name} · ${dangerLabel(currentScene.location.danger)}  /  ${currentScene.weather.name}${currentScene.hazard ? `  /  ${currentScene.hazard.name}` : ''}`
+              ? `${currentScene.transitArea ?? currentScene.location.name} · ${dangerLabel(currentScene.location.danger)}${currentScene.hazard ? `  /  ${currentScene.hazard.name}` : ''}`
               : 'No scene'}
           </Text>
           <Text style={styles.timeText} numberOfLines={1}>
             {describeTime(player.hoursElapsed ?? 0)}
+            {currentScene?.weather ? (
+              <Text style={styles.weatherText}>{` · ${currentScene.weather.name}`}</Text>
+            ) : null}
           </Text>
         </View>
         <View style={styles.sceneBarBtns}>
@@ -578,14 +572,22 @@ export function ExplorationScreen() {
             }}
             hitSlop={8}
             style={[styles.sceneBarBtn, tutLock && styles.sceneBarBtnBlocked]}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: tutLock }}
           >
             <Text style={styles.sceneBarBtnText}>MAP</Text>
           </TouchableOpacity>
-          {/* v2.4.1 (OTA 045) — QUESTS button removed per player
-              direction. The main-quest objective chip below the
-              scene bar is now the single entry to Contracts (which
-              holds the main quest + all side quests + collectibles).
-              The chip's relabeling makes that dual role explicit. */}
+          {/* OTA-748 — settings gear, relocated here from the enemy card (where
+              it covered the trait tags). Sits beside MAP in the nav row. */}
+          <TouchableOpacity
+            onPress={() => setScreen('about')}
+            hitSlop={8}
+            style={styles.sceneBarBtn}
+            accessibilityRole="button"
+            accessibilityLabel="Settings"
+          >
+            <Text style={styles.sceneBarGear}>⚙</Text>
+          </TouchableOpacity>
         </View>
       </TutorialTarget>
 
@@ -645,6 +647,7 @@ export function ExplorationScreen() {
           <TutorialTarget area="objective-chip">
           <TouchableOpacity
             style={styles.objectiveChip}
+            accessibilityRole="button"
             onPress={() => {
               // Tungsten Spire — advance the main_quest tutorial beat
               // when the player taps the MAIN QUEST chip, then route
@@ -670,6 +673,7 @@ export function ExplorationScreen() {
                   onPress={() => useGameStore.getState().summonCoreGuardian()}
                   activeOpacity={0.7}
                   hitSlop={8}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.objectiveChipSummonText}>★ SUMMON</Text>
                 </TouchableOpacity>
@@ -684,11 +688,19 @@ export function ExplorationScreen() {
           banner returns once the enemies are down), but while a hostile is
           present the banner is hidden so the player can't step into the stall
           during combat ("I just entered a vendors stall during combat"). */}
-      {currentScene?.vendor && !inCombat && (
+      {/* OTA-775 — the top "approach vendor" banner is for OUTDOOR vendors
+          (roadside fences, hub square traders). Inside a building the stalls
+          ARE the rooms — the bottom room tabs navigate them and EXIT leaves —
+          so advertising the current stall as a separate "approach" banner on
+          top is redundant and breaks the walked-into-a-building feel. Suppress
+          it while inside a building; the stall's own Trade + Crucible actions
+          render inside the room instead (block just below). */}
+      {currentScene?.vendor && !inCombat && !activeBuildingId && currentScene?.location?.id !== 'hidden_market' && (
         <TouchableOpacity
           style={styles.vendorBanner}
           onPress={() => setScreen('vendor')}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <View style={styles.vendorBannerStripe} />
           <View style={styles.vendorBannerBody}>
@@ -699,6 +711,11 @@ export function ExplorationScreen() {
         </TouchableOpacity>
       )}
 
+      {/* OTA-780 — no floating stall chips. Inside the market the room tabs ARE
+          the stalls (bottom travel row) and the stall's actions — TRADE and
+          FUSE — live down there beside them + EXIT (see InputBox). Nothing
+          layers over the feed. */}
+
       {/* OTA-451 — Mission Board chip. Stands in the vendor-free central square
           of every faction Outpost; tapping reads the board's open postings into
           the feed (the rep-0 starter quests + anything the player qualifies for)
@@ -708,6 +725,7 @@ export function ExplorationScreen() {
           style={styles.missionBoardBanner}
           onPress={() => setMissionBoardOpen(true)}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <View style={styles.missionBoardStripe} />
           <View style={styles.vendorBannerBody}>
@@ -715,6 +733,26 @@ export function ExplorationScreen() {
             <Text style={styles.vendorBannerHint}>tap to view &amp; accept postings</Text>
           </View>
           <Text style={styles.missionBoardArrow}>›</Text>
+        </TouchableOpacity>
+      )}
+
+      {/* OTA-807 — Wandering NPC chip. A person (not a vendor) resting on a peaceful
+          outdoor tile. Tapping submits "talk to <name>" so it routes through the
+          engine's wanderer talk-check (a d20 + CHA read for a tip / coins / a rare
+          standing nudge). Hidden in combat. */}
+      {currentScene?.wanderer && !inCombat && (
+        <TouchableOpacity
+          style={styles.wandererBanner}
+          onPress={() => submit(`talk to ${currentScene.wanderer!.name}`)}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+        >
+          <View style={styles.wandererStripe} />
+          <View style={styles.vendorBannerBody}>
+            <Text style={styles.wandererName}>☺ {currentScene.wanderer.name}</Text>
+            <Text style={styles.vendorBannerHint}>{currentScene.wanderer.role} · tap to speak</Text>
+          </View>
+          <Text style={styles.wandererArrow}>›</Text>
         </TouchableOpacity>
       )}
 
@@ -736,7 +774,25 @@ export function ExplorationScreen() {
           spawn macro-location). A wild fusion_bench permit (fusionPending)
           still shows it anywhere. This also keeps it off-screen for the whole
           tutorial, which runs before you've ever left. */}
-      {!crucibleDismissed && (player?.fusionPending || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1) || activeBuildingId === 'market') && (() => {
+      {(() => {
+        if (crucibleDismissed || !player) return null;
+        // OTA-775 — inside a building the Crucible is offered from within the
+        // stall (the in-stall actions block above), so the redundant top banner
+        // is suppressed here. Outpost/hub and wild-permit Crucibles (not inside
+        // a building) still show their top banner as before.
+        if (activeBuildingId || currentScene?.location?.id === 'hidden_market') return null;
+        // A location that carries its OWN (free) Crucible: an outpost you've left
+        // and returned to, an active fusion permit, or a market building.
+        const atLocationCrucible = !!(player.fusionPending
+          || (player.hubRoomId && (player.macroVisitSeq ?? 0) >= 1)
+          || activeBuildingId === 'market');
+        // arb-fix (player) — a VENDOR's portable Crucible is offered from INSIDE the
+        // vendor screen (its own fuse chip). On a roadside-vendor tile the old OTA-758
+        // exploration chip DUPLICATED that offer (chip on the tile + fuse chip in the
+        // vendor). So the tile chip now shows ONLY for a location's OWN Crucible; a
+        // vendor-carried Crucible lives solely in the vendor screen. No Crucible is
+        // stranded — the vendor screen still fires useVendorCrucible for 25 TC.
+        if (!atLocationCrucible) return null;
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { gateFusion, findFactionCatalyst } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
         // arb-fix — mirror the fuse handler: a reserved faction catalyst counts
@@ -748,20 +804,26 @@ export function ExplorationScreen() {
         );
         const bannerCatalyst = findFactionCatalyst(player.inventory ?? [], bannerEquippedIds);
         const gate = gateFusion(player.inventory ?? [], bannerCatalyst);
+        // A location forge is free via 'fuse' (a vendor's paid Crucible lives in the
+        // vendor screen now).
+        const fireCrucible = () => useGameStore.getState().submitPlayerAction('fuse');
+        const readyName = '★★ Fusing Crucible ready';
+        const readyHint = 'tap to fuse · spends your ♥ reserved items';
         return (
         <TouchableOpacity
           style={styles.fusionBanner}
-          onPress={() => useGameStore.getState().submitPlayerAction('fuse')}
+          onPress={fireCrucible}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <View style={styles.fusionBannerStripe} />
           <View style={styles.vendorBannerBody}>
             <Text style={styles.fusionBannerName}>
-              {gate.ok ? '★★ Fusing Crucible ready' : '★★ Fusing Crucible · needs prep'}
+              {gate.ok ? readyName : '★★ Fusing Crucible · needs prep'}
             </Text>
             <Text style={styles.vendorBannerHint}>
               {gate.ok
-                ? 'tap to fuse · spends your ♥ reserved items'
+                ? readyHint
                 : (gate.reason ?? 'tap for details')}
             </Text>
           </View>
@@ -770,15 +832,20 @@ export function ExplorationScreen() {
               'fuse' can still be typed, and re-entering re-shows the chip. */}
           <TouchableOpacity
             style={styles.crucibleDismiss}
-            onPress={() => setCrucibleDismissed(true)}
+            onPress={() => setCrucibleChipDismissedKey(crucibleViewKey)}
             hitSlop={10}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Dismiss Fusing Crucible"
           >
             <Text style={styles.crucibleDismissText}>✕</Text>
           </TouchableOpacity>
         </TouchableOpacity>
         );
       })()}
+
+      {/* OTA-777 — the torch is a small quick-use button in the bottom action
+          row (see InputBox `torch` QuickBtn), NOT a top banner. */}
 
       <TutorialTarget area="feed" style={styles.feed}>
         <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
@@ -801,6 +868,26 @@ export function ExplorationScreen() {
             onCancel={cancelPendingRolls}
           />
         ) : (
+          <>
+          {/* OTA-841 [did-you-mean] — after a low-confidence / unresolved parse, the
+              engine stashes the runnable command suggestions; show them as a tappable
+              chip row so the player can pick one with a tap instead of retyping. */}
+          {parseSuggestions.length > 0 && !inCombat && (
+            <View style={styles.didYouMeanRow}>
+              <Text style={styles.didYouMeanLabel}>Did you mean…</Text>
+              {parseSuggestions.map((s) => (
+                <TouchableOpacity
+                  key={s}
+                  style={styles.didYouMeanChip}
+                  activeOpacity={0.7}
+                  onPress={() => submit(s)}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.didYouMeanChipText}>{s}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
           <InputBox
             onSubmit={(text) => {
               // 2026-05-25 [POLISH-4] — warn before leaving a vendor.
@@ -843,11 +930,26 @@ export function ExplorationScreen() {
               }
               setApproachOpen(true);
             }}
+            // OTA-847 (STEALTH SYSTEM) — peaceful PICKPOCKET. Greyed when there's
+            // no vendor and nothing liftable in the scene.
+            onOpenPickpocket={() => { Keyboard.dismiss(); setPickpocketOpen(true); }}
+            pickpocketBlocked={!currentScene?.vendor && (currentScene?.ambientNouns ?? []).length === 0}
             onOpenAskArbiter={() => setAskArbiterOpen(true)}
             onOpenMissions={() => { useGameStore.getState().maybeAdvanceTutorial('main_quest'); setScreen('contracts'); }}
             onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}
             onOpenTake={() => { Keyboard.dismiss(); setTakeOpen(true); }}
             onOpenClimb={() => setClimbOpen(true)}
+            onFuse={activeBuildingId === 'market' ? () => useGameStore.getState().submitPlayerAction('fuse') : undefined}
+            hasTorch={!!(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && canonicalItemTags(i).includes('light') && i.quantity > 0)}
+            torchLabel={(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && canonicalItemTags(i).includes('light') && i.quantity > 0)?.name?.toLowerCase()}
+            torchReady={(currentScene?.hooks ?? []).some((h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged)}
+            onOpenTorch={() => {
+              const torch = (player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && canonicalItemTags(i).includes('light') && i.quantity > 0);
+              if (!torch) return;
+              const chargeable = (currentScene?.hooks ?? []).filter((h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged);
+              if (chargeable.length > 1) setTorchChooserOpen(true);
+              else useGameStore.getState().submitPlayerAction(`use ${torch.name}`);
+            }}
             onClimbUp={() => {
               // OTA 033 — tolerate the old OTA 031 string schema for
               // saves that haven't been re-saved on the new shape.
@@ -899,7 +1001,25 @@ export function ExplorationScreen() {
               // interactionTags.isSalvageable, which diverged in both
               // directions and lit SALVAGE green when modal was empty
               // (and vice versa).
-              return buildChipPool(currentScene).filter(
+              // OTA-753 — read displayedAmbientNouns directly (like TAKE),
+              // NOT buildChipPool. buildChipPool re-slices to 5 for the
+              // investigate row, which dropped reserved salvage nouns off
+              // the end and left this count (and the SALVAGE modal) empty.
+              // OTA-971 — the button glowed green from the top of a pillar while
+              // the engine refused every ground salvage ("The shelf is down
+              // there. Climb down to reach it."). Filter to nouns actually
+              // REACHABLE at this elevation first — the same rule as the
+              // engine's elevated-investigate gate, via one shared helper.
+              const salvSource = reachableWhileElevated(
+                currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
+                currentScene?.elevatedOn?.noun ?? null,
+                !!currentScene?.elevatedOverlayMeta,
+                // OTA-973 — Phase A of real heights: placed nouns count only at
+                // their own structure + tier (and never from the ground).
+                currentScene?.nounPlacements ?? null,
+                currentScene?.elevatedOn?.tier ?? 0,
+              );
+              return salvSource.filter(
                 (n) => !isAmbientConsumed(n) && isSalvageableForModal(n),
               ).length + (tutBeat === 'scrap' ? 1 : 0); // tutorial chest-plate prop
             })()}
@@ -912,7 +1032,7 @@ export function ExplorationScreen() {
               // subtracting cleared ones, leaving the button green
               // after the player had topped everything in the scene.
               const sceneNouns = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
-              // OTA-164 — see consumedAmbientNouns above. Same hub-key bug.
+              // OTA-164 — see productivelyConsumedSet above. Same hub-key bug.
               const roomKey = makeRoomKey(
                 player?.currentLocationId ?? '',
                 currentScene?.microMicroId,
@@ -967,10 +1087,26 @@ export function ExplorationScreen() {
                   // pools, mirroring the engine's accept/refuse
                   // decision. Was exact set.has(n.toLowerCase()).
                   if (isFuzzyConsumed(n, productivelyConsumedSet)) return false;
-                  if (isFuzzyConsumed(n, flavorExhaustedSet)) return false;
+                  if (isNounFlavorExhausted(n, flavorExhaustedSet)) return false;
                   const req = searchRequirementFor(n);
                   if (req && player && !playerHasScannerEquipped(player, req.scannerBias)) {
                     return false;
+                  }
+                  // OTA-953 — elevation gate, mirroring the SearchModal chip logic
+                  // (see the chips map ~"climb down to reach"). While the player is
+                  // climbed onto a feature with no elevated overlay, every GROUND
+                  // noun except the climbed one refuses with "climb down to reach"
+                  // and is greyed in the modal — so it is NOT actionable and must
+                  // not light the INVESTIGATE chip green. Without this the count
+                  // and the modal disagreed: the chip read active while every item
+                  // in the picker was greyed — the "active chip, nothing to
+                  // investigate" hang the player hit.
+                  const elev = currentScene?.elevatedOn;
+                  if (elev && !currentScene?.elevatedOverlayMeta) {
+                    const climbedNoun = elev.noun.toLowerCase();
+                    const nl = n.toLowerCase();
+                    const isClimbedNoun = nl.includes(climbedNoun) || climbedNoun.includes(nl);
+                    if (!isClimbedNoun) return false;
                   }
                   return true;
                 },
@@ -1027,7 +1163,7 @@ export function ExplorationScreen() {
               const hasReclaimersRope = player.inventory.some(
                 (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
               );
-              const wearsClimbStrap = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
+              const wearsClimbStrap = (player.equipped?.legs ?? '').toLowerCase() === 'hardened climbing strap';
               const ropeName = hasReclaimersRope ? "Reclaimer's Rope" : 'Climbing Rope';
               const ropeInstances = player.inventory.filter(
                 (i) => i.name === ropeName && i.quantity > 0 && i.durability != null,
@@ -1062,7 +1198,10 @@ export function ExplorationScreen() {
               const d = player?.dog;
               if (!d || d.hp <= 0) return null;
               // Benched at the base of a climb — can't follow you up.
-              if (d.status === 'waiting_at_base') return 'elevated';
+              // OTA-940 — 'waiting_at_base' covers BOTH a climb-benched dog (player elevated)
+              // AND a combat-downed dog (recovering on the ground). Only the former should read
+              // as "come down to fight" — a downed dog gets its own message.
+              if (d.status === 'waiting_at_base') return currentScene?.elevatedOn ? 'elevated' : 'downed';
               // At your side, but the active target flies out of reach.
               const activeEnemy = currentScene?.enemies?.[activeIdx];
               if (d.status === 'with_player' && enemyIsAerial(activeEnemy)) return 'aerial';
@@ -1140,6 +1279,7 @@ export function ExplorationScreen() {
               else st.stopTravel();
             }}
           />
+          </>
         )}
         {/* v2.4.1 (OTA 048) — bottom menu row removed. Gear icon
             moved to the top-right corner of the right column
@@ -1152,8 +1292,9 @@ export function ExplorationScreen() {
           stage's text in-place (stageHistory) so the player sees the
           full thread arc without fighting the scrim; LATER replaced
           with ABANDON (which marks the hook resolved — explicit
-          walk-away); CLOSE shown when the terminal stage fires
-          (completed: true). */}
+          walk-away). OTA-1030 — the terminal stage shows COMPLETE
+          alone; it dismisses the arc and THEN raises the held
+          completion popup (dismissHookContinue). */}
       <HookContinueModal
         visible={pendingHookContinue !== null}
         noun={pendingHookContinue?.noun ?? ''}
@@ -1161,6 +1302,7 @@ export function ExplorationScreen() {
         completed={pendingHookContinue?.completed ?? false}
         onContinue={continueHook}
         onAbandon={abandonHook}
+        onComplete={dismissHookContinue}
         // OTA-284 — when a vendor is in the scene (typically spawned
         // by the hook itself via spawn_vendor effect — Roadfire
         // Reclaimer is the canonical case), show the TRADE NOW button
@@ -1296,7 +1438,7 @@ export function ExplorationScreen() {
                 // bench" vs chip "bench") per OTA-070's pattern.
                 consumed:
                   isFuzzyConsumed(n, productivelyConsumedSet) ||
-                  isFuzzyConsumed(n, flavorExhaustedSet),
+                  isNounFlavorExhausted(n, flavorExhaustedSet),
                 unmetRequirement,
               };
             }),
@@ -1365,13 +1507,24 @@ export function ExplorationScreen() {
         chips={
           tutBeat === 'scrap'
             ? [{ noun: 'broken chest plate', consumed: false }]
-            : buildChipPool(currentScene).map((n) => ({
+            // OTA-971 — same elevation filter as the button count above: while up
+            // on a climb the picker lists only what you can actually reach,
+            // instead of ground nouns every tap would get refused on.
+            : reachableWhileElevated(
+                currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
+                currentScene?.elevatedOn?.noun ?? null,
+                !!currentScene?.elevatedOverlayMeta,
+                currentScene?.nounPlacements ?? null,
+                currentScene?.elevatedOn?.tier ?? 0,
+              ).map((n) => ({
                 noun: n,
                 // OTA-167 — salvage chip greys on the engine's per-room
                 // consumed state directly (searched + flavor-exhausted),
                 // NOT isAmbientConsumed's self-heal, which fuzzy-matched
                 // catalog items the player didn't own and kept chips lit.
-                consumed: isFuzzyConsumed(n, consumedAmbientNouns),
+                consumed:
+                  isFuzzyConsumed(n, productivelyConsumedSet) ||
+                  isNounFlavorExhausted(n, flavorExhaustedSet),
               }))
         }
         onSubmit={(target) => {
@@ -1408,6 +1561,11 @@ export function ExplorationScreen() {
       />
 
       <FusionPickerModal />
+      <FusionBlockedModal />
+      <MissionCompleteModal />
+
+      {/* OTA-808 — the two-button parley chooser (self-mounts off pendingParley). */}
+      <ParleyModal />
 
       {/* OTA-180 — FeedbackModal render removed alongside the 📝
           button. Component file kept for any future re-add. */}
@@ -1417,20 +1575,31 @@ export function ExplorationScreen() {
         enemyHints={currentScene?.enemies.map((e) => e.name) ?? []}
         sceneHints={buildChipPool(currentScene)}
         vendorName={currentScene?.vendor?.name}
-        onSubmit={(target, useStealth) => {
+        onSubmit={(target) => {
           setApproachOpen(false);
-          // Stealth-on routes through the stealth intent (sneak verb
-          // → DEX skill check). Stealth-off routes through the
-          // approach/advance verb chain — in combat that closes the
-          // gap and switches focus to the named enemy; out of combat
-          // it runs the intra-scene move-toward narration.
-          if (useStealth) {
-            submit(`sneak up on ${target}`);
-          } else {
-            submit(`approach ${target}`);
-          }
+          // OTA-847 (STEALTH SYSTEM) — APPROACH is now positioning only. The old
+          // USE STEALTH toggle (sneak-up opener) is retired; the pre-fight sneak
+          // attack migrated to the in-combat STEALTH button's first action. In
+          // combat this closes the gap and switches focus to the named enemy.
+          submit(`approach ${target}`);
         }}
         onCancel={() => setApproachOpen(false)}
+      />
+
+      {/* OTA-847 (STEALTH SYSTEM) — PICKPOCKET picker (peaceful). Vendor offers
+          become lift targets; ambient nouns become opportunistic grabs. Routes
+          to stealthTakeAmbientNoun, which dispatches vendor theft (Stealth vs
+          the vendor's DC, high-STE quiet-fail) or a sleight-of-hand grab. */}
+      <PickpocketModal
+        visible={pickpocketOpen}
+        vendorName={currentScene?.vendor?.name}
+        vendorOffers={(currentScene?.vendor?.offers ?? []).map((o) => o.itemName)}
+        npcHints={currentScene?.vendor ? [] : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])}
+        onSubmit={(target) => {
+          setPickpocketOpen(false);
+          useGameStore.getState().stealthTakeAmbientNoun(target);
+        }}
+        onCancel={() => setPickpocketOpen(false)}
       />
 
       {/* OTA 046 — CLIMB picker. Pull climbables from the same scene
@@ -1445,7 +1614,7 @@ export function ExplorationScreen() {
         const sceneNouns = (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? []);
         const climbables = sceneNouns.filter((n) => isClimbable(n));
         const heights = climbables.map((n) => climbHeightFor(n));
-        // OTA-164 — see consumedAmbientNouns above. Same hub-key bug.
+        // OTA-164 — see productivelyConsumedSet above. Same hub-key bug.
         const roomKey = makeRoomKey(
           player?.currentLocationId ?? '',
           currentScene?.microMicroId,
@@ -1469,6 +1638,21 @@ export function ExplorationScreen() {
           />
         );
       })()}
+
+      {/* OTA-776 — "aim the torch" lead chooser. Lists the room's open leads;
+          picking one charges it with the torch (reveal + take over), and that
+          lead pays an upgraded Rare/Legendary drop when the player works it. */}
+      <TorchProbeModal
+        visible={torchChooserOpen}
+        leads={(currentScene?.hooks ?? [])
+          .filter((h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged)
+          .map((h) => ({ id: h.id, noun: h.nouns[0] ?? h.kind }))}
+        onSubmit={(hookId) => {
+          setTorchChooserOpen(false);
+          useGameStore.getState().applyTorchToHook(hookId);
+        }}
+        onCancel={() => setTorchChooserOpen(false)}
+      />
 
       {/* 2026-05-25 — branded vendor-leave prompt. Replaces the
           native Alert.alert that broke the dark+amber palette. */}
@@ -1662,11 +1846,38 @@ export function ExplorationScreen() {
         ]}
         onRequestClose={() => cancelTravelConfirm()}
       />
+
+      {/* OTA-671 — stumbled-onto mission offer (Parley of Factions). Approaching
+          the leaders no longer silently takes the contract; it announces the
+          demands and asks. Accept commits it; Decline walks away. */}
+      <BrandedModal
+        visible={pendingMissionOffer !== null}
+        title={pendingMissionOffer?.title ?? 'Accept this mission?'}
+        body={pendingMissionOffer?.body}
+        buttons={[
+          {
+            label: 'Decline',
+            onPress: () => declineMissionOffer(),
+            tone: 'neutral',
+          },
+          {
+            label: 'Accept',
+            onPress: () => acceptMissionOffer(),
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => declineMissionOffer()}
+      />
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  // OTA-841 [did-you-mean] — tappable disambiguation chip row above the input.
+  didYouMeanRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, paddingHorizontal: 4, paddingBottom: 4 },
+  didYouMeanLabel: { color: '#a2977b', fontSize: 11, letterSpacing: 1, fontStyle: 'italic' },
+  didYouMeanChip: { backgroundColor: '#1a1714', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, paddingHorizontal: 10, paddingVertical: 6 },
+  didYouMeanChipText: { color: '#e6d8b3', fontSize: 12, letterSpacing: 0.5 },
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
   container: { flex: 1, backgroundColor: 'transparent', padding: 8, gap: 6, width: '100%', maxWidth: 600, alignSelf: 'center' },
   // minHeight (not fixed height) — characters with multiple active
@@ -1674,8 +1885,11 @@ const styles = StyleSheet.create({
   // clipped the bottom rows behind the scene bar. Letting the row grow
   // to fit content keeps every stat visible.
   topRow: { flexDirection: 'row', gap: 6, minHeight: 165 },
-  statsCol: { flex: 1.2 },
+  statsCol: { flex: 1 },
   rightCol: { flex: 1, position: 'relative' },
+  // OTA-852 — WORLD / LORE nav buttons bracketing the peaceful crest.
+  crestNavBtn: { backgroundColor: '#1a1714', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, paddingVertical: 5, alignItems: 'center', marginVertical: 3 },
+  crestNavText: { color: '#c9a86a', fontSize: 11, fontWeight: '800', letterSpacing: 2 },
   // v2.4.1 (OTA 048) — gear icon floats over the right column
   // (EnemyPanel or CrestPlaceholder). 32×32 hit area, semi-
   // transparent backdrop so it stays legible on top of either
@@ -1684,20 +1898,8 @@ const styles = StyleSheet.create({
   // ask. EnemyCard's `head` style no longer needs paddingRight
   // reservation since the gear no longer overlaps the enemy name
   // / range tag area.
-  cornerGear: {
-    position: 'absolute',
-    bottom: 4,
-    right: 4,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(26, 23, 20, 0.85)',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-  },
+  // OTA-748 — settings gear now lives in the scene bar next to MAP (see
+  // sceneBarGear). The old absolute-positioned cornerGear overlay is gone.
   sceneBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: 8, paddingVertical: 6, backgroundColor: '#13110f',
@@ -1705,7 +1907,10 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   sceneText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1 },
-  timeText: { color: '#7a705c', fontSize: 9, letterSpacing: 1, marginTop: 1 },
+  timeText: { color: '#a2977b', fontSize: 9, letterSpacing: 1, marginTop: 1 },
+  // OTA-937 — weather pops on the day line: the location line's bright gold + a bold weight,
+  // instead of inheriting the faded day-counter color.
+  weatherText: { color: '#c9a86a', fontWeight: '700' },
   sceneBarBtns: { flexDirection: 'row', gap: 4, flexShrink: 0 },
   sceneBtn: { color: '#cdbf99', fontSize: 16, paddingHorizontal: 8 },
   // Compact bordered chips on the scene bar — 'ACTS' opens the action
@@ -1741,7 +1946,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 2,
     marginTop: 4,
   },
-  streamingPrefix: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
+  streamingPrefix: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
   streamingText: { color: '#cdbf99', fontSize: 13, lineHeight: 18 },
   streamingCursor: { color: '#c9a86a', fontSize: 13 },
   // v2.4.1 (OTA 048) — the bottom menu row (save & exit, copy/clear
@@ -1751,7 +1956,8 @@ const styles = StyleSheet.create({
   // feed's flex:1 naturally absorbs the reclaimed vertical real
   // estate.
   controls: { gap: 6 },
-  gear: { color: '#c9a86a', fontSize: 16, lineHeight: 18 },
+  // OTA-748 — gear sized to sit inline in the scene bar next to MAP.
+  sceneBarGear: { color: '#c9a86a', fontSize: 13, lineHeight: 13, fontWeight: '700' },
   // v2.4.1 (OTA 045) — Main Quest chip + Contracts menu entry.
   // Sits above the vendor banner, below the scene bar. Now the only
   // entry to Contracts (QUESTS header button removed). Two-line
@@ -1785,7 +1991,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   objectiveChipSubtitle: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 10,
     lineHeight: 14,
     marginTop: 2,
@@ -1828,7 +2034,7 @@ const styles = StyleSheet.create({
   vendorBannerStripe: { width: 4, backgroundColor: '#c9a86a', alignSelf: 'stretch' },
   vendorBannerBody: { flex: 1, paddingHorizontal: 10, paddingVertical: 6 },
   vendorBannerName: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
-  vendorBannerHint: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginTop: 1 },
+  vendorBannerHint: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginTop: 1 },
   vendorBannerArrow: { color: '#c9a86a', fontSize: 22, paddingHorizontal: 12 },
   // OTA-451 — Mission Board chip. Parchment/brown accent to distinguish from the
   // vendor's amber and the Crucible's purple.
@@ -1845,6 +2051,21 @@ const styles = StyleSheet.create({
   missionBoardStripe: { width: 4, backgroundColor: '#8b7355', alignSelf: 'stretch' },
   missionBoardName: { color: '#b89a6a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   missionBoardArrow: { color: '#8b7355', fontSize: 22, paddingHorizontal: 12 },
+  // OTA-807 — Wandering NPC banner. Soft green stripe (a friendly, social beat) to
+  // set it apart from the vendor gold and mission-board brown.
+  wandererBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#12140f',
+    borderColor: '#6e8f4e',
+    borderWidth: 1,
+    borderRadius: 4,
+    overflow: 'hidden',
+    minHeight: 44,
+  },
+  wandererStripe: { width: 4, backgroundColor: '#6e8f4e', alignSelf: 'stretch' },
+  wandererName: { color: '#9ec96a', fontSize: 13, fontWeight: '700', letterSpacing: 0.5 },
+  wandererArrow: { color: '#6e8f4e', fontSize: 22, paddingHorizontal: 12 },
   // OTA-217 — Crucible permit banner. Purple stripe to differentiate
   // from the vendor banner's amber, matching the OTA-199 Rare rarity
   // color so the visual signal reads "rare event, act now."
@@ -1868,7 +2089,7 @@ const styles = StyleSheet.create({
   // arb152 — dismiss (✕) on the Fusing Crucible chip.
   crucibleDismiss: { paddingHorizontal: 14, paddingVertical: 8, alignSelf: 'center' },
   crucibleDismissText: { color: '#8a6fa8', fontSize: 16, fontWeight: '800' },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
 });
 
 // Build the chip pool the search / approach modals show.

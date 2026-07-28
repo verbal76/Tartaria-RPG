@@ -56,11 +56,13 @@ export function SplashOverlay() {
   const imgH = Math.round((imgW * SPLASH_H) / SPLASH_W);
 
   return (
-    <View style={styles.overlay} pointerEvents="auto">
+    <View style={styles.overlay} pointerEvents="auto" accessibilityViewIsModal={true}>
       <Image
         source={require('../../assets/splash-art.jpg')}
         style={{ position: 'absolute', top: 0, left: 0, width: imgW, height: imgH }}
         resizeMode="cover"
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no-hide-descendants"
       />
       <View style={styles.barWrap}>
         <View style={styles.barTrack}>

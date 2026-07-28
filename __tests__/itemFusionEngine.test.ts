@@ -31,10 +31,15 @@ import {
   validateFusionResponse,
   synthesizeFusionViaQwen,
   applyFusion,
+  synthesizeFusionNameViaQwen,
+  fusedNameCollidesCrossKind,
+  deterministicFusedName,
+  migrateFusedName,
   fusionInputHash,
+  synthesizeFusionDeterministic,
   type FusionSynthEngine,
 } from '../app/engine/itemFusion';
-import type { InventoryItem } from '../app/engine/types';
+import type { InventoryItem, UniqueItemStats } from '../app/engine/types';
 
 function inferred(name: string, tags: string[], opts: Partial<InventoryItem> = {}): InventoryItem {
   return {
@@ -353,6 +358,42 @@ describe('OTA-195 applyFusion — mints and drains', () => {
   });
 });
 
+describe('OTA-739 — forged armor slot rotates instead of always returning head', () => {
+  // organic-dominant inputs → the slot is hash-seeded (no cloth→chest lean),
+  // so it varies by input set rather than defaulting to head.
+  const organic = (seed: string) => [
+    inferred(`${seed}-a`, ['organic']),
+    inferred(`${seed}-b`, ['bone']),
+    inferred(`${seed}-c`, ['organic']),
+  ];
+  const profile = ['organic', 'bone'];
+
+  it('never returns a slot listed as recently forged (no back-to-back repeat)', () => {
+    const r = synthesizeFusionDeterministic(organic('one'), profile, 'armor', ['head']);
+    expect(r.stats.armorSlot).not.toBe('head');
+  });
+
+  it('avoids the last TWO forged slots so a short run keeps rotating', () => {
+    const r = synthesizeFusionDeterministic(organic('two'), profile, 'armor', ['head', 'chest']);
+    expect(['legs', 'feet']).toContain(r.stats.armorSlot);
+  });
+
+  it('produces more than one distinct slot across different input sets', () => {
+    const slots = new Set<string>();
+    for (const seed of ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) {
+      const r = synthesizeFusionDeterministic(organic(seed), profile, 'armor', []);
+      if (r.stats.armorSlot) slots.add(r.stats.armorSlot);
+    }
+    expect(slots.size).toBeGreaterThan(1); // not stuck on head
+  });
+
+  it('cloth-dominant sets still lean chest as their starting slot', () => {
+    const cloth = [inferred('c1', ['cloth']), inferred('c2', ['fiber']), inferred('c3', ['cloth'])];
+    const r = synthesizeFusionDeterministic(cloth, ['cloth', 'fiber'], 'armor', []);
+    expect(r.stats.armorSlot).toBe('chest');
+  });
+});
+
 describe('OTA-195 fusionInputHash — deterministic by sorted names', () => {
   it('same inputs in different order produce the same hash', () => {
     const a = [inferred('Alpha', ['metal']), inferred('Beta', ['fiber']), inferred('Gamma', ['organic'])];
@@ -364,5 +405,65 @@ describe('OTA-195 fusionInputHash — deterministic by sorted names', () => {
     const a = [inferred('Alpha', ['metal']), inferred('Beta', ['fiber']), inferred('Gamma', ['organic'])];
     const c = [inferred('Alpha', ['metal']), inferred('Beta', ['fiber']), inferred('Delta', ['stone'])];
     expect(fusionInputHash(a)).not.toBe(fusionInputHash(c));
+  });
+});
+
+describe('OTA-704 — Qwen fusion name is sanitized against generic / cross-kind names', () => {
+  const armorStats: UniqueItemStats = {
+    kind: 'armor', rarity: 'Legendary', acBonus: 5, armorSlot: 'head',
+    durability: { current: 45, max: 45 },
+  } as unknown as UniqueItemStats;
+  const inputs = [inferred('Aetheric Cog', ['aether', 'metal'])];
+  const reply = (name: string) => JSON.stringify({ name, description: 'A ward of humming aether-plate.' });
+
+  it('rejects "Aetheric Armor" (a real runecaster WEAPON) for an armor forge → falls back', async () => {
+    const q = new MockQwen(true, reply('Aetheric Armor'));
+    expect(await synthesizeFusionNameViaQwen(armorStats, inputs, ['aether', 'metal'], q)).toBeNull();
+  });
+
+  it('rejects a bare "<theme> Armor" name (ends with the literal kind word)', async () => {
+    const q = new MockQwen(true, reply('Woven Armor'));
+    expect(await synthesizeFusionNameViaQwen(armorStats, inputs, ['aether'], q)).toBeNull();
+  });
+
+  it('accepts a distinct structured name that does not collide', async () => {
+    const q = new MockQwen(true, reply('Resonant Aegis'));
+    const out = await synthesizeFusionNameViaQwen(armorStats, inputs, ['aether'], q);
+    expect(out?.name).toBe('Resonant Aegis');
+  });
+});
+
+describe('OTA-706 — one-time rename of collided fused item names', () => {
+  const fusedArmor = (id: string, name: string): InventoryItem => ({
+    id, name, kind: 'armor', quantity: 1, rarity: 'Legendary', tags: ['fused', 'unique', 'aetheric'],
+    description: 'A legendary armor.',
+    uniqueStats: { kind: 'armor', rarity: 'Legendary', armorSlot: 'head', acBonus: 5, damageType: 'aetheric', durability: { current: 45, max: 45 } } as unknown as InventoryItem['uniqueStats'],
+  } as InventoryItem);
+
+  it('detects a fused armor named like a catalog WEAPON as a cross-kind collision', () => {
+    expect(fusedNameCollidesCrossKind(fusedArmor('a1', 'Aetheric Armor'))).toBe(true);   // catalog runecaster weapon
+    expect(fusedNameCollidesCrossKind(fusedArmor('a2', 'Resonant Aegis'))).toBe(false);  // not a catalog name
+  });
+
+  it('deterministicFusedName is stable per id, distinct across ids, and never collides', () => {
+    const n1 = deterministicFusedName(fusedArmor('a1', 'Aetheric Armor'));
+    const n1again = deterministicFusedName(fusedArmor('a1', 'Aetheric Armor'));
+    const n2 = deterministicFusedName(fusedArmor('a2', 'Aetheric Armor'));
+    expect(n1).toBe(n1again);                 // stable across loads
+    expect(n1).not.toBe('Aetheric Armor');    // no longer the colliding name
+    expect(n1).not.toBe(n2);                  // two forged pieces get DIFFERENT names
+    expect(fusedNameCollidesCrossKind({ ...fusedArmor('a1', n1), name: n1 })).toBe(false); // the new name is clean
+  });
+
+  it('migrateFusedName renames a collider and is idempotent on a clean name', () => {
+    const migrated = migrateFusedName(fusedArmor('a1', 'Aetheric Armor'));
+    expect(migrated.name).not.toBe('Aetheric Armor');
+    // second pass over the already-migrated item is a no-op (same reference back)
+    expect(migrateFusedName(migrated)).toBe(migrated);
+  });
+
+  it('leaves a non-fused item untouched even if its name is a catalog weapon', () => {
+    const plain = { id: 'p', name: 'Aetheric Armor', kind: 'armor', quantity: 1, tags: [] } as InventoryItem;
+    expect(migrateFusedName(plain)).toBe(plain);
   });
 });
