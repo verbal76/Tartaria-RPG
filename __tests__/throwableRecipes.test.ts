@@ -14,7 +14,9 @@ const NEW_THROWABLE_RECIPES = [
   'Tartarian Hand Axe (Throw)',
   'Mud Throwing Knife',
   'Bone Throwing Axe',
-  'Shaped Aetheric Shard',
+  // OTA-754 — Shaped Aetheric Shard removed: it is obtained via the SHAPE
+  // Aethercraft power (Aetheric tab), not a Craft-tab recipe. The 'shape stone'
+  // discipline binds an Aetheric Shard to a Small Rock; there is no recipe row.
 ];
 
 function bareInvItem(name: string): InventoryItem {

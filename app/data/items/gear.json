@@ -1,138 +1,1354 @@
 {
   "gear": [
-    { "name": "Trail Rations", "kind": "consumable", "rarity": "Common", "tags": ["food"], "effect": { "kind": "consumable", "healHP": 6, "restoreStamina": 3 }, "description": "Hardtack and salted mud-meat. Eating mends the body and puts a little wind back in your lungs — +6 HP, +3 stamina. Food is how you heal out here, and how you catch your second breath in a fight." },
-
-    { "name": "Wild Onion",       "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","vegetable"], "description": "Pulled from the silt by its papery tops. Sharp, watery, fills a corner of the gut.",
-      "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 1 } },
-    { "name": "Wild Carrot",      "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","vegetable"], "description": "Pale, slender, and earth-streaked. Snaps clean between the teeth. Helps you see in the half-dark for a while after.",
-      "effect": { "kind": "consumable", "healHP": 3, "restoreStamina": 1, "buffStat": "wisdom", "buffBonus": 1, "buffDuration": 4 } },
-    { "name": "Wild Lettuce",     "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","leafy"],     "description": "Bitter green leaves growing low. Easier to find than swallow.",
-      "effect": { "kind": "consumable", "healHP": 1, "restoreStamina": 1 } },
-    { "name": "Rhubarb Stalk",    "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged"],             "description": "Sour red stalk pulled from the ditch's edge. Wakes you up either way.",
-      "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 0 } },
-    { "name": "Wild Oats",        "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","grain"],     "description": "A handful of grass-seed grain. Chew and swallow; that's the entire recipe.",
-      "effect": { "kind": "consumable", "healHP": 1, "restoreStamina": 2 } },
-    { "name": "Speckled Egg",     "kind": "consumable", "rarity": "Uncommon", "tags": ["food","foraged","protein"],   "description": "A speckled egg from a ground-nester. Cracks open warm enough to swallow raw. Sticks to your bones.",
-      "effect": { "kind": "consumable", "healHP": 3, "restoreStamina": 1, "buffStat": "strength", "buffBonus": 1, "buffDuration": 3 } },
-    { "name": "Blueberries",      "kind": "consumable", "rarity": "Uncommon", "tags": ["food","foraged","fruit"],     "description": "A palmful of dusky blueberries. The blue gets on everything. Old Tartarian herbalists called them clarity-fruit.",
-      "effect": { "kind": "consumable", "healHP": 4, "restoreStamina": 1, "buffStat": "intelligence", "buffBonus": 1, "buffDuration": 5 } },
-    { "name": "Raspberries",      "kind": "consumable", "rarity": "Uncommon", "tags": ["food","foraged","fruit"],     "description": "Soft, tart, falls apart on the tongue. A handful gets you to the next ridge.",
-      "effect": { "kind": "consumable", "healHP": 3, "restoreStamina": 1 } },
-    { "name": "Wild Grapes",      "kind": "consumable", "rarity": "Uncommon", "tags": ["food","foraged","fruit"],     "description": "Tight clusters of small grapes pulled off a low vine. Half-sweet, half-puckering. Loosens the tongue.",
-      "effect": { "kind": "consumable", "healHP": 3, "restoreStamina": 2, "buffStat": "charisma", "buffBonus": 1, "buffDuration": 4 } },
-    { "name": "Wild Chicken",     "kind": "consumable", "rarity": "Rare",     "tags": ["food","foraged","meat"],      "description": "A scrawny ground-bird, freshly killed. Real food, the kind that pays you back.",
-      "effect": { "kind": "consumable", "healHP": 6, "restoreStamina": 2, "buffStat": "strength", "buffBonus": 1, "buffDuration": 6 } },
-
-    { "name": "Red Cap Mushroom",    "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","mushroom","red"],    "description": "Bright red cap, white-speckled. Edible raw if you must; better in a stew.",
-      "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 0 } },
-    { "name": "Blue Cap Mushroom",   "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","mushroom","blue"],   "description": "Bruise-blue cap, deep purple gills. Tastes of cold stone.",
-      "effect": { "kind": "consumable", "healHP": 1, "restoreStamina": 2 } },
-    { "name": "Violet Cap Mushroom", "kind": "consumable", "rarity": "Uncommon", "tags": ["food","foraged","mushroom","violet"], "description": "Deep violet cap, almost black. Eaten raw it does very little; cooked or distilled, more. Quickens the feet either way.",
-      "effect": { "kind": "consumable", "healHP": 1, "restoreStamina": 3, "buffStat": "dexterity", "buffBonus": 1, "buffDuration": 4 } },
-    { "name": "Orange Sporecap",     "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","mushroom","orange"], "description": "Bright orange cap, freckled with darker spots. Don't eat raw unless you know the color. You know the color.",
-      "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 1 } },
-
-    { "name": "Blue Aetheric Fungus", "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","mushroom","aether","distillable","blue"], "description": "Pale-blue cap with a copper rim — clarity-grade. Halem pays for it by the colour.",
-      "effect": { "kind": "consumable", "healHP": 1, "buffStat": "intelligence", "buffBonus": 1, "buffDuration": 5 } },
-    { "name": "Violet Mushroom",      "kind": "consumable", "rarity": "Uncommon", "tags": ["food","foraged","mushroom","aether","distillable","violet"], "description": "Deep violet, almost black. Old herbalists called it the dreaming road. Halem pays by the colour.",
-      "effect": { "kind": "consumable", "healHP": 1, "restoreStamina": 2, "buffStat": "wisdom", "buffBonus": 1, "buffDuration": 4 } },
-    { "name": "Bioluminescent Fungus", "kind": "consumable", "rarity": "Uncommon", "tags": ["food","foraged","mushroom","light","aether"], "description": "Glows on its own. Eat it and the room legibility rises for a short while — hidden hooks ping back.",
-      "effect": { "kind": "consumable", "healHP": 1, "revealScene": true } },
-
-    { "name": "Empty Water Bottle", "kind": "misc",       "rarity": "Common",   "tags": ["container","water"],          "description": "A glass-and-cork bottle, scoured clean. Type 'fill bottle' near a puddle, lake, waterfall, or crevice-pool to draw water." },
-    { "name": "Water Bottle",       "kind": "consumable", "rarity": "Common",   "tags": ["drink","water","container"],   "description": "A full bottle of water — clean enough, cold enough. A few hard pulls get your wind right back when your lungs are burning: +10 stamina. The cheap, refillable way to recover stamina mid-fight — top it up free at any puddle, lake, or crevice-pool. Leaves an empty bottle behind.",
-      "effect": { "kind": "consumable", "restoreStamina": 10 } },
-
-    { "name": "Forager's Stew",       "kind": "consumable", "rarity": "Uncommon", "tags": ["food","cooked","stew"],     "description": "Onion and carrot simmered over Firewood with a bottle's worth of water. Hot, simple, restores you.",
-      "effect": { "kind": "consumable", "healHP": 8, "restoreStamina": 4, "buffStat": "wisdom", "buffBonus": 1, "buffDuration": 6 } },
-    { "name": "Hearty Stew",          "kind": "consumable", "rarity": "Rare",     "tags": ["food","cooked","stew"],     "description": "Wild chicken, onion, carrot, slow-simmered. The kind of meal you remember.",
-      "effect": { "kind": "consumable", "healHP": 14, "restoreStamina": 6, "buffStat": "strength", "buffBonus": 1, "buffDuration": 8 } },
-    { "name": "Mushroom Stew",        "kind": "consumable", "rarity": "Uncommon", "tags": ["food","cooked","stew","mushroom"], "description": "Red and blue caps cooked into a thin, earthy broth. The cooking takes the worst of the mushroom out.",
-      "effect": { "kind": "consumable", "healHP": 6, "restoreStamina": 6, "buffStat": "intelligence", "buffBonus": 1, "buffDuration": 5 } },
-
-    { "name": "Red Cap Tincture",     "kind": "consumable", "rarity": "Uncommon", "tags": ["potion","mushroom","red"], "description": "Twin red caps distilled with water and heat. Vital — a runner's brew, all heat and lift.",
-      "effect": { "kind": "consumable", "healHP": 10, "restoreStamina": 2, "buffStat": "strength", "buffBonus": 2, "buffDuration": 4 } },
-    { "name": "Blue Cap Draught",     "kind": "consumable", "rarity": "Uncommon", "tags": ["potion","mushroom","blue"], "description": "Cold, deep, mineral. Loosens the tongue and the legs both.",
-      "effect": { "kind": "consumable", "healHP": 4, "restoreStamina": 8, "buffStat": "dexterity", "buffBonus": 2, "buffDuration": 4 } },
-    { "name": "Violet Cap Distillate","kind": "consumable", "rarity": "Rare",     "tags": ["potion","mushroom","violet"], "description": "Dark as the cap it comes from. A clean dose puts the world in slow motion.",
-      "effect": { "kind": "consumable", "healHP": 4, "restoreStamina": 4, "buffStat": "dexterity", "buffBonus": 3, "buffDuration": 6 } },
-    { "name": "Orange Sporecap Brew", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion","mushroom","orange"], "description": "Bright orange brew, fragrant. Cooked, the sporecaps give back what they cost you raw.",
-      "effect": { "kind": "consumable", "healHP": 8, "restoreStamina": 4, "buffStat": "wisdom", "buffBonus": 2, "buffDuration": 5 } },
-    { "name": "Many-Colored Tonic",   "kind": "consumable", "rarity": "Rare",     "tags": ["potion","mushroom","mixed"], "description": "One of every cap, in one bottle. The taste is hard to describe; the lift is unmistakable.",
-      "effect": { "kind": "consumable", "healHP": 12, "restoreStamina": 8, "buffStat": "intelligence", "buffBonus": 2, "buffDuration": 8 } },
-    { "name": "Aetheric Torch", "kind": "relic", "rarity": "Common", "tags": ["light", "relic"], "description": "A hand-held aether-light. Flick it on to reveal hidden hooks in the current room — shadowed corners, half-buried writing, things you'd otherwise walk past. Burns one charge per use; carry several.",
-      "effect": { "kind": "consumable", "revealScene": true } },
-    { "name": "Field Dressing", "kind": "consumable", "rarity": "Common", "tags": ["healing", "crafted"], "effect": { "kind": "consumable", "healHP": 10, "cureBleed": true }, "description": "A clean rag packed with crushed red-cap and bound tight. The roughest kit there is — wad it over the wound, knot it off. +10 HP, stops the bleeding. Add binding and salve and it becomes a proper First Aid Kit." },
-    { "name": "First Aid Kit", "kind": "consumable", "rarity": "Uncommon", "tags": ["healing", "crafted"], "effect": { "kind": "consumable", "healHP": 25, "restoreStamina": 10, "cureBleed": true }, "description": "A rag, mud-spider silk to bind it, and a single dose of Aetheric salve. Patches you up properly: +25 HP, +10 stamina, stops the bleeding. Pack in a red-cap poultice and you've got a Trauma Kit." },
-    { "name": "Trauma Kit", "kind": "consumable", "rarity": "Rare", "tags": ["healing", "crafted"], "effect": { "kind": "consumable", "healHP": 45, "restoreStamina": 15, "cureBleed": true }, "description": "The full kit — rag, silk binding, a red-cap poultice AND a heavy dose of Aetheric salve, all in one wrap. Drags you back from the edge: +45 HP, +15 stamina, stops the bleeding." },
-    { "name": "Aetheric Compass", "kind": "relic", "rarity": "Uncommon", "tags": ["detection", "navigation", "relic"], "description": "A compass that points at the strongest local Aether source. Rarely north. Carried, it sharpens your read of the world by a half-beat.",
-      "effect": { "kind": "passive", "stat": "wisdom", "bonus": 1 } },
-    { "name": "Climbing Rope", "kind": "misc", "rarity": "Common", "tags": ["utility", "gate", "rope"], "baseDurability": 150, "description": "Fifty feet of mud-treated rope. Holds a Giant's weight if you don't push it. Wears with use; snaps cleanly when overstrained — two snapped ropes can be re-spliced into one good line.",
-      "effect": { "kind": "gate", "unlocks": "climb_steep" } },
-    { "name": "Broken Rope", "kind": "misc", "rarity": "Common", "tags": ["scrap", "rope"], "description": "A snapped length of rope, fibers frayed where it failed. Useless on its own — combine two to splice a fresh Climbing Rope." },
-    { "name": "Pry Bar", "kind": "relic", "rarity": "Common", "tags": ["tool", "pry", "utility", "metal"], "baseDurability": 120, "description": "A forearm of cold iron, one end flattened into a chisel, the other hooked. Set the lip under a stuck lid, sealed crate, or jammed lockbox and lean on it: type \"use pry bar on <thing>\" for a chance to crack it open and find what's inside. Sometimes it bites and slips — lean again." },
-
-    { "name": "Shaped Aetheric Shard", "kind": "misc", "rarity": "Rare", "tags": ["throwable", "aether", "shaped"], "description": "A Small Rock pulled apart and reformed by Aethercraft into a singing edge of crystal and metal. ONE THROW only — 2d20 aetheric damage. Carry it for the worst thing the road shows you." },
-
-    { "name": "Cleansing Tonic", "kind": "consumable", "rarity": "Uncommon", "tags": ["healing", "purification"], "description": "Bitter green draught brewed by Servants of the Giants. Drinks the aether back out of your blood. Drops corruption by 20.",
-      "effect": { "kind": "consumable", "reduceCorruption": 20 } },
-
-    { "name": "Purification Vial", "kind": "consumable", "rarity": "Uncommon", "tags": ["healing", "purification", "monarch"], "description": "Mud Monarch issue. A grey-clear vial that smells of clean stone. Carried by Purifiers; drops corruption by 15.",
-      "effect": { "kind": "consumable", "reduceCorruption": 15 } },
-    { "name": "Aether-Purge Tonic", "kind": "consumable", "rarity": "Common", "tags": ["potion", "purification", "foraged", "mushroom", "crafted"], "description": "A forager's cleanse — orange sporecaps boiled down with a measure of aether dust. The dust draws the aether back out of your blood. Drops corruption by 8.",
-      "effect": { "kind": "consumable", "reduceCorruption": 8 } },
-    { "name": "Hollow-Cleanse Decoction", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion", "purification", "foraged", "mushroom", "crafted"], "description": "A stronger brew — violet and blue caps distilled with a double measure of aether dust. Scours deep corruption and knits a little flesh. Drops corruption by 18, restores 3 HP.",
-      "effect": { "kind": "consumable", "reduceCorruption": 18, "healHP": 3 } },
-    { "name": "Poison Vial", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion", "weapon_coating", "poison", "crafted"], "description": "A stoppered vial of rendered venom — leech mucus cooked down with violet caps until it clings. Paint it on a blade, an arrow, or a bolt and every landing hit leaks poison into the wound. Pure rot: 1d4 poison a turn until it burns off. Survives a repair; lost only when the weapon breaks.",
-      "effect": { "kind": "consumable", "coating": { "kind": "poison", "dice": "1d4", "label": "Poisoned" } } },
-    { "name": "Acid Flask", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion", "weapon_coating", "acid", "crafted"], "description": "Caustic distillate in a wax-sealed flask — aether dust dissolved in scavenged battery bile. Coats an edge so each hit both burns (1d4 a turn) AND eats the target's armor, shaving their guard thinner with every wound. Survives a repair; lost only when the weapon breaks.",
-      "effect": { "kind": "consumable", "coating": { "kind": "acid", "dice": "1d4", "label": "Acid-Etched" } } },
-    { "name": "Corruption Tonic", "kind": "consumable", "rarity": "Rare", "tags": ["potion", "weapon_coating", "corruption", "crafted"], "description": "Bottled hollowing — a measure of raw aether dust thickened with blue-cap rot. Smear it on a weapon and each strike pushes corruption into the target (1d4 a turn) and stacks a sickening rot that bites harder against tougher foes. Survives a repair; lost only when the weapon breaks.",
-      "effect": { "kind": "consumable", "coating": { "kind": "corruption", "dice": "1d4", "label": "Corrupted" } } },
-    { "name": "Plague Tonic", "kind": "consumable", "rarity": "Rare", "tags": ["potion", "weapon_coating", "corruption", "crafted", "alchemy"], "description": "A premium hollowing brew — a live disease sample cultured into blue-cap rot until the vial sweats. Painted on a weapon, every strike drives a virulent corruption into the target (1d6 a turn) that stacks a sickening, accelerating rot — worst against the tough foes you hit again and again. Survives a repair; lost only when the weapon breaks.",
-      "effect": { "kind": "consumable", "coating": { "kind": "corruption", "dice": "1d6", "label": "Plagued" } } },
-    { "name": "Plague Vial", "kind": "consumable", "rarity": "Rare", "tags": ["potion", "weapon_coating", "poison", "crafted", "alchemy"], "description": "A premium venom — a live disease sample rendered down with violet caps into a clinging, septic oil. Coats an edge so each landing hit leaks a fever-bright poison into the wound (1d6 a turn) until it burns off. Survives a repair; lost only when the weapon breaks.",
-      "effect": { "kind": "consumable", "coating": { "kind": "poison", "dice": "1d6", "label": "Festering" } } },
-    { "name": "Inoculant Draught", "kind": "consumable", "rarity": "Rare", "tags": ["potion", "purification", "crafted", "alchemy"], "description": "Like cures like. A killed disease sample, cut with aether dust and orange sporecap, taught to your blood as a controlled dose — your body learns the rot's shape and scours the deeper Aetheric corruption with it. Drops corruption by 22.",
-      "effect": { "kind": "consumable", "reduceCorruption": 22 } },
-    { "name": "Viper Venom Vial", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion", "weapon_coating", "poison", "crafted", "alchemy"], "description": "Raw mud-viper venom cooked down with violet caps into a clinging oil. Paint it on a blade, an arrow, or a bolt and every landing hit drives the venom into the wound — a fast, fang-bright poison (1d6 a turn) until it burns off. Survives a repair; lost only when the weapon breaks.",
-      "effect": { "kind": "consumable", "coating": { "kind": "poison", "dice": "1d6", "label": "Envenomed" } } },
-    { "name": "Static Paste", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion", "weapon_coating", "electrical", "aether", "crafted", "alchemy"], "description": "Aether dust whipped with raw egg into a grey paste that crackles when it dries. Smear it along an edge or a point and every landing hit arcs ELECTRICAL damage into the wound (1d4 a turn) — and the strike itself counts as electrical, so it bites extra-deep into constructs and automatons. Survives a repair; lost only when the weapon breaks.",
-      "effect": { "kind": "consumable", "coating": { "kind": "electrical", "dice": "1d4", "label": "Charged" } } },
-    { "name": "Galvanic Paste", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion", "weapon_coating", "electrical", "aether", "crafted", "alchemy"], "description": "Static Paste cut with aether residue until it runs quiet and cold. Coats a weapon for the same arcing electrical bite (1d4 a turn, counts as electrical), and the low ozone hum it gives off muffles your own step — +1 stealth while you wield it. Survives a repair; lost only when the weapon breaks.",
-      "effect": { "kind": "consumable", "coating": { "kind": "electrical", "dice": "1d4", "label": "Galvanic", "statBonus": { "stat": "stealth", "amount": 1 } } } },
-    { "name": "Resonant Paste", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion", "weapon_coating", "electrical", "aether", "crafted", "alchemy"], "description": "Static Paste seeded with a humming aether crystal. The same arcing electrical bite (1d4 a turn, counts as electrical), but the crystal's resonance carries into your voice — +1 charisma while you wield it. Survives a repair; lost only when the weapon breaks.",
-      "effect": { "kind": "consumable", "coating": { "kind": "electrical", "dice": "1d4", "label": "Resonant", "statBonus": { "stat": "charisma", "amount": 1 } } } },
-    { "name": "Incendiary Paste", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion", "weapon_coating", "burn", "aether", "crafted", "alchemy"], "description": "Aether dust packed around a cracked aether crystal until the whole mess runs hot — the same over-harnessed aether that boiled the old world into mud, dialed down to a weapon's edge. Smear it on and every landing hit sears BURN damage into the wound (1d4 a turn); the strike itself counts as burn, so it bites extra-deep into mud creatures and anything else that hates fire. Survives a repair; lost only when the weapon breaks.",
-      "effect": { "kind": "consumable", "coating": { "kind": "burn", "dice": "1d4", "label": "Burning" } } },
-    { "name": "Searing Paste", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion", "weapon_coating", "burn", "aether", "crafted", "alchemy"], "description": "Incendiary Paste worked into a sliver of scrap metal so it holds the heat and radiates it back up the haft — the same arcing burn bite (1d4 a turn, counts as burn), and the steady warmth lets you lean your whole weight into every swing: +1 strength while you wield it. Survives a repair; lost only when the weapon breaks.",
-      "effect": { "kind": "consumable", "coating": { "kind": "burn", "dice": "1d4", "label": "Searing", "statBonus": { "stat": "strength", "amount": 1 } } } },
-    { "name": "Smoldering Paste", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion", "weapon_coating", "burn", "aether", "crafted", "alchemy"], "description": "Incendiary Paste banked down with aether residue into a slow, controlled smolder you can read like a gauge — the same burn bite (1d4 a turn, counts as burn), and minding the burn pattern sharpens your eye: +1 intelligence while you wield it. Survives a repair; lost only when the weapon breaks.",
-      "effect": { "kind": "consumable", "coating": { "kind": "burn", "dice": "1d4", "label": "Smoldering", "statBonus": { "stat": "intelligence", "amount": 1 } } } },
-    { "name": "Antivenom", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion", "cure", "crafted", "alchemy"], "description": "Like cures like. A measured dose of mud-viper venom, rendered with orange sporecap into a controlled antidote — drink it to neutralize a poison already working through your blood, and steady yourself a little besides. Stops poison, +5 HP.",
-      "effect": { "kind": "consumable", "curePoison": true, "healHP": 5 } },
-    { "name": "Resonant Song Phial", "kind": "consumable", "rarity": "Uncommon", "tags": ["consumable", "aether", "crafted", "healing"], "description": "Resonant Song Phial. A glass phial holding distilled Aetheric Song. Cracking the seal releases a calming chord that knits flesh and quiets the nerves.",
-      "effect": { "kind": "consumable", "healHP": 6, "restoreStamina": 2 } },
-    { "name": "Iron-Worm Engine", "kind": "relic", "rarity": "Rare", "tags": ["relic", "construct", "crafted"], "description": "Iron-Worm Engine. A palm-sized scavenger drone forged around an iron core. Hums and ticks in the pack, marking nearby relics with a quiet click." },
-    { "name": "Voidspawn Bolt", "kind": "relic", "rarity": "Rare", "tags": ["relic", "thrown", "aether", "crafted"], "description": "Voidspawn Bolt. A glass-cased Voidspawn egg primed with an energy fragment. Heavy in the hand. Reclaimer field manuals warn against carrying more than two." },
-
-    { "name": "Smoke-Cured Jerky Strip", "kind": "consumable", "rarity": "Common", "tags": ["food", "treat", "dog_treat"], "description": "A long ribbon of smoke-cured mud-meat. Tough, salty, keeps for weeks. A favorite of any dog willing to negotiate.",
-      "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 1, "dogTreat": true } },
-    { "name": "Marrow Bone", "kind": "consumable", "rarity": "Uncommon", "tags": ["food", "treat", "dog_treat"], "description": "A heavy bone, split lengthwise, the marrow still pink and rich. Dogs lose their minds for it.",
-      "effect": { "kind": "consumable", "healHP": 4, "restoreStamina": 2, "dogTreat": true } },
-    { "name": "Honey-Glazed Knuckle", "kind": "consumable", "rarity": "Rare", "tags": ["food", "treat", "dog_treat", "baker"], "description": "A roasted knuckle bone glazed in dark honey by a hub baker who specialises in scraps for the city's strays. Sticky, sweet, deeply unfair to refuse.",
-      "effect": { "kind": "consumable", "healHP": 6, "restoreStamina": 3, "dogTreat": true } },
-    { "name": "Ash-Cured Tongue", "kind": "consumable", "rarity": "Legendary", "tags": ["food", "treat", "dog_treat", "reclaimer"], "description": "A Reclaimer ceremonial cut — beast tongue cured in cold ash and resin. Believed to carry a sliver of the animal's loyalty into whoever eats it. They feed it to their dogs on the night before a hunt.",
-      "effect": { "kind": "consumable", "healHP": 10, "restoreStamina": 4, "dogTreat": true } },
-
-    { "name": "Forgotten Order Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "forgotten_order", "keepsake"], "description": "A pendant hammered thin, etched with the Forgotten Order's crest — taken off one of their dead. Return it to their stake at Varakush to honor the fallen (+1 standing)." },
-    { "name": "Mud Monarch Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "mud_monarchs", "keepsake"], "description": "A silt-caked token bearing the Mud Monarchs' crest, pried from a fallen courtier. Return it to their waystation to honor the fallen (+1 standing)." },
-    { "name": "Reclaimer Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "reclaimers_guild", "keepsake"], "description": "A worn Guild token off a dead Reclaimer, its crest still legible under the grime. Return it to their stake to honor the fallen (+1 standing)." },
-    { "name": "True Tartarian Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "true_tartarians", "keepsake"], "description": "A hand-cut crest of the True Tartarians, carried by one who did not make it home. Return it to their waycamp to honor the fallen (+1 standing)." },
-    { "name": "Eternal Dynasty Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "eternal_dynasty", "keepsake"], "description": "A lacquered seal of the Eternal Dynasty, taken from a fallen retainer. Return it to their border post to honor the fallen (+1 standing)." },
-    { "name": "Architect Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "conspiracy_architects", "keepsake"], "description": "A cold-etched Architect glyph-token off a dead operative. Return it to the Architect's Blind to honor the fallen (+1 standing)." },
-    { "name": "Giants' Servant Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "servants_of_giants", "keepsake"], "description": "A bone-carved crest of the Servants of the Giants, kept by one now dead. Return it to the Giant Watch shrine to honor the fallen (+1 standing)." },
-    { "name": "Stone Builder Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "stone_builders", "keepsake"], "description": "A chiselled mason's mark of the Stone Builders, off a fallen surveyor. Return it to their survey camp to honor the fallen (+1 standing)." },
-    { "name": "Revivalist Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "tartarian_revivalists", "keepsake"], "description": "A hand-painted crest of the Tartarian Revivalists, carried by one who fell for the cause. Return it to their field camp to honor the fallen (+1 standing)." }
+    {
+      "name": "Trail Rations",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food"
+      ],
+      "effect": {
+        "kind": "consumable",
+        "healHP": 6,
+        "restoreStamina": 3
+      },
+      "description": "Hardtack and salted mud-meat. Eating mends the body and puts a little wind back in your lungs — +6 HP, +3 stamina. Food is how you heal out here, and how you catch your second breath in a fight."
+    },
+    {
+      "name": "Wild Onion",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "foraged",
+        "vegetable"
+      ],
+      "description": "Pulled from the silt by its papery tops. Sharp, watery, fills a corner of the gut.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 2,
+        "restoreStamina": 1
+      }
+    },
+    {
+      "name": "Wild Carrot",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "foraged",
+        "vegetable"
+      ],
+      "description": "Pale, slender, and earth-streaked. Snaps clean between the teeth. Helps you see in the half-dark for a while after.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 3,
+        "restoreStamina": 1,
+        "buffStat": "wisdom",
+        "buffBonus": 1,
+        "buffDuration": 4
+      }
+    },
+    {
+      "name": "Wild Lettuce",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "foraged",
+        "leafy"
+      ],
+      "description": "Bitter green leaves growing low. Easier to find than swallow.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 1,
+        "restoreStamina": 1
+      }
+    },
+    {
+      "name": "Rhubarb Stalk",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "foraged"
+      ],
+      "description": "Sour red stalk pulled from the ditch's edge. Wakes you up either way.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 2,
+        "restoreStamina": 0
+      }
+    },
+    {
+      "name": "Wild Oats",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "foraged",
+        "grain"
+      ],
+      "description": "A handful of grass-seed grain. Chew and swallow; that's the entire recipe.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 1,
+        "restoreStamina": 2
+      }
+    },
+    {
+      "name": "Speckled Egg",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "food",
+        "foraged",
+        "protein"
+      ],
+      "description": "A speckled egg from a ground-nester. Cracks open warm enough to swallow raw. Sticks to your bones.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 3,
+        "restoreStamina": 1,
+        "buffStat": "strength",
+        "buffBonus": 1,
+        "buffDuration": 3
+      }
+    },
+    {
+      "name": "Blueberries",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "food",
+        "foraged",
+        "fruit"
+      ],
+      "description": "A palmful of dusky blueberries. The blue gets on everything. Old Tartarian herbalists called them clarity-fruit.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 4,
+        "restoreStamina": 1,
+        "buffStat": "intelligence",
+        "buffBonus": 1,
+        "buffDuration": 5
+      }
+    },
+    {
+      "name": "Raspberries",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "food",
+        "foraged",
+        "fruit"
+      ],
+      "description": "Soft, tart, falls apart on the tongue. A handful gets you to the next ridge.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 3,
+        "restoreStamina": 1
+      }
+    },
+    {
+      "name": "Wild Grapes",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "food",
+        "foraged",
+        "fruit"
+      ],
+      "description": "Tight clusters of small grapes pulled off a low vine. Half-sweet, half-puckering. Loosens the tongue.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 3,
+        "restoreStamina": 2,
+        "buffStat": "charisma",
+        "buffBonus": 1,
+        "buffDuration": 4
+      }
+    },
+    {
+      "name": "Wild Chicken",
+      "kind": "consumable",
+      "rarity": "Rare",
+      "tags": [
+        "food",
+        "foraged",
+        "meat"
+      ],
+      "description": "A scrawny ground-bird, freshly killed. Real food, the kind that pays you back.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 6,
+        "restoreStamina": 2,
+        "buffStat": "strength",
+        "buffBonus": 1,
+        "buffDuration": 6
+      }
+    },
+    {
+      "name": "Red Cap Mushroom",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "foraged",
+        "mushroom",
+        "red"
+      ],
+      "description": "Bright red cap, white-speckled. Edible raw if you must; better in a stew.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 2,
+        "restoreStamina": 0
+      }
+    },
+    {
+      "name": "Blue Cap Mushroom",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "foraged",
+        "mushroom",
+        "blue"
+      ],
+      "description": "Bruise-blue cap, deep purple gills. Tastes of cold stone.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 1,
+        "restoreStamina": 2
+      }
+    },
+    {
+      "name": "Violet Cap Mushroom",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "food",
+        "foraged",
+        "mushroom",
+        "violet"
+      ],
+      "description": "Deep violet cap, almost black. Eaten raw it does very little; cooked or distilled, more. Quickens the feet either way.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 1,
+        "restoreStamina": 3,
+        "buffStat": "dexterity",
+        "buffBonus": 1,
+        "buffDuration": 4
+      }
+    },
+    {
+      "name": "Orange Sporecap",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "foraged",
+        "mushroom",
+        "orange"
+      ],
+      "description": "Bright orange cap, freckled with darker spots. Don't eat raw unless you know the color. You know the color.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 2,
+        "restoreStamina": 1
+      }
+    },
+    {
+      "name": "Blue Aetheric Fungus",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "foraged",
+        "mushroom",
+        "aether",
+        "distillable",
+        "blue"
+      ],
+      "description": "Pale-blue cap with a copper rim — clarity-grade. Halem pays for it by the colour.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 1,
+        "buffStat": "intelligence",
+        "buffBonus": 1,
+        "buffDuration": 5
+      }
+    },
+    {
+      "name": "Violet Mushroom",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "food",
+        "foraged",
+        "mushroom",
+        "aether",
+        "distillable",
+        "violet"
+      ],
+      "description": "Deep violet, almost black. Old herbalists called it the dreaming road. Halem pays by the colour.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 1,
+        "restoreStamina": 2,
+        "buffStat": "wisdom",
+        "buffBonus": 1,
+        "buffDuration": 4
+      }
+    },
+    {
+      "name": "Bioluminescent Fungus",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "food",
+        "foraged",
+        "mushroom",
+        "light",
+        "aether"
+      ],
+      "description": "Glows on its own. Eat it and the room legibility rises for a short while — hidden hooks ping back.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 1,
+        "revealScene": true
+      }
+    },
+    {
+      "name": "Empty Water Bottle",
+      "kind": "misc",
+      "rarity": "Common",
+      "tags": [
+        "container",
+        "water"
+      ],
+      "description": "A glass-and-cork bottle, scoured clean. Type 'fill bottle' near a puddle, lake, waterfall, or crevice-pool to draw water."
+    },
+    {
+      "name": "Water Bottle",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "drink",
+        "water",
+        "container"
+      ],
+      "description": "A full bottle of water — clean enough, cold enough. A few hard pulls get your wind right back when your lungs are burning: +10 stamina. The cheap, refillable way to recover stamina mid-fight — top it up free at any puddle, lake, or crevice-pool. Leaves an empty bottle behind.",
+      "effect": {
+        "kind": "consumable",
+        "restoreStamina": 10
+      }
+    },
+    {
+      "name": "Forager's Stew",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "food",
+        "cooked",
+        "stew"
+      ],
+      "description": "Onion and carrot simmered over Firewood with a bottle's worth of water. Hot, simple, restores you.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 8,
+        "restoreStamina": 4,
+        "buffStat": "wisdom",
+        "buffBonus": 1,
+        "buffDuration": 6
+      }
+    },
+    {
+      "name": "Hearty Stew",
+      "kind": "consumable",
+      "rarity": "Rare",
+      "tags": [
+        "food",
+        "cooked",
+        "stew"
+      ],
+      "description": "Wild chicken, onion, carrot, slow-simmered. The kind of meal you remember.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 14,
+        "restoreStamina": 6,
+        "buffStat": "strength",
+        "buffBonus": 1,
+        "buffDuration": 8
+      }
+    },
+    {
+      "name": "Mushroom Stew",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "food",
+        "cooked",
+        "stew",
+        "mushroom"
+      ],
+      "description": "Red and blue caps cooked into a thin, earthy broth. The cooking takes the worst of the mushroom out.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 6,
+        "restoreStamina": 6,
+        "buffStat": "intelligence",
+        "buffBonus": 1,
+        "buffDuration": 5
+      }
+    },
+    {
+      "name": "Red Cap Tincture",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "mushroom",
+        "red"
+      ],
+      "description": "Twin red caps distilled with water and heat. Vital — a runner's brew, all heat and lift.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 10,
+        "restoreStamina": 2,
+        "buffStat": "strength",
+        "buffBonus": 2,
+        "buffDuration": 4
+      }
+    },
+    {
+      "name": "Blue Cap Draught",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "mushroom",
+        "blue"
+      ],
+      "description": "Cold, deep, mineral. Loosens the tongue and the legs both.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 4,
+        "restoreStamina": 8,
+        "buffStat": "dexterity",
+        "buffBonus": 2,
+        "buffDuration": 4
+      }
+    },
+    {
+      "name": "Violet Cap Distillate",
+      "kind": "consumable",
+      "rarity": "Rare",
+      "tags": [
+        "potion",
+        "mushroom",
+        "violet"
+      ],
+      "description": "Dark as the cap it comes from. A clean dose puts the world in slow motion.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 4,
+        "restoreStamina": 4,
+        "buffStat": "dexterity",
+        "buffBonus": 3,
+        "buffDuration": 6
+      }
+    },
+    {
+      "name": "Orange Sporecap Brew",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "mushroom",
+        "orange"
+      ],
+      "description": "Bright orange brew, fragrant. Cooked, the sporecaps give back what they cost you raw.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 8,
+        "restoreStamina": 4,
+        "buffStat": "wisdom",
+        "buffBonus": 2,
+        "buffDuration": 5
+      }
+    },
+    {
+      "name": "Many-Colored Tonic",
+      "kind": "consumable",
+      "rarity": "Rare",
+      "tags": [
+        "potion",
+        "mushroom",
+        "mixed"
+      ],
+      "description": "One of every cap, in one bottle. The taste is hard to describe; the lift is unmistakable.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 12,
+        "restoreStamina": 8,
+        "buffStat": "intelligence",
+        "buffBonus": 2,
+        "buffDuration": 8
+      }
+    },
+    {
+      "name": "Aetheric Torch",
+      "kind": "relic",
+      "rarity": "Common",
+      "tags": [
+        "light",
+        "relic"
+      ],
+      "description": "A hand-held aether-light that resonates with the buried. USE it in a room that still holds an unexplored lead — its flame reaches for what the mud swallowed, and on a lucky pull shakes loose a rare or legendary find (higher Wisdom, better odds and better tier). A miss burns the charge for nothing. Scarce and hard to come by — spend it where a lead remains.",
+      "effect": {
+        "kind": "consumable",
+        "revealScene": true
+      }
+    },
+    {
+      "name": "Field Dressing",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "healing",
+        "crafted"
+      ],
+      "effect": {
+        "kind": "consumable",
+        "healHP": 10,
+        "cureBleed": true
+      },
+      "description": "A clean rag packed with crushed red-cap and bound tight. The roughest kit there is — wad it over the wound, knot it off. +10 HP, stops the bleeding. Add binding and salve and it becomes a proper First Aid Kit."
+    },
+    {
+      "name": "First Aid Kit",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "healing",
+        "crafted"
+      ],
+      "effect": {
+        "kind": "consumable",
+        "healHP": 25,
+        "restoreStamina": 10,
+        "cureBleed": true
+      },
+      "description": "A rag, mud-spider silk to bind it, and a single dose of Aetheric salve. Patches you up properly: +25 HP, +10 stamina, stops the bleeding. Pack in a red-cap poultice and you've got a Trauma Kit."
+    },
+    {
+      "name": "Trauma Kit",
+      "kind": "consumable",
+      "rarity": "Rare",
+      "tags": [
+        "healing",
+        "crafted"
+      ],
+      "effect": {
+        "kind": "consumable",
+        "healHP": 45,
+        "restoreStamina": 15,
+        "cureBleed": true
+      },
+      "description": "The full kit — rag, silk binding, a red-cap poultice AND a heavy dose of Aetheric salve, all in one wrap. Drags you back from the edge: +45 HP, +15 stamina, stops the bleeding."
+    },
+    {
+      "name": "Aetheric Compass",
+      "kind": "relic",
+      "rarity": "Uncommon",
+      "tags": [
+        "detection",
+        "navigation",
+        "relic"
+      ],
+      "description": "A compass that points at the strongest local Aether source. Rarely north. Carried, it sharpens your read of the world by a half-beat.",
+      "effect": {
+        "kind": "passive",
+        "stat": "wisdom",
+        "bonus": 1
+      }
+    },
+    {
+      "name": "Climbing Rope",
+      "kind": "misc",
+      "rarity": "Common",
+      "tags": [
+        "utility",
+        "gate",
+        "rope"
+      ],
+      "baseDurability": 150,
+      "description": "Fifty feet of mud-treated rope. Holds a Giant's weight if you don't push it. Wears with use; snaps cleanly when overstrained — two snapped ropes can be re-spliced into one good line.",
+      "effect": {
+        "kind": "gate",
+        "unlocks": "climb_steep"
+      }
+    },
+    {
+      "name": "Broken Rope",
+      "kind": "misc",
+      "rarity": "Common",
+      "tags": [
+        "scrap",
+        "rope"
+      ],
+      "description": "A snapped length of rope, fibers frayed where it failed. Useless on its own — combine two to splice a fresh Climbing Rope."
+    },
+    {
+      "name": "Pry Bar",
+      "kind": "relic",
+      "rarity": "Common",
+      "tags": [
+        "tool",
+        "pry",
+        "utility",
+        "metal"
+      ],
+      "baseDurability": 120,
+      "description": "A forearm of cold iron, one end flattened into a chisel, the other hooked. Set the lip under a stuck lid, sealed crate, or jammed lockbox and lean on it: type \"use pry bar on <thing>\" for a chance to crack it open and find what's inside. Sometimes it bites and slips — lean again."
+    },
+    {
+      "name": "Shaped Aetheric Shard",
+      "kind": "misc",
+      "rarity": "Rare",
+      "tags": [
+        "throwable",
+        "aether",
+        "shaped"
+      ],
+      "description": "A Small Rock pulled apart and reformed by Aethercraft into a singing edge of crystal and metal. ONE THROW only — 2d20 aetheric damage. Carry it for the worst thing the road shows you."
+    },
+    {
+      "name": "Cleansing Tonic",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "healing",
+        "purification"
+      ],
+      "description": "Bitter green draught brewed by Servants of the Giants. Drinks the aether back out of your blood. Drops corruption by 20.",
+      "effect": {
+        "kind": "consumable",
+        "reduceCorruption": 20
+      }
+    },
+    {
+      "name": "Purification Vial",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "healing",
+        "purification",
+        "monarch"
+      ],
+      "description": "Mud Monarch issue. A grey-clear vial that smells of clean stone. Carried by Purifiers; drops corruption by 15.",
+      "effect": {
+        "kind": "consumable",
+        "reduceCorruption": 15
+      }
+    },
+    {
+      "name": "Aether-Purge Tonic",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "potion",
+        "purification",
+        "foraged",
+        "mushroom",
+        "crafted"
+      ],
+      "description": "A forager's cleanse — orange sporecaps boiled down with a measure of aether dust. The dust draws the aether back out of your blood. Drops corruption by 8.",
+      "effect": {
+        "kind": "consumable",
+        "reduceCorruption": 8
+      }
+    },
+    {
+      "name": "Hollow-Cleanse Decoction",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "purification",
+        "foraged",
+        "mushroom",
+        "crafted"
+      ],
+      "description": "A stronger brew — violet and blue caps distilled with a double measure of aether dust. Scours deep corruption and knits a little flesh. Drops corruption by 18, restores 3 HP.",
+      "effect": {
+        "kind": "consumable",
+        "reduceCorruption": 18,
+        "healHP": 3
+      }
+    },
+    {
+      "name": "Poison Vial",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "poison",
+        "crafted"
+      ],
+      "description": "A stoppered vial of rendered venom — leech mucus cooked down with violet caps until it clings. Paint it on a blade, an arrow, or a bolt and every landing hit leaks poison into the wound. Pure rot: 1d4 poison a turn until it burns off. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "poison",
+          "dice": "1d4",
+          "label": "Poisoned"
+        }
+      }
+    },
+    {
+      "name": "Acid Flask",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "acid",
+        "crafted"
+      ],
+      "description": "Caustic distillate in a wax-sealed flask — aether dust dissolved in scavenged battery bile. Coats an edge so each hit both burns (1d4 a turn) AND eats the target's armor, shaving their guard thinner with every wound. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "acid",
+          "dice": "1d4",
+          "label": "Acid-Etched"
+        }
+      }
+    },
+    {
+      "name": "Corruption Tonic",
+      "kind": "consumable",
+      "rarity": "Rare",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "corruption",
+        "crafted"
+      ],
+      "description": "Bottled hollowing — a measure of raw aether dust thickened with blue-cap rot. Smear it on a weapon and each strike pushes corruption into the target (1d4 a turn) and stacks a sickening rot that bites harder against tougher foes. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "corruption",
+          "dice": "1d4",
+          "label": "Corrupted"
+        }
+      }
+    },
+    {
+      "name": "Plague Tonic",
+      "kind": "consumable",
+      "rarity": "Rare",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "corruption",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "A premium hollowing brew — a live disease sample cultured into blue-cap rot until the vial sweats. Painted on a weapon, every strike drives a virulent corruption into the target (1d6 a turn) that stacks a sickening, accelerating rot — worst against the tough foes you hit again and again. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "corruption",
+          "dice": "1d6",
+          "label": "Plagued"
+        }
+      }
+    },
+    {
+      "name": "Plague Vial",
+      "kind": "consumable",
+      "rarity": "Rare",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "poison",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "A premium venom — a live disease sample rendered down with violet caps into a clinging, septic oil. Coats an edge so each landing hit leaks a fever-bright poison into the wound (1d6 a turn) until it burns off. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "poison",
+          "dice": "1d6",
+          "label": "Festering"
+        }
+      }
+    },
+    {
+      "name": "Inoculant Draught",
+      "kind": "consumable",
+      "rarity": "Rare",
+      "tags": [
+        "potion",
+        "purification",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "Like cures like. A killed disease sample, cut with aether dust and orange sporecap, taught to your blood as a controlled dose — your body learns the rot's shape and scours the deeper Aetheric corruption with it. Drops corruption by 22.",
+      "effect": {
+        "kind": "consumable",
+        "reduceCorruption": 22
+      }
+    },
+    {
+      "name": "Viper Venom Vial",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "poison",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "Raw mud-viper venom cooked down with violet caps into a clinging oil. Paint it on a blade, an arrow, or a bolt and every landing hit drives the venom into the wound — a fast, fang-bright poison (1d6 a turn) until it burns off. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "poison",
+          "dice": "1d6",
+          "label": "Envenomed"
+        }
+      }
+    },
+    {
+      "name": "Static Paste",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "electrical",
+        "aether",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "Aether dust whipped with raw egg into a grey paste that crackles when it dries. Smear it along an edge or a point and every landing hit arcs ELECTRICAL damage into the wound (1d4 a turn) — and the strike itself counts as electrical, so it bites extra-deep into constructs and automatons. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "electrical",
+          "dice": "1d4",
+          "label": "Charged"
+        }
+      }
+    },
+    {
+      "name": "Galvanic Paste",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "electrical",
+        "aether",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "Static Paste cut with aether residue until it runs quiet and cold. Coats a weapon for the same arcing electrical bite (1d4 a turn, counts as electrical), and the low ozone hum it gives off muffles your own step — +1 stealth while you wield it. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "electrical",
+          "dice": "1d4",
+          "label": "Galvanic",
+          "statBonus": {
+            "stat": "stealth",
+            "amount": 1
+          }
+        }
+      }
+    },
+    {
+      "name": "Resonant Paste",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "electrical",
+        "aether",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "Static Paste seeded with a humming aether crystal. The same arcing electrical bite (1d4 a turn, counts as electrical), but the crystal's resonance carries into your voice — +1 charisma while you wield it. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "electrical",
+          "dice": "1d4",
+          "label": "Resonant",
+          "statBonus": {
+            "stat": "charisma",
+            "amount": 1
+          }
+        }
+      }
+    },
+    {
+      "name": "Incendiary Paste",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "burn",
+        "aether",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "Aether dust packed around a cracked aether crystal until the whole mess runs hot — the same over-harnessed aether that boiled the old world into mud, dialed down to a weapon's edge. Smear it on and every landing hit sears BURN damage into the wound (1d4 a turn); the strike itself counts as burn, so it bites extra-deep into mud creatures and anything else that hates fire. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "burn",
+          "dice": "1d4",
+          "label": "Burning"
+        }
+      }
+    },
+    {
+      "name": "Searing Paste",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "burn",
+        "aether",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "Incendiary Paste worked into a sliver of scrap metal so it holds the heat and radiates it back up the haft — the same arcing burn bite (1d4 a turn, counts as burn), and the steady warmth lets you lean your whole weight into every swing: +1 strength while you wield it. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "burn",
+          "dice": "1d4",
+          "label": "Searing",
+          "statBonus": {
+            "stat": "strength",
+            "amount": 1
+          }
+        }
+      }
+    },
+    {
+      "name": "Smoldering Paste",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "burn",
+        "aether",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "Incendiary Paste banked down with aether residue into a slow, controlled smolder you can read like a gauge — the same burn bite (1d4 a turn, counts as burn), and minding the burn pattern sharpens your eye: +1 intelligence while you wield it. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "burn",
+          "dice": "1d4",
+          "label": "Smoldering",
+          "statBonus": {
+            "stat": "intelligence",
+            "amount": 1
+          }
+        }
+      }
+    },
+    {
+      "name": "Frost Paste",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "cold",
+        "aether",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "Aetheric rime whipped into a paste that never quite melts — smear it on a blade and every hit sinks a biting frost (1d4 a turn, counts as cold — machines seize, joints lock). DRINK it instead as a warming counter: it shakes off a chill and knits a little hurt closed. Coat a weapon, coat armor for cold resistance, or lob the vial for a one-time frost burst. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "cold",
+          "dice": "1d4",
+          "label": "Frost-Rimed"
+        }
+      }
+    },
+    {
+      "name": "Rime Draught",
+      "kind": "consumable",
+      "rarity": "Rare",
+      "tags": [
+        "potion",
+        "weapon_coating",
+        "cold",
+        "aether",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "A concentrated frost distillate — a heavier cold bite (1d6 a turn, counts as cold), and holding that focused chill steadies a cold, clear mind: +1 wisdom while you wield it. Drink it to warm through and lift a chill; coat a weapon or armor, or throw it for a one-time frost burst. Survives a repair; lost only when the weapon breaks.",
+      "effect": {
+        "kind": "consumable",
+        "coating": {
+          "kind": "cold",
+          "dice": "1d6",
+          "label": "Rimebound",
+          "statBonus": {
+            "stat": "wisdom",
+            "amount": 1
+          }
+        }
+      }
+    },
+    {
+      "name": "Antivenom",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "potion",
+        "cure",
+        "crafted",
+        "alchemy"
+      ],
+      "description": "Like cures like. A measured dose of mud-viper venom, rendered with orange sporecap into a controlled antidote — drink it to neutralize a poison already working through your blood, and steady yourself a little besides. Stops poison, +5 HP.",
+      "effect": {
+        "kind": "consumable",
+        "curePoison": true,
+        "healHP": 5
+      }
+    },
+    {
+      "name": "Resonant Song Phial",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "consumable",
+        "aether",
+        "crafted",
+        "healing"
+      ],
+      "description": "Resonant Song Phial. A glass phial holding distilled Aetheric Song. Cracking the seal releases a calming chord that knits flesh and quiets the nerves.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 6,
+        "restoreStamina": 2
+      }
+    },
+    {
+      "name": "Iron-Worm Engine",
+      "kind": "relic",
+      "rarity": "Rare",
+      "tags": [
+        "relic",
+        "construct",
+        "crafted"
+      ],
+      "description": "Iron-Worm Engine. A palm-sized scavenger drone forged around an iron core. Hums and ticks in the pack, marking nearby relics with a quiet click."
+    },
+    {
+      "name": "Voidspawn Bolt",
+      "kind": "relic",
+      "rarity": "Rare",
+      "tags": [
+        "relic",
+        "thrown",
+        "aether",
+        "crafted"
+      ],
+      "description": "Voidspawn Bolt. A glass-cased Voidspawn egg primed with an energy fragment. Heavy in the hand. Reclaimer field manuals warn against carrying more than two."
+    },
+    {
+      "name": "Smoke-Cured Jerky Strip",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "treat",
+        "dog_treat"
+      ],
+      "description": "A long ribbon of smoke-cured mud-meat. Tough, salty, keeps for weeks. A favorite of any dog willing to negotiate.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 2,
+        "restoreStamina": 1,
+        "dogTreat": true
+      }
+    },
+    {
+      "name": "Marrow Bone",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "food",
+        "treat",
+        "dog_treat"
+      ],
+      "description": "A heavy bone, split lengthwise, the marrow still pink and rich. Dogs lose their minds for it.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 4,
+        "restoreStamina": 2,
+        "dogTreat": true
+      }
+    },
+    {
+      "name": "Honey-Glazed Knuckle",
+      "kind": "consumable",
+      "rarity": "Rare",
+      "tags": [
+        "food",
+        "treat",
+        "dog_treat",
+        "baker"
+      ],
+      "description": "A roasted knuckle bone glazed in dark honey by a hub baker who specialises in scraps for the city's strays. Sticky, sweet, deeply unfair to refuse.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 6,
+        "restoreStamina": 3,
+        "dogTreat": true
+      }
+    },
+    {
+      "name": "Ash-Cured Tongue",
+      "kind": "consumable",
+      "rarity": "Legendary",
+      "tags": [
+        "food",
+        "treat",
+        "dog_treat",
+        "reclaimer"
+      ],
+      "description": "A Reclaimer ceremonial cut — beast tongue cured in cold ash and resin. Believed to carry a sliver of the animal's loyalty into whoever eats it. They feed it to their dogs on the night before a hunt.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 10,
+        "restoreStamina": 4,
+        "dogTreat": true
+      }
+    },
+    {
+      "name": "Forgotten Order Sigil",
+      "kind": "misc",
+      "rarity": "Common",
+      "tags": [
+        "sigil",
+        "forgotten_order",
+        "keepsake"
+      ],
+      "description": "A pendant hammered thin, etched with the Forgotten Order's crest — taken off one of their dead. Return it to their stake at Varakush to honor the fallen (+1 standing)."
+    },
+    {
+      "name": "Mud Monarch Sigil",
+      "kind": "misc",
+      "rarity": "Common",
+      "tags": [
+        "sigil",
+        "mud_monarchs",
+        "keepsake"
+      ],
+      "description": "A silt-caked token bearing the Mud Monarchs' crest, pried from a fallen courtier. Return it to their waystation to honor the fallen (+1 standing)."
+    },
+    {
+      "name": "Reclaimer Sigil",
+      "kind": "misc",
+      "rarity": "Common",
+      "tags": [
+        "sigil",
+        "reclaimers_guild",
+        "keepsake"
+      ],
+      "description": "A worn Guild token off a dead Reclaimer, its crest still legible under the grime. Return it to their stake to honor the fallen (+1 standing)."
+    },
+    {
+      "name": "True Tartarian Sigil",
+      "kind": "misc",
+      "rarity": "Common",
+      "tags": [
+        "sigil",
+        "true_tartarians",
+        "keepsake"
+      ],
+      "description": "A hand-cut crest of the True Tartarians, carried by one who did not make it home. Return it to their waycamp to honor the fallen (+1 standing)."
+    },
+    {
+      "name": "Eternal Dynasty Sigil",
+      "kind": "misc",
+      "rarity": "Common",
+      "tags": [
+        "sigil",
+        "eternal_dynasty",
+        "keepsake"
+      ],
+      "description": "A lacquered seal of the Eternal Dynasty, taken from a fallen retainer. Return it to their border post to honor the fallen (+1 standing)."
+    },
+    {
+      "name": "Architect Sigil",
+      "kind": "misc",
+      "rarity": "Common",
+      "tags": [
+        "sigil",
+        "conspiracy_architects",
+        "keepsake"
+      ],
+      "description": "A cold-etched Architect glyph-token off a dead operative. Return it to the Architect's Blind to honor the fallen (+1 standing)."
+    },
+    {
+      "name": "Giants' Servant Sigil",
+      "kind": "misc",
+      "rarity": "Common",
+      "tags": [
+        "sigil",
+        "servants_of_giants",
+        "keepsake"
+      ],
+      "description": "A bone-carved crest of the Servants of the Giants, kept by one now dead. Return it to the Giant Watch shrine to honor the fallen (+1 standing)."
+    },
+    {
+      "name": "Stone Builder Sigil",
+      "kind": "misc",
+      "rarity": "Common",
+      "tags": [
+        "sigil",
+        "stone_builders",
+        "keepsake"
+      ],
+      "description": "A chiselled mason's mark of the Stone Builders, off a fallen surveyor. Return it to their survey camp to honor the fallen (+1 standing)."
+    },
+    {
+      "name": "Revivalist Sigil",
+      "kind": "misc",
+      "rarity": "Common",
+      "tags": [
+        "sigil",
+        "tartarian_revivalists",
+        "keepsake"
+      ],
+      "description": "A hand-painted crest of the Tartarian Revivalists, carried by one who fell for the cause. Return it to their field camp to honor the fallen (+1 standing)."
+    },
+    {
+      "name": "Aether Collection Beacon",
+      "kind": "misc",
+      "rarity": "Legendary",
+      "tags": [
+        "beacon",
+        "skyreacher",
+        "quest",
+        "collect_only"
+      ],
+      "effect": {
+        "kind": "beacon"
+      },
+      "description": "A folded collector-array prised from the heart of a tower after its guardian fell — a throat of resonant crystal built to swallow Aether out of thin air and send it on down the grid. It only hums and points upward on its own. Carry all five down from the great climbs, then USE one: you'll break the arrays down and build a rifle from their parts."
+    },
+    {
+      "name": "Skyreacher Map 1 of 5 — Grand Spire",
+      "kind": "misc",
+      "rarity": "Rare",
+      "tags": [
+        "map",
+        "skyreacher_chart",
+        "chart"
+      ],
+      "effect": {
+        "kind": "map",
+        "climbId": "grand_spire",
+        "index": 1,
+        "total": 5
+      },
+      "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to Grand Spire of Etheria and opens its great climb. Use it from your pack to fix the way and unlock the ascent (1 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
+    },
+    {
+      "name": "Skyreacher Map 2 of 5 — Asgardar Spire",
+      "kind": "misc",
+      "rarity": "Rare",
+      "tags": [
+        "map",
+        "skyreacher_chart",
+        "chart"
+      ],
+      "effect": {
+        "kind": "map",
+        "climbId": "asgardar_spire",
+        "index": 2,
+        "total": 5
+      },
+      "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to the buried spire of Asgardar and opens its great climb. Use it from your pack to fix the way and unlock the ascent (2 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
+    },
+    {
+      "name": "Skyreacher Map 3 of 5 — Obsidian Monolith",
+      "kind": "misc",
+      "rarity": "Rare",
+      "tags": [
+        "map",
+        "skyreacher_chart",
+        "chart"
+      ],
+      "effect": {
+        "kind": "map",
+        "climbId": "obsidian_monolith",
+        "index": 3,
+        "total": 5
+      },
+      "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to the Great Obsidian Monolith and opens its great climb. Use it from your pack to fix the way and unlock the ascent (3 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
+    },
+    {
+      "name": "Skyreacher Map 4 of 5 — Thametan Tower",
+      "kind": "misc",
+      "rarity": "Rare",
+      "tags": [
+        "map",
+        "skyreacher_chart",
+        "chart"
+      ],
+      "effect": {
+        "kind": "map",
+        "climbId": "thametan_tower",
+        "index": 4,
+        "total": 5
+      },
+      "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to Thametan's Tower and opens its great climb. Use it from your pack to fix the way and unlock the ascent (4 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
+    },
+    {
+      "name": "Skyreacher Map 5 of 5 — Zharak Fang",
+      "kind": "misc",
+      "rarity": "Rare",
+      "tags": [
+        "map",
+        "skyreacher_chart",
+        "chart"
+      ],
+      "effect": {
+        "kind": "map",
+        "climbId": "zharak_fang",
+        "index": 5,
+        "total": 5
+      },
+      "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to the Great Fang of Zharak and opens its great climb. Use it from your pack to fix the way and unlock the ascent (5 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
+    }
   ]
 }

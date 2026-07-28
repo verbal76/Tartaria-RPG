@@ -237,6 +237,40 @@
       ]
     },
     {
+      "result": "Frost Paste",
+      "ingredients": [
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Rime Draught",
+      "ingredients": [
+        {
+          "name": "Aetheric Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
       "result": "Climbing Rope",
       "ingredients": [
         {
@@ -1249,7 +1283,7 @@
     },
     {
       "result": "Golem Sledge",
-      "coresRequired": 4,
+      "coresRequired": 2,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1267,7 +1301,7 @@
     },
     {
       "result": "Crude Golem Sledge",
-      "coresRequired": 4,
+      "coresRequired": 1,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1303,7 +1337,7 @@
     },
     {
       "result": "Golem Greatsword",
-      "coresRequired": 4,
+      "coresRequired": 2,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1321,7 +1355,7 @@
     },
     {
       "result": "Crude Golem Greatsword",
-      "coresRequired": 4,
+      "coresRequired": 1,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1353,7 +1387,7 @@
     },
     {
       "result": "Golem Pike",
-      "coresRequired": 4,
+      "coresRequired": 2,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1371,7 +1405,7 @@
     },
     {
       "result": "Crude Golem Pike",
-      "coresRequired": 4,
+      "coresRequired": 1,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1878,23 +1912,6 @@
         },
         {
           "name": "Cloth Scrap",
-          "quantity": 1
-        }
-      ]
-    },
-    {
-      "result": "Shaped Aetheric Shard",
-      "ingredients": [
-        {
-          "name": "Aether Crystal",
-          "quantity": 1
-        },
-        {
-          "name": "Aetheric Shard",
-          "quantity": 1
-        },
-        {
-          "name": "Aether Dust",
           "quantity": 1
         }
       ]

@@ -65,11 +65,11 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
       onRequestClose={onCancel}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim}>
+      <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>TAKE</Text>
+              <Text style={styles.title} accessibilityRole="header">TAKE</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
                 Items in the scene you can pick up. Tap one — it goes straight
@@ -88,6 +88,8 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
                   pressed && styles.chipPressed,
                 ]}
                 onPress={() => setUseStealth((s) => !s)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: useStealth }}
               >
                 <Text style={[styles.stealthToggleText, useStealth && styles.stealthToggleTextActive]}>
                   {useStealth ? '✓ USE STEALTH (DEX roll)' : 'USE STEALTH (off)'}
@@ -118,6 +120,8 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
                       ]}
                       disabled={consumed}
                       onPress={() => (useStealth ? onStealthTake(noun) : onTake(noun))}
+                      accessibilityRole="button"
+                      accessibilityState={{ disabled: consumed }}
                     >
                       <Text style={[styles.chipText, consumed && styles.chipTextConsumed]}>
                         {noun}
@@ -156,6 +160,7 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
                   <Pressable
                     style={({ pressed }) => [styles.takeAllBtn, pressed && styles.btnPressed]}
                     onPress={() => onTakeAll(grabbable)}
+                    accessibilityRole="button"
                   >
                     <Text style={styles.takeAllText}>
                       TAKE ALL ({grabbable.length})
@@ -168,6 +173,7 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
                 <Pressable
                   style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
                   onPress={onCancel}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnText}>CLOSE</Text>
                 </Pressable>
@@ -200,7 +206,7 @@ const styles = StyleSheet.create({
   title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
   body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 10 },
-  empty: { color: '#7a705c', fontSize: 12, fontStyle: 'italic', lineHeight: 17, marginVertical: 14 },
+  empty: { color: '#a2977b', fontSize: 12, fontStyle: 'italic', lineHeight: 17, marginVertical: 14 },
   chipScroll: { maxHeight: 280 },
   chipList: { gap: 6, paddingVertical: 4 },
   chip: {
@@ -228,7 +234,7 @@ const styles = StyleSheet.create({
     borderColor: '#3a342c',
     opacity: 0.55,
   },
-  chipTextConsumed: { color: '#7a705c', fontStyle: 'italic' },
+  chipTextConsumed: { color: '#a2977b', fontStyle: 'italic' },
   chipArrowConsumed: { color: '#5e5547' },
   stealthToggle: {
     paddingHorizontal: 12,
@@ -241,7 +247,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   stealthToggleActive: { borderColor: '#6a9bbf', backgroundColor: '#1c2a35' },
-  stealthToggleText: { color: '#7a705c', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  stealthToggleText: { color: '#a2977b', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   stealthToggleTextActive: { color: '#6a9bbf' },
   takeAllBtn: {
     marginTop: 10,

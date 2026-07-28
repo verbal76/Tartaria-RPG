@@ -18,6 +18,8 @@ import {
   type DisplaySettings,
 } from '../ui/displaySettings';
 import { LoreCodexBody } from '../components/LoreCodexBody';
+import { useHintsDisabled, setHintsDisabled, resetAllFirstTimeHints } from '../components/useFirstTimeHint';
+import { useAccessibility } from '../state/accessibility';
 import { THIRD_PARTY_NOTICES, NOTICES_PREAMBLE, NOTICES_VERIFIED_AT } from '../data/thirdPartyNotices';
 import {
   flushLogWrites,
@@ -97,6 +99,12 @@ export function AboutScreen() {
   // bottom of the ExplorationScreen menu row. save & exit is the
   // most-pressed action, so it's the default tab on open.
   const [tab, setTab] = useState<'session' | 'sfx' | 'display' | 'lore' | 'about' | 'notices'>('session');
+  // OTA-860 — global first-time-tips kill-switch (per-install, reactive).
+  const hintsDisabled = useHintsDisabled();
+  // OTA-898 (SA-6) — device reduce-motion preference (reactive).
+  const reduceMotion = useAccessibility((s) => s.reduceMotion);
+  const setReduceMotion = useAccessibility((s) => s.setReduceMotion);
+  const [tipsReset, setTipsReset] = useState(false);
   // arb78 — player-tunable background settings (live).
   const [display, setDisplay] = useState<DisplaySettings>(() => getDisplaySettings());
   useEffect(() => {
@@ -587,10 +595,12 @@ export function AboutScreen() {
           style={styles.backBtn}
           hitSlop={12}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
           <Text style={styles.back}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>SETTINGS</Text>
+        <Text style={styles.title} accessibilityRole="header">SETTINGS</Text>
         <View style={{ width: 80 }} />
       </View>
 
@@ -605,6 +615,8 @@ export function AboutScreen() {
             onPress={() => setTab(id)}
             style={[styles.tabBtn, tab === id && styles.tabBtnActive]}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityState={{ selected: tab === id }}
           >
             <Text
               style={[styles.tabBtnText, tab === id && styles.tabBtnTextActive]}
@@ -626,7 +638,7 @@ export function AboutScreen() {
             first; copy + clear are diagnostic tools below. */}
         {tab === 'session' && (
         <View style={styles.sessionCard}>
-          <Text style={styles.sessionLabel}>RUN</Text>
+          <Text style={styles.sessionLabel} accessibilityRole="header">RUN</Text>
           <Text style={styles.sessionHint}>
             Save or leave the run, share a log / bug report, or reload the AI.
           </Text>
@@ -639,6 +651,8 @@ export function AboutScreen() {
             onPress={() => { void handleSave(); }}
             activeOpacity={0.7}
             disabled={saveState === 'saving'}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: saveState === 'saving' }}
           >
             <Text style={styles.sessionBtnPrimaryText}>
               {saveState === 'saving' ? 'SAVING…'
@@ -652,16 +666,18 @@ export function AboutScreen() {
             style={[styles.sessionBtn, styles.sessionBtnPrimary]}
             onPress={() => { void saveAndExitToTitle(); }}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={styles.sessionBtnPrimaryText}>SAVE &amp; EXIT TO TITLE</Text>
           </TouchableOpacity>
 
-          <Text style={[styles.sessionLabel, { marginTop: 14 }]}>REPORTING</Text>
+          <Text style={[styles.sessionLabel, { marginTop: 14 }]} accessibilityRole="header">REPORTING</Text>
           <View style={styles.sessionBtnRow}>
             <TouchableOpacity
               style={[styles.sessionBtn, styles.sessionBtnSecondary, { flex: 1 }]}
               onPress={() => { void handleCopyLog(); }}
               activeOpacity={0.7}
+              accessibilityRole="button"
             >
               <Text style={styles.sessionBtnSecondaryText}>
                 {(() => {
@@ -689,6 +705,7 @@ export function AboutScreen() {
               style={[styles.sessionBtn, styles.sessionBtnSecondary, { flex: 1 }]}
               onPress={() => { void handleClearLog(); }}
               activeOpacity={0.7}
+              accessibilityRole="button"
             >
               <Text style={styles.sessionBtnSecondaryText}>
                 {logCleared ? '✓ CLEARED' : 'CLEAR LOG'}
@@ -702,6 +719,7 @@ export function AboutScreen() {
             style={[styles.sessionBtn, styles.sessionBtnPrimary, { marginTop: 8 }]}
             onPress={() => setBugReportOpen(true)}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={styles.sessionBtnPrimaryText}>REPORT A BUG</Text>
           </TouchableOpacity>
@@ -712,6 +730,8 @@ export function AboutScreen() {
             style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
             onPress={() => setAdvancedOpen((v) => !v)}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: advancedOpen }}
           >
             <Text style={styles.sessionBtnSecondaryText}>
               {advancedOpen ? '▾ ADVANCED EXPORTS' : '▸ ADVANCED EXPORTS'}
@@ -723,6 +743,7 @@ export function AboutScreen() {
                 style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
                 onPress={() => { void handleCopySave(); }}
                 activeOpacity={0.7}
+                accessibilityRole="button"
               >
                 <Text style={styles.sessionBtnSecondaryText}>
                   {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (brick repro)'}
@@ -732,6 +753,7 @@ export function AboutScreen() {
                 style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
                 onPress={() => { void handleCopyInventory(); }}
                 activeOpacity={0.7}
+                accessibilityRole="button"
               >
                 <Text style={styles.sessionBtnSecondaryText}>
                   {invCopied ? `✓ ${invCharCount.toLocaleString()} CHARS` : 'COPY INVENTORY'}
@@ -740,7 +762,7 @@ export function AboutScreen() {
             </>
           )}
 
-          <Text style={[styles.sessionLabel, { marginTop: 14 }]}>AI</Text>
+          <Text style={[styles.sessionLabel, { marginTop: 14 }]} accessibilityRole="header">AI</Text>
           {/* OTA-459/460 — RESET AI NARRATION & RELOAD. Clears the ML crash
               breadcrumbs AND force-loads Qwen in-session, bypassing the boot-time
               skip gate entirely (bootQwen doesn't consult shouldAttemptQwen, it just
@@ -758,6 +780,7 @@ export function AboutScreen() {
               });
             }}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={styles.sessionBtnPrimaryText}>
               {!aiReset ? 'RELOAD AI'
@@ -784,7 +807,7 @@ export function AboutScreen() {
         {tab === 'display' && (
         <View style={styles.musicCard}>
           <View style={styles.musicHeader}>
-            <Text style={styles.musicTitle}>BACKGROUND</Text>
+            <Text style={styles.musicTitle} accessibilityRole="header">BACKGROUND</Text>
           </View>
           <Text style={styles.sessionHint}>
             Make the parchment your own. Changes apply instantly and are saved.
@@ -844,20 +867,109 @@ export function AboutScreen() {
             style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 10 }]}
             onPress={() => { void resetDisplaySettings(); }}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={styles.sessionBtnSecondaryText}>RESET TO DEFAULT</Text>
           </TouchableOpacity>
         </View>
         )}
 
+        {/* OTA-860 — GUIDANCE: master switch for the first-time tips that pop up the
+            first time you open each system. Off hides them everywhere; the reset makes
+            them all show once more (e.g. after a big update). */}
+        {tab === 'display' && (
+        <View style={styles.musicCard}>
+          <View style={styles.musicHeader}>
+            <Text style={styles.musicTitle} accessibilityRole="header">GUIDANCE</Text>
+          </View>
+          <Text style={styles.sessionHint}>
+            Short tips pop up the first time you open a screen. Turn them off, or show them
+            all again after an update.
+          </Text>
+
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>First-time tips</Text>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={() => { void setHintsDisabled(!hintsDisabled); }}
+              style={[styles.musicToggle, !hintsDisabled && styles.musicToggleOn]}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="First-time tips"
+              accessibilityState={{ selected: !hintsDisabled }}
+            >
+              <Text style={[styles.musicToggleText, !hintsDisabled && styles.musicToggleTextOn]}>
+                {hintsDisabled ? 'OFF' : 'ON'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 10 }]}
+            onPress={() => {
+              void resetAllFirstTimeHints();
+              void setHintsDisabled(false);
+              setTipsReset(true);
+              setTimeout(() => setTipsReset(false), 2000);
+            }}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+          >
+            <Text style={styles.sessionBtnSecondaryText}>{tipsReset ? 'TIPS RESET ✓' : 'SHOW ALL TIPS AGAIN'}</Text>
+          </TouchableOpacity>
+        </View>
+        )}
+
+        {/* OTA-898 (SA-6) — ACCESSIBILITY: reduce motion holds the UI's looping /
+            flashing animations (the low-HP damage flash, the tutorial pulse)
+            static. Text size is driven by the OS font-size setting — the app
+            respects it everywhere — so it isn't duplicated here. */}
+        {tab === 'display' && (
+        <View style={styles.musicCard}>
+          <View style={styles.musicHeader}>
+            <Text style={styles.musicTitle} accessibilityRole="header">ACCESSIBILITY</Text>
+          </View>
+          <Text style={styles.sessionHint}>
+            Reduce motion holds pulsing and flashing effects still. Text size follows your
+            device&apos;s system font-size setting.
+          </Text>
+
+          <View
+            style={styles.musicRow}
+            accessible
+            accessibilityRole="switch"
+            accessibilityLabel="Reduce motion"
+            accessibilityState={{ checked: reduceMotion }}
+          >
+            <Text style={styles.musicLabel}>Reduce motion</Text>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={() => setReduceMotion(!reduceMotion)}
+              style={[styles.musicToggle, reduceMotion && styles.musicToggleOn]}
+              activeOpacity={0.7}
+              accessibilityRole="switch"
+              accessibilityLabel="Reduce motion"
+              accessibilityState={{ checked: reduceMotion }}
+            >
+              <Text style={[styles.musicToggleText, reduceMotion && styles.musicToggleTextOn]}>
+                {reduceMotion ? 'ON' : 'OFF'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        )}
+
         {tab === 'sfx' && (
         <View style={styles.musicCard}>
           <View style={styles.musicHeader}>
-            <Text style={styles.musicTitle}>MUSIC</Text>
+            <Text style={styles.musicTitle} accessibilityRole="header">MUSIC</Text>
             <TouchableOpacity
               onPress={toggleMusic}
               style={[styles.musicToggle, audio.enabled && styles.musicToggleOn]}
               activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Music"
+              accessibilityState={{ selected: audio.enabled }}
             >
               <Text style={[styles.musicToggleText, audio.enabled && styles.musicToggleTextOn]}>
                 {audio.enabled ? 'ON' : 'OFF'}
@@ -904,6 +1016,7 @@ export function AboutScreen() {
             style={[styles.applyBtn, applyFlash && styles.applyBtnFlash]}
             onPress={applyMusic}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={[styles.applyBtnText, applyFlash && styles.applyBtnTextFlash]}>
               {applyFlash ? 'APPLIED' : 'APPLY'}
@@ -915,7 +1028,7 @@ export function AboutScreen() {
         {tab === 'sfx' && (
         <View style={styles.musicCard}>
           <View style={styles.musicHeader}>
-            <Text style={styles.musicTitle}>VOICE</Text>
+            <Text style={styles.musicTitle} accessibilityRole="header">VOICE</Text>
           </View>
 
           {/* Toggles stay tappable even when the availability probe
@@ -929,6 +1042,9 @@ export function AboutScreen() {
               onPress={toggleTTS}
               style={[styles.musicToggle, voice.ttsEnabled && styles.musicToggleOn]}
               activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Read aloud (TTS)"
+              accessibilityState={{ selected: voice.ttsEnabled }}
             >
               <Text style={[styles.musicToggleText, voice.ttsEnabled && styles.musicToggleTextOn]}>
                 {voice.ttsEnabled ? 'ON' : 'OFF'}
@@ -963,6 +1079,9 @@ export function AboutScreen() {
                     onPress={() => switchEngine('system')}
                     style={[styles.musicToggle, voice.engine === 'system' && styles.musicToggleOn]}
                     activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel="System voice engine"
+                    accessibilityState={{ selected: voice.engine === 'system' }}
                   >
                     <Text style={[styles.musicToggleText, voice.engine === 'system' && styles.musicToggleTextOn]}>SYSTEM</Text>
                   </TouchableOpacity>
@@ -970,6 +1089,9 @@ export function AboutScreen() {
                     onPress={() => switchEngine('bundled')}
                     style={[styles.musicToggle, voice.engine === 'bundled' && styles.musicToggleOn]}
                     activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel="Bundled voice engine"
+                    accessibilityState={{ selected: voice.engine === 'bundled' }}
                   >
                     <Text style={[styles.musicToggleText, voice.engine === 'bundled' && styles.musicToggleTextOn]}>BUNDLED</Text>
                   </TouchableOpacity>
@@ -981,6 +1103,8 @@ export function AboutScreen() {
                     onPress={handleEngineThirdBtn}
                     style={[styles.musicToggle, kokoroState.phase === 'ready' && styles.musicToggleOn]}
                     activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel="Download or update bundled voice"
                   >
                     <Text style={[styles.musicToggleText, kokoroState.phase === 'ready' && styles.musicToggleTextOn]}>
                       {kokoroState.phase === 'downloading' ? `${Math.round(kokoroState.fraction * 100)}%` :
@@ -1015,6 +1139,7 @@ export function AboutScreen() {
                     onPress={testKokoro}
                     style={[styles.applyBtn, { marginTop: 4 }]}
                     activeOpacity={0.7}
+                    accessibilityRole="button"
                   >
                     <Text style={styles.applyBtnText}>
                       {kokoroState.phase === 'ready' ? 'TEST VOICE' :
@@ -1033,6 +1158,7 @@ export function AboutScreen() {
                     onPress={handleClearKokoroCache}
                     style={[styles.applyBtn, { marginTop: 4, backgroundColor: 'transparent', borderColor: '#5a3a2a', borderWidth: 1 }]}
                     activeOpacity={0.7}
+                    accessibilityRole="button"
                   >
                     <Text style={[styles.applyBtnText, { color: '#c9a26a' }]}>
                       {kokoroCacheCleared ? 'CACHE CLEARED — TAP TEST VOICE' : 'CLEAR BUNDLED VOICE CACHE'}
@@ -1040,7 +1166,7 @@ export function AboutScreen() {
                   </TouchableOpacity>
                   <View style={styles.musicRow}>
                     <Text style={styles.musicLabel}>Voice</Text>
-                    <TouchableOpacity onPress={() => cycleKokoroVoice(-1)} style={styles.voiceCycleBtn}>
+                    <TouchableOpacity onPress={() => cycleKokoroVoice(-1)} style={styles.voiceCycleBtn} accessibilityRole="button" accessibilityLabel="Previous voice">
                       <Text style={styles.voiceCycleText}>◀</Text>
                     </TouchableOpacity>
                     <View style={{ flex: 1, paddingHorizontal: 6 }}>
@@ -1048,7 +1174,7 @@ export function AboutScreen() {
                         {voice.kokoroVoice.toUpperCase().replace(/_/g, ' ')}
                       </Text>
                     </View>
-                    <TouchableOpacity onPress={() => cycleKokoroVoice(1)} style={styles.voiceCycleBtn}>
+                    <TouchableOpacity onPress={() => cycleKokoroVoice(1)} style={styles.voiceCycleBtn} accessibilityRole="button" accessibilityLabel="Next voice">
                       <Text style={styles.voiceCycleText}>▶</Text>
                     </TouchableOpacity>
                   </View>
@@ -1118,13 +1244,13 @@ export function AboutScreen() {
               {voice.engine === 'system' && (
                 <View style={styles.musicRow}>
                   <Text style={styles.musicLabel}>Voice</Text>
-                  <TouchableOpacity onPress={() => cycleVoice(-1)} style={styles.voiceCycleBtn}>
+                  <TouchableOpacity onPress={() => cycleVoice(-1)} style={styles.voiceCycleBtn} accessibilityRole="button" accessibilityLabel="Previous voice">
                     <Text style={styles.voiceCycleText}>◀</Text>
                   </TouchableOpacity>
                   <View style={{ flex: 1, paddingHorizontal: 6 }}>
                     <Text style={styles.voicePickerLabel} numberOfLines={1}>{currentVoiceLabel}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => cycleVoice(1)} style={styles.voiceCycleBtn}>
+                  <TouchableOpacity onPress={() => cycleVoice(1)} style={styles.voiceCycleBtn} accessibilityRole="button" accessibilityLabel="Next voice">
                     <Text style={styles.voiceCycleText}>▶</Text>
                   </TouchableOpacity>
                 </View>
@@ -1145,6 +1271,7 @@ export function AboutScreen() {
             onPress={handleVoiceCopy}
             style={[styles.applyBtn, { marginTop: 8 }]}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={styles.applyBtnText}>{voiceCopied ? 'COPIED' : 'COPY VOICE INFO'}</Text>
           </TouchableOpacity>
@@ -1177,6 +1304,8 @@ export function AboutScreen() {
                   onPress={() => setExpandedNoticeId(expanded ? null : n.id)}
                   activeOpacity={0.7}
                   style={styles.noticeHeaderRow}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded }}
                 >
                   <View style={{ flex: 1 }}>
                     <Text style={styles.noticeName}>{n.name}</Text>
@@ -1204,7 +1333,7 @@ export function AboutScreen() {
       </ScrollView>
 
       {tab === 'about' && (
-        <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7} accessibilityRole="button">
           <Text style={styles.copyText}>{copied ? 'COPIED' : 'COPY ALL'}</Text>
         </TouchableOpacity>
       )}
@@ -1374,7 +1503,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sessionFootnote: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 10,
     lineHeight: 14,
     fontStyle: 'italic',
@@ -1397,14 +1526,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   musicToggleOn: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
-  musicToggleText: { color: '#7a705c', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
+  musicToggleText: { color: '#a2977b', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
   musicToggleTextOn: { color: '#13110f' },
   musicRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  musicLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1, width: 60 },
+  musicLabel: { color: '#a2977b', fontSize: 11, letterSpacing: 1, width: 60 },
   // arb85 — color-wheel row (stacked + centered, full width).
   wheelRow: { alignItems: 'center', gap: 8, marginVertical: 6 },
-  wheelLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 2, textAlign: 'center' },
-  wheelHint: { color: '#7a705c', fontSize: 10, letterSpacing: 0.5, textAlign: 'center' },
+  wheelLabel: { color: '#a2977b', fontSize: 11, letterSpacing: 2, textAlign: 'center' },
+  wheelHint: { color: '#a2977b', fontSize: 10, letterSpacing: 0.5, textAlign: 'center' },
   musicValue: { color: '#cdbf99', fontSize: 11, fontVariant: ['tabular-nums'], width: 44, textAlign: 'right' },
   applyBtn: {
     marginTop: 10,
@@ -1418,7 +1547,7 @@ const styles = StyleSheet.create({
   applyBtnFlash: { backgroundColor: '#c9a86a' },
   applyBtnText: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
   applyBtnTextFlash: { color: '#13110f' },
-  voiceNote: { color: '#7a705c', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
+  voiceNote: { color: '#a2977b', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
   voiceCycleBtn: {
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -1444,7 +1573,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   noticesVerified: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 10,
     letterSpacing: 1,
     fontStyle: 'italic',
@@ -1488,7 +1617,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   noticeCopyright: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 11,
     lineHeight: 15,
     marginTop: 4,

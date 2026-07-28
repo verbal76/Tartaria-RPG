@@ -301,7 +301,34 @@ describe('Quest progression audit', () => {
       const titleSnippet = q.title.split(' ').slice(0, 3).join(' ');
 
       // Accept via direct store action — engine path under test.
-      store.getState().acceptFactionQuest(q.id);
+      // OTA-993 (#117) — stranded escorts are HOOK-granted only: boards, vendors,
+      // and acceptFactionQuest refuse them by design (you find the stranded
+      // soul in the wild). Seed the active record the way applyHookEffect's
+      // start_escort_contract does, then walk stages + turn-in exactly like
+      // every other contract. The hook ACCEPT path itself is covered by
+      // ota988HookEscort and the escort gauntlet suite.
+      if (/_stranded_/.test(q.id)) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const escortMod = require('../app/engine/escort');
+        const spec = escortMod.escortSpecForQuest(q);
+        const escort = spec ? escortMod.spawnEscortPool(spec.count, store.getState().player?.hpMax ?? 20, spec.label) : null;
+        store.setState((s) => {
+          if (!s.player) return s;
+          return {
+            ...s,
+            player: {
+              ...s.player,
+              activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), q.id],
+              activeFactionQuests: [
+                ...(s.player.activeFactionQuests ?? []),
+                { id: q.id, stage: 0, postedByFaction: q.factionId, acceptedAt: Date.now(), tracked: true, ...(escort ? { escort } : {}) },
+              ],
+            },
+          };
+        });
+      } else {
+        store.getState().acceptFactionQuest(q.id);
+      }
       let active = (store.getState().player?.activeFactionQuestIds ?? []);
       if (!active.includes(q.id)) {
         acceptFailures.push({ id: q.id, title: q.title, kind: 'fq',
@@ -467,12 +494,17 @@ describe('Quest progression audit', () => {
         if (!cur) break;
         if (cur.stage >= h.stages.length) { bossKilled = true; break; }
         store.getState().advanceHunt(h.id);
-        const updated = (store.getState().player?.activeHunts ?? []).find((r) => r.id === h.id);
-        if (!updated) break;
-        if (h.stages[updated.stage - 1]?.checkKind === 'boss') {
+        // OTA-796 — the FINAL boss stage FREEZES the hunt (advanceHunt spawns the
+        // boss but does NOT increment the stage; only the kill advances it). So a
+        // stage-delta check misses it — detect the spawned boss by a LIVE enemy in
+        // the scene instead. This covers both the mid-hunt boss (which increments
+        // on spawn) and the frozen final boss (which doesn't).
+        const scene = store.getState().currentScene;
+        const liveEnemy = !!scene && scene.enemies.some((_, idx) => (scene.enemyHps[idx] ?? 0) > 0);
+        if (liveEnemy) {
           bossSpawned = true;
-          // Boss scene was set by advanceHunt; zero its HP so resolveEnemyDefeat
-          // registers the kill (and advances the hunt iff it's the final boss).
+          // Zero its HP so resolveEnemyDefeat registers the kill (and advances the
+          // hunt iff it's the final boss).
           store.setState((s) => {
             if (!s.currentScene) return s;
             return {
@@ -485,7 +517,7 @@ describe('Quest progression audit', () => {
           });
           store.getState().resolveEnemyDefeat();
           const finalRec = (store.getState().player?.activeHunts ?? []).find((r) => r.id === h.id);
-          if (finalRec && finalRec.stage >= h.stages.length) bossKilled = true;
+          if (!finalRec || finalRec.stage >= h.stages.length) bossKilled = true;
         }
       }
       if (!bossSpawned || !bossKilled) {

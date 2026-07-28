@@ -785,7 +785,7 @@ export function buildEchoHookLine(entry: InvestigationEntry): string {
   const noun = entry.noun;
   if (entry.result?.kind === 'item') {
     const item = entry.result.detail.toLowerCase();
-    return `You think back to the ${noun} from earlier — the ${item} you pulled from it. Something here reminds you of it.`;
+    return `You think back to ${theLower(noun)} from earlier — the ${item.toLowerCase()} you pulled from it. Something here reminds you of it.`;
   }
   if (entry.result?.kind === 'hook') {
     return `${theCap(noun)} from a room back surfaces in memory. The thread you pulled is still warm — and now it's tugging again.`;

@@ -234,7 +234,11 @@ describe('MECHANIC-1b — golem sidekick', () => {
       });
 
       const golemHpBefore = store.getState().player!.golem!.hp;
+      // Companion rolls honor nat-1/nat-20 now — pin the dice to a mid roll
+      // (d20 = 11) so the guaranteed-hit setup stays deterministic.
+      const rnd = jest.spyOn(Math, 'random').mockReturnValue(0.5);
       await store.getState().submitPlayerAction('golem attack');
+      rnd.mockRestore();
 
       const after = store.getState().player!.golem!;
       // 10d10 is at least 10 — comfortably above the old flat cap of 7.
@@ -270,7 +274,11 @@ describe('MECHANIC-1b — golem sidekick', () => {
         },
       });
 
+      // Companion rolls honor nat-1/nat-20 now — pin the dice to a mid roll
+      // (d20 = 11) so the guaranteed-hit setup stays deterministic.
+      const rnd = jest.spyOn(Math, 'random').mockReturnValue(0.5);
       await store.getState().submitPlayerAction('golem attack');
+      rnd.mockRestore();
 
       const after = store.getState();
       // Enemy resolved out + combat ended.
@@ -333,8 +341,11 @@ describe('MECHANIC-1b — golem sidekick', () => {
       const store = await bootstrap([
         // Common garbage aether loot — NOT aether-golem fuel, but shares the element.
         { id: 'ad', name: 'Aether Dust', kind: 'misc', rarity: 'Common', quantity: 2, tags: ['aether', 'dust'] } as never,
-        // An Uncommon aether material for the half tier.
-        { id: 'ar', name: 'Aether Residue', kind: 'misc', rarity: 'Uncommon', quantity: 2, tags: ['aether'] } as never,
+        // An Uncommon aether material for the half tier. CATALOG-ABSENT name on
+        // purpose: 'Aether Residue' is a real Common materials.json row, and the
+        // feed path now reads CANONICAL rarity (catalog wins for catalog names) —
+        // only an uncatalogued instance can carry a synthetic Uncommon tier.
+        { id: 'ar', name: 'Umbral Aether Slurry', kind: 'misc', rarity: 'Uncommon', quantity: 2, tags: ['aether'] } as never,
       ]);
       const p0 = store.getState().player!;
       const golem = { ...makeCompanion(GOLEM_DEFINITIONS.aether_golem), hp: 1 };
@@ -344,7 +355,7 @@ describe('MECHANIC-1b — golem sidekick', () => {
       expect(store.getState().player!.golem!.hp).toBe(3); // 1 + 2 (Common = quarter)
       expect((store.getState().player!.inventory.find((i) => i.name === 'Aether Dust')?.quantity) ?? 0).toBe(1);
       // Uncommon substitute = floor(11 * 0.5) = 5.
-      store.getState().submitPlayerAction('feed golem aether residue');
+      store.getState().submitPlayerAction('feed golem umbral aether slurry');
       expect(store.getState().player!.golem!.hp).toBe(8); // 3 + 5 (Uncommon = half)
     });
 
@@ -432,7 +443,11 @@ describe('MECHANIC-1b — golem sidekick', () => {
         },
       });
 
+      // Companion rolls honor nat-1/nat-20 now — pin the dice to a mid roll
+      // (d20 = 11) so the guaranteed-hit setup stays deterministic.
+      const rnd = jest.spyOn(Math, 'random').mockReturnValue(0.5);
       await store.getState().submitPlayerAction('golem attack');
+      rnd.mockRestore();
 
       const after = store.getState().player!.golem!;
       // Strike landed → power progress; the dummy hit back (atk vs AC 11) often
@@ -479,7 +494,11 @@ describe('MECHANIC-1b — golem sidekick', () => {
         currentScene: { ...scene, enemies: [{ name: 'Dummy', damage: '1d4', abilityPoint: 'Strength 0', hp: 100000, type: 'construct', loot: [], rarity: 'Common', traits: [] } as never], enemyHps: [100000], activeEnemyIdx: 0, range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]] },
       });
       // 3 strikes: weapon (durability 3) wears to 0 and shatters → golem.weapon cleared.
+      // Pin the dice (d20 = 11): a nat-1 fumble would skip a wear tick and
+      // leave the weapon unshattered after 3 swings.
+      const rnd = jest.spyOn(Math, 'random').mockReturnValue(0.5);
       for (let i = 0; i < 3; i++) await store.getState().submitPlayerAction('golem attack');
+      rnd.mockRestore();
       const g = store.getState().player!.golem!;
       expect(g.weapon ?? null).toBeNull();
       const log = store.getState().gameLog.map((l) => l.text).join('\n');
@@ -507,7 +526,11 @@ describe('MECHANIC-1b — golem sidekick', () => {
         currentScene: { ...scene, enemies: [{ name: 'Dummy', damage: '1d4', abilityPoint: 'Strength 0', hp: 100000, type: 'construct', loot: [], rarity: 'Common', traits: [] } as never], enemyHps: [100000], activeEnemyIdx: 0, range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]] },
       });
 
+      // Companion rolls honor nat-1/nat-20 now — pin the dice to a mid roll
+      // (d20 = 11) so the guaranteed-hit setup stays deterministic.
+      const rnd = jest.spyOn(Math, 'random').mockReturnValue(0.5);
       await store.getState().submitPlayerAction('golem attack');
+      rnd.mockRestore();
 
       const after = store.getState().currentScene!;
       // Acid shred accumulated on the enemy, and a DOT status seeded.

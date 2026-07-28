@@ -145,10 +145,14 @@ export function detectACContexts(
   for (const slotItem of Object.values(equipped)) {
     if (!slotItem) continue;
     const item = player.inventory.find((i) => i.name === slotItem);
-    const tags = item?.tags ?? [];
+    // OTA-1024 — canonical: a stale equipped piece silently dropped its racial
+    // conditional bonus (the sheet implied protection combat didn't grant).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { canonicalItemKind: rmk, canonicalItemTags: rmt } = require('./crafting') as typeof import('./crafting');
+    const tags = item ? rmt(item) : [];
     if (tags.some((t) => /runic/i.test(t))) set.add('runic_gear');
     if (tags.some((t) => /aether/i.test(t))) set.add('aether_powers');
-    if (item?.kind === 'relic' && tags.some((t) => /armor|plate|chest|head|legs/i.test(t))) {
+    if (item && rmk(item) === 'relic' && tags.some((t) => /armor|plate|chest|head|legs/i.test(t))) {
       set.add('relic_armor');
     }
   }
@@ -266,15 +270,26 @@ export function raceDamageMultiplier(
     case 'architectural_sentinel':
       return /aetheric|electrical|burn/.test(dt) ? 0.5 : 1;
     case 'mud_golem':
-      return dt === 'aetheric' ? 1 : 0.75;
+      // OTA-835 — the Mud Golem's authored aetheric WEAKNESS now bites: aetheric
+      // deals +50% (was a no-op 1×). raceDamageMultiplier can return >1 as of this
+      // OTA, so a race can finally be VULNERABLE, not just resistant. Non-aetheric
+      // stays ×0.75 (its stony hide).
+      return dt === 'aetheric' ? 1.5 : 0.75;
     default:
       return 1;
   }
 }
 
-/** Human label for the resistance that fired (for the combat log), or ''. */
+/** Human label for the racial damage interaction that fired (combat log), or ''.
+ *  OTA-835 — handles BOTH directions: a resist (<1) reads "absorbs N%"; a weakness
+ *  (>1) reads "+N% dmg". */
 export function raceResistLabel(raceId: string | undefined, mult: number): string {
-  if (mult >= 1) return '';
+  if (mult === 1) return '';
+  if (mult > 1) {
+    const pct = Math.round((mult - 1) * 100);
+    const wName = raceId === 'mud_golem' ? 'Aetherstone Vulnerability' : 'racial vulnerability';
+    return ` (${wName} — +${pct}% dmg)`;
+  }
   const pct = Math.round((1 - mult) * 100);
   const name =
     raceId === 'mud_dweller' ? 'Aetherstone Resilience'

@@ -8,17 +8,17 @@
       "factions": ["Tartarian Giants", "Tartarian Nobles"],
       "location": "Tartaria's High Council, Ural Mountains",
       "outcome": "Schism between the Giants and Nobles",
-      "summary": "Tartarian Giants refused to share Etheric secrets with the noble families. The Giants retreated into the Urals, weakening Tartaria's leadership and seeding centuries of fragility.",
+      "summary": "Tartarian Giants refused to share Aetheric secrets with the noble families. The Giants retreated into the Urals, weakening Tartaria's leadership and seeding centuries of fragility.",
       "tags": ["giants", "urals", "nobles", "schism", "etheric secrets"]
     },
     {
       "id": "etheric_conflux_war_1505",
       "year": 1505,
-      "title": "The Etheric Conflux War",
+      "title": "The Aetheric Conflux War",
       "factions": ["Tartarian Nobles", "Reclaimers", "Local Rebels"],
       "location": "Caspian Sea",
-      "outcome": "Partial collapse of the Etheric network",
-      "summary": "A critical Etheric Conflux near the Caspian malfunctioned, sending devastating surges across the empire. Rebels backed by rogue nobles tried to harness it; the network broke and regions went dark.",
+      "outcome": "Partial collapse of the Aetheric network",
+      "summary": "A critical Aetheric Conflux near the Caspian malfunctioned, sending devastating surges across the empire. Rebels backed by rogue nobles tried to harness it; the network broke and regions went dark.",
       "tags": ["caspian", "etheric conflux", "rebels", "network collapse", "decline"]
     },
     {
@@ -34,11 +34,11 @@
     {
       "id": "etheric_accords_1603",
       "year": 1603,
-      "title": "The Etheric Accords",
+      "title": "The Aetheric Accords",
       "factions": ["Tartarian Nobles", "Emerging Monarchs"],
       "location": "Urals",
-      "outcome": "Formation of the Etheric Elite",
-      "summary": "Surviving noble families signed an alliance to safeguard remaining Etheric technology. The accord laid the groundwork for the Mud Monarchs proper — power consolidated in the families that held working relics.",
+      "outcome": "Formation of the Aetheric Elite",
+      "summary": "Surviving noble families signed an alliance to safeguard remaining Aetheric technology. The accord laid the groundwork for the Mud Monarchs proper — power consolidated in the families that held working relics.",
       "tags": ["urals", "etheric elite", "accords", "nobles", "treaty"]
     },
     {
@@ -54,11 +54,11 @@
     {
       "id": "northern_plague_1682",
       "year": 1682,
-      "title": "The Northern Plague (The Etheric Rot)",
+      "title": "The Northern Plague (The Aetheric Rot)",
       "factions": ["Mud Monarchs", "Tartarian Revivalists"],
       "location": "Siberia",
       "outcome": "Widespread loss of Tartarian relics",
-      "summary": "The Etheric Rot first appeared in Siberia — a disease tied to malfunctioning relics. The Mud Monarchs tried to quarantine; Revivalists exploited the chaos. Entire underground cities were abandoned and relics lost.",
+      "summary": "The Aetheric Rot first appeared in Siberia — a disease tied to malfunctioning relics. The Mud Monarchs tried to quarantine; Revivalists exploited the chaos. Entire underground cities were abandoned and relics lost.",
       "tags": ["siberia", "etheric rot", "plague", "lost relics", "quarantine"]
     },
     {
@@ -68,7 +68,7 @@
       "factions": ["Conspiracy Architects", "Mud Monarchs"],
       "location": "Munich, Germany",
       "outcome": "Conspiracy Architects break away",
-      "summary": "A coup led by what would become the Conspiracy Architects, originally part of the Mud Monarchs, seized Etheric relics and broke away. They blamed the Monarchs for reckless misuse and built a shadow apparatus to control global knowledge.",
+      "summary": "A coup led by what would become the Conspiracy Architects, originally part of the Mud Monarchs, seized Aetheric relics and broke away. They blamed the Monarchs for reckless misuse and built a shadow apparatus to control global knowledge.",
       "tags": ["munich", "conspiracy architects", "coup", "germany", "shadow"]
     },
     {
@@ -88,7 +88,7 @@
       "factions": ["Conspiracy Architects", "Catholic Church"],
       "location": "Vatican City, Rome",
       "outcome": "Secrecy surrounding Tartarian relics tightened",
-      "summary": "The Architects, working with the Catholic Church, contained Etheric relics found in the Vatican archives. The collaboration with religious institutions began here — keeping relics hidden beneath the Vatican for centuries.",
+      "summary": "The Architects, working with the Catholic Church, contained Aetheric relics found in the Vatican archives. The collaboration with religious institutions began here — keeping relics hidden beneath the Vatican for centuries.",
       "tags": ["vatican", "rome", "catholic church", "conspiracy architects", "relic containment"]
     },
     {
@@ -108,7 +108,7 @@
       "factions": ["Forgotten Order", "Russian Government", "Mud Monarchs"],
       "location": "St. Petersburg, Russia",
       "outcome": "Forgotten Order gains critical Tartarian relics",
-      "summary": "During WWI, the Forgotten Order ran a three-day covert siege beneath St. Petersburg and emerged with key Etheric devices. The win bolstered their long-term work and deepened the rivalry with the Mud Monarchs.",
+      "summary": "During WWI, the Forgotten Order ran a three-day covert siege beneath St. Petersburg and emerged with key Aetheric devices. The win bolstered their long-term work and deepened the rivalry with the Mud Monarchs.",
       "tags": ["st petersburg", "russia", "wwi", "forgotten order", "siege"]
     },
     {
@@ -117,8 +117,8 @@
       "title": "The Manhattan Relic Scandal",
       "factions": ["Reclaimers Guild", "Conspiracy Architects", "U.S. Government"],
       "location": "Manhattan, New York",
-      "outcome": "Conspiracy Architects suppress Etheric technologies",
-      "summary": "Reclaimers found an Etheric relic beneath Manhattan during WWII. The Architects intervened, destroyed it before study, and cemented their dominance in suppressing Tartarian tech.",
+      "outcome": "Conspiracy Architects suppress Aetheric technologies",
+      "summary": "Reclaimers found an Aetheric relic beneath Manhattan during WWII. The Architects intervened, destroyed it before study, and cemented their dominance in suppressing Tartarian tech.",
       "tags": ["manhattan", "new york", "wwii", "scandal", "suppression"]
     },
     {
@@ -134,11 +134,11 @@
     {
       "id": "antarctic_expedition_1973",
       "year": 1973,
-      "title": "The Antarctic Expedition (Etheric Pulse Awakening)",
+      "title": "The Antarctic Expedition (Aetheric Pulse Awakening)",
       "factions": ["Forgotten Order", "Conspiracy Architects", "Mud Monarchs"],
       "location": "Antarctic Ice Shelf",
-      "outcome": "Discovery of an Etheric pulse",
-      "summary": "An Etheric pulse beneath the Antarctic ice triggered a covert expedition by the Forgotten Order. Mud Monarch agents sabotaged it; the Order still recovered ancient machines hinting at a global Etheric network.",
+      "outcome": "Discovery of an Aetheric pulse",
+      "summary": "An Aetheric pulse beneath the Antarctic ice triggered a covert expedition by the Forgotten Order. Mud Monarch agents sabotaged it; the Order still recovered ancient machines hinting at a global Aetheric network.",
       "tags": ["antarctic", "ice shelf", "etheric pulse", "global network", "expedition"]
     },
     {
@@ -148,7 +148,7 @@
       "factions": ["Tartarian Revivalists", "Mud Monarchs"],
       "location": "Warsaw, Poland",
       "outcome": "Collapse of a Revivalist uprising",
-      "summary": "A group claiming descent from the original Tartarian rulers launched a rebellion in Warsaw, armed with newly-found Etheric devices. The Mud Monarchs crushed it in secret; rumors of the 'Tartarian Heir' still circulate.",
+      "summary": "A group claiming descent from the original Tartarian rulers launched a rebellion in Warsaw, armed with newly-found Aetheric devices. The Mud Monarchs crushed it in secret; rumors of the 'Tartarian Heir' still circulate.",
       "tags": ["warsaw", "poland", "heir", "revivalists", "rebellion"]
     },
     {

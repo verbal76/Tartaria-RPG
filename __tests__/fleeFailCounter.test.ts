@@ -75,7 +75,8 @@ function plant(name = 'Mud Boar') {
   useGameStore.setState({
     currentScene: {
       ...scene, enemies: [enemy], enemyHps: [enemy.hp], activeEnemyIdx: 0,
-      range: 'arm', enemyAmbushUsed: [false], enemyKnockedOut: [false],
+      // OTA-550 — melee band is 'close'; 'arm' is not a CombatRange (fails enemyCanReach).
+      range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false],
     },
   });
   return enemy;

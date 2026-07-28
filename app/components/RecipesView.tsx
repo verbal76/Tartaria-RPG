@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { CraftQuantityModal } from './CraftQuantityModal';
+import { maxCraftableCount } from '../engine/crafting';
 import { RECIPES, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
 import { recipeIsUnlockedFor } from '../engine/recipeDiscovery';
 import { getItemPreview } from './itemPreview';
@@ -61,6 +63,11 @@ export interface RecipesViewProps {
    *  on every craft. Player feedback: "the crafting menu shouldn't
    *  close it should stay open for me to craft something else." */
   onAfterCraft?: (delta: InventoryDelta[]) => void;
+  /** OTA-833 — a craft that did NOTHING (gated on Cores, missing ingredients, pack
+   *  full, …) used to leave the screen silent — the player couldn't tell their tap
+   *  registered. Surface the engine's refusal narration so the screen can pop a
+   *  "not yet" modal. Not called for the substitution-confirm case (its own modal). */
+  onCraftRefused?: (message: string) => void;
   /** OTA-059 — kind filter. CRAFT tab passes 'non-consumable' to
    *  show weapons/armor/relics/gear; RECIPES tab passes 'consumable'
    *  to show stews / tinctures / draughts. Omitting the prop shows
@@ -91,6 +98,7 @@ export interface RecipesViewProps {
 // the missing-piece list for everything else so the goal is legible.
 export function RecipesView({
   onAfterCraft,
+  onCraftRefused,
   kindFilter,
   query,
   sortKey = 'ready',
@@ -98,6 +106,10 @@ export function RecipesView({
 }: RecipesViewProps) {
   const player = useGameStore((s) => s.player);
   const craftRecipe = useGameStore((s) => s.craftRecipe);
+  const craftRecipeBatch = useGameStore((s) => s.craftRecipeBatch);
+  // OTA-1006 — the recipe awaiting a COUNT. Tapping a row no longer crafts; it asks
+  // how many, then makes them all and leaves the menu open (owner's ask).
+  const [qtyFor, setQtyFor] = React.useState<Recipe | null>(null);
 
   const evaluated = useMemo(() => {
     if (!player) return [] as RecipeStatus[];
@@ -158,12 +170,37 @@ export function RecipesView({
   // craft's outcome. Empty delta means the engine refused / no-op'd
   // — caller keeps the menu open and lets the world feed surface
   // the failure narration.
-  const handleCraft = (recipe: Recipe) => {
+  // OTA-1006 — step one: ask how many. The old body (craft + diff + refusal
+  // surfacing) moves to runCraft below, which the quantity modal calls.
+  const handleCraft = (recipe: Recipe) => setQtyFor(recipe);
+
+  const runCraft = (recipe: Recipe, count: number) => {
     const preInv = (useGameStore.getState().player?.inventory ?? []).map((i) => ({ ...i }));
-    craftRecipe(recipe.result);
-    const postInv = useGameStore.getState().player?.inventory ?? [];
+    const preLogLen = useGameStore.getState().gameLog.length;
+    if (count > 1) craftRecipeBatch(recipe.result, count);
+    else craftRecipe(recipe.result);
+    const state = useGameStore.getState();
+    const postInv = state.player?.inventory ?? [];
     const delta = computeInventoryDelta(preInv, postInv);
-    onAfterCraft?.(delta);
+    if (delta.length > 0) {
+      // OTA-1006 — report the haul for the screen's transient banner. It is NOT a
+      // question any more: the crafting menu stays open until BACK.
+      onAfterCraft?.(delta);
+      return;
+    }
+    // OTA-833 — the craft produced nothing. If it raised the substitution-confirm
+    // prompt, that has its own modal — don't double up. Otherwise it was REFUSED
+    // (gated on Cores, missing ingredients, pack full, …); surface the newest
+    // refusal narration the engine logged so the screen pops a "not yet" modal
+    // instead of sitting there silently (device report: a gated craft looked like a
+    // dead tap — the player only found out by leaving the menu).
+    if (state.craftSubstitutionPrompt) return;
+    const reason = state.gameLog
+      .slice(preLogLen)
+      .filter((e) => e.channel === 'arbiter' || e.channel === 'world')
+      .map((e) => e.text)
+      .pop() ?? 'That didn’t take — check what the recipe needs and try again.';
+    onCraftRefused?.(reason);
   };
 
   const [collapsed, setCollapsed] = React.useState<Record<string, boolean>>({});
@@ -193,6 +230,8 @@ export function RecipesView({
             return (
               <TouchableOpacity
                 key={e.recipe.result}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: !e.available }}
                 style={[styles.recipeRow, !e.available && styles.recipeRowMuted]}
                 activeOpacity={e.available ? 0.7 : 1}
                 disabled={!e.available}
@@ -235,8 +274,29 @@ export function RecipesView({
                       <Text style={styles.recipeCta}>tap to craft</Text>
                     </>
                   ) : (
-                    <Text style={styles.recipeMissing}>
-                      Missing: {e.missing.map((m) => `${m.short}× ${m.name}`).join(', ')}
+                    <Text style={styles.recipeIng}>
+                      <Text style={styles.recipeIngLabel}>Needs: </Text>
+                      {/* OTA-755 — even for recipes you can't complete yet, color
+                          each ingredient you ALREADY hold green; short ones stay
+                          red with the remaining count. Lets the player see how
+                          close a blueprint is and decide whether to save toward it
+                          (mirrors the all-green line on a ready recipe). */}
+                      {e.recipe.ingredients.map((ing, idx) => {
+                        const shortEntry = e.missing.find((m) => m.name === ing.name);
+                        return (
+                          <Text key={ing.name}>
+                            <Text style={shortEntry ? styles.recipeIngShort : styles.recipeIngHave}>
+                              {ing.quantity}× {ing.name}
+                            </Text>
+                            {shortEntry ? (
+                              <Text style={styles.recipeIngShortNote}> (need {shortEntry.short} more)</Text>
+                            ) : null}
+                            {idx < e.recipe.ingredients.length - 1 ? (
+                              <Text style={styles.recipeIngLabel}>, </Text>
+                            ) : null}
+                          </Text>
+                        );
+                      })}
                     </Text>
                   )}
                 </View>
@@ -256,6 +316,15 @@ export function RecipesView({
 
   return (
     <>
+      {/* OTA-1006 — the quantity step. MAX is substitution-aware, so it never
+          promises more than the pack can actually pay for. */}
+      <CraftQuantityModal
+        visible={qtyFor !== null}
+        recipeName={qtyFor?.result ?? ''}
+        max={qtyFor ? Math.max(1, maxCraftableCount(qtyFor, player?.inventory ?? [])) : 1}
+        onCancel={() => setQtyFor(null)}
+        onConfirm={(n) => { const r = qtyFor; setQtyFor(null); if (r) runCraft(r, n); }}
+      />
       <Text style={styles.arbiterLine}>{arbiterLine}</Text>
 
       <View style={styles.countLine}>
@@ -281,6 +350,8 @@ export function RecipesView({
             return (
               <View key={g.key}>
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: !isCollapsed }}
                   style={styles.catBanner}
                   activeOpacity={0.7}
                   onPress={() => setCollapsed((c) => ({ ...c, [g.key]: !(c[g.key] ?? true) }))}
@@ -304,13 +375,13 @@ const styles = StyleSheet.create({
   countLine: { marginBottom: 8 },
   countText: { fontSize: 11, letterSpacing: 1 },
   countReady: { color: '#9ec96a', fontWeight: '700' },
-  countDim: { color: '#7a705c' },
+  countDim: { color: '#a2977b' },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 16 },
   catBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1c1813', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 10, marginBottom: 6, marginTop: 4 },
   catChevron: { color: '#cdbf99', fontSize: 12, width: 18 },
   catLabel: { color: '#cdbf99', fontSize: 12, fontWeight: '700', letterSpacing: 2, flex: 1 },
-  catCount: { color: '#7a705c', fontSize: 11 },
+  catCount: { color: '#a2977b', fontSize: 11 },
   recipeRow: {
     flexDirection: 'row',
     backgroundColor: '#13110f',
@@ -329,11 +400,13 @@ const styles = StyleSheet.create({
   recipeNameMuted: { color: '#a89a7a' },
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
-  recipeIng: { color: '#7a705c', fontSize: 11, marginTop: 4, lineHeight: 15 },
-  recipeIngLabel: { color: '#7a705c' },
+  recipeIng: { color: '#a2977b', fontSize: 11, marginTop: 4, lineHeight: 15 },
+  recipeIngLabel: { color: '#a2977b' },
   recipeIngHave: { color: '#9ec96a', fontWeight: '600' },
+  recipeIngShort: { color: '#e07a5f', fontWeight: '600' },
+  recipeIngShortNote: { color: '#a2977b' },
   recipeMissing: { color: '#e07a5f', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeCta: { color: '#9ec96a', fontSize: 10, marginTop: 6, fontStyle: 'italic', letterSpacing: 1 },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  empty: { color: '#a2977b', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
 });

@@ -234,6 +234,23 @@ function previewAccessory(x: CatalogAccessory, kind: 'Amulet' | 'Ring'): ItemPre
   return { name: x.name, kindLabel: kind, rarity: x.rarity, description: x.description, stats };
 }
 
+/** OTA-1017 — the preview promises what USE will actually deliver: the #120-scaled
+ *  heal for the live character's frame. Outside a live game (no player yet)
+ *  the flat catalog value stands. Lazy store require — gameStore imports this
+ *  module, so a static import would cycle. */
+export function effectiveHealAmount(flatHeal: number): { amount: number; scaled: boolean } {
+  let hpMax = 0;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { useGameStore } = require('../state/gameStore') as typeof import('../state/gameStore');
+    hpMax = useGameStore.getState().player?.hpMax ?? 0;
+  } catch { /* no live store (cold boot) — the flat value stands */ }
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { scaledHealHP } = require('../engine/itemEffect') as typeof import('../engine/itemEffect');
+  const amount = hpMax > 0 ? scaledHealHP(flatHeal, hpMax) : flatHeal;
+  return { amount, scaled: amount !== flatHeal };
+}
+
 function previewGear(g: CatalogGear): ItemPreview {
   const kindLabel = g.kind === 'consumable' ? 'Consumable' : g.kind === 'relic' ? 'Relic' : 'Gear';
   const stats: string[] = [];
@@ -255,7 +272,10 @@ function previewGear(g: CatalogGear): ItemPreview {
   // effect.{healHP,restoreStamina,reduceCorruption,buffStat/Bonus/Duration,cureBleed}.
   if (g.effect && g.effect.kind === 'consumable') {
     const restoreParts: string[] = [];
-    if (g.effect.healHP) restoreParts.push(`+${g.effect.healHP} HP`);
+    if (g.effect.healHP) {
+      const heal = effectiveHealAmount(g.effect.healHP);
+      restoreParts.push(`+${heal.amount} HP${heal.scaled ? ' (your frame)' : ''}`);
+    }
     if (g.effect.restoreStamina) restoreParts.push(`+${g.effect.restoreStamina} stamina`);
     if (g.effect.reduceCorruption) restoreParts.push(`−${g.effect.reduceCorruption} corruption`);
     if (g.effect.extendLight) restoreParts.push(`+${g.effect.extendLight} light`);

@@ -59,13 +59,15 @@ export function SplashOverlay() {
   const isWeb = Platform.OS === 'web';
 
   return (
-    <View style={styles.overlay} pointerEvents="auto">
+    <View style={styles.overlay} pointerEvents="auto" accessibilityViewIsModal={true}>
       <Image
         source={isWeb ? require('../../assets/splash-art-pc.png') : require('../../assets/splash-art.jpg')}
         style={isWeb
           ? StyleSheet.absoluteFillObject
           : { position: 'absolute', top: 0, left: 0, width: imgW, height: imgH }}
         resizeMode="cover"
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no-hide-descendants"
       />
       <View style={styles.barWrap}>
         <View style={styles.barTrack}>

@@ -3,6 +3,9 @@ import { WEAPONS, ARMOR, MATERIALS, GEAR, AMULETS, RINGS, DOG_GEAR, findWeaponBy
 import { inferGearTagPack } from '../engine/itemDefaults';
 import { itemIsTool } from '../engine/pouchEligibility';
 import { isQuestLockedItem } from '../engine/questItems';
+import { isWeaponCoatingItem } from '../engine/weaponCoating';
+import { itemIsThrowable } from '../engine/bandolierEligibility';
+import { canonicalItemKind, canonicalItemTags } from '../engine/crafting';
 
 export type InventoryCategory =
   | 'weapon'
@@ -84,11 +87,18 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // Quest Items section, ahead of every other bucket, regardless of their other
   // tags/kind (a Core is kind 'misc'; a whisper token also carries 'aether').
   if (isQuestLockedItem(item)) return 'quest';
+  // OTA-872 — an ordinary item the player has tapped "Save for quest" on (food,
+  // materials, loot they were told to bring for a turn-in) moves into the Quest
+  // Items section too, so it sits with the objective items and out of the way of
+  // things they'd sell or craft with. The flag also hides it from the vendor sell
+  // tab (see sellPrice.isUnsellable). It stays usable/droppable — this is a soft
+  // earmark, not the hard lock a tag-based quest item carries.
+  if (item.reservedForQuest) return 'quest';
   // engine_Dev — weapon coatings (Poison Vial / Acid Flask / Corruption Tonic +
   // any author-defined coating) carry the `weapon_coating` tag. Pull them into their
   // own Coatings section ahead of the catalog/kind heuristics, which would otherwise
   // file these (kind 'consumable') under Consumables among food and potions.
-  if (item.tags.some((t) => /^weapon_coating$/i.test(t))) return 'coating';
+  if (isWeaponCoatingItem(item)) return 'coating';
   // OTA-688 — a Crucible-fused item's KIND is authoritative (the player chose
   // weapon / armor / dog_armor at the forge and applyFusion stamped it alongside
   // uniqueStats). Trust it BEFORE the name-based catalog heuristics below, which
@@ -114,7 +124,7 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // otherwise file an Aetheric Padded Vest (carries the 'aether' tag) under Materials
   // and the plainer vests under Loot.
   if (
-    item.kind === 'dog_armor' ||
+    canonicalItemKind(item) === 'dog_armor' ||
     item.tags.some((t) => t.toLowerCase() === 'dog_armor') ||
     DOG_GEAR.some((g) => g.name.toLowerCase() === nameLower)
   ) {
@@ -141,17 +151,29 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // catalog item with kind 'misc' + 'throwable', not in the WEAPONS catalog) is a
   // WEAPON. Bucket it by the weapon tag BEFORE the tool check — otherwise its
   // name-synthesized 'aetheric' tag made isToolItem file it under Tools.
-  if (item.tags.some((t) => /^(throwable|thrown)$/i.test(t))) return 'weapon';
+  if (itemIsThrowable(item) || item.tags.some((t) => /^thrown$/i.test(t))) return 'weapon';
   // arb90 — tools before the generic gear/material buckets so utility
   // implements get their own section (and the pry bar lands there).
   if (isToolItem(item)) return 'tool';
-  // arb-fix — `wardrobe`-tagged worn apparel (the Hardened Climbing Strap)
-  // equips in the cloak slot, so it belongs under ARMOR, not the generic Loot
-  // bucket. It lives in exploration.json (kind:exploration) for its climb_steep
-  // gate, so it isn't in the ARMOR catalog above and was falling through to
-  // 'loot'. `wardrobe` is the canonical worn-not-tool tag (see pouchEligibility
-  // NON_TOOL_TAGS); the strap is currently its only holder.
-  if (item.tags.some((t) => t.toLowerCase() === 'wardrobe')) return 'armor';
+  // The Hardened Climbing Strap is worn (cloak slot, `wardrobe` tag) but it's
+  // CLIMBING GEAR, not defensive armor — it opens the climb_steep gate like a
+  // rope and carries no AC. File it under TOOLS with the other climbing
+  // implements (Climbing Rope, Reclaimer's Rope, treads, grapplers, the
+  // "Climbing Gear" item) instead of letting it masquerade as Armor. It stays
+  // worn-not-pouchable (pouchEligibility keeps `wardrobe` out of tool slots);
+  // this only changes which inventory SECTION it lists under. The name guard
+  // keeps any hypothetical future worn *armor* (wardrobe-tagged, no climb name)
+  // falling through to the armor rules below.
+  if (
+    canonicalItemTags(item).includes('wardrobe') &&
+    /climb|strap|harness/.test(nameLower)
+  ) {
+    return 'tool';
+  }
+  // arb-fix — any other `wardrobe`-tagged worn apparel equips in the cloak slot,
+  // so it belongs under ARMOR, not the generic Loot bucket. (None today; the
+  // strap above is the only wardrobe item, and it's climbing gear.)
+  if (canonicalItemTags(item).includes('wardrobe')) return 'armor';
   if (GEAR.some((g) => g.name.toLowerCase() === nameLower)) {
     const gearKind = GEAR.find((g) => g.name.toLowerCase() === nameLower)?.kind;
     if (gearKind === 'consumable') return 'consumable';
@@ -193,7 +215,7 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
 // weapon (validSlotsForItem ignores `thrown`), so it stays Materials-only.
 export function categoriesForItem(item: InventoryItem): InventoryCategory[] {
   const primary = categorizeItem(item);
-  if (primary === 'material' && (item.tags ?? []).some((t) => /^throwable$/i.test(t))) {
+  if (primary === 'material' && itemIsThrowable(item)) {
     return ['weapon', 'material'];
   }
   return [primary];

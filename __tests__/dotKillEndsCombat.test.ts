@@ -82,7 +82,7 @@ describe('OTA-429 — DOT kill of the last enemy ends combat', () => {
     expect(log).toMatch(/Mud Boar defeated/); // victory/loot fired
   });
 
-  it('leaves a mixed fight alone (one enemy still alive after a DOT kill)', async () => {
+  it('a mid-fight DOT kill resolves the corpse; the survivor keeps the fight alive', async () => {
     const store = await boot('Toxin2');
     const proto = findEnemyByName('Mud Boar')!;
     const a = JSON.parse(JSON.stringify(proto));
@@ -110,6 +110,6 @@ describe('OTA-429 — DOT kill of the last enemy ends combat', () => {
     const sc = store.getState().currentScene;
     // Still fighting B — range stays set, at least one enemy remains.
     expect(sc?.range ?? null).not.toBeNull();
-    expect((sc?.enemies.length ?? 0)).toBeGreaterThanOrEqual(1);
+    expect(sc?.enemies.length ?? 0).toBe(1); // the DOT corpse resolved out mid-fight; B remains
   });
 });

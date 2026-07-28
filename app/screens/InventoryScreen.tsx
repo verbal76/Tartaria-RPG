@@ -10,18 +10,23 @@ import {
 import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
-import { findWeaponByName, isInferredItem, isInferredInventoryItem, isFusedInventoryItem } from '../engine/crafting';
+import { findWeaponByName, isFusedInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
-import { isBandolierEligible } from '../engine/bandolierEligibility';
+import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
+import { isWeaponCoatingItem } from '../engine/weaponCoating';
+import { canonicalItemRarity, canonicalItemTags } from '../engine/crafting';
 import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
-import { fusionMaterialTags } from '../engine/itemFusion';
+import { fusionMaterialTags, isForgeReservableItem } from '../engine/itemFusion';
+import { coatingItemDrinkable } from '../engine/coatingRemedy';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
+import { wornDogVestInstanceId } from '../engine/dogCompanion';
+import { activeFetchItemNames } from '../engine/factionQuests';
 import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon, golemRepairHeal, golemSubstituteHeal } from '../engine/golems';
 import { healBatchCount, HEAL_BATCH_NOTE } from '../engine/healBatch';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -49,8 +54,8 @@ const INV_SORT_OPTIONS = [
 // only fuses non-catalog items) OR it's faction gear (a reservable catalyst).
 // Mirrors the eligibility gate in gameStore.toggleReserveForFusion exactly.
 function isFusionEligible(item: InventoryItem): boolean {
-  if ((item.tags ?? []).includes('faction_gear')) return true;
-  return isInferredItem(item.name);
+  if (canonicalItemTags(item).includes('faction_gear')) return true;
+  return isForgeReservableItem(item);
 }
 const RARITY_RANK: Record<string, number> = {
   Common: 0,
@@ -131,6 +136,7 @@ export function InventoryScreen() {
   const useInventoryItem = useGameStore((s) => s.useInventoryItem);
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
   const toggleReserveForFusion = useGameStore((s) => s.toggleReserveForFusion);
+  const toggleReserveForQuest = useGameStore((s) => s.toggleReserveForQuest);
   const applyCoating = useGameStore((s) => s.applyCoating);
   const applyCoatingToArmor = useGameStore((s) => s.applyCoatingToArmor);
   // OTA-269 — pulled in for the pouch-filter-tap stow path. Bypasses
@@ -228,8 +234,20 @@ export function InventoryScreen() {
   // the second modal lists the coatable weapons in the pack as
   // pick buttons. Cleared on apply or cancel.
   const [coatTarget, setCoatTarget] = useState<InventoryItem | null>(null);
+  // OTA-944 — a coat that would REPLACE (scrub off) an existing coating is staged here
+  // for a second, explicit confirm. Applying a coating to a weapon with no open second
+  // slot silently overwrote slot 1 on a single tap — that is how a coating "disappears".
+  const [coatReplace, setCoatReplace] = useState<
+    { coatId: string; coatName: string; weaponId: string; weaponName: string;
+      slots: Array<{ slot: 'coating' | 'coating2'; label: string }> } | null
+  >(null);
   // engine_Dev — armor-coating picker: the vial being worked into a piece of armor.
   const [armorCoatTarget, setArmorCoatTarget] = useState<InventoryItem | null>(null);
+  // OTA-945 — a FULL armor piece (all resist slots used) stages a which-resist-to-replace
+  // picker here instead of silently refusing.
+  const [armorResistReplace, setArmorResistReplace] = useState<
+    { coatId: string; coatName: string; armorId: string; armorName: string; coatType: string; resists: string[] } | null
+  >(null);
 
   if (!player) {
     return (
@@ -326,21 +344,16 @@ export function InventoryScreen() {
   // dog.equipped.vest, NOT in the player's equip slots), so it never lit the
   // EQUIPPED badge and you couldn't tell which vest was on him. Mark ONE matching
   // inventory instance equipped so the Dog Armor row reads "EQUIPPED (on <dog>)".
+  // OTA-984 — items an ACCEPTED fetch contract still wants, by exact name.
+  // Drives the context-aware "Save for quest" earmark in the item modal.
+  const activeFetchWanted = activeFetchItemNames(player.activeFactionQuests);
   const dogForVest = player.dog;
-  const dogVestName = dogForVest && dogForVest.status !== 'dead' && dogForVest.status !== 'abandoned'
-    ? dogForVest.equipped?.vest ?? null
-    : null;
-  if (dogVestName) {
-    // OTA-696 — badge the EXACT worn instance (by id) so the right piece reads
-    // "EQUIPPED (on <dog>)" when you own two same-named vests; name-fallback for
-    // legacy saves that predate vestId.
-    const vestId = dogForVest?.equipped?.vestId ?? null;
-    const vestOwner = (vestId ? player.inventory.find((it) => it.id === vestId && it.quantity > 0) : undefined)
-      ?? player.inventory.find(
-        (it) => it.kind === 'dog_armor' && it.name === dogVestName && it.quantity > 0,
-      );
-    if (vestOwner) equippedItemIds.add(vestOwner.id);
-  }
+  // OTA-979 — one shared resolver (wornDogVestInstanceId): id-first, then a
+  // name match that also accepts uniqueStats.kind === 'dog_armor' (fused
+  // vests whose stored kind drifted). Owner: "dog vests don't show which one
+  // is equipped in the inventory."
+  const wornVestId = wornDogVestInstanceId(player);
+  if (wornVestId) equippedItemIds.add(wornVestId);
 
   // arb-fix — which SLOT(s) an equipped instance occupies, so the row can show
   // "EQUIPPED (main hand)" / "(off hand)" / "(both hands)" for weapons instead
@@ -361,8 +374,10 @@ export function InventoryScreen() {
   }
   const equippedSlotLabelFor = (item: InventoryItem): string => {
     // OTA-685 — a dog vest reads "(on <dogname>)", since it's worn on the dog,
-    // not in a player slot.
-    if (item.kind === 'dog_armor' && dogVestName && item.name === dogVestName) {
+    // not in a player slot. OTA — matched by INSTANCE ID via the shared
+    // resolver (name comparison broke when a still-cooling fused vest was
+    // renamed by the settle).
+    if (wornVestId && item.id === wornVestId) {
       return dogForVest?.name ? `on ${dogForVest.name}` : 'on your dog';
     }
     let slots = equippedSlotsById.get(item.id);
@@ -378,6 +393,15 @@ export function InventoryScreen() {
     // Armor / accessory: the human slot label(s), deduped (e.g. a ring → "ring").
     const labels = [...new Set(slots.map((s) => SLOT_LABEL[s] ?? s))];
     return labels.join(' + ');
+  };
+  // OTA-1031 — the coating pickers (weapon vials AND armor vials) tag each candidate
+  // that is CURRENTLY EQUIPPED, via the same resolver as the EQUIPPED badge —
+  // one source of truth, no divergent copy. Owner: "when you are applying
+  // coatings to weapons or armor, it should show you which one you have
+  // equipped at that time."
+  const withEquippedTag = (label: string, item: InventoryItem): string => {
+    const where = equippedSlotLabelFor(item);
+    return where ? `${label} · EQUIPPED (${where})` : label;
   };
   // arb-fix — the slot an item FILLS, shown on every equippable row (esp. armor:
   // "Chest", "Head", "Feet"…) whether worn or not, so the player can see where a
@@ -400,7 +424,7 @@ export function InventoryScreen() {
     const worn = (eq as Record<string, unknown>)[slot];
     return typeof worn === 'string' && worn.length > 0;
   };
-  const POUCH_MAX = 4; // mirrors stowInPouch in gameStore
+  const POUCH_MAX = 3; // mirrors stowInPouch in gameStore (OTA-778: scanner pouch, 3 slots)
   const itemSlotTaken = (item: InventoryItem): boolean => {
     if (equippedItemIds.has(item.id)) return false;
     const slots = validSlotsForItem(item);
@@ -585,7 +609,7 @@ export function InventoryScreen() {
     // off-hand eligibility light up the USE button for throwables — otherwise a
     // regular weapon wrongly showed both "Use (off hand)" AND "Equip (Off hand)"
     // (player: "you don't use the weapon, you equip it").
-    const isThrowableItem = (pending.item.tags ?? []).some((t) => /^throwable$/i.test(t));
+    const isThrowableItem = itemIsThrowable(pending.item);
     const anySlotFree = pending.slots.some((s) => !equippedInSlots.includes(s));
     // OTA-214 — fix the redundant USE button on equip-only items.
     // Player ask: "I don't think you can have both equip and use on
@@ -598,8 +622,20 @@ export function InventoryScreen() {
     // an off-hand-eligible item that takes a use-style off-hand
     // equip. Pure-armor / pure-weapon (no effect, equippable) gets
     // the dedicated Equip button only.
-    const useIsRealAction = isConsumable || hasEffect || (offEligible && isThrowableItem);
-    if (useIsRealAction) {
+    // OTA-765 — a coat-only coating (acid: no player ailment to counter) shows no
+    // Use/Drink button; the "Coat a weapon" / "Coat armor" buttons below still appear.
+    // OTA-991 — the Skyreacher Maps get a dedicated, always-on Use button. The
+    // owner bought one on-device and "there's no use button" — the generic gate
+    // above resolves the item's effect through three catalog lookups inside the
+    // render path, so any resolution hiccup silently eats the button. The maps
+    // are too important for that: match on the name and wire Use directly.
+    // (Legacy 'Skyreacher Chart' names are renamed on load, but match them too.)
+    const isSkyMap = /^Skyreacher (Map|Chart)\b/.test(pending.item.name);
+    const useIsRealAction = (isConsumable || hasEffect || (offEligible && isThrowableItem)) && coatingItemDrinkable(pending.item);
+    if (isSkyMap) {
+      buttons.push({ label: 'Use — add the location to your MAP', onPress: doUse, tone: 'primary' });
+    }
+    if (useIsRealAction && !isSkyMap) {
       // arb106 — show YOUR current HP on the eat/drink button so you can see at a
       // glance whether you actually need it (player ask).
       const hpTag = isConsumable && player ? `  ${player.hp}/${player.hpMax}` : '';
@@ -617,17 +653,48 @@ export function InventoryScreen() {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { findGearByName, findExplorationItemByName, findMaterialByName } = require('../engine/crafting');
       const fx = resolveItemEffect(pending.item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
-      return fx?.kind === 'consumable' ? (fx.healHP ?? 0) : 0;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { scaledHealHP: shp } = require('../engine/itemEffect') as typeof import('../engine/itemEffect');
+      return fx?.kind === 'consumable' ? shp(fx.healHP ?? 0, player?.hpMax ?? 0) : 0; // OTA-1001 — #120
     })() : 0;
     const stackQty = pending.item.quantity;
-    // Self "Use Max": the most that fit under your max HP without overhealing.
+    // Self batch-heal. Two offers:
+    //   • "Heal to full" (OTA — player ask: "the first aid kit doesn't have a heal
+    //     max option"). Uses ceil(gap / perItem) kits — the fewest that reach max HP,
+    //     accepting a little overheal-waste on the LAST kit. A single "Use" already
+    //     tops you off when the gap is smaller than one kit, so this only surfaces
+    //     when it takes 2+ kits to reach full (i.e. a real one-tap saver), and only
+    //     when the pack actually holds enough to get there.
+    //   • "Use Max (no waste)" — the most that fit UNDER max with zero waste
+    //     (floor). Kept as a secondary, de-emphasised option, and only shown when
+    //     it's a genuinely different, smaller count than the top-off (the gap isn't
+    //     an exact multiple of the per-kit heal).
     if (isConsumable && perItemHP > 0 && player && player.hp < player.hpMax) {
-      const n = healBatchCount(perItemHP, player.hpMax - player.hp, stackQty);
-      if (n >= 2) {
-        const to = Math.min(player.hpMax, player.hp + perItemHP * n);
+      const hpGap = player.hpMax - player.hp;
+      const toFull = Math.min(stackQty, Math.ceil(hpGap / perItemHP));
+      const noWaste = healBatchCount(perItemHP, hpGap, stackQty);
+      const reachesFull = perItemHP * toFull >= hpGap;
+      if (toFull >= 2 && reachesFull) {
         buttons.push({
-          label: `Use Max ×${n} → ${to}/${player.hpMax} (no waste)`,
-          onPress: () => { useHealBatch(pending.item.name, 'self', n); closeModal(); },
+          label: `Heal to full ×${toFull} → ${player.hpMax}/${player.hpMax}`,
+          onPress: () => { useHealBatch(pending.item.name, 'self', toFull); closeModal(); },
+          tone: 'primary',
+        });
+        if (noWaste >= 2 && noWaste < toFull) {
+          const to = player.hp + perItemHP * noWaste;
+          buttons.push({
+            label: `Use Max ×${noWaste} → ${to}/${player.hpMax} (no waste)`,
+            onPress: () => { useHealBatch(pending.item.name, 'self', noWaste); closeModal(); },
+            tone: 'neutral',
+          });
+        }
+      } else if (noWaste >= 2) {
+        // Can't reach full (not enough kits, or one kit already tops you off) —
+        // fall back to the original no-waste bulk-use offer.
+        const to = Math.min(player.hpMax, player.hp + perItemHP * noWaste);
+        buttons.push({
+          label: `Use Max ×${noWaste} → ${to}/${player.hpMax} (no waste)`,
+          onPress: () => { useHealBatch(pending.item.name, 'self', noWaste); closeModal(); },
           tone: 'primary',
         });
       }
@@ -639,7 +706,31 @@ export function InventoryScreen() {
     const dogActive = !!player?.dog
       && player.dog.status !== 'abandoned'
       && player.dog.status !== 'dead';
-    if (dogActive && pending.item.kind === 'dog_armor') {
+    const pendingIsDogArmor = pending.item.kind === 'dog_armor'
+      || pending.item.uniqueStats?.kind === 'dog_armor';
+    // OTA-979 — the details modal now SAYS when this exact vest is the one the
+    // dog is wearing, and offers to take it off — before this, every vest
+    // read the same "Equip on dog", so you couldn't tell them apart here.
+    if (dogActive && pendingIsDogArmor && wornVestId && pending.item.id === wornVestId) {
+      buttons.push({
+        label: `Unequip (worn by ${player?.dog?.name ?? 'your dog'})`,
+        onPress: () => {
+          const pDog = useGameStore.getState().player;
+          if (!pDog?.dog) { closeModal(); return; }
+          useGameStore.setState((s) => s.player && s.player.dog
+            ? {
+                player: {
+                  ...s.player,
+                  dog: { ...s.player.dog, equipped: { vest: null, vestId: null } },
+                },
+              }
+            : s);
+          useGameStore.getState().appendLog('world', `You unbuckle the ${pending.item.name} from ${pDog.dog.name}.`);
+          closeModal();
+        },
+        tone: 'neutral',
+      });
+    } else if (dogActive && pendingIsDogArmor) {
       buttons.push({
         label: 'Equip on dog',
         onPress: () => {
@@ -726,7 +817,7 @@ export function InventoryScreen() {
         if (!full) {
           const golemPer = isGolemRepairPart(golem.kind, pending.item.name)
             ? golemRepairHeal(golem.kind)
-            : golemSubstituteHeal(golem.kind, pending.item.rarity);
+            : golemSubstituteHeal(golem.kind, canonicalItemRarity(pending.item));
           const n = healBatchCount(golemPer, golem.hpMax - golem.hp, stackQty);
           if (n >= 2) {
             buttons.push({
@@ -758,7 +849,7 @@ export function InventoryScreen() {
     // aren't drunk: they paint onto a chosen weapon instance. Opening
     // the picker stashes the coating item in coatTarget; the second
     // modal lists the coatable weapons in the pack.
-    if ((pending.item.tags ?? []).includes('weapon_coating')) {
+    if (isWeaponCoatingItem(pending.item)) {
       buttons.push({
         label: 'Coat a weapon',
         onPress: () => {
@@ -785,15 +876,30 @@ export function InventoryScreen() {
         } catch { /* fall through to tag */ }
         return (pending.item.tags ?? []).find((t) => ['poison', 'acid', 'corruption', 'electrical', 'burn'].includes(t));
       })();
-      buttons.push({
-        label: armorCoatType ? `Apply to armor (+${armorCoatType} resist)` : 'Apply to armor',
-        onPress: () => {
-          const coat = pending.item;
-          closeModal();
-          setArmorCoatTarget(coat);
-        },
-        tone: 'primary',
-      });
+      // OTA-873 — only offer "Apply to armor" when the coating's type is one armor can
+      // actually resist (an incoming damage type). acid / corruption are offensive-only
+      // DOT families — no enemy deals them, so a resist against them is inert; hide the
+      // button for those so a vial isn't wasted. Unknown types still show it (the store
+      // action guards them).
+      const canArmorCoat = (() => {
+        if (!armorCoatType) return true;
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { isResistableIncomingType } = require('../engine/damageTypes') as typeof import('../engine/damageTypes');
+          return isResistableIncomingType(armorCoatType);
+        } catch { return true; }
+      })();
+      if (canArmorCoat) {
+        buttons.push({
+          label: armorCoatType ? `Apply to armor (+${armorCoatType} resist)` : 'Apply to armor',
+          onPress: () => {
+            const coat = pending.item;
+            closeModal();
+            setArmorCoatTarget(coat);
+          },
+          tone: 'primary',
+        });
+      }
     }
     // SCRAP — only for built items with material content. Hidden for
     // raw stock (already material) and for items currently equipped
@@ -829,12 +935,19 @@ export function InventoryScreen() {
     // arb105 — faction-gear items can ALSO be reserved, as a fusion
     // CATALYST: reserving one themes the next Crucible output into a
     // unique faction item (it doesn't count toward the 3-scrap gate).
-    const isFactionCatalyst = (pending.item.tags ?? []).includes('faction_gear');
-    if (isInferredInventoryItem(pending.item) || isFactionCatalyst) {
+    const isFactionCatalyst = canonicalItemTags(pending.item).includes('faction_gear');
+    // OTA-756 — show the reserve toggle when the item is forge-reservable (2a: no
+    // weapons/armor; 1a: 'loot' reagents included) OR it's already reserved (so a
+    // piece stranded by the new rule can still be released) OR it's a faction catalyst.
+    const alreadyReserved = pending.item.reservedForFusion === true;
+    if (isForgeReservableItem(pending.item) || alreadyReserved || isFactionCatalyst) {
       const reserved = pending.item.reservedForFusion === true;
+      const stackQty = pending.item.quantity ?? 1;
       const label = isFactionCatalyst
         ? (reserved ? '♥ Reserved as faction catalyst' : '♡ Save as faction catalyst')
-        : (reserved ? '♥ Reserved for fusion' : '♡ Save for fusion');
+        : reserved
+          ? (stackQty > 1 ? '♥ Free 1 from fusion' : '♥ Reserved for fusion')
+          : (stackQty > 1 ? '♡ Save 1 for fusion' : '♡ Save for fusion');
       buttons.push({
         label,
         onPress: () => {
@@ -843,6 +956,50 @@ export function InventoryScreen() {
         },
         tone: 'neutral',
       });
+      // OTA-968 — whole-stack reserve in ONE tap. Owner: reserving a x5 stack meant
+      // reopening this modal five times, one peel per tap. "Save all xN" (and its
+      // "Free all" mirror) moves the entire stack across the boundary at once;
+      // the single-unit button stays for partial counts. Catalysts stay 1-at-a-time
+      // (one catalyst themes one fuse).
+      if (stackQty > 1 && !isFactionCatalyst) {
+        buttons.push({
+          label: reserved ? `♥ Free all ×${stackQty}` : `♡ Save all ×${stackQty} for fusion`,
+          onPress: () => {
+            toggleReserveForFusion(pending.item.id, stackQty);
+            closeModal();
+          },
+          tone: 'neutral',
+        });
+      }
+    }
+    // OTA-872 — SAVE FOR QUEST. A soft earmark for an ordinary item (food,
+    // materials, loot) the player was told to bring for a turn-in. Sets
+    // reservedForQuest: the item moves to the Quest Items section and drops out of
+    // the vendor sell tab, but stays usable/droppable (unlike a hard tag-locked
+    // quest item, which returns a view-only modal above and never reaches here).
+    // Hidden while the item is reserved for fusion — the two earmarks are mutually
+    // exclusive (an item can't be both Crucible fodder and a quest hand-in). The
+    // player releases the fusion reserve first, then can save it for a quest.
+    if (!pending.item.reservedForFusion) {
+      const savedForQuest = pending.item.reservedForQuest === true;
+      // OTA-984 — CONTEXT-AWARE earmark (owner: "I would only like it to say save
+      // for quest when you actually have an active quest that needs them").
+      // The button now shows only when an accepted fetch contract names this
+      // exact item — the "gather N, bring them back" case the earmark was
+      // invented for. Specific objective items hard-lock automatically and
+      // never need it. An already-flagged item ALWAYS shows the release
+      // button, so a stale earmark can be cleared after the quest resolves.
+      const questWantsIt = activeFetchWanted.has(pending.item.name.toLowerCase());
+      if (savedForQuest || questWantsIt) {
+        buttons.push({
+          label: savedForQuest ? '⚑ Saved for quest' : '⚐ Save for quest',
+          onPress: () => {
+            toggleReserveForQuest(pending.item.id);
+            closeModal();
+          },
+          tone: 'neutral',
+        });
+      }
     }
     // DROP — always available unless the item is currently equipped.
     // Drop handler in the engine also refuses equipped items, but
@@ -869,16 +1026,20 @@ export function InventoryScreen() {
     catch { modalPreview = null; }
   }
   const modalBody = pending && isQuestLockedItem(pending.item)
-    ? 'Reserved for your objective — this stays in your pack until you turn it in. It can\'t be dropped, scrapped, sold, gifted, or fused.'
-    : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
-      ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
-      : undefined;
-  // OTA — fusion info block: for a fusable/reservable item, name the material it
+    ? 'Reserved for your objective — this stays in your pack until you turn it in. It can\'t be dropped, scrapped, sold, or fused.'
+    // OTA-872 — a soft "Save for quest" earmark: explain that it's out of the sell
+    // tab and filed under Quest Items, but still yours to use or drop.
+    : pending && pending.item.reservedForQuest
+      ? 'Saved for a quest — filed under Quest Items and hidden from vendor sell lists so you don\'t sell it by accident. You can still use or drop it, or tap "Saved for quest" to release it.'
+      : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
+        ? 'This item cannot be equipped, but you can still keep, sell, or use it.'
+        : undefined;
+  // OTA-968 — fusion info block: for a fusable/reservable item, name the material it
   // contributes and how diversity drives output rarity (a common playtest question:
   // "does what I put in change the quality?" — yes: DIFFERENT materials, not rarity).
-  const fusionHint = pending && (isInferredInventoryItem(pending.item) || (pending.item.tags ?? []).includes('faction_gear'))
+  const fusionHint = pending && (isForgeReservableItem(pending.item) || canonicalItemTags(pending.item).includes('faction_gear'))
     ? (() => {
-        if ((pending.item.tags ?? []).includes('faction_gear')) {
+        if (canonicalItemTags(pending.item).includes('faction_gear')) {
           return 'Fusion: a faction catalyst — themes the Crucible\'s output (a separate slot; doesn\'t count toward the 3–5 materials).';
         }
         const mats = fusionMaterialTags(pending.item);
@@ -924,7 +1085,7 @@ export function InventoryScreen() {
   if (coatTarget) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { isCoatableItem, coatedDisplayName } = require('../engine/weaponCoating');
+      const { isCoatableItem, coatedDisplayName, nextCoatSlot } = require('../engine/weaponCoating');
       const coatable = (player.inventory ?? []).filter(
         // OTA-453 — instance-aware so FUSED weapons (catalog-absent) are listed.
         (i: InventoryItem) => isCoatableItem(i),
@@ -933,16 +1094,41 @@ export function InventoryScreen() {
         coatPickerBody = 'Nothing in your pack can hold this coating. A coating needs an edge or a point to carry it — a blade, an arrow-arm, or a bolt-caster.';
       } else {
         coatPickerBody = `Paint the ${coatTarget.name.toLowerCase()} onto which weapon? It stays on until the weapon breaks (a repair won't scrub it off).`;
-        coatPickerButtons = coatable.map((w: InventoryItem) => ({
-          label: w.coating
-            ? `${coatedDisplayName(w)} — replaces ${w.coating.label.toLowerCase()}`
-            : w.name,
-          onPress: () => {
-            applyCoating(coatTarget.id, w.id);
-            setCoatTarget(null);
-          },
-          tone: 'primary' as const,
-        }));
+        coatPickerButtons = coatable.map((w: InventoryItem) => {
+          // OTA-873 — dual-slot aware label: an upgraded weapon with an open 2nd slot
+          // ADDS a coating; a full weapon REPLACES slot 1; a bare one just coats.
+          const slot: 'coating' | 'coating2' | 'replace' = nextCoatSlot(w);
+          const label = slot === 'coating2'
+            ? `${coatedDisplayName(w)} — adds 2nd coat`
+            : slot === 'replace'
+              ? `${coatedDisplayName(w)} — replaces ${w.coating!.label.toLowerCase()}`
+              : w.name;
+          const isReplace = slot === 'replace';
+          return {
+            label: withEquippedTag(label, w),
+            onPress: () => {
+              if (isReplace) {
+                // OTA-944/945 — never scrub off a coating on one tap. Stage a picker of
+                // the filled slots so the player chooses WHICH coating to replace.
+                const filled: Array<{ slot: 'coating' | 'coating2'; label: string }> = [];
+                if (w.coating) filled.push({ slot: 'coating', label: w.coating.label });
+                if (w.coating2) filled.push({ slot: 'coating2', label: w.coating2.label });
+                setCoatReplace({
+                  coatId: coatTarget.id,
+                  coatName: coatTarget.name,
+                  weaponId: w.id,
+                  weaponName: w.name,
+                  slots: filled,
+                });
+                setCoatTarget(null);
+                return;
+              }
+              applyCoating(coatTarget.id, w.id);
+              setCoatTarget(null);
+            },
+            tone: isReplace ? ('destructive' as const) : ('primary' as const),
+          };
+        });
       }
     } catch {
       coatPickerBody = 'Could not read your weapons just now.';
@@ -975,16 +1161,41 @@ export function InventoryScreen() {
         armorPickerBody = 'You have no armor to work the vial into. Pick up a piece first.';
       } else {
         armorPickerBody = `Work the ${armorCoatTarget.name.toLowerCase()} into which armor? It gains permanent ${coatType} resist until the piece is lost or destroyed.`;
-        armorPickerButtons = armorItems.map((a: InventoryItem) => ({
-          label: (a.addedResists ?? []).map((r) => r.toLowerCase()).includes(coatType.toLowerCase())
-            ? `${a.name} — already resists ${coatType}`
-            : `${a.name}${(a.addedResists ?? []).length ? ` (+${(a.addedResists ?? []).join('/')})` : ''}`,
-          onPress: () => {
-            applyCoatingToArmor(armorCoatTarget.id, a.id);
-            setArmorCoatTarget(null);
-          },
-          tone: 'primary' as const,
-        }));
+        armorPickerButtons = armorItems.map((a: InventoryItem) => {
+          const arList = a.addedResists ?? [];
+          const alreadyType = arList.map((r) => r.toLowerCase()).includes(coatType.toLowerCase());
+          // OTA-945 — mirror the store's cap: base 3 + the Crucible resistCapBonus.
+          const arCap = 3 + (a.resistCapBonus ?? 0);
+          const atCap = arList.length >= arCap;
+          return {
+            label: withEquippedTag(
+              alreadyType
+                ? `${a.name} — already resists ${coatType}`
+                : atCap
+                  ? `${a.name} — full (${arList.join('/')}) · replace one`
+                  : `${a.name}${arList.length ? ` (+${arList.join('/')})` : ''}`,
+              a,
+            ),
+            onPress: () => {
+              if (!alreadyType && atCap) {
+                // OTA-945 — full piece: pick which resist to strip instead of refusing.
+                setArmorResistReplace({
+                  coatId: armorCoatTarget.id,
+                  coatName: armorCoatTarget.name,
+                  armorId: a.id,
+                  armorName: a.name,
+                  coatType,
+                  resists: arList,
+                });
+                setArmorCoatTarget(null);
+                return;
+              }
+              applyCoatingToArmor(armorCoatTarget.id, a.id);
+              setArmorCoatTarget(null);
+            },
+            tone: !alreadyType && atCap ? ('destructive' as const) : ('primary' as const),
+          };
+        });
       }
     } catch {
       armorPickerBody = 'Could not read your armor just now.';
@@ -1035,10 +1246,11 @@ export function InventoryScreen() {
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>INVENTORY</Text>
+        <Text style={styles.title} accessibilityRole="header">INVENTORY</Text>
       </View>
 
       <Text style={styles.tc}>TC: {player.tc}</Text>
@@ -1076,7 +1288,7 @@ export function InventoryScreen() {
             <Text style={styles.pouchFilterText}>
               Tap a throwable below to rack it on your bandolier.
             </Text>
-            <TouchableOpacity onPress={() => setBandolierFilterActive(false)} style={styles.pouchFilterCancel}>
+            <TouchableOpacity onPress={() => setBandolierFilterActive(false)} style={styles.pouchFilterCancel} accessibilityRole="button">
               <Text style={styles.pouchFilterCancelText}>CANCEL</Text>
             </TouchableOpacity>
           </View>
@@ -1090,7 +1302,7 @@ export function InventoryScreen() {
             <Text style={styles.pouchFilterText}>
               Tap a tool below to stow it on your belt.
             </Text>
-            <TouchableOpacity onPress={() => setPouchFilterActive(false)} style={styles.pouchFilterCancel}>
+            <TouchableOpacity onPress={() => setPouchFilterActive(false)} style={styles.pouchFilterCancel} accessibilityRole="button">
               <Text style={styles.pouchFilterCancelText}>CANCEL</Text>
             </TouchableOpacity>
           </View>
@@ -1112,6 +1324,8 @@ export function InventoryScreen() {
                 style={[styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }]}
                 activeOpacity={0.7}
                 onPress={() => setCollapsedSections((s) => ({ ...s, [cat]: !(s[cat] ?? true) }))}
+                accessibilityRole="button"
+                accessibilityState={{ expanded: !collapsed }}
               >
                 <View style={styles.sectionHeaderLeft}>
                   <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>
@@ -1221,6 +1435,36 @@ export function InventoryScreen() {
         buttons={coatPickerButtons}
         onRequestClose={() => setCoatTarget(null)}
       />
+      {/* OTA-944/945 — every coating slot is full. Ask WHICH coating to scrub off and
+          replace (a picker), so one is never blindly overwritten. A single-slot weapon
+          shows exactly one option (its lone coating). */}
+      <BrandedModal
+        visible={coatReplace !== null}
+        title={coatReplace
+          ? (coatReplace.slots.length > 1
+              ? 'All coating slots are full'
+              : `Replace the ${(coatReplace.slots[0]?.label ?? '').toLowerCase()} coating?`)
+          : ''}
+        body={coatReplace
+          ? (coatReplace.slots.length > 1
+              ? `The ${coatReplace.weaponName} already carries ${coatReplace.slots.map((sl) => sl.label.toLowerCase()).join(' + ')} and every slot is full. Pick which coating to scrub off and replace with the ${coatReplace.coatName.toLowerCase()}.`
+              : `The ${coatReplace.weaponName} already carries a ${(coatReplace.slots[0]?.label ?? '').toLowerCase()} coating and has no open second slot, so working the ${coatReplace.coatName.toLowerCase()} in will scrub the ${(coatReplace.slots[0]?.label ?? '').toLowerCase()} off for good. Crucible-upgrade the weapon first if you want it to carry more than one coating.`)
+          : undefined}
+        buttons={coatReplace
+          ? [
+              ...coatReplace.slots.map((sl) => ({
+                label: `Scrub off ${sl.label} & replace`,
+                onPress: () => {
+                  applyCoating(coatReplace.coatId, coatReplace.weaponId, sl.slot);
+                  setCoatReplace(null);
+                },
+                tone: 'destructive' as const,
+              })),
+              { label: 'Cancel', onPress: () => setCoatReplace(null), tone: 'neutral' as const },
+            ]
+          : []}
+        onRequestClose={() => setCoatReplace(null)}
+      />
       {/* engine_Dev — armor-coating picker: works a vial's resist into a piece. */}
       <BrandedModal
         visible={armorCoatTarget !== null}
@@ -1228,6 +1472,29 @@ export function InventoryScreen() {
         body={armorPickerBody}
         buttons={armorPickerButtons}
         onRequestClose={() => setArmorCoatTarget(null)}
+      />
+      {/* OTA-945 — the armor piece is FULL. Ask which worked-in resist to strip so the
+          new one can take its place, rather than silently refusing. */}
+      <BrandedModal
+        visible={armorResistReplace !== null}
+        title={armorResistReplace ? `${armorResistReplace.armorName} is full — replace which resist?` : ''}
+        body={armorResistReplace
+          ? `The ${armorResistReplace.armorName} already turns aside ${armorResistReplace.resists.join(', ')} and every slot is worked. Pick which resist to strip so it can take ${armorResistReplace.coatType} instead. Crucible-upgrade the piece to hold one more.`
+          : undefined}
+        buttons={armorResistReplace
+          ? [
+              ...armorResistReplace.resists.map((r) => ({
+                label: `Strip ${r} & take ${armorResistReplace.coatType}`,
+                onPress: () => {
+                  applyCoatingToArmor(armorResistReplace.coatId, armorResistReplace.armorId, r);
+                  setArmorResistReplace(null);
+                },
+                tone: 'destructive' as const,
+              })),
+              { label: 'Cancel', onPress: () => setArmorResistReplace(null), tone: 'neutral' as const },
+            ]
+          : []}
+        onRequestClose={() => setArmorResistReplace(null)}
       />
     </View>
   );
@@ -1255,7 +1522,7 @@ function ToolPouchBanner({
   pouchFilterActive: boolean;
   onTapEmptySlot: () => void;
 }) {
-  const POUCH_MAX = 4;
+  const POUCH_MAX = 3;
   const pouchIds = player.equipped?.toolPouchIds ?? [];
   const unpouchItem = useGameStore((s) => s.unpouchItem);
   const slots: Array<{ name: string | null; id: string | null }> = [];
@@ -1266,8 +1533,8 @@ function ToolPouchBanner({
   }
   return (
     <View style={pouchStyles.banner}>
-      <Text style={pouchStyles.title}>TOOL POUCH</Text>
-      <Text style={pouchStyles.hint}>Ready-to-use tools (4 slots). Tap an empty slot to stow from your pack.</Text>
+      <Text style={pouchStyles.title}>SCANNER POUCH</Text>
+      <Text style={pouchStyles.hint}>Scanners run whenever you search (3 slots). Tap an empty slot to stow one from your pack.</Text>
       <View style={pouchStyles.row}>
         {slots.map((slot, idx) => (
           <View key={idx} style={pouchStyles.slot}>
@@ -1276,6 +1543,7 @@ function ToolPouchBanner({
                 style={pouchStyles.slotFilled}
                 activeOpacity={0.7}
                 onPress={() => unpouchItem(slot.name!, slot.id ?? undefined)}
+                accessibilityRole="button"
               >
                 <Text style={pouchStyles.slotName} numberOfLines={1}>{slot.name}</Text>
                 <Text style={pouchStyles.slotAction}>tap to unstow</Text>
@@ -1288,6 +1556,7 @@ function ToolPouchBanner({
                 ]}
                 activeOpacity={0.7}
                 onPress={onTapEmptySlot}
+                accessibilityRole="button"
               >
                 <Text style={[
                   pouchStyles.slotEmptyText,
@@ -1315,7 +1584,7 @@ const pouchStyles = StyleSheet.create({
     borderRadius: 4,
   },
   title: { color: '#c9a86a', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
-  hint: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
+  hint: { color: '#a2977b', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
   row: { flexDirection: 'row', gap: 6 },
   slot: { flex: 1 },
   slotFilled: {
@@ -1346,7 +1615,7 @@ const pouchStyles = StyleSheet.create({
     borderColor: '#c9a86a',
   },
   slotName: { color: '#e6d8b3', fontSize: 11, fontWeight: '700' },
-  slotAction: { color: '#7a705c', fontSize: 9, marginTop: 2 },
+  slotAction: { color: '#a2977b', fontSize: 9, marginTop: 2 },
   slotEmptyText: { color: '#9ec96a', fontSize: 10, fontWeight: '600', letterSpacing: 0.5 },
   slotEmptyTextActive: { color: '#c9a86a' },
 });
@@ -1384,6 +1653,7 @@ function BandolierBanner({
                 style={bandolierStyles.slotFilled}
                 activeOpacity={0.7}
                 onPress={() => removeFromBandolier(slot.name!, slot.id ?? undefined)}
+                accessibilityRole="button"
               >
                 <Text style={bandolierStyles.slotName} numberOfLines={1}>
                   {slot.name}{slot.qty > 1 ? ` ×${slot.qty}` : ''}
@@ -1395,6 +1665,7 @@ function BandolierBanner({
                 style={[bandolierStyles.slotEmpty, filterActive && bandolierStyles.slotEmptyActive]}
                 activeOpacity={0.7}
                 onPress={onTapEmptySlot}
+                accessibilityRole="button"
               >
                 <Text style={[bandolierStyles.slotEmptyText, filterActive && bandolierStyles.slotEmptyTextActive]}>
                   {filterActive ? 'pick a throwable ↓' : '+ rack throw'}
@@ -1419,7 +1690,7 @@ const bandolierStyles = StyleSheet.create({
     borderRadius: 4,
   },
   title: { color: '#e07a5f', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
-  hint: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
+  hint: { color: '#a2977b', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
   row: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   slot: { flexBasis: '18%', flexGrow: 1 },
   slotFilled: {
@@ -1441,7 +1712,7 @@ const bandolierStyles = StyleSheet.create({
   },
   slotEmptyActive: { backgroundColor: '#2a1a14', borderColor: '#e07a5f' },
   slotName: { color: '#e6d8b3', fontSize: 10, fontWeight: '700' },
-  slotAction: { color: '#7a705c', fontSize: 8, marginTop: 2 },
+  slotAction: { color: '#a2977b', fontSize: 8, marginTop: 2 },
   slotEmptyText: { color: '#9ec96a', fontSize: 9, fontWeight: '600', letterSpacing: 0.3, textAlign: 'center' },
   slotEmptyTextActive: { color: '#e07a5f' },
 });
@@ -1524,6 +1795,7 @@ function ItemRow({
       style={[styles.row, highlight && styles.rowHighlighted]}
       onPress={onPress}
       activeOpacity={0.7}
+      accessibilityRole="button"
     >
       {/* OTA-485 — faint diagonal hatching behind the row for companion-edible/
           usable items. Rendered FIRST so it sits behind the rarity stripe + the
@@ -1559,14 +1831,17 @@ function ItemRow({
               this is their own mark. */}
           {isFusedInventoryItem(item) ? (
             <Text style={[styles.rowFusedMark, { color: rarityHexColor(item.rarity) }]}>❖ </Text>
-          ) : isInferredInventoryItem(item) ? (
+          ) : isForgeReservableItem(item) ? (
             <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
           ) : null}
           <Text style={styles.rowName} numberOfLines={1}>
             {/* OTA-360 — a coated weapon shows its coated name
                 ("Corrupted Battle Axe"); the underlying name is
-                unchanged for stat lookup. */}
-            {item.coating ? `${item.coating.label} ${item.name}` : item.name}
+                unchanged for stat lookup. OTA-873 — a dual-coat weapon
+                shows both adjectives ("Corrupted Venomous Battle Axe"). */}
+            {[item.coating?.label, item.coating2?.label].filter(Boolean).length
+              ? `${[item.coating?.label, item.coating2?.label].filter(Boolean).join(' ')} ${item.name}`
+              : item.name}
           </Text>
           <Text style={styles.rowQty}>×{item.quantity}</Text>
         </View>
@@ -1577,9 +1852,13 @@ function ItemRow({
               rarity / dog tags. No marker when un-reserved so the row
               isn't noisy for the catalog majority. */}
           {item.reservedForFusion && <Text style={[styles.rowMeta, styles.rowReserved]}>♥</Text>}
+          {/* OTA-872 — pennant marker on items the player has saved for a quest
+              turn-in (soft earmark; hidden from the sell tab). Gold to match the
+              Quest Items section colour. */}
+          {item.reservedForQuest && <Text style={[styles.rowMeta, styles.rowQuestSaved]}>⚑</Text>}
           {/* arb58 — mark items currently stowed in the tool pouch so the
               player can see at a glance which pack items are pouched. */}
-          {isPouched && <Text style={[styles.rowMeta, styles.rowPouch]}>[tool pouch]</Text>}
+          {isPouched && <Text style={[styles.rowMeta, styles.rowPouch]}>[scanner pouch]</Text>}
           {isBandoliered && <Text style={[styles.rowMeta, styles.rowBandolier]}>[bandolier]</Text>}
           {fitsDog && <Text style={[styles.rowMeta, styles.rowDogTag]}>[fits dog]</Text>}
           {isTreat && <Text style={[styles.rowMeta, styles.rowDogTag]}>[treat]</Text>}
@@ -1754,7 +2033,7 @@ const styles = StyleSheet.create({
   rowFusedMark: { fontSize: 12, fontWeight: '700' },
   rowQty: { color: '#cdbf99', fontSize: 12 },
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
-  rowMeta: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
+  rowMeta: { color: '#a2977b', fontSize: 10, letterSpacing: 1 },
   // arb87 — per-item stat line (AC / resists / bonuses / restores).
   rowStat: { color: '#bfa86a', fontSize: 11, marginTop: 3 },
   // arb87 — "slot already worn" red ✗ (combat-miss red).
@@ -1769,14 +2048,15 @@ const styles = StyleSheet.create({
   // stand out from the grey rarity / durability metadata.
   rowDogTag: { color: '#c9a86a', fontWeight: '700' },
   rowReserved: { color: '#d97a7a', fontWeight: '700' },
+  rowQuestSaved: { color: '#d9c34a', fontWeight: '700' }, // gold — matches Quest Items section
   // OTA-360 — weapon-coating chip. Sickly green-violet so it reads as
   // an applied toxin distinct from the green damage-dice chip.
   rowCoating: { color: '#b08fd4', fontWeight: '700' },
   rowPouch: { color: '#c9a86a', fontWeight: '700' },
   rowBandolier: { color: '#e07a5f', fontWeight: '700' },
   rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },
+  rowEquippable: { color: '#a2977b', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
+  empty: { color: '#a2977b', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },
   // OTA-269 — callout shown above the inventory list when the player
   // has tapped an empty pouch slot. Tan accent bar + CANCEL chip so
   // the player always has a clear exit from the filter mode.
@@ -1812,6 +2092,6 @@ const styles = StyleSheet.create({
   },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   legendSwatch: { width: 10, height: 10, borderRadius: 2 },
-  legendText: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  legendText: { color: '#a2977b', fontSize: 10, letterSpacing: 1 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
 });

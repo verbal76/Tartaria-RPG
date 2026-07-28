@@ -57,11 +57,11 @@ export function MissionBoardModal({ visible, onClose }: Props) {
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.scrim}>
+      <TouchableWithoutFeedback onPress={onClose} accessibilityRole="button" accessibilityLabel="Close">
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>⚑ {factionLabel.toUpperCase()} MISSION BOARD</Text>
+              <Text style={styles.title} accessibilityRole="header">⚑ {factionLabel.toUpperCase()} MISSION BOARD</Text>
               <View style={styles.rule} />
               {postings.length === 0 ? (
                 <Text style={styles.empty}>
@@ -83,6 +83,7 @@ export function MissionBoardModal({ visible, onClose }: Props) {
                           <Pressable
                             style={({ pressed }) => [styles.acceptBtn, pressed && styles.btnPressed]}
                             onPress={() => acceptFactionQuest(q.title)}
+                            accessibilityRole="button"
                           >
                             <Text style={styles.acceptBtnText}>ACCEPT</Text>
                           </Pressable>
@@ -95,6 +96,7 @@ export function MissionBoardModal({ visible, onClose }: Props) {
               <Pressable
                 style={({ pressed }) => [styles.closeBtn, pressed && styles.btnPressed]}
                 onPress={onClose}
+                accessibilityRole="button"
               >
                 <Text style={styles.closeBtnText}>CLOSE</Text>
               </Pressable>
@@ -111,7 +113,7 @@ const styles = StyleSheet.create({
   card: { width: '100%', maxWidth: 400, maxHeight: '82%', backgroundColor: '#13110f', borderColor: '#b98a4a', borderWidth: 1, borderRadius: 4, padding: 14 },
   title: { color: '#d8b271', fontSize: 14, fontWeight: '800', letterSpacing: 2 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
-  subtitle: { color: '#7a705c', fontSize: 11, letterSpacing: 1, marginBottom: 10 },
+  subtitle: { color: '#a2977b', fontSize: 11, letterSpacing: 1, marginBottom: 10 },
   empty: { color: '#cdbf99', fontSize: 13, lineHeight: 19, marginBottom: 6 },
   list: { flexGrow: 0 },
   listContent: { gap: 10, paddingBottom: 4 },

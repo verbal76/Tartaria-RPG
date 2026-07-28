@@ -11,6 +11,7 @@
 // roughly one common dig.
 
 import type { InventoryItem } from './types';
+import { canonicalItemKind, canonicalItemRarity, canonicalItemTags } from './crafting';
 
 export interface ScrapOutput {
   /** Materials granted to the player. */
@@ -27,14 +28,19 @@ export function canScrap(item: InventoryItem): boolean {
   // bound to the character until the final act. Block scrap up
   // front so the player can't accidentally feed a Core to the
   // forge.
-  if ((item.tags ?? []).includes('quest')) return false;
-  if (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'relic') return true;
+  // OTA-1022 — the ONE quest-lock predicate (canonical tags), not a raw snapshot read.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  if ((require('./questItems') as typeof import('./questItems')).isQuestLockedItem(item)) return false;
+  // OTA-1023 — canonical kind: the load heal is upgrade-only, so a demoted piece
+  // (relic->misc Climbing Rope) kept its old action set forever.
+  const scrapKind = canonicalItemKind(item);
+  if (scrapKind === 'weapon' || scrapKind === 'armor' || scrapKind === 'relic') return true;
   // OTA-742 — a weapon/armor bought from a vendor could mint as kind 'misc'
   // (buyFromVendor mis-stamp, fixed there + healed on load). Treat anything
   // TAGGED as gear as scrappable too, so an already-bought Rust Dagger / Bone
   // Shiv scraps immediately instead of only after the next reload.
   {
-    const t = item.tags ?? [];
+    const t = canonicalItemTags(item);
     if (t.includes('weapon') || t.includes('armor')) return true;
   }
   // Some gear (compass, torch, rope) carries useful base materials —
@@ -44,7 +50,7 @@ export function canScrap(item: InventoryItem): boolean {
   // keyword in the name) still pass the scrap predicate. scrapOutputFor
   // already routes 'improvised' to Small Rock; this just keeps the
   // gate consistent with the output table.
-  if (item.kind === 'misc' && (item.tags ?? []).some((t) =>
+  if (scrapKind === 'misc' && canonicalItemTags(item).some((t) =>
     /metal|wood|stone|aether|crystal|fiber|cloth|plate|scaled|improvised|organic/i.test(t),
   )) {
     // Materials with these tags already ARE the scrap output — refuse
@@ -85,15 +91,71 @@ function rarityScrapBonus(rarity: InventoryItem['rarity']): number {
  *  needing a manual mapping. OTA-443 — yields 2–3+ REPRESENTATIVE
  *  materials geared to crafting / repair / golem fuel, scaled by rarity. */
 export function scrapOutputFor(item: InventoryItem): ScrapOutput {
-  const tags = new Set((item.tags ?? []).map((t) => t.toLowerCase()));
+  const tags = new Set(canonicalItemTags(item));
   const grants: Array<{ name: string; quantity: number }> = [];
-  const rb = rarityScrapBonus(item.rarity);
+  // OTA-1023 — canonical rarity (never healed on load): a stale-Common piece
+  // scrapped at rb=0 forever and never yielded the Golem Core it owes.
+  const rb = rarityScrapBonus(canonicalItemRarity(item));
   const half = Math.floor(rb / 2);
   // OTA-742 — a bought weapon/armor may be mis-stamped kind 'misc' (see canScrap).
   // Derive gear-ness from the kind OR the tag so the yield branches below still
   // fire (a Rust Dagger gives Scrap Metal + Stick, not the bare junk fallback).
-  const isWeaponLike = item.kind === 'weapon' || tags.has('weapon');
-  const isArmorLike = item.kind === 'armor' || tags.has('armor');
+  const outKind = canonicalItemKind(item);
+  const isWeaponLike = outKind === 'weapon' || tags.has('weapon');
+  const isArmorLike = outKind === 'armor' || tags.has('armor') || outKind === 'dog_armor';
+  // OTA-756 — a FUSED weapon/armor is a one-of-a-kind Crucible forge. Breaking one
+  // down should never hand back Commons: the player spent scarce reserved inputs to
+  // make it, so it yields Uncommon/Rare aether stock scaled by the forge's rarity.
+  // Detected inline (uniqueStats OR the 'fused' tag — same rule as isFusedInventoryItem)
+  // to avoid an engine import cycle. Returns early: bypasses the Common tag table AND
+  // the selfCrafted trim, both of which would drag the output back down to Commons.
+  const isFused = !!item.uniqueStats || tags.has('fused');
+  if (isFused && (isWeaponLike || isArmorLike)) {
+    const fusedGrants: Array<{ name: string; quantity: number }> = [
+      { name: 'Aetheric Shard', quantity: 2 + rb },   // Uncommon — always
+      { name: 'Aetheric Dust', quantity: 1 + half },  // Uncommon — always
+    ];
+    // A Rare+ forge (every real fusion is Rare/Legendary) also yields one Rare mat:
+    // fiber for armor, the scarce Golem Core for a weapon.
+    if (rb >= 2) {
+      fusedGrants.push(isArmorLike
+        ? { name: 'Aetheric Cloth', quantity: 1 }   // Rare fiber
+        : { name: 'Golem Core', quantity: 1 });     // Rare (Iron-Golem bottleneck)
+    }
+    // OTA-825 — exploit close (reverify workflow, CONFIRMED high-severity). This
+    // OTA-756 fused branch RETURNED before the OTA-611 selfCrafted strip/halve
+    // guard below, so a fused piece — ALWAYS selfCrafted (applyFusion stamps it)
+    // — scrapped for its FULL premium yield, incl. a free Golem Core (the
+    // Iron-Golem bottleneck). Fusion is FREE at an outpost/market Crucible, so
+    // fuse→scrap was a renewable mint of the scarce Core + Aetheric stock from
+    // cheap inferred inputs — reopening the EXACT hole OTA-611's guard closed
+    // (see applyFusion's selfCrafted comment). A fused item is player-made, so it
+    // obeys the same rule as any self-craft: recycling never out-earns the
+    // inputs. Strip the premium (high-sell / bottleneck) mats and halve the rest.
+    // A genuinely-earned fusion you break still yields token mats, never the
+    // scarce Core/Cloth/Shard for free. LEGACY fused items (forged pre-OTA-611,
+    // no selfCrafted flag) are a FINITE, non-renewable set — you can't mint new
+    // ones — so they keep the old full yield.
+    if (item.selfCrafted) {
+      const FUSED_PREMIUM = new Set([
+        'Golem Core', 'Aetheric Shard', 'Aetheric Dust', 'Aetheric Cloth',
+        'Aether Crystal', 'Aether Dust', 'Mudstone',
+      ]);
+      const stripped = fusedGrants
+        .filter((g) => !FUSED_PREMIUM.has(g.name))
+        .map((g) => ({ name: g.name, quantity: Math.floor(g.quantity / 2) }))
+        .filter((g) => g.quantity > 0);
+      const finalFused = stripped.length > 0 ? stripped : [{ name: 'Small Rock', quantity: 1 }];
+      const strippedSummary = finalFused
+        .map((g) => g.quantity > 1 ? `${g.name} x${g.quantity}` : g.name)
+        .join(', ');
+      return { grants: finalFused, summary: strippedSummary };
+    }
+    const fusedSummary = fusedGrants
+      .map((g) => g.quantity > 1 ? `${g.name} x${g.quantity}` : g.name)
+      .join(', ');
+    return { grants: fusedGrants, summary: fusedSummary };
+  }
   // Metal content → Scrap Metal (the bulk), and on a Rare+ metal piece a
   // GOLEM CORE — the Iron-Golem bottleneck — since a high-grade metal
   // construct plausibly carries one. Representative: only metal gear.

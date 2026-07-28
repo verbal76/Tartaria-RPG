@@ -9,6 +9,7 @@
 
 import factionsData from '../data/factions/factions.json';
 import { FACTION_COVETED_ITEM, eligibleBrokerFactions } from './locationChallenges';
+import { theLower } from './grammar';
 
 const FACTION_NAME: Record<string, string> =
   Object.fromEntries((factionsData as { id: string; name: string }[]).map((f) => [f.id, f.name]));
@@ -90,7 +91,7 @@ export function brokerMissionLine(
   const legs = missionLegs(m);
   if (!legs) return null;
   const line = legs
-    .map((l) => `${l.factionName} demands the ${l.itemName} (${has(l.itemName) ? 'in hand ✓' : `recover it at ${tileName(l.tileId)}`})`)
+    .map((l) => `${l.factionName} demands ${theLower(l.itemName)} (${has(l.itemName) ? 'in hand ✓' : `recover it at ${tileName(l.tileId)}`})`)
     .join('; ');
   // Lead with the mission's NAME ("Broker an Alliance" — matches the CONTRACTS
   // card title + the accept/decline offer title) so the standing reminder names

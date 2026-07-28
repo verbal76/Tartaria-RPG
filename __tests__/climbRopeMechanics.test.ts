@@ -132,50 +132,69 @@ describe('OTA 23-007 — climb mechanics', () => {
     });
   });
 
-  describe('stamina-depletion fall', () => {
-    it('plain rope, stamina < 2: player falls, loses 20% max HP, elevation cleared', async () => {
+  describe('OTA-936 — stamina shortfall while UP HOLDS (no fall)', () => {
+    it('plain rope, stamina < 2 while UP: HOLDS — no fall, no HP lost, elevation kept', async () => {
       const store = await setupClimber('Climbing Rope', {
         hp: 30, hpMax: 30, stamina: 1, staminaMax: 10,
       });
-      // Pre-set elevatedOn so we can verify it clears on fall.
       store.setState({
         currentScene: { ...store.getState().currentScene!, elevatedOn: { noun: 'wall', tier: 1, totalTiers: 2 } },
       });
       store.getState().submitPlayerAction('climb wall');
+      expect(store.getState().player!.hp).toBe(30);                       // no fall damage
+      expect(store.getState().currentScene?.elevatedOn).not.toBeNull();   // held, still up
+      const logs = store.getState().gameLog.map((e) => e.text).join('\n');
+      expect(logs).not.toMatch(/YOU FALL/);
+      expect(logs).toMatch(/climb down or rest|Climb DOWN while you can still grip/i);
+    });
+
+    it("Reclaimer's Rope, stamina 0 while UP: also HOLDS (no fall)", async () => {
+      const store = await setupClimber("Reclaimer's Rope", {
+        hp: 50, hpMax: 50, stamina: 0, staminaMax: 10,
+      });
+      store.setState({
+        currentScene: { ...store.getState().currentScene!, elevatedOn: { noun: 'wall', tier: 1, totalTiers: 2 } },
+      });
+      store.getState().submitPlayerAction('climb wall');
+      expect(store.getState().player!.hp).toBe(50);
+      expect(store.getState().currentScene?.elevatedOn).not.toBeNull();
+    });
+  });
+
+  describe('OTA-910 — a REAL fall (rope worn to 0) still scales damage by tier', () => {
+    it('plain rope at durability 0 while UP: falls, height-scaled HP, elevation cleared', async () => {
+      const store = await setupClimber('Climbing Rope', { hp: 30, hpMax: 30, stamina: 10, staminaMax: 10 });
+      store.setState({
+        player: {
+          ...store.getState().player!,
+          inventory: store.getState().player!.inventory.map((i) =>
+            i.name === 'Climbing Rope' ? { ...i, durability: { current: 0, max: 90 } } : i,
+          ),
+        },
+        currentScene: { ...store.getState().currentScene!, elevatedOn: { noun: 'wall', tier: 1, totalTiers: 2 } },
+      });
+      store.getState().submitPlayerAction('climb wall');
       const after = store.getState().player!;
-      // 20% of 30 HP = 6 damage
-      expect(after.hp).toBe(30 - 6);
+      // OTA-910 — from tier 1: floor(30 × (0.12 + 0.055×1)) = floor(30 × 0.175) = 5.
+      expect(after.hp).toBe(30 - 5);
       expect(store.getState().currentScene?.elevatedOn).toBeNull();
       const logs = store.getState().gameLog.map((e) => e.text).join('\n');
       expect(logs).toMatch(/YOU FALL/);
     });
 
-    it("Reclaimer's Rope, stamina < 1: still falls (no rope removes physics)", async () => {
-      const store = await setupClimber("Reclaimer's Rope", {
-        hp: 50, hpMax: 50, stamina: 0, staminaMax: 10,
-      });
-      // OTA-356 — already UP (elevatedOn set) so a shortfall falls, not refuses.
-      store.setState({
-        currentScene: { ...store.getState().currentScene!, elevatedOn: { noun: 'wall', tier: 1, totalTiers: 2 } },
-      });
-      store.getState().submitPlayerAction('climb wall');
-      const after = store.getState().player!;
-      // 20% of 50 HP = 10 damage
-      expect(after.hp).toBe(50 - 10);
-    });
-
     it('fall damage floors at 1 even on a low-HP-max character', async () => {
-      const store = await setupClimber('Climbing Rope', {
-        hp: 3, hpMax: 3, stamina: 0, staminaMax: 10,
-      });
-      // OTA-356 — already UP (elevatedOn set) so a shortfall falls, not refuses.
+      const store = await setupClimber('Climbing Rope', { hp: 3, hpMax: 3, stamina: 10, staminaMax: 10 });
       store.setState({
+        player: {
+          ...store.getState().player!,
+          inventory: store.getState().player!.inventory.map((i) =>
+            i.name === 'Climbing Rope' ? { ...i, durability: { current: 0, max: 90 } } : i,
+          ),
+        },
         currentScene: { ...store.getState().currentScene!, elevatedOn: { noun: 'wall', tier: 1, totalTiers: 2 } },
       });
       store.getState().submitPlayerAction('climb wall');
-      const after = store.getState().player!;
-      // 20% of 3 = 0.6 -> floor at 1, so HP = 3 - 1 = 2
-      expect(after.hp).toBe(2);
+      expect(store.getState().player!.hp).toBe(2); // 20% of 3 -> floor at 1
     });
   });
 
@@ -207,10 +226,12 @@ describe('OTA 23-007 — climb mechanics', () => {
       });
       store.getState().submitPlayerAction('rest');
       const after = store.getState().player!;
-      // arb37 — rest restores STAMINA only (HP is healed by eating).
-      // 8h rest: gain min(10, 8) = 8 stamina; HP stays put.
+      // OTA-1001 — #120: a full sleep restores stamina AND knits a light share of
+      // max HP (arb37's HP-free rest is superseded by the owner's call).
+      // 8h rest: gain min(10, 8) = 8 stamina; HP climbs ~15% of 30.
       expect(after.stamina).toBeGreaterThan(0);
-      expect(after.hp).toBe(10);
+      expect(after.hp).toBeGreaterThan(10);
+      expect(after.hp).toBeLessThanOrEqual(10 + Math.ceil(30 * 0.15));
     });
   });
 

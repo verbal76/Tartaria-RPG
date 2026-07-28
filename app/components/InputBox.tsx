@@ -15,45 +15,29 @@ import { TutorialTarget } from './TutorialTarget';
 import { visibleBuildingRooms } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS } from './tutorialSteps';
-import { useGameStore } from '../state/gameStore';
+import { playerWeaponReach, useGameStore } from '../state/gameStore';
+import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, isLeaveHubCommand } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
-import { reachClassFor } from '../engine/combatRules';
 import { reachBandsFor } from '../engine/types';
-import type { InventoryItem, CombatRange } from '../engine/types';
+import type { InventoryItem, CombatRange, PlayerCharacter } from '../engine/types';
 
-/** OTA 207 / OTA-550 — do the bands a weapon reaches include the current
- *  combat range? Resolves the weapon's four-band reach class (ranged /
- *  throwable / long / melee / runecaster) and checks band membership. */
-function bandsReachRange(
-  weaponName: string | null | undefined,
-  range: CombatRange,
-  intelligence: number,
-  inventory: ReadonlyArray<InventoryItem>,
-): boolean {
-  if (!weaponName) return reachBandsFor('barehanded').includes(range);
-  // A throwable inventory item equipped to a hand throws from 'far' inward.
-  const throwInst = inventory.find(
-    (it) => it.name.toLowerCase() === weaponName.toLowerCase() && (it.tags ?? []).some((t) => /throwable/i.test(t)),
-  );
-  if (throwInst) return reachBandsFor('throwable').includes(range);
-  const w = resolveDisplayWeaponByName(weaponName, inventory);
-  if (!w) return reachBandsFor('melee').includes(range);
-  const cls = reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
-  let bands = reachBandsFor(cls);
-  if (cls === 'runecaster' && intelligence < 9) bands = reachBandsFor('throwable');
-  return bands.includes(range);
-}
-
-/** OTA 207 — does the equipped weapon reach the current combat range? */
+/** OTA-1029 — the quick-button highlight reads reach from the SAME resolver the
+ *  attack gate rolls with (playerWeaponReach: throwable instance → catalog
+ *  row → forge-stamped uniqueStats.reachClass on fused weapons → runecaster
+ *  INT gate). The local copy this replaces re-derived reach from the display
+ *  catalog and missed the forge stamp, so a close-only fused weapon glowed
+ *  green at mid range while the gate refused every swing. Bare hands
+ *  (punch/kick, hand = null) stay a fixed barehanded check regardless of
+ *  what's equipped. */
 function weaponTone(
-  weaponName: string | null | undefined,
+  player: PlayerCharacter | null,
+  hand: 'main' | 'off' | null,
   range: CombatRange | null | undefined,
-  intelligence: number,
-  inventory: ReadonlyArray<InventoryItem>,
 ): 'ready' | 'needs-approach' | undefined {
   if (!range) return undefined;
-  return bandsReachRange(weaponName, range, intelligence, inventory) ? 'ready' : 'needs-approach';
+  const bands = hand && player ? playerWeaponReach(player, hand).bands : reachBandsFor('barehanded');
+  return bands.includes(range) ? 'ready' : 'needs-approach';
 }
 
 interface Props {
@@ -62,6 +46,13 @@ interface Props {
   onOpenSearch: () => void;
   onOpenCrafting: () => void;
   onOpenApproach: () => void;
+  /** OTA-847 (STEALTH SYSTEM) — peaceful PICKPOCKET button (replaces the old
+   *  out-of-combat APPROACH). Opens the mark/target picker; the walk-up-to-a-
+   *  noun job APPROACH used to do out of combat is retired. */
+  onOpenPickpocket: () => void;
+  /** True when there's nothing to lift here (no vendor, no liftable target) —
+   *  greys the PICKPOCKET button so it's never a dead tap. */
+  pickpocketBlocked?: boolean;
   onOpenAskArbiter: () => void;
   /** arb120 — quick-row MISSIONS button → Contracts screen. Lets the top
    *  main-quest chip slim to a single line for more exploration room. */
@@ -69,6 +60,19 @@ interface Props {
   onOpenSalvage: () => void;
   onOpenTake: () => void;
   onOpenClimb: () => void;
+  /** OTA-777 — small quick-use TORCH button (aim the Aetheric Torch at a lead).
+   *  Shown only when `hasTorch`; `torchReady` lights it when the room has an
+   *  open lead to aim at. */
+  onOpenTorch: () => void;
+  hasTorch?: boolean;
+  torchReady?: boolean;
+  /** OTA-778 — the torch's actual item name ("Aetheric Torch" / "Hand Torch"),
+   *  so the button reads "use aetheric torch" — blatantly the item, not a
+   *  mystery flashlight icon. */
+  torchLabel?: string;
+  /** OTA-788 — inside the Hidden Market, FUSE fires the free Crucible. (Trading
+   *  is handled by stepping into a stall, which auto-opens its wares.) */
+  onFuse?: () => void;
   onClimbUp: () => void;
   onClimbDown: () => void;
   elevatedOn?: { noun: string; tier: number; totalTiers: number } | null;
@@ -107,7 +111,7 @@ interface Props {
   // shows in combat; when blocked, tapping it buzzes and the engine drops the
   // matching Arbiter line ('elevated' = benched at a climb base — hasn't
   // learned to climb; 'aerial' = target flies — can't jump that high).
-  dogBlocked?: 'elevated' | 'aerial' | null;
+  dogBlocked?: 'elevated' | 'aerial' | 'downed' | null;
   // arb-fix — a once/day race ability is available → show the ✦ ability chip.
   raceAbilityReady?: boolean;
   onOpenRaceAbilities?: () => void;
@@ -147,8 +151,17 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
+  // arb-fix (OTA — adaptive quick row) — the out-of-combat quick row shows the
+  // world-interaction verbs (look / rest / investigate / take / salvage / climb /
+  // ability) always, and tucks the menus + rarer actions (pickpocket / craft /
+  // inventory / missions / torch / fuse) behind a MORE ▾ tray so the bottom of
+  // the screen isn't a wall of buttons. Nothing is hidden — MORE is always there
+  // — so discoverability holds and the layout doesn't jump as you move. During
+  // the tutorial the tray is forced open so every beat can still point at its
+  // control.
+  const [moreOpen, setMoreOpen] = useState(false);
   // arb110 — combat bandolier popup. Resolve the racked throwable ids to live
   // inventory rows (qty > 0); tapping one hurls it via throwFromBandolier.
   const [bandolierOpen, setBandolierOpen] = useState(false);
@@ -161,7 +174,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
 
   const consumeDraft = useGameStore((s) => s.consumeInputDraft);
   const pendingDraft = useGameStore((s) => s.pendingInputDraft);
-  const playerInt = useGameStore((s) => s.player?.stats.intelligence ?? 0);
+  // arb-fix — flag the floating KeyboardInputBar to appear the instant the player
+  // taps this field. A React focus event is reliable; the keyboard-height event
+  // the bar used to mount on is dropped ~half the time on Android's New
+  // Architecture, which left the bar absent and this field covered.
+  const setExplorationInputActive = useGameStore((s) => s.setExplorationInputActive);
+  // OTA-1029 — the whole player, for the shared reach resolver behind the weapon
+  // quick-button tones (replaces the old intelligence-only read).
+  const reachPlayer = useGameStore((s) => s.player ?? null);
   const tutorialStep = useGameStore((s) => s.tutorialStep);
   const awaitingTutorialName = useGameStore((s) => s.awaitingTutorialName);
   const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
@@ -179,7 +199,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const exitBuilding = useGameStore((s) => s.exitBuilding);
   const buildingRooms = useMemo(
     () => (activeBuildingId
-      ? visibleBuildingRooms(activeBuildingId, new Set(buildingRevealed))
+      // OTA-787 — navHidden rooms (the market square you land in) aren't tabs;
+      // the row is the four stall tabs + EXIT whether you're in the square or a
+      // stall.
+      ? visibleBuildingRooms(activeBuildingId, new Set(buildingRevealed)).filter((r) => !r.navHidden)
       : []),
     [activeBuildingId, buildingRevealed],
   );
@@ -206,9 +229,13 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // has `inputPulse: true` (name beat + rope beat). Pulses a border
   // colour animation; same Animated pattern as TutorialTarget.
   const inputPulse = currentTutStep?.inputPulse === true;
+  // OTA-898 (SA-6) — respect the reduce-motion preference: hold the tutorial
+  // input cue as a STATIC highlight instead of a looping pulse (the cue still
+  // reads; only the continuous motion is dropped).
+  const reduceMotion = useReduceMotion();
   const pulse = useRef(new Animated.Value(0)).current;
   useEffect(() => {
-    if (!inputPulse) {
+    if (!inputPulse || reduceMotion) {
       pulse.stopAnimation();
       pulse.setValue(0);
       return;
@@ -221,9 +248,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     );
     loop.start();
     return () => { loop.stop(); };
-  }, [inputPulse, pulse]);
+  }, [inputPulse, reduceMotion, pulse]);
   const inputBorderColor = inputPulse
-    ? pulse.interpolate({ inputRange: [0, 1], outputRange: ['#c9a86a', '#ffe28a'] })
+    ? (reduceMotion
+        ? '#ffe28a'  // static highlight — no motion, still clearly cued
+        : pulse.interpolate({ inputRange: [0, 1], outputRange: ['#c9a86a', '#ffe28a'] }))
     : '#3a342c';
 
   const handleSubmit = () => {
@@ -373,6 +402,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   onPress={() => goBuildingRoom(r.id)}
                 />
               ))}
+              {/* OTA-781 — the nav row stays CLEAN like a building's rooms:
+                  just the stall tabs + EXIT. Tapping a stall swaps to it; EXIT
+                  leaves the whole market. TRADE / FUSE live in the quick-action
+                  row below (not here, not as floating chips). */}
               <TravelBtn label="EXIT" onPress={() => exitBuilding()} />
             </>
           ) : travelTargetName ? (
@@ -430,28 +463,46 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
         {inCombat ? (
           <>
             <View style={styles.quickRowLine}>
-              {(() => {
-                const punchT = weaponTone(null, range, playerInt, inventory);
-                return <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={punchT} outOfRange={punchT === 'needs-approach'} />;
-              })()}
-              {(() => {
-                const kickT = weaponTone(null, range, playerInt, inventory);
-                return <QuickBtn label="kick" onPress={() => onSubmit('kick')} tone={kickT} outOfRange={kickT === 'needs-approach'} />;
-              })()}
+              {/* OTA-932 — hide the bare-hand PUNCH/KICK buttons when a HAND weapon (gauntlets,
+                  wraps, knuckles — tagged 'barehanded') is equipped: those hands ARE the weapon,
+                  so you wouldn't take it off to punch. The weapon button below covers the swing. */}
+              {!(
+                !!resolveDisplayWeaponByName(equippedMain ?? '', inventory)?.tags?.includes('barehanded') ||
+                !!resolveDisplayWeaponByName(equippedOff ?? '', inventory)?.tags?.includes('barehanded')
+              ) && (
+                <>
+                  {(() => {
+                    const punchT = weaponTone(reachPlayer, null, range);
+                    return <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={punchT} outOfRange={punchT === 'needs-approach'} />;
+                  })()}
+                  {(() => {
+                    const kickT = weaponTone(reachPlayer, null, range);
+                    return <QuickBtn label="kick" onPress={() => onSubmit('kick')} tone={kickT} outOfRange={kickT === 'needs-approach'} />;
+                  })()}
+                </>
+              )}
               {equippedMain ? (() => {
-                const mainT = weaponTone(equippedMain, range, playerInt, inventory);
+                const mainT = weaponTone(reachPlayer, 'main', range);
                 const coat = equippedMainCoating ? `${equippedMainCoating.toLowerCase()} ` : '';
                 return <QuickBtn label={`${coat}${shortWeaponLabel(equippedMain).toLowerCase()}`} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
               })() : null}
               {equippedOff ? (() => {
-                const offT = weaponTone(equippedOff, range, playerInt, inventory);
+                const offT = weaponTone(reachPlayer, 'off', range);
                 const coat = equippedOffCoating ? `${equippedOffCoating.toLowerCase()} ` : '';
                 return <QuickBtn label={`off: ${coat}${shortWeaponLabel(equippedOff).toLowerCase()}`} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
               })() : null}
             </View>
 
             <View style={styles.quickRowLine}>
-              {golem && golem.hp > 0 ? (
+              {/* OTA-935 — while ELEVATED (fighting atop a climb) dodge, flee, and the golem
+                  are unavailable and companions are benched below. Say so, so the missing
+                  buttons read as a rule, not a bug. */}
+              {elevatedOn ? (
+                <Text style={styles.elevatedNote}>⛰ ELEVATED — no dodge · companions below · flee dives for the base</Text>
+              ) : null}
+              {golem && golem.hp > 0 && !elevatedOn ? (
+                // OTA-911 — the golem is benched at the climb base (it can't
+                // climb), so its command is hidden while you're elevated.
                 <QuickBtn label={`golem (${golem.hp}/${golem.hpMax})`} onPress={() => onSubmit('use golem')} tone="ready" />
               ) : null}
               {dog && dog.hp > 0 ? (
@@ -474,7 +525,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                         'arbiter',
                         dogBlocked === 'aerial'
                           ? `"${dog.name} can't reach what's in the air," the Arbiter says. "Bring it down, or fight it yourself."`
-                          : `"${dog.name} is holding the ground below," the Arbiter says. "Dogs don't climb — come down to fight at ${dog.name}'s side."`,
+                          : dogBlocked === 'downed'
+                            ? `"${dog.name} is still down from that last fight," the Arbiter says. "Feed the dog to bring it up, then rest somewhere safe and it will fall in at your side."`
+                            : `"${dog.name} is holding the ground below," the Arbiter says. "Dogs don't climb — come down to fight at ${dog.name}'s side."`,
                       );
                       return;
                     }
@@ -485,7 +538,17 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {raceAbilityReady && onOpenRaceAbilities ? (
                 <QuickBtn label="✦ ability" onPress={onOpenRaceAbilities} tone="ready" />
               ) : null}
-              <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
+              {/* OTA-911 — dodge and flee are off while you're on a climb: no
+                  footing to weave a parry, nowhere to flee but straight down.
+                  Hidden here (the engine also refuses them defensively). */}
+              {!elevatedOn ? <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} /> : null}
+              {/* OTA-847 (STEALTH SYSTEM) — in-combat STEALTH. First action of the
+                  fight = SNEAK ATTACK (free STE check for the drop); mid-combat =
+                  BACKSTAB attempt (costs your turn, STE initiative race). The
+                  'sneak' verb routes to the stealth intent handler either way. */}
+              <QuickBtn label="stealth" defensive onPress={() => onSubmit('sneak')} />
+              {/* OTA — flee is legal in wall fights now: one tap, normal flee
+                  roll, success dives for the base (double stamina per tier). */}
               <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} />
               {/* OTA-361 — loot a knocked-out humanoid. One tap strips their
                   kit (damaged) + drops + TC and clears them from the fight. */}
@@ -532,7 +595,6 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               tone={investigateTone}
               blocked={investigateBlocked}
             />
-            <QuickBtn label="approach" onPress={onOpenApproach} blocked={approachBlocked} />
             <QuickBtn
               label="take"
               onPress={takeOverride ?? onOpenTake}
@@ -560,9 +622,32 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <QuickBtn label="climb down" onPress={onClimbDown} defensive />
               </>
             )}
-            <QuickBtn label="craft" onPress={onOpenCrafting} blocked={tutLock} />
-            <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
-            <QuickBtn label="missions" onPress={onOpenMissions} blocked={tutLock} />
+            {/* USE TORCH stays a PRIMARY action — it's a situational world verb (it
+                only appears when you're carrying a torch), so it doesn't belong behind
+                MORE. Player ask: "use aetheric torch should not be under the more button." */}
+            {hasTorch && (
+              <QuickBtn label={`use ${torchLabel ?? 'torch'}`} onPress={onOpenTorch} tone={hasTorch && torchReady ? 'ready' : undefined} blocked={tutLock} />
+            )}
+            {/* MORE ▾ tray toggle — reveals the menus + rarer actions. Hidden
+                during the tutorial, where the tray is force-shown so the beats
+                can point at every control. */}
+            {!tutLock && (
+              <QuickBtn label={moreOpen ? 'less ▴' : 'more ▾'} onPress={() => setMoreOpen((v) => !v)} />
+            )}
+            {(moreOpen || tutLock) && (
+              <>
+                <QuickBtn label="pickpocket" onPress={onOpenPickpocket} blocked={approachBlocked || !!pickpocketBlocked} />
+                <QuickBtn label="craft" onPress={onOpenCrafting} blocked={tutLock} />
+                <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
+                <QuickBtn label="missions" onPress={onOpenMissions} blocked={tutLock} />
+                {/* OTA-788 — no TRADE button: stepping into a stall opens its wares
+                    (and tapping the stall tab you're in re-opens them). FUSE stays —
+                    the free Crucible has no other in-market affordance. */}
+                {activeBuildingId === 'market' && onFuse && (
+                  <QuickBtn label="fuse" onPress={onFuse} blocked={tutLock} />
+                )}
+              </>
+            )}
           </>
         )}
       </TutorialTarget>
@@ -610,6 +695,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             style={styles.input}
             value={text}
             onChangeText={setText}
+            onFocus={() => setExplorationInputActive(true)}
             placeholder={
               awaitingTutorialName
                 ? 'Speak your name…'
@@ -706,7 +792,15 @@ function QuickBtn({
     onPress();
   };
   return (
-    <TouchableOpacity style={containerStyle} onPress={handlePress}>
+    // OTA-898 (SA-6) — screen-reader support for the quick-action chips: each
+    // exposes a button role, its label, and a disabled state when blocked.
+    <TouchableOpacity
+      style={containerStyle}
+      onPress={handlePress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: !!blocked }}
+    >
       <Text style={textStyle}>{label.toUpperCase()}</Text>
     </TouchableOpacity>
   );
@@ -726,6 +820,9 @@ function TravelBtn({ label, onPress, blocked, active }: { label: string; onPress
       style={[styles.travelBtn, isDestination && styles.travelBtnDest, blocked && styles.travelBtnBlocked, active && styles.travelBtnActive]}
       onPress={handlePress}
       activeOpacity={blocked ? 1 : 0.7}
+      accessibilityRole="button"
+      accessibilityLabel={`${isDestination ? 'Travel to ' : ''}${label.replace(/^→\s*/, '')}${active ? ', current course' : ''}`}
+      accessibilityState={{ disabled: !!blocked, selected: !!active }}
     >
       <Text
         style={[styles.travelBtnText, isDestination && styles.travelBtnTextDest, active && styles.travelBtnTextActive]}
@@ -745,6 +842,8 @@ const styles = StyleSheet.create({
   quickRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   quickRowColumn: { flexDirection: 'column', gap: 6 },
   quickRowLine: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  // OTA-935 — elevated-fight notice chip (why dodge/flee/companions are gone).
+  elevatedNote: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 0.3, paddingVertical: 4, paddingHorizontal: 2 },
   dogPicker: { flexDirection: 'row', gap: 8, marginTop: 6 },
   dogPickerBtn: {
     flex: 1,
@@ -810,7 +909,7 @@ const styles = StyleSheet.create({
     minWidth: 56,
   },
   movesBadgeText: { color: '#9ec96a', fontSize: 16, fontWeight: '800', letterSpacing: 1, lineHeight: 18 },
-  movesBadgeSub: { color: '#7a705c', fontSize: 8, letterSpacing: 1, marginTop: 1 },
+  movesBadgeSub: { color: '#a2977b', fontSize: 8, letterSpacing: 1, marginTop: 1 },
   quick: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

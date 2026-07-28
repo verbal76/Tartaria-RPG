@@ -3,16 +3,16 @@
 // This module PLOTS them (location ids), declares how the player would reach
 // them (entry hooks), and maps the Guild Broker faction→coveted-item chart.
 //
-// arb46 — EVERYTHING HERE SHIPS SWITCHED OFF. The master `TIER_C_ENABLED`
-// flag is false and every challenge's `enabled` is false, so `challengeActive`
-// returns false for all of them. gameStore gates every entry-hook / completion
-// site on `challengeActive(id)`, so none of this content can be encountered in
-// play. It stays inert until the user supplies hand-drawn layouts for the
-// build-heavy challenges and flips the flags after review.
+// arb46/arb54/arb55 — ALL SIX Tier-C challenges are now LIVE. The master
+// `TIER_C_ENABLED` flag is on and every challenge's `enabled` is true, so
+// `challengeActive` returns true for all of them and their entry-hook /
+// completion sites (gated on `challengeActive(id)`) are reachable in play.
+// challengeActive still requires BOTH switches, so a single per-challenge
+// `enabled:false` (or flipping the master off) cleanly disables one/all again.
 //
-// The titles themselves (engine/titles.ts) read counters that ONLY increment
-// from these (disabled) completion sites, so the 6 Tier-C titles cannot be
-// earned until the challenges go live.
+// The titles themselves (engine/titles.ts) read counters that increment ONLY
+// from these completion sites, so the 6 Tier-C titles became earnable exactly
+// when their challenges went live.
 
 export type ChallengeEntryKind = 'storyline' | 'encounter' | 'whisper' | 'found_map';
 
@@ -77,19 +77,19 @@ export const LOCATION_CHALLENGES: readonly LocationChallenge[] = [
     id: 'trap_dives_of_the_stair',
     titleId: 'shadow_diver',
     locationId: 'endless_stair', // Reclaimer trap-dive ruin (etheric_lock)
-    enabled: false,
+    enabled: true, // arb55 — built (store handleTrapDive); LIVE
     entryKind: 'encounter',
-    needsLayout: true,
-    note: '3 trap-free dives; small trap mechanic (DEX vs DC per room). Needs dive-room sequence.',
+    needsLayout: false, // arb55 — a per-dive d20+DEX check needs no drawn room graph
+    note: '3 clean trap-free dives (retryable d20+DEX vs DC13; a miss springs 1d6, banks nothing) → Shadow Diver.',
   },
   {
     id: 'defense_of_the_enclave',
     titleId: 'protector_of_the_forgotten',
-    locationId: 'tartarian_enclave', // NEW tile — deep True-Tartarian enclave
-    enabled: false,
+    locationId: 'tartarian_enclave', // deep True-Tartarian enclave under the Buried Cities
+    enabled: true, // arb54 — built (store handleTitleChallenge, one-shot d20+STR); LIVE
     entryKind: 'storyline',
-    needsLayout: true,
-    note: 'Multi-round settlement defense vs invaders. Needs defense-map layout.',
+    needsLayout: false, // arb54 — a single hold-the-breach STR check needs no drawn map
+    note: 'One-shot d20+STR DC15 to hold the breach against raiders → Protector of the Forgotten.',
   },
   {
     id: 'parley_of_factions',

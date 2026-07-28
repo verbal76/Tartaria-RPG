@@ -77,7 +77,7 @@ describe('OTA-044 — plantNextContractHint surfaces follow-up beat', () => {
     const p = store.getState().player!;
     // Inject the hunt as active + at max stage so the UI completion
     // path's gate (rec.stage < def.stages.length) passes.
-    store.setState({
+    store.setState((s) => ({
       player: {
         ...p,
         activeHunts: [{
@@ -87,8 +87,11 @@ describe('OTA-044 — plantNextContractHint surfaces follow-up beat', () => {
           acceptedAt: 0,
         }],
       },
+      // OTA-810 — the Contracts-UI COMPLETE is a face-to-face turn-in: it needs
+      // the right faction's agent present in the scene.
+      currentScene: { ...s.currentScene!, vendor: { name: 'Reclaimer Agent', faction: 'reclaimers_guild', offers: [] } as never },
       gameLog: [],
-    });
+    }));
     store.getState().completeContractFromUI('hunt', hunt.id);
     const log = store.getState().gameLog;
     const plant = log.find((e) => e.channel === 'arbiter' && PLANT_HEAD.test(e.text));
@@ -123,6 +126,8 @@ describe('OTA-044 — plantNextContractHint surfaces follow-up beat', () => {
           acceptedAt: 0,
         }],
       },
+      // OTA-810 — face-to-face turn-in needs the right faction's agent present.
+      currentScene: { ...s.currentScene!, vendor: { name: 'Reclaimer Agent', faction: 'reclaimers_guild', offers: [] } as never },
     } : s));
     store.getState().completeContractFromUI('hunt', first.id);
     const log = store.getState().gameLog;

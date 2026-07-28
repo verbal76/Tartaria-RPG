@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import type { Enemy } from '../engine/types';
 import { describeTrait, traitACBonus, traitDefenses } from '../engine/enemyTraits';
+import { enemyPowerScore, powerMatchup } from '../engine/powerRating';
 import { enemyTypeDefenses } from '../engine/crafting';
 import { enemyDamageType } from '../engine/damageTypes';
 import { BrandedModal } from './BrandedModal';
@@ -23,7 +24,7 @@ import { BrandedModal } from './BrandedModal';
  *  panel so the player can see what's ticking and how many combat turns
  *  it has left. */
 export interface EnemyStatusView {
-  kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'typed_dot';
+  kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'cold_coat' | 'typed_dot';
   turnsRemaining: number;
   dmgPerTurn: number;
   sourceName: string;
@@ -49,6 +50,7 @@ const STATUS_META: Record<EnemyStatusView['kind'], { label: string; color: strin
   corruption_coat: { label: 'CORRUPTION', color: '#b88ce0' },
   electrical_coat: { label: 'SHOCK', color: '#6ac9e0' },
   burn_coat: { label: 'BURN', color: '#e0915f' },
+  cold_coat: { label: 'FROST', color: '#8fd4e8' },
   infected: { label: 'INFECTED', color: '#c97a5f' },
   // Combat-Parity II — built-in damage-type DOT (burn/poison/radiation procs). Distinct accent
   // from the coating families so a typed-DOT stack reads clearly on the enemy panel.
@@ -63,6 +65,14 @@ interface Props {
    *  measured by ExplorationScreen). The card scrolls vertically past this so a
    *  tall enemy never grows the row — it stays in the corner like the feed. */
   maxHeight?: number;
+  /** OTA-818 — player Wisdom, gates reading a (non-boss) enemy's weaknesses. */
+  playerWisdom?: number;
+  /** OTA-838 — enemy intel learned by fighting (worldMemory.enemyIntel), keyed by
+   *  lowercased enemy name. Even below the Wisdom read-threshold, a type you've SEEN
+   *  bite (weak) or wash off (resist) is revealed on the portrait. */
+  enemyIntel?: Record<string, { weak: string[]; resist: string[] }>;
+  /** OTA-928 — the player's Power rating, to colour each enemy's Power badge by matchup. */
+  playerPower?: number;
 }
 
 // OTA-382 — fallback width only. The panel lives in the top-right column
@@ -81,18 +91,69 @@ const CARD_CHROME = 18;
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** Combine the macro type-resistance map with the enemy's per-instance
- *  resist:/vulnerable: traits into the damage types it resists / is weak to. */
+ *  resist:/vulnerable: traits into the damage types it resists / is weak to.
+ *  OTA-818 — RECONCILE per type the same way combat does (combineDamageTypeMatch):
+ *  a trait that DISAGREES with the type-map wins, so a `resist:X` trait cancels a
+ *  type-map weakness (and a `vulnerable:X` overrides a type resist). Without this the
+ *  panel would still list an enemy's ORIGINAL type weakness even after per-spawn
+ *  randomization flipped it — showing a weakness that's actually now a resistance. */
 function defensesFor(enemy: Enemy): { resists: string[]; weaknesses: string[] } {
   const type = enemyTypeDefenses(enemy.type);
   const trait = traitDefenses(enemy.traits);
-  const uniq = (a: string[]) => Array.from(new Set(a));
-  return {
-    resists: uniq([...type.resist, ...trait.resists]),
-    weaknesses: uniq([...type.weak, ...trait.weaknesses]),
-  };
+  const all = Array.from(new Set([...type.resist, ...type.weak, ...trait.resists, ...trait.weaknesses]));
+  const resists: string[] = [];
+  const weaknesses: string[] = [];
+  for (const dt of all) {
+    const typeDir = type.weak.includes(dt) ? 1 : type.resist.includes(dt) ? -1 : 0;
+    const traitDir = trait.weaknesses.includes(dt) ? 1 : trait.resists.includes(dt) ? -1 : 0;
+    // Discord → the per-enemy trait wins (matches combineDamageTypeMatch); else sum.
+    const dir = typeDir !== 0 && traitDir !== 0 && typeDir !== traitDir ? traitDir : typeDir + traitDir;
+    if (dir > 0) weaknesses.push(dt);
+    else if (dir < 0) resists.push(dt);
+  }
+  return { resists, weaknesses };
 }
 
-export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: Props) {
+// OTA-818 — a WISDOM ≥ this reads an enemy's (randomized) weaknesses off the portrait
+// up front; below it you must discover them by landing hits (the combat log's
+// "Weakness exposed" line is the feedback). Matches the parley WIS_REVEAL_THRESHOLD, so
+// Wisdom is the consistent "scout the enemy" stat. Bosses always show (OTA-798).
+const WEAKNESS_READ_WIS = 12;
+
+// OTA-819 — the WIS read is DIEGETIC: instead of a bare "WEAK: burn" label, the detail
+// popup narrates what you notice about the creature that gives the weakness/resistance
+// away. Keeps the concrete damage type in parentheses so it's still actionable.
+const WEAK_FLAVOR: Record<string, string> = {
+  burn: 'its hide is dry and cracked — fire would take fast',
+  electrical: "it's waterlogged and conductive — a shock would run right through it",
+  radiation: 'its flesh is unstable — radiation would rot it fast',
+  bludgeoning: 'its form is brittle — a heavy blow would shatter it',
+  cold: 'it runs hot and quick — cold would seize it up',
+  slashing: 'its skin is thin — a keen edge would open it',
+  piercing: 'it wears no plate — a point would sink deep',
+  poison: 'it still draws breath — venom would take hold',
+  aetheric: 'its binding is loose — aether would unmake it',
+};
+const RESIST_FLAVOR: Record<string, string> = {
+  slashing: 'blades skate off it',
+  piercing: 'points fail to find anything vital',
+  bludgeoning: 'blunt blows deform it and it just resets',
+  burn: 'flame barely marks it',
+  electrical: 'current earths away harmlessly',
+  cold: 'the chill does not touch it',
+  poison: 'it has no biology for venom to work on',
+  radiation: 'radiation washes over it',
+  aetheric: 'aether slides off it unheeded',
+};
+
+export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, playerWisdom, enemyIntel, playerPower }: Props) {
+  const canReadDefenses = (playerWisdom ?? 0) >= WEAKNESS_READ_WIS;
+  // OTA-838 — per-enemy observed intel lookup (lowercased name). Passed to each card
+  // so an already-learned weakness shows even for a low-Wisdom character.
+  const intelFor = useCallback(
+    (name: string) => enemyIntel?.[name.toLowerCase()],
+    [enemyIntel],
+  );
   // Measure the column we actually live in so cards fit the top-right corner
   // (portrait), instead of being sized to the full screen width and spilling
   // out into a left/right-scrolling "landscape" strip.
@@ -139,8 +200,8 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
   const [detailView, setDetailView] = useState<EnemyView | null>(null);
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
-    <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(item)}>
-      {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)}
+    <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={() => setDetailView(item)}>
+      {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(item.enemy.name)} playerPower={playerPower} />)}
     </TouchableOpacity>
   );
 
@@ -153,12 +214,21 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
         // Single enemy: no pager (nothing to scroll horizontally), just the card —
         // capped to the corner height and vertically scrollable when it's tall.
         // arb146 — tappable to open the full-detail popup.
-        <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)}>
-          {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)}
+        <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)}>
+          {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(enemies[0]!.enemy.name)} playerPower={playerPower} />)}
         </TouchableOpacity>
       ) : (
         <FlatList
           data={enemies}
+          // OTA-952 — BLANK-PORTRAIT-AFTER-A-KILL fix. A kill removes the fallen enemy from
+          // currentScene.enemies and REINDEXES it, but this pager keyed cells on the array INDEX
+          // and kept its stale scroll offset — so after "you beat one of them" the visible card
+          // recycled to a blank/wrong page. Key the pager on the enemy ROSTER (names) so a kill
+          // remounts a FRESH list (HP ticks don't change the roster, so they still update in place
+          // via extraData), and reopen it on the ACTIVE enemy (the next target) rather than page 0.
+          key={enemies.map((v) => v.enemy.name).join('|')}
+          getItemLayout={(_, index) => ({ length: cardWidth, offset: cardWidth * index, index })}
+          initialScrollIndex={Math.min(activeIndex, Math.max(0, enemies.length - 1))}
           // OTA 197 — extraData forces FlatList to re-render the visible cells
           // when a value not present in `data` changes (HP ticking down).
           extraData={`${cardWidth}|${enemies.map((v) => `${v.currentHp}/${v.enemy.hp}/${(v.statuses ?? []).map((s) => `${s.kind}:${s.turnsRemaining}`).join(',')}`).join('|')}`}
@@ -177,7 +247,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
           {enemies.map((_, i) => (
             <View key={i} style={[styles.dot, i === activeIndex && styles.dotActive]} />
           ))}
-          <Text style={styles.hint}>swipe to target · tap for details</Text>
+          <Text style={styles.hint}>swipe to aim · tap for info</Text>
         </View>
       )}
     </View>
@@ -185,7 +255,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
     <BrandedModal
       visible={!!detailView}
       title={detailView?.enemy.name ?? ''}
-      body={detailView ? enemyDetailBody(detailView) : undefined}
+      body={detailView ? enemyDetailBody(detailView, canReadDefenses, intelFor(detailView.enemy.name)) : undefined}
       buttons={[{ label: 'Close', tone: 'primary', onPress: () => setDetailView(null) }]}
       onRequestClose={() => setDetailView(null)}
     />
@@ -196,7 +266,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
 // arb146 — format an enemy into the full-detail popup body. Mirrors EnemyCard's
 // AC/attack math so the popup agrees with the portrait, and adds everything the
 // cramped corner can't fit: full trait descriptions + all active effects.
-function enemyDetailBody(view: EnemyView): string {
+function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { weak: string[]; resist: string[] }): string {
   const e = view.enemy;
   const apMatch = String(e.abilityPoint ?? '').match(/\d+/);
   const apNum = apMatch ? parseInt(apMatch[0], 10) : NaN;
@@ -214,8 +284,25 @@ function enemyDetailBody(view: EnemyView): string {
   lines.push('');
   lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}`);
   lines.push(`Attack ${atkLabel}     Damage ${e.damage}${dealsType ? ` (${cap(dealsType)})` : ''}`);
-  if (defenses.resists.length) lines.push(`Resists: ${defenses.resists.map(cap).join(', ')}`);
-  if (defenses.weaknesses.length) lines.push(`Weak to: ${defenses.weaknesses.map(cap).join(', ')}`);
+  // OTA-818/819 — a non-boss enemy's (randomized) defenses are WIS-gated: read them up
+  // front only with enough Wisdom, else discover by hitting. OTA-819 — the read is
+  // DIEGETIC: narrate what you notice, with the damage type in parens.
+  if (e.boss || canRead) {
+    for (const w of defenses.weaknesses) lines.push(`You size it up — ${WEAK_FLAVOR[w] ?? `it looks vulnerable to ${w}`}. (Weak: ${cap(w)})`);
+    for (const r of defenses.resists) lines.push(`— ${RESIST_FLAVOR[r] ?? `it shrugs off ${r}`}. (Resists: ${cap(r)})`);
+  } else if (defenses.resists.length || defenses.weaknesses.length) {
+    // OTA-838 — you can't read it on sight, but anything you've already SEEN in combat
+    // (recorded in worldMemory.enemyIntel) is revealed here — "strike to learn" made real.
+    const ow = observed?.weak ?? [];
+    const orr = observed?.resist ?? [];
+    if (ow.length || orr.length) {
+      for (const w of ow) lines.push(`You've seen it flinch from ${WEAK_FLAVOR[w] ?? w}. (Weak: ${cap(w)})`);
+      for (const r of orr) lines.push(`You've seen it shrug off ${r} — ${RESIST_FLAVOR[r] ?? 'it barely marks'}. (Resists: ${cap(r)})`);
+      lines.push('Keep striking with new types to learn the rest (Wisdom 12 reads them on sight).');
+    } else {
+      lines.push("You can't read its weaknesses at a glance — strike it and watch what bites (Wisdom 12 reads them on sight).");
+    }
+  }
   const traits = e.traits ?? [];
   if (traits.length) {
     lines.push('');
@@ -234,7 +321,7 @@ function enemyDetailBody(view: EnemyView): string {
   return lines.join('\n');
 }
 
-function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth: number; hpBarWidth: number }) {
+function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower }: { view: EnemyView; cardWidth: number; hpBarWidth: number; canRead: boolean; observed?: { weak: string[]; resist: string[] }; playerPower?: number }) {
   // OTA-419 — mirror combatRules.enemyAC EXACTLY so the panel's AC matches what
   // combat uses to hit: pull the number out of "Strength 4" (parseInt got NaN →
   // the panel showed a flat AC 5 and never added the boss +6). NaN falls back to
@@ -256,13 +343,29 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
   // shown under RESIST/WEAK so the portrait answers "what hits me?" for the
   // resistance-minded player without reading the combat log.
   const dealsType = enemyDamageType(view.enemy);
+  // OTA-928 — this enemy's Power rating, faced against the player's for the colour.
+  const enemyPower = enemyPowerScore(view.enemy);
+  const matchup = typeof playerPower === 'number' ? powerMatchup(playerPower, enemyPower) : 'even';
 
   return (
-    <View style={[styles.card, { width: cardWidth }]}>
+    <View
+      style={[styles.card, { width: cardWidth }]}
+      accessibilityLabel={`${view.enemy.name}, ${view.enemy.type}, ${view.enemy.rarity}. HP ${view.currentHp} of ${view.enemy.hp}, AC ${ac}, ${inRange ? 'in range' : 'out of range'}`}
+    >
       <View style={styles.head}>
-        <Text style={styles.name} numberOfLines={1}>
-          {view.enemy.name}
-        </Text>
+        <View style={styles.headLeft}>
+          {/* OTA-928 — enemy Power rating, top-left; faces the player's Power (top-right
+              of the stats panel). Colour by matchup: red = it outclasses you. */}
+          <Text
+            style={[styles.enemyPower, matchup === 'danger' ? styles.enemyPowerDanger : matchup === 'favored' ? styles.enemyPowerFavored : styles.enemyPowerEven]}
+            accessibilityLabel={`Enemy power rating ${enemyPower}`}
+          >
+            ◆ {enemyPower}
+          </Text>
+          <Text style={styles.name} numberOfLines={1}>
+            {view.enemy.name}
+          </Text>
+        </View>
         <Text style={styles.rarity}>{view.enemy.rarity}</Text>
       </View>
       <View style={styles.subhead}>
@@ -275,6 +378,11 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
             : inRange ? 'IN RANGE' : 'OUT OF RANGE'}
         </Text>
       </View>
+      {/* OTA-897 (SA-5) — the bestiary voice line also greets you on the combat
+          card, so a foe reads as a described creature, not a bare stat block. */}
+      {!!view.enemy.flavor && (
+        <Text style={styles.flavorLine} numberOfLines={3}>{view.enemy.flavor}</Text>
+      )}
       <View style={[styles.hpBarBg, { width: hpBarWidth }]}>
         {/* OTA-081 — numeric pixel width (was percent string): RN sometimes
             skipped the layout pass when only the percent changed, leaving the
@@ -294,17 +402,47 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
         <Stat label="DMG" value={String(view.enemy.damage)} />
       </View>
       <View style={styles.defs}>
-        {defenses.resists.length > 0 && (
-          <Text style={styles.defLine} numberOfLines={2}>
-            <Text style={styles.defResist}>RESIST </Text>
-            <Text style={styles.defVal}>{defenses.resists.map(cap).join(', ')}</Text>
-          </Text>
-        )}
-        {defenses.weaknesses.length > 0 && (
-          <Text style={styles.defLine} numberOfLines={2}>
-            <Text style={styles.defWeak}>WEAK </Text>
-            <Text style={styles.defVal}>{defenses.weaknesses.map(cap).join(', ')}</Text>
-          </Text>
+        {/* OTA-818 — a non-boss enemy's randomized RESIST/WEAK are WIS-gated (read
+            required); a boss always shows. Below the threshold you learn by hitting. */}
+        {(view.enemy.boss || canRead) ? (
+          <>
+            {defenses.resists.length > 0 && (
+              <Text style={styles.defLine} numberOfLines={2}>
+                <Text style={styles.defResist}>RESIST </Text>
+                <Text style={styles.defVal}>{defenses.resists.map(cap).join(', ')}</Text>
+              </Text>
+            )}
+            {defenses.weaknesses.length > 0 && (
+              <Text style={styles.defLine} numberOfLines={2}>
+                <Text style={styles.defWeak}>WEAK </Text>
+                <Text style={styles.defVal}>{defenses.weaknesses.map(cap).join(', ')}</Text>
+              </Text>
+            )}
+          </>
+        ) : (defenses.resists.length > 0 || defenses.weaknesses.length > 0) && (
+          // OTA-838 — below the Wisdom read-threshold, reveal only what you've LEARNED
+          // by hitting it (worldMemory.enemyIntel). Nothing learned yet → the prompt.
+          (observed && (observed.weak.length > 0 || observed.resist.length > 0)) ? (
+            <>
+              {observed.resist.length > 0 && (
+                <Text style={styles.defLine} numberOfLines={2}>
+                  <Text style={styles.defResist}>RESIST </Text>
+                  <Text style={styles.defVal}>{observed.resist.map(cap).join(', ')}</Text>
+                </Text>
+              )}
+              {observed.weak.length > 0 && (
+                <Text style={styles.defLine} numberOfLines={2}>
+                  <Text style={styles.defWeak}>WEAK </Text>
+                  <Text style={styles.defVal}>{observed.weak.map(cap).join(', ')}</Text>
+                </Text>
+              )}
+            </>
+          ) : (
+            <Text style={styles.defLine} numberOfLines={2}>
+              <Text style={styles.defResist}>DEF </Text>
+              <Text style={styles.defVal}>? — strike to learn</Text>
+            </Text>
+          )
         )}
         {/* arb119 — what the enemy DEALS, so armor choices have a target. */}
         <Text style={styles.defLine} numberOfLines={1}>
@@ -367,7 +505,13 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   name: { color: '#e07a5f', fontSize: 14, fontWeight: '700', letterSpacing: 1, flexShrink: 1 },
-  rarity: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginLeft: 6 },
+  rarity: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginLeft: 6 },
+  // OTA-928 — enemy Power badge (top-left of the card head), coloured by matchup.
+  headLeft: { flexDirection: 'row', alignItems: 'baseline', gap: 5, flexShrink: 1 },
+  enemyPower: { fontSize: 12, fontWeight: '800', letterSpacing: 0.5 },
+  enemyPowerDanger: { color: '#e07a5f' },
+  enemyPowerFavored: { color: '#9ec96a' },
+  enemyPowerEven: { color: '#d9b45b' },
   subhead: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -376,8 +520,11 @@ const styles = StyleSheet.create({
   },
   range: { fontSize: 9, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 2, borderWidth: 1, marginLeft: 6 },
   rangeIn: { color: '#9ec96a', borderColor: '#3d5a2c' },
-  rangeOut: { color: '#7a705c', borderColor: '#3a342c' },
-  subline: { color: '#7a705c', fontSize: 11, flexShrink: 1 },
+  rangeOut: { color: '#a2977b', borderColor: '#3a342c' },
+  subline: { color: '#a2977b', fontSize: 11, flexShrink: 1 },
+  // OTA-897 (SA-5) — the enemy card's voice line: readable italic prose, set
+  // above the stat grid.
+  flavorLine: { color: '#b8a982', fontSize: 11, lineHeight: 15, fontStyle: 'italic', marginBottom: 6 },
   hpBarBg: {
     height: 6,
     backgroundColor: '#1a1714',
@@ -391,7 +538,7 @@ const styles = StyleSheet.create({
   // the narrow column rather than spreading into a wide single row.
   statGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 },
   stat: { width: '50%', paddingVertical: 1 },
-  statLabel: { color: '#7a705c', fontSize: 9, letterSpacing: 1 },
+  statLabel: { color: '#a2977b', fontSize: 9, letterSpacing: 1 },
   statValue: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
   defs: { marginTop: 4, gap: 1 },
   defLine: { fontSize: 10, letterSpacing: 0.5 },
@@ -432,5 +579,7 @@ const styles = StyleSheet.create({
   },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#3a342c' },
   dotActive: { backgroundColor: '#c9a86a' },
-  hint: { color: '#7a705c', fontSize: 9, letterSpacing: 1, marginLeft: 8 },
+  // OTA — playtest: the multi-enemy gesture hint read too long and too small.
+  // Shorter copy ("swipe to aim · tap for info") + a larger, tighter-tracked font.
+  hint: { color: '#8a7f68', fontSize: 12, letterSpacing: 0.3, marginLeft: 8 },
 });

@@ -18,25 +18,78 @@ export const DAMAGE_TYPE_KEYWORDS = [
   'degradation',
   'bludgeoning',
   'burn',
+  // OTA-827 [Group-K] — `cold` is now a first-class damage type (frost weapons +
+  // the two Core Guardians' authored cold weakness/resist). Deep chill seizes
+  // machinery and slows the living.
+  'cold',
   'aetheric',
   'electrical',
   'piercing',
   'poison',
+  // OTA-874 — `acid` and `corruption` are now first-class incoming damage types (they
+  // were previously folded into `poison`). Acid corrodes metal (constructs are weak);
+  // corruption rots the living. This makes an armor resist against them meaningful and
+  // lets the inference type acidic / hollowing enemy attacks distinctly.
+  'acid',
+  'corruption',
   'radiation',
   'slashing',
   'stun',
   'psychic',
 ] as const;
 
+// OTA-827 [Group-K] — canonical damage-type aliases, shared by EVERY consumer of
+// the weakness math (applyDamageTypeModifier, traitDamageMultiplier, the combat
+// flare procs). Pre-fix only gameStore's proc layer aliased these, so `force`
+// weapons (aetheric-flavored runecasters) and `frost` weapons stayed type-neutral
+// in the actual DAMAGE reconcile even though the proc layer already treated them
+// as aetheric/cold. Making the alias authoritative closes that gap in one place.
+export const DAMAGE_TYPE_ALIASES: Record<string, string> = {
+  force: 'aetheric',
+  psychic: 'aetheric',
+  frost: 'cold',
+  ice: 'cold',
+  shock: 'electrical',
+  // OTA-874 — acid / corruption synonyms.
+  corrosive: 'acid',
+  caustic: 'acid',
+  blight: 'corruption',
+  hollowing: 'corruption',
+};
+
+/** Canonicalize a damage-type word through the shared alias table (identity for
+ *  a non-aliased type). Always lower-cases. */
+export function canonicalDamageType(t: string | null | undefined): string {
+  const lc = (t ?? '').toLowerCase();
+  return DAMAGE_TYPE_ALIASES[lc] ?? lc;
+}
+
+/** OTA-873 — true iff `type` is a damage type an enemy can actually DEAL, i.e. a
+ *  type that a worn armor resist can ever match. Keyed off DAMAGE_TYPE_KEYWORDS (via
+ *  the alias table). `acid` and `corruption` are OFFENSIVE-only coating families —
+ *  the player's coated WEAPON applies them as DOTs; no enemy emits them as incoming
+ *  damage — so a coating resist against them is inert. The "apply to armor" flow uses
+ *  this to reject those vials; if acid/corruption ever become real incoming types,
+ *  adding them to DAMAGE_TYPE_KEYWORDS auto-enables the armor path. */
+export function isResistableIncomingType(type: string | null | undefined): boolean {
+  const c = canonicalDamageType(type);
+  return (DAMAGE_TYPE_KEYWORDS as readonly string[]).includes(c);
+}
+
 /** Scan a string for an explicit damage-type word. Returns the canonical type
- *  (psychic normalized to aetheric) or null when none is present. Mirrors the
- *  long-standing parseIncomingDamageType so resistance behavior is unchanged
- *  for already-typed enemies. */
+ *  (psychic normalized to aetheric, frost→cold, force→aetheric, …) or null when
+ *  none is present. Mirrors the long-standing parseIncomingDamageType so
+ *  resistance behavior is unchanged for already-typed enemies. */
 export function parseDamageTypeKeyword(s: string | null | undefined): string | null {
   if (!s) return null;
   const lower = s.toLowerCase();
   for (const t of DAMAGE_TYPE_KEYWORDS) {
     if (lower.includes(t)) return t === 'psychic' ? 'aetheric' : t;
+  }
+  // OTA-827 — fall back to the alias words (frost/ice/force/shock) so a string
+  // that names only a synonym still resolves to its canonical type.
+  for (const alias of Object.keys(DAMAGE_TYPE_ALIASES)) {
+    if (lower.includes(alias)) return DAMAGE_TYPE_ALIASES[alias]!;
   }
   return null;
 }
@@ -50,8 +103,16 @@ export function parseDamageTypeKeyword(s: string | null | undefined): string | n
 const ATTACK_VERB_TYPE: ReadonlyArray<readonly [RegExp, string]> = [
   [/aether|psychic|void|mind|spectral|phantom|wail|scream|gaze|hex|curse|drain|wither/i, 'aetheric'],
   [/burn|flame|\bfire\b|scorch|ember|ignite|cinder|searing|molten|magma/i, 'burn'],
+  // OTA-827 [Group-K] — cold/frost attacks (before the physical buckets so a
+  // "Frost Maul" reads as cold, not bludgeoning).
+  [/frost|\bice\b|\bicy\b|freez|glaci|rime|chill|frigid|hoar|winter|permafrost/i, 'cold'],
   [/shock|spark|lightning|jolt|\bvolt|static|thunder|arc\b|electr/i, 'electrical'],
-  [/poison|venom|toxic|spore|acid|corros|blight|rot\b|plague|sick/i, 'poison'],
+  // OTA-874 — acid + corruption split OUT of the poison bucket into their own types.
+  // Both sit BEFORE the physical buckets so a "Corrosive Bite" reads acid (not piercing)
+  // and a "Hollow Cleave" reads corruption (not slashing).
+  [/acid|corros|caustic|dissolv|etch\b|slag\b/i, 'acid'],
+  [/corrupt|blight|wither|defile|hollow|necrot|festering|\brot\b/i, 'corruption'],
+  [/poison|venom|toxic|spore|plague|sick/i, 'poison'],
   [/radiat|irradiat|fallout|decay\b/i, 'radiation'],
   [/bite|fang|maw|sting|spike|spear|stab|pierc|gore|horn|tusk|quill|barb|bolt|arrow|lance|pincer|beak|impale|skewer|needle|jab/i, 'piercing'],
   [/claw|talon|rake|slash|rend|blade|cleaver|sword|knife|dagger|scythe|razor|saber|sabre|\baxe|shred|slice|gash|hook\b|sickle/i, 'slashing'],

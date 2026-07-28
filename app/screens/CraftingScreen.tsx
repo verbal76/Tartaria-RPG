@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
 import { missingIngredientsList, craftableRecipeCounts } from '../engine/crafting';
 import { RecipesView } from '../components/RecipesView';
-import { CraftResultModal } from '../components/CraftResultModal';
+import { CraftRefusalModal } from '../components/CraftRefusalModal';
 import { BrandedModal } from '../components/BrandedModal';
 import type { InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
@@ -149,7 +149,7 @@ function ownedQty(inventory: InventoryItem[], name: string): number {
     .reduce((s, i) => s + i.quantity, 0);
 }
 
-// OTA — confirm popup for the NON-golem disciplines (shape / mend), mirroring the
+// OTA-1006 — confirm popup for the NON-golem disciplines (shape / mend), mirroring the
 // golem summon confirm. Tapping the card no longer copies a phrase to the clipboard
 // for the player to paste back — it opens this confirm, and on Cast it dispatches
 // the action and bounces to exploration so the roll plays out live.
@@ -222,12 +222,22 @@ export function CraftingScreen() {
   // Empty / null delta = craft failed or no-op'd — the world feed
   // narrates the failure; no popup, screen stays on tab.
   const [craftResult, setCraftResult] = useState<InventoryDelta[] | null>(null);
+  // OTA-1006 — the haul banner clears itself; there is no button to hunt for.
+  useEffect(() => {
+    if (craftResult === null) return;
+    const t = setTimeout(() => setCraftResult(null), 2600);
+    return () => clearTimeout(t);
+  }, [craftResult]);
+  // OTA-833 — refusal popup message. Set when a craft did nothing and wasn't a
+  // substitution-confirm (gated on Cores / missing ingredients / pack full). Renders
+  // the CraftRefusalModal so a gated tap isn't a silent no-op.
+  const [craftRefusal, setCraftRefusal] = useState<string | null>(null);
   // arb147 — golem summon confirm. Tapping a golem variant used to only copy
   // "summon X golem" to the clipboard and make the player paste it back in
   // exploration. Now it opens a confirm → on Summon it dispatches the action and
   // bounces to exploration, where the d20+INT roll plays out live.
   const [golemConfirm, setGolemConfirm] = useState<GolemConfirm | null>(null);
-  // OTA — confirm popup for shape/mend (Aetherstone Manipulation / Aetheric
+  // OTA-1006 — confirm popup for shape/mend (Aetherstone Manipulation / Aetheric
   // Healing). Same UX as the golem summon: tap the card → confirm → cast (no
   // clipboard copy-paste).
   const [disciplineConfirm, setDisciplineConfirm] = useState<DisciplineConfirm | null>(null);
@@ -342,10 +352,11 @@ export function CraftingScreen() {
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>
+        <Text style={styles.title} accessibilityRole="header">
           {tab === 'craft' ? 'CRAFTING'
             : tab === 'repair' ? 'REPAIR'
             : tab === 'recipes' ? 'RECIPES'
@@ -359,6 +370,8 @@ export function CraftingScreen() {
           onPress={() => setTab('craft')}
           style={[styles.tabBtn, tab === 'craft' && styles.tabBtnActive]}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: tab === 'craft' }}
         >
           <Text style={[styles.tabBtnText, tab === 'craft' && styles.tabBtnTextActive]}>
             CRAFT {craftableCounts.craft > 0 ? `(${craftableCounts.craft})` : ''}
@@ -368,6 +381,8 @@ export function CraftingScreen() {
           onPress={() => setTab('repair')}
           style={[styles.tabBtn, tab === 'repair' && styles.tabBtnActive]}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: tab === 'repair' }}
         >
           <Text style={[styles.tabBtnText, tab === 'repair' && styles.tabBtnTextActive]}>
             REPAIR {repairReady > 0 ? `(${repairReady})` : ''}
@@ -377,6 +392,8 @@ export function CraftingScreen() {
           onPress={() => setTab('recipes')}
           style={[styles.tabBtn, tab === 'recipes' && styles.tabBtnActive]}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: tab === 'recipes' }}
         >
           <Text style={[styles.tabBtnText, tab === 'recipes' && styles.tabBtnTextActive]}>
             RECIPES {craftableCounts.recipes > 0 ? `(${craftableCounts.recipes})` : ''}
@@ -386,6 +403,8 @@ export function CraftingScreen() {
           onPress={() => setTab('aetheric')}
           style={[styles.tabBtn, tab === 'aetheric' && styles.tabBtnActive]}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: tab === 'aetheric' }}
         >
           <Text style={[styles.tabBtnText, tab === 'aetheric' && styles.tabBtnTextActive]}>
             AETHERIC {craftableCounts.aetheric > 0 ? `(${craftableCounts.aetheric})` : ''}
@@ -411,6 +430,7 @@ export function CraftingScreen() {
               // Empty delta = craft failed; world feed shows the
               // error and the screen stays on the active tab.
             }}
+              onCraftRefused={setCraftRefusal}
             query={craftQuery}
             sortKey={craftSortKey}
             sortDirection={craftSortDir}
@@ -434,6 +454,7 @@ export function CraftingScreen() {
               // Empty delta = craft failed; world feed shows the
               // error and the screen stays on the active tab.
             }}
+              onCraftRefused={setCraftRefusal}
             query={recipesQuery}
             sortKey={recipesSortKey}
             sortDirection={recipesSortDir}
@@ -456,13 +477,14 @@ export function CraftingScreen() {
               return (
                 <Pressable
                   key={d.id}
+                  accessibilityRole="button"
                   style={({ pressed }) => [
                     styles.aetherCard,
                     pressed && styles.aetherCardPressed,
                   ]}
                   onPress={() => {
                     // OTA-629 — the SUMMON card opens the golem confirm popup.
-                    // OTA — shape (Aetherstone Manipulation) and mend (Aetheric
+                    // OTA-1006 — shape (Aetherstone Manipulation) and mend (Aetheric
                     // Healing) now open their OWN confirm popup too, instead of
                     // copying a phrase to the clipboard for the player to paste
                     // back. No copy-paste anywhere in the aetheric flow.
@@ -508,6 +530,7 @@ export function CraftingScreen() {
                         return (
                           <Pressable
                             key={g.kind}
+                            accessibilityRole="button"
                             style={({ pressed }) => [
                               styles.golemVariantRow,
                               pressed && styles.golemVariantRowPressed,
@@ -531,7 +554,7 @@ export function CraftingScreen() {
                     </View>
                   )}
                   <Text style={styles.aetherCardExamples}>
-                    {/* OTA — every discipline card opens a confirm popup on tap
+                    {/* OTA-1006 — every discipline card opens a confirm popup on tap
                         (golem, shape, mend). No copy-to-input; the phrasings are
                         just the equivalent things you could type. */}
                     <Text style={styles.aetherCardExamplesLabel}>
@@ -589,6 +612,8 @@ export function CraftingScreen() {
                     activeOpacity={r.available ? 0.7 : 1}
                     disabled={!r.available}
                     onPress={() => repairInventoryItem(r.item.id)}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: !r.available }}
                   >
                     <View style={[styles.recipeStripe, { backgroundColor: stripeColor }]} />
                     <View style={styles.recipeBody}>
@@ -628,17 +653,30 @@ export function CraftingScreen() {
         </>
       )}
 
-      {/* OTA-264 — post-craft confirmation popup. Renders whenever
-          craftResult is non-null (set by RecipesView's onAfterCraft
-          for both Craft and Recipes tabs). CONTINUE CRAFTING clears
-          the state and keeps the screen on the active tab; CLOSE
-          MENU clears state AND navigates back to exploration. */}
-      <CraftResultModal
-        visible={craftResult !== null}
-        items={craftResult ?? []}
-        onContinue={() => setCraftResult(null)}
+      {/* OTA-1006 — SUPERSEDES OTA-264's popup. That modal asked "CONTINUE CRAFTING
+          or CLOSE MENU" after every single craft — a question whose answer was
+          always the same (owner: "assume they always want to continue crafting,
+          never close the crafting menu till they hit a back button"). The count
+          is chosen up front now, so all that's left is to say what was made.
+          This banner does that and fades itself; nothing to dismiss, and the
+          menu stays exactly where it was. */}
+      {craftResult !== null && (
+        <View style={styles.craftBanner} accessibilityRole="alert">
+          <Text style={styles.craftBannerText} numberOfLines={2}>
+            ✦ {craftResult.map((d) => `${d.name}${d.quantity > 1 ? ` ×${d.quantity}` : ''}`).join(', ')} added
+          </Text>
+        </View>
+      )}
+
+      {/* OTA-833 — craft-REFUSAL popup. A gated / unaffordable craft used to do
+          nothing visible (silent fail); now the engine's refusal narration surfaces
+          here so the tap clearly registered. KEEP CRAFTING stays; CLOSE MENU exits. */}
+      <CraftRefusalModal
+        visible={craftRefusal !== null}
+        message={craftRefusal ?? ''}
+        onContinue={() => setCraftRefusal(null)}
         onClose={() => {
-          setCraftResult(null);
+          setCraftRefusal(null);
           setScreen('exploration');
         }}
       />
@@ -694,7 +732,7 @@ export function CraftingScreen() {
         onRequestClose={() => setGolemConfirm(null)}
       />
 
-      {/* OTA — shape (Aetherstone Manipulation) + mend (Aetheric Healing) confirm.
+      {/* OTA-1006 — shape (Aetherstone Manipulation) + mend (Aetheric Healing) confirm.
           Same UX as the golem summon: confirm dispatches the cast and returns to
           exploration so the roll plays out live. No clipboard copy-paste. */}
       <BrandedModal
@@ -727,6 +765,14 @@ export function CraftingScreen() {
 }
 
 const styles = StyleSheet.create({
+  // OTA-1006 — the post-craft haul banner that replaced the "continue crafting?"
+  // question. Sits over the list, says what landed, and fades on its own.
+  craftBanner: {
+    position: 'absolute', top: 8, left: 12, right: 12,
+    backgroundColor: '#1d2416', borderWidth: 1, borderColor: '#9ec96a',
+    borderRadius: 4, paddingVertical: 10, paddingHorizontal: 14, zIndex: 20,
+  },
+  craftBannerText: { color: '#9ec96a', fontSize: 13, lineHeight: 18 },
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
   header: {
     flexDirection: 'row',
@@ -758,7 +804,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabBtnActive: { borderColor: '#c9a86a' },
-  tabBtnText: { color: '#7a705c', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  tabBtnText: { color: '#a2977b', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   tabBtnTextActive: { color: '#c9a86a' },
   arbiterLine: { color: '#cdbf99', fontSize: 12, fontStyle: 'italic', marginBottom: 10, lineHeight: 17 },
   scroll: { flex: 1 },
@@ -774,7 +820,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   sectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 2 },
-  sectionCount: { color: '#7a705c', fontSize: 11 },
+  sectionCount: { color: '#a2977b', fontSize: 11 },
   recipeRow: {
     flexDirection: 'row',
     backgroundColor: '#13110f',
@@ -796,11 +842,11 @@ const styles = StyleSheet.create({
   // OTA-165 — stats line on REPAIR rows. Same style as RecipesView's
   // recipeStats so the REPAIR tab matches CRAFT / RECIPES visually.
   recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
-  recipeIng: { color: '#7a705c', fontSize: 11, marginTop: 4, lineHeight: 15 },
+  recipeIng: { color: '#a2977b', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeMissing: { color: '#e07a5f', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeCta: { color: '#9ec96a', fontSize: 10, marginTop: 6, fontStyle: 'italic', letterSpacing: 1 },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  empty: { color: '#a2977b', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
   // OTA-095 — Aethercraft discipline card styles. Mirrors the
   // recipe-row look but with a slightly cooler border tint to
   // visually mark these as not-quite-craft (spells, not items).
@@ -816,10 +862,10 @@ const styles = StyleSheet.create({
   aetherCardQueued: { borderColor: '#9ec96a' },
   aetherCardTitle: { color: '#cdbf99', fontSize: 14, fontWeight: '700', marginBottom: 4 },
   aetherCardBody: { color: '#a89a7a', fontSize: 12, lineHeight: 17, marginBottom: 6 },
-  aetherCardFuel: { color: '#7a705c', fontSize: 11, lineHeight: 15, marginBottom: 4 },
+  aetherCardFuel: { color: '#a2977b', fontSize: 11, lineHeight: 15, marginBottom: 4 },
   aetherCardFuelLabel: { color: '#9aaab0', fontWeight: '700' },
   fuelHave: { color: '#9ec96a', fontWeight: '700' },
-  aetherCardExamples: { color: '#7a705c', fontSize: 11, lineHeight: 15 },
+  aetherCardExamples: { color: '#a2977b', fontSize: 11, lineHeight: 15 },
   aetherCardExamplesLabel: { color: '#9aaab0', fontWeight: '700' },
   aetherCardQueuedHint: { color: '#9ec96a', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
   // OTA-111 — per-golem variant rows under the summon discipline
@@ -843,7 +889,7 @@ const styles = StyleSheet.create({
   golemVariantName: { color: '#cdbf99', fontSize: 12, fontWeight: '700' },
   golemVariantStats: { color: '#c9a86a', fontSize: 11, marginTop: 2 },
   golemVariantBlurb: { color: '#a89a7a', fontSize: 11, fontStyle: 'italic', marginTop: 2 },
-  golemVariantFuel: { color: '#7a705c', fontSize: 11, marginTop: 2, lineHeight: 15 },
+  golemVariantFuel: { color: '#a2977b', fontSize: 11, marginTop: 2, lineHeight: 15 },
   golemVariantFuelLabel: { color: '#9aaab0', fontWeight: '700' },
   golemVariantPhrase: { color: '#9ec96a', fontSize: 10, marginTop: 3, fontStyle: 'italic', letterSpacing: 1 },
   golemVariantsRequires: { color: '#9aaab0', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },

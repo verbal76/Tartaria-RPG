@@ -32,6 +32,21 @@ function isForeignCodePoint(cp: number): boolean {
   return false;
 }
 
+/** Repair GLUED words in generated narration. Qwen 0.5B occasionally emits a token
+ *  boundary with no space, so two words run together with a lowercase→Uppercase seam —
+ *  the playtest caught "theYou stood in the shadowy chamber…". English narration prose
+ *  never has intra-word camelCase (place/faction/item names are space- or hyphen-
+ *  separated), so a lowercase letter immediately followed by an uppercase one inside a
+ *  token is always a missing-space glue. We split those, then drop an article left in
+ *  front of a subject pronoun (English has no "the You" / "a I"), which is what the
+ *  leading-article glue ("theYou" → "the You" → "You") really was. */
+export function repairGluedNarration(text: string): string {
+  if (!text) return text;
+  let s = text.replace(/([a-z])([A-Z])/g, '$1 $2');           // un-glue: "theYou" → "the You"
+  s = s.replace(/\b(?:the|a|an)\s+(You|I|We|They|He|She|It)\b/g, '$1'); // no "the You" → "You"
+  return s.replace(/\s{2,}/g, ' ').trim();
+}
+
 /** Drop any word containing a foreign letter; collapse the gaps + tidy the
  *  spacing left before punctuation. English-only narration in → English-only
  *  narration out. Returns '' if every word was foreign (caller falls back to a

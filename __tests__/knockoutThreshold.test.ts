@@ -23,7 +23,7 @@ describe('isSubduable — humanoids only', () => {
     expect(isSubduable('human')).toBe(true);
     expect(isSubduable('Mud Creature')).toBe(false);
     expect(isSubduable('Automation')).toBe(false);
-    expect(isSubduable('Etheric Undead')).toBe(false);
+    expect(isSubduable('Aetheric Undead')).toBe(false);
     expect(isSubduable(undefined)).toBe(false);
   });
 });

@@ -101,7 +101,7 @@ describe('ambient lore reach (OTA 185)', () => {
       const worldLines = newEntries.filter((e) => e.channel === 'world').map((e) => e.text);
       const hasLore = worldLines.some((t) =>
         !/^You (?:examine|study|inspect|look closer at|crouch beside)/.test(t)
-        || /Reclaimer|Aetherstone|Tartarian|Aether|Forgotten Order|Mud Dweller|Drakova|flood|buried|mud-glass|Sentinel|wraith|Etheric Undead/i.test(t),
+        || /Reclaimer|Aetherstone|Tartarian|Aether|Forgotten Order|Mud Dweller|Drakova|flood|buried|mud-glass|Sentinel|wraith|Aetheric Undead/i.test(t),
       );
       if (hasLore) lorelines++;
     }
