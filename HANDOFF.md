@@ -846,9 +846,23 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.39**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.40**; ledger in `VERSION.md`.
 
-- **THE WEDGED BANDOLIER — GHOST EQUIP REFERENCES (2026-07-27, latest).** HAL **1028** / golem
+- **THE GREEN LIE — DIVERGENT REACH COPIES (2026-07-28, latest).** HAL **1029** / golem
+  **1006**. Owner: "why is the Resonant Spike glowing green if I'm out of range? make sure
+  that all weapons correctly reflect that they are active at their appropriate range." Root
+  cause category: DIVERGENT COPIES of a resolver (§3a-B lens). The attack gate rolls with
+  `playerWeaponReach` (throwable instance → catalog row → forge-stamped
+  `uniqueStats.reachClass` for fused weapons → runecaster INT gate), but the weapon
+  quick-button tone (InputBox `bandsReachRange`) and the enemy panel's in-range flag
+  (ExplorationScreen `enemyViews.canHit`) each kept a LOCAL re-derivation that missed the
+  OTA-978 forge stamp — so a close-only fused weapon glowed green at mid range while the
+  gate refused every swing. Fix: `playerWeaponReach` is EXPORTED and both consumers read
+  it; the local copies are deleted; a category-lock test (`ota1029ReachHighlightUnified`)
+  pins the fused/stamp/off-hand/barehand bands AND forbids a `reachClassFor` derivation
+  from reappearing in either screen. Buttons now glow exactly when the swing would land.
+
+- **THE WEDGED BANDOLIER — GHOST EQUIP REFERENCES (2026-07-27).** HAL **1028** / golem
   **1005**. Owner screenshot: two bandolier slots rendering "+ rack throw" that refused everything.
   Root cause category: bandolierIds/toolPouchIds index inventory INSTANCES, but only THROW and
   UNRACK cleaned them — selling/scrapping/drinking/gifting/fusing/fully-using a racked item left
