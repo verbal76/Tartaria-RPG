@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { withArticle, withArticleCap, theCap, theLower } from '../engine/grammar';
+import { withArticle, withArticleCap, anOrA, theCap, theLower } from '../engine/grammar';
 import type {
   PlayerCharacter,
   WorldMemory,
@@ -30,7 +30,7 @@ import {
   trainDogStat,
   type RescueScenarioId,
 } from '../engine/dogCompanion';
-import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent } from '../engine/worldMemory';
+import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse } from '../engine/worldMemory';
 import {
   seedInvestigationTable,
   rollOutcome as rollInvestigationOutcome,
@@ -61,9 +61,8 @@ import {
   getActiveSlotId,
   loadGlobalStash,
   addResurrectionGems,
+  recordFallen,
   ensureFirstInstallSeed,
-  grantDevGemOnce,
-  grantTestSupplyGiftOnce,
   getLastSaveWriteError,
   consumeSaveReclaimedFlag,
   type SlotSummary,
@@ -71,21 +70,27 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { stripForeignWords } from '../engine/foreignText';
+import { stripForeignWords, repairGluedNarration } from '../engine/foreignText';
 import { sentenceNamesOffCanonEntity, buildEntityAllowList, normalizeEntity } from '../engine/entityGuard';
 import { isQuestLockedItem } from '../engine/questItems';
 import { revealedLocationName } from '../engine/hiddenLocations';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
+import { AETHERKIN_REVERING_FACTIONS, isAetherkin, buildAetherkinEncounter, type AetherkinContext } from '../engine/aetherkin';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
 import {
   pickWeather,
+  weatherById,
   pickHazardForLocation,
   pickEnemyForLocation,
   rollEncounter,
   getLocationById,
   pickEncounterFromLadder,
   findEnemyByName,
+  enemyScalePower,
+  scaleEncounterForContext,
+  scaledEnemyForContext,
+  rollExtraPackMembers,
 } from '../engine/encounter';
 import {
   buildOpening,
@@ -111,7 +116,7 @@ import { pickWastelandEncounter } from '../engine/wastelandEncounters';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
-import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies } from '../engine/combatRules';
+import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies, escapePursuit } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
@@ -152,7 +157,6 @@ import {
   consumeIngredients,
   missingIngredients,
   previewCraftSubstitutions,
-  isInferredItem,
   lookupCraftedItem,
   RECIPES,
   findArmorByName,
@@ -194,13 +198,28 @@ import {
   resolveBuildingRoom,
   secretRoomRevealedBy,
 } from '../engine/buildings';
-import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds } from '../engine/equipment';
+import { sellPriceFor, isUnsellable, applySellCaps } from '../engine/sellPrice';
+import { vendorPriceMod, rapportQuestId, chaPriceDiscount } from '../engine/factionRapport';
+import { isTalkDownBlocked } from '../engine/talkDown';
+import { makeWanderer, wandererCagey, type Wanderer } from '../engine/wanderers';
+import {
+  type ParleyChoice, type ParleyKind, type Temperament,
+  isRightKey, revealsTemperament, parleyDC, deriveAnimalTemperament,
+  temperamentTell, temperamentReadout, detectParleyChoice,
+  parleySuccessLine, parleyWrongKeyLine, parleyRolledFailLine,
+} from '../engine/parley';
+import {
+  raiseMenace, decayedMenace, menaceIntimidateDcBonus, menaceEncounterBonus,
+} from '../engine/menace';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
-import { isBandolierEligible } from '../engine/bandolierEligibility';
+import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
+import { applyLegacyItemRenames } from '../engine/itemMigrations';
+import { categorizeItem } from '../components/InventoryCategorize';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
 import { leaveEmptyWaterBottle } from '../engine/waterBottle';
 import { consumeVerb } from '../engine/consumeVerb';
+import { coatingDrinkRemedy, isCoatingDrinkable } from '../engine/coatingRemedy';
 import {
   canScrap,
   scrapOutputFor,
@@ -266,15 +285,23 @@ import {
   fuzzyFindStoryline,
 } from '../engine/factionStorylines';
 import { tickWeather, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
-import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, traitDodgeChance, enemyIsAerial, combineDamageTypeMatch } from '../engine/enemyTraits';
+import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, enemyDodgesHit, enemyIsAerial, combineDamageTypeMatch } from '../engine/enemyTraits';
 import { parseWeaponEffect, rollEffectBonusDamage } from '../engine/weaponEffects';
 import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
+import { nounTokensMatch } from '../engine/ambientNounMatch';
+import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
+import { resolveLootItem } from '../engine/crafting';
+import { canonicalItemKind, canonicalItemRarity, canonicalItemTags } from '../engine/crafting';
+import { rollBossSpoils } from '../engine/bossLoot';
+import { enemyPowerScore } from '../engine/powerRating';
 import { levenshtein } from '../engine/editDistance';
+import { matchLocationByName } from '../engine/locationMatch';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
 import { classifyNoun, rollBreakLoot } from '../engine/sceneNounMaterial';
 import { isClimbable, isSwimmable, isSearchable } from '../engine/interactionTags';
 import { rollSalvagePool } from '../engine/salvagePools';
+import { scaledHealHP } from '../engine/itemEffect';
 import { isOversized, refusalLine, sceneFeatureRefusalLine } from '../engine/portability';
 import { bestDigTool, rollDig, DIG_SPOT_PRODUCTIVE_CAP } from '../engine/digging';
 import {
@@ -364,7 +391,7 @@ const allLocations = locationsData as Location[];
  *  INVESTIGATE into a tap-grind with no "investigate all" escape hatch.
  *  Fewer props = fewer taps to clear; the per-noun find chance is
  *  unchanged, so the odds a room shows the player something still hold. */
-const AMBIENT_DISPLAY_CAP = 5;
+const AMBIENT_DISPLAY_CAP = 8;
 
 // OTA-434 — unique inventory instance ids. Many grant sites minted ids as
 // `${prefix}_${Date.now()}`, so two items granted in the SAME millisecond (craft
@@ -379,7 +406,7 @@ function freshInstanceId(prefix: string): string {
 }
 
 // arb89 — dev character names that get the Resurrection-Gem perk: a gem
-// granted up front on load (grantDevGemOnce) AND another on every death.
+// granted once at new-character creation (the name beat) AND another on every death.
 // Case-insensitive, trimmed. Shared by loadSlotIntoGame + handlePlayerDeath.
 const DEV_REVIVE_NAMES = ['verbal', 'sasmooch'];
 
@@ -406,9 +433,41 @@ function isStationedAtNamedLocation(p: PlayerCharacter): boolean {
  *  The wandering-lead hooks (HOOK_PLANTS) are all OUTDOOR sightings — smoke in
  *  the distance, a giant on the ridge, a submerged steeple — so none of them may
  *  be planted here. Investigating a candle in a house must not surface "a figure
- *  too tall to be human watches you from the far ridge" (the player's report). */
+ *  too tall to be human watches you from the far ridge" (the player's report).
+ *
+ *  Pure predicate (exported for tests). */
+export function readsIndoorsForHooks(p: {
+  hubRoomId?: string | null;
+  activeBuildingId?: string | null;
+  travelTarget?: { locationId: string } | null;
+  whisperCourse?: { label: string } | null;
+  currentLocationId?: string;
+} | null | undefined): boolean {
+  if (!p) return false;
+  // #1 fix (indoor prompts on the open road) — mid-journey the player is
+  // conceptually walking cross-country, but the departure scene (often a hub
+  // room) isn't rebuilt until arrival, so hubRoomId / activeBuildingId linger
+  // and the wandering / look-around narration kept emitting interior "you move
+  // from room to room" leads out in the open. If a travel course is active —
+  // an overland travelTarget pointing at a DIFFERENT location, or any whisper
+  // course — the player is ON THE ROAD: never read as indoors. (Mirrors the
+  // `onRoute` signal used elsewhere in the store.)
+  const onRoad =
+    (!!p.travelTarget && p.travelTarget.locationId !== p.currentLocationId) ||
+    !!p.whisperCourse;
+  if (onRoad) return false;
+  return !!p.hubRoomId || !!p.activeBuildingId;
+}
+
 function indoorsForOutdoorHooks(get: () => GameStore): boolean {
-  return !!get().player?.hubRoomId || !!get().activeBuildingId;
+  const s = get();
+  return readsIndoorsForHooks({
+    hubRoomId: s.player?.hubRoomId,
+    activeBuildingId: s.activeBuildingId,
+    travelTarget: s.player?.travelTarget ?? null,
+    whisperCourse: s.player?.whisperCourse ?? null,
+    currentLocationId: s.player?.currentLocationId,
+  });
 }
 
 /** arb36 — "you stumble on a structure" line for an enterable building
@@ -458,6 +517,12 @@ interface CurrentScene {
    *  renders a tappable "Mission Board" chip and acceptFactionQuest /
    *  turnInFactionQuest treat it as a quest source (no vendor required). */
   missionBoard?: { faction: string } | null;
+  /** OTA-807 — a wandering NPC (a PERSON, not a vendor) resting on this peaceful
+   *  outdoor tile. You can talk / greet / persuade them for a small payoff (a tip,
+   *  a few coins, or a rare standing nudge). Spawned in beginScene only on NOVEL
+   *  ground so it can't be leave/return-farmed; cleared once you've spoken to them.
+   *  Null on hubs, markets, combat tiles, and most tiles. */
+  wanderer?: import('../engine/wanderers').Wanderer | null;
   /** arb36 — id of an enterable structure standing on the player's current
    *  WILD tile (deterministic via buildingForTile), or null. Surfaces the
    *  ENTER affordance + narration so buildings are discovered organically
@@ -471,11 +536,27 @@ interface CurrentScene {
    *  re-triggered every round (the ranged sneak→fire loop). Resets with the
    *  scene (a fresh encounter = a fresh drop). */
   stealthOpenerUsed?: boolean;
+  /** OTA-936 — set once the sneak-odds warning has fired this encounter (throttle: a
+   *  failed close-range sneak warns about the free-hit cost only once per scene). */
+  sneakOddsWarned?: boolean;
   /** arb168 — set once a spontaneous investigate-ambush has sprung in this
    *  room. Bounds the farm: a room springs at most ONE ambush per visit, so the
    *  player can't sit on a tile spamming `investigate` to mint free trivial
    *  enemies for stat-training + loot. Resets with the scene (leave + return). */
   investigateAmbushUsed?: boolean;
+  /** RETIRED OTA-800 — the wild-drink bound moved off this per-scene flag (which
+   *  reset on leave+return, so adjacent outdoor water tiles could be bounced for
+   *  infinite drinks) to worldMemory.waterUsedAt, keyed per source on game-hours.
+   *  Kept as an optional field so legacy saves that still carry it load cleanly;
+   *  no longer read or written. */
+  barehandDrinkUsed?: boolean;
+  /** RETIRED OTA-800 — see barehandDrinkUsed; the refill bound also moved to
+   *  worldMemory.waterUsedAt. Kept optional for legacy-save compatibility. */
+  bottleRefillUsed?: boolean;
+  /** OTA-796 — dodge-training bound. Successful dodges train DEX/STE only for
+   *  the first 3 contest wins per scene visit, so a pet weak enemy can't be
+   *  dodge-farmed for unbounded stats. Resets with the scene. */
+  dodgeTrainsUsed?: number;
   /** Live narrative hooks the player can follow into multi-stage chains. */
   hooks: Hook[];
   /** Notable nouns extracted from location.description — the things the
@@ -497,6 +578,10 @@ interface CurrentScene {
    *  investigate keeps the same per-noun find chance, the odds of a
    *  given room showing the player SOMETHING actually hold up. */
   displayedAmbientNouns?: string[];
+  /** OTA-973 — Phase A of real heights: optional per-noun elevation placements
+   *  (noun → structure + tier). Absent/empty = everything is on the ground,
+   *  which is every scene until the Phase-B seeder ships. */
+  nounPlacements?: Record<string, { structure: string; tier: number }>;
   /** When this Location maps to a Macro biome in worldLadder.json, the
    *  scene picks a specific Micro-Micro room to flavor the Arbiter's
    *  narration. Stored here (not regenerated each turn) so a single
@@ -510,6 +595,12 @@ interface CurrentScene {
    *  re-fires if the weather actually shifts. Cleared when a fresh combat
    *  begins (so each new fight gets one reminder). */
   weatherSwingAnnounced?: string | null;
+  /** arb-fix (playtest) — signature-weapon leave lines already explained THIS scene.
+   *  The Order's Hollow Edge carries a long "you can't take it" paragraph; clearing
+   *  two enforcers in one scene printed it twice back-to-back. The full reason shows
+   *  the first time a given signature weapon is left; later ones in the same scene get
+   *  a one-line acknowledgement instead. Keyed by weapon name. */
+  signatureWeaponsExplained?: string[];
   /** Slow-weather repositioning progress (Iron Fog etc.). Counts player
    *  advance/retreat actions toward the next range change. Reset to 0
    *  whenever range actually changes, the player switches direction, or
@@ -536,7 +627,7 @@ interface CurrentScene {
   enemyStatuses?: Array<Array<{
     // engine_Dev (Combat-Parity II) — 'typed_dot' is a generic built-in-damage-type DOT (burn/poison/
     // radiation weapon procs), ticking like the coating DOTs.
-    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'typed_dot';
+    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'cold_coat' | 'typed_dot';
     turnsRemaining: number;
     dmgPerTurn: number;
     sourceName: string;
@@ -578,6 +669,13 @@ interface CurrentScene {
     tier: number;
     totalTiers: number;
   } | null;
+  /** OTA-983 — set by the timed ambush spawner when the party arrives while the
+   *  player is UP a climb: these enemies mass at the BASE, not at your level.
+   *  Grounded melee members can't reach you (and you need a weapon that
+   *  SHOOTS to reach them); airborne + ranged members fight across the gap.
+   *  Wall/summit encounters (spawned at your level) leave this false, so
+   *  summit brawls stay ordinary melee. */
+  enemiesAtBase?: boolean;
   /** 2026-05-27 OTA-089 — elevated overlay state. When the
    *  player crests a multi-tier climb and the overlay roll
    *  hits, this scene becomes a mini-area (nook / vantage /
@@ -697,7 +795,7 @@ async function arbiterPersonaAnswer(question: string): Promise<string | null> {
     );
     // OTA-494 — sieve foreign words from the Ask-the-Arbiter answer too (same
     // model code-switch risk as the narration feed).
-    const line = stripForeignWords((out ?? '').trim());
+    const line = repairGluedNarration(stripForeignWords((out ?? '').trim()));
     return line.length > 0 ? line : null;
   } catch {
     return null;
@@ -724,10 +822,46 @@ function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameSto
   if (!player) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { newlyEarnedTitles, TITLE_PASSIVE_PERK } = require('../engine/titles');
-  const fresh: string[] = newlyEarnedTitles(player);
+  // arb-fix — SPAM + persistence guard. Storm titles (Etherbound Survivor /
+  // Aetheric Attuned / Stormcaller) are awarded MID-action from the weather tick,
+  // and later stale-`player` writebacks in the same action revert earnedTitles /
+  // titleProgress — so the perk never stuck and the "You have earned a name to
+  // carry" banner re-fired on every fog tick. worldMemory.earnedTitleAnnounced is
+  // an announce-once ledger that player writebacks don't clobber. Because this
+  // runs at the pre-snapshot catch-all every action, step (a) folds any ledgered
+  // title back into earnedTitles so the perk PERSISTS, and step (b) announces a
+  // title only the first time it is earned.
+  const announced: string[] = getStore().worldMemory?.earnedTitleAnnounced ?? [];
+  // (a) reconcile — earnedTitles must contain everything already announced.
+  const clobbered = announced.filter((id) => !(player.earnedTitles ?? []).includes(id));
+  if (clobbered.length > 0) {
+    setStore((s) => (s.player
+      ? { player: { ...s.player, earnedTitles: [...(s.player.earnedTitles ?? []), ...clobbered] } }
+      : s));
+  }
+  const p2 = getStore().player;
+  if (!p2) return;
+  const fresh: string[] = newlyEarnedTitles(p2);
   if (fresh.length === 0) return;
-  setStore((s) => (s.player ? { player: { ...s.player, earnedTitles: [...(s.player.earnedTitles ?? []), ...fresh] } } : s));
-  for (const id of fresh) {
+  // OTA-848 — stamp each freshly-earned title with WHEN it landed (in-game hour
+  // + real time) so the Character screen can show its earn-date on tap.
+  const atHours = p2.hoursElapsed ?? 0;
+  const atMs = Date.now();
+  const freshLog = fresh.map((id) => ({ id, atHours, atMs }));
+  setStore((s) => (s.player
+    ? { player: {
+        ...s.player,
+        earnedTitles: [...(s.player.earnedTitles ?? []), ...fresh],
+        titleLog: [...(s.player.titleLog ?? []), ...freshLog],
+      } }
+    : s));
+  // (b) announce only titles never announced before, and record them in the
+  // clobber-immune ledger so a later revert can't make them re-fire.
+  const toAnnounce = fresh.filter((id) => !announced.includes(id));
+  if (toAnnounce.length > 0) {
+    setStore((s) => ({ worldMemory: { ...s.worldMemory, earnedTitleAnnounced: [...announced, ...toAnnounce] } }));
+  }
+  for (const id of toAnnounce) {
     const meta = ARBITER_TITLE_META[id];
     if (!meta) continue;
     // OTA-353 — announce the HONEST passive effect, not the canon
@@ -759,6 +893,164 @@ function recordTitleProgress(
   if (maxes) for (const k of Object.keys(maxes)) n[k] = Math.max(n[k] ?? 0, maxes[k] ?? 0);
   setStore((s) => (s.player ? { player: { ...s.player, titleProgress: next } } : s));
   awardNewTitles(getStore, setStore);
+}
+
+// OTA-912 — Skyreacher Charts: the five maps that UNLOCK the great climbs. Sold
+// only by roadside traders, each chart exactly ONCE ever (worldMemory.soldMapIds),
+// and never a chart for a climb already unlocked. climbId matches a GREAT_CLIMBS id.
+// Exported for the OTA-912 full-run verification test.
+export const SKYREACHER_CHARTS: readonly { name: string; climbId: string; price: number }[] = [
+  { name: 'Skyreacher Map 1 of 5 — Grand Spire',       climbId: 'grand_spire',       price: 110 },
+  { name: 'Skyreacher Map 2 of 5 — Asgardar Spire',    climbId: 'asgardar_spire',    price: 100 },
+  { name: 'Skyreacher Map 3 of 5 — Obsidian Monolith', climbId: 'obsidian_monolith', price: 95 },
+  { name: 'Skyreacher Map 4 of 5 — Thametan Tower',    climbId: 'thametan_tower',    price: 90 },
+  { name: 'Skyreacher Map 5 of 5 — Zharak Fang',       climbId: 'zharak_fang',       price: 85 },
+];
+/** Names of the five charts — used by the buy path to stamp soldMapIds. */
+const SKYREACHER_CHART_NAMES: ReadonlySet<string> = new Set(SKYREACHER_CHARTS.map((c) => c.name));
+// OTA-991 — the maps were named 'Skyreacher Chart (N of 5)' before this build
+// (owner: "it's not a chart. we should call it a map" — and the name should say
+// where it leads). Old saves still carry the chart names in inventories and in
+// the sell-once ledger (soldMapIds stores NAMES): backfillPlayer renames held
+// items on load, and the roadside offer filter treats a legacy ledger entry as
+// sold. Index i here pairs with SKYREACHER_CHARTS[i].
+export const LEGACY_SKYREACHER_CHART_NAMES: readonly string[] =
+  [1, 2, 3, 4, 5].map((n) => `Skyreacher Chart (${n} of 5)`);
+
+/** OTA-912 — the shared "use a Skyreacher Chart" effect: unlock the great climb
+ *  (so its prop spawns at the landmark), reveal + log the landmark, and consume
+ *  one chart. Called from BOTH the inventory USE button (useInventoryItem) and
+ *  the typed `use` verb, so it doesn't depend on the parser resolving the chart's
+ *  parenthesised name. Returns true if it handled the item. */
+function unlockGreatClimbFromChart(
+  getStore: () => GameStore,
+  setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
+  item: { id: string; name: string },
+  climbId: string,
+): boolean {
+  const player = getStore().player;
+  if (!player) return false;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { greatClimbById } = require('../engine/greatClimbs');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { discoverLocation } = require('../engine/worldMemory');
+  const gc = greatClimbById(climbId);
+  if (!gc) {
+    getStore().appendLog('world', `The ${item.name} is too weather-worn to make out. Nothing comes of it.`);
+    return true;
+  }
+  const already = (getStore().worldMemory.unlockedGreatClimbs ?? []).includes(gc.id);
+  // Consume one chart — spent fixing the route.
+  setStore((s) => (s.player
+    ? { player: { ...s.player, inventory: s.player.inventory
+        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => i.quantity > 0) } }
+    : s));
+  setStore((s) => ({
+    worldMemory: {
+      ...discoverLocation(s.worldMemory, gc.locationId),
+      unlockedGreatClimbs: Array.from(new Set([...(s.worldMemory.unlockedGreatClimbs ?? []), gc.id])),
+    },
+  }));
+  getStore().appendLog(
+    'world',
+    already
+      ? `You spread the ${item.name} again. ${theCap(gc.noun)} is already fixed on your route.`
+      : `You unroll the ${item.name} and trace the giant-drawn lines. ${theCap(gc.noun)} settles onto your atlas — the great climb is open, and a new charge stands on your board. Travel there, bring the Hardened Climbing Strap and a whole Reclaimer's Rope, and make the ascent.`,
+  );
+  if (!already) {
+    // OTA-991 — say plainly what just happened (owner: "a text pops up saying that
+    // you've added the skyreacher location ... to the map and mission logs").
+    getStore().appendLog('reward', `✦ Skyreacher location added to your MAP and MISSION LOG — ${theCap(gc.noun)}.`);
+    getStore().appendLog(
+      'arbiter',
+      `"A collector tower," the Arbiter murmurs. "One of the sky-antennas that drank the heavens dry. Its guardian still holds the crown. Climb into the heart of it, ${player.name}, if you mean to."`,
+    );
+  }
+  void getStore().persist();
+  return true;
+}
+
+/** OTA-913 — build the Beacon Rifle by breaking down the Aether Collection
+ *  Beacons. Triggered by USING a beacon once all five towers are cleared: the
+ *  collector-arrays are re-purposed into a rifle that pulls charge from the air
+ *  and throws it (electrical + a permanent acid rider). One-time. Returns true
+ *  when it handled the use (always, once resolved to a beacon). */
+function assembleBeaconRifle(
+  getStore: () => GameStore,
+  setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
+): boolean {
+  const player = getStore().player;
+  if (!player) return false;
+  const wm = getStore().worldMemory;
+  if (wm.skyreacherBoltcasterGranted) {
+    getStore().appendLog('world', `The arrays are already spent — the Beacon Rifle is built. This node is an empty shell now.`);
+    return true;
+  }
+  const bossesDown = (wm.summitBossesDefeated ?? []).length;
+  const heldBeacons = player.inventory
+    .filter((i) => i.name === 'Aether Collection Beacon')
+    .reduce((s, i) => s + i.quantity, 0);
+  if (bossesDown < 5 || heldBeacons < 5) {
+    getStore().appendLog(
+      'world',
+      `A single collector-node hums in your hand, its needle swinging toward the sky. On its own it does nothing — you'd need all five, one carried down from each great climb, before there's anything to build.`,
+    );
+    return true;
+  }
+  const rifle: InventoryItem = stampDurability({
+    id: freshInstanceId('beacon_rifle'), name: 'Beacon Rifle', kind: 'weapon', rarity: 'Legendary',
+    quantity: 1, tags: ['weapon', 'ranged', 'beacon_rifle', 'skyreacher', 'legendary', 'collect_only'],
+    // electrical (catalog) + a permanent acid rider → electrical AND acid at once.
+    coating: { kind: 'acid', dice: '2d6', label: 'Acid' },
+  });
+  const mats: InventoryItem[] = [
+    { id: freshInstanceId('mat'), name: 'Throne Shard', kind: 'misc', rarity: 'Legendary', quantity: 2, tags: ['material', 'legendary'] },
+    { id: freshInstanceId('mat'), name: 'Iron Core', kind: 'misc', rarity: 'Legendary', quantity: 2, tags: ['material', 'legendary'] },
+    { id: freshInstanceId('mat'), name: 'Aether Shard', kind: 'misc', rarity: 'Rare', quantity: 3, tags: ['material', 'rare'] },
+  ];
+  setStore((s) => {
+    if (!s.player) return s;
+    let inv = s.player.inventory;
+    let toConsume = 5; // disassemble the five collector-arrays
+    inv = inv.map((i) => {
+      if (i.name === 'Aether Collection Beacon' && toConsume > 0) {
+        const take = Math.min(i.quantity, toConsume); toConsume -= take;
+        return { ...i, quantity: i.quantity - take };
+      }
+      return i;
+    }).filter((i) => i.quantity > 0);
+    inv = mergeOrPushItem(inv, rifle);
+    for (const m of mats) inv = mergeOrPushItem(inv, m);
+    return { player: { ...s.player, inventory: inv }, worldMemory: { ...s.worldMemory, skyreacherBoltcasterGranted: true } };
+  });
+  getStore().appendLog(
+    'world',
+    `You crack the five beacons open across your knees and read how they were made: each is a folded collector-array — a throat of resonant crystal built to swallow Aether out of thin air and push it on down the grid. You strip the arrays, splice the five throats into a single barrel, and re-wire the intake to fire instead of feed. It takes the better part of a day. When you seat the last crystal the whole thing wakes with a shriek of live current: a rifle that grabs charge from an empty sky and throws it.`,
+  );
+  getStore().appendLog('reward', `✦✦ BEACON RIFLE (Legendary) — built from the five collector-arrays. Fires an electrical bolt sheathed in acid, the two elements every Tartarian machine dreads. With it, a cache of legendary materials.`);
+  getStore().appendLog('arbiter', `"You climbed into the heart of every tower that drowned the world," the Arbiter says quietly, "and made the thing that drank the sky spit it back out. Nothing built will stand easy in front of that."`);
+  void getStore().persist();
+  return true;
+}
+
+/** ~18% of eligible roadside stalls carry one not-yet-sold, not-yet-unlocked
+ *  chart. Returns the vendor (possibly) augmented with a single chart offer.
+ *  Exported for the OTA-912 full-run verification test. */
+export function withSkyreacherChartOffer(vendor: VendorInstance | null, wm: WorldMemory): VendorInstance | null {
+  if (!vendor || !vendor.id.startsWith('roadside_')) return vendor; // roadside traders only
+  if (Math.random() >= 0.18) return vendor;
+  const sold = wm.soldMapIds ?? [];
+  const unlocked = wm.unlockedGreatClimbs ?? [];
+  const already = new Set(vendor.offers.map((o) => o.itemName));
+  const pick = SKYREACHER_CHARTS.find(
+    // OTA-991 — a pre-rename sale wrote the old 'Skyreacher Chart (N of 5)' name
+    // into the ledger; that map is still sold-once, never offered again.
+    (c, i) => !sold.includes(c.name) && !sold.includes(LEGACY_SKYREACHER_CHART_NAMES[i]!)
+      && !unlocked.includes(c.climbId) && !already.has(c.name),
+  );
+  if (!pick) return vendor;
+  return { ...vendor, offers: [...vendor.offers, { itemName: pick.name, price: pick.price, quantity: 1 }] };
 }
 
 // arb48 — Labyrinth of Shadows (Wayfarer of the Lost Paths). Both helpers are
@@ -859,9 +1151,11 @@ function handleTitleChallenge(getStore: StoreGet, setStore: StoreSet, trimmed: s
     const status = getStore().player?.challengeAttempts?.[def.id];
     if (status === 'succeeded') { getStore().appendLog('world', `You have already mastered this — the title is yours.`); return; }
     if (status === 'failed') { getStore().appendLog('world', `Your one attempt here is spent.`); return; }
-    const haveLine = have >= req.quantity
-      ? `You have what you need (${reqLine}).`
-      : `You still need ${req.hint}.`;
+    const haveLine = req.quantity === 0
+      ? 'No supplies to gather — this trial asks only what you are.'
+      : have >= req.quantity
+        ? `You have what you need (${reqLine}).`
+        : `You still need ${req.hint}.`;
     getStore().appendLog(
       'world',
       `${haveLine} The trial is ${def.check.trialLabel}: a single d20 + ${def.check.statLabel} (yours: ${intVal}) against DC ${def.check.dc}. ` +
@@ -898,19 +1192,75 @@ function handleTitleChallenge(getStore: StoreGet, setStore: StoreSet, trimmed: s
   setStore((s) => (s.player ? { player: { ...s.player, inventory: inv, challengeAttempts: attempts } } : s));
   const rollLine = `(d20 ${r.roll} + ${def.check.statLabel} ${intVal} = ${r.total} vs DC ${r.dc})`;
   if (r.success) {
-    if (def.id === 'tongue_of_the_red_tower') {
+    if (def.successLine) {
+      getStore().appendLog('world', `${def.successLine} ${rollLine}`);
+    } else if (def.id === 'tongue_of_the_red_tower') {
       getStore().appendLog('world', `The glyphs resolve under the Glyph-Key's tongue — meaning pours in. You can read the dead language now. ${rollLine}`);
     } else {
       getStore().appendLog('world', `The braces hold. The nave groans, settles, and stands. You've kept a piece of the old world from the dark. ${rollLine}`);
     }
     recordTitleProgress(getStore, setStore, { [def.counter]: 1 });
   } else {
-    if (def.id === 'tongue_of_the_red_tower') {
+    if (def.failLine) {
+      getStore().appendLog('world', `${def.failLine} ${rollLine}`);
+    } else if (def.id === 'tongue_of_the_red_tower') {
       getStore().appendLog('world', `The glyphs blur and scatter; the reading collapses into noise. ${rollLine}`);
     } else {
       getStore().appendLog('world', `The braces buckle. A section of the nave caves in with a roar of stone — the shoring is wasted. ${rollLine}`);
     }
     getStore().appendLog('arbiter', `"One chance, and it's gone. Some trials don't forgive."`);
+  }
+}
+
+// arb55 — Trap Dives of the Endless Stair (Shadow Diver). Unlike the one-shot
+// title trials this is a RETRYABLE DEX gauntlet: each dive is a single d20 + DEX
+// vs DC 13. A CLEAN dive (pass) banks one of the three you need — trapCleanDives
+// accumulates persistently on the player, so the three can be earned across
+// separate visits. A tripped trap (fail) springs for 1d6 (never lethal — the
+// stair lets you try again) and banks nothing. Scouting is free and reports the
+// DC + clean dives banked. At three clean dives recordTitleProgress awards
+// Shadow Diver. `isDive` = the player committed a dive; otherwise it's a scout.
+function handleTrapDive(getStore: StoreGet, setStore: StoreSet, isDive: boolean): void {
+  const player = getStore().player;
+  if (!player) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const tc = require('../engine/titleChallenges');
+  const dex = effectiveStats(player).dexterity ?? 0;
+  const dc = 13;
+  const banked = player.titleProgress?.trapCleanDives ?? 0;
+
+  if (banked >= 3) {
+    getStore().appendLog('world', 'You have run the stair clean three times over — its traps hold no more names for you. (Shadow Diver is already yours.)');
+    return;
+  }
+
+  // ── SCOUT (free) ──────────────────────────────────────────────────────────
+  if (!isDive) {
+    getStore().appendLog(
+      'world',
+      `The stair drops away into trap-laced dark. Each dive is a single d20 + DEX (yours: ${dex}) against DC ${dc} — read the pressure-plates and time the fall. ` +
+      `Clean dives banked: ${banked}/3. (DIVE THE STAIR to attempt one — a miss springs the trap but costs you no run; you can dive again.)`,
+    );
+    return;
+  }
+
+  // ── DIVE (retryable) ──────────────────────────────────────────────────────
+  const r = tc.rollCheck(dex, dc);
+  const rollLine = `(d20 ${r.roll} + DEX ${dex} = ${r.total} vs DC ${dc})`;
+  if (r.success) {
+    const nowBanked = banked + 1;
+    if (nowBanked >= 3) {
+      getStore().appendLog('world', `You read the last plate a heartbeat before it reads you and roll clear onto the landing. Three dives, none sprung — you move through this place like it was built for you. ${rollLine}`);
+    } else {
+      getStore().appendLog('world', `You thread the dive clean — plates unsprung, rope true. That's ${nowBanked}/3. ${rollLine}`);
+    }
+    recordTitleProgress(getStore, setStore, { trapCleanDives: 1 });
+  } else {
+    const dmg = 1 + Math.floor(Math.random() * 6);
+    const newHp = Math.max(1, player.hp - dmg); // non-lethal — the stair lets you try again
+    setStore((s) => (s.player ? { player: { ...s.player, hp: newHp } } : s));
+    getStore().appendLog('world', `A plate gives under your heel — a whir of darts, a dropped step. The trap springs for ${dmg} (${newHp}/${player.hpMax} HP). Still ${banked}/3 clean; steady yourself and dive again. ${rollLine}`);
+    checkLowHpWarning(player.hp, newHp, player.hpMax ?? 1, getStore, setStore);
   }
 }
 
@@ -1007,34 +1357,91 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
   getStore().appendLog('world', missionLine);
 }
 
-// OTA-223 — background dormancy watchdog. Polls every 60s; if Qwen
-// reports isDormant() (the OOM-killed state where status==='ready'
-// but the native runtime is gone), kicks forceReinitialize() in the
-// background. Player never has to wait for the deterministic fallback
-// or notice anything — Qwen stays warm.
+// OTA-223 — background dormancy watchdog. Polls every 60s; if Qwen isn't
+// healthy, kicks forceReinitialize() in the background so it warms back up
+// before the next narration/fusion — the player never waits on it.
+//
+// OTA-797 — the watchdog used to only recover the NARROW dormant case
+// (isDormant(): status==='ready' but the native runtime OOM-died). But
+// forceReinitialize() resets status to idle→loading→ then EITHER 'ready'
+// (success) or 'failed' (if the reload throws under memory pressure). A
+// SINGLE failed revival left status='failed', where isDormant() is FALSE —
+// so the old `if (!isDormant()) return` short-circuited forever and Qwen
+// stayed not-ready for the rest of the session (whole-session qwen-not-ready,
+// 2026-07-13 device log: one "detected dormant" line, then hours of template
+// fallback). Now the watchdog revives from ANY unhealthy-and-not-progressing
+// state (idle / failed / dormant), keeps retrying every tick, and unwedges a
+// reinit that hangs in loading/downloading past a generous window.
 //
 // Held at module scope so startQwenWatchdog() can replace it on
 // re-entry without leaking handles.
 let qwenWatchdogTimer: ReturnType<typeof setInterval> | null = null;
 const QWEN_WATCHDOG_INTERVAL_MS = 60_000;
-function startQwenWatchdog(get: () => GameStore): void {
+// How long a re-init may sit in 'loading'/'downloading' before the watchdog
+// treats it as wedged and re-kicks. Generous: once dormancy is even possible
+// the GGUF is already cached, so a warm reload is ~5-30s; a legit in-flight
+// load is never interrupted.
+const QWEN_REINIT_HANG_MS = 150_000;
+let qwenReinitInFlightSince = 0;
+let qwenReinitAttempts = 0;
+function startQwenWatchdog(
+  get: () => GameStore,
+  set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+): void {
   if (qwenWatchdogTimer !== null) {
     clearInterval(qwenWatchdogTimer);
     qwenWatchdogTimer = null;
   }
+  qwenReinitInFlightSince = 0;
+  qwenReinitAttempts = 0;
   qwenWatchdogTimer = setInterval(() => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const q = qwen as any;
-      if (typeof q.isDormant !== 'function' || typeof q.forceReinitialize !== 'function') return;
-      if (!q.isDormant()) return;
+      const q = qwen;
+      if (typeof q.forceReinitialize !== 'function' || typeof q.getStatus !== 'function') return;
+      // Healthy — nothing to do; clear any in-flight tracking.
+      if (q.isReady()) {
+        if (qwenReinitAttempts > 0) {
+          get().appendLog('debug', `qwen-watchdog: Qwen ready again (recovered after ${qwenReinitAttempts} attempt${qwenReinitAttempts === 1 ? '' : 's'}).`);
+          // Mirror the revived engine status onto the store so About/debug
+          // surfaces don't stay stuck on 'failed' (narration itself already
+          // recovers — narrateViaArbiter reads qwen.isReady() directly).
+          set((s) => (s.qwenStatus === 'ready' ? {} : { qwenStatus: 'ready', qwenError: null }));
+        }
+        qwenReinitInFlightSince = 0;
+        qwenReinitAttempts = 0;
+        return;
+      }
+      const st = q.getStatus();
+      // A (re)init is genuinely in progress — let it finish, unless it has
+      // been wedged past the hang window (then fall through to re-kick).
+      if (st === 'downloading' || st === 'loading') {
+        if (qwenReinitInFlightSince === 0 || Date.now() - qwenReinitInFlightSince < QWEN_REINIT_HANG_MS) return;
+        get().appendLog('debug', `qwen-watchdog: reinit wedged in '${st}' for >${Math.round(QWEN_REINIT_HANG_MS / 1000)}s — re-kicking.`);
+      }
+      // Not ready and not making progress (idle / failed / dormant ready-but-
+      // dead / wedged): kick a fresh reinit. Keeps retrying every 60s so a
+      // transient memory-pressure failure doesn't strand Qwen for the session.
+      qwenReinitAttempts += 1;
+      qwenReinitInFlightSince = Date.now();
+      // OTA-909 — name the DORMANT case distinctly so the log doesn't read as a
+      // self-contradiction. Dormant = status==='ready' but the native llama
+      // context was released (dispose() on app-BACKGROUND frees the ~398MB
+      // context to reclaim memory; the JS status field isn't notified). That's
+      // the watchdog working AS DESIGNED, not a "ready-but-not-ready" bug — the
+      // old wording ("Qwen not ready (status='ready')") looked like a defect.
+      const dormant = typeof q.isDormant === 'function' && q.isDormant();
       get().appendLog(
         'debug',
-        `qwen-watchdog: detected dormant runtime — kicking forceReinitialize() in background.`,
+        dormant
+          ? `qwen-watchdog: Qwen dormant (status='${st}' but the native context was released — usually app-backgrounding); reinitializing (attempt #${qwenReinitAttempts}).`
+          : `qwen-watchdog: Qwen not ready (status='${st}'); reinitializing (attempt #${qwenReinitAttempts}).`,
       );
-      void q.forceReinitialize().catch((err: unknown) => {
-        get().appendLog('debug', `qwen-watchdog: reinit threw: ${String(err)}`);
-      });
+      void q.forceReinitialize()
+        .then(() => { qwenReinitInFlightSince = 0; })
+        .catch((err: unknown) => {
+          qwenReinitInFlightSince = 0;
+          get().appendLog('debug', `qwen-watchdog: reinit attempt #${qwenReinitAttempts} threw: ${String(err)}`);
+        });
     } catch { /* watchdog should never crash the host */ }
   }, QWEN_WATCHDOG_INTERVAL_MS);
 }
@@ -1083,7 +1490,7 @@ const DIRECTION_KEYWORDS = /\b(direction|way|paths?|exits?|route|where to go|whi
 // action where the player has already declared their intent.
 const ARBITER_ENGAGED_INTENTS: ReadonlySet<string> = new Set([
   'attack', 'investigate', 'open', 'pickup', 'use_relic', 'cast',
-  'steal', 'gift', 'craft', 'equip', 'throw', 'dig', 'repair',
+  'steal', 'craft', 'equip', 'throw', 'dig', 'repair',
   'accept', 'turn_in', 'sell', 'buy',
   'climb', 'search', 'drop', 'scrap', 'talk', 'advance', 'retreat',
   'unequip',
@@ -1101,6 +1508,12 @@ const STAMINA_COSTS = {
   attack: 1,
   skillCheck: 1,
 } as const;
+
+// OTA-847 (STEALTH SYSTEM) — Stealth at or above this value makes a FAILED
+// pickpocket against a vendor fail QUIETLY (you feel the mark's attention turn
+// and withdraw clean) instead of getting caught into a fight. A practiced thief
+// doesn't get grabbed red-handed; a clumsy one does. Tunable design knob.
+const STEALTH_QUIET_FAIL_STE = 14;
 
 // OTA 008 — Arbiter welcome-back debounce. Skip the line when the
 // player navigates away + back faster than this; first cold-load
@@ -1231,6 +1644,17 @@ const BODY_VERB_PART: Record<string, string> = {
  *  surfaced 7868 over 10 in-game days. 50 keeps it a meaningful
  *  gameplay signal (and within the range the narration / Arbiter
  *  remarks were authored to react to). */
+/** OTA-1006 — #122: hub rooms that are OPEN AIR. The hub graph mixes exterior
+ *  spaces (the gate, the square, the culvert descent) with genuinely roofed
+ *  ones (armory, mess, workshop, quarters, lab, vault, chapel) and the buried
+ *  level below. Only these stay exposed to weather; being anywhere else in a
+ *  hub — or inside a building — means a roof. */
+const OPEN_AIR_HUB_ROOMS: ReadonlySet<string> = new Set([
+  'outpost_gate',
+  'outpost_central',
+  'outpost_culvert_descent',
+]);
+
 const CORRUPTION_MAX = 50;
 const TRAVEL_MIN_STAMINA = STAMINA_COSTS.travel;
 
@@ -1293,16 +1717,82 @@ function acceptKeyword(title: string): string {
 // to the raw saved player (which still loads — and the persist integrity
 // guard then refuses to write it back if it's missing core identity)
 // instead of failing the load to .bak / a slot-load error.
+// OTA-839 (HAL only) — one-time INTEL BACKFILL for a returning character. The
+// observed-weakness system (OTA-838) only starts recording the day you install it,
+// so a long-time character would open the new bestiary/panel to blank weaknesses on
+// foes they've beaten dozens of times. A player who DEFEATED an enemy did learn its
+// reactions in that fight, so we seed each already-defeated enemy's canonical
+// (type + base-trait) weak/resist set — the SAME reconcile the EnemyPanel's
+// defensesFor uses (trait wins on a discord). Runs once: only when the save carries
+// no enemyIntel yet (post-838 saves keep their real observations untouched).
+export function backfillEnemyIntelFromDefeats(
+  defeatedNames: readonly string[] | undefined,
+): Record<string, { weak: string[]; resist: string[] }> {
+  const out: Record<string, { weak: string[]; resist: string[] }> = {};
+  if (!defeatedNames || defeatedNames.length === 0) return out;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const enemies = require('../data/enemies/enemies.json') as Array<{ name: string; type?: string; traits?: string[] }>;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { enemyTypeDefenses } = require('../engine/crafting') as typeof import('../engine/crafting');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { traitDefenses } = require('../engine/enemyTraits') as typeof import('../engine/enemyTraits');
+  const byName = new Map(enemies.map((e) => [e.name.toLowerCase(), e]));
+  for (const rawName of new Set(defeatedNames.map((n) => n.toLowerCase()))) {
+    const e = byName.get(rawName);
+    if (!e) continue;
+    const type = enemyTypeDefenses(e.type);
+    const trait = traitDefenses(e.traits);
+    const all = Array.from(new Set([...type.resist, ...type.weak, ...trait.resists, ...trait.weaknesses]));
+    const weak: string[] = [];
+    const resist: string[] = [];
+    for (const dt of all) {
+      const typeDir = type.weak.includes(dt) ? 1 : type.resist.includes(dt) ? -1 : 0;
+      const traitDir = trait.weaknesses.includes(dt) ? 1 : trait.resists.includes(dt) ? -1 : 0;
+      const dir = traitDir !== 0 ? traitDir : typeDir; // trait wins on a discord (mirrors defensesFor)
+      if (dir > 0) weak.push(dt);
+      else if (dir < 0) resist.push(dt);
+    }
+    if (weak.length || resist.length) out[rawName] = { weak, resist };
+  }
+  return out;
+}
+
 // Exported for the OTA-486 regression test (equipped hands/cloak must survive a
 // load). The save/load round-trip funnels every load through this migration.
+/** OTA-1021 — ONE worldMemory load-migration for every door into a save. It was a
+ *  literal inside loadSlotIntoGame only, so resurrectSlot loaded RAW memory:
+ *  no canon-location resync, no intel backfill — a whole revived session of
+ *  missing atlas pins, dead contract markers and a blank bestiary. */
+export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
+  return {
+    ...wm,
+    puppyVendorOwed: wm.puppyVendorOwed ?? false,
+    puppyVendorUsed: wm.puppyVendorUsed ?? false,
+    gemBossDefeatedKeys: wm.gemBossDefeatedKeys ?? [],
+    puppyVendorQueued: wm.puppyVendorQueued ?? false,
+    dogGolemCoActivated: wm.dogGolemCoActivated ?? false,
+    dogAerialNoticeShown: wm.dogAerialNoticeShown ?? [],
+    dogClimbNoticeShown: wm.dogClimbNoticeShown ?? false,
+    factionRepIntroShown: wm.factionRepIntroShown ?? false,
+    earnedTitleAnnounced: wm.earnedTitleAnnounced ?? [],
+    fusionCompensationGranted: wm.fusionCompensationGranted ?? false,
+    pendingDogOnboarding: wm.pendingDogOnboarding ?? null,
+    enemyIntel: wm.enemyIntel ?? backfillEnemyIntelFromDefeats(wm.defeatedEnemies),
+  };
+}
+
 export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
+  // OTA-1021 — retire legacy catalog names FIRST so every later pass (kind/tag
+  // restamp, durability, equip pointers) works on names the catalog still
+  // knows. See itemMigrations.LEGACY_ITEM_RENAMES.
+  const pm = applyLegacyItemRenames(p);
   let out: PlayerCharacter;
   try {
-    out = backfillPlayerInner(p);
+    out = backfillPlayerInner(pm);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn('backfillPlayer: save-upgrade migration threw; loading the raw saved player (degraded-safe)', e);
-    out = p;
+    out = pm;
   }
   // OTA-416 — a LIVE character can never legitimately sit at hp<=0 (that IS
   // death; death is gated by the `dead` flag, not by hp). If a save loads
@@ -1313,6 +1803,58 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   if (!out.dead && (out.hp ?? 0) <= 0) {
     const safeMax = out.hpMax && out.hpMax > 0 ? out.hpMax : 1;
     out = { ...out, hp: safeMax, stamina: out.staminaMax ?? out.stamina ?? 0 };
+  }
+  // OTA-991 — 'Skyreacher Chart (N of 5)' became 'Skyreacher Map N of 5 — <tower>'.
+  // Rename legacy charts sitting in old saves so the catalog row — and with it
+  // the Use effect that unlocks the great climb — resolves again.
+  if (out.inventory?.some((i) => LEGACY_SKYREACHER_CHART_NAMES.includes(i.name))) {
+    out = {
+      ...out,
+      inventory: out.inventory.map((i) => {
+        const at = LEGACY_SKYREACHER_CHART_NAMES.indexOf(i.name);
+        return at >= 0 ? { ...i, name: SKYREACHER_CHARTS[at]!.name } : i;
+      }),
+    };
+  }
+  // OTA-1024 — instanceStats stat CHANNELS freeze at mint; when the catalog
+  // retargeted the 42 charisma-stat weapons, old instances kept granting the
+  // dead CHA channel forever. Re-point those bonuses at the catalog's current
+  // stat (fused pieces excluded — instance-authoritative).
+  if (out.inventory?.some((i) => (i.instanceStats?.statBonuses ?? []).some((b) => b.stat === 'charisma') && !i.uniqueStats && !(i.tags ?? []).includes('fused'))) {
+    out = { ...out, inventory: out.inventory.map((i) => {
+      const sb = i.instanceStats?.statBonuses;
+      if (!sb || i.uniqueStats || (i.tags ?? []).includes('fused')) return i;
+      const chaCat = findWeaponByName(i.name);
+      if (!chaCat || !chaCat.stat || chaCat.stat === 'charisma') return i;
+      const fixed = sb.map((b) => (b.stat === 'charisma' ? { ...b, stat: chaCat.stat! } : b));
+      return fixed.some((b, ix) => b !== sb[ix]) ? { ...i, instanceStats: { ...i.instanceStats, statBonuses: fixed } } : i;
+    }) };
+  }
+  // OTA-1021 — the golem's held armament lives OUTSIDE the inventory array and
+  // never met the restamp/durability passes. Heal it like any pack item.
+  if (out.golem?.weapon) {
+    out = { ...out, golem: { ...out.golem, weapon: restampInventoryItem(stampDurability(out.golem.weapon)) } };
+  }
+  // OTA-1028 — GHOST EQUIP REFERENCES. bandolierIds / toolPouchIds index inventory
+  // INSTANCES, but only THROW and UNRACK cleaned them — selling, scrapping,
+  // drinking, gifting, fusing or fully using a racked item left its id behind
+  // forever. A ghost RENDERS as an empty slot yet still counts against the
+  // cap: the owner's bandolier showed two "+ rack throw" slots that refused
+  // everything ("Five loops, five throws") — permanently wedged, with no
+  // affordance to clear them. Sweep on every load; the stow cap checks also
+  // count only LIVE ids so a mid-session ghost can never wedge a rack again.
+  {
+    const ghostInvIds = new Set((out.inventory ?? []).map((i) => i.id));
+    const eqRef = out.equipped;
+    const deadBand = (eqRef?.bandolierIds ?? []).some((id) => !ghostInvIds.has(id));
+    const deadPouch = (eqRef?.toolPouchIds ?? []).some((id) => !ghostInvIds.has(id));
+    if (eqRef && (deadBand || deadPouch)) {
+      out = { ...out, equipped: {
+        ...eqRef,
+        bandolierIds: (eqRef.bandolierIds ?? []).filter((id) => ghostInvIds.has(id)),
+        toolPouchIds: (eqRef.toolPouchIds ?? []).filter((id) => ghostInvIds.has(id)),
+      } };
+    }
   }
   return out;
 }
@@ -1373,7 +1915,10 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     }
     let item = stampDurability(i);
     const lookup = lookupCraftedItem(item.name);
-    if (lookup.kind !== 'misc' && item.kind !== lookup.kind) {
+    // OTA-1024 — fused pieces are kind-authoritative (mirrors restampInventoryItem's
+    // guard): a fused ARMOR sharing a name with a catalog weapon row flipped to
+    // 'weapon' on every load.
+    if (!item.uniqueStats && !(item.tags ?? []).includes('fused') && lookup.kind !== 'misc' && item.kind !== lookup.kind) {
       item = { ...item, kind: lookup.kind };
       // Kind change can unlock durability tracking — re-stamp so the
       // newly-eligible item picks up its baseDurability on this load.
@@ -1396,10 +1941,38 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // OTA-688 — mark older Crucible forges. applyFusion now stamps uniqueStats AND
     // a 'fused' tag, but pieces forged before the tag existed carry uniqueStats
     // without it. Backfill the tag on load so every crucible item is marked (the
-    // inventory ✶ badge + any fused-aware logic keys off it). uniqueStats is set
-    // ONLY by fusion, so this can't mislabel authored or looted gear.
-    if (item.uniqueStats && !(item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) {
+    // inventory ✶ badge + any fused-aware logic keys off it).
+    // OTA-828 — Core Guardian reward gear now ALSO carries uniqueStats (so it's a
+    // usable weapon/armor — see coreGuardians.ts), which breaks OTA-688's old
+    // "uniqueStats ⇒ fused" assumption. A Guardian drop is NOT a forge: skip the
+    // fused-tag backfill AND the fused-name migration below for the tagged set, so
+    // "Atalan's Trident" keeps its name and doesn't read as a Crucible fusion.
+    const isGuardianReward = (item.tags ?? []).some((t) => t.toLowerCase() === 'core_guardian_set');
+    // OTA-830 — make a Core Guardian drop granted BEFORE OTA-828 usable. Those saves
+    // stored the weapon/armor with NO uniqueStats (the builder didn't stamp it yet),
+    // so getEquippedWeapon resolved them barehanded and aggregateArmor gave 0 AC —
+    // "Atalan's Trident can't be used." (A name that happens to contain a catalog word
+    // like "Halberd" worked by accident via findWeaponByName's fuzzy match; a
+    // "Trident" / "Rosary" / "Tuning Fork" did not.) Backfill uniqueStats from the
+    // canonical set entry, matched by name, BEFORE the fused-tag backfill below (which
+    // still skips Guardian gear via !isGuardianReward).
+    if (isGuardianReward && !item.uniqueStats) {
+      const gStats = (require('../engine/coreGuardians') as typeof import('../engine/coreGuardians')).guardianGearUniqueStats(item);
+      if (gStats) item = { ...item, uniqueStats: gStats };
+    }
+    if (item.uniqueStats && !isGuardianReward && !(item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) {
       item = { ...item, tags: [...(item.tags ?? []), 'fused'] };
+    }
+    // OTA-978 — reach recheck for already-forged weapons (owner: "have it recheck
+    // and fix old saves as well"). Every fused weapon now carries an explicit
+    // reachClass; older forges get it inferred from their name on load — a
+    // legacy "Humming Bow" shoots from distance, a "Cairn Spear" reaches to
+    // mid, and a "Resonant Spike" is honestly close-quarters. Idempotent:
+    // items already stamped are skipped.
+    if (item.uniqueStats && !isGuardianReward && item.uniqueStats.kind === 'weapon' && !item.uniqueStats.reachClass) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { inferReachFromName: irnSweep } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+      item = { ...item, uniqueStats: { ...item.uniqueStats, reachClass: irnSweep(item.name) ?? 'melee' } };
     }
     // OTA-225 — repair the OTA-221 deterministic-synth name bug. A
     // signed-shift bug produced fused items named "Resonant
@@ -1430,7 +2003,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // section) before OTA-704/705 sealed the resolution. Those fixes made the collision
     // harmless, but the ugly/duplicate name persisted — re-mint a distinct, non-
     // colliding deterministic name. Idempotent: a clean name is left alone next load.
-    if (item.uniqueStats) {
+    if (item.uniqueStats && !isGuardianReward) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { migrateFusedName } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
       item = migrateFusedName(item);
@@ -1464,6 +2037,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     legs: eq.legs,
     feet: eq.feet,
     cloak: eq.cloak,
+    lens: eq.lens,
     amulet: eq.amulet,
     ring: eq.ring,
     // OTA-239 — three concurrent ring slots. Legacy saves with only
@@ -1478,6 +2052,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     legsId: eq.legsId ?? findFirstId(eq.legs),
     feetId: eq.feetId ?? findFirstId(eq.feet),
     cloakId: eq.cloakId ?? findFirstId(eq.cloak),
+    lensId: eq.lensId ?? findFirstId(eq.lens),
     amuletId: eq.amuletId ?? findFirstId(eq.amulet),
     ringId: eq.ringId ?? findFirstId(eq.ring),
     ring2Id: eq.ring2Id ?? findFirstId(eq.ring2),
@@ -1490,6 +2065,20 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // racks throwables via the InventoryScreen BANDOLIER section.
     bandolierIds: Array.isArray(eq.bandolierIds) ? eq.bandolierIds : [],
   };
+  // OTA-927 — the Aetheric Vision Lens (and sibling aether-sight gadgets) moved from
+  // "active while carried" to a dedicated equip-gated `lens` slot. One-time migration:
+  // if the lens slot is empty and the player carries an aether-sight gadget, auto-equip
+  // the first one so nobody silently loses their detect_aether passive on update.
+  if (equipped && !equipped.lens) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findExplorationItemByName: _findExpLens } = require('../engine/crafting');
+    const _wornLens = inventory.find((i) => {
+      if ((i.quantity ?? 0) <= 0) return false;
+      const _e = _findExpLens(i.name);
+      return _e?.effect?.kind === 'gate' && _e.effect.unlocks === 'detect_aether';
+    });
+    if (_wornLens) { equipped.lens = _wornLens.name; equipped.lensId = _wornLens.id; }
+  }
   // v2.4.1 (OTA 029) — never let currentLocationId be undefined.
   // The hub system, scene rebuild, mapX/mapY math, atlas marker
   // positioning, and several quest paths all key off it. A missing
@@ -1512,6 +2101,9 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { grandfatheredKnownRecipes: _gkr } = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
   const knownRecipes = _gkr(_allRecipes, inventory.map((i) => i.name), p.knownRecipes);
+  // OTA-949 — the OTA-938 one-time dog-revive migration is RETIRED (spent make-good). A dead or
+  // abandoned dog is no longer auto-restored on load; the dog loads exactly as saved. The
+  // `dogRevivedOta938` flag on old saves is now inert.
   return {
     ...p,
     stats,
@@ -1623,6 +2215,9 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
         const cell = canonicalCellOf(p.currentLocationId);
         gx = cell.x; gy = cell.y;
       }
+      // (The OTA-784 one-time fresh-market repair — drop a market-parked save 5
+      // tiles east + skip one auto-enter — was REMOVED in OTA-794: it existed to
+      // reset saves after a failed OTA, and the affected save has been repaired.)
       // OTA-510 — one-shot: drop the player ONE tile west of the Hidden Market so
       // the next auto-route to it reads exactly 1 pace. Flag-guarded so it fires
       // once and never re-yanks the player back on subsequent loads. Computed from
@@ -1663,7 +2258,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     travelTarget: (() => {
       const t = p.travelTarget;
       if (!t) return undefined;
-      // OTA — re-seed the resumed journey from the player's LIVE absolute cell
+      // OTA-953 — re-seed the resumed journey from the player's LIVE absolute cell
       // (gridX/gridY via playerGridCell), NOT the departure city. The old
       // canonicalDistance(currentLocationId, target) re-seeded the FULL
       // city→target distance every load, so if the OS reclaimed the process
@@ -1717,6 +2312,753 @@ function recordMemorableEvent(
   }));
 }
 
+// OTA-844 [world pulse] — how much in-game time between world heartbeats. ~one pulse
+// per in-game day: often enough that a long game visibly shifts, rare enough that the
+// rumours never spam.
+// OTA-855 — the world ticks every couple of in-game hours, not once a day. At 24h the
+// sim effectively never ran in a normal session (a 15-min sitting is only a few in-game
+// hours), so the board stayed empty. 2h means patrols move + fight throughout play.
+const WORLD_TICK_HOURS = 2;
+// OTA-855 — patrols only clash when they actually cross paths, which takes several steps
+// of roaming. Run this many sim sub-steps per tick so they cover ground and the board
+// fills at a satisfying pace instead of one line every real hour.
+const PATROL_SUBSTEPS_PER_TICK = 4;
+
+// OTA-859 [bounty board] — how many kill-bounties the player may carry at once. Small
+// enough that the slate stays meaningful, big enough to stack a grind.
+const MAX_ACTIVE_BOUNTIES = 3;
+// Read the player's bounty slate, migrating a LEGACY single activeBounty into the array
+// so an old save mid-contract doesn't lose it.
+function activeBountiesOf(
+  player: { activeBounties?: import('../engine/factionBounty').FactionBounty[]; activeBounty?: import('../engine/factionBounty').FactionBounty } | null | undefined,
+): import('../engine/factionBounty').FactionBounty[] {
+  if (!player) return [];
+  if (player.activeBounties && player.activeBounties.length > 0) return player.activeBounties;
+  if (player.activeBounty) return [player.activeBounty];
+  return [];
+}
+
+// OTA-862 — drop any bounty whose in-game deadline has passed. Called wherever in-game
+// time has just advanced (the action-completion path). Announces each lapse so the player
+// knows a contract went cold; no standing penalty — just the lost payout.
+function expireBounties(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  if (!player) return;
+  const slate = activeBountiesOf(player);
+  if (slate.length === 0) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { bountyExpired } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
+  const hour = player.hoursElapsed ?? 0;
+  const kept = slate.filter((b) => !bountyExpired(b, hour));
+  if (kept.length === slate.length) return; // nothing lapsed
+  const lapsed = slate.filter((b) => bountyExpired(b, hour));
+  set((s) => (s.player ? { player: { ...s.player, activeBounties: kept, activeBounty: undefined } } : s));
+  for (const b of lapsed) {
+    get().appendLog('arbiter', `"The ${b.giverName} contract on the ${b.targetName} has lapsed," the Arbiter says. "You were too slow. The offer's off the board."`);
+  }
+}
+
+// OTA-844/849/851 — the world's heartbeat. Called at the end of every action; when a
+// full pulse of in-game time has accrued, one WORLD EVENT fires from a broad, weighted
+// catalogue (OTA-851: surges, skirmishes, musters, warbands, schisms, caravans, omens,
+// bounties posted, …) so the world never reads the same twice. The event's data-only
+// effect is applied here (tide shifts, patrol musters, rep nudges, bounty offers), then
+// the roaming patrols advance and fight OFF-SCREEN (rival patrols clash, patrols assault
+// enemy outposts, beasts maul them) — each skirmish another line on the board. All
+// deterministic (seeded by the tick index). First call just stamps the baseline.
+function worldTideCheck(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const s = get();
+  const player = s.player;
+  if (!player) return;
+  // arb-fix — freeze world-sim faction drift during the tutorial. The tutorial
+  // runs on currentScreen 'exploration' with tutorialStep !== null, so the
+  // realtime guard's screen check doesn't cover it, and rests/actions in the
+  // intro were drifting four factions' standing before the player had done
+  // anything. Hold the world still until the character is out of the tutorial.
+  if (s.tutorialStep !== null && s.tutorialStep !== undefined) return;
+  const hour = player.hoursElapsed ?? 0;
+  if (s.worldMemory.lastWorldTickHour === undefined) {
+    set((st) => ({ worldMemory: { ...st.worldMemory, lastWorldTickHour: hour } }));
+    return;
+  }
+  if (hour - s.worldMemory.lastWorldTickHour < WORLD_TICK_HOURS) return;
+  const tickIndex = Math.floor(hour / WORLD_TICK_HOURS);
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const WE = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+  const ctx = { factions, tides: s.worldMemory.factionTides ?? {}, standings: player.factionStanding };
+  const ev = WE.pickWorldEvent(ctx, tickIndex);
+  if (ev) {
+    // Apply the event's data-only effect.
+    let tides = WE.applyTideDelta(s.worldMemory.factionTides ?? {}, ev.effect.tideDelta);
+    if (ev.effect.repDelta) {
+      const rep = applyRepChange(player.factionStanding, ev.effect.repDelta.factionId, ev.effect.repDelta.delta);
+      set((st) => (st.player ? { player: { ...st.player, factionStanding: rep.standing } } : st));
+      logRepChanges(get, rep.changed);
+    }
+    set((st) => ({
+      worldMemory: {
+        ...st.worldMemory,
+        factionTides: tides,
+        // OTA-853 — world drama lands on the WORLD board (capped 50), NOT the play feed.
+        worldEvents: [...(st.worldMemory.worldEvents ?? []), { text: ev.rumor, hour, kind: ev.kind }].slice(-50),
+      },
+    }));
+    // Only PLAYER-directed nudges reach the exploration feed (a posted bounty). The
+    // ambient world churn stays on the board so it never clutters play.
+    if (ev.effect.musterPatrols) musterPatrols(get, set, factions, ev.effect.musterPatrols.factionId, ev.effect.musterPatrols.count);
+    if (ev.effect.offerBounty) {
+      get().appendLog('arbiter', `"There's coin on the board for a willing blade," the Arbiter says. "Read the World."`);
+    }
+  }
+  // Roaming patrols: keep the fielded count in line with each faction's power, then let
+  // them roam + fight off-screen. Several sub-steps per tick so they actually meet.
+  maintainPatrols(get, set, factions, tickIndex);
+  // OTA-855 — a WARM-UP burst the very first time patrols exist, so a player who opens
+  // the World board early already sees the war underway instead of a blank feed.
+  const firstEver = (get().worldMemory.worldEvents ?? []).length === 0;
+  const steps = firstEver ? PATROL_SUBSTEPS_PER_TICK * 4 : PATROL_SUBSTEPS_PER_TICK;
+  for (let i = 0; i < steps; i++) simulatePatrols(get, set, factions, hour, tickIndex * 16 + i);
+  set((st) => ({ worldMemory: { ...st.worldMemory, lastWorldTickHour: hour } }));
+}
+
+// OTA-853 — a faction fields more patrols the more POWER it holds (the war scoreboard,
+// factionTides). Every faction keeps a standing force (min 2) so the wars never stall,
+// scaling up to 10 for a dominant one. ~5 average × 9 factions ≈ 45 patrols roaming —
+// lively but far below any performance concern.
+const PATROL_SOFT_CAP = 100; // total patrols across the world; well under the O(N²) worry
+function targetPatrolCount(power: number): number { return Math.max(2, Math.min(10, 5 + Math.round(power))); }
+function maintainPatrols(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  factions: import('../engine/worldPulse').FactionMeta[],
+  tickIndex: number,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { FACTION_STARTING_LOCATION } = require('../engine/character') as typeof import('../engine/character');
+  const tides = get().worldMemory.factionTides ?? {};
+  const cur = get().worldMemory.patrols ?? [];
+  const idxByFaction = new Map<string, number[]>();
+  cur.forEach((p, i) => { const a = idxByFaction.get(p.factionId) ?? []; a.push(i); idxByFaction.set(p.factionId, a); });
+  let next = [...cur];
+  const dropIdx = new Set<number>();
+  for (const f of factions) {
+    const outpost = FACTION_STARTING_LOCATION[f.id];
+    if (!outpost) continue;
+    const want = targetPatrolCount(tides[f.id] ?? 0);
+    const idxs = idxByFaction.get(f.id) ?? [];
+    if (idxs.length < want && next.length < PATROL_SOFT_CAP) {
+      const cell = canonicalCellOf(outpost);
+      // OTA-855 — REPOPULATION is PACED, not instant. A faction musters fresh patrols
+      // from its outpost, but only a trickle per cycle (REINFORCE_PER_TICK) — so losses
+      // to beasts and rivals actually PERSIST, and a faction on a bad run stays thinned
+      // while others gain the upper hand. Exception: a cold start (0 patrols) deploys the
+      // full force at once, so a fresh world isn't empty. And the target itself scales
+      // with the faction's war power, so a losing faction rebuilds toward a smaller army.
+      const REINFORCE_PER_TICK = 1;
+      const fillTo = idxs.length === 0 ? want : Math.min(want, idxs.length + REINFORCE_PER_TICK);
+      for (let i = idxs.length; i < fillTo && next.length < PATROL_SOFT_CAP; i++) {
+        // SCATTER on spawn so patrols don't all stack on one cell (stacked patrols never
+        // cross an enemy). Deterministic spread of a few tiles around the outpost.
+        const ph = (tickIndex + i * 7) % 97;
+        const ox = ((ph % 7) - 3);
+        const oy = ((Math.floor(ph / 7) % 7) - 3);
+        next.push({ factionId: f.id, gx: cell.x + ox, gy: cell.y + oy, homeX: cell.x, homeY: cell.y, phase: ph });
+      }
+    } else if (idxs.length > want) {
+      // OTA-853 — a fading faction's war-parties thin out instead of lingering forever.
+      for (let k = want; k < idxs.length; k++) dropIdx.add(idxs[k]!);
+    }
+  }
+  if (dropIdx.size > 0) next = next.filter((_, i) => !dropIdx.has(i));
+  if (next.length !== cur.length) set((st) => ({ worldMemory: { ...st.worldMemory, patrols: next } }));
+}
+
+// OTA-853 — the world fights its OWN wars. Patrols roam the whole map, seeking rival
+// ground; who fights whom is decided by live faction-vs-faction STANDING, not a static
+// rival list. When patrols meet: sworn enemies clash on sight, and even two neutrals can
+// come to blows through friction — which SEEDS a brand-new grudge from zero. Every clash
+// deepens the standing (the feud grows) and moves the war scoreboard (winner gains power,
+// loser bleeds it). Patrols also sack rival outposts and get mauled by beasts. All of it
+// streams to the World board.
+function simulatePatrols(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  factions: import('../engine/worldPulse').FactionMeta[],
+  hour: number,
+  tickIndex: number,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const WE = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const FR = require('../engine/factionRelations') as typeof import('../engine/factionRelations');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { FACTION_STARTING_LOCATION } = require('../engine/character') as typeof import('../engine/character');
+  const nameOf = (id: string) => factions.find((f) => f.id === id)?.name ?? id;
+  // Seed the grudge matrix from lore the first time.
+  let relations = get().worldMemory.factionRelations ?? {};
+  if (Object.keys(relations).length === 0) relations = FR.seedRelations(factions);
+  // Outpost cells (once).
+  const outpostCell: Record<string, { x: number; y: number }> = {};
+  for (const f of factions) { const loc = FACTION_STARTING_LOCATION[f.id]; if (loc) outpostCell[f.id] = canonicalCellOf(loc); }
+  let tides = { ...(get().worldMemory.factionTides ?? {}) };
+  const bumpPower = (id: string, d: number) => { tides[id] = Math.max(-5, Math.min(5, (tides[id] ?? 0) + d)); };
+  // Advance each patrol, drifting toward its NEAREST hostile faction's outpost so they go
+  // looking for a fight instead of milling about.
+  let patrols = (get().worldMemory.patrols ?? []).map((p) => {
+    let target: { x: number; y: number } | undefined;
+    let best = Infinity;
+    for (const f of factions) {
+      if (f.id === p.factionId) continue;
+      if (FR.getRelation(relations, p.factionId, f.id) > FR.HOSTILE_AT) continue;
+      const c = outpostCell[f.id]; if (!c) continue;
+      const d = Math.abs(p.gx - c.x) + Math.abs(p.gy - c.y);
+      if (d < best) { best = d; target = c; }
+    }
+    return WE.stepPatrol(p, tickIndex, target);
+  });
+  const events: { text: string; kind: string }[] = [];
+  const lost = new Set<number>();
+
+  // Patrol meetings (each unordered pair once).
+  for (let i = 0; i < patrols.length; i++) {
+    if (lost.has(i)) continue;
+    for (let j = i + 1; j < patrols.length; j++) {
+      if (lost.has(j)) continue;
+      const a = patrols[i]!, b = patrols[j]!;
+      if (a.factionId === b.factionId) continue;
+      if (Math.abs(a.gx - b.gx) + Math.abs(a.gy - b.gy) > 2) continue;
+      const rel = FR.getRelation(relations, a.factionId, b.factionId);
+      const seed = tickIndex * 131 + i * 17 + j;
+      const outcome = FR.meetOutcome(rel, seed);
+      if (!outcome.fight) continue;
+      // OTA-868 — BLOC BATTLE. Allied war-parties near the clash pile in on their side, and a
+      // skirmish becomes a coalition engagement. Combined power decides it, casualties scale —
+      // but stay CONSERVATIVELY capped (≤2 losing side, ≤1 winning side, so ≤3 total) so the
+      // field can never be wiped in one event; the paced muster refills the losses over time.
+      const midX = Math.round((a.gx + b.gx) / 2), midY = Math.round((a.gy + b.gy) / 2);
+      const BLOC_RADIUS = 3;
+      const alliedTo = (patFac: string, sideFac: string) =>
+        patFac === sideFac || FR.getRelation(relations, patFac, sideFac) >= FR.FRIENDLY_AT;
+      const sideA: number[] = [i], sideB: number[] = [j];
+      for (let k = 0; k < patrols.length; k++) {
+        if (k === i || k === j || lost.has(k)) continue;
+        const p = patrols[k]!;
+        if (Math.abs(p.gx - midX) + Math.abs(p.gy - midY) > BLOC_RADIUS) continue;
+        const toA = alliedTo(p.factionId, a.factionId), toB = alliedTo(p.factionId, b.factionId);
+        if (toA && !toB) sideA.push(k);
+        else if (toB && !toA) sideB.push(k); // allied to both / neither → stays out
+      }
+      const isBloc = sideA.length + sideB.length >= 3 && (sideA.length >= 2 || sideB.length >= 2);
+      if (isBloc) {
+        const sidePower = (side: number[]) => side.reduce((s, k) => s + 2 + Math.max(0, tides[patrols[k]!.factionId] ?? 0), 0);
+        const pA = sidePower(sideA), pB = sidePower(sideB);
+        const aSideWins = pA !== pB ? pA > pB : a.factionId < b.factionId;
+        const winSide = aSideWins ? sideA : sideB, loseSide = aSideWins ? sideB : sideA;
+        const winLead = aSideWins ? a.factionId : b.factionId, loseLead = aSideWins ? b.factionId : a.factionId;
+        // Conservative casualties: cap at 2 on the losing side, 1 on the winning side.
+        const loserLosses = Math.min(2, loseSide.length);
+        const winnerLosses = (loseSide.length >= 2 && winSide.length >= 2) ? Math.min(1, winSide.length) : 0;
+        const casualties: number[] = [];
+        for (let n = 0; n < loserLosses; n++) casualties.push(loseSide[loseSide.length - 1 - n]!);
+        for (let n = 0; n < winnerLosses; n++) casualties.push(winSide[winSide.length - 1 - n]!);
+        casualties.forEach((k) => lost.add(k));
+        bumpPower(winLead, 1); bumpPower(loseLead, -1);
+        relations = FR.adjustRelation(relations, a.factionId, b.factionId, FR.grudgeDelta(outcome.friction));
+        relations = FR.warmSharedEnemy(relations, winLead, loseLead, factions);
+        events.push({
+          text: WE.blocBattleLine(nameOf(winLead), nameOf(loseLead), loserLosses + winnerLosses, seed),
+          kind: 'bloc_battle',
+        });
+        break;
+      }
+      // 1v1 fallback. Winner: whoever holds more power (tie-break deterministically by id).
+      const aWin = (tides[a.factionId] ?? 0) !== (tides[b.factionId] ?? 0)
+        ? (tides[a.factionId] ?? 0) > (tides[b.factionId] ?? 0)
+        : a.factionId < b.factionId;
+      const loser = aWin ? j : i, winnerFac = aWin ? a.factionId : b.factionId, loserFac = aWin ? b.factionId : a.factionId;
+      lost.add(loser);
+      bumpPower(winnerFac, 1); bumpPower(loserFac, -1);
+      relations = FR.adjustRelation(relations, a.factionId, b.factionId, FR.grudgeDelta(outcome.friction));
+      // OTA-867 — enemy of my enemy: factions who also hate the loser warm toward the winner,
+      // so alliances EMERGE from shared foes (not just the lore seed). The Dynasty — hostile
+      // to all — is excluded by the helper, so it stays friendless.
+      relations = FR.warmSharedEnemy(relations, winnerFac, loserFac, factions);
+      // OTA-864 — deep, seeded flavour pool (varies verb + scenario) so the war reads fresh.
+      events.push({
+        text: WE.patrolClashLine(nameOf(winnerFac), nameOf(loserFac), outcome.friction, seed),
+        kind: 'patrol_clash',
+      });
+      break;
+    }
+  }
+  // Outpost assaults (only against a faction you're hostile with) + beast maulings.
+  for (let i = 0; i < patrols.length; i++) {
+    if (lost.has(i)) continue;
+    const p = patrols[i]!;
+    let assaulted = false;
+    for (const f of factions) {
+      if (f.id === p.factionId) continue;
+      if (FR.getRelation(relations, p.factionId, f.id) > FR.HOSTILE_AT) continue;
+      const cell = outpostCell[f.id]; if (!cell) continue;
+      if (Math.abs(p.gx - cell.x) + Math.abs(p.gy - cell.y) <= 2) {
+        bumpPower(f.id, -1); bumpPower(p.factionId, 1);
+        relations = FR.adjustRelation(relations, p.factionId, f.id, -4);
+        events.push({ text: WE.outpostAssaultLine(nameOf(p.factionId), nameOf(f.id), tickIndex * 53 + i * 11 + p.phase), kind: 'outpost_assault' });
+        assaulted = true;
+        break;
+      }
+    }
+    if (assaulted) continue;
+    // OTA-855 — beast maulings stay COMMON (~11%): the waste is a real predator that
+    // thins every faction's herd and can hand a rival the upper hand when the dice go
+    // cold. The MECHANICAL cull always applies; the feed only SAMPLES it (below) so the
+    // board isn't a wall of identical beast lines. Varied flavor keeps repeats readable.
+    if (((p.phase * 7 + tickIndex) % 9) === 0) {
+      lost.add(i);
+      bumpPower(p.factionId, -1);
+      // OTA-864 — 16-line seeded maul pool (beasts, storms, sinkholes, bad water …).
+      events.push({ text: WE.patrolMaulLine(nameOf(p.factionId), p.phase * 31 + tickIndex * 7 + i), kind: 'patrol_mauled' });
+    }
+  }
+
+  patrols = patrols.filter((_, i) => !lost.has(i));
+  // OTA-855 — the MECHANICS above (power shifts, grudges, culled patrols) all already
+  // applied. The FEED, though, only shows a bounded, drama-first SAMPLE per sub-step:
+  // clashes and outpost assaults lead, a taste of the beast maulings trails. So the war
+  // is fully simulated (the herd really is thinned) but the board reads as a story, not
+  // a wall of identical lines.
+  const FEED_PER_STEP = 3;
+  const prio: Record<string, number> = { bloc_battle: 0, patrol_clash: 1, outpost_assault: 2, patrol_mauled: 3 };
+  const sample = [...events].sort((a, b) => (prio[a.kind] ?? 9) - (prio[b.kind] ?? 9)).slice(0, FEED_PER_STEP);
+  set((st) => ({ worldMemory: {
+    ...st.worldMemory,
+    patrols,
+    factionTides: tides,
+    factionRelations: relations,
+    ...(sample.length > 0 ? {
+      // OTA-853 — world drama routes ONLY to the World board's own log (capped 50), never
+      // the exploration feed. You see it when you tap WORLD, not mid-play.
+      worldEvents: [...(st.worldMemory.worldEvents ?? []), ...sample.map((e) => ({ ...e, hour }))].slice(-50),
+    } : {}),
+  } }));
+}
+
+// OTA-851 — muster: add N roaming patrols for a faction at its outpost right now.
+function musterPatrols(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  factions: import('../engine/worldPulse').FactionMeta[],
+  factionId: string,
+  count: number,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { FACTION_STARTING_LOCATION } = require('../engine/character') as typeof import('../engine/character');
+  const outpost = FACTION_STARTING_LOCATION[factionId];
+  if (!outpost) return;
+  const cell = canonicalCellOf(outpost);
+  const cur = get().worldMemory.patrols ?? [];
+  const add = Array.from({ length: Math.max(1, count) }, (_, i) => ({
+    factionId, gx: cell.x, gy: cell.y, homeX: cell.x, homeY: cell.y, phase: (cur.length + i * 13 + 5) % 97,
+  }));
+  set((st) => ({ worldMemory: { ...st.worldMemory, patrols: [...(st.worldMemory.patrols ?? []), ...add] } }));
+}
+
+// OTA-849 [living world] — RIVAL RAIDS. When the player has taken a side (positive
+// standing with a faction), that faction's rivals come for them. Periodically — and
+// only in a peaceful outdoor moment, never mid-fight or when the player is already
+// hurt — a war party of the most ASCENDANT eligible rival drops in. The party
+// ESCALATES with the raider's World-Pulse tide (raidPartySize), so a faction on the
+// rise fields a bigger, deadlier group: the raids grow with the game. The Arbiter
+// gives a terse warning as they arrive. Killing raiders shifts standing (see the
+// kill-handler). Deliberately avoidable: the player can still flee.
+const RAID_MIN_HOURS = 20;      // min in-game hours between raids
+const RAID_TRIGGER_CHANCE = 0.3; // per eligible action, once past the cooldown
+
+// OTA-849/850 — build + inject a FACTION-tagged party into the current scene. Shared
+// by the aspatial rival RAID (OTA-849) and the outpost PATROL interception (OTA-850):
+// both field a group of that faction's soldiers, tagged with factionId (so kills shift
+// standing + tick a bounty) and scaled/escalated by the faction's World-Pulse tide.
+// Returns true if a party actually landed. Caller does the gating + the log lines.
+// OTA-985 — ESCORT collateral (engine_Dev model). Every enemy swing that CONNECTS on
+// the player also bleeds the shared escort pool: a fixed fraction of the FINAL
+// post-mitigation damage, EXTRA (never absorbed off the player), so a clean
+// parry that zeroes the hit spares the party too. Pool at 0 = the escort FAILS
+// on the spot. Parked (deactivated) parties are out of the fight.
+function applyEscortDamage(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  baseDmg: number,
+  enemyName: string,
+): void {
+  const player = get().player;
+  if (!player || baseDmg <= 0) return;
+  const active = player.activeFactionQuests ?? [];
+  if (!active.some((q) => q.escort && q.escort.hp > 0 && q.tracked !== false)) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { ESCORT_COLLATERAL_FRACTION } = require('../engine/escort') as typeof import('../engine/escort');
+  const collateral = Math.max(1, Math.round(baseDmg * ESCORT_COLLATERAL_FRACTION));
+  const hurt: { label: string; dmg: number; hp: number; hpMax: number }[] = [];
+  const failed: string[] = [];
+  const next = active.map((q) => {
+    if (!q.escort || q.tracked === false || q.escort.hp <= 0) return q;
+    const hp = Math.max(0, q.escort.hp - collateral);
+    if (hp <= 0) failed.push(q.id);
+    else hurt.push({ label: q.escort.label, dmg: collateral, hp, hpMax: q.escort.hpMax });
+    return { ...q, escort: { ...q.escort, hp } };
+  });
+  if (hurt.length === 0 && failed.length === 0) return;
+  set((s) => (s.player ? { player: { ...s.player, activeFactionQuests: next } } : s));
+  for (const h of hurt) {
+    void Promise.resolve().then(() =>
+      get().appendLog('combat', `${enemyName} catches your ${h.label} — ${h.dmg} damage (${h.hp}/${h.hpMax} HP).`),
+    );
+  }
+  if (failed.length > 0) failEscortQuests(get, set, failed);
+}
+
+// Drop one or more failed escort contracts: pulled from the active lists (NOT
+// marked completed), and announce who fell. The party is gone with the quest
+// record, so the HUD clears automatically.
+function failEscortQuests(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  failedIds: string[],
+): void {
+  const ids = new Set(failedIds);
+  set((s) => {
+    if (!s.player) return {};
+    return {
+      player: {
+        ...s.player,
+        activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => !ids.has(q.id)),
+        activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((id) => !ids.has(id)),
+      },
+    };
+  });
+  for (const id of failedIds) {
+    const def = findFactionQuestById(id);
+    const title = def?.title ?? id;
+    const label = def?.escort?.label ?? 'escort party';
+    const isAre = def?.escort?.count === 1 ? 'is' : 'are';
+    void Promise.resolve().then(() =>
+      get().appendLog('combat', `Your ${label} ${isAre} cut down. The escort "${title}" has failed — you couldn't keep them alive.`),
+    );
+  }
+}
+
+// OTA-985 — the escort party patches up while the player rests — modest (~10% of
+// pool max) so it can't outpace combat bleed. Only ACTIVE escorts heal; a
+// parked party is safe and doesn't need it. Called from BOTH rest resolvers.
+// OTA-990 — the outpost Crucible now runs like the roadside vendor's: 25 TC a
+// fire (owner: "make the outpost run the same as a roadside vendor"). A
+// vendor fire or a wild fusion bench arrives with fusionPending already set
+// (paid / granted), and the Hidden Market cauldron keeps its perk — both skip
+// the fee. Called AFTER every gate and BEFORE any consume, so a refusal or a
+// cancelled picker never costs a coin, and the fee can never fire without the
+// fuse. Returns false (and narrates) when the player can't cover it.
+/** OTA-993 — #116: the level-up toast shows the number the CHARACTER SHEET shows
+ *  (owner: "display the appropriate stat"). The sheet displays base + gear;
+ *  the toast used to print the bare base — "+1 DEX (now 7)" beside a sheet
+ *  reading 11. When no gear rides the stat the two agree and the short form
+ *  stands. Pure; exported for tests. */
+export function statNowClause(p: PlayerCharacter | null | undefined, stat: string, base: number): string {
+  if (!p) return `now ${base}`;
+  const eff = (effectiveStats(p) as unknown as Record<string, number>)[stat] ?? base;
+  return eff === base ? `now ${base}` : `base ${base}, ${eff} as you stand`;
+}
+
+/** OTA-993 — #114: pure guard for the Qwen parse-fallback (owner: "resolve intent
+ *  cleaner"). Returns a short rejection reason when the rephrase stopped being
+ *  about what the player typed, or null when it's usable. Case on record:
+ *  "clomb into the warp" (resolved noun `warp`) came back as "wait the
+ *  reclaimer stake" — an invented do-nothing verb aimed at a noun from
+ *  nowhere. Exported for tests. */
+export function qwenRephraseRejection(
+  resolvedNoun: string | null | undefined,
+  intent: string,
+  rephrasing: string,
+  rawText: string,
+): string | null {
+  const noun = (resolvedNoun ?? '').trim().toLowerCase();
+  const reph = (rephrasing ?? '').toLowerCase();
+  if (noun) {
+    // OTA-1016 — word-level, not whole-string: the resolvedNoun is the CATALOG name
+    // ("Aetheric Torch"), and an honest repair like "use the torch" must pass.
+    const nounWords = noun.split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
+    if (nounWords.length > 0 && !nounWords.some((w) => reph.includes(w))) {
+      return `dropped the player's noun "${noun}"`;
+    }
+  } else {
+    // OTA-1016 — NO resolved noun is the dangerous case (the parser's empty-token /
+    // rejected-validation exits carry none), and the old guard checked nothing
+    // here beyond 'wait' — a fabricated "attack the vendor" from garbled input
+    // dispatched clean. A repair must share at least one significant word
+    // (exact, containment, or one typo) with what the player actually TYPED;
+    // otherwise it is an invention, not a repair.
+    const near = (a: string, b: string): boolean => {
+      if (a === b || a.includes(b) || b.includes(a)) return true;
+      if (Math.abs(a.length - b.length) > 1) return false;
+      let i = 0; let j = 0; let edits = 0;
+      while (i < a.length && j < b.length) {
+        if (a[i] === b[j]) { i++; j++; continue; }
+        edits++; if (edits > 1) return false;
+        if (a.length > b.length) i++;
+        else if (b.length > a.length) j++;
+        else { i++; j++; }
+      }
+      return edits + (a.length - i) + (b.length - j) <= 1;
+    };
+    const rawWords = (rawText ?? '').toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 4);
+    const rephWords = reph.split(/[^a-z0-9]+/).filter((w) => w.length >= 4);
+    if (rawWords.length > 0 && rephWords.length > 0
+        && !rephWords.some((rw) => rawWords.some((aw) => near(rw, aw)))) {
+      return 'invented an action unrelated to what the player typed';
+    }
+  }
+  if (intent === 'wait' && !/\b(wait|hold|stay|linger|pause|bide)\b/i.test(rawText)) {
+    return 'invented a wait the player never asked for';
+  }
+  return null;
+}
+
+/** OTA-995 — #118: ONE definition of "already running a contract", across ALL
+ *  FOUR kinds (faction quests, hunts, mysteries, storylines). tracked===false
+ *  is parked; anything else counts as live. Root cause of the accept-behavior
+ *  split: only acceptFactionQuest had single-active park logic, and it scanned
+ *  only its OWN kind — the other three accepts never set `tracked` at all, so
+ *  batch-accepting a board made everything live at once (device log: the owner
+ *  hand-deactivated NINE contracts). Exported for tests. */
+export function anyTrackedContract(p: PlayerCharacter | null | undefined): boolean {
+  if (!p) return false;
+  const live = (rs?: readonly { tracked?: boolean }[]) => (rs ?? []).some((r) => r.tracked !== false);
+  return live(p.activeFactionQuests) || live(p.activeHunts) || live(p.activeMysteries) || live(p.activeStorylines);
+}
+
+function chargeOutpostCrucibleFee(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): boolean {
+  const p = get().player;
+  if (!p) return false;
+  if (p.fusionPending || get().activeBuildingId === 'market') return true;
+  const FEE = 25;
+  if (p.tc < FEE) {
+    get().appendLog('system', `The Crucible costs ${FEE} TC to fire; you have ${p.tc}.`);
+    return false;
+  }
+  set((s2) => (s2.player ? { player: { ...s2.player, tc: s2.player.tc - FEE } } : s2));
+  get().appendLog('reward', `The outpost Crucible takes its fee. (−${FEE} TC)`);
+  return true;
+}
+
+function healEscortsOnRest(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const escActive = get().player?.activeFactionQuests ?? [];
+  if (!escActive.some((q) => q.escort && q.tracked !== false && q.escort.hp > 0 && q.escort.hp < q.escort.hpMax)) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { ESCORT_REST_HEAL_FRACTION } = require('../engine/escort') as typeof import('../engine/escort');
+  let healedLabel: string | null = null;
+  const nextQ = escActive.map((q) => {
+    if (!q.escort || q.tracked === false || q.escort.hp <= 0 || q.escort.hp >= q.escort.hpMax) return q;
+    const heal = Math.min(q.escort.hpMax - q.escort.hp, Math.max(1, Math.round(q.escort.hpMax * ESCORT_REST_HEAL_FRACTION)));
+    healedLabel = q.escort.label;
+    return { ...q, escort: { ...q.escort, hp: q.escort.hp + heal } };
+  });
+  set((st) => (st.player ? { player: { ...st.player, activeFactionQuests: nextQ } } : st));
+  if (healedLabel) get().appendLog('world', `Your ${healedLabel} rest too — they look steadier.`);
+}
+
+function injectFactionParty(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  opts: { factionId: string; factionName: string; partySize: number; noun: string },
+): boolean {
+  const s = get();
+  const player = s.player;
+  const scene = s.currentScene;
+  if (!player || !scene || !scene.location) return false;
+  const base = rollEncounter(scene.location).filter((e) => !e.boss);
+  if (base.length === 0) return false;
+  const party: Enemy[] = [];
+  for (let i = 0; i < opts.partySize; i++) {
+    const tmpl = base[i % base.length]!;
+    party.push({
+      ...tmpl,
+      name: opts.partySize > 1 ? `${opts.factionName} ${opts.noun} ${i + 1}` : `${opts.factionName} ${opts.noun}`,
+      factionId: opts.factionId,
+      aliases: [opts.noun.toLowerCase(), 'soldier', 'raider', opts.factionName.toLowerCase()],
+    });
+  }
+  const tide = Math.max(0, s.worldMemory.factionTides?.[opts.factionId] ?? 0);
+  const power = enemyScalePower(
+    Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence),
+    player.hpMax,
+  ) + tide; // escalation: an ascendant faction hits harder
+  const scaled = scaleEncounterForContext(party, scene.location.danger + Math.floor(tide / 2), power);
+  const enemyHps = scaled.map((e) => e.hp);
+  set((st) => (st.currentScene ? {
+    currentScene: {
+      ...st.currentScene,
+      enemies: scaled,
+      enemyHps,
+      activeEnemyIdx: 0,
+      range: 'mid',
+      enemyAmbushUsed: scaled.map(() => false),
+      stealthOpenerUsed: false,
+      // OTA-983 — a party that crests the rise while you're UP a climb masses at
+      // the BASE (drives the elevation combat gates); on level ground the
+      // flag clears so a stale siege can't linger into the next fight.
+      enemiesAtBase: !!st.currentScene.elevatedOn,
+    },
+  } : st));
+  return true;
+}
+
+function maybeSpawnRaid(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const s = get();
+  const player = s.player;
+  const scene = s.currentScene;
+  if (!player || !scene || !scene.location) return;
+  // Peaceful outdoor moment only: no active fight, no vendor, not inside a hub
+  // building, and not while the player is already bloodied (no kicking them down).
+  if ((scene.enemies?.length ?? 0) > 0) return;
+  if (scene.vendor) return;
+  if (player.hubRoomId) return;
+  if (player.hpMax > 0 && player.hp / player.hpMax < 0.5) return;
+  const hour = player.hoursElapsed ?? 0;
+  const last = s.worldMemory.lastRaidHour;
+  if (last !== undefined && hour - last < RAID_MIN_HOURS) return;
+  if (Math.random() > RAID_TRIGGER_CHANCE) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { pickRaid } = require('../engine/worldPulse') as typeof import('../engine/worldPulse');
+  const plan = pickRaid(factions, player.factionStanding, s.worldMemory.factionTides ?? {});
+  if (!plan) return;
+  const landed = injectFactionParty(get, set, {
+    factionId: plan.raiderId, factionName: plan.raiderName, partySize: plan.partySize, noun: 'Raider',
+  });
+  if (!landed) return;
+  set((st) => ({ worldMemory: { ...st.worldMemory, lastRaidHour: hour } }));
+  get().appendLog(
+    'world',
+    `${withArticleCap(plan.raiderName)} war party crests the rise — ${plan.partySize} of them, blades already out. They've marked you for standing with the ${plan.provokedAllyName}.`,
+  );
+  get().appendLog(
+    'arbiter',
+    `"The ${plan.raiderName} do not forgive a friend of the ${plan.provokedAllyName}," the Arbiter murmurs. "Stand, or run — but decide now."`,
+  );
+}
+
+// OTA-850 — PATROL INTERCEPTION. When the player is within 2 tiles of a faction's
+// outpost while routed toward it (a bounty destination, or any rival outpost), that
+// faction's patrol intercepts. This is what makes accepting a bounty "harm's way":
+// the reward sits inside patrolled ground. Gated on the same peaceful-moment rules as
+// a raid, plus a per-approach cooldown so one journey can't spawn a wall of patrols.
+const PATROL_MIN_HOURS = 6;
+function maybeInterceptPatrol(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  targetLocationId: string,
+  distanceRemaining: number,
+): void {
+  if (distanceRemaining > 2 || distanceRemaining < 0) return;
+  const s = get();
+  const player = s.player;
+  const scene = s.currentScene;
+  if (!player || !scene || !scene.location) return;
+  if ((scene.enemies?.length ?? 0) > 0) return;
+  if (player.hubRoomId) return;
+  if (player.hpMax > 0 && player.hp / player.hpMax < 0.4) return;
+  // Which faction holds this outpost? Only real, non-friendly factions patrol at you.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { FACTION_STARTING_LOCATION } = require('../engine/character') as typeof import('../engine/character');
+  const holderId = Object.keys(FACTION_STARTING_LOCATION).find((fid) => FACTION_STARTING_LOCATION[fid] === targetLocationId);
+  if (!holderId) return;
+  const standing = player.factionStanding.find((r) => r.factionId === holderId)?.standing ?? 0;
+  const isBountyTarget = activeBountiesOf(player).some((b) => b.targetFactionId === holderId);
+  if (!isBountyTarget && standing >= 0) return; // friends' patrols wave you through
+  const hour = player.hoursElapsed ?? 0;
+  const last = s.worldMemory.lastRaidHour;
+  if (last !== undefined && hour - last < PATROL_MIN_HOURS) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+  const holderName = factions.find((f) => f.id === holderId)?.name ?? holderId;
+  const tide = Math.max(0, s.worldMemory.factionTides?.[holderId] ?? 0);
+  const partySize = Math.max(2, Math.min(4, 2 + Math.floor(tide / 2)));
+  const landed = injectFactionParty(get, set, { factionId: holderId, factionName: holderName, partySize, noun: 'Patrol' });
+  if (!landed) return;
+  set((st) => ({ worldMemory: { ...st.worldMemory, lastRaidHour: hour } }));
+  get().appendLog(
+    'world',
+    `${withArticleCap(holderName)} patrol works the ground near their outpost — ${partySize} of them — and spots you closing in. They move to cut you off.`,
+  );
+  get().appendLog(
+    'arbiter',
+    `"You're on ${holderName} ground now," the Arbiter says low. "Their patrols don't ask why you came."`,
+  );
+}
+
+// OTA-851 — ROAMING-PATROL AMBUSH. A patrol wandering the open grid can be blundered
+// into ANYWHERE, not just near its outpost (that's maybeInterceptPatrol). Checked at
+// the end of every action: if a hostile / bounty-target faction's patrol is within 2
+// tiles of the player, it engages. The patrol that engages is consumed into the fight.
+function maybePatrolAmbush(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const s = get();
+  const player = s.player;
+  const scene = s.currentScene;
+  if (!player || !scene || !scene.location) return;
+  if ((scene.enemies?.length ?? 0) > 0) return;
+  if (player.hubRoomId) return;
+  if (player.hpMax > 0 && player.hp / player.hpMax < 0.4) return;
+  const patrols = s.worldMemory.patrols ?? [];
+  if (patrols.length === 0) return;
+  const hour = player.hoursElapsed ?? 0;
+  const last = s.worldMemory.lastRaidHour;
+  if (last !== undefined && hour - last < PATROL_MIN_HOURS) return;
+  const cell = playerGridCell(player);
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { patrolsNear } = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+  const near = patrolsNear(patrols, cell.x, cell.y, 2);
+  if (near.length === 0) return;
+  const bountyTargets = new Set(activeBountiesOf(player).map((b) => b.targetFactionId));
+  const hostile = near.find((p) => {
+    const standing = player.factionStanding.find((r) => r.factionId === p.factionId)?.standing ?? 0;
+    return bountyTargets.has(p.factionId) || standing < 0;
+  });
+  if (!hostile) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+  const name = factions.find((f) => f.id === hostile.factionId)?.name ?? hostile.factionId;
+  const tide = Math.max(0, s.worldMemory.factionTides?.[hostile.factionId] ?? 0);
+  const partySize = Math.max(2, Math.min(4, 2 + Math.floor(tide / 2)));
+  const landed = injectFactionParty(get, set, { factionId: hostile.factionId, factionName: name, partySize, noun: 'Patrol' });
+  if (!landed) return;
+  set((st) => ({ worldMemory: {
+    ...st.worldMemory,
+    patrols: (st.worldMemory.patrols ?? []).filter((p) => p !== hostile),
+    lastRaidHour: hour,
+  } }));
+  get().appendLog('world', `${withArticleCap(name)} patrol crosses your path in the open — and turns toward you.`);
+  get().appendLog('arbiter', `"${name} riders," the Arbiter says. "They've marked you. No outrunning this one."`);
+}
+
 // Milestone thresholds. Hit one of these counters and the character gets a
 // permanent stat bump. Numbers are intentionally generous so growth feels
 // earned, not handed out.
@@ -1768,7 +3110,13 @@ function debugLoadout(player: PlayerCharacter): string {
 // match the zone's danger tier?). Routed to `[debug]` (log/bug-report only).
 function debugEnemy(e: Record<string, unknown>): string {
   const g = (k: string) => (e[k] ?? '?');
-  return `enemy: ${g('name')} hp=${g('hp')} ac=${g('ac')} atk=${g('attack')} dmg=${g('damage')} rarity=${g('rarity')} danger=${g('danger')}${e['boss'] ? ' BOSS' : ''}`;
+  // OTA-758 — AC and 'danger' are NOT stored on enemy records: AC is derived from
+  // `abilityPoint` at combat time (5 + AP, clamped) and 'danger' was never a field,
+  // so both printed as a placeholder '?'. Compute the real AC the attack paths use
+  // and surface the parsed ability-point (`ap`) as the actual threat number.
+  const ap = parseEnemyAP(e as { abilityPoint?: string });
+  const ac = Math.max(5, Math.min(18, 5 + ap)) + (e['boss'] ? 6 : 0);
+  return `enemy: ${g('name')} hp=${g('hp')} ac=${ac} atk=${g('attack')} dmg=${g('damage')} rarity=${g('rarity')} ap=${ap}${e['boss'] ? ' BOSS' : ''}`;
 }
 
 // 2026-05-24 — effective stamina max accounting for hunger penalty.
@@ -1807,9 +3155,15 @@ function tickPlayerStaminaStatuses(player: PlayerCharacter): PlayerCharacter {
 }
 
 function spendStamina(player: PlayerCharacter, amount: number): PlayerCharacter {
+  // OTA-835 — Architectural Sentinels are TIRELESS constructs ("Immunity to Time"):
+  // every stamina-costing action costs HALF. Together with their ambient-corruption
+  // immunity below, this is the mechanical weight behind "a week-long vigil, a march
+  // across a famine-struck waste — none of it wears on you." (Previously the trait
+  // did nothing — the hunger/fatigue drains it described were removed/never existed.)
+  const eff = player.raceId === 'architectural_sentinel' ? amount * 0.5 : amount;
   return tickPlayerStaminaStatuses({
     ...player,
-    stamina: Math.max(0, player.stamina - amount),
+    stamina: Math.max(0, player.stamina - eff),
   });
 }
 
@@ -2041,6 +3395,16 @@ function grantTutorialItem(
 // operate on the room), the scene-bar label shows "Building · Room", and any
 // wilderness vendor / hooks are cleared (you're indoors). Combat fields are
 // left untouched — buildings are entered from peaceful scenes.
+// OTA-789 — a Hidden Market stall is a neutral-ground BROKER: its Contracts
+// board posts EVERY faction's open work (see VendorContractsModal), not just its
+// own rostered faction. So a contract accepted there usually belongs to a
+// DIFFERENT faction than the vendor. The accept handlers use this to search
+// every faction's pool for a broker vendor (a normal vendor / mission board
+// searches only its single faction).
+function isBrokerVendorId(id: string | null | undefined): boolean {
+  return typeof id === 'string' && id.startsWith('hidden_market_');
+}
+
 function patchSceneForBuildingRoom(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -2097,6 +3461,97 @@ function patchSceneForBuildingRoom(
   });
 }
 
+// OTA-914 — the Aetherkin. Buildings the flood sealed (a house, a shack, a
+// shed — never an outpost) can hold one of the mud-mummified flood-dead; open
+// mud can give one back mid-journey ("crawl up out of the silt"). They are NOT
+// aggressive hunters — see aetherkin.ts — so they spawn like any wild encounter
+// but the narration frames them as frightened, defensive, and identifiable as
+// "the Aetherkin you've heard about." Killing one angers the factions that hold
+// them sacred; talking one down pleases those factions (see resolveEnemyDefeat
+// and runParleyOutcome). HAL + golem only; never ported to the engine line.
+
+/** Building templates that can harbour an Aetherkin: homes and outbuildings the
+ *  flood drowned people inside. Explicitly NOT the outpost (a garrison, not a
+ *  home) or the market (the Hidden Market bazaar). */
+const AETHERKIN_BUILDING_IDS: ReadonlySet<string> = new Set(['flooded_house', 'shack', 'shed']);
+/** Chance an eligible building holds an Aetherkin on entry. */
+const AETHERKIN_BUILDING_CHANCE = 0.28;
+/** Chance an open, novel outdoor tile gives one back from the mud. */
+const AETHERKIN_MUD_CHANCE = 0.07;
+
+/** Spawn a scaled Aetherkin into the current (peaceful) scene and narrate the
+ *  emergence + identification + who-they-were + how-they-carry-themselves beats.
+ *  No-op if the scene already has a foe. Returns true if one was spawned. */
+function spawnAetherkin(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  where: AetherkinContext,
+): boolean {
+  const scene = get().currentScene;
+  const player = get().player;
+  if (!scene || !player) return false;
+  if (scene.enemies && scene.enemies.length > 0) return false;
+  const enc = buildAetherkinEncounter(where);
+  const base = (enemiesData as Enemy[]).find((e) => e.name === enc.enemyName);
+  if (!base) return false;
+  const power = enemyScalePower(
+    Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence),
+    player.hpMax,
+  );
+  const danger = scene.location?.danger ?? 0;
+  const scaled = scaleEncounterForContext([{ ...base }], danger, power);
+  const hps = scaled.map((e) => e.hp);
+  set((s) => (s.currentScene ? {
+    currentScene: {
+      ...s.currentScene,
+      enemies: scaled,
+      enemyHps: hps,
+      activeEnemyIdx: 0,
+      range: 'mid',
+      enemyAmbushUsed: scaled.map(() => false),
+      enemyKnockedOut: scaled.map(() => false),
+      stealthOpenerUsed: false,
+    },
+  } : s));
+  // Emergence + who-they-were as world flavor; the identification beat is the
+  // Arbiter naming them for the player ("these are the Aetherkin you've heard
+  // about"), per the design note that the Arbiter or flavor tells you what they are.
+  get().appendLog('world', enc.emergence);
+  get().appendLog('arbiter', enc.identification);
+  get().appendLog('world', enc.identity);
+  get().appendLog('world', enc.character);
+  return true;
+}
+
+/** Apply a reverence standing shift to every Aetherkin-revering faction the
+ *  player already tracks. Local clamped update (NOT the ally/rival cascade) so a
+ *  kill/spare only ever moves the four revering factions, mirroring the
+ *  faction-kill block. Returns the changed rows for logRepChanges. */
+function applyAetherkinReverenceDelta(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  delta: number,
+): { factionId: string; delta: number; newStanding: number }[] {
+  const p = get().player;
+  if (!p || delta === 0) return [];
+  const revered = new Set(AETHERKIN_REVERING_FACTIONS);
+  const changed: { factionId: string; delta: number; newStanding: number }[] = [];
+  const next = p.factionStanding.map((row) => {
+    if (!revered.has(row.factionId)) return row;
+    const ns = Math.max(-100, Math.min(100, row.standing + delta));
+    const realDelta = ns - row.standing;
+    if (realDelta !== 0) changed.push({ factionId: row.factionId, delta: realDelta, newStanding: ns });
+    return { ...row, standing: ns };
+  });
+  if (changed.length > 0) set((s) => (s.player ? { player: { ...s.player, factionStanding: next } } : s));
+  return changed;
+}
+
+/** Standing the revering factions lose when you destroy one of the flood-dead. */
+const AETHERKIN_KILL_REP = -3;
+/** Standing the revering factions gain when you talk one down instead. */
+const AETHERKIN_SPARE_REP = 2;
+
 // Tungsten Spire — default-name generator for a player who skips the
 // tutorial before the Arbiter's name beat. Pairs a random flavor
 // adjective with the singular form of their race (e.g. "Dusty Reclaimer",
@@ -2137,6 +3592,12 @@ interface GameStore {
   currentScreen: ScreenName;
   currentScene: CurrentScene | null;
   pendingRolls: PendingRollState | null;
+  /** OTA-841 [did-you-mean] — runnable command suggestions surfaced after a
+   *  low-confidence / unresolved parse (the same list the "Try: …" log line
+   *  shows), so the UI can render a TAPPABLE chip row: one tap re-submits that
+   *  command instead of making the player retype it. Cleared at the start of the
+   *  next action so stale chips never linger. */
+  parseSuggestions: string[];
   /** OTA-259 — When a multi-stage investigation hook fires a non-
    *  terminal stage (outcome.done === false), this state captures
    *  enough info to surface a CONTINUE popup so the player can
@@ -2163,6 +3624,11 @@ interface GameStore {
     noun: string;
     stageHistory: HookContinueStage[];
     completed: boolean;
+    /** OTA-1030 — completion-popup payload STASHED when the terminal stage resolves
+     *  and raised only when the player taps COMPLETE (dismissHookContinue).
+     *  The popup used to mount the instant the last stage fired — landing on
+     *  top of the thread text the player was still reading. */
+    completionNotice?: { kind: string; title: string; body: string } | null;
   } | null;
   /** arb120 — completion popup for a finished side-contract (whisper). Set when
    *  a whisper pays out so the reward lands in a modal the player can read,
@@ -2194,6 +3660,10 @@ interface GameStore {
    *  Resets on: scene change, weapon change, non-resisted hit, miss, or
    *  attack against a different enemy. Not persisted. */
   weaponResistStreak: { enemyName: string; damageType: string; count: number } | null;
+  /** OTA-959 — once-per-encounter latch for the combat legibility cues (soak praise / leak
+   *  warning — see engine/combatCues). Keyed by the fight's tile so each encounter gets
+   *  each cue at most once; a new fight re-arms them. Not persisted. */
+  combatCues: { key: string; soak: boolean; leak: boolean } | null;
   /** Set when a slot load fails — UI surfaces this and offers recovery. */
   slotLoadError: string | null;
   /** arb38 — ids of slots that crashed the app on load last session
@@ -2367,6 +3837,15 @@ interface GameStore {
   inputModalOpen: boolean;
   setInputModalOpen: (open: boolean) => void;
 
+  /** arb-fix — the player has tapped the in-flow exploration input to type. Set
+   *  true on that field's focus; the floating KeyboardInputBar mounts on THIS
+   *  (a reliable React focus signal) instead of on a keyboard-height event, which
+   *  the New Architecture drops on Android ~half the time (the "keyboard covers
+   *  the box" bug). Cleared when the floating bar loses focus / submits / the
+   *  keyboard hides. */
+  explorationInputActive: boolean;
+  setExplorationInputActive: (active: boolean) => void;
+
   hydrate: () => Promise<void>;
   setScreen: (screen: ScreenName) => void;
 
@@ -2486,6 +3965,11 @@ interface GameStore {
   submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean; silent?: boolean }) => void;
   resolveRollStep: (values: number[]) => void;
   cancelPendingRolls: () => void;
+  // OTA-980 — a bandolier throw transiently equips the throwable to the off hand
+  // while its dice modal is open. This records what to put back (and the
+  // spend-exactly-one snapshot) until the roll RESOLVES or CANCELS.
+  throwSettlement: { itemId: string; qtyAtThrow: number; prevOff?: string; prevOffId?: string } | null;
+  settleThrowRestore: (outcome: 'resolved' | 'cancelled') => void;
   concludeRolls: (steps: RollStep[], actionText: string) => void;
   /** OTA-259 — advance a multi-stage investigation hook to its next
    *  step without re-opening the investigate menu. Called by the
@@ -2521,11 +4005,17 @@ interface GameStore {
    *  only on the first unit and false for the rest — otherwise dumping a 300-item
    *  stack farmed Charisma one level at a time. */
   sellToVendor: (itemName: string, itemId?: string, opts?: { social?: boolean }) => void;
-  giftToVendor: (itemName: string) => void;
   stealFromVendor: (itemName: string) => void;
   repairWithVendor: (itemName: string) => void;
   acceptFactionQuest: (titleOrId: string) => void;
   turnInFactionQuest: (titleOrId: string, remote?: boolean) => void;
+  /** OTA-850 — accept a faction bounty: store it and set course for the quarry's
+   *  outpost (routing the player into patrolled ground). */
+  acceptBounty: (bounty: import('../engine/factionBounty').FactionBounty) => void;
+  /** OTA-857 — the world's REAL-TIME heartbeat. Driven by a wall-clock timer in
+   *  App.tsx (not in-game hours), so the war advances no matter what screen is
+   *  open or whether the player is acting — the World board is a live scroll. */
+  worldRealtimeTick: () => void;
   /** Activate / deactivate an accepted faction contract. SINGLE-ACTIVE:
    *  activating one pauses every other; deactivate parks just this one (zero
    *  active = between missions). A paused contract stays on the slate and its
@@ -2641,7 +4131,19 @@ interface GameStore {
   setActiveEnemyIdx: (idx: number) => void;
   /** Craft a specific recipe directly (used by the CraftingScreen list). */
   craftRecipe: (recipeName: string) => void;
+  /** OTA-1006 — craft the same recipe COUNT times in one go. Each pass runs the
+   *  ordinary craft (every gate intact), so a batch can never consume more than
+   *  the pack holds; it stops the moment a pass produces nothing — pack full,
+   *  a refusal, or the substitution prompt taking over — and reports how many
+   *  it actually made. Returns the count crafted. */
+  craftRecipeBatch: (recipeName: string, count: number) => number;
   dismissVendor: () => void;
+  /** OTA-776 — aim the Aetheric Torch at a chosen open lead and CHARGE it.
+   *  Consumes one torch, reveals + marks the lead (torchCharged), and the lead
+   *  pays out an upgraded WIS-scaled Rare/Legendary drop when the player later
+   *  works it (injected at hook resolution). No-op (no charge spent) if there's
+   *  no torch or the lead isn't an open, un-charged, stage-0 hook. */
+  applyTorchToHook: (hookId: string) => void;
   /** arb103 — every vendor will fire up a portable Fusing Crucible for a
    *  flat 25 TC. Pre-checks the reserve gate (no charge if you're not ready),
    *  then charges + fuses. */
@@ -2693,7 +4195,17 @@ interface GameStore {
    *  tap on `isInferredItem`. Reserved items are excluded from the
    *  OTA-193 auto-substitute drain so they survive for the fusion
    *  bench. Looked up by InventoryItem.id to disambiguate stacks. */
-  toggleReserveForFusion: (itemId: string) => void;
+  /** OTA-968 — `count` moves that many units across the save/free boundary in ONE call
+   *  (clamped to the stack). Omitted = 1 (the original tap-peels-one behavior). */
+  toggleReserveForFusion: (itemId: string, count?: number) => void;
+  /** OTA-872 — "Save for quest" earmark toggle for an ordinary item (food,
+   *  materials, loot) the player was told to bring for a turn-in. Sets the soft
+   *  reservedForQuest flag: the item moves to the Quest Items section and drops out
+   *  of the vendor sell tab, but stays usable/droppable (unlike a hard tag-locked
+   *  quest item). Peels a single unit off a stack, like toggleReserveForFusion, so
+   *  the player can save two rations and still eat the rest. Mutually exclusive with
+   *  reservedForFusion. Looked up by InventoryItem.id to disambiguate stacks. */
+  toggleReserveForQuest: (itemId: string) => void;
   /** OTA-500 — register a dynamically-mentioned place (whisper/contract/mission/
    *  narration) as install-canon: it persists in worldMemory, gets a permanent
    *  grid cell, and becomes plotted + routable with exact grid-to-grid distance. */
@@ -2707,12 +4219,12 @@ interface GameStore {
    *  lost on break). Re-coating an already-coated weapon replaces
    *  the prior coating. Returns nothing; surfaces success/refusal
    *  via the log. */
-  applyCoating: (coatingItemId: string, weaponId: string) => void;
+  applyCoating: (coatingItemId: string, weaponId: string, replaceSlot?: 'coating' | 'coating2') => void;
   /** engine_Dev — work a coating vial into an ARMOR piece for a permanent
    *  damage-type resist (the vial's damage type). Stored on the armor instance's
    *  addedResists; aggregateArmor + applyArmorResistance reduce incoming damage of
    *  that type while it's worn. Capped at 3 resists per piece. */
-  applyCoatingToArmor: (coatingItemId: string, armorId: string) => void;
+  applyCoatingToArmor: (coatingItemId: string, armorId: string, replaceResist?: string) => void;
   /** OTA-361 — loot a knocked-out humanoid. Transfers the enemy's
    *  `carries` kit (weapons + armor, DAMAGED — durability scaled to how
    *  hurt they were), the full `loot` drop list, and a little TC into
@@ -2728,12 +4240,42 @@ interface GameStore {
    *  weapon / armor / dog vest, clamps the response, mints the fused
    *  InventoryItem in place. */
   fuseAtCrucible: () => Promise<void>;
-  /** OTA — fusion picker: choose 3–5 of your reserved (♥) pieces + weapon/armor,
+  /** OTA-953 — fusion picker: choose 3–5 of your reserved (♥) pieces + weapon/armor,
    *  instead of the Crucible consuming your WHOLE reserved pool on one item. */
+  /** OTA-1006 — set while craftRecipeBatch runs so the per-craft reward line stays
+   *  quiet and the batch can emit a single aggregated one instead. */
+  craftBatchQuiet: boolean;
   fusionPickerOpen: boolean;
-  pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor'; catalystId?: string } | null;
+  pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor' | 'dog_armor'; catalystId?: string } | null;
+  /** OTA-1006 — the Crucible refused, and says why. Rendered by FusionBlockedModal,
+   *  which HOLDS until dismissed so the player actually reads it (owner's ask).
+   *  Set only on the gate-fail path, which also closes the picker outright. */
+  /** OTA-1010 — a job just finished: the modal names it and holds until dismissed.
+   *  Set ONLY by announceMissionComplete, the single choke point every
+   *  completion path funnels through. */
+  missionCompleteNotice: { kind: string; title: string; rewards: string[] } | null;
+  clearMissionCompleteNotice: () => void;
+  /** OTA-1010 — the one way a mission/contract/thread ends. Writes the feed line AND
+   *  raises the holding notice, so no completion can be silent again. Repeated
+   *  calls for the SAME title merge (a thread's finale plus its bonus drop read
+   *  as one result, not two popups fighting each other). */
+  announceMissionComplete: (kind: string, title: string, body: string) => void;
+  /** OTA-1030 — the notice-only half of announceMissionComplete (no feed line);
+   *  merges into any same-title notice already showing. Used by
+   *  dismissHookContinue to raise a completion stashed at terminal-stage
+   *  resolution. */
+  raiseMissionCompleteNotice: (kind: string, title: string, body: string) => void;
+  fusionBlockedNotice: { title: string; body: string; hint?: string } | null;
+  clearFusionBlockedNotice: () => void;
   closeFusionPicker: () => void;
-  confirmFusionSelection: (itemIds: string[], kind: 'weapon' | 'armor', catalystId?: string) => void;
+  confirmFusionSelection: (itemIds: string[], kind: 'weapon' | 'armor' | 'dog_armor', catalystId?: string) => void;
+  /** OTA-873 — Crucible "Upgrade" mode. Spend exactly 5 reserved pieces to add a
+   *  coating channel to the chosen piece: a WEAPON gains a 2nd coating slot
+   *  (coatingSlots → 2, both coatings fire on hit); an ARMOR / DOG-VEST gains +1
+   *  worked-in-resist capacity (resistCapBonus → 1, holds one more resist type).
+   *  Adds a coating channel only — no AC / damage / durability change. Consumes the
+   *  5 items like a fusion; refuses an ineligible or already-upgraded piece. */
+  upgradeCoatingSlot: (itemId: string, itemIds: string[]) => void;
   /** OTA-631 — settle a materializing fused item with its final name +
    *  description (from the background Qwen namer, or the deterministic fallback)
    *  and raise the "your forging has formed" reveal. No-op if the item was
@@ -2773,6 +4315,14 @@ interface GameStore {
   confirmEquippedCatalystFusion: () => void;
   /** Dismiss the equipped-catalyst prompt without fusing. */
   cancelFusionCatalystPrompt: () => void;
+  /** arb-fix — the view-key (location|building|room|hubRoom) at which the player
+   *  X-dismissed the Fusing Crucible chip. Held in the STORE, not ExplorationScreen
+   *  local state, so a dismiss survives entering a vendor (which UNMOUNTS the
+   *  exploration screen and would otherwise lose a useState flag → the chip popped
+   *  back on return). The chip is hidden while this equals the current view-key;
+   *  moving to a different location changes the key and re-shows it. */
+  crucibleChipDismissedKey: string | null;
+  setCrucibleChipDismissedKey: (key: string | null) => void;
   /** OTA-439 — [audit #23] when a craft would CONSUME material substitutes
    *  (a misc/inferred item standing in for a named ingredient via its tags),
    *  ask before stripping them instead of silently eating them. `subsList` is
@@ -2871,6 +4421,32 @@ interface GameStore {
    *  ignored for 'scratch' / 'speak'. */
   selectCallDogOption: (option: 'scratch' | 'treat' | 'speak', treatItemName?: string) => void;
 
+  /** OTA-808 — PARLEY. A pending two-button social choice against a wild NPC or the
+   *  animal you're fighting. Set when the player opens a parley with a GENERIC social
+   *  opener (so ParleyModal can render the two contextual buttons); null otherwise.
+   *  A player who types a SPECIFIC verb (intimidate / persuade / calm) skips the
+   *  modal and resolves straight through. */
+  pendingParley:
+    | {
+        kind: ParleyKind;
+        temperament: Temperament;
+        targetName: string;
+        /** Whether the player's Wisdom is high enough to be TOLD the temperament
+         *  (else they only get the narrated tell). */
+        wisRevealed: boolean;
+        /** For an animal parley, the enemy index whose temperament this is. */
+        enemyIdx?: number;
+      }
+    | null;
+  /** Cancel a pending parley without committing (the player backed out — no cost). */
+  closeParley: () => void;
+  /** Commit a parley choice (from a ParleyModal button, or a typed specific verb).
+   *  Runs the hard lock-and-key, the CHA roll on a right-key, the asymmetric
+   *  outcomes (safe fail = forfeit; intimidate fail = harm + forfeit), rewards
+   *  (persuade → lead, intimidate → goods), the Menace raise, and the standing cost
+   *  on a successful extortion. */
+  resolveParley: (choice: ParleyChoice) => void;
+
   /** Write the active slot. Resolves `true` when the atomic save landed and
    *  verified, `false` when it was skipped (no slot / no player) or the write
    *  failed (truncated / storage full). Most callers fire-and-forget; the
@@ -2908,6 +4484,14 @@ interface GameStore {
 // history is unaffected for diagnostics: COPY LOG reads the dedicated
 // on-disk log key (readFullLog), not this in-memory buffer.
 const MAX_LOG_IN_MEMORY = 500;
+
+// OTA-801 — post-boss grace window (game-hours). A boss fight is a major beat —
+// often the whole reason you came to an outpost — and being ambushed the instant
+// you step out, still battered and mid-loot, read as punishing rather than tense.
+// Defeating a boss stamps player.bossDefeatGraceUntilHours = now + this, and
+// beginScene suppresses arrival encounters until it lapses: enough game-time to
+// loot, breathe, and walk out, then the wasteland resumes. Tunable design knob.
+const POST_BOSS_GRACE_HOURS = 3;
 
 // OTA-631 — the Crucible no longer BLOCKS on Qwen at all: stats are forged
 // deterministically and the item is minted instantly, then a BACKGROUND Qwen call
@@ -2974,9 +4558,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
   currentScreen: 'title',
   currentScene: null,
   pendingRolls: null,
+  throwSettlement: null,
+  parseSuggestions: [],
   pendingHookContinue: null,
   pendingWhisperComplete: null,
   fusionCatalystPrompt: null,
+  crucibleChipDismissedKey: null,
+  setCrucibleChipDismissedKey(key) {
+    set({ crucibleChipDismissedKey: key });
+  },
   craftSubstitutionPrompt: null,
   craftSubConfirmedFor: null,
   discoveryReveal: null,
@@ -3010,8 +4600,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   hydrated: false,
   lowHpWarned: false,
   weaponResistStreak: null,
+  combatCues: null,
   aetherStatPickerOpen: false,
+  craftBatchQuiet: false,
   fusionPickerOpen: false,
+  missionCompleteNotice: null,
+  fusionBlockedNotice: null,
   pendingFusionSelection: null,
   pendingAetherFoodId: null,
   surgeCombatToken: null,
@@ -3045,6 +4639,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   otaBootResolved: false,
   pendingInputDraft: null,
   inputModalOpen: false,
+  explorationInputActive: false,
   cognitiveModelInfo: null,
 
   qwenStatus: 'idle',
@@ -3061,6 +4656,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
   selectCallDogOption: (option, treatItemName) => {
     handleCallDogOption(get, set, option, treatItemName);
     set({ callDogModalOpen: false });
+    void get().persist();
+  },
+
+  // OTA-808 — PARLEY. See the interface comments + engine/parley.ts.
+  pendingParley: null,
+  closeParley: () => {
+    const p = get().pendingParley;
+    if (p) get().appendLog('world', `You let the moment pass without pushing it.`);
+    set({ pendingParley: null });
+  },
+  resolveParley: (choice) => {
+    runParleyOutcome(get, set, choice);
+    set({ pendingParley: null });
     void get().persist();
   },
 
@@ -3312,26 +4920,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', sceneFeatureRefusalLine(ambientHit));
       return;
     }
-    // Self-healing dedup: a noun is "really consumed" only when the
-    // matching catalog item is currently in inventory. Without that,
-    // the searchedAmbientNouns entry is most likely a pre-OTA-173
-    // salvage-on-nothing bug-write, OR the player sold / dropped the
-    // item — either way they should be able to take from the scene
-    // again. This unsticks corrupted save state without breaking
-    // legitimate dedup for normal takes.
+    // OTA-981 — a scene noun grants its item ONCE per room, PERIOD. The old
+    // "self-healing dedup" re-allowed the take whenever the item was no longer
+    // in the pack (meant for sold/dropped copies + pre-OTA-173 corrupt
+    // markers) — but USING an item also removes it from the pack, so
+    // take -> use -> take was an infinite farm for any takeable consumable
+    // (owner's log: the same Aetheric Torch taken twice, 19 seconds apart).
+    // The shelf does not regrow.
     const alreadyConsumed = nonClimbMarkers(room?.searchedAmbientNouns).some(
       (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
     );
     if (alreadyConsumed) {
-      const catNameLower = cat.name.toLowerCase();
-      const ownsCatalogItem = player.inventory.some(
-        (i) => i.name.toLowerCase() === catNameLower && i.quantity > 0,
-      );
-      if (ownsCatalogItem) {
-        get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
-        return;
-      }
-      // Fall through to grant — the entry is corrupt / stale.
+      get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
+      return;
     }
     const newItem: InventoryItem = stampDurability({
       id: `take_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
@@ -3438,14 +5039,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // day). Per playtester: night = better cover, daytime = exposed.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { stealthTimeBonus } = require('../engine/timeOfDay');
-    const stats = effectiveStats(player, weatherStatModifiers(scene.weather));
+    const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerArmorResistKinds(player)));
     const timeBonus = stealthTimeBonus(player.hoursElapsed);
     const roll = rollDie(20);
     // OTA-348 — pickpocket / sleight-of-hand now rolls Stealth (was DEX).
     const total = roll + stats.stealth + timeBonus;
     const success = total >= 10;
     const timeNote = timeBonus !== 0 ? ` ${timeBonus > 0 ? '+' : ''}${timeBonus} (${timeBonus > 0 ? 'night' : 'day'})` : '';
-    set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+    set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
     get().appendLog(
       'combat',
       `You — sleight of hand on ${ambientHit} → d20 ${roll} + STE ${stats.stealth}${timeNote} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
@@ -3505,6 +5106,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (get().inputModalOpen !== open) set({ inputModalOpen: open });
   },
 
+  setExplorationInputActive(active) {
+    if (get().explorationInputActive !== active) set({ explorationInputActive: active });
+  },
+
   // ── Enterable buildings (arb25) ──────────────────────────────────────
   enterBuilding(buildingId) {
     const b = getBuilding(buildingId);
@@ -3528,13 +5133,49 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog('world', `You step inside ${b.name.toLowerCase()}, into ${entry.name.toLowerCase()}.`);
     get().appendLog('world', entry.description);
     patchSceneForBuildingRoom(get, set, buildingId, entry.id);
+    // OTA-914 — a home or outbuilding the flood sealed can still hold one of its
+    // dead: an Aetherkin set into the mud where they died. Roll only for homes /
+    // sheds (never the outpost garrison or the market bazaar), and never on top
+    // of a stall's wares. patchSceneForBuildingRoom just cleared enemies, so the
+    // scene is peaceful here and the spawn lands cleanly on the entry room.
+    // OTA-916 — bank the roll per building-tile. enter/exit is free and returns
+    // you to the same spot, so an unbanked re-roll made the spawn a standing/loot
+    // farm (audit finding). Resolve the roll ONCE per structure, banked whether or
+    // not one spawned, so re-entering a cleared home never re-rolls.
+    {
+      const pl = get().player;
+      if (pl && AETHERKIN_BUILDING_IDS.has(buildingId)) {
+        const tileKey = `${pl.currentLocationId}:${pl.mapX}:${pl.mapY}`;
+        const rolled = get().worldMemory.aetherkinRolledBuildings ?? [];
+        if (!rolled.includes(tileKey)) {
+          set((s) => ({
+            worldMemory: {
+              ...s.worldMemory,
+              aetherkinRolledBuildings: [...(s.worldMemory.aetherkinRolledBuildings ?? []), tileKey],
+            },
+          }));
+          if (Math.random() < AETHERKIN_BUILDING_CHANCE) spawnAetherkin(get, set, 'building');
+        }
+      }
+    }
+    // OTA-786 — market stalls are shops: stepping into one opens its wares
+    // immediately. Back (← BACK) returns to the stall, where the stall tabs +
+    // EXIT live. Only market stalls carry a vendor, so this never fires for
+    // ordinary building rooms.
+    if (buildingId === 'market' && get().currentScene?.vendor) get().setScreen('vendor');
   },
   goBuildingRoom(roomId) {
     const id = get().activeBuildingId;
     if (!id) return;
     const room = getBuildingRoom(id, roomId);
     if (!room) return;
-    if (roomId === get().activeBuildingRoomId) return;
+    if (roomId === get().activeBuildingRoomId) {
+      // OTA-788 — tapping the stall you're already in re-opens its wares. With
+      // the TRADE button gone, the active stall tab IS the way back into a shop
+      // you closed with ← BACK.
+      if (id === 'market' && get().currentScene?.vendor) get().setScreen('vendor');
+      return;
+    }
     // Hidden rooms can't be walked into until revealed.
     if (room.secret && !get().buildingRevealed.includes(roomId)) return;
     const p = get().player;
@@ -3543,6 +5184,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog('world', `You step into ${room.name.toLowerCase()}.`);
     get().appendLog('world', room.description);
     patchSceneForBuildingRoom(get, set, id, roomId);
+    // OTA-786 — swapping to another market stall opens its wares immediately,
+    // same as first entry (see enterBuilding).
+    if (id === 'market' && get().currentScene?.vendor) get().setScreen('vendor');
   },
   exitBuilding() {
     const id = get().activeBuildingId;
@@ -3711,18 +5355,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // OTA-120 — Dog Companion world-memory flag migration. Both
       // default to false on legacy saves so the safety net only
       // engages once the player actually loses a dog in combat.
-      const migratedWorldMemory = {
-        ...saved.worldMemory,
-        puppyVendorOwed: saved.worldMemory.puppyVendorOwed ?? false,
-        puppyVendorUsed: saved.worldMemory.puppyVendorUsed ?? false,
-        gemBossDefeatedKeys: saved.worldMemory.gemBossDefeatedKeys ?? [],
-        puppyVendorQueued: saved.worldMemory.puppyVendorQueued ?? false,
-        dogGolemCoActivated: saved.worldMemory.dogGolemCoActivated ?? false,
-        dogAerialNoticeShown: saved.worldMemory.dogAerialNoticeShown ?? [],
-        dogClimbNoticeShown: saved.worldMemory.dogClimbNoticeShown ?? false,
-        fusionCompensationGranted: saved.worldMemory.fusionCompensationGranted ?? false,
-        pendingDogOnboarding: saved.worldMemory.pendingDogOnboarding ?? null,
-      };
+      const migratedWorldMemory = migrateLoadedWorldMemory(saved.worldMemory);
       set({
         player: { ...player, hasSeenIntro: true },
         worldMemory: migratedWorldMemory,
@@ -3788,70 +5421,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         get().appendLog('debug', `OTA session start: ${OTA_BUILD_ID}.`);
       } catch { /* hardened: never block slot load on a debug log failure */ }
-      // arb89 — proactive dev-name Resurrection Gem. The death-handler
-      // perk (DEV_REVIVE_NAMES) already revives Verbal / Sasmooch on
-      // death without a restart; this grants the gem UP FRONT the first
-      // time such a character is loaded, so they hold one before ever
-      // dying. Idempotent per slot (grantDevGemOnce records the key), so
-      // resuming the same save never stacks more. No effect for other
-      // names.
-      if (DEV_REVIVE_NAMES.includes(player.name.trim().toLowerCase())) {
-        void grantDevGemOnce(`${slotId}:${player.name.trim().toLowerCase()}`).then((res) => {
-          if (res.granted) {
-            set({ resurrectionGems: res.gems });
-            get().appendLog(
-              'reward',
-              `✦ A Resurrection Gem is set aside for ${player.name} — the buried world keeps its own. (${res.gems} held)`,
-            );
-          }
-        });
-      }
-      // OTA-461 — one-time playtest-supply gift for the dev character "Verbal".
-      // A standing crash-test kit so the dog-fungus repro (and general testing)
-      // doesn't burn the player's own consumables. Idempotent per slot via
-      // grantTestSupplyGiftOnce — resuming the same save never restacks it. No
-      // effect for any other name.
-      if (player.name.trim().toLowerCase() === 'verbal') {
-        void grantTestSupplyGiftOnce(`${slotId}:verbal`).then((res) => {
-          if (!res.granted) return;
-          const gift: Array<{ name: string; qty: number }> = [
-            { name: 'First Aid Kit', qty: 10 },
-            { name: 'Trail Rations', qty: 20 },
-            { name: 'Smoke-Cured Jerky Strip', qty: 20 },
-            { name: 'Bioluminescent Fungus', qty: 20 },
-            { name: 'Water Bottle', qty: 1 },
-          ];
-          set((s) => {
-            if (!s.player) return s;
-            let inv = s.player.inventory;
-            for (const { name, qty } of gift) {
-              const look = lookupCraftedItem(name);
-              inv = grantItem(inv, {
-                id: `verbalgift_${Date.now()}_${name.replace(/\s+/g, '').toLowerCase()}`,
-                name,
-                kind: look.kind,
-                rarity: look.rarity,
-                quantity: qty,
-                tags: [...look.tags, 'gift'],
-              }).inventory;
-            }
-            return { player: { ...s.player, inventory: inv } };
-          });
-          get().appendLog(
-            'reward',
-            `✦ A crash-test kit lands in ${player.name}'s pack: 10 First Aid Kits, 20 Trail Rations, 20 Smoke-Cured Jerky Strips, 20 Bioluminescent Fungus, 1 Water Bottle. Test freely.`,
-          );
-          void get().persist();
-        });
-      }
       // OTA-353 — REMOVED: the one-time faction-catalyst fusion-compensation
       // make-good ("Eternal Dynasty Heir's Aegis"). It was a dev-name-only
       // repayment for the pre-OTA-336 fusion-gate bug; the devs have theirs
       // (worldMemory.fusionCompensationGranted is set on their saves), and the
       // bug it compensated for has been fixed since OTA-336. It was re-firing on
       // any FUTURE dev-named save (observed in a live bug-report load), so per
-      // the HANDOFF open issue it's stripped. The dev-name Resurrection-Gem
-      // grant above (grantDevGemOnce) is a separate, kept feature.
+      // the HANDOFF open issue it's stripped. The dev-name Resurrection-Gem grant
+      // (now at new-character creation) + the on-death revive are separate, kept features.
       // Only fall back to beginScene when the save predates scene
       // capture. New saves restore the exact scene above and skip this.
       if (!restoredScene) {
@@ -3894,6 +5471,61 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (lastEnd && Date.now() - lastEnd >= SIX_HOURS_MS) {
           const beat = WHILE_AWAY_LINES[Math.floor(Math.random() * WHILE_AWAY_LINES.length)]!;
           get().appendLog(beat.channel, beat.line, { skipDedup: true });
+        }
+      }
+      // OTA-849 [living world] — the world actually MOVED while you were away. Real
+      // time offline is converted into world pulses (bounded, so a month gone isn't
+      // chaos); the faction tides + rumours advance for that gap and the Arbiter
+      // recaps what shifted. This is what makes "offline" real: come back after a few
+      // days and the balance of power has changed without you lifting a finger.
+      {
+        const livePlayer = get().player;
+        const lastEnd = livePlayer?.lastSessionEndedAt;
+        const OFFLINE_MS_PER_PULSE = 4 * 60 * 60 * 1000; // one pulse per 4 real hours away
+        const OFFLINE_PULSE_CAP = 6;                     // bounded drift
+        if (lastEnd && livePlayer) {
+          const pulses = Math.min(OFFLINE_PULSE_CAP, Math.floor((Date.now() - lastEnd) / OFFLINE_MS_PER_PULSE));
+          if (pulses >= 1) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+            // OTA-851 — offline advance runs the same VARIED event engine, so a return
+            // after days away reads a mix of skirmishes / musters / caravans, not a row
+            // of identical surges.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const WE = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+            let tides = { ...(get().worldMemory.factionTides ?? {}) };
+            const rumors: { text: string; hour: number }[] = [];
+            const eventRows: { text: string; hour: number; kind: string }[] = [];
+            const seed = Math.floor((get().worldMemory.lastWorldTickHour ?? 0) / 24);
+            const nowH = livePlayer.hoursElapsed ?? 0;
+            for (let i = 0; i < pulses; i++) {
+              const ev = WE.pickWorldEvent({ factions, tides, standings: livePlayer.factionStanding }, seed + i + 1);
+              if (!ev) continue;
+              tides = WE.applyTideDelta(tides, ev.effect.tideDelta);
+              rumors.push({ text: ev.rumor, hour: nowH });
+              eventRows.push({ text: ev.rumor, hour: nowH, kind: ev.kind });
+            }
+            if (rumors.length > 0) {
+              set((st) => ({ worldMemory: {
+                ...st.worldMemory,
+                factionTides: tides,
+                worldEvents: [...(st.worldMemory.worldEvents ?? []), ...eventRows].slice(-50),
+              } }));
+            }
+            // OTA-853 — the wars ran too. Advance the roaming-patrol sim for the gap so
+            // the World board fills with the clashes / outpost sackings you "missed."
+            for (let i = 0; i < pulses; i++) {
+              maintainPatrols(get, set, factions, seed + i + 1);
+              simulatePatrols(get, set, factions, nowH, seed + i + 1);
+            }
+            if (rumors.length > 0 || (get().worldMemory.patrols ?? []).length > 0) {
+              get().appendLog(
+                'arbiter',
+                `"While you were gone, the waste did not sleep," the Arbiter says. "Blood was spilled and ground changed hands. Read the World for the account."`,
+                { skipDedup: true },
+              );
+            }
+          }
         }
       }
       // OTA 007 — Welcome-back from the Arbiter on every save load.
@@ -3987,9 +5619,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       await saveSlot(slotId, { ...saved, player: revived });
       const remainingGems = await addResurrectionGems(-1);
       await setActiveSlot(slotId);
+      // OTA-1021 — resurrection goes through the SAME load migrations as a normal
+      // slot load (it read raw memory before; see migrateLoadedWorldMemory).
+      const revivedWorldMemory = migrateLoadedWorldMemory(saved.worldMemory);
+      setCanonExtraLocations(revivedWorldMemory.canonLocations ?? []);
       set({
         player: revived,
-        worldMemory: saved.worldMemory,
+        worldMemory: revivedWorldMemory,
         gameLog: saved.gameLog,
         currentScreen: 'exploration',
         activeSlotId: slotId,
@@ -4051,6 +5687,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   setScreen(screen) {
+    // OTA-791 — the trade screen is unreachable mid-fight. A resonance-hook
+    // combat began while the market vendor was still attached to the scene;
+    // the player tapped into TRADE unaware, every sell bounced off the arb166
+    // guard, and the guard's "Not while you're in a fight" lines landed in a
+    // log the vendor screen never shows ("I never knew I was in combat").
+    // Refusing the switch keeps the enemy card in view, and the refusal lands
+    // in the feed the player is actually looking at.
+    if (screen === 'vendor' && (get().currentScene?.enemies.length ?? 0) > 0) {
+      get().appendLog('system', "Not while you're in a fight — deal with the threat first.");
+      return;
+    }
     set({ currentScreen: screen });
     void get().persist();
   },
@@ -4096,6 +5743,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // arb119 — a fresh game must not inherit a stale open call-dog modal
       // (a transient UI flag that otherwise survives from a prior session).
       callDogModalOpen: false,
+      pendingParley: null, // OTA-808 — clear any stale parley on a fresh game
     });
     try {
       get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
@@ -4243,10 +5891,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const nextLog = [...state.gameLog, entry].slice(-MAX_LOG_IN_MEMORY);
       // HANDOFF #4 — same-channel debounce. When two `world` entries land
       // within 500ms (typical: dig outcome + hook callback firing in the
-      // same handler), merge the second into the first so the feed reads
-      // as one continuous beat instead of a stutter. Only world+system,
+      // same handler), group the second into the first so the feed reads
+      // as one card instead of a stutter of separate stamps. Only world+system,
       // never arbiter (has dedup) or combat (one beat per d20) or reward
       // (player-positive notifications stay distinct).
+      // OTA-812 — grouped beats join with a PARAGRAPH BREAK, not two spaces.
+      // Playtest ("a big block of text"): a travel step fires the stall line, the
+      // wares blurb, the walk narration, and the arrival encounter all inside the
+      // 500ms window, and the old two-space joiner welded them into one run-on wall.
+      // A blank line between them keeps the single-card grouping (no stutter) while
+      // reading as distinct beats. RN <Text> renders "\n\n" as a paragraph gap.
       const lastEntry = state.gameLog[state.gameLog.length - 1];
       const canMerge =
         lastEntry &&
@@ -4257,7 +5911,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         !text.startsWith('⏳') &&
         !lastEntry.text.startsWith('⏳');
       if (canMerge) {
-        const merged = { ...lastEntry, text: `${lastEntry.text}  ${text}`, ts: entry.ts };
+        const merged = { ...lastEntry, text: `${lastEntry.text}\n\n${text}`, ts: entry.ts };
         const mergedLog = [...state.gameLog.slice(0, -1), merged].slice(-MAX_LOG_IN_MEMORY);
         // NOTE: previously this branch extracted ambient nouns from
         // the merged text and pushed them into scene.ambientNouns.
@@ -4414,7 +6068,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { player, worldMemory } = get();
     if (!player) return;
     const location = getLocationById(player.currentLocationId);
-    const weather = pickWeather(worldMemory);
+    // OTA-1003 — #122: weather is a LOCAL, PERSISTENT condition. Reuse the sky
+    // rolled for this location within the last ~6 game-hours (scene rebuilds
+    // stop re-rolling it); otherwise roll fresh WITH locale bias and store.
+    // OTA-1017 — #122 COMPLETED: the memory is a PER-LOCATION map. The single slot
+    // meant leave-and-return inside the window re-rolled the origin's sky.
+    // The legacy slot reads once as migration; entries self-prune when stale.
+    const skyHoursNow = player.hoursElapsed ?? 0;
+    const skyMap = worldMemory.sceneWeatherByLoc ?? {};
+    const legacySky = worldMemory.sceneWeather;
+    const skyHit = skyMap[location.id]
+      ?? (legacySky && legacySky.locationId === location.id
+        ? { id: legacySky.id, rolledAtHours: legacySky.rolledAtHours }
+        : undefined);
+    const storedSkyEntry = skyHit && skyHoursNow - skyHit.rolledAtHours < 6 ? weatherById(skyHit.id) : null;
+    const weather = storedSkyEntry ?? pickWeather(worldMemory, location);
+    if (!storedSkyEntry) {
+      set((s) => {
+        const prevMap = s.worldMemory.sceneWeatherByLoc ?? {};
+        const pruned: Record<string, { id: string; rolledAtHours: number }> = {};
+        for (const [locKey, entry] of Object.entries(prevMap)) {
+          if (skyHoursNow - entry.rolledAtHours < 6) pruned[locKey] = entry;
+        }
+        pruned[location.id] = { id: weather.id, rolledAtHours: skyHoursNow };
+        return { worldMemory: { ...s.worldMemory, sceneWeatherByLoc: pruned } };
+      });
+    }
     const hazard = pickHazardForLocation(location);
     // HANDOFF #15b — hub mode. When player is at the hub location AND
     // has a hubRoomId set (or default to entry), render the hub room
@@ -4445,6 +6124,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s) => (s.player ? { player: { ...s.player, hubRoomId } } : s));
     }
     const hubRoom = inHub && hubRoomId ? hubRoomFor(hubRoomId, player.factionId) : null;
+    get().appendLog('debug', `scene: loc=${location.id} hub=${hubRoomId ?? '-'} arrival=${opts?.arrivalFromName ? 'y' : 'n'} opening=${opts?.isOpening ? 'y' : 'n'} passing=${passingThrough ? 'y' : 'n'}`);
     if (!inHub && hubRoomId) {
       // Player left the hub — clear the hubRoomId.
       set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
@@ -4518,24 +6198,55 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // 'market'-tagged location is a safe trade ground; never spawn a fight there.
     const isNeutralMarket = location.id === 'hidden_market'
       || (location.tags ?? []).some((t) => String(t).toLowerCase() === 'market');
-    const suppressEncounter = enforcePeace || recentlyCleared || !!hubRoom || isNeutralMarket;
+    // OTA-801 — post-boss grace window. A boss kill stamps player.
+    // bossDefeatGraceUntilHours (resolveEnemyDefeat); while it holds, arrival
+    // encounters are suppressed so stepping out of the outpost you just cleared
+    // doesn't drop a fresh ambush on you mid-loot. Lapses on game-time.
+    const inBossGrace = (player?.bossDefeatGraceUntilHours ?? 0) > hoursElapsed;
+    const suppressEncounter = enforcePeace || recentlyCleared || !!hubRoom || isNeutralMarket || inBossGrace;
     // Phase 4 §4.3 — biome-curated encounter pools. If the Micro-Micro
     // has a possibleEncounters list, pick rarity-weighted from THAT pool
     // (so the Buried Skyscraper Upper only spawns Aetherbats, Reclaimer
     // Ambushers, etc., not random global enemies). Falls back to the
     // legacy global roll when no ladder or when the curated pool returns
     // nothing (data drift safety).
+    // OTA-808 — Menace pressure: a player who rules by fear draws readier, meaner
+    // encounters. The decayed menace lifts the curated-encounter chance and can add
+    // one more foe to the pack. Legible payback for leaning on intimidation.
+    const sceneMenace = decayedMenace(player?.menace ?? 0, player?.menaceUpdatedHour ?? 0, hoursElapsed);
+    const menaceBonus = menaceEncounterBonus(sceneMenace); // 0..0.25
     let encounter: Enemy[] = [];
     if (!suppressEncounter) {
-      if (ladderTriple && chance(40 + location.danger * 8)) {
+      if (ladderTriple && chance(40 + location.danger * 8 + Math.round(menaceBonus * 100))) {
         const curated = pickEncounterFromLadder(ladderTriple);
         if (curated) encounter = [curated];
       }
       if (encounter.length === 0) {
         encounter = rollEncounter(location);
       }
+      if (encounter.length > 0 && ladderTriple && menaceBonus > 0 && Math.random() < menaceBonus) {
+        const extra = pickEncounterFromLadder(ladderTriple);
+        if (extra) encounter = [...encounter, extra];
+      }
+      // OTA-817 — MIXED-ROLE PACKS. The curated single-enemy path pre-empted the group
+      // roll, so laddered areas hadn't spawned more than one foe in weeks (and the
+      // target-swipe UI + companions went unused). Add role-diverse pack members
+      // (drone + bandit + rat), frequency scaling with danger — a frontier tile stays
+      // mostly single, a deep tile brings packs. Scaling below treats the pack as one
+      // shared, boss-capped budget so a trio never out-guns a Guardian.
+      if (encounter.length > 0) {
+        const packAdds = rollExtraPackMembers(location, encounter);
+        if (packAdds.length) encounter = [...encounter, ...packAdds];
+      }
     }
-    const enemies: Enemy[] = encounter;
+    // OTA-816 — scale rolled (non-boss) enemies to the player's power AND the tile's
+    // danger, so a strong character isn't farming trivial trash and a deep zone bites
+    // harder than the frontier. Guardians/story bosses are skipped inside the scaler
+    // (they carry their own curve). A fresh arrival on a danger-0 tile is untouched.
+    const scalePower = player
+      ? enemyScalePower(Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence), player.hpMax)
+      : 0;
+    const enemies: Enemy[] = scaleEncounterForContext(encounter, location.danger, scalePower);
     const enemyHps: number[] = enemies.map((e) => e.hp);
     const activeEnemyIdx = 0;
     const hasEnemies = enemies.length > 0;
@@ -4588,7 +6299,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : (findVendorByName(hubRoom.anchorNpc) ?? null))
           // OTA-411 — a capital never falls to the roadside roll; it always
           // gets a NAMED vendor below. Only NON-capital outdoor tiles roll roadside.
-          : (!hasEnemies && !hubRoom && !atCoreCapital && Math.random() < roadsideRate ? pickRoadsideTrader() : null);
+          : (!hasEnemies && !hubRoom && !atCoreCapital && Math.random() < roadsideRate ? withSkyreacherChartOffer(pickRoadsideTrader(), get().worldMemory) : null);
       // OTA-410/411 — capital named-vendor greeting. RNG-rolled which non-defeated
       // VENDORS entry arrives, re-rolled each arrival (intended). Always fires at a
       // capital (the roadside roll above is suppressed there), so a capital begin-
@@ -4602,12 +6313,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       // arb104 — the outpost Armory stocks the player's OWN faction's named
       // armor + weapons (Irma carries faction-issue gear in your outpost).
+      // arb-fix — Irma is the shared armory ANCHOR, re-skinned into every
+      // faction's outpost (hub rooms are re-skinned by player.factionId via
+      // hubRoomFor), but her vendor template hard-codes faction 'true_tartarians'.
+      // Re-point it to the HOST faction — player.factionId, the owner of this hub
+      // — so pricing, buy-rep, theft, and kill-standing all attribute to the
+      // faction whose outpost this actually is, not always the True Tartarians.
+      // (Foreign capitals use the separate atCoreCapital vendor path above, so
+      // this only ever fires for the player's own home-hub armory anchor.)
       if (base && hubRoom?.anchorNpc === 'Irma Ironhand' && player.factionId) {
         const facOffers = factionGearOffers(player.factionId);
-        if (facOffers.length > 0) {
-          const have = new Set(base.offers.map((o) => o.itemName));
-          return { ...base, offers: [...base.offers, ...facOffers.filter((o) => !have.has(o.itemName))] };
-        }
+        const have = new Set(base.offers.map((o) => o.itemName));
+        const offers = facOffers.length > 0
+          ? [...base.offers, ...facOffers.filter((o) => !have.has(o.itemName))]
+          : base.offers;
+        // faction → HOST (prices, buy-rep, and the peace-break penalty for
+        // fighting in their outpost). nativeFaction → who she actually is (a
+        // hosted guest), so harming her also angers HER faction, not just the host.
+        return { ...base, faction: player.factionId, nativeFaction: base.faction, offers };
       }
       return base;
     })();
@@ -4837,8 +6560,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the room's consumed set (the take handler's searchedAmbientNouns) here
     // makes a taken piece stay gone for that tile, on hub AND wild tiles.
     const gearConsumed = roomConsumedSet(get().worldMemory, candidateKey);
-    const sceneGearNouns: string[] = pickTakeableGearForScene(candidateKey)
+    // OTA-996 — #119a: cross-tile variety window — exclude the last ~10 rolled
+    // gear names so a short walk stops repeating the same items.
+    const recentGearNames = new Set((worldMemory.recentTakeableGearNames ?? []).map((n) => n.toLowerCase()));
+    const sceneGearNouns: string[] = pickTakeableGearForScene(candidateKey, recentGearNames)
       .filter((n: string) => !isConsumedNoun(gearConsumed, n));
+    if (sceneGearNouns.length > 0) {
+      get().appendLog('debug', `spawn: gear=[${sceneGearNouns.join(', ')}] window=${recentGearNames.size}`);
+      set((s2) => ({
+        worldMemory: {
+          ...s2.worldMemory,
+          recentTakeableGearNames: [...(s2.worldMemory.recentTakeableGearNames ?? []), ...sceneGearNouns].slice(-10),
+        },
+      }));
+    }
     // OTA-375 — water sources for refilling the Water Bottle. Outdoor
     // tiles get a stable, per-room water source surfaced in look-around so
     // 'fill bottle' has somewhere to draw. Seeded off the room key (stable
@@ -4877,11 +6612,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       displayedAmbientNouns = [...ambientNouns];
     } else {
       // Reserve slots so each verb still gets a look-in: 3 take + 1
-      // climb + 1 salvage. Dedup overflow, then top up any unused slot
-      // allocation from the remainder to fill the cap.
+      // climb + 3 salvage. Dedup overflow, then top up any unused slot
+      // allocation from the remainder to fill the cap. OTA-753 — salvage
+      // was reserved at 1, so a tile only ever surfaced a SINGLE salvage
+      // target (and with the cap at 5, the buildChipPool re-slice often
+      // dropped even that). Widened cap 5→8 + salvage 1→3 so take/salvage
+      // both show real variety; the pick stays seeded per tile so a
+      // cleared site still resolves and doesn't re-roll fresh loot.
       const pickedTakes = shuffleSliceSeeded(baseTakeable, 3, _hashSeed(`disp-take:${candidateKey}`));
       const pickedClimb = shuffleSliceSeeded(allClimbablesPool, 1, _hashSeed(`disp-climb:${candidateKey}`));
-      const pickedSalv = shuffleSliceSeeded(allSalvageablesPool, 1, _hashSeed(`disp-salv:${candidateKey}`));
+      const pickedSalv = shuffleSliceSeeded(allSalvageablesPool, 3, _hashSeed(`disp-salv:${candidateKey}`));
       const reservedPicks = Array.from(new Set([...pickedTakes, ...pickedClimb, ...pickedSalv]));
       const remaining = ambientNouns.filter((n) => !reservedPicks.includes(n));
       const topupCount = Math.max(0, AMBIENT_DISPLAY_CAP - reservedPicks.length);
@@ -5034,10 +6774,90 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hubRoom?.id === 'outpost_central' && player?.factionId
         ? { faction: player.factionId }
         : null;
+    // OTA-807 — wandering NPC spawn. A person (not a vendor) on a peaceful OUTDOOR
+    // tile you can actually talk to. Suppressed on hubs, markets, capitals, combat
+    // tiles, when a vendor already rolled, and during the opening. Farm-proof: each
+    // tile gets exactly ONE spawn roll ever (banked in worldMemory.wandererRolled
+    // Tiles), so leaving and returning can't re-roll a person off one square — you
+    // have to cross new ground to meet new people. ~12% of eligible fresh tiles.
+    const wanderer: Wanderer | null = (() => {
+      if (opts?.isOpening || hasEnemies || hubRoom || atCoreCapital || vendor || isNeutralMarket) return null;
+      if (!player?.currentLocationId) return null;
+      const wTileKey = `${player.currentLocationId}:${player.mapX}:${player.mapY}`;
+      const rolled = get().worldMemory.wandererRolledTiles ?? [];
+      if (rolled.includes(wTileKey)) return null;
+      // Bank the roll for this tile up front (window-bounded) so it's one-and-done
+      // regardless of the outcome below.
+      set((s) => ({
+        worldMemory: {
+          ...s.worldMemory,
+          wandererRolledTiles: [...(s.worldMemory.wandererRolledTiles ?? []), wTileKey].slice(-120),
+        },
+      }));
+      if (Math.random() >= 0.12) return null;
+      // Seed from a stable hash of the tile so the same visit reads the same person.
+      let seed = 0;
+      for (let i = 0; i < wTileKey.length; i++) seed = (seed * 31 + wTileKey.charCodeAt(i)) | 0;
+      // OTA-808 — draw a faction (or none) so an affiliated wanderer's standing can
+      // be dinged if you extort them.
+      return makeWanderer(seed, FACTIONS.map((f) => f.id));
+    })();
+    // OTA-910 — great climbs. At each of the five landmark locations, force the
+    // landmark's great-climb prop (11–15 tiers) into the scene noun pool so the
+    // ascent is always there to attempt and always shows in look-around / the
+    // CLIMB modal. It's a defining feature of the place, not a rolled spawn, so
+    // it bypasses the curated picker + consumed-noun filter entirely. Gated to
+    // the open landmark (not its interior hub rooms). Height, the strap-gate,
+    // scaling falls, and the guaranteed Skyreacher drop are handled in the climb
+    // verb + climbHeight/greatClimbs.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { greatClimbForLocation } = require('../engine/greatClimbs');
+      const gcLoc = location?.id ?? player?.currentLocationId;
+      const gc = greatClimbForLocation(gcLoc);
+      // OTA-912 — access is gated on the CHART: the great-climb prop only spawns
+      // once the player has used that climb's Skyreacher Chart (its id is in
+      // worldMemory.unlockedGreatClimbs). Before that the landmark reads as an
+      // ordinary place — you can stand at Asgardar and never see the climb until
+      // a chart puts it on your route.
+      const gcUnlocked = !!gc && (get().worldMemory.unlockedGreatClimbs ?? []).includes(gc.id);
+      if (gc && gcUnlocked && !get().player?.hubRoomId && !hasEnemies) {
+        sceneAmbientNouns = Array.from(new Set([gc.noun, ...sceneAmbientNouns]));
+        sceneDisplayedNouns = Array.from(new Set([gc.noun, ...sceneDisplayedNouns]));
+      }
+    }
+    // OTA-974 — Phase B of real heights: seed PERCHES onto taller climbables
+    // (a nest at tier 2 of the tower). Deterministic per room — the hash of
+    // (roomKey, structure) decides everything, so leaving and re-entering a
+    // scene can never reroll the loot. Already-harvested perches (marked in
+    // the room's searchedAmbientNouns) stay gone. Outdoors only.
+    let scenePerchPlacements: CurrentScene['nounPlacements'];
+    if (!get().player?.hubRoomId) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { seedPerches } = require('../engine/perches') as typeof import('../engine/perches');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { climbHeightFor: chPerch } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+      const perchRoomKey = makeRoomKey(
+        player?.currentLocationId ?? '', microMicroId, player?.mapX, player?.mapY, player?.hubRoomId,
+      );
+      const climbables = sceneAmbientNouns
+        .filter((n) => isClimbable(n))
+        .map((n) => ({ noun: n, tiers: chPerch(n) }));
+      const seeded = seedPerches(perchRoomKey, climbables);
+      const perchConsumed = roomConsumedSet(get().worldMemory, perchRoomKey);
+      const liveNouns = seeded.nouns.filter((n) => !isConsumedNoun(perchConsumed, n));
+      if (liveNouns.length > 0) {
+        sceneAmbientNouns = Array.from(new Set([...sceneAmbientNouns, ...liveNouns]));
+        sceneDisplayedNouns = Array.from(new Set([...sceneDisplayedNouns, ...liveNouns]));
+        scenePerchPlacements = Object.fromEntries(liveNouns.map((n) => [n, seeded.placements[n]!]));
+      }
+    }
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
       vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, microMicroId,
+      nounPlacements: scenePerchPlacements,
       missionBoard,
+      wanderer,
       sceneBuilding,
       enemyAmbushUsed: enemies.map(() => false),
       // OTA-361 — knockout flags, one per enemy, all false at scene start.
@@ -5142,11 +6962,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // arb36 — announce a discovered structure so the new ENTER affordance
     // isn't unexplained. Skipped on the opening scene (you start on the
     // anchor, so sceneBuilding is null there anyway).
-    if (scene.sceneBuilding === 'market' && scene.location.id === 'hidden_market' && !opts?.isOpening && !get().activeBuildingId) {
+    if (scene.sceneBuilding === 'market' && scene.location.id === 'hidden_market' && !get().activeBuildingId) {
       // OTA-508 — the Hidden Market IS the market: auto-enter it on arrival so the
       // four stall buttons (weapons / armor / food / materials) + EXIT replace the
       // cardinals immediately, instead of requiring a separate "enter" step. Deferred
       // so it runs AFTER beginScene's own set() lands (no re-entrancy).
+      // OTA-777 — this now also fires on LOAD (isOpening). Building state
+      // (activeBuildingId) isn't persisted, so a save made INSIDE the market
+      // reloaded half-out — at the hidden_market tile with a stale stall vendor
+      // in the scene but no activeBuildingId — which made the top vendor +
+      // Crucible banners reappear. Re-entering on load restores the in-stall
+      // view (OTA-775 suppresses those top banners while activeBuildingId is set).
+      // The location.id === 'hidden_market' gate keeps this off every other
+      // scene, incl. a brand-new game (which opens at a spawn outpost).
       void Promise.resolve().then(() => {
         if (get().currentScene?.location.id === 'hidden_market' && !get().activeBuildingId) {
           get().enterBuilding('market');
@@ -5156,12 +6984,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const onRoute = !!get().player?.travelTarget || !!get().player?.whisperCourse;
       get().appendLog('world', buildingApproachLine(scene.sceneBuilding, onRoute));
     }
+    // OTA-807 — announce a wandering NPC on arrival so the TALK affordance isn't
+    // unexplained. Names the person after the archetype's greeting.
+    if (scene.wanderer && !opts?.isOpening) {
+      get().appendLog('world', `${scene.wanderer.greeting} This is ${scene.wanderer.name}, ${scene.wanderer.role}. (Try "talk to ${scene.wanderer.name}" — a fair word carries.)`);
+    }
+    // OTA-809 — pay out a pending LEAD (talked out of a wanderer via PERSUADE) once
+    // the player reaches fresh, peaceful ground: they followed the lead and found the
+    // cache. Grants the reward + clears the lead. Gated to peaceful non-hub arrivals
+    // so it reads as "you traveled and dug it up."
+    {
+      const leadPlayer = get().player;
+      const lead = leadPlayer?.pendingLead ?? null;
+      if (lead && !opts?.isOpening && !hasEnemies && !hubRoom && !isNeutralMarket) {
+        const gainItem = lead.rewardItem ? miscLootItem(lead.rewardItem, 1) : null;
+        set((s) => {
+          if (!s.player) return s;
+          let p = { ...s.player, tc: s.player.tc + lead.rewardTc, pendingLead: null };
+          if (gainItem) {
+            const res = grantItem(p.inventory, gainItem);
+            p = { ...p, inventory: res.inventory };
+          }
+          return { player: p };
+        });
+        get().appendLog(
+          'reward',
+          `Following the lead — ${lead.hint} — you turn up the cache: ${lead.rewardTc} TC${gainItem ? ` + ${gainItem.name}` : ''}.`,
+        );
+      }
+    }
     // arb120 — occasional Arbiter nudge inviting a deeper question (replaces the
     // dropped "ask arbiter" button with an organic prompt). Peaceful outdoor
     // scenes only, rare, and never piled on a vendor / board / building moment.
     if (!opts?.isOpening
         && (!scene.enemies || scene.enemies.length === 0)
-        && !scene.vendor && !scene.missionBoard && !scene.sceneBuilding
+        && !scene.vendor && !scene.missionBoard && !scene.sceneBuilding && !scene.wanderer
         && !get().player?.hubRoomId
         && Math.random() < 0.04) {
       const prompt = ARBITER_QUESTION_PROMPTS[Math.floor(Math.random() * ARBITER_QUESTION_PROMPTS.length)];
@@ -5544,7 +7401,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const groups = new Map<string, number>();
         for (const e of enemies) groups.set(e.name, (groups.get(e.name) ?? 0) + 1);
         const labels = Array.from(groups.entries()).map(([n, c]) => (c > 1 ? `${c} ${n}s` : withArticle(n.toLowerCase())));
-        presenceLine = `${labels.join(' and ')} ${enemies.length === 1 ? 'is' : 'are'} already here.`;
+        // arb-fix (narration audit) — this line opens a sentence ("It's dusk. <presence>"),
+        // but the single-enemy label uses withArticle ("a raider"), so it read "It's dusk. a
+        // raider is already here." Capitalise the sentence-leading first character.
+        const rawPresence = `${labels.join(' and ')} ${enemies.length === 1 ? 'is' : 'are'} already here.`;
+        presenceLine = rawPresence.charAt(0).toUpperCase() + rawPresence.slice(1);
       } else if (vendor) {
         presenceLine = `${vendor.name} is the only soul in sight.`;
       } else {
@@ -5571,6 +7432,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `It's ${timePhrase}. ${presenceLine} ` +
         bearingsLine;
       get().appendLog('world', arrival);
+      // OTA-993 — #112: reference the location before speaking of its rooms.
+      // Arrival at a hub location auto-enters the outpost interior (hubRoomId
+      // was set above), but this branch REPLACES the scene text with the
+      // OUTDOOR arrival paragraph — so the "Paths:" room line further down
+      // named rooms no narration had established (device log: open-ground
+      // arrival at Reclaimer's Stake, then a room list out of nowhere). Now
+      // the walk through the gate is narrated, so the room list that follows
+      // has its referent.
+      if (hubRoom) {
+        get().appendLog(
+          'world',
+          `You pass through the gate into ${hubNameForFaction(player.factionId)} — ${hubRoom.name}. ${hubRoom.description}`,
+        );
+      }
     } else {
       get().appendLog('world', sceneText);
     }
@@ -5871,13 +7746,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       // Faction vendors may offer a contract the player qualifies for.
       if (vendor.faction) {
+        // OTA-1002 — #121: offer budget. Four offer emitters live below (contract,
+        // bounty board, mystery notice, thick scroll) and each used to fire
+        // whenever stocked — an offer firehose. Agents now pitch only TWO
+        // rotating categories per macro visit; the rotation walks one step
+        // each visit so every category surfaces within two stops. Turn-in
+        // hints are exempt — owed work always gets a word.
+        const offerCats = ['fq', 'hunt', 'mystery', 'storyline'] as const;
+        // OTA-1016 — pitch-keyed (see worldMemory.offerPitchSeq): travel-count keying
+        // phase-locked any vendor on a circuit whose hop count was ≡ 0 (mod 4)
+        // to the same two categories forever, world-wide. The ×2 step makes
+        // consecutive pitches cover all four categories (the old +1 walk
+        // covered three, despite the "within two stops" claim its own test
+        // quietly contradicted). Number() + isFinite guards a corrupted save
+        // (NaN previously suppressed all four categories permanently).
+        const rawPitch = Number(get().worldMemory.offerPitchSeq ?? 0);
+        const pitchSeq = Number.isFinite(rawPitch) ? Math.max(0, Math.floor(rawPitch)) : 0;
+        const offerRot = (pitchSeq * 2) % 4;
+        const offerAllowed = new Set<string>([
+          offerCats[offerRot]!,
+          offerCats[(offerRot + 1) % 4]!,
+        ]);
+        set((s2) => ({ worldMemory: { ...s2.worldMemory, offerPitchSeq: pitchSeq + 1 } }));
         const pool = availableFactionQuests(
           vendor.faction,
           getStanding(player.factionStanding, vendor.faction),
           player.activeFactionQuestIds ?? [],
           player.completedFactionQuestIds ?? [],
         );
-        if (pool.length > 0) {
+        if (offerAllowed.has('fq') && pool.length > 0) {
           const q = pool[0]!;
           // Short summary line — playtest feedback: "the arbiter
           // shouldn't read the contracts. he can just say contract
@@ -5906,7 +7803,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           (player.activeHunts ?? []).map((h) => h.id),
           player.completedHuntIds ?? [],
         );
-        if (huntPool.length > 0) {
+        if (offerAllowed.has('hunt') && huntPool.length > 0) {
           const h = huntPool[0]!;
           get().appendLog(
             'world',
@@ -5932,7 +7829,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           (player.activeMysteries ?? []).map((m) => m.id),
           player.completedMysteryIds ?? [],
         );
-        if (mysteryPool.length > 0) {
+        if (offerAllowed.has('mystery') && mysteryPool.length > 0) {
           const m = mysteryPool[0]!;
           get().appendLog(
             'world',
@@ -5957,7 +7854,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           (player.activeStorylines ?? []).map((s) => s.id),
           player.completedStorylineIds ?? [],
         );
-        if (storyPool.length > 0) {
+        if (offerAllowed.has('storyline') && storyPool.length > 0) {
           const s = storyPool[0]!;
           get().appendLog(
             'arbiter',
@@ -6047,6 +7944,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
 
+    // OTA-841 [did-you-mean] — a new action clears any stale disambiguation chips
+    // from the previous low-confidence parse (tapping a chip routes here too, so the
+    // chip row vanishes the moment you pick one).
+    if (get().parseSuggestions.length) set({ parseSuggestions: [] });
+
     // Poplar Anvil — reconcile the dog's time-based fates (bleed-out /
     // abandonment) AFTER this action resolves. Scheduled as a microtask
     // so a rescue verb (feed / rest / heal) applies its HP / loyalty
@@ -6092,6 +7994,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
           awaitingTutorialName: false,
         } : { awaitingTutorialName: false }));
         get().appendLog('arbiter', `"Well met, ${cleanName}. To business."`);
+        // OTA-948 — DEV STARTER GRANT (new-character only). The dev names get their test
+        // scaffolding at CREATION, not retroactively on every load: a Resurrection Gem up
+        // front (Verbal/Sasmooch) + a crash-test supply kit (both dev names). This is the single
+        // point a brand-new character is named; an existing save never re-enters it.
+        const devStartName = cleanName.trim().toLowerCase();
+        if (DEV_REVIVE_NAMES.includes(devStartName)) {
+          void addResurrectionGems(1).then((total) => {
+            set({ resurrectionGems: total });
+            get().appendLog('reward', `✦ A Resurrection Gem is set aside for ${cleanName} — the buried world keeps its own. (${total} held)`);
+          });
+        }
+        if (DEV_REVIVE_NAMES.includes(devStartName)) {
+          const devKit: Array<{ name: string; qty: number }> = [
+            { name: 'First Aid Kit', qty: 10 },
+            { name: 'Trail Rations', qty: 20 },
+            { name: 'Smoke-Cured Jerky Strip', qty: 20 },
+            { name: 'Bioluminescent Fungus', qty: 20 },
+            { name: 'Water Bottle', qty: 1 },
+          ];
+          set((s) => {
+            if (!s.player) return s;
+            let inv = s.player.inventory;
+            for (const { name, qty } of devKit) {
+              const look = lookupCraftedItem(name);
+              inv = grantItem(inv, {
+                id: `verbalgift_${Date.now()}_${name.replace(/\s+/g, '').toLowerCase()}`,
+                name, kind: look.kind, rarity: look.rarity, quantity: qty,
+                tags: [...look.tags, 'gift'],
+              }).inventory;
+            }
+            return { player: { ...s.player, inventory: inv } };
+          });
+          get().appendLog('reward', `✦ A crash-test kit lands in ${cleanName}'s pack: 10 First Aid Kits, 20 Trail Rations, 20 Smoke-Cured Jerky Strips, 20 Bioluminescent Fungus, 1 Water Bottle. Test freely.`);
+        }
+        void get().persist();
         get().maybeAdvanceTutorial('name');
         return;
       }
@@ -6112,7 +8049,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().maybeAdvanceTutorial('cudgel');
         return;
       }
-      if (tStep?.id === 'rope' && /\btake\s+.*rope\b/i.test(trimmed)) {
+      // OTA-861 — the player now TYPES this themselves (no pre-fill), so accept the
+      // natural synonyms for picking it up, not just "take".
+      if (tStep?.id === 'rope' && /\b(take|grab|get|pick\s+up|pickup|collect|snag)\s+.*rope\b/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
         grantTutorialItem(get, set, 'rope');
         get().appendLog('world', "You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.");
@@ -6223,6 +8162,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (def && challengeActive(def.id) && (def.scoutVerb.test(trimmed) || def.attemptVerb.test(trimmed))) {
           if (!_opts?.silent) get().appendLog('player', trimmed);
           handleTitleChallenge(get, set, trimmed, def);
+          return;
+        }
+      }
+    }
+
+    // arb55 — Trap Dives of the Endless Stair (Shadow Diver). Retryable DEX
+    // gauntlet — SCOUT (free) reports the DC + banked dives; DIVE rolls one.
+    // Intercept the scout/dive verbs at the tile before the world parser.
+    {
+      const pl = get().player;
+      if (
+        pl && !pl.labyrinthRun &&
+        pl.currentLocationId === 'endless_stair' &&
+        challengeActive('trap_dives_of_the_stair')
+      ) {
+        const diveVerb = /\b(dive|descend|drop|plunge|leap|run)\b.*\b(stair|stairs|step|steps|descent|dark|trap|traps)\b|^(dive|dive\s+the\s+stair)\b/i;
+        const scoutVerb = /\b(examine|inspect|assess|scout|survey|read|study|look\s+at)\b.*\b(stair|stairs|step|steps|plate|plates|trap|traps|descent)\b/i;
+        if (diveVerb.test(trimmed) || scoutVerb.test(trimmed)) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          handleTrapDive(get, set, diveVerb.test(trimmed));
           return;
         }
       }
@@ -6492,6 +8451,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // dodging 2r → 1r) never persisted their decrement, so counters
     // were frozen until the array changed shape. Now: whenever the
     // player has ANY status going in, write the ticked result back.
+    // OTA-969 — and the write must STAY written: 26 action paths charged time+stamina
+    // via set({ player: advanceTime(spendStamina(player, ...)) }) built from the
+    // pre-tick snapshot below, silently restoring pre-tick statusEffects/HP. On
+    // dice-modal actions (every attack) timed buffs therefore NEVER ticked — a
+    // 3-round +2 STR ran the whole fight, fading only on non-roll actions
+    // (playtest: four "Legacy of Power fades" lines while STR stayed buffed).
+    // Every charge now derives from the LIVE player (functional set), so ticks,
+    // DOTs, and weather writes survive the action body.
     // skipPreChecks: the LLM parse-fallback re-submits a canonical
     // rephrasing of the same player input, and we don't want to tick
     // statuses twice for one action. The first pass already ran the
@@ -6522,8 +8489,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           checkLowHpWarning(player.hp, newHp, player.hpMax ?? 1, get, set);
         }
       }
+      // arb-fix — dedupe the fade line by rendered text. Some abilities push two
+      // distinct effects that share a label (e.g. Legacy of Power's surge is a
+      // +STR and a +WIS buff, both "Legacy of Power (surge)"), so they'd log two
+      // identical "… fades." lines on the same tick. The buffs are separate; only
+      // the message is a duplicate.
+      const seenFade = new Set<string>();
       for (const ex of tick.expired) {
-        get().appendLog('system', `${ex.label ?? ex.kind} fades.`);
+        const line = `${ex.label ?? ex.kind} fades.`;
+        if (seenFade.has(line)) continue;
+        seenFade.add(line);
+        get().appendLog('system', line);
       }
       if (incapacitated) {
         get().appendLog('world', `You cannot move. Your action is lost.`);
@@ -6548,14 +8524,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // every action, un-escapable). After any damaging tick we arm a gap so the
     // next WEATHER_TICK_GAP actions are weather-free → at most one hit per
     // (GAP+1) actions. The hazard stays felt, but periodic rather than relentless.
-    const WEATHER_TICK_GAP = 2;
+    // OTA-1003 — #122: gap 2 -> 5 (owner: stop the armor re-spec treadmill) and no
+    // weather bite at all while INDOORS — a roof is a roof.
+    const WEATHER_TICK_GAP = 5;
     const weatherCooldown = get().player?.weatherTickCooldown ?? 0;
     if (weatherCooldown > 0) {
       set((s) => (s.player ? { player: { ...s.player, weatherTickCooldown: weatherCooldown - 1 } } : s));
     }
-    const wtick = weatherCooldown > 0
+    // OTA-1003 — #122: a roof is a roof — weather doesn't bite indoors. But the hub
+    // graph is not all interior: the gate, the square and the culvert descent
+    // are OPEN AIR and stay exposed (standing at the gate in glass hail should
+    // still cost you). Everything else in a hub — armory, mess, workshop,
+    // quarters, lab, vault, chapel, and the whole buried level — is sheltered,
+    // as is any building you've stepped inside.
+    const hubRoomNow = get().player?.hubRoomId ?? null;
+    const underRoof =
+      !!get().activeBuildingId ||
+      (!!hubRoomNow && !OPEN_AIR_HUB_ROOMS.has(hubRoomNow));
+    const wtick = weatherCooldown > 0 || underRoof
       ? { hpDelta: 0, staminaDelta: 0, corruptionDelta: 0, line: null as string | null }
-      : tickWeather(get().currentScene?.weather ?? null, player);
+      : tickWeather(get().currentScene?.weather ?? null, player, playerArmorResistKinds(player));
     if (wtick.line) {
       // Rate-limit the weather-tick line: don't print the SAME line if
       // it already appeared within the last 30 log entries. The
@@ -6584,6 +8572,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       let effHpDelta = wtick.hpDelta;
       let effCorrDelta = wtick.corruptionDelta;
       if (tPerks.corruptionResist && effCorrDelta > 0) effCorrDelta = Math.ceil(effCorrDelta / 2);
+      // OTA-835 — Architectural Sentinels (ageless construct body) don't absorb the
+      // ambient aetheric corruption the weather notches into flesh — the environment
+      // can't decay them. The other half of their "Immunity to Time" trait.
+      if (player.raceId === 'architectural_sentinel' && effCorrDelta > 0) effCorrDelta = 0;
       if ((tPerks.ethericDamageResist || tPerks.ethericShield) && isEthericWeather && effHpDelta < 0) {
         effHpDelta = Math.ceil(effHpDelta / 2);
       }
@@ -6607,10 +8599,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // the player across a corruption threshold.
       {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+        const { corruptionTierOf, tierCrossLine, tierLabel } = require('../engine/corruption');
         const nowCorr = get().player?.corruption ?? 0;
-        const crossLine = tierCrossLine(corruptionTierOf(prevCorrWeather), corruptionTierOf(nowCorr));
+        const fromTier = corruptionTierOf(prevCorrWeather);
+        const toTier = corruptionTierOf(nowCorr);
+        const crossLine = tierCrossLine(fromTier, toTier);
         if (crossLine) get().appendLog('reward', crossLine);
+        // OTA-843 [Chronicle] — a WORSENING tier crossing is a beat in the character's
+        // arc; log it so the corruption descent shows in the Chronicle, not just the
+        // live number. Guard on the tier-order index so a recovery doesn't record.
+        const CORR_ORDER = ['clean', 'tainted', 'corrupted', 'hollowed'];
+        if (crossLine && CORR_ORDER.indexOf(toTier) > CORR_ORDER.indexOf(fromTier)) {
+          recordMemorableEvent(get, set, {
+            kind: 'corruption_tier',
+            text: `The Aether takes deeper root — you cross into ${tierLabel(toTier)}.`,
+            hoursElapsed: get().player?.hoursElapsed ?? 0,
+          });
+        }
       }
       if (!recentlyShown) {
         // OTA-355 — surface the actual HP bite. Lines like "a silent bolt
@@ -6627,7 +8632,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         void Promise.resolve().then(() => handlePlayerDeath(get, set));
         return;
       }
-      // arb45 — survived an Etheric storm tick (the kind that notches
+      // arb45 — survived an Aetheric storm tick (the kind that notches
       // corruption). Records storm-survival (+companion variant for
       // Stormcaller) and the high-water corruption mark for Survivor of
       // Aetherstone. recordTitleProgress also runs the award check.
@@ -6737,6 +8742,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const isGolemDismiss = /^(dismiss|release|unbind)\s+(the\s+)?golem\b/i.test(lower);
       if (isGolemCommand || isGolemDismiss) {
         get().appendLog('player', trimmed);
+        // OTA-911 — the golem can't climb, so it can't be commanded while you're
+        // up on a climb: it's holding the ground at the base. Dismiss still works.
+        if (isGolemCommand && get().currentScene?.elevatedOn) {
+          get().appendLog(
+            'world',
+            `Your golem is at the base of the ${get().currentScene?.elevatedOn?.noun ?? 'climb'} — it can't climb, and it can't reach anything up here. You're on your own until you're back on the ground.`,
+          );
+          void get().persist();
+          return;
+        }
         if (isGolemDismiss) {
           handleGolemDismiss(get, set);
         } else {
@@ -6756,6 +8771,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         void get().persist();
         return;
+      }
+    }
+    // OTA-911 — DODGE doesn't work while you're on a climb (no footing to weave
+    // a parry). OTA — FLEE now DOES work in a wall fight. Owner: "when I summit
+    // some climbs [I] immediately get thrust into a fight with up to five
+    // enemies. there is no way to flee." It runs the NORMAL flee roll; success
+    // resolves as a one-tap dive for the base — double stamina per tier, and if
+    // the tank empties partway you fall the rest (see the escape resolution).
+    // Flee with NO enemies on the wall is still refused — nothing is chasing
+    // you; that's just climbing down.
+    {
+      const elevNow = get().currentScene?.elevatedOn;
+      if (elevNow) {
+        const lowerAct = trimmed.toLowerCase().trim();
+        const isDodgeAct = /^(dodge|parry|block|deflect)\b/.test(lowerAct);
+        const isFleeAct = /^(flee|run|escape|retreat|withdraw|disengage)\b/.test(lowerAct);
+        const wallEnemies = (get().currentScene?.enemies?.length ?? 0) > 0;
+        if (isDodgeAct || (isFleeAct && !wallEnemies)) {
+          get().appendLog('player', trimmed);
+          get().appendLog(
+            'world',
+            isDodgeAct
+              ? `You can't dodge on the ${elevNow.noun} — both hands are on the rock and there's no footing to weave a parry. Set your feet and swing, or climb clear first.`
+              : `Nothing up here is chasing you. If you want down, climb down.`,
+          );
+          void get().persist();
+          return;
+        }
       }
     }
     // OTA-120 — Dog Companion: three-step Arbiter onboarding takeover.
@@ -6807,6 +8850,63 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (parsed.intent === 'dog_bite' || parsed.intent === 'dog_distract') {
       handleDogCombat(get, set, parsed.intent, parsed.target);
       void get().persist();
+      return;
+    }
+    // OTA-808 — PARLEY. Speaking to a foe you're fighting (an animal) or a wild NPC
+    // (a person) opens a two-button social choice with real, asymmetric stakes —
+    // Calm/Intimidate for animals, Persuade/Intimidate for people. A GENERIC opener
+    // ("talk to / greet / speak") surfaces the ParleyModal so the player sees the
+    // stakes; a SPECIFIC verb (intimidate / persuade / calm) commits straight
+    // through. Hard lock-and-key: the wrong approach auto-fails; a high-WIS read is
+    // told the temperament, everyone else gets the narrated tell. See parley.ts.
+    // --- Combat parley (animals; bosses / story-class threats refuse) ---
+    if (parsed.intent === 'diplomacy' && currentScene.enemies.length > 0) {
+      const foes = currentScene.enemies;
+      if (isTalkDownBlocked(foes)) {
+        get().appendLog(
+          'combat',
+          `This isn't something you can talk your way out of — ${activeEnemy(currentScene)?.name ?? 'it'} is past reason. Steel, or run.`,
+        );
+        void get().persist();
+        return;
+      }
+      const idx = currentScene.activeEnemyIdx ?? 0;
+      const foe = currentScene.enemies[idx] ?? currentScene.enemies[0]!;
+      const temperament: Temperament = foe.temperament ?? deriveAnimalTemperament(foe.name, foe.traits ?? []);
+      const wisRevealed = revealsTemperament(effectiveStats(player).wisdom);
+      const ctx = { kind: 'animal' as ParleyKind, temperament, targetName: foe.name, wisRevealed, enemyIdx: idx };
+      get().appendLog('world', wisRevealed ? temperamentReadout(temperament) : temperamentTell(temperament));
+      const explicit = detectParleyChoice(trimmed, 'animal');
+      set(() => ({ pendingParley: ctx }));
+      if (explicit) {
+        get().resolveParley(explicit);
+      } else {
+        // OTA-854 — faction patrols read as people, not beasts: persuade / intimidate.
+        get().appendLog('world', foe.factionId
+          ? `${foe.name} squares off. How do you play it — persuade them to stand down, or intimidate them into leaving?`
+          : `${foe.name} squares off. How do you play it — calm it, or intimidate it?`);
+        void get().persist();
+      }
+      return;
+    }
+    // --- Peaceful parley (a wild NPC / person) ---
+    if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.wanderer) {
+      const w = currentScene.wanderer;
+      const temperament = w.temperament;
+      const wisRevealed = revealsTemperament(effectiveStats(player).wisdom);
+      const ctx = { kind: 'person' as ParleyKind, temperament, targetName: w.name, wisRevealed };
+      // OTA-809 — the "cagey" beat: they name their price before you choose how to
+      // play it, so the exchange reads as a conversation, not a bare die roll.
+      get().appendLog('world', wandererCagey(w));
+      get().appendLog('world', wisRevealed ? temperamentReadout(temperament) : temperamentTell(temperament));
+      const explicit = detectParleyChoice(trimmed, 'person');
+      set(() => ({ pendingParley: ctx }));
+      if (explicit) {
+        get().resolveParley(explicit);
+      } else {
+        get().appendLog('world', `Persuade ${w.name} for what they know, or intimidate them for what they carry?`);
+        void get().persist();
+      }
       return;
     }
     // OTA-120 Phase 4 — `feed dog <item>` / `heal dog <item>` /
@@ -6871,7 +8971,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const nextCorr = Math.max(0, Math.min(CORRUPTION_MAX, (s.player.corruption ?? 0) + corrGain));
           let scene = s.currentScene;
           if (scene && foe) {
-            const spawn = JSON.parse(JSON.stringify(foe)) as Enemy;
+            // OTA-896 (SA-4) — a provoked apex foe (Legendary/boss) scales to the
+            // player like a rolled encounter; this direct-provoke path bypasses
+            // scaleEncounterForContext, so scale it here.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const cgScale = require('../engine/coreGuardians') as typeof import('../engine/coreGuardians');
+            const spawn = cgScale.scaleStaticBoss(
+              cgScale.guardianPlayerPower(s.player),
+              JSON.parse(JSON.stringify(foe)) as Enemy,
+            );
             scene = {
               ...scene,
               enemies: [...scene.enemies, spawn],
@@ -7040,6 +9148,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             if (parsed.suggestions.length) {
               get().appendLog('system', `Try: ${parsed.suggestions.slice(0, 3).join(' · ')}`);
+              // OTA-841 — also surface the same commands as a TAPPABLE "did you mean" chip row.
+              set({ parseSuggestions: parsed.suggestions.slice(0, 3) });
             }
             void get().persist();
             return;
@@ -7048,6 +9158,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'debug',
             `parse-fallback: qwen → intent=${result.intent} target="${result.target}" rephrase="${result.rephrasing}"`,
           );
+          // OTA-993 — #114: before re-dispatching, hold the rephrase to what the
+          // player actually said. A rejected rephrase gets the same soft
+          // refusal + did-you-mean chips as "no usable result" — never an
+          // invented action.
+          const rejection = qwenRephraseRejection(parsed.resolvedNoun, result.intent, result.rephrasing, trimmed);
+          if (rejection) {
+            get().appendLog('debug', `parse-fallback: qwen rephrase rejected (${rejection}) → soft refusal`);
+            const lastCogR = get().cognitiveLastResponse;
+            get().appendLog(
+              'arbiter',
+              buildSoftArbiterFallback({
+                parsed,
+                inventory: player.inventory,
+                enemy: activeEnemy(currentScene),
+                location: currentScene.location,
+                hazard: currentScene.hazard,
+                playerHpFraction: player.hpMax > 0 ? player.hp / player.hpMax : 1,
+                mood: lastCogR?.inferredEmotions[0],
+                lastInteractedNoun: get().lastInteractedNoun,
+                rawText: trimmed,
+              }),
+            );
+            if (parsed.suggestions.length) {
+              get().appendLog('system', `Try: ${parsed.suggestions.slice(0, 3).join(' · ')}`);
+              set({ parseSuggestions: parsed.suggestions.slice(0, 3) });
+            }
+            void get().persist();
+            return;
+          }
           // Re-dispatch through the dictionary parser. skipPreChecks
           // prevents meta-guard re-evaluation + status-tick double-fire.
           get().submitPlayerAction(result.rephrasing, { skipPreChecks: true });
@@ -7091,6 +9230,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       if (parsed.suggestions.length) {
         get().appendLog('system', `Try: ${parsed.suggestions.slice(0, 3).join(' · ')}`);
+        // OTA-841 — tappable "did you mean" chip row mirroring the Try: line.
+        set({ parseSuggestions: parsed.suggestions.slice(0, 3) });
       }
       void get().persist();
       return;
@@ -7115,7 +9256,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'advance',
       'ask',
       'diplomacy',
-      'gift',
       'steal',
       // OTA-129 — hook-puzzle verbs route through hookEligible too
       // so the puzzle resolver runs against active hooks. The
@@ -7152,7 +9292,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (hook && !hook.resolved) {
         get().appendLog('debug', `route: hook intercept (kind=${hook.kind}, target="${targetText}") — original intent=${parsed.intent}`);
         // Small stamina cost for engaging a hook (same as a skill check).
-        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
         // OTA-129 — hook puzzle gate. If this hook's kind has a
         // PUZZLE_DEFINITIONS entry AND the hook is still at stage 0
         // AND the player's intent matches the puzzle's intentList,
@@ -7276,8 +9416,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? 'The Arbiter folds their hands. "The Guardians are not yet your concern. The Cores will reveal themselves first."'
           : res.reason === 'already_recovered'
             ? 'The Arbiter inclines their head. "This Capital\'s Core is already yours. The Guardian here is at rest. Travel to a Capital you have not yet broken."'
-          : null;
-        if (reasonLine) get().appendLog('arbiter', reasonLine);
+          // OTA-840 [never-fail-silently] — the remaining reasons (no_guardian_def / no_scene /
+          // no_player) had no line, so a failed main-quest summon could no-op in silence.
+            : 'The Arbiter listens to the dark. "The summons goes unanswered — there is nothing here to call."';
+        get().appendLog('arbiter', reasonLine);
         return;
       }
     }
@@ -7441,7 +9583,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const ctaNoun = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
       // A small stamina/time cost so the gesture reads as a real beat,
       // matching the hook-engage cost above.
-      set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.1) });
+      set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.1) } : sLive));
       get().appendLog('world', callToActionLine(parsed.matchedVerb, ctaNoun));
       void get().persist();
       return;
@@ -7449,99 +9591,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     switch (parsed.intent) {
       case 'attack': {
-        // OTA-210 — tick enemy statuses at the START of each combat
-        // round. Disease Sample infection deals 1 HP/turn to its
-        // host for 10 turns; without this tick the status would
-        // never resolve. Decrements turnsRemaining + clears empty
-        // entries. Kills via DoT do NOT trigger resolveEnemyDefeat
-        // here (that fires through the natural damage path later
-        // when the player's attack also lands); a DoT-killed enemy
-        // is left at 0 HP and the next attack handler skips them.
-        {
-          const sceneNow = get().currentScene;
-          if (sceneNow && sceneNow.enemyStatuses) {
-            const newHps = [...sceneNow.enemyHps];
-            const newStatuses = sceneNow.enemyStatuses.map((arr) => [...arr]);
-            for (let i = 0; i < sceneNow.enemies.length; i++) {
-              const hp = newHps[i];
-              if (hp === undefined || hp <= 0) continue;
-              const list = newStatuses[i] ?? [];
-              const remaining: typeof list = [];
-              for (const st of list) {
-                // OTA-362 — coating DOTs (poison/acid/corruption) tick the
-                // same way as the OTA-210 infection: dmgPerTurn off the HP,
-                // decrement turns, expire with a kind-flavored line.
-                const isDot = st.kind === 'infected'
-                  || st.kind === 'poison_coat'
-                  || st.kind === 'acid_coat'
-                  || st.kind === 'corruption_coat'
-                  || st.kind === 'electrical_coat'
-                  || st.kind === 'burn_coat'
-                  || st.kind === 'typed_dot';
-                if (isDot && st.turnsRemaining > 0) {
-                  const dmg = st.dmgPerTurn;
-                  const updatedHp = Math.max(0, (newHps[i] ?? 0) - dmg);
-                  newHps[i] = updatedHp;
-                  const enemyName = sceneNow.enemies[i]!.name;
-                  const tickLine = st.kind === 'poison_coat'
-                    ? `${enemyName} shudders — poison eats ${dmg}.`
-                    : st.kind === 'acid_coat'
-                      ? `${enemyName} smokes — acid eats ${dmg}.`
-                      : st.kind === 'corruption_coat'
-                        ? `${enemyName} blackens — corruption eats ${dmg}.`
-                        : st.kind === 'electrical_coat'
-                          ? `${enemyName} convulses — arcing current bites ${dmg}.`
-                          : st.kind === 'burn_coat'
-                            ? `${enemyName} blisters — clinging fire sears ${dmg}.`
-                            : st.kind === 'typed_dot'
-                              ? `${enemyName} suffers — ${st.sourceName} eats ${dmg}.`
-                              : `${enemyName} convulses — infection bleeds ${dmg}.`;
-                  get().appendLog(
-                    'combat',
-                    `${tickLine} (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} turns left)`,
-                  );
-                  if (st.turnsRemaining - 1 > 0) {
-                    remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });
-                  } else {
-                    get().appendLog(
-                      'combat',
-                      `${enemyName}${st.kind === 'infected' ? "'s fever breaks" : ' shakes off the last of the coating'} — the ${st.sourceName} has run its course.`,
-                    );
-                  }
-                } else {
-                  remaining.push(st);
-                }
-              }
-              newStatuses[i] = remaining;
-            }
-            set((s) => s.currentScene
-              ? { currentScene: { ...s.currentScene, enemyHps: newHps, enemyStatuses: newStatuses } }
-              : s);
-          }
-        }
-        // OTA-429 — a DOT tick that drops the LAST living enemy must still end
-        // the fight. Pre-OTA, DOT kills were left at 0 HP for "the next attack
-        // to clean up" — but if the DOT kills the final enemy the player has
-        // nothing left to swing at, so the fight hung (range stayed set, no
-        // loot, no victory line). When EVERY enemy is now dead from the tick,
-        // sweep them all through resolveEnemyDefeat (loot + kill bookkeeping +
-        // combat-end, which persists) and bail out of the attack — there is no
-        // valid target. Mixed fights (at least one enemy still alive) keep the
-        // old behavior so mid-fight targeting isn't perturbed.
-        {
-          const swept = get().currentScene;
-          if (swept && swept.enemies.length > 0 && swept.enemyHps.every((h) => (h ?? 0) <= 0)) {
-            set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: 0 } } : s));
-            let guard = 0;
-            while (++guard <= 16) {
-              const sc = get().currentScene;
-              if (!sc || sc.enemies.length === 0) break;
-              get().resolveEnemyDefeat();
-            }
-            return;
-          }
-        }
-        const targetEnemy = activeEnemy(currentScene);
+        // OTA-210/362/429 — tick enemy DOT statuses at the START of the attack
+        // round, BEFORE the player's swing (a swing that would kill still gets
+        // the loot before the DOT races it), then bail if the tick ended the
+        // fight (all enemies dead → nothing left to swing at). OTA-800 hoisted
+        // the tick into tickEnemyDotsAndMaybeEndFight so every OTHER combat round
+        // (dodge / move / flee / companion / throw) ticks it too via
+        // runEnemyGroupCounters; the attack path passes skipDotTick to its
+        // counter calls below so DOTs don't double-tick.
+        if (tickEnemyDotsAndMaybeEndFight(get, set)) return;
+        // OTA-980 — the tick can now resolve individual DOT-killed enemies
+        // (splicing the scene arrays), so the target must come from the LIVE
+        // scene, not the pre-tick snapshot.
+        const sceneAfterDots = get().currentScene;
+        if (!sceneAfterDots) return;
+        const targetEnemy = activeEnemy(sceneAfterDots);
         if (targetEnemy) {
           // OTA 205 — Phase 2 args migration. If the player named an
           // instrument explicitly ("attack the drone with the bolt-
@@ -7553,12 +9617,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // skips for non-weapons (a Layer 4 selectional restriction
           // already rejected those upstream).
           const instrumentArg = parsed.args?.find((a) => a.role === 'instrument');
-          if (instrumentArg?.resolvedItemId) {
+          // arb-fix — don't promote the named instrument into the MAIN hand when
+          // the player explicitly attacked with the OFF-hand ("attack with the
+          // off-hand cudgel"). The off-hand path below already routes reach/damage
+          // to the off slot; swapping it to main left the SAME single item bound to
+          // both hands (debug loadout read "main=Cudgel off=Cudgel" from one Cudgel).
+          const usedOffHand = /\boff[- ]?hand\b/.test(trimmed.toLowerCase());
+          if (instrumentArg?.resolvedItemId && !usedOffHand) {
             const swapTo = player.inventory.find((i) => i.id === instrumentArg.resolvedItemId);
             const currentMain = player.equipped?.main;
+            // Also skip if the named instrument IS the off-hand instance — attacking
+            // by an off-hand weapon's name shouldn't yank it into the main slot.
+            // OTA-1033 — id-first, NAME fallback when the off slot carries no id (a
+            // hand-built state that never passed backfillPlayer's id stamp): the
+            // id-only test fell through and the promotion bound ONE instance to
+            // BOTH hands (main=off, the same item), silently evicting the real
+            // main weapon. Real saves get ids healed at load; this is the belt.
+            const isOffHandInstance =
+              (!!instrumentArg.resolvedItemId && instrumentArg.resolvedItemId === player.equipped?.offId)
+              || (!player.equipped?.offId && !!swapTo && !!player.equipped?.off
+                  && swapTo.name.toLowerCase() === player.equipped.off.toLowerCase());
             if (
               swapTo &&
               swapTo.name !== currentMain &&
+              !isOffHandInstance &&
               (swapTo.kind === 'weapon' || swapTo.kind === 'runecaster')
             ) {
               get().appendLog('world', `You shift grip and bring up the ${swapTo.name}.`);
@@ -7566,7 +9648,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
           const range = currentScene.range ?? 'close';
-          const barehand = isBareHandAttack(trimmed);
+          // OTA-957 — same fix as the damage site (OTA-940), which this reach lookup missed:
+          // a swung weapon whose NAME contains a body word ("Mud-FIST Wraps") tripped the
+          // bare-hand test and resolved reach as Bare hands. Strip the equipped weapon's
+          // name from the text first, and honor the 'barehanded' tag as a real weapon.
+          const reachOffHand = /\boff[- ]?hand\b/i.test(trimmed);
+          const reachSwungInst = (() => {
+            const id = reachOffHand
+              ? (player.equipped?.offId ?? null)
+              : (player.equipped?.mainId ?? player.equipped?.offId ?? null);
+            return id ? (player.inventory.find((i) => i.id === id) ?? null) : null;
+          })();
+          const reachHandWeapon = !!reachSwungInst && canonicalItemTags(reachSwungInst).includes('barehanded');
+          const reachBareText = reachSwungInst?.name
+            ? trimmed.toLowerCase().split(reachSwungInst.name.toLowerCase()).join(' ')
+            : trimmed;
+          const barehand = isBareHandAttack(reachBareText) && !reachHandWeapon;
           // OTA 027 — when the player typed "off-hand" / "off hand"
           // / "offhand" in the attack target, route the reach lookup
           // to the off-hand slot so reach.label + bands reflect the
@@ -7581,50 +9678,51 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `attack: target=${targetEnemy.name} range=${range} reach.bands=[${reach.bands.join(',')}] reach.label=${reach.label} bareHand=${barehand}`,
           );
           if (!reach.bands.includes(range)) {
-            // Don't strand the player on a refusal — close the gap (or
-            // pull back) automatically and treat THIS turn as the
-            // movement. Iron Fog / Silent Blizzard slow the move to two
-            // turns each but no longer block entirely, so the auto-move
-            // always makes progress.
-            // OTA-550 — reach bands are contiguous in RANGE_ORDER (a band +
-            // every band closer). Compare ordinals: if the current range is
-            // FARTHER than the weapon's farthest reachable band, advance
-            // (close the gap); if it's CLOSER than the nearest band (a ranged
-            // weapon shoved into arm's reach), retreat.
+            // OTA-977 — NO INVOLUNTARY FOOTWORK. OTA-550 auto-converted an
+            // out-of-range attack into a MOVE: the player typed "attack", got
+            // no attack, was walked into range, and the enemy answered the
+            // approach with a free swing. Owner, after his fused Resonant
+            // Spike (close-only — fused weapons carry no catalog reach, so
+            // they resolve as melee) dragged him from mid into a crit: "I
+            // didn't move closer, using the weapon moved me closer." The turn
+            // is now REFUSED — no stamina, no time, no enemy counters — with
+            // the weapon's true reach named, and moving left as the player's
+            // own explicit call ('advance' / 'retreat', or swap weapons).
             const curIdx = RANGE_ORDER.indexOf(range);
             const reachIdxs = reach.bands.map((b) => RANGE_ORDER.indexOf(b));
             const nearest = Math.min(...reachIdxs); // farthest band (smallest idx)
-            const farthestClose = Math.max(...reachIdxs); // closest band (largest idx)
-            if (curIdx < nearest) {
-              get().appendLog(
-                'arbiter',
-                `The Arbiter nods at the distance. "${reach.label} needs you closer — closing the gap for you."`,
-              );
-              runMoveCombatRange(get, set, player, currentScene, 'advance');
-              break;
-            }
-            if (curIdx > farthestClose) {
-              get().appendLog(
-                'arbiter',
-                `The Arbiter steps back with you. "${reach.label} needs space — pulling you back."`,
-              );
-              runMoveCombatRange(get, set, player, currentScene, 'retreat');
-              break;
-            }
-            // Last-resort refusal (shouldn't happen for contiguous bands) —
-            // keep a clear diagnosis, exempt from dedup so it shows each try.
-            const remedy = curIdx > farthestClose
-              ? `type 'retreat' to step back for a ranged shot`
-              : `type 'advance' to close in`;
+            const tooFar = curIdx < nearest;
+            const reachSpan = reach.bands.length === 1
+              ? `${RANGE_LABEL[reach.bands[0]!]} range only`
+              : `${RANGE_LABEL[reach.bands[0]!]} range and closer`;
             get().appendLog(
               'arbiter',
-              `The Arbiter holds up a hand. "${reach.label} can't reach at ${RANGE_LABEL[range]} range. ${remedy[0]!.toUpperCase()}${remedy.slice(1)}."`,
+              tooFar
+                ? `The Arbiter holds up a hand. "${reach.label} works at ${reachSpan} — you're at ${RANGE_LABEL[range]}. ADVANCE to close in (they'll answer the approach), or attack with something that reaches."`
+                : `The Arbiter holds up a hand. "${reach.label} needs space — you're at ${RANGE_LABEL[range]}. RETREAT to open the gap (they'll answer the step), or use something that works in tight."`,
               { skipDedup: true },
             );
             break;
           }
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
-          const visPenalty = weatherAttackPenalty(currentScene.weather);
+          // OTA-983 — ELEVATION, player side: a grounded target massed at the base
+          // needs a weapon that truly SHOOTS (reaches far/distant) to be hit
+          // from up a climb; an AIRBORNE foe comes to you — any weapon meets
+          // it. Free refusal, mirroring the reach gate above. (Owner: "you
+          // need a ranged weapon to fire down at the ground and any weapon to
+          // attack airborn enemies.")
+          if (sceneAfterDots.elevatedOn && sceneAfterDots.enemiesAtBase && !enemyIsAirborne(targetEnemy)) {
+            const firesDown = reach.bands.includes('far') || reach.bands.includes('distant');
+            if (!firesDown) {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter glances over the edge. "${targetEnemy.name} is down at the base — ${reach.label} won't reach from up here. Use something that SHOOTS (or a throwable), or climb down and meet them."`,
+                { skipDedup: true },
+              );
+              break;
+            }
+          }
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.attack), 0.1) } : sLive));
+          const visPenalty = weatherAttackPenalty(currentScene.weather, playerArmorResistKinds(player));
           if (visPenalty > 0) {
             // Announce the swing penalty only the FIRST time this weather
             // bites in the current fight. It doesn't change round-to-round,
@@ -7647,7 +9745,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // surprise, etc.) so the dice prompt and the final attack
           // total honor every action-card buff/penalty the player
           // earned. Ranged attacks get aim bonus, melee don't.
-          const isRangedAttack = !barehand && (playerWeaponReach(player).bands.length > 1);
+          // OTA-980 — read the SWUNG hand. This was main-hand-only, so an off-hand
+          // melee swing while a ranged main was holstered still rolled as
+          // "ranged": aim mods applied and "+2 (point blank)" landed on a blade
+          // (owner's log: the Mud Executioner's Blade at close rolled point-
+          // blank because the Bolt-Caster sat in the main hand).
+          const isRangedAttack = !barehand && (playerWeaponReach(player, offHandSwing ? 'off' : 'main').bands.length > 1);
           const statusMods = rollMods(player.statusEffects, isRangedAttack ? 'attack_ranged' : 'attack_melee');
           // Point-blank bonus: ranged weapon at arm's reach is a bonus
           // die on the attack roll (offset by the disarm/melee risk
@@ -7659,41 +9762,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const steps = buildCombatSteps(trimmed, player, targetEnemy, {
             visibilityPenalty: visPenalty,
             visibilityLabel: currentScene.weather?.name,
-            weatherMod: weatherStatModifiers(currentScene.weather),
+            weatherMod: weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)),
             statusMods,
             pointBlankBonus,
             // OTA-362 — acid-coating armor shred on the active enemy.
-            acReduction: currentScene.enemyArmorShred?.[currentScene.activeEnemyIdx] ?? 0,
+            acReduction: sceneAfterDots.enemyArmorShred?.[sceneAfterDots.activeEnemyIdx] ?? 0,
           });
-          // Drop one-shot status effects consumed by this roll (aiming
-          // burns on use).
-          if (statusMods.consume.length > 0) {
-            set((s) =>
-              s.player
-                ? {
-                    player: {
-                      ...s.player,
-                      statusEffects: (s.player.statusEffects ?? []).filter(
-                        (e) => !statusMods.consume.includes(e.kind),
-                      ),
-                    },
-                  }
-                : s,
-            );
-          }
-          set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
+          // OTA-796 — one-shot statuses consumed by this roll (aiming burns on
+          // use) are now stripped when the ATTACK STEP RESOLVES, not at prompt
+          // build. Stripping at build time meant CANCEL on the dice modal
+          // destroyed earned buffs (perfect_opening, stealthed +5, ready,
+          // distract +4) — and doubled as an exploit: cancel + re-attack shed
+          // the 'surprised' penalty without ever rolling a die.
+          set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, consumeOnResolve: statusMods.consume.length > 0 ? statusMods.consume : undefined } });
           // arb138 — the opener's weapon noun comes from parsed.resolvedNoun, but the
           // resolver sometimes binds a weapon phrase ("Tartarian Hand Axe (Throw)") to a
           // SCENE object ("shattered tartarian relay"), so the narration named the wrong
           // thing ("the shattered tartarian relay is already moving…"). Use resolvedNoun
           // only when it's actually a weapon the player carries; else fall back to the
-          // equipped main weapon (or bare-hands flavor).
+          // weapon the swing ACTUALLY uses.
+          // arb-fix (playtest + narration audit) — a PUNCH and an OFF-HAND swing both used to
+          // fall back to equipped.main here, naming "the aetheric bolt gun" for a punch. Both
+          // the opener AND the damage-outcome lines now route through swingWeaponNoun() (the
+          // shared resolved-weapon → off-hand → bare-hand → main precedence), so they always
+          // agree and never name the main weapon (or the enemy) for a swing that didn't use it.
           const openerP = get().player;
-          const rNoun = parsed.resolvedNoun;
-          const rNounIsWeapon = !!rNoun && (openerP?.inventory ?? []).some(
-            (it) => it.kind === 'weapon' && it.name.toLowerCase() === rNoun.toLowerCase(),
-          );
-          const openerWeapon = rNounIsWeapon ? rNoun : (openerP?.equipped?.main ?? null);
+          const openerWeapon = swingWeaponNoun(openerP, trimmed, parsed.resolvedNoun);
           get().appendLog('world', attackOpener(targetEnemy.name, coatedWeaponNoun(openerP, openerWeapon)));
         } else {
           // No enemy — the player might have meant "kick the rubble"
@@ -7711,6 +9805,80 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // for scene-side intent, fall back to resolvedNoun only if
           // target is empty.
           const rawTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
+          // OTA-770 — an ANIMATE scene noun (a knight / sentinel / statue-guardian)
+          // ROUSES into a fight when attacked or woken, instead of being harvested like
+          // scenery ("wake the knight" now routes here). Prefer a catalog enemy by that
+          // name; otherwise a generic roused guardian scaled to the tile stands up. Gated
+          // on a real ambient-noun match, so "attack the knight" fights while "attack the
+          // wall" still harvests. Marks the noun worked-over so a re-kill can't re-spawn it.
+          const ANIMATE_ATTACK_NOUN = /\b(knight|sentinel|guardian|warden|warrior|soldier|statue|effigy|colossus|golem|automaton|construct|wraith|revenant|sleeper|watcher|husk|skeleton)\b/i;
+          const animateHit = rawTarget ? matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? []) : null;
+          if (rawTarget && animateHit && ANIMATE_ATTACK_NOUN.test(animateHit)) {
+            const nounTitle = animateHit.replace(/^the\s+/i, '').split(/\s+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            const danger = (currentScene.location as { danger?: number })?.danger ?? 2;
+            let foe = findEnemyByName(animateHit) ?? findEnemyByName(nounTitle);
+            if (!foe) {
+              // OTA-827 [Group-K] — Constructs are a real, PROVOKABLE mid-tier BOSS: a
+              // war-automaton (big autumn-iron robot) roused by striking a statue /
+              // colossus / sentinel / automaton on a tile. It scales with BOTH the tile
+              // danger AND the player's power (guardianPlayerPower = bestCombat +
+              // hpMax/10) so it stays a threat at endgame instead of being farmed, but
+              // is CAPPED below Core-Guardian tier ("almost up to a Guardian, not quite").
+              // type 'Construct' → resists slashing/piercing, weak to bludgeoning /
+              // electrical / COLD (see TYPE_RESISTANCE_MAP): a big machine seizes to a
+              // maul, a jolt, or a deep chill. Drops real salvage (incl. the scarce
+              // Golem Core on a heavy one) so provoking it is worth the risk.
+              // Player power = best combat stat + hpMax/10 (same measure the Guardian
+              // scaler uses), computed inline so this stays lore/line-neutral.
+              const cgEff = effectiveStats(player);
+              const cgPow = Math.max(cgEff.strength, cgEff.dexterity, cgEff.intelligence) + player.hpMax / 10;
+              const over = Math.min(1.8, Math.max(1, cgPow / 15)); // 1.0 (early) .. 1.8 (endgame)
+              const hp = Math.min(90, Math.round((26 + danger * 7) * over)); // capped under Guardian HP
+              const ap = Math.min(11, Math.round(4 + danger + 3 * (over - 1)));
+              const heavy = danger >= 4 || over >= 1.4;
+              foe = {
+                name: `Roused ${nounTitle}`,
+                type: 'Construct',
+                abilityPoint: `Strength ${ap}`,
+                attack: 'Piston Slam',
+                damage: heavy ? '2D8' : '2D6',
+                hp,
+                rarity: 'Rare',
+                traits: ['armored', 'ambush_strike'],
+                loot: heavy ? ['Scrap Metal', 'Golem Core', 'Aether Crystal'] : ['Scrap Metal', 'Aether Crystal'],
+              } as unknown as Enemy;
+            }
+            const spawn = JSON.parse(JSON.stringify(foe)) as Enemy;
+            const rouseRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
+            const rouseLower = animateHit.toLowerCase();
+            set((s) => {
+              if (!s.currentScene) return s;
+              const scene = s.currentScene;
+              const room = s.worldMemory.visitedRooms?.[rouseRoomKey] ?? { firstVisitAt: Date.now(), lastVisitAt: Date.now(), visitCount: 1 };
+              return {
+                currentScene: {
+                  ...scene,
+                  enemies: [...scene.enemies, spawn],
+                  enemyHps: [...scene.enemyHps, spawn.hp],
+                  activeEnemyIdx: scene.enemies.length,
+                  range: 'close',
+                  enemyAmbushUsed: [...(scene.enemyAmbushUsed ?? []), false],
+                },
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...(s.worldMemory.visitedRooms ?? {}),
+                    [rouseRoomKey]: { ...room, searchedAmbientNouns: [...(room.searchedAmbientNouns ?? []), rouseLower] },
+                  },
+                },
+                stepsSinceCombat: 0,
+              };
+            });
+            get().appendLog('world', `The ${nounTitle} was never dead — only waiting. Iron the size of a cart grinds and unfolds; a war-automaton older than the outpost surges upright and comes for you.`);
+            get().appendLog('combat', `${spawn.name} closes — ${anOrA(spawn.rarity)} ${spawn.rarity} Construct. ${spawn.attack} ready, ${spawn.damage} on a hit. Plate turns blades; it seizes to a maul, a jolt, or a deep chill. (range: close)`);
+            void get().persist();
+            break;
+          }
           if (rawTarget && isGroundSearch(rawTarget)) {
             get().digHere();
             break;
@@ -7719,6 +9887,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // attack-fallback. "break the wagon" should harvest the
           // wagon, not silently miss because 'wagon' isn't in
           // AREA_TOKENS.
+          // OTA-974 — Phase B of real heights: placed (perched) nouns can't be
+          // attacked from the ground or the wrong tier — same rule as the
+          // investigate gate, so attack can't become a reach-anything side
+          // door. At the perch itself, harvesting is investigate's job.
+          {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { placementFor: pfAtk, sameClimbNoun: scnAtk } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+            const placedAtk = rawTarget ? pfAtk(rawTarget.toLowerCase(), currentScene.nounPlacements) : null;
+            if (placedAtk) {
+              const elevAtk = currentScene.elevatedOn;
+              const atPerch = !!elevAtk && !currentScene.elevatedOverlayMeta
+                && placedAtk.tier === elevAtk.tier
+                && scnAtk(placedAtk.structure, elevAtk.noun);
+              if (!atPerch) {
+                get().appendLog(
+                  'arbiter',
+                  `The Arbiter follows your gaze up. "${theCap(rawTarget)} is up on the ${placedAtk.structure}, tier ${placedAtk.tier}. Climb for it."`,
+                  { skipDedup: true },
+                );
+              } else {
+                get().appendLog('world', `Up here you don't swing at the ${rawTarget} — you take it. (Investigate or salvage it.)`);
+              }
+              break;
+            }
+          }
           const ambientHitInAttack = rawTarget
             ? matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? [])
             : null;
@@ -7757,12 +9950,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // 5.01% HP drops below the threshold silently.
               const prevHpBruise = player.hp;
               const hpMaxBruise = player.hpMax ?? 1;
+              // OTA-970 — weapon swings at huge inert scenery now cost 1-2 HP AND
+              // say so (the old strike line silently hid the HP tick), with a
+              // rotating deadpan so the lesson lands. Owner: "you should get
+              // small damage ... 'that wasn't your brightest move'". Bruises
+              // can't kill: floor at 1 HP — no dying to an arch you punched.
+              const bruiseDmg = isBodyVerb ? 1 : rollDie(2);
+              const SCENERY_SNARK = [
+                `That wasn't your brightest move.`,
+                `Uh — why did you do that?`,
+                `The Arbiter pretends not to have seen that.`,
+                `Somewhere, a bard decides not to write this down.`,
+              ];
+              const snark = SCENERY_SNARK[rollDie(SCENERY_SNARK.length) - 1]!;
               set((s) =>
                 s.player
                   ? {
                       player: advanceTime(
                         spendStamina(
-                          { ...s.player, hp: Math.max(0, s.player.hp - 1) },
+                          { ...s.player, hp: Math.max(1, s.player.hp - bruiseDmg) },
                           STAMINA_COSTS.attack,
                         ),
                         0.1,
@@ -7770,12 +9976,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     }
                   : s,
               );
-              checkLowHpWarning(prevHpBruise, Math.max(0, prevHpBruise - 1), hpMaxBruise, get, set);
+              checkLowHpWarning(prevHpBruise, Math.max(1, prevHpBruise - bruiseDmg), hpMaxBruise, get, set);
               get().appendLog(
                 'world',
                 isBodyVerb
                   ? `You ${past} the ${targetForNarration}. It does not care. Your ${part} does. -1 HP, briefly heroic.`
-                  : `Your strike scrapes the ${targetForNarration}. ${material === 'stone' ? 'Stone' : material === 'metal' ? 'Aetherstone-cast metal' : 'It'} does not concede.`,
+                  : `Your strike scrapes the ${targetForNarration}. ${material === 'stone' ? 'Stone' : material === 'metal' ? 'Aetherstone-cast metal' : 'It'} does not concede. -${bruiseDmg} HP. ${snark}`,
               );
             };
 
@@ -7898,7 +10104,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 break;
               }
               // Sturdy — STR roll vs DC 12. Stamina + time burn either way.
-              const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather));
+              const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
               const roll = rollDie(20);
               const total = roll + stats.strength;
               const success = total >= 12;
@@ -7960,7 +10166,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
               biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
             });
-            set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+            set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
             // OTA-200 — visible lens cue. When the player carries the
             // Aetheric Vision Lens AND the outcome is a hook, narrate
             // the lens picking up the trace. Players couldn't tell the
@@ -7977,7 +10183,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (outcome.kind === 'hook') {
               get().appendLog('world', `★ STORY THREAD — ${outcome.line}`);
             } else {
-              get().appendLog('world', outcome.line);
+              // OTA-770 — this is the ATTACK fallback, so narrate a STRIKE, not the
+              // shared 'sift/search' template (playtest: "attack the silhouette" printed
+              // "You sift the silhouette and pull out a piece worth keeping").
+              const strikeWord = isBodyVerb ? (BODY_VERB_PAST[matchedVerb] ?? `${matchedVerb}ed`) : 'struck';
+              get().appendLog('world', outcome.kind === 'material'
+                ? `You ${strikeWord} the ${targetForNarration} — a piece breaks loose.`
+                : `You ${strikeWord} the ${targetForNarration}. Nothing comes free.`);
             }
             // Dispatch outcome first, then dedupe based on whether
             // anything actually produced — mirrors the harvest-verb
@@ -8058,7 +10270,49 @@ export const useGameStore = create<GameStore>((set, get) => ({
             });
             break;
           }
-          get().appendLog('world', 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.');
+          {
+            // OTA-993 — #115: the refusal checks BOTH hands for a weapon with the
+            // range the motion implies (owner call). "shoot the warp" with a
+            // Bolt-Caster in the main hand used to answer with "arm's reach"
+            // and "your blade" — melee words for a ranged swing at scenery.
+            const eqHands = player.equipped ?? {};
+            // OTA-1016 — classify by REACH CLASS (the resolver combat itself uses),
+            // not one tag: runecasters fire to distant with no 'ranged' tag,
+            // throwables reach far, and empty hands are neither shot nor
+            // blade. The verb the player TYPED wins when the hands disagree.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { reachClassFor } = require('../engine/combatRules') as typeof import('../engine/combatRules');
+            const handClass = (hid?: string): string | null => {
+              const w = hid ? player.inventory.find((i) => i.id === hid) : undefined;
+              if (!w) return null;
+              // Inventory copies don't always carry weaponKind — the tags do.
+              const tagged = (w.tags ?? []).map((t) => t.toLowerCase());
+              const kind = (w as { weaponKind?: 'melee' | 'ranged' | 'runecaster' }).weaponKind
+                ?? (tagged.includes('runecaster') ? 'runecaster'
+                  : tagged.includes('ranged') ? 'ranged'
+                    : tagged.includes('melee') ? 'melee' : undefined);
+              return reachClassFor({
+                weaponKind: kind, name: w.name, tags: w.tags,
+                throwable: (w as { throwable?: boolean }).throwable,
+              });
+            };
+            const classes = [handClass(eqHands.mainId), handClass(eqHands.offId)];
+            const farHand = classes.some((c) => c === 'ranged' || c === 'runecaster' || c === 'throwable');
+            const nearHand = classes.some((c) => c === 'melee' || c === 'long');
+            const bareHands = classes.every((c) => c === null);
+            const verbRanged = /\b(shoot|fire|blast|snipe|loose|cast|hurl|throw|zap)\b/i.test(trimmed);
+            const verbMelee = /\b(slash|swing|stab|cut|chop|cleave|smash|bash|strike|punch|kick)\b/i.test(trimmed);
+            const SHOT = 'Nothing out there answers the shot. The bolt sails wide and Aetherstone swallows the report.';
+            const BLADE = 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.';
+            const FISTS = 'Nothing in arm\'s reach answers your fists. The motion echoes off Aetherstone.';
+            let refusal: string;
+            if (verbRanged && farHand) refusal = SHOT;
+            else if (verbMelee) refusal = bareHands ? FISTS : BLADE;
+            else if (bareHands) refusal = FISTS;
+            else if (farHand && !nearHand) refusal = SHOT;
+            else refusal = BLADE;
+            get().appendLog('world', refusal);
+          }
         }
         break;
       }
@@ -8124,12 +10378,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           const ambushRoom = get().worldMemory.visitedRooms?.[ambushRoomKey];
           const ambushPrior = ambushRoom?.flavorExhaustedNouns ?? [];
-          const alreadyClearedNoun = ambushPrior.some(
-            (n) =>
-              n === investAmbushTarget
-              || investAmbushTarget.includes(n)
-              || n.includes(investAmbushTarget),
-          );
+          // OTA-953 — word-level match (raw substrings cross-hid unrelated nouns).
+          const alreadyClearedNoun = ambushPrior.some((n) => nounTokensMatch(n, investAmbushTarget));
           if (alreadyClearedNoun) {
             // OTA-256 — neutral wording. The prior line "there was
             // nothing of use in it" contradicted itself on nouns
@@ -8236,15 +10486,133 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // down" when you were on a *different* thing. Anchored matching keeps
           // legit short↔full forms while killing the cross-prop false-positive.
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { sameClimbNoun } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+          const { sameClimbNoun, placementFor } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
           const isClimbedNoun = sameClimbNoun(tgtLower, climbedNoun);
           const isGroundNoun = (currentScene.ambientNouns ?? []).some((n) =>
             sameClimbNoun(n.toLowerCase(), tgtLower),
           );
-          if (isGroundNoun && !isClimbedNoun) {
+          // OTA-973 — Phase A of real heights. A PLACED noun (structure + tier)
+          // resolves by where it hangs, not by scene membership: at your grip
+          // (your structure, your tier) it falls through to normal handling;
+          // wrong tier or wrong structure gets a specific refusal. All
+          // refusals answer every retry (skipDedup).
+          const placedT = placementFor(tgtLower, currentScene.nounPlacements);
+          if (placedT && !isClimbedNoun) {
+            const elevTierNow = currentScene.elevatedOn.tier;
+            if (sameClimbNoun(placedT.structure, climbedNoun)) {
+              if (placedT.tier !== elevTierNow) {
+                get().appendLog(
+                  'arbiter',
+                  placedT.tier > elevTierNow
+                    ? `"Higher," the Arbiter says. "${theCap(rawTarget)} waits at tier ${placedT.tier}. Keep climbing."`
+                    : `"You climbed past it," the Arbiter says. "${theCap(rawTarget)} sits at tier ${placedT.tier}, below your grip. Down, then back up."`,
+                  { skipDedup: true },
+                );
+                break;
+              }
+              // OTA-974 — Phase B of real heights: at your tier on your structure,
+              // investigating the perch HARVESTS it — catalog-resolved loot
+              // (no invented items), tier-gated pool, once per room.
+              {
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { perchTemplateFor, rollPerchLoot } = require('../engine/perches') as typeof import('../engine/perches');
+                const perchRoomKey = makeRoomKey(
+                  player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId,
+                );
+                const perchKeyNoun = Object.keys(currentScene.nounPlacements ?? {}).find((k) => sameClimbNoun(k, tgtLower)) ?? tgtLower;
+                const perchMarks = get().worldMemory.visitedRooms?.[perchRoomKey]?.searchedAmbientNouns ?? [];
+                if (perchMarks.includes(perchKeyNoun.toLowerCase())) {
+                  get().appendLog('world', `You've already picked the ${perchKeyNoun} clean. Only the wind holds it now.`);
+                  break;
+                }
+                get().appendLog(
+                  'world',
+                  `You work the ${perchKeyNoun} loose one-handed, the other hand keeping the ${currentScene.elevatedOn.noun}.`,
+                );
+                const perchTpl = perchTemplateFor(perchKeyNoun);
+                const perchLoot = perchTpl ? rollPerchLoot(perchTpl, placedT.tier, rollDie) : null;
+                if (perchLoot) {
+                  const perchCat = findCatalogItem(perchLoot.name);
+                  const perchItem: InventoryItem = stampDurability({
+                    id: freshInstanceId('perch'),
+                    name: perchLoot.name,
+                    kind: perchCat?.kind ?? 'misc',
+                    rarity: perchCat?.rarity ?? 'Common',
+                    quantity: perchLoot.qty,
+                    tags: perchCat?.tags ?? [],
+                  });
+                  const perchGrant = grantItem(get().player?.inventory ?? player.inventory, perchItem);
+                  set((sp) => (sp.player ? { player: { ...sp.player, inventory: perchGrant.inventory } } : sp));
+                  if (perchGrant.accepted > 0) {
+                    get().appendLog('reward', `✦ ${perchLoot.name}${perchLoot.qty > 1 ? ` x${perchLoot.qty}` : ''} (${perchCat?.rarity ?? 'Common'}).`);
+                  } else {
+                    get().appendLog('world', `${perchLoot.name} comes free — and your pack can't hold it. It falls, and the ground keeps it.`);
+                  }
+                } else {
+                  get().appendLog('world', `Empty. Whatever lived or was stashed up here is long gone.`);
+                }
+                set((sp) => {
+                  const room = sp.worldMemory.visitedRooms?.[perchRoomKey] ?? {
+                    firstVisitAt: Date.now(), lastVisitAt: Date.now(), visitCount: 1,
+                  };
+                  return {
+                    worldMemory: {
+                      ...sp.worldMemory,
+                      visitedRooms: {
+                        ...(sp.worldMemory.visitedRooms ?? {}),
+                        [perchRoomKey]: {
+                          ...room,
+                          searchedAmbientNouns: [...(room.searchedAmbientNouns ?? []), perchKeyNoun.toLowerCase()],
+                        },
+                      },
+                    },
+                  };
+                });
+                set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.2) } : sLive));
+                break;
+              }
+            } else {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter measures the gap. "${theCap(rawTarget)} hangs on the ${placedT.structure}, not the ${currentScene.elevatedOn.noun}. Its own climb."`,
+                { skipDedup: true },
+              );
+              break;
+            }
+          } else if (isGroundNoun && !isClimbedNoun) {
+            // OTA-970 — a refusal must ALWAYS answer. Playtest: eight identical
+            // salvage attempts from atop a shelf — the Arbiter answered ONCE,
+            // then the arbiter-channel dedup swallowed every repeat ("dedup:
+            // suppressed arbiter repeat") and the player retried into dead
+            // silence, which reads as a hang. skipDedup forces the reply
+            // through; once the full explanation was given recently, repeats
+            // rotate short, firmer variants instead of the same paragraph.
+            const fullLine = `The Arbiter glances down. "You're up on the ${currentScene.elevatedOn.noun}. ${theCap(rawTarget)} is down there. Climb down to reach it."`;
+            const toldRecently = get().gameLog
+              .filter((e) => e.channel === 'arbiter')
+              .slice(-12)
+              .some((e) => e.text.includes('Climb down to reach it.'));
+            const line = !toldRecently
+              ? fullLine
+              : rollDie(2) === 1
+                ? `"Still up on the ${currentScene.elevatedOn.noun}," the Arbiter says. "Still down there. Climb down first."`
+                : `The Arbiter just points down, over the edge, and waits.`;
+            get().appendLog('arbiter', line, { skipDedup: true });
+            break;
+          }
+        }
+        // OTA-973 — Phase A of real heights, ground side: a noun placed up on a
+        // structure is visible from below but not touchable. The Arbiter says
+        // where it is and how to get it, every time (skipDedup).
+        if (!currentScene.elevatedOn && !currentScene.elevatedOverlayMeta && rawTarget) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { placementFor: pfGround } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+          const placedG = pfGround(rawTarget.toLowerCase(), currentScene.nounPlacements);
+          if (placedG) {
             get().appendLog(
               'arbiter',
-              `The Arbiter glances down. "You're up on the ${currentScene.elevatedOn.noun}. ${theCap(rawTarget)} is down there. Climb down to reach it."`,
+              `The Arbiter follows your gaze up. "${theCap(rawTarget)} is up on the ${placedG.structure}, tier ${placedG.tier}. Climb for it."`,
+              { skipDedup: true },
             );
             break;
           }
@@ -8326,7 +10694,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               get().appendLog('world', `You've already worked over the ${harvestAmbient} here. Nothing more to find.`);
               break;
             }
-            set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+            set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
             // 2026-05-25 OTA-040 — collectable substitution. Salvage now
             // has the same 8% biome-gated chance as container loot and
             // wasteland encounters to surface a character-story fragment
@@ -8369,7 +10737,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // Try the per-noun salvage pool first (drone → automaton
             // circuit, wagon → rations + rope, etc.). Falls through to
             // the generic area-search pool when no pool matches.
-            const salvage = rollSalvagePool(harvestAmbient);
+            const salvage = ledgeredSalvage(get, set, harvestAmbient);
             const outcome = salvage ?? rollAreaSearch(harvestAmbient, {
               hookBonus: hasAethericVision(player) ? 0.15 : 0,
               rareLootBias: raceLootBias(player, get().currentScene),
@@ -8702,7 +11070,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // model code-switch ("huà") can't leak into investigate one-liners
               // or the patched entry.result.line either.
               const qwenGenerator: LoreGenerator | null = qwen.isReady()
-                ? async (messages, opts) => stripForeignWords(await qwen.generate(messages, opts))
+                ? async (messages, opts) => repairGluedNarration(stripForeignWords(await qwen.generate(messages, opts)))
                 : null;
               const locationName =
                 currentScene.location.name ?? 'this place';
@@ -8946,8 +11314,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               nonClimbMarkers(searchPrior?.searchedAmbientNouns).some(
                 (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
               ) ||
+              // OTA-953 — flavor half is word-level; the searched half above keeps the
+              // historical loose substring rule (its catalog self-heal escape depends on it).
               nonClimbMarkers(searchPrior?.flavorExhaustedNouns).some(
-                (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
+                (n) => nounTokensMatch(n, ambientLower),
               );
             if (alreadySearched) {
               get().appendLog(
@@ -9174,8 +11544,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const previewNoun = (rawTarget || invItem.name).toLowerCase().trim();
             const previewRoom = get().worldMemory.visitedRooms?.[previewRoomKey];
             const previewExhausted = (previewRoom?.flavorExhaustedNouns ?? []).map((n) => n.toLowerCase());
+            // OTA-953 — word-level match (raw substrings cross-hid unrelated nouns).
             const alreadyPreviewed = previewNoun.length > 0 && previewExhausted.some(
-              (n) => n.length > 0 && (n === previewNoun || previewNoun.includes(n) || n.includes(previewNoun)),
+              (n) => nounTokensMatch(n, previewNoun),
             );
             if (alreadyPreviewed) {
               get().appendLog(
@@ -9232,13 +11603,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // stat training. (Scene-noun investigate below still rolls.)
             break;
           }
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
           // arb-fix — race-context for the investigated target (ancient relic?).
           const invCtxNoun = String(parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase();
           const invRelicTarget = /relic|ancient|tartarian|statue|sentinel|aetherstone|artifact|rune|monument|obelisk|automaton|machine|spire|throne|giant/.test(invCtxNoun);
           const invInRuins = (currentScene?.location?.tags ?? []).some((t) => /ruin|buried|capital|cathedral|tomb|vault|dig|labyrinth/.test(String(t).toLowerCase()));
           const steps = buildSkillSteps('investigate', player, {
-            weatherMod: weatherStatModifiers(currentScene.weather),
+            weatherMod: weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)),
             companionAssist: !!player.companion,
             raceCtx: { relicTarget: invRelicTarget, inRuins: invInRuins },
           });
@@ -9285,7 +11656,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             break;
           }
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
           // OTA-213 — investigate gets a hook-heavy distribution
           // (10% nothing / 15% mat / 15% TC / 60% hook) so the
           // verb actually rewards story-seeking. Playtester:
@@ -9490,7 +11861,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (isNpcMatch) {
             get().appendLog(
               'world',
-              `You turn your attention to ${currentScene.vendor.name}. They glance up — focused on their own work, not yours. (Use 'gift', 'sell', 'accept', or 'recruit' if you mean to engage.)`,
+              `You turn your attention to ${currentScene.vendor.name}. They glance up — focused on their own work, not yours. (Use 'sell', 'accept', or 'recruit' if you mean to engage.)`,
             );
             break;
           }
@@ -9515,7 +11886,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // above threshold (0.85), re-run the action with the inferred
         // target. Otherwise re-prompt politely.
         if (rawTarget) {
-          if (cognitive.isReady()) {
+          // OTA-796 — the semantic fallback is a ONE-SHOT: a re-dispatched
+          // action (skipPreChecks) must never re-enter it. The old code could
+          // self-dispatch forever: location.name sat in the candidate pool but
+          // NO earlier handler hard-matches it (collectSceneNouns excludes it),
+          // so 'search the <location name>' matched itself at sim ~1.0 and
+          // re-submitted the identical command in an unbounded promise loop —
+          // ticking DOTs, spamming the feed, and burning CPU until force-kill.
+          if (!_opts?.skipPreChecks && cognitive.isReady()) {
             const candidates = [
               ...(currentScene.ambientNouns ?? []),
               ...(currentScene.hooks ?? []).filter((h) => !h.resolved).flatMap((h) => h.nouns),
@@ -9526,7 +11904,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // can still resolve it (at the new 0.85 floor, only a
               // genuinely-confident match will land).
               ...(currentScene.vendor?.name ? [currentScene.vendor.name] : []),
-              currentScene.location.name,
+              // (location.name removed — no downstream hard-match handler
+              // exists for it, so matching it can only loop.)
               ...(currentScene.hazard ? [currentScene.hazard.name] : []),
             ];
             void cognitive.inferTarget(rawTarget, candidates).then((match) => {
@@ -9535,7 +11914,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   'cognitive',
                   `Resolved "${rawTarget}" → "${match.target}" (sim ${match.score.toFixed(2)}).`,
                 );
-                get().submitPlayerAction(`search the ${match.target}`);
+                get().submitPlayerAction(`search the ${match.target}`, { skipPreChecks: true });
               } else {
                 repromptUnknownTarget(get, currentScene, rawTarget);
               }
@@ -9611,9 +11990,46 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (fx?.kind === 'consumable') {
               const messages: string[] = [];
               let p = { ...player };
+              // OTA-776 — the Aetheric Torch is an AIMED tool, not a random
+              // gamble. Using it REVEALS + takes over ONE chosen open lead and
+              // CHARGES it: the lead pays out an upgraded, WIS-scaled Rare/
+              // Legendary drop when the player works it (injected at hook
+              // resolution). The charge is spent only when it actually lands on
+              // a lead. From the 🔦 room button a multi-lead room opens a chooser
+              // first; the typed `use torch [on <lead>]` path is handled here:
+              //   • an explicit target that matches an open lead → charge it
+              //   • exactly one open lead → charge it
+              //   • several open leads, no target → don't spend; say to choose
+              //   • no open lead → don't spend; say there's nothing to aim at
+              {
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { isResonanceLantern } = require('../engine/resonanceLantern');
+                if (isResonanceLantern(used)) {
+                  const chargeable = (currentScene.hooks ?? []).filter(
+                    (h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged,
+                  );
+                  const tgt = String(parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase().trim();
+                  let target = tgt
+                    ? chargeable.find((h) => h.nouns.some((n) => {
+                        const ln = n.toLowerCase();
+                        return ln === tgt || tgt.includes(ln) || ln.includes(tgt);
+                      }))
+                    : undefined;
+                  if (!target && chargeable.length === 1) target = chargeable[0];
+                  if (target) {
+                    get().applyTorchToHook(target.id);
+                  } else if (chargeable.length === 0) {
+                    get().appendLog('arbiter', `There's no open lead here to aim the ${used.name} at. You keep the charge for a room that holds one.`);
+                  } else {
+                    const list = chargeable.map((h) => h.nouns[0] ?? h.kind).slice(0, 6).join(', ');
+                    get().appendLog('arbiter', `Several leads here — the ${used.name} takes only one. Tap the 🔦 button to choose, or say "use torch on <lead>". Open leads: ${list}.`);
+                  }
+                  break;
+                }
+              }
               if (fx.healHP) {
                 const room = Math.max(0, p.hpMax - p.hp);
-                const amt = Math.min(room, fx.healHP);
+                const amt = Math.min(room, scaledHealHP(fx.healHP, p.hpMax)); // OTA-1001 — #120
                 p = { ...p, hp: p.hp + amt };
                 // OTA-618 — when the gain is capped by your max HP (you were near
                 // full), flag it. A "+5" off a 6-HP ration then reads as "topped
@@ -9691,6 +12107,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 // fired. Cheap deliverable until the buff system
                 // lands.
               }
+              if (fx.coating) {
+                // OTA-765 — a coating is drinkable only if its element has a player-side
+                // counter. Acid (no player 'acid' ailment) is coat-only: refuse without
+                // spending it, and point the player at the weapon/armor coat action.
+                if (!isCoatingDrinkable(fx.coating.kind)) {
+                  get().appendLog('arbiter', `The ${used.name} is a coating, not a draught — nothing in you for its ${fx.coating.kind} to counter. Work it into a weapon or a piece of armor instead.`);
+                  break;
+                }
+                const remedy = coatingDrinkRemedy(p, fx.coating.kind, canonicalItemRarity(used));
+                p = remedy.player;
+                messages.push(...remedy.messages);
+                if (remedy.corruptionAfter < remedy.corruptionBefore) {
+                  // eslint-disable-next-line @typescript-eslint/no-require-imports
+                  const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+                  const crossLine = tierCrossLine(corruptionTierOf(remedy.corruptionBefore), corruptionTierOf(remedy.corruptionAfter));
+                  if (crossLine) void Promise.resolve().then(() => get().appendLog('reward', crossLine));
+                }
+              }
               const newInventory = leaveEmptyWaterBottle(
                 p.inventory
                   .map((i) => (i.id === used.id ? { ...i, quantity: i.quantity - 1 } : i))
@@ -9714,10 +12148,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // the player knows it's working and doesn't keep trying
             // to consume it.
             if (fx?.kind === 'gate') {
-              get().appendLog(
-                'arbiter',
-                `The Arbiter's eyes flick to the ${used.name} in your hand. "Already at work — keep it on your person, and it will do its part. Nothing more to 'use'."`,
-              );
+              // OTA-927 — aether-sight gadgets are equip-gated now; point the player at
+              // the Lens slot. Other gate items (Climbing Rope, etc.) stay carried-active.
+              if (fx.unlocks === 'detect_aether') {
+                get().appendLog(
+                  'arbiter',
+                  `The Arbiter taps the ${used.name}. "That's a Lens — fit it in your Lens slot and it works while you wear it. Equip it; there's nothing to 'use'."`,
+                );
+              } else {
+                get().appendLog(
+                  'arbiter',
+                  `The Arbiter's eyes flick to the ${used.name} in your hand. "Already at work — keep it on your person, and it will do its part. Nothing more to 'use'."`,
+                );
+              }
+              break;
+            }
+            // OTA-912 — a Skyreacher Chart. Using it UNLOCKS the great climb (its
+            // prop starts spawning at the landmark), reveals the landmark on the
+            // atlas, and logs the climb as an active mission. Consumed on use.
+            if (fx?.kind === 'map') {
+              unlockGreatClimbFromChart(get, set, used, fx.climbId);
+              break;
+            }
+            // OTA-913 — using an Aether Collection Beacon, once all five towers
+            // are cleared, breaks the arrays down and builds the Beacon Rifle.
+            if (fx?.kind === 'beacon') {
+              assembleBeaconRifle(get, set);
               break;
             }
           }
@@ -9761,16 +12217,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
           hoursElapsed: player.hoursElapsed ?? 0,
           stamina: player.stamina,
         };
-        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
         // arb-fix — context for the conditional RACE skill bonuses: is the
         // target an ancient relic, and are we in ruins?
         const ctxNoun = String(parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase();
         const relicTarget = /relic|ancient|tartarian|statue|sentinel|aetherstone|artifact|rune|monument|obelisk|automaton|machine|spire|throne|giant/.test(ctxNoun);
         const inRuins = (currentScene?.location?.tags ?? []).some((t) => /ruin|buried|capital|cathedral|tomb|vault|dig|labyrinth/.test(String(t).toLowerCase()));
+        // OTA-835 — Unknowing Masses "Curious Mind" AWAKENS on first exposure to
+        // Tartaria's secrets. This skill-check path is the exposure chokepoint:
+        // investigating/handling a relic or acting inside a ruin flips the flag
+        // once, granting the persistent +2 INT / +2 WIS (see effectiveStats).
+        if (player.raceId === 'unknowing_mass' && !player.curiousMindAwakened && (relicTarget || inRuins)) {
+          set((s) => s.player ? { player: { ...s.player, curiousMindAwakened: true } } : s);
+          void Promise.resolve().then(() =>
+            get().appendLog('reward', `✦ Curious Mind — Tartaria's secrets crack open before you, and something in your head clicks awake. (+2 INT and +2 WIS, from here on.)`),
+          );
+        }
+        // OTA-1032 — CONTESTED FLEE: with live enemies in the scene, the fastest
+        // pursuer sets the escape bar (its d20 + speed) instead of the flat
+        // DC 9 that a grown DEX could never fail against. No pursuer (trap /
+        // stage escapes, cleared scenes) keeps the flat DC.
+        const fleePursuers = parsed.intent === 'escape'
+          ? (currentScene.enemies ?? []).filter((e, ei) => (currentScene.enemyHps?.[ei] ?? e.hp) > 0)
+          : [];
         const steps = buildSkillSteps(parsed.intent, player, {
-          weatherMod: weatherStatModifiers(currentScene.weather),
+          weatherMod: weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)),
           companionAssist: !!player.companion,
           raceCtx: { relicTarget, inRuins },
+          pursuit: fleePursuers.length > 0 ? escapePursuit(fleePursuers) : null,
         });
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, refundOnCancel } });
         break;
@@ -9797,6 +12271,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
           const fxRaw = resolveItemEffect(consumable.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+          // OTA-764 — a weapon coating drunk/eaten routes to its counter-medicine (see
+          // applyCoatingDrink) instead of the generic food branch below, which — since
+          // coatings carry no healHP/cure — would swallow it for a blank no-op.
+          if (fxRaw && fxRaw.kind === 'consumable' && fxRaw.coating) {
+            // OTA-765 — coat-only coatings (acid: no player ailment to counter) refuse
+            // the drink instead of being spent for nothing.
+            if (!isCoatingDrinkable(fxRaw.coating.kind)) {
+              get().appendLog('arbiter', `The ${consumable.name} is a coating, not a draught — nothing in you for its ${fxRaw.coating.kind} to counter. Work it into a weapon or a piece of armor instead.`);
+              break;
+            }
+            const remedy = coatingDrinkRemedy(player, fxRaw.coating.kind, consumable.rarity);
+            const inv2 = leaveEmptyWaterBottle(
+              remedy.player.inventory
+                .map((i) => (i.id === consumable.id ? { ...i, quantity: i.quantity - 1 } : i))
+                .filter((i) => i.quantity > 0),
+              consumable.name,
+            );
+            set({ player: advanceTime({ ...remedy.player, inventory: inv2 }, 0.5) });
+            if (remedy.corruptionAfter < remedy.corruptionBefore) {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+              const crossLine = tierCrossLine(corruptionTierOf(remedy.corruptionBefore), corruptionTierOf(remedy.corruptionAfter));
+              if (crossLine) void Promise.resolve().then(() => get().appendLog('reward', crossLine));
+            }
+            const tail = remedy.messages.length > 0 ? `${remedy.messages.join(', ')}.` : 'nothing to counter — it steadies you all the same.';
+            get().appendLog('world', `You ${consumeVerb(consumable)} the ${consumable.name}. ${tail}`);
+            void get().persist();
+            break;
+          }
           const fx = fxRaw && fxRaw.kind === 'consumable'
             ? fxRaw as {
                 kind: 'consumable';
@@ -9812,7 +12315,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const hpRoom = player.hpMax - player.hp;
           const stamRoom = effectiveStaminaMax(player) - player.stamina;
           const heal = fx
-            ? Math.min(Math.max(0, hpRoom), fx.healHP ?? 0)
+            ? Math.min(Math.max(0, hpRoom), scaledHealHP(fx.healHP ?? 0, player.hpMax)) // OTA-1001 — #120
             : Math.min(Math.max(0, hpRoom), rollDie(6) + rollDie(6));
           const stamGain = fx
             ? Math.min(Math.max(0, stamRoom), fx.restoreStamina ?? 0)
@@ -9941,14 +12444,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // arb102 — rest while elevated needs a Reclaimer's Rope (belay
             // loops) OR a worn Hardened Climbing Strap (a harness you can hang
             // and doze in).
-            const wearsClimbStrapForRest = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
+            const wearsClimbStrapForRest = (player.equipped?.legs ?? '').toLowerCase() === 'hardened climbing strap';
+            // OTA-910 — on a GREAT climb the rope isn't enough. Only the
+            // Hardened Climbing Strap's harness is rated to hold you for a doze
+            // at this altitude — and since a great climb is too tall to top in
+            // one push, that rest is exactly what makes the strap mandatory to
+            // finish. On ordinary climbs a Reclaimer's Rope still anchors a rest.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { greatClimbFor: gcRest } = require('../engine/greatClimbs');
+            const onGreatClimb = !!gcRest(currentScene.elevatedOn.noun, player.currentLocationId);
             const hasReclaimersRopeForRest = player.inventory.some(
               (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
-            ) || wearsClimbStrapForRest;
-            if (!hasReclaimersRopeForRest) {
+            );
+            const canRestElevated = wearsClimbStrapForRest || (!onGreatClimb && hasReclaimersRopeForRest);
+            if (!canRestElevated) {
+              // OTA-975 — skipDedup: the pillar log showed rest retries 2-4 dedup-
+              // swallowed into silence. A refusal always answers.
               get().appendLog(
                 'arbiter',
-                `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
+                onGreatClimb
+                  ? `The Arbiter cranes to look up the ${currentScene.elevatedOn.noun}. "This high, only a Hardened Climbing Strap will hold you for a rest — a rope won't do it. Climb down, or come back wearing one."`
+                  : `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
+                { skipDedup: true },
               );
               break;
             }
@@ -9990,7 +12507,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // give the RIGHT reason — a hunger-capped player's wind isn't "full",
           // it's choked; point them at food, not sleep.
           const nothingToRest =
-            stamRoom <= 0 && (player.corruption ?? 0) === 0 && !dogToRecall;
+            stamRoom <= 0 && (player.corruption ?? 0) === 0 && !dogToRecall
+            // OTA-1001 — #120: rest heals now, so open wounds are a reason to sleep.
+            && player.hp >= player.hpMax;
           if (nothingToRest) {
             const hungerCappedRefuse =
               (player.hungerStaminaPenalty ?? 0) > 0 && player.stamina < player.staminaMax;
@@ -9998,7 +12517,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               'arbiter',
               hungerCappedRefuse
                 ? `The Arbiter shakes their head. "Sleep won't fill you when it's food you're missing — your wind is choked by hunger, not weariness. Eat, then rest will mean something."`
-                : `The Arbiter shakes their head. "Your wind is full and the Aether carries no shadow on you. Sleep won't knit wounds — eat for that. Save the hours."`,
+                : `The Arbiter shakes their head. "Your wind is full, your wounds are closed, and the Aether carries no shadow on you. Save the hours."`,
             );
             break;
           }
@@ -10039,7 +12558,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const restAmbush = Math.random() < restAmbushChance;
           const hours = 8;
           // arb37 — rest grants NO HP. Stamina only: ~1/hr, up to 8.
-          const heal = 0;
+          // OTA-1001 — #120: rest heals again, LIGHT — ~15% of max HP for a full sleep,
+    // mirroring how escorts already mend on rest. The old no-HP rule (arb37 /
+    // OTA-187) is superseded by the owner's call.
+    const heal = Math.min(Math.max(0, player.hpMax - player.hp), Math.ceil(player.hpMax * 0.15));
           // OTA-614 — clamp to >= 0. stamRoom = effectiveStaminaMax - stamina,
           // and effectiveStaminaMax is the raw cap MINUS the hunger penalty. When
           // hunger has shrunk the effective cap below current stamina, stamRoom
@@ -10168,6 +12690,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? 'Hunger has capped your wind — sleep can\'t lift it. Eat something to recover the rest.'
               : 'Whole already — the Aetherstone hums steady.';
           get().appendLog('world', `You rest for ${hours} hours. ${tail} (${describeTime(newHours)})`);
+          healEscortsOnRest(get, set);
           // 2026-05-25 — ambush spawn. Rest completes (HP / stamina
           // granted above), then the encounter fires AFTER recovery
           // so the player wakes at full strength but with a problem
@@ -10192,7 +12715,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // warning (OTA-244) gives the heads-up; if the player
             // rests anyway, RNG runs free. Stays a design dial we
             // can re-enable later if playtest insists.
-            const enemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
+            const rawRestEnemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
+            // OTA-816 — scale the rest-ambusher the same way scene-arrival foes scale.
+            const restPlayer = get().player;
+            const enemy = rawRestEnemy && restPlayer
+              ? scaledEnemyForContext(
+                  rawRestEnemy,
+                  restScene.location.danger,
+                  enemyScalePower(Math.max(restPlayer.stats.strength, restPlayer.stats.dexterity, restPlayer.stats.intelligence), restPlayer.hpMax),
+                )
+              : rawRestEnemy;
             if (enemy) {
               set((s) => s.currentScene
                 ? {
@@ -10294,7 +12826,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               if (trWis.leveled) {
                 get().appendLog(
                   'reward',
-                  `✦ The watch sharpens your sense of the dark. +1 WIS (now ${trWis.leveled.to}).`,
+                  `✦ The watch sharpens your sense of the dark. +1 WIS (${statNowClause(get().player, 'wisdom', trWis.leveled.to)}).`,
                 );
               }
             }
@@ -10304,6 +12836,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'travel': {
+        // arb-fix (player: "I used follow because resonance is a sound") — a torch-CHARGED
+        // lead answers with a resonance, and the natural verb for a sound is "follow". If
+        // the travel target matches a torch-charged hook (its noun OR the sound-synonyms
+        // stamped on at charge time), WORK that lead one step instead of walking off the
+        // tile — so "follow the resonance" claims the reward the same as "investigate it".
+        {
+          const followTarget = (parsed.target ?? '').toLowerCase();
+          if (followTarget && currentScene?.hooks?.length) {
+            const chargedHook = matchHookNoun(followTarget, currentScene.hooks);
+            if (chargedHook && chargedHook.torchCharged && !chargedHook.resolved) {
+              resolveHookOneStep(chargedHook, get, set, followTarget);
+              break;
+            }
+          }
+        }
         // arb40 — interior outpost movement is FREE. Walking room-to-room
         // inside a hand-authored hub costs no stamina and no time, so a
         // 15-room capital can be explored freely and the player is never
@@ -10537,7 +13084,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (wantsDown && !currentScene.microMicroId) {
           const macroId = LOCATION_TO_MACRO[currentScene.location.id];
           if (macroId) {
-            const target = pickRandomMicroMicroIn(macroId);
+            // OTA-769 — descending REACHES the indoor / buried micro-areas (which the
+            // surface random-assignment now skips), so 'go down' opens the mausoleum /
+            // catacombs the outdoor tile no longer stamps on you.
+            const target = pickRandomMicroMicroIn(macroId, undefined, { includeIndoor: true });
             if (target) {
               set({ player: advanceTime(spendTravelStamina(player), 1) });
               get().appendLog(
@@ -10586,31 +13136,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // a substring hit. We now ONLY accept alias.includes(target),
         // and require target ≥ 3 chars so single-letter typos don't
         // brute-force a hit either.
-        let candidate = target
-          ? allLocations.find((l) =>
-              l.name.toLowerCase().includes(target)
-              || l.id === target
-              || (target.length >= 3 && ((l as { aliases?: string[] }).aliases ?? []).some((a) => {
-                const al = a.toLowerCase();
-                return al === target || al.includes(target);
-              }))
-            )
+        // OTA-1011 — one punctuation-insensitive matcher (app/engine/locationMatch.ts)
+        // replaces the raw-string find + word-wise typo pass that used to live
+        // here. The old code required the player to reproduce every apostrophe
+        // and hyphen an author typed: measured against the live catalog, exact
+        // typing resolved 36/36 but punctuation-free typing FAILED on 7 real
+        // places (Zharak's Teeth, Reclaimer's Stake, Thametan's Tower, The
+        // Architect's Blind, The Monarch's Waystation, Builders' Survey Camp,
+        // Giant-Watch Shrine) with a flat "I don't know a place called that".
+        // The typo fallback could not rescue them either — it compared single
+        // WORDS of the name against the player's WHOLE phrase and skipped
+        // anything differing in length by more than one. Owner: "'travel to the
+        // location name' should start an auto route as long as the name matches."
+        const candidate = target
+          ? matchLocationByName(target, allLocations) ?? undefined
           : undefined;
-        if (!candidate && target && target.length >= 5) {
-          let bestDist = 2;
-          for (const l of allLocations) {
-            const lname = l.name.toLowerCase();
-            const words = lname.split(/\s+/);
-            for (const w of words) {
-              if (Math.abs(w.length - target.length) > 1) continue;
-              const d = levenshtein(target, w);
-              if (d < bestDist) {
-                bestDist = d;
-                candidate = l;
-              }
-            }
-          }
-        }
         if (candidate) {
           // v2.4.1 (OTA 049) — `travel to <city>` no longer teleports.
           // Sets a course and takes ONE step toward the target's
@@ -10685,12 +13225,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : null;
         const intraSceneNoun = ambientHit ?? hookHit?.nouns[0] ?? enemyHit?.name ?? null;
         if (intraSceneNoun) {
-          set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.25) } : sLive));
           get().appendLog('world', approachLine(intraSceneNoun));
           break;
         }
         // Fall-through: wander.
-        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.wander), 1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.wander), 1) } : sLive));
         narrateWanderingJourney(get, set, currentScene);
         break;
       }
@@ -10730,7 +13270,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // through this single dodge intent now.
         const alreadyDodging = (player.statusEffects ?? []).some((e) => e.kind === 'dodging');
         if (alreadyDodging) {
-          get().appendLog('world', `You're already poised to parry — no need to spend another beat on it.`);
+          get().appendLog('world', `You're already committed to the dodge — no need to spend another beat on it.`);
           break;
         }
         const dodging: StatusEffect = {
@@ -10741,21 +13281,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
           remainingRounds: 1,
           label: 'dodging (parry)',
         };
+        // OTA-796 — the stance costs the turn like its OTA-611 siblings
+        // (disengage / ready / take_cover / aim): 1 stamina + 6 min. The
+        // exploit sweep's top CONFIRMED finding was dodge-as-free-action:
+        // zero cost + DEX/STE training on every contest win = unbounded,
+        // risk-free stat farming against a pet weak enemy in zero game time.
         set((s) =>
           s.player
-            ? {
-                player: {
-                  ...s.player,
-                  statusEffects: applyEffect(s.player.statusEffects ?? [], dodging),
-                },
-              }
+            ? { player: advanceTime(spendStamina({ ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], dodging) }, 1), 0.1) }
             : s,
         );
+        // OTA-795 — the stance line spells out the new stakes: dodge is an
+        // AC-bypass gamble (win → next strike ×2 dice; lose → the blow lands
+        // regardless of armor for 2× damage).
         get().appendLog(
           'world',
           currentScene.enemies.length > 0
-            ? `You set your stance. The next ${activeEnemy(currentScene)?.name ?? 'attacker'} swing — you intend to turn into your own.`
-            : `You shift into a parry-ready stance. Nothing tests it.`,
+            ? `You commit to the dodge. Slip ${activeEnemy(currentScene)?.name ?? 'the attacker'}'s swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.`
+            : `You shift into a dodge-ready stance. Nothing tests it.`,
         );
         if (currentScene.enemies.length > 0) {
           runEnemyGroupCounters(get, set, get().player ?? player);
@@ -10803,7 +13346,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : null;
           const noun = ambient ?? hookHit?.nouns[0] ?? vendorHit;
           if (noun) {
-            set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+            set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.25) } : sLive));
             get().appendLog('world', approachLine(noun));
             break;
           }
@@ -11233,16 +13776,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const onlyFeet = /boot|shoe|sandal|sabaton/.test(target);
           const onlyAmulet = /amulet|locket|necklace|diadem|charm/.test(target);
           const onlyRing = /ring|band|seal/.test(target);
-          if (onlyHead) get().unequipSlot('head');
-          else if (onlyChest) get().unequipSlot('chest');
-          else if (onlyLegs) get().unequipSlot('legs');
-          else if (onlyFeet) get().unequipSlot('feet');
-          else if (onlyAmulet) get().unequipSlot('amulet');
-          else if (onlyRing) get().unequipSlot('ring');
-          else {
-            // No specific target — clear hands.
-            get().unequipSlot('main');
-            get().unequipSlot('off');
+          // OTA-840 [never-fail-silently] — unequip used to no-op in SILENCE when the
+          // targeted slot was already empty (unequipSlot narrates nothing). Check the
+          // slot first: strip it if occupied, else tell the player there's nothing there.
+          const eqNow = get().player?.equipped ?? {};
+          const targetSlot: keyof PlayerEquipped | null =
+            onlyHead ? 'head' : onlyChest ? 'chest' : onlyLegs ? 'legs'
+            : onlyFeet ? 'feet' : onlyAmulet ? 'amulet' : onlyRing ? 'ring' : null;
+          if (targetSlot) {
+            if (eqNow[targetSlot]) get().unequipSlot(targetSlot);
+            else get().appendLog('arbiter', `The Arbiter glances at you. "Nothing in that slot to take off."`);
+          } else {
+            // No specific target — clear hands (both, if held).
+            const hadMain = !!eqNow.main;
+            const hadOff = !!eqNow.off;
+            if (hadMain) get().unequipSlot('main');
+            if (hadOff) get().unequipSlot('off');
+            if (!hadMain && !hadOff) {
+              get().appendLog('arbiter', `The Arbiter looks at your empty hands. "Nothing to put away."`);
+            }
           }
           break;
         }
@@ -11272,6 +13824,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? 'off'
           : validSlots[0]!;
         get().equipItem(inInventory.name, slot);
+        // OTA-840 [never-fail-silently] — a TYPED equip printed nothing to the feed
+        // (equipItem stays silent so UI taps don't bury the scene). A typed command
+        // deserves acknowledgement, so confirm it here with a slot-aware verb.
+        get().appendLog('world', `You ${slot === 'main' || slot === 'off' ? 'ready' : 'don'} the ${inInventory.name}.`);
         break;
       }
       case 'repair': {
@@ -11329,8 +13885,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'canal', 'aqueduct', 'reservoir',
         ];
         const sceneNouns = (currentScene.ambientNouns ?? []).map((n) => n.toLowerCase());
-        const sourceNoun = WATER_SOURCE_NOUNS.find((w) => sceneNouns.some((sn) => sn.includes(w)))
-          ?? (sceneNouns.find((sn) => sn.includes('water')));
+        // OTA-796 — match WHOLE WORDS, not substrings: 'spool'.includes('pool')
+        // and 'stairwell'.includes('well') used to make dry rooms (the Workshop's
+        // wire spool, the Culvert's stairwell) read as open water. Tokenize and
+        // require an exact token hit (plus a 'water*' token).
+        const sourceTokens = sceneNouns.flatMap((sn) => sn.split(/[^a-z]+/i)).filter(Boolean);
+        const sourceNoun = WATER_SOURCE_NOUNS.find((w) => sourceTokens.includes(w))
+          ?? (sourceTokens.some((t) => t === 'water' || t.startsWith('water')) ? 'water' : undefined);
         if (!sourceNoun) {
           get().appendLog(
             'arbiter',
@@ -11347,6 +13908,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `The Arbiter taps your pack. "No empty bottle to fill. Find one first — crates and ground-leavings will have them."`,
           );
           break;
+        }
+        // OTA-800 — one refill per water SOURCE per re-arm window, persisted in
+        // worldMemory by the composite room key (mapX/mapY included) and keyed on
+        // GAME-HOURS. Was a per-scene flag that reset on leave+return, so bouncing
+        // two adjacent outdoor water tiles farmed unlimited refills. Now the same
+        // spring won't refill again until WATER_REARM_HOURS of in-game time pass.
+        {
+          const waterRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
+          if (!waterSourceReady(get().worldMemory ?? emptyMemory(), waterRoomKey, 'fill', player.hoursElapsed ?? 0)) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter nods at the ${sourceNoun}. "You've already topped up here. The filter needs time between draws — fill again at the next stop, or give this one time to settle."`,
+            );
+            break;
+          }
         }
         // Swap empty → full.
         set((s) => {
@@ -11372,7 +13948,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           return { player: { ...s.player, inventory: newInventory } };
         });
-        get().appendLog('world', `You scoop water from the ${sourceNoun} into the bottle. (✦ Water Bottle, ✗ Empty Water Bottle)`);
+        // OTA-796 — filling costs 5 min like the cupped drink; it used to be a
+        // zero-time action, which is part of what made the water loops free.
+        set((s) => (s.player ? { player: advanceTime(s.player, 0.083) } : s));
+        // OTA-800 — record the refill against the water source (game-hours) so it
+        // re-arms on time, not on scene reset. Uses the post-advanceTime clock.
+        {
+          const waterRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
+          const nowHours = get().player?.hoursElapsed ?? player.hoursElapsed ?? 0;
+          set((s) => ({ worldMemory: recordWaterUse(s.worldMemory ?? emptyMemory(), waterRoomKey, 'fill', nowHours) }));
+        }
+        get().appendLog('world', `You scoop water from the ${sourceNoun} into the bottle. The filter seam in its neck pulls the murk out — bottled water drinks clean. (✦ Water Bottle, ✗ Empty Water Bottle)`);
         break;
       }
       case 'drink': {
@@ -11410,13 +13996,48 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'canal', 'aqueduct', 'reservoir',
         ];
         const sceneNouns = (currentScene.ambientNouns ?? []).map((n) => n.toLowerCase());
-        const drinkSource = WATER_SOURCE_NOUNS.find((w) => sceneNouns.some((sn) => sn.includes(w)))
-          ?? (sceneNouns.find((sn) => sn.includes('water')));
+        // OTA-796 — whole-word match (see the fill handler); substrings turned
+        // 'spool'/'stairwell' into drinkable water.
+        const drinkTokens = sceneNouns.flatMap((sn) => sn.split(/[^a-z]+/i)).filter(Boolean);
+        const drinkSource = WATER_SOURCE_NOUNS.find((w) => drinkTokens.includes(w))
+          ?? (drinkTokens.some((t) => t === 'water' || t.startsWith('water')) ? 'water' : undefined);
         const wantsWater = !drinkTarget || drinkTarget.includes('water') || WATER_SOURCE_NOUNS.includes(drinkTarget);
         if (drinkSource && wantsWater) {
+          // One cupped-hands drink per water SOURCE per re-arm window. Wild water
+          // used to be an infinite free stamina tap (+3 per 5 min vs sleep's
+          // +1/hour — a playtest log showed the loop in action). OTA-800 — the
+          // bound was a per-scene flag that reset on leave+return, so two adjacent
+          // outdoor water tiles could be bounced for unlimited drinks; now it's
+          // persisted per source on GAME-HOURS (WATER_REARM_HOURS). Bottled water
+          // (below, via the consumable path) stays unlimited because filling the
+          // bottle filters it.
+          const drinkRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
+          if (!waterSourceReady(get().worldMemory ?? emptyMemory(), drinkRoomKey, 'drink', player.hoursElapsed ?? 0)) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter shakes their head. "You've drunk your fill from the ${drinkSource}. Give it time to settle, or bottle some if you want more for the road."`,
+            );
+            break;
+          }
           const effMax = effectiveStaminaMax(player);
           const stamGained = Math.min(3, effMax - player.stamina);
-          set({ player: advanceTime(restoreStamina(player, 3), 0.083) }); // 5 min
+          // Untreated wild water carries a trace of what's settled in it:
+          // +1 corruption per drink. Filling a bottle first cleanses it (the
+          // bottle's built-in filter), so bottled water stays clean.
+          const prevCorr = player.corruption;
+          const newCorr = Math.min(100, prevCorr + 1);
+          set({
+            player: {
+              ...advanceTime(restoreStamina(player, 3), 0.083), // 5 min
+              corruption: newCorr,
+            },
+          });
+          // OTA-800 — record the drink against the water source (game-hours) so
+          // it re-arms on time, not on scene reset. Uses the post-advanceTime clock.
+          {
+            const nowHours = get().player?.hoursElapsed ?? player.hoursElapsed ?? 0;
+            set((s) => ({ worldMemory: recordWaterUse(s.worldMemory ?? emptyMemory(), drinkRoomKey, 'drink', nowHours) }));
+          }
           // A 0-gain drink has two very different causes: you're genuinely full, OR
           // hunger has capped your effective max below your real max (water can't lift
           // that — only food does). Spell out the hunger case so it never reads as broken.
@@ -11424,11 +14045,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog(
             'world',
             stamGained > 0
-              ? `You cup the ${drinkSource} in your hands and drink. The wet cuts the dust in your throat. (+${stamGained} stamina, 5 min)`
+              ? `You cup the ${drinkSource} in your hands and drink. The wet cuts the dust in your throat. (+${stamGained} stamina, +1 corruption, 5 min)`
               : hungerCapped
-                ? `You cup the ${drinkSource} in your hands and drink, but hunger has capped your wind — water won't lift it. Eat a ration to recover the rest. (5 min)`
-                : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (5 min)`,
+                ? `You cup the ${drinkSource} in your hands and drink, but hunger has capped your wind — water won't lift it. Eat a ration to recover the rest. (+1 corruption, 5 min)`
+                : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (+1 corruption, 5 min)`,
           );
+          // The warning lands AFTER the drink (player ruling) — the first sip
+          // teaches the rule, the bottle is the clean alternative.
+          get().appendLog(
+            'arbiter',
+            `The Arbiter watches you wipe your mouth. "Raw ${drinkSource} carries what the ground put in it. Fill a bottle next time — the filter takes the taint out."`,
+          );
+          {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+            const crossLine = tierCrossLine(corruptionTierOf(prevCorr), corruptionTierOf(newCorr));
+            if (crossLine) get().appendLog('reward', crossLine);
+          }
           // OTA-619 — a combat sip is a FAST action now (player ruling): drinking
           // from a water source mid-fight no longer draws a free enemy swing,
           // matching the consumable-heal change above.
@@ -11484,7 +14117,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (enemyHit) {
           // Improvised ranged attack at -2. Quick narration, no full dice
           // prompt — this is a desperate action, not a primary attack mode.
-          const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather));
+          const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
           const roll = rollDie(20);
           const total = roll + stats.dexterity - 2;
           // 2026-05-25 — use parseEnemyAP. parseInt of "Strength 4"
@@ -11492,19 +14125,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // hit rate vs all enemies including bosses).
           const ac = Math.max(5, Math.min(18, 5 + parseEnemyAP(enemyHit)));
           let hit = total >= ac;
-          const projectile = itemUsed ? itemUsed.name.toLowerCase() : 'a stone';
+          // arb-fix (narration audit) — bare noun, not "a stone": the fallback is dropped
+          // into "The ${projectile} hits" / "sidesteps the ${projectile}", so "a stone" read
+          // as "The a stone hits" / "sidesteps the a stone".
+          const projectile = itemUsed ? itemUsed.name.toLowerCase() : 'stone';
+          // arb-fix — resolve the agile/quick dodge BEFORE the outcome line so a
+          // connecting throw the enemy then slips reads as one verdict (✗ DODGED)
+          // instead of "✓ HIT" followed by "sidesteps". Same fix as the melee path.
+          let thrownDodged = false;
+          if (hit) {
+            // OTA-935 — same crit / margin-beats-dodge rule as the melee path.
+            thrownDodged = enemyDodgesHit(enemyHit.traits, total, ac, false);
+          }
           get().appendLog(
             'combat',
-            `You — thrown ${projectile} → d20 ${roll} + DEX ${stats.dexterity} − 2 (improvised) = ${total} vs ${enemyHit.name} AC ${ac} — ${hit ? '✓ HIT' : '✗ MISS'}`,
+            `You — thrown ${projectile} → d20 ${roll} + DEX ${stats.dexterity} − 2 (improvised) = ${total} vs ${enemyHit.name} AC ${ac} — ${thrownDodged ? '✗ DODGED' : hit ? '✓ HIT' : '✗ MISS'}`,
           );
-          // Agile / quick enemies get a dodge save against a thrown
-          // projectile just like a melee swing.
-          if (hit) {
-            const dodgeChance = traitDodgeChance(enemyHit.traits);
-            if (dodgeChance > 0 && Math.random() < dodgeChance) {
-              get().appendLog('combat', `${enemyHit.name} sidesteps the ${projectile}. (dodged)`);
-              hit = false;
-            }
+          if (thrownDodged) {
+            get().appendLog('combat', `${enemyHit.name} sidesteps the ${projectile}. (dodged)`);
+            hit = false;
           }
           if (hit) {
             // Damage scales by the projectile's weight. A locket does 1.
@@ -11521,7 +14160,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             let coatBonus = 0;
             if (throwCoat) {
               const raw = Math.max(1, rollFromNotation(throwCoat.dice));
-              coatBonus = (throwCoat.kind === 'electrical' || throwCoat.kind === 'burn')
+              coatBonus = (throwCoat.kind === 'electrical' || throwCoat.kind === 'burn' || throwCoat.kind === 'cold')
                 ? Math.max(1, Math.round(raw * combineDamageTypeMatch(applyDamageTypeModifier(raw, throwCoat.kind, enemyHit.type).match, traitDamageMultiplier(enemyHit.traits, throwCoat.kind).match).multiplier))
                 : raw;
               dmg += coatBonus;
@@ -11532,11 +14171,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
             hps[idx] = Math.max(0, (hps[idx] ?? enemyHit.hp) - dmg);
             set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: hps } } : s);
             get().appendLog('combat', `The ${projectile}${wLabel} hits ${enemyHit.name} for ${dmg}${coatBonus > 0 ? ` (+${coatBonus} ${throwCoat!.kind} coating)` : ''}. (${hps[idx]}/${enemyHit.hp} HP)`, { combatOutcome: 'player_dmg' });
+            // OTA-826 [Group-K audit] — coating PARITY on the typed-throw path. Pre-fix
+            // this path folded in the coating's on-hit bonus but DROPPED the lingering
+            // DOT (and acid armor-shred / corruption stacks), so a Poisoned/Acid/Corrupted
+            // knife thrown by name ("throw knife at X") did ~one 1d4 tick and nothing more,
+            // while the SAME knife racked in the bandolier landed a full 3-turn DOT. For
+            // poison/acid/corruption the DOT *is* the payload — dropping it made typed-throw
+            // coatings near-inert. Seed the same proc the equipped/bandolier paths use
+            // (shared applyWeaponCoatingProc) when the enemy survives the throw.
+            if ((hps[idx] ?? 0) > 0 && throwCoat && coatBonus > 0) {
+              applyWeaponCoatingProc(set, idx, { kind: throwCoat.kind, rolled: coatBonus, source: itemUsed?.name });
+              get().appendLog('combat', `The ${throwCoat.kind} coating clings to ${enemyHit.name}.`);
+            }
             if ((hps[idx] ?? 0) <= 0) get().resolveEnemyDefeat();
           } else {
             get().appendLog('world', `The ${projectile} skitters past ${enemyHit.name} and lands in the silt.`);
           }
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.attack), 0.1) } : sLive));
+          // OTA-825 — exploit close (reverify workflow, CONFIRMED high-severity). A
+          // thrown attack is a PLAYER TURN, but this path never let the enemy group
+          // act, so throwing was a COUNTER-FREE ranged attack that ALSO skipped enemy
+          // regen (regen only ticks inside applyEnemyCounter). Even a bare "throw
+          // stone" chipped 1 dmg/turn with zero retaliation — a safe, if slow, kill of
+          // any enemy incl. bosses. Mirror the melee/golem-command paths: after the
+          // throw (hit OR miss), the surviving enemy group swings back + regen/DOTs
+          // tick via runEnemyGroupCounters. Guard on survivors: a throw that KILLED
+          // the last enemy (resolveEnemyDefeat cleared the scene) has none left to act.
+          {
+            const sceneAfterThrow = get().currentScene;
+            if (sceneAfterThrow && sceneAfterThrow.enemies.length > 0) {
+              runEnemyGroupCounters(get, set, get().player ?? player);
+            }
+          }
           break;
         }
         if (hookMatch && !hookMatch.resolved) {
@@ -11583,6 +14249,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const rawActionLower = trimmed.toLowerCase();
         const wantsDown = /\b(down|descend)\b/.test(rawActionLower);
         if (wantsDown && currentScene.elevatedOn) {
+          // OTA-912 — climbing down from a summit BREAKS OFF a summit-boss fight:
+          // the boss doesn't pursue you down the tower, and (like a Core Guardian)
+          // it fully resets — you'll face it fresh at full HP on the next ascent.
+          // This is the deliberate escape valve for a summit boss (dodge & flee
+          // are off up there). Clear the scene enemies on the way down.
+          if (currentScene.enemies.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { summitClimbIdFromEnemy } = require('../engine/greatClimbs');
+            const hasSummitBoss = currentScene.enemies.some((e) => summitClimbIdFromEnemy(e) != null);
+            if (hasSummitBoss) {
+              set((s) => (s.currentScene
+                ? { currentScene: { ...s.currentScene, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
+                : s));
+              get().appendLog(
+                'world',
+                `You break off and climb down. The guardian at the crown does not follow — it settles back to its post, whole again. You will have to face it fresh if you come back up.`,
+              );
+            }
+          }
           // OTA 033 — tolerate the OTA 031 schema where elevatedOn
           // was a bare string. Old saves loaded into 032+ would
           // print "back down the undefined" because .noun on a
@@ -11591,6 +14276,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const downFrom = typeof elev === 'string'
             ? elev
             : (elev as { noun?: string }).noun ?? 'the height';
+          // OTA-975 — descending on EMPTY arms is a half-climb, half-fall slide:
+          // half the scaled fall damage for your tier, then the descent itself
+          // proceeds normally. Owner: at zero stamina the wall is done with
+          // you — up drops you outright, down at least lets you steer the
+          // landing. Eating first (ungated mid-climb) avoids it entirely.
+          if ((get().player?.stamina ?? player.stamina) <= 0) {
+            const slideTier = typeof elev === 'object' && elev !== null
+              ? Math.max(1, (elev as { tier?: number }).tier ?? 1)
+              : 1;
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { computeClimbFallBase: cfbSlide } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const tPerksSlide = require('../engine/titles').titlePerkModifiers(player);
+            let slideDmg = Math.max(1, Math.floor(cfbSlide(player.hpMax, slideTier) / 2));
+            if (tPerksSlide.climbFallHalved && slideDmg > 1) {
+              slideDmg = Math.max(1, Math.floor(slideDmg / 2));
+            }
+            const liveHpSlide = get().player?.hp ?? player.hp;
+            const newHpSlide = Math.max(0, liveHpSlide - slideDmg);
+            set((sp) => (sp.player ? { player: { ...sp.player, hp: newHpSlide } } : sp));
+            get().appendLog(
+              'world',
+              `Your arms are done — the last stretch off the ${downFrom} is a half-climb, half-fall. -${slideDmg} HP (${newHpSlide}/${player.hpMax}).`,
+            );
+            if (newHpSlide <= 0) {
+              handlePlayerDeath(get, set as Parameters<typeof handlePlayerDeath>[1]);
+              break;
+            }
+          }
           // 2026-05-27 OTA-089 — elevated overlay descent. When
           // the player is in an overlay scene (mini-area at
           // the apex), climb-down restores the preserved base
@@ -11621,10 +14335,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 },
               };
             });
-            set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+            set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.25) } : sLive));
             get().appendLog(
               'world',
-              `You climb down from the ${overlayMeta.overlayId === 'open_sky' ? 'lookout' : overlayMeta.overlayId.replace(/_/g, ' ')} and rejoin the ground beside the ${climbedName}. Boots back on the ground.`,
+              `You climb down from the ${(() => {
+                // OTA-996 — #119b: place-word per overlay — "climb down from the
+                // forgotten scholar" read as climbing down off a PERSON.
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { overlayDescentNoun } = require('../engine/elevatedOverlay');
+                return overlayDescentNoun(overlayMeta.overlayId);
+              })()} and rejoin the ground beside the ${climbedName}. Boots back on the ground.`,
             );
             // OTA-120 Phase 3 — dog auto-rejoins on climb-down.
             rejoinDogOnDescent(get, set);
@@ -11634,7 +14354,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           set((s) => s.currentScene ? { currentScene: { ...s.currentScene, elevatedOn: null } } : s);
-          set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.25) } : sLive));
           get().appendLog(
             'world',
             `You make your way back down the ${downFrom}. Boots back on the ground.`,
@@ -11682,7 +14402,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the top tier rolls the climb-top loot pool (50% chance of
         // an Uncommon-skewed item — chance-based so not every climb
         // pays out).
-        const tgt = climbTarget || 'the surface in front of you';
+        // OTA-972 — bare `climb` while already up continues the climb you're ON.
+        const tgt = climbTarget || currentScene.elevatedOn?.noun || 'the surface in front of you';
+        // OTA-911 — you can't climb past a fight. When guardians are on you
+        // (including a mid-climb ambush), the climb verb is refused: deal with
+        // them first. This also stops the player skipping a climb-encounter by
+        // tapping straight past it.
+        if (currentScene.enemies.length > 0) {
+          get().appendLog(
+            'world',
+            `Not while they're on you — you can't climb with enemies in reach. Put them down, or hold your ground.`,
+          );
+          break;
+        }
         const climbRoomKey = makeRoomKey(
           player.currentLocationId,
           currentScene.microMicroId,
@@ -11697,8 +14429,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the OTA 037 marker-length guard; both preserved in the
         // helper.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { climbHeightFor, climbTierLabel, rollClimbTopLoot, maxClimbedTier } = require('../engine/climbHeight');
+        const { climbHeightFor, climbTierLabel, rollClimbTopLoot, maxClimbedTier, sameClimbNoun, computeClimbFallBase } = require('../engine/climbHeight');
         const totalTiers: number = climbHeightFor(tgt);
+        // OTA-910 — is this one of the five landmark great climbs (11–15 tiers)?
+        // Great climbs cost more stamina per tier (no rope discount), gate the
+        // top ten-plus tiers behind the Hardened Climbing Strap, fall harder,
+        // and pay a guaranteed Skyreacher armor piece at the summit.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { greatClimbFor } = require('../engine/greatClimbs');
+        const greatClimb = greatClimbFor(tgt, player.currentLocationId);
         const climbRoom = get().worldMemory.visitedRooms?.[climbRoomKey];
         const climbMarks = climbRoom?.searchedAmbientNouns ?? [];
         // OTA-462 — when the player is CURRENTLY up on this climb, the live
@@ -11711,11 +14450,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // still showed (1/3). On an active climb the two now agree; the marker scan
         // only governs a fresh climb started from the ground.
         const elev = currentScene.elevatedOn;
-        const onThisClimb = !!elev && (() => {
-          const a = elev.noun.toLowerCase();
-          const b = tgt.toLowerCase();
-          return a === b || a.includes(b) || b.includes(a);
-        })();
+        // OTA-972 — anchored head-noun match (sameClimbNoun) instead of the loose
+        // bidirectional includes: typing "stone" must not read as being on the
+        // "stone pillar"'s climb, and vice versa.
+        const onThisClimb = !!elev && sameClimbNoun(elev.noun, tgt);
+        // OTA-972 — ONE CLIMB AT A TIME. Owner: "if there is more climbs than one,
+        // an elevated event on one climb isn't able to be triggered if the
+        // elevation is the same but the player is on a different climb."
+        // There was no rule connecting your feet to the thing you climb next:
+        // from the top of the pillar, "climb the tower" just started climbing
+        // the tower — a mid-air teleport that overwrote the pillar's elevated
+        // state. While elevatedOn is set, any climb target that isn't the
+        // structure under your feet is refused — always audibly (skipDedup).
+        if (elev && !onThisClimb) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter measures the gap. "You're up on the ${elev.noun}. The ${tgt} is its own climb. Down first, then up."`,
+            { skipDedup: true },
+          );
+          break;
+        }
         const effectiveTotalTiers = onThisClimb && elev ? elev.totalTiers : totalTiers;
         const maxCleared: number = onThisClimb && elev ? elev.tier : maxClimbedTier(tgt, climbMarks);
         const currentTier = maxCleared + 1;
@@ -11728,7 +14482,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        const climbStats = effectiveStats(player, weatherStatModifiers(currentScene.weather));
+        const climbStats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { inventoryHasGate: ihg } = require('../engine/itemEffect');
         // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -11758,10 +14512,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const hasReclaimersRope = player.inventory.some(
           (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
         );
-        // arb102 — Hardened Climbing Strap (worn in the cloak slot) takes the
-        // whole weight off your arms: climbing costs 0 stamina while it's worn.
-        const wearsClimbStrap = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
-        const climbStaminaCost = wearsClimbStrap ? 0 : (hasReclaimersRope ? 1 : 2);
+        // arb102 — Hardened Climbing Strap (worn in the cloak slot) takes most of
+        // the weight off your arms: climbing costs 1 stamina while it's worn — as
+        // cheap as a Reclaimer's Rope, and the strap never wears out or snaps, but
+        // it's no longer a free climb.
+        // OTA-911 — the strap is worn in the LEGS slot now (a climbing harness),
+        // not the cloak.
+        const wearsClimbStrap = (player.equipped?.legs ?? '').toLowerCase() === 'hardened climbing strap';
+        // OTA-910 — great climbs cost a flat 2 stamina/tier with NO rope/strap
+        // discount: they're gruelling by design, so the pool can't cover the
+        // full 11–15 tiers and the player MUST rest partway up. The strap's
+        // value on a great climb isn't cheaper tiers — it's that its harness is
+        // what LETS you rest at altitude (see the rest gate + strap wall below).
+        const climbStaminaCost = greatClimb ? 2 : (wearsClimbStrap ? 1 : (hasReclaimersRope ? 1 : 2));
         // Active rope instance for wear/snap tracking. Reclaimer's takes
         // precedence; falls back to Climbing Rope. We pick the highest-
         // durability instance among matches so the freshest copy gets used
@@ -11783,6 +14546,54 @@ export const useGameStore = create<GameStore>((set, get) => ({
           return { id: top.id, name: top.name, current: top.durability!.current };
         };
         const ROPE_WEAR_PER_TIER = 15;
+        // OTA-911 — great-climb entry requirements, enforced from the GROUND
+        // (before you leave the base). To make a great climb you must have BOTH:
+        //   (1) the Hardened Climbing Strap anchored in your legs slot — its
+        //       harness is what lets you rest at altitude and fight mid-climb;
+        //   (2) a Reclaimer's Rope with enough line left to outlast the WHOLE
+        //       climb (totalTiers × wear). A plain Climbing Rope frays through;
+        //       only the Reclaimer's line holds a great ascent.
+        // The mid-climb strap wall + rest gate below remain as backstops if the
+        // strap is stripped after you're already up.
+        if (greatClimb && !get().currentScene?.elevatedOn) {
+          if (!wearsClimbStrap) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter sizes up ${tgt}. "That's a great climb — ${totalTiers} pitches of it. You don't leave the ground for it without a Hardened Climbing Strap anchored to your legs. Without it the height will have you."`,
+            );
+            get().appendLog(
+              'combat',
+              `Great climb ${tgt} — refused: no Hardened Climbing Strap equipped (legs). Requires the strap + a whole Reclaimer's Rope.`,
+            );
+            break;
+          }
+          const neededRope = totalTiers * ROPE_WEAR_PER_TIER;
+          const reclRope = player.inventory
+            .filter((i) => i.name === "Reclaimer's Rope" && i.quantity > 0 && i.durability != null)
+            .sort((a, b) => (b.durability!.current - a.durability!.current))[0];
+          if (!reclRope) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter shakes his head at ${tgt}. "A plain line won't last a great climb — it'll fray through halfway up and drop you. Carry a Reclaimer's Rope, and a whole one."`,
+            );
+            get().appendLog(
+              'combat',
+              `Great climb ${tgt} — refused: no Reclaimer's Rope (need ${neededRope} durability to outlast ${totalTiers} tiers).`,
+            );
+            break;
+          }
+          if ((reclRope.durability?.current ?? 0) < neededRope) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter runs the ${reclRope.name.toLowerCase()} through his hands. "Too worn — ${reclRope.durability?.current ?? 0} of line left, and ${tgt} will eat ${neededRope}. It won't outlast the climb. Splice or replace it before you trust your weight to it."`,
+            );
+            get().appendLog(
+              'combat',
+              `Great climb ${tgt} — refused: Reclaimer's Rope durability ${reclRope.durability?.current ?? 0} < ${neededRope} required.`,
+            );
+            break;
+          }
+        }
         // Local fall helper — single source of truth for the climb-fall
         // narration + HP deduction + elevation reset + death check.
         // Both the stamina-fall and rope-snap paths call this so the
@@ -11792,16 +14603,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
           combatReason: string,
           worldReason: string,
         ): void => {
-          let fallDamage = Math.max(1, Math.floor(player.hpMax * 0.2));
+          // OTA-910 — fall damage now SCALES with how high you'd climbed. A
+          // stumble off the first hold barely stings; a fall from the top of a
+          // fifteen-tier great climb nearly kills. floor(hpMax × (0.12 + 0.055 ×
+          // tierFallenFrom)), capped at 0.9× hpMax. tierFallenFrom = the highest
+          // tier you'd cleared (maxCleared) — you fall from where you stood. A
+          // 2-tier wall lands near the old flat ~20%; great climbs punish height.
+          const tierFallenFrom = Math.max(1, maxCleared);
+          // OTA-975 — formula lives in climbHeight.computeClimbFallBase now, shared
+          // with the zero-stamina descent slide (half rate). Same numbers.
+          let fallDamage = computeClimbFallBase(player.hpMax, tierFallenFrom);
           // arb-fix — Etherbound Survivor ("survive environmental hazards")
           // passively shaves its save bonus off a climbing fall — a real,
           // always-on effect for what was flavor-only text.
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const tPerksFall = require('../engine/titles').titlePerkModifiers(player);
           let fallShaveTag = '';
+          // OTA-910 — Skyreacher halves climb-fall damage (a master climber
+          // rides a fall). Applied BEFORE the Etherbound Survivor flat shave.
+          if (tPerksFall.climbFallHalved && fallDamage > 1) {
+            fallDamage = Math.max(1, Math.floor(fallDamage / 2));
+            fallShaveTag = ' (Skyreacher halves the fall)';
+          }
           if (tPerksFall.envHazardSaveBonus > 0 && fallDamage > 1) {
             const shave = Math.min(fallDamage - 1, tPerksFall.envHazardSaveBonus);
-            if (shave > 0) { fallDamage -= shave; fallShaveTag = ` (Etherbound Survivor absorbs ${shave})`; }
+            if (shave > 0) { fallDamage -= shave; fallShaveTag += ` (Aetherbound Survivor absorbs ${shave})`; }
           }
           const newHp = Math.max(0, player.hp - fallDamage);
           // OTA-354 — vitals at the fall, so a log review can reconstruct a
@@ -11818,21 +14644,81 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'world',
             `${worldReason} You drop hard, taking ${fallDamage} damage${fallShaveTag} (${newHp}/${player.hpMax} HP).`,
           );
-          set((s) =>
-            s.player
+          // OTA-828 — a FALL wipes this climb's cleared-tier progress (player ruling:
+          // "you shouldn't resume at the level you fell from — start all the way
+          // over"). Strip the climbed:<noun>:tN markers for THIS climb (fuzzy-matched
+          // via sameClimbNoun) from the room memory, so the next attempt begins at
+          // tier 1 from the ground instead of resuming at the tier you fell off.
+          if (newHp > 0) {
+            get().appendLog(
+              'world',
+              `The line whips free and your holds are gone — the ${tgt} will have to be climbed again from the base.`,
+            );
+          }
+          set((s) => {
+            if (!s.player) return s;
+            const rooms = s.worldMemory.visitedRooms ?? {};
+            const fallRoom = rooms[climbRoomKey];
+            const prunedWorldMemory = fallRoom
               ? {
-                  player: { ...s.player, hp: newHp },
-                  currentScene: s.currentScene
-                    ? { ...s.currentScene, elevatedOn: null }
-                    : s.currentScene,
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...rooms,
+                    [climbRoomKey]: {
+                      ...fallRoom,
+                      searchedAmbientNouns: (fallRoom.searchedAmbientNouns ?? []).filter((m) => {
+                        if (!m.startsWith('climbed:')) return true; // keep non-climb markers
+                        const parts = m.split(':');
+                        if (parts.length < 3) return true;
+                        const markerNoun = parts.slice(1, parts.length - 1).join(':');
+                        return !sameClimbNoun(markerNoun, tgt); // drop only THIS climb's tier marks
+                      }),
+                    },
+                  },
                 }
-              : s,
-          );
+              : s.worldMemory;
+            return {
+              player: { ...s.player, hp: newHp },
+              currentScene: s.currentScene
+                ? { ...s.currentScene, elevatedOn: null }
+                : s.currentScene,
+              worldMemory: prunedWorldMemory,
+            };
+          });
           void get().persist();
           if (newHp <= 0) {
             handlePlayerDeath(get, set as Parameters<typeof handlePlayerDeath>[1]);
           }
         };
+        // OTA-910 — great-climb strap wall. Every great climb tops out above
+        // ten tiers, higher than grip and stamina carry you: past the tenth
+        // hold there's nowhere to anchor a rest without a Hardened Climbing
+        // Strap (a Reclaimer's Rope's belay loops aren't rated this high). Try
+        // to push past tier 10 without the strap and the height takes you — you
+        // fall from where you stand, and a great-climb fall scales brutally
+        // (climbFall above). Below tier 11 a great climb behaves normally, so a
+        // player can attempt it, feel the wall, and come back wearing the strap.
+        if (greatClimb && currentTier > 10 && !wearsClimbStrap) {
+          const alreadyUpGreat = !!get().currentScene?.elevatedOn;
+          if (!alreadyUpGreat) {
+            // Resuming a banked great climb from the ground (previously strap-
+            // climbed to tier 10+, then left) — nothing to fall off yet. Refuse.
+            get().appendLog(
+              'arbiter',
+              `The Arbiter eyes ${tgt}. "That's a great climb — past the tenth hold there's no resting without a Hardened Climbing Strap. Bring one, or it'll bring you down."`,
+            );
+            get().appendLog(
+              'combat',
+              `Great climb ${tgt} (tier ${currentTier}/${totalTiers}) — no Hardened Climbing Strap past tier 10. (refused — on the ground; equip the strap first)`,
+            );
+            break;
+          }
+          climbFall(
+            `Great climb ${tgt} (tier ${currentTier}/${totalTiers}) — no Hardened Climbing Strap past tier 10. ✗ YOU FALL.`,
+            `You reach for the next hold on ${tgt}, but this high there's nothing to anchor a rest and nothing left in your arms — without a Hardened Climbing Strap the height peels you off.`,
+          );
+          break;
+        }
         // OTA 23-007 — if the player doesn't have enough stamina to
         // finish this tier, they fall. Lose 20% of max HP and clear
         // the elevation flag. This is the only place climbing can
@@ -11857,9 +14743,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             break;
           }
-          climbFall(
-            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina ${player.stamina} < ${climbStaminaCost} required. ✗ YOU FALL.`,
-            `Your grip gives out on the ${tgt}.`,
+          // OTA-975 — zero on the wall means GRAVITY, not a parking spot. Owner
+          // (from the pillar log, 11 held climb presses while a storm chipped
+          // him): "you shouldn't be stuck on a climb at zero ... you fall and
+          // take damage." The OTA-936 no-unwarned-drops rule survives as ONE
+          // clear warning: the first zero-stamina reach is held with explicit
+          // stakes; the next one falls (climbFall — scaled damage, progress
+          // wiped). Eating mid-climb is ungated and restores stamina — that's
+          // the escape hatch, and the warning says so. PARTIAL stamina (some,
+          // but under the haul cost) keeps the safe hold.
+          if (player.stamina <= 0) {
+            const gripWarnedRecently = get().gameLog
+              .slice(-14)
+              .some((e) => e.text.includes('the next reach UP will drop you'));
+            if (!gripWarnedRecently) {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter's voice cracks like a whip. "Zero left in your arms. Eat something where you hang, or take the rough slide down — the next reach UP will drop you."`,
+                { skipDedup: true },
+              );
+              get().appendLog(
+                'combat',
+                `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina 0. GRIP FAILING: one more empty reach and you fall.`,
+              );
+              break;
+            }
+            climbFall(
+              `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina 0. Your grip gives out.`,
+              `You reach with nothing left in your arms. The ${tgt} sheds you.`,
+            );
+            break;
+          }
+          get().appendLog(
+            'arbiter',
+            `The Arbiter's voice tightens. "You've no haul left for the next pull. Climb DOWN while you can still grip — or eat something where you hang."`,
+            { skipDedup: true },
+          );
+          get().appendLog(
+            'combat',
+            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina ${player.stamina} < ${climbStaminaCost} required. (held — too spent to haul higher; climb down, or eat to recover)`,
           );
           break;
         }
@@ -11878,32 +14800,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the snap path catches the equal case and converts in place
         // before wear is applied.
         const activeRope = pickActiveRope();
-        if (activeRope && activeRope.current <= ROPE_WEAR_PER_TIER) {
-          // OTA-625 — frayed-rope fall LOOP. A rope at/below the wear-per-tier
-          // threshold is a guaranteed snap, but the same ground-rule as the
-          // empty-stamina case above applies: if you're still ON THE GROUND
-          // (not yet elevated), you can't fall off a thing you haven't left.
-          // Pre-fix, CLIMB stayed available and every tap dropped the player for
-          // ~7 (playtest: fell tier-2 back-to-back, 23→16→9, with a rope that
-          // could never make it). Refuse + warn on the ground (no fall, no
-          // damage, rope left intact to mend/replace) so the player isn't farmed
-          // for fall damage. Only a snap while ALREADY UP (committed mid-climb)
-          // actually drops them.
+        // OTA-799 — the rope is usable down to its LAST point. The old guard
+        // snapped/refused at current ≤ ROPE_WEAR_PER_TIER (15), which stranded a
+        // whole climb's worth of durability AND dropped the player with no
+        // warning ("durability 15 ≤ 15 — YOU FALL", player report: "what's the
+        // point of 15 points if you die anyway?"). Now only a TRULY SPENT rope
+        // (≤ 0 — which normally can't happen, since wearItemById removes it the
+        // moment it hits 0) fails here; a low-but-usable rope climbs, breaks
+        // gracefully at 0 below (it coils dead at your feet — no fall), and fires
+        // a fraying warning first (below) so it's never a surprise.
+        if (activeRope && activeRope.current <= 0) {
           const alreadyUpRope = !!get().currentScene?.elevatedOn;
           if (!alreadyUpRope) {
             get().appendLog(
               'arbiter',
-              `The Arbiter stops your hand. "That ${activeRope.name.toLowerCase()} is frayed through — it won't take your weight up the ${tgt}. Mend it or find another before you trust it."`,
+              `The Arbiter stops your hand. "That ${activeRope.name.toLowerCase()} is spent — worn through to nothing. Splice or replace it before you trust it to your weight."`,
             );
             get().appendLog(
               'combat',
-              `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — ${activeRope.name} too frayed (durability ${activeRope.current} ≤ ${ROPE_WEAR_PER_TIER}). (refused — it would snap; repair or replace first)`,
+              `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — ${activeRope.name} spent (durability 0). (refused — mend or replace first)`,
             );
             break;
           }
-          // Convert the rope instance to a Broken Rope artifact. Keep the
-          // same id so any saved equipment refs survive; strip durability
-          // since the broken artifact is misc and inert.
+          // Already committed mid-climb on a spent rope → it lets go.
           set((s) =>
             s.player
               ? {
@@ -11919,12 +14838,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : s,
           );
           climbFall(
-            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — ${activeRope.name} frayed through (durability ${activeRope.current} ≤ ${ROPE_WEAR_PER_TIER}). ✗ YOU FALL.`,
-            `Your ${activeRope.name.toLowerCase()} snaps under load on the ${tgt}.`,
+            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — ${activeRope.name} spent (durability 0). ✗ YOU FALL.`,
+            `Your ${activeRope.name.toLowerCase()} gives out under load on the ${tgt}.`,
           );
           break;
         }
-        set({ player: advanceTime(spendStamina(player, climbStaminaCost), 0.5) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, climbStaminaCost), 0.5) } : sLive));
         // Wear the rope by ROPE_WEAR_PER_TIER per tier cleared. The
         // wearItemById helper handles clamping; we ignore the broken
         // flag here because the next tier's snap-check above will fire
@@ -11952,12 +14871,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           set((s) => (s.player ? { player: { ...s.player, inventory: postWearInv } } : s));
           if (wearResult.broken && wearResult.brokenName) {
+            // OTA-799 — the rope gave its last climb, then let go at the top
+            // (durability 0). You completed THIS tier; there's just no rope for
+            // the next one. Graceful end-of-life, not a fall.
             get().appendLog(
               'combat',
-              `Your ${wearResult.brokenName} snaps under the strain. The line coils dead at your feet.`,
+              `Your ${wearResult.brokenName} gives out as you top the pull — the last of the line coils dead at your feet. Splice two to make a fresh one.`,
             );
             if (wearResult.salvageDrop) {
               get().appendLog('reward', `✦ ${wearResult.salvageDrop.name} (Common).`);
+            }
+          } else if (activeRope) {
+            // OTA-799 — fraying warning: the rope survived this climb but is
+            // low (≤ one more climb of durability). Heads-up to mend it before
+            // it's gone — it breaks gracefully above, but the player should
+            // never be surprised by it running out.
+            const worn = postWearInv.find((i) => i.id === activeRope.id);
+            const left = worn?.durability?.current ?? 0;
+            if (left > 0 && left <= ROPE_WEAR_PER_TIER) {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter eyes your ${activeRope.name.toLowerCase()}. "That line's fraying — about one good pull left in it. Mend it before it gives out on you."`,
+              );
             }
           }
         }
@@ -11993,7 +14928,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (trDex.leveled) {
               get().appendLog(
                 'reward',
-                `✦ Your grip remembers. +1 DEX (now ${trDex.leveled.to}).`,
+                `✦ Your grip remembers. +1 DEX (${statNowClause(get().player, 'dexterity', trDex.leveled.to)}).`,
               );
             }
             const liveClimber2 = get().player;
@@ -12003,7 +14938,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               if (trStr.leveled) {
                 get().appendLog(
                   'reward',
-                  `✦ The haul wears in. +1 STR (now ${trStr.leveled.to}).`,
+                  `✦ The haul wears in. +1 STR (${statNowClause(get().player, 'strength', trStr.leveled.to)}).`,
                 );
               }
             }
@@ -12015,6 +14950,60 @@ export const useGameStore = create<GameStore>((set, get) => ({
               'world',
               `You reach the top of the ${tgt} (tier ${currentTier}/${totalTiers}). The view changes; the room reads differently from here.`,
             );
+            // OTA-910 — great-climb summit: a GUARANTEED Skyreacher armor piece,
+            // once per climb. The five pieces (one per landmark) make the
+            // Legendary Skyreacher set — AC+4, three heavy resistances each; it
+            // can't be crafted or bought, only collected up these summits. The
+            // crest is banked in worldMemory.greatClimbsCrested (distinct set),
+            // which both prevents a re-grant and drives the Skyreacher title
+            // (greatClimbsCompleted = distinct climbs crested; earned at 5).
+            if (greatClimb) {
+              // OTA-912 — the summit holds a NAMED BOSS: the tower's master
+              // guardian, still awake at the crown. Reaching the top SPAWNS it
+              // (once, until beaten). The Skyreacher armor piece + the Aether
+              // Collection Beacon are paid out when it FALLS (see the summit-boss
+              // branch in the enemy-defeat handler), not for merely cresting. If
+              // the boss is already down, the crown is quiet.
+              const bossesDown: string[] = get().worldMemory.summitBossesDefeated ?? [];
+              if (!bossesDown.includes(greatClimb.id)) {
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { buildSummitBoss, summitBossFor } = require('../engine/greatClimbs');
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { scaleStaticBoss } = require('../engine/coreGuardians');
+                const bossDef = summitBossFor(greatClimb.id);
+                const bossBase = buildSummitBoss(greatClimb.id);
+                if (bossDef && bossBase) {
+                  const livePlTop = get().player ?? player;
+                  const bossPower = enemyScalePower(
+                    Math.max(livePlTop.stats.strength, livePlTop.stats.dexterity, livePlTop.stats.intelligence),
+                    livePlTop.hpMax,
+                  );
+                  const boss = scaleStaticBoss(bossPower, bossBase);
+                  set((s) => (s.currentScene ? {
+                    currentScene: {
+                      ...s.currentScene,
+                      enemies: [...s.currentScene.enemies, boss],
+                      enemyHps: [...s.currentScene.enemyHps, boss.hp],
+                      activeEnemyIdx: s.currentScene.enemies.length,
+                      range: 'mid',
+                      enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+                      enemyKnockedOut: [...(s.currentScene.enemyKnockedOut ?? []), false],
+                      stealthOpenerUsed: false,
+                    },
+                  } : s));
+                  get().appendLog('world', bossDef.approachLine);
+                  get().appendLog(
+                    'combat',
+                    `Summit boss — ${boss.name} (${boss.hp} HP). Dodge is off up here — fight it out, FLEE to dive for the base, or CLIMB DOWN to break off (it resets and heals, like a Core Guardian).`,
+                  );
+                }
+              } else {
+                get().appendLog(
+                  'world',
+                  `You crest ${tgt} again. Its guardian is long dead and the tower's crown is quiet; the relic it kept is already yours.`,
+                );
+              }
+            } else {
             // Top reached — roll the chance-based loot. Tall climbs
             // (tier ≥ 4) widen the pool to include Reclaimer's Rope,
             // which someone once anchored up here and left.
@@ -12048,6 +15037,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     : `✦ ${drop.name} (${drop.rarity}) — tucked into a crack at the top of the ${tgt}.`;
               get().appendLog('reward', flavor);
             }
+            } // end non-great-climb RNG-loot branch (OTA-910)
           } else {
             get().appendLog(
               'world',
@@ -12081,6 +15071,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : s.currentScene,
             };
           });
+          // OTA-974 — Phase B of real heights: cresting a tier that holds a perch
+          // announces the find. This is the discovery moment that teaches the
+          // player mid-climb stops are worth making.
+          {
+            const plCrest = get().currentScene?.nounPlacements ?? {};
+            for (const [perchNoun, pp] of Object.entries(plCrest)) {
+              if (pp.tier === currentTier && sameClimbNoun(pp.structure, tgt)) {
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { perchTemplateFor: ptfCrest } = require('../engine/perches') as typeof import('../engine/perches');
+                get().appendLog(
+                  'world',
+                  ptfCrest(perchNoun)?.discoverLine
+                    ?? `Beside your handhold: a ${perchNoun}, wedged where only climbers reach.`,
+                );
+              }
+            }
+          }
           // Tutorial climb beat does NOT advance on the way up — it ends
           // when the player has climbed back DOWN to ground level (see the
           // climb-down handler), so they finish the full climb first.
@@ -12103,6 +15110,62 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   `${dog.name} eyes the ${tgt}, then settles at its base. {Pronoun} {isOrAre} not built for the climb.`,
                   dog.sex.pronoun,
                 ),
+              );
+            }
+          }
+          // OTA-911 — the golem can't climb either. It's a walking slab of
+          // Aetherstone; there's no getting it up a rope face. Narrate it holding
+          // the base on the FIRST pitch (once), and its combat command is refused
+          // while you're elevated (see the golem intercept). It's "back" the
+          // moment you touch ground again — no rejoin bookkeeping needed since the
+          // gate is simply `currentScene.elevatedOn`.
+          if (currentTier === 1) {
+            const liveGolemer = get().player;
+            if (liveGolemer?.golem && liveGolemer.golem.hp > 0) {
+              get().appendLog(
+                'world',
+                `${liveGolemer.golem.name} sets its stone feet at the base of ${tgt} and will climb no further — the construct holds the ground while you go up alone.`,
+              );
+            }
+          }
+          // OTA-911 — great-climb guardian ambush. The collector towers are still
+          // defended: winged sentinels and drones peel off to drive you back, more
+          // of them the higher you go (closer to the live resonance apparatus at
+          // the crown). Fires only mid-climb (never the summit) on the scheduled
+          // pitches, and only when you're anchored by the strap — you can't fight
+          // on a bare rope face. Enemies drop into the scene; the "can't climb past
+          // a fight" guard above then forces you to clear them before the next
+          // pitch. Dodge/flee are already blocked while elevated.
+          if (greatClimb && wearsClimbStrap && !isTop) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { climbEncounterAtTier, buildClimbEncounter } = require('../engine/climbEncounters');
+            const sceneNow = get().currentScene;
+            if (sceneNow && sceneNow.enemies.length === 0 && climbEncounterAtTier(currentTier, totalTiers)) {
+              const enc = buildClimbEncounter(currentTier, totalTiers);
+              const livePl = get().player ?? player;
+              const climbPower = enemyScalePower(
+                Math.max(livePl.stats.strength, livePl.stats.dexterity, livePl.stats.intelligence),
+                livePl.hpMax,
+              );
+              const climbDanger = sceneNow.location?.danger ?? 3;
+              const scaledEnc = scaleEncounterForContext(enc.enemies, climbDanger, climbPower);
+              const scaledEncHps = scaledEnc.map((e) => e.hp);
+              set((s) => (s.currentScene ? {
+                currentScene: {
+                  ...s.currentScene,
+                  enemies: scaledEnc,
+                  enemyHps: scaledEncHps,
+                  activeEnemyIdx: 0,
+                  range: 'mid',
+                  enemyAmbushUsed: scaledEnc.map(() => false),
+                  enemyKnockedOut: scaledEnc.map(() => false),
+                  stealthOpenerUsed: false,
+                },
+              } : s));
+              get().appendLog('world', enc.intro);
+              get().appendLog(
+                'combat',
+                `Climb ambush at tier ${currentTier}/${totalTiers}: ${scaledEnc.map((e) => e.name).join(', ')}. (dodge is off on the wall — fight, hold, or FLEE to dive for the base.)`,
               );
             }
           }
@@ -12264,7 +15327,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        set({ player: advanceTime(spendStamina(player, 2), 0.5) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 2), 0.5) } : sLive));
         const tgt = swimTarget || 'the water';
         get().appendLog(
           'world',
@@ -12273,20 +15336,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'jump': {
-        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.1) } : sLive));
         const tgt = parsed.target ?? '';
+        // OTA-800 — resolve the jump target against REAL scene nouns (ambient /
+        // hook / enemy / vendor), the same way the advance case does. Pre-fix,
+        // ANY text after "jump at" (parsed.target) counted as a target and
+        // trained DEX — so "jump at xyzzy" on a safe tile was a free stamina→DEX
+        // grind, exactly the spam the OTA-611 bare-"jump" guard was meant to
+        // close, slipped through via an unresolved target. Now unresolved text
+        // reads as a bare leap and does NOT train.
+        const tl = tgt.toLowerCase();
+        const resolvedJumpNoun = tgt
+          ? (matchAmbientNoun(tgt, currentScene.ambientNouns ?? [])
+              ?? matchHookNoun(tgt, currentScene.hooks ?? [])?.nouns[0]
+              ?? currentScene.enemies.find((e) =>
+                    e.name.toLowerCase().includes(tl)
+                    || (e.aliases ?? []).some((a) => a.toLowerCase().includes(tl)))?.name
+              ?? (currentScene.vendor
+                    && tl.includes((currentScene.vendor.name.toLowerCase().split(/\s+/)[0] ?? ''))
+                    ? currentScene.vendor.name
+                    : null))
+          : null;
         get().appendLog(
           'world',
-          tgt
-            ? `You launch yourself toward ${tgt}. Standing long jump — 3 squares without a STR check, more with one.`
+          resolvedJumpNoun
+            ? `You launch yourself toward ${resolvedJumpNoun}. Standing long jump — 3 squares without a STR check, more with one.`
             : `You leap. Standing long jump — 3 squares clean. With a STR check, you could push it further.`,
         );
-        // OTA-112 — DEX bottleneck fix per stat-growth audit. Jump
-        // is a textbook DEX action and was missing from the training
-        // map. OTA-611 — only trains when you jump AT something (a real
-        // target/obstacle); a bare "jump" into empty air no longer trains, so
-        // it can't be spammed as a pure stamina→DEX grind on a safe tile.
-        if (tgt) {
+        // OTA-112 — Jump is a textbook DEX action. OTA-611 gated it on jumping
+        // AT something; OTA-800 tightens that to a RESOLVED scene noun so a bare
+        // or bogus target can't farm it.
+        if (resolvedJumpNoun) {
           const liveJumper = get().player;
           if (liveJumper) {
             const tr = trainStat(liveJumper, 'dexterity', true);
@@ -12294,7 +15374,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (tr.leveled) {
               get().appendLog(
                 'reward',
-                `✦ Lighter on your feet. +1 DEX (now ${tr.leveled.to}).`,
+                `✦ Lighter on your feet. +1 DEX (${statNowClause(get().player, 'dexterity', tr.leveled.to)}).`,
               );
             }
           }
@@ -12368,7 +15448,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (tr.leveled) {
               get().appendLog(
                 'reward',
-                `✦ Footwork sharper than yesterday. +1 DEX (now ${tr.leveled.to}).`,
+                `✦ Footwork sharper than yesterday. +1 DEX (${statNowClause(get().player, 'dexterity', tr.leveled.to)}).`,
               );
             }
           }
@@ -12379,7 +15459,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'help': {
-        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.1) } : sLive));
         const tgt = parsed.target ?? parsed.resolvedNoun ?? 'the nearest ally';
         // OTA-365 — the 'helping' status was stamped here but nothing ever
         // consumed it (single-player has no ally to roll at Advantage), so
@@ -12392,7 +15472,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'ready': {
-        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.1) } : sLive));
         const tgt = parsed.target ?? 'whatever moves next';
         const readying: StatusEffect = {
           kind: 'ready',
@@ -12414,7 +15494,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'mount': {
-        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.1) } : sLive));
         get().appendLog(
           'arbiter',
           `The Arbiter shrugs. "Tartaria forgot mounts a long time ago. The frame is here for when a beast worth riding shows up — until then it costs half your Speed to climb on nothing."`,
@@ -12495,7 +15575,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'reload': {
-        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, 1), 0.1) } : sLive));
         const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
         if (!equipped || equipped.weaponKind === 'melee') {
           get().appendLog(
@@ -12544,7 +15624,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : s,
           );
         }
-        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.1) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.1) } : sLive));
         // Route the maneuver to the right stat per the action card —
         // disarm/trip/sweep/hook → DEX; grapple/shove/pin → STR.
         const maneuverKind = classifyManeuver(trimmed);
@@ -12554,7 +15634,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the roll instead of vanishing silently.
         const liveFx = get().player?.statusEffects;
         const steps = buildSkillSteps(maneuverKind, player, {
-          weatherMod: weatherStatModifiers(currentScene.weather),
+          weatherMod: weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)),
           companionAssist: !!player.companion,
           statusMods: rollMods(liveFx, 'skill'),
         });
@@ -12624,12 +15704,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Burst count: bolt-caster / handgun = 2, automatic-tagged = 3.
         const tags = equipped.tags ?? [];
         const burstCount = tags.includes('firearm') ? 3 : 2;
-        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack + 1), 0.15) });
+        set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.attack + 1), 0.15) } : sLive));
         get().appendLog(
           'world',
           `You squeeze ${burstCount} shots out of the ${equipped.name}. Each takes a stacking penalty die.`,
         );
-        const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather));
+        const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
         const statVal = stats[equipped.stat];
         const statLabel = equipped.stat.slice(0, 3).toUpperCase();
         let livingHp = currentScene.enemyHps[currentScene.activeEnemyIdx] ?? targetEnemy.hp;
@@ -12646,9 +15726,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `Shot ${i + 1}/${burstCount} — d20 ${roll} + ${statLabel} ${statVal}${penalty ? ` − ${penalty} (burst)` : ''} = ${total} vs AC ${ac} — ${hit ? '✓ HIT' : '✗ MISS'}`,
           );
           if (hit) {
-            const dmg = Math.max(1, rollDie(equipped.damageDice.includes('d10') ? 10 : 6));
+            // OTA-826 [Group-K audit] — burst-fire was bypassing the weakness
+            // system: a bare rollDie ignored the weapon's damageType, so an
+            // electrical bolt-caster did nothing extra to an electrical-weak
+            // Automation and a piercing burst wasn't resisted by a pierce-resist
+            // foe. Route each shot through the same type-map + trait reconcile the
+            // primary attack uses.
+            const rawShot = Math.max(1, rollDie(equipped.damageDice.includes('d10') ? 10 : 6));
+            const shotType = equipped.damageType ?? null;
+            const shotMod = combineDamageTypeMatch(
+              applyDamageTypeModifier(rawShot, shotType, targetEnemy.type).match,
+              traitDamageMultiplier(targetEnemy.traits, shotType).match,
+            );
+            const dmg = Math.max(1, Math.round(rawShot * shotMod.multiplier));
+            const shotTag = shotMod.match === 'weak' ? ' (weak — bites deep!)' : shotMod.match === 'resist' ? ' (resisted)' : '';
+            // OTA-838 — record the observed match from ranged fire too.
+            recordEnemyIntel(get, set, targetEnemy.name, shotType, shotMod.match);
             livingHp = Math.max(0, livingHp - dmg);
-            get().appendLog('combat', `Bolt ${i + 1} hits ${targetEnemy.name} for ${dmg}. (${livingHp}/${targetEnemy.hp} HP)`, { combatOutcome: 'player_dmg' });
+            get().appendLog('combat', `Bolt ${i + 1} hits ${targetEnemy.name} for ${dmg}${shotTag}. (${livingHp}/${targetEnemy.hp} HP)`, { combatOutcome: 'player_dmg' });
             if (livingHp <= 0) {
               killed = true;
               break;
@@ -12783,7 +15878,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // bound to the player until the final act. The Order would
         // hunt the player to the ends of Tartaria for leaving one
         // in the silt. Refuse the drop with an in-character line.
-        if ((item.tags ?? []).includes('quest')) {
+        if (isQuestLockedItem(item)) {
           get().appendLog(
             'arbiter',
             `The Arbiter folds your fingers back over the ${item.name}. "Not this one. It does not leave your pack until the end of the road."`,
@@ -12851,27 +15946,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 break;
               }
               const cat = findCatalogItem(ambientHit);
-              // Self-healing dedup — see takeAmbientNoun (~line 960)
-              // for full rationale. Treat consumed-but-not-in-pack
-              // entries as stale.
+              // OTA-981 — once per room, PERIOD (see takeAmbientNoun): the
+              // owned-check "self-heal" made take -> use -> take an infinite
+              // farm for any takeable consumable.
               const alreadyConsumed = nonClimbMarkers(ambientRoom?.searchedAmbientNouns).some(
                 (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
               );
-              if (alreadyConsumed && cat) {
-                const catNameLower = cat.name.toLowerCase();
-                const ownsCatalogItem = player.inventory.some(
-                  (i) => i.name.toLowerCase() === catNameLower && i.quantity > 0,
-                );
-                if (ownsCatalogItem) {
-                  get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
-                  break;
-                }
-                // Fall through — stale entry, allow the grant.
-              } else if (alreadyConsumed && !cat) {
-                // Non-catalog scene feature already consumed (e.g. an
-                // ambient noun the player searched on). Preserve the
-                // old behavior since there's no catalog item to
-                // gate self-heal against.
+              if (alreadyConsumed) {
                 get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
                 break;
               }
@@ -12971,7 +16052,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const { puzzleFor } = require('../engine/hookPuzzles') as typeof import('../engine/hookPuzzles');
             if (pickupHook && !pickupHook.resolved && !puzzleFor(pickupHook.kind)) {
               get().appendLog('debug', `route: hook intercept via pickup (kind=${pickupHook.kind}, target="${target}")`);
-              set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+              set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
               resolveHookOneStep(pickupHook, get, set, target.toLowerCase());
               void get().persist();
               break;
@@ -12988,18 +16069,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('arbiter', `The Arbiter scans the ground. "I see ${names} here. Name one."`);
           break;
         }
+        // OTA-800 — remove the EXACT dropped instance by id (not every same-name
+        // entry) so picking up one worn sword doesn't also decrement a pristine
+        // one lying beside it.
         const remaining = dropped
-          .map((d) => (d.name === pickItem.name ? { ...d, quantity: d.quantity - 1 } : d))
+          .map((d) => (d.id === pickItem.id ? { ...d, quantity: d.quantity - 1 } : d))
           .filter((d) => d.quantity > 0);
+        let pickupAccepted = true;
         set((s) => {
           if (!s.player || !s.worldMemory.visitedRooms?.[dropKey]) return s;
-          // Merge into player inventory.
-          const inv = [...s.player.inventory];
-          const existing = inv.findIndex((i) => i.name === pickItem.name);
-          if (existing >= 0) inv[existing] = { ...inv[existing]!, quantity: inv[existing]!.quantity + 1 };
-          else inv.push({ ...pickItem, quantity: 1 });
+          // OTA-800 — route the pickup through grantItem so the same per-instance
+          // guards that protect every other grant apply here too. The old
+          // hand-rolled merge stacked by NAME, so dropping a worn / coated /
+          // rolled instance and picking it back up laundered it into a full
+          // same-name row (its low durability, coating, or instanceStats silently
+          // vanished into a +1 quantity — a free repair / coating dupe). grantItem
+          // keeps the picked instance's own id + durability + coating + stats and
+          // merges ONLY when it's genuinely fungible with an existing row.
+          const grantResult = grantItem(s.player.inventory, { ...pickItem, quantity: 1 });
+          if (grantResult.accepted <= 0) {
+            // Pack is at the per-name cap — leave the item on the ground.
+            pickupAccepted = false;
+            return s;
+          }
           return {
-            player: { ...s.player, inventory: inv },
+            player: { ...s.player, inventory: grantResult.inventory },
             worldMemory: {
               ...s.worldMemory,
               visitedRooms: {
@@ -13009,7 +16103,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             },
           };
         });
-        get().appendLog('world', `You pick up the ${pickItem.name}.`);
+        if (pickupAccepted) {
+          get().appendLog('world', `You pick up the ${pickItem.name}.`);
+        } else {
+          get().appendLog('world', `You reach for the ${pickItem.name}, but your pack is already full of them.`);
+        }
         void get().persist();
         break;
       }
@@ -13037,12 +16135,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         const opened = [...(room.containersOpened ?? []), key];
+        // OTA-760 — opening a container RESOLVES that object: also record the noun as
+        // a searched ambient noun so the salvage sweep (and take / investigate) skip
+        // it. Without this the same object paid out TWICE — once via 'open' (its
+        // contents) and again when a later SALVAGE ALL swept it up ("you work the
+        // lockbox over"). One object, one take.
+        const searchedAfterOpen = Array.from(new Set([...(room.searchedAmbientNouns ?? []), key]));
         set((s) => ({
           worldMemory: {
             ...s.worldMemory,
             visitedRooms: {
               ...(s.worldMemory.visitedRooms ?? {}),
-              [dropKey]: { ...room, containersOpened: opened },
+              [dropKey]: { ...room, containersOpened: opened, searchedAmbientNouns: searchedAfterOpen },
             },
           },
         }));
@@ -13175,57 +16279,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         const lower = target.toLowerCase();
-        // OTA-456 — "send word <quest>" / "courier <quest>" is a REMOTE turn-in:
-        // it works from anywhere for a 15% TC cut on DEED quests (hunts /
-        // mysteries / storylines / faction quests without a fetch). FETCH quests
-        // refuse it (you carry the goods — deliver in person). Detected off the
-        // raw verb the player used.
-        const remote = /\b(send word|courier|send a runner)\b/i.test(trimmed);
+        // B2 (player: "kill all remote hand ins, make all routable") — the OTA-456
+        // "send word / courier" REMOTE turn-in is GONE for every contract type. A
+        // hand-in is now face-to-face: travel to the right agent (the Contracts atlas
+        // pins + SET COURSE route you there) and turn it in for full pay + a long-haul
+        // bonus scaled to the trek. A typed "send word …" is refused with that steer.
+        if (/\b(send word|courier|send a runner)\b/i.test(trimmed)) {
+          get().appendLog('arbiter', `The Arbiter shakes their head. "No couriers for this. Carry it to a posting agent yourself — the trip pays. Open Contracts and set a course to the ◆ pin."`);
+          break;
+        }
         const huntHint = /hunt|bounty|titan|dragon|behemoth|chimera|wyvern|monarch|siren|queen|trophy/.test(lower);
         const mysteryHint = /mystery|fragment|compass|orb|eye|watch|red tower|cradle|leviathan|obsidian|temporal/.test(lower);
         const storyHint = /storyline|story|path|ascension|run|relic run|silence|red tower|tartarian path/.test(lower);
         if (storyHint && fuzzyFindStoryline(target, STORYLINES)) {
-          get().turnInStoryline(target, remote);
+          get().turnInStoryline(target);
         } else if (mysteryHint && fuzzyFindMystery(target, MYSTERIES)) {
-          get().turnInMystery(target, remote);
+          get().turnInMystery(target);
         } else if (huntHint && fuzzyFindHunt(target, HUNTS)) {
-          get().turnInHunt(target, remote);
+          get().turnInHunt(target);
         } else {
-          get().turnInFactionQuest(target, remote);
+          get().turnInFactionQuest(target);
         }
         break;
       }
-      case 'gift': {
-        if (!currentScene.vendor) {
-          get().appendLog('arbiter', `The Arbiter glances at the empty road. "No one here to gift to."`);
-          break;
-        }
-        // OTA 205 Phase 2 — if the player named a recipient
-        // explicitly ("give X to Yulka"), validate it matches the
-        // active vendor. Catches "give X to Bob" when Yulka is the
-        // one actually present. Falls through if no recipient was
-        // named (parser only attaches it when "to <name>" appears).
-        const recipArg = parsed.args?.find((a) => a.role === 'recipient');
-        if (recipArg?.text) {
-          const recipText = recipArg.text.toLowerCase().trim();
-          const vendorName = currentScene.vendor.name.toLowerCase();
-          const match = vendorName.includes(recipText) || recipText.includes(vendorName);
-          if (!match) {
-            get().appendLog(
-              'arbiter',
-              `The Arbiter glances around. "${currentScene.vendor.name} is here, not ${recipArg.text}. Drop the 'to ${recipArg.text}' if you mean them."`,
-            );
-            break;
-          }
-        }
-        const target = parsed.resolvedNoun ?? parsed.target ?? '';
-        if (!target.trim()) {
-          get().appendLog('arbiter', `The Arbiter tilts their head. "Gift what? Name a thing from your pack."`);
-          break;
-        }
-        get().giftToVendor(target);
-        break;
-      }
+      // OTA-803 — the `gift` intent + giftToVendor were removed. Faction standing
+      // is earned through mission completions + sigil/pendant turn-ins; gifting
+      // vendors loot for rep undercut that design, so the mechanic is gone.
       case 'steal': {
         const stealTarget = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
         // Vendor present → real theft attempt against their inventory.
@@ -13247,7 +16326,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? matchAmbientNoun(stealTarget, currentScene.ambientNouns ?? [])
           : null;
         if (ambient) {
-          const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather));
+          const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
           const roll = rollDie(20);
           const total = roll + stats.stealth; // OTA-348 — sleight-of-hand rolls Stealth
           const success = total >= 10;
@@ -13274,7 +16353,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } else {
             get().appendLog('world', `Your hand slips on the ${ambient}. It stays where it was.`);
           }
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+          set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
           break;
         }
         get().appendLog('arbiter', `The Arbiter watches the empty path. "Nothing to steal here."`);
@@ -13465,7 +16544,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => ({
           player: s.player ? { ...s.player, inventory: craftGrant.inventory } : s.player,
         }));
-        get().appendLog('reward', `✦ Crafted ${recipe.result}. The Arbiter watches you set the last piece.`);
+        // OTA-1006 — a batch emits ONE summary line at the end instead of N of these.
+        if (!get().craftBatchQuiet) {
+          get().appendLog('reward', `✦ Crafted ${recipe.result}. The Arbiter watches you set the last piece.`);
+        }
         break;
       }
     }
@@ -13615,6 +16697,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // while at 32 loyalty drops to 30 and emits the 30-beat) fires
     // exactly once.
     dogThresholdCheck(get, set, dogLoyaltyBefore);
+    // OTA-844 [world pulse] — advance the world's slow heartbeat. No-op unless a full
+    // pulse of in-game time has accrued since the last one.
+    worldTideCheck(get, set);
+    // OTA-862 [bounty deadline] — lapse any contract whose 24 in-game-hour window ran out.
+    expireBounties(get, set);
+    // OTA-849 [living world] — the world reaches back: rival factions raid a player
+    // who's taken a side. No-op unless the cooldown has passed and the scene is a safe
+    // outdoor moment.
+    maybeSpawnRaid(get, set);
+    // OTA-851 — a roaming faction patrol can cross your path in the open, anywhere.
+    if ((get().currentScene?.enemies?.length ?? 0) === 0) maybePatrolAmbush(get, set);
     void get().persist();
   },
 
@@ -13626,8 +16719,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const step = state.steps[idx];
     if (!step) return;
 
-    const total = values.reduce((a, b) => a + b, 0) + step.bonus;
+    let total = values.reduce((a, b) => a + b, 0) + step.bonus;
     let success = step.target !== undefined ? total >= step.target : undefined;
+    // OTA-835 — Unknowing Masses "Beginner's Luck": if this difficulty roll FAILED
+    // and the player has banked a reroll (set by the daily race ability), roll the
+    // same dice again and keep the better total. One shot — the token is burned
+    // whether or not the second throw lands. Applies to any targeted roll (skill,
+    // combat attack, relic check) — the trait's "survival, combat, or relic" scope.
+    if (success === false && step.target !== undefined) {
+      const pl = get().player;
+      if (pl?.raceId === 'unknowing_mass' && pl.luckyRerollReady) {
+        const reValues = values.map(() => rollDie(step.sides));
+        const reTotal = reValues.reduce((a, b) => a + b, 0) + step.bonus;
+        if (reTotal > total) { values = reValues; total = reTotal; }
+        success = total >= step.target;
+        set((s) => s.player ? { player: { ...s.player, luckyRerollReady: false } } : s);
+        const landed = success;
+        void Promise.resolve().then(() =>
+          get().appendLog('reward', `✦ Beginner's Luck — you throw again and ${landed ? 'pull it off' : 'still come up short'} (${total} vs DC ${step.target}).`),
+        );
+      }
+    }
     let critical: boolean | undefined;
     // Natural 1 / natural 20 rule on d20 attack rolls. Forces the
     // floor (5% always-miss) and ceiling (5% always-hit + crit damage)
@@ -13644,6 +16756,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const filled: RollStep = { ...step, values, total, success, ...(critical ? { critical } : {}) };
     const updatedSteps = state.steps.map((s, i) => (i === idx ? filled : s));
+    // OTA-796 — the swing is now committed: strip the one-shot statuses this
+    // roll consumes (see consumeOnResolve). Runs once, on the attack step.
+    if (step.id === 'attack' && state.consumeOnResolve?.length) {
+      const toConsume = state.consumeOnResolve;
+      set((s) =>
+        s.player
+          ? {
+              player: {
+                ...s.player,
+                statusEffects: (s.player.statusEffects ?? []).filter(
+                  (e) => !toConsume.includes(e.kind),
+                ),
+              },
+            }
+          : s,
+      );
+    }
 
     // Skip damage roll if attack missed. Double damage dice on crit
     // so the follow-up roll naturally produces the bigger number.
@@ -13657,7 +16786,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     while (
       nextIdx < updatedSteps.length
       && attackStep?.success === false
-      && (updatedSteps[nextIdx]?.id === 'damage' || updatedSteps[nextIdx]?.id === 'coating')
+      && (updatedSteps[nextIdx]?.id === 'damage' || updatedSteps[nextIdx]?.id === 'coating' || updatedSteps[nextIdx]?.id === 'coating2')
     ) {
       nextIdx++;
     }
@@ -13677,6 +16806,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       set({ pendingRolls: null, pendingHookContinue: null });
       get().concludeRolls(updatedSteps, state.actionText);
+      // OTA-980 — settle a bandolier throw only after the WHOLE swing resolved, so
+      // the damage phase read the thrown item, not the restored off hand.
+      get().settleThrowRestore('resolved');
     }
   },
 
@@ -13694,9 +16826,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!pending || !state.currentScene) return;
     const hook = state.currentScene.hooks?.find((h) => h.id === pending.hookId);
     if (!hook || hook.resolved) {
-      // Hook already terminated (e.g., player tapped CONTINUE on a
-      // popup whose final-stage flag was already true); just close.
-      set({ pendingHookContinue: null });
+      // Hook already terminated (stale tap on a popup whose final-stage flag
+      // was already true). Close via the dismiss path so a stashed completion
+      // notice still raises instead of being dropped.
+      get().dismissHookContinue();
       return;
     }
     // Do NOT clear pendingHookContinue here — resolveHookOneStep
@@ -13710,7 +16843,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // state). Just clears the popup state; the hook is already
   // resolved at this point.
   dismissHookContinue() {
+    // OTA-1030 — COMPLETE on the final stage: raise the completion notice STASHED at
+    // terminal-stage resolution, now that the player has read the arc and
+    // closed it. TRADE NOW routes here too, so a finished thread's payout is
+    // never silently dropped.
+    const stash = get().pendingHookContinue?.completionNotice;
     set({ pendingHookContinue: null });
+    if (stash) get().raiseMissionCompleteNotice(stash.kind, stash.title, stash.body);
   },
 
   dismissWhisperComplete() {
@@ -13765,6 +16904,53 @@ export const useGameStore = create<GameStore>((set, get) => ({
       };
     });
     get().appendLog('system', refund ? 'Action cancelled. Time and stamina refunded.' : 'Action cancelled.');
+    // OTA-980 — a cancelled bandolier throw unwinds the transient off-hand equip
+    // and spends nothing (same spirit as the refund above).
+    get().settleThrowRestore('cancelled');
+  },
+
+  settleThrowRestore(outcome) {
+    const ts = get().throwSettlement;
+    if (!ts) return;
+    set({ throwSettlement: null });
+    const p = get().player;
+    if (!p) return;
+    if (outcome === 'resolved') {
+      // The spend-exactly-one guarantee, moved to settle time: one unit per
+      // COMPLETED throw. A landed hit already consumed one via the equipped-
+      // throwable path; top up only when it didn't (a miss).
+      const cur = p.inventory.find((i) => i.id === ts.itemId);
+      const alreadySpent = !cur || cur.quantity < ts.qtyAtThrow;
+      if (!alreadySpent) {
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            inventory: s.player.inventory
+              .map((i) => (i.id === ts.itemId ? { ...i, quantity: i.quantity - 1 } : i))
+              .filter((i) => i.quantity > 0),
+          },
+        } : s));
+      }
+    }
+    const after = get().player;
+    const stillHas = !!after?.inventory.some((i) => i.id === ts.itemId && i.quantity > 0);
+    set((s) => {
+      if (!s.player) return s;
+      const eq = { ...(s.player.equipped ?? {}) };
+      // Unwind only if the hand still holds the transient throwable (or the
+      // hit-consume already emptied the slot). A deliberate re-equip in
+      // between wins over the unwind.
+      if (eq.offId !== undefined && eq.offId !== ts.itemId) return s;
+      const danglingSpent = ts.prevOffId === ts.itemId && !stillHas;
+      if (ts.prevOff && !danglingSpent) eq.off = ts.prevOff; else delete eq.off;
+      if (ts.prevOffId && !danglingSpent) eq.offId = ts.prevOffId; else delete eq.offId;
+      // Clear the slot off the bandolier once the stack is empty.
+      if (!stillHas) {
+        eq.bandolierIds = (eq.bandolierIds ?? []).filter((id) => id !== ts.itemId);
+      }
+      return { player: { ...s.player, equipped: eq } };
+    });
+    void get().persist();
   },
 
   concludeRolls(steps: RollStep[], actionText: string) {
@@ -13808,14 +16994,65 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // check (and every other) fires with the right governing stat + DC.
       {
         const d20 = (skill.total ?? 0) - (skill.bonus ?? 0);
+        // OTA-946 — CONTRADICTION GUARD. A "handler-owned" intent resolves itself below with its
+        // own authoritative outcome line. For STEALTH in combat that outcome is a SECOND roll —
+        // the break-away initiative race, which can fail — so also stamping a generic "PASS"
+        // here produced a self-contradicting log ("stealth … PASS" immediately followed by
+        // "… surprised"). When a handler owns the result, log the roll WITHOUT a PASS/FAIL
+        // verdict so the handler's line is the single source of truth. Add intents to
+        // HANDLER_OWNED_IN_COMBAT as other re-resolving handlers are found — the guard scales.
+        const HANDLER_OWNED_IN_COMBAT = new Set(['stealth']);
+        const handlerOwnsOutcome = !!skill.success
+          && (currentScene.enemies?.length ?? 0) > 0
+          && HANDLER_OWNED_IN_COMBAT.has(intent);
+        const verdict = handlerOwnsOutcome ? '(resolved below)' : (skill.success ? 'PASS' : 'FAIL');
         get().appendLog(
           'debug',
-          `skillcheck: ${intent} d20=${d20} ${skill.bonusLabel ?? ''} = ${skill.total} vs ${skill.targetLabel ?? `DC ${skill.target}`} → ${skill.success ? 'PASS' : 'FAIL'}`,
+          `skillcheck: ${intent} d20=${d20} ${skill.bonusLabel ?? ''} = ${skill.total} vs ${skill.targetLabel ?? `DC ${skill.target}`} → ${verdict}`,
         );
         const live = get().player;
         if (live) get().appendLog('debug', debugLoadout(live));
       }
+      // OTA-936 — SNEAK odds signal. A failed sneak at arm's reach is a quiet trap: it burns
+      // the turn AND the whole enemy group swings free. When the check is a long shot for this
+      // character's STEALTH, say so ONCE per encounter so the player can choose to fight or
+      // break to range instead of bleeding HP into a coin-flip.
+      if (intent === 'stealth' && !skill.success && (currentScene.enemies?.length ?? 0) > 0) {
+        const need = (skill.target ?? 0) - (skill.bonus ?? 0);         // d20 must meet/exceed this
+        const passChance = Math.max(0, Math.min(20, 21 - need)) / 20;  // rough; ignores nat rules
+        const sc = get().currentScene;
+        if (passChance <= 0.55 && !sc?.sneakOddsWarned) {
+          set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, sneakOddsWarned: true } } : s));
+          get().appendLog('arbiter', passChance <= 0.25
+            ? `The Arbiter keeps his voice low. "Your stealth won't carry you past a foe at arm's reach — not here. Every try just buys them a free swing. Fight it out, or break to distance first."`
+            : `The Arbiter keeps his voice low. "Slipping away at arm's reach is a coin-flip with your stealth — and a miss lets the whole pack swing free. Weigh it against just fighting."`);
+        }
+      }
+      // OTA-999 — a CLOSE failed stealth check teaches a little while STE is
+      // still finding its feet (cold-start band only; see trainStatNearMiss).
+      if (intent === 'stealth' && !skill.success) {
+        const liveNm = get().player;
+        if (liveNm) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { trainStatNearMiss } = require('../engine/statTraining') as typeof import('../engine/statTraining');
+          const nm = trainStatNearMiss(liveNm, 'stealth', skill.total ?? 0, skill.target ?? 0);
+          if (nm.player !== liveNm) {
+            set((s2) => (s2.player ? { player: nm.player } : s2));
+            get().appendLog('debug', `train: stealth near-miss → progress ${nm.player.statProgress?.stealth ?? '?'}/100`);
+            if (nm.leveled) {
+              get().appendLog('reward', `✦ Even the misses teach. +1 STE (${statNowClause(get().player, 'stealth', nm.leveled.to)}).`);
+            }
+          }
+        }
+      }
       if (skill.success) {
+        // arb-fix — quest ARRIVAL/exploration stages (investigate/stealth/
+        // diplomacy/escape/cast) must not auto-advance mid-combat: a stealth
+        // check during a fight was advancing an unrelated mystery and dumping its
+        // "you make your way to the Cradle's edge…" arrival scene into the combat
+        // log. Only the hunt's genuine COMBAT stages (attack_provoke / boss) may
+        // advance while enemies are present.
+        const inCombat = (currentScene.enemies?.length ?? 0) > 0;
         // Hunt advancement: if the player has an active hunt whose next
         // stage expects this skill intent, advance one stage of the hunt.
         const huntMatch = (player.activeHunts ?? [])
@@ -13828,11 +17065,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // Map intents to the hunt's expected check kinds. Any of these
             // intent matches advances the hunt one beat.
             return (
-              (next.checkKind === 'investigate' && intent === 'investigate') ||
-              (next.checkKind === 'stealth' && intent === 'stealth') ||
-              (next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
-              (next.checkKind === 'escape' && intent === 'escape') ||
-              (next.checkKind === 'cast' && intent === 'cast') ||
+              (!inCombat && next.checkKind === 'investigate' && intent === 'investigate') ||
+              (!inCombat && next.checkKind === 'stealth' && intent === 'stealth') ||
+              (!inCombat && next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
+              (next.checkKind === 'escape' && intent === 'escape') || // combat flee can advance an escape stage
+              (!inCombat && next.checkKind === 'cast' && intent === 'cast') ||
               (next.checkKind === 'attack_provoke' && intent === 'attack') ||
               (next.checkKind === 'boss' && intent === 'attack')
             );
@@ -13857,7 +17094,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               (next.checkKind === 'boss' && intent === 'investigate')
             );
           });
-        if (mysteryMatch) {
+        if (mysteryMatch && !inCombat) {
           void Promise.resolve().then(() => get().advanceMystery(mysteryMatch.rec.id));
         }
         // Storyline auto-advance — same rule.
@@ -13878,7 +17115,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               (next.checkKind === 'boss' && intent === 'diplomacy')
             );
           });
-        if (storyMatch) {
+        if (storyMatch && !inCombat) {
           void Promise.resolve().then(() => get().advanceStoryline(storyMatch.rec.id));
         }
 
@@ -13911,7 +17148,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (trainResult.leveled) {
           get().appendLog(
             'reward',
-            `✦ Practice sharpens you. +1 ${trainResult.leveled.stat.toUpperCase().slice(0, 3)} (now ${trainResult.leveled.to}). [${newChecks} checks succeeded]`,
+            `✦ Practice sharpens you. +1 ${trainResult.leveled.stat.toUpperCase().slice(0, 3)} (${statNowClause(get().player, trainResult.leveled.stat, trainResult.leveled.to)}). [${newChecks} checks succeeded]`,
           );
         }
         switch (intent) {
@@ -13941,7 +17178,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
               }
               const enemy = activeEnemy(currentScene);
               const ste = livePlayer ? (effectiveStats(livePlayer).stealth ?? 5) : 5;
-              const steMod = Math.round((ste - 10) / 2);
+              // arb-fix — STEALTH is on this engine's ~0–10 stat scale (rollDie(10),
+              // and a Giant legitimately sits at 0), NOT D&D's 3–18. The gating skill
+              // check adds the RAW stat (log reads "STE 0"), so the init contest must
+              // too. The old Math.round((ste-10)/2) applied the D&D ability-modifier
+              // formula, which turns every realistic STEALTH into a PENALTY (0 → −5,
+              // 5 → −2), the exact opposite of the comment above ("STE scales every
+              // roll") — a passed check then still lost an unwinnable init race and
+              // surprised the player every time. Use the raw stat like the rest of
+              // the engine so STEALTH actually helps.
+              const steBonus = ste;
+              // #6 — day/night cover applies to EVERY stealth check, not just
+              // pickpocket (playtest: "does stealth scale up at night, down in the
+              // day?"). Fold the same +1-night / −1-day modifier the sleight-of-hand
+              // path uses into the combat opener + reset, and surface it so the
+              // player can see it move the roll.
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { stealthTimeBonus } = require('../engine/timeOfDay');
+              const timeBonus: number = stealthTimeBonus(livePlayer?.hoursElapsed);
+              if (timeBonus !== 0) {
+                get().appendLog('world', timeBonus > 0
+                  ? 'Dusk is with you — the silt eats sound after dark. (stealth +1, night)'
+                  : 'The daylight leaves you little cover. (stealth −1, day)');
+              }
               // Awareness scales with the area's danger rating (alert country =
               // harder to slip). Kept small so STE stays the deciding factor.
               const enemyAware = 2 + Math.floor((currentScene.location?.danger ?? 2) / 2);
@@ -13965,7 +17224,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               let stealthSucceeded = false;
               if (openerAvailable) {
                 const roll = rollDie(20);
-                const total = roll + steMod + 3; // +3 for the drop (they're unaware)
+                const total = roll + steBonus + 3 + timeBonus; // +3 for the drop (they're unaware)
                 const dc = 10 + enemyAware;
                 if (total >= dc) {
                   set((s) => (s.player
@@ -13974,14 +17233,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   get().appendLog('world', hasCover
                     ? `You melt into cover and ghost toward ${foe} from the angle they aren't watching. Your next strike lands before they know you're there. (+5 next attack)`
                     : `You drop low and move quiet, closing on ${foe} unseen across the open ground. (+5 next attack)`);
-                  get().appendLog('debug', `stealth: opener d20=${roll}+STE${steMod >= 0 ? '+' : ''}${steMod}+3 = ${total} vs DC ${dc} — UNSEEN`);
+                  get().appendLog('debug', `stealth: opener d20=${roll}+STE${steBonus >= 0 ? '+' : ''}${steBonus}+3${timeBonus !== 0 ? `${timeBonus > 0 ? '+' : ''}${timeBonus}(${timeBonus > 0 ? 'night' : 'day'})` : ''} = ${total} vs DC ${dc} — UNSEEN`);
                   stealthSucceeded = true;
                 } else {
                   get().appendLog('world', `${foe} catches the movement — no sneaking up on this one. You'll have to take them head-on.`);
-                  get().appendLog('debug', `stealth: opener d20=${roll} → ${total} vs DC ${dc} — SPOTTED`);
+                  get().appendLog('debug', `stealth: opener d20=${roll}${timeBonus !== 0 ? `${timeBonus > 0 ? '+' : ''}${timeBonus}(${timeBonus > 0 ? 'night' : 'day'})` : ''} → ${total} vs DC ${dc} — SPOTTED`);
                 }
               } else {
-                const pInit = rollDie(20) + steMod + 2; // you chose the moment
+                const pInit = rollDie(20) + steBonus + 2 + timeBonus; // you chose the moment
                 const eInit = rollDie(20) + enemyAware;
                 if (pInit >= eInit) {
                   const rounds = hasCover ? 2 : 1;
@@ -14012,7 +17271,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   const tr = trainStat(liveSneaker, 'stealth', true);
                   set((s) => (s.player ? { player: tr.player } : s));
                   if (tr.leveled) {
-                    get().appendLog('reward', `✦ Moving unseen sharpens you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (now ${tr.leveled.to}).`);
+                    get().appendLog('reward', `✦ Moving unseen sharpens you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (${statNowClause(get().player, tr.leveled.stat, tr.leveled.to)}).`);
                   }
                 }
               }
@@ -14037,6 +17296,69 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           case 'escape': {
+            // OTA-976 — WALL FLEE resolution. A successful flee while elevated is
+            // a one-tap dive for the base, whatever tier you're on: enemies
+            // are left behind (a summit boss resets exactly like a break-off),
+            // and the descent costs DOUBLE stamina per tier. If the tank
+            // empties partway down, the tiers your arms couldn't cover are a
+            // FALL — scaled damage for that remaining height.
+            const elevFlee = get().currentScene?.elevatedOn;
+            if (elevFlee) {
+              const fleeTier = Math.max(1, elevFlee.tier);
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { computeClimbFallBase: cfbFlee } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const tPerksFlee = require('../engine/titles').titlePerkModifiers(player);
+              const livePl = get().player ?? player;
+              const fullCost = fleeTier * 2;
+              const paid = Math.min(livePl.stamina, fullCost);
+              const tiersCovered = Math.floor(paid / 2);
+              const tiersShort = Math.max(0, fleeTier - tiersCovered);
+              let fleeFallDmg = 0;
+              let fleeShaveTag = '';
+              if (tiersShort > 0) {
+                fleeFallDmg = cfbFlee(livePl.hpMax, tiersShort);
+                if (tPerksFlee.climbFallHalved && fleeFallDmg > 1) {
+                  fleeFallDmg = Math.max(1, Math.floor(fleeFallDmg / 2));
+                  fleeShaveTag = ' (Skyreacher halves the fall)';
+                }
+              }
+              const newHpFlee = Math.max(0, livePl.hp - fleeFallDmg);
+              get().appendLog(
+                'world',
+                `You kick off the ${elevFlee.noun} and take the wall in one desperate line — ${fleeTier} tier${fleeTier > 1 ? 's' : ''} at double burn (-${paid} stamina).`,
+              );
+              if (tiersShort > 0) {
+                get().appendLog(
+                  'world',
+                  `${tiersCovered > 0 ? `Your arms last ${tiersCovered} tier${tiersCovered > 1 ? 's' : ''} — then` : 'Your arms are already empty —'} the last ${tiersShort} tier${tiersShort > 1 ? 's' : ''} are a fall. -${fleeFallDmg} HP${fleeShaveTag} (${newHpFlee}/${livePl.hpMax}).`,
+                );
+              } else {
+                get().appendLog('world', `You hit the ground moving. Whatever was up there keeps the height.`);
+              }
+              set((sf) => {
+                if (!sf.currentScene) return sf;
+                const preservedF = sf.currentScene.preservedSceneOnDescent;
+                const baseScene = sf.currentScene.elevatedOverlayMeta && preservedF
+                  ? { ...preservedF, preservedSceneOnDescent: undefined, elevatedOverlayMeta: undefined }
+                  : sf.currentScene;
+                return {
+                  currentScene: {
+                    ...baseScene,
+                    elevatedOn: null,
+                    enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null,
+                  },
+                  player: sf.player
+                    ? { ...sf.player, hp: newHpFlee, stamina: Math.max(0, sf.player.stamina - paid) }
+                    : sf.player,
+                };
+              });
+              void get().persist();
+              if (newHpFlee <= 0) {
+                handlePlayerDeath(get, set as Parameters<typeof handlePlayerDeath>[1]);
+              }
+              break;
+            }
             // v2.4.1 (OTA 052) — Core Guardian flee path. If a
             // Guardian is in the scene the rebuke fires + the
             // Guardian de-spawns (fully restored on next gate
@@ -14119,9 +17441,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             const investRoom = get().worldMemory.visitedRooms?.[investRoomKey];
             const investPrior = investRoom?.flavorExhaustedNouns ?? [];
-            const alreadyExamined = investPrior.some(
-              (n) => n === focusKey || focusKey.includes(n) || n.includes(focusKey),
-            );
+            // OTA-953 — word-level match (was raw bidirectional substrings, which refused
+            // "cracked terminal" after a mere "rack" was flavor-exhausted).
+            const alreadyExamined = investPrior.some((n) => nounTokensMatch(n, focusKey));
             if (alreadyExamined) {
               // OTA-084 refuseAmbient pattern — atomic log +
               // dedup mark, idempotent on the second touch.
@@ -14298,7 +17620,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // what else is on the table.
             const inCombat = currentScene.enemies.length > 0;
             const hint = inCombat
-              ? " Try 'dodge' to set a parry, 'attack' to commit, or another 'retreat' to break contact."
+              ? (get().currentScene?.elevatedOn
+                ? ' No parry up here — swing back, or try the flee again.'
+                : " Try 'dodge' to set a parry, 'attack' to commit, or another 'retreat' to break contact.")
               : ' The way out is blocked for now — try a different direction, or rest before pushing through.';
             get().appendLog(
               'world',
@@ -14427,7 +17751,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       recentNouns: collectSceneNouns(currentScene),
       enemyPresent: true,
     });
-    const weaponName = coatedWeaponNoun(player, combatParse.resolvedNoun ?? null);
+    const weaponName = coatedWeaponNoun(player, swingWeaponNoun(player, actionText, combatParse.resolvedNoun ?? null));
 
     if (initiative) {
       get().appendLog('world', initiative.success
@@ -14438,10 +17762,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Always log the player's attack roll math so the combat log mirrors
     // the enemy's "d20 → X + ATK Y = Z vs AC W" line. Without this the
     // disk log only shows enemy attack rolls, which reads as one-sided.
+    // arb-fix — resolve an agile/quick enemy's dodge BEFORE printing the
+    // outcome line. The dodge (below) fully negates a connecting hit, so if we
+    // print "✓ HIT" first and then "the blow finds nothing", the player sees a
+    // guaranteed hit that missed. Roll the dodge once, up front, and fold it
+    // into the single outcome verdict (✗ DODGED). Damage math is unchanged.
+    let enemyDodged = false;
+    if (attack?.success && typeof attack.total === 'number' && typeof attack.target === 'number') {
+      // OTA-935 — a crit or a crushing margin always lands; only a marginal hit can be
+      // twisted clear (at the reduced trait rate).
+      enemyDodged = enemyDodgesHit(enemy.traits, attack.total, attack.target, !!attack.critical);
+    }
+
     if (attack && typeof attack.total === 'number' && attack.target !== undefined) {
       const naturalRoll = attack.values?.[0] ?? attack.total - attack.bonus;
       const acTag = `vs ${enemy.name} AC ${attack.target}`;
-      const outcome = attack.critical
+      const outcome = enemyDodged
+        ? '✗ DODGED'
+        : attack.critical
         ? '✓ CRITICAL HIT'
         : naturalRoll === 1
           ? '✗ FUMBLE'
@@ -14453,12 +17791,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     if (attack?.success) {
-      // Agile / quick enemies get a save against the incoming hit. Roll
-      // against the trait's dodge chance — success completely negates
-      // damage AND the on-hit status that would have applied. Misses fall
-      // through to normal damage math.
-      const dodgeChance = traitDodgeChance(enemy.traits);
-      if (dodgeChance > 0 && Math.random() < dodgeChance) {
+      // Agile / quick enemies get a save against the incoming hit (rolled
+      // above). Success completely negates damage AND the on-hit status that
+      // would have applied. Misses fall through to normal damage math.
+      if (enemyDodged) {
         get().appendLog(
           'combat',
           `${enemy.name} reads the swing and twists clear — the blow finds nothing. (dodged, ${enemy.traits?.includes('agile') ? 'agile' : 'quick'})`,
@@ -14477,7 +17813,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
       const rawDmg = damage?.total ?? rollDie(6);
-      const barehand = isBareHandAttack(actionText);
+      // OTA-940 — robust bare-hand detection (mirrors combatRules' OTA-931/932 fix). A weapon
+      // whose NAME contains a body word ("Mud-FIST Wraps") tripped isBareHandAttack(actionText)
+      // -> barehand=true, which nulled `equipped` and SKIPPED the whole coating block below — so a
+      // coated barehanded-tag weapon dealt ZERO coating damage even though combatRules used its
+      // dice. Strip the swung weapon's name before the check, and treat a 'barehanded'-tag weapon
+      // as a real (coatable) weapon.
+      const usedOffHandForDmg = /\boff[- ]?hand\b/.test(actionText.toLowerCase());
+      const swungInstForBare = (() => {
+        const id = usedOffHandForDmg
+          ? (player.equipped?.offId ?? null)
+          : (player.equipped?.mainId ?? player.equipped?.offId ?? null);
+        return id ? (player.inventory.find((i) => i.id === id) ?? null) : null;
+      })();
+      const wieldsHandWeapon = !!swungInstForBare && canonicalItemTags(swungInstForBare).includes('barehanded');
+      const barehandText = swungInstForBare?.name
+        ? actionText.toLowerCase().split(swungInstForBare.name.toLowerCase()).join(' ')
+        : actionText;
+      const barehand = isBareHandAttack(barehandText) && !wieldsHandWeapon;
       // OTA 041 — Architectural Sentinel barehand hit-gate. The lorebook
       // says a Sentinel's stone fist only lands on an even roll of the
       // damage die (1d10 even = land, odd = whiff). Pre-OTA-041 the gate
@@ -14512,12 +17865,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // play. Without this hint, getEquippedWeapon defaults to the
       // main-hand and every off-hand swing was being scored against
       // main-hand resistances.
-      const usedOffHandForDmg = /\boff[- ]?hand\b/.test(actionText.toLowerCase());
       const equipped = barehand ? null : getEquippedWeapon(player, usedOffHandForDmg ? 'off' : 'main');
       // Bare-hand strikes are bludgeoning by default so the player can
       // exploit Aetheric Mutation / Construct / Automation bludgeoning
       // weaknesses without sacrificing their weapon's durability.
-      const weaponType = barehand ? 'bludgeoning' : (equipped?.damageType ?? null);
+      const weaponType = barehand ? 'bludgeoning' : (equipped?.damageType ?? (wieldsHandWeapon ? 'bludgeoning' : null));
       const mod = applyDamageTypeModifier(rawDmg, weaponType, enemy.type);
       // Layer per-enemy trait modifiers on top of the type-resistance map.
       // Stacks multiplicatively — an Iron Spider with "resist:slashing"
@@ -14564,38 +17916,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // also seeds an ongoing DOT (applied below, only if the enemy
       // survives the blow). The instance is resolved off the equipped
       // slot id for the hand that swung.
-      let coatingProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; rolled: number; label: string; source: string } | null = null;
+      type CoatingProc = { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold'; rolled: number; label: string; source: string };
+      let coatingProc: CoatingProc | null = null;
+      // OTA-873 — a Crucible-upgraded weapon carries a SECOND coating; both slots
+      // roll and apply on this landing hit (two procs, two DOTs).
+      let coatingProc2: CoatingProc | null = null;
       if (!barehand) {
         const coatSlotId = usedOffHandForDmg
           ? (player.equipped?.offId ?? null)
           : (player.equipped?.mainId ?? player.equipped?.offId ?? null);
         const coatInst = coatSlotId ? player.inventory.find((i) => i.id === coatSlotId) : null;
-        const coating = coatInst?.coating;
-        if (coating) {
+        // Resolve ONE coating slot into a proc (null if it fails to take against a
+        // resistant foe), reading the player's manual roll step when present. Shared
+        // by both coating slots so the two behave identically. OTA-873.
+        const resolveCoatingProc = (coating: InventoryItem['coating'], stepId: string): CoatingProc | null => {
+          if (!coating) return null;
           // engine_Dev (design call) — a coating ALWAYS takes UNLESS the enemy RESISTS
           // its damage type, in which case it gets only a small chance
           // (COATING_RESIST_LAND_CHANCE) to slip through. Weak AND neutral both always
           // land ("drop your hands and you get hit"). Keys off the resist RELATIONSHIP
           // (the same applyDamageTypeModifier + resist:/vulnerable: traits the damage
-          // math uses). Ported from engine_Dev; these lines had no coating gate before.
+          // math uses).
           const coatResists = applyDamageTypeModifier(1, coating.kind, enemy.type).match === 'resist'
             || traitDamageMultiplier(enemy.traits, coating.kind).match === 'resist';
           if (coatResists && Math.random() >= COATING_RESIST_LAND_CHANCE) {
             get().appendLog('combat', `The ${coating.label} coating fails to take on ${enemy.name}.`);
-          } else {
-          // OTA-403 — prefer the player's MANUAL coating roll (the new
-          // 'coating' RollStep) when present; fall back to an internal
-          // roll only for legacy paths that didn't stage the step.
-          const coatingStep = steps.find((s) => s.id === 'coating');
+            return null;
+          }
+          // OTA-403 — prefer the player's MANUAL coating roll (the staged RollStep)
+          // when present; fall back to an internal roll only for legacy paths.
+          const coatingStep = steps.find((s) => s.id === stepId);
           const rawRolled = coatingStep?.total != null
             ? Math.max(1, coatingStep.total)
             : Math.max(1, rollFromNotation(coating.dice));
-          // OTA-386/387 — ELEMENTAL coatings (electrical, burn) deliver their own
-          // damage-typed bonus, so the proc earns the enemy's weakness to that
-          // type — both the macro type map AND the enemy's own resist:/vulnerable:
-          // traits — even when the base weapon isn't that type. Poison/acid/
-          // corruption deal flat typeless bonus damage (their bite is the DOT).
-          const isElemental = coating.kind === 'electrical' || coating.kind === 'burn';
+          // OTA-386/387 — ELEMENTAL coatings (electrical, burn, cold) deliver their own
+          // damage-typed bonus, so the proc earns the enemy's weakness to that type —
+          // both the macro type map AND the enemy's own resist:/vulnerable: traits —
+          // even when the base weapon isn't that type. Poison/acid/corruption deal flat
+          // typeless bonus damage (their bite is the DOT).
+          const isElemental = coating.kind === 'electrical' || coating.kind === 'burn' || coating.kind === 'cold';
           const rolled = isElemental
             ? Math.max(
                 1,
@@ -14608,10 +17967,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ),
               )
             : rawRolled;
-          coatingProc = { kind: coating.kind, rolled, label: coating.label, source: coatInst!.name };
-          dmg += rolled;
-          }
-        }
+          return { kind: coating.kind, rolled, label: coating.label, source: coatInst!.name };
+        };
+        coatingProc = resolveCoatingProc(coatInst?.coating, 'coating');
+        coatingProc2 = resolveCoatingProc(coatInst?.coating2, 'coating2');
+        if (coatingProc) dmg += coatingProc.rolled;
+        if (coatingProc2) dmg += coatingProc2.rolled;
       }
       if (surgeBonus > 0) {
         get().appendLog('combat', `✦ Aetheric surge — your awakened blood detonates for +${surgeBonus} on ${enemy.name}.`);
@@ -14629,7 +17990,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const tMatch: 'weak' | 'resist' | 'normal' = combinedMod.match;
           if (Math.random() < dtProcChance(tp, tMatch)) {
             const roll = rollDie(4);
-            if (tp.mode === 'on_hit') { dmg += roll; get().appendLog('combat', `${weaponType} flares — +${roll} on hit${tMatch === 'weak' ? ' (weak — bites deep!)' : ''}.`); }
+            if (tp.mode === 'on_hit') { dmg += roll; get().appendLog('combat', `${weaponType.charAt(0).toUpperCase()}${weaponType.slice(1)} flares — +${roll} on hit${tMatch === 'weak' ? ' (weak — bites deep!)' : ''}.`); }
             else typedDot = { dmgPerTurn: roll, rounds: Math.max(1, tp.rounds ?? 2), source: weaponType };
             // The "exposed" AC shred is part of the SAME proc (mirrors Dev-engine onHit firing with the
             // combat block's apply-roll) — gated by the chance, not applied on every landing hit.
@@ -14656,6 +18017,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } else if (combinedMod.match === 'resist') {
         get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×${combinedMod.multiplier} for ${dmg})`);
       }
+      // OTA-838 — bank what that swing taught you: the panel/bestiary now reveal this
+      // enemy's observed weak/resist types (even below the Wisdom read-threshold).
+      recordEnemyIntel(get, set, enemy.name, weaponType, combinedMod.match);
       // OTA-197 — consecutive-resist nudge. Playtester swung a piercing
       // bolt-caster at a piercing-resistant Silt Serpent + Mud Lurker
       // back-to-back and lost the fight largely because they didn't
@@ -14681,6 +18045,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // slashing-resistant foe. Prefer types it's outright weak to.
               const weakTypes = new Set<string>();
               const neutralTypes = new Set<string>();
+              // OTA-959 — remember a concrete carried weapon per suggested type so the
+              // nudge can NAME it ("Swap to the Boltcaster") instead of leaving the
+              // player to grep their own pack for "something electrical".
+              const nameByType = new Map<string, string>();
               try {
                 for (const it of player.inventory) {
                   if (it.kind !== 'weapon') continue;
@@ -14691,14 +18059,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     applyDamageTypeModifier(1, w.damageType, enemy.type).match,
                     traitDamageMultiplier(enemy.traits, w.damageType).match,
                   );
-                  if (alt.match === 'weak') weakTypes.add(w.damageType);
-                  else if (alt.match === 'normal') neutralTypes.add(w.damageType);
+                  if (alt.match === 'weak') {
+                    weakTypes.add(w.damageType);
+                    if (!nameByType.has(w.damageType)) nameByType.set(w.damageType, it.name);
+                  } else if (alt.match === 'normal') {
+                    neutralTypes.add(w.damageType);
+                    if (!nameByType.has(w.damageType)) nameByType.set(w.damageType, it.name);
+                  }
                   // 'resist' → skip; never suggest a type the enemy resists.
                 }
               } catch { /* ignore — hint stays generic */ }
               const altTypes = weakTypes.size > 0 ? weakTypes : neutralTypes;
-              const hint = altTypes.size > 0
-                ? `Try something ${Array.from(altTypes).slice(0, 2).join(' or ')} — you have it in your pack.`
+              const altArr = Array.from(altTypes).slice(0, 2);
+              // OTA-959 — name the weapon when we know one; the type-only phrasing stays
+              // as the fallback for a type carried only in odd forms.
+              const namedPick = altArr.map((t) => nameByType.get(t)).find(Boolean);
+              const hint = altArr.length > 0
+                ? namedPick
+                  ? `Swap to the ${namedPick} — ${altArr.join(' or ')} will bite where ${weaponType} won't.`
+                  : `Try something ${altArr.join(' or ')} — you have it in your pack.`
                 : `Find another weapon — ${weaponType} isn't biting.`;
               get().appendLog(
                 'arbiter',
@@ -14736,10 +18115,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // in combatRules.getEquippedWeapon (with damageDice='2d20'
           // for Aetheric Shards) handles the damage roll; this block
           // handles the spent-it-now bookkeeping.
-          const equippedItem = player.inventory.find(
-            (i) => i.name.toLowerCase() === weaponInUse.toLowerCase(),
-          );
-          const isThrowable = (equippedItem?.tags ?? []).some((t) => /throwable/i.test(t));
+          // OTA-800 — resolve the equipped throwable by its equipped INSTANCE ID
+          // (mainId/offId), not by name. The old first-by-name find returned
+          // whichever same-named row sat first in the pack, so with two stacks of
+          // the same name — e.g. a COATED dart equipped alongside a plain stack —
+          // the throw consumed the WRONG instance: the coated one you're wielding
+          // never depleted (infinite coated throw), and a bandolier-racked copy
+          // could be double-spent. Fall back to name only for legacy equips with
+          // no tracked id.
+          const equippedId = usedOffHand ? player.equipped?.offId : player.equipped?.mainId;
+          const equippedItem = (equippedId
+            ? player.inventory.find((i) => i.id === equippedId)
+            : undefined)
+            ?? player.inventory.find((i) => i.name.toLowerCase() === weaponInUse.toLowerCase());
+          const isThrowable = !!equippedItem && itemIsThrowable(equippedItem);
           if (isThrowable && equippedItem) {
             set((s) => {
               if (!s.player) return s;
@@ -14822,7 +18211,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (tr.leveled) {
             get().appendLog(
               'reward',
-              `✦ The work hones you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (now ${tr.leveled.to}).`,
+              `✦ The work hones you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (${statNowClause(get().player, tr.leveled.stat, tr.leveled.to)}).`,
             );
           }
         }
@@ -14882,8 +18271,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // enemy's AC (capped), corruption also adds a stack that makes
         // its DOT tick harder. (Immediate coating damage already landed
         // above, folded into `dmg`.)
-        if (coatingProc) {
-          const proc = coatingProc;
+        // OTA-873 — apply ONE coating proc's ongoing effects. Hoisted into a local so
+        // an upgraded weapon's TWO coatings each seed their DOT / shred / stack. When
+        // BOTH slots are the same element (poison + poison), their DOTs SUM within this
+        // hit into one bigger per-kind tick; across hits the DOT still refreshes (is
+        // replaced, not accumulated), so it can't grow unboundedly. Each proc still
+        // lands its own immediate damage and its acid-shred / corruption-stack tick.
+        const dotKindsThisHit = new Set<string>();
+        const applyCoatingProc = (proc: CoatingProc) => {
           set((s) => {
             if (!s.currentScene) return s;
             const n = s.currentScene.enemies.length;
@@ -14909,10 +18304,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const dotPerTurn = coatingDotPerTurn(proc.kind, proc.rolled, stacksAfter);
             const statuses = (s.currentScene.enemyStatuses ?? []).map((arr) => [...arr]);
             while (statuses.length < n) statuses.push([]);
-            // Refresh: drop any prior coating-of-this-kind, push a fresh one.
-            const list = (statuses[activeIdx] ?? []).filter((st) => st.kind !== dotKind);
-            list.push({ kind: dotKind, turnsRemaining: COATING_DOT_TURNS, dmgPerTurn: dotPerTurn, sourceName: proc.source ?? 'coating' });
-            statuses[activeIdx] = list;
+            const prior = statuses[activeIdx] ?? [];
+            const priorSame = prior.find((st) => st.kind === dotKind);
+            if (dotKindsThisHit.has(dotKind) && priorSame) {
+              // OTA-873 — a SECOND same-element slot on THIS hit sums into the DOT the
+              // first slot just seeded (a bigger tick), refreshing its duration.
+              statuses[activeIdx] = prior.map((st) =>
+                st.kind === dotKind
+                  ? { ...st, dmgPerTurn: st.dmgPerTurn + dotPerTurn, turnsRemaining: COATING_DOT_TURNS, sourceName: proc.source ?? st.sourceName }
+                  : st,
+              );
+            } else {
+              // Refresh across hits: drop any prior coating-of-this-kind, push a fresh one.
+              const list = prior.filter((st) => st.kind !== dotKind);
+              list.push({ kind: dotKind, turnsRemaining: COATING_DOT_TURNS, dmgPerTurn: dotPerTurn, sourceName: proc.source ?? 'coating' });
+              statuses[activeIdx] = list;
+            }
+            dotKindsThisHit.add(dotKind);
             const next: typeof s.currentScene = { ...s.currentScene, enemyStatuses: statuses };
             if (corr) next.enemyCorruptionStacks = corr;
             if (shred) next.enemyArmorShred = shred;
@@ -14928,7 +18336,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `${weaponName ?? `${proc.label} weapon`} — ${proc.rolled} ${proc.kind} bites in and festers (${COATING_DOT_TURNS} turns).${extra}`,
             { combatOutcome: 'player_dmg' },
           );
-        }
+        };
+        // OTA-362 — the enemy survived the blow, so apply the coating's ONGOING
+        // effects. OTA-873 — both coating slots on an upgraded weapon apply.
+        if (coatingProc) applyCoatingProc(coatingProc);
+        if (coatingProc2) applyCoatingProc(coatingProc2);
         // engine_Dev (Combat-Parity II) — seed the typed DOT + "exposed" AC shred (reuses the acid
         // enemyArmorShred lever; capped). Only runs if the proc above staged one.
         if (typedDot || typedShred > 0) {
@@ -14953,16 +18365,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (shred) next.enemyArmorShred = shred;
             return { currentScene: next };
           });
-          if (typedDot) get().appendLog('combat', `${typedDot.source} sets in — ${typedDot.dmgPerTurn}/turn for ${typedDot.rounds} turns.`, { combatOutcome: 'player_dmg' });
+          if (typedDot) get().appendLog('combat', `${typedDot.source.charAt(0).toUpperCase()}${typedDot.source.slice(1)} sets in — ${typedDot.dmgPerTurn}/turn for ${typedDot.rounds} turn${typedDot.rounds === 1 ? '' : 's'}.`, { combatOutcome: 'player_dmg' });
           if (typedShred > 0) get().appendLog('combat', `${enemy.name} is left exposed — easier to hit.`, { combatOutcome: 'player_dmg' });
         }
         // After the player's strike, every still-living enemy that ISN'T
         // knocked out counter-attacks (runEnemyGroupCounters skips KO'd).
-        runEnemyGroupCounters(get, set, player);
+        // skipDotTick — the attack path already ticked DOTs at case-top.
+        runEnemyGroupCounters(get, set, player, { skipDotTick: true });
       }
     } else {
       get().appendLog('combat', attackMiss(weaponName, enemy.name));
-      runEnemyGroupCounters(get, set, player);
+      runEnemyGroupCounters(get, set, player, { skipDotTick: true });
     }
 
     if (shouldArbiterSpeak()) {
@@ -15103,6 +18516,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('world',
           done ? 'The Parley Ground is quiet; the alliance you brokered here holds.'
           : 'Two faction banners stand on the neutral flats of the Parley Ground, their leaders waiting. (PARLEY to hear their demands; SEAL THE ALLIANCE once you hold both relics.)');
+      } else if (ch.id === 'defense_of_the_enclave') {
+        get().appendLog('world',
+          attempt === 'succeeded' ? 'The enclave you held still stands, its walls patched where the raiders broke against them.'
+          : attempt === 'failed' ? 'The breach you failed to hold gapes cold and empty; the enclave has moved on without you.'
+          : 'Raiders mass at the Sunken Enclave\'s breached wall while the elders and their children shelter behind you. (SCOUT THE BREACH to read the fight — free — then DEFEND THE ENCLAVE for your one stand.)');
+      } else if (ch.id === 'trap_dives_of_the_stair') {
+        const banked = get().player?.titleProgress?.trapCleanDives ?? 0;
+        get().appendLog('world',
+          banked >= 3 ? 'The Endless Stair drops away trap-laced as ever — but you have already run it clean three times over.'
+          : `The Endless Stair falls into trap-laced dark, pressure-plates hidden in every landing (${banked}/3 clean dives banked). (EXAMINE THE STAIR to read the traps — free — then DIVE THE STAIR; three clean dives earn the name.)`);
       } else {
         get().appendLog('world', `A path opens here: ${ch.note}`);
       }
@@ -15283,7 +18706,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         for (let i = 0; i < def.stages.length; i++) {
           if (def.stages[i]?.checkKind === 'boss') lastBoss = i;
         }
-        return enemy.name === `${def.targetEnemyName} (hunted)` && rec.stage > lastBoss;
+        // OTA-796 — >= not >: the final boss stage now FREEZES at lastBoss
+        // (advanceHunt no longer increments past it), so the kill AT lastBoss
+        // is what completes the hunt. Mid-hunt boss stages already advanced
+        // past their index, so this still won't fire early for them.
+        return enemy.name === `${def.targetEnemyName} (hunted)` && rec.stage >= lastBoss;
       });
     if (matchingHunt && matchingHunt.def) {
       set((s) =>
@@ -15345,18 +18772,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // good rare." Roll count scales with rarity:
     //   Common    → 1-2 items
     //   Uncommon  → 2-3 items
-    //   Rare      → 2-3 items (one upgraded to next rarity if pool allows)
+    //   Rare      → 2-3 items
     //   Legendary → 3-4 items
     // Picks WITH replacement so we can roll dupes (a wagon-driver
     // dropping two patched cloths reads honest).
-    const lootPool = enemy.loot.length > 0 ? enemy.loot : ['Aether dust'];
+    // OTA-960 — an EMPTY loot list on a BOSS is intentional (its rewards are deterministic
+    // overlays: Core + signature gear, Beacon + Skyreacher piece, the stash-side
+    // Resurrection Gem) — the dust fallback was minting 3-4 junk items at the game's
+    // climax. It now only pads lazily-authored NON-boss lists, and mints the catalog's
+    // real, stackable 'Aether Dust' (the old lowercase string could never stack).
+    // OTA-1017 — THE RECLAIM (owner's calls): a Hollowed's died-in WEAPON is granted
+    // outright at the put-to-rest block below, so it sits out the chance rolls
+    // (no dupes); armor pieces stay on the rolls but grant the REAL snapshot
+    // item — pristine, fused stats intact — never a look-alike trophy.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const revMod = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+    const revFr = revMod.isRevenant(enemy) ? get().worldMemory.activeRevenant : undefined;
+    const revKit = revFr?.gear ?? [];
+    const revWeaponName = revFr
+      ? (revMod.revenantReclaimWeapon({ gear: revKit })?.name
+        ?? ((revFr.gearNames && revFr.gearNames.length > 0)
+          ? revFr.gearNames
+          : revMod.cachedFallen().find((x) => x.ts === revFr.ts)?.gearNames ?? [])[0]
+        ?? null)
+      : null;
+    const basePool = enemy.loot.length > 0 ? enemy.loot : enemy.boss ? [] : ['Aether Dust'];
+    const lootPool = revWeaponName ? basePool.filter((n) => n !== revWeaponName) : basePool;
     const lootRollCount = enemy.rarity === 'Legendary' ? 3 + Math.floor(Math.random() * 2)
       : enemy.rarity === 'Rare' ? 2 + Math.floor(Math.random() * 2)
       : enemy.rarity === 'Uncommon' ? 2 + Math.floor(Math.random() * 2)
       : 1 + Math.floor(Math.random() * 2);
     const lootDrops: string[] = [];
-    for (let i = 0; i < lootRollCount; i++) {
-      lootDrops.push(lootPool[Math.floor(Math.random() * lootPool.length)]!);
+    // OTA-961 — canonicalize each rolled name (resolveLootItem: case/alias-tolerant catalog
+    // match) so the summary line and the granted item agree on the REAL, stackable name.
+    for (let i = 0; i < lootRollCount && lootPool.length > 0; i++) {
+      const pick = lootPool[Math.floor(Math.random() * lootPool.length)]!;
+      lootDrops.push(resolveLootItem(pick, enemy.rarity).name);
     }
     // OTA-603 — occasional dog-vest drop (the vests were authored but never
     // sourced). Rarity-weighted + low-rate; the Reclaimer Pattern Vest only
@@ -15380,11 +18831,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .map(([n, q]) => (q > 1 ? `${n} ×${q}` : n))
         .join(', ');
     })();
-    get().appendLog('reward', `${enemy.name} defeated. You recover ${lootSummary}.`);
+    // OTA-960 — nothing rolled (boss with an intentionally-empty pool, before its
+    // deterministic reward lines print from their own grants) -> no empty "You recover".
+    if (lootDrops.length > 0) {
+      get().appendLog('reward', `${enemy.name} defeated. You recover ${lootSummary}.`);
+    } else {
+      get().appendLog('reward', `${enemy.name} defeated.`);
+    }
     // OTA-366 — a signature weapon (the Order's Hollow Edge) can't be taken,
-    // even off a corpse; surface why and leave it.
+    // even off a corpse; surface why and leave it. Deduped per scene (arb-fix).
     if (enemy.signatureWeapon) {
-      get().appendLog('world', enemy.signatureWeapon.reason);
+      leaveSignatureWeapon(get, set, enemy.signatureWeapon);
     }
 
     // Increment lifetime kill count and check for a milestone bump. arb119 — the
@@ -15444,7 +18901,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           hpMax: newHpMax,
           inventory: lootDrops.reduce(
             (inv, lootName, i) => {
-              const lootLookup = lookupCraftedItem(lootName);
+              // OTA-961 — resolveLootItem: catalog-canonical when known, TROPHY at the
+              // enemy's own rarity when not (never a 2-TC tagless Common again).
+              const revPiece = revKit.find((g) => g.name === lootName);
+              if (revPiece) {
+                return mergeOrPushItem(inv, revMod.reconstructFallenPiece(revPiece, `loot_${Date.now()}_${i}`));
+              }
+              const lootLookup = resolveLootItem(lootName, enemy.rarity);
               // OTA-363 — a dropped coatable weapon occasionally arrives
               // pre-coated. Coated weapons mint as a distinct instance
               // (grantItem refuses to merge them) with a full durability
@@ -15467,6 +18930,94 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       };
     });
+    // OTA-960 — KILL/KO PARITY. The kit a humanoid VISIBLY fought with (carries: weapons /
+    // armor / TC) transferred only on the KNOCKOUT loot path — killing IGNORED it, so a
+    // lethal run was strictly poorer against humans and KO was the only rational play.
+    // A kill now strips the body too, at the WORN floor: the KO path scales looted
+    // durability by the foe's remaining HP (0.15-0.85 of max — a barely-subdued foe
+    // yields the best kit); a corpse's kit took the whole fight, so it lands at that
+    // scale's floor (0.15). Mercy keeps a real edge; lethal stops being a loot tax.
+    // TC transfers only when authored — no bonus roll (the kill rolled its loot above).
+    {
+      const carries = enemy.carries ?? {};
+      const kitNames = [...(carries.weapons ?? []), ...(carries.armor ?? [])];
+      const kitTc = carries.tc ?? 0;
+      if (kitNames.length > 0 || kitTc > 0) {
+        const stamp = Date.now();
+        let kn = 0;
+        const kitGrants: InventoryItem[] = [];
+        for (const wName of carries.weapons ?? []) {
+          const w = findWeaponByName(wName) ?? inferWeapon(wName);
+          const base = w.baseDurability ?? 10;
+          kitGrants.push({
+            id: `kill_kit_${stamp}_${kn++}`,
+            name: wName,
+            kind: 'weapon',
+            rarity: w.rarity,
+            quantity: 1,
+            tags: [...(w.tags ?? []), 'loot'],
+            durability: { current: Math.max(1, Math.round(base * 0.15)), max: base },
+          });
+        }
+        for (const aName of carries.armor ?? []) {
+          const a = findArmorByName(aName) ?? inferArmor(aName);
+          const base = a?.baseDurability ?? 10;
+          kitGrants.push({
+            id: `kill_kit_${stamp}_${kn++}`,
+            name: aName,
+            kind: 'armor',
+            rarity: a?.rarity,
+            quantity: 1,
+            tags: [...(a?.tags ?? []), 'loot'],
+            durability: { current: Math.max(1, Math.round(base * 0.15)), max: base },
+          });
+        }
+        set((s2) => {
+          if (!s2.player) return s2;
+          let inv = s2.player.inventory;
+          for (const kg of kitGrants) inv = mergeOrPushItem(inv, kg);
+          return { player: { ...s2.player, inventory: inv, tc: s2.player.tc + kitTc } };
+        });
+        get().appendLog(
+          'reward',
+          `You strip the body: ${kitNames.join(', ') || 'nothing worth keeping'}${kitTc > 0 ? ` (+${kitTc} TC)` : ''}. The kit took the fight badly.`,
+        );
+      }
+    }
+
+    // OTA-963 — BOSS SPOILS (owner spec): every boss kill pays out high-end materials on
+    // top of its authored drops — never mud cloth — and a non-apex boss can add one
+    // RARE (deliberately not Legendary) weapon or armor. Core Guardians and
+    // summit/tower bosses take the materials half only: their Legendary signature
+    // gear is already the deterministic reward of their own tables. Recipes ride the
+    // OTA-718 hard-won roll below, boosted for bosses.
+    if (enemy.boss) {
+      const bossSpoils = rollBossSpoils(enemy, enemyPowerScore(enemy));
+      if (bossSpoils.length > 0) {
+        const spoilsStamp = Date.now();
+        set((s2) => {
+          if (!s2.player) return s2;
+          let inv = s2.player.inventory;
+          bossSpoils.forEach((spoilName, si) => {
+            const r = resolveLootItem(spoilName, enemy.rarity);
+            inv = mergeOrPushItem(inv, {
+              id: `boss_spoils_${spoilsStamp}_${si}`,
+              name: r.name,
+              kind: r.kind,
+              rarity: r.rarity,
+              quantity: 1,
+              tags: [...r.tags, 'loot'],
+              ...(r.baseDurability && (r.kind === 'weapon' || r.kind === 'armor')
+                ? { durability: { current: r.baseDurability, max: r.baseDurability } }
+                : {}),
+            });
+          });
+          return { player: { ...s2.player, inventory: inv } };
+        });
+        get().appendLog('reward', `✦ Boss spoils: ${bossSpoils.join(', ')}.`);
+      }
+    }
+
     // OTA-716 — hard-won spoils. A long/tough fight occasionally coughs up a
     // GOOD material ON TOP of the normal loot (never instead of it) — a
     // Fallout-4-ish sprinkle that rewards the grind without touching the
@@ -15474,13 +19025,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     {
       const combatBonus = maybeCombatBonus(enemy);
       if (combatBonus) {
-        const look = lookupCraftedItem(combatBonus.name);
+        // OTA-961 — same canonical/trophy resolution as the kill path.
+        const look = resolveLootItem(combatBonus.name, enemy.rarity);
         set((s) => (s.player ? {
           player: {
             ...s.player,
             inventory: mergeOrPushItem(s.player.inventory, {
               id: `bonus_${Date.now()}`,
-              name: combatBonus.name,
+              name: look.name,
               kind: look.kind,
               rarity: look.rarity,
               quantity: 1,
@@ -15496,7 +19048,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const { isHardWonFight } = require('../engine/bonusDrops') as typeof import('../engine/bonusDrops');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const rd = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
-      if (isHardWonFight(enemy) && Math.random() < rd.HARD_WON_RECIPE_CHANCE) {
+      // OTA-963 — bosses are the recipe-bearers (owner spec: "some good recipes"): a boss
+      // kill triples the hard-won recipe chance, capped at 60%.
+      const recipeChance = enemy.boss
+        ? Math.min(0.6, rd.HARD_WON_RECIPE_CHANCE * 3)
+        : rd.HARD_WON_RECIPE_CHANCE;
+      if (isHardWonFight(enemy) && Math.random() < recipeChance) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { RECIPES } = require('../engine/crafting') as typeof import('../engine/crafting');
         const learned = rd.pickRecipeToLearn(RECIPES, get().player?.knownRecipes);
@@ -15515,11 +19072,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (isMechanical) recordTitleProgress(get, set, { sentinelsDefeated: 1 });
     }
     if (stillFighting) {
-      const next = remainingEnemies[nextActiveIdx]!;
-      get().appendLog(
-        'combat',
-        `${remainingEnemies.length} attacker${remainingEnemies.length > 1 ? 's' : ''} remain${remainingEnemies.length === 1 ? 's' : ''}. ${next.name} now in your sights.`,
-      );
+      // arb-fix (narration audit) — during a DOT / AoE sweep, resolveEnemyDefeat runs once
+      // per corpse and remainingEnemies still holds the not-yet-resolved dead, so this line
+      // used to fire for each corpse ("2 attackers remain. Mud Wasp now in your sights." ×3)
+      // — spam AND factually wrong (those are bodies being looted this same beat). Only
+      // announce when a LIVE enemy (hp > 0) actually remains, and count / name the living.
+      const liveRemaining = remainingEnemies.filter((_, i) => (remainingHps[i] ?? 0) > 0);
+      if (liveRemaining.length > 0) {
+        const next = liveRemaining[0]!;
+        get().appendLog(
+          'combat',
+          `${liveRemaining.length} attacker${liveRemaining.length > 1 ? 's' : ''} remain${liveRemaining.length === 1 ? 's' : ''}. ${next.name} now in your sights.`,
+        );
+      }
     }
     if (hitMilestone) {
       get().appendLog(
@@ -15553,6 +19118,151 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // worldMemory.chainMemos, start the 3-step Arbiter onboarding.
     if (enemy.factionNeutralFight) {
       completeRescueScenario(get, set);
+    }
+
+    // OTA-849 [living world] — killing a FACTION combatant (a raider, a patrol)
+    // has two-way consequences: their people mark you (−3 standing with that
+    // faction), and their strongest rival takes note in your favor (+1). Choosing
+    // a side is a real allegiance, not a free-for-all. Gated on a real factionId
+    // and NOT a neutral/rescue fight.
+    // arb-fix — a kill angers the victim's faction(s) and pleases each one's
+    // strongest rival. enemy.factionId is the HOST faction for an outpost anchor
+    // vendor (you broke their peace by fighting in their outpost); when
+    // enemy.nativeFactionId differs, that's the victim's OWN faction (a hosted
+    // guest, e.g. Irma the True Tartarian) — angered too for the harm to their
+    // member. Deltas accumulate so a faction that is both offended AND another
+    // victim's rival nets out sensibly.
+    const killFactionTargets = [enemy.factionId, enemy.nativeFactionId]
+      .filter((f): f is string => !!f)
+      .filter((f, i, arr) => arr.indexOf(f) === i);
+    if (killFactionTargets.length > 0 && !enemy.factionNeutralFight) {
+      const killer = get().player;
+      if (killer) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const facData = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { strongestRivalOf } = require('../engine/worldPulse') as typeof import('../engine/worldPulse');
+        // Honor the design pick "down with them, up with rivals" — NOT the ally
+        // cascade applyRepChange() bakes in — with a local clamped update. Only
+        // touch/report factions the player already tracks.
+        const KILL_REP = -3, RIVAL_REP = 1;
+        const deltaById = new Map<string, number>();
+        for (const fid of killFactionTargets) {
+          deltaById.set(fid, (deltaById.get(fid) ?? 0) + KILL_REP);
+          const rivalId = strongestRivalOf(facData, fid, killer.factionStanding);
+          if (rivalId) deltaById.set(rivalId, (deltaById.get(rivalId) ?? 0) + RIVAL_REP);
+        }
+        const changed: { factionId: string; delta: number; newStanding: number }[] = [];
+        const nextStanding = killer.factionStanding.map((row) => {
+          const raw = deltaById.get(row.factionId) ?? 0;
+          if (raw === 0) return row;
+          const ns = Math.max(-100, Math.min(100, row.standing + raw));
+          const realDelta = ns - row.standing;
+          if (realDelta !== 0) changed.push({ factionId: row.factionId, delta: realDelta, newStanding: ns });
+          return { ...row, standing: ns };
+        });
+        if (changed.length > 0) {
+          set((s) => (s.player ? { player: { ...s.player, factionStanding: nextStanding } } : s));
+          logRepChanges(get, changed);
+        }
+      }
+    }
+
+    // OTA-914 — destroying an Aetherkin (the mud-mummified flood-dead) angers the
+    // factions that hold them sacred. They carry no factionId in data, so the
+    // faction-kill block above never touches them; this is their own reverence
+    // penalty, applied only to revering factions the player already tracks.
+    // OTA-998 — THE HOLLOWED put to rest. Deliberately NOT isAetherkin (no
+    // 'aetherkin' in name or traits, on purpose) so the reverence penalty
+    // below never fires — every faction understands the mercy.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const rev998 = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+      if (rev998.isRevenant(enemy)) {
+        const fr = get().worldMemory.activeRevenant;
+        if (fr) {
+          const closing = rev998.revenantDefeatLines(fr, get().player?.name ?? 'a wanderer');
+          get().appendLog('world', closing.world);
+          get().appendLog('reward', closing.reward);
+          // OTA-1017 — the GUARANTEED reclaim (owner's call): a one-time boss must
+          // not lose the signature piece to a dice roll that can never rerun.
+          {
+            const wp = rev998.revenantReclaimWeapon(fr);
+            if (wp) {
+              const back = rev998.reconstructFallenPiece(wp, `reclaim_${Date.now()}`);
+              set((s2) => (s2.player ? { player: { ...s2.player, inventory: mergeOrPushItem(s2.player.inventory, back) } } : s2));
+              get().appendLog('reward', `✦ ${back.name} comes free of the mud — carried to the end, and yours now to carry on.`);
+            } else {
+              const pinnedNames = (fr.gearNames && fr.gearNames.length > 0)
+                ? fr.gearNames
+                : rev998.cachedFallen().find((x) => x.ts === fr.ts)?.gearNames ?? [];
+              const wname = pinnedNames[0];
+              if (wname) {
+                const lk = resolveLootItem(wname, 'Legendary');
+                set((s2) => (s2.player ? { player: { ...s2.player, inventory: mergeOrPushItem(s2.player.inventory, {
+                  id: `reclaim_${Date.now()}`, name: lk.name, kind: lk.kind, rarity: lk.rarity, quantity: 1, tags: [...lk.tags, 'loot'],
+                }) } } : s2));
+                get().appendLog('reward', `✦ ${lk.name} comes free of the mud — carried to the end, and yours now to carry on.`);
+              }
+            }
+          }
+          rev998.markAvenged(fr.ts, get().player?.name ?? 'a wanderer');
+          set((s2) => ({ worldMemory: { ...s2.worldMemory, activeRevenant: undefined } }));
+          get().appendLog('debug', `revenant: ${fr.name}@${fr.ts} put to rest`);
+        }
+      }
+    }
+    // OTA-1014 — putting a revenant to rest is a mercy, never a hunt. Guarded by
+    // the fallen_revenant TRAIT (isRevenant), not by name-matching, so a
+    // character literally named "Aetherkin" is not punished for avenging
+    // themselves when their own Hollowed rises.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const revExempt = (require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants')).isRevenant(enemy);
+    if (!revExempt && isAetherkin(enemy)) {
+      const revChanged = applyAetherkinReverenceDelta(get, set, AETHERKIN_KILL_REP);
+      if (revChanged.length > 0) {
+        logRepChanges(get, revChanged);
+        get().appendLog('system', 'Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.');
+      }
+    }
+
+    // OTA-850/859 [faction bounty] — a kill of a quarry ticks progress on EVERY active
+    // bounty whose target it matches (grind several at once). Each bounty that completes
+    // pays out (TC + standing with its giver) and drops off the slate; the rest carry on.
+    {
+      const slate = activeBountiesOf(get().player);
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { killCountsForBounty } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
+      if (slate.some((b) => killCountsForBounty(b, enemy.factionId))) {
+        const remaining: import('../engine/factionBounty').FactionBounty[] = [];
+        const completed: import('../engine/factionBounty').FactionBounty[] = [];
+        for (const b of slate) {
+          if (!killCountsForBounty(b, enemy.factionId)) { remaining.push(b); continue; }
+          const progress = b.progress + 1;
+          if (progress < b.count) {
+            remaining.push({ ...b, progress });
+            get().appendLog('world', `Bounty: ${progress}/${b.count} ${b.targetName} put down for the ${b.giverName}.`);
+          } else {
+            completed.push({ ...b, progress });
+          }
+        }
+        // Apply the surviving slate first (single kill only ever advances each bounty once).
+        set((s) => (s.player ? { player: { ...s.player, activeBounties: remaining, activeBounty: undefined } } : s));
+        // Then settle every completed contract's payout in turn.
+        for (const b of completed) {
+          const payer = get().player;
+          if (!payer) break;
+          const rep = applyRepChange(payer.factionStanding, b.giverFactionId, b.rewardRep);
+          set((s) => (s.player ? { player: {
+            ...s.player,
+            tc: (s.player.tc ?? 0) + b.rewardTc,
+            factionStanding: rep.standing,
+          } } : s));
+          logRepChanges(get, rep.changed);
+          get().announceMissionComplete('Bounty', `${b.giverName} bounty`, `✦ Bounty complete — the ${b.giverName} pay out ${b.rewardTc} TC.`);
+          get().appendLog('arbiter', `"The ${b.giverName} will hear of this," the Arbiter says. "You've done what they could not."`);
+        }
+      }
     }
 
     // First-kill and rare-kill milestones are noted in the memorable-event
@@ -15590,7 +19300,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const r = newly[0]!;
       get().appendLog(
         'arbiter',
-        `The Arbiter eyes your new pieces. "You could make a ${r.result} now, if you wanted."`,
+        `The Arbiter eyes your new pieces. "You could make ${withArticle(r.result)} now, if you wanted."`,
       );
     }
 
@@ -15692,6 +19402,59 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
+    // OTA-912 — summit-boss defeat. The tower's master guardian falls: grant the
+    // Aether Collection Beacon + this climb's Skyreacher piece (once), bank the
+    // crest (drives the Skyreacher title), and once all five towers are done,
+    // (the Beacon Rifle itself is built later, by USING a beacon — OTA-913).
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const gc912 = require('../engine/greatClimbs');
+      const summitClimbId: string | null = gc912.summitClimbIdFromEnemy(enemy);
+      if (summitClimbId) {
+        const climb = gc912.greatClimbById(summitClimbId);
+        const bossDef = gc912.summitBossFor(summitClimbId);
+        const wm912 = get().worldMemory;
+        const alreadyDown = (wm912.summitBossesDefeated ?? []).includes(summitClimbId);
+        if (climb && !alreadyDown) {
+          const nextDefeated = [...(wm912.summitBossesDefeated ?? []), summitClimbId];
+          const nextCrested = Array.from(new Set([...(wm912.greatClimbsCrested ?? []), summitClimbId]));
+          set((s) => ({ worldMemory: { ...s.worldMemory, summitBossesDefeated: nextDefeated, greatClimbsCrested: nextCrested } }));
+          if (bossDef) get().appendLog('arbiter', bossDef.defeatLine);
+          // (1) guaranteed Aether Collection Beacon
+          const beacon: InventoryItem = {
+            id: freshInstanceId('beacon'), name: 'Aether Collection Beacon', kind: 'misc',
+            rarity: 'Legendary', quantity: 1, tags: ['beacon', 'skyreacher', 'quest', 'collect_only'],
+          };
+          // (2) guaranteed Skyreacher armor piece for this climb
+          const pieceName: string = climb.rewardArmor;
+          const pieceLookup = lookupCraftedItem(pieceName);
+          const armorPiece: InventoryItem = stampDurability({
+            id: freshInstanceId('skyreacher'), name: pieceName, kind: pieceLookup.kind, rarity: 'Legendary',
+            quantity: 1, tags: Array.from(new Set([...pieceLookup.tags, 'climb_top', 'skyreacher', 'collect_only', 'legendary'])),
+          });
+          set((s) => (s.player ? { player: { ...s.player, inventory: mergeOrPushItem(mergeOrPushItem(s.player.inventory, beacon), armorPiece) } } : s));
+          get().appendLog('reward', `✦ Aether Collection Beacon — prised from the still-humming heart of the collector tower. (${nextDefeated.length} of 5)`);
+          get().appendLog('reward', `✦ ${pieceName} (Legendary) — ${climb.summitFlavor}`);
+          recordTitleProgress(get, set, undefined, { greatClimbsCompleted: nextCrested.length });
+          if (nextCrested.length < 5) {
+            get().appendLog('world', `That's ${nextCrested.length} of the 5 Skyreacher pieces. Top all five great climbs and the Arbiter will have a name for you — and the beacons will have somewhere to go.`);
+          }
+          // (3) OTA-913 — all five towers cleared: the Arbiter SUGGESTS the play.
+          // The beacons were never weapons — they were built to COLLECT Aether,
+          // to pull charge out of empty air and send it down the grid. Broken
+          // down, their arrays make a rifle that does the same and throws it. The
+          // player triggers the build by USING a beacon from the pack (see
+          // assembleBeaconRifle); it is NOT auto-assembled here.
+          if (nextDefeated.length >= 5 && !get().worldMemory.skyreacherBoltcasterGranted) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter turns one of the beacons over in the light. "Five of them now — and not one was ever meant to fight. They were built to COLLECT, ${player.name}: to pull Aether out of the empty air and send it on down the grid. Break them down. Their arrays would make a rifle that grabs the charge from nothing and throws it. Use one from your pack when you're ready to build it."`,
+            );
+          }
+        }
+      }
+    }
+
     // OTA 454 — Resurrection Gem drop sources:
     //  • boss kill → guaranteed (existing)
     //  • every 50th non-boss kill → pity timer (so any long campaign
@@ -15712,6 +19475,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // would flood the stash and drain death of stakes (the same concern that
     // raised the pity interval 50→100). On a repeat boss the guarantee lapses
     // and the kill falls back to the rare organic roll like any other.
+    // OTA-801 — a felled boss opens a short grace window: arrival encounters are
+    // suppressed (in beginScene) until it lapses, so stepping out of the outpost
+    // you just cleared doesn't drop a fresh ambush on you mid-loot. Every boss
+    // kill (including a re-fight) re-arms it.
+    if (enemy.boss) {
+      const nowH = get().player?.hoursElapsed ?? 0;
+      set((s) => (s.player
+        ? { player: { ...s.player, bossDefeatGraceUntilHours: nowH + POST_BOSS_GRACE_HOURS } }
+        : s));
+    }
     const bossGemKey = enemy.boss ? (enemy.name ?? 'boss') : null;
     const bossAlreadyPaid = bossGemKey != null
       && (get().worldMemory.gemBossDefeatedKeys ?? []).includes(bossGemKey);
@@ -15804,18 +19577,43 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // The enemy's drop list comes over in FULL (not the partial kill
     // roll) — you're picking the body clean.
+    // OTA-1017 — a knocked-out Hollowed picked clean gives back the REAL died-in
+    // kit too, and the stripping COUNTS as put to rest — otherwise the same
+    // pristine kit could be farmed off every re-rise.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const koRev = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+    const koKit = koRev.isRevenant(enemy) ? (get().worldMemory.activeRevenant?.gear ?? []) : [];
+    if (koRev.isRevenant(enemy)) {
+      const koFr = get().worldMemory.activeRevenant;
+      if (koFr) {
+        koRev.markAvenged(koFr.ts, get().player?.name ?? 'a wanderer');
+        set((s2) => ({ worldMemory: { ...s2.worldMemory, activeRevenant: undefined } }));
+        get().appendLog('world', `Stripped and still, the mud lets ${koFr.name} go. They rest now.`);
+      }
+    }
     for (const lootName of enemy.loot ?? []) {
-      const lk = lookupCraftedItem(lootName);
+      const koPiece = koKit.find((g) => g.name === lootName);
+      if (koPiece) { grants.push(koRev.reconstructFallenPiece(koPiece, `ko_${stamp}_${n++}`)); continue; }
+      // OTA-961 — same canonical/trophy resolution as the kill path.
+      const lk = resolveLootItem(lootName, enemy.rarity);
       grants.push({
         id: `ko_${stamp}_${n++}`,
-        name: lootName,
+        name: lk.name,
         kind: lk.kind,
         rarity: lk.rarity,
         quantity: 1,
         tags: [...lk.tags, 'loot'],
       });
     }
-    const tcGained = carries.tc ?? (rollDie(6) + 2);
+    // OTA-967 — MERCY PREMIUM (v2-audit knob 3). After kill/KO parity, a kill collects the
+    // kit AND its rolled loot, leaving knockout strictly cash-dominated. A live capture
+    // now adds a rarity-scaled bounty on top of the carried purse — the pockets come
+    // easier when nobody bled on them: 2d6 x tier (Common x1 ... Legendary x4).
+    const mercyRank = enemy.rarity === 'Legendary' ? 4
+      : enemy.rarity === 'Rare' ? 3
+      : enemy.rarity === 'Uncommon' ? 2
+      : 1;
+    const tcGained = (carries.tc ?? (rollDie(6) + 2)) + (rollDie(6) + rollDie(6)) * mercyRank;
     // Splice the looted enemy out of the scene — keep every index-parallel
     // per-enemy array aligned (hps / KO / status DOTs / acid shred /
     // corruption stacks / ambush flags).
@@ -15858,9 +19656,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `You strip the unconscious ${enemy.name} — ${summary || 'nothing of worth'}${tcGained > 0 ? `, +${tcGained} TC` : ''}. The gear's seen better days (worn from the fight).`,
     );
     // OTA-366 — a signature weapon (the Order's Hollow Edge) is never
-    // lootable; surface the reason and leave it on the body.
+    // lootable; surface the reason and leave it on the body. Deduped per scene (arb-fix).
     if (enemy.signatureWeapon) {
-      get().appendLog('world', enemy.signatureWeapon.reason);
+      leaveSignatureWeapon(get, set, enemy.signatureWeapon);
     }
     if (stillFighting) {
       const next = remainingEnemies[nextActiveIdx]!;
@@ -15873,7 +19671,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     const scene = state.currentScene;
     const player = state.player;
-    if (!scene?.vendor || !player) return;
+    if (!player) return;
+    // OTA-840 [never-fail-silently] — a buy fired with no vendor present (queued action,
+    // stale/dismissed vendor screen) used to no-op in silence. Say so.
+    if (!scene?.vendor) { get().appendLog('system', "There's no one here to trade with."); return; }
     // arb166 — no trading mid-fight (defense-in-depth behind the hidden vendor
     // banner: the 'buy from X' text command still parses during combat).
     if (scene.enemies.length > 0) {
@@ -15917,14 +19718,43 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     const offer = scene.vendor.offers.find((o) => o.itemName.toLowerCase() === itemName.toLowerCase());
-    if (!offer) return;
+    // OTA-840 [never-fail-silently] — asking for an item the vendor doesn't stock
+    // (stale row, sold-out, an LLM-rephrased buy) was the one silent exit here.
+    if (!offer) { get().appendLog('system', `${scene.vendor.name} doesn't carry any ${itemName}.`); return; }
     // OTA 039 — corruption-tier price markup. Corrupted players pay
     // +15%, Hollowed +30%; vendors notice the aether on you.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { corruptionTierOf, corruptionPriceMultiplier } = require('../engine/corruption');
     const tier = corruptionTierOf(player.corruption ?? 0);
     const mult = corruptionPriceMultiplier(tier);
-    const effectivePrice = Math.ceil(offer.price * mult);
+    // OTA-805 — Charisma-scaled faction DISCOUNT, gated by rapport. Once you've done
+    // this faction's rapport quest, its vendors knock up to 20% off (2%/CHA above
+    // 10). Multiplies in beside the corruption markup, same as any per-context price
+    // modifier. 0 for a neutral vendor or a faction you haven't earned.
+    const buyDiscount = vendorPriceMod(
+      effectiveStats(player).charisma,
+      player.completedFactionQuestIds,
+      scene.vendor.faction,
+    );
+    // OTA-849 [tides get teeth] — the vendor's faction fortunes move prices. An
+    // ascendant faction's traders charge a confidence premium; a waning faction's
+    // discount to move goods before they lose the ground to hold them. ±20% at the
+    // tide extremes, multiplied in beside the corruption markup + CHA discount.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { tideVendorPriceMult } = require('../engine/worldPulse') as typeof import('../engine/worldPulse');
+    const vendorTideMult = scene.vendor.faction
+      ? tideVendorPriceMult(get().worldMemory.factionTides?.[scene.vendor.faction])
+      : 1;
+    // OTA-865 [war micro-economy] — contested ground marks prices up: soldiers are buying.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const WEbuy = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const VP = require('../engine/vendorPricing') as typeof import('../engine/vendorPricing');
+    const buyCell = canonicalCellOf(player.currentLocationId);
+    const buyHeat = WEbuy.localWarHeat(get().worldMemory.patrols ?? [], buyCell.x, buyCell.y);
+    const { buyMult: warBuyMult } = VP.warPriceFactor(buyHeat);
+    const priceParts = { corruptionMult: mult, buyDiscount, tideMult: vendorTideMult, warBuyMult };
+    const effectivePrice = VP.finalBuyPrice(offer.price, priceParts);
     if (player.tc < effectivePrice) {
       get().appendLog(
         'system',
@@ -15992,12 +19822,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       tags,
     });
 
-    // Small reputation boost with the vendor's faction for honest custom.
-    const vendorFaction = scene.vendor.faction;
-    const repResult = vendorFaction
-      ? applyRepChange(player.factionStanding, vendorFaction, 1)
-      : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
-
     // Check cap BEFORE charging TC. If the player can't carry it, refuse
     // the sale instead of taking their coin for nothing.
     const dryRun = grantItem(player.inventory, newItem);
@@ -16015,6 +19839,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const boughtCount = Math.max(1, dryRun.accepted);
     const totalCost = effectivePrice * boughtCount;
     const remainingStock = available - boughtCount;
+
+    // OTA-804 — buying builds faction standing, but only as a SLOW GRIND / after-
+    // thought (per the user). Was a flat +1 per purchase — so buying anything, even
+    // a 2 TC junk item, farmed standing and let you shop your way to a faction.
+    // Now standing accrues by TC of HONEST CUSTOM: a hidden pool banks the coin you
+    // spend and grants +1 standing per BUY_REP_TC_PER_STANDING TC, carrying the
+    // remainder across purchases (buyRepProgress, persisted). Real business slowly
+    // earns a little regard; cheap-junk spam can't grind it (a 2 TC buy adds 2 to
+    // the pool). The intended paths — mission completions + sigil turn-ins — still
+    // dwarf it (joining needs 20 standing ≈ 10,000 TC spent this way). The pool is
+    // faction-agnostic; it banks into whoever you're buying from when it crosses,
+    // a benign cross-faction bleed for an afterthought lever.
+    const BUY_REP_TC_PER_STANDING = 500;
+    const vendorFaction = scene.vendor.faction;
+    const buyRepPool = (player.buyRepProgress ?? 0) + totalCost;
+    const buyRepGranted = Math.floor(buyRepPool / BUY_REP_TC_PER_STANDING);
+    const nextBuyRepProgress = buyRepPool - buyRepGranted * BUY_REP_TC_PER_STANDING;
+    const repResult = (vendorFaction && buyRepGranted > 0)
+      ? applyRepChange(player.factionStanding, vendorFaction, buyRepGranted)
+      : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
     set((s) => {
       if (!s.player || !s.currentScene?.vendor) return s;
       // OTA 036 — filter by (itemName, price) instead of reference
@@ -16035,11 +19879,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           tc: s.player.tc - totalCost,
           inventory: dryRun.inventory,
           factionStanding: repResult.standing,
+          buyRepProgress: nextBuyRepProgress,
         },
         currentScene: {
           ...s.currentScene,
           vendor: { ...s.currentScene.vendor, offers: newOffers },
         },
+        // OTA-912 — a Skyreacher Chart sells ONCE, ever. Stamp it into the
+        // persistent ledger so no other roadside stall can ever offer it again.
+        ...(SKYREACHER_CHART_NAMES.has(offer.itemName)
+          ? { worldMemory: { ...s.worldMemory, soldMapIds: Array.from(new Set([...(s.worldMemory.soldMapIds ?? []), offer.itemName])) } }
+          : {}),
       };
     });
     const markupNote = mult > 1 ? ` (${offer.price} base + ${Math.round((mult - 1) * 100)}% corruption)` : '';
@@ -16048,6 +19898,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `Bought ${countNote}${offer.itemName} from ${scene.vendor.name} for ${totalCost} TC${markupNote}. (${player.tc - totalCost} TC left)`,
     );
+    // OTA-865 — the "friend's price" line: what your CHA/rapport shaved off vs. a stranger's
+    // price here (heat/tide/corruption are NOT counted — this is purely YOUR skill's doing,
+    // so it reads as a win even in a marked-up war market). Only shown when it saved coin.
+    {
+      const strangerUnit = VP.strangerBuyPrice(offer.price, priceParts);
+      const saved = (strangerUnit - effectivePrice) * boughtCount;
+      if (saved > 0) {
+        get().appendLog('reward', `They don't charge a friend full price — ${saved} TC stayed in your pouch.`);
+      }
+    }
     logRepChanges(get, repResult.changed);
     // OTA 059 — successful BUY trains CHA. You read the room well
     // enough to close the deal at the price they offered. The
@@ -16061,7 +19921,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (tr.leveled) {
           get().appendLog(
             'reward',
-            `✦ You read them well. +1 CHA (now ${tr.leveled.to}).`,
+            `✦ You read them well. +1 CHA (${statNowClause(get().player, 'charisma', tr.leveled.to)}).`,
           );
         }
       }
@@ -16076,7 +19936,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     const scene = state.currentScene;
     const player = state.player;
-    if (!scene?.vendor || !player) return;
+    if (!player) return;
+    // OTA-840 [never-fail-silently] — a sell with no vendor present used to no-op silently.
+    if (!scene?.vendor) { get().appendLog('system', "There's no one here to trade with."); return; }
     // arb166 — no trading mid-fight (see buyFromVendor).
     if (scene.enemies.length > 0) {
       get().appendLog('system', "Not while you're in a fight — deal with the threat first.");
@@ -16126,14 +19988,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    const basePrice = sellPriceFor(item, scene.vendor);
+    // OTA-805 — CHA-scaled rapport BONUS on the sell-back, once you've earned
+    // dealing with this faction (mirror of the buy discount).
+    const sellRapportBonus = vendorPriceMod(
+      effectiveStats(player).charisma,
+      player.completedFactionQuestIds,
+      scene.vendor.faction,
+    );
+    // OTA-865 [war micro-economy] — in a contested area the trader pays a little more:
+    // they can turn your goods over to soldiers who need them. Bounded (+8% at full heat),
+    // and well under the buy/sell spread so it never opens a buy-here-sell-there arbitrage.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const WEsell = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const VPsell = require('../engine/vendorPricing') as typeof import('../engine/vendorPricing');
+    const sellCell = canonicalCellOf(player.currentLocationId);
+    const sellHeat = WEsell.localWarHeat(get().worldMemory.patrols ?? [], sellCell.x, sellCell.y);
+    const { sellMult: warSellMult } = VPsell.warPriceFactor(sellHeat);
+    const basePrice = Math.round(sellPriceFor(item, scene.vendor, sellRapportBonus) * warSellMult);
     // arb45 — Relic Trader perk: sharper coin when bartering relics.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const tPerksSell = require('../engine/titles').titlePerkModifiers(player);
-    const isRelicTrade = item.kind === 'relic';
-    const price = (isRelicTrade && tPerksSell.tradeBonus > 0)
+    const isRelicTrade = canonicalItemKind(item) === 'relic';
+    const multiplied = (isRelicTrade && tPerksSell.tradeBonus > 0)
       ? Math.round(basePrice * (1 + 0.05 * tPerksSell.tradeBonus))
       : basePrice;
+    // OTA-916 — re-clamp to the arbitrage floor as the LAST operation, so the
+    // war-heat + relic-title multipliers (like rapport) can lift the price toward
+    // but never above the cheapest-buy cap. Without this a rapport'd, war-heated
+    // relic stall paid ABOVE the floor on unstocked items — a buy-cheap-sell-here loop.
+    const price = applySellCaps(item, multiplied);
     if (price <= 0) {
       get().appendLog('system', `${scene.vendor.name} won't pay for ${item.name} — no resale value.`);
       return;
@@ -16170,7 +20054,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (tr.leveled) {
           get().appendLog(
             'reward',
-            `✦ You named your price and held it. +1 CHA (now ${tr.leveled.to}).`,
+            `✦ You named your price and held it. +1 CHA (${statNowClause(get().player, 'charisma', tr.leveled.to)}).`,
           );
         }
       }
@@ -16179,76 +20063,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-
-  giftToVendor(itemName) {
-    const state = get();
-    const scene = state.currentScene;
-    const player = state.player;
-    if (!scene?.vendor || !player) return;
-
-    const itemIdx = player.inventory.findIndex(
-      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
-    );
-    if (itemIdx < 0) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "You do not carry any ${itemName}."`);
-      return;
-    }
-    const item = player.inventory[itemIdx]!;
-
-    // OTA 461 — quest-tag refusal. The drop, sell, and scrap paths
-    // already block quest-tagged items (Cores, etc.); gift was the
-    // remaining leak. Without this, a player could gift a Tartarian
-    // Core to a vendor and lose it permanently, soft-locking the
-    // main quest.
-    if ((item.tags ?? []).includes('quest')) {
-      get().appendLog(
-        'arbiter',
-        `The Arbiter puts a hand on your wrist. "Not the ${item.name}. The main quest hangs on that piece — it stays with you."`,
-      );
-      return;
-    }
-
-    // Decrement quantity (remove row at 0).
-    const newInventory = player.inventory
-      .map((it, i) =>
-        i === itemIdx ? { ...it, quantity: it.quantity - 1 } : it,
-      )
-      .filter((it) => it.quantity > 0);
-
-    const vendorFaction = scene.vendor.faction;
-    const repResult = vendorFaction
-      ? applyRepChange(player.factionStanding, vendorFaction, 5)
-      : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
-
-    set((s) =>
-      s.player
-        ? {
-            player: { ...s.player, inventory: newInventory, factionStanding: repResult.standing },
-          }
-        : s,
-    );
-    get().appendLog(
-      'reward',
-      `You gift ${item.name} to ${scene.vendor.name}. They acknowledge it with a slow nod.`,
-    );
-    logRepChanges(get, repResult.changed);
-    // OTA 059 — gifting is pure social work; trains CHA reliably.
-    {
-      const liveGifter = get().player;
-      if (liveGifter) {
-        const tr = trainStat(liveGifter, 'charisma', true);
-        set((s) => (s.player ? { player: tr.player } : s));
-        if (tr.leveled) {
-          get().appendLog(
-            'reward',
-            `✦ Generosity carries weight. +1 CHA (now ${tr.leveled.to}).`,
-          );
-        }
-      }
-      // OTA-057 — gifting is an active CHA push; no WIS train here.
-    }
-    void get().persist();
-  },
 
   stealFromVendor(itemName) {
     const state = get();
@@ -16298,7 +20112,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const prevAttempts = Math.max(scene.vendor.stealAttempts ?? 0, decayedStealHeat);
     const dc = baseDc + prevAttempts * 2;
     // Use effectiveStats so buffs / equipment / weather count.
-    const stats = effectiveStats(player, weatherStatModifiers(scene.weather));
+    const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerArmorResistKinds(player)));
     const roll = rollDie(20);
     const total = roll + stats.stealth; // OTA-348 — vendor theft rolls Stealth
     const success = total >= dc;
@@ -16311,7 +20125,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // playtester: "instead of being all in red... just says in
     // green you have successfully stolen and then the item name".
     if (!success) {
-      get().appendLog('combat', `Steal ${offer.itemName} — d20 ${roll} + DEX ${stats.dexterity} = ${total} vs DC ${dc} — ✗ CAUGHT`);
+      get().appendLog('combat', `Steal ${offer.itemName} — d20 ${roll} + STE ${stats.stealth} = ${total} vs DC ${dc} — ✗ CAUGHT`);
     }
 
     if (success) {
@@ -16391,19 +20205,49 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (tr.leveled) {
           get().appendLog(
             'reward',
-            `✦ Light hands. +1 STE (now ${tr.leveled.to}).`,
+            `✦ Light hands. +1 STE (${statNowClause(get().player, 'stealth', tr.leveled.to)}).`,
           );
         }
       }
+    } else if ((stats.stealth ?? 0) >= STEALTH_QUIET_FAIL_STE) {
+      // OTA-847 (STEALTH SYSTEM) — STE-gated QUIET FAIL. A practiced thief
+      // (Stealth ≥ STEALTH_QUIET_FAIL_STE) who blows the roll doesn't get
+      // caught red-handed — they feel the mark's attention turn and withdraw a
+      // beat before it lands on them. No item, no fight, no rep loss. The
+      // steal-heat bump above still applies, so serial fumbling still climbs the
+      // DC — it's not risk-free, just not fatal. Below the threshold, the CAUGHT
+      // path below fires: the vendor flips hostile and the fight is real.
+      get().appendLog(
+        'world',
+        `Your fingers hover at the ${offer.itemName} — then you feel ${scene.vendor.name}'s attention start to swing your way. You let it go and step back, easy and clean. Nothing taken, nothing seen.`,
+      );
+      void get().persist();
+      return;
     } else {
       // OTA 030 — caught. Vendor flips HOSTILE (was: walks away).
       // Spin up an Enemy scaled to the vendor's tier and clear the
       // vendor slot. Faction-aligned vendors also tank rep on
       // detection.
+      // arb-fix — a caught theft in an outpost angers the HOST faction (you broke
+      // their peace / abused their protection) AND, when the vendor is a hosted
+      // guest whose own faction differs, THAT faction too (you tried to rob their
+      // member). applyRepChange cascades ally/rival for each; net the deltas from
+      // the original standing so a shared ally/rival isn't double-counted or
+      // double-logged.
       const vendorFaction = scene.vendor.faction;
-      const repResult = vendorFaction
-        ? applyRepChange(player.factionStanding, vendorFaction, -10)
-        : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+      const nativeFaction = scene.vendor.nativeFaction;
+      const origById = new Map(player.factionStanding.map((r) => [r.factionId, r.standing] as const));
+      let repStanding = player.factionStanding;
+      if (vendorFaction) repStanding = applyRepChange(repStanding, vendorFaction, -10).standing;
+      if (nativeFaction && nativeFaction !== vendorFaction) {
+        repStanding = applyRepChange(repStanding, nativeFaction, -10).standing;
+      }
+      const repResult = {
+        standing: repStanding,
+        changed: repStanding
+          .map((r) => ({ factionId: r.factionId, delta: r.standing - (origById.get(r.factionId) ?? r.standing), newStanding: r.standing }))
+          .filter((c) => c.delta !== 0),
+      };
       const enemy = buildTraderEnemy(scene.vendor);
       set((s) =>
         s.player && s.currentScene
@@ -16493,6 +20337,52 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  applyTorchToHook(hookId: string) {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player || !scene) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isResonanceLantern } = require('../engine/resonanceLantern') as typeof import('../engine/resonanceLantern');
+    const torch = player.inventory.find(
+      (i) => isResonanceLantern(i) && canonicalItemTags(i).includes('light') && i.quantity > 0,
+    );
+    if (!torch) {
+      get().appendLog('arbiter', 'You have no torch to aim.');
+      return;
+    }
+    const hook = (scene.hooks ?? []).find(
+      (h) => h.id === hookId && !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged,
+    );
+    if (!hook) {
+      get().appendLog('arbiter', 'That lead is already known, spent, or claimed — nothing for the torch to take over.');
+      return;
+    }
+    const noun = hook.nouns[0] ?? 'the lead';
+    set((s) => {
+      if (!s.currentScene || !s.player) return {};
+      const inv = s.player.inventory
+        .map((i) => (i.id === torch.id ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => i.quantity > 0);
+      return {
+        player: advanceTime({ ...s.player, inventory: inv }, 0.25),
+        currentScene: {
+          ...s.currentScene,
+          // arb-fix (player: "I used follow because resonance is a sound") — the torch
+          // makes the lead ANSWER with a resonance, so let the player work it by that
+          // word too: stamp sound-synonyms onto the charged hook's nouns so "investigate/
+          // examine/work/follow the resonance (sound / hum / ringing)" all resolve to it,
+          // not just the literal noun ("crystal").
+          hooks: s.currentScene.hooks.map((h) => (h.id === hookId
+            ? { ...h, torchCharged: true, nouns: Array.from(new Set([...h.nouns, 'resonance', 'sound', 'ringing', 'hum', 'note'])) }
+            : h)),
+        },
+      };
+    });
+    get().appendLog('world', `You fix the ${torch.name}'s aetheric light on the ${noun}. It answers with a deep, wrong-sounding resonance — there is more here than there should be. Work the ${noun} — investigate it and it will give up something rare.`);
+    void get().persist();
+  },
+
   useVendorCrucible() {
     const state = get();
     const scene = state.currentScene;
@@ -16531,7 +20421,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // arb-fix — equipped faction catalyst would complete it → ask first
       // (charge happens on confirm, not now).
       const equippedReservedFaction = player.inventory.find(
-        (i) => i.reservedForFusion && (i.tags ?? []).includes('faction_gear') && vendorEquippedIds.has(i.id),
+        (i) => i.reservedForFusion && canonicalItemTags(i).includes('faction_gear') && vendorEquippedIds.has(i.id),
       );
       if (equippedReservedFaction && fusion.gateFusion(player.inventory, equippedReservedFaction).ok) {
         const slot = slotOfEquippedId(player.equipped, equippedReservedFaction.id);
@@ -16549,6 +20439,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (player.tc < COST) {
       get().appendLog('system', `The Crucible costs ${COST} TC to fire; you have ${player.tc}.`);
       return;
+    }
+    // OTA-1007 — don't sell a fire that can't light. Pre-fix this charged the fee and
+    // THEN discovered the pack couldn't fuse, so the player paid for a dead menu.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const preFuse = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+      const eqIds = new Set(
+        Object.values(player.equipped ?? {}).filter((v): v is string => typeof v === 'string'),
+      );
+      const cat = preFuse.findFactionCatalyst(player.inventory, eqIds);
+      if (!preFuse.gateFusion(player.inventory, cat).ok) {
+        get().appendLog(
+          'arbiter',
+          `${scene.vendor.name} looks over your pack and shakes their head. "Nothing in there to work with. Come back when you've odd salvage to spare — I'll not take your coin for a cold bowl."`,
+        );
+        return;
+      }
     }
     set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc - COST, fusionPending: true } } : s));
     get().appendLog('reward', `${scene.vendor.name} fires up a portable Crucible for you. (−${COST} TC)`);
@@ -16594,7 +20501,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // arb45 — Architect's Eye perk: cheaper mends on relic / ancient gear.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const tPerksRep = require('../engine/titles').titlePerkModifiers(player);
-    const isAncientItem = item.kind === 'relic' || (item.tags ?? []).some((t: string) => /ancient|relic|tartarian/i.test(t));
+    const isAncientItem = canonicalItemKind(item) === 'relic' || canonicalItemTags(item).some((t) => /ancient|relic|tartarian/i.test(t));
     const cost = (isAncientItem && tPerksRep.repairBonus > 0)
       ? Math.max(1, Math.round(baseCost * (1 - 0.05 * tPerksRep.repairBonus)))
       : baseCost;
@@ -16659,17 +20566,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return;
     }
-    // Direct id match first, then fuzzy title within this faction's pool.
+    // Direct id match first, then fuzzy title within the faction pool. A broker
+    // (Hidden Market stall) searches EVERY faction's pool, since its board posts
+    // all factions' work — the contract's faction may not be the vendor's own.
     const direct = findFactionQuestById(titleOrId);
-    const pool = availableFactionQuests(
-      acceptFaction,
-      getStanding(player.factionStanding, acceptFaction),
-      player.activeFactionQuestIds ?? [],
-      player.completedFactionQuestIds ?? [],
-    );
-    const quest = direct && pool.includes(direct) ? direct : fuzzyFindFactionQuest(titleOrId, pool);
-    if (!quest) {
-      const titles = pool.map((q) => `"${q.title}"`).join(', ');
+    const searchFactions = isBrokerVendorId(scene?.vendor?.id)
+      ? FACTIONS.map((f) => f.id)
+      : [acceptFaction];
+    let matchedQuest: typeof direct | null = null;
+    let factionId: string = acceptFaction;
+    const offered: string[] = [];
+    for (const fid of searchFactions) {
+      const pool = availableFactionQuests(
+        fid,
+        getStanding(player.factionStanding, fid),
+        player.activeFactionQuestIds ?? [],
+        player.completedFactionQuestIds ?? [],
+      );
+      for (const q of pool) offered.push(`"${q.title}"`);
+      const found = direct && pool.includes(direct) ? direct : fuzzyFindFactionQuest(titleOrId, pool);
+      if (found) { matchedQuest = found; factionId = fid; break; }
+    }
+    if (!matchedQuest) {
+      const titles = offered.join(', ');
       get().appendLog(
         'arbiter',
         titles
@@ -16678,14 +20597,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    const factionId = acceptFaction;
+    const quest = matchedQuest;
     const wasFirstQuest = (player.activeFactionQuestIds?.length ?? 0) === 0
       && (player.completedFactionQuestIds?.length ?? 0) === 0;
     // SINGLE-ACTIVE — a new contract joins ACTIVE only if you aren't already
     // running one; otherwise it's parked, so batch-accepting from the board
     // doesn't make everything live at once. You activate it when you're ready.
-    const hasActiveOther = (player.activeFactionQuests ?? []).some((q) => q.tracked !== false);
+    const hasActiveOther = anyTrackedContract(player); // OTA-995 — #118: cross-kind
     const newTracked = !hasActiveOther;
+    // OTA-985 — ESCORT contract: accepting spawns the shared-pool party (engine_Dev
+    // model). It rides on the quest record; collateral damage + failure live in
+    // applyEscortDamage / failEscortQuests.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const escortMod = require('../engine/escort') as typeof import('../engine/escort');
+    const escortSpec = escortMod.escortSpecForQuest(quest);
+    const escort = escortSpec
+      ? escortMod.spawnEscortPool(escortSpec.count, player.hpMax ?? 20, escortSpec.label)
+      : null;
     set((s) =>
       s.player
         ? {
@@ -16694,7 +20622,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), quest.id],
               activeFactionQuests: [
                 ...(s.player.activeFactionQuests ?? []),
-                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: newTracked },
+                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: newTracked, ...(escort ? { escort } : {}) },
               ],
             },
           }
@@ -16702,6 +20630,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     if (!newTracked) {
       get().appendLog('world', `${quest.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+    }
+    if (escort) {
+      const fallsV = escort.count === 1 ? 'falls' : 'fall';
+      const standsV = escort.count === 1 ? 'stands' : 'stand';
+      get().appendLog(
+        'world',
+        newTracked
+          ? `Your ${escort.label} ${fallsV} in beside you (${escort.hp} HP). Keep them alive — if the party is cut down, the escort fails.`
+          : `Your ${escort.label} (${escort.hp} HP) ${standsV} by for ${quest.title}. They'll fall in when you ACTIVATE this contract.`,
+      );
     }
     bumpQuestsAccepted(get, set);
     // First-quest milestone — Arbiter can reference "the first
@@ -16738,7 +20676,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (chaLeveled != null) {
         get().appendLog(
           'reward',
-          `✦ They handed you the contract. +1 CHA (now ${chaLeveled}).`,
+          `✦ They handed you the contract. +1 CHA (${statNowClause(get().player, 'charisma', chaLeveled)}).`,
         );
       }
       // OTA-057 — accepting a contract is an active CHA push; the
@@ -16764,14 +20702,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...s.player,
         activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) =>
           q.id === id ? { ...q, tracked: nextActive } : (nextActive ? { ...q, tracked: false } : q)),
+        // OTA-1015 — cross-kind: "the mission you're on" means across ALL routed
+        // kinds, not just this list. See setContractActive's mirror sweep.
+        activeHunts: nextActive ? (s.player.activeHunts ?? []).map((h) => ({ ...h, tracked: false })) : (s.player.activeHunts ?? []),
+        activeMysteries: nextActive ? (s.player.activeMysteries ?? []).map((m) => ({ ...m, tracked: false })) : (s.player.activeMysteries ?? []),
+        activeStorylines: nextActive ? (s.player.activeStorylines ?? []).map((st) => ({ ...st, tracked: false })) : (s.player.activeStorylines ?? []),
       },
     } : s));
     const def = findFactionQuestById(id);
     const title = def?.title ?? id;
     const pausedNote = othersPaused > 0 ? ` (${othersPaused} other contract${othersPaused > 1 ? 's' : ''} paused.)` : '';
-    get().appendLog('world', nextActive
-      ? `Now on ${title}. It's the contract you're running.${pausedNote}`
-      : `Paused ${title}. It won't advance until you re-activate it.`);
+    // OTA-985 — an escort's party PARKS when its contract is deactivated (off the
+    // HUD, no combat damage) and falls back in on re-activate.
+    const party = rec.escort && rec.escort.hp > 0 ? rec.escort : null;
+    const partyFalls = party && party.count === 1 ? 'falls' : 'fall';
+    const partyWaits = party && party.count === 1 ? 'waits' : 'wait';
+    if (nextActive) {
+      get().appendLog('world', (party
+        ? `Now on ${title}. Your ${party.label} ${partyFalls} in beside you.`
+        : `Now on ${title}. It's the contract you're running.`) + pausedNote);
+    } else {
+      get().appendLog('world', party
+        ? `Stood down from ${title}. Your ${party.label} ${partyFalls} back to safety and ${partyWaits}; they'll rejoin when you re-activate it.`
+        : `Paused ${title}. It won't advance until you re-activate it.`);
+    }
     // Switching the active contract (or pausing the routed one) drops a route
     // chain that no longer matches the mission you're on.
     if (get().player?.routedMission && get().player?.routedMission?.id !== id) {
@@ -16837,6 +20791,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       changed = true;
     }
     if (!changed) return;
+    // OTA-1015 — SINGLE-ACTIVE, enforced at ACTIVATION. The accept-side parking was
+    // trivially undone by two taps of SET ACTIVE, leaving several contracts
+    // live at once forever after (every later accept then parked "because
+    // you're busy" against contracts the player couldn't see were both live).
+    // Activating a routed contract stands every other routed contract down,
+    // across kinds. Whispers, leads and the parley are ambient-tier: they are
+    // breadcrumbs, not routes, and deliberately do not participate.
+    if (changed && nextActive && (kind === 'hunt' || kind === 'mystery' || kind === 'storyline')) {
+      set((s2) => (s2.player ? {
+        player: {
+          ...s2.player,
+          activeHunts: (s2.player.activeHunts ?? []).map((h) => (kind === 'hunt' && h.id === id ? h : { ...h, tracked: false })),
+          activeMysteries: (s2.player.activeMysteries ?? []).map((m) => (kind === 'mystery' && m.id === id ? m : { ...m, tracked: false })),
+          activeStorylines: (s2.player.activeStorylines ?? []).map((st) => (kind === 'storyline' && st.id === id ? st : { ...st, tracked: false })),
+          activeFactionQuests: (s2.player.activeFactionQuests ?? []).map((q) => ({ ...q, tracked: false })),
+        },
+      } : s2));
+    }
     // Staged contracts + leads truly FREEZE when paused (auto-advance / auto-complete
     // gated); whispers + the parley just drop off the standing reminders.
     const reminderOnly = kind === 'whisper' || kind === 'broker';
@@ -16907,7 +20879,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         turnSourceName = `the ${homeFaction.name} hall`;
       }
     }
-    if (!remote && (!turnFaction || !turnSourceName)) {
+    if (!turnFaction || !turnSourceName) {
       // If the player named a specific contract, fuzzy-match it and tell
       // them the exact faction + sample vendor names. Otherwise fall
       // back to listing the factions they owe across all active quests.
@@ -16916,7 +20888,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const sample = namedHint.vendorNames.slice(0, 2).join(' or ');
         get().appendLog(
           'arbiter',
-          `The Arbiter waves. "${namedHint.contractTitle} closes out with the ${namedHint.factionLabel}. Find ${sample} — or any other ${namedHint.factionLabel} agent — to turn it in for full pay. Or 'send word ${namedHint.contractTitle.toLowerCase()}' to courier it now for a smaller cut."`,
+          `The Arbiter waves. "${namedHint.contractTitle} closes out with the ${namedHint.factionLabel}. Find ${sample} — or any other ${namedHint.factionLabel} agent — and hand it over in person. The trip pays a long-haul bonus."`,
         );
         return;
       }
@@ -16944,7 +20916,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : `a vendor from one of: ${lines.join('; ')}`;
         get().appendLog(
           'arbiter',
-          `The Arbiter waves. "Find ${list} to turn that contract in for full pay — or 'send word <name>' to courier it now for a smaller cut."`,
+          `The Arbiter waves. "Find ${list} and turn that contract in face to face — the trek pays a long-haul bonus. Set a course to the ◆ pin in Contracts."`,
         );
       } else {
         get().appendLog(
@@ -16957,7 +20929,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-456 — the agent name shown in the flow. Remote turn-ins have no vendor
     // present, so a "runner" stands in.
     const sourceLabel = turnSourceName ?? 'A runner';
-    const active = player.activeFactionQuestIds ?? [];
+    // OTA-1025 — the STAGED records are the truth; the legacy id mirror alone
+    // refused READY contracts whenever a path wrote only the records.
+    const active = Array.from(new Set([
+      ...(player.activeFactionQuestIds ?? []),
+      ...(player.activeFactionQuests ?? []).map((q) => q.id),
+    ]));
     // Direct id, then fuzzy title across active list.
     const direct = findFactionQuestById(titleOrId);
     const candidate = direct ?? fuzzyFindFactionQuest(
@@ -16971,24 +20948,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    // OTA-456 — a courier always carries it to the RIGHT faction, so the
-    // wrong-faction refusal only applies when turning in at a vendor/board.
-    if (!remote && candidate.factionId !== turnFaction) {
+    if (candidate.factionId !== turnFaction) {
       get().appendLog(
         'arbiter',
         `${sourceLabel} won't take it — wrong faction. Bring it to ${candidate.factionId.replace(/_/g, ' ')}.`,
-      );
-      return;
-    }
-    // OTA-456 — HYBRID remote rule. A FETCH quest is a physical delivery: you
-    // carry the goods, so it can't be couriered by word of mouth — it must be
-    // handed over in person (board or any same-faction agent). Deed quests
-    // (kill / travel / stage) CAN be sent word remotely below.
-    if (remote && candidate.fetch) {
-      const fLabel = FACTIONS.find((f) => f.id === candidate.factionId)?.name ?? candidate.factionId.replace(/_/g, ' ');
-      get().appendLog(
-        'arbiter',
-        `The Arbiter shakes their head. "${candidate.title} is a delivery — ${candidate.fetch.quantity}× ${candidate.fetch.itemName} doesn't travel by word of mouth. Carry it to the board or any ${fLabel} agent yourself."`,
       );
       return;
     }
@@ -17006,6 +20969,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         return;
       }
+    }
+    // OTA-456 — a FETCH quest is a PHYSICAL delivery: it can't be couriered
+    // remotely (you can't mail the goods). Refuse a remote turn-in for a fetch
+    // contract; it has to change hands in person. (Non-fetch contracts may still
+    // be couriered for a reduced cut — handled by their own turn-in paths.)
+    if (remote && candidate.fetch) {
+      const fLabel = candidate.factionId.replace(/_/g, ' ');
+      get().appendLog(
+        'arbiter',
+        `The Arbiter shakes their head. "${candidate.title} is a delivery — the ${candidate.fetch.itemName} has to change hands in person. Carry it to ${fLabel} yourself."`,
+      );
+      return;
     }
     // OTA-450 — fetch gate. The generic per-faction starter quests require the
     // player to actually HOLD the items; verify, then consume them on turn-in so
@@ -17033,12 +21008,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .filter((i) => (i.quantity ?? 1) > 0);
       set((s) => (s.player ? { player: { ...s.player, inventory: consumed } } : s));
     }
-    // Pay out reward + record completion. arb166 — a remote "send word" turn-in
-    // now pays HALF (both TC and rep): travelling to the agent/board and handing
-    // it over in person is the 100% play; couriering it from afar is the 50%
-    // convenience option. (Was an 85% TC cut with full rep.)
-    const payTc = remote ? Math.max(1, Math.round(candidate.reward.tc * 0.5)) : candidate.reward.tc;
-    const payRep = remote ? Math.max(1, Math.round(candidate.reward.rep * 0.5)) : candidate.reward.rep;
+    // B2 — full pay in person + a long-haul TC bonus scaled to how far you carried it.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.reward.tc);
+    // OTA-987 — ESCORT pay model (owner: "go with the scaled party for most
+    // escorts, but make the higher tier escorts all or nothing"). Scaled
+    // escorts pay the TC fee times the fraction of the party still standing
+    // (floored at 10% — you did walk them there); all_or_nothing drop-offs
+    // skip the scaling entirely. Rep pays in full either way — the faction
+    // credits the delivery itself.
+    let escortPayMult = 1;
+    if (activeRecord?.escort && candidate.escort?.mode !== 'all_or_nothing') {
+      const e = activeRecord.escort;
+      if (e.hpMax > 0) escortPayMult = Math.max(0.1, Math.min(1, e.hp / e.hpMax));
+    }
+    const payTc = Math.max(1, Math.round((candidate.reward.tc + journeyTc) * escortPayMult));
+    const payRep = candidate.reward.rep;
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, payRep);
     set((s) =>
       s.player
@@ -17055,15 +21040,61 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : s,
     );
     const fLabel = candidate.factionId.replace(/_/g, ' ');
-    get().appendLog(
-      'reward',
-      remote
-        ? `✦ Sent word — ${candidate.title} closed by courier for HALF (travel to claim full). +${payTc} TC, +${payRep} rep with ${fLabel}.`
-        : `✦ Faction contract complete — ${candidate.title}. +${payTc} TC, +${payRep} rep with ${fLabel}.`,
+    get().announceMissionComplete(
+      'Contract',
+      candidate.title,
+      `✦ Faction contract complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${payRep > 0 ? `, +${payRep} rep with ${fLabel}` : ''}.`,
     );
+    // OTA-805 — RAPPORT unlocked. Turning in a faction's rapport quest opens
+    // Charisma-scaled dealing with its vendors (the discount is derived from this
+    // completion — see factionRapport.hasFactionRapport). Announce it, and show the
+    // rate the player's current CHA earns so the payoff is concrete.
+    if (candidate.id === rapportQuestId(candidate.factionId)) {
+      const pct = Math.round(chaPriceDiscount(effectiveStats(get().player ?? player).charisma) * 100);
+      get().appendLog(
+        'reward',
+        `✦ You've earned dealing with the ${fLabel}. From now their vendors cut you the partner's rate — currently ${pct}% off buys and +${pct}% on sell-backs (it grows with your Charisma).`,
+      );
+    }
     // OTA-724 — finishing a contract can also turn up a rare/legendary recipe.
-    maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils');
+    // OTA-989 — escorts pay in coin and care, not schematics: the recipe roll
+    // belongs to salvage-and-spoils contracts. Escort turn-ins instead press
+    // HEALTH supplies into your hands (below), so their loot is only TC +
+    // healing — the owner's rule for these missions.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const eModPay = require('../engine/escort') as typeof import('../engine/escort');
+    if (!eModPay.escortSpecForQuest(candidate)) {
+      maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils');
+    }
     logRepChanges(get, repResult.changed);
+    // OTA-985 — delivered the escort party alive (a dead pool fails + drops the
+    // quest before it can ever reach turn-in), so name them in the win.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const eMod = require('../engine/escort') as typeof import('../engine/escort');
+      const dSpec = eMod.escortSpecForQuest(candidate);
+      if (dSpec) {
+        get().appendLog('reward', escortPayMult < 1
+          ? `You delivered your ${dSpec.label} — battered, but breathing. The fee reflects the shape you brought them in (${Math.round(escortPayMult * 100)}% pay).`
+          : `You delivered your ${dSpec.label} safely. They peel off with a nod.`);
+        // OTA-989 — the delivered party presses HEALTH supplies on you with the
+        // fee (2 kits on an all-or-nothing drop-off, 1 otherwise). This is the
+        // whole of an escort's item loot: TC + healing, nothing else.
+        const medLook = lookupCraftedItem('First Aid Kit');
+        const medQty = candidate.escort?.mode === 'all_or_nothing' ? 2 : 1;
+        set((s2) => (s2.player ? {
+          player: {
+            ...s2.player,
+            inventory: mergeOrPushItem(s2.player.inventory, stampDurability({
+              id: `escmed_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              name: 'First Aid Kit', kind: medLook.kind, rarity: medLook.rarity,
+              quantity: medQty, tags: [...medLook.tags, 'loot'],
+            })),
+          },
+        } : s2));
+        get().appendLog('reward', `✦ ${medQty > 1 ? `${medQty}× ` : ''}First Aid Kit — pressed into your hands with the fee.`);
+      }
+    }
     plantNextContractHint(get, candidate.factionId, 'faction_quest');
     void get().persist();
   },
@@ -17090,7 +21121,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     get().appendLog('world', `▣ ${factionLabel} Mission Board — open postings:`);
     for (const q of pool) {
-      get().appendLog('world', `• "${q.title}" — ${q.objective} (reward: ${q.reward.tc} TC, +${q.reward.rep} rep)`);
+      get().appendLog('world', `• "${q.title}" — ${q.objective} (reward: ${q.reward.tc} TC${q.reward.rep > 0 ? `, +${q.reward.rep} rep` : ''})`);
     }
     get().appendLog(
       'arbiter',
@@ -17126,20 +21157,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const alreadyDone = neutralMatch
         && (player.completedHuntIds ?? []).includes(neutralMatch.id);
       if (neutralMatch && !alreadyActive && !alreadyDone) {
+        const neutralTracked = !anyTrackedContract(player); // OTA-995 — #118
+        get().appendLog('debug', `accept: neutral ${neutralMatch.id} tracked=${neutralTracked}`);
         set((s) => (s.player ? {
           player: {
             ...s.player,
             activeHunts: [
               ...(s.player.activeHunts ?? []),
-              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now() },
+              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked },
             ],
           },
         } : s));
         bumpQuestsAccepted(get, set);
         get().appendLog(
           'arbiter',
-          `The Arbiter nods. "You take the ${neutralMatch.title} on. Open the Contracts board to see the stages."`,
+          `The Arbiter nods. "You take ${theLower(neutralMatch.title)} on. Open the Contracts board to see the stages."`,
         );
+        if (!neutralTracked) {
+          get().appendLog('world', `${neutralMatch.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+        }
         void get().persist();
         return;
       }
@@ -17158,18 +21194,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return;
     }
-    const factionId = scene.vendor.faction;
-    const playerRep = factionId ? getStanding(player.factionStanding, factionId) : 0;
+    // A broker (Hidden Market stall) searches EVERY faction's pool; a normal
+    // vendor searches only its own. availableHunts folds in faction-neutral
+    // bounties for each searched faction.
+    const searchFactions: (string | null)[] = isBrokerVendorId(scene.vendor.id)
+      ? FACTIONS.map((f) => f.id)
+      : [scene.vendor.faction];
     const direct = findHuntById(titleOrId);
-    const pool = availableHunts(
-      factionId,
-      playerRep,
-      (player.activeHunts ?? []).map((h) => h.id),
-      player.completedHuntIds ?? [],
-    );
-    const hunt = direct && pool.includes(direct) ? direct : fuzzyFindHunt(titleOrId, pool);
-    if (!hunt) {
-      const titles = pool.map((h) => `"${h.title}"`).join(', ');
+    let matchedHunt: typeof direct | null = null;
+    let factionId: string | null = scene.vendor.faction;
+    const offered = new Set<string>();
+    for (const fid of searchFactions) {
+      const playerRep = fid ? getStanding(player.factionStanding, fid) : 0;
+      const pool = availableHunts(
+        fid,
+        playerRep,
+        (player.activeHunts ?? []).map((h) => h.id),
+        player.completedHuntIds ?? [],
+      );
+      for (const h of pool) offered.add(`"${h.title}"`);
+      const found = direct && pool.includes(direct) ? direct : fuzzyFindHunt(titleOrId, pool);
+      if (found) { matchedHunt = found; factionId = fid; break; }
+    }
+    if (!matchedHunt) {
+      const titles = [...offered].join(', ');
       get().appendLog(
         'arbiter',
         titles
@@ -17178,6 +21226,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    const hunt = matchedHunt;
+    // OTA-995 — #118: same single-active rule as faction quests — accepting while
+    // ANY contract (any kind) is live PARKS the new one instead of
+    // auto-activating it.
+    const huntTracked = !anyTrackedContract(player);
+    get().appendLog('debug', `accept: hunt ${hunt.id} tracked=${huntTracked}`);
     set((s) =>
       s.player
         ? {
@@ -17185,7 +21239,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...s.player,
               activeHunts: [
                 ...(s.player.activeHunts ?? []),
-                { id: hunt.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now() },
+                { id: hunt.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: huntTracked },
               ],
             },
           }
@@ -17197,6 +21251,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const stage0 = hunt.stages[0];
     if (stage0) {
       get().appendLog('reward', `✦ Hunt accepted — ${hunt.title}. ${hunt.posterText}`);
+      if (!huntTracked) {
+        get().appendLog('world', `${hunt.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+      }
       get().appendLog('world', stage0.narration);
       // 2026-05-26 OTA-053 — playtester ask: "I get handed a poster.
       // It doesn't give me an idea of where I'm supposed to go."
@@ -17229,12 +21286,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!hpOk && !weaponOk) {
           get().appendLog(
             'arbiter',
-            `The Arbiter looks at you straight. "This one will kill you as you are right now. Train up, gear up, or come back with friends. Recommended: ${hunt.recommendedHp} HP and an ${hunt.recommendedWeaponRarity} weapon. You sit at ${livePlayerHunt?.hp ?? '?'} HP."`,
+            `The Arbiter looks at you straight. "This one will kill you as you are right now. Train up, gear up, or come back with friends. Recommended: ${hunt.recommendedHp} HP and ${withArticle(hunt.recommendedWeaponRarity)} weapon. You sit at ${livePlayerHunt?.hp ?? '?'} HP."`,
           );
         } else if (!hpOk || !weaponOk) {
           get().appendLog(
             'arbiter',
-            `The Arbiter taps the table. "Going to be tight. Recommended ${hunt.recommendedHp} HP and an ${hunt.recommendedWeaponRarity} weapon. ${!hpOk ? "Your HP is short of that — " : ''}${!weaponOk ? "Your weapon's a tier below — " : ''}take a beat before you commit."`,
+            `The Arbiter taps the table. "Going to be tight. Recommended ${hunt.recommendedHp} HP and ${withArticle(hunt.recommendedWeaponRarity)} weapon. ${!hpOk ? "Your HP is short of that — " : ''}${!weaponOk ? "Your weapon's a tier below — " : ''}take a beat before you commit."`,
           );
         }
       }
@@ -17257,7 +21314,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (chaLeveled != null) {
         get().appendLog(
           'reward',
-          `✦ The hunt is yours to take. +1 CHA (now ${chaLeveled}).`,
+          `✦ The hunt is yours to take. +1 CHA (${statNowClause(get().player, 'charisma', chaLeveled)}).`,
         );
       }
       // OTA-057 — accepting a hunt is an active CHA push; the matching
@@ -17281,8 +21338,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!stageDef) return;
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
-    // Boss stage spawns the scaled enemy and freezes the hunt at this stage
-    // until the boss dies; otherwise advance the stage counter.
+    // Boss stage spawns the scaled enemy. OTA-796 — the FINAL boss stage FREEZES
+    // the hunt here (no stage increment): the boss must actually be KILLED to
+    // complete it (resolveEnemyDefeat does the final advance). Previously every
+    // boss stage — including the last — incremented on SPAWN, so the moment the
+    // apex enemy appeared the stage hit stages.length and the turn-in gate
+    // (`stage < stages.length`) passed; the player could flee/despawn the boss
+    // and collect the full bounty without the fight (exploit sweep). Mid-hunt
+    // boss stages (there are hunts with a boss beat before the apex) still
+    // increment on spawn.
+    let lastBossIndex = -1;
+    for (let i = 0; i < hunt.stages.length; i++) {
+      if (hunt.stages[i]?.checkKind === 'boss') lastBossIndex = i;
+    }
+    const freezeForKill = stageDef.checkKind === 'boss' && record.stage === lastBossIndex;
     if (stageDef.checkKind === 'boss') {
       const boss = scaleHuntBoss(player, hunt);
       if (boss) {
@@ -17302,18 +21371,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('combat', `${boss.name} closes the distance. The hunt comes to its end.`);
       }
     }
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              activeHunts: (s.player.activeHunts ?? []).map((h) =>
-                h.id === huntId ? { ...h, stage: h.stage + 1 } : h,
-              ),
-            },
-          }
-        : s,
-    );
+    if (!freezeForKill) {
+      set((s) =>
+        s.player
+          ? {
+              player: {
+                ...s.player,
+                activeHunts: (s.player.activeHunts ?? []).map((h) =>
+                  h.id === huntId ? { ...h, stage: h.stage + 1 } : h,
+                ),
+              },
+            }
+          : s,
+      );
+    }
     void get().persist();
   },
 
@@ -17322,10 +21393,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
-    // OTA-456 — a HUNT is a deed (the trophy is the proof), so it can be sent
-    // word remotely for a 15% TC cut; in person pays in full.
-    if (!remote && !scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Need someone to pay you. Find a vendor — or 'send word <name>' to courier the trophy in for a smaller cut."`);
+    // OTA-810 — a HUNT is a FACE-TO-FACE turn-in (user's call). The trophy is the
+    // proof, and proof has to be shown in person to a paying agent — the OTA-456
+    // remote "send word" courier option is removed for hunts. (Mysteries / storylines
+    // / faction deeds keep their remote cut; a bounty specifically is paid at the
+    // table.) This also closes the B2 exploit of closing hunts 100% from a safe hub.
+    if (remote) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter shakes their head. "A trophy's no good sent by runner — a bounty is paid face to face. Carry it to an agent and put it on the table yourself."`,
+      );
+      return;
+    }
+    if (!scene?.vendor) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter folds their arms. "A bounty's settled in person — find a vendor or faction agent and show them the trophy."`,
+      );
       return;
     }
     const sourceLabel = scene?.vendor?.name ?? 'A runner';
@@ -17397,7 +21481,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const repResult = candidate.factionId && candidate.rewardRep
       ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
-    const payTc = remote ? Math.max(1, Math.round(candidate.rewardTc * 0.85)) : candidate.rewardTc;
+    // OTA-810 — face-to-face only, so always full pay. B2 — plus a long-haul bonus
+    // scaled to how far you carried the trophy.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc);
+    const payTc = candidate.rewardTc + journeyTc;
     set((s) =>
       s.player
         ? {
@@ -17412,11 +21500,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    get().appendLog(
-      'reward',
-      remote
-        ? `✦ Sent word — Hunt closed by courier: ${candidate.title}. +${payTc} TC (runner's cut taken)${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy carried back.`
-        : `✦ Hunt complete — ${candidate.title}. +${payTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
+    get().announceMissionComplete(
+      'Hunt',
+      candidate.title,
+      `✦ Hunt complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
     );
     maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-724
     applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
@@ -17453,20 +21540,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const alreadyDone = neutralMatch
         && (player.completedMysteryIds ?? []).includes(neutralMatch.id);
       if (neutralMatch && !alreadyActive && !alreadyDone) {
+        const neutralTracked = !anyTrackedContract(player); // OTA-995 — #118
+        get().appendLog('debug', `accept: neutral ${neutralMatch.id} tracked=${neutralTracked}`);
         set((s) => (s.player ? {
           player: {
             ...s.player,
             activeMysteries: [
               ...(s.player.activeMysteries ?? []),
-              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now() },
+              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked },
             ],
           },
         } : s));
         bumpQuestsAccepted(get, set);
         get().appendLog(
           'arbiter',
-          `The Arbiter nods. "You take the ${neutralMatch.title} on. Open the Contracts board to see the stages."`,
+          `The Arbiter nods. "You take ${theLower(neutralMatch.title)} on. Open the Contracts board to see the stages."`,
         );
+        if (!neutralTracked) {
+          get().appendLog('world', `${neutralMatch.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+        }
         void get().persist();
         return;
       }
@@ -17482,18 +21574,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return;
     }
-    const factionId = scene.vendor.faction;
-    const playerRep = factionId ? getStanding(player.factionStanding, factionId) : 0;
+    // A broker (Hidden Market stall) searches EVERY faction's pool; a normal
+    // vendor searches only its own. availableMysteries folds in faction-neutral
+    // work for each searched faction.
+    const searchFactions: (string | null)[] = isBrokerVendorId(scene.vendor.id)
+      ? FACTIONS.map((f) => f.id)
+      : [scene.vendor.faction];
     const direct = findMysteryById(titleOrId);
-    const pool = availableMysteries(
-      factionId,
-      playerRep,
-      (player.activeMysteries ?? []).map((m) => m.id),
-      player.completedMysteryIds ?? [],
-    );
-    const m = direct && pool.includes(direct) ? direct : fuzzyFindMystery(titleOrId, pool);
-    if (!m) {
-      const titles = pool.map((m2) => `"${m2.title}"`).join(', ');
+    let matchedMystery: typeof direct | null = null;
+    let factionId: string | null = scene.vendor.faction;
+    const offered = new Set<string>();
+    for (const fid of searchFactions) {
+      const playerRep = fid ? getStanding(player.factionStanding, fid) : 0;
+      const pool = availableMysteries(
+        fid,
+        playerRep,
+        (player.activeMysteries ?? []).map((m2) => m2.id),
+        player.completedMysteryIds ?? [],
+      );
+      for (const m2 of pool) offered.add(`"${m2.title}"`);
+      const found = direct && pool.includes(direct) ? direct : fuzzyFindMystery(titleOrId, pool);
+      if (found) { matchedMystery = found; factionId = fid; break; }
+    }
+    if (!matchedMystery) {
+      const titles = [...offered].join(', ');
       get().appendLog(
         'arbiter',
         titles
@@ -17502,6 +21606,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    const m = matchedMystery;
+    const mysteryTracked = !anyTrackedContract(player); // OTA-995 — #118
+    get().appendLog('debug', `accept: mystery ${m.id} tracked=${mysteryTracked}`);
     set((s) =>
       s.player
         ? {
@@ -17509,7 +21616,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...s.player,
               activeMysteries: [
                 ...(s.player.activeMysteries ?? []),
-                { id: m.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now() },
+                { id: m.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: mysteryTracked },
               ],
             },
           }
@@ -17520,6 +21627,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const stage0 = m.stages[0];
     if (stage0) {
       get().appendLog('reward', `✦ Mystery accepted — ${m.title}. ${m.posterText}`);
+      if (!mysteryTracked) {
+        get().appendLog('world', `${m.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+      }
       get().appendLog('world', stage0.narration);
     }
     set((s) =>
@@ -17540,7 +21650,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (chaLeveled != null) {
         get().appendLog(
           'reward',
-          `✦ They confide the mystery to you. +1 CHA (now ${chaLeveled}).`,
+          `✦ They confide the mystery to you. +1 CHA (${statNowClause(get().player, 'charisma', chaLeveled)}).`,
         );
       }
       // OTA-057 — accepting a mystery is an active CHA push; the WIS
@@ -17563,7 +21673,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
     // Final stage is the "synthesis" — the player has the trophy in hand
     // (narratively); advance the stage past the end so turn-in unlocks.
-    const nextStage = record.stage + 1;
+    let nextStage = record.stage + 1;
+    // OTA-871 — auto-consume pure-narration (checkKind: null) stages. They have no player-
+    // action gate, so a trailing null epilogue (a denouement authored after the boss stage)
+    // would otherwise leave the quest one stage short of turn-in forever. Display each such
+    // stage's narration, then advance past it — so epilogues read AND the quest completes.
+    while (nextStage < mystery.stages.length && mystery.stages[nextStage]!.checkKind === null) {
+      const epi = mystery.stages[nextStage]!;
+      get().appendLog('world', epi.narration);
+      if (epi.arbiter) get().appendLog('arbiter', epi.arbiter);
+      nextStage++;
+    }
     set((s) =>
       s.player
         ? {
@@ -17585,15 +21705,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  turnInMystery(titleOrId, remote = false) {
+  turnInMystery(titleOrId, _remote = false) {
     const state = get();
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
-    // OTA-456 — a mystery is a deed (the artifact is the proof), so it can be
-    // sent word remotely for a 15% TC cut; in person pays in full.
-    if (!remote && !scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Need a buyer. Find a vendor — or 'send word <name>' to courier it in for a smaller cut."`);
+    // B2 — the artifact is the proof and it changes hands IN PERSON now (no courier).
+    if (!scene?.vendor) {
+      get().appendLog('arbiter', `The Arbiter folds their arms. "Need a buyer, in the flesh. Carry the proof to a vendor — set a course to the ◆ pin in Contracts."`);
       return;
     }
     const sourceLabel = scene?.vendor?.name ?? 'A runner';
@@ -17619,7 +21738,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    if (!remote && candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
+    if (candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
       get().appendLog(
         'arbiter',
         `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId.replace(/_/g, ' ')} posted that."`,
@@ -17660,7 +21779,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const repResult = candidate.factionId && candidate.rewardRep
       ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
-    const payTc = remote ? Math.max(1, Math.round(candidate.rewardTc * 0.85)) : candidate.rewardTc;
+    // B2 — full pay + a LONG-HAUL bonus scaled to how far you carried it.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc);
+    const payTc = candidate.rewardTc + journeyTc;
     set((s) =>
       s.player
         ? {
@@ -17675,11 +21797,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    get().appendLog(
-      'reward',
-      remote
-        ? `✦ Sent word — Mystery closed by courier: ${candidate.title}. +${payTc} TC (runner's cut taken)${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`
-        : `✦ Mystery complete — ${candidate.title}. +${payTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
+    get().announceMissionComplete(
+      'Mystery',
+      candidate.title,
+      `✦ Mystery complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
     );
     applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
@@ -17696,7 +21817,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
       return;
     }
-    if (!scene?.vendor?.faction) {
+    // A broker (Hidden Market stall) proceeds even if its own rostered faction
+    // has no storylines — it posts every faction's board. A normal vendor still
+    // needs a faction of its own.
+    if (!scene?.vendor || (!scene.vendor.faction && !isBrokerVendorId(scene.vendor.id))) {
       const hint = findQuestFactionHint(titleOrId);
       if (hint && hint.vendorNames.length > 0) {
         const sample = hint.vendorNames.slice(0, 2).join(' or ');
@@ -17709,18 +21833,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return;
     }
-    const factionId = scene.vendor.faction;
-    const playerRep = getStanding(player.factionStanding, factionId);
+    // A broker searches EVERY faction's storyline pool; a normal vendor only its
+    // own.
+    const searchFactions: string[] = isBrokerVendorId(scene.vendor.id)
+      ? FACTIONS.map((f) => f.id)
+      : (scene.vendor.faction ? [scene.vendor.faction] : []);
     const direct = findStorylineById(titleOrId);
-    const pool = availableStorylines(
-      factionId,
-      playerRep,
-      (player.activeStorylines ?? []).map((s) => s.id),
-      player.completedStorylineIds ?? [],
-    );
-    const s = direct && pool.includes(direct) ? direct : fuzzyFindStoryline(titleOrId, pool);
-    if (!s) {
-      const titles = pool.map((s2) => `"${s2.title}"`).join(', ');
+    let matchedStoryline: typeof direct | null = null;
+    let factionId: string | null = scene.vendor.faction;
+    const offered = new Set<string>();
+    for (const fid of searchFactions) {
+      const playerRep = getStanding(player.factionStanding, fid);
+      const pool = availableStorylines(
+        fid,
+        playerRep,
+        (player.activeStorylines ?? []).map((s2) => s2.id),
+        player.completedStorylineIds ?? [],
+      );
+      for (const s2 of pool) offered.add(`"${s2.title}"`);
+      const found = direct && pool.includes(direct) ? direct : fuzzyFindStoryline(titleOrId, pool);
+      if (found) { matchedStoryline = found; factionId = fid; break; }
+    }
+    if (!matchedStoryline) {
+      const titles = [...offered].join(', ');
       get().appendLog(
         'arbiter',
         titles
@@ -17729,6 +21864,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    const s = matchedStoryline;
+    const storyTracked = !anyTrackedContract(player); // OTA-995 — #118
+    get().appendLog('debug', `accept: storyline ${s.id} tracked=${storyTracked}`);
     set((st) =>
       st.player
         ? {
@@ -17736,7 +21874,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...st.player,
               activeStorylines: [
                 ...(st.player.activeStorylines ?? []),
-                { id: s.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now() },
+                { id: s.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: storyTracked },
               ],
             },
           }
@@ -17747,6 +21885,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const stage0 = s.stages[0];
     if (stage0) {
       get().appendLog('reward', `✦ Storyline accepted — ${s.title}. ${s.posterText}`);
+      if (!storyTracked) {
+        get().appendLog('world', `${s.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+      }
       get().appendLog('world', stage0.narration);
     }
     set((st) =>
@@ -17767,7 +21908,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (chaLeveled != null) {
         get().appendLog(
           'reward',
-          `✦ The storyline opens to you. +1 CHA (now ${chaLeveled}).`,
+          `✦ The storyline opens to you. +1 CHA (${statNowClause(get().player, 'charisma', chaLeveled)}).`,
         );
       }
       // OTA-057 — accepting a storyline is an active CHA push; WIS
@@ -17788,7 +21929,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!stageDef) return;
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
-    const nextStage = record.stage + 1;
+    let nextStage = record.stage + 1;
+    // OTA-871 — auto-consume trailing pure-narration (checkKind: null) epilogue stages so a
+    // storyline authored with a denouement after its final action doesn't hang one stage
+    // short of turn-in. Show each epilogue's narration, then advance past it.
+    while (nextStage < def.stages.length && def.stages[nextStage]!.checkKind === null) {
+      const epi = def.stages[nextStage]!;
+      get().appendLog('world', epi.narration);
+      if (epi.arbiter) get().appendLog('arbiter', epi.arbiter);
+      nextStage++;
+    }
     set((s) =>
       s.player
         ? {
@@ -17810,15 +21960,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  turnInStoryline(titleOrId, remote = false) {
+  turnInStoryline(titleOrId, _remote = false) {
     const state = get();
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
-    // OTA-456 — a storyline is a deed arc, so it can be sent word remotely for a
-    // 15% TC cut; in person pays in full.
-    if (!remote && !scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Find an agent — or 'send word <name>' to courier it in for a smaller cut."`);
+    // B2 — a storyline arc is closed FACE TO FACE now (no courier).
+    if (!scene?.vendor) {
+      get().appendLog('arbiter', `The Arbiter folds their arms. "Find the agent in person. Open Contracts, set a course to the ◆ pin, and close it there — the trip pays."`);
       return;
     }
     const sourceLabel = scene?.vendor?.name ?? 'A runner';
@@ -17848,7 +21997,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // storyline ever ships with factionId=null (none currently do,
     // but schema allows it) the old bare !== check would reject
     // every vendor; the && short-circuits that.
-    if (!remote && candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
+    if (candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
       get().appendLog(
         'arbiter',
         `${sourceLabel} shakes their head. "Wrong faction. ${candidate.factionId.replace(/_/g, ' ')} posted that one."`,
@@ -17866,7 +22015,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           tags: storyRewardLookup.tags,
         })]
       : [...player.inventory];
-    const payTc = remote ? Math.max(1, Math.round(candidate.rewardTc * 0.85)) : candidate.rewardTc;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc);
+    const payTc = candidate.rewardTc + journeyTc;
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep);
     set((s) =>
       s.player
@@ -17882,11 +22033,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    get().appendLog(
-      'reward',
-      remote
-        ? `✦ Sent word — Storyline closed by courier: ${candidate.title}. +${payTc} TC (runner's cut taken), +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`
-        : `✦ Storyline complete — ${candidate.title}. +${payTc} TC, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
+    get().announceMissionComplete(
+      'Storyline',
+      candidate.title,
+      `✦ Storyline complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
     );
     maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-724
     applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
@@ -17915,6 +22065,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('arbiter', `The Arbiter eyes the contract. "Not done. The trophy is the proof — you don't have it yet."`);
         return;
       }
+      // OTA-810 — a HUNT is a FACE-TO-FACE turn-in (user's call). The Contracts-UI
+      // COMPLETE used to pay FULL from any tile — the B2 exploit (whole bounties
+      // closed from a safe hub). Now it requires a paying agent present, and the
+      // RIGHT faction's agent, exactly like the typed turn-in.
+      const scene = get().currentScene;
+      if (!scene?.vendor) {
+        get().appendLog('arbiter', `The Arbiter folds their arms. "A bounty's settled in person — stand in front of a vendor or faction agent and show them the trophy."`);
+        return;
+      }
+      if (def.factionId && def.factionId !== scene.vendor.faction) {
+        get().appendLog('arbiter', `${scene.vendor.name} waves you off. "Wrong agent. ${def.factionId.replace(/_/g, ' ')} posted that bounty — take it to their people."`);
+        return;
+      }
       const trophy: InventoryItem = stampDurability({
         id: `trophy_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         name: def.trophyName,
@@ -17939,19 +22102,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const repResult = def.factionId && def.rewardRep
         ? applyRepChange(player.factionStanding, def.factionId, def.rewardRep)
         : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+      // B2 — long-haul bonus, same as the typed turn-in.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const huntJourneyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, def.rewardTc);
+      const huntPayTc = def.rewardTc + huntJourneyTc;
       set((s) => (s.player ? {
         player: {
           ...s.player,
-          tc: s.player.tc + def.rewardTc,
+          tc: s.player.tc + huntPayTc,
           inventory: newInventory,
           factionStanding: repResult.standing,
           activeHunts: (s.player.activeHunts ?? []).filter((h) => h.id !== def.id),
           completedHuntIds: [...(s.player.completedHuntIds ?? []), def.id],
         },
       } : s));
-      get().appendLog(
-        'reward',
-        `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${def.rewardTc} TC${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
+      get().announceMissionComplete(
+        'Hunt',
+        def.title,
+        `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${huntPayTc} TC${huntJourneyTc > 0 ? ` (incl. +${huntJourneyTc} long-haul)` : ''}${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
       maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-724
       applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
@@ -17961,197 +22129,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     if (kind === 'mystery') {
-      const def = findMysteryById(id);
-      const rec = (player.activeMysteries ?? []).find((m) => m.id === id);
-      if (!def || !rec) {
-        get().appendLog('arbiter', `The Arbiter shakes their head. "That mystery isn't on your slate."`);
-        return;
-      }
-      if (rec.stage < def.stages.length) {
-        get().appendLog('arbiter', `The Arbiter studies you. "Not yet. The answer isn't gathered."`);
-        return;
-      }
-      const repResult = def.factionId && def.rewardRep
-        ? applyRepChange(player.factionStanding, def.factionId, def.rewardRep)
-        : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
-      // OTA 041 — pre-ship audit caught the UI completion path skipping
-      // the rewardItem grant (6 mysteries lost their reward when
-      // completed via the Contracts screen). Vendor turn-in at
-      // turnInMystery handled this; mirror that here.
-      // 2026-05-25 — grantItem honors cap. Previously raw spread.
-      const mysteryUiRewardLookup = def.rewardItem ? lookupCraftedItem(def.rewardItem) : null;
-      let newInventory = player.inventory.map((i) => ({ ...i }));
-      if (def.rewardItem && mysteryUiRewardLookup) {
-        const reward = stampDurability({
-          id: `mysteryreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          name: def.rewardItem,
-          kind: mysteryUiRewardLookup.kind,
-          rarity: mysteryUiRewardLookup.rarity,
-          quantity: 1,
-          tags: mysteryUiRewardLookup.tags,
-        });
-        const g = grantItem(newInventory, reward);
-        newInventory = g.inventory;
-        if (g.accepted <= 0) {
-          get().appendLog(
-            'world',
-            `Pack too full — ${def.rewardItem} couldn't be carried. Make room and complete the mystery again to claim.`,
-          );
-        }
-      }
-      set((s) => (s.player ? {
-        player: {
-          ...s.player,
-          tc: s.player.tc + def.rewardTc,
-          inventory: newInventory,
-          factionStanding: repResult.standing,
-          activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== def.id),
-          completedMysteryIds: [...(s.player.completedMysteryIds ?? []), def.id],
-        },
-      } : s));
-      get().appendLog(
-        'reward',
-        `✦ Mystery resolved — ${def.title}. +${def.rewardTc} TC${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
-      );
-      maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-724
-      applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
-      if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
-      plantNextContractHint(get, def.factionId ?? null, 'mystery');
-      void get().persist();
+      // B2 — the Contracts-UI COMPLETE used to pay from ANY tile (the remote hole).
+      // Delegate to the typed turn-in, which now enforces a FACE-TO-FACE hand-in
+      // (vendor present + right faction) + the long-haul bonus — one source of truth.
+      get().turnInMystery(id);
       return;
     }
     if (kind === 'storyline') {
-      const def = findStorylineById(id);
-      const rec = (player.activeStorylines ?? []).find((s) => s.id === id);
-      if (!def || !rec) {
-        get().appendLog('arbiter', `The Arbiter shakes their head. "That storyline isn't on your slate."`);
-        return;
-      }
-      if (rec.stage < def.stages.length) {
-        get().appendLog('arbiter', `The Arbiter folds their arms. "Not finished. The chapter isn't closed."`);
-        return;
-      }
-      const repResult = applyRepChange(player.factionStanding, def.factionId, def.rewardRep);
-      // OTA 041 — pre-ship audit caught the UI completion path skipping
-      // the rewardItem grant (4 storylines: Red Tower's Mouth → Runic
-      // Mantle, True Tartarian → Tartarian Stoneband, Reclaimer Relic
-      // Run → Echoing Steps Boots, Silence Across the Border → Mud
-      // Monarch Seal). Mirror turnInStoryline.
-      // 2026-05-25 — grantItem honors cap. Previously raw spread.
-      const storyUiRewardLookup = def.rewardItem ? lookupCraftedItem(def.rewardItem) : null;
-      let newInventory = player.inventory.map((i) => ({ ...i }));
-      if (def.rewardItem && storyUiRewardLookup) {
-        const reward = stampDurability({
-          id: `story_reward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          name: def.rewardItem,
-          kind: storyUiRewardLookup.kind,
-          rarity: storyUiRewardLookup.rarity,
-          quantity: 1,
-          tags: storyUiRewardLookup.tags,
-        });
-        const g = grantItem(newInventory, reward);
-        newInventory = g.inventory;
-        if (g.accepted <= 0) {
-          get().appendLog(
-            'world',
-            `Pack too full — ${def.rewardItem} couldn't be carried. Make room and complete the storyline again to claim.`,
-          );
-        }
-      }
-      set((s) => (s.player ? {
-        player: {
-          ...s.player,
-          tc: s.player.tc + def.rewardTc,
-          inventory: newInventory,
-          factionStanding: repResult.standing,
-          activeStorylines: (s.player.activeStorylines ?? []).filter((q) => q.id !== def.id),
-          completedStorylineIds: [...(s.player.completedStorylineIds ?? []), def.id],
-        },
-      } : s));
-      get().appendLog(
-        'reward',
-        `✦ Storyline complete — ${def.title}. +${def.rewardTc} TC, +${def.rewardRep} rep with ${def.factionId.replace(/_/g, ' ')}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
-      );
-      maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-724
-      applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
-      applyTrainAndLog(get, set, 'charisma', '✦ Word of the chapter spreads. +1 CHA (now {to}).');
-      if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
-      plantNextContractHint(get, def.factionId, 'storyline');
-      void get().persist();
+      // B2 — delegate to the face-to-face typed turn-in (closes the any-tile hole,
+      // adds the long-haul bonus).
+      get().turnInStoryline(id);
       return;
     }
     if (kind === 'faction_quest') {
-      const def = findFactionQuestById(id);
-      const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
-      // arb119 — REQUIRE an active record, like the hunt/mystery/storyline branches.
-      // Without `!rec`, a COMPLETED fetch quest (no stages) could be re-claimed for
-      // its TC + rep over and over — a Scrap-Metal→TC + rep pump.
-      if (!def || !rec) {
-        get().appendLog('arbiter', `The Arbiter shakes their head. "That contract isn't on file."`);
-        return;
-      }
-      // Stage gate matches the vendor turn-in: staged quests require
-      // max stage; legacy single-objective quests pass straight through.
-      if (def.stages && def.stages.length > 0) {
-        const currentStage = rec?.stage ?? 0;
-        if (currentStage < def.stages.length) {
-          get().appendLog('arbiter', `The Arbiter eyes the contract. "Step ${currentStage + 1} of ${def.stages.length}. Finish it first."`);
-          return;
-        }
-      }
-      // OTA-458 — fetch gate (was missing on the UI path). The OTA-450 starter
-      // quests are fetch deliveries with NO stages, so they slipped straight past
-      // the stage gate above and the Contracts-screen COMPLETE button paid out the
-      // reward WITHOUT verifying or consuming the items — a free turn-in. Mirror
-      // the vendor turn-in: require the items in pack, then consume them.
-      let fetchConsumed: InventoryItem[] | null = null;
-      if (def.fetch) {
-        const { itemName, quantity } = def.fetch;
-        const have = player.inventory
-          .filter((i) => i.name.toLowerCase() === itemName.toLowerCase())
-          .reduce((n, i) => n + (i.quantity ?? 1), 0);
-        if (have < quantity) {
-          get().appendLog('arbiter', `The Arbiter checks the slate. "${def.title} needs ${quantity}× ${itemName} — you're carrying ${have}. Gather the rest, then claim it."`);
-          return;
-        }
-        let toRemove = quantity;
-        fetchConsumed = player.inventory
-          .map((i) => {
-            if (toRemove <= 0 || i.name.toLowerCase() !== itemName.toLowerCase()) return i;
-            const take = Math.min(toRemove, i.quantity ?? 1);
-            toRemove -= take;
-            return { ...i, quantity: (i.quantity ?? 1) - take };
-          })
-          .filter((i) => (i.quantity ?? 1) > 0);
-      }
-      // arb171 / OTA-617 — proximity-gated reward (closes the "COMPLETE pays 100%
-      // from anywhere" exploit). In person → FULL; couriered from afar → HALF.
-      // "In person" is now BUILDING-LEVEL: a same-faction vendor/board in scene
-      // OR anywhere inside the faction's home outpost. (Travelling to the
-      // building auto-submits at full — see the arrival handler.)
-      const inPerson = atFactionTurnInBuilding(get, def.factionId);
-      const payTc = inPerson ? def.reward.tc : Math.max(1, Math.round(def.reward.tc * 0.5));
-      const payRep = inPerson ? def.reward.rep : Math.max(1, Math.round(def.reward.rep * 0.5));
-      const repResult = applyRepChange(player.factionStanding, def.factionId, payRep);
-      set((s) => (s.player ? {
-        player: {
-          ...s.player,
-          tc: s.player.tc + payTc,
-          inventory: fetchConsumed ?? s.player.inventory,
-          factionStanding: repResult.standing,
-          activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== def.id),
-          activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((qid) => qid !== def.id),
-          completedFactionQuestIds: [...(s.player.completedFactionQuestIds ?? []), def.id],
-        },
-      } : s));
-      get().appendLog(
-        'reward',
-        `✦ Quest complete — ${def.title}.${inPerson ? '' : ' Couriered for HALF (travel to a same-faction agent for full).'} +${payTc} TC, +${payRep} rep with ${def.factionId.replace(/_/g, ' ')}.`,
-      );
-      applyTrainAndLog(get, set, 'wisdom', '✦ Faction work finished, lessons kept. +1 WIS (now {to}).');
-      if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
-      plantNextContractHint(get, def.factionId, 'faction_quest');
-      void get().persist();
+      // B2 — delegate to the face-to-face typed turn-in. It enforces in-person
+      // (a same-faction vendor/board in scene OR inside the faction's home hall),
+      // the fetch gate, full pay + the long-haul bonus. Closes the OTA-617
+      // half-pay-from-anywhere path (now: in person or not at all).
+      get().turnInFactionQuest(id);
+      return;
     }
   },
 
@@ -18236,36 +22232,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (kind === 'hunt') {
       const def = findHuntById(id);
       const rec = (player.activeHunts ?? []).find((h) => h.id === id);
-      if (!def || !rec) return;
+      // OTA-1025 — a record whose def was RETIRED must still be droppable (the
+      // ABANDON button was a silent no-op on an orphan — a permanent slate entry).
+      if (!rec) return;
       set((s) => (s.player ? {
         player: {
           ...s.player,
           activeHunts: (s.player.activeHunts ?? []).filter((h) => h.id !== id),
         },
       } : s));
-      get().appendLog('world', `You set the ${def.title} aside. The poster goes back in the pack, edge-creased.`);
+      get().appendLog('world', `You set ${def ? theLower(def.title) : 'the hunt'} aside. The poster goes back in the pack, edge-creased.`);
     } else if (kind === 'mystery') {
       const def = findMysteryById(id);
       const rec = (player.activeMysteries ?? []).find((m) => m.id === id);
-      if (!def || !rec) return;
+      if (!rec) return;
       set((s) => (s.player ? {
         player: {
           ...s.player,
           activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== id),
         },
       } : s));
-      get().appendLog('world', `You let the ${def.title} go. Some questions Tartaria keeps.`);
+      get().appendLog('world', `You let ${def ? theLower(def.title) : 'the mystery'} go. Some questions Tartaria keeps.`);
     } else if (kind === 'storyline') {
       const def = findStorylineById(id);
       const rec = (player.activeStorylines ?? []).find((s) => s.id === id);
-      if (!def || !rec) return;
+      if (!rec) return;
       set((s) => (s.player ? {
         player: {
           ...s.player,
           activeStorylines: (s.player.activeStorylines ?? []).filter((q) => q.id !== id),
         },
       } : s));
-      get().appendLog('world', `You step away from the ${def.title} chapter. The Arbiter doesn't argue.`);
+      get().appendLog('world', `You step away from ${def ? theLower(def.title) : 'the'} chapter. The Arbiter doesn't argue.`);
     } else if (kind === 'whisper') {
       const rec = (player.activeWhispers ?? []).find((w) => w.id === id);
       if (!rec) return;
@@ -18287,7 +22285,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       const def = findFactionQuestById(id);
       const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
-      if (!def || !rec) return;
+      if (!rec) return;
       set((s) => (s.player ? {
         player: {
           ...s.player,
@@ -18297,7 +22295,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           routedMission: s.player.routedMission?.id === id ? null : s.player.routedMission,
         },
       } : s));
-      get().appendLog('world', `You hand the ${def.title} contract back to the wind. The Arbiter shrugs.`);
+      get().appendLog('world', `You hand ${def ? theLower(def.title) : 'the'} contract back to the wind. The Arbiter shrugs.`);
     }
     void get().persist();
   },
@@ -18309,10 +22307,125 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // setTravelCourse sets player.travelTarget and takes one step
   // toward the target's procedural position. continueTravel takes
   // additional steps. stopTravel clears the target.
+  acceptBounty(bounty) {
+    const player = get().player;
+    if (!player) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { bountyKey } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
+    const slate = activeBountiesOf(player);
+    // OTA-859 — don't stack the exact same contract twice.
+    if (slate.some((b) => bountyKey(b) === bountyKey(bounty))) {
+      get().appendLog('system', `You already carry the ${bounty.giverName} contract on the ${bounty.targetName}.`);
+      return;
+    }
+    // OTA-859 — hold up to MAX_ACTIVE_BOUNTIES at once; beyond that the slate is full.
+    if (slate.length >= MAX_ACTIVE_BOUNTIES) {
+      get().appendLog('system', `Your bounty slate is full (${MAX_ACTIVE_BOUNTIES}). Finish or abandon one first.`);
+      return;
+    }
+    const hadCourse = slate.length > 0;
+    // OTA-862 — stamp the accept hour so the contract can lapse after its in-game deadline.
+    const acceptedAtHour = player.hoursElapsed ?? 0;
+    // OTA-863 — DISTANCE-AWARE deadline: 24h base + one hour per tile between the player
+    // and the quarry's outpost, so a far contract isn't unreachable in time. Measured from
+    // the player's absolute cell at accept.
+    const grid = playerGridCell(player);
+    const tiles = canonicalDistanceFromGrid(grid.x, grid.y, bounty.targetLocationId);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { bountyDeadlineFor } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
+    const deadlineHours = bountyDeadlineFor(tiles);
+    set((s) => (s.player ? { player: { ...s.player, activeBounties: [...slate, { ...bounty, progress: 0, acceptedAtHour, deadlineHours }], activeBounty: undefined } } : s));
+    get().appendLog(
+      'arbiter',
+      hadCourse
+        ? `"Another contract," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down around ${bounty.targetLocationName}. Added to your slate — your current course holds."`
+        : `"A contract, then," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — and they'll be thick around ${bounty.targetLocationName}. Setting your course there now."`,
+    );
+    // Route the player to the quarry's outpost — but only if they weren't already on a
+    // bounty course. Stacking a second contract must not yank you off the first one's road.
+    if (!hadCourse) get().setTravelCourse(bounty.targetLocationId);
+  },
+
+  worldRealtimeTick() {
+    // OTA-857 — the world moves on WALL-CLOCK time, always. The in-game
+    // worldTideCheck only advanced when the player took actions that burned
+    // in-game hours; a player who opened the World board and just watched saw a
+    // frozen feed. This runs off a real-time timer (App.tsx) regardless of the
+    // open screen, so patrols roam + clash + get mauled continuously and the
+    // board is a genuine live scroll — "no matter what window is open."
+    const s = get();
+    const player = s.player;
+    if (!player) return; // no game in progress yet — nothing to simulate
+    // Don't churn the world during a boss/ending cutscene or on the title flow.
+    // arb-fix — also freeze during the tutorial: it runs on currentScreen
+    // 'exploration' with tutorialStep !== null, which this screen check missed,
+    // so the intro was drifting faction standing before the player acted.
+    if (s.currentScreen === 'title' || s.currentScreen === 'character_creation' || s.currentScreen === 'ending') return;
+    if (s.tutorialStep !== null) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+    const hour = player.hoursElapsed ?? 0;
+    // A monotonic wall-clock tick index, persisted so the sequence survives a
+    // reload (patrol positions already persist, so the war simply continues).
+    const rt = (s.worldMemory.worldRealtimeTicks ?? 0) + 1;
+    set((st) => ({ worldMemory: { ...st.worldMemory, worldRealtimeTicks: rt } }));
+    // Keep the fielded force in line with each faction's power (paced repop).
+    maintainPatrols(get, set, factions, rt);
+    // The very first heartbeat with an empty board deploys the standing forces
+    // (cold-start fill above) and runs a WARM-UP burst, so a player who opens
+    // World seconds after launch already sees the war underway, not a blank feed.
+    const firstEver = (get().worldMemory.worldEvents ?? []).length === 0;
+    // OTA-858 — ONE sub-step per real-time tick (was 2). This path fires every 6s, so 2
+    // sub-steps (~22% of the field mauled per tick) outran the +1/faction repop and the
+    // wars read as a meat-grinder with thrashing power. At 1 sub-step attrition is ~11%,
+    // which the muster comfortably keeps pace with — losses still land constantly, but
+    // armies hold ground and the field stays near its ~45 target. The warm-up burst (and
+    // the in-game worldTideCheck path) keep their heavier 4-step jumps.
+    const steps = firstEver ? PATROL_SUBSTEPS_PER_TICK * 4 : 1;
+    for (let i = 0; i < steps; i++) simulatePatrols(get, set, factions, hour, rt * 32 + i);
+    // Every so often, fold in a broader world EVENT (surge, muster, schism,
+    // caravan, omen, posted bounty) so the scroll isn't only patrol skirmishes.
+    if (rt % 6 === 0) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const WE = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+      const ctx = { factions, tides: get().worldMemory.factionTides ?? {}, standings: player.factionStanding };
+      const ev = WE.pickWorldEvent(ctx, rt);
+      if (ev) {
+        const tides = WE.applyTideDelta(get().worldMemory.factionTides ?? {}, ev.effect.tideDelta);
+        // OTA-981 — NO repDelta here. This copy of worldTideCheck's clause made
+        // player-facing faction STANDING move every ~36 real seconds — roughly
+        // 10x the intended in-game 2-hour cadence — including while idle. And
+        // since the rep-carrying events (defector / windfall) are only
+        // eligible once a faction likes you (standing >= 10) and are strictly
+        // positive for it, leaving the app open ratcheted standing toward the
+        // cap for free. The heartbeat now moves tides / patrols / the board
+        // only, matching the offline catch-up path's restraint; standing moves
+        // solely on the in-game pulse.
+        set((st) => ({ worldMemory: {
+          ...st.worldMemory,
+          factionTides: tides,
+          worldEvents: [...(st.worldMemory.worldEvents ?? []), { text: ev.rumor, hour, kind: ev.kind }].slice(-50),
+        } }));
+        if (ev.effect.musterPatrols) musterPatrols(get, set, factions, ev.effect.musterPatrols.factionId, ev.effect.musterPatrols.count);
+      }
+    }
+    // No persist() here — the 90s autosave + every player action flush
+    // worldMemory. A disk write every few seconds would be needless churn.
+  },
+
   setTravelCourse(locationId: string) {
     const player = get().player;
     const scene = get().currentScene;
     if (!player || !scene) return;
+    // OTA-1016 — a course begins OUTSIDE. Two engine callers (routeMission, the
+    // bounty board) reach here from indoors with no gate, and a surviving
+    // hubRoomId re-attached the DEPARTURE room to the ARRIVAL outpost ("you
+    // pass through the gate into <new outpost> — Workshop"). One clear at the
+    // one choke point every caller shares.
+    if (player.hubRoomId || get().activeBuildingId) {
+      set((s2) => (s2.player ? { player: { ...s2.player, hubRoomId: null }, activeBuildingId: null } : s2));
+      get().appendLog('world', 'You step out under open sky and take your bearings.');
+    }
     // arb47 — block only when the player is ACTUALLY standing on the target's
     // fixed canon cell. (You can have wandered paces away from your home location
     // in open ground — currentLocationId still reads it — and re-route back to it
@@ -18539,6 +22652,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s) => (s.player?.travelTarget ? {
         player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: dist } },
       } : s));
+      // OTA-850 — within 2 tiles of a hostile / bounty-target outpost, its patrol
+      // intercepts. No-op unless the step didn't already start a fight.
+      if ((get().currentScene?.enemies?.length ?? 0) === 0) maybeInterceptPatrol(get, set, targetId, dist);
     }
   },
 
@@ -18867,9 +22983,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // hit the crash. Fix: use the already-imported pickWeather
         // reference, no require needed.
         const liveWorldMem = get().worldMemory;
-        const newWeather = pickWeather(liveWorldMem);
+        // OTA-1003 — #122: the open road carries no locale bias (null location) and
+        // the drift updates the persisted sky so arrival doesn't re-roll it.
+        const newWeather = pickWeather(liveWorldMem, null);
+        const driftHours = get().player?.hoursElapsed ?? 0;
+        // OTA-1014 — 'open-road' is a sentinel: during transit currentLocationId
+        // still names the ORIGIN, and stamping the unbiased road roll under a
+        // real location id overwrote + locked out that location's biased sky.
+        const driftLocId = 'open-road';
         set((s) => s.currentScene
-          ? { currentScene: { ...s.currentScene, weather: newWeather } }
+          ? {
+              currentScene: { ...s.currentScene, weather: newWeather },
+              worldMemory: {
+                ...s.worldMemory,
+                sceneWeatherByLoc: {
+                  ...(s.worldMemory.sceneWeatherByLoc ?? {}),
+                  [driftLocId]: { id: newWeather.id, rolledAtHours: driftHours },
+                },
+              },
+            }
           : s);
       }
       // arb28 — RE-PLOT the distance to the plotted city from the NEW tile.
@@ -18951,7 +23083,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (trWis.leveled) {
             get().appendLog(
               'reward',
-              `✦ The road teaches you. +1 WIS (now ${trWis.leveled.to}).`,
+              `✦ The road teaches you. +1 WIS (${statNowClause(get().player, 'wisdom', trWis.leveled.to)}).`,
             );
           }
         }
@@ -18972,7 +23104,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (trStr.leveled) {
               get().appendLog(
                 'reward',
-                `✦ The pack on your back makes you stronger. +1 STR (now ${trStr.leveled.to}).`,
+                `✦ The pack on your back makes you stronger. +1 STR (${statNowClause(get().player, 'strength', trStr.leveled.to)}).`,
               );
             }
           }
@@ -18996,7 +23128,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (trCha.leveled) {
               get().appendLog(
                 'reward',
-                `✦ Your bearing reads. +1 CHA (now ${trCha.leveled.to}).`,
+                `✦ Your bearing reads. +1 CHA (${statNowClause(get().player, 'charisma', trCha.leveled.to)}).`,
               );
             }
           }
@@ -19102,7 +23234,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // it, pacing two tiles re-spawned a FRESH stall every step (unlimited rare
       // stock). Now a stall only appears on ground you haven't just walked.
       if (outdoorPeaceful && !inAnyHubRoom && tileIsNovel && Math.random() < 0.20) {
-        const stall = pickRoadsideTrader();
+        const stall = withSkyreacherChartOffer(pickRoadsideTrader(), get().worldMemory)!;
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
         get().appendLog(
           'world',
@@ -19110,6 +23242,106 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         const stallBlurb = vendorWaresBlurb(get, stall.name); // OTA-726
         if (stallBlurb) get().appendLog('world', stallBlurb);
+      }
+    }
+    // OTA-988 — HOOK ESCORT spawner: a stranded traveler on novel wild ground
+    // offers an escort. Patterned on the roadside-stall roll above; anti-farm
+    // mirrors the wanderer bank (one roll per tile, ever, 120-tile window).
+    {
+      const liveScene = get().currentScene;
+      const livePlayer = get().player;
+      const peacefulWild = !!liveScene
+        && (!liveScene.enemies || liveScene.enemies.length === 0)
+        && !liveScene.vendor && !liveScene.wanderer
+        && !livePlayer?.hubRoomId
+        && !get().activeBuildingId;
+      // One escort party at a time — never stack a second stranded traveler
+      // on top of a live one.
+      const hasLiveEscort = (livePlayer?.activeFactionQuests ?? [])
+        .some((q) => q.escort && q.escort.hp > 0);
+      // OTA-998 — THE HOLLOWED (owner feature): a fallen character of this
+      // install surfaces as a one-time Aetherkin-revenant BOSS event. Power-
+      // gated so a fresh character never stumbles into one; the pool is the
+      // install's un-avenged Fallen. Kill = put to rest (resolveEnemyDefeat).
+      let revenantBeatFired = false;
+      {
+        const rvPlayer = get().player;
+        const rvScene = get().currentScene;
+        // OTA-1017 — the power gate needs PROVEN PROGRESS beside raw HP (a fresh
+        // Giant starts near 60 hpMax — no day-one bosses for any race), and
+        // diced ground BANKS so a revisit can't re-arm the door.
+        const rvTileKey = rvPlayer ? `${rvPlayer.currentLocationId}:${rvPlayer.mapX}:${rvPlayer.mapY}` : '';
+        const rvRolled = get().worldMemory.revenantRolledTiles ?? [];
+        const rvProven = ((rvPlayer?.milestones?.enemiesDefeated ?? 0) >= 10) || ((rvPlayer?.hoursElapsed ?? 0) >= 12);
+        if (rvPlayer && rvScene && peacefulWild && tileIsNovel && !hasLiveEscort
+            && (rvScene.enemies ?? []).length === 0 && (rvPlayer.hpMax ?? 0) >= 60
+            && rvProven && !rvRolled.includes(rvTileKey)) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const rev = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+          const rvPool = rev.cachedFallen().filter((f) => !f.avengedTs);
+          if (rvPool.length > 0) {
+            set((s2) => ({ worldMemory: {
+              ...s2.worldMemory,
+              revenantRolledTiles: [...(s2.worldMemory.revenantRolledTiles ?? []), rvTileKey].slice(-120),
+            } }));
+          }
+          if (rvPool.length > 0 && Math.random() < 0.04) {
+            revenantBeatFired = true;
+            const fr = rvPool[Math.floor(Math.random() * rvPool.length)]!;
+            const foe = rev.revenantFromFallen(fr, rvPlayer.hpMax);
+            set((s2) => (s2.currentScene ? {
+              currentScene: {
+                ...s2.currentScene,
+                enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
+                enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
+              },
+              worldMemory: { ...s2.worldMemory, activeRevenant: { ...fr } },
+            } : s2));
+            const beats = rev.revenantIntroBeats(fr, fr.name === rvPlayer.name);
+            get().appendLog('world', beats.emergence);
+            get().appendLog('arbiter', beats.identification);
+            get().appendLog('world', beats.identity);
+            get().appendLog('combat', `⚔ BOSS EVENT — ${foe.name}. ${beats.character}`);
+            get().appendLog('debug', `spawn: revenant ${fr.name}@${fr.ts} pool=${rvPool.length}`);
+          } else if (rvPool.length > 0 && Math.random() < 0.05) {
+            // OTA-1004 — the HINT route (owner: "hint missions that can be picked
+            // up AND random encounters"). No boss yet — a marker on the verge
+            // naming one of the fallen, which the player may follow or leave.
+            revenantBeatFired = true;
+            const fr = rvPool[Math.floor(Math.random() * rvPool.length)]!;
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { plantHookByKind: plantFallenHook } = require('../engine/hooks') as typeof import('../engine/hooks');
+            const fw = plantFallenHook('fallen_whisper', `fallen:${fr.ts}`);
+            set((s2) => (s2.currentScene
+              ? { currentScene: { ...s2.currentScene, hooks: [...(s2.currentScene.hooks ?? []), fw] } }
+              : s2));
+            get().appendLog('world', fw.plantedLine);
+            get().appendLog(
+              'world',
+              `A trader's tale clings to this stretch: something in warrior's plate haunts ${fr.locationName}, killing for the joy it half-remembers. The tale gives it a name — ${fr.name}.`,
+            );
+            get().appendLog('system', `Try "examine the marker" — the road is warning you about something.`);
+            get().appendLog('debug', `spawn: fallen_whisper rumor ${fr.name}@${fr.ts} pool=${rvPool.length}`);
+          }
+        }
+      }
+      const sTileKey = livePlayer ? `${livePlayer.currentLocationId}:${livePlayer.mapX}:${livePlayer.mapY}` : '';
+      const sRolled = get().worldMemory.strandedEscortRolledTiles ?? [];
+      if (peacefulWild && !revenantBeatFired && !hasLiveEscort && tileIsNovel && sTileKey && !sRolled.includes(sTileKey)) {
+        set((s2) => ({ worldMemory: {
+          ...s2.worldMemory,
+          strandedEscortRolledTiles: [...(s2.worldMemory.strandedEscortRolledTiles ?? []), sTileKey].slice(-120),
+        } }));
+        if (Math.random() < 0.06) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { plantHookByKind } = require('../engine/hooks') as typeof import('../engine/hooks');
+          const h = plantHookByKind('stranded_traveler');
+          set((s2) => (s2.currentScene
+            ? { currentScene: { ...s2.currentScene, hooks: [...(s2.currentScene.hooks ?? []), h] } }
+            : s2));
+          get().appendLog('world', h.plantedLine);
+          get().appendLog('system', `Try "talk to the traveler" — they want something from you.`);
+        }
       }
     }
 
@@ -19203,6 +23435,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
         }
+      }
+    }
+
+    // OTA-914 — the mud gives one back. On open, novel ground (not in a hub, not
+    // inside a building, nothing already in front of you) an Aetherkin can claw
+    // up out of the silt for a random encounter. Gated on tileIsNovel like the
+    // roadside-stall / wasteland rolls so pacing a tile doesn't re-spawn one every
+    // step. HAL + golem only.
+    {
+      const liveScene = get().currentScene;
+      const livePlayer = get().player;
+      const openPeaceful = !!liveScene
+        && (!liveScene.enemies || liveScene.enemies.length === 0)
+        && !liveScene.vendor;
+      if (openPeaceful && livePlayer && !livePlayer.hubRoomId && !get().activeBuildingId
+        && tileIsNovel && Math.random() < AETHERKIN_MUD_CHANCE) {
+        spawnAetherkin(get, set, 'mud');
       }
     }
 
@@ -19510,7 +23759,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
           if (spawned) {
-            const finalSpawn: Enemy = spawned;
+            // OTA-896 (SA-4) — scale the apex spawn (the boss-swap boss, or a
+            // Legendary walk-in) to the player's power. This wasteland path
+            // bypasses scaleEncounterForContext, so without this a Day-30 player
+            // walks into a fixed 580 HP Hollow King no matter their build.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const cgScale = require('../engine/coreGuardians') as typeof import('../engine/coreGuardians');
+            const wePlayer = get().player;
+            const finalSpawn: Enemy = wePlayer
+              ? cgScale.scaleStaticBoss(cgScale.guardianPlayerPower(wePlayer), spawned)
+              : spawned;
             set((s) => {
               if (!s.currentScene) return s;
               return {
@@ -19611,6 +23869,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // typed `craft <name>` via submitPlayerAction.
   craftRecipe(recipeName: string) {
     get().submitPlayerAction(`craft ${recipeName}`);
+  },
+
+  craftRecipeBatch(recipeName, count) {
+    const want = Math.max(1, Math.min(Math.floor(count), 20));
+    if (want === 1) { get().submitPlayerAction(`craft ${recipeName}`); return 1; }
+    // Quiet the per-craft reward line; ONE summary lands at the end. Same
+    // deferred-narration shape salvageAllAmbient uses for `salvage all`.
+    set({ craftBatchQuiet: true });
+    let made = 0;
+    try {
+      for (let i = 0; i < want; i += 1) {
+        // OTA-1012 — count the RESULT, not the whole pack. The old total-quantity
+        // delta was a proxy that LIES when a recipe consumes as much as it
+        // produces (the Club: 1 Stick -> 1 Club, net zero), reading a
+        // successful craft as a refusal — one silent club, made === 0, no
+        // summary. A success always raises the result's own count by one.
+        const countResult = () => (get().player?.inventory ?? [])
+          .filter((it) => it.name === recipeName)
+          .reduce((n, it) => n + (it.quantity ?? 0), 0);
+        const before = countResult();
+        get().submitPlayerAction(`craft ${recipeName}`, { silent: true });
+        // The substitution-confirm prompt owns the flow from here — stop rather
+        // than firing more crafts behind a modal the player hasn't answered.
+        if (get().craftSubstitutionPrompt) break;
+        if (countResult() <= before) break; // refused / pack full / out of materials
+        made += 1;
+      }
+    } finally {
+      set({ craftBatchQuiet: false });
+    }
+    if (made > 0) {
+      get().appendLog(
+        'reward',
+        made === want
+          ? `✦ Crafted ${recipeName} ×${made}. The Arbiter watches you set the last piece.`
+          : `✦ Crafted ${recipeName} ×${made} of ${want} — the materials ran out (or your pack did).`,
+      );
+    }
+    return made;
   },
 
   clearSlotLoadError() {
@@ -20189,7 +24486,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         continue;
       }
 
-      const outcome = rollSalvagePool(noun);
+      const outcome = ledgeredSalvage(get, set, noun);
       if (!outcome) {
         // No pool matched. Track for the fallback emit + breadcrumb
         // so the player doesn't see a silent no-op.
@@ -20346,6 +24643,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // tell the player. If everything was unmatched, surface that
     // explicitly + persist a breadcrumb naming the nouns so we can
     // add the missing pools without a repro.
+    // OTA-840 [never-fail-silently] — on a MIXED batch (some nouns broke down, some
+    // matched no pool) the unmatched ones used to leave only a 'debug' breadcrumb —
+    // the player saw the successful loot but never learned the rest yielded nothing.
+    // Surface them whenever there WAS other output; the all-empty case below still
+    // owns the nothing-at-all batch.
+    const hadOtherOutput =
+      narrationLines.length > 0 || skippedAlready.length > 0 || itemTotals.size > 0 || tcGained > 0;
+    if (unmatchedNouns.length > 0 && hadOtherOutput) {
+      get().appendLog(
+        'world',
+        `You look the ${unmatchedNouns.slice(0, 3).join(', ')} over and find nothing your tools can break down here.`,
+      );
+    }
     if (
       narrationLines.length === 0
       && skippedAlready.length === 0
@@ -20378,7 +24688,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     const player = state.player;
     if (!player) return;
-    // OTA — resolve the EXACT instance the caller picked by its unique id when
+    // OTA-953 — resolve the EXACT instance the caller picked by its unique id when
     // given (the inventory UI passes it), so a stack of same-name items with
     // different durability/instance stats equips the ONE the player selected — not
     // just the first row that happens to share the name. Falls back to name-match
@@ -20414,9 +24724,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Track displacements so a single combined "you set X aside" line
     // fires before the equip narration.
     const displaced: string[] = [];
+    // OTA-796 — a displaced weapon must give back the max-HP bonus it baked in
+    // (mirror of unequipSlot). Without this, alternating a +HP shield with a
+    // +HP two-hander re-baked the bonus on every re-equip while the displace
+    // never stripped it — an unbounded hpMax + full-heal loop (exploit sweep).
+    const stripDisplacedHp = (name: string | undefined) => {
+      const d = -gearHpBonus(name);
+      if (d === 0) return;
+      set((s) => {
+        if (!s.player) return s;
+        const newMax = Math.max(1, (s.player.hpMax ?? 1) + d);
+        return { player: { ...s.player, hpMax: newMax, hp: Math.max(1, Math.min((s.player.hp ?? 1) + d, newMax)) } };
+      });
+    };
     if (slot === 'off' && mainCat?.style === 'two_handed') {
       // Equipping anything to off-hand while 2H in main → drop the 2H.
       displaced.push(mainName!);
+      stripDisplacedHp(mainName);
       set((s) => (s.player ? {
         player: {
           ...s.player,
@@ -20427,6 +24751,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (slot === 'main' && incomingCat?.style === 'two_handed' && offName) {
       // Equipping a 2H to main while off-hand has something → drop off-hand.
       displaced.push(offName);
+      stripDisplacedHp(offName);
       set((s) => (s.player ? {
         player: {
           ...s.player,
@@ -20441,6 +24766,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // here. Drops anything in either hand.
       if (mainName) {
         displaced.push(mainName);
+        stripDisplacedHp(mainName);
         set((s) => (s.player ? {
           player: {
             ...s.player,
@@ -20450,6 +24776,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       if (offName) {
         displaced.push(offName);
+        stripDisplacedHp(offName);
         set((s) => (s.player ? {
           player: {
             ...s.player,
@@ -20593,19 +24920,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  // OTA-239 — Tool Pouch. OTA-270 — capacity raised 3 → 4 so a player
-  // with all three scanner families (Pulse / Aetheric / Mud) can pouch
-  // every one AND still keep a fourth general tool on the belt. Pouched
-  // items remain in inventory; pouchIds is the index. Players stow
-  // Aetheric Torches, Vision Lenses, scanners, etc. so `use <item>`
-  // resolves faster and the InventoryScreen surfaces them in a
-  // dedicated section.
+  // OTA-239 — Tool Pouch → OTA-778 SCANNER POUCH. Three slots, one per scanner
+  // family (Pulse / Aetheric / Mud). Pouched scanners are ALWAYS RUNNING, which
+  // is why a search surfaces their hidden loot — an "always-on" contract that
+  // only makes sense for scanners. Non-scanners (the button-use Aetheric Torch,
+  // pack-gear ropes/pry bars) are refused by isPouchEligible. Pouched items
+  // remain in inventory; toolPouchIds is the index.
   stowInPouch(itemName, itemId) {
-    const POUCH_MAX = 4;
+    const POUCH_MAX = 3;
     const state = get();
     const player = state.player;
     if (!player) return;
-    const current = player.equipped?.toolPouchIds ?? [];
+    // OTA-1028 — LIVE ids only (mirrors the bandolier ghost guard): a stowed tool
+    // that left the pack by sale/scrap/use must never eat a pouch slot.
+    const current = (player.equipped?.toolPouchIds ?? []).filter((id) => player.inventory.some((i) => i.id === id));
     // OTA-695 — pouch the first UN-POUCHED instance of this name (mirrors the
     // OTA-690 bandolier fix). The old first-by-name find re-grabbed an already-
     // pouched copy, so isPouchEligible bounced with "already on your belt" and you
@@ -20637,7 +24965,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (current.length >= POUCH_MAX) {
       get().appendLog(
         'arbiter',
-        `The Arbiter looks at the pouch. "Four is the limit. Take one out before another goes in."`,
+        `The Arbiter looks at the pouch. "Three is the limit — one slot per scanner. Take one out before another goes in."`,
       );
       return;
     }
@@ -20652,7 +24980,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           },
         }
       : s);
-    get().appendLog('world', `You stow ${item.name} on your tool belt. Ready to use.`);
+    get().appendLog('world', `You clip ${item.name} into your scanner pouch. It runs whenever you search.`);
     void get().persist();
   },
 
@@ -20693,7 +25021,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const BANDOLIER_MAX = 5;
     const player = get().player;
     if (!player) return;
-    const current = player.equipped?.bandolierIds ?? [];
+    // OTA-1028 — count LIVE ids only: a ghost (racked item that left the pack by a
+    // path other than throwing) must never eat a loop.
+    const current = (player.equipped?.bandolierIds ?? []).filter((id) => player.inventory.some((i) => i.id === id));
     // OTA-690 — rack the first UN-RACKED instance of this name. The old find
     // grabbed the first-by-name instance regardless — so once one throwing knife
     // was racked, every "stow Throwing Knife" re-found that SAME (already-racked)
@@ -20774,25 +25104,51 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const tile = startingLocationForFaction(fac.id);
-    if (player.currentLocationId !== tile) {
+    // OTA-783 — the Hidden Market is a neutral broker: turn in ANY faction's
+    // sigil here, not only at that faction's home stake. Keeps the market the
+    // one-stop hub so a carried sigil is never stranded.
+    const atMarket = player.currentLocationId === 'hidden_market';
+    if (player.currentLocationId !== tile && !atMarket) {
       const dest = getLocationById(tile)?.name ?? tile;
-      get().appendLog('arbiter', `The Arbiter shakes their head. "Not here. Carry the ${item.name} to ${dest} and lay it down among their own."`);
+      get().appendLog('arbiter', `The Arbiter shakes their head. "Not here. Carry the ${item.name} to ${dest} and lay it down among their own — or take it to the Hidden Market; they broker such debts."`);
       return;
     }
     // Honor the dead: +1 standing, spend the sigil.
+    // OTA-815 — returning a faction's sigil ALSO establishes TRADE RAPPORT with that
+    // faction: it turns on the CHA-scaled vendor discount (buys cheaper / sell-backs
+    // richer) that used to sit behind a bespoke "fetch a relic" faction quest. The
+    // player asked to reuse the existing sigil economy instead of authoring nine new
+    // relics — a returned sigil is the earned gesture that opens their better prices.
+    // Mechanically we mark the faction's rapport quest id complete (the same key
+    // hasFactionRapport / vendorPriceMod already read), so no new plumbing. The
+    // authored fetch quests, where they exist, still work as an alternate path.
+    const rapportId = rapportQuestId(fac.id);
+    const hadRapport = (player.completedFactionQuestIds ?? []).includes(rapportId);
     const repResult = applyRepChange(player.factionStanding, fac.id, 1);
     set((s) => (s.player
       ? {
           player: {
             ...s.player,
             factionStanding: repResult.standing,
+            completedFactionQuestIds: hadRapport
+              ? s.player.completedFactionQuestIds
+              : [...(s.player.completedFactionQuestIds ?? []), rapportId],
             inventory: s.player.inventory
               .map((i) => (i.id === itemId ? { ...i, quantity: i.quantity - 1 } : i))
               .filter((i) => i.quantity > 0),
           },
         }
       : s));
-    get().appendLog('world', `You lay the ${item.name} down among ${fac.name}'s own. They mark the debt paid — one of their dead comes home.`);
+    get().appendLog('world', atMarket
+      ? `The Hidden Market broker takes the ${item.name} and sends it on to ${fac.name}'s own. The debt is marked paid — one of their dead comes home. (+1 ${fac.name} standing)`
+      : `You lay the ${item.name} down among ${fac.name}'s own. They mark the debt paid — one of their dead comes home.`);
+    if (!hadRapport) {
+      const chaNow = effectiveStats(player).charisma;
+      const discPct = Math.round(chaPriceDiscount(chaNow) * 100);
+      get().appendLog('world', discPct > 0
+        ? `${fac.name} count you a friend of the house now — their traders open their better prices to you. (Charisma trade discount with them: ${discPct}%.)`
+        : `${fac.name} count you a friend of the house now — their traders will open their better prices once your Charisma gives you the tongue for it.`);
+    }
     logRepChanges(get, repResult.changed);
     void get().persist();
   },
@@ -20823,7 +25179,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const perHP = isGolemRepairPart(golem.kind, item.name)
         ? golemRepairHeal(golem.kind)
         : isGolemSubstitutePart(golem.kind, item)
-          ? golemSubstituteHeal(golem.kind, item.rarity)
+          ? golemSubstituteHeal(golem.kind, canonicalItemRarity(item))
           : 0;
       if (perHP <= 0) { get().appendLog('arbiter', `The Arbiter shakes their head. "${item.name} won't feed the Aetherstone."`); return; }
       const gap = Math.max(0, golem.hpMax - golem.hp);
@@ -20838,15 +25194,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // self / dog use the item's fixed consumable heal.
     const fx = resolveItemEffect(item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
-    const perHP = fx?.kind === 'consumable' ? (fx.healHP ?? 0) : 0;
+    const perHP = fx?.kind === 'consumable' ? scaledHealHP(fx.healHP ?? 0, player.hpMax) : 0; // OTA-1001 — #120
     if (perHP <= 0) { get().appendLog('arbiter', `The Arbiter studies the ${item.name}. "That won't mend anything in bulk."`); return; }
 
     if (target === 'dog') {
       const dog = player.dog;
       if (!dog || dog.status === 'dead' || dog.status === 'abandoned') { get().appendLog('arbiter', `The Arbiter glances at your side. "No dog to tend."`); return; }
       const gap = Math.max(0, dog.hpMax - dog.hp);
-      const heal = Math.min(gap, perHP * use);
-      const isTreat = (item.tags ?? []).includes('dog_treat');
+      // OTA-1016 — the dog's meal scales by the DOG's hpMax, not the player's.
+      const dogPer = fx?.kind === 'consumable' ? scaledHealHP(fx.healHP ?? 0, dog.hpMax) : 0;
+      const heal = Math.min(gap, dogPer * use);
+      const isTreat = canonicalItemTags(item).includes('dog_treat');
       const loyPer = isTreat ? 40 : fx?.kind === 'consumable' ? 20 : 5;
       const loyalty = Math.min(100, dog.loyalty + loyPer * use);
       set((s) => (s.player?.dog
@@ -20904,7 +25262,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // whole vial bursts on impact for that full total UP FRONT (perTurn × turns) of
     // the coating's damage type, then it's spent. (A player ask: "3 burn/turn for 3
     // turns → 9 burn on the throw.") No lingering DOT / shred / stacks — one and done.
-    if ((item.tags ?? []).some((t) => /^weapon_coating$/i.test(t))) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isWeaponCoatingItem: iwciThrow } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
+    if (iwciThrow(item)) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { resolveItemEffect: rieThrow } = require('../engine/itemEffect');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -20926,7 +25286,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const mod = applyDamageTypeModifier(rawBurst, dtype, target.type);
       const traitMod = traitDamageMultiplier(target.traits, dtype);
       // OTA-715 — reconcile type+trait (trait wins on a discord).
-      const burst = Math.max(1, Math.round(rawBurst * combineDamageTypeMatch(mod.match, traitMod.match).multiplier));
+      const burstCombined = combineDamageTypeMatch(mod.match, traitMod.match);
+      const burst = Math.max(1, Math.round(rawBurst * burstCombined.multiplier));
+      // OTA-838 — a thrown coating teaches you the target's reaction to that type too.
+      recordEnemyIntel(get, set, target.name, dtype, burstCombined.match);
       const newHp = Math.max(0, targetHp - burst);
       // Consume one vial + write the enemy's reduced HP + point the active index at
       // the target so resolveEnemyDefeat resolves THIS enemy on a kill.
@@ -20943,7 +25306,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           currentScene: { ...s.currentScene, enemyHps: s.currentScene.enemyHps.map((h, i) => (i === idx ? newHp : h)), activeEnemyIdx: idx },
         };
       });
-      // OTA — the leading number is the ACTUAL damage (after the target's type
+      // OTA-953 — the leading number is the ACTUAL damage (after the target's type
       // weakness/resistance + traits). The parenthetical shows the coating's own
       // math (perTurn × turns); when the target scaled it, name the reason so the
       // two numbers reconcile instead of looking like a bug ("5 … (1/turn × 3)").
@@ -20975,43 +25338,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => s.player
       ? { player: { ...s.player, equipped: { ...(s.player.equipped ?? {}), off: item.name, offId: item.id } } }
       : s);
-    const beforeThrowQty = item.quantity;
+    // OTA-980 — the restore (and the spend-exactly-one guarantee) used to run RIGHT
+    // HERE, synchronously — written when combat resolved in the same tick. With
+    // the dice modal the damage phase runs SECONDS later and read the RESTORED
+    // weapon: owner's log shows a thrown Sentinel Core Plate rolling as itself
+    // but LANDING as the Mud-fist Wraps (wraps damage type, wraps coatings
+    // burned, wraps wear — and the plate never spent). Both now wait in
+    // throwSettlement until the roll RESOLVES (restore + spend) or CANCELS
+    // (restore, nothing spent — same spirit as the cancel time/stamina refund).
+    set({ throwSettlement: { itemId: item.id, qtyAtThrow: item.quantity, prevOff, prevOffId } });
     get().submitPlayerAction(`attack with the off-hand ${item.name}`);
-    // OTA-604 — guarantee a bandolier throw spends EXACTLY ONE unit. The
-    // off-hand attack only consumes the throwable on a HIT (the consume logic
-    // is bundled into the hit-only weapon-wear path), so a MISS left the axe in
-    // hand forever — the player threw a single axe ~50 times. If the attack
-    // didn't already decrement the stack, spend one here; if it did (a hit
-    // already consumed it), don't double-spend.
-    const midItem = get().player?.inventory.find((i) => i.id === item.id);
-    const alreadySpent = !midItem || midItem.quantity < beforeThrowQty;
-    if (!alreadySpent) {
-      set((s) => s.player ? {
-        player: {
-          ...s.player,
-          inventory: s.player.inventory
-            .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
-            .filter((i) => i.quantity > 0),
-        },
-      } : s);
-    }
-    // Did the stack survive the throw?
-    const after = get().player;
-    const stillHas = !!after?.inventory.some((i) => i.id === item.id && i.quantity > 0);
-    // Restore the prior off hand — unless what was there IS the now-spent throwable
-    // (it's gone from inventory), in which case leave the hand empty.
-    set((s) => {
-      if (!s.player) return s;
-      const eq = { ...(s.player.equipped ?? {}) };
-      const danglingSpent = prevOffId === item.id && !stillHas;
-      if (prevOff && !danglingSpent) eq.off = prevOff; else delete eq.off;
-      if (prevOffId && !danglingSpent) eq.offId = prevOffId; else delete eq.offId;
-      // Clear the slot off the bandolier once the stack is empty.
-      if (!stillHas) {
-        eq.bandolierIds = (eq.bandolierIds ?? []).filter((id) => id !== item.id);
-      }
-      return { player: { ...s.player, equipped: eq } };
-    });
+    // A swing that never opened the dice modal (a refusal, or a synchronous
+    // resolution whose hit-consume already spent the unit) settles NOW —
+    // 'cancelled' restores the hand and spends nothing extra.
+    if (!get().pendingRolls) get().settleThrowRestore('cancelled');
     void get().persist();
   },
 
@@ -21060,6 +25400,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().submitPlayerAction(`use ${item.name}`);
       return;
     }
+    // OTA-912 — a Skyreacher Chart. Applied DIRECTLY (not through the parser,
+    // whose item resolution stumbles on the "(N of 5)" name): unlock the great
+    // climb + reveal + log the mission + consume one chart.
+    if (fxLookup && fxLookup.kind === 'map') {
+      get().appendLog('player', `use ${item.name}`);
+      unlockGreatClimbFromChart(get, set, item, fxLookup.climbId);
+      return;
+    }
+    // OTA-913 — using an Aether Collection Beacon builds the Beacon Rifle once
+    // all five towers are cleared (applied directly, like the chart).
+    if (fxLookup && fxLookup.kind === 'beacon') {
+      get().appendLog('player', `use ${item.name}`);
+      assembleBeaconRifle(get, set);
+      return;
+    }
     // Consumables → eat (HP recovery + time advance + quantity
     // decrement). Routed through submitPlayerAction so the existing
     // rest-with-resolvedItemId path handles all the state mutations.
@@ -21101,7 +25456,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     setCanonExtraLocations(after.canonLocations ?? []);
   },
 
-  toggleReserveForFusion(itemId) {
+  toggleReserveForFusion(itemId, count) {
     const player = get().player;
     if (!player) return;
     const item = player.inventory.find((i) => i.id === itemId);
@@ -21117,8 +25472,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // reserved as a fusion CATALYST — reserving one themes the fused
     // output into a unique faction item (see findFactionCatalyst /
     // applyFusion). They still don't count toward the 3-scrap gate.
-    const isFactionCatalyst = (item.tags ?? []).includes('faction_gear');
-    if (!isInferredItem(item.name) && !isFactionCatalyst) return;
+    const isFactionCatalyst = canonicalItemTags(item).includes('faction_gear');
+    // OTA-756 — forge reservability is now one shared predicate (isForgeReservableItem):
+    // (2a) a weapon/armor can't be freshly reserved anymore — reserving one used to
+    // show a ♥ the Crucible then silently ignored; (1a) a 'loot' reagent with no
+    // recipe use now CAN be reserved. An already-reserved item can always be toggled
+    // OFF regardless, so anything stranded by the rule change can still be freed.
+    const { isForgeReservableItem } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+    if (!isForgeReservableItem(item) && !isFactionCatalyst && !item.reservedForFusion) return;
     const reserving = !item.reservedForFusion;
     const qty = item.quantity ?? 1;
     // arb107 — a SINGLE-unit stack just flips the flag in place.
@@ -21146,23 +25507,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
       && !a.coating && !b.coating
       && !a.instanceStats && !b.instanceStats
       && !a.uniqueStats && !b.uniqueStats;
+    // OTA-968 — move `count` units in one call (the "Save all xN" button); clamped to the
+    // stack. Moving the WHOLE stack just flips the row's flag (merging into an
+    // existing same-state stack if one exists) — no churn through N single peels.
+    const moveN = Math.max(1, Math.min(count ?? 1, qty));
+    if (moveN >= qty) {
+      set((s) => {
+        if (!s.player) return s;
+        let inv = s.player.inventory;
+        const dest = inv.find(
+          (i) => i.id !== itemId && sameUnit(i, item) && (i.reservedForFusion === true) === reserving,
+        );
+        if (dest) {
+          inv = inv
+            .filter((i) => i.id !== itemId)
+            .map((i) => (i.id === dest.id ? { ...i, quantity: (i.quantity ?? 1) + qty } : i));
+        } else {
+          inv = inv.map((i) => (i.id === itemId ? { ...i, reservedForFusion: reserving } : i));
+        }
+        return { player: { ...s.player, inventory: inv } };
+      });
+      return;
+    }
     set((s) => {
       if (!s.player) return s;
-      // Drop one off the tapped stack (remove the row if it empties).
+      // Drop `moveN` off the tapped stack (remove the row if it empties).
       let inv = s.player.inventory
-        .map((i) => (i.id === itemId ? { ...i, quantity: (i.quantity ?? 1) - 1 } : i))
+        .map((i) => (i.id === itemId ? { ...i, quantity: (i.quantity ?? 1) - moveN } : i))
         .filter((i) => (i.quantity ?? 1) > 0);
       // Merge the peeled unit into an existing opposite-state stack, else add a row.
       const destIdx = inv.findIndex(
         (i) => i.id !== itemId && sameUnit(i, item) && (i.reservedForFusion === true) === reserving,
       );
       if (destIdx >= 0) {
-        inv = inv.map((i, idx) => (idx === destIdx ? { ...i, quantity: (i.quantity ?? 1) + 1 } : i));
+        inv = inv.map((i, idx) => (idx === destIdx ? { ...i, quantity: (i.quantity ?? 1) + moveN } : i));
       } else {
         inv = [...inv, {
           ...item,
           id: `${item.name.replace(/\s+/g, '_')}_${reserving ? 'rsv' : 'free'}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-          quantity: 1,
+          quantity: moveN,
           reservedForFusion: reserving,
         }];
       }
@@ -21170,7 +25553,67 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  applyCoating(coatingItemId, weaponId) {
+  toggleReserveForQuest(itemId) {
+    const player = get().player;
+    if (!player) return;
+    const item = player.inventory.find((i) => i.id === itemId);
+    if (!item) return;
+    // A hand-authored objective item (quest / contract / broker / whisper tag) is
+    // already hard-locked and lives in the Quest Items section on its own — there's
+    // nothing to earmark, and its modal is view-only anyway.
+    if (isQuestLockedItem(item)) return;
+    // Mutually exclusive with the fusion reserve: an item can't be both fodder for
+    // the Crucible and saved for a turn-in. If it's reserved for fusion, that has to
+    // be released first (the UI hides this button in that case).
+    if (item.reservedForFusion && !item.reservedForQuest) return;
+    const reserving = !item.reservedForQuest;
+    const qty = item.quantity ?? 1;
+    // A single-unit stack just flips the flag in place.
+    if (qty <= 1) {
+      set((s) => s.player
+        ? {
+            player: {
+              ...s.player,
+              inventory: s.player.inventory.map((i) =>
+                i.id === itemId ? { ...i, reservedForQuest: reserving } : i,
+              ),
+            },
+          }
+        : s);
+      return;
+    }
+    // A multi-unit stack peels exactly ONE unit across the reserved/free boundary so
+    // the player can save one (or a few) and keep the rest free — save 2 rations for
+    // the quest, eat the other 3. Tapping again moves another unit; the opposite-
+    // state stack re-absorbs it on un-save. Mirrors toggleReserveForFusion's split.
+    const sameUnit = (a: InventoryItem, b: InventoryItem): boolean =>
+      a.name === b.name && a.kind === b.kind
+      && !a.coating && !b.coating
+      && !a.instanceStats && !b.instanceStats
+      && !a.uniqueStats && !b.uniqueStats;
+    set((s) => {
+      if (!s.player) return s;
+      let inv = s.player.inventory
+        .map((i) => (i.id === itemId ? { ...i, quantity: (i.quantity ?? 1) - 1 } : i))
+        .filter((i) => (i.quantity ?? 1) > 0);
+      const destIdx = inv.findIndex(
+        (i) => i.id !== itemId && sameUnit(i, item) && (i.reservedForQuest === true) === reserving,
+      );
+      if (destIdx >= 0) {
+        inv = inv.map((i, idx) => (idx === destIdx ? { ...i, quantity: (i.quantity ?? 1) + 1 } : i));
+      } else {
+        inv = [...inv, {
+          ...item,
+          id: `${item.name.replace(/\s+/g, '_')}_${reserving ? 'q' : 'free'}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          quantity: 1,
+          reservedForQuest: reserving,
+        }];
+      }
+      return { player: { ...s.player, inventory: inv } };
+    });
+  },
+
+  applyCoating(coatingItemId, weaponId, replaceSlot) {
     const player = get().player;
     if (!player) return;
     const coatItem = player.inventory.find((i) => i.id === coatingItemId);
@@ -21188,43 +25631,102 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { isCoatableItem, coatedDisplayName } = require('../engine/weaponCoating');
+    const { isCoatableItem, coatedDisplayName, nextCoatSlot, coatingCapacity } = require('../engine/weaponCoating');
     // OTA-453 — instance-aware: a FUSED weapon is catalog-absent (its stats live
     // on the instance), so the old name-only isCoatableWeapon always refused it.
     if (!isCoatableItem(weapon)) {
       get().appendLog('world', `You can't coat the ${weapon.name} — a coating needs an edge or a point to carry it. Try a blade, an arrow-arm, or a bolt-caster.`);
       return;
     }
-    const hadCoating = weapon.coating;
+    // OTA-873 — which slot this coat fills. 'coating' = fresh slot 1; 'coating2' =
+    // slot 1 full and this is a Crucible-upgraded dual-slot weapon with slot 2 open
+    // (adds a SECOND coating rather than replacing); 'replace' = both usable slots
+    // full, so it overwrites slot 1.
+    const coatSlot: 'coating' | 'coating2' | 'replace' = nextCoatSlot(weapon);
+    // OTA-945 — when every usable slot is full, the UI sends WHICH slot to overwrite
+    // (a picker), so a coating is never blindly scrubbed off slot 1. Default to slot 1
+    // for safety / older callers.
+    // OTA-957 — the store validates the caller's slot choice instead of trusting it: a
+    // programmatic replaceSlot: 'coating2' on a 1-slot weapon would stamp an illegal
+    // dual coat that combat honors (the UI can't send it — its picker only offers
+    // slots that exist — but "default to slot 1 for safety" must actually be enforced).
+    if (replaceSlot === 'coating2' && coatingCapacity(weapon) < 2) {
+      get().appendLog('world', `The ${weapon.name} has no second coating slot to fill.`);
+      return;
+    }
+    const replaceField: 'coating' | 'coating2' = replaceSlot === 'coating2' ? 'coating2' : 'coating';
+    const replaced = coatSlot === 'replace' ? (weapon[replaceField] ?? weapon.coating) : null;
+    const addedSecond = coatSlot === 'coating2';
     set((s) => {
       if (!s.player) return s;
-      const inv = s.player.inventory
-        // Stamp the coating on the target weapon instance.
-        .map((i) =>
-          i.id === weaponId
-            ? { ...i, coating: { kind: spec.kind, dice: spec.dice, label: spec.label, ...(spec.statBonus ? { statBonus: spec.statBonus } : {}) } }
-            : i,
-        )
-        // Consume one coating unit (drop the stack when it hits 0).
-        .map((i) =>
-          i.id === coatingItemId ? { ...i, quantity: i.quantity - 1 } : i,
-        )
+      const target = s.player.inventory.find((i) => i.id === weaponId);
+      if (!target) return s;
+      const coatingSpec = { kind: spec.kind, dice: spec.dice, label: spec.label, ...(spec.statBonus ? { statBonus: spec.statBonus } : {}) };
+      // The field to stamp: slot 2 only when nextCoatSlot chose it; 'replace' and a
+      // fresh coat both write slot 1 (`coating`).
+      const coatField: 'coating' | 'coating2' =
+        coatSlot === 'coating2' ? 'coating2'
+          : coatSlot === 'replace' ? replaceField
+            : 'coating';
+      let inv: InventoryItem[];
+      let equipped = s.player.equipped;
+      if (target.quantity > 1) {
+        // OTA-800 — the target is a STACK (e.g. a bundle of throwing darts).
+        // Stamping the coating on the row would coat ALL N copies for a single
+        // vial — a coating dupe (throw/split them and every unit carries it).
+        // Peel ONE unit off into its own instance, coat only that, and leave the
+        // rest of the stack bare. (A coated instance never re-stacks — grantItem's
+        // OTA-363 guard keeps it separate.)
+        const coatedId = freshInstanceId('coat');
+        inv = s.player.inventory.map((i) => (i.id === weaponId ? { ...i, quantity: i.quantity - 1 } : i));
+        inv.push({ ...target, id: coatedId, quantity: 1, coating: coatingSpec });
+        // OTA-814 — if the coated weapon was the EQUIPPED one, the peel just left the
+        // equipped slot pointing at the uncoated stack remainder — so the on-hit
+        // coating resolver (which looks up by equipped.mainId/offId) never fired and
+        // the "Now wielding the Burning …" line lied. Re-point the equipped slot(s)
+        // to the freshly-coated instance so the weapon you swing actually carries it.
+        if (equipped?.mainId === weaponId || equipped?.offId === weaponId) {
+          equipped = {
+            ...equipped,
+            ...(equipped.mainId === weaponId ? { mainId: coatedId } : {}),
+            ...(equipped.offId === weaponId ? { offId: coatedId } : {}),
+          };
+        }
+      } else {
+        // Single instance — stamp in place (into slot 1 or slot 2 per coatField) so
+        // the equipped weapon's id/equip state is preserved.
+        inv = s.player.inventory.map((i) => (i.id === weaponId ? { ...i, [coatField]: coatingSpec } : i));
+      }
+      // Consume one coating unit (drop the stack when it hits 0).
+      inv = inv
+        .map((i) => (i.id === coatingItemId ? { ...i, quantity: i.quantity - 1 } : i))
         .filter((i) => !(i.id === coatingItemId && i.quantity <= 0));
-      return { player: { ...s.player, inventory: inv } };
+      return { player: { ...s.player, inventory: inv, equipped } };
     });
-    const display = coatedDisplayName({ name: weapon.name, coating: { ...spec } });
+    // OTA-873 — show the weapon with BOTH coatings when a second was added / a slot
+    // was replaced, so the reward line names the real dual-coat weapon.
+    const resultCoatings = addedSecond
+      ? { coating: weapon.coating, coating2: { ...spec } }
+      : coatSlot === 'replace'
+        ? (replaceField === 'coating2'
+            ? { coating: weapon.coating, coating2: { ...spec } }
+            : { coating: { ...spec }, coating2: weapon.coating2 })
+        : { coating: { ...spec }, coating2: weapon.coating2 };
+    const display = coatedDisplayName({ name: weapon.name, ...resultCoatings });
     get().appendLog(
       'reward',
-      hadCoating
-        ? `You scrape off the old ${hadCoating.label.toLowerCase()} layer and work the ${coatItem.name.toLowerCase()} into the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`
-        : `You work the ${coatItem.name.toLowerCase()} along the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`,
+      addedSecond
+        ? `You work the ${coatItem.name.toLowerCase()} into the weapon's second channel — it now carries TWO coatings. Now wielding the ${display}; both bite on every landing hit (${weapon.coating!.dice} ${weapon.coating!.kind} + ${spec.dice} ${spec.kind}).`
+        : replaced
+          ? `You scrape off the old ${replaced.label.toLowerCase()} layer and work the ${coatItem.name.toLowerCase()} into the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`
+          : `You work the ${coatItem.name.toLowerCase()} along the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`,
     );
     // OTA-707 — persist the freshly-painted coating; the action had no explicit save,
     // so a hard-quit before the next auto-persist lost the coating.
     void get().persist();
   },
 
-  applyCoatingToArmor(coatingItemId, armorId) {
+  applyCoatingToArmor(coatingItemId, armorId, replaceResist) {
     const player = get().player;
     if (!player) return;
     const coatItem = player.inventory.find((i) => i.id === coatingItemId);
@@ -21245,26 +25747,62 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { coatingDamageType } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
     const type = coatingDamageType(String(spec.kind));
+    // OTA-873/874 — reject a coating whose damage type no enemy can ever DEAL (so a
+    // worked-in resist would match nothing and silently waste the vial). OTA-874 made
+    // acid + corruption first-class incoming types, so every current coating family
+    // (poison / acid / corruption / electrical / burn / cold) is resistable and passes;
+    // this now only guards a hypothetical future coating with no incoming counterpart.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isResistableIncomingType } = require('../engine/damageTypes') as typeof import('../engine/damageTypes');
+    if (!isResistableIncomingType(type)) {
+      get().appendLog('world', `A ${coatItem.name.toLowerCase()} is a pure offensive coating — nothing in the wasteland strikes with ${type}, so armor can't be hardened against it. Work it into a WEAPON instead.`);
+      return;
+    }
     const already = (armor.addedResists ?? []).map((r) => r.toLowerCase());
     if (already.includes(type.toLowerCase())) {
       get().appendLog('world', `The ${armor.name} already turns aside ${type}. No need to waste another vial on it.`);
       return;
     }
-    // Cap worked-in resists so one piece can't become a god-vest.
+    // Cap worked-in resists so one piece can't become a god-vest. OTA-873 — the
+    // Crucible "Upgrade" mode raises THIS piece's cap by resistCapBonus (a second
+    // coating channel, the armor parallel to a weapon's 2nd coating slot).
     const ADDED_RESIST_CAP = 3;
-    if (already.length >= ADDED_RESIST_CAP) {
-      get().appendLog('world', `The ${armor.name} is already worked with ${already.length} resists (${(armor.addedResists ?? []).join(', ')}). It can't hold another — strip it down or use a different piece.`);
+    const effectiveCap = ADDED_RESIST_CAP + (armor.resistCapBonus ?? 0);
+    // OTA-945 — a FULL piece no longer just refuses. The UI opens a picker and sends
+    // which existing resist to strip; honour it here. Without a valid replaceResist
+    // (older caller / no pick), keep the refusal.
+    const replaceLower = replaceResist?.toLowerCase();
+    const willReplace = already.length >= effectiveCap;
+    if (willReplace && (!replaceLower || !already.includes(replaceLower))) {
+      get().appendLog('world', `The ${armor.name} is already worked with ${already.length} resists (${(armor.addedResists ?? []).join(', ')}). It can't hold another — strip one first, upgrade it at a Crucible, or use a different piece.`);
       return;
     }
     set((s) => {
       if (!s.player) return s;
-      const inv = s.player.inventory
-        .map((i) => (i.id === armorId ? { ...i, addedResists: [...(i.addedResists ?? []), type] } : i))
+      const target = s.player.inventory.find((i) => i.id === armorId);
+      if (!target) return s;
+      // OTA-945 — on a full piece, strip the picked resist first; otherwise just append.
+      const withResist = (base: string[]) => {
+        const stripped = willReplace && replaceLower ? base.filter((r) => r.toLowerCase() !== replaceLower) : base;
+        return [...stripped, type];
+      };
+      let inv: InventoryItem[];
+      if (target.quantity > 1) {
+        // OTA-800 — same anti-dupe as applyCoating: peel one piece off the stack
+        // so a single vial can't work its resist into all N copies at once.
+        inv = s.player.inventory.map((i) => (i.id === armorId ? { ...i, quantity: i.quantity - 1 } : i));
+        inv.push({ ...target, id: freshInstanceId('coat'), quantity: 1, addedResists: withResist(target.addedResists ?? []) });
+      } else {
+        inv = s.player.inventory.map((i) => (i.id === armorId ? { ...i, addedResists: withResist(i.addedResists ?? []) } : i));
+      }
+      inv = inv
         .map((i) => (i.id === coatingItemId ? { ...i, quantity: i.quantity - 1 } : i))
         .filter((i) => !(i.id === coatingItemId && i.quantity <= 0));
       return { player: { ...s.player, inventory: inv } };
     });
-    get().appendLog('reward', `You work the ${coatItem.name.toLowerCase()} into the ${armor.name}. It now turns aside ${type} damage — for good, until the piece is lost or destroyed.`);
+    get().appendLog('reward', willReplace && replaceResist
+      ? `You strip the ${replaceResist.toLowerCase()} channel off the ${armor.name} and work the ${coatItem.name.toLowerCase()} in its place. It now turns aside ${type} damage instead — for good, until the piece is lost or destroyed.`
+      : `You work the ${coatItem.name.toLowerCase()} into the ${armor.name}. It now turns aside ${type} damage — for good, until the piece is lost or destroyed.`);
     void get().persist();
   },
 
@@ -21311,7 +25849,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // complete the fusion, ASK before burning it (don't silently eat worn
       // gear). On confirm we unequip it (freeing the slot) and fuse.
       const equippedReservedFaction = player.inventory.find(
-        (i) => i.reservedForFusion && (i.tags ?? []).includes('faction_gear') && equippedIdSet.has(i.id),
+        (i) => i.reservedForFusion && canonicalItemTags(i).includes('faction_gear') && equippedIdSet.has(i.id),
       );
       if (equippedReservedFaction && fusion.gateFusion(player.inventory, equippedReservedFaction).ok) {
         const slot = slotOfEquippedId(player.equipped, equippedReservedFaction.id);
@@ -21320,13 +25858,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
           return;
         }
       }
-      get().appendLog(
-        'arbiter',
-        `The Crucible hums, then cools. "${gate.reason ?? 'Not yet.'}"`,
+      // OTA-1007 — SUPERSEDES OTA-801. That fix opened the picker on a FAILED gate so
+      // the player wouldn't hit a repeated refusal line; the cure was worse than
+      // the disease — a menu you cannot act in, emitting NOTHING to the log, read
+      // on device as "I'm fusing" for ten minutes. A Crucible that can't fire now
+      // says so plainly, holds the message until it's read, and closes.
+      const shortInputs = fusion.eligibleInputs(player.inventory);
+      const shortMats = Array.from(
+        new Set(shortInputs.flatMap((i: InventoryItem) => fusion.fusionMaterialTags(i) as string[])),
       );
+      const hasCat = !!fusion.findFactionCatalyst(player.inventory, equippedIdSet);
+      // Plain English — no "inferred", which is an engine word the player can't
+      // act on. The pieces the Crucible eats are odd salvage: the finds that
+      // carry no quartermaster's name.
+      let blockBody: string;
+      if (shortInputs.length === 0 && !hasCat) {
+        blockBody = "You haven't set anything aside for the forge. Odd salvage — the pieces that answer to no catalogue — can be saved for fusing from your pack.";
+      } else if (shortInputs.length < 3) {
+        blockBody = `The forge wants three pieces and you've set aside ${shortInputs.length}. Save more odd salvage for fusing.`;
+      } else {
+        blockBody = `The forge wants three DIFFERENT materials. Your ${shortInputs.length} pieces are all ${shortMats.join(' and ')}. Set aside something of another make — metal, bone, stone, cloth, wood, crystal.`;
+      }
+      set({
+        fusionPickerOpen: false,
+        pendingFusionSelection: null,
+        fusionBlockedNotice: {
+          title: 'The Crucible stays cold',
+          body: blockBody,
+          hint: 'Reserved pieces carry a ♥ in your pack.',
+        },
+      });
+      get().appendLog('arbiter', `The Crucible hums, then cools. "${blockBody}"`);
+      get().appendLog('debug', `fuse: refused pieces=${shortInputs.length} mats=[${shortMats.join(',')}] catalyst=${hasCat}`);
       return;
     }
-    // OTA — FUSION PICKER. Unless the player has already chosen which reserved
+    // OTA-953 — FUSION PICKER. Unless the player has already chosen which reserved
     // pieces to spend (3–5) and whether to forge a weapon or armor, open the picker
     // rather than consuming the ENTIRE reserved pool on one item (the old bug: 11
     // reserved → all 11 eaten). confirmFusionSelection sets pendingFusionSelection
@@ -21354,6 +25920,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // synthesizeFusionDeterministic which produces a clamped valid
     // result from the input tag profile. Less varied than Qwen-
     // synthesized but always serviceable.
+    // OTA-990 — outpost fires cost coin now, same as the roadside vendor's rig.
+    if (!chargeOutpostCrucibleFee(get, set)) { set({ pendingFusionSelection: null }); return; }
     get().appendLog(
       'world',
       `You set your reserved pieces on the three pedestals. The Crucible takes them in.`,
@@ -21386,7 +25954,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const catalyst = selCatalyst;
     let factionTheme: import('../engine/itemFusion').FactionTheme | null = null;
     if (catalyst) {
-      const fac = FACTIONS.find((f) => (catalyst.tags ?? []).includes(f.id));
+      // OTA-1024 — canonical: the item passed the faction_gear gate but a stale
+      // faction-id tag nulled the theme — the catalyst burned un-themed.
+      const fac = FACTIONS.find((f) => canonicalItemTags(catalyst).includes(f.id));
       if (fac) {
         const facRarity: 'Rare' | 'Legendary' = selGate.tagProfile.length >= 4 ? 'Legendary' : 'Rare';
         factionTheme = { id: fac.id, label: fac.name, catalystId: catalyst.id, rarity: facRarity };
@@ -21432,7 +26002,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       // OTA-688 — name the ACTUAL kind the player chose (was hard-coded "weapon",
       // so a forged piece of armor was announced as a weapon).
-      `✦ The Crucible forges a ${fused.rarity ?? 'Rare'} ${sel.kind === 'armor' ? 'piece of armor' : 'weapon'} from your reserved pieces — and it's in your pack, still cooling.`,
+      `✦ The Crucible forges ${anOrA(fused.rarity ?? 'Rare')} ${fused.rarity ?? 'Rare'} ${sel.kind === 'armor' ? 'piece of armor' : sel.kind === 'dog_armor' ? 'piece of dog armor' : det.stats.reachClass === 'ranged' ? 'RANGED weapon' : det.stats.reachClass === 'long' ? 'reach weapon (mid range and closer)' : 'close-quarters weapon'} from your reserved pieces — and it's in your pack, still cooling.`,
     );
     get().appendLog(
       'world',
@@ -21467,9 +26037,133 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   closeFusionPicker() { set({ fusionPickerOpen: false, pendingFusionSelection: null }); },
 
+  clearFusionBlockedNotice() { set({ fusionBlockedNotice: null }); },
+
+  clearMissionCompleteNotice() { set({ missionCompleteNotice: null }); },
+
+  announceMissionComplete(kind, title, body) {
+    // The feed line is unchanged — the log stays a complete record, and anything
+    // that greps it (chronicle, bug reports) keeps working.
+    get().appendLog('reward', body);
+    get().raiseMissionCompleteNotice(kind, title, body);
+  },
+
+  raiseMissionCompleteNotice(kind, title, body) {
+    const prev = get().missionCompleteNotice;
+    set({
+      missionCompleteNotice: prev && prev.title === title
+        ? { ...prev, rewards: [...prev.rewards, body.replace(/^✦\s*/, '')] }
+        : { kind, title, rewards: [body.replace(/^✦\s*/, '')] },
+    });
+  },
+
   confirmFusionSelection(itemIds, kind, catalystId) {
     set({ pendingFusionSelection: { itemIds, kind, catalystId }, fusionPickerOpen: false });
     void get().fuseAtCrucible();
+  },
+
+  upgradeCoatingSlot(itemId, itemIds) {
+    const player = get().player;
+    if (!player) return;
+    // Gate 1 — Crucible access. Same permit as fuseAtCrucible: a wild fusion bench
+    // (fusionPending) OR standing at an outpost / Hidden-Market Crucible.
+    const hasLeftOutpost = (player.macroVisitSeq ?? 0) >= 1;
+    const atOutpostCrucible = !!player.hubRoomId && hasLeftOutpost;
+    const atMarketCrucible = get().activeBuildingId === 'market';
+    if (!player.fusionPending && !atOutpostCrucible && !atMarketCrucible) {
+      get().appendLog('arbiter', `"There's no Crucible here," the Arbiter says. "Find one — an outpost or a ruin — then bring your reserved pieces and the piece to upgrade."`);
+      return;
+    }
+    // Gate 2 — the target must be an eligible, not-yet-upgraded piece: a coatable
+    // WEAPON (→ 2nd coating slot) or an ARMOR / DOG-VEST (→ +1 resist capacity).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isCoatableItem, coatingCapacity } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findArmorByName } = require('../engine/crafting') as typeof import('../engine/crafting');
+    const piece = player.inventory.find((i) => i.id === itemId);
+    if (!piece) return;
+    // OTA-912/913 — the Skyreacher armor set and the Beacon Rifle are the reward
+    // for the great climbs: they CANNOT be upgraded/fused at a Crucible. The
+    // `collect_only` tag (on every Skyreacher piece + the Beacon Rifle) is the
+    // single lock. They still take coating vials (the 3 open resist slots), just
+    // never a Crucible slot-upgrade.
+    // OTA-1022 — canonical: a stale Skyreacher piece fed the slot-upgrade and was
+    // consumed. Same gate, catalog-aware.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    if ((require('../engine/crafting') as typeof import('../engine/crafting')).canonicalItemTags(piece).includes('collect_only')) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter waves you back from the Crucible. "That was earned on the great climbs, not forged — the Crucible has no purchase on it. Coat it if you like, but it cannot be upgraded here."`,
+      );
+      return;
+    }
+    // OTA-873 fix — never upgrade a STACK. Stamping coatingSlots / resistCapBonus on a
+    // quantity>1 row would upgrade every copy for one 5-piece cost. The picker only
+    // offers quantity===1 pieces, so this is a belt-and-suspenders guard on the action.
+    if ((piece.quantity ?? 1) > 1) {
+      get().appendLog('world', `You can only upgrade a single piece at the Crucible — you're holding a stack of ${piece.quantity} ${piece.name}. Split one off first.`);
+      return;
+    }
+    const isWeaponTarget = isCoatableItem(piece);
+    const isArmorTarget = !isWeaponTarget && (
+      piece.kind === 'armor' || piece.kind === 'dog_armor'
+      || piece.uniqueStats?.kind === 'armor' || piece.uniqueStats?.kind === 'dog_armor'
+      || !!findArmorByName(piece.name)
+    );
+    if (!isWeaponTarget && !isArmorTarget) {
+      get().appendLog('world', `The ${piece.name} can't take a coating channel — upgrade a coatable weapon (blade / arrow-arm / bolt-caster) or a piece of armor or a dog vest.`);
+      return;
+    }
+    if (isWeaponTarget && coatingCapacity(piece) >= 2) {
+      get().appendLog('world', `The ${piece.name} already has two coating channels.`);
+      return;
+    }
+    if (isArmorTarget && (piece.resistCapBonus ?? 0) >= 1) {
+      get().appendLog('world', `The ${piece.name} already carries an extra resist channel.`);
+      return;
+    }
+    // Gate 3 — EXACTLY 5 reserved, eligible inputs (a heavier cost than a normal fuse).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const fusion = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+    // OTA-873 fix — require 5 DISTINCT reserved instances. Deduping itemIds closes a
+    // dupe where passing the same id five times satisfied the count gate (chosen.length
+    // === 5) while the Set-based consumption below spent only ONE unit — a 5-cost
+    // upgrade bought with a single reserved piece.
+    const chosen = Array.from(new Set(itemIds))
+      .map((id) => player.inventory.find((i) => i.id === id && i.reservedForFusion && i.quantity > 0 && fusion.isForgeReservableItem(i)))
+      .filter(Boolean) as InventoryItem[];
+    if (chosen.length !== 5) {
+      get().appendLog('arbiter', `The Crucible cools. "An upgrade takes five reserved pieces — you set ${chosen.length}."`);
+      return;
+    }
+    // OTA-990 — the upgrade channel pays the same outpost fee as a fuse.
+    if (!chargeOutpostCrucibleFee(get, set)) return;
+    // Consume one unit of each chosen input and clear its reservation (mirrors
+    // applyFusion's drain), then stamp the upgrade on the chosen piece.
+    const chosenIds = new Set(chosen.map((i) => i.id));
+    set((s) => {
+      if (!s.player) return s;
+      const inv = s.player.inventory
+        .map((i) => {
+          if (i.id === itemId) {
+            return isWeaponTarget
+              ? { ...i, coatingSlots: 2 }
+              : { ...i, resistCapBonus: (i.resistCapBonus ?? 0) + 1 };
+          }
+          if (chosenIds.has(i.id)) return { ...i, quantity: Math.max(0, i.quantity - 1), reservedForFusion: false };
+          return i;
+        })
+        .filter((i) => i.quantity > 0);
+      return { player: { ...s.player, inventory: inv, fusionPending: false } };
+    });
+    recordTitleProgress(get, set, { fusionsCompleted: 1 });
+    get().appendLog(
+      'reward',
+      isWeaponTarget
+        ? `✦ The Crucible drinks the five pieces and works a second coating channel into the ${piece.name}. It can now hold TWO coatings at once — both bite on every landing hit. (Its damage and edge are unchanged.)`
+        : `✦ The Crucible drinks the five pieces and works an extra resist channel into the ${piece.name}. It can now hold one more worked-in resist. (Its armor rating is unchanged.)`,
+    );
+    void get().persist();
   },
 
   settleFusion(itemId, name, description) {
@@ -21479,13 +26173,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // The forging may have been scrapped / sold / consumed before it formed — if
     // it's gone, don't resurrect it; just skip the reveal.
     if (!item) return;
+    // OTA-979 — if the piece being renamed is the vest the DOG is currently
+    // wearing (equipped while still cooling), keep dog.equipped.vest in step
+    // with the new display name — the vestId already matches, but the stored
+    // NAME is what narration and legacy fallbacks read.
+    const dogWearsThis = get().player?.dog?.equipped?.vestId === itemId;
+    if (dogWearsThis) {
+      set((s) => (s.player && s.player.dog
+        ? {
+            player: {
+              ...s.player,
+              dog: { ...s.player.dog, equipped: { ...s.player.dog.equipped, vest: name } },
+            },
+          }
+        : s));
+    }
+    // OTA-978 — reach follows the DISPLAYED name. The Qwen namer only settles the
+    // name/description; if the final name clearly reads ranged or long
+    // ("...Bow", "...Spear"), re-stamp reachClass so the weapon behaves the
+    // way it reads. Reach-neutral names keep the forge-time class.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { inferReachFromName: irnSettle } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+    const settledReach = irnSettle(name);
     set((s) => (s.player
       ? {
           player: {
             ...s.player,
             inventory: s.player.inventory.map((i) =>
               i.id === itemId
-                ? { ...i, name, description, materializing: undefined, formingName: undefined, formingDesc: undefined }
+                ? {
+                    ...i, name, description, materializing: undefined, formingName: undefined, formingDesc: undefined,
+                    uniqueStats: i.uniqueStats && i.uniqueStats.kind === 'weapon' && settledReach && i.uniqueStats.reachClass !== settledReach
+                      ? { ...i.uniqueStats, reachClass: settledReach }
+                      : i.uniqueStats,
+                  }
                 : i,
             ),
           },
@@ -21506,7 +26227,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // section) so the screen unfolds that row on arrival, AND the instance id so
         // the screen scrolls to + briefly highlights the exact piece (a forged weapon
         // can sort anywhere in a long list, so expanding the section isn't enough).
-        cta: { label: 'View in inventory', screen: 'inventory', inventoryCategory: item.kind, inventoryItemId: itemId },
+        cta: { label: 'View in inventory', screen: 'inventory', inventoryCategory: categorizeItem(item), inventoryItemId: itemId },
       },
     });
     void get().persist();
@@ -21586,29 +26307,62 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let applied = true;
     switch (id) {
       case 'legacy_of_power': {
-        let worstIdx = -1; let worstFrac = 1;
-        player.inventory.forEach((it, i) => {
-          const d = it.durability;
-          // arb141 — climbing ropes ('rope'-tagged) are a CONSUMABLE climbing
-          // resource that must wear out and be re-spliced/re-bought. A rope takes
-          // the most beating of anything in the pack (every climb tier), so it was
-          // ALWAYS the most-worn item — making this once-a-day mend an infinite-rope
-          // engine: free, eternal climbing with no stamina/durability cost (the
-          // player flagged the double-gain). Skip ropes so the mend lands on real
-          // gear and the rope stays a resource you actually spend.
-          if ((it.tags ?? []).includes('rope')) return;
-          if (d && d.max > 0 && d.current < d.max) {
-            const f = d.current / d.max;
-            if (f < worstFrac) { worstFrac = f; worstIdx = i; }
+        // OTA-835 — the trait promises "repair, power-up, unexpected effect"; it
+        // used to be repair-only. Roll the three channels of the Aether. The repair
+        // channel falls back to the power-up when there's nothing worn to mend, so
+        // the day's charge is never spent on a no-op.
+        const powerUp = () => {
+          set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []), { kind: 'food_buff' as const, remainingRounds: 3, buffStat: 'strength' as const, buffBonus: 2, label: 'Legacy of Power' }] } } : s);
+          get().appendLog('reward', `✦ ${def.name} — Aether floods your limbs. +2 STR for 3 rounds.`);
+        };
+        const channel = rollDie(3);
+        if (channel === 1) {
+          let worstIdx = -1; let worstFrac = 1;
+          player.inventory.forEach((it, i) => {
+            const d = it.durability;
+            // arb141 — climbing ropes ('rope'-tagged) are a CONSUMABLE climbing
+            // resource that must wear out and be re-spliced/re-bought. A rope takes
+            // the most beating of anything in the pack (every climb tier), so it was
+            // ALWAYS the most-worn item — making this mend an infinite-rope engine:
+            // free, eternal climbing. Skip ropes so the mend lands on real gear.
+            // OTA-1024 — canonical: a stale rope re-opened the arb141 free-mend farm.
+            if (canonicalItemTags(it).includes('rope')) return;
+            if (d && d.max > 0 && d.current < d.max) {
+              const f = d.current / d.max;
+              if (f < worstFrac) { worstFrac = f; worstIdx = i; }
+            }
+          });
+          if (worstIdx < 0) {
+            // Nothing to mend — the Aether powers you up instead (channel never wasted).
+            powerUp();
+          } else {
+            const item = player.inventory[worstIdx]!;
+            set((s) => s.player ? { player: { ...s.player, inventory: s.player.inventory.map((it, i) => i === worstIdx && it.durability ? { ...it, durability: { ...it.durability, current: it.durability.max } } : it) } } : s);
+            get().appendLog('reward', `✦ ${def.name} — you channel Aether into the ${item.name}. It mends to full.`);
           }
-        });
-        if (worstIdx < 0) {
-          get().appendLog('world', `${def.name}: nothing in your pack needs mending. The Aether has nowhere to go. (Climbing rope can't be channeled — splice or replace it instead.)`);
-          applied = false;
+        } else if (channel === 2) {
+          powerUp();
         } else {
-          const item = player.inventory[worstIdx]!;
-          set((s) => s.player ? { player: { ...s.player, inventory: s.player.inventory.map((it, i) => i === worstIdx && it.durability ? { ...it, durability: { ...it.durability, current: it.durability.max } } : it) } } : s);
-          get().appendLog('reward', `✦ ${def.name} — you channel Aether into the ${item.name}. It mends to full.`);
+          // Unexpected surge — the Aether is capricious. A small table: mostly a
+          // boon (heal / double power-up / cleanse), but sometimes it bites back
+          // with a spike of corruption (the trait's "unexpected effect" downside).
+          const surge = rollDie(4);
+          if (surge === 1) {
+            const heal = rollDie(8) + 2;
+            set((s) => s.player ? { player: { ...s.player, hp: Math.min(s.player.hpMax, s.player.hp + heal) } } : s);
+            get().appendLog('reward', `✦ ${def.name} — the surge knits your wounds. +${heal} HP.`);
+          } else if (surge === 2) {
+            set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []), { kind: 'food_buff' as const, remainingRounds: 3, buffStat: 'strength' as const, buffBonus: 2, label: 'Legacy of Power (surge)' }, { kind: 'food_buff' as const, remainingRounds: 3, buffStat: 'wisdom' as const, buffBonus: 2, label: 'Legacy of Power (surge)' }] } } : s);
+            get().appendLog('reward', `✦ ${def.name} — the surge overflows: +2 STR and +2 WIS for 3 rounds.`);
+          } else if (surge === 3) {
+            const cleanse = rollDie(6);
+            set((s) => s.player ? { player: { ...s.player, corruption: Math.max(0, (s.player.corruption ?? 0) - cleanse) } } : s);
+            get().appendLog('reward', `✦ ${def.name} — the Aether runs clean and washes ${cleanse} corruption from your veins.`);
+          } else {
+            const backlash = rollDie(4);
+            set((s) => s.player ? { player: { ...s.player, corruption: Math.min(100, (s.player.corruption ?? 0) + backlash) } } : s);
+            get().appendLog('world', `✦ ${def.name} — the channel turns on you. The Aether spikes and leaves +${backlash} corruption behind.`);
+          }
         }
         break;
       }
@@ -21628,11 +26382,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!liveScene || liveScene.enemies.length === 0) { applied = false; break; }
         const idx = Math.max(0, Math.min(liveScene.activeEnemyIdx ?? 0, liveScene.enemies.length - 1));
         const target = liveScene.enemies[idx]!;
-        const dmg = rollDie(6);
+        // OTA-826 [Group-K audit] — this proc's log says "aetheric" but the damage
+        // was typeless: full damage against the many aetheric-RESISTANT foes
+        // (Aetheric Mutation/Creature, Automation, Mechanism, Aetheric Undead) and
+        // no bonus vs a vulnerable:aetheric enemy. Apply the aetheric type modifier
+        // so the named element actually interacts with the weakness system.
+        const rawEle = rollDie(6);
+        const eleMod = combineDamageTypeMatch(
+          applyDamageTypeModifier(rawEle, 'aetheric', target.type).match,
+          traitDamageMultiplier(target.traits, 'aetheric').match,
+        );
+        const dmg = Math.max(1, Math.round(rawEle * eleMod.multiplier));
+        const eleTag = eleMod.match === 'weak' ? ' (weak — bites deep!)' : eleMod.match === 'resist' ? ' (resisted)' : '';
         const prevHp = liveScene.enemyHps[idx] ?? target.hp;
         const newHp = Math.max(0, prevHp - dmg);
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: s.currentScene.enemyHps.map((h, i) => i === idx ? newHp : h) } } : s);
-        get().appendLog('reward', `✦ ${def.name} — shaped Aetherstone slams ${target.name} for ${dmg} aetheric. (${newHp} HP left)`);
+        get().appendLog('reward', `✦ ${def.name} — shaped Aetherstone slams ${target.name} for ${dmg} aetheric${eleTag}. (${newHp} HP left)`);
         // OTA-625 — run the defeat resolver when this proc is the killing blow.
         // idx is the active enemy, so resolveEnemyDefeat() targets the right one
         // (same guard pattern the normal attack paths use). Pre-fix the enemy sat
@@ -21641,12 +26406,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (newHp <= 0) get().resolveEnemyDefeat();
         break;
       }
-      case 'latent_powers':
-      case 'noble_heritage':
+      case 'elemental_ward': {
+        // OTA-835 — Elemental Control DEFENSIVE half (the "1d6 block"). Raises a
+        // shaped-stone ward that soaks the next 1d6 incoming damage before HP
+        // (consumed at the damage site). Combat-gated like the strike half.
+        const liveScene = get().currentScene;
+        if (!liveScene || liveScene.enemies.length === 0) { applied = false; break; }
+        const soak = rollDie(6);
+        set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []).filter((e) => e.kind !== 'stone_ward'), { kind: 'stone_ward' as const, remainingRounds: 10, absorb: soak, label: `Elemental Ward (soak ${soak})` }] } } : s);
+        get().appendLog('reward', `✦ ${def.name} — shaped Aetherstone hardens before you. It soaks the next ${soak} damage.`);
+        break;
+      }
       case 'beginners_luck': {
+        // OTA-835 — was a flat +3 WIS buff; now the trait's real promise: bank a
+        // one-shot reroll. resolveRollStep consumes luckyRerollReady the next time
+        // a difficulty roll FAILS, rerolling and keeping the better result.
+        set((s) => s.player ? { player: { ...s.player, luckyRerollReady: true } } : s);
+        get().appendLog('reward', `✦ ${def.name} — you feel the odds tilt your way. The next roll you fail today gets a second throw.`);
+        break;
+      }
+      case 'latent_powers':
+      case 'noble_heritage': {
         const buff = id === 'latent_powers' ? { stat: 'strength' as const, amt: 2, label: 'Latent Powers' }
-          : id === 'noble_heritage' ? { stat: 'charisma' as const, amt: 3, label: 'Noble Heritage' }
-          : { stat: 'wisdom' as const, amt: 3, label: "Beginner's Luck" };
+          : { stat: 'charisma' as const, amt: 3, label: 'Noble Heritage' };
         set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []), { kind: 'food_buff' as const, remainingRounds: 3, buffStat: buff.stat, buffBonus: buff.amt, label: buff.label }] } } : s);
         get().appendLog('reward', `✦ ${def.name} — +${buff.amt} ${buff.stat.slice(0, 3).toUpperCase()} for 3 rounds.`);
         break;
@@ -21736,7 +26518,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   scrapInventoryItem(itemName, itemId) {
     const player = get().player;
     if (!player) return;
-    // OTA — scrap the EXACT instance the caller picked by its unique id when given
+    // OTA-953 — scrap the EXACT instance the caller picked by its unique id when given
     // (the inventory UI passes it). A player with three same-name items of different
     // durability who selects the worst one must break down THAT one — not whichever
     // row happens to sort first by name. Falls back to name-match for typed commands.
@@ -21767,13 +26549,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the slot when the SPECIFIC equipped instance is being broken
     // down. Same name + different id leaves the slot alone.
     const eq = player.equipped ?? {};
-    const equippedSlots = ['main', 'off', 'head', 'chest', 'legs', 'feet', 'amulet', 'ring'] as const;
+    // OTA-796 — the scan was missing 'hands' and 'cloak' (both real equip
+    // slots) and never checked ring2/ring3, so scrapping the equipped instance
+    // in one of those slots destroyed the inventory row but left the equipped
+    // pointer live — the destroyed gear kept granting AC / resists / stats /
+    // regen forever (name-based aggregation with catalog fallback). Now every
+    // SLOT_ID_KEY slot is covered.
+    const equippedSlots = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring'] as const;
     const occupiedSlots = equippedSlots.filter((s) => {
       const idKey = SLOT_ID_KEY[s];
       return eq[idKey] === item.id;
     });
     if (occupiedSlots.length > 0) {
       for (const slot of occupiedSlots) get().unequipSlot(slot);
+    }
+    // ring2 / ring3 have no EquipSlot entry, so unequipSlot can't address them —
+    // clear the pointer inline and strip the ring's HP bonus (mirror of
+    // unequipSlot's bake-out) when the scrapped instance sits there.
+    for (const [nameKey, idKey] of [['ring2', 'ring2Id'], ['ring3', 'ring3Id']] as const) {
+      if (eq[idKey] === item.id) {
+        const ringName = eq[nameKey];
+        const hpDelta = -gearHpBonus(ringName);
+        set((s) => {
+          if (!s.player) return s;
+          const newEq = { ...(s.player.equipped ?? {}), [nameKey]: undefined, [idKey]: undefined };
+          const newMax = Math.max(1, (s.player.hpMax ?? 1) + hpDelta);
+          return { player: { ...s.player, equipped: newEq, hpMax: newMax, hp: Math.max(1, Math.min((s.player.hp ?? 1) + hpDelta, newMax)) } };
+        });
+      }
     }
     // OTA 23-014 — salvage now rolls for success. Base 70% + INT/DEX
     // modifiers. The item is CONSUMED on failure either way; the
@@ -21786,7 +26589,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = get().currentScene;
     const scrapStats = effectiveStats(
       get().player!,
-      weatherStatModifiers(scene?.weather ?? null),
+      weatherStatModifiers(scene?.weather ?? null, playerArmorResistKinds(player)),
     );
     const successP = scrapSuccessChance(scrapStats.intelligence, scrapStats.dexterity);
     let rolled = Math.random() < successP;
@@ -21871,7 +26674,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (tr.leveled) {
           get().appendLog(
             'reward',
-            `✦ Your eye for parts sharpens. +1 INT (now ${tr.leveled.to}).`,
+            `✦ Your eye for parts sharpens. +1 INT (${statNowClause(get().player, 'intelligence', tr.leveled.to)}).`,
           );
         }
       }
@@ -21992,7 +26795,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { tickWeather } = require('../engine/weatherEffects');
       for (let h = 0; h < hoursSlept; h++) {
-        const tick = tickWeather(weatherForRest, player);
+        const tick = tickWeather(weatherForRest, player, playerArmorResistKinds(player));
         if (tick.hpDelta < 0) weatherHpDamage += -tick.hpDelta;
         if (tick.staminaDelta < 0) weatherStamDamage += -tick.staminaDelta;
       }
@@ -22070,7 +26873,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // and lets the player top HP to full by eating, never by sleeping.
     // Each rest still rolls an ambush + advances the clock, so stamina
     // recovery keeps a real cost.
-    const heal = 0;
+    // OTA-1001 — #120: rest heals again, LIGHT — ~15% of max HP for a full sleep,
+    // mirroring how escorts already mend on rest. The old no-HP rule (arb37 /
+    // OTA-187) is superseded by the owner's call.
+    const heal = Math.min(Math.max(0, player.hpMax - player.hp), Math.ceil(player.hpMax * 0.15));
     const stamGain = Math.min(stamRoom, rollDie(4));
     const prevHpRest = player.hp;
     const hpMaxRest = player.hpMax;
@@ -22108,6 +26914,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'world',
       `You rest for ${hoursSlept} hours. ${parts.length ? parts.join(', ') + ' recovered/spent' : 'time passes'}. (${describeTime(newHours)})`,
     );
+    healEscortsOnRest(get, set);
     if (newHungerPenalty >= 3 && (player.hungerStaminaPenalty ?? 0) < 3) {
       get().appendLog(
         'arbiter',
@@ -22275,7 +27082,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // forceReinitialize() in the background so Qwen is warm by the
     // next time the player triggers narration or fusion. Idempotent —
     // starting twice replaces the timer cleanly.
-    startQwenWatchdog(get);
+    startQwenWatchdog(get, set);
   },
 
   async shutdownQwen() {
@@ -22568,6 +27375,7 @@ function applyHookEffect(
   effect: HookEffect,
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  hook?: Hook,
 ): { inlineSummary: string | null; fatal: boolean } {
   switch (effect.type) {
     case 'grant_tc': {
@@ -22636,10 +27444,20 @@ function applyHookEffect(
     case 'spawn_enemy_tag': {
       const tag = effect.tag;
       const candidates = (enemiesData as Enemy[]).filter((e) => e.type === tag);
-      const spawn = candidates.length > 0
+      const rawSpawn = candidates.length > 0
         ? candidates[Math.floor(Math.random() * candidates.length)]!
         : pickEnemyForLocation(get().currentScene?.location ?? getLocationById('tartarian_outskirts'));
-      if (!spawn) return { inlineSummary: null, fatal: false };
+      if (!rawSpawn) return { inlineSummary: null, fatal: false };
+      // OTA-816 — scale the hook-spawned foe to player power + tile danger too.
+      const spawnLoc = get().currentScene?.location ?? getLocationById('tartarian_outskirts');
+      const spawnPlayer = get().player;
+      const spawn = spawnPlayer
+        ? scaledEnemyForContext(
+            rawSpawn,
+            spawnLoc.danger,
+            enemyScalePower(Math.max(spawnPlayer.stats.strength, spawnPlayer.stats.dexterity, spawnPlayer.stats.intelligence), spawnPlayer.hpMax),
+          )
+        : rawSpawn;
       set((s) =>
         s.currentScene
           ? { currentScene: { ...s.currentScene, enemies: [spawn], enemyHps: [spawn.hp], activeEnemyIdx: 0, range: 'mid' } }
@@ -22733,6 +27551,92 @@ function applyHookEffect(
         return { inlineSummary: 'a quiet knowing', fatal: false };
       }
     }
+    // OTA-1004 — THE HOLLOWED, hint route. The rumour marker's second beat calls
+    // the revenant out of the mud: same pool, same boss, same put-to-rest as
+    // the OTA-998 random-encounter spawn — only the doorway differs. An empty
+    // or fully-avenged pool reads as a cold trail rather than a dead end.
+    case 'spawn_fallen_revenant': {
+      const rp = get().player;
+      if (!rp) return { inlineSummary: null, fatal: false };
+      // OTA-1017 — never over a live fight: the spawn replaces the enemies array,
+      // which would erase combatants mid-swing. The tale keeps; the pool
+      // keeps; the Hollowed can still rise at a later door.
+      if ((get().currentScene?.enemies ?? []).length > 0) {
+        return { inlineSummary: 'the mud stays shut while blades are already out — the tale keeps, and the Hollowed still walks', fatal: false };
+      }
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const rev = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+      const pool = rev.cachedFallen().filter((f) => !f.avengedTs);
+      if (pool.length === 0) {
+        return { inlineSummary: 'the trail is cold — whatever walked here has been put down already', fatal: false };
+      }
+      // OTA-1014 — the rumour NAMED a fallen (chainId carries `fallen:<ts>`); the
+      // thing that rises must be that fallen, not a random pool draw. Put to
+      // rest in the meantime → a cold trail, never a stand-in.
+      const namedTs = /^fallen:(\d+)$/.exec(hook?.chainId ?? '')?.[1];
+      let fr = pool[Math.floor(Math.random() * pool.length)]!;
+      if (namedTs) {
+        const named = rev.cachedFallen().find((f) => f.ts === Number(namedTs));
+        if (!named || named.avengedTs) {
+          return { inlineSummary: 'the trail is cold — the one the tale named has been put down already', fatal: false };
+        }
+        fr = named;
+      }
+      const foe = rev.revenantFromFallen(fr, rp.hpMax);
+      set((s2) => (s2.currentScene ? {
+        currentScene: {
+          ...s2.currentScene,
+          enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
+          enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
+        },
+        worldMemory: { ...s2.worldMemory, activeRevenant: { ...fr } },
+      } : s2));
+      const beats = rev.revenantIntroBeats(fr, fr.name === rp.name);
+      get().appendLog('world', beats.emergence);
+      get().appendLog('arbiter', beats.identification);
+      get().appendLog('world', beats.identity);
+      get().appendLog('combat', `⚔ BOSS EVENT — ${foe.name}. ${beats.character}`);
+      get().appendLog('debug', `hook: fallen_whisper answered ${fr.name}@${fr.ts} pool=${pool.length}`);
+      return { inlineSummary: `${fr.name} answers the name`, fatal: false };
+    }
+    // OTA-988 — HOOK ESCORT: take a field escort from a stranded traveler. Picks a
+    // rep-0 `_stranded_escort` def the player doesn't hold, spawns the shared
+    // pool, and pushes the record — same shape acceptFactionQuest writes, so
+    // collateral / fail / pay / turn-in all work unchanged.
+    case 'start_escort_contract': {
+      const p = get().player;
+      if (!p) return { inlineSummary: null, fatal: false };
+      const activeIds = p.activeFactionQuestIds ?? [];
+      const doneIds = p.completedFactionQuestIds ?? [];
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { FACTION_QUESTS } = require('../engine/factionQuests') as typeof import('../engine/factionQuests');
+      const pool = FACTION_QUESTS.filter((q) =>
+        q.id.endsWith(effect.idSuffix) && !activeIds.includes(q.id) && !doneIds.includes(q.id));
+      if (pool.length === 0) return { inlineSummary: 'no one who needs walking, today', fatal: false };
+      const def = pool[Math.floor(Math.random() * pool.length)]!;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const escortMod = require('../engine/escort') as typeof import('../engine/escort');
+      const spec = escortMod.escortSpecForQuest(def);
+      const escort = spec ? escortMod.spawnEscortPool(spec.count, p.hpMax ?? 20, spec.label) : null;
+      const hasActiveOther = anyTrackedContract(p); // OTA-995 — #118: cross-kind
+      const newTracked = !hasActiveOther;
+      set((s2) => (s2.player ? {
+        player: {
+          ...s2.player,
+          activeFactionQuestIds: [...(s2.player.activeFactionQuestIds ?? []), def.id],
+          activeFactionQuests: [
+            ...(s2.player.activeFactionQuests ?? []),
+            { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now(), tracked: newTracked, ...(escort ? { escort } : {}) },
+          ],
+        },
+      } : s2));
+      bumpQuestsAccepted(get, set);
+      get().appendLog('reward', `✦ Contract taken in the field — ${def.title}. ${def.objective}`);
+      get().appendLog('arbiter', newTracked
+        ? `The Arbiter marks it. "Turn it in to any ${def.factionId.replace(/_/g, ' ')} agent. Open Contracts to route there."`
+        : `The Arbiter marks it. "Parked — you're already running one. Activate it in Contracts when you're ready."`);
+      return { inlineSummary: escort ? `${escort.label} in your care (${escort.hp} HP)` : def.title, fatal: false };
+    }
   }
 }
 
@@ -22790,7 +27694,7 @@ function resolveHookOneStep(
   let fatal = false;
   const inlineSummaries: string[] = [];
   for (const eff of outcome.effects) {
-    const r = applyHookEffect(eff, get, set);
+    const r = applyHookEffect(eff, get, set, hook);
     if (r.fatal) fatal = true;
     if (r.inlineSummary) inlineSummaries.push(r.inlineSummary);
   }
@@ -22807,17 +27711,62 @@ function resolveHookOneStep(
   // Stage numbers surface so the player knows where they are in the
   // chain: "★ STORY THREAD (step 2) — ..." If `outcome.done` is set,
   // we mark the line as a finale: "★★ STORY THREAD COMPLETE — ..."
+  // OTA-1010 — threads are unnamed content; the notice still needs something the
+  // player recognises, so use the hook's own kind as a readable title.
+  const hookTitleFor = (h: { kind?: string }) =>
+    String(h.kind ?? 'story thread').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const stageLabel = outcome.done
     ? '★★ STORY THREAD COMPLETE'
     : `★ STORY THREAD (step ${hook.stage + 1})`;
   get().appendLog('world', `${stageLabel} — ${outcome.line}`);
+  // OTA-1030 — the completion POPUP is deferred. It used to mount the instant the
+  // terminal stage resolved, landing ON TOP of the thread modal the player was
+  // still reading. The payload is stashed on pendingHookContinue below and
+  // raised by dismissHookContinue when the player taps COMPLETE on the final
+  // stage. The feed line stays immediate either way — the log remains a
+  // complete record.
+  let doneNotice: { kind: string; title: string; body: string } | null = null;
   if (inlineSummaries.length > 0) {
-    get().appendLog('reward', `✦ ${inlineSummaries.join(', ')}.`);
+    const body = `✦ ${inlineSummaries.join(', ')}.`;
+    get().appendLog('reward', body);
+    if (outcome.done) {
+      doneNotice = { kind: 'Story thread', title: hookTitleFor(hook), body };
+    }
   }
   // OTA-716 — reward for reading. Completing an easy-to-miss STORY THREAD
   // occasionally yields a GOOD material on top of the thread's own payout —
   // a sprinkle for the player who followed the lore instead of walking past.
   if (outcome.done) {
+    // OTA-776 — a torch-CHARGED lead pays out an UPGRADED, WIS-scaled Rare/
+    // Legendary drop on top of its normal reward. The player aimed the torch at
+    // this lead earlier (applyTorchToHook set torchCharged); this is that altered
+    // loot landing where they worked it — the whole point of the aimed tool.
+    if (hook.torchCharged) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { rollTorchReward } = require('../engine/resonanceLantern') as typeof import('../engine/resonanceLantern');
+      const pl = get().player;
+      if (pl) {
+        const reward = rollTorchReward(effectiveStats(pl).wisdom);
+        if (reward) {
+          const look = lookupCraftedItem(reward.name);
+          set((s) => (s.player ? {
+            player: {
+              ...s.player,
+              inventory: mergeOrPushItem(s.player.inventory, {
+                id: `torchclaim_${Date.now()}`,
+                name: reward.name,
+                kind: look.kind,
+                rarity: look.rarity,
+                quantity: 1,
+                tags: [...look.tags, 'loot'],
+                ...(look.baseDurability ? { durability: { current: look.baseDurability, max: look.baseDurability } } : {}),
+              }),
+            },
+          } : s));
+          get().appendLog('reward', `✦ The torch's mark pays out — ${reward.name} (${reward.rarity})!`);
+        }
+      }
+    }
     const hookBonus = maybeLoreHookBonus();
     if (hookBonus) {
       const look = lookupCraftedItem(hookBonus.name);
@@ -22901,6 +27850,7 @@ function resolveHookOneStep(
         noun: triggerNoun ?? hook.nouns[0] ?? 'this',
         stageHistory: [...existing, stageEntry],
         completed: outcome.done,
+        completionNotice: doneNotice,
       },
     };
   });
@@ -22984,7 +27934,7 @@ function runMoveCombatRange(
   scene: CurrentScene,
   direction: 'advance' | 'retreat',
 ): void {
-  const cost = weatherRepositionCost(scene.weather);
+  const cost = weatherRepositionCost(scene.weather, playerArmorResistKinds(player));
   get().appendLog(
     'debug',
     `move: ${direction} from range=${scene.range ?? '-'} enemies=${scene.enemies.length} weather=${scene.weather?.name ?? '-'} cost=${cost} partial=${scene.repositionPartial ?? 0}`,
@@ -23085,6 +28035,25 @@ function runMoveCombatRange(
   }
 }
 
+// OTA-796 — ONE ranged-enemy classifier, shared by the reach gate and the
+// full-cover auto-miss. The two sites used to carry DIFFERENT regexes: the
+// reach gate only knew bow-words, so 14 bestiary entries with Laser / Breath /
+// Venom / Burst attacks (Bog Dragon, Architectural Sentinel, Aetheric
+// Cyclops, …) were classified melee and could NEVER counter at far range —
+// the exploit sweep's "kite the hardest non-boss monsters risk-free" finding.
+// OTA-983 — an AIRBORNE enemy ignores the ground: it reaches an elevated player
+// (and can be met with ANY weapon) as if you stood level. Matched on name /
+// type / traits, same spirit as isRangedEnemy below.
+const AIRBORNE_RE = /\b(wing|winged|fly|flying|flier|aerial|airborne|drone|wasp|hornet|bat|bird|raptor|harpy|wyvern|drake|moth|swarm|gull|vulture|hawk|owl)\b/i;
+function enemyIsAirborne(enemy: Enemy): boolean {
+  return AIRBORNE_RE.test(`${enemy.name} ${enemy.type ?? ''} ${(enemy.traits ?? []).join(' ')}`);
+}
+
+function isRangedEnemy(enemy: Enemy): boolean {
+  const sig = `${enemy.attack ?? ''} ${enemy.damage ?? ''} ${enemy.abilityPoint ?? ''}`.toLowerCase();
+  return /(bow|arrow|crossbow|ranged|projectile|firearm|sling|dart|laser|beam|breath|burst|venom|bolt|blast|aetheric|pulse|spit|spine|quill)/.test(sig);
+}
+
 // Whether an enemy can still strike the player at the given range.
 // Lore: melee = arm's reach, ranged = close + far, runecasters mostly close
 // + arm. We use a conservative default — most generic enemies threaten arm
@@ -23093,9 +28062,8 @@ function enemyCanReach(enemy: Enemy, range: CombatRange): boolean {
   // OTA-550 — at close/mid a generic (melee-capable) enemy threatens the
   // player; at far/distant only a ranged enemy can still strike.
   if (range === 'close' || range === 'mid') return true;
-  // 'far' / 'distant' — only ranged enemies (loose hint via attack/damage str).
-  const sig = `${enemy.attack ?? ''} ${enemy.damage ?? ''} ${enemy.abilityPoint ?? ''}`.toLowerCase();
-  return /(bow|arrow|crossbow|ranged|projectile|firearm|sling|dart)/.test(sig);
+  // 'far' / 'distant' — only ranged enemies can still strike.
+  return isRangedEnemy(enemy);
 }
 
 // Which range bands the player's current weapon can reach. Bare hands and
@@ -23137,6 +28105,7 @@ function grantQuestHook(
     const active = (player.activeHunts ?? []).some((h) => h.id === def.id);
     const done = (player.completedHuntIds ?? []).includes(def.id);
     if (active || done) return;
+    const grantTracked = !anyTrackedContract(player); // OTA-995 — #118
     set((s) =>
       s.player
         ? {
@@ -23144,13 +28113,19 @@ function grantQuestHook(
               ...s.player,
               activeHunts: [
                 ...(s.player.activeHunts ?? []),
-                { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now() },
+                { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now(), tracked: grantTracked },
               ],
             },
           }
         : s,
     );
     bumpQuestsAccepted(get, set);
+    // OTA-1015 — a parked grant says so (the accept sites and the escort hook
+    // already do). Silence here meant a hunt that would not advance and no
+    // line explaining why.
+    if (!grantTracked) {
+      get().appendLog('world', `Parked — you're already running a contract. Activate it in Contracts → Hunts when you're ready.`);
+    }
     // 2026-05-26 OTA-054 — playtester: "I didn't even know I had the
     // hunt let alone that I had accepted it." Field auto-grants
     // (mini-dungeon questHook path) previously emitted a single
@@ -23161,12 +28136,14 @@ function grantQuestHook(
     //   - world: explicit confirmation the slate now carries it
     // Locale + abandonment-affordance language are deliberately
     // direct — no flowery framing; this is a UX moment.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { biomeLabel: locBiomeLabel } = require('../engine/hunts');
-    const locLabel = def.targetLocationName ?? locBiomeLabel(def.biomeTag);
+    // OTA-953 — the hunt TITLE already names the place ("The Sludge Behemoth at the
+    // Cradle of Dusk"), so appending "at <location>" here restated it, reading as
+    // a doubled hint ("…at the Cradle of Dusk (target: … at the Cradle of Dusk
+    // (feeding pool))"). Name just the target; the Arbiter line below points at
+    // Contracts → Hunts for the full staged location.
     get().appendLog(
       'reward',
-      `✦ Hunt added to your slate — ${def.title} (target: ${def.targetEnemyName} at ${locLabel}).`,
+      `✦ Hunt added to your slate — ${def.title} (target: ${def.targetEnemyName}).`,
     );
     get().appendLog(
       'arbiter',
@@ -23180,6 +28157,7 @@ function grantQuestHook(
   const active = (player.activeMysteries ?? []).some((m) => m.id === def.id);
   const done = (player.completedMysteryIds ?? []).includes(def.id);
   if (active || done) return;
+  const grantTracked = !anyTrackedContract(player); // OTA-995 — #118
   set((s) =>
     s.player
       ? {
@@ -23187,13 +28165,17 @@ function grantQuestHook(
             ...s.player,
             activeMysteries: [
               ...(s.player.activeMysteries ?? []),
-              { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now() },
+              { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now(), tracked: grantTracked },
             ],
           },
         }
       : s,
   );
   bumpQuestsAccepted(get, set);
+  // OTA-1015 — a parked grant says so; see the hunt branch.
+  if (!grantTracked) {
+    get().appendLog('world', `Parked — you're already running a contract. Activate it in Contracts → Mysteries when you're ready.`);
+  }
   // 2026-05-26 OTA-054 — same OTA-054 louder-grant treatment for the
   // mystery branch.
   get().appendLog(
@@ -23327,13 +28309,18 @@ function vendorWaresBlurb(get: () => GameStore, vendorName: string): string | nu
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { RECIPES } = require('../engine/crafting') as typeof import('../engine/crafting');
   const offers = rd.vendorRecipeOffers(RECIPES, player.knownRecipes, rd.vendorSeed(vendorName));
+  // OTA-811 — prose, not a command reference. The old blurb welded typed-command
+  // syntax ("buy <name>", "repair <item>", "train <stat>") into the story, so the
+  // angle-bracket tokens read as unfilled placeholders. Say what the trader offers in
+  // plain language; the natural phrasing still tells the player what to type (buy a
+  // recipe by name, ask to repair/train/heal).
   const parts: string[] = [];
   if (offers.length > 0) {
     parts.push(
-      `Workings for sale: ${offers.map((o) => `${o.result} (${o.price} TC)`).join(', ')} — "buy <name>" to learn one.`,
+      `Rare workings for sale: ${offers.map((o) => `${o.result} (${o.price} TC)`).join(', ')} — buy one by name to learn it.`,
     );
   }
-  parts.push('They can also mend gear ("repair <item>"), train a stat ("train <stat>"), and tend your dog or golem ("heal dog" / "revive dog").');
+  parts.push('This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.');
   return parts.join(' ');
 }
 
@@ -24019,6 +29006,29 @@ export function makeRoomKey(
  *  Pass `{to}` placeholder in the line; we substitute the new stat
  *  value before emit. Safe no-op if no player or trainStat returns
  *  no leveled record. */
+function ledgeredSalvage(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  noun: string,
+): ReturnType<typeof rollSalvagePool> {
+  const out = rollSalvagePool(noun);
+  if (!out || out.poolId !== 'sigil') return out;
+  const key = `${get().player?.currentLocationId ?? ''}:${noun.trim().toLowerCase()}`;
+  const taken = get().worldMemory.salvagedSigilKeys ?? [];
+  if (taken.includes(key)) {
+    return {
+      kind: 'material', poolId: 'relic_site', itemName: 'Worn Tartarian Coin',
+      rarity: 'Common', quantity: 1,
+      line: `You work the ${noun} over again, but the mark itself is long gone — a worn coin in the rubble is all that's left.`,
+    };
+  }
+  set((s2) => ({ worldMemory: {
+    ...s2.worldMemory,
+    salvagedSigilKeys: [...(s2.worldMemory.salvagedSigilKeys ?? []), key].slice(-200),
+  } }));
+  return out;
+}
+
 function applyTrainAndLog(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -24032,7 +29042,9 @@ function applyTrainAndLog(
   if (tr.leveled) {
     get().appendLog(
       'reward',
-      rewardLineWithPlaceholder.replace('{to}', String(tr.leveled.to)),
+      rewardLineWithPlaceholder
+        .replace('(now {to})', `(${statNowClause(get().player, stat, tr.leveled.to)})`)
+        .replace('{to}', String(tr.leveled.to)),
     );
   }
 }
@@ -24288,7 +29300,13 @@ function enemyBuildScore(enemy: Enemy): number {
   return Math.max(1, Math.min(10, ap + hpTier));
 }
 
-function playerWeaponReach(
+// OTA-1029 — EXPORTED: the weapon quick-button tone (InputBox) and the enemy
+// panel's in-range flag (ExplorationScreen) now read reach from THIS resolver
+// — the same one the attack gate rolls with — instead of keeping local
+// re-derivations. The copies missed the forge stamp (uniqueStats.reachClass),
+// so a close-only fused weapon glowed green at mid range while the gate
+// refused every swing.
+export function playerWeaponReach(
   player: PlayerCharacter,
   // OTA 027 — optional slot override. When the player typed
   // "attack with the off-hand X", the caller passes 'off' so the
@@ -24303,13 +29321,23 @@ function playerWeaponReach(
   // to a hand throws from 'far' inward even though it's not in the weapon
   // catalog. Detect it off the inventory tags before the catalog lookup.
   const throwInst = (player.inventory ?? []).find(
-    (it) => it.name.toLowerCase() === wpName.toLowerCase() && (it.tags ?? []).some((t) => /throwable/i.test(t)),
+    (it) => it.name.toLowerCase() === wpName.toLowerCase() && itemIsThrowable(it),
   );
   if (throwInst) {
     return { bands: reachBandsFor('throwable'), label: throwInst.name };
   }
   const w = findWeaponByName(wpName);
-  if (!w) return { bands: reachBandsFor('melee'), label: wpName };
+  if (!w) {
+    // OTA-978 — a weapon with no catalog row (Crucible forges) reads reach from
+    // its OWN identity: the forge-stamped uniqueStats.reachClass first, then
+    // name/tag classification, then the old melee fallback. This is what let
+    // the "Resonant Spike" era happen — every fused weapon silently collapsed
+    // to close-only regardless of what the forge said it was.
+    const inst = (player.inventory ?? []).find((it) => it.name.toLowerCase() === wpName.toLowerCase());
+    const stamped = inst?.uniqueStats?.reachClass;
+    const cls = stamped ?? reachClassFor({ name: wpName, tags: inst?.tags });
+    return { bands: reachBandsFor(cls), label: wpName };
+  }
   const cls = reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
   // OTA-550 — preserve the legacy runecaster INT gate: a low-INT caster
   // (Common/Uncommon, INT < 9) can't reach the outermost 'distant' band;
@@ -24348,6 +29376,19 @@ function wearEquippedItem(
   const result = boundId
     ? wearItemById(player.inventory, boundId)
     : wearItemByName(player.inventory, itemName);
+  // OTA-982 — fraying warning. The rope warns before it fails; armor and weapons
+  // never did — the first thing the player heard was "shatters from wear. It
+  // is gone." When the piece this blow/swing just chipped is down to its last
+  // few points, say so (wear is always 1, so current === 3 fires exactly once
+  // per decline).
+  if (!result.broken) {
+    const wornInst = boundId
+      ? result.inventory.find((i) => i.id === boundId)
+      : result.inventory.find((i) => i.name.toLowerCase() === itemName.toLowerCase() && i.durability);
+    if (wornInst?.durability && wornInst.durability.current === 3) {
+      get().appendLog('system', `⚠ Your ${wornInst.name} is coming apart — a few more hits will finish it. Mend it or lose it.`);
+    }
+  }
   let equipped = player.equipped ?? {};
   let finalInventory = result.inventory;
   if (result.broken && result.brokenName) {
@@ -24377,6 +29418,15 @@ function wearEquippedItem(
     // handles stacking with any existing copies of that material.
     let dropMsg = '';
     if (result.salvageDrop) {
+      // OTA-969 — the drop phrase used to be a hardcoded "A length of ..." (rope-flavored)
+      // for EVERY remnant: "A length of Small Rock comes free in your hand." Pick a
+      // noun that fits the material instead.
+      const dn = result.salvageDrop.name;
+      const dropPrefix = /rope|cord|line/i.test(dn) ? 'A length of'
+        : /cloth|fiber|silk|hide|leather|patched/i.test(dn) ? 'A scrap of'
+        : /rock|stone|shard|glass/i.test(dn) ? 'A chunk of'
+        : /metal|iron|nail|gear|part|scrap/i.test(dn) ? 'A twist of'
+        : 'A piece of';
       const dropItem: InventoryItem = {
         id: `broken_${result.brokenName.replace(/\s+/g, '_')}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         name: result.salvageDrop.name,
@@ -24386,7 +29436,7 @@ function wearEquippedItem(
         tags: ['salvage', 'broken_item'],
       };
       finalInventory = mergeOrPushItem(finalInventory, dropItem);
-      dropMsg = ` A length of ${result.salvageDrop.name} comes free in your hand.`;
+      dropMsg = ` ${dropPrefix} ${result.salvageDrop.name} comes free in your hand.`;
     }
     // Defer the log so the caller's main set() lands first.
     void Promise.resolve().then(() => {
@@ -24410,15 +29460,28 @@ function wearEquippedItem(
 function hasAethericVision(player: PlayerCharacter | null): boolean {
   if (!player) return false;
   try {
+    // OTA-927 — equip-gated now: the detect_aether passive fires only while an
+    // aether-sight gadget is worn in the dedicated `lens` slot (was: while carried).
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { aethericVisionActive } = require('../engine/itemEffect');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
-    return !!aethericVisionActive(
-      player.inventory.map((i) => i.name),
-      [findExplorationItemByName, findGearByName, findMaterialByName],
-    );
+    const { aethericVisionEquipped } = require('../engine/equipment');
+    return !!aethericVisionEquipped(player);
   } catch { return false; }
+}
+
+// OTA-934 — a frost/cold coating on armour (-> a 'cold' entry in the piece's addedResists)
+// or any cold-resistant armour lets the player shrug off COLD weather (Silent Blizzard):
+// coatings counter weather. Exported so the character sheet can mirror the negation.
+export function playerColdResist(player: PlayerCharacter | null): boolean {
+  if (!player) return false;
+  return aggregateArmor(player).resistances.some((r) => r.toLowerCase() === 'cold');
+}
+
+// OTA-946 — the player's full armour resist kinds (lowercased). tickWeather uses this to
+// cancel a weather whose element the player's coatings resist (cold, electrical, burn …),
+// generalising playerColdResist beyond cold only.
+export function playerArmorResistKinds(player: PlayerCharacter | null): string[] {
+  if (!player) return [];
+  return aggregateArmor(player).resistances.map((r) => r.toLowerCase());
 }
 
 function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances: string[]; resistSlots: ArmorSlotResist[] } {
@@ -24482,6 +29545,44 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
     if (r?.acBonus) acBonus += r.acBonus;
   }
   return { acBonus, resistances, resistSlots };
+}
+
+// OTA-836 — TAP-TO-EXPLAIN AC. The Character sheet used to show only
+// effectiveAC() (race base + scene context), silently DROPPING the equipped
+// armor / accessory AC, the ruins-defense title bonus, and any active
+// stance/cover status — so a plate-armored player read the SAME "Armor Class"
+// as a naked one. This returns the same total the enemy-attack resolver stands
+// on (racialAC + armor + title + status; the dodge gamble is a per-swing AC
+// BYPASS, not standing AC, so it's excluded), decomposed into labelled sources
+// so the sheet can show WHY the number is what it is — matching the core-stat
+// chips. Lives here (not equipment.ts) because aggregateArmor — with its fused /
+// per-instance / accessory handling — is module-private, and keeping the display
+// on the same helper the combat math uses stops the two from drifting.
+export function effectiveACBreakdown(
+  player: PlayerCharacter,
+  scene: Parameters<typeof effectiveAC>[1],
+): { total: number; base: number; sources: Array<{ label: string; delta: number }> } {
+  const base = player.ac ?? 10;
+  const racialAC = effectiveAC(player, scene); // base + race-conditional context delta
+  const raceCtxDelta = racialAC - base;
+  const armor = aggregateArmor(player).acBonus;
+  // ruins-defense title (Protector / Warden): +AC inside a constructed environment.
+  let titleRuinsAc = 0;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const tPerks = require('../engine/titles').titlePerkModifiers(player);
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { detectACContexts } = require('../engine/raceMechanics');
+  if (tPerks.ruinsDefenseBonus > 0 && detectACContexts(player, scene).has('constructed_environment')) {
+    titleRuinsAc = tPerks.ruinsDefenseBonus;
+  }
+  const statusAdj = statusAcAdjustment(player.statusEffects);
+  const sources: Array<{ label: string; delta: number }> = [];
+  if (raceCtxDelta !== 0) sources.push({ label: 'race context', delta: raceCtxDelta });
+  if (armor !== 0) sources.push({ label: 'armor', delta: armor });
+  if (titleRuinsAc !== 0) sources.push({ label: 'title (ruins)', delta: titleRuinsAc });
+  if (statusAdj !== 0) sources.push({ label: 'stance/cover', delta: statusAdj });
+  const total = Math.max(1, base + raceCtxDelta + armor + titleRuinsAc + statusAdj);
+  return { total, base, sources };
 }
 
 // OTA-685 — per-enemy chance to swing at the DOG instead of the commander on a
@@ -24576,16 +29677,142 @@ export function applyEnemyCounterToDog(
 // player's single action provoked the whole group. Bail early if the
 // player dies mid-volley so the rest of the group don't pile damage on a
 // corpse.
+// OTA-800 — enemy DOT statuses (infection / poison / acid / corruption /
+// electrical / burn / typed) must tick once per COMBAT ROUND, not only on the
+// player's `attack`. Pre-fix the tick lived inline at the top of case 'attack',
+// so a round spent on dodge / advance / retreat / flee-fail / golem / dog /
+// throw froze every DOT — a poisoned enemy stopped taking poison the instant
+// the player stopped swinging (playtest: coating a boss then kiting it did
+// nothing). Extracted here and driven from runEnemyGroupCounters (the one call
+// every combat round routes through), so every round ticks exactly once. The
+// attack path still ticks at its own top — BEFORE the player's swing, so a
+// swing that would kill still gets the loot before the DOT races it — and passes
+// skipDotTick so the counter phase doesn't double-tick.
+// Returns true if the tick ended the fight (all enemies dead → swept through
+// resolveEnemyDefeat); the caller must then bail (no valid target left).
+function tickEnemyDotsAndMaybeEndFight(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): boolean {
+  {
+    const sceneNow = get().currentScene;
+    if (sceneNow && sceneNow.enemyStatuses) {
+      const newHps = [...sceneNow.enemyHps];
+      const newStatuses = sceneNow.enemyStatuses.map((arr) => [...arr]);
+      for (let i = 0; i < sceneNow.enemies.length; i++) {
+        const hp = newHps[i];
+        if (hp === undefined || hp <= 0) continue;
+        const list = newStatuses[i] ?? [];
+        const remaining: typeof list = [];
+        for (const st of list) {
+          // OTA-362 — coating DOTs (poison/acid/corruption) tick the
+          // same way as the OTA-210 infection: dmgPerTurn off the HP,
+          // decrement turns, expire with a kind-flavored line.
+          const isDot = st.kind === 'infected'
+            || st.kind === 'poison_coat'
+            || st.kind === 'acid_coat'
+            || st.kind === 'corruption_coat'
+            || st.kind === 'electrical_coat'
+            || st.kind === 'burn_coat'
+            || st.kind === 'typed_dot';
+          if (isDot && st.turnsRemaining > 0) {
+            const dmg = st.dmgPerTurn;
+            const updatedHp = Math.max(0, (newHps[i] ?? 0) - dmg);
+            newHps[i] = updatedHp;
+            const enemyName = sceneNow.enemies[i]!.name;
+            const tickLine = st.kind === 'poison_coat'
+              ? `${enemyName} shudders — poison eats ${dmg}.`
+              : st.kind === 'acid_coat'
+                ? `${enemyName} smokes — acid eats ${dmg}.`
+                : st.kind === 'corruption_coat'
+                  ? `${enemyName} blackens — corruption eats ${dmg}.`
+                  : st.kind === 'electrical_coat'
+                    ? `${enemyName} convulses — arcing current bites ${dmg}.`
+                    : st.kind === 'burn_coat'
+                      ? `${enemyName} blisters — clinging fire sears ${dmg}.`
+                      : st.kind === 'typed_dot'
+                        ? `${enemyName} suffers — ${st.sourceName} eats ${dmg}.`
+                        : `${enemyName} convulses — infection bleeds ${dmg}.`;
+            get().appendLog(
+              'combat',
+              `${tickLine} (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} turn${st.turnsRemaining - 1 === 1 ? '' : 's'} left)`,
+            );
+            if (st.turnsRemaining - 1 > 0) {
+              remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });
+            } else {
+              get().appendLog(
+                'combat',
+                `${enemyName}${st.kind === 'infected' ? "'s fever breaks" : ' shakes off the last of the coating'} — the ${st.sourceName} has run its course.`,
+              );
+            }
+          } else {
+            remaining.push(st);
+          }
+        }
+        newStatuses[i] = remaining;
+      }
+      set((s) => s.currentScene
+        ? { currentScene: { ...s.currentScene, enemyHps: newHps, enemyStatuses: newStatuses } }
+        : s);
+    }
+  }
+  // OTA-980 — (was: last-enemy-only) a DOT tick that drops ANY enemy to 0 kills it
+  // NOW. The old sweep only fired when EVERY enemy was dead; in a MIXED fight
+  // the corpse was left standing at 0 HP "for the next attack to clean up" —
+  // owner's log shows a raider at 0/28 hanging around until a whole extra swing
+  // formally killed it, while a solo-fight Aetherkin died instantly from the
+  // same tick. Every dead index now routes through resolveEnemyDefeat (loot,
+  // kill bookkeeping, bounty credit), and the player's living TARGET is
+  // re-pointed afterward so the sweep never silently retargets them.
+  {
+    const swept = get().currentScene;
+    if (swept && swept.enemies.length > 0 && swept.enemyHps.some((h) => (h ?? 0) <= 0)) {
+      const targetBefore = swept.enemies[swept.activeEnemyIdx] ?? null;
+      let guard = 0;
+      while (++guard <= 16) {
+        const sc = get().currentScene;
+        if (!sc || sc.enemies.length === 0) break;
+        const deadIdx = sc.enemyHps.findIndex((h) => (h ?? 0) <= 0);
+        if (deadIdx < 0) break;
+        set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: deadIdx } } : s));
+        get().resolveEnemyDefeat();
+      }
+      const scEnd = get().currentScene;
+      if (!scEnd || scEnd.enemies.length === 0) return true;
+      if (targetBefore) {
+        const keep = scEnd.enemies.indexOf(targetBefore);
+        if (keep >= 0 && keep !== scEnd.activeEnemyIdx) {
+          set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: keep } } : s));
+        }
+      }
+    }
+  }
+  return false;
+}
+
 export function runEnemyGroupCounters(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   fallbackPlayer: PlayerCharacter,
+  // OTA-795 — a failed dog distract redirects THAT enemy's counter onto the
+  // dog (it rounds on the feint) instead of rolling the usual soak chance.
+  // OTA-800 — skipDotTick is set by the attack path, which already ticked its
+  // DOTs at the top of case 'attack' (before the swing); every other combat
+  // round leaves it unset so DOTs tick here, once, as the enemy group acts.
+  opts?: { forceDogEnemyIdx?: number; skipDotTick?: boolean },
 ): void {
   const scene = get().currentScene;
   if (!scene || scene.enemies.length === 0) return;
+  // Tick enemy DOTs as the enemy group takes its turn (unless the caller — the
+  // attack path — already ticked). If the tick ends the fight, there's no group
+  // left to counter.
+  if (!opts?.skipDotTick && tickEnemyDotsAndMaybeEndFight(get, set)) return;
+  const scenePostDot = get().currentScene;
+  if (!scenePostDot || scenePostDot.enemies.length === 0) return;
   // Snapshot the enemies up-front so a death mid-volley (player killing
   // one by reaction, etc) doesn't reshape the iteration.
   const attackers = [...scene.enemies];
+  const benchedBelow: string[] = [];
   for (let i = 0; i < attackers.length; i++) {
     const enemy = attackers[i]!;
     // Skip enemies that died earlier this round (HP <= 0 in the live
@@ -24612,8 +29839,21 @@ export function runEnemyGroupCounters(
     // soaks. Fires on every volley regardless of the player's action, so it
     // can't be gamed by commanding the dog (the arb169 exploit stays closed).
     const dogNow = livePlayer.dog;
-    if (dogNow && dogNow.status === 'with_player' && dogNow.hp > 0 && Math.random() < DOG_TARGET_CHANCE) {
+    const dogUp = !!dogNow && dogNow.status === 'with_player' && dogNow.hp > 0;
+    // OTA-795 — failed-distract redirect wins over the random soak roll.
+    const forcedOnDog = dogUp && opts?.forceDogEnemyIdx === liveIdx;
+    if (dogUp && (forcedOnDog || Math.random() < DOG_TARGET_CHANCE)) {
       applyEnemyCounterToDog(enemy, get, set);
+      continue;
+    }
+    // OTA-983 — ELEVATION: a grounded melee enemy massed at the BASE cannot swing
+    // at a player who is up the climb. Airborne enemies fight you level;
+    // grounded RANGED enemies still shoot up from below. (Owner: "you can be
+    // attacked by airborn creatures and with shots from below.") Summit/wall
+    // fights (enemiesAtBase unset) are untouched.
+    if (liveScene.elevatedOn && liveScene.enemiesAtBase
+        && !enemyIsAirborne(enemy) && !isRangedEnemy(enemy)) {
+      benchedBelow.push(enemy.name);
       continue;
     }
     // Pass live index so applyEnemyCounter can resolve ambush_strike
@@ -24631,9 +29871,21 @@ export function runEnemyGroupCounters(
         && sceneAfter.enemies[liveIdx] === enemy;
       if (enemyStillAlive) {
         get().appendLog('combat', `${enemy.name} presses the second strike — bosses do not yield the tempo.`);
-        applyEnemyCounter(enemy, liveAfter, get, set, liveIdx);
+        applyEnemyCounter(enemy, liveAfter, get, set, liveIdx, true);
       }
     }
+  }
+  // OTA-983 — the grounded melee pack that can't reach an elevated player gets ONE
+  // line, not silence (and not five). Standard dedup keeps repeats quiet.
+  if (benchedBelow.length > 0 && (get().player?.hp ?? 0) > 0) {
+    const first = benchedBelow[0]!;
+    const rest = benchedBelow.length - 1;
+    get().appendLog(
+      'world',
+      rest > 0
+        ? `Below, ${first} and ${rest} other${rest > 1 ? 's' : ''} circle the base — nothing down there can reach you.`
+        : `Below, ${first} circles the base — it cannot reach you up here.`,
+    );
   }
 }
 
@@ -24672,10 +29924,14 @@ function applyEnemyCounter(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   enemyIdx?: number,
+  // OTA-796 — set on a boss's SECOND swing of the volley so the end-of-round
+  // regen doesn't fire twice per round (fast_regen is tuned to 2 HP/round but
+  // bosses got 4/round, out-healing coating DOTs — exploit-sweep balance bug).
+  secondSwing?: boolean,
 ) {
-  // Full cover vs ranged enemies auto-misses. Detect ranged from the
-  // enemy's damage notation (Aetheric / ranged tag in the name).
-  const enemyIsRanged = /aetheric|burst|laser|breath|venom|crossbow|bolt/i.test(enemy.attack + ' ' + enemy.damage);
+  // Full cover vs ranged enemies auto-misses. OTA-796 — uses the shared
+  // isRangedEnemy classifier (was a second, different regex).
+  const enemyIsRanged = isRangedEnemy(enemy);
   if (hasFullCover(player.statusEffects) && enemyIsRanged) {
     get().appendLog(
       'combat',
@@ -24721,14 +29977,24 @@ function applyEnemyCounter(
           if (tr.leveled) {
             get().appendLog(
               'reward',
-              `✦ Strength remembers itself. +1 STR (now ${tr.leveled.to}).`,
+              `✦ Strength remembers itself. +1 STR (${statNowClause(get().player, 'strength', tr.leveled.to)}).`,
             );
           }
         }
       }
       // Player lands a hit on enemy as part of trading.
       const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
-      const dmg = equipped ? rollDie(6) + 1 : rollDie(4);
+      // OTA-826 [Group-K audit] — the fight-back trade dealt untyped damage,
+      // bypassing the weakness system on this counter path. Apply the equipped
+      // weapon's type (bare-hand = bludgeoning, matching the primary attack) so a
+      // trade against a weak/resistant foe scales like a normal swing.
+      const rawFb = equipped ? rollDie(6) + 1 : rollDie(4);
+      const fbType = equipped ? (equipped.damageType ?? null) : 'bludgeoning';
+      const fbMod = combineDamageTypeMatch(
+        applyDamageTypeModifier(rawFb, fbType, enemy.type).match,
+        traitDamageMultiplier(enemy.traits, fbType).match,
+      );
+      const dmg = Math.max(1, Math.round(rawFb * fbMod.multiplier));
       const live = get().currentScene;
       if (live) {
         const idx = live.enemies.findIndex((e) => e === enemy);
@@ -24828,19 +30094,84 @@ function applyEnemyCounter(
     }
   }
   // racialAC already includes player.ac; add the gear stack on top.
-  const acFromGear = racialAC + armorPieces.acBonus + titleRuinsAc;
+  // OTA-947 — LIGHT AC TAIL-TRIM (see equipment.trimStandingAc). Trim the standing gear AC
+  // so a fully-fused build is strong but not untouchable; tactical status/cover mods (dodge,
+  // cover, ward) apply on top of the trimmed base at full value.
+  const acFromGear = trimStandingAc(racialAC + armorPieces.acBonus + titleRuinsAc);
   const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));
   // Natural 1 / natural 20 rule — same floor and ceiling that applies
   // to the player. A nat-1 forces a miss regardless of bonuses; a nat-20
   // forces a hit AND doubles the damage roll below.
   const enemyCrit = atkRoll === 20;
   const enemyFumble = atkRoll === 1;
-  const hit = enemyFumble ? false : enemyCrit ? true : atkTotal >= effectiveAc;
-  const outcomeTag = enemyCrit
-    ? '✓ CRITICAL HIT'
-    : enemyFumble
-      ? '✗ FUMBLE'
-      : hit ? '✓ HIT' : '✗ MISS';
+  // OTA-795 — DODGE is an AC-BYPASS GAMBLE (player design call; replaces the
+  // old landed-hit-only parry + instant no-roll riposte, incl. the OTA-260
+  // boxing exception and the 2-durability stance cost). While the stance is
+  // up, this swing resolves as an OPPOSED CONTEST — d20 + DEX vs the enemy's
+  // attack total — instead of vs your AC:
+  //   • WIN  → you take nothing (even a swing that beats your AC) and gain a
+  //     PERFECT OPENING: your next attack deals double damage dice; the
+  //     window is consumed by that swing, hit or miss (see combatRules).
+  //   • LOSE → you dodged INTO it: the blow lands regardless of AC and deals
+  //     2× rolled damage (out of position).
+  // The stance is spent either way. An enemy FUMBLE is a free win (it
+  // overcommits past you); nat-20 auto-wins / nat-1 auto-loses the contest.
+  const dodgingActive = (player.statusEffects ?? []).some((e) => e.kind === 'dodging');
+  let dodgeWin: boolean | null = null;
+  let dodgeLine: string | null = null;
+  if (dodgingActive) {
+    const dexStats = effectiveStats(player);
+    if (enemyCrit) {
+      // OTA-815 — a NATURAL 20 is a perfect strike: it lands through a dodge, the
+      // same 5% floor the AC path already honors (a nat-20 is always an auto-hit
+      // there). Without this a high-DEX dodger wins the opposed contest even vs a
+      // 20 and becomes literally untouchable — the invulnerability the design
+      // forbids ("never invulnerable, a high miss rate is fine"). It resolves as a
+      // dodge LOSS: 2× out-of-position damage, with the crit dice-doubling still
+      // suppressed (dodgeWin != null below) so a pierced dodge is 2×, not 4×
+      // (preserves the OTA-796 balance). So no matter how much DEX/AC you stack,
+      // an enemy still lands ~1 swing in 20.
+      dodgeWin = false;
+      dodgeLine = `Dodge — ${enemy.name} rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.`;
+    } else if (enemyFumble) {
+      dodgeWin = true;
+      dodgeLine = `Dodge — ${enemy.name} overcommits past you. ✓ Free opening (next strike ×2 dice).`;
+    } else {
+      const dRoll = rollDie(20);
+      const dTotal = dRoll + dexStats.dexterity;
+      dodgeWin = dRoll === 20 ? true : dRoll === 1 ? false : dTotal >= atkTotal;
+      dodgeLine = dodgeWin
+        ? `Dodge — d20 → ${dRoll} + DEX ${dexStats.dexterity} = ${dTotal} vs ATK ${atkTotal}. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).`
+        : `Dodge — d20 → ${dRoll} + DEX ${dexStats.dexterity} = ${dTotal} vs ATK ${atkTotal}. ✗ You misread it — no opening, and the blow lands as it normally would (armor still counts).`;
+    }
+    // The stance is spent by this swing, win or lose.
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        statusEffects: (s.player.statusEffects ?? []).filter((e) => e.kind !== 'dodging'),
+      },
+    } : s));
+  }
+  // OTA-936 — a WON dodge negates the hit; a LOST dodge is now just a NORMAL to-hit
+  // (armor counts again, no auto-land) instead of the old AC-bypass. Only the perfect
+  // OPENING is at stake on the read, not double damage.
+  // OTA-947 — NOTHING IS UNTOUCHABLE. Cap the natural d20 an enemy needs to land, so an
+  // arbitrarily high AC can never buy literal immunity. Below the cap this is the identical
+  // AC math (atkTotal >= effectiveAc); it only bites a maxed-out defensive build, floating
+  // its hit chance up to ~P(d20 >= ENEMY_HIT_NEEDED_CAP). AC still matters — it pushes the
+  // needed roll UP toward the cap (fewer hits), it just can't push it past. Adjustable knob.
+  const ENEMY_HIT_NEEDED_CAP = 13; // d20>=13 -> ~40% floor hit chance vs any AC
+  const acHitNat = Math.max(2, Math.min(ENEMY_HIT_NEEDED_CAP, effectiveAc - (atkTotal - atkRoll)));
+  const hit = dodgeWin === true
+    ? false
+    : enemyFumble ? false : enemyCrit ? true : atkRoll >= acHitNat;
+  const outcomeTag = dodgeWin === true
+    ? '✗ EVADED'
+    : enemyCrit
+      ? '✓ CRITICAL HIT'
+      : enemyFumble
+        ? '✗ FUMBLE'
+        : hit ? '✓ HIT' : '✗ MISS';
 
   // OTA 221 — tag enemy whiffs so AdventureFeed can color the
   // outcome marker (MISS / FUMBLE) green at the end of the line.
@@ -24851,12 +30182,96 @@ function applyEnemyCounter(
     `${enemy.name} — d20 → ${atkRoll}${advLabel} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc} — ${outcomeTag}`,
     hit ? undefined : { combatOutcome: 'enemy_miss' },
   );
+  if (dodgeLine) {
+    get().appendLog('combat', dodgeLine, dodgeWin ? { combatOutcome: 'enemy_miss' } : undefined);
+  }
+  // OTA-908 — dodge-outcome CLARITY (playtest: "it looked like I lost a few and
+  // took damage, there should be something saying dodge failed"). The mechanics
+  // are right; the feedback was buried in the [combat] roll line.
+  //   (a) A MISREAD dodge now gets a visceral world beat — you stumbled into it —
+  //       instead of only the terse roll line. (Skips the nat-20 pierce, which
+  //       already has its own "perfect strike lands through" line.)
+  //   (b) A SUCCESSFUL dodge only reads ONE attacker; in a crowd the others still
+  //       swing, so "I dodged but took damage" read like a failure. Name it.
+  if (dodgeWin === false && !enemyCrit) {
+    // OTA-936 — a misread no longer pitches you INTO the blow for 2×; the read just fails
+    // and the swing resolves normally (it can still miss on its own).
+    get().appendLog('world', hit
+      ? 'Your read is a beat off — you fail to make the opening, and the swing lands the way it always meant to.'
+      : 'Your read is a beat off — no opening this time — but the swing goes wide on its own.');
+  } else if (dodgeWin === true) {
+    const sc = get().currentScene;
+    const otherLive = (sc?.enemies ?? []).filter(
+      (e, i) => e !== enemy && (sc?.enemyHps?.[i] ?? e.hp) > 0,
+    ).length;
+    if (otherLive >= 1) {
+      // OTA-936 — a good read no longer leaves you flat-footed to the pack: while you're
+      // still moving off the dodge, the OTHER attackers this volley swing at +3 to your AC
+      // (evasive, one volley). Fixes "I dodged but got mobbed at full anyway."
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          statusEffects: applyEffect(s.player.statusEffects ?? [], {
+            kind: 'evasive' as const,
+            remainingRounds: 1,
+            label: 'evasive — harder to hit',
+          }),
+        },
+      } : s));
+      get().appendLog('world', `You slip ${enemy.name}'s arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.`);
+    }
+  }
+  if (dodgeWin === true) {
+    // The read paid off — train DEX (and STEALTH when stealth gear is worn;
+    // both carried over from the old parry's training rules). OTA-796 — capped
+    // at 3 trains per scene visit (exploit sweep: unbounded dodge-farming).
+    const dodgeTrains = get().currentScene?.dodgeTrainsUsed ?? 0;
+    const mayTrain = dodgeTrains < 3;
+    if (mayTrain) {
+      set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, dodgeTrainsUsed: dodgeTrains + 1 } } : s));
+    }
+    const liveParrier = mayTrain ? get().player : null;
+    if (liveParrier) {
+      const tr = trainStat(liveParrier, 'dexterity', true);
+      set((s) => (s.player ? { player: tr.player } : s));
+      if (tr.leveled) {
+        get().appendLog('reward', `✦ Reflex like water. +1 DEX (${statNowClause(get().player, 'dexterity', tr.leveled.to)}).`);
+      }
+    }
+    const liveSte = mayTrain ? get().player : null;
+    if (liveSte && (aggregateEquippedStatBonuses(liveSte).stealth ?? 0) > 0) {
+      const trS = trainStat(liveSte, 'stealth', true);
+      set((s) => (s.player ? { player: trS.player } : s));
+      if (trS.leveled) {
+        get().appendLog('reward', `✦ The shadows move with you. +1 STE (${statNowClause(get().player, 'stealth', trS.leveled.to)}).`);
+      }
+    }
+    // Grant the opening. remainingRounds 2 so the round tick at the end of
+    // THIS action can't expire it before the player's next swing; the swing
+    // itself consumes it (rollMods), so 2 is a ceiling, not a duration.
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        statusEffects: applyEffect(s.player.statusEffects ?? [], {
+          kind: 'perfect_opening' as const,
+          remainingRounds: 2,
+          label: 'perfect opening',
+        }),
+      },
+    } : s));
+  }
 
   if (hit) {
     let rawDmg = rollFromNotation(String(enemy.damage)) || rollDie(6);
     // Critical: roll damage twice and sum, mirroring the player's
-    // double-dice crit treatment so the bite hurts.
-    if (enemyCrit) {
+    // double-dice crit treatment so the bite hurts. OTA-796 — skipped when a
+    // dodge contest resolved this swing: the contest replaced the to-hit roll,
+    // and stacking the crit reroll under the failed-dodge ×2 made dodging vs a
+    // nat-20 FOUR times as deadly as standing still (exploit-sweep finding).
+    // OTA-936 — a nat-20 that pierces a dodge is a NORMAL crit now (2× dice), the same as
+    // a nat-20 vs a standing player. (The failed-dodge flat 2× this guard balanced against
+    // is retired, so crit-doubling no longer needs suppressing on a pierced dodge.)
+    if (enemyCrit && dodgeWin !== true) {
       rawDmg += rollFromNotation(String(enemy.damage)) || rollDie(6);
     }
     // Boss-tier bonus damage — +1d6 on every connecting swing on top
@@ -24896,6 +30311,13 @@ function applyEnemyCounter(
         dmg = Math.max(1, Math.ceil(dmg / 2));
         titleAethericHalved = true;
       }
+      // OTA-835 — Stormcaller (ethericShield) is now STORM-HARDENED: it also halves
+      // incoming ELECTRICAL, giving the title a defensive niche distinct from Aetheric
+      // Attuned (ethericDamageResist, aetheric-only). One storm-warded body, two lines.
+      if (enemyDamageType === 'electrical' && tPerksHit.ethericShield) {
+        dmg = Math.max(1, Math.ceil(dmg / 2));
+        titleAethericHalved = true;
+      }
       // Etherbound Survivor — environmental/elemental damage types (burn /
       // cold / electrical / poison / aetheric) get the save-bonus shaved off.
       if (tPerksHit.envHazardSaveBonus > 0
@@ -24912,10 +30334,12 @@ function applyEnemyCounter(
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { raceDamageMultiplier, raceResistLabel } = require('../engine/raceMechanics');
       const raceMult = raceDamageMultiplier(player.raceId, enemyDamageType);
-      if (raceMult < 1) {
+      // OTA-835 — apply BOTH directions (was `< 1` = resist-only). A race authored as
+      // VULNERABLE (mult > 1, e.g. Mud Golem vs aetheric) now takes extra damage.
+      if (raceMult !== 1) {
         const before = dmg;
         dmg = Math.max(1, Math.round(dmg * raceMult));
-        if (dmg < before) raceResistTag = raceResistLabel(player.raceId, raceMult);
+        if (dmg !== before) raceResistTag = raceResistLabel(player.raceId, raceMult);
       }
     }
     // arb-fix — Sentinel "Defensive Protocols" ability: an active shield halves
@@ -24924,6 +30348,18 @@ function applyEnemyCounter(
     if (dmg > 1 && (player.statusEffects ?? []).some((e) => e.kind === 'shielded')) {
       dmg = Math.max(1, Math.ceil(dmg / 2));
       shieldTag = ' (Defensive Protocols shield)';
+    }
+    // OTA-947 — GLOBAL MITIGATION FLOOR. The resist/halving layers (armor <=80%, title 1/2,
+    // race 1/2, shield 1/2) multiply with only a per-step floor of 1, so a focused build
+    // stacked them to ~1 damage and switched the defensive half of combat off. Clamp the
+    // post-stack number so a LANDED hit always delivers at least MITIGATION_FLOOR of its raw
+    // roll: resists still soak MOST of a matched hit, but a MISMATCHED one visibly leaks
+    // damage. The stone ward below is a spent absorb pool (not a passive resist), so it still
+    // runs after this and may legitimately zero a hit. Adjustable knob.
+    const MITIGATION_FLOOR = 0.30;
+    if (dmg > 0) {
+      const mitFloor = Math.round(rawDmg * MITIGATION_FLOOR);
+      if (mitFloor > dmg) dmg = mitFloor;
     }
     // engine_Dev (Combat-Parity II) — enemy TYPED on-hit proc on the player. Only EXPLICITLY-typed
     // enemies proc at full chance; an inferred (bare-dice) type procs at 0.4× — so the ~95 enemies
@@ -24943,122 +30379,25 @@ function applyEnemyCounter(
       }
     }
 
-    // ACTIVE PARRY — the player committed a dodge before this swing
-    // landed. Opposed roll: d20 + DEX vs the enemy's attack total.
-    //   - Success → damage NEGATED + free counter-strike at 2× the
-    //     equipped weapon's damage dice (no roll-to-hit on the
-    //     counter; it just lands).
-    //   - Failure → damage stays as already rolled.
-    // Either way: status consumed, equipped weapon takes 2 durability
-    // (1.5× normal hit-wear, rounded up). Bare-handed dodging still
-    // rolls — you just can't deal counter damage without a weapon.
-    //
-    // Folded the old 'block' verb into this 2026-05-21. The
-    // half-damage / 25%-1d4-riposte block was diluted vs an
-    // all-or-nothing parry, and players were getting confused about
-    // which defensive option to pick. Now there's one defensive
-    // commit and one clear payoff.
-    const dodgingActive = (player.statusEffects ?? []).some((e) => e.kind === 'dodging');
-    let parryNarration: string | null = null;
-    let riposteDamage = 0;
-    if (dodgingActive) {
-      const stats = effectiveStats(player);
-      const parryRoll = rollDie(20);
-      const parryTotal = parryRoll + stats.dexterity;
-      const success = parryRoll === 20 ? true : parryRoll === 1 ? false : parryTotal >= atkTotal;
-      const mainName = player.equipped?.main ?? player.equipped?.weaponName ?? null;
-      const equipped = mainName ? findWeaponByName(mainName) : null;
-      if (success) {
-        // OTA 058 — successful parry trains DEX.
-        {
-          const liveParrier = get().player;
-          if (liveParrier) {
-            const tr = trainStat(liveParrier, 'dexterity', true);
-            set((s) => (s.player ? { player: tr.player } : s));
-            if (tr.leveled) {
-              get().appendLog(
-                'reward',
-                `✦ Reflex like water. +1 DEX (now ${tr.leveled.to}).`,
-              );
-            }
-          }
-          // OTA-350 — using stealth gear in combat trains STEALTH. A clean
-          // parry/dodge while wearing stealth gear (cloak, footwraps, a quiet
-          // blade) is the gear earning its keep — moving unseen under fire.
-          // Gated on equipped stealth > 0 so it only fires when gear is worn.
-          const liveSte = get().player;
-          if (liveSte && (aggregateEquippedStatBonuses(liveSte).stealth ?? 0) > 0) {
-            const trS = trainStat(liveSte, 'stealth', true);
-            set((s) => (s.player ? { player: trS.player } : s));
-            if (trS.leveled) {
-              get().appendLog(
-                'reward',
-                `✦ The shadows move with you. +1 STE (now ${trS.leveled.to}).`,
-              );
-            }
-          }
-        }
-        const before = dmg;
-        // OTA-260 — boxing/karate exception. Weapon strikes can be
-        // parried clean — steel has a definite arc and a definite
-        // edge, you knock the line aside and you take nothing. A
-        // PUNCH or KICK is different: it's a body part with momentum
-        // behind it, the swing arc is wide, and "dodge" against a
-        // boxer means absorbing the glancing edge of a hook even when
-        // your read was right. Player call: "punch and kick should
-        // still land damage on Dodge — think boxing and karate."
-        // Detect unarmed strike via keywords in the enemy.damage
-        // string; on a successful parry of an unarmed strike, the
-        // counter still fires at 2× weapon dice (you opened a window),
-        // but the player eats 50% of the rolled damage (floor 1) for
-        // getting clipped on the way through.
-        const isUnarmedIncoming = isUnarmedStrike(String(enemy.damage));
-        if (isUnarmedIncoming) {
-          dmg = Math.max(1, Math.floor(before * 0.5));
-        } else {
-          dmg = 0;
-        }
-        if (equipped) {
-          // Counter-strike at 2× the weapon's damage notation.
-          const parsed = parseDamageDice(equipped.damageDice);
-          let counterDmg = 0;
-          for (let i = 0; i < parsed.count * 2; i++) counterDmg += rollDie(parsed.sides);
-          // Per-weapon-effect bonus damage if the active weapon's
-          // effect line matches this enemy (e.g. +1d4 vs constructs).
-          const fx = parseWeaponEffect(equipped.effect);
-          if (fx) counterDmg += rollEffectBonusDamage(fx, enemy);
-          riposteDamage = Math.max(1, counterDmg);
-          parryNarration = isUnarmedIncoming
-            ? `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Read the strike, but you can't parry a fist clean — ${dmg} grazes you. Counter-strike for ${riposteDamage} (2× ${equipped.damageDice}).`
-            : `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Caught the blade. Counter-strike for ${riposteDamage} (2× ${equipped.damageDice}).`;
-        } else {
-          // Bare-handed parry. Same OTA-260 boxing exception applies:
-          // a punch / kick still grazes even when you read the swing.
-          // No counter possible without a weapon, so the only outcome
-          // mod is the partial-damage on unarmed incoming.
-          parryNarration = isUnarmedIncoming
-            ? `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Read it, but you can't parry a fist clean barehanded — ${dmg} grazes you.`
-            : `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Slipped clean (no weapon to counter).`;
-        }
-        void before;
-      } else {
-        parryNarration = `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✗ Read through.`;
+    // OTA-936 — the failed-dodge flat 2× (out-of-position) is retired: a misread dodge is
+    // now just a normal hit resolved against AC above. Only the perfect OPENING is at stake
+    // on the read — so a low-DEX dodger is no longer punished DOUBLE for a bad gamble.
+
+    // OTA-835 — Elemental Control WARD (Mud Golem defensive half): a shaped-stone
+    // ward soaks a flat pool of damage before it reaches HP. Runs LAST, on the
+    // final incoming number (after every resist/shield and the dodge double), so
+    // it soaks what you'd actually take. Records the remaining pool so the set()
+    // below can decrement the ward and drop it when spent.
+    let wardTag = '';
+    let wardRemain: number | null = null;
+    {
+      const wardFx = (player.statusEffects ?? []).find((e) => e.kind === 'stone_ward' && (e.absorb ?? 0) > 0);
+      if (wardFx && dmg > 0) {
+        const soak = Math.min(wardFx.absorb ?? 0, dmg);
+        dmg -= soak;
+        wardRemain = (wardFx.absorb ?? 0) - soak;
+        wardTag = ` (stone ward soaks ${soak})`;
       }
-      // 1.5× normal hit-wear, rounded up = 2 durability per parry,
-      // regardless of outcome. The cost of committing the stance.
-      if (mainName) {
-        for (let i = 0; i < 2; i++) {
-          set((s) => (s.player ? { player: wearEquippedItem(s.player, mainName, get) } : s));
-        }
-      }
-      // Consume the dodging status — single-shot reaction, gone
-      // whether it landed or not.
-      set((s) => (s.player ? {
-        player: {
-          ...s.player,
-          statusEffects: (s.player.statusEffects ?? []).filter((e) => e.kind !== 'dodging'),
-        },
-      } : s));
     }
 
     // Roll for a status effect to apply based on the damage type.
@@ -25068,31 +30407,47 @@ function applyEnemyCounter(
     // stack with a type-based status.
     const traitHit = traitOnHitStatus(enemy.traits);
 
-    // Armor wear: every armor piece that actually contributes to the
-    // player's defence chips one point. Pieces with 0 durability or no
-    // catalog entry are skipped.
+    // OTA-982 — armor wear: a landed blow chips ONE worn piece, not the whole
+    // set. The old loop wore EVERY slot per hit, so a 5-piece set spent 5
+    // durability per blow and a 5-raider pack ate a freshly crafted set inside
+    // one fight (owner's log: cap, gloves, trousers, wraps, brow guard all
+    // shattered in ~10 minutes, AC 24 -> 17). One blow lands somewhere; that
+    // piece takes the wear — so MORE armor now means the set lasts LONGER,
+    // instead of dying faster the better-equipped you are.
     const wornSlots = ARMOR_SLOTS.filter((s) => !!player.equipped?.[s]);
+    const wornSlotHit = wornSlots.length > 0
+      ? wornSlots[Math.floor(Math.random() * wornSlots.length)]!
+      : null;
 
     let killed = false;
     set((s) => {
       if (!s.player) return {};
       let nextPlayer = s.player;
-      for (const slot of wornSlots) {
-        const name = nextPlayer.equipped?.[slot];
-        if (!name) continue;
-        nextPlayer = wearEquippedItem(nextPlayer, name, get);
+      if (wornSlotHit) {
+        const name = nextPlayer.equipped?.[wornSlotHit];
+        if (name) nextPlayer = wearEquippedItem(nextPlayer, name, get);
       }
       const newHp = Math.max(0, nextPlayer.hp - dmg);
       killed = newHp <= 0;
-      const titleTag = titleAethericHalved
-        ? ` (your title turns aside half the ${enemyDamageType})`
-        : titleHazardShaved > 0
-          ? ` (Etherbound Survivor shrugs off ${titleHazardShaved})`
-          : '';
-      const resistTag = (resisted.blocked ? ` (armor turns ${Math.round(resisted.fraction * 100)}% of the ${enemyDamageType})` : '') + titleTag + raceResistTag + shieldTag;
+      // OTA-842 [combat-log restructure] — the incoming hit's modifiers used to be
+      // appended as run-on parentheticals ("…damage (armor turns 40% of the cold)(your
+      // title turns aside half the cold)(Aetherstone Vulnerability — +50% dmg)(stone
+      // ward soaks 3)"). When two or more fired it read as a wall of parens. Collect
+      // them into ONE terse, comma-separated clause instead: "…damage [armor −40%,
+      // title ½, ward soaks 3]." Order = armor → title → race → shield → ward, the
+      // order they applied. (A race VULNERABILITY reads "+N%" here — the bracket lists
+      // every modifier, not only reductions.)
+      const modClause = damageModClause({
+        armorFraction: resisted.blocked ? resisted.fraction : 0,
+        titleHalved: titleAethericHalved,
+        titleShaved: titleHazardShaved,
+        raceTag: raceResistTag,
+        shield: !!shieldTag,
+        wardTag,
+      });
       const msg = killed
-        ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You fall.`
-        : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You have ${newHp} HP remaining.`;
+        ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}. You fall.`
+        : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}. You have ${newHp} HP remaining.`;
       const prevHpForWarn = nextPlayer.hp;
       const hpMaxForWarn = nextPlayer.hpMax ?? 1;
       void Promise.resolve().then(() => {
@@ -25113,11 +30468,48 @@ function applyEnemyCounter(
           label: traitHit.label,
         });
       }
+      // OTA-835 — decrement (or drop) the Elemental Control ward now that it has
+      // soaked its share of this hit.
+      if (wardRemain !== null) {
+        effects = (effects ?? [])
+          .map((e) => (e.kind === 'stone_ward' ? { ...e, absorb: wardRemain! } : e))
+          .filter((e) => e.kind !== 'stone_ward' || (e.absorb ?? 0) > 0);
+      }
       return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
 
-    if (parryNarration) {
-      void Promise.resolve().then(() => get().appendLog('combat', parryNarration!));
+    // OTA-985 — the same connecting swing can catch the escort party the player is
+    // protecting. Uses the final post-mitigation damage, so a clean parry
+    // (dmg 0) shields them too.
+    applyEscortDamage(get, set, dmg, enemy.name);
+
+    // OTA-959 — LEGIBILITY CUES (once per encounter, after the damage line). A matched
+    // resist that soaked >=40% earns one plain-language callout; an elemental hit that
+    // NOTHING in the loadout touched earns one "that's a hole" warning. The bracket
+    // clause on every hit stays the terse record — these are the legible sentence.
+    if (!killed) {
+      const cueKey = `${player.currentLocationId}|${player.mapX},${player.mapY}|${player.hubRoomId ?? ''}`;
+      const prevCues = get().combatCues;
+      const cues = prevCues && prevCues.key === cueKey
+        ? prevCues
+        : { key: cueKey, soak: false, leak: false };
+      const cue = incomingHitCue({
+        rawDmg,
+        dmg,
+        armorBlocked: resisted.blocked,
+        armorFraction: resisted.fraction,
+        otherLayerFired: titleAethericHalved || titleHazardShaved > 0 || !!raceResistTag || !!shieldTag || !!wardTag,
+        damageType: enemyDamageType,
+      });
+      if (cue === 'soak' && !cues.soak) {
+        set(() => ({ combatCues: { ...cues, soak: true } }));
+        void Promise.resolve().then(() => get().appendLog('combat', soakCueLine(enemyDamageType, rawDmg, dmg)));
+      } else if (cue === 'leak' && !cues.leak) {
+        set(() => ({ combatCues: { ...cues, leak: true } }));
+        void Promise.resolve().then(() => get().appendLog('combat', leakCueLine(enemyDamageType)));
+      } else if (!prevCues || prevCues.key !== cueKey) {
+        set(() => ({ combatCues: cues }));
+      }
     }
 
     if (newEffect) {
@@ -25133,50 +30525,14 @@ function applyEnemyCounter(
       );
     }
 
-    // RIPOSTE — successful block landed a counter-strike. Find the live
-    // enemy index and apply the damage to enemyHps. Death from riposte
-    // resolves normally on the next attack cycle.
-    if (riposteDamage > 0) {
-      const live = get().currentScene;
-      if (live) {
-        const idx = live.enemies.findIndex((e) => e === enemy);
-        if (idx >= 0) {
-          const hpNow = live.enemyHps[idx] ?? enemy.hp;
-          const hpAfter = Math.max(0, hpNow - riposteDamage);
-          set((s) => {
-            if (!s.currentScene) return {};
-            const hps = [...s.currentScene.enemyHps];
-            hps[idx] = hpAfter;
-            return { currentScene: { ...s.currentScene, enemyHps: hps } };
-          });
-          void Promise.resolve().then(() =>
-            get().appendLog('combat', `Counter-strike! Your parry opens a gap — ${enemy.name} takes ${riposteDamage} damage.`, { combatOutcome: 'player_dmg' }),
-          );
-          // If the riposte killed the enemy, resolve their defeat now so
-          // the rest of the group counter-volley doesn't skip them.
-          if (hpAfter <= 0) {
-            void Promise.resolve().then(() => {
-              const scene = get().currentScene;
-              if (!scene) return;
-              const i = scene.enemies.findIndex((e) => e === enemy);
-              if (i < 0) return;
-              // Re-point the active idx to the riposted enemy so
-              // resolveEnemyDefeat splices the right one.
-              set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: i } } : s));
-              get().resolveEnemyDefeat();
-            });
-          }
-        }
-      }
-    }
-
     if (killed) {
       void Promise.resolve().then(() => handlePlayerDeath(get, set));
     }
   }
   // End-of-round regen for the attacking enemy. Caps at its starting HP
-  // so a player can't out-wait a regenerator past its base.
-  const regen = traitRegen(enemy.traits);
+  // so a player can't out-wait a regenerator past its base. OTA-796 — skip on a
+  // boss's second swing so it regens once per round, not per swing.
+  const regen = secondSwing ? 0 : traitRegen(enemy.traits);
   if (regen > 0) {
     const live = get().currentScene;
     if (live) {
@@ -25203,28 +30559,68 @@ function applyEnemyCounter(
 // arb119 — damage-type parsing/inference moved to engine/damageTypes.ts
 // (parseDamageTypeKeyword + enemyDamageType), shared with the EnemyPanel.
 
-// OTA-260 — boxing/karate-style body strikes that should still graze
-// the player on a successful dodge/parry. Keyed on humanoid-fighter
-// verbs (the user's framing was explicit: "think boxing and karate").
-// Natural weapons (bite / claw / talon / horn / sting) are NOT in
-// this list — those are real edged weapons mounted on a creature,
-// and the dodge handles them clean like a sword. The current incoming
-// attack is classified by string-match against enemy.damage, which
-// is where authored monster damage notation lives ("punch 1d6+1",
-// "claw 1d4", "1d8 sword", etc).
-const UNARMED_STRIKE_KEYWORDS = [
-  'punch', 'kick', 'fist', 'knuckle', 'headbutt', 'head-butt',
-  'elbow', 'knee', 'stomp', 'slam', 'shove', 'tackle', 'jab',
-  'hook', 'uppercut', 'cross',
-];
-function isUnarmedStrike(damageString: string): boolean {
-  const lower = damageString.toLowerCase();
-  return UNARMED_STRIKE_KEYWORDS.some((k) => lower.includes(k));
-}
-
 // Death is no longer permanent erasure. The character is marked dead and
 // remains on the title slot list (with a DEAD badge) so the player can
 // resurrect them with a Resurrection Gem.
+// OTA-838 — record an OBSERVED damage-type match against an enemy so the panel and
+// bestiary can reveal what you've learned by fighting (the panel's "strike to learn"
+// promise, made real + persistent). Deduped per lowercased enemy name; a type lives
+// in weak OR resist, and a fresh contradicting observation MOVES it (per-spawn
+// OTA-842 [combat-log restructure] — build the incoming-hit modifier clause. The old
+// line appended each mitigation as its own parenthetical, so a hit that armor + title +
+// race + ward all touched read as a wall of "(…)(…)(…)(…)". This collects them into one
+// terse comma-separated bracket: " [armor −40%, title ½, ward soaks 3]". Order mirrors
+// the order they applied. Race VULNERABILITY appears as "+N%" — the bracket lists every
+// modifier, not only reductions. Empty modifiers → empty clause (no bracket). Exported
+// for the OTA-842 format test.
+export function damageModClause(opts: {
+  armorFraction?: number; // >0 when armor turned part of the hit
+  titleHalved?: boolean;  // a title halved this type
+  titleShaved?: number;   // Etherbound Survivor flat shave
+  raceTag?: string;       // raceResistLabel output — raw " (…)" or ''
+  shield?: boolean;       // Defensive Protocols shield active
+  wardTag?: string;       // stone-ward soak — raw " (…)" or ''
+}): string {
+  const strip = (t: string) => t.replace(/^\s*\(/, '').replace(/\)\s*$/, '').trim();
+  const mods: string[] = [];
+  if (opts.armorFraction && opts.armorFraction > 0) mods.push(`armor −${Math.round(opts.armorFraction * 100)}%`);
+  if (opts.titleHalved) mods.push('title ½');
+  else if (opts.titleShaved && opts.titleShaved > 0) mods.push(`Aetherbound −${opts.titleShaved}`);
+  if (opts.raceTag) mods.push(strip(opts.raceTag));
+  if (opts.shield) mods.push('shield ½');
+  if (opts.wardTag) mods.push(strip(opts.wardTag));
+  return mods.length ? ` [${mods.join(', ')}]` : '';
+}
+
+// randomization can flip a type, so the latest hit is the truth). No-op for 'normal'.
+// Exported for unit testing the dedup/move logic (OTA-838).
+export function recordEnemyIntel(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  enemyName: string,
+  damageType: string | null | undefined,
+  match: 'weak' | 'resist' | 'normal',
+): void {
+  if (match === 'normal') return;
+  const dt = (damageType ?? '').toLowerCase();
+  if (!dt || !enemyName) return;
+  const key = enemyName.toLowerCase();
+  set((s) => {
+    const wm = s.worldMemory;
+    if (!wm) return {};
+    const cur = wm.enemyIntel?.[key] ?? { weak: [], resist: [] };
+    const weak = cur.weak.filter((t) => t !== dt);
+    const resist = cur.resist.filter((t) => t !== dt);
+    if (match === 'weak') weak.push(dt); else resist.push(dt);
+    // Nothing changed → skip the write (avoids a needless re-render/persist).
+    if (weak.length === cur.weak.length && resist.length === cur.resist.length
+        && weak.every((t, i) => t === cur.weak[i]) && resist.every((t, i) => t === cur.resist[i])) {
+      return {};
+    }
+    return { worldMemory: { ...wm, enemyIntel: { ...(wm.enemyIntel ?? {}), [key]: { weak, resist } } } };
+  });
+}
+
 function handlePlayerDeath(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -25246,6 +30642,53 @@ function handlePlayerDeath(
     'system',
     `${player.name} has fallen. A Resurrection Gem from the title screen can bring them back.`,
   );
+
+  // OTA-845 [The Fallen] — a death is never wiped clean. Append this character to the
+  // install-wide roll of the Fallen so later characters inherit a graveyard of
+  // predecessors (readable in the Lore Codex, cross-character). Losing is fun: the run
+  // ends, the legend persists. Fire-and-forget; when it lands, name the beat.
+  {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const races = require('../data/races/races.json') as Array<{ id: string; name: string }>;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { corruptionTierOf, tierLabel } = require('../engine/corruption');
+    const hero = {
+      name: player.name,
+      raceName: races.find((r) => r.id === player.raceId)?.name ?? player.raceId ?? 'wanderer',
+      epitaph,
+      locationName: locName,
+      kills: player.milestones?.enemiesDefeated ?? 0,
+      corruption: tierLabel(corruptionTierOf(player.corruption ?? 0)),
+      hours: Math.floor(player.hoursElapsed ?? 0),
+      // OTA-998 — the kit they died in, for the Hollowed revenant they may yet
+      // become (slot display names; the *Id fields are instance ids, skipped).
+      gearNames: (() => {
+        const slotPrio = ['main', 'off', 'chest', 'head', 'legs', 'feet', 'amulet', 'ring', 'ring2', 'ring3'];
+        return Array.from(new Set(Object.entries((player.equipped ?? {}) as Record<string, string | undefined>)
+          .filter(([k, v]) => !!v && !k.endsWith('Id'))
+          .sort(([a], [b]) => {
+            const ia = slotPrio.indexOf(a); const ib = slotPrio.indexOf(b);
+            return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+          })
+          .map(([, v]) => String(v)))).slice(0, 6);
+      })(),
+      // OTA-1017 — THE RECLAIM: full item copies too, so the revenant can give the
+      // REAL gear back (fused stats intact), not a look-alike or a trophy.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      gear: (require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants')).buildFallenGearSnapshot(player),
+      ts: Date.now(),
+    };
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const revCache = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+      revCache.appendFallenToCache(hero);
+    }
+    void recordFallen(hero).then((total) => {
+      if (total > 1) {
+        get().appendLog('system', `You join the Fallen of Tartaria — ${total} names the buried world keeps now. Read the roll from the Lore Codex.`);
+      }
+    }).catch(() => { /* the graveyard is a keepsake, never block death on it */ });
+  }
 
   // OTA-067 — dev cheat for the project owner. If the fallen
   // character is named one of the dev names (case-insensitive,
@@ -25510,7 +30953,9 @@ function atFactionTurnInBuilding(get: () => GameStore, factionId: string): boole
  *  present, auto-turn-in every active faction quest whose WORK is done (staged →
  *  all stages; fetch → items in hand), at FULL reward, and surface a completion
  *  popup. This is the "submit on arrival at the routed spot" the player asked for
- *  — couriering from afar (the Contracts COMPLETE button) stays the HALF option. */
+ *  — OTA correction: the Contracts COMPLETE button is NOT a remote half option
+ *  anymore; it delegates to the same face-to-face typed turn-ins (see
+ *  completeContractFromUI — "in person or not at all"). */
 function autoSubmitReadyFactionQuests(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -25539,7 +30984,7 @@ function autoSubmitReadyFactionQuests(
     const stillActive = (get().player?.activeFactionQuestIds ?? []).includes(def.id);
     if (!stillActive) {
       lines.push(`✓ ${def.title}`);
-      rewards.push(`+${def.reward.tc} TC · +${def.reward.rep} rep`);
+      rewards.push(`+${def.reward.tc} TC${def.reward.rep > 0 ? ` · +${def.reward.rep} rep` : ''}`);
     }
   }
   if (lines.length > 0) {
@@ -25672,7 +31117,7 @@ const TRAVEL_LORE_BEATS = [
   `The Arbiter: "Aetherstone holds light. It holds heat. It holds memory, sometimes. The cores you'll find are not always inert."`,
   `The Arbiter: "Mud-glass is silt fused under Aetheric pressure during the flood. It traps what it traps. Don't break it without a reason."`,
   `The Arbiter, quieter: "Tartarian Giants walked here. Their footprints are in the mud-glass under your boots, if you know what to look for."`,
-  `The Arbiter: "Etheric Undead are not the same as dead. They are people the Aether kept past the threshold. They remember. That is the cruelty."`,
+  `The Arbiter: "Aetheric Undead are not the same as dead. They are people the Aether kept past the threshold. They remember. That is the cruelty."`,
   `The Arbiter: "The Red Tower in the Order's keeping has forty-seven visible rings. It had more, once. Each ring was a doctrine the Order forgot or denied."`,
   `The Arbiter: "Drakova is south. Old Drakova is south, and under. The new Drakova lives on top of its grave and rarely admits it."`,
   `The Arbiter: "The Mud Seas are not seas. They are silt over the Cradle of Dusk, and the storms there are Aetheric, not weather."`,
@@ -26079,33 +31524,29 @@ function narrateCasualLook(
   // Strip climb markers — a noun that's only been CLIMBED shouldn't
   // get hidden from the "You see:" list.
   const lookSearched = nonClimbMarkers(lookRoom?.searchedAmbientNouns).map((n) => n.toLowerCase());
+  // OTA-950 — a noun INVESTIGATED for flavor ("already worked over — nothing more to find") is
+  // cleared just like a searched/taken one, so drop it from the "You see:" list too. Playtest:
+  // "look around sees things I have already investigated and cleared." The look-around filter only
+  // honored searchedAmbientNouns (the take/salvage path); it never consulted flavorExhaustedNouns
+  // (the investigate/flavor path). A flavor-exhausted noun is pure flavor — no re-takeable catalog
+  // item — so once cleared it stays hidden (no self-heal branch needed).
+  const lookFlavor = nonClimbMarkers(lookRoom?.flavorExhaustedNouns).map((n) => n.toLowerCase());
   const isConsumedForLook = (displayNoun: string): boolean => {
     const lower = displayNoun.toLowerCase();
+    // OTA-953 — WORD-level match, not raw substrings (see nounTokensMatch). The substring rule
+    // hid unrelated nouns sharing letters: investigating a "rack" hid "cRACKed terminal";
+    // "vat" hid "obserVATion window". Partial phrasing of the SAME prop still hides
+    // ("rack" vs "armor rack").
+    if (lookFlavor.some((s) => nounTokensMatch(s, lower))) return true;
     // (1) bidirectional substring against searchedAmbientNouns.
     const recorded = lookSearched.some(
       (s) => s === lower || s.includes(lower) || lower.includes(s),
     );
-    if (recorded) {
-      // Honor engine dedup; but if the noun resolves to a real
-      // catalog item AND the player no longer owns it (dropped /
-      // sold), allow the noun back as re-takeable. Mirrors the
-      // self-heal in takeAmbientNoun.
-      const cat = findCatalogItem(displayNoun);
-      if (!cat) return true;
-      const ownsIt = !!player && player.inventory.some(
-        (i) => i.name.toLowerCase() === cat.name.toLowerCase() && i.quantity > 0,
-      );
-      return ownsIt;
-    }
-    // (2) inventory self-heal — searchedAmbientNouns may have missed
-    // a write (pre-fix bundle, race, etc.); if the player is already
-    // carrying the catalog item this noun would grant, treat as
-    // consumed so the "You see:" list stays honest.
-    const cat = findCatalogItem(displayNoun);
-    if (!cat || !player) return false;
-    return player.inventory.some(
-      (i) => i.name.toLowerCase() === cat.name.toLowerCase() && i.quantity > 0,
-    );
+    // OTA-981 — taken is taken (mirrors the engine's once-per-room rule; the
+    // owned-check un-grey re-opened the take farm). And an UN-taken noun shows
+    // regardless of what the pack holds — owning a torch from elsewhere must
+    // not hide a fresh one the engine would happily grant.
+    return recorded;
   };
   const interactables: string[] = [];
   const source = scene.displayedAmbientNouns ?? (scene.ambientNouns ?? []).slice(0, 8);
@@ -26172,7 +31613,7 @@ function narrateCasualLook(
   if (player) {
     const active = (player.statusEffects ?? []).filter((e) => e.kind === 'food_buff' && e.buffBonus && e.buffStat);
     if (active.length > 0) {
-      const chips = active.map((e) => `+${e.buffBonus} ${e.buffStat!.toUpperCase().slice(0, 3)} (${e.remainingRounds} turns)`);
+      const chips = active.map((e) => `+${e.buffBonus} ${e.buffStat!.toUpperCase().slice(0, 3)} (${e.remainingRounds} turn${e.remainingRounds === 1 ? '' : 's'})`);
       parts.push(`Active boosts: ${chips.join(' · ')}.`);
     }
   }
@@ -26192,7 +31633,14 @@ function narrateCasualLook(
     parts.push(`(Type 'leave outpost' to head into the wilds.)`);
   } else {
     const exitLine: string[] = [];
-    if (ladder?.microMicro.exits && ladder.microMicro.exits.length > 0) {
+    // OTA-768 — the Micro-Micro "Room exits" are INDOOR navigation phrases ("forward
+    // into the Grand Hall", "through the side passage"). They only make sense when the
+    // player is genuinely INSIDE a structure. On the open overworld — where cardinal
+    // travel IS the navigation — they contradict "you're outside traveling" (playtest:
+    // "I'm not in a structure, I can't be headed toward a hall"). Show them only inside
+    // an entered building; on a travel tile the look reads as the overworld it is. The
+    // sibling-room navigation still works if the player types an exit phrase.
+    if (inBuilding && ladder?.microMicro.exits && ladder.microMicro.exits.length > 0) {
       exitLine.push(`Room exits: ${ladder.microMicro.exits.join(' · ')}.`);
     }
     exitLine.push(`Cardinal travel: north, east, south, west.`);
@@ -26399,9 +31847,9 @@ function narratePossibleDirections(
   const humanizeType = (t: string | undefined): string =>
     (t ?? 'path').toLowerCase().replace(/_/g, ' ');
   const fragments: string[] = [];
-  fragments.push(`a ${humanizeType(first.type)} toward ${first.name}`);
+  fragments.push(`${withArticle(humanizeType(first.type))} toward ${first.name}`);
   if (second && second.id !== first.id) {
-    fragments.push(`a ${humanizeType(second.type)} toward ${second.name}`);
+    fragments.push(`${withArticle(humanizeType(second.type))} toward ${second.name}`);
   }
   get().appendLog('world', `You look for a way forward. The Arbiter notes ${fragments.join(' and ')}.`);
   markPathExhausted();
@@ -26465,16 +31913,23 @@ function runAethercraft(
     }
   } else {
     // shape / mend — legacy single-item Aether fuel logic.
-    const AETHER_FUEL_NAMES = [
-      'Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue',
-      'Golem Core', 'Aetheric Locket',
-    ];
+    // OTA-970 — two fuel-picker fixes from a playtest where "shape stone"
+    // silently ate the player's EQUIPPED Aetheric Locket:
+    //  1) The Aetheric Locket is a wearable amulet (detection relic), not
+    //     fuel. It's out of the list entirely — a cast can never consume it.
+    //  2) Fuel is picked cheapest-first (Common residue/mud/crystal before
+    //     the Uncommon shard before a whole Rare Golem Core), not in raw
+    //     inventory order — the cast reaches for the cheapest thing that
+    //     works instead of whatever happens to sit first in the pack.
     const allowed: string[] = discipline === 'shape'
-      ? AETHER_FUEL_NAMES
-      : ['Aetheric Shard', 'Aether Crystal']; // mend
-    fuelItem = player.inventory.find(
-      (i) => i.quantity > 0 && allowed.some((name) => name.toLowerCase() === i.name.toLowerCase()),
-    ) ?? null;
+      ? ['Aether Residue', 'Aether Mud', 'Aether Crystal', 'Aetheric Shard', 'Golem Core']
+      : ['Aether Crystal', 'Aetheric Shard']; // mend
+    for (const name of allowed) {
+      const found = player.inventory.find(
+        (i) => i.quantity > 0 && i.name.toLowerCase() === name.toLowerCase(),
+      );
+      if (found) { fuelItem = found; break; }
+    }
     if (!fuelItem) {
       get().appendLog(
         'arbiter',
@@ -26503,7 +31958,7 @@ function runAethercraft(
   const { effectiveStats } = require('../engine/equipment');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { weatherStatModifiers } = require('../engine/weatherEffects');
-  const stats = effectiveStats(player, weatherStatModifiers(scene.weather));
+  const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerArmorResistKinds(player)));
   const racialBonus = aethercraftStatBonus(player.raceId);
   const stat: keyof PlayerCharacter['stats'] = discipline === 'mend' ? 'wisdom' : 'intelligence';
   const statValue = stats[stat] + (racialBonus[stat] ?? 0);
@@ -26572,7 +32027,7 @@ function runAethercraft(
       if (tr.leveled) {
         get().appendLog(
           'reward',
-          `✦ The aether teaches you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (now ${tr.leveled.to}).`,
+          `✦ The aether teaches you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (${statNowClause(get().player, tr.leveled.stat, tr.leveled.to)}).`,
         );
       }
     }
@@ -26679,7 +32134,7 @@ function runAethercraft(
 function applyWeaponCoatingProc(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   activeIdx: number,
-  proc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; rolled: number; source?: string },
+  proc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold'; rolled: number; source?: string },
 ): void {
   set((s) => {
     if (!s.currentScene) return s;
@@ -26779,10 +32234,15 @@ function handleGolemCommand(
   const atkRoll = rollDie(20);
   const golemAtkBonus = golem.hitBonus + golemPower;
   const atkTotal = atkRoll + golemAtkBonus;
-  const hit = atkTotal >= enemyAc;
+  // Natural 1 / natural 20 rule — companions follow the same dice as the
+  // player and the dog's bite: a nat-1 always misses regardless of bonuses,
+  // a nat-20 always hits and doubles the damage below.
+  const golemNat20 = atkRoll === 20;
+  const golemNat1 = atkRoll === 1;
+  const hit = golemNat20 || (!golemNat1 && atkTotal >= enemyAc);
   get().appendLog(
     'combat',
-    `${golem.name} attacks ${target.name} — d20 ${atkRoll}${golemAtkBonus ? ` + ${golemAtkBonus}` : ''} = ${atkTotal} vs AC ${enemyAc} — ${hit ? '✓ HIT' : '✗ MISS'}`,
+    `${golem.name} attacks ${target.name} — d20 ${atkRoll}${golemAtkBonus ? ` + ${golemAtkBonus}` : ''} = ${atkTotal} vs AC ${enemyAc} — ${hit ? (golemNat20 ? '✓ NAT 20' : '✓ HIT') : '✗ MISS'}`,
   );
 
   if (hit) {
@@ -26806,6 +32266,9 @@ function handleGolemCommand(
       for (let i = 0; i < n; i++) dmg += rollDie(sides);
     }
     dmg += golem.attackMod + Math.floor(golemPower / 2);
+    // Nat-20 doubles the base swing (dice + mods) before type modifiers —
+    // same treatment as the dog's bite.
+    if (golemNat20) dmg *= 2;
     // Combat-Parity (companion) — honor the enemy's resist/weakness + creature-trait multipliers for
     // the golem's INNATE damage type (only the coating bonus respected resists before; the base swing
     // was typeless). Applied to the base hit BEFORE the coating bonus is added (the coating is already
@@ -26825,10 +32288,10 @@ function handleGolemCommand(
     // coating's shred/stack/DOT on the enemy (the armor-breaker payoff). Mirrors
     // the player's coated-strike math.
     const golemCoating = workingGolem.weapon?.coating;
-    let golemCoatProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; rolled: number; source?: string } | null = null;
+    let golemCoatProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold'; rolled: number; source?: string } | null = null;
     if (golemCoating) {
       const rawRolled = Math.max(1, rollFromNotation(golemCoating.dice));
-      const isElemental = golemCoating.kind === 'electrical' || golemCoating.kind === 'burn';
+      const isElemental = golemCoating.kind === 'electrical' || golemCoating.kind === 'burn' || golemCoating.kind === 'cold';
       const rolled = isElemental
         ? Math.max(1, Math.round(
             rawRolled * combineDamageTypeMatch(
@@ -26894,7 +32357,7 @@ function handleGolemCommand(
       const extra = golemCoatProc.kind === 'acid'
         ? ` Its guard pits — easier to hit now (−${ACID_SHRED_PER_HIT} AC, ${total} total).`
         : golemCoatProc.kind === 'corruption'
-          ? ` The rot deepens (${get().currentScene?.enemyCorruptionStacks?.[targetIdx] ?? 1} stacks).`
+          ? ` The rot deepens (${get().currentScene?.enemyCorruptionStacks?.[targetIdx] ?? 1} stack${(get().currentScene?.enemyCorruptionStacks?.[targetIdx] ?? 1) === 1 ? '' : 's'}).`
           : '';
       get().appendLog(
         'combat',
@@ -26919,7 +32382,12 @@ function handleGolemCommand(
   const enemyAtkRoll = rollDie(20);
   const enemyAtkBonus = parseEnemyAP(target);
   const golemAc = 11; // simple flat AC for golems
-  const enemyHit = (enemyAtkRoll + enemyAtkBonus) >= golemAc;
+  // Natural 1 / natural 20 rule — same floor/ceiling as every other roll:
+  // enemy nat-1 fumbles past the golem, nat-20 always connects and rolls
+  // damage twice (mirrors the enemy-vs-dog crit treatment).
+  const enemyNat20 = enemyAtkRoll === 20;
+  const enemyNat1 = enemyAtkRoll === 1;
+  const enemyHit = enemyNat1 ? false : enemyNat20 || (enemyAtkRoll + enemyAtkBonus) >= golemAc;
   if (enemyHit) {
     // OTA-433 — roll the enemy's REAL damage notation against the golem, the
     // same `enemy.damage` the player takes (gameStore ~21327), instead of a flat
@@ -26931,12 +32399,13 @@ function handleGolemCommand(
     // arb170 — % damage resistance (innate by kind + trained resilience), capped,
     // applied to the enemy's REAL damage roll. Min 1 always lands (never immune).
     const resist: number = golemDamageResist(workingGolem);
-    const rawDmg = rollFromNotation(String(target.damage)) || (rollDie(6) + 1);
+    let rawDmg = rollFromNotation(String(target.damage)) || (rollDie(6) + 1);
+    if (enemyNat20) rawDmg += rollFromNotation(String(target.damage)) || rollDie(6);
     const enemyDmg = Math.max(1, Math.round(rawDmg * (1 - resist)));
     const newGolemHp = Math.max(0, workingGolem.hp - enemyDmg);
     get().appendLog(
       'combat',
-      `${target.name} retaliates — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits ${golem.name} for ${enemyDmg}${resist > 0 ? ` (${Math.round(resist * 100)}% resisted)` : ''}. (${newGolemHp}/${golem.hpMax})`,
+      `${target.name} retaliates — d20 ${enemyAtkRoll} + ${enemyAtkBonus}${enemyNat20 ? ' (NAT 20)' : ''} hits ${golem.name} for ${enemyDmg}${resist > 0 ? ` (${Math.round(resist * 100)}% resisted)` : ''}. (${newGolemHp}/${golem.hpMax})`,
     );
     if (newGolemHp <= 0) {
       get().appendLog(
@@ -27245,6 +32714,9 @@ function handleDogCombat(
   kind: 'dog_bite' | 'dog_distract',
   targetText: string | undefined,
 ): void {
+  // OTA-795 — set when a distract FAILS; redirects that enemy's counter in
+  // this action's volley onto the dog (see runEnemyGroupCounters).
+  let failedDistractIdx: number | null = null;
   const player = get().player;
   const scene = get().currentScene;
   if (!player || !scene) return;
@@ -27402,10 +32874,17 @@ function handleDogCombat(
     const statVal = dog.stats[statKey];
     const roll = rollDie(20);
     const total = roll + statVal;
-    const success = total >= 12;
+    // OTA-795 — the DC scales with the target (8 + its ability points): a Mud
+    // Boar is easy to bait, a Core Guardian isn't. Was a flat DC 12, which a
+    // trained dog out-grew into auto-success. OTA-796 — floored at 12 (the
+    // scaling formula made LOW-tier targets easier than the old flat DC) and
+    // nat-1 always fails / nat-20 always succeeds, mirroring dog_bite — so the
+    // failure cost keeps ≥5% teeth no matter how trained the dog gets.
+    const distractDc = Math.max(12, 8 + parseEnemyAP(target));
+    const success = roll === 1 ? false : roll === 20 ? true : total >= distractDc;
     get().appendLog(
       'combat',
-      `${dog.name} dances at ${target.name}'s heels — d20 ${roll} + ${statKey.slice(0, 3).toUpperCase()} ${statVal} = ${total} vs DC 12 — ${success ? '✓ DISTRACTED' : '✗ NO EFFECT'}`,
+      `${dog.name} dances at ${target.name}'s heels — d20 ${roll} + ${statKey.slice(0, 3).toUpperCase()} ${statVal} = ${total} vs DC ${distractDc} — ${success ? '✓ DISTRACTED' : '✗ NOT FOOLED'}`,
     );
     if (success) {
       const trained = trainDogStat(dog, statKey, true);
@@ -27447,6 +32926,15 @@ function handleDogCombat(
           `✦ ${dog.name}'s ${statKey.slice(0, 3).toUpperCase()} rises to ${trained.leveled.to}.`,
         );
       }
+    } else {
+      // OTA-795 — a failed feint has teeth: the enemy isn't fooled and rounds
+      // on the DOG. Its counter in the volley below is redirected onto the dog
+      // instead of the player (dog AC / vest / resists apply as usual).
+      failedDistractIdx = targetIdx;
+      get().appendLog(
+        'world',
+        `${target.name} isn't fooled — it rounds on ${dog.name}.`,
+      );
     }
   }
   // arb169 — companion commands now provoke the FULL enemy volley, same as a
@@ -27460,7 +32948,7 @@ function handleDogCombat(
   if (!liveScene || liveScene.enemies.length === 0) return;
   const livePlayer = get().player;
   if (!livePlayer) return;
-  runEnemyGroupCounters(get, set, livePlayer);
+  runEnemyGroupCounters(get, set, livePlayer, failedDistractIdx != null ? { forceDogEnemyIdx: failedDistractIdx } : undefined);
 }
 
 // ----- OTA-120 Phase 3 / 4 helpers -------------------------------------
@@ -27611,10 +33099,11 @@ function applyItemToDog(
   const hpRoom = Math.max(0, dog.hpMax - dog.hp);
   const healAmount = (() => {
     if (fx && fx.kind === 'consumable') {
-      return Math.min(hpRoom, (fx as { healHP?: number }).healHP ?? 0);
+      // OTA-1016 — scaled by the DOG's own frame, matching the batch path below.
+      return Math.min(hpRoom, scaledHealHP((fx as { healHP?: number }).healHP ?? 0, dog.hpMax));
     }
     // No structured effect, but it IS food/consumable → default food heal.
-    const isFoodish = isConsumable || (item.tags ?? []).includes('food');
+    const isFoodish = isConsumable || canonicalItemTags(item).includes('food');
     return isFoodish ? Math.min(hpRoom, rollDie(6) + rollDie(6)) : 0;
   })();
   // Consume 1 of the item.
@@ -27720,7 +33209,7 @@ function applyItemToGolem(
   }
   const heal = Math.min(
     golem.hpMax - golem.hp,
-    (isSub ? golemSubstituteHeal(golem.kind, item.rarity) : golemRepairHeal(golem.kind)) as number,
+    (isSub ? golemSubstituteHeal(golem.kind, canonicalItemRarity(item)) : golemRepairHeal(golem.kind)) as number,
   );
   const newInventory = player.inventory
     .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
@@ -28007,6 +33496,273 @@ export type CallDogOption = 'scratch' | 'treat' | 'speak';
  *  loyalty bumps; Treat takes an itemName and routes through
  *  applyItemToDog so the +20/+40 loyalty math runs through one
  *  place. Idempotent on dead / abandoned. */
+// OTA-808 — standing lost when you successfully extort a faction-affiliated person.
+// A hair under the −10 for stealing a protected item: you shook them down, you didn't
+// crack a vault. Half bleeds to their allies via applyRepChange, same as any rep hit.
+const PARLEY_EXTORT_REP = 6;
+// OTA-854 — persuading a rival FACTION patrol to break off cleanly earns you a point
+// of goodwill with their faction (you spared their people; word gets around).
+const PARLEY_CALM_REP = 1;
+
+/** OTA-809 — build a plain misc loot item (extorted goods / lead cache reward). No
+ *  catalog row required; grantItem gives it a default stack cap. */
+function miscLootItem(name: string, quantity: number): InventoryItem {
+  return {
+    id: `loot_${name.replace(/\s+/g, '_').toLowerCase()}_${Date.now()}_${Math.floor(Math.random() * 1e6)}`,
+    name,
+    kind: 'misc',
+    quantity: Math.max(1, quantity),
+    tags: [],
+  };
+}
+
+/** OTA-808 — a botched shakedown turns the person hostile: build a lightweight Human
+ *  enemy from them so the fight can start. factionNeutralFight so a fight they STARTED
+ *  (by refusing your threat) doesn't also cascade faction hostility on their death —
+ *  the standing cost only lands on a SUCCESSFUL extortion, not a failed one. */
+function wandererToEnemy(name: string, temperament: Temperament): Enemy {
+  return {
+    name,
+    type: 'Human',
+    abilityPoint: '',
+    attack: 'lashes out',
+    damage: '1d6',
+    hp: 14,
+    rarity: 'Common',
+    loot: [],
+    temperament,
+    factionNeutralFight: true,
+  };
+}
+
+/** OTA-808 — resolve a committed parley choice. Reads the pending context, runs the
+ *  hard lock-and-key (wrong key auto-fails), the CHA roll on a right key, the
+ *  asymmetric outcomes, the Menace raise, and the extortion standing cost. See
+ *  engine/parley.ts + engine/menace.ts for the pure pieces. */
+function runParleyOutcome(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  choice: ParleyChoice,
+): void {
+  const ctx = get().pendingParley;
+  const player = get().player;
+  const scene = get().currentScene;
+  if (!ctx || !player || !scene) return;
+  const { kind, temperament, targetName } = ctx;
+  // OTA-914 — is this a frightened Aetherkin you're talking down? Captured up
+  // front because the success branches clear scene.enemies before we can check.
+  const parleyingAetherkin = scene.enemies.some((e) => isAetherkin(e));
+
+  const stats = effectiveStats(player);
+  const cha = stats.charisma;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const tPerks = require('../engine/titles').titlePerkModifiers(player);
+  const brokerBonus = tPerks.diplomacyBonus ?? 0;
+
+  const nowHours = player.hoursElapsed ?? 0;
+  const curMenace = decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, nowHours);
+  const isIntimidate = choice === 'intimidate';
+
+  const rightKey = isRightKey(choice, temperament);
+  const dcBonus = isIntimidate ? menaceIntimidateDcBonus(curMenace) : 0;
+  const dc = parleyDC(choice, dcBonus);
+  const roll = rightKey ? rollDie(20) : 0;
+  const total = roll + cha + brokerBonus;
+  const success = rightKey && total >= dc;
+
+  // Menace rises on any intimidation ATTEMPT (win or lose — the word gets out).
+  const menaceAfter = isIntimidate
+    ? raiseMenace(curMenace, kind === 'animal' ? 'animal' : 'person')
+    : curMenace;
+  const withMenace = (p: PlayerCharacter): PlayerCharacter =>
+    isIntimidate ? { ...p, menace: menaceAfter, menaceUpdatedHour: nowHours } : p;
+
+  if (rightKey) {
+    get().appendLog(
+      'combat',
+      `You — ${choice} ${targetName} → d20 ${roll} + CHA ${cha}${brokerBonus ? ` + ${brokerBonus} (Broker)` : ''} = ${total} vs DC ${dc} — ${success ? '✓' : '✗'}`,
+    );
+  } else {
+    get().appendLog('combat', `You — ${choice} ${targetName} → wrong read; it doesn't land.`);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const factionLabel = (id: string): string => (FACTIONS.find((f) => f.id === id)?.name ?? id.replace(/_/g, ' '));
+
+  if (success) {
+    const trained = trainStat(player, 'charisma', true);
+    if (kind === 'animal') {
+      // Calm or intimidate — the foe disengages; you keep the tile.
+      // OTA-854 — a FACTION patrol (enemies carrying a factionId) has faction
+      // consequences the way a wild beast doesn't:
+      //   • INTIMIDATE → they break and run, dropping what they carried (their loot + TC).
+      //   • PERSUADE (calm) → clean break, no ill will, +1 standing with their faction —
+      //     you spared their people and word gets around.
+      const facId = scene.enemies.map((e) => e.factionId).find(Boolean) ?? null;
+      const facLoot = (facId && isIntimidate)
+        ? scene.enemies.flatMap((e) => (e.factionId ? (e.loot ?? []) : []))
+        : [];
+      const dropTc = (facId && isIntimidate) ? (5 + rollDie(10)) : 0;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let repChangedFac: any[] = [];
+      const grantedFacNames: string[] = [];
+      set((s) => {
+        if (!s.player || !s.currentScene) return s;
+        let p = withMenace(advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25));
+        if (facId && isIntimidate) {
+          p = { ...p, tc: p.tc + dropTc };
+          let inv = p.inventory;
+          for (const name of facLoot) {
+            const res = grantItem(inv, miscLootItem(name, 1));
+            inv = res.inventory;
+            if (res.accepted > 0) grantedFacNames.push(name);
+          }
+          p = { ...p, inventory: inv };
+        } else if (facId && !isIntimidate) {
+          const rr = applyRepChange(p.factionStanding, facId, PARLEY_CALM_REP);
+          p = { ...p, factionStanding: rr.standing };
+          repChangedFac = rr.changed;
+        }
+        return {
+          player: p,
+          currentScene: { ...s.currentScene, enemies: [], enemyHps: [], enemyKnockedOut: [], enemyAmbushUsed: [], activeEnemyIdx: 0, range: null },
+        };
+      });
+      get().appendLog('world', parleySuccessLine(choice, kind, targetName));
+      if (facId && isIntimidate) {
+        const lootDesc = [dropTc > 0 ? `${dropTc} TC` : null, ...grantedFacNames].filter(Boolean).join(', ');
+        get().appendLog('reward', lootDesc
+          ? `The ${factionLabel(facId)} break and run, dropping ${lootDesc} in their haste.`
+          : `The ${factionLabel(facId)} break and run.`);
+      } else if (facId && !isIntimidate) {
+        get().appendLog('reward', `The ${factionLabel(facId)} lower their weapons and pull back — no blood spilled. (+${PARLEY_CALM_REP} standing with the ${factionLabel(facId)})`);
+        if (repChangedFac.length) logRepChanges(get, repChangedFac);
+      }
+    } else if (choice === 'persuade') {
+      // OTA-809 — SECRETS: talk a real LOCATION LEAD out of them. It plants as
+      // player.pendingLead and pays out (the cache) when you next reach fresh ground.
+      const w = scene.wanderer;
+      const lead = w?.lead ?? null;
+      set((s) => {
+        if (!s.player || !s.currentScene) return s;
+        const p = advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25);
+        return {
+          player: lead ? { ...p, pendingLead: lead } : p,
+          currentScene: { ...s.currentScene, wanderer: null },
+        };
+      });
+      get().appendLog('world', parleySuccessLine(choice, kind, targetName));
+      if (lead) {
+        get().appendLog('reward', `${targetName} lowers their voice: "${lead.hint}." (a lead — you'll turn it up when you next cross fresh ground)`);
+      } else {
+        get().appendLog('reward', `${targetName} tells you what they know.`);
+      }
+    } else {
+      // OTA-809 — Intimidate a person → extort their actual CARRIED GOODS (coins +
+      // items) + STANDING COST if they're faction-affiliated.
+      const w = scene.wanderer;
+      const goods = w?.goods ?? { tc: 8 + rollDie(12), items: [] as { name: string; quantity: number }[] };
+      const faction = w?.faction ?? null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let repChanged: any[] = [];
+      const grantedNames: string[] = [];
+      set((s) => {
+        if (!s.player || !s.currentScene) return s;
+        let p = withMenace(advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25));
+        p = { ...p, tc: p.tc + goods.tc };
+        let inv = p.inventory;
+        for (const it of goods.items) {
+          const res = grantItem(inv, miscLootItem(it.name, it.quantity));
+          inv = res.inventory;
+          if (res.accepted > 0) grantedNames.push(`${it.name}${it.quantity > 1 ? ` ×${it.quantity}` : ''}`);
+        }
+        p = { ...p, inventory: inv };
+        if (faction) {
+          const rr = applyRepChange(p.factionStanding, faction, -PARLEY_EXTORT_REP);
+          p = { ...p, factionStanding: rr.standing };
+          repChanged = rr.changed;
+        }
+        return { player: p, currentScene: { ...s.currentScene, wanderer: null } };
+      });
+      get().appendLog('world', parleySuccessLine(choice, kind, targetName));
+      const lootDesc = [`${goods.tc} TC`, ...grantedNames].join(', ');
+      get().appendLog('reward', `You shake it loose from ${targetName}: ${lootDesc}.`);
+      if (faction) {
+        get().appendLog('system', `Word spreads that you strong-armed one of theirs. (−${PARLEY_EXTORT_REP} standing with the ${factionLabel(faction)})`);
+      }
+      if (repChanged.length) logRepChanges(get, repChanged);
+    }
+    // OTA-914 — talking a frightened Aetherkin down (rather than destroying it)
+    // pleases the factions that hold the flood-dead sacred. Any successful
+    // disengage counts — you reached the person still inside and let them rest.
+    if (parleyingAetherkin) {
+      const revChanged = applyAetherkinReverenceDelta(get, set, AETHERKIN_SPARE_REP);
+      if (revChanged.length > 0) {
+        get().appendLog('system', `You let the Aetherkin sink back into its rest, unharmed. Those who revere the flood-dead take note. (+${AETHERKIN_SPARE_REP} standing with each)`);
+        logRepChanges(get, revChanged);
+      }
+    }
+    if (trained.leveled) get().appendLog('reward', `✦ Your words carried it. +1 CHA (${statNowClause(get().player, 'charisma', trained.leveled.to)}).`);
+    return;
+  }
+
+  // FAILURE. The BUTTON sets the downside; wrong-key vs rolled-fail sets the flavor.
+  const failLine = rightKey
+    ? parleyRolledFailLine(choice, kind, targetName)
+    : parleyWrongKeyLine(choice, kind, targetName);
+
+  if (isIntimidate) {
+    if (kind === 'animal') {
+      // Vicious hit: the creature lands a blow; the fight stays on.
+      const hit = 3 + rollDie(6);
+      set((s) =>
+        s.player
+          ? { player: withMenace(advanceTime(spendStamina({ ...s.player, hp: Math.max(0, s.player.hp - hit) }, STAMINA_COSTS.skillCheck), 0.25)) }
+          : s,
+      );
+      get().appendLog('world', failLine);
+      get().appendLog('combat', `${targetName} rakes you for ${hit} damage.`);
+      if ((get().currentScene?.enemies.length ?? 0) > 0) runEnemyGroupCounters(get, set, get().player ?? player);
+    } else {
+      // Person turns hostile → spawn them as an enemy; the wanderer is spent.
+      const foe = wandererToEnemy(targetName, temperament);
+      set((s) => {
+        if (!s.player || !s.currentScene) return s;
+        return {
+          player: withMenace(advanceTime(spendStamina(s.player, STAMINA_COSTS.skillCheck), 0.25)),
+          currentScene: {
+            ...s.currentScene,
+            wanderer: null,
+            enemies: [...s.currentScene.enemies, foe],
+            enemyHps: [...s.currentScene.enemyHps, foe.hp],
+            enemyKnockedOut: [...(s.currentScene.enemyKnockedOut ?? []), false],
+            enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+            activeEnemyIdx: s.currentScene.enemies.length,
+            range: 'close',
+          },
+          stepsSinceCombat: 0,
+        };
+      });
+      get().appendLog('world', failLine);
+      get().appendLog('combat', `${targetName} won't be pushed — ${foe.attack}, ${foe.damage} on a hit. (range: close)`);
+    }
+  } else {
+    // Safe button (calm / persuade) fail = forfeit the hook, no new harm.
+    if (kind === 'animal') {
+      set((s) => (s.player ? { player: advanceTime(spendStamina(s.player, STAMINA_COSTS.skillCheck), 0.25) } : s));
+      get().appendLog('world', failLine);
+      if ((get().currentScene?.enemies.length ?? 0) > 0) runEnemyGroupCounters(get, set, get().player ?? player);
+    } else {
+      set((s) =>
+        s.player && s.currentScene
+          ? { player: advanceTime(spendStamina(s.player, STAMINA_COSTS.skillCheck), 0.25), currentScene: { ...s.currentScene, wanderer: null } }
+          : s,
+      );
+      get().appendLog('world', failLine);
+    }
+  }
+}
+
 function handleCallDogOption(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -28126,20 +33882,31 @@ export function tickDogStatus(
       return;
     }
     const downFor = now - dog.downedAtHour;
-    // Mid-window urgent reminder — once, past the halfway mark — so the
-    // player gets a second, sharper nudge before the dog is gone for good.
-    if (downFor >= DOG_BLEED_OUT_HOURS / 2 && downFor < DOG_BLEED_OUT_HOURS && !dog.bleedWarned) {
-      set((s) => s.player?.dog
-        ? { player: { ...s.player, dog: { ...s.player.dog, bleedWarned: true } } }
-        : s);
-      get().appendLog(
-        'arbiter',
-        applyDogPronouns(
-          `The Arbiter's voice drops. "${dog.name} is fading. Feed {pronoun} or work a poultice now — wait much longer and {pronoun} is gone forever."`,
-          dog.sex.pronoun,
-        ),
-      );
-      return;
+    // OTA-938 — surface the bleed-out HARD. Before, one mid-window line was the only warning
+    // and there was no running clock, so players lost the dog without a fair shot. Now
+    // escalating Arbiter beats fire at 1/4, 1/2, 3/4 of the window — each once — and every beat
+    // states the hours left (StatsPanel also shows a live "⏳ Nh" countdown by the dog's name).
+    if (downFor < DOG_BLEED_OUT_HOURS) {
+      const hoursLeft = Math.max(1, Math.ceil(DOG_BLEED_OUT_HOURS - downFor));
+      const marks = [DOG_BLEED_OUT_HOURS * 0.25, DOG_BLEED_OUT_HOURS * 0.5, DOG_BLEED_OUT_HOURS * 0.75];
+      const lines = [
+        `${dog.name} is down and bleeding — about ${hoursLeft}h before {pronoun} is gone for good. Feed {object} or work a poultice to bring {object} back up.`,
+        `${dog.name} is fading — only about ${hoursLeft}h left. {Pronoun} needs food or a poultice, soon.`,
+        `The Arbiter grips your arm. "${dog.name} has maybe ${hoursLeft}h. Last window — feed {object} now or {pronoun} does not get up again."`,
+      ];
+      let stage = dog.bleedWarnStage ?? 0;
+      let fired = false;
+      while (stage < marks.length && downFor >= marks[stage]!) {
+        get().appendLog('arbiter', applyDogPronouns(lines[stage]!, dog.sex.pronoun));
+        stage++;
+        fired = true;
+      }
+      if (fired) {
+        set((s) => s.player?.dog
+          ? { player: { ...s.player, dog: { ...s.player.dog, bleedWarnStage: stage, bleedWarned: true } } }
+          : s);
+        return;
+      }
     }
     if (downFor >= DOG_BLEED_OUT_HOURS) {
       set((s) => s.player?.dog
@@ -28166,9 +33933,9 @@ export function tickDogStatus(
 
   // Healed back above 0 since a down — clear the bleed-out stamp + warn
   // latch so a later knockdown starts a fresh clock.
-  if (dog.downedAtHour != null || dog.bleedWarned) {
+  if (dog.downedAtHour != null || dog.bleedWarned || (dog.bleedWarnStage ?? 0) > 0) {
     set((s) => s.player?.dog
-      ? { player: { ...s.player, dog: { ...s.player.dog, downedAtHour: undefined, bleedWarned: false } } }
+      ? { player: { ...s.player, dog: { ...s.player.dog, downedAtHour: undefined, bleedWarned: false, bleedWarnStage: 0 } } }
       : s);
   }
 
@@ -28253,10 +34020,10 @@ function triggerPuppyVendor(
   // Pick a Common-rarity, non-equipped, non-weapon/armor item.
   const candidates = player.inventory.filter(
     (i) =>
-      i.rarity === 'Common' &&
+      canonicalItemRarity(i) === 'Common' &&
       i.quantity >= 1 &&
-      i.kind !== 'weapon' &&
-      i.kind !== 'armor' &&
+      canonicalItemKind(i) !== 'weapon' &&
+      canonicalItemKind(i) !== 'armor' &&
       i.id !== player.equipped?.mainId &&
       i.id !== player.equipped?.offId &&
       i.id !== player.equipped?.chestId &&
@@ -28367,24 +34134,79 @@ function coatedWeaponNoun(
   return inst ? (require('../engine/weaponCoating').coatedDisplayName(inst) as string) : resolvedNoun;
 }
 
+/** arb-fix (narration audit) — resolve the weapon NOUN a swing actually uses, so the
+ *  pre-swing opener AND the damage-outcome lines agree and never fall back to a wrong
+ *  slot. Precedence: a resolved CARRIED weapon wins (covers "attack with the off-hand
+ *  mud-fist wraps" and "…with the aetheric bolt gun"), then an off-hand swing names the
+ *  off-hand slot, then a genuine bare-hand strike drops the noun (fists flavor),
+ *  otherwise the main weapon. The damage path used to pass parsed.resolvedNoun raw — but
+ *  the parser resolves the typed target to the ENEMY, so hit/miss/kill/knockout lines
+ *  named the enemy (or literal "null") as the weapon on every natural attack command. */
+function swingWeaponNoun(
+  player: PlayerCharacter | null | undefined,
+  actionText: string,
+  resolvedNoun: string | null | undefined,
+): string | null {
+  const rNoun = resolvedNoun ?? null;
+  const rNounIsWeapon = !!rNoun && (player?.inventory ?? []).some(
+    (it) => it.kind === 'weapon' && it.name.toLowerCase() === rNoun.toLowerCase(),
+  );
+  if (rNounIsWeapon) return rNoun;
+  if (/\boff[- ]?hand\b/i.test(actionText)) return player?.equipped?.off ?? null;
+  // OTA-957 — strip equipped weapon names before the bare-hand test (same class of bug as
+  // OTA-940): "attack with the mud-fist wraps" is a weapon swing, not a punch.
+  let bareNounText = actionText.toLowerCase();
+  for (const n of [player?.equipped?.main, player?.equipped?.off]) {
+    if (n) bareNounText = bareNounText.split(n.toLowerCase()).join(' ');
+  }
+  if (isBareHandAttack(bareNounText)) return null;
+  return player?.equipped?.main ?? null;
+}
+
 function weaponPhrase(weapon: string | null): string {
   return weapon ? ` with the ${weapon.toLowerCase()}` : '';
+}
+
+/** arb-fix (playtest) — a defeated/knocked-out enemy's UNLOOTABLE signature weapon
+ *  (the Order's Hollow Edge) prints a long "you can't take it" paragraph. Clearing two
+ *  enforcers in one scene fired it twice back-to-back. Emit the full `reason` the FIRST
+ *  time a given signature weapon is left this scene; on repeats, a one-line nod so the
+ *  player still knows it stays behind without re-reading the paragraph. Keyed by weapon
+ *  name on currentScene.signatureWeaponsExplained. */
+function leaveSignatureWeapon(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  sig: { name: string; reason: string },
+): void {
+  const already = get().currentScene?.signatureWeaponsExplained ?? [];
+  if (already.some((n) => n.toLowerCase() === sig.name.toLowerCase())) {
+    get().appendLog('world', `You leave the ${sig.name} where it fell — the same locked grip as before, not yours to take.`);
+    return;
+  }
+  get().appendLog('world', sig.reason);
+  set((s) => (s.currentScene
+    ? { currentScene: { ...s.currentScene, signatureWeaponsExplained: [...(s.currentScene.signatureWeaponsExplained ?? []), sig.name] } }
+    : {}));
 }
 
 function attackOpener(enemyName: string, weapon?: string | null): string {
   const w = weapon ?? null;
   if (w) {
+    // arb-fix — these openers are picked at attack time, BEFORE initiative is
+    // rolled, so none of them may assert who acts first (the resolved
+    // "You seize the initiative" / "X moves first" line prints later and would
+    // contradict them). Keep the flavor turn-order-neutral.
     return pick([
       `You raise the ${w.toLowerCase()} toward ${enemyName}. The room narrows around the both of you.`,
-      `Your ${w.toLowerCase()} comes around in an arc; ${enemyName} reads it but does not move yet.`,
+      `Your ${w.toLowerCase()} comes around in an arc; ${enemyName} squares up to meet it.`,
       `You commit forward with the ${w.toLowerCase()}. ${enemyName} watches your hands.`,
-      `The ${w.toLowerCase()} is already moving when ${enemyName} sees it coming.`,
+      `You bring the ${w.toLowerCase()} to bear on ${enemyName}.`,
     ]);
   }
   return pick([
     `You close on ${enemyName}. The room narrows around the both of you.`,
     `${enemyName} fixes on you. You commit to the strike.`,
-    `You drive toward ${enemyName} before it can choose first.`,
+    `You drive toward ${enemyName}, set to strike.`,
   ]);
 }
 
@@ -28431,6 +34253,18 @@ function logRepChanges(
     const name = faction?.name ?? c.factionId;
     const sign = c.delta > 0 ? '+' : '';
     get().appendLog('system', `${name} standing ${sign}${c.delta} (now ${c.newStanding})`);
+  }
+  // OTA-877 — the FIRST time any standing moves, drop a one-time note explaining what
+  // faction standing is (playtest: the tutorial's first standing burst pops up with no
+  // context). Fires once per save via worldMemory.factionRepIntroShown. A single change
+  // to your OWN faction isn't confusing; but even that's a fine teaching moment, so any
+  // first change triggers it.
+  if (changes.length > 0 && !get().worldMemory?.factionRepIntroShown) {
+    get().appendLog(
+      'system',
+      'Faction standing is how a faction sees you: at −20 or below they turn hostile, at +20 or above they treat you as an ally, neutral in between. It shifts as you act — and as their own rivalries play out — and it shapes vendor prices, the work they will offer you, and who fights beside you when blades come out.',
+    );
+    useGameStore.setState((s) => ({ worldMemory: { ...s.worldMemory, factionRepIntroShown: true } }));
   }
 }
 
@@ -28728,7 +34562,7 @@ async function narrateViaArbiter(
     // the feed). Done FIRST so sentence-capping / trimming operate on the cleaned
     // English; if it empties the line, the `|| trimmed` fallback below restores
     // the template.
-    const deforeigned = stripForeignWords(text);
+    const deforeigned = repairGluedNarration(stripForeignWords(text));
     // Cap sentences before trimming so we never emit the 4-sentence
     // hallucination paragraphs the playtest log caught.
     const capped = clampSentences(deforeigned, ctx.in_combat ? 1 : 2);
@@ -28910,10 +34744,17 @@ async function maybeGenerateAmbientArbiter(
     // OTA-678 — off-canon entity guard (ambient path). A dropped line just stays
     // silent here (ambient has no template fallback), which is the safe outcome.
     const ambientAllow = narrationEntityAllow(get);
-    const survivors = clampSentences(stripForeignWords(text), 1)
+    const survivors = clampSentences(repairGluedNarration(stripForeignWords(text)), 1)
       .split(/(?<=[.!?])\s+/)
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
+      // Ambient is the narrator's own idle musing, not world narration — a
+      // second-person opener ("You step back, surveying...") reads as scene
+      // text in the arbiter channel and in practice is an off-scene
+      // hallucination (log 2026-07-13: alleyways + stone pillars narrated
+      // inside a flooded-house kitchen). Drop those sentences; an empty
+      // result just stays silent (ambient has no template fallback).
+      .filter((s) => !/^\s*you\b/i.test(s))
       .filter((s) => !sentenceNamesOffCanonEntity(s, ambientAllow))
       .join(' ')
       .trim();

@@ -22,12 +22,21 @@ import { initMainQuest } from './mainQuest';
 // Mask; a Reclaimer carries a Rusted Blade, a Trowel, a Reclaimer's Rope
 // + Echoing Steps Boots. Etc.
 
+// OTA-834 — keyed by the SINGULAR race id (matches races.json + RACE_STARTER_
+// EXPLORATION below). Pre-fix these keys were plural/faction-shaped
+// (tartarian_giants / reclaimers / architectural_sentinels / …) but the lookup is
+// RACE_PRIMARY[race.id] with a SINGULAR id, so 6 of 7 races silently fell through to
+// the 'Rusted Blade' fallback — the Tartarian Giant lost its Mud-fist Wraps and the
+// Architectural Sentinel its Tartarian Spear (only aetherborn happened to match).
+// All 7 races are now covered; mud_dweller / mud_golem keep the generic blade they
+// already defaulted to (no regression), the rest get their intended starter arm.
 const RACE_PRIMARY: Record<string, string> = {
-  tartarian_giants: 'Mud-fist Wraps', // their bare-hand combat tradition
-  true_tartarians: 'Mud-fist Wraps',
-  reclaimers: 'Rusted Blade',
-  architectural_sentinels: 'Tartarian Spear',
-  unknowing_masses: 'Rusted Blade',
+  tartarian_giant: 'Mud-fist Wraps', // their bare-hand combat tradition
+  mud_dweller: 'Rusted Blade',
+  reclaimer: 'Rusted Blade',
+  architectural_sentinel: 'Tartarian Spear',
+  mud_golem: 'Rusted Blade',
+  unknowing_mass: 'Rusted Blade',
   aetherborn: 'Pyric Wand',
 };
 
@@ -116,7 +125,7 @@ function starterId(prefix: string): string {
 
 function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
   const items: InventoryItem[] = [
-    { id: starterId('starter_torch'), name: 'Aetheric Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held aether-light. Flick it on to reveal hidden hooks in the current room. Burns one charge per use; carry several.' },
+    { id: starterId('starter_torch'), name: 'Aetheric Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held aether-light that resonates with the buried. USE it in a room that still holds an unexplored lead for a chance to shake loose a rare or legendary find (higher Wisdom, better odds). A miss burns the charge. Scarce — spend it where a lead remains.' },
     { id: starterId('starter_rations'), name: 'Trail Rations', kind: 'consumable', quantity: 3, tags: ['food'], description: 'Enough to keep you walking another day.' },
     // OTA-375 — every character starts with a Water Bottle (the cheap,
     // refillable stamina recovery item) so exhaustion in an early fight

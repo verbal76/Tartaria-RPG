@@ -92,9 +92,26 @@ export type ItemEffect =
       // (InventoryItem.coating) and consumes one unit. poison =
       // pure DOT, acid = DOT + armor shred, corruption = DOT +
       // corruption stacks. dice rolls on a landing hit.
-      coating?: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; dice: string; label: string; statBonus?: { stat: string; amount: number } };
+      coating?: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold'; dice: string; label: string; statBonus?: { stat: string; amount: number } };
     }
   | { kind: 'gate'; unlocks: GateKind }
+  | {
+      /** OTA-912 — a Skyreacher Chart. Using it from the pack unlocks a great
+       *  climb (adds greatClimb.id to worldMemory.unlockedGreatClimbs so its
+       *  climbable prop starts spawning at the landmark), reveals + routes to the
+       *  landmark, and logs the climb as an active mission. Consumed on use.
+       *  `climbId` matches a GREAT_CLIMBS id; index/total drive the "N of 5" copy. */
+      kind: 'map';
+      climbId: string;
+      index: number;
+      total: number;
+    }
+  | {
+      /** OTA-913 — an Aether Collection Beacon. Using it once all five towers
+       *  are cleared breaks the five collector-arrays down and builds the Beacon
+       *  Rifle (see assembleBeaconRifle). Before that it just hums. */
+      kind: 'beacon';
+    }
   | {
       /** Off-hand equippable scanner — a Geiger-counter analog
        *  that biases search outcomes toward a tagged loot pool
@@ -265,4 +282,18 @@ export function searchRequirementFor(noun: string): NounSearchRequirement | null
     };
   }
   return null;
+}
+
+/** OTA — #120: a consumable's EFFECTIVE heal — the flat catalog value or a
+ *  LIGHT share of max HP, whichever is larger, so healing stops falling behind
+ *  growth without becoming free. Kit-grade items (flat >= 20) scale at 15% of
+ *  hpMax; meal-grade at 4%. A NIBBLE (flat < 5 — a scavenged fungus, a sip)
+ *  never scales: it is flavor, not medicine, and quadrupling it would be the
+ *  opposite of light. Early game is unchanged either way — the flat floor wins
+ *  until max HP has actually grown. Owner call: numbers on the lighter side. */
+export function scaledHealHP(flat: number, hpMax: number): number {
+  if (flat <= 0) return 0;
+  if (flat < 5) return flat;
+  const pct = flat >= 20 ? 0.15 : 0.04;
+  return Math.max(flat, Math.ceil(Math.max(1, hpMax) * pct));
 }

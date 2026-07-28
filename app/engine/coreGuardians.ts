@@ -3,7 +3,7 @@
 // Lore: a sub-faction (non-playable). A semi-religious order of
 // Aether-born initiates dedicated to guarding the Tartarian Cores
 // that keep the underground tartarian cities' grid alive. Each of
-// the five Lost Capitals has a Guardian — their high priest from
+// the nine Lost Capitals has a Guardian — their high priest from
 // before the Mud Flood, kept living by the Core they swore to
 // protect. To them, extracting a Core is sacrilege.
 //
@@ -14,9 +14,9 @@
 // - Difficulty scales by your kill-count, NOT by the Capital. The
 //   first Guardian you fight is "Tier 1" no matter which Capital
 //   you hit first. So the player's choice of order is preserved
-//   but the curve is fixed: T1 → T2 → T3 → T4 → T5.
+//   but the curve is fixed: T1 → T2 → … → T9.
 // - Each Guardian drops a unique signature weapon + armor (the
-//   Core Guardian set — 5 weapons, 5 armors, all hand-authored)
+//   Core Guardian set — 9 weapons, 9 armors, all hand-authored)
 //   on top of the Core itself + the existing boss Res Gem.
 // - Flee is allowed. The Guardian fully restores (HP + AC + any
 //   gear damage) the next time the player triggers the gate. The
@@ -52,6 +52,16 @@ export function tierForKills(coresRecovered: number): GuardianTier {
   return t as GuardianTier;
 }
 
+// OTA-925 — THE FINAL GUARDIAN. The storyline needs every Core (mainQuest gates
+// `descent` on coresRecovered.length >= 9), and difficulty is keyed to kill-count,
+// so the Guardian whose defeat grants the LAST Core is the literal last boss of the
+// game — whichever Capital the player saved for last. Detected order-independently
+// by kill-count: the player already holds every Capital's Core but the one they're
+// standing in.
+export function isFinalGuardian(coresRecovered: number): boolean {
+  return coresRecovered >= LOST_CAPITAL_LOCATIONS.length - 1;
+}
+
 /** Per-tier multipliers + ability descriptors. Stays gentle on
  *  Tier 1 so a player who never trained can still beat it; the
  *  curve ramps steadily through T5, then plateaus on raw stats
@@ -64,10 +74,6 @@ interface TierProfile {
   acBonus: number;
   /** Damage die replacement when the base is "1d8" etc. */
   damage: string;
-  /** Number of counter-attacks per round. The engine already
-   *  gives bosses 2 counters; T1/T2 stay at 2, T3+ get extra
-   *  traits that act like a third hit. */
-  counters: number;
   /** Extra traits layered on top of the Guardian's signature
    *  trait — applied to scale-up the fight per tier. */
   extraTraits: string[];
@@ -83,19 +89,126 @@ interface TierProfile {
 // (+3/+4/+5). HP, damage, and the trait layering are unchanged, so the fight
 // still has teeth and the late-game stays demanding.
 const TIER_PROFILES: Record<GuardianTier, TierProfile> = {
-  1: { hpMult: 1.4, acBonus: -3, damage: '1d8+3',  counters: 2, extraTraits: [] },
-  2: { hpMult: 1.6, acBonus: -2, damage: '1d8+4',  counters: 2, extraTraits: ['armored'] },
-  3: { hpMult: 1.8, acBonus: -1, damage: '1d10+4', counters: 2, extraTraits: ['armored', 'quick'] },
-  4: { hpMult: 2.0, acBonus: 0,  damage: '1d10+4', counters: 2, extraTraits: ['armored', 'quick'] },
-  5: { hpMult: 2.2, acBonus: 1,  damage: '1d10+5', counters: 2, extraTraits: ['armored', 'quick', 'regenerate'] },
-  6: { hpMult: 2.4, acBonus: 2,  damage: '1d10+5', counters: 2, extraTraits: ['armored', 'quick', 'regenerate'] },
-  7: { hpMult: 2.7, acBonus: 3,  damage: '2d6+4',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
-  8: { hpMult: 2.9, acBonus: 4,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
-  9: { hpMult: 3.1, acBonus: 5,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder', 'ambush_strike'] },
+  1: { hpMult: 1.4, acBonus: -3, damage: '1d8+3',  extraTraits: [] },
+  2: { hpMult: 1.6, acBonus: -2, damage: '1d8+4',  extraTraits: ['armored'] },
+  3: { hpMult: 1.8, acBonus: -1, damage: '1d10+4', extraTraits: ['armored', 'quick'] },
+  4: { hpMult: 2.0, acBonus: 0,  damage: '1d10+4', extraTraits: ['armored', 'quick'] },
+  5: { hpMult: 2.2, acBonus: 1,  damage: '1d10+5', extraTraits: ['armored', 'quick', 'regenerate'] },
+  6: { hpMult: 2.4, acBonus: 2,  damage: '1d10+5', extraTraits: ['armored', 'quick', 'regenerate'] },
+  // OTA-924 — late-tier hpMult raised (was 2.7/2.9/3.1) so the CLIMAX Guardians are a
+  // real ~9-11 round fight instead of a ~5 round romp. Player DPS is weapon-capped at
+  // ~30-40, so the old scaled ~95-155 HP fell in a handful of rounds. Early tiers
+  // (1-6) are UNCHANGED — they were deliberately smoothed down (see comment above) and
+  // must stay approachable. Guardians hit twice per round + regen/bleed, so they land
+  // a touch under the 12-round apex target and still out-threaten a summit boss.
+  7: { hpMult: 4.0, acBonus: 3,  damage: '2d6+4',  extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
+  8: { hpMult: 5.5, acBonus: 4,  damage: '2d6+5',  extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
+  // OTA-925 — tier 9 is ONLY ever the final Guardian (9 Capitals, tier caps at 9), and
+  // the final fight OVERRIDES HP to a fixed ~20-round wall (see FINAL_GUARDIAN_HP in
+  // spawnGuardianForCapital), so this hpMult is now a defensive fallback only. AC /
+  // damage / traits still come from here.
+  9: { hpMult: 7.0, acBonus: 5,  damage: '2d6+5',  extraTraits: ['armored', 'quick', 'regenerate', 'bleeder', 'ambush_strike'] },
 };
 
+// OTA-925 — the last boss of the storyline is a ~20-round WALL, not the ~12-round apex
+// race the other bosses target (owner: "he is the last boss of the game… make him the
+// 20 not a 12"). Keying that off the tier-9 hpMult alone breaks two ways: (a) authored
+// base.hp varies 30-50 across Capitals, so "which Capital is last" would swing the
+// final HP ~210→350; (b) 20 vs 12 rounds is a deliberate step up. So the final fight
+// IGNORES base.hp × hpMult and uses this fixed, Capital-independent floor sized for
+// ~20 rounds at the weapon-capped ~30-40 net-DPS ceiling (12 rounds ≈ 430 scaled →
+// ×20/12 ≈ 700; trimmed to 660 because the tier-9 regen + double-counter pressure
+// stretches felt length past the raw round count). The upward-only over-level factor
+// still applies, so an over-grinder faces an even longer wall. Tuning value — revisit
+// after a real final-boss playtest.
+const FINAL_GUARDIAN_HP = 660;
+
+// OTA-926 — the Guardians are the game's main antagonists, and the run is meant to get
+// steadily harder: fight N should be a bit tougher than fight N-1. Difficulty is keyed
+// to KILL-COUNT, not the Capital (see the header) — but HP was `Capital.base.hp ×
+// hpMult`, and base.hp varies 30-50 across Capitals. Since the player picks the ORDER,
+// that leaked the Capital into difficulty and could INVERT the ramp (e.g. Cantor(50) at
+// tier 1 = 70 HP, then Vaelka(30) at tier 2 = 48 HP — the 2nd fight easier than the 1st).
+// So HP now uses a single Capital-independent canonical base × the tier's hpMult, giving
+// a strictly monotonic curve (T1→T8 ≈ 59/67/76/84/92/101/168/231, then the T9 final wall
+// at FINAL_GUARDIAN_HP). Damage die + AC already ramp by tier; this closes the HP leak so
+// EVERY Guardian is reliably tougher than the last. Per-Capital flavor still lives in the
+// weakness/resistance/damage-type/approach-line — just not in raw HP.
+const CANON_BASE_HP = 42;
+
+// OTA-815 — PLAYER-POWER SCALING. The kill-count tier sets the AUTHORED floor for
+// each Guardian, but difficulty was keyed to that alone: a player who over-levels on
+// side content (deep stats + a big HP pool) walked through the early Guardians
+// because the fight was tuned for a fresh arrival no matter how strong they actually
+// were (player: "I mashed out 2 Guardians and I'm at end-game level, all I did were
+// side quests"). We layer an over-level factor ON TOP of the tier profile that only
+// ADDS difficulty above the tier's expected power — never below, so a kitted fresh
+// arrival still meets the authored Tier 1 (the OTA-448 promise holds). It lifts HP
+// (the Guardian doesn't melt), AC and attack (an over-geared player neither
+// auto-hits nor is untouchable — the same "the enemy's hit chance tracks the player
+// and never floors at zero" the OTA-815 dodge fix enforces on the defensive side).
+//
+// Power proxy is deliberately BASE stats + HP pool (no gear) — an over-leveled
+// character reads high on both; a fresh arrival reads low even in good gear. (A gear
+// term could sharpen it later; base is dependency-light and deterministic for tests.)
+
+/** A single "how strong is this character" score: best offensive stat + a slice of
+ *  the HP pool (leveling and CON both read as power). Fresh arrival ≈ 11-14,
+ *  fully-built end-game ≈ 33-37. */
+export function guardianPlayerPower(player: PlayerCharacter): number {
+  const s = player.stats;
+  const bestCombat = Math.max(s.strength, s.dexterity, s.intelligence);
+  return bestCombat + player.hpMax / 10;
+}
+
+/** Over-level multiplier for a Guardian at `tier`. 1.0 when the player is at/under
+ *  the tier's expected power (authored fight stands); climbs above 1 for an
+ *  over-leveled player, capped at 1.9 so it never becomes a "ridiculously hard"
+ *  wall. Expected power runs ~17 at T1 to ~41 at T9. */
+export function guardianOverLevel(player: PlayerCharacter, tier: GuardianTier): number {
+  const expected = 14 + tier * 3;
+  return Math.min(1.9, Math.max(1, guardianPlayerPower(player) / expected));
+}
+
+/** OTA-954 — MONOTONE STAGING FLOOR. At a FIXED player power, the next tier's bigger
+ *  expected-power divisor makes `over` DROP, and in the early tiers it drops faster
+ *  than the tier's hpMult step climbs — so an over-leveled player could meet a NEXT
+ *  Guardian that staged out WEAKER (e.g. power 20: T1 = 69 HP, T2 = 67), and the AP
+ *  delta could dip 2 while acBonus rose only 1 — inverting the OTA-926 "each fight a
+ *  bit tougher than the last" promise (its test held power fixed, so a power × tier
+ *  sweep never ran; a review simulation found 134 inverting cells over power 10-60).
+ *  Rather than retune hpMult/acBonus (the authored curve is deliberate), each tier
+ *  stages as the RUNNING MAX over all tiers up to it at the SAME power: on-curve
+ *  fights stage byte-identically (at over = 1 the authored curve is already
+ *  monotone); only the small dip cells get lifted, by exactly enough (HP strictly
+ *  +1 over the previous tier). Still a spawn-time read of the player — no loop. */
+export function monotoneTierHp(player: PlayerCharacter, tier: GuardianTier): number {
+  let run = 0;
+  for (let k = 1; k <= tier; k++) {
+    const t = k as GuardianTier;
+    const hpK = Math.round(CANON_BASE_HP * TIER_PROFILES[t].hpMult * guardianOverLevel(player, t));
+    run = k === 1 ? hpK : Math.max(hpK, run + 1);
+  }
+  return run;
+}
+
+/** OTA-954 — the same floor for the tier's AP delta (acBonus + over-level power bonus).
+ *  AC and attack-to-hit BOTH derive from abilityPoint, so this keeps the Guardian's
+ *  threat monotone across tiers too. Non-strict (AP is coarse; equal threat across a
+ *  tier boundary is acceptable — HP already strictly climbs). */
+export function monotoneTierApDelta(player: PlayerCharacter, tier: GuardianTier): number {
+  let run = 0;
+  for (let k = 1; k <= tier; k++) {
+    const t = k as GuardianTier;
+    const over = guardianOverLevel(player, t);
+    const d = TIER_PROFILES[t].acBonus + Math.round((over - 1) * 8);
+    run = k === 1 ? d : Math.max(d, run);
+  }
+  return run;
+}
+
 /** Returns the live-fight Enemy for the Guardian at this Capital,
- *  scaled to the player's current kill count and HP pool. Returns
+ *  scaled to the player's current kill count AND actual power. Returns
  *  null when the locationId is not a Lost Capital. */
 export function spawnGuardianForCapital(
   player: PlayerCharacter,
@@ -107,19 +220,32 @@ export function spawnGuardianForCapital(
   const coresCount = player.mainQuest?.coresRecovered.length ?? 0;
   const tier = tierForKills(coresCount);
   const profile = TIER_PROFILES[tier];
-  // HP scales with the tier profile AND the player's HP pool, so
-  // a level-20 player isn't trivialising a Tier 1 Guardian.
-  const playerHpFactor = Math.min(1.6, Math.max(1.0, player.hpMax / 30));
-  const hp = Math.round(def.base.hp * profile.hpMult * playerHpFactor);
+  // HP scales with the tier profile AND the player's real power, so an over-leveled
+  // player can't two-round an early Guardian.
+  const over = guardianOverLevel(player, tier);
+  // OTA-925/926 — HP is Capital-INDEPENDENT so the run ramps monotonically by tier
+  // (each Guardian a bit tougher than the last, regardless of fight order): earlier
+  // Guardians use a canonical base × the tier's hpMult; the final Guardian (last Core
+  // in the run) is the game's last boss — a fixed ~20-round wall. Over-level applies to
+  // both (upward-only), so an over-prepared player still meets a real fight.
+  // OTA-954 — non-final tiers stage through the monotone floor (see monotoneTierHp);
+  // the final wall is already far above tier 8's ceiling, so it keeps its direct
+  // override (the floor would be a no-op there).
+  const hp = isFinalGuardian(coresCount)
+    ? Math.round(FINAL_GUARDIAN_HP * over)
+    : monotoneTierHp(player, tier);
   // Bump the abilityPoint number — engine's enemyAC() derives base
   // AC from `5 + apNum`, so increasing the AP by the tier's
-  // acBonus pipes the scaling through the standard combatRules
-  // formula. Format stays the canonical "Stat N" string.
+  // acBonus (+ the player-power bonus) pipes the scaling through the
+  // standard combatRules formula for BOTH the Guardian's AC and its
+  // attack bonus. Format stays the canonical "Stat N" string.
   const apStr = String(def.base.abilityPoint);
   const apMatch = apStr.match(/^(\w+)\s+(\d+)/);
   const statName = apMatch ? apMatch[1] : 'Strength';
   const apNum = apMatch ? parseInt(apMatch[2]!, 10) : 6;
-  const scaledAp = `${statName} ${apNum + profile.acBonus}`;
+  // OTA-954 — tier acBonus + over-level power bonus (+0 at/under the curve, up to +7
+  // heavily over-leveled), floored monotone across tiers via monotoneTierApDelta.
+  const scaledAp = `${statName} ${apNum + monotoneTierApDelta(player, tier)}`;
   // Merge traits: signature + tier extras. Deduped.
   const traits = Array.from(new Set([
     CORE_GUARDIAN_TRAIT,
@@ -138,6 +264,71 @@ export function spawnGuardianForCapital(
     // signature gear directly so we control the per-Guardian
     // pieces deterministically.
     loot: [],
+  };
+}
+
+// OTA-896 (SA-4) — STATIC-BOSS POWER SCALING. The Guardian scaler above solves
+// over-leveling for the ONE hand-authored boss line. Every OTHER apex fight — the
+// 28 Legendary-rarity catalog enemies (240-446 HP) and the 8 story bosses (458-700
+// HP, boss-flagged) — spawned at a FIXED HP no matter the player. Player damage is
+// weapon-driven and stat-INDEPENDENT (combatRules gates the attack stat to to-hit,
+// never to the damage roll), so a fixed 240-700 HP apex is a flat 30-55 round slog
+// for an under-damage arrival and a trivial chip for an over-geared one. This
+// re-centers the fight on the player's real power, reusing the Guardian power proxy.
+export const STATIC_SCALED_TRAIT = 'static_power_scaled';
+
+/** Expected player-power to face a static apex enemy fairly. Story bosses are
+ *  climactic set-pieces (expect a leveled character); Legendaries are mid/late
+ *  random-encounter fodder. */
+function staticExpectedPower(enemy: Enemy): number {
+  return enemy.boss ? 26 : 20;
+}
+
+/** Two-sided power scaler for the catalog's apex enemies (Legendary rarity OR
+ *  boss-flagged). `power` is the shared proxy (guardianPlayerPower /
+ *  enemyScalePower — best combat stat + hpMax/10). HP scales BOTH ways — a weak
+ *  arrival gets a shorter (not deadlier) fight, an over-leveled one a longer
+ *  fight — bounded so neither end is a 3-round pushover nor a 60-round wall.
+ *  THREAT (AC + attack-to-hit, both derived from abilityPoint) scales UP ONLY:
+ *  shrinking a sponge for a weak player must never also make it hit harder —
+ *  that would be a difficulty spike, not the tedium fix intended — while an
+ *  over-leveled player still faces a real fight, not a stationary HP bag. Raw
+ *  damage dice are untouched.
+ *
+ *  No-op for non-apex enemies, for Core Guardians (own scaler) and hunt targets
+ *  (scaleHuntBoss), and — via the STATIC_SCALED_TRAIT stamp — for an already-
+ *  scaled enemy, so re-entry or a second spawn path can't double-scale. Pure. */
+export function scaleStaticBoss(power: number, enemy: Enemy): Enemy {
+  if (!enemy) return enemy;
+  const isApex = enemy.boss === true || enemy.rarity === 'Legendary';
+  if (!isApex) return enemy;
+  const traits = enemy.traits ?? [];
+  if (traits.includes(STATIC_SCALED_TRAIT)) return enemy;   // idempotent
+  if (traits.includes(CORE_GUARDIAN_TRAIT)) return enemy;   // Guardian owns its curve
+  if ((enemy.name ?? '').includes('(hunted)')) return enemy; // scaleHuntBoss already ran
+
+  const raw = power / staticExpectedPower(enemy);
+  // Wider band for Legendaries (should track the player closely); tighter,
+  // higher-floored band for story bosses so a climactic fight never deflates
+  // below 80% of its authored weight.
+  const lo = enemy.boss ? 0.8 : 0.6;
+  const hi = enemy.boss ? 1.4 : 1.6;
+  const mult = Math.max(lo, Math.min(hi, raw));
+  const hp = Math.max(1, Math.round(enemy.hp * mult));
+  // Threat rises only above the curve (mult > 1). enemyAC() derives both the
+  // enemy's AC and its attack bonus from `5 + abilityPointNumber`, so bumping
+  // the AP number pipes the scaling through the standard combatRules formula.
+  const threatBonus = mult > 1 ? Math.round((mult - 1) * 6) : 0;
+  const apStr = String(enemy.abilityPoint ?? 'Strength 3');
+  const apMatch = apStr.match(/^(\w+)\s+(\d+)/);
+  const scaledAp = threatBonus > 0 && apMatch
+    ? `${apMatch[1]} ${parseInt(apMatch[2]!, 10) + threatBonus}`
+    : apStr;
+  return {
+    ...enemy,
+    hp,
+    abilityPoint: scaledAp,
+    traits: [...traits, STATIC_SCALED_TRAIT],
   };
 }
 
@@ -187,7 +378,46 @@ export function dropsForCapital(capitalId: string): GuardianDrop | null {
   return { weapon: freshDrop(set.weapon), armor: freshDrop(set.armor) };
 }
 
+// OTA-830 — index every canonical Guardian weapon+armor by NAME (a freshDrop only
+// suffixes the id, never the name), so a save-load migration can re-derive stats for
+// a drop granted BEFORE OTA-828 (when weapon()/armor() didn't stamp uniqueStats).
+let _guardianGearByName: Map<string, InventoryItem> | null = null;
+function guardianGearByName(): Map<string, InventoryItem> {
+  if (_guardianGearByName) return _guardianGearByName;
+  const m = new Map<string, InventoryItem>();
+  for (const set of Object.values(GUARDIAN_GEAR_BY_CAPITAL)) {
+    m.set(set.weapon.name.toLowerCase(), set.weapon);
+    m.set(set.armor.name.toLowerCase(), set.armor);
+  }
+  _guardianGearByName = m;
+  return m;
+}
+
+/** OTA-830 — the uniqueStats a Core Guardian drop SHOULD carry, matched by name.
+ *  Returns null for a non-Guardian item or one that already has uniqueStats. Used by
+ *  the save-load migration to make pre-OTA-828 drops (e.g. "Atalan's Trident") usable
+ *  without re-granting them: the canonical set entries now carry uniqueStats (OTA-828),
+ *  so we just graft the matching one onto the stored instance. */
+export function guardianGearUniqueStats(
+  item: { name: string; tags?: readonly string[]; uniqueStats?: unknown },
+): NonNullable<InventoryItem['uniqueStats']> | null {
+  if (item.uniqueStats) return null;
+  if (!(item.tags ?? []).some((t) => t.toLowerCase() === 'core_guardian_set')) return null;
+  const canon = guardianGearByName().get(item.name.toLowerCase());
+  return canon?.uniqueStats ?? null;
+}
+
 // ----- Guardian definitions ----------------------------------------------
+//
+// OTA-798 — every Guardian carries an authored `vulnerable:<type>` +
+// `resist:<type>` trait so the weakness/resistance system engages in combat AND
+// the EnemyPanel surfaces their defenses. Previously the Guardians' snake_case
+// `type` (aether_construct / mud_revenant) wasn't in crafting.ts TYPE_RESISTANCE_MAP
+// and their signature traits weren't resist:/vulnerable: tags, so every hit read
+// as 'normal' — no "Weakness exposed" line ever fired (players asked why). Each
+// weakness is thematic (crack the plate → bludgeoning, dry the silt → burn, water
+// conducts → electrical, cut the seal → slashing, …); the aether-born broadly
+// resist aetheric. Traits flow through spawnGuardianForCapital's trait merge.
 
 /** Asgardar — Sentinel-Priest Vaelka, the sky-priest of the
  *  Asgardar spire. Living plate, silver-veined; first Guardian
@@ -205,7 +435,7 @@ const VAELKA: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['vaelka', 'sentinel', 'priest', 'guardian', 'sentinel-priest'],
-    traits: ['aether_pulse'],
+    traits: ['aether_pulse', 'vulnerable:bludgeoning', 'resist:aetheric'],
     boss: true,
   },
   approachLine:
@@ -232,7 +462,7 @@ const ATALAN: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['atalan', 'heir', 'drowned', 'guardian', 'atalan-drowned'],
-    traits: ['silt_grip'],
+    traits: ['silt_grip', 'vulnerable:burn', 'resist:piercing'],
     boss: true,
   },
   approachLine:
@@ -258,7 +488,7 @@ const KONRAD: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['konrad', 'brother', 'litany', 'guardian', 'brother-konrad'],
-    traits: ['litany_chant'],
+    traits: ['litany_chant', 'vulnerable:electrical', 'resist:slashing'],
     boss: true,
   },
   approachLine:
@@ -284,7 +514,7 @@ const DRAKOVNA: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['drakovna', 'mother', 'matriarch', 'guardian'],
-    traits: ['rosary_curse'],
+    traits: ['rosary_curse', 'vulnerable:radiation', 'resist:aetheric'],
     boss: true,
   },
   approachLine:
@@ -310,7 +540,7 @@ const CANTOR: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['cantor', 'high cantor', 'voronov cantor', 'guardian', 'voronov-beneath'],
-    traits: ['chord_break'],
+    traits: ['chord_break', 'vulnerable:cold', 'resist:aetheric'],
     boss: true,
   },
   approachLine:
@@ -337,7 +567,7 @@ const TOBIEL: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['tobiel', 'sealwarden', 'warden', 'guardian'],
-    traits: ['sealcraft'],
+    traits: ['sealcraft', 'vulnerable:slashing', 'resist:aetheric'],
     boss: true,
   },
   approachLine:
@@ -364,7 +594,7 @@ const MARA_HIEROPHANT: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['mara', 'hierophant', 'yuldra', 'guardian', 'mara-of-yuldra'],
-    traits: ['giant_vigil'],
+    traits: ['giant_vigil', 'vulnerable:burn', 'resist:cold'],
     boss: true,
   },
   approachLine:
@@ -391,7 +621,7 @@ const OSTROS: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['ostros', 'riverbinder', 'binder', 'guardian'],
-    traits: ['river_bind'],
+    traits: ['river_bind', 'vulnerable:electrical', 'resist:slashing'],
     boss: true,
   },
   approachLine:
@@ -419,7 +649,7 @@ const INARRA: CoreGuardianDef = {
     hp: 46,
     loot: [],
     aliases: ['inarra', 'veilkeeper', 'keeper', 'guardian'],
-    traits: ['veil_step'],
+    traits: ['veil_step', 'vulnerable:radiation', 'resist:piercing'],
     boss: true,
   },
   approachLine:
@@ -451,6 +681,45 @@ export const GUARDIANS_BY_CAPITAL: Record<string, CoreGuardianDef> = {
 // the player's expected level for each tier — better than a
 // Legendary roll but not so good that the player skips other gear.
 
+// OTA-828 — derive a Guardian weapon's damage TYPE + scaling stat from its flavor
+// tags. Pre-fix the weapon() helper stored NONE of this (the `damage` param was
+// dropped on the floor), and Guardian gear carries no catalog row + no uniqueStats,
+// so getEquippedWeapon/aggregateArmor couldn't resolve it — every Core Guardian
+// reward (9 weapons + 9 armor) was cosmetic-only and "couldn't be used as a weapon".
+const GUARDIAN_WEAPON_TYPE_TAGS: ReadonlyArray<readonly [string, string]> = [
+  ['cold_damage', 'cold'], ['corruption_damage', 'aetheric'], ['sonic', 'aetheric'],
+  ['slashing', 'slashing'], ['piercing', 'piercing'], ['blunt', 'bludgeoning'],
+  ['burn', 'burn'], ['electrical', 'electrical'], ['poison', 'poison'],
+  ['radiation', 'radiation'], ['aetheric', 'aetheric'],
+];
+function guardianWeaponDamageType(tags: string[]): string {
+  const lower = tags.map((t) => t.toLowerCase());
+  for (const [tag, dt] of GUARDIAN_WEAPON_TYPE_TAGS) if (lower.includes(tag)) return dt;
+  return 'bludgeoning';
+}
+function guardianWeaponStat(tags: string[]): 'strength' | 'dexterity' | 'intelligence' {
+  const lower = tags.map((t) => t.toLowerCase());
+  if (lower.includes('finesse')) return 'dexterity';
+  // The exotic/caster Guardian arms (Cold-Iron Rosary, Tuning Fork) channel rather
+  // than swing — they scale INT.
+  if (lower.includes('corruption_damage') || lower.includes('sonic')) return 'intelligence';
+  return 'strength';
+}
+function guardianArmorSlot(tags: string[]): 'head' | 'chest' | 'legs' | 'feet' {
+  const lower = tags.map((t) => t.toLowerCase());
+  for (const s of ['head', 'chest', 'legs', 'feet'] as const) if (lower.includes(s)) return s;
+  return 'chest';
+}
+function guardianArmorResist(tags: string[]): string | undefined {
+  const lower = tags.map((t) => t.toLowerCase());
+  if (lower.includes('cold_resist')) return 'cold';
+  if (lower.includes('aether_resist')) return 'aetheric';
+  if (lower.includes('corruption_resist')) return 'aetheric';
+  if (lower.includes('burn_resist')) return 'burn';
+  if (lower.includes('poison_resist')) return 'poison';
+  return undefined;
+}
+
 function weapon(
   id: string,
   name: string,
@@ -459,6 +728,9 @@ function weapon(
   durabilityMax: number,
   tags: string[],
 ): InventoryItem {
+  // OTA-828 — attach uniqueStats so getEquippedWeapon (combatRules) resolves this
+  // non-catalog Legendary as a real weapon: the `damage` dice + a tag-derived type
+  // and scaling stat now actually reach combat.
   return {
     id,
     name,
@@ -468,6 +740,14 @@ function weapon(
     quantity: 1,
     tags: ['core_guardian_set', 'aether_born', ...tags],
     durability: { current: durabilityMax, max: durabilityMax },
+    uniqueStats: {
+      kind: 'weapon',
+      rarity: 'Legendary',
+      durability: { current: durabilityMax, max: durabilityMax },
+      damageDice: damage,
+      damageType: guardianWeaponDamageType(tags),
+      scalesWith: guardianWeaponStat(tags),
+    },
   };
 }
 
@@ -479,6 +759,9 @@ function armor(
   durabilityMax: number,
   tags: string[],
 ): InventoryItem {
+  // OTA-828 — attach uniqueStats so aggregateArmor credits this non-catalog
+  // Legendary its AC + resistance (pre-fix it gave 0 AC — the `ac:N` tag was never
+  // read by the armor aggregator).
   return {
     id,
     name,
@@ -488,6 +771,14 @@ function armor(
     quantity: 1,
     tags: ['core_guardian_set', 'aether_born', `ac:${ac}`, ...tags],
     durability: { current: durabilityMax, max: durabilityMax },
+    uniqueStats: {
+      kind: 'armor',
+      rarity: 'Legendary',
+      durability: { current: durabilityMax, max: durabilityMax },
+      acBonus: ac,
+      armorSlot: guardianArmorSlot(tags),
+      resistance: guardianArmorResist(tags),
+    },
   };
 }
 
@@ -703,7 +994,7 @@ export function hasUndefeatedGuardian(player: PlayerCharacter, capitalId: string
   return !mq.coresRecovered.includes(capitalId);
 }
 
-/** Lightweight ref for tests + tooling. Always 5 in production. */
+/** Lightweight ref for tests + tooling. Always 9 in production (one per Lost Capital). */
 export function totalGuardiansCount(): number {
   return Object.keys(GUARDIANS_BY_CAPITAL).length;
 }

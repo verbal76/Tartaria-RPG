@@ -33,7 +33,7 @@ import type { QwenGenerativeEngine } from '../ai/generation/QwenGenerativeEngine
 const INTENT_LIST: Intent[] = [
   'stealth', 'attack', 'diplomacy', 'escape', 'investigate', 'rest',
   'inventory', 'travel', 'use_relic', 'cast', 'wait', 'ask', 'craft',
-  'equip', 'gift', 'steal', 'join', 'dodge', 'block', 'advance',
+  'equip', 'steal', 'join', 'dodge', 'block', 'advance',
   'retreat', 'repair', 'accept', 'turn_in', 'dig', 'throw', 'climb',
   'swim', 'jump', 'dash', 'disengage', 'help', 'ready', 'mount',
   'take_cover', 'aim', 'reload', 'maneuver', 'quick_fire', 'multi_fire',
@@ -62,7 +62,6 @@ const CANONICAL_VERB: Record<Intent, string> = {
   ask: 'what',
   craft: 'craft',
   equip: 'equip',
-  gift: 'give',
   steal: 'steal',
   join: 'join',
   dodge: 'dodge',

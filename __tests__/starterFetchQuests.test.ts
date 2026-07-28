@@ -24,6 +24,15 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { FACTION_QUESTS } from '../app/engine/factionQuests';
+import { contractJourneyBonusTc } from '../app/engine/contractMarkers';
+
+// B2 — turn-in pays the base reward PLUS a distance-scaled long-haul bonus
+// (contractJourneyBonusTc). Compute the exact expected pay so the test tracks
+// the reward without hard-coding the location-dependent bonus.
+const expectedPay = (base: number): number => {
+  const loc = useGameStore.getState().player!.currentLocationId;
+  return base + contractJourneyBonusTc(loc, base);
+};
 
 async function boot(name: string, factionId: string) {
   const store = useGameStore;
@@ -71,7 +80,7 @@ describe('OTA-450 — starter fetch quests', () => {
     const p = store.getState().player!;
     expect(p.completedFactionQuestIds).toContain('fq_reclaimers_starter');
     expect(p.activeFactionQuestIds).not.toContain('fq_reclaimers_starter');
-    expect(p.tc).toBe(tcBefore + 35); // reward paid
+    expect(p.tc).toBe(tcBefore + expectedPay(35)); // base reward + long-haul bonus
     // OTA-454 — Scrap Run needs 3 (was 5); 3 of 7 consumed → 4 left.
     const sm = p.inventory.filter((i) => i.name === 'Scrap Metal').reduce((n, i) => n + i.quantity, 0);
     expect(sm).toBe(4);
@@ -106,7 +115,7 @@ describe('OTA-450 — starter fetch quests', () => {
     store.getState().turnInFactionQuest('Scrap Run');
     const p = store.getState().player!;
     expect(p.completedFactionQuestIds).toContain('fq_reclaimers_starter');
-    expect(p.tc).toBe(tcBefore + 35);
+    expect(p.tc).toBe(tcBefore + expectedPay(35));
   });
 
   it('OTA-456 — a FETCH quest CANNOT be couriered (must deliver in person)', async () => {

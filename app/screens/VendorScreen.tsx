@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 import { BrandedModal } from '../components/BrandedModal';
 import { VendorContractsModal } from '../components/VendorContractsModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
-import { validSlotsForItem, SLOT_LABEL, equippedInstanceIds } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, equippedInstanceIds, effectiveStats } from '../engine/equipment';
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
+import { vendorPriceMod } from '../engine/factionRapport';
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
-import { findGearByName, findMaterialByName, findExplorationItemByName, findCatalogItem } from '../engine/crafting';
+import { findGearByName, findMaterialByName, findExplorationItemByName, findCatalogItem, RECIPES } from '../engine/crafting';
+import { vendorRecipeOffers, vendorSeed } from '../engine/recipeDiscovery';
 import { corruptionTierOf, corruptionPriceMultiplier } from '../engine/corruption';
+import { warPriceFactor, finalBuyPrice, priceArrow } from '../engine/vendorPricing';
+import { localWarHeat, contestedFactions } from '../engine/worldEvents';
+import { tideVendorPriceMult } from '../engine/worldPulse';
+import { canonicalCellOf } from '../engine/worldMap';
+import factionsData from '../data/factions/factions.json';
 import {
   CATEGORY_ORDER,
   CATEGORY_LABEL,
@@ -29,7 +37,7 @@ function rarityColor(rarity: string | null | undefined): string {
 
 type Mode = 'buy' | 'sell' | 'contracts';
 type Pending =
-  | { mode: 'buy'; itemName: string; price: number }
+  | { mode: 'buy'; itemName: string; price: number; isRecipe?: boolean }
   | { mode: 'sell'; itemName: string; price: number; itemId?: string }
   | { mode: 'steal'; itemName: string; dc: number }
   | { mode: 'dismiss' }
@@ -40,7 +48,9 @@ export function VendorScreen() {
   const player = useGameStore((s) => s.player);
   const activeBuildingId = useGameStore((s) => s.activeBuildingId);
   const scene = useGameStore((s) => s.currentScene);
+  const worldMemory = useGameStore((s) => s.worldMemory);
   const setScreen = useGameStore((s) => s.setScreen);
+  const appendLog = useGameStore((s) => s.appendLog);
   const buyFromVendor = useGameStore((s) => s.buyFromVendor);
   const equipItem = useGameStore((s) => s.equipItem);
   const sellToVendor = useGameStore((s) => s.sellToVendor);
@@ -80,6 +90,18 @@ export function VendorScreen() {
 
   const vendor = scene?.vendor ?? null;
 
+  // OTA-791 — a fight can start while the trade screen is open (hook-spawned
+  // combat, caught stealing). The player kept trading blind: every sell bounced
+  // off the arb166 combat guard, whose messages land in a log this screen never
+  // shows. Eject to exploration the moment enemies appear so the enemy card is
+  // the first thing they see; setScreen's door guard covers re-entry.
+  const combatLive = (scene?.enemies?.length ?? 0) > 0;
+  useEffect(() => {
+    if (!combatLive) return;
+    appendLog('system', 'The trade breaks off — something hostile demands your attention.');
+    setScreen('exploration');
+  }, [combatLive, appendLog, setScreen]);
+
   if (!player || !vendor) {
     return (
       <View style={styles.container}>
@@ -88,6 +110,7 @@ export function VendorScreen() {
           style={styles.backBtn}
           onPress={() => setScreen('exploration')}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← DEAL WITH YOUR CHOICES</Text>
         </TouchableOpacity>
@@ -96,6 +119,10 @@ export function VendorScreen() {
   }
 
   const openBuy = (itemName: string, price: number) => { setBuyQty(1); setPending({ mode: 'buy', itemName, price }); };
+  // A recipe is LEARNED, not equipped or stacked — flag it so the confirm shows a
+  // single "Learn" and never the item-only "Buy & Equip" / "Buy All" affordances
+  // (buying the Aetheric Vest working doesn't put a vest on you).
+  const openLearnRecipe = (result: string, price: number) => { setBuyQty(1); setPending({ mode: 'buy', itemName: result, price, isRecipe: true }); };
   const openSell = (itemName: string, price: number, itemId?: string) => { setSellQty(1); setPending({ mode: 'sell', itemName, price, itemId }); };
 
   // OTA-178 — gate-loss warning helper. Returns the GateKind label
@@ -164,7 +191,8 @@ export function VendorScreen() {
   // the trader's stock).
   const buyStockFor = (name: string) =>
     vendor.offers.find((o) => o.itemName.toLowerCase() === name.toLowerCase())?.quantity ?? 1;
-  const pendingBuyStock = pending?.mode === 'buy' ? buyStockFor(pending.itemName) : 1;
+  // A recipe is a one-time learn — never a stack, so no ×N / Buy All.
+  const pendingBuyStock = pending?.mode === 'buy' && !pending.isRecipe ? buyStockFor(pending.itemName) : 1;
   const pendingBuyAfford = pending?.mode === 'buy' && pending.price > 0
     ? Math.floor(player.tc / pending.price)
     : 0;
@@ -175,7 +203,9 @@ export function VendorScreen() {
   // resolves weapons/armor/accessories by catalog name + name-regex fallback.
   const equipSlotsForName = (itemName: string): EquipSlot[] =>
     validSlotsForItem({ id: '', name: itemName, kind: 'misc', quantity: 1, tags: [] } as InventoryItem);
-  const pendingBuyEquipSlots: EquipSlot[] = pending?.mode === 'buy' ? equipSlotsForName(pending.itemName) : [];
+  // A recipe can't be equipped — never offer "Buy & Equip" for one (buying the working
+  // learns the recipe; it doesn't hand you the item to wear).
+  const pendingBuyEquipSlots: EquipSlot[] = pending?.mode === 'buy' && !pending.isRecipe ? equipSlotsForName(pending.itemName) : [];
 
   // Buy one and equip it immediately. A single valid slot (armor / accessory)
   // equips straight away; a weapon (main OR off hand) opens the hand-choice
@@ -239,6 +269,36 @@ export function VendorScreen() {
   const corruptionTier = corruptionTierOf(player.corruption ?? 0);
   const corruptionMult = corruptionPriceMultiplier(corruptionTier);
   const corruptionMarkupPct = Math.round((corruptionMult - 1) * 100);
+  // OTA-805 — CHA-scaled faction rapport price break (0..0.20), once you've earned
+  // dealing with this vendor's faction. Cheaper buys, better sell-backs. Mirrors the
+  // gameStore buy/sell math so the displayed prices match what actually transacts.
+  const rapportMod = vendorPriceMod(
+    effectiveStats(player).charisma,
+    player.completedFactionQuestIds,
+    vendor?.faction,
+  );
+  const rapportPct = Math.round(rapportMod * 100);
+  // OTA-849/865 — the two modifiers that also move the REAL transaction price but the
+  // display used to omit: the vendor faction's fortunes (tide teeth) and LOCAL WAR HEAT.
+  // Computed here so the screen shows exactly what buyFromVendor / sellToVendor charge.
+  const vendorTideMult = vendor?.faction ? tideVendorPriceMult(worldMemory?.factionTides?.[vendor.faction]) : 1;
+  const warCell = player ? canonicalCellOf(player.currentLocationId) : { x: 0, y: 0 };
+  const warHeat = localWarHeat(worldMemory?.patrols ?? [], warCell.x, warCell.y);
+  const { buyMult: warBuyMult, sellMult: warSellMult } = warPriceFactor(warHeat);
+  // The two factions whose war-parties are thickest here — for the "prices are up" line.
+  const contestNames = contestedFactions(worldMemory?.patrols ?? [], warCell.x, warCell.y)
+    .map((id) => (factionsData as { id: string; name: string }[]).find((f) => f.id === id)?.name ?? null)
+    .filter((n): n is string => !!n);
+  // Show the war-market note once the ground is meaningfully contested (not on one patrol).
+  const warNote = warHeat >= 0.25;
+  // OTA-812 — recipes this vendor will TEACH for TC, surfaced as buttons so the
+  // player doesn't have to know the typed "buy <name>" command. Same source the
+  // store's buy path checks; tapping LEARN calls buyFromVendor(result) which routes
+  // through the recipe-learn branch. Filtered to the ones not yet known.
+  const recipeOffers = vendor
+    ? vendorRecipeOffers(RECIPES, player.knownRecipes, vendorSeed(vendor.name))
+        .filter((o) => !(player.knownRecipes ?? []).includes(o.result))
+    : [];
   // Inventory items the player can sell — exclude the EXACT equipped instances +
   // unsellable. OTA-687 — exclude by INSTANCE ID (equippedInstanceIds), not name,
   // so a spare copy of an equipped item's name is a different instance and stays
@@ -257,7 +317,13 @@ export function VendorScreen() {
   const RARITY_ORDER: Record<string, number> = { Legendary: 0, Rare: 1, Uncommon: 2, Common: 3 };
   const sellable = player.inventory
     .filter((i) => i.quantity > 0 && !equippedItemIds.has(i.id) && !isUnsellable(i))
-    .map((i) => ({ item: i, price: sellPriceFor(i, vendor) }))
+    // OTA-865 — display the war-premium sell price (matches sellToVendor); carry the plain
+    // catalogue value as `base` so the ▲/▼ ticker can show whether you're getting more.
+    .map((i) => ({
+      item: i,
+      price: Math.round(sellPriceFor(i, vendor, rapportMod) * warSellMult),
+      base: sellPriceFor(i, vendor, 0),
+    }))
     .filter((x) => x.price > 0)
     .sort((a, b) => {
       if (sellSort === 'name') return a.item.name.localeCompare(b.item.name);
@@ -289,6 +355,8 @@ export function VendorScreen() {
       style={[styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }]}
       activeOpacity={0.7}
       onPress={() => setCollapsedSections((s) => ({ ...s, [key]: !(s[key] ?? true) }))}
+      accessibilityRole="button"
+      accessibilityState={{ expanded: !collapsed }}
     >
       <View style={styles.sectionHeaderLeft}>
         <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>{collapsed ? '▾' : '▴'}</Text>
@@ -300,21 +368,28 @@ export function VendorScreen() {
 
   return (
     <View style={styles.container}>
+      <FirstTimeHint
+        id="vendor_first_open"
+        title="The trader"
+        body="Buy and sell here. Prices swing with the seller's faction power and your standing — a favored trader deals kinder."
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>SHOP</Text>
+        <Text style={styles.title} accessibilityRole="header">SHOP</Text>
         <TouchableOpacity
           onPress={openDismiss}
           style={styles.dismissBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.dismissText}>DISMISS</Text>
         </TouchableOpacity>
@@ -324,6 +399,13 @@ export function VendorScreen() {
         <Text style={styles.vendorName}>{vendor.name}</Text>
         <Text style={styles.vendorTitle}>{vendor.title}</Text>
         <Text style={styles.vendorDesc}>{vendor.description}</Text>
+        {/* OTA-805 — rapport price break. Shown once the player has earned dealing
+            with this faction (done its rapport quest); the % scales with Charisma. */}
+        {rapportMod > 0 && (
+          <Text style={styles.rapportBanner}>
+            ✦ Trusted partner — {rapportPct}% off buys, +{rapportPct}% on sell-backs (Charisma)
+          </Text>
+        )}
         {/* arb103 — every vendor will fire a portable Fusing Crucible for 25 TC.
             arb153 — …EXCEPT where the LOCATION already has its own Crucible chip
             (outpost / Hidden Market / a live fusion permit): the exploration
@@ -338,6 +420,7 @@ export function VendorScreen() {
             style={styles.crucibleBtn}
             onPress={() => { useVendorCrucible(); setScreen('exploration'); }}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={styles.crucibleBtnText}>★★ USE CRUCIBLE · 25 TC</Text>
           </TouchableOpacity>
@@ -361,12 +444,26 @@ export function VendorScreen() {
           ⚠ +{corruptionMarkupPct}% prices — your aether unsettles them. ({corruptionTier})
         </Text>
       )}
+      {/* OTA-865 — war-market flavour: contested ground means soldiers are buying, so the
+          trader marks up (and pays a touch more). The ▲/▼ next to each price shows the net. */}
+      {warNote && (
+        <Text style={styles.warMarket}>
+          ⚔ {contestNames.length >= 2
+            ? `The fighting between the ${contestNames[0]} and the ${contestNames[1]} is cleaning them out.`
+            : contestNames.length === 1
+              ? `${contestNames[0]} war-parties are all over this ground.`
+              : 'The fighting nearby has soldiers buying up supplies.'}{' '}
+          Prices run high — your standing and charm matter more here.
+        </Text>
+      )}
 
       <View style={styles.tabRow}>
         <TouchableOpacity
           style={[styles.tab, mode === 'buy' && styles.tabActive]}
           onPress={() => setMode('buy')}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: mode === 'buy' }}
         >
           <Text style={[styles.tabText, mode === 'buy' && styles.tabTextActive]}>BUY</Text>
         </TouchableOpacity>
@@ -374,6 +471,8 @@ export function VendorScreen() {
           style={[styles.tab, mode === 'sell' && styles.tabActive]}
           onPress={() => setMode('sell')}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityState={{ selected: mode === 'sell' }}
         >
           <Text style={[styles.tabText, mode === 'sell' && styles.tabTextActive]}>SELL</Text>
         </TouchableOpacity>
@@ -385,6 +484,7 @@ export function VendorScreen() {
             style={styles.tab}
             onPress={() => setContractsOpen(true)}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={styles.tabText}>CONTRACTS ▸</Text>
           </TouchableOpacity>
@@ -393,7 +493,8 @@ export function VendorScreen() {
 
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
         {mode === 'buy' ? (
-          vendor.offers.length === 0 ? (
+          <>
+          {vendor.offers.length === 0 && recipeOffers.length === 0 ? (
             <Text style={styles.empty}>The vendor's pack is empty. Nothing more to trade.</Text>
           ) : (
             CATEGORY_ORDER.map((cat) => {
@@ -411,7 +512,13 @@ export function VendorScreen() {
               // OTA 039 — corruption-tier markup. Show the marked-up
               // price; canAfford / buyFromVendor both compute on the
               // same value so the player never sees a mismatch.
-              const effPrice = Math.ceil(o.price * corruptionMult);
+              // OTA-805 — CHA rapport discount folds in the same way (mirrors
+              // buyFromVendor's effectivePrice).
+              // OTA-865 — the FULL buy price (now including faction-tide + war heat, which
+              // the display used to drop), from the same helper buyFromVendor uses so the
+              // shown price is exactly what transacts. The ▲/▼ ticker compares it to base.
+              const effPrice = finalBuyPrice(o.price, { corruptionMult, buyDiscount: rapportMod, tideMult: vendorTideMult, warBuyMult });
+              const buyTick = priceArrow(effPrice, o.price, 'buy');
               const canAfford = player.tc >= effPrice;
               const itemPreview = getItemPreview(o.itemName);
               const owned = player.inventory
@@ -436,11 +543,12 @@ export function VendorScreen() {
                     style={[styles.offerBody, !canAfford && styles.offerRowBroke]}
                     onPress={() => openBuy(o.itemName, effPrice)}
                     activeOpacity={0.7}
+                    accessibilityRole="button"
                   >
                     <View style={styles.offerHead}>
                       <Text style={styles.offerName} numberOfLines={1}>{o.itemName}</Text>
                       <Text style={[styles.offerPrice, !canAfford && styles.offerPriceBroke]}>
-                        {effPrice} TC
+                        {effPrice} TC{buyTick ? <Text style={buyTick.good ? styles.tickGood : styles.tickBad}> {buyTick.glyph}</Text> : null}
                       </Text>
                     </View>
                     <View style={styles.offerSubHead}>
@@ -472,6 +580,7 @@ export function VendorScreen() {
                       style={styles.stealBtn}
                       hitSlop={6}
                       activeOpacity={0.7}
+                      accessibilityRole="button"
                     >
                       <Text style={styles.stealText}>STEAL</Text>
                       <Text style={styles.stealDc}>DC {stealDc}</Text>
@@ -483,7 +592,59 @@ export function VendorScreen() {
                 </View>
               );
             })
-          )
+          )}
+          {/* OTA-812 — WORKINGS TO LEARN. Recipes the vendor teaches for TC, now
+              tappable buttons instead of a typed "buy <name>" the player had to guess
+              from the arrival prose. Tapping opens the same buy-confirm; confirming
+              routes through buyFromVendor's recipe-learn branch. */}
+          {recipeOffers.length > 0 && (() => {
+            const secKey = 'buy_recipes';
+            const collapsed = collapsedSections[secKey] ?? false; // open by default — this is the discoverable bit
+            const RECIPE_ACCENT = '#c9a86a';
+            return (
+              <View style={styles.section}>
+                <TouchableOpacity
+                  style={[styles.sectionHeader, { borderLeftColor: RECIPE_ACCENT }]}
+                  activeOpacity={0.7}
+                  onPress={() => setCollapsedSections((s) => ({ ...s, [secKey]: !(s[secKey] ?? false) }))}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: !collapsed }}
+                >
+                  <View style={styles.sectionHeaderLeft}>
+                    <Text style={[styles.sectionChevron, { color: RECIPE_ACCENT }]}>{collapsed ? '▾' : '▴'}</Text>
+                    <Text style={[styles.sectionLabel, { color: RECIPE_ACCENT }]}>WORKINGS TO LEARN</Text>
+                  </View>
+                  <Text style={styles.sectionCount}>{recipeOffers.length}</Text>
+                </TouchableOpacity>
+                {!collapsed && recipeOffers.map((o) => {
+                  const preview = getItemPreview(o.result);
+                  const canAfford = player.tc >= o.price;
+                  return (
+                    <View key={`recipe_${o.result}`} style={styles.offerRow}>
+                      <View style={[styles.offerStripe, { backgroundColor: rarityColor(preview.rarity) }]} />
+                      <TouchableOpacity
+                        style={[styles.offerBody, !canAfford && styles.offerRowBroke]}
+                        onPress={() => openLearnRecipe(o.result, o.price)}
+                        activeOpacity={0.7}
+                        accessibilityRole="button"
+                      >
+                        <View style={styles.offerHead}>
+                          <Text style={styles.offerName} numberOfLines={1}>{o.result}</Text>
+                          <Text style={[styles.offerPrice, !canAfford && styles.offerPriceBroke]}>{o.price} TC</Text>
+                        </View>
+                        <View style={styles.offerSubHead}>
+                          <Text style={styles.offerKind} numberOfLines={1}>
+                            recipe{preview.rarity ? ` · ${preview.rarity}` : ''} · learn to craft
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })}
+              </View>
+            );
+          })()}
+          </>
         ) : (
           // SELL mode — inventory list with sell prices.
           <>
@@ -496,6 +657,8 @@ export function VendorScreen() {
                     onPress={() => setSellSort(s)}
                     style={[styles.sortTab, sellSort === s && styles.sortTabActive]}
                     activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: sellSort === s }}
                   >
                     <Text style={[styles.sortTabText, sellSort === s && styles.sortTabTextActive]}>
                       {s === 'value' ? 'VALUE' : s === 'rarity' ? 'RARITY' : 'NAME'}
@@ -519,7 +682,7 @@ export function VendorScreen() {
                 return (
                   <View key={secKey} style={styles.section}>
                     {renderSectionHeader(secKey, cat, count, collapsed)}
-                    {!collapsed && catRows.map(({ item, price }) => {
+                    {!collapsed && catRows.map(({ item, price, base }) => {
               // arb150 — instance-aware preview so the row shows THIS copy's
               // rolled stats (AC / attribute perks / damage / resists), not the
               // generic catalog row. Two "Bone Shoes" with different rolls now
@@ -534,6 +697,7 @@ export function VendorScreen() {
                   style={styles.offerRow}
                   onPress={() => openSell(item.name, price, item.id)}
                   activeOpacity={0.7}
+                  accessibilityRole="button"
                 >
                   <View style={[styles.offerStripe, { backgroundColor: rarityColor(preview.rarity) }]} />
                   <View style={styles.offerBody}>
@@ -546,7 +710,7 @@ export function VendorScreen() {
                             ? <Text style={styles.loadoutTag}>  ⚑ in pouch</Text>
                             : null}
                       </Text>
-                      <Text style={styles.sellPrice}>+{price} TC</Text>
+                      <Text style={styles.sellPrice}>+{price} TC{(() => { const t = priceArrow(price, base, 'sell'); return t ? <Text style={t.good ? styles.tickGood : styles.tickBad}> {t.glyph}</Text> : null; })()}</Text>
                     </View>
                     <View style={styles.offerSubHead}>
                       <Text style={styles.offerKind} numberOfLines={1}>
@@ -587,7 +751,7 @@ export function VendorScreen() {
                 : pending?.mode === 'accept'
                   ? `Accept "${pending.title}"`
                   : canAffordPending
-                    ? `Buy from ${vendor.name}`
+                    ? (pending?.mode === 'buy' && pending.isRecipe ? `Learn the ${pending.itemName} working` : `Buy from ${vendor.name}`)
                     : 'Not enough TC'
         }
         itemPreview={pending?.mode === 'accept' ? null : preview}
@@ -662,7 +826,7 @@ export function VendorScreen() {
                   : pending?.mode === 'buy' && canAffordPending
                     ? [
                         { label: 'Cancel', onPress: cancel, tone: 'neutral' as const },
-                        { label: buyMax > 1 ? `Buy ×${buyRepsClamped}` : 'Buy', onPress: () => doBuy(), tone: 'primary' as const },
+                        { label: pending.isRecipe ? 'Learn' : (buyMax > 1 ? `Buy ×${buyRepsClamped}` : 'Buy'), onPress: () => doBuy(), tone: 'primary' as const },
                         ...(buyMax > 1
                           ? [{ label: `Buy All (${buyMax})`, onPress: () => doBuy(buyMax), tone: 'primary' as const }]
                           : []),
@@ -753,15 +917,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#2a2520',
     borderColor: '#c9a86a',
   },
-  tabText: { color: '#7a705c', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
+  tabText: { color: '#a2977b', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
   tabTextActive: { color: '#c9a86a' },
   sellPrice: { color: '#9ec96a', fontSize: 12, fontWeight: '700' },
   sortRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6, paddingHorizontal: 2 },
-  sortLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginRight: 4 },
+  sortLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginRight: 4 },
   sortTab: { paddingHorizontal: 8, paddingVertical: 3, borderColor: '#3a342c', borderWidth: 1, borderRadius: 2 },
   sortTabActive: { borderColor: '#c9a86a' },
   // arb121 — text is ALWAYS readable amber; the BORDER (sortTabActive) is the
-  // sole active indicator. Was a dim #7a705c on inactive that the player
+  // sole active indicator. Was a dim #a2977b on inactive that the player
   // couldn't read.
   sortTabText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   sortTabTextActive: { color: '#c9a86a' },
@@ -776,8 +940,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   vendorName: { color: '#c9a86a', fontSize: 15, fontWeight: '700', letterSpacing: 1 },
-  vendorTitle: { color: '#7a705c', fontSize: 11, letterSpacing: 1, marginTop: 1 },
+  vendorTitle: { color: '#a2977b', fontSize: 11, letterSpacing: 1, marginTop: 1 },
   vendorDesc: { color: '#cdbf99', fontSize: 12, marginTop: 6, lineHeight: 17, fontStyle: 'italic' },
+  rapportBanner: { color: '#9ec96a', fontSize: 12, marginTop: 6, fontWeight: '700' },
   // arb103 — vendor Fusing Crucible offer.
   crucibleBtn: {
     marginTop: 10,
@@ -795,7 +960,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     marginBottom: 6,
   },
-  walletLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
+  walletLabel: { color: '#a2977b', fontSize: 11, letterSpacing: 1 },
   corruptionMarkup: {
     color: '#e07a5f',
     fontSize: 10,
@@ -805,6 +970,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     marginBottom: 6,
   },
+  // OTA-865 — war-market note + the ▲/▼ price ticker.
+  warMarket: {
+    color: '#d98a5f',
+    fontSize: 11,
+    lineHeight: 15,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingHorizontal: 10,
+    marginBottom: 6,
+  },
+  tickGood: { color: '#7fc96a', fontWeight: '900' },
+  tickBad: { color: '#e07a5f', fontWeight: '900' },
   walletValue: { color: '#c9a86a', fontSize: 13, fontWeight: '700' },
   tourBanner: {
     backgroundColor: '#2a1f12',
@@ -879,16 +1056,16 @@ const styles = StyleSheet.create({
   // arb120 — loadout warning tag (bandolier / pouch) on a sellable row.
   loadoutTag: { color: '#e0a85f', fontSize: 11, fontWeight: '700' },
   offerPrice: { color: '#c9a86a', fontSize: 12, fontWeight: '700' },
-  offerPriceBroke: { color: '#7a705c' },
+  offerPriceBroke: { color: '#a2977b' },
   offerSubHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 2 },
-  offerKind: { color: '#7a705c', fontSize: 10, letterSpacing: 1, flex: 1 },
+  offerKind: { color: '#a2977b', fontSize: 10, letterSpacing: 1, flex: 1 },
   // arb-fix — right-hand stack: "×N in stock" over "you have N".
   offerCounts: { alignItems: 'flex-end', gap: 1 },
   offerOwned: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   offerStock: { color: '#7fb0a8', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   offerStats: { color: '#cdbf99', fontSize: 11, marginTop: 4 },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  empty: { color: '#a2977b', fontStyle: 'italic', textAlign: 'center', marginTop: 40 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
   // OTA 030 — steal button sits at the right edge of every BUY row.
   // Darker tone than BUY so the player reads it as the risky path.
   stealBtn: {

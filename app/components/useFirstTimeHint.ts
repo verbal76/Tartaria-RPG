@@ -21,6 +21,54 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const KEY_PREFIX = 'tartaria.hint.v1.';
 
+// OTA-860 — a single GLOBAL kill-switch for every first-time tip. Persisted per-install
+// (like the individual hint flags) and reactive so the Settings toggle and the "turn off
+// tips" link inside a popup both take effect live. When disabled, useFirstTimeHint never
+// reports shouldShow === true, so no hint renders anywhere.
+const DISABLED_KEY = 'tartaria.hints.disabled.v1';
+let disabledCache: boolean | null = null;
+const disabledListeners = new Set<(v: boolean) => void>();
+
+/** Kick off the one-time read of the global disable flag. Safe to call repeatedly. */
+export async function loadHintsDisabled(): Promise<boolean> {
+  if (disabledCache !== null) return disabledCache;
+  try {
+    const raw = await AsyncStorage.getItem(DISABLED_KEY);
+    disabledCache = raw === '1';
+  } catch {
+    disabledCache = false;
+  }
+  for (const l of disabledListeners) { try { l(disabledCache); } catch { /* ignore */ } }
+  return disabledCache;
+}
+
+/** Synchronous read of the cached flag (false until the first load resolves). */
+export function getHintsDisabled(): boolean {
+  return disabledCache ?? false;
+}
+
+/** Turn every first-time tip on/off. Writes through + notifies subscribers live. */
+export async function setHintsDisabled(v: boolean): Promise<void> {
+  disabledCache = v;
+  for (const l of disabledListeners) { try { l(v); } catch { /* ignore */ } }
+  try { await AsyncStorage.setItem(DISABLED_KEY, v ? '1' : '0'); } catch { /* best-effort */ }
+}
+
+export function onHintsDisabledChange(fn: (v: boolean) => void): () => void {
+  disabledListeners.add(fn);
+  return () => disabledListeners.delete(fn);
+}
+
+/** Reactive hook for the Settings toggle. */
+export function useHintsDisabled(): boolean {
+  const [v, setV] = useState<boolean>(getHintsDisabled());
+  useEffect(() => {
+    void loadHintsDisabled().then(setV);
+    return onHintsDisabledChange(setV);
+  }, []);
+  return v;
+}
+
 export type HintState = {
   /** True until the hint is dismissed AND the dismissal has flushed
    *  to AsyncStorage. False on a re-render of an already-dismissed
@@ -34,7 +82,11 @@ export type HintState = {
 };
 
 export function useFirstTimeHint(id: string): HintState {
-  const [shouldShow, setShouldShow] = useState<boolean | undefined>(undefined);
+  // Per-id "already dismissed" state: undefined = still reading storage.
+  const [dismissed, setDismissed] = useState<boolean | undefined>(undefined);
+  // OTA-860 — the global tips kill-switch, reactive so flipping it in Settings (or via
+  // the in-popup link) hides any currently-open hint immediately.
+  const [disabled, setDisabled] = useState<boolean>(getHintsDisabled());
 
   useEffect(() => {
     let cancelled = false;
@@ -42,23 +94,32 @@ export function useFirstTimeHint(id: string): HintState {
       try {
         const raw = await AsyncStorage.getItem(KEY_PREFIX + id);
         if (cancelled) return;
-        setShouldShow(raw == null);
+        setDismissed(raw != null);
       } catch {
         if (cancelled) return;
-        // On read error, default to NOT showing. Better to skip a
+        // On read error, default to already-dismissed. Better to skip a
         // hint than to spam it on every render.
-        setShouldShow(false);
+        setDismissed(true);
       }
     })();
     return () => { cancelled = true; };
   }, [id]);
 
+  useEffect(() => {
+    void loadHintsDisabled().then(setDisabled);
+    return onHintsDisabledChange(setDisabled);
+  }, []);
+
   const dismiss = useCallback(() => {
-    setShouldShow(false);
+    setDismissed(true);
     void AsyncStorage.setItem(KEY_PREFIX + id, '1').catch(() => {
       // Swallow — worst case the hint shows again next launch.
     });
   }, [id]);
+
+  // Undefined while the per-id read is pending (render nothing); otherwise show only when
+  // this hint hasn't been dismissed AND tips aren't globally disabled.
+  const shouldShow: boolean | undefined = dismissed === undefined ? undefined : (!dismissed && !disabled);
 
   return { shouldShow, dismiss };
 }

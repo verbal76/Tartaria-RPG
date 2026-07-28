@@ -24,12 +24,10 @@ interface Props {
    *  alongside the scene hints so the player can hard-target NPCs
    *  by tap. */
   vendorName?: string;
-  /** If true, the player taps a target → engine routes through the
-   *  stealth intent (sneak-up + skill check) instead of a straight
-   *  approach. Win the roll → behind them undetected; lose → fight
-   *  starts. Toggle persists across opens in case the player wants
-   *  to keep stealth on across multiple targets. */
-  onSubmit: (target: string, useStealth: boolean) => void;
+  /** The player taps a target → engine runs `approach <target>`
+   *  (positioning only). OTA-847 retired the USE STEALTH toggle; the
+   *  sneak-attack opener now lives on the in-combat STEALTH button. */
+  onSubmit: (target: string) => void;
   onCancel: () => void;
 }
 
@@ -48,7 +46,6 @@ export function ApproachModal({
   onCancel,
 }: Props) {
   const [text, setText] = useState('');
-  const [useStealth, setUseStealth] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -66,12 +63,12 @@ export function ApproachModal({
     const trimmed = text.trim();
     if (!trimmed) return;
     Keyboard.dismiss();
-    onSubmit(trimmed, useStealth);
+    onSubmit(trimmed);
   };
 
   const tapToApproach = (target: string) => {
     Keyboard.dismiss();
-    onSubmit(target, useStealth);
+    onSubmit(target);
   };
 
   // Common things players approach when no scene-specific target
@@ -99,8 +96,8 @@ export function ApproachModal({
       <TouchableWithoutFeedback onPress={onCancel}>
         <KeyboardAvoidingView style={styles.scrim} behavior="padding">
           <TouchableWithoutFeedback>
-            <View style={styles.card}>
-              <Text style={styles.title}>APPROACH</Text>
+            <View style={styles.card} accessibilityViewIsModal={true}>
+              <Text style={styles.title} accessibilityRole="header">APPROACH</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
                 Name a person, enemy, door, or feature to close on. In combat
@@ -121,25 +118,6 @@ export function ApproachModal({
                 autoCapitalize="none"
               />
 
-              {/* Stealth toggle. When ON, target taps + the typed-
-                  input path route through the stealth intent: skill
-                  check (DEX-based) decides whether the player slips
-                  in unnoticed or trips the encounter. Toggle stays
-                  visible at the top of the modal so it's clearly
-                  optional, not the default. */}
-              <Pressable
-                style={({ pressed }) => [
-                  styles.stealthToggle,
-                  useStealth && styles.stealthToggleActive,
-                  pressed && styles.btnPressed,
-                ]}
-                onPress={() => setUseStealth((s) => !s)}
-              >
-                <Text style={[styles.stealthToggleText, useStealth && styles.stealthToggleTextActive]}>
-                  {useStealth ? '✓ USE STEALTH (DEX roll)' : 'USE STEALTH (off)'}
-                </Text>
-              </Pressable>
-
               {enemies.length > 0 && (
                 <>
                   <Text style={styles.chipLabel}>Enemies present</Text>
@@ -153,6 +131,7 @@ export function ApproachModal({
                         key={`enemy-${e}`}
                         style={({ pressed }) => [styles.chip, styles.chipEnemy, pressed && styles.btnPressed]}
                         onPress={() => tapToApproach(e)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.chipTextEnemy} numberOfLines={1}>{e}</Text>
                       </Pressable>
@@ -174,6 +153,7 @@ export function ApproachModal({
                         key={`vendor-${vendorName}`}
                         style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
                         onPress={() => tapToApproach(vendorName)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.chipTextScene} numberOfLines={1}>{vendorName}</Text>
                       </Pressable>
@@ -183,6 +163,7 @@ export function ApproachModal({
                         key={`scene-${h}`}
                         style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
                         onPress={() => tapToApproach(h)}
+                        accessibilityRole="button"
                       >
                         <Text style={styles.chipTextScene} numberOfLines={1}>{h}</Text>
                       </Pressable>
@@ -198,6 +179,7 @@ export function ApproachModal({
                     key={`common-${h}`}
                     style={({ pressed }) => [styles.chip, pressed && styles.btnPressed]}
                     onPress={() => tapToApproach(h)}
+                    accessibilityRole="button"
                   >
                     <Text style={styles.chipText} numberOfLines={1}>{h}</Text>
                   </Pressable>
@@ -208,6 +190,7 @@ export function ApproachModal({
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={onCancel}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
                 </Pressable>
@@ -220,6 +203,8 @@ export function ApproachModal({
                   ]}
                   onPress={handleSubmit}
                   disabled={!text.trim()}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: !text.trim() }}
                 >
                   <Text style={styles.btnTextPrimary}>APPROACH</Text>
                 </Pressable>
@@ -239,7 +224,7 @@ const styles = StyleSheet.create({
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
   body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 10 },
   input: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, color: '#e6d8b3', paddingHorizontal: 10, paddingVertical: 9, borderRadius: 3, fontSize: 14 },
-  chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
+  chipLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chipScrollRow: { flexDirection: 'row', gap: 6, paddingLeft: 2, paddingRight: 8 },
   chip: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 3, paddingHorizontal: 10, paddingVertical: 6 },
@@ -256,17 +241,4 @@ const styles = StyleSheet.create({
   btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
-  stealthToggle: {
-    marginTop: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 3,
-    alignItems: 'center',
-  },
-  stealthToggleActive: { borderColor: '#6a9bbf', backgroundColor: '#1c2a35' },
-  stealthToggleText: { color: '#7a705c', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
-  stealthToggleTextActive: { color: '#6a9bbf' },
 });

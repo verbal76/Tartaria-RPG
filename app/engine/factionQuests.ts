@@ -46,6 +46,17 @@ export interface FactionQuestDef {
    *  quests (a real "gather N, bring them back" on-ramp). Quests with a
    *  `fetch` requirement carry no stages — the fetch IS the objective. */
   fetch?: { itemName: string; quantity: number };
+  /** OTA-985 — ESCORT contract (engine_Dev model). When present (or when the quest
+   *  id ends in `_escort`), accepting spawns a shared-pool escort party that
+   *  takes real collateral damage in the player's fights — deliver them alive
+   *  or the contract FAILS. `count` (1-5) sets party size, default 2-3;
+   *  `label` is the one-word party name ("Surveyors"). */
+  escort?: { count?: number; label?: string;
+    /** OTA-987 — pay model. 'scaled' (the default): the TC reward tracks the
+     *  fraction of the party still standing at delivery ("delivered 2 of 3,
+     *  get 2/3 pay"). 'all_or_nothing': the higher-tier drop-offs — deliver
+     *  them alive for FULL pay, or lose everything when the pool dies. */
+    mode?: 'scaled' | 'all_or_nothing' };
   /** Optional explicit ROUTE destination for this contract's objective (a
    *  location id). When present it overrides the engine's text-derived guess for
    *  "ROUTE TO"; absent → the engine infers it from the mission text, falling
@@ -93,6 +104,24 @@ export function factionQuestReady(
   return true;
 }
 
+/** OTA-984 — item names an ACCEPTED fetch contract still wants (active OR paused —
+ *  a paused contract stays on the slate and the player may gather for it).
+ *  Drives the inventory's CONTEXT-AWARE "Save for quest" earmark: the button
+ *  only appears for items a live "gather N, bring them back" contract
+ *  actually names. Owner: "I would only like it to say save for quest when
+ *  you actually have an active quest that needs them" — specific objective
+ *  items are hard-locked automatically and never need the earmark. */
+export function activeFetchItemNames(
+  active: ReadonlyArray<{ id: string }> | null | undefined,
+): Set<string> {
+  const names = new Set<string>();
+  for (const a of active ?? []) {
+    const def = findFactionQuestById(a.id);
+    if (def?.fetch) names.add(def.fetch.itemName.toLowerCase());
+  }
+  return names;
+}
+
 // Quests offered by `factionId` that the player has not yet accepted or
 // completed, and where the player meets the rep requirement.
 export function availableFactionQuests(
@@ -104,6 +133,12 @@ export function availableFactionQuests(
   return FACTION_QUESTS.filter(
     (q) =>
       q.factionId === factionId &&
+      // OTA-993 — #117: field-rescue escorts (the `_stranded_` contracts) are
+      // HOOK-sourced only — you find the stranded soul in the wild and take
+      // the charge there (owner: "give the missions at the appropriate
+      // location"). An outpost board never posts one; the stranded_traveler
+      // hook grants them straight from FACTION_QUESTS by id suffix.
+      !/_stranded_/.test(q.id) &&
       playerRep >= q.requirement.rep &&
       !active.includes(q.id) &&
       !completed.includes(q.id),

@@ -19,8 +19,14 @@
       "answer": "Intense Aetheric heat from overloaded relics or high-energy Aetherstone. Burn leaves Aetheric scars that weaken your resistance to further Aetheric attacks for 1d6 rounds, and halves natural healing until you rest an hour or take Aetheric healing."
     },
     {
+      "id": "cold",
+      "keywords": ["cold", "frost", "freezing", "chill", "ice"],
+      "title": "Cold damage",
+      "answer": "The deep, aching chill of the buried world — frost-charged Aetherstone, drowned vaults, and the coldest coatings. A cold hit can leave you chilled: your hands stiffen for a shiver of −2 Dexterity until it passes. Drink a warming (cold) coating to shake it off at once, or wait it out."
+    },
+    {
       "id": "aetheric",
-      "keywords": ["aetheric", "etheric"],
+      "keywords": ["aetheric", "aetheric"],
       "title": "Aetheric damage",
       "answer": "Invisible, concussive force from raw Aetheric energy. Knocks creatures back one distance range and, in severe cases, disorients them so they cannot move or act for a round. Disrupts concentration — any ongoing effect must save."
     },
@@ -125,20 +131,44 @@
       "id": "skill_check",
       "keywords": ["skill check", "check", "roll"],
       "title": "Skill checks",
-      "answer": "d20 + the relevant stat, against a DC. Stealth uses DEX. Diplomacy uses CHA. Investigate uses INT. Cast uses INT. Use Relic uses WIS. Escape uses DEX."
+      "answer": "d20 + the relevant stat, against a DC. Stealth uses STEALTH. Diplomacy uses CHA. Investigate uses INT. Cast uses INT. Use Relic uses WIS. Escape uses DEX."
     },
 
     {
       "id": "aether",
-      "keywords": ["aether", "ether"],
+      "keywords": ["aether", "aether"],
       "title": "Aether",
       "answer": "Tartaria's lost elemental power — a living energy field that ran the empire's machines and shaped its mud. After the Flood it sleeps in pockets and pulses. Some draw on it; most are drawn by it."
     },
     {
       "id": "aetherstone",
-      "keywords": ["aetherstone", "etherstone", "stone"],
+      "keywords": ["aetherstone", "aetherstone", "stone"],
       "title": "Aetherstone",
-      "answer": "Crystallized Aether — the buried world's currency, weapon stock, and battery. Hums when something resonates with it. Most relics are built around an Aetherstone core."
+      "answer": "Crystallized Aether — the buried world's currency, weapon stock, and battery. It is the flood-mud itself, flash-calcified by the Zalmar Overload into a matrix harder than any natural rock, with pockets of raw Etherium still trapped and vibrating inside. Hums when something resonates with it. Most relics are built around an Aetherstone core."
+    },
+    {
+      "id": "zalmar_overload",
+      "keywords": ["zalmar overload", "the overload", "why the water rose", "what caused the flood", "how the flood happened", "how did the flood happen", "thermodynamic", "waste heat", "radiator", "vacuum seal", "etheric grid", "etheric grids", "quintessence", "how aetherstone formed", "how did aetherstone form", "what it left buried"],
+      "title": "The Zalmar Overload",
+      "answer": "The deep answer to why the water rose. Old Tartaria ran on Aether — the fifth force, the quintessence — harvested from the sun and the cold night sky at once, its waste heat vented into the black of space through vacuum-sealed radiators, then multiplied through oriented crystal arrays until it could lift citadels and wake sentinels. Elior Zalmar tried to hold the entire planetary grid at that screaming peak from Thametan's Tower. The resonance shook the vacuum seals of the Etheric Grids apart, and with nowhere left to dump the heat, the engines poured it down into the bedrock instead. The ground ionized and rose as Ether-charged mud — the Great Mud Flood — then flash-calcified into Aetherstone, sealing the cities and their Entombed where they stood and trapping the Etherium shards, the temporal loops, and the Etheric storms the Reclaimers pick through to this day. (Archived by the Forgotten Order's Department of Aetheric Engineering; cross-read the Zalmar Texts, the Hwang Radiative Principles, and the Soldani Crystalline Theorems.)"
+    },
+    {
+      "id": "zalmar_texts",
+      "keywords": ["zalmar texts", "the zalmar texts", "zalmar's texts", "zalmar's notes", "zalmar's papers"],
+      "title": "The Zalmar Texts",
+      "answer": "Elior Zalmar's own working papers — the resonance mathematics that lifted Tartaria and the same mathematics, pushed one column too far, that drowned it. The Forgotten Order keeps what survived under lock; copies surface in the ruins with pages missing exactly where the reader most wants them. Those who read the whole of it, the Order says, tend to start hearing the Engine's note in quiet rooms."
+    },
+    {
+      "id": "hwang_radiative_principles",
+      "keywords": ["hwang", "hwang radiative principles", "the hwang radiative principles", "radiative principles"],
+      "title": "The Hwang Radiative Principles",
+      "answer": "The foundational treatise on how the empire shed its waste heat — the vacuum-shielded radiators that dumped every unused erg into the 3-kelvin cold of the night sky so the cities would not cook in their own power. Sound engineering, and honoured right up until Zalmar's resonance shook the seals apart. The Reclaimers who can read it prize it: a working radiator plate is still worth a season's dig."
+    },
+    {
+      "id": "soldani_crystalline_theorems",
+      "keywords": ["soldani", "soldani crystalline theorems", "the soldani crystalline theorems", "crystalline theorems"],
+      "title": "The Soldani Crystalline Theorems",
+      "answer": "The amplification bible: how a raw Aetheric beam, fired true along the grain of an oriented heavy-metal crystal, could be multiplied a thousandfold into the current that woke the sentinels. Every runecaster and every Aetherstone core still leans on Soldani's angles, whether the smith who cut it knows the name or not. Misalign the crystal and the theorems turn on you — that misalignment is what the flood was, written large."
     },
     {
       "id": "tartaria",
@@ -217,7 +247,7 @@
       "id": "stealing",
       "keywords": ["steal", "stealing", "thief", "pilfer", "pocket"],
       "title": "Stealing",
-      "answer": "Type 'steal <item>' to attempt a theft from the current vendor. A d20 + DEX vs DC 12 stealth check resolves immediately. Success: the item is yours, free. Failure: the vendor catches you, faction standing drops 10, and they pack up and leave."
+      "answer": "Type 'steal <item>' to attempt a theft from the current vendor. A d20 + STEALTH check resolves immediately, against a DC the vendor's wariness sets — and it climbs every time you try, so serial pilfering gets steeply harder. Success: the item is yours, free. Failure: the vendor catches you, faction standing drops 10, and they pack up and leave."
     },
     {
       "id": "factions_join",
@@ -271,9 +301,9 @@
 
     {
       "id": "aetherkin",
-      "keywords": ["aetherkin", "etheric undead", "undead tartarian", "buried undead"],
+      "keywords": ["aetherkin", "aetheric undead", "undead tartarian", "buried undead"],
       "title": "Aetherkin",
-      "answer": "Ether-infused undead buried by the Great Mud Flood, trapped in an ethereal peace. Disturb the Aetherstone encasing them and they reawaken with powerful Etheric abilities — hostile to anything that threatens their rest."
+      "answer": "Aether-infused undead buried by the Great Mud Flood, trapped in an ethereal peace. Disturb the Aetherstone encasing them and they reawaken with powerful Aetheric abilities — hostile to anything that threatens their rest."
     },
     {
       "id": "ancient_mud_golems",
@@ -283,64 +313,64 @@
     },
     {
       "id": "architectural_sorcery",
-      "keywords": ["architectural sorcery", "aetheric engineering", "etheric architecture", "tartarian architecture"],
+      "keywords": ["architectural sorcery", "aetheric engineering", "aetheric architecture", "tartarian architecture"],
       "title": "Architectural Sorcery",
-      "answer": "Tartaria's fusion of engineering and Aetheric principles. Buildings that channel Etheric Power, self-repairing walls, defense systems that project illusions or repel intruders. The Stone Builders still study it; no one has replicated it."
+      "answer": "Tartaria's fusion of engineering and Aetheric principles. Buildings that channel Aetheric Power, self-repairing walls, defense systems that project illusions or repel intruders. The Stone Builders still study it; no one has replicated it."
     },
     {
       "id": "etheric_anomalies",
-      "keywords": ["etheric anomaly", "aetheric anomaly", "etheric disturbance", "anomaly"],
-      "title": "Etheric Anomalies",
-      "answer": "Residual Aether gone wrong — magnetic fluctuations, disorienting time slips, Etheric lightning, hallucinations. Common in the Mud Seas and near unstable Etheric Ruins. Some are predictable. Most are not."
+      "keywords": ["aetheric anomaly", "aetheric anomaly", "aetheric disturbance", "anomaly"],
+      "title": "Aetheric Anomalies",
+      "answer": "Residual Aether gone wrong — magnetic fluctuations, disorienting time slips, Aetheric lightning, hallucinations. Common in the Mud Seas and near unstable Aetheric Ruins. Some are predictable. Most are not."
     },
     {
       "id": "etheric_guardians",
-      "keywords": ["etheric guardian", "aetheric guardian", "tartarian guardian", "automaton", "guardian construct"],
-      "title": "Etheric Guardians",
+      "keywords": ["aetheric guardian", "aetheric guardian", "tartarian guardian", "automaton", "guardian construct"],
+      "title": "Aetheric Guardians",
       "answer": "Automated constructs ranging from shoulder-height drones to war-scale machines, all programmed with one task: defend the Tartarian sites they were built into. They have been at it since before the Flood."
     },
     {
       "id": "etheric_ruins",
-      "keywords": ["etheric ruin", "aetheric ruin", "ruin", "dense aether location"],
-      "title": "Etheric Ruins",
+      "keywords": ["aetheric ruin", "aetheric ruin", "ruin", "dense aether location"],
+      "title": "Aetheric Ruins",
       "answer": "Locations where Tartarian structures left so much Aether behind that time and space distort. Ghostly apparitions, unpredictable energy phenomena, and valuable relics co-exist in them. Explore carefully."
     },
     {
       "id": "etheric_titan",
-      "keywords": ["etheric titan", "aetheric titan", "titan construct", "titan guardian"],
-      "title": "Etheric Titan",
-      "answer": "A massive construct built as a final line of defense for Tartarian systems. If you're trying to activate or deactivate something important, an Etheric Titan is probably the last obstacle between you and it."
+      "keywords": ["aetheric titan", "aetheric titan", "titan construct", "titan guardian"],
+      "title": "Aetheric Titan",
+      "answer": "A massive construct built as a final line of defense for Tartarian systems. If you're trying to activate or deactivate something important, an Aetheric Titan is probably the last obstacle between you and it."
     },
     {
       "id": "mold_ether",
-      "term": "Mold Ether",
-      "keywords": ["mold ether", "mold the ether", "etheric repair", "etheric manipulation"],
-      "title": "Mold Ether",
-      "answer": "A Tartarian technique — part spell, part engineering — for repairing, redirecting, or manipulating Etheric relics. Requires high Arcana. Misapplied, it can overload a device rather than restore it."
+      "term": "Mold Aether",
+      "keywords": ["mold aether", "mold the aether", "aetheric repair", "aetheric manipulation"],
+      "title": "Mold Aether",
+      "answer": "A Tartarian technique — part spell, part engineering — for repairing, redirecting, or manipulating Aetheric relics. Requires high Arcana. Misapplied, it can overload a device rather than restore it."
     },
     {
       "id": "mud_flood",
       "keywords": ["mud flood", "great mud flood", "the flood", "aetherstone flood"],
       "title": "The Mud Flood",
-      "answer": "The catastrophe that ended Tartaria. Etheric Power experiments at Thametan's Tower in Samarran malfunctioned, releasing Aether-charged mud that encased cities in Aetherstone and buried the empire. The factions that survive today are all, in one way or another, its consequence."
+      "answer": "The catastrophe that ended Tartaria. Aetheric Power experiments at Thametan's Tower in Samarran malfunctioned, releasing Aether-charged mud that encased cities in Aetherstone and buried the empire. The factions that survive today are all, in one way or another, its consequence."
     },
     {
       "id": "mud_golems",
       "keywords": ["mud golem", "mud construct", "golem"],
       "title": "Mud Golems",
-      "answer": "Etheric constructs made from Aether-charged mud — born either from Mud Magic or from failed Mud Tech experiments. Immensely strong and highly unpredictable. Known to turn on their own makers without warning."
+      "answer": "Aetheric constructs made from Aether-charged mud — born either from Mud Magic or from failed Mud Tech experiments. Immensely strong and highly unpredictable. Known to turn on their own makers without warning."
     },
     {
       "id": "mud_magic",
-      "keywords": ["mud magic", "mud manipulation", "etheric mud"],
+      "keywords": ["mud magic", "mud manipulation", "aetheric mud"],
       "title": "Mud Magic",
-      "answer": "Primitive Aether manipulation through prolonged contact with Etheric-charged mud. Practitioners can shape terrain, accelerate healing, and conjure Mud Golems. The Mud Dwellers use it extensively. The cost is physical and mental — the mud takes something back."
+      "answer": "Primitive Aether manipulation through prolonged contact with Aetheric-charged mud. Practitioners can shape terrain, accelerate healing, and conjure Mud Golems. The Mud Dwellers use it extensively. The cost is physical and mental — the mud takes something back."
     },
     {
       "id": "mud_tech",
-      "keywords": ["mud tech", "etheric technology", "mud technology", "crude aether"],
+      "keywords": ["mud tech", "aetheric technology", "mud technology", "crude aether"],
       "title": "Mud Tech",
-      "answer": "Tartarian Etheric technology reverse-engineered from the mud. Crude, unreliable, and prone to catastrophic failure. The Reclaimers Guild sells a lot of it. The Mud Monarchs would rather no one had any."
+      "answer": "Tartarian Aetheric technology reverse-engineered from the mud. Crude, unreliable, and prone to catastrophic failure. The Reclaimers Guild sells a lot of it. The Mud Monarchs would rather no one had any."
     },
     {
       "id": "relic_trade",
@@ -352,13 +382,13 @@
       "id": "second_mud_flood",
       "keywords": ["second mud flood", "second flood", "another flood", "new flood"],
       "title": "The Second Mud Flood",
-      "answer": "The feared second cataclysm. Some factions — particularly the Tartarian Revivalists — believe that reactivating Etheric Power systems could trigger it. Others theorize cosmic disturbances or environmental shifts could do it without any help."
+      "answer": "The feared second cataclysm. Some factions — particularly the Tartarian Revivalists — believe that reactivating Aetheric Power systems could trigger it. Others theorize cosmic disturbances or environmental shifts could do it without any help."
     },
     {
       "id": "tartarian_obelisk",
-      "keywords": ["tartarian obelisk", "obelisk", "etheric obelisk", "aetheric obelisk"],
+      "keywords": ["tartarian obelisk", "obelisk", "aetheric obelisk", "aetheric obelisk"],
       "title": "Tartarian Obelisk",
-      "answer": "An Etheric artifact projecting an energy field within arm's reach. Grants advantage on up to three creatures once per long rest. If damaged, the stored energy releases as a destructive Etheric blast — handle with care."
+      "answer": "An Aetheric artifact projecting an energy field within arm's reach. Grants advantage on up to three creatures once per long rest. If damaged, the stored energy releases as a destructive Aetheric blast — handle with care."
     },
     {
       "id": "the_entombed",
@@ -377,7 +407,7 @@
       "id": "conspiracy_architects",
       "keywords": ["conspiracy architects", "architects", "cabal"],
       "title": "Conspiracy Architects",
-      "answer": "A covert cabal that suppresses all knowledge of Tartaria and Etheric technology, ostensibly to protect surface society from its dangers. In practice they serve the Mud Monarchs' interests. They work through controlled narratives, media, and the quiet removal of people who talk too much."
+      "answer": "A covert cabal that suppresses all knowledge of Tartaria and Aetheric technology, ostensibly to protect surface society from its dangers. In practice they serve the Mud Monarchs' interests. They work through controlled narratives, media, and the quiet removal of people who talk too much."
     },
     {
       "id": "servants_of_giants",
@@ -395,14 +425,14 @@
       "id": "tartarian_revivalists",
       "keywords": ["tartarian revivalists", "revivalists", "sasha ironheart", "radical faction"],
       "title": "Tartarian Revivalists",
-      "answer": "A radical faction willing to risk another Mud Flood to restore Tartaria. Led by Sasha Ironheart. They are dedicated to reactivating Etheric Power systems, and they consider the other factions' caution a form of cowardice. Dangerous allies. Worse enemies."
+      "answer": "A radical faction willing to risk another Mud Flood to restore Tartaria. Led by Sasha Ironheart. They are dedicated to reactivating Aetheric Power systems, and they consider the other factions' caution a form of cowardice. Dangerous allies. Worse enemies."
     },
 
     {
       "id": "elior_zalmar",
-      "keywords": ["elior zalmar", "zalmar", "etheric engine creator", "philosopher scientist"],
+      "keywords": ["elior zalmar", "zalmar", "aetheric engine creator", "philosopher scientist"],
       "title": "Elior Zalmar",
-      "answer": "Tartaria's most consequential engineer. His research on Etheric frequency resonance and the Etheric Engine at Thametan's Tower caused the Great Mud Flood. Whether he died in it, survived it, or stepped sideways through time depends on which account you believe."
+      "answer": "Tartaria's most consequential engineer. His research on Aetheric frequency resonance and the Aetheric Engine at Thametan's Tower caused the Great Mud Flood. Whether he died in it, survived it, or stepped sideways through time depends on which account you believe."
     },
     {
       "id": "harlan_moore",
@@ -448,9 +478,9 @@
     },
     {
       "id": "etheric_resonance",
-      "keywords": ["etheric resonance", "aetheric resonance", "resonance", "zalmar theory", "aetheron"],
-      "title": "Etheric Resonance",
-      "answer": "Elior Zalmar's theory that Aether is built of particles called Aetherons that vibrate at distinct frequencies. Tuning a device to the right resonance lets you draw on Aether without burning fuel. Pushing the resonance past its envelope is what blew the Etheric Engine apart and triggered the Mud Flood."
+      "keywords": ["aetheric resonance", "aetheric resonance", "resonance", "zalmar theory", "aetheron"],
+      "title": "Aetheric Resonance",
+      "answer": "Elior Zalmar's theory that Aether is built of particles called Aetherons that vibrate at distinct frequencies. Tuning a device to the right resonance lets you draw on Aether without burning fuel. Pushing the resonance past its envelope is what blew the Aetheric Engine apart and triggered the Mud Flood."
     },
     {
       "id": "temporal_loops",
@@ -466,14 +496,14 @@
     },
     {
       "id": "etheric_storms",
-      "keywords": ["etheric storm", "aetheric storm", "aether storm", "lightning storm"],
-      "title": "Etheric Storms",
+      "keywords": ["aetheric storm", "aetheric storm", "aether storm", "lightning storm"],
+      "title": "Aetheric Storms",
       "answer": "Charged storms that crack the sky in violet and blue. The lightning warps reality where it touches — metal flows like liquid, time hiccups, ghosts of old Tartaria flash across the eye. Caught out in one, you don't get wet, you get unmade by degrees. The storms tend to peak above buried cities."
     },
     {
       "id": "etheric_cores",
-      "keywords": ["etheric core", "aetheric core", "core", "tartarian core"],
-      "title": "Etheric Cores",
+      "keywords": ["aetheric core", "aetheric core", "core", "tartarian core"],
+      "title": "Aetheric Cores",
       "answer": "The power sources that ran Tartaria. A single Core could light a city, hover a citadel, or grind a war machine into a continent. Most are buried with their cities; a working one is the most dangerous treasure a faction can pull out of the mud."
     },
     {
@@ -498,7 +528,7 @@
       "id": "tartarian_revivalists",
       "keywords": ["tartarian revivalists", "revivalists", "sasha's faction", "ironheart faction"],
       "title": "The Tartarian Revivalists",
-      "answer": "Sasha Ironheart's faction. They want Tartaria's Etheric Power back online at full strength, and they will gamble a second Mud Flood to get it. Decentralized cells, single goal, no patience for half-measures. Most other factions call them extremists; the Revivalists call back, 'we are the only ones doing the thing.'"
+      "answer": "Sasha Ironheart's faction. They want Tartaria's Aetheric Power back online at full strength, and they will gamble a second Mud Flood to get it. Decentralized cells, single goal, no patience for half-measures. Most other factions call them extremists; the Revivalists call back, 'we are the only ones doing the thing.'"
     },
     {
       "id": "architectural_sentinels",
@@ -558,7 +588,7 @@
 
     {
       "id": "aethercraft",
-      "keywords": ["aethercraft", "ether craft", "true tartarian magic", "aetherstone magic", "aetheric craft"],
+      "keywords": ["aethercraft", "aether craft", "true tartarian magic", "aetherstone magic", "aetheric craft"],
       "title": "Aethercraft",
       "answer": "The Aetheric discipline the True Tartarians developed in their centuries underground. Aethercraft pulls energy from Aetherstone and shapes it — stone bent into walls, mud lifted into golems, wounds knit closed. Each settlement keeps an Aetherforge where the senior practitioners work. Prolonged use scars the body and frays the mind, so the best Aethercrafters are also the most haunted."
     },
@@ -576,7 +606,7 @@
     },
     {
       "id": "aetheric_healing",
-      "keywords": ["aetheric healing", "aether healing", "etheric healing", "mend with aether"],
+      "keywords": ["aetheric healing", "aether healing", "aetheric healing", "mend with aether"],
       "title": "Aetheric Healing",
       "answer": "The rarest Aethercraft discipline. The practitioner channels Aetherstone energy into a wound and pulls the flesh back together — bone, muscle, skin in whatever order the Aether picks. Costs the healer in mental strain or fresh physical scarring, so most who can do it only do it once or twice a season. Saves lives. Shortens the healer's."
     },
@@ -645,7 +675,7 @@
       "id": "dodge_action",
       "keywords": ["dodge action", "what is dodge", "dodging"],
       "title": "Dodge",
-      "answer": "You have Advantage on DEX saving throws, and any attack roll made against you has Disadvantage — if you can see the attacker. Defensive action of choice when you cannot kill or escape this turn."
+      "answer": "A gamble, not a hunker. Commit to a dodge and the next blow is contested: d20 + DEX against the attacker's swing. Slip it and your counter lands double; misjudge it and the blow finds you past any armor, twice as hard. Costs a little stamina and weapon wear — the defensive play of choice when you cannot kill or escape this turn."
     },
     {
       "id": "help_action",
@@ -663,7 +693,7 @@
       "id": "hide_action",
       "keywords": ["hide action", "hiding", "stealth roll"],
       "title": "Hide",
-      "answer": "Attempt to hide from an enemy. Roll DEX (Stealth) to see if you succeed. Failed Hide attempts leave you visible AND committed — the enemy knows you tried."
+      "answer": "Attempt to hide from an enemy. Roll STEALTH to see if you succeed. Failed Hide attempts leave you visible AND committed — the enemy knows you tried."
     },
     {
       "id": "ready_action",
@@ -879,7 +909,7 @@
       "id": "dodge_melee",
       "keywords": ["dodge melee", "evade melee", "side-step blade"],
       "title": "Dodge Melee — Skill: Dodge",
-      "answer": "MELEE ATTACKS ONLY. Dodge an attacker's melee attack or combat maneuver using an opposed dodge skill check. A defender's dodge check is an opposed skill roll to the attacker's fighting skill check, so it may still be possible to fail a successful dodge if the attacker rolls a higher success. In the case of a skill check draw, the success goes to the defender. If both fail their skill checks, no damage is inflicted. Cost: 1 Evasive Action."
+      "answer": "MELEE ATTACKS ONLY. Commit to a dodge and the next incoming strike is contested by d20 + DEX against the attacker's swing total. Beat it and you slip clear and riposte at double weapon dice; fall short and you dodge into the blow for double damage, armor be damned. Costs the beat either way."
     },
     {
       "id": "fight_back",

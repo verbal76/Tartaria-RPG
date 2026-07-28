@@ -27,8 +27,11 @@ There are two version numbers and only one moves on an OTA:
 
 ### Workflow
 
-- **Per OTA push:** PATCH += 1 → update `NEXT` below, update
-  `APP_SEMVER` in `app/buildInfo.ts`, bump `OTA_BUILD_ID`, add a log row.
+- **Per OTA push:** PATCH += 1 → update `DISPLAY_VERSION` in
+  `app/buildInfo.ts` (the character-select / About game version) in the same
+  edit as the `OTA_BUILD_ID` bump. (The old `APP_SEMVER` field never survived
+  the buildInfo rework — `DISPLAY_VERSION` is the carrier now.) Log rows here
+  are for MINOR/MAJOR moves and native builds, not every PATCH.
 - **Significant feature:** MINOR += 1, PATCH = 0.
 - **Native APK/AAB build:** stamp `app.json` `version` with the value in
   `NEXT`, then continue OTAs from there.
@@ -39,10 +42,11 @@ There are two version numbers and only one moves on an OTA:
 
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
-- **NEXT — value to stamp on the next native build:** `3.0.0`
-  (the HaL-lineage promotion AAB — MAJOR jump to the new AI-restructured
-  engine)
-- **Current logical version (post-promotion baseline):** `3.0.0`
+- **NEXT — value to stamp on the next native build:** whatever
+  `DISPLAY_VERSION` reads at build time (`4.28.46` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.46` — REACTIVATED at
+  `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
+  ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
 > Builds before `3.0.0` (the `2.x` series) predate this ledger and were
 > numbered ad hoc. The scheme starts cleanly at the `3.0.0` promotion.
@@ -52,3 +56,63 @@ There are two version numbers and only one moves on an OTA:
 | Logical | OTA_BUILD_ID | Kind | Notes |
 |---|---|---|---|
 | 3.0.0 | (set at promotion) | AAB | HaL-lineage promotion → Play internal test. Package `com.hotatticgames.tartarprim`, key `tartaria-upload`, versionCode = CI run number. New AI stack (Qwen item-synthesis / MiniLM / Kokoro). |
+| 3.4.11 → 4.1.0 | OTA-602 | OTA | Last bump before the tracker froze (title-screen relabel era). Everything after shipped without moving the number. |
+| 4.28.3 | 2026-07-26-992-game-version | OTA | TRACKER REACTIVATED — caught up 389 frozen OTAs via the wave ledger below. From here: PATCH every OTA, MINOR per feature wave. |
+| 4.28.4 → 4.28.15 | 2026-07-26-993 … -1004 | OTA | The device-log root-cause run (truth batch, stat toasts, accept parity, portable words) plus two owner features: THE HOLLOWED (998 + 1004) and the healing / offer-budget / weather-locality tuning (1001–1003). PATCH per OTA as the rule says. **The Hollowed is wave-sized** — fold it into the next MINOR bump rather than renumbering builds already on devices. |
+| 4.28.16 → 4.28.18 | 2026-07-27-1005 … -1007 | OTA | The Crucible batch, all three from one device session. **1005** opened the salvage valve — a 50-name catalog-absent curio pool drops at 18% per salvaged noun, so the fuse Crucible finally has fuel (it had been structurally starved since arb61 filtered salvage down to catalog names). **1007** made a Crucible that can't fire say so: the OTA-801 consolation-picker is removed, a modal names the shortfall and holds until read, and the vendor rig checks before charging. **1006** moved the crafting decision to the front — a quantity picker with −/+ and MAX replaces OTA-264's "continue crafting?" question, and the menu stays open until BACK. |
+| 4.28.19 → 4.28.23 | 2026-07-27-1008 … -1012 | OTA | The trust batch: build-scoped voice-crash counter (1008), the 42-weapon Charisma-to-hit data fix + runtime backstop (1009), the mission-complete holding popup with its 7-site choke point (1010), the punctuation/article-insensitive travel-by-name matcher (1011), and the owner-requested ROOT-CAUSE AUDIT of the whole run (1012) — which found and fixed two defects in this session's own fixes: the Club batch-craft net-zero miscount and the ambiguous-partial silent pick. |
+| 4.28.24 → 4.28.27 | 2026-07-27-1013 … -1016 | OTA | THE STUDS-DOWN TEARDOWN (owner: "take all of opus fixes down to the studs"). Five parallel audits re-derived every OTA-992..1004 root cause against pre-fix code: 13 audited, 5 clean, 8 with defects, ~30 findings. **1013** the stranded Mud-Frosted Bead curio (portability × curio catalog-absence). **1014** exploits+spawns: gear farm re-closed, sigil farm head-gated + permanently ledgered, revenant escort/building gates, trait-keyed reverence, live fallen cache, slot-priority kits, road-weather sentinel, the rumour names the fallen that rises. **1015** contracts+toasts: single-active enforced at ACTIVATION across kinds, parked grants say so, the 8 base-stat toasts fixed + lock hardened. **1016** input+world: qwen guard word-level both directions, reach-class refusals, indoor course clear, pitch-keyed offer rotation, tag-aware weather bias, dog-frame heals, exact-landmark climb precedence. |
+| 4.28.27 → 4.28.28 | 2026-07-27-1017 | OTA | THE RESIDUALS, CLOSED (owner: "complete 1-4 that were left open"). THE RECLAIM: full gear snapshots at death; a Hollowed put to rest hands back the died-in weapon outright (pristine, owner's call) and armor rolls grant the REAL pieces, never trophies; KO-strips count as put to rest; legacy seeded kits pin at first generation. Previews promise the scaled heal. The sky is remembered per location (self-pruning map, legacy slot migrates). Hollowed: proven-progress gate (10 kills or 12h), per-tile roll bank, retried memorial write, no boss spawn over a live fight. |
+| 4.28.28 → 4.28.29 | 2026-07-27-1018 | OTA | The Fallen roll marks the STILL-WALKING: un-avenged memorial entries carry an amber warning line and the header counts them — the player can finally see which dead are still out there as risable Hollowed. |
+| 4.28.29 → 4.28.30 | 2026-07-27-1019 | OTA | Codex tabs always on screen (owner screenshot: "there is no fallen tab under lore"): the 7-tab row was a cue-less horizontal scroll hiding FALLEN and LORE past the right edge; it now wraps onto a second line. |
+| 4.28.30 → 4.28.31 | 2026-07-27-1020 | OTA | Every coating racks (owner: bandolier refused some coatings). Category: identity-by-instance-tag-snapshot — old instances keep minted tags forever. canonicalItemTags (instance ∪ catalog) + isWeaponCoatingItem; bandolier gate, throw burst, coat-a-weapon, equip guard, drinkable gate all routed; whole-catalog sweep locked in tests. |
+| 4.28.31 → 4.28.32 | 2026-07-27-1021 | OTA | RESTITUTION (snapshot-audit batch A): legacy catalog-name migrations (Boltcaster→Beacon Rifle, Greaves→Mantle w/ slot move, torches, golem armaments) applied on every load to inventory/equipped/golem/recipes; golem armament joins the load heal passes; resurrection loads migrated worldMemory + canon-location resync. |
+| 4.28.32 → 4.28.33 | 2026-07-27-1022 | OTA | FAIL-OPEN HOLES CLOSED (snapshot-audit batch B): quest-lock, forge blocklists, substitute-drain rarity guard, collect_only — all canonical (instance ∪ catalog / catalog-first). New canonicalItemKind + canonicalItemRarity; tag union widened to amulets/rings/dog gear. Whole-catalog fail-closed sweeps locked in tests. |
+| 4.28.33 → 4.28.34 | 2026-07-27-1023 | OTA | ECONOMY CANONICAL (snapshot-audit batch C): sell/scrap/repair/golem-feed/coating-drink resolve kind/rarity/tags against the live catalog; trophy discount is catalog-authoritative (dies on promotion); stale-vs-fresh parity locked in tests. |
+| 4.28.34 → 4.28.35 | 2026-07-27-1024 | OTA | IDENTITY TAIL (snapshot-audit batch D): ~25 remaining sites canonical (sections, throwable cluster, sigils, tools, substitution, digging, racial gear, faction catalysts, rope/treat/torch/barehand/food/repair-perk) + fused-kind load guard + CHA stat-channel heal + exact-ingredient substitution exclusion. |
+| 4.28.35 → 4.28.36 | 2026-07-27-1025 | OTA | GUARD-RAILS (snapshot-audit batch E, closes the audit): catalog-name ratchet (snapshot + script + build-failing lock on unmigrated removals), orphan-safe ABANDON, def-resolving contract count, staged-record turn-in gate, loud location fallback, canonical deep-link/relic-perk/trade-away. |
+| 4.28.36 → 4.28.37 | 2026-07-27-1026 | OTA | KILL-BEAT FREEZE FIXED (owner report: 7-8s hang on the killing roll): the canonical identity helpers were uncached linear catalog scans multiplied by the kill path's inventory loops; per-name memo caches restore pre-audit speed (281ms → 25ms in the probe) with identical semantics. |
+| 4.28.37 → 4.28.38 | 2026-07-27-1027 | OTA | CRAFT-SCREEN STALL FIXED (pre-existing): ingredientShortfall annotated the whole inventory per recipe — 130× per open and per repair tap; WeakMap annotation cache on the immutable inventory array → 900ms → 3-23ms. Plus canCraft/drain exact-ingredient exclusion parity. |
+| 4.28.38 → 4.28.39 | 2026-07-27-1028 | OTA | WEDGED BANDOLIER FIXED (ghost equip references): racked/stowed ids whose items left the pack by any path other than throw/unrack rendered as empty-but-cap-counting slots; ghost sweep on load + live-id cap checks for bandolier AND tool pouch. |
+| 4.28.39 → 4.28.40 | 2026-07-28-1029 | OTA | THE GREEN LIE FIXED (divergent reach copies): the weapon quick-button highlight and the enemy panel re-derived reach locally and missed the forge-stamped reach class on fused weapons — a close-only fused weapon glowed green at mid range while the attack gate refused. One exported resolver (playerWeaponReach) now feeds the gate, the button tones, and the in-range flag; category-lock test forbids new local copies. |
+| 4.28.40 → 4.28.41 | 2026-07-28-1030 | OTA | STORY-THREAD COMPLETE FLOW: the completion popup used to mount the instant the final thread stage resolved, on top of the thread text still being read. The notice is now stashed and raised only when the player taps the new single COMPLETE button on the terminal stage (mid-thread stages keep CONTINUE/ABANDON); scrim/back route through COMPLETE so the payout notice can't be dropped. |
+| 4.28.41 → 4.28.42 | 2026-07-28-1031 | OTA | COATING PICKERS SHOW THE EQUIPPED PIECE: weapon- and armor-coating pickers now tag each candidate that is currently worn (· EQUIPPED (main hand) / (chest) etc.) through the same instance-id resolver as the inventory EQUIPPED badge, so the tag hits the exact worn instance even among same-named duplicates. |
+| 4.28.42 → 4.28.43 | 2026-07-28-1032 | OTA | CONTESTED FLEE (owner: never lost a flee roll — proven: flat DC 9 vs growing DEX made failure impossible at DEX 8+). Escapes in combat are now opposed by the fastest live pursuer's d20 + speed (bestiary AP + quick/agile/aerial/slow traits, clamp 0-14); ties go to the runner; hounds and winged things are hard to outrun, titans easy. Trap/stage escapes keep DC 9; new-character flee grace untouched. |
+| 4.28.43 → 4.28.44 | 2026-07-28-1033 | OTA | OFF-HAND PROMOTION GUARD (found via the dead combatStress canary): 'attack with <weapon>' could bind the one off-hand instance to BOTH hands on name-only equipped states, silently evicting the main weapon — the guard is now id-first with a name fallback. The heavy combat sim itself repaired (living-world fights, honest floors, real time budget) and verified green end-to-end: 20k actions, 0 crashes, <1% stalls. |
+| 4.28.44 → 4.28.45 | 2026-07-28-1034 | OTA | HEAVY-GATE HYGIENE: test:ci:heavy was never runnable (unquoted shell pattern) — fixed; first full sweep 24/27, the 3 red repaired (stale source-anchor window, outgrown 240s budget, metaNav OOM bounded to measured-stable 4000 with a hard leak characterization: ~1 MB/action module-scope heap growth from ~action 2000 — logged as the entry point for the world/persist open item). HANDOFF §8 reconciled (stale punch-list/backlog items struck; one deliberate residual surfaced: mysteries/storylines still turn in remotely). |
+| 4.28.45 → 4.28.46 | 2026-07-28-1035 | OTA | PERSIST LEAK ROOT-CAUSED (the deepest open item, closed): sim OOMs were the jest.fn AsyncStorage mock retaining every ~400 KB disk-log rewrite (plain mock via moduleNameMapper; 12k-action proof run flat at 249 MB vs 8 GB OOM before); on device, appendLogToDisk's per-line full read-modify-write is now BATCHED — one read+write per burst instead of megabytes of bridge traffic per action. Plus corrections: all contract kinds were already face-to-face; docs and a stale comment fixed. |
+
+## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
+
+MAJOR stayed **4**: same engine lineage since the AI-restructure promotion.
+MINOR: 1 (at the freeze) + **27 significant feature waves** shipped between
+OTA-603 and OTA-991 = **28**. PATCH: OTAs after the last wave closed (escorts,
+OTA-989) → 990, 991, 992 = **3**. The waves, in ship order:
+
+1. OTA-630–631 — instant Crucible forging (background naming)
+2. OTA-636–637 — typed-damage combat rework (procs/DOTs, weak/resist gating)
+3. OTA-642 — single-active mission system + auto-routing
+4. OTA-643–646 — weapon coatings (+ armor resists)
+5. OTA-650–655 — fusion picker + crafting-screen overhaul
+6. OTA-668–673 — mission tracking + universal contract pause
+7. OTA-675/690/707 — throwables & bandolier overhaul
+8. OTA-691–692 — faction sigils
+9. OTA-710–712 — gesture intent + provokable encounters
+10. OTA-716–724/731 — found-only recipe discovery + Rare/Legendary expansion
+11. OTA-726–730 — economy/gold-sink wave (paid services, premium stock)
+12. OTA-~740–789 — the Hidden Market (square nav, all-faction brokering, rotation)
+13. OTA-795 — dodge rework (opposed-contest AC-bypass gamble)
+14. OTA-806–809 — social rework: parley + menace
+15. OTA-815–819 — engaging-combat rework (scaling, packs, per-spawn weaknesses)
+16. OTA-835 — race abilities become real mechanics
+17. OTA-836–838 — visible-depth QoL (tap-to-explain, codex/bestiary)
+18. OTA-843–845 — emergent depth (Chronicle, World Pulse, The Fallen)
+19. OTA-847 — stealth system
+20. OTA-849–868 — the LIVING WORLD war arc
+21. OTA-869–870 — authored-questline content sprint (all 9 factions arced)
+22. OTA-910–915 — the Great Climbs + Skyreacher drop + the Aetherkin
+23. OTA-927–930 — the POWER rating + lens slot
+24. OTA-947/959 — combat rebalance (defense de-runaway + legibility)
+25. OTA-960–967 — loot audit + boss spoils table
+26. OTA-973–978 — real-heights climbing arc + reach
+27. OTA-985–989 — escort missions

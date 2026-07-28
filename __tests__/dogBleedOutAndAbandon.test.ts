@@ -71,7 +71,7 @@ describe('tickDogStatus — bleed-out', () => {
     const h = harness(makeDog({ status: 'waiting_at_base', hp: 0, downedAtHour: 0 }), DOG_BLEED_OUT_HOURS / 2);
     tickDogStatus(h.get, h.set);
     expect(h.dog().bleedWarned).toBe(true);
-    expect(h.text()).toMatch(/gone forever/i);
+    expect(h.text()).toMatch(/gone for good/i); // OTA-938 — staged bleed-out warning text
     // A second tick at the same time must not re-fire the reminder.
     const before = h.logs.length;
     tickDogStatus(h.get, h.set);

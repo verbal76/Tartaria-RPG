@@ -15,6 +15,15 @@
 // as a scene feature → salvage redirect path.
 
 const ALIAS_MAP: Record<string, string> = {
+  // OTA-961 — loot-name near-duplicate: the Aetheric Phoenix authored 'Aetherwing' while
+  // the catalog's material is 'Aether Wing'; the split minted a phantom Common item.
+  'aetherwing': 'Aether Wing',
+  // OTA-962 — the Aetheric<->Aether prefix family: the only PROVABLE loot-name synonyms
+  // (same words modulo the prefix). Everything else uncatalogued stays a rarity-priced
+  // trophy — sharing one word does not make two items the same thing.
+  'aetheric residue': 'Aether Residue',
+  'aetheric crystal': 'Aether Crystal',
+
   // Light / illumination — all variants collapse to Aetheric Torch
   'lantern': 'Aetheric Torch',
   'aether lantern': 'Aetheric Torch',

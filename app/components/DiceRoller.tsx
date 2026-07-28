@@ -167,7 +167,7 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
       {/* Action button (pre-roll only — post-roll auto-resolves) */}
       {rolledValues === null ? (
         <Animated.View style={{ transform: [{ scale }] }}>
-          <TouchableOpacity style={styles.rollBtn} onPress={handleRoll} activeOpacity={0.7}>
+          <TouchableOpacity accessibilityRole="button" style={styles.rollBtn} onPress={handleRoll} activeOpacity={0.7}>
             <Text style={styles.rollBtnText}>ROLL {diceLabel.toUpperCase()}</Text>
           </TouchableOpacity>
         </Animated.View>
@@ -183,7 +183,7 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
         </View>
       )}
 
-      <TouchableOpacity onPress={onCancel} style={styles.cancelBtn}>
+      <TouchableOpacity accessibilityRole="button" onPress={onCancel} style={styles.cancelBtn}>
         <Text style={styles.cancelText}>cancel</Text>
       </TouchableOpacity>
     </View>
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   stepCount: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 11,
   },
   rollLabel: {
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   context: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 12,
     marginBottom: 4,
   },
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   targetText: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 13,
     letterSpacing: 1,
   },
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   bonusLine: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 13,
   },
   divider: {
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   advancingHintText: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 12,
     fontStyle: 'italic',
     letterSpacing: 1,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   cancelText: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 11,
     letterSpacing: 1,
   },

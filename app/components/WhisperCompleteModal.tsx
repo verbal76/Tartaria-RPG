@@ -39,10 +39,10 @@ export function WhisperCompleteModal({ visible, title, lines, rewards, onClose }
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.scrim}>
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>✦✦ CONTRACT COMPLETE</Text>
+              <Text style={styles.title} accessibilityRole="header">✦✦ CONTRACT COMPLETE</Text>
               <Text style={styles.subtitle}>{title}</Text>
               <View style={styles.rule} />
 
@@ -66,6 +66,7 @@ export function WhisperCompleteModal({ visible, title, lines, rewards, onClose }
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
                   onPress={onClose}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextPrimary}>CLOSE</Text>
                 </Pressable>

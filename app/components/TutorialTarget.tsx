@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, type ViewProps } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { useReduceMotion } from '../state/accessibility';
 import { TUTORIAL_STEPS, type HighlightArea } from './tutorialSteps';
 
 interface Props extends ViewProps {
@@ -19,7 +20,10 @@ export function TutorialTarget({ area, children, style, ...rest }: Props) {
   const tutorialStep = useGameStore((s) => s.tutorialStep);
   const step = tutorialStep !== null ? TUTORIAL_STEPS[tutorialStep] ?? null : null;
   const isActive = !!step && step.area === area;
-  const shouldPulse = isActive && step?.pulse === true;
+  // OTA-898 (SA-6) — reduce-motion holds the highlight as a static glow (the
+  // ring still marks the target; only the looping pulse is dropped).
+  const reduceMotion = useReduceMotion();
+  const shouldPulse = isActive && step?.pulse === true && !reduceMotion;
 
   const pulse = useRef(new Animated.Value(0)).current;
 

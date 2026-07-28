@@ -24,7 +24,11 @@ export interface TitleChallengeDef {
   titleId: string;
   locationId: string;
   /** TitleProgress counter bumped on success. */
-  counter: 'languageLearned' | 'relicsPreserved';
+  counter: 'languageLearned' | 'relicsPreserved' | 'settlementsDefended';
+  /** Optional per-challenge success / failure narration (falls back to the
+   *  built-in Speaker/Warden lines in the store handler when omitted). */
+  successLine?: string;
+  failLine?: string;
   /** Human label for the perk (display only — the perk itself lives in titles.ts). */
   perkLabel: string;
   /** The required item. `recoverOnScout` = handed to the player for free when
@@ -80,6 +84,21 @@ export const TITLE_CHALLENGES: Record<string, TitleChallengeDef> = {
     check: { stat: 'intelligence', dc: 15, statLabel: 'Engineering', trialLabel: 'bracing the nave' },
     scoutVerb: /\b(examine|inspect|study|assess|look\s+at)\b.*\b(cathedral|nave|ruin|collapse|structure|pillar|pillars)\b/i,
     attemptVerb: /\b(stabilize|stabilise|shore|brace|preserve|save|repair)\b.*\b(cathedral|nave|ruin|structure)\b|^(stabilize|shore\s+up|brace\s+the\s+nave)\b/i,
+  },
+  // arb54 — Protector of the Forgotten (deep True-Tartarian enclave under siege).
+  // SKILL-gated, no material: a single d20 + STR to hold the breach. One-shot.
+  defense_of_the_enclave: {
+    id: 'defense_of_the_enclave',
+    titleId: 'protector_of_the_forgotten',
+    locationId: 'tartarian_enclave',
+    counter: 'settlementsDefended',
+    perkLabel: 'Ruins Defense Bonus',
+    requirement: { itemName: '', quantity: 0, recoverOnScout: false, consumeOnAttempt: false, hint: '' },
+    check: { stat: 'strength', dc: 15, statLabel: 'STR', trialLabel: 'holding the breach against the raiders' },
+    scoutVerb: /\b(examine|inspect|assess|scout|survey|look\s+at)\b.*\b(enclave|settlement|wall|walls|gate|breach|siege|defense|defence|raiders)\b/i,
+    attemptVerb: /\b(defend|hold|protect|rally|man|guard)\b.*\b(enclave|line|wall|walls|gate|settlement|breach|defense|defence)\b|^(defend|hold\s+the\s+line|rally\s+the\s+defense|rally\s+the\s+defence)\b/i,
+    successLine: "You hold the breach. When the raiders break and run, the enclave still stands — and its elders learn the name of the one who would not move.",
+    failLine: "The line buckles and the gate gives. You drag the wounded clear as fire takes the wall behind you — there was only ever the one stand to make here.",
   },
 };
 

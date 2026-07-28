@@ -187,10 +187,10 @@
             },
             {
               "id": "buried_strip_mall",
-              "name": "Buried Strip Mall",
-              "environmental_description": "A row of storefronts, plate glass long since shattered, signage half-erased. The hardware shop has been picked over but not stripped — somebody comes back for these supplies.",
+              "name": "Buried Market Row",
+              "environmental_description": "A row of shopfronts, glass long since shattered, signage half-erased. The tool-monger\u2019s stall has been picked over but not stripped — somebody comes back for these supplies.",
               "exits": [
-                "out to the parking lot",
+                "out to the wagon court",
                 "behind the counter",
                 "through the loading dock"
               ],
@@ -236,6 +236,7 @@
         {
           "id": "aetheric_power_grid",
           "name": "Aetheric Power Grid",
+          "indoor": true,
           "description": "A subterranean lattice of Aetherstone conduits — the empire's nervous system, still humming five centuries after burial.",
           "microMicroLocations": [
             {
@@ -307,6 +308,7 @@
         {
           "id": "giantkin_mausoleum",
           "name": "Giant-Kin Mausoleum",
+          "indoor": true,
           "description": "A burial vault sized for a race two stories tall. The Tartarians worshipped their giants. The dead remember.",
           "microMicroLocations": [
             {
@@ -782,6 +784,7 @@
         {
           "id": "true_tartarian_catacombs",
           "name": "True Tartarian Catacombs",
+          "indoor": true,
           "description": "Memorial passages of the Entombed — the honored dead, sealed in their homes during the flood. The True Tartarians tunnel through carefully, reburying every bone in the wall shelves.",
           "microMicroLocations": [
             {
@@ -851,6 +854,7 @@
         {
           "id": "aetherkin_nesting",
           "name": "Aetherkin Nesting Grounds",
+          "indoor": true,
           "description": "Where the reanimated dead try to return to their Aetheric rest. Disturb the mud and they wake — and they are not patient with the living.",
           "microMicroLocations": [
             {
@@ -916,6 +920,7 @@
         {
           "id": "underground_markets",
           "name": "Underground Markets",
+          "indoor": true,
           "description": "Hidden trade halls of the True Tartarians — Varakush Forum, smoke-thick cantinas, fences who deal in surface contraband.",
           "microMicroLocations": [
             {

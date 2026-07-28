@@ -20,7 +20,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { endingLine, LOST_CAPITAL_LOCATIONS } from '../engine/mainQuest';
+import { endingLine, LOST_CAPITAL_LOCATIONS, LOST_CAPITAL_NAMES } from '../engine/mainQuest';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 
@@ -34,11 +34,10 @@ function factionName(id: string): string {
   return factions.find((f) => f.id === id)?.name ?? id;
 }
 function capitalLabel(id: string): string {
-  const map: Record<string, string> = {
-    asgardar: 'Asgardar', samarran: 'Samarran', nimari: 'Nimari',
-    drakova: 'Drakova', voronov: 'Voronov',
-  };
-  return map[id] ?? id;
+  // OTA-871 — use the canonical export from mainQuest so the ending recap
+  // shows real names for all nine Lost Capitals (the local map only listed
+  // the original five, so the four OTA-052 Capitals fell back to raw ids).
+  return LOST_CAPITAL_NAMES[id] ?? id;
 }
 
 // OTA-151 — homeward narrative. Faction-neutral wording so it lands
@@ -90,7 +89,7 @@ export function EndingScreen() {
     return (
       <View style={styles.container}>
         <Text style={styles.placeholder}>No ending recorded. Returning to title.</Text>
-        <TouchableOpacity style={styles.btn} onPress={() => setScreen('title')} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.btn} onPress={() => setScreen('title')} activeOpacity={0.7} accessibilityRole="button">
           <Text style={styles.btnText}>BACK TO TITLE</Text>
         </TouchableOpacity>
       </View>
@@ -114,14 +113,14 @@ export function EndingScreen() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={[styles.tag, { color: endingColor }]}>YOU CHOSE</Text>
-        <Text style={[styles.endingLabel, { color: endingColor }]}>{endingLabel}</Text>
+        <Text style={[styles.endingLabel, { color: endingColor }]} accessibilityRole="header">{endingLabel}</Text>
         <View style={styles.rule} />
 
         <Text style={styles.body}>{line}</Text>
 
         <View style={[styles.rule, { marginTop: 28 }]} />
 
-        <Text style={styles.tag}>RUN SUMMARY</Text>
+        <Text style={styles.tag} accessibilityRole="header">RUN SUMMARY</Text>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryKey}>Character</Text>
           <Text style={styles.summaryVal}>{player.name}</Text>
@@ -157,13 +156,14 @@ export function EndingScreen() {
         </View>
 
         <View style={styles.btnRow}>
-          <TouchableOpacity style={styles.btn} onPress={() => setScreen('title')} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.btn} onPress={() => setScreen('title')} activeOpacity={0.7} accessibilityRole="button">
             <Text style={styles.btnText}>BACK TO TITLE</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.btn, styles.btnPrimary]}
             onPress={() => setStage('homeward')}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={styles.btnText}>HEAD HOME ▸</Text>
           </TouchableOpacity>
@@ -217,6 +217,8 @@ function HomewardSplash({
         style={styles.skipOverlay}
         onPress={onDone}
         activeOpacity={1}
+        accessibilityRole="button"
+        accessibilityLabel="Skip to title screen"
       />
     </View>
   );
@@ -225,7 +227,7 @@ function HomewardSplash({
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent', padding: 16 },
   scroll: { paddingBottom: 32 },
-  tag: { color: '#7a705c', fontSize: 11, letterSpacing: 4, fontWeight: '700', marginTop: 16 },
+  tag: { color: '#a2977b', fontSize: 11, letterSpacing: 4, fontWeight: '700', marginTop: 16 },
   endingLabel: { fontSize: 36, letterSpacing: 6, fontWeight: '800', marginTop: 8 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 12, marginBottom: 12 },
   body: { color: '#e6d8b3', fontSize: 14, lineHeight: 22 },
@@ -237,7 +239,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#1a1714',
     borderBottomWidth: 1,
   },
-  summaryKey: { color: '#7a705c', fontSize: 12, letterSpacing: 1 },
+  summaryKey: { color: '#a2977b', fontSize: 12, letterSpacing: 1 },
   summaryVal: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
   coresList: { color: '#cdbf99', fontSize: 11, fontStyle: 'italic', marginTop: 6 },
   btnRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 24, gap: 8 },
@@ -252,7 +254,7 @@ const styles = StyleSheet.create({
   },
   btnPrimary: { backgroundColor: '#2a1f12' },
   btnText: { color: '#c9a86a', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80, fontSize: 14 },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80, fontSize: 14 },
   // OTA-151 — Homeward splash. Full-black backdrop, large prose
   // centered vertically, slow fade.
   homewardContainer: {
@@ -270,7 +272,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   homewardTag: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 18,
     letterSpacing: 8,
     textAlign: 'center',

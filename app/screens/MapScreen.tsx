@@ -38,6 +38,7 @@ import {
   type GestureResponderEvent,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 // OTA-171 — Location + locationsData are already imported below for
 // the existing LOCATIONS const; reused here for the Places list
 // panel so a player can tap any known location and start travel
@@ -657,21 +658,29 @@ export function MapScreen() {
 
   return (
     <View style={styles.container}>
+      <FirstTimeHint
+        id="map_first_open"
+        title="The map"
+        body="Tap a known place to set a course; travel burns stamina and time. Your dot shows where you stand."
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>ATLAS</Text>
+        <Text style={styles.title} accessibilityRole="header">ATLAS</Text>
         <TouchableOpacity
           onPress={resetTransform}
           style={styles.resetBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Reset map zoom and position"
         >
           <Text style={styles.resetText}>RESET</Text>
         </TouchableOpacity>
@@ -695,6 +704,8 @@ export function MapScreen() {
             source={mapSource}
             style={styles.atlas}
             resizeMode="contain"
+            accessibilityRole="image"
+            accessibilityLabel={showingOutpost ? 'Outpost interior map' : 'World atlas map'}
           />
           {/* OTA-498 — the Hidden Market. It has no icon painted into the atlas
               art, so this overlay both marks it and explains the blank: a
@@ -754,7 +765,7 @@ export function MapScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerHere}>WHERE YOU ARE</Text>
+        <Text style={styles.footerHere} accessibilityRole="header">WHERE YOU ARE</Text>
         <Text style={styles.footerWhere}>{whereLine}</Text>
         {whereaboutsLine ? (
           <Text style={styles.footerNear}>{whereaboutsLine}</Text>
@@ -787,7 +798,7 @@ export function MapScreen() {
           info / confirm path; this just gives a fast alternative
           one tap from the home screen's MAP button. */}
       <View style={styles.placesPanel}>
-        <Text style={styles.placesPanelTitle}>TRAVEL TO ▸ tap a place</Text>
+        <Text style={styles.placesPanelTitle} accessibilityRole="header">TRAVEL TO ▸ tap a place</Text>
         <ScrollView
           style={styles.placesScroll}
           contentContainerStyle={styles.placesContent}
@@ -803,7 +814,7 @@ export function MapScreen() {
               so each contract carries its own name + type. */}
           {contractMarkers.length > 0 && (
             <>
-              <Text style={styles.contractSectionTitle}>◆ OPEN CONTRACTS</Text>
+              <Text style={styles.contractSectionTitle} accessibilityRole="header">◆ OPEN CONTRACTS</Text>
               {contractMarkers.map((cm) => {
                 const info = placesView.find((p) => p.id === cm.anchorId);
                 const isHere = player?.currentLocationId === cm.anchorId;
@@ -813,6 +824,7 @@ export function MapScreen() {
                     key={cm.key}
                     style={[styles.placeRow, styles.contractRow, isHere && styles.placeRowHere]}
                     activeOpacity={0.7}
+                    accessibilityRole="button"
                     onPress={() => {
                       if (!player) return;
                       // OTA-616 — standing on the contract's anchor (its turn-in
@@ -878,7 +890,7 @@ export function MapScreen() {
                   </TouchableOpacity>
                 );
               })}
-              <Text style={styles.contractSectionTitle}>ALL PLACES</Text>
+              <Text style={styles.contractSectionTitle} accessibilityRole="header">ALL PLACES</Text>
             </>
           )}
           {placesView.map((p) => {
@@ -899,6 +911,8 @@ export function MapScreen() {
                 style={[styles.placeRow, isHere && styles.placeRowHere]}
                 activeOpacity={isHere ? 1 : 0.7}
                 disabled={isHere}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: isHere }}
                 onPress={() => {
                   if (!player) return;
                   if (player.hubRoomId) {
@@ -987,8 +1001,8 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: 'center',
   },
-  resetText: { color: '#7a705c', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  resetText: { color: '#a2977b', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
 
   imageBox: {
     // OTA 055 — flex-filled. The previous aspect-locked sizing
@@ -1154,7 +1168,7 @@ const styles = StyleSheet.create({
   placeRowRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   placeName: { color: '#e6d8b3', fontSize: 13, fontWeight: '600' },
   placeNameHere: { color: '#e07a5f' },
-  placeType: { color: '#7a705c', fontSize: 10, marginTop: 1 },
+  placeType: { color: '#a2977b', fontSize: 10, marginTop: 1 },
   placeDanger: { color: '#cdbf99', fontSize: 10, letterSpacing: 0.5 },
   placeHereTag: { color: '#e07a5f', fontSize: 9, letterSpacing: 1.5, fontWeight: '700' },
   placeArrow: { color: '#c9a86a', fontSize: 16, fontWeight: '700' },

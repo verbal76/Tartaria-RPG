@@ -1,6 +1,8 @@
-// arb37 — food / rest split. Eating heals HP (food → health, spammable to
-// full); rest restores STAMINA only and never HP. This keeps food markets
-// and food lore valuable: you top your health bar by eating, not sleeping.
+// arb37 — food / rest split, as REVISED by OTA-1001 (#120). Eating still heals HP
+// and is still the fast, spammable route to full. Rest now also knits a LIGHT
+// share of max HP (~15% for a full sleep) instead of none at all: sleeping off
+// a wound is slow and costs hours, so food markets and food lore stay
+// valuable, but a player with no consumables is no longer stuck at 8 HP.
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
@@ -68,27 +70,40 @@ async function boot() {
 describe('arb37 — food heals HP, rest restores stamina', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
-  it('rest restores stamina but never HP', async () => {
+  it('rest restores stamina AND knits a light share of HP', async () => {
     const store = await boot();
     const p = store.getState().player!;
     store.setState({ player: { ...p, hp: 10, hpMax: 30, stamina: 0, staminaMax: 10, corruption: 0 } });
     store.getState().submitPlayerAction('rest');
     const after = store.getState().player!;
     expect(after.stamina).toBeGreaterThan(0); // stamina recovered
-    expect(after.hp).toBe(10);                 // HP untouched by rest
+    // OTA-1001 — #120: ~15% of max HP per full sleep — real, but light.
+    expect(after.hp).toBeGreaterThan(10);
+    expect(after.hp).toBeLessThanOrEqual(10 + Math.ceil(30 * 0.15));
   });
 
-  it('resting while wounded but full-stamina is refused and points you at food', async () => {
+  it('being wounded is now a reason to sleep, even on full stamina', async () => {
     const store = await boot();
     const p = store.getState().player!;
     store.setState({ player: { ...p, hp: 5, hpMax: 30, stamina: 10, staminaMax: 10, corruption: 0 } });
+    store.getState().submitPlayerAction('rest');
+    const after = store.getState().player!;
+    // OTA-1001 — #120: the old refusal ("sleep won't knit wounds") is superseded.
+    expect(after.hp).toBeGreaterThan(5);
+    expect(after.stamina).toBe(10); // nothing to restore there
+  });
+
+  it('a whole, rested, uncorrupted player is still told to save the hours', async () => {
+    const store = await boot();
+    const p = store.getState().player!;
+    store.setState({ player: { ...p, hp: 30, hpMax: 30, stamina: 10, staminaMax: 10, corruption: 0 } });
     const logLenBefore = store.getState().gameLog.length;
     store.getState().submitPlayerAction('rest');
     const after = store.getState().player!;
-    expect(after.hp).toBe(5);       // not healed
-    expect(after.stamina).toBe(10); // nothing to restore
+    expect(after.hp).toBe(30);
+    expect(after.stamina).toBe(10);
     const newLogs = store.getState().gameLog.slice(logLenBefore).map((e) => e.text).join('\n');
-    expect(newLogs).toMatch(/eat for that|knit wounds/i);
+    expect(newLogs).toMatch(/save the hours/i);
   });
 
   it('eating food heals HP', async () => {

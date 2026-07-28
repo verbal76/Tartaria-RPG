@@ -69,6 +69,8 @@ export function NumberStepper({
   return (
     <View style={styles.row}>
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Decrease"
         onPress={() => bump(-step)}
         style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
       >
@@ -88,7 +90,7 @@ export function NumberStepper({
           selectTextOnFocus
         />
       ) : (
-        <Pressable onPress={onPressNumber} style={styles.display}>
+        <Pressable accessibilityRole="button" onPress={onPressNumber} style={styles.display}>
           <Text style={styles.displayText}>
             {value.toFixed(decimals)}{suffix}
           </Text>
@@ -96,6 +98,8 @@ export function NumberStepper({
       )}
 
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Increase"
         onPress={() => bump(step)}
         style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
       >

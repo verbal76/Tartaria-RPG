@@ -10611,8 +10611,15 @@
 //   - When the next AAB ships, app.json expo.version flips up to
 //     DISPLAY_VERSION and the two are synced again.
 //
-// Bump this for marketing-visible version changes.
-export const DISPLAY_VERSION = '4.1.0';
+// OTA-992 — REACTIVATED 2026-07-26 (owner: "let's reactivate it and catch it
+// up"). This is the GAME version the player sees (character-select footer +
+// About) — a knowledge tracker, not a build number. It froze at 4.1.0 back at
+// OTA-602; the catch-up replayed the changelog through VERSION.md's rules:
+// 27 significant feature waves since the freeze -> MINOR 28, then PATCH counts
+// OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
+// RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
+// closes a significant feature wave · MAJOR only on a milestone/lineage jump.
+export const DISPLAY_VERSION = '4.28.46';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -15935,4 +15942,2881 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Aether Dust). isDiscoverableRecipe now excludes any result that IS a material (findMaterialByName) — the
 // refine chain is always craftable again; Rare/Legendary weapons/armor/relics/consumables stay found-only.
 // Recipe-discovery + craftableTabCounts tests reworked off the Mudstone example onto a non-material Rare.
-export const OTA_BUILD_ID = '2026-07-09-743-hidden-market-is-peaceful';
+// OTA-790 — Arbiter TTS tail clip: the last fraction of EVERY spoken line was cut off
+// (player report, Pixel 10 Pro XL, bundled Kokoro). Three stacked causes in
+// PiperTTSManager.playPcm: trimSilenceLeadTrail shaved the trailing decay to within 8ms of the
+// last loud sample; only a 70ms silent tail pad followed it; and didJustFinish → immediate
+// unloadAsync released the player while Android's hardware AudioTrack still held ~100-250ms of
+// "finished" audio. Fix: defer the release 300ms (queue pacing unchanged — the promise still
+// resolves on didJustFinish), raise the tail pad 70 → 200ms, and widen the trailing trim guard
+// 8 → 40ms so a soft natural decay survives the trim.
+// OTA-791 — combat blocks the trade screen (visibly). A resonance story hook spawned combat
+// while the market vendor was still attached to the scene; the player opened TRADE unaware the
+// fight had started ("I never knew I was in combat"), every sell bounced off the arb166 guard,
+// and the guard's "Not while you're in a fight" lines went to a log the vendor screen never
+// shows. Now setScreen('vendor') refuses while enemies are live (refusal logged to the feed the
+// player IS looking at, enemy card stays in view), and VendorScreen ejects to exploration if a
+// fight starts mid-trade (hook spawn, caught stealing). +2 tests (vendorCombatGuard).
+// OTA-792 — companions follow the dice + wild-water balance (playtest log 2026-07-13).
+// (1) Companion rolls honor the natural-1/natural-20 rule like every other d20 in the game:
+// the golem's attack (the log showed a nat-20 dealing 13 while an ordinary 12 dealt 36 — no
+// crit path existed) and the enemy's retaliation vs the golem now fumble on nat-1 and crit
+// on nat-20 (double base swing / second damage roll — mirrors the dog-bite and enemy-vs-dog
+// treatment; the dog already followed the rule). (2) Wild water reined in: a bare-handed
+// drink from a scene water source is ONE per location visit, adds +1 corruption (untreated
+// water carries what the ground put in it), and the Arbiter warns after the sip. Filling a
+// water bottle (also one refill per visit) runs it through the bottle's built-in filter, so
+// bottled water stays clean and unlimited. Rationale: rest recovers 1 stamina/hour while the
+// old cup-hands loop gave +3 per 5 min forever — 36:1 over sleeping, and the log showed the
+// loop in live use. golemCompanion tests pin the dice (nat rules made guaranteed-hit setups
+// flaky).
+// OTA-793 — ambient narration drops second-person openers. The ambient Qwen musing is the
+// narrator's OWN idle observation, but the model sometimes writes it as world narration
+// ("You step back, surveying the cobweb-infested alleyways...") — and in the observed case
+// the scene it described wasn't the player's scene at all (a flooded-house kitchen). The
+// ambient sentence filter now also removes sentences opening with "You"; if nothing
+// survives, ambient stays silent (it has no template fallback). Reactive narration is
+// untouched — second person is legitimate there.
+// OTA-794 — the OTA-784 one-time fresh-market repair is removed (user call: it existed to
+// reset saves after a failed OTA, and the affected save has been repaired). A save at the
+// Hidden Market now loads exactly where it saved; the market auto-enter is unconditional
+// again; the _freshMarketEntry784 / _skipMarketAutoEnterOnce player flags are gone (old
+// saves may still carry the keys — ignored).
+// OTA-795 — DODGE reworked into an AC-bypass gamble; dog DISTRACT gets a scaled DC and a
+// failure cost (user design call, replaces the landed-hit-only parry + instant riposte).
+// DODGE: while the stance is up, the enemy's swing resolves as an OPPOSED CONTEST (d20+DEX
+// vs its attack total) instead of vs your AC. Win → take nothing + PERFECT OPENING: your
+// next attack rolls double damage dice (consumed by that swing, hit or miss — crit stacks
+// to 4× dice); lose → you dodged INTO it: the blow lands regardless of AC for 2× damage.
+// Enemy fumble = free opening; nat-20/nat-1 auto-win/lose the contest; DEX (+stealth-gear
+// stealth) training kept; the boxing exception + 2-durability stance cost retired. This
+// finally makes dodge live at high AC — an untouchable tank now gambles that immunity for
+// a 2× window. DISTRACT: DC is 8 + the target's ability points (was flat 12 — a trained
+// dog auto-passed); a FAILED feint redirects that enemy's counter onto the DOG instead of
+// the player. Action-reference help text updated. (defensiveTurnAdvances' 3 failures are
+// the long-standing pre-existing wording drift, verified identical before this change.)
+// OTA-796 — exploit-sweep fixes (multi-agent audit; shared across all three lines).
+// COMBAT: (1) dodge now costs 1 stamina + 6 min like its OTA-611 siblings and
+// trains DEX/STE for only the first 3 wins per scene visit — closes the
+// zero-cost unbounded dodge-farm. (2) A failed dodge no longer stacks the
+// enemy's nat-20 crit reroll under its ×2, so dodging vs a crit is no longer 4×
+// deadly. (3) Dog distract DC floored at 12 with nat-1/nat-20 rules, so a
+// trained dog can't auto-succeed with no failure risk. (4) ONE shared
+// isRangedEnemy() classifier for the reach gate AND full-cover — 14 Laser/
+// Breath/Venom bestiary entries could never counter at 'far' and were kited
+// risk-free. (5) Boss regenerators heal once per round, not per swing. (6)
+// One-shot combat buffs (perfect_opening/stealthed/ready/distract/aiming) are
+// consumed when the ATTACK RESOLVES, not at prompt build — CANCEL no longer
+// eats your buff, and cancel+re-attack no longer sheds the 'surprised' penalty.
+// ECONOMY/ITEMS: (7) scrapping an equipped hands/cloak/ring2/ring3 item no
+// longer leaves a ghost granting AC/stats forever. (8) Two-handed auto-displace
+// strips the displaced weapon's HP bonus — closes an unbounded hpMax/heal loop.
+// SURVIVAL: (9) water sources match whole words, not substrings ('spool'/
+// 'stairwell' are no longer drinkable); (10) filling a bottle costs 5 min.
+// QUESTS: (11) a hunt's final boss must be KILLED to complete — spawning it no
+// longer marks it turn-inable. LOOP: (12) the MiniLM investigate fallback can't
+// self-dispatch 'search the <location name>' forever (unbounded CPU/feed/DOT).
+// OTA-797 — Qwen dormancy watchdog now revives from a FAILED reinit, not just the
+// narrow dormant case. Root cause (2026-07-13 device log: one "detected dormant"
+// line at 18:23, then ~4.5h of every Arbiter line reason=qwen-not-ready): the
+// watchdog only re-kicked when isDormant() was true (status==='ready' but the
+// native runtime OOM-died). forceReinitialize() resets status idle→loading→
+// then 'ready' (ok) or 'failed' (reload throws under memory pressure). One failed
+// revival left status='failed', where isDormant() is FALSE, so the watchdog's
+// `if (!isDormant()) return` short-circuited forever and never retried. Now it
+// revives from ANY not-ready/not-progressing state (idle/failed/dormant), retries
+// every 60s (a transient memory failure no longer strands Qwen for the session),
+// unwedges a reinit hung in loading past 150s, and mirrors the revived status onto
+// the store so About/debug don't stay stuck on 'failed'. +1 regression test.
+// OTA-798 — Core Guardians now show weakness/resistance in combat + the EnemyPanel.
+// Player asked twice (2026-07-13 log) why the Core Guardian showed no weakness or
+// strength — only flat damage. Cause: the 9 Guardians' snake_case type
+// (aether_construct / mud_revenant) isn't in crafting.ts TYPE_RESISTANCE_MAP, and
+// their signature traits weren't resist:/vulnerable: tags — so every hit resolved
+// as 'normal' and no "Weakness exposed" line ever fired. Each Guardian now carries
+// an authored, thematic vulnerable:<type> + resist:<type> trait (crack the plate →
+// bludgeoning, dry the silt → burn, water conducts → electrical, cut the seal →
+// slashing, thaw the vigil → burn, …; the aether-born broadly resist aetheric),
+// which drives both the in-combat multiplier lines and traitDefenses in the panel.
+// HAL + golem only — engine_Dev has no Guardians (Tartaria main-quest content).
+// OTA-799 — Climbing rope is now usable down to its LAST point + warns before it
+// gives out. Player report (2026-07-13 log): "rope should fray… fire a warning to
+// you and not fail till it actually hits zero. what's the point of having 15 points
+// left if you die anyway?" The old guard refused/snapped at durability ≤
+// ROPE_WEAR_PER_TIER (15) — stranding a whole climb's worth of rope AND dropping
+// the player for fall damage with no warning. Now: (1) only a TRULY SPENT rope
+// (≤ 0) refuses/gives out; a low-but-usable rope climbs. (2) when the last pull
+// wears it to 0 it breaks GRACEFULLY at the top — no fall, "the last of the line
+// coils dead at your feet." (3) a fraying warning fires while the rope is low
+// (≤ one climb of durability left) so it's never a surprise. climbReadiness (the
+// CLIMB button colour/haptic) mirrors the new ≤ 0 rule so button and engine agree.
+// Shared engine code — ships to all three lines.
+// OTA-800 — punch-list A1+A2: small-bug closes + item-dupe closes (exploit sweep).
+// A1 SMALL BUGS: (1) enemy DOT statuses (poison/acid/corruption/burn/electrical/
+// infection/typed) now tick once per COMBAT ROUND, not only on `attack` — a
+// poisoned enemy kept eating poison while the player dodged/moved/commanded a
+// companion (hoisted the tick into runEnemyGroupCounters; the attack path still
+// ticks pre-swing and passes skipDotTick so it can't double). (2) Hard training
+// ceiling MAX_TRAINED_STAT=30 on the player + dog + golem twins — stats trained
+// forever at 0.1/use, so a patient grind broke damage/AC/DC scaling (and the
+// golem's uncapped power/HP). (3) `jump at <bogus text>` no longer trains DEX —
+// it now needs a RESOLVED scene noun (ambient/hook/enemy/vendor), closing the
+// stamina→DEX grind the OTA-611 bare-jump guard missed. (4) defeatedEnemies is
+// now a de-duplicated distinct-name set (self-heals legacy dup-farmed saves) so
+// it can't grow unbounded → save bloat. (5) Wild-water re-arm moved off the
+// per-scene one-shot flags (which reset on leave+return, so two adjacent outdoor
+// water tiles could be bounced for infinite drinks/refills) onto worldMemory,
+// keyed per SOURCE on game-hours (WATER_REARM_HOURS=6). A2 ITEM DUPES: (6) dropped-
+// item PICKUP now routes through grantItem — the old name-keyed merge laundered a
+// worn/coated/rolled instance into a full same-name stack (free repair / coating
+// dupe); and it decrements the exact dropped instance by id. (7) applyCoating (and
+// armor) on a STACK peels ONE unit off to coat, instead of coating all N for a
+// single vial. (8) The equipped throwable consumed on a thrown attack resolves by
+// the equipped INSTANCE id (mainId/offId), not first-by-name — closing infinite
+// coated-throw + bandolier double-spend. Shared engine code — all three lines;
+// engine_Dev's water refusal lines use getNarratorName() (lore-neutral).
+// OTA-801 — punch-list group C (polish). C1 FUSION UX: firing the Crucible with
+// reserved-but-insufficient pieces (too few, or too alike) now OPENS THE PICKER —
+// which surfaces each piece's material bucket + a live "N materials → need 3+
+// DIFFERENT" readout — instead of dead-ending on a repeated arbiter refusal
+// (material buckets in the picker itself were already OTA-679; repeat-identical
+// refusals were already deduped on the arbiter channel). C2 FUSED-WEAPON NAMING:
+// a forged WEAPON whose Qwen name ends in a soft / non-weapon noun ("Aetheric
+// Thread", "Resonant Veil") is now rejected so the deterministic weapon pool
+// (Cleaver / Edge / Reaver / …) names it; migrateFusedName heals such names on
+// load. C3 POST-BOSS GRACE: a boss kill stamps a game-hours grace window
+// (POST_BOSS_GRACE_HOURS=3); beginScene suppresses arrival encounters while it
+// holds, so stepping out of a just-cleared outpost doesn't drop a fresh ambush
+// mid-loot. C4 MiniLM ANCHORS: reworded the 6 EMOTION_ANCHORS to short, distinct,
+// LORE-NEUTRAL sentences (no shared "ruins/Aetheric" boilerplate) so cosine
+// similarity discriminates instead of smearing across labels — and the neutral
+// wording keeps the engine_Dev copy identical. Shared engine code — all three lines.
+// OTA-802 — punch-list B1 (economy re-tiering; per the user's design calls). (a)
+// SELF-CRAFTED SELL CAP: a self-crafted item never sells above the summed raw-sell
+// value of its recipe ingredients (crafting-to-sell is break-even, not a profit
+// loop) — a Legendary result gets a slight ×1.25 bump. (b) BOTTLENECK MATS: fused
+// items stay scrappable (the intended crafting-materials market), but the fuel
+// mats they yield — Golem Core, Aetheric Shard/Dust, Aether Crystal, Aetheric
+// Cloth, Mudstone — now price as near-worthless AT VENDORS (flat 3 TC) so they're
+// valuable to CRAFT/summon with, not as a fuse→scrap→sell money pump. (c) SELL ≤
+// BUY: nothing sells back above the cheapest realistic buy for its rarity
+// (RARITY_BUY_FLOOR: Common 5 / Uncommon 14 / Rare 40 / Legendary 112), closing
+// cross-stall arbitrage (the reported Common-armor sell-11 vs buy-8). (d) GIFT
+// VALUE-GATE: gifting a near-worthless item is politely declined (no rep, no CHA,
+// not consumed); rep now scales with the gift's worth (~30 TC ≈ the old +5, up to
+// +8) instead of a flat +5 per junk item. Shared engine code — all three lines.
+// OTA-803 — GIFTING REMOVED (per the user). Faction standing is earned through
+// mission completions + sigil/pendant turn-ins; gifting vendors loot for rep
+// (added +5, then value-scaled in 802's B1d) was a side door that undercut that
+// design and was undiscoverable (no button, typed-only). The whole mechanic is
+// gone: the `gift` Intent, the parser verb table entry + verb-frame, the
+// giftToVendor store action + its `case 'gift'` handler, the LLM-parser intent
+// row, and the stray 'gift' mentions in help/hint text + the inventory modal.
+// (The buy-from-vendor +1 rep side door is left as-is unless the user asks.)
+// Shared engine code — all three lines.
+// OTA-804 — BUY-FOR-REP greatly reduced to a slow afterthought (per the user:
+// "buying should be a slow grind … contributes but almost as an afterthought").
+// Was a flat +1 standing per purchase (so a 2 TC junk buy farmed rep). Now
+// standing accrues by TC of HONEST CUSTOM: spent coin banks in player.buyRepProgress
+// and grants +1 standing per BUY_REP_TC_PER_STANDING (500) TC, remainder carried.
+// Cheap-junk spam can't grind it; joining a faction this way alone needs ~10,000 TC
+// spent, so mission completions + sigil turn-ins still dominate. Left IN as a minor
+// contributor per the user; the pool is faction-agnostic (banks into whoever you're
+// buying from when it crosses). Shared engine code — all three lines.
+// OTA-805 — CHARISMA EARNS VENDOR DISCOUNTS, gated per faction by a "rapport"
+// fetch quest (user-designed). Charisma finally touches pricing: once you've done a
+// faction's rapport quest ("bring me a high-end object … now we can deal"), that
+// faction's vendors cut you a CHA-scaled break — 2%/point of CHA above 10, capped
+// at 20%, applied to BOTH buys (× (1−mod)) and sell-backs (× (1+mod)). Ungated CHA
+// does nothing to price; the quest is the "in," Charisma is the magnitude. New
+// engine module factionRapport.ts (rapportQuestId/hasFactionRapport/chaPriceDiscount/
+// vendorPriceMod); wired into buyFromVendor.effectivePrice + sellToVendor +
+// sellPriceFor (new optional rapportBonus) + VendorScreen (discounted prices + a
+// "Trusted partner" banner). Nine rapport quests (fq_<faction>_rapport) added to
+// faction-quests.json — each fetches a Golem Core (an obtainable high-end object;
+// the lore coveted-relics aren't reliably placed in the world yet, a content
+// follow-up) and, on turn-in, logs "you've earned dealing with the <faction>". The
+// rapport SELL bonus is a deliberate earned exception to the B1 RARITY_BUY_FLOOR
+// cap (SELL_FRACTION 0.4 keeps buy-then-sell a loss, so it's a merchant perk not
+// arbitrage). Also confirmed: DIPLOMACY is already wired (resolves social-gated
+// hunt/mystery/storyline stages + trains CHA); "convince" already routes to it.
+// OTA-806 — TALK DOWN A FIGHT. Answering "where does persuade actually matter?":
+// IN COMBAT, a diplomacy verb (persuade / intimidate / convince / negotiate) is now
+// a real d20 + CHA (+ Broker) contest that can END the encounter without a kill —
+// distinct from fleeing (the foe stands down and you KEEP the tile; fleeing is you
+// running and leaving it). Success clears the enemies with NO loot / XP (you avoided
+// the fight, didn't win it) + a small CHA train; failure costs the turn and draws the
+// enemy counter, so spamming a tough group is dangerous, not free. DC scales with foe
+// count + toughest tier (10 for a lone Common, +2/tier, +2/extra foe). Bosses /
+// Guardians refuse outright. New engine module talkDown.ts (talkDownDC /
+// isTalkDownBlocked / isIntimidationVerb / isBeastPack + flavor lines — beasts flee,
+// people back off); intercept in submitPlayerAction ahead of the shared diplomacy
+// switch arm. Also refreshed SKILL_ACTIVITIES.charisma (dropped the removed "Gifting
+// to a vendor"; added the talk-down + diplomacy-check surfaces).
+// OTA-807 — WANDERING NPCs. The other half of "where does Charisma matter?": the
+// open road now occasionally puts a PERSON in front of you — a traveler, refugee,
+// tinker, scout, pilgrim — someone you can actually talk to (not a vendor stall, not
+// an animal). Greeting / persuading them ("talk to <name>") is a d20 + CHA (+ Broker)
+// check vs a friendly DC 12 for a small payoff: a word of the road (tip), a few coins
+// (6–15 TC), or — rarely — a +1 standing nudge with your own faction as your people
+// hear you dealt fair. ONE read per wanderer (win or whiff, they move on), so CHA
+// decides whether the meeting pays. FARM-PROOF: each peaceful OUTDOOR tile gets
+// exactly ONE spawn roll ever (banked in worldMemory.wandererRolledTiles, a bounded
+// window), so you can't leave/return-roll a person off one square — you cross new
+// ground to meet new people (~12% of eligible fresh tiles). New engine module
+// wanderers.ts (makeWanderer / rollWandererReward / WANDERER_TALK_DC + lore-neutral
+// archetypes & flavor); CurrentScene.wanderer field; beginScene spawn (suppressed on
+// hubs/markets/capitals/combat/when a vendor rolled); talk intercept in
+// submitPlayerAction; a green "☺ <name>" banner in ExplorationScreen taps to speak.
+// OTA-808 — PARLEY + MENACE (Phase 1 of the social rework). The flat wanderer/talk-
+// down rolls become a two-button CHOICE with real asymmetric stakes. People: PERSUADE
+// vs INTIMIDATE. Animals (in combat): CALM vs INTIMIDATE. A GENERIC opener ("talk to
+// / approach") surfaces the ParleyModal so the stakes are explicit; a SPECIFIC verb
+// (intimidate / soothe / persuade …) commits straight through. HARD LOCK-AND-KEY:
+// every target has a temperament (skittish→calm, aggressive→intimidate, reasonable→
+// persuade, greedy→intimidate) and the WRONG key AUTO-FAILS regardless of Charisma —
+// a high-WIS character is TOLD the temperament, everyone else reads the narrated tell
+// or gambles. STAKES set by the button: the safe read (calm/persuade) fail = the hook
+// is SPENT (no harm, but the lead/exit is gone); INTIMIDATE fail = active harm (the
+// animal lands a vicious hit / the person turns hostile and it's a fight) AND the hook
+// is spent. REWARD split: persuade → a lead (Phase-2 wires real traceable leads),
+// intimidate → their goods (Phase-1 stand-in = TC). Full MENACE loop: intimidation
+// raises player.menace (people 8 / animals 4), which SELF-BLUNTS your own intimidate
+// DC (+1/20), draws readier encounters (beginScene), decays 0.4/game-hour, and shows
+// on the character portrait (decayed value + tier). Successful EXTORTION of a
+// faction-affiliated person costs −6 standing (half to allies). New engine modules
+// parley.ts + menace.ts; Enemy.temperament + Wanderer.temperament/faction +
+// PlayerCharacter.menace/menaceUpdatedHour; new ParleyModal; parser gains the parley
+// verbs (soothe/pacify/tame/threaten/menace/coerce/coax). The OTA-806/807 single-roll
+// store flows are SUPERSEDED by this (their pure helpers remain).
+// OTA-809 — PARLEY Phase 2 (procedural payloads + dialogue beats + real rewards).
+// Wanderers now carry a SEEDED payload: GOODS (coins + salvage items, greedy sorts
+// carry more) and a LOCATION LEAD. Intimidate success now grants the actual CARRIED
+// GOODS into the pack (was a flat TC stand-in); persuade success plants a real
+// pendingLead on the player that PAYS OUT — the cache — the next time you reach fresh
+// peaceful ground (beginScene), so "talk for secrets" is a genuine go-find-it, not
+// instant loot. New "cagey" dialogue beat: on opening a person-parley they name their
+// price ("what's it worth to you?") before you choose, so it reads as a conversation.
+// Two new greedy archetypes (drifter, scavenger) already added in 808 round out the
+// pool. New wanderers helpers (makeWandererGoods / makeWandererLead / wandererCagey);
+// Wanderer.goods + Wanderer.lead; PlayerCharacter.pendingLead; miscLootItem grant
+// helper; beginScene lead payout. All lore-neutral. Closes the social rework.
+// OTA-810 — HUNTS ARE A FACE-TO-FACE TURN-IN (user's call; closes the B2 exploit).
+// A bounty's proof is the trophy, and proof is shown in person: turnInHunt no longer
+// accepts the OTA-456 remote "send word" courier close, and the Contracts-UI COMPLETE
+// (completeContractFromUI 'hunt') — which used to pay FULL from ANY tile, the actual
+// B2 hole — now requires a paying agent in scene AND the RIGHT posting faction's agent
+// (neutral hunts take any vendor). Always full pay now (no courier's cut). The kill
+// handler already directs "return to a posting agent". Mysteries / storylines /
+// faction deeds keep their remote cut untouched. ContractsScreen hunt "how to finish"
+// updated to say hand in face to face. Dodge-at-high-DEX (the other open B item) is
+// parked pending a live retest.
+// OTA-811 — PROSE POLISH: kill the command-syntax placeholders leaking into
+// narration (playtest: "a big block of text with placeholder nouns in it"). The
+// vendor-arrival wares blurb welded typed-command syntax into the story — 'buy
+// <name>', 'repair <item>', 'train <stat>' — so the angle-bracket tokens read as
+// unfilled template placeholders in the middle of prose. Rewritten in plain language
+// (buy a recipe by name, "mends worn gear, trains a stat for coin, patches up a hurt
+// dog or golem — just ask") that still tells the player what to type. Same fix on the
+// three arbiter "send word <name>" contract-courier lines → "send word by name". The
+// remaining <...> tokens in the codebase are all in CODE COMMENTS, not player-facing.
+// OTA-812 — READABILITY: break the wall of text + surface recipe buys as buttons
+// (the two follow-ups to 811's placeholder cleanup). (1) FEED BEATS: the same-channel
+// debounce still GROUPS rapid world/system entries into one card (no stutter of
+// stamps), but now joins them with a PARAGRAPH BREAK ("\n\n") instead of two spaces —
+// so a travel step's stall line + wares blurb + walk narration + arrival encounter
+// read as distinct paragraphs, not one run-on block (the screenshot). RN <Text>
+// renders "\n\n" as a blank line; no feed-component change. (2) RECIPE BUTTONS: the
+// vendor buy screen now shows a "WORKINGS TO LEARN" section listing the recipes the
+// trader teaches for TC, each a tappable row (opens the standard buy-confirm →
+// buyFromVendor's recipe-learn branch) — so learning a recipe no longer requires
+// knowing the typed "buy <name>" command from the arrival prose. Filtered to
+// not-yet-known recipes; open by default.
+// OTA-813 — BOSS NAME CASING. Playtest (Heir Atalan-Drowned, a Core Guardian): the
+// Arbiter's combat templates lowercased the enemy name — fine for a generic creature
+// ("the mud boar") but wrong for a NAMED boss ("the heir atalan-drowned is patient").
+// New combatEnemyLabel(enemy) keeps proper case when enemy.boss (Guardians + boss-gate
+// spawns all carry the flag) and still lowercases generics; applied to the three
+// combat-arbiter template sites in narrativeGenerator (combatRemark, the call-to-
+// action pick, ARBITER_COMBAT_INTROS).
+//
+// OTA-814 — two playtest bugs from a device log re-read:
+//   1. applyCoating on a STACKED, equipped weapon peeled the coating onto a fresh
+//      instance but left equipped.mainId/offId on the uncoated stack remainder, so
+//      the on-hit resolver (keyed off the equip slot) never fired — the weapon read
+//      "Now wielding the Burning …" yet landed zero burn. Fix re-points the equip
+//      slot to the coated instance.
+//   2. WEAPON_SOFT_TAIL_NOUNS gained item/material end-nouns (core, orb, heart,
+//      crystal, essence, stone, rune, sigil, …) so a forged WEAPON can't keep a
+//      soft Qwen name like "Aether Core"; the deterministic weapon pool renames it.
+//
+// OTA-815 — three tuning calls from the playtest conversation:
+//   A. GUARDIAN POWER SCALING — Core Guardians scaled by kill-count only, so an
+//      over-leveled side-quester mashed the early Guardians. spawnGuardianForCapital
+//      now layers a player-power factor (guardianOverLevel) on top of the tier
+//      profile: 1.0 at/under the tier's expected power (authored fight stands for a
+//      fresh arrival), climbing to 1.9× for an over-leveled player — lifting HP, AC,
+//      and attack together. HAL/golem only (engine has no Guardians).
+//   B. DODGE FLOOR — a dodging high-DEX player could win the opposed contest even
+//      vs an enemy nat-20 and become literally untouchable. A NATURAL 20 now lands
+//      through a dodge (2× out-of-position, crit-doubling still suppressed per
+//      OTA-796), the same 5% floor the AC path honors. Never invulnerable; a high
+//      miss rate is fine.
+//   C. SIGIL → RAPPORT — returning a faction sigil now establishes that faction's
+//      CHA vendor discount (marks its rapport quest id complete), replacing the
+//      bespoke fetch-a-relic gate. Reuses the existing sigil economy; no new items.
+//
+// OTA-816 — REGULAR-ENEMY SCALING (the companion to 815's Guardian scaling). Base
+// enemy stats came straight from enemies.json, so an over-leveled character farmed
+// trivial trash (a 15-HP Aetherbat stayed 15 HP forever) — danger tiers only changed
+// WHICH rarity spawned, never the numbers. scaledEnemyForContext now lifts a NON-BOSS
+// enemy's HP (and lightly its attack/AC) by player power AND tile danger: a rising
+// per-power/per-danger HP floor (kills one-shot farming; maxed player ~34 at danger 0
+// to ~64 at danger 5) plus a flat-CAPPED multiplier (so a big Legendary is nudged,
+// not exploded — stays gentler than a Guardian). A fresh arrival on a danger-0 tile
+// is left exactly as authored — "low level is still low level". Applied at the three
+// spawn boundaries (scene arrival + groups, rest-ambush, hook spawn_enemy_tag). All
+// knobs in encounter.ts.
+//
+// OTA-817 — MIXED-ROLE PACKS + PACK-AWARE SCALING (player: bring back multi-enemy
+// fights; "scale multiples as a package not individually — 3 scaled enemies together
+// would be harder than a boss"). (1) The curated single-enemy path pre-empted the
+// group roll, so laddered areas hadn't spawned more than one foe in weeks (the
+// target-swipe UI + companions went unused). rollExtraPackMembers now adds role-DIVERSE
+// foes (a drone + a bandit + a rat — different types → different weaknesses in one
+// fight), frequency scaling with danger (frontier ~10% → deep ~75%), never onto a
+// boss, capped at 3 total. (2) scaleEncounterForContext is now PACK-AWARE: a multi-foe
+// pack shares ONE budget — anchored on a single solo-scaled body of the pack's mean
+// HP, +a small premium per extra body, HARD-CAPPED under a boss's HP (70+danger·10),
+// then distributed across members by base-HP weight (a brute out-bulks a rat). Solo
+// spawns still scale per-enemy. Weakness reveal chosen WIS-gated (lands next in 818).
+//
+// OTA-818 — PER-SPAWN RANDOMIZED WEAKNESS + WIS-GATED READ (the second half of "random
+// weaknesses so you can't have a 1-kit-fits-all build"). Weaknesses were deterministic
+// by enemy TYPE, so one loadout fit all forever. Each NON-boss spawn now rolls a random
+// primary weakness + a resistance, stamped as vulnerable:/resist: TRAITS — which ride
+// the existing resolver free: combineDamageTypeMatch already lets a per-enemy trait WIN
+// on a discord, so a resist:<type-default-weak> trait cancels the old weakness and a
+// vulnerable:<rolled> installs the new one (no change to the ~10 damage call sites).
+// Folded into the scalers so it applies at every spawn (varies even on a frontier tile
+// — engagement at all levels); bosses/Guardians keep authored defenses. REVEAL is
+// WIS-gated (WEAKNESS_READ_WIS=12, matching the parley threshold): high-Wisdom reads a
+// non-boss enemy's RESIST/WEAK off the portrait, everyone else sees "? — strike to
+// learn" and discovers via the combat log's "Weakness exposed" line. EnemyPanel's
+// defensesFor now RECONCILES type-map vs traits (discord → trait wins) so it never
+// shows a flipped-away weakness. Knobs (WEAKNESS_POOL) in encounter.ts.
+//
+// OTA-819 — THEMATIC ("Pokémon-route") weakness + medium hardness + diegetic read
+// (player: "believable but not stale — not 'only weak to this', don't break immersion").
+// 818's flat-random weakness read as nonsense (mud weak to cold). Now each creature TYPE
+// has a small pool of PLAUSIBLE weaknesses (mud → burn/radiation/electrical; aetheric
+// being → bludgeoning/cold/slashing; machine → electrical/bludgeoning/aetheric; flesh →
+// pierce/poison/cut/burn) and a spawn rolls ONE — believable every time, varied fight to
+// fight. HARDNESS = MEDIUM: the weakness is a ×1.5 BONUS, everything else stays normal
+// and still works (never hard-locked); each spawn takes one soft ×0.5 resist, and ~35%
+// get a real ×0.25 WALL on a type their kind is already armored against (a trait resist
+// STACKED onto a type-map resist — no new plumbing). READ is diegetic: the WIS-gated
+// detail popup narrates what you notice ("its hide is dry and cracked — fire would take
+// fast (Weak: Burn)") instead of a bare label. THEMATIC_DEFENSE_POOLS + flavor maps are
+// the knobs. Supersedes 818's flat WEAKNESS_POOL.
+//
+// OTA-820 — FUSE-CHIP DISMISS SURVIVES A VENDOR ROUND-TRIP (player: dismiss the Crucible
+// chip with its X, enter the vendor, come back to exploration → the chip is there again).
+// App.tsx renders exploration vs vendor by a flag, so entering the vendor UNMOUNTS
+// ExplorationScreen — and the chip's dismiss was LOCAL useState, lost on the round-trip.
+// Moved the dismiss into the STORE (crucibleChipDismissedKey), keyed to the view-key
+// (location|building|room|hubRoom): the chip is hidden while the stored key equals the
+// current view-key, so the dismiss persists across the unmount but still auto-re-shows
+// when you actually move to a different location (key mismatch). Removed the now-moot
+// local reset effect.
+//
+// OTA-821 — NO DUPLICATE CRUCIBLE CHIP ON A VENDOR TILE (player: "we don't need a
+// separate fuse chip on a tile with a vendor if the vendor has a crucible too — the road
+// hawker has a built-in fuse chip"). OTA-758 lit the exploration Crucible chip in a
+// VENDOR mode (25 TC) on roadside-vendor tiles — but the vendor screen ALSO offers that
+// same portable Crucible (arb103), so the tile showed the chip AND the vendor its own
+// fuse button: two entry points for one Crucible. The exploration chip now shows ONLY
+// for a LOCATION's own Crucible (outpost/hub/market/fusion-permit); a vendor-carried
+// Crucible lives solely in the vendor screen (which already suppresses ITS offer at
+// location-crucible tiles — arb153 — so the two partition cleanly, never both). Nothing
+// stranded: the vendor screen still fires useVendorCrucible for 25 TC. Removed the
+// atVendorCrucible branch + the now-unused tutorialDemoVendor read.
+//
+// OTA-822 — VENDOR RECIPE MENU: NO REROLL, NO "BUY & EQUIP" (device log: Road Hawker —
+// buying a recipe rerolled/restocked the recipe list so the player bought recipes until
+// broke; and recipes offered a nonsensical "Buy & Equip"). (1) REROLL: vendorRecipeOffers
+// drew its `count` window from the player's UNKNOWN pool, so learning one shrank the pool,
+// shifted `start = seed % pool.length`, and slid a NEW recipe into view — an endless
+// restock. The menu is now a FIXED seeded slice of the FULL discoverable pool (new
+// allDiscoverableRecipes), independent of what's known; a learned recipe just drops from
+// the buyable list (its slot doesn't slide), and once the whole menu is learned the
+// section is empty. (2) BUY & EQUIP / ×N: recipe rows reused the item-buy flow, so the
+// confirm offered "Buy & Equip" (tried to equip an item you don't own — "I don't see an
+// Aetheric Vest on you") and quantity. Recipe rows now open a LEARN pending (isRecipe):
+// no equip slots, no stack, the confirm button reads "Learn" and the title "Learn the X
+// working". buyFromVendor's recipe-learn branch still charges TC + teaches it.
+//
+// OTA-823 — NARRATOR "theYou" GLUE + TORCH LEAD CLARITY (device log). (1) Qwen 0.5B
+// occasionally emits a token boundary with no space, gluing words at a lowercase→
+// Uppercase seam — the log caught the Arbiter narrating "theYou stood in the shadowy
+// chamber…". New repairGluedNarration (foreignText.ts) un-glues any [a-z][A-Z] seam
+// (English narration prose never has intra-word camelCase) and drops an article
+// stranded before a subject pronoun ("the You" → "You"); wired alongside
+// stripForeignWords at every narration site (main + ambient arbiter, generate wrapper,
+// ask-arbiter). (2) The Aetheric Torch charged a lead but the reveal said "Work it",
+// so the player typed the flavor word ("the resonance") and got refused; it now names
+// the hook's actual noun — "Work the crystal — investigate it and it will give up
+// something rare" — pointing the player at the interactable that claims the reward.
+//
+// OTA-824 — B2: FACE-TO-FACE CONTRACT HAND-INS + LONG-HAUL BONUS, and "follow the
+// resonance" (player: "kill all remote hand ins, make all routable, but make sure the
+// journey is worth the loot — I don't want a 32-time trip worth 20 TC"). (1) KILLED all
+// remote "send word / courier" turn-ins for EVERY contract type (faction/mystery/
+// storyline; hunts were already OTA-810). The typed handlers require in person; the
+// Contracts-UI COMPLETE now DELEGATES to those handlers (closing the "pay 100% / half
+// from any tile" hole — the OTA-617 half-pay-from-afar path is gone too). A typed "send
+// word …" is refused with a route-to-the-pin steer. (2) LONG-HAUL BONUS: new
+// contractJourneyBonusTc (contractMarkers.ts) adds TC scaled to the turn-in tile's
+// grid-cell remoteness from the starter hub (0 next door, capped at 1.5× base), applied
+// at every turn-in — so a far hand-in is never trivially paid. (3) ROUTABLE: every open
+// contract already carries an atlas ◆ pin + SET COURSE anchor (contractMarkers). (4)
+// "follow the resonance": the torch-charged hook is stamped with sound-synonyms
+// (resonance/sound/ringing/hum/note) so investigate/examine/work/FOLLOW the resonance
+// all resolve to it; a "follow"-verb travel onto a torch-charged hook advances it.
+// ── OTA-835 (race trait/ability "make the flavor true" batch) ─────────────────
+// The races/factions/titles audit flagged four traits whose text over-promised.
+// This ships the four re-implementations the owner signed off on, plus real race
+// VULNERABILITY:
+//   (1) RACE WEAKNESS is now possible — raceDamageMultiplier may exceed 1. The
+//       Mud Golem's authored aetheric weakness bites (+50% aetheric; ×0.75 to
+//       everything else). raceResistLabel reads both directions (weakness/absorb),
+//       and the incoming-damage site applies mult !== 1 (was resist-only <1).
+//   (2) CURIOUS MIND (Unknowing Masses) — was a per-roll +2 investigate; now a
+//       persistent +2 INT / +2 WIS that AWAKENS on first exposure to a relic/ruin
+//       (curiousMindAwakened → effectiveStats). The old investigate special-case
+//       was removed to avoid double-counting.
+//   (3) ELEMENTAL CONTROL (Mud Golem) gained its defensive half: a new
+//       'elemental_ward' ability raises a 1d6-soak stone_ward (per-encounter,
+//       consumed at the damage site before HP).
+//   (4) BEGINNER'S LUCK (Unknowing Masses) — was a flat +3 WIS buff; now banks a
+//       real one-shot reroll token (luckyRerollReady) that resolveRollStep spends
+//       on the next FAILED difficulty roll, keeping the better throw.
+//   (5) LEGACY OF POWER (Tartarian Giant) — was repair-only; now rolls the trait's
+//       three channels (repair / power-up / unexpected surge).
+// Sentinel (tireless + ageless), Stormcaller (also halves electrical) landed in
+// the same batch.
+// ── OTA-836 (Tier-1 QoL #1: tap-to-explain numbers) ───────────────────────────
+// The Character sheet's core STATS already showed per-source chips (base + race +
+// equipped + food + weather + corruption …), but the derived DEFENSE number did
+// NOT — and worse, "Armor Class" rendered only effectiveAC() (race base + scene
+// context), silently DROPPING the equipped armor / accessory AC, the ruins-defense
+// title bonus, and any active stance/cover. A plate-armored player read the SAME
+// AC as a naked one. New effectiveACBreakdown() (gameStore) returns the SAME total
+// the enemy-attack resolver stands on — racialAC + armor + title + status (the
+// dodge gamble is a per-swing AC bypass, not standing AC, so it's excluded) —
+// decomposed into labelled sources. The DEFENSE card now shows acBd.total with
+// "(base N)" + source chips, matching the core-stat treatment. Fixes both the
+// legibility gap AND the display-accuracy bug. Test: ota836ACBreakdown.
+// ── OTA-837 (Tier-1 QoL #2: discovery codex / bestiary) ───────────────────────
+// The Lore codex (LoreCodexBody — reachable from the gear icon + title screen) had
+// races/factions/places/timeline tabs. Two more, per the "make the depth visible"
+// push: (1) a BESTIARY that FILLS IN AS YOU PLAY — each enemy is a "??? —
+// undiscovered" silhouette until you defeat its type (keyed off
+// worldMemory.defeatedEnemies, case-insensitive), then reveals type/HP/damage/
+// traits/drops, with an "X of N catalogued" counter; (2) a LORE tab that finally
+// surfaces the 172-entry concepts bank (app/data/lore/concepts.json) — the "massive
+// lore document" that was in the files feeding the Arbiter's narration context but
+// NEVER shown to the player. Test: ota837CodexData (data contracts + the discovery
+// gate). Next: OTA-838 adds observed damage-type weaknesses to each bestiary entry.
+// ── OTA-838 (Tier-1 QoL #3: enemy weakness tags "once discovered") ────────────
+// The EnemyPanel already WIS-gated an enemy's weak/resist reveal (Wisdom ≥ 12 reads
+// them on sight; below that its own copy said "strike to learn") — but that "learn
+// by hitting" was a transient combat-log line, never persisted or shown on the
+// portrait. This makes it real: landing a weak/resist hit now records the observed
+// damage type in worldMemory.enemyIntel (name-keyed; recordEnemyIntel dedupes and a
+// contradicting later hit MOVES the type — per-spawn randomization can flip it, so
+// the freshest observation wins). Wired at the primary melee, ranged-bolt, and
+// thrown-coating attack paths. The portrait + detail popup now reveal the types
+// you've LEARNED even below the Wisdom threshold, and the OTA-837 bestiary shows
+// "WEAK TO / RESISTS" on each fought enemy. Test: ota838EnemyIntel (dedup/move).
+// This completes the three Tier-1 "make the depth visible" OTAs (836/837/838).
+// ── OTA-839 (lore-accuracy pass + HAL-only intel backfill) ────────────────────
+// (1) LORE ACCURACY — the game drifted from its lore docs; two parallel audits
+// (races/factions + concepts/glossary) reconciled the player-facing codex against
+// the CODE (game wins on a conflict). races.json: Sentinel "Immunity to Time" no
+// longer promises immunity to the REMOVED hunger/forage system (now: half stamina
+// cost + weather-corruption immunity + gem luck); Mud Golem "Aetherstone Resilience"
+// now states its aetheric VULNERABILITY (+50%) and the ×0.75 non-aetheric cut (was
+// "half from non-Aetheric"); "Elemental Control" reads as the two once/day abilities
+// (strike + ward); Mud Dweller drops the non-existent "Mud-power" type. concepts.json:
+// dodge_action + dodge_melee describe the AC-bypass GAMBLE (not the retired
+// advantage/opposed-check model); skill_check/hide_action/stealing use STEALTH (not
+// DEX) and stealing's DC is vendor-set + escalating (not a fixed 12); added the
+// missing `cold` damage-type entry (cold is live). factions/glossary were clean.
+// (2) INTEL BACKFILL (HAL ONLY, per owner) — backfillEnemyIntelFromDefeats seeds a
+// returning character's OTA-838 enemyIntel from the foes they've ALREADY defeated, so
+// the new bestiary/panel weaknesses aren't blank on a veteran save. Runs once (only
+// when the save has no enemyIntel yet). Tests: ota839LoreAccuracy, ota839IntelBackfill.
+// ── OTA-840 (Tier-2 QoL #1: never-fail-silently sweep) ────────────────────────
+// An audit of the whole action pipeline (submitPlayerAction + every intent handler)
+// confirmed the codebase is already unusually well-instrumented — most guards already
+// speak. The genuine residual silent no-ops (an action that ends with no log / no
+// modal) were a short list; all fixed here:
+//   • UNEQUIP an empty slot — `remove helmet` / `take off ring` with nothing there
+//     used to do nothing at all (unequipSlot narrates nothing). Now checks the slot
+//     first and says "nothing in that slot to take off" (and "nothing to put away"
+//     for an empty-handed weapon strip).
+//   • TYPED EQUIP — `equip iron sword` printed nothing (equipItem stays silent for
+//     UI taps). Now a typed equip confirms with a slot-aware verb ("You ready/don …").
+//   • BUY with an item the vendor doesn't stock — the one silent exit in buyFromVendor
+//     ("…doesn't carry any X").
+//   • BUY / SELL with NO VENDOR present (queued/stale action) — now "There's no one
+//     here to trade with."
+//   • SUMMON CORE GUARDIAN — the no_guardian_def / no_scene reasons had no line; a
+//     failed main-quest summon could no-op silently. Now always answers.
+//   • SALVAGE ALL on a MIXED batch — unmatched nouns left only a debug breadcrumb
+//     while the successful loot showed; now they surface too.
+// Test: ota840NeverFailSilently.
+// ── OTA-841 (Tier-2 QoL #2: intent-parse "did you mean…" chip row) ────────────
+// The natural-language parser already degraded gracefully — a low-confidence /
+// unresolved input tries the Qwen fallback, then a soft Arbiter refusal + a "Try:
+// look around · search · rest" TEXT hint. But that hint was dead text the player had
+// to RETYPE. Now the same runnable command list is stashed on the store
+// (parseSuggestions, set on both soft-refusal paths, cleared at the start of the next
+// action), and ExplorationScreen renders it as a TAPPABLE "Did you mean…" chip row
+// above the input — one tap re-submits that command. Turns the NL cliff into a
+// one-tap recovery. Test: ota841DidYouMean (populate on unresolved parse; clear on
+// next action).
+// ── OTA-842 (Tier-2 QoL #3: combat-log restructure — damage-modifier breakdown) ─
+// The incoming-hit line appended each mitigation as its OWN parenthetical, so a hit
+// that armor + a title + a race resist/vuln + a shield + a ward all touched read as a
+// wall: "…damage (armor turns 40% of the cold)(your title turns aside half the cold)
+// (Aetherstone Vulnerability — +50% dmg)(Defensive Protocols shield)(stone ward soaks
+// 3)." New `damageModClause()` collects them into ONE terse comma-separated bracket in
+// apply-order: "…damage [armor −40%, title ½, +50% dmg, shield ½, ward soaks 3]." A
+// race VULNERABILITY lists as "+N%" (the bracket shows every modifier, not only
+// reductions); no modifiers → no bracket. Completes the Tier-2 QoL batch (840/841/842).
+// Test: ota842CombatLogMods.
+// ── OTA-843 (Tier-3 depth #1: Character Chronicle / legends log) ──────────────
+// A long-lived character ACCRETED a story — worldMemory.memorableEvents logs the
+// dramatic beats (first kill, faction oath, Guardians felled, the Choice), milestones
+// count the lifetime deeds, corruption marks the descent — but nothing pulled it into
+// one readable place, so a veteran read as a pile of numbers, not a legend. New
+// engine/chronicle.ts `buildChronicle()` assembles it: a headline ("<race> · <faction>
+// · Nd Mh in Tartaria"), a deed-list (foes bested, kinds catalogued, titles earned,
+// Cores recovered, corruption tier), and the memorable beats as a glyph-marked
+// timeline (oldest → newest). Surfaced as a collapsible CHRONICLE section at the top
+// of the Character sheet. Also NEW: a WORSENING corruption-tier crossing now records a
+// `corruption_tier` memorable event (at the weather-accrual site), so the Aether's
+// arc on the soul shows in the timeline, not just the live number. Test: ota843Chronicle.
+// ── OTA-844 (Tier-3 depth #2: the world that moves offscreen — WORLD PULSE) ────
+// Tartaria used to sit still between the player's actions — factions never gained or
+// lost ground on their own. This gives the world a slow heartbeat. New
+// engine/worldPulse.ts nextWorldTide() advances the balance of power one pulse: one
+// faction rises (pressing its rivals down, lifting its allies), DETERMINISTICALLY (the
+// tick index picks the mover — no RNG, so it's reproducible + testable). worldTideCheck
+// (gameStore, end-of-action, gated to ~one pulse per in-game DAY via WORLD_TICK_HOURS)
+// runs it, stores per-faction momentum in worldMemory.factionTides, keeps the last 12
+// worldRumors, and drops a "🗞 Word on the wind: the Mud Monarchs press their claim…"
+// line so the player SEES the world move. The faction-standings panel now tags each
+// faction rising ▲ / waning ▼ / ascendant / collapsing (tideLabel). First action on a
+// save just stamps the baseline (no turn-one rumour). Test: ota844WorldPulse.
+// ── OTA-845 (Tier-3 depth #3: "losing is fun" — THE FALLEN) ───────────────────
+// Death used to be a clean wipe — a character fell, and unless you spent a Resurrection
+// Gem, they were simply gone. This makes the run's END part of the world. Every
+// character who dies is now appended to an install-wide, cross-character roll of THE
+// FALLEN (saveSystem GlobalStash `fallen` + recordFallen/loadFallen, capped 25): their
+// name, race, epitaph, where they fell, foes bested, hours survived, and the corruption
+// that took them. handlePlayerDeath records it and adds a beat — "You join the Fallen of
+// Tartaria — N names the buried world keeps now." A new FALLEN tab in the Lore Codex
+// renders the memorial (newest first), readable BETWEEN runs from the title screen too,
+// so a long-dead predecessor is never forgotten. Losing is fun: the run ends, the legend
+// persists. (Recommended core of the Tier-3 death batch; the dead-PC-as-enemy and
+// permanent-corruption-scar variants are noted as follow-ups.) Test: ota845TheFallen.
+// Completes the Tier-3 emergent-depth batch (843/844/845).
+// ── OTA-846 (audit fix: "Grows from:" stat-training copy accuracy) ────────────
+// The Character sheet prints SKILL_ACTIVITIES[stat] under each core stat as "how
+// it is earned." A line-by-line audit against the live trainStat() call sites in
+// gameStore found two blocks had drifted from the engine:
+//   • DEX still advertised "Parry / dodge" — parry was RETIRED in OTA-795 (dodge
+//     gamble replaced it) — and omitted the trainers the code actually rewards:
+//     landing finesse/ranged hits, dodging, jumping to a resolved target,
+//     disengaging under pressure, and escape skill-checks. Rewritten to match.
+//   • STR advertised "Heavy salvage / breaking", but salvage trains INT, not STR;
+//     dropped that line and added the real "Winning a Fight-Back struggle" trainer.
+//   • STE was accurate but under-sold — surfaced the stealth-gear passive (train
+//     on a hit taken while wearing stealth gear) and the STEALTH skill-check path.
+// INT / WIS / CHA verified accurate, unchanged. Pure display-copy fix — no
+// mechanics change. Test: ota846SkillActivities pins the corrected copy so it
+// can't silently drift back to describing mechanics the engine no longer has.
+// ── OTA-847 (STEALTH SYSTEM — pickpocket + in-combat sneak attack / backstab) ──
+// Stealth becomes a real playstyle instead of a thin 6th stat. One STE stat now
+// governs the whole loop: pickpocket → the sneak-attack opener → the mid-combat
+// backstab → the finesse-weapon payoff.
+//   OUT OF COMBAT — the peaceful APPROACH button becomes PICKPOCKET (new
+//     PickpocketModal). Tap a vendor's goods or an in-reach mark → Stealth roll
+//     vs their awareness. Win → it's yours, quiet. Fail → STE-GATED: a practiced
+//     thief (Stealth ≥ STEALTH_QUIET_FAIL_STE=14) feels the attention turn and
+//     withdraws clean (no item, no fight); a clumsy one is caught and the vendor
+//     flips hostile (the existing rep hit stands). APPROACH's old walk-up-to-a-
+//     noun job is retired; the USE STEALTH toggle on the approach picker is gone.
+//   IN COMBAT — a new STEALTH button (beside dodge/flee) drives the existing
+//     stealth intent: FIRST action of the fight = SNEAK ATTACK (free STE check
+//     for the drop, the `stealthed` +5 opener); mid-combat = BACKSTAB attempt
+//     (costs your turn, STE-tilted initiative race, capped one free opener).
+//   BACKSTAB payoff (combatRules.buildCombatSteps) — striking from `stealthed`
+//     with a FINESSE / thrown weapon (stat 'dexterity') DOUBLES the damage dice
+//     (reusing the perfect_opening treatment); a HEAVY weapon still gets the +5
+//     to-hit but no doubling — a plain sneak strike, so heavy builds can use the
+//     button too, they just don't get the rogue multiplier. The throwing-knife
+//     perk falls out for free: a finesse throwable hurled from stealth backstabs.
+// SKILL_ACTIVITIES STE copy updated to name the new STEALTH / PICKPOCKET buttons
+// (the retired approach toggle line is gone). Test: ota847Stealth pins the
+// finesse-only dice-doubling gate.
+// ── OTA-848 (Character screen — readability: expandable stats, AC breakdown, title provenance) ─
+// Three tap-to-expand upgrades to the Character sheet:
+//   • CORE STATS — each stat row is tap-to-expand. Collapsed it's a clean number
+//     + progress bar; expanded it opens the source breakdown AND the "Grows
+//     from" trainers as a one-per-line bulleted list (the old cramped, ellipsized
+//     3-line run-on is gone). Readability, per playtester ask.
+//   • ARMOR CLASS — the AC row is tappable, expanding a readable line-per-source
+//     breakdown (base + each armor piece / stance / title / racial → total) so a
+//     player can audit exactly what builds their number. (OTA-836 first surfaced
+//     these as chips; now they're clean rows behind a tap.)
+//   • ARBITER TITLES — each title is singly tappable: expands to show HOW it was
+//     earned (the requirement / deed) and, for earned titles, WHEN — a new
+//     player.titleLog captures the in-game hour + real timestamp at award time
+//     (awardNewTitles), rendered as "Day N (period) · YYYY-MM-DD" by the pure,
+//     tested describeTitleEarned helper. Titles earned before this shipped get an
+//     honest "before this was recorded" fallback — never a fabricated date.
+// Test: ota848TitleProvenance pins the date formatter + fallback.
+// ── OTA-849 (LIVING WORLD — tides get teeth + World view + raids + kill-standing + offline) ─
+// OTA-844's World Pulse was cosmetic (a momentum number that narrated itself). This
+// gives it teeth and makes the background world genuinely live:
+//   • TIDE VISIBILITY — a new WORLD view (WorldScreen, reached from the Character
+//     sheet's faction section) shows EVERY faction's momentum meter (rising/waning),
+//     your standing with each, and the running rumour feed. The tides were near-
+//     invisible before (tideLabel is null at 0, and the sheet only tagged factions
+//     you already stood with) — now the whole board is on one screen.
+//   • TIDES GET TEETH — a vendor's faction tide moves its prices (tideVendorPriceMult:
+//     ascendant charges up to +20%, waning discounts to −20%), folded into buyFromVendor.
+//   • RIVAL RAIDS — take a side (positive standing) and that faction's rivals come for
+//     you: a war party of the most-ascendant eligible rival periodically drops into a
+//     peaceful outdoor scene (maybeSpawnRaid, cooldown-gated, avoidable, never when
+//     you're already bloodied). Party size ESCALATES with the raider's tide
+//     (raidPartySize) — raids grow with the game. The Arbiter gives a terse warning.
+//   • KILL → STANDING — defeating a faction combatant (Enemy.factionId) now lowers your
+//     standing with them and nudges you UP with their strongest rival (design pick:
+//     rivals, not allies).
+//   • OFFLINE — the world moves while you're away: on load, real time offline is
+//     converted into bounded world pulses (advancing tides + rumours), and the Arbiter
+//     recaps what shifted. Data hygiene: nextWorldTide now ignores the factions JSON's
+//     descriptive pseudo-ids (e.g. "anyone_paying") so the tide map only holds real
+//     factions. Test: ota849LivingWorld pins the pure helpers.
+// ── OTA-850 (FACTION PATROLS & BOUNTIES — bounties that route you into harm's way) ─
+// The spatial half of the living world. A faction you FAVOR (standing +10) will pay
+// you to thin its rivals — and the contract names WHERE: the rival's own outpost.
+//   • BOUNTY OFFER — surfaced in the WORLD view (pickBounty): the favored faction's
+//     most-ascendant rival is the quarry; bounty size + pay ESCALATE with the quarry's
+//     tide (bountyTerms). ACCEPT sets your course straight to the quarry's outpost.
+//   • ROUTE INTO HARM'S WAY — acceptBounty stores player.activeBounty and calls
+//     setTravelCourse(targetLocationId), so the reward sits inside patrolled ground.
+//   • PATROL INTERCEPTION — within 2 tiles of a hostile / bounty-target outpost while
+//     travelling toward it, that faction's patrol intercepts (maybeInterceptPatrol,
+//     hooked into continueTravel's per-step distance; peaceful-moment + cooldown gated).
+//     Reuses the OTA-849 faction-party builder (now shared as injectFactionParty).
+//   • PROGRESS + TURN-IN — each kill of a targetFactionId combatant ticks the bounty;
+//     the last one pays TC + giver standing and clears it (in the kill handler).
+// Enemies carry factionId (OTA-849), so patrol/raid kills also move standing. Test:
+// ota850FactionBounty pins the pure offer/terms/kill-counts helpers.
+// ── OTA-851 (LIVING WORLD — event variety + roaming patrols that fight their own wars) ─
+// Two things keep the world from getting old: VARIETY and AUTONOMY.
+//   • WORLD-EVENT ENGINE (worldEvents.ts) — the single OTA-844 pulse becomes a broad,
+//     weighted catalogue (surge, setback, skirmish, muster, warband, bounty-posted,
+//     schism, truce, defector, pilgrimage, caravan, relic, market, omen, purge,
+//     windfall). Each carries a data-only effect the store applies (tide shifts, patrol
+//     musters, rep nudges, bounty offers) + a rumour and a terse Arbiter line. Drives
+//     the live tick AND the offline catch-up, so no two stretches read the same.
+//   • ROAMING PATROLS — faction war-parties (worldMemory.patrols) wander loops near
+//     their outposts on the world grid (stepPatrol). They can be blundered into ANYWHERE
+//     (maybePatrolAmbush, per-action proximity) — on top of OTA-850's outpost-approach
+//     interception. Count scales with the faction's tide; musters/warbands add more.
+//   • OFF-SCREEN WARS (simulatePatrols) — each tick, patrols fight without you: rival
+//     patrols within 2 tiles CLASH (weaker faction's is lost, tides shift), a patrol
+//     next to a RIVAL outpost ASSAULTS it, and beasts MAUL a deterministic slice — every
+//     skirmish another line on the board.
+//   • THE BOARD — WorldScreen now shows the world-event feed (glyph per kind) + a live
+//     "N patrols abroad" note, alongside the bounty board + balance of power.
+// Deterministic (seeded by tick index). Test: ota851WorldEvents pins the pure engine.
+// ── OTA-852 (surface WORLD + LORE on the crest; fix the crowded Lore tab row) ──
+// Discoverability. The World view and the Lore Codex were both buried — World behind
+// a link in the Character sheet's faction section, Lore three taps deep in Settings —
+// so nobody found them.
+//   • CREST HUB — the top-right square shows the Tartaria crest when peaceful and the
+//     enemy portrait in combat. That idle peaceful square now brackets the crest with
+//     two small nav buttons: ⚑ WORLD above, ◈ LORE below. Both vanish the instant an
+//     enemy is staged (the panel flips to EnemyPanel), so they cost no permanent real
+//     estate and never clutter a fight. The old buried paths stay as secondary routes.
+//   • LORE TAB ROW — the 7 codex tabs (races/factions/places/timeline/beasts/lore/
+//     fallen) were 7 equal flex cells crammed into the width, so every label word-
+//     wrapped. The row is now a horizontal scroll of content-sized, one-line tabs.
+// UI-only (no engine change); covered by the app-source typecheck.
+// ── OTA-853 (EMERGENT GRUDGES — factions wage their own wars across the whole map) ─
+// Kills the abstract "tide" model. Factions now have STANDING WITH EACH OTHER
+// (factionRelations, −100..+100) — the same concept the player has with factions:
+//   • EARNED GRUDGES — seeded from lore, then live: every patrol clash deepens the two
+//     factions' standing, and two NEUTRALS can come to blows through friction, seeding a
+//     brand-new grudge FROM ZERO (meetOutcome). Rivalries build themselves out of RNG.
+//   • PATROLS ROAM THE WHOLE MAP — the radius-3 home leash is gone (stepPatrol). Patrols
+//     drift toward their nearest hostile faction's outpost, so they go LOOKING for a fight.
+//   • WAR SCOREBOARD — factionTides is now earned POWER: win clashes / sack outposts →
+//     power up, get crushed → down. It still drives patrol count, vendor prices, raids.
+//   • FIELDED FORCE scaled up (targetPatrolCount 2..10 by power; ~45 out typically, soft-
+//     capped 100 — trivially cheap), and a fading faction's patrols now thin out.
+//   • WORLD BOARD — new GRUDGES & ALLIANCES section (who's at whose throat, via topGrudges/
+//     relationLabel); the event feed (capped 50) is THE WAR AS IT HAPPENS. World drama now
+//     routes ONLY to the board, never the exploration feed. Offline load simulates the gap.
+// Test: ota853FactionRelations. (854 next: talk a rival patrol down — persuade/intimidate.)
+// ── OTA-854 (TALK A PATROL DOWN — persuade / intimidate a rival faction's patrol) ─
+// The player-facing counterpart to the roaming patrols (OTA-853). When a faction
+// patrol is hostile to you over standing, you can end it with words:
+//   • PERSUADE → they break off, no ill will — everyone walks — and you GAIN +1 standing
+//     with their faction (PARLEY_CALM_REP; you spared their people, word gets around).
+//   • INTIMIDATE → they break and RUN, dropping what they carried (their loot + a little TC).
+// Wired into the existing combat parley (runParleyOutcome): a foe carrying a factionId
+// now routes faction consequences a wild beast never did, and the opener prompt reads
+// "persuade them to stand down, or intimidate them into leaving" for a patrol.
+//   • BIG VOCABULARY EXPANSION — detectParleyChoice + the parser's diplomacy verbs now
+//     read natural aggression: "shout at them to go away", "yell to back off", "get out
+//     of here", "scare them off", "browbeat them", "or else" → INTIMIDATE; "reason with
+//     them", "talk them down", "defuse it", "make peace" → PERSUADE. (Bare phrasal
+//     commands like "back off" stay out of the parser to avoid colliding with retreat;
+//     they resolve once a parley is open.)
+// Test: ota854TalkDownVocab pins the widened reads.
+// ── OTA-855 (LIVING WORLD fixes — the board actually fills; collapsible standings) ──
+// A device log showed the World board near-empty (events=4) even at Day 99. The bug: the
+// sim ticked once per 24 IN-GAME hours, which almost never accrues in a real sitting.
+//   • CADENCE — WORLD_TICK_HOURS 24 → 2, plus PATROL_SUBSTEPS_PER_TICK sub-steps so
+//     patrols cover ground and meet. A first-ever tick runs a warm-up burst so a fresh
+//     player opening the board already sees the war underway.
+//   • PATROLS SCATTER ON SPAWN (deterministic spread around the outpost) instead of
+//     stacking on one cell — stacked patrols never cross an enemy, so nothing happened.
+//   • BEAST MAULINGS stay COMMON (~11%) — real ecological pressure that thins every
+//     faction's herd and can hand a rival the upper hand — but the FEED only shows a
+//     bounded, drama-first SAMPLE per sub-step (clashes/assaults lead, a taste of maulings
+//     trails), so the board reads as a story, not a wall of identical beast lines. Varied
+//     maul flavor too. The mechanical cull always applies regardless of what's shown.
+//   • REPOPULATION IS PACED — a faction musters only a trickle of fresh patrols per cycle
+//     (not an instant refill), so losses PERSIST and a faction on a bad run stays thinned.
+//     Cold start still deploys a full force; the target scales with war power.
+//   • WORLD BOARD — the standings sections (balance of power, grudges) are now COLLAPSIBLE
+//     like the inventory, and start collapsed, so the war FEED gets the room.
+// ── OTA-856 (World board — the collapsible section headers now READ as buttons) ──
+// The BALANCE OF POWER / GRUDGES headers were plain text + a chevron, so the tap target
+// wasn't obvious. They're now proper tappable plates (bordered card + gold left accent
+// bar + chevron + a "tap to show / tap to hide" hint), matching the inventory/character
+// collapsible headers. UI-only.
+// ── OTA-857 (The world is a LIVE SCROLL — wall-clock heartbeat) ──
+// The war only advanced when the player took actions that burned in-game hours, so a
+// player who opened the World board and just watched saw a frozen feed ("still nothing
+// populating"). Now a real-time timer in App.tsx fires worldRealtimeTick() every 6s no
+// matter what screen is open — patrols roam, clash, sack outposts, and get mauled
+// continuously, and every so often a broader world event (surge, muster, schism, caravan,
+// omen, bounty) folds in for variety. The first tick warms up a blank board so it's
+// populated seconds after launch. Tick is wall-clock (worldRealtimeTicks counter), NOT
+// in-game hours — the board is a genuine live scroll independent of what the player does.
+// worldRealtimeTick() self-guards (no player / title / creation / ending) and doesn't
+// persist (the 90s autosave + player actions flush worldMemory). Test: ota857WorldRealtime.
+// ── OTA-858 (Live-scroll balance — one sub-step per real-time tick) ──
+// OTA-857's real-time path ran 2 sim sub-steps every 6s. That mauls ~22% of the fielded
+// patrols per tick, which OUTRAN the +1/faction muster: the wars read as a meat-grinder
+// and faction power thrashed. Dropped to 1 sub-step (~11% attrition) so the muster keeps
+// pace — losses still land constantly but armies hold ground and the field stays near its
+// ~45 target. The warm-up burst and the in-game worldTideCheck path keep their 4 steps.
+// ── OTA-859 (Bounty BOARD — hold several contracts and grind standing) ──
+// The World board handed out ONE bounty at a time (accept it, no others until you finished
+// or abandoned). Now it's a real board: every eligible contract shows at once (a favored
+// faction posts a job for each of its outpost-holding rivals), and the player can STACK up
+// to 3. A single kill of a quarry advances EVERY held bounty whose target it matches, and
+// each contract that completes pays out + drops off independently — so several at once is a
+// faster standing grind. Accepting the first sets course; stacking more doesn't yank you off
+// that road (each held bounty has its own "set course" button). player.activeBounty (single)
+// is migrated into player.activeBounties[] on read so old saves keep an in-progress contract.
+// New engine helpers listBounties + bountyKey. Test: ota859BountyBoard.
+// ── OTA-860 (First-time tips pass + a global off switch) ──
+// Only Inventory + Crafting had first-time hint popups; a lot of systems shipped with no
+// just-in-time intro. Added a ~25-word FirstTimeHint at the entry of Character sheet,
+// World board, Lore codex, Map, Vendor, the Missions/Contracts board, and the FIRST combat
+// (stealth / talk-down / parley live there and aren't in the tutorial). Added a GLOBAL
+// tips kill-switch: a "First-time tips" ON/OFF toggle + "SHOW ALL TIPS AGAIN" reset in
+// Settings → Display, and a "Turn off tips" link inside every popup — both write the same
+// per-install flag, live. useFirstTimeHint now respects it. Test: ota860Hints.
+// ── OTA-861 (Rope tutorial: type it, don't pre-fill) ──
+// The rope beat used to pre-fill the input with "take rope"; now the player TYPES it. The
+// draftText pre-fill is gone and the accept-regex broadened to take/grab/get/pick up/…rope
+// so a natural synonym still lands. If they mistype, the existing lockdown nudges them.
+// ── OTA-862 (Bounty board v2 — all-faction offers + 24h deadline + missions tracking) ──
+// Two changes to the bounty board. (1) NO standing gate: EVERY faction posts bounties on
+// its rivals, not just favored ones. A faction that dislikes you still hires you — just a
+// harder job (more kills, scaled by giverDifficulty) that pays MORE standing, so bounties
+// are the road back into any faction's favor. The only quarry withheld is one you're
+// genuinely allied with. The World board frames the difficulty ("they don't trust you…").
+// (2) A 24 IN-GAME-hour DEADLINE: acceptBounty stamps acceptedAtHour; expireBounties (run
+// on the action path, where in-game time advances) lapses any overdue contract with an
+// Arbiter line, no penalty. Held bounties now also render on the Missions/Contracts board
+// under BOUNTIES with a live countdown + tap-to-route. Tests: ota862BountyDeadline; ota850
+// updated for the no-gate model.
+// ── OTA-863 (Bounty deadline is DISTANCE-AWARE) ──
+// A flat 24 in-game-hour window was too tight for a far + hard contract (a distant hostile-
+// faction bounty routes you through patrol fights, demands up to 9 kills, and one forced
+// rest alone is ~8h). The deadline is now 24h + one hour per TILE between the player and the
+// quarry's outpost (bountyDeadlineFor), measured at accept from the player's absolute cell.
+// Near jobs still ~24-34h; the farthest (~31 tiles) get ~55h. The offer card shows the
+// estimated window before you accept; the held card + Missions board count it down.
+// Test: ota862BountyDeadline (OTA-863 cases).
+// ── OTA-864 (War-feed flavour — deep, varied line pools) ──
+// The World board drew patrol clashes from 2 lines, outpost assaults from 1, and beast
+// maulings from 4, so it read the same on loop ("X smashed Y in the wild" over and over).
+// New seeded pools in worldEvents (patrolClashLine / outpostAssaultLine / patrolMaulLine):
+// 20 clash lines that vary the verb AND the scenario (ambushes, routes, night raids, box
+// canyons, pyrrhic wins), 14 assault lines, 16 maul lines (beasts, storms, sinkholes, bad
+// water). A friction clash appends one of 7 varied "a grudge is born" tails. All pure +
+// deterministic (same sim seed → same line), so the world stays reproducible + testable.
+// Test: ota864WarFlavor.
+// ── OTA-865 (War micro-economy — contested ground moves vendor prices) ──
+// The living world now touches your wallet. LOCAL WAR HEAT (0..1, from roaming-patrol
+// density near the vendor's cell) marks BUY prices up (soldiers are buying) and SELL prices
+// up a little (the trader resells to those soldiers). Bounded hard — +12% buy / +8% sell at
+// full heat, inside the CHA/tide swing — and the sell premium stays far under the buy/sell
+// spread, so there's no buy-here-sell-there arbitrage. New pure module vendorPricing
+// (warPriceFactor / finalBuyPrice / strangerBuyPrice / priceArrow) is now the SINGLE source
+// of the price math for BOTH the screen and buyFromVendor/sellToVendor — fixing an old drift
+// where the display dropped the tide modifier. UX: a war-market flavour line on entry
+// ("The fighting between the X and the Y is cleaning them out — prices run high"), a green▼/
+// red▲ ticker beside every price (colour = your benefit, so your discount beating the war
+// tax reads green), and a "friend's price" line after a buy showing what your standing/charm
+// shaved off vs a stranger. Test: ota865WarEconomy.
+// ── OTA-866 (Bounty countdown on the Missions board) ──
+// Every accepted bounty on the Missions board now carries a prominent LIVE countdown: a
+// bordered "⏳ Nh left" pill + a draining time bar, colour-tiered green → amber → red as the
+// window runs down (and "LAPSED" in red past the deadline). The window is in-game hours
+// (drains only as you act, per OTA-862), so it can't tick in real time, but the bar makes
+// "how long have I got" unmistakable and it updates the instant the clock moves. UI-only;
+// the countdown math (bountyHoursLeft) is already covered by ota862/863.
+// ── OTA-867 (Alliances — lore-seeded + emergent, and shown) ──
+// The relations board only ever showed grudges because relations only ever moved DOWN and
+// the ally seeds were half-broken (the JSON's allies arrays were full of descriptive
+// pseudo-ids the seeder dropped). Three fixes: (1) a LORE-AUTHORED seed matrix — every one
+// of the 9 factions gets real starting grudges AND alliances read from the descriptions
+// (Suppressor axis Monarchs+Architects; the Religious Reclamation bloc; the Scholars; the
+// Reclaimers merc; and the Eternal Dynasty as the friendless supremacist, hated by all).
+// (2) EMERGENT warming — enemy-of-my-enemy: when a patrol guts another, factions that also
+// hate the loser (and aren't already at war with the winner) warm toward it, so alliances
+// FORM from shared foes over time; the all-hating Dynasty is excluded so it stays friendless.
+// (3) topAlliances + the World board now renders a GRUDGES list AND an ALLIANCES list, so
+// the section finally earns its name. Test: ota853FactionRelations (seed/warming/alliances).
+// ── OTA-868 (Bloc battles — alliances fight together) ──
+// Now that alliances are real, a clash can escalate into a PITCHED BLOC BATTLE: allied
+// war-parties near the fight (within 3 tiles, allied ≥ FRIENDLY_AT) pile in on their side,
+// combined power decides it, and casualties scale. CONSERVATIVELY capped so the field can't
+// be wiped in one event — ≤2 lost on the losing side, ≤1 on the winning side (≤3 total) —
+// and the paced muster refills over time. Only fires when allies are genuinely clustered
+// (≥3 participants, a side of ≥2), so it stays a rare set-piece, not every clash. A new
+// 12-line seeded flavour pool (blocBattleLine) + a 🛡 board glyph + top feed priority.
+// Test: ota868BlocBattle.
+// ── OTA-869 (Content sprint — authored questlines from the Tartaria Prima lore) ──
+// The audit found the authored-narrative layer thin (6 hunts / 6 mysteries / 4 storylines).
+// This batch DOUBLES each, grounded in the Tartaria Hack ("Prima") material and anchored to
+// real named locations, enemies, and factions — every questline unique and specific:
+//   +6 STORYLINES, one per thin faction — Monarchs "Ledger of Silence", True Tartarians
+//     "Descent to Karok-Sa", Dynasty "Blood of the Aetherborn", Servants "Giant-Watch Vigil",
+//     Stone Builders "Scripture in Stone", Revivalists "Sasha's Gambit".
+//   +6 HUNTS — Steam Walker of Zharak's Teeth, Silt Serpent of the Sinking Cathedral, Shade
+//     of the Endless Stair, Siren of Drakova, Weaver of the Obsidian Pillars, Apparition in
+//     the Red Tower (standard_7, real enemy targets).
+//   +6 MYSTERIES — Weeping Core, Aetherborn Foundling, Drowned Bell of Samarran, Singing
+//     Stone of Ostragar, Monarch's Redaction, Second Flood Cipher.
+// Data only. HAL + golem lore lines (NOT engine — engine is lore-agnostic). Validated: all
+// factionIds resolve + have vendors, every hunt boss spawns, typecheck clean. (The pre-
+// existing questProgressionAudit boss-KILL step + starterFetchQuests were already red on the
+// clean tree — unrelated combat-harness issues, not this content.)
+// ── OTA-870 (Content sprint batch 2 — completes the double) ──
+// The second half of the authored-questline sprint, finishing "twice what was recommended".
+//   +4 STORYLINES — Reclaimers "The Highest Bidder", Architects "The Silence Protocol", a
+//     2nd Order arc "The Drowned Library", a 2nd Dynasty arc "The Purge at Asgardar". Now
+//     ALL 9 factions have at least one storyline.
+//   +6 HUNTS (3 standard_7 + 3 bait_switch_5 for structural variety) — Harpy of the Cradle
+//     of Dusk, Fiend in the Tartary Dust, Warden of Thametan's Tower, Plague Moth of the
+//     Sunken Enclave, Alpha of Yuldra-Tul, Salamander Under Voronov.
+//   +6 MYSTERIES — Cartographer's Last Map, Giant's Tooth, Hollow Crown, Ashen Codex,
+//     Tuning Fork of Asgardar, The Pale Signal.
+// Totals: hunts 6→18, mysteries 6→18, storylines 4→14. Data only; HAL + golem (NOT engine).
+// Validated: all 18 hunt targets are real enemies, all factionIds resolve + have vendors,
+// typecheck clean, loaders green.
+//
+// OTA-871 (completability sweep) — a 6-agent audit drove every hunt / mystery /
+// storyline / bounty / whisper / hook to completion plus a full endgame run. Two
+// real bugs surfaced and are fixed here:
+//   (bug 1, MECHANIC — all 3 lines) mysteries/storylines authored with a trailing
+//     pure-narration (checkKind: null) EPILOGUE stage hung one stage short of turn-in,
+//     because the real-play advance path can't step past a null stage. advanceMystery/
+//     advanceStoryline now auto-consume trailing null stages (emit their narration +
+//     arbiter line, then advance) so turn-in unlocks. Affected 14 authored quests.
+//   (bug 2, CONTENT — HAL + golem) hunt_salamander_voronov had an invalid checkKind
+//     "investigation" (≠ "investigate"); the stage could never be satisfied. Fixed.
+//   (cosmetic, MECHANIC — all 3 lines) EndingScreen recap showed raw ids for the four
+//     OTA-052 Capitals; now reads the canonical LOST_CAPITAL_NAMES export from mainQuest.
+// New guard test __tests__/ota871QuestEpilogue.test.ts (data-integrity checkKind guard +
+// mystery/storyline epilogue advance-to-turn-in). Typecheck clean; 3/3 green.
+//
+// OTA-872 (inventory sell-tab protection + "Save for quest") — MECHANIC, all 3 lines.
+//   · Items reserved for the fusion Crucible (reservedForFusion) no longer appear in the
+//     vendor SELL tab — closes a real leak where fusion stock was easy to sell off.
+//   · isUnsellable now routes through isQuestLockedItem, so a contract/broker/whisper
+//     objective item that isn't ALSO tagged 'quest' is still locked out of selling (the
+//     old check only matched the bare 'quest' tag). Named mandatory hand-in items stay
+//     fully view-only (no drop/scrap/sell/gift/fuse) as before.
+//   · NEW soft earmark reservedForQuest + toggleReserveForQuest: a "Save for quest" button
+//     (⚑) on ordinary food/materials/loot the player was told to bring. It moves the item
+//     into the Quest Items section and hides it from the sell tab, but leaves it usable and
+//     droppable (unlike a hard tag-locked item). Peels one unit off a stack like the fusion
+//     reserve (save 2 rations, eat the rest); mutually exclusive with the fusion reserve.
+// New test __tests__/ota872SaveForQuest.test.ts (7/7). Typecheck clean; related vendor/
+// fusion/sell suites 161/161 green.
+//
+// OTA-873 (Crucible "Upgrade" mode — extra coating channels) — MECHANIC, all 3 lines.
+//   The Fusing Crucible gains a 4th mode next to Weapon / Armor / Dog: "⬆ Upgrade".
+//   Pick EXACTLY 5 reserved pieces, then choose a piece on a second screen — the
+//   Crucible works an extra coating channel into it. Two target kinds:
+//   · WEAPON → a SECOND coating slot (coatingSlots → 2). A dual-coat weapon holds two
+//     coatings at once and BOTH fire on every landing hit: two on-hit roll steps
+//     ('coating' + 'coating2'), two DOTs / shred / corruption ticks. Any two elements,
+//     including the same twice — two same-element slots (poison + poison) SUM their DOT
+//     within the hit into one bigger per-kind tick (still refreshed, not accumulated,
+//     across hits, so it can't grow unboundedly); immediate damage doubles too.
+//   · ARMOR / DOG-VEST → +1 worked-in-resist capacity (resistCapBonus → 1), so the
+//     piece can hold one more damage-type resist than the stock cap of 3 (→ 4). The
+//     armor parallel to a weapon's 2nd coating slot.
+//   Adds a coating channel ONLY — no AC / damage / durability change either way.
+//   · types: InventoryItem.coating2 + coatingSlots (weapon); resistCapBonus (armor).
+//   · weaponCoating: coatedDisplayName shows both adjectives; new coatingCapacity /
+//     nextCoatSlot helpers.
+//   · applyCoating is dual-slot aware (2nd coat fills the open slot, list labels it
+//     "adds 2nd coat"); applyCoatingToArmor honours the per-instance resist cap.
+//   · new store action upgradeCoatingSlot (permit-gated like fusion; consumes 5,
+//     branches weapon vs armor, refuses ineligible / already-upgraded / wrong count).
+//   · combatRules stages the 2nd coating step; equipment aggregates a 2nd coating's
+//     passive statBonus.
+// Tests: __tests__/ota873WeaponUpgradeDualCoat.test.ts + ota873DualPoisonSum.test.ts
+// (drives a real dual-poison hit: DOT ticks for exactly 2× a single-poison weapon, as one
+// merged status). Typecheck clean; fast coating/combat/armor suites green.
+//
+// OTA-873 hardening — a 5-agent pressure-test suite (real headless combat + exploit hunt)
+// verified dual-coating combat, same-element DOT summing (10-hit flat, no unbounded growth),
+// armor/dog double-resists (cap 3→4, real damage reduction), the picker eligibility logic,
+// and the engine custom-coating merge — all CLEAN. It also found TWO real exploits in
+// upgradeCoatingSlot, now fixed:
+//   (1) dup-id cost bypass — passing the same reserved id five times satisfied the count
+//       gate but the Set-based consumption spent only ONE unit (5-cost upgrade for 1 piece).
+//       Fixed by deduping itemIds (Array.from(new Set(...))) before the ===5 gate.
+//   (2) stack mass-upgrade — upgradeCoatingSlot stamped coatingSlots/resistCapBonus on a
+//       quantity>1 row, upgrading every copy for one cost. Fixed by refusing a stacked
+//       target (the picker already restricts to quantity===1). Two EXPLOIT-GUARD regression
+//       tests added; suite now 11/11.
+//
+// OTA-873 armor-coating hygiene — the pressure-test suite also flagged a pre-existing
+// gap: acid / corruption vials worked into ARMOR granted an inert resist, because acid /
+// corruption are OFFENSIVE-only DOT families (the coated WEAPON applies them) and no enemy
+// deals them as incoming damage — so the resist matched nothing and silently wasted the
+// vial. New isResistableIncomingType() (app/engine/damageTypes.ts, keyed off
+// DAMAGE_TYPE_KEYWORDS) now gates the armor path: applyCoatingToArmor refuses an offensive
+// coating with a message steering it to a weapon, and the "Apply to armor" button is hidden
+// for those vials. The four resistable types (poison / electrical / burn / cold) are
+// unaffected — a fully-upgraded piece (cap 4) can still hold all four. Data-driven, so if
+// acid/corruption ever become real incoming types the armor path auto-enables. New test
+// ota873ArmorCoatOffensive (acid/corruption refused + not consumed; poison still works).
+//
+// OTA-874 (acid + corruption become first-class damage types) — HAL + golem.
+// Player insight: the damage inference already reads acidic/corrosive/rot attacks — it
+// just folded them ALL into `poison`, which is why an "acid resist" on armor was inert.
+// Rather than block those vials (OTA-873), this SPLITS acid + corruption out into their
+// own incoming types so a resist against them is real:
+//   · damageTypes.ts — `acid` + `corruption` added to DAMAGE_TYPE_KEYWORDS (+ corrosive/
+//     caustic/blight/hollowing aliases); two new ATTACK_VERB_TYPE rules placed before the
+//     physical buckets, so acidic attacks read `acid` and hollowing attacks read
+//     `corruption` (they were poison / slashing). Re-types the 3 Aetheric oozes (Acidic
+//     Dissolve / Acid Spit / Acid Trail → acid) and the Hollow King (Hollow Cleave →
+//     corruption), giving each type a real incoming source.
+//   · crafting.ts TYPE_RESISTANCE_MAP — metal/constructs WEAK to acid + RESIST corruption;
+//     living flesh WEAK to corruption; the acid oozes RESIST acid (made of it). This also
+//     gates whether an acid/corruption COATING "takes" on a resistant foe (thematic: acid
+//     can't corrode an acid ooze; corruption can't rot a machine or the undead).
+//   · Because isResistableIncomingType() is data-driven off DAMAGE_TYPE_KEYWORDS, the
+//     OTA-873 armor guard AUTO-LIFTS: Acid Flask / Corruption Tonic now grant a REAL resist
+//     worked into armor and the "Apply to armor" button reappears for them. (Engine keeps
+//     the guard — its lore-agnostic base defines no acid/corruption attackers.)
+// New test ota874AcidCorruptionTypes (replaces ota873ArmorCoatOffensive); typecheck clean;
+// construct/coating/weakness suites 55/55 green.
+//
+// OTA-875 (Choose-Your-Race text audit) — removed a STALE player-facing note and fixed
+// five misleading trait lines to match the shipped mechanics:
+//   · CharacterCreationScreen: deleted "(Per-day powers and immunities arrive in a
+//     follow-up update.)" — those all shipped (OTA-835 race abilities + Sentinel Immunity
+//     to Time), so the note both leaked a dev reference and was flat wrong. (All 3 lines.)
+//   · races.json (HAL + golem): the investigate-bonus traits were framed as STAT bonuses on
+//     the wrong stat / with unimplemented conditions. Reworded to the real effect (a flat
+//     "+N to investigation on relics"): Giant Ancient Insight, Mud Dweller Relic Savvy (also
+//     clarified the +2 DEX is always-on, shown separately), Reclaimer Ruins Specialist (drop
+//     the unimplemented "navigating dangerous areas"), Aetherborn Aetheric Awakening. Mud
+//     Golem Regenerative Core drops the unenforced "Near Aetherstone" gate. Unknowing Masses
+//     "Ignorant of Aetheric Power" drops a fictional Common-level magic-tier cap / 1d6 dice
+//     (no such mechanic exists) and now states the real effect (untrained → stiff Aethercraft
+//     DC penalty). No mechanic changes — text-only, matched to the engine.
+//
+// OTA-876 (faction data hygiene) — three allies/rivals entries used pseudo-ids that only
+// the standing system's normalizeRef resolved, so the relationships fired for reputation
+// but were silently dropped by the world-sim (bounties / world-pulse / world-events filter
+// on exact ids). Cleaned to plain real ids so they fire everywhere: forgotten_order ally
+// reclaimers_guild_situational → reclaimers_guild; true_tartarians ally forgotten_order_partial
+// → forgotten_order; reclaimers_guild rival mud_monarchs_when_unpaid → mud_monarchs; and its
+// non-faction ally "anyone_paying" removed (the Guild keeps no fixed faction ally). Data-only;
+// all allies/rivals now resolve to real faction ids.
+//
+// OTA-877 (first-time faction-standing explainer) — playtest: the tutorial's first standing
+// burst (e.g. picking up the Reclaimer's Rope / salvaging) pops up "X standing +N" lines with
+// zero context. logRepChanges now appends ONE brief note the first time any standing moves,
+// explaining what standing is (hostile ≤ −20, allied ≥ +20, neutral between; shaped by your
+// actions AND faction rivalries; affects vendor prices, offered work, and who fights beside
+// you). Fires once per save via new worldMemory.factionRepIntroShown (hydration-defaulted for
+// old saves), same one-time pattern as dogClimbNoticeShown.
+//
+// OTA-878 (Hardened Climbing Strap → climbing gear, not armor; 1 stamina/climb) — the strap is
+// worn (cloak slot) but carries no AC: it opens the climb_steep gate like a rope. It was showing
+// under the inventory's ARMOR section (via its `wardrobe` tag), reading like a defensive piece.
+// It now categorizes as a TOOL, listing with the other climbing implements (ropes, treads,
+// grapplers, the "Climbing Gear" item). Its worn climb cost changed from 0 → 1 stamina/tier
+// (as cheap as a Reclaimer's Rope, and it still never wears out or snaps — just no longer a free
+// climb). Rest-at-altitude (dozing on a wall while the strap is worn) is unchanged.
+//
+// OTA-879 (playtest-log bugfix sweep) — nine fixes confirmed against a real APK log:
+//  1. STEALTH init contest used the D&D (ste-10)/2 modifier on this engine's 0–10 stat
+//     scale, turning STEALTH into a penalty — a PASSED sneak check still lost an unwinnable
+//     init race and surprised the player every time. Now uses the raw stat like the gating
+//     skill check, so STEALTH actually helps.
+//  2. Title re-award loop: the storm titles (Etherbound Survivor / Aetheric Attuned /
+//     Stormcaller) were awarded mid-action from the weather tick, then reverted by later
+//     stale-`player` writebacks — so the "You have earned a name to carry" banner re-fired on
+//     every fog tick and the perk never stuck. New worldMemory.earnedTitleAnnounced ledger
+//     (immune to player writebacks) announces once and re-folds the title so the perk persists.
+//  3. Stormcaller's passive DESCRIPTION was a copy of Aetheric Attuned's; reworded to its real
+//     effect (also halves electrical in combat). The flags always differed — no double-halving.
+//  4. "✓ HIT" then enemy "dodged" (the blow finds nothing): the dodge is now resolved BEFORE the
+//     outcome line, which reads ✗ DODGED. Melee + thrown paths. Damage math unchanged.
+//  5. Quest ARRIVAL/exploration stages no longer auto-advance mid-combat (a stealth check in a
+//     fight was dumping the Cradle-of-Dusk mystery's travel scene into the combat log).
+//  6. Killing a faction vendor now shifts standing — buildTraderEnemy carries the vendor's
+//     faction (the kill→standing path was gated on a factionId trader enemies never set).
+//  7. World-sim faction drift is frozen during the tutorial (it ran on currentScreen
+//     'exploration', which the realtime + tide guards missed, drifting standings in the intro).
+//  8. One off-hand weapon no longer shows in BOTH hand slots (an off-hand attack was promoting
+//     the weapon into the main slot; the single item then read as main=X off=X).
+//  9. Parser respects an explicit trailing ordinal ("raider 3" no longer resolves to raider 2);
+//     duplicate "Legacy of Power (surge) fades." line deduped; CAUGHT-theft roll label fixed
+//     (logged "+ DEX" but rolls Stealth).
+//
+// OTA-880 (anchor-vendor faction follows the host outpost) — follow-up to OTA-879 #6. The
+// armory anchor "Irma Ironhand" is re-skinned into every faction's outpost (hub rooms are
+// re-skinned by player.factionId), but her vendor template hard-codes faction 'true_tartarians'.
+// When she spawns as the home-hub armory anchor the scene now re-points her faction to the HOST
+// faction (player.factionId), so pricing, buy-rep, theft, and kill-standing attribute to the
+// faction whose outpost it actually is — not always the True Tartarians. Foreign capitals use a
+// separate vendor path, so only the player's own home-hub anchor is affected.
+//
+// OTA-881 (peace-break penalty + victim's own faction) — refines OTA-880's framing. Killing or
+// robbing someone inside a faction's outpost is a PEACE violation owed to the HOST faction (you
+// broke their peace / abused their protection of a guest), independent of who the victim is; and
+// if the victim belongs to their OWN faction they are angered too (their member was harmed). The
+// anchor vendor now carries faction=HOST (prices, buy-rep, peace-break) AND nativeFaction=her real
+// identity (Enemy.nativeFactionId); kill→standing and caught-theft both apply to the host AND the
+// native faction when they differ. Runtime-verified: robbing hosted-Tartarian Irma at a Stone
+// Builders outpost drops Stone Builders (peace) AND True Tartarians (member) by 10 each.
+//
+// OTA-882 (floating input bar covers the box ~half the time) — the floating
+// KeyboardInputBar mounted only when a keyboard-HEIGHT event arrived, but the New
+// Architecture (Fabric) on Android drops keyboardDidShow ~half the time, so the
+// bar stayed unmounted and the in-flow field was left covered by the keyboard.
+// Fix (JS-only, OTA-safe): mount the bar on a reliable React FOCUS signal instead
+// — the in-flow input sets worldMemory-independent store flag explorationInputActive
+// onFocus. Height now only POSITIONS the bar; it's cached across opens
+// (lastKeyboardHeight) with a screen-fraction fallback, so the bar always sits
+// just above the keyboard even when the event never lands. Three retract paths
+// (submit / deferred keyboard-hide / deferred blur) keep it from lingering. The
+// autoFocus keeps the keyboard the field already raised (never pops it unbidden).
+//
+// OTA-883 (missions: distance-in-moves + sort by distance) — every mission entry on the
+// Contracts screen (bounties, hunts, mysteries, storylines, faction quests, alliance broker
+// legs, whispers, leads, sigils) now shows "◈ N moves away" to its target location, and each
+// Lost Capital row in the expanded PRIMARY OBJECTIVE box shows it too. A SORT BY DISTANCE toggle
+// sits at the top of the missions scroll AND inside the Primary Objective box (one shared flag).
+// When on, entries sort nearest-first but stay GROUPED BY TYPE (we sort within each section, never
+// merge them; placeless entries like collectibles sort last / show no distance). Distance =
+// Manhattan tile count via canonicalDistanceFromGrid(player.gridX/gridY, targetLocationId) with a
+// map-offset then location-to-location fallback for legacy saves. UI-only; ships over-the-air.
+//
+// OTA-884 (adaptive quick-action row — MORE ▾ tray) — the out-of-combat quick row had grown to a
+// wall of buttons that ate the bottom of the screen. It now keeps the world-interaction verbs
+// (look / rest / ✦ ability / investigate / take / salvage / climb) always visible, and tucks the
+// menus + rarer actions (pickpocket / craft / inventory / missions / torch / fuse) behind a single
+// MORE ▾ / less ▴ toggle. Nothing is removed — MORE is always present — so every action stays one
+// tap (or two) away and the layout no longer jumps as context changes. During the tutorial the tray
+// is force-open so each beat can still point at its control. UI-only; ships over-the-air.
+//
+// OTA-885 (indoor "room to room" leads leaking onto the open road) — playtest: the world feed
+// narrated interior finds ("You move from room to room…") while the player was traveling in the
+// open. Cause: mid-journey the departure scene (often a hub room) isn't rebuilt until arrival, so
+// player.hubRoomId / activeBuildingId linger, and indoorsForOutdoorHooks read those stale flags as
+// "indoors". Fix: readsIndoorsForHooks now treats an ACTIVE TRAVEL COURSE — a travelTarget pointing
+// at a different location, or any whisperCourse — as ON THE ROAD and never indoors, mirroring the
+// `onRoute` signal used elsewhere. Genuine hub-room / building interiors (no course underway) still
+// plant interior leads. JS-only; ships over-the-air. Covered by indoorHooksTravel.test.ts.
+//
+// OTA-886 (doubled hunt hint + "a Aetheric" article) — two copy fixes. (1) The auto-grant "Hunt
+// added to your slate" line appended "at <location>", but the hunt TITLE already names the place
+// ("The Sludge Behemoth at the Cradle of Dusk"), so the location read twice; it now names just the
+// target and leaves the full staged location to Contracts → Hunts. (2) A few player-facing lines
+// hardcoded the article "a" before a dynamic vowel-sound word — the recipe-unlock suggestion ("a
+// Aetheric Crystal Blade"), the Construct spawn line and the Crucible-forge line ("a Uncommon …").
+// They now use the shared grammar helper (withArticle / anOrA) so vowel-initial names and rarities
+// read "an". JS-only; ships over-the-air. Covered by grammar.test.ts.
+//
+// OTA-887 (multi-enemy gesture hint too long / too small) — the swipe-to-target caption under the
+// enemy carousel dots (shown only with 2+ enemies) read "swipe to target · tap for details" at a
+// 9px, wide-tracked font — playtest: too long and too small to read mid-fight. Shortened to "swipe
+// to aim · tap for info" and bumped to a larger, tighter, slightly brighter font (fontSize 9 → 12,
+// letterSpacing 1 → 0.3). UI-only; ships over-the-air.
+//
+// OTA-888 (First Aid Kit "Heal to full" option) — playtest: "the first aid kit doesn't have a heal
+// max option." The inventory batch-heal only offered "Use Max (no waste)" = floor(gap / perKit),
+// which stops SHORT of full whenever the missing HP isn't an exact multiple of the per-kit heal
+// (First Aid Kit = 25), so there was no single tap to the top. Added a primary "Heal to full ×N →
+// max/max" button using ceil(gap / perKit) kits (capped at the stack) — the fewest that reach max,
+// the last kit's surplus clamped at hpMax by useHealBatch. It shows only when it takes 2+ kits and
+// the pack holds enough; "Use Max (no waste)" stays as a de-emphasised secondary when it's a
+// smaller count. JS-only; ships over-the-air. Covered by healBatch.test.ts.
+//
+// OTA-889 (stealth day/night made consistent + visible) — playtest question: "does stealth scale up
+// at night, down in the day?" It did for the pickpocket / sleight-of-hand check (+1 night / −1 day)
+// but the IN-COMBAT stealth opener (and its reset initiative gamble) ignored the clock entirely.
+// Now the same stealthTimeBonus is folded into the combat opener + reset rolls, and a short world
+// line surfaces it ("Dusk is with you … stealth +1, night" / "The daylight leaves you little cover
+// … stealth −1, day") so the player can see the modifier move the roll. Mechanic-consistency; no
+// balance change to pickpocket. JS-only; ships over-the-air. Covered by stealthTimeOfDay.test.ts.
+//
+// OTA-890 (attack opener named the wrong weapon) — playtest: a PUNCH and an off-hand swing both
+// narrated "You bring the aetheric bolt gun to bear" — the main weapon the striking hand isn't even
+// holding. The pre-swing opener's weapon noun fell back to equipped.main whenever the resolved noun
+// wasn't a carried weapon, ignoring that the swing was bare-handed or off-hand. Now it honours the
+// actual swing: a resolved carried weapon wins, then an off-hand swing names the off-hand slot, then
+// a genuine bare-hand strike drops the weapon noun for the fists flavor, otherwise the main weapon.
+// (Bare-reach weapons like the mud-fist wraps still keep their name — barehand sits below the weapon
+// / off-hand cases.) Narration-only; the resolved combat was already correct. JS-only; ships over-
+// the-air. Covered by attackOpenerWeapon.test.ts.
+//
+// OTA-891 (signature-weapon leave line deduped per scene) — an unlootable signature weapon (the
+// Order's Hollow Edge) prints a long "you can't take it" paragraph when left on a body. Clearing two
+// enforcers in one scene printed the whole paragraph twice back-to-back. Now the full reason shows
+// the FIRST time a given signature weapon is left in a scene; later leaves of the same weapon get a
+// one-line acknowledgement ("You leave the Hollow Edge where it fell — the same locked grip as
+// before…") so the player still knows it stays behind without re-reading the lore. Tracked per scene
+// (cleared on a fresh scene). JS-only; ships over-the-air. Covered by signatureWeaponDedup.test.ts.
+//
+// OTA-892 (USE TORCH back in the primary quick row) — follow-up to OTA-884's MORE ▾ tray. Player
+// ask: "use aetheric torch should not be under the more button." USE TORCH is a situational world
+// verb — it only appears while you're carrying a torch — so it now sits in the always-visible primary
+// row (just before the MORE toggle) instead of inside the tray. The menus + rarer actions
+// (pickpocket / craft / inventory / missions / fuse) stay behind MORE. UI-only; ships over-the-air.
+//
+// OTA-893 (NARRATION CONSISTENCY AUDIT SWEEP) — a full six-lens pass over every player-facing dynamic
+// string (combat, world/exploration, quests/vendors, global articles, formatting, pronouns/dedup).
+// Fixes the verified findings:
+//  • COMBAT weapon name [biggest]: the damage-outcome lines (hit/miss/kill/knockout/coating) passed the
+//    parser's resolvedNoun raw, which resolves to the ENEMY — so they named the enemy (or literal
+//    "null") as the weapon on nearly every natural "attack" command. Both the opener and the outcome
+//    now route through one shared swingWeaponNoun() (resolved-weapon → off-hand → bare-hand → main).
+//  • Throw fallback "a stone" → "stone" (was "The a stone hits").
+//  • DOT-sweep spam: "N attackers remain … now in your sights" fired once per CORPSE during an AoE/DOT
+//    wipe, naming the dead; now gated on a LIVE remaining enemy.
+//  • Indefinite articles: "an Rare/Legendary weapon" (hunt readiness), "A Eternal Dynasty warband/
+//    patrol/caravan" (worldEvents + raid/patrol intros), "a {enemy}" wasteland encounters (Aetheric
+//    Slug/bat/Worm), "a ${scene noun}" arbiter line, "a {noun}" ambient-flavor, "a ${type}" way-forward,
+//    single-enemy arrival "a raider" at sentence start — all routed through grammar helpers.
+//  • Definite-article DOUBLING: "the ${quest title}" where 17/18 hunt (and most mystery/storyline)
+//    titles already start "The" → "the The Bog Dragon…"; six accept/abandon sites + the broker relic
+//    ("the The Entombed's Prayer Tablet") + the investigate echo line, all via theLower().
+//  • Capitalization: combat "burn flares"/"poison sets in" now sentence-cased.
+//  • Pluralization: "1 turns left" (DOT tick), "(1 turns)" (look boosts), "(1 stacks)" (golem rot),
+//    "N turns" (DOT onset) — all get a singular branch.
+//  • "+0 rep" suppressed on the 18 zero-rep faction quests (log + board + Contracts card).
+// Verified-clean families (no fix needed): uninterpolated placeholders, ${} in quotes, number/sign,
+// empty-interp double-spaces, pronoun/gender (dog has a pronoun system), double-words. JS/data-only;
+// ships over-the-air. Covered by attackOpenerWeapon (outcome), grammar, healBatch, stealth, contract tests.
+//
+// OTA-894 (SA-2 — reconcile "Aether" vs "Etheric" in prose) — the central magic term shipped in two
+// spellings (~1600 Aether vs ~535 Ether), used interchangeably even inside a single faction entry
+// ("Aetheric knowledge" for the Order, "Etheric Power" for the Revivalists). Canonicalised to AETHER
+// across all PLAYER-FACING PROSE — faction/race flavor, lore/glossary/concepts, hazard + weather
+// names, quest narration, location flavor, arbiter titles, and the engine prose literals (hooks storm
+// leads, the Samarran "Aetheric Engine", the "Aetherbound Survivor" title + its combat display). A
+// field-aware converter left every id/key/tag untouched (etheric_storm_burst, etherbound_survivor,
+// etc. — matched by code) and never touched the real word "ethereal". CATALOG ITEM NAMES (weapons /
+// armor / materials / relics / loot) are deliberately NOT renamed here — that's a save-migration +
+// recipe/loot-linkage change and gets its own dedicated pass. Data/string-only; ships over-the-air.
+//
+// OTA-895 (SA-3 — re-tier contract rewards to a monotone formula) — the contract board had
+// reward/difficulty inversions (a tier-2 hunt paying more than a tier-3, a high-rep-gated mystery
+// paying less than an open one) that made the economy read as noise. Re-tiered on a monotone
+// formula: HUNTS pay by difficultyTier in non-overlapping bands (tier2 = 400, tier3 = 700-780,
+// tier4 = 1000-1080; a small id-hashed nudge stays inside the band so payouts stay distinct but
+// never cross a tier line). MYSTERIES are floored at 300 TC and their rep gate now RISES with the
+// reward (kills the "high gate / low reward" inversions). Crucially, only FACTION-POSTED contracts
+// gate on standing: acceptHunt/acceptMystery compute playerRep=0 for a null-faction ("open
+// contract") vendor, so a rep gate on an open contract was either unreachable via a faction vendor
+// or silently bypassed on the road — a self-contradicting gate. Open contracts now stay open (their
+// elevated tier-4 reward still reflects the difficulty); the two faction-posted tier-4 hunts and the
+// faction mysteries keep their standing gate. Each posterText's inline "N TC" prose was kept in sync
+// with the new reward. Data-only (hunts.json + mysteries.json); ships over-the-air.
+//
+// OTA-896 (SA-4 — static-boss power scaling) — the Guardian scaler solved over-leveling for the ONE
+// hand-authored boss line, but every OTHER apex fight spawned at a FIXED HP: the 28 Legendary catalog
+// enemies (240-446 HP) and — worse — the 8 story bosses (458-700 HP, boss-flagged), which BOTH context
+// scalers explicitly skipped ("tuned elsewhere" — they never were). Player damage is weapon-driven and
+// stat-INDEPENDENT (combatRules gates the attack stat to to-hit, never the damage roll), so a fixed
+// 240-700 HP apex was a flat 30-55 round slog for an under-damage arrival and a trivial chip for an
+// over-geared one. New scaleStaticBoss() (coreGuardians) re-centers the fight on the player's real power
+// (reusing the Guardian power proxy): HP scales BOTH ways — a weak player gets a SHORTER, not deadlier,
+// fight; an over-leveled one a longer fight — bounded (Legendary 0.6-1.6×, story boss 0.8-1.4× so a
+// climactic set-piece never deflates below 80%). THREAT (AC + attack-to-hit) scales UP ONLY: shrinking a
+// sponge must never also make it hit harder. Raw damage dice untouched. Wired into both context scalers
+// (bosses now route through it instead of passing through fixed) plus the wasteland boss-swap and direct-
+// provoke spawn paths that bypass context scaling. Idempotent + no-op for Guardians/hunt targets/non-apex
+// via a trait stamp. Engine logic; ships over-the-air. Covered by ota896StaticBossScaling + ota816.
+//
+// OTA-897 (SA-5 — voice the bestiary) — all 109 catalog enemies shipped with ZERO prose: the OTA-837
+// bestiary and the combat enemy panel showed a bare stat block (type • rarity • HP • dmg • traits) and
+// nothing about WHAT the thing actually is. Added a one-line "flavor" field to every enemy in
+// enemies.json — an evocative field description leaning on the foe's type/attack/traits and the
+// post-Mud-Flood Tartaria setting (canonical "Aether" throughout, per SA-2). Surfaced in two places: the
+// codex bestiary (once you've recorded the kill) and, briefly, the in-combat EnemyPanel — so a foe reads
+// as a described creature, not a spreadsheet row. Pure flavor: the field is never read by combat logic
+// (types.ts documents it as such). Data + two thin UI renders; ships over-the-air.
+//
+// OTA-898 (SA-6 — accessibility baseline) — first pass at a real a11y baseline:
+//  • REDUCE MOTION — a device-level pref (its own AsyncStorage key, off the save path) that holds the
+//    UI's looping / flashing animations static: the low-HP damage flash + HP-bar fade (StatsPanel), the
+//    tutorial input pulse (InputBox), and the tutorial highlight ring (TutorialTarget). Toggle lives in
+//    Settings → DISPLAY → ACCESSIBILITY, loaded once at boot.
+//  • SCREEN-READER LABELS — accessibilityRole/Label/State on the core interactive rows: the quick-action
+//    chips and the travel buttons (disabled + selected states exposed), plus the reduce-motion switch.
+//  • CONTRAST — the muted label tan #7a705c (≈3.5:1 on the parchment base, under WCAG AA) lifted to
+//    #a2977b (≈5.9:1) across all 35 component/screen files that used it — the 8-9px meta labels the audit
+//    flagged now clear AA.
+// Text SIZE is intentionally NOT a new in-app control: the app never disables allowFontScaling, so the OS
+// Dynamic-Type / font-size setting already scales every label; a second control would only drift from it.
+// UI + a tiny new prefs store; ships over-the-air. Covered by ota898Accessibility.
+//
+// OTA-899 (test-suite triage, batch 1) — hardening + stale-test cleanup toward making the jest suite a
+// real (blocking) CI gate. Shipped-source change: accessibility.ts now LAZY-loads AsyncStorage inside its
+// read/write helpers instead of at module top, so importing the store never pulls the native module —
+// a component that transitively imports it (StatsPanel, InputBox) can be loaded in a bare JS/test env
+// without crashing (this was surfacing as a "PlatformLocalStorage undefined" load failure). On-device
+// behavior is unchanged. The rest of this batch is test-only: corrected stale expectations
+// (enemyTypeDefenses Construct row, roadside 3-7 offers), fixed the questProgressionAudit boss-kill probe
+// for OTA-796's frozen final-boss stage, updated dogGolem retaliation stats for OTA-685's DOG_TARGET_
+// CHANCE, and bounded two OOM-prone stress probes to their stable iteration range.
+//
+// OTA-900 (test-suite triage, batch 3) — one real gameplay fix + stale-test cleanup toward the blocking
+// jest gate. SHIPPED FIX: turnInFactionQuest's `remote` parameter was declared but never used, so a
+// FETCH faction quest could be couriered remotely (completed without in-person delivery) — the OTA-456
+// promise ("you can't mail the goods") wasn't enforced. Now a remote turn-in of a fetch contract is
+// refused; carry it in person. Test-only in this batch: starterFetchQuests now computes the expected pay
+// via contractJourneyBonusTc (B2 long-haul bonus) instead of a flat 35; fungusFoodReveal points its
+// pure-detector case at a Basic Aether Detector (the Aetheric Torch became an AIMED tool, OTA-776);
+// chainedNarrative injects the face-to-face vendor completeContractFromUI requires (OTA-810); and two
+// heavy stress sims (thousandDayStressSim 180→90 days, combatStress 700→250 days) are bounded to their
+// stable range (the engine's world/persist layer grows super-linearly in the tail).
+//
+// OTA-901 (jest gate → BLOCKING + RNG-flake hardening) — the jest suite is now a REQUIRED CI gate,
+// split into two jobs so the block is real without being hostage to a known engine characteristic:
+//  • jest (fast · required)   — the 467 deterministic unit/integration suites (~3950 tests). The real
+//    regression ratchet; BLOCKING.
+//  • jest (heavy sims · reported) — the 27 stress/balance/long-run sims (700-day sims, chaos sweeps,
+//    balance probes). NON-blocking: they exercise the engine's known super-linear world/persist tail-
+//    growth and are memory/time-sensitive by nature, so gating every PR on that flagged-but-unfixed
+//    characteristic would be the wrong gate. They run serially with aggressive worker recycling and
+//    surface as an informational signal.
+// Making the fast gate merge-safe meant killing a class of latent RNG flakes that only tripped
+// intermittently (a different ~1 test per full run — weather chips, variety checks, outcome bands):
+//  • DETERMINISTIC PRNG (the general fix) — jest.setup.js seeds Math.random with a fixed mulberry32,
+//    reset per test file, so every run is byte-identical: one green run is green forever and the tail of
+//    statistical/variety checks can't surprise a merge. Coverage is unchanged — tests still drive real
+//    code with a full pseudo-random sequence; it's just reproducible. Tests that need a specific value
+//    still override Math.random locally. Product code is untouched.
+//  • INCIDENTAL WEATHER (kept, for intent) — tickWeather rolls an HP/stamina chip on EVERY action; the
+//    setup also pins incidental scene weather (pickWeather) to Eerie Calm so vital-exact assertions read
+//    clean regardless of seed. Tests that exercise weather set it explicitly; weatherEffects calls
+//    tickWeather directly — both unaffected.
+//  • FIXTURE FRAGILITY — pinned hpMax in the climb-rope / heal-batch fixtures that assumed a fixed
+//    starting HP (some races roll hpMax < the hardcoded value), and recalibrated directionalFindAndCool
+//    Story's outcome bands to ±~5σ around the TRUE design (0.75 hook family → 0.375/0.225/0.15, not the
+//    stale ~30%), correcting the misleading "60% hook share" comment in areaSearch.
+// Test-harness + CI-config only; the one source touch (areaSearch) is a comment. No shipped gameplay change.
+//
+// OTA-902 (accessibility sweep — every screen + every interactive component) — the full a11y pass on top
+// of the OTA-898 baseline (which only labelled the quick-action chips, travel buttons, and reduce-motion
+// switch). This walks all 15 screens and all 39 components and gives EVERY interactive element proper
+// screen-reader / switch-access semantics:
+//  • ROLE — accessibilityRole="button" on ~230 touchables that lacked one (and "header" on ~60 screen/
+//    section titles) so a screen reader announces what each control IS and lets heading-navigation jump
+//    between sections.
+//  • LABEL — accessibilityLabel on every icon- or symbol-only control (the ✕ dismisses, ◀/▶ voice cyclers,
+//    +/− steppers, the crucible-dismiss, the map reset, the ★ SUMMON chip, back arrows, …) so they no
+//    longer read as an unlabelled "button".
+//  • STATE — accessibilityState reused from the EXACT conditions already in code: selected on tabs /
+//    one-of-a-set option rows (BUY/SELL, race/faction pick, sort toggles, fusion kind), disabled on gated
+//    buttons (SEND when empty, SAVE while saving, blocked travel), expanded on the collapsible section
+//    cards. Nothing invented.
+//  • MODAL — accessibilityViewIsModal on ~20 modal/overlay backdrops so focus is trapped in the dialog.
+//  • IMAGES — decorative art (splash poster, crest, atlas overlay glyphs) hidden from the reader; the few
+//    meaningful images (colour wheel, atlas map) get a label instead.
+//  • EnemyPanel now reads the foe's name/type/rarity/HP/AC/range as one grouped label instead of a
+//    scattered pile of numbers.
+// Text size still rides the OS Dynamic-Type setting (allowFontScaling is never disabled). UI-only,
+// additive accessibility props — no behaviour, layout, styling, logic, or copy changed (verified: source
+// tsc clean, full fast jest suite 467/467, and every removed diff line is pure JSX-tag reflow). 46 files.
+//
+// OTA-903 (lint → BLOCKING — the last non-blocking quality gate closed) — the `lint` CI job existed since
+// SA-1 but was `continue-on-error`, and in fact it NEVER RAN: the repo had no ESLint config, and under
+// ESLint 9+ (flat-config only) `eslint .` just errored "couldn't find eslint.config.js". This adds a real
+// ESLint 9 flat config (eslint.config.js) plus the pinned toolchain (eslint, @eslint/js, typescript-eslint,
+// eslint-plugin-react-hooks) as devDependencies, and flips the job to REQUIRED. The rule set is
+// deliberately LEAN and high-signal: it enforces only genuine-bug rules the tree already passes (no-dupe-
+// keys, no-unreachable, use-isnan, valid-typeof, no-fallthrough, no-constant-binary-expression, no-self-
+// compare, no-misused-new, …) and turns OFF stylistic / whole-tree-churn rules (no-explicit-any, no-unused-
+// vars, exhaustive-deps) so the gate is green today and blocks real regressions going forward — the same
+// "start where the code is, ratchet later" model as the test-typecheck gate. Two rules are OFF for
+// codebase-fit, not to hide bugs: react-hooks/rules-of-hooks (the store's ACTION methods are named with the
+// "use" verb — useHealBatch, useInventoryItem — which the rule mis-reads as React hooks) and no-useless-
+// assignment (false-positives on defensive try/catch fallback inits). Dev-tooling + CI-config only; no app
+// code, behaviour, or shipped bundle changed.
+//
+// OTA-904 (Aetherstone Thesis — flavor, first tranche) — first use of the owner's new canon doc
+// (docs/aetherstone-thesis.docx/.md): the mechanistic origin story for the whole world. Additive lore,
+// no retcon — Zalmar, Thametan's Tower, the Forgotten Order, Aetherstone, and Mud Golems were all already
+// in-game; this fills in the "how". Two edits: (1) a new discoverable concept `zalmar_overload` — the
+// radiative-Aether-harvest → vacuum-seal-shatter → substratum-liquefaction → Mud Flood → Aetherstone-
+// calcification chain, keyworded to the questions the narrator already teases ("why the water rose",
+// "what it left buried") and weaving in the doc's new proper nouns (the Grand Spire of Etheria, the Hwang
+// Radiative Principles, the Soldani Crystalline Theorems, "quintessence"); plus a one-clause enrichment of
+// the thin `aetherstone` concept (it's calcified flood-mud with trapped Etherium). (2) the Mud Golem
+// bestiary flavor line now carries its canonical origin (woke where the trapped Etheric charge ran hottest
+// — "a scrap of the empire's own thermodynamic hubris"). Terminology follows the doc's deliberate 3-way
+// scheme — Aether (the force), Etheric (the machinery/phenomena), Etherium (the crystallized shards) —
+// additively, no mass-rename of existing "Aetheric" text. Data-only; Tartaria canon → HAL + golem only,
+// never engine. Covered by ota837CodexData + ota839LoreAccuracy + ambientLoreReach (all green).
+//
+// OTA-905 (Aetherstone Thesis — flavor, second tranche: items, weather, locations, referenced works) —
+// finishes threading the owner's canon doc through the world data, all additive, no retcon:
+//  • ITEMS (materials.json) — the shard family now names its origin: Aether Crystal is "a pocket of
+//    Etherium the calcification never quite let cool"; the Aetheric/Aether Shards carry the trapped
+//    Etheric charge / slow-cooled-whole Etherium.
+//  • WEATHER (weather.json) — the two lightning weathers gain their real cause: Aetheric Storm is the
+//    buried Etheric fields discharging where the old grid shorts; Aether Lightning is trapped Etherium
+//    venting a charge held since the calcification.
+//  • LOCATIONS (locations.json) — the Grand Spire of Etheria's description now carries the radiative heat-
+//    sink mechanism (harvest sun + cold sky, vent waste heat to the stars); Thametan's Tower's carries the
+//    vacuum-seal failure that dumped the heat into the bedrock. Two matching ambient lines added to
+//    location-flavors.json (Spire radiators gone dark; Thametan frost-line where the cold stopped coming).
+//  • REFERENCED WORKS (concepts.json) — three new discoverable codex entries for the thesis's cited works:
+//    the Zalmar Texts, the Hwang Radiative Principles, the Soldani Crystalline Theorems.
+// Three-way terminology (Aether / Etheric / Etherium) used additively per the doc. Data-only; Tartaria
+// canon → HAL + golem only, never engine. Verified: ota837CodexData + ota839LoreAccuracy + ambientLoreReach
+// + mapIntegrityAudit green; full fast suite 467/467.
+//
+// OTA-906 (thesis-flavor follow-up — keyword-collision fix) — the OTA-904 `zalmar_overload` concept had
+// claimed the keywords "grand spire" / "grand spire of etheria", which the `cap_asgardar` concept already
+// owns; an audit (no name/id/recipe/collectable/weapon/armor was ever touched — all the flavor edits were
+// description/answer/flavor TEXT only) turned up that one real regression: "grand spire" would now route
+// ambiguously. Dropped those two keywords from zalmar_overload (it's still reachable via "why the water
+// rose", "the overload", "how aetherstone formed", etc.). Concept keyword set is now collision-clean for
+// all four new thesis concepts. Data-only; Tartaria canon → HAL + golem only.
+//
+// OTA-907 (arb54/arb55 — the last two Tier-C challenges go LIVE) — all six Tier-C Arbiter titles are now
+// earnable. The four that shipped earlier (Wayfarer/Speaker/Warden/Guild Broker) are joined by:
+//  • PROTECTOR OF THE FORGOTTEN (defense_of_the_enclave @ The Sunken Enclave) — a one-shot d20 + STR vs DC 15
+//    "hold the breach against the raiders." SCOUT THE BREACH reads the fight for free; DEFEND THE ENCLAVE is
+//    your single stand (pass → settlementsDefended, fail → spent). Runs on the shared handleTitleChallenge
+//    path, generalized so the def's own successLine/failLine are used instead of the Warden cathedral
+//    fallback. The enclave tile is now discoverable (was hidden), stale `disabled_challenge` tag removed.
+//  • SHADOW DIVER (trap_dives_of_the_stair @ the Endless Stair) — a RETRYABLE d20 + DEX vs DC 13 gauntlet:
+//    three CLEAN dives (trapCleanDives) earn the title, a miss springs a non-lethal 1d6 and banks nothing so
+//    you can dive again. New store handler handleTrapDive + an endless_stair scout/dive interceptor.
+// locationChallenges: both flipped enabled:true / needsLayout:false; module header + [PLANNED] doc register
+// updated (all 6 live). This is game MECHANIC + Tartaria-canon content → HAL + golem only, never engine.
+// Verified: locationChallenges + titleChallenges + tierCNewChallenges (store integration, 6 tests) green;
+// typecheck:ci + typecheck:tests (200 baseline, no growth) + lint clean; full fast suite 468/468 (3958).
+//
+// OTA-908 (dodge-outcome CLARITY — device-playtest feedback: "it looked like I lost a few and took damage,
+// there should be something saying dodge failed, maybe a you lost balance and fell") — the dodge MECHANICS
+// were right (incl. the OTA-815 nat-20-pierces fix), but the outcome feedback was buried in the [combat]
+// roll line, and — the real source of confusion — a SUCCESSFUL dodge in a multi-enemy fight still takes hits
+// from the OTHER attackers (a dodge reads ONE swing), which read like a failed dodge. Two new world beats in
+// applyEnemyCounter (gameStore): (a) a MISREAD dodge now gets a visceral "you stumble into it / lose your
+// balance" beat from a 4-line pool (skips the nat-20 pierce, which keeps its own line); (b) a SUCCESSFUL
+// dodge with other live enemies names it — "you slip X's arc clean, but a dodge reads one attacker; the rest
+// press in while you're committed." Pure narration; no mechanics change. Verified: dodgeParry +2 tests
+// (deterministic via pinned dice) → 6/6; full fast suite 468/468 (3960). Ships all three lines.
+//
+// OTA-909 (qwen-watchdog log clarity — device-log review) — the dormancy-recovery watchdog logged
+// "Qwen not ready (status='ready') — forceReinitialize()" which reads as a self-contradicting BUG. It isn't:
+// dormant = engine status==='ready' but the native llama context was released (dispose() frees the ~398MB
+// context on app-BACKGROUND; the JS status field isn't notified), so isReady() is false while getStatus() is
+// 'ready'. The watchdog reinitializing is CORRECT (OTA-222/797). Reworded the line to name the dormant case
+// distinctly (isDormant() branch) vs a genuine idle/failed reinit. Pure log-string change, no behavior/logic
+// change. Verified: typecheck:ci + lint clean. Ships all three lines.
+//
+// OTA-910 (THE GREAT CLIMBS + the Skyreacher armor set — new content, HAL + golem only) — five landmark
+// "great climbs" of 11–15 tiers: the Grand Spire of Etheria (15), the buried spire of Asgardar (14), the
+// Great Obsidian Monolith (13), Thametan's Tower (12), and the Great Fang of Zharak (11). New engine module
+// greatClimbs.ts registers each (locationId → distinctive prop noun → tiers → reward piece); climbHeightFor
+// + isClimbable recognise them (token-matched so they never collide with the generic curated climbables that
+// share a location — "grand spire capacitor", "obsidian pillar", "zharak's teeth spire"). beginScene forces
+// the great-climb prop into the landmark's scene nouns so the ascent is always there. Climb-verb wiring:
+// (a) great climbs cost a flat 2 stamina/tier (no rope discount) so the pool can't cover the full height and
+// you MUST rest partway up; (b) mid-climb rest on a great climb needs the Hardened Climbing Strap specifically
+// — a Reclaimer's Rope won't anchor a doze this high; (c) a HARD strap wall past tier 10: try to push past the
+// tenth hold without the strap and you FALL; (d) fall damage now SCALES with height —
+// floor(hpMax × (0.12 + 0.055 × tierFallenFrom)), capped 0.9× (short climbs barely change from the old flat
+// 20%, great-climb falls near-kill). Summit pays a GUARANTEED Skyreacher piece, once per climb (banked in
+// worldMemory.greatClimbsCrested). Skyreacher armor set = 5 Legendary pieces (head/chest/legs/feet/hands —
+// cloak left free for the strap), AC+4, THREE heavy authored resistances each (the only armor authored with
+// three resist slots), collect_only: no recipe, excluded from vendor legendary rolls, sells for a nominal 1 TC.
+// New "Skyreacher" title (titles.ts + arbiter-titles.json): earned at 5 distinct great climbs crested — perk
+// halves climb-fall damage + a passive +2 DEX (folded into effectiveStats). Verified: greatClimbs +21 new
+// assertions; titles/arbiterTitlesScreen/canonFacts retargeted (20 → 21 titles); climbRopeMechanics fall
+// damage retargeted to the scaled formula; typecheck:ci + typecheck:tests (200 baseline, no growth) + lint
+// clean; full fast suite 469/469 (3972). Content → HAL + golem only, NOT engine (lore-agnostic).
+// OTA-911 (GREAT CLIMBS — mountaineering rework: guardians, gear, combat rules — HAL + golem only) —
+// heavy-lore follow-up to OTA-910. The five great climbs are the Aether-collector towers of the old
+// planetary grid — the sky-antennas that drew Aether from sun + cold night into the cities (the Grand Spire
+// "channeled cosmic Aether into the city grid"), the same grid whose resonance cascade at Thametan's Tower
+// drowned the world. Their automated defenders never stood down (canon etheric_guardians: "drones to war-
+// scale machines... defend the Tartarian sites since before the Flood"). Changes:
+// (1) NEW engine module climbEncounters.ts — winged sentinels + collector drones ambush you mid-climb,
+//     2–5 times scaling with height (~floor(tiers/3), spread across the middle pitches, tougher band the
+//     higher you go); scaled to the player via scaleEncounterForContext. Injected from the climb handler.
+// (2) STRAP → LEGS SLOT: the Hardened Climbing Strap is now a legs-slot harness (was cloak; `wardrobe`-tag
+//     routing in equipment.ts → ['legs'], all equipped.cloak strap checks → equipped.legs, ExplorationScreen
+//     too). Description rewritten (legs harness; rest + fight anchor; great-climb-mandatory; collector-tower
+//     lore). The Skyreacher legs piece (Greaves) moved to the freed CLOAK slot as the "Skyreacher Mantle" so
+//     the full set + strap are worn together during the guardian fights (set now head/chest/cloak/feet/hands).
+// (3) GREAT-CLIMB ENTRY GATE: from the ground you now need BOTH the strap equipped (legs) AND a Reclaimer's
+//     Rope with enough line to outlast the whole climb (totalTiers × 15 wear; a fresh 300-durability rope
+//     clears the 15-tier Spire). Refused at the base otherwise. Mid-climb strap-wall + rest-gate stay as
+//     backstops if the strap is stripped after you're up.
+// (4) COMBAT RULES ON A CLIMB: dodge & flee are refused while elevated (early intercept — no roll/stamina
+//     spent; inventory + drinking still work). You can't climb past a live fight (forces you to clear a
+//     climb-ambush before the next pitch). Mid-climb encounters only fire WITH the strap (you can't fight a
+//     bare rope face — "without the strap you fight only at top or bottom"). UI: dodge/flee/golem buttons
+//     hidden while elevated.
+// (5) COMPANIONS: the golem can't climb — benched narratively at the base on the first pitch, its command
+//     refused while you're elevated (mirrors the dog's existing bench). Both "return" on descent.
+// Verified: climbEncounters (+10 assertions) + climbCombatGates integration (dodge/flee refusal) + greatClimbs
+// retargeted (Mantle/cloak, strap→legs); typecheck:ci + typecheck:tests (200 baseline, no growth) + lint clean;
+// full fast suite 471/471. Content → HAL + golem only, NOT engine.
+// OTA-912 (GREAT CLIMBS — maps, summit bosses, the Skyreacher Boltcaster — content, HAL + golem only) —
+// the great climbs become a full quest chain, framed on the canon: they ARE the Aether-collector towers of
+// the grid that drowned the world (the Grand Spire "channeled cosmic Aether into the city grid"; Thametan's
+// Tower is ground zero of the Zalmar Overload). Changes:
+// (1) ACCESS via MAPS. Five "Skyreacher Chart (N of 5)" items (gear.json, new `map` ItemEffect) are sold ONE
+//     time each by roadside traders (worldMemory.soldMapIds ledger; ~18% of eligible stalls). Using a chart
+//     (unlockGreatClimbFromChart) unlocks that climb (worldMemory.unlockedGreatClimbs), reveals + logs the
+//     landmark, and consumes the chart. The great-climb prop now ONLY spawns once its chart is used — access
+//     is gated on the maps.
+// (2) SUMMIT BOSSES. Five named bosses (greatClimbs.SUMMIT_BOSSES, boss:true, scaled via scaleStaticBoss)
+//     spawn at the top tier — you fight into the heart of the disaster. Machines vulnerable to electrical +
+//     acid. Climbing DOWN breaks off the fight and fully resets the boss (the escape valve, since dodge/flee
+//     are off up there). The Skyreacher armor piece is now claimed by BEATING the boss, not merely cresting.
+// (3) BEACONS → BOLTCASTER. Each boss guaranteed-drops an Aether Collection Beacon; the fifth re-links into
+//     the SKYREACHER BOLTCASTER (Legendary ranged, electrical damage + a permanent baked-in acid coating =
+//     electrical + acid) plus a legendary material cache. One-time (worldMemory flags).
+// (4) ARMOR REWORK. Skyreacher pieces now resist COLD baseline only (rarity ladder SUPPRESSED for the
+//     `skyreacher` tag), leaving their 3 resist slots OPEN for the player to fill by choice via coating vials.
+// (5) FUSION-LOCK. Skyreacher armor + the Boltcaster (all `collect_only`) cannot be upgraded at a Crucible.
+// (6) Great climbs listed as missions in Contracts (unlocked-but-uncrowned) with a 0/5 tower tally.
+// Verified: greatClimbs + skyreacherRewards + climbEncounters + skyreacherChartUnlock (integration) tests;
+// armorResistanceLadder + weaponDefense + greatClimbs retargeted; typecheck:ci + typecheck:tests (200
+// baseline, no growth) + lint clean; full fast suite 473/473 (3987). Content → HAL + golem only, NOT engine.
+// OTA-913 (GREAT CLIMBS — the Beacon Rifle is now BUILT, not handed in — content, HAL + golem only) — the
+// five Aether Collection Beacons no longer auto-assemble on the fifth boss. Instead, when all five towers
+// fall the Arbiter SUGGESTS the play: the beacons were never weapons — they were built to COLLECT Aether,
+// to pull charge out of the empty air and send it down the grid; broken down, their arrays make a rifle that
+// does the same and throws it. The player triggers it by USING a beacon from the pack (new `beacon` item
+// effect on the Aether Collection Beacon → assembleBeaconRifle): it disassembles the five collector-arrays,
+// consumes them, and builds the BEACON RIFLE (renamed from "Skyreacher Boltcaster"; Legendary ranged,
+// electrical + a permanent acid rider) plus the legendary material cache — with an in-voice build beat.
+// Using a beacon before all five towers are cleared just hums (no build); once built, further nodes are
+// spent shells. Fusion-lock (collect_only) + the Contracts hint updated for the rename. Verified:
+// skyreacherFullRun retargeted (5th boss no longer auto-builds; USING a beacon builds it) + a "hums early"
+// guard test; skyreacherRewards renamed; typecheck:ci + typecheck:tests (200 baseline) + lint clean; full
+// fast suite 474/474 (3991). Content → HAL + golem only, NOT engine.
+//
+// OTA-914 (THE AETHERKIN — a new enemy type: the mud-mummified flood-dead — content, HAL + golem only) — the
+// Aetherkin are the Tartarians the Great Mud Flood sealed under, drowned and mummified in silt, reanimated by
+// the Aether they died steeped in. They are NOT zombies: they are AFRAID — reanimated with basic memories of
+// who they were and a muscle-memory of fright-or-flight. They don't hunt; they cringe and defend themselves if
+// pressed (authored `skittish`, so CALM is the talk-down key). Two defensive variants join enemies.json:
+// Drowned Aetherkin (Common, hp 45) and Mud-Wracked Aetherkin (Uncommon, hp 95), both carrying an `aetherkin`
+// marker trait; the older power-hall "Aetherkin" (Rare) also reads as one by name. New app/engine/aetherkin.ts
+// builds a RANDOMIZED encounter — emergence → an Arbiter beat naming them ("these are the Aetherkin you've
+// heard about") → who they were / might have been / why they're here → how they carry themselves. They can
+// spawn on entering a discovered HOME or SHED (never an outpost/market) and can claw up out of open, novel mud
+// as a roadside encounter. Reverence has teeth: DESTROYING one lowers standing with the four factions that hold
+// the flood-dead sacred (true_tartarians, servants_of_giants, tartarian_revivalists, eternal_dynasty); TALKING
+// one down raises it. Verified: ota914Aetherkin (module + data + kill-lowers / calm-raises store tests);
+// typecheck:ci + typecheck:tests (200 baseline) + lint clean; full fast suite green. Content → HAL + golem, NOT engine.
+//
+// OTA-915 (GREAT CLIMBS — codex + title discovery-gating — content, HAL + golem only) — three codex gaps closed:
+//   (1) LORE › PLACES — the five Great-Climb tower locations now mask as "?" ("unknown — a chart will lead you
+//       here", no route affordance) until you USE that tower's Skyreacher Chart (unlockedGreatClimbs). Ordinary
+//       locations are never map-gated. (isGreatClimbLocationLocked in greatClimbs.ts.)
+//   (2) BESTIARY — the five summit bosses (Aurenthal / Draugveil / Magnetar / Zalmar's Cascade-Wraith / Ossika)
+//       are now catalogued, gated on DEFEAT like every foe. They are deliberately NOT added to enemies.json
+//       (that pool is rolled for random wild spawns — a unique tower boss must never ambush you in open waste);
+//       instead they're projected into the codex from greatClimbs.SUMMIT_BOSS_BASES (single source of truth),
+//       each given a one-line codex flavor. Their built name matches the projection so a kill lights the entry.
+//   (3) TITLES — the Skyreacher title now stays hidden as "??? — undiscovered" until you've found the questline
+//       (bought a chart / unlocked / crested — greatClimbLoreDiscovered); earned always shows. (isHiddenTitle.)
+// Aetherkin were already bestiary-gated (they live in enemies.json) — no change needed there. Verified:
+// ota915GreatClimbCodex (summit-boss projection + name-match, location mask, hidden-title gate); typecheck:ci +
+// typecheck:tests (200 baseline) + lint clean; full fast suite green. Content → HAL + golem only, NOT engine.
+//
+// OTA-916 (AUDIT FIXES — two economy/faction leaks from a game-wide bug/exploit sweep) — (1) the OTA-914
+// Aetherkin BUILDING spawn re-rolled on every enter() — and enter/exit is free and returns you to the same
+// tile, so a home/shed was a repeatable faction-standing (+2 reverence ×4 factions per spare) AND loot farm.
+// The roll is now BANKED per building-tile (worldMemory.aetherkinRolledBuildings): one roll per structure,
+// banked whether or not one spawned, mirroring the mud spawn's tileIsNovel gate. (2) The rapport / war-heat /
+// relic-title SELL multipliers stacked ON TOP of the RARITY_BUY_FLOOR cap on unstocked items, letting a
+// rapport'd stall pay above the cheapest-buy floor (buy-cheap-elsewhere → sell-here loop). applySellCaps is now
+// applied as the FINAL step (exported; re-clamped in the store after war/title, and rapport moved before the cap
+// inside sellPriceFor), so the floor is always the last word; rapport still lifts a below-floor sell. Both are
+// balance leaks, not crashes; the sweep found no corruption/crash/state-integrity failures. Verified:
+// ota916AuditFixes (bank + floor) + retargeted ota805RapportDiscount; typecheck:ci + typecheck:tests (200
+// baseline) + lint clean; full fast suite green. Fixes → HAL + golem only, NOT engine.
+//
+// OTA-917 (BALANCE TUNE — reward-monotonicity fix from the balance/economy audit — content, HAL + golem only) —
+// "The Reclaimer Relic Run" storyline was the confirmed reward outlier of all 14: 7 stages (tied 2nd-most) but
+// the LOWEST payout — 1000 TC / 20 rep and a COMMON reward item (Echoing Steps Boots, tcSell 7), while the other
+// 13 all pay a Rare item + 1200-2000 TC + 22-30 rep. Worse, that item is the Reclaimer race's own STARTER
+// (RACE_STARTER_EXPLORATION), so for its likeliest runners the reward was a duplicate worth nothing. Re-tiered to
+// sit monotone with the 7-stage tier: rewardTc 1000→1400, rewardRep 20→24, rewardItem Echoing Steps Boots →
+// Explorer's Aetheric Greaves (Rare, tcSell 48, feet, explorer-themed, not any race starter); posterText TC
+// updated. Data-only. (The audit's other confirmed mis-tune — gear resale clamped to scrap because
+// RARITY_BUY_FLOOR shadows GEAR_RARITY_BASE — is deferred: the safe fix must be per-item buy-grounded, since a
+// flat gear floor reopens bare-Common-weapon arbitrage.) Verified: contractUIRewards + echoingBootsArmor green;
+// JSON valid. Content → HAL + golem only, NOT engine.
+//
+// OTA-918 (BALANCE TUNE — summit bosses to a real boss tier + weakness de-dup, from the balance audit — content,
+// HAL + golem only) — the five Great-Climb summit bosses guard the game's biggest reward (5 guaranteed Legendary
+// Skyreacher pieces + the Beacon Rifle) but sat at the LIGHTEST boss tier: base HP 270-320 (~46% of the
+// ~458 story-boss floor), AND they carried an explicit `vulnerable:electrical` trait that DOUBLE-DIPPED with the
+// Automation/Mechanism type-map electrical weakness — combineDamageTypeMatch stacks concordant type+trait
+// (1.5x * 1.5x = 2.25x), so any electrical hit did 2.25x, roughly halving their effective HP again. Fix: (1)
+// remove `vulnerable:electrical` from all 5 (electrical stays a clean 1.5x via the type map — verified combat
+// applies the type map to bosses at gameStore.ts:16863,16873); (2) KEEP `vulnerable:acid` (acid is NOT a type
+// weakness, so the trait is the intended single 1.5x that makes the Boltcaster's acid rider bite); (3) raise
+// base HP to a real Legendary tier preserving the spread — Ossika 270->440, Draugveil 285->460, Aurenthal/Zalmar
+// 300->470, Magnetar 320->500. Altitude lethality (scaling falls, dodge/flee off mid-climb) stays the extra
+// counterweight. Verified: skyreacherRewards retargeted (electrical-via-type, no double-dip, HP>=440) +
+// greatClimbs/climbEncounters/skyreacherFullRun/ota915 green; typecheck:ci + typecheck:tests (200) + lint clean;
+// full fast suite green. Content → HAL + golem only, NOT engine.
+//
+// OTA-919 (AUDIT BATCH 1 — new-content wiring/integrity sweep — content, HAL + golem only) — verified this arc's
+// additions resolve end-to-end and found one real gap: `Veil of Peace`, dropped by all three Aetherkin variants,
+// was never an authored item — it fell through as a bare misc name with no flavor or value (a phantom reward;
+// it predated this arc on the legacy Aetherkin and was propagated to the two new variants). Authored it as a
+// real Uncommon Aether relic in materials.json. Everything else checked clean: the other Aetherkin loot
+// (Aetherstone Fragment, Aether Mud) is authored; the 5 summit-boss codex projections' names match the built
+// boss (so a defeat catalogues them) and don't collide with enemies.json; the swapped storyline reward
+// (Explorer's Aetheric Greaves) exists; and the new worldMemory fields (aetherkinRolledBuildings, etc.) are
+// save-safe (hydrate spreads ...saved.worldMemory and reads guard with ?? []). New test ota919NewContentWiring
+// locks all of it. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. HAL + golem only.
+//
+// OTA-920 (AUDIT BATCHES 2-7 — accessibility / narration / lore / parity / reachability / perf-save over the new
+// content — content, HAL + golem only). Parity + reachability came back CLEAN (no logic drift between lines; no
+// phantom reward items). Fixes applied: (a11y, batch 2) the locked codex rows dimmed the whole container with
+// `opacity: 0.5`, which group-composited every child's text below WCAG AA — dropped the opacity (dashed border +
+// already-muted colors carry the "locked" read) and raised `lockedSub` #5a5245 (2.45:1) → #9a8f79; the hidden
+// "??? — undiscovered" title row (a plain View) got `accessible`/`accessibilityRole`/`accessibilityLabel` so a
+// screen reader announces one coherent node instead of "white diamond, question question question". (narration,
+// batch 3) the baker former-life carried an internal em-dash that collided with the identity template's own
+// " — ", stacking 2-3 dashes in one sentence → changed to a comma. (perf/save, batch 7) `aetherkinRolledBuildings`
+// grew unbounded (one key per building tile, never pruned, absent from saveTrim) → bounded to the last 300 under
+// save-size pressure only (regenerable; banking intact in all normal play). DEFERRED (recorded in
+// docs/open-audits): the enemy `type` "Etheric Undead" → "Aetheric Undead" rename (SA-2 canon), a coordinated
+// combat-critical change across enemies.json + the crafting.ts AND encounter.ts weakness-lookup maps — pre-existing
+// drift on 3 legacy enemies, not this arc's, and unsafe to rush. Verified: typecheck:ci + typecheck:tests (200) +
+// lint clean; full fast suite green. Content → HAL + golem only, NOT engine.
+//
+// OTA-921 (LORE — "Etheric Undead" → "Aetheric Undead" enemy-type rename, closing the last open audit item;
+// content, HAL + golem only) — SA-2 reconciled Aether vs Etheric across the lore, but the enemy `type` taxonomy
+// key stayed the pre-reconciliation "Etheric Undead" while the canon banks (glossary/concepts/ambient-flavor) all
+// spell it "Aetheric" — so the codex/EnemyPanel showed the un-reconciled label. Renamed as ONE atomic change so
+// the weakness lookups never desync: the 5 enemy `type` fields (enemies.json), BOTH type-keyed weakness maps —
+// crafting.ts TYPE_RESISTANCE_MAP['Etheric Undead'] and encounter.ts THEMATIC_DEFENSE_POOLS['etheric undead']
+// (the lowercased key the batch-4 agent missed) — plus the crafting/gameStore comments and the Arbiter flavor
+// line. Values unchanged, so combat behavior is identical — only the display string + lookup key moved. Retargeted
+// 5 tests (ota827/knockoutThreshold/weaponEffects/ambientLoreReach/ota914Aetherkin). Verified: damageTypes +
+// ota827 + weaponEffects (weakness resolution) green; typecheck:ci + typecheck:tests (200) + lint clean; full
+// fast suite green. Pre-existing drift (3 legacy enemies) + this arc's 2 Aetherkin. Content → HAL + golem only.
+//
+// OTA-922 (BALANCE — armor resale grounded per-item; closes the last confirmed balance mis-tune — content, HAL +
+// golem only). The gear re-level (GEAR_RARITY_BASE → intended sell 11/26/60/128) was dead code: applySellCaps
+// clamped it to RARITY_BUY_FLOOR (5/14/40/112), which is the cheapest buy of a BONUS-LESS item, so every
+// Uncommon+ armor sold at the same scrap price as raw materials. Fix (the audit-verifier's per-item, buy-grounded
+// approach, using authored catalog data): for kind==='armor', cap resale at 0.8 × the piece's OWN tcBuy
+// (findArmorByName) instead of the flat floor — the same 0.8 haggle factor the flat floor uses, but bonus-aware.
+// A specific piece thus sells for its worth yet never clears its own cheapest buy (arbitrage stays closed; a data
+// test proves sell ≤ 0.8×tcBuy < tcBuy across all ~130 catalogued Common-through-Legendary pieces). Effect:
+// Uncommon armor 14→~26, Rare 40→60, Legendary 112→128, pricier Commons 5→up to 11; cheap/low-AC Commons stay
+// low (correct — their own buy is low). Weapons (no authored tcSell, arbitrage-prone bare Commons), fused/renamed
+// armor not in the catalog, and collect-only pieces (Skyreacher, tcBuy 0) all keep the flat floor. A FLAT gear
+// floor was rejected: the cheapest Common armor buys at 8, so a flat 11 would reopen buy-8-sell-11 arbitrage —
+// only the per-item cap is safe. Verified: ota922GearResale (per-item cap + Uncommon/Rare lift + weapon/fused
+// fallback); typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Content → HAL + golem only.
+//
+// OTA-923 (BALANCE — the two remaining PLAYTEST tuning items from the balance audit; content, HAL + golem only).
+//   (1) REPAIR COST (durability.ts) — was a flat 1 TC / missing point, rarity-blind, so mending a Legendary cost
+//       the same as a Common cudgel and upkeep was a negligible late-game sink. Now scales GENTLY by rarity
+//       (×1 / 1.5 / 2 / 3 — deliberately NOT 1/2/4/8, which overshoots): a full Legendary repair ~65 → ~195 TC,
+//       a real wealth sink but not punishing vs late income. Composes with the Architect's Eye discount (applied
+//       on top at the call site).
+//   (2) LEADS / QUEST CURRENCY REWARD (questGenerator.ts) — the 30/120/400 currency tiers were flat-weighted, so
+//       a trivial early quest rolled a 400-TC jackpot as often as a 30-TC one, with no early→late lean. Location
+//       is now chosen BEFORE the reward, and the size-tag weight leans by location.danger (bias 'small' at
+//       danger≤2, 'large' at danger≥4) — a monotone early→late cash lean that PRESERVES the anti-repetition
+//       novelty rotation (weightByMemory still drives variety; this only nudges the tier). The combat-AC / to-hit
+//       item stays OPEN as a genuine playtest call — the audit's own synthesis judged boss AC well-shaped and the
+//       to-hit soft-cap ripples through the combat-log display; not shipped blind (see docs/open-audits).
+// Verified: durability/questGenerator/repair tests green; typecheck:ci + typecheck:tests (200) + lint clean;
+// full fast suite green. These are TUNING values — easy to revisit after playtest. Content → HAL + golem only.
+//
+// OTA-924 (BALANCE — apex fights converged to ~12-round tense races; content, HAL + golem only). A time-to-kill
+// analysis found apex fights were BOTH failure modes at once: player DPS is weapon/coating/weakness-driven (per
+// design — stat only feeds to-hit) and hard-caps ~30-40, but the two boss-HP systems diverged ~4×. scaleStaticBoss
+// bosses were HP-sponge SLOGS (summit 440-500 → ~615 scaled → ~19 rounds after my own OTA-918 over-swing; wild
+// Legendaries 458-700 → up to ~920 scaled → 24-26 rounds), while Core Guardians were TRIVIAL (base 30-50 × hpMult
+// 3.1 → ~95-155 scaled → ~5 rounds). Owner's target: ~12-round fights where you must BUILD FOR THE FIGHT (right
+// weapon + coating for the foe's weakness); wrong build = longer, by design. Converged all apex HP toward a
+// ~400-460 scaled band (~12 rounds at the ~35-DPS ceiling): (1) summit bosses base 300-350 (greatClimbs.ts —
+// re-tunes OTA-918 down, still a real boss tier by TTK); (2) wild Legendary bosses base 300-345 (enemies.json,
+// 8 entries — Iron Worm/Mud Tyrant were the worst); (3) Core Guardian late tiers hpMult 2.7/2.9/3.1 → 4.0/5.5/7.0
+// (T7-T9 only; early tiers 1-6 stay smoothed/approachable) → the CLIMAX Guardians now a ~9-11 round fight. Damage
+// unchanged (no stat-to-damage). Verified: skyreacherRewards HP assertion re-tuned + coreGuardians/greatClimbs/
+// climbEncounters/skyreacherFullRun green; typecheck:ci + typecheck:tests (200) + lint clean; full fast suite
+// green. TUNING values — revisit after real playtest. Content → HAL + golem only, NOT engine.
+// OTA-925 (BALANCE — THE FINAL GUARDIAN is the game's last boss → a ~20-round wall, not the 12-round apex race).
+// The storyline needs all 9 Cores and Guardian difficulty is keyed to kill-count, so the 9th Guardian (whichever
+// Capital the player saved for last) is the literal endgame fight. Two problems keying that off the tier-9 hpMult:
+// authored base.hp varies 30-50 across Capitals (so "which seat is last" swung final HP ~210→350), and 20 vs 12
+// rounds is a deliberate step up. Fix: coreGuardians.isFinalGuardian(coresRecovered) detects the last fight
+// order-independently, and spawnGuardianForCapital OVERRIDES HP to a fixed, Capital-independent FINAL_GUARDIAN_HP
+// (660 — ~20 rounds at the weapon-capped ~30-40 net-DPS ceiling; tier-9 regen + double-counter pressure carries
+// felt length past 20). Over-level still applies upward-only, so an over-grinder faces an even longer wall. AC /
+// damage / traits unchanged (tier-9 profile). coreGuardians test extended (final-fight HP fixed + Capital-
+// independent + > tier 8); typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. TUNING value
+// — revisit after a real final-boss playtest. Content → HAL + golem only, NOT engine.
+// OTA-926 (BALANCE — Core Guardians ramp monotonically; each of the game's main antagonists a bit tougher than the
+// last). The Guardians scale by KILL-COUNT not Capital (design intent), but HP was Capital.base.hp × hpMult, and
+// base.hp varies 30-50 across Capitals. Since the player picks the fight ORDER, that leaked the Capital into
+// difficulty and could INVERT the ramp (Cantor(50) @ tier1 = 70 HP, then Vaelka(30) @ tier2 = 48 HP — 2nd fight
+// EASIER than the 1st). Fix: HP now uses one Capital-independent canonical base (CANON_BASE_HP=42) × the tier's
+// hpMult → a strictly monotonic curve (T1→T8 ≈ 59/67/76/84/92/101/168/231, then the T9 final wall at 660). Damage
+// die + AC already ramp by tier; this closes the HP leak so EVERY Guardian is reliably tougher than the last.
+// Per-Capital flavor still lives in weakness/resistance/damage-type/approach-line, just not raw HP. New monotonic
+// ramp test (different Capital each tier). typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green.
+// TUNING values — revisit after playtest. Content → HAL + golem only, NOT engine.
+// OTA-927 (FEATURE — the Aetheric Vision Lens gets a dedicated equip slot + is equip-gated). The tool pouch became
+// scanner-only (OTA-778), leaving the Lens (and the 9 other detect_aether aether-sight gadgets: goggles, beacons,
+// locators, analyzer, compass, tuner) homeless and confusingly "active while merely carried" with no equip button.
+// Now: a new `lens` EquipSlot (its own worn slot, never competes with a weapon/off-hand). validSlotsForItem returns
+// ['lens'] for any detect_aether gate item, so the Equip (Lens) button appears automatically. The detect_aether
+// passive (search hook +15pp, fusion-bench encounter bias) + the HUD 'scanning' badge are now equip-gated via
+// equipment.aethericVisionEquipped(player) instead of "in inventory". backfillPlayer auto-equips a carried gadget
+// into an empty lens slot (no silent loss on update). USE on a gate-lens now nudges 'equip it'. New ota927 test.
+// typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Content-agnostic UI/equip feature —
+// ships HAL + golem (NOT engine: Tartaria item names).
+// OTA-928 (FEATURE — the POWER rating: a single at-a-glance number so the player FEELS growth with no character art).
+// New app/engine/powerRating.ts computes one comparable score for the player AND each enemy from the same four terms
+// (best effective combat stat + avg weapon damage/hit + effective AC + HP/10), so training a stat or upgrading a
+// weapon/armour visibly moves it. The player's Power shows top-right of the stats panel; each enemy's Power shows
+// top-left of its combat card, so they FACE each other; the enemy badge is coloured by matchup (green = you outclass
+// it, gold = even, red = it outclasses you). A first-fight FirstTimeHint ('power_number') introduces it. Power is a
+// GAUGE, not a replacement — every underlying stat still matters. New powerRating test. typecheck:ci + typecheck:tests
+// (200) + lint clean; full fast suite green. UI feature -> HAL + golem (NOT engine).
+// OTA-929 (FEATURE — Power-change flash: see the number move). Building on OTA-928's Power rating, the stats-panel
+// badge now shows a transient signed delta whenever your Power changes — swap your main weapon and a green ▲ +8 (or
+// red ▼ -6) flashes under the ◆ PWR number for ~2.5s, so a gear choice gives instant "did that help?" feedback. It
+// fires for any Power move (weapon/armour swap, stat tick, buff on/off). StatsPanel-only; no formula change.
+// typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. UI feature -> HAL + golem (NOT engine).
+// OTA-930 (FEATURE — the player's OWN Power badge now recolours by the matchup, not just the enemy's). Playtest
+// confusion: a weak enemy (22) showed green while the player's strong 74 stayed a static gold, reading backwards.
+// Now StatsPanel takes the active target's Power (threaded from ExplorationScreen) and colours the player badge by
+// the same verdict as the enemy badge — green when you outclass your target, gold on an even fight, red when
+// outmatched; neutral gold out of combat. Both numbers now tell the same story at a glance. Tutorial 'power_number'
+// copy updated to say BOTH numbers colour by the matchup. StatsPanel + ExplorationScreen; no formula change.
+// typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. UI feature -> HAL + golem (NOT engine).
+// OTA-931 (BUGFIX + BALANCE — a weapon's own name no longer forces a bare-hand swing; Giant starter buffed). The
+// engine lets a player deliberately punch by saying "punch/kick/fist/…", trading damage for the bludgeoning type.
+// But the Tartarian Giant's starter weapon is "Mud-fist Wraps" — the "fist" in its NAME tripped that override, so
+// "attack with the mud-fist wraps" silently dropped the weapon and swung bare-handed (also making the equipped
+// Power reading disagree with real combat). Fix: strip the equipped weapon's own name before the bare-hand check
+// (a standalone "punch it" still punches). Also, Mud-fist Wraps read 1d4 — WEAKER than the Giant's own 1d6+2
+// fists — so its damage is bumped 1d4 -> 1d10 (note: parseDamageDice ignores flat +N, so pure dice; with its
+// existing +2 defense, wielding it now clearly beats punching). New ota931 test. typecheck:ci + typecheck:tests
+// (200) + lint clean; full fast suite green. Content + generic combat fix -> HAL + golem (NOT engine).
+// OTA-932 (BUGFIX + UI — a HAND weapon is never treated as, or offered as, a bare-fist/kick swing). OTA-931 stopped
+// a weapon's NAME from forcing barehanded; this closes the rest. (a) combatRules: any weapon tagged 'barehanded'
+// (the Mud-fist Wraps, the Aetherstone/Shock/Graviton Gauntlets, the Giant Bone Knuckles) IS the player's fist, so
+// "punch"/"kick" now swings THAT weapon instead of bare skin (deliberately punching while holding a NON-hand weapon
+// like a sword still drops to fists; empty-handed still punches). (b) InputBox: the bare-hand PUNCH/KICK quick
+// buttons are HIDDEN when a hand weapon is equipped — you're not going to take the gauntlets off to punch, so just
+// the weapon button shows. No weapon can fall into the bare-hand trap anymore. ota931 test extended. typecheck:ci +
+// typecheck:tests (200) + lint clean; full fast suite green. Combat/UI fix -> HAL + golem (NOT engine).
+// OTA-933 (UI — weather moved onto the day-counter line so it's actually readable). The scene bar showed weather at
+// the END of line 1 ("Flooded House · Kitchen · Danger 5 (Lethal) / Silent Blizzard"), where it truncated to
+// "Sile…". Line 1 now ends after danger (+ any hazard); the weather is appended to line 2 next to the day/time
+// ("Day 4 · evening · Silent Blizzard"). No new line added. ExplorationScreen scene-bar only. typecheck:ci +
+// typecheck:tests (200) + lint clean; full fast suite green. UI -> HAL + golem (NOT engine).
+// OTA-934 (MECHANIC — a frost/cold coating on armour counters COLD weather). Owner: "coatings should be able to
+// counter weather effects." A frost coating worked into armour (or any cold-resistant armour) puts 'cold' in the
+// piece's resistances; now that cold resistance CANCELS a cold-tagged weather's effects (Silent Blizzard): the
+// -2 attack penalty, the -1 DEX / -1 STR stat mod, the per-action HP/stamina drain, and the movement slow all go
+// to neutral. Wired via a coldResist param on weatherStatModifiers/weatherAttackPenalty/weatherRepositionCost/
+// tickWeather + an exported playerColdResist(player); applied at every combat/skill/tick/reposition site and mirrored
+// on the character sheet. Non-cold weather (Iron Fog etc.) is unaffected. New ota934 test. typecheck:ci +
+// typecheck:tests (200) + lint clean; full fast suite green. Mechanic -> HAL + golem (NOT engine).
+// OTA-935 (UX + BALANCE — elevated-fight indicator + the agile-dodge feel fix). Playtest: an elevated (climb-top)
+// fight silently hid dodge/flee + benched the dog, and an 'agile' foe's flat 25% dodge negated even a 29-vs-AC-7
+// swing ("rolled 29 and whiffed") — a long, stonewalled Rare fight. Fixes: (1) InputBox shows an "⛰ ELEVATED — no
+// dodge/flee · companions below" chip in combat so the missing options read as a rule, not a bug. (2) enemyTraits:
+// a CRIT never dodges and beating AC by >= DODGE_BEATEN_MARGIN (8) always lands (enemyDodgesHit) — so a solid roll
+// can't be twisted clear; only marginal hits face the dodge, and the base rate is trimmed (agile 0.25->0.18, quick
+// 0.15->0.12). Applied at the melee + thrown dodge sites. New ota935 test. typecheck:ci + typecheck:tests (200) +
+// lint clean; full fast suite green. Combat/UI fix -> HAL + golem (NOT engine).
+// OTA-936 (BALANCE + UX — dodge de-trap + two combat-QoL signals). Playtest of a long Samarran run: (1) player
+// DODGE was a DEX-scaled trap — a failed read auto-landed through armor for 2x (20-dmg spikes at DEX 4-7) and in a
+// crowd only evaded ONE attacker while the rest hit full (mobbed to death by a 5-raider war party). Fix: a misread
+// dodge is now just a NORMAL to-hit (armor counts, no auto-land, no 2x); success still grants the perfect opening AND
+// now applies 'evasive' (+3 AC vs the rest of that volley) so a good read isn't punished by the pack; a nat-20 still
+// pierces (as a normal crit). (2) SNEAK at arm's reach silently wasted turns + gave free hits (7 straight fails at
+// STE 0) — a once-per-encounter Arbiter signal now flags the poor odds. (3) A climb with too little stamina DROPPED
+// you for big damage (26 HP) — it now HOLDS you and says to climb down / rest, matching the rope-durability rule. New
+// ota936 test; dodgeParry assertions updated. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green.
+// Combat/UX -> HAL + golem (NOT engine).
+// OTA-937 (UI — equal portrait cards + weather pops on the day line). Owner playtest: the character card was
+// visibly WIDER than the enemy card (statsCol flex 1.2 vs 1, a leftover from the stat-spacing pass) — now both are
+// flex:1 so each is half the screen; the stat row's cells are already equal-flex (styles.stat flex:1) so the even
+// spacing survives the slight compression. And the weather moved onto the day-counter line kept the thin faded
+// day-count color — now it renders in its own span with the LOCATION line's bright gold + a bold weight so it stands
+// out. Pure styling; typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. UI -> HAL + golem (NOT engine).
+// OTA-938 (DOG — one-time revive + surface the bleed-out HARD). Owner: a downed dog quietly bleeds out in 24h and
+// there's no second dog until the very endgame, but that 24h window was near-invisible (one mid-window line, no
+// clock) and a dog killed outright (you dying in the same fight) had no way back. Fixes: (1) a one-time migration
+// revives a DEAD/ABANDONED dog once, at full HP with loyalty floored (dogRevivedOta938 latch — a dog lost AFTER this
+// stays lost). (2) The StatsPanel dog-name row now shows a live "⏳ Nh — feed to save" countdown while downed, in
+// urgent red. (3) tickDogStatus fires escalating Arbiter beats at 1/4, 1/2, 3/4 of the window — each once, each
+// stating the hours left (bleedWarnStage latch). New ota938 test. typecheck:ci + typecheck:tests (200) + lint clean;
+// full fast suite green. Dog mechanic/UI -> HAL + golem (NOT engine).
+// OTA-939 (PARSER — possessive scene nouns resolve). Device log: `salvage scribe's quill` in the Tartarian Archives
+// kept dead-ending on "You've already worked over the Phoenix Feather Quill. Nothing more to find." The scene noun
+// "scribe's quill" never matched the parser's apostrophe-stripped tokens ("scribe quill"), so the salvage fell through
+// to a FUZZY inventory match on the owner's Phoenix Feather Quill (shared word "quill") — an already-worked item — and
+// the real scene object was unreachable. Fix: normalizeForCompare now strips the possessive 's (+ stray apostrophes),
+// so any possessive prop ("Zalmar's tower", "reclaimer's cache") resolves. Applied symmetrically, so equality holds.
+// New ota939 test. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Parser fix -> HAL + golem (NOT engine).
+// OTA-940 (COMBAT BUG + narration). (1) COATINGS were DEAD on barehanded weapons: a coated Mud-fist Wraps (or any
+// 'barehanded'-tag weapon — gauntlets, knuckles) dealt ZERO coating damage. gameStore re-derived barehand=true from
+// the weapon NAME ("mud-FIST") and skipped the entire coating block. Now bare-hand detection strips the swung weapon's
+// name first and treats a barehanded-tag weapon as a real, coatable weapon (mirrors combatRules' OTA-931/932). (2) A
+// combat-DOWNED dog (waiting_at_base, player on the ground) wrongly showed the climb-only "come down to fight at his
+// side" line when tapped; it now shows a recovery message ('downed' reason). New ota940 test. typecheck:ci +
+// typecheck:tests (200) + lint clean; full fast suite green. Combat/UI fix -> HAL + golem (NOT engine).
+// OTA-941 (one-time owner Mud Siren rematch). The Mud Siren fight was won with the barehanded-coating bug live
+// (fixed in OTA-940). On the next load this refunds the consumables spent in that fight (Acid Flask x2, Smoke-Cured
+// Jerky Strip x8) and re-stages a fresh, scaled Mud Siren so it can be re-fought with working coatings. Fires exactly
+// once (latch) and only for the owner's real deep save (name 'Verbal' + at least one recovered Core), fully guarded so
+// it can never brick a load. No engine change. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite
+// green. Save fixup -> HAL + golem (NOT engine).
+// OTA-942 (broaden the one-time owner rematch prep). Pairs with OTA-941: on the same one-time load, restores a clean
+// pre-fight state so the Mud Siren re-fight is apples-to-apples now that barehanded coatings work (OTA-940): full HP +
+// stamina, every worn/carried weapon & armor repaired to full durability, and the key throwables/consumables topped up
+// (Acid Flask/Disease Sample/Throwing Knife/First Aid Kit/Trail Rations/Jerky floors). Same owner-only gate (name +
+// recovered Core), own latch, fully guarded. No engine change. typecheck:ci + typecheck:tests (200) + lint clean; full
+// fast suite green. Save fixup -> HAL + golem (NOT engine).
+// OTA-943 (finish the rematch refund — the THROWABLES). OTA-941/942 under-counted: Disease Sample, Throwing Knife,
+// and Sentinel Core Plate are consumed one-per-throw ("attack with the off-hand X" throws + consumes them — hence the
+// empty bandolier), and the Acid Flasks + Corruption Tonic were spent too. This restocks them (Disease Sample x4,
+// Throwing Knife x4, Sentinel Core Plate x2, Acid Flask x4, Corruption Tonic x1) via the existing grantItem +
+// grantTestSupplyGiftOnce one-time-per-slot infra, correct catalog kind/rarity + forced throwable tags. Owner-name
+// gated. No engine change. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Save fixup -> HAL + golem (NOT engine).
+// OTA-944 (protect a weapon's coatings). Investigation of "the corruption coating vanished from the Mud-fist Wraps":
+// persistence is provably clean (applyCoating slot-write, Crucible slot-grant, backfill/restamp/durability, JSON
+// save round-trip, and saveTrim all preserve coating2 — pinned by a new round-trip regression test). The one path that
+// DESTROYS a coating is the apply flow's 'replace' branch: coating a weapon with no open 2nd slot (not Crucible-upgraded)
+// overwrote slot 1 on a SINGLE tap with a friendly 'primary' tone. Harden it — the replace pick is now destructive-toned
+// and routes through an explicit confirm ("scrub off X for good / keep X"), so a coating can never be lost by a mis-tap.
+// UI + test only, no engine change. typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green.
+// Save/UX fixup -> HAL + golem (NOT engine).
+// OTA-945 (coating-slot replace picker). Extends OTA-944 into the full model the owner asked for: a coating stays until
+// the weapon/armor breaks or is replaced. A weapon FILLS empty coating slots first; when every slot is full, tapping a
+// coat opens a picker of the filled slots so you choose WHICH coating to scrub off (a 1-slot weapon shows its lone
+// coating). ARMOR resist channels work the same: a full piece (base cap 3 + Crucible bonus) now opens a which-resist-to-
+// strip picker instead of flatly refusing. applyCoating gained an optional replaceSlot; applyCoatingToArmor an optional
+// replaceResist. UI + store + tests only, no engine change. typecheck:ci + typecheck:tests (200) + lint clean; full fast
+// suite green. Coating UX -> HAL + golem (NOT engine).
+// OTA-946 (combat correctness — weather resist + stealth contradiction guard). (1) WEATHER now respects the player's
+// armour coatings: a matching-element resist shrugs off that element's weather (electrical coating vs Aether-lightning,
+// etc.), generalising the OTA-934 cold rule to every element via tickWeather(resistKinds). Weather with no coatable
+// counterpart (physical hail, ash, psychic fog) still bites. (2) STEALTH-in-combat no longer logs a self-contradicting
+// "PASS" before the break-away init race that can end in "surprised": a reusable CONTRADICTION GUARD suppresses the
+// generic skill-check verdict whenever a handler owns the real outcome (HANDLER_OWNED_IN_COMBAT). The failed-disengage
+// penalty is preserved (single authoritative verdict from the handler, not coddled). No engine change to combat math.
+// typecheck:ci + typecheck:tests (200) + lint clean; full fast suite green. Combat correctness -> HAL + golem (NOT engine).
+// OTA-947 (combat rebalance I of III — defense de-runaway). The build/fusion loop is UNTOUCHED; this only stops raw
+// defense from switching combat off. (1) LIGHT AC TAIL-TRIM: standing AC climbs untouched to 22, then each point counts
+// 0.4x, so a full Legendary set lands ~28 not ~37 (equipment.trimStandingAc, shared by combat + StatsPanel). (2) ENEMY
+// HIT FLOOR: cap the natural d20 an enemy needs (ENEMY_HIT_NEEDED_CAP=13 -> ~40% floor), so no AC buys literal immunity;
+// identical to the old AC math below the cap. (3) GLOBAL MITIGATION FLOOR: a landed hit always deals >=30% of its raw
+// roll, so stacked resists soak MOST but never ALL — a mismatched resist visibly leaks. Named knobs for downrange tuning.
+// Matched-progression HP/damage scaling + the legibility layer follow in OTA-948/949. typecheck:ci + typecheck:tests +
+// lint clean; full fast suite green. Combat tuning -> HAL + golem (NOT engine).
+// OTA-948 (dev-grant cleanup). Retires the spent one-time debug grants that fired on the owner's load: the OTA-766
+// corruption-tonic refund, and the OTA-941/942/943 Mud Siren rematch (refund + clean-slate restore + throwable restock)
+// are all removed. The two grants worth keeping — the up-front Resurrection Gem (Verbal/Sasmooch) and the crash-test
+// supply kit (Verbal) — MOVE to the new-character name beat so they land exactly once at CREATION, never retroactively on
+// an existing save's load. The on-death DEV_REVIVE gem is untouched. No engine change. typecheck:ci + typecheck:tests +
+// lint clean; full fast suite green. Save/dev fixup -> HAL + golem (NOT engine).
+// OTA-949 (dev-grant cleanup II). (1) SASMOOCH now gets the crash-test supply kit at new-character creation too — she
+// already got the up-front Resurrection Gem via DEV_REVIVE_NAMES, so both dev names now land exactly grants #1 + #2 at
+// CREATION and nothing else. (2) The OTA-938 one-time DOG-REVIVE migration is RETIRED (spent make-good): a dead/abandoned
+// dog is no longer auto-restored on load; the dog loads as saved. The dogRevivedOta938 flag is now inert (kept
+// deprecated for save/test back-compat); the OTA-938 dedicated test is removed. No engine change. typecheck:ci +
+// typecheck:tests + lint clean; full fast suite green. Save/dev fixup -> HAL + golem (NOT engine).
+// OTA-950 (look-around honors investigated nouns). Playtest: "look around sees things I have already investigated and
+// cleared." The look-around "You see:" list filtered out nouns SEARCHED/TAKEN (searchedAmbientNouns) but never the ones
+// INVESTIGATED for flavor (flavorExhaustedNouns — the "already worked over, nothing more to find" set), so a cleared
+// prop kept re-listing. Now the look filter also drops flavor-exhausted nouns (bidirectional substring, climb markers
+// stripped); pure flavor, so no re-take self-heal. No engine change. typecheck:ci + typecheck:tests + lint clean; full
+// fast suite green. Content/UX fix -> HAL + golem (NOT engine).
+// OTA-951 (input bar reliably rises above the keyboard). Playtest: "the text box still doesn't always get pushed to
+// the top of the keyboard when I tap in." The floating in-flow bar positions itself from the keyboardDidShow/changeFrame
+// HEIGHT event, which Fabric/Android drops ~half the time — so it fell back to a screen-fraction estimate at the wrong
+// height. Native keyboard state stays correct even when the JS event is lost, so KeyboardInputBar now POLLS
+// Keyboard.metrics() over the first ~1s after focus and snaps to the true settled height the moment it lands (then
+// stops). Purely additive over the existing event/estimate path; no native/soft-input change (that isn't OTA-updatable).
+// typecheck:ci + typecheck:tests + lint clean; full fast suite green. UI fix -> HAL + golem (NOT engine).
+// OTA-952 (enemy portrait no longer blanks after a kill in a group fight). Playtest: "mid fight on a group of four,
+// after I beat one of them the enemy portrait went blank." A kill removes the fallen foe from currentScene.enemies and
+// REINDEXES the array, but the EnemyPanel pager (FlatList) keyed cells on the array INDEX and kept a stale scroll
+// offset, so it recycled to a blank/wrong page. The pager is now keyed on the enemy ROSTER (names) so a kill remounts a
+// fresh list (HP ticks keep updating in place via extraData), and it reopens on the ACTIVE enemy via initialScrollIndex
+// + getItemLayout. UI only, no engine change. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+// UI fix -> HAL + golem (NOT engine).
+// OTA-953 (flavor-exhausted noun matching is word-level). The OTA-950 look-around filter — and the older
+// investigate-refusal matchers on the same flavorExhaustedNouns list — compared raw bidirectional SUBSTRINGS, so one
+// investigated noun hid/refused unrelated nouns sharing mere letters ("rack" hid "cRACKed terminal"; "vat" hid
+// "obserVATion window"; the authored rooms carry 10 such letter-collision pairs across 5 rooms). New
+// ambientNounMatch.nounTokensMatch matches whole WORDS over normNoun (possessive/of/hyphen folds + light plural fold):
+// same-prop phrasing tolerance survives ("rack" vs "armor rack", "obelisk" vs "cracked obelisk" behave as before) but a
+// match can never cross word boundaries. Applied to all five flavor-list matchers in gameStore and the
+// ExplorationScreen chip mirror (merged pool split; searched keeps its historical loose rule + self-heal). Sweep: all
+// 10 letter collisions eliminated, 0 new cross-prop matches. Dedicated test added. typecheck:ci + typecheck:tests +
+// lint clean; full fast suite green. Content/UX fix -> HAL + golem (NOT engine).
+// OTA-954 (Guardian ramp is monotone at every power, not just on-curve). Review sim found 134 power-x-tier cells where
+// the NEXT Guardian staged out WEAKER (power 20: T1 69 HP -> T2 67; AP dips of 1-2): at fixed power the next tier's
+// bigger expected-power divisor shrinks the over-level factor faster than the early hpMult/acBonus steps grow —
+// inverting OTA-926's "each fight tougher than the last" (its test held power fixed). Fix is a MONOTONE STAGING FLOOR,
+// not a retune: each tier stages as the running max over all tiers at the same power (HP strictly +1 over the previous
+// tier, AP non-decreasing). On-curve fights stage byte-identically to the authored curve (test-locked 59/67/76/84/92/
+// 101/168/231); only the 1-3 point dip cells lift. Final-wall override, over-level cap 1.9, and all tuning knobs
+// untouched; still a spawn-time read (no feedback loop). New power-x-tier sweep test covers the missed dimension.
+// typecheck:ci + typecheck:tests + lint clean; full fast suite green. Balance fix -> HAL + golem (NOT engine).
+// OTA-955 (the Power gauge respects the OTA-947 AC trim). playerPowerScore predated the defense rebalance and
+// summed RAW standing AC, so a tank saw AC 28 on the panel but a Power built from raw ~37 — inflated exactly where the
+// trim bent the tail, and the favored/even/danger badge (+/-15% bands) shifted with it. The gauge's AC term now runs
+// through trimStandingAc — identical formula + inputs to the StatsPanel readout, so shown AC, fought AC, and gauged AC
+// agree. Enemy Power stays raw by design (enemy combat AC is never trimmed). Below the knee (22) nothing changes; a
+// tank's number corrects once, SILENTLY — the OTA-929 delta flash seeds on mount and never fires on a between-session
+// change (verified). New test locks the AC term to trimStandingAc. typecheck:ci + typecheck:tests + lint clean; full
+// fast suite green. UI-consistency fix -> HAL + golem (NOT engine).
+// OTA-956 (keyboard reliability poll reworked: Android-only, per-focus, hide always wins). Audit found two
+// flaws in the first cut: (1) the poll ran once at component MOUNT, not per focus — a keyboard opened any later never
+// got the net ("still doesn't always get pushed up"); (2) it called the event path's applyHeight, which CANCELS the
+// pending hide retract, so tap-in + quick dismiss could read a stale mid-dismiss metrics height and strand the bar
+// mid-screen. Now: the poll re-arms for EVERY typing session (keyed on the bar's `active` state), runs on Android only
+// (Fabric drops height events there; iOS events are reliable and its metrics lie during dismissal), each tick routes
+// through the pure keyboardPollAction helper (confirmed-hidden -> stop untouched; settled height -> snap; else keep
+// polling to a ~1s cap), and the poll lives OUTSIDE the hideTimer closure so it structurally cannot cancel a retract.
+// New engine/keyboardPoll.ts + unit tests for every tick decision. On-device verify: tap in / dismiss fast / tap in
+// again — bar rises every time, never lingers. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+// UI fix -> HAL + golem (NOT engine).
+// OTA-957 (correctness batch): (1) FULL WEATHER SYMMETRY — OTA-946 only generalised the DAMAGE tick, so an
+// electrical coat cancelled Aether-lightning's zap but not its stat mods / attack penalty / slow, while a cold coat
+// cancelled everything about a blizzard. The penalty/stat helpers now take the full resist list (shared
+// weatherCounteredByResists; ~16 call sites pass playerArmorResistKinds): the RIGHT coating fully neutralises its
+// weather — you can plan for and escape it. Buffs survive the counter (insulated players keep the Aether +INT); psychic
+// fog / iron fog stay uncounterable by design. Black rain's 'tainted' tag now maps to the corruption resist (it never
+// did — a corruption coat silently did nothing). (2) applyCoating VALIDATES replaceSlot: a programmatic 'coating2' on a
+// 1-slot weapon used to stamp an illegal dual coat combat honored; the store now refuses (vial not consumed). (3) the
+// reach-lookup + log-noun bare-hand tests get the OTA-940 name-strip ("attack with the Mud-FIST Wraps" is a weapon
+// swing, not a punch, for reach too). New batch test; ota934 test retargeted to the list signature. typecheck:ci +
+// typecheck:tests + lint clean; full fast suite green. Combat/content fix -> HAL + golem (NOT engine).
+// OTA-958 (hygiene batch — audit dead-code retire + dev-grant test backfill). No behavior change. (1)
+// saveSystem's arb89 grantDevGemOnce + OTA-461 grantTestSupplyGiftOnce DELETED — zero callers since the OTA-948/949
+// dev-grant cleanup (stash FIELDS kept for old-save back-compat); a test locks them retired. (2) the inert
+// mudSirenRematchOta941/942 latch fields get the same @deprecated treatment as dogRevivedOta938. (3) coreGuardians
+// drops the never-read `counters` tier field and corrects the stale five-guardian docs (there are NINE Lost Capitals;
+// gear set is 9 weapons / 9 armors; "always 5" -> 9). (4) TEST BACKFILL for OTA-948/949, which shipped without tests:
+// the dev starter grants (gem + crash-test kit) fire at the tutorial NAME-COMMIT exactly once, dev names only; a
+// re-submit re-grants nothing; a non-dev name gets nothing. typecheck:ci + typecheck:tests + lint clean; full fast
+// suite green. Hygiene -> HAL + golem (NOT engine).
+// OTA-959 (LEGIBILITY LAYER — combat rebalance pass III of III; pass II 'matched progression' is deliberately
+// HELD, see HANDOFF 8.B3). Owner brief: players should SEE their builds/gear/resists doing something — forefront of
+// mind, not micromanaged. Three cues, all once-per-encounter (new transient combatCues latch keyed by the fight's
+// tile): (1) SOAK praise — when a matched armor/coating resist eats >=40% of a hit, one plain-language line names the
+// resist and the numbers ("that's your cold resist working — 3 of 10 got through"); the terse [armor -40%] bracket
+// stays the per-hit record. (2) LEAK warning — when an elemental hit lands that NOTHING in the loadout touched (no
+// armor match, no title/race/shield/ward) and it actually hurt (>=4), one line names the missing resist and points at
+// coatings. Physical hits never nag (unresisted physical is normal combat). (3) The OTA-197 swap-nudge now NAMES a
+// carried weapon ("Swap to the Boltcaster — electrical will bite where piercing won't") instead of just a type. Pure
+// decision rules live in new engine/combatCues.ts with unit tests. typecheck:ci + typecheck:tests + lint clean; full
+// fast suite green. Combat-feel -> HAL + golem (NOT engine).
+// OTA-960 (loot audit fixes I of II — the outright bugs, no balance opinions). (1) The 8 "Resurrection Gem"
+// entries in boss loot pools were FAKES — the real gem is a separate stash grant — each minting a useless Common brick
+// ~60-70% of kills and stealing a drop slot from the boss's real rolls; deleted, with a data test locking them out.
+// (2) An EMPTY loot list on a BOSS is intentional (deterministic overlays carry the reward) — the "Aether dust"
+// fallback no longer fires there (no more junk dust at the game's climax), only pads non-boss lists, and now mints the
+// catalog's real stackable 'Aether Dust'. (3) KILL/KO PARITY: a humanoid's carries kit (weapons/armor/TC) transferred
+// only on the knockout path — killing ignored it, making KO strictly dominant. A kill now strips the body too, at the
+// worn floor (0.15 durability vs KO's HP-scaled 0.15-0.85) — mercy keeps its edge, lethal stops being a loot tax.
+// (4) The never-implemented Rare "one item upgraded" promise is deleted from the roll comment (candidate feature, see
+// HANDOFF). typecheck:ci + typecheck:tests + lint clean; full fast suite green. Loot fix -> HAL + golem (NOT engine).
+// OTA-961 (loot audit fixes II of II — canonical resolution + rarity-aware trophies). The audit's SEV-1: 136
+// of ~190 authored loot names exist in NO catalog, and the exact-match chain minted each as a 2-TC tagless Common misc
+// — every trophy from a big kill was identical junk, inverting the Legendary tier (organic Legendaries ~54 TC EV vs
+// machine ~164-204). New crafting.resolveLootItem, used by ALL drop paths (kill roll, knockout strip, hard-won bonus):
+// (1) findCatalogItem first — case-insensitive + alias-aware — so variant names land on the REAL catalog row with the
+// canonical, STACKABLE name; the Aetherwing/'Aether Wing' split is healed by alias. (2) The exact chain still covers
+// dog gear. (3) An unknown name mints as a TROPHY at the ENEMY'S OWN rarity ('trophy' tag; sellable, no recipe uses
+// it) — a Legendary hide prices like a Legendary find. Roll-time canonicalization keeps the summary line and the
+// granted item in agreement. A data SWEEP test locks the epidemic shut: no loot name from a non-Common enemy can mint
+// the old tagless-Common fallback again. The morning's curated pass decides which trophies become REAL items.
+// typecheck:ci + typecheck:tests + lint clean; full fast suite green. Loot fix -> HAL + golem (NOT engine).
+// OTA-962 (curated trophy pass — the audit's 136 uncatalogued names, dispositioned). 35 iconic boss/creature
+// trophies PROMOTED to real authored materials in materials.json — 20 Legendary (Dragon Scale, Titan Core, Phoenix
+// Feather, Kraken Ink, Sentinel Core, the core/heart family...) and 15 Rare (Drake Scale, Serpent Fang, Clockwork
+// Core...), each with rarity, thematic tags, and in-voice descriptions; big hunts now feed real, catalog-priced stock
+// (materials 51 -> 86; Rare pool 9 -> 24, Legendary 8 -> 28 — this is also the stock the boss spoils table draws from).
+// 2 PROVABLE synonyms aliased (Aetheric Residue/Crystal -> their Aether-prefixed catalog rows). Everything else stays a
+// deliberately rarity-priced trophy: sharing one word does not make two items the same thing (the earlier table's
+// "84 alias candidates" heuristic was overridden as too loose). Tests pin all 35 promotions + both aliases + one
+// stays-a-trophy control. typecheck:ci + typecheck:tests + lint clean; full fast suite green. Content -> HAL + golem
+// (NOT engine).
+// OTA-963 (BOSS SPOILS TABLE). Owner spec: no boss fight ends in mud cloth and scrap metal — bosses drop
+// high-end materials, good recipes, and Rare (NOT Legendary) gear; Guardians/tower bosses keep their own Legendary
+// signature tables. New engine/bossLoot.ts rolls ON TOP of authored drops for every boss-flagged kill: 2 materials
+// (3 at power >= 80), each Rare with a Legendary chance scaling with the fight (apex 50% / heavy 30% / boss 15%), and
+// non-apex bosses add one Rare weapon/armor 60% of the time (collect_only excluded). APEX bosses (core_guardian /
+// summit_climb: traits) take the materials half ONLY. Pools are live catalog views, so the OTA-962 promoted trophies
+// (Dragon Scale, Titan Core...) are automatically in stock; floors are STRUCTURAL — every pool is Rare+, so a sub-Rare
+// boss payout is impossible by construction. Recipes: the OTA-718 hard-won recipe roll is tripled for bosses (cap 60%).
+// Tests: apex exclusion, tier counts, structural floor, pool stocking. typecheck:ci + typecheck:tests + lint clean;
+// full fast suite green. Loot system -> HAL + golem (NOT engine).
+// OTA-964 (Iron Spider materials — owner request). "I'd prefer to get something based off of the Iron
+// Spider." The Iron Spider (Uncommon Automation) authored two drops — Iron Fangs + Spider Mechanism — that the OTA-962
+// curation left as generic trophies; both are now real Uncommon MACHINE materials at the spider's own tier, with
+// in-voice descriptions. (Bestiary fact surfaced in review: Bog Dragon / Mud Drake / Aetheric Wyvern ARE authored
+// enemies — the scale materials came from their own loot lists; renaming that family is a separate owner lore call,
+// not taken here.) typecheck:ci + typecheck:tests + lint clean; full fast suite green. Content -> HAL + golem (NOT
+// engine).
+// OTA-965 (loot alias precedence — v2 audit SEV-2 regression fix). The OTA-961 resolver reused the
+// AMBIENT-NOUN alias map, whose pickup-oriented entries misfire on loot names: the old 'aether residue' -> 'Aether
+// Dust' pickup alias silently converted the REAL recipe material Aether Residue on every drop (6 enemy sources dead),
+// and 'Obsidian Shard' -> 'Aetheric Shard' turned the Obsidian Sentinel's Legendary drop into a 3-TC shard. Fix:
+// resolveLootItem checks EXACT (case-insensitive, alias-free) catalog membership FIRST — a real catalog name can never
+// be rerouted — and keeps its own short LOOT_NAME_ALIASES list (provable synonyms only). findCatalogItem gains an
+// { aliases: false } opt-out; the ambient PICKUP path is unchanged (default on). Regression tests lock both leaks
+// shut + pickup behavior. typecheck:ci + typecheck:tests + lint clean; full fast suite green. Loot fix -> HAL + golem
+// (NOT engine).
+// OTA-966 (v2-audit knobs 1+2: mid-tier windfalls closed + trophy sell discount). (1) Four sub-Legendary
+// enemies had promoted-LEGENDARY materials in their loot lists — a lottery ticket in a mid fight (Sky-Warden 215 EV at
+// power 45 via TWO Legendary cores). All four re-tiered to Rare machine/beast materials: Golem Knight Aether Core ->
+// Clockwork Core; Aetheric Lion Aether Core -> Beast Fang; Resonance Sentinel Sentinel Core -> Crystal Core;
+// Sky-Warden Sentinel+Guardian Cores -> Steam + Clockwork Cores. A sweep test locks the rule: no sub-Legendary enemy
+// may drop a Legendary material. (2) TROPHY DISCOUNT: rarity-priced trophies made every Legendary non-boss converge on
+// the same ~382 TC/kill (~7x the old faucet). Trophy-tagged parts now SELL at half a real material's rate — genuine
+// materials (Dragon Scale, Titan Core...) keep full value, so which monster you hunt matters again. typecheck:ci +
+// typecheck:tests + lint clean; full fast suite green. Loot tuning -> HAL + golem (NOT engine).
+// OTA-967 (v2-audit knobs 3+4: KO mercy premium + Reaver double-dip). (3) After kill/KO parity, a kill
+// collects the carried kit AND its rolled loot, leaving knockout strictly cash-dominated vs humans. A live capture now
+// adds a rarity-scaled bounty on top of the carried purse: 2d6 x tier (Common x1 ... Legendary x4) — the pockets come
+// easier when nobody bled on them. (4) The Tartarian Reaver authored "Reaver's Greatsword" in BOTH carries and loot, so
+// a kill paid it twice (the loot roll could even duplicate it) — 812 TC EV, 30% above any boss. The Greatsword now
+// transfers with the kit only; loot keeps the Pauldron. A sweep test generalizes the rule: an item may live in carries
+// OR loot, never both, for ANY enemy. typecheck:ci + typecheck:tests + lint clean; full fast suite green. Loot tuning
+// -> HAL + golem (NOT engine).
+// OTA-968 (stack-sized fusion reserve). Owner: reserving a x5 stack for the Crucible meant reopening the
+// item modal five times — one peel per tap. toggleReserveForFusion now takes a COUNT (clamped to the stack; whole-stack
+// moves flip the row's flag and merge into a same-state stack instead of churning N peels), and the inventory modal
+// adds "Save all xN for fusion" / "Free all xN" next to the single-unit button for any stack > 1 (catalysts stay
+// one-at-a-time — one catalyst themes one fuse). Safety NOTE verified during this review: the Crucible drains exactly
+// ONE unit per reserved row and un-reserves the survivors (arb168), so a reserved x4 stack contributes one bolt per
+// fuse — never eaten wholesale. Store tests: default single peel unchanged, 3-of-5 split, save-all no-split, free-all
+// re-merge, oversized-count clamp. typecheck:ci + typecheck:tests + lint clean; full fast suite green. UX -> HAL +
+// golem (NOT engine).
+// OTA-969 (the stale-charge clobber — buffs/DOTs now actually tick in combat). Playtest: "Legacy of Power
+// fades" printed FOUR times while STR stayed buffed. Diagnosed by store-level repro: the status-effect tick at the top
+// of every action ran fine, but 26 action paths charged time+stamina via set({ player: advanceTime(spendStamina(
+// player, ...)) }) built from the PRE-TICK snapshot — silently restoring pre-tick statusEffects/HP. On dice-modal
+// actions (every attack) timed buffs therefore NEVER ticked: a 3-round +2 STR ran the whole fight, and the same
+// clobber could swallow DOT and weather writes. All 26 charges now derive from the LIVE player (functional set).
+// Repro-locked: a 3-round buff driven through REAL dice-modal attacks ticks 3 -> 2 -> 1 -> gone with exactly ONE fade
+// line, and the charge still spends stamina/advances time. ALSO: armor-shatter remnant text picks a material-fitting
+// noun ("A chunk of Small Rock", "A scrap of Patched Cloth") instead of rope-flavored "A length of" for everything.
+// Dice audit from the same playtest: enemy group rolls verified independent (rollDie(20) per enemy per swing) — the
+// triple-nat-20 round was real variance, not shared rolls; no change. typecheck:ci + typecheck:tests + lint clean;
+// full fast suite green. Combat fix -> HAL + golem (NOT engine).
+// OTA-970 (playtest batch: the arch that was actually a chart). Four fixes from one log. (1) "attack the
+// arch" swung at the RESEARCH CHART: ambient matching used raw substrings and "research chart" contains "arch"
+// mid-word ("reseARCH") — passes 2+3 of matchAmbientNoun rebuilt at the WORD level (whole-token compare, light plural
+// fold, 3+ char word-PREFIX allowed, mid-word never). (2) "shape stone" ate the player's EQUIPPED Aetheric Locket:
+// the locket (a wearable amulet) sat in the Aether fuel list and fuel was taken in inventory order — locket removed,
+// fuel now picked cheapest-first (Common residue/mud/crystal -> Uncommon shard -> Rare Golem Core). (3) Owner ask:
+// weapon swings at hard scenery now cost 1-2 HP and SAY so, with rotating deadpan ("That wasn't your brightest
+// move."); bruises floor at 1 HP — a wall can't kill you. (4) The elevated "climb down" refusal was dedup-swallowed
+// on repeats (8 salvage tries, 1 answer, 7 dead silences) — refusals now always answer, rotating short firm variants.
+// Repro-locked on the literal playtest scene (chart + arch in the same room). typecheck:ci + typecheck:tests + lint
+// clean; full fast suite green. Fixes -> HAL + golem (NOT engine).
+// OTA-971 (the salvage button that lied from a pillar). Owner, standing on a pillar: "the salvage button
+// [is] still green ... but there is nothing at my elevation to salvage." The engine's elevated-investigate gate
+// refuses every ambient noun that isn't the thing you're standing on (elevatedOn set, no rooftop overlay) — but the
+// SALVAGE button's green tone and the salvage picker counted the GROUND nouns anyway, advertising salvage the engine
+// would refuse. New pure helper climbHeight.reachableWhileElevated (the gate's rule as a filter) now feeds BOTH the
+// button count and the picker chips: up top with nothing reachable, the button greys and the picker lists nothing;
+// rooftop overlays and ground-level play are untouched. Locked with unit tests on the helper (climbed-noun
+// head-anchoring included). typecheck:ci + typecheck:tests + lint clean; full fast suite green. UI truthfulness fix
+// -> HAL + golem (NOT engine).
+// OTA-972 (one climb at a time). Owner: with two climbs in a scene, being up on one must not let you
+// trigger or touch the other at the same height. There was NO rule connecting your feet to the thing you climb next:
+// from the top of the pillar, "climb the tower" just STARTED climbing the tower — a mid-air teleport that overwrote
+// the pillar's elevated state. Now while elevatedOn is set, any climb target that isn't the structure under your
+// feet is refused ("The tower is its own climb. Down first, then up." — always audible, skipDedup). Also: the
+// on-this-climb check upgraded from loose bidirectional includes to the anchored sameClimbNoun, and bare `climb`
+// while elevated continues the CURRENT climb by name instead of inventing "the surface in front of you" as a fresh
+// target. Locked with store tests: cross-climb refusal + untouched elevated state, refusal answers every retry,
+// same-structure climb unblocked, bare-climb continuation, other-structure investigate stays refused, reachability
+// helper excludes the other climb. typecheck:ci + typecheck:tests + lint clean; full fast suite green. Correctness
+// -> HAL + golem (NOT engine).
+// OTA-973 (real heights, Phase A: the skeleton). Owner-approved plan: objects will be able to live PARTWAY
+// UP structures (a nest at tier 2 of the tower). This ships the model with zero content: (1) CurrentScene.
+// nounPlacements — optional noun -> {structure, tier} side-table; absent = ground, so every existing scene is
+// unchanged. (2) climbHeight.placementFor (short-form aware) + reachableWhileElevated extended: a placed noun is
+// reachable ONLY on its own structure at exactly your tier; from the ground it's visible-but-refused; same height on
+// a DIFFERENT structure is never reachable; overlays untouched. (3) Engine investigate gates route placed nouns by
+// where they hang — ground: "up on the ${structure}, tier N. Climb for it."; wrong tier: "Keep climbing." / "below
+// your grip"; wrong structure: "Its own climb." — all always-audible (skipDedup). (4) SALVAGE button + picker pass
+// placements through the shared helper. 13 tests: placement lookup, 6-case reachability matrix, 6 store-level gate
+// scenarios incl. no-placements regression. Phase B (seeder, perch pools, tier-crest discovery lines, height-scaled
+// loot) ships separately. typecheck:ci + typecheck:tests + lint clean; full fast suite green. -> HAL + golem (NOT
+// engine).
+// OTA-974 (real heights, Phase B: PERCHES). Climbing is now exploration, not a top-only lottery. New engine
+// module perches.ts: 8 themed perch templates (nest / prayer flags / service box / satchel / wasp gall / gull roost /
+// climbing cache / signal lamp) matched to structure material via classifyNoun. Seeder runs at scene build for
+// outdoor climbables with 3+ tiers: ~35% chance, tier 1..N-1 (NEVER the apex — that stays overlay turf), one perch
+// per structure, DETERMINISTIC per (roomKey, structure) hash — leaving and re-entering can never reroll; harvested
+// perches stay gone via the room's consumed marks. Cresting a perch's tier prints its discovery line (the "mid-climb
+// stops are worth it" teach). Investigating it AT its tier harvests once: catalog-resolved loot (findCatalogItem —
+// no invented items), tier-gated pool (rarer entries need minTier 3-4), stamina + 0.2h charge, then "picked clean".
+// Attack gate: perched nouns can't be attacked from the ground/wrong tier (same gaze-up refusal as investigate) so
+// attack isn't a reach-anything side door; at the perch you're told to take it, not swing. 11 tests: catalog
+// validator on every loot name, low-tier-never-empty, determinism, tier bounds, tier gating, harvest-once flow,
+// ground-attack refusal, scene-build smoke. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+// -> HAL + golem (NOT engine).
+// OTA-975 (zero grip means gravity). Owner, after 11 held climb-presses at stamina 0 while a storm chipped
+// him on the pillar: "you shouldn't be stuck on a climb at zero — you fall and take damage." VERIFIED first: eating
+// mid-climb is UNGATED (the strap/rope gate only guards sleeping; strap only demanded on great climbs) and food
+// restores stamina — so the escape hatch exists and the warnings now name it. New rules: at stamina 0 while UP, the
+// first empty reach gets ONE whip-crack warning (OTA-936's no-unwarned-drops rule, kept); the NEXT empty reach UP
+// falls — full scaled climbFall damage, progress wiped. Climbing DOWN on empty arms is a half-climb-half-fall SLIDE:
+// half the scaled damage for your tier (Skyreacher still halves), then you're on the ground. PARTIAL stamina keeps
+// the safe hold, its text now teaching the eat option. Fall math extracted to climbHeight.computeClimbFallBase
+// (identical numbers, one source of truth). ALSO: the rest-on-wall refusal now skipDedups — the same log showed rest
+// retries 2-4 swallowed into silence. 7 tests: formula parity, warn-then-fall, slide, partial hold, mid-climb eat,
+// rest retries always answer. typecheck:ci + typecheck:tests + lint clean; full fast suite green. -> HAL + golem
+// (NOT engine).
+// OTA-976 (wall flee: dive for the base). Owner: "when I summit some climbs [I] immediately get thrust into
+// a fight with up to five enemies. there is no way to flee." FLEE is now legal in wall fights: the OTA-911 intercept
+// keeps blocking DODGE (and fleeing NOTHING on a wall), but flee with enemies present runs the NORMAL escape roll.
+// SUCCESS = one-tap dive for the base from ANY tier: enemies left behind (summit boss resets like a break-off; an
+// apex overlay restores its preserved base scene), descent costs DOUBLE stamina per tier, and if the tank empties
+// partway the tiers your arms couldn't cover are a FALL (computeClimbFallBase for the remaining height; Skyreacher
+// halves). FAILURE keeps you on the wall and the enemy group takes its opening (the standard failed-flee volley), with
+// the follow-up hint rewritten for walls (no dodge advice up there). UI: the flee QuickBtn now shows while elevated;
+// the ⛰ ELEVATED notice + ambush/summit banners say flee is on the menu. NOTE: the OTA-455 first-steps flee grace
+// applies on walls too — a brand-new character's failed wall-flee still nudges to success. 5 tests (internal-d20
+// outcomes observed across fresh boots): won-flee clean descent + double burn, won-flee stamina shortfall -> scaled
+// fall, failed flee holds the wall + enemy opening + wall-aware hint, dodge still refused, flee-with-no-enemies still
+// refused. typecheck:ci + typecheck:tests + lint clean; full fast suite green. -> HAL + golem (NOT engine).
+// OTA-977 (no involuntary footwork). Playtest: "attack with the resonant spike" at MID range auto-walked the
+// player to CLOSE ("closing the gap for you"), the attack never happened, and the Aetherkin answered the approach
+// with an 18+6 hit — owner: "I didn't move closer, using the weapon moved me closer." Root cause pair: (1) the
+// Resonant Spike is a FUSED weapon — fused weapons aren't in the weapon catalog, so playerWeaponReach falls back to
+// melee/close-only regardless of what was fused; (2) OTA-550's auto-move converted any out-of-range attack into a
+// MOVE that provokes the enemy group's free swing. Fix: an out-of-range attack now REFUSES — zero cost (no stamina,
+// no time, no enemy counters, no roll), names the weapon's actual reach band ("works at close range only — you're at
+// mid"), and leaves ADVANCE/RETREAT as the player's own explicit tap. skipDedup so every retry answers. 5 tests:
+// refusal leaves range/HP/stamina untouched with no roll started, retries always answer, advance-then-attack works,
+// ranged-from-mid regression, melee-at-close regression. typecheck:ci + typecheck:tests + lint clean; full fast
+// suite green. -> HAL + golem (NOT engine).
+// OTA-978 (the Crucible forges REACH). Owner: "let's have the crucible add the appropriate range to
+// weapons, have it recheck and fix old saves as well." Until now EVERY fused weapon collapsed to close-only (no
+// catalog row -> melee fallback — the Resonant Spike surprise). Now: (1) FORGE — weapons pick a reach class first
+// (60% melee / 20% long / 20% ranged, hash-seeded = deterministic per input set) and the form noun MATCHES it
+// (Spike/Maul = melee; Spear/Pike/Glaive = long, mid+close; Bow/Caster/Launcher = ranged, every band), stamped into
+// uniqueStats.reachClass; the description and forge announcement state the reach in plain words. (2) SETTLE — if the
+// Qwen namer's final name clearly reads ranged/long, reach follows the DISPLAYED name (one shared inferReachFromName).
+// (3) OLD SAVES — backfillPlayer runs the reach recheck on load: legacy "…Bow" forges become ranged, "…Spear" become
+// long, melee-named stay honest; idempotent. (4) COMBAT — playerWeaponReach reads the stamp (then name/tag class)
+// before the melee fallback, so a fused Bow fires from mid with no ADVANCE refusal. 6 tests: inference table,
+// noun/reach coherence + all 3 classes across 60 forges, plain-words description, forge determinism, legacy
+// back-stamp + idempotence, fused-Bow-fires-from-mid. typecheck:ci + typecheck:tests + lint clean; full fast suite
+// green. -> HAL + golem (NOT engine).
+// OTA-979 (dog-vest equipped visibility). Owner: "dog vests don't show which one is equipped in the
+// inventory." The EQUIPPED badge (OTA-685/696) existed but three holes could hide the worn state: the details MODAL
+// showed the same "Equip on dog" on every vest (no worn indicator, no way to take one off), the badge's name-fallback
+// and the equip button demanded item.kind === 'dog_armor' EXACTLY (fused vests whose stored kind drifted fell
+// through), and equipping a still-cooling Crucible vest broke the "(on <dog>)" label when the settle renamed it (name
+// comparison). Fixes: ONE shared resolver dogCompanion.wornDogVestInstanceId (vestId first, then name match accepting
+// uniqueStats.kind === 'dog_armor') feeds the badge, the label (now by instance id), and the modal — which now reads
+// "Unequip (worn by <dog>)" on the worn vest and can take it off. settleFusion keeps dog.equipped.vest in step with
+// the settled name. 5 tests: id-exact with same-named twins, legacy name fallback, kind-drift acceptance, gone/dead
+// nulls, rename-follow through a real settleFusion. typecheck:ci + typecheck:tests + lint clean; full fast suite
+// green. UI truthfulness -> HAL + golem (NOT engine).
+// OTA-980 (combat truth batch). Three fixes from one playtest log. (1) A DOT tick that
+// drops an enemy to 0 in a MIXED fight now kills it on the spot (resolveEnemyDefeat: loot, bounty,
+// standing) instead of leaving a 0-HP corpse standing until a whole extra swing formally killed it —
+// the sweep previously fired only when EVERY enemy was dead. The player's living target is re-pointed
+// after the sweep, and the attack case reads the post-tick LIVE scene. (2) A bandolier throw used to
+// restore the real off hand SYNCHRONOUSLY after building the dice prompt, so the damage phase (seconds
+// later) read the restored weapon: a thrown Sentinel Core Plate rolled as itself but landed as the
+// Mud-fist Wraps — wraps damage type, wraps coatings burned, wraps wear, plate never spent. The
+// restore + spend-exactly-one guarantee now live in throwSettlement and settle when the roll RESOLVES
+// (spend + restore) or CANCELS (restore only, nothing spent). (3) isRangedAttack read the MAIN hand
+// even for off-hand swings, so a melee blade inherited "+2 (point blank)" + ranged aim mods from a
+// holstered Bolt-Caster; it now reads the swung hand. Tests: mid-fight DOT kill, throw settle/cancel,
+// point-blank slot; retargeted bandolierThrowConsumes + dotKillEndsCombat to the new semantics.
+// typecheck:ci + typecheck:tests + lint clean; full fast suite green. Combat core -> HAL + golem.
+// OTA-981 (exploit batch). Two closures from the playtest-log audit. (1) STANDING DRIP:
+// the 6s wall-clock world heartbeat (worldRealtimeTick) carried a copy of worldTideCheck's repDelta
+// clause, so player-facing faction standing moved every ~36 real seconds — ~10x the intended in-game
+// 2-hour cadence, idle included — and since the rep events (defector/windfall) are only eligible for
+// a faction at standing >= 10 and are strictly positive for it, leaving the app open ratcheted rep
+// toward the cap for free. The heartbeat now moves tides/patrols/board only. (2) TAKE FARM: the
+// ground-take "self-heal" re-granted a scene item whenever it was absent from the pack — meant for
+// sold/dropped copies, but USING an item also empties the pack, so take->use->take farmed any takeable
+// consumable forever (owner's log: the same Aetheric Torch taken twice, 19s apart). A scene noun now
+// grants ONCE per room, period, across all four sites: takeAmbientNoun, the typed pickup fallback,
+// the look-around "You see:" filter, and the TAKE-chip grey-out (a lit chip never earns a refusal).
+// Tests: 120 heartbeat ticks leave standing untouched (board still scrolls); take->use->take refused
+// on both take paths. typecheck:ci + typecheck:tests + lint clean; full fast suite green.
+// World-sim + economy integrity -> HAL + golem (NOT engine).
+// OTA-982 (durability rebalance). Owner's log: a freshly crafted 5-piece set shattered
+// inside ONE ~10-min pack fight (AC 24 -> 17). Audit verdict: not a bug — every landed enemy hit
+// chipped EVERY worn armor slot, so a 5-piece set spent 5 durability per blow and the whole set held
+// ~22 landed hits of life; the numbers were tuned for 1v1 before 5-raider packs and defensive-verb
+// volleys existed. Fixes: (1) a landed blow now chips ONE worn piece (random among worn slots) — more
+// armor means the set lasts LONGER, not dies faster; expected set life vs a 5-pack rises ~5x. (2) the
+// rope's fraying courtesy extends to armor + weapons: at 3 durability the piece warns ("coming apart —
+// mend it or lose it") instead of jumping straight to "shatters from wear. It is gone." The temper
+// roll's fragile floor (0.4x, strong perks) is deliberately UNTOUCHED — it's the glass-cannon
+// tradeoff, and single-piece wear already makes a low roll livable. Tests: 3-piece set loses exactly
+// one point per landed hit over 10 rounds; the 4-durability piece warns at 3. typecheck:ci +
+// typecheck:tests + lint clean; full fast suite green. Combat economy -> HAL + golem (NOT engine).
+// OTA-983 (elevated combat). Owner's design, replacing the incoherent "raiders spawn and
+// punch you two tiers up a pillar": "you can be attacked by airborn creatures and with shots from
+// below, so you need a ranged weapon to fire down at the ground and any weapon to attack airborn
+// enemies." A timed ambush that arrives while you're UP a climb now masses at the BASE (new scene
+// flag enemiesAtBase, stamped by injectFactionParty when elevatedOn is set — so summit/wall fights
+// spawned AT your level keep ordinary melee). While besieged: grounded MELEE members bench (skip
+// counters; one narrated "circle the base" line per volley, deduped), grounded RANGED members shoot
+// up (isRangedEnemy), AIRBORNE members (new enemyIsAirborne: wing/fly/drone/wasp/bat/wyvern/... on
+// name+type+traits) fight you level. Player side mirrors: a grounded target needs a weapon reaching
+// far/distant (caster / throwable) — a melee swing at the base is a FREE refusal naming the fix; an
+// airborne target meets any weapon. Tests: melee-vs-base refused + caster allowed, airborne melee
+// both ways, benched-brute + firing-slinger volley, summit fight (flag off) unchanged. typecheck:ci
+// + typecheck:tests + lint clean; full fast suite green. Combat model -> HAL + golem (NOT engine).
+// OTA-984 (context-aware Save-for-quest). Owner: the earmark exists for BULK fetch
+// materials ("go get me 15 rusted metal") — specific objective items hard-lock automatically and
+// never need it — "I would only like it to say save for quest when you actually have an active quest
+// that needs them." New engine helper factionQuests.activeFetchItemNames returns the item names
+// ACCEPTED fetch contracts (active OR paused — a paused contract stays on the slate) still want;
+// the inventory modal shows "Save for quest" only when the tapped item's exact name is in that set.
+// An already-flagged item ALWAYS shows "Saved for quest" so a stale earmark can be released after
+// the quest resolves. 5 tests: fetch surfaces its item lowercased, empty/null slates want nothing,
+// staged contracts want nothing, unknown ids ignored, multiple fetches union. typecheck:ci +
+// typecheck:tests + lint clean; full fast suite green. Inventory UX -> HAL + golem (NOT engine).
+// OTA-985 (escort missions). Owner: "I want to add escort missions to this game like
+// [engine_Dev] has. it has a very specific way of doing it that I like." Ported the engine's
+// SHARED-POOL model: an escort faction contract (FactionQuestDef.escort {count,label} or an
+// _escort id) spawns ONE pooled party health bar on accept (sum of ~35%-of-player-hpMax members,
+// clamped 8-45 each). The party rides the active-quest record, shows as "↳ Surveyors (54/81)" under
+// the HUD vitals, and takes COLLATERAL damage — 30% of the player's final post-mitigation hit,
+// EXTRA, never absorbed — every time an enemy connects (a clean parry spares them). Pool at 0 =
+// contract FAILS on the spot (record dropped, loss narrated). Rest heals active parties ~10% of
+// pool max (both rest resolvers, shared helper). Deactivating the contract PARKS the party (off
+// HUD, no damage) and re-activating recalls them; delivering alive narrates the win at turn-in.
+// New app/engine/escort.ts + EscortPool type + 4 authored Tartaria contracts (Surveyors x3,
+// Pilgrims x2, Envoy x1, Scholars x2 across Stone Builders / Forgotten Order / Eternal Dynasty /
+// Revivalists). 6 tests: spec/pool/HUD-filter units, collateral, fail-at-0, rest heal. typecheck +
+// lint clean; full fast suite green. Mission content + combat wiring -> HAL + golem (NOT engine).
+// OTA-986 (escort toggle label). Owner-approved engine_Dev polish: the Contracts
+// screen's ACTIVATE / DEACTIVATE toggle on an escort contract now NAMES the living party it acts
+// on — "▮▮ DEACTIVATE (stand down your Surveyors)" / "▶ SET ACTIVE (recall your Surveyors)" — via
+// the new testable escort.escortToggleLabel helper; non-escort contracts keep the plain labels
+// verbatim. 2 tests. typecheck + lint clean; full fast suite green. UI polish -> HAL + golem.
+// OTA-987 (escort pay model + content pass). Owner: scaled pay for most escorts,
+// all_or_nothing for the higher tier + 3 normal / 2 hard flavors per faction. escort.mode 'scaled'
+// (default) pays the TC fee times the party's remaining pool fraction at delivery (floor 10%; rep
+// pays FULL); 'all_or_nothing' drop-offs skip scaling: alive = full fee, dead pool = total failure.
+// Delivery narration names the state ("battered, but breathing — 50% pay"). 16 new contracts so each
+// escort faction fields 3 scaled + 2 all_or_nothing. Tests: tier coverage per faction, half-strength
+// scaled pays ~half + says so, bloodied all_or_nothing pays full. typecheck + lint clean; full fast
+// suite green. Mission economy -> HAL + golem (NOT engine).
+// OTA-988 (hook escorts). Owner: "we need hook escort missions." A STRANDED TRAVELER can
+// now appear on novel, peaceful wild ground (6% roll per never-before-rolled tile in stepDirection —
+// mirrors the roadside-stall + wanderer anti-farm patterns; never while a live escort party is out;
+// new worldMemory.strandedEscortRolledTiles bank). Talking/investigating them opens a 2-beat hook
+// chain (new kind stranded_traveler, weight 0 — spawner-planted only): beat 1 is the offer (the hook
+// modal's CONTINUE accepts, ABANDON declines), beat 2 fires the new start_escort_contract hook
+// effect — picks a rep-0 `_stranded_escort` def the player doesn't hold, spawns the shared pool, and
+// pushes the SAME record shape acceptFactionQuest writes, so collateral/fail/scaled-pay/turn-in all
+// work unchanged (turn in at any same-faction agent). 9 new field contracts, one per faction (45 TC
+// / 5 rep, solo traveler, scaled pay). Tests: defs valid per faction, random picker never draws the
+// kind, full talk->CONTINUE->record E2E. typecheck + lint clean; full fast suite green.
+// Mission content + world encounters -> HAL + golem (NOT engine).
+// OTA-989 (escort gauntlet). Owner: "develop a new test suite and fully run escort
+// missions through their paces ... tune the 30% damage bleed ... make sure the authoring is complete
+// ... make sure the TC is worth it, and have these missions only drop TC and health items for loot."
+// (1) BLEED TUNED 0.30 -> 0.20: at 30% a solo party (pool ~42-45) died inside one hard pack fight —
+// every solo contract was a coin flip; at 20% solo holds ~1.5-2 fights + rest heals, 3-member ~4.
+// (2) LOOT RULE: escort turn-ins never roll the recipe reward (gated on escortSpecForQuest) and
+// instead press First Aid Kits into your hands with the fee (2 on all_or_nothing, 1 otherwise) —
+// escort loot is TC + healing, nothing else. (3) ECONOMICS: stranded field escorts 45 -> 55 TC;
+// guards assert scaled >= 55, hard >= 160, rep >= 5. (4) AUTHORING: the nine stranded objectives
+// rewritten with per-faction voice (no copy-paste template); guard asserts every escort title /
+// description / objective is unique. NEW SUITE ota-EscortGauntlet: all 29 contracts accepted +
+// delivered E2E (loot verified TC+healing only), vendor + board + hook pickups, 20% collateral in a
+// real fight, parked party untouched, dead pool fails un-completed. typecheck + lint clean; full
+// fast suite green. Mission QA + economy -> HAL + golem (NOT engine).
+// OTA-990 (outpost Crucible fee). Owner's design call on the Crucible faucet: "make the
+// outpost run the same as a roadside vendor." Every outpost's free-unlimited Crucible (arb103) was
+// an infinite guaranteed-Legendary faucet (3 material types = Rare, 4+ = Legendary, junk inputs
+// accepted, no fee/cooldown) — it zeroed the vendor's 25 TC fee and devalued found/crafted/boss
+// gear. New shared chargeOutpostCrucibleFee: outpost fires (fuse AND the extra-channel upgrade) now
+// cost the vendor's 25 TC, charged AFTER every gate and BEFORE any consume — a refusal, a cancelled
+// picker, or an empty purse never costs a coin or an item. Vendor fires + wild fusion benches
+// (fusionPending) stay pre-paid; the Hidden Market cauldron keeps its free-fire perk. 4 tests: fee
+// lands and forges, broke = nothing consumed + price named, pre-paid never double-charged, market
+// still free. typecheck + lint clean; full fast suite green. Economy -> HAL + golem (NOT engine).
+// OTA-991 (skyreacher maps). Owner on-device: bought a chart, "I click on it and
+// there's no use button... it's not a chart. we should call it a map." The five items are now
+// 'Skyreacher Map N of 5 — <tower>'; the inventory modal wires a dedicated always-on Use button
+// for them (no catalog-lookup gate to silently fail); a fresh unlock pops an explicit reward line
+// "Skyreacher location added to your MAP and MISSION LOG — <tower>". Old saves migrate: held
+// legacy charts rename on load (backfillPlayer) and legacy names in the sell-once ledger still
+// block re-offers. 4 new tests + 3 suites retargeted. typecheck + lint clean; full fast suite
+// green. Gameplay fix -> HAL + golem.
+// OTA-992 (game version 4.28.3). Owner: the character-select version is a knowledge
+// tracker, not a build number — "let's reactivate it and catch it up." DISPLAY_VERSION had frozen at
+// 4.1.0 back at OTA-602; the catch-up replayed the changelog through VERSION.md's rules (MAJOR =
+// lineage jump, MINOR = significant feature wave, PATCH = every OTA since the last wave): 27 waves
+// since the freeze -> 4.28.3 (full wave ledger written into VERSION.md). VERSION.md's workflow now
+// names DISPLAY_VERSION (the old APP_SEMVER field died in a rework); HANDOFF section-3 change loop
+// gains the per-OTA bump step so the tracker never freezes again. 2 tests. Gameplay-visible ->
+// HAL + golem.
+// OTA-993 (playtest truth batch). Six fixes from the 2026-07-26 device log, per the
+// owner's per-item directions. #112 arrival at a hub location narrates the walk through the gate
+// BEFORE the room Paths line (the arrival branch replaced scene text with the outdoor paragraph
+// while auto-enter had already put the player indoors). #113 isClimbable refuses nouns that
+// exact-match a catalog item ("climb Rail Saber" was a tier-1 perch with summit loot). #114 the
+// Qwen parse-fallback rephrase is validated (qwenRephraseRejection) — it must keep the player's
+// resolved noun and may not invent a wait; rejected rephrases get the soft refusal + chips.
+// #115 the empty-swing refusal checks BOTH hands and words itself for the shot when a ranged
+// weapon is equipped. #116 every stat level-up toast shows the sheet's number via statNowClause
+// (base + gear) instead of the bare base. #117 stranded-traveler escorts are hook-only — boards
+// and vendors never post them. DISPLAY_VERSION 4.28.4 (PATCH rule). 6 tests. Gameplay ->
+// HAL + golem.
+// OTA-994 (stat-toast category completion). The owner's category-verification pass on
+// review item #116 caught the truth-batch fix short: 11 MORE reward toasts (persuade/haggle CHA,
+// pickpocket/stealth STE, the travel-tick WIS/STR/CHA trio, scrap-eye INT, resist-training STR,
+// water-reflex DEX, aether-exposure generic) still printed the bare BASE stat beside a sheet showing
+// base + gear. All now route through statNowClause — 18 sites total — and a source-scanning category
+// LOCK test fails any future toast written the old way, so the class can't regrow. DISPLAY_VERSION
+// 4.28.5. 2 tests. Gameplay -> HAL + golem.
+// OTA-995 (one accept behavior for every contract kind). Review item #118: hunts,
+// mysteries, and storylines auto-ACTIVATED on accept while faction quests auto-parked — the owner
+// hand-deactivated nine contracts in one board-browsing session. Root cause: only
+// acceptFactionQuest had single-active park logic, and it scanned only its OWN kind. Now
+// anyTrackedContract() is the one shared cross-kind predicate; all EIGHT accept/grant sites
+// (faction accept, hook escort grant, faction+neutral hunt, faction+neutral mystery, storyline,
+// whisper hunt/mystery grants) park the newcomer when anything is live, with the same "paused —
+// you're already on another contract" line. Debug breadcrumbs: every accept logs kind/id/tracked.
+// DISPLAY_VERSION 4.28.6. 2 tests. Gameplay -> HAL + golem.
+// OTA-996 (polish trio + observability). Review item #119. (a) Ambient takeable gear
+// gets a cross-tile variety window: pickTakeableGearForScene was independent uniform draws over one
+// 128-name pool with ZERO cross-scene memory — "Rail Saber x3 in 90s" was a birthday collision by
+// construction. worldMemory.recentTakeableGearNames (last 10) now feeds an exclude window;
+// guard-capped so it degrades, never starves. (b) The climb-down line names the PERCH, never the
+// person (overlayDescentNoun — overlay ids doubled as labels and trader/lookout overlays are named
+// after their occupant). (c) The Buried Strip Mall becomes the Buried Market Row (climbable +
+// worldLadder display strings; room id kept for save continuity) + an Americana lock test. Debug
+// breadcrumbs: scene-build state (loc/hub/arrival/passing) + gear-spawn rolls on the debug channel.
+// DISPLAY_VERSION 4.28.7. 4 tests. Gameplay -> HAL + golem.
+// OTA-997 (the missing names). #119-completion, owner: "complete 119 missing names."
+// Root cause: the portability filter matched raw SUBSTRINGS, so 'mud' banned every Mud-* weapon
+// and armor (~58 Common names) from ambient spawns AND pickup, 'arch' banned "Architect's" gear,
+// 'rain' matched "training". Category fix: word-boundary matching plus an exact catalog-item
+// exemption (a catalog item is by definition pocketable; true substances/masses — "wet mud",
+// "fog bank", "ash drift" — stay put). Mud-* gear provably returns to the spawn pool (test probe).
+// DISPLAY_VERSION 4.28.8. 3 tests. Gameplay -> HAL + golem.
+// OTA-998 (THE HOLLOWED). Owner feature: the install's Fallen roll made flesh — a dead
+// character can return as a one-time Aetherkin-revenant BOSS event. Violent where the other
+// Aetherkin are afraid: it remembers being a warrior ({kills} feed its strength) and wears the
+// custom kit it died in (captured at death going forward via FallenHero.gearNames; pre-998 records
+// get a seeded Rare+ kit). Wild spawner beside the stranded-traveler roll (power-gated hpMax>=60,
+// 4% on novel peaceful tiles, backfills the existing install roll automatically); standard loot
+// rolls draw from the died-in kit; the kill is EXEMPT from the Aetherkin reverence penalty (no
+// marker trait/name — locked by test); the sentimental put-to-rest close writes the memorial:
+// "put to rest by <avenger>" shows in the FALLEN codex, install-wide. New engine/fallenRevenants.ts.
+// Hint-mission rumor pickup ships next OTA. DISPLAY_VERSION 4.28.9. 4 tests. HAL + golem.
+// OTA-999 (stealth cold start). Owner: "why does STE build so slowly... my character is
+// still at 0" — root cause: stealth is the only stat that can START at 0 (others 5-13), the
+// success-gated curve needed ~34 successful sneaks for the FIRST point, failures taught nothing
+// (and in combat punished the attempt), and only three deliberate thief actions train it at all.
+// Owner picked (a)+(b-low): a stat in the 0-2 band earns DOUBLE progress (+6/success, first points
+// in ~17 uses); NEAR-MISS learning is deliberately the LOWER road — only while the stat is <= 5,
+// only a failure within 3 of the DC, flat +1 (a sixth of a cold-start success) — so nothing
+// snowballs once the needle moves. Wired stealth-only at the failed-check site. DISPLAY_VERSION
+// 4.28.10. 3 tests + curve retarget. Gameplay -> HAL + golem.
+// OTA-1000 (sigil salvage). Owner: "a pried sigil awards coin? it should give me a
+// faction sigil." Root cause: EVERY salvage yield (pry/strip/break/bulk) flows through
+// rollSalvagePool, which had no sigil awareness — a 'scout sigil' noun fell to the junk table
+// (coins). Category fix at that one choke point: any sigil/crest noun now yields a REAL faction
+// sigil item — faction read from the noun's own words via the existing sigils.ts keyword map
+// ("architect sigil" -> Architect Sigil), rolled across the nine otherwise; the OTA-691 turn-in
+// economy (+1 standing at that faction's agent, SIGILS section auto-route) takes it from there.
+// DISPLAY_VERSION 4.28.11. 3 tests. Gameplay -> HAL + golem.
+// OTA-1001 (light healing). Task #120, owner: "keep its fix numbers on the lighter
+// side." Root cause: heal numbers were FLAT in a game where hpMax scales (kit 25 / ration ~6 vs
+// 133 hpMax), and rest restored stamina only — HP recovery existed solely through a pile of
+// consumables. Category fix: one scaler, scaledHealHP(flat, hpMax) — kit-grade (flat>=20) heals
+// max(flat, 15% hpMax), snack-grade max(flat, 4%) — wired at ALL three consumable apply sites +
+// the InventoryScreen button math; rest now knits ~15% hpMax per full sleep (supersedes arb37),
+// and the full-rest refusal counts open wounds as a reason to sleep. Floors keep the early game
+// identical. DISPLAY_VERSION 4.28.12. 2 tests. Gameplay -> HAL + golem.
+// OTA-1002 (offer budget + rep floors). Task #121. Root cause: the scene-entry
+// vendor block has FOUR independent offer emitters (contract / bounty board / mystery notice /
+// thick scroll), each firing whenever its pool was stocked — no aggregate budget, so a mid-game
+// player got pitched all four every visit. Category fix at the shared block: agents pitch TWO
+// rotating categories per macro visit (keyed on macroVisitSeq, walks one step per visit — every
+// category surfaces within two stops); turn-in hints stay unbudgeted. Plus: the all_or_nothing
+// escort tier (full pay or lose EVERYTHING) sat at rep 18-22 — a newcomer trap; all 8 floored
+// at rep 25. DISPLAY_VERSION 4.28.13. 4 tests. Gameplay -> HAL + golem.
+// OTA-1003 (weather locality). Task #122, owner: keep weather LOCATION-RELEVANT
+// "so you're not trying to re-spec your armor every 2 seconds." Root cause: pickWeather weighed
+// only NOVELTY — no location linkage, no persistence — so every scene rebuild could re-roll the
+// sky and an Aetheric spire hailed as readily as a mud flat. Category fix at the single chooser
+// + both call sites: (1) locale keyword bias (aether/spire -> Aether Lightning + Aetheric Storm
+// x3; mud/marsh -> Black Rain x3 + Whisper Fog x2; ash -> Ash Storm x3; frost -> Silent Blizzard
+// x3), (2) the rolled sky PERSISTS per location for ~6 game-hours (worldMemory.sceneWeather —
+// rebuilds reuse, travel drift updates it), (3) no weather bite INDOORS (hubRoomId /
+// activeBuildingId), (4) chip gap 2 -> 5. DISPLAY_VERSION 4.28.14. 4 tests. Gameplay -> HAL + golem.
+// OTA-1004 (Hollowed rumour hooks). THE HOLLOWED part 2 — the HINT route the owner
+// asked for alongside the random encounters ("make these all hint missions that can be picked up
+// AND from random encounters"). OTA-998 shipped only the direct door: a 4% wild roll spawns the
+// revenant boss outright. This adds the pickup-able lead — when that roll misses, a 5% roll
+// instead plants a 'fallen_whisper' hook (a blade driven hilt-up at the verge, warband cloth
+// knotted to the guard) plus a trader's tale naming the fallen and where they walk. Following it
+// two beats calls the SAME revenant from the SAME un-avenged pool through a new
+// spawn_fallen_revenant hook effect; an install with nothing un-avenged reads as a cold trail.
+// DISPLAY_VERSION 4.28.15. 4 tests. Gameplay -> HAL + golem.
+// OTA-1005 (the curio valve). Owner asked why the Fusing Crucible was built; the notes
+// answered it: OTA-193/194/195, from the owner's own challenge — "we are generating an endless
+// stream of items that will never have a real use." The Crucible exists to give catalog-ABSENT
+// "inferred" junk a destiny, and inferred-only is the FEATURE (owner: "burning junk devalues the
+// fuse crucible"). But two later cleanups starved it: arb61 filtered salvage output down to
+// materials.json names — all catalog items — so salvage produced ZERO fuel, structurally; and the
+// standing inferred-stats BACKFILL practice kept converting the remainder into catalog rows. A
+// device session salvaging for hours yielded ONE fusable item. Fix at the single salvage choke
+// point (rollSalvagePool): a new 50-name curio pool, deliberately catalog-absent and spanning all
+// seven material families, drops at CURIO_CHANCE = 18% (owner's number) IN PLACE of the material
+// that would have dropped. `salvage all` calls that function once per noun, so all ten things roll
+// independently. Measured: 18.0%, ~1.8 curios per ten-noun sweep. The suite LOCKS the drain shut —
+// if a curio ever gains a catalog row, it goes red. DISPLAY_VERSION 4.28.16. 8 tests. -> HAL + golem.
+// OTA-1007 (the Crucible refuses out loud). Owner: "if you don't have enough to fuse,
+// don't let it have you still go through the menu ... I honestly thought I was fusing all those
+// things." ROOT CAUSE, and it was a band-aid we shipped: OTA-801 made a FAILED gate OPEN THE
+// PICKER anyway to dodge repeat-refusal spam. That swapped a visible annoyance for an invisible
+// one — a menu you cannot act in that logs NOTHING. Reproduced from the device log: three `fuse`
+// commands, one line each (the player's own echo), ten minutes of a dead FUSE button. This OTA
+// REMOVES the OTA-801 patch instead of layering on it. All three Crucible doors funnel through
+// fuseAtCrucible, so one choke point covers the category: the picker opens ONLY when a fusion is
+// genuinely possible; otherwise a modal names exactly what is short (plain English — the word
+// "inferred" is gone from player copy), HOLDS until dismissed, and the Crucible closes. Also: the
+// vendor's portable rig now checks BEFORE taking its 25 TC (was: pay, then get a dead menu), the
+// FUSE button gates on the real rule so a lit button always fuses, and the stale selection is
+// cleared on refusal. DISPLAY_VERSION 4.28.17. 7 tests. Gameplay -> HAL + golem.
+// OTA-1006 (how many, not "do you want to continue?"). Owner: "instead of having the continue
+// crafting, let's assume they always want to continue crafting — never close the crafting menu
+// till they hit a back button. So that pop-up becomes how many of that item do we want to craft
+// ... plus and minus buttons or Craft Max ... and then it just completes that crafting task and
+// stays in the crafting menu." ROOT CAUSE: OTA-264 put the decision AFTER the work. A tap crafted
+// exactly one, then a modal asked CONTINUE CRAFTING / CLOSE MENU — a question whose answer was
+// always the same, so ten stews cost twenty taps and ten identical prompts, and the modal could
+// take the menu away. The step moves to the FRONT: tapping a recipe opens a quantity picker
+// (- / + stepper and MAX), the batch runs, and the menu stays exactly where it was. MAX is honest
+// — maxCraftableCount simulates the real drain one craft at a time through the same
+// substitution-aware consumeIngredientsList the craft uses, rather than dividing and hoping, and
+// is capped at MAX_CRAFT_BATCH = 20. craftRecipeBatch mirrors salvageAllAmbient's proven shape:
+// every pass is an ordinary craft with every gate intact (so it can never over-consume), it stops
+// on a refusal / full pack / the substitution prompt, and emits ONE aggregated reward line instead
+// of N. The OTA-264 modal is retired for a self-clearing haul banner. DISPLAY_VERSION 4.28.18.
+// 5 tests. Gameplay -> HAL + golem.
+// OTA-1008 (the voice crash count belongs to a BUILD, not an install). Owner: "can we reset the
+// crash counter to 0 for my install? those are a few hundred fixes ago." ROOT CAUSE of the whole
+// category — a stale verdict against code that no longer exists: the voice count is
+// install-lifetime, so a number banked hundreds of OTAs back is still reported as if it described
+// the build running today. And it is inflated by the very act of shipping fixes: OTA-464 pulled the
+// voice auto-disable precisely because the breadcrumb CANNOT distinguish a real Kokoro SIGSEGV from
+// a benign termination, and an OTA reload mid-utterance is exactly that. Fix: stamp the count with
+// OTA_BUILD_ID and re-zero when the build changes, dropping the surviving breadcrumb in the same
+// breath (the reload that applied the OTA must not become "1 voice crash"). The diagnostic now reads
+// "on this build" and says "count reset" out loud. SCOPE IS DELIBERATE AND TEST-LOCKED: this
+// forgives the VOICE counter only. arb128 removed the OTA-560 blanket amnesty after it forgave a
+// genuinely-incapable device, re-enabled Qwen and produced a crash-to-home loop — so the Qwen
+// completion guard and the ML-init guard keep their install-lifetime counts and their manual-only
+// reset (About -> RESET AI NARRATION). The voice counter is the only one that is BOTH detection-only
+// (shouldAttemptBundledTTS is an unconditional `return true`) and known to over-count, so clearing it
+// forgives nothing and re-enables nothing. DISPLAY_VERSION 4.28.19. 8 tests. -> HAL + golem.
+// OTA-1009 (charisma is not a to-hit stat). From the device log: `attack with the off-hand mud
+// executioner's blade` -> "You — d20 -> 8 + CHA 9". A SWORD swinging on the SOCIAL stat. ROOT CAUSE,
+// and it is DATA not code: attackStatFor() cannot return charisma at all, but it is only consulted
+// when NO weapon is held — with one equipped the roll uses `equipped.stat` from the catalog row, and
+// the catalog assigned that field BY GRIP with the single_handed bucket set to charisma wholesale.
+// 37/37 single-handed melee and 5/5 single-handed ranged, zero exceptions: 42 weapons, 7 of them
+// LEGENDARY. For a STR-14 / CHA-9 character that is a silent -5 to hit on every one-handed weapon,
+// so the best one-handed gear in the game was quietly the worst. WHY IT SURVIVED AN EARLIER FIX: we
+// logged this exact symptom before ("melee blade rolls CHA") and patched a CODE path; the row was
+// never touched, so it came straight back — a band-aid on a data bug. THE REPLACEMENT STAT IS
+// DERIVED, NOT INVENTED: six weapons appear TWICE under different grips and only the single_handed
+// row was charisma (Giant Bone Spear strength / (Single) charisma; Plasma Pistol dexterity /
+// (Single) charisma; Energy Blade (Legendary) dexterity / Energy Blade charisma; and three more).
+// Those twins are the intent, and the owner chose to match them: heavy one-handers (blade/axe/
+// hammer/spear) -> STRENGTH like the two-handed rows of their own family; knives, batons, rods and
+// thrown pieces -> DEXTERITY like the dual-wield rows of theirs; one-handed pistols -> DEXTERITY like
+// the Plasma Pistol they vary. Untouched grips verified unchanged (two-handed still STR, dual-wield
+// still DEX). Two authored non-charisma exceptions are named and preserved, not swept up: the Order
+// Letter-Opener (a scholar's tool, INT) and the Golem Aether-Lance (channels, INT). CATEGORY LOCKED
+// two ways — a suite that fails if ANY catalog weapon carries charisma, and a runtime backstop
+// (isValidAttackStat) so a bad row falls back to the weapon-class default instead of being obeyed.
+// DISPLAY_VERSION 4.28.20. 9 tests. Gameplay -> HAL + golem.
+// OTA-1010 (finishing a job is an EVENT, not a log line). Owner: "there needs to be a pop-up that
+// hangs for a second to let you read that says that you completed a mission and give the name and the
+// reward. I didn't even realize I completed the mission except for that the name of my escort was off
+// the screen." On device a STORY THREAD paid Trail Rations, Mud Essence AND a Rare Golem Core — all of
+// it feed lines that scrolled away behind ambient chatter. ROOT CAUSE OF THE CATEGORY: "a mission
+// completed" did not EXIST as a concept in this codebase — only SEVEN independent sites that each
+// hand-built a reward string and dropped it in the log (bounty, faction contract, hunt board turn-in,
+// hunt pack turn-in, mystery, storyline, story-thread finale). Patching the one the owner happened to
+// hit would have left six others exactly as missable. So this OTA CREATES the missing concept:
+// announceMissionComplete(kind, title, body) is now the one way a job ends — it writes the same feed
+// line it always did (the log stays a complete record for the chronicle and bug reports) AND raises
+// missionCompleteNotice, which MissionCompleteModal renders and HOLDS until dismissed (AUTO_CLOSE_MS
+// 12s is a safety valve, not a timed toast). All seven sites funnel through it. Repeated calls for the
+// SAME title MERGE, so a thread's finale and its persistence bonus read as one result instead of two
+// popups fighting. LOCKED TWO WAYS: a category test pinning all 7 call sites + every job kind, and a
+// SOURCE lock that fails the build if any completion is ever written straight to the feed again.
+// DISPLAY_VERSION 4.28.21. 7 tests. Gameplay -> HAL + golem.
+// OTA-1011 (travel-by-name finds the place you NAMED, not the one you punctuated right). Owner:
+// "'travel to the location name' should start an auto route as long as the name matches." Auto-routing
+// itself was fine (OTA-049: match -> setTravelCourse, one tile at a time). The MATCHER was not.
+// ROOT CAUSE: it compared RAW strings, so every apostrophe and hyphen an author typed had to be
+// reproduced exactly on a phone keyboard. MEASURED against the live 36-location catalog: exact typing
+// resolved 36/36, punctuation-free typing FAILED on 7 real places — Zharak's Teeth, Reclaimer's Stake,
+// Thametan's Tower, The Architect's Blind, The Monarch's Waystation, Builders' Survey Camp,
+// Giant-Watch Shrine — with a flat "I don't know a place called that" for somewhere the player had
+// already been. The typo fallback could not rescue them: it compared single WORDS of the name against
+// the player's WHOLE phrase and skipped anything differing in length by more than one, so "zharaks
+// teeth" (13) was measured against "zharak's" (8) and "teeth" (5) and both were rejected before the
+// spell-check ran. FIX: one shared matcher, app/engine/locationMatch.ts, normalising BOTH sides to
+// letters-and-digits — which collapses apostrophes, hyphens AND spaces together, so "Giant-Watch
+// Shrine" answers to "giant-watch shrine", "giantwatch shrine" and "giant watch shrine" alike. Article
+// handling is symmetric (keysFor): stripping "the" off the player's words but not off the authored
+// name was why "The Hidden Market" only resolved by luck (it happens to carry a matching alias) and
+// why "the engine" — an exact alias of Thametan's Tower — missed. Tiers run most-precise-first
+// (id, exact name, exact alias, partial name, partial alias, whole-name typo budget) and AMBIGUITY
+// REFUSES rather than guessing: five places share the alias "city" and three share "tower", so
+// "travel to the city" now gets the honest refusal + destination list instead of a silent walk to
+// whichever row sorted first. 18 tests drive EVERY location through exact / lowercased / shouted /
+// padded / punctuation-dropped / punctuation-spaced / article-added / alias / id forms plus a
+// single-character deletion at every position and substitutions, and assert the refusals still hold
+// for non-places, sub-4-character scraps and ambiguous near-misses. DISPLAY_VERSION 4.28.22.
+// Gameplay -> HAL + golem.
+// OTA-1012 (the root-cause audit's own findings). Owner: "run a root cause analysis of all fixes
+// done in the last 12 hours ... thoroughly test everything." The audit re-verified all seven OTAs
+// (1005-1011 / golem 982-988): commit-for-commit parity across both lines confirmed (only OTA-number
+// comments differ), every claimed root cause re-checked against the code, fusion-made weapons proven
+// safe under the OTA-1009 backstop (they carry no to-hit stat, so they fall to the class default).
+// TWO REAL DEFECTS FOUND — both introduced by this session's fixes, both the species those fixes
+// hunt: a PROXY standing in for the truth. (1) craftRecipeBatch judged success by TOTAL pack
+// quantity; the Club (1 Stick -> 1 Club) nets ZERO, read as refusal — one silent club, made === 0,
+// no summary, per-craft line suppressed by craftBatchQuiet. Found by sweeping all 130 recipes for
+// consumed == produced. Fix: count the RESULT item itself — a success always raises it by one.
+// (2) OTA-1011 preached "ambiguity refuses" but the partial-name tier kept shortest-name-wins:
+// "travel to camp" matched THREE real places and silently chose Builders' Survey Camp; "tartarian"
+// matched two. Fix: multiple partial owners refuse like the alias/typo tiers, with one carve-out —
+// a candidate whose name is the BASE the others extend ("Nimari" in "Red Tower of Nimari") is
+// unambiguous intent and still resolves. Both fixes source-locked. The two suites that flickered in
+// the combined run (ota1006CraftQuantity, ota1011TravelByName) were re-run serially and pass — the
+// combined-run failures were jest parallel-load timeouts, not regressions. DISPLAY_VERSION 4.28.23.
+// 7 tests. Gameplay -> HAL + golem.
+// OTA-1013 (extended audit: the full Opus span, 992-1004). The owner asked whether the 12-hour
+// audit had covered ALL of the session's OTAs — it had not: OTA-992..1004 (13 OTAs, 2026-07-26) fell
+// outside the window. EXTENDED AUDIT RESULTS: all 13 HAL commits verified against their golem ports
+// PATCH-FOR-PATCH (excluding buildInfo/tests, every port is line-identical modulo OTA numbers, delta
+// 0 on all 13); the file-level drift in gameStore/InventoryScreen predates the run (comment-only).
+// Adversarial probes: sigil-vs-curio ordering in rollSalvagePool SAFE (the OTA-1000 sigil branch runs
+// before the OTA-1005 curio roll, so a pried sigil can never become a curio); stealth near-miss
+// (OTA-999) cannot double-award on success (missBy <= 0 returns first); scaledHealHP (OTA-1001)
+// bands verified (nibble floor first, max() never heals below authored, hpMax guarded). ONE REAL
+// DEFECT: OTA-997 exempts exact CATALOG items from the substance-word portability ban, but OTA-1005's
+// curios are deliberately catalog-absent — the Mud-Frosted Bead (word "mud") could be salvaged into
+// the pack yet REFUSED on re-pickup once dropped. Fix at the same choke point: the curio roster is a
+// catalog too, so isExactCatalogItem now consults it — any future curio named with a substance word
+// is covered the day it is authored. Category-locked by a test sweeping the live roster; the ban
+// itself still refuses real substances ("wet mud", "fog bank"). DISPLAY_VERSION 4.28.24. 3 tests.
+// Gameplay -> HAL + golem.
+// OTA-1014 (studs-down corrections, batch 1: exploits + spawns). Owner: "take all of opus fixes
+// down to the studs and verify root cause and proper implementation of new systems." Five parallel
+// audits re-derived every OTA-992..1004 root cause against PRE-fix code; 13 OTAs audited, 5 clean,
+// 8 with defects, ~30 findings. This batch fixes the exploit-class + spawn-system tier: (1) OTA-996's
+// variety window reopened the leave-and-return GEAR FARM — the exclusion check sat inside the seeded
+// draw loop, so skipped picks shifted the RNG stream and a rotating window dealt the same tile fresh
+// gear; the window now filters AFTER the draw (hide, never substitute), with a pool-size guard.
+// (2) OTA-1000's sigil branch fired on ANY noun containing sigil/crest ("sigil floor", the sealed-
+// door perch's "sigil-etched door") at 100% yield on nouns that RESPAWN after any round-trip — an
+// unbounded +standing / permanent trade-rapport farm; now HEAD-NOUN gated ("seal sigil" yes, "sigil
+// floor" no) and a permanent worldMemory.salvagedSigilKeys ledger (deliberately NOT wiped by the
+// arb105 restock) makes a faction's mark come off a place ONCE — repeats find a coin; both grant
+// sites funnel through one ledgeredSalvage helper. (3) The Hollowed spawn ignored activeBuildingId
+// (both sibling spawners check it) and live escorts — a 90-150 HP no-parley boss could land mid-
+// escort and shred the shared pool; both revenant doors now gate on !hasLiveEscort + the building
+// check. (4) A revenant beat claims its step — the stranded-traveler roll yields instead of planting
+// a mute traveler behind a boss. (5) The Aetherkin reverence exemption was an ACCIDENT of name-
+// matching ("Hollowed X" happens not to match /aetherkin/i); a character named "Aetherkin" would eat
+// the four-faction penalty for avenging themselves — now guarded on the fallen_revenant TRAIT.
+// (6) FALLEN_CACHE was primed once per process, so a mid-session death could not rise for a
+// successor until app restart — death now appends to the live pool. (7) The revenant's kit/attack
+// followed first-equip HISTORY (a boots-first character produced a "Mud-Caked Boots (remembered)"
+// boss); gearNames now sort by slot priority, weapons first. (8) The travel drift persisted its
+// deliberately UNBIASED road roll under the ORIGIN location's id (currentLocationId switches only on
+// arrival), overwriting and LOCKING OUT the locale-biased sky for 6 game-hours — the exact "spire
+// hails like a mud flat" symptom OTA-1003 fixed; the drift now stamps the 'open-road' sentinel.
+// (9) The door-2 rumour NAMED one fallen and the effect re-drew at random (tale says Verbal,
+// Sasmooch rises 4-in-5 with a pool of five); the named fallen now rides the hook's chainId
+// (`fallen:<ts>`), and one put to rest in the meantime reads as a cold trail, never a stand-in.
+// Contracts/toasts and input/world correction batches follow. DISPLAY_VERSION 4.28.25. 10 tests.
+// Gameplay -> HAL + golem.
+// OTA-1015 (studs-down corrections, batch 2: contracts + toasts). The OTA-995 audit found the
+// single-active invariant enforced only on ACCEPT: the Contracts screen's SET ACTIVE toggle flipped
+// one record and paused NOTHING — two taps left several contracts live at once forever after, and
+// every later accept then parked "because you're busy" against contracts the player couldn't see
+// were both live. FIX: activation now stands every other routed contract down, ACROSS kinds (hunts,
+// mysteries, storylines, faction quests — setContractActive sweep + a mirror in
+// setFactionQuestActive); deactivation touches only its target. Whispers, leads and the parley are
+// ambient-tier breadcrumbs and deliberately exempt (test-locked as a design decision, not an
+// omission). Hook-granted hunts/mysteries that park now SAY SO (they parked in silence — a
+// regression on the very OTA-054 "I didn't even know I had the hunt" lesson cited three lines
+// below the grant). The OTA-994 audit found EIGHT player-facing stat toasts still printing the BASE
+// stat: seven routed through applyTrainAndLog's raw {to} substitution (the hunt/mystery/storyline
+// completion toasts — verbatim #116 in the exact paths the fix was for) and the parley's raw
+// "Charisma X -> Y". One helper edit wires all seven through statNowClause; the parley line joins
+// them. The clause's "with your gear on" became "as you stand" — effectiveStats folds in race, food
+// and corruption, and the old wording blamed gear for all of them (a naked Giant read "10 with your
+// gear on"). The OTA-994 lock test is HARDENED: it was green over eight live offenders because its
+// filter required the exact `(now ${` shape on one line; it now pins the helper's statNowClause
+// routing and bans the raw X->Y form. DISPLAY_VERSION 4.28.26. 8 tests. Gameplay -> HAL + golem.
+// OTA-1016 (studs-down corrections, batch 3: input + world). (1) The qwen typo-repair guard was
+// INERT in its most dangerous cases — the parser's unknown-exits carry no resolvedNoun, so a
+// fabricated non-'wait' action ("attack the vendor" from garbled input) dispatched clean; and the
+// whole-string containment REJECTED honest repairs ("Aetheric Torch" resolved vs "use the torch").
+// Now word-level in both directions: a repair must keep a significant word of the resolved noun, or
+// — with no noun — share a significant word (exact/containment/one-typo) with what the player TYPED.
+// (2) The scenery-attack refusal classified by a single /^ranged$/ tag — all 55 runecasters (same
+// reach as ranged, no tag) and every throwable read "arm's reach ... your blade"; bare hands read
+// "your blade"; melee+ranged dual-wield narrated a shot for a sword swing. Now classified by
+// reachClassFor (the resolver combat itself uses, tag-aware), the typed VERB wins on disagreement,
+// and empty hands answer with fists. (3) routeMission and the bounty board start courses from
+// INDOORS with no gate — the surviving hubRoomId re-attached the departure room to the ARRIVAL
+// outpost ("you pass through the gate into <new outpost> — Workshop", the stale-room #112 named);
+// setTravelCourse (the choke point every caller shares) now clears hubRoomId/activeBuildingId.
+// (4) Offer rotation re-keyed on PITCHES (worldMemory.offerPitchSeq): macroVisitSeq keying phase-
+// locked any vendor on a ≡0 (mod 4) circuit to the same two categories forever, world-wide; the ×2
+// step makes consecutive pitches cover all four (the old +1 walk covered three while claiming two-
+// stop coverage — its own test asserted union=3 under a name claiming 2); NaN-guarded. (5) Weather
+// locale bias reads the location's TAGS (31 of 36 locations had an unbiased sky; the frost row
+// matched NOTHING — Yuldra-Tul's frost lives in tags) and the short-word rows are word-anchored.
+// (6) Dog heals agree: 'feed dog' healed FLAT while 'Feed Max' scaled by the PLAYER's hpMax — both
+// now scale by the DOG's own frame. (7) Great-climb precedence in isClimbable requires the noun to
+// BE the landmark (exact authored noun): the token match made the three purchasable Skyreacher Maps
+// climbable paper (#113 reopened through its own fix); the Great Fang of Zharak still climbs; the
+// curly-apostrophe hole in the catalog exclusion is closed. DISPLAY_VERSION 4.28.27. 13 tests.
+// Gameplay -> HAL + golem.
+// OTA-1017 — THE RESIDUALS, CLOSED (owner: "complete 1-4 that were left open").
+// (1) THE RECLAIM: the kit is captured as FULL ITEM COPIES at death; a Hollowed
+// put to rest hands back the died-in WEAPON outright and armor rides the normal
+// rolls as the REAL items — pristine, fused stats intact — never look-alike
+// trophies. KO-strips count as put to rest (no rise-again kit farm). Legacy
+// seeded kits PIN at first generation (catalog edits can't re-dress a named
+// fallen). (2) itemPreview heals promise the #120-scaled value for YOUR frame.
+// (3) The sky is remembered PER LOCATION (self-pruning map; legacy slot
+// migrates) — leave-and-return keeps the origin's weather. (4) Hollowed polish:
+// proven-progress gate (10 kills or 12h) beside the HP bar, per-tile roll bank,
+// retried memorial write, and the rumour can't spawn the boss over a live fight.
+// OTA-1018 — THE FALLEN ROLL MARKS THE STILL-WALKING (owner: "push the marker").
+// The Lore Codex memorial showed "put to rest by X" on avenged entries and
+// NOTHING on the rest — the player couldn't tell which of their dead were
+// still out in the mud as risable Hollowed. Un-avenged entries now carry an
+// amber "STILL WALKING" line, and the header counts them ("N remembered *
+// M still walking").
+// OTA-1019 — THE CODEX TABS ARE ALWAYS ON SCREEN (owner screenshot: "there is
+// no fallen tab under lore"). The 7-tab row was a horizontal ScrollView with
+// the indicator hidden and no affordance — FALLEN and LORE sat past the right
+// edge and effectively did not exist unless the player happened to swipe the
+// row. The row now WRAPS onto a second line: every tab always visible, no
+// hidden state. Category rule: content that exists must be discoverable.
+// OTA-1020 — EVERY COATING RACKS (owner: "there were coatings that I couldn't
+// load into my bandolier"). Root cause: five sites asked "is this a coating?"
+// by reading the INSTANCE's tag snapshot, and instances keep the tags they
+// were minted with forever — vials acquired before a catalog tag existed
+// failed the bandolier gate (and the coat-a-weapon button, equip guard,
+// drinkable gate, throw burst) while identical new ones passed. One canonical
+// reader now answers for all of them: canonicalItemTags (instance UNION
+// catalog row, by name) + isWeaponCoatingItem; the bandolier's throwable and
+// spear tests read the same canonical tags. Non-catalog (fused) names keep
+// instance-only behavior.
+// OTA-1021 — RESTITUTION (snapshot-audit batch A). Catalog renames had shipped
+// with NO save migration, so months-old saves held names the catalog no longer
+// knows and every by-name resolution silently degraded them to inferred
+// Commons: the renamed endgame rifle (with the build latch blocking a redo),
+// the re-slotted Skyreacher legs piece (crest ledger blocking a re-earn), two
+// retired torches, and the four original golem armaments. LEGACY_ITEM_RENAMES
+// (itemMigrations.ts) now maps every retired name to its surviving row and
+// backfillPlayer applies it to inventory + equipped slots (incl. the
+// legs->cloak move) + the golem's armament + knownRecipes on every load. The
+// golem's held weapon also joins the restamp/durability heal passes it had
+// been excluded from. And resurrection now runs the SAME worldMemory load
+// migration as a normal slot load (migrateLoadedWorldMemory + canon-location
+// resync) — a gem revival no longer strips the atlas, contract pins and
+// bestiary for the session.
+// OTA-1022 — THE FAIL-OPEN HOLES, CLOSED (snapshot-audit batch B). Four
+// protections read the instance tag/rarity snapshot and silently failed OPEN
+// for items acquired before the catalog marking shipped: (1) the quest-item
+// lock (one predicate, now canonical — drop/sell/scrap/gift/section all
+// route through it, the two raw sibling reads routed too) let a main-quest
+// key be scrapped into an unwinnable run; (2) the forge blocklists let stale
+// sigils/vials/quest cores read as reservable junk and applyFusion CONSUMED
+// them; (3) the substitute-drain rarity guard read mint-time rarity — NEVER
+// healed on load — so a stale-Common Titan Core vanished into low-tier
+// recipes; (4) collect_only let unreplaceable Skyreacher rewards sell at
+// full Legendary rate or feed the Crucible. NEW: canonicalItemKind +
+// canonicalItemRarity beside canonicalItemTags (whose catalog union now also
+// spans amulets/rings/dog gear). 'loot' and other provenance stamps stay
+// instance-read by design.
+// OTA-1023 — THE ECONOMY READS CANONICAL VALUES (snapshot-audit batch C). Sell
+// price (base table, kind fallbacks, self-crafted bump, arbitrage floor +
+// armor-floor gate), scrap gate + yields (kind/tags/rarity — a stale-Common
+// piece never yielded its Golem Core), repair cost, golem substitute feeding
+// (kind gate + element tags + heal tier at all three call sites) and
+// coating-drink potency now resolve kind/rarity/tags canonically instead of
+// trusting the mint-frozen instance snapshot (kind heals upgrade-only; rarity
+// is NEVER healed; stack-merges spread a stale row onto every new copy — a
+// pre-promotion Beast Fang sold at 5 TC where a fresh one sells 36, forever).
+// The 'trophy' half-price stamp is now catalog-AUTHORITATIVE: it only applies
+// while the name is catalog-ABSENT, so promoted parts shed the discount (a
+// union can add tags but never retire one). selfCrafted/fused/stolen stay
+// instance-read by design.
+// OTA-1024 — THE IDENTITY TAIL (snapshot-audit batch D, ~25 sites). Inventory
+// sections (coatings finally file under COATINGS; throwables/wardrobe/dog
+// gear canonical), the whole throwable cluster (equip routing, one-shot
+// ranged synth, consume-on-throw, reach bands, USE button — a stale Shard
+// swung bare-handed and was never consumed), sigils (visible + faction-typed
+// again), itemIsTool (pouch + TOOLS section), crafting material substitution
+// + shortfall, dig-tool scoring, racial gear conditions, faction-catalyst
+// cluster (incl. the un-themed-burn faction-id read), rope free-mend guard,
+// dog treats, torch/lantern detection, barehanded gauntlets, dog food heal,
+// ancient-repair perk — all canonical. PLUS two load heals: the kind heal now
+// skips fused pieces (a fused armor named like a catalog weapon flipped to
+// 'weapon' every load), and pre-retarget CHA stat-channels on weapon
+// instanceStats re-point at the catalog's current stat.
+// OTA-1025 — GUARD-RAILS (snapshot-audit batch E, the recurrence lock). (1) A
+// committed catalog-name SNAPSHOT + refresh script + lock test: a name that
+// leaves the catalogs without a LEGACY_ITEM_RENAMES entry now FAILS THE BUILD
+// — the Boltcaster class of loss can never ship again (HANDOFF §3a rename
+// policy). (2) abandonContract is orphan-safe: a record whose def was retired
+// is still droppable (was a silent no-op — a permanent slate entry). (3) The
+// Contracts header counts only records whose def resolves (agrees with the
+// cards). (4) The faction turn-in gate reads the STAGED records union, not
+// the legacy id mirror alone. (5) getLocationById's fallback is LOUD. (6) The
+// last routing reads canonical: the View-in-inventory deep-link files by
+// categorizeItem, the Relic-Trader perk and the trade-away filter read
+// canonical kind/rarity. Accepted residuals (display-only): rarity label/
+// stripe/sort read the instance; itemWeight/parseValidator kind fallbacks;
+// use/eat handler kind routing (visibility already name-canonical).
+// OTA-1026 — THE KILL-BEAT FREEZE, FIXED (owner: the final blow "hangs on
+// resolving for a good 7-8 seconds"). Root cause: OUR OWN snapshot-audit
+// batches — the canonical identity helpers ran up to nine linear catalog
+// scans per call with no cache, and the kill path (loot grants, quest-lock
+// checks, substitution scans over the whole inventory) multiplied that into
+// a blocked JS thread. Kills touch the inventory; ordinary damage rolls
+// don't — which is exactly why only the killing roll hung. Fix at the choke
+// point: per-name memo caches inside canonicalItemTags + the kind/rarity row
+// lookup (identical semantics incl. inferred-row fallbacks; catalogs are
+// static per process). Probe: kill beat 281ms -> baseline ~25ms in the
+// harness; on-device the freeze collapses proportionally.
+// OTA-1027 — THE CRAFT SCREEN STOPS STALLING (owner: opening CRAFT took
+// seconds; each repairs-tab tap was "tap, wait 20 seconds, stutter"). Root
+// cause was PRE-EXISTING (not the audit batches — bisect-proven ~900ms both
+// before and after): ingredientShortfall annotated the ENTIRE inventory
+// (canonical tags + substitutability + catalog lookups) PER RECIPE, and the
+// craft badge runs it for all 130 recipes on every open AND on every
+// inventory change — each repair tap re-paid the whole bill. Fix: a WeakMap
+// annotation cache keyed on the immutable inventory array (self-invalidates
+// on any change); per-recipe allocation copies only the qty. Harness:
+// 900ms -> ~15ms. BONUS parity fix: canCraft's shortfall now carries the
+// same exact-ingredient substitution exclusion the preview/drain loops
+// gained, so approve and drain can never disagree (the OTA-613 hazard).
+// OTA-1028 — THE WEDGED BANDOLIER (owner screenshot: "no matter what I do I
+// cannot add anything to those last 2 bandolier slots"). Root cause category:
+// GHOST EQUIP REFERENCES — bandolierIds/toolPouchIds index inventory
+// instances, but only THROW and UNRACK cleaned them; selling/scrapping/
+// drinking/gifting/fusing/fully-using a racked item left its id behind. A
+// ghost renders as an EMPTY slot yet still counts against the cap, so the
+// rack refuses ("Five loops, five throws") with nothing visible to pull —
+// permanently wedged. Fix: a ghost sweep on every load (heals wedged saves
+// on first boot) + the two stow cap checks count only LIVE ids so a
+// mid-session ghost can never wedge the bandolier or the tool pouch again.
+// OTA-1029 — THE GREEN LIE (owner: "why is the Resonant Spike glowing green if
+// I'm out of range? make sure that all weapons correctly reflect that they are
+// active at their appropriate range"). Root cause category: DIVERGENT COPIES
+// of the reach resolver. The attack gate rolls with playerWeaponReach
+// (throwable instance → catalog row → forge-stamped uniqueStats.reachClass for
+// fused weapons → runecaster INT gate), but the weapon quick-button tone
+// (InputBox) and the enemy panel's in-range flag (ExplorationScreen) each kept
+// a LOCAL re-derivation that missed the forge stamp — so the fused close-only
+// Resonant Spike glowed green at mid range while the gate refused every swing.
+// Fix: playerWeaponReach is exported and BOTH consumers read it; the local
+// copies are deleted, and a category-lock test forbids a reachClassFor
+// derivation from reappearing in either screen. Buttons now glow exactly when
+// the swing they fire would land.
+// OTA-1030 — THE POPUP THAT COULDN'T WAIT (owner: "as soon as you hit the last
+// part of the story hook, it immediately pops up a completion pop-up... when
+// you dismiss the last section, THAT's when it should show you the
+// completion"). The story-thread completion notice was raised synchronously
+// inside resolveHookOneStep the instant the terminal stage resolved — the
+// MissionCompleteModal mounted ON TOP of the thread modal the player was
+// still reading. Story threads are the only completion with a reading modal
+// in front, which is why only they misbehaved. Fix: the notice payload is
+// STASHED on pendingHookContinue and raised by dismissHookContinue when the
+// player closes the arc; the terminal stage now shows a single COMPLETE
+// button (no CONTINUE, no ABANDON — the thread is already done), and scrim
+// taps / back route through COMPLETE so the payout notice can't be dropped.
+// Mid-thread stages keep CONTINUE / ABANDON exactly as before.
+// OTA-1031 — WHICH ONE AM I HOLDING? (owner: "when you are applying coatings to
+// weapons or armor, it should show you which one you have equipped at that
+// time"). The two coating pickers (paint a vial onto a weapon; work a resist
+// vial into armor) listed candidates by bare name — with two same-named
+// weapons, or a pack full of armor, nothing said which piece was actually on
+// your body. Each picker row is now tagged "· EQUIPPED (main hand)" /
+// "(off hand)" / "(chest)" etc. through the SAME instance-id resolver that
+// drives the inventory EQUIPPED badge (equippedSlotLabelFor — id-first,
+// legacy name fallback), so the tag lands on the exact instance you're
+// wearing, never a duplicate, and the pickers can't drift from the badge.
+// OTA-1032 — THE UNLOSABLE FLEE (owner: "I don't think I ever lost a flee roll").
+// Proven: the escape check was d20 + DEX vs a FLAT DC 9 — the lowest DC in the
+// table, opposed by nothing. At DEX 8+ the minimum possible total (1 + 8)
+// already met the bar, so a flee mathematically could not fail; the wired
+// consequence (the enemy's free round) was dead code. Same disease dodge had:
+// a level-1 constant that stats simply outgrow. Fix (owner's pick): the FLEE
+// IS NOW CONTESTED — the fastest live pursuer rolls d20 + speed and that sets
+// the bar. Speed is bestiary DATA: the AP number plus movement traits
+// (quick +2, agile +2, aerial +3, slow -3, clamp 0..14); only the fastest
+// pursuer matters. Ties go to the runner. Hounds and winged things are now
+// genuinely hard to outrun; titans stay easy. Escapes with no pursuer (traps,
+// hook stages) keep the flat DC, and the first-3-steps flee grace for
+// brand-new characters is untouched. The dice line names the chase:
+// "Pursuit 17 — Mud Hound (d20 12 + SPD 5)".
+// OTA-1033 — THE DEAD CANARY (owner: "is the preexisting issue something we need
+// to look at?" — yes). The heavy combatStress sim had been red since ~Jul 20
+// (the heavy gate isn't part of the per-OTA fast gates), hiding two findings.
+// REAL BUG (fixed here): "attack <enemy> with <weapon>" promotes the named
+// weapon into the MAIN hand; its off-hand protection compared INSTANCE IDS
+// only, so an equipped state carrying name-only slots (anything that never
+// passed backfillPlayer's id stamp) fell through — the promotion bound ONE
+// off-hand instance to BOTH hands and silently evicted the real main weapon.
+// Real saves get ids healed at load; the guard now falls back to NAME when the
+// off slot has no id (the codebase's own id-first-name-fallback rule). SIM
+// FIXTURE DRIFT (repaired in the test): the fixture equipped name-only slots
+// (triggering the above), and living-world patrols/raids — newer than the
+// harness — arrive outside its injector, leaving its verb rotation stuck
+// mid-beatdown attack-spamming a close-only knife from mid-range into the
+// 25-round stall guard on every engine-spawned fight (the 10% "win rate").
+// OTA-1034 — HEAVY-GATE HYGIENE (owner: "any other preexistings that still exist?").
+// The heavy test gate (test:ci:heavy) turned out to have NEVER been runnable —
+// its package.json pattern was unquoted, so the shell rejected it on sight;
+// that's how the combat canary sat dead for 8 days. Fixed, and the first full
+// sweep ever run came back 24/27: a stale source-anchor window widened
+// (playerInputChaosSim), an outgrown 240s budget raised to measured reality
+// (twoYearChaosSim, ~440s), and metaNavStress's V8 OOM bounded to its measured
+// stable range with a hard characterization of the long-standing world/persist
+// leak (deterministic ~1 MB/action module-scope heap growth from ~action 2000
+// — AsyncStorage and store state exonerated). HANDOFF §8 reconciled: four
+// stale punch-list items struck, the exploit-sweep backlog annotated closed,
+// and one deliberate residual surfaced for an owner call: mysteries and
+// storylines still advance stages anywhere and keep the remote courier cut
+// (only hunts were made face-to-face, per the owner's earlier call).
+// OTA-1035 — THE LEAK THAT ATE THE SIMS, ROOT-CAUSED (owner: "do the root cause
+// dig"). The deepest open item — "world/persist super-linear tail growth",
+// deferred since Jul 20 — is closed. Heap-snapshot autopsy: the retained
+// gigabytes were hundreds of copies of the capped ~400 KB disk game-log.
+// TEST-SIDE: the official AsyncStorage jest mock's jest.fn() methods retain
+// every call's arguments forever — every log rewrite payload — until V8's
+// 8 GB wall; replaced via moduleNameMapper with a plain no-recording mock
+// (12 000-action proof run: dead flat 249 MB, was OOM by ~9 750). APP-SIDE:
+// appendLogToDisk did a full ~400 KB read-modify-write PER LOG LINE (several
+// per action = megabytes of bridge traffic per action on device); now batched
+// into one read + one write per burst, order preserved. Also corrected: the
+// prior OTA's claim that mysteries/storylines still turn in remotely was
+// wrong — all contract kinds already turn in face-to-face; docs + a stale
+// "remote HALF option" comment fixed.
+export const OTA_BUILD_ID = '2026-07-28-1035-persist-leak-root-cause';

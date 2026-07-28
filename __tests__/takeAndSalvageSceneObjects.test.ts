@@ -181,3 +181,88 @@ describe('OTA-710 — salvage falls back to the context-resolved noun', () => {
     expect(hoursAfter - hoursBefore).toBeGreaterThanOrEqual(0.2);
   });
 });
+
+describe('OTA-760 — an OPENED container is not also salvageable (no double-dip)', () => {
+  beforeAll(() => {
+    console.log = () => {};
+    console.warn = () => {};
+    console.error = () => {};
+  });
+
+  it('opening a lockbox marks it searched, so a later SALVAGE ALL skips it', async () => {
+    const store = await bootstrap('BoxCracker');
+    const scene = store.getState().currentScene!;
+    store.setState({
+      currentScene: {
+        ...scene,
+        enemies: [],
+        hooks: [],
+        investigateAmbushUsed: true,
+        ambientNouns: ['lockbox', 'rubble'],
+        displayedAmbientNouns: ['lockbox', 'rubble'],
+      },
+    });
+
+    // OPEN the container (rolls its contents + resolves the object).
+    store.getState().submitPlayerAction('open lockbox');
+
+    // The fix: opening records the noun as a searched ambient noun (and an opened
+    // container) on whichever room key the player is standing in.
+    const rooms = store.getState().worldMemory.visitedRooms ?? {};
+    const searchedSomewhere = Object.values(rooms).some(
+      (r) => (r.searchedAmbientNouns ?? []).includes('lockbox'),
+    );
+    const openedSomewhere = Object.values(rooms).some(
+      (r) => (r.containersOpened ?? []).includes('lockbox'),
+    );
+    expect(openedSomewhere).toBe(true);
+    expect(searchedSomewhere).toBe(true);
+
+    // A subsequent SALVAGE ALL over the same lockbox must be a no-op: the harvest
+    // handler spends 0.25h per noun it actually works, so a skipped noun advances
+    // the clock by 0. (Pre-fix the lockbox was re-worked and paid out again.)
+    const hoursBefore = store.getState().player!.hoursElapsed ?? 0;
+    store.getState().salvageAllAmbient(['lockbox']);
+    const hoursAfter = store.getState().player!.hoursElapsed ?? 0;
+    expect(hoursAfter - hoursBefore).toBe(0);
+  });
+});
+
+describe('OTA-770 — attack wording + rousing an animate scene noun', () => {
+  beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
+
+  const setScene = (store: ReturnType<typeof bootstrap> extends Promise<infer S> ? S : never, nouns: string[]) => {
+    const scene = store.getState().currentScene!;
+    store.setState({
+      currentScene: {
+        ...scene, enemies: [], enemyHps: [], hooks: [], investigateAmbushUsed: true,
+        ambientNouns: nouns, displayedAmbientNouns: nouns,
+      },
+    });
+  };
+
+  it('attacking a non-animate scene noun harvests it but no longer narrates "sift"', async () => {
+    const store = await bootstrap('Smasher');
+    setScene(store, ['debris', 'rubble']);
+    store.getState().submitPlayerAction('attack the debris');
+    // The old shared search line ("You sift ... pull out a piece worth keeping") is gone;
+    // an attack reads as a strike whatever the roll.
+    expect(tailLog(10)).not.toMatch(/\bsift\b/i);
+  });
+
+  it('attacking an animate scene noun (knight) rouses it into combat', async () => {
+    const store = await bootstrap('KnightWaker');
+    setScene(store, ['knight', 'debris']);
+    expect(store.getState().currentScene!.enemies.length).toBe(0);
+    store.getState().submitPlayerAction('attack the knight');
+    expect(store.getState().currentScene!.enemies.length).toBe(1);
+    expect(tailLog(10)).toMatch(/surges upright|comes for you/i);
+  });
+
+  it('"wake the knight" also rouses it (wake routes to attack)', async () => {
+    const store = await bootstrap('Rouser');
+    setScene(store, ['knight', 'debris']);
+    store.getState().submitPlayerAction('wake the knight');
+    expect(store.getState().currentScene!.enemies.length).toBe(1);
+  });
+});

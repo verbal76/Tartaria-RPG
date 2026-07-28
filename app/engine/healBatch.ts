@@ -20,7 +20,9 @@ export function healBatchCount(perItem: number, gap: number, quantity: number): 
   return Math.min(quantity, Math.floor(gap / perItem));
 }
 
-/** One-line explanation for the UI, so a Max that stops before the whole stack
- *  reads as intentional, not broken. */
+/** One-line explanation for the UI, so a batch that stops before the whole stack
+ *  reads as intentional, not broken. Covers both offers: "Heal to full" (fewest
+ *  kits to reach max, last one may slightly overheal) and "Use Max (no waste)"
+ *  (the most that fit UNDER max with nothing wasted). */
 export const HEAL_BATCH_NOTE =
-  'Uses the most that fit under your max HP — any that would overheal stay in your pack.';
+  'Heal to full uses the fewest that reach max HP; Use Max uses the most that fit with nothing wasted.';
