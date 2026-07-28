@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.42';
+export const DISPLAY_VERSION = '4.28.43';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18728,4 +18728,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // drives the inventory EQUIPPED badge (equippedSlotLabelFor — id-first,
 // legacy name fallback), so the tag lands on the exact instance you're
 // wearing, never a duplicate, and the pickers can't drift from the badge.
-export const OTA_BUILD_ID = '2026-07-28-1031-coat-picker-equipped';
+// OTA-1032 — THE UNLOSABLE FLEE (owner: "I don't think I ever lost a flee roll").
+// Proven: the escape check was d20 + DEX vs a FLAT DC 9 — the lowest DC in the
+// table, opposed by nothing. At DEX 8+ the minimum possible total (1 + 8)
+// already met the bar, so a flee mathematically could not fail; the wired
+// consequence (the enemy's free round) was dead code. Same disease dodge had:
+// a level-1 constant that stats simply outgrow. Fix (owner's pick): the FLEE
+// IS NOW CONTESTED — the fastest live pursuer rolls d20 + speed and that sets
+// the bar. Speed is bestiary DATA: the AP number plus movement traits
+// (quick +2, agile +2, aerial +3, slow -3, clamp 0..14); only the fastest
+// pursuer matters. Ties go to the runner. Hounds and winged things are now
+// genuinely hard to outrun; titans stay easy. Escapes with no pursuer (traps,
+// hook stages) keep the flat DC, and the first-3-steps flee grace for
+// brand-new characters is untouched. The dice line names the chase:
+// "Pursuit 17 — Mud Hound (d20 12 + SPD 5)".
+export const OTA_BUILD_ID = '2026-07-28-1032-contested-flee';

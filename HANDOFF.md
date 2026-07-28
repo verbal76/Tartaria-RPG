@@ -846,9 +846,27 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.42**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.43**; ledger in `VERSION.md`.
 
-- **WHICH ONE AM I HOLDING — COATING PICKERS TAG THE EQUIPPED PIECE (2026-07-28, latest).**
+- **THE UNLOSABLE FLEE — CONTESTED ESCAPES (2026-07-28, latest).** HAL **1032** / golem
+  **1009**. Owner: "I don't think I ever lost a flee roll" — and the math agreed: escape was
+  d20 + DEX vs a FLAT DC 9 (the lowest DC in the table, opposed by nothing), so at DEX 8+ the
+  minimum total (1 + 8) already met the bar — failure was IMPOSSIBLE and the wired
+  consequence (the enemy's free round) was dead code. Same category as the old dodge
+  dominance: a level-1 constant that stats outgrow. Owner's design pick (AskUserQuestion):
+  the enemy contests the flee. `escapePursuit(enemies)` in combatRules reads bestiary DATA —
+  the AP number + movement traits (quick +2, agile +2, aerial +3 via enemyIsAerial, slow -3),
+  clamped 0..14, fastest live pursuer only — and `buildSkillSteps` rolls that pursuer's d20 +
+  speed as the escape TARGET (dice line: "Pursuit 17 — Mud Hound (d20 12 + SPD 5)"). Ties go
+  to the runner. The store's skill dispatch passes hp-filtered live enemies; no pursuer
+  (traps, hook escape stages, cleared scenes) keeps the flat DC 9; the first-3-steps flee
+  grace for brand-new characters is untouched, as is the summit-boss escape valve (bosses get
+  no extra pursuit bonus — their AP already carries it). 7-test suite + category lock
+  (`ota1032ContestedFlee`). NOTE: the heavy `combatStress` sim (test:ci:heavy, NOT part of
+  the fast gate) times out at 480s on this container at BASELINE too — pre-existing, and the
+  sim never submits a flee; verified by a stash-run before shipping.
+
+- **WHICH ONE AM I HOLDING — COATING PICKERS TAG THE EQUIPPED PIECE (2026-07-28).**
   HAL **1031** / golem **1008**. Owner: "when you are applying coatings to weapons or armor,
   it should show you which one you have equipped at that time." Both coating pickers (paint a
   vial onto a weapon; work a resist vial into armor) listed candidates by bare name. Each row

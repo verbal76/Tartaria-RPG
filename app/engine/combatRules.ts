@@ -2,7 +2,7 @@ import type { RollStep, PlayerCharacter, Enemy, Stats, StatusEffect, WeaponReach
 import { rollDie } from './rng';
 import { findWeaponByName, type CatalogWeapon } from './crafting';
 import { effectiveStats } from './equipment';
-import { traitACBonus } from './enemyTraits';
+import { traitACBonus, enemyIsAerial } from './enemyTraits';
 import { barehandDamageFor } from './raceMechanics';
 import { titlePerkModifiers, type TitlePerks } from './titles';
 
@@ -691,6 +691,37 @@ export function fleeGraceApplies(intent: string, skillSucceeded: boolean, tilesS
   return intent === 'escape' && !skillSucceeded && tilesSeen <= FLEE_GRACE_STEPS;
 }
 
+/** OTA-1032 — CONTESTED FLEE. The fastest live enemy opposes an in-combat escape:
+ *  its d20 + speed sets the bar the player's d20 + DEX must meet. Speed reads
+ *  the DATA the bestiary already declares — the AP number, then the movement
+ *  traits (quick +2, agile +2, aerial +3, slow -3), clamped 0..14. Only the
+ *  single fastest pursuer matters: you only need to outrun the one who can
+ *  catch you. The flat DC 9 below still governs escapes with no pursuer
+ *  (traps, hook escape stages) — but a growing DEX had outrun it in combat:
+ *  at DEX 8+, d20 min 1 + 8 >= 9 meant a flee could NEVER fail. */
+export interface EscapePursuit {
+  bonus: number;
+  label: string;
+  /** Test injection for the pursuer's d20; production rolls it live. */
+  d20?: number;
+}
+export function escapePursuit(enemies: readonly Enemy[]): EscapePursuit | null {
+  let best: EscapePursuit | null = null;
+  for (const e of enemies) {
+    const apMatch = String(e.abilityPoint ?? '').match(/\d+/);
+    const ap = apMatch ? parseInt(apMatch[0], 10) : 3;
+    const t = e.traits ?? [];
+    let speed = ap;
+    if (t.includes('quick')) speed += 2;
+    if (t.includes('agile')) speed += 2;
+    if (enemyIsAerial(e)) speed += 3;
+    if (t.includes('slow')) speed -= 3;
+    speed = Math.max(0, Math.min(14, speed));
+    if (!best || speed > best.bonus) best = { bonus: speed, label: e.name };
+  }
+  return best;
+}
+
 const SKILL_DC: Record<string, number> = {
   stealth: 12,
   diplomacy: 15,
@@ -764,7 +795,7 @@ const INTENT_ACTION_VERB: Record<string, string> = {
 export function buildSkillSteps(
   intent: string,
   player: PlayerCharacter,
-  opts?: { weatherMod?: Partial<Stats>; companionAssist?: boolean; statusMods?: RollMods; raceCtx?: RaceSkillContext },
+  opts?: { weatherMod?: Partial<Stats>; companionAssist?: boolean; statusMods?: RollMods; raceCtx?: RaceSkillContext; pursuit?: EscapePursuit | null },
 ): RollStep[] {
   const statKey = SKILL_STAT[intent] ?? 'wisdom';
   const stats = effectiveStats(player, opts?.weatherMod);
@@ -772,6 +803,13 @@ export function buildSkillSteps(
   const statLabel = STAT_LABEL[statKey];
   const dc = SKILL_DC[intent] ?? 12;
   const dcName = DC_NAME[dc] ?? '';
+  // OTA-1032 — contested flee (see escapePursuit above): a live pursuer's rolled
+  // d20 + speed replaces the flat DC. Ties go to the runner (success is
+  // total >= target), and the first-steps flee grace still nudges a failed
+  // roll for brand-new characters exactly as before.
+  const pursuit = intent === 'escape' ? opts?.pursuit ?? null : null;
+  const pursuitD20 = pursuit ? (pursuit.d20 ?? 1 + Math.floor(Math.random() * 20)) : 0;
+  const target = pursuit ? pursuitD20 + pursuit.bonus : dc;
   const verb = INTENT_ACTION_VERB[intent] ?? intent.toUpperCase();
   const label = `Roll to ${verb}`;
   // Companion assist — +2 bonus when a companion is present. Stacks
@@ -799,8 +837,12 @@ export function buildSkillSteps(
     count: 1,
     bonus: statVal + assistBonus + statusNet + perkBonus,
     bonusLabel: `${statLabel} ${statVal}${assistLabel}${perkLabel}${statusLabel}`,
-    target: dc,
-    targetLabel: `DC ${dc}${dcName ? ` — ${dcName}` : ''}`,
-    context: `d20 + ${statLabel}${assistLabel}${perkLabel}${statusLabel} vs ${dcName || 'DC'} ${dc}`,
+    target,
+    targetLabel: pursuit
+      ? `Pursuit ${target} — ${pursuit.label} (d20 ${pursuitD20} + SPD ${pursuit.bonus})`
+      : `DC ${dc}${dcName ? ` — ${dcName}` : ''}`,
+    context: pursuit
+      ? `d20 + ${statLabel}${assistLabel}${perkLabel}${statusLabel} vs ${pursuit.label} — contested chase`
+      : `d20 + ${statLabel}${assistLabel}${perkLabel}${statusLabel} vs ${dcName || 'DC'} ${dc}`,
   }];
 }
