@@ -845,9 +845,37 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.43**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.44**; ledger in `VERSION.md`.
 
-- **THE UNLOSABLE FLEE — CONTESTED ESCAPES (2026-07-28, latest).** HAL **1032** / golem
+- **THE DEAD CANARY — OFF-HAND PROMOTION GUARD + combatStress REVIVED (2026-07-28, latest).**
+  HAL **1033** / golem **1010**. Owner: "is the preexisting issue something we need to look
+  at?" — yes. The heavy `combatStress` sim (test:ci:heavy, NOT in the per-OTA fast gates) had
+  been red since ~Jul 20; the autopsy found one REAL bug and four layers of harness drift.
+  • **REAL BUG (shipped fix):** "attack <enemy> with <weapon>" promotes the named weapon into
+    the MAIN hand (OTA-205 grip-switch); its off-hand protection compared INSTANCE IDS only,
+    so an equipped state carrying name-only slots (never passed backfillPlayer's id stamp,
+    gameStore ~2047) fell through — the promotion bound ONE off-hand instance to BOTH hands
+    and silently evicted the real main weapon. Real saves get ids healed at load; the guard
+    now falls back to NAME when the off slot has no id (§3a id-first-name-fallback rule).
+    4-test lock (`ota1010OffhandPromotionGuard`): name-only protected, id path protected,
+    legitimate pack-weapon promotion preserved, source lock.
+  • **HARNESS DRIFT (repaired in the sim):** (1) fixture equipped name-only slots →
+    triggered the bug above, knife-in-both-hands, close-only refusals forever; (2)
+    living-world patrols/raids (newer than the harness) arrive outside its injector — the
+    verb rotation never re-advanced from mid → 100% stall rate; now a FIGHT = peace→combat
+    transition and the rotation restarts on enemy-membership change; (3) 480s budget vs a
+    measured ~610-640s full run → 900s; (4) dodge tracker asserted the RETIRED 'dodging'
+    +AC status — dodge is a CONTEST now (perfect_opening / evasive), tracker follows; the
+    old ≥60% duel win-rate floor (predates swarms/death-cycles) → absolute kills ≥ 40, and
+    the <1% stall-rate + zero-crash floors stay.
+  • **VERIFIED GREEN** end-to-end: 20 000 actions, 0 crashes, 0.8% stalls, 98 kills. The
+    intermittent raid-window `tc.challengeForLocation` crash seen in two early runs did NOT
+    recur across three consecutive full runs — unexplained mechanically, watch the canary;
+    if it resurfaces, capture `e.stack` at the throw (the probe pattern is in §9's record).
+  • RULE GOING FORWARD: run the heavy gate (`npm run test:ci:heavy`) after any combat-loop
+    OTA, or at least weekly — a red canary hid a real bug for 8 days.
+
+- **THE UNLOSABLE FLEE — CONTESTED ESCAPES (2026-07-28).** HAL **1032** / golem
   **1009**. Owner: "I don't think I ever lost a flee roll" — and the math agreed: escape was
   d20 + DEX vs a FLAT DC 9 (the lowest DC in the table, opposed by nothing), so at DEX 8+ the
   minimum total (1 + 8) already met the bar — failure was IMPOSSIBLE and the wired
