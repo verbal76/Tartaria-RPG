@@ -279,7 +279,27 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
       try {
         store.getState().submitPlayerAction(text);
       } catch (e: any) {
-        crashes.push(`submitPlayerAction("${text}"): ${e?.message ?? e}`);
+        // OTA-1036 — ARMED TRIPWIRE for the raid-window `tc.challengeForLocation
+        // is not a function` ghost (seen twice on 2026-07-28, both under the
+        // since-fixed 6-8 GB mock-leak heap pressure; never reproduced across
+        // 3 armed attempts + 4 clean full runs after OTA-1035). If it EVER
+        // recurs, this captures the stack, the live module shape, and heap —
+        // the diagnosis writes itself. Costs nothing on the healthy path.
+        try {
+          if (String(e?.message ?? '').includes('challengeForLocation')) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const tcProbe = require('../app/engine/titleChallenges');
+            const mu = process.memoryUsage();
+            const line = `TC-GHOST [heapMB=${Math.round(mu.heapUsed / 1048576)}] keys=[${Object.keys(tcProbe).join(',')}] typeof=${typeof tcProbe.challengeForLocation} :: ${e?.stack?.split('\n').slice(0, 8).join(' <- ')}`;
+            crashes.push(line);
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            require('fs').appendFileSync('/tmp/tartaria-tc-ghost.txt', line + '\n\n');
+          } else {
+            crashes.push(`submitPlayerAction("${text}"): ${e?.message ?? e}`);
+          }
+        } catch {
+          crashes.push(`submitPlayerAction("${text}"): ${e?.message ?? e}`);
+        }
       }
       resolveAnyPendingRoll();
     }
