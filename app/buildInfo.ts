@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.47';
+export const DISPLAY_VERSION = '4.28.48';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17730,4 +17730,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // now carries a permanent self-diagnosing tripwire — any recurrence records
 // the stack, the module's live export list, and heap size on the spot.
 // Test-only change; no gameplay code touched.
-export const OTA_BUILD_ID = '2026-07-28-1013-tc-ghost-tripwire';
+// OTA-1014 — THE WEDGED CONTRACTS CARD (owner report: "I tapped the green button
+// like 15 times. it did nothing"). Quit-navigating cleared the travel course
+// but left player.routedMission set, so the Contracts card kept its
+// "Auto-routing" note (which replaces the ROUTE button) with no course left
+// to chain — and every COMPLETE tap was refused wrong-faction into the world
+// feed, which the Contracts screen never renders (7 invisible refusals in
+// the log). Fixes: stopTravel/stopWhisperCourse now stand down routedMission;
+// the routed note requires a LIVE course (heals saves already carrying the
+// stale flag); and completeContractFromUI wraps the turn-in so any refused
+// tap surfaces the Arbiter's line as a dismissible strip on the screen
+// itself. Deactivate → reactivate is no longer the secret handshake.
+export const OTA_BUILD_ID = '2026-07-28-1014-contracts-card-unwedged';

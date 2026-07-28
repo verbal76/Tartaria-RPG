@@ -859,10 +859,27 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.47**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.48**; ledger in `VERSION.md`.
 
-- **THE TC GHOST — INVESTIGATED, PRECONDITIONS ELIMINATED, TRIPWIRE ARMED (2026-07-28,
-  latest).** HAL **1036** / golem **1013**. Owner: "work towards the root cause, do this one
+- **THE WEDGED CONTRACTS CARD — COURSE-CANCEL NOW STANDS DOWN ROUTING + REFUSALS ANSWER
+  ON-SCREEN (2026-07-28, latest).** HAL **1037** / golem **1014**. Owner's report (screenshot +
+  log part 16): after accidentally tapping quit-navigating, a READY faction contract showed a
+  stale "Auto-routing" note with NO route button, and ~15 taps on the green COMPLETE "did
+  nothing" — the log shows 7 invisible wrong-faction refusals spoken to the world feed while
+  the Contracts screen (which never renders that feed) was up. Deactivate → reactivate was the
+  accidental workaround (deactivation clears routedMission). Three fixes, one category:
+  • **stopTravel + stopWhisperCourse now clear `player.routedMission`** — cancelling the
+    course cancels the route chain (deactivation already did; the cancel paths were the gap).
+  • **The card's routed note requires a LIVE course** (`travelTarget`/`whisperCourse`), so the
+    ROUTE button returns the moment no course is running — this also HEALS saves already
+    carrying the stale flag (including the owner's).
+  • **`completeContractFromUI` is now a wrapper**: if a COMPLETE tap doesn't raise the
+    completion popup, the freshest Arbiter refusal — or, when the arbiter dedup swallowed a
+    repeat tap, the line it suppressed — surfaces as `contractsNotice`, rendered as a
+    dismissible amber strip at the top of the Contracts screen. Refused taps can never read
+    as "the button does nothing" again; a successful tap clears any stale strip.
+
+- **THE TC GHOST — INVESTIGATED, PRECONDITIONS ELIMINATED, TRIPWIRE ARMED (2026-07-28).** HAL **1036** / golem **1013**. Owner: "work towards the root cause, do this one
   last." The intermittent `tc.challengeForLocation is not a function` crash (2 combatStress
   runs, 232/370 hits each, all during raid windows) was investigated to its evidence floor:
   single call site (gameStore ~8161), export intact, no module cycle, no mock interference —
