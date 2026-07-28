@@ -409,6 +409,25 @@ export function rollElevatedOverlay(
   return pick;
 }
 
+/** OTA-996 — #119b: the place-word for the climb-down narration. Overlay ids
+ *  double as labels, and the trader/lookout overlays are named after their
+ *  OCCUPANT — so the descent line read "You climb down from the forgotten
+ *  scholar". Every person-overlay maps to its perch; unknown ids keep the
+ *  old id-to-words fallback (encounter overlays are already places). */
+const DESCENT_NOUNS: Record<string, string> = {
+  open_sky: 'lookout',
+  ledger_keeper: "ledger-keeper's shack",
+  wind_priest: "wind-priest's perch",
+  reclaimer_hiding: "reclaimer's hideout",
+  forgotten_scholar: "scholar's perch",
+  drunk_drifter: "drifter's roost",
+  rumor_scout: "scout's vantage",
+  rumor_pilgrim: "pilgrim's perch",
+};
+export function overlayDescentNoun(overlayId: string): string {
+  return DESCENT_NOUNS[overlayId] ?? overlayId.replace(/_/g, ' ');
+}
+
 export function overlayById(id: string): ElevatedOverlay | null {
   return OVERLAY_BY_ID[id] ?? null;
 }

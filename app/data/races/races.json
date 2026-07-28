@@ -14,7 +14,7 @@
     "tags": ["large", "strength", "relic_savvy"],
     "traits": [
       "Towering Strength: +2 Strength.",
-      "Ancient Insight: +1 Intelligence when investigating ancient structures or artifacts.",
+      "Ancient Insight: +1 to investigation when you examine ancient relics and artifacts.",
       "Legacy of Power: Once per day, channel Aetheric energy into a relic (repair, power-up, unexpected effect)."
     ],
     "description": "Towering descendants of Tartaria's first builders. Strongest hand-to-hand fighters; revered as divine by True Tartarians.",
@@ -36,8 +36,8 @@
     "traits": [
       "Tunnel Sense: At home in the dark. Indoors or underground you turn up loot more often and pull more story hooks when you investigate.",
       "Aethercraft Mastery: +2 Intelligence when using Aethercraft (shaping Aetherstone, tools, weapons, golems, earth).",
-      "Relic Savvy: +2 Dexterity when investigating Aetherstone or Tartarian tech.",
-      "Aetherstone Resilience: Half damage from Aetheric or Mud-power attacks."
+      "Relic Savvy: +2 to investigation when you study Aetherstone or Tartarian tech (on top of your always-on Dexterity).",
+      "Aetherstone Resilience: Half damage from Aetheric attacks."
     ],
     "description": "True Tartarians who survived underground in subterranean enclaves. Nimble but lacking brute force; rely on Aethercraft.",
     "flavor": "The dark was your cradle. You hear stone the way the surface hears wind, and Aetherstone shapes under your fingers like wet clay. Above you are the cities that should have been yours."
@@ -57,7 +57,7 @@
     "tags": ["scavenger", "urban", "rogue"],
     "traits": [
       "Urban Explorer: +2 Stealth in city ruins or underground.",
-      "Ruins Specialist: +1 Investigation when searching for relics or navigating dangerous areas.",
+      "Ruins Specialist: +1 to investigation when you search ruins for relics.",
       "Relic Hunter: A scavenger's nose for buried value — a strong, always-on chance to turn up rare Aetheric loot, materials, weapons, and armor when you search or investigate."
     ],
     "description": "Treasure hunters and scavengers, equally at home in ruined cities and dangerous tunnels. Profit before ideology.",
@@ -79,7 +79,7 @@
     "traits": [
       "Aetheric Constitution: Half damage from energy-based attacks.",
       "Indomitable Strength: +2 Strength, +1 Intelligence.",
-      "Immunity to Time: You are an ageless construct — you neither age, hunger, nor tire. Where the living must stop to forage, drink, and sleep off exhaustion, you simply keep going: a week-long vigil in a dead city, a march across a famine-struck waste, a night with no shelter — none of it wears on you the way it would on flesh. The one thing in Tartaria that survives death answers to that kindred patience: your kills are markedly more likely to yield a Resurrection Gem.",
+      "Immunity to Time: You are an ageless construct. Every exertion costs you only half the stamina flesh would spend — a week-long vigil in a dead city, a long march, a night with no shelter wears on you at half the rate it would on the living. The corrupting Aether the weather grinds into flesh simply cannot decay you. And the one thing in Tartaria that survives death answers to that kindred patience: your kills are markedly more likely to yield a Resurrection Gem.",
       "Defensive Protocols: Once per day, activate a shield reducing incoming damage by half for 3 rounds."
     ],
     "description": "Aetherstone-powered constructs left over from Tartaria's golden age. Tireless, durable, programmed with ancient duties.",
@@ -99,11 +99,11 @@
     "barehandDamage": "1d6",
     "tags": ["construct", "aetherstone", "regenerative"],
     "traits": [
-      "Aetherstone Resilience: +2 Strength; half damage from non-Aetheric attacks.",
-      "Elemental Control: Manipulate Aetherstone within arm's reach/close range. 1d6 block / 1d6 attack, one of each per encounter.",
-      "Regenerative Core: Near Aetherstone, roll 1d10 daily for free HP recharge up to max."
+      "Aetherstone Resilience: +2 Strength. Your stony hide shrugs off a quarter of all non-Aetheric damage — but raw Aether is your undoing: Aetheric attacks tear into you for half again as much.",
+      "Elemental Control: Shape the Aetherstone around you into a weapon or a shield. Once per day each: hurl it for 1d6 Aetheric damage, or harden it into a ward that soaks the next 1d6 of incoming damage.",
+      "Regenerative Core: once per day, your Aetherstone core hums back to life — recharge 1d10 HP."
     ],
-    "description": "Etheric constructs born of the mud that consumed Tartaria. Unpredictable. Some serve their makers, others turn on them.",
+    "description": "Aetheric constructs born of the mud that consumed Tartaria. Unpredictable. Some serve their makers, others turn on them.",
     "flavor": "You are mud and Aether and the violence of an empire's last breath, given a shape that walks. You do not remember being summoned. You only know that the buried things still belong somewhere, and that you go where they hum."
   },
   {
@@ -120,7 +120,7 @@
     "traits": [
       "Curious Mind: +2 Intelligence and Wisdom after first exposure to Tartaria's secrets.",
       "Beginner's Luck: Once per day, reroll a failed difficulty roll for survival, combat, or relic interaction.",
-      "Ignorant of Aetheric Power: No initial resistance; can only use Common-level Aether/mud magic. 1d6 for damage, 1d6 for blocking/restoration."
+      "Ignorant of Aetheric Power: you start with no Aetheric resistances and no training — you attempt Aethercraft at a stiff penalty until the wasteland schools you."
     ],
     "description": "Ordinary surface-dwellers unaware of Tartaria's existence until they stumble into it. Average human stock, but adaptive.",
     "flavor": "Last week you had never heard the word Tartaria. This week you can't stop hearing it. Something in a pawn shop window stared back at you and now the world doesn't fit the way it did, and you are not going home until it does."
@@ -139,7 +139,7 @@
     "barehandDamage": "1d6 -2",
     "tags": ["bloodline", "aetheric", "noble"],
     "traits": [
-      "Aetheric Awakening: Attuned to relics — +2 Intelligence when investigating them, and a higher chance to turn up rare Aetheric loot when you search or investigate.",
+      "Aetheric Awakening: Attuned to relics — +2 to investigation when you examine them, and a higher chance to turn up rare Aetheric loot when you search or investigate.",
       "Noble Heritage: +1 Charisma; once per day, an Aetheric-presence surge (+3 Charisma for 3 rounds) for persuasion or intimidation.",
       "Latent Powers: Once per day, a surge of Aetheric energy grants +2 Strength for 3 rounds.",
       "Destiny Unfolding: Your awakened bloodline charges Aetheric weapons — they deal an extra 1d6 damage on every hit."

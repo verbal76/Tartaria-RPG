@@ -112,6 +112,12 @@ export function trimSaveStateToFit(state: SaveState, maxChars = SAFE_BLOB_CHARS)
       ...next.worldMemory,
       memorableEvents: (next.worldMemory.memorableEvents ?? []).slice(-40),
       chainMemos: (next.worldMemory.chainMemos ?? []).slice(-40),
+      // OTA-920 — aetherkinRolledBuildings only ever grows (one key per house/shed
+      // tile entered, never pruned). It's regenerable — shedding old keys just lets
+      // long-abandoned buildings re-roll their Aetherkin spawn — so bound it here as
+      // a last resort under save-size pressure. 300 distinct buildings is far beyond
+      // normal play, so banking is intact in every real game; only an oversized save trims it.
+      aetherkinRolledBuildings: (next.worldMemory.aetherkinRolledBuildings ?? []).slice(-300),
     },
   };
   memosCapped = true;

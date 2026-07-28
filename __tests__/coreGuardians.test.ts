@@ -20,6 +20,7 @@ import {
   fleeAftermathLine,
   hasUndefeatedGuardian,
   isCoreGuardian,
+  isFinalGuardian,
   spawnGuardianForCapital,
   tierForKills,
   totalGuardiansCount,
@@ -98,6 +99,27 @@ describe('Core Guardians', () => {
       expect(g!.boss).toBe(true);
       expect(g!.traits).toContain(CORE_GUARDIAN_TRAIT);
     });
+    // OTA-798 — every Guardian must carry an authored weakness + resistance so
+    // the "Weakness exposed" combat lines and the EnemyPanel actually engage
+    // (players asked why Guardians showed no weakness/strength). Guardian types
+    // (aether_construct / mud_revenant) aren't in the type-resistance map, so the
+    // trait is the ONLY thing that makes the damage system read non-'normal'.
+    it('every Guardian carries a vulnerable: and resist: trait the damage system reads', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { traitDamageMultiplier, traitDefenses } = require('../app/engine/enemyTraits');
+      for (const capitalId of Object.keys(GUARDIANS_BY_CAPITAL)) {
+        const g = spawnGuardianForCapital(makePlayer(), capitalId)!;
+        const def = traitDefenses(g.traits);
+        expect(def.weaknesses.length).toBeGreaterThan(0);
+        expect(def.resists.length).toBeGreaterThan(0);
+        // The authored weakness actually multiplies damage (×1.5, 'vulnerable').
+        const weakType = def.weaknesses[0];
+        expect(traitDamageMultiplier(g.traits, weakType).match).toBe('vulnerable');
+        // The authored resistance actually halves it (×0.5, 'resist').
+        const resistType = def.resists[0];
+        expect(traitDamageMultiplier(g.traits, resistType).match).toBe('resist');
+      }
+    });
     it('tier 1 spawn matches kill count of 0', () => {
       const p = makePlayer({ mainQuest: { phase: 'revelation', coresRecovered: [] } });
       const g = spawnGuardianForCapital(p, 'asgardar');
@@ -116,6 +138,66 @@ describe('Core Guardians', () => {
       const g = spawnGuardianForCapital(p, 'iskan_veil');
       expect(g!.traits).toContain('tier:9');
     });
+
+    // OTA-925 — the final Guardian (last Core in the run) is the game's last boss.
+    it('isFinalGuardian fires only on the last Core, order-independently', () => {
+      const last = LOST_CAPITAL_LOCATIONS.length; // 9
+      expect(isFinalGuardian(0)).toBe(false);
+      expect(isFinalGuardian(last - 2)).toBe(false); // 7 cores → 8th fight, not final
+      expect(isFinalGuardian(last - 1)).toBe(true);  // 8 cores → 9th (final) fight
+      expect(isFinalGuardian(last)).toBe(true);       // defensive: never under-fires
+    });
+
+    it('the final Guardian is a fixed ~20-round wall, Capital-independent', () => {
+      // 8 Cores held → the 9th and final Guardian, whichever seat is left.
+      const eightCores = (leftOut: string) =>
+        makePlayer({
+          hpMax: 30,
+          mainQuest: {
+            phase: 'cores',
+            coresRecovered: LOST_CAPITAL_LOCATIONS.filter((id) => id !== leftOut),
+          },
+        });
+      // Two different "saved for last" Capitals: authored base.hp differs (Vaelka 30 vs
+      // Cantor 50) but the final override ignores base.hp, so the fight HP is identical.
+      const lastIsVaelka = spawnGuardianForCapital(eightCores('asgardar'), 'asgardar')!;
+      const lastIsCantor = spawnGuardianForCapital(eightCores('voronov'), 'voronov')!;
+      expect(lastIsVaelka.hp).toBe(lastIsCantor.hp);
+      // Sized for a long final-boss fight — far above the ~12-round apex band, and well
+      // past the 8th Guardian (tier 8) at the same player power.
+      expect(lastIsVaelka.hp).toBeGreaterThanOrEqual(600);
+      const tier8 = makePlayer({
+        hpMax: 30,
+        mainQuest: {
+          phase: 'cores',
+          coresRecovered: LOST_CAPITAL_LOCATIONS.slice(0, 7), // 7 cores → 8th fight
+        },
+      });
+      const eighth = spawnGuardianForCapital(tier8, LOST_CAPITAL_LOCATIONS[7]!)!;
+      expect(lastIsVaelka.hp).toBeGreaterThan(eighth.hp);
+    });
+
+    // OTA-926 — the Guardians are the game's main antagonists and must ramp
+    // monotonically: each fight tougher than the last, regardless of which Capital the
+    // player fights in which ORDER. HP is now Capital-independent, so spawning a
+    // different Capital at each tier still yields a strictly increasing HP curve.
+    it('HP ramps strictly upward tier 1→9, independent of Capital/order', () => {
+      const caps = LOST_CAPITAL_LOCATIONS;
+      const hps: number[] = [];
+      for (let tier = 1; tier <= 9; tier++) {
+        // Fixed, at-curve player power (over-level = 1.0 at every tier) so the ramp
+        // reflects the authored tier curve, not player scaling. Spawn a DIFFERENT
+        // Capital each tier — the seat must not change the HP.
+        const p = makePlayer({ mainQuest: { phase: 'cores', coresRecovered: caps.slice(0, tier - 1) } });
+        hps.push(spawnGuardianForCapital(p, caps[tier - 1]!)!.hp);
+      }
+      for (let i = 1; i < hps.length; i++) {
+        expect(hps[i]).toBeGreaterThan(hps[i - 1]!);
+      }
+      // The final Guardian is the biggest wall in the run.
+      expect(hps[8]).toBe(Math.max(...hps));
+    });
+
     it('HP scales up with player hpMax', () => {
       const lowHp = makePlayer({ hpMax: 30 });
       const highHp = makePlayer({ hpMax: 80 });

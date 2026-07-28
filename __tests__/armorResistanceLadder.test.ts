@@ -8,6 +8,10 @@ import type { CatalogArmor } from '../app/engine/crafting';
 describe('armor resistance ladder', () => {
   it('Uncommon ≥1, Rare ≥2, Legendary ≥3 across the whole catalog', () => {
     for (const a of ARMOR as CatalogArmor[]) {
+      // OTA-912 — the Skyreacher set is the deliberate exception: the ladder is
+      // suppressed so it resists only its baseline (cold) and leaves its slots
+      // open for player choice. Skip it here (covered by greatClimbs.test.ts).
+      if ((a.tags ?? []).some((t) => t.toLowerCase() === 'skyreacher')) continue;
       const n = armorResistances(a).length;
       if (a.rarity === 'Uncommon') expect(n).toBeGreaterThanOrEqual(1);
       if (a.rarity === 'Rare') expect(n).toBeGreaterThanOrEqual(2);

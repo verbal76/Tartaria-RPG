@@ -115,3 +115,29 @@ export function contractMarkerNumbers(player: PlayerCharacter | null | undefined
   for (const m of openContractMarkers(player)) out[m.key] = m.number;
   return out;
 }
+
+// B2 (player) — with remote "send word" turn-ins killed, EVERY contract is a face-to-face
+// hand-in you must TRAVEL to. So a far turn-in has to be worth the trek — "I don't want a
+// 32-time trip worth 20 TC." A LONG-HAUL BONUS scales the TC reward by how remote the
+// turn-in anchor is from the starter region (a Manhattan grid-cell distance on the canon
+// atlas — the same cells the map pins + SET COURSE use). A hand-in next door adds nothing;
+// a hand-in in a deep capital pays a real premium. Capped so it can't dwarf the base.
+const JOURNEY_HUB = 'tartarian_outskirts';   // the starter region — distance is measured from here
+const JOURNEY_TC_PER_CELL = 6;               // TC added per grid cell of remoteness
+const JOURNEY_BONUS_CAP_FRAC = 1.5;          // bonus never exceeds 1.5× the base reward
+
+/** Grid-cell remoteness of a turn-in anchor from the starter hub (Manhattan distance). */
+export function contractTurnInRemoteness(anchorId: string): number {
+  const a = canonicalCellOf(anchorId);
+  const hub = canonicalCellOf(JOURNEY_HUB);
+  return Math.abs(a.x - hub.x) + Math.abs(a.y - hub.y);
+}
+
+/** Long-haul TC bonus for turning a contract in at `anchorId`, given its base TC reward.
+ *  0 for a turn-in near the starter; scales with remoteness, capped at 1.5× the base. */
+export function contractJourneyBonusTc(anchorId: string, baseTc: number): number {
+  const dist = contractTurnInRemoteness(anchorId);
+  const raw = dist * JOURNEY_TC_PER_CELL;
+  const cap = Math.round(Math.max(0, baseTc) * JOURNEY_BONUS_CAP_FRAC);
+  return Math.max(0, Math.min(raw, cap));
+}

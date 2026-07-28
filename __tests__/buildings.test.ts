@@ -77,7 +77,11 @@ describe('building templates', () => {
   it('shows at most 4 rooms on the nav row (so the row + EXIT = 5 fits)', () => {
     const none = new Set<string>();
     for (const id of buildingIds()) {
-      expect(visibleBuildingRooms(id, none).length).toBeLessThanOrEqual(4);
+      // OTA-787 — the nav row (InputBox) filters out navHidden rooms (the market
+      // SQUARE you land in is not a tab; its exits are the four stall tabs + EXIT).
+      // Mirror that filter so the count reflects what's actually on the row.
+      const navTabs = visibleBuildingRooms(id, none).filter((r) => !r.navHidden);
+      expect(navTabs.length).toBeLessThanOrEqual(4);
     }
   });
 
@@ -126,7 +130,10 @@ describe('building templates', () => {
 
   describe('market stalls', () => {
     it('has four categorised stalls', () => {
-      const cats = BUILDINGS.market!.rooms.map((r) => r.stallCategory);
+      // OTA-787 — the market's first room is the navHidden SQUARE (no stallCategory);
+      // the four categorised stalls follow it. Filter to the rooms that actually
+      // carry a category.
+      const cats = BUILDINGS.market!.rooms.map((r) => r.stallCategory).filter(Boolean);
       expect(cats).toEqual(['weapons', 'armor', 'food', 'materials']);
     });
   });

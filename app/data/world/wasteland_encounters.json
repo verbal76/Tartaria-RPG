@@ -79,7 +79,7 @@
     "type": "skirmish",
     "weight": 40,
     "matchers": ["mud", "outskirts", "open", "ruin", "borderlands"],
-    "narration": "Movement low and fast — a {enemy} cuts across your path. You're closer than either of you wanted to be.",
+    "narration": "Movement low and fast — {enemy} cuts across your path. You're closer than either of you wanted to be.",
     "enemyPool": ["Gutter Rat", "Aetheric Slug", "Mud Lurker", "Aetherbat", "Bog Hound", "Mud Spider", "Silt Serpent", "Aetheric Worm", "Rust Lurker", "Scrap Drone"],
     "loot": []
   },
@@ -225,7 +225,7 @@
       { "name": "Trail Rations", "weight": 30, "min": 2, "max": 5, "kind": "consumable", "tags": ["food"] },
       { "name": "Worn Tartarian Coin", "weight": 25, "min": 5, "max": 12, "kind": "misc", "tags": ["currency"] },
       { "name": "Climbing Rope", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["tool"] },
-      { "name": "Aetheric Torch", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","aether"] },
+      { "name": "Aetheric Torch", "weight": 4, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","aether"] },
       { "name": "Aether Crystal", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","crystal"] }
     ],
     "lore_note": "Pinned inside the lead wagon, a hand-drawn map. The destination is circled in red ink: Old Drakova. In the margin, in a different hand: 'the dragon is real. they were not exaggerating. turn back.'",
@@ -415,7 +415,7 @@
       { "name": "Rune Engraving Kit", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","rune","crafting"] },
       { "name": "Aetheric Shard", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","shard"] },
       { "name": "First Aid Kit", "weight": 20, "min": 1, "max": 2, "kind": "consumable", "tags": ["medical"] },
-      { "name": "Aetheric Torch", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["tool","aether"] },
+      { "name": "Aetheric Torch", "weight": 4, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","aether"] },
       { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] }
     ],
     "lore_note": "An exam paper still pinned to the practice rack, in a young Tartarian's hand: 'Question 7 — Define the failure mode of an unmoored Aether reservoir. Show your work.' The answer underneath is one word: 'mud.'"
@@ -498,7 +498,7 @@
     "narration": "A landing on the Endless Stair, the kind they used to put a guard post on. The stair below this point is mud-locked — a wall of solidified silt, dense as iron. The landing itself is dry. Sealed crates line the back wall, stamped with a date older than every kingdom on every honest map. Something coils in the dark between you and the crates.",
     "loot": [
       { "name": "Aether-Breath Mask", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["mask","aether","tool"] },
-      { "name": "Aetheric Torch", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["tool","aether"] },
+      { "name": "Aetheric Torch", "weight": 4, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","aether"] },
       { "name": "Climbing Rope", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["tool"] },
       { "name": "Trail Rations", "weight": 15, "min": 2, "max": 4, "kind": "consumable", "tags": ["food"] },
       { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] }
@@ -576,7 +576,7 @@
     "narration": "A Reclaimer dig site, abandoned mid-excavation. The shoring is still up. The ladder still works. A cot at the rim has a half-eaten meal on it. The hole goes down twenty feet and ends in a stone floor that was not supposed to be there. The Reclaimers found something. They did not come back up to write the report.",
     "loot": [
       { "name": "Climbing Rope", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["tool"] },
-      { "name": "Aetheric Torch", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["tool","aether"] },
+      { "name": "Aetheric Torch", "weight": 4, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","aether"] },
       { "name": "Trail Rations", "weight": 20, "min": 2, "max": 4, "kind": "consumable", "tags": ["food"] },
       { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Reclaimer Survey Journal", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["journal","story","reclaimers"] }

@@ -72,7 +72,7 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim}>
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -80,7 +80,7 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
             >
               <View style={styles.card}>
                 <View style={styles.headerRow}>
-                  <Text style={styles.title}>INVITE A PLAYTESTER</Text>
+                  <Text style={styles.title} accessibilityRole="header">INVITE A PLAYTESTER</Text>
                   <View style={styles.ruleLine} />
                 </View>
 
@@ -125,6 +125,7 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
                       pressed && styles.btnPressed,
                     ]}
                     onPress={onCancel}
+                    accessibilityRole="button"
                   >
                     <Text style={[styles.btnText, styles.btnTextNeutral]}>CANCEL</Text>
                   </Pressable>
@@ -136,6 +137,8 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
                     ]}
                     onPress={handleSend}
                     disabled={!valid}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: !valid }}
                   >
                     <Text
                       style={[
@@ -182,7 +185,7 @@ const styles = StyleSheet.create({
   ruleLine: { height: 1, backgroundColor: '#3a342c', marginTop: 6 },
   body: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 12 },
   sectionLabel: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 2,

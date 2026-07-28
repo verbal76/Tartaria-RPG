@@ -6,17 +6,22 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useGameStore } from '../state/gameStore';
+import { useGameStore, effectiveACBreakdown, playerArmorResistKinds } from '../state/gameStore';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
 import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
-import { effectiveAC, barehandDamageFor } from '../engine/raceMechanics';
+import { barehandDamageFor } from '../engine/raceMechanics';
 import { corruptionTierOf, tierLabel, tierDescription } from '../engine/corruption';
+import { buildChronicle } from '../engine/chronicle';
+import { tideLabel } from '../engine/worldPulse';
+import { decayedMenace, menaceTier } from '../engine/menace';
 import arbiterTitlesData from '../data/lore/arbiter-titles.json';
-import { TITLE_PASSIVE_PERK } from '../engine/titles';
+import { TITLE_PASSIVE_PERK, describeTitleEarned, isHiddenTitle } from '../engine/titles';
+import { greatClimbLoreDiscovered } from '../engine/greatClimbs';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { weatherStatModifiers } from '../engine/weatherEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -52,6 +57,9 @@ export function CharacterScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   // arb119 — per-section collapse (hook must precede the early return below).
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  // OTA-848 — tap-to-expand: the AC breakdown, and which title's provenance is open.
+  const [acOpen, setAcOpen] = useState(false);
+  const [openTitle, setOpenTitle] = useState<string | null>(null);
 
   if (!player) {
     return (
@@ -69,13 +77,26 @@ export function CharacterScreen() {
   const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.25 ? '#c9a86a' : '#e07a5f';
   const stamColor = stamPct > 0.4 ? '#9ec96a' : '#c9a86a';
 
-  const breakdown = effectiveStatsBreakdown(player, weatherStatModifiers(scene?.weather ?? null));
-  const acValue = effectiveAC(player, scene ?? null);
+  const breakdown = effectiveStatsBreakdown(player, weatherStatModifiers(scene?.weather ?? null, playerArmorResistKinds(player)));
+  // OTA-836 — full AC breakdown (base + armor + title + stance), matching what
+  // the combat resolver actually stands on (the old sheet showed only race base +
+  // context, dropping equipped armor). The DEFENSE card renders acBd.total + chips.
+  const acBd = effectiveACBreakdown(player, scene ?? null);
   const barehand = barehandDamageFor(player.raceId);
   const barehandStr = barehand.bonus === 0
     ? `${barehand.count}d${barehand.sides}`
     : `${barehand.count}d${barehand.sides}${barehand.bonus > 0 ? '+' : ''}${barehand.bonus}`;
   const tier = corruptionTierOf(player.corruption ?? 0);
+
+  // OTA-843 [Chronicle] — assemble the character's legend from accreted state
+  // (memorable beats + milestones + titles + corruption + main-quest progress).
+  const chronicle = buildChronicle(player, worldMemory?.memorableEvents, {
+    raceName: race?.name,
+    factionName: faction?.name,
+    distinctFoes: new Set(worldMemory?.defeatedEnemies ?? []).size,
+    coresRecovered: player.mainQuest?.coresRecovered?.length ?? 0,
+    coresTotal: player.mainQuest ? 9 : 0,
+  });
 
   // arb119 — section header helper, mirroring the inventory headers: each section
   // title is a tappable plate (semi-transparent backing so the gold label reads
@@ -85,6 +106,8 @@ export function CharacterScreen() {
       style={styles.sectionHeaderBar}
       activeOpacity={0.7}
       onPress={() => setCollapsed((s) => ({ ...s, [key]: !s[key] }))}
+      accessibilityRole="button"
+      accessibilityState={{ expanded: !collapsed[key] }}
     >
       <Text style={styles.sectionChevron}>{collapsed[key] ? '▾' : '▴'}</Text>
       <Text style={styles.sectionHeaderLabel}>{label}</Text>
@@ -93,16 +116,22 @@ export function CharacterScreen() {
 
   return (
     <View style={styles.container}>
+      <FirstTimeHint
+        id="character_first_open"
+        title="Your character"
+        body="Tap any stat or number to see exactly what feeds it. Scroll down for your Chronicle — the legend of what you've done."
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>CHARACTER</Text>
+        <Text style={styles.title} accessibilityRole="header">CHARACTER</Text>
         <View style={{ width: 80 }} />
       </View>
 
@@ -131,6 +160,33 @@ export function CharacterScreen() {
           </View>
         </View>
 
+        {/* ── CHRONICLE ─────────────────────────────────────────── */}
+        {/* OTA-843 — the character's legend: a headline, a short deed-list, and the
+            memorable beats as a timeline. Collapsed by default so it doesn't push the
+            stats down; tap to unfurl the story. */}
+        {sectionHeader('chronicle', 'CHRONICLE')}
+        {!collapsed.chronicle && (
+        <View style={styles.card}>
+          <Text style={styles.chronicleTitle}>{chronicle.title}</Text>
+          <Text style={styles.chronicleHeadline}>{chronicle.headline}</Text>
+          {chronicle.deeds.map((d, i) => (
+            <Text key={i} style={styles.chronicleDeed}>· {d}</Text>
+          ))}
+          {chronicle.entries.length > 0 ? (
+            <View style={styles.chronicleTimeline}>
+              {chronicle.entries.map((e, i) => (
+                <View key={i} style={styles.chronicleRow}>
+                  <Text style={styles.chronicleGlyph}>{e.glyph}</Text>
+                  <Text style={styles.chronicleEntryText}>{e.text}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.chronicleEmpty}>Your legend is unwritten. Go and make it.</Text>
+          )}
+        </View>
+        )}
+
         {/* ── CORE STATS ────────────────────────────────────────── */}
         {sectionHeader('core', 'CORE STATS')}
         {!collapsed.core && (
@@ -152,10 +208,49 @@ export function CharacterScreen() {
         {sectionHeader('defense', 'DEFENSE')}
         {!collapsed.defense && (
         <View style={styles.card}>
-          <View style={styles.kvRow}>
-            <Text style={styles.kvKey}>Armor Class</Text>
-            <Text style={styles.kvValue}>{acValue}</Text>
-          </View>
+          {/* OTA-848 — the whole AC row is tappable: it expands a readable,
+              line-per-source breakdown of exactly what builds the number (base +
+              each armor piece / stance / title / racial). OTA-836 first surfaced
+              these as chips; the tap keeps the card clean by default and lets the
+              player audit any surprising AC on demand. */}
+          <TouchableOpacity
+            style={styles.kvRow}
+            activeOpacity={acBd.sources.length > 0 ? 0.7 : 1}
+            onPress={() => acBd.sources.length > 0 && setAcOpen((v) => !v)}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: acOpen }}
+          >
+            <Text style={styles.kvKey}>
+              Armor Class{acBd.sources.length > 0 && <Text style={styles.tapHint}>  {acOpen ? '▾' : '▸'}</Text>}
+            </Text>
+            <Text style={styles.kvValue}>
+              {acBd.total}
+              {acBd.sources.length > 0 && <Text style={styles.statBase}>  (base {acBd.base})</Text>}
+            </Text>
+          </TouchableOpacity>
+          {acBd.sources.length > 0 && !acOpen && (
+            <Text style={styles.tapHintLine}>tap to see what makes up your AC ›</Text>
+          )}
+          {acBd.sources.length > 0 && acOpen && (
+            <View style={styles.breakdownList}>
+              <View style={styles.breakdownRow}>
+                <Text style={styles.breakdownDelta}>{acBd.base}</Text>
+                <Text style={styles.breakdownLabel}>base (10 + racial floor)</Text>
+              </View>
+              {acBd.sources.map((s, i) => (
+                <View key={i} style={styles.breakdownRow}>
+                  <Text style={[styles.breakdownDelta, s.delta < 0 && styles.breakdownDeltaNeg]}>
+                    {s.delta > 0 ? '+' : ''}{s.delta}
+                  </Text>
+                  <Text style={styles.breakdownLabel}>{s.label}</Text>
+                </View>
+              ))}
+              <View style={[styles.breakdownRow, styles.breakdownTotalRow]}>
+                <Text style={styles.breakdownTotalDelta}>{acBd.total}</Text>
+                <Text style={styles.breakdownTotalLabel}>total Armor Class</Text>
+              </View>
+            </View>
+          )}
           {race?.racialACBonus && race.racialACBonus !== 'No inherent AC bonus' && (
             <Text style={styles.kvSub}>↳ {race.racialACBonus}</Text>
           )}
@@ -184,6 +279,26 @@ export function CharacterScreen() {
             </Text>
           </View>
           <Text style={styles.kvSub}>↳ {tierDescription(tier)}</Text>
+          {/* OTA-808 — MENACE: your reputation for ruling by fear. Shown once you've
+              built any (intimidation raises it), so it doesn't clutter a peaceful
+              run. Higher menace stiffens your own intimidate checks and draws
+              readier encounters; it fades if you stop. */}
+          {(() => {
+            const m = decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, player.hoursElapsed ?? 0);
+            if (m < 1) return null;
+            const mt = menaceTier(m);
+            return (
+              <>
+                <View style={styles.kvRow}>
+                  <Text style={styles.kvKey}>Menace</Text>
+                  <Text style={[styles.kvValue, mt === 'Dreaded' && styles.danger, mt === 'Feared' && styles.warning]}>
+                    {Math.round(m)} · {mt}
+                  </Text>
+                </View>
+                <Text style={styles.kvSub}>↳ The waste has heard of you. Fear opens doors — and stiffens every spine you'd threaten next.</Text>
+              </>
+            );
+          })()}
         </View>
         )}
 
@@ -220,10 +335,14 @@ export function CharacterScreen() {
                 : standing >= 0 ? '#cdbf99'
                 : standing >= -10 ? '#c9a86a'
                 : '#e07a5f';
+              // OTA-844 [world pulse] — the world moves on its own; show whether this
+              // faction is rising or waning in the balance of power right now.
+              const tide = tideLabel(worldMemory?.factionTides?.[row.factionId]);
               return (
                 <View key={row.factionId} style={styles.kvRow}>
                   <Text style={[styles.kvKey, isOwn && styles.factionOwn]}>
                     {meta!.name}{isOwn ? ' (sworn)' : ''}
+                    {tide ? <Text style={tide.word === 'rising' || tide.word === 'ascendant' ? styles.tideRising : styles.tideWaning}>{`  ${tide.glyph} ${tide.word}`}</Text> : null}
                   </Text>
                   <Text style={[styles.kvValue, { color }]}>
                     {standing >= 0 ? '+' : ''}{standing}{qualifies && !isOwn ? ' ✓' : ''}
@@ -238,6 +357,10 @@ export function CharacterScreen() {
             with a faction surfaces more of their contracts (hunts, mysteries, storylines) when
             you meet their vendors.
           </Text>
+          {/* OTA-849 — jump to the WORLD view: the full balance of power + rumours. */}
+          <TouchableOpacity style={styles.worldLink} activeOpacity={0.7} onPress={() => setScreen('world')} accessibilityRole="button">
+            <Text style={styles.worldLinkText}>◆ THE WORLD — balance of power & rumours ›</Text>
+          </TouchableOpacity>
         </View>
         )}
 
@@ -320,6 +443,7 @@ export function CharacterScreen() {
                 style={styles.card}
                 onPress={() => useGameStore.getState().openCallDogModal()}
                 activeOpacity={0.8}
+                accessibilityRole="button"
               >
                 <Text style={styles.name}>
                   {dog.name} <Text style={{ color: '#c9a86a' }}>{sexGlyph}</Text>
@@ -491,7 +615,7 @@ export function CharacterScreen() {
           <>
             {sectionHeader('contracts', 'ACTIVE CONTRACTS')}
             {!collapsed.contracts && (
-            <TouchableOpacity style={styles.card} onPress={() => setScreen('contracts')} activeOpacity={0.8}>
+            <TouchableOpacity style={styles.card} onPress={() => setScreen('contracts')} activeOpacity={0.8} accessibilityRole="button">
               {(player.activeFactionQuestIds ?? []).map((id) => {
                 const q = findFactionQuestById(id);
                 if (!q) return null;
@@ -563,6 +687,11 @@ export function CharacterScreen() {
           {(() => {
             const allTitles = (arbiterTitlesData as { titles: Array<{ id: string; title: string; requirement: string; perk: string }> }).titles;
             const earned = new Set(player.earnedTitles ?? []);
+            // OTA-915 — a HIDDEN title (Skyreacher) reads as an undiscovered "?" until
+            // you've found its questline (your first Skyreacher Chart). Earned always shows.
+            const climbLoreKnown = greatClimbLoreDiscovered(worldMemory);
+            // OTA-848 — provenance lookup: id → when it was earned.
+            const logMap = new Map((player.titleLog ?? []).map((e) => [e.id, e]));
             const sorted = [...allTitles].sort((a, b) => {
               const ea = earned.has(a.id) ? 0 : 1;
               const eb = earned.has(b.id) ? 0 : 1;
@@ -575,19 +704,66 @@ export function CharacterScreen() {
                 <Text style={styles.titlesSummary}>
                   {earnedCount === 0
                     ? 'No titles earned yet. The Arbiter watches your deeds.'
-                    : `${earnedCount} of ${allTitles.length} titles earned.`}
+                    : `${earnedCount} of ${allTitles.length} titles earned. Tap a title for details.`}
                 </Text>
                 {sorted.map((t) => {
                   const isEarned = earned.has(t.id);
+                  // OTA-915 — mask a hidden, not-yet-discovered title as "???" so a fresh
+                  // character sees a slot to chase but not a spoiler name/requirement.
+                  if (isHiddenTitle(t.id) && !isEarned && !climbLoreKnown) {
+                    return (
+                      <View
+                        key={t.id}
+                        style={styles.titleRow}
+                        accessible
+                        accessibilityRole="text"
+                        accessibilityLabel="Undiscovered title. A title whose path you haven't crossed yet."
+                      >
+                        <Text style={[styles.titleName, styles.titleNameLocked]}>◇ ??? — undiscovered</Text>
+                        <Text style={styles.titleRequirement}>A title whose path you haven&apos;t crossed yet.</Text>
+                      </View>
+                    );
+                  }
+                  const isOpen = openTitle === t.id;
+                  // OTA-848 — each title is singly tappable: expands to show HOW it
+                  // was earned (the requirement / deed) and, for earned titles, WHEN
+                  // (its earn-date from titleLog, or an honest fallback for titles
+                  // earned before provenance was recorded).
                   return (
-                    <View key={t.id} style={styles.titleRow}>
+                    <TouchableOpacity
+                      key={t.id}
+                      style={styles.titleRow}
+                      activeOpacity={0.7}
+                      onPress={() => setOpenTitle((cur) => (cur === t.id ? null : t.id))}
+                      accessibilityRole="button"
+                      accessibilityState={{ expanded: isOpen }}
+                    >
                       <Text style={[styles.titleName, isEarned ? styles.titleNameEarned : styles.titleNameLocked]}>
                         {isEarned ? '◆ ' : '◇ '}{t.title}
+                        <Text style={styles.tapHint}>  {isOpen ? '▾' : '▸'}</Text>
                       </Text>
                       <Text style={isEarned ? styles.titlePerk : styles.titleRequirement}>
                         {isEarned ? (TITLE_PASSIVE_PERK[t.id] ?? t.perk) : t.requirement}
                       </Text>
-                    </View>
+                      {isOpen && (
+                        <View style={styles.titleDetail}>
+                          <Text style={styles.titleDetailLine}>
+                            <Text style={styles.titleDetailKey}>How: </Text>{t.requirement}
+                          </Text>
+                          {isEarned ? (
+                            <Text style={styles.titleDetailLine}>
+                              <Text style={styles.titleDetailKey}>When: </Text>
+                              {describeTitleEarned(logMap.get(t.id)).replace(/^Earned(: )?/, '')}
+                            </Text>
+                          ) : (
+                            <Text style={styles.titleDetailLine}>
+                              <Text style={styles.titleDetailKey}>Perk once earned: </Text>
+                              {TITLE_PASSIVE_PERK[t.id] ?? t.perk}
+                            </Text>
+                          )}
+                        </View>
+                      )}
+                    </TouchableOpacity>
                   );
                 })}
               </>
@@ -602,6 +778,11 @@ export function CharacterScreen() {
   );
 }
 
+// OTA-848 — each core-stat row is now tap-to-expand. Collapsed, it's a clean
+// number + progress bar (readable at a glance); expanded, it opens the full
+// source breakdown AND the "Grows from" activities as a bulleted list, one per
+// line, so the cramped ellipsized run-on that used to squeeze six trainers into
+// three clipped lines is gone.
 function StatRow({
   label,
   b,
@@ -615,14 +796,23 @@ function StatRow({
   progressPct: number;
   activities: string[];
 }) {
+  const [expanded, setExpanded] = useState(false);
   const hasSources = b.sources.length > 0;
+  const hasDetail = hasSources || activities.length > 0;
   return (
-    <View style={styles.statRow}>
+    <TouchableOpacity
+      style={styles.statRow}
+      activeOpacity={hasDetail ? 0.7 : 1}
+      onPress={() => hasDetail && setExpanded((v) => !v)}
+      accessibilityRole="button"
+      accessibilityState={{ expanded }}
+    >
       <Text style={styles.statKey}>{label}</Text>
       <View style={styles.statBody}>
         <Text style={styles.statTotal}>
           {b.total}
           {hasSources && <Text style={styles.statBase}>  (base {b.base})</Text>}
+          {hasDetail && <Text style={styles.tapHint}>  {expanded ? '▾' : '▸'}</Text>}
         </Text>
         {/* 2026-05-25 [VIZ-1] — 20-segment fine bar (5% per rune)
             replaces the legacy 4-segment quartile. Player sees
@@ -630,15 +820,10 @@ function StatRow({
         <Text style={styles.progressBar}>
           {progressBar}  <Text style={styles.progressPct}>{progressPct}%</Text>
         </Text>
-        {/* 2026-05-25 [VIZ-1] — activity list per skill. Shows the
-            player which game actions train this stat so they don't
-            have to guess. */}
-        {activities.length > 0 && (
-          <Text style={styles.activityList} numberOfLines={3} ellipsizeMode="tail">
-            Grows from: {activities.join(' · ')}
-          </Text>
+        {!expanded && hasDetail && (
+          <Text style={styles.tapHintLine}>tap to see sources & how it grows ›</Text>
         )}
-        {hasSources && (
+        {expanded && hasSources && (
           <View style={styles.chipRow}>
             {b.sources.map((s, i) => (
               <View key={i} style={[styles.chip, s.delta < 0 && styles.chipNeg]}>
@@ -649,8 +834,16 @@ function StatRow({
             ))}
           </View>
         )}
+        {expanded && activities.length > 0 && (
+          <View style={styles.growsFrom}>
+            <Text style={styles.growsFromHead}>Grows from:</Text>
+            {activities.map((a, i) => (
+              <Text key={i} style={styles.growsFromItem}>•  {a}</Text>
+            ))}
+          </View>
+        )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -731,6 +924,35 @@ const styles = StyleSheet.create({
   progressBar: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, marginTop: 3 },
   progressPct: { color: '#c9a86a', fontSize: 9, letterSpacing: 0.5 },
   activityList: { color: '#c9a86a', fontSize: 9, marginTop: 2, lineHeight: 13, letterSpacing: 0.3 },
+  // OTA-848 — tap-to-expand affordances + readable breakdown lists.
+  tapHint: { color: '#a2977b', fontSize: 11, fontWeight: '400' },
+  tapHintLine: { color: '#a2977b', fontSize: 9, fontStyle: 'italic', marginTop: 3, letterSpacing: 0.3 },
+  breakdownList: { marginTop: 6, borderTopColor: '#2a2620', borderTopWidth: 1, paddingTop: 6 },
+  breakdownRow: { flexDirection: 'row', alignItems: 'baseline', paddingVertical: 2 },
+  breakdownDelta: { color: '#9ec96a', fontSize: 12, fontWeight: '700', width: 40 },
+  breakdownDeltaNeg: { color: '#e07a5f' },
+  breakdownLabel: { color: '#cdbf99', fontSize: 12, flex: 1 },
+  breakdownTotalRow: { marginTop: 3, borderTopColor: '#2a2620', borderTopWidth: 1, paddingTop: 5 },
+  breakdownTotalDelta: { color: '#e6d8b3', fontSize: 13, fontWeight: '800', width: 40 },
+  breakdownTotalLabel: { color: '#e6d8b3', fontSize: 12, fontWeight: '700', flex: 1 },
+  growsFrom: { marginTop: 6 },
+  growsFromHead: { color: '#c9a86a', fontSize: 10, letterSpacing: 0.5, marginBottom: 3, fontWeight: '700' },
+  growsFromItem: { color: '#bcae88', fontSize: 11, lineHeight: 16, marginLeft: 2 },
+  titleDetail: { marginTop: 6, marginLeft: 14, borderLeftColor: '#3a342c', borderLeftWidth: 2, paddingLeft: 8 },
+  titleDetailLine: { color: '#bcae88', fontSize: 11, lineHeight: 16, marginBottom: 2 },
+  titleDetailKey: { color: '#c9a86a', fontWeight: '700' },
+  // OTA-849 — WORLD view link on the faction section.
+  worldLink: { marginTop: 8, borderTopColor: '#2a2620', borderTopWidth: 1, paddingTop: 8, alignItems: 'center' },
+  worldLinkText: { color: '#c9a86a', fontSize: 11, letterSpacing: 1, fontWeight: '700' },
+  // OTA-843 — Chronicle section.
+  chronicleTitle: { color: '#e6d8b3', fontSize: 15, fontWeight: '700', letterSpacing: 0.5 },
+  chronicleHeadline: { color: '#c9a86a', fontSize: 12, marginTop: 2, marginBottom: 8, letterSpacing: 0.5 },
+  chronicleDeed: { color: '#cdbf99', fontSize: 12, lineHeight: 18 },
+  chronicleTimeline: { marginTop: 10, borderTopColor: '#2a2620', borderTopWidth: 1, paddingTop: 8, gap: 6 },
+  chronicleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  chronicleGlyph: { color: '#c9a86a', fontSize: 13, width: 16, textAlign: 'center' },
+  chronicleEntryText: { color: '#bcae88', fontSize: 12, lineHeight: 18, flex: 1 },
+  chronicleEmpty: { color: '#a2977b', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   chip: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 3, paddingHorizontal: 8, paddingVertical: 3 },
   chipNeg: { borderColor: '#7a4040', backgroundColor: '#221512' },
@@ -740,6 +962,9 @@ const styles = StyleSheet.create({
   kvRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 4 },
   kvKey: { color: '#c9a86a', fontSize: 12, letterSpacing: 1 },
   factionOwn: { color: '#cdbf99', fontWeight: '700' },
+  // OTA-844 — world-pulse tide tags on the faction standings.
+  tideRising: { color: '#9ec96a', fontSize: 10, fontWeight: '400' },
+  tideWaning: { color: '#c98a6a', fontSize: 10, fontWeight: '400' },
   kvValue: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   kvSub: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
   warning: { color: '#c9a86a' },

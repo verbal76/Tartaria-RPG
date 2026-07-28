@@ -1,4 +1,4 @@
-import type { InventoryItem } from './types';
+import type { InventoryItem, Rarity } from './types';
 import {
   findWeaponByName,
   findArmorByName,
@@ -267,12 +267,27 @@ export function wearItemById(
   return { inventory: next, broken: false, brokenName: null, salvageDrop: null };
 }
 
-// Compute the TC cost to fully restore an item's durability. Convention:
-// 1 TC per point missing, with a minimum of 1.
+// OTA-923 — repair cost scales GENTLY with rarity so upkeep stays a meaningful
+// wealth sink on expensive late kit instead of a flat rounding error. Was a flat
+// 1 TC / missing point, rarity-blind (a Legendary blade cost the same to mend as a
+// Common cudgel). Conservative multipliers (1 / 1.5 / 2 / 3, NOT 1/2/4/8 which
+// overshoots) — a full Legendary repair goes ~65 → ~195 TC, real but not punishing
+// against late income. Composes with the Architect's Eye repair discount, which is
+// applied on top of this at the call site.
+const REPAIR_RARITY_MULT: Record<Rarity, number> = { Common: 1, Uncommon: 1.5, Rare: 2, Legendary: 3 };
+
+// Compute the TC cost to fully restore an item's durability. Base 1 TC per point
+// missing, scaled by the item's rarity, with a minimum of 1.
 export function repairCost(item: InventoryItem): number {
   if (!item.durability) return 0;
   const missing = item.durability.max - item.durability.current;
-  return Math.max(1, missing);
+  if (missing <= 0) return 0;
+  // OTA-1023 — canonical rarity: a stale-Common instance of a promoted piece
+  // repaired at 1/3 the intended TC sink while fighting with CURRENT stats.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const repairRarity = (require('./crafting') as typeof import('./crafting')).canonicalItemRarity(item);
+  const mult = repairRarity ? (REPAIR_RARITY_MULT[repairRarity] ?? 1) : 1;
+  return Math.max(1, Math.round(missing * mult));
 }
 
 // Restore an item's durability to max in place. Returns a fresh inventory.

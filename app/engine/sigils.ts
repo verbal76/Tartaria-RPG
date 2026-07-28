@@ -67,14 +67,18 @@ export function rollSigilDrop(
 }
 
 /** A sigil is any item tagged `sigil`. */
-export function isSigilItem(item: Pick<InventoryItem, 'tags'>): boolean {
-  return (item.tags ?? []).some((t) => t.toLowerCase() === 'sigil');
+export function isSigilItem(item: Pick<InventoryItem, 'tags' | 'name'>): boolean {
+  // OTA-1024 — canonical: a stale sigil was invisible to the Contracts screen and
+  // its standing reward unearnable forever.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return (require('./crafting') as typeof import('./crafting')).canonicalItemTags(item).includes('sigil');
 }
 
 /** The faction a sigil belongs to — resolved from the faction-id tag it carries
  *  (the same convention `faction_gear` uses). Null if it carries none. */
-export function sigilFaction(item: Pick<InventoryItem, 'tags'>): { id: string; name: string } | null {
-  const tags = (item.tags ?? []).map((t) => t.toLowerCase());
+export function sigilFaction(item: Pick<InventoryItem, 'tags' | 'name'>): { id: string; name: string } | null {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const tags = (require('./crafting') as typeof import('./crafting')).canonicalItemTags(item);
   const fac = FACTIONS.find((f) => tags.includes(f.id.toLowerCase()));
   if (!fac) return null;
   return { id: fac.id, name: fac.name ?? factionName(fac.id) };

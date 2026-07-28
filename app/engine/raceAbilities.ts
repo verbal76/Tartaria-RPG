@@ -23,7 +23,7 @@ export const RACE_ABILITIES: RaceAbilityDef[] = [
     id: 'legacy_of_power',
     raceId: 'tartarian_giant',
     name: 'Legacy of Power',
-    description: 'Channel Aether into your gear — fully repairs your most-worn durable item.',
+    description: 'Channel Aether — either fully repairs your most-worn gear, empowers you (+2 STR/3 rounds), or triggers an unexpected surge (a heal, a windfall, or a spike of corruption).',
     cooldown: 'day',
   },
   {
@@ -43,8 +43,16 @@ export const RACE_ABILITIES: RaceAbilityDef[] = [
   {
     id: 'elemental_control',
     raceId: 'mud_golem',
-    name: 'Elemental Control',
+    name: 'Elemental Control — Strike',
     description: 'Hurl shaped Aetherstone at your foe — 1d6 aetheric damage.',
+    cooldown: 'day',
+    combatOnly: true,
+  },
+  {
+    id: 'elemental_ward',
+    raceId: 'mud_golem',
+    name: 'Elemental Control — Ward',
+    description: 'Shape Aetherstone into a ward — soaks the next 1d6 incoming damage before it reaches you.',
     cooldown: 'day',
     combatOnly: true,
   },
@@ -66,7 +74,7 @@ export const RACE_ABILITIES: RaceAbilityDef[] = [
     id: 'beginners_luck',
     raceId: 'unknowing_mass',
     name: "Beginner's Luck",
-    description: 'Fortune favors the new — +3 Wisdom for 3 rounds (survival, combat, relics).',
+    description: 'Bank your luck — the next difficulty roll you FAIL today (survival, combat, or relic) is rolled again, keeping the better result.',
     cooldown: 'day',
   },
 ];

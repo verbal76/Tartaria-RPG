@@ -128,12 +128,22 @@ describe('bandolier — rack multiple + coating throw (OTA-690)', () => {
     store.setState((s) => ({
       currentScene: {
         ...((s.currentScene ?? {}) as any),
-        enemies: [{ name: 'Brute', hp: 40, ac: 5, attack: 'Slam', damage: '1d6', abilityPoint: 'STR 10', rarity: 'Common', traits: [] }],
+        enemies: [{ name: 'Brute', hp: 40, ac: 5, attack: 'Slam', damage: '1d6', abilityPoint: 'STR 10', rarity: 'Common', traits: [], loot: [] }],
         enemyHps: [40], enemyKnockedOut: [false], enemyAmbushUsed: [false], activeEnemyIdx: 0, range: 'close',
       } as any,
     }));
 
     store.getState().throwFromBandolier('Throwing Knife', 'k2'); // tapped the coated instance
+    // The knife's dice modal settles the spend + hand restore when it closes.
+    {
+      let guard = 0;
+      while (store.getState().pendingRolls) {
+        if (guard++ > 50) throw new Error('roll loop did not terminate');
+        const pr = store.getState().pendingRolls!;
+        const step = pr.steps[pr.currentStep]!;
+        store.getState().resolveRollStep(Array.from({ length: step.count ?? 1 }, () => 20));
+      }
+    }
 
     const inv = store.getState().player!.inventory;
     // k2 (the coated, tapped instance) is the one thrown/consumed; k1 stays racked.

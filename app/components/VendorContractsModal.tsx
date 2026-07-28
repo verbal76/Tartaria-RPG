@@ -13,8 +13,16 @@ import { availableFactionQuests } from '../engine/factionQuests';
 import { availableHunts } from '../engine/hunts';
 import { availableMysteries } from '../engine/mysteries';
 import { availableStorylines } from '../engine/factionStorylines';
-import { getStanding } from '../engine/factions';
+import { getStanding, FACTIONS } from '../engine/factions';
 import type { VendorInstance } from '../engine/vendors';
+
+/** OTA-782 — the Hidden Market is the contract HUB. Its stall vendors are
+ *  neutral-ground brokers: instead of only their own faction's work, they post
+ *  every open contract across all factions (still rep-gated per faction), so
+ *  there's always a board to pick from no matter who you've been running with. */
+function isBrokerVendor(vendor: VendorInstance): boolean {
+  return typeof vendor.id === 'string' && vendor.id.startsWith('hidden_market_');
+}
 
 interface Props {
   visible: boolean;
@@ -57,15 +65,37 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
   const acceptStoryline = useGameStore((s) => s.acceptStoryline);
 
   const sections = useMemo(() => {
-    const rep = vendor.faction ? getStanding(factionStanding ?? [], vendor.faction) : 0;
-    const quests = vendor.faction
-      ? availableFactionQuests(vendor.faction, rep, activeFactionQuestIds ?? [], completedFactionQuestIds ?? [])
-      : [];
-    const hunts = availableHunts(vendor.faction, rep, (activeHunts ?? []).map((h) => h.id), completedHuntIds ?? []);
-    const mysteries = availableMysteries(vendor.faction, rep, (activeMysteries ?? []).map((m) => m.id), completedMysteryIds ?? []);
-    const stories = vendor.faction
-      ? availableStorylines(vendor.faction, rep, (activeStorylines ?? []).map((s) => s.id), completedStorylineIds ?? [])
-      : [];
+    // A market broker posts EVERY faction's board (+ faction-agnostic work);
+    // any other vendor posts only its own. Each faction is scored at the
+    // player's OWN standing with it, so rep gates still apply.
+    const factionIds: (string | null)[] = isBrokerVendor(vendor)
+      ? [null, ...FACTIONS.map((f) => f.id)]
+      : [vendor.faction ?? null];
+    const activeHuntIds = (activeHunts ?? []).map((h) => h.id);
+    const activeMysteryIds = (activeMysteries ?? []).map((m) => m.id);
+    const activeStorylineIds = (activeStorylines ?? []).map((s) => s.id);
+    const quests: ReturnType<typeof availableFactionQuests> = [];
+    const hunts: ReturnType<typeof availableHunts> = [];
+    const mysteries: ReturnType<typeof availableMysteries> = [];
+    const stories: ReturnType<typeof availableStorylines> = [];
+    const seen = new Set<string>();
+    for (const fid of factionIds) {
+      const rep = fid ? getStanding(factionStanding ?? [], fid) : 0;
+      if (fid) {
+        for (const q of availableFactionQuests(fid, rep, activeFactionQuestIds ?? [], completedFactionQuestIds ?? [])) {
+          if (!seen.has(`q:${q.id}`)) { seen.add(`q:${q.id}`); quests.push(q); }
+        }
+        for (const s of availableStorylines(fid, rep, activeStorylineIds, completedStorylineIds ?? [])) {
+          if (!seen.has(`s:${s.id}`)) { seen.add(`s:${s.id}`); stories.push(s); }
+        }
+      }
+      for (const h of availableHunts(fid, rep, activeHuntIds, completedHuntIds ?? [])) {
+        if (!seen.has(`h:${h.id}`)) { seen.add(`h:${h.id}`); hunts.push(h); }
+      }
+      for (const m of availableMysteries(fid, rep, activeMysteryIds, completedMysteryIds ?? [])) {
+        if (!seen.has(`m:${m.id}`)) { seen.add(`m:${m.id}`); mysteries.push(m); }
+      }
+    }
 
     const out: { label: string; postings: Posting[] }[] = [];
     if (quests.length > 0) {
@@ -106,7 +136,7 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
     }
     return out;
   }, [
-    vendor.faction, factionStanding, activeFactionQuestIds, completedFactionQuestIds,
+    vendor.id, vendor.faction, factionStanding, activeFactionQuestIds, completedFactionQuestIds,
     activeHunts, completedHuntIds, activeMysteries, completedMysteryIds,
     activeStorylines, completedStorylineIds,
     acceptFactionQuest, acceptHunt, acceptMystery, acceptStoryline,
@@ -116,11 +146,11 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.scrim}>
+      <TouchableWithoutFeedback onPress={onClose} accessibilityRole="button" accessibilityLabel="Close">
+        <View style={styles.scrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>⚑ {vendor.name.toUpperCase()} · CONTRACTS</Text>
+              <Text style={styles.title} accessibilityRole="header">⚑ {vendor.name.toUpperCase()} · CONTRACTS</Text>
               <View style={styles.rule} />
               {empty ? (
                 <Text style={styles.empty}>
@@ -133,7 +163,7 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
                   <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
                     {sections.map((sec) => (
                       <View key={sec.label} style={styles.section}>
-                        <Text style={styles.sectionTitle}>{sec.label}</Text>
+                        <Text style={styles.sectionTitle} accessibilityRole="header">{sec.label}</Text>
                         {sec.postings.map((p) => (
                           <View key={p.key} style={styles.posting}>
                             <View style={[styles.stripe, { backgroundColor: p.accent }]} />
@@ -147,6 +177,7 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
                                 <Pressable
                                   style={({ pressed }) => [styles.acceptBtn, pressed && styles.btnPressed]}
                                   onPress={p.onAccept}
+                                  accessibilityRole="button"
                                 >
                                   <Text style={styles.acceptBtnText}>ACCEPT</Text>
                                 </Pressable>
@@ -162,6 +193,7 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
               <Pressable
                 style={({ pressed }) => [styles.closeBtn, pressed && styles.btnPressed]}
                 onPress={onClose}
+                accessibilityRole="button"
               >
                 <Text style={styles.closeBtnText}>CLOSE</Text>
               </Pressable>
@@ -178,7 +210,7 @@ const styles = StyleSheet.create({
   card: { width: '100%', maxWidth: 400, maxHeight: '82%', backgroundColor: '#13110f', borderColor: '#b98a4a', borderWidth: 1, borderRadius: 4, padding: 14 },
   title: { color: '#d8b271', fontSize: 14, fontWeight: '800', letterSpacing: 2 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
-  subtitle: { color: '#7a705c', fontSize: 11, letterSpacing: 1, marginBottom: 10 },
+  subtitle: { color: '#a2977b', fontSize: 11, letterSpacing: 1, marginBottom: 10 },
   empty: { color: '#cdbf99', fontSize: 13, lineHeight: 19, marginBottom: 6 },
   list: { flexGrow: 0 },
   listContent: { paddingBottom: 4 },

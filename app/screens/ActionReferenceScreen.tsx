@@ -187,7 +187,7 @@ const SHORT: Record<string, string> = {
   throw_action: 'Hurl a weapon / object. DEX-based; damage scales with item weight.',
   dash_action: 'Double your movement this turn at the cost of your attack.',
   disengage_action: 'Step back without provoking an opportunity attack.',
-  dodge_action: 'Defensive stance — +4 AC and advantage on DEX saves this turn.',
+  dodge_action: 'The dodge gamble — opposed DEX vs the swing, ignoring armor both ways. Win: take nothing, next strike deals double dice. Lose: the blow lands past any armor for 2× damage.',
   help_action: "Aid an ally's next roll. They roll with advantage.",
   use_object_action: 'Apply an item to a target. "use X on Y".',
   hide_action: 'Slip into cover / shadow. Opposed DEX vs the area\'s spotters.',
@@ -207,7 +207,7 @@ const SHORT: Record<string, string> = {
   bolt_caster: 'Tartaria\'s firearm equivalent — magnetic bolt accelerator. INT or DEX.',
 
   // Evasive
-  dodge_melee: 'Side-step a melee swing. Opposed DEX. Success negates damage.',
+  dodge_melee: 'Side-step a swing — opposed DEX vs its attack total. Win: untouched + a perfect opening (next strike ×2 dice). Lose: you dodge into it (2× damage, armor bypassed).',
   fight_back: 'Counter the attacker with your own Fighting check. Risky.',
   dive_for_cover: 'Hit the ground behind cover. Free movement, but you\'re prone.',
 
@@ -318,6 +318,7 @@ export function ActionReferenceScreen() {
           queued && styles.cardQueued,
         ]}
         onPress={() => handleCardTap(id, examples)}
+        accessibilityRole="button"
       >
         <Text style={styles.cardTitle}>{c.title}</Text>
         <Text style={styles.cardBody}>{explanationFor(c)}</Text>
@@ -363,10 +364,12 @@ export function ActionReferenceScreen() {
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>ACTIONS</Text>
+        <Text style={styles.title} accessibilityRole="header">ACTIONS</Text>
         <View style={{ width: 80 }} />
       </View>
       {/* arb88 — search box. Filters every card by name / what-it-does /
@@ -383,7 +386,7 @@ export function ActionReferenceScreen() {
           returnKeyType="search"
         />
         {query.length > 0 && (
-          <TouchableOpacity onPress={() => setQuery('')} hitSlop={8} style={styles.searchClear}>
+          <TouchableOpacity onPress={() => setQuery('')} hitSlop={8} style={styles.searchClear} accessibilityRole="button" accessibilityLabel="Clear search">
             <Text style={styles.searchClearText}>✕</Text>
           </TouchableOpacity>
         )}
@@ -395,7 +398,7 @@ export function ActionReferenceScreen() {
             <Text style={styles.intro}>No action matches “{query.trim()}”.</Text>
           ) : (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>{searchResults.length} MATCH{searchResults.length === 1 ? '' : 'ES'}</Text>
+              <Text style={styles.sectionTitle} accessibilityRole="header">{searchResults.length} MATCH{searchResults.length === 1 ? '' : 'ES'}</Text>
               {searchResults.map(({ id }) => renderCard(id))}
             </View>
           )
@@ -410,7 +413,7 @@ export function ActionReferenceScreen() {
             </Text>
             {orderedSections.map((section) => (
               <View key={section.title} style={styles.section}>
-                <Text style={styles.sectionTitle}>{section.title}</Text>
+                <Text style={styles.sectionTitle} accessibilityRole="header">{section.title}</Text>
                 {section.ids.map((id) => renderCard(id))}
               </View>
             ))}
@@ -461,9 +464,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   searchClear: { paddingLeft: 8, paddingVertical: 4 },
-  searchClearText: { color: '#7a705c', fontSize: 14, fontWeight: '700' },
+  searchClearText: { color: '#a2977b', fontSize: 14, fontWeight: '700' },
   intro: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 12,
     fontStyle: 'italic',
     marginBottom: 12,

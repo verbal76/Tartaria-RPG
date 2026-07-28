@@ -17,6 +17,22 @@
 // needed; "once per day" lore perks become balanced passives.
 
 import type { PlayerCharacter } from './types';
+import { getDayPeriod } from './timeOfDay';
+
+/** OTA-848 — human-readable earn-date for a title, from its titleLog entry.
+ *  In-game "Day N (period)" is the primary, immersive date; the real wall-clock
+ *  date is appended as the literal answer. Titles earned before provenance was
+ *  recorded (no entry) get an honest fallback, never a fabricated date.
+ *  Exported + pure so it's unit-testable and reused by the Character screen. */
+export function describeTitleEarned(entry?: { atHours: number; atMs: number }): string {
+  if (!entry) return 'Earned earlier in your journey (before this was recorded).';
+  const day = Math.floor((entry.atHours ?? 0) / 24) + 1;
+  const period = getDayPeriod(entry.atHours);
+  const d = new Date(entry.atMs);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const real = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return `Earned: Day ${day} (${period}) · ${real}`;
+}
 
 /** Running counters that title predicates read. Lives on the player as
  *  `player.titleProgress`; absent fields default to 0 via EMPTY. */
@@ -55,6 +71,10 @@ export interface TitleProgress {
   relicsPreserved: number;
   /** Guild Broker — faction alliances brokered. */
   alliancesBrokered: number;
+  // ── Skyreacher (OTA-910) ──────────────────────────────────────────────
+  /** Distinct great climbs crested (of 5). At 5 the Skyreacher title lands
+   *  and the Skyreacher armor set is complete. */
+  greatClimbsCompleted: number;
 }
 
 export const EMPTY_TITLE_PROGRESS: TitleProgress = {
@@ -73,6 +93,7 @@ export const EMPTY_TITLE_PROGRESS: TitleProgress = {
   trapCleanDives: 0,
   relicsPreserved: 0,
   alliancesBrokered: 0,
+  greatClimbsCompleted: 0,
 };
 
 export function withTitleProgress(p?: Partial<TitleProgress>): TitleProgress {
@@ -104,6 +125,9 @@ export interface TitlePerks {
   stealthBonus: number;         // Shadow Diver (+1 Stealth)
   pathfinder: boolean;          // Wayfarer (read the true path)
   machineSpeech: boolean;       // Speaker (commune with Tartarian machines/relics)
+  // ── Skyreacher (OTA-910) ──────────────────────────────────────────────
+  climbFallHalved: boolean;     // Skyreacher — halves climb-fall damage
+  dexterityBonus: number;       // Skyreacher — passive +DEX (folds into effectiveStats)
 }
 
 export const EMPTY_TITLE_PERKS: TitlePerks = {
@@ -113,6 +137,7 @@ export const EMPTY_TITLE_PERKS: TitlePerks = {
   corruptionResist: false, ethericShield: false, ethericSurge: false,
   ruinsDefenseBonus: 0, diplomacyBonus: 0, stealthBonus: 0,
   pathfinder: false, machineSpeech: false,
+  climbFallHalved: false, dexterityBonus: 0,
 };
 
 interface TitleDef {
@@ -244,9 +269,31 @@ export const WIRED_TITLES: TitleDef[] = [
     earned: (_pl, p) => p.relicsPreserved >= 1,
     perk: (a) => { a.ruinsDefenseBonus += 1; },
   },
+  // ── Skyreacher (OTA-910) — top all five great climbs (11–15 tiers) to
+  //    complete the Skyreacher armor set and earn the name. The perk is a
+  //    climber's mastery of height: falls hurt half as much, and the hands
+  //    that made those summits are quicker (+2 DEX, always on). Earnable on
+  //    HAL + golem, where the great climbs live.
+  {
+    id: 'skyreacher',
+    earned: (_pl, p) => p.greatClimbsCompleted >= 5,
+    perk: (a) => { a.climbFallHalved = true; a.dexterityBonus += 2; },
+  },
 ];
 
 export const WIRED_TITLE_IDS: ReadonlySet<string> = new Set(WIRED_TITLES.map((t) => t.id));
+
+// OTA-915 — HIDDEN titles: shown on the titles screen as an undiscovered "?" until
+// the player has run into the questline that can earn them (so a fresh character
+// doesn't see a spoiler goal they've never heard of). Skyreacher is hidden until you
+// find your first Skyreacher Chart (see greatClimbs.greatClimbLoreDiscovered). An
+// earned title is always shown regardless.
+export const HIDDEN_TITLE_IDS: ReadonlySet<string> = new Set(['skyreacher']);
+
+/** True if this title is hidden until its questline is discovered. */
+export function isHiddenTitle(id: string): boolean {
+  return HIDDEN_TITLE_IDS.has(id);
+}
 
 // arb-fix — the canon `arbiter-titles.json` perk strings are tabletop lore
 // ("Once per day, …") and DON'T match the shipped implementation (passive,
@@ -267,7 +314,10 @@ export const TITLE_PASSIVE_PERK: Record<string, string> = {
   aetherborn_awakened: 'Passive: once per fight, your first hit detonates an Aetheric surge (+1d8 damage).',
   scholar_of_forgotten_lore: 'Passive: +2 to Investigate / lore checks.',
   aetheric_attuned: 'Passive: halves incoming Aetheric damage — in combat AND from Etheric weather.',
-  stormcaller: 'Passive: halves incoming Aetheric damage — in combat AND from Etheric weather.',
+  // arb-fix — was a copy of Aetheric Attuned's line. Stormcaller's perk sets
+  // ethericShield, which ALSO halves electrical damage in combat (OTA-835) — so
+  // the description must state its distinct effect, not duplicate the other title.
+  stormcaller: 'Passive: halves incoming Aetheric damage (in combat AND from Etheric weather) — and halves incoming electrical damage in combat.',
   // Tier-C (earnable once those challenges go live):
   guild_broker: 'Passive: +1 to social (diplomacy) checks.',
   shadow_diver: 'Passive: +1 to Stealth checks.',
@@ -275,6 +325,8 @@ export const TITLE_PASSIVE_PERK: Record<string, string> = {
   warden_of_the_old_world: 'Passive: +1 AC while in ruins / constructed places (stacks with Protector).',
   speaker_of_forgotten_tongues: 'Passive: +2 when investigating relics & Tartarian machines.',
   wayfarer_of_the_lost_paths: 'Passive: cardinal travel costs less stamina (2 → 1.5); +1 Stealth (you move the lost paths unseen).',
+  // OTA-910 — Skyreacher (top all five great climbs).
+  skyreacher: 'Passive: climbing falls deal half damage; +2 DEX, always on (the surest hands in the Reaches).',
 };
 
 /** Every wired title whose requirement the player currently meets. */

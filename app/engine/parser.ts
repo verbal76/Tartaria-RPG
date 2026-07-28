@@ -18,6 +18,9 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'shatter', 'break', 'destroy', 'crush', 'bash',
     // From the overwhelm action card — semantically a flavour of attack.
     'overwhelm', 'press the attack',
+    // OTA-770 — rousing a dormant guardian ("wake the knight") IS a hostile act:
+    // route it to attack so an animate scene noun stands up and fights.
+    'wake', 'rouse', 'awaken', 'stir', 'provoke', 'disturb',
   ],
   diplomacy: [
     'convince', 'persuade', 'negotiate', 'parley', 'bargain', 'plead', 'speak', 'talk',
@@ -33,6 +36,22 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // collides with the 'call dog' parser intercept.
     // Social + performance card verbs.
     'intimidate', 'perform', 'sing', 'play',
+    // OTA-808 — parley verbs. Threat + gentle approaches route through diplomacy so
+    // the two-button parley opens (soothe an animal / persuade a person, or
+    // intimidate either). 'calm'/'settle' are deliberately NOT here — they collide
+    // with the self-directed "calm down" / "settle down" (which are ready/rest); the
+    // unambiguous gentle verbs below cover the animal read, and the two-button modal
+    // (opened by a generic "talk to / approach") always offers "Calm it" by tap.
+    'threaten', 'menace', 'coerce', 'coax',
+    'soothe', 'pacify', 'tame',
+    // OTA-854 — a wider net of LEADING verbs so natural talk-down phrasings route to
+    // diplomacy ("shout at them to go away", "browbeat the patrol"). The phrasal
+    // target-commands ("back off", "go away") are NOT here — they collide with retreat
+    // as bare input; detectParleyChoice reads them once a parley is underway.
+    'shout', 'yell', 'holler', 'bellow', 'roar', 'snarl', 'growl', 'scare', 'frighten',
+    'bully', 'terrify', 'browbeat', 'scowl', 'spook', 'daunt',
+    // PERSUASION reads (reason): defuse the standoff with words.
+    'reason', 'appeal', 'defuse', 'deescalate', 'de-escalate', 'reconcile', 'placate',
   ],
   escape: [
     'run', 'flee', 'retreat', 'escape', 'withdraw', 'bolt', 'scram',
@@ -131,7 +150,10 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // pouch; `unpouch <item>` / `unstow <item>` takes it out.
   stow_pouch: ['stow', 'pouch', 'belt'],
   unpouch: ['unpouch', 'unstow', 'unbelt'],
-  gift: ['gift', 'give', 'offer', 'hand', 'bestow', 'donate', 'tender', 'grant', 'pass'],
+  // OTA-803 — the `gift` intent was removed (gifting deleted). Faction standing is
+  // earned through mission completions + sigil/pendant turn-ins, not by handing
+  // vendors loot; the gift-for-rep side door undercut that, so the whole verb +
+  // action is gone. Its verbs (give/offer/hand/…) now fall through to unknown.
   // 'pocket' removed — clashes with the noun "pockets" / "in his pocket"
   // and the inventory channel. 'grab' kept (genuine steal verb).
   steal: ['steal', 'pilfer', 'lift', 'pinch', 'swipe', 'snatch', 'filch', 'nick', 'grab'],
@@ -1168,7 +1190,20 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
   const enemyNamesLower = (context.enemyNames ?? []).map((n) => n.toLowerCase());
   let enemyHit: string | undefined = undefined;
   if (enemyNamesLower.length > 0 && targetTokens.length > 0) {
+    // arb-fix — respect an explicit trailing ordinal ("raider 3") BEFORE the
+    // loose any-token match. Numbered enemies share every word except the
+    // number ("Conspiracy Architects Raider 2/3"), so the any-token loop below
+    // matched on "conspiracy" and returned the FIRST enemy regardless of the
+    // typed number (so "approach raider 3" resolved to raider 2 once 1 died).
+    const ordinalTok = targetTokens.find((t) => /^\d+$/.test(t));
+    if (ordinalTok) {
+      const numbered = (context.enemyNames ?? []).find((e) =>
+        new RegExp(`\\b${ordinalTok}\\b\\s*$`).test(e.toLowerCase().trim()),
+      );
+      if (numbered) enemyHit = numbered;
+    }
     // Exact substring first.
+    if (!enemyHit)
     for (const eRaw of context.enemyNames ?? []) {
       const e = eRaw.toLowerCase();
       if (targetTokens.some((t) => e.includes(t) || t.includes(e))) {

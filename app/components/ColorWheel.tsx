@@ -76,13 +76,21 @@ export function ColorWheel({ size, hue, sat, light = 0.5, onChange }: Props) {
     >
       <Image
         source={require('../../assets/textures/colorwheel.png')}
+        accessibilityLabel="Color wheel"
         style={{ width: size, height: size }}
         resizeMode="contain"
       />
       {/* subtle ring so the disc reads as interactive against any bg */}
-      <View pointerEvents="none" style={[styles.ring, { width: size, height: size, borderRadius: R }]} />
       <View
         pointerEvents="none"
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no-hide-descendants"
+        style={[styles.ring, { width: size, height: size, borderRadius: R }]}
+      />
+      <View
+        pointerEvents="none"
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no-hide-descendants"
         style={[
           styles.thumb,
           {

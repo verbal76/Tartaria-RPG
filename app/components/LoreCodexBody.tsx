@@ -20,18 +20,43 @@
 // only activates when there's an active player (so the title-screen
 // host still renders the entries as info-only).
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { BrandedModal } from './BrandedModal';
 import factionsData from '../data/factions/factions.json';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import timelineData from '../data/events/timeline.json';
+import enemiesData from '../data/enemies/enemies.json';
+import conceptsData from '../data/lore/concepts.json';
 import type { Faction, Race, Location, TimelineEvent } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../engine/hiddenLocations';
+import { isGreatClimbLocationLocked, SUMMIT_BOSS_BASES } from '../engine/greatClimbs';
+import { loadFallen, type FallenHero } from '../engine/saveSystem';
 
-type Section = 'races' | 'factions' | 'places' | 'timeline';
+// OTA-837 — Tier-1 QoL #2: the codex now includes a discovery-gated BESTIARY (fills
+// in as you defeat enemy types) and a LORE tab that finally surfaces the 172-entry
+// concepts bank (the "massive lore document" that lived in the files but was never
+// shown to the player — only fed to the Arbiter's context). Both extend the existing
+// races/factions/places/timeline codex rather than a new screen.
+// OTA-845 — the FALLEN tab: an install-wide, cross-character memorial. Every character
+// who dies is remembered here (saveSystem.loadFallen), so a run ending is never a clean
+// wipe — later characters (and the title screen, between runs) can read who came before.
+type Section = 'races' | 'factions' | 'places' | 'timeline' | 'bestiary' | 'lore' | 'fallen';
+
+interface CodexEnemy {
+  name: string;
+  type?: string;
+  hp?: number;
+  damage?: string;
+  rarity?: string;
+  traits?: string[];
+  loot?: string[];
+  /** OTA-897 (SA-5) — one-line codex voice; shown once the foe is discovered. */
+  flavor?: string;
+}
+interface LoreConcept { id: string; title: string; answer: string }
 
 export function LoreCodexBody() {
   const [section, setSection] = useState<Section>('races');
@@ -46,6 +71,36 @@ export function LoreCodexBody() {
   const appendLog = useGameStore((s) => s.appendLog);
   // OTA-498 — hidden locations (the Hidden Market) read as "?" here too until visited.
   const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
+  // OTA-915 — the five Great-Climb towers stay masked as "?" until you use their
+  // Skyreacher Chart (unlockedGreatClimbs), so the tower locations are a mystery
+  // the roadside maps sell you.
+  const unlockedClimbs = useGameStore((s) => s.worldMemory?.unlockedGreatClimbs);
+  // OTA-837 — the bestiary reveals an enemy once you've DEFEATED its type (its name is
+  // recorded in worldMemory.defeatedEnemies). Undiscovered foes read as "??? — undiscovered".
+  const defeatedEnemies = useGameStore((s) => s.worldMemory?.defeatedEnemies);
+  const defeatedSet = React.useMemo(
+    () => new Set((defeatedEnemies ?? []).map((n) => n.toLowerCase())),
+    [defeatedEnemies],
+  );
+  // OTA-838 — damage-type intel you've LEARNED by fighting each enemy (name-keyed).
+  const enemyIntel = useGameStore((s) => s.worldMemory?.enemyIntel);
+  // OTA-915 — the five Great-Climb SUMMIT BOSSES aren't in enemies.json (that pool
+  // is rolled for random wild spawns), so project them in from greatClimbs.ts as
+  // codex-only entries. They still gate on defeat like every other foe.
+  const enemyCatalog = React.useMemo(
+    () => [...(enemiesData as CodexEnemy[]), ...(SUMMIT_BOSS_BASES as unknown as CodexEnemy[])],
+    [],
+  );
+  const beatenCount = enemyCatalog.filter((e) => defeatedSet.has(e.name.toLowerCase())).length;
+  const concepts = (conceptsData as { concepts: LoreConcept[] }).concepts;
+  // OTA-845 [The Fallen] — install-wide roll of the dead, loaded async from the global
+  // stash. Newest first (most recent death at the top of the memorial).
+  const [fallen, setFallen] = useState<FallenHero[]>([]);
+  useEffect(() => {
+    let live = true;
+    void loadFallen().then((f) => { if (live) setFallen([...f].reverse()); });
+    return () => { live = false; };
+  }, []);
 
   const canPlanRoute = !!player;
   const here = player?.currentLocationId ?? null;
@@ -73,14 +128,23 @@ export function LoreCodexBody() {
 
   return (
     <View style={styles.bodyWrap}>
+      {/* OTA-852 — the 7 codex tabs no longer cram into the width and word-wrap;
+          each tab sizes to its one-line label. UPDATED: the row now
+          WRAPS instead of scrolling — the hidden horizontal scroll (indicator off,
+          no cue) cut FALLEN and LORE off past the right edge on the owner's device;
+          a tab that exists must be visible. */}
       <View style={styles.tabs}>
-        {(['races', 'factions', 'places', 'timeline'] as Section[]).map((s) => (
+        {(['races', 'factions', 'places', 'timeline', 'bestiary', 'lore', 'fallen'] as Section[]).map((s) => (
           <TouchableOpacity
             key={s}
             onPress={() => setSection(s)}
             style={[styles.tab, section === s && styles.tabActive]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: section === s }}
           >
-            <Text style={[styles.tabText, section === s && styles.tabTextActive]}>{s}</Text>
+            <Text style={[styles.tabText, section === s && styles.tabTextActive]} numberOfLines={1}>
+              {s === 'bestiary' ? 'beasts' : s}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -120,21 +184,30 @@ export function LoreCodexBody() {
         {section === 'places' && (locationsData as Location[]).map((l) => {
           const atHere = canPlanRoute && l.id === here;
           const hidden = isHiddenLocation(l.id) && !isLocationRevealed(l.id, discoveredIds);
+          // OTA-915 — a Great-Climb tower stays masked until you've charted it.
+          const climbLocked = isGreatClimbLocationLocked(l.id, { unlockedGreatClimbs: unlockedClimbs });
+          const masked = hidden || climbLocked;
+          const displayName = climbLocked ? '?' : revealedLocationName(l.id, l.name, discoveredIds);
+          const subtitle = climbLocked ? 'unknown — a chart will lead you here'
+            : hidden ? 'unknown — travel to reveal' : l.type;
+          const desc = climbLocked ? 'A great climb the roadside cartographers keep off the common maps. Buy and read its Skyreacher Map to put it on yours.'
+            : hidden ? 'A place that keeps no name on any map until you find it yourself.' : l.description;
           const content = (
             <>
-              <Text style={styles.name}>{revealedLocationName(l.id, l.name, discoveredIds)}</Text>
-              <Text style={styles.subtitle}>{hidden ? 'unknown — travel to reveal' : l.type}</Text>
-              <Text style={styles.desc}>{hidden ? 'A place that keeps no name on any map until you find it yourself.' : l.description}</Text>
+              <Text style={styles.name}>{displayName}</Text>
+              <Text style={styles.subtitle}>{subtitle}</Text>
+              <Text style={styles.desc}>{desc}</Text>
               <Text style={styles.meta}>Danger {l.danger}/5</Text>
-              {canPlanRoute ? (
+              {canPlanRoute && !climbLocked ? (
                 <Text style={styles.tapHint}>
                   {atHere ? '· you are here ·' : '▸ tap to plan a route'}
                 </Text>
               ) : null}
             </>
           );
-          if (!canPlanRoute || atHere) {
-            return <View key={l.id} style={styles.entry}>{content}</View>;
+          // A masked climb can't be routed to until charted.
+          if (!canPlanRoute || atHere || climbLocked) {
+            return <View key={l.id} style={[styles.entry, climbLocked ? styles.entryLocked : null]}>{content}</View>;
           }
           return (
             <TouchableOpacity
@@ -142,6 +215,7 @@ export function LoreCodexBody() {
               style={styles.entry}
               activeOpacity={0.7}
               onPress={() => setPendingRoute(l)}
+              accessibilityRole="button"
             >
               {content}
             </TouchableOpacity>
@@ -154,6 +228,94 @@ export function LoreCodexBody() {
             <Text style={styles.desc}>{e.summary}</Text>
           </View>
         ))}
+        {/* OTA-837 — BESTIARY. Fills in as you defeat enemy types; an unbeaten foe
+            reads as an "??? — undiscovered" silhouette so the tab shows the shape of
+            what's left to meet, not a spoiler dump. */}
+        {section === 'bestiary' && (
+          <>
+            <Text style={styles.counter}>{beatenCount} of {enemyCatalog.length} catalogued</Text>
+            {enemyCatalog.map((e, idx) => {
+              const known = defeatedSet.has(e.name.toLowerCase());
+              if (!known) {
+                return (
+                  <View key={`${e.name}_${idx}`} style={[styles.entry, styles.entryLocked]}>
+                    <Text style={styles.lockedName}>??? — undiscovered</Text>
+                    <Text style={styles.lockedSub}>Defeat one to record it here.</Text>
+                  </View>
+                );
+              }
+              const intel = enemyIntel?.[e.name.toLowerCase()];
+              return (
+                <View key={`${e.name}_${idx}`} style={styles.entry}>
+                  <Text style={styles.name}>{e.name}</Text>
+                  <Text style={styles.subtitle}>{e.type ?? 'Unknown'} • {e.rarity ?? 'Common'}</Text>
+                  {/* OTA-897 (SA-5) — the bestiary now has a VOICE: a one-line
+                      field description per foe, shown once you've recorded it. */}
+                  {!!e.flavor && <Text style={styles.flavorLine}>{e.flavor}</Text>}
+                  <Text style={styles.meta}>COMBAT • HP {e.hp ?? '?'} • Dmg {e.damage ?? '?'}</Text>
+                  {(e.traits ?? []).length > 0 && (
+                    <Text style={styles.meta}>TRAITS • {(e.traits ?? []).join(', ')}</Text>
+                  )}
+                  {/* OTA-838 — damage-type intel you've learned by fighting it. */}
+                  {(intel?.weak.length ?? 0) > 0 && (
+                    <Text style={styles.meta}>WEAK TO • {intel!.weak.join(', ')}</Text>
+                  )}
+                  {(intel?.resist.length ?? 0) > 0 && (
+                    <Text style={styles.meta}>RESISTS • {intel!.resist.join(', ')}</Text>
+                  )}
+                  {(e.loot ?? []).length > 0 && (
+                    <Text style={styles.meta}>DROPS • {(e.loot ?? []).join(', ')}</Text>
+                  )}
+                </View>
+              );
+            })}
+          </>
+        )}
+        {/* OTA-837 — LORE. Surfaces the concepts bank (172 entries) that was already
+            in the files feeding the Arbiter's context but never shown to the player.
+            Reference material — always readable, not discovery-gated. */}
+        {section === 'lore' && (
+          <>
+            <Text style={styles.counter}>{concepts.length} entries</Text>
+            {concepts.map((c) => (
+              <View key={c.id} style={styles.entry}>
+                <Text style={styles.name}>{c.title}</Text>
+                <Text style={styles.desc}>{c.answer}</Text>
+              </View>
+            ))}
+          </>
+        )}
+        {/* OTA-845 — THE FALLEN. The install-wide memorial of dead characters. A run
+            ending is never a clean wipe: every fallen predecessor is remembered here,
+            readable between runs from the title screen too. */}
+        {section === 'fallen' && (
+          fallen.length === 0 ? (
+            <Text style={styles.fallenEmpty}>No one has fallen yet. Tartaria is patient.</Text>
+          ) : (
+            <>
+              {/* OTA-1018 — the header counts the ones still out there. */}
+              <Text style={styles.counter}>
+                {fallen.length} remembered
+                {fallen.some((h) => !h.avengedBy)
+                  ? ` • ${fallen.filter((h) => !h.avengedBy).length} still walking`
+                  : ''}
+              </Text>
+              {fallen.map((h, i) => (
+                <View key={`${h.name}_${h.ts}_${i}`} style={[styles.entry, styles.fallenEntry]}>
+                  <Text style={styles.name}>† {h.name}</Text>
+                  <Text style={styles.subtitle}>{h.raceName} • fell at {h.locationName}</Text>
+                  <Text style={styles.desc}>{h.epitaph}</Text>
+                  <Text style={styles.meta}>{h.kills} foes bested • {h.hours}h in Tartaria • {h.corruption}</Text>
+                  {h.avengedBy ? (
+                    <Text style={styles.meta}>— put to rest by {h.avengedBy}</Text>
+                  ) : (
+                    <Text style={styles.fallenWalking}>— STILL WALKING. Something in warrior's plate wears their name out in the mud.</Text>
+                  )}
+                </View>
+              ))}
+            </>
+          )
+        )}
       </ScrollView>
 
       <Modal
@@ -164,7 +326,7 @@ export function LoreCodexBody() {
       >
         <View style={styles.modalScrim}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>PLAN A ROUTE</Text>
+            <Text style={styles.modalTitle} accessibilityRole="header">PLAN A ROUTE</Text>
             <Text style={styles.modalBody}>
               Set course for {pendingRoute?.name}? The Arbiter will start
               the walk and the travel row will replace your cardinal
@@ -175,6 +337,7 @@ export function LoreCodexBody() {
                 style={[styles.modalBtn, styles.modalBtnGhost]}
                 onPress={() => setPendingRoute(null)}
                 activeOpacity={0.7}
+                accessibilityRole="button"
               >
                 <Text style={styles.modalBtnGhostText}>CANCEL</Text>
               </TouchableOpacity>
@@ -182,6 +345,7 @@ export function LoreCodexBody() {
                 style={[styles.modalBtn, styles.modalBtnGo]}
                 onPress={confirmRoute}
                 activeOpacity={0.7}
+                accessibilityRole="button"
               >
                 <Text style={styles.modalBtnGoText}>SET COURSE</Text>
               </TouchableOpacity>
@@ -219,17 +383,33 @@ export function LoreCodexBody() {
 
 const styles = StyleSheet.create({
   bodyWrap: { flex: 1 },
-  tabs: { flexDirection: 'row', gap: 6, marginBottom: 8 },
-  tab: { flex: 1, paddingVertical: 6, borderWidth: 1, borderColor: '#3a342c', borderRadius: 4, alignItems: 'center' },
+  tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 },
+  tab: { paddingVertical: 6, paddingHorizontal: 14, borderWidth: 1, borderColor: '#3a342c', borderRadius: 4, alignItems: 'center' },
   tabActive: { borderColor: '#c9a86a' },
-  tabText: { color: '#7a705c', fontSize: 11, letterSpacing: 2 },
+  tabText: { color: '#a2977b', fontSize: 11, letterSpacing: 1 },
   tabTextActive: { color: '#e6d8b3' },
   scroll: { flex: 1 },
   entry: { backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, padding: 10, borderRadius: 4, marginBottom: 8 },
+  // OTA-837 — bestiary/lore chrome.
+  counter: { color: '#a2977b', fontSize: 10, letterSpacing: 2, marginBottom: 8, textTransform: 'uppercase' },
+  // OTA-920 — a dashed border marks a locked row; do NOT dim the whole container
+  // with opacity (group-opacity halved every child's contrast below WCAG AA — the
+  // muted lockedName/lockedSub colors already read as "locked" vs the bright unlocked names).
+  entryLocked: { borderStyle: 'dashed' },
+  // OTA-845 — The Fallen memorial.
+  fallenEntry: { borderLeftWidth: 3, borderLeftColor: '#6a5a4a' },
+  fallenEmpty: { color: '#a2977b', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
+  // OTA-1018 — un-avenged entries carry a live warning, amber against the memorial browns.
+  fallenWalking: { color: '#d9a441', fontSize: 12, fontStyle: 'italic', marginTop: 2 },
+  lockedName: { color: '#a2977b', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  lockedSub: { color: '#9a8f79', fontSize: 10, marginTop: 2, fontStyle: 'italic' }, // OTA-920 — was #5a5245 (2.45:1, failed WCAG AA)
   name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   subtitle: { color: '#c9a86a', fontSize: 11, marginBottom: 4 },
+  // OTA-897 (SA-5) — the bestiary voice line: readable prose, italic to set it
+  // apart from the stat rows below it.
+  flavorLine: { color: '#cdbf99', fontSize: 12, lineHeight: 18, fontStyle: 'italic', marginBottom: 4 },
   desc: { color: '#cdbf99', fontSize: 12, lineHeight: 18, marginTop: 2 },
-  meta: { color: '#7a705c', fontSize: 11, marginTop: 4 },
+  meta: { color: '#a2977b', fontSize: 11, marginTop: 4 },
   trait: { color: '#a89a78', fontSize: 11, marginTop: 2 },
   tapHint: { color: '#c9a86a', fontSize: 10, marginTop: 6, letterSpacing: 1 },
   modalScrim: {

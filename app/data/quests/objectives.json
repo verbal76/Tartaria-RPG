@@ -16,5 +16,5 @@
   { "id": "interrogate_revivalist", "verb": "Interrogate", "target": "a captured Tartarian Revivalist", "tags": ["interrogation", "revivalist"] },
   { "id": "destroy_machine", "verb": "Destroy", "target": "a malfunctioning Tartarian device", "tags": ["sabotage", "tartarian_tech"] },
   { "id": "smuggle_aetherborn", "verb": "Smuggle", "target": "an awakening Aetherborn child past Dynasty agents", "tags": ["eternal_dynasty", "rescue"] },
-  { "id": "trace_signal", "verb": "Trace", "target": "the source of a recurring Etheric pulse", "tags": ["investigation", "aetheric"] }
+  { "id": "trace_signal", "verb": "Trace", "target": "the source of a recurring Aetheric pulse", "tags": ["investigation", "aetheric"] }
 ]

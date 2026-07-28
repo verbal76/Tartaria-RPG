@@ -17,7 +17,6 @@ export type Intent =
   | 'ask'
   | 'craft'
   | 'equip'
-  | 'gift'
   | 'steal'
   | 'join'
   | 'dodge'
@@ -240,10 +239,25 @@ export interface Enemy {
    *  paths are skipped. See engine/dogCompanion.ts for the spawn
    *  site and the framework spec entry in HANDOFF.md §0.A. */
   factionNeutralFight?: boolean;
+  /** OTA-849 [living world] — the faction this enemy fights for, when it's a
+   *  faction combatant (a raid party member, a patrol). Killing it shifts the
+   *  player's standing with this faction (down) and its strongest rival (up). Unset
+   *  on wild beasts / automata / freelance foes, which carry no allegiance. */
+  factionId?: string;
+  /** arb-fix — the victim's OWN faction, when it differs from factionId. An outpost
+   *  anchor vendor's factionId is the HOST faction (whose peace you break by fighting
+   *  in their outpost); nativeFactionId is who the vendor actually IS (e.g. Irma is a
+   *  hosted True Tartarian). Killing them angers the host (peace) AND their own faction
+   *  (their member was harmed). Unset for enemies whose allegiance == their host. */
+  nativeFactionId?: string;
   /** Synonyms the parser accepts for this enemy. "Architectural Sentinel"
    *  might list ["sentinel", "guardian", "statue"] so `attack the sentinel`
    *  resolves to the canonical entity. Lowercase, no punctuation. */
   aliases?: string[];
+  /** OTA-897 (SA-5) — one-line codex "voice": a short, evocative field
+   *  description shown in the bestiary (once the foe is recorded) and, briefly,
+   *  on the combat enemy panel. Pure flavor — never read by combat logic. */
+  flavor?: string;
   /** Per-enemy perks layered on top of the macro type-resistance map.
    *  Supported ids live in engine/enemyTraits.ts; examples:
    *  - "armored"            (+2 AC)
@@ -281,6 +295,12 @@ export interface Enemy {
    *  along the grip so only a trained Order hand can take one up without
    *  flaying their own palm. Never enters the loot grant. */
   signatureWeapon?: { name: string; reason: string };
+  /** OTA-808 — parley temperament (the "lock" the player reads). Animals are
+   *  'skittish' (yield to CALM) or 'aggressive' (yield to INTIMIDATE); a HUMANOID
+   *  ('Human') enemy is 'reasonable' (PERSUADE) or 'greedy' (INTIMIDATE). When
+   *  absent, engine/parley.deriveAnimalTemperament() infers it from the name/traits
+   *  so every foe has a stable read. Bosses are unparley-able regardless. */
+  temperament?: import('./parley').Temperament;
 }
 
 export interface WeatherEntry {
@@ -397,6 +417,11 @@ export interface TimelineEvent {
   summary: string;
 }
 
+/** OTA-1017 — the actual kit a fallen character died in: full item copies (minus
+ *  instance id / stack count, slot kept) so a Hollowed revenant can give back
+ *  the REAL gear — fused stats and all — instead of a look-alike or trophy. */
+export type FallenGearPiece = Omit<InventoryItem, 'id' | 'quantity'> & { slot: string };
+
 export interface InventoryItem {
   id: string;
   name: string;
@@ -443,6 +468,15 @@ export interface InventoryItem {
    *  flag; the inventory UI gates the heart-tap on that predicate.
    *  Reserved items are saved for the fusion bench. */
   reservedForFusion?: boolean;
+  /** OTA-872 — player-tapped "Save for quest" earmark on an ordinary
+   *  item (food, materials, loot) the player was told to bring for a
+   *  quest turn-in. Unlike a hand-authored quest-locked item (quest /
+   *  contract / broker / whisper tag, which is fully view-only), a
+   *  reservedForQuest item can still be used or dropped — the flag only
+   *  moves it into the Quest Items section and hides it from the vendor
+   *  sell tab so it isn't sold by accident. Mutually exclusive with
+   *  reservedForFusion. */
+  reservedForQuest?: boolean;
   /** OTA-195 — per-instance unique stats stamped on a fused item.
    *  When present, combat / preview / equip resolvers read these
    *  BEFORE falling back to catalog or inference. A fused item is
@@ -478,18 +512,36 @@ export interface InventoryItem {
    *  status: poison = pure DOT, acid = DOT + armor shred (−AC),
    *  corruption = DOT + corruption stacks. */
   coating?: WeaponCoating;
+  /** OTA-873 — SECOND coating slot, unlocked by the Fusing Crucible's "Upgrade
+   *  weapon" mode (spend 5 reserved pieces + pick a weapon → coatingSlots = 2). A
+   *  dual-coat weapon carries two coatings at once and BOTH fire on every landing
+   *  hit — two on-hit rolls, two DOTs (poison + acid, or even poison + poison; the
+   *  design allows same-element). Only ever set when coatingSlots >= 2. The upgrade
+   *  adds a coating slot only — it does NOT change AC / damage / durability. */
+  coating2?: WeaponCoating;
+  /** OTA-873 — coating capacity for THIS weapon instance. Absent / 1 = the normal
+   *  single slot; 2 = upgraded (can hold `coating2`). Set by the Crucible upgrade. */
+  coatingSlots?: number;
   /** engine_Dev — damage-type resists worked into THIS ARMOR instance from a
    *  coating vial (the "apply to armor" use). Permanent for the piece's life;
    *  aggregateArmor adds these to the slot's resistances while it's worn, so the
    *  existing applyArmorResistance combat path reduces incoming damage of that
    *  type. Lower-cased damage-type strings (e.g. ['poison', 'cold']). */
   addedResists?: string[];
+  /** OTA-873 — extra resist-coating capacity granted by the Fusing Crucible's
+   *  "Upgrade" mode on an ARMOR / DOG-VEST instance (the armor parallel to a
+   *  weapon's second coating slot). The effective worked-in-resist cap is
+   *  ADDED_RESIST_CAP + resistCapBonus, so an upgraded piece can hold one more
+   *  resist type than a stock one. Adds a coating channel only — no AC change. */
+  resistCapBonus?: number;
 }
 
 /** OTA-360 — a weapon coating stamped on a single weapon instance. */
 export interface WeaponCoating {
-  /** Coating family — drives the on-hit enemy status that lands. */
-  kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn';
+  /** Coating family — drives the on-hit enemy status that lands. OTA-831 adds
+   *  `cold` (the anti-machine element from OTA-827): frost coatings deal a cold
+   *  DOT that earns a Construct/Automation's cold weakness. */
+  kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold';
   /** Damage dice rolled on a landing hit ("1d4"). */
   dice: string;
   /** Display adjective used by coatedDisplayName ("Corrupted"). */
@@ -537,6 +589,11 @@ export interface UniqueItemStats {
    *  (applied by aggregateEquippedStatBonuses' fused-item pass). Fusion
    *  inherits a stealth bonus when the inputs include stealthy gear. */
   statBonus?: { stat: keyof Stats; amount: number };
+  /** OTA-978 — weapon reach identity, chosen at forge time (the form noun is
+   *  picked to MATCH it: Spike/Maul = melee, Spear/Pike = long, Bow/Caster =
+   *  ranged). melee = close only; long = mid+close; ranged = every band.
+   *  Older forges are back-stamped on load from their name. */
+  reachClass?: 'melee' | 'long' | 'ranged';
 }
 
 // OTA-550 — four-band combat range model. Ordered farthest → closest.
@@ -611,6 +668,17 @@ export interface FactionStanding { factionId: string; standing: number; }
  *  (when to go), and a stage that advances as the player follows it.
  *  Expire on their own after `expiresAtHour` so the Whispers panel
  *  doesn't pile up forever. */
+/** A SHARED-POOL escort party (engine_Dev model). All-or-nothing: one health bar
+ *  for the whole group; it bleeds collateral in fights and the escort fails when
+ *  it hits 0. `label` is the one-word cargo name shown in the HUD. */
+export interface EscortPool {
+  label: string;
+  hp: number;
+  hpMax: number;
+  /** Party size — drives singular/plural verb agreement in escort log lines. */
+  count?: number;
+}
+
 export interface WhisperRecord {
   /** Unique chain id (e.g. 'yulka_discs'). Each whisper has authored
    *  text + spawn rules in the engine; this field is the lookup key. */
@@ -688,7 +756,8 @@ export type EquipSlot =
   | 'feet'
   | 'cloak'
   | 'amulet'
-  | 'ring';
+  | 'ring'
+  | 'lens';
 
 export interface PlayerEquipped {
   /** Catalog name of the weapon in the main (dominant) hand.
@@ -703,6 +772,10 @@ export interface PlayerEquipped {
   legs?: string;
   feet?: string;
   cloak?: string;
+  /** OTA-927 — the Aetheric Vision Lens (and sibling aether-sight gadgets)
+   *  equip here. Equip-gated: the detect_aether passive is active only while
+   *  one is worn in this dedicated slot (was: active merely by being carried). */
+  lens?: string;
   amulet?: string;
   /** OTA-239 — three concurrent ring slots. `ring` is the legacy first
    *  slot (kept for back-compat); `ring2` and `ring3` are the new
@@ -725,6 +798,7 @@ export interface PlayerEquipped {
   legsId?: string;
   feetId?: string;
   cloakId?: string;
+  lensId?: string;
   amuletId?: string;
   ringId?: string;
   ring2Id?: string;
@@ -757,13 +831,17 @@ export type DamageType =
   | 'degradation'
   | 'bludgeoning'
   | 'burn'
+  | 'cold'
   | 'aetheric'
   | 'electrical'
   | 'piercing'
   | 'poison'
   | 'radiation'
   | 'slashing'
-  | 'stun';
+  | 'stun'
+  // OTA-827 [Group-K] — `force` is a first-class alias of aetheric (see
+  // canonicalDamageType); the 2 runecaster force weapons are aetheric-flavored.
+  | 'force';
 
 export type StatusEffectKind =
   | 'bleed'
@@ -772,6 +850,10 @@ export type StatusEffectKind =
   | 'armor_severed'
   | 'paralyzed'
   | 'poisoned'
+  // OTA-831 — a cold hit can leave you `chilled`: a timed −DEX slow (a shiver in the
+  // hands). Cleared by drinking a cold coating (the warming counter) or by waiting it
+  // out. Gives the new cold coating a real player-side ailment so it's drinkable.
+  | 'chilled'
   | 'dodging'
   // OTA-365 — 'blocking' removed (retired: no engine path ever applied
   // it; the dodge rework folded block into dodge).
@@ -803,6 +885,11 @@ export type StatusEffectKind =
   // player.golem + handleGolemCommand. Removed from the union now
   // that the unreachable handler block was deleted.
   | 'shaped_stone_ward'
+  // OTA-835 — Mud Golem "Elemental Control" DEFENSIVE half: shaped Aetherstone
+  // held as a ward that ABSORBS a fixed pool of incoming damage (the rolled 1d6)
+  // before it reaches HP, then falls away. Distinct from shaped_stone_ward (a
+  // one-round +4 AC to-be-hit bonus); this soaks damage on a hit that lands.
+  | 'stone_ward'
   // 2026-05-24 — stamina-driven combat statuses. tired and exhausted
   // are auto-applied/cleared by tickPlayerStaminaStatuses based on
   // current stamina (no persistence drift). power_attack_pending and
@@ -816,7 +903,14 @@ export type StatusEffectKind =
   // OTA-120 — dog distract success applies this to one enemy for
   // the player's NEXT action. The next attack hit roll, dodge
   // parry, or flee from THAT enemy gets +2. Consumed when applied.
-  | 'distracted';
+  | 'distracted'
+  // OTA-795 — successful dodge payoff: the player's NEXT attack deals double
+  // damage dice (buildCombatSteps peeks it; rollMods consumes it on the swing,
+  // hit or miss — the window closes either way).
+  | 'perfect_opening'
+  // OTA-936 — successful-dodge GROUP defense: while you're still moving off a read, the
+  // OTHER attackers this volley swing at +3 to your AC. Lasts one volley, then clears.
+  | 'evasive';
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -829,6 +923,9 @@ export interface StatusEffect {
    *  how much. effectiveStats reads these when summing buffs. */
   buffStat?: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
   buffBonus?: number;
+  /** OTA-835 — remaining damage this ward can still soak (stone_ward). Each hit
+   *  subtracts from it; the ward is dropped when it reaches 0. */
+  absorb?: number;
 }
 
 // v2.4.1 (OTA 033) — Mud Flood Nexus main quest arc.
@@ -898,6 +995,30 @@ export interface PlayerCharacter {
    *  player on back-to-back steps (it reads as periodic pressure, not an
    *  un-escapable per-step drip). Absent for legacy saves → treated as 0. */
   weatherTickCooldown?: number;
+  /** OTA-801 — game-hours mark until which arrival encounters are suppressed after
+   *  a boss kill (post-boss grace window). Set to hoursElapsed + POST_BOSS_GRACE_HOURS
+   *  when a boss falls; beginScene suppresses the arrival roll while it exceeds the
+   *  current clock, so stepping out of a just-cleared outpost doesn't drop a fresh
+   *  ambush mid-loot. Absent for legacy saves → treated as 0 (no grace). */
+  bossDefeatGraceUntilHours?: number;
+  /** OTA-804 — unbanked "honest custom" credit toward faction standing from
+   *  BUYING. Buying accrues standing as a slow afterthought: TC spent banks here
+   *  and grants +1 standing per BUY_REP_TC_PER_STANDING TC, remainder carried.
+   *  Absent for legacy saves → treated as 0. */
+  buyRepProgress?: number;
+  /** OTA-808 — MENACE: a reputation for ruling by fear, built by intimidation. Rises
+   *  on every intimidate attempt (people more than animals); raises your own
+   *  intimidate DC (self-blunting), draws readier encounters, and decays slowly over
+   *  game-time. Shown on the character portrait. Absent for legacy saves → 0. */
+  menace?: number;
+  /** OTA-808 — the game-hour at which `menace` was last raised, so decay can be
+   *  applied lazily (menace bleeds off MENACE_DECAY_PER_HOUR per hour since). */
+  menaceUpdatedHour?: number;
+  /** OTA-809 — a LOCATION LEAD talked out of a wandering NPC (persuade reward). Paid
+   *  out the next time the player reaches fresh ground (beginScene on a novel tile):
+   *  they follow the lead to the cache and claim it. Cleared on payout. One at a
+   *  time — a fresh lead overwrites an unclaimed one. */
+  pendingLead?: { hint: string; rewardTc: number; rewardItem?: string } | null;
   ac: number;
   tc: number;
   corruption: number;
@@ -914,6 +1035,13 @@ export interface PlayerCharacter {
    *  the titles' requirement strings (e.g. "Discover three Tartarian
    *  relics") to runtime trackers. arb45 wires the Tier-A/B titles. */
   earnedTitles?: string[];
+  /** OTA-848 — provenance for earned titles: WHEN each was awarded, so the
+   *  Character screen can show "Earned: Day N" on tap. `atHours` is in-game
+   *  time (hoursElapsed at award); `atMs` is the real wall-clock stamp. Titles
+   *  earned before this shipped have no entry — the UI shows an honest "before
+   *  this was recorded" fallback rather than a fake date. Parallel to
+   *  earnedTitles (which stays the source of truth for WHICH are earned). */
+  titleLog?: Array<{ id: string; atHours: number; atMs: number }>;
   /** arb45 — running counters the title-earning engine reads to award
    *  Arbiter titles (relics found, sentinels defeated, storms survived,
    *  etc.). See engine/titles.ts. Absent on legacy saves → treated as all
@@ -1023,6 +1151,16 @@ export interface PlayerCharacter {
    *  last used. A daily ability is ready again when that day < the current
    *  day (Math.floor(hoursElapsed/24)+1). */
   abilityCooldowns?: Record<string, number>;
+  /** OTA-835 — Unknowing Masses "Beginner's Luck": a one-shot reroll token set
+   *  by the daily race ability and burned the next time a difficulty roll FAILS
+   *  (resolveRollStep). A plain flag (not a status) so it survives scene changes
+   *  and never ticks down — the daily cooldown is what gates re-arming it. */
+  luckyRerollReady?: boolean;
+  /** OTA-835 — Unknowing Masses "Curious Mind": flips true the first time the
+   *  character is exposed to Tartaria's secrets (a relic/ancient target or a
+   *  ruin). Once awakened it grants a persistent +2 INT / +2 WIS via
+   *  effectiveStats — the flavor's "after first exposure" stat awakening. */
+  curiousMindAwakened?: boolean;
   /** Hours elapsed since the character entered Tartaria. Day = 24 hours. */
   hoursElapsed?: number;
   /** OTA-612 — persistent vendor-theft "heat". Each steal attempt (success or
@@ -1076,7 +1214,7 @@ export interface PlayerCharacter {
   /** Active faction quests with per-stage progress. Mirrors activeHunts
    *  / activeMysteries / activeStorylines so all four contract types
    *  share the same accept / advance / turn-in flow. */
-  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; tracked?: boolean }[];
+  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; escort?: EscortPool; tracked?: boolean }[];
   /** Mission ROUTE CHAIN in progress (set by ROUTE TO on a contract). The engine
    *  courses to the objective, then auto-courses to the turn-in once the work is
    *  done. Cleared on turn-in, abandon, deactivate, or a manual divert. */
@@ -1090,6 +1228,16 @@ export interface PlayerCharacter {
   activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
   /** IDs of hunts that have been turned in. */
   completedHuntIds?: string[];
+  /** OTA-850 [faction bounty] — LEGACY single active kill-bounty. Superseded by
+   *  activeBounties (OTA-859); still read on load and migrated into the array so old
+   *  saves don't lose an in-progress contract. New writes go to activeBounties. */
+  activeBounty?: import('./factionBounty').FactionBounty;
+  /** OTA-859 [bounty board] — every kill-bounty the player currently carries (up to a
+   *  small cap). A favored faction pays to hunt N of a rival's members at the rival's
+   *  outpost. Accepting routes the player there; each kill of a targetFactionId
+   *  combatant ticks EVERY matching bounty's progress; a bounty that completes pays out
+   *  and drops off the slate. Holding several lets the player grind faction standing. */
+  activeBounties?: import('./factionBounty').FactionBounty[];
   /** Active mystery-object quests. `tracked === false` = paused (see activeHunts). */
   activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
   /** IDs of mystery quests turned in. */
@@ -1147,6 +1295,9 @@ export interface PlayerCharacter {
    *  auto-route to it reads exactly 1) and sets this true so it fires only once
    *  and never yanks the player back on later loads. */
   _placedWestOfHiddenMarket510?: boolean;
+  /** OTA-784's `_freshMarketEntry784` / `_skipMarketAutoEnterOnce` repair flags
+   *  were removed in OTA-794 (the failed-OTA save reset they served is done);
+   *  old saves may still carry the keys — they're ignored. */
   /** Last cardinal direction the player traveled. Lets "continue" /
    *  "keep going" / "onward" repeat the previous step without forcing the
    *  player to retype the direction. Cleared on travelTo() to a named
@@ -1190,6 +1341,20 @@ export interface PlayerCharacter {
    *  in loadSlotIntoGame). See DogCompanion interface above and the
    *  framework spec in HANDOFF.md §0.A. */
   dog?: DogCompanion | null;
+  /** OTA-938 — latches the one-time dead/abandoned-dog revive migration so it fires exactly
+   *  once ever. A dog lost AFTER this OTA stays lost (death mechanic intact going forward). */
+  /** @deprecated OTA-949 — the one-time dog-revive migration was retired; this flag is now
+   *  inert (kept for save/test back-compat only; nothing reads it). */
+  dogRevivedOta938?: boolean;
+  /** OTA-941 — latches the one-time owner Mud Siren rematch (refund + re-stage) so it fires once. */
+  /** @deprecated OTA-948 — the rematch was reverted and its load-path wiring removed; this
+   *  flag is inert (kept for save back-compat only; nothing reads or writes it). */
+  mudSirenRematchOta941?: boolean;
+  /** OTA-942 — latches the one-time owner clean-slate prep (full HP/stamina, gear repaired,
+   *  throwables/consumables topped up) that pairs with the OTA-941 rematch. */
+  /** @deprecated OTA-948 — the rematch was reverted and its load-path wiring removed; this
+   *  flag is inert (kept for save back-compat only; nothing reads or writes it). */
+  mudSirenRematchOta942?: boolean;
 }
 
 /** OTA-120 — Dog Companion. A one-at-a-time canine sidekick the player
@@ -1241,6 +1406,9 @@ export interface DogCompanion {
    *  Arbiter reminder so it fires once per down-event, not every tick.
    *  Cleared alongside downedAtHour when the dog is healed back up. */
   bleedWarned?: boolean;
+  /** OTA-938 — how many escalating bleed-out beats have fired this down-event (0..3, at
+   *  1/4, 1/2, 3/4 of the window). Latches so each fires once. Cleared when healed back up. */
+  bleedWarnStage?: number;
   /** Poplar Anvil — lowest loyalty band already warned about (50/30/15).
    *  Latches so each escalating "your dog is drifting" Arbiter beat
    *  fires once per crossing, not every tick. undefined = none warned
@@ -1355,6 +1523,13 @@ export interface PendingRollState {
   // who back out of a flee / cast / stealth / etc. modal shouldn't
   // lose 15 minutes and stamina for nothing.
   refundOnCancel?: { hoursElapsed: number; stamina: number };
+  /** OTA-796 — one-shot statuses to strip when the ATTACK step actually
+   *  resolves (perfect_opening / stealthed / ready / distracted / aiming /
+   *  quick_fire / surprised / power_attack_pending). They used to be stripped
+   *  at prompt-BUILD time, so tapping CANCEL on the dice modal silently
+   *  destroyed earned buffs — and let a player shed the 'surprised' penalty
+   *  by cancel + re-attack without ever rolling. */
+  consumeOnResolve?: string[];
 }
 
 /**
@@ -1404,7 +1579,11 @@ export interface MemorableEvent {
     | 'mq_core_recovered'
     | 'mq_descent_unlocked'
     | 'mq_nexus_reached'
-    | 'mq_ending_chosen';
+    | 'mq_ending_chosen'
+    // OTA-843 [Chronicle] — the character first crossed INTO a worse corruption tier
+    // (Tainted / Corrupted / Hollowed). Records the aether's arc on the soul so the
+    // Chronicle can show how far they've fallen, not just the current number.
+    | 'corruption_tier';
   text: string;
   timestamp: number;
   factionId?: string;
@@ -1443,10 +1622,52 @@ export interface CanonLocation {
 
 export interface WorldMemory {
   tagCounts: Record<string, number>;
+  /** OTA-1014 — #122: the CURRENT local sky. Weather persists per location visit —
+   *  a scene rebuild at the same spot inside ~6 game-hours reuses this instead
+   *  of re-rolling, so conditions read as weather, not a slot machine. */
+  sceneWeather?: { id: string; locationId: string; rolledAtHours: number };
+  /** OTA-1017 — #122 completed: the sky is remembered PER LOCATION (the single slot
+   *  above is legacy — read once as migration, no longer written). Entries
+   *  self-prune once stale (>= 6 game-hours old). */
+  sceneWeatherByLoc?: Record<string, { id: string; rolledAtHours: number }>;
   discoveredLocationIds: string[];
   /** OTA-500 — install-canon locations registered from dynamic mentions. */
   canonLocations?: CanonLocation[];
   defeatedEnemies: string[];
+  /** OTA-838 — enemy INTEL learned by fighting. Keyed by lowercased enemy name →
+   *  the damage types you've SEEN bite deep (weak) or wash off (resist) against it.
+   *  Landing a weak/resist hit records it here; the EnemyPanel then reveals those
+   *  specific types even below the Wisdom read-threshold ("strike to learn" made
+   *  real + persistent), and the bestiary shows them on that enemy's entry. */
+  enemyIntel?: Record<string, { weak: string[]; resist: string[] }>;
+  /** OTA-844 [world pulse] / OTA-853 [war scoreboard] — per-faction POWER (−5..+5):
+   *  who's winning the world's wars. OTA-853 made this EARNED — it rises when a
+   *  faction's patrols win clashes and sack outposts, falls when they're crushed
+   *  (was an abstract pulse). Drives patrol count, vendor prices, and raid strength. */
+  factionTides?: Record<string, number>;
+  /** OTA-853 [emergent grudges] — faction-vs-faction STANDING (−100..+100), the same
+   *  concept the player has with factions. Seeded from lore, then earned through actual
+   *  patrol clashes; decides who fights whom. Two neutrals can grudge into war from zero. */
+  factionRelations?: import('./factionRelations').RelationsMatrix;
+  /** In-game hour of the last world pulse (gates the next one). */
+  lastWorldTickHour?: number;
+  /** Recent world rumours (newest last), capped. The world moving, in the player's ear. */
+  worldRumors?: { text: string; hour: number }[];
+  /** OTA-849 [tides get teeth] — in-game hour of the last faction raid (gates the
+   *  next one so raids stay periodic, not constant). */
+  lastRaidHour?: number;
+  /** OTA-851 [variety] — recent world events for the WORLD board's event feed
+   *  (newest last, capped). Distinct from worldRumors (the rumour line) by kind. */
+  worldEvents?: { text: string; hour: number; kind: string }[];
+  /** OTA-851 — roaming faction patrols on the world grid: war-parties that wander
+   *  loops near their outposts and intercept the player on proximity, anywhere. */
+  patrols?: import('./worldEvents').Patrol[];
+  /** In-game hour the patrols last advanced (throttles their movement). */
+  lastPatrolTickHour?: number;
+  /** OTA-857 — monotonic counter for the WALL-CLOCK world heartbeat (App.tsx
+   *  timer). Seeds the real-time patrol sim and survives reload so the war
+   *  continues from where it stood, independent of in-game hours. */
+  worldRealtimeTicks?: number;
   completedQuestIds: string[];
   /** OTA-244 — location ids for which the danger-vs-tier warning has
    *  fired. Prevents the Arbiter from repeating the "you're light
@@ -1478,6 +1699,30 @@ export interface WorldMemory {
    *  re-entry doesn't re-roll a fresh scene. Optional + defaulted so
    *  legacy saves load cleanly. */
   visitedRooms?: Record<string, VisitedRoom>;
+  /** OTA-800 — per-water-source use timestamps (game-hours, i.e. player.
+   *  hoursElapsed) so a wild drink / bottle refill re-arms on GAME TIME, not on
+   *  scene reset. Keyed by the composite room key (makeRoomKey — includes the
+   *  outdoor mapX/mapY), so two adjacent outdoor water tiles can no longer be
+   *  bounced A→B→A to reset the old per-scene one-shot flags. Pruned to only
+   *  still-cooling sources on write, so it stays tiny. */
+  waterUsedAt?: Record<string, { drink?: number; fill?: number }>;
+  /** OTA-807 — outdoor tiles that have already ROLLED for a wandering NPC (see
+   *  gameStore beginScene). Each peaceful outdoor tile gets exactly ONE spawn roll
+   *  ever; the tile key is banked here so leaving and returning can't re-roll it
+   *  (no farming a person off one square). Bounded to a sliding window so it never
+   *  bloats the save — a tile older than the window can roll again, which requires
+   *  crossing that many fresh tiles first, so it's still not a practical farm. */
+  wandererRolledTiles?: string[];
+  /** OTA-988 — outdoor tiles that already rolled for a stranded-traveler escort
+   *  hook. Same one-roll-per-tile, sliding-window anti-farm as
+   *  wandererRolledTiles. */
+  strandedEscortRolledTiles?: string[];
+  /** OTA-1017 — ground already diced for a Hollowed door never re-rolls (mirrors the
+   *  stranded-escort tile bank; tileIsNovel alone re-arms after 50 tiles). */
+  revenantRolledTiles?: string[];
+  /** OTA-998 — the Hollowed revenant currently standing in the scene (the fallen
+   *  record it was built from); cleared when put to rest. */
+  activeRevenant?: { name: string; ts: number; raceName: string; epitaph: string; locationName: string; kills: number; corruption: string; hours: number; gearNames?: string[]; gear?: FallenGearPiece[]; avengedBy?: string; avengedTs?: number };
   /** HANDOFF #15b — hub rooms the player has visited at least once.
    *  Used by hub fast-travel to gate "jump to the workshop" against
    *  rooms the player actually knows. Stored separately from
@@ -1530,6 +1775,53 @@ export interface WorldMemory {
    *  the player is elevated). Cleared when the dog rejoins on descent,
    *  so each climb gets the joke once; taps still buzz. */
   dogClimbNoticeShown?: boolean;
+  /** OTA-877 — one-time faction-standing explainer. Set true after the first time
+   *  any standing change is logged, so the brief "what is faction standing" note
+   *  (appended by logRepChanges) fires exactly once per save. */
+  factionRepIntroShown?: boolean;
+  /** arb-fix — announce-once ledger for earned titles. Storm titles are awarded
+   *  mid-action (weather tick); later stale-`player` writebacks in the same
+   *  action revert earnedTitles, so the "You have earned a name to carry" banner
+   *  re-fired on every fog tick and the perk never stuck. This lives on
+   *  worldMemory (which player writebacks don't clobber): awardNewTitles announces
+   *  a title only once and re-folds any ledgered title back into earnedTitles. */
+  earnedTitleAnnounced?: string[];
+  /** OTA-910 — distinct great-climb ids the player has crested. Drives the
+   *  one-time Skyreacher armor grant (no re-award on re-cresting) and the
+   *  Skyreacher title (greatClimbsCompleted = this set's size; earned at 5). */
+  greatClimbsCrested?: string[];
+  /** OTA-912 — Skyreacher Chart ids sold by roadside vendors, ever (sell-once
+   *  ledger; each of the 5 charts can be sold a single time across the game). */
+  soldMapIds?: string[];
+  /** OTA-912 — great-climb ids UNLOCKED by using their chart. The climbable prop
+   *  only spawns at a landmark once its id is in here (access is gated on maps). */
+  unlockedGreatClimbs?: string[];
+  /** OTA-1014 — #119a: last ~10 ambient takeable gear names rolled into scenes,
+   *  newest last. Fed back into pickTakeableGearForScene as an exclude window
+   *  so adjacent tiles stop offering the same Rail Saber three times in a
+   *  ninety-second walk. */
+  recentTakeableGearNames?: string[];
+  /** OTA-1014 — location:noun keys of faction sigils already pried. PERMANENT — the
+   *  arb105 restock deliberately does not clear it; a faction's mark comes off
+   *  a place once, then the noun yields rubble coin. Closes the round-trip
+   *  sigil farm the OTA-1000 guaranteed-yield branch opened. */
+  salvagedSigilKeys?: string[];
+  /** OTA-1016 — how many times an agent has actually PITCHED offers. Keys the
+   *  category rotation; travel-count keying phase-locked circuit routes. */
+  offerPitchSeq?: number;
+  /** OTA-912 — distinct great-climb ids whose SUMMIT BOSS has been defeated.
+   *  Gates the one-time Skyreacher armor + Aether Collection Beacon grant, and at
+   *  size 5, using a beacon builds the Beacon Rifle (OTA-913). */
+  summitBossesDefeated?: string[];
+  /** OTA-912/913 — one-time flag: the Beacon Rifle (+ materials) has been built
+   *  from the five beacons. Prevents a re-build. (Legacy field name retained for
+   *  save compatibility.) */
+  skyreacherBoltcasterGranted?: boolean;
+  /** OTA-916 — building-tile keys ("loc:x:y") whose Aetherkin spawn roll has
+   *  already been resolved. enter/exit is free and doesn't move you, so without
+   *  this a home/shed re-rolls its 28% Aetherkin every entry — a faction-standing
+   *  + loot farm. One roll per structure; banked whether or not one spawned. */
+  aetherkinRolledBuildings?: string[];
   /** arb-fix — one-time make-good: a faction fused item the player should
    *  have received but didn't (the pre-fix faction catalyst never counted
    *  toward the gate). Granted once per save on load for dev names; this
@@ -1693,6 +1985,7 @@ export type ScreenName =
   | 'vendor'
   | 'actions'
   | 'contracts'
+  | 'world'
   | 'ending';
 
 export interface SaveState {

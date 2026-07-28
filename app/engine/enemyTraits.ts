@@ -7,6 +7,8 @@
 // a colon — "resist:slashing", "vulnerable:burn". Unknown ids are ignored,
 // so the catalog can drift ahead of code without breaking saves.
 
+import { canonicalDamageType } from './damageTypes';
+
 // arb-fix — flying / hovering enemies the dog can't reach (it can't jump
 // that high), and that ranged "+Nd6 against airborne enemies" weapons get a
 // bonus against. Primary signal is the explicit `aerial` trait; a name/type
@@ -70,12 +72,16 @@ export function traitDamageMultiplier(
   weaponDamageType: string | null | undefined,
 ): { multiplier: number; match: 'resist' | 'vulnerable' | 'normal' } {
   if (!traits || !weaponDamageType) return { multiplier: 1, match: 'normal' };
-  const wt = weaponDamageType.toLowerCase();
+  // OTA-827 [Group-K] — canonicalize both sides through the shared alias table so
+  // a `force` weapon matches a `resist:aetheric` trait and a `frost` weapon matches
+  // a `vulnerable:cold` trait (the two Core Guardians' authored cold traits now fire
+  // against the new frost weapons). Identity for a non-aliased type.
+  const wt = canonicalDamageType(weaponDamageType);
   for (const t of traits) {
     const [key, arg] = t.split(':');
     if (!arg) continue;
-    if (key === 'resist' && arg.toLowerCase() === wt) return { multiplier: 0.5, match: 'resist' };
-    if (key === 'vulnerable' && arg.toLowerCase() === wt) return { multiplier: 1.5, match: 'vulnerable' };
+    if (key === 'resist' && canonicalDamageType(arg) === wt) return { multiplier: 0.5, match: 'resist' };
+    if (key === 'vulnerable' && canonicalDamageType(arg) === wt) return { multiplier: 1.5, match: 'vulnerable' };
   }
   return { multiplier: 1, match: 'normal' };
 }
@@ -163,10 +169,30 @@ export function traitDodgeChance(traits: readonly string[] | undefined): number 
   if (!traits) return 0;
   let chance = 0;
   for (const t of traits) {
-    if (t === 'agile') chance = Math.max(chance, 0.25);
-    else if (t === 'quick') chance = Math.max(chance, 0.15);
+    // OTA-935 — trimmed (agile 0.25->0.18, quick 0.15->0.12) so a slippery foe slips the
+    // odd blow without stonewalling a long fight.
+    if (t === 'agile') chance = Math.max(chance, 0.18);
+    else if (t === 'quick') chance = Math.max(chance, 0.12);
   }
   return chance;
+}
+
+/** OTA-935 — a CRUSHING blow can't be twisted clear. A crit never dodges, and beating the
+ *  enemy's AC by DODGE_BEATEN_MARGIN or more always lands (no more "rolled 29, whiffed").
+ *  Only marginal hits face the (reduced) trait dodge chance. */
+export const DODGE_BEATEN_MARGIN = 8;
+export function enemyDodgesHit(
+  traits: readonly string[] | undefined,
+  attackTotal: number,
+  enemyAc: number,
+  isCrit: boolean,
+  rng: () => number = Math.random,
+): boolean {
+  if (isCrit) return false;
+  const chance = traitDodgeChance(traits);
+  if (chance <= 0) return false;
+  if (attackTotal - enemyAc >= DODGE_BEATEN_MARGIN) return false;
+  return rng() < chance;
 }
 
 /** Human-readable trait summary for the EnemyPanel. Shortens to badges

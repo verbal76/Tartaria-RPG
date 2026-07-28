@@ -1,4 +1,12 @@
 import { rollSalvagePool, isSalvageMaterial, __TEST_ONLY__ } from '../app/engine/salvagePools';
+import curiosData from '../app/data/relics/curios.json';
+
+// OTA-1005 — CURIOS: catalog-ABSENT oddments that refuel the Fusing Crucible. They
+// are not gear, food, or clues, so the bleed guard this suite exists to enforce
+// is unchanged — curios are simply exempt from the "is a catalog material" leg.
+const CURIO_NAMES = new Set(
+  (curiosData as { curios: { name: string }[] }).curios.map((c) => c.name),
+);
 
 describe('salvage yields MATERIALS ONLY (arb61, Piece B)', () => {
   const NOUNS = [
@@ -13,6 +21,9 @@ describe('salvage yields MATERIALS ONLY (arb61, Piece B)', () => {
       for (let i = 0; i < 60; i++) {
         const out = rollSalvagePool(noun, () => (i + 0.5) / 60);
         if (!out || !out.itemName) continue;
+        // OTA-1005 — a curio is the intended exception; everything else must still
+        // be a true catalog material (no gear / food / clue bleed).
+        if (CURIO_NAMES.has(out.itemName)) continue;
         expect(isSalvageMaterial(out.itemName)).toBe(true);
       }
     }

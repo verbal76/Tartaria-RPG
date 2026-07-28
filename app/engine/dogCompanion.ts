@@ -280,6 +280,34 @@ export function createDogCompanion(args: {
   };
 }
 
+// OTA-979 — the ONE way to answer "which inventory instance is the vest the dog
+// is wearing?". Owner: "dog vests don't show which one is equipped in the
+// inventory." The screen used to re-derive this ad hoc: the badge required
+// item.kind === 'dog_armor' exactly (fused/odd-kind vests fell through the
+// name fallback) and the slot label compared by NAME (broken the moment a
+// still-cooling Crucible vest got renamed by the settle). Resolution order:
+// exact instance id, then name match on anything that IS dog armor by kind
+// OR by uniqueStats.kind. Returns null when no dog / nothing worn / vest gone.
+export function wornDogVestInstanceId(player: {
+  dog?: { status?: string; equipped?: { vest?: string | null; vestId?: string | null } } | null;
+  inventory?: ReadonlyArray<{ id: string; name: string; kind?: string; quantity?: number; uniqueStats?: { kind?: string } }>;
+}): string | null {
+  const dog = player.dog;
+  if (!dog || dog.status === 'dead' || dog.status === 'abandoned') return null;
+  const vestName = dog.equipped?.vest ?? null;
+  const vestId = dog.equipped?.vestId ?? null;
+  const inv = player.inventory ?? [];
+  if (vestId) {
+    const byId = inv.find((it) => it.id === vestId && (it.quantity ?? 1) > 0);
+    if (byId) return byId.id;
+  }
+  if (!vestName) return null;
+  const isDogArmor = (it: { kind?: string; uniqueStats?: { kind?: string } }): boolean =>
+    it.kind === 'dog_armor' || it.uniqueStats?.kind === 'dog_armor';
+  const byName = inv.find((it) => isDogArmor(it) && it.name === vestName && (it.quantity ?? 1) > 0);
+  return byName?.id ?? null;
+}
+
 /** Pick a default fall-back name from the breed for players who skip
  *  the name stage. Three flavor names rotate per session. */
 export function defaultDogName(): string {
@@ -306,6 +334,10 @@ function dogProgressAwardFor(currentStat: number): number {
 }
 
 const DOG_LEVEL_UP_THRESHOLD = 100;
+// OTA-800 — hard training ceiling, mirroring the player's MAX_TRAINED_STAT
+// (statTraining.ts). Without it a dog stat trained forever (0.1/use at 22+), so
+// a companion could be ground past the player and past sane damage/AC scaling.
+const DOG_MAX_TRAINED_STAT = 30;
 
 export interface DogTrainResult {
   dog: DogCompanion;
@@ -321,18 +353,21 @@ export function trainDogStat(
 ): DogTrainResult {
   if (!success) return { dog, leveled: null };
   const baseStat = dog.stats[stat];
+  // OTA-800 — ceiling reached: stop training (see DOG_MAX_TRAINED_STAT).
+  if (baseStat >= DOG_MAX_TRAINED_STAT) return { dog, leveled: null };
   const award = dogProgressAwardFor(baseStat);
   if (award <= 0) return { dog, leveled: null };
   const prev = dog.statProgress[stat];
   let progress = prev + award;
   let next = baseStat;
   let leveled: DogTrainResult['leveled'] = null;
-  while (progress >= DOG_LEVEL_UP_THRESHOLD) {
+  while (progress >= DOG_LEVEL_UP_THRESHOLD && next < DOG_MAX_TRAINED_STAT) {
     progress -= DOG_LEVEL_UP_THRESHOLD;
     const before = next;
     next = before + 1;
     if (!leveled) leveled = { stat, from: before, to: next };
   }
+  if (next >= DOG_MAX_TRAINED_STAT) progress = 0;
   return {
     dog: {
       ...dog,

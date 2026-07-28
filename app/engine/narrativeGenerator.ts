@@ -10,7 +10,7 @@ import type {
   PlayerCharacter,
   WorldMemory,
 } from './types';
-import { withArticleCap } from './grammar';
+import { withArticle, withArticleCap } from './grammar';
 import { pick, chance, rotatingPick } from './rng';
 import openings from '../data/events/openings.json';
 // OTA-298 — mood, intent, location, and scene flavor JSON files are
@@ -634,8 +634,16 @@ const COMBAT_REMARKS = [
   `"One of you ends this exchange standing," the Arbiter says, eyes on the {enemy}. "Cast the vote."`,
 ];
 
+// OTA-813 — a boss / named Guardian is a PROPER NOUN; lowercasing it reads wrong
+// ("the heir atalan-drowned is patient"). Generic creatures still lowercase cleanly
+// ("the mud boar"). Keyed off the `boss` flag (Core Guardians + boss-gate spawns all
+// carry it), so the fix is scoped to exactly the named threats.
+export function combatEnemyLabel(enemy: Pick<Enemy, 'name' | 'boss'>): string {
+  return enemy.boss ? enemy.name : enemy.name.toLowerCase();
+}
+
 function combatRemark(enemy: Enemy): string {
-  return rotatingPick(COMBAT_REMARKS, 'arbiter.combat.remark').replace('{enemy}', enemy.name.toLowerCase());
+  return rotatingPick(COMBAT_REMARKS, 'arbiter.combat.remark').replace('{enemy}', combatEnemyLabel(enemy));
 }
 
 // arb136 — cooldown counter for the unresolved-hook "nag" callback. Without it the
@@ -826,7 +834,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
       `The Arbiter watches you and the ${n} both. "Your move."`,
       `"What you make of the ${n} is on you," the Arbiter says.`,
       `The Arbiter considers the ${n}. "Name your intent and I'll grade it."`,
-      `"You've got a ${n} and a question," the Arbiter says. "Pair them."`,
+      `"You've got ${withArticle(n)} and a question," the Arbiter says. "Pair them."`,
       `"The ${n} won't act for you," the Arbiter says, dry. "Choose a verb."`,
       `The Arbiter glances between you and the ${n}. "Decide while it's still yours to."`,
       `"I will know what you mean when you act on the ${n}," the Arbiter says.`,
@@ -1057,7 +1065,7 @@ export function buildSoftArbiterFallback(ctx: SoftArbiterContext): string {
 
   if (enemy) {
     return pick([
-      `The Arbiter does not look away from the ${enemy.name.toLowerCase()}. "Decide quickly. It will not wait."`,
+      `The Arbiter does not look away from the ${combatEnemyLabel(enemy)}. "Decide quickly. It will not wait."`,
       `"You can fight, hide, or speak," the Arbiter says low. "${enemy.name} is already deciding for itself."`,
     ]);
   }
@@ -1121,7 +1129,7 @@ export function buildArbiterSceneIntro(ctx: SceneIntroContext): string {
   // Combat scenes stay tight on the threat — no identity / timeline drift
   // while a hostile is staged.
   if (enemy) {
-    return pick(ARBITER_COMBAT_INTROS).replace('{enemyName}', enemy.name.toLowerCase());
+    return pick(ARBITER_COMBAT_INTROS).replace('{enemyName}', combatEnemyLabel(enemy));
   }
 
   // ~12% — timeline callback. Builds dynamically from milestones and the

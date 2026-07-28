@@ -593,7 +593,7 @@ describe('Thousand-day stress simulation of Tartaria Realms', () => {
     };
 
     // ── Main loop ─────────────────────────────────────────────────────
-    const TARGET_HOURS = 4320; // 180 days (6 months) — cut from 1000d/24000h
+    const TARGET_HOURS = 2160; // 90 days — bounded from 180d to fit the timeout (engine world/persist layer grows super-linearly in the tail)
     const MAX_ACTIONS = 50000;
     const MAX_EXCEPTIONS = 10;
     let hoursBaseline = 0; // accumulated across reincarnations

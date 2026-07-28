@@ -36,7 +36,7 @@ const channelColors: Record<LogChannel, string> = {
   system: WORLD_COLOR,
   combat: COMBAT_COLOR,
   reward: REWARD_COLOR,
-  cognitive: '#7a705c',
+  cognitive: '#a2977b',
   debug: '#605648',
   // OTA 202 — designer notes from the 📝 button. Distinct accent so
   // a glance distinguishes them from world prose during a long

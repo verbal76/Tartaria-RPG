@@ -85,8 +85,10 @@ describe('useHealBatch store action (OTA-693)', () => {
   it('SELF: applies N kits at once, clamped to missing HP, spends N', async () => {
     const store = await freshGame();
     const p = store.getState().player!;
-    // First Aid Kit heals 25. Set hp 30/ (hpMax). gap = hpMax-30.
-    store.setState({ player: { ...p, hp: 30, inventory: [...p.inventory, firstAidKit('fak', 5)] } });
+    // First Aid Kit heals 25. Pin hpMax to 100 so the "hp 30, positive gap"
+    // premise holds regardless of the race's rolled hpMax (some starting races
+    // roll hpMax < 30, which left hp:30 ABOVE max and flaked the <= maxHp check).
+    store.setState({ player: { ...p, hp: 30, hpMax: 100, inventory: [...p.inventory, firstAidKit('fak', 5)] } });
     const maxHp = store.getState().player!.hpMax;
     const gap = maxHp - 30;
     const n = healBatchCount(25, gap, 5);
@@ -119,5 +121,25 @@ describe('useHealBatch store action (OTA-693)', () => {
     store.setState({ player: { ...p, hp: p.hpMax - 10, inventory: [...p.inventory, firstAidKit('fak', 9)] } });
     store.getState().useHealBatch('First Aid Kit', 'self', 9); // 9*25 way over the 10 gap
     expect(store.getState().player!.hp).toBe(p.hpMax);       // capped, not over
+  });
+
+  it('HEAL TO FULL: ceil(gap/perItem) kits reach exactly max, last kit clamped', async () => {
+    // #4 — the "Heal to full" button uses ceil(gap / perItem). When the gap is not a
+    // multiple of the per-kit heal, the no-waste (floor) count stops short; the ceil
+    // count tops off in one tap, the last kit's surplus clamped at hpMax.
+    const store = await freshGame();
+    const p = store.getState().player!;
+    const maxHp = 100; // pin so hp = maxHp - 55 stays positive regardless of the rolled hpMax
+    const gap = 55; // not a multiple of 25
+    store.setState({ player: { ...p, hp: maxHp - gap, hpMax: maxHp, inventory: [...p.inventory, firstAidKit('fak', 5)] } });
+    const noWaste = healBatchCount(25, gap, 5);           // floor(55/25) = 2 → stops at -5 short
+    const toFull = Math.min(5, Math.ceil(gap / 25));       // ceil(55/25) = 3 → reaches full
+    expect(noWaste).toBe(2);
+    expect(toFull).toBe(3);
+
+    store.getState().useHealBatch('First Aid Kit', 'self', toFull);
+    const after = store.getState().player!;
+    expect(after.hp).toBe(maxHp);                          // exactly full, not over
+    expect(after.inventory.find((i) => i.id === 'fak')?.quantity).toBe(2); // spent 3
   });
 });

@@ -76,7 +76,7 @@ describe('OTA-616 — turn a faction fetch quest in from its map anchor', () => 
     // proximity makes this an IN-PERSON turn-in → FULL 35 TC (not the couriered
     // half). And the quest left the active list — the turn-in fired off the
     // marker-derived id.
-    expect(after.tc).toBe(tcBefore + 35);
+    expect(after.tc).toBeGreaterThanOrEqual(tcBefore + 35); // B2 — full pay + long-haul bonus
     expect((after.activeFactionQuests ?? []).some((q) => q.id === 'fq_reclaimers_starter')).toBe(false);
   });
 
@@ -101,7 +101,7 @@ describe('OTA-616 — turn a faction fetch quest in from its map anchor', () => 
 
     const after = useGameStore.getState();
     // Auto-submitted at FULL (35 TC) and cleared from the active list...
-    expect(after.player!.tc).toBe(tcBefore + 35);
+    expect(after.player!.tc).toBeGreaterThanOrEqual(tcBefore + 35); // B2 — full pay + long-haul bonus
     expect((after.player!.activeFactionQuests ?? []).some((q) => q.id === 'fq_reclaimers_starter')).toBe(false);
     // ...with a completion popup carrying the mission name + reward total.
     expect(after.pendingWhisperComplete).toBeTruthy();

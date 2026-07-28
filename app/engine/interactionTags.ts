@@ -163,6 +163,44 @@ export function getInteractionTags(noun: string): Set<InteractionTag> {
 }
 
 export function isClimbable(noun: string): boolean {
+  // OTA-993 — #113: great-climb props are checked FIRST — "the Great Fang of
+  // Zharak" is BOTH the climb and a Legendary weapon row, and the climb
+  // outranks the item-name collision below.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isGreatClimbNoun, isGreatClimbExactNoun } = require('./greatClimbs');
+  // OTA-1016 — landmark precedence holds only when the noun IS the landmark
+  // (exact authored noun). A TOKEN match ("Skyreacher Map 2 of 5 — Asgardar
+  // Spire" contains "asgardar") must not outrank the catalog exclusion below,
+  // or bought maps become climbable paper — #113 reopened through the very
+  // fix that closed it. The Great Fang of Zharak, weapon AND landmark by
+  // name, still climbs via the exact form; token-level props resume below,
+  // after the catalog has had its say.
+  if (isGreatClimbExactNoun(noun)) return true;
+  // OTA-993 — #113: a takeable ITEM lying in the scene is never a wall (owner:
+  // "make sure it is something actually climbable first"). "Rail Saber"
+  // word-matched the climbable patterns and became a tier-1 perch with
+  // summit loot. Exclusion is by EXACT full-name catalog match only, so
+  // structural nouns that merely contain an item word ("rope bridge",
+  // plain "rope") keep their grip.
+  {
+    // OTA-1016 — normalize the curly apostrophe: narration and LLM rephrases emit
+    // U+2019, and "Reclaimer’s Rope" must match the catalog either way.
+    const n = (noun ?? '').trim().toLowerCase().replace(/’/g, "'");
+    if (n) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { findWeaponByName, findArmorByName, findGearByName, findExplorationItemByName } = require('./crafting');
+      for (const look of [findWeaponByName, findArmorByName, findGearByName, findExplorationItemByName]) {
+        try {
+          const row = look(n);
+          if (row && String(row.name).toLowerCase() === n) return false;
+        } catch { /* catalog unavailable — fall through to the tag rules */ }
+      }
+    }
+  }
+  // OTA-1016 — token-level great-climb props (scene nouns like "great obsidian")
+  // resume their precedence here, once the exact-catalog exclusion has ruled
+  // out purchasable items that merely CONTAIN a landmark token.
+  if (isGreatClimbNoun(noun)) return true;
   if (getInteractionTags(noun).has('climbable')) return true;
   // 2026-05-24 — curated climbable spawns (climbableSpawns.ts) carry
   // nouns like "ruined skyscraper" / "petrified mud wave" that don't

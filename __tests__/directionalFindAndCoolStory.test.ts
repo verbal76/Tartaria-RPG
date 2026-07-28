@@ -34,26 +34,35 @@ describe('OTA-216 — investigate outcome kinds split', () => {
     return counts;
   }
 
-  it('investigate produces directional_find outcomes (~18% of total)', () => {
+  // Design math (rollAreaSearch, intent:'investigate', no bonus/loot):
+  //   nothing 0.10 · find +0.07 · tc +0.08  ⇒  hook FAMILY = 0.75 of total.
+  // The family then splits 50/30/20:
+  //   plain hook       0.75 × 0.50 = 0.375 of total
+  //   directional_find 0.75 × 0.30 = 0.225 of total
+  //   cool_story       0.75 × 0.20 = 0.150 of total
+  // (The old "60% hook share / ~30% hook" figures predate arb61, which cut
+  // investigate's item drop to ~7% and raised the hook family to 0.75.)
+  // Bands are ±~5σ at n=2000 (σ≈0.01): wide enough to never flake a BLOCKING
+  // gate, tight enough that a real regression in the split still trips them.
+  it('investigate produces directional_find outcomes (~22.5% of total)', () => {
     const c = tally(2000, 'investigate');
-    // 60% hook share * 30% = ~18%. Accept 10–26% slack.
     const rate = c.directional_find / 2000;
-    expect(rate).toBeGreaterThanOrEqual(0.10);
-    expect(rate).toBeLessThanOrEqual(0.26);
+    expect(rate).toBeGreaterThanOrEqual(0.16);
+    expect(rate).toBeLessThanOrEqual(0.29);
   });
 
-  it('investigate produces cool_story outcomes (~12% of total)', () => {
+  it('investigate produces cool_story outcomes (~15% of total)', () => {
     const c = tally(2000, 'investigate');
     const rate = c.cool_story / 2000;
-    expect(rate).toBeGreaterThanOrEqual(0.06);
-    expect(rate).toBeLessThanOrEqual(0.18);
+    expect(rate).toBeGreaterThanOrEqual(0.09);
+    expect(rate).toBeLessThanOrEqual(0.21);
   });
 
-  it('investigate still produces scene-hook outcomes (~30% of total)', () => {
+  it('investigate still produces scene-hook outcomes (~37.5% of total)', () => {
     const c = tally(2000, 'investigate');
     const rate = c.hook / 2000;
-    expect(rate).toBeGreaterThanOrEqual(0.22);
-    expect(rate).toBeLessThanOrEqual(0.38);
+    expect(rate).toBeGreaterThanOrEqual(0.32);
+    expect(rate).toBeLessThanOrEqual(0.43);
   });
 
   it('default search does NOT produce directional_find or cool_story', () => {

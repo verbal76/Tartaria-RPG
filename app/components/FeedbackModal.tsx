@@ -201,8 +201,8 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
       <TouchableWithoutFeedback onPress={handleCancel}>
         <KeyboardAvoidingView style={styles.scrim} behavior="padding">
           <TouchableWithoutFeedback>
-            <View style={styles.card}>
-              <Text style={styles.title}>DESIGNER NOTE</Text>
+            <View style={styles.card} accessibilityViewIsModal={true}>
+              <Text style={styles.title} accessibilityRole="header">DESIGNER NOTE</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
                 Drops straight into the game log on the `feedback`
@@ -257,6 +257,7 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={handleCancel}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
                 </Pressable>
@@ -269,6 +270,8 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
                   ]}
                   onPress={handleSave}
                   disabled={!text.trim()}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: !text.trim() }}
                 >
                   <Text style={styles.btnTextPrimary}>SAVE NOTE</Text>
                 </Pressable>
@@ -306,7 +309,7 @@ const styles = StyleSheet.create({
   statusDotLive: { backgroundColor: '#9ec96a' },
   statusDotIdle: { backgroundColor: '#3a342c' },
   statusDotError: { backgroundColor: '#c97a5f' },
-  statusText: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
+  statusText: { color: '#a2977b', fontSize: 11, letterSpacing: 1 },
   input: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

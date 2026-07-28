@@ -671,6 +671,8 @@ export function TitleScreen() {
         onPress={() => onSlotTap(item)}
         activeOpacity={0.7}
         disabled={!bootGateOpen}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: !bootGateOpen }}
       >
         <View style={styles.slotHead}>
           <View style={styles.slotNameRow}>
@@ -738,6 +740,7 @@ export function TitleScreen() {
                 void copyDeadLog(item);
               }}
               activeOpacity={0.7}
+              accessibilityRole="button"
             >
               <Text style={styles.copyLogText}>
                 {(() => {
@@ -766,6 +769,7 @@ export function TitleScreen() {
                 void shareDeadLog(item);
               }}
               activeOpacity={0.7}
+              accessibilityRole="button"
             >
               <Text style={styles.shareLogText}>
                 {sharedSlotId === item.slotId ? '✓ SHARED' : 'SHARE'}
@@ -783,8 +787,10 @@ export function TitleScreen() {
         source={require('../../assets/icon.png')}
         style={styles.crest}
         resizeMode="contain"
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no-hide-descendants"
       />
-      <Text style={styles.title}>TARTARIA</Text>
+      <Text style={styles.title} accessibilityRole="header">TARTARIA</Text>
       <Text style={styles.subtitle}>REALMS</Text>
       <Text style={[styles.flavor, { color: mutedColor }]}>A procedural narrative of the buried world.</Text>
       {(() => {
@@ -904,12 +910,14 @@ export function TitleScreen() {
               <TouchableOpacity
                 style={styles.playStoreNagPrimary}
                 onPress={openPlayStore}
+                accessibilityRole="button"
               >
                 <Text style={styles.playStoreNagPrimaryText}>OPEN PLAY STORE</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.playStoreNagDismiss}
                 onPress={() => setPlayStoreNagDismissed(true)}
+                accessibilityRole="button"
               >
                 <Text style={styles.playStoreNagDismissText}>later</Text>
               </TouchableOpacity>
@@ -953,6 +961,7 @@ export function TitleScreen() {
               onPress={() => {
                 void Linking.openURL(url).catch(() => {});
               }}
+              accessibilityRole="button"
             >
               <Text style={styles.apkBannerInstallText}>
                 ⬇ OPEN RELEASE PAGE
@@ -966,6 +975,7 @@ export function TitleScreen() {
             <TouchableOpacity
               style={styles.apkBannerCopyBtn}
               activeOpacity={0.7}
+              accessibilityRole="button"
               onPress={() => {
                 void Clipboard.setStringAsync(url).then(() => {
                   setApkUrlCopied(true);
@@ -986,6 +996,8 @@ export function TitleScreen() {
           style={styles.updateBanner}
           activeOpacity={0.8}
           disabled={applyingOTA !== null}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: applyingOTA !== null }}
           // OTA-405 — the staged bundle applies AUTOMATICALLY the next time
           // the app is opened (expo ON_LOAD → boot-front apply, before any
           // native module starts). So this tap is optional: "apply now"
@@ -1036,6 +1048,8 @@ export function TitleScreen() {
               onPress={() => setScreen('character_creation')}
               activeOpacity={0.7}
               disabled={!bootGateOpen}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !bootGateOpen }}
             >
               <Text style={styles.primaryBtnText}>
                 {bootGateOpen ? 'New Tartarian' : `${bootGateReason}`}
@@ -1055,6 +1069,8 @@ export function TitleScreen() {
             <TouchableOpacity
               style={[styles.secondaryBtn, (applyingOTA !== null || modelsLoading) && styles.btnDisabled]}
               disabled={applyingOTA !== null || modelsLoading}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: applyingOTA !== null || modelsLoading }}
               onPress={() => {
                 // OTA-294 — should be unreachable because disabled=true
                 // when modelsLoading, but guard defensively. Killing
@@ -1125,6 +1141,7 @@ export function TitleScreen() {
         onPress={() => setScreen('about')}
         activeOpacity={0.7}
         hitSlop={10}
+        accessibilityRole="button"
         accessibilityLabel="Settings"
       >
         <Text style={styles.gear}>⚙</Text>
@@ -1153,6 +1170,7 @@ export function TitleScreen() {
             style={styles.inviteBtn}
             activeOpacity={0.7}
             onPress={() => setInviteOpen(true)}
+            accessibilityRole="button"
           >
             <Text style={styles.inviteBtnText}>
               {inviteSent ? '✓ SENT' : 'INVITE PLAYTESTER'}
@@ -1168,6 +1186,7 @@ export function TitleScreen() {
             style={styles.bugReportBtn}
             activeOpacity={0.7}
             onPress={() => setBugReportOpen(true)}
+            accessibilityRole="button"
           >
             <Text style={styles.bugReportBtnText}>
               {bugReportSent ? '✓ COPIED' : 'REPORT BUG'}
@@ -1189,6 +1208,7 @@ export function TitleScreen() {
               style={styles.exitBtn}
               activeOpacity={0.7}
               onPress={() => setPendingAction({ kind: 'exit' })}
+              accessibilityRole="button"
             >
               <Text style={styles.exitBtnText}>EXIT GAME</Text>
             </TouchableOpacity>
@@ -1330,11 +1350,11 @@ const styles = StyleSheet.create({
   crest: { width: 180, height: 180, alignSelf: 'center', marginBottom: 8 },
   title: { fontSize: 36, color: '#e6d8b3', letterSpacing: 8, fontWeight: '800', textAlign: 'center' },
   subtitle: { fontSize: 14, color: '#c9a86a', letterSpacing: 14, marginTop: -4, textAlign: 'center' },
-  flavor: { color: '#7a705c', fontSize: 12, marginTop: 10, fontStyle: 'italic', textAlign: 'center', marginBottom: 14 },
+  flavor: { color: '#a2977b', fontSize: 12, marginTop: 10, fontStyle: 'italic', textAlign: 'center', marginBottom: 14 },
   list: { flex: 1 },
   listContent: { paddingVertical: 4 },
-  listLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 2, marginBottom: 6 },
-  empty: { color: '#7a705c', fontStyle: 'italic', fontSize: 12, textAlign: 'center', marginTop: 24, paddingHorizontal: 16 },
+  listLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 2, marginBottom: 6 },
+  empty: { color: '#a2977b', fontStyle: 'italic', fontSize: 12, textAlign: 'center', marginTop: 24, paddingHorizontal: 16 },
   slot: {
     backgroundColor: '#13110f',
     borderColor: '#3a342c',
@@ -1358,8 +1378,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 1,
   },
-  slotTime: { color: '#7a705c', fontSize: 11 },
-  slotMeta: { color: '#7a705c', fontSize: 12, marginTop: 2 },
+  slotTime: { color: '#a2977b', fontSize: 11 },
+  slotMeta: { color: '#a2977b', fontSize: 12, marginTop: 2 },
   // v2.4.1 (OTA 036) — RESUME OBJECTIVE line on each slot card.
   // Warm-gold to distinguish from the gray meta rows + signal it's
   // the main-quest beat.
@@ -1402,7 +1422,7 @@ const styles = StyleSheet.create({
   buildMarker: { fontSize: 11, fontWeight: '800', textAlign: 'center', marginBottom: 8, letterSpacing: 3 },
   // v2.4.1 (OTA 043) — completion-badges row styles.
   badgesContainer: { marginBottom: 8, paddingHorizontal: 8 },
-  badgesTag: { color: '#7a705c', fontSize: 10, letterSpacing: 2, textAlign: 'center', marginBottom: 6 },
+  badgesTag: { color: '#a2977b', fontSize: 10, letterSpacing: 2, textAlign: 'center', marginBottom: 6 },
   badgesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 4 },
   badge: {
     flexDirection: 'row',
@@ -1578,7 +1598,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   playStoreNagDismissText: {
-    color: '#7a705c',
+    color: '#a2977b',
     fontSize: 11,
     fontStyle: 'italic',
   },
@@ -1760,7 +1780,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   kokoroBannerText: { color: '#c9a86a', fontSize: 12, letterSpacing: 1 },
-  kokoroBannerProgress: { color: '#7a705c', fontSize: 11, marginTop: 2 },
+  kokoroBannerProgress: { color: '#a2977b', fontSize: 11, marginTop: 2 },
 });
 
 // Surfaces the bundled-voice download state on the title screen so
@@ -1829,7 +1849,7 @@ function EndingBadgesRow(): React.ReactElement | null {
           const [factionId, ending] = id.split(':');
           const faction = FACTION_NAMES_FOR_BADGES[factionId ?? ''] ?? factionId;
           const glyph = ENDING_GLYPH[ending ?? ''] ?? '◯';
-          const color = ENDING_COLOR[ending ?? ''] ?? '#7a705c';
+          const color = ENDING_COLOR[ending ?? ''] ?? '#a2977b';
           return (
             <View key={id} style={[styles.badge, { borderColor: color }]}>
               <Text style={[styles.badgeGlyph, { color }]}>{glyph}</Text>
@@ -1883,6 +1903,7 @@ function LastCrashLine(): React.ReactElement | null {
       }}
       activeOpacity={0.7}
       style={lastCrashStyles.pill}
+      accessibilityRole="button"
     >
       <Text style={lastCrashStyles.title}>LAST CRASH · {crash.stage} · {ageMin}m ago (tap to dismiss)</Text>
       <Text style={lastCrashStyles.message}>{crash.message}</Text>
@@ -1940,13 +1961,14 @@ function CopyCrashedSaveLine(): React.ReactElement | null {
         ⎘ CRASHED SAVE CAPTURED · {capture.stage} · {ageMin}m ago · {bytes} bytes
       </Text>
       <View style={crashSaveStyles.row}>
-        <TouchableOpacity onPress={() => void doCopy()} activeOpacity={0.7} style={crashSaveStyles.btn}>
+        <TouchableOpacity onPress={() => void doCopy()} activeOpacity={0.7} style={crashSaveStyles.btn} accessibilityRole="button">
           <Text style={crashSaveStyles.btnText}>{copied ? '✓ COPIED' : 'COPY CRASHED SAVE'}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => { void clearCrashSave(); setCapture(null); }}
           activeOpacity={0.7}
           style={[crashSaveStyles.btn, crashSaveStyles.btnGhost]}
+          accessibilityRole="button"
         >
           <Text style={crashSaveStyles.btnText}>DISMISS</Text>
         </TouchableOpacity>

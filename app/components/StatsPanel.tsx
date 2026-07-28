@@ -4,9 +4,12 @@ import type { PlayerCharacter } from '../engine/types';
 import racesData from '../data/races/races.json';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { coatedDisplayName } from '../engine/weaponCoating';
-import { ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
+import { ARMOR_SLOTS, effectiveStats, aethericVisionEquipped, trimStandingAc } from '../engine/equipment';
+import { playerPowerScore, powerMatchup } from '../engine/powerRating';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
+import { livingEscortPools } from '../engine/escort';
+import { useReduceMotion } from '../state/accessibility';
 
 // OTA-214 — Aetheric Vision Lens active indicator. Pure presence
 // readout: when the player has any item granting the detect_aether
@@ -15,18 +18,11 @@ import { findFactionQuestById } from '../engine/factionQuests';
 // Without this the lens worked silently and the player had no way
 // to verify it was active beyond the rare OTA-200 hook narration.
 function AethericVisionBadge({ player }: Props) {
+  // OTA-927 — the badge tracks the EQUIPPED Lens slot (equip-gated), not mere carry.
+  // Depends on equipped (the slot) + inventory (resolveEquippedItem reads the instance).
   const active = React.useMemo(() => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { aethericVisionActive } = require('../engine/itemEffect');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
-      return !!aethericVisionActive(
-        player.inventory.map((i) => i.name),
-        [findExplorationItemByName, findGearByName, findMaterialByName],
-      );
-    } catch { return false; }
-  }, [player.inventory]);
+    try { return !!aethericVisionEquipped(player); } catch { return false; }
+  }, [player.equipped, player.inventory]);
   if (!active) return null;
   return (
     <Text style={lensBadgeStyle.badge}>◉ AETHERIC LENS · scanning</Text>
@@ -79,7 +75,7 @@ const coresBadgeStyle = StyleSheet.create({
   badge: { color: '#d8b46a', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginTop: 3 },
 });
 
-interface Props { player: PlayerCharacter; }
+interface Props { player: PlayerCharacter; enemyPower?: number; }
 
 // OTA-632 — health-tinted player card. The HP readout is a tiny number in the
 // top-left card; a playtester died (broken-ladder fall) partly because it's so
@@ -126,7 +122,7 @@ const HP_PULSE_FALL_MS = 320;    // settle slower — can't be missed
 const HP_PULSE_MAX_OPACITY = 0.45;
 const HP_PULSE_COLOR = 'rgb(220, 64, 52)';
 
-export function StatsPanel({ player }: Props) {
+export function StatsPanel({ player, enemyPower }: Props) {
   const race = (racesData as { id: string; name: string }[]).find((r) => r.id === player.raceId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
   // OTA-632 — HP fraction drives the card tint + HP-number colour.
@@ -139,7 +135,16 @@ export function StatsPanel({ player }: Props) {
   const animFrac = React.useRef(new Animated.Value(hpFrac)).current;
   const pulse = React.useRef(new Animated.Value(0)).current;
   const prevHp = React.useRef(player.hp);
+  // OTA-898 (SA-6) — reduce-motion: snap the HP bar to its new level and skip
+  // the red damage-flash entirely (the number still updates; no motion).
+  const reduceMotion = useReduceMotion();
   React.useEffect(() => {
+    if (reduceMotion) {
+      animFrac.setValue(hpFrac);
+      pulse.setValue(0);
+      prevHp.current = player.hp;
+      return;
+    }
     Animated.timing(animFrac, { toValue: hpFrac, duration: HP_FADE_MS, useNativeDriver: false }).start();
     if (player.hp < prevHp.current) {
       pulse.stopAnimation();
@@ -151,7 +156,7 @@ export function StatsPanel({ player }: Props) {
     }
     prevHp.current = player.hp;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [player.hp, player.hpMax]);
+  }, [player.hp, player.hpMax, reduceMotion]);
   // Card background follows the animated fraction across the full gradient.
   const animBg = React.useMemo(
     () => animFrac.interpolate({
@@ -176,11 +181,34 @@ export function StatsPanel({ player }: Props) {
     if (!name) continue;
     armorAc += resolveDisplayArmorByName(name, player.inventory)?.acBonus ?? 0;
   }
-  const effectiveAc = player.ac + armorAc;
+  // OTA-947 — show the trimmed standing AC so the panel matches what combat resolves against.
+  const effectiveAc = trimStandingAc(player.ac + armorAc);
 
   // Stats with accessory + armor bonuses folded in so the player sees the
   // numbers combat will actually use.
   const eff = effectiveStats(player);
+  // OTA-928 — the player's Power rating (best combat stat + weapon avg + AC + HP/10),
+  // shown top-right; faces each enemy's Power on its card as a quick matchup gauge.
+  const pwrRating = playerPowerScore(player);
+  // OTA-930 — colour the player's OWN Power badge by the current-target matchup so a
+  // fight you dominate lights your number green (gold = even, red = outmatched). Neutral
+  // gold out of combat (no enemyPower passed). Mirrors the colour on the enemy's badge.
+  const playerMatch = typeof enemyPower === 'number' ? powerMatchup(pwrRating, enemyPower) : null;
+  // OTA-929 — flash the UP/DOWN movement of Power when it changes (swapping your main
+  // weapon, upgrading armour, a stat tick, a buff), so a gear choice gives instant
+  // "did that help?" feedback. Shows the signed delta for ~2.5s, then fades.
+  const [powerDelta, setPowerDelta] = React.useState<number | null>(null);
+  const prevPowerRef = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    const prev = prevPowerRef.current;
+    prevPowerRef.current = pwrRating;
+    if (prev !== null && prev !== pwrRating) {
+      setPowerDelta(pwrRating - prev);
+      const t = setTimeout(() => setPowerDelta(null), 2500);
+      return () => clearTimeout(t);
+    }
+    return undefined;
+  }, [pwrRating]);
 
   // Compose a single-line summary of every filled slot so the panel
   // stays compact even with eight slots tracked.
@@ -217,6 +245,19 @@ export function StatsPanel({ player }: Props) {
   // character box."
   const golemShows = !!player.golem && player.golem.hp > 0;
 
+  // OTA-938 — a downed dog (benched at 0 HP, bleed-out clock running) shows a live
+  // "⏳ Nh — feed to save" countdown by its name instead of the plain HP, so the 24h
+  // window is impossible to miss. Healthy/climb-benched dogs keep the normal HP readout.
+  // 24 = gameStore's DOG_BLEED_OUT_HOURS (hardcoded to keep this component store-free).
+  const DOG_BLEED_OUT_HOURS = 24;
+  const dogDowned = !!player.dog
+    && player.dog.status === 'waiting_at_base'
+    && player.dog.hp <= 0
+    && player.dog.downedAtHour != null;
+  const dogHoursLeft = dogDowned
+    ? Math.max(0, Math.ceil(DOG_BLEED_OUT_HOURS - ((player.hoursElapsed ?? 0) - (player.dog!.downedAtHour ?? 0))))
+    : null;
+
   return (
     <Animated.View style={[styles.container, { backgroundColor: animBg }]}>
       {/* OTA-633 — damage pulse: a red wash that flashes in fast and fades out,
@@ -224,11 +265,32 @@ export function StatsPanel({ player }: Props) {
       <Animated.View pointerEvents="none" style={[styles.pulseOverlay, { opacity: pulseOpacity }]} />
       <View style={styles.nameRow}>
         <Text style={styles.name} numberOfLines={1}>{player.name}</Text>
-        {dogShows && player.dog ? (
-          <Text style={styles.dogName} numberOfLines={1}>
-            {player.dog.name} ({player.dog.hp}/{player.dog.hpMax})
+        <View style={styles.nameRowRight}>
+          {/* OTA-928 — the player's Power rating, top-right corner; faces each enemy's
+              Power (top-left of its card) across the HUD gap as a quick matchup gauge. */}
+          <Text style={[styles.powerBadge, playerMatch === 'favored' ? styles.powerFavored : playerMatch === 'danger' ? styles.powerDanger : null]} accessibilityLabel={`Your power rating ${pwrRating}`}>
+            ◆ {pwrRating} PWR
           </Text>
-        ) : null}
+          {powerDelta !== null && powerDelta !== 0 && (
+            <Text
+              style={[styles.powerDelta, powerDelta > 0 ? styles.powerUp : styles.powerDown]}
+              accessibilityLabel={`Power ${powerDelta > 0 ? 'up' : 'down'} ${Math.abs(powerDelta)}`}
+            >
+              {powerDelta > 0 ? `▲ +${powerDelta}` : `▼ ${powerDelta}`}
+            </Text>
+          )}
+          {dogShows && player.dog ? (
+            dogDowned ? (
+              <Text style={styles.dogDown} numberOfLines={1} accessibilityLabel={`${player.dog.name} is down — about ${dogHoursLeft} hours to feed before it dies`}>
+                {player.dog.name} ⏳ {dogHoursLeft}h — feed to save
+              </Text>
+            ) : (
+              <Text style={styles.dogName} numberOfLines={1}>
+                {player.dog.name} ({player.dog.hp}/{player.dog.hpMax})
+              </Text>
+            )
+          ) : null}
+        </View>
       </View>
       {golemShows && player.golem ? (
         <View style={styles.golemRow}>
@@ -237,14 +299,29 @@ export function StatsPanel({ player }: Props) {
           </Text>
         </View>
       ) : null}
+      {/* OTA-985 — escort party the player is protecting: ONE row per active escort
+          (shared pool), color by remaining fraction. Parked parties are hidden. */}
+      {livingEscortPools(player.activeFactionQuests).map((p, i) => {
+        const frac = p.hpMax > 0 ? p.hp / p.hpMax : 0;
+        const col = frac <= 0.34 ? '#e07a5f' : frac <= 0.67 ? '#d9b15f' : '#7fae8a';
+        return (
+          <Text key={`esc_${i}`} style={[styles.escortName, { color: col }]} numberOfLines={1}>
+            ↳ {p.label} ({p.hp}/{p.hpMax})
+          </Text>
+        );
+      })}
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
+      {/* OTA-744 — vitals row. TC moved OUT to its own wallet line below: with 5
+          cells a 3-digit HP ("109/109") overflowed its 1/5 slot and wrapped a
+          digit onto a second line ("65/10" + a stray "9"). Four vitals give each
+          cell more room, and the values now shrink-to-fit instead of wrapping. */}
       <View style={styles.row}>
         <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
         <Stat label="STA" value={`${player.stamina}/${player.staminaMax}`} />
         <Stat label="AC" value={`${effectiveAc}`} />
-        <Stat label="TC" value={`${player.tc}`} />
         <Stat label="Corr" value={`${player.corruption}`} />
       </View>
+      <Text style={styles.wallet} numberOfLines={1}>◈ {player.tc} TC</Text>
       <AethericVisionBadge player={player} />
       <AetherBuffBadge player={player} />
       <CoresProgressBadge player={player} />
@@ -295,14 +372,28 @@ function formatStat(base: number, effective: number): string {
 
 function Stat({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) {
   return (
+    // OTA-746 — all vitals share one flex:1 cell width, so the four columns are
+    // equidistant. (OTA-745's per-stat nudge broke the even spacing; reverted.)
     <View style={styles.stat}>
       <Text style={styles.label}>{label}</Text>
-      <Text style={[styles.value, valueColor ? { color: valueColor } : null]}>{value}</Text>
+      {/* OTA-744 — one line always; a wide value (e.g. "109/109") scales down to
+          fit its cell instead of wrapping a digit onto a second row. */}
+      <Text
+        style={[styles.value, valueColor ? { color: valueColor } : null]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >{value}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  escortName: {
+    fontSize: 11,
+    fontFamily: 'monospace',
+    marginTop: 1,
+  },
   container: {
     backgroundColor: '#13110f',
     borderColor: '#3a342c',
@@ -321,20 +412,38 @@ const styles = StyleSheet.create({
   // OTA-145 — row holds player name (left, growing) + dog name
   // (right, fixed). flex layout pins the dog to the right edge.
   nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
+  // OTA-928 — right group: Power rating badge stacked above the dog name, right-aligned.
+  nameRowRight: { alignItems: 'flex-end', flexShrink: 0 },
+  powerBadge: { color: '#d9b45b', fontSize: 12, fontWeight: '800', letterSpacing: 0.5 },
+  // OTA-930 — the player badge recolours by the current-target matchup (green favoured,
+  // red outmatched); gold stays the even / no-target default.
+  powerFavored: { color: '#9ec96a' },
+  powerDanger: { color: '#e07a5f' },
+  // OTA-929 — transient up/down Power-change flash, under the Power badge.
+  powerDelta: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
+  powerUp: { color: '#9ec96a' },
+  powerDown: { color: '#e07a5f' },
   dogName: { color: '#c9a86a', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
+  // OTA-938 — downed-dog bleed-out countdown: urgent red, wider to fit the "feed to save" call.
+  dogDown: { color: '#e5484d', fontSize: 12, fontWeight: '700', flexShrink: 0, maxWidth: 200 },
   // OTA-145 — golem row sits right-aligned beneath the dog name row.
   // Slightly muted color (slate-mauve) so it reads as a secondary
   // companion vs the dog's warm-gold.
   golemRow: { flexDirection: 'row', justifyContent: 'flex-end' },
   golemName: { color: '#9888a8', fontSize: 12, fontWeight: '600', maxWidth: 200 },
-  subline: { color: '#7a705c', fontSize: 10, marginBottom: 2 },
+  subline: { color: '#a2977b', fontSize: 10, marginBottom: 2 },
   equipped: { color: '#c9a86a', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
-  tapHint: { color: '#7a705c', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
+  tapHint: { color: '#a2977b', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
   companion: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
   contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
   row: { flexDirection: 'row', gap: 4, marginTop: 3 },
-  stat: { flex: 1, minWidth: 0 },
-  label: { color: '#7a705c', fontSize: 9 },
-  value: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
+  // OTA-747 — each stat CENTERS its label+value in its equal-width cell, so the
+  // columns read as evenly distributed regardless of how wide the value is
+  // (a wide "35/109" no longer crowds the left while "20"/"34" leave big gaps).
+  stat: { flex: 1, minWidth: 0, alignItems: 'center' },
+  // OTA-744 — the wallet gets its own gold line, off the cramped vitals row.
+  wallet: { color: '#e0b84a', fontSize: 12, fontWeight: '700', marginTop: 4, letterSpacing: 0.5 },
+  label: { color: '#a2977b', fontSize: 9, textAlign: 'center' },
+  value: { color: '#e6d8b3', fontSize: 12, fontWeight: '600', textAlign: 'center' },
 });

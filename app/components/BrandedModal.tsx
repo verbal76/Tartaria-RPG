@@ -80,7 +80,7 @@ export function BrandedModal({
   const cardChildren = (
     <>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>{title.toUpperCase()}</Text>
+        <Text style={styles.title} accessibilityRole="header">{title.toUpperCase()}</Text>
         <View style={styles.ruleLine} />
       </View>
 
@@ -149,6 +149,7 @@ export function BrandedModal({
               pressed && styles.btnPressed,
             ]}
             onPress={b.onPress}
+            accessibilityRole="button"
           >
             <Text style={[styles.btnText, toneText(b.tone)]}>{b.label.toUpperCase()}</Text>
           </Pressable>
@@ -162,7 +163,7 @@ export function BrandedModal({
   if (inline) {
     if (!visible) return null;
     return (
-      <View style={styles.inlineScrim} pointerEvents="box-none">
+      <View style={styles.inlineScrim} pointerEvents="box-none" accessibilityViewIsModal={true}>
         <TouchableWithoutFeedback onPress={onRequestClose}>
           <KeyboardAvoidingView style={styles.scrim} behavior="padding">
             <TouchableWithoutFeedback>
@@ -186,7 +187,7 @@ export function BrandedModal({
             the soft keyboard so an open text field is always visible. */}
         <KeyboardAvoidingView style={styles.scrim} behavior="padding">
           <TouchableWithoutFeedback>
-            <View style={styles.card}>{cardChildren}</View>
+            <View style={styles.card} accessibilityViewIsModal={true}>{cardChildren}</View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -277,10 +278,10 @@ const styles = StyleSheet.create({
   },
   itemName: { color: '#e6d8b3', fontSize: 15, fontWeight: '700', flex: 1 },
   rarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  itemKind: { color: '#7a705c', fontSize: 11, letterSpacing: 1, marginTop: 1 },
+  itemKind: { color: '#a2977b', fontSize: 11, letterSpacing: 1, marginTop: 1 },
   statsBlock: { marginTop: 8, gap: 2 },
   statLine: { color: '#cdbf99', fontSize: 12 },
-  itemDesc: { color: '#7a705c', fontSize: 11, marginTop: 8, fontStyle: 'italic' },
+  itemDesc: { color: '#a2977b', fontSize: 11, marginTop: 8, fontStyle: 'italic' },
   body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 4 },
   // OTA-286 — quantity stepper row inside the action modal. Mirrors
   // the About screen's volume / rate / pitch row layout exactly so
