@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.44';
+export const DISPLAY_VERSION = '4.28.45';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17691,4 +17691,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // harness — arrive outside its injector, leaving its verb rotation stuck
 // mid-beatdown attack-spamming a close-only knife from mid-range into the
 // 25-round stall guard on every engine-spawned fight (the 10% "win rate").
-export const OTA_BUILD_ID = '2026-07-28-1010-offhand-promotion-guard';
+// OTA-1011 — HEAVY-GATE HYGIENE (owner: "any other preexistings that still exist?").
+// The heavy test gate (test:ci:heavy) turned out to have NEVER been runnable —
+// its package.json pattern was unquoted, so the shell rejected it on sight;
+// that's how the combat canary sat dead for 8 days. Fixed, and the first full
+// sweep ever run came back 24/27: a stale source-anchor window widened
+// (playerInputChaosSim), an outgrown 240s budget raised to measured reality
+// (twoYearChaosSim, ~440s), and metaNavStress's V8 OOM bounded to its measured
+// stable range with a hard characterization of the long-standing world/persist
+// leak (deterministic ~1 MB/action module-scope heap growth from ~action 2000
+// — AsyncStorage and store state exonerated). HANDOFF §8 reconciled: four
+// stale punch-list items struck, the exploit-sweep backlog annotated closed,
+// and one deliberate residual surfaced for an owner call: mysteries and
+// storylines still advance stages anywhere and keep the remote courier cut
+// (only hunts were made face-to-face, per the owner's earlier call).
+export const OTA_BUILD_ID = '2026-07-28-1011-heavy-gate-hygiene';

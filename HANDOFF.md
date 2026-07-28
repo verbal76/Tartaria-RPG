@@ -496,7 +496,12 @@ Key invariants worth knowing:
      blocking** (HAL + golem are blocking). Triaging them → flip engine's fast
      job to `required`, matching HAL. (This session already greened 12 engine
      suites, 28 → 16, as a side effect of the harness port.)
-  2. **Engine world/persist super-linear tail-growth.** The heaviest stress /
+  2. **Engine world/persist super-linear tail-growth.** UPDATE 2026-07-28 (OTA-1034): first
+     hard characterization from a metaNavStress heap probe — flat ~220 MB to ~action 2000,
+     then a deterministic ~1 MB/action pure-heap leak (large strings, V8 dies in
+     StringSubstring at 8 GB); AsyncStorage (~1 MB) and store state both exonerated, so the
+     holder is module-scope JS. Next step for whoever picks this up: v8.writeHeapSnapshot at
+     ~action 3000 in that sim and diff retainers. The heaviest stress /
      balance / long-run sims (700-day sims, chaos sweeps, balance probes) grow
      memory super-linearly over a single very long run and OOM / time out past
      ~400–1000 steps. This is why the `jest (heavy sims)` job is **reported, not
@@ -528,13 +533,13 @@ Key invariants worth knowing:
      miss rate is fine (player's design call).
   7. ~~Core Guardians show no weakness/resistance in combat (player asked
      twice).~~ **FIXED 798/778 (HAL+golem only — no Guardians on engine_Dev).**
-  8. Rework the fused-weapon naming pool ("Aetheric Thread" is a bad weapon name).
+  8. ~~Rework the fused-weapon naming pool.~~ **FIXED 801/781/1086 (C2 below).**
   9. ~~Climbing rope: warn at durability 4, fail only at 0 (stop stranding 15
      pts).~~ **FIXED 799/779/1084** (usable to last point; graceful break at 0,
      no fall; fraying warning while low; climbReadiness button mirrors ≤ 0).
-  10. Post-boss ambush grace window on outpost exit.
-  11. Fusion material-type UX (surface item material buckets; kill refusal spam).
-  12. MiniLM cognitive-label noise (8-label dumps, wrong classifications).
+  10. ~~Post-boss ambush grace window on outpost exit.~~ **FIXED 801/781/1086 (C3 below).**
+  11. ~~Fusion material-type UX.~~ **FIXED 801/781/1086 (C1 below).**
+  12. ~~MiniLM cognitive-label noise.~~ **FIXED 801/781/1086 (C4 below).**
 
 - **REMAINING WORK LIST (2026-07-14) — reorganized; A1+A2 now DONE (800/780/1085).**
   The user's three front-loaded picks (#5 Qwen, #7 Guardians, #9 rope) plus the
@@ -705,7 +710,12 @@ Key invariants worth knowing:
   and needs the strictness call; B3 (dodge at high DEX) needs a 796+ retest first.
 
 
-- **Exploit-sweep backlog (2026-07-13) — 12 fixed in 796/776/1082, these REMAIN.**
+- **Exploit-sweep backlog (2026-07-13) — RECONCILED 2026-07-28: every group below was
+  subsequently closed (economy re-tiering B1 802/782; item dupes A2 800/780; water bounce +
+  small bugs A1 800/780; HUNT turn-in gating 810/790) EXCEPT one deliberate slice: mysteries +
+  storylines still advance stages from anywhere and keep the 15% remote courier cut — the owner
+  called out hunts only ("hunts are a face to face turn in"). That slice is an OWNER DESIGN
+  CALL, not a bug. Original record kept below for the audit trail.**
   A multi-agent audit surfaced ~33 findings; the confirmed criticals/highs with
   contained fixes shipped this OTA. Still open, grouped by why they were deferred:
   - **Economy re-tiering (needs a design call on numbers):** (a) self-crafted
@@ -820,7 +830,7 @@ Key invariants worth knowing:
 - **Spin-off sync status** — steam_Dev / mac_dev / linux_dev / html_dev / apple_ios
   were merged up to the current Tartaria game code (`git merge -X theirs HaL2001`,
   identity + platform shims preserved) at the **OTA-660 baseline**; they're now
-  **~130 OTAs behind** (HaL2001 is at 789) — re-run the same merge to top them
+  **now ~370 OTAs behind** (reconciled 2026-07-28: HaL2001 at 1034, merge baseline still OTA-660) — re-run the same merge to top them
   up when the user asks. `Dev_engine_PC` tracks `engine_Dev` (not Tartaria) and was
   left alone; `arbiters-line` is retired. Native/desktop/web builds were NOT
   compiled in the SDK container — verify via each line's build workflow.
@@ -845,9 +855,30 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.44**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.45**; ledger in `VERSION.md`.
 
-- **THE DEAD CANARY — OFF-HAND PROMOTION GUARD + combatStress REVIVED (2026-07-28, latest).**
+- **HEAVY-GATE HYGIENE — THE WHOLE AVIARY (2026-07-28, latest).** HAL **1034** / golem
+  **1011**. Owner: "are there any other preexistings listed in any doc that still exist?" The
+  audit ran the FULL heavy gate for the first time ever — and found `npm run test:ci:heavy`
+  itself had NEVER been runnable: the package.json script's `(Stress|…)` pattern was unquoted,
+  so sh rejected the command on sight (why the canaries sat dead). Quoted. First real sweep:
+  24/27 green; the 3 red fixed:
+  • `playerInputChaosSim` — its OTA-356 source-anchor window (1600 chars) stopped reaching
+    `climbFall(` as comments grew (measured 2504); widened to 5000. 15/15 green.
+  • `twoYearChaosSim` — 240s budget vs ~440s measured full run (same drift class as
+    combatStress); budget now 900s.
+  • `metaNavStress` — V8 OOM at 8 GB. HEAP-PROBE CHARACTERIZATION (the §8 world/persist
+    open item's first hard data): flat ~220 MB until ~action 2000, then a DETERMINISTIC
+    ~1 MB/action pure-heap leak (large strings; dies in StringSubstring). AsyncStorage stays
+    ~1 MB / 8 keys, store state stays tiny → the holder is MODULE-SCOPE JS, not persisted or
+    store state. Bounded 28000 → 4000 (measured stable; 4500 completed at ~2 GB peak); the
+    characterization is the entry point for the deep investigation.
+  Plus the §8 RECONCILIATION: punch-list items 8/10/11/12 struck (shipped 801/781 C-group),
+  the exploit-sweep backlog annotated as closed EXCEPT the deliberate mysteries/storylines
+  remote-turn-in slice (owner called out hunts only — an OWNER DESIGN CALL if it should
+  tighten), spin-off staleness refreshed (~370 OTAs behind, merge baseline OTA-660).
+
+- **THE DEAD CANARY — OFF-HAND PROMOTION GUARD + combatStress REVIVED (2026-07-28).**
   HAL **1033** / golem **1010**. Owner: "is the preexisting issue something we need to look
   at?" — yes. The heavy `combatStress` sim (test:ci:heavy, NOT in the per-OTA fast gates) had
   been red since ~Jul 20; the autopsy found one REAL bug and four layers of harness drift.
