@@ -89,6 +89,14 @@ as clarified by the user on 2026-07-13:
 
 - **`HaL2001` is PRODUCTION.** The Tartaria build in the wild with internal
   testers. Vetted changes only; a push OTAs their devices.
+- **⚠ GOLEM DIVERGENCE (2026-07-29, owner's call): the STORY FEATURE lives on golem ONLY.**
+  golem OTA-1018+ carries "The Reason You Came Down" (five story motives, the Skyrim-style
+  opening crawl, and the coming chapter-card/drip phases): `app/data/story/`,
+  `app/engine/story.ts`, `app/components/StoryIntroOverlay.tsx`, plus wiring in gameStore /
+  types / character / CharacterCreationScreen / ExplorationScreen / AboutScreen. Do NOT port
+  it to HAL uninvited, and when syncing HAL → golem do NOT clobber those files — gameplay
+  changes still ship to both lines, but the story layer is golem's own until the owner says
+  otherwise.
 - **`golem-line` is HAL's warm standby — it must STAY CURRENT with HAL.** Not a
   scratch pad. Its purpose: when a major, potentially engine-breaking change
   begins, development forks onto golem so production Tartaria is never at risk
