@@ -220,21 +220,38 @@ describe('OTA 23-007 — climb mechanics', () => {
       expect(logs).toMatch(/can't sleep on a wall|won't hold you asleep/i);
     });
 
-    it("Reclaimer's Rope: rest works while elevated", async () => {
+    it("Reclaimer's Rope: rest is REFUSED while elevated — only the strap anchors one", async () => {
+      // OTA-1017 — OWNER'S RULE CHANGE: a rope no longer anchors a rest on ANY
+      // climb ("you need the hardened climbing strap for that"). This test
+      // asserted the old allowance; it now guards the new rule from both
+      // sides — nothing recovers, and the refusal explains itself.
       const store = await setupClimber("Reclaimer's Rope", {
         hp: 10, hpMax: 30, stamina: 0, staminaMax: 10,
       });
       store.setState({
         currentScene: { ...store.getState().currentScene!, elevatedOn: { noun: 'wall', tier: 1, totalTiers: 2 } },
       });
+      const before = store.getState().player!;
       store.getState().submitPlayerAction('rest');
       const after = store.getState().player!;
-      // OTA-978 — #120: a full sleep restores stamina AND knits a light share of
-      // max HP (arb37's HP-free rest is superseded by the owner's call).
-      // 8h rest: gain min(10, 8) = 8 stamina; HP climbs ~15% of 30.
+      expect(after.stamina).toBe(before.stamina);
+      expect(after.hp).toBe(before.hp);
+      const logs = store.getState().gameLog.map((e) => e.text).join('\n');
+      expect(logs).toMatch(/won't hold you asleep|Hardened Climbing Strap/i);
+    });
+
+    it('the Hardened Climbing Strap still anchors a rest while elevated', async () => {
+      const store = await setupClimber("Reclaimer's Rope", {
+        hp: 10, hpMax: 30, stamina: 0, staminaMax: 10,
+      });
+      store.setState({
+        player: { ...store.getState().player!, equipped: { ...(store.getState().player!.equipped ?? {}), legs: 'Hardened Climbing Strap' } } as any,
+        currentScene: { ...store.getState().currentScene!, elevatedOn: { noun: 'wall', tier: 1, totalTiers: 2 } },
+      });
+      store.getState().submitPlayerAction('rest');
+      const after = store.getState().player!;
       expect(after.stamina).toBeGreaterThan(0);
       expect(after.hp).toBeGreaterThan(10);
-      expect(after.hp).toBeLessThanOrEqual(10 + Math.ceil(30 * 0.15));
     });
   });
 

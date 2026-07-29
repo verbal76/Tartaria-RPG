@@ -12511,7 +12511,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const hasPlainClimbingRope = player.inventory.some(
               (i) => i.name === 'Climbing Rope' && i.quantity > 0,
             );
-            const canRestElevated = wearsClimbStrapForRest || (!onGreatClimb && hasReclaimersRopeForRest);
+            // OTA-1017 — OWNER'S RULE: "no it shouldn't, you need the hardened
+            // climbing strap for that." A rope is a line you climb, not a
+            // harness you can hang and sleep in — on ANY climb, not just a
+            // great one. The Reclaimer's-Rope allowance on ordinary climbs is
+            // gone; the strap is the single answer. (hasReclaimersRopeForRest /
+            // hasPlainClimbingRope are kept below only to name what you're
+            // carrying in the refusal.)
+            const canRestElevated = wearsClimbStrapForRest;
             if (!canRestElevated) {
               // OTA-952 — skipDedup: the pillar log showed rest retries 2-4 dedup-
               // swallowed into silence. A refusal always answers.
@@ -12519,9 +12526,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 'arbiter',
                 onGreatClimb
                   ? `The Arbiter cranes to look up the ${currentScene.elevatedOn.noun}. "This high, only a Hardened Climbing Strap will hold you for a rest — a rope won't do it. Climb down, or come back wearing one."`
-                  : hasPlainClimbingRope
-                    ? `The Arbiter looks up. "That Climbing Rope got you up — it won't hold you asleep. Climb down, or come back with a Reclaimer's Rope or a Hardened Climbing Strap to anchor a doze."`
-                    : `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
+                  : (hasPlainClimbingRope || hasReclaimersRopeForRest)
+                    // OTA-1017 — they ARE carrying a line; say why it isn't enough.
+                    ? `The Arbiter looks up. "A line gets you up — it won't hold you asleep. Only a Hardened Climbing Strap will. Climb down, or come back wearing one."`
+                    : `The Arbiter looks up. "You can't sleep on a wall. Climb down, or come back wearing a Hardened Climbing Strap — that harness is the only thing that anchors a doze."`,
                 { skipDedup: true },
               );
               break;
@@ -17840,6 +17848,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : `${enemy.name} moves first. The pressure is immediate.`);
     }
 
+    // OTA-1017 — INITIATIVE NOW DECIDES THE ORDER. Owner: "I thought the initiative
+    // roll was the deciding factor on who went first on any series of attacks."
+    // It wasn't — the roll had exactly ONE consumer in the whole codebase, the
+    // line printed just above. Whoever won it, the player's swing always
+    // resolved first and the enemy group always answered afterward, so "X moves
+    // first. The pressure is immediate." described something that never
+    // happened. Losing initiative now genuinely costs the tempo: the enemy
+    // group takes its turn BEFORE your strike lands — and if that volley drops
+    // you, your swing never happens at all. The volley is MOVED, not added:
+    // every post-strike counter site below is suppressed when it already ran,
+    // so a round still contains exactly one enemy volley. (skipDotTick mirrors
+    // the post-strike sites — the attack path ticked DOTs at case-top.)
+    const lostInitiative = !!initiative && !initiative.success;
+    let enemiesActedFirst = false;
+    if (lostInitiative && (get().currentScene?.enemies?.length ?? 0) > 0) {
+      runEnemyGroupCounters(get, set, player, { skipDotTick: true });
+      enemiesActedFirst = true;
+      const afterVolley = get().player;
+      if (!afterVolley || afterVolley.hp <= 0 || afterVolley.dead) {
+        // They got there first. The swing you committed to never lands.
+        const hoursAfterInit = get().player?.hoursElapsed ?? hoursBeforeConclude;
+        const dtInit = hoursAfterInit - hoursBeforeConclude;
+        if (dtInit > 0) {
+          const label = dtInit < 1 ? `${Math.round(dtInit * 60)} min` : `${Math.round(dtInit * 10) / 10}h`;
+          get().appendLog('system', `⏳ Time passed: ${label}`);
+        }
+        void get().persist();
+        return;
+      }
+    }
+
     // Always log the player's attack roll math so the combat log mirrors
     // the enemy's "d20 → X + ATK Y = Z vs AC W" line. Without this the
     // disk log only shows enemy attack rolls, which reads as one-sided.
@@ -17882,7 +17921,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         // The dodge still costs the player the action — let any reaching
         // enemy counter-attack, same as a miss path.
-        runEnemyGroupCounters(get, set, player);
+        // OTA-1017 — unless they already swung first (lost initiative).
+        if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player);
         // Surface clock movement before we early-return.
         const hoursAfterDodge = get().player?.hoursElapsed ?? hoursBeforeConclude;
         const dt = hoursAfterDodge - hoursBeforeConclude;
@@ -17928,7 +17968,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'combat',
             `Stonework fist rings off ${enemy.name} — d${spec.sides} rolled ${natural}, needed ${spec.hitGate}.`,
           );
-          runEnemyGroupCounters(get, set, player);
+          if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player); // OTA-1017 — one volley per round
           const hoursAfterGate = get().player?.hoursElapsed ?? hoursBeforeConclude;
           const dt = hoursAfterGate - hoursBeforeConclude;
           if (dt > 0) {
@@ -18446,11 +18486,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // After the player's strike, every still-living enemy that ISN'T
         // knocked out counter-attacks (runEnemyGroupCounters skips KO'd).
         // skipDotTick — the attack path already ticked DOTs at case-top.
-        runEnemyGroupCounters(get, set, player, { skipDotTick: true });
+        // OTA-1017 — skipped when initiative already gave them the first swing.
+        if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player, { skipDotTick: true });
       }
     } else {
       get().appendLog('combat', attackMiss(weaponName, enemy.name));
-      runEnemyGroupCounters(get, set, player, { skipDotTick: true });
+      // OTA-1017 — one volley per round; skipped if initiative already spent it.
+      if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player, { skipDotTick: true });
     }
 
     if (shouldArbiterSpeak()) {

@@ -859,9 +859,36 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.50**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.51**; ledger in `VERSION.md`.
 
-- **NO OPEN-GROUND AMBUSHES INDOORS (2026-07-29, latest).** HAL **1039** / golem **1016**.
+- **INITIATIVE FINALLY DECIDES THE ORDER + THE STRAP IS THE ONLY ANCHOR (2026-07-29, latest).**
+  HAL **1040** / golem **1017**. Both are the OWNER'S CALLS on the two items left open by
+  1038/1039 — and the first turned out to be a BUG, not a balance choice:
+  • **INITIATIVE.** Owner: "I thought the initiative roll was the deciding factor on who went
+    first on any series of attacks." It never was. The roll had exactly ONE consumer in the
+    entire codebase — the log line — so "X moves first. The pressure is immediate." described
+    something that never happened; the player's swing always resolved first and the enemy group
+    always answered afterward, win or lose. Losing initiative now runs the enemy volley BEFORE
+    the strike, and a volley that drops you means your swing never lands at all. The volley is
+    **MOVED, NOT ADDED** — all four post-strike counter sites (dodged / barehand-gate / hit /
+    miss) are suppressed when it already fired, so a round still contains exactly ONE enemy
+    volley either way. Locked by a test that counts the guarded sites (4) AND asserts the
+    ordering behaviourally in both directions.
+    ⚠ THIS RAISES LETHALITY BY DESIGN — a lost initiative at low HP can now kill before you act.
+    That is what the owner asked for; the dial to soften it is the initiative DC in
+    combatRules' step (d10 vs enemyInit), not the ordering.
+  • **ELEVATED REST.** Owner: "no it shouldn't, you need the hardened climbing strap for that."
+    The Reclaimer's-Rope allowance for resting on an ordinary climb is GONE — the strap is the
+    single answer on every climb, great or not. A rope is a line you climb, not a harness you
+    can hang and doze in. The refusal names what you're carrying and why it isn't enough. The
+    old "rope rests fine" test is flipped to assert the refusal, with a new companion test
+    proving the strap still works.
+  • Process note: OTA-1039's lock test pinned the LITERAL refusal sentence, so this rule change
+    tripped it — retargeted to the invariant (a line-carrier is told their line won't hold them
+    asleep). Third time a wording-pinned assert has cost a gate cycle this span; prefer
+    invariant matches in new locks.
+
+- **NO OPEN-GROUND AMBUSHES INDOORS (2026-07-29).** HAL **1039** / golem **1016**.
   From the owner's 6-part log: a Mud Monarchs patrol "crosses your path IN THE OPEN" while the
   player stood in a flooded house's KITCHEN (12:16:43), and six minutes later a Conspiracy
   Architects war party "crests the rise" while they stood in its STUDY (12:22:19). Both lines
