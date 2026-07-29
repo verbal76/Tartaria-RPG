@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.49';
+export const DISPLAY_VERSION = '4.28.50';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17758,4 +17758,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // rode the gate roll but sat out the contest that decides the outcome.
 // Plus: a status-expiry line that read as a fragment, and a warning that
 // said "arm's reach" at mid range. Initiative-is-cosmetic left open.
-export const OTA_BUILD_ID = '2026-07-29-1015-one-kill-one-price';
+// OTA-1016 — NO OPEN-GROUND AMBUSHES INDOORS. From the owner's log, twice in
+// six minutes: a Mud Monarchs patrol "crosses your path IN THE OPEN" while
+// the player stood in a flooded house's kitchen, and a Conspiracy Architects
+// war party "crests the rise" while they stood in its study. Root cause is a
+// category, not two lines: all three outdoor world-event spawners
+// (maybeSpawnRaid / maybeInterceptPatrol / maybePatrolAmbush) asked
+// `player.hubRoomId` for "am I inside?" — a field set ONLY in an outpost
+// room. Explorable building interiors live on the store's activeBuildingId,
+// which none of them consulted, so every one read "outdoors" indoors. One
+// shared underRoof() predicate now answers for all three, locked by a test
+// that counts the call sites. Also: climbing accepts a Reclaimer's Rope OR a
+// plain Climbing Rope, but a wall-rest accepts only the Reclaimer's — and the
+// refusal told a rope-carrying player to "carry a Reclaimer's Rope" while
+// they hung from a rope. The message now names their line and its limit; the
+// RULE is unchanged and left as an owner's call.
+export const OTA_BUILD_ID = '2026-07-29-1016-no-indoor-ambush';

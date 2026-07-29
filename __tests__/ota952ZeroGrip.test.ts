@@ -151,7 +151,12 @@ describe('OTA-952 — rest-on-wall refusal answers every retry', () => {
     await new Promise((r) => setTimeout(r, 5));
     store.getState().submitPlayerAction('rest');
     await new Promise((r) => setTimeout(r, 5));
-    const refusals = store.getState().gameLog.filter((e) => e.text.includes('sleep on a wall'));
+    // OTA-1016 — match EITHER wall-rest refusal (the rope-specific one added this
+    // OTA, or the generic one). What OTA-975 guards is that both retries are
+    // ANSWERED — never dedup-swallowed into silence — not the exact sentence.
+    const refusals = store.getState().gameLog.filter(
+      (e) => e.text.includes('sleep on a wall') || e.text.includes("won't hold you asleep"),
+    );
     expect(refusals.length).toBe(2);
   });
 });

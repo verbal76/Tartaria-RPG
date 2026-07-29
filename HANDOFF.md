@@ -859,9 +859,29 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.49**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.50**; ledger in `VERSION.md`.
 
-- **ONE KILL, ONE PRICE — AND STEALTH KEEPS ITS PROMISES (2026-07-29, latest).** HAL **1038**
+- **NO OPEN-GROUND AMBUSHES INDOORS (2026-07-29, latest).** HAL **1039** / golem **1016**.
+  From the owner's 6-part log: a Mud Monarchs patrol "crosses your path IN THE OPEN" while the
+  player stood in a flooded house's KITCHEN (12:16:43), and six minutes later a Conspiracy
+  Architects war party "crests the rise" while they stood in its STUDY (12:22:19). Both lines
+  are explicitly open-ground. ROOT CAUSE (a whole category, not two lines): the three outdoor
+  world-event spawners — `maybeSpawnRaid`, `maybeInterceptPatrol`, `maybePatrolAmbush` — each
+  asked `player.hubRoomId` for "am I inside?", and that field is set ONLY in an OUTPOST room.
+  Explorable building interiors live on the STORE's `activeBuildingId`, which none of them
+  consulted, so all three read "outdoors" indoors. Fixed at one choke point: a shared
+  `underRoof(s, player)` predicate that counts BOTH kinds of interior, and all three spawners
+  route through it (locked by a test that counts the call sites, so a fourth spawner can't
+  quietly get it wrong).
+  • Also, an HONEST REFUSAL: climbing accepts a Reclaimer's Rope OR a plain Climbing Rope
+    (pickActiveRope), but resting on a wall accepts only the Reclaimer's. The player who had
+    just climbed on a Climbing Rope was told to "carry a Reclaimer's Rope" — reading as "you
+    have no rope" while they hung from one, then retried the climb at 0 stamina and fell for
+    21. The refusal now names the line they're on and what it can't do. NOTE — whether a plain
+    Climbing Rope SHOULD anchor an ordinary-climb rest is an open OWNER'S CALL; only the
+    message changed, not the rule.
+
+- **ONE KILL, ONE PRICE — AND STEALTH KEEPS ITS PROMISES (2026-07-29).** HAL **1038**
   / golem **1015**. From the owner's log part 16, re-verified with runtime probes before any
   code was touched (owner: "reverify all findings and continue"):
   • **THE DOUBLE DOCK.** Every patrol kill cost Eternal Dynasty **−6**, not −3 (log shows two
