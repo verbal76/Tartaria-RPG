@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.48';
+export const DISPLAY_VERSION = '4.28.49';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17741,4 +17741,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stale flag); and completeContractFromUI wraps the turn-in so any refused
 // tap surfaces the Arbiter's line as a dismissible strip on the screen
 // itself. Deactivate → reactivate is no longer the secret handshake.
-export const OTA_BUILD_ID = '2026-07-28-1014-contracts-card-unwedged';
+// OTA-1015 — ONE KILL, ONE PRICE, AND STEALTH KEEPS ITS PROMISES. Three
+// findings from the owner's log, each re-verified with a runtime probe
+// before anything was touched. (1) THE DOUBLE DOCK: faction parties are
+// built by reskinning whatever the local wild table rolls — rename, stamp
+// a factionId, keep every trait — so an Aetherkin roll walked in as
+// "Eternal Dynasty Patrol", and its kill charged that faction both the
+// faction penalty AND the Aetherkin reverence penalty. Measured −6 for one
+// kill where the same patrol without the trait cost −3. Fixed at both
+// ends: special templates never become faction troops, and the reverence
+// pass skips any faction the same kill already docked. (2) A FAILED SNEAK
+// WAS FREE while a successful one always cost HP — rolling badly was the
+// better play — even though the Arbiter's own warning tells the player a
+// miss "lets the whole pack swing free". The failed-flee path has charged
+// exactly this since OTA-372; stealth now matches. (3) Shadow Diver's +1
+// rode the gate roll but sat out the contest that decides the outcome.
+// Plus: a status-expiry line that read as a fragment, and a warning that
+// said "arm's reach" at mid range. Initiative-is-cosmetic left open.
+export const OTA_BUILD_ID = '2026-07-29-1015-one-kill-one-price';

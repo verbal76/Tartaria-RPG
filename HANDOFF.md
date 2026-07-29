@@ -859,10 +859,44 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.48**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.49**; ledger in `VERSION.md`.
+
+- **ONE KILL, ONE PRICE — AND STEALTH KEEPS ITS PROMISES (2026-07-29, latest).** HAL **1038**
+  / golem **1015**. From the owner's log part 16, re-verified with runtime probes before any
+  code was touched (owner: "reverify all findings and continue"):
+  • **THE DOUBLE DOCK.** Every patrol kill cost Eternal Dynasty **−6**, not −3 (log shows two
+    separate −3 lines per kill; probe: aetherkin-trait patrol with a factionId measured −6,
+    control without the trait −3). Cause: `injectFactionParty` reskins whatever the LOCAL WILD
+    TABLE rolls — rename + stamp a factionId, keep every trait — so an Aetherkin roll walked in
+    as "Eternal Dynasty Patrol 1", a corpse wearing a soldier's name (which is also why the
+    Arbiter kept saying piercing wasn't biting). The reverence penalty's own comment assumes
+    "they carry no factionId in data"; that assumption broke, and the victim's faction paid
+    twice. Fixed at BOTH ends: special-marked templates (aetherkin / revenant) are excluded
+    from faction parties outright, and the reverence pass now takes an exclusion set of every
+    faction the same kill already docked. The other three revering factions still pay −3.
+  • **A FAILED SNEAK WAS THE ONLY FREE ACTION IN COMBAT.** Probe: failed sneak `hp 200 → 200`,
+    no statuses, no enemy swings; successful sneak `hp 200 → 193` **even when it won the init
+    race** (the reset branch always runs the group counters). Rolling BADLY was the better
+    play. And the game already told the player otherwise — the sneak-odds warning says a miss
+    "lets the whole pack swing free", and the OTA-936 comment that authored it says a failed
+    sneak "burns the turn AND the whole enemy group swings free". Nothing ever charged it.
+    The failed-FLEE path has charged this since OTA-372 ("a FAILED flee is not free"); stealth
+    now matches. This is a promise being kept, not a balance change.
+  • **THE STEALTH TITLE SAT OUT THE DECIDING ROLL.** Shadow Diver's +1 rides the GATE
+    (buildSkillSteps folds in titleSkillBonus — the log's "STE 1 + 1 (title: Shadow Diver)")
+    but was absent from the break-away init contest that actually decides the outcome. Same
+    bonus, both rolls now.
+  • Two cosmetics: the `surprised` label read as a fragment when it expired ("caught mid-vanish
+    fades.") → "exposed opening"; and the sneak-odds warning said "at arm's reach" at MID range
+    → range-aware phrasing.
+  • **OPEN / OWNER'S CALL — INITIATIVE IS NARRATION ONLY.** "X moves first. The pressure is
+    immediate." has exactly one consumer in the codebase (the log line). The player's attack
+    still fully resolves first either way, so losing initiative costs nothing. Options put to
+    the owner: leave as flavor / loser's swing resolves first (raises lethality) / winner takes
+    a small to-hit edge. NOT changed unilaterally — a lethality change is the owner's to make.
 
 - **THE WEDGED CONTRACTS CARD — COURSE-CANCEL NOW STANDS DOWN ROUTING + REFUSALS ANSWER
-  ON-SCREEN (2026-07-28, latest).** HAL **1037** / golem **1014**. Owner's report (screenshot +
+  ON-SCREEN (2026-07-28).** HAL **1037** / golem **1014**. Owner's report (screenshot +
   log part 16): after accidentally tapping quit-navigating, a READY faction contract showed a
   stale "Auto-routing" note with NO route button, and ~15 taps on the green COMPLETE "did
   nothing" — the log shows 7 invisible wrong-faction refusals spoken to the world feed while
