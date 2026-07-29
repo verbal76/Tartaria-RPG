@@ -71,6 +71,9 @@ describe('OTA-1039 — SOURCE LOCKS: one roof test, used by every outdoor spawne
 
   it('the wall-rest refusal tells a rope-carrier what their rope cannot do', () => {
     expect(src).toMatch(/const hasPlainClimbingRope = player\.inventory\.some\(/);
-    expect(src).toMatch(/That Climbing Rope got you up — it won't hold you asleep\./);
+    // OTA-1040 — the RULE changed (strap-only, owner's call), so the sentence did
+    // too. Assert the invariant this lock exists for — a line-carrier is told
+    // their line won't hold them asleep — not the exact wording.
+    expect(src).toMatch(/won't hold you asleep/);
   });
 });

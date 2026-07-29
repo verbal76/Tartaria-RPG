@@ -839,6 +839,22 @@ Key invariants worth knowing:
   up when the user asks. `Dev_engine_PC` tracks `engine_Dev` (not Tartaria) and was
   left alone; `arbiters-line` is retired. Native/desktop/web builds were NOT
   compiled in the SDK container — verify via each line's build workflow.
+  **⚠ MANDATORY STEP THE RECIPE WAS MISSING (learned the hard way 2026-07-29):
+  after every `merge -X theirs`, REGENERATE THE SPIN-OFF'S package-lock.json**
+  (`npm install --package-lock-only`, verify with `npm ci --dry-run`), then commit
+  it with the merge. `-X theirs` resolves conflicts in HAL's favour and
+  package-lock.json conflicts WHOLESALE, so each spin-off silently inherited HAL's
+  lock — which has no `react-native-web` tree — while keeping its own package.json
+  that declares `react-native-web ~0.19.13`. `npm ci` refuses an out-of-sync lock,
+  so ALL FIVE CI jobs on steam_Dev / mac_dev / linux_dev / html_dev died at install
+  on 8 missing transitives (normalize-colors, inline-style-prefixer, memoize-one,
+  postcss-value-parser, styleq, css-in-js-utils, fast-loops, hyphenate-style-name)
+  before running a single test. `apple_ios` was unaffected — it declares no
+  react-native-web. The platform BUILD workflows stayed GREEN throughout because
+  they use `npm install` (reconciles the lock) not `npm ci` (demands a match), so
+  the breakage was invisible in the artifact that matters and only showed as a red
+  CI check. Fixed on all four (lock 1145 → 1157 packages, no declared dependency
+  changed). Restore the 4 app.json identity values AND the lock every time.
 - **golem CI hygiene (done)** — the dead inherited `eas-update.yml` (HAL's
   multi-channel publisher) was deleted from `golem-line`; golem now has ONLY its
   isolated `eas-update-golem.yml`. Don't re-add a HAL publisher to any line.
@@ -860,9 +876,56 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.49**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.51**; ledger in `VERSION.md`.
 
-- **ONE KILL, ONE PRICE — AND STEALTH KEEPS ITS PROMISES (2026-07-29, latest).** HAL **1038**
+- **INITIATIVE FINALLY DECIDES THE ORDER + THE STRAP IS THE ONLY ANCHOR (2026-07-29, latest).**
+  HAL **1040** / golem **1017**. Both are the OWNER'S CALLS on the two items left open by
+  1038/1039 — and the first turned out to be a BUG, not a balance choice:
+  • **INITIATIVE.** Owner: "I thought the initiative roll was the deciding factor on who went
+    first on any series of attacks." It never was. The roll had exactly ONE consumer in the
+    entire codebase — the log line — so "X moves first. The pressure is immediate." described
+    something that never happened; the player's swing always resolved first and the enemy group
+    always answered afterward, win or lose. Losing initiative now runs the enemy volley BEFORE
+    the strike, and a volley that drops you means your swing never lands at all. The volley is
+    **MOVED, NOT ADDED** — all four post-strike counter sites (dodged / barehand-gate / hit /
+    miss) are suppressed when it already fired, so a round still contains exactly ONE enemy
+    volley either way. Locked by a test that counts the guarded sites (4) AND asserts the
+    ordering behaviourally in both directions.
+    ⚠ THIS RAISES LETHALITY BY DESIGN — a lost initiative at low HP can now kill before you act.
+    That is what the owner asked for; the dial to soften it is the initiative DC in
+    combatRules' step (d10 vs enemyInit), not the ordering.
+  • **ELEVATED REST.** Owner: "no it shouldn't, you need the hardened climbing strap for that."
+    The Reclaimer's-Rope allowance for resting on an ordinary climb is GONE — the strap is the
+    single answer on every climb, great or not. A rope is a line you climb, not a harness you
+    can hang and doze in. The refusal names what you're carrying and why it isn't enough. The
+    old "rope rests fine" test is flipped to assert the refusal, with a new companion test
+    proving the strap still works.
+  • Process note: OTA-1039's lock test pinned the LITERAL refusal sentence, so this rule change
+    tripped it — retargeted to the invariant (a line-carrier is told their line won't hold them
+    asleep). Third time a wording-pinned assert has cost a gate cycle this span; prefer
+    invariant matches in new locks.
+
+- **NO OPEN-GROUND AMBUSHES INDOORS (2026-07-29).** HAL **1039** / golem **1016**.
+  From the owner's 6-part log: a Mud Monarchs patrol "crosses your path IN THE OPEN" while the
+  player stood in a flooded house's KITCHEN (12:16:43), and six minutes later a Conspiracy
+  Architects war party "crests the rise" while they stood in its STUDY (12:22:19). Both lines
+  are explicitly open-ground. ROOT CAUSE (a whole category, not two lines): the three outdoor
+  world-event spawners — `maybeSpawnRaid`, `maybeInterceptPatrol`, `maybePatrolAmbush` — each
+  asked `player.hubRoomId` for "am I inside?", and that field is set ONLY in an OUTPOST room.
+  Explorable building interiors live on the STORE's `activeBuildingId`, which none of them
+  consulted, so all three read "outdoors" indoors. Fixed at one choke point: a shared
+  `underRoof(s, player)` predicate that counts BOTH kinds of interior, and all three spawners
+  route through it (locked by a test that counts the call sites, so a fourth spawner can't
+  quietly get it wrong).
+  • Also, an HONEST REFUSAL: climbing accepts a Reclaimer's Rope OR a plain Climbing Rope
+    (pickActiveRope), but resting on a wall accepts only the Reclaimer's. The player who had
+    just climbed on a Climbing Rope was told to "carry a Reclaimer's Rope" — reading as "you
+    have no rope" while they hung from one, then retried the climb at 0 stamina and fell for
+    21. The refusal now names the line they're on and what it can't do. NOTE — whether a plain
+    Climbing Rope SHOULD anchor an ordinary-climb rest is an open OWNER'S CALL; only the
+    message changed, not the rule.
+
+- **ONE KILL, ONE PRICE — AND STEALTH KEEPS ITS PROMISES (2026-07-29).** HAL **1038**
   / golem **1015**. From the owner's log part 16, re-verified with runtime probes before any
   code was touched (owner: "reverify all findings and continue"):
   • **THE DOUBLE DOCK.** Every patrol kill cost Eternal Dynasty **−6**, not −3 (log shows two

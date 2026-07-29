@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.49';
+export const DISPLAY_VERSION = '4.28.51';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18824,4 +18824,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // rode the gate roll but sat out the contest that decides the outcome.
 // Plus: a status-expiry line that read as a fragment, and a warning that
 // said "arm's reach" at mid range. Initiative-is-cosmetic left open.
-export const OTA_BUILD_ID = '2026-07-29-1038-one-kill-one-price';
+// OTA-1039 — NO OPEN-GROUND AMBUSHES INDOORS. From the owner's log, twice in
+// six minutes: a Mud Monarchs patrol "crosses your path IN THE OPEN" while
+// the player stood in a flooded house's kitchen, and a Conspiracy Architects
+// war party "crests the rise" while they stood in its study. Root cause is a
+// category, not two lines: all three outdoor world-event spawners
+// (maybeSpawnRaid / maybeInterceptPatrol / maybePatrolAmbush) asked
+// `player.hubRoomId` for "am I inside?" — a field set ONLY in an outpost
+// room. Explorable building interiors live on the store's activeBuildingId,
+// which none of them consulted, so every one read "outdoors" indoors. One
+// shared underRoof() predicate now answers for all three, locked by a test
+// that counts the call sites. Also: climbing accepts a Reclaimer's Rope OR a
+// plain Climbing Rope, but a wall-rest accepts only the Reclaimer's — and the
+// refusal told a rope-carrying player to "carry a Reclaimer's Rope" while
+// they hung from a rope. The message now names their line and its limit; the
+// RULE is unchanged and left as an owner's call.
+// OTA-1040 — INITIATIVE FINALLY DECIDES THE ORDER, AND THE STRAP IS THE ONLY
+// ANCHOR. Both are the owner's calls on the items 1038/1039 left open, and
+// the first was a BUG: "I thought the initiative roll was the deciding
+// factor on who went first on any series of attacks." It never was — the
+// roll's ONLY consumer was the log line, so "X moves first. The pressure is
+// immediate." described something that never happened. Losing initiative now
+// runs the enemy volley BEFORE your strike, and a volley that drops you means
+// your swing never lands. The volley is MOVED, not added: all four
+// post-strike counter sites are suppressed when it already fired, so a round
+// still contains exactly one. THIS RAISES LETHALITY BY DESIGN — a lost roll
+// at low HP can kill before you act; the dial to soften it is the initiative
+// DC, not the ordering. Second: "no it shouldn't, you need the hardened
+// climbing strap for that" — the Reclaimer's-Rope allowance for resting on an
+// ordinary climb is gone. A rope is a line you climb, not a harness you can
+// sleep in. The strap is the single answer on every climb.
+export const OTA_BUILD_ID = '2026-07-29-1040-initiative-decides-order';
