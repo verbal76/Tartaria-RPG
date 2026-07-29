@@ -77,6 +77,8 @@ import { revealedLocationName } from '../engine/hiddenLocations';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
 import { AETHERKIN_REVERING_FACTIONS, isAetherkin, buildAetherkinEncounter, type AetherkinContext } from '../engine/aetherkin';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
+// OTA-1018 — the story spine: motives + the opening crawl.
+import { introPagesFor, assignMotive } from '../engine/story';
 import { generateQuest } from '../engine/questGenerator';
 import {
   pickWeather,
@@ -1753,6 +1755,20 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     console.warn('backfillPlayer: save-upgrade migration threw; loading the raw saved player (degraded-safe)', e);
     out = pm;
   }
+  // OTA-1018 — pre-feature saves get a REASON THEY CAME DOWN, dealt
+  // deterministically from the character's identity so the same save always
+  // resolves to the same motive (the phase-2/3 story beats key off it).
+  // storyIntroSeen backfills TRUE: the crawl introduces a new character, it
+  // must never ambush someone forty days into a run. REPLAY OPENING exists
+  // for saves that want to read it.
+  if (!out.storyMotive) {
+    out = {
+      ...out,
+      storyMotive: assignMotive(`${out.name}|${out.raceId}|${out.factionId}`),
+      storyIntroSeen: true,
+    };
+  }
+
   // OTA-416 — a LIVE character can never legitimately sit at hp<=0 (that IS
   // death; death is gated by the `dead` flag, not by hp). If a save loads
   // alive-but-zeroed — e.g. a crash interrupted the death sequence before
@@ -4096,6 +4112,17 @@ interface GameStore {
    *  is captured as the golem's name (or 'skip' to keep the type label), like
    *  the dog onboarding. Transient — not persisted. */
   pendingGolemNaming: boolean;
+  /** OTA-1018 — the opening crawl's pages while it is showing, null otherwise.
+   *  Set by startNewGame for a fresh character and by replayStoryIntro; the
+   *  StoryIntroOverlay renders whenever this is non-null. Transient — never
+   *  persisted, always reset by slot load / new game / delete. */
+  storyIntro: string[] | null;
+  /** OTA-1018 — close the crawl (tap-through or SKIP) and remember on the
+   *  CHARACTER that it was seen, so it never re-ambushes this save. */
+  dismissStoryIntro: () => void;
+  /** OTA-1018 — re-run the opening for the current character (About screen).
+   *  No-op without a live character. */
+  replayStoryIntro: () => void;
   /** Set the pending destination; the screen renders the modal. */
   requestTravelConfirm: (locationId: string, locationName: string) => void;
   /** Yes path: leave outpost, then set course. Clears pending. */
@@ -4589,6 +4616,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   fusionPickerOpen: false,
   missionCompleteNotice: null,
   contractsNotice: null,
+  storyIntro: null,
   fusionBlockedNotice: null,
   pendingFusionSelection: null,
   pendingAetherFoodId: null,
@@ -5364,6 +5392,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentScene: restoredScene,
         pendingRolls: null,
   pendingHookContinue: null,
+        // OTA-1018 — a loaded save never reopens the crawl mid-game.
+        storyIntro: null,
         pendingGolemNaming: false,
         justUpdatedFromBuild: null,
         // OTA-100 — clear pendingOtaAppliedFrom in the same set
@@ -5665,7 +5695,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       crashedSlotIds,
       // If we just deleted the currently-loaded character, drop player state too.
       ...(get().activeSlotId === slotId
-        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null }
+        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null, storyIntro: null }
         : {}),
     });
   },
@@ -5796,6 +5826,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // (a transient UI flag that otherwise survives from a prior session).
       callDogModalOpen: false,
       pendingParley: null, // OTA-808 — clear any stale parley on a fresh game
+      // OTA-1018 — THE OPENING CRAWL. A brand-new character opens on the
+      // reason they came down: three universal pages (the flood, the thousand
+      // years, the nine hearts), two for their motive, one for the faction
+      // that took them in, and the closing hand-off. Assembled per-character;
+      // the StoryIntroOverlay shows it over the first scene.
+      storyIntro: introPagesFor(player.storyMotive, player.factionId),
     });
     try {
       get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
@@ -5839,6 +5875,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScene: null,
       pendingRolls: null,
   pendingHookContinue: null,
+      storyIntro: null, // OTA-1018
       currentScreen: 'title',
       activeSlotId: null,
       slots,
@@ -26180,6 +26217,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
   clearFusionBlockedNotice() { set({ fusionBlockedNotice: null }); },
 
   clearMissionCompleteNotice() { set({ missionCompleteNotice: null }); },
+
+  // OTA-1018 — close the opening crawl. The SEEN flag lives on the CHARACTER
+  // (persisted), so a save that finished or skipped the crawl never gets
+  // re-ambushed by it — while REPLAY OPENING (About) can always re-raise it.
+  dismissStoryIntro() {
+    set((st) => ({
+      storyIntro: null,
+      player: st.player ? { ...st.player, storyIntroSeen: true } : st.player,
+    }));
+    void get().persist();
+  },
+
+  replayStoryIntro() {
+    const p = get().player;
+    if (!p) return;
+    set({ storyIntro: introPagesFor(p.storyMotive, p.factionId) });
+  },
 
   clearContractsNotice() { set({ contractsNotice: null }); },
 

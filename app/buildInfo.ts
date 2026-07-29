@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.51';
+export const DISPLAY_VERSION = '4.28.52';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17788,4 +17788,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // climbing strap for that" — the Reclaimer's-Rope allowance for resting on an
 // ordinary climb is gone. A rope is a line you climb, not a harness you can
 // sleep in. The strap is the single answer on every climb.
-export const OTA_BUILD_ID = '2026-07-29-1017-initiative-decides-order';
+// OTA-1018 — THE REASON YOU CAME DOWN (story feature, phase 1 of 3 —
+// GOLEM-ONLY, no HAL twin by the owner's call). The game had a living world
+// and no reason to walk it: nothing ever said why THIS character went below.
+// Now: five story motives (debt / missing / exile / calling / record) picked
+// at creation step 3, a full-screen Skyrim-style opening crawl assembled
+// per-character (the flood, the thousand years, the nine hearts — then YOUR
+// pages, then the faction that took you in), SKIP always available, REPLAY
+// OPENING in About, and old saves dealt a stable motive without ever being
+// ambushed by the crawl. The motive id is the hook phases 2-3 hang from:
+// chapter cards on every main-quest transition, then the drip + side-threads
+// + per-motive endings.
+export const OTA_BUILD_ID = '2026-07-29-1018-story-intro';

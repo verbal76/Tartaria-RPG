@@ -859,9 +859,34 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.51**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.52**; ledger in `VERSION.md`.
 
-- **INITIATIVE FINALLY DECIDES THE ORDER + THE STRAP IS THE ONLY ANCHOR (2026-07-29, latest).**
+- **THE REASON YOU CAME DOWN — STORY FEATURE PHASE 1 OF 3 (2026-07-29, latest). GOLEM-ONLY.**
+  golem **1018**, no HAL twin — the owner's call: "we have a ton of lore, a living civilization
+  and economy, but no real story... we need a scrolling text intro akin to the Skyrim
+  criminal-in-a-cart intro... and we need to keep updating the player as they play. let's keep
+  this part only on golem for now." ⚠ THIS BREAKS THE golem = HAL − 23 TWIN RULE BY DESIGN —
+  do NOT port to HAL and do NOT let a future HAL→golem sync clobber it (story files:
+  app/data/story/, app/engine/story.ts, app/components/StoryIntroOverlay.tsx, plus wiring in
+  gameStore / types / character / CharacterCreationScreen / ExplorationScreen / AboutScreen).
+  • **FIVE MOTIVES** — the personal reason this character went below (debt / missing / exile /
+    calling / record), picked at creation step 3 ("WHY DID YOU COME DOWN?"), stored as
+    `player.storyMotive`. Callers that omit it (sims, legacy tests) get a random one;
+    pre-feature SAVES are dealt one deterministically in backfillPlayer (identity hash — same
+    save, same motive, every load) with `storyIntroSeen: true` so the crawl never ambushes an
+    existing character.
+  • **THE OPENING CRAWL** — full-screen paged intro over a new game's first scene:
+    3 universal pages (the flood / the thousand years / the nine hearts), 2 motive pages,
+    1 faction page ("who took you in", all 9 authored), 1 closing hand-off. Tap to advance,
+    SKIP always, REPLAY OPENING in About. All authored text in app/data/story/intro.json;
+    assembly in engine/story.ts (introPagesFor); StoryIntroOverlay renders whenever
+    store.storyIntro is non-null; every load/reset path clears it (locked by test).
+  • **NEXT PHASES** (planned): 1019 = chapter cards at every main-quest transition
+    (hook→revelation→cores→descent→nexus→choice→ended already exist in engine/mainQuest.ts);
+    1020 = the motive drip + The Missing side-thread (Hollowed tie-in) + per-motive ending
+    echoes. The motive id on the player is the key everything phases 2-3 hang from.
+
+- **INITIATIVE FINALLY DECIDES THE ORDER + THE STRAP IS THE ONLY ANCHOR (2026-07-29).**
   HAL **1040** / golem **1017**. Both are the OWNER'S CALLS on the two items left open by
   1038/1039 — and the first turned out to be a BUG, not a balance choice:
   • **INITIATIVE.** Owner: "I thought the initiative roll was the deciding factor on who went

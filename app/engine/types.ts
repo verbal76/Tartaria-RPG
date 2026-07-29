@@ -979,6 +979,14 @@ export interface PlayerCharacter {
   name: string;
   raceId: string;
   factionId: string;
+  /** OTA-1018 — THE REASON YOU CAME DOWN. One of engine/story's five motive
+   *  ids (debt / missing / exile / calling / record). Picked at character
+   *  creation; saves that predate the feature are dealt one deterministically
+   *  in backfillPlayer so phase-2/3 story beats stay stable per character. */
+  storyMotive?: string;
+  /** OTA-1018 — the opening crawl was seen (or skipped). Old saves are
+   *  backfilled to true so the intro never ambushes an existing character. */
+  storyIntroSeen?: boolean;
   stats: Stats;
   hp: number;
   hpMax: number;

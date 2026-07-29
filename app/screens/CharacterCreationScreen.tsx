@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
+import { getStoryMotives } from '../engine/story'; // OTA-1018
 
 // Tungsten Spire — the 'name' step is gone. New flow: race → faction →
 // BEGIN. The player gives their name in-game when the Arbiter prompts
@@ -9,12 +10,15 @@ import { getRaces, getFactions } from '../engine/character';
 // removes the in-screen TextInput that was driving the Android soft-
 // keyboard race the Nickel Tine + Zinc Anvil OTAs were chasing.
 
-type Step = 'race' | 'faction';
+// OTA-1018 — a third step: THE REASON YOU CAME DOWN. The motive shapes the
+// opening crawl and (phases 2-3) the story beats woven through the main quest.
+type Step = 'race' | 'faction' | 'motive';
 
-const STEP_ORDER: Step[] = ['race', 'faction'];
+const STEP_ORDER: Step[] = ['race', 'faction', 'motive'];
 const STEP_TITLE: Record<Step, string> = {
   race: 'CHOOSE YOUR RACE',
   faction: 'CHOOSE YOUR FACTION',
+  motive: 'WHY DID YOU COME DOWN?',
 };
 
 export function CharacterCreationScreen() {
@@ -24,9 +28,12 @@ export function CharacterCreationScreen() {
   const races = getRaces();
   const factions = getFactions();
 
+  const motives = getStoryMotives();
+
   const [step, setStep] = useState<Step>('race');
   const [raceId, setRaceId] = useState(races[0]!.id);
   const [factionId, setFactionId] = useState(factions[0]!.id);
+  const [motiveId, setMotiveId] = useState(motives[0]!.id);
 
   const stepIndex = STEP_ORDER.indexOf(step);
   const selectedRace = races.find((r) => r.id === raceId) ?? races[0]!;
@@ -35,8 +42,10 @@ export function CharacterCreationScreen() {
   const goBack = () => {
     if (step === 'race') {
       setScreen('title');
-    } else {
+    } else if (step === 'faction') {
       setStep('race');
+    } else {
+      setStep('faction');
     }
   };
 
@@ -45,14 +54,18 @@ export function CharacterCreationScreen() {
       setStep('faction');
       return;
     }
-    // Faction step → straight into the game with an empty name; the
+    if (step === 'faction') {
+      setStep('motive');
+      return;
+    }
+    // Motive step → straight into the game with an empty name; the
     // Arbiter prompts for it in the outpost. tutorialStep starts at 0
     // (the name beat) and the InputBox routes the next submission as
-    // the player's name.
-    void startNewGame({ name: '', raceId, factionId });
+    // the player's name. The motive drives the opening crawl.
+    void startNewGame({ name: '', raceId, factionId, motiveId });
   };
 
-  const nextLabel = step === 'faction' ? 'BEGIN' : 'NEXT →';
+  const nextLabel = step === 'motive' ? 'BEGIN' : 'NEXT →';
 
   return (
     <View style={styles.container}>
@@ -131,6 +144,39 @@ export function CharacterCreationScreen() {
               <Text style={styles.contextLine}>
                 {selectedRace.name} · {selectedFaction.name}
               </Text>
+              <Text style={styles.beginHint}>
+                One more step: the reason you came down.
+              </Text>
+            </View>
+          </>
+        )}
+
+        {step === 'motive' && (
+          <>
+            {/* OTA-1018 — THE REASON YOU CAME DOWN. The pick shapes the opening
+                crawl now and the story beats woven through the main quest in
+                later phases. There is no wrong answer and no stat attached —
+                this is who you are, not what you roll. */}
+            <Text style={styles.contextLine}>
+              {selectedRace.name} · {selectedFaction.name}
+            </Text>
+            {motives.map((m) => (
+              <TouchableOpacity
+                key={m.id}
+                style={[styles.option, motiveId === m.id && styles.optionSelected]}
+                onPress={() => setMotiveId(m.id)}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityState={{ selected: motiveId === m.id }}
+              >
+                <Text style={styles.optionName}>{m.title}</Text>
+                <Text style={styles.optionDesc}>{m.blurb}</Text>
+                {motiveId === m.id && (
+                  <Text style={styles.optionFlavor}>{m.pages[0]?.split('\n')[0] ?? ''}</Text>
+                )}
+              </TouchableOpacity>
+            ))}
+            <View style={styles.beginBlock}>
               <Text style={styles.beginHint}>
                 Tap BEGIN below. The Arbiter will greet you in the outpost and ask your name.
               </Text>
