@@ -2939,6 +2939,19 @@ function injectFactionParty(
   return true;
 }
 
+// OTA-1039 — ARE YOU UNDER A ROOF? The three outdoor world-event spawners below each
+// asked `player.hubRoomId` — which is ONLY set inside an OUTPOST room. Explorable
+// building interiors (a flooded house's kitchen, its study, its attic) live on the
+// STORE's activeBuildingId instead, so every one of these read "outdoors" while the
+// player stood indoors. Owner's log, twice in six minutes: a Mud Monarchs patrol
+// "crosses your path in the open" inside a flooded-house kitchen, and a Conspiracy
+// Architects war party "crests the rise" inside the study. Both narrations are
+// explicitly open-ground. One predicate now answers the question for all of them,
+// so a fourth spawner can't quietly get it wrong.
+function underRoof(s: GameStore, player: PlayerCharacter): boolean {
+  return !!player.hubRoomId || !!s.activeBuildingId;
+}
+
 function maybeSpawnRaid(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -2951,7 +2964,7 @@ function maybeSpawnRaid(
   // building, and not while the player is already bloodied (no kicking them down).
   if ((scene.enemies?.length ?? 0) > 0) return;
   if (scene.vendor) return;
-  if (player.hubRoomId) return;
+  if (underRoof(s, player)) return;
   if (player.hpMax > 0 && player.hp / player.hpMax < 0.5) return;
   const hour = player.hoursElapsed ?? 0;
   const last = s.worldMemory.lastRaidHour;
@@ -2996,7 +3009,7 @@ function maybeInterceptPatrol(
   const scene = s.currentScene;
   if (!player || !scene || !scene.location) return;
   if ((scene.enemies?.length ?? 0) > 0) return;
-  if (player.hubRoomId) return;
+  if (underRoof(s, player)) return;
   if (player.hpMax > 0 && player.hp / player.hpMax < 0.4) return;
   // Which faction holds this outpost? Only real, non-friendly factions patrol at you.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -3040,7 +3053,7 @@ function maybePatrolAmbush(
   const scene = s.currentScene;
   if (!player || !scene || !scene.location) return;
   if ((scene.enemies?.length ?? 0) > 0) return;
-  if (player.hubRoomId) return;
+  if (underRoof(s, player)) return;
   if (player.hpMax > 0 && player.hp / player.hpMax < 0.4) return;
   const patrols = s.worldMemory.patrols ?? [];
   if (patrols.length === 0) return;
@@ -12494,6 +12507,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const hasReclaimersRopeForRest = player.inventory.some(
               (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
             );
+            // OTA-1039 — HONEST REFUSAL. Climbing accepts a Reclaimer's Rope OR a plain
+            // Climbing Rope (see pickActiveRope), but resting on the wall accepts
+            // only the Reclaimer's. A player who just climbed on a Climbing Rope was
+            // told to "carry a Reclaimer's Rope" — which reads as "you have no rope"
+            // while they hang from one. Name the line they're on and what it can't do.
+            const hasPlainClimbingRope = player.inventory.some(
+              (i) => i.name === 'Climbing Rope' && i.quantity > 0,
+            );
             const canRestElevated = wearsClimbStrapForRest || (!onGreatClimb && hasReclaimersRopeForRest);
             if (!canRestElevated) {
               // OTA-975 — skipDedup: the pillar log showed rest retries 2-4 dedup-
@@ -12502,7 +12523,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 'arbiter',
                 onGreatClimb
                   ? `The Arbiter cranes to look up the ${currentScene.elevatedOn.noun}. "This high, only a Hardened Climbing Strap will hold you for a rest — a rope won't do it. Climb down, or come back wearing one."`
-                  : `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
+                  : hasPlainClimbingRope
+                    ? `The Arbiter looks up. "That Climbing Rope got you up — it won't hold you asleep. Climb down, or come back with a Reclaimer's Rope or a Hardened Climbing Strap to anchor a doze."`
+                    : `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
                 { skipDedup: true },
               );
               break;

@@ -214,7 +214,10 @@ describe('OTA 23-007 — climb mechanics', () => {
       expect(after.hp).toBe(before.hp);
       expect(after.stamina).toBe(before.stamina);
       const logs = store.getState().gameLog.map((e) => e.text).join('\n');
-      expect(logs).toMatch(/can't sleep on a wall/i);
+      // OTA-1039 — a plain Climbing Rope now gets its OWN refusal naming what the
+      // line can't do; the generic wall line still covers the no-rope case.
+      // The invariant under test is that rest is REFUSED, not its phrasing.
+      expect(logs).toMatch(/can't sleep on a wall|won't hold you asleep/i);
     });
 
     it("Reclaimer's Rope: rest works while elevated", async () => {
