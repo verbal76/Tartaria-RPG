@@ -859,9 +859,24 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.52**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.53**; ledger in `VERSION.md`.
 
-- **THE REASON YOU CAME DOWN — STORY FEATURE PHASE 1 OF 3 (2026-07-29, latest). GOLEM-ONLY.**
+- **THE ARBITER HOLDS HIS TONGUE — crawl/tutorial ordering fix (2026-07-29, latest). GOLEM-ONLY.**
+  golem **1019**, no HAL twin (extends the golem-only 1018 story feature; the planned chapter
+  cards move to 1020+). Owner: "the arbiter says his tutorial opening line over top of the new
+  origin text screens — it needs to hold until you are in the tutorial." startNewGame armed the
+  tutorial AND spoke the beat-0 name prompt in the same breath, so "Your name, traveler..."
+  printed into the feed underneath the opening crawl. Now: the tutorial still ARMS immediately
+  in startNewGame (tutorialStep 0 + awaitingTutorialName — keeps the scene-entry Arbiter hints
+  suppressed, per the 1018 comment there), but **startTutorial() — the spoken prompt — fires
+  from dismissStoryIntro()**, the moment the crawl closes. Guard: `storyIntroSeen === false &&
+  !hasSeenIntro` — true only on a brand-new character's FIRST dismissal, so a REPLAY OPENING
+  dismissal (About) or a backfilled save can never re-speak the prompt or restart the tutorial.
+  The immediate startTutorial() call in startNewGame survives only as a no-crawl fallback
+  (`!get().storyIntro`). Locked by `__tests__/ota1019TutorialHold.test.ts` (3 tests: silent
+  under the crawl / fires exactly once on dismissal / replay can't re-arm).
+
+- **THE REASON YOU CAME DOWN — STORY FEATURE PHASE 1 OF 3 (2026-07-29). GOLEM-ONLY.**
   golem **1018**, no HAL twin — the owner's call: "we have a ton of lore, a living civilization
   and economy, but no real story... we need a scrolling text intro akin to the Skyrim
   criminal-in-a-cart intro... and we need to keep updating the player as they play. let's keep
@@ -881,9 +896,10 @@ re-architecture. Currently **4.28.52**; ledger in `VERSION.md`.
     SKIP always, REPLAY OPENING in About. All authored text in app/data/story/intro.json;
     assembly in engine/story.ts (introPagesFor); StoryIntroOverlay renders whenever
     store.storyIntro is non-null; every load/reset path clears it (locked by test).
-  • **NEXT PHASES** (planned): 1019 = chapter cards at every main-quest transition
+  • **NEXT PHASES** (planned; renumbered — 1019 became the crawl/tutorial ordering fix above):
+    chapter cards at every main-quest transition
     (hook→revelation→cores→descent→nexus→choice→ended already exist in engine/mainQuest.ts);
-    1020 = the motive drip + The Missing side-thread (Hollowed tie-in) + per-motive ending
+    then the motive drip + The Missing side-thread (Hollowed tie-in) + per-motive ending
     echoes. The motive id on the player is the key everything phases 2-3 hang from.
 
 - **INITIATIVE FINALLY DECIDES THE ORDER + THE STRAP IS THE ONLY ANCHOR (2026-07-29).**

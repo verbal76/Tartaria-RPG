@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.52';
+export const DISPLAY_VERSION = '4.28.53';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17799,4 +17799,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ambushed by the crawl. The motive id is the hook phases 2-3 hang from:
 // chapter cards on every main-quest transition, then the drip + side-threads
 // + per-motive endings.
-export const OTA_BUILD_ID = '2026-07-29-1018-story-intro';
+// OTA-1019 — THE ARBITER HOLDS HIS TONGUE (owner: "the arbiter says his
+// tutorial opening line over top of the new origin text screens — it needs
+// to hold until you are in the tutorial"). startNewGame armed the tutorial
+// AND spoke the beat-0 name prompt in the same breath, so "Your name,
+// traveler..." printed into the feed underneath the OTA-1018 crawl. The
+// tutorial still arms immediately (scene-entry hints stay suppressed), but
+// startTutorial() — the spoken prompt — now fires from dismissStoryIntro(),
+// the moment the crawl closes and the player is actually looking at the
+// feed. Guarded on storyIntroSeen===false && !hasSeenIntro, so a REPLAY
+// OPENING dismissal or a backfilled save can never re-speak the prompt or
+// restart the tutorial. DISPLAY_VERSION 4.28.53. 3 tests. Golem-only.
+export const OTA_BUILD_ID = '2026-07-29-1019-tutorial-hold';

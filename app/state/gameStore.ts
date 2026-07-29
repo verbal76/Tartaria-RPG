@@ -5852,10 +5852,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     await get().persist();
     const slots = await listSlots();
     set({ slots });
-    // First-time tutorial — only on brand-new characters. The
-    // tutorial's beat-0 Arbiter line arms awaitingTutorialName so
-    // the next text input becomes the player's name.
-    if (!player.hasSeenIntro) {
+    // First-time tutorial — only on brand-new characters. OTA-1019 — THE
+    // ARBITER HOLDS HIS TONGUE. Owner: "the arbiter says his tutorial
+    // opening line over top of the new origin text screens — it needs to
+    // hold until you are in the tutorial." startTutorial() used to fire
+    // HERE, printing "Your name, traveler..." into the feed while the
+    // OTA-1018 crawl was still covering the screen. The tutorial STATE is
+    // already armed above (so the scene-entry hints stay suppressed); the
+    // spoken name prompt now waits for dismissStoryIntro() — the moment
+    // the crawl closes and the player is actually looking at the feed.
+    // The immediate call survives only as a fallback for the no-crawl case.
+    if (!player.hasSeenIntro && !get().storyIntro) {
       get().startTutorial();
     }
   },
@@ -26222,10 +26229,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // (persisted), so a save that finished or skipped the crawl never gets
   // re-ambushed by it — while REPLAY OPENING (About) can always re-raise it.
   dismissStoryIntro() {
+    // OTA-1019 — closing the FIRST crawl of a brand-new character is the
+    // hand-off to the Arbiter: startNewGame armed the tutorial but held the
+    // spoken name prompt so it couldn't print underneath the crawl. Fire it
+    // now, once. storyIntroSeen===false only on that first showing — a
+    // REPLAY OPENING dismiss (About) and every backfilled save arrive here
+    // with it already true, so neither can restart the tutorial.
+    const pre = get().player;
+    const handOffToTutorial = !!pre && pre.storyIntroSeen === false && !pre.hasSeenIntro;
     set((st) => ({
       storyIntro: null,
       player: st.player ? { ...st.player, storyIntroSeen: true } : st.player,
     }));
+    if (handOffToTutorial) get().startTutorial();
     void get().persist();
   },
 
