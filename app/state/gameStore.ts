@@ -2887,7 +2887,22 @@ function injectFactionParty(
   const player = s.player;
   const scene = s.currentScene;
   if (!player || !scene || !scene.location) return false;
-  const base = rollEncounter(scene.location).filter((e) => !e.boss);
+  // OTA-1038 — a faction party is made of that faction's PEOPLE. This builder reskins
+  // whatever the local wild table rolls (rename + stamp a factionId) and KEEPS
+  // every trait, so an Aetherkin roll used to walk in as "<Faction> Patrol 1" —
+  // a mud-mummified corpse wearing a soldier's name, resisting piercing and
+  // burning like tinder. That reskin is also what double-docked the victim's own
+  // faction on the kill (the reverence penalty below assumes Aetherkin carry no
+  // faction). Special-marked creatures are excluded from the pool outright; if
+  // nothing ordinary is available here, no party lands (callers handle false).
+  const specialTemplate = (e: Enemy): boolean => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isAetherkin: isAk } = require('../engine/aetherkin') as typeof import('../engine/aetherkin');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isRevenant } = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+    return isAk(e) || isRevenant(e);
+  };
+  const base = rollEncounter(scene.location).filter((e) => !e.boss && !specialTemplate(e));
   if (base.length === 0) return false;
   const party: Enemy[] = [];
   for (let i = 0; i < opts.partySize; i++) {
@@ -3531,6 +3546,13 @@ function applyAetherkinReverenceDelta(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   delta: number,
+  // OTA-1038 — factions the SAME event already moved. One kill must cost a faction
+  // once. When an Aetherkin carries a faction (see injectFactionParty), the
+  // faction-kill penalty already docked it; without this exclusion the reverence
+  // pass docked it a second time — a measured −6 for one kill where every other
+  // faction paid −3. The block's own comment assumes "they carry no factionId";
+  // this is the guard for when that assumption doesn't hold.
+  excludeFactionIds?: ReadonlySet<string>,
 ): { factionId: string; delta: number; newStanding: number }[] {
   const p = get().player;
   if (!p || delta === 0) return [];
@@ -3538,6 +3560,7 @@ function applyAetherkinReverenceDelta(
   const changed: { factionId: string; delta: number; newStanding: number }[] = [];
   const next = p.factionStanding.map((row) => {
     if (!revered.has(row.factionId)) return row;
+    if (excludeFactionIds?.has(row.factionId)) return row;
     const ns = Math.max(-100, Math.min(100, row.standing + delta));
     const realDelta = ns - row.standing;
     if (realDelta !== 0) changed.push({ factionId: row.factionId, delta: realDelta, newStanding: ns });
@@ -17038,9 +17061,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const sc = get().currentScene;
         if (passChance <= 0.55 && !sc?.sneakOddsWarned) {
           set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, sneakOddsWarned: true } } : s));
+          // OTA-1038 — this fired verbatim at MID range too, telling the player about
+          // "arm's reach" while they stood well off it. Name the range they're in.
+          const atReach = sc?.range === 'close';
+          const wherePhrase = atReach ? `a foe at arm's reach` : `a foe who already has your scent`;
+          const slipPhrase = atReach ? `Slipping away at arm's reach` : `Slipping away once they're onto you`;
           get().appendLog('arbiter', passChance <= 0.25
-            ? `The Arbiter keeps his voice low. "Your stealth won't carry you past a foe at arm's reach — not here. Every try just buys them a free swing. Fight it out, or break to distance first."`
-            : `The Arbiter keeps his voice low. "Slipping away at arm's reach is a coin-flip with your stealth — and a miss lets the whole pack swing free. Weigh it against just fighting."`);
+            ? `The Arbiter keeps his voice low. "Your stealth won't carry you past ${wherePhrase} — not here. Every try just buys them a free swing. Fight it out, or break to distance first."`
+            : `The Arbiter keeps his voice low. "${slipPhrase} is a coin-flip with your stealth — and a miss lets the whole pack swing free. Weigh it against just fighting."`);
         }
       }
       // OTA-999 — a CLOSE failed stealth check teaches a little while STE is
@@ -17202,7 +17230,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // roll") — a passed check then still lost an unwinnable init race and
               // surprised the player every time. Use the raw stat like the rest of
               // the engine so STEALTH actually helps.
-              const steBonus = ste;
+              // OTA-1038 — Shadow Diver's +1 rode the GATE roll (buildSkillSteps folds
+              // titleSkillBonus in, which is why the log reads "STE 1 + 1 (title:
+              // Shadow Diver)") but was missing from THIS contest — the roll that
+              // actually decides the outcome. The stealth title got you into the
+              // race and then sat out. Same bonus, both rolls.
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const stealthTitleBonus: number = livePlayer
+                ? (require('../engine/titles').titlePerkModifiers(livePlayer).stealthBonus ?? 0)
+                : 0;
+              const steBonus = ste + stealthTitleBonus;
               // #6 — day/night cover applies to EVERY stealth check, not just
               // pickpocket (playtest: "does stealth scale up at night, down in the
               // day?"). Fold the same +1-night / −1-day modifier the sleight-of-hand
@@ -17269,7 +17306,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   stealthSucceeded = true;
                 } else {
                   set((s) => (s.player
-                    ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'surprised', remainingRounds: 1, label: 'caught mid-vanish' }) } }
+                    ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'surprised', remainingRounds: 1, label: 'exposed opening' }) } }
                     : s));
                   get().appendLog('world', `${foe} reads the move before you finish it — you break contact a beat too slow and leave yourself open. Their next strike has the advantage.`);
                   get().appendLog('debug', `stealth: reset LOSE init ${pInit} vs ${eInit} — surprised applied`);
@@ -17620,6 +17657,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         switch (intent) {
           case 'stealth':
             get().appendLog('world', 'Your foot scrapes stone. Something stirs in the dark.');
+            // OTA-1038 — CHARGE WHAT THE GAME PROMISES. The sneak-odds warning above
+            // tells the player in as many words that a miss "lets the whole pack
+            // swing free", and the OTA-936 comment that authored it says a failed
+            // sneak "burns the turn AND the whole enemy group swings free" — but
+            // nothing here ever ran the counters. Measured: a FAILED sneak cost
+            // 0 HP and no status, while a SUCCESSFUL one cost HP every time
+            // (the reset branch always runs the counters). Rolling badly was the
+            // better play. The failed-flee path right below has always charged
+            // this ("a FAILED flee is not free"); stealth now matches.
+            if ((currentScene.enemies?.length ?? 0) > 0) {
+              runEnemyGroupCounters(get, set, player);
+            }
             break;
           case 'diplomacy': {
             const hasAudience = currentScene.enemies.length > 0 || !!currentScene.vendor;
@@ -19147,6 +19196,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // guest, e.g. Irma the True Tartarian) — angered too for the harm to their
     // member. Deltas accumulate so a faction that is both offended AND another
     // victim's rival nets out sensibly.
+    // OTA-1038 — every faction this kill has ALREADY docked, so no later pass can
+    // charge the same faction twice for the same corpse.
+    const killDockedFactions = new Set<string>();
     const killFactionTargets = [enemy.factionId, enemy.nativeFactionId]
       .filter((f): f is string => !!f)
       .filter((f, i, arr) => arr.indexOf(f) === i);
@@ -19179,6 +19231,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (changed.length > 0) {
           set((s) => (s.player ? { player: { ...s.player, factionStanding: nextStanding } } : s));
           logRepChanges(get, changed);
+          // OTA-1038 — only the PENALTIES claim the slot; a rival's +1 must not stop
+          // the reverence pass from reaching that faction.
+          for (const c of changed) if (c.delta < 0) killDockedFactions.add(c.factionId);
         }
       }
     }
@@ -19234,7 +19289,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const revExempt = (require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants')).isRevenant(enemy);
     if (!revExempt && isAetherkin(enemy)) {
-      const revChanged = applyAetherkinReverenceDelta(get, set, AETHERKIN_KILL_REP);
+      const revChanged = applyAetherkinReverenceDelta(get, set, AETHERKIN_KILL_REP, killDockedFactions);
       if (revChanged.length > 0) {
         logRepChanges(get, revChanged);
         get().appendLog('system', 'Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.');

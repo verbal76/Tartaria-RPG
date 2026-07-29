@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.48` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.48` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.49` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.49` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -83,6 +83,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.45 → 4.28.46 | 2026-07-28-1035 | OTA | PERSIST LEAK ROOT-CAUSED (the deepest open item, closed): sim OOMs were the jest.fn AsyncStorage mock retaining every ~400 KB disk-log rewrite (plain mock via moduleNameMapper; 12k-action proof run flat at 249 MB vs 8 GB OOM before); on device, appendLogToDisk's per-line full read-modify-write is now BATCHED — one read+write per burst instead of megabytes of bridge traffic per action. Plus corrections: all contract kinds were already face-to-face; docs and a stale comment fixed. |
 | 4.28.46 → 4.28.47 | 2026-07-28-1036 | OTA | TC-GHOST CLOSE-OUT: the intermittent raid-window challengeForLocation crash investigated to its evidence floor — both occurrences co-occurred with the since-fixed 6-8 GB test-mock heap pressure; 3 armed repro attempts + 4 clean runs show zero recurrence. Permanent self-diagnosing tripwire armed in the combat canary (stack + module shape + heap on any recurrence). Test-only. |
 | 4.28.47 → 4.28.48 | 2026-07-28-1037 | OTA | CONTRACTS CARD UNWEDGED (owner report, log part 16): quit-navigating left routedMission set, freezing the card's Auto-routing note over the ROUTE button, and COMPLETE-tap refusals (wrong faction etc.) spoke only to the invisible world feed. Now: stopTravel/stopWhisperCourse clear routedMission; the routed note requires a live course (heals stale saves); refused COMPLETE taps surface the Arbiter's line as a dismissible strip on the Contracts screen itself. |
+| 4.28.48 → 4.28.49 | 2026-07-29-1038 | OTA | ONE KILL, ONE PRICE + STEALTH HONESTY (owner log part 16, re-verified by probe): faction patrols were reskinned from whatever the wild table rolled, so an Aetherkin walked in wearing a faction name and its kill docked that faction TWICE (measured −6 vs −3) — special templates are now excluded from faction parties and the reverence pass skips factions the kill already docked. A FAILED sneak cost nothing while a successful one always cost HP; the failed sneak now charges the group counter the Arbiter's own warning promises. Shadow Diver's +1 now rides the deciding contest, not just the gate. Plus a fragment status-expiry line and range-aware warning wording. Initiative-is-cosmetic left OPEN for the owner. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 
