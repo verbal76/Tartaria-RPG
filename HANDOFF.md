@@ -859,9 +859,36 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.53**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.54**; ledger in `VERSION.md`.
 
-- **THE ARBITER HOLDS HIS TONGUE — crawl/tutorial ordering fix (2026-07-29, latest). GOLEM-ONLY.**
+- **CHAPTER CARDS — STORY FEATURE PHASE 2 OF 3 (2026-07-29, latest). GOLEM-ONLY.**
+  golem **1020**, no HAL twin (⚠ same golem-only divergence rule as 1018 — do NOT port, do
+  NOT let a HAL→golem sync clobber app/data/story/chapters.json, app/engine/chapters.ts,
+  app/components/ChapterCardOverlay.tsx, or the wiring in gameStore / App.tsx /
+  EndingScreen). Owner: "we need to keep updating the player as they play."
+  • **FOUR CARDS**, one per main-quest phase transition, raised at the single
+    `triggerMainQuest` choke point (`nextState.phase !== prevState.phase` →
+    `chapterCardFor(phase, player.storyMotive)`): CHAPTER II — NINE HEARTS (hook→revelation,
+    first Lost Capital), III — THE FIRST HEART (revelation→cores, first Core), IV — THE
+    ENDLESS STAIR (cores→descent, all nine), V — THE MUD FLOOD NEXUS (descent→choice,
+    arrival). Each card = kicker + title + universal body + a line authored for THIS
+    character's OTA-1018 motive (5 motives × 4 chapters, all in
+    app/data/story/chapters.json). The feed narration is unchanged — the log stays the
+    complete record; the card is the cinematic marker on top, one tap dismisses.
+  • **GLOBAL MOUNT** — ChapterCardOverlay renders from App.tsx's global-overlay stack (own
+    SilentBoundary), NOT per-screen: travel arrivals land on exploration but the Nexus
+    choice fires from Contracts. `store.chapterCard` transient; cleared on slot load /
+    delete / hard reset / new game (locked by count in tests).
+  • **'ended' HAS NO CARD BY DESIGN** — EndingScreen is already the ending's full-screen
+    moment. It instead renders the new per-motive EPILOGUE (3 endings × 5 motives matrix in
+    chapters.json → `epilogueMotiveLine`) under the faction ending prose — the per-motive
+    ending echoes originally planned for phase 3, delivered early.
+  • **NEXT (phase 3):** the motive DRIP (periodic mid-arc beats keyed to motive — letters,
+    rumors, the Missing's trail via the Hollowed system) + The Missing side-thread.
+    Locked by `__tests__/ota1020ChapterCards.test.ts` (11 tests incl. a real
+    travel-into-Asgardar transition through the store).
+
+- **THE ARBITER HOLDS HIS TONGUE — crawl/tutorial ordering fix (2026-07-29). GOLEM-ONLY.**
   golem **1019**, no HAL twin (extends the golem-only 1018 story feature; the planned chapter
   cards move to 1020+). Owner: "the arbiter says his tutorial opening line over top of the new
   origin text screens — it needs to hold until you are in the tutorial." startNewGame armed the
@@ -896,11 +923,10 @@ re-architecture. Currently **4.28.53**; ledger in `VERSION.md`.
     SKIP always, REPLAY OPENING in About. All authored text in app/data/story/intro.json;
     assembly in engine/story.ts (introPagesFor); StoryIntroOverlay renders whenever
     store.storyIntro is non-null; every load/reset path clears it (locked by test).
-  • **NEXT PHASES** (planned; renumbered — 1019 became the crawl/tutorial ordering fix above):
-    chapter cards at every main-quest transition
-    (hook→revelation→cores→descent→nexus→choice→ended already exist in engine/mainQuest.ts);
-    then the motive drip + The Missing side-thread (Hollowed tie-in) + per-motive ending
-    echoes. The motive id on the player is the key everything phases 2-3 hang from.
+  • **NEXT PHASES** (updated): phase 2 (chapter cards + per-motive epilogues) SHIPPED as
+    golem 1020 — see the CHAPTER CARDS entry above. Remaining phase 3: the motive drip +
+    The Missing side-thread (Hollowed tie-in). The motive id on the player is the key
+    everything hangs from.
 
 - **INITIATIVE FINALLY DECIDES THE ORDER + THE STRAP IS THE ONLY ANCHOR (2026-07-29).**
   HAL **1040** / golem **1017**. Both are the OWNER'S CALLS on the two items left open by

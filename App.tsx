@@ -37,6 +37,7 @@ import { TutorialOverlay } from './app/components/TutorialOverlay';
 import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
+import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1020
 import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
@@ -583,6 +584,13 @@ export default function App() {
       </SilentBoundary>
       <SilentBoundary tag="AetherStatPickerModal">
         <AetherStatPickerModal />
+      </SilentBoundary>
+      {/* OTA-1020 — chapter cards mount GLOBALLY (not per-screen) because
+          main-quest phase transitions fire from more than one screen: travel
+          arrival lands on exploration, but the Nexus choice fires from
+          Contracts. Wherever the arc turns, the card shows. */}
+      <SilentBoundary tag="ChapterCardOverlay">
+        <ChapterCardOverlay />
       </SilentBoundary>
       <SilentBoundary tag="KeyboardInputBar">
         <KeyboardInputBar />

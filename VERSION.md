@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.53` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.53` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.54` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.54` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -88,6 +88,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.50 → 4.28.51 | 2026-07-29-1017 | OTA | INITIATIVE DECIDES WHO SWINGS FIRST (owner: "I thought the initiative roll was the deciding factor on who went first" — it never was; the roll's only consumer was the log line). Losing it now runs the enemy volley BEFORE your strike, and a lethal volley cancels your swing; the volley is MOVED not added, so a round still holds exactly one. RAISES LETHALITY BY DESIGN. Plus the owner's second call: only the Hardened Climbing Strap anchors an elevated rest — the Reclaimer's-Rope allowance is removed on every climb. |
 | 4.28.51 → 4.28.52 | 2026-07-29-1018 | OTA | THE REASON YOU CAME DOWN (story phase 1/3, GOLEM-ONLY — no HAL twin by owner's call): five story motives picked at creation step 3, a Skyrim-style paged opening crawl (3 universal + 2 motive + 1 faction + closing) over the first scene with SKIP and About-screen REPLAY OPENING, and save migration that deals old characters a stable motive without ever showing them the crawl uninvited. |
 | 4.28.52 → 4.28.53 | 2026-07-29-1019 | OTA | THE ARBITER HOLDS HIS TONGUE (owner: "the arbiter says his tutorial opening line over top of the new origin text screens — it needs to hold until you are in the tutorial"): startNewGame armed the tutorial and spoke the beat-0 name prompt in the same breath, printing it underneath the OTA-1018 crawl. The tutorial still arms immediately (scene-entry hints stay suppressed), but the spoken prompt now fires from dismissStoryIntro() — guarded so a REPLAY OPENING dismissal or backfilled save can never re-speak it or restart the tutorial. Golem-only. |
+| 4.28.53 → 4.28.54 | 2026-07-29-1020 | OTA | CHAPTER CARDS (story phase 2/3, GOLEM-ONLY): every main-quest phase transition raises a full-screen chapter card — II NINE HEARTS (first Capital), III THE FIRST HEART (first Core), IV THE ENDLESS STAIR (all nine), V THE MUD FLOOD NEXUS (arrival) — each with a universal body plus a line written for this character's story motive. Raised at the triggerMainQuest choke point, mounted globally (the Nexus choice fires from Contracts). 'ended' gets no card: EndingScreen renders the new 3×5 per-motive EPILOGUE matrix instead, closing the run on the personal thread. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 
