@@ -89,7 +89,18 @@ as clarified by the user on 2026-07-13:
 
 - **`HaL2001` is PRODUCTION.** The Tartaria build in the wild with internal
   testers. Vetted changes only; a push OTAs their devices.
-- **PLAYER-FEEDBACK BATCH (2026-07-30, latest). BOTH LINES.** golem **1025** / HAL **1048**.
+- **NARRATION CONTEXT (2026-07-30, latest). BOTH LINES.** golem **1026** / HAL **1049**.
+  Owner's log: post-combat crate salvage drew "Don't make me decide which one of you to
+  leave breathing" with zero enemies. Two-part root cause: the template picker's mood is
+  read from `cognitiveLastResponse` — one action STALE (the fresh classification lands
+  after the line prints) — and the AGGRESSION pool is the one mood whose every line
+  presupposes a live opponent. `pickMoodPool` now takes `hasLiveEnemy` and refuses the
+  AGGRESSION pool without one (other moods read fine ambient; no staleness surgery
+  needed). Plus the Aetheric Torch mark line: was one verbatim string per use, leaning on
+  "resonance" — now 4 rotating variants, exactly one keeping the word. Locked by
+  ota1026/1049NarrationContext (3 tests per line incl. a 300-draw no-menace sweep).
+
+- **PLAYER-FEEDBACK BATCH (2026-07-30). BOTH LINES.** golem **1025** / HAL **1048**.
   Three device-session items: • GUARDIAN DAMAGE now tracks over-level (`monotoneTierDmgBonus`
   in coreGuardians — the missing fourth dimension; HP/AC/attack already scaled). Fresh
   arrivals byte-identical (bonus 0 at over=1); the owner's tier-2 case goes 1d8+4 → 1d8+8;

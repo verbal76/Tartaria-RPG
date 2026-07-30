@@ -20614,7 +20614,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       };
     });
-    get().appendLog('world', `You fix the ${torch.name}'s aetheric light on the ${noun}. It answers with a deep, wrong-sounding resonance — there is more here than there should be. Work the ${noun} — investigate it and it will give up something rare.`);
+    // OTA-1049 — the mark line repeated VERBATIM per torch use (twice in ten
+    // minutes in the owner's log) and leaned on "resonance", the same word
+    // the owner already flagged as overused. Four variants, one keeper.
+    const torchMarkLines = [
+      `You fix the ${torch.name}'s aetheric light on the ${noun}. It answers with a deep, wrong-sounding resonance — there is more here than there should be. Work the ${noun} — investigate it and it will give up something rare.`,
+      `You sweep the ${torch.name}'s light across the ${noun}. The glow catches and HOLDS — the Aether has marked something inside. Work the ${noun} — investigate it and it will give up something rare.`,
+      `Under the ${torch.name}'s light the ${noun} throws a second shadow it should not have. Something is layered in there. Work the ${noun} — investigate it and it will give up something rare.`,
+      `The ${torch.name}'s light thins against the ${noun} and comes back tinged — the color of buried metal. Work the ${noun} — investigate it and it will give up something rare.`,
+    ];
+    get().appendLog('world', torchMarkLines[Math.floor(Math.random() * torchMarkLines.length)]!);
     void get().persist();
   },
 
