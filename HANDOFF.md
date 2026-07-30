@@ -89,7 +89,16 @@ as clarified by the user on 2026-07-13:
 
 - **`HaL2001` is PRODUCTION.** The Tartaria build in the wild with internal
   testers. Vetted changes only; a push OTAs their devices.
-- **FUSION LEGIBILITY (2026-07-30, latest). BOTH LINES.** golem **1024** / HAL **1047**.
+- **PLAYER-FEEDBACK BATCH (2026-07-30, latest). BOTH LINES.** golem **1025** / HAL **1048**.
+  Three device-session items: • GUARDIAN DAMAGE now tracks over-level (`monotoneTierDmgBonus`
+  in coreGuardians — the missing fourth dimension; HP/AC/attack already scaled). Fresh
+  arrivals byte-identical (bonus 0 at over=1); the owner's tier-2 case goes 1d8+4 → 1d8+8;
+  cap +9. Running-max staged; ota954/931 monotone suites still green. • The travel/room
+  row (InputBox `travelRow`) WRAPS (minWidth 92, font floor 0.55→0.8) instead of shrinking
+  a 5-button row unreadable. • RESONANCE hook: weight 5→2, plant pool 2→5 lines. Locked by
+  ota1025/1048FeedbackBatch (5 tests per line).
+
+- **FUSION LEGIBILITY (2026-07-30). BOTH LINES.** golem **1024** / HAL **1047**.
   Owner's log told the whole story in two minutes: a CORRECT "too alike" refusal (2 kinds
   reserved), self-corrected spread, then a fee bounce at 11 TC learned from a buried
   system line. Fixes: (1) every forge-reservable inventory row carries its material
