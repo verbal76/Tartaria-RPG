@@ -987,6 +987,13 @@ export interface PlayerCharacter {
   /** OTA-1018 — the opening crawl was seen (or skipped). Old saves are
    *  backfilled to true so the intro never ambushes an existing character. */
   storyIntroSeen?: boolean;
+  /** OTA-1021 — motive-drip beat ids already delivered to the feed (strict
+   *  order, one-shot each; see engine/storyDrip.ts). Absent = none yet. */
+  storyBeatsSeen?: string[];
+  /** OTA-1021 — how The Missing side-thread ended for this character
+   *  ('grave' | 'lie' | 'walker'), set when the resolution fires. Also keys
+   *  the EndingScreen epilogue override. Absent = trail still open. */
+  missingResolved?: string;
   stats: Stats;
   hp: number;
   hpMax: number;

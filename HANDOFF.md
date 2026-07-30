@@ -859,9 +859,38 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.54**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.55**; ledger in `VERSION.md`.
 
-- **CHAPTER CARDS — STORY FEATURE PHASE 2 OF 3 (2026-07-29, latest). GOLEM-ONLY.**
+- **THE MOTIVE DRIP — STORY FEATURE PHASE 3 OF 3, ARC COMPLETE (2026-07-29, latest). GOLEM-ONLY.**
+  golem **1021**, no HAL twin (⚠ same golem-only divergence rule as 1018/1020 — protect
+  app/data/story/drip.json, app/engine/storyDrip.ts, and the wiring in gameStore /
+  EndingScreen / types from any HAL→golem sync). Owner: "we need to keep updating the
+  player as they play." With this, the full story stack is: crawl (1018) → tutorial hold
+  (1019) → chapter cards + epilogues (1020) → drip + The Missing's ending (1021).
+  • **THE DRIP** — five authored beats per motive (25 total), delivered on TRAVEL ARRIVALS
+    via `advanceStoryDrip` (called in travelTo after triggerMainQuest). Strict order,
+    one-shot each (`player.storyBeatsSeen`), gated per-beat on hoursElapsed (6/16/30/48/70)
+    and coresRecovered (0/0/1/2/3). At most ONE story event per arrival; holds while the
+    tutorial/crawl runs, while a chapter card is up, or when the arrival scene is hostile —
+    a held beat just waits for the next arrival.
+  • **THE MISSING'S TRAIL ENDS** — motive 'missing' only: once all five trail beats are
+    seen and 3+ Cores carried, the next Lost Capital arrival answers "the grave, the lie,
+    or the thing that walks" — dealt deterministically from the character seed
+    (`missingResolutionFor`), person named by `missingPersonName` (stable per character).
+    GRAVE/LIE: 3 arrival paragraphs + guaranteed keepsake (Weathered Locket / Unsent
+    Letter) + `player.missingResolved` set on the spot. WALKER: a Hollowed boss wearing
+    their face spawns into the arrival scene (same scene shape as revenant events; carries
+    REVENANT_TRAIT so mercy rules apply and every activeRevenant-dependent block no-ops) —
+    the KILL PATH hook (isMissingWalker) grants the closing beats + Mud-Kept Locket and
+    marks resolved THERE, so a fled fight re-offers the walker at the next Capital instead
+    of losing the ending. KO-strip does not resolve (deliberate — the mercy is the kill).
+  • **EPILOGUE OVERRIDE** — a resolved thread replaces the standard 'missing' EndingScreen
+    epilogue (which assumes the question is open) with the resolution's own closing
+    (`missingResolvedEpilogue`).
+  • Locked by `__tests__/ota1021MotiveDrip.test.ts` (10 tests incl. real travel-arrival
+    delivery and a real Capital-arrival resolution through the store).
+
+- **CHAPTER CARDS — STORY FEATURE PHASE 2 OF 3 (2026-07-29). GOLEM-ONLY.**
   golem **1020**, no HAL twin (⚠ same golem-only divergence rule as 1018 — do NOT port, do
   NOT let a HAL→golem sync clobber app/data/story/chapters.json, app/engine/chapters.ts,
   app/components/ChapterCardOverlay.tsx, or the wiring in gameStore / App.tsx /
@@ -883,9 +912,8 @@ re-architecture. Currently **4.28.54**; ledger in `VERSION.md`.
     moment. It instead renders the new per-motive EPILOGUE (3 endings × 5 motives matrix in
     chapters.json → `epilogueMotiveLine`) under the faction ending prose — the per-motive
     ending echoes originally planned for phase 3, delivered early.
-  • **NEXT (phase 3):** the motive DRIP (periodic mid-arc beats keyed to motive — letters,
-    rumors, the Missing's trail via the Hollowed system) + The Missing side-thread.
-    Locked by `__tests__/ota1020ChapterCards.test.ts` (11 tests incl. a real
+  • **Phase 3 SHIPPED** as golem 1021 (the motive drip + The Missing's ending) — see the
+    entry above. Locked by `__tests__/ota1020ChapterCards.test.ts` (11 tests incl. a real
     travel-into-Asgardar transition through the store).
 
 - **THE ARBITER HOLDS HIS TONGUE — crawl/tutorial ordering fix (2026-07-29). GOLEM-ONLY.**

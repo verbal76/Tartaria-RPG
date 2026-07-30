@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.54';
+export const DISPLAY_VERSION = '4.28.55';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17825,4 +17825,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // authored matrix that closes the run on the personal thread, not just the
 // political one. All text in app/data/story/chapters.json; logic in
 // engine/chapters.ts. DISPLAY_VERSION 4.28.54. 11 tests. Golem-only.
-export const OTA_BUILD_ID = '2026-07-29-1020-chapter-cards';
+// OTA-1021 — THE MOTIVE DRIP (story feature, phase 3 of 3 — GOLEM-ONLY;
+// closes the arc). Owner: "we need to keep updating the player as they
+// play." Five authored beats per motive now drip into the feed at travel
+// arrivals — strict order, one-shot (player.storyBeatsSeen), gated on
+// hoursElapsed + Cores — so the personal thread keeps talking between the
+// chapter cards: the recalculated debt, the registry mark, the warrant gone
+// soft, the hum answering back, the second notebook. One story event max
+// per arrival; holds during the opening, chapter cards, and hostile scenes.
+// THE MISSING SIDE-THREAD ENDS: once its five trail beats are seen and
+// three Cores carried, the next Lost Capital arrival answers the intro's
+// question — grave, lie, or the thing that walks — dealt deterministically
+// from the character seed. grave/lie resolve on the spot (keepsake
+// guaranteed); walker spawns a Hollowed boss wearing their face (revenant
+// rules apply) whose defeat hook grants the closing beats + keepsake and
+// marks the thread — a fled fight re-offers it at the next Capital. A
+// resolved thread overrides the 'missing' epilogue on EndingScreen with its
+// own closing. All text in app/data/story/drip.json; logic in
+// engine/storyDrip.ts. DISPLAY_VERSION 4.28.55. 10 tests. Golem-only.
+export const OTA_BUILD_ID = '2026-07-29-1021-motive-drip';

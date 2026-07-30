@@ -18783,6 +18783,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (locationId === 'mud_flood_nexus') {
       triggerMainQuest(get, set, { kind: 'reached_nexus' });
     }
+    // OTA-1021 — the motive drip rides travel arrivals (one story event max
+    // per arrival; holds during the opening / chapter cards / hostile scenes).
+    advanceStoryDrip(get, set, locationId);
     void get().persist();
   },
 
@@ -19387,6 +19390,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set((s2) => ({ worldMemory: { ...s2.worldMemory, activeRevenant: undefined } }));
           get().appendLog('debug', `revenant: ${fr.name}@${fr.ts} put to rest`);
         }
+      }
+    }
+    // OTA-1021 — THE MISSING's third answer, put to rest. The closing beats
+    // and the keepsake are GUARANTEED here (never a dice roll), and the
+    // thread marks resolved HERE, not at spawn — a fled fight re-offers the
+    // walker at the next Lost Capital instead of losing the ending forever.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const dripMod = require('../engine/storyDrip') as typeof import('../engine/storyDrip');
+      const pWalk = get().player;
+      if (pWalk && dripMod.isMissingWalker(enemy)) {
+        const person = dripMod.missingPersonName(dripMod.storySeed(pWalk));
+        const res = dripMod.missingResolution('walker', person);
+        for (const line of res.defeat ?? []) get().appendLog(line.speaker, line.text);
+        const keep: InventoryItem = {
+          id: freshInstanceId('story_keepsake'),
+          name: res.keepsake.name, kind: 'relic', rarity: 'Legendary', quantity: 1,
+          tags: ['quest', 'story', 'keepsake'], description: res.keepsake.description,
+        };
+        set((s2) => (s2.player ? { player: { ...s2.player, missingResolved: 'walker', inventory: mergeOrPushItem(s2.player.inventory, keep) } } : s2));
+        get().appendLog('reward', `✦ ${keep.name} — it was theirs the whole time. Yours now to carry home.`);
       }
     }
     // OTA-991 — putting a revenant to rest is a mercy, never a hunt. Guarded by
@@ -29471,6 +29495,73 @@ function triggerMainQuest(
     for (const line of cine) {
       get().appendLog('arbiter', line);
     }
+  }
+}
+
+// OTA-1021 — THE MOTIVE DRIP (story phase 3). Called on every travel arrival,
+// AFTER triggerMainQuest: delivers at most ONE story event per arrival —
+// either The Missing's resolution (which outranks everything once due) or the
+// next drip beat for the character's motive. Beats are strict-order,
+// one-shot (player.storyBeatsSeen), gated on hoursElapsed + Cores inside
+// nextDripBeat. Holds entirely while the opening still runs (tutorial/crawl),
+// while a chapter card owns the moment, or when the arrival scene is hostile
+// — a skipped beat simply waits for the next arrival.
+function advanceStoryDrip(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore>) => void,
+  arrivedAt: string,
+): void {
+  const player = get().player;
+  if (!player) return;
+  if (get().tutorialStep !== null || get().storyIntro || get().chapterCard) return;
+  if ((get().currentScene?.enemies?.length ?? 0) > 0) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const drip = require('../engine/storyDrip') as typeof import('../engine/storyDrip');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mq = require('../engine/mainQuest');
+  // THE MISSING's trail ends at a Lost Capital. grave/lie resolve on the
+  // spot (keepsake + missingResolved). walker spawns the boss and marks
+  // NOTHING — resolution + keepsake land in the defeat hook, so a fled
+  // fight re-offers the walker at the next Capital instead of losing the
+  // ending forever (same retry semantics as the Hollowed).
+  if (drip.missingResolutionDue(player) && mq.LOST_CAPITAL_LOCATIONS.includes(arrivedAt)) {
+    const seed = drip.storySeed(player);
+    const person = drip.missingPersonName(seed);
+    const kind = drip.missingResolutionFor(seed);
+    const res = drip.missingResolution(kind, person);
+    for (const line of res.arrival) get().appendLog(line.speaker, line.text);
+    if (kind === 'walker') {
+      const foe = drip.missingWalkerEnemy(player.hpMax, person);
+      const scene = get().currentScene;
+      if (scene) {
+        set({
+          currentScene: {
+            ...scene,
+            enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
+            enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
+          },
+        });
+        get().appendLog('combat', `⚔ BOSS EVENT — ${foe.name}. It cannot be talked down and it will not stop. Put them to rest. Nothing else is mercy.`);
+      }
+    } else {
+      const cur = get().player!;
+      const keep: InventoryItem = {
+        id: freshInstanceId('story_keepsake'),
+        name: res.keepsake.name, kind: 'relic', rarity: 'Legendary', quantity: 1,
+        tags: ['quest', 'story', 'keepsake'], description: res.keepsake.description,
+      };
+      set({ player: { ...cur, missingResolved: kind, inventory: mergeOrPushItem(cur.inventory, keep) } });
+      get().appendLog('reward', `✦ ${keep.name} — ${keep.description}`);
+    }
+    get().appendLog('debug', `story: missing resolution '${kind}' fired at ${arrivedAt}`);
+    return;
+  }
+  const beat = drip.nextDripBeat(player);
+  if (!beat) return;
+  get().appendLog(beat.speaker, beat.text);
+  const cur = get().player;
+  if (cur) {
+    set({ player: { ...cur, storyBeatsSeen: [...(cur.storyBeatsSeen ?? []), beat.id] } });
   }
 }
 
