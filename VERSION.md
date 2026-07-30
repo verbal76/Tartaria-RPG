@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.55` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.55` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.56` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.56` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -90,6 +90,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.52 → 4.28.53 | 2026-07-29-1019 | OTA | THE ARBITER HOLDS HIS TONGUE (owner: "the arbiter says his tutorial opening line over top of the new origin text screens — it needs to hold until you are in the tutorial"): startNewGame armed the tutorial and spoke the beat-0 name prompt in the same breath, printing it underneath the OTA-1018 crawl. The tutorial still arms immediately (scene-entry hints stay suppressed), but the spoken prompt now fires from dismissStoryIntro() — guarded so a REPLAY OPENING dismissal or backfilled save can never re-speak it or restart the tutorial. Golem-only. |
 | 4.28.53 → 4.28.54 | 2026-07-29-1020 | OTA | CHAPTER CARDS (story phase 2/3, GOLEM-ONLY): every main-quest phase transition raises a full-screen chapter card — II NINE HEARTS (first Capital), III THE FIRST HEART (first Core), IV THE ENDLESS STAIR (all nine), V THE MUD FLOOD NEXUS (arrival) — each with a universal body plus a line written for this character's story motive. Raised at the triggerMainQuest choke point, mounted globally (the Nexus choice fires from Contracts). 'ended' gets no card: EndingScreen renders the new 3×5 per-motive EPILOGUE matrix instead, closing the run on the personal thread. |
 | 4.28.54 → 4.28.55 | 2026-07-29-1021 | OTA | THE MOTIVE DRIP (story phase 3/3, GOLEM-ONLY — closes the arc): five authored beats per motive drip into the feed at travel arrivals (strict order, one-shot, gated on hours + Cores), keeping the personal thread talking between chapter cards. THE MISSING side-thread ends: after its five trail beats and three Cores, the next Lost Capital answers the intro's question — grave, lie, or the thing that walks (deterministic per character). grave/lie resolve with a guaranteed keepsake; walker spawns a Hollowed boss wearing their face whose defeat grants the closing + keepsake (fled fights re-offer). A resolved thread overrides the 'missing' epilogue on EndingScreen. |
+| 4.28.55 → 4.28.56 | 2026-07-30-1022 | OTA | ONE-TIME VETERAN MOTIVE PICKER (owner: "let's do the one time motive picker"): saves whose motive was DEALT by backfill (guessed, never chosen — new storyMotiveChosen flag) get asked once on load — five cards, the mud's guess tagged, CONFIRM commits forever; creation-made characters (explicit pick or rolled) never see it. Both load paths covered (slot load + resurrection); the Arbiter acknowledges the pick in the feed. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

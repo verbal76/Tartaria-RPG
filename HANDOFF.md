@@ -859,9 +859,24 @@ ported FROM engine_Dev, not to it).
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.55**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.56**; ledger in `VERSION.md`.
 
-- **THE MOTIVE DRIP — STORY FEATURE PHASE 3 OF 3, ARC COMPLETE (2026-07-29, latest). GOLEM-ONLY.**
+- **ONE-TIME VETERAN MOTIVE PICKER (2026-07-30, latest). BOTH LINES.**
+  golem **1022** / HAL **1045**. Owner: "let's do the one time motive picker" — pre-story
+  saves had their motive DEALT by backfill (deterministic guess, never a choice). New
+  `player.storyMotiveChosen` flag: creation sets TRUE always (explicit pick or rolled
+  fallback — a sim that smashed BEGIN "chose"); backfill's dealing sets FALSE. Both load
+  paths (`loadSlotIntoGame` + `resurrectSlot`) raise `motivePickerPending` for un-chosen
+  saves → full-screen `MotivePickerModal` (global mount): five motive cards, the dealt one
+  tagged THE MUD'S GUESS, CONFIRM commits via `confirmMotivePick` (validates the id, falls
+  back to the dealt motive on garbage, marks CHOSEN, persists, Arbiter ack in the feed).
+  Android back = confirm current selection — the one-time ask can never wedge the save.
+  Asked once ever; drip beats seen under the old motive keep their ids (motive-prefixed, no
+  collision) and the new motive's thread starts from its first beat. Locked by
+  `__tests__/ota1022MotivePicker.test.ts` (7 tests incl. a full save→load→pick→reload
+  round trip through real slots).
+
+- **THE MOTIVE DRIP — STORY FEATURE PHASE 3 OF 3, ARC COMPLETE (2026-07-29). GOLEM-ONLY.**
   golem **1021** — ✔ PROMOTED TO HAL as **OTA-1044** on 2026-07-30 (owner: "push all of
   this to HAL"); the golem-only divergence is CLOSED, both lines now carry the identical
   story arc. NOTE the OTA-TAG SKEW inside otherwise-identical code: HAL comments/tests say

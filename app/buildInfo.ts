@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.55';
+export const DISPLAY_VERSION = '4.28.56';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17843,4 +17843,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resolved thread overrides the 'missing' epilogue on EndingScreen with its
 // own closing. All text in app/data/story/drip.json; logic in
 // engine/storyDrip.ts. DISPLAY_VERSION 4.28.55. 10 tests. Golem-only.
-export const OTA_BUILD_ID = '2026-07-29-1021-motive-drip';
+// OTA-1022 — THE ONE-TIME VETERAN MOTIVE PICKER (owner: "let's do the one
+// time motive picker"). Pre-story saves had their motive DEALT by backfill
+// (deterministic guess, never a choice). New player.storyMotiveChosen flag:
+// creation always sets TRUE (explicit pick or rolled fallback alike);
+// backfill's dealing sets FALSE. Both load paths (loadSlotIntoGame +
+// resurrectSlot) raise a full-screen MotivePickerModal for un-chosen saves:
+// five cards, the mud's guess tagged, CONFIRM commits forever (Android back
+// confirms the current selection — the ask can't be wedged). Asked once,
+// never again; the Arbiter acknowledges the pick in the feed.
+// DISPLAY_VERSION 4.28.56. 7 tests.
+export const OTA_BUILD_ID = '2026-07-30-1022-motive-picker';
