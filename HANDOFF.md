@@ -89,7 +89,25 @@ as clarified by the user on 2026-07-13:
 
 - **`HaL2001` is PRODUCTION.** The Tartaria build in the wild with internal
   testers. Vetted changes only; a push OTAs their devices.
-- **PROMPT ECHO LEAK (2026-07-30, latest). BOTH LINES.** golem **1030** / HAL **1053**.
+- **AMBIENT COMPANION REVIVED (2026-07-30, latest). BOTH LINES.** golem **1031** /
+  HAL **1054**. Found reading the owner's Asgardar logs, not from a report: every ambient
+  generation ends `arbiter: ambient ∅` (75627ms in one log, 26173ms in the next) and never
+  once `ambient ✓`, across two builds. It was a CONTRADICTION, not bad luck — the shared
+  `VOICE_RULES` order the model *"Sentences must START with \"You\" or \"Your\""*, and the
+  ambient filter then dropped every sentence starting with "You". The path discarded its
+  own output by construction. And it isn't free: ambient holds the SHARED `isGenerating`
+  lock, so up to 75s of guaranteed-discarded work is 75s the REACTIVE Arbiter can't
+  narrate in — the `reason=cooldown` templates clustered around those ∅ entries are that.
+  Fix: `isSecondPersonActionOpener()` filters on REGISTER instead of the pronoun. An
+  action opener ("You step back, surveying the alleyway") is still scene-hallucination and
+  still dropped — that's the real failure the filter was written for; a reflection ("You
+  have come a long way…", "You've grown harder…") is what ambient exists to produce and
+  now survives. The reactive path never had this filter and must never get one — it is
+  supposed to narrate actions. Locked by ota1031/1054AmbientRevival (6 tests per line).
+  WATCH: no ambient line has EVER shipped to a player, so the first device session on this
+  build is the real test of whether the lines read well.
+
+- **PROMPT ECHO LEAK (2026-07-30). BOTH LINES.** golem **1030** / HAL **1053**.
   Owner at Asgardar: a line about having walked beside "the player" a long while appeared
   twice — "it's like someone was talking to the arbitor." It was: that sentence was the
   literal opening of `AMBIENT_INSTRUCTION` in contextInjector, and the model recited its

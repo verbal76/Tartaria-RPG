@@ -89,6 +89,30 @@ export function looksLikeInstructionEcho(text: string): boolean {
   return INSTRUCTION_ECHO_PATTERNS.some((re) => re.test(text));
 }
 
+// OTA-1054 — "You …" openers, split by REGISTER rather than banned outright.
+// The ambient companion filter used to drop every sentence starting with "You",
+// to kill a real failure (the model narrating invented scenery — "You step
+// back, surveying the alleyway" — inside a room that has no alleyway). But the
+// shared VOICE_RULES *command* the model to start sentences with "You", so that
+// filter discarded the ambient path's own output by construction: both of the
+// owner's logs show `arbiter: ambient ∅` and never once `ambient ✓`.
+//
+// The tell isn't the pronoun, it's the VERB. A scene hallucination opens with a
+// present-tense action ("You step / turn / reach"); a reflection — the thing
+// ambient exists to produce — opens with a state or perfect ("You have come…",
+// "You've grown…", "You carry it better now"). Allow the second, drop the first.
+const REFLECTIVE_YOU_OPENER =
+  /^\s*you(?:'(?:ve|re|ll|d))\b|^\s*you\s+(?:have|has|had|are|were|was|will|can|could|would|should|used|came|come|arrived|learned|learnt|grew|grown|changed|carry|carried|bear|bore|wear|wore|know|knew|remember|remembered|forget|forgot|never|always|still|no|not|do|don't|didn't|weren't|aren't|seem|seemed|began|begin|stopped|survived|lasted|lived)\b/i;
+
+/** True for a second-person opener that reads as SCENE NARRATION ("You step
+ *  back…") rather than reflection ("You have come a long way…"). Only the
+ *  ambient companion path uses it: reactive narration is *supposed* to describe
+ *  what just happened, so it must never filter these. */
+export function isSecondPersonActionOpener(sentence: string): boolean {
+  if (!/^\s*you\b/i.test(sentence)) return false; // not a bare "You …" opener
+  return !REFLECTIVE_YOU_OPENER.test(sentence);
+}
+
 /** Drop any word containing a foreign letter; collapse the gaps + tidy the
  *  spacing left before punctuation. English-only narration in → English-only
  *  narration out. Returns '' if every word was foreign (caller falls back to a
