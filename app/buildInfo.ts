@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.61';
+export const DISPLAY_VERSION = '4.28.62';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17909,4 +17909,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // story hook pop-up"); the thread modal's completed state spotlights the
 // payout in a YOUR REWARD strip and the feed's ✦ line remains the record.
 // DISPLAY_VERSION 4.28.61. 7 tests (+6 suites retargeted off the typed flow).
-export const OTA_BUILD_ID = '2026-07-30-1027-dog-golem-popups';
+// OTA-1028 — MUSIC CROSSFADE + CRUCIBLE UPGRADE LIST (twin of HAL 1051).
+// (1) MUSIC (owner: tracks "should Crossfade into each other... the boss
+// music and the market music should be a noticable shift"): transitions are
+// now true crossfades — outgoing and incoming ramp together, epoch-guarded.
+// Reflective beds (explore/menu) melt over 2.2s; entering boss/combat or
+// the market is a fast 450ms shift, and combat tiers always restart from
+// the opening bars. The outgoing bed PAUSES in place and resumes mid-phrase
+// on a quick return (4-minute window) — a market stop or a fight no longer
+// resets the reflective bed. Pools keep the owner's upload labels (boss
+// tracks / the one happy market song / reflective rest).
+// (2) UPGRADE LIST (owner: "listed as all armor that can be upgraded, then
+// all weapons. and it should say which are equipped"): the Crucible upgrade
+// target list is grouped ARMOR & VESTS then WEAPONS, worn pieces sort first
+// and carry an amber EQUIPPED badge (dog vests badge "ON <dog>") via the
+// same instance-id resolver as the inventory badge.
+// DISPLAY_VERSION 4.28.62. 7 tests.
+export const OTA_BUILD_ID = '2026-07-30-1028-crossfade-upgrade-list';
