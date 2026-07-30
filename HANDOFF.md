@@ -89,14 +89,20 @@ as clarified by the user on 2026-07-13:
 
 - **`HaL2001` is PRODUCTION.** The Tartaria build in the wild with internal
   testers. Vetted changes only; a push OTAs their devices.
-- **⚠ GOLEM DIVERGENCE (2026-07-29, owner's call): the STORY FEATURE lives on golem ONLY.**
-  golem OTA-1018+ carries "The Reason You Came Down" (five story motives, the Skyrim-style
-  opening crawl, and the coming chapter-card/drip phases): `app/data/story/`,
-  `app/engine/story.ts`, `app/components/StoryIntroOverlay.tsx`, plus wiring in gameStore /
-  types / character / CharacterCreationScreen / ExplorationScreen / AboutScreen. Do NOT port
-  it to HAL uninvited, and when syncing HAL → golem do NOT clobber those files — gameplay
-  changes still ship to both lines, but the story layer is golem's own until the owner says
-  otherwise.
+- **✔ STORY FEATURE PROMOTED TO HAL (2026-07-30, owner: "push all of this to HAL").**
+  The former golem-only divergence is CLOSED: the full three-phase story arc now lives on
+  BOTH lines — HAL **OTA-1041..1044** = golem **1018..1021** (crawl + motive picker /
+  tutorial hold / chapter cards + per-motive epilogues / motive drip + The Missing's
+  ending). Same files both lines: `app/data/story/` (intro/chapters/drip.json),
+  `app/engine/{story,chapters,storyDrip}.ts`, `app/components/{StoryIntroOverlay,
+  ChapterCardOverlay}.tsx`, wiring in gameStore / types / character / App /
+  CharacterCreation / Exploration / About / EndingScreen. NOTE the OTA-TAG SKEW: inside
+  identical code, HAL comments/tests say 1041-1044 where golem's say 1018-1021 — when
+  syncing lines, that skew is EXPECTED and must not be "fixed" by clobbering either side.
+  Coverage (verified by audit + suite locks): 5/5 motives everywhere (crawl pages, 4
+  chapter cards, 3×5 ending epilogues, 5 drip beats each), 9/9 factions everywhere the
+  design uses them (crawl faction page; the pre-existing per-faction main-quest narration
+  the cards ride on). Race is deliberately NOT a story axis (no race-conditional text).
 - **`golem-line` is HAL's warm standby — it must STAY CURRENT with HAL.** Not a
   scratch pad. Its purpose: when a major, potentially engine-breaking change
   begins, development forks onto golem so production Tartaria is never at risk
