@@ -1807,6 +1807,9 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
       ...out,
       storyMotive: assignMotive(`${out.name}|${out.raceId}|${out.factionId}`),
       storyIntroSeen: true,
+      // OTA-1045 — a DEALT motive is a guess, not a choice. The load path
+      // reads this and owes the player the one-time picker.
+      storyMotiveChosen: false,
     };
   }
 
@@ -4192,6 +4195,14 @@ interface GameStore {
   chapterCard: import('../engine/chapters').ChapterCard | null;
   /** OTA-1043 — close the chapter card (tap-through). */
   dismissChapterCard: () => void;
+  /** OTA-1045 — TRUE while the one-time veteran motive picker is owed: the
+   *  loaded character's motive was DEALT by backfill (storyMotiveChosen !==
+   *  true), so the player gets one "why did you come down?" ask. Transient —
+   *  never persisted; the durable answer lives on the character. */
+  motivePickerPending: boolean;
+  /** OTA-1045 — commit the pick (or the kept guess): sets the motive,
+   *  marks it CHOSEN on the character (never asked again), persists. */
+  confirmMotivePick: (motiveId: string) => void;
   /** Set the pending destination; the screen renders the modal. */
   requestTravelConfirm: (locationId: string, locationName: string) => void;
   /** Yes path: leave outpost, then set course. Clears pending. */
@@ -4692,6 +4703,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   contractsNotice: null,
   storyIntro: null,
   chapterCard: null, // OTA-1043
+  motivePickerPending: false, // OTA-1045
   fusionBlockedNotice: null,
   pendingFusionSelection: null,
   pendingAetherFoodId: null,
@@ -5470,6 +5482,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // OTA-1041 — a loaded save never reopens the crawl mid-game.
         storyIntro: null,
         chapterCard: null, // OTA-1043 — nor a stale chapter card
+        // OTA-1045 — a save whose motive was DEALT (backfill guess, never
+        // chosen) is owed the one-time picker, right here on load.
+        motivePickerPending: player.storyMotiveChosen !== true,
 
         pendingGolemNaming: false,
         justUpdatedFromBuild: null,
@@ -5724,6 +5739,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentScene: null,
         pendingRolls: null,
         pendingHookContinue: null,
+        // OTA-1045 — resurrection is a load path too: a dealt-motive save
+        // gets its one-time picker here as well.
+        motivePickerPending: revived.storyMotiveChosen !== true,
         wastelandStepsSinceEncounter: 0,
         stepsSinceCombat: 0,
       });
@@ -5772,7 +5790,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       crashedSlotIds,
       // If we just deleted the currently-loaded character, drop player state too.
       ...(get().activeSlotId === slotId
-        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null, storyIntro: null, chapterCard: null }
+        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null, storyIntro: null, chapterCard: null, motivePickerPending: false }
         : {}),
     });
   },
@@ -5842,6 +5860,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // the StoryIntroOverlay shows it over the first scene.
       storyIntro: introPagesFor(player.storyMotive, player.factionId),
       chapterCard: null, // OTA-1043 — no stale card from a prior character
+      motivePickerPending: false, // OTA-1045 — creation chose; nothing owed
     });
     try {
       get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
@@ -5894,6 +5913,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingHookContinue: null,
       storyIntro: null, // OTA-1041
       chapterCard: null, // OTA-1043
+      motivePickerPending: false, // OTA-1045
       currentScreen: 'title',
       activeSlotId: null,
       slots,
@@ -26329,6 +26349,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // transition that raised it is already on the player record (and
   // persisted), and the feed carries the transition's narration.
   dismissChapterCard() { set({ chapterCard: null }); },
+
+  // OTA-1045 — the one-time veteran motive picker commits here. The pick
+  // (or the kept guess — confirming the dealt motive counts) becomes the
+  // character's CHOSEN motive: persisted, never asked again. Beats already
+  // seen under the old motive keep their ids (motive-prefixed, no
+  // collision); the new motive's thread simply starts from its first beat.
+  confirmMotivePick(motiveId) {
+    const p = get().player;
+    if (!p) { set({ motivePickerPending: false }); return; }
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const story = require('../engine/story') as typeof import('../engine/story');
+    const chosen = story.isStoryMotiveId(motiveId) ? motiveId : (p.storyMotive ?? 'debt');
+    set({
+      player: { ...p, storyMotive: chosen, storyMotiveChosen: true },
+      motivePickerPending: false,
+    });
+    const title = story.motiveById(chosen).title;
+    get().appendLog(
+      'arbiter',
+      `The Arbiter marks the ledger without looking up. "${title}. So that is why you came down. The mud had its own guess; yours is the one that counts. Walk on."`,
+    );
+    void get().persist();
+  },
 
   clearContractsNotice() { set({ contractsNotice: null }); },
 

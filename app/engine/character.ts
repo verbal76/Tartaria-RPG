@@ -345,6 +345,10 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     name: input.name,
     storyMotive,
     storyIntroSeen: false,
+    // OTA-1045 — a creation-made character never sees the veteran motive
+    // picker: an explicit pick IS chosen, and a rolled one (sims, legacy
+    // callers) counts as "smashed BEGIN without reading" — their choice.
+    storyMotiveChosen: true,
     raceId: race.id,
     factionId: faction.id,
     stats,

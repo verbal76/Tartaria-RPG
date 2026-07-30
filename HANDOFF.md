@@ -99,6 +99,9 @@ as clarified by the user on 2026-07-13:
   CharacterCreation / Exploration / About / EndingScreen. NOTE the OTA-TAG SKEW: inside
   identical code, HAL comments/tests say 1041-1044 where golem's say 1018-1021 — when
   syncing lines, that skew is EXPECTED and must not be "fixed" by clobbering either side.
+  OTA-1045 (= golem 1022) adds the ONE-TIME VETERAN
+  MOTIVE PICKER: dealt-motive saves (new storyMotiveChosen flag — creation TRUE, backfill
+  FALSE) get asked once on load via MotivePickerModal; confirm commits forever.
   Coverage (verified by audit + suite locks): 5/5 motives everywhere (crawl pages, 4
   chapter cards, 3×5 ending epilogues, 5 drip beats each), 9/9 factions everywhere the
   design uses them (crawl faction page; the pre-existing per-faction main-quest narration

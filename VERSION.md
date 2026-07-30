@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.55` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.55` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.56` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.56` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -90,6 +90,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.52 → 4.28.53 | 2026-07-30-1042 | OTA | THE ARBITER HOLDS HIS TONGUE (promoted from golem 1019): the tutorial still arms at startNewGame (scene-entry hints suppressed), but the spoken beat-0 name prompt now fires from dismissStoryIntro() — guarded so REPLAY OPENING and backfilled saves can never re-speak it or restart the tutorial. |
 | 4.28.53 → 4.28.54 | 2026-07-30-1043 | OTA | CHAPTER CARDS (story phase 2/3, promoted from golem 1020): every main-quest phase transition raises a full-screen chapter card (II NINE HEARTS, III THE FIRST HEART, IV THE ENDLESS STAIR, V THE MUD FLOOD NEXUS), each with a universal body + a per-motive line; 'ended' gets the 3-endings × 5-motives epilogue matrix on EndingScreen instead. |
 | 4.28.54 → 4.28.55 | 2026-07-30-1044 | OTA | THE MOTIVE DRIP (story phase 3/3, promoted from golem 1021 — arc complete): five beats per motive at travel arrivals (strict order, one-shot, hour+Core gated); The Missing's trail ends at a Lost Capital with grave, lie, or the thing that walks — keepsake guaranteed, walker defeat closes the thread, resolved threads override the EndingScreen epilogue. |
+| 4.28.55 → 4.28.56 | 2026-07-30-1045 | OTA | ONE-TIME VETERAN MOTIVE PICKER (twin of golem 1022): saves whose motive was DEALT by backfill (guessed, never chosen — new storyMotiveChosen flag) get asked once on load — five cards, the mud's guess tagged, CONFIRM commits forever; creation-made characters never see it. Both load paths covered (slot load + resurrection); the Arbiter acknowledges the pick in the feed. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

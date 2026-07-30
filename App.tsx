@@ -38,6 +38,7 @@ import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1043
+import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1045
 import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
@@ -591,6 +592,11 @@ export default function App() {
           Contracts. Wherever the arc turns, the card shows. */}
       <SilentBoundary tag="ChapterCardOverlay">
         <ChapterCardOverlay />
+      </SilentBoundary>
+      {/* OTA-1045 — one-time veteran motive picker, raised by the load paths
+          for saves whose motive was dealt by backfill rather than chosen. */}
+      <SilentBoundary tag="MotivePickerModal">
+        <MotivePickerModal />
       </SilentBoundary>
       <SilentBoundary tag="KeyboardInputBar">
         <KeyboardInputBar />
