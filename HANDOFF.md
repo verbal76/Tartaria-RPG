@@ -89,6 +89,17 @@ as clarified by the user on 2026-07-13:
 
 - **`HaL2001` is PRODUCTION.** The Tartaria build in the wild with internal
   testers. Vetted changes only; a push OTAs their devices.
+- **FUSION LEGIBILITY (2026-07-30, latest). BOTH LINES.** golem **1024** / HAL **1047**.
+  Owner's log told the whole story in two minutes: a CORRECT "too alike" refusal (2 kinds
+  reserved), self-corrected spread, then a fee bounce at 11 TC learned from a buried
+  system line. Fixes: (1) every forge-reservable inventory row carries its material
+  kind(s) — `[organic]`, `[stone · crystal]` — rendered from `fusionMaterialTags`, the
+  SAME helper the diversity gate counts (mirror property locked in tests); (2) the vendor
+  Crucible button states fee + balance BEFORE the tap — amber "25 TC — you have N" when
+  short. (The fusion PICKER already had per-row kind labels + a live kinds meter from
+  OTA-679/1007 — the gap was the inventory, where reserving actually happens, and the
+  paid button.) Locked by ota1024/1047FusionLegibility (4 tests per line).
+
 - **✔ STORY FEATURE PROMOTED TO HAL (2026-07-30, owner: "push all of this to HAL").**
   The former golem-only divergence is CLOSED: the full three-phase story arc now lives on
   BOTH lines — HAL **OTA-1041..1044** = golem **1018..1021** (crawl + motive picker /
