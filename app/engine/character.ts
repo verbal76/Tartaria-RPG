@@ -265,6 +265,9 @@ export interface CreateCharacterInput {
   raceId: string;
   factionId: string;
   startingLocationId?: string;
+  /** OTA-1041 — the story motive picked on creation step 3. Optional so sims
+   *  and legacy callers keep working; createCharacter rolls one when absent. */
+  motiveId?: string;
 }
 
 // v2.4.1 (OTA 029) — canonical per-faction starting location.
@@ -312,6 +315,14 @@ export function startingLocationForFaction(factionId: string): string {
 }
 
 export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
+  // OTA-1041 — every character has a REASON they came down. Callers that
+  // don't pass one (sims, old tests) get a random motive, same as a player
+  // smashing BEGIN without reading.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isStoryMotiveId, STORY_MOTIVE_IDS } = require('./story') as typeof import('./story');
+  const storyMotive = isStoryMotiveId(input.motiveId)
+    ? input.motiveId
+    : STORY_MOTIVE_IDS[Math.floor(Math.random() * STORY_MOTIVE_IDS.length)]!;
   const race = races.find((r) => r.id === input.raceId) ?? races[0]!;
   const faction = factions.find((f) => f.id === input.factionId) ?? factions[0]!;
   const stats = rollStats();
@@ -332,6 +343,8 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
 
   return {
     name: input.name,
+    storyMotive,
+    storyIntroSeen: false,
     raceId: race.id,
     factionId: faction.id,
     stats,
