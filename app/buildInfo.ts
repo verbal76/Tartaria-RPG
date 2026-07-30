@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.65';
+export const DISPLAY_VERSION = '4.28.66';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19040,4 +19040,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // allowed through. The reactive path never had this filter and still doesn't —
 // it is SUPPOSED to narrate actions.
 // DISPLAY_VERSION 4.28.65. 6 tests.
-export const OTA_BUILD_ID = '2026-07-30-1054-ambient-revival';
+// OTA-1055 — WHO GETS IN, AND HOW FAST QWEN COMES BACK (twin of golem 1032).
+// (1) INDOOR AMBUSH CAST (owner: "tighten the group that can spawn inside,
+// make it more believable"). A rest-ambush drew from the WILDERNESS table
+// wherever you slept, so the owner's log has a Rare 202-HP Mud Cyclops in the
+// Builders' crew bunks inside fortified Asgardar, narrated as if it crossed
+// open country. The ODDS were already right (a hub rest is 8% vs the wilds'
+// 22%) — the CAST was wrong. Under a roof the pick is now swapped for an
+// indoor-plausible foe AT THE SAME RARITY, from four groups that can actually
+// be in the room: an intruder who got past the door (Silt Thief, Reclaimer
+// Ambusher, Black Cloak Agent), vermin that live in a drowned building (Gutter
+// Rat, Aetheric Spider, Scrap Drone), a machine still walking its rounds
+// (Aetheric Drone, Steel Hound, Clockwork Knight, Stone Warden), or one of the
+// dead sealed into these walls (the Aetherkin, Shifting Shade, Mud Wraith).
+// Difficulty is untouched — a Rare ambush stays Rare. Both narration beats are
+// re-voiced indoors too: "circled" and "closes the distance" are open-ground
+// images. The roof test reuses the action scope's own, which correctly treats
+// the outpost GATE / square / culvert as open air — something can still walk in
+// off the mud where the outpost opens to the sky.
+// (2) WATCHDOG RECOVERY (owner: "tighten the recovery time"). The flat 60s poll
+// made every step of the recovery dance wait a full tick — the owner's log
+// spends ~2 minutes on canned templates (notice at :48, retry at :47, all-clear
+// at :47). Now adaptive: 60s while healthy, 5s while recovering, so a retry and
+// the all-clear land in seconds. Plus an AppState hook — dormancy is CAUSED by
+// backgrounding (App.tsx disposes the ~398MB native context), so returning to
+// the foreground checks immediately instead of burning up to a full interval
+// before the watchdog has even noticed.
+// DISPLAY_VERSION 4.28.66. 10 tests.
+export const OTA_BUILD_ID = '2026-07-30-1055-indoor-ambush-watchdog';

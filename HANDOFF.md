@@ -89,7 +89,28 @@ as clarified by the user on 2026-07-13:
 
 - **`HaL2001` is PRODUCTION.** The Tartaria build in the wild with internal
   testers. Vetted changes only; a push OTAs their devices.
-- **AMBIENT COMPANION REVIVED (2026-07-30, latest). BOTH LINES.** golem **1031** /
+- **INDOOR AMBUSH CAST + FASTER QWEN RECOVERY (2026-07-30, latest). BOTH LINES.**
+  golem **1032** / HAL **1055**. Two owner asks off the Asgardar log. (a) CAST: a
+  rest-ambush drew from the WILDERNESS table wherever you slept — hence a Rare 202-HP Mud
+  Cyclops in the Builders' crew bunks, narrated as if it crossed open country. The odds
+  were already right (hub rest 8% vs wilds 22%); the cast was wrong. New
+  `app/engine/indoorAmbush.ts` holds a rarity-keyed indoor cast — intruders, vermin,
+  patrol machines, the Aetherkin sealed in the walls — and the rest handler swaps the pick
+  for a SAME-RARITY indoor one under a roof, so difficulty is untouched. Both beats are
+  re-voiced indoors ("circled" / "closes the distance" are open-ground images). The roof
+  test REUSES the enclosing action scope's `underRoof`, which excludes
+  `OPEN_AIR_HUB_ROOMS` — the gate, square and culvert descent stay exposed, so something
+  can still walk in off the mud where the outpost opens to the sky. Note the module-level
+  `underRoof(s, player)` FUNCTION is shadowed by that local boolean inside
+  submitPlayerAction; calling the function there is a type error (it bit this OTA).
+  (b) WATCHDOG: the flat 60s poll meant every step of recovery waited a full tick (~2 min
+  of canned templates in the log). Now adaptive — `QWEN_WATCHDOG_HEALTHY_MS` 60s vs
+  `QWEN_WATCHDOG_RECOVERING_MS` 5s, driven by `runQwenHealthCheck()`'s boolean — plus an
+  `AppState` 'active' hook, because dormancy is CAUSED by backgrounding and the app knows
+  the instant it returns. Locked by ota1032/1055IndoorAmbushWatchdog (10 tests per line,
+  incl. a rarity-parity check and an explicit deny-list for the open-country megafauna).
+
+- **AMBIENT COMPANION REVIVED (2026-07-30). BOTH LINES.** golem **1031** /
   HAL **1054**. Found reading the owner's Asgardar logs, not from a report: every ambient
   generation ends `arbiter: ambient ∅` (75627ms in one log, 26173ms in the next) and never
   once `ambient ✓`, across two builds. It was a CONTRADICTION, not bad luck — the shared

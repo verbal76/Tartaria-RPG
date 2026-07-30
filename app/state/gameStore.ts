@@ -70,6 +70,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
+import { AppState } from 'react-native'; // OTA-1055 — foreground hook for the Qwen watchdog
 import { stripForeignWords, repairGluedNarration, looksLikeInstructionEcho, isSecondPersonActionOpener } from '../engine/foreignText';
 import { sentenceNamesOffCanonEntity, buildEntityAllowList, normalizeEntity } from '../engine/entityGuard';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -1377,8 +1378,15 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
 //
 // Held at module scope so startQwenWatchdog() can replace it on
 // re-entry without leaking handles.
-let qwenWatchdogTimer: ReturnType<typeof setInterval> | null = null;
-const QWEN_WATCHDOG_INTERVAL_MS = 60_000;
+let qwenWatchdogTimer: ReturnType<typeof setTimeout> | null = null;
+let qwenAppStateSub: { remove: () => void } | null = null;
+// OTA-1055 — ADAPTIVE CADENCE. A flat 60s poll made recovery feel broken: the
+// owner's log spends ~2 minutes on canned templates because every step of the
+// dance waits a full tick (notice at :48, retry at :47, confirm ready at :47).
+// Healthy, 60s is plenty; while recovering, poll fast so a retry and the
+// all-clear land in seconds, not minutes.
+const QWEN_WATCHDOG_HEALTHY_MS = 60_000;
+const QWEN_WATCHDOG_RECOVERING_MS = 5_000;
 // How long a re-init may sit in 'loading'/'downloading' before the watchdog
 // treats it as wedged and re-kicks. Generous: once dormancy is even possible
 // the GGUF is already cached, so a warm reload is ~5-30s; a legit in-flight
@@ -1386,20 +1394,16 @@ const QWEN_WATCHDOG_INTERVAL_MS = 60_000;
 const QWEN_REINIT_HANG_MS = 150_000;
 let qwenReinitInFlightSince = 0;
 let qwenReinitAttempts = 0;
-function startQwenWatchdog(
+/** OTA-1055 — one health check. Returns TRUE when Qwen is healthy, which is what
+ *  drives the adaptive poll: healthy → back to the slow cadence, anything else →
+ *  keep checking fast until it recovers. */
+function runQwenHealthCheck(
   get: () => GameStore,
   set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
-): void {
-  if (qwenWatchdogTimer !== null) {
-    clearInterval(qwenWatchdogTimer);
-    qwenWatchdogTimer = null;
-  }
-  qwenReinitInFlightSince = 0;
-  qwenReinitAttempts = 0;
-  qwenWatchdogTimer = setInterval(() => {
-    try {
+): boolean {
+    {
       const q = qwen;
-      if (typeof q.forceReinitialize !== 'function' || typeof q.getStatus !== 'function') return;
+      if (typeof q.forceReinitialize !== 'function' || typeof q.getStatus !== 'function') return true;
       // Healthy — nothing to do; clear any in-flight tracking.
       if (q.isReady()) {
         if (qwenReinitAttempts > 0) {
@@ -1411,13 +1415,13 @@ function startQwenWatchdog(
         }
         qwenReinitInFlightSince = 0;
         qwenReinitAttempts = 0;
-        return;
+        return true;
       }
       const st = q.getStatus();
       // A (re)init is genuinely in progress — let it finish, unless it has
       // been wedged past the hang window (then fall through to re-kick).
       if (st === 'downloading' || st === 'loading') {
-        if (qwenReinitInFlightSince === 0 || Date.now() - qwenReinitInFlightSince < QWEN_REINIT_HANG_MS) return;
+        if (qwenReinitInFlightSince === 0 || Date.now() - qwenReinitInFlightSince < QWEN_REINIT_HANG_MS) return false;
         get().appendLog('debug', `qwen-watchdog: reinit wedged in '${st}' for >${Math.round(QWEN_REINIT_HANG_MS / 1000)}s — re-kicking.`);
       }
       // Not ready and not making progress (idle / failed / dormant ready-but-
@@ -1444,8 +1448,49 @@ function startQwenWatchdog(
           qwenReinitInFlightSince = 0;
           get().appendLog('debug', `qwen-watchdog: reinit attempt #${qwenReinitAttempts} threw: ${String(err)}`);
         });
+      return false;
+    }
+}
+
+function startQwenWatchdog(
+  get: () => GameStore,
+  set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+): void {
+  if (qwenWatchdogTimer !== null) {
+    clearTimeout(qwenWatchdogTimer);
+    qwenWatchdogTimer = null;
+  }
+  if (qwenAppStateSub) {
+    qwenAppStateSub.remove();
+    qwenAppStateSub = null;
+  }
+  qwenReinitInFlightSince = 0;
+  qwenReinitAttempts = 0;
+
+  const schedule = (ms: number): void => {
+    if (qwenWatchdogTimer !== null) clearTimeout(qwenWatchdogTimer);
+    qwenWatchdogTimer = setTimeout(tick, ms);
+  };
+  function tick(): void {
+    let healthy = true;
+    try {
+      healthy = runQwenHealthCheck(get, set);
     } catch { /* watchdog should never crash the host */ }
-  }, QWEN_WATCHDOG_INTERVAL_MS);
+    schedule(healthy ? QWEN_WATCHDOG_HEALTHY_MS : QWEN_WATCHDOG_RECOVERING_MS);
+  }
+
+  // OTA-1055 — DON'T WAIT FOR THE NEXT TICK. Dormancy is CAUSED by backgrounding
+  // (App.tsx disposes the ~398MB native context to reclaim memory), so the app
+  // knows the exact moment it matters: coming back to the foreground. Checking
+  // there removes up to a full poll interval of dead narration before the
+  // watchdog has even noticed.
+  try {
+    qwenAppStateSub = AppState.addEventListener('change', (next) => {
+      if (next === 'active') tick();
+    }) as { remove: () => void } | null;
+  } catch { /* AppState unavailable (headless/test) — the poll alone still recovers */ }
+
+  schedule(QWEN_WATCHDOG_HEALTHY_MS);
 }
 
 // Casual-look narration: the player asked to look around but didn't target
@@ -12890,7 +12935,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // warning (OTA-244) gives the heads-up; if the player
             // rests anyway, RNG runs free. Stays a design dial we
             // can re-enable later if playtest insists.
-            const rawRestEnemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
+            const rawWildRestEnemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
+            // OTA-1055 — UNDER A ROOF, THE CAST CHANGES. The pick above is the
+            // wilderness table, which is right out in the mud and absurd in a
+            // fortified capital's bunkroom (owner's log: a Rare 202-HP Mud
+            // Cyclops in the Builders' crew bunks). Swap in an indoor-plausible
+            // ambusher AT THE SAME RARITY — an intruder, vermin, a patrol
+            // machine, or one of the dead sealed in these walls — so the danger
+            // the roll chose is preserved and only the cast is believable. The
+            // odds are untouched (a hub rest is already 8% vs the wilds' 22%).
+            // Reuse the enclosing action's own roof test (computed for the
+            // weather tick). It is the RIGHT predicate here too: it treats the
+            // outpost gate / square / culvert descent as OPEN AIR, so something
+            // can still walk in off the mud where the outpost opens to the sky,
+            // but never into a sealed bunkroom.
+            const restUnderRoof = underRoof;
+            const restIndoorSwap = restUnderRoof && rawWildRestEnemy
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              ? (require('../engine/indoorAmbush') as typeof import('../engine/indoorAmbush'))
+                  .pickIndoorAmbusher(rawWildRestEnemy.rarity)
+              : null;
+            const rawRestEnemy = restIndoorSwap ?? rawWildRestEnemy;
             // OTA-816 — scale the rest-ambusher the same way scene-arrival foes scale.
             const restPlayer = get().player;
             const enemy = rawRestEnemy && restPlayer
@@ -12912,11 +12977,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     },
                   }
                 : s);
+              // OTA-1055 — indoors both beats are re-voiced: "circled" and "closes
+              // the distance" are open-ground images, and the unsettling part of
+              // waking up in a sealed room is that it was already in with you.
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const restAmb = require('../engine/indoorAmbush') as typeof import('../engine/indoorAmbush');
               get().appendLog(
                 'arbiter',
-                `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
+                restUnderRoof
+                  ? restAmb.indoorRestWakeLine()
+                  : `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
               );
-              get().appendLog('world', `${withArticleCap(enemy.name)} closes the distance through the dark. The rest is over.`);
+              get().appendLog('world', restUnderRoof
+                ? restAmb.indoorRestArrivalLine(withArticleCap(enemy.name))
+                : `${withArticleCap(enemy.name)} closes the distance through the dark. The rest is over.`);
               get().appendLog('debug', debugEnemy(enemy as unknown as Record<string, unknown>)); // OTA-354
             } else {
               // No enemy could be spawned — emit a flavor line so the
