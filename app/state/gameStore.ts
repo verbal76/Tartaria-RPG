@@ -1742,6 +1742,16 @@ export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
   };
 }
 
+/** OTA-1029 — the scope a "hide this chip" ✕ applies to: the macro TILE
+ *  (location + map x/y), NOT the room. A capital is a dozen hand-authored rooms
+ *  standing on one tile, so a room-keyed dismiss re-showed the chip on every
+ *  interior hop. beginScene clears a dismiss whose tile no longer matches, which
+ *  is what makes "dismissed until you leave the tile and come back" true. */
+export function chipDismissTileKey(p: { currentLocationId?: string; mapX?: number; mapY?: number } | null | undefined): string {
+  if (!p) return '';
+  return `${p.currentLocationId ?? ''}|${p.mapX ?? 0},${p.mapY ?? 0}`;
+}
+
 export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   // OTA-998 — retire legacy catalog names FIRST so every later pass (kind/tag
   // restamp, durability, equip pointers) works on names the catalog still
@@ -4345,14 +4355,24 @@ interface GameStore {
   confirmEquippedCatalystFusion: () => void;
   /** Dismiss the equipped-catalyst prompt without fusing. */
   cancelFusionCatalystPrompt: () => void;
-  /** arb-fix — the view-key (location|building|room|hubRoom) at which the player
-   *  X-dismissed the Fusing Crucible chip. Held in the STORE, not ExplorationScreen
-   *  local state, so a dismiss survives entering a vendor (which UNMOUNTS the
-   *  exploration screen and would otherwise lose a useState flag → the chip popped
-   *  back on return). The chip is hidden while this equals the current view-key;
-   *  moving to a different location changes the key and re-shows it. */
+  /** arb-fix — the key at which the player X-dismissed the Fusing Crucible chip.
+   *  Held in the STORE, not ExplorationScreen local state, so a dismiss survives
+   *  entering a vendor (which UNMOUNTS the exploration screen and would otherwise
+   *  lose a useState flag → the chip popped back on return).
+   *  OTA-1029 — the key is now the macro TILE (chipDismissTileKey), not the
+   *  room. Owner: "the crucible once dismissed can stay dismissed until we leave
+   *  the capital tile and come back" — a capital is a dozen rooms on ONE tile, so
+   *  a room-keyed dismiss (arb154) made the chip pop back on every room hop.
+   *  beginScene clears the key the moment the player leaves the tile, so a return
+   *  visit shows the chip again. */
   crucibleChipDismissedKey: string | null;
   setCrucibleChipDismissedKey: (key: string | null) => void;
+  /** OTA-1029 — same tile-scoped dismiss for the VENDOR chip's ✕ (owner: "there
+   *  should also be an x next to their names like the cruciable has"). Hides the
+   *  chip only — the vendor stays anchored to their room, so walking back in (or
+   *  typing "trade") still reaches them. */
+  vendorChipDismissedKey: string | null;
+  setVendorChipDismissedKey: (key: string | null) => void;
   /** OTA-439 — [audit #23] when a craft would CONSUME material substitutes
    *  (a misc/inferred item standing in for a named ingredient via its tags),
    *  ask before stripping them instead of silently eating them. `subsList` is
@@ -4596,6 +4616,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   crucibleChipDismissedKey: null,
   setCrucibleChipDismissedKey(key) {
     set({ crucibleChipDismissedKey: key });
+  },
+  vendorChipDismissedKey: null,
+  setVendorChipDismissedKey(key) {
+    set({ vendorChipDismissedKey: key });
   },
   craftSubstitutionPrompt: null,
   craftSubConfirmedFor: null,
@@ -6223,6 +6247,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         pruned[location.id] = { id: weather.id, rolledAtHours: skyHoursNow };
         return { worldMemory: { ...s.worldMemory, sceneWeatherByLoc: pruned } };
       });
+    }
+    // OTA-1029 — chip dismissals (Crucible ✕, vendor ✕) are TILE-scoped. Clear
+    // them the moment the player is standing somewhere else, so walking the rooms
+    // of a capital keeps a dismiss but leaving and returning brings the chip back
+    // (owner: "stay dismissed until we leave the capital tile and come back").
+    {
+      const tileNow = chipDismissTileKey(player);
+      const cruc = get().crucibleChipDismissedKey;
+      const vend = get().vendorChipDismissedKey;
+      if (cruc && cruc !== tileNow) set({ crucibleChipDismissedKey: null });
+      if (vend && vend !== tileNow) set({ vendorChipDismissedKey: null });
     }
     const hazard = pickHazardForLocation(location);
     // HANDOFF #15b — hub mode. When player is at the hub location AND

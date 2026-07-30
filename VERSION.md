@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.62` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.62` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.63` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.63` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -97,6 +97,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.59 → 4.28.60 | 2026-07-30-1026 | OTA | NARRATION CONTEXT (twin of HAL 1049): the Arbiter's AGGRESSION mood pool (all lines presuppose a live opponent) no longer fires without a live enemy — the mood read is one action stale, so post-combat looting drew combat menace ("which one of you to leave breathing" over a quiet crate). The Aetheric Torch mark line now rotates 4 variants instead of repeating "wrong-sounding resonance" verbatim. |
 | 4.28.60 → 4.28.61 | 2026-07-30-1027 | OTA | DOG + GOLEM NAMING POPUPS (twin of HAL 1050): the typed in-feed takeovers are gone — a playtester typed "rest" at the breed ask and it silently became the breed. Breed/name/sex land on one blocking DogOnboardingModal card (wedged saves heal with part-answers pre-filled); golem naming gets GolemNamingModal (SEAL THE NAME / KEEP ITS MAKING). Typed input mid-ask is never an answer. Plus: story-hook COMPLETE no longer raises the redundant second popup — the thread modal spotlights the payout in a YOUR REWARD strip. |
 | 4.28.61 → 4.28.62 | 2026-07-30-1028 | OTA | MUSIC CROSSFADE + UPGRADE LIST (twin of HAL 1051): music transitions are true crossfades — reflective beds melt over 2.2s, boss/combat and the market arrive as a fast 450ms shift (combat always from the opening bars), and an interrupted bed pauses in place and resumes mid-phrase on a quick return. The Crucible upgrade target list is grouped ARMOR & VESTS then WEAPONS, worn pieces first with an amber EQUIPPED badge (dog vests read ON <dog>). |
+| 4.28.62 → 4.28.63 | 2026-07-30-1029 | OTA | CAPITAL TIDY-UP (twin of HAL 1052): the vendor stay/leave popup is gone — it fired on every capital ROOM hop, because the room chips submit "go <dir>" and the leave-gate caught them. The trader chip gains a ✕ like the Crucible's, and BOTH dismisses are now keyed to the macro TILE: they survive interior hops and clear when you leave the tile, so coming back re-shows them. The trader / board / wanderer / Crucible banners collapse from four stacked full-width two-line boxes into one compact wrapping row. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 
