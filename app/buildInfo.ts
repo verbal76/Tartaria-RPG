@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.54';
+export const DISPLAY_VERSION = '4.28.55';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18885,4 +18885,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 5-motives per-motive EPILOGUE matrix instead. Text in
 // app/data/story/chapters.json; logic in engine/chapters.ts.
 // DISPLAY_VERSION 4.28.54. 11 tests.
-export const OTA_BUILD_ID = '2026-07-30-1043-chapter-cards';
+// OTA-1044 — THE MOTIVE DRIP (story phase 3 of 3, promoted from golem 1021 —
+// arc complete). Five authored beats per motive drip into the feed at travel
+// arrivals (strict order, one-shot, gated on hoursElapsed 6/16/30/48/70 +
+// coresRecovered 0/0/1/2/3; at most one story event per arrival; holds
+// during tutorial/crawl/chapter-card/hostile scenes). THE MISSING side-
+// thread ENDS: after its five trail beats and 3+ Cores, the next Lost
+// Capital arrival answers the intro's question — grave, lie, or the thing
+// that walks — dealt deterministically per character (storyDrip.ts).
+// grave/lie: guaranteed keepsake + missingResolved on the spot. walker: a
+// Hollowed boss wearing their face (carries REVENANT_TRAIT — mercy rules,
+// no talk-down); the kill-path hook grants closing + keepsake and marks
+// resolved THERE so a fled fight re-offers. Resolved threads override the
+// 'missing' EndingScreen epilogue. DISPLAY_VERSION 4.28.55. 10 tests.
+export const OTA_BUILD_ID = '2026-07-30-1044-motive-drip';

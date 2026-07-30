@@ -23,6 +23,7 @@ import { useGameStore } from '../state/gameStore';
 import { endingLine, LOST_CAPITAL_LOCATIONS, LOST_CAPITAL_NAMES } from '../engine/mainQuest';
 import { epilogueMotiveLine } from '../engine/chapters'; // OTA-1043
 import { motiveById } from '../engine/story'; // OTA-1043
+import { missingResolvedEpilogue } from '../engine/storyDrip'; // OTA-1044
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 
@@ -113,8 +114,10 @@ export function EndingScreen() {
   // OTA-1043 — the per-motive epilogue: how THIS ending answers the reason
   // this character came down (the OTA-1041 story motive). Rendered under the
   // faction ending prose so the run closes on the personal thread, not just
-  // the political one.
-  const motiveLine = epilogueMotiveLine(ending, player.storyMotive);
+  // the political one. OTA-1044 — if The Missing side-thread RESOLVED in-run
+  // (grave / lie / walker), its own closing replaces the standard 'missing'
+  // epilogue, which assumes the question is still open.
+  const motiveLine = missingResolvedEpilogue(player) ?? epilogueMotiveLine(ending, player.storyMotive);
   const motiveTitle = motiveById(player.storyMotive).title;
 
   return (
