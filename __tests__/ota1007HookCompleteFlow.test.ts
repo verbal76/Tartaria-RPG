@@ -37,6 +37,11 @@ jest.mock('expo-updates', () => ({}));
 // MissionCompleteModal on top of the thread modal the player was still
 // reading. It is now STASHED on pendingHookContinue and raised only when the
 // player taps COMPLETE (dismissHookContinue) on the final stage.
+//
+// OTA-1027 UPDATE — the held popup is retired entirely (owner: redundant next
+// to the thread modal's own reward display; the modal now spotlights the
+// payout in a YOUR REWARD strip). This suite now locks the popup-free flow:
+// no mission-complete notice is raised at ANY point in a thread's life.
 jest.setTimeout(30000);
 
 import * as fs from 'fs';
@@ -82,32 +87,31 @@ describe('OTA-1007 — the completion popup waits for COMPLETE', () => {
     console.error = () => {};
   });
 
-  it('terminal stage STASHES the notice; the popup fires only on dismissHookContinue', async () => {
+  it('no popup at ANY point: mid-thread, terminal stage, or the COMPLETE tap', async () => {
     const store = await bootWithHook();
 
-    // Stage 1 (mid-thread): CONTINUE/ABANDON territory — nothing held, nothing raised.
+    // Stage 1 (mid-thread): CONTINUE/ABANDON territory — nothing raised.
     store.getState().submitPlayerAction('investigate the footprints');
     let pending = store.getState().pendingHookContinue;
     expect(pending).not.toBeNull();
     expect(pending!.completed).toBe(false);
-    expect(pending!.completionNotice ?? null).toBeNull();
     expect(store.getState().missionCompleteNotice).toBeNull();
 
-    // Terminal stage (grants items + TC): the notice is STASHED, not shown.
+    // Terminal stage (grants items + TC): the payout rides the modal, no popup.
     store.getState().continueHook();
     pending = store.getState().pendingHookContinue;
     expect(pending).not.toBeNull();
     expect(pending!.completed).toBe(true);
-    expect(pending!.completionNotice).toBeTruthy();                 // new shape: held payload
-    expect(store.getState().missionCompleteNotice).toBeNull();      // old shape gone: no popup over the modal
+    expect(pending!.stageHistory.some((st) => st.reward)).toBe(true); // the modal has the payout to spotlight
+    expect(store.getState().missionCompleteNotice).toBeNull();
 
-    // The COMPLETE tap: thread closes, THEN the popup raises.
+    // The COMPLETE tap: thread closes. Still no popup — the feed's ✦ line
+    // and the modal's reward strip were the whole announcement.
     store.getState().dismissHookContinue();
     expect(store.getState().pendingHookContinue).toBeNull();
-    const notice = store.getState().missionCompleteNotice;
-    expect(notice).not.toBeNull();
-    expect(notice!.kind).toBe('Story thread');
-    expect(notice!.rewards.length).toBeGreaterThan(0);
+    expect(store.getState().missionCompleteNotice).toBeNull();
+    const logs = store.getState().gameLog.map((e) => e.text).join('\n');
+    expect(logs).toMatch(/✦ /);
   });
 
   it('a dismissal with no stash (mid-thread) raises nothing', async () => {
@@ -119,13 +123,13 @@ describe('OTA-1007 — the completion popup waits for COMPLETE', () => {
     expect(store.getState().missionCompleteNotice).toBeNull();
   });
 
-  it('a stale CONTINUE on a resolved hook still raises the stash (dismiss path)', async () => {
+  it('a stale CONTINUE on a resolved hook dismisses cleanly — still no popup', async () => {
     const store = await bootWithHook();
     store.getState().submitPlayerAction('investigate the footprints');
-    store.getState().continueHook();                                 // terminal — stash held
+    store.getState().continueHook();                                 // terminal
     store.getState().continueHook();                                 // stale tap: hook resolved
     expect(store.getState().pendingHookContinue).toBeNull();
-    expect(store.getState().missionCompleteNotice).not.toBeNull();   // payout never dropped
+    expect(store.getState().missionCompleteNotice).toBeNull();       // no popup, by design
   });
 });
 
@@ -142,10 +146,10 @@ describe('OTA-1007 — category lock: terminal stage shows COMPLETE alone', () =
     expect(modal.includes('completed ? onComplete : onAbandon')).toBe(true);
   });
 
-  it('the store defers the story-thread notice — no announce at resolution time', () => {
-    expect(store.includes("announceMissionComplete('Story thread'")).toBe(false); // old shape gone
-    expect(store.includes('completionNotice: doneNotice')).toBe(true);            // new shape present
-    expect(store.includes('raiseMissionCompleteNotice(stash.kind, stash.title, stash.body)')).toBe(true);
+  it('the store never announces a story-thread popup at all', () => {
+    expect(store.includes("announceMissionComplete('Story thread'")).toBe(false); // resolution-time popup gone
+    expect(store.includes('completionNotice')).toBe(false);                       // OTA-1027: the stash is retired too
+    expect(modal.includes('rewardStrip')).toBe(true);                             // the payout spotlight lives in-modal
   });
 
   it('the screen wires COMPLETE to dismissHookContinue', () => {

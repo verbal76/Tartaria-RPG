@@ -35,9 +35,12 @@ import type { HookContinueStage } from '../engine/types';
 //
 // OTA-1007 — the terminal stage shows a single COMPLETE button (owner: "the
 // last part of the story thread is completed, so it shouldn't say continue
-// or abandon — it should only say complete"). COMPLETE dismisses the arc
-// and THEN raises the mission-complete popup, which used to mount over
-// this modal the moment the final stage resolved.
+// or abandon — it should only say complete").
+//
+// OTA-1027 — COMPLETE just dismisses. The follow-up mission-complete popup is
+// gone (owner: "I think we can do without the story hook pop-up... we just
+// need to show the reward a little more prominently") — the completed state
+// now renders the final payout in a boxed YOUR REWARD strip above the button.
 //
 // The previous stage's narration also goes to the world feed (log)
 // via resolveHookOneStep's existing appendLog calls, so the player
@@ -57,10 +60,10 @@ interface Props {
   completed: boolean;
   onContinue: () => void;
   onAbandon: () => void;
-  /** OTA-1007 — COMPLETE on the terminal stage. Dismisses the thread AND raises
-   *  the held completion popup (wire to dismissHookContinue). On a completed
-   *  thread this is the ONLY button — nothing left to continue or abandon —
-   *  and scrim taps / the back button route here too. */
+  /** OTA-1007 — COMPLETE on the terminal stage (wire to dismissHookContinue).
+   *  On a completed thread this is the ONLY button — nothing left to continue
+   *  or abandon — and scrim taps / the back button route here too. OTA-1027:
+   *  dismisses only; no second popup follows. */
   onComplete: () => void;
   /** OTA-284 — vendor name when the current scene has a spawned
    *  vendor (typically from a spawn_vendor effect fired by THIS
@@ -97,6 +100,12 @@ export function HookContinueModal({
   onTrade,
 }: Props) {
   const scrollRef = useRef<ScrollView>(null);
+
+  // OTA-1027 — the payout to spotlight in the completed state: the newest
+  // stage that carried a reward (the terminal stage in practice).
+  const finalReward = completed
+    ? [...stageHistory].reverse().find((s) => s.reward)?.reward
+    : undefined;
 
   // Auto-scroll to the newest stage as it's appended so the player
   // sees the freshly-fired beat without having to scroll manually.
@@ -162,6 +171,12 @@ export function HookContinueModal({
                   TRADE NOW closes the modal (without resolving the
                   hook — player can re-investigate the noun to
                   resume) and navigates to the vendor screen. */}
+              {completed && finalReward ? (
+                <View style={styles.rewardStrip}>
+                  <Text style={styles.rewardKicker}>YOUR REWARD</Text>
+                  <Text style={styles.rewardText}>{finalReward}</Text>
+                </View>
+              ) : null}
               <View style={styles.btnRow}>
                 {completed ? (
                   <Pressable
@@ -241,6 +256,21 @@ const styles = StyleSheet.create({
   stageLine: { color: '#e6d8b3', fontSize: 13, lineHeight: 19 },
   stageReward: { color: '#9ec96a', fontSize: 12, lineHeight: 17 },
   stageArbiter: { color: '#bf9b6a', fontSize: 12, fontStyle: 'italic', lineHeight: 17 },
+  // OTA-1027 — completed-state reward strip: the payout in reward-channel
+  // green, boxed and centered above COMPLETE so it can't be missed.
+  rewardStrip: {
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    borderRadius: 4,
+    backgroundColor: 'rgba(32, 42, 22, 0.55)',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginTop: 12,
+    alignItems: 'center',
+    gap: 4,
+  },
+  rewardKicker: { color: '#7c8f6a', fontSize: 9, letterSpacing: 3, fontWeight: '700' },
+  rewardText: { color: '#9ec96a', fontSize: 14, fontWeight: '700', lineHeight: 20, textAlign: 'center' },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 12 },
   btn: {
     paddingHorizontal: 14,

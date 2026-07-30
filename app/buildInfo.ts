@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.60';
+export const DISPLAY_VERSION = '4.28.61';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17895,4 +17895,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ambient). Plus: the Aetheric Torch mark line repeated VERBATIM per use
 // and leaned on "resonance" — now 4 rotating variants, one keeper.
 // DISPLAY_VERSION 4.28.60. 3 tests.
-export const OTA_BUILD_ID = '2026-07-30-1026-narration-context';
+// OTA-1027 — DOG + GOLEM NAMING POPUPS; NO SECOND STORY-HOOK POPUP (twin of
+// HAL 1050). Playtester at the rescue moment typed "rest", thought the
+// naming beat was another fight, and the in-feed takeover silently stored
+// "rest" as the breed. (1) Breed/name/sex now land on ONE blocking card
+// (DogOnboardingModal) committed via confirmDogOnboarding — same cleanup,
+// caps, and feed beats; a save wedged mid-way through the old typed flow
+// heals on next open (part-answers pre-fill). (2) The golem summon ask gets
+// the same treatment (GolemNamingModal / confirmGolemName: SEAL THE NAME or
+// KEEP ITS MAKING). Typed feed input during either ask is NEVER an answer —
+// the Arbiter points back at the card. (3) Story-hook COMPLETE no longer
+// raises the redundant mission-complete popup (owner: "we can do without the
+// story hook pop-up"); the thread modal's completed state spotlights the
+// payout in a YOUR REWARD strip and the feed's ✦ line remains the record.
+// DISPLAY_VERSION 4.28.61. 7 tests (+6 suites retargeted off the typed flow).
+export const OTA_BUILD_ID = '2026-07-30-1027-dog-golem-popups';

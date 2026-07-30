@@ -103,21 +103,19 @@ describe('OTA-987 — a finished mission announces itself', () => {
 
   it('CATEGORY LOCK: every completion path goes through the choke point', () => {
     // 6 call sites + 1 implementation. (The interface declaration uses a colon,
-    // not a paren, so it is deliberately not counted here. OTA-1007 — story
-    // threads no longer announce at resolution: their notice is STASHED on
-    // pendingHookContinue and raised by dismissHookContinue via
-    // raiseMissionCompleteNotice, so the popup lands AFTER the player closes
-    // the thread modal instead of on top of it.)
+    // not a paren, so it is deliberately not counted here. OTA-1027 — story
+    // threads no longer announce AT ALL: the thread modal itself spotlights
+    // the payout in its completed-state reward strip, and the feed's ✦ line
+    // is the permanent record.)
     const calls = STORE_SRC.match(/announceMissionComplete\(/g) ?? [];
     expect(calls.length).toBe(7);
     // Every kind of job that announces directly is represented among them.
     for (const kind of ['Bounty', 'Contract', 'Hunt', 'Mystery', 'Storyline']) {
       expect(STORE_SRC).toMatch(new RegExp(`announceMissionComplete\\(\\s*'${kind}'`));
     }
-    // The story-thread completion still reaches the notice choke point — via
-    // the deferred stash, never via a direct announce over the thread modal.
-    expect(STORE_SRC).toMatch(/kind: 'Story thread'/);
-    expect(STORE_SRC).toMatch(/raiseMissionCompleteNotice\(stash\.kind, stash\.title, stash\.body\)/);
+    // OTA-1027 — story threads bypass the notice entirely (no popup): nothing
+    // in the store may announce or stash a 'Story thread' notice.
+    expect(STORE_SRC).not.toMatch(/kind: 'Story thread'/);
     expect(STORE_SRC).not.toMatch(/announceMissionComplete\(\s*'Story thread'/);
     // Two Hunt sites exist (board turn-in and pack turn-in); both must be wired.
     expect((STORE_SRC.match(/announceMissionComplete\(\s*'Hunt'/g) ?? []).length).toBe(2);
