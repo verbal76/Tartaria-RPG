@@ -70,7 +70,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { stripForeignWords, repairGluedNarration } from '../engine/foreignText';
+import { stripForeignWords, repairGluedNarration, looksLikeInstructionEcho } from '../engine/foreignText';
 import { sentenceNamesOffCanonEntity, buildEntityAllowList, normalizeEntity } from '../engine/entityGuard';
 import { isQuestLockedItem } from '../engine/questItems';
 import { revealedLocationName } from '../engine/hiddenLocations';
@@ -34985,13 +34985,28 @@ async function narrateViaArbiter(
     //   combat:   1 short sentence ≈ 20 words ≈ 28 tokens → cap 30
     //   peaceful: 1 short sentence ≈ 20 words ≈ 28 tokens → cap 34
     const maxTokens = ctx.in_combat ? 30 : 34;
+    // OTA-1053 — the streaming tail is VETTED now. It used to mirror raw model
+    // tokens straight to the screen, so when the model recited its own brief the
+    // player read the prompt under "The Arbiter:" for the whole generation. The
+    // post-generation filters below could only ever clean the FINAL line — by
+    // then the raw text had already been on screen for seconds. Accumulate
+    // locally and stop mirroring the moment the output turns into meta-text;
+    // the tail falls back to an empty "thinking" frame.
+    let streamed = '';
+    let previewBlocked = false;
     const text = await qwen.stream(
       messages,
       (token: string) => {
         // Only update the buffer if we're still the active generation.
         if (myEpoch !== arbiterGenerationEpoch) return;
-        const current = get().partialArbiterText ?? '';
-        set({ partialArbiterText: current + token });
+        streamed += token;
+        if (previewBlocked) return;
+        if (looksLikeInstructionEcho(streamed)) {
+          previewBlocked = true;
+          set({ partialArbiterText: '' });
+          return;
+        }
+        set({ partialArbiterText: streamed });
       },
       { maxNewTokens: maxTokens },
     );
@@ -35022,6 +35037,9 @@ async function narrateViaArbiter(
       .split(/(?<=[.!?])\s+/)
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
+      // OTA-1053 — drop a sentence that is the brief coming back rather than a
+      // line. Nothing survives → the `|| trimmed` fallback restores the template.
+      .filter((s) => !looksLikeInstructionEcho(s))
       .filter((s) => !sentenceNamesOffCanonEntity(s, narrationAllow))
       .join(' ')
       .trim();
@@ -35176,11 +35194,23 @@ async function maybeGenerateAmbientArbiter(
   lastQwenGenStartMs = t0;
   set({ isGenerating: true, partialArbiterText: '' });
   try {
+    // OTA-1053 — same vetted tail as the reactive path. THIS is the generation the
+    // owner caught: the ambient brief came back verbatim, streamed raw to the
+    // screen, and was then correctly filtered to nothing — the log shows
+    // "arbiter: ambient ∅", a line that never existed as far as the feed knew.
+    let streamed = '';
+    let previewBlocked = false;
     const text = await qwen.stream(
       messages,
       (token: string) => {
-        const current = get().partialArbiterText ?? '';
-        set({ partialArbiterText: current + token });
+        streamed += token;
+        if (previewBlocked) return;
+        if (looksLikeInstructionEcho(streamed)) {
+          previewBlocked = true;
+          set({ partialArbiterText: '' });
+          return;
+        }
+        set({ partialArbiterText: streamed });
       },
       { maxNewTokens: 32 },
     );
@@ -35198,6 +35228,8 @@ async function maybeGenerateAmbientArbiter(
       // inside a flooded-house kitchen). Drop those sentences; an empty
       // result just stays silent (ambient has no template fallback).
       .filter((s) => !/^\s*you\b/i.test(s))
+      // OTA-1053 — the brief recited back is not a line. Empty → stays silent.
+      .filter((s) => !looksLikeInstructionEcho(s))
       .filter((s) => !sentenceNamesOffCanonEntity(s, ambientAllow))
       .join(' ')
       .trim();
