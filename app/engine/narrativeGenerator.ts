@@ -592,8 +592,17 @@ export interface ArbiterContext {
   hasFood?: boolean;
 }
 
-function pickMoodPool(mood: string | undefined): string[] | undefined {
+// OTA-1026 — the mood arrives one action STALE (the cognitive read for the
+// current action lands after this line prints), so the first peaceful action
+// after a fight still reads AGGRESSION — and every AGGRESSION line
+// presupposes a live opponent ("don't make me decide which one of you to
+// leave breathing" fired over a quiet crate salvage in the owner's log).
+// Every other mood reads fine ambient (FEAR is atmosphere, CURIOSITY is
+// looting); AGGRESSION alone is combat-locked, so it only selects its pool
+// when the scene actually holds a live enemy.
+function pickMoodPool(mood: string | undefined, hasLiveEnemy?: boolean): string[] | undefined {
   if (!mood) return undefined;
+  if (mood === 'AGGRESSION' && !hasLiveEnemy) return undefined;
   const pool = getMoodRemarks()[mood];
   return pool && pool.length > 0 ? pool : undefined;
 }
@@ -853,7 +862,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   ) {
     const lastAction = ctx.recentActions[ctx.recentActions.length - 1];
     if (lastAction && lastAction.trim().length > 0) {
-      const moodPool = pickMoodPool(ctx.mood);
+      const moodPool = pickMoodPool(ctx.mood, !!ctx.enemy);
       const flavor = moodPool ? pick(moodPool).replace('this place', ctx.location.name) : null;
       // OTA 027 — see combat-context site above. Plain "look" gets
       // the rotating LOOK pool instead of the generic templated
@@ -885,7 +894,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   // Mood pool — only fires when the location has no authored flavor
   // (procedural / future content). Replaces "this place" with the
   // actual location name so the line stays anchored.
-  const moodPool = pickMoodPool(ctx.mood);
+  const moodPool = pickMoodPool(ctx.mood, !!ctx.enemy);
   if (moodPool) {
     return pick(moodPool).replace('this place', ctx.location.name);
   }

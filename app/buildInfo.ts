@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.59';
+export const DISPLAY_VERSION = '4.28.60';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17885,4 +17885,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (3) RESONANCE RARER + VARIED ("the resonance hook is overused"): weight
 // 5 → 2 and the plant pool widened 2 → 5 lines (hardcoded direction cut).
 // DISPLAY_VERSION 4.28.59. 5 tests.
-export const OTA_BUILD_ID = '2026-07-30-1025-feedback-batch';
+// OTA-1026 — NARRATION CONTEXT (twin of HAL 1049) (owner's log part 8: a quiet crate
+// salvage drew "Don't make me decide which one of you to leave breathing",
+// voice flat — no enemy in the scene). Root cause is double: the mood the
+// template picker reads is one action STALE (the current action's cognitive
+// classification lands after the line prints), and the AGGRESSION pool's
+// lines all presuppose a live opponent. Fix: AGGRESSION only selects its
+// pool when the scene holds a live enemy (every other mood reads fine
+// ambient). Plus: the Aetheric Torch mark line repeated VERBATIM per use
+// and leaned on "resonance" — now 4 rotating variants, one keeper.
+// DISPLAY_VERSION 4.28.60. 3 tests.
+export const OTA_BUILD_ID = '2026-07-30-1026-narration-context';
