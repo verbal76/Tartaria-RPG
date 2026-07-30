@@ -4185,6 +4185,13 @@ interface GameStore {
   /** OTA-1041 — re-run the opening for the current character (About screen).
    *  No-op without a live character. */
   replayStoryIntro: () => void;
+  /** OTA-1043 — the chapter card raised by the latest main-quest phase
+   *  transition, null when none is showing. ChapterCardOverlay (mounted
+   *  globally in App.tsx) renders whenever this is non-null. Transient —
+   *  never persisted, always reset by slot load / new game / delete. */
+  chapterCard: import('../engine/chapters').ChapterCard | null;
+  /** OTA-1043 — close the chapter card (tap-through). */
+  dismissChapterCard: () => void;
   /** Set the pending destination; the screen renders the modal. */
   requestTravelConfirm: (locationId: string, locationName: string) => void;
   /** Yes path: leave outpost, then set course. Clears pending. */
@@ -4684,6 +4691,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   missionCompleteNotice: null,
   contractsNotice: null,
   storyIntro: null,
+  chapterCard: null, // OTA-1043
   fusionBlockedNotice: null,
   pendingFusionSelection: null,
   pendingAetherFoodId: null,
@@ -5461,6 +5469,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingHookContinue: null,
         // OTA-1041 — a loaded save never reopens the crawl mid-game.
         storyIntro: null,
+        chapterCard: null, // OTA-1043 — nor a stale chapter card
+
         pendingGolemNaming: false,
         justUpdatedFromBuild: null,
         // OTA-100 — clear pendingOtaAppliedFrom in the same set
@@ -5762,7 +5772,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       crashedSlotIds,
       // If we just deleted the currently-loaded character, drop player state too.
       ...(get().activeSlotId === slotId
-        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null, storyIntro: null }
+        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null, storyIntro: null, chapterCard: null }
         : {}),
     });
   },
@@ -5831,6 +5841,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // that took them in, and the closing hand-off. Assembled per-character;
       // the StoryIntroOverlay shows it over the first scene.
       storyIntro: introPagesFor(player.storyMotive, player.factionId),
+      chapterCard: null, // OTA-1043 — no stale card from a prior character
     });
     try {
       get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
@@ -5882,6 +5893,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       pendingRolls: null,
   pendingHookContinue: null,
       storyIntro: null, // OTA-1041
+      chapterCard: null, // OTA-1043
       currentScreen: 'title',
       activeSlotId: null,
       slots,
@@ -26289,6 +26301,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ storyIntro: introPagesFor(p.storyMotive, p.factionId) });
   },
 
+  // OTA-1043 — close the chapter card. Nothing to remember: the phase
+  // transition that raised it is already on the player record (and
+  // persisted), and the feed carries the transition's narration.
+  dismissChapterCard() { set({ chapterCard: null }); },
+
   clearContractsNotice() { set({ contractsNotice: null }); },
 
   announceMissionComplete(kind, title, body) {
@@ -29440,6 +29457,19 @@ function triggerMainQuest(
     if (line) {
       get().appendLog('arbiter', line);
     }
+  }
+  // OTA-1043 — CHAPTER CARD on every phase transition (story phase 2).
+  // The feed narration above/below stays — the log remains the complete
+  // record — while the card is the full-screen cinematic marker on top,
+  // personalized to the character's OTA-1041 story motive. 'ended' has
+  // no card by design: EndingScreen is the ending's own full-screen
+  // presentation (it renders the motive epilogue line instead), and
+  // chapterCardFor returns null for it (and for 'hook').
+  if (nextState.phase !== prevState.phase) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ch = require('../engine/chapters');
+    const card = ch.chapterCardFor(nextState.phase, player.storyMotive);
+    if (card) set({ chapterCard: card });
   }
   // For multi-phase triggers — e.g. core_recovered that lands the
   // player on phase 'descent' (5th Core) — also log the descent

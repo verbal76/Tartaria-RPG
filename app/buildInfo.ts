@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.53';
+export const DISPLAY_VERSION = '4.28.54';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18874,4 +18874,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dismissStoryIntro(), guarded on storyIntroSeen===false && !hasSeenIntro so
 // a REPLAY OPENING dismissal or a backfilled save can never re-speak the
 // prompt or restart the tutorial. DISPLAY_VERSION 4.28.53. 3 tests.
-export const OTA_BUILD_ID = '2026-07-30-1042-tutorial-hold';
+// OTA-1043 — CHAPTER CARDS (story phase 2 of 3, promoted from golem 1020).
+// Every main-quest phase transition raises a full-screen chapter card:
+// CHAPTER II — NINE HEARTS (first Lost Capital), III — THE FIRST HEART
+// (first Core), IV — THE ENDLESS STAIR (all nine), V — THE MUD FLOOD NEXUS
+// (arrival). Each carries a universal body plus a line written for THIS
+// character's OTA-1041 story motive. Raised at the triggerMainQuest choke
+// point, mounted globally in App.tsx (the Nexus choice fires from
+// Contracts). 'ended' has NO card — EndingScreen renders the 3-endings ×
+// 5-motives per-motive EPILOGUE matrix instead. Text in
+// app/data/story/chapters.json; logic in engine/chapters.ts.
+// DISPLAY_VERSION 4.28.54. 11 tests.
+export const OTA_BUILD_ID = '2026-07-30-1043-chapter-cards';
