@@ -70,7 +70,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { stripForeignWords, repairGluedNarration, looksLikeInstructionEcho } from '../engine/foreignText';
+import { stripForeignWords, repairGluedNarration, looksLikeInstructionEcho, isSecondPersonActionOpener } from '../engine/foreignText';
 import { sentenceNamesOffCanonEntity, buildEntityAllowList, normalizeEntity } from '../engine/entityGuard';
 import { isQuestLockedItem } from '../engine/questItems';
 import { revealedLocationName } from '../engine/hiddenLocations';
@@ -35187,12 +35187,17 @@ async function maybeGenerateAmbientArbiter(
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
       // Ambient is the narrator's own idle musing, not world narration — a
-      // second-person opener ("You step back, surveying...") reads as scene
-      // text in the arbiter channel and in practice is an off-scene
+      // second-person ACTION opener ("You step back, surveying...") reads as
+      // scene text in the arbiter channel and in practice is an off-scene
       // hallucination (log 2026-07-13: alleyways + stone pillars narrated
       // inside a flooded-house kitchen). Drop those sentences; an empty
       // result just stays silent (ambient has no template fallback).
-      .filter((s) => !/^\s*you\b/i.test(s))
+      // OTA-1031 — this used to drop EVERY "You …" sentence, which silently
+      // guaranteed the empty result: VOICE_RULES orders the model to start
+      // sentences with "You", so the filter ate the whole feature (every
+      // ambient in the owner's logs is ∅, never ✓). Now it splits on register —
+      // an action opener is still scene text, a reflection is what we asked for.
+      .filter((s) => !isSecondPersonActionOpener(s))
       // OTA-1030 — the brief recited back is not a line. Empty → stays silent.
       .filter((s) => !looksLikeInstructionEcho(s))
       .filter((s) => !sentenceNamesOffCanonEntity(s, ambientAllow))

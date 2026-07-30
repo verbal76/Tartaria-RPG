@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.64';
+export const DISPLAY_VERSION = '4.28.65';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17966,4 +17966,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Why TWICE: two generations in a row (reactive + ambient share the tail) each
 // streamed their echo; neither was ever logged.
 // DISPLAY_VERSION 4.28.64. 14 tests.
-export const OTA_BUILD_ID = '2026-07-30-1030-prompt-echo-leak';
+// OTA-1031 — THE AMBIENT COMPANION COULD NEVER SPEAK (twin of HAL 1054).
+// Found reading the owner's Asgardar logs: every ambient generation ends
+// `arbiter: ambient ∅` — 75627ms in one log, 26173ms in the next — and not one
+// `ambient ✓`, across two builds. Not bad luck, a contradiction: the shared
+// VOICE_RULES order the model "Sentences must START with 'You' or 'Your'", and
+// the ambient filter then dropped every sentence starting with "You". The path
+// discarded its own output by construction. Worse, it isn't free — ambient
+// holds the SHARED isGenerating lock while it runs, so up to 75s of guaranteed-
+// discarded work is 75s the reactive Arbiter can't narrate in (hence the
+// `reason=cooldown` templates around it).
+// Fix: filter on REGISTER, not on the pronoun. A scene hallucination opens with
+// a present-tense action ("You step back, surveying the alleyway" — the real
+// failure the filter was written for, and still blocked); a reflection, which
+// is the whole point of ambient, opens with a state or perfect ("You have come
+// a long way…", "You've grown harder…", "You carry it better now") and is now
+// allowed through. The reactive path never had this filter and still doesn't —
+// it is SUPPOSED to narrate actions.
+// DISPLAY_VERSION 4.28.65. 6 tests.
+export const OTA_BUILD_ID = '2026-07-30-1031-ambient-revival';
