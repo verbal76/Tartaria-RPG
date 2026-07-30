@@ -29,10 +29,13 @@ export const INDOOR_AMBUSHERS: Readonly<Record<string, readonly string[]>> = {
     'Iron Spider', 'Rust Lurker', 'Plague Moth', 'Mud-Wracked Aetherkin',
   ],
   // A serious intrusion: a hired blade, a guard-machine, a haunting.
+  // OTA-1033 — Mud Monarch Purifier added: a zealot-knight is exactly the kind
+  // of armed caller a capital gets, and he was the one martial human the cast
+  // had left out.
   Rare: [
-    'Black Cloak Agent', 'Steel Hound', 'Clockwork Knight', 'Stone Warden',
-    'Clockwork Serpent', 'Steam Spider', 'Shifting Shade', 'Aetheric Ghost',
-    'Mud Wraith', 'Aetherkin',
+    'Black Cloak Agent', 'Mud Monarch Purifier', 'Steel Hound',
+    'Clockwork Knight', 'Stone Warden', 'Clockwork Serpent', 'Steam Spider',
+    'Shifting Shade', 'Aetheric Ghost', 'Mud Wraith', 'Aetherkin',
   ],
   // The things a sealed hall keeps. All of these belong under a roof — the
   // open-country colossi (Iron Titan, Metal Hydra, Storm Walker) do not.
@@ -42,10 +45,80 @@ export const INDOOR_AMBUSHERS: Readonly<Record<string, readonly string[]>> = {
   ],
 };
 
+// OTA-1033 — RAIDERS AND SOLDIERS WEARING A FACTION'S COLOURS. Owner asked the
+// indoor list to cover raiders and soldiers explicitly. The roster only has six
+// humans total and exactly one martial one below Legendary, so a named-enemy
+// list alone can't carry "a rival faction broke in" at every tier. The game
+// already builds faction fighters by RESKINNING a template (injectFactionParty
+// for outdoor raids) — but that one dresses whatever the WILD table rolled,
+// which is how a soldier's name can end up on a cyclops's statline. Indoors we
+// only ever dress a HUMAN body, so a "Mud Monarchs Raider" fights like a person.
+//
+// Common is deliberately absent: the cheapest human body is Uncommon, and a
+// Common-tier intruder in a fortified capital is a rat or a loose drone, not a
+// soldier. A soldier is a serious visit by definition.
+export const INDOOR_FACTION_BODIES: Readonly<Record<string, readonly string[]>> = {
+  Uncommon: ['Silt Thief', 'Reclaimer Ambusher', 'Disc Hijacker'],
+  Rare: ['Black Cloak Agent', 'Mud Monarch Purifier'],
+  Legendary: ['Tartarian Reaver'],
+};
+
+/** Which word fits the body. A cutpurse or brigand who got in is a RAIDER; a
+ *  zealot-knight, a blade in someone's pay, or a warlord is a SOLDIER. */
+const FACTION_NOUN_BY_BODY: Readonly<Record<string, 'Raider' | 'Soldier'>> = {
+  'Silt Thief': 'Raider',
+  'Reclaimer Ambusher': 'Raider',
+  'Disc Hijacker': 'Raider',
+  'Black Cloak Agent': 'Soldier',
+  'Mud Monarch Purifier': 'Soldier',
+  'Tartarian Reaver': 'Soldier',
+};
+
+/** Dress a same-rarity HUMAN body in a faction's colours: "Mud Monarchs Raider",
+ *  "Stone Builders Soldier". Keeps the body's statline and traits (so the fight
+ *  plays like a person), stamps the factionId so the kill lands on the right
+ *  ledger, and carries the aliases the parser already answers to. Returns null
+ *  at a rarity with no human body — the caller falls back to the creature cast. */
+export function pickIndoorFactionIntruder(
+  rarity: string | null | undefined,
+  factionId: string,
+  factionName: string,
+): Enemy | null {
+  const pool = rarity ? INDOOR_FACTION_BODIES[rarity] : undefined;
+  if (!pool || pool.length === 0) return null;
+  const order = [...pool].sort(() => Math.random() - 0.5);
+  for (const bodyName of order) {
+    const body = findEnemyByName(bodyName);
+    if (!body) continue;
+    const noun = FACTION_NOUN_BY_BODY[bodyName] ?? 'Raider';
+    return {
+      ...body,
+      name: `${factionName} ${noun}`,
+      factionId,
+      aliases: [noun.toLowerCase(), 'soldier', 'raider', 'intruder', factionName.toLowerCase()],
+    };
+  }
+  return null;
+}
+
 /** Every name in the indoor cast, flattened. */
 export function indoorAmbusherNames(): string[] {
   return Object.values(INDOOR_AMBUSHERS).flatMap((names) => [...names]);
 }
+
+// OTA-1033 — the three groups the owner named, so a future edit can't drop one.
+// (Faction raiders/soldiers are BUILT, not listed, so they're covered by the
+// INDOOR_FACTION_BODIES check rather than by name.)
+export const INDOOR_RAIDERS: readonly string[] = [
+  'Silt Thief', 'Reclaimer Ambusher', 'Disc Hijacker',
+];
+export const INDOOR_SOLDIERS: readonly string[] = [
+  'Black Cloak Agent', 'Mud Monarch Purifier', 'Tartarian Reaver',
+];
+export const INDOOR_AETHERKIN: readonly string[] = [
+  'Drowned Aetherkin', 'Mud-Wracked Aetherkin', 'Aetherkin',
+  'Aetheric Lich', 'Hollow King',
+];
 
 /** True when this enemy is one the indoor cast allows. Used by the guard test
  *  so a future edit can't quietly re-admit a swamp behemoth to a bunkhouse. */

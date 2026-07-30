@@ -861,7 +861,25 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.56**; ledger in `VERSION.md`.
 
-- **INDOOR AMBUSH CAST + FASTER QWEN RECOVERY (2026-07-30, latest). BOTH LINES.**
+- **RAIDERS, SOLDIERS + AETHERKIN INDOORS (2026-07-30, latest). BOTH LINES.**
+  golem **1033** / HAL **1056**. Owner asked the indoor cast to cover raiders, soldiers and
+  Aetherkin explicitly. Audit result: AETHERKIN already complete — all five roster entries —
+  and now locked by a test that READS enemies.json and demands the indoor list equal the
+  full `Aetheric Undead` set, so adding one to the roster without listing it fails CI.
+  RAIDERS were in at Uncommon only. SOLDIERS were the real gap: the roster holds six humans
+  TOTAL and exactly one martial one below Legendary, so a name-list can't carry "a rival
+  faction broke in" at every tier. Fixes: (a) Mud Monarch Purifier joins the Rare pool;
+  (b) `pickIndoorFactionIntruder()` BUILDS raiders/soldiers by dressing a same-rarity HUMAN
+  body in the colours of the faction with the worst (negative) standing — "Mud Monarchs
+  Raider", "Stone Builders Soldier". Contrast with the outdoor `injectFactionParty`, which
+  reskins whatever the WILD table rolled and can therefore put a soldier's name on a
+  cyclops statline (OTA-1038 fixed only the Aetherkin half of that); the indoor builder
+  only ever dresses a human. ~50% of indoor ambushes are people now. Common deliberately
+  has no faction body — the cheapest human is Uncommon, and a Common-tier intruder in a
+  fortified capital is a rat, not a soldier. Locked by ota1033/1056IndoorCastGroups
+  (9 tests per line).
+
+- **INDOOR AMBUSH CAST + FASTER QWEN RECOVERY (2026-07-30). BOTH LINES.**
   golem **1032** / HAL **1055**. Two owner asks off the Asgardar log. (a) CAST: a
   rest-ambush drew from the WILDERNESS table wherever you slept — hence a Rare 202-HP Mud
   Cyclops in the Builders' crew bunks, narrated as if it crossed open country. The odds
