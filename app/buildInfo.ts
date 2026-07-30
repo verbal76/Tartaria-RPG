@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.57';
+export const DISPLAY_VERSION = '4.28.58';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17862,4 +17862,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // StoryIntroOverlay mounts GLOBALLY in App.tsx so the crawl plays right
 // over the sheet with no navigation. About's dead button removed.
 // DISPLAY_VERSION 4.28.57. Golem + HAL (1046).
-export const OTA_BUILD_ID = '2026-07-30-1023-replay-findable';
+// OTA-1024 — FUSION LEGIBILITY (twin of HAL 1047) (owner log 03:22-03:24: refused "too
+// alike" with 2 kinds reserved, fixed the spread himself, then bounced off
+// the 25 TC fee he learned about from a buried system line at 11 TC).
+// (1) Every forge-reservable inventory row now carries its material kind(s)
+// — [organic], [stone · crystal] — via fusionMaterialTags, the SAME helper
+// the diversity gate counts, so building a 3-kind spread is a glance.
+// (2) The vendor Crucible button states the fee AND the balance BEFORE the
+// tap: short-of-coin reads amber as "25 TC — you have N".
+// DISPLAY_VERSION 4.28.58. 4 tests.
+export const OTA_BUILD_ID = '2026-07-30-1024-fusion-legibility';

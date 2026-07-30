@@ -861,7 +861,18 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.56**; ledger in `VERSION.md`.
 
-- **REPLAY OPENING FINDABLE (2026-07-30, latest). BOTH LINES.** golem **1023** / HAL **1046**.
+- **FUSION LEGIBILITY (2026-07-30, latest). BOTH LINES.** golem **1024** / HAL **1047**.
+  Owner's log told the whole story in two minutes: a CORRECT "too alike" refusal (2 kinds
+  reserved), self-corrected spread, then a fee bounce at 11 TC learned from a buried
+  system line. Fixes: (1) every forge-reservable inventory row carries its material
+  kind(s) — `[organic]`, `[stone · crystal]` — rendered from `fusionMaterialTags`, the
+  SAME helper the diversity gate counts (mirror property locked in tests); (2) the vendor
+  Crucible button states fee + balance BEFORE the tap — amber "25 TC — you have N" when
+  short. (The fusion PICKER already had per-row kind labels + a live kinds meter from
+  OTA-679/1007 — the gap was the inventory, where reserving actually happens, and the
+  paid button.) Locked by ota1024/1047FusionLegibility (4 tests per line).
+
+- **REPLAY OPENING FINDABLE (2026-07-30). BOTH LINES.** golem **1023** / HAL **1046**.
   Owner: "I went to settings and about and there was no replay opening." Root cause: About's
   only real entry is the TITLE screen (no live player), so OTA-1018's player-gated button
   never rendered on the path players take. Fix per owner's placement: the button lives in

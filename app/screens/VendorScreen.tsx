@@ -422,7 +422,15 @@ export function VendorScreen() {
             activeOpacity={0.7}
             accessibilityRole="button"
           >
-            <Text style={styles.crucibleBtnText}>★★ USE CRUCIBLE · 25 TC</Text>
+            {/* OTA-1024 — say the fee AND the balance BEFORE the tap. The
+                owner spent down to 11 TC, tapped, and learned about the fee
+                from a buried system line — a lit button that doesn't fire.
+                Short-of-coin now reads amber with the exact shortfall. */}
+            <Text style={[styles.crucibleBtnText, (player?.tc ?? 0) < 25 && styles.crucibleBtnShort]}>
+              {(player?.tc ?? 0) < 25
+                ? `★★ USE CRUCIBLE · 25 TC — you have ${player?.tc ?? 0}`
+                : '★★ USE CRUCIBLE · 25 TC'}
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -954,6 +962,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   crucibleBtnText: { color: '#d9b8f0', fontSize: 12, fontWeight: '800', letterSpacing: 1 },
+  crucibleBtnShort: { color: '#e0a75f' }, // OTA-1024 — short-of-coin amber
   walletRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
