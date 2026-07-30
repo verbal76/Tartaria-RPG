@@ -862,9 +862,11 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 re-architecture. Currently **4.28.55**; ledger in `VERSION.md`.
 
 - **THE MOTIVE DRIP — STORY FEATURE PHASE 3 OF 3, ARC COMPLETE (2026-07-29, latest). GOLEM-ONLY.**
-  golem **1021**, no HAL twin (⚠ same golem-only divergence rule as 1018/1020 — protect
-  app/data/story/drip.json, app/engine/storyDrip.ts, and the wiring in gameStore /
-  EndingScreen / types from any HAL→golem sync). Owner: "we need to keep updating the
+  golem **1021** — ✔ PROMOTED TO HAL as **OTA-1044** on 2026-07-30 (owner: "push all of
+  this to HAL"); the golem-only divergence is CLOSED, both lines now carry the identical
+  story arc. NOTE the OTA-TAG SKEW inside otherwise-identical code: HAL comments/tests say
+  1041-1044 where golem's say 1018-1021 — expected, do not "fix" by clobbering either
+  side on a sync. Owner: "we need to keep updating the
   player as they play." With this, the full story stack is: crawl (1018) → tutorial hold
   (1019) → chapter cards + epilogues (1020) → drip + The Missing's ending (1021).
   • **THE DRIP** — five authored beats per motive (25 total), delivered on TRAVEL ARRIVALS
@@ -891,7 +893,7 @@ re-architecture. Currently **4.28.55**; ledger in `VERSION.md`.
     delivery and a real Capital-arrival resolution through the store).
 
 - **CHAPTER CARDS — STORY FEATURE PHASE 2 OF 3 (2026-07-29). GOLEM-ONLY.**
-  golem **1020**, no HAL twin (⚠ same golem-only divergence rule as 1018 — do NOT port, do
+  golem **1020** — ✔ PROMOTED TO HAL as **OTA-1043** on 2026-07-30 (formerly: do NOT port, do
   NOT let a HAL→golem sync clobber app/data/story/chapters.json, app/engine/chapters.ts,
   app/components/ChapterCardOverlay.tsx, or the wiring in gameStore / App.tsx /
   EndingScreen). Owner: "we need to keep updating the player as they play."
@@ -931,14 +933,15 @@ re-architecture. Currently **4.28.55**; ledger in `VERSION.md`.
   (`!get().storyIntro`). Locked by `__tests__/ota1019TutorialHold.test.ts` (3 tests: silent
   under the crawl / fires exactly once on dismissal / replay can't re-arm).
 
-- **THE REASON YOU CAME DOWN — STORY FEATURE PHASE 1 OF 3 (2026-07-29). GOLEM-ONLY.**
-  golem **1018**, no HAL twin — the owner's call: "we have a ton of lore, a living civilization
-  and economy, but no real story... we need a scrolling text intro akin to the Skyrim
-  criminal-in-a-cart intro... and we need to keep updating the player as they play. let's keep
-  this part only on golem for now." ⚠ THIS BREAKS THE golem = HAL − 23 TWIN RULE BY DESIGN —
-  do NOT port to HAL and do NOT let a future HAL→golem sync clobber it (story files:
-  app/data/story/, app/engine/story.ts, app/components/StoryIntroOverlay.tsx, plus wiring in
-  gameStore / types / character / CharacterCreationScreen / ExplorationScreen / AboutScreen).
+- **THE REASON YOU CAME DOWN — STORY FEATURE PHASE 1 OF 3 (2026-07-29).**
+  golem **1018** — ✔ PROMOTED TO HAL as **OTA-1041** on 2026-07-30 (owner: "push all of
+  this to HAL"); the whole arc (golem 1018-1021 = HAL 1041-1044) now lives on BOTH lines
+  and the former golem-only rule is retired. The owner's original call: "we have a ton of
+  lore, a living civilization and economy, but no real story... we need a scrolling text
+  intro akin to the Skyrim criminal-in-a-cart intro... and we need to keep updating the
+  player as they play." (Story files: app/data/story/, app/engine/story.ts,
+  app/components/StoryIntroOverlay.tsx, plus wiring in gameStore / types / character /
+  CharacterCreationScreen / ExplorationScreen / AboutScreen.)
   • **FIVE MOTIVES** — the personal reason this character went below (debt / missing / exile /
     calling / record), picked at creation step 3 ("WHY DID YOU COME DOWN?"), stored as
     `player.storyMotive`. Callers that omit it (sims, legacy tests) get a random one;
