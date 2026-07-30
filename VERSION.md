@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.61` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.61` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.62` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.62` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -96,6 +96,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.58 → 4.28.59 | 2026-07-30-1048 | OTA | PLAYER-FEEDBACK BATCH (twin of golem 1025): (1) Guardians finally HIT like their over-level — a flat damage bonus rides the tier die (+0 for fresh arrivals, ~+4 at the owner's level, +9 at cap), monotone-staged so the ramp never inverts ("the second boss was a fairly easy fight"); (2) the travel/room row WRAPS instead of shrinking five buttons to 55% font ("Materials… too small to read"); (3) the resonance hook weight 5 → 2 with a 2 → 5 line pool ("overused"). |
 | 4.28.59 → 4.28.60 | 2026-07-30-1049 | OTA | NARRATION CONTEXT (twin of golem 1026): the Arbiter's AGGRESSION mood pool (all lines presuppose a live opponent) no longer fires without a live enemy — the mood read is one action stale, so post-combat looting drew combat menace ("which one of you to leave breathing" over a quiet crate). The Aetheric Torch mark line now rotates 4 variants instead of repeating "wrong-sounding resonance" verbatim. |
 | 4.28.60 → 4.28.61 | 2026-07-30-1050 | OTA | DOG + GOLEM NAMING POPUPS (twin of golem 1027): the typed in-feed takeovers are gone — a playtester typed "rest" at the breed ask and it silently became the breed. Breed/name/sex land on one blocking DogOnboardingModal card (wedged saves heal with part-answers pre-filled); golem naming gets GolemNamingModal (SEAL THE NAME / KEEP ITS MAKING). Typed input mid-ask is never an answer. Plus: story-hook COMPLETE no longer raises the redundant second popup — the thread modal spotlights the payout in a YOUR REWARD strip. |
+| 4.28.61 → 4.28.62 | 2026-07-30-1051 | OTA | MUSIC CROSSFADE + UPGRADE LIST (twin of golem 1028): music transitions are true crossfades — reflective beds melt over 2.2s, boss/combat and the market arrive as a fast 450ms shift (combat always from the opening bars), and an interrupted bed pauses in place and resumes mid-phrase on a quick return. The Crucible upgrade target list is grouped ARMOR & VESTS then WEAPONS, worn pieces first with an amber EQUIPPED badge (dog vests read ON <dog>). |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

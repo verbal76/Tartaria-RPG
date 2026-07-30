@@ -89,7 +89,22 @@ as clarified by the user on 2026-07-13:
 
 - **`HaL2001` is PRODUCTION.** The Tartaria build in the wild with internal
   testers. Vetted changes only; a push OTAs their devices.
-- **DOG + GOLEM NAMING POPUPS / NO SECOND HOOK POPUP (2026-07-30, latest). BOTH LINES.**
+- **MUSIC CROSSFADE + CRUCIBLE UPGRADE LIST (2026-07-30, latest). BOTH LINES.**
+  golem **1028** / HAL **1051**. Two owner items. MUSIC: AudioManager transitions are now
+  true crossfades (outgoing + incoming ramp in one epoch-guarded loop — the old
+  hard-stop-then-fade is gone). Reflective beds (explore/menu) hand over at
+  SMOOTH_FADE_MS 2200; entering boss/combat/shop is SHIFT_FADE_MS 450 so the boss and
+  market music land as a noticeable shift, and combat tiers always restart from the top.
+  The outgoing bed PAUSES IN PLACE (pauseInPlace, never stop) and resumes mid-phrase when
+  its context returns within RESUME_WINDOW_MS (4 min) — a fight or market stop no longer
+  resets the bed. Pools keep the owner's upload labels (boss-* / the single happy
+  shop-quiet-back-alley / reflective rest). UPGRADE LIST: the Crucible upgrade stage-2
+  target list is grouped ARMOR & VESTS then WEAPONS, worn pieces sort first and carry an
+  amber EQUIPPED badge (dog vests badge ON <dog>) via equippedInstanceIds — same resolver
+  as the inventory badge. Locked by ota1028/1051CrossfadeUpgradeList (7 tests per line,
+  incl. a mocked expo-av double proving pause-not-stop + no-position-reset resume).
+
+- **DOG + GOLEM NAMING POPUPS / NO SECOND HOOK POPUP (2026-07-30). BOTH LINES.**
   golem **1027** / HAL **1050**. Playtester at the dog rescue typed "rest", read the naming
   beat as another fight, and the in-feed takeover silently stored "rest" as the breed. The
   typed takeovers are GONE: breed/name/sex commit together from DogOnboardingModal

@@ -9,6 +9,7 @@ import { useGameStore } from '../state/gameStore';
 import { canonicalItemTags } from '../engine/crafting';
 import { eligibleInputs, fusionMaterialTags, visibleFusionInputs } from '../engine/itemFusion';
 import { isCoatableItem, coatingCapacity, coatedDisplayName } from '../engine/weaponCoating';
+import { equippedInstanceIds } from '../engine/equipment';
 import type { InventoryItem } from '../engine/types';
 
 const MIN_PICK = 3;
@@ -33,6 +34,7 @@ export function FusionPickerModal() {
   const close = useGameStore((s) => s.closeFusionPicker);
   const confirm = useGameStore((s) => s.confirmFusionSelection);
   const upgradeCoating = useGameStore((s) => s.upgradeCoatingSlot);
+  const player = useGameStore((s) => s.player);
 
   const scraps = useMemo<InventoryItem[]>(
     () => (inventory ? eligibleInputs(inventory) : []),
@@ -57,6 +59,26 @@ export function FusionPickerModal() {
     ),
     [inventory],
   );
+  // OTA-1051 — the upgrade target list, grouped + badged (owner: "listed as all
+  // armor that can be upgraded, then all weapons. and it should say which are
+  // equipped. I want to be able to upgrade what I am wearing"). Worn pieces
+  // sort first in each group and carry an EQUIPPED badge — same instance-id
+  // resolver as the inventory badge, plus the dog's vest (worn on the dog,
+  // never in a player slot).
+  const equippedIds = useMemo<Set<string>>(
+    () => (player ? equippedInstanceIds(player) : new Set<string>()),
+    [player],
+  );
+  const isWorn = (i: InventoryItem): boolean => {
+    if (equippedIds.has(i.id)) return true;
+    const vestId = player?.dog?.equipped?.vestId ?? null;
+    const vestName = player?.dog?.equipped?.vest ?? null;
+    if (vestId) return i.id === vestId;
+    return !!vestName && i.name === vestName;
+  };
+  const wornFirst = (a: InventoryItem, b: InventoryItem) => Number(isWorn(b)) - Number(isWorn(a));
+  const upgradeableArmor = upgradeable.filter(isArmorPiece).sort(wornFirst);
+  const upgradeableWeapons = upgradeable.filter((i) => !isArmorPiece(i)).sort(wornFirst);
 
   const [picked, setPicked] = useState<string[]>([]);
   const [catalystId, setCatalystId] = useState<string | null>(null);
@@ -139,18 +161,37 @@ export function FusionPickerModal() {
                     <Text style={styles.empty}>No eligible piece. You need a single coatable weapon (blade / arrow-arm / bolt-caster) without two coating slots, or a piece of armor or a dog vest that hasn't been upgraded yet.</Text>
                   ) : (
                     <ScrollView style={styles.list} nestedScrollEnabled>
-                      {upgradeable.map((w) => {
-                        const armor = isArmorPiece(w);
-                        const detail = armor
-                          ? `${(w.addedResists ?? []).length} resist${(w.addedResists ?? []).length === 1 ? '' : 's'} → +1 slot`
-                          : w.coating ? `has ${w.coating.label.toLowerCase()} → +1 slot` : 'no coating yet → +1 slot';
-                        return (
-                          <Pressable key={w.id} onPress={() => onPickPiece(w.id)} style={[styles.row, styles.rowOn]} accessibilityRole="button">
-                            <Text style={styles.rowName} numberOfLines={1}>{armor ? w.name : coatedDisplayName(w)}</Text>
-                            <Text style={styles.rowType} numberOfLines={1}>{detail}</Text>
-                          </Pressable>
-                        );
-                      })}
+                      {/* OTA-1051 — grouped: ALL upgradeable armor (incl. dog vests), then
+                          ALL weapons; worn pieces first in each group with an EQUIPPED
+                          badge so upgrading what you're wearing is a deliberate,
+                          visible choice. */}
+                      {[
+                        { label: 'ARMOR & VESTS', items: upgradeableArmor },
+                        { label: 'WEAPONS', items: upgradeableWeapons },
+                      ].map((section) => section.items.length === 0 ? null : (
+                        <View key={section.label}>
+                          <Text style={styles.sectionLabel}>{section.label}</Text>
+                          {section.items.map((w) => {
+                            const armor = isArmorPiece(w);
+                            const worn = isWorn(w);
+                            const onDog = worn && !equippedIds.has(w.id);
+                            const detail = armor
+                              ? `${(w.addedResists ?? []).length} resist${(w.addedResists ?? []).length === 1 ? '' : 's'} → +1 slot`
+                              : w.coating ? `has ${w.coating.label.toLowerCase()} → +1 slot` : 'no coating yet → +1 slot';
+                            return (
+                              <Pressable key={w.id} onPress={() => onPickPiece(w.id)} style={[styles.row, styles.rowOn]} accessibilityRole="button" accessibilityLabel={`${w.name}${worn ? ', equipped' : ''}`}>
+                                <View style={styles.rowNameWrap}>
+                                  <Text style={[styles.rowName, styles.rowNameTight]} numberOfLines={1}>{armor ? w.name : coatedDisplayName(w)}</Text>
+                                  {worn ? (
+                                    <Text style={styles.equippedTag}>★ {onDog ? `ON ${(player?.dog?.name ?? 'THE DOG').toUpperCase()}` : 'EQUIPPED'}</Text>
+                                  ) : null}
+                                </View>
+                                <Text style={styles.rowType} numberOfLines={1}>{detail}</Text>
+                              </Pressable>
+                            );
+                          })}
+                        </View>
+                      ))}
                     </ScrollView>
                   )}
                   <View style={styles.actions}>
@@ -271,6 +312,12 @@ const styles = StyleSheet.create({
   // the (secondary) rarity. Right-aligned so the type column lines up down the list.
   rowType: { color: '#8fbfa8', fontSize: 11, fontWeight: '600', marginLeft: 8, textAlign: 'right' },
   rowMeta: { color: '#6c8088', fontSize: 10, marginLeft: 8 },
+  // OTA-1051 — upgrade list grouping + worn badge (amber matches the
+  // inventory EQUIPPED badge palette).
+  sectionLabel: { color: '#8fa6ac', fontSize: 10, fontWeight: '700', letterSpacing: 1.2, marginTop: 8, marginBottom: 4 },
+  rowNameWrap: { flex: 1 },
+  rowNameTight: { flex: 0 },
+  equippedTag: { color: '#c9a86a', fontSize: 9, fontWeight: '700', letterSpacing: 1.5, marginTop: 2 },
   catBlock: { marginTop: 6, borderTopColor: '#2b3a3e', borderTopWidth: 1, paddingTop: 6 },
   catLabel: { color: '#8fa6ac', fontSize: 10, fontWeight: '700', letterSpacing: 0.6, marginTop: 8, marginBottom: 4 },
   kindRow: { flexDirection: 'row', gap: 8 },
