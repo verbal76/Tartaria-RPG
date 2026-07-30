@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.56';
+export const DISPLAY_VERSION = '4.28.57';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18908,4 +18908,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // forever (Android back confirms the current selection — the ask can't be
 // wedged). Asked once, never again; the Arbiter acknowledges the pick.
 // DISPLAY_VERSION 4.28.56. 7 tests.
-export const OTA_BUILD_ID = '2026-07-30-1045-motive-picker';
+// OTA-1046 — REPLAY OPENING FINDABLE (twin of golem 1023; owner: "I went to
+// settings and about and there was no replay opening... put it on the
+// character info screen"). Root cause: About's only real entry is the TITLE
+// screen, where no player is loaded, so the player-gated button never
+// rendered on the path players actually take. The button now lives in the
+// CharacterScreen HEADER (BACK | CHARACTER | REPLAY OPENING — the owner's
+// exact placement), and the StoryIntroOverlay mounts GLOBALLY in App.tsx so
+// the crawl plays right over the sheet with no navigation. About's dead
+// button removed; the motive picker's pointer text updated to "tap your
+// portrait". DISPLAY_VERSION 4.28.57.
+export const OTA_BUILD_ID = '2026-07-30-1046-replay-findable';
