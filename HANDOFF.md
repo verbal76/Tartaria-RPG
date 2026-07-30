@@ -861,7 +861,28 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.56**; ledger in `VERSION.md`.
 
-- **CAPITAL TIDY-UP (2026-07-30, latest). BOTH LINES.** golem **1029** / HAL **1052**.
+- **PROMPT ECHO LEAK (2026-07-30, latest). BOTH LINES.** golem **1030** / HAL **1053**.
+  Owner at Asgardar: a line about having walked beside "the player" a long while appeared
+  twice — "it's like someone was talking to the arbitor." It was: that sentence was the
+  literal opening of `AMBIENT_INSTRUCTION` in contextInjector, and the model recited its
+  brief instead of answering it. THE LEAK PATH IS THE STREAMING TAIL: both narration
+  paths mirrored raw model tokens into `partialArbiterText`, which ExplorationScreen
+  renders live under "The Arbiter:" — while the output filters, which only ever see the
+  FINAL assembled text, correctly dropped the echo to nothing. The log proves it
+  (`arbiter: ambient ∅`): a line the feed never recorded but the player still read for
+  the whole generation. Fixes: (a) both streams accumulate LOCALLY and stop mirroring the
+  moment `looksLikeInstructionEcho()` trips, blanking the tail to a thinking frame;
+  (b) the same detector filters the final sentences on both paths; (c) the ambient brief
+  is fully imperative now — no complete, narration-shaped second-person sentence for the
+  model to copy. IMPORTANT for anyone extending the detector: a bare imperative is NOT a
+  tell — the Arbiter really does say "Do not look behind you." and "Speak carefully.", and
+  an earlier draft of this guard silently ate all three such authored lines. It matches an
+  imperative only when aimed at a CRAFT OBJECT (a sentence, a word count, a register).
+  Locked by ota1030/1053PromptEchoLeak (14 tests per line), including a sweep of every
+  authored line in the six narration lore files (4,036 strings) asserting zero false
+  positives.
+
+- **CAPITAL TIDY-UP (2026-07-30). BOTH LINES.** golem **1029** / HAL **1052**.
   Owner, standing in Asgardar: "it just feels disorganized, like all of the capitals do."
   Three separate causes. (a) THE STAY/LEAVE POPUP: the POLISH-4 vendor-leave gate
   intercepted any cardinal move while a trader was in the scene — and a capital's room

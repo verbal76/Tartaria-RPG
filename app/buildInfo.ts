@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.63';
+export const DISPLAY_VERSION = '4.28.64';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17945,4 +17945,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // BLOCKED Crucible keeps its two-line reason (OTA-220's fix survives).
 // Plus: the trader chip gains its own ✕, matching the Crucible's.
 // DISPLAY_VERSION 4.28.63. 6 tests.
-export const OTA_BUILD_ID = '2026-07-30-1029-capital-tidy';
+// OTA-1030 — THE PROMPT LEAKED INTO THE FEED (twin of HAL 1053). Owner, at
+// Asgardar: a line about having walked beside "the player" a long while showed
+// up twice, "like someone was talking to the arbitor." Someone was — the game.
+// That sentence was the literal opening of the AMBIENT brief the engine hands
+// the local model (contextInjector AMBIENT_INSTRUCTION); the model recited its
+// brief instead of answering it. Root cause of the LEAK is the streaming tail:
+// it mirrored raw model tokens to the screen under "The Arbiter:" while the
+// output-filters — which only ever see the FINAL assembled text — correctly
+// dropped the whole thing to nothing. The log proves it: `arbiter: ambient ∅`,
+// a line the feed never recorded but the player still read. Three fixes:
+// (1) BOTH streaming paths now VET the preview — a local accumulator, and the
+// mirror stops the instant looksLikeInstructionEcho() trips (tail blanks to a
+// thinking frame). (2) The new detector also filters the final sentences on
+// both paths. (3) The ambient brief no longer OPENS with a complete,
+// narration-shaped second-person sentence — pure parrot bait — so there is no
+// ready-made line to recite. The detector deliberately does NOT flag a bare
+// imperative: the Arbiter really says "Do not look behind you." A 4,036-string
+// sweep of every authored lore line guards against exactly that regression.
+// Why TWICE: two generations in a row (reactive + ambient share the tail) each
+// streamed their echo; neither was ever logged.
+// DISPLAY_VERSION 4.28.64. 14 tests.
+export const OTA_BUILD_ID = '2026-07-30-1030-prompt-echo-leak';
