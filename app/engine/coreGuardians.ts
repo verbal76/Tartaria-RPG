@@ -207,6 +207,28 @@ export function monotoneTierApDelta(player: PlayerCharacter, tier: GuardianTier)
   return run;
 }
 
+/** OTA-1025 — OVER-LEVEL DAMAGE BONUS. The over-level factor lifts HP, AC and
+ *  attack, but the damage DIE stayed the authored tier value — so against an
+ *  over-leveled player the Guardian lived longer and hit more often, yet each
+ *  hit stayed tuned for a fresh arrival's HP pool. Owner, after the 2nd
+ *  Guardian at ~28 power (tier expectation 20, 137 HP pool vs 1d8+4): "the
+ *  second boss was a fairly easy fight." A flat bonus now rides the tier die,
+ *  scaled by the same over-level factor: +0 at/under the curve (the OTA-448
+ *  fresh-arrival promise holds byte-identically), ~+4 at the owner's measured
+ *  over-level (1d8+4 → 1d8+8: ~11 net per hit through his −18% armor, twice a
+ *  round — the fight now spends about half his pool over its length), +9 at
+ *  the 1.9 cap. Runs through the same running-max staging as HP/AP so the
+ *  tier-over-tier damage ramp never inverts at a fixed player power. */
+export function monotoneTierDmgBonus(player: PlayerCharacter, tier: GuardianTier): number {
+  let run = 0;
+  for (let k = 1; k <= tier; k++) {
+    const t = k as GuardianTier;
+    const b = Math.round((guardianOverLevel(player, t) - 1) * 10);
+    run = k === 1 ? b : Math.max(b, run);
+  }
+  return run;
+}
+
 /** Returns the live-fight Enemy for the Guardian at this Capital,
  *  scaled to the player's current kill count AND actual power. Returns
  *  null when the locationId is not a Lost Capital. */
@@ -253,11 +275,18 @@ export function spawnGuardianForCapital(
     ...(def.base.traits ?? []),
     ...profile.extraTraits,
   ]));
+  // OTA-1025 — the tier die plus the over-level flat bonus (see
+  // monotoneTierDmgBonus). Authored 'NdM+K' shape is preserved.
+  const dmgBonus = monotoneTierDmgBonus(player, tier);
+  const dm = profile.damage.match(/^(\d+d\d+)\+(\d+)$/);
+  const scaledDamage = dmgBonus > 0 && dm
+    ? `${dm[1]}+${parseInt(dm[2]!, 10) + dmgBonus}`
+    : profile.damage;
   return {
     ...def.base,
     hp,
     abilityPoint: scaledAp,
-    damage: profile.damage,
+    damage: scaledDamage,
     traits,
     boss: true,
     // Loot fields stay empty; resolveEnemyDefeat dispenses the

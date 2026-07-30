@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.58';
+export const DISPLAY_VERSION = '4.28.59';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -17871,4 +17871,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (2) The vendor Crucible button states the fee AND the balance BEFORE the
 // tap: short-of-coin reads amber as "25 TC — you have N".
 // DISPLAY_VERSION 4.28.58. 4 tests.
-export const OTA_BUILD_ID = '2026-07-30-1024-fusion-legibility';
+// OTA-1025 — PLAYER-FEEDBACK BATCH (twin of HAL 1048) (owner's device session, three items).
+// (1) GUARDIANS HIT LIKE IT ("the second boss was a fairly easy fight"):
+// the over-level factor lifted HP/AC/attack but the damage DIE stayed the
+// authored fresh-arrival value, so an over-leveled player faced a longer
+// fight that never threatened their pool. monotoneTierDmgBonus now rides a
+// flat bonus on the tier die — +0 at/under the curve (OTA-448 promise holds
+// byte-identically), ~+4 at the owner's measured over-level, +9 at cap —
+// staged through the same running-max floor so the ramp never inverts.
+// (2) THE ROW WRAPS, NOT SHRINKS ("Materials on a 5-button row, the text is
+// too small to read"): travelRow wraps at minWidth 92 and the shrink floor
+// rises 0.55 → 0.8.
+// (3) RESONANCE RARER + VARIED ("the resonance hook is overused"): weight
+// 5 → 2 and the plant pool widened 2 → 5 lines (hardcoded direction cut).
+// DISPLAY_VERSION 4.28.59. 5 tests.
+export const OTA_BUILD_ID = '2026-07-30-1025-feedback-batch';

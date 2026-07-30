@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.58` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.58` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.59` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.59` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -93,6 +93,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.55 → 4.28.56 | 2026-07-30-1022 | OTA | ONE-TIME VETERAN MOTIVE PICKER (owner: "let's do the one time motive picker"): saves whose motive was DEALT by backfill (guessed, never chosen — new storyMotiveChosen flag) get asked once on load — five cards, the mud's guess tagged, CONFIRM commits forever; creation-made characters (explicit pick or rolled) never see it. Both load paths covered (slot load + resurrection); the Arbiter acknowledges the pick in the feed. |
 | 4.28.56 → 4.28.57 | 2026-07-30-1023 | OTA | REPLAY OPENING FINDABLE (owner: "there was no replay opening" on About): About's only real entry is the title screen, where no player exists, so the player-gated button never rendered. Moved to the CharacterScreen header (BACK / CHARACTER / REPLAY OPENING, the owner's placement); the crawl overlay now mounts globally so replay plays over the sheet with no navigation. About's dead button removed. |
 | 4.28.57 → 4.28.58 | 2026-07-30-1024 | OTA | FUSION LEGIBILITY (twin of HAL 1047): forge-reservable inventory rows show their material kind(s) via the same helper the diversity gate counts ([organic], [stone · crystal]), and the vendor Crucible button states fee + balance before the tap (amber "25 TC — you have N" when short). Driven by the owner's log: a correct "too alike" refusal at 2 kinds, then a fee bounce at 11 TC discovered only after tapping. |
+| 4.28.58 → 4.28.59 | 2026-07-30-1025 | OTA | PLAYER-FEEDBACK BATCH (twin of HAL 1048): (1) Guardians finally HIT like their over-level — a flat damage bonus rides the tier die (+0 for fresh arrivals, ~+4 at the owner's level, +9 at cap), monotone-staged so the ramp never inverts ("the second boss was a fairly easy fight"); (2) the travel/room row WRAPS instead of shrinking five buttons to 55% font ("Materials… too small to read"); (3) the resonance hook weight 5 → 2 with a 2 → 5 line pool ("overused"). |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 
