@@ -3022,6 +3022,26 @@ function injectFactionParty(
 // Architects war party "crests the rise" inside the study. Both narrations are
 // explicitly open-ground. One predicate now answers the question for all of them,
 // so a fourth spawner can't quietly get it wrong.
+/** OTA-1056 — who would actually send someone in after you: the faction you've
+ *  wronged most. Excludes your own (your hosts don't raid their own hall) and
+ *  ignores anyone you're square with — a break-in wants a motive. Null when no
+ *  faction holds a grudge, and the caller uses the creature cast instead. */
+function worstStandingFaction(player: PlayerCharacter): { id: string; name: string } | null {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('../data/factions/factions.json') as Array<{ id: string; name: string }>;
+  let worst: { id: string; name: string } | null = null;
+  let worstValue = 0; // only a NEGATIVE standing counts as a grudge
+  for (const f of factions) {
+    if (f.id === player.factionId) continue;
+    const v = getStanding(player.factionStanding ?? [], f.id);
+    if (v < worstValue) {
+      worstValue = v;
+      worst = { id: f.id, name: f.name };
+    }
+  }
+  return worst;
+}
+
 function underRoof(s: GameStore, player: PlayerCharacter): boolean {
   return !!player.hubRoomId || !!s.activeBuildingId;
 }
@@ -12950,10 +12970,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // can still walk in off the mud where the outpost opens to the sky,
             // but never into a sealed bunkroom.
             const restUnderRoof = underRoof;
+            // OTA-1056 — and about half the time it's PEOPLE, not a creature (owner:
+            // the indoor list should cover raiders and soldiers). The caller is
+            // the faction you've wronged most — a real grudge is why someone
+            // walks into a capital after you — dressed on a same-rarity HUMAN
+            // body so a soldier fights like one. Falls back to the creature cast
+            // at Common, where no human body exists.
             const restIndoorSwap = restUnderRoof && rawWildRestEnemy
-              // eslint-disable-next-line @typescript-eslint/no-require-imports
-              ? (require('../engine/indoorAmbush') as typeof import('../engine/indoorAmbush'))
-                  .pickIndoorAmbusher(rawWildRestEnemy.rarity)
+              ? (() => {
+                  // eslint-disable-next-line @typescript-eslint/no-require-imports
+                  const ia = require('../engine/indoorAmbush') as typeof import('../engine/indoorAmbush');
+                  if (Math.random() < 0.5) {
+                    const grudge = worstStandingFaction(player);
+                    const people = grudge
+                      ? ia.pickIndoorFactionIntruder(rawWildRestEnemy.rarity, grudge.id, grudge.name)
+                      : null;
+                    if (people) return people;
+                  }
+                  return ia.pickIndoorAmbusher(rawWildRestEnemy.rarity);
+                })()
               : null;
             const rawRestEnemy = restIndoorSwap ?? rawWildRestEnemy;
             // OTA-816 — scale the rest-ambusher the same way scene-arrival foes scale.

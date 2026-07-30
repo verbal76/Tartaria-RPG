@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.66` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.66` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.67` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.67` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -101,6 +101,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.63 → 4.28.64 | 2026-07-30-1053 | OTA | PROMPT ECHO LEAK (twin of golem 1030): the Arbiter feed showed the game's own ambient BRIEF — the model recited its instructions instead of answering them, and the live streaming tail mirrored raw tokens to screen before any filter ran (the final filters dropped it, so it was never even logged). Both streaming paths now vet the preview and blank it the moment the output turns into meta-text; a new instruction-echo detector also filters the final sentences; and the ambient brief no longer opens with a narration-shaped sentence for the model to copy. |
 | 4.28.64 → 4.28.65 | 2026-07-30-1054 | OTA | AMBIENT COMPANION REVIVED (twin of golem 1031): the Arbiter's idle reflections could never reach the feed — VOICE_RULES order the model to start sentences with "You", and the ambient filter dropped every sentence starting with "You", so the path discarded its own output by construction (every ambient in the owner's logs is ∅, never ✓) while holding the shared generation lock for up to 75s. The filter now splits on register: action openers ("You step back, surveying…") stay blocked, reflections ("You have come a long way…") get through. |
 | 4.28.65 → 4.28.66 | 2026-07-30-1055 | OTA | INDOOR AMBUSH CAST + FASTER QWEN RECOVERY (twin of golem 1032): a rest-ambush under a roof drew from the wilderness table (a Rare 202-HP Mud Cyclops in a capital bunkroom); it now swaps in an indoor-plausible foe at the SAME rarity — an intruder, vermin, a patrol machine, or the sealed dead — with both narration beats re-voiced for a sealed room. Difficulty unchanged. And the Qwen watchdog goes adaptive (60s healthy / 5s recovering) plus an AppState foreground check, cutting a ~2-minute template-only stretch to seconds. |
+| 4.28.66 → 4.28.67 | 2026-07-30-1056 | OTA | RAIDERS, SOLDIERS + AETHERKIN INDOORS (twin of golem 1033): Aetherkin were already complete (all five, now roster-locked by test) and raiders present at Uncommon; SOLDIERS were the gap — the roster has six humans total. Added the Mud Monarch Purifier, and raiders/soldiers are now also BUILT by dressing a same-rarity HUMAN body in the colours of the faction you have wronged most ("Mud Monarchs Raider", "Stone Builders Soldier") at Uncommon/Rare/Legendary. About half of indoor ambushes are people; Common stays vermin. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

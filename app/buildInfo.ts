@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.66';
+export const DISPLAY_VERSION = '4.28.67';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19067,4 +19067,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the foreground checks immediately instead of burning up to a full interval
 // before the watchdog has even noticed.
 // DISPLAY_VERSION 4.28.66. 10 tests.
-export const OTA_BUILD_ID = '2026-07-30-1055-indoor-ambush-watchdog';
+// OTA-1056 — RAIDERS, SOLDIERS AND AETHERKIN INDOORS (twin of golem 1033). Owner:
+// "make sure the list for inside attacks includes raiders and soldiers and
+// aetherkin among what else you have in it." The audit: AETHERKIN were already
+// complete — all five in the roster (Drowned / Mud-Wracked / Aetherkin /
+// Aetheric Lich / Hollow King), now locked by a test that reads the roster and
+// demands the indoor list match it exactly. RAIDERS were in but only at
+// Uncommon (Silt Thief, Reclaimer Ambusher, Disc Hijacker). SOLDIERS were the
+// real gap: the roster holds six humans TOTAL and exactly one martial one below
+// Legendary, so a name-list alone can't carry "a rival faction broke in".
+// Two fixes: (1) Mud Monarch Purifier — the zealot-knight the cast had left
+// out — joins the Rare pool. (2) Raiders and soldiers are now also BUILT:
+// pickIndoorFactionIntruder dresses a same-rarity HUMAN body in the colours of
+// the faction you've wronged most, giving "Mud Monarchs Raider" / "Stone
+// Builders Soldier" at Uncommon, Rare and Legendary. Unlike the outdoor raid
+// builder (injectFactionParty), which reskins whatever the WILD table rolled
+// and can put a soldier's name on a cyclops, this one only ever dresses a
+// human — so a soldier fights like a person. About half of indoor ambushes are
+// people now; Common stays vermin, because the cheapest human body is Uncommon
+// and a Common-tier intruder in a fortified capital is a rat, not a soldier.
+// Only a NEGATIVE standing counts as a motive, and never your own faction.
+// DISPLAY_VERSION 4.28.67. 9 tests.
+export const OTA_BUILD_ID = '2026-07-30-1056-indoor-cast-groups';
