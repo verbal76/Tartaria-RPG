@@ -89,7 +89,22 @@ as clarified by the user on 2026-07-13:
 
 - **`HaL2001` is PRODUCTION.** The Tartaria build in the wild with internal
   testers. Vetted changes only; a push OTAs their devices.
-- **NARRATION CONTEXT (2026-07-30, latest). BOTH LINES.** golem **1026** / HAL **1049**.
+- **DOG + GOLEM NAMING POPUPS / NO SECOND HOOK POPUP (2026-07-30, latest). BOTH LINES.**
+  golem **1027** / HAL **1050**. Playtester at the dog rescue typed "rest", read the naming
+  beat as another fight, and the in-feed takeover silently stored "rest" as the breed. The
+  typed takeovers are GONE: breed/name/sex commit together from DogOnboardingModal
+  (`confirmDogOnboarding` — same OTA-142 preamble-stripping + caps + feed beats; a save
+  wedged mid-way through the old flow heals on open, part-answers pre-filled), and golem
+  naming commits from GolemNamingModal (`confirmGolemName`: SEAL THE NAME / KEEP ITS
+  MAKING). Typed feed input during either ask is never an answer — the Arbiter points at
+  the card. Separately (owner): story-hook COMPLETE no longer raises the redundant
+  mission-complete popup; the `completionNotice` stash is retired and HookContinueModal's
+  completed state spotlights the payout in a boxed YOUR REWARD strip (the feed's ✦ line
+  remains the permanent record). Locked by ota1027/1050DogGolemPopups (7 tests per line);
+  6 suites per line retargeted off the typed flow (dogBreedParsing, dogOnboardingFuzz,
+  dogRescueIntegration, golemCompanion, the MissionComplete category lock, HookCompleteFlow).
+
+- **NARRATION CONTEXT (2026-07-30). BOTH LINES.** golem **1026** / HAL **1049**.
   Owner's log: post-combat crate salvage drew "Don't make me decide which one of you to
   leave breathing" with zero enemies. Two-part root cause: the template picker's mood is
   read from `cognitiveLastResponse` — one action STALE (the fresh classification lands

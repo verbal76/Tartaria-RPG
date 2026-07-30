@@ -1293,8 +1293,8 @@ export function ExplorationScreen() {
           full thread arc without fighting the scrim; LATER replaced
           with ABANDON (which marks the hook resolved — explicit
           walk-away). OTA-1030 — the terminal stage shows COMPLETE
-          alone; it dismisses the arc and THEN raises the held
-          completion popup (dismissHookContinue). */}
+          alone (dismissHookContinue). OTA-1050 — no follow-up popup;
+          the modal's own reward strip shows the payout. */}
       <HookContinueModal
         visible={pendingHookContinue !== null}
         noun={pendingHookContinue?.noun ?? ''}

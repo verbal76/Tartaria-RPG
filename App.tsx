@@ -40,6 +40,8 @@ import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1043
 import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1045
 import { StoryIntroOverlay } from './app/components/StoryIntroOverlay'; // OTA-1046 — global (was exploration-only)
+import { DogOnboardingModal } from './app/components/DogOnboardingModal'; // OTA-1050
+import { GolemNamingModal } from './app/components/GolemNamingModal'; // OTA-1050
 import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
@@ -605,6 +607,15 @@ export default function App() {
           it — the CharacterScreen header button included. */}
       <SilentBoundary tag="StoryIntroOverlay">
         <StoryIntroOverlay />
+      </SilentBoundary>
+      {/* OTA-1050 — dog onboarding + golem naming moved out of the typed feed
+          into blocking popups (a playtester typed "rest" at the breed ask and
+          the old takeover swallowed it as the answer). */}
+      <SilentBoundary tag="DogOnboardingModal">
+        <DogOnboardingModal />
+      </SilentBoundary>
+      <SilentBoundary tag="GolemNamingModal">
+        <GolemNamingModal />
       </SilentBoundary>
       <SilentBoundary tag="KeyboardInputBar">
         <KeyboardInputBar />

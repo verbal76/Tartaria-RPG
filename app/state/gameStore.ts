@@ -3679,11 +3679,6 @@ interface GameStore {
     noun: string;
     stageHistory: HookContinueStage[];
     completed: boolean;
-    /** OTA-1030 — completion-popup payload STASHED when the terminal stage resolves
-     *  and raised only when the player taps COMPLETE (dismissHookContinue).
-     *  The popup used to mount the instant the last stage fired — landing on
-     *  top of the thread text the player was still reading. */
-    completionNotice?: { kind: string; title: string; body: string } | null;
   } | null;
   /** arb120 — completion popup for a finished side-contract (whisper). Set when
    *  a whisper pays out so the reward lands in a modal the player can read,
@@ -4203,6 +4198,15 @@ interface GameStore {
   /** OTA-1045 — commit the pick (or the kept guess): sets the motive,
    *  marks it CHOSEN on the character (never asked again), persists. */
   confirmMotivePick: (motiveId: string) => void;
+  /** OTA-1050 — dog onboarding popup commit. Breed/name/sex arrive together from
+   *  DogOnboardingModal (the typed three-step takeover is gone — a playtester
+   *  couldn't tell the ask from a fight and "rest" became the breed). Applies
+   *  the same breed preamble-stripping + caps as the old typed path, then
+   *  finalizes the dog exactly as before. */
+  confirmDogOnboarding: (breedRaw: string, nameRaw: string, sexRaw: string) => void;
+  /** OTA-1050 — golem naming popup commit. null/empty = keep its making (the old
+   *  "skip"); otherwise seals the name (16 cap) with the same Arbiter acks. */
+  confirmGolemName: (name: string | null) => void;
   /** Set the pending destination; the screen renders the modal. */
   requestTravelConfirm: (locationId: string, locationName: string) => void;
   /** Yes path: leave outpost, then set course. Clears pending. */
@@ -4356,9 +4360,7 @@ interface GameStore {
    *  as one result, not two popups fighting each other). */
   announceMissionComplete: (kind: string, title: string, body: string) => void;
   /** OTA-1030 — the notice-only half of announceMissionComplete (no feed line);
-   *  merges into any same-title notice already showing. Used by
-   *  dismissHookContinue to raise a completion stashed at terminal-stage
-   *  resolution. */
+   *  merges into any same-title notice already showing. */
   raiseMissionCompleteNotice: (kind: string, title: string, body: string) => void;
   fusionBlockedNotice: { title: string; body: string; hint?: string } | null;
   clearFusionBlockedNotice: () => void;
@@ -8928,39 +8930,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
     }
-    // OTA-120 — Dog Companion: three-step Arbiter onboarding takeover.
-    // While pendingDogOnboarding is non-null, ALL player input goes
-    // through the onboarding handler, NOT the normal verb pipeline.
-    // Each input fills the current stage's field (breed → name →
-    // sex); after the sex stage the dog is finalized and all rescue
-    // hooks die globally.
+    // OTA-120 — Dog Companion onboarding. OTA-1050 — the three-step TYPED
+    // takeover is gone: a playtester mid-rescue typed "rest", couldn't tell
+    // the naming moment from a fight, and the takeover silently stored
+    // "rest" as the breed. Breed/name/sex now land together in the
+    // DogOnboardingModal popup (confirmDogOnboarding). Typed input while
+    // the ask is open is NEVER treated as an answer — the Arbiter points
+    // back at the card.
     if (get().worldMemory.pendingDogOnboarding) {
       get().appendLog('player', trimmed);
-      handleDogOnboardingInput(get, set, trimmed);
+      get().appendLog('dog_quest', `The Arbiter raises a hand. "The dog first. Answer the card in front of you."`);
       void get().persist();
       return;
     }
-    // OTA-466 — golem naming takeover. Set right after a summon: the next typed
-    // input names the golem (or "skip" keeps the type label). One input only.
+    // OTA-466 — golem naming. OTA-1050 — same popup treatment as the dog: the
+    // name lands in the GolemNamingModal (confirmGolemName), never in typed
+    // feed input. A golem that vanished before naming (dismissed / died)
+    // just clears the flag and the input processes normally.
     if (get().pendingGolemNaming) {
-      get().appendLog('player', trimmed);
-      const golemNow = get().player?.golem;
-      if (!golemNow) {
-        // Golem vanished before naming (dismissed / died) — just clear the flag.
+      if (!get().player?.golem) {
         set({ pendingGolemNaming: false });
-      } else if (/^(skip|no|none|nope|leave it|no name|nvm|cancel|n)$/i.test(trimmed)) {
-        set({ pendingGolemNaming: false });
-        get().appendLog('arbiter', `"As you like," the Arbiter says. "It answers to its making, then — ${golemNow.name}."`);
       } else {
-        const name = trimmed.slice(0, 16).trim() || golemNow.name;
-        set((s) => (s.player && s.player.golem
-          ? { pendingGolemNaming: false, player: { ...s.player, golem: { ...s.player.golem, name } } }
-          : { pendingGolemNaming: false }));
-        get().appendLog('world', `${name}. The name takes hold in the Aetherstone.`);
-        get().appendLog('arbiter', `The Arbiter nods. "${name}, then."`);
+        get().appendLog('player', trimmed);
+        get().appendLog('arbiter', `"The construct first," the Arbiter says. "Seal a name on the card, or let it keep its making."`);
+        void get().persist();
+        return;
       }
-      void get().persist();
-      return;
     }
     const parsed = parseInput(trimmed, parseCtx);
     // OTA-128 — silent re-dispatch (drink-of-consumable, etc.) skips
@@ -16972,8 +16967,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const hook = state.currentScene.hooks?.find((h) => h.id === pending.hookId);
     if (!hook || hook.resolved) {
       // Hook already terminated (stale tap on a popup whose final-stage flag
-      // was already true). Close via the dismiss path so a stashed completion
-      // notice still raises instead of being dropped.
+      // was already true). Close via the dismiss path for symmetry.
       get().dismissHookContinue();
       return;
     }
@@ -16988,13 +16982,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // state). Just clears the popup state; the hook is already
   // resolved at this point.
   dismissHookContinue() {
-    // OTA-1030 — COMPLETE on the final stage: raise the completion notice STASHED at
-    // terminal-stage resolution, now that the player has read the arc and
-    // closed it. TRADE NOW routes here too, so a finished thread's payout is
-    // never silently dropped.
-    const stash = get().pendingHookContinue?.completionNotice;
+    // OTA-1050 — the post-COMPLETE popup is gone (owner: the thread modal already
+    // shows the reward, so a second popup with another close button was
+    // redundant). The payout now gets the prominent reward strip inside
+    // HookContinueModal's completed state; the feed's green ✦ line remains
+    // the permanent record.
     set({ pendingHookContinue: null });
-    if (stash) get().raiseMissionCompleteNotice(stash.kind, stash.title, stash.body);
   },
 
   dismissWhisperComplete() {
@@ -26382,6 +26375,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  // OTA-1050 — the dog onboarding popup commits here; the shared finalization
+  // lives in module-level finalizeDogOnboarding (same caps + feed beats the
+  // old typed path produced).
+  confirmDogOnboarding(breedRaw, nameRaw, sexRaw) {
+    finalizeDogOnboarding(get, set, breedRaw, nameRaw, sexRaw);
+  },
+
+  // OTA-1050 — the golem naming popup commits here (replaces the typed
+  // takeover's two branches: seal a name, or keep its making).
+  confirmGolemName(name) {
+    if (!get().pendingGolemNaming) return;
+    const golemNow = get().player?.golem;
+    if (!golemNow) {
+      // Golem vanished before naming (dismissed / died) — just clear the flag.
+      set({ pendingGolemNaming: false });
+      void get().persist();
+      return;
+    }
+    const sealed = (name ?? '').trim().slice(0, 16).trim();
+    if (!sealed) {
+      set({ pendingGolemNaming: false });
+      get().appendLog('arbiter', `"As you like," the Arbiter says. "It answers to its making, then — ${golemNow.name}."`);
+    } else {
+      set((s) => (s.player && s.player.golem
+        ? { pendingGolemNaming: false, player: { ...s.player, golem: { ...s.player.golem, name: sealed } } }
+        : { pendingGolemNaming: false }));
+      get().appendLog('world', `${sealed}. The name takes hold in the Aetherstone.`);
+      get().appendLog('arbiter', `The Arbiter nods. "${sealed}, then."`);
+    }
+    void get().persist();
+  },
+
   clearContractsNotice() { set({ contractsNotice: null }); },
 
   announceMissionComplete(kind, title, body) {
@@ -28054,27 +28079,16 @@ function resolveHookOneStep(
   // Stage numbers surface so the player knows where they are in the
   // chain: "★ STORY THREAD (step 2) — ..." If `outcome.done` is set,
   // we mark the line as a finale: "★★ STORY THREAD COMPLETE — ..."
-  // OTA-1010 — threads are unnamed content; the notice still needs something the
-  // player recognises, so use the hook's own kind as a readable title.
-  const hookTitleFor = (h: { kind?: string }) =>
-    String(h.kind ?? 'story thread').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const stageLabel = outcome.done
     ? '★★ STORY THREAD COMPLETE'
     : `★ STORY THREAD (step ${hook.stage + 1})`;
   get().appendLog('world', `${stageLabel} — ${outcome.line}`);
-  // OTA-1030 — the completion POPUP is deferred. It used to mount the instant the
-  // terminal stage resolved, landing ON TOP of the thread modal the player was
-  // still reading. The payload is stashed on pendingHookContinue below and
-  // raised by dismissHookContinue when the player taps COMPLETE on the final
-  // stage. The feed line stays immediate either way — the log remains a
-  // complete record.
-  let doneNotice: { kind: string; title: string; body: string } | null = null;
+  // OTA-1050 — no completion popup at all anymore (owner: redundant next to the
+  // thread modal's own reward display). The feed line stays immediate — the
+  // log remains a complete record — and the modal's completed state renders
+  // the payout in a prominent reward strip.
   if (inlineSummaries.length > 0) {
-    const body = `✦ ${inlineSummaries.join(', ')}.`;
-    get().appendLog('reward', body);
-    if (outcome.done) {
-      doneNotice = { kind: 'Story thread', title: hookTitleFor(hook), body };
-    }
+    get().appendLog('reward', `✦ ${inlineSummaries.join(', ')}.`);
   }
   // OTA-716 — reward for reading. Completing an easy-to-miss STORY THREAD
   // occasionally yields a GOOD material on top of the thread's own payout —
@@ -28193,7 +28207,6 @@ function resolveHookOneStep(
         noun: triggerNoun ?? hook.nouns[0] ?? 'this',
         stageHistory: [...existing, stageEntry],
         completed: outcome.done,
-        completionNotice: doneNotice,
       },
     };
   });
@@ -32515,11 +32528,11 @@ function runAethercraft(
       'world',
       `Aetherstone lifts out of the ground and folds into a shape that walks. ${golem.name} stands ready beside you.${golemEdgeTag} (HP ${golem.hp}/${golem.hpMax}, ${golem.attackDie} ${golem.damageType})`,
     );
-    // OTA-466 — like the dog, a thing you gave life gets a name. The next typed
-    // input is captured as the golem's name (or "skip" to keep the type label).
+    // OTA-466 — like the dog, a thing you gave life gets a name. OTA-1050 — the
+    // ask now lands in the GolemNamingModal popup, not the typed feed.
     get().appendLog(
       'arbiter',
-      `The Arbiter studies the standing shape. "You gave it life. You might as well give it a name." (Type a name, or "skip".)`,
+      `The Arbiter studies the standing shape. "You gave it life. You might as well give it a name."`,
     );
   } else if (discipline === 'mend') {
     const livePlayer = get().player ?? player;
@@ -33045,67 +33058,38 @@ function completeRescueScenario(
   );
 }
 
-/** Handle a single onboarding input. Each input advances the stage;
- *  after the sex stage the dog is built and rescue hooks die. */
-function handleDogOnboardingInput(
+/** OTA-1050 — one-shot popup finalization (replaces the typed three-step
+ *  state machine). Breed keeps the OTA-142 smart preamble-stripping so a
+ *  role-played answer ("looks like a Pitbull") still reads natural; caps
+ *  match the old typed path (breed 24, name 16, sex 8). */
+function finalizeDogOnboarding(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-  raw: string,
+  breedRaw: string,
+  nameRaw: string,
+  sexRaw: string,
 ): void {
-  const wm = get().worldMemory;
-  const pending = wm.pendingDogOnboarding;
+  const pending = get().worldMemory.pendingDogOnboarding;
   if (!pending) return;
   const player = get().player;
   if (!player) return;
-  const trimmed = raw.trim();
-  if (pending.stage === 'breed') {
-    // OTA-142 — smart breed extraction. Pre-fix, the player who role-
-    // played their answer ("looks like a Pitbull") got the WHOLE
-    // sentence stored as the breed. Playtester flagged: "should be
-    // smarter about parsing the dog breed." Strip common preamble
-    // phrases so the breed reads natural ("Pitbull" instead of
-    // "looks like a Pitbull"). Conservative — when no preamble
-    // matches, the raw input is preserved. Caps at 24 chars after
-    // stripping.
-    const cleaned = trimmed
-      .replace(/^\s*(?:i think (?:it's|its|it is) (?:a |an )?|looks like (?:a |an )?|kind of (?:a |an )?|sort of (?:a |an )?|seems like (?:a |an )?|probably (?:a |an )?|maybe (?:a |an )?|definitely (?:a |an )?|some kind of |its (?:a |an )?|it's (?:a |an )?|it is (?:a |an )?|a |an )/i, '')
-      .replace(/[.!?]+$/, '')
-      .trim();
-    const breed = (cleaned || trimmed).slice(0, 24) || 'mutt';
-    set((s) => ({
-      worldMemory: {
-        ...s.worldMemory,
-        pendingDogOnboarding: { ...pending, stage: 'name', breed },
-      },
-    }));
-    get().appendLog('world', `You name the breed: ${breed}.`);
-    // OTA-177 — Arbiter prompts during dog onboarding go on the
-    // dog_quest channel (purple) so each step of the rescue
-    // sequence stays visually grouped.
-    get().appendLog('dog_quest', `The Arbiter nods. "What will you name them?"`);
-    return;
-  }
-  if (pending.stage === 'name') {
-    const name = trimmed.slice(0, 16) || defaultDogName();
-    set((s) => ({
-      worldMemory: {
-        ...s.worldMemory,
-        pendingDogOnboarding: { ...pending, stage: 'sex', name },
-      },
-    }));
-    get().appendLog('world', `${name}. The name settles on the dog like a coat.`);
-    get().appendLog('dog_quest', `The Arbiter nods again. "Boy or girl?"`);
-    return;
-  }
-  // pending.stage === 'sex'
-  const rawSex = trimmed.slice(0, 8) || 'unknown';
+  const trimmedBreed = breedRaw.trim();
+  const cleaned = trimmedBreed
+    .replace(/^\s*(?:i think (?:it's|its|it is) (?:a |an )?|looks like (?:a |an )?|kind of (?:a |an )?|sort of (?:a |an )?|seems like (?:a |an )?|probably (?:a |an )?|maybe (?:a |an )?|definitely (?:a |an )?|some kind of |its (?:a |an )?|it's (?:a |an )?|it is (?:a |an )?|a |an )/i, '')
+    .replace(/[.!?]+$/, '')
+    .trim();
+  const breed = (cleaned || trimmedBreed).slice(0, 24) || 'mutt';
+  const name = nameRaw.trim().slice(0, 16) || defaultDogName();
+  const rawSex = sexRaw.trim().slice(0, 8) || 'unknown';
   const dog = createDogCompanion({
-    name: pending.name ?? defaultDogName(),
-    breed: pending.breed ?? 'mutt',
+    name,
+    breed,
     rawSex,
     startingProfile: pending.rescueData.startingProfile,
     currentHour: player.hoursElapsed ?? 0,
   });
+  // The feed keeps a complete record of what the card collected.
+  get().appendLog('world', `A ${breed}. ${dog.name}. The name settles on the dog like a coat.`);
   set((s) => ({
     player: s.player ? { ...s.player, dog } : s.player,
     worldMemory: {
@@ -33126,6 +33110,7 @@ function handleDogOnboardingInput(
     'dog_quest',
     `The Arbiter studies the new pair. "${dog.name}, then. ${pending.rescueData.scenario === 'puppy_vendor' || pending.rescueData.scenario === 'puppy_rubble' ? 'You owe the pup nothing yet. Earn its trust on the road.' : 'The chain is off. The road is open.'}"`,
   );
+  void get().persist();
 }
 
 /** Dog combat dispatch — bite / distract. Acts at the start of the
