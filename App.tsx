@@ -39,6 +39,7 @@ import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1020
 import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1022
+import { StoryIntroOverlay } from './app/components/StoryIntroOverlay'; // OTA-1023 — global (was exploration-only)
 import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
@@ -597,6 +598,13 @@ export default function App() {
           for saves whose motive was dealt by backfill rather than chosen. */}
       <SilentBoundary tag="MotivePickerModal">
         <MotivePickerModal />
+      </SilentBoundary>
+      {/* OTA-1023 — the opening crawl mounts GLOBALLY (it lived on the
+          exploration screen only, which forced REPLAY OPENING to navigate
+          there first). Now REPLAY plays right over whatever screen raised
+          it — the CharacterScreen header button included. */}
+      <SilentBoundary tag="StoryIntroOverlay">
+        <StoryIntroOverlay />
       </SilentBoundary>
       <SilentBoundary tag="KeyboardInputBar">
         <KeyboardInputBar />

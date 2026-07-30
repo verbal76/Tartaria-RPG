@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.56` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.56` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.57` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.57` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -91,6 +91,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.53 → 4.28.54 | 2026-07-29-1020 | OTA | CHAPTER CARDS (story phase 2/3, GOLEM-ONLY): every main-quest phase transition raises a full-screen chapter card — II NINE HEARTS (first Capital), III THE FIRST HEART (first Core), IV THE ENDLESS STAIR (all nine), V THE MUD FLOOD NEXUS (arrival) — each with a universal body plus a line written for this character's story motive. Raised at the triggerMainQuest choke point, mounted globally (the Nexus choice fires from Contracts). 'ended' gets no card: EndingScreen renders the new 3×5 per-motive EPILOGUE matrix instead, closing the run on the personal thread. |
 | 4.28.54 → 4.28.55 | 2026-07-29-1021 | OTA | THE MOTIVE DRIP (story phase 3/3, GOLEM-ONLY — closes the arc): five authored beats per motive drip into the feed at travel arrivals (strict order, one-shot, gated on hours + Cores), keeping the personal thread talking between chapter cards. THE MISSING side-thread ends: after its five trail beats and three Cores, the next Lost Capital answers the intro's question — grave, lie, or the thing that walks (deterministic per character). grave/lie resolve with a guaranteed keepsake; walker spawns a Hollowed boss wearing their face whose defeat grants the closing + keepsake (fled fights re-offer). A resolved thread overrides the 'missing' epilogue on EndingScreen. |
 | 4.28.55 → 4.28.56 | 2026-07-30-1022 | OTA | ONE-TIME VETERAN MOTIVE PICKER (owner: "let's do the one time motive picker"): saves whose motive was DEALT by backfill (guessed, never chosen — new storyMotiveChosen flag) get asked once on load — five cards, the mud's guess tagged, CONFIRM commits forever; creation-made characters (explicit pick or rolled) never see it. Both load paths covered (slot load + resurrection); the Arbiter acknowledges the pick in the feed. |
+| 4.28.56 → 4.28.57 | 2026-07-30-1023 | OTA | REPLAY OPENING FINDABLE (owner: "there was no replay opening" on About): About's only real entry is the title screen, where no player exists, so the player-gated button never rendered. Moved to the CharacterScreen header (BACK / CHARACTER / REPLAY OPENING, the owner's placement); the crawl overlay now mounts globally so replay plays over the sheet with no navigation. About's dead button removed. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

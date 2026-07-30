@@ -861,7 +861,16 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.56**; ledger in `VERSION.md`.
 
-- **ONE-TIME VETERAN MOTIVE PICKER (2026-07-30, latest). BOTH LINES.**
+- **REPLAY OPENING FINDABLE (2026-07-30, latest). BOTH LINES.** golem **1023** / HAL **1046**.
+  Owner: "I went to settings and about and there was no replay opening." Root cause: About's
+  only real entry is the TITLE screen (no live player), so OTA-1018's player-gated button
+  never rendered on the path players take. Fix per owner's placement: the button lives in
+  the CharacterScreen HEADER row (BACK | CHARACTER | REPLAY OPENING); StoryIntroOverlay
+  moved from ExplorationScreen to App.tsx's GLOBAL overlay stack so the crawl plays over
+  any screen (replay no longer navigates); About's dead button removed. Source locks in
+  the 1018/1041 suite retargeted (global mount + CharacterScreen button).
+
+- **ONE-TIME VETERAN MOTIVE PICKER (2026-07-30). BOTH LINES.**
   golem **1022** / HAL **1045**. Owner: "let's do the one time motive picker" — pre-story
   saves had their motive DEALT by backfill (deterministic guess, never a choice). New
   `player.storyMotiveChosen` flag: creation sets TRUE always (explicit pick or rolled

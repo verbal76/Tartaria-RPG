@@ -169,9 +169,9 @@ describe('OTA-1018 — old saves are dealt a motive, never ambushed', () => {
 
 describe('OTA-1018 — SOURCE LOCKS (category: the story reaches the screen)', () => {
   const storeSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
-  const exploreSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'screens', 'ExplorationScreen.tsx'), 'utf8');
+  const appSrc = fs.readFileSync(path.join(__dirname, '..', 'App.tsx'), 'utf8');
   const createSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'screens', 'CharacterCreationScreen.tsx'), 'utf8');
-  const aboutSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'screens', 'AboutScreen.tsx'), 'utf8');
+  const charSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'screens', 'CharacterScreen.tsx'), 'utf8');
 
   it('startNewGame raises the crawl and every load/reset path clears it', () => {
     expect(storeSrc).toMatch(/storyIntro: introPagesFor\(player\.storyMotive, player\.factionId\)/);
@@ -180,8 +180,8 @@ describe('OTA-1018 — SOURCE LOCKS (category: the story reaches the screen)', (
     expect(clears.length).toBeGreaterThanOrEqual(4);
   });
 
-  it('the overlay renders on the exploration screen', () => {
-    expect(exploreSrc).toMatch(/<StoryIntroOverlay \/>/);
+  it('the overlay mounts GLOBALLY (OTA-1023 — replay must play over any screen)', () => {
+    expect(appSrc).toMatch(/<StoryIntroOverlay \/>/);
   });
 
   it("creation has the motive step and passes the pick to startNewGame", () => {
@@ -189,7 +189,8 @@ describe('OTA-1018 — SOURCE LOCKS (category: the story reaches the screen)', (
     expect(createSrc).toMatch(/motiveId\s*\}\);/);
   });
 
-  it('About offers REPLAY OPENING for a live character', () => {
-    expect(aboutSrc).toMatch(/REPLAY OPENING/);
+  it('the CharacterScreen header offers REPLAY OPENING (OTA-1023 — moved off About, whose only real entry path has no live player)', () => {
+    expect(charSrc).toMatch(/REPLAY\{'\\n'\}OPENING/);
+    expect(charSrc).toMatch(/replayStoryIntro\(\)/);
   });
 });

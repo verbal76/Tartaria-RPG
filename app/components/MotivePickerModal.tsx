@@ -53,7 +53,7 @@ export function MotivePickerModal() {
           <Pressable onPress={commit} style={styles.confirmBtn} accessibilityRole="button" accessibilityLabel="Confirm motive">
             <Text style={styles.confirmText}>THIS IS WHY I CAME DOWN</Text>
           </Pressable>
-          <Text style={styles.hint}>You can read your opening any time: About → REPLAY OPENING.</Text>
+          <Text style={styles.hint}>You can read your opening any time: tap your portrait → REPLAY OPENING.</Text>
         </ScrollView>
       </View>
     </Modal>

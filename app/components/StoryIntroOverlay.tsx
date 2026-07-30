@@ -3,7 +3,9 @@
 // are doing this and what you want to happen."
 //
 // Full-screen paged crawl shown over the first scene of a new game (and on
-// demand via REPLAY OPENING in About). Each page drifts up out of the dark as
+// demand via REPLAY OPENING in the CharacterScreen header — OTA-1023; it was
+// on About before, whose title-screen entry path has no player to gate on).
+// Each page drifts up out of the dark as
 // it fades in — slow enough to read as a title crawl, fast enough not to fight
 // the reader. Tap anywhere advances; SKIP is always available (the owner
 // replays constantly); the last page's button hands over the first step.

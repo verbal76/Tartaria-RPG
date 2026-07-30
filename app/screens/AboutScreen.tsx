@@ -73,7 +73,6 @@ export function AboutScreen() {
   const bootQwen = useGameStore((s) => s.bootQwen);
   const gameLogLength = useGameStore((s) => s.gameLog.length);
   const player = useGameStore((s) => s.player);
-  const replayStoryIntro = useGameStore((s) => s.replayStoryIntro); // OTA-1018
 
   const [copied, setCopied] = useState(false);
   const [voiceCopied, setVoiceCopied] = useState(false);
@@ -703,20 +702,12 @@ export function AboutScreen() {
             <Text style={styles.sessionBtnPrimaryText}>SAVE &amp; EXIT TO TITLE</Text>
           </TouchableOpacity>
 
-          {/* OTA-1018 — re-read the opening crawl for this character. The
-              crawl is personalized (motive + faction), so it only exists with
-              a live character; navigates to exploration where the overlay
-              renders. */}
-          {player && (
-            <TouchableOpacity
-              style={[styles.sessionBtn, styles.sessionBtnSecondary]}
-              onPress={() => { replayStoryIntro(); setScreen('exploration'); }}
-              activeOpacity={0.7}
-              accessibilityRole="button"
-            >
-              <Text style={styles.sessionBtnSecondaryText}>REPLAY OPENING</Text>
-            </TouchableOpacity>
-          )}
+          {/* OTA-1023 — REPLAY OPENING moved to the CharacterScreen header
+              (owner: "I went to settings and about and there was no replay
+              opening"). About's normal entry is the TITLE screen, where no
+              character is loaded, so the player-gated button here was
+              invisible on the only path players actually took to it. The
+              character sheet only exists with a live run — no gate needed. */}
 
           <Text style={[styles.sessionLabel, { marginTop: 14 }]} accessibilityRole="header">REPORTING</Text>
           <View style={styles.sessionBtnRow}>

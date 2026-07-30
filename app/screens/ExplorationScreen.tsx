@@ -41,7 +41,6 @@ import { MissionBoardModal } from '../components/MissionBoardModal';
 import { FusionPickerModal } from '../components/FusionPickerModal';
 import { FusionBlockedModal } from '../components/FusionBlockedModal';
 import { MissionCompleteModal } from '../components/MissionCompleteModal';
-import { StoryIntroOverlay } from '../components/StoryIntroOverlay'; // OTA-1018
 import { ParleyModal } from '../components/ParleyModal';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
@@ -1575,8 +1574,8 @@ export function ExplorationScreen() {
       <FusionPickerModal />
       <FusionBlockedModal />
       <MissionCompleteModal />
-      {/* OTA-1018 — the opening crawl, over the first scene of a new game. */}
-      <StoryIntroOverlay />
+      {/* OTA-1023 — the opening crawl moved to App.tsx's GLOBAL overlay
+          stack so REPLAY OPENING plays over any screen. */}
 
       {/* OTA-808 — the two-button parley chooser (self-mounts off pendingParley). */}
       <ParleyModal />
