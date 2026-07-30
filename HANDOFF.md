@@ -89,7 +89,24 @@ as clarified by the user on 2026-07-13:
 
 - **`HaL2001` is PRODUCTION.** The Tartaria build in the wild with internal
   testers. Vetted changes only; a push OTAs their devices.
-- **MUSIC CROSSFADE + CRUCIBLE UPGRADE LIST (2026-07-30, latest). BOTH LINES.**
+- **CAPITAL TIDY-UP (2026-07-30, latest). BOTH LINES.** golem **1029** / HAL **1052**.
+  Owner, standing in Asgardar: "it just feels disorganized, like all of the capitals do."
+  Three separate causes. (a) THE STAY/LEAVE POPUP: the POLISH-4 vendor-leave gate
+  intercepted any cardinal move while a trader was in the scene — and a capital's room
+  chips submit `go <dir>`, so every interior hop asked "leave Tarek behind?". The gate is
+  removed entirely; vendors are anchored to rooms via hub `anchorNpc`, so walking back in
+  finds them unchanged. (b) THE ✕ DIDN'T STICK: the Crucible dismiss was ROOM-keyed
+  (arb154), so it popped back next door. Both it and the NEW vendor ✕ are keyed to the
+  macro TILE via the exported `chipDismissTileKey(player)`; beginScene clears a dismiss
+  whose tile no longer matches, which is what makes "dismissed until you leave the tile
+  and come back" literally true. (c) FOUR STACKED BANNERS: trader / board / wanderer /
+  Crucible were each full-width, two-line, 44px; they now share one wrapping
+  `placeChipRow` two-across at 34px. A BLOCKED Crucible keeps its two-line reason so
+  OTA-220's "tell them what's missing" fix survives the squeeze. Locked by
+  ota1029/1052CapitalTidy (6 tests per line, incl. a runtime beginScene check that a
+  dismiss survives a room hop and clears on a real tile change).
+
+- **MUSIC CROSSFADE + CRUCIBLE UPGRADE LIST (2026-07-30). BOTH LINES.**
   golem **1028** / HAL **1051**. Two owner items. MUSIC: AudioManager transitions are now
   true crossfades (outgoing + incoming ramp in one epoch-guarded loop — the old
   hard-stop-then-fade is gone). Reflective beds (explore/menu) hand over at

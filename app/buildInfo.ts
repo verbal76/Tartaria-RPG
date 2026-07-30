@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.62';
+export const DISPLAY_VERSION = '4.28.63';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18981,4 +18981,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and carry an amber EQUIPPED badge (dog vests badge "ON <dog>") via the
 // same instance-id resolver as the inventory badge.
 // DISPLAY_VERSION 4.28.62. 7 tests.
-export const OTA_BUILD_ID = '2026-07-30-1051-crossfade-upgrade-list';
+// OTA-1052 — CAPITAL TIDY-UP (twin of golem 1029). Owner, standing in Asgardar:
+// "it just feels disorganized, like all of the capitals do." Three causes:
+// (1) THE STAY/LEAVE POPUP fired on every interior ROOM hop. The vendor-leave
+// gate (POLISH-4) intercepted any cardinal move while a trader stood in the
+// scene — and a capital's room chips submit "go <dir>", so walking Workshop →
+// Armory asked "leave Tarek behind?" every time. Gate removed outright:
+// vendors are anchored to their rooms (hub anchorNpc), so walking back in
+// finds them where they were.
+// (2) THE CRUCIBLE ✕ DIDN'T STICK. Its dismiss was keyed to the ROOM
+// (arb154), so the chip popped back the moment you walked next door. Both the
+// Crucible and the new vendor ✕ are now keyed to the macro TILE
+// (chipDismissTileKey): a dismiss survives every interior hop, and beginScene
+// clears it when you actually leave the tile, so a return visit re-shows it.
+// (3) FOUR STACKED BANNERS ate the feed ("the map line, the weather line, the
+// vendor line and the fuse line takes up a lot of screen real estate"). The
+// trader / board / wanderer / Crucible banners were full-width, two-line and
+// 44px tall each; they now share ONE wrapping row two-across at 34px. A
+// BLOCKED Crucible keeps its two-line reason (OTA-220's fix survives).
+// Plus: the trader chip gains its own ✕, matching the Crucible's.
+// DISPLAY_VERSION 4.28.63. 6 tests.
+export const OTA_BUILD_ID = '2026-07-30-1052-capital-tidy';
