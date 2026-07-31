@@ -849,8 +849,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1057`**,
-**golem-line `2026-07-31-1034`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1058`**,
+**golem-line `2026-07-31-1035`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -859,9 +859,51 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.68**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.69**; ledger in `VERSION.md`.
 
-- **AETHER MUD ON THE SHELF + THE AMBIENT ∅ NAMES ITS CULPRIT (2026-07-31, latest). BOTH LINES.**
+- **A FACTION SOLDIER IS A PERSON + THE BATTLE FOLLOW-UP IS A CARD (2026-07-31, latest). BOTH LINES.**
+  golem **1035** / HAL **1058**. Two owner items off the Asgardar / Iskan-Veil log.
+  • **HUMANS DROPPING BEAST LOOT.** Owner: "let's fix the loot drop issue where humans
+    drop beast loot." A faction party is BUILT, not authored — `injectFactionParty`
+    reskins a roster entry (rename, stamp a factionId) — and outdoors that entry was
+    whatever the WILD table rolled for the tile. A "Conspiracy Architects Patrol" could
+    be a Mud Cyclops underneath: 202 HP, tinder-dry to fire, swinging a beak, dropping
+    Raven Feather and Aether Wing off a man's corpse. OTA-1056 fixed the INDOOR half by
+    only ever dressing a human body; that list moved to `app/engine/factionBodies.ts` and
+    the outdoor builder now shares it. **The wild roll still decides HOW MANY and at what
+    RARITY** — the tile's danger still governs — it just no longer decides what a soldier
+    is made of.
+    ⚠ DIFFICULTY IS UNMOVED, and the reason matters if you touch this:
+    `scaleEncounterForContext` anchors a pack on its MEAN HP against the tile's danger,
+    not on the template's authored numbers. What the body actually decides is the loot,
+    the resist profile and the attack name. The roster holds six humans and NONE at
+    Common, so `pickFactionBody(rarity, { nearest: true })` borrows the cheapest
+    (Uncommon) rather than handing the raid back to a beast — a patrol is people at
+    every tier by definition. Indoors keeps the strict form (no `nearest`) because there
+    a Common-tier intruder really is a rat.
+  • **THE BATTLE FOLLOW-UP.** Owner, after a Core Guardian kill: "if the whole giants and
+    vigil thing was the player's reasons flavor text it needs to be last so it will be
+    read, it gets pushed up screen and missed. it should be a pop-up I think. the battle
+    follow up should be, it should have the flavor text, and the rewards on it." A boss
+    kill fires eight-plus lines from FIVE modules in one tick — spoils, hard-won material,
+    TC, the dying words, the signature gear, the Core, the faction's reaction — and the
+    story beat lands in the middle, then gets shoved off screen by the reward lines behind
+    it. Reordering five call sites would lose the same argument again next time something
+    is added, so instead a capture window opens for the duration of `resolveEnemyDefeat`
+    and everything the fight produced goes on ONE card: story first, then THE TAKE.
+    ⚠ THE WINDOW IS STRICTLY SYNCHRONOUS, and that is what keeps it clean — the canned
+    post-kill Arbiter beat ("Make the next strike count for two") comes from
+    `narrateViaArbiter`, an async path that cannot resume until this call stack is gone,
+    so it can never land on the card. Anything that arrives LATE has to be pushed on by
+    name, which is what the Resurrection Gem does. Bosses only; a rat gets no popup.
+    Reuses MissionCompleteModal (gold not green, a VICTORY kicker, a 60s safety valve
+    since there is prose to read), and a job finished in the same fight MERGES into the
+    card rather than raising a second popup that fights it for the screen.
+  Locked by ota1035/1058FactionBodiesVictoryCard (15 tests) + ota1035/1058BossVictoryCardRuntime
+  (5 tests, driving a real defeat through the real store — including a check that the
+  window SHUT and that an ordinary kill raises nothing).
+
+- **AETHER MUD ON THE SHELF + THE AMBIENT ∅ NAMES ITS CULPRIT (2026-07-31). BOTH LINES.**
   golem **1034** / HAL **1057**. Two items.
   • **MUD SUPPLY.** Owner: "did we work on getting limited amounts of aether mud to named
     vendors for sale". We had not — this is new. A Mud Golem costs 2 Aether Mud per summon

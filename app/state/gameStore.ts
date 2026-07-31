@@ -2890,6 +2890,55 @@ function healEscortsOnRest(
   if (healedLabel) get().appendLog('world', `Your ${healedLabel} rest too — they look steadier.`);
 }
 
+/** OTA-1035 — one reward line, one entry. Strips the ✦ the feed uses (the card
+ *  draws its own) and drops exact repeats, so a line that reached the card by
+ *  both the capture window and an explicit raise appears once. */
+function mergeRewardLines(existing: readonly string[], incoming: readonly string[]): string[] {
+  const out = [...existing];
+  for (const raw of incoming) {
+    const clean = raw.replace(/^✦\s*/, '').trim();
+    if (clean && !out.includes(clean)) out.push(clean);
+  }
+  return out;
+}
+
+// OTA-1035 — THE BATTLE FOLLOW-UP IS A CARD, NOT A SCROLLBACK. Owner, after
+// killing Veilkeeper Inarra: "if the whole giants and vigil thing was the
+// player's reasons flavor text it needs to be last so it will be read, it gets
+// pushed up screen and missed. it should be a pop-up I think. the battle follow
+// up should be, it should have the flavor text, and the rewards on it."
+//
+// A boss kill fires eight-plus lines from five different modules in one tick —
+// spoils, hard-won material, TC, the boss's dying words, the signature gear, the
+// Core, the faction's reaction, then the Resurrection Gem a beat later. The
+// story beat lands in the MIDDLE of that and the reward lines shove it off
+// screen before it can be read. Rather than reorder five call sites (and lose
+// the argument again next time something is added), a window opens for the
+// duration of resolveEnemyDefeat and everything the fight produced is collected
+// into ONE card: flavor first, then the take.
+//
+// The window is strictly SYNCHRONOUS, which is what keeps it clean — the canned
+// post-kill Arbiter beat ("Make the next strike count for two") comes from
+// narrateViaArbiter, an async path that cannot resume until this call stack is
+// gone, so it never lands on the card. Bosses only; a rat does not get a popup.
+type BossVictoryCapture = { name: string; flavor: string[]; rewards: string[] };
+let bossVictoryCapture: BossVictoryCapture | null = null;
+
+/** Called from appendLog on EVERY line. A no-op unless a boss defeat is being
+ *  resolved right now. Rewards and story are split by channel; exact repeats are
+ *  dropped so a line the feed deduped can't appear twice on the card. */
+function captureBossVictoryLine(channel: string, text: string): void {
+  const cap = bossVictoryCapture;
+  if (!cap) return;
+  const clean = text.trim();
+  if (!clean) return;
+  const bucket = channel === 'reward' ? cap.rewards
+    : channel === 'arbiter' || channel === 'world' ? cap.flavor
+    : null;                                   // debug / combat rolls stay in the feed
+  if (!bucket || bucket.includes(clean)) return;
+  bucket.push(clean);
+}
+
 function injectFactionParty(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -2916,15 +2965,30 @@ function injectFactionParty(
   };
   const base = rollEncounter(scene.location).filter((e) => !e.boss && !specialTemplate(e));
   if (base.length === 0) return false;
+  // OTA-1035 — AND THE BODY IS A PERSON. Owner: "let's fix the loot drop issue
+  // where humans drop beast loot." The reskin above kept every trait of the WILD
+  // roll, so a "Conspiracy Architects Patrol" could be a Mud Cyclops underneath —
+  // dropping Raven Feather and Aether Wing off a man's corpse, burning like
+  // tinder, swinging a beak. The indoor ambush was fixed this way in OTA-1056;
+  // this is the outdoor half, sharing the same body list. The wild roll still
+  // decides HOW MANY and at what RARITY (so the tile's danger still governs) —
+  // it just no longer decides what a soldier is made of. Difficulty is unmoved:
+  // scaleEncounterForContext below anchors the pack on its mean HP against the
+  // tile's danger, not on the template's authored numbers.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const fbMod = require('../engine/factionBodies') as typeof import('../engine/factionBodies');
   const party: Enemy[] = [];
   for (let i = 0; i < opts.partySize; i++) {
     const tmpl = base[i % base.length]!;
-    party.push({
-      ...tmpl,
-      name: opts.partySize > 1 ? `${opts.factionName} ${opts.noun} ${i + 1}` : `${opts.factionName} ${opts.noun}`,
-      factionId: opts.factionId,
-      aliases: [opts.noun.toLowerCase(), 'soldier', 'raider', opts.factionName.toLowerCase()],
-    });
+    // `nearest` because a Common tile still sends PEOPLE — the roster has no
+    // Common human, and borrowing the cheapest one beats sending a rat in
+    // faction colours. Falls back to the old reskin only if the roster somehow
+    // yields no human at all, so this can never leave a raid unspawned.
+    const body = fbMod.pickFactionBody(tmpl.rarity, { nearest: true }) ?? tmpl;
+    party.push(fbMod.dressFactionFighter(
+      body, opts.factionId, opts.factionName, opts.noun,
+      opts.partySize > 1 ? i + 1 : undefined,
+    ));
   }
   const tide = Math.max(0, s.worldMemory.factionTides?.[opts.factionId] ?? 0);
   const power = enemyScalePower(
@@ -4353,7 +4417,13 @@ interface GameStore {
   /** OTA-987 — a job just finished: the modal names it and holds until dismissed.
    *  Set ONLY by announceMissionComplete, the single choke point every
    *  completion path funnels through. */
-  missionCompleteNotice: { kind: string; title: string; rewards: string[] } | null;
+  /** OTA-1035 — `flavor` (story beats) and `heading` (a kicker that isn't
+   *  "<KIND> COMPLETE") are set by the boss VICTORY card; both are absent on an
+   *  ordinary mission notice, which renders exactly as it did before. */
+  missionCompleteNotice: {
+    kind: string; title: string; rewards: string[];
+    flavor?: string[]; heading?: string;
+  } | null;
   clearMissionCompleteNotice: () => void;
   /** OTA-1014 — Contracts-screen refusal strip. A COMPLETE tap that does NOT end in
    *  the completion popup surfaces the Arbiter's refusal line here — the
@@ -4370,6 +4440,11 @@ interface GameStore {
   /** OTA-1007 — the notice-only half of announceMissionComplete (no feed line);
    *  merges into any same-title notice already showing. */
   raiseMissionCompleteNotice: (kind: string, title: string, body: string) => void;
+  /** OTA-1035 — the boss VICTORY card: the fight's story beats and everything it
+   *  paid, in one popup that holds until dismissed. Called once with the whole
+   *  capture, then again for anything that lands late (the Resurrection Gem);
+   *  repeat calls for the same boss merge instead of replacing. */
+  raiseBossVictoryNotice: (name: string, flavor: string[], rewards: string[]) => void;
   fusionBlockedNotice: { title: string; body: string; hint?: string } | null;
   clearFusionBlockedNotice: () => void;
   closeFusionPicker: () => void;
@@ -6013,6 +6088,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   appendLog(channel, text, meta) {
+    // OTA-1035 — if a boss is being resolved, this line also goes on the victory
+    // card. No-op otherwise; nothing about the feed changes either way.
+    captureBossVictoryLine(channel, text);
     // 2026-05-25 OTA-034 — narration-channel invariant. The authored
     // vendor caught-stealing line ("Thief! — steel comes out.") is
     // emitted ONCE in this file inside stealFromVendor. A first-time
@@ -18961,6 +19039,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { currentScene, player, worldMemory } = get();
     const enemy = activeEnemy(currentScene);
     if (!currentScene || !enemy || !player) return;
+    // OTA-1035 — collect this fight's story + take into one card (bosses only).
+    bossVictoryCapture = enemy.boss ? { name: enemy.name, flavor: [], rewards: [] } : null;
     const activeIdx = currentScene.activeEnemyIdx;
     // Whisper-chain hook — Silt Thief death grants Stolen Aetheric
     // Discs and advances the Yulka chain to its return stage.
@@ -19866,7 +19946,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? `✦ The buried world relents — a Resurrection Gem at the ${newKills}-kill mark. (${total} held)`
           : `✦ A Resurrection Gem flickers from the dust — gathered to your stash. (${total} held)`;
         get().appendLog('reward', line);
+        // OTA-1035 — the gem lands a tick LATE (the count is read off disk), long
+        // after the synchronous window shut. Push it onto the card by name; the
+        // merge-by-title path adds it to the one already showing.
+        if (enemy.boss) get().raiseBossVictoryNotice(enemy.name, [], [line]);
       });
+    }
+    // OTA-1035 — shut the window and show what the fight was worth. Cleared FIRST
+    // so an exception below can never leave a stale capture collecting the rest
+    // of the session's narration into a card that opens on the next boss.
+    if (bossVictoryCapture) {
+      const cap = bossVictoryCapture;
+      bossVictoryCapture = null;
+      get().raiseBossVictoryNotice(cap.name, cap.flavor, cap.rewards);
     }
     void get().persist();
   },
@@ -26524,10 +26616,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   raiseMissionCompleteNotice(kind, title, body) {
     const prev = get().missionCompleteNotice;
+    // OTA-1035 — also merge into a VICTORY card that's already up. A boss kill
+    // that finishes a hunt used to raise two popups that fought over the screen;
+    // one battle should read as one result.
+    const mergeInto = prev && (prev.title === title || !!prev.heading);
     set({
-      missionCompleteNotice: prev && prev.title === title
-        ? { ...prev, rewards: [...prev.rewards, body.replace(/^✦\s*/, '')] }
-        : { kind, title, rewards: [body.replace(/^✦\s*/, '')] },
+      missionCompleteNotice: mergeInto
+        ? { ...prev!, rewards: mergeRewardLines(prev!.rewards, [body]) }
+        : { kind, title, rewards: mergeRewardLines([], [body]) },
+    });
+  },
+
+  raiseBossVictoryNotice(name, flavor, rewards) {
+    const prev = get().missionCompleteNotice;
+    const same = prev?.title === name;
+    set({
+      missionCompleteNotice: {
+        kind: 'Victory',
+        heading: 'VICTORY',
+        title: name,
+        flavor: [...(same ? prev?.flavor ?? [] : []), ...flavor],
+        // A mission card raised earlier in the same fight is absorbed rather
+        // than dropped — its reward lines were captured too, and mergeRewardLines
+        // dedupes the overlap.
+        rewards: mergeRewardLines(prev?.rewards ?? [], rewards),
+      },
     });
   },
 

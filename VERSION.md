@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.68` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.68` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.69` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.69` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -103,6 +103,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.65 → 4.28.66 | 2026-07-30-1032 | OTA | INDOOR AMBUSH CAST + FASTER QWEN RECOVERY (twin of HAL 1055): a rest-ambush under a roof drew from the wilderness table (a Rare 202-HP Mud Cyclops in a capital bunkroom); it now swaps in an indoor-plausible foe at the SAME rarity — an intruder, vermin, a patrol machine, or the sealed dead — with both narration beats re-voiced for a sealed room. Difficulty unchanged. And the Qwen watchdog goes adaptive (60s healthy / 5s recovering) plus an AppState foreground check, cutting a ~2-minute template-only stretch to seconds. |
 | 4.28.66 → 4.28.67 | 2026-07-30-1033 | OTA | RAIDERS, SOLDIERS + AETHERKIN INDOORS (twin of HAL 1056): Aetherkin were already complete (all five, now roster-locked by test) and raiders present at Uncommon; SOLDIERS were the gap — the roster has six humans total. Added the Mud Monarch Purifier, and raiders/soldiers are now also BUILT by dressing a same-rarity HUMAN body in the colours of the faction you have wronged most ("Mud Monarchs Raider", "Stone Builders Soldier") at Uncommon/Rare/Legendary. About half of indoor ambushes are people; Common stays vermin. |
 | 4.28.67 → 4.28.68 | 2026-07-31-1034 | OTA | AETHER MUD ON THE SHELF (twin of HAL 1057): a Mud Golem costs 2 Aether Mud per summon and no vendor stocked any, so the only route to a golem was foraging. Six named sellers now carry it — Halem the Trader, Tellin Mak, Tarek the Tinkerer, Naha, Veska of the Hollow, Foreman Drest Holloway — spread so no single counter or faction gates the fuel. LIMITED is enforced: a new SCARCE_STOCK table caps mud at 2-5 per visit against the 1-10 every other material rolls, and stock re-rolls per vendor instance. Plus the ambient ∅ debug line now names WHICH filter dropped the companion aside (the OTA-1031/1054 fix did not work — the owner's 4.28.66 log still shows ∅), so the next log answers it instead of another guess. |
+| 4.28.68 → 4.28.69 | 2026-07-31-1035 | OTA | FACTION SOLDIERS ARE PEOPLE + THE BATTLE FOLLOW-UP IS A CARD (twin of HAL 1058): outdoor faction parties were reskinned from whatever the WILD table rolled, so a "Conspiracy Architects Patrol" could be a Mud Cyclops underneath — dropping Raven Feather and Aether Wing off a man's corpse. They now wear a HUMAN body from the same shared list the indoor ambush uses; the wild roll still sets the count and rarity, and pack scaling keeps the difficulty identical. And a boss kill now collects its story beats and its whole take into ONE popup (flavor first, then THE TAKE) instead of firing eight lines from five modules and letting the story scroll off behind the rewards. Bosses only; a job finished in the same fight merges into the card. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.68';
+export const DISPLAY_VERSION = '4.28.69';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18065,4 +18065,42 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     Debug channel only — it cannot put a line in the feed, and nothing about
 //     generation changes. The next pasted log answers the question outright.
 // DISPLAY_VERSION 4.28.68. 12 tests.
-export const OTA_BUILD_ID = '2026-07-31-1034-mud-supply';
+// OTA-1035 — A FACTION SOLDIER IS A PERSON, AND THE BATTLE FOLLOW-UP IS A CARD.
+// (1) HUMANS DROPPING BEAST LOOT. Owner: "let's fix the loot drop issue where
+//     humans drop beast loot." A faction party is BUILT by reskinning a roster
+//     entry — rename it, stamp a factionId — and outdoors (injectFactionParty)
+//     that entry was whatever the WILD table rolled for the tile. So a
+//     "Conspiracy Architects Patrol" could be a Mud Cyclops underneath: 202 HP,
+//     tinder-dry to fire, swinging a beak, and dropping Raven Feather and Aether
+//     Wing off a man's corpse. OTA-1056 fixed this INDOORS by only ever dressing
+//     a human body; that list now lives in a shared engine/factionBodies.ts and
+//     the outdoor builder uses it too. The wild roll still decides HOW MANY and
+//     at what RARITY, so the tile's danger still governs — it just no longer
+//     decides what a soldier is made of. Difficulty is unmoved:
+//     scaleEncounterForContext anchors a pack on its mean HP against the tile's
+//     danger, not on the template's authored numbers. What moves is the loot,
+//     the resist profile and the attack name. Common has no human in the roster,
+//     so `nearest` borrows the cheapest one (Uncommon) rather than handing the
+//     raid back to a beast — a patrol is people at every tier by definition.
+// (2) THE BATTLE FOLLOW-UP. Owner, after killing a Core Guardian: "if the whole
+//     giants and vigil thing was the player's reasons flavor text it needs to be
+//     last so it will be read, it gets pushed up screen and missed. it should be
+//     a pop-up I think. the battle follow up should be, it should have the
+//     flavor text, and the rewards on it." A boss kill fires eight-plus lines
+//     from five modules in ONE tick — spoils, hard-won material, TC, the boss's
+//     dying words, the signature gear, the Core, the faction's reaction — and
+//     the story beat lands in the middle, then gets shoved off screen by the
+//     reward lines behind it. Rather than reorder five call sites (and lose the
+//     argument again next time something is added), a capture window opens for
+//     the duration of resolveEnemyDefeat and everything the fight produced goes
+//     onto ONE card: story first, then THE TAKE. The window is strictly
+//     SYNCHRONOUS, which is what keeps it clean — the canned post-kill Arbiter
+//     beat comes from narrateViaArbiter, an async path that cannot resume until
+//     this call stack is gone, so it never lands on the card. The Resurrection
+//     Gem, which arrives a tick late, is pushed on by name. Bosses only; a rat
+//     gets no popup. It reuses MissionCompleteModal (gold instead of green, a
+//     VICTORY kicker, a longer safety valve since there is prose to read), and a
+//     job finished in the same fight MERGES into the card instead of raising a
+//     second popup that fights it for the screen.
+// DISPLAY_VERSION 4.28.69. 20 tests.
+export const OTA_BUILD_ID = '2026-07-31-1035-faction-bodies-victory-card';
