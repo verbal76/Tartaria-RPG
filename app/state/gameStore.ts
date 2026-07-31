@@ -1033,6 +1033,27 @@ function assembleBeaconRifle(
   );
   getStore().appendLog('reward', `✦✦ BEACON RIFLE (Legendary) — built from the five collector-arrays. Fires an electrical bolt sheathed in acid, the two elements every Tartarian machine dreads. With it, a cache of legendary materials.`);
   getStore().appendLog('arbiter', `"You climbed into the heart of every tower that drowned the world," the Arbiter says quietly, "and made the thing that drank the sky spit it back out. Nothing built will stand easy in front of that."`);
+  // OTA-1060 — AND IT GETS A CARD. The doubled ✦✦ above was the only thing
+  // marking this as bigger than a Trail Rations pickup, and a feed line is
+  // exactly what OTA-1010 was written because the player scrolls past — the
+  // owner's words then were "I didn't even realize I completed the mission."
+  // This is the payoff for all five great climbs: a Legendary weapon plus seven
+  // Legendary/Rare materials, and it announced itself the same way a mud cloth
+  // does. The boss VICTORY card already knew how to show story-then-take, so it
+  // is reused under its own banner. The feed lines above are UNCHANGED — the log
+  // stays a complete record, same rule as every other announcement.
+  getStore().raiseSpotlightNotice(
+    'BEACON RIFLE ASSEMBLED',
+    'Beacon Rifle (Legendary)',
+    [
+      `You crack the five beacons open across your knees: each is a folded collector-array, a throat of resonant crystal built to swallow Aether out of thin air. You splice the five throats into a single barrel and re-wire the intake to fire instead of feed. When you seat the last crystal the whole thing wakes with a shriek of live current.`,
+      `"You climbed into the heart of every tower that drowned the world," the Arbiter says quietly, "and made the thing that drank the sky spit it back out. Nothing built will stand easy in front of that."`,
+    ],
+    [
+      `Beacon Rifle (Legendary) — electrical bolt sheathed in acid, the two elements every Tartarian machine dreads.`,
+      ...mats.map((m) => `${m.name} ×${m.quantity} (${m.rarity})`),
+    ],
+  );
   void getStore().persist();
   return true;
 }
@@ -4523,6 +4544,11 @@ interface GameStore {
    *  capture, then again for anything that lands late (the Resurrection Gem);
    *  repeat calls for the same boss merge instead of replacing. */
   raiseBossVictoryNotice: (name: string, flavor: string[], rewards: string[]) => void;
+  /** OTA-1060 — the same card under any banner. A VICTORY card is one kind of
+   *  SPOTLIGHT: a custom kicker, story above the take, gold instead of the
+   *  mission green. Use it for a milestone the player would otherwise only learn
+   *  about from a feed line that scrolls away. */
+  raiseSpotlightNotice: (heading: string, title: string, flavor: string[], rewards: string[]) => void;
   fusionBlockedNotice: { title: string; body: string; hint?: string } | null;
   clearFusionBlockedNotice: () => void;
   closeFusionPicker: () => void;
@@ -26677,15 +26703,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   raiseBossVictoryNotice(name, flavor, rewards) {
+    get().raiseSpotlightNotice('VICTORY', name, flavor, rewards);
+  },
+
+  raiseSpotlightNotice(heading, title, flavor, rewards) {
     const prev = get().missionCompleteNotice;
-    const same = prev?.title === name;
+    const same = prev?.title === title;
     set({
       missionCompleteNotice: {
-        kind: 'Victory',
-        heading: 'VICTORY',
-        title: name,
+        kind: heading,
+        heading,
+        title,
         flavor: [...(same ? prev?.flavor ?? [] : []), ...flavor],
-        // A mission card raised earlier in the same fight is absorbed rather
+        // A mission card raised earlier in the same moment is absorbed rather
         // than dropped — its reward lines were captured too, and mergeRewardLines
         // dedupes the overlap.
         rewards: mergeRewardLines(prev?.rewards ?? [], rewards),

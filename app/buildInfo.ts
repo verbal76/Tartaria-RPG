@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.70';
+export const DISPLAY_VERSION = '4.28.71';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19173,4 +19173,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // one choke point, one rule. Cosmetic only; nothing about what is granted, what
 // is logged, or when the card appears changes.
 // DISPLAY_VERSION 4.28.70. 5 tests.
-export const OTA_BUILD_ID = '2026-07-31-1059-reward-bullets';
+// OTA-1060 — THE DOUBLE-DIAMOND PAYOFF GETS A CARD. Owner asked whether the ✦✦
+// items read right on the awards popup. The TEXT was fine — the finding was that
+// the one line written that way could never reach a popup at all.
+// assembleBeaconRifle fires from a USE-ITEM path, nowhere near the boss-defeat
+// capture window, so the payoff for all five great climbs — a Legendary weapon
+// plus seven Legendary/Rare materials, the end of the whole Skyreacher chain —
+// announced itself with a single feed line, exactly the way a mud cloth does.
+// That is the failure OTA-1010 was written to prevent ("I didn't even realize I
+// completed the mission"), and the doubled ✦✦ was the only thing marking it as
+// bigger. It now raises a card of its own: the crack-open narration and the
+// Arbiter's line as story, then the rifle and every granted material as the
+// take. The FEED LINES ARE UNCHANGED — the log stays a complete record, same
+// rule as every other announcement.
+// The VICTORY card from OTA-1058 was already the right shape for this, so it is
+// generalized rather than copied: raiseSpotlightNotice(heading, title, flavor,
+// rewards) is the one implementation, and raiseBossVictoryNotice is now a
+// three-line delegate passing 'VICTORY'. A spotlight already had the behaviour
+// this needed — gold instead of mission green, a custom kicker, story above the
+// take, and a merge rule that stops an unrelated job completing underneath it
+// from clobbering the card.
+// DISPLAY_VERSION 4.28.71. 6 tests.
+export const OTA_BUILD_ID = '2026-07-31-1060-spotlight-card';
