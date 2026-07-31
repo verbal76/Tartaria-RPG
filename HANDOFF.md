@@ -849,19 +849,53 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-27-1016`**,
-**golem-line `2026-07-27-993`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1057`**,
+**golem-line `2026-07-31-1034`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
-ported FROM engine_Dev, not to it).
+ported FROM engine_Dev, not to it))
 
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.56**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.68**; ledger in `VERSION.md`.
 
-- **RAIDERS, SOLDIERS + AETHERKIN INDOORS (2026-07-30, latest). BOTH LINES.**
+- **AETHER MUD ON THE SHELF + THE AMBIENT ∅ NAMES ITS CULPRIT (2026-07-31, latest). BOTH LINES.**
+  golem **1034** / HAL **1057**. Two items.
+  • **MUD SUPPLY.** Owner: "did we work on getting limited amounts of aether mud to named
+    vendors for sale". We had not — this is new. A Mud Golem costs 2 Aether Mud per summon
+    and NOT ONE vendor stocked it; the only material any named vendor sold was Patched
+    Cloth, so foraging was the sole route to a golem. Six named sellers now carry it:
+    Halem the Trader (6 TC), Tellin Mak (6), Tarek the Tinkerer (7 — he already sells the
+    Golem Controller Ring), Naha (7), Veska of the Hollow (5 — Mud Monarchs), Foreman
+    Drest Holloway (6 — Stone Builders). Deliberately spread so no single counter and no
+    single faction gates golem fuel.
+    ⚠ ONLY VENDORS WITH AUTHORED OFFERS ARE ELIGIBLE. Twelve entries in `vendors.json`
+    carry `offers: []` and are stocked dynamically at runtime — an offer added to one of
+    those is silently overwritten. Korr Stonefoot and Mara Stoneskin were in the first
+    draft of this list for exactly that reason; a test now asserts every mud seller has an
+    authored list.
+    LIMITED IS ENFORCED, NOT INTENDED: materials otherwise roll 1-10 per visit (five
+    golems' worth off one counter), so `SCARCE_STOCK` in `vendors.ts` gives 'aether mud'
+    2-5 and is consulted BEFORE the food/material bands. One summon guaranteed, two at
+    best. Stock re-rolls per vendor INSTANCE, so the shelf refills between visits without
+    ever being deep. Add future scarce items to that table, not to the roll body.
+  • **AMBIENT ∅ — A CORRECTION, THEN INSTRUMENTATION.** OTA-1031/1054 claimed the
+    ambient companion aside was fixed. It was not: the owner's next log, on build 4.28.66
+    which CARRIES that fix, still reads `arbiter: ambient ∅ 55801ms`. Verified along the
+    way that `trimToLastSentence` and `clampSentences` both fall back to raw text, so
+    neither is the culprit — but the ∅ line has never said which of the five filters ate
+    the line, or whether the model returned anything at all, which is precisely why the
+    last fix was a guess. The empty path now logs `reason=` (model-returned-nothing /
+    cleaners-emptied-it / third-person / they-opener / action-opener / instruction-echo /
+    off-canon-entity / near-duplicate-of-recent) plus the raw output's first 120 chars.
+    Debug channel ONLY — a test asserts the block cannot append to arbiter or world — and
+    generation is untouched. The next pasted log names the filter outright.
+  Locked by ota1034/1057MudSupply (12 tests per line), including a shelf check that goes
+  through `findVendorByName` for all six sellers rather than the roll helper alone.
+
+- **RAIDERS, SOLDIERS + AETHERKIN INDOORS (2026-07-30). BOTH LINES.**
   golem **1033** / HAL **1056**. Owner asked the indoor cast to cover raiders, soldiers and
   Aetherkin explicitly. Audit result: AETHERKIN already complete — all five roster entries —
   and now locked by a test that READS enemies.json and demands the indoor list equal the

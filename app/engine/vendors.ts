@@ -34,8 +34,24 @@ const MATERIAL_NAMES = new Set(
   (((materialsData as unknown as { materials?: { name: string }[] }).materials ?? []))
     .map((m) => m.name.toLowerCase()),
 );
+// OTA-1034 — SCARCE materials. Owner asked for "limited amounts of Aether Mud
+// to named vendors for sale". Mud is a MATERIAL, and materials otherwise roll
+// 1-10 per visit — enough to walk away with five golems' worth from one
+// counter. These roll a deliberately tight band instead: a real supply you can
+// plan around, never a stockpile. Keyed by lowercased item name; anything not
+// listed keeps its normal roll. Stock re-rolls per vendor INSTANCE — each time
+// you arrive — so the shelf refills between visits without ever being deep.
+const SCARCE_STOCK: Readonly<Record<string, readonly [number, number]>> = {
+  'aether mud': [2, 5],
+};
+
 export function rollOfferQuantity(itemName: string): number {
   const n = itemName.toLowerCase();
+  const scarce = SCARCE_STOCK[n];
+  if (scarce) {
+    const [lo, hi] = scarce;
+    return lo + Math.floor(Math.random() * (hi - lo + 1));
+  }
   if (FOOD_NAMES.has(n)) return 1 + Math.floor(Math.random() * 5); // 1-5
   if (MATERIAL_NAMES.has(n)) return 1 + Math.floor(Math.random() * 10); // 1-10
   return 1;
