@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.71';
+export const DISPLAY_VERSION = '4.28.72';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18138,4 +18138,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // take, and a merge rule that stops an unrelated job completing underneath it
 // from clobbering the card.
 // DISPLAY_VERSION 4.28.71. 6 tests.
-export const OTA_BUILD_ID = '2026-07-31-1037-spotlight-card';
+// OTA-1038 — THE CRAFT LIST SAYS WHICH SLOT. Owner: "under the craft tab for
+// armor, it needs to list what slot its for. some of the names don't explain it.
+// it took me a few minutes to find something in the hand slot."
+// The catalog knew all along — previewArmor has built `kindLabel: "Hands Armor"`
+// since it was written — but the craft row only ever rendered the STATS line, so
+// the slot never reached the screen and the player had to infer it from the
+// name. Measured, that inference fails often: of the 90 distinct nouns armor
+// names end in, 17 are used by more than one slot. "Greaves" is legs AND feet;
+// "mantle", "vest", "jacket" and "coat" are each split between chest and cloak;
+// "cloak" itself appears on chest pieces. A test now asserts that ambiguity, so
+// the label can only become redundant by a deliberate rename.
+// Two halves, because the owner's sentence has two halves. LABELLING fixes
+// reading it: every armor row carries a "HANDS SLOT" line above the stats, in a
+// spaced-caps grey that reads as a label rather than another stat, so the eye
+// can run the column without reading item names. SEARCH fixes FINDING it:
+// typing "hands" now narrows 293 armor pieces to the 41 you can wear there. The
+// name match is unchanged — the slot is an addition, not a swap.
+// Plumbing: ItemPreview gains `slot?: string`. The slot was already in
+// kindLabel, but only as PROSE, so any caller wanting to show or filter by it
+// had to parse English back out. Fused pieces carry theirs too (u.armorSlot) —
+// a fusion re-rolls the numbers, never the slot.
+// DISPLAY_VERSION 4.28.72. 9 tests.
+export const OTA_BUILD_ID = '2026-07-31-1038-craft-armor-slot';

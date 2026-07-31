@@ -849,8 +849,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1060`**,
-**golem-line `2026-07-31-1037`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1061`**,
+**golem-line `2026-07-31-1038`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -859,9 +859,32 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.71**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.72**; ledger in `VERSION.md`.
 
-- **THE DOUBLE-DIAMOND PAYOFF GETS A CARD (2026-07-31, latest). BOTH LINES.**
+- **THE CRAFT LIST SAYS WHICH SLOT (2026-07-31, latest). BOTH LINES.**
+  golem **1038** / HAL **1061**. Owner: "under the craft tab for armor, it needs to list
+  what slot its for. some of the names don't explain it. it took me a few minutes to find
+  something in the hand slot."
+  The catalog knew all along — `previewArmor` has built `kindLabel: "Hands Armor"` since it
+  was written — but the craft row only ever rendered the STATS line, so the slot never
+  reached the screen. Measured, guessing from the name fails often: of the 90 distinct
+  nouns armor names end in, **17 are used by more than one slot**. "Greaves" is legs AND
+  feet; "mantle", "vest", "jacket" and "coat" are each split between chest and cloak;
+  "cloak" itself appears on chest pieces. A test asserts that ambiguity, so the label can
+  only become redundant by a deliberate rename rather than by accident.
+  TWO HALVES, because the owner's sentence has two. LABELLING fixes reading it: every
+  armor row gets a "HANDS SLOT" line above the stats, spaced-caps grey so it reads as a
+  label rather than another stat and the eye can run the column without reading names.
+  SEARCH fixes FINDING it: typing "hands" narrows 293 armor pieces to the 41 you can wear
+  there. The name match is untouched — the slot is an ADDITION to the filter, not a swap.
+  ⚠ PLUMBING NOTE: `ItemPreview` gains `slot?: string`. The slot was already present, but
+  only as PROSE inside `kindLabel`, so any caller wanting to show or filter by it had to
+  parse English back out of a label. Read the field, don't regex the label. Fused pieces
+  carry theirs too (`u.armorSlot`) — a fusion re-rolls the numbers, never the slot.
+  Locked by ota1038/1061CraftArmorSlot (9 tests per line, incl. a sweep asserting every
+  catalogue piece reports its real slot and that non-armor reports none).
+
+- **THE DOUBLE-DIAMOND PAYOFF GETS A CARD (2026-07-31). BOTH LINES.**
   golem **1037** / HAL **1060**. Owner asked whether the ✦✦ items read right on the
   awards popup. The TEXT was fine. The finding was that the one line written that way could
   never reach a popup at all: `assembleBeaconRifle` fires from a USE-ITEM path, nowhere

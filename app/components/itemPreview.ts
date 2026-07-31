@@ -31,6 +31,12 @@ export type ItemPreview = {
   description: string;
   /** Compact list of mechanical lines: "Damage: 2d6 (slashing)", "AC +2", etc. */
   stats: string[];
+  /** OTA-1038 — the equip slot for armor ('head' | 'chest' | 'legs' | 'cloak' |
+   *  'feet' | 'hands'), absent for everything else. It was already baked into
+   *  `kindLabel` as prose ("Hands Armor"), which meant any caller wanting to
+   *  show or FILTER by slot had to parse English back out of it. Carried as
+   *  data so the craft list can label and search on it. */
+  slot?: string;
 };
 
 // engine_Dev — coating-vial resists worked into an ARMOR instance (addedResists)
@@ -90,6 +96,8 @@ export function getItemPreviewForInstance(item: {
     return {
       name: item.name,
       kindLabel,
+      // OTA-1038 — a fused piece keeps its slot too; the roll never moves it.
+      slot: u.armorSlot,
       rarity: u.rarity,
       description: item.description ?? '',
       stats: withAddedResists(stats, item.addedResists),
@@ -222,7 +230,7 @@ function previewArmor(a: CatalogArmor): ItemPreview {
   if (resists.length > 0) stats.push(`Resists: ${resists.join(', ')}`);
   if (a.statBonus) stats.push(`${a.statBonus.stat.toUpperCase().slice(0, 3)} +${a.statBonus.amount}`);
   if (a.baseDurability !== undefined) stats.push(`Durability: ${a.baseDurability}`);
-  return { name: a.name, kindLabel: `${slotLabel} Armor`, rarity: a.rarity, description: a.description, stats };
+  return { name: a.name, kindLabel: `${slotLabel} Armor`, slot: a.slot, rarity: a.rarity, description: a.description, stats };
 }
 
 function previewAccessory(x: CatalogAccessory, kind: 'Amulet' | 'Ring'): ItemPreview {
