@@ -34,6 +34,10 @@
         {
           "itemName": "Patched Cloth",
           "price": 20
+        },
+        {
+          "itemName": "Aether Mud",
+          "price": 6
         }
       ],
       "gender": "male",
@@ -143,6 +147,10 @@
         {
           "itemName": "First Aid Kit",
           "price": 30
+        },
+        {
+          "itemName": "Aether Mud",
+          "price": 7
         }
       ],
       "gender": "female",
@@ -317,6 +325,10 @@
         {
           "itemName": "Patched Cloth",
           "price": 18
+        },
+        {
+          "itemName": "Aether Mud",
+          "price": 6
         }
       ],
       "gender": "male",
@@ -348,6 +360,10 @@
         {
           "itemName": "Aether-Runner Boots",
           "price": 170
+        },
+        {
+          "itemName": "Aether Mud",
+          "price": 7
         }
       ],
       "gender": "male",
@@ -537,7 +553,8 @@
         { "itemName": "Trail Rations", "price": 8 },
         { "itemName": "Aetheric Torch", "price": 25 },
         { "itemName": "Climbing Rope", "price": 12 },
-        { "itemName": "Throwing Knife", "price": 18 }
+        { "itemName": "Throwing Knife", "price": 18 },
+        { "itemName": "Aether Mud", "price": 5 }
       ],
       "gender": "female",
       "voiceId": "af_river"
@@ -609,7 +626,8 @@
         { "itemName": "Sentinel's Chestplate", "price": 90 },
         { "itemName": "Climbing Rope", "price": 12 },
         { "itemName": "Rusted Blade", "price": 28 },
-        { "itemName": "Trail Rations", "price": 8 }
+        { "itemName": "Trail Rations", "price": 8 },
+        { "itemName": "Aether Mud", "price": 6 }
       ],
       "gender": "male",
       "voiceId": "am_adam"

@@ -47,6 +47,72 @@ export function repairGluedNarration(text: string): string {
   return s.replace(/\s{2,}/g, ' ').trim();
 }
 
+// OTA-1053 — INSTRUCTION-ECHO DETECTOR. The local model is small enough that it
+// sometimes answers a prompt by reciting the prompt: the owner watched the
+// ambient brief's own opening sentence appear at Asgardar as an Arbiter line.
+// These patterns are meta-text about HOW to narrate — a word-count, a "do not"
+// rule, a third-person label for the person being narrated to. None of them can
+// occur inside a real 18-word grim aside, so matching one means the output is
+// the brief coming back, not a line.
+const INSTRUCTION_ECHO_PATTERNS: readonly RegExp[] = [
+  // The narration is second person. Anything calling them "the player" is the
+  // brief talking ABOUT them, not the Arbiter talking TO them.
+  /\b(the player|the adventurer|the explorer|the figure)\b/i,
+  // The exact phrase from the brief the owner saw recited back.
+  /\bwalked beside\b/i,
+  // Craft directions: length caps, register notes, meta nouns.
+  /\bone short (sentence|line|aside)\b/i,
+  /\b(no more than|about)\s+\d+\s+words\b/i,
+  /\bunprompted\b/i,
+  /\bsecond[- ]person\b/i,
+  /\bsystem facts\b/i,
+  /\bdo not (narrate|react|invent|repeat|restate)\b/i,
+  /\b(restate|these directions)\b/i,
+  /\b(the|their) last action\b/i,
+  /\bavailable player actions\b/i,
+  /\bidle companion talk\b/i,
+  // An imperative ALONE is not a tell — the Arbiter really does say "Do not
+  // look behind you." and "Speak carefully." (both authored lines, and an
+  // earlier draft of this guard silently ate them). What marks a craft
+  // direction is an imperative aimed at a CRAFT OBJECT — a sentence, a word
+  // count, a register — within the same clause.
+  /^\s*(speak|write|narrate|make|keep it|end)\b[^.!?]{0,80}\b(sentence|words|tone|register|person|aside|narration|instructions?|companion who|reflection)\b/i,
+];
+
+/** True when generated text is the model reciting its own brief rather than
+ *  narrating. Used three ways: to blank the LIVE streaming preview the instant
+ *  it turns into meta-text (the leak the owner actually saw — the preview shows
+ *  raw tokens, and the post-generation filters can only clean the FINAL line),
+ *  and as a belt-and-braces sentence filter on both narration paths. */
+export function looksLikeInstructionEcho(text: string): boolean {
+  if (!text) return false;
+  return INSTRUCTION_ECHO_PATTERNS.some((re) => re.test(text));
+}
+
+// OTA-1054 — "You …" openers, split by REGISTER rather than banned outright.
+// The ambient companion filter used to drop every sentence starting with "You",
+// to kill a real failure (the model narrating invented scenery — "You step
+// back, surveying the alleyway" — inside a room that has no alleyway). But the
+// shared VOICE_RULES *command* the model to start sentences with "You", so that
+// filter discarded the ambient path's own output by construction: both of the
+// owner's logs show `arbiter: ambient ∅` and never once `ambient ✓`.
+//
+// The tell isn't the pronoun, it's the VERB. A scene hallucination opens with a
+// present-tense action ("You step / turn / reach"); a reflection — the thing
+// ambient exists to produce — opens with a state or perfect ("You have come…",
+// "You've grown…", "You carry it better now"). Allow the second, drop the first.
+const REFLECTIVE_YOU_OPENER =
+  /^\s*you(?:'(?:ve|re|ll|d))\b|^\s*you\s+(?:have|has|had|are|were|was|will|can|could|would|should|used|came|come|arrived|learned|learnt|grew|grown|changed|carry|carried|bear|bore|wear|wore|know|knew|remember|remembered|forget|forgot|never|always|still|no|not|do|don't|didn't|weren't|aren't|seem|seemed|began|begin|stopped|survived|lasted|lived)\b/i;
+
+/** True for a second-person opener that reads as SCENE NARRATION ("You step
+ *  back…") rather than reflection ("You have come a long way…"). Only the
+ *  ambient companion path uses it: reactive narration is *supposed* to describe
+ *  what just happened, so it must never filter these. */
+export function isSecondPersonActionOpener(sentence: string): boolean {
+  if (!/^\s*you\b/i.test(sentence)) return false; // not a bare "You …" opener
+  return !REFLECTIVE_YOU_OPENER.test(sentence);
+}
+
 /** Drop any word containing a foreign letter; collapse the gaps + tidy the
  *  spacing left before punctuation. English-only narration in → English-only
  *  narration out. Returns '' if every word was foreign (caller falls back to a

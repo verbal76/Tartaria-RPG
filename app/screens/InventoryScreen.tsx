@@ -1852,6 +1852,17 @@ function ItemRow({
               rarity / dog tags. No marker when un-reserved so the row
               isn't noisy for the catalog majority. */}
           {item.reservedForFusion && <Text style={[styles.rowMeta, styles.rowReserved]}>♥</Text>}
+          {/* OTA-1047 — material kind(s) on every forge-reservable row (owner,
+              reading his 29 identical-looking ♥ rows: "they are all too
+              alike, there isn't 3 different kinds here?"). Building a
+              3-kind spread is now a glance, not a refusal-driven lesson.
+              Mirrors fusionMaterialTags — what the player reads is exactly
+              what the diversity gate counts. */}
+          {isForgeReservableItem(item) && (
+            <Text style={[styles.rowMeta, styles.rowMatKinds]}>
+              [{fusionMaterialTags(item).join(' · ') || 'misc'}]
+            </Text>
+          )}
           {/* OTA-872 — pennant marker on items the player has saved for a quest
               turn-in (soft earmark; hidden from the sell tab). Gold to match the
               Quest Items section colour. */}
@@ -2047,6 +2058,8 @@ const styles = StyleSheet.create({
   // OTA-120 Phase 5 — [fits dog] / [treat] tag styling. Amber so they
   // stand out from the grey rarity / durability metadata.
   rowDogTag: { color: '#c9a86a', fontWeight: '700' },
+  // OTA-1047 — material-kind chip tone (teal, quieter than the ♥).
+  rowMatKinds: { color: '#8aa0a4' },
   rowReserved: { color: '#d97a7a', fontWeight: '700' },
   rowQuestSaved: { color: '#d9c34a', fontWeight: '700' }, // gold — matches Quest Items section
   // OTA-360 — weapon-coating chip. Sickly green-violet so it reads as

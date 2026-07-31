@@ -193,12 +193,19 @@ const COMBAT_INSTRUCTION =
 // to the last action (the canned templates own reactions), so its latency never
 // reads as late. Reflective/relational, never advice, one short line. The shared
 // VOICE_RULES still pin it to second-person English with no third-person recap.
+// OTA-1053 — this brief used to OPEN with a complete, narration-shaped,
+// second-person sentence about having travelled at the character's side: the
+// exact register the model was being asked to produce, handed to it ready to
+// copy. The owner watched it come back verbatim as an Arbiter line. Every
+// directive is imperative now, so there is no ready-made sentence to recite,
+// and an echo reads as meta-text that looksLikeInstructionEcho catches.
 const AMBIENT_INSTRUCTION =
-  'You have walked beside the player a long while. Make ONE short, UNPROMPTED ' +
-  'aside — a passing reflection on how far they have come, their growth, the ' +
-  'road behind you both, or your changing read of them. DO NOT narrate or react ' +
-  'to their last action; this is idle companion talk between moments, not a ' +
-  'response to anything. Warm or wry, never advice or instructions. ' +
+  'Speak as a companion who has travelled a long road at their side. ' +
+  'Make ONE short, UNPROMPTED aside — a passing reflection on how far they have ' +
+  'come, their growth, the road behind you both, or your changing read of them. ' +
+  'DO NOT narrate or react to their last action; this is idle companion talk ' +
+  'between moments, not a response to anything. Warm or wry, never advice or ' +
+  'instructions. Never repeat or restate any of these directions. ' +
   'ONE short sentence — about 18 words, no more. ' +
   VOICE_RULES;
 

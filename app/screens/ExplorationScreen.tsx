@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { playerWeaponReach, useGameStore, makeRoomKey } from '../state/gameStore';
+import { playerWeaponReach, useGameStore, makeRoomKey, chipDismissTileKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -166,20 +166,23 @@ export function ExplorationScreen() {
       player.completedFactionQuestIds ?? [],
     ).length > 0;
   }, [currentScene?.missionBoard, player]);
-  // arb152 — a per-location dismiss for the Fusing Crucible chip (X on the chip).
-  // Reset whenever the location or building changes (re-entering re-shows it).
-  // arb-fix — the dismiss lives in the STORE (crucibleChipDismissedKey), NOT local
-  // useState: entering a vendor UNMOUNTS this screen (App.tsx renders exploration vs
-  // vendor by a flag), so a local flag was lost on the round-trip and the chip popped
-  // back on return. Keying the stored dismiss to the view-key still auto-re-shows the
-  // chip when you actually move to a different location (key mismatch).
-  // arb154 — include activeBuildingRoomId: moving between ROOMS of a building
-  // (market stalls etc.) changes only this, not activeBuildingId — so without it
-  // a dismiss in one room stuck for the whole building ("disabled in all rooms").
-  const crucibleViewKey = `${currentScene?.location.id ?? ''}|${activeBuildingId ?? ''}|${activeBuildingRoomId ?? ''}|${player?.hubRoomId ?? ''}`;
+  // arb152 — a dismiss (✕) for the Fusing Crucible chip, and OTA-1052 the same for
+  // the vendor chip. arb-fix — the dismiss lives in the STORE, NOT local useState:
+  // entering a vendor UNMOUNTS this screen (App.tsx renders exploration vs vendor by
+  // a flag), so a local flag was lost on the round-trip and the chip popped back on
+  // return.
+  // OTA-1052 — the scope is the macro TILE, not the room (reversing arb154's
+  // room-keyed shape). Owner: "the crucible once dismissed can stay dismissed until
+  // we leave the capital tile and come back" — a capital is a dozen rooms on ONE
+  // tile, so a room-keyed dismiss re-showed the chip on every interior hop. Leaving
+  // the tile clears the key in beginScene, so a return visit shows it again.
+  const chipViewKey = chipDismissTileKey(player);
   const crucibleDismissedKey = useGameStore((s) => s.crucibleChipDismissedKey);
   const setCrucibleChipDismissedKey = useGameStore((s) => s.setCrucibleChipDismissedKey);
-  const crucibleDismissed = !!crucibleDismissedKey && crucibleDismissedKey === crucibleViewKey;
+  const crucibleDismissed = !!crucibleDismissedKey && crucibleDismissedKey === chipViewKey;
+  const vendorDismissedKey = useGameStore((s) => s.vendorChipDismissedKey);
+  const setVendorChipDismissedKey = useGameStore((s) => s.setVendorChipDismissedKey);
+  const vendorChipDismissed = !!vendorDismissedKey && vendorDismissedKey === chipViewKey;
   const [takeOpen, setTakeOpen] = useState(false);
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
@@ -231,13 +234,13 @@ export function ExplorationScreen() {
     const t = setTimeout(() => setDoorModalVisible(true), 450);
     return () => clearTimeout(t);
   }, [doorBeatOpen]);
-  // 2026-05-25 — branded vendor-leave prompt (POLISH-4). Replaces
-  // the native Alert that was breaking the dark+amber palette. Holds
-  // {vendorName, pendingText} so confirmation dispatches the
-  // originally-typed move command.
-  const [vendorLeavePrompt, setVendorLeavePrompt] = useState<
-    { vendorName: string; pendingText: string } | null
-  >(null);
+  // OTA-1052 — the vendor-leave prompt (POLISH-4, 2026-05-25) is GONE. It gated
+  // every cardinal move while a vendor stood in the scene — and a capital's room
+  // hops ARE cardinal moves, so walking Workshop → Armory asked "leave Tarek
+  // behind?" every single time (owner: "it just feels disorganized... we don't
+  // need the stay or leave popup when we switch rooms"). Vendors are anchored to
+  // their rooms (hub anchorNpc), so walking back in finds them exactly where they
+  // were; the chip's ✕ is the deliberate way to wave one off.
   // OTA-180 — feedbackOpen state dropped alongside the 📝 button.
   // OTA 223 — transient "COPIED" flash on the FULL LOG button so
   // the tap-to-copy shortcut gives visible confirmation without a
@@ -695,19 +698,39 @@ export function ExplorationScreen() {
           top is redundant and breaks the walked-into-a-building feel. Suppress
           it while inside a building; the stall's own Trade + Crucible actions
           render inside the room instead (block just below). */}
-      {currentScene?.vendor && !inCombat && !activeBuildingId && currentScene?.location?.id !== 'hidden_market' && (
+      {/* OTA-1052 — ONE compact row for everything standing in this place: the
+          trader, the board, a wanderer, the Crucible. Owner (at Asgardar): "having
+          the map line, the weather line, the vendor line and the fuse line takes up
+          a lot of screen real estate at a capital." Each was a full-width two-line
+          banner; they now sit two-across as short chips, so four stacked banners
+          become one row and the feed keeps the height. */}
+      <View style={styles.placeChipRow}>
+      {currentScene?.vendor && !inCombat && !activeBuildingId && !vendorChipDismissed && currentScene?.location?.id !== 'hidden_market' && (
         <TouchableOpacity
-          style={styles.vendorBanner}
+          style={[styles.placeChip, styles.vendorChip]}
           onPress={() => setScreen('vendor')}
           activeOpacity={0.7}
           accessibilityRole="button"
         >
           <View style={styles.vendorBannerStripe} />
-          <View style={styles.vendorBannerBody}>
-            <Text style={styles.vendorBannerName}>{currentScene.vendor.name}</Text>
-            <Text style={styles.vendorBannerHint}>tap to approach · {currentScene.vendor.offers.length} offers</Text>
+          <View style={styles.placeChipBody}>
+            <Text style={styles.vendorBannerName} numberOfLines={1}>{currentScene.vendor.name}</Text>
+            <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.vendor.offers.length} offers · tap to trade</Text>
           </View>
-          <Text style={styles.vendorBannerArrow}>›</Text>
+          {/* OTA-1052 — ✕ on the trader, matching the Crucible's. Nested touchable
+              handles its own tap (doesn't open the stall). Hides the chip for this
+              tile only: the vendor stays anchored to the room, so walking back in
+              — or typing "trade" — still reaches them. */}
+          <TouchableOpacity
+            style={styles.placeChipX}
+            onPress={() => setVendorChipDismissedKey(chipViewKey)}
+            hitSlop={10}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Dismiss ${currentScene.vendor.name}`}
+          >
+            <Text style={styles.vendorChipX}>✕</Text>
+          </TouchableOpacity>
         </TouchableOpacity>
       )}
 
@@ -722,17 +745,17 @@ export function ExplorationScreen() {
           so a brand-new character has an immediate quest on-ramp. */}
       {currentScene?.missionBoard && missionBoardHasPostings && (
         <TouchableOpacity
-          style={styles.missionBoardBanner}
+          style={[styles.placeChip, styles.missionBoardChip]}
           onPress={() => setMissionBoardOpen(true)}
           activeOpacity={0.7}
           accessibilityRole="button"
         >
           <View style={styles.missionBoardStripe} />
-          <View style={styles.vendorBannerBody}>
-            <Text style={styles.missionBoardName}>⚑ MISSION BOARD</Text>
-            <Text style={styles.vendorBannerHint}>tap to view &amp; accept postings</Text>
+          <View style={styles.placeChipBody}>
+            <Text style={styles.missionBoardName} numberOfLines={1}>⚑ MISSION BOARD</Text>
+            <Text style={styles.placeChipHint} numberOfLines={1}>tap to view postings</Text>
           </View>
-          <Text style={styles.missionBoardArrow}>›</Text>
+          <Text style={styles.placeChipArrow}>›</Text>
         </TouchableOpacity>
       )}
 
@@ -742,17 +765,17 @@ export function ExplorationScreen() {
           standing nudge). Hidden in combat. */}
       {currentScene?.wanderer && !inCombat && (
         <TouchableOpacity
-          style={styles.wandererBanner}
+          style={[styles.placeChip, styles.wandererChip]}
           onPress={() => submit(`talk to ${currentScene.wanderer!.name}`)}
           activeOpacity={0.7}
           accessibilityRole="button"
         >
           <View style={styles.wandererStripe} />
-          <View style={styles.vendorBannerBody}>
-            <Text style={styles.wandererName}>☺ {currentScene.wanderer.name}</Text>
-            <Text style={styles.vendorBannerHint}>{currentScene.wanderer.role} · tap to speak</Text>
+          <View style={styles.placeChipBody}>
+            <Text style={styles.wandererName} numberOfLines={1}>☺ {currentScene.wanderer.name}</Text>
+            <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.wanderer.role} · tap to speak</Text>
           </View>
-          <Text style={styles.wandererArrow}>›</Text>
+          <Text style={styles.placeChipArrow}>›</Text>
         </TouchableOpacity>
       )}
 
@@ -807,32 +830,35 @@ export function ExplorationScreen() {
         // A location forge is free via 'fuse' (a vendor's paid Crucible lives in the
         // vendor screen now).
         const fireCrucible = () => useGameStore.getState().submitPlayerAction('fuse');
-        const readyName = '★★ Fusing Crucible ready';
-        const readyHint = 'tap to fuse · spends your ♥ reserved items';
+        const readyName = '★★ Crucible ready';
+        const readyHint = 'tap to fuse · spends ♥ items';
         return (
         <TouchableOpacity
-          style={styles.fusionBanner}
+          style={[styles.placeChip, styles.fusionChip]}
           onPress={fireCrucible}
           activeOpacity={0.7}
           accessibilityRole="button"
         >
           <View style={styles.fusionBannerStripe} />
-          <View style={styles.vendorBannerBody}>
-            <Text style={styles.fusionBannerName}>
-              {gate.ok ? readyName : '★★ Fusing Crucible · needs prep'}
+          <View style={styles.placeChipBody}>
+            <Text style={styles.fusionBannerName} numberOfLines={1}>
+              {gate.ok ? readyName : '★★ Crucible · needs prep'}
             </Text>
-            <Text style={styles.vendorBannerHint}>
+            {/* OTA-220's reason line survives the OTA-1052 squeeze: the READY case
+                is a one-liner, but a BLOCKED Crucible still spells out what's
+                missing (a player once tapped fuse 5× not knowing). */}
+            <Text style={styles.placeChipHint} numberOfLines={gate.ok ? 1 : 2}>
               {gate.ok
                 ? readyHint
                 : (gate.reason ?? 'tap for details')}
             </Text>
           </View>
-          {/* arb152 — dismiss the Crucible chip for this visit if you don't need
-              it. Nested touchable handles its own tap (doesn't fire the fuse);
-              'fuse' can still be typed, and re-entering re-shows the chip. */}
+          {/* arb152 — dismiss the Crucible chip if you don't need it. Nested
+              touchable handles its own tap (doesn't fire the fuse); 'fuse' can
+              still be typed, and OTA-1052 leaving the tile re-shows the chip. */}
           <TouchableOpacity
-            style={styles.crucibleDismiss}
-            onPress={() => setCrucibleChipDismissedKey(crucibleViewKey)}
+            style={styles.placeChipX}
+            onPress={() => setCrucibleChipDismissedKey(chipViewKey)}
             hitSlop={10}
             activeOpacity={0.7}
             accessibilityRole="button"
@@ -843,6 +869,7 @@ export function ExplorationScreen() {
         </TouchableOpacity>
         );
       })()}
+      </View>
 
       {/* OTA-777 — the torch is a small quick-use button in the bottom action
           row (see InputBox `torch` QuickBtn), NOT a top banner. */}
@@ -890,24 +917,11 @@ export function ExplorationScreen() {
           )}
           <InputBox
             onSubmit={(text) => {
-              // 2026-05-25 [POLISH-4] — warn before leaving a vendor.
-              // When a cardinal direction or 'continue travel' submit
-              // comes through while a vendor banner is on the scene,
-              // prompt the player "leave [vendor]?" before actually
-              // moving. Yes → submit (stepDirection clears vendor on
-              // next-tile move); No → cancel the move, vendor stays
-              // visible. Typed direction commands ("n", "go north")
-              // are caught by the regex too. Anti-nag toggle is a
-              // follow-up (file as ANTINAG-1).
-              const vendor = currentScene?.vendor;
-              const isMove = /^(go\s+|head\s+|walk\s+|move\s+)?(north|south|east|west|northeast|northwest|southeast|southwest|n|s|e|w|ne|nw|se|sw|continue|continue travel|onward)$/i.test(text.trim());
-              if (vendor && isMove) {
-                // 2026-05-25 — branded modal (BrandedModal below)
-                // replaces the OS Alert. Same yes/no/dismiss shape;
-                // matches the rest of the game's popup palette.
-                setVendorLeavePrompt({ vendorName: vendor.name, pendingText: text });
-                return;
-              }
+              // OTA-1052 — no vendor-leave gate. Every cardinal move used to be
+              // intercepted while a vendor stood in the scene, which meant every
+              // capital ROOM hop (the room chips submit "go <dir>") asked whether
+              // to leave the trader behind. Vendors stay anchored to their rooms;
+              // the chip's ✕ is the way to dismiss one.
               submit(text);
             }}
             onOpenInventory={() => setScreen('inventory')}
@@ -1293,8 +1307,8 @@ export function ExplorationScreen() {
           full thread arc without fighting the scrim; LATER replaced
           with ABANDON (which marks the hook resolved — explicit
           walk-away). OTA-1030 — the terminal stage shows COMPLETE
-          alone; it dismisses the arc and THEN raises the held
-          completion popup (dismissHookContinue). */}
+          alone (dismissHookContinue). OTA-1050 — no follow-up popup;
+          the modal's own reward strip shows the payout. */}
       <HookContinueModal
         visible={pendingHookContinue !== null}
         noun={pendingHookContinue?.noun ?? ''}
@@ -1563,6 +1577,8 @@ export function ExplorationScreen() {
       <FusionPickerModal />
       <FusionBlockedModal />
       <MissionCompleteModal />
+      {/* OTA-1046 — the opening crawl moved to App.tsx's GLOBAL overlay
+          stack so REPLAY OPENING plays over any screen. */}
 
       {/* OTA-808 — the two-button parley chooser (self-mounts off pendingParley). */}
       <ParleyModal />
@@ -1715,31 +1731,6 @@ export function ExplorationScreen() {
           },
         ]}
         onRequestClose={() => chooseTutorialExplore()}
-      />
-
-      <BrandedModal
-        visible={vendorLeavePrompt !== null}
-        title="Vendor present"
-        body={vendorLeavePrompt
-          ? `${vendorLeavePrompt.vendorName} is still set up here. Leave them behind and move on?`
-          : undefined}
-        buttons={[
-          {
-            label: 'Stay',
-            onPress: () => setVendorLeavePrompt(null),
-            tone: 'neutral',
-          },
-          {
-            label: 'Move on',
-            onPress: () => {
-              const text = vendorLeavePrompt?.pendingText ?? '';
-              setVendorLeavePrompt(null);
-              if (text) submit(text);
-            },
-            tone: 'primary',
-          },
-        ]}
-        onRequestClose={() => setVendorLeavePrompt(null)}
       />
 
       {/* arb-fix — equipped faction catalyst confirmation. When the only
@@ -2021,51 +2012,43 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1.5,
   },
-  vendorBanner: {
+  // OTA-1052 — the "what's standing here" chip system. Was four full-width,
+  // two-line, 44px-tall banners stacked down the screen (trader / board /
+  // wanderer / Crucible); at a capital that ate the feed. They now share one
+  // wrapping row two-across: same information, ~a third of the height. Each keeps
+  // its own accent colour so the family stays readable at a glance.
+  placeChipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 5 },
+  placeChip: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
     borderWidth: 1,
     borderRadius: 4,
     overflow: 'hidden',
-    minHeight: 44,
+    minHeight: 34,
+    flexGrow: 1,
+    flexBasis: '47%',
+    minWidth: 150,
   },
+  placeChipBody: { flex: 1, paddingHorizontal: 7, paddingVertical: 3, minWidth: 0 },
+  placeChipHint: { color: '#a2977b', fontSize: 9, letterSpacing: 0.5, marginTop: 1 },
+  placeChipArrow: { color: '#8a8070', fontSize: 16, paddingHorizontal: 7 },
+  placeChipX: { paddingHorizontal: 9, paddingVertical: 7, alignSelf: 'center' },
+  vendorChip: { borderColor: '#c9a86a' },
+  missionBoardChip: { borderColor: '#8b7355' },
+  wandererChip: { borderColor: '#6e8f4e' },
+  fusionChip: { borderColor: '#b88ce0' },
+  vendorChipX: { color: '#8a7448', fontSize: 15, fontWeight: '800' },
   vendorBannerStripe: { width: 4, backgroundColor: '#c9a86a', alignSelf: 'stretch' },
-  vendorBannerBody: { flex: 1, paddingHorizontal: 10, paddingVertical: 6 },
-  vendorBannerName: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
-  vendorBannerHint: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginTop: 1 },
-  vendorBannerArrow: { color: '#c9a86a', fontSize: 22, paddingHorizontal: 12 },
+  vendorBannerName: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
   // OTA-451 — Mission Board chip. Parchment/brown accent to distinguish from the
   // vendor's amber and the Crucible's purple.
-  missionBoardBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#13110f',
-    borderColor: '#8b7355',
-    borderWidth: 1,
-    borderRadius: 4,
-    overflow: 'hidden',
-    minHeight: 44,
-  },
   missionBoardStripe: { width: 4, backgroundColor: '#8b7355', alignSelf: 'stretch' },
-  missionBoardName: { color: '#b89a6a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
-  missionBoardArrow: { color: '#8b7355', fontSize: 22, paddingHorizontal: 12 },
+  missionBoardName: { color: '#b89a6a', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
   // OTA-807 — Wandering NPC banner. Soft green stripe (a friendly, social beat) to
   // set it apart from the vendor gold and mission-board brown.
-  wandererBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#12140f',
-    borderColor: '#6e8f4e',
-    borderWidth: 1,
-    borderRadius: 4,
-    overflow: 'hidden',
-    minHeight: 44,
-  },
   wandererStripe: { width: 4, backgroundColor: '#6e8f4e', alignSelf: 'stretch' },
-  wandererName: { color: '#9ec96a', fontSize: 13, fontWeight: '700', letterSpacing: 0.5 },
-  wandererArrow: { color: '#6e8f4e', fontSize: 22, paddingHorizontal: 12 },
+  wandererName: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
   // OTA-217 — Crucible permit banner. Purple stripe to differentiate
   // from the vendor banner's amber, matching the OTA-199 Rare rarity
   // color so the visual signal reads "rare event, act now."
@@ -2074,21 +2057,10 @@ const styles = StyleSheet.create({
   // it reads as a sibling of the quest box / vendor banner rather than a
   // detached, narrower chip. Mirrors `vendorBanner`'s box model; only the
   // purple accent colour distinguishes it.
-  fusionBanner: {
-    backgroundColor: '#13110f',
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#b88ce0',
-    borderWidth: 1,
-    borderRadius: 4,
-    overflow: 'hidden',
-    minHeight: 44,
-  },
   fusionBannerStripe: { width: 4, backgroundColor: '#b88ce0', alignSelf: 'stretch' },
-  fusionBannerName: { color: '#b88ce0', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  fusionBannerName: { color: '#b88ce0', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
   // arb152 — dismiss (✕) on the Fusing Crucible chip.
-  crucibleDismiss: { paddingHorizontal: 14, paddingVertical: 8, alignSelf: 'center' },
-  crucibleDismissText: { color: '#8a6fa8', fontSize: 16, fontWeight: '800' },
+  crucibleDismissText: { color: '#8a6fa8', fontSize: 15, fontWeight: '800' },
   placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
 });
 

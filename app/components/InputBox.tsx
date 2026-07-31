@@ -829,7 +829,7 @@ function TravelBtn({ label, onPress, blocked, active }: { label: string; onPress
         numberOfLines={isDestination ? 2 : 1}
         ellipsizeMode="tail"
         adjustsFontSizeToFit={!isDestination}
-        minimumFontScale={0.55}
+        minimumFontScale={0.8} // OTA-1048 — was 0.55; below ~80% room names stop being readable
       >
         {active ? `▸ ${label}` : label}
       </Text>
@@ -877,9 +877,16 @@ const styles = StyleSheet.create({
   bandolierInRange: { borderColor: '#4f7a3a' },
   bandolierOutOfRange: { borderColor: '#7a2f2f', backgroundColor: '#241211' },
   bandolierOutOfRangeLabel: { color: '#c45b4a' },
-  travelRow: { flexDirection: 'row', gap: 6, marginBottom: 6 },
+  // OTA-1048 — WRAP, don't shrink. Five equal-width slots on a phone left
+  // ~80pt per button and adjustsFontSizeToFit took "MATERIALS" down to
+  // 55% font — unreadable (owner, in Asgardar: "the text is too small to
+  // read"). The row now wraps onto a second line once buttons would drop
+  // under ~92pt, and the shrink floor is raised so text stays legible.
+  travelRow: { flexDirection: 'row', gap: 6, marginBottom: 6, flexWrap: 'wrap' },
   travelBtn: {
-    flex: 1,
+    flexGrow: 1, // OTA-1048 — grow to fill, but never below minWidth (wrap instead)
+    flexBasis: '22%',
+    minWidth: 92,
     backgroundColor: '#1a1714',
     borderColor: '#5a4a2e',
     borderWidth: 1,

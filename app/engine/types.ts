@@ -979,6 +979,26 @@ export interface PlayerCharacter {
   name: string;
   raceId: string;
   factionId: string;
+  /** OTA-1041 — THE REASON YOU CAME DOWN. One of engine/story's five motive
+   *  ids (debt / missing / exile / calling / record). Picked at character
+   *  creation; saves that predate the feature are dealt one deterministically
+   *  in backfillPlayer so phase-2/3 story beats stay stable per character. */
+  storyMotive?: string;
+  /** OTA-1041 — the opening crawl was seen (or skipped). Old saves are
+   *  backfilled to true so the intro never ambushes an existing character. */
+  storyIntroSeen?: boolean;
+  /** OTA-1045 — TRUE when the player themselves picked this character's
+   *  motive (creation step 3, or the one-time veteran picker). FALSE/absent
+   *  = the motive was dealt by backfill and the load path owes the player
+   *  one "why did you come down?" ask. */
+  storyMotiveChosen?: boolean;
+  /** OTA-1044 — motive-drip beat ids already delivered to the feed (strict
+   *  order, one-shot each; see engine/storyDrip.ts). Absent = none yet. */
+  storyBeatsSeen?: string[];
+  /** OTA-1044 — how The Missing side-thread ended for this character
+   *  ('grave' | 'lie' | 'walker'), set when the resolution fires. Also keys
+   *  the EndingScreen epilogue override. Absent = trail still open. */
+  missingResolved?: string;
   stats: Stats;
   hp: number;
   hpMax: number;

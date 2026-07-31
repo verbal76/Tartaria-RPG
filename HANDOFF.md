@@ -839,6 +839,22 @@ Key invariants worth knowing:
   up when the user asks. `Dev_engine_PC` tracks `engine_Dev` (not Tartaria) and was
   left alone; `arbiters-line` is retired. Native/desktop/web builds were NOT
   compiled in the SDK container — verify via each line's build workflow.
+  **⚠ MANDATORY STEP THE RECIPE WAS MISSING (learned the hard way 2026-07-29):
+  after every `merge -X theirs`, REGENERATE THE SPIN-OFF'S package-lock.json**
+  (`npm install --package-lock-only`, verify with `npm ci --dry-run`), then commit
+  it with the merge. `-X theirs` resolves conflicts in HAL's favour and
+  package-lock.json conflicts WHOLESALE, so each spin-off silently inherited HAL's
+  lock — which has no `react-native-web` tree — while keeping its own package.json
+  that declares `react-native-web ~0.19.13`. `npm ci` refuses an out-of-sync lock,
+  so ALL FIVE CI jobs on steam_Dev / mac_dev / linux_dev / html_dev died at install
+  on 8 missing transitives (normalize-colors, inline-style-prefixer, memoize-one,
+  postcss-value-parser, styleq, css-in-js-utils, fast-loops, hyphenate-style-name)
+  before running a single test. `apple_ios` was unaffected — it declares no
+  react-native-web. The platform BUILD workflows stayed GREEN throughout because
+  they use `npm install` (reconciles the lock) not `npm ci` (demands a match), so
+  the breakage was invisible in the artifact that matters and only showed as a red
+  CI check. Fixed on all four (lock 1145 → 1157 packages, no declared dependency
+  changed). Restore the 4 app.json identity values AND the lock every time.
 - **golem CI hygiene (done)** — the dead inherited `eas-update.yml` (HAL's
   multi-channel publisher) was deleted from `golem-line`; golem now has ONLY its
   isolated `eas-update-golem.yml`. Don't re-add a HAL publisher to any line.
@@ -850,19 +866,447 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-27-1016`**,
-**golem-line `2026-07-27-993`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1061`**,
+**golem-line `2026-07-31-1038`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
-ported FROM engine_Dev, not to it).
+ported FROM engine_Dev, not to it))
 
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.46**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.72**; ledger in `VERSION.md`.
 
-- **THE LEAK THAT ATE THE SIMS — ROOT-CAUSED AND KILLED (2026-07-28, latest).** HAL **1035**
+- **THE CRAFT LIST SAYS WHICH SLOT (2026-07-31, latest). BOTH LINES.**
+  HAL **1061** / golem **1038**. Owner: "under the craft tab for armor, it needs to list
+  what slot its for. some of the names don't explain it. it took me a few minutes to find
+  something in the hand slot."
+  The catalog knew all along — `previewArmor` has built `kindLabel: "Hands Armor"` since it
+  was written — but the craft row only ever rendered the STATS line, so the slot never
+  reached the screen. Measured, guessing from the name fails often: of the 90 distinct
+  nouns armor names end in, **17 are used by more than one slot**. "Greaves" is legs AND
+  feet; "mantle", "vest", "jacket" and "coat" are each split between chest and cloak;
+  "cloak" itself appears on chest pieces. A test asserts that ambiguity, so the label can
+  only become redundant by a deliberate rename rather than by accident.
+  TWO HALVES, because the owner's sentence has two. LABELLING fixes reading it: every
+  armor row gets a "HANDS SLOT" line above the stats, spaced-caps grey so it reads as a
+  label rather than another stat and the eye can run the column without reading names.
+  SEARCH fixes FINDING it: typing "hands" narrows 293 armor pieces to the 41 you can wear
+  there. The name match is untouched — the slot is an ADDITION to the filter, not a swap.
+  ⚠ PLUMBING NOTE: `ItemPreview` gains `slot?: string`. The slot was already present, but
+  only as PROSE inside `kindLabel`, so any caller wanting to show or filter by it had to
+  parse English back out of a label. Read the field, don't regex the label. Fused pieces
+  carry theirs too (`u.armorSlot`) — a fusion re-rolls the numbers, never the slot.
+  Locked by ota1061/1038CraftArmorSlot (9 tests per line, incl. a sweep asserting every
+  catalogue piece reports its real slot and that non-armor reports none).
+
+- **THE DOUBLE-DIAMOND PAYOFF GETS A CARD (2026-07-31). BOTH LINES.**
+  HAL **1060** / golem **1037**. Owner asked whether the ✦✦ items read right on the
+  awards popup. The TEXT was fine. The finding was that the one line written that way could
+  never reach a popup at all: `assembleBeaconRifle` fires from a USE-ITEM path, nowhere
+  near the boss-defeat capture window, so the payoff for all five great climbs — a
+  Legendary weapon plus seven Legendary/Rare materials, the end of the entire Skyreacher
+  chain — announced itself with a single feed line, exactly the way a mud cloth does. That
+  is precisely the failure OTA-1010 was written to prevent ("I didn't even realize I
+  completed the mission"), and the doubled ✦✦ was the only thing marking it as bigger.
+  It now raises a card of its own: the crack-open narration and the Arbiter's line as
+  story, then the rifle and every granted material as the take.
+  ⚠ THE FEED LINES ARE UNCHANGED, deliberately — the log stays a complete record, same
+  rule as every other announcement since OTA-1010. Anything that greps the log keeps
+  working.
+  The VICTORY card from 1058/1035 was already the right shape, so it is GENERALIZED rather
+  than copied: `raiseSpotlightNotice(heading, title, flavor, rewards)` is the one
+  implementation and `raiseBossVictoryNotice` is a three-line delegate passing 'VICTORY'.
+  A spotlight already had the behaviour this needed — gold instead of mission green, a
+  custom kicker, story above the take, and the merge rule that stops an unrelated job
+  completing underneath it from clobbering the card.
+  ⚠ USE A SPOTLIGHT FOR A MILESTONE, NOT A PICKUP. A test asserts the rifle is still the
+  ONLY line in the store written with ✦✦, so a second double-diamond payout fails the
+  build until someone decides whether it deserves a card too.
+  Locked by ota1060/1037SpotlightCard (6 tests per line).
+
+- **ONE THING, ONE BULLET ON THE VICTORY CARD (2026-07-31). BOTH LINES.**
+  HAL **1059** / golem **1036**. Follow-up to 1058/1035, found by walking the owner's
+  Iskan-Veil log line by line against the card that OTA had just built — he asked what that
+  kill would actually have shown, and reading the answer surfaced the defect. The Core
+  Guardian gear drop is ONE reward line carrying both pieces with a ✦ between them
+  (`✦ Veilkeeper Blades taken from X. ✦ Grey Leather of Iskan-Veil taken from X.`), and
+  `mergeRewardLines` stripped only a LEADING ✦ — so it landed as a single bullet with a
+  stray marker sitting in the middle of it. It now splits ON the marker.
+  ⚠ THE `✦✦` FLOURISH IS EMPHASIS, NOT A SEPARATOR — the Beacon Rifle line opens with two.
+  Splitting on `/✦+/` and dropping empty pieces keeps it as one entry; a naive split on a
+  single `✦` would have turned it into a blank bullet plus the real one. Locked by test.
+  Applies to the plain mission notice too — one choke point, one rule. Cosmetic only:
+  nothing about what is granted, what is logged, or when the card appears changes.
+  Locked by ota1059/1036RewardBullets (5 tests per line).
+
+- **A FACTION SOLDIER IS A PERSON + THE BATTLE FOLLOW-UP IS A CARD (2026-07-31). BOTH LINES.**
+  HAL **1058** / golem **1035**. Two owner items off the Asgardar / Iskan-Veil log.
+  • **HUMANS DROPPING BEAST LOOT.** Owner: "let's fix the loot drop issue where humans
+    drop beast loot." A faction party is BUILT, not authored — `injectFactionParty`
+    reskins a roster entry (rename, stamp a factionId) — and outdoors that entry was
+    whatever the WILD table rolled for the tile. A "Conspiracy Architects Patrol" could
+    be a Mud Cyclops underneath: 202 HP, tinder-dry to fire, swinging a beak, dropping
+    Raven Feather and Aether Wing off a man's corpse. OTA-1056 fixed the INDOOR half by
+    only ever dressing a human body; that list moved to `app/engine/factionBodies.ts` and
+    the outdoor builder now shares it. **The wild roll still decides HOW MANY and at what
+    RARITY** — the tile's danger still governs — it just no longer decides what a soldier
+    is made of.
+    ⚠ DIFFICULTY IS UNMOVED, and the reason matters if you touch this:
+    `scaleEncounterForContext` anchors a pack on its MEAN HP against the tile's danger,
+    not on the template's authored numbers. What the body actually decides is the loot,
+    the resist profile and the attack name. The roster holds six humans and NONE at
+    Common, so `pickFactionBody(rarity, { nearest: true })` borrows the cheapest
+    (Uncommon) rather than handing the raid back to a beast — a patrol is people at
+    every tier by definition. Indoors keeps the strict form (no `nearest`) because there
+    a Common-tier intruder really is a rat.
+  • **THE BATTLE FOLLOW-UP.** Owner, after a Core Guardian kill: "if the whole giants and
+    vigil thing was the player's reasons flavor text it needs to be last so it will be
+    read, it gets pushed up screen and missed. it should be a pop-up I think. the battle
+    follow up should be, it should have the flavor text, and the rewards on it." A boss
+    kill fires eight-plus lines from FIVE modules in one tick — spoils, hard-won material,
+    TC, the dying words, the signature gear, the Core, the faction's reaction — and the
+    story beat lands in the middle, then gets shoved off screen by the reward lines behind
+    it. Reordering five call sites would lose the same argument again next time something
+    is added, so instead a capture window opens for the duration of `resolveEnemyDefeat`
+    and everything the fight produced goes on ONE card: story first, then THE TAKE.
+    ⚠ THE WINDOW IS STRICTLY SYNCHRONOUS, and that is what keeps it clean — the canned
+    post-kill Arbiter beat ("Make the next strike count for two") comes from
+    `narrateViaArbiter`, an async path that cannot resume until this call stack is gone,
+    so it can never land on the card. Anything that arrives LATE has to be pushed on by
+    name, which is what the Resurrection Gem does. Bosses only; a rat gets no popup.
+    Reuses MissionCompleteModal (gold not green, a VICTORY kicker, a 60s safety valve
+    since there is prose to read), and a job finished in the same fight MERGES into the
+    card rather than raising a second popup that fights it for the screen.
+  Locked by ota1058/1035FactionBodiesVictoryCard (15 tests) + ota1058/1035BossVictoryCardRuntime
+  (5 tests, driving a real defeat through the real store — including a check that the
+  window SHUT and that an ordinary kill raises nothing).
+
+- **AETHER MUD ON THE SHELF + THE AMBIENT ∅ NAMES ITS CULPRIT (2026-07-31). BOTH LINES.**
+  HAL **1057** / golem **1034**. Two items.
+  • **MUD SUPPLY.** Owner: "did we work on getting limited amounts of aether mud to named
+    vendors for sale". We had not — this is new. A Mud Golem costs 2 Aether Mud per summon
+    and NOT ONE vendor stocked it; the only material any named vendor sold was Patched
+    Cloth, so foraging was the sole route to a golem. Six named sellers now carry it:
+    Halem the Trader (6 TC), Tellin Mak (6), Tarek the Tinkerer (7 — he already sells the
+    Golem Controller Ring), Naha (7), Veska of the Hollow (5 — Mud Monarchs), Foreman
+    Drest Holloway (6 — Stone Builders). Deliberately spread so no single counter and no
+    single faction gates golem fuel.
+    ⚠ ONLY VENDORS WITH AUTHORED OFFERS ARE ELIGIBLE. Twelve entries in `vendors.json`
+    carry `offers: []` and are stocked dynamically at runtime — an offer added to one of
+    those is silently overwritten. Korr Stonefoot and Mara Stoneskin were in the first
+    draft of this list for exactly that reason; a test now asserts every mud seller has an
+    authored list.
+    LIMITED IS ENFORCED, NOT INTENDED: materials otherwise roll 1-10 per visit (five
+    golems' worth off one counter), so `SCARCE_STOCK` in `vendors.ts` gives 'aether mud'
+    2-5 and is consulted BEFORE the food/material bands. One summon guaranteed, two at
+    best. Stock re-rolls per vendor INSTANCE, so the shelf refills between visits without
+    ever being deep. Add future scarce items to that table, not to the roll body.
+  • **AMBIENT ∅ — A CORRECTION, THEN INSTRUMENTATION.** OTA-1054/1031 claimed the
+    ambient companion aside was fixed. It was not: the owner's next log, on build 4.28.66
+    which CARRIES that fix, still reads `arbiter: ambient ∅ 55801ms`. Verified along the
+    way that `trimToLastSentence` and `clampSentences` both fall back to raw text, so
+    neither is the culprit — but the ∅ line has never said which of the five filters ate
+    the line, or whether the model returned anything at all, which is precisely why the
+    last fix was a guess. The empty path now logs `reason=` (model-returned-nothing /
+    cleaners-emptied-it / third-person / they-opener / action-opener / instruction-echo /
+    off-canon-entity / near-duplicate-of-recent) plus the raw output's first 120 chars.
+    Debug channel ONLY — a test asserts the block cannot append to arbiter or world — and
+    generation is untouched. The next pasted log names the filter outright.
+  Locked by ota1034/1057MudSupply (12 tests per line), including a shelf check that goes
+  through `findVendorByName` for all six sellers rather than the roll helper alone.
+
+- **RAIDERS, SOLDIERS + AETHERKIN INDOORS (2026-07-30). BOTH LINES.**
+  golem **1033** / HAL **1056**. Owner asked the indoor cast to cover raiders, soldiers and
+  Aetherkin explicitly. Audit result: AETHERKIN already complete — all five roster entries —
+  and now locked by a test that READS enemies.json and demands the indoor list equal the
+  full `Aetheric Undead` set, so adding one to the roster without listing it fails CI.
+  RAIDERS were in at Uncommon only. SOLDIERS were the real gap: the roster holds six humans
+  TOTAL and exactly one martial one below Legendary, so a name-list can't carry "a rival
+  faction broke in" at every tier. Fixes: (a) Mud Monarch Purifier joins the Rare pool;
+  (b) `pickIndoorFactionIntruder()` BUILDS raiders/soldiers by dressing a same-rarity HUMAN
+  body in the colours of the faction with the worst (negative) standing — "Mud Monarchs
+  Raider", "Stone Builders Soldier". Contrast with the outdoor `injectFactionParty`, which
+  reskins whatever the WILD table rolled and can therefore put a soldier's name on a
+  cyclops statline (OTA-1038 fixed only the Aetherkin half of that); the indoor builder
+  only ever dresses a human. ~50% of indoor ambushes are people now. Common deliberately
+  has no faction body — the cheapest human is Uncommon, and a Common-tier intruder in a
+  fortified capital is a rat, not a soldier. Locked by ota1033/1056IndoorCastGroups
+  (9 tests per line).
+
+- **INDOOR AMBUSH CAST + FASTER QWEN RECOVERY (2026-07-30). BOTH LINES.**
+  golem **1032** / HAL **1055**. Two owner asks off the Asgardar log. (a) CAST: a
+  rest-ambush drew from the WILDERNESS table wherever you slept — hence a Rare 202-HP Mud
+  Cyclops in the Builders' crew bunks, narrated as if it crossed open country. The odds
+  were already right (hub rest 8% vs wilds 22%); the cast was wrong. New
+  `app/engine/indoorAmbush.ts` holds a rarity-keyed indoor cast — intruders, vermin,
+  patrol machines, the Aetherkin sealed in the walls — and the rest handler swaps the pick
+  for a SAME-RARITY indoor one under a roof, so difficulty is untouched. Both beats are
+  re-voiced indoors ("circled" / "closes the distance" are open-ground images). The roof
+  test REUSES the enclosing action scope's `underRoof`, which excludes
+  `OPEN_AIR_HUB_ROOMS` — the gate, square and culvert descent stay exposed, so something
+  can still walk in off the mud where the outpost opens to the sky. Note the module-level
+  `underRoof(s, player)` FUNCTION is shadowed by that local boolean inside
+  submitPlayerAction; calling the function there is a type error (it bit this OTA).
+  (b) WATCHDOG: the flat 60s poll meant every step of recovery waited a full tick (~2 min
+  of canned templates in the log). Now adaptive — `QWEN_WATCHDOG_HEALTHY_MS` 60s vs
+  `QWEN_WATCHDOG_RECOVERING_MS` 5s, driven by `runQwenHealthCheck()`'s boolean — plus an
+  `AppState` 'active' hook, because dormancy is CAUSED by backgrounding and the app knows
+  the instant it returns. Locked by ota1032/1055IndoorAmbushWatchdog (10 tests per line,
+  incl. a rarity-parity check and an explicit deny-list for the open-country megafauna).
+
+- **AMBIENT COMPANION REVIVED (2026-07-30). BOTH LINES.** golem **1031** /
+  HAL **1054**. Found reading the owner's Asgardar logs, not from a report: every ambient
+  generation ends `arbiter: ambient ∅` (75627ms in one log, 26173ms in the next) and never
+  once `ambient ✓`, across two builds. It was a CONTRADICTION, not bad luck — the shared
+  `VOICE_RULES` order the model *"Sentences must START with \"You\" or \"Your\""*, and the
+  ambient filter then dropped every sentence starting with "You". The path discarded its
+  own output by construction. And it isn't free: ambient holds the SHARED `isGenerating`
+  lock, so up to 75s of guaranteed-discarded work is 75s the REACTIVE Arbiter can't
+  narrate in — the `reason=cooldown` templates clustered around those ∅ entries are that.
+  Fix: `isSecondPersonActionOpener()` filters on REGISTER instead of the pronoun. An
+  action opener ("You step back, surveying the alleyway") is still scene-hallucination and
+  still dropped — that's the real failure the filter was written for; a reflection ("You
+  have come a long way…", "You've grown harder…") is what ambient exists to produce and
+  now survives. The reactive path never had this filter and must never get one — it is
+  supposed to narrate actions. Locked by ota1031/1054AmbientRevival (6 tests per line).
+  WATCH: no ambient line has EVER shipped to a player, so the first device session on this
+  build is the real test of whether the lines read well.
+
+- **PROMPT ECHO LEAK (2026-07-30). BOTH LINES.** golem **1030** / HAL **1053**.
+  Owner at Asgardar: a line about having walked beside "the player" a long while appeared
+  twice — "it's like someone was talking to the arbitor." It was: that sentence was the
+  literal opening of `AMBIENT_INSTRUCTION` in contextInjector, and the model recited its
+  brief instead of answering it. THE LEAK PATH IS THE STREAMING TAIL: both narration
+  paths mirrored raw model tokens into `partialArbiterText`, which ExplorationScreen
+  renders live under "The Arbiter:" — while the output filters, which only ever see the
+  FINAL assembled text, correctly dropped the echo to nothing. The log proves it
+  (`arbiter: ambient ∅`): a line the feed never recorded but the player still read for
+  the whole generation. Fixes: (a) both streams accumulate LOCALLY and stop mirroring the
+  moment `looksLikeInstructionEcho()` trips, blanking the tail to a thinking frame;
+  (b) the same detector filters the final sentences on both paths; (c) the ambient brief
+  is fully imperative now — no complete, narration-shaped second-person sentence for the
+  model to copy. IMPORTANT for anyone extending the detector: a bare imperative is NOT a
+  tell — the Arbiter really does say "Do not look behind you." and "Speak carefully.", and
+  an earlier draft of this guard silently ate all three such authored lines. It matches an
+  imperative only when aimed at a CRAFT OBJECT (a sentence, a word count, a register).
+  Locked by ota1030/1053PromptEchoLeak (14 tests per line), including a sweep of every
+  authored line in the six narration lore files (4,036 strings) asserting zero false
+  positives.
+
+- **CAPITAL TIDY-UP (2026-07-30). BOTH LINES.** golem **1029** / HAL **1052**.
+  Owner, standing in Asgardar: "it just feels disorganized, like all of the capitals do."
+  Three separate causes. (a) THE STAY/LEAVE POPUP: the POLISH-4 vendor-leave gate
+  intercepted any cardinal move while a trader was in the scene — and a capital's room
+  chips submit `go <dir>`, so every interior hop asked "leave Tarek behind?". The gate is
+  removed entirely; vendors are anchored to rooms via hub `anchorNpc`, so walking back in
+  finds them unchanged. (b) THE ✕ DIDN'T STICK: the Crucible dismiss was ROOM-keyed
+  (arb154), so it popped back next door. Both it and the NEW vendor ✕ are keyed to the
+  macro TILE via the exported `chipDismissTileKey(player)`; beginScene clears a dismiss
+  whose tile no longer matches, which is what makes "dismissed until you leave the tile
+  and come back" literally true. (c) FOUR STACKED BANNERS: trader / board / wanderer /
+  Crucible were each full-width, two-line, 44px; they now share one wrapping
+  `placeChipRow` two-across at 34px. A BLOCKED Crucible keeps its two-line reason so
+  OTA-220's "tell them what's missing" fix survives the squeeze. Locked by
+  ota1029/1052CapitalTidy (6 tests per line, incl. a runtime beginScene check that a
+  dismiss survives a room hop and clears on a real tile change).
+
+- **MUSIC CROSSFADE + CRUCIBLE UPGRADE LIST (2026-07-30). BOTH LINES.**
+  golem **1028** / HAL **1051**. Two owner items. MUSIC: AudioManager transitions are now
+  true crossfades (outgoing + incoming ramp in one epoch-guarded loop — the old
+  hard-stop-then-fade is gone). Reflective beds (explore/menu) hand over at
+  SMOOTH_FADE_MS 2200; entering boss/combat/shop is SHIFT_FADE_MS 450 so the boss and
+  market music land as a noticeable shift, and combat tiers always restart from the top.
+  The outgoing bed PAUSES IN PLACE (pauseInPlace, never stop) and resumes mid-phrase when
+  its context returns within RESUME_WINDOW_MS (4 min) — a fight or market stop no longer
+  resets the bed. Pools keep the owner's upload labels (boss-* / the single happy
+  shop-quiet-back-alley / reflective rest). UPGRADE LIST: the Crucible upgrade stage-2
+  target list is grouped ARMOR & VESTS then WEAPONS, worn pieces sort first and carry an
+  amber EQUIPPED badge (dog vests badge ON <dog>) via equippedInstanceIds — same resolver
+  as the inventory badge. Locked by ota1028/1051CrossfadeUpgradeList (7 tests per line,
+  incl. a mocked expo-av double proving pause-not-stop + no-position-reset resume).
+
+- **DOG + GOLEM NAMING POPUPS / NO SECOND HOOK POPUP (2026-07-30). BOTH LINES.**
+  golem **1027** / HAL **1050**. Playtester at the dog rescue typed "rest", read the naming
+  beat as another fight, and the in-feed takeover silently stored "rest" as the breed. The
+  typed takeovers are GONE: breed/name/sex commit together from DogOnboardingModal
+  (`confirmDogOnboarding` — same OTA-142 preamble-stripping + caps + feed beats; a save
+  wedged mid-way through the old flow heals on open, part-answers pre-filled), and golem
+  naming commits from GolemNamingModal (`confirmGolemName`: SEAL THE NAME / KEEP ITS
+  MAKING). Typed feed input during either ask is never an answer — the Arbiter points at
+  the card. Separately (owner): story-hook COMPLETE no longer raises the redundant
+  mission-complete popup; the `completionNotice` stash is retired and HookContinueModal's
+  completed state spotlights the payout in a boxed YOUR REWARD strip (the feed's ✦ line
+  remains the permanent record). Locked by ota1027/1050DogGolemPopups (7 tests per line);
+  6 suites per line retargeted off the typed flow (dogBreedParsing, dogOnboardingFuzz,
+  dogRescueIntegration, golemCompanion, the MissionComplete category lock, HookCompleteFlow).
+
+- **NARRATION CONTEXT (2026-07-30). BOTH LINES.** golem **1026** / HAL **1049**.
+  Owner's log: post-combat crate salvage drew "Don't make me decide which one of you to
+  leave breathing" with zero enemies. Two-part root cause: the template picker's mood is
+  read from `cognitiveLastResponse` — one action STALE (the fresh classification lands
+  after the line prints) — and the AGGRESSION pool is the one mood whose every line
+  presupposes a live opponent. `pickMoodPool` now takes `hasLiveEnemy` and refuses the
+  AGGRESSION pool without one (other moods read fine ambient; no staleness surgery
+  needed). Plus the Aetheric Torch mark line: was one verbatim string per use, leaning on
+  "resonance" — now 4 rotating variants, exactly one keeping the word. Locked by
+  ota1026/1049NarrationContext (3 tests per line incl. a 300-draw no-menace sweep).
+
+- **PLAYER-FEEDBACK BATCH (2026-07-30). BOTH LINES.** golem **1025** / HAL **1048**.
+  Three device-session items: • GUARDIAN DAMAGE now tracks over-level (`monotoneTierDmgBonus`
+  in coreGuardians — the missing fourth dimension; HP/AC/attack already scaled). Fresh
+  arrivals byte-identical (bonus 0 at over=1); the owner's tier-2 case goes 1d8+4 → 1d8+8;
+  cap +9. Running-max staged; ota954/931 monotone suites still green. • The travel/room
+  row (InputBox `travelRow`) WRAPS (minWidth 92, font floor 0.55→0.8) instead of shrinking
+  a 5-button row unreadable. • RESONANCE hook: weight 5→2, plant pool 2→5 lines. Locked by
+  ota1025/1048FeedbackBatch (5 tests per line).
+
+- **FUSION LEGIBILITY (2026-07-30). BOTH LINES.** golem **1024** / HAL **1047**.
+  Owner's log told the whole story in two minutes: a CORRECT "too alike" refusal (2 kinds
+  reserved), self-corrected spread, then a fee bounce at 11 TC learned from a buried
+  system line. Fixes: (1) every forge-reservable inventory row carries its material
+  kind(s) — `[organic]`, `[stone · crystal]` — rendered from `fusionMaterialTags`, the
+  SAME helper the diversity gate counts (mirror property locked in tests); (2) the vendor
+  Crucible button states fee + balance BEFORE the tap — amber "25 TC — you have N" when
+  short. (The fusion PICKER already had per-row kind labels + a live kinds meter from
+  OTA-679/1007 — the gap was the inventory, where reserving actually happens, and the
+  paid button.) Locked by ota1024/1047FusionLegibility (4 tests per line).
+
+- **✔ STORY FEATURE PROMOTED TO HAL (2026-07-30, owner: "push all of this to HAL").**
+  The former golem-only divergence is CLOSED: the full three-phase story arc now lives on
+  BOTH lines — HAL **OTA-1041..1044** = golem **1018..1021** (crawl + motive picker /
+  tutorial hold / chapter cards + per-motive epilogues / motive drip + The Missing's
+  ending). Same files both lines: `app/data/story/` (intro/chapters/drip.json),
+  `app/engine/{story,chapters,storyDrip}.ts`, `app/components/{StoryIntroOverlay,
+  ChapterCardOverlay}.tsx`, wiring in gameStore / types / character / App /
+  CharacterCreation / Exploration / About / EndingScreen. NOTE the OTA-TAG SKEW: inside
+  identical code, HAL comments/tests say 1041-1044 where golem's say 1018-1021 — when
+  syncing lines, that skew is EXPECTED and must not be "fixed" by clobbering either side.
+  OTA-1046 (= golem 1023) makes REPLAY OPENING findable:
+  moved from About (whose title-screen entry path has no live player — the gated button
+  never rendered) to the CharacterScreen HEADER, with StoryIntroOverlay mounted globally.
+  OTA-1045 (= golem 1022) adds the ONE-TIME VETERAN
+  MOTIVE PICKER: dealt-motive saves (new storyMotiveChosen flag — creation TRUE, backfill
+  FALSE) get asked once on load via MotivePickerModal; confirm commits forever.
+  Coverage (verified by audit + suite locks): 5/5 motives everywhere (crawl pages, 4
+  chapter cards, 3×5 ending epilogues, 5 drip beats each), 9/9 factions everywhere the
+  design uses them (crawl faction page; the pre-existing per-faction main-quest narration
+  the cards ride on). Race is deliberately NOT a story axis (no race-conditional text).
+
+- **INITIATIVE FINALLY DECIDES THE ORDER + THE STRAP IS THE ONLY ANCHOR (2026-07-29).**
+  HAL **1040** / golem **1017**. Both are the OWNER'S CALLS on the two items left open by
+  1038/1039 — and the first turned out to be a BUG, not a balance choice:
+  • **INITIATIVE.** Owner: "I thought the initiative roll was the deciding factor on who went
+    first on any series of attacks." It never was. The roll had exactly ONE consumer in the
+    entire codebase — the log line — so "X moves first. The pressure is immediate." described
+    something that never happened; the player's swing always resolved first and the enemy group
+    always answered afterward, win or lose. Losing initiative now runs the enemy volley BEFORE
+    the strike, and a volley that drops you means your swing never lands at all. The volley is
+    **MOVED, NOT ADDED** — all four post-strike counter sites (dodged / barehand-gate / hit /
+    miss) are suppressed when it already fired, so a round still contains exactly ONE enemy
+    volley either way. Locked by a test that counts the guarded sites (4) AND asserts the
+    ordering behaviourally in both directions.
+    ⚠ THIS RAISES LETHALITY BY DESIGN — a lost initiative at low HP can now kill before you act.
+    That is what the owner asked for; the dial to soften it is the initiative DC in
+    combatRules' step (d10 vs enemyInit), not the ordering.
+  • **ELEVATED REST.** Owner: "no it shouldn't, you need the hardened climbing strap for that."
+    The Reclaimer's-Rope allowance for resting on an ordinary climb is GONE — the strap is the
+    single answer on every climb, great or not. A rope is a line you climb, not a harness you
+    can hang and doze in. The refusal names what you're carrying and why it isn't enough. The
+    old "rope rests fine" test is flipped to assert the refusal, with a new companion test
+    proving the strap still works.
+  • Process note: OTA-1039's lock test pinned the LITERAL refusal sentence, so this rule change
+    tripped it — retargeted to the invariant (a line-carrier is told their line won't hold them
+    asleep). Third time a wording-pinned assert has cost a gate cycle this span; prefer
+    invariant matches in new locks.
+
+- **NO OPEN-GROUND AMBUSHES INDOORS (2026-07-29).** HAL **1039** / golem **1016**.
+  From the owner's 6-part log: a Mud Monarchs patrol "crosses your path IN THE OPEN" while the
+  player stood in a flooded house's KITCHEN (12:16:43), and six minutes later a Conspiracy
+  Architects war party "crests the rise" while they stood in its STUDY (12:22:19). Both lines
+  are explicitly open-ground. ROOT CAUSE (a whole category, not two lines): the three outdoor
+  world-event spawners — `maybeSpawnRaid`, `maybeInterceptPatrol`, `maybePatrolAmbush` — each
+  asked `player.hubRoomId` for "am I inside?", and that field is set ONLY in an OUTPOST room.
+  Explorable building interiors live on the STORE's `activeBuildingId`, which none of them
+  consulted, so all three read "outdoors" indoors. Fixed at one choke point: a shared
+  `underRoof(s, player)` predicate that counts BOTH kinds of interior, and all three spawners
+  route through it (locked by a test that counts the call sites, so a fourth spawner can't
+  quietly get it wrong).
+  • Also, an HONEST REFUSAL: climbing accepts a Reclaimer's Rope OR a plain Climbing Rope
+    (pickActiveRope), but resting on a wall accepts only the Reclaimer's. The player who had
+    just climbed on a Climbing Rope was told to "carry a Reclaimer's Rope" — reading as "you
+    have no rope" while they hung from one, then retried the climb at 0 stamina and fell for
+    21. The refusal now names the line they're on and what it can't do. NOTE — whether a plain
+    Climbing Rope SHOULD anchor an ordinary-climb rest is an open OWNER'S CALL; only the
+    message changed, not the rule.
+
+- **ONE KILL, ONE PRICE — AND STEALTH KEEPS ITS PROMISES (2026-07-29).** HAL **1038**
+  / golem **1015**. From the owner's log part 16, re-verified with runtime probes before any
+  code was touched (owner: "reverify all findings and continue"):
+  • **THE DOUBLE DOCK.** Every patrol kill cost Eternal Dynasty **−6**, not −3 (log shows two
+    separate −3 lines per kill; probe: aetherkin-trait patrol with a factionId measured −6,
+    control without the trait −3). Cause: `injectFactionParty` reskins whatever the LOCAL WILD
+    TABLE rolls — rename + stamp a factionId, keep every trait — so an Aetherkin roll walked in
+    as "Eternal Dynasty Patrol 1", a corpse wearing a soldier's name (which is also why the
+    Arbiter kept saying piercing wasn't biting). The reverence penalty's own comment assumes
+    "they carry no factionId in data"; that assumption broke, and the victim's faction paid
+    twice. Fixed at BOTH ends: special-marked templates (aetherkin / revenant) are excluded
+    from faction parties outright, and the reverence pass now takes an exclusion set of every
+    faction the same kill already docked. The other three revering factions still pay −3.
+  • **A FAILED SNEAK WAS THE ONLY FREE ACTION IN COMBAT.** Probe: failed sneak `hp 200 → 200`,
+    no statuses, no enemy swings; successful sneak `hp 200 → 193` **even when it won the init
+    race** (the reset branch always runs the group counters). Rolling BADLY was the better
+    play. And the game already told the player otherwise — the sneak-odds warning says a miss
+    "lets the whole pack swing free", and the OTA-936 comment that authored it says a failed
+    sneak "burns the turn AND the whole enemy group swings free". Nothing ever charged it.
+    The failed-FLEE path has charged this since OTA-372 ("a FAILED flee is not free"); stealth
+    now matches. This is a promise being kept, not a balance change.
+  • **THE STEALTH TITLE SAT OUT THE DECIDING ROLL.** Shadow Diver's +1 rides the GATE
+    (buildSkillSteps folds in titleSkillBonus — the log's "STE 1 + 1 (title: Shadow Diver)")
+    but was absent from the break-away init contest that actually decides the outcome. Same
+    bonus, both rolls now.
+  • Two cosmetics: the `surprised` label read as a fragment when it expired ("caught mid-vanish
+    fades.") → "exposed opening"; and the sneak-odds warning said "at arm's reach" at MID range
+    → range-aware phrasing.
+  • **OPEN / OWNER'S CALL — INITIATIVE IS NARRATION ONLY.** "X moves first. The pressure is
+    immediate." has exactly one consumer in the codebase (the log line). The player's attack
+    still fully resolves first either way, so losing initiative costs nothing. Options put to
+    the owner: leave as flavor / loser's swing resolves first (raises lethality) / winner takes
+    a small to-hit edge. NOT changed unilaterally — a lethality change is the owner's to make.
+
+- **THE WEDGED CONTRACTS CARD — COURSE-CANCEL NOW STANDS DOWN ROUTING + REFUSALS ANSWER
+  ON-SCREEN (2026-07-28).** HAL **1037** / golem **1014**. Owner's report (screenshot +
+  log part 16): after accidentally tapping quit-navigating, a READY faction contract showed a
+  stale "Auto-routing" note with NO route button, and ~15 taps on the green COMPLETE "did
+  nothing" — the log shows 7 invisible wrong-faction refusals spoken to the world feed while
+  the Contracts screen (which never renders that feed) was up. Deactivate → reactivate was the
+  accidental workaround (deactivation clears routedMission). Three fixes, one category:
+  • **stopTravel + stopWhisperCourse now clear `player.routedMission`** — cancelling the
+    course cancels the route chain (deactivation already did; the cancel paths were the gap).
+  • **The card's routed note requires a LIVE course** (`travelTarget`/`whisperCourse`), so the
+    ROUTE button returns the moment no course is running — this also HEALS saves already
+    carrying the stale flag (including the owner's).
+  • **`completeContractFromUI` is now a wrapper**: if a COMPLETE tap doesn't raise the
+    completion popup, the freshest Arbiter refusal — or, when the arbiter dedup swallowed a
+    repeat tap, the line it suppressed — surfaces as `contractsNotice`, rendered as a
+    dismissible amber strip at the top of the Contracts screen. Refused taps can never read
+    as "the button does nothing" again; a successful tap clears any stale strip.
+
+- **THE TC GHOST — INVESTIGATED, PRECONDITIONS ELIMINATED, TRIPWIRE ARMED (2026-07-28).** HAL **1036** / golem **1013**. Owner: "work towards the root cause, do this one
+  last." The intermittent `tc.challengeForLocation is not a function` crash (2 combatStress
+  runs, 232/370 hits each, all during raid windows) was investigated to its evidence floor:
+  single call site (gameStore ~8161), export intact, no module cycle, no mock interference —
+  and BOTH crashing runs sat at 6-8 GB heap under the since-fixed OTA-1035 mock leak, while
+  every low-heap run (4 clean full runs + 3 ARMED reproduction attempts at the exact original
+  configuration) shows zero recurrence. VERDICT: not conclusively provable, but the strongest
+  reading is V8 misbehavior under near-OOM pressure, and the pressure itself is gone.
+  The watch item converts to a SELF-DIAGNOSING one: combatStress's crash catch now carries a
+  permanent tripwire — any future `challengeForLocation` crash records the stack, the live
+  module's export list + typeof, and heap size to the report and `/tmp/tartaria-tc-ghost.txt`.
+  If the weekly heavy gate ever trips it, the diagnosis writes itself. Costs nothing healthy.
+
+- **THE LEAK THAT ATE THE SIMS — ROOT-CAUSED AND KILLED (2026-07-28).** HAL **1035**
   / golem **1012**. Owner: "do the root cause dig." Done — the §8 "world/persist super-linear
   tail-growth" open item (the deepest open thread, deferred since 2026-07-20) is CLOSED. The
   heap-snapshot autopsy of metaNavStress found the retained gigabytes were HUNDREDS of copies
@@ -931,8 +1375,9 @@ re-architecture. Currently **4.28.46**; ledger in `VERSION.md`.
     the <1% stall-rate + zero-crash floors stay.
   • **VERIFIED GREEN** end-to-end: 20 000 actions, 0 crashes, 0.8% stalls, 98 kills. The
     intermittent raid-window `tc.challengeForLocation` crash seen in two early runs did NOT
-    recur across three consecutive full runs — unexplained mechanically, watch the canary;
-    if it resurfaces, capture `e.stack` at the throw (the probe pattern is in §9's record).
+    recur across three consecutive full runs — RESOLVED-WITH-TRIPWIRE — see the OTA-1036 entry above:
+    preconditions (mock-leak heap pressure) eliminated, armed stack-capture now permanent in
+    the canary's crash catch.
   • RULE GOING FORWARD: run the heavy gate (`npm run test:ci:heavy`) after any combat-loop
     OTA, or at least weekly — a red canary hid a real bug for 8 days.
 

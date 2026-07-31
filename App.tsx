@@ -38,6 +38,11 @@ import { GamepadNav } from './app/components/GamepadNav';
 import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
+import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1043
+import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1045
+import { StoryIntroOverlay } from './app/components/StoryIntroOverlay'; // OTA-1046 — global (was exploration-only)
+import { DogOnboardingModal } from './app/components/DogOnboardingModal'; // OTA-1050
+import { GolemNamingModal } from './app/components/GolemNamingModal'; // OTA-1050
 import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
@@ -584,6 +589,34 @@ export default function App() {
       </SilentBoundary>
       <SilentBoundary tag="AetherStatPickerModal">
         <AetherStatPickerModal />
+      </SilentBoundary>
+      {/* OTA-1043 — chapter cards mount GLOBALLY (not per-screen) because
+          main-quest phase transitions fire from more than one screen: travel
+          arrival lands on exploration, but the Nexus choice fires from
+          Contracts. Wherever the arc turns, the card shows. */}
+      <SilentBoundary tag="ChapterCardOverlay">
+        <ChapterCardOverlay />
+      </SilentBoundary>
+      {/* OTA-1045 — one-time veteran motive picker, raised by the load paths
+          for saves whose motive was dealt by backfill rather than chosen. */}
+      <SilentBoundary tag="MotivePickerModal">
+        <MotivePickerModal />
+      </SilentBoundary>
+      {/* OTA-1046 — the opening crawl mounts GLOBALLY (it lived on the
+          exploration screen only, which forced REPLAY OPENING to navigate
+          there first). Now REPLAY plays right over whatever screen raised
+          it — the CharacterScreen header button included. */}
+      <SilentBoundary tag="StoryIntroOverlay">
+        <StoryIntroOverlay />
+      </SilentBoundary>
+      {/* OTA-1050 — dog onboarding + golem naming moved out of the typed feed
+          into blocking popups (a playtester typed "rest" at the breed ask and
+          the old takeover swallowed it as the answer). */}
+      <SilentBoundary tag="DogOnboardingModal">
+        <DogOnboardingModal />
+      </SilentBoundary>
+      <SilentBoundary tag="GolemNamingModal">
+        <GolemNamingModal />
       </SilentBoundary>
       <SilentBoundary tag="KeyboardInputBar">
         <KeyboardInputBar />

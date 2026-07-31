@@ -55,6 +55,7 @@ export function CharacterScreen() {
   const scene = useGameStore((s) => s.currentScene);
   const worldMemory = useGameStore((s) => s.worldMemory);
   const setScreen = useGameStore((s) => s.setScreen);
+  const replayStoryIntro = useGameStore((s) => s.replayStoryIntro); // OTA-1046
   // arb119 — per-section collapse (hook must precede the early return below).
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   // OTA-848 — tap-to-expand: the AC breakdown, and which title's provenance is open.
@@ -132,7 +133,20 @@ export function CharacterScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title} accessibilityRole="header">CHARACTER</Text>
-        <View style={{ width: 80 }} />
+        {/* OTA-1046 — REPLAY OPENING lives here now (owner's placement:
+            "across the top is back, character, and then replay opening").
+            The crawl overlay mounts globally, so it plays right over this
+            screen — no navigation needed. */}
+        <TouchableOpacity
+          onPress={() => replayStoryIntro()}
+          style={styles.replayBtn}
+          hitSlop={8}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Replay the opening crawl"
+        >
+          <Text style={styles.replayText}>REPLAY{'\n'}OPENING</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
@@ -867,6 +881,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  // OTA-1046 — header REPLAY OPENING button; sized to balance the BACK pill.
+  replayBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  replayText: { color: '#8aa0a4', fontSize: 10, letterSpacing: 2, fontWeight: '700', textAlign: 'center', lineHeight: 14 },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
   placeholder: { color: '#c9a86a', textAlign: 'center', marginTop: 80 },
   scroll: { flex: 1 },

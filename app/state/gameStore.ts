@@ -70,13 +70,16 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { stripForeignWords, repairGluedNarration } from '../engine/foreignText';
+import { AppState } from 'react-native'; // OTA-1055 — foreground hook for the Qwen watchdog
+import { stripForeignWords, repairGluedNarration, looksLikeInstructionEcho, isSecondPersonActionOpener } from '../engine/foreignText';
 import { sentenceNamesOffCanonEntity, buildEntityAllowList, normalizeEntity } from '../engine/entityGuard';
 import { isQuestLockedItem } from '../engine/questItems';
 import { revealedLocationName } from '../engine/hiddenLocations';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
 import { AETHERKIN_REVERING_FACTIONS, isAetherkin, buildAetherkinEncounter, type AetherkinContext } from '../engine/aetherkin';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
+// OTA-1041 — the story spine: motives + the opening crawl.
+import { introPagesFor, assignMotive } from '../engine/story';
 import { generateQuest } from '../engine/questGenerator';
 import {
   pickWeather,
@@ -1030,6 +1033,27 @@ function assembleBeaconRifle(
   );
   getStore().appendLog('reward', `✦✦ BEACON RIFLE (Legendary) — built from the five collector-arrays. Fires an electrical bolt sheathed in acid, the two elements every Tartarian machine dreads. With it, a cache of legendary materials.`);
   getStore().appendLog('arbiter', `"You climbed into the heart of every tower that drowned the world," the Arbiter says quietly, "and made the thing that drank the sky spit it back out. Nothing built will stand easy in front of that."`);
+  // OTA-1060 — AND IT GETS A CARD. The doubled ✦✦ above was the only thing
+  // marking this as bigger than a Trail Rations pickup, and a feed line is
+  // exactly what OTA-1010 was written because the player scrolls past — the
+  // owner's words then were "I didn't even realize I completed the mission."
+  // This is the payoff for all five great climbs: a Legendary weapon plus seven
+  // Legendary/Rare materials, and it announced itself the same way a mud cloth
+  // does. The boss VICTORY card already knew how to show story-then-take, so it
+  // is reused under its own banner. The feed lines above are UNCHANGED — the log
+  // stays a complete record, same rule as every other announcement.
+  getStore().raiseSpotlightNotice(
+    'BEACON RIFLE ASSEMBLED',
+    'Beacon Rifle (Legendary)',
+    [
+      `You crack the five beacons open across your knees: each is a folded collector-array, a throat of resonant crystal built to swallow Aether out of thin air. You splice the five throats into a single barrel and re-wire the intake to fire instead of feed. When you seat the last crystal the whole thing wakes with a shriek of live current.`,
+      `"You climbed into the heart of every tower that drowned the world," the Arbiter says quietly, "and made the thing that drank the sky spit it back out. Nothing built will stand easy in front of that."`,
+    ],
+    [
+      `Beacon Rifle (Legendary) — electrical bolt sheathed in acid, the two elements every Tartarian machine dreads.`,
+      ...mats.map((m) => `${m.name} ×${m.quantity} (${m.rarity})`),
+    ],
+  );
   void getStore().persist();
   return true;
 }
@@ -1375,8 +1399,15 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
 //
 // Held at module scope so startQwenWatchdog() can replace it on
 // re-entry without leaking handles.
-let qwenWatchdogTimer: ReturnType<typeof setInterval> | null = null;
-const QWEN_WATCHDOG_INTERVAL_MS = 60_000;
+let qwenWatchdogTimer: ReturnType<typeof setTimeout> | null = null;
+let qwenAppStateSub: { remove: () => void } | null = null;
+// OTA-1055 — ADAPTIVE CADENCE. A flat 60s poll made recovery feel broken: the
+// owner's log spends ~2 minutes on canned templates because every step of the
+// dance waits a full tick (notice at :48, retry at :47, confirm ready at :47).
+// Healthy, 60s is plenty; while recovering, poll fast so a retry and the
+// all-clear land in seconds, not minutes.
+const QWEN_WATCHDOG_HEALTHY_MS = 60_000;
+const QWEN_WATCHDOG_RECOVERING_MS = 5_000;
 // How long a re-init may sit in 'loading'/'downloading' before the watchdog
 // treats it as wedged and re-kicks. Generous: once dormancy is even possible
 // the GGUF is already cached, so a warm reload is ~5-30s; a legit in-flight
@@ -1384,20 +1415,16 @@ const QWEN_WATCHDOG_INTERVAL_MS = 60_000;
 const QWEN_REINIT_HANG_MS = 150_000;
 let qwenReinitInFlightSince = 0;
 let qwenReinitAttempts = 0;
-function startQwenWatchdog(
+/** OTA-1055 — one health check. Returns TRUE when Qwen is healthy, which is what
+ *  drives the adaptive poll: healthy → back to the slow cadence, anything else →
+ *  keep checking fast until it recovers. */
+function runQwenHealthCheck(
   get: () => GameStore,
   set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
-): void {
-  if (qwenWatchdogTimer !== null) {
-    clearInterval(qwenWatchdogTimer);
-    qwenWatchdogTimer = null;
-  }
-  qwenReinitInFlightSince = 0;
-  qwenReinitAttempts = 0;
-  qwenWatchdogTimer = setInterval(() => {
-    try {
+): boolean {
+    {
       const q = qwen;
-      if (typeof q.forceReinitialize !== 'function' || typeof q.getStatus !== 'function') return;
+      if (typeof q.forceReinitialize !== 'function' || typeof q.getStatus !== 'function') return true;
       // Healthy — nothing to do; clear any in-flight tracking.
       if (q.isReady()) {
         if (qwenReinitAttempts > 0) {
@@ -1409,13 +1436,13 @@ function startQwenWatchdog(
         }
         qwenReinitInFlightSince = 0;
         qwenReinitAttempts = 0;
-        return;
+        return true;
       }
       const st = q.getStatus();
       // A (re)init is genuinely in progress — let it finish, unless it has
       // been wedged past the hang window (then fall through to re-kick).
       if (st === 'downloading' || st === 'loading') {
-        if (qwenReinitInFlightSince === 0 || Date.now() - qwenReinitInFlightSince < QWEN_REINIT_HANG_MS) return;
+        if (qwenReinitInFlightSince === 0 || Date.now() - qwenReinitInFlightSince < QWEN_REINIT_HANG_MS) return false;
         get().appendLog('debug', `qwen-watchdog: reinit wedged in '${st}' for >${Math.round(QWEN_REINIT_HANG_MS / 1000)}s — re-kicking.`);
       }
       // Not ready and not making progress (idle / failed / dormant ready-but-
@@ -1442,8 +1469,49 @@ function startQwenWatchdog(
           qwenReinitInFlightSince = 0;
           get().appendLog('debug', `qwen-watchdog: reinit attempt #${qwenReinitAttempts} threw: ${String(err)}`);
         });
+      return false;
+    }
+}
+
+function startQwenWatchdog(
+  get: () => GameStore,
+  set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+): void {
+  if (qwenWatchdogTimer !== null) {
+    clearTimeout(qwenWatchdogTimer);
+    qwenWatchdogTimer = null;
+  }
+  if (qwenAppStateSub) {
+    qwenAppStateSub.remove();
+    qwenAppStateSub = null;
+  }
+  qwenReinitInFlightSince = 0;
+  qwenReinitAttempts = 0;
+
+  const schedule = (ms: number): void => {
+    if (qwenWatchdogTimer !== null) clearTimeout(qwenWatchdogTimer);
+    qwenWatchdogTimer = setTimeout(tick, ms);
+  };
+  function tick(): void {
+    let healthy = true;
+    try {
+      healthy = runQwenHealthCheck(get, set);
     } catch { /* watchdog should never crash the host */ }
-  }, QWEN_WATCHDOG_INTERVAL_MS);
+    schedule(healthy ? QWEN_WATCHDOG_HEALTHY_MS : QWEN_WATCHDOG_RECOVERING_MS);
+  }
+
+  // OTA-1055 — DON'T WAIT FOR THE NEXT TICK. Dormancy is CAUSED by backgrounding
+  // (App.tsx disposes the ~398MB native context to reclaim memory), so the app
+  // knows the exact moment it matters: coming back to the foreground. Checking
+  // there removes up to a full poll interval of dead narration before the
+  // watchdog has even noticed.
+  try {
+    qwenAppStateSub = AppState.addEventListener('change', (next) => {
+      if (next === 'active') tick();
+    }) as { remove: () => void } | null;
+  } catch { /* AppState unavailable (headless/test) — the poll alone still recovers */ }
+
+  schedule(QWEN_WATCHDOG_HEALTHY_MS);
 }
 
 // Casual-look narration: the player asked to look around but didn't target
@@ -1781,6 +1849,16 @@ export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
   };
 }
 
+/** OTA-1052 — the scope a "hide this chip" ✕ applies to: the macro TILE
+ *  (location + map x/y), NOT the room. A capital is a dozen hand-authored rooms
+ *  standing on one tile, so a room-keyed dismiss re-showed the chip on every
+ *  interior hop. beginScene clears a dismiss whose tile no longer matches, which
+ *  is what makes "dismissed until you leave the tile and come back" true. */
+export function chipDismissTileKey(p: { currentLocationId?: string; mapX?: number; mapY?: number } | null | undefined): string {
+  if (!p) return '';
+  return `${p.currentLocationId ?? ''}|${p.mapX ?? 0},${p.mapY ?? 0}`;
+}
+
 export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   // OTA-1021 — retire legacy catalog names FIRST so every later pass (kind/tag
   // restamp, durability, equip pointers) works on names the catalog still
@@ -1794,6 +1872,23 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     console.warn('backfillPlayer: save-upgrade migration threw; loading the raw saved player (degraded-safe)', e);
     out = pm;
   }
+  // OTA-1041 — pre-feature saves get a REASON THEY CAME DOWN, dealt
+  // deterministically from the character's identity so the same save always
+  // resolves to the same motive (the phase-2/3 story beats key off it).
+  // storyIntroSeen backfills TRUE: the crawl introduces a new character, it
+  // must never ambush someone forty days into a run. REPLAY OPENING exists
+  // for saves that want to read it.
+  if (!out.storyMotive) {
+    out = {
+      ...out,
+      storyMotive: assignMotive(`${out.name}|${out.raceId}|${out.factionId}`),
+      storyIntroSeen: true,
+      // OTA-1045 — a DEALT motive is a guess, not a choice. The load path
+      // reads this and owes the player the one-time picker.
+      storyMotiveChosen: false,
+    };
+  }
+
   // OTA-416 — a LIVE character can never legitimately sit at hp<=0 (that IS
   // death; death is gated by the `dead` flag, not by hp). If a save loads
   // alive-but-zeroed — e.g. a crash interrupted the death sequence before
@@ -2878,6 +2973,66 @@ function healEscortsOnRest(
   if (healedLabel) get().appendLog('world', `Your ${healedLabel} rest too — they look steadier.`);
 }
 
+/** OTA-1058 — one reward line, one entry on the card. Drops exact repeats, so a
+ *  line that reached the card by both the capture window and an explicit raise
+ *  appears once.
+ *
+ *  OTA-1059 — and one THING, one bullet. The ✦ is the feed's marker and the card
+ *  draws its own, but a few emitters pack two rewards into a single line with a
+ *  ✦ between them — the Core Guardian gear drop is one line for the weapon AND
+ *  the armor. Stripping only a LEADING ✦ left that stray marker sitting in the
+ *  middle of a bullet. Split on the marker instead: the gear line becomes two
+ *  clean bullets, an ordinary line is untouched (no marker to split on), and the
+ *  Beacon Rifle's doubled `✦✦` flourish still yields exactly one entry because
+ *  empty pieces are dropped. */
+function mergeRewardLines(existing: readonly string[], incoming: readonly string[]): string[] {
+  const out = [...existing];
+  for (const raw of incoming) {
+    for (const piece of raw.split(/✦+/)) {
+      const clean = piece.trim();
+      if (clean && !out.includes(clean)) out.push(clean);
+    }
+  }
+  return out;
+}
+
+// OTA-1058 — THE BATTLE FOLLOW-UP IS A CARD, NOT A SCROLLBACK. Owner, after
+// killing Veilkeeper Inarra: "if the whole giants and vigil thing was the
+// player's reasons flavor text it needs to be last so it will be read, it gets
+// pushed up screen and missed. it should be a pop-up I think. the battle follow
+// up should be, it should have the flavor text, and the rewards on it."
+//
+// A boss kill fires eight-plus lines from five different modules in one tick —
+// spoils, hard-won material, TC, the boss's dying words, the signature gear, the
+// Core, the faction's reaction, then the Resurrection Gem a beat later. The
+// story beat lands in the MIDDLE of that and the reward lines shove it off
+// screen before it can be read. Rather than reorder five call sites (and lose
+// the argument again next time something is added), a window opens for the
+// duration of resolveEnemyDefeat and everything the fight produced is collected
+// into ONE card: flavor first, then the take.
+//
+// The window is strictly SYNCHRONOUS, which is what keeps it clean — the canned
+// post-kill Arbiter beat ("Make the next strike count for two") comes from
+// narrateViaArbiter, an async path that cannot resume until this call stack is
+// gone, so it never lands on the card. Bosses only; a rat does not get a popup.
+type BossVictoryCapture = { name: string; flavor: string[]; rewards: string[] };
+let bossVictoryCapture: BossVictoryCapture | null = null;
+
+/** Called from appendLog on EVERY line. A no-op unless a boss defeat is being
+ *  resolved right now. Rewards and story are split by channel; exact repeats are
+ *  dropped so a line the feed deduped can't appear twice on the card. */
+function captureBossVictoryLine(channel: string, text: string): void {
+  const cap = bossVictoryCapture;
+  if (!cap) return;
+  const clean = text.trim();
+  if (!clean) return;
+  const bucket = channel === 'reward' ? cap.rewards
+    : channel === 'arbiter' || channel === 'world' ? cap.flavor
+    : null;                                   // debug / combat rolls stay in the feed
+  if (!bucket || bucket.includes(clean)) return;
+  bucket.push(clean);
+}
+
 function injectFactionParty(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -2887,17 +3042,47 @@ function injectFactionParty(
   const player = s.player;
   const scene = s.currentScene;
   if (!player || !scene || !scene.location) return false;
-  const base = rollEncounter(scene.location).filter((e) => !e.boss);
+  // OTA-1038 — a faction party is made of that faction's PEOPLE. This builder reskins
+  // whatever the local wild table rolls (rename + stamp a factionId) and KEEPS
+  // every trait, so an Aetherkin roll used to walk in as "<Faction> Patrol 1" —
+  // a mud-mummified corpse wearing a soldier's name, resisting piercing and
+  // burning like tinder. That reskin is also what double-docked the victim's own
+  // faction on the kill (the reverence penalty below assumes Aetherkin carry no
+  // faction). Special-marked creatures are excluded from the pool outright; if
+  // nothing ordinary is available here, no party lands (callers handle false).
+  const specialTemplate = (e: Enemy): boolean => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isAetherkin: isAk } = require('../engine/aetherkin') as typeof import('../engine/aetherkin');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isRevenant } = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
+    return isAk(e) || isRevenant(e);
+  };
+  const base = rollEncounter(scene.location).filter((e) => !e.boss && !specialTemplate(e));
   if (base.length === 0) return false;
+  // OTA-1058 — AND THE BODY IS A PERSON. Owner: "let's fix the loot drop issue
+  // where humans drop beast loot." The reskin above kept every trait of the WILD
+  // roll, so a "Conspiracy Architects Patrol" could be a Mud Cyclops underneath —
+  // dropping Raven Feather and Aether Wing off a man's corpse, burning like
+  // tinder, swinging a beak. The indoor ambush was fixed this way in OTA-1056;
+  // this is the outdoor half, sharing the same body list. The wild roll still
+  // decides HOW MANY and at what RARITY (so the tile's danger still governs) —
+  // it just no longer decides what a soldier is made of. Difficulty is unmoved:
+  // scaleEncounterForContext below anchors the pack on its mean HP against the
+  // tile's danger, not on the template's authored numbers.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const fbMod = require('../engine/factionBodies') as typeof import('../engine/factionBodies');
   const party: Enemy[] = [];
   for (let i = 0; i < opts.partySize; i++) {
     const tmpl = base[i % base.length]!;
-    party.push({
-      ...tmpl,
-      name: opts.partySize > 1 ? `${opts.factionName} ${opts.noun} ${i + 1}` : `${opts.factionName} ${opts.noun}`,
-      factionId: opts.factionId,
-      aliases: [opts.noun.toLowerCase(), 'soldier', 'raider', opts.factionName.toLowerCase()],
-    });
+    // `nearest` because a Common tile still sends PEOPLE — the roster has no
+    // Common human, and borrowing the cheapest one beats sending a rat in
+    // faction colours. Falls back to the old reskin only if the roster somehow
+    // yields no human at all, so this can never leave a raid unspawned.
+    const body = fbMod.pickFactionBody(tmpl.rarity, { nearest: true }) ?? tmpl;
+    party.push(fbMod.dressFactionFighter(
+      body, opts.factionId, opts.factionName, opts.noun,
+      opts.partySize > 1 ? i + 1 : undefined,
+    ));
   }
   const tide = Math.max(0, s.worldMemory.factionTides?.[opts.factionId] ?? 0);
   const power = enemyScalePower(
@@ -2924,6 +3109,39 @@ function injectFactionParty(
   return true;
 }
 
+// OTA-1039 — ARE YOU UNDER A ROOF? The three outdoor world-event spawners below each
+// asked `player.hubRoomId` — which is ONLY set inside an OUTPOST room. Explorable
+// building interiors (a flooded house's kitchen, its study, its attic) live on the
+// STORE's activeBuildingId instead, so every one of these read "outdoors" while the
+// player stood indoors. Owner's log, twice in six minutes: a Mud Monarchs patrol
+// "crosses your path in the open" inside a flooded-house kitchen, and a Conspiracy
+// Architects war party "crests the rise" inside the study. Both narrations are
+// explicitly open-ground. One predicate now answers the question for all of them,
+// so a fourth spawner can't quietly get it wrong.
+/** OTA-1056 — who would actually send someone in after you: the faction you've
+ *  wronged most. Excludes your own (your hosts don't raid their own hall) and
+ *  ignores anyone you're square with — a break-in wants a motive. Null when no
+ *  faction holds a grudge, and the caller uses the creature cast instead. */
+function worstStandingFaction(player: PlayerCharacter): { id: string; name: string } | null {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('../data/factions/factions.json') as Array<{ id: string; name: string }>;
+  let worst: { id: string; name: string } | null = null;
+  let worstValue = 0; // only a NEGATIVE standing counts as a grudge
+  for (const f of factions) {
+    if (f.id === player.factionId) continue;
+    const v = getStanding(player.factionStanding ?? [], f.id);
+    if (v < worstValue) {
+      worstValue = v;
+      worst = { id: f.id, name: f.name };
+    }
+  }
+  return worst;
+}
+
+function underRoof(s: GameStore, player: PlayerCharacter): boolean {
+  return !!player.hubRoomId || !!s.activeBuildingId;
+}
+
 function maybeSpawnRaid(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -2936,7 +3154,7 @@ function maybeSpawnRaid(
   // building, and not while the player is already bloodied (no kicking them down).
   if ((scene.enemies?.length ?? 0) > 0) return;
   if (scene.vendor) return;
-  if (player.hubRoomId) return;
+  if (underRoof(s, player)) return;
   if (player.hpMax > 0 && player.hp / player.hpMax < 0.5) return;
   const hour = player.hoursElapsed ?? 0;
   const last = s.worldMemory.lastRaidHour;
@@ -2981,7 +3199,7 @@ function maybeInterceptPatrol(
   const scene = s.currentScene;
   if (!player || !scene || !scene.location) return;
   if ((scene.enemies?.length ?? 0) > 0) return;
-  if (player.hubRoomId) return;
+  if (underRoof(s, player)) return;
   if (player.hpMax > 0 && player.hp / player.hpMax < 0.4) return;
   // Which faction holds this outpost? Only real, non-friendly factions patrol at you.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -3025,7 +3243,7 @@ function maybePatrolAmbush(
   const scene = s.currentScene;
   if (!player || !scene || !scene.location) return;
   if ((scene.enemies?.length ?? 0) > 0) return;
-  if (player.hubRoomId) return;
+  if (underRoof(s, player)) return;
   if (player.hpMax > 0 && player.hp / player.hpMax < 0.4) return;
   const patrols = s.worldMemory.patrols ?? [];
   if (patrols.length === 0) return;
@@ -3531,6 +3749,13 @@ function applyAetherkinReverenceDelta(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   delta: number,
+  // OTA-1038 — factions the SAME event already moved. One kill must cost a faction
+  // once. When an Aetherkin carries a faction (see injectFactionParty), the
+  // faction-kill penalty already docked it; without this exclusion the reverence
+  // pass docked it a second time — a measured −6 for one kill where every other
+  // faction paid −3. The block's own comment assumes "they carry no factionId";
+  // this is the guard for when that assumption doesn't hold.
+  excludeFactionIds?: ReadonlySet<string>,
 ): { factionId: string; delta: number; newStanding: number }[] {
   const p = get().player;
   if (!p || delta === 0) return [];
@@ -3538,6 +3763,7 @@ function applyAetherkinReverenceDelta(
   const changed: { factionId: string; delta: number; newStanding: number }[] = [];
   const next = p.factionStanding.map((row) => {
     if (!revered.has(row.factionId)) return row;
+    if (excludeFactionIds?.has(row.factionId)) return row;
     const ns = Math.max(-100, Math.min(100, row.standing + delta));
     const realDelta = ns - row.standing;
     if (realDelta !== 0) changed.push({ factionId: row.factionId, delta: realDelta, newStanding: ns });
@@ -3624,11 +3850,6 @@ interface GameStore {
     noun: string;
     stageHistory: HookContinueStage[];
     completed: boolean;
-    /** OTA-1030 — completion-popup payload STASHED when the terminal stage resolves
-     *  and raised only when the player taps COMPLETE (dismissHookContinue).
-     *  The popup used to mount the instant the last stage fired — landing on
-     *  top of the thread text the player was still reading. */
-    completionNotice?: { kind: string; title: string; body: string } | null;
   } | null;
   /** arb120 — completion popup for a finished side-contract (whisper). Set when
    *  a whisper pays out so the reward lands in a modal the player can read,
@@ -4061,6 +4282,13 @@ interface GameStore {
     kind: 'hunt' | 'mystery' | 'storyline' | 'faction_quest',
     id: string,
   ) => void;
+  /** OTA-1037 — internal body of completeContractFromUI; the public name is a
+   *  wrapper that surfaces refusals to the Contracts screen's strip. UI code
+   *  keeps calling completeContractFromUI. */
+  completeContractFromUIInner: (
+    kind: 'hunt' | 'mystery' | 'storyline' | 'faction_quest',
+    id: string,
+  ) => void;
   /** OTA 020 — drop a procedurally-generated lead from the active
    *  list. Leads auto-complete on kill (OTA 011) but the player
    *  may want to abandon one that isn't worth chasing. */
@@ -4115,6 +4343,41 @@ interface GameStore {
    *  is captured as the golem's name (or 'skip' to keep the type label), like
    *  the dog onboarding. Transient — not persisted. */
   pendingGolemNaming: boolean;
+  /** OTA-1041 — the opening crawl's pages while it is showing, null otherwise.
+   *  Set by startNewGame for a fresh character and by replayStoryIntro; the
+   *  StoryIntroOverlay renders whenever this is non-null. Transient — never
+   *  persisted, always reset by slot load / new game / delete. */
+  storyIntro: string[] | null;
+  /** OTA-1041 — close the crawl (tap-through or SKIP) and remember on the
+   *  CHARACTER that it was seen, so it never re-ambushes this save. */
+  dismissStoryIntro: () => void;
+  /** OTA-1041 — re-run the opening for the current character (About screen).
+   *  No-op without a live character. */
+  replayStoryIntro: () => void;
+  /** OTA-1043 — the chapter card raised by the latest main-quest phase
+   *  transition, null when none is showing. ChapterCardOverlay (mounted
+   *  globally in App.tsx) renders whenever this is non-null. Transient —
+   *  never persisted, always reset by slot load / new game / delete. */
+  chapterCard: import('../engine/chapters').ChapterCard | null;
+  /** OTA-1043 — close the chapter card (tap-through). */
+  dismissChapterCard: () => void;
+  /** OTA-1045 — TRUE while the one-time veteran motive picker is owed: the
+   *  loaded character's motive was DEALT by backfill (storyMotiveChosen !==
+   *  true), so the player gets one "why did you come down?" ask. Transient —
+   *  never persisted; the durable answer lives on the character. */
+  motivePickerPending: boolean;
+  /** OTA-1045 — commit the pick (or the kept guess): sets the motive,
+   *  marks it CHOSEN on the character (never asked again), persists. */
+  confirmMotivePick: (motiveId: string) => void;
+  /** OTA-1050 — dog onboarding popup commit. Breed/name/sex arrive together from
+   *  DogOnboardingModal (the typed three-step takeover is gone — a playtester
+   *  couldn't tell the ask from a fight and "rest" became the breed). Applies
+   *  the same breed preamble-stripping + caps as the old typed path, then
+   *  finalizes the dog exactly as before. */
+  confirmDogOnboarding: (breedRaw: string, nameRaw: string, sexRaw: string) => void;
+  /** OTA-1050 — golem naming popup commit. null/empty = keep its making (the old
+   *  "skip"); otherwise seals the name (16 cap) with the same Arbiter acks. */
+  confirmGolemName: (name: string | null) => void;
   /** Set the pending destination; the screen renders the modal. */
   requestTravelConfirm: (locationId: string, locationName: string) => void;
   /** Yes path: leave outpost, then set course. Clears pending. */
@@ -4253,18 +4516,39 @@ interface GameStore {
   /** OTA-1010 — a job just finished: the modal names it and holds until dismissed.
    *  Set ONLY by announceMissionComplete, the single choke point every
    *  completion path funnels through. */
-  missionCompleteNotice: { kind: string; title: string; rewards: string[] } | null;
+  /** OTA-1058 — `flavor` (story beats) and `heading` (a kicker that isn't
+   *  "<KIND> COMPLETE") are set by the boss VICTORY card; both are absent on an
+   *  ordinary mission notice, which renders exactly as it did before. */
+  missionCompleteNotice: {
+    kind: string; title: string; rewards: string[];
+    flavor?: string[]; heading?: string;
+  } | null;
   clearMissionCompleteNotice: () => void;
+  /** OTA-1037 — Contracts-screen refusal strip. A COMPLETE tap that does NOT end in
+   *  the completion popup surfaces the Arbiter's refusal line here — the
+   *  turn-in guards speak to the world feed, which the Contracts screen never
+   *  renders, so a refused tap read as "the button does nothing" (owner tapped
+   *  a READY contract ~15× against a wrong-faction hall into silence). */
+  contractsNotice: { text: string; ts: number } | null;
+  clearContractsNotice: () => void;
   /** OTA-1010 — the one way a mission/contract/thread ends. Writes the feed line AND
    *  raises the holding notice, so no completion can be silent again. Repeated
    *  calls for the SAME title merge (a thread's finale plus its bonus drop read
    *  as one result, not two popups fighting each other). */
   announceMissionComplete: (kind: string, title: string, body: string) => void;
   /** OTA-1030 — the notice-only half of announceMissionComplete (no feed line);
-   *  merges into any same-title notice already showing. Used by
-   *  dismissHookContinue to raise a completion stashed at terminal-stage
-   *  resolution. */
+   *  merges into any same-title notice already showing. */
   raiseMissionCompleteNotice: (kind: string, title: string, body: string) => void;
+  /** OTA-1058 — the boss VICTORY card: the fight's story beats and everything it
+   *  paid, in one popup that holds until dismissed. Called once with the whole
+   *  capture, then again for anything that lands late (the Resurrection Gem);
+   *  repeat calls for the same boss merge instead of replacing. */
+  raiseBossVictoryNotice: (name: string, flavor: string[], rewards: string[]) => void;
+  /** OTA-1060 — the same card under any banner. A VICTORY card is one kind of
+   *  SPOTLIGHT: a custom kicker, story above the take, gold instead of the
+   *  mission green. Use it for a milestone the player would otherwise only learn
+   *  about from a feed line that scrolls away. */
+  raiseSpotlightNotice: (heading: string, title: string, flavor: string[], rewards: string[]) => void;
   fusionBlockedNotice: { title: string; body: string; hint?: string } | null;
   clearFusionBlockedNotice: () => void;
   closeFusionPicker: () => void;
@@ -4315,14 +4599,24 @@ interface GameStore {
   confirmEquippedCatalystFusion: () => void;
   /** Dismiss the equipped-catalyst prompt without fusing. */
   cancelFusionCatalystPrompt: () => void;
-  /** arb-fix — the view-key (location|building|room|hubRoom) at which the player
-   *  X-dismissed the Fusing Crucible chip. Held in the STORE, not ExplorationScreen
-   *  local state, so a dismiss survives entering a vendor (which UNMOUNTS the
-   *  exploration screen and would otherwise lose a useState flag → the chip popped
-   *  back on return). The chip is hidden while this equals the current view-key;
-   *  moving to a different location changes the key and re-shows it. */
+  /** arb-fix — the key at which the player X-dismissed the Fusing Crucible chip.
+   *  Held in the STORE, not ExplorationScreen local state, so a dismiss survives
+   *  entering a vendor (which UNMOUNTS the exploration screen and would otherwise
+   *  lose a useState flag → the chip popped back on return).
+   *  OTA-1052 — the key is now the macro TILE (chipDismissTileKey), not the
+   *  room. Owner: "the crucible once dismissed can stay dismissed until we leave
+   *  the capital tile and come back" — a capital is a dozen rooms on ONE tile, so
+   *  a room-keyed dismiss (arb154) made the chip pop back on every room hop.
+   *  beginScene clears the key the moment the player leaves the tile, so a return
+   *  visit shows the chip again. */
   crucibleChipDismissedKey: string | null;
   setCrucibleChipDismissedKey: (key: string | null) => void;
+  /** OTA-1052 — same tile-scoped dismiss for the VENDOR chip's ✕ (owner: "there
+   *  should also be an x next to their names like the cruciable has"). Hides the
+   *  chip only — the vendor stays anchored to their room, so walking back in (or
+   *  typing "trade") still reaches them. */
+  vendorChipDismissedKey: string | null;
+  setVendorChipDismissedKey: (key: string | null) => void;
   /** OTA-439 — [audit #23] when a craft would CONSUME material substitutes
    *  (a misc/inferred item standing in for a named ingredient via its tags),
    *  ask before stripping them instead of silently eating them. `subsList` is
@@ -4567,6 +4861,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setCrucibleChipDismissedKey(key) {
     set({ crucibleChipDismissedKey: key });
   },
+  vendorChipDismissedKey: null,
+  setVendorChipDismissedKey(key) {
+    set({ vendorChipDismissedKey: key });
+  },
   craftSubstitutionPrompt: null,
   craftSubConfirmedFor: null,
   discoveryReveal: null,
@@ -4605,6 +4903,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   craftBatchQuiet: false,
   fusionPickerOpen: false,
   missionCompleteNotice: null,
+  contractsNotice: null,
+  storyIntro: null,
+  chapterCard: null, // OTA-1043
+  motivePickerPending: false, // OTA-1045
   fusionBlockedNotice: null,
   pendingFusionSelection: null,
   pendingAetherFoodId: null,
@@ -5380,6 +5682,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentScene: restoredScene,
         pendingRolls: null,
   pendingHookContinue: null,
+        // OTA-1041 — a loaded save never reopens the crawl mid-game.
+        storyIntro: null,
+        chapterCard: null, // OTA-1043 — nor a stale chapter card
+        // OTA-1045 — a save whose motive was DEALT (backfill guess, never
+        // chosen) is owed the one-time picker, right here on load.
+        motivePickerPending: player.storyMotiveChosen !== true,
+
         pendingGolemNaming: false,
         justUpdatedFromBuild: null,
         // OTA-100 — clear pendingOtaAppliedFrom in the same set
@@ -5633,6 +5942,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentScene: null,
         pendingRolls: null,
         pendingHookContinue: null,
+        // OTA-1045 — resurrection is a load path too: a dealt-motive save
+        // gets its one-time picker here as well.
+        motivePickerPending: revived.storyMotiveChosen !== true,
         wastelandStepsSinceEncounter: 0,
         stepsSinceCombat: 0,
       });
@@ -5681,7 +5993,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       crashedSlotIds,
       // If we just deleted the currently-loaded character, drop player state too.
       ...(get().activeSlotId === slotId
-        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null }
+        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null, storyIntro: null, chapterCard: null, motivePickerPending: false }
         : {}),
     });
   },
@@ -5744,6 +6056,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // (a transient UI flag that otherwise survives from a prior session).
       callDogModalOpen: false,
       pendingParley: null, // OTA-808 — clear any stale parley on a fresh game
+      // OTA-1041 — THE OPENING CRAWL. A brand-new character opens on the
+      // reason they came down: three universal pages (the flood, the thousand
+      // years, the nine hearts), two for their motive, one for the faction
+      // that took them in, and the closing hand-off. Assembled per-character;
+      // the StoryIntroOverlay shows it over the first scene.
+      storyIntro: introPagesFor(player.storyMotive, player.factionId),
+      chapterCard: null, // OTA-1043 — no stale card from a prior character
+      motivePickerPending: false, // OTA-1045 — creation chose; nothing owed
     });
     try {
       get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
@@ -5764,10 +6084,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     await get().persist();
     const slots = await listSlots();
     set({ slots });
-    // First-time tutorial — only on brand-new characters. The
-    // tutorial's beat-0 Arbiter line arms awaitingTutorialName so
-    // the next text input becomes the player's name.
-    if (!player.hasSeenIntro) {
+    // First-time tutorial — only on brand-new characters. OTA-1042 — THE
+    // ARBITER HOLDS HIS TONGUE. Owner: "the arbiter says his tutorial
+    // opening line over top of the new origin text screens — it needs to
+    // hold until you are in the tutorial." startTutorial() used to fire
+    // HERE, printing "Your name, traveler..." into the feed while the
+    // OTA-1041 crawl was still covering the screen. The tutorial STATE is
+    // already armed above (so the scene-entry hints stay suppressed); the
+    // spoken name prompt now waits for dismissStoryIntro() — the moment
+    // the crawl closes and the player is actually looking at the feed.
+    // The immediate call survives only as a fallback for the no-crawl case.
+    if (!player.hasSeenIntro && !get().storyIntro) {
       get().startTutorial();
     }
   },
@@ -5787,6 +6114,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScene: null,
       pendingRolls: null,
   pendingHookContinue: null,
+      storyIntro: null, // OTA-1041
+      chapterCard: null, // OTA-1043
+      motivePickerPending: false, // OTA-1045
       currentScreen: 'title',
       activeSlotId: null,
       slots,
@@ -5794,6 +6124,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   appendLog(channel, text, meta) {
+    // OTA-1058 — if a boss is being resolved, this line also goes on the victory
+    // card. No-op otherwise; nothing about the feed changes either way.
+    captureBossVictoryLine(channel, text);
     // 2026-05-25 OTA-034 — narration-channel invariant. The authored
     // vendor caught-stealing line ("Thief! — steel comes out.") is
     // emitted ONCE in this file inside stealFromVendor. A first-time
@@ -6093,6 +6426,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         pruned[location.id] = { id: weather.id, rolledAtHours: skyHoursNow };
         return { worldMemory: { ...s.worldMemory, sceneWeatherByLoc: pruned } };
       });
+    }
+    // OTA-1052 — chip dismissals (Crucible ✕, vendor ✕) are TILE-scoped. Clear
+    // them the moment the player is standing somewhere else, so walking the rooms
+    // of a capital keeps a dismiss but leaving and returning brings the chip back
+    // (owner: "stay dismissed until we leave the capital tile and come back").
+    {
+      const tileNow = chipDismissTileKey(player);
+      const cruc = get().crucibleChipDismissedKey;
+      const vend = get().vendorChipDismissedKey;
+      if (cruc && cruc !== tileNow) set({ crucibleChipDismissedKey: null });
+      if (vend && vend !== tileNow) set({ vendorChipDismissedKey: null });
     }
     const hazard = pickHazardForLocation(location);
     // HANDOFF #15b — hub mode. When player is at the hub location AND
@@ -8801,39 +9145,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
     }
-    // OTA-120 — Dog Companion: three-step Arbiter onboarding takeover.
-    // While pendingDogOnboarding is non-null, ALL player input goes
-    // through the onboarding handler, NOT the normal verb pipeline.
-    // Each input fills the current stage's field (breed → name →
-    // sex); after the sex stage the dog is finalized and all rescue
-    // hooks die globally.
+    // OTA-120 — Dog Companion onboarding. OTA-1050 — the three-step TYPED
+    // takeover is gone: a playtester mid-rescue typed "rest", couldn't tell
+    // the naming moment from a fight, and the takeover silently stored
+    // "rest" as the breed. Breed/name/sex now land together in the
+    // DogOnboardingModal popup (confirmDogOnboarding). Typed input while
+    // the ask is open is NEVER treated as an answer — the Arbiter points
+    // back at the card.
     if (get().worldMemory.pendingDogOnboarding) {
       get().appendLog('player', trimmed);
-      handleDogOnboardingInput(get, set, trimmed);
+      get().appendLog('dog_quest', `The Arbiter raises a hand. "The dog first. Answer the card in front of you."`);
       void get().persist();
       return;
     }
-    // OTA-466 — golem naming takeover. Set right after a summon: the next typed
-    // input names the golem (or "skip" keeps the type label). One input only.
+    // OTA-466 — golem naming. OTA-1050 — same popup treatment as the dog: the
+    // name lands in the GolemNamingModal (confirmGolemName), never in typed
+    // feed input. A golem that vanished before naming (dismissed / died)
+    // just clears the flag and the input processes normally.
     if (get().pendingGolemNaming) {
-      get().appendLog('player', trimmed);
-      const golemNow = get().player?.golem;
-      if (!golemNow) {
-        // Golem vanished before naming (dismissed / died) — just clear the flag.
+      if (!get().player?.golem) {
         set({ pendingGolemNaming: false });
-      } else if (/^(skip|no|none|nope|leave it|no name|nvm|cancel|n)$/i.test(trimmed)) {
-        set({ pendingGolemNaming: false });
-        get().appendLog('arbiter', `"As you like," the Arbiter says. "It answers to its making, then — ${golemNow.name}."`);
       } else {
-        const name = trimmed.slice(0, 16).trim() || golemNow.name;
-        set((s) => (s.player && s.player.golem
-          ? { pendingGolemNaming: false, player: { ...s.player, golem: { ...s.player.golem, name } } }
-          : { pendingGolemNaming: false }));
-        get().appendLog('world', `${name}. The name takes hold in the Aetherstone.`);
-        get().appendLog('arbiter', `The Arbiter nods. "${name}, then."`);
+        get().appendLog('player', trimmed);
+        get().appendLog('arbiter', `"The construct first," the Arbiter says. "Seal a name on the card, or let it keep its making."`);
+        void get().persist();
+        return;
       }
-      void get().persist();
-      return;
     }
     const parsed = parseInput(trimmed, parseCtx);
     // OTA-128 — silent re-dispatch (drink-of-consumable, etc.) skips
@@ -12456,7 +12793,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const hasReclaimersRopeForRest = player.inventory.some(
               (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
             );
-            const canRestElevated = wearsClimbStrapForRest || (!onGreatClimb && hasReclaimersRopeForRest);
+            // OTA-1039 — HONEST REFUSAL. Climbing accepts a Reclaimer's Rope OR a plain
+            // Climbing Rope (see pickActiveRope), but resting on the wall accepts
+            // only the Reclaimer's. A player who just climbed on a Climbing Rope was
+            // told to "carry a Reclaimer's Rope" — which reads as "you have no rope"
+            // while they hang from one. Name the line they're on and what it can't do.
+            const hasPlainClimbingRope = player.inventory.some(
+              (i) => i.name === 'Climbing Rope' && i.quantity > 0,
+            );
+            // OTA-1040 — OWNER'S RULE: "no it shouldn't, you need the hardened
+            // climbing strap for that." A rope is a line you climb, not a
+            // harness you can hang and sleep in — on ANY climb, not just a
+            // great one. The Reclaimer's-Rope allowance on ordinary climbs is
+            // gone; the strap is the single answer. (hasReclaimersRopeForRest /
+            // hasPlainClimbingRope are kept below only to name what you're
+            // carrying in the refusal.)
+            const canRestElevated = wearsClimbStrapForRest;
             if (!canRestElevated) {
               // OTA-975 — skipDedup: the pillar log showed rest retries 2-4 dedup-
               // swallowed into silence. A refusal always answers.
@@ -12464,7 +12816,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 'arbiter',
                 onGreatClimb
                   ? `The Arbiter cranes to look up the ${currentScene.elevatedOn.noun}. "This high, only a Hardened Climbing Strap will hold you for a rest — a rope won't do it. Climb down, or come back wearing one."`
-                  : `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
+                  : (hasPlainClimbingRope || hasReclaimersRopeForRest)
+                    // OTA-1040 — they ARE carrying a line; say why it isn't enough.
+                    ? `The Arbiter looks up. "A line gets you up — it won't hold you asleep. Only a Hardened Climbing Strap will. Climb down, or come back wearing one."`
+                    : `The Arbiter looks up. "You can't sleep on a wall. Climb down, or come back wearing a Hardened Climbing Strap — that harness is the only thing that anchors a doze."`,
                 { skipDedup: true },
               );
               break;
@@ -12715,7 +13070,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // warning (OTA-244) gives the heads-up; if the player
             // rests anyway, RNG runs free. Stays a design dial we
             // can re-enable later if playtest insists.
-            const rawRestEnemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
+            const rawWildRestEnemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
+            // OTA-1055 — UNDER A ROOF, THE CAST CHANGES. The pick above is the
+            // wilderness table, which is right out in the mud and absurd in a
+            // fortified capital's bunkroom (owner's log: a Rare 202-HP Mud
+            // Cyclops in the Builders' crew bunks). Swap in an indoor-plausible
+            // ambusher AT THE SAME RARITY — an intruder, vermin, a patrol
+            // machine, or one of the dead sealed in these walls — so the danger
+            // the roll chose is preserved and only the cast is believable. The
+            // odds are untouched (a hub rest is already 8% vs the wilds' 22%).
+            // Reuse the enclosing action's own roof test (computed for the
+            // weather tick). It is the RIGHT predicate here too: it treats the
+            // outpost gate / square / culvert descent as OPEN AIR, so something
+            // can still walk in off the mud where the outpost opens to the sky,
+            // but never into a sealed bunkroom.
+            const restUnderRoof = underRoof;
+            // OTA-1056 — and about half the time it's PEOPLE, not a creature (owner:
+            // the indoor list should cover raiders and soldiers). The caller is
+            // the faction you've wronged most — a real grudge is why someone
+            // walks into a capital after you — dressed on a same-rarity HUMAN
+            // body so a soldier fights like one. Falls back to the creature cast
+            // at Common, where no human body exists.
+            const restIndoorSwap = restUnderRoof && rawWildRestEnemy
+              ? (() => {
+                  // eslint-disable-next-line @typescript-eslint/no-require-imports
+                  const ia = require('../engine/indoorAmbush') as typeof import('../engine/indoorAmbush');
+                  if (Math.random() < 0.5) {
+                    const grudge = worstStandingFaction(player);
+                    const people = grudge
+                      ? ia.pickIndoorFactionIntruder(rawWildRestEnemy.rarity, grudge.id, grudge.name)
+                      : null;
+                    if (people) return people;
+                  }
+                  return ia.pickIndoorAmbusher(rawWildRestEnemy.rarity);
+                })()
+              : null;
+            const rawRestEnemy = restIndoorSwap ?? rawWildRestEnemy;
             // OTA-816 — scale the rest-ambusher the same way scene-arrival foes scale.
             const restPlayer = get().player;
             const enemy = rawRestEnemy && restPlayer
@@ -12737,11 +13127,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     },
                   }
                 : s);
+              // OTA-1055 — indoors both beats are re-voiced: "circled" and "closes
+              // the distance" are open-ground images, and the unsettling part of
+              // waking up in a sealed room is that it was already in with you.
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const restAmb = require('../engine/indoorAmbush') as typeof import('../engine/indoorAmbush');
               get().appendLog(
                 'arbiter',
-                `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
+                restUnderRoof
+                  ? restAmb.indoorRestWakeLine()
+                  : `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
               );
-              get().appendLog('world', `${withArticleCap(enemy.name)} closes the distance through the dark. The rest is over.`);
+              get().appendLog('world', restUnderRoof
+                ? restAmb.indoorRestArrivalLine(withArticleCap(enemy.name))
+                : `${withArticleCap(enemy.name)} closes the distance through the dark. The rest is over.`);
               get().appendLog('debug', debugEnemy(enemy as unknown as Record<string, unknown>)); // OTA-354
             } else {
               // No enemy could be spawned — emit a flavor line so the
@@ -16827,8 +17226,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const hook = state.currentScene.hooks?.find((h) => h.id === pending.hookId);
     if (!hook || hook.resolved) {
       // Hook already terminated (stale tap on a popup whose final-stage flag
-      // was already true). Close via the dismiss path so a stashed completion
-      // notice still raises instead of being dropped.
+      // was already true). Close via the dismiss path for symmetry.
       get().dismissHookContinue();
       return;
     }
@@ -16843,13 +17241,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // state). Just clears the popup state; the hook is already
   // resolved at this point.
   dismissHookContinue() {
-    // OTA-1030 — COMPLETE on the final stage: raise the completion notice STASHED at
-    // terminal-stage resolution, now that the player has read the arc and
-    // closed it. TRADE NOW routes here too, so a finished thread's payout is
-    // never silently dropped.
-    const stash = get().pendingHookContinue?.completionNotice;
+    // OTA-1050 — the post-COMPLETE popup is gone (owner: the thread modal already
+    // shows the reward, so a second popup with another close button was
+    // redundant). The payout now gets the prominent reward strip inside
+    // HookContinueModal's completed state; the feed's green ✦ line remains
+    // the permanent record.
     set({ pendingHookContinue: null });
-    if (stash) get().raiseMissionCompleteNotice(stash.kind, stash.title, stash.body);
   },
 
   dismissWhisperComplete() {
@@ -17023,9 +17420,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const sc = get().currentScene;
         if (passChance <= 0.55 && !sc?.sneakOddsWarned) {
           set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, sneakOddsWarned: true } } : s));
+          // OTA-1038 — this fired verbatim at MID range too, telling the player about
+          // "arm's reach" while they stood well off it. Name the range they're in.
+          const atReach = sc?.range === 'close';
+          const wherePhrase = atReach ? `a foe at arm's reach` : `a foe who already has your scent`;
+          const slipPhrase = atReach ? `Slipping away at arm's reach` : `Slipping away once they're onto you`;
           get().appendLog('arbiter', passChance <= 0.25
-            ? `The Arbiter keeps his voice low. "Your stealth won't carry you past a foe at arm's reach — not here. Every try just buys them a free swing. Fight it out, or break to distance first."`
-            : `The Arbiter keeps his voice low. "Slipping away at arm's reach is a coin-flip with your stealth — and a miss lets the whole pack swing free. Weigh it against just fighting."`);
+            ? `The Arbiter keeps his voice low. "Your stealth won't carry you past ${wherePhrase} — not here. Every try just buys them a free swing. Fight it out, or break to distance first."`
+            : `The Arbiter keeps his voice low. "${slipPhrase} is a coin-flip with your stealth — and a miss lets the whole pack swing free. Weigh it against just fighting."`);
         }
       }
       // OTA-999 — a CLOSE failed stealth check teaches a little while STE is
@@ -17187,7 +17589,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // roll") — a passed check then still lost an unwinnable init race and
               // surprised the player every time. Use the raw stat like the rest of
               // the engine so STEALTH actually helps.
-              const steBonus = ste;
+              // OTA-1038 — Shadow Diver's +1 rode the GATE roll (buildSkillSteps folds
+              // titleSkillBonus in, which is why the log reads "STE 1 + 1 (title:
+              // Shadow Diver)") but was missing from THIS contest — the roll that
+              // actually decides the outcome. The stealth title got you into the
+              // race and then sat out. Same bonus, both rolls.
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const stealthTitleBonus: number = livePlayer
+                ? (require('../engine/titles').titlePerkModifiers(livePlayer).stealthBonus ?? 0)
+                : 0;
+              const steBonus = ste + stealthTitleBonus;
               // #6 — day/night cover applies to EVERY stealth check, not just
               // pickpocket (playtest: "does stealth scale up at night, down in the
               // day?"). Fold the same +1-night / −1-day modifier the sleight-of-hand
@@ -17254,7 +17665,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   stealthSucceeded = true;
                 } else {
                   set((s) => (s.player
-                    ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'surprised', remainingRounds: 1, label: 'caught mid-vanish' }) } }
+                    ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'surprised', remainingRounds: 1, label: 'exposed opening' }) } }
                     : s));
                   get().appendLog('world', `${foe} reads the move before you finish it — you break contact a beat too slow and leave yourself open. Their next strike has the advantage.`);
                   get().appendLog('debug', `stealth: reset LOSE init ${pInit} vs ${eInit} — surprised applied`);
@@ -17605,6 +18016,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         switch (intent) {
           case 'stealth':
             get().appendLog('world', 'Your foot scrapes stone. Something stirs in the dark.');
+            // OTA-1038 — CHARGE WHAT THE GAME PROMISES. The sneak-odds warning above
+            // tells the player in as many words that a miss "lets the whole pack
+            // swing free", and the OTA-936 comment that authored it says a failed
+            // sneak "burns the turn AND the whole enemy group swings free" — but
+            // nothing here ever ran the counters. Measured: a FAILED sneak cost
+            // 0 HP and no status, while a SUCCESSFUL one cost HP every time
+            // (the reset branch always runs the counters). Rolling badly was the
+            // better play. The failed-flee path right below has always charged
+            // this ("a FAILED flee is not free"); stealth now matches.
+            if ((currentScene.enemies?.length ?? 0) > 0) {
+              runEnemyGroupCounters(get, set, player);
+            }
             break;
           case 'diplomacy': {
             const hasAudience = currentScene.enemies.length > 0 || !!currentScene.vendor;
@@ -17759,6 +18182,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : `${enemy.name} moves first. The pressure is immediate.`);
     }
 
+    // OTA-1040 — INITIATIVE NOW DECIDES THE ORDER. Owner: "I thought the initiative
+    // roll was the deciding factor on who went first on any series of attacks."
+    // It wasn't — the roll had exactly ONE consumer in the whole codebase, the
+    // line printed just above. Whoever won it, the player's swing always
+    // resolved first and the enemy group always answered afterward, so "X moves
+    // first. The pressure is immediate." described something that never
+    // happened. Losing initiative now genuinely costs the tempo: the enemy
+    // group takes its turn BEFORE your strike lands — and if that volley drops
+    // you, your swing never happens at all. The volley is MOVED, not added:
+    // every post-strike counter site below is suppressed when it already ran,
+    // so a round still contains exactly one enemy volley. (skipDotTick mirrors
+    // the post-strike sites — the attack path ticked DOTs at case-top.)
+    const lostInitiative = !!initiative && !initiative.success;
+    let enemiesActedFirst = false;
+    if (lostInitiative && (get().currentScene?.enemies?.length ?? 0) > 0) {
+      runEnemyGroupCounters(get, set, player, { skipDotTick: true });
+      enemiesActedFirst = true;
+      const afterVolley = get().player;
+      if (!afterVolley || afterVolley.hp <= 0 || afterVolley.dead) {
+        // They got there first. The swing you committed to never lands.
+        const hoursAfterInit = get().player?.hoursElapsed ?? hoursBeforeConclude;
+        const dtInit = hoursAfterInit - hoursBeforeConclude;
+        if (dtInit > 0) {
+          const label = dtInit < 1 ? `${Math.round(dtInit * 60)} min` : `${Math.round(dtInit * 10) / 10}h`;
+          get().appendLog('system', `⏳ Time passed: ${label}`);
+        }
+        void get().persist();
+        return;
+      }
+    }
+
     // Always log the player's attack roll math so the combat log mirrors
     // the enemy's "d20 → X + ATK Y = Z vs AC W" line. Without this the
     // disk log only shows enemy attack rolls, which reads as one-sided.
@@ -17801,7 +18255,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         // The dodge still costs the player the action — let any reaching
         // enemy counter-attack, same as a miss path.
-        runEnemyGroupCounters(get, set, player);
+        // OTA-1040 — unless they already swung first (lost initiative).
+        if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player);
         // Surface clock movement before we early-return.
         const hoursAfterDodge = get().player?.hoursElapsed ?? hoursBeforeConclude;
         const dt = hoursAfterDodge - hoursBeforeConclude;
@@ -17847,7 +18302,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'combat',
             `Stonework fist rings off ${enemy.name} — d${spec.sides} rolled ${natural}, needed ${spec.hitGate}.`,
           );
-          runEnemyGroupCounters(get, set, player);
+          if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player); // OTA-1040 — one volley per round
           const hoursAfterGate = get().player?.hoursElapsed ?? hoursBeforeConclude;
           const dt = hoursAfterGate - hoursBeforeConclude;
           if (dt > 0) {
@@ -18371,11 +18826,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // After the player's strike, every still-living enemy that ISN'T
         // knocked out counter-attacks (runEnemyGroupCounters skips KO'd).
         // skipDotTick — the attack path already ticked DOTs at case-top.
-        runEnemyGroupCounters(get, set, player, { skipDotTick: true });
+        // OTA-1040 — skipped when initiative already gave them the first swing.
+        if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player, { skipDotTick: true });
       }
     } else {
       get().appendLog('combat', attackMiss(weaponName, enemy.name));
-      runEnemyGroupCounters(get, set, player, { skipDotTick: true });
+      // OTA-1040 — one volley per round; skipped if initiative already spent it.
+      if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player, { skipDotTick: true });
     }
 
     if (shouldArbiterSpeak()) {
@@ -18610,6 +19067,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (locationId === 'mud_flood_nexus') {
       triggerMainQuest(get, set, { kind: 'reached_nexus' });
     }
+    // OTA-1044 — the motive drip rides travel arrivals (one story event max
+    // per arrival; holds during the opening / chapter cards / hostile scenes).
+    advanceStoryDrip(get, set, locationId);
     void get().persist();
   },
 
@@ -18628,6 +19088,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { currentScene, player, worldMemory } = get();
     const enemy = activeEnemy(currentScene);
     if (!currentScene || !enemy || !player) return;
+    // OTA-1058 — collect this fight's story + take into one card (bosses only).
+    bossVictoryCapture = enemy.boss ? { name: enemy.name, flavor: [], rewards: [] } : null;
     const activeIdx = currentScene.activeEnemyIdx;
     // Whisper-chain hook — Silt Thief death grants Stolen Aetheric
     // Discs and advances the Yulka chain to its return stage.
@@ -19132,6 +19594,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // guest, e.g. Irma the True Tartarian) — angered too for the harm to their
     // member. Deltas accumulate so a faction that is both offended AND another
     // victim's rival nets out sensibly.
+    // OTA-1038 — every faction this kill has ALREADY docked, so no later pass can
+    // charge the same faction twice for the same corpse.
+    const killDockedFactions = new Set<string>();
     const killFactionTargets = [enemy.factionId, enemy.nativeFactionId]
       .filter((f): f is string => !!f)
       .filter((f, i, arr) => arr.indexOf(f) === i);
@@ -19164,6 +19629,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (changed.length > 0) {
           set((s) => (s.player ? { player: { ...s.player, factionStanding: nextStanding } } : s));
           logRepChanges(get, changed);
+          // OTA-1038 — only the PENALTIES claim the slot; a rival's +1 must not stop
+          // the reverence pass from reaching that faction.
+          for (const c of changed) if (c.delta < 0) killDockedFactions.add(c.factionId);
         }
       }
     }
@@ -19212,6 +19680,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
     }
+    // OTA-1044 — THE MISSING's third answer, put to rest. The closing beats
+    // and the keepsake are GUARANTEED here (never a dice roll), and the
+    // thread marks resolved HERE, not at spawn — a fled fight re-offers the
+    // walker at the next Lost Capital instead of losing the ending forever.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const dripMod = require('../engine/storyDrip') as typeof import('../engine/storyDrip');
+      const pWalk = get().player;
+      if (pWalk && dripMod.isMissingWalker(enemy)) {
+        const person = dripMod.missingPersonName(dripMod.storySeed(pWalk));
+        const res = dripMod.missingResolution('walker', person);
+        for (const line of res.defeat ?? []) get().appendLog(line.speaker, line.text);
+        const keep: InventoryItem = {
+          id: freshInstanceId('story_keepsake'),
+          name: res.keepsake.name, kind: 'relic', rarity: 'Legendary', quantity: 1,
+          tags: ['quest', 'story', 'keepsake'], description: res.keepsake.description,
+        };
+        set((s2) => (s2.player ? { player: { ...s2.player, missingResolved: 'walker', inventory: mergeOrPushItem(s2.player.inventory, keep) } } : s2));
+        get().appendLog('reward', `✦ ${keep.name} — it was theirs the whole time. Yours now to carry home.`);
+      }
+    }
     // OTA-1014 — putting a revenant to rest is a mercy, never a hunt. Guarded by
     // the fallen_revenant TRAIT (isRevenant), not by name-matching, so a
     // character literally named "Aetherkin" is not punished for avenging
@@ -19219,7 +19708,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const revExempt = (require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants')).isRevenant(enemy);
     if (!revExempt && isAetherkin(enemy)) {
-      const revChanged = applyAetherkinReverenceDelta(get, set, AETHERKIN_KILL_REP);
+      const revChanged = applyAetherkinReverenceDelta(get, set, AETHERKIN_KILL_REP, killDockedFactions);
       if (revChanged.length > 0) {
         logRepChanges(get, revChanged);
         get().appendLog('system', 'Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.');
@@ -19508,7 +19997,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? `✦ The buried world relents — a Resurrection Gem at the ${newKills}-kill mark. (${total} held)`
           : `✦ A Resurrection Gem flickers from the dust — gathered to your stash. (${total} held)`;
         get().appendLog('reward', line);
+        // OTA-1058 — the gem lands a tick LATE (the count is read off disk), long
+        // after the synchronous window shut. Push it onto the card by name; the
+        // merge-by-title path adds it to the one already showing.
+        if (enemy.boss) get().raiseBossVictoryNotice(enemy.name, [], [line]);
       });
+    }
+    // OTA-1058 — shut the window and show what the fight was worth. Cleared FIRST
+    // so an exception below can never leave a stale capture collecting the rest
+    // of the session's narration into a card that opens on the next boss.
+    if (bossVictoryCapture) {
+      const cap = bossVictoryCapture;
+      bossVictoryCapture = null;
+      get().raiseBossVictoryNotice(cap.name, cap.flavor, cap.rewards);
     }
     void get().persist();
   },
@@ -20379,7 +20880,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       };
     });
-    get().appendLog('world', `You fix the ${torch.name}'s aetheric light on the ${noun}. It answers with a deep, wrong-sounding resonance — there is more here than there should be. Work the ${noun} — investigate it and it will give up something rare.`);
+    // OTA-1049 — the mark line repeated VERBATIM per torch use (twice in ten
+    // minutes in the owner's log) and leaned on "resonance", the same word
+    // the owner already flagged as overused. Four variants, one keeper.
+    const torchMarkLines = [
+      `You fix the ${torch.name}'s aetheric light on the ${noun}. It answers with a deep, wrong-sounding resonance — there is more here than there should be. Work the ${noun} — investigate it and it will give up something rare.`,
+      `You sweep the ${torch.name}'s light across the ${noun}. The glow catches and HOLDS — the Aether has marked something inside. Work the ${noun} — investigate it and it will give up something rare.`,
+      `Under the ${torch.name}'s light the ${noun} throws a second shadow it should not have. Something is layered in there. Work the ${noun} — investigate it and it will give up something rare.`,
+      `The ${torch.name}'s light thins against the ${noun} and comes back tinged — the color of buried metal. Work the ${noun} — investigate it and it will give up something rare.`,
+    ];
+    get().appendLog('world', torchMarkLines[Math.floor(Math.random() * torchMarkLines.length)]!);
     void get().persist();
   },
 
@@ -22051,7 +22561,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // Player tapped on purpose; no need to walk to a vendor first.
   // Still validates stage / boss-kill criteria, still grants the
   // same reward.
+  // OTA-1037 — WRAPPER: a COMPLETE tap must ANSWER ON THIS SCREEN. The typed
+  // turn-ins the body delegates to guard with Arbiter lines (wrong faction, no
+  // agent in scene, work not done) spoken to the world feed — which the
+  // Contracts screen doesn't render. Owner's report: a READY faction contract's
+  // green COMPLETE tapped ~15× while standing in another faction's hall "did
+  // nothing" — the log shows 7 invisible wrong-faction refusals plus dedup
+  // crumbs. If the tap doesn't raise the completion popup, the freshest
+  // Arbiter line — or, when the arbiter dedup swallowed a repeat, the line it
+  // suppressed — is surfaced as contractsNotice for the screen's strip.
   completeContractFromUI(kind, id) {
+    const logBefore = get().gameLog;
+    const lastIdBefore = logBefore[logBefore.length - 1]?.id ?? null;
+    const noticeBefore = get().missionCompleteNotice;
+    get().completeContractFromUIInner(kind, id);
+    if (get().missionCompleteNotice !== noticeBefore) {
+      // Completed — the popup tells the story; drop any stale refusal.
+      if (get().contractsNotice) set({ contractsNotice: null });
+      return;
+    }
+    const logAfter = get().gameLog;
+    let refusal: string | null = null;
+    for (let i = logAfter.length - 1; i >= 0; i--) {
+      const e = logAfter[i];
+      if (!e || e.id === lastIdBefore) break;
+      if (e.channel === 'arbiter') { refusal = e.text; break; }
+    }
+    if (!refusal) {
+      // No fresh line and no popup: the arbiter dedup ate a repeat refusal.
+      // Surface the newest arbiter line — on a repeat tap that IS the refusal.
+      for (let i = logAfter.length - 1; i >= 0; i--) {
+        const e = logAfter[i];
+        if (e?.channel === 'arbiter') { refusal = e.text; break; }
+      }
+    }
+    if (refusal) set({ contractsNotice: { text: refusal, ts: Date.now() } });
+  },
+
+  completeContractFromUIInner(kind, id) {
     const player = get().player;
     if (!player) return;
     if (kind === 'hunt') {
@@ -22665,8 +23212,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // back to currentScene.location.name on the next render. Player
     // tapped STOP TRAVEL; they're now standing where they stopped,
     // not "near X."
+    // OTA-1037 — quit-navigating also stands down mission auto-routing. routedMission
+    // used to survive this, so the Contracts card kept its "Auto-routing" note
+    // (which replaces the ROUTE button) with no course left to chain — a wedged
+    // card whose only way out was deactivate → reactivate (the owner's
+    // accidental workaround). Same fix in stopWhisperCourse below.
     set((s) => (s.player ? {
-      player: { ...s.player, travelTarget: undefined },
+      player: { ...s.player, travelTarget: undefined, routedMission: null },
       currentScene: s.currentScene ? { ...s.currentScene, transitArea: null } : s.currentScene,
     } : s));
     get().appendLog(
@@ -22755,7 +23307,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   stopWhisperCourse() {
     const player = get().player;
     if (!player || !player.whisperCourse) return;
-    set((s) => (s.player ? { player: { ...s.player, whisperCourse: null } } : s));
+    // OTA-1037 — see stopTravel: cancelling the course cancels the route chain too.
+    set((s) => (s.player ? { player: { ...s.player, whisperCourse: null, routedMission: null } } : s));
     get().appendLog('world', 'You set the course aside. Cardinal direction is yours again.');
   },
 
@@ -26041,6 +26594,94 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   clearMissionCompleteNotice() { set({ missionCompleteNotice: null }); },
 
+  // OTA-1041 — close the opening crawl. The SEEN flag lives on the CHARACTER
+  // (persisted), so a save that finished or skipped the crawl never gets
+  // re-ambushed by it — while REPLAY OPENING (About) can always re-raise it.
+  dismissStoryIntro() {
+    // OTA-1042 — closing the FIRST crawl of a brand-new character is the
+    // hand-off to the Arbiter: startNewGame armed the tutorial but held the
+    // spoken name prompt so it couldn't print underneath the crawl. Fire it
+    // now, once. storyIntroSeen===false only on that first showing — a
+    // REPLAY OPENING dismiss (About) and every backfilled save arrive here
+    // with it already true, so neither can restart the tutorial.
+    const pre = get().player;
+    const handOffToTutorial = !!pre && pre.storyIntroSeen === false && !pre.hasSeenIntro;
+    set((st) => ({
+      storyIntro: null,
+      player: st.player ? { ...st.player, storyIntroSeen: true } : st.player,
+    }));
+    if (handOffToTutorial) get().startTutorial();
+    void get().persist();
+  },
+
+  replayStoryIntro() {
+    const p = get().player;
+    if (!p) return;
+    set({ storyIntro: introPagesFor(p.storyMotive, p.factionId) });
+  },
+
+  // OTA-1043 — close the chapter card. Nothing to remember: the phase
+  // transition that raised it is already on the player record (and
+  // persisted), and the feed carries the transition's narration.
+  dismissChapterCard() { set({ chapterCard: null }); },
+
+  // OTA-1045 — the one-time veteran motive picker commits here. The pick
+  // (or the kept guess — confirming the dealt motive counts) becomes the
+  // character's CHOSEN motive: persisted, never asked again. Beats already
+  // seen under the old motive keep their ids (motive-prefixed, no
+  // collision); the new motive's thread simply starts from its first beat.
+  confirmMotivePick(motiveId) {
+    const p = get().player;
+    if (!p) { set({ motivePickerPending: false }); return; }
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const story = require('../engine/story') as typeof import('../engine/story');
+    const chosen = story.isStoryMotiveId(motiveId) ? motiveId : (p.storyMotive ?? 'debt');
+    set({
+      player: { ...p, storyMotive: chosen, storyMotiveChosen: true },
+      motivePickerPending: false,
+    });
+    const title = story.motiveById(chosen).title;
+    get().appendLog(
+      'arbiter',
+      `The Arbiter marks the ledger without looking up. "${title}. So that is why you came down. The mud had its own guess; yours is the one that counts. Walk on."`,
+    );
+    void get().persist();
+  },
+
+  // OTA-1050 — the dog onboarding popup commits here; the shared finalization
+  // lives in module-level finalizeDogOnboarding (same caps + feed beats the
+  // old typed path produced).
+  confirmDogOnboarding(breedRaw, nameRaw, sexRaw) {
+    finalizeDogOnboarding(get, set, breedRaw, nameRaw, sexRaw);
+  },
+
+  // OTA-1050 — the golem naming popup commits here (replaces the typed
+  // takeover's two branches: seal a name, or keep its making).
+  confirmGolemName(name) {
+    if (!get().pendingGolemNaming) return;
+    const golemNow = get().player?.golem;
+    if (!golemNow) {
+      // Golem vanished before naming (dismissed / died) — just clear the flag.
+      set({ pendingGolemNaming: false });
+      void get().persist();
+      return;
+    }
+    const sealed = (name ?? '').trim().slice(0, 16).trim();
+    if (!sealed) {
+      set({ pendingGolemNaming: false });
+      get().appendLog('arbiter', `"As you like," the Arbiter says. "It answers to its making, then — ${golemNow.name}."`);
+    } else {
+      set((s) => (s.player && s.player.golem
+        ? { pendingGolemNaming: false, player: { ...s.player, golem: { ...s.player.golem, name: sealed } } }
+        : { pendingGolemNaming: false }));
+      get().appendLog('world', `${sealed}. The name takes hold in the Aetherstone.`);
+      get().appendLog('arbiter', `The Arbiter nods. "${sealed}, then."`);
+    }
+    void get().persist();
+  },
+
+  clearContractsNotice() { set({ contractsNotice: null }); },
+
   announceMissionComplete(kind, title, body) {
     // The feed line is unchanged — the log stays a complete record, and anything
     // that greps it (chronicle, bug reports) keeps working.
@@ -26050,10 +26691,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   raiseMissionCompleteNotice(kind, title, body) {
     const prev = get().missionCompleteNotice;
+    // OTA-1058 — also merge into a VICTORY card that's already up. A boss kill
+    // that finishes a hunt used to raise two popups that fought over the screen;
+    // one battle should read as one result.
+    const mergeInto = prev && (prev.title === title || !!prev.heading);
     set({
-      missionCompleteNotice: prev && prev.title === title
-        ? { ...prev, rewards: [...prev.rewards, body.replace(/^✦\s*/, '')] }
-        : { kind, title, rewards: [body.replace(/^✦\s*/, '')] },
+      missionCompleteNotice: mergeInto
+        ? { ...prev!, rewards: mergeRewardLines(prev!.rewards, [body]) }
+        : { kind, title, rewards: mergeRewardLines([], [body]) },
+    });
+  },
+
+  raiseBossVictoryNotice(name, flavor, rewards) {
+    get().raiseSpotlightNotice('VICTORY', name, flavor, rewards);
+  },
+
+  raiseSpotlightNotice(heading, title, flavor, rewards) {
+    const prev = get().missionCompleteNotice;
+    const same = prev?.title === title;
+    set({
+      missionCompleteNotice: {
+        kind: heading,
+        heading,
+        title,
+        flavor: [...(same ? prev?.flavor ?? [] : []), ...flavor],
+        // A mission card raised earlier in the same moment is absorbed rather
+        // than dropped — its reward lines were captured too, and mergeRewardLines
+        // dedupes the overlap.
+        rewards: mergeRewardLines(prev?.rewards ?? [], rewards),
+      },
     });
   },
 
@@ -27711,27 +28377,16 @@ function resolveHookOneStep(
   // Stage numbers surface so the player knows where they are in the
   // chain: "★ STORY THREAD (step 2) — ..." If `outcome.done` is set,
   // we mark the line as a finale: "★★ STORY THREAD COMPLETE — ..."
-  // OTA-1010 — threads are unnamed content; the notice still needs something the
-  // player recognises, so use the hook's own kind as a readable title.
-  const hookTitleFor = (h: { kind?: string }) =>
-    String(h.kind ?? 'story thread').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const stageLabel = outcome.done
     ? '★★ STORY THREAD COMPLETE'
     : `★ STORY THREAD (step ${hook.stage + 1})`;
   get().appendLog('world', `${stageLabel} — ${outcome.line}`);
-  // OTA-1030 — the completion POPUP is deferred. It used to mount the instant the
-  // terminal stage resolved, landing ON TOP of the thread modal the player was
-  // still reading. The payload is stashed on pendingHookContinue below and
-  // raised by dismissHookContinue when the player taps COMPLETE on the final
-  // stage. The feed line stays immediate either way — the log remains a
-  // complete record.
-  let doneNotice: { kind: string; title: string; body: string } | null = null;
+  // OTA-1050 — no completion popup at all anymore (owner: redundant next to the
+  // thread modal's own reward display). The feed line stays immediate — the
+  // log remains a complete record — and the modal's completed state renders
+  // the payout in a prominent reward strip.
   if (inlineSummaries.length > 0) {
-    const body = `✦ ${inlineSummaries.join(', ')}.`;
-    get().appendLog('reward', body);
-    if (outcome.done) {
-      doneNotice = { kind: 'Story thread', title: hookTitleFor(hook), body };
-    }
+    get().appendLog('reward', `✦ ${inlineSummaries.join(', ')}.`);
   }
   // OTA-716 — reward for reading. Completing an easy-to-miss STORY THREAD
   // occasionally yields a GOOD material on top of the thread's own payout —
@@ -27850,7 +28505,6 @@ function resolveHookOneStep(
         noun: triggerNoun ?? hook.nouns[0] ?? 'this',
         stageHistory: [...existing, stageEntry],
         completed: outcome.done,
-        completionNotice: doneNotice,
       },
     };
   });
@@ -29191,6 +29845,19 @@ function triggerMainQuest(
       get().appendLog('arbiter', line);
     }
   }
+  // OTA-1043 — CHAPTER CARD on every phase transition (story phase 2).
+  // The feed narration above/below stays — the log remains the complete
+  // record — while the card is the full-screen cinematic marker on top,
+  // personalized to the character's OTA-1041 story motive. 'ended' has
+  // no card by design: EndingScreen is the ending's own full-screen
+  // presentation (it renders the motive epilogue line instead), and
+  // chapterCardFor returns null for it (and for 'hook').
+  if (nextState.phase !== prevState.phase) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ch = require('../engine/chapters');
+    const card = ch.chapterCardFor(nextState.phase, player.storyMotive);
+    if (card) set({ chapterCard: card });
+  }
   // For multi-phase triggers — e.g. core_recovered that lands the
   // player on phase 'descent' (5th Core) — also log the descent
   // narration so the player gets the "Stair opens" beat.
@@ -29228,6 +29895,73 @@ function triggerMainQuest(
     for (const line of cine) {
       get().appendLog('arbiter', line);
     }
+  }
+}
+
+// OTA-1044 — THE MOTIVE DRIP (story phase 3). Called on every travel arrival,
+// AFTER triggerMainQuest: delivers at most ONE story event per arrival —
+// either The Missing's resolution (which outranks everything once due) or the
+// next drip beat for the character's motive. Beats are strict-order,
+// one-shot (player.storyBeatsSeen), gated on hoursElapsed + Cores inside
+// nextDripBeat. Holds entirely while the opening still runs (tutorial/crawl),
+// while a chapter card owns the moment, or when the arrival scene is hostile
+// — a skipped beat simply waits for the next arrival.
+function advanceStoryDrip(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore>) => void,
+  arrivedAt: string,
+): void {
+  const player = get().player;
+  if (!player) return;
+  if (get().tutorialStep !== null || get().storyIntro || get().chapterCard) return;
+  if ((get().currentScene?.enemies?.length ?? 0) > 0) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const drip = require('../engine/storyDrip') as typeof import('../engine/storyDrip');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mq = require('../engine/mainQuest');
+  // THE MISSING's trail ends at a Lost Capital. grave/lie resolve on the
+  // spot (keepsake + missingResolved). walker spawns the boss and marks
+  // NOTHING — resolution + keepsake land in the defeat hook, so a fled
+  // fight re-offers the walker at the next Capital instead of losing the
+  // ending forever (same retry semantics as the Hollowed).
+  if (drip.missingResolutionDue(player) && mq.LOST_CAPITAL_LOCATIONS.includes(arrivedAt)) {
+    const seed = drip.storySeed(player);
+    const person = drip.missingPersonName(seed);
+    const kind = drip.missingResolutionFor(seed);
+    const res = drip.missingResolution(kind, person);
+    for (const line of res.arrival) get().appendLog(line.speaker, line.text);
+    if (kind === 'walker') {
+      const foe = drip.missingWalkerEnemy(player.hpMax, person);
+      const scene = get().currentScene;
+      if (scene) {
+        set({
+          currentScene: {
+            ...scene,
+            enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
+            enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
+          },
+        });
+        get().appendLog('combat', `⚔ BOSS EVENT — ${foe.name}. It cannot be talked down and it will not stop. Put them to rest. Nothing else is mercy.`);
+      }
+    } else {
+      const cur = get().player!;
+      const keep: InventoryItem = {
+        id: freshInstanceId('story_keepsake'),
+        name: res.keepsake.name, kind: 'relic', rarity: 'Legendary', quantity: 1,
+        tags: ['quest', 'story', 'keepsake'], description: res.keepsake.description,
+      };
+      set({ player: { ...cur, missingResolved: kind, inventory: mergeOrPushItem(cur.inventory, keep) } });
+      get().appendLog('reward', `✦ ${keep.name} — ${keep.description}`);
+    }
+    get().appendLog('debug', `story: missing resolution '${kind}' fired at ${arrivedAt}`);
+    return;
+  }
+  const beat = drip.nextDripBeat(player);
+  if (!beat) return;
+  get().appendLog(beat.speaker, beat.text);
+  const cur = get().player;
+  if (cur) {
+    set({ player: { ...cur, storyBeatsSeen: [...(cur.storyBeatsSeen ?? []), beat.id] } });
   }
 }
 
@@ -32092,11 +32826,11 @@ function runAethercraft(
       'world',
       `Aetherstone lifts out of the ground and folds into a shape that walks. ${golem.name} stands ready beside you.${golemEdgeTag} (HP ${golem.hp}/${golem.hpMax}, ${golem.attackDie} ${golem.damageType})`,
     );
-    // OTA-466 — like the dog, a thing you gave life gets a name. The next typed
-    // input is captured as the golem's name (or "skip" to keep the type label).
+    // OTA-466 — like the dog, a thing you gave life gets a name. OTA-1050 — the
+    // ask now lands in the GolemNamingModal popup, not the typed feed.
     get().appendLog(
       'arbiter',
-      `The Arbiter studies the standing shape. "You gave it life. You might as well give it a name." (Type a name, or "skip".)`,
+      `The Arbiter studies the standing shape. "You gave it life. You might as well give it a name."`,
     );
   } else if (discipline === 'mend') {
     const livePlayer = get().player ?? player;
@@ -32622,67 +33356,38 @@ function completeRescueScenario(
   );
 }
 
-/** Handle a single onboarding input. Each input advances the stage;
- *  after the sex stage the dog is built and rescue hooks die. */
-function handleDogOnboardingInput(
+/** OTA-1050 — one-shot popup finalization (replaces the typed three-step
+ *  state machine). Breed keeps the OTA-142 smart preamble-stripping so a
+ *  role-played answer ("looks like a Pitbull") still reads natural; caps
+ *  match the old typed path (breed 24, name 16, sex 8). */
+function finalizeDogOnboarding(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-  raw: string,
+  breedRaw: string,
+  nameRaw: string,
+  sexRaw: string,
 ): void {
-  const wm = get().worldMemory;
-  const pending = wm.pendingDogOnboarding;
+  const pending = get().worldMemory.pendingDogOnboarding;
   if (!pending) return;
   const player = get().player;
   if (!player) return;
-  const trimmed = raw.trim();
-  if (pending.stage === 'breed') {
-    // OTA-142 — smart breed extraction. Pre-fix, the player who role-
-    // played their answer ("looks like a Pitbull") got the WHOLE
-    // sentence stored as the breed. Playtester flagged: "should be
-    // smarter about parsing the dog breed." Strip common preamble
-    // phrases so the breed reads natural ("Pitbull" instead of
-    // "looks like a Pitbull"). Conservative — when no preamble
-    // matches, the raw input is preserved. Caps at 24 chars after
-    // stripping.
-    const cleaned = trimmed
-      .replace(/^\s*(?:i think (?:it's|its|it is) (?:a |an )?|looks like (?:a |an )?|kind of (?:a |an )?|sort of (?:a |an )?|seems like (?:a |an )?|probably (?:a |an )?|maybe (?:a |an )?|definitely (?:a |an )?|some kind of |its (?:a |an )?|it's (?:a |an )?|it is (?:a |an )?|a |an )/i, '')
-      .replace(/[.!?]+$/, '')
-      .trim();
-    const breed = (cleaned || trimmed).slice(0, 24) || 'mutt';
-    set((s) => ({
-      worldMemory: {
-        ...s.worldMemory,
-        pendingDogOnboarding: { ...pending, stage: 'name', breed },
-      },
-    }));
-    get().appendLog('world', `You name the breed: ${breed}.`);
-    // OTA-177 — Arbiter prompts during dog onboarding go on the
-    // dog_quest channel (purple) so each step of the rescue
-    // sequence stays visually grouped.
-    get().appendLog('dog_quest', `The Arbiter nods. "What will you name them?"`);
-    return;
-  }
-  if (pending.stage === 'name') {
-    const name = trimmed.slice(0, 16) || defaultDogName();
-    set((s) => ({
-      worldMemory: {
-        ...s.worldMemory,
-        pendingDogOnboarding: { ...pending, stage: 'sex', name },
-      },
-    }));
-    get().appendLog('world', `${name}. The name settles on the dog like a coat.`);
-    get().appendLog('dog_quest', `The Arbiter nods again. "Boy or girl?"`);
-    return;
-  }
-  // pending.stage === 'sex'
-  const rawSex = trimmed.slice(0, 8) || 'unknown';
+  const trimmedBreed = breedRaw.trim();
+  const cleaned = trimmedBreed
+    .replace(/^\s*(?:i think (?:it's|its|it is) (?:a |an )?|looks like (?:a |an )?|kind of (?:a |an )?|sort of (?:a |an )?|seems like (?:a |an )?|probably (?:a |an )?|maybe (?:a |an )?|definitely (?:a |an )?|some kind of |its (?:a |an )?|it's (?:a |an )?|it is (?:a |an )?|a |an )/i, '')
+    .replace(/[.!?]+$/, '')
+    .trim();
+  const breed = (cleaned || trimmedBreed).slice(0, 24) || 'mutt';
+  const name = nameRaw.trim().slice(0, 16) || defaultDogName();
+  const rawSex = sexRaw.trim().slice(0, 8) || 'unknown';
   const dog = createDogCompanion({
-    name: pending.name ?? defaultDogName(),
-    breed: pending.breed ?? 'mutt',
+    name,
+    breed,
     rawSex,
     startingProfile: pending.rescueData.startingProfile,
     currentHour: player.hoursElapsed ?? 0,
   });
+  // The feed keeps a complete record of what the card collected.
+  get().appendLog('world', `A ${breed}. ${dog.name}. The name settles on the dog like a coat.`);
   set((s) => ({
     player: s.player ? { ...s.player, dog } : s.player,
     worldMemory: {
@@ -32703,6 +33408,7 @@ function handleDogOnboardingInput(
     'dog_quest',
     `The Arbiter studies the new pair. "${dog.name}, then. ${pending.rescueData.scenario === 'puppy_vendor' || pending.rescueData.scenario === 'puppy_rubble' ? 'You owe the pup nothing yet. Earn its trust on the road.' : 'The chain is off. The road is open.'}"`,
   );
+  void get().persist();
 }
 
 /** Dog combat dispatch — bite / distract. Acts at the start of the
@@ -34542,13 +35248,28 @@ async function narrateViaArbiter(
     //   combat:   1 short sentence ≈ 20 words ≈ 28 tokens → cap 30
     //   peaceful: 1 short sentence ≈ 20 words ≈ 28 tokens → cap 34
     const maxTokens = ctx.in_combat ? 30 : 34;
+    // OTA-1053 — the streaming tail is VETTED now. It used to mirror raw model
+    // tokens straight to the screen, so when the model recited its own brief the
+    // player read the prompt under "The Arbiter:" for the whole generation. The
+    // post-generation filters below could only ever clean the FINAL line — by
+    // then the raw text had already been on screen for seconds. Accumulate
+    // locally and stop mirroring the moment the output turns into meta-text;
+    // the tail falls back to an empty "thinking" frame.
+    let streamed = '';
+    let previewBlocked = false;
     const text = await qwen.stream(
       messages,
       (token: string) => {
         // Only update the buffer if we're still the active generation.
         if (myEpoch !== arbiterGenerationEpoch) return;
-        const current = get().partialArbiterText ?? '';
-        set({ partialArbiterText: current + token });
+        streamed += token;
+        if (previewBlocked) return;
+        if (looksLikeInstructionEcho(streamed)) {
+          previewBlocked = true;
+          set({ partialArbiterText: '' });
+          return;
+        }
+        set({ partialArbiterText: streamed });
       },
       { maxNewTokens: maxTokens },
     );
@@ -34579,6 +35300,9 @@ async function narrateViaArbiter(
       .split(/(?<=[.!?])\s+/)
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
+      // OTA-1053 — drop a sentence that is the brief coming back rather than a
+      // line. Nothing survives → the `|| trimmed` fallback restores the template.
+      .filter((s) => !looksLikeInstructionEcho(s))
       .filter((s) => !sentenceNamesOffCanonEntity(s, narrationAllow))
       .join(' ')
       .trim();
@@ -34733,11 +35457,23 @@ async function maybeGenerateAmbientArbiter(
   lastQwenGenStartMs = t0;
   set({ isGenerating: true, partialArbiterText: '' });
   try {
+    // OTA-1053 — same vetted tail as the reactive path. THIS is the generation the
+    // owner caught: the ambient brief came back verbatim, streamed raw to the
+    // screen, and was then correctly filtered to nothing — the log shows
+    // "arbiter: ambient ∅", a line that never existed as far as the feed knew.
+    let streamed = '';
+    let previewBlocked = false;
     const text = await qwen.stream(
       messages,
       (token: string) => {
-        const current = get().partialArbiterText ?? '';
-        set({ partialArbiterText: current + token });
+        streamed += token;
+        if (previewBlocked) return;
+        if (looksLikeInstructionEcho(streamed)) {
+          previewBlocked = true;
+          set({ partialArbiterText: '' });
+          return;
+        }
+        set({ partialArbiterText: streamed });
       },
       { maxNewTokens: 32 },
     );
@@ -34749,12 +35485,19 @@ async function maybeGenerateAmbientArbiter(
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
       // Ambient is the narrator's own idle musing, not world narration — a
-      // second-person opener ("You step back, surveying...") reads as scene
-      // text in the arbiter channel and in practice is an off-scene
+      // second-person ACTION opener ("You step back, surveying...") reads as
+      // scene text in the arbiter channel and in practice is an off-scene
       // hallucination (log 2026-07-13: alleyways + stone pillars narrated
       // inside a flooded-house kitchen). Drop those sentences; an empty
       // result just stays silent (ambient has no template fallback).
-      .filter((s) => !/^\s*you\b/i.test(s))
+      // OTA-1054 — this used to drop EVERY "You …" sentence, which silently
+      // guaranteed the empty result: VOICE_RULES orders the model to start
+      // sentences with "You", so the filter ate the whole feature (every
+      // ambient in the owner's logs is ∅, never ✓). Now it splits on register —
+      // an action opener is still scene text, a reflection is what we asked for.
+      .filter((s) => !isSecondPersonActionOpener(s))
+      // OTA-1053 — the brief recited back is not a line. Empty → stays silent.
+      .filter((s) => !looksLikeInstructionEcho(s))
       .filter((s) => !sentenceNamesOffCanonEntity(s, ambientAllow))
       .join(' ')
       .trim();
@@ -34767,6 +35510,31 @@ async function maybeGenerateAmbientArbiter(
     const ambientUsable = !!finalText && !generatedLineRepeatsRecent(get, finalText);
     if (ambientUsable) get().appendLog('arbiter', finalText);
     get().appendLog('debug', `arbiter: ambient ${ambientUsable ? '✓' : finalText ? 'dup-dropped' : '∅'} ${Date.now() - t0}ms`);
+    // OTA-1057 — WHY it was empty. The owner's logs show ∅ on every ambient
+    // attempt across four builds, including one that carries the OTA-1054
+    // register fix — so the register filter was NOT the whole story, and the ∅
+    // line never said which of the five filters ate the line (or whether the
+    // model returned anything at all). Name the culprit so the next pasted log
+    // answers it instead of another round of guessing. Debug channel only; no
+    // behaviour change.
+    if (!ambientUsable) {
+      const rawOut = (text ?? '').trim();
+      if (!rawOut) {
+        get().appendLog('debug', 'arbiter: ambient-empty reason=model-returned-nothing');
+      } else {
+        const firstCut = clampSentences(repairGluedNarration(stripForeignWords(rawOut)), 1)
+          .split(/(?<=[.!?])\s+/)[0] ?? '';
+        const why = !firstCut ? 'cleaners-emptied-it'
+          : /\b(the player|the adventurer|the explorer|the figure)\b/i.test(firstCut) ? 'third-person'
+          : /^\s*they\s/i.test(firstCut) ? 'they-opener'
+          : isSecondPersonActionOpener(firstCut) ? 'action-opener'
+          : looksLikeInstructionEcho(firstCut) ? 'instruction-echo'
+          : sentenceNamesOffCanonEntity(firstCut, ambientAllow) ? 'off-canon-entity'
+          : finalText ? 'near-duplicate-of-recent'
+          : 'unknown';
+        get().appendLog('debug', `arbiter: ambient-empty reason=${why} raw="${rawOut.slice(0, 120)}"`);
+      }
+    }
   } catch {
     get().appendLog('debug', `arbiter: ambient-error ${Date.now() - t0}ms`);
   } finally {

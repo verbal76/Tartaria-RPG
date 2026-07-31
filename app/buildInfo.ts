@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.46';
+export const DISPLAY_VERSION = '4.28.72';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18819,4 +18819,435 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // prior OTA's claim that mysteries/storylines still turn in remotely was
 // wrong — all contract kinds already turn in face-to-face; docs + a stale
 // "remote HALF option" comment fixed.
-export const OTA_BUILD_ID = '2026-07-28-1035-persist-leak-root-cause';
+// OTA-1036 — THE TC GHOST, CLOSED WITH A TRIPWIRE (owner: "work towards the root
+// cause, do this one last"). The intermittent raid-window
+// `tc.challengeForLocation is not a function` crash was chased to its
+// evidence floor: one call site, intact export, no cycle, no mock — and both
+// crashing runs sat at 6-8 GB heap under the mock leak OTA-1035 killed, while
+// 3 armed reproduction attempts at the exact original configuration plus 4
+// clean full runs since show zero recurrence. Strongest reading: V8 under
+// near-OOM pressure; the pressure is gone. The combat canary's crash catch
+// now carries a permanent self-diagnosing tripwire — any recurrence records
+// the stack, the module's live export list, and heap size on the spot.
+// Test-only change; no gameplay code touched.
+// OTA-1037 — THE WEDGED CONTRACTS CARD (owner report: "I tapped the green button
+// like 15 times. it did nothing"). Quit-navigating cleared the travel course
+// but left player.routedMission set, so the Contracts card kept its
+// "Auto-routing" note (which replaces the ROUTE button) with no course left
+// to chain — and every COMPLETE tap was refused wrong-faction into the world
+// feed, which the Contracts screen never renders (7 invisible refusals in
+// the log). Fixes: stopTravel/stopWhisperCourse now stand down routedMission;
+// the routed note requires a LIVE course (heals saves already carrying the
+// stale flag); and completeContractFromUI wraps the turn-in so any refused
+// tap surfaces the Arbiter's line as a dismissible strip on the screen
+// itself. Deactivate → reactivate is no longer the secret handshake.
+// OTA-1038 — ONE KILL, ONE PRICE, AND STEALTH KEEPS ITS PROMISES. Three
+// findings from the owner's log, each re-verified with a runtime probe
+// before anything was touched. (1) THE DOUBLE DOCK: faction parties are
+// built by reskinning whatever the local wild table rolls — rename, stamp
+// a factionId, keep every trait — so an Aetherkin roll walked in as
+// "Eternal Dynasty Patrol", and its kill charged that faction both the
+// faction penalty AND the Aetherkin reverence penalty. Measured −6 for one
+// kill where the same patrol without the trait cost −3. Fixed at both
+// ends: special templates never become faction troops, and the reverence
+// pass skips any faction the same kill already docked. (2) A FAILED SNEAK
+// WAS FREE while a successful one always cost HP — rolling badly was the
+// better play — even though the Arbiter's own warning tells the player a
+// miss "lets the whole pack swing free". The failed-flee path has charged
+// exactly this since OTA-372; stealth now matches. (3) Shadow Diver's +1
+// rode the gate roll but sat out the contest that decides the outcome.
+// Plus: a status-expiry line that read as a fragment, and a warning that
+// said "arm's reach" at mid range. Initiative-is-cosmetic left open.
+// OTA-1039 — NO OPEN-GROUND AMBUSHES INDOORS. From the owner's log, twice in
+// six minutes: a Mud Monarchs patrol "crosses your path IN THE OPEN" while
+// the player stood in a flooded house's kitchen, and a Conspiracy Architects
+// war party "crests the rise" while they stood in its study. Root cause is a
+// category, not two lines: all three outdoor world-event spawners
+// (maybeSpawnRaid / maybeInterceptPatrol / maybePatrolAmbush) asked
+// `player.hubRoomId` for "am I inside?" — a field set ONLY in an outpost
+// room. Explorable building interiors live on the store's activeBuildingId,
+// which none of them consulted, so every one read "outdoors" indoors. One
+// shared underRoof() predicate now answers for all three, locked by a test
+// that counts the call sites. Also: climbing accepts a Reclaimer's Rope OR a
+// plain Climbing Rope, but a wall-rest accepts only the Reclaimer's — and the
+// refusal told a rope-carrying player to "carry a Reclaimer's Rope" while
+// they hung from a rope. The message now names their line and its limit; the
+// RULE is unchanged and left as an owner's call.
+// OTA-1040 — INITIATIVE FINALLY DECIDES THE ORDER, AND THE STRAP IS THE ONLY
+// ANCHOR. Both are the owner's calls on the items 1038/1039 left open, and
+// the first was a BUG: "I thought the initiative roll was the deciding
+// factor on who went first on any series of attacks." It never was — the
+// roll's ONLY consumer was the log line, so "X moves first. The pressure is
+// immediate." described something that never happened. Losing initiative now
+// runs the enemy volley BEFORE your strike, and a volley that drops you means
+// your swing never lands. The volley is MOVED, not added: all four
+// post-strike counter sites are suppressed when it already fired, so a round
+// still contains exactly one. THIS RAISES LETHALITY BY DESIGN — a lost roll
+// at low HP can kill before you act; the dial to soften it is the initiative
+// DC, not the ordering. Second: "no it shouldn't, you need the hardened
+// climbing strap for that" — the Reclaimer's-Rope allowance for resting on an
+// ordinary climb is gone. A rope is a line you climb, not a harness you can
+// sleep in. The strap is the single answer on every climb.
+// OTA-1041 — THE REASON YOU CAME DOWN (story feature phase 1 of 3, PROMOTED
+// FROM GOLEM 1018 by the owner's call: "push all of this to HAL"). The game
+// had a living world and no reason to walk it: nothing ever said why THIS
+// character went below. Now: five story motives (debt / missing / exile /
+// calling / record) picked at creation step 3, a full-screen Skyrim-style
+// opening crawl assembled per-character (the flood, the thousand years, the
+// nine hearts — then YOUR pages, then the faction that took you in), SKIP
+// always available, REPLAY OPENING in About, and old saves dealt a stable
+// motive without ever being ambushed by the crawl. The motive id is the hook
+// phases 2-3 hang from. DISPLAY_VERSION 4.28.52. 14 tests.
+// OTA-1042 — THE ARBITER HOLDS HIS TONGUE (promoted from golem 1019; owner:
+// "the arbiter says his tutorial opening line over top of the new origin
+// text screens — it needs to hold until you are in the tutorial").
+// startNewGame armed the tutorial AND spoke the beat-0 name prompt in the
+// same breath, so "Your name, traveler..." printed underneath the OTA-1041
+// crawl. The tutorial still arms immediately (scene-entry hints stay
+// suppressed), but startTutorial() — the spoken prompt — now fires from
+// dismissStoryIntro(), guarded on storyIntroSeen===false && !hasSeenIntro so
+// a REPLAY OPENING dismissal or a backfilled save can never re-speak the
+// prompt or restart the tutorial. DISPLAY_VERSION 4.28.53. 3 tests.
+// OTA-1043 — CHAPTER CARDS (story phase 2 of 3, promoted from golem 1020).
+// Every main-quest phase transition raises a full-screen chapter card:
+// CHAPTER II — NINE HEARTS (first Lost Capital), III — THE FIRST HEART
+// (first Core), IV — THE ENDLESS STAIR (all nine), V — THE MUD FLOOD NEXUS
+// (arrival). Each carries a universal body plus a line written for THIS
+// character's OTA-1041 story motive. Raised at the triggerMainQuest choke
+// point, mounted globally in App.tsx (the Nexus choice fires from
+// Contracts). 'ended' has NO card — EndingScreen renders the 3-endings ×
+// 5-motives per-motive EPILOGUE matrix instead. Text in
+// app/data/story/chapters.json; logic in engine/chapters.ts.
+// DISPLAY_VERSION 4.28.54. 11 tests.
+// OTA-1044 — THE MOTIVE DRIP (story phase 3 of 3, promoted from golem 1021 —
+// arc complete). Five authored beats per motive drip into the feed at travel
+// arrivals (strict order, one-shot, gated on hoursElapsed 6/16/30/48/70 +
+// coresRecovered 0/0/1/2/3; at most one story event per arrival; holds
+// during tutorial/crawl/chapter-card/hostile scenes). THE MISSING side-
+// thread ENDS: after its five trail beats and 3+ Cores, the next Lost
+// Capital arrival answers the intro's question — grave, lie, or the thing
+// that walks — dealt deterministically per character (storyDrip.ts).
+// grave/lie: guaranteed keepsake + missingResolved on the spot. walker: a
+// Hollowed boss wearing their face (carries REVENANT_TRAIT — mercy rules,
+// no talk-down); the kill-path hook grants closing + keepsake and marks
+// resolved THERE so a fled fight re-offers. Resolved threads override the
+// 'missing' EndingScreen epilogue. DISPLAY_VERSION 4.28.55. 10 tests.
+// OTA-1045 — THE ONE-TIME VETERAN MOTIVE PICKER (twin of golem 1022; owner:
+// "let's do the one time motive picker"). Pre-story saves had their motive
+// DEALT by backfill (deterministic guess, never a choice). New
+// player.storyMotiveChosen flag: creation always sets TRUE (explicit pick or
+// rolled fallback alike); backfill's dealing sets FALSE. Both load paths
+// (loadSlotIntoGame + resurrectSlot) raise a full-screen MotivePickerModal
+// for un-chosen saves: five cards, the mud's guess tagged, CONFIRM commits
+// forever (Android back confirms the current selection — the ask can't be
+// wedged). Asked once, never again; the Arbiter acknowledges the pick.
+// DISPLAY_VERSION 4.28.56. 7 tests.
+// OTA-1046 — REPLAY OPENING FINDABLE (twin of golem 1023; owner: "I went to
+// settings and about and there was no replay opening... put it on the
+// character info screen"). Root cause: About's only real entry is the TITLE
+// screen, where no player is loaded, so the player-gated button never
+// rendered on the path players actually take. The button now lives in the
+// CharacterScreen HEADER (BACK | CHARACTER | REPLAY OPENING — the owner's
+// exact placement), and the StoryIntroOverlay mounts GLOBALLY in App.tsx so
+// the crawl plays right over the sheet with no navigation. About's dead
+// button removed; the motive picker's pointer text updated to "tap your
+// portrait". DISPLAY_VERSION 4.28.57.
+// OTA-1047 — FUSION LEGIBILITY (twin of golem 1024) (owner log 03:22-03:24: refused "too
+// alike" with 2 kinds reserved, fixed the spread himself, then bounced off
+// the 25 TC fee he learned about from a buried system line at 11 TC).
+// (1) Every forge-reservable inventory row now carries its material kind(s)
+// — [organic], [stone · crystal] — via fusionMaterialTags, the SAME helper
+// the diversity gate counts, so building a 3-kind spread is a glance.
+// (2) The vendor Crucible button states the fee AND the balance BEFORE the
+// tap: short-of-coin reads amber as "25 TC — you have N".
+// DISPLAY_VERSION 4.28.58. 4 tests.
+// OTA-1048 — PLAYER-FEEDBACK BATCH (twin of golem 1025) (owner's device session, three items).
+// (1) GUARDIANS HIT LIKE IT ("the second boss was a fairly easy fight"):
+// the over-level factor lifted HP/AC/attack but the damage DIE stayed the
+// authored fresh-arrival value, so an over-leveled player faced a longer
+// fight that never threatened their pool. monotoneTierDmgBonus now rides a
+// flat bonus on the tier die — +0 at/under the curve (OTA-448 promise holds
+// byte-identically), ~+4 at the owner's measured over-level, +9 at cap —
+// staged through the same running-max floor so the ramp never inverts.
+// (2) THE ROW WRAPS, NOT SHRINKS ("Materials on a 5-button row, the text is
+// too small to read"): travelRow wraps at minWidth 92 and the shrink floor
+// rises 0.55 → 0.8.
+// (3) RESONANCE RARER + VARIED ("the resonance hook is overused"): weight
+// 5 → 2 and the plant pool widened 2 → 5 lines (hardcoded direction cut).
+// DISPLAY_VERSION 4.28.59. 5 tests.
+// OTA-1049 — NARRATION CONTEXT (twin of golem 1026) (owner's log part 8: a quiet crate
+// salvage drew "Don't make me decide which one of you to leave breathing",
+// voice flat — no enemy in the scene). Root cause is double: the mood the
+// template picker reads is one action STALE (the current action's cognitive
+// classification lands after the line prints), and the AGGRESSION pool's
+// lines all presuppose a live opponent. Fix: AGGRESSION only selects its
+// pool when the scene holds a live enemy (every other mood reads fine
+// ambient). Plus: the Aetheric Torch mark line repeated VERBATIM per use
+// and leaned on "resonance" — now 4 rotating variants, one keeper.
+// DISPLAY_VERSION 4.28.60. 3 tests.
+// OTA-1050 — DOG + GOLEM NAMING POPUPS; NO SECOND STORY-HOOK POPUP (twin of
+// golem 1027). Playtester at the rescue moment typed "rest", thought the
+// naming beat was another fight, and the in-feed takeover silently stored
+// "rest" as the breed. (1) Breed/name/sex now land on ONE blocking card
+// (DogOnboardingModal) committed via confirmDogOnboarding — same cleanup,
+// caps, and feed beats; a save wedged mid-way through the old typed flow
+// heals on next open (part-answers pre-fill). (2) The golem summon ask gets
+// the same treatment (GolemNamingModal / confirmGolemName: SEAL THE NAME or
+// KEEP ITS MAKING). Typed feed input during either ask is NEVER an answer —
+// the Arbiter points back at the card. (3) Story-hook COMPLETE no longer
+// raises the redundant mission-complete popup (owner: "we can do without the
+// story hook pop-up"); the thread modal's completed state spotlights the
+// payout in a YOUR REWARD strip and the feed's ✦ line remains the record.
+// DISPLAY_VERSION 4.28.61. 7 tests (+6 suites retargeted off the typed flow).
+// OTA-1051 — MUSIC CROSSFADE + CRUCIBLE UPGRADE LIST (twin of golem 1028).
+// (1) MUSIC (owner: tracks "should Crossfade into each other... the boss
+// music and the market music should be a noticable shift"): transitions are
+// now true crossfades — outgoing and incoming ramp together, epoch-guarded.
+// Reflective beds (explore/menu) melt over 2.2s; entering boss/combat or
+// the market is a fast 450ms shift, and combat tiers always restart from
+// the opening bars. The outgoing bed PAUSES in place and resumes mid-phrase
+// on a quick return (4-minute window) — a market stop or a fight no longer
+// resets the reflective bed. Pools keep the owner's upload labels (boss
+// tracks / the one happy market song / reflective rest).
+// (2) UPGRADE LIST (owner: "listed as all armor that can be upgraded, then
+// all weapons. and it should say which are equipped"): the Crucible upgrade
+// target list is grouped ARMOR & VESTS then WEAPONS, worn pieces sort first
+// and carry an amber EQUIPPED badge (dog vests badge "ON <dog>") via the
+// same instance-id resolver as the inventory badge.
+// DISPLAY_VERSION 4.28.62. 7 tests.
+// OTA-1052 — CAPITAL TIDY-UP (twin of golem 1029). Owner, standing in Asgardar:
+// "it just feels disorganized, like all of the capitals do." Three causes:
+// (1) THE STAY/LEAVE POPUP fired on every interior ROOM hop. The vendor-leave
+// gate (POLISH-4) intercepted any cardinal move while a trader stood in the
+// scene — and a capital's room chips submit "go <dir>", so walking Workshop →
+// Armory asked "leave Tarek behind?" every time. Gate removed outright:
+// vendors are anchored to their rooms (hub anchorNpc), so walking back in
+// finds them where they were.
+// (2) THE CRUCIBLE ✕ DIDN'T STICK. Its dismiss was keyed to the ROOM
+// (arb154), so the chip popped back the moment you walked next door. Both the
+// Crucible and the new vendor ✕ are now keyed to the macro TILE
+// (chipDismissTileKey): a dismiss survives every interior hop, and beginScene
+// clears it when you actually leave the tile, so a return visit re-shows it.
+// (3) FOUR STACKED BANNERS ate the feed ("the map line, the weather line, the
+// vendor line and the fuse line takes up a lot of screen real estate"). The
+// trader / board / wanderer / Crucible banners were full-width, two-line and
+// 44px tall each; they now share ONE wrapping row two-across at 34px. A
+// BLOCKED Crucible keeps its two-line reason (OTA-220's fix survives).
+// Plus: the trader chip gains its own ✕, matching the Crucible's.
+// DISPLAY_VERSION 4.28.63. 6 tests.
+// OTA-1053 — THE PROMPT LEAKED INTO THE FEED (twin of golem 1030). Owner, at
+// Asgardar: a line about having walked beside "the player" a long while showed
+// up twice, "like someone was talking to the arbitor." Someone was — the game.
+// That sentence was the literal opening of the AMBIENT brief the engine hands
+// the local model (contextInjector AMBIENT_INSTRUCTION); the model recited its
+// brief instead of answering it. Root cause of the LEAK is the streaming tail:
+// it mirrored raw model tokens to the screen under "The Arbiter:" while the
+// output-filters — which only ever see the FINAL assembled text — correctly
+// dropped the whole thing to nothing. The log proves it: `arbiter: ambient ∅`,
+// a line the feed never recorded but the player still read. Three fixes:
+// (1) BOTH streaming paths now VET the preview — a local accumulator, and the
+// mirror stops the instant looksLikeInstructionEcho() trips (tail blanks to a
+// thinking frame). (2) The new detector also filters the final sentences on
+// both paths. (3) The ambient brief no longer OPENS with a complete,
+// narration-shaped second-person sentence — pure parrot bait — so there is no
+// ready-made line to recite. The detector deliberately does NOT flag a bare
+// imperative: the Arbiter really says "Do not look behind you." A 4,036-string
+// sweep of every authored lore line guards against exactly that regression.
+// Why TWICE: two generations in a row (reactive + ambient share the tail) each
+// streamed their echo; neither was ever logged.
+// DISPLAY_VERSION 4.28.64. 14 tests.
+// OTA-1054 — THE AMBIENT COMPANION COULD NEVER SPEAK (twin of golem 1031).
+// Found reading the owner's Asgardar logs: every ambient generation ends
+// `arbiter: ambient ∅` — 75627ms in one log, 26173ms in the next — and not one
+// `ambient ✓`, across two builds. Not bad luck, a contradiction: the shared
+// VOICE_RULES order the model "Sentences must START with 'You' or 'Your'", and
+// the ambient filter then dropped every sentence starting with "You". The path
+// discarded its own output by construction. Worse, it isn't free — ambient
+// holds the SHARED isGenerating lock while it runs, so up to 75s of guaranteed-
+// discarded work is 75s the reactive Arbiter can't narrate in (hence the
+// `reason=cooldown` templates around it).
+// Fix: filter on REGISTER, not on the pronoun. A scene hallucination opens with
+// a present-tense action ("You step back, surveying the alleyway" — the real
+// failure the filter was written for, and still blocked); a reflection, which
+// is the whole point of ambient, opens with a state or perfect ("You have come
+// a long way…", "You've grown harder…", "You carry it better now") and is now
+// allowed through. The reactive path never had this filter and still doesn't —
+// it is SUPPOSED to narrate actions.
+// DISPLAY_VERSION 4.28.65. 6 tests.
+// OTA-1055 — WHO GETS IN, AND HOW FAST QWEN COMES BACK (twin of golem 1032).
+// (1) INDOOR AMBUSH CAST (owner: "tighten the group that can spawn inside,
+// make it more believable"). A rest-ambush drew from the WILDERNESS table
+// wherever you slept, so the owner's log has a Rare 202-HP Mud Cyclops in the
+// Builders' crew bunks inside fortified Asgardar, narrated as if it crossed
+// open country. The ODDS were already right (a hub rest is 8% vs the wilds'
+// 22%) — the CAST was wrong. Under a roof the pick is now swapped for an
+// indoor-plausible foe AT THE SAME RARITY, from four groups that can actually
+// be in the room: an intruder who got past the door (Silt Thief, Reclaimer
+// Ambusher, Black Cloak Agent), vermin that live in a drowned building (Gutter
+// Rat, Aetheric Spider, Scrap Drone), a machine still walking its rounds
+// (Aetheric Drone, Steel Hound, Clockwork Knight, Stone Warden), or one of the
+// dead sealed into these walls (the Aetherkin, Shifting Shade, Mud Wraith).
+// Difficulty is untouched — a Rare ambush stays Rare. Both narration beats are
+// re-voiced indoors too: "circled" and "closes the distance" are open-ground
+// images. The roof test reuses the action scope's own, which correctly treats
+// the outpost GATE / square / culvert as open air — something can still walk in
+// off the mud where the outpost opens to the sky.
+// (2) WATCHDOG RECOVERY (owner: "tighten the recovery time"). The flat 60s poll
+// made every step of the recovery dance wait a full tick — the owner's log
+// spends ~2 minutes on canned templates (notice at :48, retry at :47, all-clear
+// at :47). Now adaptive: 60s while healthy, 5s while recovering, so a retry and
+// the all-clear land in seconds. Plus an AppState hook — dormancy is CAUSED by
+// backgrounding (App.tsx disposes the ~398MB native context), so returning to
+// the foreground checks immediately instead of burning up to a full interval
+// before the watchdog has even noticed.
+// DISPLAY_VERSION 4.28.66. 10 tests.
+// OTA-1056 — RAIDERS, SOLDIERS AND AETHERKIN INDOORS (twin of golem 1033). Owner:
+// "make sure the list for inside attacks includes raiders and soldiers and
+// aetherkin among what else you have in it." The audit: AETHERKIN were already
+// complete — all five in the roster (Drowned / Mud-Wracked / Aetherkin /
+// Aetheric Lich / Hollow King), now locked by a test that reads the roster and
+// demands the indoor list match it exactly. RAIDERS were in but only at
+// Uncommon (Silt Thief, Reclaimer Ambusher, Disc Hijacker). SOLDIERS were the
+// real gap: the roster holds six humans TOTAL and exactly one martial one below
+// Legendary, so a name-list alone can't carry "a rival faction broke in".
+// Two fixes: (1) Mud Monarch Purifier — the zealot-knight the cast had left
+// out — joins the Rare pool. (2) Raiders and soldiers are now also BUILT:
+// pickIndoorFactionIntruder dresses a same-rarity HUMAN body in the colours of
+// the faction you've wronged most, giving "Mud Monarchs Raider" / "Stone
+// Builders Soldier" at Uncommon, Rare and Legendary. Unlike the outdoor raid
+// builder (injectFactionParty), which reskins whatever the WILD table rolled
+// and can put a soldier's name on a cyclops, this one only ever dresses a
+// human — so a soldier fights like a person. About half of indoor ambushes are
+// people now; Common stays vermin, because the cheapest human body is Uncommon
+// and a Common-tier intruder in a fortified capital is a rat, not a soldier.
+// Only a NEGATIVE standing counts as a motive, and never your own faction.
+// DISPLAY_VERSION 4.28.67. 9 tests.
+// OTA-1057 — AETHER MUD ON THE SHELF, IN LIMITED AMOUNTS + the ambient ∅ finally
+// names its culprit.
+// (1) MUD SUPPLY. Owner asked about "getting limited amounts of aether mud to
+//     named vendors for sale" — the answer was that it had never been done. A
+//     Mud Golem costs 2 Aether Mud per summon and NO vendor stocked any; the
+//     only material any named vendor sold was Patched Cloth, so the only route
+//     to a golem was foraging. Six named sellers now carry it, chosen so no
+//     single counter and no single faction gates the fuel: Halem the Trader
+//     (general goods, the outpost anchor, 6 TC), Tellin Mak (Reclaimers scrap
+//     broker, 6), Tarek the Tinkerer (sells the Golem Controller Ring — of
+//     course he stocks fuel, 7), Naha (drifter, carries what the road gives,
+//     7), Veska of the Hollow (Mud Monarchs — mud is the family business, 5)
+//     and Foreman Drest Holloway (Stone Builders — mud is mortar, 6). All six
+//     have AUTHORED offer lists; the twelve vendors carrying `offers: []` are
+//     stocked dynamically at runtime and an entry added there is overwritten.
+//     LIMITED is enforced, not just intended: materials otherwise roll 1-10 per
+//     visit, which is five golems' worth off one counter, so a new SCARCE_STOCK
+//     table in vendors.ts gives 'aether mud' a tight 2-5 and is consulted BEFORE
+//     the food/material bands. That is one summon guaranteed, two at best, and
+//     because stock re-rolls per vendor INSTANCE the shelf refills between
+//     visits without ever being deep.
+// (2) AMBIENT ∅ INSTRUMENTED — and a correction. OTA-1054 claimed to have
+//     fixed the ambient companion aside; the owner's next log, on a build that
+//     CARRIES that fix, still reads `arbiter: ambient ∅ 55801ms`. It did not
+//     work, and the ∅ line has never said which of the five filters ate the
+//     line or whether the model returned anything at all — which is why the
+//     last fix was a guess. Rather than guess again, the empty path now logs
+//     `reason=` (model-returned-nothing / cleaners-emptied-it / third-person /
+//     they-opener / action-opener / instruction-echo / off-canon-entity /
+//     near-duplicate-of-recent) plus the first 120 chars of the raw output.
+//     Debug channel only — it cannot put a line in the feed, and nothing about
+//     generation changes. The next pasted log answers the question outright.
+// DISPLAY_VERSION 4.28.68. 12 tests.
+// OTA-1058 — A FACTION SOLDIER IS A PERSON, AND THE BATTLE FOLLOW-UP IS A CARD.
+// (1) HUMANS DROPPING BEAST LOOT. Owner: "let's fix the loot drop issue where
+//     humans drop beast loot." A faction party is BUILT by reskinning a roster
+//     entry — rename it, stamp a factionId — and outdoors (injectFactionParty)
+//     that entry was whatever the WILD table rolled for the tile. So a
+//     "Conspiracy Architects Patrol" could be a Mud Cyclops underneath: 202 HP,
+//     tinder-dry to fire, swinging a beak, and dropping Raven Feather and Aether
+//     Wing off a man's corpse. OTA-1056 fixed this INDOORS by only ever dressing
+//     a human body; that list now lives in a shared engine/factionBodies.ts and
+//     the outdoor builder uses it too. The wild roll still decides HOW MANY and
+//     at what RARITY, so the tile's danger still governs — it just no longer
+//     decides what a soldier is made of. Difficulty is unmoved:
+//     scaleEncounterForContext anchors a pack on its mean HP against the tile's
+//     danger, not on the template's authored numbers. What moves is the loot,
+//     the resist profile and the attack name. Common has no human in the roster,
+//     so `nearest` borrows the cheapest one (Uncommon) rather than handing the
+//     raid back to a beast — a patrol is people at every tier by definition.
+// (2) THE BATTLE FOLLOW-UP. Owner, after killing a Core Guardian: "if the whole
+//     giants and vigil thing was the player's reasons flavor text it needs to be
+//     last so it will be read, it gets pushed up screen and missed. it should be
+//     a pop-up I think. the battle follow up should be, it should have the
+//     flavor text, and the rewards on it." A boss kill fires eight-plus lines
+//     from five modules in ONE tick — spoils, hard-won material, TC, the boss's
+//     dying words, the signature gear, the Core, the faction's reaction — and
+//     the story beat lands in the middle, then gets shoved off screen by the
+//     reward lines behind it. Rather than reorder five call sites (and lose the
+//     argument again next time something is added), a capture window opens for
+//     the duration of resolveEnemyDefeat and everything the fight produced goes
+//     onto ONE card: story first, then THE TAKE. The window is strictly
+//     SYNCHRONOUS, which is what keeps it clean — the canned post-kill Arbiter
+//     beat comes from narrateViaArbiter, an async path that cannot resume until
+//     this call stack is gone, so it never lands on the card. The Resurrection
+//     Gem, which arrives a tick late, is pushed on by name. Bosses only; a rat
+//     gets no popup. It reuses MissionCompleteModal (gold instead of green, a
+//     VICTORY kicker, a longer safety valve since there is prose to read), and a
+//     job finished in the same fight MERGES into the card instead of raising a
+//     second popup that fights it for the screen.
+// DISPLAY_VERSION 4.28.69. 20 tests.
+// OTA-1059 — ONE THING, ONE BULLET ON THE VICTORY CARD. Found by walking the
+// owner's Iskan-Veil log line by line against the card OTA-1058 had just
+// built, after he asked what that kill would actually have shown. The Core
+// Guardian gear drop is a SINGLE reward line carrying both pieces with a ✦
+// between them — "✦ Veilkeeper Blades taken from X. ✦ Grey Leather of
+// Iskan-Veil taken from X." mergeRewardLines stripped only a LEADING ✦, so that
+// landed as one bullet with a stray marker sitting in the middle of it, on the
+// exact line the player is reading. It now splits ON the marker: the gear line
+// becomes two clean bullets, an ordinary line is untouched (no marker to split
+// on), and the Beacon Rifle's doubled `✦✦` flourish still yields exactly one
+// entry because empty pieces are dropped. Applies to the mission notice too —
+// one choke point, one rule. Cosmetic only; nothing about what is granted, what
+// is logged, or when the card appears changes.
+// DISPLAY_VERSION 4.28.70. 5 tests.
+// OTA-1060 — THE DOUBLE-DIAMOND PAYOFF GETS A CARD. Owner asked whether the ✦✦
+// items read right on the awards popup. The TEXT was fine — the finding was that
+// the one line written that way could never reach a popup at all.
+// assembleBeaconRifle fires from a USE-ITEM path, nowhere near the boss-defeat
+// capture window, so the payoff for all five great climbs — a Legendary weapon
+// plus seven Legendary/Rare materials, the end of the whole Skyreacher chain —
+// announced itself with a single feed line, exactly the way a mud cloth does.
+// That is the failure OTA-1010 was written to prevent ("I didn't even realize I
+// completed the mission"), and the doubled ✦✦ was the only thing marking it as
+// bigger. It now raises a card of its own: the crack-open narration and the
+// Arbiter's line as story, then the rifle and every granted material as the
+// take. The FEED LINES ARE UNCHANGED — the log stays a complete record, same
+// rule as every other announcement.
+// The VICTORY card from OTA-1058 was already the right shape for this, so it is
+// generalized rather than copied: raiseSpotlightNotice(heading, title, flavor,
+// rewards) is the one implementation, and raiseBossVictoryNotice is now a
+// three-line delegate passing 'VICTORY'. A spotlight already had the behaviour
+// this needed — gold instead of mission green, a custom kicker, story above the
+// take, and a merge rule that stops an unrelated job completing underneath it
+// from clobbering the card.
+// DISPLAY_VERSION 4.28.71. 6 tests.
+// OTA-1061 — THE CRAFT LIST SAYS WHICH SLOT. Owner: "under the craft tab for
+// armor, it needs to list what slot its for. some of the names don't explain it.
+// it took me a few minutes to find something in the hand slot."
+// The catalog knew all along — previewArmor has built `kindLabel: "Hands Armor"`
+// since it was written — but the craft row only ever rendered the STATS line, so
+// the slot never reached the screen and the player had to infer it from the
+// name. Measured, that inference fails often: of the 90 distinct nouns armor
+// names end in, 17 are used by more than one slot. "Greaves" is legs AND feet;
+// "mantle", "vest", "jacket" and "coat" are each split between chest and cloak;
+// "cloak" itself appears on chest pieces. A test now asserts that ambiguity, so
+// the label can only become redundant by a deliberate rename.
+// Two halves, because the owner's sentence has two halves. LABELLING fixes
+// reading it: every armor row carries a "HANDS SLOT" line above the stats, in a
+// spaced-caps grey that reads as a label rather than another stat, so the eye
+// can run the column without reading item names. SEARCH fixes FINDING it:
+// typing "hands" now narrows 293 armor pieces to the 41 you can wear there. The
+// name match is unchanged — the slot is an addition, not a swap.
+// Plumbing: ItemPreview gains `slot?: string`. The slot was already in
+// kindLabel, but only as PROSE, so any caller wanting to show or filter by it
+// had to parse English back out. Fused pieces carry theirs too (u.armorSlot) —
+// a fusion re-rolls the numbers, never the slot.
+// DISPLAY_VERSION 4.28.72. 9 tests.
+export const OTA_BUILD_ID = '2026-07-31-1061-craft-armor-slot';
