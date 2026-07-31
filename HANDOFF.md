@@ -849,8 +849,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1059`**,
-**golem-line `2026-07-31-1036`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1060`**,
+**golem-line `2026-07-31-1037`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -859,9 +859,34 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.70**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.71**; ledger in `VERSION.md`.
 
-- **ONE THING, ONE BULLET ON THE VICTORY CARD (2026-07-31, latest). BOTH LINES.**
+- **THE DOUBLE-DIAMOND PAYOFF GETS A CARD (2026-07-31, latest). BOTH LINES.**
+  golem **1037** / HAL **1060**. Owner asked whether the ✦✦ items read right on the
+  awards popup. The TEXT was fine. The finding was that the one line written that way could
+  never reach a popup at all: `assembleBeaconRifle` fires from a USE-ITEM path, nowhere
+  near the boss-defeat capture window, so the payoff for all five great climbs — a
+  Legendary weapon plus seven Legendary/Rare materials, the end of the entire Skyreacher
+  chain — announced itself with a single feed line, exactly the way a mud cloth does. That
+  is precisely the failure OTA-1010 was written to prevent ("I didn't even realize I
+  completed the mission"), and the doubled ✦✦ was the only thing marking it as bigger.
+  It now raises a card of its own: the crack-open narration and the Arbiter's line as
+  story, then the rifle and every granted material as the take.
+  ⚠ THE FEED LINES ARE UNCHANGED, deliberately — the log stays a complete record, same
+  rule as every other announcement since OTA-1010. Anything that greps the log keeps
+  working.
+  The VICTORY card from 1035/1058 was already the right shape, so it is GENERALIZED rather
+  than copied: `raiseSpotlightNotice(heading, title, flavor, rewards)` is the one
+  implementation and `raiseBossVictoryNotice` is a three-line delegate passing 'VICTORY'.
+  A spotlight already had the behaviour this needed — gold instead of mission green, a
+  custom kicker, story above the take, and the merge rule that stops an unrelated job
+  completing underneath it from clobbering the card.
+  ⚠ USE A SPOTLIGHT FOR A MILESTONE, NOT A PICKUP. A test asserts the rifle is still the
+  ONLY line in the store written with ✦✦, so a second double-diamond payout fails the
+  build until someone decides whether it deserves a card too.
+  Locked by ota1037/1060SpotlightCard (6 tests per line).
+
+- **ONE THING, ONE BULLET ON THE VICTORY CARD (2026-07-31). BOTH LINES.**
   golem **1036** / HAL **1059**. Follow-up to 1035/1058, found by walking the owner's
   Iskan-Veil log line by line against the card that OTA had just built — he asked what that
   kill would actually have shown, and reading the answer surfaced the defect. The Core
