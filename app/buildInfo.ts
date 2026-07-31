@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.67';
+export const DISPLAY_VERSION = '4.28.68';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19088,4 +19088,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and a Common-tier intruder in a fortified capital is a rat, not a soldier.
 // Only a NEGATIVE standing counts as a motive, and never your own faction.
 // DISPLAY_VERSION 4.28.67. 9 tests.
-export const OTA_BUILD_ID = '2026-07-30-1056-indoor-cast-groups';
+// OTA-1057 — AETHER MUD ON THE SHELF, IN LIMITED AMOUNTS + the ambient ∅ finally
+// names its culprit.
+// (1) MUD SUPPLY. Owner asked about "getting limited amounts of aether mud to
+//     named vendors for sale" — the answer was that it had never been done. A
+//     Mud Golem costs 2 Aether Mud per summon and NO vendor stocked any; the
+//     only material any named vendor sold was Patched Cloth, so the only route
+//     to a golem was foraging. Six named sellers now carry it, chosen so no
+//     single counter and no single faction gates the fuel: Halem the Trader
+//     (general goods, the outpost anchor, 6 TC), Tellin Mak (Reclaimers scrap
+//     broker, 6), Tarek the Tinkerer (sells the Golem Controller Ring — of
+//     course he stocks fuel, 7), Naha (drifter, carries what the road gives,
+//     7), Veska of the Hollow (Mud Monarchs — mud is the family business, 5)
+//     and Foreman Drest Holloway (Stone Builders — mud is mortar, 6). All six
+//     have AUTHORED offer lists; the twelve vendors carrying `offers: []` are
+//     stocked dynamically at runtime and an entry added there is overwritten.
+//     LIMITED is enforced, not just intended: materials otherwise roll 1-10 per
+//     visit, which is five golems' worth off one counter, so a new SCARCE_STOCK
+//     table in vendors.ts gives 'aether mud' a tight 2-5 and is consulted BEFORE
+//     the food/material bands. That is one summon guaranteed, two at best, and
+//     because stock re-rolls per vendor INSTANCE the shelf refills between
+//     visits without ever being deep.
+// (2) AMBIENT ∅ INSTRUMENTED — and a correction. OTA-1054 claimed to have
+//     fixed the ambient companion aside; the owner's next log, on a build that
+//     CARRIES that fix, still reads `arbiter: ambient ∅ 55801ms`. It did not
+//     work, and the ∅ line has never said which of the five filters ate the
+//     line or whether the model returned anything at all — which is why the
+//     last fix was a guess. Rather than guess again, the empty path now logs
+//     `reason=` (model-returned-nothing / cleaners-emptied-it / third-person /
+//     they-opener / action-opener / instruction-echo / off-canon-entity /
+//     near-duplicate-of-recent) plus the first 120 chars of the raw output.
+//     Debug channel only — it cannot put a line in the feed, and nothing about
+//     generation changes. The next pasted log answers the question outright.
+// DISPLAY_VERSION 4.28.68. 12 tests.
+export const OTA_BUILD_ID = '2026-07-31-1057-mud-supply';

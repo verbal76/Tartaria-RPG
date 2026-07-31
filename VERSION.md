@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.67` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.67` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.68` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.68` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -102,6 +102,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.64 → 4.28.65 | 2026-07-30-1054 | OTA | AMBIENT COMPANION REVIVED (twin of golem 1031): the Arbiter's idle reflections could never reach the feed — VOICE_RULES order the model to start sentences with "You", and the ambient filter dropped every sentence starting with "You", so the path discarded its own output by construction (every ambient in the owner's logs is ∅, never ✓) while holding the shared generation lock for up to 75s. The filter now splits on register: action openers ("You step back, surveying…") stay blocked, reflections ("You have come a long way…") get through. |
 | 4.28.65 → 4.28.66 | 2026-07-30-1055 | OTA | INDOOR AMBUSH CAST + FASTER QWEN RECOVERY (twin of golem 1032): a rest-ambush under a roof drew from the wilderness table (a Rare 202-HP Mud Cyclops in a capital bunkroom); it now swaps in an indoor-plausible foe at the SAME rarity — an intruder, vermin, a patrol machine, or the sealed dead — with both narration beats re-voiced for a sealed room. Difficulty unchanged. And the Qwen watchdog goes adaptive (60s healthy / 5s recovering) plus an AppState foreground check, cutting a ~2-minute template-only stretch to seconds. |
 | 4.28.66 → 4.28.67 | 2026-07-30-1056 | OTA | RAIDERS, SOLDIERS + AETHERKIN INDOORS (twin of golem 1033): Aetherkin were already complete (all five, now roster-locked by test) and raiders present at Uncommon; SOLDIERS were the gap — the roster has six humans total. Added the Mud Monarch Purifier, and raiders/soldiers are now also BUILT by dressing a same-rarity HUMAN body in the colours of the faction you have wronged most ("Mud Monarchs Raider", "Stone Builders Soldier") at Uncommon/Rare/Legendary. About half of indoor ambushes are people; Common stays vermin. |
+| 4.28.67 → 4.28.68 | 2026-07-31-1057 | OTA | AETHER MUD ON THE SHELF (twin of golem 1034): a Mud Golem costs 2 Aether Mud per summon and no vendor stocked any, so the only route to a golem was foraging. Six named sellers now carry it — Halem the Trader, Tellin Mak, Tarek the Tinkerer, Naha, Veska of the Hollow, Foreman Drest Holloway — spread so no single counter or faction gates the fuel. LIMITED is enforced: a new SCARCE_STOCK table caps mud at 2-5 per visit against the 1-10 every other material rolls, and stock re-rolls per vendor instance. Plus the ambient ∅ debug line now names WHICH filter dropped the companion aside (the OTA-1054/1031 fix did not work — the owner's 4.28.66 log still shows ∅), so the next log answers it instead of another guess. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

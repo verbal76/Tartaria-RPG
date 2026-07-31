@@ -89,182 +89,6 @@ as clarified by the user on 2026-07-13:
 
 - **`HaL2001` is PRODUCTION.** The Tartaria build in the wild with internal
   testers. Vetted changes only; a push OTAs their devices.
-- **RAIDERS, SOLDIERS + AETHERKIN INDOORS (2026-07-30, latest). BOTH LINES.**
-  golem **1033** / HAL **1056**. Owner asked the indoor cast to cover raiders, soldiers and
-  Aetherkin explicitly. Audit result: AETHERKIN already complete — all five roster entries —
-  and now locked by a test that READS enemies.json and demands the indoor list equal the
-  full `Aetheric Undead` set, so adding one to the roster without listing it fails CI.
-  RAIDERS were in at Uncommon only. SOLDIERS were the real gap: the roster holds six humans
-  TOTAL and exactly one martial one below Legendary, so a name-list can't carry "a rival
-  faction broke in" at every tier. Fixes: (a) Mud Monarch Purifier joins the Rare pool;
-  (b) `pickIndoorFactionIntruder()` BUILDS raiders/soldiers by dressing a same-rarity HUMAN
-  body in the colours of the faction with the worst (negative) standing — "Mud Monarchs
-  Raider", "Stone Builders Soldier". Contrast with the outdoor `injectFactionParty`, which
-  reskins whatever the WILD table rolled and can therefore put a soldier's name on a
-  cyclops statline (OTA-1038 fixed only the Aetherkin half of that); the indoor builder
-  only ever dresses a human. ~50% of indoor ambushes are people now. Common deliberately
-  has no faction body — the cheapest human is Uncommon, and a Common-tier intruder in a
-  fortified capital is a rat, not a soldier. Locked by ota1033/1056IndoorCastGroups
-  (9 tests per line).
-
-- **INDOOR AMBUSH CAST + FASTER QWEN RECOVERY (2026-07-30). BOTH LINES.**
-  golem **1032** / HAL **1055**. Two owner asks off the Asgardar log. (a) CAST: a
-  rest-ambush drew from the WILDERNESS table wherever you slept — hence a Rare 202-HP Mud
-  Cyclops in the Builders' crew bunks, narrated as if it crossed open country. The odds
-  were already right (hub rest 8% vs wilds 22%); the cast was wrong. New
-  `app/engine/indoorAmbush.ts` holds a rarity-keyed indoor cast — intruders, vermin,
-  patrol machines, the Aetherkin sealed in the walls — and the rest handler swaps the pick
-  for a SAME-RARITY indoor one under a roof, so difficulty is untouched. Both beats are
-  re-voiced indoors ("circled" / "closes the distance" are open-ground images). The roof
-  test REUSES the enclosing action scope's `underRoof`, which excludes
-  `OPEN_AIR_HUB_ROOMS` — the gate, square and culvert descent stay exposed, so something
-  can still walk in off the mud where the outpost opens to the sky. Note the module-level
-  `underRoof(s, player)` FUNCTION is shadowed by that local boolean inside
-  submitPlayerAction; calling the function there is a type error (it bit this OTA).
-  (b) WATCHDOG: the flat 60s poll meant every step of recovery waited a full tick (~2 min
-  of canned templates in the log). Now adaptive — `QWEN_WATCHDOG_HEALTHY_MS` 60s vs
-  `QWEN_WATCHDOG_RECOVERING_MS` 5s, driven by `runQwenHealthCheck()`'s boolean — plus an
-  `AppState` 'active' hook, because dormancy is CAUSED by backgrounding and the app knows
-  the instant it returns. Locked by ota1032/1055IndoorAmbushWatchdog (10 tests per line,
-  incl. a rarity-parity check and an explicit deny-list for the open-country megafauna).
-
-- **AMBIENT COMPANION REVIVED (2026-07-30). BOTH LINES.** golem **1031** /
-  HAL **1054**. Found reading the owner's Asgardar logs, not from a report: every ambient
-  generation ends `arbiter: ambient ∅` (75627ms in one log, 26173ms in the next) and never
-  once `ambient ✓`, across two builds. It was a CONTRADICTION, not bad luck — the shared
-  `VOICE_RULES` order the model *"Sentences must START with \"You\" or \"Your\""*, and the
-  ambient filter then dropped every sentence starting with "You". The path discarded its
-  own output by construction. And it isn't free: ambient holds the SHARED `isGenerating`
-  lock, so up to 75s of guaranteed-discarded work is 75s the REACTIVE Arbiter can't
-  narrate in — the `reason=cooldown` templates clustered around those ∅ entries are that.
-  Fix: `isSecondPersonActionOpener()` filters on REGISTER instead of the pronoun. An
-  action opener ("You step back, surveying the alleyway") is still scene-hallucination and
-  still dropped — that's the real failure the filter was written for; a reflection ("You
-  have come a long way…", "You've grown harder…") is what ambient exists to produce and
-  now survives. The reactive path never had this filter and must never get one — it is
-  supposed to narrate actions. Locked by ota1031/1054AmbientRevival (6 tests per line).
-  WATCH: no ambient line has EVER shipped to a player, so the first device session on this
-  build is the real test of whether the lines read well.
-
-- **PROMPT ECHO LEAK (2026-07-30). BOTH LINES.** golem **1030** / HAL **1053**.
-  Owner at Asgardar: a line about having walked beside "the player" a long while appeared
-  twice — "it's like someone was talking to the arbitor." It was: that sentence was the
-  literal opening of `AMBIENT_INSTRUCTION` in contextInjector, and the model recited its
-  brief instead of answering it. THE LEAK PATH IS THE STREAMING TAIL: both narration
-  paths mirrored raw model tokens into `partialArbiterText`, which ExplorationScreen
-  renders live under "The Arbiter:" — while the output filters, which only ever see the
-  FINAL assembled text, correctly dropped the echo to nothing. The log proves it
-  (`arbiter: ambient ∅`): a line the feed never recorded but the player still read for
-  the whole generation. Fixes: (a) both streams accumulate LOCALLY and stop mirroring the
-  moment `looksLikeInstructionEcho()` trips, blanking the tail to a thinking frame;
-  (b) the same detector filters the final sentences on both paths; (c) the ambient brief
-  is fully imperative now — no complete, narration-shaped second-person sentence for the
-  model to copy. IMPORTANT for anyone extending the detector: a bare imperative is NOT a
-  tell — the Arbiter really does say "Do not look behind you." and "Speak carefully.", and
-  an earlier draft of this guard silently ate all three such authored lines. It matches an
-  imperative only when aimed at a CRAFT OBJECT (a sentence, a word count, a register).
-  Locked by ota1030/1053PromptEchoLeak (14 tests per line), including a sweep of every
-  authored line in the six narration lore files (4,036 strings) asserting zero false
-  positives.
-
-- **CAPITAL TIDY-UP (2026-07-30). BOTH LINES.** golem **1029** / HAL **1052**.
-  Owner, standing in Asgardar: "it just feels disorganized, like all of the capitals do."
-  Three separate causes. (a) THE STAY/LEAVE POPUP: the POLISH-4 vendor-leave gate
-  intercepted any cardinal move while a trader was in the scene — and a capital's room
-  chips submit `go <dir>`, so every interior hop asked "leave Tarek behind?". The gate is
-  removed entirely; vendors are anchored to rooms via hub `anchorNpc`, so walking back in
-  finds them unchanged. (b) THE ✕ DIDN'T STICK: the Crucible dismiss was ROOM-keyed
-  (arb154), so it popped back next door. Both it and the NEW vendor ✕ are keyed to the
-  macro TILE via the exported `chipDismissTileKey(player)`; beginScene clears a dismiss
-  whose tile no longer matches, which is what makes "dismissed until you leave the tile
-  and come back" literally true. (c) FOUR STACKED BANNERS: trader / board / wanderer /
-  Crucible were each full-width, two-line, 44px; they now share one wrapping
-  `placeChipRow` two-across at 34px. A BLOCKED Crucible keeps its two-line reason so
-  OTA-220's "tell them what's missing" fix survives the squeeze. Locked by
-  ota1029/1052CapitalTidy (6 tests per line, incl. a runtime beginScene check that a
-  dismiss survives a room hop and clears on a real tile change).
-
-- **MUSIC CROSSFADE + CRUCIBLE UPGRADE LIST (2026-07-30). BOTH LINES.**
-  golem **1028** / HAL **1051**. Two owner items. MUSIC: AudioManager transitions are now
-  true crossfades (outgoing + incoming ramp in one epoch-guarded loop — the old
-  hard-stop-then-fade is gone). Reflective beds (explore/menu) hand over at
-  SMOOTH_FADE_MS 2200; entering boss/combat/shop is SHIFT_FADE_MS 450 so the boss and
-  market music land as a noticeable shift, and combat tiers always restart from the top.
-  The outgoing bed PAUSES IN PLACE (pauseInPlace, never stop) and resumes mid-phrase when
-  its context returns within RESUME_WINDOW_MS (4 min) — a fight or market stop no longer
-  resets the bed. Pools keep the owner's upload labels (boss-* / the single happy
-  shop-quiet-back-alley / reflective rest). UPGRADE LIST: the Crucible upgrade stage-2
-  target list is grouped ARMOR & VESTS then WEAPONS, worn pieces sort first and carry an
-  amber EQUIPPED badge (dog vests badge ON <dog>) via equippedInstanceIds — same resolver
-  as the inventory badge. Locked by ota1028/1051CrossfadeUpgradeList (7 tests per line,
-  incl. a mocked expo-av double proving pause-not-stop + no-position-reset resume).
-
-- **DOG + GOLEM NAMING POPUPS / NO SECOND HOOK POPUP (2026-07-30). BOTH LINES.**
-  golem **1027** / HAL **1050**. Playtester at the dog rescue typed "rest", read the naming
-  beat as another fight, and the in-feed takeover silently stored "rest" as the breed. The
-  typed takeovers are GONE: breed/name/sex commit together from DogOnboardingModal
-  (`confirmDogOnboarding` — same OTA-142 preamble-stripping + caps + feed beats; a save
-  wedged mid-way through the old flow heals on open, part-answers pre-filled), and golem
-  naming commits from GolemNamingModal (`confirmGolemName`: SEAL THE NAME / KEEP ITS
-  MAKING). Typed feed input during either ask is never an answer — the Arbiter points at
-  the card. Separately (owner): story-hook COMPLETE no longer raises the redundant
-  mission-complete popup; the `completionNotice` stash is retired and HookContinueModal's
-  completed state spotlights the payout in a boxed YOUR REWARD strip (the feed's ✦ line
-  remains the permanent record). Locked by ota1027/1050DogGolemPopups (7 tests per line);
-  6 suites per line retargeted off the typed flow (dogBreedParsing, dogOnboardingFuzz,
-  dogRescueIntegration, golemCompanion, the MissionComplete category lock, HookCompleteFlow).
-
-- **NARRATION CONTEXT (2026-07-30). BOTH LINES.** golem **1026** / HAL **1049**.
-  Owner's log: post-combat crate salvage drew "Don't make me decide which one of you to
-  leave breathing" with zero enemies. Two-part root cause: the template picker's mood is
-  read from `cognitiveLastResponse` — one action STALE (the fresh classification lands
-  after the line prints) — and the AGGRESSION pool is the one mood whose every line
-  presupposes a live opponent. `pickMoodPool` now takes `hasLiveEnemy` and refuses the
-  AGGRESSION pool without one (other moods read fine ambient; no staleness surgery
-  needed). Plus the Aetheric Torch mark line: was one verbatim string per use, leaning on
-  "resonance" — now 4 rotating variants, exactly one keeping the word. Locked by
-  ota1026/1049NarrationContext (3 tests per line incl. a 300-draw no-menace sweep).
-
-- **PLAYER-FEEDBACK BATCH (2026-07-30). BOTH LINES.** golem **1025** / HAL **1048**.
-  Three device-session items: • GUARDIAN DAMAGE now tracks over-level (`monotoneTierDmgBonus`
-  in coreGuardians — the missing fourth dimension; HP/AC/attack already scaled). Fresh
-  arrivals byte-identical (bonus 0 at over=1); the owner's tier-2 case goes 1d8+4 → 1d8+8;
-  cap +9. Running-max staged; ota954/931 monotone suites still green. • The travel/room
-  row (InputBox `travelRow`) WRAPS (minWidth 92, font floor 0.55→0.8) instead of shrinking
-  a 5-button row unreadable. • RESONANCE hook: weight 5→2, plant pool 2→5 lines. Locked by
-  ota1025/1048FeedbackBatch (5 tests per line).
-
-- **FUSION LEGIBILITY (2026-07-30). BOTH LINES.** golem **1024** / HAL **1047**.
-  Owner's log told the whole story in two minutes: a CORRECT "too alike" refusal (2 kinds
-  reserved), self-corrected spread, then a fee bounce at 11 TC learned from a buried
-  system line. Fixes: (1) every forge-reservable inventory row carries its material
-  kind(s) — `[organic]`, `[stone · crystal]` — rendered from `fusionMaterialTags`, the
-  SAME helper the diversity gate counts (mirror property locked in tests); (2) the vendor
-  Crucible button states fee + balance BEFORE the tap — amber "25 TC — you have N" when
-  short. (The fusion PICKER already had per-row kind labels + a live kinds meter from
-  OTA-679/1007 — the gap was the inventory, where reserving actually happens, and the
-  paid button.) Locked by ota1024/1047FusionLegibility (4 tests per line).
-
-- **✔ STORY FEATURE PROMOTED TO HAL (2026-07-30, owner: "push all of this to HAL").**
-  The former golem-only divergence is CLOSED: the full three-phase story arc now lives on
-  BOTH lines — HAL **OTA-1041..1044** = golem **1018..1021** (crawl + motive picker /
-  tutorial hold / chapter cards + per-motive epilogues / motive drip + The Missing's
-  ending). Same files both lines: `app/data/story/` (intro/chapters/drip.json),
-  `app/engine/{story,chapters,storyDrip}.ts`, `app/components/{StoryIntroOverlay,
-  ChapterCardOverlay}.tsx`, wiring in gameStore / types / character / App /
-  CharacterCreation / Exploration / About / EndingScreen. NOTE the OTA-TAG SKEW: inside
-  identical code, HAL comments/tests say 1041-1044 where golem's say 1018-1021 — when
-  syncing lines, that skew is EXPECTED and must not be "fixed" by clobbering either side.
-  OTA-1046 (= golem 1023) makes REPLAY OPENING findable:
-  moved from About (whose title-screen entry path has no live player — the gated button
-  never rendered) to the CharacterScreen HEADER, with StoryIntroOverlay mounted globally.
-  OTA-1045 (= golem 1022) adds the ONE-TIME VETERAN
-  MOTIVE PICKER: dealt-motive saves (new storyMotiveChosen flag — creation TRUE, backfill
-  FALSE) get asked once on load via MotivePickerModal; confirm commits forever.
-  Coverage (verified by audit + suite locks): 5/5 motives everywhere (crawl pages, 4
-  chapter cards, 3×5 ending epilogues, 5 drip beats each), 9/9 factions everywhere the
-  design uses them (crawl faction page; the pre-existing per-faction main-quest narration
-  the cards ride on). Race is deliberately NOT a story axis (no race-conditional text).
 - **`golem-line` is HAL's warm standby — it must STAY CURRENT with HAL.** Not a
   scratch pad. Its purpose: when a major, potentially engine-breaking change
   begins, development forks onto golem so production Tartaria is never at risk
@@ -1042,19 +866,230 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-27-1016`**,
-**golem-line `2026-07-27-993`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1057`**,
+**golem-line `2026-07-31-1034`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
-ported FROM engine_Dev, not to it).
+ported FROM engine_Dev, not to it))
 
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.51**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.68**; ledger in `VERSION.md`.
 
-- **INITIATIVE FINALLY DECIDES THE ORDER + THE STRAP IS THE ONLY ANCHOR (2026-07-29, latest).**
+- **AETHER MUD ON THE SHELF + THE AMBIENT ∅ NAMES ITS CULPRIT (2026-07-31, latest). BOTH LINES.**
+  HAL **1057** / golem **1034**. Two items.
+  • **MUD SUPPLY.** Owner: "did we work on getting limited amounts of aether mud to named
+    vendors for sale". We had not — this is new. A Mud Golem costs 2 Aether Mud per summon
+    and NOT ONE vendor stocked it; the only material any named vendor sold was Patched
+    Cloth, so foraging was the sole route to a golem. Six named sellers now carry it:
+    Halem the Trader (6 TC), Tellin Mak (6), Tarek the Tinkerer (7 — he already sells the
+    Golem Controller Ring), Naha (7), Veska of the Hollow (5 — Mud Monarchs), Foreman
+    Drest Holloway (6 — Stone Builders). Deliberately spread so no single counter and no
+    single faction gates golem fuel.
+    ⚠ ONLY VENDORS WITH AUTHORED OFFERS ARE ELIGIBLE. Twelve entries in `vendors.json`
+    carry `offers: []` and are stocked dynamically at runtime — an offer added to one of
+    those is silently overwritten. Korr Stonefoot and Mara Stoneskin were in the first
+    draft of this list for exactly that reason; a test now asserts every mud seller has an
+    authored list.
+    LIMITED IS ENFORCED, NOT INTENDED: materials otherwise roll 1-10 per visit (five
+    golems' worth off one counter), so `SCARCE_STOCK` in `vendors.ts` gives 'aether mud'
+    2-5 and is consulted BEFORE the food/material bands. One summon guaranteed, two at
+    best. Stock re-rolls per vendor INSTANCE, so the shelf refills between visits without
+    ever being deep. Add future scarce items to that table, not to the roll body.
+  • **AMBIENT ∅ — A CORRECTION, THEN INSTRUMENTATION.** OTA-1054/1031 claimed the
+    ambient companion aside was fixed. It was not: the owner's next log, on build 4.28.66
+    which CARRIES that fix, still reads `arbiter: ambient ∅ 55801ms`. Verified along the
+    way that `trimToLastSentence` and `clampSentences` both fall back to raw text, so
+    neither is the culprit — but the ∅ line has never said which of the five filters ate
+    the line, or whether the model returned anything at all, which is precisely why the
+    last fix was a guess. The empty path now logs `reason=` (model-returned-nothing /
+    cleaners-emptied-it / third-person / they-opener / action-opener / instruction-echo /
+    off-canon-entity / near-duplicate-of-recent) plus the raw output's first 120 chars.
+    Debug channel ONLY — a test asserts the block cannot append to arbiter or world — and
+    generation is untouched. The next pasted log names the filter outright.
+  Locked by ota1034/1057MudSupply (12 tests per line), including a shelf check that goes
+  through `findVendorByName` for all six sellers rather than the roll helper alone.
+
+- **RAIDERS, SOLDIERS + AETHERKIN INDOORS (2026-07-30). BOTH LINES.**
+  golem **1033** / HAL **1056**. Owner asked the indoor cast to cover raiders, soldiers and
+  Aetherkin explicitly. Audit result: AETHERKIN already complete — all five roster entries —
+  and now locked by a test that READS enemies.json and demands the indoor list equal the
+  full `Aetheric Undead` set, so adding one to the roster without listing it fails CI.
+  RAIDERS were in at Uncommon only. SOLDIERS were the real gap: the roster holds six humans
+  TOTAL and exactly one martial one below Legendary, so a name-list can't carry "a rival
+  faction broke in" at every tier. Fixes: (a) Mud Monarch Purifier joins the Rare pool;
+  (b) `pickIndoorFactionIntruder()` BUILDS raiders/soldiers by dressing a same-rarity HUMAN
+  body in the colours of the faction with the worst (negative) standing — "Mud Monarchs
+  Raider", "Stone Builders Soldier". Contrast with the outdoor `injectFactionParty`, which
+  reskins whatever the WILD table rolled and can therefore put a soldier's name on a
+  cyclops statline (OTA-1038 fixed only the Aetherkin half of that); the indoor builder
+  only ever dresses a human. ~50% of indoor ambushes are people now. Common deliberately
+  has no faction body — the cheapest human is Uncommon, and a Common-tier intruder in a
+  fortified capital is a rat, not a soldier. Locked by ota1033/1056IndoorCastGroups
+  (9 tests per line).
+
+- **INDOOR AMBUSH CAST + FASTER QWEN RECOVERY (2026-07-30). BOTH LINES.**
+  golem **1032** / HAL **1055**. Two owner asks off the Asgardar log. (a) CAST: a
+  rest-ambush drew from the WILDERNESS table wherever you slept — hence a Rare 202-HP Mud
+  Cyclops in the Builders' crew bunks, narrated as if it crossed open country. The odds
+  were already right (hub rest 8% vs wilds 22%); the cast was wrong. New
+  `app/engine/indoorAmbush.ts` holds a rarity-keyed indoor cast — intruders, vermin,
+  patrol machines, the Aetherkin sealed in the walls — and the rest handler swaps the pick
+  for a SAME-RARITY indoor one under a roof, so difficulty is untouched. Both beats are
+  re-voiced indoors ("circled" / "closes the distance" are open-ground images). The roof
+  test REUSES the enclosing action scope's `underRoof`, which excludes
+  `OPEN_AIR_HUB_ROOMS` — the gate, square and culvert descent stay exposed, so something
+  can still walk in off the mud where the outpost opens to the sky. Note the module-level
+  `underRoof(s, player)` FUNCTION is shadowed by that local boolean inside
+  submitPlayerAction; calling the function there is a type error (it bit this OTA).
+  (b) WATCHDOG: the flat 60s poll meant every step of recovery waited a full tick (~2 min
+  of canned templates in the log). Now adaptive — `QWEN_WATCHDOG_HEALTHY_MS` 60s vs
+  `QWEN_WATCHDOG_RECOVERING_MS` 5s, driven by `runQwenHealthCheck()`'s boolean — plus an
+  `AppState` 'active' hook, because dormancy is CAUSED by backgrounding and the app knows
+  the instant it returns. Locked by ota1032/1055IndoorAmbushWatchdog (10 tests per line,
+  incl. a rarity-parity check and an explicit deny-list for the open-country megafauna).
+
+- **AMBIENT COMPANION REVIVED (2026-07-30). BOTH LINES.** golem **1031** /
+  HAL **1054**. Found reading the owner's Asgardar logs, not from a report: every ambient
+  generation ends `arbiter: ambient ∅` (75627ms in one log, 26173ms in the next) and never
+  once `ambient ✓`, across two builds. It was a CONTRADICTION, not bad luck — the shared
+  `VOICE_RULES` order the model *"Sentences must START with \"You\" or \"Your\""*, and the
+  ambient filter then dropped every sentence starting with "You". The path discarded its
+  own output by construction. And it isn't free: ambient holds the SHARED `isGenerating`
+  lock, so up to 75s of guaranteed-discarded work is 75s the REACTIVE Arbiter can't
+  narrate in — the `reason=cooldown` templates clustered around those ∅ entries are that.
+  Fix: `isSecondPersonActionOpener()` filters on REGISTER instead of the pronoun. An
+  action opener ("You step back, surveying the alleyway") is still scene-hallucination and
+  still dropped — that's the real failure the filter was written for; a reflection ("You
+  have come a long way…", "You've grown harder…") is what ambient exists to produce and
+  now survives. The reactive path never had this filter and must never get one — it is
+  supposed to narrate actions. Locked by ota1031/1054AmbientRevival (6 tests per line).
+  WATCH: no ambient line has EVER shipped to a player, so the first device session on this
+  build is the real test of whether the lines read well.
+
+- **PROMPT ECHO LEAK (2026-07-30). BOTH LINES.** golem **1030** / HAL **1053**.
+  Owner at Asgardar: a line about having walked beside "the player" a long while appeared
+  twice — "it's like someone was talking to the arbitor." It was: that sentence was the
+  literal opening of `AMBIENT_INSTRUCTION` in contextInjector, and the model recited its
+  brief instead of answering it. THE LEAK PATH IS THE STREAMING TAIL: both narration
+  paths mirrored raw model tokens into `partialArbiterText`, which ExplorationScreen
+  renders live under "The Arbiter:" — while the output filters, which only ever see the
+  FINAL assembled text, correctly dropped the echo to nothing. The log proves it
+  (`arbiter: ambient ∅`): a line the feed never recorded but the player still read for
+  the whole generation. Fixes: (a) both streams accumulate LOCALLY and stop mirroring the
+  moment `looksLikeInstructionEcho()` trips, blanking the tail to a thinking frame;
+  (b) the same detector filters the final sentences on both paths; (c) the ambient brief
+  is fully imperative now — no complete, narration-shaped second-person sentence for the
+  model to copy. IMPORTANT for anyone extending the detector: a bare imperative is NOT a
+  tell — the Arbiter really does say "Do not look behind you." and "Speak carefully.", and
+  an earlier draft of this guard silently ate all three such authored lines. It matches an
+  imperative only when aimed at a CRAFT OBJECT (a sentence, a word count, a register).
+  Locked by ota1030/1053PromptEchoLeak (14 tests per line), including a sweep of every
+  authored line in the six narration lore files (4,036 strings) asserting zero false
+  positives.
+
+- **CAPITAL TIDY-UP (2026-07-30). BOTH LINES.** golem **1029** / HAL **1052**.
+  Owner, standing in Asgardar: "it just feels disorganized, like all of the capitals do."
+  Three separate causes. (a) THE STAY/LEAVE POPUP: the POLISH-4 vendor-leave gate
+  intercepted any cardinal move while a trader was in the scene — and a capital's room
+  chips submit `go <dir>`, so every interior hop asked "leave Tarek behind?". The gate is
+  removed entirely; vendors are anchored to rooms via hub `anchorNpc`, so walking back in
+  finds them unchanged. (b) THE ✕ DIDN'T STICK: the Crucible dismiss was ROOM-keyed
+  (arb154), so it popped back next door. Both it and the NEW vendor ✕ are keyed to the
+  macro TILE via the exported `chipDismissTileKey(player)`; beginScene clears a dismiss
+  whose tile no longer matches, which is what makes "dismissed until you leave the tile
+  and come back" literally true. (c) FOUR STACKED BANNERS: trader / board / wanderer /
+  Crucible were each full-width, two-line, 44px; they now share one wrapping
+  `placeChipRow` two-across at 34px. A BLOCKED Crucible keeps its two-line reason so
+  OTA-220's "tell them what's missing" fix survives the squeeze. Locked by
+  ota1029/1052CapitalTidy (6 tests per line, incl. a runtime beginScene check that a
+  dismiss survives a room hop and clears on a real tile change).
+
+- **MUSIC CROSSFADE + CRUCIBLE UPGRADE LIST (2026-07-30). BOTH LINES.**
+  golem **1028** / HAL **1051**. Two owner items. MUSIC: AudioManager transitions are now
+  true crossfades (outgoing + incoming ramp in one epoch-guarded loop — the old
+  hard-stop-then-fade is gone). Reflective beds (explore/menu) hand over at
+  SMOOTH_FADE_MS 2200; entering boss/combat/shop is SHIFT_FADE_MS 450 so the boss and
+  market music land as a noticeable shift, and combat tiers always restart from the top.
+  The outgoing bed PAUSES IN PLACE (pauseInPlace, never stop) and resumes mid-phrase when
+  its context returns within RESUME_WINDOW_MS (4 min) — a fight or market stop no longer
+  resets the bed. Pools keep the owner's upload labels (boss-* / the single happy
+  shop-quiet-back-alley / reflective rest). UPGRADE LIST: the Crucible upgrade stage-2
+  target list is grouped ARMOR & VESTS then WEAPONS, worn pieces sort first and carry an
+  amber EQUIPPED badge (dog vests badge ON <dog>) via equippedInstanceIds — same resolver
+  as the inventory badge. Locked by ota1028/1051CrossfadeUpgradeList (7 tests per line,
+  incl. a mocked expo-av double proving pause-not-stop + no-position-reset resume).
+
+- **DOG + GOLEM NAMING POPUPS / NO SECOND HOOK POPUP (2026-07-30). BOTH LINES.**
+  golem **1027** / HAL **1050**. Playtester at the dog rescue typed "rest", read the naming
+  beat as another fight, and the in-feed takeover silently stored "rest" as the breed. The
+  typed takeovers are GONE: breed/name/sex commit together from DogOnboardingModal
+  (`confirmDogOnboarding` — same OTA-142 preamble-stripping + caps + feed beats; a save
+  wedged mid-way through the old flow heals on open, part-answers pre-filled), and golem
+  naming commits from GolemNamingModal (`confirmGolemName`: SEAL THE NAME / KEEP ITS
+  MAKING). Typed feed input during either ask is never an answer — the Arbiter points at
+  the card. Separately (owner): story-hook COMPLETE no longer raises the redundant
+  mission-complete popup; the `completionNotice` stash is retired and HookContinueModal's
+  completed state spotlights the payout in a boxed YOUR REWARD strip (the feed's ✦ line
+  remains the permanent record). Locked by ota1027/1050DogGolemPopups (7 tests per line);
+  6 suites per line retargeted off the typed flow (dogBreedParsing, dogOnboardingFuzz,
+  dogRescueIntegration, golemCompanion, the MissionComplete category lock, HookCompleteFlow).
+
+- **NARRATION CONTEXT (2026-07-30). BOTH LINES.** golem **1026** / HAL **1049**.
+  Owner's log: post-combat crate salvage drew "Don't make me decide which one of you to
+  leave breathing" with zero enemies. Two-part root cause: the template picker's mood is
+  read from `cognitiveLastResponse` — one action STALE (the fresh classification lands
+  after the line prints) — and the AGGRESSION pool is the one mood whose every line
+  presupposes a live opponent. `pickMoodPool` now takes `hasLiveEnemy` and refuses the
+  AGGRESSION pool without one (other moods read fine ambient; no staleness surgery
+  needed). Plus the Aetheric Torch mark line: was one verbatim string per use, leaning on
+  "resonance" — now 4 rotating variants, exactly one keeping the word. Locked by
+  ota1026/1049NarrationContext (3 tests per line incl. a 300-draw no-menace sweep).
+
+- **PLAYER-FEEDBACK BATCH (2026-07-30). BOTH LINES.** golem **1025** / HAL **1048**.
+  Three device-session items: • GUARDIAN DAMAGE now tracks over-level (`monotoneTierDmgBonus`
+  in coreGuardians — the missing fourth dimension; HP/AC/attack already scaled). Fresh
+  arrivals byte-identical (bonus 0 at over=1); the owner's tier-2 case goes 1d8+4 → 1d8+8;
+  cap +9. Running-max staged; ota954/931 monotone suites still green. • The travel/room
+  row (InputBox `travelRow`) WRAPS (minWidth 92, font floor 0.55→0.8) instead of shrinking
+  a 5-button row unreadable. • RESONANCE hook: weight 5→2, plant pool 2→5 lines. Locked by
+  ota1025/1048FeedbackBatch (5 tests per line).
+
+- **FUSION LEGIBILITY (2026-07-30). BOTH LINES.** golem **1024** / HAL **1047**.
+  Owner's log told the whole story in two minutes: a CORRECT "too alike" refusal (2 kinds
+  reserved), self-corrected spread, then a fee bounce at 11 TC learned from a buried
+  system line. Fixes: (1) every forge-reservable inventory row carries its material
+  kind(s) — `[organic]`, `[stone · crystal]` — rendered from `fusionMaterialTags`, the
+  SAME helper the diversity gate counts (mirror property locked in tests); (2) the vendor
+  Crucible button states fee + balance BEFORE the tap — amber "25 TC — you have N" when
+  short. (The fusion PICKER already had per-row kind labels + a live kinds meter from
+  OTA-679/1007 — the gap was the inventory, where reserving actually happens, and the
+  paid button.) Locked by ota1024/1047FusionLegibility (4 tests per line).
+
+- **✔ STORY FEATURE PROMOTED TO HAL (2026-07-30, owner: "push all of this to HAL").**
+  The former golem-only divergence is CLOSED: the full three-phase story arc now lives on
+  BOTH lines — HAL **OTA-1041..1044** = golem **1018..1021** (crawl + motive picker /
+  tutorial hold / chapter cards + per-motive epilogues / motive drip + The Missing's
+  ending). Same files both lines: `app/data/story/` (intro/chapters/drip.json),
+  `app/engine/{story,chapters,storyDrip}.ts`, `app/components/{StoryIntroOverlay,
+  ChapterCardOverlay}.tsx`, wiring in gameStore / types / character / App /
+  CharacterCreation / Exploration / About / EndingScreen. NOTE the OTA-TAG SKEW: inside
+  identical code, HAL comments/tests say 1041-1044 where golem's say 1018-1021 — when
+  syncing lines, that skew is EXPECTED and must not be "fixed" by clobbering either side.
+  OTA-1046 (= golem 1023) makes REPLAY OPENING findable:
+  moved from About (whose title-screen entry path has no live player — the gated button
+  never rendered) to the CharacterScreen HEADER, with StoryIntroOverlay mounted globally.
+  OTA-1045 (= golem 1022) adds the ONE-TIME VETERAN
+  MOTIVE PICKER: dealt-motive saves (new storyMotiveChosen flag — creation TRUE, backfill
+  FALSE) get asked once on load via MotivePickerModal; confirm commits forever.
+  Coverage (verified by audit + suite locks): 5/5 motives everywhere (crawl pages, 4
+  chapter cards, 3×5 ending epilogues, 5 drip beats each), 9/9 factions everywhere the
+  design uses them (crawl faction page; the pre-existing per-faction main-quest narration
+  the cards ride on). Race is deliberately NOT a story axis (no race-conditional text).
+
+- **INITIATIVE FINALLY DECIDES THE ORDER + THE STRAP IS THE ONLY ANCHOR (2026-07-29).**
   HAL **1040** / golem **1017**. Both are the OWNER'S CALLS on the two items left open by
   1038/1039 — and the first turned out to be a BUG, not a balance choice:
   • **INITIATIVE.** Owner: "I thought the initiative roll was the deciding factor on who went

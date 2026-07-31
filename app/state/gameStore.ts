@@ -35356,6 +35356,31 @@ async function maybeGenerateAmbientArbiter(
     const ambientUsable = !!finalText && !generatedLineRepeatsRecent(get, finalText);
     if (ambientUsable) get().appendLog('arbiter', finalText);
     get().appendLog('debug', `arbiter: ambient ${ambientUsable ? '✓' : finalText ? 'dup-dropped' : '∅'} ${Date.now() - t0}ms`);
+    // OTA-1057 — WHY it was empty. The owner's logs show ∅ on every ambient
+    // attempt across four builds, including one that carries the OTA-1054
+    // register fix — so the register filter was NOT the whole story, and the ∅
+    // line never said which of the five filters ate the line (or whether the
+    // model returned anything at all). Name the culprit so the next pasted log
+    // answers it instead of another round of guessing. Debug channel only; no
+    // behaviour change.
+    if (!ambientUsable) {
+      const rawOut = (text ?? '').trim();
+      if (!rawOut) {
+        get().appendLog('debug', 'arbiter: ambient-empty reason=model-returned-nothing');
+      } else {
+        const firstCut = clampSentences(repairGluedNarration(stripForeignWords(rawOut)), 1)
+          .split(/(?<=[.!?])\s+/)[0] ?? '';
+        const why = !firstCut ? 'cleaners-emptied-it'
+          : /\b(the player|the adventurer|the explorer|the figure)\b/i.test(firstCut) ? 'third-person'
+          : /^\s*they\s/i.test(firstCut) ? 'they-opener'
+          : isSecondPersonActionOpener(firstCut) ? 'action-opener'
+          : looksLikeInstructionEcho(firstCut) ? 'instruction-echo'
+          : sentenceNamesOffCanonEntity(firstCut, ambientAllow) ? 'off-canon-entity'
+          : finalText ? 'near-duplicate-of-recent'
+          : 'unknown';
+        get().appendLog('debug', `arbiter: ambient-empty reason=${why} raw="${rawOut.slice(0, 120)}"`);
+      }
+    }
   } catch {
     get().appendLog('debug', `arbiter: ambient-error ${Date.now() - t0}ms`);
   } finally {
