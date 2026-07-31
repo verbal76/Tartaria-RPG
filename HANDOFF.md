@@ -849,8 +849,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1058`**,
-**golem-line `2026-07-31-1035`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1059`**,
+**golem-line `2026-07-31-1036`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -859,9 +859,24 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.69**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.70**; ledger in `VERSION.md`.
 
-- **A FACTION SOLDIER IS A PERSON + THE BATTLE FOLLOW-UP IS A CARD (2026-07-31, latest). BOTH LINES.**
+- **ONE THING, ONE BULLET ON THE VICTORY CARD (2026-07-31, latest). BOTH LINES.**
+  golem **1036** / HAL **1059**. Follow-up to 1035/1058, found by walking the owner's
+  Iskan-Veil log line by line against the card that OTA had just built — he asked what that
+  kill would actually have shown, and reading the answer surfaced the defect. The Core
+  Guardian gear drop is ONE reward line carrying both pieces with a ✦ between them
+  (`✦ Veilkeeper Blades taken from X. ✦ Grey Leather of Iskan-Veil taken from X.`), and
+  `mergeRewardLines` stripped only a LEADING ✦ — so it landed as a single bullet with a
+  stray marker sitting in the middle of it. It now splits ON the marker.
+  ⚠ THE `✦✦` FLOURISH IS EMPHASIS, NOT A SEPARATOR — the Beacon Rifle line opens with two.
+  Splitting on `/✦+/` and dropping empty pieces keeps it as one entry; a naive split on a
+  single `✦` would have turned it into a blank bullet plus the real one. Locked by test.
+  Applies to the plain mission notice too — one choke point, one rule. Cosmetic only:
+  nothing about what is granted, what is logged, or when the card appears changes.
+  Locked by ota1036/1059RewardBullets (5 tests per line).
+
+- **A FACTION SOLDIER IS A PERSON + THE BATTLE FOLLOW-UP IS A CARD (2026-07-31). BOTH LINES.**
   golem **1035** / HAL **1058**. Two owner items off the Asgardar / Iskan-Veil log.
   • **HUMANS DROPPING BEAST LOOT.** Owner: "let's fix the loot drop issue where humans
     drop beast loot." A faction party is BUILT, not authored — `injectFactionParty`

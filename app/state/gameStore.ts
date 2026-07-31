@@ -2890,14 +2890,25 @@ function healEscortsOnRest(
   if (healedLabel) get().appendLog('world', `Your ${healedLabel} rest too — they look steadier.`);
 }
 
-/** OTA-1035 — one reward line, one entry. Strips the ✦ the feed uses (the card
- *  draws its own) and drops exact repeats, so a line that reached the card by
- *  both the capture window and an explicit raise appears once. */
+/** OTA-1035 — one reward line, one entry on the card. Drops exact repeats, so a
+ *  line that reached the card by both the capture window and an explicit raise
+ *  appears once.
+ *
+ *  OTA-1036 — and one THING, one bullet. The ✦ is the feed's marker and the card
+ *  draws its own, but a few emitters pack two rewards into a single line with a
+ *  ✦ between them — the Core Guardian gear drop is one line for the weapon AND
+ *  the armor. Stripping only a LEADING ✦ left that stray marker sitting in the
+ *  middle of a bullet. Split on the marker instead: the gear line becomes two
+ *  clean bullets, an ordinary line is untouched (no marker to split on), and the
+ *  Beacon Rifle's doubled `✦✦` flourish still yields exactly one entry because
+ *  empty pieces are dropped. */
 function mergeRewardLines(existing: readonly string[], incoming: readonly string[]): string[] {
   const out = [...existing];
   for (const raw of incoming) {
-    const clean = raw.replace(/^✦\s*/, '').trim();
-    if (clean && !out.includes(clean)) out.push(clean);
+    for (const piece of raw.split(/✦+/)) {
+      const clean = piece.trim();
+      if (clean && !out.includes(clean)) out.push(clean);
+    }
   }
   return out;
 }
