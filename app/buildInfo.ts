@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.69';
+export const DISPLAY_VERSION = '4.28.70';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19159,4 +19159,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     job finished in the same fight MERGES into the card instead of raising a
 //     second popup that fights it for the screen.
 // DISPLAY_VERSION 4.28.69. 20 tests.
-export const OTA_BUILD_ID = '2026-07-31-1058-faction-bodies-victory-card';
+// OTA-1059 — ONE THING, ONE BULLET ON THE VICTORY CARD. Found by walking the
+// owner's Iskan-Veil log line by line against the card OTA-1058 had just
+// built, after he asked what that kill would actually have shown. The Core
+// Guardian gear drop is a SINGLE reward line carrying both pieces with a ✦
+// between them — "✦ Veilkeeper Blades taken from X. ✦ Grey Leather of
+// Iskan-Veil taken from X." mergeRewardLines stripped only a LEADING ✦, so that
+// landed as one bullet with a stray marker sitting in the middle of it, on the
+// exact line the player is reading. It now splits ON the marker: the gear line
+// becomes two clean bullets, an ordinary line is untouched (no marker to split
+// on), and the Beacon Rifle's doubled `✦✦` flourish still yields exactly one
+// entry because empty pieces are dropped. Applies to the mission notice too —
+// one choke point, one rule. Cosmetic only; nothing about what is granted, what
+// is logged, or when the card appears changes.
+// DISPLAY_VERSION 4.28.70. 5 tests.
+export const OTA_BUILD_ID = '2026-07-31-1059-reward-bullets';
