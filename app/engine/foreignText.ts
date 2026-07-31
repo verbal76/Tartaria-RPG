@@ -101,16 +101,42 @@ export function looksLikeInstructionEcho(text: string): boolean {
 // present-tense action ("You step / turn / reach"); a reflection — the thing
 // ambient exists to produce — opens with a state or perfect ("You have come…",
 // "You've grown…", "You carry it better now"). Allow the second, drop the first.
-const REFLECTIVE_YOU_OPENER =
-  /^\s*you(?:'(?:ve|re|ll|d))\b|^\s*you\s+(?:have|has|had|are|were|was|will|can|could|would|should|used|came|come|arrived|learned|learnt|grew|grown|changed|carry|carried|bear|bore|wear|wore|know|knew|remember|remembered|forget|forgot|never|always|still|no|not|do|don't|didn't|weren't|aren't|seem|seemed|began|begin|stopped|survived|lasted|lived)\b/i;
+// OTA-1039 — THE WHITELIST WAS FAIL-CLOSED, AND THAT IS WHY THE FEATURE NEVER
+// WORKED. OTA-1031 listed the reflective openers it knew and dropped everything
+// else that began with "You" — so any phrasing nobody anticipated was killed on
+// sight. The owner's instrumented log finally caught it in the act:
+//
+//   arbiter: ambient-empty reason=action-opener
+//   raw="You, my companion, have traveled far and wide, but the distance
+//        between you and the ancient city you once called home ha…"
+//
+// That is precisely the reflective companion line ambient exists to write. It
+// died because an appositive sat between the pronoun and the verb: the old rule
+// required `you\s+have`, and "You, my companion, have" put a comma there. One
+// unanticipated comma, and a whole feature produced nothing across four builds.
+//
+// So this no longer guesses at every good phrasing. It names the BAD one and
+// lets everything else through — fail OPEN. A hallucinated scene opens with a
+// present-tense physical action ("You step back", "You reach for the lid");
+// reflection does not. The asymmetry matters: a scene line slipping through
+// costs one odd sentence, while a reflection wrongly blocked costs the entire
+// feature, which is the bill we have been paying.
+//
+// Deliberately EXCLUDED as ambiguous — each reads either way, so fail open:
+// take/drop/strike/fire/run/rise/stop/pause ("You drop your guard less often
+// now" is reflection; "You drop your pack" is scene).
+const SCENE_ACTION_OPENER =
+  /^\s*you\b(?:\s*,[^,]{1,40},)?\s+(?:\w+ly\s+)?(?:step|turn|reach|walk|move|look|glance|peer|kneel|crouch|stand|sit|lean|pull|push|draw|raise|lower|open|close|grab|enter|exit|climb|descend|swing|slash|stab|throw|scan|search|survey|approach|follow|cross|slip|duck|dive|creep|crawl|slide|press|lift|place|pick|toss|hurl|swipe|dodge|sprint)\b/i;
 
 /** True for a second-person opener that reads as SCENE NARRATION ("You step
  *  back…") rather than reflection ("You have come a long way…"). Only the
  *  ambient companion path uses it: reactive narration is *supposed* to describe
- *  what just happened, so it must never filter these. */
+ *  what just happened, so it must never filter these.
+ *
+ *  Fails OPEN — an opener this doesn't recognise is allowed through. Adding a
+ *  verb here can silence a real line, so add only unambiguous physical actions. */
 export function isSecondPersonActionOpener(sentence: string): boolean {
-  if (!/^\s*you\b/i.test(sentence)) return false; // not a bare "You …" opener
-  return !REFLECTIVE_YOU_OPENER.test(sentence);
+  return SCENE_ACTION_OPENER.test(sentence);
 }
 
 /** Drop any word containing a foreign letter; collapse the gaps + tidy the

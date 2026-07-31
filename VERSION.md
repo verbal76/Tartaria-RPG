@@ -43,8 +43,8 @@ There are two version numbers and only one moves on an OTA:
 - **Current native / runtime version (`app.json`):** `2.4.1`
   (the live Google Play internal-test build; dev lineage)
 - **NEXT — value to stamp on the next native build:** whatever
-  `DISPLAY_VERSION` reads at build time (`4.28.72` as of this write).
-- **Current logical version (`DISPLAY_VERSION`):** `4.28.72` — REACTIVATED at
+  `DISPLAY_VERSION` reads at build time (`4.28.73` as of this write).
+- **Current logical version (`DISPLAY_VERSION`):** `4.28.73` — REACTIVATED at
   `4.28.3` on 2026-07-26 after freezing at `4.1.0` (OTA-602; see the catch-up
   ledger below), then PATCH +1 per OTA through the 993–1016 run.
 
@@ -107,6 +107,7 @@ There are two version numbers and only one moves on an OTA:
 | 4.28.69 → 4.28.70 | 2026-07-31-1036 | OTA | ONE THING, ONE BULLET (twin of HAL 1059): the Core Guardian gear drop is a single reward line carrying both pieces with a ✦ between them, and the new victory card stripped only a LEADING ✦ — so it landed as one bullet with a stray marker in the middle. The card now splits on the marker: two clean bullets, ordinary lines untouched, and the Beacon Rifle's doubled ✦✦ flourish still reads as one entry. Cosmetic only. |
 | 4.28.70 → 4.28.71 | 2026-07-31-1037 | OTA | THE DOUBLE-DIAMOND PAYOFF GETS A CARD (twin of HAL 1060): the Beacon Rifle — the end of the five-tower Skyreacher chain, a Legendary weapon plus seven Legendary/Rare materials — announced itself with one feed line, because it is built from a use-item path that never touches the boss-defeat capture window. The doubled ✦✦ was the only thing marking it as bigger than a mud cloth. It now raises its own card (story, then the take), and the VICTORY card is generalized into raiseSpotlightNotice rather than copied — one card implementation, two banners. Feed lines unchanged. |
 | 4.28.71 → 4.28.72 | 2026-07-31-1038 | OTA | THE CRAFT LIST SAYS WHICH SLOT (twin of HAL 1061): armor rows in the Craft tab never showed the equip slot, so the player had to guess from the name — and of the 90 nouns armor names end in, 17 are used by more than one slot ("greaves" is legs AND feet; "mantle"/"vest"/"jacket"/"coat" split between chest and cloak). Every armor row now carries a "HANDS SLOT" label above its stats, and the search box matches the slot, so typing "hands" narrows 293 pieces to the 41 you can wear there. ItemPreview gains slot as DATA rather than prose buried in kindLabel. |
+| 4.28.72 → 4.28.73 | 2026-07-31-1039 | OTA | AMBIENT FILTER FAILS OPEN (twin of HAL 1062): the OTA-1034 instrumentation caught the culprit on the owner's next session — reason=action-opener, on the line "You, my companion, have traveled far and wide…", which is exactly the reflective companion line the feature exists to write. The OTA-1031 whitelist required `you\\s+have` and an appositive put a comma there, so it fell through to "scene narration" and died. The rule is inverted: it now names the BAD opener (present-tense physical action) and lets everything else through. A blocked reflection costs the whole feature; a scene line slipping through costs one sentence. All six prior tests still pass. |
 
 ## Catch-up ledger — how 4.1.0 became 4.28.3 (2026-07-26)
 

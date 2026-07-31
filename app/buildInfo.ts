@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.72';
+export const DISPLAY_VERSION = '4.28.73';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18160,4 +18160,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // had to parse English back out. Fused pieces carry theirs too (u.armorSlot) —
 // a fusion re-rolls the numbers, never the slot.
 // DISPLAY_VERSION 4.28.72. 9 tests.
-export const OTA_BUILD_ID = '2026-07-31-1038-craft-armor-slot';
+// OTA-1039 — THE AMBIENT FILTER FAILS OPEN NOW, AND THE FEATURE SHOULD FINALLY
+// SPEAK. The OTA-1034 instrumentation did its job on the owner's very next
+// session (build 4.28.72), naming in one line what four builds of reasoning had
+// not:
+//   arbiter: ambient ∅ 30603ms
+//   arbiter: ambient-empty reason=action-opener
+//   raw="You, my companion, have traveled far and wide, but the distance
+//        between you and the ancient city you once called home ha…"
+// The model was writing EXACTLY the reflective companion line the feature
+// exists for. OTA-1031 killed it over a comma.
+//
+// ROOT CAUSE — the filter's SHAPE, not its contents. REFLECTIVE_YOU_OPENER was a
+// WHITELIST: it enumerated the reflective openers it knew and dropped anything
+// else starting with "You". It required `you\s+have` — literal whitespace — and
+// the model wrote "You, my companion, have". An appositive put a comma where the
+// regex wanted a space, the whitelist missed, and the sentence fell through to
+// "must be scene narration" and died. That is FAIL-CLOSED, and it was always
+// going to eat prose nobody anticipated; teaching it about appositives would fix
+// this one sentence and leave the next surprise to die identically.
+//
+// So the rule is inverted. SCENE_ACTION_OPENER names the BAD opener — a
+// present-tense physical action ("You step back", "You reach for the lid") —
+// and everything else passes. The asymmetry is the whole argument: a scene line
+// slipping through costs one odd sentence; a reflection wrongly blocked costs
+// the entire feature, which is the bill this has been paying since it shipped.
+// Ambiguous verbs are deliberately NOT blocked (take/drop/strike/run/rise/stop):
+// "You drop your guard less often now" is reflection, "You drop your pack" is
+// scene, and when in doubt the companion gets to speak.
+// All six OTA-1031 tests still pass unchanged — the old contract holds.
+// DISPLAY_VERSION 4.28.73. 6 tests.
+export const OTA_BUILD_ID = '2026-07-31-1039-ambient-fail-open';
