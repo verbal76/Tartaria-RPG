@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1061`**,
-**golem-line `2026-07-31-1038`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1062`**,
+**golem-line `2026-07-31-1039`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,43 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.72**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.73**; ledger in `VERSION.md`.
 
-- **THE CRAFT LIST SAYS WHICH SLOT (2026-07-31, latest). BOTH LINES.**
+- **THE AMBIENT FILTER FAILS OPEN (2026-07-31, latest). BOTH LINES.**
+  HAL **1062** / golem **1039**. The OTA-1057 instrumentation paid for itself on the owner's
+  very next session (build 4.28.72), naming in one line what four builds of reasoning could not:
+  ```
+  arbiter: ambient ∅ 30603ms
+  arbiter: ambient-empty reason=action-opener
+  raw="You, my companion, have traveled far and wide, but the distance
+       between you and the ancient city you once called home ha…"
+  ```
+  The model was producing EXACTLY the reflective companion line ambient exists for. It was
+  being destroyed by the filter OTA-1054 added to save it.
+  ⚠ ROOT CAUSE IS THE FILTER'S **SHAPE**, NOT ITS CONTENTS — read this before touching it.
+  `REFLECTIVE_YOU_OPENER` was a **whitelist**: it enumerated known reflective openers and
+  dropped everything else beginning with "You". It required `you\s+have` (literal
+  whitespace); the model wrote `"You, my companion, have"`. One appositive, one comma where
+  the regex wanted a space, and the whole feature produced nothing across four builds.
+  That is **fail-closed**. Teaching it about appositives would have fixed this sentence and
+  left the next unanticipated phrasing to die exactly the same way.
+  The rule is now INVERTED. `SCENE_ACTION_OPENER` names the BAD opener — a present-tense
+  physical action ("You step back", "You reach for the lid") — and everything else passes.
+  **Fail open.** The asymmetry is the argument: a scene line slipping through costs one odd
+  sentence; a reflection wrongly blocked costs the entire feature.
+  ⚠ DO NOT ADD AMBIGUOUS VERBS to `SCENE_ACTION_OPENER`. take / drop / strike / run / rise /
+  stop are deliberately absent — "You drop your guard less often now" is reflection and
+  "You drop your pack" is scene. Adding a verb here can silence a real line; when in doubt,
+  let the companion speak.
+  All six OTA-1054 tests pass unchanged, so the original contract still holds. The
+  `reason=` instrumentation STAYS — if something else starts eating lines, it names that too.
+  Locked by ota1062/1039AmbientFailOpen (6 tests per line), including the verbatim string
+  from the device log and a fail-open case with five reflective phrasings that were never in
+  the whitelist and would each have been destroyed silently.
+  WATCH: no ambient line has still ever reached a player. The next peaceful wander on
+  4.28.73 is the real test — look for `arbiter: ambient ✓`.
+
+- **THE CRAFT LIST SAYS WHICH SLOT (2026-07-31). BOTH LINES.**
   HAL **1061** / golem **1038**. Owner: "under the craft tab for armor, it needs to list
   what slot its for. some of the names don't explain it. it took me a few minutes to find
   something in the hand slot."
