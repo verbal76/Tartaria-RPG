@@ -11,6 +11,7 @@
 // wilderness roll picked — a Rare ambush stays a Rare ambush, it just stops
 // being a swamp behemoth in a bunkhouse.
 
+import * as fb from './factionBodies';
 import { findEnemyByName } from './encounter';
 import type { Enemy } from './types';
 
@@ -57,22 +58,10 @@ export const INDOOR_AMBUSHERS: Readonly<Record<string, readonly string[]>> = {
 // Common is deliberately absent: the cheapest human body is Uncommon, and a
 // Common-tier intruder in a fortified capital is a rat or a loose drone, not a
 // soldier. A soldier is a serious visit by definition.
-export const INDOOR_FACTION_BODIES: Readonly<Record<string, readonly string[]>> = {
-  Uncommon: ['Silt Thief', 'Reclaimer Ambusher', 'Disc Hijacker'],
-  Rare: ['Black Cloak Agent', 'Mud Monarch Purifier'],
-  Legendary: ['Tartarian Reaver'],
-};
-
-/** Which word fits the body. A cutpurse or brigand who got in is a RAIDER; a
- *  zealot-knight, a blade in someone's pay, or a warlord is a SOLDIER. */
-const FACTION_NOUN_BY_BODY: Readonly<Record<string, 'Raider' | 'Soldier'>> = {
-  'Silt Thief': 'Raider',
-  'Reclaimer Ambusher': 'Raider',
-  'Disc Hijacker': 'Raider',
-  'Black Cloak Agent': 'Soldier',
-  'Mud Monarch Purifier': 'Soldier',
-  'Tartarian Reaver': 'Soldier',
-};
+// OTA-1058 — the list now lives in factionBodies.ts, because the OUTDOOR raid
+// builder needed the same one. Re-exported under the old name so nothing that
+// reads the indoor cast has to know where it moved.
+export { FACTION_BODIES as INDOOR_FACTION_BODIES } from './factionBodies';
 
 /** Dress a same-rarity HUMAN body in a faction's colours: "Mud Monarchs Raider",
  *  "Stone Builders Soldier". Keeps the body's statline and traits (so the fight
@@ -84,21 +73,11 @@ export function pickIndoorFactionIntruder(
   factionId: string,
   factionName: string,
 ): Enemy | null {
-  const pool = rarity ? INDOOR_FACTION_BODIES[rarity] : undefined;
-  if (!pool || pool.length === 0) return null;
-  const order = [...pool].sort(() => Math.random() - 0.5);
-  for (const bodyName of order) {
-    const body = findEnemyByName(bodyName);
-    if (!body) continue;
-    const noun = FACTION_NOUN_BY_BODY[bodyName] ?? 'Raider';
-    return {
-      ...body,
-      name: `${factionName} ${noun}`,
-      factionId,
-      aliases: [noun.toLowerCase(), 'soldier', 'raider', 'intruder', factionName.toLowerCase()],
-    };
-  }
-  return null;
+  // OTA-1058 — no `nearest`: indoors, a Common-tier intruder really is a rat, and
+  // the caller wants the null so it can fall back to the creature cast.
+  const body = fb.pickFactionBody(rarity);
+  if (!body) return null;
+  return fb.dressFactionFighter(body, factionId, factionName, fb.nounForBody(body.name));
 }
 
 /** Every name in the indoor cast, flattened. */
