@@ -381,3 +381,56 @@ export function consumeFuel<T extends { name: string; quantity: number }>(
     })
     .filter((i) => i.quantity > 0);
 }
+
+
+// ---------------------------------------------------------------------------
+// OTA-1044 — the golem card's ROLL pool. Mirrors the dog card's shuffle bag
+// (dogCompanion.defaultDogName): 50 authored names, Fisher-Yates, no repeat
+// until the bag is exhausted, and a refill guard so the seam can't hand back
+// the name that just came out. The golem card previously had NO suggestion
+// affordance at all -- its sibling has ROLL, so a player who reached for the
+// same button found nothing there.
+//
+// Register is deliberately different from the dog list: a dog is an animal you
+// name, a golem is a thing you MADE and are sealing a name into the
+// Aetherstone of. These read as works, titles or epitaphs.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const GOLEM_NAME_POOL: string[] = (require('../data/golems/golem-names.json') as { names: string[] }).names;
+
+let golemNameBag: string[] = [];
+let lastGolemName: string | null = null;
+
+function refillGolemNameBag(): void {
+  const next = [...GOLEM_NAME_POOL];
+  for (let i = next.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [next[i], next[j]] = [next[j]!, next[i]!];
+  }
+  // Names come off with pop(), i.e. from the TAIL -- guard that end, not the
+  // head. (The dog version shipped with this backwards on the first cut and
+  // only the test caught it.)
+  const last = next.length - 1;
+  if (next.length > 1 && next[last] === lastGolemName) {
+    [next[last], next[0]] = [next[0]!, next[last]!];
+  }
+  golemNameBag = next;
+}
+
+/** Backs the ROLL button in GolemNamingModal. */
+export function suggestGolemName(): string {
+  if (golemNameBag.length === 0) refillGolemNameBag();
+  const name = golemNameBag.pop() ?? GOLEM_NAME_POOL[0]!;
+  lastGolemName = name;
+  return name;
+}
+
+/** Test seam — reset the bag so a spec starts from a known state. */
+export function _resetGolemNameBag(): void {
+  golemNameBag = [];
+  lastGolemName = null;
+}
+
+/** Test seam — the full authored pool. */
+export function golemNamePool(): readonly string[] {
+  return GOLEM_NAME_POOL;
+}
