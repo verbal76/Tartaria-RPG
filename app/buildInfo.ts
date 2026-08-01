@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.75';
+export const DISPLAY_VERSION = '4.28.76';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19289,6 +19289,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1063 `range: null` defect. Every one already sets range; the elevated
 // overlay was the only gap and OTA-1063 closed it.
 // DISPLAY_VERSION 4.28.75. 5 tests.
-export const OTA_BUILD_ID = '2026-08-01-1064-ota-teardown-parallel';
+// ---------------------------------------------------------------------------
+// OTA-1065 — THE TUTORIAL VOICE RAN A BEAT BEHIND (twin of golem 1042).
+// Owner report on 4.28.75: "I hear you'll want a weapon while I'm already
+// typing in take the rope."
+// Each beat appends TWO arbiter lines -- an acknowledgement of the action just
+// taken, then the next instruction -- and a player clears a beat in a couple
+// of seconds. On-device Kokoro synthesis is slower than that, so the voice
+// queue GAINS entries faster than it drains and the spoken line drifts a whole
+// beat behind the visible one. A stale instruction is worse than silence: it
+// tells the player to do something they finished two actions ago.
+// Beat instructions now carry meta.supersede. The TTS controller answers it
+// with clearQueueKeepCurrent() + speak(front: true): drop the backlog, keep
+// whatever sentence is already in the air, put the new line next.
+// clearQueueKeepCurrent NOT stopAndClear, deliberately -- no clipped word, and
+// no race between piperStopAndClear's async expo-av teardown and the new
+// utterance.
+// Useful side effect: when the voice is NOT behind, the beat's acknowledgement
+// is already `currentlySpeaking` rather than queued, so it survives and the
+// instruction follows it. The acknowledgement is only sacrificed when audio is
+// genuinely lagging -- exactly when it should be.
+// NOTE: clearQueueKeepCurrent had shipped in TTSManager but was never called
+// from anywhere; its own comment describes this exact problem. Now wired.
+// DISPLAY_VERSION 4.28.76. 4 tests.
+export const OTA_BUILD_ID = '2026-08-01-1065-tutorial-voice-supersede';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1064-ota-teardown-parallel';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1063-tutorial-climb-softlock';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-07-31-1062-ambient-fail-open';
