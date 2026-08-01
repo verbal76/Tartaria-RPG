@@ -878,7 +878,34 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.73**; ledger in `VERSION.md`.
 
-- **THE TUTORIAL CLIMB SOFTLOCK (2026-08-01, latest). BOTH LINES.**
+- **OTA TEARDOWN RUNS CONCURRENTLY (2026-08-01, latest). BOTH LINES.**
+  The four native disposes before `reloadAsync` ran in SERIES, each behind its
+  own 3-second deadline (OTA-243). Worst case is 12 seconds of a screen that
+  shows a static *"Releasing resources…"* and nothing else.
+  - ⚠ **This is the leading suspect for the FabricUIManager NPE.** The owner's
+    hypothesis was right: hung update -> player taps -> crash -> second update.
+    A touch dispatched into that window hits a surface teardown has already
+    destroyed (`SurfaceMountingManager` null), and it lands BEFORE
+    `reloadAsync` commits -- which is exactly why the update appeared to run
+    a second time.
+  - expo-av, ONNX Runtime, llama.rn and executorch are independent subsystems
+    with no teardown ordering between them, so they race their deadlines
+    concurrently via `Promise.all`. ~12s -> ~3s.
+  - `stopTTSController` + `stopTTS` are hoisted ahead of the group (both
+    synchronous) so the expo-av Sound `playPcm` created is released before
+    audio teardown begins.
+  - `Promise.all` is safe here because `disposeWithDeadline` catches its own
+    rejection and resolves null -- no member can reject the whole set.
+  - `disposeWithDeadline` now clears its deadline timer when the dispose wins;
+    four handles previously stayed armed for the full 3s.
+  - **AUDIT, no change needed:** swept all 17 `gameStore` enemy-spawn sites for
+    the OTA-1063 `range: null` defect. Every one already sets `range`. The
+    elevated overlay was the only gap and OTA-1063 closed it.
+  - **NOT a bug (withdrawn):** the dog's hits logging on the `reward` channel
+    while misses log on `combat` is OTA-146, deliberate, from playtester
+    feedback ("Rockey's hits are red, they should be green"). Left alone.
+
+- **THE TUTORIAL CLIMB SOFTLOCK (2026-08-01). BOTH LINES.**
   Owner device report on 4.28.73: topped out the tutorial climb, the summit
   overlay spawned an Aetheric Raven, and every input answered *"Not yet — do
   what I've asked of you."* Two defects stacked into a genuine softlock.
