@@ -878,7 +878,38 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.73**; ledger in `VERSION.md`.
 
-- **THE TUTORIAL VOICE RAN A BEAT BEHIND (2026-08-01, latest). BOTH LINES.**
+- **THE DOG CARD: TIMING, PALETTE, NAME POOL (2026-08-01, latest). BOTH LINES.**
+  Three owner reports against `DogOnboardingModal`, all correct.
+  - **Fired too fast.** *"I hadn't seen the results of the fight and that I had
+    won before that popped on the screen."* `completeRescueScenario` sets
+    `pendingDogOnboarding` inside `resolveEnemyDefeat` — the SAME tick that
+    appends the victory lines — and the modal rendered on `pending` alone. It
+    now holds while any `missionCompleteNotice` is up, then waits
+    `DOG_CARD_DWELL_MS` (4s) with the screen clear. The dwell restarts from
+    when the competing card is dismissed, not from the kill.
+  - **Wrong palette.** The card was cold — `#8aa0a4` labels, `#3a4448`
+    borders, a near-opaque `#040608` backdrop, full-bleed with no card body —
+    while every other popup is a BOUNDED warm card: `#17150f` body, `#c9a86a`
+    gold border and accents, `#f0e6cc` title, on translucent
+    `rgba(0,0,0,0.78)`. Restyled to `MissionCompleteModal`, the house
+    reference. The translucent backdrop also keeps the fight result visible
+    behind the card, which reinforces the timing fix.
+  - **Three names.** `defaultDogName` drew from `['Rust','Cinder','Marrow']`
+    WITH REPLACEMENT, so fifteen taps could never produce more than three
+    distinct names. Now 50 authored names in `app/data/dogs/dog-names.json`,
+    handed out from a Fisher-Yates shuffle bag — consecutive taps cannot repeat
+    until the bag empties.
+  - ⚠ **The refill guard must look at the TAIL of the bag.** Names are taken
+    with `pop()`. The first cut guarded `next[0]`, which is the wrong end, and
+    a double-tap repeat went straight through the seam. The test caught it;
+    review did not.
+  - ⚠ **`GolemNamingModal` is the sibling and was NOT touched.** It very likely
+    carries the same cold palette and the same instant-render timing. Not
+    changed here because the owner reported the dog card specifically and no
+    device evidence exists for the golem one — check it before the next
+    naming beat ships.
+
+- **THE TUTORIAL VOICE RAN A BEAT BEHIND (2026-08-01). BOTH LINES.**
   Owner on 4.28.75: *"I hear 'you'll want a weapon' while I'm already typing in
   take the rope."*
   - **Why it compounds.** Every beat appends TWO arbiter lines — an

@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.76';
+export const DISPLAY_VERSION = '4.28.77';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19312,7 +19312,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // NOTE: clearQueueKeepCurrent had shipped in TTSManager but was never called
 // from anywhere; its own comment describes this exact problem. Now wired.
 // DISPLAY_VERSION 4.28.76. 4 tests.
-export const OTA_BUILD_ID = '2026-08-01-1065-tutorial-voice-supersede';
+// ---------------------------------------------------------------------------
+// OTA-1066 — THE DOG CARD: TIMING, PALETTE, NAME POOL (twin of golem 1043).
+// Three owner reports against DogOnboardingModal, all correct.
+// (1) TOO FAST. completeRescueScenario sets pendingDogOnboarding inside
+//     resolveEnemyDefeat, in the SAME tick that appends the victory lines, and
+//     the modal rendered on `pending` alone -- so the card covered the feed
+//     before the player could read that they had won. It now holds while any
+//     missionCompleteNotice is up, then waits DOG_CARD_DWELL_MS (4s) with the
+//     screen clear. The dwell restarts from the moment a competing card is
+//     dismissed, not from the kill.
+// (2) WRONG PALETTE. The card was built cold -- #8aa0a4 labels, #3a4448
+//     borders, a near-opaque #040608 backdrop, full-bleed with no card body --
+//     while every other popup is a BOUNDED warm card: #17150f body, #c9a86a
+//     gold border/accents, #f0e6cc title, on a translucent rgba(0,0,0,0.78)
+//     backdrop. Restyled to MissionCompleteModal, the house reference. The
+//     translucent backdrop also means the fight result stays visible behind.
+// (3) THREE NAMES. defaultDogName picked from ['Rust','Cinder','Marrow'] with
+//     replacement, so tapping ROLL fifteen times could never show more than
+//     three distinct names and repeated constantly. Now 50 authored names in
+//     app/data/dogs/dog-names.json, handed out from a Fisher-Yates SHUFFLE BAG:
+//     consecutive taps cannot repeat until the bag is exhausted, and the
+//     refill guard stops the seam handing back the name that just came out.
+// ⚠ The seam guard must look at the TAIL of the bag -- names are taken with
+//   pop(). Guarding next[0] guards the wrong end and lets a double-tap repeat
+//   straight through (caught by the test, not by review).
+// DISPLAY_VERSION 4.28.77. 7 tests.
+export const OTA_BUILD_ID = '2026-08-01-1066-dog-card-timing-palette-names';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1065-tutorial-voice-supersede';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1064-ota-teardown-parallel';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1063-tutorial-climb-softlock';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-07-31-1062-ambient-fail-open';
