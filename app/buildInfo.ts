@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.75';
+export const DISPLAY_VERSION = '4.28.78';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19323,6 +19323,79 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1063 `range: null` defect. Every one already sets range; the elevated
 // overlay was the only gap and OTA-1063 closed it.
 // DISPLAY_VERSION 4.28.75. 5 tests.
-export const OTA_BUILD_ID = '2026-08-01-1064-ota-teardown-parallel';
+// ---------------------------------------------------------------------------
+// OTA-1065 — THE TUTORIAL VOICE RAN A BEAT BEHIND (twin of golem 1042).
+// Owner report on 4.28.75: "I hear you'll want a weapon while I'm already
+// typing in take the rope."
+// Each beat appends TWO arbiter lines -- an acknowledgement of the action just
+// taken, then the next instruction -- and a player clears a beat in a couple
+// of seconds. On-device Kokoro synthesis is slower than that, so the voice
+// queue GAINS entries faster than it drains and the spoken line drifts a whole
+// beat behind the visible one. A stale instruction is worse than silence: it
+// tells the player to do something they finished two actions ago.
+// Beat instructions now carry meta.supersede. The TTS controller answers it
+// with clearQueueKeepCurrent() + speak(front: true): drop the backlog, keep
+// whatever sentence is already in the air, put the new line next.
+// clearQueueKeepCurrent NOT stopAndClear, deliberately -- no clipped word, and
+// no race between piperStopAndClear's async expo-av teardown and the new
+// utterance.
+// Useful side effect: when the voice is NOT behind, the beat's acknowledgement
+// is already `currentlySpeaking` rather than queued, so it survives and the
+// instruction follows it. The acknowledgement is only sacrificed when audio is
+// genuinely lagging -- exactly when it should be.
+// NOTE: clearQueueKeepCurrent had shipped in TTSManager but was never called
+// from anywhere; its own comment describes this exact problem. Now wired.
+// DISPLAY_VERSION 4.28.76. 4 tests.
+// ---------------------------------------------------------------------------
+// OTA-1066 — THE DOG CARD: TIMING, PALETTE, NAME POOL (twin of golem 1043).
+// Three owner reports against DogOnboardingModal, all correct.
+// (1) TOO FAST. completeRescueScenario sets pendingDogOnboarding inside
+//     resolveEnemyDefeat, in the SAME tick that appends the victory lines, and
+//     the modal rendered on `pending` alone -- so the card covered the feed
+//     before the player could read that they had won. It now holds while any
+//     missionCompleteNotice is up, then waits DOG_CARD_DWELL_MS (4s) with the
+//     screen clear. The dwell restarts from the moment a competing card is
+//     dismissed, not from the kill.
+// (2) WRONG PALETTE. The card was built cold -- #8aa0a4 labels, #3a4448
+//     borders, a near-opaque #040608 backdrop, full-bleed with no card body --
+//     while every other popup is a BOUNDED warm card: #17150f body, #c9a86a
+//     gold border/accents, #f0e6cc title, on a translucent rgba(0,0,0,0.78)
+//     backdrop. Restyled to MissionCompleteModal, the house reference. The
+//     translucent backdrop also means the fight result stays visible behind.
+// (3) THREE NAMES. defaultDogName picked from ['Rust','Cinder','Marrow'] with
+//     replacement, so tapping ROLL fifteen times could never show more than
+//     three distinct names and repeated constantly. Now 50 authored names in
+//     app/data/dogs/dog-names.json, handed out from a Fisher-Yates SHUFFLE BAG:
+//     consecutive taps cannot repeat until the bag is exhausted, and the
+//     refill guard stops the seam handing back the name that just came out.
+// ⚠ The seam guard must look at the TAIL of the bag -- names are taken with
+//   pop(). Guarding next[0] guards the wrong end and lets a double-tap repeat
+//   straight through (caught by the test, not by review).
+// DISPLAY_VERSION 4.28.77. 7 tests.
+// ---------------------------------------------------------------------------
+// OTA-1067 — THE GOLEM CARD BROUGHT IN LINE (twin of golem 1044).
+// GolemNamingModal carried all three OTA-1066 faults. Found by reading the
+// file, not by a second device report -- the owner should not have to report
+// the same defect twice because it lives in two components.
+// (1) INSTANT RENDER on pendingGolemNaming, the same tick that logs
+//     "Aetherstone lifts out of the ground… (HP x/y, NdM type)". That summon
+//     line is the ONLY place the golem's stats are stated and the card covered
+//     it. Now holds for any live missionCompleteNotice, then
+//     GOLEM_CARD_DWELL_MS (2500ms). Shorter than the dog card's 4s on purpose:
+//     a summon is player-initiated and the line is one sentence, not a fight
+//     result the player is still assembling.
+// (2) SAME COLD PALETTE -> restyled to MissionCompleteModal.
+// (3) NO ROLL BUTTON AT ALL, while its sibling has one -- a player reaching
+//     for the same affordance found empty space. Added, backed by
+//     app/data/golems/golem-names.json: 50 names, own shuffle bag, tail-side
+//     refill guard (the dog version shipped that backwards on the first cut).
+// Register is deliberately unlike the dog list -- a dog is an animal you name,
+// a golem is a thing you MADE and are sealing a name into. A test pins the two
+// pools apart so they can't drift together.
+// DISPLAY_VERSION 4.28.78. 9 tests.
+export const OTA_BUILD_ID = '2026-08-01-1067-golem-card-in-line';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1066-dog-card-timing-palette-names';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1065-tutorial-voice-supersede';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1064-ota-teardown-parallel';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1063-tutorial-climb-softlock';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-07-31-1062-ambient-fail-open';

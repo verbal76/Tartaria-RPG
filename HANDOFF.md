@@ -878,7 +878,91 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.73**; ledger in `VERSION.md`.
 
-- **OTA TEARDOWN RUNS CONCURRENTLY (2026-08-01, latest). BOTH LINES.**
+- **THE GOLEM CARD BROUGHT IN LINE (2026-08-01, latest). BOTH LINES.**
+  `GolemNamingModal` carried all three of the faults the owner reported
+  against the dog card. Found by reading the file rather than waiting for a
+  second device report — the owner should not have to report the same defect
+  twice because it lives in two components.
+  - **Instant render.** It opened the moment `pendingGolemNaming` flipped —
+    the same tick that logs *"Aetherstone lifts out of the ground… (HP x/y,
+    NdM type)"*. That summon line is the ONLY place the golem's stats are
+    stated, and the card covered it. Now holds for any live
+    `missionCompleteNotice`, then `GOLEM_CARD_DWELL_MS` (2500ms).
+  - ⚠ **The golem dwell is deliberately SHORTER than the dog card's 4s.** A
+    summon is player-initiated and the line is one sentence; a rescue lands on
+    top of a fight result the player is still assembling. Don't unify them.
+  - **Same cold palette** → restyled to `MissionCompleteModal`.
+  - **No ROLL button at all**, while its sibling has one. Added, backed by
+    `app/data/golems/golem-names.json` — 50 names, its own shuffle bag, and
+    the tail-side refill guard (the dog version shipped that backwards on the
+    first cut and only the test caught it).
+  - The golem register is deliberately unlike the dog list: a dog is an animal
+    you name, a golem is a thing you MADE and are sealing a name into the
+    Aetherstone of. A test pins the two pools apart so they can't drift into
+    each other.
+  - **Both naming cards are now consistent.** If a third naming beat is ever
+    added, copy this pair — dwell + notice-gate, house palette, shuffle-bag
+    ROLL — rather than starting from the original cold template.
+
+- **THE DOG CARD: TIMING, PALETTE, NAME POOL (2026-08-01). BOTH LINES.**
+  Three owner reports against `DogOnboardingModal`, all correct.
+  - **Fired too fast.** *"I hadn't seen the results of the fight and that I had
+    won before that popped on the screen."* `completeRescueScenario` sets
+    `pendingDogOnboarding` inside `resolveEnemyDefeat` — the SAME tick that
+    appends the victory lines — and the modal rendered on `pending` alone. It
+    now holds while any `missionCompleteNotice` is up, then waits
+    `DOG_CARD_DWELL_MS` (4s) with the screen clear. The dwell restarts from
+    when the competing card is dismissed, not from the kill.
+  - **Wrong palette.** The card was cold — `#8aa0a4` labels, `#3a4448`
+    borders, a near-opaque `#040608` backdrop, full-bleed with no card body —
+    while every other popup is a BOUNDED warm card: `#17150f` body, `#c9a86a`
+    gold border and accents, `#f0e6cc` title, on translucent
+    `rgba(0,0,0,0.78)`. Restyled to `MissionCompleteModal`, the house
+    reference. The translucent backdrop also keeps the fight result visible
+    behind the card, which reinforces the timing fix.
+  - **Three names.** `defaultDogName` drew from `['Rust','Cinder','Marrow']`
+    WITH REPLACEMENT, so fifteen taps could never produce more than three
+    distinct names. Now 50 authored names in `app/data/dogs/dog-names.json`,
+    handed out from a Fisher-Yates shuffle bag — consecutive taps cannot repeat
+    until the bag empties.
+  - ⚠ **The refill guard must look at the TAIL of the bag.** Names are taken
+    with `pop()`. The first cut guarded `next[0]`, which is the wrong end, and
+    a double-tap repeat went straight through the seam. The test caught it;
+    review did not.
+  - ⚠ **`GolemNamingModal` is the sibling and was NOT touched.** It very likely
+    carries the same cold palette and the same instant-render timing. Not
+    changed here because the owner reported the dog card specifically and no
+    device evidence exists for the golem one — check it before the next
+    naming beat ships.
+
+- **THE TUTORIAL VOICE RAN A BEAT BEHIND (2026-08-01). BOTH LINES.**
+  Owner on 4.28.75: *"I hear 'you'll want a weapon' while I'm already typing in
+  take the rope."*
+  - **Why it compounds.** Every beat appends TWO arbiter lines — an
+    acknowledgement of the action just taken, then the next instruction — and a
+    player clears a beat in a couple of seconds. On-device Kokoro synthesis is
+    slower than that, so the queue gains entries faster than it drains. The lag
+    is not constant; it grows with every beat.
+  - Beat instructions now carry `meta.supersede`. The controller answers it
+    with `clearQueueKeepCurrent()` + `speak(front: true)`.
+  - ⚠ **`clearQueueKeepCurrent`, NOT `stopAndClear`.** stopAndClear would clip
+    a word mid-syllable and would race `piperStopAndClear`'s async expo-av
+    teardown against the new utterance — the same class of unhandled rejection
+    that once crashed Android to the home screen on SILENCE ARBITER.
+  - Useful side effect: when the voice is NOT behind, the acknowledgement is
+    already `currentlySpeaking` rather than queued, so it survives and the
+    instruction follows it. The acknowledgement is only dropped when audio is
+    genuinely lagging — exactly when it should be.
+  - `clearQueueKeepCurrent` had shipped in TTSManager but was never called from
+    anywhere. Its own comment describes this exact problem ("so the player
+    isn't 30 seconds behind the visible scene"). Now wired. A test asserts it
+    still exists so it isn't reaped as dead code.
+  - **Scoped to tutorial beats on purpose.** Ordinary narration must NOT
+    supersede — a player wants to hear the combat lines they queued up, not
+    have them dropped. If the same lag shows up outside the tutorial, the fix
+    is a queue cap or a scene-transition flush, not blanket superseding.
+
+- **OTA TEARDOWN RUNS CONCURRENTLY (2026-08-01). BOTH LINES.**
   The four native disposes before `reloadAsync` ran in SERIES, each behind its
   own 3-second deadline (OTA-243). Worst case is 12 seconds of a screen that
   shows a static *"Releasing resources…"* and nothing else.
