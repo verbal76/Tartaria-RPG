@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.73';
+export const DISPLAY_VERSION = '4.28.74';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19246,4 +19246,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // scene, and when in doubt the companion gets to speak.
 // All six OTA-1054 tests still pass unchanged — the old contract holds.
 // DISPLAY_VERSION 4.28.73. 6 tests.
-export const OTA_BUILD_ID = '2026-07-31-1062-ambient-fail-open';
+// ---------------------------------------------------------------------------
+// OTA-1063 — THE TUTORIAL CLIMB SOFTLOCK (twin of golem 1040).
+// Device report 4.28.73, Pixel 10 Pro XL: the player topped out the tutorial
+// climb, the summit overlay spawned an Aetheric Raven, and every command came
+// back "Not yet — do what I've asked of you." Two defects stacked.
+//   (1) The arb108 lockdown accepted ONLY the current beat's verb. At 'climb'
+//       that is `climb` and nothing else — so with a live enemy the player
+//       could not attack, flee, sneak, or use an item. The sole escape was
+//       `climb down`, which nothing told them about. A softlock.
+//   (2) The refusal never restated the pending instruction, so once the
+//       Arbiter's line scrolled off the feed it was unrecoverable.
+// Fixes: TUTORIAL_SELF_DEFENCE verbs always pass while enemies are live;
+// every gated beat carries a `remind` the refusal interpolates; the summit
+// overlay roll is suppressed entirely during the tutorial; and the overlay
+// scene now sets range explicitly ('mid', like every other spawn site)
+// instead of inheriting null and letting the attack gate and the move
+// handler disagree about where the player was standing.
+// NOT changed: no ranged weapon is granted. The raven has no airborne trait
+// and range coalesced to 'close' — the cudgel could reach it. The block was
+// the lockdown, not the weapon.
+// DISPLAY_VERSION 4.28.74. 7 tests.
+export const OTA_BUILD_ID = '2026-08-01-1063-tutorial-climb-softlock';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-07-31-1062-ambient-fail-open';

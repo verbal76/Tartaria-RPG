@@ -345,7 +345,7 @@ import {
   makeStolenDiscs,
   describeWhisperStage,
 } from '../engine/whispers';
-import { TUTORIAL_STEPS, type TutorialStep } from '../components/tutorialSteps';
+import { TUTORIAL_STEPS, TUTORIAL_SELF_DEFENCE, type TutorialStep } from '../components/tutorialSteps';
 import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome } from '../engine/collectables';
 
 interface Concept {
@@ -8456,14 +8456,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const isClimbCmd = /\bclimb\b/i.test(trimmed);
         const isLeaveCmd = isLeaveHubCommand(trimmed)
           || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed);
+        // OTA-1063 — the lockdown must never outrank a live enemy. A summit
+        // overlay (or any other spawn) can drop a hostile into a tutorial
+        // beat, and before this every verb but the beat's own was refused:
+        // the player could not attack, flee, sneak, or use an item while
+        // being hit, with only 'climb' accepted. Softlock. With enemies on
+        // the board, self-defence verbs always pass.
+        const enemiesLive = (get().currentScene?.enemies.length ?? 0) > 0;
+        const isCombatCmd = TUTORIAL_SELF_DEFENCE.test(trimmed);
         const beatAllows =
           (lockBeatId === 'climb' && isClimbCmd)
-          || (lockBeatId === 'explore_or_leave' && isLeaveCmd);
+          || (lockBeatId === 'explore_or_leave' && isLeaveCmd)
+          || (enemiesLive && isCombatCmd);
         if (!beatAllows) {
           if (!_opts?.silent) get().appendLog('player', trimmed);
+          // OTA-1063 — restate the pending step. "Do what I've asked of you"
+          // is dead text the moment the instruction scrolls away; the player
+          // then has no way to recover it short of replaying the tutorial.
+          const pending = tStep?.remind ?? null;
           get().appendLog(
             'arbiter',
-            `The Arbiter lifts a hand. "Not yet — do what I've asked of you, or tap SKIP TUTORIAL to set out on your own."`,
+            pending
+              ? `The Arbiter lifts a hand. "Not yet — ${pending}. Or tap SKIP TUTORIAL to set out on your own."`
+              : `The Arbiter lifts a hand. "Not yet — do what I've asked of you, or tap SKIP TUTORIAL to set out on your own."`,
           );
           return;
         }
@@ -15592,7 +15607,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // climbs. Player asked: traders only on "larger
             // locations" so a 1-tier ledge doesn't surface a
             // man-with-a-ledger absurdity.
-            const overlay = rollElevatedOverlay(totalTiers);
+            // OTA-1063 — no summit ambush during the tutorial. The scripted
+            // climb beat says "top out, then climb back down"; dropping a
+            // hostile (or a trader, or a lookout hook) on a player who owns
+            // one cudgel and is still inside the beat lockdown is a trap,
+            // not a lesson. Suppress the whole overlay roll until the
+            // tutorial is done or skipped.
+            const inTutorial =
+              get().tutorialStep !== null && !get().tutorialExploreChosen;
+            const overlay = inTutorial ? null : rollElevatedOverlay(totalTiers);
             if (overlay) {
               // Branch on kind. Encounter spawns an enemy.
               // Trader spawns a VendorInstance on scene.vendor.
@@ -15632,6 +15655,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   enemyHps: overrides.enemyHps,
                   enemyAmbushUsed: overrides.enemyAmbushUsed,
                   activeEnemyIdx: overrides.activeEnemyIdx,
+                  // OTA-1063 — set the band explicitly. Every other spawn
+                  // site opens at 'mid'; this one inherited the base scene's
+                  // range, which is null on a peaceful room. Null then got
+                  // coalesced to 'close' by the attack gate and to 'mid' by
+                  // the move handler — the two disagreed about where the
+                  // player was standing.
+                  range: overrides.enemies.length > 0 ? 'mid' : baseScene.range,
                   // Trader → vendor overrides the base's; null
                   // for encounter/lookout. Lookout → put the
                   // planted hook in hooks[]; encounter/trader
