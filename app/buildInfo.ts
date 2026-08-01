@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.77';
+export const DISPLAY_VERSION = '4.28.78';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19338,7 +19338,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   pop(). Guarding next[0] guards the wrong end and lets a double-tap repeat
 //   straight through (caught by the test, not by review).
 // DISPLAY_VERSION 4.28.77. 7 tests.
-export const OTA_BUILD_ID = '2026-08-01-1066-dog-card-timing-palette-names';
+// ---------------------------------------------------------------------------
+// OTA-1067 — THE GOLEM CARD BROUGHT IN LINE (twin of golem 1044).
+// GolemNamingModal carried all three OTA-1066 faults. Found by reading the
+// file, not by a second device report -- the owner should not have to report
+// the same defect twice because it lives in two components.
+// (1) INSTANT RENDER on pendingGolemNaming, the same tick that logs
+//     "Aetherstone lifts out of the ground… (HP x/y, NdM type)". That summon
+//     line is the ONLY place the golem's stats are stated and the card covered
+//     it. Now holds for any live missionCompleteNotice, then
+//     GOLEM_CARD_DWELL_MS (2500ms). Shorter than the dog card's 4s on purpose:
+//     a summon is player-initiated and the line is one sentence, not a fight
+//     result the player is still assembling.
+// (2) SAME COLD PALETTE -> restyled to MissionCompleteModal.
+// (3) NO ROLL BUTTON AT ALL, while its sibling has one -- a player reaching
+//     for the same affordance found empty space. Added, backed by
+//     app/data/golems/golem-names.json: 50 names, own shuffle bag, tail-side
+//     refill guard (the dog version shipped that backwards on the first cut).
+// Register is deliberately unlike the dog list -- a dog is an animal you name,
+// a golem is a thing you MADE and are sealing a name into. A test pins the two
+// pools apart so they can't drift together.
+// DISPLAY_VERSION 4.28.78. 9 tests.
+export const OTA_BUILD_ID = '2026-08-01-1067-golem-card-in-line';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1066-dog-card-timing-palette-names';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1065-tutorial-voice-supersede';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1064-ota-teardown-parallel';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1063-tutorial-climb-softlock';

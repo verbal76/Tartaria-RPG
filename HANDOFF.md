@@ -878,7 +878,33 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.73**; ledger in `VERSION.md`.
 
-- **THE DOG CARD: TIMING, PALETTE, NAME POOL (2026-08-01, latest). BOTH LINES.**
+- **THE GOLEM CARD BROUGHT IN LINE (2026-08-01, latest). BOTH LINES.**
+  `GolemNamingModal` carried all three of the faults the owner reported
+  against the dog card. Found by reading the file rather than waiting for a
+  second device report — the owner should not have to report the same defect
+  twice because it lives in two components.
+  - **Instant render.** It opened the moment `pendingGolemNaming` flipped —
+    the same tick that logs *"Aetherstone lifts out of the ground… (HP x/y,
+    NdM type)"*. That summon line is the ONLY place the golem's stats are
+    stated, and the card covered it. Now holds for any live
+    `missionCompleteNotice`, then `GOLEM_CARD_DWELL_MS` (2500ms).
+  - ⚠ **The golem dwell is deliberately SHORTER than the dog card's 4s.** A
+    summon is player-initiated and the line is one sentence; a rescue lands on
+    top of a fight result the player is still assembling. Don't unify them.
+  - **Same cold palette** → restyled to `MissionCompleteModal`.
+  - **No ROLL button at all**, while its sibling has one. Added, backed by
+    `app/data/golems/golem-names.json` — 50 names, its own shuffle bag, and
+    the tail-side refill guard (the dog version shipped that backwards on the
+    first cut and only the test caught it).
+  - The golem register is deliberately unlike the dog list: a dog is an animal
+    you name, a golem is a thing you MADE and are sealing a name into the
+    Aetherstone of. A test pins the two pools apart so they can't drift into
+    each other.
+  - **Both naming cards are now consistent.** If a third naming beat is ever
+    added, copy this pair — dwell + notice-gate, house palette, shuffle-bag
+    ROLL — rather than starting from the original cold template.
+
+- **THE DOG CARD: TIMING, PALETTE, NAME POOL (2026-08-01). BOTH LINES.**
   Three owner reports against `DogOnboardingModal`, all correct.
   - **Fired too fast.** *"I hadn't seen the results of the fight and that I had
     won before that popped on the screen."* `completeRescueScenario` sets
