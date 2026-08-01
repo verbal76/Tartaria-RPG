@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.72';
+export const DISPLAY_VERSION = '4.28.75';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19250,4 +19250,79 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // had to parse English back out. Fused pieces carry theirs too (u.armorSlot) —
 // a fusion re-rolls the numbers, never the slot.
 // DISPLAY_VERSION 4.28.72. 9 tests.
-export const OTA_BUILD_ID = '2026-07-31-1061-craft-armor-slot';
+// OTA-1062 — THE AMBIENT FILTER FAILS OPEN NOW, AND THE FEATURE SHOULD FINALLY
+// SPEAK. The OTA-1057 instrumentation did its job on the owner's very next
+// session (build 4.28.72), naming in one line what four builds of reasoning had
+// not:
+//   arbiter: ambient ∅ 30603ms
+//   arbiter: ambient-empty reason=action-opener
+//   raw="You, my companion, have traveled far and wide, but the distance
+//        between you and the ancient city you once called home ha…"
+// The model was writing EXACTLY the reflective companion line the feature
+// exists for. OTA-1054 killed it over a comma.
+//
+// ROOT CAUSE — the filter's SHAPE, not its contents. REFLECTIVE_YOU_OPENER was a
+// WHITELIST: it enumerated the reflective openers it knew and dropped anything
+// else starting with "You". It required `you\s+have` — literal whitespace — and
+// the model wrote "You, my companion, have". An appositive put a comma where the
+// regex wanted a space, the whitelist missed, and the sentence fell through to
+// "must be scene narration" and died. That is FAIL-CLOSED, and it was always
+// going to eat prose nobody anticipated; teaching it about appositives would fix
+// this one sentence and leave the next surprise to die identically.
+//
+// So the rule is inverted. SCENE_ACTION_OPENER names the BAD opener — a
+// present-tense physical action ("You step back", "You reach for the lid") —
+// and everything else passes. The asymmetry is the whole argument: a scene line
+// slipping through costs one odd sentence; a reflection wrongly blocked costs
+// the entire feature, which is the bill this has been paying since it shipped.
+// Ambiguous verbs are deliberately NOT blocked (take/drop/strike/run/rise/stop):
+// "You drop your guard less often now" is reflection, "You drop your pack" is
+// scene, and when in doubt the companion gets to speak.
+// All six OTA-1054 tests still pass unchanged — the old contract holds.
+// DISPLAY_VERSION 4.28.73. 6 tests.
+// ---------------------------------------------------------------------------
+// OTA-1063 — THE TUTORIAL CLIMB SOFTLOCK (twin of golem 1040).
+// Device report 4.28.73, Pixel 10 Pro XL: the player topped out the tutorial
+// climb, the summit overlay spawned an Aetheric Raven, and every command came
+// back "Not yet — do what I've asked of you." Two defects stacked.
+//   (1) The arb108 lockdown accepted ONLY the current beat's verb. At 'climb'
+//       that is `climb` and nothing else — so with a live enemy the player
+//       could not attack, flee, sneak, or use an item. The sole escape was
+//       `climb down`, which nothing told them about. A softlock.
+//   (2) The refusal never restated the pending instruction, so once the
+//       Arbiter's line scrolled off the feed it was unrecoverable.
+// Fixes: TUTORIAL_SELF_DEFENCE verbs always pass while enemies are live;
+// every gated beat carries a `remind` the refusal interpolates; the summit
+// overlay roll is suppressed entirely during the tutorial; and the overlay
+// scene now sets range explicitly ('mid', like every other spawn site)
+// instead of inheriting null and letting the attack gate and the move
+// handler disagree about where the player was standing.
+// NOT changed: no ranged weapon is granted. The raven has no airborne trait
+// and range coalesced to 'close' — the cudgel could reach it. The block was
+// the lockdown, not the weapon.
+// DISPLAY_VERSION 4.28.74. 7 tests.
+// ---------------------------------------------------------------------------
+// OTA-1064 — OTA TEARDOWN RUNS CONCURRENTLY (twin of golem 1041).
+// The four native disposes ran in SERIES, each with its own 3-second deadline
+// (OTA-243). Worst case: 12 seconds on a screen showing a static "Releasing
+// resources…" and nothing else. That window is the leading suspect for the
+// reported FabricUIManager.markActiveTouchForTag NPE -- the player taps what
+// looks like a dead screen, the touch dispatches into a surface teardown has
+// already destroyed, SurfaceMountingManager is null, crash. It lands BEFORE
+// reloadAsync commits, which explains the "update ran twice" report.
+// expo-av / ONNX Runtime / llama.rn / executorch are independent subsystems
+// with no teardown ordering between them, so they now race their deadlines
+// concurrently via Promise.all. Worst case ~12s -> ~3s.
+// stopTTSController + stopTTS are hoisted ahead of the group (both are
+// synchronous) so the expo-av Sound playPcm created is released before audio
+// teardown starts. Promise.all is safe: disposeWithDeadline catches its own
+// rejection and resolves null, so no member can reject the set.
+// Also: disposeWithDeadline now clears its deadline timer when the dispose
+// wins the race -- four handles used to stay armed for the full 3s.
+// AUDIT (no change needed): swept all 17 gameStore enemy-spawn sites for the
+// OTA-1063 `range: null` defect. Every one already sets range; the elevated
+// overlay was the only gap and OTA-1063 closed it.
+// DISPLAY_VERSION 4.28.75. 5 tests.
+export const OTA_BUILD_ID = '2026-08-01-1064-ota-teardown-parallel';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1063-tutorial-climb-softlock';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-07-31-1062-ambient-fail-open';

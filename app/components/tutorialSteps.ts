@@ -73,7 +73,22 @@ export interface TutorialStep {
   /** Line the Arbiter speaks when this step opens. Routed through
    *  appendLog('arbiter', ...). Falls back to body if not set. */
   arbiter?: string;
+  /** Short imperative the Arbiter restates when the tutorial lockdown
+   *  refuses an off-script command. The refusal used to say only "do what
+   *  I've asked of you" — unusable once the instruction has scrolled off
+   *  the feed, because it tells the player they are wrong without telling
+   *  them what right looks like. Lowercase, no trailing period: it is
+   *  interpolated mid-sentence. */
+  remind?: string;
 }
+
+/** OTA-1063 — verbs the tutorial lockdown always lets through while an
+ *  enemy is live. Self-defence, disengagement, and consumables: everything
+ *  a cornered player needs. Deliberately NOT world verbs (travel, craft,
+ *  fuse, rest) — the lockdown still holds for those, so the tutorial can't
+ *  be walked out of sideways. */
+export const TUTORIAL_SELF_DEFENCE =
+  /\b(attack|strike|hit|swing|shoot|fire|stab|slash|punch|kick|throw|flee|run|escape|retreat|dodge|block|sneak|hide|use|drink|eat|equip|wield|talk|parley)\b/i;
 
 // Tungsten Spire — the new 10-beat in-feed sequence. Each beat is
 // driven by a specific player action; the state machine in gameStore
@@ -81,6 +96,7 @@ export interface TutorialStep {
 export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'name',
+    remind: 'type your name, then tap ACT',
     screen: 'exploration',
     area: 'input-row',
     inputPulse: true,
@@ -91,6 +107,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id: 'cudgel',
+    remind: 'take the cudgel at your feet',
     screen: 'exploration',
     area: 'quick-row',
     pulse: true,
@@ -101,6 +118,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id: 'rope',
+    remind: 'type take rope, then tap ACT',
     screen: 'exploration',
     area: 'input-row',
     inputPulse: true,
@@ -111,6 +129,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id: 'scrap',
+    remind: 'salvage the broken chest plate',
     screen: 'exploration',
     area: 'quick-row',
     pulse: true,
@@ -121,6 +140,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id: 'climb',
+    remind: 'finish the climb — climb again to go higher, or climb down to come back',
     screen: 'exploration',
     area: 'quick-row',
     pulse: true,
@@ -131,6 +151,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id: 'investigate',
+    remind: 'investigate the north door',
     screen: 'exploration',
     area: 'quick-row',
     pulse: true,
@@ -149,6 +170,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     // LEAVE (or later typing 'leave outpost') advances; see
     // finishOutpostTutorial in gameStore.
     id: 'explore_or_leave',
+    remind: 'pick this place over, or type leave outpost to set out',
     screen: 'exploration',
     area: 'fullscreen',
     title: 'The Door Is Open',

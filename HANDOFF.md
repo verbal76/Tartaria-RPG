@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1061`**,
-**golem-line `2026-07-31-1038`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1062`**,
+**golem-line `2026-07-31-1039`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,100 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.72**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.73**; ledger in `VERSION.md`.
 
-- **THE CRAFT LIST SAYS WHICH SLOT (2026-07-31, latest). BOTH LINES.**
+- **OTA TEARDOWN RUNS CONCURRENTLY (2026-08-01, latest). BOTH LINES.**
+  The four native disposes before `reloadAsync` ran in SERIES, each behind its
+  own 3-second deadline (OTA-243). Worst case is 12 seconds of a screen that
+  shows a static *"Releasing resources…"* and nothing else.
+  - ⚠ **This is the leading suspect for the FabricUIManager NPE.** The owner's
+    hypothesis was right: hung update -> player taps -> crash -> second update.
+    A touch dispatched into that window hits a surface teardown has already
+    destroyed (`SurfaceMountingManager` null), and it lands BEFORE
+    `reloadAsync` commits -- which is exactly why the update appeared to run
+    a second time.
+  - expo-av, ONNX Runtime, llama.rn and executorch are independent subsystems
+    with no teardown ordering between them, so they race their deadlines
+    concurrently via `Promise.all`. ~12s -> ~3s.
+  - `stopTTSController` + `stopTTS` are hoisted ahead of the group (both
+    synchronous) so the expo-av Sound `playPcm` created is released before
+    audio teardown begins.
+  - `Promise.all` is safe here because `disposeWithDeadline` catches its own
+    rejection and resolves null -- no member can reject the whole set.
+  - `disposeWithDeadline` now clears its deadline timer when the dispose wins;
+    four handles previously stayed armed for the full 3s.
+  - **AUDIT, no change needed:** swept all 17 `gameStore` enemy-spawn sites for
+    the OTA-1063 `range: null` defect. Every one already sets `range`. The
+    elevated overlay was the only gap and OTA-1063 closed it.
+  - **NOT a bug (withdrawn):** the dog's hits logging on the `reward` channel
+    while misses log on `combat` is OTA-146, deliberate, from playtester
+    feedback ("Rockey's hits are red, they should be green"). Left alone.
+
+- **THE TUTORIAL CLIMB SOFTLOCK (2026-08-01). BOTH LINES.**
+  Owner device report on 4.28.73: topped out the tutorial climb, the summit
+  overlay spawned an Aetheric Raven, and every input answered *"Not yet — do
+  what I've asked of you."* Two defects stacked into a genuine softlock.
+  - **The lockdown outranked a live enemy.** arb108's typed-input lockdown
+    accepts only the current beat's verb. At the `climb` beat that is `climb`.
+    With a hostile on the board the player could not attack, flee, sneak, or
+    use an item — the only accepted escape was `climb down`, and nothing told
+    them it existed. Fixed: `TUTORIAL_SELF_DEFENCE` (tutorialSteps.ts) always
+    passes while `currentScene.enemies` is non-empty. World verbs (fuse,
+    craft, travel, rest) still hold, so the tutorial can't be exited sideways.
+  - **The refusal was dead text.** "Do what I've asked of you" is unusable
+    once the instruction scrolls off the feed. Every lockdown-gated beat now
+    carries a `remind` clause the refusal interpolates: *"Not yet — finish the
+    climb — climb again to go higher, or climb down to come back."*
+  - **Root cause of the spawn:** `rollElevatedOverlay` had no tutorial guard.
+    Suppressed for the whole tutorial now — the scripted beat says "top out,
+    then climb back down", and a hostile there is a trap, not a lesson.
+  - ⚠ **The overlay scene never set `range`.** It inherited the base scene's,
+    which is `null` on a peaceful room (gameStore ~6685 sets `'mid'` only when
+    the scene is BUILT with enemies). Null was then coalesced to `'close'` by
+    the attack gate and `'mid'` by the move handler — two subsystems
+    disagreeing about the same fight. Now set explicitly. This affected every
+    summit-overlay encounter in the game, not just the tutorial.
+  - ⚠ **No ranged weapon is granted, deliberately.** The owner's read was that
+    they were stuck for lack of a ranged option. The raven carries no airborne
+    trait and range resolved to `'close'`, so the starting cudgel could reach
+    it. Adding a tutorial rifle would have changed the intended loadout to
+    treat a symptom that wasn't the cause.
+
+- **THE AMBIENT FILTER FAILS OPEN (2026-07-31). BOTH LINES.**
+  HAL **1062** / golem **1039**. The OTA-1057 instrumentation paid for itself on the owner's
+  very next session (build 4.28.72), naming in one line what four builds of reasoning could not:
+  ```
+  arbiter: ambient ∅ 30603ms
+  arbiter: ambient-empty reason=action-opener
+  raw="You, my companion, have traveled far and wide, but the distance
+       between you and the ancient city you once called home ha…"
+  ```
+  The model was producing EXACTLY the reflective companion line ambient exists for. It was
+  being destroyed by the filter OTA-1054 added to save it.
+  ⚠ ROOT CAUSE IS THE FILTER'S **SHAPE**, NOT ITS CONTENTS — read this before touching it.
+  `REFLECTIVE_YOU_OPENER` was a **whitelist**: it enumerated known reflective openers and
+  dropped everything else beginning with "You". It required `you\s+have` (literal
+  whitespace); the model wrote `"You, my companion, have"`. One appositive, one comma where
+  the regex wanted a space, and the whole feature produced nothing across four builds.
+  That is **fail-closed**. Teaching it about appositives would have fixed this sentence and
+  left the next unanticipated phrasing to die exactly the same way.
+  The rule is now INVERTED. `SCENE_ACTION_OPENER` names the BAD opener — a present-tense
+  physical action ("You step back", "You reach for the lid") — and everything else passes.
+  **Fail open.** The asymmetry is the argument: a scene line slipping through costs one odd
+  sentence; a reflection wrongly blocked costs the entire feature.
+  ⚠ DO NOT ADD AMBIGUOUS VERBS to `SCENE_ACTION_OPENER`. take / drop / strike / run / rise /
+  stop are deliberately absent — "You drop your guard less often now" is reflection and
+  "You drop your pack" is scene. Adding a verb here can silence a real line; when in doubt,
+  let the companion speak.
+  All six OTA-1054 tests pass unchanged, so the original contract still holds. The
+  `reason=` instrumentation STAYS — if something else starts eating lines, it names that too.
+  Locked by ota1062/1039AmbientFailOpen (6 tests per line), including the verbatim string
+  from the device log and a fail-open case with five reflective phrasings that were never in
+  the whitelist and would each have been destroyed silently.
+  WATCH: no ambient line has still ever reached a player. The next peaceful wander on
+  4.28.73 is the real test — look for `arbiter: ambient ✓`.
+
+- **THE CRAFT LIST SAYS WHICH SLOT (2026-07-31). BOTH LINES.**
   HAL **1061** / golem **1038**. Owner: "under the craft tab for armor, it needs to list
   what slot its for. some of the names don't explain it. it took me a few minutes to find
   something in the hand slot."
