@@ -861,7 +861,37 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.73**; ledger in `VERSION.md`.
 
-- **THE AMBIENT FILTER FAILS OPEN (2026-07-31, latest). BOTH LINES.**
+- **THE TUTORIAL CLIMB SOFTLOCK (2026-08-01, latest). BOTH LINES.**
+  Owner device report on 4.28.73: topped out the tutorial climb, the summit
+  overlay spawned an Aetheric Raven, and every input answered *"Not yet — do
+  what I've asked of you."* Two defects stacked into a genuine softlock.
+  - **The lockdown outranked a live enemy.** arb108's typed-input lockdown
+    accepts only the current beat's verb. At the `climb` beat that is `climb`.
+    With a hostile on the board the player could not attack, flee, sneak, or
+    use an item — the only accepted escape was `climb down`, and nothing told
+    them it existed. Fixed: `TUTORIAL_SELF_DEFENCE` (tutorialSteps.ts) always
+    passes while `currentScene.enemies` is non-empty. World verbs (fuse,
+    craft, travel, rest) still hold, so the tutorial can't be exited sideways.
+  - **The refusal was dead text.** "Do what I've asked of you" is unusable
+    once the instruction scrolls off the feed. Every lockdown-gated beat now
+    carries a `remind` clause the refusal interpolates: *"Not yet — finish the
+    climb — climb again to go higher, or climb down to come back."*
+  - **Root cause of the spawn:** `rollElevatedOverlay` had no tutorial guard.
+    Suppressed for the whole tutorial now — the scripted beat says "top out,
+    then climb back down", and a hostile there is a trap, not a lesson.
+  - ⚠ **The overlay scene never set `range`.** It inherited the base scene's,
+    which is `null` on a peaceful room (gameStore ~6685 sets `'mid'` only when
+    the scene is BUILT with enemies). Null was then coalesced to `'close'` by
+    the attack gate and `'mid'` by the move handler — two subsystems
+    disagreeing about the same fight. Now set explicitly. This affected every
+    summit-overlay encounter in the game, not just the tutorial.
+  - ⚠ **No ranged weapon is granted, deliberately.** The owner's read was that
+    they were stuck for lack of a ranged option. The raven carries no airborne
+    trait and range resolved to `'close'`, so the starting cudgel could reach
+    it. Adding a tutorial rifle would have changed the intended loadout to
+    treat a symptom that wasn't the cause.
+
+- **THE AMBIENT FILTER FAILS OPEN (2026-07-31). BOTH LINES.**
   golem **1039** / HAL **1062**. The OTA-1034 instrumentation paid for itself on the owner's
   very next session (build 4.28.72), naming in one line what four builds of reasoning could not:
   ```
