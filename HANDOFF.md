@@ -861,7 +861,34 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.73**; ledger in `VERSION.md`.
 
-- **OTA TEARDOWN RUNS CONCURRENTLY (2026-08-01, latest). BOTH LINES.**
+- **THE TUTORIAL VOICE RAN A BEAT BEHIND (2026-08-01, latest). BOTH LINES.**
+  Owner on 4.28.75: *"I hear 'you'll want a weapon' while I'm already typing in
+  take the rope."*
+  - **Why it compounds.** Every beat appends TWO arbiter lines — an
+    acknowledgement of the action just taken, then the next instruction — and a
+    player clears a beat in a couple of seconds. On-device Kokoro synthesis is
+    slower than that, so the queue gains entries faster than it drains. The lag
+    is not constant; it grows with every beat.
+  - Beat instructions now carry `meta.supersede`. The controller answers it
+    with `clearQueueKeepCurrent()` + `speak(front: true)`.
+  - ⚠ **`clearQueueKeepCurrent`, NOT `stopAndClear`.** stopAndClear would clip
+    a word mid-syllable and would race `piperStopAndClear`'s async expo-av
+    teardown against the new utterance — the same class of unhandled rejection
+    that once crashed Android to the home screen on SILENCE ARBITER.
+  - Useful side effect: when the voice is NOT behind, the acknowledgement is
+    already `currentlySpeaking` rather than queued, so it survives and the
+    instruction follows it. The acknowledgement is only dropped when audio is
+    genuinely lagging — exactly when it should be.
+  - `clearQueueKeepCurrent` had shipped in TTSManager but was never called from
+    anywhere. Its own comment describes this exact problem ("so the player
+    isn't 30 seconds behind the visible scene"). Now wired. A test asserts it
+    still exists so it isn't reaped as dead code.
+  - **Scoped to tutorial beats on purpose.** Ordinary narration must NOT
+    supersede — a player wants to hear the combat lines they queued up, not
+    have them dropped. If the same lag shows up outside the tutorial, the fix
+    is a queue cap or a scene-transition flush, not blanket superseding.
+
+- **OTA TEARDOWN RUNS CONCURRENTLY (2026-08-01). BOTH LINES.**
   The four native disposes before `reloadAsync` ran in SERIES, each behind its
   own 3-second deadline (OTA-243). Worst case is 12 seconds of a screen that
   shows a static *"Releasing resources…"* and nothing else.

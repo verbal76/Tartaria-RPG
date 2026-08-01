@@ -18,7 +18,7 @@
 
 import { AppState, type AppStateStatus } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { speak, stopAndClear } from './TTSManager';
+import { speak, stopAndClear, clearQueueKeepCurrent } from './TTSManager';
 import { getVoiceSettings, onVoiceSettingsChange } from './voiceSettings';
 import { splitSentences } from './sentenceSplitter';
 import { advanceStream, emptyStreamState } from './streamBundler';
@@ -254,6 +254,30 @@ function onState(state: GameState): void {
       // arbiter-only channel (per OTA 123 player request) — frame
       // strip + speak. The SPOKEN_CHANNELS set is now {'arbiter'}
       // so this is always the arbiter path.
+      // OTA-1065 — meta.supersede: this line REPLACES the pending backlog.
+      // The tutorial appends two arbiter lines per beat (an acknowledgement
+      // and the next instruction) while on-device Kokoro is still
+      // synthesising the previous one, so the queue grows faster than it
+      // drains and the voice falls a whole beat behind: the owner heard
+      // "you'll want a weapon" while already typing `take the rope`. A stale
+      // instruction is worse than no instruction — it tells the player to do
+      // something they finished two actions ago.
+      //
+      // clearQueueKeepCurrent (not stopAndClear) on purpose: it drops the
+      // backlog without cutting the sentence already in the air, so there's
+      // no clipped word and no race with piperStopAndClear's async expo-av
+      // teardown. Then the new line goes to the FRONT.
+      //
+      // Note the useful side effect when the voice is NOT behind: with an
+      // empty queue the beat's acknowledgement is already `currentlySpeaking`
+      // rather than queued, so it survives and the instruction simply follows
+      // it. The acknowledgement is only sacrificed when audio is genuinely
+      // lagging — which is exactly when it should be.
+      if (entry.meta?.supersede === true) {
+        clearQueueKeepCurrent();
+        speakArbiter(entry.text, true);
+        continue;
+      }
       // OTA-635 — meta.speakFront (the welcome-back greeting) jumps the voice
       // queue so it's heard immediately instead of behind a backlog.
       speakArbiter(entry.text, entry.meta?.speakFront === true);

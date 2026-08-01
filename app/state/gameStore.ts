@@ -24493,7 +24493,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ tutorialStep: 0, awaitingTutorialName: true });
     const firstStep = TUTORIAL_STEPS[0];
     if (firstStep?.arbiter) {
-      get().appendLog('arbiter', firstStep.arbiter);
+      // OTA-1065 — supersede: a beat instruction outranks anything still
+      // queued for the voice. Nothing precedes the first beat, but tagging it
+      // keeps every beat's dispatch identical.
+      get().appendLog('arbiter', firstStep.arbiter, { supersede: true });
     }
   },
   advanceTutorial() {
@@ -24522,7 +24525,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     // Speak the next Arbiter line in the feed.
     if (nextStep.arbiter) {
-      get().appendLog('arbiter', nextStep.arbiter);
+      // OTA-1065 — supersede: drop whatever voice backlog has piled up so the
+      // spoken instruction matches the beat the player is actually on. The
+      // tutorial advances faster than on-device TTS synthesises, so without
+      // this the audio runs a full beat behind the screen.
+      get().appendLog('arbiter', nextStep.arbiter, { supersede: true });
     }
     // Pre-fill the input with the draft text (the rope beat uses
     // this to demo typed input).
