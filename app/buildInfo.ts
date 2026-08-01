@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.74';
+export const DISPLAY_VERSION = '4.28.75';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18211,5 +18211,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and range coalesced to 'close' — the cudgel could reach it. The block was
 // the lockdown, not the weapon.
 // DISPLAY_VERSION 4.28.74. 7 tests.
-export const OTA_BUILD_ID = '2026-08-01-1040-tutorial-climb-softlock';
+// ---------------------------------------------------------------------------
+// OTA-1041 — OTA TEARDOWN RUNS CONCURRENTLY (twin of HAL 1064).
+// The four native disposes ran in SERIES, each with its own 3-second deadline
+// (OTA-243). Worst case: 12 seconds on a screen showing a static "Releasing
+// resources…" and nothing else. That window is the leading suspect for the
+// reported FabricUIManager.markActiveTouchForTag NPE -- the player taps what
+// looks like a dead screen, the touch dispatches into a surface teardown has
+// already destroyed, SurfaceMountingManager is null, crash. It lands BEFORE
+// reloadAsync commits, which explains the "update ran twice" report.
+// expo-av / ONNX Runtime / llama.rn / executorch are independent subsystems
+// with no teardown ordering between them, so they now race their deadlines
+// concurrently via Promise.all. Worst case ~12s -> ~3s.
+// stopTTSController + stopTTS are hoisted ahead of the group (both are
+// synchronous) so the expo-av Sound playPcm created is released before audio
+// teardown starts. Promise.all is safe: disposeWithDeadline catches its own
+// rejection and resolves null, so no member can reject the set.
+// Also: disposeWithDeadline now clears its deadline timer when the dispose
+// wins the race -- four handles used to stay armed for the full 3s.
+// AUDIT (no change needed): swept all 17 gameStore enemy-spawn sites for the
+// OTA-1063 `range: null` defect. Every one already sets range; the elevated
+// overlay was the only gap and OTA-1063 closed it.
+// DISPLAY_VERSION 4.28.75. 5 tests.
+export const OTA_BUILD_ID = '2026-08-01-1041-ota-teardown-parallel';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1040-tutorial-climb-softlock';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-07-31-1039-ambient-fail-open';
