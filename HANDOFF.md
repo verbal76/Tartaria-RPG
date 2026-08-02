@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1073`**,
-**golem-line `2026-08-02-1050`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1074`**,
+**golem-line `2026-08-02-1051`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,47 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.84**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.85**; ledger in `VERSION.md`.
 
-- **NPC MEMORY SLICE 2 (2026-08-02, latest). BOTH LINES.**
+- **ARBITER COOLDOWN DISCIPLINE + STORY BEATS (2026-08-02, latest). BOTH LINES.**
+  Phase 0 items 3 and 4, both root-caused before any code moved.
+  **(3) Interjections that don't follow from the last action.** ROOT CAUSE:
+  every guard on the ambient path runs at generation **start** — no combat, not
+  in the tutorial, cooldown expired — and **none** run at emit. On device a
+  musing takes 14–20s (owner's 4.28.79 log: `arbiter: ambient ✓ 14080ms`), by
+  which time the player has crossed a room or opened a fight. The line was
+  composed for a moment that no longer exists. ⚠ This was **deliberate** — the
+  `arb163` comment says ambient asides *"can run to completion in the background
+  and speak whenever ready"*. The **reactive** path (`narrateViaArbiter`)
+  already carries the discipline this one lacks (`arbiterGenerationEpoch`,
+  checked as *"cancelled mid-flight"*); ambient was exempted from it.
+  FIX: `takeAmbientStamp()` at t0 (location / room / micro-micro / in-combat /
+  log length) and `ambientStaleReason()` immediately before the line speaks.
+  Drops on `combat-started`, `moved-location`, `moved-room`, `moved-scene`,
+  `log-moved-on` (> 12 player-visible lines). The reason rides the **existing**
+  `arbiter: ambient …` debug marker, so a pasted log shows the drop and its
+  cause the way OTA-1057 surfaced the ∅ reasons.
+  ⚠ Deliberately **not** the epoch: every reactive generation bumps that
+  counter, so gating ambient on it would discard nearly every musing and
+  silently undo OTA-1054 — the OTA that finally got ambient working at all.
+  **(4) Story beats read as loot chatter.** ROOT CAUSE: there is no notion of
+  "story" in the log at all. A main-quest phase turn, the 3-Core twist, the
+  4-Core forge unlock and every motive-drip beat call `appendLog('arbiter', …)`
+  — the same channel, colour and chip the Arbiter uses to shrug about your
+  stamina. FIX: a `storyBeat` **meta flag** (`STORY_BEAT_META`), not a new
+  `LogChannel` — a channel drives TTS routing, `HIDDEN_CHANNELS` and the
+  copy-all export, and none of that should change; only the look should. The
+  flag rides the same meta bag as `combatOutcome`. `AdventureFeed` gives a
+  flagged entry a gold rule, a `STORY` chip and its own air.
+  Six sites marked: phase narration, descent, 3-Core twist, 4-Core forge,
+  motive drip, The Missing's resolution. Contract stage narration is
+  deliberately **not** marked — it already has the MISSION chip and the
+  Contracts card, and if half the feed is a story beat the marker is wallpaper.
+  Files: `gameStore.ts` (stamp + staleness + 6 marked sites),
+  `AdventureFeed.tsx` (story render branch + styles),
+  `ota1074ArbiterCooldownStory.test.ts` (15).
+
+- **NPC MEMORY SLICE 2 (2026-08-02). BOTH LINES.**
   The four things OTA-1072 deliberately deferred.
   **1. Turn-in credit.** Slice 1 counted contracts *taken* but not *finished* —
   the one act most worth remembering (you came back and delivered) moved
