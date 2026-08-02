@@ -177,7 +177,8 @@ export const WIRED_TITLES: TitleDef[] = [
   {
     id: 'etherbound_survivor',
     // OTA-350 — a survivor of the wastes has learned to keep to cover. (perk below)
-    earned: (_pl, p) => p.stormsSurvived >= 1,
+    // OTA-1069 — was >= 1, which one ambient weather tick satisfied.
+    earned: (_pl, p) => p.stormsSurvived >= STORM_TICKS_FOR_SURVIVOR,
     perk: (a) => { a.envHazardSaveBonus += 2; a.stealthBonus += 1; },
   },
   {
@@ -227,12 +228,17 @@ export const WIRED_TITLES: TitleDef[] = [
   {
     id: 'aetheric_attuned',
     // survive a direct brush with an Etheric anomaly (a storm tick counts).
-    earned: (_pl, p) => p.stormsSurvived >= 1 || p.maxCorruption >= 5,
+    // OTA-1069 — was `>= 1 || maxCorruption >= 5`. BOTH branches were free: one
+    // ambient tick, or the couple of corruption a few ticks hand you. This perk
+    // halves all Aetheric damage, so it is pitched highest of the three.
+    earned: (_pl, p) => p.stormsSurvived >= STORM_TICKS_FOR_ATTUNED
+      || p.maxCorruption >= CORRUPTION_FOR_ATTUNED,
     perk: (a) => { a.ethericDamageResist = true; },
   },
   {
     id: 'stormcaller',
-    earned: (_pl, p) => p.stormsSurvivedWithCompanion >= 1,
+    // OTA-1069 — was >= 1: one tick with a dog or golem alive.
+    earned: (_pl, p) => p.stormsSurvivedWithCompanion >= STORM_TICKS_FOR_STORMCALLER,
     perk: (a) => { a.ethericShield = true; },
   },
   // ── Tier C (arb46 — location challenges; counters increment only from the
@@ -300,6 +306,37 @@ export function isHiddenTitle(id: string): boolean {
 // always-on). This map is what the CharacterScreen shows for an EARNED title:
 // an honest, present-tense description of the PASSIVE effect the engine now
 // applies. Titles absent here fall back to the canon string.
+// ---------------------------------------------------------------------------
+// OTA-1069 — STORM-TITLE THRESHOLDS.
+//
+// Owner: "you shouldn't be able to earn titles in the tutorial. what titles are
+// so easy to get that you earn them in the tutorial? they should take effort."
+//
+// They were right, and the numbers were the reason. etherbound_survivor and
+// aetheric_attuned both awarded at `stormsSurvived >= 1`, and stormsSurvived
+// incremented on ANY tick of Etheric weather -- ambient scenery the player
+// neither sought nor answered. One line of black rain in the tutorial room
+// therefore handed out TWO titles at once, before the player had finished the
+// scripted climb. Nothing was earned; the weather simply happened near them.
+//
+// Two changes, both needed:
+//   1. A tick only counts if the storm actually BIT (raw hp loss or corruption
+//      gain). Standing in decorative weather is not survival. Measured on the
+//      RAW delta, not the post-resist one, so owning the resist perk doesn't
+//      stall progress toward the companion title.
+//   2. Real thresholds. "Survive an Aetheric storm" should mean you lived in
+//      the weather, not that you saw it once.
+//
+// aetheric_attuned is pitched highest of the three because its perk is the
+// strongest: it HALVES all Aetheric damage, in combat and from weather.
+export const STORM_TICKS_FOR_SURVIVOR = 12;
+export const STORM_TICKS_FOR_ATTUNED = 20;
+export const STORM_TICKS_FOR_STORMCALLER = 10;
+/** Corruption high-water alternative for aetheric_attuned. Was 5 -- reachable
+ *  from a couple of ambient ticks, which made the || branch as free as the
+ *  count branch it was meant to complement. */
+export const CORRUPTION_FOR_ATTUNED = 15;
+
 export const TITLE_PASSIVE_PERK: Record<string, string> = {
   bane_of_sentinels: 'Passive: +1d6 damage against mechanical foes (automatons, sentinels, drones).',
   seeker_of_lost_relics: 'Passive: +2 to Investigate checks.',
