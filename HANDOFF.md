@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-31-1062`**,
-**golem-line `2026-07-31-1039`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1071`**,
+**golem-line `2026-08-02-1048`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,40 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.73**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.82**; ledger in `VERSION.md`.
 
-- **THE LAST THREE FREE TITLES (2026-08-02, latest). BOTH LINES.**
+- **ACCEPT-BURST COMPACTION (2026-08-02, latest). BOTH LINES.**
+  Phase 0, item 1 of the immersion build plan: clear the noise floor. From the
+  owner's 4.28.79 log — thirteen hunts accepted at one board inside fifty-six
+  seconds, roughly **sixty-five lines** of board copy. Each accept spent up to
+  five: poster text, stage narration, an Arbiter line naming the destination,
+  the two-sentence *"(paused — you're already on another contract)"* notice,
+  and the difficulty warning. That last one — *"This one will kill you as you
+  are right now…"* — fired **thirteen times**, and per-message dedup could
+  never have caught it because the HP numbers interpolated into it differ per
+  hunt.
+  The fix is not a shorter message. The first accept of a burst is worth
+  narrating and the twelfth is not — by then the player has stopped reading and
+  is collecting. So **#1 of a burst is unchanged** and **#2 onward collapse to
+  one line**: title, destination, and a `(parked)` marker where the
+  two-sentence notice used to be. Nothing is lost — poster text, stage
+  narration and the full recommended-HP numbers all live on the Contracts card,
+  which is where someone reviewing thirteen commitments actually looks.
+  The burst boundary is the **existing** `BURST_WINDOW_MS` (5s of silence) that
+  `bumpQuestsAccepted` already used to throttle its own meta-nag, reused rather
+  than reinvented so the compaction and the Arbiter's *"you're stacking
+  promises"* agree about what a burst is. `acceptIsCompact()` is a pure **peek**
+  — all six accept paths (faction quest, faction hunt/mystery/storyline, and
+  the two neutral fallbacks) read it **before** their own `bumpQuestsAccepted`
+  call, so the value is the index of the accept in hand rather than the next
+  one's. ⚠ Getting that order wrong makes the FIRST accept read as compact.
+  ⚠ The parked notice became a parked marker, so OTA-995/972's accept-unify
+  test was retargeted from counting the old sentence to asserting `(parked)` on
+  the accept line — that test's real subject is the `tracked === false`
+  assertions above it, which are untouched.
+  Files: `gameStore.ts` (helpers + six paths), `ota1071AcceptBurst.test.ts` (5).
+
+- **THE LAST THREE FREE TITLES (2026-08-02). BOTH LINES.**
   OTA-1069 raised the storm family and flagged three more. Owner: *"fix the other
   three."* Each was checked against its own canon requirement in
   `arbiter-titles.json`, and in all three the code was not testing what the
