@@ -40,7 +40,7 @@ jest.mock('expo-updates', () => ({}));
 // it scanned only its own kind. Now anyTrackedContract() is the one shared
 // cross-kind predicate, and every accept/grant site parks the newcomer when
 // anything — any kind — is already live.
-import { useGameStore, anyTrackedContract } from '../app/state/gameStore';
+import { useGameStore, anyTrackedContract, _resetAcceptBurst } from '../app/state/gameStore';
 import { HUNTS } from '../app/engine/hunts';
 import { MYSTERIES } from '../app/engine/mysteries';
 import { STORYLINES } from '../app/engine/factionStorylines';
@@ -49,6 +49,9 @@ import { getRaces, getFactions } from '../app/engine/character';
 const FACTION = 'forgotten_order';
 
 async function boot(name: string) {
+  // OTA-1048 — the accept-burst tracker is module-level; without this the
+  // first accept of a later test inherits the previous test's burst.
+  _resetAcceptBurst();
   const store = useGameStore;
   await store.getState().hydrate();
   await store.getState().startNewGame({ name, raceId: getRaces()[0]!.id, factionId: getFactions()[0]!.id });
@@ -103,9 +106,13 @@ describe('OTA-972 — one accept behavior for every contract kind', () => {
     expect(st).toBeDefined();
     expect(st!.tracked).toBe(false);
 
+    // OTA-1048 — the parked notice used to be a dedicated two-sentence line
+    // per accept. Mid-burst it is now a "(parked)" marker on the one accept
+    // line the contract gets; the state it reports is unchanged, which is what
+    // this case is actually about (see the tracked=false assertions above).
     const log = store.getState().gameLog.map((e) => e.text).join('\n');
-    const pausedCount = (log.match(/paused — you're already on another contract/g) ?? []).length;
-    expect(pausedCount).toBeGreaterThanOrEqual(2); // the mystery and the storyline both said it
+    expect(log).toContain(`Mystery accepted — ${mystery.title} (parked)`);
+    expect(log).toContain(`Storyline accepted — ${story.title} (parked)`);
 
     // 4) cross-kind the other way: a faction quest accepted now parks too
     // eslint-disable-next-line @typescript-eslint/no-require-imports

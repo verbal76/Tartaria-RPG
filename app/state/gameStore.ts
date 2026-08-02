@@ -21172,9 +21172,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    if (!newTracked) {
-      get().appendLog('world', `${quest.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
-    }
     if (escort) {
       const fallsV = escort.count === 1 ? 'falls' : 'fall';
       const standsV = escort.count === 1 ? 'stands' : 'stand';
@@ -21185,6 +21182,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : `Your ${escort.label} (${escort.hp} HP) ${standsV} by for ${quest.title}. They'll fall in when you ACTIVATE this contract.`,
       );
     }
+    const factionCompact = acceptIsCompact(); // OTA-1071 — before the bump.
     bumpQuestsAccepted(get, set);
     // First-quest milestone — Arbiter can reference "the first
     // contract you took" later. Fires only on the first accept of
@@ -21198,7 +21196,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     get().appendLog(
       'reward',
-      `New faction contract — ${quest.title}. ${quest.objective} (${factionId.replace(/_/g, ' ')})`,
+      `New faction contract — ${quest.title}${parkedTag(newTracked)}. ${quest.objective} (${factionId.replace(/_/g, ' ')})`,
     );
     // Play the first stage immediately so the player has narrative
     // momentum, mirroring how hunts / mysteries / storylines open.
@@ -21209,7 +21207,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // commentary (first-quest line, burst-start, "stacking", "slow
     // down") instead.
     const stage0 = quest.stages?.[0];
-    if (stage0) {
+    // OTA-1071 — mid-burst the opening beat is dropped with the rest of the
+    // detail; it is replayed in Contracts when the contract is activated.
+    if (stage0 && !factionCompact) {
       get().appendLog('world', stage0.narration);
     }
     // OTA 059 — accepting a contract is a social close — you
@@ -21711,13 +21711,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ],
           },
         } : s));
+        const neutralCompact = acceptIsCompact(); // OTA-1071 — before the bump.
         bumpQuestsAccepted(get, set);
-        get().appendLog(
-          'arbiter',
-          `The Arbiter nods. "You take ${theLower(neutralMatch.title)} on. Open the Contracts board to see the stages."`,
-        );
-        if (!neutralTracked) {
-          get().appendLog('world', `${neutralMatch.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+        if (neutralCompact) {
+          get().appendLog('reward', `✦ Contract accepted — ${neutralMatch.title}${parkedTag(neutralTracked)}.`);
+        } else {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter nods. "You take ${theLower(neutralMatch.title)} on. Open the Contracts board to see the stages."`,
+          );
+          if (!neutralTracked) {
+            get().appendLog('world', `${neutralMatch.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+          }
         }
         void get().persist();
         return;
@@ -21788,35 +21793,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
+    // OTA-1071 — read the burst index BEFORE the bump, so this accept is
+    // judged on its own position in the burst rather than the next one's.
+    const huntCompact = acceptIsCompact();
     bumpQuestsAccepted(get, set);
     // Per-hunt stage0.arbiter suppressed on accept (see acceptFactionQuest
     // for rationale). Burst-aware meta line comes from bumpQuestsAccepted.
     const stage0 = hunt.stages[0];
     if (stage0) {
-      get().appendLog('reward', `✦ Hunt accepted — ${hunt.title}. ${hunt.posterText}`);
-      if (!huntTracked) {
-        get().appendLog('world', `${hunt.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+      if (huntCompact) {
+        // OTA-1048 — one line. Destination is folded in; poster text, stage
+        // narration and the danger detail are all in Contracts.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { biomeLabel: bl } = require('../engine/hunts');
+        const where = hunt.targetLocationName ?? bl(hunt.biomeTag);
+        get().appendLog('reward', `✦ Hunt accepted — ${hunt.title}${parkedTag(huntTracked)} → ${where}.`);
+      } else {
+        get().appendLog('reward', `✦ Hunt accepted — ${hunt.title}${parkedTag(huntTracked)}. ${hunt.posterText}`);
+        get().appendLog('world', stage0.narration);
+        // 2026-05-26 OTA-053 — playtester ask: "I get handed a poster.
+        // It doesn't give me an idea of where I'm supposed to go."
+        // Emit an explicit Arbiter line naming the target location so
+        // the player isn't reduced to scanning posterText for a proper
+        // noun. Uses targetLocationName when authored, falls back to
+        // biomeLabel() for legacy hunts.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { biomeLabel: huntBiomeLabel } = require('../engine/hunts');
+        const locLabel = hunt.targetLocationName ?? huntBiomeLabel(hunt.biomeTag);
+        get().appendLog(
+          'arbiter',
+          `The Arbiter taps the poster. "Travel to ${locLabel} to begin. The ${hunt.targetEnemyName} won't come to you."`,
+        );
       }
-      get().appendLog('world', stage0.narration);
-      // 2026-05-26 OTA-053 — playtester ask: "I get handed a poster.
-      // It doesn't give me an idea of where I'm supposed to go."
-      // Emit an explicit Arbiter line naming the target location so
-      // the player isn't reduced to scanning posterText for a proper
-      // noun. Uses targetLocationName when authored, falls back to
-      // biomeLabel() for legacy hunts.
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { biomeLabel: huntBiomeLabel } = require('../engine/hunts');
-      const locLabel = hunt.targetLocationName ?? huntBiomeLabel(hunt.biomeTag);
-      get().appendLog(
-        'arbiter',
-        `The Arbiter taps the poster. "Travel to ${locLabel} to begin. The ${hunt.targetEnemyName} won't come to you."`,
-      );
       // 2026-05-26 OTA-055 — difficulty warning. If the player is
       // both under-HP and under-weapon, the Arbiter calls it out
       // before they walk into the boss. Doesn't block accept — the
       // player can still take the contract and try — but they
-      // can't say nobody warned them.
-      if (hunt.recommendedHp && hunt.recommendedWeaponRarity) {
+      // can't say nobody warned them. OTA-1071 — full-detail accepts only;
+      // mid-burst the numbers are on the Contracts card.
+      if (!huntCompact && hunt.recommendedHp && hunt.recommendedWeaponRarity) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { weaponRarityMeets: huntWeaponRarityMeets } = require('../engine/hunts');
         // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -22094,13 +22109,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ],
           },
         } : s));
+        const neutralCompact = acceptIsCompact(); // OTA-1071 — before the bump.
         bumpQuestsAccepted(get, set);
-        get().appendLog(
-          'arbiter',
-          `The Arbiter nods. "You take ${theLower(neutralMatch.title)} on. Open the Contracts board to see the stages."`,
-        );
-        if (!neutralTracked) {
-          get().appendLog('world', `${neutralMatch.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+        if (neutralCompact) {
+          get().appendLog('reward', `✦ Contract accepted — ${neutralMatch.title}${parkedTag(neutralTracked)}.`);
+        } else {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter nods. "You take ${theLower(neutralMatch.title)} on. Open the Contracts board to see the stages."`,
+          );
+          if (!neutralTracked) {
+            get().appendLog('world', `${neutralMatch.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+          }
         }
         void get().persist();
         return;
@@ -22165,15 +22185,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
+    const mysteryCompact = acceptIsCompact(); // OTA-1071 — before the bump.
     bumpQuestsAccepted(get, set);
     // Per-mystery stage0.arbiter suppressed (burst-aware line above).
     const stage0 = m.stages[0];
     if (stage0) {
-      get().appendLog('reward', `✦ Mystery accepted — ${m.title}. ${m.posterText}`);
-      if (!mysteryTracked) {
-        get().appendLog('world', `${m.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+      if (mysteryCompact) {
+        get().appendLog('reward', `✦ Mystery accepted — ${m.title}${parkedTag(mysteryTracked)}.`);
+      } else {
+        get().appendLog('reward', `✦ Mystery accepted — ${m.title}${parkedTag(mysteryTracked)}. ${m.posterText}`);
+        get().appendLog('world', stage0.narration);
       }
-      get().appendLog('world', stage0.narration);
     }
     set((s) =>
       s.player
@@ -22423,15 +22445,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : st,
     );
+    const storyCompact = acceptIsCompact(); // OTA-1071 — before the bump.
     bumpQuestsAccepted(get, set);
     // Per-storyline stage0.arbiter suppressed (burst-aware line above).
     const stage0 = s.stages[0];
     if (stage0) {
-      get().appendLog('reward', `✦ Storyline accepted — ${s.title}. ${s.posterText}`);
-      if (!storyTracked) {
-        get().appendLog('world', `${s.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+      if (storyCompact) {
+        get().appendLog('reward', `✦ Storyline accepted — ${s.title}${parkedTag(storyTracked)}.`);
+      } else {
+        get().appendLog('reward', `✦ Storyline accepted — ${s.title}${parkedTag(storyTracked)}. ${s.posterText}`);
+        get().appendLog('world', stage0.narration);
       }
-      get().appendLog('world', stage0.narration);
     }
     set((st) =>
       st.player
@@ -29174,6 +29198,52 @@ function advanceMissionRoute(
 let _burstLastAt = 0;
 let _burstCount = 0;
 const BURST_WINDOW_MS = 5000;
+
+/** OTA-1048 — what burst index the NEXT accept will take, WITHOUT mutating.
+ *
+ *  bumpQuestsAccepted already knew about accept bursts, but only used that
+ *  knowledge to throttle its own meta-nag. The per-contract emission ignored
+ *  it completely: every hunt spent five lines regardless of whether it was the
+ *  first of the session or the thirteenth in a minute. The owner's 4.28.79 log
+ *  shows 13 hunts accepted in 56 seconds -- roughly 65 lines, with the same
+ *  "this one will kill you" warning thirteen times.
+ *
+ *  A pure peek rather than a reorder of bumpQuestsAccepted: that function owns
+ *  the first-ever-contract one-shot and the burst-tier Arbiter lines, and its
+ *  position relative to each path's own logging differs. Every caller reads
+ *  this BEFORE its bump, so the value is the index of the accept in hand. */
+function nextAcceptBurstIndex(): number {
+  return Date.now() - _burstLastAt > BURST_WINDOW_MS ? 1 : _burstCount + 1;
+}
+
+/** The first accept of a burst gets the full treatment; everything after it
+ *  collapses to one line. Detail is never lost -- poster text, stage narration
+ *  and the full danger numbers all live in Contracts, which is where a player
+ *  reviewing thirteen commitments is actually going to look. */
+function acceptIsCompact(): boolean {
+  return nextAcceptBurstIndex() > 1;
+}
+
+/** " (parked)" when a contract lands inactive. Replaces a full dedicated line
+ *  ("X added to your slate (paused -- you're already on another contract).
+ *  Activate it in Contracts when you're ready.") that repeated verbatim on
+ *  every single accept. OTA-1015 added that notice deliberately so parked
+ *  grants say so -- this keeps the information and drops twelve repetitions
+ *  of the sentence explaining it. */
+function parkedTag(tracked: boolean): string {
+  return tracked ? '' : ' (parked)';
+}
+
+/** Test seam. The burst tracker is module-level and transient by design (it
+ *  models a few seconds of chip-tapping, not save state), which means one Jest
+ *  module instance carries it across every `it` in a file — a later test's
+ *  FIRST accept would inherit the previous test's burst and render compact.
+ *  Nothing in the app calls this. */
+export function _resetAcceptBurst(): void {
+  _burstLastAt = 0;
+  _burstCount = 0;
+}
+
 
 const BURST_START_LINES = [
   `The Arbiter watches you sign. "Another for the slate."`,

@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.81';
+export const DISPLAY_VERSION = '4.28.82';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18384,7 +18384,40 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // threshold 1). Tests written from the implementation lock in whatever the code
 // happened to do that day.
 // DISPLAY_VERSION 4.28.81. 12 tests.
-export const OTA_BUILD_ID = '2026-08-02-1047-last-three-titles';
+// OTA-1048 — PHASE 0, ITEM 1: THE CONTRACT-ACCEPTANCE FIREHOSE.
+// From the 4.28.79 log: thirteen hunts accepted at one board in fifty-six
+// seconds, roughly sixty-five lines of board copy. Every accept spent up to
+// five lines -- poster text, stage narration, an Arbiter line naming the
+// destination, the two-sentence "(paused -- you're already on another
+// contract)" notice, and the difficulty warning. That last one,
+//   "This one will kill you as you are right now..."
+// appeared THIRTEEN TIMES. Per-message dedup could never catch it: the HP
+// numbers interpolated into the sentence differ per hunt.
+// The fix is not a shorter message, it is that accept #1 of a burst is worth
+// narrating and accept #12 is not -- by then the player has stopped reading
+// and is collecting. So:
+//   #1 of a burst  -> unchanged, every line it had before.
+//   #2 onward      -> ONE line: title, destination, and a " (parked)" marker.
+// Nothing is lost. Poster text, stage narration and the full recommended-HP
+// numbers all live on the Contracts card, which is where someone reviewing
+// thirteen commitments actually looks.
+// Burst boundary is the EXISTING BURST_WINDOW_MS (5s of silence) that
+// bumpQuestsAccepted already used to throttle its own meta-nag -- reused, not
+// reinvented, so the compaction and the Arbiter's "you're stacking promises"
+// agree on what a burst is. New helpers: nextAcceptBurstIndex / acceptIsCompact
+// (a pure PEEK -- every one of the six accept paths reads it BEFORE its own
+// bumpQuestsAccepted call, so the value is the index of the accept in hand) and
+// parkedTag(). Six paths covered: faction quest, faction hunt, faction mystery,
+// faction storyline, and the two neutral/unaffiliated fallbacks.
+// ⚠ The parked NOTICE became a parked MARKER, so OTA-995/972's accept-unify
+// test was retargeted from counting the old sentence to asserting "(parked)"
+// on the accept line. The state it reports is unchanged; that test's real
+// subject is the tracked=false assertions above it.
+// _resetAcceptBurst() is a test seam only -- the tracker is module-level and
+// transient by design, which would otherwise leak a burst across Jest cases.
+// DISPLAY_VERSION 4.28.82. 5 tests.
+export const OTA_BUILD_ID = '2026-08-02-1048-accept-burst-compaction';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1047-last-three-titles';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1046-titles-take-effort';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1045-mixed-pack-announce';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1044-golem-card-in-line';
