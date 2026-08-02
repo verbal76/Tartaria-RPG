@@ -888,6 +888,16 @@ function recordTitleProgress(
 ): void {
   const player = getStore().player;
   if (!player) return;
+  // OTA-1046 — NOTHING IN THE TUTORIAL COUNTS. The tutorial is a scripted
+  // sandbox: it hands you a cudgel, a rope and a rigged four-tier climb. A
+  // legend should not be able to start there. Owner report: two titles landed
+  // mid-tutorial off a single line of ambient black rain, before the scripted
+  // climb was even finished.
+  // Progress is not merely un-awarded here, it is not RECORDED -- otherwise the
+  // player banks counters through the sandbox and collects the titles the
+  // instant the tutorial ends, which reads exactly as unearned.
+  const tState = getStore();
+  if (tState.tutorialStep !== null && !tState.tutorialExploreChosen) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { withTitleProgress } = require('../engine/titles');
   const next = withTitleProgress(player.titleProgress);
@@ -9002,7 +9012,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // corruption). Records storm-survival (+companion variant for
       // Stormcaller) and the high-water corruption mark for Survivor of
       // Aetherstone. recordTitleProgress also runs the award check.
-      if (isEthericWeather) {
+      // OTA-1046 — a tick only counts toward the storm titles if the storm
+      // actually BIT. Standing in decorative weather is not survival, and it
+      // was the whole reason a tutorial room could award two titles. Measured
+      // on the RAW delta rather than the post-resist one, so owning the
+      // Aetheric resist perk doesn't stall progress toward Stormcaller.
+      const stormBit = wtick.hpDelta < 0 || wtick.corruptionDelta > 0;
+      if (isEthericWeather && stormBit) {
         const survivor = get().player;
         const withCompanion = !!(survivor && (survivor.dog || survivor.golem));
         recordTitleProgress(

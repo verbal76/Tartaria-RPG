@@ -861,7 +861,42 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.73**; ledger in `VERSION.md`.
 
-- **MIXED-PACK ANNOUNCE — "2 SCRAP DRONES", THEN A MUD WASP (2026-08-02, latest). BOTH LINES.**
+- **TITLES TAKE EFFORT — no more legends from the tutorial (2026-08-02, latest). BOTH LINES.**
+  Owner: *"you shouldn't be able to earn titles in the tutorial. what titles are
+  so easy to get that you earn them in the tutorial? they should take effort."*
+  - **The answer to the question**, straight from the award table:
+    `etherbound_survivor` = `stormsSurvived >= 1`; `aetheric_attuned` =
+    `stormsSurvived >= 1 || maxCorruption >= 5`; `stormcaller` =
+    `stormsSurvivedWithCompanion >= 1`. And `stormsSurvived` incremented on ANY
+    tick of Etheric weather, decorative ones included. One line of black rain
+    in the tutorial room paid out two titles a millisecond apart.
+  - **Fix 1 — the tutorial feeds nothing.** `recordTitleProgress` returns early
+    while the tutorial is running and unskipped. Progress is not merely
+    un-awarded, it is NOT RECORDED: banking counters through a scripted sandbox
+    and collecting the instant the tutorial ends reads exactly as unearned.
+  - **Fix 2 — a tick must bite.** Counts only when `wtick.hpDelta < 0` or
+    `wtick.corruptionDelta > 0`. ⚠ Measured on the RAW delta, not the
+    post-resist one, so owning the Aetheric resist perk can't stall progress
+    toward Stormcaller.
+  - **Fix 3 — real numbers.** `STORM_TICKS_FOR_SURVIVOR` 12,
+    `STORM_TICKS_FOR_STORMCALLER` 10, `STORM_TICKS_FOR_ATTUNED` 20 (highest of
+    the three because its perk halves ALL Aetheric damage, in combat and from
+    weather), and `CORRUPTION_FOR_ATTUNED` 5 → 15. ⚠ Raising the count branch
+    without raising the `||` corruption branch would have achieved nothing.
+  - ⚠ **STILL CHEAP, DELIBERATELY NOT CHANGED — owner's call.** Flagged rather
+    than silently redesigned, because each is arguably an identity payoff
+    rather than an achievement:
+      - `scion_of_the_giants` — pure race + faction check. Earned at CHARACTER
+        CREATION with zero gameplay. By the owner's standard this is the worst
+        offender in the table.
+      - `golem_whisperer` — `!!player.golem`. Summon once, hold the title.
+      - `architects_eye` — one repair.
+    If "titles should take effort" applies to these too, say so and they get
+    the same treatment.
+  - A test asserts NO title fires on an all-zero progress record (excluding the
+    three sheet-gated ones above), so a future threshold-1 title can't slip in.
+
+- **MIXED-PACK ANNOUNCE — "2 SCRAP DRONES", THEN A MUD WASP (2026-08-02). BOTH LINES.**
   Owner log 4.28.75 @ 23:41:56. Root-caused before fixing, at the owner's ask.
   - **The line.** `gameStore` announced
     `${n} ${enemies[0].name}s close on you` — true only for a homogeneous

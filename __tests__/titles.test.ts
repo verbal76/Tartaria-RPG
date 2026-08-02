@@ -7,6 +7,8 @@ import {
   titlePerkModifiers,
   withTitleProgress,
   WIRED_TITLE_IDS,
+  STORM_TICKS_FOR_ATTUNED,
+  STORM_TICKS_FOR_STORMCALLER,
 } from '../app/engine/titles';
 import type { PlayerCharacter } from '../app/engine/types';
 
@@ -41,9 +43,21 @@ describe('titles — earning engine', () => {
   });
 
   it('storm survival awards Etherbound Survivor + Aetheric Attuned', () => {
-    const got = evaluateEarnedTitles(mk({ titleProgress: withTitleProgress({ stormsSurvived: 1 }) }));
+    // OTA-1046 — this asserted stormsSurvived: 1, which was the defect itself:
+    // one tick of ambient weather paid out both titles, in the tutorial, before
+    // the player had done anything. Retargeted to the real thresholds so the
+    // test still proves the titles ARE reachable without re-encoding the bug.
+    const got = evaluateEarnedTitles(mk({
+      titleProgress: withTitleProgress({ stormsSurvived: STORM_TICKS_FOR_ATTUNED }),
+    }));
     expect(got).toContain('etherbound_survivor');
     expect(got).toContain('aetheric_attuned');
+  });
+
+  it('one ambient storm tick awards NOTHING (OTA-1046)', () => {
+    const got = evaluateEarnedTitles(mk({ titleProgress: withTitleProgress({ stormsSurvived: 1 }) }));
+    expect(got).not.toContain('etherbound_survivor');
+    expect(got).not.toContain('aetheric_attuned');
   });
 
   it('Survivor of Aetherstone at high corruption load', () => {
@@ -53,7 +67,9 @@ describe('titles — earning engine', () => {
 
   it('Stormcaller needs a companion present during the storm', () => {
     expect(evaluateEarnedTitles(mk({ titleProgress: withTitleProgress({ stormsSurvived: 1 }) }))).not.toContain('stormcaller');
-    expect(evaluateEarnedTitles(mk({ titleProgress: withTitleProgress({ stormsSurvivedWithCompanion: 1 }) }))).toContain('stormcaller');
+    expect(evaluateEarnedTitles(mk({
+      titleProgress: withTitleProgress({ stormsSurvivedWithCompanion: STORM_TICKS_FOR_STORMCALLER }),
+    }))).toContain('stormcaller');
   });
 
   it('derived titles: Scion (race+faction), Explorer (locations), Golem (companion), Aetherborn (race+corruption)', () => {
