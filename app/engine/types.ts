@@ -1911,6 +1911,12 @@ export interface NpcRelation {
   contractsTurnedIn: number;
   /** Thefts, attacks — anything that makes them watch your hands. */
   wrongs: number;
+  /** OTA-1076 — TC of honest custom banked toward buying back a caught theft.
+   *  Only coin spent AFTER the wrong counts; see AMENDS_TC_PER_WRONG. */
+  amendsTc?: number;
+  /** How many wrongs have been paid off. Kept so the Chronicle can say a debt
+   *  was settled rather than silently erasing that it ever happened. */
+  amendsCleared?: number;
 }
 
 export interface VisitedRoom {

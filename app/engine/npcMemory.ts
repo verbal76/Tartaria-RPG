@@ -30,6 +30,20 @@ export const TC_FOR_TRUSTED = 1500;
 /** In-game hours away before a greeting acknowledges the gap (3 days). */
 export const LONG_ABSENCE_HOURS = 72;
 
+/** OTA-1076 — TC of honest custom that buys back ONE caught theft.
+ *
+ *  OTA-1072 made `wronged` permanent and I flagged that as a decision the owner
+ *  might want reversed. Permanent is the wrong call: it turns one failed DEX
+ *  roll into a stall the player can never use properly again, in a game whose
+ *  whole steal system is built to be attempted. But cheap forgiveness is worse
+ *  — it would make theft free.
+ *
+ *  So amends are paid the only way that needs no new screen and reads true:
+ *  you go back and give them your business, at their price. 600 TC is real
+ *  money at the tier where stealing is tempting, and a SECOND theft doubles the
+ *  bill, so a repeat thief digs a hole faster than they can fill it. */
+export const AMENDS_TC_PER_WRONG = 600;
+
 export type NpcRegard =
   | 'wronged'    // you stole from them, or drew on them
   | 'trusted'    // repeat business, finished work
@@ -135,8 +149,33 @@ export function rememberNpcMeeting(
   // Seeding before the append makes the inner seed a no-op (npcRelations is
   // already defined, even if empty), so the newly added row cannot be swept up
   // as a pre-existing acquaintance.
-  const seeded = seedRelationsFromMet(memory);
+  const seeded = pruneSpawnKeyedRelations(seedRelationsFromMet(memory));
   return recordNpcSighting(recordNpcMet(seeded, npc), npc, opts);
+}
+
+/** OTA-1076 — clean up the rows the timestamped roadside id already leaked.
+ *
+ *  Builds 4.28.83–4.28.86 keyed roadside traders on `roadside_<demeanor>_<ms>`,
+ *  so every spawn left a permanent, never-revisited row in BOTH stores. Anyone
+ *  who played those builds is carrying that litter in their save; the id fix
+ *  alone stops the bleeding but does not clear it.
+ *
+ *  Self-healing rather than a one-shot migration: it runs on vendor arrival,
+ *  costs a cheap scan, and rebuilds nothing when there is nothing to drop. The
+ *  rows removed are by definition worthless — a spawn-unique key can never be
+ *  seen twice, so none of them holds a relationship that could still matter. */
+export function pruneSpawnKeyedRelations(memory: WorldMemory): WorldMemory {
+  const stale = (id: string) => /^roadside_[a-z]+_\d{10,}$/.test(id);
+  const rels = memory.npcRelations ?? {};
+  const keys = Object.keys(rels);
+  if (!keys.some(stale) && !(memory.npcsMet ?? []).some((n) => stale(n.id))) return memory;
+  const kept: Record<string, NpcRelation> = {};
+  for (const k of keys) if (!stale(k)) kept[k] = rels[k]!;
+  return {
+    ...memory,
+    npcRelations: kept,
+    npcsMet: (memory.npcsMet ?? []).filter((n) => !stale(n.id)),
+  };
 }
 
 /** Everything that is not just being in the room: trades, contracts, thefts.
@@ -150,7 +189,7 @@ export function recordNpcDealing(
   const seeded = seedRelationsFromMet(memory);
   const prev = seeded.npcRelations?.[id];
   if (!prev) return seeded;
-  const next: NpcRelation = {
+  let next: NpcRelation = {
     ...prev,
     trades: prev.trades + (patch.trades ?? 0),
     tcTraded: prev.tcTraded + (patch.tcTraded ?? 0),
@@ -158,6 +197,36 @@ export function recordNpcDealing(
     contractsTurnedIn: prev.contractsTurnedIn + (patch.contractsTurnedIn ?? 0),
     wrongs: prev.wrongs + (patch.wrongs ?? 0),
   };
+  // OTA-1076 — RESTITUTION. Coin that crosses the table of somebody you were
+  // caught stealing from is banked as amends; enough of it buys one wrong back.
+  // Deliberately only counts custom AFTER the theft (patch.tcTraded), never the
+  // history that preceded it — you cannot pre-pay for a robbery.
+  // ⚠ Amends are settled against the wrongs that were ALREADY OUTSTANDING when
+  // this patch arrived (prev.wrongs), never against one the same patch adds.
+  // Live code never does both at once — the theft path passes only `wrongs`,
+  // the buy path only `trades`/`tcTraded` — but a rule that depends on callers
+  // behaving is not a rule. Without this, a single patch carrying both would
+  // let the player pay for a robbery in the same breath as committing it.
+  const spent = patch.tcTraded ?? 0;
+  const addedWrongs = patch.wrongs ?? 0;
+  let outstanding = prev.wrongs;
+  if (spent > 0 && outstanding > 0) {
+    let bank = (prev.amendsTc ?? 0) + spent;
+    let cleared = 0;
+    while (outstanding > 0 && bank >= AMENDS_TC_PER_WRONG * outstanding) {
+      // The price scales with how many wrongs are outstanding, so a repeat
+      // thief digs the hole faster than they can fill it.
+      bank -= AMENDS_TC_PER_WRONG * outstanding;
+      outstanding -= 1;
+      cleared += 1;
+    }
+    next = {
+      ...next,
+      wrongs: outstanding + addedWrongs,
+      amendsTc: bank,
+      ...(cleared > 0 ? { amendsCleared: (prev.amendsCleared ?? 0) + cleared } : {}),
+    };
+  }
   return { ...seeded, npcRelations: { ...(seeded.npcRelations ?? {}), [id]: next } };
 }
 
@@ -189,6 +258,25 @@ export function npcRegard(rel: NpcRelation | null | undefined): NpcRegard {
   // times. Found by a slice-2 test; the ladder was wrong, not the test.
   if (rel.trades >= 1 || rel.contractsTaken >= 1 || rel.meetings >= MEETINGS_FOR_NAME) return 'known';
   return 'met';
+}
+
+/** OTA-1076 — what the relationship is worth at the counter.
+ *
+ *  Deliberately small. Faction standing, CHA/rapport, tides and war heat
+ *  already move prices; if the relationship swung harder than all of those it
+ *  would become the only lever worth pulling. ±10% is enough to notice on a
+ *  Legendary and enough to make being a regular somewhere feel like it pays.
+ *
+ *  The wronged markup is the one that bites — a quarter over the odds — and it
+ *  is not a punishment so much as the mechanism of restitution: paying it IS
+ *  how the debt gets settled (see AMENDS_TC_PER_WRONG). */
+export function regardPriceMult(regard: NpcRegard): number {
+  switch (regard) {
+    case 'wronged': return 1.25;
+    case 'trusted': return 0.90;
+    case 'familiar': return 0.95;
+    default: return 1;
+  }
 }
 
 /** True when enough in-game time has passed that a greeting should say so.

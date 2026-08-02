@@ -33,6 +33,8 @@ import {
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse } from '../engine/worldMemory';
 // OTA-1072 — Phase 1: the per-person ledger the greeting layer reads.
 import { rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName } from '../engine/npcMemory';
+// OTA-1076 — the relationship reaches the counter.
+import { npcRegard, regardPriceMult } from '../engine/npcMemory';
 // OTA-1073 — Phase 1 slice 2: turn-in credit, roadside recognition, gossip.
 import { gossipSubject, gossipLine } from '../engine/npcMemory';
 import {
@@ -3446,12 +3448,30 @@ function arbiterAddress(player: PlayerCharacter | null | undefined, fallback: st
   return fallback;
 }
 
-/** OTA-1072 — the id an NPC is remembered under. Vendors carry stable ids;
- *  legacy saves and a few hand-authored stalls do not, so a name slug is the
- *  fallback. Must be computed the SAME way at the sighting site and at every
- *  read, or the ledger silently splits one person into two. */
+/** OTA-1072 — the id an NPC is remembered under. Must be computed the SAME way
+ *  at the sighting site and at every read, or the ledger silently splits one
+ *  person into two.
+ *
+ *  OTA-1076 — LEDGER IDENTITY IS NOT RUNTIME IDENTITY, and conflating them was
+ *  a real leak. pickRoadsideTrader mints `roadside_<demeanor>_<Date.now()>`, a
+ *  fresh id on EVERY spawn, while the trader's name and description come from a
+ *  fixed archetype — so one authored character was being split into an
+ *  unbounded number of one-encounter strangers. Two consequences, both mine
+ *  from OTA-1072/1073:
+ *    - roadside recognition (OTA-1073) could never fire for the very
+ *      population it was written for: the relation was new every time.
+ *    - worse, since OTA-1072 sights every vendor, each spawn appended a
+ *      permanent row to BOTH npcsMet and npcRelations. Neither is capped and
+ *      both persist, so a long save accumulated hundreds of dead rows and the
+ *      Chronicle's people column filled with strangers met once.
+ *  Keying roadside traders by archetype closes both. The runtime id keeps its
+ *  per-spawn uniqueness — nothing else reads past the `roadside_` prefix — and
+ *  the ledger gets the identity that actually corresponds to a person. */
 function vendorNpcId(vendor: { id?: string; name: string }): string {
-  return vendor.id || `vendor:${vendor.name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
+  const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  const id = vendor.id ?? '';
+  if (id.startsWith('roadside_')) return `roadside:${slug(vendor.name)}`;
+  return id || `vendor:${slug(vendor.name)}`;
 }
 
 /** OTA-1073 — credit a finished contract to the person who took it back.
@@ -20368,7 +20388,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const buyCell = canonicalCellOf(player.currentLocationId);
     const buyHeat = WEbuy.localWarHeat(get().worldMemory.patrols ?? [], buyCell.x, buyCell.y);
     const { buyMult: warBuyMult } = VP.warPriceFactor(buyHeat);
-    const priceParts = { corruptionMult: mult, buyDiscount, tideMult: vendorTideMult, warBuyMult };
+    // OTA-1076 — and finally the relationship with THIS person. Excluded from
+    // strangerBuyPrice by design, so the existing "you saved N TC" line now
+    // reports what being a regular is worth alongside the charm.
+    const buyRegardMult = regardPriceMult(npcRegard(getRelation(get().worldMemory, vendorNpcId(scene.vendor))));
+    const priceParts = { corruptionMult: mult, buyDiscount, tideMult: vendorTideMult, warBuyMult, regardMult: buyRegardMult };
     const effectivePrice = VP.finalBuyPrice(offer.price, priceParts);
     if (player.tc < effectivePrice) {
       get().appendLog(
@@ -20511,12 +20535,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // one transaction, not `boughtCount` of them: walking out with five of
     // something is one piece of business, and counting units would let a
     // stack purchase vault a stranger to "trusted" in a single tap.
+    // OTA-1076 — restitution. Coin spent with someone you were caught stealing
+    // from is banked as amends; enough of it buys the wrong back. Read the
+    // count before and after so the clearing can be announced — a debt settled
+    // silently is a debt the player never learns they could settle.
+    const wrongsBefore = getRelation(get().worldMemory, vendorNpcId(scene.vendor))?.wrongs ?? 0;
     set((s) => ({
       worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(scene.vendor!), {
         trades: 1,
         tcTraded: totalCost,
       }),
     }));
+    const relAfterBuy = getRelation(get().worldMemory, vendorNpcId(scene.vendor));
+    if (wrongsBefore > 0 && (relAfterBuy?.wrongs ?? 0) < wrongsBefore) {
+      get().appendLog(
+        'world',
+        `${scene.vendor.name} counts the coin twice, then puts it away without a word. Whatever you took from them, you have paid for it now.`,
+      );
+    }
     const markupNote = mult > 1 ? ` (${offer.price} base + ${Math.round((mult - 1) * 100)}% corruption)` : '';
     const countNote = boughtCount > 1 ? `${boughtCount}× ` : '';
     get().appendLog(
