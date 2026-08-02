@@ -87,7 +87,10 @@ describe('OTA-1069 — no title is earnable from a blank slate', () => {
     // because they legitimately read the character sheet, not the counters —
     // see the note below.
     const p = withTitleProgress(undefined);
-    const sheetGated = new Set(['scion_of_the_giants', 'aetherborn_awakened', 'golem_whisperer']);
+    // OTA-1070 — scion_of_the_giants and golem_whisperer were fixed, so they
+    // come off the exclusion list. aetherborn_awakened still reads the sheet
+    // but needs corruption >= 10, which a fresh character does not have.
+    const sheetGated = new Set<string>();
     for (const t of WIRED_TITLES) {
       if (sheetGated.has(t.id)) continue;
       expect({ id: t.id, earned: t.earned(anyPlayer, p) }).toEqual({ id: t.id, earned: false });

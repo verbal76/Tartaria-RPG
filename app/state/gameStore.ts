@@ -33045,6 +33045,17 @@ function handleGolemCommand(
     const tp = trainGolemStat(workingGolem, 'power', true);
     workingGolem = tp.golem;
     if (tp.leveled) get().appendLog('reward', `✦ ${workingGolem.name}'s Power rises to ${tp.leveled.to}.`);
+    // OTA-1070 — golem_whisperer's canon is "successfully control an Aether
+    // Golem". A landed strike is the smallest honest unit of that; merely
+    // having one stand beside you (the old `!!player.golem`) was not control.
+    // handleGolemCommand's `set` is the narrow function-only form;
+    // recordTitleProgress takes the wide store setter. Adapt rather than cast
+    // so the value branch stays type-checked.
+    recordTitleProgress(
+      get,
+      (u) => set((s) => (typeof u === 'function' ? u(s) : u)),
+      { golemStrikesLanded: 1 },
+    );
     // OTA-478 — a WIELDED golem weapon's dice REPLACE the innate attackDie (it
     // swings the weapon, not its fists); Power still adds half to damage.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
