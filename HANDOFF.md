@@ -849,8 +849,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1072`**,
-**golem-line `2026-08-02-1049`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1073`**,
+**golem-line `2026-08-02-1050`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -859,9 +859,46 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.83**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.84**; ledger in `VERSION.md`.
 
-- **NPCs REMEMBER YOU (2026-08-02, latest). BOTH LINES.**
+- **NPC MEMORY SLICE 2 (2026-08-02, latest). BOTH LINES.**
+  The four things OTA-1072 deliberately deferred.
+  **1. Turn-in credit.** Slice 1 counted contracts *taken* but not *finished* —
+  the one act most worth remembering (you came back and delivered) moved
+  nobody's regard. New `creditTurnIn()` at the five `announceMissionComplete`
+  sites. ⚠ Deliberately at the **callers**, not inside the choke point: only
+  the caller knows whether the turn-in was face to face, and a *"send word"*
+  courier turn-in (OTA-456, faction quests only) can fire while the player
+  happens to be standing at some unrelated stall — crediting it would be a lie
+  the greeting layer then repeats for the rest of the save.
+  **2. Roadside recognition.** Slice 1 re-greeted only *anchor* NPCs — a proxy
+  for "someone you come back to" that existed because no ledger did. The ledger
+  now says it directly: `meetings >= 2` means *"A figure crests the rise"* is
+  the wrong sentence, because they are not new. The sighting for this arrival
+  is recorded upstream in `beginScene`, so a genuine first meeting reads
+  `meetings === 1` and still gets the arrival line.
+  **3. The people column.** Contracts › Milestones › NPCs Met was a roll-call
+  (name, role, place). It now reports the **relationship** — regard label plus
+  the dealings that earned it — ordered worst-regard first, because the person
+  who watches your hands is the one you most need to see. It reads the same
+  ledger the greeting layer does, so the Chronicle and the world cannot
+  disagree about who knows you. Anyone with no relation still shows, with no
+  claim made about a history there is no record of.
+  **4. Gossip.** A faction-mate mentions someone else you've built something
+  with. Both ends must be familiar-or-better, same faction, and it fires only
+  every `GOSSIP_EVERY`-th (4th) visit — deterministic cadence off the meeting
+  count. Phase 0 was spent cutting the noise floor; a line that fired on every
+  arrival would put it straight back.
+  ⚠ **Ladder fix found by a slice-2 test:** `contractsTaken` earned the
+  player's *name* in slice 1 but no *regard*, so someone who had handed you
+  work ranked below someone you'd merely walked past three times. It now sits
+  on the `known` rung. The ladder was wrong, not the test.
+  Files: `npcMemory.ts` (REGARD_LABEL, dealingsSummary, knownPeople,
+  gossipSubject/gossipLine), `gameStore.ts` (creditTurnIn ×5, return-visit
+  gate, gossip), `ContractsScreen.tsx` (people column),
+  `ota1050NpcMemorySlice2.test.ts` (18).
+
+- **NPCs REMEMBER YOU (2026-08-02). BOTH LINES.**
   Phase 1, slice 1 of the immersion build plan. **The gap:** `recordNpcMet` is
   idempotent on `id` — the second meeting with an NPC returns the memory object
   unchanged — so the only question the game could answer about a person was

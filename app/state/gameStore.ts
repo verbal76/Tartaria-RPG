@@ -33,6 +33,8 @@ import {
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse } from '../engine/worldMemory';
 // OTA-1049 — Phase 1: the per-person ledger the greeting layer reads.
 import { recordNpcSighting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName } from '../engine/npcMemory';
+// OTA-1050 — Phase 1 slice 2: turn-in credit, roadside recognition, gossip.
+import { gossipSubject, gossipLine } from '../engine/npcMemory';
 import {
   seedInvestigationTable,
   rollOutcome as rollInvestigationOutcome,
@@ -3383,6 +3385,27 @@ function arbiterAddress(player: PlayerCharacter | null | undefined, fallback: st
  *  read, or the ledger silently splits one person into two. */
 function vendorNpcId(vendor: { id?: string; name: string }): string {
   return vendor.id || `vendor:${vendor.name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
+}
+
+/** OTA-1050 — credit a finished contract to the person who took it back.
+ *
+ *  Called from the five announceMissionComplete sites rather than from inside
+ *  announceMissionComplete itself, because only the caller knows whether the
+ *  turn-in was face to face. A "send word" courier turn-in (OTA-456, faction
+ *  quests only) can happen while the player happens to be standing at some
+ *  unrelated stall, and crediting that stall would be a lie the greeting layer
+ *  then repeats for the rest of the save. */
+function creditTurnIn(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  remote: boolean,
+): void {
+  if (remote) return;
+  const v = get().currentScene?.vendor;
+  if (!v) return; // mission board / faction hall — nobody to credit
+  set((s) => ({
+    worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(v), { contractsTurnedIn: 1 }),
+  }));
 }
 
 function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
@@ -8084,7 +8107,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // visits get a quieter "still here" line. Random non-anchor
       // vendors always get the arrival line (they aren't permanent).
       const isAnchor = !!(hubRoom?.anchorNpc && vendor.name === hubRoom.anchorNpc);
-      const isReturnVisit = isAnchor && !!existing && (existing.visitCount ?? 0) >= 1;
+      // OTA-1050 — roadside and other non-anchor traders get recognition too.
+      // The anchor rule was a proxy for "someone you come back to", and it was
+      // the only proxy available before the ledger existed. Now the ledger says
+      // so directly: if THIS person has stood in front of you before, "A figure
+      // crests the rise" is simply the wrong sentence — they are not new. The
+      // sighting for this arrival is recorded upstream in beginScene, so a
+      // genuine first meeting reads meetings === 1 and still gets the arrival.
+      const relNow = getRelation(get().worldMemory, vendorNpcId(vendor));
+      const seenBefore = (relNow?.meetings ?? 0) >= 2;
+      const isReturnVisit = (isAnchor && !!existing && (existing.visitCount ?? 0) >= 1) || seenBefore;
       if (isReturnVisit) {
         // Warmth scales with the player's standing in the anchor
         // vendor's faction. The player called the original "they nod
@@ -8104,10 +8136,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // function of stored dealings, and WHICH variant they use is indexed
         // off the meeting count, never rolled. An NPC who alternates between
         // knowing you and not reads as broken, not as varied.
-        const rel = getRelation(get().worldMemory, vendorNpcId(vendor));
+        const rel = relNow;
         get().appendLog('world', npcGreeting(rel, vendor.name, player.name));
         const awayLine = npcAbsenceLine(rel, vendor.name, player.name, player.hoursElapsed ?? 0);
         if (awayLine) get().appendLog('world', awayLine);
+        // OTA-1050 — word travels inside a faction. Fires only when BOTH ends
+        // are people the player has genuinely built something with, and only
+        // every GOSSIP_EVERY-th visit: Phase 0 was spent cutting the noise
+        // floor, and a line that fired on every arrival would put it back.
+        // Deterministic — the cadence is read off the meeting count.
+        const talkAbout = gossipSubject(get().worldMemory, rel);
+        if (talkAbout) {
+          get().appendLog('world', gossipLine(vendor.name, talkAbout, player.name));
+        }
       } else {
       // Narrate the arrival in the world channel first — vendors don't
       // appear out of nowhere. The player should see they showed up
@@ -21639,6 +21680,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       candidate.title,
       `✦ Faction contract complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${payRep > 0 ? `, +${payRep} rep with ${fLabel}` : ''}.`,
     );
+    // OTA-1050 — the agent who took it back remembers that you finished it.
+    creditTurnIn(get, set, remote);
     // OTA-805 — RAPPORT unlocked. Turning in a faction's rapport quest opens
     // Charisma-scaled dealing with its vendors (the discount is derived from this
     // completion — see factionRapport.hasFactionRapport). Announce it, and show the
@@ -22129,6 +22172,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       candidate.title,
       `✦ Hunt complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
     );
+    // OTA-1050 — the agent who took it back remembers that you finished it.
+    creditTurnIn(get, set, false);
     maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
     applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
@@ -22449,6 +22494,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       candidate.title,
       `✦ Mystery complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
     );
+    // OTA-1050 — the agent who took it back remembers that you finished it.
+    creditTurnIn(get, set, false);
     applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
     plantNextContractHint(get, candidate.factionId ?? null, 'mystery');
@@ -22695,6 +22742,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       candidate.title,
       `✦ Storyline complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
     );
+    // OTA-1050 — the agent who took it back remembers that you finished it.
+    creditTurnIn(get, set, false);
     maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
     applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
     applyTrainAndLog(get, set, 'charisma', '✦ Word of the chapter spreads. +1 CHA (now {to}).');
@@ -22815,6 +22864,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         def.title,
         `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${huntPayTc} TC${huntJourneyTc > 0 ? ` (incl. +${huntJourneyTc} long-haul)` : ''}${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
+      // OTA-1050 — the agent who took it back remembers that you finished it.
+      creditTurnIn(get, set, false);
       maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
       applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);

@@ -10,6 +10,8 @@ import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
 import { findFactionQuestById, FACTION_QUESTS, factionQuestReady } from '../engine/factionQuests';
 import { escortToggleLabel } from '../engine/escort';
 import { FACTIONS } from '../engine/factions';
+// OTA-1050 — Phase 1 slice 2: the Chronicle's people column.
+import { knownPeople, npcRegard, REGARD_LABEL, dealingsSummary } from '../engine/npcMemory';
 import { startingLocationForFaction } from '../engine/character';
 import { missionObjectiveLocationId } from '../engine/missionRouting';
 import { getLocationById } from '../engine/encounter';
@@ -774,14 +776,40 @@ export function ContractsScreen() {
                   along the way show up here.
                 </Text>
               ) : (
-                (worldMemory.npcsMet ?? []).map((n) => (
-                  <Text key={n.id} style={styles.milestoneDetailRow}>
-                    · {n.name}
-                    {n.role ? ` — ${n.role}` : ''}
-                    {n.locationId ? `  (${n.locationId.replace(/_/g, ' ')})` : ''}
-                  </Text>
-                ))
+                // OTA-1050 — this was a roll-call: a name, a role, a place.
+                // It now reports the RELATIONSHIP, ordered by how each person
+                // regards you, with the dealings that got them there. The
+                // ledger is the same one the greeting layer reads, so the
+                // Chronicle and the world can never disagree about who knows
+                // you. Anyone on the old npcsMet list without a relation (a
+                // Guardian, a pre-OTA-1049 save mid-migration) still shows,
+                // with no claim made about a relationship there is no record
+                // of — the honest blank.
+                (worldMemory.npcsMet ?? []).map((n) => {
+                  const rel = (worldMemory.npcRelations ?? {})[n.id];
+                  const regard = rel ? npcRegard(rel) : null;
+                  const dealings = dealingsSummary(rel);
+                  return (
+                    <View key={n.id} style={styles.npcRow}>
+                      <Text style={styles.milestoneDetailRow}>
+                        · {n.name}
+                        {n.role ? ` — ${n.role}` : ''}
+                        {regard ? `  ·  ${REGARD_LABEL[regard]}` : ''}
+                      </Text>
+                      {dealings ? (
+                        <Text style={styles.npcDealings}>   {dealings}</Text>
+                      ) : null}
+                    </View>
+                  );
+                })
               )}
+              {knownPeople(worldMemory).length > 0 ? (
+                <Text style={styles.npcFootnote}>
+                  Regard is earned in dealings with that person, not in standing
+                  with their faction. Trades, contracts finished, and thefts they
+                  CAUGHT all count.
+                </Text>
+              ) : null}
             </View>
           )}
         </View>
@@ -1865,6 +1893,9 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginVertical: 1,
   },
+  npcRow: { marginBottom: 2 },
+  npcDealings: { color: '#8a7f6a', fontSize: 11, lineHeight: 15 },
+  npcFootnote: { color: '#6f6656', fontSize: 10, lineHeight: 14, marginTop: 8, fontStyle: 'italic' },
   milestoneDetailEmpty: {
     color: '#a2977b',
     fontSize: 11,
