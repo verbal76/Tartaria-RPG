@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.83';
+export const DISPLAY_VERSION = '4.28.84';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19543,7 +19543,39 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // NOT in this slice (slice 2): turn-in credit, roadside/non-anchor traders,
 // the Chronicle people column, NPC-to-NPC gossip.
 // DISPLAY_VERSION 4.28.83. 35 tests.
-export const OTA_BUILD_ID = '2026-08-02-1072-npcs-remember-you';
+// OTA-1073 — PHASE 1, SLICE 2. The four things slice 1 deliberately deferred.
+// 1. TURN-IN CREDIT. Slice 1 counted contracts TAKEN but not FINISHED -- the
+//    one act most worth remembering (you came back and delivered) moved
+//    nobody's regard. New creditTurnIn() at the five announceMissionComplete
+//    sites. ⚠ Deliberately at the CALLERS, not inside announceMissionComplete:
+//    only the caller knows whether the turn-in was face to face, and a "send
+//    word" courier turn-in (OTA-456, faction quests only) can fire while the
+//    player happens to be standing at some unrelated stall.
+// 2. ROADSIDE RECOGNITION. Slice 1 re-greeted only "anchor" NPCs -- a proxy
+//    for "someone you come back to" that existed because no ledger did. The
+//    ledger now says it directly: meetings >= 2 means "A figure crests the
+//    rise" is the wrong sentence, because they are not new. The sighting for
+//    THIS arrival is recorded upstream in beginScene, so a genuine first
+//    meeting reads meetings === 1 and still gets the arrival line.
+// 3. THE PEOPLE COLUMN. Contracts > Milestones > NPCs Met was a roll-call
+//    (name, role, place). It now reports the RELATIONSHIP -- regard label plus
+//    the dealings that earned it -- ordered worst-regard first, because the
+//    person who watches your hands is the one you most need to see. Reads the
+//    same ledger the greeting layer does, so Chronicle and world cannot
+//    disagree about who knows you. Anyone with no relation shows with no claim
+//    made: the honest blank.
+// 4. GOSSIP. A faction-mate mentions someone else you have built something
+//    with. Both ends must be familiar-or-better, same faction, and it fires
+//    only every GOSSIP_EVERY-th (4th) visit -- deterministic cadence off the
+//    meeting count. Phase 0 was spent cutting the noise floor; a line that
+//    fired on every arrival would put it straight back.
+// ⚠ LADDER FIX found by a slice-2 test: contractsTaken earned the player's
+// NAME in slice 1 but no REGARD, so someone who had handed you work ranked
+// below someone you had merely walked past three times. It now sits on the
+// 'known' rung. The ladder was wrong, not the test.
+// DISPLAY_VERSION 4.28.84. 18 tests (53 across Phase 1).
+export const OTA_BUILD_ID = '2026-08-02-1073-npc-memory-slice-2';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1072-npcs-remember-you';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1071-accept-burst-compaction';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1070-last-three-titles';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1069-titles-take-effort';
