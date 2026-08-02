@@ -31,6 +31,8 @@ import {
   type RescueScenarioId,
 } from '../engine/dogCompanion';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse } from '../engine/worldMemory';
+// OTA-1049 — Phase 1: the per-person ledger the greeting layer reads.
+import { recordNpcSighting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName } from '../engine/npcMemory';
 import {
   seedInvestigationTable,
   rollOutcome as rollInvestigationOutcome,
@@ -3373,6 +3375,14 @@ function arbiterAddress(player: PlayerCharacter | null | undefined, fallback: st
     return player.name.split(/\s+/)[0]!;
   }
   return fallback;
+}
+
+/** OTA-1049 — the id an NPC is remembered under. Vendors carry stable ids;
+ *  legacy saves and a few hand-authored stalls do not, so a name slug is the
+ *  fallback. Must be computed the SAME way at the sighting site and at every
+ *  read, or the ledger silently splits one person into two. */
+function vendorNpcId(vendor: { id?: string; name: string }): string {
+  return vendor.id || `vendor:${vendor.name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
 }
 
 function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
@@ -7616,17 +7626,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // use the vendor's id when present, otherwise a slug of their name
     // (roadside traders have stable ids; legacy saves may not).
     if (vendor) {
-      const npcId = vendor.id || `vendor:${vendor.name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
+      const npcId = vendorNpcId(vendor);
+      const npcRecord = {
+        id: npcId,
+        name: vendor.name,
+        role: vendor.title || 'vendor',
+        factionId: vendor.faction ?? undefined,
+        locationId: location.id,
+        hoursElapsed: get().player?.hoursElapsed ?? 0,
+        firstMetAt: Date.now(),
+      };
+      // OTA-1049 — the milestone list stays idempotent (it is a list of people
+      // you have met, and meeting someone twice does not make two of them).
+      // The RELATION is the opposite: every arrival counts, because repetition
+      // is the only thing that turns a stranger into a regular.
       set((s) => ({
-        worldMemory: recordNpcMet(s.worldMemory, {
-          id: npcId,
-          name: vendor.name,
-          role: vendor.title || 'vendor',
-          factionId: vendor.faction ?? undefined,
-          locationId: location.id,
-          hoursElapsed: get().player?.hoursElapsed ?? 0,
-          firstMetAt: Date.now(),
-        }),
+        worldMemory: recordNpcSighting(
+          recordNpcMet(s.worldMemory, npcRecord),
+          npcRecord,
+          { nowMs: Date.now(), hoursElapsed: get().player?.hoursElapsed ?? 0 },
+        ),
       }));
     }
     // For narration, use the first enemy as the scene representative.
@@ -8073,18 +8092,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // 10 the relationship should have texture. ≥10 standing
         // (1-2 completed faction contracts' worth) earns a familiar
         // line; ≥25 (regular customer) earns a warm one.
-        const standing = vendor.faction
-          ? getStanding(player.factionStanding, vendor.faction)
-          : 0;
-        let line: string;
-        if (standing >= 25) {
-          line = `${vendor.name} looks up before you've finished crossing the room — already reaching for the pot, already smiling. "Back so soon. Sit. Tell me what kind of day it's been."`;
-        } else if (standing >= 10) {
-          line = `${vendor.name} catches your eye and nods — the kind of nod that knows your name. "You're back. Good. Come look at what came in this week."`;
-        } else {
-          line = `${vendor.name} is still at their post — pack open, wares laid out. They nod without looking up.`;
-        }
-        get().appendLog('world', line);
+        // OTA-1049 — the greeting now reads the ledger with THIS person
+        // (app/engine/npcMemory.ts) rather than the player's standing with
+        // their FACTION. Standing is a number shared with hundreds of
+        // strangers: it could tell a shopkeeper the Order thinks well of you,
+        // but never that you had actually bought anything from THEM. One of
+        // the old lines literally read "the kind of nod that knows your name"
+        // and then did not say it — the name is now said, or withheld,
+        // according to whether anything has actually passed between you.
+        // Deterministic in both axes: whether they know your name is a pure
+        // function of stored dealings, and WHICH variant they use is indexed
+        // off the meeting count, never rolled. An NPC who alternates between
+        // knowing you and not reads as broken, not as varied.
+        const rel = getRelation(get().worldMemory, vendorNpcId(vendor));
+        get().appendLog('world', npcGreeting(rel, vendor.name, player.name));
+        const awayLine = npcAbsenceLine(rel, vendor.name, player.name, player.hoursElapsed ?? 0);
+        if (awayLine) get().appendLog('world', awayLine);
       } else {
       // Narrate the arrival in the world channel first — vendors don't
       // appear out of nowhere. The player should see they showed up
@@ -20431,6 +20454,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : {}),
       };
     });
+    // OTA-1049 — the trade goes on the ledger with THIS person. A bulk buy is
+    // one transaction, not `boughtCount` of them: walking out with five of
+    // something is one piece of business, and counting units would let a
+    // stack purchase vault a stranger to "trusted" in a single tap.
+    set((s) => ({
+      worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(scene.vendor!), {
+        trades: 1,
+        tcTraded: totalCost,
+      }),
+    }));
     const markupNote = mult > 1 ? ` (${offer.price} base + ${Math.round((mult - 1) * 100)}% corruption)` : '';
     const countNote = boughtCount > 1 ? `${boughtCount}× ` : '';
     get().appendLog(
@@ -20574,6 +20607,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `Sold ${item.name} to ${scene.vendor.name} for ${price} TC. (${player.tc + price} TC on hand)`,
     );
+    // OTA-1049 — on the ledger with THIS person. TC accrues per unit, but the
+    // TRADE count rides the same `social` flag the Charisma train already uses
+    // to mean "first unit of this negotiation" (OTA-727) — so emptying a stack
+    // of twenty is one piece of business, exactly as it is for CHA.
+    set((s) => ({
+      worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(scene.vendor!), {
+        trades: opts?.social !== false ? 1 : 0,
+        tcTraded: price,
+      }),
+    }));
     // arb45 — Relic Trader: count relic barters toward the title (5 needed).
     if (isRelicTrade) recordTitleProgress(get, set, { relicsTraded: 1 });
     // OTA 059 — successful SELL trains CHA. Closing the trade
@@ -20816,6 +20859,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         text: `were caught stealing from ${scene.vendor.name}`,
         factionId: vendorFaction ?? undefined,
       });
+      // OTA-1049 — deliberately on the CAUGHT branch only. A theft they never
+      // noticed cannot change how they greet you; the ledger records what the
+      // NPC knows, not what the player did. Getting away clean means getting
+      // away clean, and getting caught follows you back to that stall forever.
+      set((s) => ({
+        worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(scene.vendor!), { wrongs: 1 }),
+      }));
     }
     void get().persist();
   },
@@ -21702,6 +21752,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (neutralMatch && !alreadyActive && !alreadyDone) {
         const neutralTracked = !anyTrackedContract(player); // OTA-972 — #118
         get().appendLog('debug', `accept: neutral ${neutralMatch.id} tracked=${neutralTracked}`);
+      // OTA-1049 — a contract handed over face to face is business with THAT
+      // agent, so it goes on their ledger. Guarded on a live vendor because
+      // board/remote accepts have no one standing across from you.
+      if (scene?.vendor) {
+        set((st) => ({
+          worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
+        }));
+      }
         set((s) => (s.player ? {
           player: {
             ...s.player,
@@ -21780,6 +21838,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // auto-activating it.
     const huntTracked = !anyTrackedContract(player);
     get().appendLog('debug', `accept: hunt ${hunt.id} tracked=${huntTracked}`);
+      // OTA-1049 — a contract handed over face to face is business with THAT
+      // agent, so it goes on their ledger. Guarded on a live vendor because
+      // board/remote accepts have no one standing across from you.
+      if (scene?.vendor) {
+        set((st) => ({
+          worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
+        }));
+      }
     set((s) =>
       s.player
         ? {
@@ -22100,6 +22166,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (neutralMatch && !alreadyActive && !alreadyDone) {
         const neutralTracked = !anyTrackedContract(player); // OTA-972 — #118
         get().appendLog('debug', `accept: neutral ${neutralMatch.id} tracked=${neutralTracked}`);
+      // OTA-1049 — a contract handed over face to face is business with THAT
+      // agent, so it goes on their ledger. Guarded on a live vendor because
+      // board/remote accepts have no one standing across from you.
+      if (scene?.vendor) {
+        set((st) => ({
+          worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
+        }));
+      }
         set((s) => (s.player ? {
           player: {
             ...s.player,
@@ -22172,6 +22246,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const m = matchedMystery;
     const mysteryTracked = !anyTrackedContract(player); // OTA-972 — #118
     get().appendLog('debug', `accept: mystery ${m.id} tracked=${mysteryTracked}`);
+      // OTA-1049 — a contract handed over face to face is business with THAT
+      // agent, so it goes on their ledger. Guarded on a live vendor because
+      // board/remote accepts have no one standing across from you.
+      if (scene?.vendor) {
+        set((st) => ({
+          worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
+        }));
+      }
     set((s) =>
       s.player
         ? {
@@ -22432,6 +22514,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const s = matchedStoryline;
     const storyTracked = !anyTrackedContract(player); // OTA-972 — #118
     get().appendLog('debug', `accept: storyline ${s.id} tracked=${storyTracked}`);
+      // OTA-1049 — a contract handed over face to face is business with THAT
+      // agent, so it goes on their ledger. Guarded on a live vendor because
+      // board/remote accepts have no one standing across from you.
+      if (scene?.vendor) {
+        set((st) => ({
+          worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
+        }));
+      }
     set((st) =>
       st.player
         ? {
