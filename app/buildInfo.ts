@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.84';
+export const DISPLAY_VERSION = '4.28.85';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18484,7 +18484,44 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // below someone you had merely walked past three times. It now sits on the
 // 'known' rung. The ladder was wrong, not the test.
 // DISPLAY_VERSION 4.28.84. 18 tests (53 across Phase 1).
-export const OTA_BUILD_ID = '2026-08-02-1050-npc-memory-slice-2';
+// OTA-1051 — PHASE 0, ITEMS 3 AND 4. Both root-caused before touching code.
+//
+// (3) ARBITER COOLDOWN DISCIPLINE -- interjections that don't follow from the
+//     last action. ROOT CAUSE: every guard on the ambient path runs at
+//     generation START (no combat, not in tutorial, cooldown expired) and NONE
+//     run at EMIT. On device a musing takes 14-20s (owner's 4.28.79 log:
+//     `arbiter: ambient ✓ 14080ms`); in fourteen seconds the player has crossed
+//     a room or opened a fight. The line was composed for a moment that no
+//     longer exists.
+//     ⚠ This was DELIBERATE -- the arb163 comment says ambient asides "can run
+//     to completion in the background and speak whenever ready". The REACTIVE
+//     path (narrateViaArbiter) already carries the discipline this one lacks:
+//     arbiterGenerationEpoch, checked as "cancelled mid-flight". Ambient was
+//     exempted from it.
+//     FIX: takeAmbientStamp() at t0 (location / room / micro-micro / in-combat
+//     / log length), ambientStaleReason() before the line speaks. Drops on
+//     combat-started, moved-location, moved-room, moved-scene, log-moved-on
+//     (> 12 lines). The reason rides the existing `arbiter: ambient …` debug
+//     marker, so a pasted log shows the drop AND its cause.
+//     ⚠ NOT the epoch: every reactive generation bumps that counter, so gating
+//     ambient on it would discard nearly every musing and silently undo
+//     OTA-1054, which is what finally got ambient working at all.
+//
+// (4) STORY BEATS GET VISUAL SEPARATION. ROOT CAUSE: there is no notion of
+//     "story" in the log. A main-quest phase turn, the 3-Core twist, the 4-Core
+//     forge and every motive-drip beat call appendLog('arbiter', …) -- the same
+//     channel, colour and chip the Arbiter uses to shrug about your stamina.
+//     FIX: a `storyBeat` META FLAG (STORY_BEAT_META), not a new LogChannel --
+//     a channel drives TTS routing, HIDDEN_CHANNELS and the copy-all export,
+//     and none of that should change; only the look should. AdventureFeed gives
+//     a flagged entry a gold rule, a STORY chip and its own air. Six sites
+//     marked: phase narration, descent, 3-Core twist, 4-Core forge, motive
+//     drip, The Missing's resolution. Contract stage narration is deliberately
+//     NOT marked -- it already has the MISSION chip and the Contracts card, and
+//     if half the feed is a story beat the marker is wallpaper.
+// DISPLAY_VERSION 4.28.85. 15 tests.
+export const OTA_BUILD_ID = '2026-08-02-1051-arbiter-cooldown-story-beats';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1050-npc-memory-slice-2';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1049-npcs-remember-you';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1048-accept-burst-compaction';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1047-last-three-titles';
