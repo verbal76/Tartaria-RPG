@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1071`**,
-**golem-line `2026-08-02-1048`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1072`**,
+**golem-line `2026-08-02-1049`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,52 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.82**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.83**; ledger in `VERSION.md`.
 
-- **ACCEPT-BURST COMPACTION (2026-08-02, latest). BOTH LINES.**
+- **NPCs REMEMBER YOU (2026-08-02, latest). BOTH LINES.**
+  Phase 1, slice 1 of the immersion build plan. **The gap:** `recordNpcMet` is
+  idempotent on `id` — the second meeting with an NPC returns the memory object
+  unchanged — so the only question the game could answer about a person was
+  *have you ever stood in a room with them*. That is a checklist, not a
+  relationship. The only thing that varied a vendor's greeting was the player's
+  standing with their **faction**, a number shared with hundreds of strangers,
+  which cannot tell a shopkeeper whether you ever bought anything from **them**.
+  One greeting line literally read *"the kind of nod that knows your name"* and
+  then did not say the name.
+  **New:** `app/engine/npcMemory.ts` — a per-person ledger (meetings, trades,
+  TC across the table, contracts taken/turned in, wrongs, first/last seen) on
+  `worldMemory.npcRelations`, keyed by the same id as `npcsMet`.
+  **Determinism is the feature, not an implementation detail.** Owner: *"make
+  it deterministic per NPC."* `arbiterAddress` names the player on a ~60%
+  per-line coin flip (OTA-635) and that works because the Arbiter is one
+  continuous voice; applied per NPC it reads as a fault — a shopkeeper who uses
+  your name, then doesn't, then does, has a head injury. So **both** axes are
+  pure functions of stored state: whether they know your name, and which
+  greeting variant they use (indexed off the meeting count, never rolled — so
+  successive visits still read differently while any single state replays
+  identically).
+  **The name is earned:** one trade, one contract, one caught theft, or three
+  visits. A stranger gets *"traveler"*. ⚠ The wrong counts deliberately — the
+  person you stole from learns your name faster than the one you bought bread
+  from. The regard ladder (`stranger / met / known / familiar / trusted /
+  wronged`) is monotone in custom, and `wronged` outranks everything: 99,999 TC
+  of business does not offset a knife at the stall.
+  **Wired:** sighting at the vendor-arrival site (`recordNpcMet` stays
+  idempotent alongside it — the milestone list is a list of *people*), buys,
+  sells, contract accepts, and the **CAUGHT** branch of theft only. A theft
+  they never noticed cannot change how they greet you: the ledger records what
+  the NPC *knows*, not what the player did. A bulk buy/sell is ONE piece of
+  business, not one per unit — counting units would let a single stack purchase
+  vault a stranger to *trusted*.
+  **Migration:** `seedRelationsFromMet()` promotes pre-OTA saves on first
+  touch, so a player forty hours in is not demoted to a stranger by an update.
+  **Not in this slice** (slice 2): turn-in credit, roadside/non-anchor traders,
+  the Chronicle people column, NPC-to-NPC gossip.
+  Files: `npcMemory.ts` (new), `types.ts` (`NpcRelation` + `npcRelations`),
+  `gameStore.ts` (sighting, greeting, buy/sell/theft/accept),
+  `ota1072NpcMemory.test.ts` (30) + `ota1072NpcLedgerWiring.test.ts` (5).
+
+- **ACCEPT-BURST COMPACTION (2026-08-02). BOTH LINES.**
   Phase 0, item 1 of the immersion build plan: clear the noise floor. From the
   owner's 4.28.79 log — thirteen hunts accepted at one board inside fifty-six
   seconds, roughly **sixty-five lines** of board copy. Each accept spent up to
