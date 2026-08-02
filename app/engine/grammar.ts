@@ -52,3 +52,63 @@ export function theCap(noun: Word): string {
 export function theLower(noun: Word): string {
   return `the ${stripLeadingArticle(noun)}`;
 }
+
+// ---------------------------------------------------------------------------
+// OTA-1068 — party composition, in words.
+//
+// The scene-arrival announcer used to read
+//     `${enemies.length} ${enemies[0].name}${'s'} close on you`
+// which is only true when every member of the party is the same enemy. That
+// held when the ONLY multi-enemy source was pickGroupForLocation, which spawns
+// `count` copies of ONE prototype. OTA-808 (menace bonus) and OTA-817
+// (mixed-role packs) both later appended members of a DIFFERENT kind --
+// rollExtraPackMembers explicitly filters out names already present -- and
+// neither updated the announcer. Result: a Scrap Drone + Mud Wasp pack was
+// announced as "2 Scrap Drones", and the Mud Wasp only revealed itself by
+// swinging.
+//
+// This describes what is actually standing there: groups by name, keeps
+// first-seen order, counts duplicates, and joins with proper articles.
+//   [Drone]                      -> "a Scrap Drone"
+//   [Drone, Drone, Drone]        -> "3 Scrap Drones"
+//   [Drone, Wasp]                -> "a Scrap Drone and a Mud Wasp"
+//   [Drone, Drone, Wasp]         -> "2 Scrap Drones and a Mud Wasp"
+// ---------------------------------------------------------------------------
+
+/** English plural for an enemy/item noun. Handles the sibilant and
+ *  consonant-y endings that a bare +'s' gets wrong ("Mud Lich" -> "Mud Liches",
+ *  "Harpy" -> "Harpies", not "Lichs" / "Harpys"). */
+export function pluralizeNoun(word: Word): string {
+  const w = (word ?? '').trim();
+  if (!w) return w;
+  if (/(s|x|z|ch|sh)$/i.test(w)) return `${w}es`;
+  if (/[^aeiou]y$/i.test(w)) return `${w.slice(0, -1)}ies`;
+  return `${w}s`;
+}
+
+/** Mid-sentence description of who is present, grouped and counted. */
+export function describeEnemyParty(names: readonly string[]): string {
+  const order: string[] = [];
+  const counts = new Map<string, number>();
+  for (const raw of names) {
+    const n = (raw ?? '').trim();
+    if (!n) continue;
+    if (!counts.has(n)) order.push(n);
+    counts.set(n, (counts.get(n) ?? 0) + 1);
+  }
+  const parts = order.map((n) => {
+    const c = counts.get(n) ?? 1;
+    return c === 1 ? withArticle(n) : `${c} ${pluralizeNoun(n)}`;
+  });
+  if (parts.length === 0) return '';
+  if (parts.length === 1) return parts[0]!;
+  if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+  return `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}`;
+}
+
+/** Sentence-start form of describeEnemyParty. A count-led phrase ("2 Scrap
+ *  Drones") is already fine; capitalising its first character is a no-op. */
+export function describeEnemyPartyCap(names: readonly string[]): string {
+  const s = describeEnemyParty(names);
+  return s ? `${s.charAt(0).toUpperCase()}${s.slice(1)}` : s;
+}

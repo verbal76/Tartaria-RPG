@@ -878,7 +878,39 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.73**; ledger in `VERSION.md`.
 
-- **THE GOLEM CARD BROUGHT IN LINE (2026-08-01, latest). BOTH LINES.**
+- **MIXED-PACK ANNOUNCE — "2 SCRAP DRONES", THEN A MUD WASP (2026-08-02, latest). BOTH LINES.**
+  Owner log 4.28.75 @ 23:41:56. Root-caused before fixing, at the owner's ask.
+  - **The line.** `gameStore` announced
+    `${n} ${enemies[0].name}s close on you` — true only for a homogeneous
+    party.
+  - **That invariant was real when it was written.** `pickGroupForLocation`
+    was the only multi-enemy source and it spawns `count` copies of ONE
+    prototype, so pluralising member 0 was correct.
+  - ⚠ **Two later features broke it and neither revisited the announcer.**
+    OTA-808 (menace pressure) appends an independent ladder pick. OTA-817
+    (mixed-role packs) appends members that are *guaranteed* to differ —
+    `rollExtraPackMembers` filters the pool by `usedNames` and prefers an
+    unused `type`. Every pack OTA-817 produces is heterogeneous by design, so
+    the announcer was not occasionally wrong on those — it was always wrong.
+  - ⚠ **The narration path explicitly delegated this job to that line.**
+    `gameStore` ~7623: narration names only the first enemy as "the scene
+    representative" because "the full group is surfaced via the EnemyPanel +
+    a follow-up line when it's actually a pack." The announcer IS that
+    follow-up line. Nothing else was ever going to name the second enemy.
+  - **Fix:** `grammar.ts` gains `pluralizeNoun` + `describeEnemyParty` /
+    `describeEnemyPartyCap` — groups by name, keeps first-seen order so the
+    lead matches the enemy the paragraph already named, counts duplicates,
+    joins with correct articles and a serial comma. Homogeneous output is
+    unchanged ("3 Mudlings close on you").
+  - **Swept, no change needed:** `EnemyPanel` FlatLists every member (its
+    single-card branch is gated on `length === 1`); `ExplorationScreen`
+    guards `length === 1`; `talkDown`'s `enemies[0]` is a deliberate
+    spokesperson, not a whole-party claim.
+  - **The lesson worth keeping:** this is a display invariant silently
+    invalidated by a gameplay feature. When a future change makes encounters
+    more varied, grep the announcers before shipping it.
+
+- **THE GOLEM CARD BROUGHT IN LINE (2026-08-01). BOTH LINES.**
   `GolemNamingModal` carried all three of the faults the owner reported
   against the dog card. Found by reading the file rather than waiting for a
   second device report — the owner should not have to report the same defect
