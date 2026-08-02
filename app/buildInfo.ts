@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.86';
+export const DISPLAY_VERSION = '4.28.87';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18553,7 +18553,50 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     and gameStore no longer imports recordNpcMet at all. Two calls at one
 //     site is a pattern the next person will half-copy; one call cannot be.
 // DISPLAY_VERSION 4.28.86. 12 tests.
-export const OTA_BUILD_ID = '2026-08-02-1052-absence-line-and-ledger-coverage';
+// OTA-1053 — THE LAST PHASE 1 RESIDUALS. Two were leaks I shipped.
+//
+// (1) LEDGER IDENTITY WAS RUNTIME IDENTITY. pickRoadsideTrader mints
+//     `roadside_<demeanor>_<Date.now()>` -- a fresh id EVERY spawn -- while the
+//     name and description come from a fixed archetype. One authored character,
+//     split into unbounded one-encounter strangers. Consequences, both mine:
+//       - OTA-1073's roadside recognition could never fire for the population
+//         it was written for; the relation was new every time.
+//       - since OTA-1072 sights every vendor, each spawn appended a PERMANENT
+//         row to npcsMet AND npcRelations. Neither capped, both persisted. A
+//         long save accrued hundreds of dead rows; the Chronicle's people
+//         column filled with strangers met once.
+//     FIX: vendorNpcId keys roadside traders by ARCHETYPE. The runtime id keeps
+//     its per-spawn uniqueness (nothing reads past the `roadside_` prefix).
+//     Plus pruneSpawnKeyedRelations() sweeps the rows 4.28.83-4.28.86 already
+//     leaked into live saves -- self-healing on vendor arrival, no-op when
+//     clean. Those rows are worthless by construction: a spawn-unique key can
+//     never be seen twice.
+//
+// (2) `wronged` WAS A LIFE SENTENCE. OTA-1072 made it permanent and I flagged
+//     it as the owner's call; the owner said fix it. Permanent is wrong -- one
+//     failed DEX roll shut a stall forever in a game whose steal system exists
+//     to be attempted -- but cheap forgiveness would make theft free. AMENDS:
+//     coin spent at that stall AFTER the theft banks toward it, 600 TC per
+//     outstanding wrong, so a second theft doubles the bill. ⚠ Settled against
+//     wrongs OUTSTANDING WHEN THE PATCH ARRIVED, never one the same patch adds
+//     -- a rule that depends on callers behaving is not a rule.
+//
+// (3) PRICES NOW MOVE ON THE RELATIONSHIP. regardPriceMult: trusted 0.90,
+//     familiar 0.95, wronged 1.25, everything else 1. Deliberately small --
+//     standing, CHA/rapport, tides and war heat already move prices and a
+//     relationship that outswung all of them would be the only lever worth
+//     pulling. regardMult is OPTIONAL on BuyPriceParts so every existing caller
+//     is byte-identical, and is excluded from strangerBuyPrice on purpose: the
+//     "you saved N TC" line now counts the relationship as well as the charm.
+//
+// ⚠ NOT DONE, and not fudged: "an NPC you know is killed / their outpost is
+// raided" from the Phase 1 delta. Raids target the PLAYER -- no offscreen
+// location-raid event exists at all -- and the vendor-kill path converts the
+// vendor into a generic Enemy that no longer carries its ledger id. Both need
+// new plumbing, not a wire-up. Phase 3 work.
+// DISPLAY_VERSION 4.28.87. 21 tests.
+export const OTA_BUILD_ID = '2026-08-02-1053-ledger-identity-amends-prices';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1052-absence-line-and-ledger-coverage';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1051-arbiter-cooldown-story-beats';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1050-npc-memory-slice-2';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1049-npcs-remember-you';
