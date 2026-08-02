@@ -30108,7 +30108,8 @@ function triggerMainQuest(
   if (nextState.phase !== 'choice') {
     const line = mq.narrationForPhase(nextState.phase, player.factionId, context);
     if (line) {
-      get().appendLog('arbiter', line);
+      // OTA-1074 — the main story turning over is not an aside.
+      get().appendLog('arbiter', line, { ...STORY_BEAT_META });
     }
   }
   // OTA-1043 — CHAPTER CARD on every phase transition (story phase 2).
@@ -30129,7 +30130,7 @@ function triggerMainQuest(
   // narration so the player gets the "Stair opens" beat.
   if (prevState.phase === 'cores' && nextState.phase === 'descent') {
     const descentLine = mq.narrationForPhase('descent', player.factionId, { seed: player.name });
-    if (descentLine) get().appendLog('arbiter', descentLine);
+    if (descentLine) get().appendLog('arbiter', descentLine, { ...STORY_BEAT_META });
   }
   // v2.4.1 (OTA 042 — Phase 4b) — 3-Core rival-pressure twist.
   // Fires once per character the moment coresRecovered hits 3.
@@ -30137,7 +30138,7 @@ function triggerMainQuest(
   // record we just wrote, then re-set with the new flag.
   if (mq.shouldFireThreeCoreTwist(nextState)) {
     const twistLine = mq.threeCoreTwistLine(player.factionId);
-    if (twistLine) get().appendLog('arbiter', twistLine);
+    if (twistLine) get().appendLog('arbiter', twistLine, { ...STORY_BEAT_META });
     const flagged = mq.markTwistFired(nextState, 'three_core_pressure');
     const cur = get().player;
     if (cur) set({ player: { ...cur, mainQuest: flagged } });
@@ -30146,7 +30147,7 @@ function triggerMainQuest(
   // twist). Fires the moment coresRecovered hits 4 and opens the golem-armament
   // recipes (gated in the craft handler on recipe.coresRequired).
   if (mq.shouldFireFourCoreForge(nextState)) {
-    get().appendLog('arbiter', mq.fourCoreForgeLine());
+    get().appendLog('arbiter', mq.fourCoreForgeLine(), { ...STORY_BEAT_META });
     const flagged = mq.markTwistFired(nextState, 'four_core_forge');
     const cur = get().player;
     if (cur) set({ player: { ...cur, mainQuest: flagged } });
@@ -30195,7 +30196,9 @@ function advanceStoryDrip(
     const person = drip.missingPersonName(seed);
     const kind = drip.missingResolutionFor(seed);
     const res = drip.missingResolution(kind, person);
-    for (const line of res.arrival) get().appendLog(line.speaker, line.text);
+    // OTA-1074 — the end of The Missing's trail is the single biggest story
+    // moment a character reaches; it must not scroll past as scenery.
+    for (const line of res.arrival) get().appendLog(line.speaker, line.text, { ...STORY_BEAT_META });
     if (kind === 'walker') {
       const foe = drip.missingWalkerEnemy(player.hpMax, person);
       const scene = get().currentScene;
@@ -30224,7 +30227,7 @@ function advanceStoryDrip(
   }
   const beat = drip.nextDripBeat(player);
   if (!beat) return;
-  get().appendLog(beat.speaker, beat.text);
+  get().appendLog(beat.speaker, beat.text, { ...STORY_BEAT_META });
   const cur = get().player;
   if (cur) {
     set({ player: { ...cur, storyBeatsSeen: [...(cur.storyBeatsSeen ?? []), beat.id] } });
@@ -35301,6 +35304,84 @@ let lastQwenGenStartMs = 0;
 const AMBIENT_GEN_COOLDOWN_MS = 90000;
 let lastAmbientGenStartMs = 0;
 
+// OTA-1074 — ARBITER COOLDOWN DISCIPLINE. Owner: interjections that don't
+// follow from the last action.
+//
+// ROOT CAUSE. Every guard on the ambient path runs at generation START — no
+// combat, not in the tutorial, cooldown expired. None of them run at EMIT, and
+// on device a musing takes 14-20s to generate (owner's 4.28.79 log:
+// `arbiter: ambient ✓ 14080ms`). In fourteen seconds of tapping the player has
+// crossed a room, opened a fight, or looted three things. The line was composed
+// for a moment that no longer exists and is delivered into whatever is on
+// screen now.
+//
+// This was DELIBERATE, and the comment above says so — ambient asides "can run
+// to completion in the background and speak whenever ready". The reactive path
+// (narrateViaArbiter) already has the discipline this one lacks: it stamps
+// arbiterGenerationEpoch at start and discards its own result if the epoch
+// moved. Ambient was exempted from it.
+//
+// The fix is NOT the epoch. Every reactive generation bumps that counter, so
+// reusing it here would discard nearly every ambient line and silently kill a
+// feature that only just started working (OTA-1054). What makes an ambient
+// musing read wrong is not that time passed — it is unprompted by design — but
+// that the SITUATION changed underneath it. So stamp the situation, and check
+// the stamp before speaking.
+// OTA-1074 — STORY BEATS GET VISUAL SEPARATION. Owner: story beats should not
+// read as loot chatter.
+//
+// ROOT CAUSE. There is no notion of "story" in the log at all. A main-quest
+// phase turn, the 3-Core twist, the 4-Core forge unlock and every motive-drip
+// beat all call appendLog('arbiter', …) — the exact channel, colour and chip
+// the Arbiter uses to shrug about your stamina. The Missing's resolution lines
+// ride whatever speaker the data names. LogChannel already carries a `mission`
+// member with its own chip and accent (OTA-673), which is the precedent — but
+// a NEW channel would ripple into TTS routing, HIDDEN_CHANNELS, the copy-all
+// export and every on-disk log consumer. A meta flag reaches the renderer
+// without touching any of that, exactly as `combatOutcome` and `supersede`
+// already do.
+export const STORY_BEAT_META = { storyBeat: true } as const;
+
+interface AmbientStamp {
+  locationId: string | undefined;
+  roomId: string | null | undefined;
+  microId: string | null | undefined;
+  inCombat: boolean;
+  logLen: number;
+}
+
+/** Player-visible lines that may pass before a musing stops following from
+ *  anything the player did. Generous — ambient is meant to be unprompted; this
+ *  catches "a great deal has happened since", not "one more turn". */
+const AMBIENT_STALE_LINES = 12;
+
+function takeAmbientStamp(get: () => GameStore): AmbientStamp {
+  const scene = get().currentScene;
+  return {
+    locationId: scene?.location?.id,
+    roomId: get().player?.hubRoomId,
+    microId: scene?.microMicroId,
+    inCombat: (scene?.enemies?.length ?? 0) > 0,
+    logLen: get().gameLog.length,
+  };
+}
+
+/** null when the line still belongs to the moment; otherwise WHY it doesn't.
+ *  The reason string rides the existing `arbiter: ambient …` debug marker so a
+ *  pasted log shows the drop and its cause, the same way OTA-1057 surfaced the
+ *  ∅ reasons. */
+function ambientStaleReason(get: () => GameStore, at: AmbientStamp): string | null {
+  const now = takeAmbientStamp(get);
+  // A fight is the loudest possible change of subject. The start-of-generation
+  // guard already refuses to BEGIN in combat; this refuses to finish into one.
+  if (now.inCombat && !at.inCombat) return 'combat-started';
+  if (now.locationId !== at.locationId) return 'moved-location';
+  if (now.roomId !== at.roomId) return 'moved-room';
+  if (now.microId !== at.microId) return 'moved-scene';
+  if (now.logLen - at.logLen > AMBIENT_STALE_LINES) return 'log-moved-on';
+  return null;
+}
+
 // OTA-612 — exploit close: contract/hunt accept trains CHA, but accept→abandon→
 // re-accept happens with ZERO in-game time passing, so it was a free CHA grind.
 // Gate the accept-CHA train behind a short IN-GAME-HOUR cooldown: an instant
@@ -35728,6 +35809,9 @@ async function maybeGenerateAmbientArbiter(
   });
   const messages = buildSystemPrompt(ctx);
   const t0 = Date.now();
+  // OTA-1074 — the situation this line is being composed FOR. Checked again
+  // before it speaks; see ambientStaleReason.
+  const stamp = takeAmbientStamp(get);
   lastAmbientGenStartMs = t0;
   // Arm the reactive cooldown too, so a scene-intro generation doesn't pile on
   // the lock the instant this one finishes.
@@ -35784,9 +35868,18 @@ async function maybeGenerateAmbientArbiter(
     // just logs and stays silent; there's no template fallback for ambient.
     // OTA-609 — also drop a near-duplicate of a recent Arbiter line (the model
     // rephrasing the same thought on a long journey) so it can't repeat 5-6×.
-    const ambientUsable = !!finalText && !generatedLineRepeatsRecent(get, finalText);
+    // OTA-1074 — has the world moved on while this was generating? Checked
+    // here rather than at the appendLog site so the debug marker can name the
+    // reason, and checked BEFORE the dup test because a stale line should read
+    // as stale in the log even when it also happens to be a repeat.
+    const staleReason = ambientStaleReason(get, stamp);
+    const ambientUsable = !staleReason && !!finalText && !generatedLineRepeatsRecent(get, finalText);
     if (ambientUsable) get().appendLog('arbiter', finalText);
-    get().appendLog('debug', `arbiter: ambient ${ambientUsable ? '✓' : finalText ? 'dup-dropped' : '∅'} ${Date.now() - t0}ms`);
+    const ambientMark = staleReason ? `stale:${staleReason}`
+      : ambientUsable ? '✓'
+      : finalText ? 'dup-dropped'
+      : '∅';
+    get().appendLog('debug', `arbiter: ambient ${ambientMark} ${Date.now() - t0}ms`);
     // OTA-1057 — WHY it was empty. The owner's logs show ∅ on every ambient
     // attempt across four builds, including one that carries the OTA-1054
     // register fix — so the register filter was NOT the whole story, and the ∅
