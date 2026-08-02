@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.79';
+export const DISPLAY_VERSION = '4.28.80';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19420,7 +19420,35 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // branch is gated on length === 1); ExplorationScreen guards length === 1;
 // talkDown's enemies[0] is a deliberate spokesperson.
 // DISPLAY_VERSION 4.28.79. 14 tests.
-export const OTA_BUILD_ID = '2026-08-02-1068-mixed-pack-announce';
+// ---------------------------------------------------------------------------
+// OTA-1069 — TITLES IN THE TUTORIAL (twin of golem 1046).
+// Owner: "you shouldn't be able to earn titles in the tutorial. what titles are
+// so easy to get that you earn them in the tutorial? they should take effort."
+// ANSWER, from the award table:
+//   etherbound_survivor  stormsSurvived >= 1
+//   aetheric_attuned     stormsSurvived >= 1 || maxCorruption >= 5
+//   stormcaller          stormsSurvivedWithCompanion >= 1
+// ...and stormsSurvived incremented on ANY tick of Etheric weather, decorative
+// ones included. One line of black rain in the tutorial room therefore paid out
+// TWO titles a millisecond apart (log 05:17:02), before the scripted climb was
+// finished. The player did nothing; the weather happened near them.
+// THREE CHANGES:
+//  1. recordTitleProgress returns early during the tutorial. Progress is not
+//     merely un-awarded, it is NOT RECORDED -- banking counters through a
+//     scripted sandbox and collecting on exit reads exactly as unearned.
+//  2. A storm tick counts only if the storm actually BIT (raw hpDelta < 0 or
+//     corruptionDelta > 0). Measured RAW, not post-resist, so owning the
+//     Aetheric resist perk can't stall progress toward Stormcaller.
+//  3. Real thresholds: survivor 12, stormcaller 10, attuned 20 (highest -- its
+//     perk halves ALL Aetheric damage), and attuned's corruption back door
+//     5 -> 15 so the || branch isn't free while the count branch is dear.
+// ⚠ STILL CHEAP, NOT CHANGED -- owner's call, flagged not silently redesigned:
+//   scion_of_the_giants is pure race+faction, earned at CHARACTER CREATION with
+//   zero gameplay. golem_whisperer is `!!player.golem`. architects_eye is one
+//   repair. Each is defensible as an identity/first-use payoff; none is effort.
+// DISPLAY_VERSION 4.28.80. 7 tests.
+export const OTA_BUILD_ID = '2026-08-02-1069-titles-take-effort';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1068-mixed-pack-announce';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1067-golem-card-in-line';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1066-dog-card-timing-palette-names';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1065-tutorial-voice-supersede';
