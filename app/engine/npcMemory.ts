@@ -19,6 +19,8 @@
 // they greet you with is indexed off the meeting count rather than picked at
 // random — varied across visits, identical on any replay of the same state.
 import type { NpcRelation, NpcMet, WorldMemory } from './types';
+// OTA-1075 — rememberNpcMeeting pairs the two stores; see below.
+import { recordNpcMet } from './worldMemory';
 
 /** Three separate arrivals in front of someone and they know your face. */
 export const MEETINGS_FOR_NAME = 3;
@@ -93,10 +95,48 @@ export function recordNpcSighting(
     role: npc.role ?? base.role,
     factionId: npc.factionId ?? base.factionId,
     meetings: base.meetings + 1,
+    // OTA-1075 — remember WHEN THEY LAST SAW YOU before overwriting it with
+    // "now". The greeting is composed after this write, so an absence line
+    // measured against lastSeenHours always saw a gap of zero. Undefined on a
+    // first meeting: someone cannot have missed you before they met you.
+    prevSeenHours: base.meetings > 0 ? base.lastSeenHours : undefined,
     lastSeenAt: opts.nowMs,
     lastSeenHours: opts.hoursElapsed,
   };
   return { ...seeded, npcRelations: { ...(seeded.npcRelations ?? {}), [npc.id]: next } };
+}
+
+/** OTA-1075 — THE ONE WAY TO RECORD MEETING SOMEBODY.
+ *
+ *  Two stores have to move together and they have opposite rules: `npcsMet` is
+ *  a list of PEOPLE and is idempotent (meeting someone twice does not make two
+ *  of them), while the relation counts EVERY arrival because repetition is the
+ *  only thing that turns a stranger into a regular.
+ *
+ *  OTA-1072 wired them as two calls at one site and left the other two
+ *  recordNpcMet sites (both Core Guardians) unpaired, so a Guardian appeared in
+ *  the Chronicle's people column with a blank where its regard should be. That
+ *  gap could reopen every time someone adds an NPC. Pairing them here makes the
+ *  correct thing the only convenient thing — callers cannot record half of it. */
+export function rememberNpcMeeting(
+  memory: WorldMemory,
+  npc: NpcMet,
+  opts: { nowMs: number; hoursElapsed: number },
+): WorldMemory {
+  // ⚠ SEED FIRST. OTA-1072 wrote these in the order (recordNpcMet, then
+  // recordNpcSighting) and that DOUBLE-COUNTED every first meeting: on a save
+  // with no npcRelations yet, the sighting's own seedRelationsFromMet ran
+  // against an npcsMet list that already contained the person just added, so it
+  // manufactured a relation at meetings=1 and then the sighting incremented it
+  // to 2. A first-ever arrival therefore read as a SECOND meeting — which
+  // OTA-1073's `seenBefore = meetings >= 2` turned into greeting a total
+  // stranger as a returning face.
+  //
+  // Seeding before the append makes the inner seed a no-op (npcRelations is
+  // already defined, even if empty), so the newly added row cannot be swept up
+  // as a pre-existing acquaintance.
+  const seeded = seedRelationsFromMet(memory);
+  return recordNpcSighting(recordNpcMet(seeded, npc), npc, opts);
 }
 
 /** Everything that is not just being in the room: trades, contracts, thefts.
@@ -151,10 +191,25 @@ export function npcRegard(rel: NpcRelation | null | undefined): NpcRegard {
   return 'met';
 }
 
-/** True when enough in-game time has passed that a greeting should say so. */
+/** True when enough in-game time has passed that a greeting should say so.
+ *
+ *  OTA-1075 — MUST be read AFTER this arrival's recordNpcSighting, which is
+ *  where the store calls it. The gap is measured against `prevSeenHours` (the
+ *  visit before this one), NOT `lastSeenHours` — the sighting sets that to the
+ *  current clock, so the original version compared now against now and returned
+ *  false every single time. The absence line was unreachable in play from the
+ *  day it shipped; the unit tests missed it because they hand-built relations
+ *  in which lastSeenHours still held the previous visit, so they were asserting
+ *  the rule without ever exercising the wiring.
+ *
+ *  Undefined prevSeenHours — a first meeting, or a relation migrated from a
+ *  pre-OTA-1072 save — is not an absence. There is no prior visit to be absent
+ *  from, and inventing one would greet a brand-new face with "it's been a long
+ *  stretch". */
 export function longAbsence(rel: NpcRelation | null | undefined, hoursNow: number): boolean {
   if (!rel || rel.meetings <= 0) return false;
-  return hoursNow - rel.lastSeenHours >= LONG_ABSENCE_HOURS;
+  if (rel.prevSeenHours === undefined) return false;
+  return hoursNow - rel.prevSeenHours >= LONG_ABSENCE_HOURS;
 }
 
 /** How this NPC addresses the player, out loud.

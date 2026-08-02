@@ -30,9 +30,9 @@ import {
   trainDogStat,
   type RescueScenarioId,
 } from '../engine/dogCompanion';
-import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse } from '../engine/worldMemory';
+import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse } from '../engine/worldMemory';
 // OTA-1072 — Phase 1: the per-person ledger the greeting layer reads.
-import { recordNpcSighting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName } from '../engine/npcMemory';
+import { rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName } from '../engine/npcMemory';
 // OTA-1073 — Phase 1 slice 2: turn-in credit, roadside recognition, gossip.
 import { gossipSubject, gossipLine } from '../engine/npcMemory';
 import {
@@ -7660,16 +7660,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         hoursElapsed: get().player?.hoursElapsed ?? 0,
         firstMetAt: Date.now(),
       };
-      // OTA-1072 — the milestone list stays idempotent (it is a list of people
-      // you have met, and meeting someone twice does not make two of them).
-      // The RELATION is the opposite: every arrival counts, because repetition
-      // is the only thing that turns a stranger into a regular.
+      // OTA-1075 — one call now records both stores (rememberNpcMeeting): the
+      // idempotent milestone list AND the per-arrival relation. They were two
+      // calls here and only here, which is how the two Guardian sites below
+      // ended up recording half of it.
       set((s) => ({
-        worldMemory: recordNpcSighting(
-          recordNpcMet(s.worldMemory, npcRecord),
-          npcRecord,
-          { nowMs: Date.now(), hoursElapsed: get().player?.hoursElapsed ?? 0 },
-        ),
+        worldMemory: rememberNpcMeeting(s.worldMemory, npcRecord, {
+          nowMs: Date.now(),
+          hoursElapsed: get().player?.hoursElapsed ?? 0,
+        }),
       }));
     }
     // For narration, use the first enemy as the scene representative.
@@ -9938,8 +9937,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
               });
               // OTA 454 — record the Guardian as a met NPC so they
               // show up in the NPCs Met milestone list.
+              // OTA-1075 — a Guardian is somebody you MET; before this it was
+              // listed in the Chronicle with a blank where its regard should be,
+              // because only the vendor site recorded a relation.
               set((s) => ({
-                worldMemory: recordNpcMet(s.worldMemory, {
+                worldMemory: rememberNpcMeeting(s.worldMemory, {
                   id: `guardian:${capitalId}`,
                   name: guardian.name,
                   role: 'Core Guardian',
@@ -9947,7 +9949,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   locationId: capitalId,
                   hoursElapsed: player.hoursElapsed ?? 0,
                   firstMetAt: Date.now(),
-                }),
+                }, { nowMs: Date.now(), hoursElapsed: player.hoursElapsed ?? 0 }),
               }));
               // Don't run the normal gate verb's effect this turn —
               // the Guardian is now the scene's focus. Skip the
@@ -28078,8 +28080,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hoursElapsed: player.hoursElapsed ?? 0,
       enemyName: guardian.name,
     });
+    // OTA-1075 — see the sibling site above: both Guardian spawns record the
+    // relation as well as the milestone row now.
     set((s) => ({
-      worldMemory: recordNpcMet(s.worldMemory, {
+      worldMemory: rememberNpcMeeting(s.worldMemory, {
         id: `guardian:${capitalId}`,
         name: guardian.name,
         role: 'Core Guardian',
@@ -28087,7 +28091,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         locationId: capitalId,
         hoursElapsed: player.hoursElapsed ?? 0,
         firstMetAt: Date.now(),
-      }),
+      }, { nowMs: Date.now(), hoursElapsed: player.hoursElapsed ?? 0 }),
     }));
     // Bounce to exploration so the boss card is visible to the
     // player immediately — no second tap required.
