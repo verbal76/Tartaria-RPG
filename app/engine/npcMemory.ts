@@ -143,7 +143,11 @@ export function npcRegard(rel: NpcRelation | null | undefined): NpcRegard {
   if (rel.wrongs > 0) return 'wronged';
   if (rel.contractsTurnedIn >= 2 || rel.tcTraded >= TC_FOR_TRUSTED) return 'trusted';
   if (rel.trades >= 3 || rel.contractsTurnedIn >= 1 || rel.tcTraded >= TC_FOR_FAMILIAR) return 'familiar';
-  if (rel.trades >= 1 || rel.meetings >= MEETINGS_FOR_NAME) return 'known';
+  // OTA-1073 — contractsTaken belongs on this rung. Slice 1 let it earn the
+  // player's NAME (knowsPlayerName) but not any regard, so someone who had
+  // handed you work was ranked below someone you had merely walked past three
+  // times. Found by a slice-2 test; the ladder was wrong, not the test.
+  if (rel.trades >= 1 || rel.contractsTaken >= 1 || rel.meetings >= MEETINGS_FOR_NAME) return 'known';
   return 'met';
 }
 
@@ -243,4 +247,86 @@ export function npcAbsenceLine(
   return line
     .replace(/\{npc\}/g, npcName)
     .replace(/\{name\}/g, npcAddress(rel, playerName));
+}
+
+// ---------------------------------------------------------------------------
+// OTA-1073 — PHASE 1, SLICE 2.
+// ---------------------------------------------------------------------------
+
+/** Player-facing name for a rung of the ladder, for the Chronicle's people
+ *  column. Deliberately plain nouns rather than a number: a relationship the
+ *  UI renders as "familiar" is legible; one it renders as "62" invites the
+ *  player to grind it. */
+export const REGARD_LABEL: Record<NpcRegard, string> = {
+  stranger: 'unknown',
+  met: 'seen once',
+  known: 'knows you',
+  familiar: 'a regular',
+  trusted: 'trusted',
+  wronged: 'wary of you',
+};
+
+/** One line of what has actually passed between you, for the Chronicle. Empty
+ *  string when nothing has — an honest blank beats inventing a history. */
+export function dealingsSummary(rel: NpcRelation | null | undefined): string {
+  if (!rel) return '';
+  const bits: string[] = [];
+  if (rel.trades > 0) bits.push(`${rel.trades} trade${rel.trades === 1 ? '' : 's'}`);
+  if (rel.tcTraded > 0) bits.push(`${rel.tcTraded} TC`);
+  const contracts = rel.contractsTurnedIn;
+  if (contracts > 0) bits.push(`${contracts} contract${contracts === 1 ? '' : 's'} finished`);
+  else if (rel.contractsTaken > 0) bits.push(`${rel.contractsTaken} taken`);
+  if (rel.wrongs > 0) bits.push(rel.wrongs === 1 ? 'caught stealing' : `caught stealing ×${rel.wrongs}`);
+  return bits.join(' · ');
+}
+
+/** Everyone the player has actually met, best-regarded first, for the
+ *  Chronicle. Ties break on meeting count so the list is stable. */
+const REGARD_RANK: NpcRegard[] = ['wronged', 'trusted', 'familiar', 'known', 'met', 'stranger'];
+export function knownPeople(memory: WorldMemory): NpcRelation[] {
+  const all = Object.values(memory.npcRelations ?? {}).filter((r) => r.meetings > 0);
+  return all.sort((a, b) => {
+    const d = REGARD_RANK.indexOf(npcRegard(a)) - REGARD_RANK.indexOf(npcRegard(b));
+    if (d !== 0) return d;
+    if (b.meetings !== a.meetings) return b.meetings - a.meetings;
+    return a.name.localeCompare(b.name);
+  });
+}
+
+/** Every fourth visit, a familiar face mentions someone else. Deterministic —
+ *  the cadence is read off the meeting count, not rolled — and rare on purpose:
+ *  Phase 0 was spent cutting the noise floor, and gossip that fires on every
+ *  arrival would put it straight back. */
+export const GOSSIP_EVERY = 4;
+
+/** Whoever this NPC would talk about: another person in the same faction the
+ *  player is genuinely well regarded by. Returns null when there is nobody
+ *  worth mentioning, which is most of the game — word only travels once the
+ *  player has actually built something for it to travel about. */
+export function gossipSubject(
+  memory: WorldMemory,
+  speaker: NpcRelation | null | undefined,
+): NpcRelation | null {
+  if (!speaker || !speaker.factionId) return null;
+  if (speaker.meetings <= 0 || speaker.meetings % GOSSIP_EVERY !== 0) return null;
+  const speakerRegard = npcRegard(speaker);
+  if (speakerRegard !== 'familiar' && speakerRegard !== 'trusted') return null;
+  const peers = knownPeople(memory).filter(
+    (r) => r.id !== speaker.id
+      && r.factionId === speaker.factionId
+      && (npcRegard(r) === 'familiar' || npcRegard(r) === 'trusted'),
+  );
+  return peers[0] ?? null;
+}
+
+export function gossipLine(
+  speakerName: string,
+  subject: NpcRelation,
+  playerName: string | null | undefined,
+): string {
+  // The subject is at familiar-or-better, which cannot be reached without real
+  // dealings, so they demonstrably know the player's name — npcAddress here is
+  // belt and braces rather than a live fallback.
+  const you = npcAddress(subject, playerName);
+  return `${speakerName} tilts their head. "${subject.name} mentioned you, ${you}. Said you were worth dealing with — and ${subject.name} doesn't say that about many."`;
 }
