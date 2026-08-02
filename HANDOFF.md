@@ -849,8 +849,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1074`**,
-**golem-line `2026-08-02-1051`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1075`**,
+**golem-line `2026-08-02-1052`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -859,9 +859,47 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.85**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.86**; ledger in `VERSION.md`.
 
-- **ARBITER COOLDOWN DISCIPLINE + STORY BEATS (2026-08-02, latest). BOTH LINES.**
+- **ABSENCE LINE + LEDGER COVERAGE (2026-08-02, latest). BOTH LINES.**
+  Three Phase 1 defects; two of them shipped in OTA-1072/1073.
+  **(1) The absence line was unreachable.** `recordNpcSighting` overwrites
+  `lastSeenHours` with the current clock the moment the player walks in, and
+  the greeting is composed **after** that write — so `longAbsence` compared now
+  against now and returned false every single time. *"It's been a long stretch
+  — I'd started asking after you"* could never appear on device.
+  ⚠ **The tests shipped green anyway.** `ota1072NpcMemory.test.ts` hand-built
+  relations in which `lastSeenHours` still held the *previous* visit, so it
+  asserted the rule while never once exercising the wiring. That is the third
+  distinct flavour of the "tests written from the implementation" problem in
+  this codebase — the first two guarded **defects**; this one guarded a
+  **contract the store does not satisfy**. The new suite drives
+  sighting-then-greet in the real order.
+  FIX in the **data**, not the call order: `prevSeenHours` carries the previous
+  visit's clock forward, so the greeting can be composed before, after, or
+  nowhere near the sighting and still be right.
+  **(2) Every first meeting was double-counted** — shipped in OTA-1072, found
+  by a 1075 test. `recordNpcMet` ran **before** `recordNpcSighting`, so on a
+  save with no `npcRelations` yet the sighting's own `seedRelationsFromMet`
+  swept up the row that had just been appended, manufactured a relation at
+  `meetings: 1`, and the sighting incremented it to 2. A first-ever arrival
+  read as a **second** meeting — and OTA-1073's `seenBefore = meetings >= 2`
+  turned that into greeting a total stranger as a returning face. Seeding
+  before the append makes the inner seed a no-op.
+  **(3) Only vendors were on the ledger.** Of the three `recordNpcMet` sites,
+  OTA-1072 paired only the vendor arrival; both Core Guardian sites recorded
+  the milestone row and nothing else, so a Guardian appeared in the Chronicle's
+  people column with a blank where its regard should be.
+  FIX: `rememberNpcMeeting()` is now the **one** way to record meeting somebody
+  and `gameStore` no longer imports `recordNpcMet` at all. Two calls at one
+  site is a pattern the next person to add an NPC will half-copy; one call
+  cannot be half-copied. A test asserts the store contains no unpaired
+  `recordNpcMet`, so the gap cannot reopen.
+  Files: `npcMemory.ts` (prevSeenHours, longAbsence, rememberNpcMeeting),
+  `types.ts` (`prevSeenHours`), `gameStore.ts` (3 sites through the helper),
+  `ota1052AbsenceAndCoverage.test.ts` (12).
+
+- **ARBITER COOLDOWN DISCIPLINE + STORY BEATS (2026-08-02). BOTH LINES.**
   Phase 0 items 3 and 4, both root-caused before any code moved.
   **(3) Interjections that don't follow from the last action.** ROOT CAUSE:
   every guard on the ambient path runs at generation **start** — no combat, not

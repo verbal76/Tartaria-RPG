@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.85';
+export const DISPLAY_VERSION = '4.28.86';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18520,7 +18520,41 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     NOT marked -- it already has the MISSION chip and the Contracts card, and
 //     if half the feed is a story beat the marker is wallpaper.
 // DISPLAY_VERSION 4.28.85. 15 tests.
-export const OTA_BUILD_ID = '2026-08-02-1051-arbiter-cooldown-story-beats';
+// OTA-1052 — THREE PHASE 1 DEFECTS, TWO OF THEM MINE FROM 1072/1073.
+//
+// (1) THE ABSENCE LINE WAS UNREACHABLE. recordNpcSighting overwrites
+//     lastSeenHours with the current clock the moment the player walks in, and
+//     the greeting is composed AFTER that write -- so longAbsence compared now
+//     against now and returned false every time. "It's been a long stretch --
+//     I'd started asking after you" could never appear on device.
+//     ⚠ THE TESTS SHIPPED GREEN. ota1072NpcMemory hand-built relations in which
+//     lastSeenHours still held the PREVIOUS visit, so it asserted the rule
+//     while never exercising the wiring. Third flavour of the "tests written
+//     from the implementation" problem here: the first two guarded DEFECTS,
+//     this one guarded a CONTRACT THE STORE DOES NOT SATISFY.
+//     FIX in the DATA, not the call order: new prevSeenHours carries the
+//     previous visit's clock forward, so the greeting can be composed before,
+//     after or nowhere near the sighting and still be right.
+//
+// (2) EVERY FIRST MEETING WAS DOUBLE-COUNTED (shipped in OTA-1072, found by a
+//     1075 test). recordNpcMet ran BEFORE recordNpcSighting, so on a save with
+//     no npcRelations yet the sighting's own seedRelationsFromMet swept up the
+//     row that had just been appended, manufactured a relation at meetings=1,
+//     and the sighting incremented it to 2. A first-ever arrival read as a
+//     SECOND meeting -- and OTA-1073's `seenBefore = meetings >= 2` turned that
+//     into greeting a total stranger as a returning face. Seeding before the
+//     append makes the inner seed a no-op.
+//
+// (3) ONLY VENDORS WERE ON THE LEDGER. Of the three recordNpcMet sites,
+//     OTA-1072 paired only the vendor arrival; both Core Guardian sites
+//     recorded the milestone row and nothing else, so a Guardian appeared in
+//     the Chronicle people column with a blank where its regard should be.
+//     FIX: rememberNpcMeeting() is now the ONE way to record meeting somebody,
+//     and gameStore no longer imports recordNpcMet at all. Two calls at one
+//     site is a pattern the next person will half-copy; one call cannot be.
+// DISPLAY_VERSION 4.28.86. 12 tests.
+export const OTA_BUILD_ID = '2026-08-02-1052-absence-line-and-ledger-coverage';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1051-arbiter-cooldown-story-beats';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1050-npc-memory-slice-2';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1049-npcs-remember-you';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1048-accept-burst-compaction';
