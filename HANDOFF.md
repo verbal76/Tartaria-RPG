@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1075`**,
-**golem-line `2026-08-02-1052`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1076`**,
+**golem-line `2026-08-02-1053`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,51 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.86**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.87**; ledger in `VERSION.md`.
 
-- **ABSENCE LINE + LEDGER COVERAGE (2026-08-02, latest). BOTH LINES.**
+- **LEDGER IDENTITY + AMENDS + RELATIONSHIP PRICES (2026-08-02, latest). BOTH LINES.**
+  The last Phase 1 residuals. Two were leaks I shipped.
+  **(1) Ledger identity was runtime identity.** `pickRoadsideTrader` mints
+  `roadside_<demeanor>_<Date.now()>` — a fresh id on **every** spawn — while
+  the trader's name and description come from a fixed archetype. One authored
+  character, split into unbounded one-encounter strangers. Two consequences,
+  both mine: OTA-1073's roadside recognition could never fire for the very
+  population it was written for (the relation was new every time), and — worse
+  — since OTA-1072 sights every vendor, **each spawn appended a permanent row
+  to both `npcsMet` and `npcRelations`**. Neither is capped, both persist, so a
+  long save accrued hundreds of dead rows and the Chronicle's people column
+  filled with strangers met once.
+  FIX: `vendorNpcId` keys roadside traders by **archetype**; the runtime id
+  keeps its per-spawn uniqueness because nothing reads past the `roadside_`
+  prefix. Plus `pruneSpawnKeyedRelations()` sweeps the rows 4.28.83–4.28.86
+  already leaked into live saves — self-healing on vendor arrival, a no-op when
+  clean. Those rows are worthless by construction: a spawn-unique key can never
+  be seen twice, so none of them holds a relationship that could still matter.
+  **(2) `wronged` was a life sentence.** OTA-1072 made it permanent and I
+  flagged it as the owner's call. Permanent is wrong — one failed DEX roll shut
+  a stall forever, in a game whose steal system exists to be attempted — but
+  cheap forgiveness would make theft free. **Amends:** coin spent at that stall
+  *after* the theft banks toward it at 600 TC per outstanding wrong, so a second
+  theft doubles the bill and a repeat thief digs faster than they fill.
+  ⚠ Settled against wrongs **outstanding when the patch arrived**, never one the
+  same patch adds — live code never does both at once, but a rule that depends
+  on callers behaving is not a rule.
+  **(3) Prices move on the relationship.** `regardPriceMult`: trusted 0.90,
+  familiar 0.95, wronged 1.25, everything else 1. Deliberately small — standing,
+  CHA/rapport, tides and war heat already move prices, and a relationship that
+  outswung all of them would be the only lever worth pulling. `regardMult` is
+  **optional** on `BuyPriceParts` so every existing caller stays byte-identical,
+  and is excluded from `strangerBuyPrice` on purpose: the existing *"you saved
+  N TC"* line now reports what being a regular is worth alongside the charm.
+  ⚠ **NOT done, and not fudged:** *"an NPC you know is killed / their outpost is
+  raided"* from the Phase 1 delta. Raids target the **player** — no offscreen
+  location-raid event exists at all — and the vendor-kill path converts the
+  vendor into a generic `Enemy` that no longer carries its ledger id. Both need
+  new plumbing, not a wire-up. Phase 3 work.
+  Files: `npcMemory.ts`, `vendorPricing.ts`, `types.ts`, `gameStore.ts`,
+  `ota1076LedgerIdentityAmendsPrices.test.ts` (21).
+
+- **ABSENCE LINE + LEDGER COVERAGE (2026-08-02). BOTH LINES.**
   Three Phase 1 defects; two of them shipped in OTA-1072/1073.
   **(1) The absence line was unreachable.** `recordNpcSighting` overwrites
   `lastSeenHours` with the current clock the moment the player walks in, and

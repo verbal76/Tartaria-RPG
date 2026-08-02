@@ -27,15 +27,27 @@ export interface BuyPriceParts {
   tideMult: number;
   /** Local war-heat buy multiplier (≥1). */
   warBuyMult: number;
+  /** OTA-1076 — how THIS person regards you (npcMemory.regardPriceMult).
+   *  Optional so every existing caller keeps its exact behaviour; absent means
+   *  1, i.e. the price is unaffected by the relationship. Bounded ±10% for
+   *  favour and +25% against, which is inside the swing CHA + tide already
+   *  produce, so it cannot open a buy-here-sell-there arbitrage. */
+  regardMult?: number;
 }
 
 /** The price the player actually pays for one unit (integer, floored at 1). */
 export function finalBuyPrice(base: number, p: BuyPriceParts): number {
-  return Math.max(1, Math.ceil(base * p.corruptionMult * (1 - p.buyDiscount) * p.tideMult * p.warBuyMult));
+  return Math.max(1, Math.ceil(
+    base * p.corruptionMult * (1 - p.buyDiscount) * p.tideMult * p.warBuyMult * (p.regardMult ?? 1),
+  ));
 }
 
 /** The same buy price WITHOUT the player's CHA/rapport discount — i.e. what a stranger
- *  would be charged here. Used to show how much the player's standing/charm saved them. */
+ *  would be charged here. Used to show how much the player's standing/charm saved them.
+ *
+ *  OTA-1076 — the regard multiplier is excluded here too, and that is the point:
+ *  a stranger has no regard, so the existing "you saved N TC" line now reports
+ *  what the RELATIONSHIP was worth as well as the charm. */
 export function strangerBuyPrice(base: number, p: BuyPriceParts): number {
   return Math.max(1, Math.ceil(base * p.corruptionMult * p.tideMult * p.warBuyMult));
 }
