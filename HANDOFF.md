@@ -861,7 +861,38 @@ on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
 re-architecture. Currently **4.28.73**; ledger in `VERSION.md`.
 
-- **TITLES TAKE EFFORT — no more legends from the tutorial (2026-08-02, latest). BOTH LINES.**
+- **THE LAST THREE FREE TITLES (2026-08-02, latest). BOTH LINES.**
+  OTA-1046 raised the storm family and flagged three more. Owner: *"fix the other
+  three."* Each was checked against its own canon requirement in
+  `arbiter-titles.json`, and in all three the code was not testing what the
+  canon asks for.
+  - **`scion_of_the_giants`** — canon *"PROVE direct descent from the Tartarian
+    Giants."* Code was `raceId === 'tartarian_giant' && a Giant-respecting
+    faction`: the DESCENT half only, and both values are chosen at CHARACTER
+    CREATION, so the title landed before the player had taken a single action.
+    Descent is now the prerequisite; **standing ≥ 25 with a Giant-respecting
+    faction is the proof**. 25 is the codebase's existing "they really like
+    you" tier (`gameStore` ~8081) rather than a number invented for this.
+  - **`golem_whisperer`** — canon *"Successfully CONTROL an Aether Golem."*
+    Code was `!!player.golem`. A golem standing beside you is not control. New
+    `golemStrikesLanded` counter, incremented at the golem's own hit site;
+    **15 landed strikes**.
+    - ⚠ **Deliberately NOT also gated on a live golem.** The title records what
+      you did; it must not blink out the moment a construct falls.
+  - **`architects_eye`** — canon *"Repair or restore a piece of ancient
+    Tartarian architecture."* Was ONE repair. Now **ten** — a body of work.
+  - **The blank-slate test is now total.** OTA-1046's "nothing earnable from a
+    blank slate" assertion had to exclude these three; with them fixed the
+    exclusion list is empty and the check covers the whole table. That is the
+    strongest form of the owner's rule and the thing to keep green.
+  - ⚠ **`titles.test.ts` asserted all three old behaviours** and was retargeted.
+    That makes THREE tests today found guarding a defect rather than an intent
+    — `dogOnboardingFuzz` pinned the three-name dog pool, `titles.test.ts`
+    pinned storm-threshold 1, and now this. Tests written from the
+    implementation lock in whatever the code happened to do that day. Worth
+    watching for across the rest of the suite.
+
+- **TITLES TAKE EFFORT — no more legends from the tutorial (2026-08-02). BOTH LINES.**
   Owner: *"you shouldn't be able to earn titles in the tutorial. what titles are
   so easy to get that you earn them in the tutorial? they should take effort."*
   - **The answer to the question**, straight from the award table:
