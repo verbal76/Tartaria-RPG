@@ -1756,6 +1756,10 @@ export interface WorldMemory {
    *  who they've actually spoken with. Optional + defaulted so
    *  legacy saves load cleanly. */
   npcsMet?: NpcMet[];
+  /** OTA-1072 — per-NPC relationship state, keyed by the same id as npcsMet.
+   *  Absent on saves written before that OTA; seedRelationsFromMet() migrates
+   *  them on first touch rather than in a save-load pass. */
+  npcRelations?: Record<string, NpcRelation>;
   /** OTA-120 — dog acquisition state machine, lives on world memory
    *  so it survives across screens. ALL player input routes through
    *  the onboarding handler when this is non-null. Cleared on
@@ -1874,6 +1878,32 @@ export interface NpcMet {
   hoursElapsed?: number;
   /** Unix ms timestamp of first meeting. */
   firstMetAt?: number;
+}
+
+/** OTA-1072 — the per-person ledger behind NpcMet. NpcMet answers "have you
+ *  ever stood in a room with this NPC"; this answers "what has passed between
+ *  you". Keyed by the same id. See app/engine/npcMemory.ts. */
+export interface NpcRelation {
+  id: string;
+  name: string;
+  role?: string;
+  factionId?: string;
+  /** Unix ms of the first sighting. */
+  firstMetAt: number;
+  /** Unix ms of the most recent sighting. */
+  lastSeenAt: number;
+  /** player.hoursElapsed at the most recent sighting — drives absence lines. */
+  lastSeenHours: number;
+  /** Scene arrivals in front of this NPC. NOT deduped; repetition is signal. */
+  meetings: number;
+  /** Completed buy/sell transactions. */
+  trades: number;
+  /** TC moved across their table, either direction. */
+  tcTraded: number;
+  contractsTaken: number;
+  contractsTurnedIn: number;
+  /** Thefts, attacks — anything that makes them watch your hands. */
+  wrongs: number;
 }
 
 export interface VisitedRoom {

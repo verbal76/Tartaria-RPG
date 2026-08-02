@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.82';
+export const DISPLAY_VERSION = '4.28.83';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19472,7 +19472,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // _resetAcceptBurst() is a test seam only -- the tracker is module-level and
 // transient by design, which would otherwise leak a burst across Jest cases.
 // DISPLAY_VERSION 4.28.82. 5 tests.
-export const OTA_BUILD_ID = '2026-08-02-1071-accept-burst-compaction';
+// OTA-1072 — PHASE 1, SLICE 1: NPCs REMEMBER YOU.
+// THE GAP: `recordNpcMet` is idempotent on id -- the second meeting with an
+// NPC returns the memory object UNCHANGED. So the only question the game could
+// answer about a person was "have you ever stood in a room with them". That is
+// a checklist, not a relationship. The only thing that ever varied a vendor's
+// greeting was the player's standing with their FACTION -- a number shared
+// with hundreds of strangers, which cannot tell a shopkeeper whether you have
+// ever bought anything from THEM. One greeting line read "the kind of nod that
+// knows your name" and then did not say the name.
+// NEW: app/engine/npcMemory.ts -- a per-person ledger (meetings, trades,
+// tcTraded, contractsTaken/TurnedIn, wrongs, first/last seen) on
+// worldMemory.npcRelations, keyed by the same id as npcsMet.
+// DETERMINISM IS THE FEATURE, per the owner: "make it deterministic per NPC."
+// arbiterAddress names the player on a ~60% per-line coin flip (OTA-635) and
+// that works because the Arbiter is ONE continuous voice; per NPC it would
+// read as a fault -- a shopkeeper who uses your name, then doesn't, then does,
+// has a head injury. So BOTH axes are pure functions of stored state: whether
+// they know your name, and which greeting variant they use (indexed off the
+// meeting count, never rolled -- varied across visits, identical on replay).
+// THE NAME IS EARNED: 1 trade, 1 contract, 1 wrong, or 3 visits. A stranger
+// gets "traveler". ⚠ The wrong counts DELIBERATELY -- the person you stole
+// from learns your name faster than the one you bought bread from.
+// Regard ladder (monotone, wronged outranks everything): stranger / met /
+// known / familiar / trusted / wronged. You cannot buy your way back to
+// friendly; 99,999 TC of custom does not offset a knife at the stall.
+// Wired: sighting at the vendor-arrival site (recordNpcMet stays idempotent
+// alongside it -- the milestone list is a list of PEOPLE), buys, sells,
+// contract accepts, and the CAUGHT branch of theft only. A theft they never
+// noticed cannot change how they greet you: the ledger records what the NPC
+// KNOWS, not what the player did.
+// A bulk buy/sell is ONE piece of business, not one per unit -- counting units
+// would let a single stack purchase vault a stranger to "trusted".
+// MIGRATION: seedRelationsFromMet() promotes pre-OTA saves on first touch, so
+// a player forty hours in is not demoted to a stranger by an update.
+// NOT in this slice (slice 2): turn-in credit, roadside/non-anchor traders,
+// the Chronicle people column, NPC-to-NPC gossip.
+// DISPLAY_VERSION 4.28.83. 35 tests.
+export const OTA_BUILD_ID = '2026-08-02-1072-npcs-remember-you';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1071-accept-burst-compaction';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1070-last-three-titles';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1069-titles-take-effort';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1068-mixed-pack-announce';
