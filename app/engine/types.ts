@@ -1892,8 +1892,15 @@ export interface NpcRelation {
   firstMetAt: number;
   /** Unix ms of the most recent sighting. */
   lastSeenAt: number;
-  /** player.hoursElapsed at the most recent sighting — drives absence lines. */
+  /** player.hoursElapsed at the most recent sighting. */
   lastSeenHours: number;
+  /** OTA-1075 — player.hoursElapsed at the sighting BEFORE the most recent one.
+   *  This is what an absence line actually needs. `lastSeenHours` is overwritten
+   *  with "now" the moment the player walks in, and the greeting is composed
+   *  after that, so measuring the gap against it always yielded zero — the
+   *  absence line was unreachable in play. Undefined on a first meeting and on
+   *  relations migrated from a pre-OTA-1072 save. */
+  prevSeenHours?: number;
   /** Scene arrivals in front of this NPC. NOT deduped; repetition is signal. */
   meetings: number;
   /** Completed buy/sell transactions. */
