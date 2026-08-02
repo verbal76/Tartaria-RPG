@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { withArticle, withArticleCap, anOrA, theCap, theLower } from '../engine/grammar';
+import { withArticle, withArticleCap, anOrA, theCap, theLower, describeEnemyPartyCap } from '../engine/grammar';
 import type {
   PlayerCharacter,
   WorldMemory,
@@ -8028,9 +8028,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
     if (enemies.length > 1) {
+      // OTA-1045 — say who is ACTUALLY here. This line used to pluralise the
+      // first enemy's name across the whole count, which is only correct for a
+      // homogeneous party. pickGroupForLocation does spawn clones, but OTA-808
+      // (menace) and OTA-817 (mixed-role packs) both append members of a
+      // DIFFERENT kind -- rollExtraPackMembers guarantees a different name --
+      // so every mixed pack was announced as N copies of its first member. The
+      // narration path at ~7623 explicitly delegates "surface the rest of the
+      // group" to THIS line; it wasn't doing it.
       get().appendLog(
         'combat',
-        `${enemies.length} ${enemies[0]!.name}${enemies.length > 1 ? 's' : ''} close on you. Tap the right-side panel to cycle targets.`,
+        `${describeEnemyPartyCap(enemies.map((e) => e.name))} close on you. Tap the right-side panel to cycle targets.`,
       );
     }
     // Announce any landed chain-hook so the player knows the thread continued.

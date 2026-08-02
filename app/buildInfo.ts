@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.78';
+export const DISPLAY_VERSION = '4.28.79';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18303,7 +18303,35 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // a golem is a thing you MADE and are sealing a name into. A test pins the two
 // pools apart so they can't drift together.
 // DISPLAY_VERSION 4.28.78. 9 tests.
-export const OTA_BUILD_ID = '2026-08-01-1044-golem-card-in-line';
+// ---------------------------------------------------------------------------
+// OTA-1045 — "2 SCRAP DRONES CLOSE ON YOU", THEN A MUD WASP ATTACKS
+// (twin of HAL 1068).
+// Owner log 4.28.75 @ 23:41:56. ROOT CAUSE, not a typo:
+//   The announcer read `${n} ${enemies[0].name}s close on you` -- true only
+//   for a HOMOGENEOUS party. That invariant DID hold when it was written:
+//   pickGroupForLocation was the only multi-enemy source and it spawns `count`
+//   copies of ONE prototype.
+//   Two later features broke it, neither revisited the announcer:
+//     - OTA-808 (menace pressure) appends an independent ladder pick.
+//     - OTA-817 (mixed-role packs) appends members GUARANTEED to differ --
+//       rollExtraPackMembers filters the pool by usedNames and prefers an
+//       unused type. Every pack it makes is heterogeneous BY DESIGN, so the
+//       announcer wasn't occasionally wrong on those; it was always wrong.
+//   Compounding: gameStore ~7623 says narration names only the first enemy as
+//   "the scene representative" because "the full group is surfaced via the
+//   EnemyPanel + a follow-up line when it's actually a pack." THIS announcer
+//   is that follow-up line. It had been delegated the job and wasn't doing it.
+// FIX: grammar.ts gains pluralizeNoun + describeEnemyParty/Cap. Groups by name,
+// keeps first-seen order (so the lead matches the enemy narration already
+// named), counts duplicates, joins with correct articles and a serial comma.
+//   [Drone, Wasp]        -> "A Scrap Drone and a Mud Wasp close on you."
+//   [Mudling x3]         -> "3 Mudlings close on you."   (unchanged)
+// SWEPT, no change needed: EnemyPanel FlatLists every member (its single-card
+// branch is gated on length === 1); ExplorationScreen guards length === 1;
+// talkDown's enemies[0] is a deliberate spokesperson.
+// DISPLAY_VERSION 4.28.79. 14 tests.
+export const OTA_BUILD_ID = '2026-08-02-1045-mixed-pack-announce';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1044-golem-card-in-line';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1043-dog-card-timing-palette-names';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1042-tutorial-voice-supersede';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1041-ota-teardown-parallel';
