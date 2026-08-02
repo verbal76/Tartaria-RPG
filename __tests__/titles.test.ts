@@ -9,6 +9,9 @@ import {
   WIRED_TITLE_IDS,
   STORM_TICKS_FOR_ATTUNED,
   STORM_TICKS_FOR_STORMCALLER,
+  STANDING_FOR_SCION,
+  GOLEM_STRIKES_FOR_WHISPERER,
+  REPAIRS_FOR_ARCHITECTS_EYE,
 } from '../app/engine/titles';
 import type { PlayerCharacter } from '../app/engine/types';
 
@@ -73,17 +76,37 @@ describe('titles — earning engine', () => {
   });
 
   it('derived titles: Scion (race+faction), Explorer (locations), Golem (companion), Aetherborn (race+corruption)', () => {
-    expect(evaluateEarnedTitles(mk({ raceId: 'tartarian_giant', factionId: 'servants_of_giants' }))).toContain('scion_of_the_giants');
-    expect(evaluateEarnedTitles(mk({ raceId: 'tartarian_giant', factionId: 'mud_monarchs' }))).not.toContain('scion_of_the_giants');
+    // OTA-1070 — descent alone used to award this, and both fields are set at
+    // CHARACTER CREATION, so the assertion below was pinning "earned for free".
+    // Canon asks the player to PROVE descent; standing is the proof.
+    expect(evaluateEarnedTitles(mk({ raceId: 'tartarian_giant', factionId: 'servants_of_giants' }))).not.toContain('scion_of_the_giants');
+    expect(evaluateEarnedTitles(mk({
+      raceId: 'tartarian_giant', factionId: 'servants_of_giants',
+      factionStanding: [{ factionId: 'servants_of_giants', standing: STANDING_FOR_SCION }],
+    }))).toContain('scion_of_the_giants');
+    expect(evaluateEarnedTitles(mk({
+      raceId: 'tartarian_giant', factionId: 'mud_monarchs',
+      factionStanding: [{ factionId: 'mud_monarchs', standing: STANDING_FOR_SCION }],
+    }))).not.toContain('scion_of_the_giants');
     expect(evaluateEarnedTitles(mk({ mainQuest: { coresRecovered: ['asgardar'] } }))).toContain('etheric_explorer');
-    expect(evaluateEarnedTitles(mk({ golem: { hp: 10 } }))).toContain('golem_whisperer');
+    // OTA-1070 — was `!!player.golem`. Canon asks for CONTROL, so the golem has
+    // to have actually fought for you.
+    expect(evaluateEarnedTitles(mk({ golem: { hp: 10 } }))).not.toContain('golem_whisperer');
+    expect(evaluateEarnedTitles(mk({
+      golem: { hp: 10 },
+      titleProgress: withTitleProgress({ golemStrikesLanded: GOLEM_STRIKES_FOR_WHISPERER }),
+    }))).toContain('golem_whisperer');
     expect(evaluateEarnedTitles(mk({ raceId: 'aetherborn', corruption: 12 }))).toContain('aetherborn_awakened');
     expect(evaluateEarnedTitles(mk({ raceId: 'aetherborn', corruption: 4 }))).not.toContain('aetherborn_awakened');
   });
 
   it('fusion + repair award their titles', () => {
     expect(evaluateEarnedTitles(mk({ titleProgress: withTitleProgress({ fusionsCompleted: 1 }) }))).toContain('master_of_aethercraft');
-    expect(evaluateEarnedTitles(mk({ titleProgress: withTitleProgress({ repairsCompleted: 1 }) }))).toContain('architects_eye');
+    // OTA-1070 — was 1 repair.
+    expect(evaluateEarnedTitles(mk({ titleProgress: withTitleProgress({ repairsCompleted: 1 }) }))).not.toContain('architects_eye');
+    expect(evaluateEarnedTitles(mk({
+      titleProgress: withTitleProgress({ repairsCompleted: REPAIRS_FOR_ARCHITECTS_EYE }),
+    }))).toContain('architects_eye');
   });
 
   it('newlyEarnedTitles excludes already-earned', () => {

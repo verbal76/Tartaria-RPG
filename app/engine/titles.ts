@@ -55,6 +55,10 @@ export interface TitleProgress {
   maxCorruption: number;
   /** Storms survived while a companion (dog/golem) was alive. */
   stormsSurvivedWithCompanion: number;
+  /** OTA-1070 — strikes your golem has LANDED. golem_whisperer's canon is
+   *  "successfully control an Aether Golem"; merely having one stand beside
+   *  you was never control. */
+  golemStrikesLanded: number;
   // ── Tier-C challenge counters (arb46) ─────────────────────────────────
   // These only increment from the location-challenge completion sites,
   // which are gated OFF behind locationChallenges.TIER_C_ENABLED — so these
@@ -87,6 +91,7 @@ export const EMPTY_TITLE_PROGRESS: TitleProgress = {
   loreRead: 0,
   maxCorruption: 0,
   stormsSurvivedWithCompanion: 0,
+  golemStrikesLanded: 0,
   languageLearned: 0,
   labyrinthCleanRuns: 0,
   settlementsDefended: 0,
@@ -189,7 +194,11 @@ export const WIRED_TITLES: TitleDef[] = [
   },
   {
     id: 'scion_of_the_giants',
-    earned: (pl) => pl.raceId === 'tartarian_giant' && GIANT_RESPECTING_FACTIONS.has(pl.factionId),
+    // OTA-1070 — was descent alone, both fields set at character creation.
+    // Descent is the prerequisite; standing is the proof.
+    earned: (pl) => pl.raceId === 'tartarian_giant'
+      && GIANT_RESPECTING_FACTIONS.has(pl.factionId)
+      && provenToGiantKin(pl),
     perk: (a) => { a.socialBonus += 2; },
   },
   {
@@ -201,7 +210,11 @@ export const WIRED_TITLES: TitleDef[] = [
   },
   {
     id: 'golem_whisperer',
-    earned: (pl) => !!pl.golem,
+    // OTA-1070 — was `!!pl.golem`: summon once, hold the title. Canon asks for
+    // CONTROL, so the golem has to have fought for you. Deliberately NOT also
+    // gated on a golem being alive right now — the title is a record of what
+    // you did, and it should not blink out when a golem falls.
+    earned: (_pl, p) => p.golemStrikesLanded >= GOLEM_STRIKES_FOR_WHISPERER,
     perk: (a) => { a.golemEdge = true; },
   },
   // ── Tier B (substitute mappings) ──────────────────────────────────────
@@ -212,7 +225,8 @@ export const WIRED_TITLES: TitleDef[] = [
   },
   {
     id: 'architects_eye',
-    earned: (_pl, p) => p.repairsCompleted >= 1,
+    // OTA-1070 — was 1. One patch job is not an eye for architecture.
+    earned: (_pl, p) => p.repairsCompleted >= REPAIRS_FOR_ARCHITECTS_EYE,
     perk: (a) => { a.repairBonus += 2; },
   },
   {
@@ -329,6 +343,43 @@ export function isHiddenTitle(id: string): boolean {
 //
 // aetheric_attuned is pitched highest of the three because its perk is the
 // strongest: it HALVES all Aetheric damage, in combat and from weather.
+// ---------------------------------------------------------------------------
+// OTA-1070 — the last three free titles.
+//
+// OTA-1069 raised the storm family and flagged these as still cheap. The owner:
+// "fix the other three." Each was checked against its own canon requirement in
+// arbiter-titles.json, and in all three cases the code was not testing what the
+// canon actually asks for:
+//
+//   scion_of_the_giants  canon: "PROVE direct descent from the Tartarian Giants"
+//     was: raceId === 'tartarian_giant' && a giant-respecting faction. That is
+//     the DESCENT half and nothing else -- both values are set at character
+//     creation, so the title landed before the player had acted at all. Descent
+//     is now the prerequisite and the PROOF is standing: the faction that
+//     honours the Giants has to actually honour YOU. 25 is the codebase's
+//     existing "they really like you" tier (gameStore ~8081).
+//
+//   golem_whisperer      canon: "Successfully CONTROL an Aether Golem"
+//     was: `!!player.golem` -- a golem standing next to you is not control. Now
+//     the golem has to have fought for you: landed strikes, counted at the
+//     golem's own hit site.
+//
+//   architects_eye       canon: "Repair or restore a piece of ancient Tartarian
+//     architecture" -- was ONE repair. A single patch job is not an eye for
+//     architecture; ten is a body of work.
+export const STANDING_FOR_SCION = 25;
+export const GOLEM_STRIKES_FOR_WHISPERER = 15;
+export const REPAIRS_FOR_ARCHITECTS_EYE = 10;
+
+/** True when any Giant-respecting faction holds the player in real regard.
+ *  The "prove" half of scion_of_the_giants. */
+function provenToGiantKin(pl: PlayerCharacter): boolean {
+  const standings = pl.factionStanding ?? [];
+  return standings.some(
+    (fs) => GIANT_RESPECTING_FACTIONS.has(fs.factionId) && fs.standing >= STANDING_FOR_SCION,
+  );
+}
+
 export const STORM_TICKS_FOR_SURVIVOR = 12;
 export const STORM_TICKS_FOR_ATTUNED = 20;
 export const STORM_TICKS_FOR_STORMCALLER = 10;

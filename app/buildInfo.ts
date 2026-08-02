@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.80';
+export const DISPLAY_VERSION = '4.28.81';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19447,7 +19447,35 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   zero gameplay. golem_whisperer is `!!player.golem`. architects_eye is one
 //   repair. Each is defensible as an identity/first-use payoff; none is effort.
 // DISPLAY_VERSION 4.28.80. 7 tests.
-export const OTA_BUILD_ID = '2026-08-02-1069-titles-take-effort';
+// ---------------------------------------------------------------------------
+// OTA-1070 — THE LAST THREE FREE TITLES (twin of golem 1047).
+// OTA-1069 raised the storm family and flagged three more as still cheap. Owner:
+// "fix the other three." Each was checked against its OWN canon requirement in
+// arbiter-titles.json; in all three the code was not testing what canon asks.
+//   scion_of_the_giants | canon "PROVE direct descent from the Tartarian Giants"
+//     was raceId + faction -- the DESCENT half alone, and both are chosen at
+//     CHARACTER CREATION, so it landed before the player acted. Descent is now
+//     the prerequisite and standing >= 25 with a Giant-respecting faction is the
+//     proof. 25 is the codebase's existing "they really like you" tier
+//     (gameStore ~8081), not a number invented here.
+//   golem_whisperer | canon "Successfully CONTROL an Aether Golem"
+//     was `!!player.golem`. A golem standing beside you is not control. New
+//     counter golemStrikesLanded, incremented at the golem's own hit site;
+//     15 landed strikes. ⚠ Deliberately NOT also gated on a live golem -- the
+//     title records what you DID and must not blink out when a construct falls.
+//   architects_eye | canon "Repair or restore ancient Tartarian architecture"
+//     was ONE repair. Ten is a body of work.
+// With these fixed, OTA-1069's "nothing earnable from a blank slate" test no
+// longer needs its sheet-gated exclusion list -- the assertion now covers the
+// WHOLE table, which is the strongest form of the owner's rule.
+// ⚠ titles.test.ts asserted all three old behaviours and was retargeted. That
+// is the THIRD test today found guarding a defect rather than an intent
+// (dogOnboardingFuzz pinned the 3-name pool; titles.test.ts pinned storm
+// threshold 1). Tests written from the implementation lock in whatever the code
+// happened to do that day.
+// DISPLAY_VERSION 4.28.81. 12 tests.
+export const OTA_BUILD_ID = '2026-08-02-1070-last-three-titles';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1069-titles-take-effort';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1068-mixed-pack-announce';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1067-golem-card-in-line';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-01-1066-dog-card-timing-palette-names';
