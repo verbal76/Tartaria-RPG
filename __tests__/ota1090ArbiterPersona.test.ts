@@ -366,15 +366,31 @@ describe('OTA-1090 — the remark itself', () => {
     expect(seen.size).toBeGreaterThan(3);
   });
 
-  it('⚠ NO {slot} ever reaches the feed, across the whole matrix', () => {
+  it('⚠ NO {slot} ever reaches the feed, across the whole stance × tone matrix', () => {
+    // Regard is genuinely VARIED here rather than looped over and ignored — a
+    // test that names a dimension it does not exercise is the ota1041 problem,
+    // where the assertion checked argument ORDER while its name claimed
+    // something else. These three fixtures land in hard / plain / close.
     const memory = wm([rel({ id: 'npc:a', name: 'Ande', wrongs: 1, amendsCleared: 1, gifts: [{ name: 'x', atHours: 0 }] })]);
+    const tones = new Set<string>();
     for (let cores = 0; cores <= 9; cores++) {
-      for (const band of REGARD_ORDER) {
-        void band;
+      for (const shape of ['hated', 'neutral', 'loved'] as const) {
         const p = withCores(cores);
         p.corruption = 90;
         p.titleProgress = { relicsPreserved: 3 } as never;
         p.storyChoices = { debt_collector: 'pay_partial' };
+        if (shape === 'hated') {
+          p.menace = 400; p.corruption = 100;
+          p.factionStanding = [{ factionId: 'a', standing: -100 }] as never;
+          p.titleProgress = { relicsTraded: 20 } as never;
+          p.storyChoices = { debt_claim: 'sell_the_claim' };
+        }
+        if (shape === 'loved') {
+          p.corruption = 0; p.pressure = 'bury_me';
+          p.titleProgress = { loreRead: 99, relicsPreserved: 99 } as never;
+          p.factionStanding = [{ factionId: 'a', standing: 100 }] as never;
+        }
+        tones.add(toneFor(regardOf(p, memory)));
         for (let n = 0; n < 20; n++) {
           const line = arbiterRemark(p, memory, n);
           expect(line).not.toBeNull();
@@ -382,6 +398,8 @@ describe('OTA-1090 — the remark itself', () => {
         }
       }
     }
+    // ...and all three tones were actually reached, not just looped past.
+    expect([...tones].sort()).toEqual(['close', 'hard', 'plain']);
   });
 
   it('a negative or absurd counter is handled rather than crashing', () => {
@@ -405,6 +423,10 @@ describe('OTA-1090 — the beats fire once, and only one at a time', () => {
   it('⚠ stance outranks regard when both are due', () => {
     const p = withCores(3);
     p.titleProgress = { loreRead: 99, relicsPreserved: 9 } as never;
+    // The earlier arc beats are already spoken, so 'invested' is the lowest
+    // unspoken stance — OTA-1091 made the walk start from the bottom, and a
+    // fixture that skipped that would be asserting the old bug.
+    p.arbiterBeatsSeen = [stanceBeatKey('witness'), stanceBeatKey('interested')];
     const beat = dueArbiterBeat(p, wm([rel({ amendsCleared: 9 })]));
     expect(beat?.key).toBe(stanceBeatKey('invested'));
   });
@@ -430,6 +452,49 @@ describe('OTA-1090 — the beats fire once, and only one at a time', () => {
     // Regard moves both ways, so hovering on a boundary must not re-fire.
     const seen = [stanceBeatKey('witness'), regardBeatKey('even')];
     expect(dueArbiterBeat(pc({ arbiterBeatsSeen: seen }), wm())).toBeNull();
+  });
+
+  it('⚠ crossing two thresholds at once does not DROP the beat in between', () => {
+    // OTA-1091, found by the phases 0-5 playtest harness: a run walked to nine
+    // Cores and came back having heard witness / invested / implicated / named
+    // — 'interested' never fired, because dueArbiterBeat only ever offered the
+    // CURRENT stance and 'interested' was behind the player by the next
+    // arrival. A chapter of the arc vanishing quietly is precisely what the
+    // derive-from-the-save design was chosen to make impossible.
+    let seen: string[] = [];
+    // Jump straight from nothing to the top, the way an offline catch-up or
+    // two Guardians in a row would.
+    const p = () => {
+      const c = withCores(9);
+      c.arbiterBeatsSeen = seen;
+      return c;
+    };
+    const fired: string[] = [];
+    for (let i = 0; i < 12; i++) {
+      const beat = dueArbiterBeat(p(), wm());
+      if (!beat) break;
+      fired.push(beat.key);
+      seen = recordArbiterBeat(seen, beat.key);
+    }
+    // Every stance beat, in arc order, one per call.
+    expect(fired.filter((k) => k.startsWith('stance:')))
+      .toEqual(STANCE_ORDER.map((s) => stanceBeatKey(s)));
+  });
+
+  it('...and a stance the run has NOT reached is never offered early', () => {
+    let seen: string[] = [];
+    const fired: string[] = [];
+    for (let i = 0; i < 12; i++) {
+      const c = withCores(2); // 'interested' — 'invested' needs 3
+      c.arbiterBeatsSeen = seen;
+      const beat = dueArbiterBeat(c, wm());
+      if (!beat) break;
+      fired.push(beat.key);
+      seen = recordArbiterBeat(seen, beat.key);
+    }
+    expect(fired).toContain(stanceBeatKey('interested'));
+    expect(fired).not.toContain(stanceBeatKey('invested'));
+    expect(fired).not.toContain(stanceBeatKey('named'));
   });
 
   it('every stance and every band has a beat to fire', () => {

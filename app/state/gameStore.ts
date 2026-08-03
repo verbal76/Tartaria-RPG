@@ -9196,9 +9196,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // without modifiers. Suppressed on the opening scene — the weather
     // description is woven into the opening paragraph instead, so a
     // brand-new player isn't greeted with a mechanical line break.
+    // ⚠ OTA-1091 — ...and only when the sky has CHANGED. This fired on every
+    // beginScene, and OTA-1017 made weather persist per location for six game
+    // hours, so an unchanged sky re-announced itself at every single arrival —
+    // sixteen identical lines in one walk of the playtest harness. The player
+    // needs to know what is pressing on them; they do not need to be told the
+    // same thing every time they cross a tile. Keyed on the WEATHER rather than
+    // the location so calm → storm → calm still says all three.
     const weatherMods = describeWeatherStatModifiers(weather);
-    if (weatherMods && !opts?.isOpening) {
+    if (weatherMods && !opts?.isOpening && get().player?.weatherEffectSeen !== weather.id) {
       get().appendLog('system', `Weather effect — ${weather.name}: ${weatherMods}`);
+      const nowP = get().player;
+      if (nowP) set({ player: { ...nowP, weatherEffectSeen: weather.id } });
     }
     // Phase 4 §3.3 — the "Radar" block. Deterministic compass summary so
     // the player ALWAYS knows where they are and what's in each cardinal

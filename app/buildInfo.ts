@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.1';
+export const DISPLAY_VERSION = '4.29.2';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20445,7 +20445,44 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // personality that only exists while a 0.5B model happens to be warm is not a
 // personality, so everything else here is authored.
 // DISPLAY_VERSION 4.29.1. 55 tests.
-export const OTA_BUILD_ID = '2026-08-03-1090-arbiter-persona';
+//
+// OTA-1091 — ACTIVE PLAYTEST OF PHASES 0-5, AND THE TWO THINGS IT FOUND.
+//
+// Owner: "lets do active play testing on phases 0-5."
+//
+// __tests__/playtestPhases0to5.test.ts is a harness that does not test a unit.
+// It PLAYS: starts a character, seeds Math.random so the run is repeatable,
+// walks 64 steps through `travelTo` and `submitPlayerAction` — the same two
+// entry points a thumb drives — answers whatever the story asks, and then
+// reads the FEED and asks of each phase "did the player actually SEE this?"
+//
+// That is the OTA-1087 lesson made permanent. Every other suite here asks
+// whether content is authored and gated; 621 green ones did that while most of
+// Phase 2 was unreachable. This one asks whether a route reaches it, and it
+// grades only the channels the player can actually read (the hidden-channel
+// list moved to engine/gameLog so the harness and AdventureFeed cannot drift).
+//
+// ⚠ FINDING 1 — THE SKY REPEATED ITSELF SIXTEEN TIMES. "Weather effect —
+// Eerie Calm: +1 WIS" fired on every beginScene, and OTA-1017 persists weather
+// per location for six game-hours, so an UNCHANGED sky re-announced itself at
+// every arrival. Now gated on player.weatherEffectSeen — keyed on the WEATHER
+// rather than the tile, so calm → storm → calm still says all three and four
+// calm tiles in a row say it once.
+//
+// ⚠ FINDING 2 — THE ARC SILENTLY SKIPPED A CHAPTER, and it was mine, one OTA
+// old. The digest came back with `witness, invested, implicated, named`:
+// 'interested' NEVER FIRED. dueArbiterBeat only ever offered the CURRENT
+// stance, so crossing two Core thresholds between two arrivals put the
+// intermediate beat permanently behind the player — never due again. It now
+// walks UP from the lowest unspoken stance, so an over-levelled run delivers
+// the missed beats in order, one per arrival, and the arc still reads in
+// sequence. A chapter vanishing quietly is exactly what "derive it from the
+// save" was chosen to make impossible, and Phase 5 put it straight back in.
+//
+// Both findings are the harness earning its keep on its first run.
+// DISPLAY_VERSION 4.29.2. 19 playtest assertions + 2 regression tests.
+export const OTA_BUILD_ID = '2026-08-03-1091-playtest-phases-0-5';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1090-arbiter-persona';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1089-pressure-difficulty';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1088-story-forks';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1087-talk-doors-and-audit';
