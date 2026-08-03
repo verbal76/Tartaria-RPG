@@ -36,7 +36,7 @@ import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
 import { enemyIsAerial } from '../engine/enemyTraits';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
-import { PickpocketModal } from '../components/PickpocketModal';
+import { PickpocketSheet } from '../components/PickpocketSheet';
 import { MissionBoardModal } from '../components/MissionBoardModal';
 import { FusionPickerModal } from '../components/FusionPickerModal';
 import { FusionBlockedModal } from '../components/FusionBlockedModal';
@@ -938,6 +938,19 @@ export function ExplorationScreen() {
           <TalkSheet />
         ) : pendingParley ? (
           <ParleySheet />
+        ) : pickpocketOpen ? (
+          // OTA-1100 — the pickpocket picker joins the slot: choose the mark
+          // at the bottom, the Stealth roll and outcome land in the feed.
+          <PickpocketSheet
+            vendorName={currentScene?.vendor?.name}
+            vendorOffers={(currentScene?.vendor?.offers ?? []).map((o) => o.itemName)}
+            npcHints={currentScene?.vendor ? [] : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])}
+            onSubmit={(target) => {
+              setPickpocketOpen(false);
+              useGameStore.getState().stealthTakeAmbientNoun(target);
+            }}
+            onCancel={() => setPickpocketOpen(false)}
+          />
         ) : (
           <>
           {/* OTA-841 [did-you-mean] — after a low-confidence / unresolved parse, the
@@ -1650,21 +1663,11 @@ export function ExplorationScreen() {
         onCancel={() => setApproachOpen(false)}
       />
 
-      {/* OTA-847 (STEALTH SYSTEM) — PICKPOCKET picker (peaceful). Vendor offers
-          become lift targets; ambient nouns become opportunistic grabs. Routes
-          to stealthTakeAmbientNoun, which dispatches vendor theft (Stealth vs
-          the vendor's DC, high-STE quiet-fail) or a sleight-of-hand grab. */}
-      <PickpocketModal
-        visible={pickpocketOpen}
-        vendorName={currentScene?.vendor?.name}
-        vendorOffers={(currentScene?.vendor?.offers ?? []).map((o) => o.itemName)}
-        npcHints={currentScene?.vendor ? [] : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])}
-        onSubmit={(target) => {
-          setPickpocketOpen(false);
-          useGameStore.getState().stealthTakeAmbientNoun(target);
-        }}
-        onCancel={() => setPickpocketOpen(false)}
-      />
+      {/* OTA-1100 — the PICKPOCKET picker moved out of the overlay stack into
+          the controls slot above (bottom sheet, dice-roller pattern). It
+          routes to stealthTakeAmbientNoun, which dispatches vendor theft
+          (Stealth vs the vendor's DC, high-STE quiet-fail) or a
+          sleight-of-hand grab. */}
 
       {/* OTA 046 — CLIMB picker. Pull climbables from the same scene
           noun pool the other modals read (displayedAmbientNouns →
