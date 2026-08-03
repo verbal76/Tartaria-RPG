@@ -188,6 +188,19 @@
           ]
         },
         {
+          "id": "tellin_yulka",
+          "label": "Ask where the cheap Discs come from",
+          "gate": {
+            "minRegard": "familiar"
+          },
+          "grants": {
+            "whisper": "yulka_discs"
+          },
+          "lines": [
+            "Tellin looks at the door before he answers, which tells you most of it. \"There is a Mud Dweller called Yulka. South, after dark, two or three tiles out — you will see her fire.\" He turns back to his ledger. \"She sells Aetheric Discs at half what Irma charges and I have never once asked why. Neither should you.\""
+          ]
+        },
+        {
           "id": "tellin_wronged",
           "label": "Try to say something",
           "gate": {
@@ -503,6 +516,19 @@
           ]
         },
         {
+          "id": "elara_yulka",
+          "label": "Ask who else deals in odd stock",
+          "gate": {
+            "minRegard": "known"
+          },
+          "grants": {
+            "whisper": "yulka_discs"
+          },
+          "lines": [
+            "\"Odd stock.\" Elara smiles without looking up. \"There is a woman south of the gate who works nights. Yulka. Discs, mostly, and she does not haggle because she does not need to.\" She turns a ring over. \"Go after the moon is up or do not go.\""
+          ]
+        },
+        {
           "id": "t_wronged",
           "label": "Try to say something",
           "gate": {
@@ -584,6 +610,22 @@
           },
           "lines": [
             "\"I can tell where you have been from the wear.\" Felra turns a sole over. \"Left edge goes first on the eastern flats. Toe-first means you have been climbing. I have not left this stall in two years and I have seen everywhere, secondhand, in leather.\""
+          ]
+        },
+        {
+          "id": "felra_lead",
+          "label": "Ask where the wear on the roads is strangest",
+          "gate": {
+            "minRegard": "familiar"
+          },
+          "grants": {
+            "lead": {
+              "hint": "A stretch of road north where the tread-wear stops dead — somebody has been going around something, and going around it for years",
+              "rewardTc": 22
+            }
+          },
+          "lines": [
+            "\"North.\" Felra says it immediately; she has clearly been waiting for somebody to ask. \"There is a stretch where the wear just STOPS. Not a fork. Not a slide. Everybody who walks it steps off the road for forty paces and steps back on.\" She shrugs. \"Nobody I have asked knows they do it.\""
           ]
         },
         {
@@ -794,6 +836,22 @@
           },
           "lines": [
             "\"The animals changed faster than we did.\" Bran says it without drama. \"Three generations. That is all it took. I set traps my grandfather designed and they do not work any more, because the things they were designed for have learned. We have not learned anything since the water.\""
+          ]
+        },
+        {
+          "id": "bran_lead",
+          "label": "Ask if anything out there is worth finding",
+          "gate": {
+            "minRegard": "familiar"
+          },
+          "grants": {
+            "lead": {
+              "hint": "There is a collapsed feed-store two days east — the roof went in but the floor held, and nobody has bothered because it looks like nothing",
+              "rewardTc": 26
+            }
+          },
+          "lines": [
+            "Bran thinks about it properly, which takes a while. \"East. Two days, maybe less if you push. There was a feed-store out that way and the roof went in on it.\" He scratches the dog. \"Everyone who passes it sees a hole in the ground. The floor held. Whatever went down with it is still under there and dry.\""
           ]
         },
         {
@@ -1091,6 +1149,22 @@
           ]
         },
         {
+          "id": "nalren_lead",
+          "label": "Ask about the site he will not return to",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "grants": {
+            "lead": {
+              "hint": "The high frozen site Nalren will not go back to — everything in it laid out on purpose and left",
+              "rewardTc": 34
+            }
+          },
+          "lines": [
+            "Nalren is quiet for a long moment. \"I will tell you where it is. I will not take you.\" He describes it carefully, twice, the way you describe something you want somebody else to be able to find without you. \"If it is still arranged when you get there, come back and tell me. If it is not — do not tell me.\""
+          ]
+        },
+        {
           "id": "t_wronged",
           "label": "Try to say something",
           "gate": {
@@ -1340,6 +1414,19 @@
           },
           "lines": [
             "\"I have stopped expecting to see it.\" Yune folds a cloth carefully. \"That is not doubt. I have simply done the arithmetic on my own lifetime. It changes what the work is for. You keep going because it is right, not because you will be there.\""
+          ]
+        },
+        {
+          "id": "yune_purse",
+          "label": "Tell her what you have seen out there",
+          "gate": {
+            "minRegard": "familiar"
+          },
+          "grants": {
+            "tc": 18
+          },
+          "lines": [
+            "Yune listens the whole way through without interrupting, which almost nobody does. At the end she nods slowly and presses something into your hand before you can refuse. \"We pay for word. Not much, and not officially. But somebody walked out there and came back, and that is worth knowing.\""
           ]
         },
         {
