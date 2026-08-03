@@ -1440,6 +1440,468 @@
           ]
         }
       ]
+    },
+    "class:wanderer:traveler": {
+      "displayName": "a road-worn traveler",
+      "topics": [
+        {
+          "id": "c_front",
+          "label": "Ask what brings them here",
+          "lines": [
+            "\"Where am I going?\" They consider the horizon as though it had asked. \"Onward is the honest answer. I stopped having a destination about two seasons back and I have not missed it.\""
+          ]
+        },
+        {
+          "id": "c_known",
+          "label": "Ask about their road",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"I keep to the high ground after dark, and I do not sleep where I can hear water.\" They say it like a recipe. \"Those two rules are the whole of my expertise and they have been enough.\""
+          ]
+        },
+        {
+          "id": "c_deep",
+          "label": "Ask what they are not saying",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I will tell you the thing nobody says out loud on the road.\" They lower their voice without meaning to. \"You pass the same people. Not similar people — the SAME ones, going the other way, three and four times. Everybody is walking in a circle and nobody has said so.\""
+          ]
+        },
+        {
+          "id": "c_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You went into my pack.\" They shoulder it and step back. \"I have very little. You knew that when you did it.\""
+          ]
+        }
+      ]
+    },
+    "class:wanderer:refugee": {
+      "displayName": "a refugee",
+      "topics": [
+        {
+          "id": "c_front",
+          "label": "Ask what brings them here",
+          "lines": [
+            "\"I am from somewhere that is not there any more,\" they say, without self-pity. \"That is most of my conversation, so you may as well have it early.\""
+          ]
+        },
+        {
+          "id": "c_known",
+          "label": "Ask about their road",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"We came out in the second week. Not the first — the first week everyone thought it would stop.\" A pause. \"The people who left in the first week are the ones who are still alive to be sneered at for panicking.\""
+          ]
+        },
+        {
+          "id": "c_deep",
+          "label": "Ask what they are not saying",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I go back.\" They look at you steadily, daring you to make something of it. \"Every season. There is nothing there and I know there is nothing there. I stand in the mud over where the street was and I come away again. You asked what I was not saying.\""
+          ]
+        },
+        {
+          "id": "c_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"I have been robbed by the water and by men,\" they say. \"You have joined a list.\""
+          ]
+        }
+      ]
+    },
+    "class:wanderer:tinker": {
+      "displayName": "a tinker",
+      "topics": [
+        {
+          "id": "c_front",
+          "label": "Ask what brings them here",
+          "lines": [
+            "\"I mend things,\" the tinker says, hands already busy with something. \"Badly, sometimes, but faster than anybody else out here and that is what people actually want.\""
+          ]
+        },
+        {
+          "id": "c_known",
+          "label": "Ask about their road",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"I was apprenticed. Properly, indentures and everything.\" A short laugh. \"Then the shop went under the mud with my master in it, so now I am a very well-trained man with a bag.\""
+          ]
+        },
+        {
+          "id": "c_deep",
+          "label": "Ask what they are not saying",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"Half the things I mend, I do not understand.\" Said quietly, to the work rather than to you. \"I make them go again. I could not tell you what they are for. I have started to suspect that is true of the people who built them as well.\""
+          ]
+        },
+        {
+          "id": "c_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You took a tool.\" The tinker does not look up. \"It is not the value. Every tool I have, I have because somebody let me keep it.\""
+          ]
+        }
+      ]
+    },
+    "class:wanderer:scout": {
+      "displayName": "a scout",
+      "topics": [
+        {
+          "id": "c_front",
+          "label": "Ask what brings them here",
+          "lines": [
+            "\"I look at things and then I tell people about them,\" the scout says. \"You would be astonished what that is worth to somebody who has not left their outpost in a year.\""
+          ]
+        },
+        {
+          "id": "c_known",
+          "label": "Ask about their road",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"I work for whoever is paying, and I do not lie about what I saw.\" A shrug. \"That second part costs me more work than it wins. Everybody wants to be told the road is clear.\""
+          ]
+        },
+        {
+          "id": "c_deep",
+          "label": "Ask what they are not saying",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"There is more movement out there than anyone is reporting.\" The scout says it flatly. \"Not raiders. Not patrols. Movement, at night, in a direction that does not go anywhere. I have stopped putting it in my reports because of how the last one was received.\""
+          ]
+        },
+        {
+          "id": "c_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"I saw you do it,\" the scout says. \"I see everything. That is the job.\""
+          ]
+        }
+      ]
+    },
+    "class:wanderer:pilgrim": {
+      "displayName": "a pilgrim",
+      "topics": [
+        {
+          "id": "c_front",
+          "label": "Ask what brings them here",
+          "lines": [
+            "\"I am walking to somewhere I do not expect to reach,\" the pilgrim says comfortably. \"That is not a tragedy. It is the arrangement.\""
+          ]
+        },
+        {
+          "id": "c_known",
+          "label": "Ask about their road",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"I walk for the Giants. Not to them — for them.\" They adjust the pack. \"There is a difference and it has taken me eleven years to be able to say it out loud without sounding foolish.\""
+          ]
+        },
+        {
+          "id": "c_deep",
+          "label": "Ask what they are not saying",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I have stopped believing and I have not stopped walking.\" Said very calmly. \"I expected those to happen together. They did not, and I have decided the walking was the part that mattered.\""
+          ]
+        },
+        {
+          "id": "c_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"Take it,\" the pilgrim says. \"I mean that. It is a poorer thing to have taken than to have been given, and you have chosen the poorer thing.\""
+          ]
+        }
+      ]
+    },
+    "class:wanderer:drifter": {
+      "displayName": "a drifter",
+      "topics": [
+        {
+          "id": "c_front",
+          "label": "Ask what brings them here",
+          "lines": [
+            "\"What do I want?\" The drifter looks you over with frank commercial interest. \"Same as you. Slightly more than I have got.\""
+          ]
+        },
+        {
+          "id": "c_known",
+          "label": "Ask about their road",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"No people, no faction, no fixed anything.\" A grin without much in it. \"Everyone I ever answered to is dead or has forgotten me. I have decided to take that as freedom.\""
+          ]
+        },
+        {
+          "id": "c_deep",
+          "label": "Ask what they are not saying",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I have been in three places when they went under.\" The drifter's grin finally goes. \"Not near. IN. Three. At some point that stops being luck in either direction and starts being a question, and I do not want the answer.\""
+          ]
+        },
+        {
+          "id": "c_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"Fair enough,\" the drifter says, and means it, and does not stop watching your hands."
+          ]
+        }
+      ]
+    },
+    "class:wanderer:scavenger": {
+      "displayName": "a scavenger",
+      "topics": [
+        {
+          "id": "c_front",
+          "label": "Ask what brings them here",
+          "lines": [
+            "\"I take what the mud gives up,\" the scavenger says. \"It gives up more than you would think and less than I need.\""
+          ]
+        },
+        {
+          "id": "c_known",
+          "label": "Ask about their road",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"I work the edges. Everybody works the middle of a site and fights about it.\" She taps her nose. \"The edges are where things got carried to before they got dropped.\""
+          ]
+        },
+        {
+          "id": "c_deep",
+          "label": "Ask what they are not saying",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I have found people.\" Flat, no drama. \"Four. You do not report it, because reporting it means the site closes and the site is what you eat. I have made my peace with that and I would rather you did not ask me to explain it.\""
+          ]
+        },
+        {
+          "id": "c_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"I take from the dead,\" the scavenger says. \"You take from the living. Do not look at me like that.\""
+          ]
+        }
+      ]
+    },
+    "class:roadside": {
+      "displayName": "a roadside trader",
+      "topics": [
+        {
+          "id": "c_front",
+          "label": "Ask what brings them here",
+          "lines": [
+            "\"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\""
+          ]
+        },
+        {
+          "id": "c_known",
+          "label": "Ask about their road",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\""
+          ]
+        },
+        {
+          "id": "c_deep",
+          "label": "Ask what they are not saying",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"There are fewer stalls than there were.\" Said while tidying something already tidy. \"Not because the trade dried up. Because the stretches got longer. Every year the distance between two safe places gets a little bigger and nobody announces it.\""
+          ]
+        },
+        {
+          "id": "c_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You lifted from a roadside stall.\" They start packing up while you are still standing there. \"Now I move on early and lose the afternoon. That is what it cost, in case you wondered.\""
+          ]
+        }
+      ]
+    },
+    "class:escort": {
+      "displayName": "someone under your protection",
+      "topics": [
+        {
+          "id": "c_front",
+          "label": "Ask what brings them here",
+          "lines": [
+            "\"I am not a fighter,\" they say, matter-of-fact rather than apologetic. \"I am somebody who has to be somewhere, and you are the reason I might get there.\""
+          ]
+        },
+        {
+          "id": "c_known",
+          "label": "Ask about their road",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"There are more of us than you,\" they point out. \"That is the part people forget about an escort. You are one. We are several. If it goes badly it does not go badly for you first.\""
+          ]
+        },
+        {
+          "id": "c_deep",
+          "label": "Ask what they are not saying",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I have done this walk before, with somebody else.\" A pause. \"Not everybody who set out that time arrived. I am not telling you that to be grim. I am telling you because you keep checking behind us and I want you to know I have noticed and I am grateful.\""
+          ]
+        },
+        {
+          "id": "c_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"We are still walking with you,\" they say quietly. \"We have to. That is not the same as trusting you, and you should know the difference.\""
+          ]
+        }
+      ]
+    },
+    "class:guardian": {
+      "displayName": "a Core Guardian",
+      "topics": [
+        {
+          "id": "c_front",
+          "label": "Ask what brings them here",
+          "lines": [
+            "The Guardian does not turn. \"QUERY ACKNOWLEDGED. I AM THE HOLD ON THIS PLACE.\" A pause that is almost patient. \"THAT IS THE WHOLE OF MY FUNCTION AND I HAVE PERFORMED IT WITHOUT INTERRUPTION.\""
+          ]
+        },
+        {
+          "id": "c_known",
+          "label": "Ask about their road",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"YOU HAVE RETURNED.\" Something in the cadence shifts. \"I DO NOT REQUIRE COMPANY. I HAVE NOTED THE INTERVAL BETWEEN YOUR VISITS. I DO NOT KNOW WHY I NOTED IT.\""
+          ]
+        },
+        {
+          "id": "c_deep",
+          "label": "Ask what they are not saying",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "The Guardian is silent long enough that you think it has finished. \"I WAS GIVEN AN INSTRUCTION AND THE ONE WHO GAVE IT DID NOT RETURN.\" Quieter. \"I HAVE CONTINUED. I AM NO LONGER CERTAIN WHETHER THAT IS OBEDIENCE OR WHETHER IT IS THE ONLY THING LEFT IN ME.\""
+          ]
+        },
+        {
+          "id": "c_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"YOU TOOK.\" No anger; something worse. \"I HAVE FILED IT. I FILE EVERYTHING. THERE IS NO MECHANISM BY WHICH I FORGET.\""
+          ]
+        }
+      ]
+    },
+    "class:overlay": {
+      "displayName": "a trader up here",
+      "topics": [
+        {
+          "id": "c_front",
+          "label": "Ask what brings them here",
+          "lines": [
+            "\"Not many come up,\" they say, nodding at the drop. \"Which is exactly why the stock is worth carrying.\""
+          ]
+        },
+        {
+          "id": "c_known",
+          "label": "Ask about their road",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"I hauled every bit of this up on my own back.\" They say it without complaint. \"Twice, because the first lot went over the edge in the wind. I do not talk about the first lot.\""
+          ]
+        },
+        {
+          "id": "c_deep",
+          "label": "Ask what they are not saying",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"You can see the pattern from here.\" They gesture at the flats below without looking. \"The settlements. They are not scattered. They are on a line, and the line does not follow the ground. I have stopped pointing it out to people who come up, because they look and they do not see it and then they look at me.\""
+          ]
+        },
+        {
+          "id": "c_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"There is one way down,\" they observe, \"and I am not going to do anything about what you took. I am simply saying it out loud.\""
+          ]
+        }
+      ]
     }
   }
 }
