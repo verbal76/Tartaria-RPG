@@ -198,7 +198,14 @@ describe('OTA-1055 — every vendor install records the meeting', () => {
     // it prevented. The rule moved into recordNpcSighting, where it is one rule
     // for every caller instead of a guard each new site can forget.
     expect(SRC).not.toContain('priorVendor');
-    const fn = SRC.slice(SRC.indexOf('function sightVendor('), SRC.indexOf('function emitVendorGreeting('));
+    // ⚠ OTA-1064 — bound the slice to sightVendor's OWN body. It used to run to
+    // `function emitVendorGreeting(`, which is not adjacent — anything added
+    // between the two failed this test for standing in the wrong place rather
+    // than for doing the wrong thing. `talkablePeople` reads the live scene
+    // legitimately and tripped it. Top-level functions close on a column-0 `}`.
+    const from = SRC.indexOf('function sightVendor(');
+    const fn = SRC.slice(from, SRC.indexOf('\n}\n', from));
+    expect(fn).toContain('rememberNpcMeeting');   // we sliced the right function
     expect(fn).not.toContain('get().currentScene');
   });
 

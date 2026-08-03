@@ -50,6 +50,9 @@ import {
   flourishFor, flourishKindFor, flourishPrompt, vetModelFlourish,
   FLOURISH_MAX_PER_CONVERSATION, FLOURISH_SYSTEM,
 } from '../engine/flourish';
+// OTA-1064 — talkablePeople needs these at module scope; the in-handler `cg`
+// alias is function-local.
+import { isCoreGuardian, capitalIdFromGuardian } from '../engine/coreGuardians';
 // OTA-1050 — Phase 1 slice 2: turn-in credit, roadside recognition, gossip.
 import { gossipSubject, gossipLine } from '../engine/npcMemory';
 import {
@@ -3526,19 +3529,29 @@ function applyTopicGrant(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   npcName: string,
   grant: import('../engine/dialogue').TopicGrant,
-): void {
+): boolean {
   const player = get().player;
-  if (!player) return;
+  if (!player) return false;
+  // ⚠ OTA-1064 — the return value is "did this land". See the lead branch.
+  let deferred = false;
+  let deliveredSomething = false;
 
   if (grant.lead) {
     // One pending lead at a time — the payout site reads a single slot, and
     // overwriting an unclaimed one would quietly delete something the player
     // was told. They keep the one they have.
     if (player.pendingLead) {
-      get().appendLog('world', `You are already chasing something. ${npcName}'s tip will keep.`);
+      // ⚠ OTA-1064 — AND THE TOPIC IS NOT SPENT, so the tip really does keep.
+      // Before this the caller incremented talkedTopics regardless, so the
+      // grant was fire-once and this branch threw the lead away while printing
+      // a sentence promising it had not. A gated topic behind 'familiar' plus a
+      // chapter check paid out exactly nothing, once, forever.
+      get().appendLog('world', `You are already chasing something. ${npcName}'s tip will keep — ask again when your hands are free.`);
+      deferred = true;
     } else {
       set((st) => (st.player ? { player: { ...st.player, pendingLead: grant.lead } } : {}));
       get().appendLog('reward', `${npcName} tells you where to look. (a lead — you'll turn it up when you next cross fresh ground)`);
+      deliveredSomething = true;
     }
   }
 
@@ -3569,12 +3582,71 @@ function applyTopicGrant(
       } : {}));
       get().appendLog('reward', `✦ Whisper — ${chain.title}. (Check the Whispers panel.)`);
     }
+    // A whisper you already hold is not a failure to deliver — word reaching
+    // you twice is not two rumours, and the topic is legitimately spent.
+    deliveredSomething = true;
   }
 
   if (grant.tc && grant.tc > 0) {
     set((st) => (st.player ? { player: { ...st.player, tc: st.player.tc + grant.tc! } } : {}));
     get().appendLog('reward', `${npcName} presses ${grant.tc} TC into your hand. "For the trouble."`);
+    deliveredSomething = true;
   }
+  // ⚠ Only a grant that delivered NOTHING may be retried. If a topic ever pays
+  // coin AND a lead, and only the lead was deferred, replaying it would pay the
+  // coin twice — a money loop is a worse bug than a dropped tip.
+  return !(deferred && !deliveredSomething);
+}
+
+/** ⚠ OTA-1064 — HOSTILITY COSTS FACTION STANDING ONCE PER PERSON.
+ *
+ *  THE EXPLOIT THIS CLOSES. applyRepChange propagates half of any delta to the
+ *  target faction's RIVALS with the sign flipped, so every standing loss is a
+ *  standing gain elsewhere. Harmless for a one-off; a farm for anything
+ *  repeatable — and two Phase 1/2 acts were freely repeatable:
+ *
+ *    1. A refused gift. resolveGift returns `refused: true` and the item is
+ *       deliberately NOT consumed, so offering the same bent nail costs nothing
+ *       but a tap: -2 to them, +1 to each of their rivals, forever.
+ *    2. Beating a vendor into submission. -12 to them, +6 to each rival, and
+ *       the vendor is anchored to the room (OTA-1029) — walk back in and again.
+ *
+ *  THE RULE. The largest hit already taken for this person is remembered as a
+ *  magnitude. A heavier act tops up the difference; a repeat of the same or a
+ *  lighter one costs nothing. Recording the magnitude rather than a flag is
+ *  what stops the DOWNGRADE hole — a -2 insult must not buy immunity from the
+ *  -12 for putting somebody on their knees.
+ *
+ *  It also reads correctly, which is why it is the rule rather than a cooldown:
+ *  a faction's opinion of you is about what you ARE to their people, and you
+ *  only become the person who robs Irma once.
+ *
+ *  Returns the magnitude actually applied (0 when already covered). */
+function dockHostileStanding(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  npcId: string,
+  factionIds: readonly (string | null | undefined)[],
+  magnitude: number,
+): number {
+  const rel = getRelation(get().worldMemory, npcId);
+  const already = rel?.standingDocked ?? 0;
+  const applied = Math.max(0, magnitude - already);
+  if (applied <= 0) return 0;
+  set((st) => {
+    const relations = st.worldMemory.npcRelations ?? {};
+    const prev = relations[npcId];
+    return prev
+      ? { worldMemory: { ...st.worldMemory, npcRelations: { ...relations, [npcId]: { ...prev, standingDocked: magnitude } } } }
+      : {};
+  });
+  for (const f of factionIds) {
+    if (!f) continue;
+    set((st) => (st.player
+      ? { player: { ...st.player, factionStanding: applyRepChange(st.player.factionStanding, f, -applied).standing } }
+      : {}));
+  }
+  return applied;
 }
 
 /** OTA-1060 — a gift's standing effect, applied to the recipient's faction.
@@ -3593,6 +3665,14 @@ function applyGiftStanding(
   // Gains are metered against a LIFETIME per-faction budget; losses are not,
   // because an insult should always land and a capped insult would let a player
   // be rude for free once the budget was spent.
+  // ⚠ OTA-1064 — a NEGATIVE gift delta is an insult, and an insult is free to
+  // repeat (the item is refused, not consumed). Route it through the one-dock
+  // rule so it cannot be farmed for rival standing. See dockHostileStanding.
+  if (delta < 0) {
+    const applied = dockHostileStanding(get, set, npcId, [faction], -delta);
+    if (applied > 0) get().appendLog('system', `Standing -${applied} — ${faction.replace(/_/g, ' ')}.`);
+    return;
+  }
   let applied = delta;
   if (delta > 0) {
     const spent = get().worldMemory.giftStandingGranted?.[faction] ?? 0;
@@ -3638,6 +3718,75 @@ function talkContextFor(
     chapter: player?.mainQuest?.phase ?? 'hook',
     cores: player?.mainQuest?.coresRecovered?.length ?? 0,
   };
+}
+
+/** OTA-1064 — EVERYBODY IN THIS SCENE WORTH TALKING TO, DERIVED ONCE.
+ *
+ *  ⚠ THIS EXISTS BECAUSE THE ANSWER WAS BEING COMPUTED THREE DIFFERENT WAYS AND
+ *  TWO OF THEM WERE WRONG. OTA-1062 authored 44 topics for the procedural cast
+ *  and widened `talkToNpc` to reach them — but the two places that DECIDE
+ *  whether to call it (the TALK chip and the `talk to <name>` router) both
+ *  asked `hasTopicsFor(vendor.id)` with the RAW spawn id. A roadside trader's
+ *  raw id is `roadside_<seed>`; their ledger id — the one the topic sets are
+ *  keyed on — is `roadside:<name>`. So the question was asked in a namespace
+ *  the answer does not live in, and it came back `false` every time for all 24
+ *  roadside traders and all 5 overlay traders. The feature was reachable only
+ *  for the 30 vendors whose raw id happens to equal their ledger id.
+ *
+ *  One list, one identity function, three consumers. The screen imports
+ *  npcLedgerId for the same reason rather than inventing a fourth answer. */
+export interface TalkablePerson {
+  id: string;
+  name: string;
+  faction?: string | null;
+  role?: string | null;
+}
+
+function talkablePeople(get: () => GameStore): TalkablePerson[] {
+  const scene = get().currentScene;
+  const player = get().player;
+  const people: TalkablePerson[] = [];
+  if (!player) return people;
+  if (scene?.vendor) people.push({ id: vendorNpcId(scene.vendor), name: scene.vendor.name, faction: scene.vendor.faction, role: scene.vendor.title });
+  if (scene?.wanderer) people.push({ id: vendorNpcId(scene.wanderer), name: scene.wanderer.name, faction: scene.wanderer.faction, role: scene.wanderer.role });
+  for (const q of player.activeFactionQuests ?? []) {
+    const leader = q.escort?.leaderName;
+    if (q.tracked !== false && leader && (q.escort?.hp ?? 0) > 0) {
+      people.push({ id: vendorNpcId({ id: `escort_${leader}`, name: leader }), name: leader, role: 'escort leader' });
+    }
+  }
+  // ⚠ OTA-1064 — A CORE GUARDIAN IS THE ONLY TALKABLE PERSON WHO IS ALSO AN
+  // ENEMY, which is exactly why its authored voice sat unreachable: every route
+  // into the conversation required an empty scene. It does NOT become
+  // parley-able — `isTalkDownBlocked` still refuses, because you cannot
+  // sweet-talk a Guardian off its post and that guardrail predates this. You
+  // can only ask it things, and it answers, and then it kills you anyway.
+  const hps = scene?.enemyHps ?? [];
+  (scene?.enemies ?? []).forEach((e, i) => {
+    if (!isCoreGuardian(e) || (hps[i] ?? 0) <= 0) return;
+    const capitalId = capitalIdFromGuardian(e);
+    if (!capitalId) return;
+    people.push({ id: `guardian:${capitalId}`, name: e.name, faction: 'aether_born_order', role: 'Core Guardian' });
+  });
+  return people;
+}
+
+/** Name → person. Empty input means "whoever you are standing in front of",
+ *  which is the first entry: the counter before the road. */
+function matchTalkable(people: TalkablePerson[], nameOrId: string): TalkablePerson | null {
+  const want = (nameOrId ?? '').trim().toLowerCase();
+  if (!want) return people[0] ?? null;
+  return people.find((p) => p.name.toLowerCase().includes(want) || p.id.includes(want)) ?? null;
+}
+
+/** Somebody in this scene, other than `excludeId`, that this input names. Used
+ *  by the router so naming your escort leader does not open a parley with a
+ *  wanderer who merely happens to be standing on the same tile. */
+function namesSomeoneElse(get: () => GameStore, input: string, excludeId: string): boolean {
+  const want = (input ?? '').trim().toLowerCase();
+  if (!want) return false;
+  const hit = matchTalkable(talkablePeople(get).filter((p) => p.id !== excludeId), want);
+  return !!hit && hasTopicsFor(hit.id);
 }
 
 // ── OTA-1063 — THE FLOURISH SLOT ───────────────────────────────────────────
@@ -3869,19 +4018,26 @@ function resolveVendorSubmission(
   );
 
   // Standing: the second hit, where the kill used to take it.
+  // ⚠ OTA-1064 — ONCE PER PERSON. The vendor is anchored to the room, so before
+  // this the loop was: walk in, put them on their knees, take -12 with their
+  // faction and +6 with every rival of it, walk out, walk back in, repeat. The
+  // punishment was a reward generator. See dockHostileStanding.
   const origById = new Map(player.factionStanding.map((r) => [r.factionId, r.standing] as const));
-  let standing = player.factionStanding;
-  if (vendor.faction) standing = applyRepChange(standing, vendor.faction, -12).standing;
-  if (vendor.nativeFaction && vendor.nativeFaction !== vendor.faction) {
-    standing = applyRepChange(standing, vendor.nativeFaction, -12).standing;
-  }
+  const docked = dockHostileStanding(
+    get, set, vendorNpcId(vendor),
+    [vendor.faction, vendor.nativeFaction !== vendor.faction ? vendor.nativeFaction : null],
+    12,
+  );
+  const standing = get().player?.factionStanding ?? player.factionStanding;
   for (const r of standing) {
     const delta = r.standing - (origById.get(r.factionId) ?? r.standing);
     if (delta !== 0) get().appendLog('system', `Standing ${delta > 0 ? '+' : ''}${delta} — ${r.factionId.replace(/_/g, ' ')}.`);
   }
+  if (docked === 0) {
+    get().appendLog('world', `Word of what you are had already gone round. Nobody thinks worse of you for it than they did this morning.`);
+  }
 
   set((st) => ({
-    ...(st.player ? { player: { ...st.player, factionStanding: standing } } : {}),
     // The person, on their own ledger. recordNpcDealing no-ops without a
     // relation, and every install path sights the vendor first (OTA-1078), so
     // by the time anyone can steal from them the row exists.
@@ -5278,10 +5434,18 @@ interface GameStore {
         wisRevealed: boolean;
         /** For an animal parley, the enemy index whose temperament this is. */
         enemyIdx?: number;
+        /** OTA-1064 — set when this person also has an authored topic set, so
+         *  the modal can offer "just talk to them" beside persuade and
+         *  intimidate. Absent for animals and for anybody unauthored. */
+        topicsNpcId?: string;
       }
     | null;
   /** Cancel a pending parley without committing (the player backed out — no cost). */
   closeParley: () => void;
+  /** OTA-1064 — step out of the parley into the authored conversation. Costs
+   *  nothing and forfeits nothing: the parley was never committed, so the
+   *  player can talk first and still come back and choose. */
+  parleyIntoTalk: () => void;
   /** Commit a parley choice (from a ParleyModal button, or a typed specific verb).
    *  Runs the hard lock-and-key, the CHA roll on a right-key, the asymmetric
    *  outcomes (safe fail = forfeit; intimidate fail = harm + forfeit), rewards
@@ -5535,9 +5699,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // Everyone present who is a PERSON on the ledger. A gift needs a recipient
     // who can remember it, which is exactly the population OTA-1057 finished.
-    const candidates: { id: string; name: string }[] = [];
-    if (scene?.vendor) candidates.push({ id: vendorNpcId(scene.vendor), name: scene.vendor.name });
-    if (scene?.wanderer) candidates.push({ id: vendorNpcId(scene.wanderer), name: scene.wanderer.name });
+    // ⚠ OTA-1064 — derived from talkablePeople so the two verbs cannot drift.
+    // They already had: an escort leader walks beside you for an entire contract
+    // and is fully on the ledger (sightPerson, two spawn sites), you could TALK
+    // to them, and the gift picker did not list them. Guardians are filtered by
+    // the no-enemies guard above, which is the right answer — you do not hand a
+    // present to something that is trying to kill you.
+    const candidates: { id: string; name: string }[] =
+      talkablePeople(get).map((p) => ({ id: p.id, name: p.name }));
     if (candidates.length === 0) {
       get().appendLog('system', 'There is nobody here to give anything to.');
       return;
@@ -5564,6 +5733,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const item = player.inventory.find((i) => i.id === itemId);
     if (!item) return;
     const rel = getRelation(get().worldMemory, g.toId);
+    // ⚠ OTA-1064 — NO ROW, NO GIFT. The accept path writes the memory inside a
+    // `prev ? ... : st.worldMemory` branch but decrements the inventory outside
+    // it, so a recipient the ledger had never seen ate the item and remembered
+    // nothing — the one clause the owner asked for by name, silently skipped.
+    // Every live path sights first, so this is a guard against the next one.
+    if (!rel) {
+      get().appendLog('system', `${g.toName} is not somebody you have properly met yet.`);
+      set({ pendingGift: null });
+      return;
+    }
     const worth = sellPriceFor(item, get().currentScene?.vendor ?? null, 0);
     const gi: GiftItem = { name: item.name, tags: item.tags ?? [], worth };
     const out = resolveGift(g.toId, g.toName, gi, rel);
@@ -5626,27 +5805,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ pendingTalk: null });
   },
   talkToNpc: (nameOrId) => {
-    const scene = get().currentScene;
-    const player = get().player;
-    if (!player) return;
-    // OTA-1062 — EVERYONE PRESENT, not just whoever is behind a counter.
-    // Vendors were the only talkable people because they were the only cast the
-    // ledger covered; OTA-1057 finished that, so the verb catches up. Escort
-    // leaders are included because they are walking beside you — the one
-    // population you are guaranteed to have time with.
-    const people: { id: string; name: string; faction?: string | null; role?: string | null }[] = [];
-    if (scene?.vendor) people.push({ id: vendorNpcId(scene.vendor), name: scene.vendor.name, faction: scene.vendor.faction, role: scene.vendor.title });
-    if (scene?.wanderer) people.push({ id: vendorNpcId(scene.wanderer), name: scene.wanderer.name, faction: scene.wanderer.faction, role: scene.wanderer.role });
-    for (const q of player.activeFactionQuests ?? []) {
-      const leader = q.escort?.leaderName;
-      if (q.tracked !== false && leader && (q.escort?.hp ?? 0) > 0) {
-        people.push({ id: vendorNpcId({ id: `escort_${leader}`, name: leader }), name: leader, role: 'escort leader' });
-      }
-    }
-    const want = nameOrId.trim().toLowerCase();
-    const target = want
-      ? people.find((p) => p.name.toLowerCase().includes(want) || p.id.includes(want))
-      : people[0];
+    const people = talkablePeople(get);
+    if (!get().player) return;
+    const target = matchTalkable(people, nameOrId);
     if (!target) return;
     const npcId = target.id;
     // Anybody with no authored topics — their own or their kind's — keeps the
@@ -5688,18 +5849,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // is that fact rather than a separate flag. The counter below is the same
     // one that drives "I have told you that one", so the payout and the
     // acknowledgement can never disagree about whether this has happened.
-    if (asked === 0 && topic.grants) applyTopicGrant(get, set, t.npcName, topic.grants);
+    const granted = asked === 0 && topic.grants
+      ? applyTopicGrant(get, set, t.npcName, topic.grants)
+      : true;
     // ⚠ OTA-1063 — AFTER the reply has already landed, and only on a first
     // raise. Same `asked === 0` fact the grant reads: a re-tread gets the words
     // back but not the business, because the business was about hearing it for
     // the first time. Synchronous — see engine/flourish.ts.
     if (asked === 0) emitFlourish(get, set, topic.id);
-    set((st) => ({
-      worldMemory: {
-        ...st.worldMemory,
-        talkedTopics: { ...(st.worldMemory.talkedTopics ?? {}), [`${t.npcId}:${topic.id}`]: asked + 1 },
-      },
-    }));
+    // ⚠ OTA-1064 — a grant that could not be delivered does NOT spend the topic.
+    // The counter is the same one that drives "I have told you that one", so
+    // leaving it alone is exactly what lets the player come back and collect.
+    if (granted) {
+      set((st) => ({
+        worldMemory: {
+          ...st.worldMemory,
+          talkedTopics: { ...(st.worldMemory.talkedTopics ?? {}), [`${t.npcId}:${topic.id}`]: asked + 1 },
+        },
+      }));
+    }
     void get().persist();
   },
 
@@ -5714,6 +5882,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     runParleyOutcome(get, set, choice);
     set({ pendingParley: null });
     void get().persist();
+  },
+  parleyIntoTalk: () => {
+    const p = get().pendingParley;
+    if (!p?.topicsNpcId) return;
+    // ⚠ The parley is CLOSED, not resolved — no roll, no outcome, no cost. The
+    // wanderer stays in the scene (only runParleyOutcome clears them), so
+    // walking out of the conversation and tapping them again gets the choice
+    // back. Talking to somebody must never spend the chance to deal with them.
+    set({ pendingParley: null });
+    get().talkToNpc(p.targetName);
   },
 
   async hydrate() {
@@ -10076,6 +10254,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // stakes; a SPECIFIC verb (intimidate / persuade / calm) commits straight
     // through. Hard lock-and-key: the wrong approach auto-fails; a high-WIS read is
     // told the temperament, everyone else gets the narrated tell. See parley.ts.
+    // --- OTA-1064: A CORE GUARDIAN WILL ANSWER A QUESTION ---
+    // ⚠ ORDERED BEFORE isTalkDownBlocked ON PURPOSE, and it does NOT weaken it.
+    // "You can't sweet-talk a Guardian off its post" (OTA-806) is still true:
+    // this cannot end the fight, cannot damage it, cannot heal you, and does not
+    // pass a turn or draw a counter — it changes nothing, which is precisely why
+    // it is safe to give away for free. It is the only way the class:guardian
+    // voice is reachable at all, because a Guardian only ever exists as an
+    // enemy and every other route into a conversation requires an empty scene.
+    if (parsed.intent === 'diplomacy' && currentScene.enemies.length > 0) {
+      const guardian = talkablePeople(get).find((p) => p.id.startsWith('guardian:'));
+      if (guardian && hasTopicsFor(guardian.id)) {
+        get().talkToNpc(guardian.name);
+        if (get().pendingTalk) { void get().persist(); return; }
+      }
+    }
     // --- Combat parley (animals; bosses / story-class threats refuse) ---
     if (parsed.intent === 'diplomacy' && currentScene.enemies.length > 0) {
       const foes = currentScene.enemies;
@@ -10113,19 +10306,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // you meant. A vendor with no topics falls through to everything below
     // unchanged — the slice is three people, and it must not swallow the verb
     // for the rest of the cast.
+    // ⚠ OTA-1064 — vendorNpcId, NOT `vendor.id`. The raw id is the SPAWN id
+    // (`roadside_<seed>`, `overlay_<id>_<ms>`); the ledger id is who they ARE
+    // (`roadside:grit_maalen`), and that is the namespace the topic sets live
+    // in. Asking the question in the wrong namespace returned false for all 24
+    // roadside and 5 overlay traders, so OTA-1062's claim that they "became
+    // talkable with no wiring" was true of the store action and false of every
+    // route into it. Named vendors survived only because their raw id happens
+    // to equal their ledger id.
     if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.vendor) {
-      const vId = currentScene.vendor.id ?? '';
-      if (hasTopicsFor(vId)) {
+      if (hasTopicsFor(vendorNpcId(currentScene.vendor))) {
         get().talkToNpc(parsed.resolvedNoun ?? parsed.target ?? '');
         if (get().pendingTalk) return;
       }
     }
     // --- Peaceful parley (a wild NPC / person) ---
-    if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.wanderer) {
+    // ⚠ OTA-1064 — `namesSomeoneElse` guard. Without it, naming the escort
+    // leader walking beside you opened a parley with a wanderer who merely
+    // happened to be on the same tile, because this branch only ever checked
+    // that a wanderer EXISTED and never that you meant them.
+    if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.wanderer
+        && !namesSomeoneElse(get, parsed.resolvedNoun ?? parsed.target ?? '', vendorNpcId(currentScene.wanderer))) {
       const w = currentScene.wanderer;
       const temperament = w.temperament;
       const wisRevealed = revealsTemperament(effectiveStats(player).wisdom);
-      const ctx = { kind: 'person' as ParleyKind, temperament, targetName: w.name, wisRevealed };
+      // OTA-1064 — `topicsNpcId` is what makes the seven wanderer archetypes
+      // audible at all. They have 28 authored topics between them and NOT ONE
+      // was reachable: `talk to <wanderer>` has always landed here, and this
+      // branch returns. Rather than stealing the verb from the parley — which
+      // pays a lead, goods or standing and is the whole point of meeting
+      // somebody on the road — the conversation becomes a THIRD option on the
+      // same modal, next to persuade and intimidate. Nothing is displaced.
+      const wId = vendorNpcId(w);
+      const ctx = {
+        kind: 'person' as ParleyKind, temperament, targetName: w.name, wisRevealed,
+        ...(hasTopicsFor(wId) ? { topicsNpcId: wId } : {}),
+      };
       // OTA-809 — the "cagey" beat: they name their price before you choose how to
       // play it, so the exchange reads as a conversation, not a bare die roll.
       get().appendLog('world', wandererCagey(w));
@@ -10139,6 +10355,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         void get().persist();
       }
       return;
+    }
+    // --- OTA-1064: ANYBODY ELSE YOU NAMED ---
+    // Today that is an escort leader. They walk beside you for a whole contract
+    // and had four authored topics that nothing on earth could reach: they are
+    // not a vendor, not a wanderer, and not in the scene's cast at all — they
+    // live on player.activeFactionQuests. Ordered last so it can only ever pick
+    // up input the branches above declined.
+    if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0) {
+      const who = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
+      if (who) {
+        get().talkToNpc(who);
+        if (get().pendingTalk) return;
+      }
     }
     // OTA-120 Phase 4 — `feed dog <item>` / `heal dog <item>` /
     // `use <item> on dog` intercepts. These short-circuit the normal

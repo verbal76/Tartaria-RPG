@@ -1943,6 +1943,23 @@ export interface NpcRelation {
    *  practice by GIFT_BOONS_PER_PERSON plus the repeat decay — there is no
    *  reason to keep gifting past the cap, and nothing rewards it. */
   gifts?: { name: string; atHours: number }[];
+  /** ⚠ OTA-1064 — THE LARGEST FACTION-STANDING HIT ALREADY TAKEN FOR BEING
+   *  HOSTILE TO THIS PERSON, as a magnitude. Load-bearing anti-exploit state.
+   *
+   *  applyRepChange propagates HALF of any delta to the target faction's rivals
+   *  with the sign flipped, so a standing LOSS is simultaneously a standing GAIN
+   *  somewhere else. That is fine for a one-off. It is not fine for anything the
+   *  player can repeat at will — and two Phase 1/2 acts were exactly that:
+   *    - a refused gift (-2, and the item is NOT consumed, so it is free);
+   *    - beating a vendor into submission (-12, and they are back next visit).
+   *  Both were unbounded rival-standing farms costing nothing but taps.
+   *
+   *  Recording the MAGNITUDE rather than a boolean is what closes the downgrade
+   *  hole: insulting somebody for -2 must not buy immunity from the -12 for
+   *  putting them on their knees. A later, heavier act tops up the difference; a
+   *  repeat of the same or a lighter one costs nothing, because you have already
+   *  paid for what you are to them. */
+  standingDocked?: number;
   /** OTA-1060 — how many gifts have actually MOVED this relationship. Capped,
    *  so warmth stays something you mostly earn by doing rather than shopping. */
   giftBoons?: number;

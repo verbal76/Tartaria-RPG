@@ -849,8 +849,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1086`**,
-**golem-line `2026-08-03-1063`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1087`**,
+**golem-line `2026-08-03-1064`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -859,9 +859,65 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.97**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.98**; ledger in `VERSION.md`.
 
-- **THE FLOURISH (2026-08-03, latest). BOTH LINES.**
+- **THE DOORS + AN AUDIT OF PHASES 0–2 (2026-08-03, latest). BOTH LINES.**
+  - ⚠ **Most of what OTA-1062 authored was unreachable, and 621 green suites
+    said otherwise.** Every Phase 2 test asked whether a topic was *authored*
+    and correctly *gated*. None asked whether any route in the shipped game
+    reaches it.
+    - The TALK chip and the `talk to <name>` router both asked
+      `hasTopicsFor(vendor.id)` — the **spawn** id (`roadside_<seed>`,
+      `overlay_<id>_<ms>`). The topic sets are keyed on the **ledger** id
+      (`roadside:grit_maalen`). Wrong namespace, `false` every time, for all 24
+      roadside and 5 overlay traders. The 30 named vendors worked only because
+      their raw id happens to equal their ledger id — which is why it hid.
+    - `talk to <wanderer>` has always landed on the parley branch, which
+      returns. All 28 wanderer-archetype topics: dead.
+    - An escort leader is not in the scene at all (`player.activeFactionQuests`).
+      Nothing routed to them.
+    - A Core Guardian only ever exists as an **enemy**, and every route into a
+      conversation required an empty scene.
+  - **Fixed:** one `talkablePeople()` list with one identity function feeding
+    all three consumers; the wanderer conversation is a **third option on the
+    parley modal** so nothing is displaced (the parley still pays a lead, goods
+    or standing); escort leaders route by name; a Guardian answers questions
+    mid-fight. ⚠ It still **cannot be talked off its post** — OTA-806's
+    guardrail is older and outranks this, and the conversation is free precisely
+    *because* it changes nothing: no damage, no heal, no turn, no counter.
+  - All 11 class sets shipped with the **same four button labels**, so a
+    scavenger and a Core Guardian both offered "Ask what they are not saying".
+    Each set now has its own.
+  - **Audit — fixed:**
+    1. ⚠ **Hostility was a rival-standing farm.** `applyRepChange` propagates
+       half of any delta to the target faction's **rivals with the sign
+       flipped**, so every standing *loss* is a standing *gain* elsewhere. Fine
+       once; a generator for anything repeatable — and two acts were. A refused
+       gift does not consume the item (deliberate, OTA-1060), so −2 / +1-per-
+       rival cost a tap. Beating a vendor into submission was −12 / +6-per-rival
+       and the vendor is anchored to the room (OTA-1029). Closed by
+       `dockHostileStanding`: the largest hit already taken for a person is kept
+       as a **magnitude** on their ledger row; a heavier act tops up the
+       difference, a repeat costs nothing. Magnitude rather than a flag is what
+       shuts the downgrade hole — a −2 insult must not buy immunity from the −12.
+    2. **A topic grant could evaporate.** With a lead already in hand the branch
+       printed "the tip will keep" and the caller spent the topic anyway. A
+       payout gated behind `familiar` plus a chapter check paid nothing, once,
+       forever. `applyTopicGrant` now reports whether it delivered, and the
+       counter is bumped only when it did — and only when *nothing* landed, so a
+       lead+coin topic can never be replayed for the coin.
+    3. **Gifting reached a smaller cast than talking.** Escort leaders were
+       talkable and absent from the gift picker, which is now derived from the
+       same list. And a gift to somebody with no ledger row consumed the item
+       while writing no memory — the one clause the owner asked for by name —
+       now refused instead.
+  - **Reported, not changed:** caught theft applies its standing loss on every
+    attempt (same shape as 1 — what repeated stealing from one person should
+    cost is a design call); and restitution (OTA-1053) banks only coin the
+    player *hands over*, so buying and re-selling launders amends at the cost of
+    the spread — bounded, but softer than 600 TC a wrong. 26 tests.
+
+- **THE FLOURISH (2026-08-03). BOTH LINES.**
   The build plan's last unbuilt line, and the last item on the owner's
   seven-item list: *"the LLM contributes at most one short flourish line per
   exchange, off the critical path, with a template fallback if it's slow."*

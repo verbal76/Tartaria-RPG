@@ -14,6 +14,7 @@ export function ParleyModal() {
   const ctx = useGameStore((s) => s.pendingParley);
   const resolve = useGameStore((s) => s.resolveParley);
   const close = useGameStore((s) => s.closeParley);
+  const intoTalk = useGameStore((s) => s.parleyIntoTalk);
 
   if (!ctx) return null;
   const [safe, hard] = choicesFor(ctx.kind); // [calm|persuade, intimidate]
@@ -43,6 +44,20 @@ export function ParleyModal() {
           onPress: () => resolve(hard),
           tone: 'destructive',
         },
+        // OTA-1064 — THE THIRD OPTION, and the only door the seven wanderer
+        // archetypes have. Their 28 authored topics were unreachable because
+        // `talk to <them>` has always landed on this modal and stopped here.
+        // Offering the conversation as a peer of persuade/intimidate rather
+        // than taking the verb from them costs the parley nothing: this CLOSES
+        // the parley without rolling, the wanderer stays in the scene, and
+        // walking out of the conversation gets this screen back.
+        ...(ctx.topicsNpcId
+          ? [{
+              label: 'Just talk — ask them about the road. Costs nothing, forfeits nothing.',
+              onPress: intoTalk,
+              tone: 'neutral' as const,
+            }]
+          : []),
         {
           label: 'Back off',
           onPress: close,
