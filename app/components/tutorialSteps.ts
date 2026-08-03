@@ -106,6 +106,31 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'The Arbiter looks up. "Your name, traveler. Type it, then tap ACT."',
   },
   {
+    // OTA-1094 — CONVERGED FROM GOLEM-LINE, at the owner's direction: "never
+    // noted that lapse in the tutorial, HAL should have the look around you
+    // beat as well." golem commit 5d23d6fd added this beat on that line only
+    // and it was never flagged for porting; the tutorial walk exposed the gap
+    // a month later. The store handler (maybeAdvanceTutorial('look') at the
+    // end of the look-around function) and the InputBox chip-lighting were
+    // ALREADY here — only this step definition was missing, so the beat is
+    // one insertion, verbatim from golem.
+    //
+    // The orientation tool — taught FIRST, before the player picks anything up,
+    // because it's the "where am I / re-read the room" button. Tapping LOOK
+    // AROUND YOU calls maybeAdvanceTutorial('look') and InputBox lights this
+    // chip green for currentBeatId === 'look', so it advances to the cudgel beat.
+    // Looking around at the very start also surfaces the props (cudgel, rope,
+    // plate, locked door) the next beats walk the player through.
+    id: 'look',
+    screen: 'exploration',
+    area: 'quick-row',
+    pulse: true,
+    title: 'Look Around',
+    body: 'Start here. Tap LOOK AROUND YOU to get your bearings — it re-reads the room: what\'s here, your exits, and any open leads you\'re chasing. Use it any time you lose the thread.',
+    arbiter:
+      '"First, get your bearings. Tap LOOK AROUND YOU — I\'ll read the room for you: what\'s here, your way out, and whatever you\'re still chasing. Use it any time you\'re lost."',
+  },
+  {
     id: 'cudgel',
     remind: 'take the cudgel at your feet',
     screen: 'exploration',
