@@ -3507,6 +3507,36 @@ function sightVendor(
   if (greet) emitVendorGreeting(get, vendor);
 }
 
+/** OTA-1057 — LEDGER COVERAGE FOR PEOPLE WHO ARE NOT BEHIND A COUNTER.
+ *
+ *  Phase 1 built a per-person ledger and then wired it to vendors and Core
+ *  Guardians only, so the two populations the player actually TALKS to were
+ *  invisible to it: wanderers on the road (persuade, intimidate, a word of the
+ *  road) and the escorts they walk across the flats. Meet the same traveller
+ *  twice and nobody remembered; extort them and it cost you nothing they could
+ *  recall; get three pilgrims killed and the survivors greeted you like a
+ *  stranger. This is the same rememberNpcMeeting the vendor path uses — the
+ *  ledger did not need extending, only pointing at the rest of the cast. */
+function sightPerson(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  npc: { id: string; name: string; role?: string; factionId?: string | null },
+): void {
+  if (!npc?.name || !npc.id) return;
+  const hoursElapsed = get().player?.hoursElapsed ?? 0;
+  set((s) => ({
+    worldMemory: rememberNpcMeeting(s.worldMemory, {
+      id: vendorNpcId(npc),
+      name: npc.name,
+      role: npc.role ?? 'traveler',
+      factionId: npc.factionId ?? undefined,
+      locationId: get().player?.currentLocationId,
+      hoursElapsed,
+      firstMetAt: Date.now(),
+    }, { nowMs: Date.now(), hoursElapsed }),
+  }));
+}
+
 /** OTA-1055 — the greeting block, lifted out of beginScene so the other vendor
  *  paths can say it too. beginScene keeps its own copy because it interleaves
  *  the first-meeting arrival narration; everything here is the returning-face
@@ -7637,7 +7667,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-807 — announce a wandering NPC on arrival so the TALK affordance isn't
     // unexplained. Names the person after the archetype's greeting.
     if (scene.wanderer && !opts?.isOpening) {
-      get().appendLog('world', `${scene.wanderer.greeting} This is ${scene.wanderer.name}, ${scene.wanderer.role}. (Try "talk to ${scene.wanderer.name}" — a fair word carries.)`);
+      // OTA-1057 — and onto the ledger, where every other person the player
+      // meets already lives. Keyed by archetype + name, so the same traveller
+      // met on two tiles is one person rather than two rows.
+      sightPerson(get, set, {
+        id: scene.wanderer.id,
+        name: scene.wanderer.name,
+        role: scene.wanderer.role,
+        factionId: scene.wanderer.faction,
+      });
+      const wRel = getRelation(get().worldMemory, vendorNpcId(scene.wanderer));
+      if (wRel && wRel.meetings > 1) {
+        get().appendLog('world', npcGreeting(wRel, scene.wanderer.name, get().player?.name));
+      } else {
+        get().appendLog('world', `${scene.wanderer.greeting} This is ${scene.wanderer.name}, ${scene.wanderer.role}. (Try "talk to ${scene.wanderer.name}" — a fair word carries.)`);
+      }
     }
     // OTA-809 — pay out a pending LEAD (talked out of a wanderer via PERSUADE) once
     // the player reaches fresh, peaceful ground: they followed the lead and found the
@@ -21539,6 +21583,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const escort = escortSpec
       ? escortMod.spawnEscortPool(escortSpec.count, player.hpMax ?? 20, escortSpec.label)
       : null;
+    // OTA-1057 — the escort leader goes on the ledger the moment you take them
+    // on. `escort_` keys them by name, so the same person walked twice is one
+    // relationship, and whether you got them home is recorded against it below.
+    if (escort?.leaderName) {
+      sightPerson(get, set, {
+        id: `escort_${escort.leaderName}`,
+        name: escort.leaderName,
+        role: 'under your protection',
+        factionId: quest.factionId,
+      });
+    }
     set((s) =>
       s.player
         ? {
@@ -22012,6 +22067,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('reward', escortPayMult < 1
           ? `You delivered your ${dSpec.label} — battered, but breathing. The fee reflects the shape you brought them in (${Math.round(escortPayMult * 100)}% pay).`
           : `You delivered your ${dSpec.label} safely. They peel off with a nod.`);
+        // OTA-1057 — and the person who walked at the front remembers it. This
+        // is the payoff of naming the leader: take a second contract with the
+        // same party and you are not a stranger to them. Recorded only on
+        // DELIVERY -- a wiped party fails the quest long before turn-in, and
+        // there is nobody left to remember anything.
+        const leader = (get().player?.activeFactionQuests ?? [])
+          .find((q) => q.id === candidate.id)?.escort?.leaderName;
+        if (leader) {
+          set((st) => ({
+            worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId({ id: `escort_${leader}`, name: leader }), { contractsTurnedIn: 1 }),
+          }));
+        }
         // OTA-966 — the delivered party presses HEALTH supplies on you with the
         // fee (2 kits on an all-or-nothing drop-off, 1 otherwise). This is the
         // whole of an escort's item loot: TC + healing, nothing else.
@@ -28794,6 +28861,18 @@ function applyHookEffect(
       const escortMod = require('../engine/escort') as typeof import('../engine/escort');
       const spec = escortMod.escortSpecForQuest(def);
       const escort = spec ? escortMod.spawnEscortPool(spec.count, p.hpMax ?? 20, spec.label) : null;
+    // OTA-1057 — the escort leader goes on the ledger the moment you take them
+      // on. `escort_` keys them by name, so the same person walked twice is one
+      // relationship, and whether you got them home is recorded against it below.
+      if (escort?.leaderName) {
+        sightPerson(get, set, {
+          id: `escort_${escort.leaderName}`,
+          name: escort.leaderName,
+          role: 'under your protection',
+          factionId: def.factionId,
+        });
+      }
+
       const hasActiveOther = anyTrackedContract(p); // OTA-972 — #118: cross-kind
       const newTracked = !hasActiveOther;
       set((s2) => (s2.player ? {
@@ -34962,6 +35041,12 @@ function runParleyOutcome(
           currentScene: { ...s.currentScene, wanderer: null },
         };
       });
+      // OTA-1057 — talking a lead out of somebody is a dealing. It is what
+      // moves a wanderer off the 'met' rung, so meeting them again reads as
+      // meeting somebody rather than another stranger with the same face.
+      if (w) {
+        set((st) => ({ worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(w), { contractsTurnedIn: 1 }) }));
+      }
       get().appendLog('world', parleySuccessLine(choice, kind, targetName));
       if (lead) {
         get().appendLog('reward', `${targetName} lowers their voice: "${lead.hint}." (a lead — you'll turn it up when you next cross fresh ground)`);
@@ -34995,6 +35080,15 @@ function runParleyOutcome(
         }
         return { player: p, currentScene: { ...s.currentScene, wanderer: null } };
       });
+      // ⚠ OTA-1057 — SHAKING SOMEBODY DOWN IS A WRONG, and until now it was the
+      // only form of robbery in the game that cost you nothing personal. Lifting
+      // an item off a vendor's counter has been a `wrongs` since OTA-1049;
+      // putting a hand on a traveller and taking their coins was free, because
+      // wanderers were not on the ledger at all. Now they remember — and, like
+      // every other wrong, it is payable off through OTA-1053's amends.
+      if (w) {
+        set((st) => ({ worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(w), { wrongs: 1 }) }));
+      }
       get().appendLog('world', parleySuccessLine(choice, kind, targetName));
       const lootDesc = [`${goods.tc} TC`, ...grantedNames].join(', ');
       get().appendLog('reward', `You shake it loose from ${targetName}: ${lootDesc}.`);

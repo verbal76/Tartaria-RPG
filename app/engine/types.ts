@@ -672,6 +672,11 @@ export interface FactionStanding { factionId: string; standing: number; }
  *  for the whole group; it bleeds collateral in fights and the escort fails when
  *  it hits 0. `label` is the one-word cargo name shown in the HUD. */
 export interface EscortPool {
+  /** OTA-1057 — the one walking at the front, and the only member of the party
+   *  with an identity. An escort was a pool of hit points with a label; when
+   *  ledger coverage came to escorts there was nobody in it to remember. Absent
+   *  on saves written before this OTA. */
+  leaderName?: string;
   label: string;
   hp: number;
   hpMax: number;

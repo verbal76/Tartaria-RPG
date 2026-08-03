@@ -44,7 +44,13 @@ export const LONG_ABSENCE_HOURS = 72;
  *  bill, so a repeat thief digs a hole faster than they can fill it. */
 export const AMENDS_TC_PER_WRONG = 600;
 
-/** OTA-1055 — THE ONE RULE FOR WHO SOMEBODY IS, moved here from gameStore.
+/** OTA-1057 — renamed from vendorLedgerId. It stopped being about vendors three
+ *  OTAs ago (roadside, Hidden Market, overlay), and now covers wanderers and
+ *  escort leaders too; a name that lies about its scope is how the "three
+ *  install sites" comment in OTA-1055 got written. The old name stays as an
+ *  alias so nothing has to churn.
+ *
+ *  OTA-1055 — THE ONE RULE FOR WHO SOMEBODY IS, moved here from gameStore.
  *
  *  It lived in the store as a private function, which meant the test suite
  *  re-implemented it and then tested the copy — change the real rule and every
@@ -59,7 +65,7 @@ export const AMENDS_TC_PER_WRONG = 600;
  *     id while resolveStallIdentity rotates name, title AND faction daily across
  *     six authored reps — six people merged into one row, with the relation's
  *     faction flipping every real-world day. */
-export function vendorLedgerId(vendor: { id?: string; name: string }): string {
+export function npcLedgerId(vendor: { id?: string; name: string }): string {
   const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '_');
   const id = vendor.id ?? '';
   if (id.startsWith('roadside_')) return `roadside:${slug(vendor.name)}`;
@@ -68,8 +74,24 @@ export function vendorLedgerId(vendor: { id?: string; name: string }): string {
   // same per-spawn shape that made roadside traders litter the save. They are
   // five authored characters, so key them by who they are.
   if (id.startsWith('overlay_')) return `overlay:${slug(vendor.name)}`;
+  // OTA-1057 — WANDERERS. makeWanderer mints `wanderer_<archetype>_<tile seed>`,
+  // so the same person met on two tiles was two rows — the roadside leak again,
+  // in a system that had no ledger presence at all. Archetype + name IS the
+  // person: the cast is ARCHETYPES x FIRST_NAMES and both come off the seed.
+  if (id.startsWith('wanderer_')) {
+    const arch = id.split('_')[1] ?? 'traveler';
+    return `wanderer:${arch}:${slug(vendor.name)}`;
+  }
+  // OTA-1057 — ESCORT LEADERS. The party is a POOL (label, hp, count) with no
+  // individuals in it, so there was nobody to remember. The pool now names the
+  // person walking at the front, and that is who goes on the ledger.
+  if (id.startsWith('escort_')) return `escort:${slug(vendor.name)}`;
   return id || `vendor:${slug(vendor.name)}`;
 }
+
+/** OTA-1057 — the pre-rename name. Kept so the store's `vendorNpcId` alias and
+ *  every existing import keep working. */
+export const vendorLedgerId = npcLedgerId;
 
 export type NpcRegard =
   | 'wronged'    // you stole from them, or drew on them
@@ -201,7 +223,7 @@ export function rememberNpcMeeting(
   // against an npcsMet list that already contained the person just added, so it
   // manufactured a relation at meetings=1 and then the sighting incremented it
   // to 2. A first-ever arrival therefore read as a SECOND meeting — which
-  // OTA-1050's `seenBefore = meetings >= 2` turned into greeting a total
+  // OTA-1073's `seenBefore = meetings >= 2` turned into greeting a total
   // stranger as a returning face.
   //
   // Seeding before the append makes the inner seed a no-op (npcRelations is
@@ -366,7 +388,7 @@ export function npcRegard(rel: NpcRelation | null | undefined): NpcRegard {
   if (rel.wrongs > 0) return 'wronged';
   if (rel.contractsTurnedIn >= 2 || rel.tcTraded >= TC_FOR_TRUSTED) return 'trusted';
   if (rel.trades >= 3 || rel.contractsTurnedIn >= 1 || rel.tcTraded >= TC_FOR_FAMILIAR) return 'familiar';
-  // OTA-1050 — contractsTaken belongs on this rung. Slice 1 let it earn the
+  // OTA-1073 — contractsTaken belongs on this rung. Slice 1 let it earn the
   // player's NAME (knowsPlayerName) but not any regard, so someone who had
   // handed you work was ranked below someone you had merely walked past three
   // times. Found by a slice-2 test; the ladder was wrong, not the test.
@@ -374,7 +396,7 @@ export function npcRegard(rel: NpcRelation | null | undefined): NpcRegard {
   return 'met';
 }
 
-/** OTA-1054 — how many raid records to keep. Enough that a player who has been
+/** OTA-1077 — how many raid records to keep. Enough that a player who has been
  *  away a long while still hears about it; short enough that the save does not
  *  grow a war diary. */
 export const RAID_MEMORY_CAP = 12;
@@ -577,7 +599,7 @@ export function npcAbsenceLine(
 }
 
 // ---------------------------------------------------------------------------
-// OTA-1050 — PHASE 1, SLICE 2.
+// OTA-1073 — PHASE 1, SLICE 2.
 // ---------------------------------------------------------------------------
 
 /** Player-facing name for a rung of the ladder, for the Chronicle's people

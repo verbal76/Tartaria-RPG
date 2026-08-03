@@ -171,8 +171,11 @@ describe('OTA-1052 — everyone you meet is on the ledger', () => {
       require('path').join(__dirname, '../app/state/gameStore.ts'),
       'utf8',
     );
-    // Three sites: the vendor arrival and the two Core Guardian spawns.
+    // OTA-1057 — FOUR now: sightVendor (all five vendor-install paths funnel
+    // through it), the two Core Guardian spawns, and sightPerson, which carries
+    // wanderers and escort leaders. The count is the point of the test — it is
+    // what stops a sixth site being added without going through a helper.
     const calls = src.match(/rememberNpcMeeting\(/g) ?? [];
-    expect(calls.length).toBe(3);
+    expect(calls.length).toBe(4);
   });
 });
