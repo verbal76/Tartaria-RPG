@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.94';
+export const DISPLAY_VERSION = '4.28.95';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18991,7 +18991,47 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // appears only when a vendor AND a wanderer are both present, because a
 // one-entry picker is a tap of pure ceremony.
 // DISPLAY_VERSION 4.28.94. 21 tests.
-export const OTA_BUILD_ID = '2026-08-03-1060-gifting';
+// OTA-1061 — CONVERSATION THAT GIVES YOU SOMETHING.
+//
+// Topics were gated, characterful and INERT. The neighbouring system already
+// pays -- parley hands you a lead or their goods -- so a talk that never
+// yielded anything read thin sitting next to one that did. Topics can now carry
+// a `grants` block: a traceable LEAD, an authored WHISPER chain, or a small
+// payment. Six authored so far, all of them gated behind a real relationship.
+//
+// ⚠ FIRE-ONCE, AND NOT BY A SEPARATE FLAG. The grant is keyed off the SAME
+// worldMemory.talkedTopics counter that already drives "I have told you that
+// one" -- `asked === 0` IS the first raise. One fact read twice, so the payout
+// and the acknowledgement cannot drift apart. A parallel `granted` set would
+// have been the obvious shape and the wrong one.
+//
+// ⚠ NO STANDING, DELIBERATELY. OTA-803 deleted gifting because faction standing
+// had a side door; OTA-1060 reopened that verb only behind a LIFETIME
+// per-faction budget. A topic that granted standing would be a SECOND door into
+// the same economy with no budget on it at all. Talk pays in information and
+// occasionally in coin. Never in reputation. There is a test that reads
+// applyTopicGrant and fails if applyRepChange or factionStanding appears in it.
+//
+// WHISPERS FROM CONVERSATION close a real gap: the Yulka chain could only be
+// planted by walking into the Mess and winning a 15% roll. Now Tellin (who buys
+// the Discs and has never asked where they come from) and Elara (who knows
+// everyone working nights) can tell you directly -- which is what "word
+// travels" should mean. Hearing it twice is not two rumours: an already-held or
+// already-finished chain is skipped silently, because the topic's own line has
+// been said and a second sentence explaining that nothing happened is noise.
+//
+// LEADS reuse player.pendingLead and the OTA-809 payout site rather than
+// inventing a parallel one. An UNCLAIMED lead is never overwritten -- that slot
+// is single, and replacing it would quietly delete something the player was
+// told to go and find. They keep the one they have and are told so.
+//
+// Everything that pays is gated behind at least 'familiar', and a robbed
+// shopkeeper grants nothing at all -- a stranger who can talk a lead out of
+// somebody makes the whole relationship layer pointless, because the payout
+// becomes the fast path.
+// DISPLAY_VERSION 4.28.95. 12 tests.
+export const OTA_BUILD_ID = '2026-08-03-1061-topic-grants-whispers';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1060-gifting';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1059-talk-full-cast-chapter-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1058-talk-topics-phase2-slice';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1057-wanderer-escort-ledger';

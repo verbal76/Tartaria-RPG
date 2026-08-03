@@ -60,11 +60,42 @@ export interface TopicGate {
   minCores?: number;
 }
 
+/** OTA-1061 — what a topic HANDS YOU, once, the first time it is raised.
+ *
+ *  Until now a conversation was flavour: gated, characterful, and inert. The
+ *  neighbouring system already pays — parley gives a lead or their goods — so a
+ *  talk that never yields anything reads thin sitting next to one that does.
+ *
+ *  ⚠ FIRE-ONCE, BY CONSTRUCTION. The effect is keyed off the SAME
+ *  worldMemory.talkedTopics counter that drives "I have told you that one", so
+ *  a topic that has been raised cannot pay again. That is not a guard bolted on
+ *  the side; it is the same fact being read twice, which is why it cannot drift.
+ *
+ *  ⚠ NO STANDING HERE. Deliberate. OTA-803 deleted gifting because faction
+ *  standing had a side door, and OTA-1060 reopened the verb only behind a
+ *  lifetime per-faction budget. Letting topics grant standing would be a
+ *  SECOND door into the same economy, with no budget on it. Talk pays in
+ *  information and occasionally coin — never in reputation. */
+export interface TopicGrant {
+  /** A traceable lead: plants player.pendingLead, which pays out when the
+   *  player next reaches fresh ground. Reuses the OTA-809 parley machinery
+   *  rather than inventing a parallel one. */
+  lead?: { hint: string; rewardTc: number; rewardItem?: string };
+  /** Plants an authored whisper chain by id (engine/whispers.ts CHAINS).
+   *  Skipped silently if the player already has it or has finished it — word
+   *  reaching you twice is not two rumours. */
+  whisper?: string;
+  /** A small payment. Bounded deliberately: this is somebody pressing coins on
+   *  you, not a contract. */
+  tc?: number;
+}
+
 export interface Topic {
   id: string;
   label: string;
   gate?: TopicGate;
   lines: string[];
+  grants?: TopicGrant;
 }
 
 export interface NpcTopicSet {

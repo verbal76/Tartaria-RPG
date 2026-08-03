@@ -849,8 +849,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1083`**,
-**golem-line `2026-08-03-1060`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1084`**,
+**golem-line `2026-08-03-1061`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -859,9 +859,44 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.94**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.95**; ledger in `VERSION.md`.
 
-- **GIFTING (2026-08-03, latest). BOTH LINES.**
+- **TOPIC GRANTS + WHISPERS FROM CONVERSATION (2026-08-03, latest). BOTH LINES.**
+  Topics were gated, characterful and **inert**. The neighbouring system already
+  pays — parley hands you a lead or their goods — so a talk that never yielded
+  anything read thin next to one that did. Topics can now carry a `grants`
+  block: a traceable **lead**, an authored **whisper** chain, or a small
+  **payment**. Six authored.
+  ⚠ **Fire-once, and not by a separate flag.** The grant is keyed off the same
+  `talkedTopics` counter that already drives *"I have told you that one"* —
+  `asked === 0` **is** the first raise. One fact read twice, so the payout and
+  the acknowledgement cannot drift apart. A parallel `granted` set would have
+  been the obvious shape and the wrong one.
+  ⚠ **No standing, deliberately.** OTA-803 deleted gifting because faction
+  standing had a side door; OTA-1060 reopened that verb only behind a lifetime
+  per-faction budget. A topic granting standing would be a **second** door into
+  the same economy with no budget on it. Talk pays in information and
+  occasionally coin — never reputation. A test reads `applyTopicGrant` and fails
+  if `applyRepChange` or `factionStanding` appears in it.
+  **Whispers from conversation** close a real gap: the Yulka chain could only be
+  planted by walking into the Mess and winning a 15% roll. Now Tellin — who buys
+  the Discs and has never asked where they come from — and Elara, who knows
+  everyone working nights, can tell you directly. That is what "word travels"
+  should mean. Hearing it twice is not two rumours: an already-held chain is
+  skipped silently.
+  **Leads** reuse `player.pendingLead` and the OTA-809 payout site rather than a
+  parallel one, and an **unclaimed lead is never overwritten** — that slot is
+  single, and replacing it would quietly delete something the player was told to
+  go and find.
+  Everything that pays is gated behind `familiar` or better, and a robbed
+  shopkeeper grants nothing at all — a stranger who can talk a lead out of
+  somebody makes the relationship layer pointless, because the payout becomes
+  the fast path.
+  Files: `dialogue.ts` (`TopicGrant`), `dialogue_topics.json` (+6 granting
+  topics, 135 total), `gameStore.ts` (`applyTopicGrant`, first-raise gate),
+  `ota1084TopicGrants.test.ts` (12).
+
+- **GIFTING (2026-08-03). BOTH LINES.**
   Type `gift`, pick an item, pick a person. They take it, react in character,
   and **remember the object** — `NpcRelation.gifts` stores names, not a score.
   A gift that only moved a warmth number would be a second currency; the memory
