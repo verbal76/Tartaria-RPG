@@ -523,6 +523,14 @@ interface CurrentScene {
   /** Index of the enemy the player is currently targeting. */
   activeEnemyIdx: number;
   vendor: VendorInstance | null;
+  /** OTA-1056 — THE PERSON BEHIND THE ENEMY. A vendor who catches you stealing
+   *  flips hostile, and OTA-1055's review found the conversion threw them away:
+   *  `vendor` was nulled and a generic Enemy installed carrying only a name. So
+   *  there was nothing to put back, and nothing to write the consequence
+   *  against. VENDORS DO NOT DIE (owner's call — a dead armourer silently
+   *  breaks every contract chain that turns in at their counter). They yield.
+   *  This is what they are restored from. */
+  vendorInFight?: VendorInstance | null;
   /** OTA-451 — a public MISSION BOARD standing in this room (the vendor-free
    *  central square of every faction Outpost). Carries the faction whose
    *  contracts it posts so a new player has an immediate quest on-ramp; the UI
@@ -3519,6 +3527,96 @@ function emitVendorGreeting(
   if (raid) get().appendLog('world', raidNewsLine(rel, raid, vendor.name, player.name));
   const talkAbout = gossipSubject(get().worldMemory, rel);
   if (talkAbout) get().appendLog('world', gossipLine(vendor.name, talkAbout, player.name));
+}
+
+/** OTA-1056 — THE VENDOR YIELDS.
+ *
+ *  Owner's design call, and it closes the last open piece of Phase 1: vendors
+ *  never die. You win the fight or you lose it; either way they are still there
+ *  afterwards. A dead armourer would silently break every contract chain that
+ *  turns in at their counter, and there is no dead-NPC list anywhere in the code
+ *  to reason about it with — so the honest fix is to remove the death, not to
+ *  build machinery around it.
+ *
+ *  Winning costs you and pays you NOTHING:
+ *    - they keep every item. A successful THEFT still hands you the goods (that
+ *      is what the steal roll is for); a beating does not. Otherwise "steal ->
+ *      get caught -> win the fight -> take two things off the shelf -> repeat"
+ *      is a better item source than stealing, and the person is still standing
+ *      there to do it to again.
+ *    - the room turns on you. Where there are other traders or guards, they run
+ *      you out; on the open road there is nobody to do it, so the trader gets
+ *      their stock away and goes.
+ *    - it goes on their PERSONAL ledger as a wrong, so it shows in the Chronicle,
+ *      drops them to `wronged`, and prices everything they sell you at +25%
+ *      until you have made it good (OTA-1053's amends: 600 TC per wrong). There
+ *      is a road back, which is the point of putting it on the ledger rather
+ *      than making it permanent.
+ *    - faction standing takes the second hit here, where the kill used to take
+ *      it (buildTraderEnemy carries factionId for exactly that path). */
+function resolveVendorSubmission(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  vendor: VendorInstance,
+): void {
+  const player = get().player;
+  if (!player) return;
+  const scene = get().currentScene;
+  // Guards and rival stallholders exist in a hub / market / outpost room. On an
+  // empty stretch of road there is nobody to raise a hand, so the trader simply
+  // does not stay to be hit again.
+  const inSettlement = !!player.hubRoomId || !!get().activeBuildingId;
+
+  get().appendLog(
+    'combat',
+    `${vendor.name} goes down on one knee, hands open, and stays there. "Enough. ENOUGH." Whatever you came for is still under their arm — through all of it they never let go of the pack, and not one thing in it is yours.`,
+  );
+  get().appendLog(
+    'world',
+    inSettlement
+      ? `Boots on stone behind you. The other stallholders are already up, and two of the watch are coming at a jog with their hands on their belts. Nobody draws. Nobody has to — you are outnumbered and standing over a kneeling trader, and every one of them saw it. You are walked out, and the whole row watches you go.`
+      : `${vendor.name} drags the pack up off the ground, backing away, keeping their face to you the whole time. By the time you have your breath the poles are down, the cloth is rolled, and there is nothing on this stretch of road but you and the flats. They will remember this.`,
+  );
+
+  // Standing: the second hit, where the kill used to take it.
+  const origById = new Map(player.factionStanding.map((r) => [r.factionId, r.standing] as const));
+  let standing = player.factionStanding;
+  if (vendor.faction) standing = applyRepChange(standing, vendor.faction, -12).standing;
+  if (vendor.nativeFaction && vendor.nativeFaction !== vendor.faction) {
+    standing = applyRepChange(standing, vendor.nativeFaction, -12).standing;
+  }
+  for (const r of standing) {
+    const delta = r.standing - (origById.get(r.factionId) ?? r.standing);
+    if (delta !== 0) get().appendLog('system', `Standing ${delta > 0 ? '+' : ''}${delta} — ${r.factionId.replace(/_/g, ' ')}.`);
+  }
+
+  set((st) => ({
+    ...(st.player ? { player: { ...st.player, factionStanding: standing } } : {}),
+    // The person, on their own ledger. recordNpcDealing no-ops without a
+    // relation, and every install path sights the vendor first (OTA-1078), so
+    // by the time anyone can steal from them the row exists.
+    worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(vendor), { wrongs: 1 }),
+    ...(st.currentScene ? {
+      currentScene: {
+        ...st.currentScene,
+        // In a settlement you are the one who leaves, so the counter is still
+        // there — you are just not standing at it. On the road they leave.
+        vendor: null,
+        vendorInFight: null,
+        enemies: [],
+        enemyHps: [],
+        activeEnemyIdx: 0,
+        range: null,
+        enemyAmbushUsed: [],
+      },
+    } : {}),
+  }));
+
+  // Run them off for real, not just in prose: a player left standing in the
+  // room could re-open the stall tab and start again.
+  if (get().activeBuildingId) get().exitBuilding();
+
+  void get().persist();
 }
 
 /** OTA-1050 — credit a finished contract to the person who took it back.
@@ -19356,6 +19454,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { currentScene, player, worldMemory } = get();
     const enemy = activeEnemy(currentScene);
     if (!currentScene || !enemy || !player) return;
+    // OTA-1056 — A VENDOR YIELDS; THEY DO NOT DIE. Intercepted at the top of the
+    // defeat routine so none of what follows runs for them: no loot roll, no
+    // defeatedEnemies row, no kill milestone, no corpse. Killing merchants was
+    // never designed — it fell out of the caught-theft flip converting them into
+    // an ordinary Enemy — and it silently breaks contract chains that turn in at
+    // their counter. Beating somebody senseless is not the same as ending them.
+    if (currentScene.vendorInFight && currentScene.vendorInFight.name === enemy.name) {
+      resolveVendorSubmission(get, set, currentScene.vendorInFight);
+      return;
+    }
     // OTA-1035 — collect this fight's story + take into one card (bosses only).
     bossVictoryCapture = enemy.boss ? { name: enemy.name, flavor: [], rewards: [] } : null;
     const activeIdx = currentScene.activeEnemyIdx;
@@ -21055,6 +21163,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScene: {
                 ...s.currentScene,
                 vendor: null,
+                // OTA-1056 — but not gone. See CurrentScene.vendorInFight.
+                vendorInFight: scene.vendor,
                 enemies: [enemy],
                 enemyHps: [enemy.hp],
                 activeEnemyIdx: 0,
