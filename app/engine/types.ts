@@ -1004,6 +1004,19 @@ export interface PlayerCharacter {
   /** OTA-1044 — motive-drip beat ids already delivered to the feed (strict
    *  order, one-shot each; see engine/storyDrip.ts). Absent = none yet. */
   storyBeatsSeen?: string[];
+  /** ⚠ OTA-1089 — PHASE 4 DIFFICULTY, chosen on the last step of character
+   *  creation and LOWERABLE MID-RUN BUT NEVER RAISABLE (engine/pressure.ts
+   *  canChangeTo). Absent = DEFAULT_PRESSURE ('owed'), which is what every
+   *  save written before this OTA reads as: the game exactly as it has always
+   *  played, plus the two new pressure systems at their gentlest. Anybody who
+   *  finds that too much can drop a tier from Settings without abandoning the
+   *  character, which is the escape hatch that makes an honest default safe. */
+  pressure?: string;
+  /** OTA-1089 — the highest TIDE stage this character has been told about, so
+   *  the crossing line fires once per stage rather than on every step inside
+   *  it. Derived state would be wrong here: the stage is a function of hours,
+   *  and "have you been told" is not. */
+  tideStageSeen?: number;
   /** ⚠ OTA-1088 — PHASE 3 BRANCH STATE. forkId → optionId, one entry per
    *  question this character has answered. This is the ONLY thing the fork
    *  system persists: which fork is due, whether a card should be showing, and

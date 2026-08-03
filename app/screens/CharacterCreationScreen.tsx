@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
 import { getStoryMotives } from '../engine/story'; // OTA-1041
+// OTA-1089 — Phase 4: the last thing you say before you walk.
+import { PRESSURE_ORDER, PRESSURE_PROFILES, DEFAULT_PRESSURE, type PressureTier } from '../engine/pressure';
 
 // Tungsten Spire — the 'name' step is gone. New flow: race → faction →
 // BEGIN. The player gives their name in-game when the Arbiter prompts
@@ -12,13 +14,18 @@ import { getStoryMotives } from '../engine/story'; // OTA-1041
 
 // OTA-1041 — a third step: THE REASON YOU CAME DOWN. The motive shapes the
 // opening crawl and (phases 2-3) the story beats woven through the main quest.
-type Step = 'race' | 'faction' | 'motive';
+// OTA-1089 — a fourth and final step: HOW MUCH DOES THE MUD TAKE? It sits
+// AFTER the motive on purpose. You say why you came down, and then you say what
+// you are prepared to have it cost — which is the same order the Arbiter would
+// ask in, and the last thing decided before the crawl starts.
+type Step = 'race' | 'faction' | 'motive' | 'pressure';
 
-const STEP_ORDER: Step[] = ['race', 'faction', 'motive'];
+const STEP_ORDER: Step[] = ['race', 'faction', 'motive', 'pressure'];
 const STEP_TITLE: Record<Step, string> = {
   race: 'CHOOSE YOUR RACE',
   faction: 'CHOOSE YOUR FACTION',
   motive: 'WHY DID YOU COME DOWN?',
+  pressure: 'HOW MUCH DOES IT TAKE?',
 };
 
 export function CharacterCreationScreen() {
@@ -34,6 +41,7 @@ export function CharacterCreationScreen() {
   const [raceId, setRaceId] = useState(races[0]!.id);
   const [factionId, setFactionId] = useState(factions[0]!.id);
   const [motiveId, setMotiveId] = useState(motives[0]!.id);
+  const [pressure, setPressure] = useState<PressureTier>(DEFAULT_PRESSURE); // OTA-1089
 
   const stepIndex = STEP_ORDER.indexOf(step);
   const selectedRace = races.find((r) => r.id === raceId) ?? races[0]!;
@@ -44,8 +52,10 @@ export function CharacterCreationScreen() {
       setScreen('title');
     } else if (step === 'faction') {
       setStep('race');
-    } else {
+    } else if (step === 'motive') {
       setStep('faction');
+    } else {
+      setStep('motive');
     }
   };
 
@@ -58,14 +68,18 @@ export function CharacterCreationScreen() {
       setStep('motive');
       return;
     }
+    if (step === 'motive') {
+      setStep('pressure');
+      return;
+    }
     // Motive step → straight into the game with an empty name; the
     // Arbiter prompts for it in the outpost. tutorialStep starts at 0
     // (the name beat) and the InputBox routes the next submission as
     // the player's name. The motive drives the opening crawl.
-    void startNewGame({ name: '', raceId, factionId, motiveId });
+    void startNewGame({ name: '', raceId, factionId, motiveId, pressure });
   };
 
-  const nextLabel = step === 'motive' ? 'BEGIN' : 'NEXT →';
+  const nextLabel = step === 'pressure' ? 'BEGIN' : 'NEXT →';
 
   return (
     <View style={styles.container}>
@@ -176,7 +190,38 @@ export function CharacterCreationScreen() {
                 )}
               </TouchableOpacity>
             ))}
+          </>
+        )}
+
+        {step === 'pressure' && (
+          <>
+            {/* OTA-1089 — PHASE 4 BEHIND ITS TOGGLE. Every option carries a
+                plain subtitle: a difficulty name that sounds good and explains
+                nothing is a trap on a screen you cannot revisit. */}
+            <Text style={styles.contextLine}>
+              {selectedRace.name} · {selectedFaction.name} · {motives.find((m) => m.id === motiveId)?.title ?? ''}
+            </Text>
+            {PRESSURE_ORDER.map((id) => {
+              const prof = PRESSURE_PROFILES[id];
+              return (
+                <TouchableOpacity
+                  key={id}
+                  style={[styles.option, pressure === id && styles.optionSelected]}
+                  onPress={() => setPressure(id)}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: pressure === id }}
+                  accessibilityLabel={`${prof.label} ${prof.subtitle}`}
+                >
+                  <Text style={styles.optionName}>{prof.label}</Text>
+                  <Text style={styles.optionDesc}>{prof.subtitle}</Text>
+                </TouchableOpacity>
+              );
+            })}
             <View style={styles.beginBlock}>
+              <Text style={styles.beginHint}>
+                You can ease this later from your character sheet if it turns out to be too much. You can never raise it.
+              </Text>
               <Text style={styles.beginHint}>
                 Tap BEGIN below. The Arbiter will greet you in the outpost and ask your name.
               </Text>
