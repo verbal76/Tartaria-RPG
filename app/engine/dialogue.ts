@@ -58,6 +58,15 @@ export interface TopicGate {
   /** OTA-1082 — Cores recovered. `cores` is a long phase (five Cores inside
    *  it), so phase alone cannot express "once you are most of the way". */
   minCores?: number;
+  /** ⚠ OTA-1088 — WHAT YOU CHOSE. `"<forkId>:<optionId>"`, matched against
+   *  storyForks.choiceKeys(player). This is the third place a Phase 3 decision
+   *  lands and the only one that happens in the middle of the game rather than
+   *  at the moment of choosing or at the ending: the cast built over
+   *  OTA-1081..1087 can know what you did and open a topic about it.
+   *
+   *  One string rather than two fields, deliberately — a gate that took a fork
+   *  and an option separately would have a second way to be half-specified. */
+  requiresChoice?: string;
 }
 
 /** OTA-1084 — what a topic HANDS YOU, once, the first time it is raised.
@@ -117,6 +126,9 @@ export interface TalkContext {
    *  hold. Both default safely for a character who has not started it. */
   chapter: MainQuestPhase;
   cores: number;
+  /** OTA-1088 — `"<forkId>:<optionId>"` for every Phase 3 question this
+   *  character has answered. Empty for a run that has not been asked one. */
+  choices: string[];
 }
 
 /** OTA-1085 — THE CLASS KEY: topics for people who are not authored one by one.
@@ -194,6 +206,7 @@ export function gateAllows(gate: TopicGate | undefined, ctx: TalkContext): boole
     if (need < 0 || have < 0 || have < need) return false;
   }
   if (gate.minCores !== undefined && ctx.cores < gate.minCores) return false;
+  if (gate.requiresChoice && !ctx.choices.includes(gate.requiresChoice)) return false;
   return true;
 }
 

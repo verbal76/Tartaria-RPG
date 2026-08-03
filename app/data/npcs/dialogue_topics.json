@@ -209,6 +209,17 @@
           "lines": [
             "Tellin keeps his hands flat on the table where you can see them. \"I know exactly what you took,\" he says. \"To the quarter-weight. It is my job to know.\" He does not blink. \"So we will talk about that, when you are ready to talk about that. Not before.\""
           ]
+        },
+        {
+          "id": "the_claim",
+          "label": "Ask whether the Guild talks about your writ",
+          "gate": {
+            "minRegard": "known",
+            "requiresChoice": "debt_claim:sell_the_claim"
+          },
+          "lines": [
+            "Tellin does not look up. \"Everyone knows. You signed in front of a witness and the witness drinks.\" He weighs something, sets it down. \"For what it is worth, nobody thinks less of you. Half the Guild would have signed it. The other half already did and are still paying.\" A pause. \"When you bring the first one up, bring it to me and not to her. I will at least tell you what it was worth.\""
+          ]
         }
       ]
     },
@@ -272,6 +283,17 @@
           "lines": [
             "\"You took from the archive.\" Vesryn does not raise their voice. \"I do not care about the object. I care that you were in a room of irreplaceable things and decided one of them was yours. That is a character, not a mistake.\""
           ]
+        },
+        {
+          "id": "the_pages",
+          "label": "Ask if the pages reached anyone",
+          "gate": {
+            "minRegard": "known",
+            "requiresChoice": "record_first_pages:send_it_up"
+          },
+          "lines": [
+            "Vesryn keeps a finger in the page. \"They reached us,\" she says, which is not the answer to the question you asked. \"Three of the claims are wrong. Two of them are wrong in ways that make the fourth one much more interesting than you realised when you wrote it.\" She finally looks up. \"You published early. That was either brave or careless and I have not decided, and neither, I think, have you.\""
+          ]
         }
       ]
     },
@@ -313,6 +335,17 @@
           },
           "lines": [
             "\"You stole from a quartermaster.\" Korash almost laughs. \"Do you know what that means? It means somebody on the line goes without. Not me. Them. Go and think about which of them it was.\""
+          ]
+        },
+        {
+          "id": "the_seat",
+          "label": "Ask what the districts make of your seat",
+          "gate": {
+            "minRegard": "known",
+            "requiresChoice": "exile_throne:take_the_title"
+          },
+          "lines": [
+            "Korash straightens up from the crate, and for a moment he is not a quartermaster. \"Four families,\" he says. \"Two of them think you will sell the district the first time somebody offers. One of them is waiting to see. The fourth has your drowned name over their door, painted, badly.\" He goes back to the crate. \"I did not say which was which. Work it out. That is most of the job.\""
           ]
         }
       ]
