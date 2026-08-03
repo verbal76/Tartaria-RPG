@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.7';
+export const DISPLAY_VERSION = '4.29.8';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19518,7 +19518,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // surfaces, not popups, and their colors are purpose-coded (damage types,
 // feed channels) — a separate conversation if the owner wants it.
 // DISPLAY_VERSION 4.29.7.
-export const OTA_BUILD_ID = '2026-08-03-1073-all-popups-house-palette';
+//
+// OTA-1074 — THE DIFFICULTY STEP SAYS THE WORD DIFFICULTY.
+//
+// Owner: "remove the how much does it take and replace it with a more
+// recognizable difficulty level title." The creation step's header was
+// 'HOW MUCH DOES IT TAKE?' — evocative, and wrong for signage. A new player
+// picking a permanent, never-raisable setting deserves to know instantly
+// that this is the difficulty screen. Now 'CHOOSE YOUR DIFFICULTY',
+// matching the sibling steps' pattern (CHOOSE YOUR RACE / CHOOSE YOUR
+// FACTION). The flavor lives on where it belongs: the four first-person
+// tier names and their plain subtitles. The character sheet's HOW MUCH IT
+// TAKES section is untouched — there the player already knows the system.
+// DISPLAY_VERSION 4.29.8.
+export const OTA_BUILD_ID = '2026-08-03-1074-difficulty-step-title';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1073-all-popups-house-palette';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1072-fork-overlay-house-palette';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1070-tutorial-and-combat-walks';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1069-playtest-honest-walk';

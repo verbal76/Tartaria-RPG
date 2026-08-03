@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1096`**,
-**golem-line `2026-08-03-1073`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1097`**,
+**golem-line `2026-08-03-1074`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,9 +923,16 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.7**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.8**; ledger in `VERSION.md`.
 
-- **EVERY POPUP ON THE HOUSE PALETTE (2026-08-03, latest). BOTH LINES.**
+- **THE DIFFICULTY STEP SAYS THE WORD DIFFICULTY (2026-08-03, latest). BOTH
+  LINES.** HAL OTA-1074 / golem OTA-1051. The creation step's header
+  'HOW MUCH DOES IT TAKE?' → **'CHOOSE YOUR DIFFICULTY'** at the owner's
+  direction — evocative flavor failed as signage on a permanent,
+  never-raisable choice. Matches the sibling steps' pattern; the flavor
+  stays in the four first-person tier names. Sheet section untouched.
+
+- **EVERY POPUP ON THE HOUSE PALETTE (2026-08-03). BOTH LINES.**
   HAL OTA-1073 / golem OTA-1050. Owner: *"make all of the pop ups fit the
   same color palette, and design style for the same look."* The audit across
   all 33 popups found eight with orphans: seven were TOKEN DRIFT (near-miss
