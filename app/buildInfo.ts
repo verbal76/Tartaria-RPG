@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.89';
+export const DISPLAY_VERSION = '4.28.90';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19832,7 +19832,48 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // that was a pure tautology — it passed unchanged under the mutation that
 // deletes the feature — was replaced with a partition check that can fail.
 // DISPLAY_VERSION 4.28.89. 37 + 35 tests.
-export const OTA_BUILD_ID = '2026-08-02-1078-ledger-holes-and-noise-floor';
+// OTA-1079 — VENDORS DO NOT DIE. Owner's design call, and it closes the last
+// open item of Phase 1.
+//
+// The death half was never designed. It fell out of the caught-theft path
+// converting the vendor into an ordinary Enemy, which then flowed into the
+// generic defeat routine like any wasteland raider. Two things were wrong:
+//
+// (1) IT BREAKS THE GAME QUIETLY. A killed armourer is the turn-in point for
+// every contract chain that ends at their counter. There is no dead-NPC list
+// anywhere in the code, so the "death" was really a scene wipe that the next
+// scene regeneration undid — nobody decided that, it just happened.
+// (2) IT PAID BETTER THAN THE MECHANIC IT COMPETES WITH. buildTraderEnemy's
+// loot pool is the vendor's own first two offers, so "steal -> get caught ->
+// win the fight" was a better item source than stealing, and the target was
+// still standing there for a second round.
+//
+// So: you win the fight or you lose it, and either way they are alive after.
+// A successful THEFT still hands you the goods — that is what the steal roll
+// is for. A BEATING hands you nothing.
+//
+// WHAT WINNING GETS YOU:
+//  - nothing off the shelf. They never let go of the pack.
+//  - thrown out. Where there are other traders and guards — a hub, a market,
+//    an outpost room — the row turns on you and you are walked out (and
+//    exitBuilding actually fires, so a player cannot re-open the stall tab and
+//    start again; the prose and the state agree). On the open road there is
+//    nobody to raise a hand, so the trader gets their stock away and goes.
+//  - -12 faction standing, taken HERE, where the kill used to take it.
+//  - a `wrongs` on their PERSONAL ledger, so it shows in the Chronicle, drops
+//    them to `wronged`, and prices everything they sell you at +25% until you
+//    have made it good. That is deliberate: OTA-1076's amends (600 TC per
+//    wrong) give a road back, which is why this lands on the ledger instead of
+//    being a permanent black mark.
+//
+// The person is carried through the fight on CurrentScene.vendorInFight —
+// OTA-1078's review found the conversion threw them away entirely, so there was
+// nothing to restore and nothing to write the consequence against. The intercept
+// sits at the TOP of resolveEnemyDefeat, so none of the corpse machinery runs:
+// no loot roll, no defeatedEnemies row, no kill milestone.
+// DISPLAY_VERSION 4.28.90. 10 tests.
+export const OTA_BUILD_ID = '2026-08-03-1079-vendors-do-not-die';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1078-ledger-holes-and-noise-floor';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1077-raid-news-reaches-the-people';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1076-ledger-identity-amends-prices';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1075-absence-line-and-ledger-coverage';
