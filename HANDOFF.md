@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1104`**,
-**golem-line `2026-08-03-1081`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1105`**,
+**golem-line `2026-08-03-1082`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,9 +923,19 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.15**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.16**; ledger in `VERSION.md`.
 
-- **THE SHAKEDOWN, THE CLIENT'S COAT, AND THE MUMBLE (2026-08-03, latest).
+- **DISMISSING THE VENDOR ENDS THE CONVERSATION (2026-08-03, latest). BOTH
+  LINES.** HAL OTA-1105 / golem OTA-1082. Owner, on device: *"I hit ✕ to
+  close the vendor chip while the talk menu was still open; the vendor went
+  away but the talk menu stayed open."* The OTA-1099 walk-away guard lives
+  in submitPlayerAction; the vendor chip's ✕ (OTA-1052) doesn't route
+  through it — the one uncovered exit. The ✕ now closes an open talk WITH
+  THAT VENDOR first (ledger-id match; a wanderer conversation is untouched)
+  with the STOP TALKING feed line, and does nothing mid-shakedown — the
+  pay-or-fight choice cannot be dismissed from a chip.
+
+- **THE SHAKEDOWN, THE CLIENT'S COAT, AND THE MUMBLE (2026-08-03).
   BOTH LINES.** HAL OTA-1104 / golem OTA-1081. Three owner decisions:
   (1) *"the pay them off option when caught; if you don't have the TC you
   fight"* — caught at a vendor's pocket with enough TC raises a PAY/FIGHT

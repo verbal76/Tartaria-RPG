@@ -792,7 +792,23 @@ export function ExplorationScreen() {
               — or typing "trade" — still reaches them. */}
           <TouchableOpacity
             style={styles.placeChipX}
-            onPress={() => setVendorChipDismissedKey(chipViewKey)}
+            onPress={() => {
+              // OTA-1105 — the ✕ doesn't route through submitPlayerAction, so
+              // it was the one exit the talk sheet's walk-away guard didn't
+              // cover: owner hit ✕ mid-conversation and the vendor left while
+              // the sheet stayed open. Dismissing the person you're talking
+              // to walks away from the conversation first (same feed line as
+              // STOP TALKING). A conversation with somebody ELSE (a wanderer)
+              // is not touched — match on the ledger id. And mid-shakedown
+              // the ✕ does nothing: their grip is on your wrist.
+              const st = useGameStore.getState();
+              if (st.pendingPayoff) return;
+              if (st.pendingTalk && currentScene.vendor
+                && st.pendingTalk.npcId === npcLedgerId(currentScene.vendor)) {
+                st.closeTalk();
+              }
+              setVendorChipDismissedKey(chipViewKey);
+            }}
             hitSlop={10}
             activeOpacity={0.7}
             accessibilityRole="button"
