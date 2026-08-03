@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.98';
+export const DISPLAY_VERSION = '4.28.99';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19175,7 +19175,59 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // re-selling launders amends at the cost of the spread — bounded, but softer
 // than 600 TC a wrong.
 // DISPLAY_VERSION 4.28.98. 26 tests.
-export const OTA_BUILD_ID = '2026-08-03-1064-talk-doors-and-audit';
+// OTA-1065 — PHASE 3: MAKE THE STORY ASK QUESTIONS.
+//
+// The build plan, verbatim: "the audience that pays premium for text is paying
+// for consequence, and right now you have exactly one fork in the game. The
+// Missing's grave / lie / walker resolution proves the machinery works. Extend
+// that shape: 1-2 genuine forks per motive, with lasting consequence. Chapter
+// cards become decisions rather than broadcasts."
+//
+// WHAT MAKES THIS A FORK AND NOT WHAT WE HAD. The Missing resolution is DEALT
+// — missingResolutionFor() hashes the identity seed and the character gets
+// whichever of three answers it lands on. It proved the plumbing (a thread
+// that ends, carries a keepsake, overrides the epilogue) and the player never
+// chose it. This is that plumbing with the hash replaced by a person.
+// 10 forks, 29 options, 2 per motive, in app/data/story/forks.json.
+//
+// ⚠ FORKS ARE DERIVED, NOT QUEUED — THE LOAD-BEARING DECISION.
+// The plan flagged Phase 3 as "the one place a save-migration bug would be
+// unrecoverable for a player mid-arc." A fork pushed onto a pending queue can
+// be lost by a crash, a kill, or a bad backfill, and a lost fork is a chapter
+// of the player's story that silently never happens with nothing on screen to
+// say so. So nothing is queued: dueFork(player) is a PURE read of the save —
+// first fork whose motive matches, whose phase gate the run has passed, with
+// no recorded answer. Kill the app in front of the card and it is due again on
+// load. store.pendingFork is a VIEW of that and is safe to drop at any moment.
+//
+// The only thing persisted is the ANSWER: player.storyChoices, forkId →
+// optionId. Absent on every older save, which reads correctly as "asked
+// nothing yet" — no migration, no backfill, nothing to get wrong. An id from a
+// newer build is ignored rather than fatal. And answerFork WRITES THE CHOICE
+// BEFORE PAYING THE EFFECTS, so a death between the two costs the player some
+// coin, never a re-asked question they already answered.
+//
+// LASTING CONSEQUENCE, THREE PLACES:
+//   1. NOW — an authored line, plus coin / a keepsake / faction standing.
+//      Keepsakes are 'quest'-tagged, so a decision cannot be pawned.
+//   2. AT THE END — one sentence per answer on EndingScreen under WHAT YOU
+//      CHOSE, permanently, beneath the motive epilogue that still closes the arc.
+//   3. IN THE WORLD — TopicGate.requiresChoice lets the Phase 2 cast react.
+//      Three authored so far: Tellin on the writ you signed, Korash on the
+//      districts, Vesryn on the pages you sent up early.
+//
+// "CHAPTER CARDS BECOME DECISIONS" is done by asking the question the instant
+// the card is dismissed, not by making the card itself answerable — a card
+// holds nothing a fast tap can lose (OTA-1020) and a decision must hold
+// exactly that. So the fork overlay is the ONE modal here with no backdrop
+// dismiss and no close: a stray thumb must not delete a chapter.
+//
+// Standing effects are one-shot BY CONSTRUCTION rather than by a guard — a
+// fork can be answered once, ever — which is the opposite of the two
+// repeatable acts OTA-1064 had to meter.
+// DISPLAY_VERSION 4.28.99. 25 tests.
+export const OTA_BUILD_ID = '2026-08-03-1065-story-forks';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1064-talk-doors-and-audit';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1063-flourish';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1062-non-vendor-cast';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1061-topic-grants-whispers';

@@ -71,7 +71,7 @@ const codeOnly = (src: string) =>
 
 const at = (over: Partial<TalkContext> = {}): TalkContext => ({
   regard: 'stranger', contractsTurnedIn: 0, standing: 0, titles: [],
-  hasRecentRaidNews: false, chapter: 'hook', cores: 0, ...over,
+  hasRecentRaidNews: false, chapter: 'hook', cores: 0, choices: [], ...over, // OTA-1065
 });
 
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });

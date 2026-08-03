@@ -1004,6 +1004,24 @@ export interface PlayerCharacter {
   /** OTA-1021 — motive-drip beat ids already delivered to the feed (strict
    *  order, one-shot each; see engine/storyDrip.ts). Absent = none yet. */
   storyBeatsSeen?: string[];
+  /** ⚠ OTA-1065 — PHASE 3 BRANCH STATE. forkId → optionId, one entry per
+   *  question this character has answered. This is the ONLY thing the fork
+   *  system persists: which fork is due, whether a card should be showing, and
+   *  every downstream consequence are all DERIVED from this map plus state the
+   *  run already carries (see engine/storyForks.ts dueFork).
+   *
+   *  That is deliberate and it is the whole migration story. The build plan
+   *  flagged Phase 3 as "the one place a save-migration bug would be
+   *  unrecoverable for a player mid-arc" — a pending-fork queue can be dropped
+   *  by a crash or a bad backfill, and a dropped fork is a chapter of the
+   *  player's story that silently never happens. A map of answers cannot be
+   *  dropped that way: absent means unanswered means ask again.
+   *
+   *  Absent on every save older than OTA-1065, which reads correctly as "has
+   *  not answered anything yet" — those characters get their questions at the
+   *  next phase they qualify for. Unknown ids from a newer build are ignored
+   *  rather than crashing. */
+  storyChoices?: Record<string, string>;
   /** OTA-1021 — how The Missing side-thread ended for this character
    *  ('grave' | 'lie' | 'walker'), set when the resolution fires. Also keys
    *  the EndingScreen epilogue override. Absent = trail still open. */

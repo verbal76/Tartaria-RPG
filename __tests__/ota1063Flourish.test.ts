@@ -273,7 +273,7 @@ describe('OTA-1063 — the judge for a model line', () => {
 describe('OTA-1063 — in the exchange', () => {
   const ctx: TalkContext = {
     regard: 'trusted', contractsTurnedIn: 4, standing: 60, titles: [],
-    hasRecentRaidNews: false, chapter: 'cores', cores: 2,
+    hasRecentRaidNews: false, chapter: 'cores', cores: 2, choices: [], // OTA-1065
   };
   const topics = topicsFor('irma_ironhand', ctx);
 

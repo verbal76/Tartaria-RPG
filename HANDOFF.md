@@ -849,8 +849,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1087`**,
-**golem-line `2026-08-03-1064`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1088`**,
+**golem-line `2026-08-03-1065`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -859,9 +859,53 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.98**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.99**; ledger in `VERSION.md`.
 
-- **THE DOORS + AN AUDIT OF PHASES 0–2 (2026-08-03, latest). BOTH LINES.**
+- **PHASE 3 — MAKE THE STORY ASK QUESTIONS (2026-08-03, latest). BOTH LINES.**
+  The build plan, verbatim: *"the audience that pays premium for text is paying
+  for consequence, and right now you have exactly one fork in the game… extend
+  that shape: 1–2 genuine forks per motive, with lasting consequence. Chapter
+  cards become decisions rather than broadcasts."*
+  - **What makes this a fork and not what we had.** The Missing's
+    grave/lie/walker resolution is **dealt** — `missingResolutionFor()` hashes
+    the identity seed. It proved the plumbing (a thread that ends, carries a
+    keepsake, overrides the epilogue) and the player never chose it. This is
+    that plumbing with the hash replaced by a person. **10 forks, 29 options,
+    two per motive**, in `app/data/story/forks.json`.
+  - ⚠ **Forks are DERIVED, not queued** — and that is the whole answer to the
+    risk the plan named: *"the one place a save-migration bug would be
+    unrecoverable for a player mid-arc."* A queued fork can be lost to a crash,
+    a kill or a bad backfill, and a lost fork is a chapter of the player's
+    story that silently never happens. `dueFork(player)` is a **pure read of
+    the save**: first fork whose motive matches, whose phase gate the run has
+    passed, with no recorded answer. Kill the app in front of the card and it
+    is due again on load; `store.pendingFork` is a *view* and is safe to drop
+    at any moment.
+  - The only persisted state is the **answer** (`player.storyChoices`,
+    forkId → optionId). Absent on every older save, which reads correctly as
+    "asked nothing yet" — **no migration to get wrong**. An id from a newer
+    build is ignored rather than fatal. And `answerFork` writes the choice
+    **before** paying the effects, so a death between the two costs the player
+    coin, never a re-asked question they already answered.
+  - **Lasting consequence, three places:**
+    1. **Now** — an authored line, plus coin / a keepsake / one-shot faction
+       standing. Keepsakes are `quest`-tagged, so a decision cannot be pawned.
+    2. **At the end** — one sentence per answer under **WHAT YOU CHOSE** on
+       EndingScreen, permanently, beneath the motive epilogue that still closes
+       the arc.
+    3. **In the world** — `TopicGate.requiresChoice` lets the Phase 2 cast
+       react. Three authored: Tellin on the writ you signed, Korash on the
+       districts, Vesryn on the pages you sent up early.
+  - *"Chapter cards become decisions"* is done by asking the question the
+    instant the card is dismissed, **not** by making the card answerable — a
+    card holds nothing a fast tap can lose (OTA-1020) and a decision must hold
+    exactly that. So the fork overlay is the **one modal in the game with no
+    backdrop dismiss and no close button**.
+  - Standing here is one-shot **by construction** rather than by a guard (a
+    fork can be answered once, ever) — the opposite of the two repeatable acts
+    OTA-1064 had to meter. 25 tests.
+
+- **THE DOORS + AN AUDIT OF PHASES 0–2 (2026-08-03). BOTH LINES.**
   - ⚠ **Most of what OTA-1062 authored was unreachable, and 621 green suites
     said otherwise.** Every Phase 2 test asked whether a topic was *authored*
     and correctly *gated*. None asked whether any route in the shipped game

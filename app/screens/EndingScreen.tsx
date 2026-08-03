@@ -22,6 +22,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from '
 import { useGameStore } from '../state/gameStore';
 import { endingLine, LOST_CAPITAL_LOCATIONS, LOST_CAPITAL_NAMES } from '../engine/mainQuest';
 import { epilogueMotiveLine } from '../engine/chapters'; // OTA-1020
+import { epilogueChoiceLines } from '../engine/storyForks'; // OTA-1065
 import { motiveById } from '../engine/story'; // OTA-1020
 import { missingResolvedEpilogue } from '../engine/storyDrip'; // OTA-1021
 import racesData from '../data/races/races.json';
@@ -119,6 +120,12 @@ export function EndingScreen() {
   // epilogue, which assumes the question is still open.
   const motiveLine = missingResolvedEpilogue(player) ?? epilogueMotiveLine(ending, player.storyMotive);
   const motiveTitle = motiveById(player.storyMotive).title;
+  // ⚠ OTA-1065 — THE SECOND PLACE A PHASE 3 DECISION LANDS, and the permanent
+  // one. The motive epilogue above still closes the arc — that is what the
+  // motive was FOR. These are what you DID inside it, one sentence per
+  // question answered, in authored fork order so a second run through the same
+  // choices reads the same way. Empty for a character who was never asked.
+  const choiceLines = epilogueChoiceLines(player);
 
   return (
     <View style={styles.container}>
@@ -133,6 +140,15 @@ export function EndingScreen() {
           <View style={styles.motiveBlock}>
             <Text style={styles.motiveTag}>{motiveTitle.toUpperCase()}</Text>
             <Text style={styles.motiveLine}>{motiveLine}</Text>
+          </View>
+        )}
+
+        {choiceLines.length > 0 && (
+          <View style={styles.motiveBlock}>
+            <Text style={styles.motiveTag}>WHAT YOU CHOSE</Text>
+            {choiceLines.map((l, i) => (
+              <Text key={i} style={[styles.motiveLine, i > 0 && { marginTop: 10 }]}>{l}</Text>
+            ))}
           </View>
         )}
 
