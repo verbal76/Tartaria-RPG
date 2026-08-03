@@ -51,6 +51,7 @@ const CANONICAL_VERB: Record<Intent, string> = {
   stealth: 'sneak',
   attack: 'attack',
   diplomacy: 'talk',
+  gift: 'gift', // OTA-1083 — restored; see parser.ts for why it was removed.
   escape: 'flee',
   investigate: 'search',
   rest: 'rest',
