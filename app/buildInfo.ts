@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.9';
+export const DISPLAY_VERSION = '4.29.10';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20629,7 +20629,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // focus() on press-in is a no-op when the chain worked and the retry when
 // it did not.
 // DISPLAY_VERSION 4.29.9.
-export const OTA_BUILD_ID = '2026-08-03-1098-tutorial-pacing-dog-card-keyboard';
+//
+// OTA-1099 — ALL TALKING MOVES TO THE BOTTOM OF THE SCREEN.
+//
+// Owner, from his first live TALK interaction (Tarek, business topic — the
+// modal stayed covering the screen): "I think the popup should be at the
+// bottom of the screen like the dice rolls and just have a list of things to
+// ask, and then you close when you want to be done talking. I think all
+// talking should be like this."
+//
+// TalkModal and ParleyModal are gone. In their place: TalkSheet and
+// ParleySheet, bottom sheets rendered in ExplorationScreen's controls slot —
+// exactly where the DiceRoller goes — replacing the input box while the
+// conversation is open. The feed stays readable the whole time, which is the
+// point: replies have always landed in the feed, and now the player can see
+// them arrive. The topic list persists across asks (spent topics stay
+// visible, marked "(asked)"), and a STOP TALKING button hands the slot back.
+// The parley chooser gets the same treatment (BACK OFF closes it), and its
+// "Just talk" third option now swaps sheet for sheet in place. One visual
+// language for the whole slot: same tokens as the dice.
+//
+// The sheets deliberately give up the modal's screen lock, so the store
+// covers the exits: any real action submitted while a conversation or parley
+// is open walks away from it first — same feed line as STOP TALKING — so no
+// action can ever run under a half-open conversation. Silent (LLM-internal)
+// submissions don't count as walking away.
+// DISPLAY_VERSION 4.29.10.
+export const OTA_BUILD_ID = '2026-08-03-1099-talk-bottom-sheet';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1098-tutorial-pacing-dog-card-keyboard';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1097-difficulty-step-title';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1096-all-popups-house-palette';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1095-fork-overlay-house-palette';
