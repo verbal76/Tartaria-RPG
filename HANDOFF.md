@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1101`**,
-**golem-line `2026-08-03-1078`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1102`**,
+**golem-line `2026-08-03-1079`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,9 +923,24 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.12**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.13**; ledger in `VERSION.md`.
 
-- **WHAT'S ACTUALLY IN THEIR POCKETS (2026-08-03, latest). BOTH LINES.**
+- **THE TALK GLOW + THE POCKETS AUDIT (2026-08-03, latest). BOTH LINES.**
+  HAL OTA-1102 / golem OTA-1079. Owner: *"make the talk button glow green
+  if there are unspoken lines of dialogue"* — new `hasUnspokenTalk` store
+  query drives the vendor chip's TALK button: house green (#9ec96a) while
+  any gate-open topic has unread lines, gold once all heard, re-lights when
+  a warmth/story/standing gate opens a new topic. Same machinery as the
+  conversation itself, so light and list can never disagree. AUDIT (owner:
+  "who besides vendors can we actually pickpocket, don't guess"): vendors
+  (30 named + 24 roadside + overlays) and wanderers (7 archetypes) are the
+  only scene-present people with pockets — both already marks. Escort
+  leaders are human/present but are the player's own charge; adding them
+  needs contract-fallout design (owner's call, parked). Core Guardians =
+  constructs; combat enemies = kill-loot; popup NPCs have no scene body.
+  Mark list confirmed complete, no change. Test: `ota1079TalkGlow.test.ts`.
+
+- **WHAT'S ACTUALLY IN THEIR POCKETS (2026-08-03). BOTH LINES.**
   HAL OTA-1101 / golem OTA-1078. Owner: *"only show what you can
   pickpocket. Stealing is for items, pickpocket is for what would be in
   their clothing or on them... something they wouldn't trust on the
