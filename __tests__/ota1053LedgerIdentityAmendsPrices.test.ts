@@ -32,22 +32,30 @@ import {
   npcRegard,
   regardPriceMult,
   AMENDS_TC_PER_WRONG,
+  vendorLedgerId as ledgerId,
+  dealingsSummary,
 } from '../app/engine/npcMemory';
 import { recordNpcMet, emptyMemory } from '../app/engine/worldMemory';
 import { finalBuyPrice, strangerBuyPrice } from '../app/engine/vendorPricing';
 import type { WorldMemory, NpcMet, NpcRelation } from '../app/engine/types';
 
-/** The store's ledger-identity rule, mirrored (gameStore.vendorNpcId). */
-const ledgerId = (v: { id?: string; name: string }): string => {
-  const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '_');
-  const id = v.id ?? '';
-  if (id.startsWith('roadside_')) return `roadside:${slug(v.name)}`;
-  return id || `vendor:${slug(v.name)}`;
-};
+// OTA-1055 — the REAL function, not a copy of it. This suite used to
+// re-implement the rule and then test the re-implementation, so changing the
+// production rule left every case green. The rule now lives in npcMemory (its
+// proper home), which also keeps this suite free of the store's native deps.
 
 /** A roadside trader as pickRoadsideTrader actually mints it: same archetype,
  *  a brand-new timestamped id every spawn. */
-const roadsideSpawn = (ms: number) => ({ id: `roadside_sketchy_${ms}`, name: 'Grit', title: 'fence' });
+const roadsideSpawn = (ms: number) => ({ id: `roadside_sketchy_${ms}`, name: ROADSIDE_NAME, title: 'fence' });
+
+// A name the real archetype table actually mints (app/data/npcs/roadside_traders.json),
+// so the key under test is one production can generate — the original fixture
+// used 'Grit', which no archetype produces.
+// OTA-1055 — a member of the real CAST. 'Road Hawker' is an archetype label,
+// not a person, and `roadside:road_hawker` is now a LEGACY key the save-healing
+// pass deletes on sight — see the OTA-1055 block at the bottom of this file.
+const ROADSIDE_NAME = 'Grit Maalen';
+const ROADSIDE_KEY = 'roadside:grit_maalen';
 
 describe('OTA-1053 — one archetype is one person', () => {
   it('THE LEAK: two spawns of the same trader share a ledger id', () => {
@@ -57,12 +65,15 @@ describe('OTA-1053 — one archetype is one person', () => {
 
   it('so meeting the fence three times actually makes them know you', () => {
     let m = emptyMemory();
-    for (const ms of [1_700_000_000_000, 1_700_000_500_000, 1_700_000_900_000]) {
+    const stamps = [1_700_000_000_000, 1_700_000_500_000, 1_700_000_900_000];
+    for (const [i, ms] of stamps.entries()) {
       const spawn = roadsideSpawn(ms);
       m = rememberNpcMeeting(m, { id: ledgerId(spawn), name: spawn.name, role: spawn.title },
-        { nowMs: ms, hoursElapsed: 0 });
+        // OTA-1055 — one in-game hour apart. Three spawns at a frozen clock are
+        // ONE visit now, and three roadside encounters cannot share an hour.
+        { nowMs: ms, hoursElapsed: i });
     }
-    const rel = getRelation(m, 'roadside:grit')!;
+    const rel = getRelation(m, ROADSIDE_KEY)!;
     expect(rel.meetings).toBe(3);
     expect(npcRegard(rel)).toBe('known');
   });
@@ -80,14 +91,16 @@ describe('OTA-1053 — one archetype is one person', () => {
 
   it('named and stall vendors keep their authored ids untouched', () => {
     expect(ledgerId({ id: 'vendor_irma', name: 'Irma' })).toBe('vendor_irma');
-    expect(ledgerId({ id: 'hidden_market_weapons', name: 'Broker' })).toBe('hidden_market_weapons');
+    // Hidden Market keeps its stall id AND gains the rep — see the OTA-1055
+    // block below for why the bare stall id was wrong.
+    expect(ledgerId({ id: 'hidden_market_weapons', name: 'Broker' })).toBe('hidden_market_weapons:broker');
     // Only the name-slug fallback for a vendor with no id at all.
     expect(ledgerId({ name: 'Nameless Hawker' })).toBe('vendor:nameless_hawker');
   });
 
   it('two different roadside ARCHETYPES stay two different people', () => {
-    expect(ledgerId({ id: 'roadside_sketchy_1', name: 'Grit' }))
-      .not.toBe(ledgerId({ id: 'roadside_honest_1', name: 'Maro' }));
+    expect(ledgerId({ id: 'roadside_sketchy_1', name: 'Skiv' }))
+      .not.toBe(ledgerId({ id: 'roadside_honest_1', name: 'Grit Maalen' }));
   });
 });
 
@@ -119,9 +132,9 @@ describe('OTA-1053 — the rows already leaked into live saves are swept up', ()
   it('leaves the NEW roadside key alone — it is a real person', () => {
     const m: WorldMemory = {
       ...emptyMemory(),
-      npcRelations: { 'roadside:grit': { ...stale(1), id: 'roadside:grit' } },
+      npcRelations: { [ROADSIDE_KEY]: { ...stale(1), id: ROADSIDE_KEY } },
     };
-    expect(Object.keys(pruneSpawnKeyedRelations(m).npcRelations ?? {})).toEqual(['roadside:grit']);
+    expect(Object.keys(pruneSpawnKeyedRelations(m).npcRelations ?? {})).toEqual([ROADSIDE_KEY]);
   });
 
   it('is a no-op — same object back — when there is nothing to clean', () => {
@@ -139,13 +152,13 @@ describe('OTA-1053 — a caught theft can be paid off', () => {
   const rel = (m: WorldMemory) => getRelation(m, IRMA.id)!;
 
   it('a little custom does not buy forgiveness', () => {
-    const m = recordNpcDealing(wronged(), IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG - 1 });
+    const m = recordNpcDealing(wronged(), IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG - 1, spent: AMENDS_TC_PER_WRONG - 1 });
     expect(rel(m).wrongs).toBe(1);
     expect(npcRegard(rel(m))).toBe('wronged');
   });
 
   it('real money, at their price, settles it', () => {
-    const m = recordNpcDealing(wronged(), IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG });
+    const m = recordNpcDealing(wronged(), IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG, spent: AMENDS_TC_PER_WRONG });
     expect(rel(m).wrongs).toBe(0);
     expect(npcRegard(rel(m))).not.toBe('wronged');
     expect(rel(m).amendsCleared).toBe(1);   // the Chronicle can still say it happened
@@ -153,21 +166,55 @@ describe('OTA-1053 — a caught theft can be paid off', () => {
 
   it('amends accumulate across visits rather than needing one big purchase', () => {
     let m = wronged();
-    for (let i = 0; i < 6; i++) m = recordNpcDealing(m, IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG / 6 });
+    for (let i = 0; i < 6; i++) m = recordNpcDealing(m, IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG / 6, spent: AMENDS_TC_PER_WRONG / 6 });
     expect(rel(m).wrongs).toBe(0);
   });
 
   it('a SECOND theft doubles the bill — a repeat thief digs faster than they fill', () => {
     let m = recordNpcDealing(wronged(), IRMA.id, { wrongs: 1 }); // two outstanding
-    m = recordNpcDealing(m, IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG });
+    m = recordNpcDealing(m, IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG, spent: AMENDS_TC_PER_WRONG });
     expect(rel(m).wrongs).toBe(2); // 600 does not touch a 1200 debt
-    m = recordNpcDealing(m, IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG });
+    m = recordNpcDealing(m, IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG, spent: AMENDS_TC_PER_WRONG });
     expect(rel(m).wrongs).toBe(1); // 1200 banked clears one, at the higher rate
+  });
+
+  it('THE RESIDUE EXPLOIT: change from a settled debt does NOT pre-pay the next one', () => {
+    // Shipped in OTA-1053 and caught by a test-quality audit. Settling a 600
+    // debt with 1100 TC banked 500; robbing them again and spending 100 then
+    // cleared it — a second theft costing 100 TC, the exact inverse of "a
+    // repeat thief digs the hole faster than they can fill it". Every original
+    // amends test spent an exact multiple of 600, so the residue never existed.
+    let m = recordNpcDealing(wronged(), IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG + 500, spent: AMENDS_TC_PER_WRONG + 500 });
+    expect(rel(m).wrongs).toBe(0);
+    expect(rel(m).amendsTc).toBe(0);              // the bank is spent with the debt
+
+    m = recordNpcDealing(m, IRMA.id, { wrongs: 1 });
+    m = recordNpcDealing(m, IRMA.id, { trades: 1, tcTraded: 100, spent: 100 });
+    expect(rel(m).wrongs).toBe(1);                // 100 TC buys nothing
+    expect(npcRegard(rel(m))).toBe('wronged');
+  });
+
+  it('SELLING to someone you robbed does not settle it — restitution must COST', () => {
+    // The sell path passes tcTraded (business done) but no `spent`, because the
+    // TC moves toward the PLAYER. Inferring amends from tcTraded meant you could
+    // clear a debt by offloading loot on the person you stole from — settled AND
+    // paid for the privilege. Found by an engine review, not by these tests.
+    const m = recordNpcDealing(wronged(), IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG * 5 });
+    expect(rel(m).wrongs).toBe(1);
+    expect(npcRegard(rel(m))).toBe('wronged');
+    expect(rel(m).amendsTc ?? 0).toBe(0);
+  });
+
+  it('a settled debt is REMEMBERED, not erased', () => {
+    // amendsCleared was write-only: types.ts documents it as existing so the
+    // Chronicle can say a debt was settled, and nothing read it.
+    let m = recordNpcDealing(wronged(), IRMA.id, { trades: 1, tcTraded: AMENDS_TC_PER_WRONG, spent: AMENDS_TC_PER_WRONG });
+    expect(dealingsSummary(rel(m))).toContain('a debt settled');
   });
 
   it('custom from BEFORE the theft cannot be back-dated into amends', () => {
     let m = recordNpcSighting(emptyMemory(), IRMA, { nowMs: 1, hoursElapsed: 0 });
-    m = recordNpcDealing(m, IRMA.id, { trades: 9, tcTraded: 50_000 }); // a long, honest history
+    m = recordNpcDealing(m, IRMA.id, { trades: 9, tcTraded: 50_000, spent: 50_000 }); // a long, honest history
     m = recordNpcDealing(m, IRMA.id, { wrongs: 1 });                   // then you rob them
     expect(rel(m).wrongs).toBe(1);
     expect(npcRegard(rel(m))).toBe('wronged');
@@ -175,7 +222,7 @@ describe('OTA-1053 — a caught theft can be paid off', () => {
 
   it('honest customers never accrue an amends bank at all', () => {
     let m = recordNpcSighting(emptyMemory(), IRMA, { nowMs: 1, hoursElapsed: 0 });
-    m = recordNpcDealing(m, IRMA.id, { trades: 4, tcTraded: 9_000 });
+    m = recordNpcDealing(m, IRMA.id, { trades: 4, tcTraded: 9_000, spent: 9_000 });
     expect(rel(m).amendsTc).toBeUndefined();
   });
 });
@@ -223,5 +270,132 @@ describe('OTA-1053 — the relationship reaches the counter', () => {
 
   it('the price can never fall below 1 TC', () => {
     expect(finalBuyPrice(1, parts(regardPriceMult('trusted')))).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('OTA-1055 — a Hidden Market stall is SIX people, not one', () => {
+  // resolveStallIdentity keeps a FIXED id per stall while rotating the name,
+  // title AND faction daily across six authored reps — the stall's own blurb
+  // says "the faces here change with the day". The fixed id pooled all six into
+  // one ledger row: today's rep inherited six people's history, and because
+  // recordNpcSighting refreshes factionId from whoever is on shift, OTA-1054
+  // raid news was attributed to the wrong faction.
+  it('two reps behind the same stall are two different ledger entries', () => {
+    expect(ledgerId({ id: 'hidden_market_weapons', name: 'Zorin Nightblade' }))
+      .not.toBe(ledgerId({ id: 'hidden_market_weapons', name: 'Drakos' }));
+  });
+
+  it('the same rep is still the same person', () => {
+    expect(ledgerId({ id: 'hidden_market_weapons', name: 'Zorin Nightblade' }))
+      .toBe(ledgerId({ id: 'hidden_market_weapons', name: 'Zorin Nightblade' }));
+  });
+
+  it('one rep working two different stalls stays two relationships', () => {
+    // Different counters, different dealings — the stall is part of who they
+    // are to you.
+    expect(ledgerId({ id: 'hidden_market_weapons', name: 'Cassia' }))
+      .not.toBe(ledgerId({ id: 'hidden_market_armor', name: 'Cassia' }));
+  });
+
+  it('meeting six reps does not make any one of them a regular', () => {
+    let m = emptyMemory();
+    for (const name of ['Zorin Nightblade', 'Drakos', 'Cassia', 'Korr', 'Odar', 'Nalren']) {
+      const id = ledgerId({ id: 'hidden_market_weapons', name });
+      m = rememberNpcMeeting(m, { id, name }, { nowMs: 1, hoursElapsed: 0 });
+    }
+    expect(Object.keys(m.npcRelations ?? {})).toHaveLength(6);
+    for (const r of Object.values(m.npcRelations ?? {})) expect(r.meetings).toBe(1);
+  });
+});
+
+describe('OTA-1055 — a fresh betrayal costs you your restitution', () => {
+  const IRMA: NpcMet = { id: 'v_irma', name: 'Irma', role: 'armorer' };
+  const wronged = (n: number) => {
+    let m = recordNpcSighting(emptyMemory(), IRMA, { nowMs: 1, hoursElapsed: 0 });
+    for (let i = 0; i < n; i++) m = recordNpcDealing(m, IRMA.id, { wrongs: 1 });
+    return m;
+  };
+  const relOf = (m: WorldMemory) => getRelation(m, IRMA.id)!;
+
+  it('THE PARTIAL-CLEAR RESIDUE: a part payment does not survive the next theft', () => {
+    // ⚠ My first residue fix zeroed the bank only on FULL settlement, so a
+    // partial clear kept up to 600*outstanding-1 alive. Measured: 3 wrongs,
+    // spend 2999 -> one cleared, 1199 banked; rob again; spend 601 -> the 4th
+    // wrong's 1800 TC bill paid with 601 TC of new money.
+    let m = wronged(3);
+    m = recordNpcDealing(m, IRMA.id, { trades: 1, tcTraded: 2999, spent: 2999 });
+    expect(relOf(m).wrongs).toBe(2);
+    m = recordNpcDealing(m, IRMA.id, { wrongs: 1 });        // rob them again
+    expect(relOf(m).wrongs).toBe(3);
+    expect(relOf(m).amendsTc ?? 0).toBe(0);                  // progress is gone
+    m = recordNpcDealing(m, IRMA.id, { trades: 1, tcTraded: 601, spent: 601 });
+    expect(relOf(m).wrongs).toBe(3);                         // 601 buys nothing
+  });
+
+  it('a theft and a payment in the SAME patch cannot pay for itself', () => {
+    let m = wronged(1);
+    m = recordNpcDealing(m, IRMA.id, { trades: 1, tcTraded: 600, spent: 600, wrongs: 1 });
+    expect(relOf(m).wrongs).toBe(1);        // the old one cleared, the new one stands
+    expect(relOf(m).amendsTc ?? 0).toBe(0); // and no change carried forward
+  });
+
+  it('honest part-payment still accumulates when you do not reoffend', () => {
+    let m = wronged(1);
+    m = recordNpcDealing(m, IRMA.id, { trades: 1, tcTraded: 300, spent: 300 });
+    expect(relOf(m).wrongs).toBe(1);
+    expect(relOf(m).amendsTc).toBe(300);
+    m = recordNpcDealing(m, IRMA.id, { trades: 1, tcTraded: 300, spent: 300 });
+    expect(relOf(m).wrongs).toBe(0);
+  });
+});
+
+describe('OTA-1055 — saves written by 4.28.87/88 heal themselves', () => {
+  const relRow = (over: Partial<NpcRelation>): NpcRelation => ({
+    id: 'x', name: 'X', meetings: 2, firstMetAt: 1, lastSeenAt: 1, lastSeenHours: 0,
+    trades: 0, tcTraded: 0, contractsTaken: 0, contractsTurnedIn: 0, wrongs: 0, ...over,
+  } as NpcRelation);
+
+  it('THE LEGACY BANK: a sale-fed amends bank with no debt is dropped', () => {
+    // 4.28.87 fed the bank from tcTraded, which counts SALES. A live save can
+    // hold wrongs:0 / amendsTc:49400 — rob them twice, buy a 1 TC trinket, and
+    // both wrongs evaporate.
+    const m: WorldMemory = { ...emptyMemory(), npcRelations: {
+      v: relRow({ id: 'v', wrongs: 0, amendsTc: 49_400 }) } };
+    const healed = pruneSpawnKeyedRelations(m);
+    expect(healed.npcRelations!.v!.amendsTc).toBe(0);
+  });
+
+  it('...and a bank bigger than the debt it faces is clamped', () => {
+    const m: WorldMemory = { ...emptyMemory(), npcRelations: {
+      v: relRow({ id: 'v', wrongs: 1, amendsTc: 5_000 }) } };
+    expect(pruneSpawnKeyedRelations(m).npcRelations!.v!.amendsTc).toBe(0);
+  });
+
+  it('a legitimate part-payment is left alone', () => {
+    const m: WorldMemory = { ...emptyMemory(), npcRelations: {
+      v: relRow({ id: 'v', wrongs: 1, amendsTc: 300 }) } };
+    expect(pruneSpawnKeyedRelations(m)).toBe(m); // untouched, same object
+  });
+
+  it('THE ARCHETYPE GHOSTS: the two unmintable roadside rows are swept out', () => {
+    // 4.28.87/88 keyed every roadside trader by archetype. Nothing can mint
+    // those ids again, so the rows sit in the Chronicle forever — and a `wrongs`
+    // on one is a debt that can NEVER be paid, because amends need a dealing
+    // against the same id.
+    const m: WorldMemory = {
+      ...emptyMemory(),
+      npcRelations: {
+        'roadside:road_hawker': relRow({ id: 'roadside:road_hawker', trades: 7, wrongs: 1 }),
+        'roadside:sketchy_stall': relRow({ id: 'roadside:sketchy_stall' }),
+        'roadside:grit_maalen': relRow({ id: 'roadside:grit_maalen' }),
+      },
+      npcsMet: [
+        { id: 'roadside:road_hawker', name: 'Road Hawker' },
+        { id: 'roadside:grit_maalen', name: 'Grit Maalen' },
+      ],
+    };
+    const healed = pruneSpawnKeyedRelations(m);
+    expect(Object.keys(healed.npcRelations ?? {})).toEqual(['roadside:grit_maalen']);
+    expect((healed.npcsMet ?? []).map((n) => n.id)).toEqual(['roadside:grit_maalen']);
   });
 });

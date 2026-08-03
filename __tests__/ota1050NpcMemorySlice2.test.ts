@@ -31,7 +31,9 @@ const OUTSIDER: NpcMet = { id: 'v_out', name: 'Kesh', role: 'hawker', factionId:
 
 const see = (m: WorldMemory, npc: NpcMet, times = 1, hours = 0) => {
   let out = m;
-  for (let i = 0; i < times; i++) out = recordNpcSighting(out, npc, { nowMs: 1 + i, hoursElapsed: hours });
+  // OTA-1055 — one in-game hour per visit: a same-clock sighting is a re-render,
+  // not a return, and no longer counts as a separate meeting.
+  for (let i = 0; i < times; i++) out = recordNpcSighting(out, npc, { nowMs: 1 + i, hoursElapsed: hours + i });
   return out;
 };
 const rel = (m: WorldMemory, id: string) => (m.npcRelations ?? {})[id]!;

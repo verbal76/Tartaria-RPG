@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.87';
+export const DISPLAY_VERSION = '4.28.89';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18595,7 +18595,190 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // vendor into a generic Enemy that no longer carries its ledger id. Both need
 // new plumbing, not a wire-up. Phase 3 work.
 // DISPLAY_VERSION 4.28.87. 21 tests.
-export const OTA_BUILD_ID = '2026-08-02-1053-ledger-identity-amends-prices';
+// OTA-1054 — THE OFFSCREEN WAR REACHES THE PEOPLE WHO LIVE IN IT.
+//
+// ⚠ CORRECTION TO THE OTA-1053 NOTE. It records "there is no offscreen
+// location-raid event in the game at all". That was WRONG and should have been
+// checked before it was written down. The world step has emitted
+// `outpost_assault` events since OTA-844/864/867 -- a full offscreen war sim
+// that raids outposts, culls patrols and moves faction power and relations.
+//
+// What was actually missing is far narrower: those events name only FACTIONS
+// ("The Reclaimers stormed the Forgotten Order outpost") and go only to the
+// World board. They are never joined to a LOCATION the player has walked or a
+// PERSON the player knows, and nobody ever says one out loud. Every piece of
+// the join already existed -- the assault knows its defender,
+// FACTION_STARTING_LOCATION maps faction to home ground, and every NpcRelation
+// carries a factionId.
+//
+// So this OTA SIMULATES NOTHING NEW. It keeps the same assault as data
+// (OutpostRaid on worldMemory.recentRaids, capped at RAID_MEMORY_CAP=12) and
+// lets the people whose outpost burned mention it next time you walk in.
+// ⚠ Records are kept WHOLE, not sampled. The board's FEED_PER_STEP=3 sample
+// exists so the World screen reads as a story rather than a wall; a raid
+// trimmed from the DISPLAY still happened, and the trader whose outpost burned
+// should still be able to say so.
+// GATED HARD, because Phase 0 was spent on the noise floor: it must be THEIR
+// faction's ground, it must have happened since they last saw you (measured
+// against OTA-1052's prevSeenHours, so a first meeting never qualifies), and
+// they must actually know you -- an acquaintance does not confide and someone
+// who caught you stealing tells you nothing. Deterministic: most recent
+// qualifying raid, ties broken on location id.
+// Sits ABOVE gossip in the greeting: what happened to THEM outranks what they
+// heard about somebody else.
+// STILL NOT DONE: the DEATH half. The vendor-kill path converts the vendor into
+// a generic Enemy that no longer carries its ledger id, AND a killed vendor
+// currently respawns (there is no dead-NPC list anywhere). That needs an
+// identity thread through combat plus an owner decision on permadeath.
+// DISPLAY_VERSION 4.28.88. 18 tests.
+// OTA-1055 — THE HOLES THE OTA-1054 REVIEW FOUND. Six defects, five of them
+// mine from the Phase 0/1 run. Grouped into one OTA because they share a root:
+// the ledger and the noise floor were both wired by following the code that
+// already existed rather than the SET of places that needed it.
+//
+// (1) ROADSIDE TRADERS COLLAPSED INTO TWO PEOPLE. OTA-1053 was right that
+// `roadside_<demeanor>_<Date.now()>` is not an identity -- it split one trader
+// into unbounded one-encounter strangers -- but keyed the replacement off the
+// archetype NAME, and roadside_traders.json holds exactly TWO archetypes whose
+// names are furniture ("Road Hawker", "Sketchy Stall"). So it over-corrected
+// into the mirror bug: from the second roadside stall a save ever saw, arrival
+// narration was skipped as a familiar face, tcTraded pooled across strangers,
+// and ONE caught theft made every roadside trader on the map charge the wronged
+// markup. Neither id was ever an identity because the DATA had no people in it,
+// so the fix is content: twelve named traders per archetype (24 in all). The
+// archetype still supplies demeanor, stock and description.
+//
+// (2) TWO OF THE THREE VENDOR-INSTALL SITES NEVER RECORDED THE MEETING. Nothing
+// but patchSceneForBuildingRoom can mint a `hidden_market_*` id, so the four
+// Hidden Market stalls had NO relation at all -- every recordNpcDealing against
+// them silently no-opped (a caught theft there cost nothing, forever). And
+// stepDirection's roadside stall -- the path the code itself calls dominant,
+// "one every ~5 travel steps" -- never calls beginScene, so no sighting, no
+// greeting, no absence line, no raid news for the traders the player meets
+// MOST. Same shape as the OTA-1052 Guardian gap. One helper (sightVendor) now.
+//
+// (3) ...and collapsing them introduced a THIRD bug that had to be caught before
+// it shipped. The same-vendor guard first read currentScene.vendor -- but
+// beginScene COMMITS the scene long before it sights the vendor, so the guard
+// compared the new vendor against itself and would have killed every sighting
+// the ledger has taken since OTA-1049. It is a parameter now, supplied only by
+// the stall-tab path, which is the only one with a meaningful "before".
+//
+// (4) STORY BEATS WERE BEING MERGED AWAY. appendLog's world/system debounce
+// rebuilds the merged entry as `{ ...lastEntry, text }`, so meta comes from the
+// FIRST line: a beat glued onto a preceding world line lost `storyBeat`
+// entirely -- no rule, no STORY chip, no air. Not a corner case: most authored
+// drip beats are world-channel and advanceStoryDrip runs microseconds after
+// beginScene's own world lines. OTA-1051's complaint, reintroduced by a
+// debounce written years earlier. Beats never merge now, in either direction.
+//
+// (5) `log-moved-on` WAS DEAD IN EVERY REAL SESSION. It compared
+// gameLog.length across the 14-20s generation, and gameLog is `.slice(-500)` on
+// every append -- so past ~500 entries (roughly ten minutes) the length is
+// pinned and the difference is permanently zero. It is the only one of the five
+// staleness checks that catches the OTA's own stated case: a player standing
+// still who "looted three things" while the musing generated. Monotonic
+// player-visible counter now; debug/cognitive excluded.
+//
+// (6) AUTO-GRANTED CONTRACTS POISONED THE ACCEPT BURST. Three sites hand a
+// contract over off a hook the player walked into (field escort, hunt grant,
+// mystery grant) and all three ran the full burst path -- so a stretch of road
+// that dropped three hooks could have the Arbiter tell a player who accepted
+// NOTHING that they were "stacking promises", and, because OTA-1048 keys the
+// compact accept card off the same counter, could make their next genuinely
+// FIRST manual accept render as the compact repeat form. The milestone still
+// counts; only the burst does not.
+//
+// (7) RAID DIALOGUE PRINTED SLUGS. `locationId.replace(/_/g, ' ')` had somebody
+// who lives at Reclaimer's Stake call it "reclaimer stake", and turned the
+// Tartarian Pilgrim Camp into "pilgrim waycamp". npcMemory has no location
+// catalog and should not grow one, so the store stamps safeLocName onto the
+// record at write time; the de-slugged id survives only as the migration
+// fallback for raids written before this OTA.
+//
+// Also: acceptFactionQuest -- the sixth and most face-to-face accept path -- was
+// the only one not crediting contractsTaken, so a faction agent could show a
+// finished contract with no record of having handed it over.
+//
+// ── SECOND PASS: WHAT FOUR REVIEW AGENTS FOUND IN THE ABOVE ────────────────
+// Everything below was caught BEFORE the push, by review of this OTA's own
+// first draft. Recorded rather than folded in silently, because the pattern is
+// the point: five of the seven items above are "a rule applied at some sites
+// out of several", and the first draft repeated that mistake three more times.
+//
+// (8) ⚠ (2) SAID "TWO OF THREE". IT WAS TWO OF FIVE. The elevated-overlay
+// trader and the `spawn_vendor` campfire Reclaimer also install a real,
+// tradeable, stealable vendor and were also unsighted — so a theft from either
+// still cost nothing on the ledger, permanently, under a docblock that claimed
+// the hole was closed. Both wired; vendorLedgerId gains an `overlay:` rule
+// because overlay ids carry a per-spawn timestamp; the test now counts the
+// call sites in the source instead of restating the comment.
+//
+// (9) ⚠ THE STALL-TAB GUARD IN (3) WAS DEAD CODE, and the inflation it named
+// was still happening. goBuildingRoom early-returns when you re-tap the tab you
+// are on, so the same stall never re-patches back-to-back; the only reachable
+// case is ALTERNATING tabs, where the previous vendor is the OTHER stall and
+// the ids never match. A review drove the real store and measured a rep at SIX
+// meetings after six taps — past MEETINGS_FOR_NAME, so a shopkeeper used the
+// player's name and hit the 'known' rung having done no business.
+// The rule moved into recordNpcSighting where it belongs: A SIGHTING AT THE
+// SAME IN-GAME CLOCK IS THE SAME VISIT. One rule for every caller instead of a
+// per-site guard the next site forgets — which is the exact failure mode of
+// everything else in this OTA. Display fields and the wall clock still refresh.
+//
+// (10) ⚠ AND WIRING THOSE SITES SILENTLY REGRESSED OTA-1052. A sighting
+// advances prevSeenHours, which is the anchor npcAbsenceLine measures against —
+// but only beginScene had a greeting emitter, so the stall and roadside paths
+// consumed the anchor and said nothing. A trader you had not seen in a hundred
+// hours got quietly recorded on a travel step and then had nothing to say about
+// it at the next real encounter. The greeting block is lifted into
+// emitVendorGreeting and the four non-beginScene sites now speak.
+//
+// (11) THE AMENDS RESIDUE FIX ONLY COVERED FULL SETTLEMENT. Zeroing on
+// `outstanding === 0` left a PARTIAL clear's residue alive — up to
+// 600*outstanding-1. Three thefts, spend 2999 -> one cleared, 1199 banked; rob
+// again; spend 601 -> the fourth wrong's 1800 TC bill paid with 601 TC of new
+// money. Same exploit one layer down, surviving for the same reason: every
+// amends test spent an exact multiple of 600. Now a fresh betrayal costs you
+// your restitution progress outright.
+//
+// (12) NO MIGRATION FOR THE 4.28.87 BANK. That build fed amends from tcTraded,
+// which counts SALES, so a shipped save can hold wrongs:0 / amendsTc:49_400
+// earned by offloading loot. Rob them twice, buy a 1 TC trinket, both wrongs
+// evaporate. The save-healing pass now enforces the invariant the live code
+// maintains anyway: a bank exists only against an outstanding debt and can
+// never exceed what that debt would absorb.
+//
+// (13) THE ARCHETYPE ROWS BECAME PERMANENT GHOSTS. 4.28.87/88 keyed roadside
+// traders as `roadside:road_hawker` / `roadside:sketchy_stall`; nothing can mint
+// those again, so they sit in the Chronicle's people column forever as somebody
+// the player can never meet — and a `wrongs` on one is a debt that can NEVER be
+// paid, since amends need a dealing against the same id. Swept by the same pass.
+//
+// (14) RAID RECORDS WERE EVICTED BY THE WALL CLOCK, not by in-game distance.
+// worldRealtimeTick runs the patrol sim every ~6 REAL seconds whether or not
+// game time moves; 60 idle ticks — six minutes of an open app — overflowed the
+// 12-slot buffer, so a raid on the player's own faction was near-guaranteed to
+// be gone before they next reached a vendor. OTA-1054 was close to inert in
+// exactly the sessions it was written for. Deduped on (defender, in-game hour).
+//
+// (15) THE CHRONICLE COULD CONTRADICT ITSELF — "caught stealing · a debt
+// settled" — because wrongs and amendsCleared are independent counters. Now "an
+// old debt settled" while a wrong stands.
+//
+// TESTS: four of this OTA's fixes were guarded ONLY by grepping gameStore.ts
+// for their own source line, and one guarded a condition that could not fire.
+// A mutation audit reverted each fix and measured which tests died. The
+// grep-only ones are now behavioural: the ambient stamp is proven to CONSUME
+// the monotonic counter (not merely to have one), a granted contract is proven
+// not to make the next real accept render compact, and buying from a vendor you
+// robbed is proven to clear the debt end-to-end through the store. One test
+// that was a pure tautology — it passed unchanged under the mutation that
+// deletes the feature — was replaced with a partition check that can fail.
+// DISPLAY_VERSION 4.28.89. 37 + 35 tests.
+export const OTA_BUILD_ID = '2026-08-02-1055-ledger-holes-and-noise-floor';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1054-raid-news-reaches-the-people';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1053-ledger-identity-amends-prices';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1052-absence-line-and-ledger-coverage';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1051-arbiter-cooldown-story-beats';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1050-npc-memory-slice-2';

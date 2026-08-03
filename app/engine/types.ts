@@ -1759,6 +1759,9 @@ export interface WorldMemory {
    *  Absent on saves written before that OTA; seedRelationsFromMet() migrates
    *  them on first touch rather than in a save-load pass. */
   npcRelations?: Record<string, NpcRelation>;
+  /** OTA-1054 — recent outpost assaults, newest last, capped. Feeds the "your
+   *  outpost was hit while I was away" beat in a greeting. */
+  recentRaids?: OutpostRaid[];
   /** OTA-120 — dog acquisition state machine, lives on world memory
    *  so it survives across screens. ALL player input routes through
    *  the onboarding handler when this is non-null. Cleared on
@@ -1916,6 +1919,32 @@ export interface NpcRelation {
   /** How many wrongs have been paid off. Kept so the Chronicle can say a debt
    *  was settled rather than silently erasing that it ever happened. */
   amendsCleared?: number;
+}
+
+/** OTA-1054 — an outpost assault the offscreen war sim actually carried out.
+ *  The sim (OTA-844/864/867) has raided outposts since it shipped, but the
+ *  events it emitted named only FACTIONS and went only to the World board. This
+ *  record keeps the same event joined to the LOCATION and the clock, so the
+ *  people who live there can mention it. */
+export interface OutpostRaid {
+  /** Faction whose outpost was hit. */
+  defenderId: string;
+  defenderName: string;
+  attackerId: string;
+  attackerName: string;
+  /** The defender's home location — FACTION_STARTING_LOCATION[defenderId]. */
+  locationId: string;
+  /** OTA-1055 — the AUTHORED name of that place, resolved at write time.
+   *  The line is spoken by somebody who lives there, and de-slugging the id
+   *  handed them "reclaimer stake" and "pilgrim waycamp" for grounds the game
+   *  calls Reclaimer's Stake and the Tartarian Pilgrim Camp. npcMemory has no
+   *  location catalog and should not grow one, so the store — which already has
+   *  safeLocName — stamps the display name onto the record. Optional: raids
+   *  written before this OTA fall back to the humanised id. */
+  locationName?: string;
+  /** player.hoursElapsed when it happened, so a greeting can ask "since I last
+   *  saw you?" against NpcRelation.prevSeenHours. */
+  atHours: number;
 }
 
 export interface VisitedRoom {

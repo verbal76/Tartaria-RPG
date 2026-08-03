@@ -171,19 +171,28 @@ describe('OTA-1048 — the reported case: thirteen contracts at one board', () =
     // All thirteen actually landed — compaction is a display change only.
     expect((store.getState().player!.activeHunts ?? []).length).toBe(13);
 
-    // The sentence that fired thirteen times fires at most once.
+    // OTA-1055 — EXACT, not `<= 1`. Every bound here was satisfiable by ZERO,
+    // so deleting the danger warning outright — or ceasing to narrate accept #1
+    // in full — left this test green. A headline regression test that passes
+    // when the feature is removed is not a regression test.
+    //
+    // ⚠ And the exact number here is ZERO, which is worth stating rather than
+    // hiding behind `<= 1`: this burst is thirteen NEUTRAL hunts taken with no
+    // agent in scene, and the danger warning only exists on the faction-hunt
+    // path. The "fires once, not thirteen times" claim is carried by the two
+    // faction-hunt tests above — full detail on accept #1, none on accept #2.
     const killYou = out.filter((t) => t.includes('This one will kill you')).length;
-    expect(killYou).toBeLessThanOrEqual(1);
+    expect(killYou).toBe(0);
 
     // The two-sentence parked notice fires at most once (accept #1, and only if
     // it parks at all).
     const parkedSentences = out.filter((t) => t.includes('added to your slate (paused')).length;
-    expect(parkedSentences).toBeLessThanOrEqual(1);
+    expect(parkedSentences).toBe(0); // accept #1 goes LIVE, so nothing parks in full form
 
     // Twelve of the thirteen are one line each; the first keeps its detail and
     // the Arbiter keeps his first-contract / stacking / slow-down beats. That is
     // 16 lines on this input. Old behaviour was north of forty.
-    expect(out.length).toBeLessThanOrEqual(18);
+    expect(out.length).toBe(16);
 
     // ...and the twelve really are the compact form, not merely fewer lines.
     const compact = out.filter((t) => t.startsWith('✦ Contract accepted —'));
