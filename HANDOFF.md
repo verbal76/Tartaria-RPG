@@ -391,6 +391,26 @@ a push to one reaches the others. Watch for per-line divergence:
   `metro.config.js` on the `web` target.
 Typecheck + run the relevant suite in **each** worktree before pushing it.
 
+### ⚠ THE PORT IS NOT DONE UNTIL THE VERIFIER SAYS SO (2026-08-03 audit)
+
+Run after EVERY cross-line port, before pushing:
+
+    node scripts/verify-parity.mjs /tmp/hal-main-fix '<hal-range>' /tmp/hal-golem '<golem-range>'
+
+(one-arg ranges like `HEAD~1^` compare against the working tree). It maps
+HAL's OTA numbering onto golem's (−23, all shapes: `OTA-####`, `ota####`
+any case, bare date-slugs) and diffs the added/removed line multisets of the
+two ranges. Exit 0 or the port is not finished.
+
+Why this is a hard rule: the 3-day audit of the Fable→Opus window found
+ELEVEN files where golem comments carried HAL's OTA numbers, one VERSION.md
+row carrying a HAL build-id slug, and nothing else — every code line
+matched. Root cause in every single case: the renumber regex was re-typed
+per port in a scratch heredoc, and each fresh copy missed a shape
+(lowercase refs, bare slugs, a wrong cutoff). One committed rule, one
+committed comparison, zero scratch regexes — that is how the category dies.
+
+
 ### ⚠ PHASE 6 IS GOLEM-LINE ONLY (owner directive, 2026-08-03)
 
 The immersion build plan's Phase 6 — **local-LLM NPC conversation** — does NOT
