@@ -25,6 +25,13 @@
 // not engineering. Adding an NPC is a JSON entry; no code changes.
 import rawTopics from '../data/npcs/dialogue_topics.json';
 import type { NpcRegard } from './npcMemory';
+import type { MainQuestPhase } from './types';
+
+/** OTA-1082 — the story's own order, for `minChapter`. The main quest is a
+ *  LINE, not a set, so "from the descent onwards" is a real thing to say and a
+ *  topic that only makes sense after the Nexus should not be reachable at the
+ *  hook. `ended` sits last so post-ending topics stay open. */
+const PHASE_ORDER: MainQuestPhase[] = ['hook', 'revelation', 'cores', 'descent', 'nexus', 'choice', 'ended'];
 
 /** The regard ladder, weakest to strongest, for `minRegard` comparisons.
  *  `wronged` is deliberately NOT on this scale — it is not a rung, it is a
@@ -45,6 +52,12 @@ export interface TopicGate {
   minContractsTurnedIn?: number;
   /** Player's standing with the NPC's faction. */
   minStanding?: number;
+  /** OTA-1082 — earliest main-quest phase this topic makes sense in. The fifth
+   *  and last gate dimension the build plan called for. */
+  minChapter?: MainQuestPhase;
+  /** OTA-1082 — Cores recovered. `cores` is a long phase (five Cores inside
+   *  it), so phase alone cannot express "once you are most of the way". */
+  minCores?: number;
 }
 
 export interface Topic {
@@ -69,6 +82,10 @@ export interface TalkContext {
   standing: number;
   titles: string[];
   hasRecentRaidNews: boolean;
+  /** OTA-1082 — where the player is in the main quest, and how many Cores they
+   *  hold. Both default safely for a character who has not started it. */
+  chapter: MainQuestPhase;
+  cores: number;
 }
 
 export function hasTopicsFor(npcId: string): boolean {
@@ -103,6 +120,12 @@ export function gateAllows(gate: TopicGate | undefined, ctx: TalkContext): boole
   if (gate.requiresTitle && !ctx.titles.includes(gate.requiresTitle)) return false;
   if (gate.minContractsTurnedIn !== undefined && ctx.contractsTurnedIn < gate.minContractsTurnedIn) return false;
   if (gate.minStanding !== undefined && ctx.standing < gate.minStanding) return false;
+  if (gate.minChapter) {
+    const need = PHASE_ORDER.indexOf(gate.minChapter);
+    const have = PHASE_ORDER.indexOf(ctx.chapter);
+    if (need < 0 || have < 0 || have < need) return false;
+  }
+  if (gate.minCores !== undefined && ctx.cores < gate.minCores) return false;
   return true;
 }
 
