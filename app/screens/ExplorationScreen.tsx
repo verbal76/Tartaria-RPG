@@ -45,6 +45,9 @@ import { ParleyModal } from '../components/ParleyModal';
 import { TalkModal } from '../components/TalkModal';
 import { GiftModal } from '../components/GiftModal';
 import { hasTopicsFor } from '../engine/dialogue';
+// OTA-1087 — the SAME identity function the store and the ledger use. See the
+// TALK chip below for what asking in the wrong namespace cost.
+import { npcLedgerId } from '../engine/npcMemory';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
 import { TutorialTarget } from '../components/TutorialTarget';
@@ -726,8 +729,15 @@ export function ExplorationScreen() {
               way to reach it but typing `talk to <name>`, which is a feature
               nobody finds. Shown ONLY for the authored cast — a TALK button on
               somebody with nothing to say is a worse lie than no button. Nested
-              touchable, so it does not open the stall. */}
-          {hasTopicsFor(currentScene.vendor.id ?? '') ? (
+              touchable, so it does not open the stall.
+              ⚠ OTA-1087 — npcLedgerId, NOT `vendor.id`. The raw id is the SPAWN
+              id (`roadside_<seed>`, `overlay_<id>_<ms>`); the topic sets are
+              keyed on who the person IS (`roadside:grit_maalen`). Asking in the
+              wrong namespace answered `false` for all 24 roadside and 5 overlay
+              traders, so this button only ever appeared for the 30 named vendors
+              whose raw id happens to equal their ledger id — and it was the only
+              route into their conversation that a player would ever find. */}
+          {hasTopicsFor(npcLedgerId(currentScene.vendor)) ? (
             <TouchableOpacity
               style={styles.placeChipTalk}
               onPress={() => talkToNpc(currentScene.vendor?.name ?? '')}

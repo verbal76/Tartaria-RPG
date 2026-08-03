@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.97';
+export const DISPLAY_VERSION = '4.28.98';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20203,7 +20203,70 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // this OTA's test asserts BOTH files still have it plus that emitFlourish
 // contains no await at all.
 // DISPLAY_VERSION 4.28.97. 30 tests.
-export const OTA_BUILD_ID = '2026-08-03-1086-flourish';
+// OTA-1087 — THE DOORS, AND AN AUDIT OF PHASES 0-2.
+//
+// ⚠ MOST OF WHAT OTA-1085 AUTHORED WAS UNREACHABLE, AND 621 GREEN SUITES SAID
+// OTHERWISE. Every Phase 2 test asked whether a topic was authored and
+// correctly gated. None asked whether any route in the shipped game reaches it.
+// The answer, for the whole procedural cast, was no:
+//   - the TALK chip and the `talk to <name>` router both asked
+//     `hasTopicsFor(vendor.id)` — the SPAWN id (`roadside_<seed>`,
+//     `overlay_<id>_<ms>`). The topic sets are keyed on the LEDGER id
+//     (`roadside:grit_maalen`). Wrong namespace, `false` every time, for all 24
+//     roadside and 5 overlay traders. The 30 named vendors worked only because
+//     their raw id happens to equal their ledger id, which is why it hid.
+//   - `talk to <wanderer>` has always landed on the parley branch, which
+//     returns. All 28 wanderer-archetype topics: dead.
+//   - an escort leader is not in the scene at all (they live on
+//     player.activeFactionQuests). Nothing routed to them.
+//   - a Core Guardian only ever exists as an ENEMY, and every route into a
+//     conversation required an empty scene.
+// Fixed: one `talkablePeople()` list with one identity function feeding all
+// three consumers; the wanderer conversation is a THIRD option on the parley
+// modal (nothing displaced — the parley still pays a lead, goods or standing);
+// escort leaders route by name; and a Guardian answers questions mid-fight.
+// ⚠ Talking to a Guardian still cannot END the fight — OTA-806's guardrail is
+// older and outranks this. It costs nothing precisely BECAUSE it changes
+// nothing: no damage, no heal, no turn, no enemy counter.
+// Also: all 11 class sets shipped with the SAME four button labels, so a
+// scavenger and a Core Guardian both offered "Ask what they are not saying".
+// Each set now has its own.
+//
+// ── THE AUDIT (dead ends, code gaps, loops, degenerate exploits) ──────────
+// 1. ⚠ HOSTILITY WAS A RIVAL-STANDING FARM. applyRepChange propagates half of
+//    any delta to the target faction's RIVALS with the sign flipped, so every
+//    standing LOSS is a standing GAIN elsewhere. Fine once; a generator for
+//    anything repeatable — and two acts were freely repeatable. A refused gift
+//    does NOT consume the item (deliberate, OTA-1083), so -2/+1-per-rival cost
+//    only a tap. Beating a vendor into submission was -12/+6-per-rival, and the
+//    vendor is anchored to the room (OTA-1052) — walk out, walk in, again.
+//    Closed by dockHostileStanding: the largest hit already taken for a person
+//    is remembered as a MAGNITUDE on their ledger row. A heavier act tops up
+//    the difference; a repeat costs nothing. Magnitude rather than a flag is
+//    what shuts the downgrade hole — a -2 insult must not buy immunity from the
+//    -12 for putting somebody on their knees.
+// 2. A TOPIC GRANT COULD EVAPORATE. With a lead already in hand, the grant
+//    branch printed "the tip will keep" and the caller spent the topic anyway.
+//    Fire-once, so a payout gated behind 'familiar' plus a chapter check paid
+//    nothing, once, forever. applyTopicGrant now reports whether it delivered
+//    and the talkedTopics counter is only bumped when it did — and ONLY when
+//    nothing at all landed, so a topic paying coin AND a lead can never be
+//    replayed for the coin.
+// 3. GIFTING REACHED A SMALLER CAST THAN TALKING. Escort leaders are fully on
+//    the ledger and were talkable, and the gift picker did not list them. The
+//    picker is now derived from the same talkablePeople list. And a gift to
+//    somebody with no ledger row consumed the item while writing no memory —
+//    the one clause the owner asked for by name — now refused instead.
+//
+// REPORTED, NOT CHANGED: caught theft applies its standing loss on every
+// attempt, so it shares the shape of (1); the fix there is a design call about
+// what repeated stealing from one person should cost, not a bug fix. And
+// restitution (OTA-1076) banks only coin the player HANDS OVER, so buying and
+// re-selling launders amends at the cost of the spread — bounded, but softer
+// than 600 TC a wrong.
+// DISPLAY_VERSION 4.28.98. 26 tests.
+export const OTA_BUILD_ID = '2026-08-03-1087-talk-doors-and-audit';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1086-flourish';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1085-non-vendor-cast';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1084-topic-grants-whispers';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1083-gifting';
