@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1091`**,
-**golem-line `2026-08-03-1068`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1092`**,
+**golem-line `2026-08-03-1069`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,9 +923,31 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.2**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.3**; ledger in `VERSION.md`.
 
-- **ACTIVE PLAYTEST OF PHASES 0-5 (2026-08-03, latest). BOTH LINES.**
+- **THE PLAYTEST WALKS THE REAL STORY (2026-08-03, latest). BOTH LINES.**
+  HAL OTA-1092 / golem OTA-1069. Owner, shown the honest-walk experiment
+  before any code shipped: *"actual events trigger storyline is the way to
+  go."* OTA-1091's harness granted Cores by writing `coresRecovered` straight
+  into the save — a character no real player can be (nine Cores, story still
+  in its prologue) — and the fork system, reading that contradiction,
+  correctly refused the second question per motive. The harness under-covered
+  exactly the content it existed to reach.
+
+  Every Core now goes through `advanceMainQuest('core_recovered', <real
+  capital id>)` — the exact state machine a Guardian kill feeds the store —
+  so phase and core list move in lockstep. The seeded 80-step walk reaches
+  **both** debt forks and asserts that permanently. The fight itself stays
+  skipped on purpose: combat's dice have their own suites; this harness
+  grades the story consequence of winning. The repetition guard now skips the
+  `player` channel (the walker's own typed commands echoed back).
+
+  Parked tuning note per the owner ("we can tune it later"): two answered
+  forks still left regard at `even (2)` — `sell_the_claim` cost −4, which is
+  the system working, and a data point that the regard bands sit high for a
+  low-conduct run. 20 assertions.
+
+- **ACTIVE PLAYTEST OF PHASES 0-5 (2026-08-03). BOTH LINES.**
   HAL OTA-1091 / golem OTA-1068. `__tests__/playtestPhases0to5.test.ts` (new).
   Owner: *"lets do active play testing on phases 0-5."*
 

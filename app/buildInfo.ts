@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.2';
+export const DISPLAY_VERSION = '4.29.3';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20447,7 +20447,41 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //
 // Both findings are the harness earning its keep on its first run.
 // DISPLAY_VERSION 4.29.2. 19 playtest assertions + 2 regression tests.
-export const OTA_BUILD_ID = '2026-08-03-1091-playtest-phases-0-5';
+//
+// OTA-1092 — THE PLAYTEST WALKS THE REAL STORY, AND PROVES BOTH FORKS LAND.
+//
+// Owner, on being shown the honest-walk experiment side by side with the
+// original: "actual events trigger storyline is the way to go."
+//
+// The first cut of the phases 0-5 harness (OTA-1091) granted Cores by writing
+// coresRecovered straight into the save. That produced a character no real
+// player can be — nine Cores with the story still in its prologue — and the
+// fork system, reading that contradiction, correctly refused to ask the
+// second question per motive. So the harness under-covered exactly the
+// content it existed to reach, and reported "only one fork fired" as a
+// harness limitation instead of proving the second one works.
+//
+// Now every Core goes through advanceMainQuest('core_recovered', <real
+// capital id>) — the exact state machine a Guardian kill feeds the store —
+// so phase and core list move in lockstep and every phase-gated beat gets
+// its window. The seeded 80-step walk now reaches BOTH debt forks
+// (debt_collector at revelation, debt_claim at cores+3), and the harness
+// asserts that permanently. The fight itself is still skipped on purpose:
+// combat's dice have their own suites; what this harness grades is the
+// story consequence of winning.
+//
+// Also: the repetition guard now skips the `player` channel — fourteen
+// "search" lines in eighty steps is the walker's own typed commands echoed
+// back, not the game repeating itself.
+//
+// A live tuning observation from the honest run, parked at the owner's
+// direction ("we can tune it later"): two answered forks still left regard
+// at even (2) — the walker's sell_the_claim answer cost -4, which is the
+// system working, and also a data point that the band boundaries sit high
+// relative to what a low-conduct run accumulates.
+// DISPLAY_VERSION 4.29.3. 20 playtest assertions.
+export const OTA_BUILD_ID = '2026-08-03-1092-playtest-honest-walk';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1091-playtest-phases-0-5';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1090-arbiter-persona';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1089-pressure-difficulty';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1088-story-forks';
