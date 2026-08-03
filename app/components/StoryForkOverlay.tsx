@@ -73,22 +73,30 @@ export function StoryForkOverlay() {
   );
 }
 
+// OTA-1095 — RESTYLED ONTO THE HOUSE TOKENS. The owner's style audit found
+// this overlay wearing nine colors that appear NOWHERE else in the app — an
+// invented palette in the same earthy family as the base game but sharing not
+// one token with it. Every value below is now a color the game already owns:
+// #c9a86a gold (the signature accent, 340 uses), #f0e6cc / #e6d8b3 / #a2977b
+// text ranks, #3a342c the app-wide rule, #6b5c3a the modal border, and the
+// #0a0908 / #17150f / #2a1f12 ground family. Layout, weights and the
+// no-dismiss solemnity are untouched — this is a change of clothes, not bones.
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(6,7,9,0.97)', justifyContent: 'center' },
+  backdrop: { flex: 1, backgroundColor: 'rgba(10,9,8,0.97)', justifyContent: 'center' },
   cardWrap: { paddingHorizontal: 18, maxHeight: '92%' },
   pad: { paddingVertical: 26 },
-  kicker: { color: '#8a7a55', fontSize: 11, letterSpacing: 3, textAlign: 'center', fontWeight: '700' },
-  title: { color: '#e8dcc0', fontSize: 24, letterSpacing: 2, textAlign: 'center', marginTop: 8, fontWeight: '700' },
-  rule: { height: 1, backgroundColor: '#3a3527', marginVertical: 16, marginHorizontal: 30 },
-  body: { color: '#b8ae97', fontSize: 14, lineHeight: 22 },
-  question: { color: '#e8dcc0', fontSize: 15, lineHeight: 22, marginTop: 18, marginBottom: 12, fontWeight: '700' },
+  kicker: { color: '#c9a86a', fontSize: 11, letterSpacing: 3, textAlign: 'center', fontWeight: '700' },
+  title: { color: '#f0e6cc', fontSize: 24, letterSpacing: 2, textAlign: 'center', marginTop: 8, fontWeight: '700' },
+  rule: { height: 1, backgroundColor: '#3a342c', marginVertical: 16, marginHorizontal: 30 },
+  body: { color: '#a2977b', fontSize: 14, lineHeight: 22 },
+  question: { color: '#e6d8b3', fontSize: 15, lineHeight: 22, marginTop: 18, marginBottom: 12, fontWeight: '700' },
   option: {
-    borderWidth: 1, borderColor: '#4a4432', borderRadius: 4,
+    borderWidth: 1, borderColor: '#6b5c3a', borderRadius: 4,
     paddingVertical: 12, paddingHorizontal: 14, marginBottom: 10,
-    backgroundColor: 'rgba(30,28,22,0.7)',
+    backgroundColor: 'rgba(23,21,15,0.85)',
   },
-  optionPressed: { backgroundColor: 'rgba(60,55,40,0.9)', borderColor: '#7a6f4e' },
-  optionLabel: { color: '#e2d7b8', fontSize: 14, fontWeight: '700' },
-  optionHint: { color: '#8f8672', fontSize: 12, lineHeight: 18, marginTop: 5 },
-  footnote: { color: '#6d6552', fontSize: 11, letterSpacing: 1, textAlign: 'center', marginTop: 6 },
+  optionPressed: { backgroundColor: 'rgba(42,31,18,0.9)', borderColor: '#c9a86a' },
+  optionLabel: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
+  optionHint: { color: '#a2977b', fontSize: 12, lineHeight: 18, marginTop: 5 },
+  footnote: { color: '#6b5c3a', fontSize: 11, letterSpacing: 1, textAlign: 'center', marginTop: 6 },
 });
