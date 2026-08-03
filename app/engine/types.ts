@@ -1992,6 +1992,16 @@ export interface NpcRelation {
   contractsTurnedIn: number;
   /** Thefts, attacks — anything that makes them watch your hands. */
   wrongs: number;
+  /** OTA-1104 — CLEAN pockets lifted off this person (they never caught you).
+   *  Feeds the delayed "always losing things" mumble: on a later meeting they
+   *  notice the loss out loud WITHOUT suspecting you — the player learns the
+   *  theft registered and that they got away with it. A caught lift records a
+   *  `wrong` instead, never this. */
+  pocketsLifted?: number;
+  /** How many of those losses they have mumbled about. The mumble fires while
+   *  pocketsLifted > pocketsMumbled, once per later meeting — deterministic,
+   *  no roll, and it can never repeat past what was actually taken. */
+  pocketsMumbled?: number;
   /** OTA-1076 — TC of honest custom banked toward buying back a caught theft.
    *  Only coin spent AFTER the wrong counts; see AMENDS_TC_PER_WRONG. */
   amendsTc?: number;
