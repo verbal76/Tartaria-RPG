@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1100`**,
-**golem-line `2026-08-03-1077`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1101`**,
+**golem-line `2026-08-03-1078`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,9 +923,24 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.11**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.12**; ledger in `VERSION.md`.
 
-- **PICKPOCKET JOINS THE BOTTOM SLOT (2026-08-03, latest). BOTH LINES.**
+- **WHAT'S ACTUALLY IN THEIR POCKETS (2026-08-03, latest). BOTH LINES.**
+  HAL OTA-1101 / golem OTA-1078. Owner: *"only show what you can
+  pickpocket. Stealing is for items, pickpocket is for what would be in
+  their clothing or on them... something they wouldn't trust on the
+  tabletop with all the thieves around."* The sheet shows MARKS (vendor /
+  wanderer chips), not merchandise — items on tables stay with steal/take.
+  New `pickpocketPerson`: same Stealth roll + consequences as vendor theft
+  (demeanor DC, steal-heat, quiet fail; CAUGHT starts the same fight via
+  the extracted `vendorCatchesThief` — shared, not copied; a wanderer who
+  catches you leaves, no steel over a pocket). Payout table
+  (`engine/pocketLoot.ts`): 50% TC 3-12, 30% collectable note (owned notes
+  fall to coin — no dupes), 15% one Legendary material, 5% a tower map.
+  Lifted goods carry the stolen flag; a clean lift trains Stealth. Test:
+  `ota1078PocketLoot.test.ts`.
+
+- **PICKPOCKET JOINS THE BOTTOM SLOT (2026-08-03). BOTH LINES.**
   HAL OTA-1100 / golem OTA-1077. Owner's first pickpocket on device: *"it
   did a popup — can we have it do a bottom cover as well when we pick the
   item?"* PickpocketModal → `PickpocketSheet` in the DiceRoller's controls

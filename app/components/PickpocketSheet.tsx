@@ -1,74 +1,35 @@
-// OTA-847 (STEALTH SYSTEM) — the PICKPOCKET picker. Replaces the old
-// out-of-combat APPROACH picker (whose walk-up-to-a-noun job is retired).
-// Vendor offers become lift targets; ambient nouns become opportunistic
-// grabs. Rolls Stealth vs the mark's awareness — pickpocket IS the stealth
-// action, so there's no toggle.
+// OTA-847 (STEALTH SYSTEM) — the PICKPOCKET picker. Rolls Stealth vs the
+// mark's awareness — pickpocket IS the stealth action, so there's no toggle.
 //
 // OTA-1077 — rebuilt as a BOTTOM SHEET, same slot and skin as the DiceRoller
-// and the talk sheets, at the owner's direction ("can we have it do a bottom
-// cover as well when we pick the item"). The feed stays readable while you
-// choose the mark — and the roll line + outcome land there, right where
-// you're already looking. Picking a target attempts the lift and closes the
-// sheet; CANCEL hands the slot back untouched.
+// and the talk sheets ("can we have it do a bottom cover as well" — owner).
+// The feed stays readable while you choose — the Stealth roll line and the
+// outcome land there.
+//
+// OTA-1078 — the sheet shows MARKS, not merchandise. Owner: "only show what
+// you can pickpocket. Stealing is for items, pickpocket is for what would be
+// in their clothing or on them." So no vendor-goods chips, no ambient nouns,
+// no free-typed target: one chip per PERSON in reach, and what's in their
+// pocket stays hidden until your hand is in it (engine/pocketLoot.ts rolls
+// the payout). Items on tables and the ground stay with the steal/take
+// verbs. Picking a mark attempts the lift and closes the sheet.
 
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Keyboard,
-} from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 
 interface Props {
-  /** Vendor name in the scene, if any — the header names who you're lifting
-   *  from. */
-  vendorName?: string;
-  /** The vendor's offer item names, surfaced as green chips — tap one to
-   *  attempt to lift THAT item. */
-  vendorOffers?: string[];
-  /** Ambient / NPC nouns you can pickpocket when there's no vendor (opportunistic
-   *  sleight-of-hand grabs). */
-  npcHints?: string[];
-  /** The player picks a mark/item (or types one) and the engine runs the
-   *  Stealth check. Success → it's yours, quiet and clean. Failure → if your
-   *  Stealth is high you withdraw unseen; if it's low against a vendor, you're
-   *  caught and the fight is real. */
-  onSubmit: (target: string) => void;
+  /** People in the scene with pockets worth trying — vendor and/or wanderer
+   *  names. Empty means no marks in reach; the sheet says so. */
+  marks: string[];
+  /** The player picks a mark and the engine runs the Stealth check against
+   *  THEM. Success → whatever they were carrying close. Failure → a high-
+   *  Stealth hand withdraws unseen; a clumsy one against a vendor starts a
+   *  real fight. */
+  onPick: (markName: string) => void;
   onCancel: () => void;
 }
 
-export function PickpocketSheet({
-  vendorName,
-  vendorOffers,
-  npcHints,
-  onSubmit,
-  onCancel,
-}: Props) {
-  const [text, setText] = useState('');
-  const inputRef = useRef<TextInput>(null);
-
-  // The sheet mounts fresh each open (it's conditionally rendered in the
-  // controls slot), but clear anyway in case a parent ever keeps it mounted.
-  useEffect(() => { setText(''); }, []);
-
-  const handleSubmit = () => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    Keyboard.dismiss();
-    onSubmit(trimmed);
-  };
-
-  const tapTarget = (target: string) => {
-    Keyboard.dismiss();
-    onSubmit(target);
-  };
-
-  const offers = vendorOffers ?? [];
-  const npcs = npcHints ?? [];
-
+export function PickpocketSheet({ marks, onPick, onCancel }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -76,91 +37,32 @@ export function PickpocketSheet({
         <Text style={styles.hint}>the roll lands in the feed above</Text>
       </View>
       <Text style={styles.body}>
-        {vendorName
-          ? `Lift something off ${vendorName} without them noticing. Rolls STEALTH — a clean hand takes it quiet; a clumsy one gets caught, and the steel comes out.`
-          : 'Palm something off a mark or out of the open without being seen. Rolls STEALTH.'}
+        {marks.length > 0
+          ? 'Slip a hand into someone’s pocket. Rolls STEALTH — what they keep on them stays hidden until it’s in your hand. A clean lift goes unfelt; a clumsy one gets caught.'
+          : 'No one in reach worth the risk. Pockets belong to people — find a trader or a traveler.'}
       </Text>
 
-      <TextInput
-        ref={inputRef}
-        style={styles.input}
-        value={text}
-        onChangeText={setText}
-        placeholder='e.g. "the coin pouch", "the amulet"'
-        placeholderTextColor="#a2977b"
-        onSubmitEditing={handleSubmit}
-        returnKeyType="go"
-        autoCorrect={false}
-        autoCapitalize="none"
-      />
-
-      {offers.length > 0 && (
-        <>
-          <Text style={styles.chipLabel}>{vendorName ? `${vendorName}'s goods` : 'On offer'}</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.chipScrollRow}
-          >
-            {offers.map((o) => (
-              <Pressable
-                key={`offer-${o}`}
-                style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
-                onPress={() => tapTarget(o)}
-                accessibilityRole="button"
-              >
-                <Text style={styles.chipTextScene} numberOfLines={1}>{o}</Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </>
-      )}
-
-      {npcs.length > 0 && (
-        <>
-          <Text style={styles.chipLabel}>Within reach</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.chipScrollRow}
-          >
-            {npcs.map((h) => (
-              <Pressable
-                key={`npc-${h}`}
-                style={({ pressed }) => [styles.chip, pressed && styles.btnPressed]}
-                onPress={() => tapTarget(h)}
-                accessibilityRole="button"
-              >
-                <Text style={styles.chipText} numberOfLines={1}>{h}</Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </>
-      )}
-
-      <View style={styles.btnRow}>
+      {marks.map((m) => (
         <Pressable
-          style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
-          onPress={onCancel}
+          key={m}
+          style={({ pressed }) => [styles.markBtn, pressed && styles.btnPressed]}
+          onPress={() => onPick(m)}
           accessibilityRole="button"
+          accessibilityLabel={`Pickpocket ${m}`}
         >
-          <Text style={styles.btnTextNeutral}>CANCEL</Text>
+          <Text style={styles.markText} numberOfLines={1}>{m}</Text>
+          <Text style={styles.markHint}>what's on them, not what's on the table</Text>
         </Pressable>
-        <Pressable
-          style={({ pressed }) => [
-            styles.btn,
-            styles.btnPrimary,
-            !text.trim() && styles.btnDisabled,
-            pressed && styles.btnPressed,
-          ]}
-          onPress={handleSubmit}
-          disabled={!text.trim()}
-          accessibilityRole="button"
-          accessibilityState={{ disabled: !text.trim() }}
-        >
-          <Text style={styles.btnTextPrimary}>LIFT</Text>
-        </Pressable>
-      </View>
+      ))}
+
+      <Pressable
+        style={({ pressed }) => [styles.cancelBtn, pressed && styles.btnPressed]}
+        onPress={onCancel}
+        accessibilityRole="button"
+        accessibilityLabel="Cancel pickpocket"
+      >
+        <Text style={styles.cancelText}>CANCEL</Text>
+      </Pressable>
     </View>
   );
 }
@@ -196,40 +98,36 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 17,
   },
-  input: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+  markBtn: {
+    borderColor: '#6b5c3a',
     borderWidth: 1,
+    borderRadius: 4,
+    backgroundColor: '#17150f',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    gap: 2,
+  },
+  markText: {
     color: '#e6d8b3',
-    paddingHorizontal: 10,
-    paddingVertical: 9,
-    borderRadius: 3,
     fontSize: 14,
+    fontWeight: '700',
   },
-  chipLabel: {
+  markHint: {
     color: '#a2977b',
-    fontSize: 10,
-    letterSpacing: 1.5,
-    marginTop: 2,
+    fontSize: 11,
+    fontStyle: 'italic',
   },
-  chipScrollRow: { flexDirection: 'row', gap: 6, paddingLeft: 2, paddingRight: 8 },
-  chip: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 3,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  chipScene: { borderColor: '#9ec96a' },
-  chipText: { color: '#cdbf99', fontSize: 12 },
-  chipTextScene: { color: '#9ec96a', fontSize: 12 },
-  btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 4 },
-  btn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, minWidth: 80, alignItems: 'center' },
   btnPressed: { opacity: 0.7 },
-  btnDisabled: { opacity: 0.3 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
-  btnTextPrimary: { color: '#0a0908', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
-  btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  cancelBtn: {
+    backgroundColor: '#3a342c',
+    borderRadius: 4,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  cancelText: {
+    color: '#c9a86a',
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
 });

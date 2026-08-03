@@ -954,13 +954,14 @@ export function ExplorationScreen() {
         ) : pickpocketOpen ? (
           // OTA-1077 — the pickpocket picker joins the slot: choose the mark
           // at the bottom, the Stealth roll and outcome land in the feed.
+          // OTA-1078 — marks are PEOPLE (vendor / wanderer), and the payout
+          // is what's in their pockets, not their table (pickpocketPerson →
+          // engine/pocketLoot.ts). Items stay with the steal/take verbs.
           <PickpocketSheet
-            vendorName={currentScene?.vendor?.name}
-            vendorOffers={(currentScene?.vendor?.offers ?? []).map((o) => o.itemName)}
-            npcHints={currentScene?.vendor ? [] : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])}
-            onSubmit={(target) => {
+            marks={[currentScene?.vendor?.name, currentScene?.wanderer?.name].filter((n): n is string => !!n)}
+            onPick={(mark) => {
               setPickpocketOpen(false);
-              useGameStore.getState().stealthTakeAmbientNoun(target);
+              useGameStore.getState().pickpocketPerson(mark);
             }}
             onCancel={() => setPickpocketOpen(false)}
           />
