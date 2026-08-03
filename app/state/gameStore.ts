@@ -32,9 +32,12 @@ import {
 } from '../engine/dogCompanion';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse } from '../engine/worldMemory';
 // OTA-1072 — Phase 1: the per-person ledger the greeting layer reads.
-import { rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName } from '../engine/npcMemory';
+import { rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName, vendorLedgerId } from '../engine/npcMemory';
 // OTA-1076 — the relationship reaches the counter.
 import { npcRegard, regardPriceMult } from '../engine/npcMemory';
+// OTA-1077 — the offscreen war reaches the people who live in it.
+import { raidNewsFor, raidNewsLine, RAID_MEMORY_CAP } from '../engine/npcMemory';
+import type { OutpostRaid } from '../engine/types';
 // OTA-1073 — Phase 1 slice 2: turn-in credit, roadside recognition, gossip.
 import { gossipSubject, gossipLine } from '../engine/npcMemory';
 import {
@@ -2636,6 +2639,12 @@ function simulatePatrols(
     return WE.stepPatrol(p, tickIndex, target);
   });
   const events: { text: string; kind: string }[] = [];
+  // OTA-1077 — the SAME assault, kept as data rather than only as prose. The
+  // sim has raided outposts since OTA-844; the events it emitted named only
+  // factions and went only to the World board, so the people who actually live
+  // at the sacked outpost never mentioned it. Joining the event to its location
+  // and the clock is all that was missing.
+  const raidRecords: OutpostRaid[] = [];
   const lost = new Set<number>();
 
   // Patrol meetings (each unordered pair once).
@@ -2723,6 +2732,24 @@ function simulatePatrols(
         bumpPower(f.id, -1); bumpPower(p.factionId, 1);
         relations = FR.adjustRelation(relations, p.factionId, f.id, -4);
         events.push({ text: WE.outpostAssaultLine(nameOf(p.factionId), nameOf(f.id), tickIndex * 53 + i * 11 + p.phase), kind: 'outpost_assault' });
+        // OTA-1077 — and the same event as a record someone can talk about.
+        const raidedLoc = FACTION_STARTING_LOCATION[f.id];
+        if (raidedLoc) {
+          raidRecords.push({
+            defenderId: f.id,
+            defenderName: nameOf(f.id),
+            attackerId: p.factionId,
+            attackerName: nameOf(p.factionId),
+            locationId: raidedLoc,
+            // OTA-1078 — resolve the AUTHORED name here, where the location
+            // catalog is. npcMemory only had the id and de-slugged it, which
+            // put "reclaimer stake" and "pilgrim waycamp" in the mouths of the
+            // people who live at Reclaimer's Stake and the Tartarian Pilgrim
+            // Camp.
+            locationName: safeLocName(raidedLoc),
+            atHours: get().player?.hoursElapsed ?? 0,
+          });
+        }
         assaulted = true;
         break;
       }
@@ -2758,6 +2785,33 @@ function simulatePatrols(
       // OTA-853 — world drama routes ONLY to the World board's own log (capped 50), never
       // the exploration feed. You see it when you tap WORLD, not mid-play.
       worldEvents: [...(st.worldMemory.worldEvents ?? []), ...sample.map((e) => ({ ...e, hour }))].slice(-50),
+    } : {}),
+    // OTA-1077 — raid RECORDS are kept whole, not sampled. The board's FEED_PER_STEP
+    // sample exists so the World screen reads as a story rather than a wall; a raid
+    // that got trimmed out of the display still happened, and the trader whose
+    // outpost burned should still be able to say so.
+    // ⚠ OTA-1078 — ONE RAID PER DEFENDER PER IN-GAME HOUR. worldRealtimeTick
+    // runs simulatePatrols every ~6 REAL seconds whether or not in-game time
+    // moves, so a review measured 60 idle ticks — about six minutes of an open
+    // app — overflowing the 12-slot buffer outright. A raid on the player's own
+    // faction was near-guaranteed to be evicted before they next reached a
+    // vendor, which made OTA-1077 all but inert in exactly the sessions it was
+    // written for. The cap was doing the trimming the sampling comment claims
+    // it avoids. Deduping on (defender, hour) makes the buffer measure IN-GAME
+    // distance again: an idle player accumulates at most one row per faction
+    // per hour instead of one per heartbeat.
+    ...(raidRecords.length > 0 ? {
+      recentRaids: (() => {
+        const out = [...(st.worldMemory.recentRaids ?? [])];
+        const seen = new Set(out.map((r) => `${r.defenderId}@${r.atHours}`));
+        for (const r of raidRecords) {
+          const key = `${r.defenderId}@${r.atHours}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          out.push(r);
+        }
+        return out.slice(-RAID_MEMORY_CAP);
+      })(),
     } : {}),
   } }));
 }
@@ -3448,30 +3502,90 @@ function arbiterAddress(player: PlayerCharacter | null | undefined, fallback: st
   return fallback;
 }
 
-/** OTA-1072 — the id an NPC is remembered under. Must be computed the SAME way
- *  at the sighting site and at every read, or the ledger silently splits one
- *  person into two.
+/** OTA-1078 — moved to app/engine/npcMemory.ts (vendorLedgerId); re-exported
+ *  here under the store's original name so every call site and the test seam
+ *  keep working. Ledger identity is npcMemory's subject, and keeping the rule
+ *  private to the store is what let the tests drift onto a copy of it. */
+export const vendorNpcId = vendorLedgerId;
+
+/** OTA-1078 — THE ONE WAY A VENDOR ENTERS THE LEDGER.
  *
- *  OTA-1076 — LEDGER IDENTITY IS NOT RUNTIME IDENTITY, and conflating them was
- *  a real leak. pickRoadsideTrader mints `roadside_<demeanor>_<Date.now()>`, a
- *  fresh id on EVERY spawn, while the trader's name and description come from a
- *  fixed archetype — so one authored character was being split into an
- *  unbounded number of one-encounter strangers. Two consequences, both mine
- *  from OTA-1072/1073:
- *    - roadside recognition (OTA-1073) could never fire for the very
- *      population it was written for: the relation was new every time.
- *    - worse, since OTA-1072 sights every vendor, each spawn appended a
- *      permanent row to BOTH npcsMet and npcRelations. Neither is capped and
- *      both persist, so a long save accumulated hundreds of dead rows and the
- *      Chronicle's people column filled with strangers met once.
- *  Keying roadside traders by archetype closes both. The runtime id keeps its
- *  per-spawn uniqueness — nothing else reads past the `roadside_` prefix — and
- *  the ledger gets the identity that actually corresponds to a person. */
-function vendorNpcId(vendor: { id?: string; name: string }): string {
-  const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '_');
-  const id = vendor.id ?? '';
-  if (id.startsWith('roadside_')) return `roadside:${slug(vendor.name)}`;
-  return id || `vendor:${slug(vendor.name)}`;
+ *  ⚠ I FIRST WROTE "three separate places" HERE AND IT WAS WRONG. There are
+ *  FIVE, and my first pass wired three of them — publishing a docblock that
+ *  claimed the hole was closed while two sites still had it. Counting the
+ *  places a thing happens is the whole job in this file; asserting the count
+ *  without grepping for it is how OTA-1072, OTA-1075 and this OTA all shipped
+ *  the same class of defect. All five now go through here:
+ *    - beginScene (the only one OTA-1072 wired).
+ *    - patchSceneForBuildingRoom (the four Hidden Market stalls) — and NOTHING
+ *      else can mint a `hidden_market_*` id, so those stalls had no relation at
+ *      all. Every ledger write against them was a no-op: a caught theft there
+ *      cost nothing, forever, and the broker contract-accept paths that exist
+ *      specifically to serve them recorded nothing.
+ *    - stepDirection's roadside stall, which the code itself calls the dominant
+ *      spawn path ("one every ~5 travel steps") and which never calls
+ *      beginScene, so no sighting, no greeting, no absence line, no raid news.
+ *    - the elevated-overlay trader, found on a climbed tier.
+ *    - the `spawn_vendor` hook effect (the campfire Reclaimer), which carries a
+ *      faction AND takes contracts, so it dropped contractsTaken as well.
+ *  Same shape as the OTA-1075 Guardian gap: a pattern applied at some sites out
+ *  of several. Funnelled through one helper so the next vendor source cannot
+ *  half-copy it — and the test asserts the count against the source, so a sixth
+ *  site cannot be added silently. */
+function sightVendor(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  vendor: { id?: string; name: string; title?: string; faction?: string | null },
+  locationId: string | undefined,
+  /** OTA-1078 — say the greeting too, for callers that have nowhere else to say
+   *  it. beginScene composes its own (it also owns the first-meeting arrival
+   *  narration), but the stall and roadside paths had NO greeting emitter at
+   *  all — so wiring the sighting alone made them advance `prevSeenHours`
+   *  SILENTLY, which consumed the absence anchor OTA-1075 exists to protect: a
+   *  trader you had not seen in a hundred hours got recorded on a travel step
+   *  and then had nothing to say about it at the next real encounter. A
+   *  sighting that nobody speaks for is worse than no sighting. */
+  greet = false,
+): void {
+  if (!vendor?.name) return;
+  // NOTE: repeat-visit suppression lives in recordNpcSighting (same in-game
+  // clock == same visit), NOT here. A per-site guard is exactly what every
+  // defect in this area has been.
+  const hoursElapsed = get().player?.hoursElapsed ?? 0;
+  set((s) => ({
+    worldMemory: rememberNpcMeeting(s.worldMemory, {
+      id: vendorNpcId(vendor),
+      name: vendor.name,
+      role: vendor.title || 'vendor',
+      factionId: vendor.faction ?? undefined,
+      locationId,
+      hoursElapsed,
+      firstMetAt: Date.now(),
+    }, { nowMs: Date.now(), hoursElapsed }),
+  }));
+  if (greet) emitVendorGreeting(get, vendor);
+}
+
+/** OTA-1078 — the greeting block, lifted out of beginScene so the other vendor
+ *  paths can say it too. beginScene keeps its own copy because it interleaves
+ *  the first-meeting arrival narration; everything here is the returning-face
+ *  half, in the same order and with the same gates. */
+function emitVendorGreeting(
+  get: () => GameStore,
+  vendor: { id?: string; name: string },
+): void {
+  const player = get().player;
+  if (!player) return;
+  const rel = getRelation(get().worldMemory, vendorNpcId(vendor));
+  if (!rel || rel.meetings <= 1) return; // a stranger gets the arrival line, not a greeting
+  const hours = player.hoursElapsed ?? 0;
+  get().appendLog('world', npcGreeting(rel, vendor.name, player.name));
+  const awayLine = npcAbsenceLine(rel, vendor.name, player.name, hours);
+  if (awayLine) get().appendLog('world', awayLine);
+  const raid = raidNewsFor(get().worldMemory, rel, hours);
+  if (raid) get().appendLog('world', raidNewsLine(rel, raid, vendor.name, player.name));
+  const talkAbout = gossipSubject(get().worldMemory, rel);
+  if (talkAbout) get().appendLog('world', gossipLine(vendor.name, talkAbout, player.name));
 }
 
 /** OTA-1073 — credit a finished contract to the person who took it back.
@@ -3740,6 +3854,13 @@ function patchSceneForBuildingRoom(
       },
     };
   });
+  // OTA-1078 — SIGHT THE STALL REP. This install path never recorded the
+  // meeting, and nothing else can mint a `hidden_market_*` id, so these four
+  // stalls had NO relation at all — every ledger write against them silently
+  // no-opped. A caught theft at the Hidden Market cost nothing, permanently,
+  // and the broker contract-accept branches that exist specifically to serve
+  // them recorded nothing.
+  if (stallVendor) sightVendor(get, set, stallVendor, get().player?.currentLocationId, true);
 }
 
 // OTA-914 — the Aetherkin. Buildings the flood sealed (a house, a shack, a
@@ -4841,6 +4962,19 @@ interface GameStore {
 // history is unaffected for diagnostics: COPY LOG reads the dedicated
 // on-disk log key (readFullLog), not this in-memory buffer.
 const MAX_LOG_IN_MEMORY = 500;
+
+/** OTA-1078 — total player-visible lines emitted this session, never trimmed.
+ *  gameLog is capped at MAX_LOG_IN_MEMORY, so its length cannot measure "how
+ *  much has happened"; this can. Debug/cognitive are excluded because they are
+ *  developer bookkeeping the player never sees. */
+let _playerVisibleLogCount = 0;
+
+/** Test seam. The counter IS the OTA-1078 staleness fix — gameLog.length
+ *  cannot measure "how much has happened" once the buffer sits at its cap —
+ *  so a regression test has to be able to read it past 500 lines. */
+export function _playerVisibleLogTotal(): number {
+  return _playerVisibleLogCount;
+}
 
 // OTA-801 — post-boss grace window (game-hours). A boss fight is a major beat —
 // often the whole reason you came to an outpost — and being ambushed the instant
@@ -6298,6 +6432,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // A blank line between them keeps the single-card grouping (no stutter) while
       // reading as distinct beats. RN <Text> renders "\n\n" as a paragraph gap.
       const lastEntry = state.gameLog[state.gameLog.length - 1];
+      if (channel !== 'debug' && channel !== 'cognitive') _playerVisibleLogCount += 1;
       const canMerge =
         lastEntry &&
         lastEntry.channel === channel &&
@@ -6305,7 +6440,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         entry.ts - lastEntry.ts < 500 &&
         // Don't merge time-passed markers — they're discrete clock beats.
         !text.startsWith('⏳') &&
-        !lastEntry.text.startsWith('⏳');
+        !lastEntry.text.startsWith('⏳') &&
+        // OTA-1078 — NEVER merge a story beat, in either direction. The merged
+        // entry is built as `{ ...lastEntry, text }`, so meta comes from the
+        // FIRST line: a story beat glued onto a preceding world line inherited
+        // that line's meta and lost `storyBeat` entirely — no rule, no STORY
+        // chip, no spacing. That is not a corner case. Most authored drip beats
+        // are world-channel and advanceStoryDrip runs microseconds after
+        // beginScene's own world lines, so the main story turning over rendered
+        // stuck to the end of a radar line. Exactly the complaint OTA-1074 was
+        // written to fix, reintroduced by a debounce written years earlier.
+        (meta as { storyBeat?: boolean } | undefined)?.storyBeat !== true &&
+        (lastEntry.meta as { storyBeat?: boolean } | undefined)?.storyBeat !== true;
       if (canMerge) {
         const merged = { ...lastEntry, text: `${lastEntry.text}\n\n${text}`, ts: entry.ts };
         const mergedLog = [...state.gameLog.slice(0, -1), merged].slice(-MAX_LOG_IN_MEMORY);
@@ -7669,28 +7815,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // re-entering the same vendor's scene won't double-list them. We
     // use the vendor's id when present, otherwise a slug of their name
     // (roadside traders have stable ids; legacy saves may not).
-    if (vendor) {
-      const npcId = vendorNpcId(vendor);
-      const npcRecord = {
-        id: npcId,
-        name: vendor.name,
-        role: vendor.title || 'vendor',
-        factionId: vendor.faction ?? undefined,
-        locationId: location.id,
-        hoursElapsed: get().player?.hoursElapsed ?? 0,
-        firstMetAt: Date.now(),
-      };
-      // OTA-1075 — one call now records both stores (rememberNpcMeeting): the
-      // idempotent milestone list AND the per-arrival relation. They were two
-      // calls here and only here, which is how the two Guardian sites below
-      // ended up recording half of it.
-      set((s) => ({
-        worldMemory: rememberNpcMeeting(s.worldMemory, npcRecord, {
-          nowMs: Date.now(),
-          hoursElapsed: get().player?.hoursElapsed ?? 0,
-        }),
-      }));
-    }
+    // OTA-1078 — through the shared helper, so this site and the two that were
+    // missing it can never drift apart again. No prior-vendor argument: an
+    // arrival IS the event here, and beginScene has already committed the new
+    // scene by this point, so reading currentScene.vendor would always match
+    // itself and suppress every sighting the ledger has taken since OTA-1072.
+    if (vendor) sightVendor(get, set, vendor, location.id);
     // For narration, use the first enemy as the scene representative.
     // The full group is surfaced via the EnemyPanel + a follow-up line
     // when it's actually a pack.
@@ -8159,6 +8289,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // every GOSSIP_EVERY-th visit: Phase 0 was spent cutting the noise
         // floor, and a line that fired on every arrival would put it back.
         // Deterministic — the cadence is read off the meeting count.
+        // OTA-1077 — their outpost was sacked while you were away, and they are
+        // the ones who live there. Sits above gossip on purpose: what happened
+        // to THEM outranks what they heard about somebody else.
+        const raid = raidNewsFor(get().worldMemory, rel, player.hoursElapsed ?? 0);
+        if (raid && rel) {
+          get().appendLog('world', raidNewsLine(rel, raid, vendor.name, player.name));
+        }
         const talkAbout = gossipSubject(get().worldMemory, rel);
         if (talkAbout) {
           get().appendLog('world', gossipLine(vendor.name, talkAbout, player.name));
@@ -15831,6 +15968,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 );
                 get().appendLog('debug', debugEnemy(enemy as unknown as Record<string, unknown>)); // OTA-354
               }
+              // OTA-1078 — SIGHT THE OVERLAY TRADER. The fourth of five vendor
+              // install sites, and the docblock on sightVendor claimed there
+              // were three. Until now, stealing from the trader you find on a
+              // climbed tier cost nothing on the ledger — permanently — because
+              // recordNpcDealing no-ops without a relation. Exactly the Hidden
+              // Market hole, left open one storey up.
+              if (overlayVendor) {
+                sightVendor(get, set, overlayVendor, get().player?.currentLocationId, true);
+              }
               if (overlayVendor) {
                 get().appendLog(
                   'world',
@@ -20544,6 +20690,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(scene.vendor!), {
         trades: 1,
         tcTraded: totalCost,
+        // OTA-1078 — only money the player HANDS OVER can pay a debt.
+        spent: totalCost,
       }),
     }));
     const relAfterBuy = getRelation(get().worldMemory, vendorNpcId(scene.vendor));
@@ -21324,6 +21472,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? `Your ${escort.label} ${fallsV} in beside you (${escort.hp} HP). Keep them alive — if the party is cut down, the escort fails.`
           : `Your ${escort.label} (${escort.hp} HP) ${standsV} by for ${quest.title}. They'll fall in when you ACTIVATE this contract.`,
       );
+    }
+    // OTA-1078 — the sixth accept path. The other five credit contractsTaken;
+    // this one — the most face-to-face of them — never did, so a faction agent
+    // could show "1 contract finished" having no record of handing it over, and
+    // never reached the 'known' rung that OTA-1073 added contractsTaken to.
+    if (scene?.vendor) {
+      set((st) => ({
+        worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
+      }));
     }
     const factionCompact = acceptIsCompact(); // OTA-1071 — before the bump.
     bumpQuestsAccepted(get, set);
@@ -24040,6 +24197,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (outdoorPeaceful && !inAnyHubRoom && tileIsNovel && Math.random() < 0.20) {
         const stall = withSkyreacherChartOffer(pickRoadsideTrader(), get().worldMemory)!;
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
+        // OTA-1078 — SIGHT THE TRADER. stepDirection never calls beginScene (its
+        // own comment says so), so this path — which the code itself calls the
+        // dominant one, "a stall every ~5 travel steps" — recorded no meeting.
+        // Meetings never accrued, prevSeenHours never advanced, and the whole
+        // greeting / absence / raid-news / gossip block never ran for the
+        // traders the player actually meets most often.
+        sightVendor(get, set, stall, get().player?.currentLocationId, true);
         get().appendLog(
           'world',
           `A stall has been thrown up on the next stretch of ground — ${stall.name}, ${stall.title}. Tap the vendor banner to trade.`,
@@ -28437,6 +28601,19 @@ function applyHookEffect(
           },
         };
       });
+      // OTA-1078 — SIGHT THE HOOK-SPAWNED VENDOR. The fifth site. The campfire
+      // Reclaimer carries a faction and takes contracts, so without this both
+      // the theft ledger AND the contractsTaken credit silently vanished.
+      // Guarded on the vendor actually landing: the set above refuses when a
+      // vendor is already in place.
+      if (get().currentScene?.vendor?.id === effect.vendor.id) {
+        sightVendor(get, set, {
+          id: effect.vendor.id,
+          name: effect.vendor.name,
+          title: effect.vendor.title,
+          faction: effect.vendor.faction,
+        }, get().player?.currentLocationId, true);
+      }
       return { inlineSummary: `${effect.vendor.name} sits by the fire — tap to trade.`, fatal: false };
     }
     case 'grant_random_quest_hook': {
@@ -28556,7 +28733,8 @@ function applyHookEffect(
           ],
         },
       } : s2));
-      bumpQuestsAccepted(get, set);
+      // OTA-1078 — a field grant, not a player accept: see bumpQuestsAccepted.
+      bumpQuestsAccepted(get, set, { granted: true });
       get().appendLog('reward', `✦ Contract taken in the field — ${def.title}. ${def.objective}`);
       get().appendLog('arbiter', newTracked
         ? `The Arbiter marks it. "Turn it in to any ${def.factionId.replace(/_/g, ' ')} agent. Open Contracts to route there."`
@@ -29033,7 +29211,8 @@ function grantQuestHook(
           }
         : s,
     );
-    bumpQuestsAccepted(get, set);
+    // OTA-1078 — a hook grant, not a player accept: see bumpQuestsAccepted.
+    bumpQuestsAccepted(get, set, { granted: true });
     // OTA-1015 — a parked grant says so (the accept sites and the escort hook
     // already do). Silence here meant a hunt that would not advance and no
     // line explaining why.
@@ -29085,7 +29264,8 @@ function grantQuestHook(
         }
       : s,
   );
-  bumpQuestsAccepted(get, set);
+  // OTA-1078 — a hook grant, not a player accept: see bumpQuestsAccepted.
+  bumpQuestsAccepted(get, set, { granted: true });
   // OTA-1015 — a parked grant says so; see the hunt branch.
   if (!grantTracked) {
     get().appendLog('world', `Parked — you're already running a contract. Activate it in Contracts → Mysteries when you're ready.`);
@@ -29477,9 +29657,31 @@ const BURST_SLOW_DOWN_LINES = [
   `"That's a lot of promises," the Arbiter says quietly. "Plan your route, or you'll forget half."`,
 ];
 
+/** OTA-1078 — test seam. The granted-burst opt-out was guarded only by grepping
+ *  for its own `if (opts?.granted) return;`, while the player-visible symptom it
+ *  exists to prevent — your next genuine first accept rendering compact — was
+ *  asserted nowhere. */
+export function _bumpQuestsAcceptedForTest(opts?: { granted?: boolean }): void {
+  bumpQuestsAccepted(() => useGameStore.getState(), useGameStore.setState as never, opts);
+}
+
 function bumpQuestsAccepted(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  /** OTA-1078 — the world HANDED this over; the player did not take it.
+   *
+   *  Three sites grant a contract off a hook the player walked into — the
+   *  field-escort effect, and the hunt and mystery hook grants. All three ran
+   *  the full burst path, so a stretch of road that dropped three hooks could
+   *  make the Arbiter tell a player who had accepted nothing that they were
+   *  "stacking promises", and — worse, because OTA-1071 keys the compact accept
+   *  card off the same counter — could make the player's next genuinely FIRST
+   *  manual accept render as the compact repeat form.
+   *
+   *  The milestone still counts (it is a contract on your slate either way);
+   *  only the burst does not, because a burst is a statement about what the
+   *  PLAYER just did. */
+  opts?: { granted?: boolean },
 ): void {
   const player = get().player;
   if (!player) return;
@@ -29506,10 +29708,16 @@ function bumpQuestsAccepted(
       'arbiter',
       `The Arbiter watches you take the contract. "First one. The work begins now — not when you finish it, not when you cash it in. Now."`,
     );
-    _burstLastAt = Date.now();
-    _burstCount = 1;
+    // OTA-1078 — a granted first contract still earns the one-shot line, but it
+    // does not open a burst the player never started.
+    if (!opts?.granted) {
+      _burstLastAt = Date.now();
+      _burstCount = 1;
+    }
     return;
   }
+
+  if (opts?.granted) return;
 
   const now = Date.now();
   if (now - _burstLastAt > BURST_WINDOW_MS) {
@@ -35402,7 +35610,15 @@ function takeAmbientStamp(get: () => GameStore): AmbientStamp {
     roomId: get().player?.hubRoomId,
     microId: scene?.microMicroId,
     inCombat: (scene?.enemies?.length ?? 0) > 0,
-    logLen: get().gameLog.length,
+    // OTA-1078 — a MONOTONIC counter, not the log length. This read
+    // gameLog.length, and gameLog is `.slice(-500)` on every append — so past
+    // ~500 entries (about ten minutes of play) the length is pinned and the
+    // difference is permanently zero. `log-moved-on` was dead in every real
+    // session, and it is the ONLY one of the five checks that catches the
+    // OTA's own stated case: a player standing still who "looted three things"
+    // while the musing generated. Filtering channels did not fix that; at the
+    // cap, lines added ≈ lines pushed off the front either way.
+    logLen: _playerVisibleLogCount,
   };
 }
 
@@ -35410,6 +35626,21 @@ function takeAmbientStamp(get: () => GameStore): AmbientStamp {
  *  The reason string rides the existing `arbiter: ambient …` debug marker so a
  *  pasted log shows the drop and its cause, the same way OTA-1057 surfaced the
  *  ∅ reasons. */
+/** OTA-1078 — test seams for the staleness pair.
+ *
+ *  A review found that the OTA's own headline fix — pointing the stamp at the
+ *  monotonic counter instead of the capped log — was guarded ONLY by a grep for
+ *  its own source line. The two behavioural tests exercised the counter in
+ *  isolation and never checked that takeAmbientStamp CONSUMES it, so pointing
+ *  it back at gameLog.length re-killed `log-moved-on` with the suite green. */
+export function _takeAmbientStampForTest(): AmbientStamp {
+  return takeAmbientStamp(() => useGameStore.getState());
+}
+export function _ambientStaleReasonForTest(at: AmbientStamp): string | null {
+  return ambientStaleReason(() => useGameStore.getState(), at);
+}
+export const _AMBIENT_STALE_LINES = AMBIENT_STALE_LINES;
+
 function ambientStaleReason(get: () => GameStore, at: AmbientStamp): string | null {
   const now = takeAmbientStamp(get);
   // A fight is the loudest possible change of subject. The start-of-generation
