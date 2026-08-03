@@ -75,6 +75,14 @@ const stepId = () => {
  *  own; the phrasing is deliberately ordinary. */
 const BEAT_INPUT: Record<string, string> = {
   name: 'Walker',
+  // ⚠ 'look' exists on golem-line only (commit 5d23d6fd added a look-around
+  // beat between name and cudgel as a golem feature; HAL never had it). The
+  // entry is inert on a line without the beat — and having it HERE is what
+  // lets ONE walk file play BOTH lines' real tutorials, which is how the
+  // walk caught the divergence in the first place: it stalled on golem at a
+  // beat it had no input for, on content no unit suite had ever compared
+  // across lines.
+  look: 'look around',
   cudgel: 'take the cudgel',
   rope: 'take the rope',
   scrap: 'scrap the chest plate',
