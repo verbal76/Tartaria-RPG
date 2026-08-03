@@ -390,18 +390,16 @@ a push to one reaches the others. Watch for per-line divergence:
   `metro.config.js` on the `web` target.
 Typecheck + run the relevant suite in **each** worktree before pushing it.
 
-### ⚠ OPEN DEBT — golem tutorial walk (2026-08-03)
+### ✓ RESOLVED — golem tutorial walk divergence (2026-08-03, same day)
 
-HAL's `playtestTutorialWalk` (OTA-1093) does NOT yet run on golem-line: the
-ported copy stalls after the `name` beat even though the name beat itself
-advances when probed in isolation. Something in golem's onboarding flow —
-the story-arc-era crawl/chapter plumbing golem pioneered — diverges from
-HAL's in a way the walk exposes and unit suites do not. That is precisely
-the kind of finding the walk exists to make. NEXT SESSION: port the walk,
-probe beat-by-beat where golem's flow forks, and either fix the divergence
-or document it as intended. Until then the parity verifier will flag the
-missing file on every port — deliberately. The combat walk and the climb
-grammar fix DID port clean (parity OK).
+The stall was this line's own `look` tutorial beat (commit 5d23d6fd, a
+deliberate golem-line feature between `name` and `cudgel` — "Tap LOOK AROUND
+YOU"; HAL never had it): the walk had no input for a beat it did not know
+existed. Fixed in the WALK — one `look: 'look around'` entry in the
+beat-input map, inert on a line without the beat — so ONE walk file plays
+BOTH lines' real tutorials. ⚠ The content divergence itself is INTENDED
+per-line behavior and stands; do not "fix" it into parity. Both walks now
+green on both lines.
 
 ### ⚠ THE PORT IS NOT DONE UNTIL THE VERIFIER SAYS SO (2026-08-03 audit)
 
@@ -909,8 +907,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1092`**,
-**golem-line `2026-08-03-1069`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1093`**,
+**golem-line `2026-08-03-1070`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -919,9 +917,30 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.3**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.4**; ledger in `VERSION.md`.
 
-- **THE PLAYTEST WALKS THE REAL STORY (2026-08-03, latest). BOTH LINES.**
+- **THE TUTORIAL WALK AND THE COMBAT WALK (2026-08-03, latest). BOTH LINES.**
+  HAL OTA-1070 / golem OTA-1047. The audit's two named coverage edges, closed
+  at the owner's direction. `playtestTutorialWalk` plays onboarding by typing
+  what the Arbiter asks, beat by beat, and asserts the tutorial ENDS, every
+  beat visits in order, and the lockdown restates the ask on an off-script
+  command. Found in passing: the climb template double-articled nouns that
+  carry their own ("the the surface in front of you") — fixed.
+  `playtestCombatWalk` walks until the seeded world stages fights, then plays
+  them like a person — ADVANCE at the reach gate, dodge, FLEE a 2v1, kit,
+  rest — and asserts every engagement ends, combat narrates with numbers,
+  death is told, nothing leaks. Its three own failures were each the harness
+  outrunning the phone (dice overlay swallows input; reach gate refuses
+  mid-range melee; death resolves on a microtask a synchronous loop starves),
+  all documented in-file as walk rules. ⚠ Balance observation, reported not
+  tuned: level-one attack-only loses a 2v1 in 2–7 swings on every seed, and
+  the seeded run ends dead to a 1v1 Mud Spider even playing well. 14
+  assertions.
+  On THIS line the walk also exposed and resolved a divergence: golem's
+  tutorial carries a `look` beat HAL never had (commit 5d23d6fd, deliberate);
+  the walk now plays it via one inert-on-HAL input entry. 14 assertions.
+
+- **THE PLAYTEST WALKS THE REAL STORY (2026-08-03). BOTH LINES.**
   HAL OTA-1069 / golem OTA-1046. Owner, shown the honest-walk experiment
   before any code shipped: *"actual events trigger storyline is the way to
   go."* OTA-1068's harness granted Cores by writing `coresRecovered` straight
