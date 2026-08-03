@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.96';
+export const DISPLAY_VERSION = '4.28.97';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19066,7 +19066,55 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the interval between your visits, and it is no longer certain whether
 // continuing is obedience or the only thing left in it.
 // DISPLAY_VERSION 4.28.96. 41 tests.
-export const OTA_BUILD_ID = '2026-08-03-1062-non-vendor-cast';
+// OTA-1063 — THE FLOURISH. The build plan's last unbuilt line, and the last
+// item on the owner's seven-item list: "the LLM contributes at most one short
+// flourish line per exchange, off the critical path, with a template fallback
+// if it's slow."
+//
+// WHAT IT IS. Not more dialogue. The authored reply owns the words; the
+// flourish owns the hands. One short beat of what somebody is DOING while they
+// answer — a rag over a joint, a count that does not falter, a pack that never
+// comes off the shoulder. 51 authored lines in app/data/npcs/flourishes.json,
+// keyed two ways at once: by TRADE (ten buckets, so a smith's hands are not a
+// scholar's) and by REGARD (six rungs including wronged, so posture tracks the
+// relationship Phase 1 spent nine OTAs building). Both pools are concatenated
+// and indexed by a hash of person + topic, so it is deterministic — the same
+// state gives the same beat, for the same reason as OTA-1049.
+//
+// ⚠ WHY THE MODEL IS STILL NOT IN THE CRITICAL PATH. This is the first time
+// the local narrator has been anywhere near the conversation system, which
+// OTA-1058 built entirely synchronous BECAUSE a 14-20s generation in front of
+// a tapped topic is a loading screen. Nothing about that changed. The order is
+// inverted instead:
+//   - a request is fired when the topic LIST OPENS — the one moment in an
+//     exchange where the player is reliably busy reading;
+//   - whatever comes back sits in ONE module-level slot, keyed to that person;
+//   - raising a topic TAKES from the slot if it is full, or takes an authored
+//     line if it is not, and cannot tell the difference.
+// So "slow model", "dormant model" and "no model" are all the same case: an
+// empty slot. There is no awaited call anywhere in the exchange, no spinner,
+// no degraded mode — the authored line was never an apology, it is the
+// product, and the model can only ever swap one for another of the same shape.
+// The slot dies with the conversation and is never persisted.
+//
+// THE JUDGE. A generated line has to name the person, be one sentence inside
+// 160 chars, terminate, and carry no quotes, questions, first person or
+// second-person opener — the two registers the ambient path proved this model
+// falls into (OTA-1031) and the echo OTA-1030 caught streaming raw to screen.
+// It lives in engine/flourish.ts beside the brief that asks for it, so the two
+// cannot drift, and it is pure so it is testable with no model in the room.
+//
+// FREQUENCY. Punctuation stops being punctuation when it is on every word.
+// First raise of a topic only (a re-tread gets the words back but not the
+// business), at most 3 per conversation, never the same line twice in one, and
+// silence rather than a repeat once the pool is spent.
+//
+// engine/flourish.ts carries the same no-await guard dialogue.ts carries, and
+// this OTA's test asserts BOTH files still have it plus that emitFlourish
+// contains no await at all.
+// DISPLAY_VERSION 4.28.97. 30 tests.
+export const OTA_BUILD_ID = '2026-08-03-1063-flourish';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1062-non-vendor-cast';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1061-topic-grants-whispers';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1060-gifting';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1059-talk-full-cast-chapter-gate';
