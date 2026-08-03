@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.0';
+export const DISPLAY_VERSION = '4.29.1';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20373,7 +20373,80 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // finds that too much drops a tier without abandoning the character. That
 // escape hatch is what makes an honest default safe.
 // DISPLAY_VERSION 4.29.0. 27 tests.
-export const OTA_BUILD_ID = '2026-08-03-1089-pressure-difficulty';
+//
+// OTA-1090 — PHASE 5: THE ARBITER BECOMES SOMEONE.
+//
+// The plan, verbatim: "Memory of what you've done, an opinion that shifts with
+// your choices, and an arc across the nine Cores. It has more screen time than
+// any character in the game and currently less personality than any of them."
+//
+// That is fair. He was a pool of thirteen good lines picked at random, and one
+// of them has promised, since OTA-236, "There is a name I have not used in a
+// long time. Not even to myself. Not yet to you." — with no machinery anywhere
+// in the game to keep it. He said it on hour two and again on hour ninety, to
+// a player who robbed him blind and to one who carried nine Cores out of the
+// mud, in exactly the same tone, and never mentioned it again.
+//
+// engine/arbiterPersona.ts is the machinery. Three things, kept separate:
+//
+//   STANCE  — WHERE HE IS. An arc across the nine Cores (witness → interested
+//             → invested → implicated → named, at 0/1/3/6/9). Rises only.
+//             Changes WHAT he is willing to talk about.
+//   REGARD  — WHAT HE THINKS OF YOU. A score summed from conduct the run has
+//             already recorded, banded cold/wary/even/warm/kin. Moves both
+//             ways. Changes HOW he says any of it (three tones, not five —
+//             five produced pairs nobody could tell apart in play).
+//   MEMORY  — WHAT HE NAMES. The person you wronged, the debt you squared,
+//             the Phase 3 question you answered — by name, not by allusion.
+//             Every third remark reaches for one when there is one.
+//
+// ⚠ DERIVED, NOT STORED — the Phase 3 rule again. Stance and regard are pure
+// functions of the save. The ONLY new persisted field is
+// player.arbiterBeatsSeen: the one-shot lines already spoken, because "has he
+// said this yet" genuinely is not derivable. Same shape and same reasoning as
+// tideStageSeen. Absent on an old save reads as "he has not said any of it".
+//
+// ⚠ AND NOTHING IN THE MODULE ROLLS DICE. npcMemory made this argument first
+// and it holds harder for him: he is one continuous voice, so his opinion must
+// be a function of your conduct, not a coin. Callers pass a rotation counter
+// (tiles found + foes down at the one narration site); the same save always
+// yields the same line. WHETHER he says something personal is still chance;
+// WHICH thing he says is not.
+//
+// ⚠ THE OPINION CANNOT BE FARMED. Every input is clamped and the total is
+// clamped again: lore read +8 max, gifts +6, relics preserved +8, forks ±20,
+// wrongs -24, corruption -15, menace -12. What moves regard late in a run is
+// conduct that costs something. The negatives are clamped for the opposite
+// reason — cold has to be a place a fifty-hour run can climb out of.
+//
+// WHAT HE HAS OPINIONS ABOUT: all 29 Phase 3 fork options carry a signed
+// regard value AND an echo phrase in his own words (a test fails the build if
+// either side has an orphan — the OTA-1087 audit lesson, applied across
+// files). Plus wrongs vs amends, gifts, corruption, menace, best/worst faction
+// standing, lore read, relics preserved vs sold on, and which Phase 4 tier you
+// asked the mud for.
+//
+// FIVE ROUTES IN, all tested for reachability rather than for existing:
+//   · scene narration — the 15% personal-beat branch now asks the persona
+//     first, falling back to the old flat pool only with no character to read;
+//   · arrival — one due beat per arrival, yielding to a tide crossing rather
+//     than stacking on it (the beat is not consumed until spoken, so it lands
+//     next time instead of being lost);
+//   · "what is your name" — matched BEFORE every lookup that would otherwise
+//     swallow it, and always answered: the name, "not yet", or "not to you";
+//   · the character sheet — a THE ARBITER section with the ITEMISED why,
+//     because a hidden opinion score is the Phase 4 legibility failure again;
+//   · the ending — his verdict on you, and, at nine Cores with the regard to
+//     match, the name he has been holding since OTA-236.
+//
+// The one model touch is a one-sentence brief appended to the live Qwen
+// persona prompt (stance + tone). Additive: an empty brief leaves the prompt
+// byte-identical, and a failed generation falls through exactly as before. A
+// personality that only exists while a 0.5B model happens to be warm is not a
+// personality, so everything else here is authored.
+// DISPLAY_VERSION 4.29.1. 55 tests.
+export const OTA_BUILD_ID = '2026-08-03-1090-arbiter-persona';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1089-pressure-difficulty';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1088-story-forks';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1087-talk-doors-and-audit';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1086-flourish';

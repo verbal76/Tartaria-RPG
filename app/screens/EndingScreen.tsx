@@ -25,6 +25,7 @@ import { epilogueMotiveLine } from '../engine/chapters'; // OTA-1043
 import { epilogueChoiceLines } from '../engine/storyForks'; // OTA-1088
 import { motiveById } from '../engine/story'; // OTA-1043
 import { missingResolvedEpilogue } from '../engine/storyDrip'; // OTA-1044
+import { arbiterVerdict, arbiterNameBeat } from '../engine/arbiterPersona'; // OTA-1090
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 
@@ -85,6 +86,9 @@ function buildHomewardBeats(player: {
 export function EndingScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
+  // OTA-1090 — the Arbiter's regard reads the per-person ledger, which lives
+  // on worldMemory rather than the character.
+  const worldMemory = useGameStore((s) => s.worldMemory);
   const [stage, setStage] = useState<'splash' | 'homeward'>('splash');
 
   if (!player || !player.mainQuest || player.mainQuest.phase !== 'ended' || !player.mainQuest.ending) {
@@ -126,6 +130,15 @@ export function EndingScreen() {
   // question answered, in authored fork order so a second run through the same
   // choices reads the same way. Empty for a character who was never asked.
   const choiceLines = epilogueChoiceLines(player);
+  // ⚠ OTA-1090 — PHASE 5, AND THE ONLY PLACE HE SPEAKS *ABOUT* YOU RATHER THAN
+  // TO YOU. The ending prose is the world's verdict and the motive epilogue is
+  // the character's; this is the verdict of the one person who was standing
+  // there for all of it. Derived from the save like everything else in the
+  // persona system, so it is the honest summary of the run and not a reward
+  // for reaching the screen — a player who spent the run robbing people gets
+  // told so, at the door, by name.
+  const verdict = arbiterVerdict(player, worldMemory);
+  const nameBeat = arbiterNameBeat(player, worldMemory);
 
   return (
     <View style={styles.container}>
@@ -149,6 +162,16 @@ export function EndingScreen() {
             {choiceLines.map((l, i) => (
               <Text key={i} style={[styles.motiveLine, i > 0 && { marginTop: 10 }]}>{l}</Text>
             ))}
+          </View>
+        )}
+
+        {verdict != null && (
+          <View style={styles.motiveBlock}>
+            <Text style={styles.motiveTag}>THE ARBITER</Text>
+            <Text style={styles.motiveLine}>{verdict}</Text>
+            {nameBeat != null && (
+              <Text style={[styles.motiveLine, { marginTop: 10 }]}>{nameBeat}</Text>
+            )}
           </View>
         )}
 
