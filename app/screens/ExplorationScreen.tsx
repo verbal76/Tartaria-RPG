@@ -799,6 +799,19 @@ export function ExplorationScreen() {
               <Text style={[styles.placeChipTalkText, vendorTalkGlow && styles.placeChipTalkTextUnspoken]}>TALK</Text>
             </TouchableOpacity>
           ) : null}
+          {/* OTA-1083 — GIFT beside TALK. The verb existed since OTA-1060 but
+              only as typed input ("I didn't see a gift button" — owner). Same
+              quiet affordance as TALK; opens the OTA-1060 picker. */}
+          <TouchableOpacity
+            style={styles.placeChipTalk}
+            onPress={() => useGameStore.getState().openGift()}
+            hitSlop={8}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Give a gift`}
+          >
+            <Text style={styles.placeChipTalkText}>GIFT</Text>
+          </TouchableOpacity>
           {/* OTA-1029 — ✕ on the trader, matching the Crucible's. Nested touchable
               handles its own tap (doesn't open the stall). Hides the chip for this
               tile only: the vendor stays anchored to the room, so walking back in

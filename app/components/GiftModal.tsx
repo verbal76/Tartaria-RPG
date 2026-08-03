@@ -15,12 +15,27 @@ import React from 'react';
 import { useGameStore } from '../state/gameStore';
 import { BrandedModal } from './BrandedModal';
 import { GIFT_FLOOR_TC } from '../engine/gifting';
+import { getRelation } from '../engine/npcMemory';
 import { sellPriceFor } from '../engine/sellPrice';
+
+/** OTA-1083 — what the player has WITNESSED of this person's tastes, phrased
+ *  for the picker. Entries are ledger strings ('loves:metal', 'cold:food')
+ *  recorded only when a gift's reaction revealed them — never the authored
+ *  list. Empty until you've learned something. */
+function knownTastesLine(tastes: readonly string[] | undefined): string | null {
+  if (!tastes || tastes.length === 0) return null;
+  const phrased = tastes.map((t) => {
+    const [kind, subject] = [t.slice(0, t.indexOf(':')), t.slice(t.indexOf(':') + 1)];
+    return kind === 'loves' ? `loves ${subject}` : `no use for ${subject}`;
+  });
+  return `You know of them: ${phrased.join(' · ')}.`;
+}
 
 export function GiftModal() {
   const ctx = useGameStore((s) => s.pendingGift);
   const inventory = useGameStore((s) => s.player?.inventory);
   const vendor = useGameStore((s) => s.currentScene?.vendor);
+  const worldMemory = useGameStore((s) => s.worldMemory);
   const choose = useGameStore((s) => s.chooseGiftRecipient);
   const give = useGameStore((s) => s.giveGift);
   const close = useGameStore((s) => s.closeGift);
@@ -63,7 +78,12 @@ export function GiftModal() {
       body={
         giftable.length === 0
           ? 'You have nothing to give.'
-          : `Anything under ${GIFT_FLOOR_TC} TC will be taken as an insult, not a gift.`
+          : [
+              // OTA-1083 — discoveries first: what their reactions have taught
+              // you. Absent until a gift has actually revealed something.
+              knownTastesLine(getRelation(worldMemory, ctx.toId)?.giftTastes),
+              `Anything under ${GIFT_FLOOR_TC} TC will be taken as an insult, not a gift.`,
+            ].filter(Boolean).join('\n\n')
       }
       buttons={[
         ...giftable.map(({ item, worth }) => ({

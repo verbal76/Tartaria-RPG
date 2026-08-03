@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1105`**,
-**golem-line `2026-08-03-1082`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1106`**,
+**golem-line `2026-08-03-1083`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,9 +923,25 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.16**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.17**; ledger in `VERSION.md`.
 
-- **DISMISSING THE VENDOR ENDS THE CONVERSATION (2026-08-03, latest). BOTH
+- **THE GIFT ECONOMY (2026-08-03, latest). BOTH LINES.** HAL OTA-1106 /
+  golem OTA-1083. Owner: *"do all three."* (1) THE FENCE: sketchy traders
+  buy stolen goods at `FENCE_STOLEN_CUT` (40%) of the honest sell-back —
+  "no questions asked, and none answered"; honest/hub keep the refusal.
+  Completes the thief economy pocket loot opened. (2) TASTES: GIFT button
+  joins TALK on the vendor chip; gift reactions record what they PROVED on
+  the ledger (`giftTastes`: 'loves:metal' / 'cold:food' via
+  `tasteDiscoveries`), and the gift picker shows what you've witnessed.
+  `lovedGifts` counts loved landings. (3) THE RETURN GIFT: trusted regard
+  + ≥1 loved gift → on a later arrival (same greeting hook as the mumble)
+  the vendor pushes an authored, thematic item back — once ever
+  (`returnGiftGiven`); all nine authored vendors carry one
+  (gift_prefs.json `returnGift`/`returnGiftLine`), catalog-verified by
+  test. stealOverhaul's refusal case flips its vendor honest — the fence
+  buying IS the feature. Test: `ota1083GiftEconomy.test.ts`.
+
+- **DISMISSING THE VENDOR ENDS THE CONVERSATION (2026-08-03). BOTH
   LINES.** HAL OTA-1105 / golem OTA-1082. Owner, on device: *"I hit ✕ to
   close the vendor chip while the talk menu was still open; the vendor went
   away but the talk menu stayed open."* The talk sheet's walk-away guard

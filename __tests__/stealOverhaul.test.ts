@@ -131,8 +131,15 @@ describe('OTA 23-009 — steal overhaul', () => {
 
   describe('sellToVendor refuses stolen items per instance', () => {
     it('refuses to buy back a stolen Wild Onion', async () => {
+      // ⚠ OTA-1083 — a SKETCHY vendor is a fence now and BUYS hot goods at
+      // the cut (its own suite covers that), so the refusal this test asserts
+      // belongs to the honest/hub tiers. Flip the vendor honest after the
+      // steal: the per-instance refusal — the claim under test — is unchanged
+      // there, word for word.
       const store = await setupSketchyVendor();
       store.getState().stealFromVendor('Wild Onion');
+      const scHonest = store.getState().currentScene!;
+      store.setState({ currentScene: { ...scHonest, vendor: { ...scHonest.vendor!, demeanor: 'honest' } } });
       const tcBefore = store.getState().player!.tc;
       store.getState().sellToVendor('Wild Onion');
       const after = store.getState().player!;

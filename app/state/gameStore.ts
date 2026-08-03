@@ -39,7 +39,7 @@ import { npcRegard, regardPriceMult } from '../engine/npcMemory';
 import { raidNewsFor, raidNewsLine, RAID_MEMORY_CAP } from '../engine/npcMemory';
 import type { OutpostRaid } from '../engine/types';
 // OTA-1060 — giving somebody something, and them remembering the object.
-import { resolveGift, giftMemoryLine, GIFT_STANDING_FACTION_CAP, type GiftItem } from '../engine/gifting';
+import { resolveGift, giftMemoryLine, GIFT_STANDING_FACTION_CAP, tasteDiscoveries, returnGiftFor, type GiftItem } from '../engine/gifting';
 // OTA-1058 — Phase 2 slice: the topic-based talk exchange.
 import {
   hasTopicsFor, topicsFor, topicReply, alreadySaidLine, nothingToSayLine,
@@ -1655,6 +1655,10 @@ const STEALTH_QUIET_FAIL_STE = 14;
  *  (clamped to the pouch). On top of the dead mission and the party fight —
  *  the escort takes back wages before the steel comes out. */
 const ESCORT_CAUGHT_FINE = 40;
+/** OTA-1083 — what a fence pays for stolen goods, as a fraction of the honest
+ *  sell-back. Deep by design: they carry the risk of holding hot goods, and
+ *  the cut is what keeps steal-and-fence from beating honest selling. */
+const FENCE_STOLEN_CUT = 0.4;
 
 // OTA 008 — Arbiter welcome-back debounce. Skip the line when the
 // player navigates away + back faster than this; first cold-load
@@ -6090,6 +6094,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   // A gift that lands counts as business done — it is what lifts
                   // somebody off the 'met' rung without a purchase.
                   trades: prev.trades + (out.countsAsBoon ? 1 : 0),
+                  // OTA-1083 — the reaction is the tell: what this gift just
+                  // TAUGHT you about their tastes goes on the ledger (the gift
+                  // picker shows it), and a loved gift is counted — it is what
+                  // gates the return gift alongside trusted regard.
+                  giftTastes: Array.from(new Set([
+                    ...(prev.giftTastes ?? []),
+                    ...tasteDiscoveries(g.toId!, gi, out.reaction),
+                  ])),
+                  lovedGifts: (prev.lovedGifts ?? 0) + (out.reaction === 'loved' ? 1 : 0),
                 },
               },
             }
@@ -9674,6 +9687,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (mumble) {
           get().appendLog('world', mumble);
           set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(vendor), { pocketsMumbled: 1 }) }));
+        }
+        // OTA-1083 — THE RETURN GIFT. Once, ever: reach trusted with someone
+        // whose tastes you have honored (at least one LOVED gift), and on a
+        // later arrival they push something back across the counter. Only the
+        // authored cast carries one — a return requires tastes to have hit.
+        if (rel && !rel.returnGiftGiven && npcRegard(rel) === 'trusted' && (rel.lovedGifts ?? 0) > 0) {
+          const rg = returnGiftFor(vendorNpcId(vendor));
+          const rgCat = rg ? findCatalogItem(rg.item) : null;
+          if (rg && rgCat) {
+            const given: InventoryItem = stampDurability({
+              id: `returngift_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              name: rg.item,
+              kind: rgCat.kind ?? 'misc',
+              rarity: rgCat.rarity,
+              quantity: 1,
+              tags: rgCat.tags ?? [],
+            });
+            set((s) => (s.player ? { player: { ...s.player, inventory: [...s.player.inventory, given] } } : s));
+            get().appendLog('world', rg.line);
+            get().appendLog('reward', `✦ ${vendor.name} gives you ${withArticle(rg.item)}.`);
+            set((s) => {
+              const relations = s.worldMemory.npcRelations ?? {};
+              const cur = relations[vendorNpcId(vendor)];
+              return cur
+                ? { worldMemory: { ...s.worldMemory, npcRelations: { ...relations, [vendorNpcId(vendor)]: { ...cur, returnGiftGiven: true } } } }
+                : s;
+            });
+          }
         }
         // OTA-1050 — word travels inside a faction. Fires only when BOTH ends
         // are people the player has genuinely built something with, and only
@@ -22305,7 +22346,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // in the player's pack are fine — only the specific stolen
     // instance is refused. Player can still USE it or SCRAP it
     // (scrap outputs are clean, mintable for resale).
-    if (item.stolen) {
+    // OTA-1083 — EXCEPT AT THE FENCE. A sketchy trader buys hot goods, no
+    // questions asked, at FENCE_STOLEN_CUT of the honest price — the deep
+    // cut is the whole deal: they carry the risk, you carry the discount.
+    // Honest and hub vendors keep the refusal word for word.
+    const fenced = !!item.stolen;
+    if (item.stolen && scene.vendor.demeanor !== 'sketchy') {
       get().appendLog(
         'arbiter',
         `${scene.vendor.name} looks at the ${item.name} you're holding. "That's mine — or somebody's. I'm not buying it back. Use it, break it down, but don't put it on my table."`,
@@ -22341,7 +22387,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // war-heat + relic-title multipliers (like rapport) can lift the price toward
     // but never above the cheapest-buy cap. Without this a rapport'd, war-heated
     // relic stall paid ABOVE the floor on unstocked items — a buy-cheap-sell-here loop.
-    const price = applySellCaps(item, multiplied);
+    // OTA-1083 — the fence's cut, applied LAST so it can never lift a price,
+    // only sink one. max(1,…): a fence never pays zero for something they
+    // agreed to take — a 1 TC insult is still a completed deal.
+    const price = fenced
+      ? Math.max(1, Math.round(applySellCaps(item, multiplied) * FENCE_STOLEN_CUT))
+      : applySellCaps(item, multiplied);
     if (price <= 0) {
       get().appendLog('system', `${scene.vendor.name} won't pay for ${item.name} — no resale value.`);
       return;
@@ -22361,7 +22412,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     get().appendLog(
       'reward',
-      `Sold ${item.name} to ${scene.vendor.name} for ${price} TC. (${player.tc + price} TC on hand)`,
+      fenced
+        ? `Fenced ${item.name} to ${scene.vendor.name} for ${price} TC — no questions asked, and none answered. (${player.tc + price} TC on hand)`
+        : `Sold ${item.name} to ${scene.vendor.name} for ${price} TC. (${player.tc + price} TC on hand)`,
     );
     // OTA-1049 — on the ledger with THIS person. TC accrues per unit, but the
     // TRADE count rides the same `social` flag the Charisma train already uses
