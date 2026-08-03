@@ -66,6 +66,8 @@ import type { PlayerCharacter } from '../app/engine/types';
 import { dueFork } from '../app/engine/storyForks';
 import { stanceOf, regardOf, regardScore, arbiterMemory, dueArbiterBeat } from '../app/engine/arbiterPersona';
 import { tideStage, profileOf } from '../app/engine/pressure';
+// OTA-1092 — the walk drives the REAL story state machine; see the grant block.
+import { advanceMainQuest, LOST_CAPITAL_LOCATIONS } from '../app/engine/mainQuest';
 import { isPlayerVisibleChannel } from '../app/engine/gameLog';
 import type { LogChannel } from '../app/engine/types';
 
@@ -120,7 +122,7 @@ beforeAll(async () => {
 
     const forksAnswered: string[] = [];
 
-    for (let step = 0; step < WALK.length * 4; step++) {
+    for (let step = 0; step < WALK.length * 5; step++) {
       const s = useGameStore.getState();
 
       // Answer any open question the way a player would: take the first
@@ -143,19 +145,32 @@ beforeAll(async () => {
       }
 
       // Time passes, Cores accumulate, and the world turns against you — the
-      // three substrates Phases 3-5 read. Driven directly rather than through
-      // combat, because this is a content playtest and a boss fight is a dice
-      // roll with a hundred ways to go sideways.
+      // three substrates Phases 3-5 read.
+      //
+      // ⚠ OTA-1092 — CORES GO THROUGH THE REAL STATE MACHINE. The first cut of
+      // this harness wrote coresRecovered straight into the save, which
+      // produced a character no real player can be: nine Cores with the story
+      // still in its prologue. The fork system read that contradiction and
+      // correctly refused to ask the second question per motive — so the
+      // harness under-covered exactly the content it existed to reach.
+      // advanceMainQuest with 'core_recovered' and a real capital id is what a
+      // Guardian kill actually feeds the store, so phase and core list move in
+      // lockstep and every phase-gated beat gets its window. The FIGHT itself
+      // is still skipped on purpose — combat's dice have their own suites;
+      // what this harness grades is the story consequence of winning.
       const now = useGameStore.getState().player!;
       const cores = now.mainQuest?.coresRecovered ?? [];
+      let mq = now.mainQuest;
+      if (mq && step > 0 && step % 6 === 0 && cores.length < 9) {
+        const capital = LOST_CAPITAL_LOCATIONS.find((c) => !cores.includes(c));
+        if (capital) mq = advanceMainQuest(now, { kind: 'core_recovered', locationId: capital });
+      }
       useGameStore.setState({
         player: {
           ...now,
           hoursElapsed: (now.hoursElapsed ?? 0) + 14,
           corruption: Math.min(70, (now.corruption ?? 0) + 1),
-          mainQuest: now.mainQuest && step > 0 && step % 6 === 0 && cores.length < 9
-            ? { ...now.mainQuest, coresRecovered: [...cores, `core_${cores.length}`] }
-            : now.mainQuest,
+          mainQuest: mq,
         } as PlayerCharacter,
       });
       void p;
@@ -211,6 +226,16 @@ describe('playtest — PHASE 3: the story asked a question', () => {
     // Not "a fork exists and its gate is correct" — that is ota1088's job.
     // This is: walking the world put the card in front of the player.
     expect(report.forksAnswered.length).toBeGreaterThan(0);
+  });
+
+  it('⚠ BOTH of the motive\'s forks reach the player across the run', () => {
+    // The owner's call, and the reason the walk drives the real state
+    // machine: "actual events trigger storyline is the way to go." The debt
+    // motive authors two questions; a run that finishes the arc must have
+    // been asked both. The first harness could never see the second one.
+    const forkIds = report.forksAnswered.map((k) => k.split(':')[0]);
+    expect(forkIds).toContain('debt_collector');
+    expect(forkIds).toContain('debt_claim');
   });
 
   it('...and the answer stuck, so the same question is not asked twice', () => {
@@ -310,7 +335,13 @@ describe('playtest — PHASES 0-2: the world remembered the run', () => {
     // The failure OTA-1074 and the 500ms debounce exist for. A line the player
     // sees ten times in one walk is a bug regardless of which system emits it.
     const counts = new Map<string, number>();
-    for (const l of visible()) counts.set(l.text, (counts.get(l.text) ?? 0) + 1);
+    // OTA-1092 — the player channel is the run's own typed commands echoed
+    // back; "search" fourteen times in eighty steps is the walker, not the
+    // game, and a real thumb repeats itself just as much.
+    for (const l of visible()) {
+      if (l.channel === 'player') continue;
+      counts.set(l.text, (counts.get(l.text) ?? 0) + 1);
+    }
     const worst = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
     expect(`${worst?.[1]} × ${String(worst?.[0]).slice(0, 70)}`)
       .toBe(`${Math.min(worst?.[1] ?? 0, 12)} × ${String(worst?.[0]).slice(0, 70)}`);
