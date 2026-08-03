@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1099`**,
-**golem-line `2026-08-03-1076`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1100`**,
+**golem-line `2026-08-03-1077`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,9 +923,19 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.10**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.11**; ledger in `VERSION.md`.
 
-- **ALL TALKING MOVES TO THE BOTTOM OF THE SCREEN (2026-08-03, latest).
+- **PICKPOCKET JOINS THE BOTTOM SLOT (2026-08-03, latest). BOTH LINES.**
+  HAL OTA-1100 / golem OTA-1077. Owner's first pickpocket on device: *"it
+  did a popup — can we have it do a bottom cover as well when we pick the
+  item?"* PickpocketModal → `PickpocketSheet` in the DiceRoller's controls
+  slot: choose the mark at the bottom, feed stays readable, the Stealth
+  roll + outcome land there. One-shot (attempt closes the sheet), LIFT /
+  CANCEL, house tokens. His roll question — Stealth + DEX or just Stealth?
+  — answered and left UNCHANGED at just Stealth: it's its own trained stat
+  (split from DEX in OTA-348); stacking DEX would double-count vs DC 10.
+
+- **ALL TALKING MOVES TO THE BOTTOM OF THE SCREEN (2026-08-03).
   BOTH LINES.** HAL OTA-1099 / golem OTA-1076 — the owner's design decision
   from his first live TALK, built: *"the popup should be at the bottom of
   the screen like the dice rolls and just have a list of things to ask, and
