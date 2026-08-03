@@ -32,7 +32,10 @@ import { defaultDogName } from '../engine/dogCompanion';
 /** How long the fight result gets the screen to itself once any competing
  *  card is gone. Long enough to read "you won" and the spoils; short enough
  *  that the pause reads as a beat rather than a hang. */
-export const DOG_CARD_DWELL_MS = 4000;
+// OTA-1098 — 4000 → 3200 at the owner's direction ("just a hair" shorter):
+// still long enough to read the purple victory beat, no longer long enough
+// to start typing into the feed before the card lands.
+export const DOG_CARD_DWELL_MS = 3200;
 
 export function DogOnboardingModal() {
   const pending = useGameStore((s) => s.worldMemory.pendingDogOnboarding);
