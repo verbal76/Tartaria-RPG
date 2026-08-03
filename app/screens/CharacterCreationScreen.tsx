@@ -25,7 +25,13 @@ const STEP_TITLE: Record<Step, string> = {
   race: 'CHOOSE YOUR RACE',
   faction: 'CHOOSE YOUR FACTION',
   motive: 'WHY DID YOU COME DOWN?',
-  pressure: 'HOW MUCH DOES IT TAKE?',
+  // OTA-1097 — was 'HOW MUCH DOES IT TAKE?'. Owner: "replace it with a more
+  // recognizable difficulty level title." The evocative header worked as
+  // flavor but failed as signage — a new player picking a permanent,
+  // never-raisable setting deserves to know instantly that THIS is the
+  // difficulty screen. The flavor lives on where it belongs: in the four
+  // first-person tier names and their plain subtitles below.
+  pressure: 'CHOOSE YOUR DIFFICULTY',
 };
 
 export function CharacterCreationScreen() {
