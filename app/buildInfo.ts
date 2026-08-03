@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.12';
+export const DISPLAY_VERSION = '4.29.13';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20736,7 +20736,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // material, 5% a tower map. Lifted goods carry the stolen flag; a clean
 // lift still trains Stealth. Test: ota1101PocketLoot.test.ts.
 // DISPLAY_VERSION 4.29.12.
-export const OTA_BUILD_ID = '2026-08-03-1101-pocket-loot';
+//
+// OTA-1102 — THE TALK BUTTON GLOWS GREEN WHEN THERE'S SOMETHING NEW TO HEAR.
+//
+// Owner: "let's make the talk button glow green if there are unspoken lines
+// of dialogue." New store query hasUnspokenTalk answers with the SAME
+// machinery the conversation uses — same person match, same gate context,
+// same spent-counter as the sheet's "(asked)" marks — so the light and the
+// topic list can never disagree. The vendor chip's TALK button turns the
+// house green (#9ec96a) on border + text while any gate-open topic still
+// has unread lines, and goes back to gold once the player has heard them
+// all. It RE-lights when a warmth/story/standing gate opens a new topic on
+// that person — the glow tracks new content, not just first contact. The
+// screen subscribes to worldMemory.talkedTopics so the light updates the
+// moment an answer lands. Accessibility label says why it's glowing.
+// Test: ota1102TalkGlow.test.ts.
+//
+// Also in this pass, the POCKETS AUDIT the owner asked for ("who besides
+// vendors can we actually pickpocket, don't guess"): every person-entity in
+// the game was enumerated via talkablePeople + scene fields. Vendors (30
+// named incl. Tarek the Tinkerer, 24 roadside traders, overlay traders) and
+// wanderers (7 archetypes) are the only people STANDING IN A SCENE with
+// clothing and pockets — both already marks. Escort leaders are human and
+// present while escorting but are the player's own charge (adding them
+// needs contract-fallout design — owner's call, not made here). Core
+// Guardians are talkable but are constructs with no clothing. Combat
+// enemies resolve through kill-loot, popup NPCs (dog scenarios) have no
+// scene body, and the Arbiter has no body at all. No code change from the
+// audit; the mark list (vendor + wanderer) is confirmed complete.
+// DISPLAY_VERSION 4.29.13.
+export const OTA_BUILD_ID = '2026-08-03-1102-talk-glow';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1101-pocket-loot';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1100-pickpocket-bottom-sheet';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1099-talk-bottom-sheet';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1098-tutorial-pacing-dog-card-keyboard';
