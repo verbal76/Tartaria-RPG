@@ -849,8 +849,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1089`**,
-**golem-line `2026-08-03-1066`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1090`**,
+**golem-line `2026-08-03-1067`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -859,9 +859,91 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.0**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.1**; ledger in `VERSION.md`.
 
-- **PHASE 4 — THE DEBT COMES DUE, BEHIND A DIFFICULTY TOGGLE (2026-08-03, latest). BOTH LINES.**
+- **PHASE 5 — THE ARBITER BECOMES SOMEONE (2026-08-03, latest). BOTH LINES.**
+  HAL OTA-1067 / golem OTA-1044. `app/engine/arbiterPersona.ts` (new),
+  `app/data/lore/arbiter-persona.json` (new). The plan's brief, verbatim:
+  *"memory of what you've done, an opinion that shifts with your choices, and
+  an arc across the nine Cores. It has more screen time than any character in
+  the game and currently less personality than any of them."*
+
+  That is fair, and one line in the old pool makes it embarrassing: since
+  OTA-236 he has been saying *"there is a name I have not used in a long time.
+  Not even to myself. Not yet to you"* — with nothing anywhere in the game able
+  to keep that promise. He said it on hour two and again on hour ninety, to a
+  player who robbed him blind and to one who carried nine Cores out of the mud,
+  in exactly the same tone.
+
+  **Three things, deliberately separate.**
+  - **STANCE — where he is.** An arc across the nine Cores: `witness` →
+    `interested` → `invested` → `implicated` → `named`, at 0/1/3/6/9. Rises
+    only. Changes WHAT he is willing to talk about.
+  - **REGARD — what he thinks of you.** A score summed from conduct the run
+    already records, banded `cold`/`wary`/`even`/`warm`/`kin`. Moves both ways.
+    Changes HOW he says any of it, through **three** tones rather than five —
+    five produced pairs nobody could tell apart across sixty lines, which is
+    worse than three that read clearly.
+  - **MEMORY — what he names.** The person you wronged, the debt you squared,
+    the Phase 3 question you answered — by name. Every third remark reaches
+    for one when there is one; a voice that only ever alludes has no memory,
+    and a voice that names something every line will not shut up about your
+    business.
+
+  ⚠ **DERIVED, NOT STORED — the Phase 3 rule again.** Stance and regard are
+  pure functions of the save. The ONLY new persisted field is
+  `player.arbiterBeatsSeen`: the one-shot lines already SPOKEN, because "has he
+  said this yet" genuinely is not derivable from anything else. Same shape and
+  same reasoning as `tideStageSeen`. Absent on every older save, which reads
+  correctly as "he has not said any of it yet", so a long-running character
+  hears the beats it has earned rather than silently missing the whole arc.
+
+  ⚠ **And nothing in the module rolls dice.** `npcMemory` made this argument
+  first and it holds harder for him: he is one continuous voice, so his opinion
+  must be a function of your conduct, not of a coin. Callers pass a rotation
+  counter (tiles found + foes down, at the one narration site). WHETHER he says
+  something personal is still chance; WHICH thing he says is not.
+
+  ⚠ **The opinion cannot be farmed.** The exploit lens on any opinion system is
+  the cheap repeatable input. Every one is clamped and the total is clamped
+  again: lore read **+8**, gifts **+6**, relics preserved **+8**, Phase 3
+  answers **±20**, wrongs **−24**, corruption **−15**, menace **−12**. What
+  moves regard late in a run is conduct that costs something. The negatives are
+  clamped for the opposite reason — `cold` has to be a place a fifty-hour run
+  can climb out of.
+
+  **All 29 Phase 3 fork options** carry a signed regard value AND an echo
+  phrase in his own words, and a test fails the build if either side has an
+  orphan. That cross-file completeness check is the OTA-1064 audit lesson
+  applied across files: an option authored in `forks.json` with no entry here
+  reads, in play, as the Arbiter having no opinion about the one thing the game
+  made you choose.
+
+  **Five routes in, each tested for REACHABILITY rather than for existing:**
+  1. **Scene narration** — the 15% personal-beat branch asks the persona first
+     and falls back to the old flat pool only when there is no character to
+     read (title-screen previews, fixtures).
+  2. **Arrival** — one due beat per arrival, yielding to a tide crossing rather
+     than stacking on it. Unspoken means unconsumed, so a skipped beat lands
+     next arrival instead of being lost.
+  3. **"What is your name"** — matched BEFORE every lookup that would otherwise
+     swallow it (the lore bank would cosine-match some near-miss), and ALWAYS
+     answered: the name, "not yet", or "not to you".
+  4. **The character sheet** — a `THE ARBITER` section with the ITEMISED why,
+     signed, in the same words the engine used. A hidden opinion score is the
+     Phase 4 legibility failure again: the game quietly decides something about
+     the player and never says what moved it.
+  5. **The ending** — his verdict on you, and, at nine Cores WITH the regard to
+     match, the name he has been holding since OTA-236. Nine Cores alone is not
+     enough: he said he had not used it even to himself.
+
+  The one model touch is a one-sentence brief (stance + tone) appended to the
+  live Qwen persona prompt. Additive — an empty brief leaves the prompt
+  byte-identical and a failed generation falls through exactly as before. A
+  personality that only exists while a 0.5B model happens to be warm is not a
+  personality, so everything else is authored. 55 tests.
+
+- **PHASE 4 — THE DEBT COMES DUE, BEHIND A DIFFICULTY TOGGLE (2026-08-03). BOTH LINES.**
   *(MINOR bump — a new axis, not another patch on the same one.)*
   The plan: *"the ledger actually calls… you have every substrate already —
   `hoursElapsed`, weather, corruption, faction standing — none of it currently

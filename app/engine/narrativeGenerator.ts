@@ -11,6 +11,9 @@ import type {
   WorldMemory,
 } from './types';
 import { withArticle, withArticleCap } from './grammar';
+// OTA-1067 — Phase 5: the Arbiter's arc across the Cores and his opinion of
+// the player, both derived from the save.
+import { arbiterRemark } from './arbiterPersona';
 import { pick, chance, rotatingPick } from './rng';
 import openings from '../data/events/openings.json';
 // OTA-298 — mood, intent, location, and scene flavor JSON files are
@@ -1163,8 +1166,27 @@ export function buildArbiterSceneIntro(ctx: SceneIntroContext): string {
     if (pool && pool.length > 0) return pick(pool);
   }
 
-  // ~15% — personal beat (who the Arbiter is, in passing).
+  // ⚠ OTA-1067 — PHASE 5. ~15% — who the Arbiter is, in passing.
+  //
+  // This branch is where the phase lands in play. It used to be a flat pick
+  // from thirteen lines that knew nothing: the same confession on hour two and
+  // hour ninety, to a player who robbed him blind and one who carried nine
+  // Cores out, in identical tone.
+  //
+  // It now asks arbiterPersona what he would say GIVEN where he stands in the
+  // arc and what he thinks of this player, and falls back to the old pool only
+  // when there is no character to read (title-screen previews, fixtures).
+  //
+  // Note the counter rather than a roll — see arbiterRemark's header. WHETHER
+  // he says something personal is still chance; WHICH thing he says is a pure
+  // function of the save, because an opinion decided by a coin is not one.
   if (Math.random() < 0.15) {
+    if (player) {
+      const nth = (worldMemory?.discoveredLocationIds?.length ?? 0)
+        + (worldMemory?.defeatedEnemies?.length ?? 0);
+      const line = arbiterRemark(player, worldMemory, nth);
+      if (line) return line;
+    }
     return pick(ARBITER_PERSONAL_BEATS);
   }
 

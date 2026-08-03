@@ -67,6 +67,11 @@ import {
   scaledCorruptionGain, scaledWeatherBite,
   type PressureTier,
 } from '../engine/pressure';
+// OTA-1067 — Phase 5: the Arbiter becomes someone.
+import {
+  dueArbiterBeat, recordArbiterBeat, arbiterBrief,
+  isNameQuestion, arbiterNameAnswer,
+} from '../engine/arbiterPersona';
 // OTA-1050 — Phase 1 slice 2: turn-in credit, roadside recognition, gossip.
 import { gossipSubject, gossipLine } from '../engine/npcMemory';
 import {
@@ -832,12 +837,19 @@ const ARBITER_PERSONA_SYSTEM =
   "asked something you cannot know, say it is buried or does not surface. " +
   "Never mention games, rules, or AI, and never break character.";
 
-async function arbiterPersonaAnswer(question: string): Promise<string | null> {
+/** OTA-1067 — `brief` is Phase 5's ONLY touch on the model path: one sentence
+ *  of where he stands in the arc and what he currently thinks of the player,
+ *  appended to the fixed system prompt. Additive by design — an empty brief
+ *  leaves the prompt byte-identical to what shipped before, and a failed
+ *  generation still falls through to the same silent-lore line it always did.
+ *  A personality that only exists while a 0.5B model happens to be warm is not
+ *  a personality, so everything else in Phase 5 is authored text. */
+async function arbiterPersonaAnswer(question: string, brief = ''): Promise<string | null> {
   if (!qwen.isReady()) return null;
   try {
     const out = await qwen.generate(
       [
-        { role: 'system', content: ARBITER_PERSONA_SYSTEM },
+        { role: 'system', content: brief ? `${ARBITER_PERSONA_SYSTEM} ${brief}` : ARBITER_PERSONA_SYSTEM },
         { role: 'user', content: question },
       ],
       { maxNewTokens: 90, temperature: 0.7 },
@@ -3762,16 +3774,50 @@ function talkContextFor(
 function announceTide(
   get: () => GameStore,
   set: (partial: Partial<GameStore>) => void,
+): boolean {
+  const player = get().player;
+  if (!player) return false;
+  if (get().tutorialStep !== null || get().storyIntro || get().chapterCard || get().pendingFork) return false;
+  const stage = tideStage(player.hoursElapsed ?? 0, profileOf(player));
+  const seen = player.tideStageSeen ?? 0;
+  if (stage <= seen) return false;
+  const line = tideCrossLine(stage);
+  if (line) get().appendLog('world', line);
+  set({ player: { ...get().player!, tideStageSeen: stage } });
+  return true;
+}
+
+/** ⚠ OTA-1067 — PHASE 5: SAY THE THING HE OWES YOU, IF HE OWES YOU ONE.
+ *
+ *  The Arbiter's arc and his opinion are derived (arbiterPersona.ts reads the
+ *  save and answers); this is the only place either becomes a LINE, and it is
+ *  the one write the whole persona system makes.
+ *
+ *  ⚠ ONE PER ARRIVAL, AND IT YIELDS TO THE TIDE. dueArbiterBeat already caps
+ *  itself at a single beat per call, but a tide crossing on the same arrival
+ *  would stack an Arbiter confession on top of a world line, and two systems
+ *  announcing themselves back to back is exactly the texture Phase 5 exists to
+ *  replace. The beat is not lost — it is not consumed until it is spoken, so
+ *  it lands on the next arrival instead.
+ *
+ *  Same full-screen yields as the tide and the fork: three beats stacked on
+ *  each other is a stack, not a story. */
+function announceArbiterBeat(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore>) => void,
 ): void {
   const player = get().player;
   if (!player) return;
   if (get().tutorialStep !== null || get().storyIntro || get().chapterCard || get().pendingFork) return;
-  const stage = tideStage(player.hoursElapsed ?? 0, profileOf(player));
-  const seen = player.tideStageSeen ?? 0;
-  if (stage <= seen) return;
-  const line = tideCrossLine(stage);
-  if (line) get().appendLog('world', line);
-  set({ player: { ...get().player!, tideStageSeen: stage } });
+  const beat = dueArbiterBeat(player, get().worldMemory);
+  if (!beat) return;
+  get().appendLog('arbiter', beat.line, { ...STORY_BEAT_META });
+  set({
+    player: {
+      ...get().player!,
+      arbiterBeatsSeen: recordArbiterBeat(get().player!.arbiterBeatsSeen, beat.key),
+    },
+  });
 }
 
 /** ⚠ OTA-1065 — RAISE THE OPEN QUESTION, IF THERE IS ONE.
@@ -15372,6 +15418,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
         }
+        // ⚠ OTA-1067 — HIS NAME, ASKED FOR DIRECTLY. Checked BEFORE every
+        // lookup below it, because "what is your name" would otherwise
+        // cosine-match some near-miss in the lore bank and the one question
+        // Phase 5 exists to answer would be fielded by the glossary.
+        if (isNameQuestion(trimmed)) {
+          get().appendLog('arbiter', arbiterNameAnswer(player, get().worldMemory), { ...STORY_BEAT_META });
+          break;
+        }
         // Otherwise normal concept lookup.
         const concept = findConcept(lookup);
         if (concept) {
@@ -15428,7 +15482,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
           if (!answered) {
-            const persona = await arbiterPersonaAnswer(trimmed);
+            // OTA-1067 — read the brief HERE rather than closing over a stale
+            // player: this runs after an await, and the run may have moved.
+            const persona = await arbiterPersonaAnswer(
+              trimmed,
+              arbiterBrief(get().player, get().worldMemory),
+            );
             get().appendLog('arbiter', persona ?? aa.ARBITER_SILENT_LINE);
           }
         })();
@@ -20364,7 +20423,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-1021 — the motive drip rides travel arrivals (one story event max
     // per arrival; holds during the opening / chapter cards / hostile scenes).
     advanceStoryDrip(get, set, locationId);
-    announceTide(get, set);
+    const tideSpoke = announceTide(get, set);
+    // OTA-1067 — and the Arbiter, if his arc or his opinion of you has moved.
+    // Yields to the tide line rather than stacking on it; see the function.
+    if (!tideSpoke) announceArbiterBeat(get, set);
     // OTA-1065 — and the open question, if the run has reached one. Same
     // moment as the drip and the same reasons: the player has just arrived
     // somewhere, nothing is on fire, and there is room for the story to speak.

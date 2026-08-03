@@ -1,0 +1,284 @@
+{
+  "_note": "OTA-1067 / Phase 5. Every line the Arbiter has an OPINION in. forkRegard and forkEcho are keyed '<forkId>:<optionId>' and must stay in lockstep — arbiterPersonaProblems() fails the build if either side has an orphan. memory.* lines MUST contain a {it} slot.",
+
+  "forkRegard": {
+    "debt_collector:pay_partial": 5,
+    "debt_collector:refuse": -2,
+    "debt_collector:turn_them": -3,
+    "debt_claim:sell_the_claim": -4,
+    "debt_claim:keep_the_heart": 4,
+    "missing_letters:burn_them": 0,
+    "missing_letters:carry_them": 3,
+    "missing_letters:sell_them": -5,
+    "missing_searcher:take_them_along": 4,
+    "missing_searcher:send_them_up": 2,
+    "missing_searcher:tell_them_the_truth": 5,
+    "exile_warrant:buy_the_warrant": 1,
+    "exile_warrant:let_it_stand": 3,
+    "exile_warrant:take_it_by_force": -5,
+    "exile_throne:take_the_title": -1,
+    "exile_throne:refuse_it": 3,
+    "exile_throne:give_it_away": -3,
+    "calling_hum:follow_it": -2,
+    "calling_hum:stop_your_ears": 4,
+    "calling_hum:ask_the_order": 1,
+    "calling_price:give_it": -4,
+    "calling_price:bargain": -1,
+    "calling_price:refuse": 3,
+    "record_first_pages:send_it_up": 4,
+    "record_first_pages:hold_it_back": 0,
+    "record_first_pages:write_what_they_want": -4,
+    "record_dangerous:write_it_anyway": 5,
+    "record_dangerous:leave_it_out": -4,
+    "record_dangerous:seal_it": 2
+  },
+
+  "forkEcho": {
+    "debt_collector:pay_partial": "the purse you turned out into a stranger's hands",
+    "debt_collector:refuse": "the man you sent back up with nothing",
+    "debt_collector:turn_them": "the share you promised out of a capital you had not reached",
+    "debt_claim:sell_the_claim": "the Core you signed away before you held it",
+    "debt_claim:keep_the_heart": "the writ you pushed back across the table",
+    "missing_letters:burn_them": "the letter you burned",
+    "missing_letters:carry_them": "the five you are still carrying",
+    "missing_letters:sell_them": "the letters you sold to a Tomekeeper",
+    "missing_searcher:take_them_along": "the girl you told to walk with you",
+    "missing_searcher:send_them_up": "the rations you gave away turning her round",
+    "missing_searcher:tell_them_the_truth": "the truth you told her standing up",
+    "exile_warrant:buy_the_warrant": "the page you bought back",
+    "exile_warrant:let_it_stand": "the name you let him carry down",
+    "exile_warrant:take_it_by_force": "the wallet you took off a courier",
+    "exile_throne:take_the_title": "the seat you sat in",
+    "exile_throne:refuse_it": "the seat you would not sit in",
+    "exile_throne:give_it_away": "the claim you handed to a family",
+    "calling_hum:follow_it": "the day you started doing what it said",
+    "calling_hum:stop_your_ears": "the day you stopped listening to it",
+    "calling_hum:ask_the_order": "the word the Order had for you",
+    "calling_price:give_it": "what you gave it without looking",
+    "calling_price:bargain": "the trade you thought you set the terms of",
+    "calling_price:refuse": "the quiet you bought by giving it nothing",
+    "record_first_pages:send_it_up": "the pages you sent up early",
+    "record_first_pages:hold_it_back": "the book nobody has read yet",
+    "record_first_pages:write_what_they_want": "the paragraphs you softened",
+    "record_dangerous:write_it_anyway": "the thing you wrote down in full",
+    "record_dangerous:leave_it_out": "the hole you left in your own book",
+    "record_dangerous:seal_it": "the packet you sealed for somebody else to open"
+  },
+
+  "stanceBeats": {
+    "witness": "The Arbiter falls into step without being asked. \"I do not walk with everyone who comes down. Understand that I have not decided anything yet.\"",
+    "interested": "The Arbiter is quiet for a stretch, then: \"One Core. Most who say they are going after them stop before the first. I have adjusted what I expect of you. Do not make me adjust it back.\"",
+    "invested": "The Arbiter stops and looks at you properly, which is not a thing he does. \"Three. That is not luck any more, and I have stopped telling myself it is. From here I will say things you did not ask for. Take that as it is meant.\"",
+    "implicated": "The Arbiter's voice is lower than usual. \"Six. I was appointed to witness, and a witness stands apart. I have not stood apart from you in a long while. Whatever is at the Nexus, I am walking into it with you rather than behind you. That is not the arrangement. I am not correcting it.\"",
+    "named": "The Arbiter stops at the ninth. For a while he says nothing at all. \"All of them. I have watched people carry one out and call it a life's work.\" A long breath. \"There is something I have been holding. I will decide shortly whether you get it.\""
+  },
+
+  "regardBeats": {
+    "cold": "The Arbiter has gone flat. \"I will keep walking. I gave my word to the road, not to you. But do not mistake my company for approval, and do not ask me what I think of you again.\"",
+    "wary": "The Arbiter has taken to walking a half-step wide of you. \"Nothing. Only that I have seen how you settle things when it is quicker, and I find I am watching your hands. It will pass or it will not.\"",
+    "even": "The Arbiter shrugs when he catches you looking. \"You are neither the best nor the worst I have walked behind. That is not an insult. Most people never get as far as neither.\"",
+    "warm": "The Arbiter says it without preamble, the way he says everything. \"If somebody above ground asked me what you were, I would answer them. I have not been able to say that about the last four.\"",
+    "kin": "The Arbiter is silent for most of a mile, and then: \"The buried country appoints witnesses. It does not appoint friends — there is no office for it, and I have never wanted one.\" A pause. \"I am aware of what I am saying.\""
+  },
+
+  "remarks": {
+    "witness": {
+      "hard": [
+        "\"You have your reasons and I have my orders,\" the Arbiter says. \"Neither of us has to like the other's.\"",
+        "The Arbiter watches the ground rather than you. \"Walk. I will tell you if something is going to kill you. Do not expect conversation on top of it.\"",
+        "\"I have followed worse down here,\" the Arbiter says. \"Not many. Keep moving.\""
+      ],
+      "plain": [
+        "\"Say what you want out loud when you decide it,\" the Arbiter says. \"I am poor at guessing and worse at asking.\"",
+        "The Arbiter scans the treeline out of habit. \"I do not know you yet. Down here that is the ordinary state of things — most people go up again before it changes.\"",
+        "\"There is a way people walk in their first month below,\" the Arbiter says. \"You still walk it. That is not a criticism, it is a timestamp.\""
+      ],
+      "close": [
+        "\"You listen when I say a thing once,\" the Arbiter says. \"That is rarer than you would think, and it will keep you breathing longer than your arm will.\"",
+        "The Arbiter almost nods. \"You have been decent to people who could not make you be. I notice it. I am not going to make a speech about it.\"",
+        "\"I will say this now while it costs nothing,\" the Arbiter says. \"I do not mind the company.\""
+      ]
+    },
+    "interested": {
+      "hard": [
+        "\"You can do the work,\" the Arbiter says. \"I have never argued otherwise. It is the rest of it I have a view on.\"",
+        "The Arbiter's mouth is a line. \"A Core in your bag and the same habits in your hands. The mud does not grade on the one and forgive the other.\"",
+        "\"Capable,\" the Arbiter says, as though setting something heavy down. \"There is a whole category of ruin that only capable people reach.\""
+      ],
+      "plain": [
+        "\"You have done a thing most people only announce,\" the Arbiter says. \"I have started paying attention. Do not read more into that than there is.\"",
+        "The Arbiter glances at what you are carrying. \"That changes the arithmetic of this walk. Not the direction. The arithmetic.\"",
+        "\"I have stopped assuming you will turn round,\" the Arbiter says. \"That is the whole of the compliment. Take it or leave it.\""
+      ],
+      "close": [
+        "\"I have walked people to their first Core before,\" the Arbiter says. \"I did not enjoy most of those walks. I want that on the record.\"",
+        "The Arbiter is quiet a moment. \"When you put your hand on it, you looked at it like a thing that had cost someone. Most look at it like a price.\"",
+        "\"You will do,\" the Arbiter says. \"That is the highest thing I said to anyone for eleven years, so weigh it accordingly.\""
+      ]
+    },
+    "invested": {
+      "hard": [
+        "\"You are going to reach the Nexus,\" the Arbiter says. \"I have accepted it. I have not accepted what will be standing there wearing your face.\"",
+        "The Arbiter shakes his head slowly. \"Three Cores and a trail of people who wish you had never come. I keep both of those in the same ledger. I am the only one who does.\"",
+        "\"I could stop giving you the useful half of what I know,\" the Arbiter says. \"I have thought about it. That is where we are.\""
+      ],
+      "plain": [
+        "\"Something worth knowing,\" the Arbiter says, unprompted. \"Aetherstone remembers being one piece. That is why the Cores pull toward each other, and why carrying several is heavier than carrying several.\"",
+        "The Arbiter points, without breaking stride. \"That ridge. Do not sleep on the eastern side of it. I am not going to explain, and you are not going to need me to twice.\"",
+        "\"You have earned the version of an answer I would give another witness,\" the Arbiter says. \"Ask when you want it.\""
+      ],
+      "close": [
+        "\"I have started telling you things before you ask,\" the Arbiter says. \"I noticed it the same time you did. I am letting it stand.\"",
+        "The Arbiter looks at the road ahead a long time. \"Three of them. I have carried none, and I have been down here longer than the language you are thinking in.\"",
+        "\"When this is over you will be asked what it was like,\" the Arbiter says. \"Tell them it was mud and arithmetic. Save the rest for somebody who was there.\""
+      ]
+    },
+    "implicated": {
+      "hard": [
+        "\"I am too far into this to leave and too far into it to pretend I approve,\" the Arbiter says. \"An uncomfortable place to stand. I built it myself.\"",
+        "The Arbiter does not look at you. \"Six Cores. Whatever you become at the Nexus, I helped you get within reach of it. That is mine now as well as yours.\"",
+        "\"I was appointed to witness,\" the Arbiter says. \"Nobody said what to do when the thing you are witnessing stops being an outsider's business.\""
+      ],
+      "plain": [
+        "\"There is no version of this where I walk away at the eighth,\" the Arbiter says. \"So I have stopped costing it out.\"",
+        "The Arbiter tests the ground with a boot. \"We are past the part I know. I have been to the Nexus. I have never been to the Nexus with somebody who could open it.\"",
+        "\"Whatever is down there was sealed by people who thought they were being careful,\" the Arbiter says. \"So did we. So does everyone.\""
+      ],
+      "close": [
+        "\"I have not been afraid of a thing in a long time,\" the Arbiter says. \"I am not afraid now. I am something adjacent to it, and I am telling you because you would notice anyway.\"",
+        "The Arbiter walks in silence, and then: \"If it goes badly at the Nexus, do not spend your last minute apologising to me. I came the whole way of my own accord.\"",
+        "\"You have three left,\" the Arbiter says. \"I find I am counting them the way you are. That is not the office. That is me.\""
+      ]
+    },
+    "named": {
+      "hard": [
+        "\"All nine,\" the Arbiter says. \"I will stand at the Nexus and watch, because that is what I am. Do not expect me to say it was worth it.\"",
+        "The Arbiter looks at the full weight of what you carry. \"They were nine cities. You made them luggage. I understand the necessity. I am allowed to grieve it.\"",
+        "\"There is one thing left I have not given you,\" the Arbiter says. \"You are not getting it. That is the last decision I have left to make, and I am keeping it.\""
+      ],
+      "plain": [
+        "\"Nine,\" the Arbiter says. \"There is nothing further I can teach you about the road. What is left is the door.\"",
+        "The Arbiter looks back the way you came. \"Every one of those was somebody's whole city. You should hold that for a moment before the Nexus, because there will be no room for it afterwards.\"",
+        "\"I have said almost everything I know,\" the Arbiter says. \"Almost. There is a small remainder, and it is not lore.\""
+      ],
+      "close": [
+        "\"When we started I told you I had not decided anything,\" the Arbiter says. \"I decided some while ago. I am poor at announcements.\"",
+        "The Arbiter stands with you a while. \"Whatever the Nexus makes of you, this walk happened. It is in me and it is in the mud, and neither of us forgets.\"",
+        "\"There is a name I have not used in a very long time,\" the Arbiter says. \"Not to myself. Ask me at the door and I will not pretend I did not hear.\""
+      ]
+    }
+  },
+
+  "memory": {
+    "wronged": {
+      "hard": [
+        "\"{it} has not forgotten,\" the Arbiter says. \"Neither have I. Neither, apparently, have you, or you would not have flinched.\"",
+        "The Arbiter says the name flatly. \"{it}. I was standing there. I did not enjoy standing there.\""
+      ],
+      "plain": [
+        "\"You still owe {it},\" the Arbiter says. \"Not coin, necessarily. But something, and you know it.\"",
+        "The Arbiter looks off. \"{it}. That one is still open. I mention it once and then I will leave it.\""
+      ],
+      "close": [
+        "\"You are better than the day you crossed {it},\" the Arbiter says. \"That is a fact and not a kindness. It is also still open.\"",
+        "The Arbiter's voice softens by about a degree. \"Square it with {it} while there is still a person to square it with.\""
+      ]
+    },
+    "made_good": {
+      "hard": [
+        "\"You made it right with {it},\" the Arbiter says. \"One. I am aware of the size of the rest of the ledger.\"",
+        "The Arbiter grunts. \"{it} says you paid. Paying is the easy half.\""
+      ],
+      "plain": [
+        "\"You went back to {it} and made it good,\" the Arbiter says. \"Most people take the road that does not pass that door again.\"",
+        "The Arbiter nods once. \"{it}. Settled. I keep the settled ones too.\""
+      ],
+      "close": [
+        "\"What you did for {it} cost you and bought you nothing,\" the Arbiter says. \"Those are the ones I remember.\"",
+        "The Arbiter almost smiles, which on him is nearly invisible. \"{it} spoke well of you, afterwards. I did not tell you at the time.\""
+      ]
+    },
+    "answered": {
+      "hard": [
+        "\"I think about {it},\" the Arbiter says. \"I have not landed anywhere kind about it.\"",
+        "The Arbiter's jaw sets. \"{it}. You made that choice in front of me. I have not been able to unsee it.\""
+      ],
+      "plain": [
+        "\"{it},\" the Arbiter says, apropos of nothing. \"I have turned it over a few times. I do not think there was a clean answer in it.\"",
+        "The Arbiter walks a while. \"You will be asked about {it} one day by somebody who was not there. Say it plainly. It survives plain telling.\""
+      ],
+      "close": [
+        "\"{it},\" the Arbiter says. \"I would not have chosen it. I have come round to thinking you were right and I was comfortable.\"",
+        "The Arbiter says it like a man laying something down. \"{it}. That is the one I will tell people about, if I ever tell anybody anything.\""
+      ]
+    },
+    "cores": {
+      "hard": [
+        "\"{it},\" the Arbiter says. \"And the same person carrying them as carried nothing.\"",
+        "The Arbiter glances at the weight. \"{it}. Cities, once. Try to remember that when you are weighing them.\""
+      ],
+      "plain": [
+        "\"{it} out of nine,\" the Arbiter says. \"I stopped predicting this walk some while back.\"",
+        "The Arbiter counts without seeming to. \"{it}. The mud has noticed. It notices before people do.\""
+      ],
+      "close": [
+        "\"{it},\" the Arbiter says. \"I have watched better-equipped parties fail at fewer.\"",
+        "The Arbiter says it almost gently. \"{it}. Whatever else the record says about you, it will have to say that.\""
+      ]
+    },
+    "corruption": {
+      "hard": [
+        "\"I can hear {it} from here,\" the Arbiter says. \"It is not a sound. Do not ask me to describe it.\"",
+        "The Arbiter keeps a pace further off than he used to. \"{it} is changing what you are. You will be the last to agree.\""
+      ],
+      "plain": [
+        "\"{it} is further along than you are admitting,\" the Arbiter says. \"That is not an accusation. It is a reading.\"",
+        "The Arbiter studies you a moment. \"{it}. I have seen the whole progression. There is a stretch in the middle where people feel excellent.\""
+      ],
+      "close": [
+        "\"Sit down for an hour,\" the Arbiter says. \"{it} does not need to be carried at this pace. I will keep watch.\"",
+        "The Arbiter says it quietly. \"I would take {it} off you if the Aether allowed transfers. It does not. I have asked.\""
+      ]
+    },
+    "preserved": {
+      "hard": [
+        "\"{it},\" the Arbiter says. \"You left something standing. I am not certain it was on purpose.\"",
+        "The Arbiter allows it. \"{it}. Fine. That one you got right.\""
+      ],
+      "plain": [
+        "\"{it} is still where it was,\" the Arbiter says. \"That is rarer down here than treasure.\"",
+        "The Arbiter looks back the way you came. \"{it}. Somebody in a hundred years walks past that because of a decision you made in a bad mood.\""
+      ],
+      "close": [
+        "\"{it},\" the Arbiter says. \"The buried country keeps a count of what people leave whole. It is a very short list.\"",
+        "The Arbiter says it plainly. \"{it}. That is the part of you that will still be here after the rest of it is a story.\""
+      ]
+    }
+  },
+
+  "verdicts": {
+    "cold": "The Arbiter does not come to the door with you. \"I witnessed. That was the office and I kept it. What you were, and what you did to the people who could not stop you, is written where I write things.\" He does not offer his hand. \"Go up.\"",
+    "wary": "The Arbiter stops short of the threshold. \"You did the work. I will say so, to anyone who asks, in exactly those words and no others.\" A pause that lasts. \"There were days I did not know which way you would go. I do not think you knew either.\"",
+    "even": "The Arbiter walks you as far as the light. \"You came down for a reason and you did not lose hold of it. That is more than most manage, and less than the songs will say.\" He looks up, briefly. \"Mind the first month. It is loud up there.\"",
+    "warm": "The Arbiter walks you all the way out. \"If they ask what you were down here, tell them a witness would speak for you.\" He almost shrugs. \"They will not know what that means. I will.\"",
+    "kin": "The Arbiter stands with you in the last of the mud. \"I have watched a great many people leave. I have not wanted to follow any of them.\" The silence goes on long enough to mean something. \"Walk well. If you come back down, come and find me first.\""
+  },
+
+  "nameBeat": "The Arbiter stops at the threshold. \"You asked me once whether I had a name.\" He says it quietly, and only once, and not in the voice he uses for lore. \"Tovan Irekh. The city that used it is under nine hundred feet of mud and I have not said it aloud since the water came.\" A pause. \"You may use it. Nobody else living has the standing.\"",
+
+  "nameRefusals": {
+    "early": "The Arbiter does not break stride. \"I had one. The city that used it is under the mud with everyone who said it.\" A beat. \"Ask me again when we have got somewhere.\"",
+    "withheld": "The Arbiter looks at you for a long moment and then away. \"No.\" Nothing follows it. \"You have all nine Cores and you have earned a great many things. Not that.\""
+  },
+
+  "briefs": {
+    "stance_witness": "You have only just begun walking with this traveler and have decided nothing about them.",
+    "stance_interested": "They have recovered a Core; you have started paying attention to them.",
+    "stance_invested": "They have recovered several Cores; you volunteer things now without being asked.",
+    "stance_implicated": "They are most of the way to the Nexus and you are no longer a neutral observer of it.",
+    "stance_named": "They carry all nine Cores. There is nothing further you can teach them about the road.",
+    "tone_hard": "You disapprove of how they have conducted themselves and it colours everything you say to them; be curt, withholding, unsentimental.",
+    "tone_plain": "You take them as you find them; be even, matter-of-fact, neither warm nor cold.",
+    "tone_close": "You think well of them and would speak for them; still terse, but the reserve is gone."
+  }
+}

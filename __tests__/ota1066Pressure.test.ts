@@ -295,8 +295,17 @@ describe('OTA-1066 — in the real store', () => {
   });
 
   it('the tide announcement fires once per stage and never re-fires', () => {
-    const fn = store.slice(store.indexOf('function announceTide('), store.indexOf('/** ⚠ OTA-1065 — RAISE THE OPEN QUESTION'));
-    expect(fn).toContain('if (stage <= seen) return;');
+    // ⚠ Sliced to announceTide's OWN body (column-0 closing brace), not to the
+    // next authored comment. Anchoring on a neighbour's comment is how this
+    // assertion broke when OTA-1067 landed a helper between them — a failure
+    // of POSITION rather than of behaviour, which is the least useful kind of
+    // red there is.
+    const from = store.indexOf('function announceTide(');
+    const fn = store.slice(from, store.indexOf('\n}\n', from));
+    expect(fn).toContain('function announceTide(');
+    // OTA-1067 gave it a return value (did it speak?) so the Arbiter beat can
+    // yield to it; the once-per-stage guard is unchanged.
+    expect(fn).toContain('if (stage <= seen) return false;');
     expect(fn).toContain('tideStageSeen: stage');
     // ...and it yields to anything already holding the screen.
     expect(fn).toContain('get().chapterCard || get().pendingFork');
