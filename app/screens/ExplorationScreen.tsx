@@ -41,8 +41,8 @@ import { MissionBoardModal } from '../components/MissionBoardModal';
 import { FusionPickerModal } from '../components/FusionPickerModal';
 import { FusionBlockedModal } from '../components/FusionBlockedModal';
 import { MissionCompleteModal } from '../components/MissionCompleteModal';
-import { ParleyModal } from '../components/ParleyModal';
-import { TalkModal } from '../components/TalkModal';
+import { ParleySheet } from '../components/ParleySheet';
+import { TalkSheet } from '../components/TalkSheet';
 import { GiftModal } from '../components/GiftModal';
 import { hasTopicsFor } from '../engine/dialogue';
 // OTA-1064 — the SAME identity function the store and the ledger use. See the
@@ -126,6 +126,11 @@ export function ExplorationScreen() {
     && !tutorialExploreChosen;
   const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
+  // OTA-1076 — the talk/parley sheets share the DiceRoller's controls slot;
+  // these drive which occupant renders. Rolls win: a parley choice that starts
+  // a roll hands the slot straight to the dice.
+  const pendingTalk = useGameStore((s) => s.pendingTalk);
+  const pendingParley = useGameStore((s) => s.pendingParley);
   // OTA-841 [did-you-mean] — runnable command suggestions from the last low-confidence
   // parse, rendered as a tappable chip row above the input.
   const parseSuggestions = useGameStore((s) => s.parseSuggestions);
@@ -939,6 +944,13 @@ export function ExplorationScreen() {
             onRoll={resolveRollStep}
             onCancel={cancelPendingRolls}
           />
+        ) : pendingTalk ? (
+          // OTA-1076 — an open conversation takes the input's place, dice-
+          // roller style: topic list at the bottom, replies in the feed,
+          // STOP TALKING to hand the slot back.
+          <TalkSheet />
+        ) : pendingParley ? (
+          <ParleySheet />
         ) : (
           <>
           {/* OTA-841 [did-you-mean] — after a low-confidence / unresolved parse, the
@@ -1623,10 +1635,10 @@ export function ExplorationScreen() {
       {/* OTA-1023 — the opening crawl moved to App.tsx's GLOBAL overlay
           stack so REPLAY OPENING plays over any screen. */}
 
-      {/* OTA-808 — the two-button parley chooser (self-mounts off pendingParley). */}
-      <ParleyModal />
-      {/* OTA-1058 — Phase 2 slice: the topic exchange, self-mounting off pendingTalk. */}
-      <TalkModal />
+      {/* OTA-1076 — the parley chooser and the topic exchange moved out of the
+          overlay stack into the controls slot below (bottom sheets, dice-
+          roller pattern) at the owner's direction: the feed must stay
+          readable while talking. */}
       {/* OTA-1060 — the gift picker, self-mounting off pendingGift. */}
       <GiftModal />
 

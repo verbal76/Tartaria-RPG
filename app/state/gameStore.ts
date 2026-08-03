@@ -5557,7 +5557,7 @@ interface GameStore {
 
   /** OTA-808 — PARLEY. A pending two-button social choice against a wild NPC or the
    *  animal you're fighting. Set when the player opens a parley with a GENERIC social
-   *  opener (so ParleyModal can render the two contextual buttons); null otherwise.
+   *  opener (so ParleySheet can render the contextual choices); null otherwise.
    *  A player who types a SPECIFIC verb (intimidate / persuade / calm) skips the
    *  modal and resolves straight through. */
   /** OTA-1058 — PHASE 2 SLICE. The open talk exchange: who you are talking to
@@ -5625,7 +5625,7 @@ interface GameStore {
    *  nothing and forfeits nothing: the parley was never committed, so the
    *  player can talk first and still come back and choose. */
   parleyIntoTalk: () => void;
-  /** Commit a parley choice (from a ParleyModal button, or a typed specific verb).
+  /** Commit a parley choice (from a ParleySheet choice, or a typed specific verb).
    *  Runs the hard lock-and-key, the CHA roll on a right-key, the asymmetric
    *  outcomes (safe fail = forfeit; intimidate fail = harm + forfeit), rewards
    *  (persuade → lead, intimidate → goods), the Menace raise, and the standing cost
@@ -9517,6 +9517,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
 
+    // OTA-1076 — the talk/parley sheets don't lock the screen the way the old
+    // modals did (that was the point: the feed stays readable, and so do the
+    // room chips around it). Any REAL action taken while one is open walks
+    // away from the conversation first, exactly as tapping STOP TALKING /
+    // BACK OFF would — same line in the feed, no orphaned sheet state under
+    // whatever the action does next. Silent (LLM-internal) submissions don't
+    // count as walking away; the ambient paths already guard on these flags.
+    if (!_opts?.silent) {
+      if (get().pendingTalk) get().closeTalk();
+      if (get().pendingParley) get().closeParley();
+    }
+
     // OTA-841 [did-you-mean] — a new action clears any stale disambiguation chips
     // from the previous low-confidence parse (tapping a chip routes here too, so the
     // chip row vanishes the moment you pick one).
@@ -10456,7 +10468,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-808 — PARLEY. Speaking to a foe you're fighting (an animal) or a wild NPC
     // (a person) opens a two-button social choice with real, asymmetric stakes —
     // Calm/Intimidate for animals, Persuade/Intimidate for people. A GENERIC opener
-    // ("talk to / greet / speak") surfaces the ParleyModal so the player sees the
+    // ("talk to / greet / speak") surfaces the ParleySheet so the player sees the
     // stakes; a SPECIFIC verb (intimidate / persuade / calm) commits straight
     // through. Hard lock-and-key: the wrong approach auto-fails; a high-WIS read is
     // told the temperament, everyone else gets the narrated tell. See parley.ts.
