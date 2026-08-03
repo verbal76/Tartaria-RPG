@@ -160,6 +160,11 @@ describe('OTA-1078 — pickpocketPerson (store)', () => {
   it('⚠ caught at a vendor’s pocket starts the SAME fight as caught at their table', () => {
     putVendor();
     setStealth(0); // d20 max 20... force the miss with a floored die
+    // OTA-1081 — empty the pouch first: with TC in hand the shakedown offer
+    // now intercepts this moment (its own suite covers that). Broke, there is
+    // no offer, and the original claim — the direct fight — still holds.
+    const p0 = useGameStore.getState().player!;
+    useGameStore.setState({ player: { ...p0, tc: 0 } });
     const realRandom = Math.random;
     Math.random = () => 0.0; // d20 = 1; total ≤ 2 vs DC 11 — caught, STE 0 < quiet-fail 14
     try {

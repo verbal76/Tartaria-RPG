@@ -291,7 +291,9 @@ export function pruneSpawnKeyedRelations(memory: WorldMemory): WorldMemory {
 export function recordNpcDealing(
   memory: WorldMemory,
   id: string,
-  patch: Partial<Pick<NpcRelation, 'trades' | 'tcTraded' | 'contractsTaken' | 'contractsTurnedIn' | 'wrongs'>>
+  patch: Partial<Pick<NpcRelation, 'trades' | 'tcTraded' | 'contractsTaken' | 'contractsTurnedIn' | 'wrongs'
+    /** OTA-1081 — clean lifts and mumbles delivered; see the NpcRelation fields. */
+    | 'pocketsLifted' | 'pocketsMumbled'>>
     /** OTA-1055 — TC the player SPENT here, which is the only kind that can pay
      *  a debt. `tcTraded` counts business in both directions, so inferring
      *  amends from it meant SELLING to someone you robbed settled the debt AND
@@ -308,6 +310,9 @@ export function recordNpcDealing(
     contractsTaken: prev.contractsTaken + (patch.contractsTaken ?? 0),
     contractsTurnedIn: prev.contractsTurnedIn + (patch.contractsTurnedIn ?? 0),
     wrongs: prev.wrongs + (patch.wrongs ?? 0),
+    // OTA-1081 — the mumble ledger. Increment-only, like every other dealing.
+    pocketsLifted: (prev.pocketsLifted ?? 0) + (patch.pocketsLifted ?? 0),
+    pocketsMumbled: (prev.pocketsMumbled ?? 0) + (patch.pocketsMumbled ?? 0),
   };
   // OTA-1053 — RESTITUTION. Coin that crosses the table of somebody you were
   // caught stealing from is banked as amends; enough of it buys one wrong back.
@@ -693,4 +698,26 @@ export function gossipLine(
   // belt and braces rather than a live fallback.
   const you = npcAddress(subject, playerName);
   return `${speakerName} tilts their head. "${subject.name} mentioned you, ${you}. Said you were worth dealing with — and ${subject.name} doesn't say that about many."`;
+}
+
+/** OTA-1081 — THE MUMBLE. Someone whose pocket was lifted CLEAN eventually
+ *  notices the loss — out loud, on a later meeting, without ever looking at
+ *  the player. The owner's spec in as many words: "they should eventually
+ *  mumble about always losing things or some other statement so you know
+ *  they realized it, and that you're not suspected."
+ *
+ *  Returns the line while a mumble is owed (pocketsLifted > pocketsMumbled),
+ *  else null. Deterministic — the variant is indexed off how many they have
+ *  already delivered, never rolled. The CALLER must record
+ *  `pocketsMumbled: 1` when it speaks the line, or the mumble repeats. */
+export function pocketLossMumble(rel: NpcRelation | undefined, name: string): string | null {
+  if (!rel) return null;
+  const owed = (rel.pocketsLifted ?? 0) - (rel.pocketsMumbled ?? 0);
+  if (owed <= 0) return null;
+  const lines = [
+    `${name} pats at a pocket and frowns. "Swear I'm always losing things on this road."`,
+    `${name} turns out a pocket, stares into it, and shakes their head. "Could've sworn I still had that."`,
+    `${name} mutters something about holes in coats and the price of thread — and never once looks your way.`,
+  ];
+  return lines[(rel.pocketsMumbled ?? 0) % lines.length]!;
 }
