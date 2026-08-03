@@ -20164,7 +20164,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // WHAT IT IS. Not more dialogue. The authored reply owns the words; the
 // flourish owns the hands. One short beat of what somebody is DOING while they
 // answer — a rag over a joint, a count that does not falter, a pack that never
-// comes off the shoulder. 51 authored lines in app/data/npcs/flourishes.json,
+// comes off the shoulder. 55 authored lines in app/data/npcs/flourishes.json,
 // keyed two ways at once: by TRADE (ten buckets, so a smith's hands are not a
 // scholar's) and by REGARD (six rungs including wronged, so posture tracks the
 // relationship Phase 1 spent nine OTAs building). Both pools are concatenated

@@ -885,7 +885,7 @@ re-architecture. Currently **4.28.97**; ledger in `VERSION.md`.
   A flourish is **not more dialogue** — the authored reply owns the words, the
   flourish owns the hands. One short beat of what somebody is *doing* while they
   answer: a rag over a joint, a count that does not falter, a pack that never
-  comes off the shoulder. 51 authored lines in `app/data/npcs/flourishes.json`,
+  comes off the shoulder. 55 authored lines in `app/data/npcs/flourishes.json`,
   keyed two ways at once — by **trade** (ten buckets; all 30 named vendors map,
   and the procedural cast buckets straight off the OTA-1085 class keys) and by
   **regard** (six rungs including `wronged`, so posture tracks the Phase 1
