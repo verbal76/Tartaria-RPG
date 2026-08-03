@@ -223,7 +223,7 @@ export function rememberNpcMeeting(
   // against an npcsMet list that already contained the person just added, so it
   // manufactured a relation at meetings=1 and then the sighting incremented it
   // to 2. A first-ever arrival therefore read as a SECOND meeting — which
-  // OTA-1073's `seenBefore = meetings >= 2` turned into greeting a total
+  // OTA-1050's `seenBefore = meetings >= 2` turned into greeting a total
   // stranger as a returning face.
   //
   // Seeding before the append makes the inner seed a no-op (npcRelations is
@@ -388,7 +388,7 @@ export function npcRegard(rel: NpcRelation | null | undefined): NpcRegard {
   if (rel.wrongs > 0) return 'wronged';
   if (rel.contractsTurnedIn >= 2 || rel.tcTraded >= TC_FOR_TRUSTED) return 'trusted';
   if (rel.trades >= 3 || rel.contractsTurnedIn >= 1 || rel.tcTraded >= TC_FOR_FAMILIAR) return 'familiar';
-  // OTA-1073 — contractsTaken belongs on this rung. Slice 1 let it earn the
+  // OTA-1050 — contractsTaken belongs on this rung. Slice 1 let it earn the
   // player's NAME (knowsPlayerName) but not any regard, so someone who had
   // handed you work was ranked below someone you had merely walked past three
   // times. Found by a slice-2 test; the ladder was wrong, not the test.
@@ -396,7 +396,7 @@ export function npcRegard(rel: NpcRelation | null | undefined): NpcRegard {
   return 'met';
 }
 
-/** OTA-1077 — how many raid records to keep. Enough that a player who has been
+/** OTA-1054 — how many raid records to keep. Enough that a player who has been
  *  away a long while still hears about it; short enough that the save does not
  *  grow a war diary. */
 export const RAID_MEMORY_CAP = 12;
@@ -599,7 +599,7 @@ export function npcAbsenceLine(
 }
 
 // ---------------------------------------------------------------------------
-// OTA-1073 — PHASE 1, SLICE 2.
+// OTA-1050 — PHASE 1, SLICE 2.
 // ---------------------------------------------------------------------------
 
 /** Player-facing name for a rung of the ladder, for the Chronicle's people

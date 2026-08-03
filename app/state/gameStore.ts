@@ -4205,7 +4205,7 @@ function resolveVendorSubmission(
 
   set((st) => ({
     // The person, on their own ledger. recordNpcDealing no-ops without a
-    // relation, and every install path sights the vendor first (OTA-1078), so
+    // relation, and every install path sights the vendor first (OTA-1055), so
     // by the time anyone can steal from them the row exists.
     worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(vendor), { wrongs: 1 }),
     ...(st.currentScene ? {
@@ -9685,7 +9685,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const isClimbCmd = /\bclimb\b/i.test(trimmed);
         const isLeaveCmd = isLeaveHubCommand(trimmed)
           || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed);
-        // OTA-1063 — the lockdown must never outrank a live enemy. A summit
+        // OTA-1040 — the lockdown must never outrank a live enemy. A summit
         // overlay (or any other spawn) can drop a hostile into a tutorial
         // beat, and before this every verb but the beat's own was refused:
         // the player could not attack, flee, sneak, or use an item while
@@ -9699,7 +9699,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           || (enemiesLive && isCombatCmd);
         if (!beatAllows) {
           if (!_opts?.silent) get().appendLog('player', trimmed);
-          // OTA-1063 — restate the pending step. "Do what I've asked of you"
+          // OTA-1040 — restate the pending step. "Do what I've asked of you"
           // is dead text the moment the instruction scrolls away; the player
           // then has no way to recover it short of replaying the tutorial.
           const pending = tStep?.remind ?? null;
@@ -16930,7 +16930,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // climbs. Player asked: traders only on "larger
             // locations" so a 1-tier ledge doesn't surface a
             // man-with-a-ledger absurdity.
-            // OTA-1063 — no summit ambush during the tutorial. The scripted
+            // OTA-1040 — no summit ambush during the tutorial. The scripted
             // climb beat says "top out, then climb back down"; dropping a
             // hostile (or a trader, or a lookout hook) on a player who owns
             // one cudgel and is still inside the beat lockdown is a trap,
@@ -16978,7 +16978,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   enemyHps: overrides.enemyHps,
                   enemyAmbushUsed: overrides.enemyAmbushUsed,
                   activeEnemyIdx: overrides.activeEnemyIdx,
-                  // OTA-1063 — set the band explicitly. Every other spawn
+                  // OTA-1040 — set the band explicitly. Every other spawn
                   // site opens at 'mid'; this one inherited the base scene's
                   // range, which is null on a peaceful room. Null then got
                   // coalesced to 'close' by the attack gate and to 'mid' by
@@ -22591,7 +22591,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
       }));
     }
-    const factionCompact = acceptIsCompact(); // OTA-1071 — before the bump.
+    const factionCompact = acceptIsCompact(); // OTA-1048 — before the bump.
     bumpQuestsAccepted(get, set);
     // First-quest milestone — Arbiter can reference "the first
     // contract you took" later. Fires only on the first accept of
@@ -22616,7 +22616,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // commentary (first-quest line, burst-start, "stacking", "slow
     // down") instead.
     const stage0 = quest.stages?.[0];
-    // OTA-1071 — mid-burst the opening beat is dropped with the rest of the
+    // OTA-1048 — mid-burst the opening beat is dropped with the rest of the
     // detail; it is replayed in Contracts when the contract is activated.
     if (stage0 && !factionCompact) {
       get().appendLog('world', stage0.narration);
@@ -23142,7 +23142,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ],
           },
         } : s));
-        const neutralCompact = acceptIsCompact(); // OTA-1071 — before the bump.
+        const neutralCompact = acceptIsCompact(); // OTA-1048 — before the bump.
         bumpQuestsAccepted(get, set);
         if (neutralCompact) {
           get().appendLog('reward', `✦ Contract accepted — ${neutralMatch.title}${parkedTag(neutralTracked)}.`);
@@ -23232,7 +23232,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    // OTA-1071 — read the burst index BEFORE the bump, so this accept is
+    // OTA-1048 — read the burst index BEFORE the bump, so this accept is
     // judged on its own position in the burst rather than the next one's.
     const huntCompact = acceptIsCompact();
     bumpQuestsAccepted(get, set);
@@ -23268,7 +23268,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // both under-HP and under-weapon, the Arbiter calls it out
       // before they walk into the boss. Doesn't block accept — the
       // player can still take the contract and try — but they
-      // can't say nobody warned them. OTA-1071 — full-detail accepts only;
+      // can't say nobody warned them. OTA-1048 — full-detail accepts only;
       // mid-burst the numbers are on the Contracts card.
       if (!huntCompact && hunt.recommendedHp && hunt.recommendedWeaponRarity) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -23558,7 +23558,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ],
           },
         } : s));
-        const neutralCompact = acceptIsCompact(); // OTA-1071 — before the bump.
+        const neutralCompact = acceptIsCompact(); // OTA-1048 — before the bump.
         bumpQuestsAccepted(get, set);
         if (neutralCompact) {
           get().appendLog('reward', `✦ Contract accepted — ${neutralMatch.title}${parkedTag(neutralTracked)}.`);
@@ -23642,7 +23642,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    const mysteryCompact = acceptIsCompact(); // OTA-1071 — before the bump.
+    const mysteryCompact = acceptIsCompact(); // OTA-1048 — before the bump.
     bumpQuestsAccepted(get, set);
     // Per-mystery stage0.arbiter suppressed (burst-aware line above).
     const stage0 = m.stages[0];
@@ -23912,7 +23912,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : st,
     );
-    const storyCompact = acceptIsCompact(); // OTA-1071 — before the bump.
+    const storyCompact = acceptIsCompact(); // OTA-1048 — before the bump.
     bumpQuestsAccepted(get, set);
     // Per-storyline stage0.arbiter suppressed (burst-aware line above).
     const stage0 = s.stages[0];
@@ -26019,7 +26019,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ tutorialStep: 0, awaitingTutorialName: true });
     const firstStep = TUTORIAL_STEPS[0];
     if (firstStep?.arbiter) {
-      // OTA-1065 — supersede: a beat instruction outranks anything still
+      // OTA-1042 — supersede: a beat instruction outranks anything still
       // queued for the voice. Nothing precedes the first beat, but tagging it
       // keeps every beat's dispatch identical.
       get().appendLog('arbiter', firstStep.arbiter, { supersede: true });
@@ -26051,7 +26051,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     // Speak the next Arbiter line in the feed.
     if (nextStep.arbiter) {
-      // OTA-1065 — supersede: drop whatever voice backlog has piled up so the
+      // OTA-1042 — supersede: drop whatever voice backlog has piled up so the
       // spoken instruction matches the beat the player is actually on. The
       // tutorial advances faster than on-device TTS synthesises, so without
       // this the audio runs a full beat behind the screen.
@@ -30786,7 +30786,7 @@ function acceptIsCompact(): boolean {
 /** " (parked)" when a contract lands inactive. Replaces a full dedicated line
  *  ("X added to your slate (paused -- you're already on another contract).
  *  Activate it in Contracts when you're ready.") that repeated verbatim on
- *  every single accept. OTA-1015 added that notice deliberately so parked
+ *  every single accept. OTA-992 added that notice deliberately so parked
  *  grants say so -- this keeps the information and drops twelve repetitions
  *  of the sentence explaining it. */
 function parkedTag(tracked: boolean): string {
@@ -36764,7 +36764,7 @@ let lastAmbientGenStartMs = 0;
 //
 // The fix is NOT the epoch. Every reactive generation bumps that counter, so
 // reusing it here would discard nearly every ambient line and silently kill a
-// feature that only just started working (OTA-1054). What makes an ambient
+// feature that only just started working (OTA-1031). What makes an ambient
 // musing read wrong is not that time passed — it is unprompted by design — but
 // that the SITUATION changed underneath it. So stamp the situation, and check
 // the stamp before speaking.
@@ -36817,7 +36817,7 @@ function takeAmbientStamp(get: () => GameStore): AmbientStamp {
 
 /** null when the line still belongs to the moment; otherwise WHY it doesn't.
  *  The reason string rides the existing `arbiter: ambient …` debug marker so a
- *  pasted log shows the drop and its cause, the same way OTA-1057 surfaced the
+ *  pasted log shows the drop and its cause, the same way OTA-1034 surfaced the
  *  ∅ reasons. */
 /** OTA-1055 — test seams for the staleness pair.
  *

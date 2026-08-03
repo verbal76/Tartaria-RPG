@@ -208,7 +208,7 @@ describe('playtest — the run itself happened', () => {
 
 describe('playtest — PHASE 3: the story asked a question', () => {
   it('a fork was actually RAISED during ordinary play', () => {
-    // Not "a fork exists and its gate is correct" — that is ota1088's job.
+    // Not "a fork exists and its gate is correct" — that is ota1065's job.
     // This is: walking the world put the card in front of the player.
     expect(report.forksAnswered.length).toBeGreaterThan(0);
   });

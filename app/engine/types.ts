@@ -2023,7 +2023,6 @@ export interface NpcRelation {
   /** OTA-1060 — how many gifts have actually MOVED this relationship. Capped,
    *  so warmth stays something you mostly earn by doing rather than shopping. */
   giftBoons?: number;
-
 }
 
 /** OTA-1054 — an outpost assault the offscreen war sim actually carried out.

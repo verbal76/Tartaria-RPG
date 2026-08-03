@@ -82,7 +82,7 @@ export interface TutorialStep {
   remind?: string;
 }
 
-/** OTA-1063 — verbs the tutorial lockdown always lets through while an
+/** OTA-1040 — verbs the tutorial lockdown always lets through while an
  *  enemy is live. Self-defence, disengagement, and consumables: everything
  *  a cornered player needs. Deliberately NOT world verbs (travel, craft,
  *  fuse, rest) — the lockdown still holds for those, so the tutorial can't

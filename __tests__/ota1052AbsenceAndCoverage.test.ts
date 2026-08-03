@@ -8,7 +8,7 @@
  * "It's been a long stretch — I'd started asking after you" could never appear
  * on device.
  *
- * ⚠ THE TESTS SHIPPED GREEN ANYWAY. ota1072NpcMemory.test.ts hand-built
+ * ⚠ THE TESTS SHIPPED GREEN ANYWAY. ota1049NpcMemory.test.ts hand-built
  * relations in which `lastSeenHours` still held the PREVIOUS visit, so it was
  * asserting the rule while never once exercising the wiring. That is the third
  * distinct flavour of the "tests written from the implementation" problem in

@@ -1,4 +1,4 @@
-// OTA-1050 — DOG ONBOARDING POPUP. A playtester at the rescue moment typed
+// OTA-1027 — DOG ONBOARDING POPUP. A playtester at the rescue moment typed
 // "rest", thought the naming beat was another fight, and the old in-feed
 // takeover silently stored "rest" as the breed. The three asks (breed, name,
 // sex) now land together on one blocking card in the house style — answers

@@ -49,7 +49,7 @@ jest.mock('expo-updates', () => ({}));
  *
  * The fix is not the epoch — every reactive generation bumps that counter, so
  * reusing it would discard nearly every ambient line and silently kill a
- * feature that only just started working (OTA-1054). What makes an ambient
+ * feature that only just started working (OTA-1031). What makes an ambient
  * musing read wrong is that the SITUATION changed underneath it. So the
  * situation is stamped at start and checked before it speaks.
  *
@@ -181,7 +181,7 @@ describe('OTA-1051 — ambient staleness', () => {
 
   it('does NOT reuse arbiterGenerationEpoch', () => {
     // The epoch is bumped by EVERY reactive generation. Gating ambient on it
-    // would discard almost every musing and silently undo OTA-1054.
+    // would discard almost every musing and silently undo OTA-1031.
     const fnStart = src.indexOf('async function maybeGenerateAmbientArbiter');
     const fnEnd = src.indexOf('\nasync function ', fnStart + 10);
     const body = src.slice(fnStart, fnEnd > 0 ? fnEnd : undefined);

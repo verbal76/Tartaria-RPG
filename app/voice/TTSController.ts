@@ -254,7 +254,7 @@ function onState(state: GameState): void {
       // arbiter-only channel (per OTA 123 player request) — frame
       // strip + speak. The SPOKEN_CHANNELS set is now {'arbiter'}
       // so this is always the arbiter path.
-      // OTA-1065 — meta.supersede: this line REPLACES the pending backlog.
+      // OTA-1042 — meta.supersede: this line REPLACES the pending backlog.
       // The tutorial appends two arbiter lines per beat (an acknowledgement
       // and the next instruction) while on-device Kokoro is still
       // synthesising the previous one, so the queue grows faster than it

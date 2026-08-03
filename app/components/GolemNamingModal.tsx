@@ -1,4 +1,4 @@
-// OTA-1050 — GOLEM NAMING POPUP. Same treatment as the dog onboarding: the
+// OTA-1027 — GOLEM NAMING POPUP. Same treatment as the dog onboarding: the
 // old flow captured the NEXT TYPED INPUT as the golem's name (or "skip"),
 // which read as just another feed line and could swallow a combat command.
 // Raised whenever pendingGolemNaming is set and a golem stands; a flag left
