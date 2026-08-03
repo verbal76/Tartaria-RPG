@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.11';
+export const DISPLAY_VERSION = '4.29.12';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20677,7 +20677,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // top would double-count against the same DC 10 and make lifts nearly
 // automatic. DEX keeps its own kingdom (dodge, initiative, ranged).
 // DISPLAY_VERSION 4.29.11.
-export const OTA_BUILD_ID = '2026-08-03-1100-pickpocket-bottom-sheet';
+//
+// OTA-1101 — WHAT'S ACTUALLY IN THEIR POCKETS.
+//
+// Owner: "only show what you can pickpocket. Stealing is for items,
+// pickpocket is for what would be in their clothing or on them. Maybe their
+// TC, a collectable note, rarely a tower map... a single legendary material
+// — something they wouldn't trust on the tabletop with all the thieves
+// around."
+//
+// The sheet now shows MARKS, not merchandise: one chip per PERSON in reach
+// (vendor and/or wanderer), no goods chips, no ambient nouns, no typed
+// target. Items on tables and the ground stay with the steal/take verbs.
+// Picking a mark runs the new pickpocketPerson action: same Stealth roll
+// and consequences as vendor theft (demeanor DC, steal-heat escalation,
+// STE-gated quiet fail, and CAUGHT at a vendor starts the same fight — the
+// consequences were extracted into vendorCatchesThief and shared, not
+// copied). A wanderer who catches you names it and leaves; no steel over a
+// pocket.
+//
+// The payout is the pocket table (engine/pocketLoot.ts): 50% their
+// walking-around TC (3-12), 30% a collectable note (un-owned fragments
+// only — an owned note falls through to coin), 15% a single Legendary
+// material, 5% a tower map. Lifted goods carry the stolen flag; a clean
+// lift still trains Stealth. Test: ota1101PocketLoot.test.ts.
+// DISPLAY_VERSION 4.29.12.
+export const OTA_BUILD_ID = '2026-08-03-1101-pocket-loot';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1100-pickpocket-bottom-sheet';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1099-talk-bottom-sheet';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1098-tutorial-pacing-dog-card-keyboard';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1097-difficulty-step-title';
