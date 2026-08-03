@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.3';
+export const DISPLAY_VERSION = '4.29.4';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20480,7 +20480,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // system working, and also a data point that the band boundaries sit high
 // relative to what a low-conduct run accumulates.
 // DISPLAY_VERSION 4.29.3. 20 playtest assertions.
-export const OTA_BUILD_ID = '2026-08-03-1092-playtest-honest-walk';
+//
+// OTA-1093 — THE TUTORIAL WALK AND THE COMBAT WALK: THE LAST TWO EDGES CLOSED.
+//
+// Owner: "do both the tutorial walk and the combat walk." The 3-day audit
+// named the two places its coverage stopped: onboarding (the phases harness
+// deliberately skips it) and fights (deliberately skipped as combat's own
+// business). Both now have seeded feed-graded walks of their own.
+//
+// playtestTutorialWalk — a brand-new character, the crawl dismissed the way a
+// thumb dismisses it, every beat advanced by TYPING what the Arbiter asked:
+// name, cudgel, rope, scrap, climb up AND down (completion fires on the way
+// down), the door, the choice, the objective chip, a Capital picked. Asserts
+// the tutorial ENDS on typed input alone, every authored beat is visited in
+// order, and the lockdown refuses an off-script command by RESTATING the ask
+// (the OTA-1063 complaint). Found and fixed in passing: "loop your rope
+// around the the surface in front of you" — climbable nouns that carry their
+// own article got a second one from the template.
+//
+// playtestCombatWalk — walk until the seeded arrival rolls stage fights
+// (nothing forced), then fight them like a player: ADVANCE when the reach
+// gate refuses, dodge in the exchange, FLEE a 2v1, kit when hurt, rest after.
+// Asserts every engagement ENDS (cleared/escaped/died — never stalled),
+// combat narrates with numbers, death is told to the player, and nothing
+// leaks a slot. The walk's own three failures were all the harness
+// outrunning the phone, each now documented in the file: typed input is
+// swallowed while the dice overlay is up (roll it), reach gates refuse
+// mid-range melee (advance), and death resolves on a MICROTASK — a
+// synchronous loop starves it and "finds" a zombie at 0 HP that no device
+// can ever see (yield after every action, like every real tap does).
+//
+// Balance observation for the owner's logs, reported not tuned: at level
+// one, attack-only loses a 2v1 in 2-7 swings on every seed tried, and even
+// with dodge and flee the seeded run ends dead to a 1v1 Mud Spider. The
+// verbs the game hands you for this (flee, talk-down, stealth) are the
+// answer by design; whether the wilderness should be this sharp on hour one
+// is the owner's call, with this digest as the data.
+// DISPLAY_VERSION 4.29.4. 6 + 8 assertions.
+export const OTA_BUILD_ID = '2026-08-03-1093-tutorial-and-combat-walks';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1092-playtest-honest-walk';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1091-playtest-phases-0-5';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1090-arbiter-persona';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1089-pressure-difficulty';
