@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.8';
+export const DISPLAY_VERSION = '4.29.9';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19531,7 +19531,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // tier names and their plain subtitles. The character sheet's HOW MUCH IT
 // TAKES section is untouched — there the player already knows the system.
 // DISPLAY_VERSION 4.29.8.
-export const OTA_BUILD_ID = '2026-08-03-1074-difficulty-step-title';
+//
+// OTA-1075 — TUTORIAL PACING, THE DOG CARD'S DOUBLE QUESTION, AND THE
+// KEYBOARD THAT WOULDN'T COME UP. Twin of HAL OTA-1098; all four from the
+// owner's device run.
+//
+// (1) "Way too much text for the salvage button" — the scrap beat stacked a
+// two-sentence world line + reward + an Arbiter quip + the next beat's long
+// climb instruction. Now: one world sentence, the reward, on. The quip is
+// gone and the climb instruction is half its length.
+// (2) "He's still talking well into me already exploring" — the EXPLORE
+// choice's send-off was three sentences of narration into free roam. Now one:
+// "Take your time. Tap EXIT when you're ready."
+// (3) The dog rescue's second purple line ended on the Arbiter asking "What
+// kind of dog is that?" — the POPUP asks exactly that next, and a player who
+// starts typing an answer into the feed gets cut off by the card. Line
+// removed (both the rescue and puppy-vendor paths); the victory beat sets the
+// scene, the card asks the question. Dwell 4000 → 3200ms ("just a hair").
+// (4) At the rope beat the tapped input row raised no keyboard until a second
+// try — Android intermittently drops the tap→focus→keyboard chain, worst
+// while the JS-driven tutorial pulse is saturating the thread. An explicit
+// focus() on press-in is a no-op when the chain worked and the retry when
+// it did not.
+// DISPLAY_VERSION 4.29.9.
+export const OTA_BUILD_ID = '2026-08-03-1075-tutorial-pacing-dog-card-keyboard';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1074-difficulty-step-title';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1073-all-popups-house-palette';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1072-fork-overlay-house-palette';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1070-tutorial-and-combat-walks';

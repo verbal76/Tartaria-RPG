@@ -163,7 +163,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Climb',
     body: 'There\'s something here worth getting on top of. Tap CLIMB and pick what to scale — your rope makes it possible.',
     arbiter:
-      '"Now the rope earns its keep. Tap CLIMB. You go up in stages, each pull burns stamina, and empty means a fall. Top out, then climb back down."',
+      '"Now the rope earns its keep. Tap CLIMB — top out, then climb back down."',
   },
   {
     id: 'investigate',

@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1097`**,
-**golem-line `2026-08-03-1074`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1098`**,
+**golem-line `2026-08-03-1075`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,17 +923,36 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.8**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.9**; ledger in `VERSION.md`.
 
-- **THE DIFFICULTY STEP SAYS THE WORD DIFFICULTY (2026-08-03, latest). BOTH
-  LINES.** HAL OTA-1074 / golem OTA-1051. The creation step's header
+- **TUTORIAL PACING, DOG CARD, KEYBOARD (2026-08-03, latest). BOTH LINES.**
+  HAL OTA-1098 / golem OTA-1075, all from the owner's device run. Salvage
+  beat trimmed to one world sentence + reward; EXPLORE send-off is one line;
+  the dog rescue no longer asks "What kind of dog is that?" in the feed (the
+  popup asks it next — players were typing when the card hit), dwell
+  4000→3200ms; rope-beat keyboard fixed with an explicit focus() on press-in
+  (Android drops the tap→focus→keyboard chain under the tutorial pulse).
+
+  ### ⚠ NEXT UP — OWNER DESIGN DECISION, VERBATIM (talk UI rework)
+  From the owner's first live TALK interaction (Tarek, business topic — the
+  popup stayed covering the screen): *"I think the popup should be at the
+  bottom of the screen like the dice rolls and just have a list of things to
+  ask, and then you close when you want to be done talking. I think all
+  talking should be like this."* So: TalkModal becomes a BOTTOM SHEET (dice-
+  roller pattern) — topic list only, responses land in the FEED where they
+  can be read, sheet stays up across multiple asks, closes via a STOP
+  TALKING button. Applies to ALL talk surfaces (vendor topics, wanderers,
+  escorts, guardians). Not yet built — next session's first task.
+
+- **THE DIFFICULTY STEP SAYS THE WORD DIFFICULTY (2026-08-03). BOTH
+  LINES.** HAL OTA-1097 / golem OTA-1074. The creation step's header
   'HOW MUCH DOES IT TAKE?' → **'CHOOSE YOUR DIFFICULTY'** at the owner's
   direction — evocative flavor failed as signage on a permanent,
   never-raisable choice. Matches the sibling steps' pattern; the flavor
   stays in the four first-person tier names. Sheet section untouched.
 
 - **EVERY POPUP ON THE HOUSE PALETTE (2026-08-03). BOTH LINES.**
-  HAL OTA-1073 / golem OTA-1050. Owner: *"make all of the pop ups fit the
+  HAL OTA-1096 / golem OTA-1073. Owner: *"make all of the pop ups fit the
   same color palette, and design style for the same look."* The audit across
   all 33 popups found eight with orphans: seven were TOKEN DRIFT (near-miss
   shades one or two digits off real tokens — snapped to the real ones,
@@ -946,7 +965,7 @@ re-architecture. Currently **4.29.8**; ledger in `VERSION.md`.
   StatsPanel, etc.) are persistent HUD with purpose-coded colors, not popups.
 
 - **THE FORK OVERLAY JOINS THE HOUSE PALETTE (2026-08-03). BOTH
-  LINES.** HAL OTA-1072 / golem OTA-1049. The owner's style audit of the
+  LINES.** HAL OTA-1095 / golem OTA-1072. The owner's style audit of the
   Phase 3-5 surfaces: creation pressure step, both character-sheet sections
   and the ending blocks all reuse existing styles or pre-existing tokens —
   clean. `StoryForkOverlay` was the exception: nine colors appearing nowhere
@@ -955,7 +974,7 @@ re-architecture. Currently **4.29.8**; ledger in `VERSION.md`.
   now shared with 4-50 other files; layout and the no-dismiss rule untouched.
 
 - **THE TUTORIAL WALK AND THE COMBAT WALK (2026-08-03). BOTH LINES.**
-  HAL OTA-1070 / golem OTA-1047. The audit's two named coverage edges, closed
+  HAL OTA-1093 / golem OTA-1070. The audit's two named coverage edges, closed
   at the owner's direction. `playtestTutorialWalk` plays onboarding by typing
   what the Arbiter asks, beat by beat, and asserts the tutorial ENDS, every
   beat visits in order, and the lockdown restates the ask on an off-script
@@ -976,7 +995,7 @@ re-architecture. Currently **4.29.8**; ledger in `VERSION.md`.
   the walk now plays it via one inert-on-HAL input entry. 14 assertions.
 
 - **THE PLAYTEST WALKS THE REAL STORY (2026-08-03). BOTH LINES.**
-  HAL OTA-1069 / golem OTA-1046. Owner, shown the honest-walk experiment
+  HAL OTA-1092 / golem OTA-1069. Owner, shown the honest-walk experiment
   before any code shipped: *"actual events trigger storyline is the way to
   go."* OTA-1068's harness granted Cores by writing `coresRecovered` straight
   into the save — a character no real player can be (nine Cores, story still
@@ -998,7 +1017,7 @@ re-architecture. Currently **4.29.8**; ledger in `VERSION.md`.
   low-conduct run. 20 assertions.
 
 - **ACTIVE PLAYTEST OF PHASES 0-5 (2026-08-03). BOTH LINES.**
-  HAL OTA-1068 / golem OTA-1045. `__tests__/playtestPhases0to5.test.ts` (new).
+  HAL OTA-1091 / golem OTA-1068. `__tests__/playtestPhases0to5.test.ts` (new).
   Owner: *"lets do active play testing on phases 0-5."*
 
   The harness does not test a unit. It **plays**: starts a character, seeds
@@ -1036,7 +1055,7 @@ re-architecture. Currently **4.29.8**; ledger in `VERSION.md`.
   tests; 627 suites / 5,278 green.
 
 - **PHASE 5 — THE ARBITER BECOMES SOMEONE (2026-08-03). BOTH LINES.**
-  HAL OTA-1067 / golem OTA-1044. `app/engine/arbiterPersona.ts` (new),
+  HAL OTA-1090 / golem OTA-1067. `app/engine/arbiterPersona.ts` (new),
   `app/data/lore/arbiter-persona.json` (new). The plan's brief, verbatim:
   *"memory of what you've done, an opinion that shifts with your choices, and
   an arc across the nine Cores. It has more screen time than any character in
