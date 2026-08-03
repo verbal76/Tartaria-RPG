@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.90';
+export const DISPLAY_VERSION = '4.28.91';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19872,7 +19872,48 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sits at the TOP of resolveEnemyDefeat, so none of the corpse machinery runs:
 // no loot roll, no defeatedEnemies row, no kill milestone.
 // DISPLAY_VERSION 4.28.90. 10 tests.
-export const OTA_BUILD_ID = '2026-08-03-1079-vendors-do-not-die';
+// OTA-1080 — THE REST OF THE CAST GOES ON THE LEDGER.
+//
+// Phase 1 built a per-person relationship ledger and then wired it to vendors
+// and Core Guardians only, which left the two populations the player actually
+// TALKS to invisible to it.
+//
+// WANDERERS. Persuadable travellers on the road: talk to them, talk a location
+// lead out of them, or put a hand on them and take their coins. None of it was
+// remembered by anybody. And makeWanderer mints
+// `wanderer_<archetype>_<tile seed>`, so even once they were on the ledger the
+// same person met on two tiles would have been two rows -- the OTA-1076
+// roadside leak waiting to happen again in a system that had never been keyed
+// at all. Archetype + name IS the person: the cast is ARCHETYPES x FIRST_NAMES
+// and both come off the seed.
+// ⚠ AND EXTORTION WAS THE ONE FREE ROBBERY IN THE GAME. Lifting an item off a
+// vendor's counter has cost a `wrongs` since OTA-1072; shaking down a traveller
+// cost nothing personal at all. It does now -- and, like every other wrong, it
+// is payable off through OTA-1076's amends rather than being permanent.
+// A returning traveller also gets the greeting layer, so meeting somebody twice
+// on the road reads as meeting somebody.
+//
+// ESCORTS were worse: there was nobody to put on the ledger. An escort is a
+// POOL -- label, hp, count -- with no individuals in it, so you could walk
+// three people across the flats, lose one, and the survivors had no more
+// identity than a stack of rations. spawnEscortPool now names whoever walks at
+// the front, drawn deterministically from the party's own shape so a save
+// reload cannot reshuffle who you are travelling with. They go on the ledger
+// when you take the contract, and getting them home is recorded against them --
+// so the second time you walk with the same leader, you are not a stranger.
+// leaderName is OPTIONAL on EscortPool: saves written before this OTA load
+// without one and simply have no leader.
+// ⚠ NOT RECORDED: a WIPED party. There is nobody left to remember it, and
+// inventing a row for the dead is the same mistake as inventing an identity for
+// an archetype. A failed escort already costs the contract and the pay.
+//
+// The ledger itself needed no extending -- only pointing at the rest of the
+// cast. vendorLedgerId is renamed npcLedgerId to stop the name lying about its
+// scope (it has covered roadside, market and overlay ids for three OTAs); the
+// old name stays as an alias.
+// DISPLAY_VERSION 4.28.91. 13 tests.
+export const OTA_BUILD_ID = '2026-08-03-1080-wanderer-escort-ledger';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1079-vendors-do-not-die';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1078-ledger-holes-and-noise-floor';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1077-raid-news-reaches-the-people';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1076-ledger-identity-amends-prices';

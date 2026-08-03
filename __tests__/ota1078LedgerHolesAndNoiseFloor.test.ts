@@ -180,9 +180,12 @@ describe('OTA-1078 — every vendor install records the meeting', () => {
     // are the Core Guardian spawns, so adding a fourth vendor write while
     // dropping a Guardian site left it green. Count what the name claims.
     expect(SRC).not.toMatch(/worldMemory: rememberNpcMeeting\(s\.worldMemory, npcRecord/);
-    const inSightVendor = SRC.slice(SRC.indexOf('function sightVendor('), SRC.indexOf('function emitVendorGreeting('));
+    // OTA-1080 — the slice ends at sightPerson, which now sits between the two.
+    const inSightVendor = SRC.slice(SRC.indexOf('function sightVendor('), SRC.indexOf('function sightPerson('));
     expect((inSightVendor.match(/rememberNpcMeeting\(/g) ?? []).length).toBe(1);
-    expect((SRC.match(/rememberNpcMeeting\(/g) ?? []).length).toBe(3); // + 2 Guardians
+    // OTA-1080 — 4: sightVendor, sightPerson (wanderers + escort leaders), and
+    // the two Core Guardian spawns.
+    expect((SRC.match(/rememberNpcMeeting\(/g) ?? []).length).toBe(4);
   });
 
   it('THE DEAD GUARD IS GONE — no per-site same-vendor check survives', () => {

@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1079`**,
-**golem-line `2026-08-03-1056`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1080`**,
+**golem-line `2026-08-03-1057`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,47 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.90**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.91**; ledger in `VERSION.md`.
 
-- **VENDORS DO NOT DIE (2026-08-03, latest). BOTH LINES.**
+- **WANDERER + ESCORT LEDGER COVERAGE (2026-08-03, latest). BOTH LINES.**
+  Phase 1 built a per-person relationship ledger and then wired it to vendors
+  and Core Guardians only — which left the two populations the player actually
+  **talks to** invisible to it.
+  **Wanderers.** Persuadable travellers on the road: talk to them, talk a
+  location lead out of them, or put a hand on them and take their coins. None of
+  it was remembered by anybody. And `makeWanderer` mints
+  `wanderer_<archetype>_<tile seed>`, so even once they were on the ledger the
+  same person met on two tiles would have been two rows — the OTA-1076 roadside
+  leak waiting to happen again in a system that had never been keyed at all.
+  Archetype + name is the person. A returning traveller now gets the greeting
+  layer, so meeting somebody twice on the road reads as meeting somebody.
+  ⚠ **And extortion was the one free robbery in the game.** Lifting an item off
+  a vendor's counter has cost a `wrongs` since OTA-1072; shaking down a
+  traveller cost nothing personal at all. It does now — and like every other
+  wrong it is payable off through OTA-1076's amends rather than permanent.
+  **Escorts** were worse: there was nobody to put on the ledger. An escort is a
+  **pool** — label, hp, count — with no individuals in it, so you could walk
+  three people across the flats, lose one, and the survivors had no more
+  identity than a stack of rations. `spawnEscortPool` now names whoever walks at
+  the front, drawn deterministically from the party's own shape so a save reload
+  cannot reshuffle who you are travelling with. They go on the ledger when you
+  take the contract, and getting them home is recorded against them — so the
+  second time you walk with the same leader, you are not a stranger.
+  `leaderName` is optional on `EscortPool`, so pre-1080 saves load without one.
+  ⚠ **Not recorded: a wiped party.** There is nobody left to remember it, and
+  inventing a row for the dead is the same mistake as inventing an identity for
+  an archetype. A failed escort already costs the contract and the pay.
+  The ledger needed no extending — only pointing at the rest of the cast.
+  `vendorLedgerId` is renamed `npcLedgerId` to stop the name lying about its
+  scope (it has covered roadside, market and overlay ids for three OTAs); the
+  old name stays as an alias so nothing churns.
+  Files: `npcMemory.ts` (`npcLedgerId` + wanderer/escort branches),
+  `wanderers.ts` (unchanged — the id already carried what was needed),
+  `escort.ts` (`escortLeaderName`, `leaderName` on the pool), `types.ts`,
+  `gameStore.ts` (`sightPerson`, wanderer sighting + greeting, parley outcomes,
+  escort accept ×2 and delivery), `ota1080WandererEscortLedger.test.ts` (13).
+
+- **VENDORS DO NOT DIE (2026-08-03). BOTH LINES.**
   Owner's design call, and it closes the **last open item of Phase 1**.
   The death half was never designed. It fell out of the caught-theft path
   converting the vendor into an ordinary `Enemy`, which then flowed into the
