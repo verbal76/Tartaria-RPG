@@ -390,6 +390,19 @@ a push to one reaches the others. Watch for per-line divergence:
   `metro.config.js` on the `web` target.
 Typecheck + run the relevant suite in **each** worktree before pushing it.
 
+### ⚠ OPEN DEBT — golem tutorial walk (2026-08-03)
+
+HAL's `playtestTutorialWalk` (OTA-1093) does NOT yet run on golem-line: the
+ported copy stalls after the `name` beat even though the name beat itself
+advances when probed in isolation. Something in golem's onboarding flow —
+the story-arc-era crawl/chapter plumbing golem pioneered — diverges from
+HAL's in a way the walk exposes and unit suites do not. That is precisely
+the kind of finding the walk exists to make. NEXT SESSION: port the walk,
+probe beat-by-beat where golem's flow forks, and either fix the divergence
+or document it as intended. Until then the parity verifier will flag the
+missing file on every port — deliberately. The combat walk and the climb
+grammar fix DID port clean (parity OK).
+
 ### ⚠ THE PORT IS NOT DONE UNTIL THE VERIFIER SAYS SO (2026-08-03 audit)
 
 Run after EVERY cross-line port, before pushing:

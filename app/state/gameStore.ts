@@ -16645,11 +16645,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const tgtLow = tgt.toLowerCase();
           const tgtIsRope = /\b(rope|line|chain|cable|cord)\b/.test(tgtLow);
           const rope = hasReclaimersRope ? "Reclaimer's Rope" : 'climbing rope';
+          // OTA-1070 — the tutorial walk caught "around the the surface in
+          // front of you": some climbable nouns already carry their article.
+          // Strip ours when the noun brings its own.
+          const tgtArt = /^(the|a|an)\s/i.test(tgt) ? tgt : `the ${tgt}`;
           get().appendLog(
             'world',
             tgtIsRope
-              ? `You haul up the ${tgt} hand over hand. Tier ${currentTier}/${totalTiers} cleared.`
-              : `You loop your ${rope} around the ${tgt} and walk the line. Tier ${currentTier}/${totalTiers} cleared.`,
+              ? `You haul up ${tgtArt} hand over hand. Tier ${currentTier}/${totalTiers} cleared.`
+              : `You loop your ${rope} around ${tgtArt} and walk the line. Tier ${currentTier}/${totalTiers} cleared.`,
           );
           tierCleared = true;
         }
