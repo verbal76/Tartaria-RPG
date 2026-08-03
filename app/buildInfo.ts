@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.99';
+export const DISPLAY_VERSION = '4.29.0';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19226,7 +19226,65 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fork can be answered once, ever — which is the opposite of the two
 // repeatable acts OTA-1064 had to meter.
 // DISPLAY_VERSION 4.28.99. 25 tests.
-export const OTA_BUILD_ID = '2026-08-03-1065-story-forks';
+// OTA-1066 — PHASE 4: LET THE DEBT COME DUE, BEHIND A DIFFICULTY TOGGLE.
+//
+// The plan: "the ledger actually calls. Corruption, standing and elapsed time
+// produce consequences you can feel. You have every substrate already —
+// hoursElapsed, weather, corruption, faction standing — none of it currently
+// threatens anything." And, in the same breath, the line that decided the
+// SHAPE of this OTA: "⚠ HIGHEST RISK OF MAKING THE GAME WORSE. Overtuned
+// pressure in a game with no fail-forward is punishing. Ship it behind a
+// difficulty toggle and tune from logs."
+//
+// ── THE TOGGLE (owner's call on both) ─────────────────────────────────────
+// Four tiers, Doom-shaped, first person — the player's own answer rather than
+// a label on a slider, picked on a NEW FOURTH STEP of character creation that
+// sits after "why did you come down?":
+//   "I only came for the salvage."  — time costs nothing, grudges stay cold.
+//   "I know what I owe."            — the intended run. DEFAULT.
+//   "Let it come."                  — supplies thin, the wronged find you.
+//   "Bury me with them."            — everything it is owed.
+// Every tier carries a subtitle saying plainly what changes; a difficulty name
+// that sounds good and explains nothing is a trap on a screen you cannot
+// revisit. ⚠ LOWERABLE MID-RUN AND NEVER RAISABLE (canChangeTo) — you can
+// always ask the buried country for less, and nobody finishes on "Bury me
+// with them" a run they spent on "salvage". The character sheet is where it
+// lives afterwards: higher tiers render as dimmed text rather than buttons, so
+// the rule is visible instead of enforced by a refusal.
+//
+// ── ⚠ WHY EVERY NUMBER IN THE GAME IS NOT ON A DIAL ───────────────────────
+// Corruption and weather ALREADY bite — stat penalties, price markup, extra
+// encounters, reposition cost, attack penalty, HP and corruption ticks. Those
+// are shipped, played and balanced. Re-scaling them from a difficulty tier
+// would put a multiplier on top of a year of tuning and quietly invalidate all
+// of it. So Phase 4 turns the two substrates that genuinely threaten NOTHING
+// into pressure, and only increases the RATE at which the other two
+// accumulate:
+//   TIDE     (time)       — scarcity. +4% vendor prices per stage, one stage
+//                           per ~4 in-game days × dial, HARD CAP at 6 stages
+//                           (+24% and it stops). 1.0 for the whole of tier 1.
+//   HOSTILE  (standing)   — at standing ≤ -25 a faction starts FINDING you.
+//                           A gate on an interception that was already going
+//                           to happen, not a new spawner. Capped at 22%, and
+//                           a bounty you took on purpose is exempt.
+//   CREEP    (corruption) — weather notches corruption in faster. Not what
+//                           corruption DOES once you have it.
+//   EXPOSURE (weather)    — a storm takes a heavier bite. Same rule.
+// Sits AFTER the title perks and BEFORE the race immunity at the weather choke
+// point, so earned mitigations still work and a Sentinel is still immune.
+//
+// LEGIBILITY IS HALF THE FEATURE. The quieter way this phase fails is pressure
+// the player cannot see: prices creep over forty hours, nothing says why, the
+// game just feels worse for no nameable reason. So every tide stage crossing
+// gets an authored line, once, tracked by player.tideStageSeen.
+//
+// Every save older than this reads as 'owed' — the game exactly as it has
+// always played, plus the two new systems at their gentlest — and anyone who
+// finds that too much drops a tier without abandoning the character. That
+// escape hatch is what makes an honest default safe.
+// DISPLAY_VERSION 4.29.0. 27 tests.
+export const OTA_BUILD_ID = '2026-08-03-1066-pressure-difficulty';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1065-story-forks';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1064-talk-doors-and-audit';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1063-flourish';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1062-non-vendor-cast';

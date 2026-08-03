@@ -186,7 +186,11 @@ describe('OTA-1018 — SOURCE LOCKS (category: the story reaches the screen)', (
 
   it("creation has the motive step and passes the pick to startNewGame", () => {
     expect(createSrc).toMatch(/'race', 'faction', 'motive'/);
-    expect(createSrc).toMatch(/motiveId\s*\}\);/);
+    // OTA-1066 — the motive is still passed; it is simply no longer the LAST
+    // argument, because a fourth creation step (difficulty) now follows it.
+    // Asserting on the trailing brace was asserting on the step ORDER, which
+    // is a different claim than the one this test's name makes.
+    expect(createSrc).toMatch(/startNewGame\(\{[^}]*motiveId/);
   });
 
   it('the CharacterScreen header offers REPLAY OPENING (OTA-1023 — moved off About, whose only real entry path has no live player)', () => {

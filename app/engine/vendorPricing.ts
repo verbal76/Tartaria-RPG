@@ -27,6 +27,11 @@ export interface BuyPriceParts {
   tideMult: number;
   /** Local war-heat buy multiplier (≥1). */
   warBuyMult: number;
+  /** ⚠ OTA-1066 — PHASE 4 TIDE. Scarcity that comes with elapsed time, scaled
+   *  by the character's difficulty tier (engine/pressure.ts tidePriceMultiplier).
+   *  Optional so every existing caller keeps its exact behaviour; absent and
+   *  the whole of the 'salvage' tier both mean 1.0, i.e. today's economy. */
+  pressureTideMult?: number;
   /** OTA-1053 — how THIS person regards you (npcMemory.regardPriceMult).
    *  Optional so every existing caller keeps its exact behaviour; absent means
    *  1, i.e. the price is unaffected by the relationship. Bounded ±10% for
@@ -38,7 +43,8 @@ export interface BuyPriceParts {
 /** The price the player actually pays for one unit (integer, floored at 1). */
 export function finalBuyPrice(base: number, p: BuyPriceParts): number {
   return Math.max(1, Math.ceil(
-    base * p.corruptionMult * (1 - p.buyDiscount) * p.tideMult * p.warBuyMult * (p.regardMult ?? 1),
+    base * p.corruptionMult * (1 - p.buyDiscount) * p.tideMult * p.warBuyMult * (p.regardMult ?? 1)
+    * (p.pressureTideMult ?? 1),
   ));
 }
 
@@ -49,7 +55,9 @@ export function finalBuyPrice(base: number, p: BuyPriceParts): number {
  *  a stranger has no regard, so the existing "you saved N TC" line now reports
  *  what the RELATIONSHIP was worth as well as the charm. */
 export function strangerBuyPrice(base: number, p: BuyPriceParts): number {
-  return Math.max(1, Math.ceil(base * p.corruptionMult * p.tideMult * p.warBuyMult));
+  // The Phase 4 tide is scarcity, not charm — a stranger pays it too, so it
+  // belongs on this side of the 'what your standing saved you' line.
+  return Math.max(1, Math.ceil(base * p.corruptionMult * p.tideMult * p.warBuyMult * (p.pressureTideMult ?? 1)));
 }
 
 /** Price direction vs. the catalogue base, for the ▲/▼ ticker next to a price.
