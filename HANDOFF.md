@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1102`**,
-**golem-line `2026-08-03-1079`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1103`**,
+**golem-line `2026-08-03-1080`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,9 +923,18 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.13**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.14**; ledger in `VERSION.md`.
 
-- **THE TALK GLOW + THE POCKETS AUDIT (2026-08-03, latest). BOTH LINES.**
+- **PICKPOCKET GLOWS GREEN WHEN POSSIBLE (2026-08-03, latest). BOTH
+  LINES.** HAL OTA-1103 / golem OTA-1080. Owner: *"let's have pickpocket
+  green when it's a possibility as well."* The quick-row PICKPOCKET button
+  lights the torch's ready-green (#9ec96a) whenever a mark (vendor or
+  wanderer) is in reach — one visual language with the TALK glow: green
+  means live right now. Also fixed the stale block condition (vendor OR
+  ambient nouns, a pre-pocket-loot leftover from when pickpocket lifted
+  objects): block + glow both key on vendor/wanderer presence now.
+
+- **THE TALK GLOW + THE POCKETS AUDIT (2026-08-03). BOTH LINES.**
   HAL OTA-1102 / golem OTA-1079. Owner: *"make the talk button glow green
   if there are unspoken lines of dialogue"* — new `hasUnspokenTalk` store
   query drives the vendor chip's TALK button: house green (#9ec96a) while
