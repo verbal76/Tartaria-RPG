@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1078`**,
-**golem-line `2026-08-02-1055`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1079`**,
+**golem-line `2026-08-03-1056`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,42 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.89**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.90**; ledger in `VERSION.md`.
 
-- **LEDGER HOLES + NOISE FLOOR (2026-08-02, latest). BOTH LINES.**
+- **VENDORS DO NOT DIE (2026-08-03, latest). BOTH LINES.**
+  Owner's design call, and it closes the **last open item of Phase 1**.
+  The death half was never designed. It fell out of the caught-theft path
+  converting the vendor into an ordinary `Enemy`, which then flowed into the
+  generic defeat routine like any wasteland raider. Two things were wrong with
+  that. **It breaks the game quietly:** a killed armourer is the turn-in point
+  for every contract chain that ends at their counter, and there is no dead-NPC
+  list anywhere in the code — so the "death" was really a scene wipe that the
+  next scene regeneration undid. Nobody decided that; it happened. **And it paid
+  better than the mechanic it competes with:** `buildTraderEnemy`'s loot pool is
+  the vendor's own first two offers, so *steal → get caught → win the fight* beat
+  stealing, on a target still standing there for a second round.
+  So: you win the fight or you lose it, and either way they are alive after. A
+  successful **theft** still hands you the goods — that is what the steal roll is
+  for. A **beating** hands you nothing:
+  they keep hold of the pack; where there are other traders and guards you are
+  walked out (and `exitBuilding` actually fires, so the prose and the state
+  agree — you cannot re-open the stall tab and start again); on the open road
+  there is nobody to raise a hand, so the trader gets their stock away and goes.
+  It costs **−12 standing**, taken here where the kill used to take it, and a
+  **`wrongs` on their personal ledger** — so it shows in the Chronicle, drops
+  them to `wronged`, and prices everything they sell you at +25% until you have
+  made it good. That last part is deliberate: OTA-1076's amends (600 TC per
+  wrong) give a road back, which is why this lands on the ledger rather than
+  being permanent.
+  The person is carried through the fight on `CurrentScene.vendorInFight` —
+  OTA-1078's review found the conversion threw them away entirely, so there was
+  nothing to restore and nothing to write the consequence against. The intercept
+  sits at the **top** of `resolveEnemyDefeat`, so none of the corpse machinery
+  runs: no loot roll, no `defeatedEnemies` row, no kill milestone.
+  Files: `gameStore.ts` (`vendorInFight`, `resolveVendorSubmission`, the
+  intercept), `ota1079VendorsDoNotDie.test.ts` (10).
+
+- **LEDGER HOLES + NOISE FLOOR (2026-08-02). BOTH LINES.**
   Six defects the OTA-1077 review turned up, five of them mine from the Phase
   0/1 run. One OTA because they share a root: the ledger and the noise floor
   were both wired by following the code that already existed rather than the
