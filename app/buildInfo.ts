@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.10';
+export const DISPLAY_VERSION = '4.29.11';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20655,7 +20655,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // action can ever run under a half-open conversation. Silent (LLM-internal)
 // submissions don't count as walking away.
 // DISPLAY_VERSION 4.29.10.
-export const OTA_BUILD_ID = '2026-08-03-1099-talk-bottom-sheet';
+//
+// OTA-1100 — PICKPOCKET JOINS THE BOTTOM SLOT.
+//
+// Owner, first pickpocket attempt on device (found Tarek): "it did a popup —
+// can we have it do a bottom cover as well when we pick the item?" Same
+// verdict as the talk rework, same fix: PickpocketModal is gone, and
+// PickpocketSheet renders in the DiceRoller's controls slot — choose the
+// mark at the bottom while the feed stays readable, because the Stealth
+// roll line and the outcome land THERE, right where you're already looking.
+// Same targets as before (vendor goods as green chips, ambient nouns when
+// there's no vendor, or type it), LIFT / CANCEL, house tokens throughout.
+// Picking a target attempts the lift and closes the sheet — it is a
+// one-shot action, not a conversation, so it does not persist the way the
+// talk sheet does.
+//
+// The owner also asked whether the check should roll Stealth + DEX or just
+// Stealth. Decision: JUST STEALTH, unchanged. Stealth is its own trained
+// stat here (rolled per race at creation, trained through use, day/night
+// modifier), deliberately split from DEX back in OTA-348 — stacking DEX on
+// top would double-count against the same DC 10 and make lifts nearly
+// automatic. DEX keeps its own kingdom (dodge, initiative, ranged).
+// DISPLAY_VERSION 4.29.11.
+export const OTA_BUILD_ID = '2026-08-03-1100-pickpocket-bottom-sheet';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1099-talk-bottom-sheet';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1098-tutorial-pacing-dog-card-keyboard';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1097-difficulty-step-title';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1096-all-popups-house-palette';
