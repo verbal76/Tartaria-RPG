@@ -849,8 +849,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1082`**,
-**golem-line `2026-08-03-1059`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1083`**,
+**golem-line `2026-08-03-1060`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -859,9 +859,45 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.93**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.94**; ledger in `VERSION.md`.
 
-- **PHASE 2 — FULL CAST, FIFTH GATE, WAY IN (2026-08-03, latest). BOTH LINES.**
+- **GIFTING (2026-08-03, latest). BOTH LINES.**
+  Type `gift`, pick an item, pick a person. They take it, react in character,
+  and **remember the object** — `NpcRelation.gifts` stores names, not a score.
+  A gift that only moved a warmth number would be a second currency; the memory
+  of the thing is what makes it a relationship.
+  ⚠ **This verb was deleted once, on purpose, and that decided the design.**
+  OTA-803's note is still in `parser.ts`: *"Faction standing is earned through
+  mission completions + sigil/pendant turn-ins, not by handing vendors loot; the
+  gift-for-rep side door undercut that."* Restoring the verb without closing
+  that door restores the bug — and a per-person cap is **not enough**, because
+  several vendors share a faction (four boons each across five members is eighty
+  standing through the side door). So faction standing from gifts is metered
+  against a **lifetime, global per-faction budget** (`GIFT_STANDING_FACTION_CAP`
+  = 10, roughly one mission's worth). What gifts really buy is the **personal**
+  relationship — one ledger row, that person's discount via OTA-1053's
+  `regardPriceMult`, and the memory — which cannot cascade to anybody else.
+  **Insults are not capped**: a metered penalty would let a player be rude for
+  free once the positive budget was spent.
+  Three more exploits closed. **Gift-farm:** repeat gifts of the same item name
+  decay to nothing — the second identical present is not a surprise.
+  **Trash-flood:** anything under `GIFT_FLOOR_TC` (12) is **refused** and stays
+  in the pack; accepting junk would let a player empty a bag into somebody at a
+  cost of taps only. **Buy-back loop:** gifts are consumed and never re-enter
+  stock, and the per-person boon count is capped at 4.
+  Reaction is driven by **who they are**, not what it cost — value is a floor,
+  not the score. Irma wants metal and is unmoved by beads; Halem wants food and
+  curios; Tarek takes a mechanism apart before he has finished thanking you.
+  Nine authored preference sets plus a fallback, and something genuinely
+  valuable is welcome from anybody — a specialist who can only be given their
+  own trade reads as a lookup table rather than a person. Deterministic.
+  Files: `gifting.ts` (new), `gift_prefs.json` (new), `GiftModal.tsx` (new),
+  `gameStore.ts` (`pendingGift` / `openGift` / `chooseGiftRecipient` /
+  `giveGift` / `applyGiftStanding`), `types.ts` (`gifts`, `giftBoons`,
+  `giftStandingGranted`, restored `gift` Intent), `parser.ts` + `llmParser.ts`,
+  `ota1083Gifting.test.ts` (21).
+
+- **PHASE 2 — FULL CAST, FIFTH GATE, WAY IN (2026-08-03). BOTH LINES.**
   The three things the OTA-1058 slice left open.
   **(1) The whole cast.** 27 more named vendors authored — all 30 in
   `vendors.json` now have topics, **129 in total**. Everyone gets a shop-front

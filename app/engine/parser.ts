@@ -150,10 +150,19 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // pouch; `unpouch <item>` / `unstow <item>` takes it out.
   stow_pouch: ['stow', 'pouch', 'belt'],
   unpouch: ['unpouch', 'unstow', 'unbelt'],
-  // OTA-803 — the `gift` intent was removed (gifting deleted). Faction standing is
-  // earned through mission completions + sigil/pendant turn-ins, not by handing
-  // vendors loot; the gift-for-rep side door undercut that, so the whole verb +
-  // action is gone. Its verbs (give/offer/hand/…) now fall through to unknown.
+  // OTA-803 removed the `gift` intent: "Faction standing is earned through
+  // mission completions + sigil/pendant turn-ins, not by handing vendors loot;
+  // the gift-for-rep side door undercut that."
+  // ⚠ OTA-1060 RESTORES IT, and that note is the reason the restoration looks
+  // the way it does. Faction standing from gifts is now metered against a
+  // LIFETIME per-faction budget (GIFT_STANDING_FACTION_CAP, ~one mission's
+  // worth, across every member of that faction) so the side door cannot reopen.
+  // What gifts actually buy is the PERSONAL relationship — one ledger row, that
+  // person's discount, and the fact that they remember the object — which
+  // cannot cascade to anybody else.
+  // 'give' and 'offer' only; 'hand' and 'donate' stay out because "hand" collides
+  // with the body-part noun and the off-hand slot.
+  gift: ['gift', 'give', 'offer', 'present'],
   // 'pocket' removed — clashes with the noun "pockets" / "in his pocket"
   // and the inventory channel. 'grab' kept (genuine steal verb).
   steal: ['steal', 'pilfer', 'lift', 'pinch', 'swipe', 'snatch', 'filch', 'nick', 'grab'],

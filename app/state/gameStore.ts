@@ -38,6 +38,8 @@ import { npcRegard, regardPriceMult } from '../engine/npcMemory';
 // OTA-1054 — the offscreen war reaches the people who live in it.
 import { raidNewsFor, raidNewsLine, RAID_MEMORY_CAP } from '../engine/npcMemory';
 import type { OutpostRaid } from '../engine/types';
+// OTA-1060 — giving somebody something, and them remembering the object.
+import { resolveGift, giftMemoryLine, GIFT_STANDING_FACTION_CAP, type GiftItem } from '../engine/gifting';
 // OTA-1058 — Phase 2 slice: the topic-based talk exchange.
 import {
   hasTopicsFor, topicsFor, topicReply, alreadySaidLine, nothingToSayLine,
@@ -3512,6 +3514,42 @@ function sightVendor(
   if (greet) emitVendorGreeting(get, vendor);
 }
 
+/** OTA-1060 — a gift's standing effect, applied to the recipient's faction.
+ *  Factored out because the refused path needs it too and duplicating an
+ *  applyRepChange call is how the two drift. */
+function applyGiftStanding(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  npcId: string,
+  delta: number,
+): void {
+  const rel = getRelation(get().worldMemory, npcId);
+  const faction = rel?.factionId;
+  if (!faction) return;
+  // ⚠ THE DOOR OTA-803 CLOSED, KEPT CLOSED. See GIFT_STANDING_FACTION_CAP.
+  // Gains are metered against a LIFETIME per-faction budget; losses are not,
+  // because an insult should always land and a capped insult would let a player
+  // be rude for free once the budget was spent.
+  let applied = delta;
+  if (delta > 0) {
+    const spent = get().worldMemory.giftStandingGranted?.[faction] ?? 0;
+    applied = Math.max(0, Math.min(delta, GIFT_STANDING_FACTION_CAP - spent));
+    if (applied === 0) return; // budget exhausted — the gift still lands personally
+    set((st) => ({
+      worldMemory: {
+        ...st.worldMemory,
+        giftStandingGranted: { ...(st.worldMemory.giftStandingGranted ?? {}), [faction]: spent + applied },
+      },
+    }));
+  }
+  set((st) => {
+    if (!st.player) return {};
+    const r = applyRepChange(st.player.factionStanding, faction, applied);
+    return { player: { ...st.player, factionStanding: r.standing } };
+  });
+  get().appendLog('system', `Standing ${applied > 0 ? '+' : ''}${applied} — ${faction.replace(/_/g, ' ')}.`);
+}
+
 /** OTA-1058 — everything the topic gates need, gathered here so engine/dialogue
  *  stays free of store and save-shape knowledge. This is the first feature that
  *  reads the Phase 1 ledger for something the PLAYER chooses rather than
@@ -5002,6 +5040,24 @@ interface GameStore {
    *  conversation is open. Mirrors pendingParley deliberately — same modal
    *  shape, same self-mounting component, so the interaction is one the player
    *  has already learned. */
+  /** OTA-1060 — the open gift exchange: who can receive, and what you can offer.
+   *  Two steps in one modal rather than two screens — the person is almost
+   *  always the one you are standing in front of, so a mandatory person-picker
+   *  would be a tap of pure ceremony. It appears only when there IS a choice. */
+  pendingGift:
+    | {
+        candidates: { id: string; name: string }[];
+        /** Chosen recipient; null while the player is still picking one. */
+        toId: string | null;
+        toName: string | null;
+      }
+    | null;
+  /** Open the gift flow against whoever is present. */
+  openGift: () => void;
+  chooseGiftRecipient: (id: string) => void;
+  /** Hand it over. */
+  giveGift: (itemId: string) => void;
+  closeGift: () => void;
   pendingTalk:
     | {
         npcId: string;
@@ -5265,6 +5321,97 @@ export const useGameStore = create<GameStore>((set, get) => ({
   selectCallDogOption: (option, treatItemName) => {
     handleCallDogOption(get, set, option, treatItemName);
     set({ callDogModalOpen: false });
+    void get().persist();
+  },
+
+  // OTA-1060 — GIFTS. See engine/gifting.ts for the three exploits this shape
+  // exists to close (gift-farm, trash-flood, buy-back loop).
+  pendingGift: null,
+  closeGift: () => set({ pendingGift: null }),
+  openGift: () => {
+    const scene = get().currentScene;
+    if (!get().player) return;
+    if ((scene?.enemies?.length ?? 0) > 0) {
+      get().appendLog('system', 'Not mid-fight.');
+      return;
+    }
+    // Everyone present who is a PERSON on the ledger. A gift needs a recipient
+    // who can remember it, which is exactly the population OTA-1057 finished.
+    const candidates: { id: string; name: string }[] = [];
+    if (scene?.vendor) candidates.push({ id: vendorNpcId(scene.vendor), name: scene.vendor.name });
+    if (scene?.wanderer) candidates.push({ id: vendorNpcId(scene.wanderer), name: scene.wanderer.name });
+    if (candidates.length === 0) {
+      get().appendLog('system', 'There is nobody here to give anything to.');
+      return;
+    }
+    set({
+      pendingGift: {
+        candidates,
+        // One person present is not a choice; do not make the player confirm it.
+        toId: candidates.length === 1 ? candidates[0]!.id : null,
+        toName: candidates.length === 1 ? candidates[0]!.name : null,
+      },
+    });
+  },
+  chooseGiftRecipient: (id) => {
+    const g = get().pendingGift;
+    const who = g?.candidates.find((c) => c.id === id);
+    if (!g || !who) return;
+    set({ pendingGift: { ...g, toId: who.id, toName: who.name } });
+  },
+  giveGift: (itemId) => {
+    const g = get().pendingGift;
+    const player = get().player;
+    if (!g?.toId || !g.toName || !player) return;
+    const item = player.inventory.find((i) => i.id === itemId);
+    if (!item) return;
+    const rel = getRelation(get().worldMemory, g.toId);
+    const worth = sellPriceFor(item, get().currentScene?.vendor ?? null, 0);
+    const gi: GiftItem = { name: item.name, tags: item.tags ?? [], worth };
+    const out = resolveGift(g.toId, g.toName, gi, rel);
+
+    get().appendLog('world', out.line);
+
+    if (out.refused) {
+      // ⚠ The item is NOT consumed. Accepting worthless gifts would let a
+      // player empty a pack of junk into somebody at a cost of taps only.
+      if (out.standingDelta !== 0) applyGiftStanding(get, set, g.toId, out.standingDelta);
+      set({ pendingGift: null });
+      void get().persist();
+      return;
+    }
+
+    const hours = player.hoursElapsed ?? 0;
+    set((st) => {
+      if (!st.player) return {};
+      const inv = st.player.inventory
+        .map((i) => (i.id === itemId ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => i.quantity > 0);
+      const prev = getRelation(st.worldMemory, g.toId!);
+      const relations = st.worldMemory.npcRelations ?? {};
+      return {
+        player: { ...st.player, inventory: inv },
+        worldMemory: prev
+          ? {
+              ...st.worldMemory,
+              npcRelations: {
+                ...relations,
+                [g.toId!]: {
+                  ...prev,
+                  // THE CLAUSE THAT MATTERS: the object, by name.
+                  gifts: [...(prev.gifts ?? []), { name: item.name, atHours: hours }],
+                  giftBoons: (prev.giftBoons ?? 0) + (out.countsAsBoon ? 1 : 0),
+                  // A gift that lands counts as business done — it is what lifts
+                  // somebody off the 'met' rung without a purchase.
+                  trades: prev.trades + (out.countsAsBoon ? 1 : 0),
+                },
+              },
+            }
+          : st.worldMemory,
+      };
+    });
+    if (out.standingDelta !== 0) applyGiftStanding(get, set, g.toId, out.standingDelta);
+    set({ pendingGift: null });
     void get().persist();
   },
 
@@ -6481,6 +6628,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // arb119 — a fresh game must not inherit a stale open call-dog modal
       // (a transient UI flag that otherwise survives from a prior session).
       callDogModalOpen: false,
+      pendingGift: null, // OTA-1060 — and any half-finished gift
       pendingTalk: null, // OTA-1058 — and any stale conversation
       pendingParley: null, // OTA-808 — clear any stale parley on a fresh game
       // OTA-1018 — THE OPENING CRAWL. A brand-new character opens on the
@@ -17236,6 +17384,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // OTA-803 — the `gift` intent + giftToVendor were removed. Faction standing
       // is earned through mission completions + sigil/pendant turn-ins; gifting
       // vendors loot for rep undercut that design, so the mechanic is gone.
+      // OTA-1060 — GIFTS. Opens the picker rather than resolving inline: the
+      // player has to choose an object, and a parser guess at which object
+      // would be the worst possible place to be wrong.
+      case 'gift': {
+        get().openGift();
+        return;
+      }
       case 'steal': {
         const stealTarget = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
         // Vendor present → real theft attempt against their inventory.

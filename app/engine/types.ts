@@ -17,6 +17,10 @@ export type Intent =
   | 'ask'
   | 'craft'
   | 'equip'
+  /** OTA-1060 — RESTORED. Removed in OTA-803 because gift-for-rep undercut the
+   *  standing economy; see GIFT_STANDING_FACTION_CAP for how that door is kept
+   *  shut this time. */
+  | 'gift'
   | 'steal'
   | 'join'
   | 'dodge'
@@ -1772,6 +1776,10 @@ export interface WorldMemory {
    *  replaying a line as though neither of you remembers the last two minutes.
    *  Bounded by the authored topic count, so it cannot grow with play. */
   talkedTopics?: Record<string, number>;
+  /** OTA-1060 — LIFETIME standing each faction has been granted via gifts.
+   *  Metered against GIFT_STANDING_FACTION_CAP so the verb OTA-803 deleted
+   *  cannot come back as the side door it was deleted for. */
+  giftStandingGranted?: Record<string, number>;
   /** OTA-120 — dog acquisition state machine, lives on world memory
    *  so it survives across screens. ALL player input routes through
    *  the onboarding handler when this is non-null. Cleared on
@@ -1929,6 +1937,16 @@ export interface NpcRelation {
   /** How many wrongs have been paid off. Kept so the Chronicle can say a debt
    *  was settled rather than silently erasing that it ever happened. */
   amendsCleared?: number;
+  /** OTA-1060 — WHAT YOU GAVE THEM, by name. The owner's requirement in as many
+   *  words: they remember that you gave them that particular item. A warmth
+   *  number would not have been this; the object is the point. Bounded in
+   *  practice by GIFT_BOONS_PER_PERSON plus the repeat decay — there is no
+   *  reason to keep gifting past the cap, and nothing rewards it. */
+  gifts?: { name: string; atHours: number }[];
+  /** OTA-1060 — how many gifts have actually MOVED this relationship. Capped,
+   *  so warmth stays something you mostly earn by doing rather than shopping. */
+  giftBoons?: number;
+
 }
 
 /** OTA-1054 — an outpost assault the offscreen war sim actually carried out.

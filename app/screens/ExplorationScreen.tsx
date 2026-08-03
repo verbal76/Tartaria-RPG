@@ -43,6 +43,7 @@ import { FusionBlockedModal } from '../components/FusionBlockedModal';
 import { MissionCompleteModal } from '../components/MissionCompleteModal';
 import { ParleyModal } from '../components/ParleyModal';
 import { TalkModal } from '../components/TalkModal';
+import { GiftModal } from '../components/GiftModal';
 import { hasTopicsFor } from '../engine/dialogue';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
@@ -1616,6 +1617,8 @@ export function ExplorationScreen() {
       <ParleyModal />
       {/* OTA-1058 — Phase 2 slice: the topic exchange, self-mounting off pendingTalk. */}
       <TalkModal />
+      {/* OTA-1060 — the gift picker, self-mounting off pendingGift. */}
+      <GiftModal />
 
       {/* OTA-180 — FeedbackModal render removed alongside the 📝
           button. Component file kept for any future re-add. */}
