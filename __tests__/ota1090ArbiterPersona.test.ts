@@ -366,15 +366,31 @@ describe('OTA-1090 — the remark itself', () => {
     expect(seen.size).toBeGreaterThan(3);
   });
 
-  it('⚠ NO {slot} ever reaches the feed, across the whole matrix', () => {
+  it('⚠ NO {slot} ever reaches the feed, across the whole stance × tone matrix', () => {
+    // Regard is genuinely VARIED here rather than looped over and ignored — a
+    // test that names a dimension it does not exercise is the ota1041 problem,
+    // where the assertion checked argument ORDER while its name claimed
+    // something else. These three fixtures land in hard / plain / close.
     const memory = wm([rel({ id: 'npc:a', name: 'Ande', wrongs: 1, amendsCleared: 1, gifts: [{ name: 'x', atHours: 0 }] })]);
+    const tones = new Set<string>();
     for (let cores = 0; cores <= 9; cores++) {
-      for (const band of REGARD_ORDER) {
-        void band;
+      for (const shape of ['hated', 'neutral', 'loved'] as const) {
         const p = withCores(cores);
         p.corruption = 90;
         p.titleProgress = { relicsPreserved: 3 } as never;
         p.storyChoices = { debt_collector: 'pay_partial' };
+        if (shape === 'hated') {
+          p.menace = 400; p.corruption = 100;
+          p.factionStanding = [{ factionId: 'a', standing: -100 }] as never;
+          p.titleProgress = { relicsTraded: 20 } as never;
+          p.storyChoices = { debt_claim: 'sell_the_claim' };
+        }
+        if (shape === 'loved') {
+          p.corruption = 0; p.pressure = 'bury_me';
+          p.titleProgress = { loreRead: 99, relicsPreserved: 99 } as never;
+          p.factionStanding = [{ factionId: 'a', standing: 100 }] as never;
+        }
+        tones.add(toneFor(regardOf(p, memory)));
         for (let n = 0; n < 20; n++) {
           const line = arbiterRemark(p, memory, n);
           expect(line).not.toBeNull();
@@ -382,6 +398,8 @@ describe('OTA-1090 — the remark itself', () => {
         }
       }
     }
+    // ...and all three tones were actually reached, not just looped past.
+    expect([...tones].sort()).toEqual(['close', 'hard', 'plain']);
   });
 
   it('a negative or absurd counter is handled rather than crashing', () => {
