@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.6';
+export const DISPLAY_VERSION = '4.29.7';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19487,7 +19487,39 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // border, #f0e6cc/#e6d8b3/#a2977b text ranks): 4-50 other files each. Layout
 // and the no-dismiss solemnity untouched — a change of clothes, not bones.
 // DISPLAY_VERSION 4.29.6.
-export const OTA_BUILD_ID = '2026-08-03-1072-fork-overlay-house-palette';
+//
+// OTA-1073 — EVERY POPUP ON THE HOUSE PALETTE.
+//
+// Owner: "make all of the pop ups fit the same color palette, and design
+// style for the same look." The OTA-1072 audit method run across ALL 33
+// popups found eight carrying orphan colors, in two diseases:
+//
+// DRIFT (seven popups, 1-2 colors each) — near-misses of real tokens, a
+// painter mixing the house color from memory: SplashOverlay #0b0a09 was one
+// digit off the #0a0908 ground and #e6dcc2 off the parchment; FirstTimeHint
+// #d8cfc1 was literally one bit off #d8cfc0; TorchProbe and CraftRefusal
+// each carried their own almost-gold; FusionBlocked an almost-#cdbf99;
+// ClimbModal and TakeModal off-token dims. Every one snapped to its nearest
+// real token. Visually near-imperceptible; the point is that drift is how
+// the fork overlay's stranger-palette started, and now the count is zero.
+//
+// INVENTION (FusionPickerModal, 11 of 14 colors orphaned) — a full teal-
+// steel wardrobe existing nowhere else, hovering NEAR the game's real aether
+// blue-grey token without ever using it. Someone was reaching for an
+// "Aetheric ritual" identity; the identity stays, built from tokens the game
+// owns: #8aa0a4 (the aether accent) for borders/labels/selection, #9ec96a
+// house green for material text, #e6d8b3/#f0e6cc/#a2977b text ranks, and
+// the #17150f/#2a2620/#2a1f12 grounds with the #3a342c rule. The Crucible
+// still reads cool and ceremonial — from the same paintbox as everything.
+//
+// Result: all 33 popups audit at ZERO orphan colors. The eight files still
+// carrying unique values (AdventureFeed, EnemyPanel, InputBox, StatsPanel,
+// DiceRoller, LoreCodexBody, RecipesView, ColorWheel) are persistent HUD
+// surfaces, not popups, and their colors are purpose-coded (damage types,
+// feed channels) — a separate conversation if the owner wants it.
+// DISPLAY_VERSION 4.29.7.
+export const OTA_BUILD_ID = '2026-08-03-1073-all-popups-house-palette';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1072-fork-overlay-house-palette';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1070-tutorial-and-combat-walks';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1069-playtest-honest-walk';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1068-playtest-phases-0-5';

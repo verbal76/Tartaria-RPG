@@ -1,4 +1,4 @@
-// OTA-984 — Fusion picker. The Crucible used to consume the player's ENTIRE reserved
+// OTA-1007 — Fusion picker. The Crucible used to consume the player's ENTIRE reserved
 // (♥) pool on one item. Now firing it opens this picker: choose 3–5 of your reserved
 // pieces, optionally add a reserved faction catalyst (separate theme slot), pick
 // whether to forge a WEAPON or ARMOR, then fuse — spending only what you selected.
@@ -115,7 +115,7 @@ export function FusionPickerModal() {
   const visibleScraps = visibleFusionInputs(scraps, picked, isUpgrade ? UPGRADE_PICK : MIN_PICK);
   const predicted = nMats >= 4 ? 'Legendary' : nMats >= 3 ? 'Rare' : null;
   // OTA-873 — upgrade needs EXACTLY 5; a normal forge needs 3–5.
-  // OTA-984 — ...AND the diversity rule the STORE enforces on confirm. Gating on
+  // OTA-1007 — ...AND the diversity rule the STORE enforces on confirm. Gating on
   // count alone let the button light on three same-material pieces, which then
   // bounced off gateFusion ("The Crucible cools") — a lit button that doesn't
   // fuse. A lit FUSE now always fuses.
@@ -296,40 +296,40 @@ export function FusionPickerModal() {
 
 const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 20 },
-  card: { backgroundColor: '#141c1e', borderColor: '#8fa6ac', borderWidth: 1.5, borderRadius: 8, padding: 16, maxHeight: '82%' },
+  card: { backgroundColor: '#17150f', borderColor: '#8aa0a4', borderWidth: 1.5, borderRadius: 8, padding: 16, maxHeight: '82%' },
   title: { color: '#d8b46a', fontSize: 16, fontWeight: '700', letterSpacing: 1 },
-  sub: { color: '#9db2b8', fontSize: 12, marginTop: 4, marginBottom: 2 },
+  sub: { color: '#a2977b', fontSize: 12, marginTop: 4, marginBottom: 2 },
   readout: { color: '#d8b46a', fontSize: 11, fontWeight: '700', marginBottom: 8 },
-  empty: { color: '#9db2b8', fontSize: 13, fontStyle: 'italic', paddingVertical: 16, textAlign: 'center' },
+  empty: { color: '#a2977b', fontSize: 13, fontStyle: 'italic', paddingVertical: 16, textAlign: 'center' },
   list: { maxHeight: 260, marginBottom: 6 },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 8, borderRadius: 4, borderWidth: 1, borderColor: 'transparent' },
-  rowOn: { backgroundColor: '#1e2f24', borderColor: '#3d5a2c' },
+  rowOn: { backgroundColor: '#2a2620', borderColor: '#3d5a2c' },
   rowDim: { opacity: 0.4 },
-  check: { color: '#6c8088', fontSize: 16, width: 26 },
+  check: { color: '#a2977b', fontSize: 16, width: 26 },
   checkOn: { color: '#9ec96a' },
-  rowName: { color: '#d6e4e8', fontSize: 13, flex: 1 },
+  rowName: { color: '#e6d8b3', fontSize: 13, flex: 1 },
   // OTA-679 — material type: the primary decision info, so it reads brighter than
   // the (secondary) rarity. Right-aligned so the type column lines up down the list.
-  rowType: { color: '#8fbfa8', fontSize: 11, fontWeight: '600', marginLeft: 8, textAlign: 'right' },
-  rowMeta: { color: '#6c8088', fontSize: 10, marginLeft: 8 },
+  rowType: { color: '#9ec96a', fontSize: 11, fontWeight: '600', marginLeft: 8, textAlign: 'right' },
+  rowMeta: { color: '#a2977b', fontSize: 10, marginLeft: 8 },
   // OTA-1028 — upgrade list grouping + worn badge (amber matches the
   // inventory EQUIPPED badge palette).
-  sectionLabel: { color: '#8fa6ac', fontSize: 10, fontWeight: '700', letterSpacing: 1.2, marginTop: 8, marginBottom: 4 },
+  sectionLabel: { color: '#8aa0a4', fontSize: 10, fontWeight: '700', letterSpacing: 1.2, marginTop: 8, marginBottom: 4 },
   rowNameWrap: { flex: 1 },
   rowNameTight: { flex: 0 },
   equippedTag: { color: '#c9a86a', fontSize: 9, fontWeight: '700', letterSpacing: 1.5, marginTop: 2 },
-  catBlock: { marginTop: 6, borderTopColor: '#2b3a3e', borderTopWidth: 1, paddingTop: 6 },
-  catLabel: { color: '#8fa6ac', fontSize: 10, fontWeight: '700', letterSpacing: 0.6, marginTop: 8, marginBottom: 4 },
+  catBlock: { marginTop: 6, borderTopColor: '#3a342c', borderTopWidth: 1, paddingTop: 6 },
+  catLabel: { color: '#8aa0a4', fontSize: 10, fontWeight: '700', letterSpacing: 0.6, marginTop: 8, marginBottom: 4 },
   kindRow: { flexDirection: 'row', gap: 8 },
-  kindBtn: { flex: 1, paddingVertical: 10, borderRadius: 4, borderWidth: 1, borderColor: '#2b3a3e', alignItems: 'center' },
-  kindOn: { backgroundColor: '#26313a', borderColor: '#8fa6ac' },
-  kindTxt: { color: '#9db2b8', fontSize: 13, fontWeight: '600' },
-  kindTxtOn: { color: '#e8f0f2' },
+  kindBtn: { flex: 1, paddingVertical: 10, borderRadius: 4, borderWidth: 1, borderColor: '#3a342c', alignItems: 'center' },
+  kindOn: { backgroundColor: '#2a1f12', borderColor: '#8aa0a4' },
+  kindTxt: { color: '#a2977b', fontSize: 13, fontWeight: '600' },
+  kindTxtOn: { color: '#f0e6cc' },
   actions: { flexDirection: 'row', gap: 10, marginTop: 14 },
   actBtn: { flex: 1, paddingVertical: 12, borderRadius: 4, alignItems: 'center' },
-  actNeutral: { backgroundColor: '#26313a' },
-  actNeutralTxt: { color: '#9db2b8', fontSize: 14, fontWeight: '600' },
+  actNeutral: { backgroundColor: '#2a1f12' },
+  actNeutralTxt: { color: '#a2977b', fontSize: 14, fontWeight: '600' },
   actPrimary: { backgroundColor: '#3d5a2c' },
-  actPrimaryTxt: { color: '#e8f0f2', fontSize: 14, fontWeight: '700' },
+  actPrimaryTxt: { color: '#f0e6cc', fontSize: 14, fontWeight: '700' },
   actDisabled: { opacity: 0.4 },
 });

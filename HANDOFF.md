@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1095`**,
-**golem-line `2026-08-03-1072`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1096`**,
+**golem-line `2026-08-03-1073`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,9 +923,22 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.6**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.7**; ledger in `VERSION.md`.
 
-- **THE FORK OVERLAY JOINS THE HOUSE PALETTE (2026-08-03, latest). BOTH
+- **EVERY POPUP ON THE HOUSE PALETTE (2026-08-03, latest). BOTH LINES.**
+  HAL OTA-1073 / golem OTA-1050. Owner: *"make all of the pop ups fit the
+  same color palette, and design style for the same look."* The audit across
+  all 33 popups found eight with orphans: seven were TOKEN DRIFT (near-miss
+  shades one or two digits off real tokens — snapped to the real ones,
+  near-imperceptible visually), and `FusionPickerModal` was a full INVENTED
+  teal wardrobe (11 of 14 colors orphaned) hovering near the real aether
+  token without using it. The Crucible keeps its cool ceremonial identity,
+  rebuilt from owned tokens: #8aa0a4 aether accent, #9ec96a material green,
+  house text ranks and grounds. **All 33 popups now audit at zero orphan
+  colors.** Remaining unique-color files (feed, EnemyPanel, InputBox,
+  StatsPanel, etc.) are persistent HUD with purpose-coded colors, not popups.
+
+- **THE FORK OVERLAY JOINS THE HOUSE PALETTE (2026-08-03). BOTH
   LINES.** HAL OTA-1072 / golem OTA-1049. The owner's style audit of the
   Phase 3-5 surfaces: creation pressure step, both character-sheet sections
   and the ending blocks all reuse existing styles or pre-existing tokens —
