@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.5';
+export const DISPLAY_VERSION = '4.29.6';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20580,7 +20580,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // modern diegetic version. The walk plays both lines' tutorials identically
 // now — ten beats each, byte-identical step lists.
 // DISPLAY_VERSION 4.29.5. Tutorial is 10 beats; walk + canonical-beats suite updated.
-export const OTA_BUILD_ID = '2026-08-03-1094-look-beat-converged';
+//
+// OTA-1095 — THE FORK OVERLAY JOINS THE HOUSE PALETTE.
+//
+// Owner's style audit: "all new additions and pop ups are stylized and color
+// coordinated to the base game?" The check: dump every hex literal in each
+// Phase 3-5 surface and count where else it appears. Verdicts —
+//   · CharacterCreation pressure step: ZERO new colors (reuses step styles);
+//   · CharacterScreen HOW MUCH IT TAKES + THE ARBITER: reuse card/kv styles,
+//     only literals are #7a8a5a / #a85a3a, pre-existing EndingScreen tokens;
+//   · EndingScreen WHAT YOU CHOSE + THE ARBITER: zero new colors;
+//   · StoryForkOverlay: NINE colors appearing NOWHERE else in the app.
+// An invented palette in the same earthy family, sharing not one token — a
+// stranger at the table. Now every value is a color the game already owns
+// (#c9a86a gold, the #0a0908/#17150f/#2a1f12 grounds, #3a342c rule, #6b5c3a
+// border, #f0e6cc/#e6d8b3/#a2977b text ranks): 4-50 other files each. Layout
+// and the no-dismiss solemnity untouched — a change of clothes, not bones.
+// DISPLAY_VERSION 4.29.6.
+export const OTA_BUILD_ID = '2026-08-03-1095-fork-overlay-house-palette';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1094-look-beat-converged';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1093-tutorial-and-combat-walks';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1092-playtest-honest-walk';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1091-playtest-phases-0-5';
