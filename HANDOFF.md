@@ -893,8 +893,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1090`**,
-**golem-line `2026-08-03-1067`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1091`**,
+**golem-line `2026-08-03-1068`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -903,9 +903,47 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.1**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.2**; ledger in `VERSION.md`.
 
-- **PHASE 5 — THE ARBITER BECOMES SOMEONE (2026-08-03, latest). BOTH LINES.**
+- **ACTIVE PLAYTEST OF PHASES 0-5 (2026-08-03, latest). BOTH LINES.**
+  HAL OTA-1091 / golem OTA-1068. `__tests__/playtestPhases0to5.test.ts` (new).
+  Owner: *"lets do active play testing on phases 0-5."*
+
+  The harness does not test a unit. It **plays**: starts a character, seeds
+  `Math.random` so the run repeats exactly, walks 64 steps through `travelTo`
+  and `submitPlayerAction` — the same two entry points a thumb drives — answers
+  whatever the story asks, then reads the **feed** and asks of each phase *did
+  the player actually SEE this?*
+
+  That is the OTA-1087 lesson made permanent. Every other suite here asks
+  whether content is authored and correctly gated, and 621 green ones were
+  doing exactly that while most of Phase 2 was unreachable. It grades only
+  channels the player can read — the hidden-channel list moved out of
+  `AdventureFeed` into `engine/gameLog` (`HIDDEN_LOG_CHANNELS`) so the harness
+  and the screen cannot drift, after the harness's own first run failed twice
+  on `debug` telemetry nobody has ever seen.
+
+  ⚠ **Finding 1 — the sky repeated itself sixteen times.** `Weather effect —
+  Eerie Calm: +1 WIS` fired on every `beginScene`, and OTA-1017 persists
+  weather per location for six game-hours, so an UNCHANGED sky re-announced
+  itself at every arrival. Now gated on `player.weatherEffectSeen`, keyed on
+  the **weather** rather than the tile: calm → storm → calm still says all
+  three, four calm tiles in a row say it once.
+
+  ⚠ **Finding 2 — the arc silently skipped a chapter, and it was mine, one OTA
+  old.** The digest came back `witness, invested, implicated, named` —
+  `interested` **never fired**. `dueArbiterBeat` only ever offered the CURRENT
+  stance, so crossing two Core thresholds between two arrivals put the
+  intermediate beat permanently behind the player: never due again. It now
+  walks UP from the lowest unspoken stance, so an over-levelled run delivers
+  the missed beats in order, one per arrival, and the arc still reads in
+  sequence. A chapter vanishing quietly is precisely what "derive it from the
+  save" was chosen to make impossible, and Phase 5 put it straight back in.
+
+  Both found on the harness's first run. 19 playtest assertions + 2 regression
+  tests; 627 suites / 5,278 green.
+
+- **PHASE 5 — THE ARBITER BECOMES SOMEONE (2026-08-03). BOTH LINES.**
   HAL OTA-1090 / golem OTA-1067. `app/engine/arbiterPersona.ts` (new),
   `app/data/lore/arbiter-persona.json` (new). The plan's brief, verbatim:
   *"memory of what you've done, an opinion that shifts with your choices, and

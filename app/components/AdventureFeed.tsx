@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import type { GameLogEntry, LogChannel } from '../engine/types';
+import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog';
 
 interface Props {
   entries: GameLogEntry[];
@@ -55,12 +56,12 @@ const channelColors: Record<LogChannel, string> = {
   mission: MISSION_COLOR,
 };
 
-// `cognitive` (MiniLM emotion/intent) and `debug` (parser, combat range
-// transitions) are diagnostic noise — kept in the on-disk log via
-// COPY ALL but never shown in-game. `system` is now folded visually into
-// the world voice; the underlying channel is preserved so the on-disk
-// log is still searchable.
-const HIDDEN_CHANNELS: ReadonlySet<LogChannel> = new Set(['cognitive', 'debug']);
+// The hidden-channel list moved to engine/gameLog so the playtest harness can
+// grade the feed the PLAYER reads against the same rule this screen renders
+// by — see HIDDEN_LOG_CHANNELS there for why there is only one copy.
+// `system` is folded visually into the world voice; the underlying channel is
+// preserved so the on-disk log is still searchable.
+const HIDDEN_CHANNELS = HIDDEN_LOG_CHANNELS;
 
 // Only these channels get a label tag above the text. Everything else
 // is rendered as voiceless prose — colored, but without a SYSTEM /
