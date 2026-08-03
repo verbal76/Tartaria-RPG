@@ -42,6 +42,7 @@ import { FusionPickerModal } from '../components/FusionPickerModal';
 import { FusionBlockedModal } from '../components/FusionBlockedModal';
 import { MissionCompleteModal } from '../components/MissionCompleteModal';
 import { ParleySheet } from '../components/ParleySheet';
+import { PayoffSheet } from '../components/PayoffSheet';
 import { TalkSheet } from '../components/TalkSheet';
 import { GiftModal } from '../components/GiftModal';
 import { hasTopicsFor } from '../engine/dialogue';
@@ -131,6 +132,19 @@ export function ExplorationScreen() {
   // a roll hands the slot straight to the dice.
   const pendingTalk = useGameStore((s) => s.pendingTalk);
   const pendingParley = useGameStore((s) => s.pendingParley);
+  // OTA-1104 — the shakedown outranks every other sheet: your wrist is in
+  // their grip, and the store refuses all actions until you pay or fight.
+  const pendingPayoff = useGameStore((s) => s.pendingPayoff);
+  // OTA-1104 — escort leaders walking with you are pickpocket marks too.
+  // Select the stable quests reference; derive the names in a memo so the
+  // selector never mints a fresh array (which would re-render on every tick).
+  const activeQuestsForMarks = useGameStore((s) => s.player?.activeFactionQuests);
+  const escortLeaderMarks = React.useMemo(
+    () => (activeQuestsForMarks ?? [])
+      .filter((q) => q.tracked !== false && !!q.escort?.leaderName && (q.escort?.hp ?? 0) > 0)
+      .map((q) => q.escort!.leaderName!),
+    [activeQuestsForMarks],
+  );
   // OTA-1102 — the TALK glow. Subscribing to talkedTopics is what keeps the
   // light honest: it goes out the moment the last unread line is heard, and
   // comes back when a warmth/story gate opens a new topic on this vendor.
@@ -949,6 +963,9 @@ export function ExplorationScreen() {
             onRoll={resolveRollStep}
             onCancel={cancelPendingRolls}
           />
+        ) : pendingPayoff ? (
+          // OTA-1104 — the shakedown. No cancel: pay, or fight.
+          <PayoffSheet />
         ) : pendingTalk ? (
           // OTA-1099 — an open conversation takes the input's place, dice-
           // roller style: topic list at the bottom, replies in the feed,
@@ -963,7 +980,7 @@ export function ExplorationScreen() {
           // is what's in their pockets, not their table (pickpocketPerson →
           // engine/pocketLoot.ts). Items stay with the steal/take verbs.
           <PickpocketSheet
-            marks={[currentScene?.vendor?.name, currentScene?.wanderer?.name].filter((n): n is string => !!n)}
+            marks={[currentScene?.vendor?.name, currentScene?.wanderer?.name, ...escortLeaderMarks].filter((n): n is string => !!n)}
             onPick={(mark) => {
               setPickpocketOpen(false);
               useGameStore.getState().pickpocketPerson(mark);
@@ -1024,10 +1041,10 @@ export function ExplorationScreen() {
             // no vendor and nothing liftable in the scene.
             onOpenPickpocket={() => { Keyboard.dismiss(); setPickpocketOpen(true); }}
             // OTA-1103 — marks are PEOPLE now (OTA-1101), so both the block
-            // and the glow key on vendor/wanderer presence. The old ambient-
-            // noun clause was a leftover from when pickpocket lifted objects.
-            pickpocketBlocked={!currentScene?.vendor && !currentScene?.wanderer}
-            pickpocketPossible={!!(currentScene?.vendor || currentScene?.wanderer)}
+            // and the glow key on presence of someone with pockets. OTA-1104
+            // adds escort leaders walking with you to that set.
+            pickpocketBlocked={!currentScene?.vendor && !currentScene?.wanderer && escortLeaderMarks.length === 0}
+            pickpocketPossible={!!(currentScene?.vendor || currentScene?.wanderer) || escortLeaderMarks.length > 0}
             onOpenAskArbiter={() => setAskArbiterOpen(true)}
             onOpenMissions={() => { useGameStore.getState().maybeAdvanceTutorial('main_quest'); setScreen('contracts'); }}
             onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}

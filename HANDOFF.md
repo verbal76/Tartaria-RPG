@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1103`**,
-**golem-line `2026-08-03-1080`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1104`**,
+**golem-line `2026-08-03-1081`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,9 +923,31 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.14**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.15**; ledger in `VERSION.md`.
 
-- **PICKPOCKET GLOWS GREEN WHEN POSSIBLE (2026-08-03, latest). BOTH
+- **THE SHAKEDOWN, THE CLIENT'S COAT, AND THE MUMBLE (2026-08-03, latest).
+  BOTH LINES.** HAL OTA-1104 / golem OTA-1081. Three owner decisions:
+  (1) *"the pay them off option when caught; if you don't have the TC you
+  fight"* — caught at a vendor's pocket with enough TC raises a PAY/FIGHT
+  bottom sheet (`PayoffSheet`, no cancel; `pendingPayoff` blocks all other
+  actions). Price is demeanor-tiered 20/30/40. Pay = no fight, no faction
+  word, but the ledger takes the wrong. Broke = straight to steel.
+  (2) *"do the escort leader pickpocket. it should kill the mission if
+  caught, cost you money, and you have to fight the whole party"* — leaders
+  with a `leaderName` are marks (DC 14); caught fails the quest with its
+  own narration (failEscortQuests gained narrate:false), fines 40 TC
+  (ESCORT_CAUGHT_FINE, clamped), and spawns the named leader (22 HP,
+  1D8+2) plus the pool as guards. (3) *"they should eventually mumble
+  about always losing things... so you know they realized it, and that
+  you're not suspected"* — clean lifts record `pocketsLifted` on the
+  ledger; `pocketLossMumble` (npcMemory) fires on later meetings (vendor
+  return greeting, wanderer re-encounter, escort camp on rest), one per
+  loss via `pocketsMumbled`, three deterministic variants tested to never
+  accuse. Test: `ota1104ShakedownEscortMumble.test.ts` (9 cases; the 1101
+  caught-fight case now empties the pouch first since the shakedown
+  intercepts a funded catch).
+
+- **PICKPOCKET GLOWS GREEN WHEN POSSIBLE (2026-08-03). BOTH
   LINES.** HAL OTA-1103 / golem OTA-1080. Owner: *"let's
   have pickpocket green when it's a possibility as well."* The quick-row
   PICKPOCKET button lights the torch's ready-green (#9ec96a) whenever a

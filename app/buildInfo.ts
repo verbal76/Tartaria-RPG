@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.14';
+export const DISPLAY_VERSION = '4.29.15';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20782,7 +20782,40 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // vendor/wanderer presence — no more live-looking button over an empty
 // room full of furniture.
 // DISPLAY_VERSION 4.29.14.
-export const OTA_BUILD_ID = '2026-08-03-1103-pickpocket-glow';
+//
+// OTA-1104 — THE SHAKEDOWN, THE CLIENT'S COAT, AND THE MUMBLE. Three owner
+// decisions in one pass.
+//
+// (1) PAY THEM OFF — "the pay them off option when caught; if you don't have
+// the TC you fight." Caught at a vendor's pocket while holding enough TC:
+// the vendor names a price for silence (demeanor-tiered, 20/30/40 — the
+// same ladder the DC uses) and a bottom sheet offers PAY or FIGHT. Paying
+// buys quiet — no fight, no word to the factions — but the LEDGER takes
+// the wrong either way: they caught you, and they remember. Broke, there
+// is no offer; the fight comes straight on. The shakedown blocks every
+// other action until it resolves — there's no walking away from a caught
+// wrist.
+//
+// (2) ESCORT LEADERS ARE MARKS — "it should kill the mission if caught,
+// cost you money, and you have to fight the whole party. They should put
+// up a decent fight." Leaders with a name join the pickpocket sheet while
+// the party walks with you (DC 14 — a wary professional an arm's length
+// away). Caught: the mission fails on the spot (no "cut down" lie — its
+// own narration), 40 TC is shaken back out of you, and the WHOLE party
+// turns — the named leader at 22 HP hitting 1D8+2 with the rest of the
+// pool behind them.
+//
+// (3) THE MUMBLE — "if you don't get caught pickpocketing anyone, they
+// should eventually mumble about always losing things... so you know they
+// realized it, and that you're not suspected." A clean lift records
+// pocketsLifted on the ledger; on a LATER meeting (vendor return visit,
+// wanderer re-encounter, or camp settling for an escort leader) they
+// notice the loss out loud — three deterministic variants, none of which
+// accuse, and they never once look your way. Once per loss, counted by
+// pocketsMumbled, tested to never say "you"/"thief"/"stolen".
+// DISPLAY_VERSION 4.29.15.
+export const OTA_BUILD_ID = '2026-08-03-1104-shakedown-escort-mumble';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1103-pickpocket-glow';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1102-talk-glow';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1101-pocket-loot';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1100-pickpocket-bottom-sheet';

@@ -32,7 +32,7 @@ import {
 } from '../engine/dogCompanion';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse } from '../engine/worldMemory';
 // OTA-1072 — Phase 1: the per-person ledger the greeting layer reads.
-import { rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName, vendorLedgerId } from '../engine/npcMemory';
+import { rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName, vendorLedgerId, pocketLossMumble } from '../engine/npcMemory';
 // OTA-1076 — the relationship reaches the counter.
 import { npcRegard, regardPriceMult } from '../engine/npcMemory';
 // OTA-1077 — the offscreen war reaches the people who live in it.
@@ -1651,6 +1651,10 @@ const STAMINA_COSTS = {
 // and withdraw clean) instead of getting caught into a fight. A practiced thief
 // doesn't get grabbed red-handed; a clumsy one does. Tunable design knob.
 const STEALTH_QUIET_FAIL_STE = 14;
+/** OTA-1104 — TC shaken out of a thief caught in their own client's coat
+ *  (clamped to the pouch). On top of the dead mission and the party fight —
+ *  the escort takes back wages before the steel comes out. */
+const ESCORT_CAUGHT_FINE = 40;
 
 // OTA 008 — Arbiter welcome-back debounce. Skip the line when the
 // player navigates away + back faster than this; first cold-load
@@ -2946,6 +2950,9 @@ function failEscortQuests(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   failedIds: string[],
+  // OTA-1104 — narrate:false lets a caller with its OWN failure story (caught
+  // robbing the leader) skip the "cut down" line, which would be a lie there.
+  opts?: { narrate?: boolean },
 ): void {
   const ids = new Set(failedIds);
   set((s) => {
@@ -2958,6 +2965,7 @@ function failEscortQuests(
       },
     };
   });
+  if (opts?.narrate === false) return;
   for (const id of failedIds) {
     const def = findFactionQuestById(id);
     const title = def?.title ?? id;
@@ -3079,6 +3087,20 @@ function healEscortsOnRest(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
 ): void {
   const escActive = get().player?.activeFactionQuests ?? [];
+  // OTA-1104 — an escort leader lifted clean earlier notices the loss as camp
+  // settles: the road's version of a later meeting. Never looks your way.
+  // BEFORE the heal gate — a full-health party still makes camp.
+  for (const q of escActive) {
+    const leader = q.escort?.leaderName;
+    if (!leader || q.tracked === false || (q.escort?.hp ?? 0) <= 0) continue;
+    const lid = vendorNpcId({ id: `escort_${leader}`, name: leader });
+    const lRel = getRelation(get().worldMemory, lid);
+    const lMumble = pocketLossMumble(lRel ?? undefined, leader);
+    if (lMumble) {
+      get().appendLog('world', lMumble);
+      set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, lid, { pocketsMumbled: 1 }) }));
+    }
+  }
   if (!escActive.some((q) => q.escort && q.tracked !== false && q.escort.hp > 0 && q.escort.hp < q.escort.hpMax)) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { ESCORT_REST_HEAL_FRACTION } = require('../engine/escort') as typeof import('../engine/escort');
@@ -5023,8 +5045,19 @@ interface GameStore {
    *  what's actually in their pockets: TC, a collectable note, rarely a
    *  Legendary material or a tower map (engine/pocketLoot.ts). Stealing
    *  items off the table stays with stealFromVendor / the steal verb; this
-   *  is the hand inside the coat. Roll + consequences mirror vendor theft. */
+   *  is the hand inside the coat. Roll + consequences mirror vendor theft.
+   *  OTA-1104 — escort leaders (with a leaderName) are marks too; caught at
+   *  THEIR coat kills the mission, costs a fine, and the whole party fights. */
   pickpocketPerson: (targetName: string) => void;
+  /** OTA-1104 — caught with a hand in a vendor's pocket while holding enough
+   *  TC to settle: the vendor names a price for their silence. PAY buys quiet
+   *  (no fight, no faction word — but THEY remember the wrong); REFUSE, or
+   *  being too poor to be offered the choice, gets the fight. Null otherwise.
+   *  Deliberately NOT persisted with the save: killing the app mid-shakedown
+   *  forfeits nothing but the fight — the wrong and the steal-heat were
+   *  already recorded the moment the hand was caught. */
+  pendingPayoff: { npcId: string; vendorName: string; amount: number; triggerSource: string } | null;
+  resolvePayoff: (pay: boolean) => void;
   /** Pre-fill text staged by ActionReferenceScreen (or any other
    *  helper screen) for the next mount of InputBox on the exploration
    *  screen. InputBox reads this once on mount + on changes, drops
@@ -6227,6 +6260,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  // OTA-1104 — THE SHAKEDOWN. See the interface comments; raised only by
+  // pickpocketPerson's vendor-caught branch, and only when the player can
+  // actually cover the price — an offer you cannot take is just a taunt.
+  pendingPayoff: null,
+  resolvePayoff: (pay) => {
+    const p = get().pendingPayoff;
+    if (!p) return;
+    set({ pendingPayoff: null });
+    const player = get().player;
+    if (!player) return;
+    if (pay && player.tc >= p.amount) {
+      set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc - p.amount } } : s));
+      get().appendLog(
+        'world',
+        `You count ${p.amount} TC into ${p.vendorName}'s waiting palm. It disappears, and they turn back to their stall as if nothing happened. As far as anyone else will ever hear, nothing did.`,
+      );
+      // They caught you. The coin buys their SILENCE — no fight, no word to
+      // the faction — but never their memory: the ledger takes the wrong, so
+      // the greeting cools and the amends price stands like any other theft.
+      set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, p.npcId, { wrongs: 1 }) }));
+      recordMemorableEvent(get, set, {
+        kind: 'theft_caught',
+        text: `bought ${p.vendorName}'s silence after a lift gone wrong`,
+      });
+    } else {
+      // Refused (or a stale offer with the coin now spent) — the fight the
+      // payoff was holding back. Same consequences as any caught theft.
+      vendorCatchesThief(get, set, p.triggerSource);
+    }
+    void get().persist();
+  },
+
   // OTA-808 — PARLEY. See the interface comments + engine/parley.ts.
   pendingParley: null,
   closeParley: () => {
@@ -6583,15 +6648,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!want) return;
     const vendorMark = scene.vendor && scene.vendor.name.toLowerCase().includes(want) ? scene.vendor : null;
     const wandererMark = !vendorMark && scene.wanderer && scene.wanderer.name.toLowerCase().includes(want) ? scene.wanderer : null;
-    if (!vendorMark && !wandererMark) {
+    // OTA-1104 — YOUR OWN CLIENT'S COAT. Escort leaders with a name are marks
+    // while the party walks with you (tracked, pool alive). The payoff is the
+    // same pocket table; the CAUGHT branch below is what makes it a different
+    // crime — you were paid to keep these people alive.
+    const escortMark = !vendorMark && !wandererMark
+      ? (player.activeFactionQuests ?? []).find((q) =>
+          q.tracked !== false && q.escort && (q.escort.hp ?? 0) > 0
+          && !!q.escort.leaderName && q.escort.leaderName.toLowerCase().includes(want)) ?? null
+      : null;
+    if (!vendorMark && !wandererMark && !escortMark) {
       get().appendLog('world', `No one by that name is close enough to touch.`);
       return;
     }
-    const markName = vendorMark ? vendorMark.name : wandererMark!.name;
+    const markName = vendorMark ? vendorMark.name : wandererMark ? wandererMark.name : escortMark!.escort!.leaderName!;
     // DC mirrors stealFromVendor's demeanor tiers; a wanderer on the road
-    // watches their own back but has no stall crowd to help them (DC 12).
+    // watches their own back but has no stall crowd to help them (DC 12). An
+    // escort leader is a wary professional walking an arm's length away — DC
+    // 14, and what happens when they FEEL it is the real deterrent.
     const baseDc = vendorMark
       ? (vendorMark.demeanor === 'sketchy' ? 11 : vendorMark.demeanor === 'honest' ? 14 : 16)
+      : escortMark ? 14
       : 12;
     // Same heat machinery as stealFromVendor — a pocket and a table feed the
     // same reputation for light fingers.
@@ -6659,6 +6736,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+      // OTA-1104 — a clean lift is remembered by the LEDGER, not their eyes:
+      // on a later meeting they mumble about the loss (pocketLossMumble)
+      // without ever suspecting you. A caught lift records a wrong instead.
+      const markId = vendorMark ? vendorNpcId(vendorMark)
+        : wandererMark ? vendorNpcId(wandererMark)
+        : vendorNpcId({ id: `escort_${markName}`, name: markName });
+      set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, markId, { pocketsLifted: 1 }) }));
     } else if ((stats.stealth ?? 0) >= STEALTH_QUIET_FAIL_STE) {
       // OTA-847 quiet fail — the practiced thief withdraws a beat early.
       get().appendLog(
@@ -6668,11 +6752,75 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       get().appendLog('combat', `Pickpocket ${markName} — d20 ${roll} + STE ${stats.stealth}${timeNote} = ${total} vs DC ${dc} — ✗ CAUGHT`);
       if (vendorMark) {
-        vendorCatchesThief(
-          get,
-          set,
-          `pickpocketPerson: vendor='${markName}' demeanor=${vendorMark.demeanor} pocket roll=d20(${roll})+STE(${stats.stealth})=${total} vs DC${dc} prevAttempts=${prevAttempts} location=${player.currentLocationId}${player.hubRoomId ? `:${player.hubRoomId}` : ''}`,
+        const trigger = `pickpocketPerson: vendor='${markName}' demeanor=${vendorMark.demeanor} pocket roll=d20(${roll})+STE(${stats.stealth})=${total} vs DC${dc} prevAttempts=${prevAttempts} location=${player.currentLocationId}${player.hubRoomId ? `:${player.hubRoomId}` : ''}`;
+        // OTA-1104 — THE SHAKEDOWN. Owner: "the pay them off option when
+        // caught; if you don't have the TC you fight." Tiered to the same
+        // demeanor ladder the DC uses — the sketchy fence settles cheap, the
+        // hub merchant knows exactly what their silence is worth. The offer
+        // only exists when the pouch can cover it: an unpayable price is not
+        // a choice, so the fight comes straight on.
+        const price = vendorMark.demeanor === 'sketchy' ? 20 : vendorMark.demeanor === 'honest' ? 30 : 40;
+        if ((get().player?.tc ?? 0) >= price) {
+          get().appendLog(
+            'world',
+            `${markName} clamps your wrist mid-lift — then glances down the row and leans close. "That's a ${price} TC problem. Make it go away, or we do this loud."`,
+          );
+          set({ pendingPayoff: { npcId: vendorNpcId(vendorMark), vendorName: markName, amount: price, triggerSource: trigger } });
+        } else {
+          get().appendLog(
+            'world',
+            `${markName} clamps your wrist mid-lift, palm out for a settlement your pouch can't cover. The palm closes into a fist.`,
+          );
+          vendorCatchesThief(get, set, trigger);
+        }
+      } else if (escortMark) {
+        // OTA-1104 — CAUGHT ROBBING YOUR OWN CLIENT. All three consequences
+        // are the owner's, verbatim: "it should kill the mission if caught,
+        // cost you money, and you have to fight the whole party."
+        const def = findFactionQuestById(escortMark.id);
+        const label = def?.escort?.label ?? 'escort party';
+        const title = def?.title ?? escortMark.id;
+        const fine = Math.min(get().player?.tc ?? 0, ESCORT_CAUGHT_FINE);
+        get().appendLog(
+          'combat',
+          `${markName} seizes your wrist inside their own coat. "You? We PAID you." The whole ${label} turns on you.`,
         );
+        if (fine > 0) {
+          set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc - fine } } : s));
+          get().appendLog('world', `They shake ${fine} TC back out of you — wages for a guard they should never have hired.`);
+        }
+        failEscortQuests(get, set, [escortMark.id], { narrate: false });
+        get().appendLog('combat', `The escort "${title}" is dead on the spot — no one keeps a thief on the payroll.`);
+        // The whole party, and they put up a decent fight: the named leader
+        // at the front, the rest of the pool behind them.
+        const partySize = Math.max(1, escortMark.escort?.count ?? def?.escort?.count ?? 1);
+        const leaderEnemy: Enemy = {
+          name: markName, type: 'Human', abilityPoint: 'Strength 3',
+          attack: 'Road Blade', damage: '1D8+2', hp: 22, rarity: 'Uncommon',
+          loot: ['First Aid Kit'], traits: ['quick'],
+        };
+        const guards: Enemy[] = Array.from({ length: Math.max(0, partySize - 1) }, () => ({
+          name: `${markName}'s Guard`, type: 'Human', abilityPoint: 'Dexterity 2',
+          attack: 'Cudgel', damage: '1D6+1', hp: 14, rarity: 'Common', loot: [], traits: [],
+        }));
+        const party = [leaderEnemy, ...guards];
+        set((s) => (s.currentScene
+          ? {
+              currentScene: {
+                ...s.currentScene,
+                enemies: party,
+                enemyHps: party.map((e) => e.hp),
+                activeEnemyIdx: 0,
+                range: 'mid',
+                enemyAmbushUsed: party.map(() => false),
+              },
+            }
+          : s));
+        set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId({ id: `escort_${markName}`, name: markName }), { wrongs: 1 }) }));
+        recordMemorableEvent(get, set, {
+          kind: 'theft_caught',
+          text: `were caught robbing ${markName}, the escort you were paid to guard`,
+        });
       } else {
         // A wanderer caught with your hand in their coat doesn't draw steel
         // over a pocket — they name it, and the road takes them elsewhere.
@@ -7457,6 +7605,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       pendingGift: null, // OTA-1083 — and any half-finished gift
       pendingTalk: null, // OTA-1081 — and any stale conversation
       pendingParley: null, // OTA-808 — clear any stale parley on a fresh game
+      pendingPayoff: null, // OTA-1104 — and any stale shakedown
       // OTA-1041 — THE OPENING CRAWL. A brand-new character opens on the
       // reason they came down: three universal pages (the flood, the thousand
       // years, the nine hearts), two for their motive, one for the faction
@@ -8758,6 +8907,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const wRel = getRelation(get().worldMemory, vendorNpcId(scene.wanderer));
       if (wRel && wRel.meetings > 1) {
         get().appendLog('world', npcGreeting(wRel, scene.wanderer.name, get().player?.name));
+        // OTA-1104 — a wanderer lifted clean on an earlier road notices the
+        // loss when your paths cross again — and never looks at you.
+        const wMumble = pocketLossMumble(wRel, scene.wanderer.name);
+        if (wMumble) {
+          get().appendLog('world', wMumble);
+          set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(scene.wanderer!), { pocketsMumbled: 1 }) }));
+        }
       } else {
         get().appendLog('world', `${scene.wanderer.greeting} This is ${scene.wanderer.name}, ${scene.wanderer.role}. (Try "talk to ${scene.wanderer.name}" — a fair word carries.)`);
       }
@@ -9513,6 +9669,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('world', npcGreeting(rel, vendor.name, player.name));
         const awayLine = npcAbsenceLine(rel, vendor.name, player.name, player.hoursElapsed ?? 0);
         if (awayLine) get().appendLog('world', awayLine);
+        // OTA-1104 — the delayed mumble: a pocket lifted CLEAN on an earlier
+        // visit surfaces here, on the return, as them noticing the loss out
+        // loud without suspecting anyone. One per visit, ledger-counted.
+        const mumble = pocketLossMumble(rel ?? undefined, vendor.name);
+        if (mumble) {
+          get().appendLog('world', mumble);
+          set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(vendor), { pocketsMumbled: 1 }) }));
+        }
         // OTA-1073 — word travels inside a faction. Fires only when BOTH ends
         // are people the player has genuinely built something with, and only
         // every GOSSIP_EVERY-th visit: Phase 0 was spent cutting the noise
@@ -9757,6 +9921,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // whatever the action does next. Silent (LLM-internal) submissions don't
     // count as walking away; the ambient paths already guard on these flags.
     if (!_opts?.silent) {
+      // OTA-1104 — but there is no walking away from a hand already caught.
+      // The shakedown blocks everything until the player picks pay or fight.
+      if (get().pendingPayoff) {
+        get().appendLog('world', `${get().pendingPayoff!.vendorName}'s grip doesn't loosen. Settle it — pay, or fight.`);
+        return;
+      }
       if (get().pendingTalk) get().closeTalk();
       if (get().pendingParley) get().closeParley();
     }
