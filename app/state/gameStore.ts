@@ -3531,6 +3531,11 @@ function talkContextFor(
       : 0,
     titles: player?.earnedTitles ?? [],
     hasRecentRaidNews: !!raidNewsFor(get().worldMemory, rel, player?.hoursElapsed ?? 0),
+    // OTA-1059 — the fifth gate dimension. Defaults to the opening phase for a
+    // character who has not touched the main quest, so a missing mainQuest
+    // block reads as "the very beginning" rather than unlocking everything.
+    chapter: player?.mainQuest?.phase ?? 'hook',
+    cores: player?.mainQuest?.coresRecovered?.length ?? 0,
   };
 }
 

@@ -43,6 +43,7 @@ import { FusionBlockedModal } from '../components/FusionBlockedModal';
 import { MissionCompleteModal } from '../components/MissionCompleteModal';
 import { ParleyModal } from '../components/ParleyModal';
 import { TalkModal } from '../components/TalkModal';
+import { hasTopicsFor } from '../engine/dialogue';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
 import { TutorialTarget } from '../components/TutorialTarget';
@@ -89,6 +90,8 @@ export function ExplorationScreen() {
   const submit = useGameStore((s) => s.submitPlayerAction);
   const setInputModalOpen = useGameStore((s) => s.setInputModalOpen);
   const setScreen = useGameStore((s) => s.setScreen);
+  // OTA-1059 — the Phase 2 talk exchange, reachable by tap rather than only by typing.
+  const talkToNpc = useGameStore((s) => s.talkToNpc);
   const currentScene = useGameStore((s) => s.currentScene);
   // OTA-507 — drives the hidden-location "?" so the travel row doesn't leak the
   // real name before arrival/discovery.
@@ -731,6 +734,23 @@ export function ExplorationScreen() {
             <Text style={styles.vendorBannerName} numberOfLines={1}>{currentScene.vendor.name}</Text>
             <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.vendor.offers.length} offers · tap to trade</Text>
           </View>
+          {/* OTA-1059 — TALK. The Phase 2 exchange shipped in OTA-1058 with no
+              way to reach it but typing `talk to <name>`, which is a feature
+              nobody finds. Shown ONLY for the authored cast — a TALK button on
+              somebody with nothing to say is a worse lie than no button. Nested
+              touchable, so it does not open the stall. */}
+          {hasTopicsFor(currentScene.vendor.id ?? '') ? (
+            <TouchableOpacity
+              style={styles.placeChipTalk}
+              onPress={() => talkToNpc(currentScene.vendor?.name ?? '')}
+              hitSlop={8}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel={`Talk to ${currentScene.vendor.name}`}
+            >
+              <Text style={styles.placeChipTalkText}>TALK</Text>
+            </TouchableOpacity>
+          ) : null}
           {/* OTA-1029 — ✕ on the trader, matching the Crucible's. Nested touchable
               handles its own tap (doesn't open the stall). Hides the chip for this
               tile only: the vendor stays anchored to the room, so walking back in
@@ -2053,6 +2073,13 @@ const styles = StyleSheet.create({
   fusionChip: { borderColor: '#b88ce0' },
   vendorChipX: { color: '#8a7448', fontSize: 15, fontWeight: '800' },
   vendorBannerStripe: { width: 4, backgroundColor: '#c9a86a', alignSelf: 'stretch' },
+  // OTA-1059 — the TALK affordance on the vendor chip. Deliberately quieter
+  // than the chip itself: trading is still the primary action at a counter.
+  placeChipTalk: {
+    paddingHorizontal: 8, paddingVertical: 4, marginRight: 4,
+    borderWidth: 1, borderColor: '#7a6640', borderRadius: 4,
+  },
+  placeChipTalkText: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   vendorBannerName: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
   // OTA-451 — Mission Board chip. Parchment/brown accent to distinguish from the
   // vendor's amber and the Crucible's purple.

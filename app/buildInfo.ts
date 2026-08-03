@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.92';
+export const DISPLAY_VERSION = '4.28.93';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -18904,7 +18904,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the player has already learned. The exchange stays OPEN after a topic, so it
 // reads as a conversation rather than a menu that fires once.
 // DISPLAY_VERSION 4.28.92. 20 tests.
-export const OTA_BUILD_ID = '2026-08-03-1058-talk-topics-phase2-slice';
+// OTA-1059 — PHASE 2: THE FULL CAST, THE FIFTH GATE, AND A WAY IN.
+//
+// Three things OTA-1058 left open, all of them now closed.
+//
+// (1) THE WHOLE CAST. 27 more named vendors authored -- all 30 in vendors.json
+// now have topics; 129 in total. Everyone gets a shop-front line anyone can
+// hear, something about their people once they place you, something they
+// actually believe once you have earned it, and a single closed door if you
+// robbed them. Voices are deliberately unalike: Vesryn is frightened of how
+// GOOD the oldest records are; Korash says his people are not big because they
+// are strong but because the ones who were not big did not come back up; the
+// Cartographer puts the same error on every map they sell and is no longer sure
+// they could draw it correctly. Adding a vendor is still a JSON entry.
+//
+// (2) ⚠ THE FIFTH GATE, AND THE THREE THAT WERE NEVER EXERCISED. The build plan
+// named five dimensions -- warmth, standing, contracts, titles, story chapter.
+// OTA-1058 shipped machinery for four and content for ONE. minStanding,
+// requiresTitle and minContractsTurnedIn were unit-tested and had never
+// executed on a device, which is not the same thing as working. Story chapter
+// did not exist at all: TalkContext had no chapter field.
+// Now: minChapter (ordered against MainQuestPhase, so "from the descent
+// onwards" is expressible) plus minCores, because `cores` is a LONG phase with
+// five Cores inside it and phase alone cannot say "once you are most of the way".
+// Every one of the eight dimensions is used by real authored content, and a
+// test walks the JSON to prove it -- so "tested" and "exercised" cannot drift
+// apart again.
+// Defaults matter here: a character with no mainQuest block reads as 'hook',
+// the BEGINNING. Defaulting the other way would unlock every story topic on a
+// fresh character.
+//
+// (3) A WAY IN. OTA-1058 shipped the exchange reachable only by typing
+// `talk to <name>`, which is a feature nobody finds. The vendor chip now
+// carries a TALK button -- shown ONLY for someone with authored topics, because
+// a TALK button on somebody with nothing to say is a worse lie than no button.
+// Quieter than the chip itself: trading is still the primary action at a
+// counter.
+// DISPLAY_VERSION 4.28.93. 26 tests.
+export const OTA_BUILD_ID = '2026-08-03-1059-talk-full-cast-chapter-gate';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1058-talk-topics-phase2-slice';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1057-wanderer-escort-ledger';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1056-vendors-do-not-die';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1055-ledger-holes-and-noise-floor';
