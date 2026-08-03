@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.15';
+export const DISPLAY_VERSION = '4.29.16';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19708,7 +19708,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // accuse, and they never once look your way. Once per loss, counted by
 // pocketsMumbled, tested to never say "you"/"thief"/"stolen".
 // DISPLAY_VERSION 4.29.15.
-export const OTA_BUILD_ID = '2026-08-03-1081-shakedown-escort-mumble';
+//
+// OTA-1082 — DISMISSING THE VENDOR ENDS THE CONVERSATION WITH THEM. Twin of
+// HAL OTA-1105.
+//
+// Owner, on device: "I hit ✕ to close the vendor chip while the talk menu
+// was still open; the vendor went away but the talk menu stayed open."
+//
+// Root cause: the talk sheet's walk-away guard lives in submitPlayerAction —
+// any REAL action closes an open conversation first — but the vendor chip's
+// ✕ doesn't route through submitPlayerAction. It was the one exit the guard
+// didn't cover: the person left the screen and the sheet talked on to
+// nobody.
+//
+// The ✕ now walks away from the conversation first when the open talk IS
+// with that vendor (matched on the ledger id — a conversation with a
+// wanderer on the same tile is not touched), with the same feed line STOP
+// TALKING produces. And mid-shakedown the ✕ does nothing at all: their
+// grip is on your wrist, and the pay-or-fight choice cannot be dismissed
+// from a chip.
+// DISPLAY_VERSION 4.29.16.
+export const OTA_BUILD_ID = '2026-08-03-1082-vendor-dismiss-closes-talk';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1081-shakedown-escort-mumble';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1080-pickpocket-glow';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1079-talk-glow';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1078-pocket-loot';
