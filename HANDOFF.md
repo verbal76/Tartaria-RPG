@@ -390,6 +390,33 @@ a push to one reaches the others. Watch for per-line divergence:
   `metro.config.js` on the `web` target.
 Typecheck + run the relevant suite in **each** worktree before pushing it.
 
+### ⚠ PHASE 6 IS GOLEM-LINE ONLY (owner directive, 2026-08-03)
+
+The immersion build plan's Phase 6 — **local-LLM NPC conversation** — does NOT
+ship to HaL2001. The owner's call, and the plan agrees with it: *"Phase 6 is a
+separate project. Treat it that way."*
+
+Why it is the one phase that gets its own line:
+- It is the **only phase that cannot ride an OTA.** It needs native config
+  (`n_predict` 120 → ~40 for dialogue, thread count raised off 4, warm context
+  held between turns), so it means a rebuild, a store submission, and the
+  14-day closed-testing clock. Phases 0–5 were JS-only and landed in seconds.
+- It is the **only phase flagged as able to regress the crash numbers**, right
+  after the work that got the SVE crash wave under control.
+- Today a generation takes **14–20s**; Phase 6's own bar is **under 4 seconds
+  or it is not a conversation**. That gap is a native-config research problem,
+  not tuning.
+
+So: Phase 6 work lands on `golem-line` and stays there. HaL2001 keeps the
+Phases 0–5 game — authored content plus modest engine work, shippable over the
+air — and does not take the risk. Nothing in 0–5 depends on 6; the dependency
+runs the other way (6 requires 1 and 2 shipped, plus the latency work).
+
+⚠ This is a DEVIATION from the parity rule above, and the only standing one.
+Every other gameplay OTA still ships to both lines in the same pass at the
+HAL − 23 offset.
+
+
 Worktrees used this session: `/tmp/hal-main-fix` (HaL2001), `/tmp/hal-golem`
 (golem-line), `/tmp/hal-eng7` (engine_Dev) — each checked out on its branch.
 
