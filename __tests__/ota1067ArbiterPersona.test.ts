@@ -423,6 +423,10 @@ describe('OTA-1067 — the beats fire once, and only one at a time', () => {
   it('⚠ stance outranks regard when both are due', () => {
     const p = withCores(3);
     p.titleProgress = { loreRead: 99, relicsPreserved: 9 } as never;
+    // The earlier arc beats are already spoken, so 'invested' is the lowest
+    // unspoken stance — OTA-1068 made the walk start from the bottom, and a
+    // fixture that skipped that would be asserting the old bug.
+    p.arbiterBeatsSeen = [stanceBeatKey('witness'), stanceBeatKey('interested')];
     const beat = dueArbiterBeat(p, wm([rel({ amendsCleared: 9 })]));
     expect(beat?.key).toBe(stanceBeatKey('invested'));
   });
@@ -448,6 +452,49 @@ describe('OTA-1067 — the beats fire once, and only one at a time', () => {
     // Regard moves both ways, so hovering on a boundary must not re-fire.
     const seen = [stanceBeatKey('witness'), regardBeatKey('even')];
     expect(dueArbiterBeat(pc({ arbiterBeatsSeen: seen }), wm())).toBeNull();
+  });
+
+  it('⚠ crossing two thresholds at once does not DROP the beat in between', () => {
+    // OTA-1068, found by the phases 0-5 playtest harness: a run walked to nine
+    // Cores and came back having heard witness / invested / implicated / named
+    // — 'interested' never fired, because dueArbiterBeat only ever offered the
+    // CURRENT stance and 'interested' was behind the player by the next
+    // arrival. A chapter of the arc vanishing quietly is precisely what the
+    // derive-from-the-save design was chosen to make impossible.
+    let seen: string[] = [];
+    // Jump straight from nothing to the top, the way an offline catch-up or
+    // two Guardians in a row would.
+    const p = () => {
+      const c = withCores(9);
+      c.arbiterBeatsSeen = seen;
+      return c;
+    };
+    const fired: string[] = [];
+    for (let i = 0; i < 12; i++) {
+      const beat = dueArbiterBeat(p(), wm());
+      if (!beat) break;
+      fired.push(beat.key);
+      seen = recordArbiterBeat(seen, beat.key);
+    }
+    // Every stance beat, in arc order, one per call.
+    expect(fired.filter((k) => k.startsWith('stance:')))
+      .toEqual(STANCE_ORDER.map((s) => stanceBeatKey(s)));
+  });
+
+  it('...and a stance the run has NOT reached is never offered early', () => {
+    let seen: string[] = [];
+    const fired: string[] = [];
+    for (let i = 0; i < 12; i++) {
+      const c = withCores(2); // 'interested' — 'invested' needs 3
+      c.arbiterBeatsSeen = seen;
+      const beat = dueArbiterBeat(c, wm());
+      if (!beat) break;
+      fired.push(beat.key);
+      seen = recordArbiterBeat(seen, beat.key);
+    }
+    expect(fired).toContain(stanceBeatKey('interested'));
+    expect(fired).not.toContain(stanceBeatKey('invested'));
+    expect(fired).not.toContain(stanceBeatKey('named'));
   });
 
   it('every stance and every band has a beat to fire', () => {

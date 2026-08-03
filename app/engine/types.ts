@@ -1050,6 +1050,20 @@ export interface PlayerCharacter {
    *  have already earned, one per arrival, rather than silently missing the
    *  whole arc. Unknown keys from a newer build are inert. */
   arbiterBeatsSeen?: string[];
+  /** ⚠ OTA-1068 — the weather whose stat line the player has ALREADY been
+   *  told about, so the same conditions are not re-announced on every scene.
+   *
+   *  Found by the phases 0-5 playtest harness, which walks a run and reads the
+   *  feed the player actually sees: "Weather effect — Eerie Calm: +1 WIS"
+   *  appeared SIXTEEN times in one walk, because the line fired on every
+   *  beginScene and OTA-994 persists weather per location for six game-hours
+   *  — so an unchanged sky repeats itself at every arrival.
+   *
+   *  Keyed on the WEATHER, not the location: walking calm → storm → calm should
+   *  say all three, and walking through four calm tiles should say it once.
+   *  Absent on older saves, which reads as "not told yet" and costs one
+   *  redundant line after the update rather than a silence. */
+  weatherEffectSeen?: string;
   /** OTA-1021 — how The Missing side-thread ended for this character
    *  ('grave' | 'lie' | 'walker'), set when the resolution fires. Also keys
    *  the EndingScreen epilogue override. Absent = trail still open. */

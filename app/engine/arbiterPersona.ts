@@ -337,10 +337,25 @@ export function dueArbiterBeat(
   if (!p) return null;
   const seen = p.arbiterBeatsSeen ?? [];
 
+  // ⚠ THE LOWEST UNSPOKEN STANCE UP TO WHERE HE IS — not the current one.
+  //
+  // Found by the phases 0-5 playtest harness (OTA-1068), which walked a run to
+  // nine Cores and came back with `witness, invested, implicated, named`:
+  // 'interested' never fired. Asking only about the CURRENT stance means that
+  // crossing two thresholds between two arrivals drops the intermediate beat
+  // FOREVER — it is behind him, so it is never due again. A chapter of the arc
+  // vanishing quietly is exactly the failure the "derive it from the save"
+  // design was chosen to make impossible, and I put it right back in.
+  //
+  // Walking upward means an over-levelled run delivers the missed beats in
+  // order, one per arrival, so the arc still reads in sequence.
   const stance = stanceOf(p);
-  const sKey = stanceBeatKey(stance);
-  if (!seen.includes(sKey)) {
-    const line = data.stanceBeats[stance];
+  const reached = STANCE_ORDER.indexOf(stance);
+  for (let i = 0; i <= reached; i++) {
+    const s = STANCE_ORDER[i]!;
+    const sKey = stanceBeatKey(s);
+    if (seen.includes(sKey)) continue;
+    const line = data.stanceBeats[s];
     if (line) return { key: sKey, line };
   }
 
