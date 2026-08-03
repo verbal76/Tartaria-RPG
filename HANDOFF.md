@@ -923,9 +923,25 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.18**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.19**; ledger in `VERSION.md`.
 
-- **THE LOG-EXPORT REINIT LOOP (2026-08-03, latest). BOTH LINES.** HAL
+- **THE LEDGER EXPLAINS ITSELF (2026-08-03, latest). BOTH LINES.** HAL
+  OTA-1108 / golem OTA-1085. Two owner reports off the Character screen.
+  (1) The Arbiter regard row *"1 answer he was standing there for -5"*
+  named nothing — it was the Phase-3 fork-regard aggregate. `regardParts`
+  now emits one row PER judged answer, labelled with the words the player
+  chose (`your answer: Sell the bundle to a Tomekeeper  -5`, via
+  `optionById` on forks.json). The ±20 aggregate sub-clamp retired with
+  the aggregation: forks are one-shot and finite (ten questions, deltas
+  ±5, perfect run +36 < kin 40) and the ±60 total clamp holds. (2) A Core
+  Guardian kill was recorded twice ("cut down the Iron Litany Brother
+  Konrad…" from the generic rare-kill writer + "defeated … at Nimari"
+  from the guardian block). The generic writer now skips
+  `isCoreGuardian(enemy)` — one corpse, one ledger line. Test:
+  `ota1108LedgerExplainsItself.test.ts`; the ota1090 anti-farm fork test
+  retargeted to the itemised rows.
+
+- **THE LOG-EXPORT REINIT LOOP (2026-08-03). BOTH LINES.** HAL
   OTA-1107 / golem OTA-1084. The owner's 11-part device log ends with the
   Qwen watchdog burning 10+ reinit attempts in 64s, status 'idle' every
   time: exporting chunks bounces the app (copy → switch away to paste →
