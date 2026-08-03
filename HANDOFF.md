@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1093`**,
-**golem-line `2026-08-03-1070`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1095`**,
+**golem-line `2026-08-03-1072`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,9 +923,18 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.4**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.6**; ledger in `VERSION.md`.
 
-- **THE TUTORIAL WALK AND THE COMBAT WALK (2026-08-03, latest). BOTH LINES.**
+- **THE FORK OVERLAY JOINS THE HOUSE PALETTE (2026-08-03, latest). BOTH
+  LINES.** HAL OTA-1072 / golem OTA-1049. The owner's style audit of the
+  Phase 3-5 surfaces: creation pressure step, both character-sheet sections
+  and the ending blocks all reuse existing styles or pre-existing tokens —
+  clean. `StoryForkOverlay` was the exception: nine colors appearing nowhere
+  else in the app. Restyled onto the house set (gold #c9a86a, the dark
+  grounds, #3a342c rule, #6b5c3a border, parchment text ranks) — every value
+  now shared with 4-50 other files; layout and the no-dismiss rule untouched.
+
+- **THE TUTORIAL WALK AND THE COMBAT WALK (2026-08-03). BOTH LINES.**
   HAL OTA-1070 / golem OTA-1047. The audit's two named coverage edges, closed
   at the owner's direction. `playtestTutorialWalk` plays onboarding by typing
   what the Arbiter asks, beat by beat, and asserts the tutorial ENDS, every
