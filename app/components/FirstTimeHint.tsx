@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   body: {
-    color: '#d8cfc1',
+    color: '#d8cfc0',
     fontSize: 13,
     lineHeight: 18,
     marginBottom: 14,
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   linkText: {
-    color: '#8a7f6c',
+    color: '#a2977b',
     fontSize: 11,
     textDecorationLine: 'underline',
     letterSpacing: 0.3,
