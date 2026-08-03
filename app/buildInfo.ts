@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.17';
+export const DISPLAY_VERSION = '4.29.18';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20828,7 +20828,42 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // requires tastes to have hit, and the fallback loves nothing specific.
 // Test: ota1106GiftEconomy.test.ts.
 // DISPLAY_VERSION 4.29.17.
-export const OTA_BUILD_ID = '2026-08-03-1106-gift-economy';
+//
+// OTA-1107 — THE LOG-EXPORT REINIT LOOP: BOUNDED, FOREGROUND-ONLY QWEN
+// REVIVAL. Owner's 11-part device log ends with the watchdog burning 10+
+// reinit attempts in 64 seconds, status 'idle' every time.
+//
+// ROOT CAUSE: exporting log chunks means bouncing the app — copy a part,
+// switch away to paste it, come back for the next. Every switch-away
+// disposes the ~400MB Qwen context (background → shutdownQwen → status
+// 'idle'); every return let the OTA-1055 5s recovering cadence kick a
+// FRESH full context load, which the next bounce killed. Worse, two
+// engine defects compounded it: forceReinitialize() reset status to
+// 'idle' BEFORE initialize(), defeating the "already loading" guard — so
+// a dispose landing mid-load let a second concurrent context load stack —
+// and a load the dispose had interrupted still installed itself as
+// 'ready' when it landed, resurrecting in the background the very context
+// the dispose had just paid to free.
+//
+// THE FIX, four locks:
+// (1) WATCHDOG RULE 1 — no revival kicks while the app isn't foregrounded
+//     (AppState gate). A background reload is guaranteed wasted work; the
+//     'active' listener re-checks the moment the player is back. Logged
+//     once per background stretch, not per tick.
+// (2) WATCHDOG RULE 2 — after QWEN_WATCHDOG_FREE_RETRIES (4) straight
+//     attempts, the retry cadence doubles per attempt up to the healthy
+//     60s. A fresh return to foreground resets the ladder for one fast
+//     retry. Worst case is now one reload a minute, not twelve.
+// (3) ENGINE — initInFlight: one context load at a time; a reinit kicked
+//     while one is warming JOINS it instead of stacking a second load.
+// (4) ENGINE — lifecycleGen: dispose() marks in-flight loads stale; a
+//     stale load tears its fresh context down and leaves status 'idle'
+//     instead of going 'ready' behind a backgrounded app.
+// Test: ota1107QwenWatchdogBackoff.test.ts (+ ota1055 source locks
+// retargeted to the backoff-aware schedule).
+// DISPLAY_VERSION 4.29.18.
+export const OTA_BUILD_ID = '2026-08-03-1107-qwen-watchdog-backoff';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1106-gift-economy';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1105-vendor-dismiss-closes-talk';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1104-shakedown-escort-mumble';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1103-pickpocket-glow';
