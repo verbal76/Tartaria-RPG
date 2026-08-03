@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1076`**,
-**golem-line `2026-08-02-1053`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-02-1078`**,
+**golem-line `2026-08-02-1055`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,159 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.87**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.89**; ledger in `VERSION.md`.
 
-- **LEDGER IDENTITY + AMENDS + RELATIONSHIP PRICES (2026-08-02, latest). BOTH LINES.**
+- **LEDGER HOLES + NOISE FLOOR (2026-08-02, latest). BOTH LINES.**
+  Six defects the OTA-1077 review turned up, five of them mine from the Phase
+  0/1 run. One OTA because they share a root: the ledger and the noise floor
+  were both wired by following the code that already existed rather than the
+  **set** of places that needed it.
+  **(1) Roadside traders had collapsed into two people.** OTA-1076 was right
+  that `roadside_<demeanor>_<Date.now()>` is not an identity — it split one
+  trader into unbounded one-encounter strangers — but keyed the replacement off
+  the archetype **name**, and `roadside_traders.json` holds exactly **two**
+  archetypes whose names are furniture ("Road Hawker", "Sketchy Stall"). So it
+  over-corrected into the mirror bug: from the second roadside stall a save ever
+  saw, arrival narration was skipped as a familiar face, `tcTraded` pooled
+  across strangers, and **one** caught theft made every roadside trader on the
+  map charge the wronged markup. Neither id was ever an identity because the
+  **data** had no people in it — so the fix is content, not keying: twelve named
+  traders per archetype (24 in all). The archetype still supplies demeanor,
+  stock and description.
+  **(2) Two of the three vendor-install sites never recorded the meeting.**
+  Nothing but `patchSceneForBuildingRoom` can mint a `hidden_market_*` id, so
+  the four Hidden Market stalls had **no relation at all** — every
+  `recordNpcDealing` against them silently no-opped, meaning a caught theft
+  there cost nothing, permanently. And `stepDirection`'s roadside stall — the
+  path the code itself calls dominant, *"one every ~5 travel steps"* — never
+  calls `beginScene`, so no sighting, no greeting, no absence line, no raid news
+  for the traders the player meets **most**. Same shape as the OTA-1075 Guardian
+  gap; one helper (`sightVendor`) now, so a fourth vendor source cannot
+  half-copy it.
+  **(3) …and collapsing them introduced a third bug**, caught before it shipped.
+  The same-vendor guard first read `currentScene.vendor` — but `beginScene`
+  **commits the scene** long before it sights the vendor, so the guard compared
+  the new vendor against itself and would have killed every sighting the ledger
+  has taken since OTA-1072. It is a parameter now, supplied only by the
+  stall-tab path, which is the only caller with a meaningful "before".
+  **(4) Story beats were being merged away.** `appendLog`'s world/system
+  debounce rebuilds the merged entry as `{ ...lastEntry, text }`, so meta comes
+  from the **first** line: a beat glued onto a preceding world line lost
+  `storyBeat` entirely — no rule, no STORY chip, no air. Not a corner case; most
+  authored drip beats are world-channel and `advanceStoryDrip` runs microseconds
+  after `beginScene`'s own world lines. Exactly the complaint OTA-1074 was
+  written to fix, reintroduced by a debounce written years earlier.
+  **(5) `log-moved-on` was dead in every real session.** It compared
+  `gameLog.length` across the 14–20s generation, and `gameLog` is `.slice(-500)`
+  on every append — so past ~500 entries (roughly ten minutes of play) the
+  length is pinned and the difference is permanently zero. It is the **only** one
+  of the five staleness checks that catches the OTA's own stated case: a player
+  standing still who "looted three things" while the musing generated.
+  **(6) Auto-granted contracts poisoned the accept burst.** Three sites hand a
+  contract over off a hook the player walked into, and all three ran the full
+  burst path — so a stretch of road that dropped three hooks could have the
+  Arbiter tell a player who accepted **nothing** that they were "stacking
+  promises", and, because OTA-1071 keys the compact accept card off the same
+  counter, could make their next genuinely **first** manual accept render as the
+  compact repeat form. The milestone still counts; only the burst does not.
+  **(7) Raid dialogue printed slugs.** Somebody who lives at Reclaimer's Stake
+  called it "reclaimer stake"; the Tartarian Pilgrim Camp came out "pilgrim
+  waycamp". `npcMemory` has no location catalog and should not grow one, so the
+  store stamps `safeLocName` onto the record at write time; the de-slugged id
+  survives only as the migration fallback.
+  Also: `acceptFactionQuest` — the sixth and most face-to-face accept path — was
+  the only one not crediting `contractsTaken`.
+  **⚠ SECOND PASS — what four review agents found in the above, before it was
+  pushed.** The pattern is the point: five of the seven items are "a rule
+  applied at some sites out of several", and the first draft repeated that
+  mistake three more times.
+  **(8) "two of three" was two of FIVE.** The elevated-overlay trader and the
+  `spawn_vendor` campfire Reclaimer are also vendor-install sites and were also
+  unsighted, under a docblock claiming the hole was shut. Both wired;
+  `vendorLedgerId` gains an `overlay:` rule; the test counts the call sites in
+  the source rather than restating the comment.
+  **(9) The stall-tab guard was dead code and the inflation was still real.**
+  `goBuildingRoom` early-returns when you re-tap the tab you are on, so the same
+  stall never re-patches; the reachable case is *alternating* tabs, where the
+  previous vendor is the other stall and the ids never match. A review measured
+  a rep at **six** meetings after six taps — past `MEETINGS_FOR_NAME`, so a
+  shopkeeper used the player's name with no business done. The rule moved into
+  `recordNpcSighting`: **a sighting at the same in-game clock is the same
+  visit** — one rule for every caller instead of a guard each new site forgets.
+  **(10) Wiring those sites silently regressed OTA-1075.** A sighting advances
+  `prevSeenHours`, the anchor the absence line measures against, but only
+  `beginScene` had a greeting emitter — so the new sites consumed the anchor and
+  said nothing. Greeting block lifted into `emitVendorGreeting`; all four
+  non-`beginScene` sites now speak.
+  **(11) The amends residue fix only covered full settlement** — a partial clear
+  banked up to `600×outstanding − 1`, which then pre-paid the next theft. A
+  fresh betrayal now costs you your restitution progress outright.
+  **(12) No migration for the 4.28.87 bank**, which was fed from `tcTraded`
+  (sales included): a live save can hold `wrongs: 0, amendsTc: 49_400`. The
+  save-healing pass now enforces the invariant the live code already maintains.
+  **(13) The archetype rows became permanent ghosts** — `roadside:road_hawker`
+  and `roadside:sketchy_stall` can never be minted again, so they sit in the
+  Chronicle forever, and a `wrongs` on one is a debt that can never be paid.
+  Swept by the same pass.
+  **(14) Raid records were evicted by the wall clock.** The patrol sim runs
+  every ~6 real seconds regardless of in-game time; 60 idle ticks overflowed the
+  12-slot buffer, so OTA-1077 was near-inert in exactly the sessions it was
+  written for. Deduped on (defender, in-game hour).
+  **(15) The Chronicle could print "caught stealing · a debt settled".** Now "an
+  old debt settled" while a wrong stands.
+  **Tests.** A mutation audit reverted each fix and measured which tests died.
+  Four were guarded only by grepping `gameStore.ts` for their own source line
+  and one guarded a condition that could not fire; those are behavioural now —
+  the ambient stamp is proven to *consume* the monotonic counter, a granted
+  contract is proven not to make the next real accept render compact, and buying
+  from a vendor you robbed is proven to clear the debt end-to-end. One test that
+  was a pure tautology (it passed unchanged under the mutation that deletes the
+  feature) was replaced with a partition check that can fail.
+  Files: `vendors.ts` + `roadside_traders.json` (the cast), `gameStore.ts`
+  (`sightVendor` × 5, `emitVendorGreeting`, merge guard, monotonic counter,
+  `granted` burst opt-out, `safeLocName` stamp, faction-accept credit, raid
+  dedup), `npcMemory.ts` (same-visit rule, amends, save-healing, `raidNewsLine`
+  place name), `types.ts` (`OutpostRaid.locationName`),
+  `ota1078LedgerHolesAndNoiseFloor.test.ts` (37) + `ota1076…` (35).
+
+- **RAID NEWS REACHES THE PEOPLE (2026-08-02). BOTH LINES.**
+  ⚠ **Correction to the OTA-1076 entry**, which records *"there is no offscreen
+  location-raid event in the game at all"*. That was wrong and should have been
+  checked before it was written down. The world step has emitted
+  `outpost_assault` events since OTA-844/864/867 — a full offscreen war sim that
+  raids outposts, culls patrols and moves faction power and relations.
+  What was actually missing is far narrower: those events name only **factions**
+  and go only to the **World board**. They are never joined to a location the
+  player has walked or a person the player knows, and nobody says one out loud.
+  Every piece of the join already existed — the assault knows its defender,
+  `FACTION_STARTING_LOCATION` maps faction to home ground, and every
+  `NpcRelation` carries a `factionId`.
+  So this OTA **simulates nothing new**. It keeps the same assault as data
+  (`OutpostRaid` on `worldMemory.recentRaids`, capped at `RAID_MEMORY_CAP` = 12)
+  and lets the people whose outpost burned mention it next time you walk in.
+  ⚠ Records are kept **whole, not sampled**. The board's `FEED_PER_STEP` = 3
+  sample exists so the World screen reads as a story rather than a wall; a raid
+  trimmed out of the *display* still happened, and the trader whose outpost
+  burned should still be able to say so.
+  **Gated hard**, because Phase 0 was spent on the noise floor: it must be their
+  faction's ground, it must have happened since they last saw you (measured
+  against OTA-1075's `prevSeenHours`, so a first meeting never qualifies), and
+  they must actually know you — an acquaintance does not confide, and someone
+  who caught you stealing tells you nothing. Deterministic: the most recent
+  qualifying raid, ties broken on location id. Sits **above** gossip in the
+  greeting — what happened to *them* outranks what they heard about somebody
+  else.
+  **Still not done: the death half.** The vendor-kill path converts the vendor
+  into a generic `Enemy` that no longer carries its ledger id, **and** a killed
+  vendor currently respawns (there is no dead-NPC list anywhere in the code).
+  That needs an identity thread through combat resolution plus an owner decision
+  on permadeath — if the player murders the only armourer at their home outpost,
+  do they lose that service for good?
+  Files: `npcMemory.ts` (`raidNewsFor` / `raidNewsLine` / `RAID_MEMORY_CAP`),
+  `types.ts` (`OutpostRaid`, `recentRaids`), `gameStore.ts` (record at the
+  assault site, persist, greeting wire), `ota1077RaidNews.test.ts` (18).
+
+- **LEDGER IDENTITY + AMENDS + RELATIONSHIP PRICES (2026-08-02). BOTH LINES.**
   The last Phase 1 residuals. Two were leaks I shipped.
   **(1) Ledger identity was runtime identity.** `pickRoadsideTrader` mints
   `roadside_<demeanor>_<Date.now()>` — a fresh id on **every** spawn — while

@@ -39,10 +39,17 @@ import type { WorldMemory, NpcMet } from '../app/engine/types';
 
 const IRMA: NpcMet = { id: 'vendor_irma', name: 'Irma', role: 'armorer', factionId: 'reclaimers_guild' };
 
+/** OTA-1078 — the clock ADVANCES between visits. This helper used to stack
+ *  every sighting on one `hoursElapsed`, which is not a thing the world can do:
+ *  you cannot walk away and come back without time passing. recordNpcSighting
+ *  now treats same-clock sightings as one visit (a re-render, a stall tab, a
+ *  room re-entry), so a fixture that freezes the clock is asserting against a
+ *  world that does not exist. One in-game hour per visit is the minimum honest
+ *  spacing. */
 const see = (m: WorldMemory, times = 1, hours = 0): WorldMemory => {
   let out = m;
   for (let i = 0; i < times; i++) {
-    out = recordNpcSighting(out, IRMA, { nowMs: 1000 + i, hoursElapsed: hours });
+    out = recordNpcSighting(out, IRMA, { nowMs: 1000 + i, hoursElapsed: hours + i });
   }
   return out;
 };
@@ -220,8 +227,11 @@ describe('OTA-1072 — absence', () => {
   });
 
   it('three in-game days out and they say so', () => {
-    const m = see(emptyMemory(), 4, 10);
-    const line = npcAbsenceLine(rel(m), 'Irma', 'Verbal', 10 + LONG_ABSENCE_HOURS);
+    // OTA-1078 — four visits (hours 10-13), then the return, recorded as a
+    // sighting BEFORE the line is composed, which is the order the store uses.
+    const back = 13 + LONG_ABSENCE_HOURS + 1;
+    const m = recordNpcSighting(see(emptyMemory(), 4, 10), IRMA, { nowMs: 9_999, hoursElapsed: back });
+    const line = npcAbsenceLine(rel(m), 'Irma', 'Verbal', back);
     expect(line).toBeTruthy();
     expect(line).not.toContain('{');
   });
