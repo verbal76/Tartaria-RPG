@@ -397,9 +397,15 @@ deliberate golem-line feature between `name` and `cudgel` — "Tap LOOK AROUND
 YOU"; HAL never had it): the walk had no input for a beat it did not know
 existed. Fixed in the WALK — one `look: 'look around'` entry in the
 beat-input map, inert on a line without the beat — so ONE walk file plays
-BOTH lines' real tutorials. ⚠ The content divergence itself is INTENDED
-per-line behavior and stands; do not "fix" it into parity. Both walks now
-green on both lines.
+BOTH lines' real tutorials.
+
+⚠ SUPERSEDED SAME DAY by HAL OTA-1094: the owner ruled the divergence was a
+LAPSE, not intent — "never noted that lapse in the tutorial, HAL should have
+the look around you beat as well" — and HAL adopted the beat (its
+maybeAdvanceTutorial('look') handler and InputBox chip-lighting were already
+ported; only the step definition was missing). Both lines now run the SAME
+ten beats and the walk plays them identically. The earlier "do not fix into
+parity" instruction is void.
 
 ### ⚠ THE PORT IS NOT DONE UNTIL THE VERIFIER SAYS SO (2026-08-03 audit)
 
