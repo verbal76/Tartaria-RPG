@@ -1446,14 +1446,14 @@
       "topics": [
         {
           "id": "c_front",
-          "label": "Ask what brings them here",
+          "label": "Ask where they are headed",
           "lines": [
             "\"Where am I going?\" They consider the horizon as though it had asked. \"Onward is the honest answer. I stopped having a destination about two seasons back and I have not missed it.\""
           ]
         },
         {
           "id": "c_known",
-          "label": "Ask about their road",
+          "label": "Ask how they stay safe out here",
           "gate": {
             "minRegard": "known"
           },
@@ -1463,7 +1463,7 @@
         },
         {
           "id": "c_deep",
-          "label": "Ask what they are not saying",
+          "label": "Ask what the road has taught them",
           "gate": {
             "minRegard": "trusted"
           },
@@ -1473,7 +1473,7 @@
         },
         {
           "id": "c_wronged",
-          "label": "Try to say something",
+          "label": "Try to make it right",
           "gate": {
             "onlyRegard": "wronged"
           },
@@ -1488,14 +1488,14 @@
       "topics": [
         {
           "id": "c_front",
-          "label": "Ask what brings them here",
+          "label": "Ask where they are from",
           "lines": [
             "\"I am from somewhere that is not there any more,\" they say, without self-pity. \"That is most of my conversation, so you may as well have it early.\""
           ]
         },
         {
           "id": "c_known",
-          "label": "Ask about their road",
+          "label": "Ask when they got out",
           "gate": {
             "minRegard": "known"
           },
@@ -1505,7 +1505,7 @@
         },
         {
           "id": "c_deep",
-          "label": "Ask what they are not saying",
+          "label": "Ask if they ever go back",
           "gate": {
             "minRegard": "trusted"
           },
@@ -1515,7 +1515,7 @@
         },
         {
           "id": "c_wronged",
-          "label": "Try to say something",
+          "label": "Try to make it right",
           "gate": {
             "onlyRegard": "wronged"
           },
@@ -1530,14 +1530,14 @@
       "topics": [
         {
           "id": "c_front",
-          "label": "Ask what brings them here",
+          "label": "Ask what they mend",
           "lines": [
             "\"I mend things,\" the tinker says, hands already busy with something. \"Badly, sometimes, but faster than anybody else out here and that is what people actually want.\""
           ]
         },
         {
           "id": "c_known",
-          "label": "Ask about their road",
+          "label": "Ask where they learned it",
           "gate": {
             "minRegard": "known"
           },
@@ -1547,7 +1547,7 @@
         },
         {
           "id": "c_deep",
-          "label": "Ask what they are not saying",
+          "label": "Ask if they understand the work",
           "gate": {
             "minRegard": "trusted"
           },
@@ -1557,7 +1557,7 @@
         },
         {
           "id": "c_wronged",
-          "label": "Try to say something",
+          "label": "Try to make it right",
           "gate": {
             "onlyRegard": "wronged"
           },
@@ -1572,14 +1572,14 @@
       "topics": [
         {
           "id": "c_front",
-          "label": "Ask what brings them here",
+          "label": "Ask what they do out here",
           "lines": [
             "\"I look at things and then I tell people about them,\" the scout says. \"You would be astonished what that is worth to somebody who has not left their outpost in a year.\""
           ]
         },
         {
           "id": "c_known",
-          "label": "Ask about their road",
+          "label": "Ask who they work for",
           "gate": {
             "minRegard": "known"
           },
@@ -1589,7 +1589,7 @@
         },
         {
           "id": "c_deep",
-          "label": "Ask what they are not saying",
+          "label": "Ask what they have seen moving",
           "gate": {
             "minRegard": "trusted"
           },
@@ -1599,7 +1599,7 @@
         },
         {
           "id": "c_wronged",
-          "label": "Try to say something",
+          "label": "Try to make it right",
           "gate": {
             "onlyRegard": "wronged"
           },
@@ -1614,14 +1614,14 @@
       "topics": [
         {
           "id": "c_front",
-          "label": "Ask what brings them here",
+          "label": "Ask where they are walking",
           "lines": [
             "\"I am walking to somewhere I do not expect to reach,\" the pilgrim says comfortably. \"That is not a tragedy. It is the arrangement.\""
           ]
         },
         {
           "id": "c_known",
-          "label": "Ask about their road",
+          "label": "Ask who they walk for",
           "gate": {
             "minRegard": "known"
           },
@@ -1631,7 +1631,7 @@
         },
         {
           "id": "c_deep",
-          "label": "Ask what they are not saying",
+          "label": "Ask if they still believe it",
           "gate": {
             "minRegard": "trusted"
           },
@@ -1641,7 +1641,7 @@
         },
         {
           "id": "c_wronged",
-          "label": "Try to say something",
+          "label": "Try to make it right",
           "gate": {
             "onlyRegard": "wronged"
           },
@@ -1656,14 +1656,14 @@
       "topics": [
         {
           "id": "c_front",
-          "label": "Ask what brings them here",
+          "label": "Ask what they want",
           "lines": [
             "\"What do I want?\" The drifter looks you over with frank commercial interest. \"Same as you. Slightly more than I have got.\""
           ]
         },
         {
           "id": "c_known",
-          "label": "Ask about their road",
+          "label": "Ask who they answer to",
           "gate": {
             "minRegard": "known"
           },
@@ -1673,7 +1673,7 @@
         },
         {
           "id": "c_deep",
-          "label": "Ask what they are not saying",
+          "label": "Ask where they have been",
           "gate": {
             "minRegard": "trusted"
           },
@@ -1683,7 +1683,7 @@
         },
         {
           "id": "c_wronged",
-          "label": "Try to say something",
+          "label": "Try to make it right",
           "gate": {
             "onlyRegard": "wronged"
           },
@@ -1698,14 +1698,14 @@
       "topics": [
         {
           "id": "c_front",
-          "label": "Ask what brings them here",
+          "label": "Ask what the mud gives up",
           "lines": [
             "\"I take what the mud gives up,\" the scavenger says. \"It gives up more than you would think and less than I need.\""
           ]
         },
         {
           "id": "c_known",
-          "label": "Ask about their road",
+          "label": "Ask where they work a site",
           "gate": {
             "minRegard": "known"
           },
@@ -1715,7 +1715,7 @@
         },
         {
           "id": "c_deep",
-          "label": "Ask what they are not saying",
+          "label": "Ask what they have found out there",
           "gate": {
             "minRegard": "trusted"
           },
@@ -1725,7 +1725,7 @@
         },
         {
           "id": "c_wronged",
-          "label": "Try to say something",
+          "label": "Try to make it right",
           "gate": {
             "onlyRegard": "wronged"
           },
@@ -1740,14 +1740,14 @@
       "topics": [
         {
           "id": "c_front",
-          "label": "Ask what brings them here",
+          "label": "Ask why the stall is here",
           "lines": [
             "\"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\""
           ]
         },
         {
           "id": "c_known",
-          "label": "Ask about their road",
+          "label": "Ask how far they range",
           "gate": {
             "minRegard": "known"
           },
@@ -1757,7 +1757,7 @@
         },
         {
           "id": "c_deep",
-          "label": "Ask what they are not saying",
+          "label": "Ask if there are fewer stalls",
           "gate": {
             "minRegard": "trusted"
           },
@@ -1767,7 +1767,7 @@
         },
         {
           "id": "c_wronged",
-          "label": "Try to say something",
+          "label": "Try to make it right",
           "gate": {
             "onlyRegard": "wronged"
           },
@@ -1782,14 +1782,14 @@
       "topics": [
         {
           "id": "c_front",
-          "label": "Ask what brings them here",
+          "label": "Ask if they can fight",
           "lines": [
             "\"I am not a fighter,\" they say, matter-of-fact rather than apologetic. \"I am somebody who has to be somewhere, and you are the reason I might get there.\""
           ]
         },
         {
           "id": "c_known",
-          "label": "Ask about their road",
+          "label": "Ask about the people with them",
           "gate": {
             "minRegard": "known"
           },
@@ -1799,7 +1799,7 @@
         },
         {
           "id": "c_deep",
-          "label": "Ask what they are not saying",
+          "label": "Ask if they have walked this before",
           "gate": {
             "minRegard": "trusted"
           },
@@ -1809,7 +1809,7 @@
         },
         {
           "id": "c_wronged",
-          "label": "Try to say something",
+          "label": "Try to make it right",
           "gate": {
             "onlyRegard": "wronged"
           },
@@ -1824,14 +1824,14 @@
       "topics": [
         {
           "id": "c_front",
-          "label": "Ask what brings them here",
+          "label": "Ask what it holds here",
           "lines": [
             "The Guardian does not turn. \"QUERY ACKNOWLEDGED. I AM THE HOLD ON THIS PLACE.\" A pause that is almost patient. \"THAT IS THE WHOLE OF MY FUNCTION AND I HAVE PERFORMED IT WITHOUT INTERRUPTION.\""
           ]
         },
         {
           "id": "c_known",
-          "label": "Ask about their road",
+          "label": "Ask if it remembers you",
           "gate": {
             "minRegard": "known"
           },
@@ -1841,7 +1841,7 @@
         },
         {
           "id": "c_deep",
-          "label": "Ask what they are not saying",
+          "label": "Ask who gave it the order",
           "gate": {
             "minRegard": "trusted"
           },
@@ -1866,14 +1866,14 @@
       "topics": [
         {
           "id": "c_front",
-          "label": "Ask what brings them here",
+          "label": "Ask why they trade up here",
           "lines": [
             "\"Not many come up,\" they say, nodding at the drop. \"Which is exactly why the stock is worth carrying.\""
           ]
         },
         {
           "id": "c_known",
-          "label": "Ask about their road",
+          "label": "Ask how the stock got up",
           "gate": {
             "minRegard": "known"
           },
@@ -1883,7 +1883,7 @@
         },
         {
           "id": "c_deep",
-          "label": "Ask what they are not saying",
+          "label": "Ask what they can see from here",
           "gate": {
             "minRegard": "trusted"
           },
@@ -1893,7 +1893,7 @@
         },
         {
           "id": "c_wronged",
-          "label": "Try to say something",
+          "label": "Try to make it right",
           "gate": {
             "onlyRegard": "wronged"
           },

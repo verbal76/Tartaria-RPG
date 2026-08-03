@@ -153,7 +153,9 @@ describe('OTA-1084 — the store pays once, and reads one fact to decide', () =>
   it('the grant is gated on the FIRST raise, off the same counter as the reply', () => {
     // Not a separate `granted` flag. One fact, read twice, so the payout and
     // "I have told you that one" cannot drift apart.
-    expect(SRC).toMatch(/if \(asked === 0 && topic\.grants\) applyTopicGrant/);
+    // OTA-1087 — the call now yields whether it DELIVERED, so a lead that could
+    // not land does not spend the topic. The fact it reads is unchanged.
+    expect(SRC).toMatch(/const granted = asked === 0 && topic\.grants\s*\n\s*\? applyTopicGrant/);
     expect(SRC).toMatch(/const asked = get\(\)\.worldMemory\.talkedTopics/);
   });
 
@@ -161,7 +163,11 @@ describe('OTA-1084 — the store pays once, and reads one fact to decide', () =>
     // The payout site reads a single slot. Replacing an unclaimed lead would
     // quietly delete something the player was told to go and find.
     expect(SRC).toMatch(/if \(player\.pendingLead\) \{/);
-    expect(SRC).toContain("will keep.");
+    expect(SRC).toContain("tip will keep");
+    // ⚠ OTA-1087 — and it is no longer a lie. The topic stays unspent, so the
+    // player can come back and actually collect it.
+    expect(SRC).toContain('deferred = true;');
+    expect(SRC).toContain('if (granted) {');
   });
 
   it('a whisper you already have is not planted twice', () => {
@@ -169,8 +175,13 @@ describe('OTA-1084 — the store pays once, and reads one fact to decide', () =>
   });
 
   it('applyTopicGrant cannot touch faction standing', () => {
-    const fn = SRC.slice(SRC.indexOf('function applyTopicGrant('), SRC.indexOf("/** OTA-1083 — a gift's standing effect"));
+    // OTA-1087 — bound to applyTopicGrant's OWN body (column-0 close), not to
+    // whichever function happens to be declared next. A helper added between
+    // them used to fail this test for its position rather than its behaviour.
+    const from = SRC.indexOf('function applyTopicGrant(');
+    const fn = SRC.slice(from, SRC.indexOf('\n}\n', from));
     expect(fn.length).toBeGreaterThan(400);
+    expect(fn).toContain('grant.whisper');   // we sliced the right function
     expect(fn).not.toContain('applyRepChange');
     expect(fn).not.toContain('factionStanding');
   });
