@@ -1035,6 +1035,21 @@ export interface PlayerCharacter {
    *  next phase they qualify for. Unknown ids from a newer build are ignored
    *  rather than crashing. */
   storyChoices?: Record<string, string>;
+  /** ⚠ OTA-1090 — PHASE 5. The one-shot Arbiter beats already SPOKEN
+   *  ('stance:invested', 'regard:warm'), and the only thing the persona system
+   *  persists.
+   *
+   *  His arc and his opinion of you are both PURE FUNCTIONS of the save
+   *  (engine/arbiterPersona.ts) — nothing accumulates a hidden score that a bad
+   *  backfill could drop or a re-entrant world tick could double-count. But
+   *  "has he already said this" is genuinely not derivable from anything else,
+   *  so it is recorded, exactly like tideStageSeen.
+   *
+   *  Absent on every save older than OTA-1090, which reads correctly as "he has
+   *  not said any of it yet" — a long-running character hears the beats they
+   *  have already earned, one per arrival, rather than silently missing the
+   *  whole arc. Unknown keys from a newer build are inert. */
+  arbiterBeatsSeen?: string[];
   /** OTA-1044 — how The Missing side-thread ended for this character
    *  ('grave' | 'lie' | 'walker'), set when the resolution fires. Also keys
    *  the EndingScreen epilogue override. Absent = trail still open. */

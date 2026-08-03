@@ -16,6 +16,8 @@ import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from
 import {
   PRESSURE_ORDER, PRESSURE_PROFILES, pressureOf, canChangeTo,
 } from '../engine/pressure';
+// OTA-1090 — Phase 5: where the Arbiter stands, and what he thinks of you.
+import { arbiterSheetLines } from '../engine/arbiterPersona';
 import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { barehandDamageFor } from '../engine/raceMechanics';
@@ -92,6 +94,10 @@ export function CharacterScreen() {
     ? `${barehand.count}d${barehand.sides}`
     : `${barehand.count}d${barehand.sides}${barehand.bonus > 0 ? '+' : ''}${barehand.bonus}`;
   const tier = corruptionTierOf(player.corruption ?? 0);
+
+  // OTA-1090 [Phase 5] — where the Arbiter stands in the arc, what he thinks
+  // of this character, and the itemised reasons for it.
+  const arbiter = arbiterSheetLines(player, worldMemory);
 
   // OTA-843 [Chronicle] — assemble the character's legend from accreted state
   // (memorable beats + milestones + titles + corruption + main-quest progress).
@@ -215,6 +221,39 @@ export function CharacterScreen() {
             You can ease what the mud takes at any time. You can never raise it again.
           </Text>
         </View>
+        )}
+
+        {/* ── THE ARBITER ───────────────────────────────────────── */}
+        {/* ⚠ OTA-1090 — PHASE 5. Where he stands in the arc, what he currently
+            thinks of you, and the ITEMISED WHY.
+            A hidden opinion score is the same legibility failure the Phase 4
+            tide lines were written to close: the game quietly decides something
+            about the player and never says what moved it, so the character just
+            starts feeling differently-written for no reason they can name.
+            Every contribution regardScore() sums is listed here, signed, in the
+            same words the engine used. */}
+        {arbiter && (
+          <>
+            {sectionHeader('arbiter', 'THE ARBITER')}
+            {!collapsed.arbiter && (
+            <View style={styles.card}>
+              <Text style={styles.kvKey}>{arbiter.stance}</Text>
+              <Text style={styles.kvValue}>{arbiter.regard}</Text>
+              {arbiter.parts.length > 0 && (
+                <View style={{ marginTop: 10 }}>
+                  {arbiter.parts.map((part, i) => (
+                    <View key={i} style={styles.kvRow}>
+                      <Text style={styles.kvValue}>{part.label}</Text>
+                      <Text style={[styles.kvValue, { color: part.value >= 0 ? '#7a8a5a' : '#a85a3a' }]}>
+                        {part.value >= 0 ? '+' : ''}{part.value}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+            )}
+          </>
         )}
 
         {/* ── CHRONICLE ─────────────────────────────────────────── */}
