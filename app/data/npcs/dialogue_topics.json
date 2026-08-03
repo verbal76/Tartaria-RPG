@@ -41,6 +41,17 @@
           ]
         },
         {
+          "id": "irma_title",
+          "label": "Ask about the climb",
+          "gate": {
+            "requiresTitle": "skyreacher",
+            "minRegard": "known"
+          },
+          "lines": [
+            "Irma actually stops. \"You went UP.\" She looks at your gear with new attention. \"My mother's people went up and stayed. I have never met anyone who went up and came back down to tell me what is there.\" A pause. \"Well. Go on, then.\""
+          ]
+        },
+        {
           "id": "irma_wronged",
           "label": "Try to say something",
           "gate": {
@@ -91,6 +102,17 @@
           },
           "lines": [
             "Halem's cheer dips a notch, which on him is a shout. \"Fewer people coming through than last season. Same amount of goods, though — which means the goods are coming without the people.\" He straightens a row of tins that were straight. \"I do not like arithmetic that works out like that.\""
+          ]
+        },
+        {
+          "id": "halem_standing",
+          "label": "Ask what the factions make of you",
+          "gate": {
+            "minRegard": "known",
+            "minStanding": 35
+          },
+          "lines": [
+            "\"You have friends,\" Halem observes. \"That is not nothing. People come through here with a badge and no standing and they get charged like a stranger. You get charged like somebody who might be back.\""
           ]
         },
         {
@@ -146,6 +168,16 @@
           ]
         },
         {
+          "id": "tellin_contracts",
+          "label": "Ask about the work you have done for him",
+          "gate": {
+            "minContractsTurnedIn": 2
+          },
+          "lines": [
+            "\"Two jobs finished and both of them accounted for.\" Tellin taps the ledger. \"I keep a column for people like that. It is not a long column. Most people finish one and decide they have proved something.\""
+          ]
+        },
+        {
           "id": "tellin_you",
           "label": "Ask what he makes of you",
           "gate": {
@@ -163,6 +195,1161 @@
           },
           "lines": [
             "Tellin keeps his hands flat on the table where you can see them. \"I know exactly what you took,\" he says. \"To the quarter-weight. It is my job to know.\" He does not blink. \"So we will talk about that, when you are ready to talk about that. Not before.\""
+          ]
+        }
+      ]
+    },
+    "order_scholar": {
+      "displayName": "Vesryn of Varakush",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"I catalogue,\" Vesryn says. \"Everyone assumes that means I know things. It means I know where things are, which is a different and much lonelier profession.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"The Order keeps records because nobody else did. That is the entire claim. Not wisdom — filing.\" A thin smile. \"We are the only people who wrote down what the water took, and now everyone who wants to argue about it has to come to us.\""
+          ]
+        },
+        {
+          "id": "t_cores",
+          "label": "Ask what the Cores are, really",
+          "gate": {
+            "minRegard": "familiar",
+            "minCores": 2
+          },
+          "lines": [
+            "Vesryn goes very still. \"You are carrying two. I can smell the air around you change.\" They sit down, which they do not do for customers. \"There is nothing in our records about Cores. Nothing. For an order that wrote down the shape of every drowned street, that is not an absence. That is a deletion.\""
+          ]
+        },
+        {
+          "id": "vesryn_chapter",
+          "label": "Ask about the descent",
+          "gate": {
+            "minChapter": "descent"
+          },
+          "lines": [
+            "\"You have been below.\" Vesryn's hands go flat on the desk. \"Then you know what I am not allowed to write down. The Order has a word for the lower structure and the word is a lie — we call it a ruin. It is not ruined. It is CLOSED, and closed is a thing somebody does.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I will tell you what frightens me. The oldest records are the CLEAREST. The hand is steady, the ink is good, the dates line up.\" Vesryn closes the ledger. \"Everything since is worse. We have been getting stupider for a very long time, and the flood is only where we started noticing.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You took from the archive.\" Vesryn does not raise their voice. \"I do not care about the object. I care that you were in a room of irreplaceable things and decided one of them was yours. That is a character, not a mistake.\""
+          ]
+        }
+      ]
+    },
+    "tartarian_quartermaster": {
+      "displayName": "Korash of the Deep",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Quartermaster means I say no,\" Korash rumbles. \"All day. To my own people mostly. There is never enough, and the ones who shout loudest are never the ones on the line.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"We went deep when the water came. Not up — down. Everyone gets that wrong.\" He taps the table. \"The Giants built downward first. The mud filled the top of the world and we already lived under it.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"You want the truth of it? We are not big because we are strong. We are big because the ones who were not big did not come back up.\" Korash looks at his own hands. \"That is not a heritage. That is a graveyard with survivors standing on it.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You stole from a quartermaster.\" Korash almost laughs. \"Do you know what that means? It means somebody on the line goes without. Not me. Them. Go and think about which of them it was.\""
+          ]
+        }
+      ]
+    },
+    "wandering_drifter": {
+      "displayName": "Naha",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Trade?\" Naha shrugs the pack higher. \"I carry what is light and sell what is heavy. That is the whole system. I have never once known what anything is worth.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"No people. That is not sad, before you make the face.\" She adjusts a strap. \"Everyone with people is somewhere, and somewhere is where the mud finds you. I am nowhere, professionally.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I have walked past every settlement on this map twice.\" Naha says it flatly. \"The second time is the one that tells you. Half of them are smaller. Nobody inside a place can see it shrinking — you have to leave and come back, and almost nobody does that but me.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You went into my pack.\" Naha does not step away, which is somehow worse. \"Everything I own is on my back. You understand what you did. You did not take a thing from me, you took a percentage of my life.\""
+          ]
+        }
+      ]
+    },
+    "thalan_wanderer": {
+      "displayName": "Thalan",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"I sell what the road gives me,\" Thalan says. \"Which is mostly other people's dropped things and occasionally something I should probably have left where it was.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"I do not answer to anyone, and that is a job in itself.\" He gestures vaguely at the horizon. \"Every faction on this map has offered me a badge. A badge is a thing people aim at.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I keep walking because I found something once and put it back.\" Thalan's voice loses its ease. \"I have spent eleven years unable to find that place again, and I am no longer certain I want to. But I keep walking.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"Ah.\" Thalan's pleasantness does not waver. \"Well. I have been robbed by better and worse. You are somewhere in the middle, if that helps.\" It does not sound like it is meant to help."
+          ]
+        }
+      ]
+    },
+    "velar_shadowblade": {
+      "displayName": "Velar Shadowblade",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"I sell quiet,\" Velar says. \"Soft soles, dark cloth, oil that does not smell. Anyone who tells you stealth is a talent is selling you a talent.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"I have no faction and I take no side, and both of those are professional positions.\" A shrug. \"The moment I belong to somebody, every job I ever did belongs to them too.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"The best thing I ever did, nobody knows about.\" Velar says it without pride. \"That is the trade. You want to be remembered, buy a sword. I have kept four people alive who never learned my name and would not thank me if they did.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You stole from a thief.\" Velar sounds genuinely tired. \"Do you know how insulting that is? Not the theft. The assumption that I would not notice.\""
+          ]
+        }
+      ]
+    },
+    "jorah_scholar": {
+      "displayName": "Jorah the Scholar",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Books,\" says Jorah, \"mostly ruined. I sell the ones that survived and I read the ones that did not, which is slower work and pays nothing.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"The Order took me in when I could not read. That is not a story of charity — they needed hands, and hands that cannot read cannot leak.\" He smiles. \"Then they taught me, which I still think was a mistake on their part.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"There is a shelf I do not sell from.\" Jorah does not point at it. \"Six volumes, all the same hand, all describing machines that cannot exist and giving their maintenance schedules. Somebody was very serious about a world that was not this one.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You have taken a book.\" Jorah looks at the gap on the shelf the way you would look at a missing tooth. \"It will be traded on for coin and used to start a fire within the season. I am not angry with you. I am simply not going to speak to you.\""
+          ]
+        }
+      ]
+    },
+    "elara_lightfinger": {
+      "displayName": "Elara Lightfinger",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Trinkets,\" Elara says brightly. \"Beads, buckles, dead people's rings. Everything on this cloth was loved by somebody, which is what you are actually buying.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"I work alone because partners get sentimental about provenance.\" She turns a ring to the light. \"You cannot sell a thing and grieve it at the same time. I picked selling.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"There is one I will not part with.\" She does not show you which. \"I have priced it eleven times for eleven people and taken it off the cloth every time. It is not valuable. That is the whole trouble with it.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"Oh, that is rich.\" Elara laughs, and there is nothing in it. \"Lifted from Lightfinger. You will be a story in three settlements by the end of the month, and I will be the one telling it.\""
+          ]
+        }
+      ]
+    },
+    "tarek_tinkerer": {
+      "displayName": "Tarek the Tinkerer",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Mechanisms,\" Tarek says, up to the elbows in one. \"If it has moving parts and it has stopped, bring it. If it has moving parts and it has NOT stopped, bring it anyway, I am curious.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"The Guild pays me to make old things work again.\" He wipes his hands. \"What they actually want is for old things to work again in ways they understand. Those are not the same job and I get paid for the wrong one.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"Half of what I repair, I do not repair.\" Tarek says it quietly, glancing at the door. \"I get it working. There is a difference, and the difference is that I have no idea what most of these mechanisms were FOR. I make them move. Somebody else decided why.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You took a part.\" Tarek does not look up. \"I know exactly which. I will have to make another and it will not be as good, because the original was not made here and I do not know how it was made at all.\""
+          ]
+        }
+      ]
+    },
+    "felra_swiftfoot": {
+      "displayName": "Felra Swiftfoot",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Boots,\" says Felra. \"The most underrated purchase in Tartaria. People spend a fortune on armour for a fight they might have and nothing on the walk they are definitely having.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Runner's family. Four generations of us carried messages before anyone thought of roads.\" She grins. \"Now there are roads and nobody carries messages. Progress.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I can tell where you have been from the wear.\" Felra turns a sole over. \"Left edge goes first on the eastern flats. Toe-first means you have been climbing. I have not left this stall in two years and I have seen everywhere, secondhand, in leather.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You took a pair of my boots.\" Felra shakes her head slowly. \"Walk in them. Every step. I hope they fit badly.\""
+          ]
+        }
+      ]
+    },
+    "korr_stonefoot": {
+      "displayName": "Korr Stonefoot",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Heavy weapons,\" Korr says. \"Things that solve a problem by being heavier than it. I do not stock anything clever.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Golem-made, most of it. My people do not tire, so we forge past the point where a human hand would stop.\" He shrugs, stone grinding. \"That is not skill. It is stubbornness with a hammer.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"They tell you golems do not feel it.\" Korr sets down the piece. \"We do not feel PAIN. Those are different words and everyone chooses the convenient one. I have carried loads that would fold a man and I have felt every single one of them.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You stole.\" Korr does not move at all, and he is very large. \"I will not chase you. I will simply be here, every time, for as long as you keep coming back, remembering.\""
+          ]
+        }
+      ]
+    },
+    "cassia_nightwind": {
+      "displayName": "Cassia Nightwind",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Bows, slings, anything that ends an argument from a distance,\" Cassia says. \"The distance is the product. The weapon is just how you buy it.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Aetherborn, before you ask, and no I do not glow.\" She says it like a line she has said often. \"We are people who were near the wrong thing at the wrong time, and everyone has decided that makes us interesting.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I do not shoot any more.\" Cassia says it evenly. \"Not cannot. Do not. I was very good, and being very good at killing people from far enough away that they stay strangers is not a skill I want to keep sharp.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"Range is a courtesy,\" Cassia says coldly. \"You came inside it and took something. Do not do it twice.\""
+          ]
+        }
+      ]
+    },
+    "odar_flameforge": {
+      "displayName": "Odar Flameforge",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Fire,\" Odar says, and the forge behind him agrees. \"Everything on this rack burns something. Mostly the thing you point it at. Occasionally you.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Sentinel work. We keep the old fires because the old fires were built to be kept.\" He nods at the forge. \"That flame has not gone out. Not once, not in any record we hold. Somebody would have written it down.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I do not know how to relight it.\" Odar says it to the fire rather than to you. \"That is the secret of the Sentinels and it is not much of one. We are not keepers of a flame. We are people who are very frightened of a draught.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You reached past a working forge to take from me.\" Odar's tone does not change. \"You are lucky. I am not going to say more than that.\""
+          ]
+        }
+      ]
+    },
+    "silvan_the_quiet": {
+      "displayName": "Silvan the Quiet",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "Silvan gestures at the cloth rather than speaking, then relents. \"Relics. I do not name them. Naming a thing is a claim about what it is, and I do not make claims.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Aetherborn.\" A pause long enough to be an answer in itself. \"We do not have a people. We have a diagnosis. Anyone the flood changed gets the same word, and the word does very little work.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"They are not artefacts.\" Silvan touches one, briefly. \"That is the wrong shape of thought. They are PARTS. Every one of these came out of something larger that is still, somewhere, missing them.\" A long silence. \"I sell them because I would rather they were spread out.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "Silvan says nothing at all, and goes on saying it, and after a while you understand that this is the entire response and it is not going to end."
+          ]
+        }
+      ]
+    },
+    "bran_the_beastmaster": {
+      "displayName": "Bran the Beastmaster",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Wilderness kit,\" Bran says. \"Traps, feed, the sort of rope that does not mind being wet. And advice, free, which is that most animals out there want less to do with you than you think.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Reclaimer, technically. Mostly I just live further out than the rest of them.\" He scratches a dog behind the ears. \"The Guild calls it a posting. It is a house.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"The animals changed faster than we did.\" Bran says it without drama. \"Three generations. That is all it took. I set traps my grandfather designed and they do not work any more, because the things they were designed for have learned. We have not learned anything since the water.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You took from a man who feeds strays.\" Bran looks more disappointed than angry. \"That is a low thing. Go on.\""
+          ]
+        }
+      ]
+    },
+    "vela_ironheart": {
+      "displayName": "Vela Ironheart",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Close work,\" Vela says, laying out a gauntlet. \"Armour for people who intend to be within arm's reach. It is heavier and it is honest.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Tartarian, same as Irma, different valley.\" She catches your look. \"Yes, there are valleys. Everyone thinks we came from one place. There were nine, and seven of them are under the mud.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I make armour for a fight I do not believe in.\" Vela sets the gauntlet down. \"Every faction on this map is arming for the others and none of them are arming for the WATER, which is the only thing that has ever actually beaten us. I make the plate anyway. That is my part in it.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You will not be sold to here again,\" Vela says. \"Not because of the value. Because I put armour on people's bodies, and I have to be able to look at them.\""
+          ]
+        }
+      ]
+    },
+    "mara_stoneskin": {
+      "displayName": "Mara Stoneskin",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Earth-gear,\" Mara says. \"Anything that holds when the ground does not. Half of Tartaria is standing on something that has already decided to move.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Golem-kin. Not built — born, whatever the stories say.\" A dry look. \"The stories are better. I have stopped correcting them.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I can feel it under the settlements.\" Mara puts a palm flat on the table. \"There is a rhythm down there and it is not water. It is too regular for water. I have said this to four people in my life and three of them stopped speaking to me.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"Take, then.\" Mara does not rise. \"The ground under this stall remembers weight. So do I.\""
+          ]
+        }
+      ]
+    },
+    "yara_windcaller": {
+      "displayName": "Yara the Windcaller",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Wind-gear,\" says Yara. \"Cloaks that do not fight the air, masks for the dust seasons. Everyone prepares for the mud. The mud is the slow part.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Aetherborn, and yes I hear it in the air, and no it is not a gift.\" She adjusts a hanging cloth. \"It is a sound that does not stop. You would call it a symptom.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"The wind changed direction eleven years ago and never changed back.\" Yara says it like a confession. \"I have asked everyone who would listen. They say weather. It is not weather. Weather returns.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You reached into my stall.\" Yara turns away. \"The air told me before I looked. It always does. That is the part you should find unsettling.\""
+          ]
+        }
+      ]
+    },
+    "zorin_nightblade": {
+      "displayName": "Zorin Nightblade",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Exotic,\" Zorin says, with a showman's flourish. \"Which means I cannot tell you what most of these were for, and I have decided to charge extra for the mystery.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"I come from nobody in particular.\" He grins. \"The Unknowing Masses, they call us, which is a magnificent name for people who simply were not invited to any of the meetings.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I sell wonder because I ran out of it.\" Zorin's patter drops away entirely. \"I have handled every strange thing that came through three settlements. Not one of them turned out to be magic. All of them turned out to be MADE. By somebody. Who is not here.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You robbed a man who sells other people's stolen goods.\" Zorin spreads his hands. \"There is a symmetry there I would enjoy if it were happening to somebody else.\""
+          ]
+        }
+      ]
+    },
+    "kirin_spellweaver": {
+      "displayName": "Kirin Spellweaver",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Arcane gear,\" Kirin says, \"which is a word we use for equipment whose function we have agreed not to interrogate.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Aetherborn. We are the only people who can hold this stock safely, which is less an honour than an occupational hazard with a rota.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"None of it is arcane.\" Kirin taps a rod on the counter. \"That is my professional opinion after nineteen years. It is all engineering. We call it arcane because the alternative is admitting that somebody understood the world far better than we do and is gone.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You handled my stock without permission.\" Kirin looks at you carefully. \"I am not going to punish you. I am going to wait and see whether it punishes you. It sometimes does.\""
+          ]
+        }
+      ]
+    },
+    "drakos_mercenary": {
+      "displayName": "Drakos the Mercenary",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Two-handed,\" Drakos says. \"Big. Slow. Ends things. If you have to ask whether you can lift it, you cannot, and I am not going to be polite about it.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Tartarian by blood, mercenary by trade, and the blood side does not like the trade side.\" He shrugs, enormous. \"I fight for whoever pays. My cousins think that is a betrayal. My cousins have never had to buy their own food.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I have been on every side of this,\" Drakos says. \"Every one. Same fight, different colours, and I have never once been able to tell the difference from inside it. That should worry somebody more important than me.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You took from an armed man in daylight.\" Drakos considers you. \"Either you are brave or you did not think about it. I know which I would bet.\""
+          ]
+        }
+      ]
+    },
+    "nalren_frostgrip": {
+      "displayName": "Nalren Frostgrip",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Frost-gear,\" Nalren says. \"For the high ground and the cold seasons. People forget Tartaria has cold. They only remember the mud because the mud is what they died in.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Reclaimer. I work the frozen sites, which the Guild likes because the cold keeps things whole.\" He blows on his hands. \"It also keeps things whole that would have been better rotted.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"There is a site I will not go back to.\" Nalren says it plainly. \"Everything in it was perfectly preserved and arranged. Not fallen. ARRANGED. Somebody laid that place out and then the cold took it, and they have not been back either.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"Cold makes people slow and you thought that meant me.\" Nalren does not smile. \"Get away from my stall.\""
+          ]
+        }
+      ]
+    },
+    "monarch_agent": {
+      "displayName": "Veska of the Hollow",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"I procure,\" says Veska. \"For the Monarchs. What that means day to day is that I am the person who knows what everyone else is short of.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"The Mud Monarchs are not a joke, whatever the road says.\" Her voice cools. \"We were the first to organise after the water. Everyone laughing now was fed by us for a decade.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"We are losing.\" Veska says it very quietly and does not look around, which tells you she has already checked. \"Not to a faction. To arithmetic. There were more of us last year and there will be fewer next year, and no one at the top will say the number out loud.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You stole from a Monarch factor.\" Veska writes something down. \"That is now a matter of record. I do not do anything about it. The record does.\""
+          ]
+        }
+      ]
+    },
+    "servants_quartermaster": {
+      "displayName": "Vael of the Listening Stone",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"I keep stores for the devout,\" Vael says. \"Which is a great deal of rope and very little comfort, in my experience of the devout.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"We serve the Giants.\" A slight bow. \"Not the memory of them. Them. I understand how that sounds to somebody who counts them as history.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I have listened at the stone for thirty-one years.\" Vael's composure does not break, quite. \"I was told I would hear them. I have heard something. I have never been able to say honestly that it was them, and I have never been able to say honestly that it was not.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You took from an offering.\" Vael's face closes completely. \"Not from me. From an offering. There is nothing I can say to you that would be adequate, so I will say nothing.\""
+          ]
+        }
+      ]
+    },
+    "dynasty_factor": {
+      "displayName": "Magister Caul Veyre",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"I am a factor, not a merchant,\" Veyre says, with distaste for the correction he has had to make. \"I move the Dynasty's holdings. What is on this table is surplus.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"The Eternal Dynasty predates the water.\" He does not soften it. \"That is not a boast, it is a bookkeeping fact, and it is the reason we are insufferable.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"The line is broken.\" Veyre says it as though reading a figure he dislikes. \"Three generations back. Everyone senior knows. We continue to say Eternal because the word is doing structural work — take it out and a great many arrangements collapse. Including mine.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You stole from the Dynasty.\" Veyre makes a note. \"You have no idea how long we keep records. It will outlast your interest in the matter considerably.\""
+          ]
+        }
+      ]
+    },
+    "architects_keeper": {
+      "displayName": "The Cartographer",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Maps,\" says the Cartographer. \"Of places. Some of which are still there.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"No name, before you ask twice.\" A very small smile. \"A name is a thing that can be put on a list. I draw the lists. I know what they are for.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"Every map I sell is wrong in one particular.\" The Cartographer meets your eye. \"The same particular, on all of them, for eleven years. I did it deliberately at first. Now I am no longer certain I could draw it correctly if I tried, and I have stopped testing myself.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You have taken a map.\" The Cartographer does not seem troubled. \"Then you are carrying my error into somewhere I cannot follow. I would call that your problem rather than mine.\""
+          ]
+        }
+      ]
+    },
+    "builders_foreman": {
+      "displayName": "Foreman Drest Holloway",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Stone and the tools for it,\" Drest says. \"We are still building. Everyone finds that funny. We will still be building when they have finished finding it funny.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"Builders. Not rebuilders.\" He is firm on it. \"The distinction matters. Rebuilding assumes you know what was there. We do not, so we build new, and we build it to stand.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I have measured the old foundations.\" Drest says it heavily. \"Every site. They are better than anything we can lay. Not stronger — BETTER. Squarer, truer, laid by people who had time. We are building shelters on top of somebody's architecture and calling it a city.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You took from a work site.\" Drest folds his arms. \"Somebody now works without that tool. I will find out who. Then I will tell them your name.\""
+          ]
+        }
+      ]
+    },
+    "revivalists_quartermaster": {
+      "displayName": "Sister Yune Ashfall",
+      "topics": [
+        {
+          "id": "t_front",
+          "label": "Ask about their trade",
+          "lines": [
+            "\"Supplies for the Revival,\" says Yune warmly. \"Which is mostly bandages and bread. Faith is very physical work.\""
+          ]
+        },
+        {
+          "id": "t_known",
+          "label": "Ask about their people",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"We believe Tartaria comes back.\" She says it without embarrassment. \"Not as it was. That is the part people miss when they laugh — nobody sensible wants it as it was.\""
+          ]
+        },
+        {
+          "id": "t_deep",
+          "label": "Ask what they really think",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"I have stopped expecting to see it.\" Yune folds a cloth carefully. \"That is not doubt. I have simply done the arithmetic on my own lifetime. It changes what the work is for. You keep going because it is right, not because you will be there.\""
+          ]
+        },
+        {
+          "id": "t_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "\"You took from the Revival stores.\" Yune looks at you with something worse than anger. \"We would have GIVEN it to you. You only had to ask. That is the part I cannot get past.\""
           ]
         }
       ]

@@ -55,6 +55,7 @@ import {
 
 const base: TalkContext = {
   regard: 'met', contractsTurnedIn: 0, standing: 0, titles: [], hasRecentRaidNews: false,
+  chapter: 'hook', cores: 0,
 };
 const at = (over: Partial<TalkContext>): TalkContext => ({ ...base, ...over });
 const ids = (npc: string, ctx: TalkContext) => topicsFor(npc, ctx).map((t) => t.id);
@@ -62,10 +63,21 @@ const ids = (npc: string, ctx: TalkContext) => topicsFor(npc, ctx).map((t) => t.
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
 describe('OTA-1081 — the slice is three people, and it says so', () => {
-  it('exactly the authored cast has topics', () => {
-    expect(TOPIC_NPC_IDS.sort()).toEqual(['halem_trader', 'irma_ironhand', 'scrap_broker']);
-    expect(hasTopicsFor('irma_ironhand')).toBe(true);
-    expect(displayNameFor('irma_ironhand')).toBe('Irma Ironhand');
+  it('OTA-1082 — every authored vendor now has topics, not just the slice', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const vendors = require('../app/data/npcs/vendors.json') as { vendors: { id: string; name: string }[] };
+    for (const v of vendors.vendors) {
+      expect(hasTopicsFor(v.id)).toBe(true);
+      expect(displayNameFor(v.id)).toBe(v.name);
+    }
+    expect(TOPIC_NPC_IDS.length).toBe(vendors.vendors.length);
+  });
+
+  it('every one of them opens with something, and closes to one thing if robbed', () => {
+    for (const npc of TOPIC_NPC_IDS) {
+      expect(topicsFor(npc, at({ regard: 'met' })).length).toBeGreaterThan(0);
+      expect(topicsFor(npc, at({ regard: 'wronged' }))).toHaveLength(1);
+    }
   });
 
   it('everybody else is untouched — the verb must not be swallowed', () => {
@@ -122,7 +134,7 @@ describe('OTA-1081 — robbing somebody is not a warmth level', () => {
     expect(w).not.toContain('irma_trade');
   });
 
-  it('every one of the three has something to say about it', () => {
+  it('every one of them has something to say about it', () => {
     for (const npc of TOPIC_NPC_IDS) {
       const w = topicsFor(npc, at({ regard: 'wronged' }));
       expect(w).toHaveLength(1);
@@ -214,5 +226,56 @@ describe('OTA-1081 — authored, deterministic, and finite', () => {
     expect(src).not.toMatch(/await |Promise|llama|generate\(/);
     expect(topicReply(topicsFor('irma_ironhand', at({ regard: 'trusted' }))[0]!, 0))
       .toEqual(expect.any(String));
+  });
+});
+
+describe('OTA-1082 — the story is the fifth gate', () => {
+  it('a chapter topic is shut before you get there and open after', () => {
+    expect(ids('order_scholar', at({ regard: 'trusted', chapter: 'cores' }))).not.toContain('vesryn_chapter');
+    expect(ids('order_scholar', at({ regard: 'trusted', chapter: 'descent' }))).toContain('vesryn_chapter');
+    // ...and stays open for every later phase, because the line is about
+    // something you have DONE, and you cannot un-descend.
+    for (const c of ['nexus', 'choice', 'ended'] as const) {
+      expect(ids('order_scholar', at({ regard: 'trusted', chapter: c }))).toContain('vesryn_chapter');
+    }
+  });
+
+  it('cores gate separately from phase — `cores` is a long chapter', () => {
+    const two = at({ regard: 'familiar', chapter: 'cores', cores: 2 });
+    expect(ids('order_scholar', two)).toContain('t_cores');
+    expect(ids('order_scholar', { ...two, cores: 1 })).not.toContain('t_cores');
+  });
+
+  it('a character who never started the main quest defaults to the beginning', () => {
+    // The store passes 'hook' when mainQuest is absent. Getting this wrong the
+    // other way — defaulting to 'ended' — would unlock every story topic on a
+    // fresh character.
+    expect(ids('order_scholar', at({ regard: 'trusted', chapter: 'hook' }))).not.toContain('vesryn_chapter');
+  });
+
+  it('ALL FIVE gate dimensions the build plan named are live in content', () => {
+    // ⚠ The machinery for standing / titles / contracts existed in OTA-1081 and
+    // no authored topic used it, so those paths had never run on a device.
+    // Tested is not the same as exercised.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const raw = require('../app/data/npcs/dialogue_topics.json') as
+      { npcs: Record<string, { topics: { gate?: Record<string, unknown> }[] }> };
+    const used = new Set<string>();
+    for (const npc of Object.values(raw.npcs)) {
+      for (const t of npc.topics) for (const k of Object.keys(t.gate ?? {})) used.add(k);
+    }
+    for (const dim of ['minRegard', 'onlyRegard', 'minStanding', 'requiresTitle',
+                       'minContractsTurnedIn', 'minChapter', 'minCores', 'requiresRecentRaid']) {
+      expect(used.has(dim)).toBe(true);
+    }
+  });
+
+  it('standing, titles and contracts each actually gate a real topic', () => {
+    expect(ids('halem_trader', at({ regard: 'known', standing: 34 }))).not.toContain('halem_standing');
+    expect(ids('halem_trader', at({ regard: 'known', standing: 35 }))).toContain('halem_standing');
+    expect(ids('scrap_broker', at({ regard: 'known', contractsTurnedIn: 1 }))).not.toContain('tellin_contracts');
+    expect(ids('scrap_broker', at({ regard: 'known', contractsTurnedIn: 2 }))).toContain('tellin_contracts');
+    expect(ids('irma_ironhand', at({ regard: 'known' }))).not.toContain('irma_title');
+    expect(ids('irma_ironhand', at({ regard: 'known', titles: ['skyreacher'] }))).toContain('irma_title');
   });
 });

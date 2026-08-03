@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1081`**,
-**golem-line `2026-08-03-1058`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1082`**,
+**golem-line `2026-08-03-1059`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,37 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.92**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.93**; ledger in `VERSION.md`.
 
-- **PHASE 2 VERTICAL SLICE — GIVE THE WORLD A MOUTH (2026-08-03, latest). BOTH LINES.**
+- **PHASE 2 — FULL CAST, FIFTH GATE, WAY IN (2026-08-03, latest). BOTH LINES.**
+  The three things the OTA-1081 slice left open.
+  **(1) The whole cast.** 27 more named vendors authored — all 30 in
+  `vendors.json` now have topics, **129 in total**. Everyone gets a shop-front
+  line anyone can hear, something about their people once they place you,
+  something they actually believe once you have earned it, and a single closed
+  door if you robbed them. Adding a vendor is still a JSON entry.
+  **(2) ⚠ The fifth gate — and the three that were never exercised.** The plan
+  named five dimensions: warmth, standing, contracts, titles, story chapter.
+  OTA-1081 shipped machinery for four and *content* for one. `minStanding`,
+  `requiresTitle` and `minContractsTurnedIn` were unit-tested and had never
+  executed on a device — which is not the same as working. Story chapter did not
+  exist at all; `TalkContext` had no chapter field. Now `minChapter` (ordered
+  against `MainQuestPhase`) plus `minCores`, because `cores` is a long phase
+  with five Cores inside it. All eight dimensions are used by real content and a
+  test walks the JSON to prove it, so *tested* and *exercised* cannot drift
+  apart again. A character with no `mainQuest` block reads as `hook`, the
+  beginning — defaulting the other way would unlock every story topic on a fresh
+  character.
+  **(3) A way in.** OTA-1081 shipped the exchange reachable only by typing
+  `talk to <name>`, which is a feature nobody finds. The vendor chip now carries
+  a **TALK** button, shown only for someone with authored topics — a TALK button
+  on somebody with nothing to say is a worse lie than no button.
+  Files: `dialogue_topics.json` (+27 NPCs), `dialogue.ts` (`minChapter`,
+  `minCores`, `PHASE_ORDER`), `gameStore.ts` (chapter + cores in
+  `talkContextFor`), `ExplorationScreen.tsx` (the TALK button),
+  `ota1081TalkTopics.test.ts` (26).
+
+- **PHASE 2 VERTICAL SLICE — GIVE THE WORLD A MOUTH (2026-08-03). BOTH LINES.**
   A `talk <npc>` exchange with three named vendors — Irma Ironhand, Halem the
   Trader, Tellin Mak — opening a list of topics, each gated on what has actually
   passed between you, each with an authored reply. A **vertical slice on
