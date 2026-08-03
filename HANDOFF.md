@@ -913,8 +913,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1098`**,
-**golem-line `2026-08-03-1070`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1099`**,
+**golem-line `2026-08-03-1076`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -923,26 +923,33 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.9**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.10**; ledger in `VERSION.md`.
 
-- **TUTORIAL PACING, DOG CARD, KEYBOARD (2026-08-03, latest). BOTH LINES.**
+- **ALL TALKING MOVES TO THE BOTTOM OF THE SCREEN (2026-08-03, latest).
+  BOTH LINES.** HAL OTA-1099 / golem OTA-1076 — the owner's design decision
+  from his first live TALK, built: *"the popup should be at the bottom of
+  the screen like the dice rolls and just have a list of things to ask, and
+  then you close when you want to be done talking. I think all talking
+  should be like this."* TalkModal + ParleyModal are GONE; `TalkSheet` +
+  `ParleySheet` render in the DiceRoller's controls slot, replacing the
+  input box while the conversation is open — the feed (where replies have
+  always landed) stays readable the whole time. Topic list persists across
+  asks, spent topics stay visible marked "(asked)", STOP TALKING / BACK OFF
+  hands the slot back, and parley's "Just talk" swaps sheet for sheet in
+  place. Covers ALL talk surfaces (vendors, roadside traders, wanderers,
+  escort leaders, guardians — everything routes through `pendingTalk` /
+  `pendingParley`). Because the sheets give up the modal's screen lock, the
+  store covers the exits: any real action submitted mid-conversation walks
+  away from it first (same feed line as STOP TALKING); silent LLM-internal
+  submissions don't count. Test: `ota1099TalkSheetWalkAway.test.ts`.
+
+- **TUTORIAL PACING, DOG CARD, KEYBOARD (2026-08-03). BOTH LINES.**
   HAL OTA-1098 / golem OTA-1075, all from the owner's device run. Salvage
   beat trimmed to one world sentence + reward; EXPLORE send-off is one line;
   the dog rescue no longer asks "What kind of dog is that?" in the feed (the
   popup asks it next — players were typing when the card hit), dwell
   4000→3200ms; rope-beat keyboard fixed with an explicit focus() on press-in
   (Android drops the tap→focus→keyboard chain under the tutorial pulse).
-
-  ### ⚠ NEXT UP — OWNER DESIGN DECISION, VERBATIM (talk UI rework)
-  From the owner's first live TALK interaction (Tarek, business topic — the
-  popup stayed covering the screen): *"I think the popup should be at the
-  bottom of the screen like the dice rolls and just have a list of things to
-  ask, and then you close when you want to be done talking. I think all
-  talking should be like this."* So: TalkModal becomes a BOTTOM SHEET (dice-
-  roller pattern) — topic list only, responses land in the FEED where they
-  can be read, sheet stays up across multiple asks, closes via a STOP
-  TALKING button. Applies to ALL talk surfaces (vendor topics, wanderers,
-  escorts, guardians). Not yet built — next session's first task.
 
 - **THE DIFFICULTY STEP SAYS THE WORD DIFFICULTY (2026-08-03). BOTH
   LINES.** HAL OTA-1097 / golem OTA-1074. The creation step's header
