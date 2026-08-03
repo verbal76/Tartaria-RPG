@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.95';
+export const DISPLAY_VERSION = '4.28.96';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20120,7 +20120,44 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // somebody makes the whole relationship layer pointless, because the payout
 // becomes the fast path.
 // DISPLAY_VERSION 4.28.95. 12 tests.
-export const OTA_BUILD_ID = '2026-08-03-1084-topic-grants-whispers';
+// OTA-1085 — THE REST OF THE CAST GETS A VOICE.
+//
+// 30 named vendors were authored one at a time. The rest of the population
+// cannot work that way and SHOULD not: roadside traders are 24 procedurally
+// named people sharing two archetypes; wanderers are ARCHETYPES x FIRST_NAMES,
+// so per-person authoring would be dozens of near-identical entries and the
+// seventh "Corin the refugee" would read exactly like the first; escort leaders
+// are drawn from a name pool at spawn; Core Guardians are one voice per Capital.
+// What makes those people distinct is their KIND, not their name.
+//
+// So topic lookup falls back to a CLASS entry (`class:wanderer:refugee`,
+// `class:roadside`, `class:escort`, `class:guardian`, `class:overlay`). The
+// LEDGER still treats them as individuals -- Grit remembers you personally,
+// and what he SAYS is what a roadside trader says. Exact id always wins, so
+// authoring a specific person later needs no code change at all.
+// 11 class sets, 44 topics, 179 total.
+//
+// AND THE VERB CAUGHT UP WITH THE LEDGER. talkToNpc only ever looked at
+// currentScene.vendor, because vendors were the only cast the ledger covered --
+// OTA-1080 finished that and the verb had not been told. It now resolves
+// against the vendor, the wanderer, AND active escort leaders, who are the one
+// population you are guaranteed to have time with. Roadside and overlay traders
+// arrive through the vendor slot, so those 29 people became talkable with no
+// wiring at all: the class fallback was the whole change.
+//
+// ⚠ TWO CLASS SETS ARE AUTHORED AND NOT YET REACHABLE, and I would rather say
+// so than let a green suite imply otherwise. `class:guardian` needs an entry
+// point because a Core Guardian is an ENEMY -- talking to one is the parley
+// system's job, not this one. And an escort leader is only reachable while
+// their contract is tracked and their party is alive, which is correct but
+// narrow. The content is written and gated; the doors are the open work.
+//
+// The Guardian voice is the one worth reading: it does not know why it noted
+// the interval between your visits, and it is no longer certain whether
+// continuing is obedience or the only thing left in it.
+// DISPLAY_VERSION 4.28.96. 41 tests.
+export const OTA_BUILD_ID = '2026-08-03-1085-non-vendor-cast';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1084-topic-grants-whispers';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1083-gifting';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1082-talk-full-cast-chapter-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1081-talk-topics-phase2-slice';

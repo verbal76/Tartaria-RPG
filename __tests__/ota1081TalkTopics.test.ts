@@ -80,14 +80,48 @@ describe('OTA-1081 — the slice is three people, and it says so', () => {
     }
   });
 
-  it('everybody else is untouched — the verb must not be swallowed', () => {
-    // A vendor with no topics has to fall through to the behaviour they had
-    // before this OTA. A slice that silently breaks "talk to" for the rest of
-    // the cast is worse than not shipping the verb.
-    expect(hasTopicsFor('roadside:grit_maalen')).toBe(false);
+  it('OTA-1085 — the non-vendor cast is covered by CLASS, not by name', () => {
+    // ⚠ This asserted `hasTopicsFor('roadside:grit_maalen') === false` before
+    // OTA-1085 and the change is intended: roadside traders are 24
+    // procedurally-named people sharing two archetypes, so what makes them
+    // distinct is their KIND. The ledger still treats them as individuals —
+    // Grit remembers you personally; what he SAYS is what a roadside trader
+    // says.
+    expect(hasTopicsFor('roadside:grit_maalen')).toBe(true);
+    expect(hasTopicsFor('wanderer:refugee:corin')).toBe(true);
+    expect(hasTopicsFor('escort:sena')).toBe(true);
+    expect(hasTopicsFor('guardian:zharaks_teeth')).toBe(true);
+    // Somebody genuinely uncovered still falls through — a talk verb that
+    // swallows the input and says nothing is worse than not having it.
     expect(hasTopicsFor('hidden_market_weapons')).toBe(false);
     expect(topicsFor('nobody_at_all', base)).toEqual([]);
     expect(displayNameFor('nobody_at_all')).toBeNull();
+  });
+
+  it('an EXACT entry always beats the class one', () => {
+    // So authoring a specific person later needs no code change.
+    expect(displayNameFor('irma_ironhand')).toBe('Irma Ironhand');
+    // ...and somebody covered only by class has no authored display name,
+    // because "a refugee" is not what anybody is called.
+    expect(displayNameFor('wanderer:refugee:corin')).toBeNull();
+  });
+
+  it('every wanderer archetype the generator can mint has a voice', () => {
+    // A missing archetype would be an invisible hole: the traveller spawns,
+    // the TALK verb finds nothing, and nothing says why.
+    for (const arch of ['traveler', 'refugee', 'tinker', 'scout', 'pilgrim', 'drifter', 'scavenger']) {
+      expect(hasTopicsFor(`wanderer:${arch}:someone`)).toBe(true);
+      expect(topicsFor(`wanderer:${arch}:someone`, at({ regard: 'known' })).length).toBeGreaterThan(1);
+    }
+  });
+
+  it('class sets obey every rule the named cast does', () => {
+    for (const k of ['class:roadside', 'class:escort', 'class:guardian', 'class:wanderer:drifter']) {
+      const id = k.replace('class:', '').replace('wanderer:', 'wanderer:') + ':x';
+      const probe = k === 'class:wanderer:drifter' ? 'wanderer:drifter:x' : id;
+      expect(topicsFor(probe, at({ regard: 'met' })).length).toBeGreaterThan(0);
+      expect(topicsFor(probe, at({ regard: 'wronged' }))).toHaveLength(1);
+    }
   });
 });
 

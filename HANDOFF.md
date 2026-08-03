@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1084`**,
-**golem-line `2026-08-03-1061`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1085`**,
+**golem-line `2026-08-03-1062`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,41 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.95**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.96**; ledger in `VERSION.md`.
 
-- **TOPIC GRANTS + WHISPERS FROM CONVERSATION (2026-08-03, latest). BOTH LINES.**
+- **THE NON-VENDOR CAST GETS A VOICE (2026-08-03, latest). BOTH LINES.**
+  30 named vendors were authored one at a time. The rest of the population
+  cannot work that way and **should not**: roadside traders are 24 procedurally
+  named people sharing two archetypes; wanderers are archetypes × first names,
+  so per-person authoring would be dozens of near-identical entries and the
+  seventh "Corin the refugee" would read exactly like the first; escort leaders
+  are drawn from a name pool at spawn; Core Guardians are one voice per Capital.
+  What makes those people distinct is their **kind**, not their name.
+  So topic lookup falls back to a **class entry** (`class:wanderer:refugee`,
+  `class:roadside`, `class:escort`, `class:guardian`, `class:overlay`) — 11 sets,
+  44 topics, 179 total. The **ledger still treats them as individuals**: Grit
+  remembers you personally, and what he *says* is what a roadside trader says.
+  Exact id always wins, so authoring a specific person later needs no code
+  change.
+  **And the verb caught up with the ledger.** `talkToNpc` only ever looked at
+  `currentScene.vendor`, because vendors were the only cast the ledger covered —
+  OTA-1080 finished that and the verb had not been told. It now resolves against
+  the vendor, the wanderer, **and** active escort leaders, who are the one
+  population you are guaranteed to have time with. Roadside and overlay traders
+  arrive through the vendor slot, so those 29 people became talkable with **no
+  wiring at all** — the class fallback was the whole change.
+  ⚠ **Two class sets are authored and not yet reachable**, and that is worth
+  saying rather than letting a green suite imply otherwise. `class:guardian`
+  needs an entry point because a Core Guardian is an **enemy** — talking to one
+  is the parley system's job, not this one. And an escort leader is only
+  reachable while their contract is tracked and their party alive, which is
+  correct but narrow. The content is written and gated; the doors are the open
+  work.
+  Files: `dialogue.ts` (`classKeyFor`, `setFor`, `TOPIC_CLASS_KEYS`),
+  `dialogue_topics.json` (+11 class sets), `gameStore.ts` (`talkToNpc` resolves
+  the whole cast), `ota1081TalkTopics.test.ts` (41).
+
+- **TOPIC GRANTS + WHISPERS FROM CONVERSATION (2026-08-03). BOTH LINES.**
   Topics were gated, characterful and **inert**. The neighbouring system already
   pays — parley hands you a lead or their goods — so a talk that never yielded
   anything read thin next to one that did. Topics can now carry a `grants`

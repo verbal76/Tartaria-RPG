@@ -5552,22 +5552,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
   talkToNpc: (nameOrId) => {
     const scene = get().currentScene;
     const player = get().player;
-    const vendor = scene?.vendor;
-    if (!vendor || !player) return;
-    const npcId = vendor.id ?? '';
-    // Only the authored cast has topics. Everyone else keeps the behaviour they
-    // had before this OTA — the vertical slice is three people, and pretending
-    // otherwise would be worse than not having the verb.
-    if (!hasTopicsFor(npcId)) return;
+    if (!player) return;
+    // OTA-1085 — EVERYONE PRESENT, not just whoever is behind a counter.
+    // Vendors were the only talkable people because they were the only cast the
+    // ledger covered; OTA-1080 finished that, so the verb catches up. Escort
+    // leaders are included because they are walking beside you — the one
+    // population you are guaranteed to have time with.
+    const people: { id: string; name: string; faction?: string | null }[] = [];
+    if (scene?.vendor) people.push({ id: vendorNpcId(scene.vendor), name: scene.vendor.name, faction: scene.vendor.faction });
+    if (scene?.wanderer) people.push({ id: vendorNpcId(scene.wanderer), name: scene.wanderer.name, faction: scene.wanderer.faction });
+    for (const q of player.activeFactionQuests ?? []) {
+      const leader = q.escort?.leaderName;
+      if (q.tracked !== false && leader && (q.escort?.hp ?? 0) > 0) {
+        people.push({ id: vendorNpcId({ id: `escort_${leader}`, name: leader }), name: leader });
+      }
+    }
     const want = nameOrId.trim().toLowerCase();
-    if (want && !vendor.name.toLowerCase().includes(want) && !npcId.includes(want)) return;
+    const target = want
+      ? people.find((p) => p.name.toLowerCase().includes(want) || p.id.includes(want))
+      : people[0];
+    if (!target) return;
+    const npcId = target.id;
+    // Anybody with no authored topics — their own or their kind's — keeps the
+    // behaviour they had before. A talk verb that swallows the input and says
+    // nothing is worse than not having it.
+    if (!hasTopicsFor(npcId)) return;
+    const vendor = { id: npcId, name: target.name, faction: target.faction ?? null };
     const ctx = talkContextFor(get, vendor);
     const topics = topicsFor(npcId, ctx);
     if (topics.length === 0) {
-      get().appendLog('world', nothingToSayLine(vendor.name));
+      get().appendLog('world', nothingToSayLine(target.name));
       return;
     }
-    set({ pendingTalk: { npcId, npcName: vendor.name, topics } });
+    set({ pendingTalk: { npcId, npcName: target.name, topics } });
   },
   raiseTopic: (topicId) => {
     const t = get().pendingTalk;

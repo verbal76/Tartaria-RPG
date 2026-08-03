@@ -119,10 +119,47 @@ export interface TalkContext {
   cores: number;
 }
 
-export function hasTopicsFor(npcId: string): boolean {
-  return !!TOPICS[npcId];
+/** OTA-1085 — THE CLASS KEY: topics for people who are not authored one by one.
+ *
+ *  The vendor cast is 30 named individuals and each got their own entry. The
+ *  rest of the population cannot work that way and should not:
+ *   - roadside traders are 24 procedurally-named people sharing two archetypes;
+ *   - wanderers are ARCHETYPES x FIRST_NAMES, so authoring per person would be
+ *     dozens of near-identical entries and the seventh "Corin the refugee"
+ *     would read exactly like the first;
+ *   - escort leaders are drawn from a name pool at spawn;
+ *   - Core Guardians are one voice per Capital.
+ *  What makes those people distinct is their KIND, not their name. So identity
+ *  falls back to a class entry, and the ledger keeps treating them as
+ *  individuals — Corin remembers you personally even though what he SAYS is
+ *  what a refugee says.
+ *
+ *  Exact id always wins, so authoring a specific person later needs no code
+ *  change: add `wanderer:refugee:corin` and Corin stops sharing the class set. */
+export function classKeyFor(npcId: string): string | null {
+  const seg = npcId.split(':');
+  if (seg[0] === 'wanderer' && seg[1]) return `class:wanderer:${seg[1]}`;
+  if (seg[0] === 'roadside') return 'class:roadside';
+  if (seg[0] === 'escort') return 'class:escort';
+  if (seg[0] === 'guardian') return 'class:guardian';
+  if (seg[0] === 'overlay') return 'class:overlay';
+  return null;
 }
 
+function setFor(npcId: string): NpcTopicSet | undefined {
+  const exact = TOPICS[npcId];
+  if (exact) return exact;
+  const cls = classKeyFor(npcId);
+  return cls ? TOPICS[cls] : undefined;
+}
+
+export function hasTopicsFor(npcId: string): boolean {
+  return !!setFor(npcId);
+}
+
+/** The authored display name, or null when this person is only covered by a
+ *  class set — in which case the CALLER already knows their real name and must
+ *  use it, because "Refugee" is not what anybody is called. */
 export function displayNameFor(npcId: string): string | null {
   return TOPICS[npcId]?.displayName ?? null;
 }
@@ -164,7 +201,7 @@ export function gateAllows(gate: TopicGate | undefined, ctx: TalkContext): boole
  *  Order is authored order — deterministic, never shuffled, so the list does not
  *  reshuffle under the player's thumb between taps. */
 export function topicsFor(npcId: string, ctx: TalkContext): Topic[] {
-  const set = TOPICS[npcId];
+  const set = setFor(npcId);
   if (!set) return [];
   return set.topics.filter((t) => gateAllows(t.gate, ctx));
 }
@@ -191,4 +228,6 @@ export function nothingToSayLine(npcName: string): string {
   return `${npcName} is willing enough, but there is nothing between you yet worth a conversation. Trade with them, work for them, and there will be.`;
 }
 
-export const TOPIC_NPC_IDS = Object.keys(TOPICS);
+/** Individually-authored people only — class entries are not "an NPC". */
+export const TOPIC_NPC_IDS = Object.keys(TOPICS).filter((k) => !k.startsWith('class:'));
+export const TOPIC_CLASS_KEYS = Object.keys(TOPICS).filter((k) => k.startsWith('class:'));
