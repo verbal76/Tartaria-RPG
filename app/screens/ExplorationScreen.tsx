@@ -42,6 +42,7 @@ import { FusionPickerModal } from '../components/FusionPickerModal';
 import { FusionBlockedModal } from '../components/FusionBlockedModal';
 import { MissionCompleteModal } from '../components/MissionCompleteModal';
 import { ParleyModal } from '../components/ParleyModal';
+import { TalkModal } from '../components/TalkModal';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
 import { TutorialTarget } from '../components/TutorialTarget';
@@ -1593,6 +1594,8 @@ export function ExplorationScreen() {
 
       {/* OTA-808 — the two-button parley chooser (self-mounts off pendingParley). */}
       <ParleyModal />
+      {/* OTA-1058 — Phase 2 slice: the topic exchange, self-mounting off pendingTalk. */}
+      <TalkModal />
 
       {/* OTA-180 — FeedbackModal render removed alongside the 📝
           button. Component file kept for any future re-add. */}

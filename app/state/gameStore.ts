@@ -38,6 +38,11 @@ import { npcRegard, regardPriceMult } from '../engine/npcMemory';
 // OTA-1054 — the offscreen war reaches the people who live in it.
 import { raidNewsFor, raidNewsLine, RAID_MEMORY_CAP } from '../engine/npcMemory';
 import type { OutpostRaid } from '../engine/types';
+// OTA-1058 — Phase 2 slice: the topic-based talk exchange.
+import {
+  hasTopicsFor, topicsFor, topicReply, alreadySaidLine, nothingToSayLine,
+  type Topic as TalkTopic,
+} from '../engine/dialogue';
 // OTA-1050 — Phase 1 slice 2: turn-in credit, roadside recognition, gossip.
 import { gossipSubject, gossipLine } from '../engine/npcMemory';
 import {
@@ -3507,6 +3512,28 @@ function sightVendor(
   if (greet) emitVendorGreeting(get, vendor);
 }
 
+/** OTA-1058 — everything the topic gates need, gathered here so engine/dialogue
+ *  stays free of store and save-shape knowledge. This is the first feature that
+ *  reads the Phase 1 ledger for something the PLAYER chooses rather than
+ *  something that happens at them. */
+function talkContextFor(
+  get: () => GameStore,
+  vendor: { id?: string; name: string; faction?: string | null },
+): import('../engine/dialogue').TalkContext {
+  const player = get().player;
+  const rel = getRelation(get().worldMemory, vendorNpcId(vendor));
+  const faction = vendor.faction ?? rel?.factionId ?? null;
+  return {
+    regard: npcRegard(rel),
+    contractsTurnedIn: rel?.contractsTurnedIn ?? 0,
+    standing: faction
+      ? (player?.factionStanding.find((r) => r.factionId === faction)?.standing ?? 0)
+      : 0,
+    titles: player?.earnedTitles ?? [],
+    hasRecentRaidNews: !!raidNewsFor(get().worldMemory, rel, player?.hoursElapsed ?? 0),
+  };
+}
+
 /** OTA-1057 — LEDGER COVERAGE FOR PEOPLE WHO ARE NOT BEHIND A COUNTER.
  *
  *  Phase 1 built a per-person ledger and then wired it to vendors and Core
@@ -4965,6 +4992,23 @@ interface GameStore {
    *  opener (so ParleyModal can render the two contextual buttons); null otherwise.
    *  A player who types a SPECIFIC verb (intimidate / persuade / calm) skips the
    *  modal and resolves straight through. */
+  /** OTA-1058 — PHASE 2 SLICE. The open talk exchange: who you are talking to
+   *  and which topics they will discuss with you right now. Null when no
+   *  conversation is open. Mirrors pendingParley deliberately — same modal
+   *  shape, same self-mounting component, so the interaction is one the player
+   *  has already learned. */
+  pendingTalk:
+    | {
+        npcId: string;
+        npcName: string;
+        topics: TalkTopic[];
+      }
+    | null;
+  /** Open a conversation with the named person in the current scene. */
+  talkToNpc: (nameOrId: string) => void;
+  /** Raise a topic. The reply goes to the feed, and the exchange stays open. */
+  raiseTopic: (topicId: string) => void;
+  closeTalk: () => void;
   pendingParley:
     | {
         kind: ParleyKind;
@@ -5216,6 +5260,57 @@ export const useGameStore = create<GameStore>((set, get) => ({
   selectCallDogOption: (option, treatItemName) => {
     handleCallDogOption(get, set, option, treatItemName);
     set({ callDogModalOpen: false });
+    void get().persist();
+  },
+
+  // OTA-1058 — PHASE 2 SLICE. See engine/dialogue.ts for why none of this is
+  // generated: a 14-20s model turn cannot be in a conversation's critical path.
+  pendingTalk: null,
+  closeTalk: () => {
+    const t = get().pendingTalk;
+    if (t) get().appendLog('world', `You let the conversation go and ${t.npcName} gets back to it.`);
+    set({ pendingTalk: null });
+  },
+  talkToNpc: (nameOrId) => {
+    const scene = get().currentScene;
+    const player = get().player;
+    const vendor = scene?.vendor;
+    if (!vendor || !player) return;
+    const npcId = vendor.id ?? '';
+    // Only the authored cast has topics. Everyone else keeps the behaviour they
+    // had before this OTA — the vertical slice is three people, and pretending
+    // otherwise would be worse than not having the verb.
+    if (!hasTopicsFor(npcId)) return;
+    const want = nameOrId.trim().toLowerCase();
+    if (want && !vendor.name.toLowerCase().includes(want) && !npcId.includes(want)) return;
+    const ctx = talkContextFor(get, vendor);
+    const topics = topicsFor(npcId, ctx);
+    if (topics.length === 0) {
+      get().appendLog('world', nothingToSayLine(vendor.name));
+      return;
+    }
+    set({ pendingTalk: { npcId, npcName: vendor.name, topics } });
+  },
+  raiseTopic: (topicId) => {
+    const t = get().pendingTalk;
+    if (!t) return;
+    const topic = t.topics.find((x) => x.id === topicId);
+    if (!topic) return;
+    const asked = get().worldMemory.talkedTopics?.[`${t.npcId}:${topic.id}`] ?? 0;
+    // Repetition is acknowledged rather than replayed. An NPC who answers the
+    // same question twice as though it were the first time is the exact
+    // "checklist, not a relationship" failure Phase 1 was written against.
+    if (asked >= topic.lines.length) {
+      get().appendLog('world', alreadySaidLine(t.npcName));
+      return;
+    }
+    get().appendLog('world', topicReply(topic, asked));
+    set((st) => ({
+      worldMemory: {
+        ...st.worldMemory,
+        talkedTopics: { ...(st.worldMemory.talkedTopics ?? {}), [`${t.npcId}:${topic.id}`]: asked + 1 },
+      },
+    }));
     void get().persist();
   },
 
@@ -6381,6 +6476,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // arb119 — a fresh game must not inherit a stale open call-dog modal
       // (a transient UI flag that otherwise survives from a prior session).
       callDogModalOpen: false,
+      pendingTalk: null, // OTA-1058 — and any stale conversation
       pendingParley: null, // OTA-808 — clear any stale parley on a fresh game
       // OTA-1018 — THE OPENING CRAWL. A brand-new character opens on the
       // reason they came down: three universal pages (the flood, the thousand
@@ -9619,6 +9715,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         void get().persist();
       }
       return;
+    }
+    // --- OTA-1058, PHASE 2 SLICE: a real conversation with somebody you know ---
+    // Ordered BEFORE the wanderer parley on purpose. A vendor with authored
+    // topics and a wanderer cannot both be the subject of "talk to <name>", and
+    // if a scene ever holds both, the named person you walked up to is the one
+    // you meant. A vendor with no topics falls through to everything below
+    // unchanged — the slice is three people, and it must not swallow the verb
+    // for the rest of the cast.
+    if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.vendor) {
+      const vId = currentScene.vendor.id ?? '';
+      if (hasTopicsFor(vId)) {
+        get().talkToNpc(parsed.resolvedNoun ?? parsed.target ?? '');
+        if (get().pendingTalk) return;
+      }
     }
     // --- Peaceful parley (a wild NPC / person) ---
     if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.wanderer) {

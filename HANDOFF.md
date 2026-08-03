@@ -849,8 +849,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1080`**,
-**golem-line `2026-08-03-1057`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1081`**,
+**golem-line `2026-08-03-1058`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -859,9 +859,50 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.91**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.92**; ledger in `VERSION.md`.
 
-- **WANDERER + ESCORT LEDGER COVERAGE (2026-08-03, latest). BOTH LINES.**
+- **PHASE 2 VERTICAL SLICE — GIVE THE WORLD A MOUTH (2026-08-03, latest). BOTH LINES.**
+  A `talk <npc>` exchange with three named vendors — Irma Ironhand, Halem the
+  Trader, Tellin Mak — opening a list of topics, each gated on what has actually
+  passed between you, each with an authored reply. A **vertical slice on
+  purpose**: the build plan flagged this phase's real cost as *writing*, not
+  engineering, so the framework ships against three people and the rest of the
+  cast is a JSON entry each with no code changes.
+  ⚠ **The model is not in the critical path, and that is the whole design.** A
+  Qwen generation on device measures 14–20s. A conversation turn at that speed
+  is a loading screen with dialogue in it. So the exchange is entirely authored
+  and entirely synchronous — no spinner, no async, no fallback, no way for a
+  slow model to make the game feel broken. There is a test that greps
+  `engine/dialogue.ts` for `async`/`await`/`Promise`, so a later "just make it
+  dynamic" cannot go out quietly. The narrator's eventual job here (Phase 6) is
+  one optional flourish *after* the authored reply has landed.
+  **Gating is the point.** This is the first feature that reads the Phase 1
+  ledger for something the player **chooses** rather than something that happens
+  at them. Irma talks about armour to anyone; about the encampments once she
+  places you; about the flood once you are a regular; about what she makes of
+  you only if you have earned it. Gates are **AND, not OR** — world state (a
+  raid on their ground) never substitutes for a relationship.
+  ⚠ **And robbing somebody is not a warmth level.** `wronged` is deliberately
+  off the regard ladder: a naive scale would sort it somewhere and hand a thief
+  the most private topic in the set. Rob them and exactly **one** topic remains.
+  My first `gateAllows` put the ungated short-circuit above that check, so every
+  shop-front topic survived a theft — caught by this OTA's own test, which
+  asserts the wronged list is exactly one item rather than merely "contains the
+  apology".
+  Repetition is acknowledged, not replayed: `worldMemory.talkedTopics` counts
+  raises per (npc, topic) and a spent topic answers *"I have told you that
+  one."* Bounded by the authored topic count, so it cannot grow with play. The
+  topic stays **visible** marked `(asked)` rather than vanishing — a list that
+  silently shrinks reads as the game losing content.
+  The modal mirrors `ParleyModal` deliberately, so it is an interaction the
+  player has already learned, and the exchange stays **open** after a topic —
+  a conversation, not a menu that fires once.
+  Files: `dialogue.ts` (new), `dialogue_topics.json` (new, 16 topics),
+  `TalkModal.tsx` (new), `gameStore.ts` (`pendingTalk` / `talkToNpc` /
+  `raiseTopic` / `closeTalk` / `talkContextFor`, diplomacy routing),
+  `types.ts` (`talkedTopics`), `ota1081TalkTopics.test.ts` (20).
+
+- **WANDERER + ESCORT LEDGER COVERAGE (2026-08-03). BOTH LINES.**
   Phase 1 built a per-person relationship ledger and then wired it to vendors
   and Core Guardians only — which left the two populations the player actually
   **talks to** invisible to it.
