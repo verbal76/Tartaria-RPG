@@ -131,6 +131,16 @@ export function ExplorationScreen() {
   // a roll hands the slot straight to the dice.
   const pendingTalk = useGameStore((s) => s.pendingTalk);
   const pendingParley = useGameStore((s) => s.pendingParley);
+  // OTA-1102 — the TALK glow. Subscribing to talkedTopics is what keeps the
+  // light honest: it goes out the moment the last unread line is heard, and
+  // comes back when a warmth/story gate opens a new topic on this vendor.
+  const talkedTopics = useGameStore((s) => s.worldMemory.talkedTopics);
+  const glowVendorName = useGameStore((s) => s.currentScene?.vendor?.name);
+  const vendorTalkGlow = React.useMemo(
+    () => (glowVendorName ? useGameStore.getState().hasUnspokenTalk(glowVendorName) : false),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- talkedTopics is the invalidation signal
+    [glowVendorName, talkedTopics],
+  );
   // OTA-841 [did-you-mean] — runnable command suggestions from the last low-confidence
   // parse, rendered as a tappable chip row above the input.
   const parseSuggestions = useGameStore((s) => s.parseSuggestions);
@@ -743,15 +753,23 @@ export function ExplorationScreen() {
               whose raw id happens to equal their ledger id — and it was the only
               route into their conversation that a player would ever find. */}
           {hasTopicsFor(npcLedgerId(currentScene.vendor)) ? (
+            // OTA-1102 — the glow means "something NEW to hear": green while
+            // any gate-open topic still has unread lines, back to gold once
+            // the player has heard them all. Same spent-math as the sheet's
+            // "(asked)" marks, via hasUnspokenTalk.
             <TouchableOpacity
-              style={styles.placeChipTalk}
+              style={[styles.placeChipTalk, vendorTalkGlow && styles.placeChipTalkUnspoken]}
               onPress={() => talkToNpc(currentScene.vendor?.name ?? '')}
               hitSlop={8}
               activeOpacity={0.7}
               accessibilityRole="button"
-              accessibilityLabel={`Talk to ${currentScene.vendor.name}`}
+              accessibilityLabel={
+                vendorTalkGlow
+                  ? `Talk to ${currentScene.vendor.name}, they have something new to say`
+                  : `Talk to ${currentScene.vendor.name}`
+              }
             >
-              <Text style={styles.placeChipTalkText}>TALK</Text>
+              <Text style={[styles.placeChipTalkText, vendorTalkGlow && styles.placeChipTalkTextUnspoken]}>TALK</Text>
             </TouchableOpacity>
           ) : null}
           {/* OTA-1052 — ✕ on the trader, matching the Crucible's. Nested touchable
@@ -2099,6 +2117,10 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: '#7a6640', borderRadius: 4,
   },
   placeChipTalkText: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  // OTA-1102 — unspoken-dialogue glow: the house green (#9ec96a, the wanderer/
+  // social accent) on border + text while this person still has unread lines.
+  placeChipTalkUnspoken: { borderColor: '#9ec96a' },
+  placeChipTalkTextUnspoken: { color: '#9ec96a' },
   vendorBannerName: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
   // OTA-451 — Mission Board chip. Parchment/brown accent to distinguish from the
   // vendor's amber and the Crucible's purple.

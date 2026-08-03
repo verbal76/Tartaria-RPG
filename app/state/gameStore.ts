@@ -5757,6 +5757,13 @@ interface GameStore {
     | null;
   /** Open a conversation with the named person in the current scene. */
   talkToNpc: (nameOrId: string) => void;
+  /** OTA-1102 — does this person have dialogue the player has NOT heard yet?
+   *  True when at least one currently-GATED-OPEN topic still has unread lines
+   *  (the same spent-math the TalkSheet's "(asked)" marks use). Drives the
+   *  TALK button's green glow: the light means "there is something new to
+   *  hear", not merely "this person can talk". Re-render on
+   *  worldMemory.talkedTopics to keep the glow honest after each ask. */
+  hasUnspokenTalk: (nameOrId: string) => boolean;
   /** Raise a topic. The reply goes to the feed, and the exchange stays open. */
   raiseTopic: (topicId: string) => void;
   closeTalk: () => void;
@@ -6167,6 +6174,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // hold anything up — nothing awaits it, and if it never returns the first
     // beat (and every beat) is an authored line.
     void prefetchFlourish(get, set, npcId, target.name, role);
+  },
+  // OTA-1102 — the TALK glow's question, answered with the SAME machinery the
+  // conversation itself uses: same person match, same gate context, same
+  // spent-counter. Anything else would let the light and the list disagree.
+  hasUnspokenTalk: (nameOrId) => {
+    const target = matchTalkable(talkablePeople(get), nameOrId);
+    if (!target || !hasTopicsFor(target.id)) return false;
+    const ctx = talkContextFor(get, { id: target.id, name: target.name, faction: target.faction ?? null });
+    const talked = get().worldMemory.talkedTopics ?? {};
+    return topicsFor(target.id, ctx).some(
+      (t) => (talked[`${target.id}:${t.id}`] ?? 0) < t.lines.length,
+    );
   },
   raiseTopic: (topicId) => {
     const t = get().pendingTalk;
