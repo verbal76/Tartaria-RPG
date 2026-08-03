@@ -9645,9 +9645,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => ({
           tutorialPropsConsumed: { ...s.tutorialPropsConsumed, chestPlate: true },
         }));
-        get().appendLog('world', 'You wedge the cudgel against the rim and pop the rusted plate off its strap. The metal comes apart along old hammer-marks.');
+        // OTA-1098 — owner, from a device run: "way too much text for the
+        // salvage button... shorter lines and less of them." One world
+        // sentence, the reward, and straight on — the quip is gone; the
+        // reward line already says ruins pay out.
+        get().appendLog('world', 'You pop the rusted plate off its strap and it comes apart along old hammer-marks.');
         get().appendLog('reward', '✦ Plate Fragment x2 (Common). [scrapped]');
-        get().appendLog('arbiter', '"There. Ruins always pay out."');
         get().maybeAdvanceTutorial('scrap');
         return;
       }
@@ -26106,10 +26109,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the outpost by any means (typed 'leave outpost', the OUT chip, or a
     // cardinal step out the gate) trips finishOutpostTutorial.
     set({ tutorialExploreChosen: true });
-    get().appendLog(
-      'arbiter',
-      `"Take your time, then. Pick this place clean if you like. When you're ready to begin, tap EXIT or type 'leave outpost', and I'll set you on the road."`,
-    );
+    // OTA-1098 — owner: "he's still talking well into me already exploring."
+    // One short sentence and then silence; the choice popup already framed it.
+    get().appendLog('arbiter', `"Take your time. Tap EXIT when you're ready."`);
   },
   chooseTutorialLeave() {
     const state = get();
@@ -35093,11 +35095,11 @@ function completeRescueScenario(
   // OTA-177 — victory + onboarding-intro Arbiter beat on the
   // dog_quest channel (purple) so the rescue arc reads as one
   // visually-grouped sequence.
+  // OTA-1098 — victory line only. The old second line ended on the Arbiter
+  // asking "What kind of dog is that?" — the POPUP asks exactly that next,
+  // and a player who starts typing an answer into the feed gets cut off by
+  // the card. The purple beat sets the scene; the card asks the question.
   get().appendLog('dog_quest', scenario.victoryLine);
-  get().appendLog(
-    'dog_quest',
-    `The dog watches you with the flat unread look of an animal that has just had one ownership scratched off its name. The Arbiter steps in. "What kind of dog is that?"`,
-  );
 }
 
 /** OTA-1050 — one-shot popup finalization (replaces the typed three-step
@@ -36574,7 +36576,7 @@ function tryFireRubblePuppy(
   );
   get().appendLog(
     'dog_quest',
-    `The Arbiter looks at the pup, then at you. "Some debts the world settles itself. What kind of dog is that?"`,
+    `The Arbiter looks at the pup, then at you. "Some debts the world settles itself."`,
   );
   return true;
 }

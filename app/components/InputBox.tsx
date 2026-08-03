@@ -695,6 +695,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             style={styles.input}
             value={text}
             onChangeText={setText}
+            // OTA-1098 — owner, at the rope beat: "the text bar didn't pop up
+            // with the keyboard, i had to back up and hit it again." Android
+            // intermittently drops the native tap→focus→keyboard chain
+            // (worst while a JS-driven pulse animation is saturating the
+            // thread, which is exactly the tutorial's input-row state). An
+            // explicit focus() on press-in is a no-op when the chain worked
+            // and the retry when it did not — first tap always lands.
+            onPressIn={() => inputRef.current?.focus()}
             onFocus={() => setExplorationInputActive(true)}
             placeholder={
               awaitingTutorialName
