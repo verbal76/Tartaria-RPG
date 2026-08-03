@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     textTransform: 'uppercase',
   },
-  body: { color: '#d8cfb4', fontSize: 14, lineHeight: 21 },
+  body: { color: '#cdbf99', fontSize: 14, lineHeight: 21 },
   hint: { color: '#a2977b', fontSize: 12, lineHeight: 18, marginTop: 10, fontStyle: 'italic' },
   btn: {
     marginTop: 20,
