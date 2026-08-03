@@ -3581,6 +3581,64 @@ function sightVendor(
   if (greet) emitVendorGreeting(get, vendor);
 }
 
+/** OTA-1084 — hand over whatever a topic promised. Information and coin only:
+ *  see TopicGrant for why standing is deliberately absent. */
+function applyTopicGrant(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  npcName: string,
+  grant: import('../engine/dialogue').TopicGrant,
+): void {
+  const player = get().player;
+  if (!player) return;
+
+  if (grant.lead) {
+    // One pending lead at a time — the payout site reads a single slot, and
+    // overwriting an unclaimed one would quietly delete something the player
+    // was told. They keep the one they have.
+    if (player.pendingLead) {
+      get().appendLog('world', `You are already chasing something. ${npcName}'s tip will keep.`);
+    } else {
+      set((st) => (st.player ? { player: { ...st.player, pendingLead: grant.lead } } : {}));
+      get().appendLog('reward', `${npcName} tells you where to look. (a lead — you'll turn it up when you next cross fresh ground)`);
+    }
+  }
+
+  if (grant.whisper) {
+    const chain = CHAINS.find((c) => c.id === grant.whisper);
+    const already =
+      (player.activeWhispers ?? []).some((w) => w.id === grant.whisper) ||
+      (player.completedWhisperIds ?? []).includes(grant.whisper);
+    // Hearing the same rumour twice is not two rumours. Silent rather than
+    // apologetic: the topic's own line has already been said, and a second
+    // sentence explaining that nothing happened is noise.
+    if (chain && !already) {
+      const px = typeof player.mapX === 'number' ? player.mapX : 0;
+      const py = typeof player.mapY === 'number' ? player.mapY : 0;
+      const tile = pickTargetTile(chain, px, py);
+      const whisper: WhisperRecord = {
+        id: chain.id,
+        stage: 'planted',
+        plantedAtHour: player.hoursElapsed ?? 0,
+        targetMapX: tile.x,
+        targetMapY: tile.y,
+        targetLocationId: player.currentLocationId,
+        activeFromHour: chain.activeHours?.[0],
+        activeToHour: chain.activeHours?.[1],
+      };
+      set((st) => (st.player ? {
+        player: { ...st.player, activeWhispers: [...(st.player.activeWhispers ?? []), whisper] },
+      } : {}));
+      get().appendLog('reward', `✦ Whisper — ${chain.title}. (Check the Whispers panel.)`);
+    }
+  }
+
+  if (grant.tc && grant.tc > 0) {
+    set((st) => (st.player ? { player: { ...st.player, tc: st.player.tc + grant.tc! } } : {}));
+    get().appendLog('reward', `${npcName} presses ${grant.tc} TC into your hand. "For the trouble."`);
+  }
+}
+
 /** OTA-1083 — a gift's standing effect, applied to the recipient's faction.
  *  Factored out because the refused path needs it too and duplicating an
  *  applyRepChange call is how the two drift. */
@@ -5525,6 +5583,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     get().appendLog('world', topicReply(topic, asked));
+    // ⚠ OTA-1084 — THE GRANT FIRES ON THE FIRST RAISE ONLY, and `asked === 0`
+    // is that fact rather than a separate flag. The counter below is the same
+    // one that drives "I have told you that one", so the payout and the
+    // acknowledgement can never disagree about whether this has happened.
+    if (asked === 0 && topic.grants) applyTopicGrant(get, set, t.npcName, topic.grants);
     set((st) => ({
       worldMemory: {
         ...st.worldMemory,
