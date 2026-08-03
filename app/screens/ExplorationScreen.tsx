@@ -1023,7 +1023,11 @@ export function ExplorationScreen() {
             // OTA-847 (STEALTH SYSTEM) — peaceful PICKPOCKET. Greyed when there's
             // no vendor and nothing liftable in the scene.
             onOpenPickpocket={() => { Keyboard.dismiss(); setPickpocketOpen(true); }}
-            pickpocketBlocked={!currentScene?.vendor && (currentScene?.ambientNouns ?? []).length === 0}
+            // OTA-1103 — marks are PEOPLE now (OTA-1101), so both the block
+            // and the glow key on vendor/wanderer presence. The old ambient-
+            // noun clause was a leftover from when pickpocket lifted objects.
+            pickpocketBlocked={!currentScene?.vendor && !currentScene?.wanderer}
+            pickpocketPossible={!!(currentScene?.vendor || currentScene?.wanderer)}
             onOpenAskArbiter={() => setAskArbiterOpen(true)}
             onOpenMissions={() => { useGameStore.getState().maybeAdvanceTutorial('main_quest'); setScreen('contracts'); }}
             onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}

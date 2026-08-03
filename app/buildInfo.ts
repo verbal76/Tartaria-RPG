@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.13';
+export const DISPLAY_VERSION = '4.29.14';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20765,7 +20765,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // scene body, and the Arbiter has no body at all. No code change from the
 // audit; the mark list (vendor + wanderer) is confirmed complete.
 // DISPLAY_VERSION 4.29.13.
-export const OTA_BUILD_ID = '2026-08-03-1102-talk-glow';
+//
+// OTA-1103 — PICKPOCKET GLOWS GREEN WHEN IT'S A LIVE POSSIBILITY.
+//
+// Owner: "let's have pickpocket green when it's a possibility as well."
+// The quick-row PICKPOCKET button now lights the same ready-green the
+// torch button uses (#9ec96a border + text on the dark-green ground)
+// whenever a MARK — a person with pockets, vendor or wanderer — is in
+// reach. One visual language across the row: green means "this is live
+// right now", exactly what the TALK glow says one row up. Tutorial
+// blocking still wins over the tone.
+//
+// Also fixes the button's stale block condition: it keyed on vendor OR
+// ambient nouns from the pre-OTA-1101 days when pickpocket lifted
+// objects. Marks are PEOPLE now, so both the block and the glow key on
+// vendor/wanderer presence — no more live-looking button over an empty
+// room full of furniture.
+// DISPLAY_VERSION 4.29.14.
+export const OTA_BUILD_ID = '2026-08-03-1103-pickpocket-glow';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1102-talk-glow';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1101-pocket-loot';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1100-pickpocket-bottom-sheet';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1099-talk-bottom-sheet';
