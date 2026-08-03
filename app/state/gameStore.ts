@@ -288,6 +288,7 @@ import {
   plantHookByKind,
 } from '../engine/hooks';
 import type { EquipSlot, PlayerEquipped } from '../engine/types';
+import { rollPocketLoot } from '../engine/pocketLoot';
 import {
   WEAPONS,
   ARMOR,
@@ -3975,6 +3976,88 @@ export interface TalkablePerson {
   role?: string | null;
 }
 
+/** OTA-1101 — the caught-red-handed consequences, extracted verbatim from
+ *  stealFromVendor's CAUGHT branch so pickpocketPerson shares them instead of
+ *  duplicating: rep cascade against host + guest factions, the vendor flips
+ *  into a real fight (vendorInFight preserved), the memorable event, and the
+ *  greeting-ledger wrong. One set of consequences, two hands in the pocket. */
+function vendorCatchesThief(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+  triggerSource: string,
+): void {
+  const scene = get().currentScene;
+  const player = get().player;
+  if (!scene?.vendor || !player) return;
+  const vendor = scene.vendor;
+  // OTA 030 — caught. Vendor flips HOSTILE (was: walks away).
+  // Spin up an Enemy scaled to the vendor's tier and clear the
+  // vendor slot. Faction-aligned vendors also tank rep on
+  // detection.
+  // arb-fix — a caught theft in an outpost angers the HOST faction (you broke
+  // their peace / abused their protection) AND, when the vendor is a hosted
+  // guest whose own faction differs, THAT faction too (you tried to rob their
+  // member). applyRepChange cascades ally/rival for each; net the deltas from
+  // the original standing so a shared ally/rival isn't double-counted or
+  // double-logged.
+  const vendorFaction = vendor.faction;
+  const nativeFaction = vendor.nativeFaction;
+  const origById = new Map(player.factionStanding.map((r) => [r.factionId, r.standing] as const));
+  let repStanding = player.factionStanding;
+  if (vendorFaction) repStanding = applyRepChange(repStanding, vendorFaction, -10).standing;
+  if (nativeFaction && nativeFaction !== vendorFaction) {
+    repStanding = applyRepChange(repStanding, nativeFaction, -10).standing;
+  }
+  const repResult = {
+    standing: repStanding,
+    changed: repStanding
+      .map((r) => ({ factionId: r.factionId, delta: r.standing - (origById.get(r.factionId) ?? r.standing), newStanding: r.standing }))
+      .filter((c) => c.delta !== 0),
+  };
+  const enemy = buildTraderEnemy(vendor);
+  set((s) =>
+    s.player && s.currentScene
+      ? {
+          player: { ...s.player, factionStanding: repResult.standing },
+          currentScene: {
+            ...s.currentScene,
+            vendor: null,
+            // OTA-1079 — but not gone. See CurrentScene.vendorInFight.
+            vendorInFight: vendor,
+            enemies: [enemy],
+            enemyHps: [enemy.hp],
+            activeEnemyIdx: 0,
+            range: 'mid',
+            enemyAmbushUsed: [false],
+          },
+        }
+      : s,
+  );
+  get().appendLog(
+    'combat',
+    `${vendor.name} catches your hand mid-lift. "Thief!" — steel comes out.`,
+    {
+      stealCaught: true,
+      // 2026-05-25 OTA-036 — full trigger context so any future
+      // appearance of this line is self-explanatory in the log.
+      triggerSource,
+    },
+  );
+  logRepChanges(get, repResult.changed);
+  recordMemorableEvent(get, set, {
+    kind: 'theft_caught',
+    text: `were caught stealing from ${vendor.name}`,
+    factionId: vendorFaction ?? undefined,
+  });
+  // OTA-1072 — deliberately on the CAUGHT branch only. A theft they never
+  // noticed cannot change how they greet you; the ledger records what the
+  // NPC knows, not what the player did. Getting away clean means getting
+  // away clean, and getting caught follows you back to that stall forever.
+  set((s) => ({
+    worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(vendor), { wrongs: 1 }),
+  }));
+}
+
 function talkablePeople(get: () => GameStore): TalkablePerson[] {
   const scene = get().currentScene;
   const player = get().player;
@@ -4936,6 +5019,12 @@ interface GameStore {
    *  consumed; failure narrates the slip and leaves the noun on
    *  the board for a normal take or another attempt. */
   stealthTakeAmbientNoun: (noun: string) => void;
+  /** OTA-1101 — pickpocket a PERSON in the scene (vendor or wanderer) for
+   *  what's actually in their pockets: TC, a collectable note, rarely a
+   *  Legendary material or a tower map (engine/pocketLoot.ts). Stealing
+   *  items off the table stays with stealFromVendor / the steal verb; this
+   *  is the hand inside the coat. Roll + consequences mirror vendor theft. */
+  pickpocketPerson: (targetName: string) => void;
   /** Pre-fill text staged by ActionReferenceScreen (or any other
    *  helper screen) for the next mount of InputBox on the exploration
    *  screen. InputBox reads this once on mount + on changes, drops
@@ -6454,6 +6543,128 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // we only reach here when the grant landed.
     get().appendLog('world', `You take the ${cat.name} from where it lay.`);
     get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
+    void get().persist();
+  },
+
+  // OTA-1101 — PICKPOCKET IS FOR PEOPLE. Owner: "stealing is for items,
+  // pickpocket is for what would be in their clothing or on them." The mark's
+  // market goods live on the table — that's what `steal <item>` is for. This
+  // action lifts from the POCKET: their walking-around TC, a collectable note
+  // kept folded and close, maybe a single Legendary material, rarely a tower
+  // map — the things they wouldn't trust on the tabletop with all the thieves
+  // around. Roll and consequences mirror vendor theft exactly (Stealth vs the
+  // demeanor DC, steal-heat escalation, STE-gated quiet fail, caught → the
+  // fight is real); only the payout differs. See engine/pocketLoot.ts.
+  pickpocketPerson(targetName) {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player || !scene) return;
+    const want = targetName.trim().toLowerCase();
+    if (!want) return;
+    const vendorMark = scene.vendor && scene.vendor.name.toLowerCase().includes(want) ? scene.vendor : null;
+    const wandererMark = !vendorMark && scene.wanderer && scene.wanderer.name.toLowerCase().includes(want) ? scene.wanderer : null;
+    if (!vendorMark && !wandererMark) {
+      get().appendLog('world', `No one by that name is close enough to touch.`);
+      return;
+    }
+    const markName = vendorMark ? vendorMark.name : wandererMark!.name;
+    // DC mirrors stealFromVendor's demeanor tiers; a wanderer on the road
+    // watches their own back but has no stall crowd to help them (DC 12).
+    const baseDc = vendorMark
+      ? (vendorMark.demeanor === 'sketchy' ? 11 : vendorMark.demeanor === 'honest' ? 14 : 16)
+      : 12;
+    // Same heat machinery as stealFromVendor — a pocket and a table feed the
+    // same reputation for light fingers.
+    const nowHours = player.hoursElapsed ?? 0;
+    const decayedHeat = Math.max(
+      0,
+      (player.stealHeat ?? 0) - Math.floor(Math.max(0, nowHours - (player.stealHeatHours ?? nowHours))),
+    );
+    const prevAttempts = Math.max(vendorMark?.stealAttempts ?? 0, decayedHeat);
+    const dc = baseDc + prevAttempts * 2;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { stealthTimeBonus } = require('../engine/timeOfDay');
+    const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerArmorResistKinds(player)));
+    const timeBonus = stealthTimeBonus(player.hoursElapsed);
+    const roll = rollDie(20);
+    const total = roll + stats.stealth + timeBonus;
+    const success = total >= dc;
+    const timeNote = timeBonus !== 0 ? ` ${timeBonus > 0 ? '+' : ''}${timeBonus} (${timeBonus > 0 ? 'night' : 'day'})` : '';
+    set((s) => (s.player ? { player: { ...s.player, stealHeat: decayedHeat + 1, stealHeatHours: nowHours } } : s));
+    set((s) => (s.player ? { player: advanceTime(spendStamina(s.player, STAMINA_COSTS.skillCheck), 0.25) } : s));
+    if (vendorMark) {
+      set((s) => (s.currentScene?.vendor
+        ? { currentScene: { ...s.currentScene, vendor: { ...s.currentScene.vendor, stealAttempts: prevAttempts + 1 } } }
+        : s));
+    }
+    if (success) {
+      const loot = rollPocketLoot({ ownedCollectables: get().player?.collectables ?? [] });
+      if (loot.kind === 'tc') {
+        set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + loot.amount } } : s));
+        get().appendLog('reward', `✦ Light fingers — ${loot.amount} TC out of ${markName}'s pocket, and they never felt it.`);
+      } else if (loot.kind === 'fragment') {
+        // Its own reward line + first-time reveal overlay live in the grant.
+        get().appendLog('reward', `✦ A folded page, kept close inside ${markName}'s coat.`);
+        get().grantCollectableFragment(loot.fragmentId);
+      } else {
+        const cat = findCatalogItem(loot.name);
+        // OTA 23-009 pattern — push, don't merge: the stolen flag lives on
+        // this instance and must not launder into a clean stack.
+        const lifted: InventoryItem = stampDurability({
+          id: `pocket_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: loot.name,
+          kind: cat?.kind ?? 'misc',
+          rarity: cat?.rarity,
+          quantity: 1,
+          tags: cat?.tags ?? [],
+          stolen: true,
+        });
+        set((s) => (s.player ? { player: { ...s.player, inventory: [...s.player.inventory, lifted] } } : s));
+        get().appendLog(
+          'reward',
+          loot.kind === 'map'
+            ? `✦ Folded oilcloth inside ${markName}'s coat — ${loot.name}. They would never have sold this.`
+            : `✦ Your fingers close on something small and wrapped — ${loot.name}, lifted clean off ${markName}.`,
+        );
+      }
+      // Successful lift trains the thief, same as vendor theft.
+      const liveThief = get().player;
+      if (liveThief) {
+        const tr = trainStat(liveThief, 'stealth', true);
+        set((s) => (s.player ? { player: tr.player } : s));
+        if (tr.leveled) {
+          get().appendLog(
+            'reward',
+            `✦ Light hands. +1 STE (${statNowClause(get().player, 'stealth', tr.leveled.to)}).`,
+          );
+        }
+      }
+    } else if ((stats.stealth ?? 0) >= STEALTH_QUIET_FAIL_STE) {
+      // OTA-847 quiet fail — the practiced thief withdraws a beat early.
+      get().appendLog(
+        'world',
+        `Your hand drifts toward ${markName}'s coat — then you feel their attention start to swing your way. You let it go and step back, easy and clean. Nothing taken, nothing seen.`,
+      );
+    } else {
+      get().appendLog('combat', `Pickpocket ${markName} — d20 ${roll} + STE ${stats.stealth}${timeNote} = ${total} vs DC ${dc} — ✗ CAUGHT`);
+      if (vendorMark) {
+        vendorCatchesThief(
+          get,
+          set,
+          `pickpocketPerson: vendor='${markName}' demeanor=${vendorMark.demeanor} pocket roll=d20(${roll})+STE(${stats.stealth})=${total} vs DC${dc} prevAttempts=${prevAttempts} location=${player.currentLocationId}${player.hubRoomId ? `:${player.hubRoomId}` : ''}`,
+        );
+      } else {
+        // A wanderer caught with your hand in their coat doesn't draw steel
+        // over a pocket — they name it, and the road takes them elsewhere.
+        get().appendLog(
+          'world',
+          `${markName} snatches your wrist out of their coat. "Try that again and lose the hand." They shoulder past you and are gone up the road.`,
+        );
+        set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, wanderer: null } } : s));
+        set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(wandererMark!), { wrongs: 1 }) }));
+      }
+    }
     void get().persist();
   },
 
@@ -22179,72 +22390,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void get().persist();
       return;
     } else {
-      // OTA 030 — caught. Vendor flips HOSTILE (was: walks away).
-      // Spin up an Enemy scaled to the vendor's tier and clear the
-      // vendor slot. Faction-aligned vendors also tank rep on
-      // detection.
-      // arb-fix — a caught theft in an outpost angers the HOST faction (you broke
-      // their peace / abused their protection) AND, when the vendor is a hosted
-      // guest whose own faction differs, THAT faction too (you tried to rob their
-      // member). applyRepChange cascades ally/rival for each; net the deltas from
-      // the original standing so a shared ally/rival isn't double-counted or
-      // double-logged.
-      const vendorFaction = scene.vendor.faction;
-      const nativeFaction = scene.vendor.nativeFaction;
-      const origById = new Map(player.factionStanding.map((r) => [r.factionId, r.standing] as const));
-      let repStanding = player.factionStanding;
-      if (vendorFaction) repStanding = applyRepChange(repStanding, vendorFaction, -10).standing;
-      if (nativeFaction && nativeFaction !== vendorFaction) {
-        repStanding = applyRepChange(repStanding, nativeFaction, -10).standing;
-      }
-      const repResult = {
-        standing: repStanding,
-        changed: repStanding
-          .map((r) => ({ factionId: r.factionId, delta: r.standing - (origById.get(r.factionId) ?? r.standing), newStanding: r.standing }))
-          .filter((c) => c.delta !== 0),
-      };
-      const enemy = buildTraderEnemy(scene.vendor);
-      set((s) =>
-        s.player && s.currentScene
-          ? {
-              player: { ...s.player, factionStanding: repResult.standing },
-              currentScene: {
-                ...s.currentScene,
-                vendor: null,
-                // OTA-1079 — but not gone. See CurrentScene.vendorInFight.
-                vendorInFight: scene.vendor,
-                enemies: [enemy],
-                enemyHps: [enemy.hp],
-                activeEnemyIdx: 0,
-                range: 'mid',
-                enemyAmbushUsed: [false],
-              },
-            }
-          : s,
+      // OTA-1101 — the caught-red-handed consequences are shared with
+      // pickpocketPerson now; the machinery lives in vendorCatchesThief.
+      vendorCatchesThief(
+        get,
+        set,
+        `stealFromVendor: vendor='${scene.vendor.name}' demeanor=${scene.vendor.demeanor} item='${offer.itemName}' roll=d20(${roll})+DEX(${stats.dexterity})=${total} vs DC${dc} prevAttempts=${prevAttempts} location=${player.currentLocationId}${player.hubRoomId ? `:${player.hubRoomId}` : ''}`,
       );
-      get().appendLog(
-        'combat',
-        `${scene.vendor.name} catches your hand mid-lift. "Thief!" — steel comes out.`,
-        {
-          stealCaught: true,
-          // 2026-05-25 OTA-036 — full trigger context so any future
-          // appearance of this line is self-explanatory in the log.
-          triggerSource: `stealFromVendor: vendor='${scene.vendor.name}' demeanor=${scene.vendor.demeanor} item='${offer.itemName}' roll=d20(${roll})+DEX(${stats.dexterity})=${total} vs DC${dc} prevAttempts=${prevAttempts} location=${player.currentLocationId}${player.hubRoomId ? `:${player.hubRoomId}` : ''}`,
-        },
-      );
-      logRepChanges(get, repResult.changed);
-      recordMemorableEvent(get, set, {
-        kind: 'theft_caught',
-        text: `were caught stealing from ${scene.vendor.name}`,
-        factionId: vendorFaction ?? undefined,
-      });
-      // OTA-1072 — deliberately on the CAUGHT branch only. A theft they never
-      // noticed cannot change how they greet you; the ledger records what the
-      // NPC knows, not what the player did. Getting away clean means getting
-      // away clean, and getting caught follows you back to that stall forever.
-      set((s) => ({
-        worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(scene.vendor!), { wrongs: 1 }),
-      }));
     }
     void get().persist();
   },
