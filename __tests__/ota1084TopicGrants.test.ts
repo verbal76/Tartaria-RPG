@@ -57,7 +57,7 @@ import { CHAINS } from '../app/engine/whispers';
 
 const base: TalkContext = {
   regard: 'trusted', contractsTurnedIn: 4, standing: 60, titles: [],
-  hasRecentRaidNews: false, chapter: 'cores', cores: 2,
+  hasRecentRaidNews: false, chapter: 'cores', cores: 2, choices: [], // OTA-1088
 };
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const RAW = require('../app/data/npcs/dialogue_topics.json') as {

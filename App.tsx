@@ -38,6 +38,7 @@ import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1043
+import { StoryForkOverlay } from './app/components/StoryForkOverlay'; // OTA-1088
 import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1045
 import { StoryIntroOverlay } from './app/components/StoryIntroOverlay'; // OTA-1046 — global (was exploration-only)
 import { DogOnboardingModal } from './app/components/DogOnboardingModal'; // OTA-1050
@@ -593,6 +594,13 @@ export default function App() {
           main-quest phase transitions fire from more than one screen: travel
           arrival lands on exploration, but the Nexus choice fires from
           Contracts. Wherever the arc turns, the card shows. */}
+      {/* OTA-1088 — ABOVE the chapter card in the tree so a decision is never
+          drawn under a marker. raiseDueFork already yields to a live card, so
+          in practice they never both want the screen; this is the belt to that
+          braces. */}
+      <SilentBoundary tag="StoryForkOverlay">
+        <StoryForkOverlay />
+      </SilentBoundary>
       <SilentBoundary tag="ChapterCardOverlay">
         <ChapterCardOverlay />
       </SilentBoundary>

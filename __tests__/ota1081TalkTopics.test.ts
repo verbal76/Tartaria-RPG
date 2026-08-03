@@ -55,7 +55,7 @@ import {
 
 const base: TalkContext = {
   regard: 'met', contractsTurnedIn: 0, standing: 0, titles: [], hasRecentRaidNews: false,
-  chapter: 'hook', cores: 0,
+  chapter: 'hook', cores: 0, choices: [], // OTA-1088
 };
 const at = (over: Partial<TalkContext>): TalkContext => ({ ...base, ...over });
 const ids = (npc: string, ctx: TalkContext) => topicsFor(npc, ctx).map((t) => t.id);

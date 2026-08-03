@@ -53,6 +53,11 @@ import {
 // OTA-1087 — talkablePeople needs these at module scope; the in-handler `cg`
 // alias is function-local.
 import { isCoreGuardian, capitalIdFromGuardian } from '../engine/coreGuardians';
+// OTA-1088 — Phase 3: the story asks questions.
+import {
+  dueFork, forkById, optionById, recordChoice, choiceKeys,
+  type StoryFork,
+} from '../engine/storyForks';
 // OTA-1073 — Phase 1 slice 2: turn-in credit, roadside recognition, gossip.
 import { gossipSubject, gossipLine } from '../engine/npcMemory';
 import {
@@ -3784,7 +3789,76 @@ function talkContextFor(
     // block reads as "the very beginning" rather than unlocking everything.
     chapter: player?.mainQuest?.phase ?? 'hook',
     cores: player?.mainQuest?.coresRecovered?.length ?? 0,
+    // OTA-1088 — the third place a Phase 3 decision lands: the cast can gate a
+    // topic on what you chose, so the world knows and says so.
+    choices: player ? choiceKeys(player) : [],
   };
+}
+
+/** ⚠ OTA-1088 — RAISE THE OPEN QUESTION, IF THERE IS ONE.
+ *
+ *  Called at every point the story could have moved. Idempotent and
+ *  cheap: `dueFork` is a pure read of the save, so calling this twice, or
+ *  after a crash, or on the load path, all produce the same answer. THAT is
+ *  the migration story — a fork cannot go missing because it was never
+ *  anywhere but the save's own shape.
+ *
+ *  Deliberately yields to the tutorial, the opening crawl and a chapter card:
+ *  three full-screen beats stacked on each other is a stack, not a story. The
+ *  question keeps until they are done, because it keeps forever. */
+function raiseDueFork(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore>) => void,
+): void {
+  if (get().pendingFork) return;
+  if (get().tutorialStep !== null || get().storyIntro || get().chapterCard) return;
+  const player = get().player;
+  if (!player) return;
+  const fork = dueFork(player);
+  if (fork) set({ pendingFork: fork });
+}
+
+/** What an answer DOES, immediately. The epilogue and the topic gates read the
+ *  recorded choice later; this is the part the player watches happen. */
+function applyForkEffects(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  forkId: string,
+  optionId: string,
+): void {
+  const opt = optionById(forkId, optionId);
+  const fx = opt?.effects;
+  if (!fx) return;
+  if (fx.tc) {
+    // ⚠ Clamped at zero. A fork that could put the player into debt they
+    // cannot see is a trap, and "you pay what you have" is what the writing
+    // says anyway — the collector's man counts it and knows it is not enough.
+    set((st) => (st.player ? { player: { ...st.player, tc: Math.max(0, st.player.tc + fx.tc!) } } : {}));
+    const paid = fx.tc < 0 ? `−${Math.min(Math.abs(fx.tc), get().player?.tc ?? 0) || Math.abs(fx.tc)}` : `+${fx.tc}`;
+    get().appendLog('reward', `${paid} TC.`);
+  }
+  if (fx.item) {
+    const keep: InventoryItem = {
+      id: freshInstanceId('story_keepsake'),
+      name: fx.item.name, kind: 'relic', rarity: 'Legendary', quantity: 1,
+      // 'quest' locks it: never sellable, giftable, scrappable or fusable
+      // (engine/questItems.ts). A decision you can pawn is not a decision.
+      tags: ['quest', 'story', 'keepsake'], description: fx.item.description,
+    };
+    set((st) => (st.player ? { player: { ...st.player, inventory: mergeOrPushItem(st.player.inventory, keep) } } : {}));
+    get().appendLog('reward', `✦ ${keep.name}`);
+  }
+  if (fx.standing) {
+    // ⚠ ONE-SHOT BY CONSTRUCTION. OTA-1087 closed two rival-standing farms
+    // built out of repeatable acts; this is safe for the opposite reason
+    // rather than by a guard — a fork can only ever be answered once, so this
+    // line can only ever run once per character, ever.
+    const { factionId, delta } = fx.standing;
+    set((st) => (st.player
+      ? { player: { ...st.player, factionStanding: applyRepChange(st.player.factionStanding, factionId, delta).standing } }
+      : {}));
+    get().appendLog('system', `Standing ${delta > 0 ? '+' : ''}${delta} — ${factionId.replace(/_/g, ' ')}.`);
+  }
 }
 
 /** OTA-1087 — EVERYBODY IN THIS SCENE WORTH TALKING TO, DERIVED ONCE.
@@ -5088,6 +5162,16 @@ interface GameStore {
    *  globally in App.tsx) renders whenever this is non-null. Transient —
    *  never persisted, always reset by slot load / new game / delete. */
   chapterCard: import('../engine/chapters').ChapterCard | null;
+  /** ⚠ OTA-1088 — THE FORK CURRENTLY BEING ASKED, and nothing more.
+   *
+   *  This is a VIEW of `dueFork(player)`, never a queue. It is recomputed by
+   *  raiseDueFork at every point the story could have moved, and it is
+   *  correct to drop it on the floor at any moment: the question is derived
+   *  from the save, so killing the app in front of the card re-asks it on
+   *  load. Nothing about a fork lives here that a crash could lose. */
+  pendingFork: StoryFork | null;
+  /** Answer the open question. One-way — see storyForks.recordChoice. */
+  answerFork: (optionId: string) => void;
   /** OTA-1043 — close the chapter card (tap-through). */
   dismissChapterCard: () => void;
   /** OTA-1045 — TRUE while the one-time veteran motive picker is owed: the
@@ -5699,6 +5783,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   contractsNotice: null,
   storyIntro: null,
   chapterCard: null, // OTA-1043
+  pendingFork: null, // OTA-1088
   motivePickerPending: false, // OTA-1045
   fusionBlockedNotice: null,
   pendingFusionSelection: null,
@@ -6673,6 +6758,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // OTA-1041 — a loaded save never reopens the crawl mid-game.
         storyIntro: null,
         chapterCard: null, // OTA-1043 — nor a stale chapter card
+        pendingFork: null, // OTA-1088 — nor an open question from another run
         // OTA-1045 — a save whose motive was DEALT (backfill guess, never
         // chosen) is owed the one-time picker, right here on load.
         motivePickerPending: player.storyMotiveChosen !== true,
@@ -6981,7 +7067,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       crashedSlotIds,
       // If we just deleted the currently-loaded character, drop player state too.
       ...(get().activeSlotId === slotId
-        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null, storyIntro: null, chapterCard: null, motivePickerPending: false }
+        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null, storyIntro: null, chapterCard: null, pendingFork: null, motivePickerPending: false }
         : {}),
     });
   },
@@ -7053,6 +7139,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // the StoryIntroOverlay shows it over the first scene.
       storyIntro: introPagesFor(player.storyMotive, player.factionId),
       chapterCard: null, // OTA-1043 — no stale card from a prior character
+      pendingFork: null, // OTA-1088
       motivePickerPending: false, // OTA-1045 — creation chose; nothing owed
     });
     try {
@@ -7106,6 +7193,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingHookContinue: null,
       storyIntro: null, // OTA-1041
       chapterCard: null, // OTA-1043
+  pendingFork: null, // OTA-1088
       motivePickerPending: false, // OTA-1045
       currentScreen: 'title',
       activeSlotId: null,
@@ -20229,6 +20317,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-1044 — the motive drip rides travel arrivals (one story event max
     // per arrival; holds during the opening / chapter cards / hostile scenes).
     advanceStoryDrip(get, set, locationId);
+    // OTA-1088 — and the open question, if the run has reached one. Same
+    // moment as the drip and the same reasons: the player has just arrived
+    // somewhere, nothing is on fire, and there is room for the story to speak.
+    raiseDueFork(get, set);
     void get().persist();
   },
 
@@ -27959,7 +28051,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // OTA-1043 — close the chapter card. Nothing to remember: the phase
   // transition that raised it is already on the player record (and
   // persisted), and the feed carries the transition's narration.
-  dismissChapterCard() { set({ chapterCard: null }); },
+  dismissChapterCard() {
+    set({ chapterCard: null });
+    // OTA-1088 — the card was the thing standing in front of the question.
+    raiseDueFork(get, set);
+  },
+  answerFork: (optionId) => {
+    const fork = get().pendingFork;
+    const player = get().player;
+    if (!fork || !player) return;
+    const opt = optionById(fork.id, optionId);
+    if (!opt) return;
+    // ⚠ RECORD FIRST, THEN NARRATE, THEN PAY. If the app dies between these,
+    // the worst case is a player who chose and did not get the coin — not a
+    // player who got the coin and is asked the same question again. The
+    // recorded answer is what every downstream reader keys on, so it is the
+    // one write that must not be second.
+    set({
+      player: { ...player, storyChoices: recordChoice(player.storyChoices, fork.id, optionId) },
+      pendingFork: null,
+    });
+    get().appendLog('arbiter', opt.line, { ...STORY_BEAT_META });
+    applyForkEffects(get, set, fork.id, optionId);
+    void get().persist();
+    // A motive with two questions asks the second one when its gate opens, not
+    // on the same screen. Re-check anyway — a fork gated at the same phase as
+    // this one is authorable, and silently dropping it would be the exact
+    // failure this system is built to make impossible.
+    raiseDueFork(get, set);
+  },
 
   // OTA-1045 — the one-time veteran motive picker commits here. The pick
   // (or the kept guess — confirming the dealt motive counts) becomes the
@@ -27982,6 +28102,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `The Arbiter marks the ledger without looking up. "${title}. So that is why you came down. The mud had its own guess; yours is the one that counts. Walk on."`,
     );
     void get().persist();
+    // ⚠ OTA-1088 — the motive just changed, and forks belong to motives. A
+    // veteran who picks a different motive here inherits THAT motive's
+    // questions from wherever their run has already got to; answers recorded
+    // under the old motive stay in the map, harmless and unread. Nothing is
+    // re-asked and nothing is lost, because both facts are derived.
+    raiseDueFork(get, set);
   },
 
   // OTA-1050 — the dog onboarding popup commits here; the shared finalization
@@ -31298,6 +31424,13 @@ function triggerMainQuest(
     const ch = require('../engine/chapters');
     const card = ch.chapterCardFor(nextState.phase, player.storyMotive);
     if (card) set({ chapterCard: card });
+    // ⚠ OTA-1088 — CHAPTER CARDS BECOME DECISIONS, which is the plan's phrase
+    // for this. Not by making the card itself a fork — the card is a marker
+    // and holds no state a fast tap could lose (OTA-1043) — but by asking the
+    // question the instant it is dismissed. A phase turn with a fork gated on
+    // it now reads: cinematic, then decision. With no card (or with the card
+    // already gone) the question comes straight up.
+    if (!card) raiseDueFork(get, set);
   }
   // For multi-phase triggers — e.g. core_recovered that lands the
   // player on phase 'descent' (5th Core) — also log the descent
