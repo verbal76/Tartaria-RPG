@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1085`**,
-**golem-line `2026-08-03-1062`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1086`**,
+**golem-line `2026-08-03-1063`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,45 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.96**; ledger in `VERSION.md`.
+re-architecture. Currently **4.28.97**; ledger in `VERSION.md`.
 
-- **THE NON-VENDOR CAST GETS A VOICE (2026-08-03, latest). BOTH LINES.**
+- **THE FLOURISH (2026-08-03, latest). BOTH LINES.**
+  The build plan's last unbuilt line, and the last item on the owner's
+  seven-item list: *"the LLM contributes at most one short flourish line per
+  exchange, off the critical path, with a template fallback if it's slow."*
+  A flourish is **not more dialogue** — the authored reply owns the words, the
+  flourish owns the hands. One short beat of what somebody is *doing* while they
+  answer: a rag over a joint, a count that does not falter, a pack that never
+  comes off the shoulder. 51 authored lines in `app/data/npcs/flourishes.json`,
+  keyed two ways at once — by **trade** (ten buckets; all 30 named vendors map,
+  and the procedural cast buckets straight off the OTA-1085 class keys) and by
+  **regard** (six rungs including `wronged`, so posture tracks the Phase 1
+  ledger). The pools concatenate and index by a hash of person + topic, so the
+  same state gives the same beat, deterministic like everything since OTA-1072.
+  - ⚠ **The model is still not in the critical path.** OTA-1081 built the
+    conversation synchronous *because* a 14–20s generation in front of a tapped
+    topic is a loading screen, and nothing about that changed. The order is
+    inverted instead: a request fires when the topic **list opens** — the one
+    moment in an exchange where the player is reliably busy reading — the result
+    sits in **one module-level slot** keyed to that person, and raising a topic
+    *takes* from the slot if it is full or takes an authored line if it is not,
+    and cannot tell the difference. Slow model, dormant model and no model are
+    all the same case: an empty slot. No `await` anywhere in the exchange, no
+    spinner, no degraded mode. The slot dies with the conversation and is never
+    persisted.
+  - The **judge** for a generated line is pure and synchronous, beside the brief
+    that asks for it so the two cannot drift: must name the person, one sentence
+    under 160 chars, terminated, no quotes / questions / first person /
+    second-person opener (the two registers OTA-1054 caught the ambient path
+    falling into) and no instruction echo (OTA-1053).
+  - **Frequency.** First raise of a topic only — a re-tread gets the words back
+    but not the business; at most 3 per conversation; never the same line twice
+    in one; silence rather than a repeat once the pool is spent.
+  - `engine/flourish.ts` carries the same no-await guard `dialogue.ts` carries,
+    and the test asserts **both** files plus that `emitFlourish` contains no
+    `await` at all. 30 tests.
+
+- **THE NON-VENDOR CAST GETS A VOICE (2026-08-03). BOTH LINES.**
   30 named vendors were authored one at a time. The rest of the population
   cannot work that way and **should not**: roadside traders are 24 procedurally
   named people sharing two archetypes; wanderers are archetypes × first names,

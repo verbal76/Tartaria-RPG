@@ -45,6 +45,11 @@ import {
   hasTopicsFor, topicsFor, topicReply, alreadySaidLine, nothingToSayLine,
   type Topic as TalkTopic,
 } from '../engine/dialogue';
+// OTA-1086 — the flourish: one beat of stage business under an authored reply.
+import {
+  flourishFor, flourishKindFor, flourishPrompt, vetModelFlourish,
+  FLOURISH_MAX_PER_CONVERSATION, FLOURISH_SYSTEM,
+} from '../engine/flourish';
 // OTA-1073 — Phase 1 slice 2: turn-in credit, roadside recognition, gossip.
 import { gossipSubject, gossipLine } from '../engine/npcMemory';
 import {
@@ -3702,6 +3707,133 @@ function talkContextFor(
   };
 }
 
+// ── OTA-1086 — THE FLOURISH SLOT ───────────────────────────────────────────
+//
+// ⚠ ONE SLOT, NOT A QUEUE, AND NOTHING EVER AWAITS IT. This is the entire
+// mechanism by which the local narrator gets to contribute to a conversation
+// without being allowed to slow one down. A request is fired when the topic
+// list OPENS — the one moment in the exchange where the player is reliably
+// busy reading — and whatever comes back sits here until a topic is raised.
+// The raise itself is synchronous: it takes what is in the slot, or it takes
+// an authored line, and it can never tell the difference between "the model is
+// slow", "the model is dormant" and "there is no model", because in all three
+// cases the slot is simply empty. See engine/flourish.ts.
+//
+// Not persisted, deliberately. A beat of stage business is worth composing but
+// not worth carrying across a save; and a slot that survived a load would be a
+// line generated for a game state that no longer exists.
+let flourishSlot: { npcId: string; line: string } | null = null;
+let flourishGenStartMs = 0;
+/** One request per this window, whatever the player taps. The generation is
+ *  free to the exchange but not free to the device. */
+const FLOURISH_GEN_COOLDOWN_MS = 45_000;
+
+/** OTA-1086 test seams. The slot is module state on purpose (it must not
+ *  persist), which leaves a test no other way to reach it. */
+export function _resetFlourishForTest(): void {
+  flourishSlot = null;
+  flourishGenStartMs = 0;
+}
+export function _setFlourishSlotForTest(npcId: string, line: string): void {
+  flourishSlot = { npcId, line };
+}
+export function _flourishSlotForTest(): { npcId: string; line: string } | null {
+  return flourishSlot;
+}
+
+/** The beat itself. Called AFTER the authored reply has already been appended,
+ *  and only on a topic's first raise. Synchronous end to end. */
+function emitFlourish(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+  topicId: string,
+): void {
+  const t = get().pendingTalk;
+  if (!t) return;
+  // Punctuation stops being punctuation when it is on every line.
+  if (t.flourishCount >= FLOURISH_MAX_PER_CONVERSATION) return;
+  const rel = getRelation(get().worldMemory, t.npcId);
+  const role = t.role ?? rel?.role ?? null;
+  // ⚠ TAKEN, NOT AWAITED. If the slot happens to hold a vetted line for this
+  // person, it speaks; otherwise the authored pool does, at the same speed.
+  const fromModel = flourishSlot?.npcId === t.npcId ? flourishSlot.line : null;
+  if (fromModel) flourishSlot = null;
+  const line = fromModel ?? flourishFor({
+    npcId: t.npcId,
+    npcName: t.npcName,
+    role,
+    regard: npcRegard(rel),
+    topicId,
+    used: t.flourishesUsed,
+  });
+  // Null means the pool is spent for this conversation. Silence beats repeating
+  // a gesture the player watched two taps ago.
+  if (!line) return;
+  // Lands within the debounce window of the reply it follows, so the feed shows
+  // one card — the answer, then the business — rather than two stamps.
+  get().appendLog('world', line);
+  set((s) => ({
+    pendingTalk:
+      s.pendingTalk && s.pendingTalk.npcId === t.npcId
+        ? {
+            ...s.pendingTalk,
+            flourishesUsed: [...s.pendingTalk.flourishesUsed, line],
+            flourishCount: s.pendingTalk.flourishCount + 1,
+          }
+        : s.pendingTalk,
+  }));
+  // Line up the next one while they read this one.
+  void prefetchFlourish(get, set, t.npcId, t.npcName, role);
+}
+
+/** Fill the slot, if the device is in a position to. Every early return here is
+ *  a case where the feature silently stays authored, which is the whole point:
+ *  there is no degraded mode, because the authored line was never a fallback in
+ *  the apologetic sense — it is the product, and this can only improve on it. */
+async function prefetchFlourish(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+  npcId: string,
+  npcName: string,
+  role: string | null,
+): Promise<void> {
+  if (flourishSlot) return;
+  // ⚠ `isGenerating` is BOTH the check and, below, the lock. llama.rn holds one
+  // context; a flourish that started while the ambient path was mid-stream
+  // would be two generations into one runtime. The ambient and reactive paths
+  // guard on the same flag, so taking it here keeps this off their toes too.
+  if (!qwen.isReady() || get().isGenerating) return;
+  if (Date.now() - flourishGenStartMs < FLOURISH_GEN_COOLDOWN_MS) return;
+  flourishGenStartMs = Date.now();
+  const t0 = Date.now();
+  // Note: no partialArbiterText. The streaming preview belongs to narration the
+  // player asked for; a flourish must not put a spinner over a topic list.
+  set({ isGenerating: true });
+  try {
+    const out = await qwen.generate(
+      [
+        { role: 'system', content: FLOURISH_SYSTEM },
+        { role: 'user', content: flourishPrompt(npcName, role, flourishKindFor(npcId, role)) },
+      ],
+      { maxNewTokens: 48, temperature: 0.8 },
+    );
+    const cleaned = repairGluedNarration(stripForeignWords((out ?? '').trim()));
+    const line = vetModelFlourish(cleaned, npcName);
+    // If the player has walked away, the line is dropped rather than banked —
+    // it was composed for a conversation that is over.
+    const stillTalking = get().pendingTalk?.npcId === npcId;
+    if (line && stillTalking) flourishSlot = { npcId, line };
+    get().appendLog(
+      'debug',
+      `flourish: ${line ? (stillTalking ? '✓' : 'stale') : '∅'} ${Date.now() - t0}ms`,
+    );
+  } catch {
+    get().appendLog('debug', `flourish: error ${Date.now() - t0}ms`);
+  } finally {
+    set({ isGenerating: false });
+  }
+}
+
 /** OTA-1080 — LEDGER COVERAGE FOR PEOPLE WHO ARE NOT BEHIND A COUNTER.
  *
  *  Phase 1 built a per-person ledger and then wired it to vendors and Core
@@ -5189,6 +5321,14 @@ interface GameStore {
         npcId: string;
         npcName: string;
         topics: TalkTopic[];
+        /** OTA-1086 — their job title, carried so the flourish can tell a smith
+         *  from a scholar without re-deriving it off the scene every raise. */
+        role?: string | null;
+        /** OTA-1086 — flourish lines already spent in THIS conversation, so a
+         *  gesture the player watched two taps ago is not repeated. */
+        flourishesUsed: string[];
+        /** OTA-1086 — beats emitted so far, against FLOURISH_MAX_PER_CONVERSATION. */
+        flourishCount: number;
       }
     | null;
   /** Open a conversation with the named person in the current scene. */
@@ -5547,6 +5687,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   closeTalk: () => {
     const t = get().pendingTalk;
     if (t) get().appendLog('world', `You let the conversation go and ${t.npcName} gets back to it.`);
+    // OTA-1086 — the slot's lifetime is the conversation it was fired for. A
+    // line composed while you were standing at Irma's counter should not be
+    // waiting there an hour later; the beat was about this exchange.
+    flourishSlot = null;
     set({ pendingTalk: null });
   },
   talkToNpc: (nameOrId) => {
@@ -5558,13 +5702,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ledger covered; OTA-1080 finished that, so the verb catches up. Escort
     // leaders are included because they are walking beside you — the one
     // population you are guaranteed to have time with.
-    const people: { id: string; name: string; faction?: string | null }[] = [];
-    if (scene?.vendor) people.push({ id: vendorNpcId(scene.vendor), name: scene.vendor.name, faction: scene.vendor.faction });
-    if (scene?.wanderer) people.push({ id: vendorNpcId(scene.wanderer), name: scene.wanderer.name, faction: scene.wanderer.faction });
+    const people: { id: string; name: string; faction?: string | null; role?: string | null }[] = [];
+    if (scene?.vendor) people.push({ id: vendorNpcId(scene.vendor), name: scene.vendor.name, faction: scene.vendor.faction, role: scene.vendor.title });
+    if (scene?.wanderer) people.push({ id: vendorNpcId(scene.wanderer), name: scene.wanderer.name, faction: scene.wanderer.faction, role: scene.wanderer.role });
     for (const q of player.activeFactionQuests ?? []) {
       const leader = q.escort?.leaderName;
       if (q.tracked !== false && leader && (q.escort?.hp ?? 0) > 0) {
-        people.push({ id: vendorNpcId({ id: `escort_${leader}`, name: leader }), name: leader });
+        people.push({ id: vendorNpcId({ id: `escort_${leader}`, name: leader }), name: leader, role: 'escort leader' });
       }
     }
     const want = nameOrId.trim().toLowerCase();
@@ -5584,7 +5728,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', nothingToSayLine(target.name));
       return;
     }
-    set({ pendingTalk: { npcId, npcName: target.name, topics } });
+    const role = target.role ?? null;
+    set({ pendingTalk: { npcId, npcName: target.name, topics, role, flourishesUsed: [], flourishCount: 0 } });
+    // OTA-1086 — ONE EXCHANGE AHEAD. Fired at the moment the topic list opens,
+    // which is the only place in this feature where there is time to spend: the
+    // player is reading a list of questions, and a 14-20s generation started now
+    // has a real chance of landing before the second one gets tapped. It cannot
+    // hold anything up — nothing awaits it, and if it never returns the first
+    // beat (and every beat) is an authored line.
+    void prefetchFlourish(get, set, npcId, target.name, role);
   },
   raiseTopic: (topicId) => {
     const t = get().pendingTalk;
@@ -5605,6 +5757,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // one that drives "I have told you that one", so the payout and the
     // acknowledgement can never disagree about whether this has happened.
     if (asked === 0 && topic.grants) applyTopicGrant(get, set, t.npcName, topic.grants);
+    // ⚠ OTA-1086 — AFTER the reply has already landed, and only on a first
+    // raise. Same `asked === 0` fact the grant reads: a re-tread gets the words
+    // back but not the business, because the business was about hearing it for
+    // the first time. Synchronous — see engine/flourish.ts.
+    if (asked === 0) emitFlourish(get, set, topic.id);
     set((st) => ({
       worldMemory: {
         ...st.worldMemory,
