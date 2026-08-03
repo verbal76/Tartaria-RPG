@@ -12,6 +12,10 @@ import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
+// OTA-1089 — Phase 4 difficulty, and the only place it can be eased.
+import {
+  PRESSURE_ORDER, PRESSURE_PROFILES, pressureOf, canChangeTo,
+} from '../engine/pressure';
 import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { barehandDamageFor } from '../engine/raceMechanics';
@@ -102,6 +106,8 @@ export function CharacterScreen() {
   // arb119 — section header helper, mirroring the inventory headers: each section
   // title is a tappable plate (semi-transparent backing so the gold label reads
   // over any background) with a ▾/▴ chevron that folds the section away.
+  const setPressure = useGameStore((st) => st.setPressure); // OTA-1089
+
   const sectionHeader = (key: string, label: string) => (
     <TouchableOpacity
       style={styles.sectionHeaderBar}
@@ -173,6 +179,43 @@ export function CharacterScreen() {
             <Text style={styles.barValue}>{player.stamina}/{player.staminaMax}</Text>
           </View>
         </View>
+
+        {/* ── HOW MUCH IT TAKES ─────────────────────────────────── */}
+        {/* OTA-1089 — PHASE 4's toggle, after creation. It lives on the sheet
+            rather than a settings menu because it is a fact about this
+            character, like their race — and the plan's warning that overtuned
+            pressure is the likeliest way to make the game worse is exactly why
+            the escape hatch has to be somewhere a struggling player will find
+            it. ⚠ LOWER ONLY: higher tiers render as plain text, not buttons,
+            so the rule is visible rather than enforced by a refusal. */}
+        {sectionHeader('pressure', 'HOW MUCH IT TAKES')}
+        {!collapsed.pressure && (
+        <View style={styles.card}>
+          {PRESSURE_ORDER.map((id) => {
+            const prof = PRESSURE_PROFILES[id];
+            const current = pressureOf(player) === id;
+            const lowerable = !current && canChangeTo(pressureOf(player), id);
+            return (
+              <TouchableOpacity
+                key={id}
+                style={[styles.kvRow, { flexDirection: 'column', alignItems: 'flex-start', opacity: current || lowerable ? 1 : 0.35 }]}
+                onPress={lowerable ? () => setPressure(id) : undefined}
+                disabled={!lowerable}
+                activeOpacity={0.7}
+                accessibilityRole={lowerable ? 'button' : 'text'}
+                accessibilityState={{ selected: current, disabled: !lowerable }}
+                accessibilityLabel={`${prof.label} ${prof.subtitle}${current ? '. Current.' : lowerable ? '. Tap to ease to this.' : '. Cannot be raised.'}`}
+              >
+                <Text style={styles.kvKey}>{current ? '▸ ' : ''}{prof.label}</Text>
+                <Text style={styles.kvValue}>{prof.subtitle}</Text>
+              </TouchableOpacity>
+            );
+          })}
+          <Text style={styles.kvValue}>
+            You can ease what the mud takes at any time. You can never raise it again.
+          </Text>
+        </View>
+        )}
 
         {/* ── CHRONICLE ─────────────────────────────────────────── */}
         {/* OTA-843 — the character's legend: a headline, a short deed-list, and the

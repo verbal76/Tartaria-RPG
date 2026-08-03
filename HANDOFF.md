@@ -866,8 +866,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1088`**,
-**golem-line `2026-08-03-1065`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1089`**,
+**golem-line `2026-08-03-1066`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -876,9 +876,52 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.28.99**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.0**; ledger in `VERSION.md`.
 
-- **PHASE 3 — MAKE THE STORY ASK QUESTIONS (2026-08-03, latest). BOTH LINES.**
+- **PHASE 4 — THE DEBT COMES DUE, BEHIND A DIFFICULTY TOGGLE (2026-08-03, latest). BOTH LINES.**
+  *(MINOR bump — a new axis, not another patch on the same one.)*
+  The plan: *"the ledger actually calls… you have every substrate already —
+  `hoursElapsed`, weather, corruption, faction standing — none of it currently
+  threatens anything."* And in the same breath: *"⚠ highest risk of making the
+  game worse… ship it behind a difficulty toggle and tune from logs."*
+  - **The toggle.** Four tiers, Doom-shaped and first person, on a **new fourth
+    step of character creation** that sits after the motive:
+    *"I only came for the salvage."* / *"I know what I owe."* (default) /
+    *"Let it come."* / *"Bury me with them."* Each carries a subtitle saying
+    plainly what changes — a difficulty name that sounds good and explains
+    nothing is a trap on a screen you cannot revisit.
+  - ⚠ **Lowerable mid-run, never raisable.** You can always ask the buried
+    country for less; nobody finishes on "Bury me with them" a run they spent
+    on salvage. It lives on the **character sheet** afterwards, with higher
+    tiers rendered dim rather than tappable, so the rule is visible instead of
+    enforced by a refusal.
+  - ⚠ **Why everything is not on a dial.** Corruption and weather *already*
+    bite — stat penalties, price markup, extra encounters, reposition cost,
+    attack penalty, HP and corruption ticks — and that is shipped, played and
+    balanced. Re-scaling it from a difficulty tier would put a multiplier on
+    top of a year of tuning. So Phase 4 turns the two substrates that threaten
+    **nothing** into pressure, and only raises the **rate** the other two
+    accumulate:
+    - **TIDE** (time → scarcity): +4% vendor prices per stage, one stage per
+      ~4 in-game days × dial, **hard cap 6 stages / +24%**, and exactly 1.0 for
+      the whole of tier 1.
+    - **HOSTILE** (standing ≤ −25 and a faction starts *finding* you): a gate
+      on an interception that was already going to happen, not a new spawner.
+      Capped at 22%; a bounty you took on purpose is exempt.
+    - **CREEP**: weather notches corruption in faster.
+    - **EXPOSURE**: a storm takes a heavier bite.
+    The last two sit **after** the title perks and **before** the race immunity
+    at the weather choke point, so earned mitigations still work and a Sentinel
+    is still immune.
+  - **Legibility is half the feature.** The quiet way this phase fails is
+    pressure the player cannot see — prices creep over forty hours, nothing
+    says why, the game just feels worse for no nameable reason. Every tide
+    stage crossing gets an authored line, once (`player.tideStageSeen`).
+  - Every save older than this reads as **'owed'** — the game exactly as it has
+    always played, plus the two new systems at their gentlest — with a one-tap
+    way down. That escape hatch is what makes an honest default safe. 27 tests.
+
+- **PHASE 3 — MAKE THE STORY ASK QUESTIONS (2026-08-03). BOTH LINES.**
   The build plan, verbatim: *"the audience that pays premium for text is paying
   for consequence, and right now you have exactly one fork in the game… extend
   that shape: 1–2 genuine forks per motive, with lasting consequence. Chapter

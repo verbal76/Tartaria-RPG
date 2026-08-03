@@ -58,6 +58,15 @@ import {
   dueFork, forkById, optionById, recordChoice, choiceKeys,
   type StoryFork,
 } from '../engine/storyForks';
+// OTA-1089 — Phase 4: the ledger calls, behind the difficulty toggle.
+import {
+  profileOf, pressureOf, canChangeTo, isPressureTier,
+  tideStage, tidePriceMultiplier, tideCrossLine,
+  hostileHuntChance, // NB: pressure.worstStandingFaction is deliberately NOT
+  // imported — gameStore already has a local one with a different shape.
+  scaledCorruptionGain, scaledWeatherBite,
+  type PressureTier,
+} from '../engine/pressure';
 // OTA-1073 — Phase 1 slice 2: turn-in credit, roadside recognition, gossip.
 import { gossipSubject, gossipLine } from '../engine/npcMemory';
 import {
@@ -3359,6 +3368,17 @@ function maybePatrolAmbush(
     return bountyTargets.has(p.factionId) || standing < 0;
   });
   if (!hostile) return;
+  // ⚠ OTA-1089 — PHASE 4 HOSTILE GROUND. Standing already moved and already
+  // threatened nothing; below HOSTILE_STANDING the people it belongs to start
+  // FINDING you. This is a gate on an interception that was already going to
+  // happen, not a new spawner: at 'salvage' the chance is 0 and the patrol
+  // simply passes, and even at the top tier it is capped at HOSTILE_MAX_CHANCE
+  // so no combination of tier and standing can make a road impassable.
+  // A bounty target is exempt — that is a contract the player took on purpose.
+  if (!bountyTargets.has(hostile.factionId)) {
+    const chance = hostileHuntChance(player.factionStanding, profileOf(player));
+    if (chance <= 0 || Math.random() > chance) return;
+  }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
   const name = factions.find((f) => f.id === hostile.factionId)?.name ?? hostile.factionId;
@@ -3793,6 +3813,32 @@ function talkContextFor(
     // topic on what you chose, so the world knows and says so.
     choices: player ? choiceKeys(player) : [],
   };
+}
+
+/** ⚠ OTA-1089 — SAY IT OUT LOUD WHEN THE TIDE TURNS OVER.
+ *
+ *  The plan's warning about Phase 4 is that overtuned pressure punishes. The
+ *  quieter half of that failure is pressure the player cannot SEE: prices creep
+ *  up over forty hours of play, nothing ever says why, and the game just feels
+ *  worse for no reason they can name. So every stage crossing gets a line.
+ *
+ *  `tideStageSeen` is real persisted state rather than something derived,
+ *  because the stage IS derived (hours × dial) but "have you been told" is not.
+ *  Monotonic — dropping a tier lowers the stage and must not re-announce the
+ *  ones already heard on the way up. */
+function announceTide(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  if (!player) return;
+  if (get().tutorialStep !== null || get().storyIntro || get().chapterCard || get().pendingFork) return;
+  const stage = tideStage(player.hoursElapsed ?? 0, profileOf(player));
+  const seen = player.tideStageSeen ?? 0;
+  if (stage <= seen) return;
+  const line = tideCrossLine(stage);
+  if (line) get().appendLog('world', line);
+  set({ player: { ...get().player!, tideStageSeen: stage } });
 }
 
 /** ⚠ OTA-1088 — RAISE THE OPEN QUESTION, IF THERE IS ONE.
@@ -5172,6 +5218,9 @@ interface GameStore {
   pendingFork: StoryFork | null;
   /** Answer the open question. One-way — see storyForks.recordChoice. */
   answerFork: (optionId: string) => void;
+  /** OTA-1089 — change the Phase 4 difficulty. ⚠ LOWER ONLY; a request to
+   *  raise is refused with a line rather than silently ignored. */
+  setPressure: (tier: PressureTier) => void;
   /** OTA-1043 — close the chapter card (tap-through). */
   dismissChapterCard: () => void;
   /** OTA-1045 — TRUE while the one-time veteran motive picker is owed: the
@@ -10058,6 +10107,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       let effHpDelta = wtick.hpDelta;
       let effCorrDelta = wtick.corruptionDelta;
       if (tPerks.corruptionResist && effCorrDelta > 0) effCorrDelta = Math.ceil(effCorrDelta / 2);
+      // ⚠ OTA-1089 — PHASE 4, and note WHERE it sits: after the title perks and
+      // before the race immunity, so a player's earned mitigations still work
+      // and a Sentinel is still immune. The dial changes how fast you TAKE
+      // corruption and weather damage, never what they do once you have them —
+      // re-scaling corruption's shipped stat penalties would put a difficulty
+      // multiplier on top of a year of balance work. See engine/pressure.ts.
+      {
+        const prof = profileOf(player);
+        if (effCorrDelta > 0) effCorrDelta = scaledCorruptionGain(effCorrDelta, prof);
+        if (effHpDelta < 0) effHpDelta = scaledWeatherBite(effHpDelta, prof);
+      }
       // OTA-835 — Architectural Sentinels (ageless construct body) don't absorb the
       // ambient aetheric corruption the weather notches into flesh — the environment
       // can't decay them. The other half of their "Immunity to Time" trait.
@@ -20317,6 +20377,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-1044 — the motive drip rides travel arrivals (one story event max
     // per arrival; holds during the opening / chapter cards / hostile scenes).
     advanceStoryDrip(get, set, locationId);
+    announceTide(get, set);
     // OTA-1088 — and the open question, if the run has reached one. Same
     // moment as the drip and the same reasons: the player has just arrived
     // somewhere, nothing is on fire, and there is room for the story to speak.
@@ -21519,7 +21580,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // strangerBuyPrice by design, so the existing "you saved N TC" line now
     // reports what being a regular is worth alongside the charm.
     const buyRegardMult = regardPriceMult(npcRegard(getRelation(get().worldMemory, vendorNpcId(scene.vendor))));
-    const priceParts = { corruptionMult: mult, buyDiscount, tideMult: vendorTideMult, warBuyMult, regardMult: buyRegardMult };
+    // OTA-1089 — PHASE 4 TIDE: the buried country gets leaner the longer you
+    // stay in it. Flat, capped at TIDE_MAX_STAGES, and exactly 1.0 for a fresh
+    // character and for the whole of the 'salvage' tier.
+    const pressureTideMult = tidePriceMultiplier(tideStage(player.hoursElapsed ?? 0, profileOf(player)));
+    const priceParts = { corruptionMult: mult, buyDiscount, tideMult: vendorTideMult, warBuyMult, regardMult: buyRegardMult, pressureTideMult };
     const effectivePrice = VP.finalBuyPrice(offer.price, priceParts);
     if (player.tc < effectivePrice) {
       get().appendLog(
@@ -28055,6 +28120,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ chapterCard: null });
     // OTA-1088 — the card was the thing standing in front of the question.
     raiseDueFork(get, set);
+  },
+  setPressure: (tier) => {
+    const player = get().player;
+    if (!player || !isPressureTier(tier)) return;
+    const from = pressureOf(player);
+    if (from === tier) return;
+    // ⚠ THE OWNER'S RULE, AND THE ONLY PLACE IT IS ENFORCED. You can always ask
+    // the buried country for less. You cannot finish a run on "Bury me with
+    // them" that you spent on "I only came for the salvage" — a difficulty that
+    // can be raised at the last minute is a scoreboard, not a choice.
+    if (!canChangeTo(from, tier)) {
+      get().appendLog('system', 'You can ease what the mud takes. You cannot go back and claim you took more.');
+      return;
+    }
+    set({ player: { ...player, pressure: tier } });
+    get().appendLog('arbiter', `The Arbiter marks the ledger. "${profileOf(get().player).label}" Nothing about that is a failure. "Walk on."`);
+    void get().persist();
   },
   answerFork: (optionId) => {
     const fork = get().pendingFork;

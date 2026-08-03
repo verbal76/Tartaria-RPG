@@ -268,6 +268,10 @@ export interface CreateCharacterInput {
   /** OTA-1041 — the story motive picked on creation step 3. Optional so sims
    *  and legacy callers keep working; createCharacter rolls one when absent. */
   motiveId?: string;
+  /** ⚠ OTA-1089 — the Phase 4 difficulty picked on creation step 4. Optional
+   *  so sims and legacy callers keep working; absent resolves to
+   *  DEFAULT_PRESSURE, which is the game as it has always played. */
+  pressure?: string;
 }
 
 // v2.4.1 (OTA 029) — canonical per-faction starting location.
@@ -323,6 +327,12 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
   const storyMotive = isStoryMotiveId(input.motiveId)
     ? input.motiveId
     : STORY_MOTIVE_IDS[Math.floor(Math.random() * STORY_MOTIVE_IDS.length)]!;
+  // OTA-1089 — and how much the mud is allowed to take. An unrecognised value
+  // resolves to DEFAULT_PRESSURE rather than throwing: a difficulty setting is
+  // never worth failing a character creation over.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isPressureTier, DEFAULT_PRESSURE } = require('./pressure') as typeof import('./pressure');
+  const pressure = isPressureTier(input.pressure) ? input.pressure : DEFAULT_PRESSURE;
   const race = races.find((r) => r.id === input.raceId) ?? races[0]!;
   const faction = factions.find((f) => f.id === input.factionId) ?? factions[0]!;
   const stats = rollStats();
@@ -344,6 +354,7 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
   return {
     name: input.name,
     storyMotive,
+    pressure, // OTA-1089
     storyIntroSeen: false,
     // OTA-1045 — a creation-made character never sees the veteran motive
     // picker: an explicit pick IS chosen, and a rolled one (sims, legacy
