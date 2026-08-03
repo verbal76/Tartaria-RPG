@@ -1768,6 +1768,11 @@ export interface WorldMemory {
   /** OTA-1077 — recent outpost assaults, newest last, capped. Feeds the "your
    *  outpost was hit while I was away" beat in a greeting. */
   recentRaids?: OutpostRaid[];
+  /** OTA-1081 — how many times each authored talk topic has been raised, keyed
+   *  `<npcId>:<topicId>`. Drives "I have told you that one" rather than
+   *  replaying a line as though neither of you remembers the last two minutes.
+   *  Bounded by the authored topic count, so it cannot grow with play. */
+  talkedTopics?: Record<string, number>;
   /** OTA-120 — dog acquisition state machine, lives on world memory
    *  so it survives across screens. ALL player input routes through
    *  the onboarding handler when this is non-null. Cleared on

@@ -1,0 +1,171 @@
+{
+  "npcs": {
+    "irma_ironhand": {
+      "displayName": "Irma Ironhand",
+      "topics": [
+        {
+          "id": "irma_trade",
+          "label": "Ask about her work",
+          "lines": [
+            "\"Plate,\" Irma says, without looking up. \"Everything else is decoration you bleed through.\" She turns the piece she is working, finds a seam, and hits it once. \"You want light, go to Halem. You want to walk home, you come here.\""
+          ]
+        },
+        {
+          "id": "irma_giants",
+          "label": "Ask about the Giants",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"The encampments.\" She sets the hammer down, which she does not often do. \"My mother's people. They went up the ridge when the mud came and they never came back down — not because they cannot. Because down here you all still argue about whose flood it was.\" A pause. \"I came down. Somebody has to make the armour.\""
+          ]
+        },
+        {
+          "id": "irma_flood",
+          "label": "Ask what she remembers of the flood",
+          "gate": {
+            "minRegard": "familiar"
+          },
+          "lines": [
+            "\"I remember it was quiet,\" Irma says. \"Everyone tells it loud. It was not loud. The mud came up through the floors like something breathing out, and the loudest thing in my street was a door.\" She looks at her hands. \"I was small enough to be carried and big enough to remember being carried. Both of those are worse than you would think.\""
+          ]
+        },
+        {
+          "id": "irma_you",
+          "label": "Ask what she makes of you",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "Irma looks at you properly for a moment, the way she looks at a piece before she decides whether it is worth the iron. \"You come back,\" she says. \"That is most of it. Half the people through that door are dead within the season and the other half stop coming because they got rich or got scared.\" She goes back to the seam. \"You are neither, yet. Do not make me wrong.\""
+          ]
+        },
+        {
+          "id": "irma_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "Irma does not stop working. \"No,\" she says. She does not raise her voice and she does not look up, and somehow that is worse. \"Your money is good. Your conversation is not. Buy something or get out of my light.\""
+          ]
+        },
+        {
+          "id": "irma_war",
+          "label": "Ask about the raid",
+          "gate": {
+            "minRegard": "known",
+            "requiresRecentRaid": true
+          },
+          "lines": [
+            "\"You heard, then.\" Irma's jaw sets. \"They came over the wall in the dark and they went for the stores, not the armoury, which tells you they were not stupid.\" She picks the hammer back up. \"I have been making straps for a week. Straps. Because the people who lost everything still have to carry what is left.\""
+          ]
+        }
+      ]
+    },
+    "halem_trader": {
+      "displayName": "Halem the Trader",
+      "topics": [
+        {
+          "id": "halem_trade",
+          "label": "Ask how business is",
+          "lines": [
+            "\"Business is people,\" Halem says cheerfully, moving a crate that did not need moving. \"Everything on this post came off somebody who needed something else more. I do not think there is a single new thing in Tartaria. Just things that have changed hands enough times to look new.\""
+          ]
+        },
+        {
+          "id": "halem_post",
+          "label": "Ask about the trading post",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"It was my father's, and it was not a post then, it was a front room.\" He gestures at the roof, which is three different roofs. \"Every bit of this is somebody's payment. That beam is a debt. That shutter is a debt. I have been paid in doors more times than in coin.\" He grins. \"Do not tell anybody. It is the only reason I have a building.\""
+          ]
+        },
+        {
+          "id": "halem_road",
+          "label": "Ask what the road is saying",
+          "gate": {
+            "minRegard": "familiar"
+          },
+          "lines": [
+            "Halem's cheer dips a notch, which on him is a shout. \"Fewer people coming through than last season. Same amount of goods, though — which means the goods are coming without the people.\" He straightens a row of tins that were straight. \"I do not like arithmetic that works out like that.\""
+          ]
+        },
+        {
+          "id": "halem_you",
+          "label": "Ask what he makes of you",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"Honestly?\" Halem leans on the counter. \"I priced you wrong the first time. I had you down as a season, maybe two, and then somebody would come in with your boots to sell me.\" He shrugs, entirely without embarrassment. \"I have been wrong about people before. It is the only kind of wrong I enjoy.\""
+          ]
+        },
+        {
+          "id": "halem_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "Halem is still friendly. That is somehow the problem. \"Now, I am not going to make a thing of it,\" he says pleasantly, and does not move away from the strongbox. \"You will notice my prices. That is the whole of it. When you have noticed them long enough, we will be square.\""
+          ]
+        }
+      ]
+    },
+    "scrap_broker": {
+      "displayName": "Tellin Mak",
+      "topics": [
+        {
+          "id": "tellin_trade",
+          "label": "Ask about the scrap trade",
+          "lines": [
+            "\"Everything has a price,\" Tellin says, not as a boast — as a complaint. \"That is not wisdom, it is my whole difficulty. I know what a thing costs and I very rarely know what it is worth, and the Guild only pays me for the first one.\""
+          ]
+        },
+        {
+          "id": "tellin_guild",
+          "label": "Ask about the Reclaimers",
+          "gate": {
+            "minRegard": "known"
+          },
+          "lines": [
+            "\"We are not scavengers, whatever the Order says at us.\" Tellin turns a bent fitting over. \"A scavenger takes. A Reclaimer puts it back into use. The difference is entirely in what happens afterwards, and nobody ever stays long enough to watch the afterwards.\""
+          ]
+        },
+        {
+          "id": "tellin_before",
+          "label": "Ask what the scrap tells him",
+          "gate": {
+            "minRegard": "familiar"
+          },
+          "lines": [
+            "\"You want to know what I actually think?\" He lowers his voice, which for Tellin is an event. \"Half of what comes across this table was not made by anyone who was here. The joins are wrong. The tolerances are wrong — too good, I mean, not too poor.\" He puts the fitting down. \"Somebody built very well, and then the mud came, and we have all agreed to call it ours.\""
+          ]
+        },
+        {
+          "id": "tellin_you",
+          "label": "Ask what he makes of you",
+          "gate": {
+            "minRegard": "trusted"
+          },
+          "lines": [
+            "\"You bring me things and you do not lie about where they came from,\" Tellin says. \"You would be astonished how rare the second part is.\" He counts something out that he has already counted. \"I have a shelf at the back for people I do not have to check behind. It is a short shelf.\""
+          ]
+        },
+        {
+          "id": "tellin_wronged",
+          "label": "Try to say something",
+          "gate": {
+            "onlyRegard": "wronged"
+          },
+          "lines": [
+            "Tellin keeps his hands flat on the table where you can see them. \"I know exactly what you took,\" he says. \"To the quarter-weight. It is my job to know.\" He does not blink. \"So we will talk about that, when you are ready to talk about that. Not before.\""
+          ]
+        }
+      ]
+    }
+  }
+}

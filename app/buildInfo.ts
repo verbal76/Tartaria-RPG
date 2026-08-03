@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.91';
+export const DISPLAY_VERSION = '4.28.92';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19946,7 +19946,56 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // scope (it has covered roadside, market and overlay ids for three OTAs); the
 // old name stays as an alias.
 // DISPLAY_VERSION 4.28.91. 13 tests.
-export const OTA_BUILD_ID = '2026-08-03-1080-wanderer-escort-ledger';
+// OTA-1081 — PHASE 2, VERTICAL SLICE: GIVE THE WORLD A MOUTH.
+//
+// A `talk <npc>` exchange with three named vendors -- Irma Ironhand, Halem the
+// Trader, Tellin Mak -- opening a list of topics, each gated on what has
+// actually passed between you, each with an authored reply. A vertical slice on
+// purpose: the build plan flagged that this phase's real cost is WRITING, not
+// engineering, so the framework ships against three people and the rest of the
+// cast is a JSON entry each, no code.
+//
+// ⚠ THE MODEL IS NOT IN THE CRITICAL PATH, AND THAT IS THE WHOLE DESIGN.
+// A Qwen generation on device measures 14-20 seconds (owner's 4.28.79 log:
+// `ambient ✓ 14080ms`). A conversation turn at that speed is not a conversation,
+// it is a loading screen with dialogue in it. So the exchange is ENTIRELY
+// authored and entirely synchronous: tap a topic, read the reply, no spinner,
+// no async, no fallback path, no way for a slow model to make the game feel
+// broken. There is a test that greps engine/dialogue.ts for `async`/`await`/
+// `Promise` so a later "just make it dynamic" cannot go out quietly. The local
+// narrator's eventual job here (Phase 6) is one optional flourish AFTER the
+// authored reply has landed -- never the reply itself.
+//
+// GATING IS THE POINT. Phase 1 spent nine OTAs building a per-person ledger;
+// this is the first feature that reads it for something the PLAYER CHOOSES
+// rather than something that happens at them. Irma talks about armour to
+// anyone; about the encampments once she places you; about the flood once you
+// are a regular; about what she makes of you only if you have earned it. Gates
+// are AND, not OR -- world state (a raid on their ground) never substitutes for
+// a relationship.
+//
+// ⚠ AND ROBBING SOMEBODY IS NOT A WARMTH LEVEL. `wronged` is deliberately off
+// the regard ladder: a naive scale would sort it somewhere and hand a thief the
+// most private topic in the set. When you have taken something off somebody
+// there is exactly ONE topic left, and it is them telling you where you stand.
+// My first cut of gateAllows put the ungated short-circuit ABOVE that check, so
+// every shop-front topic survived a theft -- caught by this OTA's own test,
+// which asserts the wronged list is exactly one item rather than merely
+// "contains the apology".
+//
+// Repetition is acknowledged, not replayed: worldMemory.talkedTopics counts
+// raises per (npc, topic) and a spent topic answers "I have told you that one".
+// Bounded by the authored topic count, so it cannot grow with play. The topic
+// stays VISIBLE in the list marked "(asked)" rather than vanishing -- a list
+// that silently shrinks reads as the game losing content.
+//
+// The modal mirrors ParleyModal deliberately (self-mounts off one piece of
+// store state, buttons with the subject spelled out) so it is an interaction
+// the player has already learned. The exchange stays OPEN after a topic, so it
+// reads as a conversation rather than a menu that fires once.
+// DISPLAY_VERSION 4.28.92. 20 tests.
+export const OTA_BUILD_ID = '2026-08-03-1081-talk-topics-phase2-slice';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1080-wanderer-escort-ledger';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1079-vendors-do-not-die';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1078-ledger-holes-and-noise-floor';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-02-1077-raid-news-reaches-the-people';
