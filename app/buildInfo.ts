@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.16';
+export const DISPLAY_VERSION = '4.29.17';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20833,7 +20833,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // grip is on your wrist, and the pay-or-fight choice cannot be dismissed
 // from a chip.
 // DISPLAY_VERSION 4.29.16.
-export const OTA_BUILD_ID = '2026-08-03-1105-vendor-dismiss-closes-talk';
+//
+// OTA-1106 — THE GIFT ECONOMY: THE FENCE, THE TASTES, AND THE RETURN GIFT.
+// Owner: "do all three."
+//
+// (1) THE FENCE BUYS STOLEN GOODS. A sketchy trader takes hot goods at
+// FENCE_STOLEN_CUT (40%) of the honest sell-back — no questions asked, and
+// none answered. The deep cut is the deal: they carry the risk of holding
+// hot goods, and it keeps steal-and-fence from beating honest selling.
+// Honest and hub vendors keep the refusal word for word. This completes
+// the thief economy the pocket loot opened: lift it, walk it to a fence,
+// get paid — less.
+//
+// (2) REACTIONS TEACH TASTES. The GIFT button joins TALK on the vendor
+// chip (the verb existed since OTA-1083 but only as typed input — "I
+// didn't see a gift button"). And what a gift's reaction PROVES now lands
+// on the ledger: a loved gift records which taste it hit ('loves:metal',
+// 'loves:Aether Mud'), a shrugged-at cold tag records the shrug
+// ('cold:food'). The gift picker shows what you have WITNESSED — "You
+// know of them: loves metal · no use for food" — never the authored list.
+//
+// (3) THE RETURN GIFT. Reach TRUSTED with somebody whose tastes you have
+// honored (at least one LOVED gift), and on a later arrival they push
+// something back across the counter — once, ever. All nine authored
+// vendors carry one, each thematic and in their own voice (Irma's better
+// batch of plate, Bran's knuckle "for the dog — or for you", Tarek's
+// engine that "doesn't work YET"). The fallback cast has none: a return
+// requires tastes to have hit, and the fallback loves nothing specific.
+// Test: ota1106GiftEconomy.test.ts.
+// DISPLAY_VERSION 4.29.17.
+export const OTA_BUILD_ID = '2026-08-03-1106-gift-economy';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1105-vendor-dismiss-closes-talk';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1104-shakedown-escort-mumble';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1103-pickpocket-glow';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1102-talk-glow';

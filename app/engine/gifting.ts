@@ -76,6 +76,11 @@ interface GiftPref {
   lovesItems?: string[];
   /** Tags they have no use for. Not an insult; just a shrug. */
   coldTags?: string[];
+  /** OTA-1106 — the one-time return gift at trusted: the item they push
+   *  across the counter, and the words they do it with. Only the authored
+   *  cast carries one — a return gift requires having tastes to honor. */
+  returnGift?: string;
+  returnGiftLine?: string;
   /** Said when they love it. `{item}` is replaced. */
   lovedLine?: string;
   likedLine?: string;
@@ -188,3 +193,29 @@ export function giftMemoryLine(rel: NpcRelation | null | undefined): string {
 }
 
 export const GIFT_PREF_NPC_IDS = Object.keys(PREFS);
+
+/** OTA-1106 — WHAT A REACTION TEACHES. When a gift lands, the reaction is the
+ *  tell: a LOVED reaction reveals which taste it hit (tag or exact item), a
+ *  POLITE reaction on a matched cold tag reveals the shrug. Returns ledger
+ *  entries like 'loves:metal', 'loves:Aether Mud', 'cold:food' — the gift
+ *  picker shows what has been WITNESSED, never the authored list itself. */
+export function tasteDiscoveries(npcId: string, item: GiftItem, reaction: GiftReaction): string[] {
+  const p = giftPrefFor(npcId);
+  const tags = item.tags.map((t) => t.toLowerCase());
+  const found: string[] = [];
+  if (reaction === 'loved') {
+    if ((p.lovesItems ?? []).some((n) => n.toLowerCase() === item.name.toLowerCase())) found.push(`loves:${item.name}`);
+    for (const t of p.lovesTags ?? []) if (tags.includes(t.toLowerCase())) found.push(`loves:${t}`);
+  }
+  if (reaction === 'polite') {
+    for (const t of p.coldTags ?? []) if (tags.includes(t.toLowerCase())) found.push(`cold:${t}`);
+  }
+  return found;
+}
+
+/** OTA-1106 — the authored return gift, if this person has one. */
+export function returnGiftFor(npcId: string): { item: string; line: string } | null {
+  const p = giftPrefFor(npcId);
+  if (!p.returnGift) return null;
+  return { item: p.returnGift, line: p.returnGiftLine ?? 'They push something across the counter. "No charge. You have been good to me."' };
+}

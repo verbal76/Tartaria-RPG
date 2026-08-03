@@ -2002,6 +2002,15 @@ export interface NpcRelation {
    *  pocketsLifted > pocketsMumbled, once per later meeting — deterministic,
    *  no roll, and it can never repeat past what was actually taken. */
   pocketsMumbled?: number;
+  /** OTA-1106 — tastes the player has WITNESSED through gift reactions:
+   *  entries like 'loves:metal', 'loves:Aether Mud', 'cold:food'. The gift
+   *  picker shows these — what you've learned, never the authored list. */
+  giftTastes?: string[];
+  /** Gifts that landed LOVED — the proof you honored who they are. Gates the
+   *  return gift alongside trusted regard. */
+  lovedGifts?: number;
+  /** OTA-1106 — the one-time return gift at trusted has been handed over. */
+  returnGiftGiven?: boolean;
   /** OTA-1076 — TC of honest custom banked toward buying back a caught theft.
    *  Only coin spent AFTER the wrong counts; see AMENDS_TC_PER_WRONG. */
   amendsTc?: number;
