@@ -913,7 +913,7 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1093`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1094`**,
 **golem-line `2026-08-03-1070`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -923,9 +923,21 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.4**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.5**; ledger in `VERSION.md`.
 
-- **THE TUTORIAL WALK AND THE COMBAT WALK (2026-08-03, latest). BOTH LINES.**
+- **THE LOOK-AROUND BEAT, CONVERGED FROM GOLEM-LINE (2026-08-03, latest).
+  HAL-ONLY BY CONSTRUCTION** — golem already has it; this is HAL catching up.
+  HAL OTA-1094. Owner: *"never noted that lapse in the tutorial, HAL should
+  have the look around you beat as well."* The walk exposed the gap; the
+  audit note calling the divergence "intended" was wrong about intent —
+  golem commit 5d23d6fd was never flagged for porting or surfaced to the
+  owner. The beat lands second (name → **look** → cudgel): the orientation
+  tool taught first, which also surfaces the props the next beats use. One
+  insertion — the `maybeAdvanceTutorial('look')` handler call and the
+  InputBox chip-lighting were ALREADY on HAL, machinery without its content.
+  Both lines now run the same ten beats and the walk plays them identically.
+
+- **THE TUTORIAL WALK AND THE COMBAT WALK (2026-08-03). BOTH LINES.**
   HAL OTA-1093 / golem OTA-1070. The audit's two named coverage edges, closed
   at the owner's direction. `playtestTutorialWalk` plays onboarding by typing
   what the Arbiter asks, beat by beat, and asserts the tutorial ENDS, every

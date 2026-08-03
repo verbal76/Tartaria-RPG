@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.4';
+export const DISPLAY_VERSION = '4.29.5';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20551,7 +20551,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // answer by design; whether the wilderness should be this sharp on hour one
 // is the owner's call, with this digest as the data.
 // DISPLAY_VERSION 4.29.4. 6 + 8 assertions.
-export const OTA_BUILD_ID = '2026-08-03-1093-tutorial-and-combat-walks';
+//
+// OTA-1094 — THE LOOK-AROUND BEAT, CONVERGED FROM GOLEM-LINE.
+//
+// Owner: "never noted that lapse in the tutorial, HAL should have the look
+// around you beat as well." The tutorial walk exposed the gap (OTA-1093's
+// golem stall); the audit note that called the divergence "intended" was
+// wrong about intent — golem commit 5d23d6fd added the beat on that line
+// only, in June, and it was never flagged for porting or surfaced to the
+// owner. This closes it the direction the owner chose.
+//
+// The beat: 'look', second in the sequence, between name and cudgel — the
+// orientation tool taught FIRST, before the player picks anything up. "Tap
+// LOOK AROUND YOU — I'll read the room for you." Looking around at the very
+// start also surfaces the props (cudgel, rope, plate, locked door) the next
+// beats walk the player through, so the sequence reads better than it did:
+// the Arbiter no longer asks for a cudgel the player has not seen.
+//
+// ⚠ ONE INSERTION, because the plumbing was already here: the look handler's
+// maybeAdvanceTutorial('look') call and the InputBox chip-lighting for
+// currentBeatId === 'look' were ported at some point without the step that
+// makes them fire — machinery waiting eleven hundred OTAs for its content.
+// The lockdown list deliberately omits 'look' (matching golem): the beat is
+// unlocked, so a player who explores mid-beat is not refused.
+//
+// History, for the record: HAL HAD a look beat in the old card-tour tutorial
+// and dropped it in the arb4 explore_or_leave redesign; golem re-added the
+// modern diegetic version. The walk plays both lines' tutorials identically
+// now — ten beats each, byte-identical step lists.
+// DISPLAY_VERSION 4.29.5. Tutorial is 10 beats; walk + canonical-beats suite updated.
+export const OTA_BUILD_ID = '2026-08-03-1094-look-beat-converged';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1093-tutorial-and-combat-walks';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1092-playtest-honest-walk';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1091-playtest-phases-0-5';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1090-arbiter-persona';
