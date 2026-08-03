@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.28.93';
+export const DISPLAY_VERSION = '4.28.94';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19997,7 +19997,58 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Quieter than the chip itself: trading is still the primary action at a
 // counter.
 // DISPLAY_VERSION 4.28.93. 26 tests.
-export const OTA_BUILD_ID = '2026-08-03-1082-talk-full-cast-chapter-gate';
+// OTA-1083 — GIVING SOMEBODY SOMETHING, AND THEM REMEMBERING THE OBJECT.
+//
+// Owner's design: type `gift`, pick an item, pick a person; you get a discount,
+// a status bump or some other boon, and THEY REMEMBER THAT YOU GAVE THEM THAT
+// PARTICULAR ITEM. The last clause is the feature. A gift that only moves a
+// warmth number is a second currency; a gift that remembers the OBJECT is a
+// relationship, and NpcRelation.gifts stores names, not a score.
+//
+// ⚠ THIS VERB WAS DELETED ONCE, ON PURPOSE, AND THAT DECIDED THE DESIGN.
+// OTA-803's note is still in parser.ts: "Faction standing is earned through
+// mission completions + sigil/pendant turn-ins, not by handing vendors loot;
+// the gift-for-rep side door undercut that, so the whole verb + action is gone."
+// Restoring the verb without closing that door would restore the bug. A
+// per-person cap is NOT enough -- several vendors share a faction, so four
+// boons each across five members is eighty standing through the side door. So
+// faction standing from gifts is metered against a LIFETIME, GLOBAL per-faction
+// budget (GIFT_STANDING_FACTION_CAP = 10, roughly one mission's worth). Enough
+// to register as the "status bump" that was asked for; nowhere near a route.
+// What gifts really buy is the PERSONAL relationship: one ledger row, that
+// person's discount via OTA-1076 regardPriceMult, and the memory of the object.
+// That is contained by construction -- it cannot cascade to anybody else.
+// Insults are NOT capped: a metered penalty would let a player be rude for free
+// once the positive budget was spent, which is the wrong way round.
+//
+// THE OTHER THREE EXPLOITS, AND WHAT STOPS THEM:
+//  - GIFT-FARM. Twenty of the same thing must not buy twenty steps of warmth.
+//    Repeat gifts of the SAME item name decay to nothing (REPEAT_DECAY): the
+//    second identical present is not a surprise, and the third is a habit.
+//  - TRASH-FLOOD. A gift under GIFT_FLOOR_TC (12) is REFUSED and the item stays
+//    in the pack. Accepting junk would let a player empty a bag into somebody
+//    at a cost of taps only; refusing keeps the insult legible and costs them
+//    standing, because offering somebody a bent nail is a comment.
+//  - BUY-BACK LOOP. Gifts are consumed and never re-enter stock, and the
+//    per-person boon count is capped (GIFT_BOONS_PER_PERSON = 4), so it ends.
+//
+// WHAT decides the reaction is WHO THEY ARE, not what it cost. Value is a floor,
+// not the score -- otherwise the optimal play is to hand over the most expensive
+// thing you own and nothing else matters. Irma wants metal and is unmoved by
+// beads; Halem wants food and curios and shrugs at ore; Tarek takes a mechanism
+// apart before he has finished thanking you. Nine authored preference sets, a
+// fallback for everyone else, and something genuinely valuable is welcome from
+// anybody -- a specialist who can ONLY be given their own trade reads as a
+// lookup table rather than a person.
+//
+// Deterministic, like every other line in this system: gratitude that is a dice
+// roll reads as broken, not as varied.
+// The picker is ONE modal with an optional first step -- the recipient chooser
+// appears only when a vendor AND a wanderer are both present, because a
+// one-entry picker is a tap of pure ceremony.
+// DISPLAY_VERSION 4.28.94. 21 tests.
+export const OTA_BUILD_ID = '2026-08-03-1083-gifting';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1082-talk-full-cast-chapter-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1081-talk-topics-phase2-slice';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1080-wanderer-escort-ledger';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1079-vendors-do-not-die';
