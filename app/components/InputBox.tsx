@@ -53,6 +53,11 @@ interface Props {
   /** True when there's nothing to lift here (no vendor, no liftable target) —
    *  greys the PICKPOCKET button so it's never a dead tap. */
   pickpocketBlocked?: boolean;
+  /** OTA-1103 — true when a MARK (a person with pockets) is in reach. Lights
+   *  the PICKPOCKET button the same ready-green the torch uses: the glow
+   *  means "this is a live possibility right now", matching the TALK glow's
+   *  language one row up. */
+  pickpocketPossible?: boolean;
   onOpenAskArbiter: () => void;
   /** arb120 — quick-row MISSIONS button → Contracts screen. Lets the top
    *  main-quest chip slim to a single line for more exploration room. */
@@ -151,7 +156,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb-fix (OTA — adaptive quick row) — the out-of-combat quick row shows the
   // world-interaction verbs (look / rest / investigate / take / salvage / climb /
@@ -636,7 +641,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             )}
             {(moreOpen || tutLock) && (
               <>
-                <QuickBtn label="pickpocket" onPress={onOpenPickpocket} blocked={approachBlocked || !!pickpocketBlocked} />
+                {/* OTA-1103 — ready-green while a mark is in reach, matching
+                    the TALK glow's "live possibility" language. Blocked still
+                    wins (tone resolves to none). */}
+                <QuickBtn label="pickpocket" onPress={onOpenPickpocket} blocked={approachBlocked || !!pickpocketBlocked} tone={pickpocketPossible ? 'ready' : undefined} />
                 <QuickBtn label="craft" onPress={onOpenCrafting} blocked={tutLock} />
                 <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
                 <QuickBtn label="missions" onPress={onOpenMissions} blocked={tutLock} />
