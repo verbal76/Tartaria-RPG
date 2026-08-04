@@ -43,6 +43,7 @@ import { resolveGift, giftMemoryLine, GIFT_STANDING_FACTION_CAP, tasteDiscoverie
 // OTA-1081 — Phase 2 slice: the topic-based talk exchange.
 import {
   hasTopicsFor, topicsFor, topicReply, alreadySaidLine, nothingToSayLine,
+  lockedTopicCount, teaserDeflectionLine,
   type Topic as TalkTopic,
 } from '../engine/dialogue';
 // OTA-1086 — the flourish: one beat of stage business under an authored reply.
@@ -3945,6 +3946,10 @@ function talkContextFor(
     // OTA-1088 — the third place a Phase 3 decision lands: the cast can gate a
     // topic on what you chose, so the world knows and says so.
     choices: player ? choiceKeys(player) : [],
+    // OTA-1113 — the two new gate roads: gifts they LOVED (honoring who they
+    // are) and pocket-loss mumbles delivered (the thief's-only door).
+    lovedGifts: rel?.lovedGifts ?? 0,
+    pocketsMumbled: rel?.pocketsMumbled ?? 0,
   };
 }
 
@@ -5889,6 +5894,16 @@ interface GameStore {
         flourishesUsed: string[];
         /** OTA-1086 — beats emitted so far, against FLOURISH_MAX_PER_CONVERSATION. */
         flourishCount: number;
+        /** OTA-1113 — how many topics exist but are gated shut right now (0
+         *  below `known` and for the wronged — see lockedTopicCount). Drives
+         *  the count-only teaser row: the player learns THAT there is more,
+         *  never WHAT. */
+        lockedCount: number;
+        /** OTA-1113 — the rung this conversation opened at, so the teaser's
+         *  wording and its deflections speak to where you actually stand. */
+        regard: import('../engine/npcMemory').NpcRegard;
+        /** OTA-1113 — teaser taps THIS conversation; rotates the deflection. */
+        teaserTaps: number;
       }
     | null;
   /** Open a conversation with the named person in the current scene. */
@@ -5902,6 +5917,9 @@ interface GameStore {
   hasUnspokenTalk: (nameOrId: string) => boolean;
   /** Raise a topic. The reply goes to the feed, and the exchange stays open. */
   raiseTopic: (topicId: string) => void;
+  /** OTA-1113 — tap the locked-count teaser row: an in-voice deflection lands
+   *  in the feed (never the locked labels), rotating per tap. */
+  tapLockedTeaser: () => void;
   closeTalk: () => void;
   pendingParley:
     | {
@@ -6311,7 +6329,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const role = target.role ?? null;
-    set({ pendingTalk: { npcId, npcName: target.name, topics, role, flourishesUsed: [], flourishCount: 0 } });
+    // OTA-1113 — count what's behind the door (0 until they place you).
+    const lockedCount = lockedTopicCount(npcId, ctx);
+    set({ pendingTalk: {
+      npcId, npcName: target.name, topics, role,
+      flourishesUsed: [], flourishCount: 0,
+      lockedCount, regard: ctx.regard, teaserTaps: 0,
+    } });
     // OTA-1086 — ONE EXCHANGE AHEAD. Fired at the moment the topic list opens,
     // which is the only place in this feature where there is time to spend: the
     // player is reading a list of questions, and a 14-20s generation started now
@@ -6331,6 +6355,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     return topicsFor(target.id, ctx).some(
       (t) => (talked[`${target.id}:${t.id}`] ?? 0) < t.lines.length,
     );
+  },
+  // OTA-1113 — the teaser answers IN VOICE, never in labels. Rotates through
+  // the rung's deflection pool per tap; the count row itself never changes,
+  // because nothing about the relationship changed by asking.
+  tapLockedTeaser: () => {
+    const t = get().pendingTalk;
+    if (!t || t.lockedCount <= 0) return;
+    get().appendLog('world', teaserDeflectionLine(t.npcName, t.regard, t.teaserTaps));
+    set((s) => (s.pendingTalk && s.pendingTalk.npcId === t.npcId
+      ? { pendingTalk: { ...s.pendingTalk, teaserTaps: s.pendingTalk.teaserTaps + 1 } }
+      : {}));
   },
   raiseTopic: (topicId) => {
     const t = get().pendingTalk;

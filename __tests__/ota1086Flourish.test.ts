@@ -283,6 +283,9 @@ describe('OTA-1086 — in the exchange', () => {
       pendingTalk: {
         npcId: 'irma_ironhand', npcName: 'Irma Ironhand', topics,
         role: 'Heavy Armorer', flourishesUsed: [], flourishCount: 0,
+        // OTA-1113 — the teaser fields ride along; this harness talks at
+        // trusted with everything open, so the locked count is genuinely 0.
+        lockedCount: 0, regard: 'trusted', teaserTaps: 0,
       },
     });
     const wm = useGameStore.getState().worldMemory;
