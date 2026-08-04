@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.24';
+export const DISPLAY_VERSION = '4.29.25';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20952,6 +20952,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1114 — THE DEEP BENCH: NINE PEOPLE, NOT NINE COUNTERS.
+// Workstream B step 2, the writing wave the teaser was built to serve.
+// The audit's dialogue finding was thinness — the nine authored vendors
+// ran 5-8 topics and a "person" three questions deep IS three questions
+// deep. All nine now carry 14-16 laddered topics (catalog 182 → 258):
+// shopfront for anyone; craft + local colour at known; history and
+// people at familiar; and at TRUSTED the personal core — a marriage or
+// its shape (Irma's Berrin, Korash's Enna, Bran's Tamsin, Elara's
+// Mirei, Halem's Sera), an origin, why-this-trade, a fear, and one
+// PAYING SECRET per vendor (a lead grant, 25-34 TC: Berrin's dry-side
+// gallery, Tellin's mother's weighhouse cellar, Maleth's uncatalogued
+// crate, Halem's cart with the cut-out page, the third-vault stores,
+// Elara's mark-collector, Felra's hollow nobody walks into, Bran's
+// ordered valley, Nalren's saved waystation). The OTA-1113 gate roads
+// are live: six minLovedGifts intimacy doors (Irma's hammer only comes
+// out for someone who honored who she is) and two minPocketsMumbled
+// thief doors (Tellin suspects the wrong boy; Elara names your
+// weather). Cross-references stitched (Irma on Halem's armour, Halem
+// on everyone, Bran's letters through Felra's stall). ota1114DeepBench
+// locks the STRUCTURE — ladder shape, grant coverage, gate-road counts,
+// id/label uniqueness — so future edits can't quietly thin it back;
+// the ota1081 exact-list lock retargeted to its invariant.
+// DISPLAY_VERSION 4.29.25.
+//
 // OTA-1113 — THE DOOR THE PLAYER CAN SEE. Workstream B ("the deep
 // bench") step 1, the doorway before the OTA-1114/1115 writing wave.
 // 141 of 182 topics sit behind gates and a locked topic was INVISIBLE:
@@ -21036,7 +21060,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-04-1113-door-you-can-see';
+export const OTA_BUILD_ID = '2026-08-04-1114-deep-bench';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1113-door-you-can-see';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1112-packs-end-too';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1111-guard-crack';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1110-name-the-slog';

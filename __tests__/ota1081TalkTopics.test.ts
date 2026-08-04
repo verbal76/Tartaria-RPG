@@ -132,7 +132,15 @@ describe('OTA-1081 — warmth opens the conversation up', () => {
   });
 
   it('being placed unlocks the next layer', () => {
-    expect(ids('irma_ironhand', at({ regard: 'known' }))).toEqual(['irma_trade', 'irma_giants']);
+    // OTA-1114 — was an exact two-item list from when Irma had 7 topics; the
+    // deep-bench wave grew her to 15, so the lock now asserts the INVARIANT
+    // the exact list stood for: `known` strictly grows the met list and the
+    // encampments topic is among what it opens.
+    const asMet = ids('irma_ironhand', at({ regard: 'met' }));
+    const asKnown = ids('irma_ironhand', at({ regard: 'known' }));
+    expect(asKnown).toContain('irma_giants');
+    expect(asKnown.length).toBeGreaterThan(asMet.length);
+    for (const id of asMet) expect(asKnown).toContain(id);
   });
 
   it('a regular hears about the flood', () => {
