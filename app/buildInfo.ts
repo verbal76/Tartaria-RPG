@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.20';
+export const DISPLAY_VERSION = '4.29.21';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20932,7 +20932,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // day/night), with only the enemy rolling fresh.
 // Test: ota1109SixFromTheLog.test.ts (18 tests).
 // DISPLAY_VERSION 4.29.20.
-export const OTA_BUILD_ID = '2026-08-04-1109-six-from-the-log';
+//
+// OTA-1110 — WORKSTREAM A, STEP 1: NAME THE SLOG BEFORE TOUCHING IT.
+// The combatStress 700-day sim has been tripping its 25-round stall guard
+// (~5-7% vs the 2.5% cap) and the report only said HOW MANY fights
+// stalled, never WHICH or WHY. Test-only instrumentation: every stall now
+// records the enemy signature, the player's hands, and what share of the
+// fight's combat lines were resisted; every kill records rounds-to-kill
+// per matchup. Two new report tables (stalled matchups / slowest kills).
+//
+// FIRST RUN'S VERDICT — the resist hypothesis is WRONG for the sim:
+// every stalled matchup is a 4-5 member FACTION PACK (Mud Monarchs /
+// Conspiracy Architects / True Tartarians raider parties) at 0-5%
+// resisted lines, with 844 stun applications across the run — pack
+// stun-chaining, not resistance, is what drags sim fights past 25
+// rounds. The owner's on-device slog (solo big-HP Uncommon resisting
+// the whole kit) is a SEPARATE disease. So the fix splits cleanly:
+// OTA-1111 guard-crack + damage floor for the resist slog (owner-
+// approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
+// No app code in this OTA — the fast gate is untouched by construction.
+// DISPLAY_VERSION 4.29.21.
+export const OTA_BUILD_ID = '2026-08-04-1110-name-the-slog';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1109-six-from-the-log';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1108-ledger-explains-itself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1107-qwen-watchdog-backoff';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1106-gift-economy';
