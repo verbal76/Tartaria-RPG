@@ -923,9 +923,28 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.23**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.24**; ledger in `VERSION.md`.
 
-- **PACKS END TOO (2026-08-04, latest). BOTH LINES.** golem OTA-1089 /
+- **THE DOOR YOU CAN SEE (2026-08-04, latest). BOTH LINES.** golem
+  OTA-1090 / HAL OTA-1113. Workstream B step 1 — the doorway before the
+  writing wave. The talk sheet ends with a COUNT of this person's
+  gated-shut topics, never the labels (`lockedTopicCount` /
+  `lockedTeaserLabel` in engine/dialogue.ts): "…4 things Irma doesn't
+  tell strangers", wording scaled by rung (strangers / still holds back
+  / isn't ready to say). Shown only at regard >= known
+  (TEASER_MIN_REGARD), never to the wronged, `onlyRegard` repair topics
+  excluded. Tapping the row (`tapLockedTeaser`) lands an in-voice
+  deflection — nine authored lines, three per rung, rotating per tap
+  (`teaserDeflectionLine`). pendingTalk carries lockedCount/regard/
+  teaserTaps; TalkSheet renders the row dashed + italic under the
+  topics. TWO NEW GATE ROADS: `minLovedGifts` (rel.lovedGifts) and
+  `minPocketsMumbled` (rel.pocketsMumbled), both optional in
+  TalkContext, defaulting 0. AUTHORING LOCK: the ota1090 suite reds on
+  any unknown gate key in dialogue_topics.json. Next: the nine authored
+  vendors deepen to 14-16 laddered topics; then the secondary cast
+  pools.
+
+- **PACKS END TOO (2026-08-04). BOTH LINES.** golem OTA-1089 /
   HAL OTA-1112. Workstream A step 3 (owner: "keep going with the KO fix
   and ship 1112"), closing the stall-guard task legitimately. (1)
   ANTI-STUN-LOCK — a stun/paralyze that takes hold grants `braced`

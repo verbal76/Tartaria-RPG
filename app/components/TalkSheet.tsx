@@ -23,11 +23,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { lockedTeaserLabel } from '../engine/dialogue';
 
 export function TalkSheet() {
   const ctx = useGameStore((s) => s.pendingTalk);
   const raise = useGameStore((s) => s.raiseTopic);
   const close = useGameStore((s) => s.closeTalk);
+  const tapTeaser = useGameStore((s) => s.tapLockedTeaser);
   const talked = useGameStore((s) => s.worldMemory.talkedTopics);
 
   if (!ctx) return null;
@@ -67,6 +69,25 @@ export function TalkSheet() {
             </TouchableOpacity>
           );
         })}
+
+        {/* OTA-1090 — the door the player can see: a COUNT of what's still
+            gated shut, never the labels. Appears only once this person has
+            placed you (lockedCount is 0 below `known` and for the wronged).
+            Tapping it gets an in-voice deflection in the feed — the person
+            telling you, in character, that the rest is earned. */}
+        {ctx.lockedCount > 0 && (
+          <TouchableOpacity
+            style={styles.teaserBtn}
+            onPress={tapTeaser}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`${ctx.lockedCount} locked topic${ctx.lockedCount > 1 ? 's' : ''} — ask about them`}
+          >
+            <Text style={styles.teaserText}>
+              {lockedTeaserLabel(ctx.npcName, ctx.regard, ctx.lockedCount)}
+            </Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       <TouchableOpacity
@@ -138,6 +159,22 @@ const styles = StyleSheet.create({
   },
   topicTextSpent: {
     color: '#a2977b',
+  },
+  // OTA-1090 — the teaser row reads as a held door, not a question: dashed
+  // border, muted ink, same tap affordance as the topics above it.
+  teaserBtn: {
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderRadius: 4,
+    backgroundColor: '#13110f',
+    paddingVertical: 11,
+    paddingHorizontal: 12,
+  },
+  teaserText: {
+    color: '#a2977b',
+    fontSize: 14,
+    fontStyle: 'italic',
   },
   stopBtn: {
     backgroundColor: '#3a342c',
