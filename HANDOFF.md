@@ -923,9 +923,22 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.24**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.25**; ledger in `VERSION.md`.
 
-- **THE DOOR YOU CAN SEE (2026-08-04, latest). BOTH LINES.** golem
+- **THE DEEP BENCH (2026-08-04, latest). BOTH LINES.** golem OTA-1091 /
+  HAL OTA-1114. Workstream B step 2 — the writing wave (data-only:
+  dialogue_topics.json + tests, no engine change). The nine authored
+  vendors grow 5-8 → 14-16 laddered topics; catalog 182 → 258. Ladder:
+  ungated shopfront; ≥2 known; ≥2 familiar (Irma's Berrin ring, Elara's
+  Mirei, Nalren's brother Doval); ≥3 trusted (marriage/its shape,
+  origin, why-this-trade, a fear, and ONE PAYING SECRET each — lead
+  grants 25-34 TC). The 1090 gate roads live: 6 minLovedGifts doors, 2
+  minPocketsMumbled doors. Re-ask depth on the heaviest topics (2-line
+  arrays). `ota1091DeepBench` locks the structure; ota1058's exact
+  two-item known-list lock retargeted to its superset invariant. Next:
+  the secondary cast pools (4-6 topics via archetypes, → ~400 total).
+
+- **THE DOOR YOU CAN SEE (2026-08-04). BOTH LINES.** golem
   OTA-1090 / HAL OTA-1113. Workstream B step 1 — the doorway before the
   writing wave. The talk sheet ends with a COUNT of this person's
   gated-shut topics, never the labels (`lockedTopicCount` /
