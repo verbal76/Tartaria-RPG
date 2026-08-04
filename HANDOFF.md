@@ -923,9 +923,24 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.25**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.26**; ledger in `VERSION.md`.
 
-- **THE DEEP BENCH (2026-08-04, latest). BOTH LINES.** HAL OTA-1114 /
+- **THE SECONDARY CAST (2026-08-04, latest). BOTH LINES.** HAL
+  OTA-1115 / golem OTA-1092. Workstream B step 3 — data-only, closing
+  the production audit's dialogue-thinness finding. The 21 secondary
+  named NPCs each drew one known + one familiar + one trusted topic
+  from their archetype's pool (blade ×7, maker ×2, seeker ×3, road ×3,
+  office ×6), name woven into the prose, rotation ensuring archetype
+  neighbours differ; the 11 class sets each gained a familiar + trusted
+  pair written in register. Catalog 258 → 343; Workstream B total +161
+  authored topics from the 182 baseline. `ota1115SecondaryCast` locks
+  shape, rung coverage, neighbour divergence, and the template failure
+  modes (raw placeholders, skipped rungs). WORKSTREAM B COMPLETE
+  (1113 doorway → 1114 deep bench → 1115 secondary cast); the audit's
+  actionable findings (combat slog, dialogue thinness) are both closed.
+  Remaining audit gap is external playtesting, which is owner-side.
+
+- **THE DEEP BENCH (2026-08-04). BOTH LINES.** HAL OTA-1114 /
   golem OTA-1091. Workstream B step 2 — the writing wave (data-only:
   dialogue_topics.json + tests, no engine change). The nine authored
   vendors grow 5-8 → 14-16 laddered topics; catalog 182 → 258. Ladder:

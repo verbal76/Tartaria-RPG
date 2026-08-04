@@ -820,6 +820,36 @@
      ]
     },
     {
+     "id": "wandering_drifter_pool_road",
+     "label": "Ask what the road has taught them",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "\"That you can leave anything behind except your feet.\" Naha says it lightly, but it has corners. \"People think the road is freedom. The road is a landlord like any other — it takes its rent in soles and weather and names of places you will not see twice. I pay it because I am worse at paying the other kind.\""
+     ]
+    },
+    {
+     "id": "wandering_drifter_pool_place",
+     "label": "Ask about a place that stayed with them",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"There is a bend in a river, south, past the third ford, where somebody planted a garden and never came back for it.\" Naha’s voice settles. \"It keeps blooming. Nobody tends it and it blooms anyway, in rows — you can still read the ROWS. I have slept there four times and I have never once picked anything. It would be like interrupting somebody.\""
+     ]
+    },
+    {
+     "id": "wandering_drifter_pool_stop",
+     "label": "Ask what would make them stop walking",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "Naha looks at you the way people look at a question they have been avoiding on purpose. \"There was a door once. A whole winter behind it. I fixed their fence, I learned their kettle, I started recognizing the dogs.\" The pause has weight. \"I left in the spring like the road was calling and the truth is nothing called. Staying was TERRIFYING and walking was easy, and I have been telling that story backwards to strangers ever since. You are the first one who got it the right way round.\""
+     ]
+    },
+    {
      "id": "t_wronged",
      "label": "Try to say something",
      "gate": {
@@ -859,6 +889,36 @@
      },
      "lines": [
       "\"I keep walking because I found something once and put it back.\" Thalan's voice loses its ease. \"I have spent eleven years unable to find that place again, and I am no longer certain I want to. But I keep walking.\""
+     ]
+    },
+    {
+     "id": "thalan_wanderer_pool_carry",
+     "label": "Ask what they always carry",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "Thalan does not have to think. \"Needle and thread, a dry pair of socks, and one thing that is worth nothing.\" They pat a pocket without showing you. \"The first two keep you walking. The third keeps you a person. You meet walkers who dropped their nothing-thing to lighten the load, and you can tell. You can always tell.\""
+     ]
+    },
+    {
+     "id": "thalan_wanderer_pool_people",
+     "label": "Ask about the people out there",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "Thalan thinks it over. \"Kinder than the settled ones expect, and stranger. Out past the posts, hospitality is not manners, it is INFRASTRUCTURE — you feed the walker because you will be the walker. The strangeness is just what happens to people who talk to themselves for a season at a stretch.\" A dry look. \"I include myself. Present company was doing the asking, so present company can judge.\""
+     ]
+    },
+    {
+     "id": "thalan_wanderer_pool_seen",
+     "label": "Ask the thing they have never told anyone",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "\"On the high flats, two winters back, I watched lights moving in a line where there is no road.\" Thalan watches your face while saying it. \"Not drifting. MARCHING. All night, too far to walk to, gone by morning, and no tracks when I crossed there the next day.\" They shrug, but it is not a shrug. \"I have told it as a joke twice. You are getting it plain. Something out there keeps formation, and I route around the flats now.\""
      ]
     },
     {
@@ -904,6 +964,36 @@
      ]
     },
     {
+     "id": "velar_shadowblade_pool_scars",
+     "label": "Ask which scar taught the most",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "Velar Shadowblade considers the question like an opponent. \"This one.\" Not the biggest — a thin line along the forearm. \"First season. I blocked with the edge, like a fool, because holding the blade felt safer than holding the distance. The distance is the weapon. Everything after that scar has been footwork.\""
+     ]
+    },
+    {
+     "id": "velar_shadowblade_pool_teacher",
+     "label": "Ask who taught them the trade",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "Velar Shadowblade is quiet a moment. \"Somebody better than me who did not live to see it. That is the honest answer for anyone in this work, and the ones who claim otherwise trained alone.\" They check a strap that did not need checking. \"You carry your teacher in your guard. Mine is still keeping my left side honest.\""
+     ]
+    },
+    {
+     "id": "velar_shadowblade_pool_after",
+     "label": "Ask what comes after the blade",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "Velar Shadowblade does not laugh at the question, which tells you something. \"A door I can bar from the inside. Somewhere the weather is the loudest thing that happens.\" A pause. \"Everyone in this trade has the same dream and none of us can sit still in a quiet room for an hour. I have tried. I lasted forty minutes and checked the door twice.\""
+     ]
+    },
+    {
      "id": "t_wronged",
      "label": "Try to say something",
      "gate": {
@@ -943,6 +1033,36 @@
      },
      "lines": [
       "\"There is a shelf I do not sell from.\" Jorah does not point at it. \"Six volumes, all the same hand, all describing machines that cannot exist and giving their maintenance schedules. Somebody was very serious about a world that was not this one.\""
+     ]
+    },
+    {
+     "id": "jorah_scholar_pool_why",
+     "label": "Ask what they are looking for",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "\"The same thing as everyone in my line — the piece that makes the rest make sense.\" Jorah the Scholar smiles at their own phrasing. \"You imagine it as a door, when you start. A vault, a tablet, one big answer. Twenty years in, you understand it is a THREAD. You do not find it. You notice you have been holding it a while.\""
+     ]
+    },
+    {
+     "id": "jorah_scholar_pool_find",
+     "label": "Ask about the strangest thing they have found",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "Jorah the Scholar weighs how much to say. \"A room that had been counted. Every object numbered, in a hand nobody can date — not catalogued, COUNTED, the way you count what you are afraid of losing.\" They look at you. \"Whoever numbered that room knew the water was coming. That is not in any record. The counting IS the record.\""
+     ]
+    },
+    {
+     "id": "jorah_scholar_pool_afraid",
+     "label": "Ask what finding it would mean",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "Jorah the Scholar goes quiet in a new way. \"You have put your finger on the thing. I have built a whole life out of the looking — the looking is my trade, my mornings, my reason.\" A slow breath. \"If I found it tomorrow, I would be a person who HAS a thing instead of a person who SEEKS a thing, and I do not know that man. Some nights I suspect I walk slower on purpose.\""
      ]
     },
     {
@@ -1139,6 +1259,36 @@
      },
      "lines": [
       "\"Half of what I repair, I do not repair.\" Tarek says it quietly, glancing at the door. \"I get it working. There is a difference, and the difference is that I have no idea what most of these mechanisms were FOR. I make them move. Somebody else decided why.\""
+     ]
+    },
+    {
+     "id": "tarek_tinkerer_pool_hands",
+     "label": "Ask how they learned the craft",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "\"Badly, first.\" Tarek the Tinkerer holds up their hands as evidence — old burns, old lines. \"Everything I know is a mistake I only made once. The craft is not in the making, it is in the remembering. My hands keep the notes.\""
+     ]
+    },
+    {
+     "id": "tarek_tinkerer_pool_best",
+     "label": "Ask about the best thing they ever made",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Sold it. Of course.\" Tarek the Tinkerer snorts at their own answer. \"That is the trade’s little cruelty — your best work walks out the door with a stranger and your worst waits in the corner where you can see it. I could draw it for you now, every line. I hope whoever has it does not know what they have. Things that are known to be precious get locked away, and it was made to be USED.\""
+     ]
+    },
+    {
+     "id": "tarek_tinkerer_pool_apprentice",
+     "label": "Ask who the work goes to when they stop",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "Tarek the Tinkerer does not answer at once, and the shop is loud with it. \"There was an apprentice. It did not end in anger — it ended worse, in nothing. They were good and the road wanted them and the road can be argued with exactly once.\" A breath. \"The tools are oiled. The bench is the right height for somebody shorter than me. I notice that every morning and I have not changed it.\""
      ]
     },
     {
@@ -1341,6 +1491,36 @@
      ]
     },
     {
+     "id": "korr_stonefoot_pool_work",
+     "label": "Ask what the work is really like",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "\"Waiting,\" Korr Stonefoot says flatly. \"Nine parts waiting, one part everything at once. The stories keep the one part and sell it as the whole trade.\" A shrug. \"Nobody sings about standing in the rain outside a door. The rain is the job.\""
+     ]
+    },
+    {
+     "id": "korr_stonefoot_pool_line",
+     "label": "Ask if there is work they will not take",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Three things.\" Korr Stonefoot counts them plainly, a recitation worn smooth. \"Nothing against children. Nothing against someone already down. And nothing where the coin is too good for the story I am being told — overpay is the surest sign the story is missing its worst part.\""
+     ]
+    },
+    {
+     "id": "korr_stonefoot_pool_night",
+     "label": "Ask what keeps them up at night",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "\"Not the ones I have fought. The one I walked away from.\" Korr Stonefoot looks at the middle distance. \"There was a job I turned down for good reasons, and somebody hungrier took it, and it went the way I knew it would. You can be right and still owe. That is the ledger nobody teaches you to keep.\""
+     ]
+    },
+    {
      "id": "t_wronged",
      "label": "Try to say something",
      "gate": {
@@ -1380,6 +1560,36 @@
      },
      "lines": [
       "\"I do not shoot any more.\" Cassia says it evenly. \"Not cannot. Do not. I was very good, and being very good at killing people from far enough away that they stay strangers is not a skill I want to keep sharp.\""
+     ]
+    },
+    {
+     "id": "cassia_nightwind_pool_scars",
+     "label": "Ask which scar taught the most",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "Cassia Nightwind considers the question like an opponent. \"This one.\" Not the biggest — a thin line along the forearm. \"First season. I blocked with the edge, like a fool, because holding the blade felt safer than holding the distance. The distance is the weapon. Everything after that scar has been footwork.\""
+     ]
+    },
+    {
+     "id": "cassia_nightwind_pool_teacher",
+     "label": "Ask who taught them the trade",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "Cassia Nightwind is quiet a moment. \"Somebody better than me who did not live to see it. That is the honest answer for anyone in this work, and the ones who claim otherwise trained alone.\" They check a strap that did not need checking. \"You carry your teacher in your guard. Mine is still keeping my left side honest.\""
+     ]
+    },
+    {
+     "id": "cassia_nightwind_pool_after",
+     "label": "Ask what comes after the blade",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "Cassia Nightwind does not laugh at the question, which tells you something. \"A door I can bar from the inside. Somewhere the weather is the loudest thing that happens.\" A pause. \"Everyone in this trade has the same dream and none of us can sit still in a quiet room for an hour. I have tried. I lasted forty minutes and checked the door twice.\""
      ]
     },
     {
@@ -1425,6 +1635,36 @@
      ]
     },
     {
+     "id": "odar_flameforge_pool_good",
+     "label": "Ask what makes a piece good",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "Odar Flameforge picks up a finished piece and turns it. \"Not the look. The look is for buyers. A good piece is one that fails SLOWLY — it warns you, it complains, it gives you a season of creaking before it lets go.\" They set it down. \"Anything that breaks without warning first lied to you for years.\""
+     ]
+    },
+    {
+     "id": "odar_flameforge_pool_mudwork",
+     "label": "Ask what the old work teaches",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "Odar Flameforge pulls something half-cleaned from under the bench — a join, older than the settlement. \"Look at that seam. No flux, no filler, and I cannot make it and neither can anyone I have met.\" They turn it over. \"Whoever made this was not cleverer than me. They had TIME. A whole life for one seam. That is what drowned, if you ask me. Not the cities. The time.\""
+     ]
+    },
+    {
+     "id": "odar_flameforge_pool_last",
+     "label": "Ask what they would make last",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "\"Everyone thinks a masterwork. A crown, a blade, something with a name.\" Odar Flameforge shakes their head slowly. \"The last thing I make will be a hinge, or a latch, or a pot mend, because somebody will need it that afternoon. And that is right. The craft was never the grand things. It was the settlement working, one small fix at a time, and I would be glad to go out mid-fix.\""
+     ]
+    },
+    {
      "id": "t_wronged",
      "label": "Try to say something",
      "gate": {
@@ -1464,6 +1704,36 @@
      },
      "lines": [
       "\"They are not artefacts.\" Silvan touches one, briefly. \"That is the wrong shape of thought. They are PARTS. Every one of these came out of something larger that is still, somewhere, missing them.\" A long silence. \"I sell them because I would rather they were spread out.\""
+     ]
+    },
+    {
+     "id": "silvan_the_quiet_pool_road",
+     "label": "Ask what the road has taught them",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "\"That you can leave anything behind except your feet.\" Silvan the Quiet says it lightly, but it has corners. \"People think the road is freedom. The road is a landlord like any other — it takes its rent in soles and weather and names of places you will not see twice. I pay it because I am worse at paying the other kind.\""
+     ]
+    },
+    {
+     "id": "silvan_the_quiet_pool_place",
+     "label": "Ask about a place that stayed with them",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"There is a bend in a river, south, past the third ford, where somebody planted a garden and never came back for it.\" Silvan the Quiet’s voice settles. \"It keeps blooming. Nobody tends it and it blooms anyway, in rows — you can still read the ROWS. I have slept there four times and I have never once picked anything. It would be like interrupting somebody.\""
+     ]
+    },
+    {
+     "id": "silvan_the_quiet_pool_stop",
+     "label": "Ask what would make them stop walking",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "Silvan the Quiet looks at you the way people look at a question they have been avoiding on purpose. \"There was a door once. A whole winter behind it. I fixed their fence, I learned their kettle, I started recognizing the dogs.\" The pause has weight. \"I left in the spring like the road was calling and the truth is nothing called. Staying was TERRIFYING and walking was easy, and I have been telling that story backwards to strangers ever since. You are the first one who got it the right way round.\""
      ]
     },
     {
@@ -1664,6 +1934,36 @@
      ]
     },
     {
+     "id": "vela_ironheart_pool_work",
+     "label": "Ask what the work is really like",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "\"Waiting,\" Vela Ironheart says flatly. \"Nine parts waiting, one part everything at once. The stories keep the one part and sell it as the whole trade.\" A shrug. \"Nobody sings about standing in the rain outside a door. The rain is the job.\""
+     ]
+    },
+    {
+     "id": "vela_ironheart_pool_line",
+     "label": "Ask if there is work they will not take",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Three things.\" Vela Ironheart counts them plainly, a recitation worn smooth. \"Nothing against children. Nothing against someone already down. And nothing where the coin is too good for the story I am being told — overpay is the surest sign the story is missing its worst part.\""
+     ]
+    },
+    {
+     "id": "vela_ironheart_pool_night",
+     "label": "Ask what keeps them up at night",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "\"Not the ones I have fought. The one I walked away from.\" Vela Ironheart looks at the middle distance. \"There was a job I turned down for good reasons, and somebody hungrier took it, and it went the way I knew it would. You can be right and still owe. That is the ledger nobody teaches you to keep.\""
+     ]
+    },
+    {
      "id": "t_wronged",
      "label": "Try to say something",
      "gate": {
@@ -1703,6 +2003,36 @@
      },
      "lines": [
       "\"I can feel it under the settlements.\" Mara puts a palm flat on the table. \"There is a rhythm down there and it is not water. It is too regular for water. I have said this to four people in my life and three of them stopped speaking to me.\""
+     ]
+    },
+    {
+     "id": "mara_stoneskin_pool_scars",
+     "label": "Ask which scar taught the most",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "Mara Stoneskin considers the question like an opponent. \"This one.\" Not the biggest — a thin line along the forearm. \"First season. I blocked with the edge, like a fool, because holding the blade felt safer than holding the distance. The distance is the weapon. Everything after that scar has been footwork.\""
+     ]
+    },
+    {
+     "id": "mara_stoneskin_pool_teacher",
+     "label": "Ask who taught them the trade",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "Mara Stoneskin is quiet a moment. \"Somebody better than me who did not live to see it. That is the honest answer for anyone in this work, and the ones who claim otherwise trained alone.\" They check a strap that did not need checking. \"You carry your teacher in your guard. Mine is still keeping my left side honest.\""
+     ]
+    },
+    {
+     "id": "mara_stoneskin_pool_after",
+     "label": "Ask what comes after the blade",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "Mara Stoneskin does not laugh at the question, which tells you something. \"A door I can bar from the inside. Somewhere the weather is the loudest thing that happens.\" A pause. \"Everyone in this trade has the same dream and none of us can sit still in a quiet room for an hour. I have tried. I lasted forty minutes and checked the door twice.\""
      ]
     },
     {
@@ -1748,6 +2078,36 @@
      ]
     },
     {
+     "id": "yara_windcaller_pool_why",
+     "label": "Ask what they are looking for",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "\"The same thing as everyone in my line — the piece that makes the rest make sense.\" Yara the Windcaller smiles at their own phrasing. \"You imagine it as a door, when you start. A vault, a tablet, one big answer. Twenty years in, you understand it is a THREAD. You do not find it. You notice you have been holding it a while.\""
+     ]
+    },
+    {
+     "id": "yara_windcaller_pool_find",
+     "label": "Ask about the strangest thing they have found",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "Yara the Windcaller weighs how much to say. \"A room that had been counted. Every object numbered, in a hand nobody can date — not catalogued, COUNTED, the way you count what you are afraid of losing.\" They look at you. \"Whoever numbered that room knew the water was coming. That is not in any record. The counting IS the record.\""
+     ]
+    },
+    {
+     "id": "yara_windcaller_pool_afraid",
+     "label": "Ask what finding it would mean",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "Yara the Windcaller goes quiet in a new way. \"You have put your finger on the thing. I have built a whole life out of the looking — the looking is my trade, my mornings, my reason.\" A slow breath. \"If I found it tomorrow, I would be a person who HAS a thing instead of a person who SEEKS a thing, and I do not know that man. Some nights I suspect I walk slower on purpose.\""
+     ]
+    },
+    {
      "id": "t_wronged",
      "label": "Try to say something",
      "gate": {
@@ -1787,6 +2147,36 @@
      },
      "lines": [
       "\"I sell wonder because I ran out of it.\" Zorin's patter drops away entirely. \"I have handled every strange thing that came through three settlements. Not one of them turned out to be magic. All of them turned out to be MADE. By somebody. Who is not here.\""
+     ]
+    },
+    {
+     "id": "zorin_nightblade_pool_work",
+     "label": "Ask what the work is really like",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "\"Waiting,\" Zorin Nightblade says flatly. \"Nine parts waiting, one part everything at once. The stories keep the one part and sell it as the whole trade.\" A shrug. \"Nobody sings about standing in the rain outside a door. The rain is the job.\""
+     ]
+    },
+    {
+     "id": "zorin_nightblade_pool_line",
+     "label": "Ask if there is work they will not take",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Three things.\" Zorin Nightblade counts them plainly, a recitation worn smooth. \"Nothing against children. Nothing against someone already down. And nothing where the coin is too good for the story I am being told — overpay is the surest sign the story is missing its worst part.\""
+     ]
+    },
+    {
+     "id": "zorin_nightblade_pool_night",
+     "label": "Ask what keeps them up at night",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "\"Not the ones I have fought. The one I walked away from.\" Zorin Nightblade looks at the middle distance. \"There was a job I turned down for good reasons, and somebody hungrier took it, and it went the way I knew it would. You can be right and still owe. That is the ledger nobody teaches you to keep.\""
      ]
     },
     {
@@ -1832,6 +2222,36 @@
      ]
     },
     {
+     "id": "kirin_spellweaver_pool_method",
+     "label": "Ask how they know what is true",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "Kirin Spellweaver takes the question seriously, which few do. \"I keep two lists. Things I can show you, and things I believe. The discipline is remembering which list is which — every fraud I have ever met started by letting the second list borrow the first one’s clothes.\""
+     ]
+    },
+    {
+     "id": "kirin_spellweaver_pool_cost",
+     "label": "Ask what the seeking has cost",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Every seeker will show you the notebook and nobody shows you the ledger.\" Kirin Spellweaver does show you — empty hands. \"Two good friendships, gone to distance. A stretch of years I measured in sites instead of seasons. My mother’s last winter, which I spent a week’s walk away being RIGHT about something small.\" The hands close. \"The thread had better be worth it. Most days I still think it is. Most days.\""
+     ]
+    },
+    {
+     "id": "kirin_spellweaver_pool_heir",
+     "label": "Ask who gets the notebooks",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "\"Direct, aren’t you.\" But Kirin Spellweaver has clearly thought about it. \"There is a box, and instructions, and a name on the instructions that would surprise the name. Not a scholar — scholars would ARGUE with the notebooks. I chose somebody who will simply keep them until the right stranger comes asking.\" A beat. \"That is how I got mine, if you are wondering. I was the right stranger once.\""
+     ]
+    },
+    {
      "id": "t_wronged",
      "label": "Try to say something",
      "gate": {
@@ -1871,6 +2291,36 @@
      },
      "lines": [
       "\"I have been on every side of this,\" Drakos says. \"Every one. Same fight, different colours, and I have never once been able to tell the difference from inside it. That should worry somebody more important than me.\""
+     ]
+    },
+    {
+     "id": "drakos_mercenary_pool_scars",
+     "label": "Ask which scar taught the most",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "Drakos the Mercenary considers the question like an opponent. \"This one.\" Not the biggest — a thin line along the forearm. \"First season. I blocked with the edge, like a fool, because holding the blade felt safer than holding the distance. The distance is the weapon. Everything after that scar has been footwork.\""
+     ]
+    },
+    {
+     "id": "drakos_mercenary_pool_teacher",
+     "label": "Ask who taught them the trade",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "Drakos the Mercenary is quiet a moment. \"Somebody better than me who did not live to see it. That is the honest answer for anyone in this work, and the ones who claim otherwise trained alone.\" They check a strap that did not need checking. \"You carry your teacher in your guard. Mine is still keeping my left side honest.\""
+     ]
+    },
+    {
+     "id": "drakos_mercenary_pool_after",
+     "label": "Ask what comes after the blade",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "Drakos the Mercenary does not laugh at the question, which tells you something. \"A door I can bar from the inside. Somewhere the weather is the loudest thing that happens.\" A pause. \"Everyone in this trade has the same dream and none of us can sit still in a quiet room for an hour. I have tried. I lasted forty minutes and checked the door twice.\""
      ]
     },
     {
@@ -2072,6 +2522,36 @@
      ]
     },
     {
+     "id": "monarch_agent_pool_office",
+     "label": "Ask what the position actually involves",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "\"Less power and more paper than anyone believes.\" Veska of the Hollow gestures at the evidence. \"People imagine the faction as a fist. From the inside it is a LEDGER — everything my people are owed, everything we owe, and me at the hinge making sure the two lists never meet by surprise. The fist is what happens when someone like me makes an error.\""
+     ]
+    },
+    {
+     "id": "monarch_agent_pool_above",
+     "label": "Ask what their superiors do not know",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "Veska of the Hollow glances at the door — the professional reflex. \"That half of what runs smoothly here runs on arrangements I have never written down. A favour ledger, person to person, older than my posting.\" A thin smile. \"If I recorded it, it would become POLICY, and policy can be ordered stopped. Some things survive by staying too small to forbid.\""
+     ]
+    },
+    {
+     "id": "monarch_agent_pool_doubt",
+     "label": "Ask if they ever doubt the cause",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "Veska of the Hollow is silent long enough to honour the question. \"Twice a year, properly. I keep the doubts like inspection days — scheduled, thorough, private.\" They meet your eye. \"A believer who never audits is a liability to the thing they love. The faction does not know I do this. The faction is WHY I do this. If that ever stops making sense to you, be careful of me.\""
+     ]
+    },
+    {
      "id": "t_wronged",
      "label": "Try to say something",
      "gate": {
@@ -2111,6 +2591,36 @@
      },
      "lines": [
       "\"I have listened at the stone for thirty-one years.\" Vael's composure does not break, quite. \"I was told I would hear them. I have heard something. I have never been able to say honestly that it was them, and I have never been able to say honestly that it was not.\""
+     ]
+    },
+    {
+     "id": "servants_quartermaster_pool_serve",
+     "label": "Ask why they serve",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "Vael of the Listening Stone gives you a look that measures the question for irony and finds none. \"Because somebody stands at this desk, and the last one who stood here was worse. That is the honest shape of it. You do not serve because the cause is clean — no cause is clean. You serve because you have seen the desk empty, and empty is worse.\""
+     ]
+    },
+    {
+     "id": "servants_quartermaster_pool_price",
+     "label": "Ask what the post has cost them",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Friends, in the ordinary way — people hear the title before they hear me now.\" Vael of the Listening Stone straightens something on the desk. \"But the real price is smaller and dearer: I have not said a careless sentence in nine years. Every word weighed, every joke checked for edges. You are hearing the loosest I get, and you will notice I am still watching the door.\""
+     ]
+    },
+    {
+     "id": "servants_quartermaster_pool_after",
+     "label": "Ask what they will do when it is over",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "\"Over.\" Vael of the Listening Stone tries the word like a foreign coin. \"There is a version of this where the work is done — the accounts settled, the people safe, the desk needed by nobody. I used to plan for it. A place, a trade, a different name even.\" The papers get squared away. \"I stopped planning it the year I understood I was describing a stranger. This desk has eaten the person who would have enjoyed leaving it. I am what is left, and what is left is quite good at the desk.\""
      ]
     },
     {
@@ -2156,6 +2666,36 @@
      ]
     },
     {
+     "id": "dynasty_factor_pool_office",
+     "label": "Ask what the position actually involves",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "\"Less power and more paper than anyone believes.\" Magister Caul Veyre gestures at the evidence. \"People imagine the faction as a fist. From the inside it is a LEDGER — everything my people are owed, everything we owe, and me at the hinge making sure the two lists never meet by surprise. The fist is what happens when someone like me makes an error.\""
+     ]
+    },
+    {
+     "id": "dynasty_factor_pool_above",
+     "label": "Ask what their superiors do not know",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "Magister Caul Veyre glances at the door — the professional reflex. \"That half of what runs smoothly here runs on arrangements I have never written down. A favour ledger, person to person, older than my posting.\" A thin smile. \"If I recorded it, it would become POLICY, and policy can be ordered stopped. Some things survive by staying too small to forbid.\""
+     ]
+    },
+    {
+     "id": "dynasty_factor_pool_doubt",
+     "label": "Ask if they ever doubt the cause",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "Magister Caul Veyre is silent long enough to honour the question. \"Twice a year, properly. I keep the doubts like inspection days — scheduled, thorough, private.\" They meet your eye. \"A believer who never audits is a liability to the thing they love. The faction does not know I do this. The faction is WHY I do this. If that ever stops making sense to you, be careful of me.\""
+     ]
+    },
+    {
      "id": "t_wronged",
      "label": "Try to say something",
      "gate": {
@@ -2198,6 +2738,36 @@
      ]
     },
     {
+     "id": "architects_keeper_pool_serve",
+     "label": "Ask why they serve",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "The Cartographer gives you a look that measures the question for irony and finds none. \"Because somebody stands at this desk, and the last one who stood here was worse. That is the honest shape of it. You do not serve because the cause is clean — no cause is clean. You serve because you have seen the desk empty, and empty is worse.\""
+     ]
+    },
+    {
+     "id": "architects_keeper_pool_price",
+     "label": "Ask what the post has cost them",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Friends, in the ordinary way — people hear the title before they hear me now.\" The Cartographer straightens something on the desk. \"But the real price is smaller and dearer: I have not said a careless sentence in nine years. Every word weighed, every joke checked for edges. You are hearing the loosest I get, and you will notice I am still watching the door.\""
+     ]
+    },
+    {
+     "id": "architects_keeper_pool_after",
+     "label": "Ask what they will do when it is over",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "\"Over.\" The Cartographer tries the word like a foreign coin. \"There is a version of this where the work is done — the accounts settled, the people safe, the desk needed by nobody. I used to plan for it. A place, a trade, a different name even.\" The papers get squared away. \"I stopped planning it the year I understood I was describing a stranger. This desk has eaten the person who would have enjoyed leaving it. I am what is left, and what is left is quite good at the desk.\""
+     ]
+    },
+    {
      "id": "t_wronged",
      "label": "Try to say something",
      "gate": {
@@ -2237,6 +2807,36 @@
      },
      "lines": [
       "\"I have measured the old foundations.\" Drest says it heavily. \"Every site. They are better than anything we can lay. Not stronger — BETTER. Squarer, truer, laid by people who had time. We are building shelters on top of somebody's architecture and calling it a city.\""
+     ]
+    },
+    {
+     "id": "builders_foreman_pool_office",
+     "label": "Ask what the position actually involves",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "\"Less power and more paper than anyone believes.\" Foreman Drest Holloway gestures at the evidence. \"People imagine the faction as a fist. From the inside it is a LEDGER — everything my people are owed, everything we owe, and me at the hinge making sure the two lists never meet by surprise. The fist is what happens when someone like me makes an error.\""
+     ]
+    },
+    {
+     "id": "builders_foreman_pool_above",
+     "label": "Ask what their superiors do not know",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "Foreman Drest Holloway glances at the door — the professional reflex. \"That half of what runs smoothly here runs on arrangements I have never written down. A favour ledger, person to person, older than my posting.\" A thin smile. \"If I recorded it, it would become POLICY, and policy can be ordered stopped. Some things survive by staying too small to forbid.\""
+     ]
+    },
+    {
+     "id": "builders_foreman_pool_doubt",
+     "label": "Ask if they ever doubt the cause",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "Foreman Drest Holloway is silent long enough to honour the question. \"Twice a year, properly. I keep the doubts like inspection days — scheduled, thorough, private.\" They meet your eye. \"A believer who never audits is a liability to the thing they love. The faction does not know I do this. The faction is WHY I do this. If that ever stops making sense to you, be careful of me.\""
      ]
     },
     {
@@ -2295,6 +2895,36 @@
      ]
     },
     {
+     "id": "revivalists_quartermaster_pool_serve",
+     "label": "Ask why they serve",
+     "gate": {
+      "minRegard": "known"
+     },
+     "lines": [
+      "Sister Yune Ashfall gives you a look that measures the question for irony and finds none. \"Because somebody stands at this desk, and the last one who stood here was worse. That is the honest shape of it. You do not serve because the cause is clean — no cause is clean. You serve because you have seen the desk empty, and empty is worse.\""
+     ]
+    },
+    {
+     "id": "revivalists_quartermaster_pool_price",
+     "label": "Ask what the post has cost them",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Friends, in the ordinary way — people hear the title before they hear me now.\" Sister Yune Ashfall straightens something on the desk. \"But the real price is smaller and dearer: I have not said a careless sentence in nine years. Every word weighed, every joke checked for edges. You are hearing the loosest I get, and you will notice I am still watching the door.\""
+     ]
+    },
+    {
+     "id": "revivalists_quartermaster_pool_after",
+     "label": "Ask what they will do when it is over",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "\"Over.\" Sister Yune Ashfall tries the word like a foreign coin. \"There is a version of this where the work is done — the accounts settled, the people safe, the desk needed by nobody. I used to plan for it. A place, a trade, a different name even.\" The papers get squared away. \"I stopped planning it the year I understood I was describing a stranger. This desk has eaten the person who would have enjoyed leaving it. I am what is left, and what is left is quite good at the desk.\""
+     ]
+    },
+    {
      "id": "t_wronged",
      "label": "Try to say something",
      "gate": {
@@ -2334,6 +2964,26 @@
      },
      "lines": [
       "\"I will tell you the thing nobody says out loud on the road.\" They lower their voice without meaning to. \"You pass the same people. Not similar people — the SAME ones, going the other way, three and four times. Everybody is walking in a circle and nobody has said so.\""
+     ]
+    },
+    {
+     "id": "cls_traveler_maps",
+     "label": "Ask what the maps get wrong",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Everything that matters.\" The traveler says it without heat. \"Maps show you where the places are. They cannot show you which ford lies in spring, which waystation charges double after dark, which stretch of road everyone walks fast and nobody says why.\" A tap on the temple. \"The real map is up here, and it dies with every walker who keeps it to themselves. So ask. I always answer walkers.\""
+     ]
+    },
+    {
+     "id": "cls_traveler_home",
+     "label": "Ask if anywhere counts as home",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "The traveler is a long time answering. \"There is a table I am always welcome at, three settlements from here. I have eaten there maybe ten times in as many years.\" A slow smile. \"Home is not where you are. It is where they would notice if you stopped coming. One table is enough. I know walkers with none, and you can hear it in how they talk about the road.\""
      ]
     },
     {
@@ -2379,6 +3029,26 @@
      ]
     },
     {
+     "id": "cls_refugee_kept",
+     "label": "Ask what they managed to keep",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"A key.\" The refugee turns it over — an ordinary key, kept bright with handling. \"To a door that is under the mud now. Everyone from my street kept theirs. When we meet on the road we show them, like papers.\" It goes away again, close to the skin. \"You keep the key so the door stays yours. The mud can have the house. The DOOR is ours.\""
+     ]
+    },
+    {
+     "id": "cls_refugee_back",
+     "label": "Ask if they would go back",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "\"You are the first person to ask that plainly. People assume — yes of course, or no of course.\" The refugee weighs it, properly. \"If the water gave the street back tomorrow, I would go LOOK. I would stand where the door was. And then, I think, I would leave again — because the person that street belonged to did not make it out, and I have been somebody else for years now, and she has her own door somewhere ahead.\" A pause. \"But I would want the key to fit. Just once. Just to know.\""
+     ]
+    },
+    {
      "id": "c_wronged",
      "label": "Try to make it right",
      "gate": {
@@ -2418,6 +3088,26 @@
      },
      "lines": [
       "\"Half the things I mend, I do not understand.\" Said quietly, to the work rather than to you. \"I make them go again. I could not tell you what they are for. I have started to suspect that is true of the people who built them as well.\""
+     ]
+    },
+    {
+     "id": "cls_tinker_fixes",
+     "label": "Ask about the strangest thing they have fixed",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"A music box, last winter, out at a steading two days from anywhere.\" The tinker's hands remember it while they talk. \"Old work, drowned-world work — I have no business understanding it and mostly I did not. But the fault was a bent pin, and a bent pin is a bent pin in any century.\" A shrug. \"It played. The whole house cried, me included, and none of us knew the tune. That is the trade at its best: you fix the small thing and the big thing fixes itself a little.\""
+     ]
+    },
+    {
+     "id": "cls_tinker_broken",
+     "label": "Ask what cannot be fixed",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "The tinker stops working, which is rare. \"Anything, if you mean the object. Give me time and stock and I will mend the moon.\" The hands go still. \"What cannot be fixed is a thing mended too late. I have repaired kettles for houses that had already gone cold, you understand me. The trade taught me speed for exactly that reason. When somebody says 'when you have a moment' — go NOW. The moment is the repair.\""
      ]
     },
     {
@@ -2463,6 +3153,26 @@
      ]
     },
     {
+     "id": "cls_scout_signs",
+     "label": "Ask what they look for first",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Birds. Always birds first.\" The scout does not even have to think. \"Ground sign lies — rain rewrites it, mud swallows it. But birds are a live report. Silent trees mean something passed within the hour. Circling means something is down. And birds going UP in a line —\" a flat look \"— means something is walking under them, keeping pace, and you should be behind a rock deciding things.\""
+     ]
+    },
+    {
+     "id": "cls_scout_report",
+     "label": "Ask about a report nobody believed",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "The scout glances around first, an old habit. \"Two seasons back I reported a camp — fires banked, gear stowed, thirty sleepers by the bedrolls. Except there was nobody in them. Warm fires. Empty rolls. Thirty people's kit and no people.\" A breath. \"Command logged it as 'abandoned camp'. I know what abandoned looks like — abandoned is COLD. That camp was interrupted, mid-breath, all at once. I did not argue the log. I just do not scout that valley any more, and I notice command has never sent anyone else either.\""
+     ]
+    },
+    {
      "id": "c_wronged",
      "label": "Try to make it right",
      "gate": {
@@ -2502,6 +3212,26 @@
      },
      "lines": [
       "\"I have stopped believing and I have not stopped walking.\" Said very calmly. \"I expected those to happen together. They did not, and I have decided the walking was the part that mattered.\""
+     ]
+    },
+    {
+     "id": "cls_pilgrim_way",
+     "label": "Ask about the way they walk",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"People think a pilgrimage is about the shrine.\" The pilgrim smiles like somebody who thought so once too. \"The shrine is the excuse. The walking is the practice — every step a small agreement to keep going, ten thousand small agreements a day. By the time you arrive, the arriving is almost beside the point.\" The staff taps the ground, twice. \"Almost. You still go. An excuse this good deserves keeping.\""
+     ]
+    },
+    {
+     "id": "cls_pilgrim_asked",
+     "label": "Ask what they asked for",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "The pilgrim looks at you with sudden clear attention. \"You are the first to ask WHAT rather than whether it worked.\" A long moment. \"I set out asking for somebody back. You cannot have somebody back; I knew it then too. Somewhere on the third week the asking changed shape on its own — I started asking to stop being angry at the mud. Just that.\" The staff shifts. \"That one is being answered. Slowly. In installments. The shrines are honest that way — they only grant what walking can carry.\""
      ]
     },
     {
@@ -2547,6 +3277,26 @@
      ]
     },
     {
+     "id": "cls_drifter_names",
+     "label": "Ask how many names they have used",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "The drifter laughs, caught. \"Four. No — five, if the winter at the fishery counts, and it should.\" The laugh settles into something older. \"None of them were lies, that is the thing. Every one fit when I wore it. You settled people get one name and stretch it your whole life. We get a wardrobe.\" A sidelong look. \"The one I gave you is real, before you ask. It is just not the only real one.\""
+     ]
+    },
+    {
+     "id": "cls_drifter_why",
+     "label": "Ask what they are drifting from",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "\"From, from. Everyone asks from.\" But the drifter does not deflect it this time. \"Fine. There was an expectation, back where I started. A whole life, pre-built, correct, waiting for me to move into it like a fitted room. Good people built it. That is what made it unbearable.\" The eyes come up. \"I did not drift away from anything bad. I drifted from a GOOD life that was not mine, which is harder to explain, so mostly I let people assume a tragedy. You get the true version. Spend it wisely.\""
+     ]
+    },
+    {
      "id": "c_wronged",
      "label": "Try to make it right",
      "gate": {
@@ -2586,6 +3336,26 @@
      },
      "lines": [
       "\"I have found people.\" Flat, no drama. \"Four. You do not report it, because reporting it means the site closes and the site is what you eat. I have made my peace with that and I would rather you did not ask me to explain it.\""
+     ]
+    },
+    {
+     "id": "cls_scav_rules",
+     "label": "Ask the rules of the trade",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Three rules, and the third one sorts us from the ghouls.\" The scavenger counts them off. \"One: never work a site somebody is coming back to — a hidden cache is PROPERTY, and you can tell hidden from lost if you bother looking. Two: leave the doors closed that you find closed, until you have listened. Three:\" a beat \"— anything with a name on it gets carried out and passed to their people if their people can be found. Coin costs a detour sometimes. The ghouls skip rule three. We do not drink with ghouls.\""
+     ]
+    },
+    {
+     "id": "cls_scav_found",
+     "label": "Ask about the find they did not sell",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "The scavenger goes quiet in a way the trade does not usually allow. \"A child's boot, in a drowned attic, set on a windowsill facing out. Just one. Placed, not dropped — somebody put it where it could see the road.\" The hands open, empty. \"There was salvage in that attic worth a month. I took nothing. Closed the door, listened, left. Some rooms are not sites. Some rooms are still WAITING, and you do not sell out of a room that is waiting.\""
      ]
     },
     {
@@ -2631,6 +3401,26 @@
      ]
     },
     {
+     "id": "cls_roadside_pitch",
+     "label": "Ask why they trade out here",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Because out here I am the only shop in the world.\" The trader grins at their own arithmetic. \"In a settlement I am one stall among twenty. On this stretch of road I am civilization ITSELF for half a day's walk in both directions. The mark-up is not greed, it is geography.\" The grin softens a notch. \"Also — and do not spread this — somebody should be out here. The road is long. A fire and a fair-enough price change what the road IS.\""
+     ]
+    },
+    {
+     "id": "cls_roadside_seen",
+     "label": "Ask what passes when nobody is watching",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "The trader banks the fire down a little, which is what they do instead of lowering their voice. \"Night traffic. Not much, but steady — and night walkers fall in two kinds. The ones who stop at my fire are just late. The ones who pass a lit fire at a walking pace, no hail, no look —\" a slow headshake \"— those I count. Four this season. All heading the same direction, all carrying nothing, all walking like the dark was daylight. I sell to everyone, but I did not call out to those, and I bank the fire earlier than I used to.\""
+     ]
+    },
+    {
      "id": "c_wronged",
      "label": "Try to make it right",
      "gate": {
@@ -2670,6 +3460,26 @@
      },
      "lines": [
       "\"I have done this walk before, with somebody else.\" A pause. \"Not everybody who set out that time arrived. I am not telling you that to be grim. I am telling you because you keep checking behind us and I want you to know I have noticed and I am grateful.\""
+     ]
+    },
+    {
+     "id": "cls_escort_road",
+     "label": "Ask how they ended up out here",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"The usual story, which is that there is no usual story.\" They walk a few paces before finishing it. \"A plan that was sound when I made it. A road that had other opinions. And then you, which I am still deciding whether to call luck.\" A quick glance, almost a smile. \"It is luck. Do not let it go to your head. Keep walking.\""
+     ]
+    },
+    {
+     "id": "cls_escort_after",
+     "label": "Ask what they will do when they are safe",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "\"Safe.\" They say the word carefully, like checking a rope before trusting it. \"First: a door with a bar on it, and a night of sleep so deep it should be measured in fathoms. Then —\" the voice steadies into something real \"— then I owe somebody a letter I have been composing since the second day out. If this road has taught me one thing worth carrying, it is that the letters you are 'going to write' are a graveyard. I have watched what happens to unsent things out here. Mine gets SENT.\""
      ]
     },
     {
@@ -2715,6 +3525,26 @@
      ]
     },
     {
+     "id": "cls_guardian_watch",
+     "label": "Ask what it guards against",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "The Guardian's answer arrives with the patience of masonry. \"YOU MISTAKE THE FACING OF THE DOOR. I WAS NOT SET TO KEEP THE WORLD FROM THE DEEP PLACES.\" A long resonance, almost consideration. \"I WAS SET TO KEEP FAITH WITH AN INSTRUCTION WHOSE GIVERS ARE GONE. THE INSTRUCTION REMAINS. I REMAIN. WHETHER ANYTHING REMAINS BELOW THAT REQUIRES KEEPING — THAT KNOWLEDGE WAS NOT ISSUED TO ME. I HAVE ELECTED NOT TO CHECK.\""
+     ]
+    },
+    {
+     "id": "cls_guardian_alone",
+     "label": "Ask what the centuries were like",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "The great head turns, and the sound it makes thinking is the sound of a hillside settling. \"THE FIRST CENTURY WAS DUTY. THE SECOND WAS HABIT. I WILL NOT NUMBER THE ONES AFTER — THEY WERE WEATHER.\" A pause deeper than the others. \"THEN A SMALL LOUD THING CAME ASKING QUESTIONS, AND I FIND THE ANSWERS ARRIVE EAGERLY, AS IF THEY HAD BEEN WAITING IN FORMATION. I DO NOT HAVE A WORD FOR THIS CONDITION. IF YOU LEARN IT, BRING IT. I WILL WAIT. WAITING IS THE THING I AM BEST AT.\""
+     ]
+    },
+    {
      "id": "c_wronged",
      "label": "Try to say something",
      "gate": {
@@ -2754,6 +3584,26 @@
      },
      "lines": [
       "\"You can see the pattern from here.\" They gesture at the flats below without looking. \"The settlements. They are not scattered. They are on a line, and the line does not follow the ground. I have stopped pointing it out to people who come up, because they look and they do not see it and then they look at me.\""
+     ]
+    },
+    {
+     "id": "cls_overlay_up",
+     "label": "Ask what trading up here is like",
+     "gate": {
+      "minRegard": "familiar"
+     },
+     "lines": [
+      "\"Cold, thin, and honest.\" The trader tightens a guy-line out of pure habit. \"Nobody hauls goods up HERE on a whim — every item at this altitude earned its carry twice. Down below you haggle over wants. Up here everything on the blanket is a NEED that got this far.\" A gesture at the drop below. \"Best customers in Tartaria, climbers. Nobody argues the price of rope while they are looking at the reason for rope.\""
+     ]
+    },
+    {
+     "id": "cls_overlay_seen",
+     "label": "Ask what they have seen from this height",
+     "gate": {
+      "minRegard": "trusted"
+     },
+     "lines": [
+      "The trader looks out instead of answering, and for a while you both just stand in the wind. \"Lights, some nights, out on the flats where nothing is. Weather moving against the wind. Once — once — something big enough to have a shadow, between me and the moon, and no wings that I could name.\" They turn back to the blanket, entirely calm. \"The height does not show you more of the world. It shows you how much of it was going on over your head the whole time. I sleep better up here KNOWING than I did below, guessing. Blanket's open. Buy something warm.\""
      ]
     },
     {
