@@ -204,6 +204,27 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
     // spot death-spiral / runaway-stamina behavior.
     const hpSamples: number[] = [];
     const staminaSamples: number[] = [];
+    // OTA-1087 — STALL COMPOSITION + TIME-TO-KILL telemetry (Workstream A:
+    // fights that end). The 25-round guard has been tripping at ~4.7% and the
+    // report only said HOW MANY stalled, never WHICH matchups or WHY. Every
+    // stall now records the enemy signature, the player's hands, and how many
+    // combat lines were resisted; every kill records its round count per
+    // enemy. The report prints both tables so the retier pass (OTA-1089)
+    // works a named list instead of a feeling. Log scanning is by entry ID
+    // (the sim trims gameLog to 40 per turn, so length offsets lie).
+    const stallDetails: Array<{ enemies: string; resisted: number; combatLines: number; main: string; off: string }> = [];
+    const killRounds: Record<string, number[]> = {};
+    let encResisted = 0;
+    let encCombatLines = 0;
+    let seenCombatIds = new Set<string>();
+    const scanCombatLog = (): void => {
+      for (const e of store.getState().gameLog) {
+        if (e.channel !== 'combat' || seenCombatIds.has(e.id)) continue;
+        seenCombatIds.add(e.id);
+        encCombatLines++;
+        if (e.text.includes('(resisted,')) encResisted++;
+      }
+    };
 
     // ── Helpers ─────────────────────────────────────────────────────
 
@@ -512,11 +533,27 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
       if (encSig !== lastEncounterSig) {
         lastEncounterSig = encSig;
         combatRoundsInEncounter = 0;
+        // OTA-1087 — fresh composition window for the new membership.
+        encResisted = 0;
+        encCombatLines = 0;
+        seenCombatIds = new Set<string>();
       }
       combatRoundsInEncounter++;
       // Stall guard: every encounter must resolve in ≤25 rounds.
       if (combatRoundsInEncounter > 25) {
         stalled++;
+        // OTA-1087 — name the matchup before force-ending it.
+        scanCombatLog();
+        {
+          const eqp = store.getState().player?.equipped;
+          stallDetails.push({
+            enemies: encSig,
+            resisted: encResisted,
+            combatLines: encCombatLines,
+            main: eqp?.main ?? '(bare hands)',
+            off: eqp?.off ?? '-',
+          });
+        }
         // Force-end the encounter by clearing the enemy from the
         // scene so the next loop iteration treats it as a peaceful
         // tick. We count this as a "fled" outcome for stats.
@@ -620,6 +657,7 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
       submit(action, verb);
       diffStatuses();
       recordStatusSnapshot();
+      scanCombatLog(); // OTA-1087 — fold this action's combat lines into the window
 
       // Verify the defensive verb produced its status. OTA — dodge was
       // REDESIGNED (the dodge-dominance tuning): it resolves an immediate
@@ -646,6 +684,8 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
       const defeatedNow = snapshotMilestones();
       if (defeatedNow > prevDefeatedSnap) {
         wins++;
+        // OTA-1087 — time-to-kill per matchup, for the retier target list.
+        (killRounds[encSig] ??= []).push(combatRoundsInEncounter);
         prevDefeated = defeatedNow;
         recordLootGrant(prevInvSize);
         lootDropsCounted++;
@@ -714,6 +754,30 @@ ${(['dodge', 'block', 'take_cover'] as const)
 ${Object.entries(rangeBandsSeen).map(([k, v]) => `  ${k}: ${v}`).join('\n') || '(none)'}
 Advances issued:      ${advanceCount.v}
 Retreats issued:      ${retreatCount.v}
+
+── OTA-1087 · stalled matchups (enemy | count | avg resisted-line share | hands) ──
+${(() => {
+  if (stallDetails.length === 0) return '  (none stalled)';
+  const g = new Map<string, { n: number; res: number; lines: number; hands: Set<string> }>();
+  for (const d of stallDetails) {
+    const e = g.get(d.enemies) ?? { n: 0, res: 0, lines: 0, hands: new Set<string>() };
+    e.n++; e.res += d.resisted; e.lines += d.combatLines; e.hands.add(`${d.main}/${d.off}`);
+    g.set(d.enemies, e);
+  }
+  return [...g.entries()].sort((a, b) => b[1].n - a[1].n)
+    .map(([k, v]) => `  ${k.padEnd(34)} x${v.n}  resisted ${(v.lines ? (100 * v.res / v.lines) : 0).toFixed(0)}% of combat lines  [${[...v.hands].join(' | ')}]`)
+    .join('\n');
+})()}
+
+── OTA-1087 · slowest kills (avg rounds to kill, min 3 kills) ──
+${(() => {
+  const rows = Object.entries(killRounds)
+    .filter(([, r]) => r.length >= 3)
+    .map(([k, r]) => ({ k, avg: r.reduce((a, b) => a + b, 0) / r.length, n: r.length, max: Math.max(...r) }))
+    .sort((a, b) => b.avg - a.avg)
+    .slice(0, 14);
+  return rows.map((r) => `  ${r.k.padEnd(34)} avg ${r.avg.toFixed(1)}  max ${r.max}  (${r.n} kills)`).join('\n') || '  (insufficient data)';
+})()}
 
 ── Status effects ──
 Applied:    ${Object.entries(statusApplied).map(([k, v]) => `${k}=${v}`).join(', ') || '(none)'}

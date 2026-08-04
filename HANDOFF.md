@@ -923,9 +923,23 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.20**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.21**; ledger in `VERSION.md`.
 
-- **SIX FROM THE LOG (2026-08-04, latest). BOTH LINES.** HAL OTA-1109 /
+- **NAME THE SLOG (2026-08-04, latest). BOTH LINES.** HAL OTA-1110 /
+  golem OTA-1087. Workstream A ("fights that end") step 1 — test-only
+  instrumentation in combatStress: per-stall composition (enemy sig,
+  hands, resisted-line share) + rounds-to-kill per matchup, two new
+  report tables. VERDICT: sim stalls are 4-5 member faction packs at
+  0-5% resisted lines with 844 stuns/run — pack stun-chaining, not
+  resistance. The device-side resist slog (solo big-HP Uncommon vs a
+  fully-resisted kit) is separate. Fix splits: OTA-1111/1088
+  guard-crack (3 landed resisted hits of a type breaks that resist for
+  the fight, owner-approved) + min damage floor 2 + first-resist
+  weakness advice; OTA-1112/1089 anti-stun-lock + pack math retier.
+  Heavy suite stays red on its 2.5% guard until the retier re-baselines
+  it legitimately.
+
+- **SIX FROM THE LOG (2026-08-04). BOTH LINES.** HAL OTA-1109 /
   golem OTA-1086. Owner: *"fix all six bugs, ship to all three lines."*
   (1) `spawn_enemy_name` hook effect — mud_golem_stir raises a real Mud
   Golem instead of tag-rolling an Aetheric Scarab; the spawn line matches

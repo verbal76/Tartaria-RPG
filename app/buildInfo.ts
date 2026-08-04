@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.20';
+export const DISPLAY_VERSION = '4.29.21';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19842,7 +19842,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Test: ota1086SixFromTheLog.test.ts (18 tests); ota1015 stealth-title
 // source lock retargeted to the one-roll wiring.
 // DISPLAY_VERSION 4.29.20.
-export const OTA_BUILD_ID = '2026-08-04-1086-six-from-the-log';
+//
+// OTA-1087 — WORKSTREAM A, STEP 1: NAME THE SLOG (twin of HAL OTA-1110).
+// Test-only combatStress instrumentation: per-stall composition (enemy
+// signature, hands, resisted-line share) + rounds-to-kill per matchup,
+// two new report tables. First run's verdict on HAL overturned the
+// resist hypothesis for the sim: stalls are 4-5 member faction packs at
+// 0-5% resisted lines with 844 stuns/run — pack stun-chaining, not
+// resistance. The device-side resist slog is a separate disease. Fix
+// splits: OTA-1111/1088 guard-crack + damage floor (owner-approved),
+// OTA-1112/1089 anti-stun-lock + pack math. No app code; the fast gate
+// is untouched by construction.
+// DISPLAY_VERSION 4.29.21.
+export const OTA_BUILD_ID = '2026-08-04-1087-name-the-slog';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1086-six-from-the-log';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1085-ledger-explains-itself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1084-qwen-watchdog-backoff';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1083-gift-economy';
