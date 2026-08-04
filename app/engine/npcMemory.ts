@@ -293,7 +293,11 @@ export function recordNpcDealing(
   id: string,
   patch: Partial<Pick<NpcRelation, 'trades' | 'tcTraded' | 'contractsTaken' | 'contractsTurnedIn' | 'wrongs'
     /** OTA-1081 — clean lifts and mumbles delivered; see the NpcRelation fields. */
-    | 'pocketsLifted' | 'pocketsMumbled'>>
+    | 'pocketsLifted' | 'pocketsMumbled'
+    /** OTA-1086 — hour-stamp of the newest raid they've told the player about
+     *  (max-merged, not incremented). Gates raidNewsFor so a sacking is news
+     *  exactly once per person. */
+    | 'raidHeardAtHours'>>
     /** OTA-1055 — TC the player SPENT here, which is the only kind that can pay
      *  a debt. `tcTraded` counts business in both directions, so inferring
      *  amends from it meant SELLING to someone you robbed settled the debt AND
@@ -313,6 +317,11 @@ export function recordNpcDealing(
     // OTA-1081 — the mumble ledger. Increment-only, like every other dealing.
     pocketsLifted: (prev.pocketsLifted ?? 0) + (patch.pocketsLifted ?? 0),
     pocketsMumbled: (prev.pocketsMumbled ?? 0) + (patch.pocketsMumbled ?? 0),
+    // OTA-1086 — a STAMP, not a counter: keep the newest raid hour they've
+    // reported. Max-merge so a stale caller can never un-tell a newer raid.
+    raidHeardAtHours: patch.raidHeardAtHours !== undefined
+      ? Math.max(prev.raidHeardAtHours ?? 0, patch.raidHeardAtHours)
+      : prev.raidHeardAtHours,
   };
   // OTA-1053 — RESTITUTION. Coin that crosses the table of somebody you were
   // caught stealing from is banked as amends; enough of it buys one wrong back.
@@ -430,8 +439,14 @@ export function raidNewsFor(
   // ignored, so a raid stamped in the future would still have qualified. It
   // cannot happen today (atHours comes off the same player clock), but a
   // silently unused parameter is a hole waiting for the next caller.
+  // OTA-1086 — "since they last saw you" was the WRONG gate for repeat
+  // suppression: quick room-hops don't advance prevSeenHours, so the same
+  // sacking was re-told on every re-entry (Tarek, four visits in a row).
+  // Told-ness is now recorded on the relation (raidHeardAtHours, stamped by
+  // the caller when the line is delivered) and only NEWER raids qualify.
+  const alreadyTold = rel.raidHeardAtHours ?? -1;
   const mine = (memory.recentRaids ?? []).filter(
-    (r) => r.defenderId === rel.factionId && r.atHours > since && r.atHours <= hoursNow,
+    (r) => r.defenderId === rel.factionId && r.atHours > since && r.atHours <= hoursNow && r.atHours > alreadyTold,
   );
   if (mine.length === 0) return null;
   // OTA-1055 — the locationId tie-break below is BELT AND BRACES, not a live

@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.19';
+export const DISPLAY_VERSION = '4.29.20';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19819,7 +19819,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // writer now skips Core Guardians; the guardian's dedicated record wins.
 // Test: ota1085LedgerExplainsItself.test.ts.
 // DISPLAY_VERSION 4.29.19.
-export const OTA_BUILD_ID = '2026-08-03-1085-ledger-explains-itself';
+//
+// OTA-1086 — SIX FROM THE LOG (twin of HAL OTA-1109). Owner: "fix all six
+// bugs, ship to all three lines." All six came out of the 11-part
+// device-log triage:
+// (1) THE GOLEM THAT WAS A BEETLE — mud_golem_stir narrated a golem and
+//     spawn_enemy_tag 'Construct' rolled an Aetheric Scarab. New hook
+//     effect spawn_enemy_name: the hook raises a real Mud Golem, and the
+//     spawn line stops claiming close range over a state of 'mid'.
+// (2) ONE KEYWORD PER CONTRACT — acceptKeyword is collision-aware; the
+//     four hint sites at a counter share a per-visit set (Irma's
+//     'accept vigil' pair → 'kindling' / 'giant-watch').
+// (3) THE FORGE STOPS NAMING ITS PRODUCT AFTER AN INGREDIENT — the Qwen
+//     namer rejects any input's name and any curio-catalog name
+//     ("Hollow Quill Sheaf"); the deterministic name stands.
+// (4) A RAID IS NEWS ONCE — delivery stamped on the relation
+//     (raidHeardAtHours, max-merged); both greeting paths stamp.
+// (5) SET-PIECES DON'T REPLAY BACK-TO-BACK — the travel picker excludes
+//     the last RECENT_ENCOUNTER_MEMORY (8) encounter archetypes.
+// (6) ONE BUTTON, ONE ROLL — in-combat sneak is decided by the visible
+//     gate roll; the engaged reset contests skill.total, no hidden d20.
+// Test: ota1086SixFromTheLog.test.ts (18 tests); ota1015 stealth-title
+// source lock retargeted to the one-roll wiring.
+// DISPLAY_VERSION 4.29.20.
+export const OTA_BUILD_ID = '2026-08-04-1086-six-from-the-log';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1085-ledger-explains-itself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1084-qwen-watchdog-backoff';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1083-gift-economy';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1082-vendor-dismiss-closes-talk';

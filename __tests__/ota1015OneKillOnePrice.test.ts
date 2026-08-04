@@ -153,7 +153,13 @@ describe('OTA-1015 — SOURCE LOCKS (category: one event, one price; promises ar
   });
 
   it('the stealth title rides the deciding contest, not just the gate', () => {
-    expect(src).toMatch(/const steBonus = ste \+ stealthTitleBonus;/);
+    // OTA-1086 — the handler no longer rolls its own player d20 at all, so
+    // there is no second roll for the title bonus to miss: the gate roll
+    // (skill.total — STE + title folded in by buildSkillSteps) IS the sneak,
+    // and the engaged reset contests that same total. The OTA-1015 claim
+    // (title rides the deciding contest) holds by construction now.
+    expect(src).toMatch(/const pInit = \(skill\.total \?\? 0\) \+ 2 \+ timeBonus;/);
+    expect(src).toMatch(/stealth: opener carried by the skill roll/);
     expect(src).not.toMatch(/const steBonus = ste;/);
   });
 

@@ -923,9 +923,27 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.19**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.20**; ledger in `VERSION.md`.
 
-- **THE LEDGER EXPLAINS ITSELF (2026-08-03, latest). BOTH LINES.** HAL
+- **SIX FROM THE LOG (2026-08-04, latest). BOTH LINES.** HAL OTA-1109 /
+  golem OTA-1086. Owner: *"fix all six bugs, ship to all three lines."*
+  (1) `spawn_enemy_name` hook effect — mud_golem_stir raises a real Mud
+  Golem instead of tag-rolling an Aetheric Scarab; the spawn line matches
+  the mid-range state. (2) `acceptKeyword(title, taken)` — the four hint
+  sites at a counter share a per-visit set so two contracts never share
+  'accept X' (Irma's vigil pair → 'kindling' / 'giant-watch'; interior
+  hyphens kept for the fuzzy matcher). (3) The Qwen forge-namer rejects
+  input-echo and curio-catalog names ("Hollow Quill Sheaf"); deterministic
+  name stands. (4) Raid news stamped on the relation (`raidHeardAtHours`,
+  max-merged in recordNpcDealing; both greeting paths stamp) — told once.
+  (5) Travel picker excludes the last `RECENT_ENCOUNTER_MEMORY` (8)
+  archetypes (`worldMemory.recentEncounterArchetypes`); full-pool fallback,
+  directional finds bypass. (6) In-combat sneak is ONE roll: the opener is
+  carried by the visible gate roll, the engaged reset contests
+  `skill.total + 2 + timeBonus` vs the enemy's fresh die. Test:
+  `ota1086SixFromTheLog.test.ts`.
+
+- **THE LEDGER EXPLAINS ITSELF (2026-08-03). BOTH LINES.** HAL
   OTA-1108 / golem OTA-1085. Two owner reports off the Character screen.
   (1) The Arbiter regard row *"1 answer he was standing there for -5"*
   named nothing — it was the Phase-3 fork-regard aggregate. `regardParts`
