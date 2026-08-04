@@ -70,7 +70,7 @@ export function traitDefenses(
 export function traitDamageMultiplier(
   traits: readonly string[] | undefined,
   weaponDamageType: string | null | undefined,
-): { multiplier: number; match: 'resist' | 'vulnerable' | 'normal' } {
+): { multiplier: number; match: 'resist' | 'vulnerable' | 'normal' | 'inured' } {
   if (!traits || !weaponDamageType) return { multiplier: 1, match: 'normal' };
   // OTA-827 [Group-K] — canonicalize both sides through the shared alias table so
   // a `force` weapon matches a `resist:aetheric` trait and a `frost` weapon matches
@@ -82,6 +82,14 @@ export function traitDamageMultiplier(
     if (!arg) continue;
     if (key === 'resist' && canonicalDamageType(arg) === wt) return { multiplier: 0.5, match: 'resist' };
     if (key === 'vulnerable' && canonicalDamageType(arg) === wt) return { multiplier: 1.5, match: 'vulnerable' };
+    // ⚠ OTA-1093 — `inured:<type>` CANCELS this individual's kind-wide WEAKNESS
+    // to that type. It does NOT make the hit worse; it makes it ordinary. See
+    // combineDamageTypeMatch, and randomizeEnemyDefense which is the only thing
+    // that stamps it. The distinction is the whole point of this OTA: the
+    // per-spawn profiler used to write `resist:` here, which INVERTED a kind's
+    // softness into armour — a man in a leather vest shrugging off a crossbow
+    // bolt at ×0.5 (owner's device log, 2026-08-04).
+    if (key === 'inured' && canonicalDamageType(arg) === wt) return { multiplier: 1, match: 'inured' };
   }
   return { multiplier: 1, match: 'normal' };
 }
@@ -99,8 +107,19 @@ export function traitDamageMultiplier(
  *  deliberate override, so on a DISCORD the trait wins; otherwise stack. */
 export function combineDamageTypeMatch(
   typeMatch: 'weak' | 'resist' | 'normal',
-  traitMatch: 'resist' | 'vulnerable' | 'normal',
+  traitMatch: 'resist' | 'vulnerable' | 'normal' | 'inured',
 ): { multiplier: number; match: 'weak' | 'resist' | 'normal' } {
+  // OTA-1093 — `inured` is a CANCELLATION, not a direction, so it resolves
+  // before the stack/discord math: whatever the type table says, this
+  // individual takes that type as an ordinary hit. It can only ever cancel a
+  // WEAKNESS — an inured trait on a type the kind already resists leaves the
+  // kind's armour alone (you cannot be "used to" something that was never
+  // soft), which keeps Constructs from being talked out of their plating.
+  if (traitMatch === 'inured') {
+    return typeMatch === 'weak'
+      ? { multiplier: 1, match: 'normal' }
+      : { multiplier: typeMatch === 'resist' ? 0.5 : 1, match: typeMatch };
+  }
   const typeMult = typeMatch === 'weak' ? 1.5 : typeMatch === 'resist' ? 0.5 : 1;
   const traitMult = traitMatch === 'vulnerable' ? 1.5 : traitMatch === 'resist' ? 0.5 : 1;
   const typeDir = typeMatch === 'weak' ? 1 : typeMatch === 'resist' ? -1 : 0;

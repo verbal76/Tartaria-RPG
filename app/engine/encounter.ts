@@ -169,11 +169,24 @@ export function randomizeEnemyDefense(enemy: Enemy, rng: () => number = Math.ran
   const pick = (arr: readonly string[]) => arr[Math.floor(rng() * arr.length)];
   const newWeak = pick(pool.weak) ?? 'slashing';
   const softResist = pool.resist.length ? pick(pool.resist.filter((r) => r !== newWeak)) : undefined;
-  // Neutralize the type-map's DEFAULT weaknesses (bar the rolled one) so the old fixed
-  // answer doesn't still work — a resist trait wins the discord vs a type weak.
+  // Neutralize the type-map's DEFAULT weaknesses (bar the rolled one) so the old
+  // fixed answer doesn't still work.
+  //
+  // ⚠ OTA-1093 — THIS WRITES `inured:`, NOT `resist:`. `resist:` does not
+  // neutralize a weakness, it INVERTS it. A Human is weak to four types
+  // (piercing, slashing, poison, corruption); this loop rolled one to keep and
+  // turned the other three into ×0.5 armour, so every human in the game
+  // resisted three of the four things humans are meant to be soft to. The owner
+  // met it head-on (device log 2026-08-04): a Reclaimer Ambusher — a man in a
+  // salvage vest — shrugging off crossbow bolts at ×0.5, while the Arbiter
+  // correctly pointed at slashing, the one weakness left standing. `inured:`
+  // means "this one is not as soft here as its kind usually is" and lands the
+  // hit NORMALLY, which is what neutralize was always supposed to mean. The
+  // variety intent is untouched: one rolled weakness still stands out, and the
+  // wall roll below still stacks REAL armour where the kind already had some.
   const map = enemyTypeDefenses(enemy.type);
   for (const w of map.weak) {
-    if (w !== newWeak && !traits.includes(`resist:${w}`)) traits.push(`resist:${w}`);
+    if (w !== newWeak && !traits.includes(`inured:${w}`)) traits.push(`inured:${w}`);
   }
   if (!traits.includes(`vulnerable:${newWeak}`)) traits.push(`vulnerable:${newWeak}`);
   if (softResist && softResist !== newWeak && !traits.includes(`resist:${softResist}`)) traits.push(`resist:${softResist}`);

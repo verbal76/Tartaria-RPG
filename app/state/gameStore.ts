@@ -933,19 +933,40 @@ function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameSto
   if (toAnnounce.length > 0) {
     setStore((s) => ({ worldMemory: { ...s.worldMemory, earnedTitleAnnounced: [...announced, ...toAnnounce] } }));
   }
-  for (const id of toAnnounce) {
-    const meta = ARBITER_TITLE_META[id];
-    if (!meta) continue;
+  // ⚠ OTA-1093 — ONE NAME AT A TIME. Two titles landing in the same beat gave
+  // the owner back-to-back "You have earned a name to carry" banners mid-fight
+  // (Aetherbound Survivor + Stormcaller, device log 2026-08-04) — the same
+  // pile-up OTA-1036 fixed for reward lines. A title is a moment; two moments
+  // stacked read as one long block of text nobody parses. The first is spoken
+  // now with its full honest perk; the rest are folded into one following line
+  // that NAMES them, so nothing is hidden — it just stops shouting.
+  // Keep the id alongside the meta — the honest-perk lookup below is keyed by
+  // id, and a `.filter(Boolean)` does not narrow the meta type on its own.
+  const spoken = toAnnounce
+    .map((id) => ({ id, meta: ARBITER_TITLE_META[id] }))
+    .filter((e): e is { id: string; meta: NonNullable<typeof e.meta> } => !!e.meta);
+  const first = spoken[0];
+  if (first) {
+    const firstId = first.id;
     // OTA-353 — announce the HONEST passive effect, not the canon
     // arbiter-titles.json "Once per day…" flavor. The engine implements these
     // as always-on passives (and several now grant +Stealth, OTA-350); the
     // earn message used to promise a daily active that doesn't exist. The
     // Character screen already shows TITLE_PASSIVE_PERK — match it here.
-    const honest: string = (TITLE_PASSIVE_PERK as Record<string, string>)[id] ?? meta.perk;
+    const honest: string = (TITLE_PASSIVE_PERK as Record<string, string>)[firstId] ?? first.meta.perk;
     getStore().appendLog(
       'arbiter',
-      `The Arbiter studies you a long moment. "You have earned a name to carry: ${meta.title}. ${honest}"`,
+      `The Arbiter studies you a long moment. "You have earned a name to carry: ${first.meta.title}. ${honest}"`,
     );
+    const rest = spoken.slice(1);
+    if (rest.length > 0) {
+      getStore().appendLog(
+        'arbiter',
+        rest.length === 1
+          ? `"And a second, in the same breath: ${rest[0]!.meta.title}. Read them on your sheet when the dust settles."`
+          : `"And ${rest.length} more in the same breath: ${rest.map((m) => m.meta.title).join(', ')}. Read them on your sheet when the dust settles."`,
+      );
+    }
   }
 }
 
@@ -6162,6 +6183,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!g?.toId || !g.toName || !player) return;
     const item = player.inventory.find((i) => i.id === itemId);
     if (!item) return;
+    // ⚠ OTA-1093 — YOU CANNOT GIVE AWAY WHAT YOU ARE WEARING. giveGift
+    // decremented the inventory row and never looked at `equipped`, so gifting
+    // a worn piece left the slot naming an instance that no longer existed — a
+    // ghost item on the sheet, and its id dangling for every consumer that
+    // resolves gear by instance. Refuse it and say which slot, rather than
+    // silently unequipping: taking somebody's armour off as a side effect of a
+    // social action is exactly the kind of thing OTA-977 was written against.
+    const wornSlot = ARMOR_SLOTS.find((sl) => player.equipped?.[sl] === item.name)
+      ?? (player.equipped?.main === item.name ? 'main'
+        : player.equipped?.off === item.name ? 'off' : null);
+    if (wornSlot) {
+      get().appendLog(
+        'system',
+        `You are still wearing the ${item.name} (${wornSlot}). Take it off first if you mean to give it away.`,
+      );
+      set({ pendingGift: null });
+      return;
+    }
     const rel = getRelation(get().worldMemory, g.toId);
     // ⚠ OTA-1064 — NO ROW, NO GIFT. The accept path writes the memory inside a
     // `prev ? ... : st.worldMemory` branch but decrements the inventory outside
@@ -32966,8 +33005,18 @@ export function runEnemyGroupCounters(
     // blades fit around one person at a time. A 5-raider wall was five attack
     // rolls and five stun rolls a round — more dice than drama (and the sim's
     // whole stall tail). The overflow presses in behind, one line, dedup-quiet.
-    // Bosses and ranged enemies are exempt (a shooter needs no elbow room).
-    const meleeAttacker = !enemy.boss && !isRangedEnemy(enemy);
+    //
+    // ⚠ OTA-1093 — THE EXEMPTION IS NOW RANGE-AWARE. 1112 exempted every ranged
+    // enemy outright, reasoning that "a shooter needs no elbow room". True at
+    // far; false in a scrum. The owner's five-raider fight was MIXED — two
+    // crossbow bodies, three cudgel — so only the cudgels counted, the cap never
+    // engaged, and he still ate four attacks a round at arm's reach. A shooter
+    // standing INSIDE the ring is jostling for the same space as everyone else,
+    // so at close range it takes a slot like any other body. Bosses stay exempt
+    // at every band; ranged enemies keep their exemption at mid and beyond,
+    // which is the case the reasoning was actually about.
+    const inTheScrum = (liveScene.range ?? 'close') === 'close';
+    const meleeAttacker = !enemy.boss && (inTheScrum || !isRangedEnemy(enemy));
     if (meleeAttacker && meleeSwings >= MELEE_PACK_SWINGS_PER_ROUND) {
       crowdedOut.push(enemy.name);
       continue;

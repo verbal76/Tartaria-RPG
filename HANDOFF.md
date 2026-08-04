@@ -923,9 +923,35 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.26**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.27**; ledger in `VERSION.md`.
 
-- **THE SECONDARY CAST (2026-08-04, latest). BOTH LINES.** golem
+- **FIVE FROM THE DEVICE LOG (2026-08-04, latest). BOTH LINES.** golem
+  OTA-1093 / HAL OTA-1116. From the owner's Pixel log on 4.29.26.
+  (1) **A CORRECTION TO THE FIRST TRIAGE** — the raid builder was NOT
+  dressing a non-human body; the raiders were human.
+  `randomizeEnemyDefense` "neutralized" a kind's unrolled weaknesses by
+  writing `resist:<type>`, which INVERTS softness into armour: a Human
+  is weak to four types, so three became ×0.5 on every spawn and a man
+  in a salvage vest shrugged off crossbow bolts (the Arbiter meanwhile
+  correctly pointed at slashing, the one weakness left standing). New
+  third trait state `inured:<type>` in enemyTraits.ts — cancels a
+  kind-wide weakness to NORMAL, never below it, and never softens a type
+  the kind already resists, so Constructs keep their plating. (2) The
+  pack swing cap is RANGE-AWARE: the owner's five-raider fight was mixed
+  (two crossbow, three cudgel) so the cap never engaged and he ate four
+  attacks a round at arm's reach; a shooter in the scrum now takes a
+  slot, ranged keeps the exemption at mid+. (3) `combatEnemyLabel` keeps
+  case when the enemy carries a factionId. (4) `giveGift` refuses a worn
+  piece and names the slot. (5) Two titles in one beat speak once, then
+  name the rest. **Deliberately NOT included:** the 29s Qwen generation
+  — it gets per-intent timing first rather than a blind budget cut.
+  Suite `ota1093FromTheDeviceLog` (9 tests); the 1089 pack-cap source
+  lock retargeted to the range-aware line. NEXT: the owner-approved
+  sheet-collapse rework (talk/gift/pickpocket collapse to a breadcrumb
+  bar on tap, tap-or-swipe to reopen, unasked-first sort, scroll memory)
+  plus equipped-first sorting in every armour/weapon list.
+
+- **THE SECONDARY CAST (2026-08-04). BOTH LINES.** golem
   OTA-1092 / HAL OTA-1115. Workstream B step 3 — data-only, closing the
   production audit's dialogue-thinness finding. The 21 secondary named
   NPCs each drew one known + one familiar + one trusted topic from
