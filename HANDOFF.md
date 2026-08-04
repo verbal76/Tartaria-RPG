@@ -923,9 +923,27 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.17**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.18**; ledger in `VERSION.md`.
 
-- **THE GIFT ECONOMY (2026-08-03, latest). BOTH LINES.** HAL OTA-1106 /
+- **THE LOG-EXPORT REINIT LOOP (2026-08-03, latest). BOTH LINES.** HAL
+  OTA-1107 / golem OTA-1084. The owner's 11-part device log ends with the
+  Qwen watchdog burning 10+ reinit attempts in 64s, status 'idle' every
+  time: exporting chunks bounces the app (copy → switch away to paste →
+  return); every switch-away disposes the ~400MB context, every return let
+  the OTA-1032 5s recovering cadence kick a fresh full context load that
+  the next bounce killed. Two engine defects compounded it —
+  `forceReinitialize()` reset status BEFORE `initialize()` (defeating the
+  already-loading guard, letting concurrent loads STACK), and a load
+  interrupted by `dispose()` still installed itself 'ready' behind a
+  backgrounded app. Four locks: watchdog kicks only while
+  `AppState.currentState` is active (held stretches logged once);
+  exponential backoff after `QWEN_WATCHDOG_FREE_RETRIES` (4) up to the
+  healthy 60s, reset by recovery or a fresh foreground; engine
+  `initInFlight` (joiners share one load); engine `lifecycleGen` (stale
+  loads tear their context down and stay 'idle'). Test:
+  `ota1084QwenWatchdogBackoff.test.ts`; ota1032 source locks retargeted.
+
+- **THE GIFT ECONOMY (2026-08-03). BOTH LINES.** HAL OTA-1106 /
   golem OTA-1083. Owner: *"do all three."* (1) THE FENCE: sketchy traders
   buy stolen goods at `FENCE_STOLEN_CUT` (40%) of the honest sell-back —
   "no questions asked, and none answered"; honest/hub keep the refusal.

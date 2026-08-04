@@ -93,10 +93,11 @@ describe('OTA-1032 — SOURCE LOCKS', () => {
     expect(store).toMatch(/QWEN_WATCHDOG_RECOVERING_MS = 5_000/);
     // The fixed-interval loop is gone; health drives the next delay.
     expect(store).not.toMatch(/QWEN_WATCHDOG_INTERVAL_MS/);
-    expect(store).toMatch(/schedule\(healthy \? QWEN_WATCHDOG_HEALTHY_MS : QWEN_WATCHDOG_RECOVERING_MS\)/);
+    // OTA-1084 — the recovering delay now runs through the backoff ladder.
+    expect(store).toMatch(/schedule\(healthy \? QWEN_WATCHDOG_HEALTHY_MS : qwenRecoveringDelayMs\(\)\)/);
     // Dormancy is caused by backgrounding, so the return to foreground checks.
     expect(store).toMatch(/AppState\.addEventListener\('change'/);
-    expect(store).toMatch(/if \(next === 'active'\) tick\(\);/);
+    expect(store).toMatch(/if \(next === 'active'\) \{ qwenBackoffLevel = 0; tick\(\); \}/);
   });
 
   it('the health check reports health rather than just returning', () => {

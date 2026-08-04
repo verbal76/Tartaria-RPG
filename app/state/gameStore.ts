@@ -1482,8 +1482,30 @@ const QWEN_WATCHDOG_RECOVERING_MS = 5_000;
 // the GGUF is already cached, so a warm reload is ~5-30s; a legit in-flight
 // load is never interrupted.
 const QWEN_REINIT_HANG_MS = 150_000;
+// OTA-1084 — BOUNDED, FOREGROUND-ONLY REVIVAL. The 11-part log-export
+// session showed the failure mode: exporting chunks means bouncing the app
+// (copy → switch away to paste → return), and every switch-away disposes
+// the ~400MB context ('background' → shutdownQwen → status 'idle') while
+// every return let the 5s recovering cadence kick ANOTHER full context
+// load — 10+ attempts inside a minute, each one killed by the next bounce.
+// Two rules end the loop:
+//   1. Never kick a reload while the app isn't foregrounded — the same
+//      backgrounding that caused 'idle' will kill the reload too, and both
+//      App.tsx's unpark hook and the watchdog's 'active' listener re-check
+//      the moment the player is back.
+//   2. After QWEN_WATCHDOG_FREE_RETRIES straight attempts without reaching
+//      ready, the retry cadence doubles per attempt up to the healthy 60s —
+//      so even a pathological state costs one reload a minute, not twelve.
+//      A fresh return to foreground resets the backoff for one fast retry.
+const QWEN_WATCHDOG_FREE_RETRIES = 4;
 let qwenReinitInFlightSince = 0;
 let qwenReinitAttempts = 0;
+let qwenBackoffLevel = 0;
+let qwenHeldWhileBackgroundLogged = false;
+function qwenRecoveringDelayMs(): number {
+  if (qwenBackoffLevel <= 0) return QWEN_WATCHDOG_RECOVERING_MS;
+  return Math.min(QWEN_WATCHDOG_HEALTHY_MS, QWEN_WATCHDOG_RECOVERING_MS * 2 ** qwenBackoffLevel);
+}
 /** OTA-1032 — one health check. Returns TRUE when Qwen is healthy, which is what
  *  drives the adaptive poll: healthy → back to the slow cadence, anything else →
  *  keep checking fast until it recovers. */
@@ -1505,6 +1527,8 @@ function runQwenHealthCheck(
         }
         qwenReinitInFlightSince = 0;
         qwenReinitAttempts = 0;
+        qwenBackoffLevel = 0;
+        qwenHeldWhileBackgroundLogged = false;
         return true;
       }
       const st = q.getStatus();
@@ -1514,10 +1538,29 @@ function runQwenHealthCheck(
         if (qwenReinitInFlightSince === 0 || Date.now() - qwenReinitInFlightSince < QWEN_REINIT_HANG_MS) return false;
         get().appendLog('debug', `qwen-watchdog: reinit wedged in '${st}' for >${Math.round(QWEN_REINIT_HANG_MS / 1000)}s — re-kicking.`);
       }
+      // OTA-1084 — rule 1: hold revival while the app isn't foregrounded.
+      // Kicking a ~400MB context load from the background is guaranteed
+      // wasted work — the background dispose that produced this state kills
+      // the reload too. Logged once per background stretch, not per tick.
+      let appActive = true;
+      try {
+        const s = AppState.currentState;
+        appActive = s !== 'background' && s !== 'inactive';
+      } catch { /* AppState unavailable (headless/test) — treat as active */ }
+      if (!appActive) {
+        if (!qwenHeldWhileBackgroundLogged) {
+          qwenHeldWhileBackgroundLogged = true;
+          get().appendLog('debug', `qwen-watchdog: app is backgrounded — holding revival until foreground (status='${st}').`);
+        }
+        return false;
+      }
+      qwenHeldWhileBackgroundLogged = false;
       // Not ready and not making progress (idle / failed / dormant ready-but-
-      // dead / wedged): kick a fresh reinit. Keeps retrying every 60s so a
-      // transient memory-pressure failure doesn't strand Qwen for the session.
+      // dead / wedged): kick a fresh reinit. Keeps retrying so a transient
+      // memory-pressure failure doesn't strand Qwen for the session — but
+      // rule 2 spreads the retries out once the free ones are spent.
       qwenReinitAttempts += 1;
+      if (qwenReinitAttempts > QWEN_WATCHDOG_FREE_RETRIES) qwenBackoffLevel += 1;
       qwenReinitInFlightSince = Date.now();
       // OTA-909 — name the DORMANT case distinctly so the log doesn't read as a
       // self-contradiction. Dormant = status==='ready' but the native llama
@@ -1532,6 +1575,9 @@ function runQwenHealthCheck(
           ? `qwen-watchdog: Qwen dormant (status='${st}' but the native context was released — usually app-backgrounding); reinitializing (attempt #${qwenReinitAttempts}).`
           : `qwen-watchdog: Qwen not ready (status='${st}'); reinitializing (attempt #${qwenReinitAttempts}).`,
       );
+      if (qwenBackoffLevel > 0) {
+        get().appendLog('debug', `qwen-watchdog: ${qwenReinitAttempts} attempts without recovery — backing off (next check in ~${Math.round(qwenRecoveringDelayMs() / 1000)}s).`);
+      }
       void q.forceReinitialize()
         .then(() => { qwenReinitInFlightSince = 0; })
         .catch((err: unknown) => {
@@ -1556,6 +1602,8 @@ function startQwenWatchdog(
   }
   qwenReinitInFlightSince = 0;
   qwenReinitAttempts = 0;
+  qwenBackoffLevel = 0;
+  qwenHeldWhileBackgroundLogged = false;
 
   const schedule = (ms: number): void => {
     if (qwenWatchdogTimer !== null) clearTimeout(qwenWatchdogTimer);
@@ -1566,7 +1614,8 @@ function startQwenWatchdog(
     try {
       healthy = runQwenHealthCheck(get, set);
     } catch { /* watchdog should never crash the host */ }
-    schedule(healthy ? QWEN_WATCHDOG_HEALTHY_MS : QWEN_WATCHDOG_RECOVERING_MS);
+    // OTA-1084 — recovering cadence honors the backoff ladder.
+    schedule(healthy ? QWEN_WATCHDOG_HEALTHY_MS : qwenRecoveringDelayMs());
   }
 
   // OTA-1032 — DON'T WAIT FOR THE NEXT TICK. Dormancy is CAUSED by backgrounding
@@ -1576,7 +1625,10 @@ function startQwenWatchdog(
   // watchdog has even noticed.
   try {
     qwenAppStateSub = AppState.addEventListener('change', (next) => {
-      if (next === 'active') tick();
+      // OTA-1084 — a fresh return to foreground clears the backoff ladder:
+      // the player is present again, so the first retry should be fast even
+      // if the last background stretch burned through the free attempts.
+      if (next === 'active') { qwenBackoffLevel = 0; tick(); }
     }) as { remove: () => void } | null;
   } catch { /* AppState unavailable (headless/test) — the poll alone still recovers */ }
 
