@@ -650,8 +650,13 @@ const COMBAT_REMARKS = [
 // ("the heir atalan-drowned is patient"). Generic creatures still lowercase cleanly
 // ("the mud boar"). Keyed off the `boss` flag (Core Guardians + boss-gate spawns all
 // carry it), so the fix is scoped to exactly the named threats.
-export function combatEnemyLabel(enemy: Pick<Enemy, 'name' | 'boss'>): string {
-  return enemy.boss ? enemy.name : enemy.name.toLowerCase();
+// OTA-1116 — AND FACTION FIGHTERS ARE NAMED TOO. dressFactionFighter builds
+// "<Faction> Raider N" and stamps a factionId, which the boss flag never
+// covered — so the owner's log read "The Arbiter watches the conspiracy
+// architects raider 1." A carried factionId is the same signal as `boss`: this
+// is somebody's name, not a description of a species.
+export function combatEnemyLabel(enemy: Pick<Enemy, 'name' | 'boss' | 'factionId'>): string {
+  return enemy.boss || enemy.factionId ? enemy.name : enemy.name.toLowerCase();
 }
 
 function combatRemark(enemy: Enemy): string {
