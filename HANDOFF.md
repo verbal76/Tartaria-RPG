@@ -923,9 +923,43 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.17**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.19**; ledger in `VERSION.md`.
 
-- **THE GIFT ECONOMY (2026-08-03, latest). BOTH LINES.** HAL OTA-1106 /
+- **THE LEDGER EXPLAINS ITSELF (2026-08-03, latest). BOTH LINES.** HAL
+  OTA-1108 / golem OTA-1085. Two owner reports off the Character screen.
+  (1) The Arbiter regard row *"1 answer he was standing there for -5"*
+  named nothing — it was the Phase-3 fork-regard aggregate. `regardParts`
+  now emits one row PER judged answer, labelled with the words the player
+  chose (`your answer: Sell the bundle to a Tomekeeper  -5`, via
+  `optionById` on forks.json). The ±20 aggregate sub-clamp retired with
+  the aggregation: forks are one-shot and finite (ten questions, deltas
+  ±5, perfect run +36 < kin 40) and the ±60 total clamp holds. (2) A Core
+  Guardian kill was recorded twice ("cut down the Iron Litany Brother
+  Konrad…" from the generic rare-kill writer + "defeated … at Nimari"
+  from the guardian block). The generic writer now skips
+  `isCoreGuardian(enemy)` — one corpse, one ledger line. Test:
+  `ota1108LedgerExplainsItself.test.ts`; the ota1090 anti-farm fork test
+  retargeted to the itemised rows.
+
+- **THE LOG-EXPORT REINIT LOOP (2026-08-03). BOTH LINES.** HAL
+  OTA-1107 / golem OTA-1084. The owner's 11-part device log ends with the
+  Qwen watchdog burning 10+ reinit attempts in 64s, status 'idle' every
+  time: exporting chunks bounces the app (copy → switch away to paste →
+  return); every switch-away disposes the ~400MB context, every return let
+  the OTA-1055 5s recovering cadence kick a fresh full context load that
+  the next bounce killed. Two engine defects compounded it —
+  `forceReinitialize()` reset status BEFORE `initialize()` (defeating the
+  already-loading guard, letting concurrent loads STACK), and a load
+  interrupted by `dispose()` still installed itself 'ready' behind a
+  backgrounded app. Four locks: watchdog kicks only while
+  `AppState.currentState` is active (held stretches logged once);
+  exponential backoff after `QWEN_WATCHDOG_FREE_RETRIES` (4) up to the
+  healthy 60s, reset by recovery or a fresh foreground; engine
+  `initInFlight` (joiners share one load); engine `lifecycleGen` (stale
+  loads tear their context down and stay 'idle'). Test:
+  `ota1107QwenWatchdogBackoff.test.ts`; ota1055 source locks retargeted.
+
+- **THE GIFT ECONOMY (2026-08-03). BOTH LINES.** HAL OTA-1106 /
   golem OTA-1083. Owner: *"do all three."* (1) THE FENCE: sketchy traders
   buy stolen goods at `FENCE_STOLEN_CUT` (40%) of the honest sell-back —
   "no questions asked, and none answered"; honest/hub keep the refusal.

@@ -78,6 +78,20 @@ export class QwenGenerativeEngine {
   private lastError: string | null = null;
   private runtime: LlamaRuntime | null = null;
   private modelId: string = DEFAULT_QWEN_MODEL_ID;
+  // OTA-1107 — the two guards that stop background-bounce thrash (the
+  // 11-part log-export session: every switch-away disposed the context,
+  // every return kicked a fresh ~400MB load, 10+ overlapping attempts
+  // in a minute):
+  //   initInFlight — one load at a time. dispose() resets status to
+  //     'idle' while a load is still awaiting, which used to defeat the
+  //     'already loading' status guard and let forceReinitialize() stack
+  //     a SECOND concurrent context load (double memory pressure).
+  //   lifecycleGen — dispose() bumps it. A load that started before the
+  //     bump is STALE when it lands: the backgrounding that disposed the
+  //     old context must not be resurrected by a straggler, so the fresh
+  //     runtime is discarded and status stays 'idle'.
+  private initInFlight: Promise<void> | null = null;
+  private lifecycleGen = 0;
 
   getStatus(): QwenStatus {
     return this.status;
@@ -112,6 +126,9 @@ export class QwenGenerativeEngine {
    *  fallback path (e.g., deterministic fusion) covers the current
    *  interaction; the warm-up is for the NEXT one. */
   async forceReinitialize(opts: QwenInitOptions = {}): Promise<void> {
+    // OTA-1107 — a load is already warming up: join it instead of resetting
+    // status underneath it and stacking a second concurrent context load.
+    if (this.initInFlight) return this.initInFlight;
     this.status = 'idle';
     this.runtime = null;
     return this.initialize(opts);
@@ -139,9 +156,24 @@ export class QwenGenerativeEngine {
    * Arbiter when the engine isn't ready.
    */
   async initialize(opts: QwenInitOptions = {}): Promise<void> {
+    if (this.initInFlight) return this.initInFlight;
     if (this.status === 'ready' || this.status === 'loading' || this.status === 'downloading') {
       return;
     }
+    const run = this.runInitialize(opts);
+    this.initInFlight = run;
+    try {
+      await run;
+    } finally {
+      if (this.initInFlight === run) this.initInFlight = null;
+    }
+  }
+
+  private async runInitialize(opts: QwenInitOptions): Promise<void> {
+    // OTA-1107 — snapshot the lifecycle generation. If dispose() runs while
+    // this load is in flight (app backgrounded mid-reload), the result is
+    // stale and must be thrown away, not installed as 'ready'.
+    const gen = this.lifecycleGen;
     const onProgress = opts.onProgress;
     this.status = 'downloading';
     this.downloadFraction = 0;
@@ -164,10 +196,14 @@ export class QwenGenerativeEngine {
         });
       }
     } catch (err) {
+      // Stale (disposed mid-download): the dispose already set the state it
+      // wants ('idle'); don't overwrite it with 'failed'.
+      if (this.lifecycleGen !== gen) return;
       this.status = 'failed';
       this.lastError = err instanceof Error ? `GGUF download failed: ${err.message}` : String(err);
       return;
     }
+    if (this.lifecycleGen !== gen) { this.status = 'idle'; return; }
 
     // ── 2) Load the model into a llama.cpp context ────────────────────────
     this.status = 'loading';
@@ -179,11 +215,21 @@ export class QwenGenerativeEngine {
         contextSize: opts.contextSize ?? 2048,
         threads: opts.threads ?? 2,
       });
+      if (this.lifecycleGen !== gen) {
+        // OTA-1107 — dispose() landed while the context was loading. The app
+        // wanted the memory back; a straggler load must not resurrect a
+        // ~400MB context in the background. Tear the fresh one down.
+        try { await runtime.dispose(); } catch { /* best effort */ }
+        this.status = 'idle';
+        this.runtime = null;
+        return;
+      }
       this.runtime = runtime;
       this.status = 'ready';
       this.downloadFraction = 1;
       onProgress?.('ready', 1);
     } catch (err) {
+      if (this.lifecycleGen !== gen) { this.status = 'idle'; this.runtime = null; return; }
       this.status = 'failed';
       this.lastError = err instanceof Error ? `Load failed: ${err.message}` : String(err);
       this.runtime = null;
@@ -233,6 +279,8 @@ export class QwenGenerativeEngine {
    * free memory cleanly.
    */
   async dispose(): Promise<void> {
+    // OTA-1107 — mark any in-flight load stale (see lifecycleGen above).
+    this.lifecycleGen += 1;
     if (this.runtime) {
       try { await this.runtime.dispose(); } catch { /* best effort */ }
       this.runtime = null;
