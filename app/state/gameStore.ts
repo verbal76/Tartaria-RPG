@@ -30443,6 +30443,7 @@ function applyHookEffect(
           ...s2.currentScene,
           enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
           enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
+          resistWear: {}, resistCracked: [],
         },
         worldMemory: { ...s2.worldMemory, activeRevenant: { ...fr } },
       } : s2));
@@ -32227,6 +32228,7 @@ function advanceStoryDrip(
             ...scene,
             enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
             enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
+            resistWear: {}, resistCracked: [],
           },
         });
         get().appendLog('combat', `⚔ BOSS EVENT — ${foe.name}. It cannot be talked down and it will not stop. Put them to rest. Nothing else is mercy.`);
