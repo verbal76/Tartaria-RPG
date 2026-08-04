@@ -157,6 +157,9 @@ const COMBAT_ONLY_STATUSES: ReadonlySet<StatusEffectKind> = new Set([
   // OTA-835 — the Mud Golem's Elemental Control ward is a per-encounter block;
   // clear any unspent soak when the fight ends so it never carries into the next.
   'stone_ward',
+  // OTA-1089 — the anti-stun-lock window is per-encounter: it protects the
+  // recovery rounds of THIS fight and never carries immunity into the next.
+  'braced',
 ]);
 const STAMINA_GATED_STATUSES: ReadonlySet<StatusEffectKind> = new Set(['tired', 'exhausted']);
 

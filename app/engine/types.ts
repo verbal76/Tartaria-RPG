@@ -863,6 +863,11 @@ export type StatusEffectKind =
   // hands). Cleared by drinking a cold coating (the warming counter) or by waiting it
   // out. Gives the new cold coating a real player-side ailment so it's drinkable.
   | 'chilled'
+  // OTA-1089 — anti-stun-lock. Granted automatically the moment a stun or
+  // paralyze takes hold: while braced runs, further incapacitations cannot
+  // land, so a pack of concussive hitters re-rolling 20% per landed blow
+  // can't chain the player's turns away (sim: 844 stuns/run before this).
+  | 'braced'
   | 'dodging'
   // OTA-365 — 'blocking' removed (retired: no engine path ever applied
   // it; the dodge rework folded block into dodge).

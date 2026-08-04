@@ -1522,6 +1522,19 @@ function qwenRecoveringDelayMs(): number {
  *  system the way a global ×0.5 → ×0.75 soften would. The bestiary keeps
  *  recording the TRUE resist, so the knowledge layer never lies. */
 const GUARD_CRACK_HITS = 3;
+/** OTA-1089 — anti-stun-lock. When a stun/paralyze takes hold, the player is
+ *  `braced` for this many rounds (the incapacitated round plus the recovery
+ *  rounds it protects): further incapacitations cannot land while it runs.
+ *  One clean lockdown per window is drama; a 5-member concussive pack
+ *  re-rolling 20% per landed blow was a slot machine that ate the player's
+ *  turns (sim: 844 stuns per 20k-action run, every stalled matchup a pack). */
+const BRACED_ROUNDS = 3;
+/** OTA-1089 — pack action economy. At most this many non-boss MELEE pack
+ *  members can land swings on the player in one volley; the rest crowd in
+ *  behind, waiting for an opening (one narrated line). Ranged enemies and
+ *  bosses are exempt. A 5-blade wall was five attack rolls + five stun rolls
+ *  a round — more dice than drama, and the sim's whole stall tail. */
+const MELEE_PACK_SWINGS_PER_ROUND = 3;
 /** OTA-1032 — one health check. Returns TRUE when Qwen is healthy, which is what
  *  drives the adaptive poll: healthy → back to the slow cadence, anything else →
  *  keep checking fast until it recovers. */
@@ -20656,6 +20669,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `You crack the ${enemy.name} with the ${weaponName} for ${dmg} — half their fight, gone in one blow. They crumple, out cold. (${newEnemyHp}/${enemyMaxHp} HP) Loot them before they come to.`,
             { combatOutcome: 'player_dmg' },
           );
+          // OTA-1089 — a knockout has to MOVE the fight, not park it. A KO'd
+          // body leaves the scene only via lootKnockedOutEnemy's splice, so
+          // sights stayed parked on a sleeper and a pack fight where every
+          // raider got cracked could never end by attrition — the sim's whole
+          // stall tail (human faction packs, 0% resisted, no kills for 45+
+          // rounds) was exactly this shape.
+          const scNow = get().currentScene;
+          if (scNow) {
+            const standing = scNow.enemies
+              .map((e2, i2) => ({ e2, i2 }))
+              .filter(({ i2 }) => (scNow.enemyHps[i2] ?? 0) > 0 && !(scNow.enemyKnockedOut?.[i2] ?? false));
+            if (standing.length === 0) {
+              // Everyone left is dead or out cold — the fight is WON by
+              // subdual. Strip the sleepers where they lie: the same grants,
+              // TC bounty, and signature-weapon rules as a manual loot (each
+              // strip splices its body; the last splice clears the range back
+              // to peaceful). Mercy still pays — it just stops stalling.
+              get().appendLog(
+                'combat',
+                scNow.enemies.length > 1
+                  ? 'Nobody left standing — the fight is yours. You take your time and strip the sleepers where they lie.'
+                  : 'Nobody left standing — the fight is yours.',
+              );
+              let koSafety = 0;
+              while ((get().currentScene?.enemyKnockedOut ?? []).some(Boolean) && koSafety < 12) {
+                get().lootKnockedOutEnemy();
+                koSafety++;
+              }
+            } else if (scNow.enemyKnockedOut?.[scNow.activeEnemyIdx]) {
+              // Others still stand — move the sights OFF the sleeping body so
+              // the next swing meets someone actually fighting back.
+              const nextUp = standing[0]!;
+              set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: nextUp.i2 } } : s));
+              get().appendLog('combat', `${enemy.name} is out of it. ${nextUp.e2.name} now in your sights.`);
+            }
+          }
         } else {
           get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp), { combatOutcome: 'player_dmg' });
         }
@@ -21280,7 +21329,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const remainingEnemies = currentScene.enemies.filter((_, i) => i !== activeIdx);
     const remainingHps = currentScene.enemyHps.filter((_, i) => i !== activeIdx);
     const nextActiveIdx = remainingEnemies.length > 0 ? Math.min(activeIdx, remainingEnemies.length - 1) : 0;
-    const stillFighting = remainingEnemies.length > 0;
+    // OTA-1089 — "still fighting" means a LIVE, CONSCIOUS enemy remains. A
+    // KO'd sleeper used to hold the fight open here (remainingEnemies.length
+    // counted bodies, not fighters), so killing the last standing raider of a
+    // half-subdued pack left the player locked in combat with the unconscious.
+    const remainingKOFlags = (currentScene.enemyKnockedOut ?? []).filter((_, i) => i !== activeIdx);
+    const stillFighting = remainingEnemies.some(
+      (_, i) => (remainingHps[i] ?? 0) > 0 && !(remainingKOFlags[i] ?? false),
+    );
     // OTA-362 — keep the index-parallel per-enemy arrays aligned with the
     // spliced enemies list (status DOTs, KO flags, acid shred, corruption
     // stacks, ambush flags) so they don't drift onto the wrong enemy.
@@ -21493,13 +21549,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // used to fire for each corpse ("2 attackers remain. Mud Wasp now in your sights." ×3)
       // — spam AND factually wrong (those are bodies being looted this same beat). Only
       // announce when a LIVE enemy (hp > 0) actually remains, and count / name the living.
-      const liveRemaining = remainingEnemies.filter((_, i) => (remainingHps[i] ?? 0) > 0);
+      // OTA-1089 — a KO'd sleeper is not an attacker: exclude it from the
+      // count and never point the sights line at an unconscious body.
+      const liveRemaining = remainingEnemies.filter(
+        (_, i) => (remainingHps[i] ?? 0) > 0 && !(remainingKOFlags[i] ?? false),
+      );
       if (liveRemaining.length > 0) {
         const next = liveRemaining[0]!;
         get().appendLog(
           'combat',
           `${liveRemaining.length} attacker${liveRemaining.length > 1 ? 's' : ''} remain${liveRemaining.length === 1 ? 's' : ''}. ${next.name} now in your sights.`,
         );
+      }
+    } else if (remainingEnemies.length > 0) {
+      // OTA-1089 — the kill that just resolved dropped the last STANDING
+      // member of a half-subdued pack. The sleepers can't fight and can't be
+      // fought — strip them where they lie (same subdual resolution as the
+      // knockout path; each strip splices its body out of the scene).
+      get().appendLog('combat', 'Nobody left standing — the fight is yours. You strip the sleepers where they lie.');
+      let koSafety = 0;
+      while ((get().currentScene?.enemyKnockedOut ?? []).some(Boolean) && koSafety < 12) {
+        get().lootKnockedOutEnemy();
+        koSafety++;
       }
     }
     if (hitMilestone) {
@@ -22086,8 +22157,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const remainingKO = ko.filter((_, i) => i !== idx);
     const dropAt = <T>(arr: T[] | undefined): T[] | undefined =>
       arr ? arr.filter((_, i) => i !== idx) : undefined;
-    const stillFighting = remainingEnemies.length > 0;
-    const nextActiveIdx = stillFighting ? Math.min(activeIdx, remainingEnemies.length - 1) : 0;
+    // OTA-1089 — "still fighting" means a live, CONSCIOUS enemy remains; the
+    // range only stays combat-locked (and the sights line only fires) for
+    // someone actually able to swing back.
+    const standingAfterLoot = remainingEnemies.filter(
+      (_, i) => (remainingHps[i] ?? 0) > 0 && !(remainingKO[i] ?? false),
+    );
+    const stillFighting = standingAfterLoot.length > 0;
+    const nextActiveIdx = remainingEnemies.length > 0 ? Math.min(activeIdx, remainingEnemies.length - 1) : 0;
     set((s) => {
       if (!s.player || !s.currentScene) return s;
       let inv = s.player.inventory;
@@ -22125,8 +22202,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       leaveSignatureWeapon(get, set, enemy.signatureWeapon);
     }
     if (stillFighting) {
-      const next = remainingEnemies[nextActiveIdx]!;
-      get().appendLog('combat', `${remainingEnemies.length} still standing. ${next.name} now in your sights.`);
+      const next = standingAfterLoot[0]!;
+      get().appendLog('combat', `${standingAfterLoot.length} still standing. ${next.name} now in your sights.`);
     }
     void get().persist();
   },
@@ -32799,9 +32876,16 @@ export function runEnemyGroupCounters(
   // Snapshot the enemies up-front so a death mid-volley (player killing
   // one by reaction, etc) doesn't reshape the iteration.
   const attackers = [...scene.enemies];
+  // OTA-1089 — rotate who leads the volley so the melee swing cap below
+  // doesn't bench the same tail members every round; the pack takes turns
+  // pressing in.
+  const volleyLead = attackers.length > 1 ? Math.floor(Math.random() * attackers.length) : 0;
+  const volleyOrder = [...attackers.slice(volleyLead), ...attackers.slice(0, volleyLead)];
   const benchedBelow: string[] = [];
-  for (let i = 0; i < attackers.length; i++) {
-    const enemy = attackers[i]!;
+  const crowdedOut: string[] = [];
+  let meleeSwings = 0;
+  for (let i = 0; i < volleyOrder.length; i++) {
+    const enemy = volleyOrder[i]!;
     // Skip enemies that died earlier this round (HP <= 0 in the live
     // scene array).
     const liveScene = get().currentScene;
@@ -32843,9 +32927,20 @@ export function runEnemyGroupCounters(
       benchedBelow.push(enemy.name);
       continue;
     }
+    // OTA-1089 — PACK ACTION ECONOMY: only MELEE_PACK_SWINGS_PER_ROUND melee
+    // blades fit around one person at a time. A 5-raider wall was five attack
+    // rolls and five stun rolls a round — more dice than drama (and the sim's
+    // whole stall tail). The overflow presses in behind, one line, dedup-quiet.
+    // Bosses and ranged enemies are exempt (a shooter needs no elbow room).
+    const meleeAttacker = !enemy.boss && !isRangedEnemy(enemy);
+    if (meleeAttacker && meleeSwings >= MELEE_PACK_SWINGS_PER_ROUND) {
+      crowdedOut.push(enemy.name);
+      continue;
+    }
     // Pass live index so applyEnemyCounter can resolve ambush_strike
     // (one-shot +2 to the first counter for enemies with the trait).
     applyEnemyCounter(enemy, livePlayer ?? fallbackPlayer, get, set, liveIdx);
+    if (meleeAttacker) meleeSwings++;
     // Boss tier: a second counter swing after the first lands. Skipped
     // if the first counter killed the player, or if the enemy itself
     // dropped (riposte / fight-back path).
@@ -32872,6 +32967,19 @@ export function runEnemyGroupCounters(
       rest > 0
         ? `Below, ${first} and ${rest} other${rest > 1 ? 's' : ''} circle the base — nothing down there can reach you.`
         : `Below, ${first} circles the base — it cannot reach you up here.`,
+    );
+  }
+  // OTA-1089 — the swing-capped overflow gets ONE line, not silence (and not
+  // one line per benched raider). Standard dedup keeps round-over-round
+  // repeats quiet.
+  if (crowdedOut.length > 0 && (get().player?.hp ?? 0) > 0) {
+    const first = crowdedOut[0]!;
+    const rest = crowdedOut.length - 1;
+    get().appendLog(
+      'combat',
+      rest > 0
+        ? `${first} and ${rest} other${rest > 1 ? 's' : ''} press in behind their own pack, waiting for an opening.`
+        : `${first} presses in behind the others, waiting for an opening.`,
     );
   }
 }
@@ -33393,6 +33501,15 @@ function applyEnemyCounter(
     // concussive). Independent of the damage-type roll so a trait can
     // stack with a type-based status.
     const traitHit = traitOnHitStatus(enemy.traits);
+    // OTA-1089 — ANTI-STUN-LOCK. While `braced` runs (granted below when an
+    // incapacitation takes hold), further stun/paralyze procs cannot land.
+    // Non-incapacitating statuses (bleed, poison, chill…) pass through.
+    const isIncapKind = (k: string) => k === 'stun' || k === 'paralyzed';
+    const bracedNow = (player.statusEffects ?? []).some((e) => e.kind === 'braced');
+    const landedEffect = newEffect && !(bracedNow && isIncapKind(newEffect.effect.kind)) ? newEffect : null;
+    const landedTraitHit = traitHit && !(bracedNow && isIncapKind(traitHit.kind)) ? traitHit : null;
+    const incapSuppressed = (newEffect !== null && landedEffect === null)
+      || (traitHit !== null && landedTraitHit === null);
 
     // OTA-959 — armor wear: a landed blow chips ONE worn piece, not the whole
     // set. The old loop wore EVERY slot per hit, so a 5-piece set spent 5
@@ -33445,14 +33562,22 @@ function applyEnemyCounter(
         // for itself.
         if (!killed) checkLowHpWarning(prevHpForWarn, newHp, hpMaxForWarn, get, set);
       });
-      let effects = newEffect
-        ? applyEffect(nextPlayer.statusEffects ?? [], newEffect.effect)
+      let effects = landedEffect
+        ? applyEffect(nextPlayer.statusEffects ?? [], landedEffect.effect)
         : nextPlayer.statusEffects;
-      if (traitHit) {
+      if (landedTraitHit) {
         effects = applyEffect(effects ?? [], {
-          kind: traitHit.kind,
-          remainingRounds: traitHit.rounds,
-          label: traitHit.label,
+          kind: landedTraitHit.kind,
+          remainingRounds: landedTraitHit.rounds,
+          label: landedTraitHit.label,
+        });
+      }
+      // OTA-1089 — the incapacitation that just took hold opens the braced
+      // window: the stunned round plus the recovery rounds it protects.
+      if ((landedEffect && isIncapKind(landedEffect.effect.kind))
+          || (landedTraitHit && isIncapKind(landedTraitHit.kind))) {
+        effects = applyEffect(effects ?? [], {
+          kind: 'braced', remainingRounds: BRACED_ROUNDS, label: 'braced — will not go down again',
         });
       }
       // OTA-835 — decrement (or drop) the Elemental Control ward now that it has
@@ -33499,16 +33624,24 @@ function applyEnemyCounter(
       }
     }
 
-    if (newEffect) {
-      const verb = newEffect.isNew ? 'inflicts' : 'refreshes';
+    if (landedEffect) {
+      const verb = landedEffect.isNew ? 'inflicts' : 'refreshes';
       void Promise.resolve().then(() =>
-        get().appendLog('combat', `The ${enemyDamageType} ${verb} ${newEffect.effect.label}.`),
+        get().appendLog('combat', `The ${enemyDamageType} ${verb} ${landedEffect.effect.label}.`),
       );
     }
 
-    if (traitHit) {
+    if (landedTraitHit) {
       void Promise.resolve().then(() =>
-        get().appendLog('combat', `${enemy.name}'s strike leaves you ${traitHit.label}.`),
+        get().appendLog('combat', `${enemy.name}'s strike leaves you ${landedTraitHit.label}.`),
+      );
+    }
+
+    // OTA-1089 — say when the braced window turned an incapacitation away, so
+    // the mechanic is legible instead of a silently missing status line.
+    if (incapSuppressed && !killed) {
+      void Promise.resolve().then(() =>
+        get().appendLog('combat', `${enemy.name}'s blow rings off you — braced; you keep your feet.`),
       );
     }
 
