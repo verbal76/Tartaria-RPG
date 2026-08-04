@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.25';
+export const DISPLAY_VERSION = '4.29.26';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20986,6 +20986,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1115 — THE SECONDARY CAST GETS A LADDER TOO. Workstream B step
+// 3, closing the audit's dialogue finding. The 21 secondary named NPCs
+// (4-5 topics) and the 11 class sets now carry depth: each named NPC
+// drew one known + one familiar + one trusted topic from their
+// archetype's pool — blade (7 fighters), maker (2 crafters), seeker
+// (3 scholars), road (3 drifters), office (6 faction officials) —
+// with their name woven into the prose and a rotation so neighbours
+// in an archetype do not share a draw. Every class set gained a
+// familiar + trusted pair in its own register (the refugee's key, the
+// scout's interrupted camp, the scavenger's waiting room, the
+// Guardian's centuries, the overlay trader's shadow with no wings).
+// Catalog 258 → 343 — 182 before Workstream B, so the writing wave
+// landed +161 authored topics total. ota1115SecondaryCast locks the
+// shape and the two template failure modes (leftover placeholders,
+// a draw that skipped a rung). DISPLAY_VERSION 4.29.26.
+//
 // OTA-1114 — THE DEEP BENCH: NINE PEOPLE, NOT NINE COUNTERS.
 // Workstream B step 2, the writing wave the teaser was built to serve.
 // The audit's dialogue finding was thinness — the nine authored vendors
@@ -21094,7 +21110,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-04-1114-deep-bench';
+export const OTA_BUILD_ID = '2026-08-04-1115-secondary-cast';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1114-deep-bench';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1113-door-you-can-see';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1112-packs-end-too';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1111-guard-crack';
