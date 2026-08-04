@@ -923,9 +923,34 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.22**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.23**; ledger in `VERSION.md`.
 
-- **GUARD-CRACK: RESISTED FIGHTS END (2026-08-04, latest). BOTH LINES.**
+- **PACKS END TOO (2026-08-04, latest). BOTH LINES.** HAL OTA-1112 /
+  golem OTA-1089. Workstream A step 3 (owner: "keep going with the KO fix
+  and ship 1112"), closing task #168's stall guard legitimately. (1)
+  ANTI-STUN-LOCK — a stun/paralyze that takes hold grants `braced`
+  (BRACED_ROUNDS 3, per-encounter, cleared at fight end): further
+  incapacitations cannot land while it runs; suppression is narrated
+  ("…braced; you keep your feet."). (2) PACK ACTION ECONOMY —
+  MELEE_PACK_SWINGS_PER_ROUND (3) non-boss melee swings per volley,
+  rotating lead, overflow narrated once dedup-quiet; bosses/ranged
+  exempt. (3) KNOCKOUTS RESOLVE FIGHTS — mid-fight KO moves sights to a
+  standing enemy; when a KO or kill drops the last standing enemy the
+  fight resolves by SUBDUAL: sleepers auto-stripped via the existing
+  lootKnockedOutEnemy splice (same grants/TC/signature-weapon rules),
+  scene back to peace. `stillFighting` now means a live CONSCIOUS enemy
+  in resolveEnemyDefeat AND lootKnockedOutEnemy (sights lines never point
+  at sleepers). (4) SIM HONESTY — combatStress: pack-scaled stall budget
+  (25 + 5/extra member, 2.5% cap unchanged), per-stall anatomy telemetry
+  (damage lines/refusals/KOs/stun lines), and a RANGE-AWARE beat-down
+  phase — slow-weather repositioning (advance accrues progress, direction
+  flip resets it) had marooned the sim at mid spamming a close-only
+  cleaver into the reach gate, which was the entire remaining stall tail
+  (0% resisted, ~5 damage lines per 45-round stall, refusals on the
+  arbiter channel). Suite `ota1112PackEconomyAntiStunLock` (7 tests)
+  drives the real volley + subdual through the store.
+
+- **GUARD-CRACK: RESISTED FIGHTS END (2026-08-04). BOTH LINES.**
   HAL OTA-1111 / golem OTA-1088. Workstream A step 2, owner-approved
   ("let's go with the resists break == Guard-crack") over globally
   softening the x0.5. Three landed RESISTED hits of one damage type into
