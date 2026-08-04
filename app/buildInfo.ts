@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.23';
+export const DISPLAY_VERSION = '4.29.24';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20952,6 +20952,32 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1113 — THE DOOR THE PLAYER CAN SEE. Workstream B ("the deep
+// bench") step 1, the doorway before the OTA-1114/1115 writing wave.
+// 141 of 182 topics sit behind gates and a locked topic was INVISIBLE:
+// a stranger saw Irma's three open questions and had no way to know she
+// is a person with seven more behind them. Invisible depth reads as
+// absent depth — the production audit's dialogue finding in one line.
+//   1. THE TEASER — the talk sheet now ends with a COUNT of what is
+//      still shut, never the labels ("…4 things Irma doesn't tell
+//      strangers"). Wording scales with the rung (strangers / still
+//      holds back / isn't ready to say). Appears only once the person
+//      has PLACED you (regard >= known); the wronged get nothing — no
+//      checklist for winning someone back. onlyRegard repair topics
+//      are excluded from the count.
+//   2. IN-VOICE DEFLECTIONS — tapping the teaser lands a deflection in
+//      the feed: the person telling you, in character, that the rest
+//      is earned. Nine authored lines, three per rung, rotating per
+//      tap within a conversation.
+//   3. TWO NEW GATE ROADS for the coming authoring wave:
+//      `minLovedGifts` (gifts that landed loved — intimacy through
+//      honoring who they are) and `minPocketsMumbled` (the thief-only
+//      door: a topic only someone robbing them blind ever hears).
+//   4. AUTHORING LOCK — gateAllows ignores unknown fields, so a typo'd
+//      gate key would silently UNGATE its topic; the ota1113 suite now
+//      reds on any unknown key in dialogue_topics.json.
+// DISPLAY_VERSION 4.29.24.
+//
 // OTA-1112 — PACKS END TOO: ANTI-STUN-LOCK + PACK ECONOMY + KNOCKOUTS
 // RESOLVE FIGHTS. Workstream A, step 3 (owner: "keep going with the KO
 // fix and ship 1112"). Four changes:
@@ -21010,7 +21036,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-04-1112-packs-end-too';
+export const OTA_BUILD_ID = '2026-08-04-1113-door-you-can-see';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1112-packs-end-too';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1111-guard-crack';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1110-name-the-slog';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1109-six-from-the-log';

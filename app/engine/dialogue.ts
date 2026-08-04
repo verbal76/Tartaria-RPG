@@ -67,6 +67,15 @@ export interface TopicGate {
    *  One string rather than two fields, deliberately — a gate that took a fork
    *  and an option separately would have a second way to be half-specified. */
   requiresChoice?: string;
+  /** OTA-1113 — gifts this person LOVED (npcMemory rel.lovedGifts). A topic
+   *  behind this gate opens because you honored who they are, not because you
+   *  showed up often — a different road to intimacy than regard alone, and the
+   *  one the OTA-1114 personal topics (marriage, origin, fears) lean on. */
+  minLovedGifts?: number;
+  /** OTA-1113 — times they have mumbled about losing things after a clean lift
+   *  (rel.pocketsMumbled). The DARK gate: a topic only a thief ever hears —
+   *  someone airing suspicions to the very person robbing them blind. */
+  minPocketsMumbled?: number;
 }
 
 /** OTA-1084 — what a topic HANDS YOU, once, the first time it is raised.
@@ -129,6 +138,13 @@ export interface TalkContext {
   /** OTA-1088 — `"<forkId>:<optionId>"` for every Phase 3 question this
    *  character has answered. Empty for a run that has not been asked one. */
   choices: string[];
+  /** OTA-1113 — gifts this person loved / pocket-loss mumbles delivered, read
+   *  off the same per-person ledger as everything else. OPTIONAL, defaulting
+   *  to 0 in gateAllows, so the many existing TalkContext call sites (and the
+   *  OTA-1081..1088 test contexts) stay valid — a missing ledger reads as
+   *  "nothing has passed between you", which is also what it means. */
+  lovedGifts?: number;
+  pocketsMumbled?: number;
 }
 
 /** OTA-1085 — THE CLASS KEY: topics for people who are not authored one by one.
@@ -207,6 +223,8 @@ export function gateAllows(gate: TopicGate | undefined, ctx: TalkContext): boole
   }
   if (gate.minCores !== undefined && ctx.cores < gate.minCores) return false;
   if (gate.requiresChoice && !ctx.choices.includes(gate.requiresChoice)) return false;
+  if (gate.minLovedGifts !== undefined && (ctx.lovedGifts ?? 0) < gate.minLovedGifts) return false;
+  if (gate.minPocketsMumbled !== undefined && (ctx.pocketsMumbled ?? 0) < gate.minPocketsMumbled) return false;
   return true;
 }
 
@@ -226,6 +244,76 @@ export function topicsFor(npcId: string, ctx: TalkContext): Topic[] {
 export function topicReply(topic: Topic, timesAsked: number): string {
   if (topic.lines.length === 0) return '';
   return topic.lines[timesAsked % topic.lines.length]!;
+}
+
+// ─── OTA-1113 — THE DOOR THE PLAYER CAN SEE ─────────────────────────────────
+//
+// 141 of the cast's topics sit behind gates, and until now a locked topic was
+// INVISIBLE: a stranger saw three questions and had no way to know Irma is a
+// person with seven more behind them. Invisible depth reads as absent depth —
+// the audit's dialogue finding in one line. So the list now ends with a COUNT
+// — never the labels: "…things Irma doesn't tell strangers (4)". Knowing WHAT
+// she is not telling you would spoil the finding of it; knowing THAT there is
+// more is what makes a person feel deeper than her shopfront.
+//
+// ⚠ ONLY AFTER SHE PLACES YOU. A stranger gets no teaser — the door is earned
+// at `known`, same rung where Irma starts talking about the encampments. And
+// `wronged` gets nothing: someone you robbed has no hidden depth for you, and
+// a count would read as a checklist for winning them back.
+
+/** The regard rung at which the locked-count teaser appears. */
+export const TEASER_MIN_REGARD: NpcRegard = 'known';
+
+/** How many of this person's topics exist but are NOT currently open — the
+ *  number the teaser shows. `onlyRegard` topics are excluded: the wronged
+ *  apology is a repair state, not hidden depth, and counting it would show
+ *  every clean-handed player a phantom locked topic. Returns 0 (teaser
+ *  suppressed) for strangers/met and for the wronged. */
+export function lockedTopicCount(npcId: string, ctx: TalkContext): number {
+  if (ctx.regard === 'wronged') return 0;
+  const have = REGARD_ORDER.indexOf(ctx.regard);
+  const need = REGARD_ORDER.indexOf(TEASER_MIN_REGARD);
+  if (have < 0 || have < need) return 0;
+  const set = setFor(npcId);
+  if (!set) return 0;
+  return set.topics.filter((t) => !t.gate?.onlyRegard && !gateAllows(t.gate, ctx)).length;
+}
+
+/** The teaser row's label. Wording scales with the rung — the count is the
+ *  same fact, but "doesn't tell strangers" to someone she has merely placed
+ *  and "isn't ready to say" to someone she trusts are different sentences. */
+export function lockedTeaserLabel(npcName: string, regard: NpcRegard, count: number): string {
+  const noun = count === 1 ? 'thing' : 'things';
+  if (regard === 'trusted') return `…${count === 1 ? 'a thing' : `${count} ${noun}`} ${npcName} isn't ready to say`;
+  if (regard === 'familiar') return `…${count} ${noun} ${npcName} still holds back`;
+  return `…${count} ${noun} ${npcName} doesn't tell strangers`;
+}
+
+/** OTA-1113 — tapping the teaser gets a DEFLECTION, in voice: not a menu
+ *  refusal but the person telling you, in character, that the rest is earned.
+ *  Three lines per rung, indexed by taps THIS conversation (deterministic —
+ *  same state, same line, like every reply in this module). The trusted set
+ *  speaks to gates that are not about warmth at all: work, standing, story. */
+export function teaserDeflectionLine(npcName: string, regard: NpcRegard, timesTapped: number): string {
+  const pools: Partial<Record<NpcRegard, string[]>> = {
+    known: [
+      `${npcName} waves the question off. "Ask me again when we've traded more than words."`,
+      `${npcName} keeps their hands busy. "Some things I keep for people I know better."`,
+      `${npcName} half-smiles. "Not that one. Not yet."`,
+    ],
+    familiar: [
+      `${npcName} looks at you a moment longer than usual. "Nearly. You're nearly there."`,
+      `${npcName} shakes their head, but slower than they used to. "Keep coming around and we'll see."`,
+      `${npcName} drops their voice. "There's more. It costs more than asking, that's all."`,
+    ],
+    trusted: [
+      `${npcName} nods at the question but not to it. "That one isn't about trust. It's about timing."`,
+      `${npcName} taps the counter twice. "Do a bit more for my people and I'll say it out loud."`,
+      `${npcName} glances at the door. "When things out there are different, ask me again."`,
+    ],
+  };
+  const pool = pools[regard] ?? pools.known!;
+  return pool[timesTapped % pool.length]!;
 }
 
 /** Said when a topic has been exhausted — they have told you this already and
