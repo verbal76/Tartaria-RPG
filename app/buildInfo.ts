@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.26';
+export const DISPLAY_VERSION = '4.29.27';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20952,6 +20952,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1116 — FIVE FROM THE DEVICE LOG (Pixel 10 Pro XL, 4.29.26).
+//   1. ⚠ THE HEADLINE, AND A CORRECTION TO MY OWN TRIAGE. I told the
+//      owner the raid builder was dressing a non-human body in faction
+//      colours. It was not — the raiders were human. The real cause is
+//      `randomizeEnemyDefense`, which "neutralized" a kind's unrolled
+//      weaknesses by writing `resist:<type>` on them. That does not
+//      neutralize a weakness, it INVERTS it: a Human is weak to four
+//      types, so three of them became x0.5 armour on every spawn, and
+//      the owner watched a man in a salvage vest shrug off crossbow
+//      bolts while the Arbiter correctly pointed at slashing (the one
+//      weakness left standing). New third state `inured:<type>` —
+//      cancels a kind-wide weakness to NORMAL, never below it, and can
+//      never soften a type the kind already resists (Constructs keep
+//      their plating). Variety intent intact: one rolled weakness still
+//      stands out, and the 35% wall roll still stacks real armour.
+//   2. THE PACK SWING CAP IS RANGE-AWARE. OTA-1112 exempted every
+//      ranged enemy ("a shooter needs no elbow room") — true at far,
+//      false in a scrum. The owner's five-raider fight was MIXED (two
+//      crossbow bodies, three cudgel), so only the cudgels counted, the
+//      cap never engaged, and he ate four attacks a round at arm's
+//      reach. A shooter standing INSIDE the ring now takes a slot;
+//      ranged keeps its exemption at mid and beyond.
+//   3. THE ARBITER USES A FACTION FIGHTER'S NAME. combatEnemyLabel
+//      lowercased every non-boss, so the log read "the conspiracy
+//      architects raider 1". A carried factionId is the same signal as
+//      `boss`: a name, not a species.
+//   4. YOU CANNOT GIVE AWAY WHAT YOU ARE WEARING. giveGift decremented
+//      the inventory row without looking at `equipped`, leaving the
+//      slot naming a deleted instance. Refused, with the slot named.
+//   5. ONE NAME AT A TIME. Two titles in one beat gave back-to-back
+//      earn banners mid-fight; the first speaks with its full perk, the
+//      rest are folded into one line that still NAMES them.
+// NOT IN THIS OTA: the 29s Qwen generation. Cutting token budgets blind
+// is exactly the vibes-tuning Workstream A was written against — that
+// one gets per-intent timing instrumentation first, then a number.
+// DISPLAY_VERSION 4.29.27.
+//
 // OTA-1115 — THE SECONDARY CAST GETS A LADDER TOO. Workstream B step
 // 3, closing the audit's dialogue finding. The 21 secondary named NPCs
 // (4-5 topics) and the 11 class sets now carry depth: each named NPC
@@ -21076,7 +21113,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-04-1115-secondary-cast';
+export const OTA_BUILD_ID = '2026-08-04-1116-from-the-device-log';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1115-secondary-cast';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1114-deep-bench';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1113-door-you-can-see';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1112-packs-end-too';

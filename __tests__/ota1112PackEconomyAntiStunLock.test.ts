@@ -290,6 +290,12 @@ describe('OTA-1112 — braced tick class + source locks', () => {
   });
 
   it('bosses and ranged enemies are exempt from the swing cap', () => {
-    expect(src).toMatch(/const meleeAttacker = !enemy\.boss && !isRangedEnemy\(enemy\);/);
+    // OTA-1116 retarget — the exemption became RANGE-AWARE (a shooter standing
+    // in the scrum takes a slot; ranged keeps its pass at mid and beyond), so
+    // the old exact line is gone. The invariant this lock stands for is
+    // unchanged: bosses are never capped, and range decides whether a ranged
+    // enemy is exempt.
+    expect(src).toMatch(/const meleeAttacker = !enemy\.boss && \(inTheScrum \|\| !isRangedEnemy\(enemy\)\);/);
+    expect(src).toMatch(/const inTheScrum = \(liveScene\.range \?\? 'close'\) === 'close';/);
   });
 });
