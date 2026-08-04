@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.22';
+export const DISPLAY_VERSION = '4.29.23';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20986,6 +20986,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1112 — PACKS END TOO: ANTI-STUN-LOCK + PACK ECONOMY + KNOCKOUTS
+// RESOLVE FIGHTS. Workstream A, step 3 (owner: "keep going with the KO
+// fix and ship 1112"). Four changes:
+//   1. ANTI-STUN-LOCK — the moment a stun/paralyze takes hold the
+//      player is `braced` (BRACED_ROUNDS 3, per-encounter): further
+//      incapacitations cannot land while it runs ("…blow rings off
+//      you — braced; you keep your feet."). A 5-member concussive
+//      pack re-rolling 20% per landed blow was 844 stuns per sim run.
+//   2. PACK ACTION ECONOMY — at most MELEE_PACK_SWINGS_PER_ROUND (3)
+//      non-boss melee blades land per volley (rotating lead); the
+//      overflow presses in behind, one dedup-quiet line. Bosses and
+//      ranged are exempt.
+//   3. KNOCKOUTS RESOLVE FIGHTS — a KO'd body leaves the scene only
+//      via the loot splice, so sights parked on sleepers and a pack
+//      where everyone got cracked could never end by attrition. Now:
+//      a mid-fight KO moves the sights to someone still standing;
+//      when a KO (or a kill) drops the LAST standing enemy the fight
+//      resolves by subdual — the sleepers are stripped where they lie
+//      (same grants/TC/signature-weapon rules as a manual loot) and
+//      the scene returns to peace. "Still fighting" now means a live,
+//      CONSCIOUS enemy everywhere it's computed.
+//   4. SIM HONESTY — combatStress's stall budget scales with pack
+//      size (25 + 5/extra member; the 2.5% cap is unchanged), stall
+//      rows record their anatomy (damage lines / refusals / KOs /
+//      stun lines), and the beat-down phase is RANGE-AWARE: under
+//      slow-weather repositioning a lone advance doesn't move a band,
+//      and the fixed rotation left the sim marooned at mid spamming a
+//      close-only cleaver into the reach gate — the entire remaining
+//      stall tail. A real player keeps walking in; now the sim does.
+// DISPLAY_VERSION 4.29.23.
+//
 // OTA-1111 — GUARD-CRACK: RESISTED FIGHTS END. Workstream A, step 2
 // (owner-approved: "let's go with the resists break == Guard-crack").
 // The device slog was a solo resisted matchup — every swing halved to
@@ -21013,7 +21044,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-04-1111-guard-crack';
+export const OTA_BUILD_ID = '2026-08-04-1112-packs-end-too';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1111-guard-crack';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1110-name-the-slog';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1109-six-from-the-log';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1108-ledger-explains-itself';

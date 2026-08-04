@@ -186,7 +186,7 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
     let wins = 0;
     let deaths = 0;
     let fled = 0;
-    let stalled = 0;          // encounters that exceeded 25 rounds — assertion
+    let stalled = 0;          // encounters that exceeded their round budget — assertion
     const verbAttempts: Counter = {};
     const verbHits: Counter = {};       // success rate (per attack verb)
     const verbMisses: Counter = {};
@@ -212,10 +212,22 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
     // enemy. The report prints both tables so the retier pass (OTA-1112)
     // works a named list instead of a feeling. Log scanning is by entry ID
     // (the sim trims gameLog to 40 per turn, so length offsets lie).
-    const stallDetails: Array<{ enemies: string; resisted: number; combatLines: number; main: string; off: string }> = [];
+    const stallDetails: Array<{
+      enemies: string; resisted: number; combatLines: number; main: string; off: string;
+      // OTA-1112 — stall anatomy: what the player's rounds in the stalled
+      // phase actually WERE. playerDmg = landed player damage lines,
+      // refusals = swings refused (wrong range etc.), ko = knockout lines
+      // (a KO'd humanoid stays in the lineup at HP>0 — kills nobody),
+      // stunLines = lines mentioning the player stunned.
+      playerDmg: number; refusals: number; ko: number; stunLines: number;
+    }> = [];
     const killRounds: Record<string, number[]> = {};
     let encResisted = 0;
     let encCombatLines = 0;
+    let encPlayerDmg = 0;
+    let encRefusals = 0;
+    let encKO = 0;
+    let encStunLines = 0;
     let seenCombatIds = new Set<string>();
     const scanCombatLog = (): void => {
       for (const e of store.getState().gameLog) {
@@ -223,6 +235,10 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
         seenCombatIds.add(e.id);
         encCombatLines++;
         if (e.text.includes('(resisted,')) encResisted++;
+        if ((e.meta as Record<string, unknown> | undefined)?.combatOutcome === 'player_dmg') encPlayerDmg++;
+        if (e.text.startsWith("Nothing in arm's reach")) encRefusals++;
+        if (e.text.includes('out cold')) encKO++;
+        if (e.text.includes('stunned')) encStunLines++;
       }
     };
 
@@ -536,11 +552,22 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
         // OTA-1110 — fresh composition window for the new membership.
         encResisted = 0;
         encCombatLines = 0;
+        encPlayerDmg = 0;
+        encRefusals = 0;
+        encKO = 0;
+        encStunLines = 0;
         seenCombatIds = new Set<string>();
       }
       combatRoundsInEncounter++;
-      // Stall guard: every encounter must resolve in ≤25 rounds.
-      if (combatRoundsInEncounter > 25) {
+      // Stall guard — OTA-1112: the round budget scales with pack size. The
+      // flat 25 was calibrated for solo fights; a 5-member pack is five
+      // sequential kills (~4-6 landed hits each per the OTA-1110 kill table),
+      // so it earns +5 rounds per extra member before it counts as
+      // pathological. The 2.5% cap on the assertion below is UNCHANGED — what
+      // changed is that a legitimately long pack fight is no longer conflated
+      // with a fight that refuses to end.
+      const stallBudget = 25 + 5 * Math.max(0, (sc?.enemies.length ?? 1) - 1);
+      if (combatRoundsInEncounter > stallBudget) {
         stalled++;
         // OTA-1110 — name the matchup before force-ending it.
         scanCombatLog();
@@ -552,6 +579,10 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
             combatLines: encCombatLines,
             main: eqp?.main ?? '(bare hands)',
             off: eqp?.off ?? '-',
+            playerDmg: encPlayerDmg,
+            refusals: encRefusals,
+            ko: encKO,
+            stunLines: encStunLines,
           });
         }
         // Force-end the encounter by clearing the enemy from the
@@ -645,8 +676,24 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
           break;
         default:
           // Beat-down phase — keep swinging the equipped weapon.
-          action = `attack ${enemy.name}`;
-          verb = 'equipped_attack';
+          // OTA-1112 — RANGE-AWARE: under slow-weather repositioning (Iron
+          // Fog / Silent Blizzard) a single advance only accrues progress
+          // toward the band change, and a direction flip resets it — so the
+          // fixed rotation (advance r4, retreat r8, advance r9) could leave
+          // the sim marooned at mid spamming a close-only cleaver into the
+          // reach gate for the whole 45-round budget. That was the ENTIRE
+          // remaining stall tail: 0% resisted, ~5 damage lines per stalled
+          // phase, every refusal an arbiter-channel line the combat scan
+          // never counted. A real player just keeps walking in; now the sim
+          // does too.
+          if ((sc!.range ?? 'close') !== 'close') {
+            action = 'advance';
+            verb = 'advance';
+            advanceCount.v++;
+          } else {
+            action = `attack ${enemy.name}`;
+            verb = 'equipped_attack';
+          }
       }
 
       // Capture pre-action statusEffects so we can verify the
@@ -733,7 +780,7 @@ Player deaths:        ${deaths}
 Total encounters:     ${totalEncounters}
   Wins (kills):       ${wins}  (rate ${(winRate * 100).toFixed(1)}%)
   Fled / force-ended: ${fled}
-  Stalled >25 rds:    ${stalled}
+  Stalled >budget:    ${stalled}  (budget 25 + 5/extra pack member)
   Player deaths:      ${deaths}
 
 ── Verb attempts ──
@@ -758,14 +805,15 @@ Retreats issued:      ${retreatCount.v}
 ── OTA-1110 · stalled matchups (enemy | count | avg resisted-line share | hands) ──
 ${(() => {
   if (stallDetails.length === 0) return '  (none stalled)';
-  const g = new Map<string, { n: number; res: number; lines: number; hands: Set<string> }>();
+  const g = new Map<string, { n: number; res: number; lines: number; hands: Set<string>; pd: number; ref: number; ko: number; stun: number }>();
   for (const d of stallDetails) {
-    const e = g.get(d.enemies) ?? { n: 0, res: 0, lines: 0, hands: new Set<string>() };
+    const e = g.get(d.enemies) ?? { n: 0, res: 0, lines: 0, hands: new Set<string>(), pd: 0, ref: 0, ko: 0, stun: 0 };
     e.n++; e.res += d.resisted; e.lines += d.combatLines; e.hands.add(`${d.main}/${d.off}`);
+    e.pd += d.playerDmg; e.ref += d.refusals; e.ko += d.ko; e.stun += d.stunLines;
     g.set(d.enemies, e);
   }
   return [...g.entries()].sort((a, b) => b[1].n - a[1].n)
-    .map(([k, v]) => `  ${k.padEnd(34)} x${v.n}  resisted ${(v.lines ? (100 * v.res / v.lines) : 0).toFixed(0)}% of combat lines  [${[...v.hands].join(' | ')}]`)
+    .map(([k, v]) => `  ${k.padEnd(34)} x${v.n}  resisted ${(v.lines ? (100 * v.res / v.lines) : 0).toFixed(0)}%  avg/stall: dmgLines ${(v.pd / v.n).toFixed(1)} refusals ${(v.ref / v.n).toFixed(1)} KO ${(v.ko / v.n).toFixed(1)} stunLines ${(v.stun / v.n).toFixed(1)}  [${[...v.hands].join(' | ')}]`)
     .join('\n');
 })()}
 
