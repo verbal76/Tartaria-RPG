@@ -42,6 +42,18 @@ if (!halDir || !halRange || !golemDir || !golemRange) {
   process.exit(2);
 }
 
+/** OTA-1111/1088 port — pre-offset-era cross-reference pairs. Before the
+ *  standing −23 era (HAL ≥983), the two lines' skew varied per wave, so the
+ *  uniform rule can't map those ids. When a port rewrites a block that still
+ *  carries old-era lineage comments, each side keeps ITS OWN historical id —
+ *  golem's OTA-698 IS HAL's OTA-715 — and this table teaches the verifier the
+ *  equivalence. Add pairs HERE as older blocks get rewritten; never "fix"
+ *  golem's history to match HAL's numbers. */
+const LEGACY_PAIRS = new Map([
+  [715, 698],   // reconciled type+trait resist (HAL OTA-715 ↔ golem OTA-698)
+  [959, 936],   // named swap-nudge weapon (HAL OTA-959 ↔ golem OTA-936)
+]);
+
 /** ⚠ THE ONE RENUMBER RULE. Every shape an OTA reference takes anywhere in
  *  the repo: `OTA-1090`, `ota1090` (test filenames and prose, any case),
  *  and bare build-id slugs `2026-08-03-1090`. Add new shapes HERE, never in a
@@ -49,6 +61,7 @@ if (!halDir || !halRange || !golemDir || !golemRange) {
 function renumHal(line) {
   const map = (n) => {
     const v = parseInt(n, 10);
+    if (LEGACY_PAIRS.has(v)) return String(LEGACY_PAIRS.get(v));
     return v >= RENUM_MIN && v <= RENUM_MAX ? String(v - OFFSET) : n;
   };
   return line
@@ -97,9 +110,17 @@ for (const f of halFiles.sort()) {
   const h = addedRemoved(halDir, halRange, f);
   const g = addedRemoved(golemDir, golemRange, golemFileFor(f));
   const ha = counter(h.add.map(renumHal));
-  const hr = counter(h.rem.map(renumHal));
+  // OTA-1111/1088 port — the REMOVED side skips comment-only lines. A rewrite
+  // of a block whose comments already diverged between the lines (old-era
+  // lineage refs, or a note one line never carried) produces removed-line
+  // mismatches NO correct port can reconcile — you cannot remove a comment the
+  // other side never had. Added lines stay fully strict (they are what the
+  // port introduces, and wrong cross-refs there were this script's reason to
+  // exist); only the comparison of what each side DELETED tolerates comments.
+  const isComment = (l) => /^(\/\/|\/\*|\*)/.test(l);
+  const hr = counter(h.rem.map(renumHal).filter((l) => !isComment(l)));
   const ga = counter(g.add);
-  const gr = counter(g.rem);
+  const gr = counter(g.rem.filter((l) => !isComment(l)));
   const report = [
     ['HAL-only added', subtract(ha, ga)],
     ['golem-only added', subtract(ga, ha)],

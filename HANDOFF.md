@@ -923,9 +923,31 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.21**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.22**; ledger in `VERSION.md`.
 
-- **NAME THE SLOG (2026-08-04, latest). BOTH LINES.** HAL OTA-1110 /
+- **GUARD-CRACK: RESISTED FIGHTS END (2026-08-04, latest). BOTH LINES.**
+  golem OTA-1088 / HAL OTA-1111. Workstream A step 2, owner-approved
+  ("let's go with the resists break == Guard-crack") over globally
+  softening the x0.5. Three landed RESISTED hits of one damage type into
+  one enemy wear its guard through: from the next swing that resist stops
+  applying for the rest of the fight (crack line "…worn <enemy>'s guard
+  through — it bites full from here."). Per-scene bookkeeping
+  (`CurrentScene.resistWear` / `resistCracked`, key
+  `${enemy.name}|${damageType}`; cleared where a fight's lineup is
+  wholesale-replaced — climb ambush, revenant spawns, missing-walker —
+  so a fresh encounter re-arms). `effectiveMod` carries the crack through
+  damage, narration, and type-procs; `recordEnemyIntel` still receives
+  the TRUE `combinedMod`, so the bestiary shows the real matchup. Damage
+  floor 1 → 2. The swap advice re-keys off the same wear counter: FIRST
+  skid when it can NAME a carried weapon ("Swap to the Cudgel — …"),
+  second skid generic, once per enemy+type per fight; `weaponResistStreak`
+  is retired (field kept for legacy saves; weaponResistNudge suite locks
+  the surface). New suite `ota1088GuardCrack` drives REAL store combat
+  (slashing cleaver vs Construct) through advice → crack → full-bite →
+  intact intel, plus source locks (floor, threshold, intel arg). Next:
+  OTA-1089/1112 anti-stun-lock + pack math re-baselines the heavy guard.
+
+- **NAME THE SLOG (2026-08-04). BOTH LINES.** HAL OTA-1110 /
   golem OTA-1087. Workstream A ("fights that end") step 1 — test-only
   instrumentation in combatStress: per-stall composition (enemy sig,
   hands, resisted-line share) + rounds-to-kill per matchup, two new

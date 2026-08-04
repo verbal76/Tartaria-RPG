@@ -1,3 +1,8 @@
+// OTA-1088 — the combat wiring for the resist-nudge moved to the per-scene
+// CurrentScene.resistWear counter (see ota1088GuardCrack.test.ts); combat no
+// longer writes weaponResistStreak. This suite still locks the retired
+// field's state surface so legacy saves/snapshots that carry it load cleanly.
+//
 // OTA-197 — verifies the Arbiter resist-nudge. Playtest log
 // (2026-05-29) showed the player swinging a piercing bolt-caster
 // twice in a row at piercing-resistant enemies (Silt Serpent, Mud

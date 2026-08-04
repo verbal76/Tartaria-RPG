@@ -591,6 +591,15 @@ interface CurrentScene {
    *  re-triggered every round (the ranged sneak→fire loop). Resets with the
    *  scene (a fresh encounter = a fresh drop). */
   stealthOpenerUsed?: boolean;
+  /** OTA-1088 — landed RESISTED hits this fight, keyed `${enemy.name}|${damageType}`.
+   *  At GUARD_CRACK_HITS the pair moves to resistCracked and that resist stops
+   *  applying. Resets when a fresh enemy lineup replaces the scene's. */
+  resistWear?: Record<string, number>;
+  /** OTA-1088 — `${enemy.name}|${damageType}` pairs whose guard has been worn
+   *  through this fight: damage, narration, and type-procs treat the pair as a
+   *  normal matchup from the next swing on. recordEnemyIntel still banks the
+   *  TRUE resist, so the bestiary shows the real matchup. */
+  resistCracked?: string[];
   /** OTA-913 — set once the sneak-odds warning has fired this encounter (throttle: a
    *  failed close-range sneak warns about the free-hit cost only once per scene). */
   sneakOddsWarned?: boolean;
@@ -1506,6 +1515,13 @@ function qwenRecoveringDelayMs(): number {
   if (qwenBackoffLevel <= 0) return QWEN_WATCHDOG_RECOVERING_MS;
   return Math.min(QWEN_WATCHDOG_HEALTHY_MS, QWEN_WATCHDOG_RECOVERING_MS * 2 ** qwenBackoffLevel);
 }
+/** OTA-1088 — guard-crack. Landing this many RESISTED hits of one damage type
+ *  into one enemy wears its guard through: from the next swing on, that resist
+ *  stops applying for the rest of the fight. Bounds the wrong-weapon slog — a
+ *  resisted fight ends slower, not never — without flattening the damage-type
+ *  system the way a global ×0.5 → ×0.75 soften would. The bestiary keeps
+ *  recording the TRUE resist, so the knowledge layer never lies. */
+const GUARD_CRACK_HITS = 3;
 /** OTA-1032 — one health check. Returns TRUE when Qwen is healthy, which is what
  *  drives the adaptive poll: healthy → back to the slow cadence, anything else →
  *  keep checking fast until it recovers. */
@@ -4881,12 +4897,10 @@ interface GameStore {
    *  stretch pulls combat back into the rotation. Persisted alongside
    *  wastelandStepsSinceEncounter for consistency. */
   stepsSinceCombat: number;
-  /** OTA-197 — transient streak tracker for the "this weapon isn't
-   *  working on this enemy" arbiter nudge. Counts consecutive resisted
-   *  hits with the same weapon type against the same enemy. On the 2nd
-   *  consecutive resist, the arbiter chimes in suggesting a swap.
-   *  Resets on: scene change, weapon change, non-resisted hit, miss, or
-   *  attack against a different enemy. Not persisted. */
+  /** RETIRED OTA-1088 (was OTA-197) — the resist swap-nudge now keys off
+   *  CurrentScene.resistWear (the same per-scene counter the guard-crack
+   *  reads), so combat no longer writes this field. Kept so legacy saves
+   *  and state snapshots that carry it still load cleanly. */
   weaponResistStreak: { enemyName: string; damageType: string; count: number } | null;
   /** OTA-936 — once-per-encounter latch for the combat legibility cues (soak praise / leak
    *  warning — see engine/combatCues). Keyed by the fight's tile so each encounter gets
@@ -17434,6 +17448,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   enemyAmbushUsed: scaledEnc.map(() => false),
                   enemyKnockedOut: scaledEnc.map(() => false),
                   stealthOpenerUsed: false,
+                  resistWear: {}, resistCracked: [],
                 },
               } : s));
               get().appendLog('world', enc.intro);
@@ -20234,6 +20249,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // OTA-698 — reconcile the type table with the authored trait. STACK when
       // they agree (double-resist x0.25); on a DISCORD the per-enemy trait wins.
       const combinedMod = combineDamageTypeMatch(mod.match, traitMod.match);
+      // OTA-1088 — guard-crack. Once this enemy has shrugged off this damage
+      // type GUARD_CRACK_HITS times this fight, its guard is worn through: the
+      // resist stops applying. Damage, narration, and type-procs all read
+      // effectiveMod; recordEnemyIntel below keeps banking the TRUE
+      // combinedMod so the bestiary never lies about the matchup.
+      const crackKey = weaponType !== null ? `${enemy.name}|${weaponType}` : null;
+      const guardCracked = crackKey !== null && combinedMod.match === 'resist'
+        && (currentScene.resistCracked ?? []).includes(crackKey);
+      const effectiveMod = guardCracked ? { match: 'normal' as const, multiplier: 1 } : combinedMod;
       // HANDOFF followup — weapon "Effect" parser. Parses the catalog
       // entry's free-text effect column for patterns like "+1d6 against
       // Large creatures" / "+1d6 against constructs" and rolls the
@@ -20261,7 +20285,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ surgeCombatToken: token });
         }
       }
-      let dmg = Math.max(1, Math.round(rawDmg * combinedMod.multiplier) + effectBonus + titleDmgBonus + surgeBonus);
+      // OTA-1088 — floor 2 (was 1): a landed hit always tells the HP bar
+      // something, so a resisted chip-fight can't grind out "for 1" forever.
+      let dmg = Math.max(2, Math.round(rawDmg * effectiveMod.multiplier) + effectBonus + titleDmgBonus + surgeBonus);
       // OTA-362 — weapon coating on-hit. If the weapon that landed this
       // blow carries a coating, roll its dice ONCE: the roll lands as
       // IMMEDIATE bonus damage this strike (folded into `dmg` so it
@@ -20338,7 +20364,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const tp = BUILTIN_DT_COMBAT[canonDT(weaponType)];
         if (tp) {
           // OTA-698 — use the reconciled type+trait result for the flare proc.
-          const tMatch: 'weak' | 'resist' | 'normal' = combinedMod.match;
+          // OTA-1088 — reads effectiveMod so a cracked guard procs at normal odds.
+          const tMatch: 'weak' | 'resist' | 'normal' = effectiveMod.match;
           if (Math.random() < dtProcChance(tp, tMatch)) {
             const roll = rollDie(4);
             if (tp.mode === 'on_hit') { dmg += roll; get().appendLog('combat', `${weaponType.charAt(0).toUpperCase()}${weaponType.slice(1)} flares — +${roll} on hit${tMatch === 'weak' ? ' (weak — bites deep!)' : ''}.`); }
@@ -20363,86 +20390,102 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Narrate the resistance/weakness modifier on its own line so the
       // player can see WHY the damage changed.
       // OTA-698 — ONE reconciled line (was two, which could contradict).
-      if (combinedMod.match === 'weak') {
-        get().appendLog('combat', `Weakness exposed — ${enemy.name} flinches. (${weaponType} ×${combinedMod.multiplier} for ${dmg})`);
-      } else if (combinedMod.match === 'resist') {
-        get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×${combinedMod.multiplier} for ${dmg})`);
+      if (effectiveMod.match === 'weak') {
+        get().appendLog('combat', `Weakness exposed — ${enemy.name} flinches. (${weaponType} ×${effectiveMod.multiplier} for ${dmg})`);
+      } else if (effectiveMod.match === 'resist') {
+        get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×${effectiveMod.multiplier} for ${dmg})`);
+      }
+      // OTA-1088 — wear bookkeeping. Count this landed resisted hit; at
+      // GUARD_CRACK_HITS the pair cracks (the shrug-off line above still
+      // printed for THIS hit — the next swing is the one that lands full).
+      let resistWearNow = 0;
+      if (crackKey !== null && effectiveMod.match === 'resist') {
+        resistWearNow = ((get().currentScene?.resistWear ?? {})[crackKey] ?? 0) + 1;
+        if (resistWearNow >= GUARD_CRACK_HITS) {
+          set((s) => (s.currentScene ? {
+            currentScene: {
+              ...s.currentScene,
+              resistCracked: [...(s.currentScene.resistCracked ?? []), crackKey],
+            },
+          } : s));
+          get().appendLog('combat', `The ${weaponType} has worn ${enemy.name}'s guard through — it bites full from here.`);
+        } else {
+          set((s) => (s.currentScene ? {
+            currentScene: {
+              ...s.currentScene,
+              resistWear: { ...(s.currentScene.resistWear ?? {}), [crackKey]: resistWearNow },
+            },
+          } : s));
+        }
       }
       // OTA-838 — bank what that swing taught you: the panel/bestiary now reveal this
       // enemy's observed weak/resist types (even below the Wisdom read-threshold).
       recordEnemyIntel(get, set, enemy.name, weaponType, combinedMod.match);
-      // OTA-197 — consecutive-resist nudge. Playtester swung a piercing
-      // bolt-caster at a piercing-resistant Silt Serpent + Mud Lurker
-      // back-to-back and lost the fight largely because they didn't
-      // know to swap weapons. When the same enemy resists the same
-      // damage type a second time in a row, the Arbiter pipes up
-      // suggesting a swap. Resets after firing (so it's a single
-      // nudge, not a per-turn lecture).
-      if (weaponType !== null) {
-        // OTA-698 — nag only when the RECONCILED result is a resist (so an
-        // enemy that's actually vulnerable to this type never draws it).
-        const isResist = combinedMod.match === 'resist';
-        const prev = get().weaponResistStreak;
-        if (isResist) {
-          if (prev && prev.enemyName === enemy.name && prev.damageType === weaponType) {
-            const nextCount = prev.count + 1;
-            if (nextCount >= 2) {
-              // Build a swap hint — surface the available alternative
-              // damage types in the player's pack so the Arbiter's
-              // suggestion is grounded.
-              // OTA-698 — only suggest types the enemy does NOT resist
-              // (checking both the creature-type table and its traits), so
-              // we never tell the player to "try slashing" against a
-              // slashing-resistant foe. Prefer types it's outright weak to.
-              const weakTypes = new Set<string>();
-              const neutralTypes = new Set<string>();
-              // OTA-936 — remember a concrete carried weapon per suggested type so the
-              // nudge can NAME it ("Swap to the Boltcaster") instead of leaving the
-              // player to grep their own pack for "something electrical".
-              const nameByType = new Map<string, string>();
-              try {
-                for (const it of player.inventory) {
-                  if (it.kind !== 'weapon') continue;
-                  if (it.name === equipped?.name) continue;
-                  const w = findWeaponByName(it.name);
-                  if (!w || w.damageType === weaponType) continue;
-                  const alt = combineDamageTypeMatch(
-                    applyDamageTypeModifier(1, w.damageType, enemy.type).match,
-                    traitDamageMultiplier(enemy.traits, w.damageType).match,
-                  );
-                  if (alt.match === 'weak') {
-                    weakTypes.add(w.damageType);
-                    if (!nameByType.has(w.damageType)) nameByType.set(w.damageType, it.name);
-                  } else if (alt.match === 'normal') {
-                    neutralTypes.add(w.damageType);
-                    if (!nameByType.has(w.damageType)) nameByType.set(w.damageType, it.name);
-                  }
-                }
-              } catch { /* ignore — hint stays generic */ }
-              const altTypes = weakTypes.size > 0 ? weakTypes : neutralTypes;
-              const altArr = Array.from(altTypes).slice(0, 2);
-              // OTA-936 — name the weapon when we know one; the type-only phrasing stays
-              // as the fallback for a type carried only in odd forms.
-              const namedPick = altArr.map((t) => nameByType.get(t)).find(Boolean);
-              const hint = altArr.length > 0
-                ? namedPick
-                  ? `Swap to the ${namedPick} — ${altArr.join(' or ')} will bite where ${weaponType} won't.`
-                  : `Try something ${altArr.join(' or ')} — you have it in your pack.`
-                : `Find another weapon — ${weaponType} isn't biting.`;
-              get().appendLog(
-                'arbiter',
-                `The Arbiter watches the ${weaponType} skid off again. "Twice now. ${hint}"`,
-              );
-              set({ weaponResistStreak: null });
-            } else {
-              set({ weaponResistStreak: { enemyName: enemy.name, damageType: weaponType, count: nextCount } });
+      // OTA-197 — resist swap-nudge. Playtester swung a piercing bolt-caster
+      // at a piercing-resistant Silt Serpent + Mud Lurker back-to-back and
+      // lost the fight largely because they didn't know to swap weapons.
+      // OTA-1088 — rekeyed off the same per-scene wear counter as the
+      // guard-crack (the old cross-fight weaponResistStreak made the player
+      // eat TWO resisted hits even when the Arbiter could already NAME the
+      // swap, and its streak carried across encounters). Fires at most once
+      // per enemy+type per fight: on the FIRST skid when a concrete carried
+      // weapon can be named, otherwise on the second with the generic
+      // phrasing — one data point isn't enough to say "find another weapon".
+      if (weaponType !== null && crackKey !== null
+          && effectiveMod.match === 'resist' && resistWearNow <= 2) {
+        // Build a swap hint — surface the available alternative
+        // damage types in the player's pack so the Arbiter's
+        // suggestion is grounded.
+        // OTA-698 — only suggest types the enemy does NOT resist
+        // (checking both the creature-type table and its traits), so
+        // we never tell the player to "try slashing" against a
+        // slashing-resistant foe. Prefer types it's outright weak to.
+        const weakTypes = new Set<string>();
+        const neutralTypes = new Set<string>();
+        // OTA-936 — remember a concrete carried weapon per suggested type so the
+        // nudge can NAME it ("Swap to the Boltcaster") instead of leaving the
+        // player to grep their own pack for "something electrical".
+        const nameByType = new Map<string, string>();
+        try {
+          for (const it of player.inventory) {
+            if (it.kind !== 'weapon') continue;
+            if (it.name === equipped?.name) continue;
+            const w = findWeaponByName(it.name);
+            if (!w || w.damageType === weaponType) continue;
+            const alt = combineDamageTypeMatch(
+              applyDamageTypeModifier(1, w.damageType, enemy.type).match,
+              traitDamageMultiplier(enemy.traits, w.damageType).match,
+            );
+            if (alt.match === 'weak') {
+              weakTypes.add(w.damageType);
+              if (!nameByType.has(w.damageType)) nameByType.set(w.damageType, it.name);
+            } else if (alt.match === 'normal') {
+              neutralTypes.add(w.damageType);
+              if (!nameByType.has(w.damageType)) nameByType.set(w.damageType, it.name);
             }
-          } else {
-            set({ weaponResistStreak: { enemyName: enemy.name, damageType: weaponType, count: 1 } });
+            // 'resist' → skip; never suggest a type the enemy resists.
           }
-        } else {
-          // Non-resisted hit on ANY target breaks the streak.
-          if (prev) set({ weaponResistStreak: null });
+        } catch { /* ignore — hint stays generic */ }
+        const altTypes = weakTypes.size > 0 ? weakTypes : neutralTypes;
+        const altArr = Array.from(altTypes).slice(0, 2);
+        // OTA-936 — name the weapon when we know one; the type-only phrasing stays
+        // as the fallback for a type carried only in odd forms.
+        const namedPick = altArr.map((t) => nameByType.get(t)).find(Boolean);
+        // First skid speaks only when there's a weapon to point at; the second
+        // covers the no-name case (a named nudge already fired on hit one).
+        const fireNow = resistWearNow === 1 ? namedPick != null : namedPick == null;
+        if (fireNow) {
+          const hint = altArr.length > 0
+            ? namedPick
+              ? `Swap to the ${namedPick} — ${altArr.join(' or ')} will bite where ${weaponType} won't.`
+              : `Try something ${altArr.join(' or ')} — you have it in your pack.`
+            : `Find another weapon — ${weaponType} isn't biting.`;
+          get().appendLog(
+            'arbiter',
+            resistWearNow === 1
+              ? `The Arbiter watches the ${weaponType} skid off. "${hint}"`
+              : `The Arbiter watches the ${weaponType} skid off again. "Twice now. ${hint}"`,
+          );
         }
       }
       if (effectBonus > 0) {
@@ -25876,6 +25919,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ...s2.currentScene,
                 enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
                 enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
+                resistWear: {}, resistCracked: [],
               },
               worldMemory: { ...s2.worldMemory, activeRevenant: { ...fr } },
             } : s2));
@@ -30366,6 +30410,7 @@ function applyHookEffect(
           ...s2.currentScene,
           enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
           enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
+          resistWear: {}, resistCracked: [],
         },
         worldMemory: { ...s2.worldMemory, activeRevenant: { ...fr } },
       } : s2));
@@ -32146,6 +32191,7 @@ function advanceStoryDrip(
             ...scene,
             enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
             enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
+            resistWear: {}, resistCracked: [],
           },
         });
         get().appendLog('combat', `⚔ BOSS EVENT — ${foe.name}. It cannot be talked down and it will not stop. Put them to rest. Nothing else is mercy.`);

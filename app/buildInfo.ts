@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.21';
+export const DISPLAY_VERSION = '4.29.22';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19854,7 +19854,35 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1112/1089 anti-stun-lock + pack math. No app code; the fast gate
 // is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
-export const OTA_BUILD_ID = '2026-08-04-1087-name-the-slog';
+// OTA-1088 — GUARD-CRACK: RESISTED FIGHTS END. Workstream A, step 2
+// (owner-approved: "let's go with the resists break == Guard-crack").
+// The device slog was a solo resisted matchup — every swing halved to
+// chip damage and the fight refused to end. Three changes, one seam:
+//   1. GUARD-CRACK — landing GUARD_CRACK_HITS (3) RESISTED hits of one
+//      damage type into one enemy wears its guard through: from the
+//      next swing that resist stops applying for the rest of the fight
+//      (crack line: "…worn <enemy>'s guard through — it bites full
+//      from here."). Per-scene bookkeeping (CurrentScene.resistWear /
+//      resistCracked, keyed `${enemy.name}|${damageType}`), so a fresh
+//      encounter re-arms the resist. effectiveMod overrides
+//      resist→normal for damage, narration, and type-procs;
+//      recordEnemyIntel still banks the TRUE combinedMod, so the
+//      bestiary never lies about the matchup.
+//   2. DAMAGE FLOOR 2 (was 1) — a landed hit always moves the HP bar;
+//      no more "for 1" grind against a resistant foe.
+//   3. EARLY SWAP ADVICE — the Arbiter's resist nudge re-keyed off the
+//      same wear counter: fires on the FIRST skid when it can NAME a
+//      carried alternative ("Swap to the Cudgel — …"), on the second
+//      for the generic phrasing; once per enemy+type per fight. The
+//      old cross-fight weaponResistStreak state is retired (field kept
+//      for legacy saves).
+// Wear cleared at the three wholesale-lineup-replacement sites (climb
+// ambush + both revenant spawns). New suite ota1088GuardCrack drives
+// REAL store combat (slashing cleaver vs a Construct) through advice →
+// crack → full-bite → intact bestiary intel, plus source locks on the
+// floor and the crack threshold. DISPLAY_VERSION 4.29.22.
+export const OTA_BUILD_ID = '2026-08-04-1088-guard-crack';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1087-name-the-slog';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1086-six-from-the-log';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1085-ledger-explains-itself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1084-qwen-watchdog-backoff';
