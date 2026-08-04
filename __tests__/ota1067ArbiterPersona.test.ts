@@ -253,15 +253,22 @@ describe('OTA-1067 — ⚠ the opinion cannot be farmed', () => {
   });
 
   it('answering every fork the best way still cannot alone reach the top band', () => {
-    // The forks are the heaviest input by design; they are still clamped, so a
-    // perfect Phase 3 run is a strong opinion rather than a finished one.
+    // OTA-1085 — the sheet now itemises one row per judged answer (the old
+    // aggregate row was illegible: "1 answer he was standing there for -5"
+    // named nothing). Forks are one-shot and finite, so the anti-farm
+    // property is structural now, not a clamp: even a perfect Phase 3 run
+    // stays a strong opinion, short of the top band (kin begins at 40).
     const best: Record<string, string> = {};
     for (const [key, v] of Object.entries(personaData.forkRegard)) {
       const [f, o] = key.split(':') as [string, string];
       if ((v as number) > 0 && !best[f]) best[f] = o;
     }
-    const part = regardParts(pc({ storyChoices: best }), wm()).find((x) => /answer/.test(x.label));
-    expect(part!.value).toBeLessThanOrEqual(20);
+    const rows = regardParts(pc({ storyChoices: best }), wm()).filter((x) => /^your answer:/.test(x.label));
+    expect(rows.length).toBe(Object.keys(best).length); // every answer is named
+    // Each row carries the words the player actually chose, not a code key.
+    for (const r of rows) expect(r.label).toMatch(/^your answer: [A-Z]/);
+    const total = rows.reduce((n, r) => n + r.value, 0);
+    expect(total).toBeLessThan(40);
   });
 
   it('⚠ and the total is clamped at both ends', () => {

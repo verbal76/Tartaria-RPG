@@ -21653,12 +21653,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         enemyName: enemy.name,
       });
     }
-    if (enemy.rarity === 'Rare' || enemy.rarity === 'Legendary') {
-      recordMemorableEvent(get, set, {
-        kind: 'rare_kill',
-        text: `cut down the ${enemy.name} in ${currentScene.location.name}`,
-        enemyName: enemy.name,
-      });
+    // OTA-1085 — one corpse, one ledger line. Core Guardians are Legendary,
+    // so this generic writer used to fire ("cut down the Iron Litany Brother
+    // Konrad…") AND the guardian block below wrote its own milestone
+    // ("defeated Iron Litany Brother Konrad at Nimari") — the owner's sheet
+    // showed the same kill twice. The guardian's dedicated record wins.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const cgKill = require('../engine/coreGuardians');
+      if ((enemy.rarity === 'Rare' || enemy.rarity === 'Legendary') && !cgKill.isCoreGuardian(enemy)) {
+        recordMemorableEvent(get, set, {
+          kind: 'rare_kill',
+          text: `cut down the ${enemy.name} in ${currentScene.location.name}`,
+          enemyName: enemy.name,
+        });
+      }
     }
 
     // TC drop. OTA 029 — was 30% chance per kill; playtester

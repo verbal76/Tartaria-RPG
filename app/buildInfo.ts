@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.18';
+export const DISPLAY_VERSION = '4.29.19';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19796,7 +19796,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Test: ota1084QwenWatchdogBackoff.test.ts (+ ota1032 source locks
 // retargeted to the backoff-aware schedule).
 // DISPLAY_VERSION 4.29.18.
-export const OTA_BUILD_ID = '2026-08-03-1084-qwen-watchdog-backoff';
+//
+// OTA-1085 — THE LEDGER EXPLAINS ITSELF (twin of HAL OTA-1108). Two owner
+// reports off the same Character screen:
+//
+// (1) "under arbiter it says '1 answer he was standing there for -5'...
+// I have no idea what I got a -5 for." That was the Phase-3 fork-regard
+// row: the Arbiter's judgement of the story answers you gave, summed
+// into one aggregate that named nothing (his -5 was 'Sell the bundle to
+// a Tomekeeper' — the missing man's letters). Each judged answer is now
+// its OWN row carrying the words the player actually chose: "your
+// answer: Sell the bundle to a Tomekeeper  -5". The old ±20 aggregate
+// sub-clamp retires with the aggregation — forks are one-shot and finite
+// (ten questions, deltas ±5), so nothing is farmable and the ±60 total
+// clamp still holds; a perfect run sums to +36, still short of kin (40).
+//
+// (2) "you have that I killed the litany brother Conrad twice — once
+// that I cut him down and then again that I defeated him." Core
+// Guardians are Legendary, so the generic rare-kill writer ("cut down
+// the…") AND the guardian milestone writer ("defeated … at Nimari") both
+// recorded the same corpse. One corpse, one ledger line: the generic
+// writer now skips Core Guardians; the guardian's dedicated record wins.
+// Test: ota1085LedgerExplainsItself.test.ts.
+// DISPLAY_VERSION 4.29.19.
+export const OTA_BUILD_ID = '2026-08-03-1085-ledger-explains-itself';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1084-qwen-watchdog-backoff';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1083-gift-economy';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1082-vendor-dismiss-closes-talk';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1081-shakedown-escort-mumble';

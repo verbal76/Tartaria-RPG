@@ -38,7 +38,7 @@
 // conduct, not of a coin. Callers supply a rotation counter for variety; the
 // same state always yields the same line.
 import type { PlayerCharacter, WorldMemory } from './types';
-import { choiceKeys } from './storyForks';
+import { choiceKeys, optionById } from './storyForks';
 import { pressureOf } from './pressure';
 import personaData from '../data/lore/arbiter-persona.json';
 
@@ -166,12 +166,21 @@ export function regardParts(
   // ── What you ANSWERED (Phase 3). The heaviest single input, deliberately:
   //    these are the only places the game ever asked you a question with no
   //    right answer and made you pick. ──
-  let forkTotal = 0, forkCount = 0;
+  // OTA-1085 — ITEMISED. This used to be one aggregate row ("1 answer he
+  // was standing there for  -5") and the owner, reading his own sheet,
+  // could not name the answer it was charging him for. Each judged answer
+  // is now its own row, labelled with the words the player actually chose
+  // ("your answer: Sell the bundle to a Tomekeeper  -5"). The old ±20
+  // aggregate sub-clamp is retired with the aggregation: forks are
+  // one-shot and finite (ten questions, each answered once, deltas ±5),
+  // so nothing here can be farmed, and the ±60 total clamp still holds.
   for (const key of choiceKeys(p)) {
     const d = FORK_REGARD[key];
-    if (typeof d === 'number' && d !== 0) { forkTotal += d; forkCount += 1; }
+    if (typeof d !== 'number' || d === 0) continue;
+    const [forkId = '', optionId = ''] = key.split(':');
+    const opt = optionById(forkId, optionId);
+    parts.push({ label: opt ? `your answer: ${opt.label}` : 'an answer he was standing there for', value: d });
   }
-  if (forkCount > 0) parts.push({ label: `${forkCount} answer${forkCount === 1 ? '' : 's'} he was standing there for`, value: clamp(forkTotal, -20, 20) });
 
   // ── What you asked the mud for (Phase 4). He notices. ──
   const tier = pressureOf(p);
