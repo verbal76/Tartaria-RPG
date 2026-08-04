@@ -266,6 +266,12 @@ export type HookEffect =
   | { type: 'grant_tc'; amount: number }
   | { type: 'grant_item'; name: string }
   | { type: 'spawn_enemy_tag'; tag: string }
+  // OTA-1109 — spawn a NAMED enemy. For hooks whose narration promises a
+  // specific creature: mud_golem_stir narrated "a hulking shape of stone and
+  // silt … The Golem turns toward your scent" and then spawn_enemy_tag
+  // 'Construct' rolled an Aetheric Scarab (owner's log). When the prose
+  // names the monster, the spawn must honor the name.
+  | { type: 'spawn_enemy_name'; name: string }
   | { type: 'heal'; amount: number }
   | { type: 'damage'; amount: number; cause: string }
   | { type: 'unlock_location'; locationId: string }
@@ -589,7 +595,8 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     {
       line: 'The Golem turns toward your scent. It has decided.',
       arbiterLine: '"Aether Golems do not negotiate," the Arbiter says.',
-      effects: [{ type: 'spawn_enemy_tag', tag: 'Construct' }],
+      // OTA-1109 — the narration names a golem, so a golem is what stands up.
+      effects: [{ type: 'spawn_enemy_name', name: 'Mud Golem' }],
       done: true,
     },
   ],

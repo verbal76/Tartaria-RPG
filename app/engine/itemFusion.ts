@@ -24,6 +24,14 @@
 import type { InventoryItem, UniqueItemStats } from './types';
 import { canonicalItemTags, isInferredItem, isRecipeIngredientName, findWeaponByName, findArmorByName } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
+// OTA-1109 — the salvage-curio catalog, so the forge can refuse to name its
+// product after stock salvage (see the input-echo rejection in the namer).
+import curiosData from '../data/relics/curios.json';
+
+// OTA-1109 — lowercase curio-name set for the forge-name rejection ladder.
+const CURIO_NAME_SET: ReadonlySet<string> = new Set(
+  ((curiosData as { curios: { name: string }[] }).curios ?? []).map((c) => c.name.trim().toLowerCase()),
+);
 
 /** Minimal Qwen interface — matches itemSynthesisQwen.ts so tests can
  *  pass a mock without dragging the full LlamaRuntime stack. */
@@ -586,7 +594,16 @@ export async function synthesizeFusionNameViaQwen(
     // OTA-801 — and reject a WEAPON name that ends in a soft / non-weapon noun
     // ("Aetheric Thread", "Resonant Veil") so the deterministic weapon pool names it.
     const weaponReadsSoft = stats.kind === 'weapon' && fusedWeaponNameReadsSoft(name);
-    if (endsWithKindWord || collidesCrossKind || isLowQualityForgeName(name) || weaponReadsSoft) return null;
+    // OTA-1109 — reject an INPUT ECHO / curio-catalog name. The prompt lists
+    // the reserved pieces by name and the model can hand one straight back:
+    // the owner's Legendary chest armor came out named "Hollow Quill Sheaf" —
+    // the exact Uncommon curio he fed into the forge. A forged product must
+    // never share a name with an ingredient or with salvage stock; when it
+    // would, fall back to the deterministic theme+noun name.
+    const lowerName = name.trim().toLowerCase();
+    const echoesInput = inputs.some((i) => i.name.trim().toLowerCase() === lowerName);
+    const isCurioName = CURIO_NAME_SET.has(lowerName);
+    if (endsWithKindWord || collidesCrossKind || echoesInput || isCurioName || isLowQualityForgeName(name) || weaponReadsSoft) return null;
     return { name, description };
   } catch {
     return null;

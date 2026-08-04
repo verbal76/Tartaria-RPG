@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.19';
+export const DISPLAY_VERSION = '4.29.20';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20919,7 +20919,55 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // writer now skips Core Guardians; the guardian's dedicated record wins.
 // Test: ota1108LedgerExplainsItself.test.ts.
 // DISPLAY_VERSION 4.29.19.
-export const OTA_BUILD_ID = '2026-08-03-1108-ledger-explains-itself';
+//
+// OTA-1109 — SIX FROM THE LOG. Owner: "fix all six bugs, ship to all three
+// lines." All six came out of the 11-part device-log triage:
+//
+// (1) THE GOLEM THAT WAS A BEETLE. mud_golem_stir narrated "a hulking
+// shape of stone and silt … The Golem turns toward your scent" and then
+// spawn_enemy_tag 'Construct' rolled an Aetheric Scarab. New hook effect
+// spawn_enemy_name: when the prose names the monster, the spawn honors
+// the name — the hook now raises a Mud Golem. The spawn line also
+// stops saying "close range" over a state of 'mid', and "emerges from
+// the hook" no longer leaks engine jargon.
+//
+// (2) ONE KEYWORD PER CONTRACT. Irma offered "Kindling for the Vigil"
+// AND "The Giant-Watch Vigil" in the same breath — both hints said
+// 'accept vigil'. acceptKeyword is collision-aware now: the four hint
+// sites at a counter share a per-visit set, and a claimed word makes the
+// next title walk back through its own significant words ("kindling" /
+// "giant-watch" — interior hyphens kept so the fuzzy matcher still
+// resolves them).
+//
+// (3) THE FORGE STOPS NAMING ITS PRODUCT AFTER AN INGREDIENT. The Qwen
+// namer is fed the reserved pieces by name and handed one straight back:
+// a Legendary chest piece named "Hollow Quill Sheaf" — the exact curio
+// the owner put in. The rejection ladder now refuses any input's name
+// and any curio-catalog name; the deterministic theme+noun name stands.
+//
+// (4) A RAID IS NEWS ONCE. Tarek re-told the same sacking verbatim on
+// four straight visits — the news gate keyed on prevSeenHours, which
+// quick room-hops never advanced. Delivery is now stamped on the
+// relation (raidHeardAtHours, max-merged in recordNpcDealing); only
+// raids NEWER than the stamp qualify. Both greeting paths stamp.
+//
+// (5) SET-PIECES DON'T REPLAY BACK-TO-BACK. The Phoenix-Feather scam
+// vendor appeared twice inside an hour, same velvet cloth, same speech.
+// The travel picker now excludes the last RECENT_ENCOUNTER_MEMORY (8)
+// encounter archetypes (worldMemory.recentEncounterArchetypes), falling
+// back to the full pool rather than a silent step if a biome is too
+// narrow; promised directional finds bypass as before.
+//
+// (6) ONE BUTTON, ONE ROLL. In-combat sneak PASSED its visible skill
+// roll ("14 vs DC 12") and a second hidden d20 then said "catches the
+// movement — SPOTTED". The opener no longer rolls its own die — the
+// visible gate roll IS the sneak; the engaged reset stays contested but
+// the player's side is the roll they already saw (skill.total + 2 +
+// day/night), with only the enemy rolling fresh.
+// Test: ota1109SixFromTheLog.test.ts (18 tests).
+// DISPLAY_VERSION 4.29.20.
+export const OTA_BUILD_ID = '2026-08-04-1109-six-from-the-log';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1108-ledger-explains-itself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1107-qwen-watchdog-backoff';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1106-gift-economy';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-03-1105-vendor-dismiss-closes-talk';

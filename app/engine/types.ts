@@ -1832,6 +1832,11 @@ export interface WorldMemory {
   /** OTA-1077 — recent outpost assaults, newest last, capped. Feeds the "your
    *  outpost was hit while I was away" beat in a greeting. */
   recentRaids?: OutpostRaid[];
+  /** OTA-1109 — archetype ids of the last few wasteland encounters, newest
+   *  first, capped at RECENT_ENCOUNTER_MEMORY. The travel picker excludes
+   *  these so an authored set-piece (the Phoenix-Feather scam vendor) can't
+   *  replay back-to-back. */
+  recentEncounterArchetypes?: string[];
   /** OTA-1081 — how many times each authored talk topic has been raised, keyed
    *  `<npcId>:<topicId>`. Drives "I have told you that one" rather than
    *  replaying a line as though neither of you remembers the last two minutes.
@@ -2002,6 +2007,13 @@ export interface NpcRelation {
    *  pocketsLifted > pocketsMumbled, once per later meeting — deterministic,
    *  no roll, and it can never repeat past what was actually taken. */
   pocketsMumbled?: number;
+  /** OTA-1109 — game-hour stamp of the newest raid this person has told the
+   *  player about. raidNewsFor only surfaces raids NEWER than this, so the
+   *  same sacking is news exactly once (Tarek repeated "the Conspiracy
+   *  Architects raided our outpost" verbatim on four consecutive visits —
+   *  the old gate keyed on prevSeenHours, which quick room-hops inside the
+   *  same hour never advanced). */
+  raidHeardAtHours?: number;
   /** OTA-1106 — tastes the player has WITNESSED through gift reactions:
    *  entries like 'loves:metal', 'loves:Aether Mud', 'cold:food'. The gift
    *  picker shows these — what you've learned, never the authored list. */

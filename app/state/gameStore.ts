@@ -158,7 +158,7 @@ import {
   narrate as containerNarrate,
   type ContainerLootEntry,
 } from '../engine/containerLoot';
-import { pickWastelandEncounter } from '../engine/wastelandEncounters';
+import { pickWastelandEncounter, RECENT_ENCOUNTER_MEMORY } from '../engine/wastelandEncounters';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
@@ -1890,17 +1890,30 @@ const ACCEPT_HINT_STOPWORDS = new Set([
   'a', 'an', 'the', 'of', 'in', 'on', 'to', 'for', 'with', 'from',
   'by', 'at', 'and', 'or', 'old', 'new', 'true', 'down', 'up',
 ]);
-function acceptKeyword(title: string): string {
+// OTA-1109 — COLLISION-AWARE. Irma offered "Kindling for the Vigil" AND the
+// long-form "The Giant-Watch Vigil" in the same breath, and both hints said
+// 'accept vigil' — two contracts, one keyword, and whichever the fuzzy
+// matcher resolved, the player didn't choose it. Callers that emit several
+// hints per visit now pass one shared `taken` set; the picker walks the
+// title's significant words from the tail and returns the first one no
+// sibling hint has claimed ("kindling" for the first, "giant-watch" for the
+// second). Interior hyphens are KEPT so the returned word still substring-
+// matches its own title in the accept-handler's fuzzy finders.
+export function acceptKeyword(title: string, taken?: Set<string>): string {
   const tokens = title.split(/\s+/).filter(Boolean);
+  const candidates: string[] = [];
   for (let i = tokens.length - 1; i >= 0; i--) {
     const raw = tokens[i]!;
-    const clean = raw.replace(/[^a-zA-Z']/g, '');
+    const clean = raw.replace(/[^a-zA-Z'-]/g, '').replace(/^-+|-+$/g, '');
     if (clean.length < 4) continue;
     if (ACCEPT_HINT_STOPWORDS.has(clean.toLowerCase())) continue;
-    return clean.toLowerCase();
+    candidates.push(clean.toLowerCase());
   }
-  // Fallback — title was unusually short; just lowercase the first token.
-  return (tokens[0] ?? title).toLowerCase();
+  const picked = candidates.find((c) => !taken?.has(c))
+    ?? candidates[0]
+    ?? (tokens[0] ?? title).toLowerCase();
+  taken?.add(picked);
+  return picked;
 }
 
 // OTA-368 — THE SAVE-UPGRADE STEP. Scans a loaded save and brings it up
@@ -3702,7 +3715,7 @@ function sightVendor(
       firstMetAt: Date.now(),
     }, { nowMs: Date.now(), hoursElapsed }),
   }));
-  if (greet) emitVendorGreeting(get, vendor);
+  if (greet) emitVendorGreeting(get, set, vendor);
 }
 
 /** OTA-1084 — hand over whatever a topic promised. Information and coin only:
@@ -4346,6 +4359,7 @@ function sightPerson(
  *  half, in the same order and with the same gates. */
 function emitVendorGreeting(
   get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   vendor: { id?: string; name: string },
 ): void {
   const player = get().player;
@@ -4357,7 +4371,13 @@ function emitVendorGreeting(
   const awayLine = npcAbsenceLine(rel, vendor.name, player.name, hours);
   if (awayLine) get().appendLog('world', awayLine);
   const raid = raidNewsFor(get().worldMemory, rel, hours);
-  if (raid) get().appendLog('world', raidNewsLine(rel, raid, vendor.name, player.name));
+  if (raid) {
+    get().appendLog('world', raidNewsLine(rel, raid, vendor.name, player.name));
+    // OTA-1109 — told ONCE. Stamp the raid delivered on the relation; the
+    // old "since they last saw you" gate never advanced across quick
+    // room-hops, so Tarek re-told the same sacking on four straight visits.
+    set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, rel.id, { raidHeardAtHours: raid.atHours }) }));
+  }
   const talkAbout = gossipSubject(get().worldMemory, rel);
   if (talkAbout) get().appendLog('world', gossipLine(vendor.name, talkAbout, player.name));
 }
@@ -9781,6 +9801,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const raid = raidNewsFor(get().worldMemory, rel, player.hoursElapsed ?? 0);
         if (raid && rel) {
           get().appendLog('world', raidNewsLine(rel, raid, vendor.name, player.name));
+          // OTA-1109 — told once (see emitVendorGreeting).
+          set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, rel.id, { raidHeardAtHours: raid.atHours }) }));
         }
         const talkAbout = gossipSubject(get().worldMemory, rel);
         if (talkAbout) {
@@ -9836,6 +9858,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           player.activeFactionQuestIds ?? [],
           player.completedFactionQuestIds ?? [],
         );
+        // OTA-1109 — one keyword set per visit: every hint this agent emits
+        // claims its word here, so two contracts can never share 'accept X'.
+        const takenAcceptWords = new Set<string>();
         if (offerAllowed.has('fq') && pool.length > 0) {
           const q = pool[0]!;
           // Short summary line — playtest feedback: "the arbiter
@@ -9844,7 +9869,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // lives in the Contracts screen if the player wants it.
           get().appendLog(
             'world',
-            `${vendor.name} offers a contract: "${q.title}." (Say 'accept ${acceptKeyword(q.title)}' or open Contracts for details.)`,
+            `${vendor.name} offers a contract: "${q.title}." (Say 'accept ${acceptKeyword(q.title, takenAcceptWords)}' or open Contracts for details.)`,
           );
         }
         // Active quest with this faction's agent? Hint at the turn-in.
@@ -9869,7 +9894,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const h = huntPool[0]!;
           get().appendLog(
             'world',
-            `${vendor.name} points at the bounty board: "${h.title}." (Say 'accept ${acceptKeyword(h.title)}' or open Contracts.)`,
+            `${vendor.name} points at the bounty board: "${h.title}." (Say 'accept ${acceptKeyword(h.title, takenAcceptWords)}' or open Contracts.)`,
           );
         }
         // Active hunt with this faction's agent? Prompt for turn-in.
@@ -9895,7 +9920,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const m = mysteryPool[0]!;
           get().appendLog(
             'world',
-            `${vendor.name} nods at a mystery notice: "${m.title}." (Say 'accept ${acceptKeyword(m.title)}' or open Contracts.)`,
+            `${vendor.name} nods at a mystery notice: "${m.title}." (Say 'accept ${acceptKeyword(m.title, takenAcceptWords)}' or open Contracts.)`,
           );
         }
         const mysteryTurnable = (player.activeMysteries ?? [])
@@ -9920,7 +9945,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const s = storyPool[0]!;
           get().appendLog(
             'arbiter',
-            `${vendor.name} unrolls a thick scroll. "Long-form work — ${s.title}. ${s.posterText} Say 'accept ${acceptKeyword(s.title)}' to take it."`,
+            `${vendor.name} unrolls a thick scroll. "Long-form work — ${s.title}. ${s.posterText} Say 'accept ${acceptKeyword(s.title, takenAcceptWords)}' to take it."`,
           );
         }
         const storyTurnable = (player.activeStorylines ?? [])
@@ -19466,26 +19491,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 break;
               }
               const enemy = activeEnemy(currentScene);
-              const ste = livePlayer ? (effectiveStats(livePlayer).stealth ?? 5) : 5;
-              // arb-fix — STEALTH is on this engine's ~0–10 stat scale (rollDie(10),
-              // and a Giant legitimately sits at 0), NOT D&D's 3–18. The gating skill
-              // check adds the RAW stat (log reads "STE 0"), so the init contest must
-              // too. The old Math.round((ste-10)/2) applied the D&D ability-modifier
-              // formula, which turns every realistic STEALTH into a PENALTY (0 → −5,
-              // 5 → −2), the exact opposite of the comment above ("STE scales every
-              // roll") — a passed check then still lost an unwinnable init race and
-              // surprised the player every time. Use the raw stat like the rest of
-              // the engine so STEALTH actually helps.
+              // arb-fix / OTA-1109 — STEALTH reaches this handler through the
+              // gate roll's total (skill.total, raw stat + title bonus folded
+              // in by buildSkillSteps); the handler itself no longer computes
+              // a stealth bonus because it no longer rolls a player die.
               // OTA-1038 — Shadow Diver's +1 rode the GATE roll (buildSkillSteps folds
               // titleSkillBonus in, which is why the log reads "STE 1 + 1 (title:
-              // Shadow Diver)") but was missing from THIS contest — the roll that
-              // actually decides the outcome. The stealth title got you into the
-              // race and then sat out. Same bonus, both rolls.
-              // eslint-disable-next-line @typescript-eslint/no-require-imports
-              const stealthTitleBonus: number = livePlayer
-                ? (require('../engine/titles').titlePerkModifiers(livePlayer).stealthBonus ?? 0)
-                : 0;
-              const steBonus = ste + stealthTitleBonus;
+              // Shadow Diver)") but was missing from THIS contest.
+              // OTA-1109 — moot now: the handler no longer rolls its own player
+              // d20 at all. The gate roll (skill.total, STE + title folded in)
+              // IS the sneak — see the one-button-one-roll blocks below — so
+              // there is no second roll for the bonus to miss.
               // #6 — day/night cover applies to EVERY stealth check, not just
               // pickpocket (playtest: "does stealth scale up at night, down in the
               // day?"). Fold the same +1-night / −1-day modifier the sleight-of-hand
@@ -19521,24 +19537,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // investigate-ambush stat farm). Set on the success branches below.
               let stealthSucceeded = false;
               if (openerAvailable) {
-                const roll = rollDie(20);
-                const total = roll + steBonus + 3 + timeBonus; // +3 for the drop (they're unaware)
-                const dc = 10 + enemyAware;
-                if (total >= dc) {
-                  set((s) => (s.player
-                    ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'stealthed', remainingRounds: 2, label: 'unseen — next strike +5' }) } }
-                    : s));
-                  get().appendLog('world', hasCover
-                    ? `You melt into cover and ghost toward ${foe} from the angle they aren't watching. Your next strike lands before they know you're there. (+5 next attack)`
-                    : `You drop low and move quiet, closing on ${foe} unseen across the open ground. (+5 next attack)`);
-                  get().appendLog('debug', `stealth: opener d20=${roll}+STE${steBonus >= 0 ? '+' : ''}${steBonus}+3${timeBonus !== 0 ? `${timeBonus > 0 ? '+' : ''}${timeBonus}(${timeBonus > 0 ? 'night' : 'day'})` : ''} = ${total} vs DC ${dc} — UNSEEN`);
-                  stealthSucceeded = true;
-                } else {
-                  get().appendLog('world', `${foe} catches the movement — no sneaking up on this one. You'll have to take them head-on.`);
-                  get().appendLog('debug', `stealth: opener d20=${roll}${timeBonus !== 0 ? `${timeBonus > 0 ? '+' : ''}${timeBonus}(${timeBonus > 0 ? 'night' : 'day'})` : ''} → ${total} vs DC ${dc} — SPOTTED`);
-                }
+                // OTA-1109 — ONE BUTTON, ONE ROLL. This branch used to roll a
+                // SECOND hidden d20 against its own DC (10 + enemyAware), so
+                // the player could watch their visible skill roll PASS ("14 vs
+                // DC 12") and still read "catches the movement — SPOTTED" a
+                // beat later (owner's log, 21:35). The handler only runs when
+                // the visible skill check succeeded — that roll IS the sneak.
+                // The drop bonus and awareness DC retire with the double
+                // jeopardy; the skill check's own DC ladder carries difficulty.
+                set((s) => (s.player
+                  ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'stealthed', remainingRounds: 2, label: 'unseen — next strike +5' }) } }
+                  : s));
+                get().appendLog('world', hasCover
+                  ? `You melt into cover and ghost toward ${foe} from the angle they aren't watching. Your next strike lands before they know you're there. (+5 next attack)`
+                  : `You drop low and move quiet, closing on ${foe} unseen across the open ground. (+5 next attack)`);
+                get().appendLog('debug', `stealth: opener carried by the skill roll (${skill.total} vs ${skill.targetLabel ?? `DC ${skill.target}`}) — UNSEEN`);
+                stealthSucceeded = true;
               } else {
-                const pInit = rollDie(20) + steBonus + 2 + timeBonus; // you chose the moment
+                // OTA-1109 — the reset stays CONTESTED (the enemy is already on
+                // you, so they get their own die) but the player's side is the
+                // roll they already SAW: the passed skill check's total, plus
+                // the choose-the-moment edge and the day/night cover. No second
+                // hidden player d20.
+                const pInit = (skill.total ?? 0) + 2 + timeBonus; // you chose the moment
                 const eInit = rollDie(20) + enemyAware;
                 if (pInit >= eInit) {
                   const rounds = hasCover ? 2 : 1;
@@ -26260,9 +26281,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // variety (treasure / npc / fusion bench) so a route brings in more
         // different encounters without more fights.
         autoTravel: isAutoTravel,
+        // OTA-1109 — the last few encounters stay off the table so an authored
+        // set-piece can't replay back-to-back (Phoenix-Feather vendor, twice
+        // in an hour on the owner's device).
+        recentArchetypeIds: get().worldMemory.recentEncounterArchetypes ?? [],
       }) : null;
       if (enc) {
         set(() => ({ wastelandStepsSinceEncounter: 0 }));
+        // OTA-1109 — remember what just fired (newest first, capped).
+        set((s) => ({
+          worldMemory: {
+            ...s.worldMemory,
+            recentEncounterArchetypes: [
+              enc.archetypeId,
+              ...(s.worldMemory.recentEncounterArchetypes ?? []).filter((id) => id !== enc.archetypeId),
+            ].slice(0, RECENT_ENCOUNTER_MEMORY),
+          },
+        }));
         // OTA-217 — visually elevate fusion_bench encounters so the
         // player can't scroll past them. Playtest log: player almost
         // missed the Crucible because the narration was buried
@@ -30197,9 +30232,15 @@ function applyHookEffect(
       logRepChanges(get, result.changed);
       return { inlineSummary: null, fatal: false };
     }
+    // OTA-1109 — spawn_enemy_name joins spawn_enemy_tag: when the hook's prose
+    // names the creature (mud_golem_stir narrates a golem), the spawn honors
+    // the name instead of rolling the whole tag pool (which handed the owner
+    // an Aetheric Scarab where "The Golem turns toward your scent").
+    case 'spawn_enemy_name':
     case 'spawn_enemy_tag': {
-      const tag = effect.tag;
-      const candidates = (enemiesData as Enemy[]).filter((e) => e.type === tag);
+      const candidates = effect.type === 'spawn_enemy_name'
+        ? (enemiesData as Enemy[]).filter((e) => e.name === effect.name)
+        : (enemiesData as Enemy[]).filter((e) => e.type === effect.tag);
       const rawSpawn = candidates.length > 0
         ? candidates[Math.floor(Math.random() * candidates.length)]!
         : pickEnemyForLocation(get().currentScene?.location ?? getLocationById('tartarian_outskirts'));
@@ -30219,7 +30260,9 @@ function applyHookEffect(
           ? { currentScene: { ...s.currentScene, enemies: [spawn], enemyHps: [spawn.hp], activeEnemyIdx: 0, range: 'mid' } }
           : s,
       );
-      get().appendLog('combat', `${spawn.name} emerges from the hook. Combat begins at close range.`);
+      // OTA-1109 — the old line said "close range" while the state above sets
+      // 'mid', and "emerges from the hook" leaked engine jargon into the feed.
+      get().appendLog('combat', `${spawn.name} rises to meet you. Combat begins at mid range.`);
       return { inlineSummary: null, fatal: false };
     }
     case 'unlock_location': {
