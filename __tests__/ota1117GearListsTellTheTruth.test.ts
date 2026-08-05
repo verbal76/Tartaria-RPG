@@ -140,12 +140,28 @@ describe('OTA-1117 #2 — worn gear floats to the top of every gear list', () =>
 describe('OTA-1117 #3 — source locks on the lists that must not regress', () => {
   const read = (p: string): string => require('fs').readFileSync(require('path').join(__dirname, '..', p), 'utf8');
 
-  it('the REPAIR tab sorts worn gear above every axis, direction-independent', () => {
+  // OTA-1119 — RETARGETED. Worn-first was an unconditional pre-key welded onto
+  // every axis; it is now a real axis, and the DEFAULT one. Owner: "let's add
+  // some different sorting options in the craft repair tab, still prioritize
+  // equipped it's on top as default sort." Opening the tab is still worn-first
+  // (the OTA-1117 ask, unchanged) — but picking NAME now sorts by name instead
+  // of by name within worn and within unworn.
+  it('the REPAIR tab opens on the EQUIPPED axis, and that axis puts worn gear first', () => {
     const src = read('app/screens/CraftingScreen.tsx');
-    // The pre-key must sit OUTSIDE the switch (so it applies to READY / DURABILITY
-    // / NAME / COST alike) and must not be multiplied by `dir`.
-    expect(src).toContain('if (a.worn !== b.worn) return a.worn ? -1 : 1;');
+    expect(src).toContain("useState('equipped')");
+    expect(src).toContain("{ key: 'equipped', label: 'EQUIPPED' }");
+    expect(src).toContain("case 'equipped': {");
+    expect(src).toContain('if (a.worn !== b.worn) return (a.worn ? -1 : 1) * dir;');
     expect(src).toContain('wornInstanceIds(player)');
+    // The old unconditional pre-key must be GONE, or the new axes are theatre.
+    expect(src).not.toContain('if (a.worn !== b.worn) return a.worn ? -1 : 1;\n      switch');
+  });
+
+  it('the ★ worn marker still shows on EVERY axis, so gear stays findable after a re-sort', () => {
+    const src = read('app/screens/CraftingScreen.tsx');
+    // Rendered off r.worn, never off the active sort key.
+    expect(src).toContain("{r.worn ? '★ ' : ''}{r.item.name}");
+    expect(src).toContain('EQUIPPED — this is what breaks mid-fight');
   });
 
   it('the Crucible upgrade list renders BOTH headings unconditionally', () => {
@@ -154,6 +170,26 @@ describe('OTA-1117 #3 — source locks on the lists that must not regress', () =
     expect(src).not.toContain('section.items.length === 0 ? null');
     expect(src).toContain('section.group.open.length === 0 &&');
     expect(src).toContain('section.group.blocked.map');
+  });
+
+  // OTA-1119 — owner: "let's add some different sorting options in the craft
+  // repair tab". Three new axes, each with a real tie-break so the order is
+  // deterministic rather than dependent on inventory insertion order.
+  it('the REPAIR tab offers the three new axes, each ranked and tie-broken', () => {
+    const src = read('app/screens/CraftingScreen.tsx');
+    for (const axis of ['slot', 'rarity', 'kind']) {
+      expect(src).toContain(`case '${axis}': {`);
+      expect(src).toContain(`{ key: '${axis}',`);
+    }
+    // SLOT reuses the SAME head-to-toe ranks as the inventory screen, so "sorted
+    // by slot" means one order across the game, not two that nearly agree.
+    expect(src).toMatch(/REPAIR_SLOT_RANK[\s\S]{0,160}main: 0, off: 1, head: 2, chest: 3, hands: 4, legs: 5, feet: 6, cloak: 7, amulet: 8, ring: 9,/);
+    const invSrc = read('app/screens/InventoryScreen.tsx');
+    expect(invSrc).toMatch(/main: 0, off: 1, head: 2, chest: 3, hands: 4, legs: 5, feet: 6, cloak: 7, amulet: 8, ring: 9,/);
+    // Gear with no equip slot sinks below the worn kit instead of scattering.
+    expect(src).toContain('return s ? (REPAIR_SLOT_RANK[s] ?? 50) : 99;');
+    // Every new axis falls through to a name tie-break.
+    expect((src.match(/return byName\(a, b\);/g) ?? []).length).toBeGreaterThanOrEqual(4);
   });
 
   it('the inventory list and both coating pickers take the worn pre-key', () => {
