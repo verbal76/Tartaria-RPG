@@ -26,7 +26,7 @@ export interface ItemSynthEngine {
   isReady(): boolean;
   generate(
     messages: ReadonlyArray<{ role: 'system' | 'user' | 'assistant'; content: string }>,
-    opts?: { maxNewTokens?: number; temperature?: number },
+    opts?: { maxNewTokens?: number; temperature?: number; job?: string },
   ): Promise<string>;
 }
 
@@ -106,7 +106,7 @@ export async function synthesizeItemViaQwen(
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      { maxNewTokens: 180, temperature: 0.1 },
+      { maxNewTokens: 180, temperature: 0.1, job: 'item_synthesis' },
     );
   } catch {
     return null;
