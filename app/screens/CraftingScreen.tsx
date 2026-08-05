@@ -12,6 +12,7 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem } from '../engine/types';
 import { getItemPreview } from '../components/itemPreview';
 import { GOLEM_DEFINITIONS, type GolemDefinition } from '../engine/golems';
+import { wornInstanceIds } from '../engine/equipment';
 
 // 2026-05-27 OTA-095 — Aethercraft disciplines moved from
 // ActionReferenceScreen's "Recipes" mode (now deleted) into a
@@ -131,6 +132,9 @@ interface RepairStatus {
   cost: { name: string; quantity: number }[];
   missing: { name: string; short: number }[];
   available: boolean;
+  // OTA-1094 — is this the piece the player is actually WEARING? Worn gear is what
+  // breaks mid-fight, so it floats above every sort axis and carries a badge.
+  worn: boolean;
 }
 
 // OTA-401 — substitute-aware repair affordability. The engine's
@@ -162,11 +166,21 @@ function buildDisciplineConfirm(d: AethercraftDiscipline, inventory: InventoryIt
   return { title: d.title, phrase, body: d.body, fuel, afford };
 }
 
-function evaluateRepair(item: InventoryItem, inventory: InventoryItem[]): RepairStatus {
+function evaluateRepair(
+  item: InventoryItem,
+  inventory: InventoryItem[],
+  worn: ReadonlySet<string>,
+): RepairStatus {
   const cost = repairCostMaterials(item);
   const short = missingIngredientsList(cost, inventory);
   const missing = short.map((m) => ({ name: m.name, short: m.quantity }));
-  return { item, cost, missing, available: cost.length > 0 && missing.length === 0 };
+  return {
+    item,
+    cost,
+    missing,
+    available: cost.length > 0 && missing.length === 0,
+    worn: worn.has(item.id),
+  };
 }
 
 // 2026-05-26 OTA-059 — three tabs. CRAFT shows every gear/relic
@@ -261,10 +275,13 @@ export function CraftingScreen() {
   // (playtester spec). Available when the materials are in stock.
   const repairable = useMemo(() => {
     if (!player) return [] as RepairStatus[];
+    // OTA-1094 — resolve worn instances ONCE per inventory change (it walks every
+    // equip slot), then stamp `worn` on each row.
+    const worn = wornInstanceIds(player);
     return player.inventory
       .filter((i) => i.durability && i.durability.current < i.durability.max)
-      .map((i) => evaluateRepair(i, [...player.inventory]));
-  }, [player?.inventory]);
+      .map((i) => evaluateRepair(i, [...player.inventory], worn));
+  }, [player?.inventory, player?.equipped, player?.dog?.equipped]);
 
   // OTA-087 — filter + sort the repair list. Search matches
   // the item NAME substring; sort axis selectable.
@@ -276,6 +293,12 @@ export function CraftingScreen() {
     const dir = repairSortDir === 'asc' ? 1 : -1;
     const sorted = [...filtered];
     sorted.sort((a, b) => {
+      // OTA-1094 — WORN gear outranks every axis and never flips with direction.
+      // Owner: "when you open the repair tab, it should prioritize all of the
+      // things that are equipped that can be repaired at the top." The piece you
+      // are standing in is the one whose durability decides the next fight, so it
+      // stays on top whether you sort by READY, DURABILITY, NAME or COST.
+      if (a.worn !== b.worn) return a.worn ? -1 : 1;
       switch (repairSortKey) {
         case 'available': {
           // available=true floats to top when asc (the playtester-
@@ -607,18 +630,24 @@ export function CraftingScreen() {
                     disabled={!r.available}
                     onPress={() => repairInventoryItem(r.item.id)}
                     accessibilityRole="button"
+                    accessibilityLabel={`${r.item.name}${r.worn ? ', equipped' : ''}, ${dur.current} of ${dur.max} durability`}
                     accessibilityState={{ disabled: !r.available }}
                   >
                     <View style={[styles.recipeStripe, { backgroundColor: stripeColor }]} />
                     <View style={styles.recipeBody}>
                       <View style={styles.recipeHead}>
                         <Text style={[styles.recipeName, r.available && styles.recipeNameReady, !r.available && styles.recipeNameMuted]}>
-                          {r.item.name}
+                          {/* OTA-1094 — the worn marker rides the NAME so it survives
+                              every sort axis and reads at a glance in the top block. */}
+                          {r.worn ? '★ ' : ''}{r.item.name}
                         </Text>
                         <Text style={styles.durabilityChip}>
                           {dur.current}/{dur.max}
                         </Text>
                       </View>
+                      {r.worn && (
+                        <Text style={styles.repairWorn}>EQUIPPED — this is what breaks mid-fight</Text>
+                      )}
                       {preview.stats.length > 0 && (
                         <Text style={styles.recipeStats}>
                           {preview.stats.join(' · ')}
@@ -833,6 +862,9 @@ const styles = StyleSheet.create({
   recipeNameMuted: { color: '#a89a7a' },
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   durabilityChip: { color: '#c9a86a', fontSize: 11, fontWeight: '700' },
+  // OTA-1094 — the worn-gear callout on a REPAIR row. Same gold as the EQUIPPED
+  // badge in the Crucible upgrade list so "worn" reads identically everywhere.
+  repairWorn: { color: '#e6c67a', fontSize: 10, marginTop: 3, letterSpacing: 0.6, fontWeight: '700' },
   // OTA-165 — stats line on REPAIR rows. Same style as RecipesView's
   // recipeStats so the REPAIR tab matches CRAFT / RECIPES visually.
   recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },

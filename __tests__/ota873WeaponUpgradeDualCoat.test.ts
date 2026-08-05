@@ -133,7 +133,14 @@ describe('OTA-873 — upgradeWeaponCoatingSlot + dual-slot applyCoating', () => 
     expect(inv.filter((i) => i.name.startsWith('Odd Fragment'))).toHaveLength(5); // nothing consumed
   });
 
-  it('EXPLOIT GUARD — a quantity>1 weapon stack is refused (no mass-upgrade)', () => {
+  // OTA-1094 — RETARGETED. This used to assert the stack was REFUSED outright.
+  // That refusal told the player to "split one off first" — an instruction the game
+  // gives no way to follow, so a stacked piece could never be upgraded at all and
+  // the picker hid it. The upgrade now PEELS one unit (the same move OTA-800 makes
+  // for coating a stack). The invariant this test exists to guard is unchanged and
+  // still asserted below: the STACK is never stamped, so five pieces buy exactly
+  // one upgraded instance, never N.
+  it('EXPLOIT GUARD — a quantity>1 weapon stack peels ONE unit; the stack stays bare', () => {
     const p = useGameStore.getState().player!;
     // Turn the blade into a stack of 3.
     useGameStore.setState({
@@ -141,10 +148,14 @@ describe('OTA-873 — upgradeWeaponCoatingSlot + dual-slot applyCoating', () => 
     });
     useGameStore.getState().upgradeCoatingSlot('blade', ['rsv_1', 'rsv_2', 'rsv_3', 'rsv_4', 'rsv_5']);
     const inv = useGameStore.getState().player!.inventory;
-    const blade = inv.find((i) => i.id === 'blade')!;
-    expect(blade.quantity).toBe(3);
-    expect(coatingCapacity(blade)).toBe(1); // stack NOT upgraded
-    expect(inv.filter((i) => i.name.startsWith('Odd Fragment'))).toHaveLength(5); // nothing consumed
+    const stack = inv.find((i) => i.id === 'blade')!;
+    expect(stack.quantity).toBe(2);                 // one unit peeled off
+    expect(coatingCapacity(stack)).toBe(1);         // the STACK is still bare — no mass-upgrade
+    const peeled = inv.filter((i) => i.name === 'Rusted Blade' && i.id !== 'blade');
+    expect(peeled).toHaveLength(1);
+    expect(peeled[0]!.quantity).toBe(1);
+    expect(coatingCapacity(peeled[0]!)).toBe(2);    // exactly ONE instance bought the channel
+    expect(inv.filter((i) => i.name.startsWith('Odd Fragment'))).toHaveLength(0); // and it cost the 5
   });
 
   it('upgrades an ARMOR piece by raising its worked-in-resist capacity (+1)', () => {

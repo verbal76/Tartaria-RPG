@@ -195,6 +195,65 @@ export function eligibleInputs(inventory: readonly InventoryItem[]): InventoryIt
   return out;
 }
 
+/** OTA-1094 — what the Crucible's UPGRADE channel can do with one piece, and when
+ *  it can't, WHY.
+ *
+ *  Owner, from the device: "went to upgrade at the fuse and it only allowed me to
+ *  pick armor no weapons." The upgrade list rendered ARMOR & VESTS and then
+ *  silently dropped the WEAPONS section whenever nothing qualified — and roughly
+ *  half the weapon catalog can never qualify, because the upgrade grants a COATING
+ *  CHANNEL and energy weapons (runecasters, burn/aetheric/electrical casters) have
+ *  no edge to carry a coating. Nothing on screen said so, so a permanent rule read
+ *  as a broken screen.
+ *
+ *  One verdict function now answers for both the picker and the store action, so
+ *  the list you can tap and the refusal you'd get can't disagree.
+ *
+ *  `kind` is what the upgrade WOULD grant (null = this piece takes no channel at
+ *  all); `blocked` is null when the piece is upgradeable right now, otherwise the
+ *  player-facing reason. */
+export type CrucibleUpgradeKind = 'weapon' | 'armor';
+export interface CrucibleUpgradeVerdict {
+  kind: CrucibleUpgradeKind | null;
+  blocked: string | null;
+}
+export function crucibleUpgradeVerdict(item: InventoryItem): CrucibleUpgradeVerdict {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isCoatableItem, coatingCapacity } = require('./weaponCoating') as typeof import('./weaponCoating');
+  // The great-climb rewards are earned, not forged — same lock the store applies.
+  if (canonicalItemTags(item).includes('collect_only')) {
+    return { kind: null, blocked: 'earned on the great climbs — the Crucible has no purchase on it' };
+  }
+  if (isCoatableItem(item)) {
+    return coatingCapacity(item) >= 2
+      ? { kind: 'weapon', blocked: 'already carries two coating channels' }
+      : { kind: 'weapon', blocked: null };
+  }
+  const isArmor = item.kind === 'armor' || item.kind === 'dog_armor'
+    || item.uniqueStats?.kind === 'armor' || item.uniqueStats?.kind === 'dog_armor'
+    || !!findArmorByName(item.name);
+  if (isArmor) {
+    return (item.resistCapBonus ?? 0) >= 1
+      ? { kind: 'armor', blocked: 'already carries an extra resist channel' }
+      : { kind: 'armor', blocked: null };
+  }
+  // A real weapon that simply can't hold a coating — the common case behind the
+  // vanishing WEAPONS section, and the one that most needs saying out loud.
+  if (item.kind === 'weapon' || item.uniqueStats?.kind === 'weapon' || !!findWeaponByName(item.name)) {
+    return { kind: null, blocked: 'fires no edge to carry a coating — energy weapons take no channel' };
+  }
+  return { kind: null, blocked: 'not a weapon, a piece of armor, or a dog vest' };
+}
+
+/** OTA-1094 — is this inventory row a WEAPON at all (catalog, fused, or tagged)?
+ *  The upgrade list uses it to decide what belongs under the WEAPONS heading —
+ *  including the ones it has to explain rather than offer. */
+export function isWeaponRow(item: InventoryItem): boolean {
+  return item.kind === 'weapon'
+    || item.uniqueStats?.kind === 'weapon'
+    || !!findWeaponByName(item.name);
+}
+
 /** Gate fusion against the live inventory. Returns the eligible inputs
  *  and a reason if the pack doesn't satisfy the rules. Rules:
  *   - At least 3 reserved inferred misc items

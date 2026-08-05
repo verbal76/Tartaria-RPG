@@ -123,9 +123,14 @@ describe('OTA-1028 — SOURCE LOCKS', () => {
     expect((shopPool.match(/id: '/g) ?? []).length).toBe(1);
   });
 
+  // OTA-1094 — RETARGETED. The section descriptor changed from `{ label, items }`
+  // to `{ label, group, none }` when each heading gained an empty-state line and a
+  // list of turned-away pieces carrying their reason. Everything this test exists
+  // to guard — armor before weapons, worn-first inside each group, an EQUIPPED
+  // badge that includes the dog's vest — is unchanged and still asserted below.
   it('the upgrade list is grouped armor-then-weapons with EQUIPPED badges', () => {
     expect(modalSrc).toMatch(/ARMOR & VESTS/);
-    expect(modalSrc).toMatch(/\{ label: 'ARMOR & VESTS', items: upgradeableArmor \},\s*\{ label: 'WEAPONS', items: upgradeableWeapons \},/);
+    expect(modalSrc).toMatch(/label: 'ARMOR & VESTS'[\s\S]{0,240}label: 'WEAPONS'/);
     expect(modalSrc).toMatch(/equippedInstanceIds/);
     expect(modalSrc).toMatch(/equippedTag/);
     // Worn pieces sort first in each group.

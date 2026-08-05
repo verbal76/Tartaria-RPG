@@ -923,9 +923,78 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.27**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.29**; ledger in `VERSION.md`.
 
-- **FIVE FROM THE DEVICE LOG (2026-08-04, latest). BOTH LINES.** golem
+- **TALKING IS ITS OWN SCREEN NOW (2026-08-05, latest). BOTH LINES.**
+  golem OTA-1095 / HAL OTA-1118. Owner, from the device: "the talk box
+  is bigger than the exploration window so I don't get to see what he
+  actually says unless I stop talking." Then, weighing the fix: "should
+  talking be a whole separate full or 3/4 screen popup that way the
+  story text is the only thing to read."
+  **The answer is yes — but only because the replies moved in with it.**
+  A full-screen popup that still routed answers to the feed BEHIND it
+  would be the current bug made total: you would have to close the
+  conversation to read every single line. What makes the tall view work
+  is that the exchange is rendered INSIDE it.
+  (1) **THE CONVERSATION VIEW.** TalkSheet is an 88%-height overlay: the
+  exchange on top (the larger share — it is the thing that could not be
+  read), the topic tray below, STOP TALKING at the foot.
+  (2) **THE TRANSCRIPT IS A WINDOW, NOT A COPY.** `pendingTalk` carries
+  `startedAtLogLen` (the feed's high-water mark when the talk opened) and
+  the view renders `gameLog.slice(startedAtLogLen)`. dialogue.ts still
+  routes every reply through `appendLog`, so the exploration log remains
+  the whole record and closing the conversation leaves the history intact.
+  (3) **⚠ A REGRESSION THAT WOULD HAVE SHIPPED.** `appendLog`'s
+  same-channel 500ms debounce merges a world line into the PREVIOUS world
+  entry. Unguarded, the FIRST reply of a conversation is welded onto the
+  arrival narration that predates it — landing outside the window, so the
+  player watches their opening question get no answer: this OTA's own bug,
+  arriving through the debounce instead of the layout. `canMerge` now
+  refuses to weld across the conversation boundary; grouping WITHIN a
+  conversation is untouched. Direct regression test in the suite.
+  (4) **UNASKED FIRST.** The tray sorts unasked topics above asked ones
+  (stable, so the authored ladder still reads as a ladder); an asked
+  topic still renders, still marked "(asked)".
+  (5) **THE COLLAPSE BAR SURVIVES, AS AN OPTION.** OTA-1094's breadcrumb
+  is still there, holding the controls slot so collapsing never leaves a
+  gap where the input box was — it is just no longer REQUIRED to read a
+  reply. Tray capped at 34% so a 16-topic vendor cannot push the exchange
+  off screen from the other side. **GIFT and PICKPOCKET unchanged:**
+  single-choice pickers that close on the pick, so the reaction is already
+  readable. Suite ota1095ConversationView (10).
+
+- **GEAR LISTS TELL THE TRUTH (2026-08-04). BOTH LINES.** golem
+  OTA-1094 / HAL OTA-1117. Three reports from the device, and the first
+  one's fix is mostly an admission.
+  (1) **THE CRUCIBLE'S VANISHING WEAPONS SECTION.** Owner: "went to
+  upgrade at the fuse and it only allowed me to pick armor no weapons."
+  Nothing was broken. The upgrade grants a COATING CHANNEL, and ~129 of
+  the 276 catalog weapons are energy-based (runecasters, burn / aetheric
+  / electrical casters) — they fire no edge, so they can NEVER take one.
+  `FusionPickerModal` rendered `section.items.length === 0 ? null : …`,
+  so the WEAPONS heading simply disappeared, indistinguishable from a
+  bug. Both headings now always render; an empty one says so and then
+  LISTS the pieces it turned away, greyed and inert, each with its
+  reason. New `crucibleUpgradeVerdict` in itemFusion.ts is the single
+  seam the picker and `upgradeCoatingSlot` both read.
+  (2) **THE STACK DEAD END.** A quantity>1 piece was refused with "split
+  one off first" — an instruction the game gives NO way to follow. It now
+  PEELS one unit into its own instance and upgrades that; the stack stays
+  bare so five reserved pieces still buy exactly ONE channel, and an
+  equipped stack re-points to the peeled instance. OTA-873's exploit
+  guard RETARGETED, not deleted.
+  (3) **EQUIPPED FIRST, EVERYWHERE.** New `wornInstanceIds` /
+  `byWornFirst` in equipment.ts — worn ids INCLUDING the dog's vest,
+  which lives on `player.dog.equipped` and was therefore invisible to
+  every worn check in the game. Applied to the REPAIR tab (a
+  direction-independent pre-key outranking READY / DURABILITY / NAME /
+  COST, plus a callout), the inventory list, both coating pickers, and
+  the Crucible upgrade list. **Deliberately excluded:** sell, salvage and
+  gift — those already exclude or refuse worn gear, and floating your
+  armor to the top of a "what do you want to destroy" list is the
+  opposite of a favour. Suite ota1094GearListsTellTheTruth (16).
+
+- **FIVE FROM THE DEVICE LOG (2026-08-04). BOTH LINES.** golem
   OTA-1093 / HAL OTA-1116. From the owner's Pixel log on 4.29.26.
   (1) **A CORRECTION TO THE FIRST TRIAGE** — the raid builder was NOT
   dressing a non-human body; the raiders were human.

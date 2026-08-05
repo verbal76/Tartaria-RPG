@@ -8,7 +8,7 @@ import {
   groupInventoryByCategory,
 } from '../components/InventoryCategorize';
 import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types';
-import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, wornInstanceIds, byWornFirst } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isFusedInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
@@ -77,10 +77,20 @@ function sortInventoryItems(
   items: InventoryItem[],
   sortKey: string,
   direction: SortDirection,
+  // OTA-1094 — worn instance ids. Gear you are actually wearing floats to the top
+  // of its category on EVERY axis. Owner: "whenever a list of armor or weapons
+  // pops up sort equipped items to the top."
+  worn: ReadonlySet<string> = new Set<string>(),
 ): InventoryItem[] {
   const dir = direction === 'asc' ? 1 : -1;
   const sorted = [...items];
   sorted.sort((a, b) => {
+    // Pre-key, direction-independent: the pieces on your body come first. The list
+    // is grouped by category downstream, so this reads as "worn first within Weapons,
+    // worn first within Armor" rather than dragging armor above weapons.
+    const aw = worn.has(a.id);
+    const bw = worn.has(b.id);
+    if (aw !== bw) return aw ? -1 : 1;
     switch (sortKey) {
       case 'rarity': {
         const ar = RARITY_RANK[a.rarity ?? 'Common'] ?? 0;
@@ -282,7 +292,11 @@ export function InventoryScreen() {
   const fusionFiltered = sortKey === 'fusionable'
     ? filtered.filter(isFusionEligible)
     : filtered;
-  const sorted = sortInventoryItems(fusionFiltered, sortKey, sortDirection);
+  // OTA-1094 — one worn-instance set for the whole screen: the sort pre-key AND
+  // the coating pickers below read it, so what floats to the top and what carries
+  // the EQUIPPED tag can never disagree.
+  const wornIds = wornInstanceIds(player);
+  const sorted = sortInventoryItems(fusionFiltered, sortKey, sortDirection, wornIds);
   const grouped = groupInventoryByCategory(sorted);
   // Map equipped item name → the slot(s) it's currently in. Used so the
   // modal can offer Unequip on items already worn.
@@ -1079,7 +1093,9 @@ export function InventoryScreen() {
       const coatable = (player.inventory ?? []).filter(
         // OTA-453 — instance-aware so FUSED weapons (catalog-absent) are listed.
         (i: InventoryItem) => isCoatableItem(i),
-      );
+      // OTA-1094 — the weapon you are HOLDING is the one you almost always mean
+      // to coat, so it heads the list instead of sitting wherever pack order put it.
+      ).sort(byWornFirst(wornIds));
       if (coatable.length === 0) {
         coatPickerBody = 'Nothing in your pack can hold this coating. A coating needs an edge or a point to carry it — a blade, an arrow-arm, or a bolt-caster.';
       } else {
@@ -1146,7 +1162,8 @@ export function InventoryScreen() {
         : (armorCoatTarget.tags ?? []).find((t) => ['poison', 'acid', 'corruption', 'electrical', 'burn'].includes(t))) ?? 'this';
       const armorItems = (player.inventory ?? []).filter(
         (i: InventoryItem) => i.kind === 'armor' || i.uniqueStats?.kind === 'armor' || !!findArmorByName(i.name),
-      );
+      // OTA-1094 — worn armor first, same rule as the weapon picker above.
+      ).sort(byWornFirst(wornIds));
       if (armorItems.length === 0) {
         armorPickerBody = 'You have no armor to work the vial into. Pick up a piece first.';
       } else {
