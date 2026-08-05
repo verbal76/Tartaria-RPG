@@ -190,9 +190,18 @@ describe('OTA-1120 — source locks on the selection surface', () => {
     expect(view).toContain('toggleReserveForFusion(item.id, item.quantity ?? 1);');
   });
 
-  it('long-press keeps the full item menu reachable inside the view', () => {
+  // OTA-1123 — SUPERSEDED, deliberately. This OTA's long-press opened the item
+  // sheet as an escape hatch from tap-to-toggle. OTA-1123 gave the whole
+  // inventory a hold-to-group gesture, and one gesture has to mean one thing on
+  // a screen — so the hold is the group now. The single-unit "Save 1 for fusion"
+  // that hatch reached is still reachable (switch off the FUSABLE axis and tap),
+  // and the FUSABLE banner says so, which is what the assertion moved to.
+  it('long-press starts a GROUP now; the per-unit route is still signposted', () => {
     expect(view).toContain('const handleItemLongPress = ');
-    expect(view).toMatch(/onLongPress=\{fusionSelectMode \? \(\) => handleItemLongPress\(item\) : undefined\}/);
+    expect(view).toContain('onLongPress={() => handleItemLongPress(item)}');
+    expect(view).toContain('beginInvSelect(item.id);');
+    // The hatch was not dropped silently — the banner names where it went.
+    expect(view).toContain('switch sort and tap the item');
   });
 
   it('the SELECT ALL chip renders in the header but does not collapse the section', () => {
@@ -214,7 +223,10 @@ describe('OTA-1120 — source locks on the selection surface', () => {
     expect(view).toContain('styles.fusionModeBanner');
     expect(view).toContain('Tap to reserve');
     expect(view).toContain('styles.rowSelected');
-    expect(view).toMatch(/accessibilityRole=\{selectable \? 'checkbox' : 'button'\}/);
+    // OTA-1123 — the role now also covers group mode; the FUSABLE checkbox
+    // semantics this test guards are unchanged, they just share the branch.
+    expect(view).toMatch(/accessibilityRole=\{grouped \|\| selectable \? 'checkbox' : 'button'\}/);
+    expect(view).toMatch(/selectable \? \{ checked: item\.reservedForFusion === true \}/);
   });
 });
 
