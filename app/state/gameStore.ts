@@ -453,6 +453,22 @@ function freshInstanceId(prefix: string): string {
   return `${prefix}_${Date.now()}_${(_itemInstanceSeq++).toString(36)}`;
 }
 
+/** Are these two inventory rows the SAME stackable unit — i.e. can a peeled unit
+ *  from one merge into the other? Name + kind must match, and neither row may
+ *  carry per-instance identity (a coating, tempered stats, or fused uniqueStats)
+ *  that a merge would silently erase. Same rule grantItem uses on pickup.
+ *
+ *  OTA-1120 — hoisted to module scope. It was defined THREE times as an
+ *  identical local closure (fusion reserve, quest reserve, and now the bulk
+ *  fusion reserve). Three copies of a merge-safety predicate is three chances
+ *  for one of them to fall behind when a new per-instance field lands. */
+function sameStackUnit(a: InventoryItem, b: InventoryItem): boolean {
+  return a.name === b.name && a.kind === b.kind
+    && !a.coating && !b.coating
+    && !a.instanceStats && !b.instanceStats
+    && !a.uniqueStats && !b.uniqueStats;
+}
+
 // arb89 — dev character names that get the Resurrection-Gem perk: a gem
 // granted once at new-character creation (the name beat) AND another on every death.
 // Case-insensitive, trimmed. Shared by loadSlotIntoGame + handlePlayerDeath.
@@ -5620,6 +5636,16 @@ interface GameStore {
   /** OTA-968 — `count` moves that many units across the save/free boundary in ONE call
    *  (clamped to the stack). Omitted = 1 (the original tap-peels-one behavior). */
   toggleReserveForFusion: (itemId: string, count?: number) => void;
+  /** OTA-1120 — move MANY rows across the save/free boundary in ONE call, whole
+   *  stacks at a time. Drives the FUSABLE view's per-category SELECT ALL / CLEAR
+   *  ALL (owner: "we also need a select all button on the category headers in
+   *  inventory when we select sort by fusable so you can select a whole
+   *  category"). Enforces the same eligibility gates as toggleReserveForFusion
+   *  — quest-locked items are skipped, a not-yet-reserved row must be
+   *  forge-reservable or a faction catalyst, and FREEING is always allowed so
+   *  nothing can get stranded. Rows already in the target state are no-ops, so
+   *  the call is idempotent and safe to fire twice. */
+  reserveManyForFusion: (itemIds: string[], reserved: boolean) => void;
   /** OTA-872 — "Save for quest" earmark toggle for an ordinary item (food,
    *  materials, loot) the player was told to bring for a turn-in. Sets the soft
    *  reservedForQuest flag: the item moves to the Quest Items section and drops out
@@ -28340,11 +28366,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // again moves another unit; the opposite-state stack re-absorbs it on un-save.
     // Same "is this the same stackable unit" rule as grantItem (name+kind, no
     // coating / per-instance stats).
-    const sameUnit = (a: InventoryItem, b: InventoryItem): boolean =>
-      a.name === b.name && a.kind === b.kind
-      && !a.coating && !b.coating
-      && !a.instanceStats && !b.instanceStats
-      && !a.uniqueStats && !b.uniqueStats;
+    const sameUnit = sameStackUnit;
     // OTA-968 — move `count` units in one call (the "Save all xN" button); clamped to the
     // stack. Moving the WHOLE stack just flips the row's flag (merging into an
     // existing same-state stack if one exists) — no churn through N single peels.
@@ -28391,6 +28413,63 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
+  // OTA-1120 — SELECT ALL / CLEAR ALL for one category in the FUSABLE view.
+  // Owner: "we also need a select all button on the category headers in
+  // inventory when we select sort by fusable so you can select a whole
+  // category." Reserving a category one row at a time was the same complaint
+  // OTA-968 answered for a single stack, one level up.
+  //
+  // Whole stacks move, never single peels — a bulk control that moved one unit
+  // per row would leave the player worse off than tapping. Every eligibility
+  // gate toggleReserveForFusion enforces is enforced here too, and FREEING is
+  // always allowed so a rule change can never strand a row. Rows already in the
+  // target state are skipped, so the call is idempotent.
+  reserveManyForFusion(itemIds, reserved) {
+    const player = get().player;
+    if (!player) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isForgeReservableItem } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+    const wanted = new Set(itemIds);
+    const moving = player.inventory.filter((i) => {
+      if (!wanted.has(i.id)) return false;
+      if ((i.reservedForFusion === true) === reserved) return false; // already there
+      if (isQuestLockedItem(i)) return false;
+      // Freeing is unconditional; reserving must clear the same bar a tap does.
+      if (i.reservedForFusion) return true;
+      return isForgeReservableItem(i) || canonicalItemTags(i).includes('faction_gear');
+    });
+    if (moving.length === 0) return;
+    const movingIds = new Set(moving.map((i) => i.id));
+    set((s) => {
+      if (!s.player) return s;
+      // Flip the flag on every moved row in place…
+      let inv = s.player.inventory.map((i) =>
+        movingIds.has(i.id) ? { ...i, reservedForFusion: reserved } : i,
+      );
+      // …then fold each moved row into a pre-existing row of the same stackable
+      // unit that was ALREADY in the target state, so the list doesn't end up
+      // with two "Aetheric Cog ♥" rows the player has to reason about. Only rows
+      // that just moved are folded; untouched rows are never merged with each
+      // other (that would be a change this action was not asked to make).
+      for (const moved of moving) {
+        const self = inv.find((i) => i.id === moved.id);
+        if (!self) continue;
+        const dest = inv.find(
+          (i) => i.id !== moved.id
+            && !movingIds.has(i.id)
+            && sameStackUnit(i, self)
+            && (i.reservedForFusion === true) === reserved,
+        );
+        if (!dest) continue;
+        inv = inv
+          .filter((i) => i.id !== moved.id)
+          .map((i) => (i.id === dest.id ? { ...i, quantity: (i.quantity ?? 1) + (self.quantity ?? 1) } : i));
+      }
+      return { player: { ...s.player, inventory: inv } };
+    });
+    void get().persist();
+  },
+
   toggleReserveForQuest(itemId) {
     const player = get().player;
     if (!player) return;
@@ -28424,11 +28503,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the player can save one (or a few) and keep the rest free — save 2 rations for
     // the quest, eat the other 3. Tapping again moves another unit; the opposite-
     // state stack re-absorbs it on un-save. Mirrors toggleReserveForFusion's split.
-    const sameUnit = (a: InventoryItem, b: InventoryItem): boolean =>
-      a.name === b.name && a.kind === b.kind
-      && !a.coating && !b.coating
-      && !a.instanceStats && !b.instanceStats
-      && !a.uniqueStats && !b.uniqueStats;
+    const sameUnit = sameStackUnit;
     set((s) => {
       if (!s.player) return s;
       let inv = s.player.inventory

@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.30';
+export const DISPLAY_VERSION = '4.29.31';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20952,6 +20952,46 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1120 — THE FUSABLE VIEW BECOMES A SELECTION SURFACE.
+// Owner: "we also need a select all button on the category headers in
+// inventory when we select sort by fusable so you can select a whole
+// category. and if you tap on an item that has been selected it
+// automatically deselects." Reserving a category one row at a time was
+// the same complaint OTA-968 answered for a single stack, one level up.
+//   1. TAP IS THE SELECTION. In the FUSABLE view (and only there) a tap
+//      toggles the reserve directly instead of opening the item sheet —
+//      in BOTH directions, because deselect-on-tap without
+//      select-on-tap would be maddening. It moves the WHOLE stack,
+//      matching the bulk intent of a view whose headers say ALL. The
+//      per-unit "Save 1 / Free 1" controls stay one LONG-PRESS away, so
+//      nothing was taken off the table. A quest-locked row keeps its
+//      modal (it can never be fused, so swallowing the tap would just
+//      look broken), and the pouch / bandolier fill modes still win the
+//      tap — two armed tap modes at once is a coin flip.
+//   2. SELECT ALL / CLEAR ALL per category header. New store action
+//      `reserveManyForFusion(ids, reserved)` moves them in ONE set(),
+//      enforcing every gate a single tap enforces: quest-locked rows are
+//      skipped, a not-yet-reserved row must be forge-reservable or a
+//      faction catalyst, and FREEING is always allowed so no rule change
+//      can strand a row. Rows already in the target state are no-ops, so
+//      a double-tap cannot double-count. A moved row folds into an
+//      existing same-unit row already in that state, so the player never
+//      ends up with two "Odd Fragment ♥" rows to reason about. The
+//      chip's count comes from the SAME filter the store applies, so it
+//      can never claim a number it cannot deliver, and it carries its
+//      own onPress — inheriting the header's would fold away the very
+//      rows it just reserved.
+//   3. THE MODE SAYS ITSELF. One banner, only in this view, naming both
+//      the tap and the long-press; a reserved row gets a lit border
+//      (quieter than the transient forge highlight — a dozen loud rows
+//      is no signal) and reads as a checkbox to a screen reader.
+//   4. `sameStackUnit` HOISTED. The merge-safety predicate was defined
+//      THREE times as an identical local closure (fusion reserve, quest
+//      reserve, and now the bulk path). Three copies is three chances
+//      for one to fall behind when a new per-instance field lands. One
+//      module-level definition now; both call sites route through it.
+// New suite ota1120FusionSelectMode (16). DISPLAY_VERSION 4.29.31.
+//
 // OTA-1119 — THE TALK SCREEN GETS A FRAME; THE REPAIR TAB GETS AXES.
 //   1. THE SHEET FLOATS. Owner: "let's shrink the width of the talk
 //      screen so it doesn't touch the edges of the screen and let's put
@@ -21249,7 +21289,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1119-frame-and-axes';
+export const OTA_BUILD_ID = '2026-08-05-1120-fusable-select-mode';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1119-frame-and-axes';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1118-talking-is-its-own-screen';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1117-gear-lists-tell-the-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1116-from-the-device-log';

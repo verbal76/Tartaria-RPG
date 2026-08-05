@@ -923,9 +923,48 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.30**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.31**; ledger in `VERSION.md`.
 
-- **A FRAME ON THE TALK SCREEN, AXES ON THE REPAIR TAB (2026-08-05, latest).
+- **THE FUSABLE VIEW BECOMES A SELECTION SURFACE (2026-08-05, latest).
+  BOTH LINES.** HAL OTA-1120 / golem OTA-1097. Owner: "we also need a
+  select all button on the category headers in inventory when we select
+  sort by fusable so you can select a whole category. and if you tap on
+  an item that has been selected it automatically deselects." Reserving
+  a category one row at a time was the same complaint OTA-968 answered
+  for a single stack, one level up.
+  (1) **TAP IS THE SELECTION.** In the FUSABLE view — and only there — a
+  tap toggles the reserve directly instead of opening the item sheet, in
+  BOTH directions, because deselect-on-tap without select-on-tap would be
+  maddening. It moves the WHOLE stack, matching the bulk intent of a view
+  whose headers say ALL. The per-unit "Save 1 / Free 1" controls stay one
+  LONG-PRESS away, so nothing was taken off the table. A quest-locked row
+  keeps its modal (it can never be fused, so swallowing the tap would
+  just look broken), and the pouch / bandolier fill modes still win the
+  tap — two armed tap modes at once is a coin flip.
+  (2) **SELECT ALL / CLEAR ALL per category header.** New store action
+  `reserveManyForFusion(ids, reserved)` moves them in ONE `set()`,
+  enforcing every gate a single tap enforces: quest-locked rows skipped,
+  a not-yet-reserved row must be forge-reservable or a faction catalyst,
+  and FREEING is always allowed so no rule change can strand a row. Rows
+  already in the target state are no-ops, so a double-tap cannot
+  double-count. A moved row folds into an existing same-unit row already
+  in that state, so the player never ends up with two "Odd Fragment ♥"
+  rows to reason about. The chip's count comes from the SAME filter the
+  store applies — it can never claim a number it cannot deliver — and it
+  carries its own `onPress`, because inheriting the header's would fold
+  away the very rows it just reserved.
+  (3) **THE MODE SAYS ITSELF.** One banner, only in this view, naming
+  both the tap and the long-press; a reserved row gets a lit border
+  (deliberately quieter than the transient forge highlight — a dozen loud
+  rows is no signal) and reads as a checkbox to a screen reader.
+  (4) **`sameStackUnit` HOISTED.** The merge-safety predicate was defined
+  THREE times as an identical local closure (fusion reserve, quest
+  reserve, and now the bulk path). Three copies is three chances for one
+  to fall behind when a new per-instance field lands. One module-level
+  definition now; both call sites route through it. Suite
+  ota1120FusionSelectMode (16).
+
+- **A FRAME ON THE TALK SCREEN, AXES ON THE REPAIR TAB (2026-08-05).
   BOTH LINES.** HAL OTA-1119 / golem OTA-1096.
   (1) **THE SHEET FLOATS.** Owner: "let's shrink the width of the talk
   screen so it doesn't touch the edges of the screen and let's put the
