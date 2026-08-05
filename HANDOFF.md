@@ -923,9 +923,48 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.29**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.30**; ledger in `VERSION.md`.
 
-- **TALKING IS ITS OWN SCREEN NOW (2026-08-05, latest). BOTH LINES.**
+- **A FRAME ON THE TALK SCREEN, AXES ON THE REPAIR TAB (2026-08-05, latest).
+  BOTH LINES.** HAL OTA-1119 / golem OTA-1096.
+  (1) **THE SHEET FLOATS.** Owner: "let's shrink the width of the talk
+  screen so it doesn't touch the edges of the screen and let's put the
+  outside edge detail [a brighter] gold color so it pops and you
+  understand a border is there." OTA-1118 welded the sheet to the bottom
+  bezel, which gives a panel no readable edge — it reads as the app
+  rather than as a layer over the app. It now sits in a gutter on all
+  four sides (backdrop centers it, 14pt horizontal / 22pt vertical
+  padding), 92% tall so the gutter shows top AND bottom, a full 14pt
+  corner radius instead of two top corners, and a 2px `#f0c96a` frame —
+  deliberately brighter than any gold INSIDE the sheet (`#c9a86a`
+  kicker, `#6b5c3a` topic rows) so the border is the first thing the eye
+  finds. The darkened world visible in the gutter is what tells you this
+  is a layer you can step out of.
+  (2) **EQUIPPED BECOMES AN AXIS, NOT A HIDDEN PRE-KEY.** Owner: "let's
+  add some different sorting options in the craft repair tab, still
+  prioritize equipped it's on top as default sort." OTA-1117 made
+  worn-first an UNCONDITIONAL pre-key on every axis, which meant tapping
+  NAME sorted by name *within worn* and *within unworn* — the axis you
+  picked never really ran. EQUIPPED is now a real axis and the DEFAULT
+  one, so opening the tab is unchanged (the OTA-1117 ask is about the
+  tab's default state) while every other axis genuinely sorts. Inside
+  the worn block, what you can fix RIGHT NOW leads.
+  (3) **THREE NEW REPAIR AXES.** SLOT (head-to-toe body order so a full
+  kit reads like a paper doll; slotless gear — rope, lantern, tools —
+  sinks below it rather than scattering through it), RARITY (Common →
+  Legendary), KIND (weapons together, armor together, tools together).
+  SLOT reuses the SAME rank map as InventoryScreen, so "sorted by slot"
+  means one order across the game rather than two that nearly agree.
+  Eight axes now; `SearchSortBar`'s sortRow already carries
+  `flexWrap: 'wrap'`. The ★ EQUIPPED marker renders off `r.worn`, never
+  off the active axis, so your gear stays findable after a re-sort.
+  Two source locks RETARGETED, not deleted: the OTA-1118 height pin
+  follows 88%→92% while still asserting the exchange owns the screen,
+  and the OTA-1117 worn-pre-key lock now asserts the axis form AND that
+  the old unconditional pre-key is gone — otherwise the new axes are
+  theatre.
+
+- **TALKING IS ITS OWN SCREEN NOW (2026-08-05). BOTH LINES.**
   HAL OTA-1118 / golem OTA-1095. Owner, from the device: "the talk box
   is bigger than the exploration window so I don't get to see what he
   actually says unless I stop talking." Then, weighing the fix: "should

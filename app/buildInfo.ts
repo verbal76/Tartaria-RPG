@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.29';
+export const DISPLAY_VERSION = '4.29.30';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20952,6 +20952,44 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1119 — THE TALK SCREEN GETS A FRAME; THE REPAIR TAB GETS AXES.
+//   1. THE SHEET FLOATS. Owner: "let's shrink the width of the talk
+//      screen so it doesn't touch the edges of the screen and let's put
+//      the outside edge detail [a brighter] gold color so it pops and
+//      you understand a border is there." OTA-1118 welded the sheet to
+//      the bottom bezel, which gives a panel no readable edge — it reads
+//      as the app rather than as a layer over the app. It now sits in a
+//      gutter on all four sides (backdrop centers it, 14pt horizontal /
+//      22pt vertical padding), 92% tall so the gutter shows top AND
+//      bottom, full 14pt corner radius instead of two top corners, and a
+//      2px #f0c96a frame — brighter than any gold INSIDE the sheet
+//      (#c9a86a kicker, #6b5c3a topic rows) so the border is the first
+//      thing the eye finds. The darkened world in the gutter is what
+//      tells you this is something you can step out of.
+//   2. EQUIPPED BECOMES AN AXIS, NOT A HIDDEN PRE-KEY. Owner: "let's add
+//      some different sorting options in the craft repair tab, still
+//      prioritize equipped it's on top as default sort." OTA-1117 made
+//      worn-first an UNCONDITIONAL pre-key on every axis, which meant
+//      tapping NAME sorted by name *within worn* and *within unworn* —
+//      the axis you picked never really ran. EQUIPPED is now a real axis
+//      and the DEFAULT one, so opening the tab is unchanged (the
+//      OTA-1117 ask), and every other axis genuinely sorts. Within the
+//      worn block, what you can fix RIGHT NOW leads.
+//   3. THREE NEW REPAIR AXES. SLOT (head-to-toe body order, so a full
+//      kit reads like a paper doll; slotless gear — rope, lantern,
+//      tools — sinks below it), RARITY (Common → Legendary), KIND
+//      (weapons together, armor together, tools together). SLOT reuses
+//      the SAME rank map as InventoryScreen, so "sorted by slot" means
+//      one order across the game rather than two that nearly agree.
+//      Eight axes now; SearchSortBar's sortRow already wraps. The ★
+//      EQUIPPED marker renders off r.worn, never off the active axis, so
+//      your gear stays findable after a re-sort.
+// Two source locks RETARGETED, not deleted: the OTA-1118 height pin
+// follows 88%→92% while still asserting the exchange owns the screen,
+// and the OTA-1117 worn-pre-key lock now asserts the axis form AND that
+// the old unconditional pre-key is gone (otherwise the new axes are
+// theatre). DISPLAY_VERSION 4.29.30.
+//
 // OTA-1118 — TALKING IS ITS OWN SCREEN NOW.
 // Owner, from the device: "the talk box is bigger than the exploration
 // window so I don't get to see what he actually says unless I stop
@@ -21211,7 +21249,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1118-talking-is-its-own-screen';
+export const OTA_BUILD_ID = '2026-08-05-1119-frame-and-axes';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1118-talking-is-its-own-screen';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1117-gear-lists-tell-the-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1116-from-the-device-log';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1115-secondary-cast';
