@@ -192,6 +192,14 @@ export function InventoryScreen() {
   const [pouchFilterActive, setPouchFilterActive] = useState(false);
   // arb110 — bandolier fill mode (mutually exclusive with the pouch fill mode).
   const [bandolierFilterActive, setBandolierFilterActive] = useState(false);
+  // OTA-1123 — inventory GROUP mode. Owner, after OTA-1122's group sell: "yes
+  // wire drop, fusable select and scrap the same way." Same contract as the
+  // vendor list, which is the whole point — one gesture, one meaning, wherever
+  // you are: HOLD a row to start a group, TAP to add or remove, act on the lot.
+  const [invSelectMode, setInvSelectMode] = useState(false);
+  const [invSelected, setInvSelected] = useState<string[]>([]);
+  // Which group action is awaiting confirmation; null = no modal up.
+  const [invGroupAction, setInvGroupAction] = useState<'drop' | 'scrap' | 'reserve' | 'release' | null>(null);
   // arb108 — per-category collapse. Tapping a section header folds that whole
   // category away so the player can skip past Weapons/Armor to reach Materials /
   // Food without scrolling through every row. Keyed by category id; default open.
@@ -316,6 +324,59 @@ export function InventoryScreen() {
   // the coating pickers below read it, so what floats to the top and what carries
   // the EQUIPPED tag can never disagree.
   const wornIds = wornInstanceIds(player);
+  // OTA-1123 — THE INVENTORY LEARNS THE SAME GRIP. Owner, after OTA-1122's group
+  // sell: "yes wire drop, fusable select and scrap the same way." Same contract
+  // as the vendor list, which is the whole point — one gesture, one meaning,
+  // wherever you are: HOLD a row to start a group, TAP to add or remove, act on
+  // the lot. A player who never holds a row sees no change at all.
+  //
+  // Selection is by INSTANCE ID and, like the group sell, RE-DERIVED from the
+  // live inventory every render — a picked row that is sold, dropped, used or
+  // scrapped falls OUT of the group instead of lingering as a dead id the count
+  // still claims.
+  const selectedItems = invSelected
+    .map((id) => (player.inventory ?? []).find((i) => i.id === id && i.quantity > 0))
+    .filter((i): i is InventoryItem => !!i);
+  // Per-action eligibility, mirroring exactly what each single-item path allows.
+  // A group action must never claim a count it cannot deliver, and must never
+  // sweep up something the one-at-a-time route would have refused.
+  const droppable = selectedItems.filter((i) => !isQuestLockedItem(i) && !wornIds.has(i.id));
+  // Scrap AUTO-UNEQUIPS (OTA-058), so worn gear is allowed here — but that is
+  // exactly why the confirm names it.
+  const scrappable = selectedItems.filter((i) => !isQuestLockedItem(i) && canScrap(i));
+  const reservable = selectedItems.filter((i) => !isQuestLockedItem(i) && !i.reservedForFusion && isFusionEligible(i));
+  const releasable = selectedItems.filter((i) => i.reservedForFusion === true);
+
+  const exitInvSelect = () => { setInvSelectMode(false); setInvSelected([]); setInvGroupAction(null); };
+  const toggleInvSelect = (id: string) => {
+    setInvSelected((cur) => {
+      const next = cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id];
+      // Emptying the group leaves the mode, so you are never parked on a bar
+      // that reads "0" with nothing to act on.
+      if (next.length === 0) setInvSelectMode(false);
+      return next;
+    });
+  };
+  const beginInvSelect = (id: string) => { setInvSelectMode(true); setInvSelected([id]); };
+  const runGroupAction = () => {
+    if (invGroupAction === 'drop') {
+      // Snapshot first — each drop mutates the inventory the rows came from.
+      // Instance-exact: OTA-1123 threads the id through, so two rows of the same
+      // name drop the ones you ticked rather than whichever sorts first.
+      for (const it of droppable.map((i) => ({ name: i.name, id: i.id, qty: i.quantity ?? 1 }))) {
+        for (let n = 0; n < it.qty; n++) dropInventoryItem(it.name, it.id);
+      }
+    } else if (invGroupAction === 'scrap') {
+      for (const it of scrappable.map((i) => ({ name: i.name, id: i.id }))) {
+        scrapInventoryItem(it.name, it.id);
+      }
+    } else if (invGroupAction === 'reserve') {
+      reserveManyForFusion(reservable.map((i) => i.id), true);
+    } else if (invGroupAction === 'release') {
+      reserveManyForFusion(releasable.map((i) => i.id), false);
+    }
+    exitInvSelect();
+  };
   const sorted = sortInventoryItems(fusionFiltered, sortKey, sortDirection, wornIds);
   const grouped = groupInventoryByCategory(sorted);
   // Map equipped item name → the slot(s) it's currently in. Used so the
@@ -480,6 +541,10 @@ export function InventoryScreen() {
   // and left no path to unequip. Modal always opens; player picks Equip
   // (specific slot) or Unequip (if currently worn) or Close.
   const handleItemTap = (item: InventoryItem) => {
+    // OTA-1123 — once a group is open, a tap adds or removes. Checked FIRST so
+    // it beats every other tap meaning on this screen, including the FUSABLE
+    // reserve-toggle below: while you are building a group, that is what taps do.
+    if (invSelectMode) { toggleInvSelect(item.id); return; }
     // OTA-269 — pouch-filter tap path. The player tapped an empty
     // pouch slot above, narrowing the inventory below to eligible
     // tools. Tapping one of those tools stows it directly and
@@ -514,14 +579,18 @@ export function InventoryScreen() {
     setPending({ item, slots: validSlotsForItem(item) });
   };
 
-  // OTA-1120 — the escape hatch from tap-to-toggle: a long press in the FUSABLE
-  // view opens the ordinary item modal, so the single-unit "Save 1 for fusion"
-  // (and everything else on that sheet) is still reachable without leaving the
-  // view. Elsewhere it is a no-op — the tap already opens the modal.
+  // OTA-1123 — HOLD starts a group, everywhere in the inventory. This replaces
+  // OTA-1120's FUSABLE-only "long-press opens the item sheet" escape hatch: one
+  // gesture has to mean one thing on this screen, and the group is worth more
+  // than that hatch was. The single-unit "Save 1 for fusion" it used to reach is
+  // still there — switch off the FUSABLE axis and tap the item, which is what
+  // the FUSABLE banner now says.
   const handleItemLongPress = (item: InventoryItem) => {
-    if (!fusionSelectMode) return;
-    setScrapResult(null);
-    setPending({ item, slots: validSlotsForItem(item) });
+    // The pouch / bandolier fill modes own the tap while they're armed; letting
+    // a hold start a group underneath them would leave two live modes fighting.
+    if (pouchFilterActive || bandolierFilterActive) return;
+    if (invSelectMode) { toggleInvSelect(item.id); return; }
+    beginInvSelect(item.id);
   };
 
   const closeModal = () => {
@@ -1371,11 +1440,56 @@ export function InventoryScreen() {
             the item sheet), and a screen that silently changes what a tap means
             is the same silent-rule problem OTA-1117 was written against. One
             line, only in this view, naming both the tap and the long-press. */}
-        {fusionSelectMode && (
+        {fusionSelectMode && !invSelectMode && (
           <View style={styles.fusionModeBanner}>
             <Text style={styles.fusionModeText}>
-              Tap to reserve ♡ / release ♥ for the Crucible. Use a category&apos;s ALL button to take the lot; long-press a row for its full menu.
+              Tap to reserve ♡ / release ♥ for the Crucible. Use a category&apos;s ALL button to take the lot, or hold a row to build a group. For a single unit off a stack, switch sort and tap the item.
             </Text>
+          </View>
+        )}
+        {/* OTA-1123 — the group bar. Only present once you've held a row, and it
+            offers exactly the actions the SELECTION can actually take: a button
+            that would act on nothing is not shown at all, rather than sitting
+            there greyed and unexplained. Counts come from the same predicates
+            the action uses, so a button can never claim a number it cannot
+            deliver — the rule the Crucible's SELECT ALL learned in OTA-1120. */}
+        {invSelectMode && (
+          <View style={styles.groupBar}>
+            <View style={styles.groupBarHead}>
+              <Text style={styles.groupBarCount}>☑ {selectedItems.length} picked</Text>
+              <TouchableOpacity onPress={exitInvSelect} style={styles.groupBarCancel} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel="Cancel the group">
+                <Text style={styles.groupBarCancelText}>CANCEL</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.groupBarActions}>
+              {droppable.length > 0 && (
+                <TouchableOpacity onPress={() => setInvGroupAction('drop')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Drop ${droppable.length} items`}>
+                  <Text style={styles.groupActText}>DROP {droppable.length}</Text>
+                </TouchableOpacity>
+              )}
+              {scrappable.length > 0 && (
+                <TouchableOpacity onPress={() => setInvGroupAction('scrap')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Scrap ${scrappable.length} items`}>
+                  <Text style={styles.groupActText}>SCRAP {scrappable.length}</Text>
+                </TouchableOpacity>
+              )}
+              {reservable.length > 0 && (
+                <TouchableOpacity onPress={() => setInvGroupAction('reserve')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Reserve ${reservable.length} items for fusion`}>
+                  <Text style={styles.groupActText}>♡ RESERVE {reservable.length}</Text>
+                </TouchableOpacity>
+              )}
+              {releasable.length > 0 && (
+                <TouchableOpacity onPress={() => setInvGroupAction('release')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Release ${releasable.length} items from fusion`}>
+                  <Text style={styles.groupActText}>♥ RELEASE {releasable.length}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            {/* Say what the group CAN'T do, rather than leaving the player to
+                wonder why their quest item has no button. */}
+            {droppable.length + scrappable.length + reservable.length + releasable.length === 0 && (
+              <Text style={styles.groupBarNone}>
+                Nothing here can be dropped, scrapped or reserved — quest-bound items stay with you.
+              </Text>
+            )}
           </View>
         )}
         {CATEGORY_ORDER.map((cat) => {
@@ -1457,8 +1571,13 @@ export function InventoryScreen() {
                   slotTaken={!pouchFilterActive && !bandolierFilterActive && itemSlotTaken(item)}
                   stripeColor={companionStripeColor(item)}
                   onPress={() => handleItemTap(item)}
-                  onLongPress={fusionSelectMode ? () => handleItemLongPress(item) : undefined}
+                  onLongPress={() => handleItemLongPress(item)}
+                  // OTA-1123 — the checkbox affordance now belongs to the GROUP
+                  // mode; the FUSABLE view keeps its own ♥ tick through
+                  // item.reservedForFusion, which is a different thing.
                   selectable={fusionSelectMode}
+                  grouped={invSelectMode}
+                  groupPicked={invSelected.includes(item.id)}
                 />
                 </View>
               ))}
@@ -1523,6 +1642,59 @@ export function InventoryScreen() {
         }
         buttons={scrapResultButtons ?? buildModalButtons()}
         onRequestClose={closeModal}
+      />
+
+      {/* OTA-1123 — group-action confirmation. Itemises exactly what is going,
+          and carries the warnings each single-item path would have raised: SCRAP
+          silently AUTO-UNEQUIPS worn gear (OTA-058) and DROP leaves things on
+          the ground where you stand. A bulk action's real danger is doing
+          quietly what one action would have stopped to explain. */}
+      <BrandedModal
+        visible={invGroupAction !== null}
+        title={
+          invGroupAction === 'drop' ? `Drop ${droppable.length}`
+            : invGroupAction === 'scrap' ? `Break down ${scrappable.length}`
+              : invGroupAction === 'reserve' ? `Reserve ${reservable.length} for the Crucible`
+                : `Release ${releasable.length} from the Crucible`
+        }
+        body={(() => {
+          const rows = invGroupAction === 'drop' ? droppable
+            : invGroupAction === 'scrap' ? scrappable
+              : invGroupAction === 'reserve' ? reservable
+                : releasable;
+          const list = rows
+            .map((i) => `· ${i.name}${(i.quantity ?? 1) > 1 ? ` ×${i.quantity}` : ''}`)
+            .join('\n');
+          const notes: string[] = [];
+          if (invGroupAction === 'drop') {
+            notes.push('They lie on the ground here. You can pick them back up until you move on.');
+            if (selectedItems.length > droppable.length) {
+              notes.push(`Skipped: ${selectedItems.length - droppable.length} you're wearing or that are quest-bound.`);
+            }
+          }
+          if (invGroupAction === 'scrap') {
+            notes.push('Broken down for stock material. This cannot be undone.');
+            const wornHere = scrappable.filter((i) => wornIds.has(i.id)).map((i) => i.name);
+            if (wornHere.length > 0) notes.push(`⚠ Worn right now — these will be taken off first: ${wornHere.join(', ')}.`);
+            if (selectedItems.length > scrappable.length) {
+              notes.push(`Skipped: ${selectedItems.length - scrappable.length} that are already raw stock or quest-bound.`);
+            }
+          }
+          return [list, ...notes].filter(Boolean).join('\n\n');
+        })()}
+        buttons={[
+          { label: 'Back', onPress: () => setInvGroupAction(null), tone: 'neutral' as const },
+          {
+            label: invGroupAction === 'drop' ? 'Drop them'
+              : invGroupAction === 'scrap' ? 'Break them down'
+                : invGroupAction === 'reserve' ? '♡ Reserve them' : '♥ Release them',
+            onPress: runGroupAction,
+            tone: (invGroupAction === 'drop' || invGroupAction === 'scrap')
+              ? ('destructive' as const)
+              : ('primary' as const),
+          },
+        ]}
+        onRequestClose={() => setInvGroupAction(null)}
       />
 
       {/* OTA-360 — weapon-coating picker. Second modal that opens when
@@ -1864,6 +2036,8 @@ function ItemRow({
   onPress,
   onLongPress,
   selectable,
+  grouped,
+  groupPicked,
 }: {
   item: InventoryItem;
   color: string;
@@ -1883,6 +2057,10 @@ function ItemRow({
    *  A reserved row gets a lit border so "selected" reads at a glance rather
    *  than resting entirely on the small ♥ at the end of the meta line. */
   selectable?: boolean;
+  /** OTA-1123 — a group is open (hold-to-pick). Rows show a ☐/☑ box. */
+  grouped?: boolean;
+  /** OTA-1123 — this row is in the group. */
+  groupPicked?: boolean;
 }) {
   const canEquip = validSlotsForItem(item).length > 0;
   // OTA-120 Phase 5 — dog-related tagging.
@@ -1906,19 +2084,35 @@ function ItemRow({
         highlight && styles.rowHighlighted,
         // OTA-1120 — selection state is a lit border, not just the trailing ♥.
         selectable && item.reservedForFusion === true && styles.rowSelected,
+        // OTA-1123 — group membership outranks it visually: while a group is
+        // open, that is the question the screen is asking.
+        grouped && groupPicked && styles.rowGrouped,
       ]}
       onPress={onPress}
       onLongPress={onLongPress}
       delayLongPress={350}
       activeOpacity={0.7}
-      accessibilityRole={selectable ? 'checkbox' : 'button'}
-      accessibilityState={selectable ? { checked: item.reservedForFusion === true } : undefined}
-      accessibilityHint={selectable
-        ? (item.reservedForFusion
-          ? 'Reserved for fusion. Tap to release it. Long-press for the item menu.'
-          : 'Tap to reserve it for fusion. Long-press for the item menu.')
-        : undefined}
+      accessibilityRole={grouped || selectable ? 'checkbox' : 'button'}
+      accessibilityState={grouped
+        ? { checked: !!groupPicked }
+        : selectable ? { checked: item.reservedForFusion === true } : undefined}
+      accessibilityHint={grouped
+        ? 'Tap to add or remove this from the group.'
+        : selectable
+          ? (item.reservedForFusion
+            ? 'Reserved for fusion. Tap to release it. Hold to start a group.'
+            : 'Tap to reserve it for fusion. Hold to start a group.')
+          : 'Tap for the item menu. Hold to start a group.'}
     >
+      {/* OTA-1123 — the group tick. Sits ahead of the rarity stripe so a picked
+          row reads from its leading edge, the way a checklist does. */}
+      {grouped && (
+        <View style={styles.groupTickWrap}>
+          <Text style={groupPicked ? styles.groupTick : styles.groupTickOff}>
+            {groupPicked ? '☑' : '☐'}
+          </Text>
+        </View>
+      )}
       {/* OTA-485 — faint diagonal hatching behind the row for companion-edible/
           usable items. Rendered FIRST so it sits behind the rarity stripe + the
           text body; pointerEvents none + low opacity so it never blocks a tap or
@@ -2244,6 +2438,39 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   fusionModeText: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
+  // OTA-1123 — the inventory group bar + row tick. Same amber language as the
+  // Crucible controls, since a group is the same kind of thing: a declaration
+  // about several items at once.
+  groupBar: {
+    backgroundColor: '#1e1a12',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 8,
+    gap: 8,
+  },
+  groupBarHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  groupBarCount: { color: '#e6d8b3', fontSize: 12, fontWeight: '700' },
+  groupBarCancel: {
+    borderColor: '#3a342c', borderWidth: 1, borderRadius: 3,
+    paddingHorizontal: 10, paddingVertical: 4,
+  },
+  groupBarCancelText: { color: '#a2977b', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  groupBarActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  groupActBtn: {
+    borderColor: '#6b5c3a', borderWidth: 1, borderRadius: 3,
+    backgroundColor: '#17150f', paddingHorizontal: 10, paddingVertical: 6,
+  },
+  groupActText: { color: '#e6d8b3', fontSize: 10, fontWeight: '700', letterSpacing: 0.8 },
+  groupBarNone: { color: '#a2977b', fontSize: 11, fontStyle: 'italic' },
+  groupTickWrap: { justifyContent: 'center', paddingLeft: 8, paddingRight: 2 },
+  groupTick: { color: '#c9a86a', fontSize: 15, fontWeight: '700' },
+  groupTickOff: { color: '#6b5c3a', fontSize: 15 },
+  // A row in the group. Brighter than rowSelected (the FUSABLE ♥ state) because
+  // while a group is open, group membership is the question being asked.
+  rowGrouped: { borderColor: '#c9a86a', backgroundColor: '#1e1a12' },
   pouchFilterCancel: {
     paddingHorizontal: 10,
     paddingVertical: 4,
