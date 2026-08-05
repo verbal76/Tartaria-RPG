@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.37';
+export const DISPLAY_VERSION = '4.29.38';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20986,6 +20986,46 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1127 — ⚠ EVERY FIRST VISIT GREETED YOU AS A RETURNER, AND RE-ENTRY
+// WIPED THE ROOM'S MEMORY. Task #174 root-caused with a LIVE-STORE REPRO
+// (fresh game, hub walk, per-build call counting) — the log-archaeology
+// theory (double scene builds) was WRONG: _beginSceneCore runs once per
+// action. Three defects, one room-record map:
+//   1. PHANTOM PRIOR VISIT. The OTA-071 investigation-table seeder and the
+//      OTA-120 dog smell-find both run BEFORE the visit-record block in the
+//      same build, and both CREATED the record with visitCount 1 when it
+//      was missing. The counter then found an "existing" record on the
+//      player's genuinely-first entry — every room in the game greeted
+//      "You've stood here before. (visit 2)" on first sight (device log
+//      2026-08-05, every first entry inflated). Created shells now seed
+//      visitCount 0 and the greeting requires >= 1: the visit block owns
+//      the counting, the tables ride along.
+//   2. THE WRONG DRAWER AT BOOT. candidateKey read player.hubRoomId off the
+//      snapshot captured at the top of the build — but hub AUTO-ENTRY
+//      assigns the gate room AFTER that capture, so the opening scene filed
+//      the gate under a SUFFIXLESS key while every later hub move used
+//      `…@outpost_gate`. One room, two records; the boot record (count +
+//      seeded investigation table) was orphaned on the first step — which
+//      is why the log's Reception said "(visit 2)" at boot and "(visit 2)"
+//      AGAIN on return. The key now uses the RESOLVED hub room id (same
+//      stale-snapshot class as OTA-1126's fall fix). The investigation
+//      seeder keys the same way.
+//   3. RE-ENTRY WIPED THE ROOM'S MEMORY (found by the new suite's own
+//      assertion, not the device log). The visit block's record literal was
+//      field-by-field — arb107's comment "any un-spread field is dropped"
+//      was its own indictment: searchNothingCounts, groundDigCount,
+//      firstInvestigateDone and roomInvestigationTable were all silently
+//      erased on every re-entry, resetting the investigate consumed-state
+//      ("look again later") and un-doing OTA-1126's echoed stamps for that
+//      room. The literal is now `...existing` + overrides, so a future
+//      field survives by default.
+// New suite ota1127VisitCount (live-store: boot counts 1/greets nobody/
+// files under the hub key; first entries silent; returns greet "(visit 2)";
+// the table rides the counted record) + source locks. One playtest-sim cap
+// retargeted 12 → 13: the false greetings had been padding the feed's line
+// variety, so the walker's wait template counts one higher on the same run.
+// DISPLAY_VERSION 4.29.38.
+//
 // OTA-1126 — ⚠ DEVICE-LOG TRIAGE: THE ECHO THAT PAID FOREVER, THE ROOF
 // THAT WASN'T, AND THE ARC THE FALL ERASED. Three defects from one
 // APK-293 playtest log (2026-08-05), each reproduced in the log itself:
@@ -21555,7 +21595,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1126-echo-farm-roof-fall';
+export const OTA_BUILD_ID = '2026-08-05-1127-first-visit-truth';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1126-echo-farm-roof-fall';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1125-repair-group-budget';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1124-group-bar-anchored';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1123-inventory-group';

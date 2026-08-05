@@ -923,10 +923,48 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.37**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.38**; ledger in `VERSION.md`.
+
+- **FIRST VISITS TELL THE TRUTH (2026-08-05, latest). BOTH LINES.** HAL
+  OTA-1127 / golem OTA-1104. Task #174, root-caused with a LIVE-STORE REPRO
+  (fresh game, hub walk, per-build call counting) — the log-archaeology
+  theory (double scene builds) was WRONG: `_beginSceneCore` runs once per
+  action. The counter was being poisoned inside a single build. Three
+  defects, one visitedRooms map:
+  (1) **PHANTOM PRIOR VISIT.** The OTA-071 investigation-table seeder and
+  the OTA-120 dog smell-find run BEFORE the visit-record block in the same
+  build, and both CREATED the room record with `visitCount: 1` when it was
+  missing — so the counter found an "existing" record on the player's
+  genuinely-first entry, and every room in the game greeted "You've stood
+  here before. (visit 2)" on first sight. Created shells now seed
+  `visitCount: 0` and the greeting requires `>= 1`: the visit block owns
+  the counting; the tables ride along.
+  (2) **THE WRONG DRAWER AT BOOT.** `candidateKey` read `player.hubRoomId`
+  off the snapshot captured at the top of the build, but hub AUTO-ENTRY
+  assigns the gate room AFTER that capture — the opening scene filed the
+  gate under a SUFFIXLESS key while every later hub move used
+  `…@outpost_gate`. One room, two records; the boot record was orphaned on
+  the first step (why the device log's Reception said "(visit 2)" at boot
+  and "(visit 2)" AGAIN on return). Same stale-snapshot class as OTA-1126's
+  fall fix; the key now uses the RESOLVED hub room id, and the
+  investigation seeder keys the same way.
+  (3) **RE-ENTRY WIPED THE ROOM'S MEMORY** — found by the new suite's own
+  assertion, not the device log. The visit block's record literal was
+  field-by-field, and arb107's comment ("any un-spread field is dropped")
+  was its own indictment: `searchNothingCounts`, `groundDigCount`,
+  `firstInvestigateDone` and `roomInvestigationTable` were silently erased
+  on every re-entry — resetting the investigate consumed-state ("look
+  again later") and un-doing OTA-1126's `echoed` stamps for that room. The
+  literal is now `...existing` + overrides, so a future field survives
+  re-entry by default.
+  New suite `ota1127VisitCount` (live-store boot/first-entry/return walk +
+  source locks). One playtest-sim repetition cap retargeted 12 → 13 — the
+  false greetings had been padding the feed's line variety, so the walker's
+  wait template counts one higher on the same run; the guarded intent is
+  unchanged.
 
 - **DEVICE-LOG TRIAGE — THE ECHO THAT PAID FOREVER, THE ROOF THAT WASN'T,
-  AND THE ARC THE FALL ERASED (2026-08-05, latest). BOTH LINES.** HAL
+  AND THE ARC THE FALL ERASED (2026-08-05). BOTH LINES.** HAL
   OTA-1126 / golem OTA-1103. Three defects from one APK-293 playtest log,
   each reproduced in the log itself.
   (1) **⚠ ECHO-HOOK FARM (exploit).** OTA-075's cross-room echo plants a
