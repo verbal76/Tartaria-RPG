@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.49';
+export const DISPLAY_VERSION = '4.29.50';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22124,7 +22124,57 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // characters of raw text.
 // New suite ota1138PipeLoop; ota1132 and ota1131 retargeted off the pipe
 // form they were asserting. DISPLAY_VERSION 4.29.49.
-export const OTA_BUILD_ID = '2026-08-05-1138-pipe-loop';
+// OTA-1139 — THE ELITE SWAP. The last of the nine difficulty dials to
+// find a consumer, and the one the industry survey the owner brought
+// back rates highest: the CONTENT lever. On a hit, the party that
+// would have crested the rise arrives as ONE named body instead.
+// ⚠ WHY THIS LEVER AND NOT ANOTHER MULTIPLIER. A multiplier makes the
+// same fight LONGER — this project has been bitten by that once, and
+// it is why scaledPackSize is welded to scaledSwingCap. A content swap
+// makes the fight DIFFERENT. Four raiders is a targeting and attrition
+// problem: who is closest, who is shooting, does the swing cap let me
+// finish this. One Reaver-Captain is a puzzle: what is it weak to, do
+// I have that coating, is my resist profile wrong for this. Those are
+// different verbs — and the second set of systems (bestiary, weakness
+// tags, coatings, resistances) is most valuable against ONE durable
+// body and nearly irrelevant against four disposable ones. The swap is
+// the encounter shape that finally makes them pay. It is also
+// structurally incapable of the stall tail: one body is one attacker,
+// so the swing cap can never bind. It is the ANTI-pack, which is why a
+// tier running both hot is more varied than either alone.
+// ⚠ AND IT ADDS NO NEW BALANCE CONSTANTS, which is what makes the
+// difficulty claim checkable. scaleEncounterForContext already encodes
+// the rule this needs: a PACK is anchored on one solo-equivalent plus
+// 22% per extra body and gets only 0.6x of the attack/AC bump
+// "because there are several of them"; a SOLO foe gets the full bump.
+// So the elite is defined as the pack's OWN summed HP concentrated
+// into one body, hitting at the solo rate. The fold therefore runs
+// AFTER pack scaling — the scaled pack's total IS the budget — and the
+// single body is then re-scaled through the solo branch and given that
+// total back. Durability from the pack, aggression from the solo. If
+// the pack numbers are ever retuned, the elite retunes with them free.
+// ⚠ THE CARRY IS THE ONLY WAY THIS COULD HAVE UNDERPAID. Spoils are
+// rolled PER CORPSE, so a body that replaced four would have paid one
+// corpse's worth for a four-body fight — being paid LESS for a harder
+// encounter, the exact fake-difficulty trap the dial exists to avoid.
+// eliteReplaced rides on the enemy and buys n-1 extra loot rolls, on
+// the ROLL COUNT rather than as a flat grant, so the spoils stay drawn
+// from its own table and can still come up dupes like any other kill.
+// WHAT THE AUDIT FOUND, recorded in eliteSwap.ts so it is not
+// re-litigated: there are NO "kill N of X" objectives in the game
+// (faction quests are fetch / escort / staged, and a staged kill
+// advances ONE stage per kill, so a collapsed party costs encounters,
+// never completions); the +1 max-HP milestone keys on DISTINCT enemy
+// types rather than total kills (arb119, anti-farm), so collapsing
+// identical grunts costs nothing and a NAMED elite is a new type; and
+// hunts match their target by EXACT NAME, which is why this must never
+// touch a hunt or boss spawn — a renamed target would silently never
+// complete. Bodies are named for that reason and two others: an
+// unannounced stat-inflated grunt reads as a bug, and the announce
+// lines stop claiming a headcount that is no longer true.
+// New suite ota1139EliteSwap (29 tests). DISPLAY_VERSION 4.29.50.
+export const OTA_BUILD_ID = '2026-08-05-1139-elite-swap';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1138-pipe-loop';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1137-group-equip';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1136-difficulty-systems';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1135-outdoor-rest-lines';
