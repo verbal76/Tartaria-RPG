@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.45';
+export const DISPLAY_VERSION = '4.29.46';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -21893,7 +21893,49 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     encounters and loot). Halving the baseline is what actually
 //     fixes the symptom the owner felt.
 // New suite ota1134EncounterRate (11 tests). DISPLAY_VERSION 4.29.45.
-export const OTA_BUILD_ID = '2026-08-05-1134-half-the-roll';
+// OTA-1135 — THE OUTDOOR HALF OF OTA-1055. Owner: "fix the rest
+// ambush line dedup, or should the llm rework be giving a new line
+// for that?"
+//
+// Neither framing was quite it, and the cause is smaller than "needs
+// new content". OTA-1055 re-voiced the rest ambush for INDOOR scenes
+// — "circled" and "closes the distance" are open-ground images, and
+// the unsettling part of waking in a sealed room is that it was
+// already in with you — and gave that path THREE lines for the wake
+// beat and THREE for the arrival. It never came back for the outdoor
+// path, which has been a single hardcoded string for BOTH beats ever
+// since. So the more common case, resting under open sky, was the one
+// with no variety at all, and the owner's log caught it: two
+// consecutive rest ambushes, identical beat. The RATE measured fine
+// (22% wild / 8% hub × 1.3 night / 0.85 day — two hits in one session
+// is a ~5% coincidence), so the repetition was the entire complaint.
+// Five lines each now, drawn the same way indoorAmbush draws its
+// three, so the two paths cannot drift apart again. The original line
+// stays in the pool: the owner has read it many times and losing it
+// would read as a different game rather than the same one with more
+// to say.
+//
+// ⚠ AND WHY AUTHORED RATHER THAN GENERATED, which is what was actually
+// asked. Three reasons, in order of weight:
+//   1. IT FIRES AS THE FIGHT STARTS. This device's own telemetry:
+//      fastest job ~2s, ambient averaging 11.6s, slowest 19.6s. A line
+//      whose job is "you wake to something standing over you" cannot
+//      arrive after the first attack roll. The headroom track's hard
+//      rule is that the model never runs in front of a tap.
+//   2. IT WOULD BE UNRELIABLE AT EXACTLY THE WRONG MOMENT. Two of
+//      three ambient generations in the last log were DISCARDED. A
+//      beat this dramatic getting nothing two times in three is worse
+//      than a repeat.
+//   3. EVERY GENERATED SLOT NEEDS AN AUTHORED FALLBACK ANYWAY, so this
+//      pool has to exist whether or not the model ever touches it.
+// Where the model COULD help later, and it is the best fit in the
+// game: rest is eight in-game hours during which the player is
+// PROVABLY busy — the ideal bank-and-spend slot. Generate during the
+// sleep, spend on waking, fall back to these when the bank is empty.
+// That needs the bank built first; noted in HANDOFF §OPEN ITEMS.
+// New suite ota1135OutdoorRestLines (13 tests). DISPLAY_VERSION 4.29.46.
+export const OTA_BUILD_ID = '2026-08-05-1135-outdoor-rest-lines';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1134-half-the-roll';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1133-death-screen';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1132-synth-yields';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1131-ambient-contradiction';
