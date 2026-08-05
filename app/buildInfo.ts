@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.54';
+export const DISPLAY_VERSION = '4.29.55';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22339,7 +22339,52 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // probe that found it, kept verbatim: same pack, same swing, same roll
 // steps, the ONLY variable is whether the blow was lethal.
 // DISPLAY_VERSION 4.29.54.
-export const OTA_BUILD_ID = '2026-08-05-1143-volley-after-kill';
+// OTA-1144 — THE CACHED PREFIX. First real win of the headroom
+// track, and it costs nothing: no new generation, no new model,
+// no content removed.
+// ⚠ OTA-1131 measured prefix reuse at exactly ZERO across a whole
+// session and recorded it as "the cache saved us nothing." That
+// reading was wrong in a useful way. llama.cpp reuses the longest
+// COMMON PREFIX between the previous prompt and this one — and every
+// prompt we built put a VARIABLE line SECOND (the room name), so the
+// reusable prefix ended after ~14 tokens no matter how much
+// byte-identical text followed it.
+// Measured on the ambient prompt: 327 tokens, of which 287 were
+// identical on EVERY call, of which 19 were ever reused. At the
+// measured ~10.5ms/token that is ~2.8 seconds per ambient line spent
+// re-reading text the model had already read.
+// FIXED BY ORDER, NOT CONTENT:
+//     STABLE PREFIX  ->  VARIABLE BODY  ->  IMPERATIVE TAIL
+// Measured before -> after, reusable prefix between consecutive calls:
+//     ambient  -> ambient    19 ->  271 tokens
+//     narration-> combat    114 ->  456 tokens
+//     narration-> ambient    14 ->   98 tokens
+// About 2.6s off a repeat ambient line and 3.6s off a combat line.
+// The prompt did not get smaller (356 -> 359 tokens on ambient); this
+// is pure reordering and the suite asserts that so a later edit cannot
+// "improve" the number by deleting content.
+// ⚠ THE IMPERATIVE STAYS LAST. A 0.5B model follows the instruction
+// nearest the generation point best, so the instruction blocks are
+// SPLIT — rules in front where they cache, task at the back where it
+// binds — rather than moved wholesale. Leaving the task uncached costs
+// ~40 tokens and is worth it.
+// ⚠ THE PREAMBLE IS SHARED ACROSS JOBS ON PURPOSE. The cache holds ONE
+// sequence, so an ambient call after a combat call reuses only what
+// those two prompts share. An identical opening across ambient /
+// peaceful / combat means the preamble survives a job switch. Edit it
+// for one job and cross-job reuse silently drops — nothing fails, it
+// just gets slower again.
+// Every sentence keeps its original wording. The only rewrites are the
+// "above"/"below" pointers the move forces — OTA-1131 is the standing
+// lesson that a prompt which lies about its own layout costs a whole
+// generation, so combat's "entities listed above" is deliberately NOT
+// flipped (its task still sits after the entity block).
+// New suite ota1144CachedPrefix (13 tests). Two OTA-1131 assertions
+// retargeted: the "above" pointer, and a rules-size comparison whose
+// slice marker moved into the shared preamble and stopped measuring
+// what it was named for. DISPLAY_VERSION 4.29.55.
+export const OTA_BUILD_ID = '2026-08-05-1144-cached-prefix';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1143-volley-after-kill';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1142-dormancy-window';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1141-hunger-carcass';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1140-rule-dials';

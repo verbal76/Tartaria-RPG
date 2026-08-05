@@ -146,7 +146,10 @@ describe('OTA-1131 — the ambient prompt stops arguing with itself', () => {
     expect(p).toContain("NEVER write 'The player'");
     // The location anchor and its no-invented-places rule.
     expect(p).toContain("The Architect's Blind");
-    expect(p).toContain('Do not name any place, room, weather or person other than the location named above');
+    // RETARGETED BY OTA-1144 — "above" → "below". The rules now PRECEDE the
+    // scene anchor so they can sit in the cached prefix, so this pointer had
+    // to follow the move. The guard is unchanged; where it points is.
+    expect(p).toContain('Do not name any place, room, weather or person other than the location named below');
     // Mid-sentence cutoffs were a named failure mode from the start.
     expect(p).toContain('End on a complete sentence.');
   });
@@ -160,9 +163,20 @@ describe('OTA-1131 — the ambient prompt stops arguing with itself', () => {
     // the ~11ms/token this device measures.
     expect(p.length).toBeLessThan(1500);
     expect(p.length).toBeLessThan(reaction.length * 0.56);
-    const ambientRules = p.slice(p.indexOf('**SECOND PERSON ONLY.**'));
-    const sharedRules = reaction.slice(reaction.indexOf('**SECOND PERSON ONLY.**'));
-    expect(ambientRules.length).toBeLessThan(sharedRules.length * 0.5);
+    // RETARGETED BY OTA-1144. This used to slice both prompts from
+    // '**SECOND PERSON ONLY.**' to the end and compare the remainders. That
+    // marker now lives in the SHARED preamble at the very top, so the slice
+    // became "almost the whole prompt" for both and stopped measuring what it
+    // was named for. The property is unchanged and still worth guarding:
+    // ambient dropped the ~470-character action catalog it is forbidden to
+    // use, so its RULES block is far cheaper than the reaction one.
+    expect(p).not.toContain('AVAILABLE PLAYER ACTIONS');
+    expect(reaction).toContain('AVAILABLE PLAYER ACTIONS');
+    // The two size assertions above already price the whole prompt; this one
+    // prices the part this OTA was about.
+    const rulesOnly = (s: string): number =>
+      s.slice(s.indexOf('Sentences must START with'), s.indexOf('\n\n')).length;
+    expect(rulesOnly(p)).toBeLessThan(rulesOnly(reaction) * 0.6);
   });
 
   it('the scene-reaction voice block is untouched — this OTA splits, it does not rewrite', () => {
