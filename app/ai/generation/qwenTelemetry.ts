@@ -21,6 +21,11 @@
 
 export type QwenCallOutcome = 'ok' | 'empty' | 'error';
 
+/** OTA-1130 — how generation ended, straight from llama.cpp. `limit` means it
+ *  ran into the token cap mid-thought (we are paying full price AND cutting a
+ *  sentence off); `eos` means it finished naturally and the cap has headroom. */
+export type QwenStopReason = 'eos' | 'limit' | 'word' | 'unknown';
+
 export interface QwenCallRecord {
   /** Which job asked — 'flourish', 'forge_name', 'ambient', a narration intent… */
   job: string;
@@ -32,6 +37,26 @@ export interface QwenCallRecord {
   chars: number;
   outcome: QwenCallOutcome;
   at: number;
+  // ── OTA-1130 — the numbers llama.cpp was already computing and we discarded ──
+  /** READ time: how long the model spent ingesting the prompt before writing a
+   *  token. OTA-1129 inferred this from wall-clock and it carried the whole
+   *  diagnosis; now it is measured. */
+  prefillMs?: number;
+  /** WRITE time: generation proper. */
+  decodeMs?: number;
+  /** Prompt length in TOKENS (the model's own count, not a chars/4 guess). */
+  promptTokens?: number;
+  /** Tokens emitted. */
+  outTokens?: number;
+  /** Prompt tokens llama.cpp reused from cache instead of re-reading. A
+   *  persistently ZERO value across calls means every generation re-reads its
+   *  whole prompt from scratch — and that a stable prompt PREFIX would make
+   *  repeat calls dramatically cheaper. That is the next 1129 if it shows. */
+  cachedTokens?: number;
+  /** Why generation stopped. */
+  stop?: QwenStopReason;
+  /** Prompt size in characters, measured on our side of the boundary. */
+  promptChars?: number;
 }
 
 interface JobAggregate {
@@ -42,11 +67,36 @@ interface JobAggregate {
   maxWaitMs: number;
   empty: number;
   error: number;
+  // OTA-1130
+  prefillMs: number;
+  decodeMs: number;
+  promptTokens: number;
+  outTokens: number;
+  cachedTokens: number;
+  hitLimit: number;
+  /** Calls whose text never reached the player (cancelled, filtered, stale). */
+  discarded: number;
+  /** Milliseconds burned on those calls — the honest waste number. */
+  discardedMs: number;
 }
 
 const jobs = new Map<string, JobAggregate>();
 let callCount = 0;
 let sink: ((r: QwenCallRecord) => void) | null = null;
+/** OTA-1130 — the most recent recorded call. Every completion is serialized
+ *  behind the shared native-ML lock (arb159), so exactly one generation is in
+ *  flight at a time and "the last call" is unambiguous — which is what lets a
+ *  consumer report a discard without threading an id back through the runtime. */
+let lastCall: { job: string; totalMs: number } | null = null;
+let discardSink: ((job: string, reason: string, ms: number) => void) | null = null;
+
+function emptyAggregate(): JobAggregate {
+  return {
+    count: 0, totalMs: 0, maxMs: 0, waitMs: 0, maxWaitMs: 0, empty: 0, error: 0,
+    prefillMs: 0, decodeMs: 0, promptTokens: 0, outTokens: 0, cachedTokens: 0,
+    hitLimit: 0, discarded: 0, discardedMs: 0,
+  };
+}
 
 /** The store registers a sink at hydrate so calls surface in the debug log.
  *  A throwing sink must never break a generation — recording swallows. */
@@ -56,9 +106,7 @@ export function setQwenTelemetrySink(fn: ((r: QwenCallRecord) => void) | null): 
 
 export function recordQwenCall(r: QwenCallRecord): void {
   callCount += 1;
-  const agg = jobs.get(r.job) ?? {
-    count: 0, totalMs: 0, maxMs: 0, waitMs: 0, maxWaitMs: 0, empty: 0, error: 0,
-  };
+  const agg = jobs.get(r.job) ?? emptyAggregate();
   agg.count += 1;
   agg.totalMs += r.totalMs;
   agg.maxMs = Math.max(agg.maxMs, r.totalMs);
@@ -66,12 +114,57 @@ export function recordQwenCall(r: QwenCallRecord): void {
   agg.maxWaitMs = Math.max(agg.maxWaitMs, r.waitMs);
   if (r.outcome === 'empty') agg.empty += 1;
   if (r.outcome === 'error') agg.error += 1;
+  agg.prefillMs += r.prefillMs ?? 0;
+  agg.decodeMs += r.decodeMs ?? 0;
+  agg.promptTokens += r.promptTokens ?? 0;
+  agg.outTokens += r.outTokens ?? 0;
+  agg.cachedTokens += r.cachedTokens ?? 0;
+  if (r.stop === 'limit') agg.hitLimit += 1;
   jobs.set(r.job, agg);
+  lastCall = { job: r.job, totalMs: r.totalMs };
   try { sink?.(r); } catch { /* a broken sink must never break a generation */ }
 }
 
 export function qwenCallCount(): number {
   return callCount;
+}
+
+/** OTA-1130 — the store registers this to log discards as they happen. */
+export function setQwenDiscardSink(fn: ((job: string, reason: string, ms: number) => void) | null): void {
+  discardSink = fn;
+}
+
+/** ⚠ OTA-1130 — WASTED WORK. Report that the text from the generation that
+ *  just finished never reached the player: the narration was cancelled because
+ *  you acted again, an ambient line was filtered as a near-duplicate or a
+ *  wrong-shaped opener, a flourish came back after you had walked away.
+ *
+ *  Until now those recorded as clean successes, so the most expensive job in
+ *  the app could be burning fifteen seconds a call on lines nobody read and
+ *  the stats would call it healthy. This is the number that decides whether a
+ *  job is worth keeping at all — and the only honest way to price the
+ *  background work the headroom track is about to add.
+ *
+ *  Safe when no call is in flight (returns silently), and attributes to the
+ *  LAST call because the native-ML lock guarantees generations never overlap. */
+export function noteQwenDiscarded(reason: string): void {
+  const last = lastCall;
+  if (!last) return;
+  lastCall = null; // one discard per call — a double report can't inflate waste
+  const agg = jobs.get(last.job);
+  if (agg) {
+    agg.discarded += 1;
+    agg.discardedMs += last.totalMs;
+  }
+  try { discardSink?.(last.job, reason, last.totalMs); } catch { /* never break a generation */ }
+}
+
+/** Session totals for the wasted-work line. */
+export function qwenWasteTotals(): { calls: number; ms: number } {
+  let calls = 0;
+  let ms = 0;
+  for (const a of jobs.values()) { calls += a.discarded; ms += a.discardedMs; }
+  return { calls, ms };
 }
 
 export interface QwenJobStats {
@@ -83,6 +176,15 @@ export interface QwenJobStats {
   maxWaitMs: number;
   empty: number;
   error: number;
+  // OTA-1130
+  avgPrefillMs: number;
+  avgDecodeMs: number;
+  avgPromptTokens: number;
+  avgOutTokens: number;
+  cachedTokens: number;
+  hitLimit: number;
+  discarded: number;
+  discardedMs: number;
 }
 
 /** Per-job aggregates, busiest first. */
@@ -97,6 +199,14 @@ export function qwenJobStats(): QwenJobStats[] {
       maxWaitMs: a.maxWaitMs,
       empty: a.empty,
       error: a.error,
+      avgPrefillMs: Math.round(a.prefillMs / a.count),
+      avgDecodeMs: Math.round(a.decodeMs / a.count),
+      avgPromptTokens: Math.round(a.promptTokens / a.count),
+      avgOutTokens: Math.round(a.outTokens / a.count),
+      cachedTokens: a.cachedTokens,
+      hitLimit: a.hitLimit,
+      discarded: a.discarded,
+      discardedMs: a.discardedMs,
     }))
     .sort((x, y) => y.count - x.count);
 }
@@ -108,9 +218,22 @@ export function qwenTelemetrySummary(): string {
   const parts = qwenJobStats().map((j) => {
     const wait = j.avgWaitMs >= 500 ? ` wait${s(j.avgWaitMs)}` : '';
     const bad = (j.empty > 0 ? ` ∅${j.empty}` : '') + (j.error > 0 ? ` err${j.error}` : '');
-    return `${j.job} n${j.count} avg${s(j.avgMs)} max${s(j.maxMs)}${wait}${bad}`;
+    // OTA-1130 — read/write split + prompt size. This is the shape that made
+    // OTA-1129 obvious; now it rides every rollup instead of needing a
+    // code-reading session to reconstruct.
+    const split = j.avgPrefillMs > 0 || j.avgDecodeMs > 0
+      ? ` read${s(j.avgPrefillMs)}/write${s(j.avgDecodeMs)}`
+      : '';
+    const sizes = j.avgPromptTokens > 0 ? ` in${j.avgPromptTokens}t→out${j.avgOutTokens}t` : '';
+    const cached = j.cachedTokens > 0 ? ` cache${j.cachedTokens}t` : '';
+    const capped = j.hitLimit > 0 ? ` cap${j.hitLimit}` : '';
+    const waste = j.discarded > 0 ? ` ✂${j.discarded}/${s(j.discardedMs)}` : '';
+    return `${j.job} n${j.count} avg${s(j.avgMs)} max${s(j.maxMs)}${split}${sizes}${cached}${capped}${wait}${bad}${waste}`;
   });
-  return parts.length > 0 ? parts.join(' | ') : 'no calls yet';
+  if (parts.length === 0) return 'no calls yet';
+  const w = qwenWasteTotals();
+  const tail = w.calls > 0 ? ` || WASTED ${w.calls} calls / ${(w.ms / 1000).toFixed(1)}s` : '';
+  return parts.join(' | ') + tail;
 }
 
 /** Tests only — the module is session-scoped state. */
@@ -118,4 +241,6 @@ export function resetQwenTelemetry(): void {
   jobs.clear();
   callCount = 0;
   sink = null;
+  discardSink = null;
+  lastCall = null;
 }

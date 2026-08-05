@@ -923,9 +923,99 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.40**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.41**; ledger in `VERSION.md`.
 
-- **⚠ THE STALL WAS THE PROMPT, NOT THE MODEL (2026-08-05, latest). BOTH
+### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
+
+Owner's direction: *"do it, and log the rest as open items that we can
+continue to work on. I don't want to lose this train of thought."* Everything
+below is **OTA-able and ships to all three lines** unless marked build-bound.
+
+**The premise, in one line:** the app pays the full cost of carrying a 400MB
+on-device model and extracts very little from it — while betting on that same
+model to cover the content gap the production audit flagged. The fix is not
+to put the model in front of a tap (it never goes there); it is to spend its
+idle time and stop wasting its working time.
+
+**SHIPPED so far:** OTA-1128 telemetry · OTA-1129 lean ambient + capped pack
+(prefill was the stall — NOT the native rebuild everyone assumed) ·
+OTA-1130 native timings + wasted-work accounting.
+
+**NEXT — in order:**
+
+1. **Read the next device log first.** OTA-1130 hands over read/write splits,
+   prompt token counts, HIT-CAP flags, cache-reuse counts and a wasted-work
+   total. Three of the items below are *decided by that data*, not by opinion.
+
+2. **STABLE PROMPT PREFIX (pending cache data).** If `tokens_cached` reads
+   zero all session, every generation re-reads its whole prompt. Reordering
+   `buildSystemPrompt` so the invariant block (persona + voice rules +
+   instruction) comes FIRST and volatile scene facts come LAST would let
+   llama.cpp reuse the cached prefix across calls. Potentially a 1129-sized
+   win on every job at once. Pure JS.
+
+3. **THE BANK (bank-and-spend).** Generate during moments the player is
+   provably busy — an 8-hour rest, a travel leg, a sheet they are reading —
+   store the result keyed to its target, spend it instantly later, fall back
+   to authored text when the bank is empty. The flourish slot already proves
+   the pattern; this generalises it. Hard rules: **the model never runs in
+   front of a tap**, and **every slot has an authored fallback.**
+
+4. **THE HOMEWORK SLOTS** (each small once the bank exists): adjacent-room
+   flavor (cleanest pilot — bounded, invisible when empty) · bestiary flavor
+   on first kill · vendor small-talk variants · chronicle/journal day
+   summaries at rest · rumour + echo-thread phrasing variants.
+   Voiced-or-silent follows the channel each line lands in: narration-feed
+   lines get TTS for free, codex/journal lines stay read-only.
+
+5. **TOKEN-BUDGET TRIM (pending HIT-CAP data).** If narration routinely stops
+   at the cap, it is being truncated mid-sentence at maximum cost — raise or
+   lower deliberately, per job, using the stop-reason counts.
+
+6. **REMAINING DIAGNOSTICS** (smaller, still useful): lock-holder attribution
+   (was the wait behind Kokoro TTS or another generation?) · battery/thermal
+   state so a slow late session reads as throttling rather than regression ·
+   the per-job rollup folded into the bug-report export so it travels with
+   the log instead of needing a scroll.
+
+7. **BUILD-BOUND, STAYS PARKED (golem, Phase 6):** native config only —
+   `n_predict` 120→40, thread count off 4, warm context between turns — plus
+   live LLM NPC conversation. ⚠ Note the correction OTA-1129 forced: speed
+   work was assumed to live here and mostly does **not**. Only genuinely
+   native settings belong on this list.
+
+- **DEEP LLM TELEMETRY (2026-08-05, latest). BOTH LINES.**
+  The native numbers + the wasted work. HAL OTA-1130 / golem OTA-1107. Step 3 of the
+  LLM-headroom track. OTA-1129 proved prefill dominance by INFERRING it from
+  wall-clock; llama.cpp returns a `timings` object on every completion with
+  the exact split and the runtime was throwing it away. Five additions:
+  (1) **READ vs WRITE, measured** — `prompt_ms` / `predicted_ms` per call. The
+  pair points at completely different fixes (trim the prompt vs cut the token
+  budget); telling them apart previously took a code-reading session.
+  (2) **PROMPT SIZE in the model's own tokens** (`tokens_evaluated`), so the
+  next thing worth trimming names itself.
+  (3) ⚠ **WASTED WORK.** A discarded line costs exactly what a delivered one
+  costs, and every one recorded as a clean success: narration cancelled
+  because the player acted again, ambient filtered as a near-duplicate or a
+  wrong-shaped opener, a flourish arriving after they walked away.
+  `noteQwenDiscarded(reason)` attributes to the LAST call — safe because the
+  native-ML lock (arb159) guarantees generations never overlap — logs
+  `qwen⏱ ✂ DISCARDED <job> after <ms> — <reason>` as it happens, and the
+  rollup ends with `WASTED n calls / Ns`. **This is the number that decides
+  whether a job is worth keeping at all**, and the only honest way to price
+  the background work the track is about to add.
+  (4) **STOP REASON** — natural end (`stopped_eos`) vs slamming into the token
+  cap (`stopped_limit`). Hitting the cap means paying full price AND getting
+  truncated prose; the per-call line flags `HIT-CAP`.
+  (5) **CACHE REUSE** (`tokens_cached`). A persistent ZERO means every call
+  re-reads its whole prompt from scratch — which would make a **stable prompt
+  PREFIX** (persona + voice rules first, volatile scene facts last) the next
+  1129-sized win. The metric decides that instead of a guess.
+  Everything is optional-chained: an older llama.rn or the jest mock returns
+  no timings and records cleanly without them. Suite `ota1130DeepTelemetry`.
+  **Still open on the track — see §OPEN ITEMS below.**
+
+- **⚠ THE STALL WAS THE PROMPT, NOT THE MODEL (2026-08-05). BOTH
   LINES.** HAL OTA-1129 / golem OTA-1106. Step 2 of the LLM-headroom track,
   and OTA-1128's telemetry paid for itself on its FIRST device log:
   ```
