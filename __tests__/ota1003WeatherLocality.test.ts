@@ -111,9 +111,14 @@ describe('OTA-1003 — weather reads the ground it falls on', () => {
     const src = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
     expect(src).toContain('const WEATHER_TICK_GAP = 5;');
     expect(src).toContain('const OPEN_AIR_HUB_ROOMS: ReadonlySet<string>');
-    expect(src).toContain('!!hubRoomNow && !OPEN_AIR_HUB_ROOMS.has(hubRoomNow)');
+    // OTA-1126 — RETARGETED. The bare set-membership check became
+    // faction-skin-aware: the base set is still the FALLBACK, but a variant
+    // that moves the room indoors (the Architects' gate is a clerical
+    // office) overrides it. What this lock guards — the roof suppresses the
+    // tick, the open-air rooms stay exposed by default — is unchanged.
+    expect(src).toContain('!hubRoomOpenAir(hubRoomNow, get().player?.factionId ?? null, OPEN_AIR_HUB_ROOMS.has(hubRoomNow))');
     expect(src).toContain('weatherCooldown > 0 || underRoof');
-    // the open-air rooms must stay exposed — a gate is not a roof
+    // the open-air rooms must stay exposed BY DEFAULT — a gate is not a roof
     expect(src).toMatch(/'outpost_gate',\s*\n\s*'outpost_central',/);
     expect(src).toContain('pickWeather(worldMemory, location)');
     expect(src).toContain('pickWeather(liveWorldMem, null)');
