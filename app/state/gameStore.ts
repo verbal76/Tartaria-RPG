@@ -15274,6 +15274,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : 'Whole already — the Aetherstone hums steady.';
           get().appendLog('world', `You rest for ${hours} hours. ${tail} (${describeTime(newHours)})`);
           healEscortsOnRest(get, set);
+          // ⚠ OTA-1122 — GENERATE DURING REST, SPEND ON WAKING. This is the
+          // window the whole bank was built for: the player has explicitly
+          // chosen to pass time, the world is standing still by definition, and
+          // the shared native-ML lock is as free as it ever gets. A musing
+          // written here CANNOT go stale while it is being written, which is
+          // the failure mode that binned most of them. Fired AFTER the rest
+          // resolves so a slow generation never delays the recovery, and before
+          // the ambush spawn below so a fight (which invalidates the stamp)
+          // simply leaves the bank untouched rather than poisoning it.
+          void fillMusingBank(get, set);
           // 2026-05-25 — ambush spawn. Rest completes (HP / stamina
           // granted above), then the encounter fires AFTER recovery
           // so the player wakes at full strength but with a problem
@@ -38187,6 +38197,81 @@ export function _ambientStaleReasonForTest(at: AmbientStamp): string | null {
 }
 export const _AMBIENT_STALE_LINES = AMBIENT_STALE_LINES;
 
+/** ⚠ OTA-1122 — THE BANK. Step two of the headroom track.
+ *
+ *  The economics of an ambient musing were upside down. It is generated ON
+ *  DEMAND, takes 8–16 seconds, and is then checked against the world it was
+ *  composed for — and the OTA-1107 telemetry says two of three came back
+ *  unusable, ~16.6 seconds of model time for lines nobody read. The single
+ *  biggest killer is `stale`: the player kept playing while the model wrote,
+ *  so by the time the line existed it no longer belonged to the moment.
+ *
+ *  That is a race we were never going to win by generating faster. So stop
+ *  racing. A musing is UNPROMPTED by construction — AMBIENT_INSTRUCTION
+ *  forbids it from reacting to the last action — which is exactly the property
+ *  that makes it pre-generatable. Write them when the world is standing still,
+ *  spend them when it isn't.
+ *
+ *  ⚠ AND A STALE LINE IS NOT A WASTED LINE. `stale` almost always means
+ *  "you walked somewhere else" — the line is still perfectly good FOR THE PLACE
+ *  IT WAS WRITTEN ABOUT. Banking it against its own stamp means walking back
+ *  into that room spends it instantly instead of paying for it twice. The
+ *  discard that used to be the headline waste becomes the stock.
+ *
+ *  Validity is `ambientStaleReason` unchanged — the same five checks the live
+ *  path already ran, just asked at SPEND time instead of at finish time. That
+ *  is the whole trick: a banked line cannot go stale between being wanted and
+ *  being spoken, because there is no gap. */
+interface BankedMusing {
+  text: string;
+  stamp: AmbientStamp;
+  at: number;
+}
+/** Session-scoped, like the telemetry. Deliberately NOT persisted: a musing is
+ *  worth seconds, not a save-file migration, and a cold start has no lock
+ *  contention to relieve anyway. */
+const musingBank: BankedMusing[] = [];
+/** Small on purpose. This is a latency buffer, not a content store — every
+ *  entry is a generation someone's battery paid for. */
+const MUSING_BANK_CAP = 3;
+
+/** Tests only — the bank is module state, and the deposit/withdraw pair is the
+ *  behaviour worth exercising directly rather than through a mocked model. */
+export function _resetMusingBank(): void { musingBank.length = 0; }
+export function _musingBankSize(): number { return musingBank.length; }
+export function _bankMusingForTest(text: string, stamp: AmbientStamp): void {
+  bankMusing(text, stamp);
+}
+export function _takeBankedMusingForTest(): string | null {
+  return takeBankedMusing(() => useGameStore.getState());
+}
+export const _MUSING_BANK_CAP = MUSING_BANK_CAP;
+
+function bankMusing(text: string, stamp: AmbientStamp): void {
+  if (!text) return;
+  if (musingBank.some((m) => m.text === text)) return;
+  // Oldest out when full — a musing written six rooms ago is the least likely
+  // to match anything the player is about to do.
+  if (musingBank.length >= MUSING_BANK_CAP) musingBank.shift();
+  musingBank.push({ text, stamp, at: Date.now() });
+}
+
+/** Spend the first banked musing that still belongs to this moment, or null.
+ *  Re-runs BOTH gates the live path uses: staleness against the entry's own
+ *  stamp, and the near-duplicate check against what the Arbiter has said
+ *  recently — the second matters more here, because a banked line may have sat
+ *  through a dozen other lines since it was written. */
+function takeBankedMusing(get: () => GameStore): string | null {
+  for (let i = 0; i < musingBank.length; i++) {
+    const m = musingBank[i]!;
+    if (ambientStaleReason(get, m.stamp) !== null) continue;
+    if (generatedLineRepeatsRecent(get, m.text)) continue;
+    musingBank.splice(i, 1);
+    return m.text;
+  }
+  return null;
+}
+
 function ambientStaleReason(get: () => GameStore, at: AmbientStamp): string | null {
   const now = takeAmbientStamp(get);
   // A fight is the loudest possible change of subject. The start-of-generation
@@ -38588,9 +38673,25 @@ function generatedLineRepeatsRecent(get: () => GameStore, text: string): boolean
   return isRepetitiveArbiterLine(text, recent);
 }
 
+/** OTA-1122 — the rest-window filler. Deliberately a thin wrapper rather than
+ *  its own generation path: a second copy of the vetting pipeline would drift
+ *  from the live one, and the filters ARE the feature (five OTAs of register,
+ *  echo and off-canon work live in them). One extra musing per rest, capped. */
+async function fillMusingBank(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+): Promise<void> {
+  if (musingBank.length >= MUSING_BANK_CAP) return;
+  await maybeGenerateAmbientArbiter(get, set, { bankOnly: true });
+}
+
 async function maybeGenerateAmbientArbiter(
   get: () => GameStore,
   set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+  // OTA-1122 — bankOnly: write the musing into the bank instead of speaking it.
+  // Everything upstream (muzzles, model readiness, prompt, vetting) is shared;
+  // only the last step differs.
+  opts?: { bankOnly?: boolean },
 ): Promise<void> {
   const scene = get().currentScene;
   const player = get().player;
@@ -38603,6 +38704,20 @@ async function maybeGenerateAmbientArbiter(
   // feels between climbing down and the INVESTIGATE prompt. Resumes at the
   // post-investigate explore/leave choice (see inScriptedTutorialPhase).
   if (inScriptedTutorialPhase(get)) return;
+  // ⚠ OTA-1122 — SPEND BEFORE YOU GENERATE. A banked musing is spoken with
+  // zero model time, so this sits ABOVE the readiness and cooldown gates: the
+  // bank works even while Qwen is reloading, and a line that costs nothing
+  // should not be rationed by a cooldown that exists to ration generations.
+  // It stays below the combat and tutorial muzzles, which are about whether a
+  // musing is WANTED at all.
+  if (!opts?.bankOnly) {
+    const banked = takeBankedMusing(get);
+    if (banked) {
+      get().appendLog('arbiter', banked);
+      get().appendLog('debug', `arbiter: ambient ✓ 0ms (banked, ${musingBank.length} left)`);
+      return;
+    }
+  }
   if (!qwen.isReady() || get().isGenerating) return;
   if (Date.now() - lastAmbientGenStartMs < AMBIENT_GEN_COOLDOWN_MS) return;
 
@@ -38689,14 +38804,36 @@ async function maybeGenerateAmbientArbiter(
     // here rather than at the appendLog site so the debug marker can name the
     // reason, and checked BEFORE the dup test because a stale line should read
     // as stale in the log even when it also happens to be a repeat.
+    // OTA-1122 — the fill path never speaks. It banks whatever survived the
+    // filters and says so in the debug channel; the stamp it carries is the one
+    // taken at generation start, so validity is decided at SPEND time by the
+    // same five checks the live path uses.
+    if (opts?.bankOnly) {
+      if (finalText) bankMusing(finalText, stamp);
+      get().appendLog('debug',
+        `arbiter: ambient-fill ${finalText ? `banked (${musingBank.length}/${MUSING_BANK_CAP})` : '∅'} ${Date.now() - t0}ms`);
+      if (!finalText) noteQwenDiscarded('ambient:fill-∅');
+      return;
+    }
     const staleReason = ambientStaleReason(get, stamp);
     const ambientUsable = !staleReason && !!finalText && !generatedLineRepeatsRecent(get, finalText);
     if (ambientUsable) get().appendLog('arbiter', finalText);
-    const ambientMark = staleReason ? `stale:${staleReason}`
+    // ⚠ OTA-1122 — A STALE LINE GOES IN THE BANK, NOT THE BIN. It is stale
+    // because the world moved WHILE we wrote it — almost always because the
+    // player walked on — and it is still a perfectly good musing for the place
+    // it was written about. Banked against its own stamp, walking back into
+    // that room spends it instantly instead of paying for it a second time.
+    // Only the stale class: a `∅` produced nothing, and a `dup-dropped` line is
+    // one the Arbiter has effectively already said.
+    if (staleReason && finalText) bankMusing(finalText, stamp);
+    const ambientMark = staleReason ? `stale:${staleReason}${finalText ? '→banked' : ''}`
       : ambientUsable ? '✓'
       : finalText ? 'dup-dropped'
       : '∅';
-    if (!ambientUsable) noteQwenDiscarded(`ambient:${ambientMark}`);
+    // A banked line is deferred work, not wasted work — the waste ledger is the
+    // number that decides whether a job is worth keeping, so it must not count
+    // a generation the player is still going to hear.
+    if (!ambientUsable && !(staleReason && finalText)) noteQwenDiscarded(`ambient:${ambientMark}`);
     get().appendLog('debug', `arbiter: ambient ${ambientMark} ${Date.now() - t0}ms`);
     // OTA-1034 — WHY it was empty. The owner's logs show ∅ on every ambient
     // attempt across four builds, including one that carries the OTA-1054

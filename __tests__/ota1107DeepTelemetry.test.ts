@@ -153,7 +153,15 @@ describe('OTA-1107 — the four waste sites are wired', () => {
   });
 
   it('⚠ filtered ambient is reported — the job that most often pays for nothing', () => {
-    expect(store).toContain('if (!ambientUsable) noteQwenDiscarded(`ambient:${ambientMark}`);');
+    // RETARGETED BY OTA-1122. The condition gained one exclusion: a STALE line
+    // with usable text is now BANKED rather than binned, and a generation the
+    // player is still going to hear is deferred work, not wasted work.
+    // Counting it here would make the bank look like the problem it was built
+    // to solve. Every other unusable ambient still reports exactly as before.
+    expect(store).toContain('if (!ambientUsable && !(staleReason && finalText)) noteQwenDiscarded(`ambient:${ambientMark}`);');
+    // ...and the fill path reports its OWN misses, so a rest that generated
+    // nothing is still visible in the waste ledger.
+    expect(store).toContain("if (!finalText) noteQwenDiscarded('ambient:fill-∅');");
   });
 
   it('a flourish that arrives after the player walks away is reported', () => {
