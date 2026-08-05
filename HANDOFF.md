@@ -923,9 +923,52 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.27**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.28**; ledger in `VERSION.md`.
 
-- **FIVE FROM THE DEVICE LOG (2026-08-04, latest). BOTH LINES.** HAL
+- **GEAR LISTS TELL THE TRUTH (2026-08-04, latest). BOTH LINES.** HAL
+  OTA-1117 / golem OTA-1094. Three reports from the device, and the
+  first one's fix is mostly an admission.
+  (1) **THE CRUCIBLE'S VANISHING WEAPONS SECTION.** Owner: "went to
+  upgrade at the fuse and it only allowed me to pick armor no weapons."
+  Nothing was broken. The upgrade grants a COATING CHANNEL, and ~129 of
+  the 276 catalog weapons are energy-based (runecasters, burn / aetheric
+  / electrical casters) — they fire no edge, so they can NEVER take one.
+  `FusionPickerModal` rendered `section.items.length === 0 ? null : …`,
+  so the WEAPONS heading simply disappeared, indistinguishable from a
+  bug. A permanent rule was reading as a broken screen because nothing
+  on the screen said the rule existed. Both headings now always render;
+  an empty one says so and then LISTS the pieces it turned away, greyed
+  and inert, each with its reason. New `crucibleUpgradeVerdict` in
+  itemFusion.ts is the single seam — the picker and
+  `upgradeCoatingSlot` read the same verdict, so what you can tap and
+  what the Arbiter would refuse cannot drift apart.
+  (2) **THE STACK DEAD END.** A quantity>1 piece was refused with "split
+  one off first" — an instruction the game gives NO way to follow, since
+  no split action exists anywhere. So a stacked weapon could never be
+  upgraded at all and the picker hid it silently. It now PEELS one unit
+  into its own instance (exactly OTA-800's move for coating a stack) and
+  upgrades that; the stack stays bare so five reserved pieces still buy
+  exactly ONE channel, and an equipped stack re-points to the peeled
+  instance (OTA-814's lesson). OTA-873's exploit-guard test is
+  RETARGETED, not deleted — it now asserts the no-mass-upgrade invariant
+  harder than the refusal did.
+  (3) **EQUIPPED FIRST, EVERYWHERE.** Owner: "whenever a list of armor
+  or weapons pops up sort equipped items to the top", and specifically
+  "when you open the repair tab, it should prioritize all of the things
+  that are equipped that can be repaired at the top." New
+  `wornInstanceIds` / `byWornFirst` in equipment.ts — worn ids INCLUDING
+  the dog's vest, which lives on `player.dog.equipped` and was therefore
+  invisible to every worn check in the game. Applied to the REPAIR tab
+  (a direction-independent pre-key that outranks READY / DURABILITY /
+  NAME / COST, plus a ★ EQUIPPED callout), the inventory list (worn
+  first within each category, on every axis), both coating pickers, and
+  the Crucible upgrade list. **Deliberately excluded:** sell, salvage
+  and gift. Those either already exclude worn gear or refuse it outright
+  (OTA-1116), and floating your armor to the top of a "what do you want
+  to destroy" list is the opposite of a favour. Suite
+  ota1117GearListsTellTheTruth (16).
+
+- **FIVE FROM THE DEVICE LOG (2026-08-04). BOTH LINES.** HAL
   OTA-1116 / golem OTA-1093. From the owner's Pixel log on 4.29.26.
   (1) **A CORRECTION TO MY OWN TRIAGE** — I reported that the raid
   builder was dressing a non-human body in faction colours. It was not;

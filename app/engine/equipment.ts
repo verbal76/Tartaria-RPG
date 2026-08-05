@@ -230,6 +230,40 @@ export function equippedInstanceIds(player: PlayerCharacter): Set<string> {
   return ids;
 }
 
+/** OTA-1117 — everything the player has WORN right now, the dog's vest included.
+ *  equippedInstanceIds only knows the player's own slots; the vest lives on
+ *  `player.dog.equipped` and so never counted, which is why "float what I'm
+ *  wearing to the top" quietly skipped the dog. Every gear list that floats worn
+ *  pieces (repair, coating pickers, inventory, the Crucible upgrade list) resolves
+ *  through THIS, so they cannot drift apart again. Falls back to name-matching the
+ *  vest for saves written before vestId existed. */
+export function wornInstanceIds(player: PlayerCharacter): Set<string> {
+  const ids = equippedInstanceIds(player);
+  const vestId = player.dog?.equipped?.vestId ?? null;
+  if (vestId) {
+    ids.add(vestId);
+    return ids;
+  }
+  const vestName = player.dog?.equipped?.vest ?? null;
+  if (vestName) {
+    const owner = player.inventory.find(
+      (i) => i.name.toLowerCase() === vestName.toLowerCase() && i.quantity > 0,
+    );
+    if (owner) ids.add(owner.id);
+  }
+  return ids;
+}
+
+/** OTA-1117 — the comparator every gear list uses to float worn pieces. A stable
+ *  PRE-key: worn before unworn, ties handed back to the caller's own sort axis.
+ *  Owner: "whenever a list of armor or weapons pops up sort equipped items to the
+ *  top." */
+export function byWornFirst(
+  worn: ReadonlySet<string>,
+): (a: { id: string }, b: { id: string }) => number {
+  return (a, b) => Number(worn.has(b.id)) - Number(worn.has(a.id));
+}
+
 // Stat names the equipment system can boost. Includes 'constitution' for
 // future use (some accessories grant it) — it routes to HP/stamina math.
 type StatKey = keyof Stats;

@@ -29081,12 +29081,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     // OTA-873 fix — never upgrade a STACK. Stamping coatingSlots / resistCapBonus on a
-    // quantity>1 row would upgrade every copy for one 5-piece cost. The picker only
-    // offers quantity===1 pieces, so this is a belt-and-suspenders guard on the action.
-    if ((piece.quantity ?? 1) > 1) {
-      get().appendLog('world', `You can only upgrade a single piece at the Crucible — you're holding a stack of ${piece.quantity} ${piece.name}. Split one off first.`);
-      return;
-    }
+    // quantity>1 row would upgrade every copy for one 5-piece cost.
+    // OTA-1117 — that used to REFUSE with "split one off first", which is a dead end:
+    // there is no split action anywhere in the game, so a stacked piece could never be
+    // upgraded at all and the picker hid it. Peel one unit into its own instance
+    // instead — exactly what OTA-800 does for coating a stack — and upgrade that.
+    // The stack itself stays bare, so the one-per-five cost still holds.
+    const isStack = (piece.quantity ?? 1) > 1;
     const isWeaponTarget = isCoatableItem(piece);
     const isArmorTarget = !isWeaponTarget && (
       piece.kind === 'armor' || piece.kind === 'dog_armor'
@@ -29126,18 +29127,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const chosenIds = new Set(chosen.map((i) => i.id));
     set((s) => {
       if (!s.player) return s;
-      const inv = s.player.inventory
+      // OTA-1117 — a stacked target is peeled first: one unit leaves the row and
+      // becomes its own instance, and THAT is what the channel is worked into.
+      const peeledId = isStack ? freshInstanceId('upg') : itemId;
+      const stampUpgrade = (i: InventoryItem): InventoryItem => (isWeaponTarget
+        ? { ...i, coatingSlots: 2 }
+        : { ...i, resistCapBonus: (i.resistCapBonus ?? 0) + 1 });
+      let inv = s.player.inventory
         .map((i) => {
           if (i.id === itemId) {
-            return isWeaponTarget
-              ? { ...i, coatingSlots: 2 }
-              : { ...i, resistCapBonus: (i.resistCapBonus ?? 0) + 1 };
+            // The peeled row keeps quantity-1 units and stays UNupgraded; the
+            // single-instance case is stamped in place as before.
+            return isStack ? { ...i, quantity: i.quantity - 1 } : stampUpgrade(i);
           }
           if (chosenIds.has(i.id)) return { ...i, quantity: Math.max(0, i.quantity - 1), reservedForFusion: false };
           return i;
         })
         .filter((i) => i.quantity > 0);
-      return { player: { ...s.player, inventory: inv, fusionPending: false } };
+      let equipped = s.player.equipped;
+      if (isStack) {
+        inv = [...inv, stampUpgrade({ ...piece, id: peeledId, quantity: 1 })];
+        // OTA-814's lesson, applied here: if the stack was the equipped instance,
+        // re-point the slot at the peeled piece so the channel you just paid for is
+        // the one you're actually carrying.
+        if (equipped?.mainId === itemId || equipped?.offId === itemId) {
+          equipped = {
+            ...equipped,
+            ...(equipped.mainId === itemId ? { mainId: peeledId } : {}),
+            ...(equipped.offId === itemId ? { offId: peeledId } : {}),
+          };
+        }
+      }
+      return { player: { ...s.player, inventory: inv, equipped, fusionPending: false } };
     });
     recordTitleProgress(get, set, { fusionsCompleted: 1 });
     get().appendLog(

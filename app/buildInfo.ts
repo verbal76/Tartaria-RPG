@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.27';
+export const DISPLAY_VERSION = '4.29.28';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20952,6 +20952,52 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1117 — GEAR LISTS TELL THE TRUTH. From the device, and the fix is
+// mostly an admission: a permanent design rule was reading as a broken
+// screen because nothing on the screen said the rule existed.
+//   1. THE CRUCIBLE'S VANISHING WEAPONS SECTION. Owner: "went to upgrade
+//      at the fuse and it only allowed me to pick armor no weapons."
+//      Nothing was broken. The upgrade grants a COATING CHANNEL, and
+//      ~129 of the 276 catalog weapons are energy-based (runecasters,
+//      burn / aetheric / electrical casters) with no edge to carry a
+//      coating — they can NEVER take the upgrade. The picker rendered
+//      `section.items.length === 0 ? null : …`, so the WEAPONS heading
+//      simply disappeared, indistinguishable from a bug. Both headings
+//      now always render; a heading with nothing tappable says so and
+//      then LISTS the pieces it turned away, greyed, each with its
+//      reason. One new seam, `crucibleUpgradeVerdict`, answers for both
+//      the picker and the store action, so what you can tap and what the
+//      Arbiter would refuse can no longer disagree.
+//   2. THE STACK DEAD END. A quantity>1 piece was refused with "split one
+//      off first" — an instruction the game gives NO way to follow. So a
+//      stacked weapon could never be upgraded at all, and the picker hid
+//      it without a word. It now PEELS one unit into its own instance
+//      (exactly what OTA-800 does for coating a stack) and upgrades that;
+//      the stack stays bare, so five reserved pieces still buy exactly
+//      one channel, and an equipped stack re-points to the peeled piece
+//      (OTA-814's lesson) so the channel you paid for is the one you
+//      carry. The OTA-873 exploit-guard test is RETARGETED, not deleted:
+//      the invariant it exists to protect (no mass-upgrade) is asserted
+//      harder than before.
+//   3. EQUIPPED FIRST, EVERYWHERE. Owner: "whenever a list of armor or
+//      weapons pops up sort equipped items to the top", and specifically
+//      "when you open the repair tab, it should prioritize all of the
+//      things that are equipped that can be repaired at the top." New
+//      `wornInstanceIds` (equippedInstanceIds PLUS the dog's vest, which
+//      lives on player.dog.equipped and so was invisible to every worn
+//      check) + `byWornFirst`. Applied to: the REPAIR tab (a
+//      direction-independent pre-key that outranks READY / DURABILITY /
+//      NAME / COST, with a ★ EQUIPPED callout on the row), the inventory
+//      list (worn first within each category, on every axis), both
+//      coating pickers, and the Crucible upgrade list.
+// Destructive lists are deliberately NOT re-sorted: sell, salvage and
+// gift either exclude worn gear already or refuse it outright (OTA-1116),
+// and floating your armor to the top of a "what do you want to destroy"
+// list is the opposite of a favour.
+// New suite ota1117GearListsTellTheTruth (16) — verdict coverage on real
+// catalog weapons, the dog-vest gap in both id and legacy-name form, and
+// source locks on all three lists. DISPLAY_VERSION 4.29.28.
+//
 // OTA-1116 — FIVE FROM THE DEVICE LOG (Pixel 10 Pro XL, 4.29.26).
 //   1. ⚠ THE HEADLINE, AND A CORRECTION TO MY OWN TRIAGE. I told the
 //      owner the raid builder was dressing a non-human body in faction
@@ -21113,7 +21159,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-04-1116-from-the-device-log';
+export const OTA_BUILD_ID = '2026-08-04-1117-gear-lists-tell-the-truth';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1116-from-the-device-log';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1115-secondary-cast';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1114-deep-bench';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1113-door-you-can-see';
