@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.59';
+export const DISPLAY_VERSION = '4.29.60';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22547,7 +22547,58 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // STRING, not around a reconstruction of it. OTA-1147 had the line
 // available in the owner's report and still generalised from memory.
 // DISPLAY_VERSION 4.29.59.
-export const OTA_BUILD_ID = '2026-08-05-1148-filter-missed-its-example';
+// OTA-1149 + OTA-1150 — THE FIRST HOMEWORK SLOT, AND THE METRIC THAT
+// CAN SETTLE THE CACHING QUESTION. Two numbered changes, ONE push and
+// ONE build id; 1149 never reached a device on its own, so there is
+// no SUPERSEDED line for it.
+// ⚠ 1149 — ITEM DESCRIPTIONS AS HOMEWORK. OTA-1146 built the harness
+// (a priority below voice, and a running idle job CUT SHORT the
+// moment the player acts). This is its first real consumer. The owner
+// picked the slot: "our problem is screen real estate. more just
+// scrolls up and blends in with the chatter and isn't read. I would
+// go with faster, and only do fancy bespoke writing on screens that
+// are stationary." Item descriptions land in a POPUP the player is
+// holding still and reading, and the work is pure SPEED — the
+// synthesis already runs on demand the moment an unknown item is
+// opened, so doing it early changes nothing about what the game
+// CONTAINS. It only moves a 4-13s wait out of the player's way.
+// ⚠ THE SLOT IS A SCHEDULER AND NOTHING ELSE. Prompt, clamps, cache
+// and silent-discard-on-bad-row are the existing path untouched —
+// which is the point: those are five OTAs of hard-won correctness and
+// a second copy would drift from them invisibly. What is new is WHEN.
+// A 5s tick that fires only when Qwen is ready, nothing is
+// generating, no enemies are up, the tutorial is not scripted, the
+// player is not withholding identity, no synth is already in flight,
+// 30s have passed since the last homework, and the player has been
+// sitting on a stationary screen for 1.5s. The pack marks itself a
+// homework window on focus and clears it on blur; submitPlayerAction
+// clears it as well, at the ONE choke point every action passes
+// through, so "the player is back" cannot be missed by a screen that
+// forgot to unmark.
+// ⚠ 1150 — MS PER PROMPT TOKEN, BEST AND WORST. Owner: "fix the
+// tracking information in the log so that we can see more clearly
+// what is affecting number one, but until we get the data capture
+// portion of the log for that specific issue fixed, don't chase it
+// anymore." Number one is the prompt cache: OTA-1144 reordered every
+// prompt so the stable half sits first, and the next log still read
+// `reuse 0t` — which proves nothing either way, because `reuse` is a
+// field llama.cpp may simply not populate on this path. So the signal
+// is replaced with one that cannot lie about itself: PREFILL MS
+// DIVIDED BY PROMPT TOKENS, kept as a best-worst RANGE per job rather
+// than a mean. A mean hides exactly the thing being looked for; if
+// caching ever engages, the BEST figure collapses while the worst
+// stays put, and a range shows that on one line. `reuse` is kept but
+// demoted. Preempted rows are excluded — a cut-short call's prefill
+// is not a measurement. Per the owner's instruction the caching
+// investigation STOPS here until a log carries the new range.
+// New suite ota1149ItemDescHomework (19 tests, incl. the 1150 block).
+// Also: two source-reading suites both declared a top-level `SRC`
+// with no `import`, so both files were SCRIPTS, the consts landed in
+// global scope, and they collided. `export {}` on each. The typecheck
+// ratchet caught it — 202 against baseline 200 — which is precisely
+// the job that ratchet was added to do. DISPLAY_VERSION 4.29.60.
+export const OTA_BUILD_ID = '2026-08-05-1150-homework-and-ms-per-token';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1148-filter-missed-its-example';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1147-ac-ledger-and-voice';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1146-homework-yields';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1145-the-bank';

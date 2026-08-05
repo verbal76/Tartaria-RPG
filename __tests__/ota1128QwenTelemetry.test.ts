@@ -124,7 +124,10 @@ describe('OTA-1128 — every consumer is labeled', () => {
     expect(fusion).toContain("job: 'fusion_forge'");
     expect(fusion).toContain("job: 'forge_name'");
     expect(src('app/engine/llmParser.ts')).toContain("job: 'parse_fallback'");
-    expect(src('app/engine/itemSynthesisQwen.ts')).toContain("job: 'item_synthesis'");
+    // RETARGETED BY OTA-1149 — item synthesis now names TWO jobs: the live
+    // 'item_synthesis' and the idle-time 'item_synthesis_hw', so homework
+    // cost cannot hide inside the interactive average. Same property guarded.
+    expect(src('app/engine/itemSynthesisQwen.ts')).toContain("? 'item_synthesis_hw' : 'item_synthesis'");
   });
 
   it('the store surfaces calls in the debug log, rollup every tenth', () => {

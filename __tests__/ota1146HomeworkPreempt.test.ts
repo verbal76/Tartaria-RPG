@@ -240,6 +240,11 @@ describe('OTA-1146 — the wiring, and the first homework job', () => {
     // waiting on must never be interruptible.
     const store = src('app/state/gameStore.ts');
     expect(store).toContain('homework: !!opts?.bankOnly');
-    expect(store).not.toContain('homework: true }');
+    // RETARGETED BY OTA-1149 — `{ homework: true }` now legitimately appears in
+    // the store: the item-description slot passes it explicitly. The property
+    // this guards is about the AMBIENT path, so it is asserted there rather
+    // than by a file-wide absence that any new slot would trip.
+    const amb = store.slice(store.indexOf('async function maybeGenerateAmbientArbiter('));
+    expect(amb.slice(0, 4000)).not.toContain('homework: true');
   });
 });
