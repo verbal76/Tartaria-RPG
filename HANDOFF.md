@@ -1028,6 +1028,42 @@ wasted seconds and starving every other job behind it).
    work was assumed to live here and mostly does **not**. Only genuinely
    native settings belong on this list.
 
+### ⚠ WATCH LIST — SEEN IN A LOG, NOT YET ACTED ON
+
+Owner: *"keep the handoff as an open item."* These are observations from
+device logs that were deliberately NOT changed in the OTA that spotted them —
+either because the sample is thin or because the fix is a design call rather
+than a bug fix. They are here so a later log can promote them instead of
+rediscovering them.
+
+- **⚠ EVERY REST IS AMBUSHED.** The OTA-1131 log rested twice — Day 7 and
+  Day 8 — and both times drew the identical beat: *"The Arbiter goes still.
+  'You weren't alone. Something circled while you were out — and it stopped
+  circling.'"* followed immediately by a spawn (Mud Tortoise, then Aetheric
+  Drone). Two for two, same wording both times. An earlier log showed the same
+  rest → ambush → flee → rest shape. If the roll is meant to be a chance and
+  is reading as a certainty, rest is not a decision the player can make — it
+  is a fight they have to buy. Worth checking the actual probability and the
+  line's dedup before touching either. **Design call: does rest carry risk
+  every single time, or sometimes?**
+
+- **QWEN DORMANCY IS FIRING REGULARLY.** Third log in a row ending with
+  `qwen-watchdog: Qwen dormant (status='ready' but the native context was
+  released — usually app-backgrounding); reinitializing (attempt #1)`. The
+  watchdog is doing its job and recovering, and the ML-health block reports
+  `Status: active, Crash count: 0` — so this is not a crash. But the recovery
+  is not free (a reinit costs a model load) and the same session logged an
+  `item_synthesis empty 8809ms … out 0t` — a full prompt read that returned
+  nothing — moments before the watchdog fired. That empty is now reported as
+  `item_synth:empty` (OTA-1132) precisely so the next log can show whether
+  dormancy is silently eating generations before the watchdog notices.
+  **Check first:** how often does a dormant context swallow a call, and can
+  the AppState hook detach sooner so the call is never started?
+
+- **BOG HOUND SAT OUT A FIGHT** after Silt Thief died (task #175). Carried
+  from an earlier log across a truncated span, so it was never confirmed as a
+  bug. Still unresolved; needs a log that captures the whole encounter.
+
 - **⚠ THE AMBIENT TRIM LANDED AND THE LINE STILL ARRIVED LATER (2026-08-05, latest). BOTH LINES.**
   HAL OTA-1132 / golem OTA-1109. Step 5 of the LLM-headroom track, and
   OTA-1131's own check coming back:
