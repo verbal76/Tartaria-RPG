@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.51**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.52**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1100,7 +1100,53 @@ rediscovering them.
   log across a truncated span, so it was never confirmed as a bug. Still
   unresolved; needs a log that captures the whole encounter.
 
-- **⚠⚠ THE RULE DIALS, AND ONE THAT WAS A CONTROL OVER NOTHING (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ THE HUNGER CARCASS (2026-08-05, latest). BOTH LINES.**
+  golem OTA-1118 / HAL OTA-1141. Owner, immediately after the previous OTA removed
+  the hunger DIAL: *"we removed hunger, we don't still have that somewhere do
+  we? we eat for HP not to lower hunger, that's a different mechanic."*
+  **Right on both counts — and the audit found the second half was only half
+  true.** The MECHANIC was gone: `effectiveStaminaMax` stopped reading the
+  penalty and both accrual sites were hardcoded to 0, so nothing got hungry and
+  nothing bit. But the CARCASS was still in place, and it was **the same failure
+  the previous OTA had just deleted one floor up** — code that LOOKS live and is
+  not.
+  **⚠ Three player-facing lines that could never print**, each behind a
+  permanently-zero penalty:
+  1. the rest REFUSAL — *"your wind is choked by hunger, not weariness"*;
+  2. the rest RESULT — *"Hunger has capped your wind — sleep can't lift it"*;
+  3. the drink RESULT — *"water won't lift it. Eat a ration."*
+  Plus a heartbeat ledger entry `hunger +N (now -M max)` and an *"eat something
+  soon"* Arbiter warning, both behind hardcoded zeros.
+  **⚠ And a write on every action in the game.** `advanceTime` computed an
+  8-hour bucket, derived a tick count it immediately discarded, and stamped
+  `hungerStaminaPenalty` onto every player object that passed through — and
+  advanceTime runs on rest, travel, combat, climb, every path that moves the
+  clock. Plus stale comments in five places, including one telling the reader
+  that eating *"heals the cap shrink immediately"*. It heals nothing.
+  **ALL REMOVED. What stays, deliberately:**
+  · the `backfillPlayer` migration forcing the field to 0 on load, so a save
+    written mid-hunger comes back uncapped — it is the ONE executable line left
+    that names it, and the suite asserts that it is the only one;
+  · the field on the type, now labelled **⚠ SAVE FOSSIL. DO NOT WIRE ANYTHING TO
+    THIS** with the removal reason beside it, so the next reader finds a warning
+    rather than a spec;
+  · rest's `Math.max(0, …)` stamina clamp. Its CAUSE was hunger driving
+    `stamRoom` negative, but the invariant it protects — **rest must never reduce
+    stamina** — is true regardless of what made it negative, so the clamp stays
+    and the comment now says so.
+  **⚠ AND THE ONE THING THIS SWEEP HAD TO NOT BREAK:** the DOG's feeding clock.
+  `lastFedAtHour` / loyalty decay is a real, live mechanic that happens to use
+  the same word, and the owner's own framing named the distinction exactly. It
+  is untouched, and the suite has a section asserting it.
+  New suite `ota1118HungerCarcass` (15 tests), whose first assertion is that exactly
+  ONE executable line in `gameStore.ts` still says the word.
+  **⚠ THE PATTERN WORTH CARRYING:** two OTAs in a row now, the bug was not a
+  wrong behaviour but a DEAD one wearing live clothes — a difficulty checkbox
+  over nothing, then narration behind an impossible condition. When a mechanic
+  is removed, the removal is not done until the things that READ it are gone
+  too, or the codebase keeps promising a player something it cannot deliver.
+
+- **⚠⚠ THE RULE DIALS, AND ONE THAT WAS A CONTROL OVER NOTHING (2026-08-05). BOTH LINES.**
   golem OTA-1117 / HAL OTA-1140. Closes the difficulty set OTA-1136 opened. The
   survey rates rule changes above multipliers because they cost nothing to
   compute and change how a fight is PLAYED rather than how long it takes.
