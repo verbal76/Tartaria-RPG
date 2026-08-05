@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.42**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.43**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -941,7 +941,9 @@ its working time.
 (prefill was the stall — NOT the native rebuild parked on this line) ·
 OTA-1107 native timings + wasted-work accounting · OTA-1108 the read on that
 data (reuse metric corrected, ambient prompt de-contradicted, item-synthesis
-silent failure closed, debug lines out of the talk popup).
+silent failure closed, debug lines out of the talk popup) · OTA-1109 item
+synthesis yields the lock + its brief shrinks (it was burning 41 of every 55
+wasted seconds and starving every other job behind it).
 
 **WHAT THE FIRST DEEP-TELEMETRY LOG SETTLED (OTA-1107 running, read in 1108):**
 
@@ -960,10 +962,18 @@ silent failure closed, debug lines out of the talk popup).
 
 **NEXT — in order:**
 
-1. **Read the next device log first.** The check on OTA-1108: (a) did the
-   ambient discard rate drop once the prompt stopped ordering the beat to
-   narrate the last action; (b) did ambient's prompt land near ~360 tokens and
-   its total near ~5–6s; (c) does `reuse` still read 0 everywhere.
+1. **Read the next device log first.** The OTA-1108 check came back:
+   ambient's prompt landed at **361 tokens** (predicted ~360) and its read
+   time at **4.4s** — the trim was exactly right — but its TOTAL rose because
+   item synthesis was saturating the device and the lock. `reuse` read a
+   measured **0 on every job**, as expected. The check on OTA-1109 is
+   therefore: (a) does `item_synthesis` stop appearing 3-for-3 as
+   `unparseable`, and what does the new `raw="…"` sample say when it does
+   fail; (b) with synthesis yielding, do ambient's `wait` (was 4.0s) and
+   `write` (was 3.0s for 31 tokens) fall back toward the OTA-1107 rates,
+   which would finally realise the 1106+1108 prompt savings; (c) does the
+   ambient discard rate drop (no `action-opener` appeared this session, but
+   n=2).
 2. **STABLE PROMPT PREFIX — CONFIRMED WORTH DOING (reuse measured at 0).**
    Every generation re-reads its whole prompt. Two parts, and the second is
    the one the log actually argues for: (a) reorder `buildSystemPrompt` so the
@@ -982,16 +992,21 @@ silent failure closed, debug lines out of the talk popup).
    flavor on first kill · vendor small-talk variants · chronicle day
    summaries at rest · rumour + echo-thread phrasing variants. Voiced or
    silent follows the channel each line lands in.
-5. **TOKEN-BUDGET TRIM — DATA IN, ACTION DEFERRED WITH A REASON.** Every
-   ambient ends `HIT-CAP` at 31 of 32 tokens and `item_synthesis` at 179 of
-   180, so both are truncated at maximum cost. Deliberately NOT changed in
-   1108: ambient's discards in that log were `action-opener` and `stale`, not
-   truncation, and the beat is clamped to one sentence anyway — raising the
-   cap costs decode time, lowering it risks the first sentence.
-   `item_synthesis` is the live candidate: its 180-token budget is genuinely
-   too small for the JSON shape it is asked for, and 1108 only made the
-   truncation survivable (first balanced object) rather than rare. Revisit
-   both with the next log's stop-reason counts.
+5. **TOKEN-BUDGET TRIM — HALF DONE.** `item_synthesis` was the live
+   candidate and OTA-1109 acted on it: cap 180 → 240, and more importantly a
+   much smaller requested SHAPE, since the real fault was a 0.5B model being
+   shown a six-field nested object and dutifully filling it. Ambient's cap is
+   still deliberately untouched — across two logs now its discards have been
+   `action-opener`, `stale` and near-duplicate, never truncation, and the beat
+   is clamped to one sentence anyway. The cap moves when a log blames it.
+
+5b. **⚠ THE LOCK IS A SHARED RESOURCE AND NOTHING WAS PRIORITISING IT.**
+   OTA-1109 fixed the worst case by hand (synthesis yields), but the general
+   problem stands: `runExclusiveNativeMl` is FIFO, so whichever job asks first
+   wins regardless of whether a player is waiting on it. If a second job ever
+   starves a player-facing one the same way, the answer is a real priority on
+   the lock — player-facing narration ahead of background enrichment — rather
+   than another per-job hand-tuned gap.
 6. **REMAINING DIAGNOSTICS:** lock-holder attribution (waiting behind Kokoro
    or another generation?) · battery/thermal state so a slow late session
    reads as throttling · the per-job rollup folded into the bug-report export.
@@ -1000,7 +1015,66 @@ silent failure closed, debug lines out of the talk popup).
    live LLM NPC conversation. ⚠ Note the correction OTA-1106 forced: speed
    work was assumed to live here and mostly does **not**.
 
-- **⚠ WHAT THE FIRST DEEP-TELEMETRY LOG SAID (2026-08-05, latest). BOTH LINES.**
+- **⚠ THE AMBIENT TRIM LANDED AND THE LINE STILL ARRIVED LATER (2026-08-05, latest). BOTH LINES.**
+  golem OTA-1109 / HAL OTA-1132. Step 5 of the LLM-headroom track, and
+  OTA-1108's own check coming back:
+  ```
+  investigate_lore n5 avg8.5s  read1.1s/write0.9s in126t→out25t reuse0t wait6.5s
+  item_synthesis   n3 avg13.7s max19.6s in310t→out119t reuse0t cap2 ∅1 ✂2/32.2s
+  ambient          n2 avg11.6s max14.6s read4.4s/write3.0s in361t→out31t reuse0t
+  || WASTED 4 calls / 55.4s
+  ```
+  **What worked, exactly as predicted:** ambient's prompt fell **545 → 361
+  tokens** (the estimate was ~360) and its READ time **5.8–9.9s → 4.4s**. The
+  trim is not in question. `reuse` also read a measured **zero on every job**,
+  confirming OTA-1108's correction and leaving the stable-prefix item open.
+  **⚠ What the same log then showed:** ambient's TOTAL went UP anyway —
+  8–11.8s before, 11.6s average now — because the saving was handed straight
+  to something else. Ambient now waits **4.0s** for the lock and spends
+  **3.0s writing 31 tokens**, about 2.5× the ~40ms/token it managed in the
+  OTA-1107 log. Neither number is about ambient; both are about the device
+  being busy.
+  **⚠ What was busy: item synthesis.** Three calls, THREE failures, 41
+  seconds — `item_synth:unparseable` every time, two of them having burned the
+  entire 180-token budget without ever closing a brace (472ch and 488ch for a
+  shape that needs ~200). That is 41 of the session's 55.4 wasted seconds, and
+  while it burns them it holds the shared native-ML lock (arb159) — which is
+  precisely why every other job in that rollup carries 4–6.5 seconds of queue.
+  Stated plainly the trade was indefensible: a background enrichment that
+  lands on the NEXT inventory open was delaying the companion line and the
+  lore flourish the player is waiting on now. Four changes:
+  (1) **IT YIELDS.** One synthesis at a time, with a 20s gap measured from
+  COMPLETION — a 19-second call must not be followed instantly just because
+  the clock ran while it held the lock. The old per-name `pending` set stopped
+  duplicates and nothing else, so a salvage haul of five curios fired five
+  calls. A dropped request is free: the name stays uncached and asks again on
+  the next lookup, which is the fire-and-forget contract this path already had.
+  (2) **THE BRIEF SHRINKS.** The old one handed a 0.5B model a six-field
+  nested `effect` object and six prose rules, then asked for "ONLY a single
+  JSON object on one line". It filled the shape it was shown and the cap
+  arrived before the braces closed. Now the shape is one line holding exactly
+  what the validator reads, with the rules folded in as inline hints: ~900 →
+  ~430 characters (≈310 → ≈150 prompt tokens, which is prefill this job pays
+  on every call).
+  (3) **THE CAP RISES 180 → 240** — insurance, not a decision to generate
+  more: a cap only costs time when it is reached, and 180 was guaranteeing
+  failure.
+  (4) **THE RAW TEXT IS PRINTED** on a parse failure (bounded to 160 chars,
+  whitespace-collapsed, riding the existing discard sink so it needs no new
+  plumbing). `unparseable` never said whether the model wrote prose, opened a
+  markdown fence, emitted two objects, or simply ran long. And an **EMPTY
+  return is now its own reason**: the log's `empty 8809ms … out 0t` was
+  followed moments later by *"Qwen dormant … the native context was
+  released"*, so that is the watchdog's bug, not bad JSON, and filing it under
+  `unparseable` would have aimed the next investigation at the parser.
+  **NOT changed:** the ambient token cap, again — its two discards here were
+  `stale:combat-started` and a near-duplicate, not truncation. No
+  `action-opener` discard appeared this session, which is the right direction
+  for OTA-1108's fix at a weak n=2. New suite `ota1109SynthStarvation`
+  (15 tests); the OTA-1108 reporting lock retargeted.
+  **Track continues — see §OPEN ITEMS above.**
+
+- **⚠ WHAT THE FIRST DEEP-TELEMETRY LOG SAID (2026-08-05). BOTH LINES.**
   golem OTA-1108 / HAL OTA-1131. Step 4 of the LLM-headroom track — OTA-1107
   shipped the instrumentation, this is the read on it. **Headline: OTA-1106
   worked** — ambient fell from ~1,145 prompt tokens / 16.8s to ~545 / 8–11.8s.

@@ -75,23 +75,31 @@ export async function synthesizeItemViaQwen(
   const cached = getCachedSynth(name);
   if (cached) return cached;
 
+  // ⚠ OTA-1109 — THE PROMPT WAS A SPECIFICATION, AND IT GOT A SPECIFICATION
+  // BACK. The OTA-1108 log ran this job three times and every one failed:
+  //   item_synthesis n3 avg13.7s max19.6s in310t→out119t cap2 ∅1 ✂2/32.2s
+  // 41 seconds, three `item_synth:unparseable`, nothing cached. Two of the
+  // three ran into the 180-token cap having written 472 and 488 characters
+  // without ever closing an object — which for a shape that needs ~200 means
+  // the model was not writing one row, it was elaborating.
+  //
+  // The old brief handed it a multi-line schema with a SIX-FIELD nested
+  // effect object and six prose rules, then asked for "ONLY a single JSON
+  // object on one line". A 0.5B model given a big shape fills the big shape:
+  // it opens `effect`, works through every field it was shown, and the cap
+  // arrives before the braces close.
+  //
+  // So the shape shrinks to what the validator actually reads, on ONE line,
+  // with the rules folded into it as inline hints rather than a separate
+  // section. ~900 → ~430 characters (≈310 → ≈150 prompt tokens), which is
+  // also prefill this job pays on every single call.
   const systemPrompt = [
-    'You stat-balance items for a text RPG. Output ONLY a single JSON object on one line, no markdown, no prose.',
-    '',
-    'Shape:',
-    '{"kind":"weapon|armor|accessory|consumable|misc|relic",',
-    ' "description":"<one short sentence>",',
-    ' "extraTags":["organic","metal","fiber",...],',
-    ' "effect":{"kind":"passive|consumable|gate","stat":"strength|dexterity|intelligence|wisdom|charisma","bonus":<n>,"healHP":<n>,"restoreStamina":<n>,"buffStat":"<stat>","buffBonus":<n>,"buffDuration":<n>}',
-    '}',
-    '',
-    'Rules:',
-    '- Cap healHP at 10, restoreStamina at 8, any bonus at 2, buffDuration at 6.',
-    '- Use "kind":"consumable" + healHP/restoreStamina for food, drink, potion, tonic, fungus.',
-    '- Use "kind":"passive" + stat+bonus for amulets, rings, charms, lockets, and other carry-bonus items.',
-    '- Use "kind":"misc" + extraTags for tools, rope, lantern, compass.',
-    '- Omit the "effect" field entirely if no effect applies.',
-    '- description should explain the item in one short evocative sentence.',
+    'Stat-balance one item for a text RPG. Reply with ONE line: a single JSON object, nothing before or after it.',
+    '{"kind":"weapon|armor|accessory|consumable|misc|relic","description":"one short sentence","extraTags":["organic|metal|fiber|stone|glass"],"effect":{...}}',
+    'Omit "effect" unless the item clearly does something. When present, use exactly one of:',
+    '{"kind":"consumable","healHP":1-10,"restoreStamina":1-8} for food, drink, potion, tonic, fungus;',
+    '{"kind":"passive","stat":"strength|dexterity|intelligence|wisdom|charisma","bonus":1-2} for amulets, rings, charms, lockets.',
+    'Tools, rope, lanterns and compasses are "misc" with extraTags and no effect.',
   ].join('\n');
 
   const userPrompt = [
@@ -107,9 +115,26 @@ export async function synthesizeItemViaQwen(
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      { maxNewTokens: 180, temperature: 0.1, job: 'item_synthesis' },
+      // OTA-1109 — 180 was guaranteeing failure: two of three calls in the
+      // OTA-1108 log spent the entire budget and still had an open brace. The
+      // leaner shape above should make the extra headroom unnecessary in the
+      // normal case, and a cap only costs time when it is actually reached —
+      // so this is insurance, not a decision to generate more.
+      { maxNewTokens: 240, temperature: 0.1, job: 'item_synthesis' },
     );
   } catch {
+    return null;
+  }
+
+  // OTA-1109 — an empty return is a DIFFERENT failure from an unparseable
+  // one and must not be filed under it. The OTA-1108 log has
+  // `item_synthesis empty 8809ms read 0ms/write 0ms in 309t→out 0t` moments
+  // before the watchdog reported "Qwen dormant … the native context was
+  // released" — that is the dormancy bug, not a model that wrote bad JSON,
+  // and calling it `unparseable` would have sent the next investigation at
+  // the parser.
+  if (!raw.trim()) {
+    noteQwenDiscarded('item_synth:empty');
     return null;
   }
 
@@ -123,7 +148,15 @@ export async function synthesizeItemViaQwen(
   // truncated tail), and whatever still fails is reported as the waste it is.
   const obj = extractJsonObject(raw);
   if (!obj) {
-    noteQwenDiscarded('item_synth:unparseable');
+    // ⚠ OTA-1109 — NAME THE CULPRIT INSTEAD OF GUESSING AT IT. OTA-1108 made
+    // this failure visible and the next log showed it happening three times
+    // out of three — but `unparseable` does not say WHETHER the model wrote
+    // prose, opened a markdown fence, emitted two objects, or simply ran long.
+    // The ambient ∅ mystery was closed the same way (OTA-1034) by printing
+    // the raw text beside the verdict. The reason string rides the existing
+    // discard sink into the debug channel, so this needs no new plumbing.
+    const sample = raw.trim().replace(/\s+/g, ' ').slice(0, 160);
+    noteQwenDiscarded(`item_synth:unparseable (${raw.length}ch) raw="${sample}"`);
     return null;
   }
 
