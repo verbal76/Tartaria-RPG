@@ -923,9 +923,36 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.32**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.33**; ledger in `VERSION.md`.
 
-- **⚠ THE TALK TRANSCRIPT WAS EMPTY, AND IT WAS MY BUG (2026-08-05, latest).
+- **GROUP SELL — HOLD TO PICK, TAP TO ADD, SELL THE LOT (2026-08-05, latest).
+  BOTH LINES.** golem OTA-1099 / HAL OTA-1122. Owner: "if I want to have
+  a hold to start multiple select so I can hold on an item and it gets a
+  check mark then I tap to add others to that group and sell a group
+  let's make that happen."
+  (1) **THE LONG-PRESS IS THE MODE SWITCH**, which is what makes this
+  safe to add: a plain tap keeps meaning "sell this one" until you have
+  declared otherwise, so NOTHING changes for a player who never holds a
+  row. Emptying the group leaves the mode; leaving the SELL tab ends it.
+  (2) **WHOLE STACKS, AND THE TOTAL SAYS SO** — priced by the same
+  `price × quantity` the sale uses.
+  (3) **⚠ ONE NEGOTIATION.** The `social` flag goes to the FIRST unit
+  across the WHOLE group; the counter lives outside both loops. Reset it
+  per item and selling ten things together farms ten times the social XP
+  of ten separate sales — a new exploit introduced by a convenience
+  feature. The suite asserts the counter's declaration position.
+  (4) **⚠ THE WARNINGS SURVIVE.** The group confirm itemises every piece
+  and carries both single-sale callouts — the gate-loss warning (your
+  last way to climb / breathe toxic) and the bandolier/pouch loadout flag
+  — because the risk of any bulk action is that it quietly does what one
+  action would have stopped to ask about.
+  (5) **SELECTION IS DERIVED, NEVER STORED.** Picked rows are looked up
+  in the live sell list every render, so a row that stops being sellable
+  falls OUT of the group instead of lingering as a dead id. Built from
+  the same `sellable` list, so the equipped-instance and unsellable
+  exclusions cannot drift. Suite ota1099GroupSell (13).
+
+- **⚠ THE TALK TRANSCRIPT WAS EMPTY, AND IT WAS MY BUG (2026-08-05).
   BOTH LINES.** golem OTA-1098 / HAL OTA-1121. Owner, on the conversation
   view: "I can talk and they can answer, but none of the text is in the
   popup window, it's still in the exploration window."
