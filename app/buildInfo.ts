@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.60';
+export const DISPLAY_VERSION = '4.29.61';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -21465,7 +21465,62 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // global scope, and they collided. `export {}` on each. The typecheck
 // ratchet caught it — 202 against baseline 200 — which is precisely
 // the job that ratchet was added to do. DISPLAY_VERSION 4.29.60.
-export const OTA_BUILD_ID = '2026-08-05-1127-homework-and-ms-per-token';
+// OTA-1128 — THE PROMPT WAS SAYING THE SAME THING FOUR TIMES.
+// Owner: "go after the big ones." So the big one got PRICED rather
+// than guessed at. The device log gives the exchange rate:
+//   narration:scene_intro ok 19255ms wait 3744ms read 11004ms/
+//   write 3544ms in 854t->out 33t HIT-CAP
+// 11.0s of reading to produce a 33-token sentence = 12.9 ms per
+// prompt token. Every line of the prompt now has a price on it, so
+// a representative scene_intro was measured line by line: 3,194
+// chars / ~888 tokens, of which VOICE_RULES alone was 311 — a THIRD
+// of the whole prompt.
+// ⚠ THE FINDING. Three successive OTAs each added a "do not invent
+// places" guard and none removed the previous one, so the model read
+// the SAME RULE FOUR TIMES in four wordings, for ~123 tokens:
+//   1. NO_INVENTED_PLACES  'NEVER name "Borderlands" ... not below'
+//   2. VOICE_RULES         'DO NOT name any location, room, weather'
+//   3. body                'Location: <biome> - <room>'
+//   4. body                '**The player is at "X". If you name any
+//                            place, it MUST be "X".**'
+// A 0.5B model given one instruction four ways does not obey it four
+// times as hard; it spends attention reconciling them. The
+// third-person ban was doubled the same way — SHARED_PREAMBLE bans
+// it ANYWHERE, which strictly contains VOICE_RULES' weaker "if a
+// draft sentence BEGINS with". Consolidated to one statement each.
+// ⚠ WHAT WAS NOT CUT. Every guard here has a scar behind it —
+// OTA-1031's third-person recap, the "Borderlands" playtest failure,
+// the hallucinated trap sequences. No guard was removed; only the
+// duplicate STATEMENTS of them. The verb catalog stayed too: teaching
+// the player the engine's vocabulary through narration is a real
+// feature and it is the one part a model cannot supply from training
+// data. What went from it was padding — slash-alternates
+// ("retreat / step back"), the parenthetical item list after "use",
+// and six verbs a 20-word aside will never reach for.
+// ⚠ AND THE HONEST ARITHMETIC, which is the more valuable half.
+// 888 -> 760 tokens is ~1.7s off every narration, free. It is ALSO
+// NOT ENOUGH, and the same measurement says why: 19.3s = 3.7 wait +
+// 11.0 read + 3.5 write + ~1.0 other. Even a ZERO-token prompt
+// leaves ~8s, because the model writes at 107 ms/token and waits
+// ~3.7s for the native-ML lock. Prompt trimming cannot make
+// scene_intro fast — it has to stop being on the critical path, the
+// way OTA-1122's bank did for ambient. That is a design call and it
+// is the owner's, so it is written down rather than guessed at.
+// ⚠ SECOND FINDING, found while measuring: the COMBAT branch of
+// buildSystemPrompt is UNREACHABLE in the shipped game.
+// narrateViaArbiter muzzles on any hostile entity and returns the
+// template BEFORE building a prompt (Phase 4 §1.2), and the only
+// other caller is ambient. So ctx.in_combat is never true there;
+// COMBAT_RULES / COMBAT_TASK are live only in tests. Recorded, not
+// deleted — the muzzle is a policy that could be relaxed, and
+// removing the branch would make that a rewrite instead of a flag
+// flip. The branch inherited the dedup so it stays correct.
+// New suite ota1128PromptSaidItFourTimes (11 tests), which pins the
+// ceiling AND a floor: re-inflation is caught, and so is a second
+// round of cutting done quietly. Four older suites retargeted, each
+// noting WHY its number moved. DISPLAY_VERSION 4.29.61.
+export const OTA_BUILD_ID = '2026-08-05-1128-said-it-four-times';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1127-homework-and-ms-per-token';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1125-filter-missed-its-example';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1124-ac-ledger-and-voice';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1123-homework-yields';

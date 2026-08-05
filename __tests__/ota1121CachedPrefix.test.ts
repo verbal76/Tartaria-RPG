@@ -79,17 +79,30 @@ describe('OTA-1121 — the reusable prefix is large, and that is the whole point
   it('⚠ narration → combat shares nearly everything (was 114 tokens)', () => {
     const reused = tokens(commonPrefixChars(
       prompt(), prompt({ in_combat: true, active_entities: 'Bog Hound, Silt Thief' })));
-    expect(reused).toBeGreaterThan(350);
+    // ⚠ RETARGETED BY OTA-1128, and the number moved for a good reason: the
+    // shared prefix IS the rules block, and OTA-1128 halved that block by
+    // deleting three duplicate statements of the no-invented-places rule.
+    // The property this test exists for — a job switch reuses MOST of the
+    // prompt rather than the 114 tokens it reused before OTA-1121 — is
+    // untouched; the prefix is simply made of less padding now.
+    expect(reused).toBeGreaterThan(300);
   });
 
-  it('⚠ this is REORDERING, not trimming — the prompt did not get smaller', () => {
-    // If a future edit "improves" the prefix by deleting content, that is a
-    // different change with different risks and this test should stop it
-    // passing quietly. Ambient measured 327 tokens before, 359 after (the
-    // anchor line is deliberately said twice, generic in front, specific
-    // in the tail).
+  it('⚠ OTA-1121 was REORDERING; OTA-1128 did the trimming, deliberately', () => {
+    // ORIGINAL INTENT, KEPT: a future edit must not "improve" the prefix by
+    // quietly deleting content — that is a different change with different
+    // risks and it must not pass as a caching win.
+    // ⚠ RETARGETED BY OTA-1128, which is exactly such a change and made it on
+    // purpose, with the arithmetic written down first: the peaceful prompt
+    // measured 888 tokens, of which ~123 were the SAME "do not invent places"
+    // rule stated FOUR times by three successive OTAs that each added a guard
+    // and removed none. Deleting three of the four costs no instruction at
+    // all. So the floor moves down rather than the test being deleted, and a
+    // ceiling joins it — re-inflation is still caught, and so is a second
+    // round of cutting done quietly.
     expect(tokens(prompt({ ambient: true }).length)).toBeGreaterThan(300);
-    expect(tokens(prompt().length)).toBeGreaterThan(550);
+    expect(tokens(prompt().length)).toBeGreaterThan(450);
+    expect(tokens(prompt().length)).toBeLessThan(560);
   });
 });
 
@@ -123,7 +136,14 @@ describe('OTA-1121 — the ordering invariant itself', () => {
     const amb = prompt({ ambient: true });
     expect(amb).toContain('**If you name any place, it MUST be "The Architect\'s Blind".**');
     expect(amb.indexOf('it MUST be')).toBeGreaterThan(amb.indexOf('Your read of them:'));
-    expect(amb).toContain('NEVER name "Borderlands"');
+    // RETARGETED BY OTA-1128 — the generic list is still in the prefix and
+    // still names "Borderlands" (that example IS the playtest failure it was
+    // written for), but the sentence around it was rewritten when the four
+    // duplicate copies of this rule collapsed into one. Anchored on the
+    // example rather than the sentence, so the next rewording does not
+    // re-break it.
+    expect(amb).toContain('"Borderlands"');
+    expect(amb.indexOf('"Borderlands"')).toBeLessThan(amb.indexOf('it MUST be'));
   });
 });
 
@@ -153,8 +173,12 @@ describe('OTA-1121 — ⚠ the prompt still says what it said, and points the ri
     expect(nar).toContain('not listed in the SYSTEM FACTS below');
     expect(nar).not.toContain('not listed in the SYSTEM FACTS above');
     const amb = prompt({ ambient: true });
-    expect(amb).toContain('other than the location named below');
-    expect(amb).not.toContain('other than the location named above');
+    // RETARGETED BY OTA-1128 — the ambient copy of this rule was one of the
+    // three duplicates that collapsed into NO_INVENTED_PLACES, so the wording
+    // changed while the DIRECTION under test did not. Anchored on the
+    // direction word itself, which is the whole point of the test.
+    expect(amb).toContain('that is not named below');
+    expect(amb).not.toContain('named above');
     // Combat's "entities listed above" is STILL correct — its task sits after
     // the entity block — so it must NOT have been flipped.
     expect(prompt({ in_combat: true })).toContain('entities listed above');

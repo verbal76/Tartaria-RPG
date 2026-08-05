@@ -1129,8 +1129,83 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠ THE PROMPT WAS SAYING THE SAME THING FOUR TIMES (2026-08-05, latest).
+  BOTH LINES.** golem OTA-1128 / HAL OTA-1151. Owner: *"go after the big ones."*
+  So the big one was **priced**, not guessed at.
+
+  The device log supplies the exchange rate:
+
+  > `qwen⏱ narration:scene_intro ok 19255ms wait 3744ms read 11004ms/write
+  > 3544ms in 854t→out 33t reuse 0t HIT-CAP (151ch)`
+
+  11.0 s of *reading* to produce a 33-token sentence — **12.9 ms per prompt
+  token**. That number turns every line of the prompt into a price, so a
+  representative `scene_intro` was measured line by line: 3,194 characters /
+  ~888 tokens, of which `VOICE_RULES` alone was **311 — a third of the whole
+  prompt**.
+
+  ⚠ **The finding.** Three successive OTAs each added a "do not invent places"
+  guard and **none removed the previous one**, so the model was reading the
+  same rule **four times**, in four wordings, for ~123 tokens:
+
+  | # | where | text |
+  |---|---|---|
+  | 1 | `NO_INVENTED_PLACES` | `NEVER name "Borderlands" … not named below` |
+  | 2 | `VOICE_RULES` | `DO NOT name any location, room, weather, or NPC…` |
+  | 3 | body | `Location: <biome> - <room>` |
+  | 4 | body | `**The player is at "X". If you name any place, it MUST be "X".**` |
+
+  A 0.5B model given one instruction in four wordings does not obey it four
+  times as hard; it spends attention reconciling them. The third-person ban was
+  doubled the same way — `SHARED_PREAMBLE` bans it **anywhere** in a sentence,
+  which strictly contains `VOICE_RULES`' weaker *"if a draft sentence **begins**
+  with…"*. Each rule now appears once.
+
+  ⚠ **What was NOT cut, and why.** Every guard in this prompt has a scar behind
+  it — the third-person recap, the "Borderlands" playtest failure, the
+  hallucinated trap sequences. **No guard was removed**; only the duplicate
+  *statements* of them. The verb catalog stayed too: teaching the player the
+  engine's vocabulary through narration is a real feature and it is the one part
+  of the block a model cannot supply from training data. What went from it was
+  padding — slash-alternates (`retreat / step back`, `hide / sneak`), the
+  parenthetical item list after `use`, and six verbs a 20-word aside will never
+  reach for.
+
+  ⚠ **And the honest arithmetic, which is the more valuable half of this OTA.**
+  888 → 760 tokens is **~1.7 s off every narration**, and it is free. It is
+  **also not enough**, and the same measurement says why:
+
+  > 19.3 s = 3.7 wait + **11.0 read** + 3.5 write + ~1.0 other
+
+  Even a prompt of **zero** tokens leaves ~8 s, because the model writes at
+  107 ms/token and waits ~3.7 s for the native-ML lock. **Prompt trimming
+  cannot make `scene_intro` fast.** It has to stop being on the critical path —
+  which is exactly what the ambient bank did. That is a design call and it is
+  the owner's, so it is written down here rather than guessed at. The two
+  shapes on the table: *(a)* let the template speak on arrival and let the Qwen
+  line land as a follow-up beat (or be dropped if the player moved on — the
+  epoch cancel already does that), or *(b)* pre-generate intros for the
+  neighbouring tiles on the homework harness.
+
+  ⚠ **Second finding, found while measuring.** The **combat branch of
+  `buildSystemPrompt` is unreachable in the shipped game.**
+  `narrateViaArbiter` muzzles on any hostile entity and returns the template
+  *before* it builds a prompt (Phase 4 §1.2), and the only other caller is the
+  ambient path. So `ctx.in_combat` is never true at `buildSystemPrompt`, and
+  `COMBAT_RULES` / `COMBAT_TASK` are live only in tests. **Recorded, not
+  deleted** — the muzzle is a policy that could be relaxed, and quietly removing
+  the branch would turn that into a rewrite instead of a flag flip. The branch
+  inherited the dedup so it stays correct if it is ever switched back on.
+
+  New suite `ota1128PromptSaidItFourTimes` (11 tests), which pins a **ceiling
+  and a floor**: re-inflation is caught, and so is a second round of cutting
+  done quietly. Four older suites retargeted, each recording *why* its number
+  moved — the rules-block ratio in particular now reads ~0.63 rather than 0.56,
+  **not because ambient grew but because the reaction prompt shrank**, and
+  asserting the old bound would have been asserting something false.
+
 - **⚠⚠ THE FIRST HOMEWORK SLOT, AND THE METRIC THAT CAN SETTLE THE CACHING
-  QUESTION (2026-08-05, latest). BOTH LINES.** golem OTA-1127 / HAL OTA-1150.
+  QUESTION (2026-08-05). BOTH LINES.** golem OTA-1127 / HAL OTA-1150.
   Two numbered changes in one push and one build id — 1126 never reached a
   device on its own, so no `SUPERSEDED` line carries it.
 
