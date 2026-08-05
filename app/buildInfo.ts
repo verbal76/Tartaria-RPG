@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.57';
+export const DISPLAY_VERSION = '4.29.58';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -21341,7 +21341,57 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1123HomeworkPreempt (15 tests). Three assertions
 // retargeted for a multi-line outcome expression, one for the split
 // ambient job label. DISPLAY_VERSION 4.29.57.
-export const OTA_BUILD_ID = '2026-08-05-1123-homework-yields';
+// OTA-1124 — THE AC LEDGER, THE VOICE SLIP, AND THE CHIP THAT LIED.
+// Three items off the owner's open list. Two get MEASURED rather
+// than guessed at a third time; one is fixed outright.
+// ⚠ 1. AC 16 -> AC 10, TWICE NOW. Two device logs in a row show a
+// six-point drop with no line saying why — the second with a ~2m40s
+// inventory gap in the middle, which is room for anything. The
+// suspect is the group unequip bar. A suspect is not a cause, and
+// two timestamps four minutes apart are not evidence of one. So the
+// ONE place the number is computed now prints its whole derivation
+// on any shift of 2 or more: race/base, gear, title, the trim,
+// status — and the full worn list INCLUDING empty slots, because
+// "the chest slot is empty" is the finding and a list that omits
+// what is missing cannot show it. Threshold 2 because +/-1 is
+// ordinary and a noisy ledger gets ignored by eye. Debug channel
+// only, no behaviour change. OTA-1109 is the precedent: instrument
+// first, let the log name the culprit, then write the remedy.
+// ⚠ 2. THE AMBIENT VOICE SLIPPED TWICE IN ONE LINE — first person
+// ("my eyes") and invented scenery ("ancient trees" in the Obsidian
+// Pillars, which has none).
+//   · The first-person half IS fixed, NARROWLY: a filter mirroring
+//     the existing they-opener that tests the OPENER only. The
+//     Arbiter is a companion and may say "I" inside a line addressed
+//     to the player; being the SUBJECT is what stops it being a
+//     reflection on the player. OTA-1031 is why this is narrow — its
+//     broader version dropped every sentence starting with "You",
+//     which the voice rules ORDER, and silently ate the whole
+//     feature for four builds.
+//   · The scenery half is deliberately NOT fixed. The off-canon
+//     guard covers named ENTITIES; policing generic scenery needs a
+//     per-biome whitelist, which is a content system rather than a
+//     filter, and guessing at one is how OTA-1031 happened. What
+//     ships instead is EVIDENCE: an accepted ambient line now logs
+//     its raw text. OTA-1034 added that for FAILURES; a line that
+//     passes every filter and is still wrong left no trace at all.
+// ⚠ 3. THE INVESTIGATE CHIP THAT LIED — and this needed no log. The
+// watch list carried "tap again -> 2 active items" as unconfirmed,
+// noting the detail needed was WHETHER THE PLAYER WAS CLIMBED UP.
+// Reproducible from a cold read: the pinned surface chip (ground /
+// mud / floor) is built separately from the scene nouns and never
+// received the elevation gate OTA-166 gave the chips or OTA-953 gave
+// the count. On a perch every reachable noun greys and the ground
+// chip alone stays bright, badge still active, while the engine
+// answers every tap with "You're up on the {perch}. The ground is
+// down there. Climb down to reach it." OTA-970 describes the same
+// thing from the other side: "eight identical salvage attempts from
+// atop a shelf … the player retried into dead silence, which reads
+// as a hang." BOTH sides fixed — the chip greys AND the count drops
+// it, because fixing one alone just moves the lie to the other.
+// New suite ota1124AcLedgerAndVoice (19 tests). DISPLAY_VERSION 4.29.58.
+export const OTA_BUILD_ID = '2026-08-05-1124-ac-ledger-and-voice';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1123-homework-yields';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1122-the-bank';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1121-cached-prefix';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1120-volley-after-kill';

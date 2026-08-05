@@ -33109,6 +33109,24 @@ export function playerArmorResistKinds(player: PlayerCharacter | null): string[]
   return aggregateArmor(player).resistances.map((r) => r.toLowerCase());
 }
 
+/** OTA-1124 — the AC ledger's memory. Session-scoped and combat-local: it only
+ *  ever compares one swing to the previous one, so a fresh session starting
+ *  from null simply prints nothing until there is something to compare. */
+let _lastEffectiveAc: number | null = null;
+
+/** OTA-1124 — what is actually worn, slot by slot, for the AC ledger line.
+ *  Names the EMPTY slots too: "AC dropped and the chest slot is empty" is the
+ *  finding, and a list that silently omits what is missing cannot show it. */
+function describeWornForAcLedger(player: PlayerCharacter): string {
+  const eq = player.equipped ?? {};
+  const parts: string[] = [];
+  for (const slot of ARMOR_SLOTS) {
+    const name = eq[slot];
+    parts.push(`${slot}=${name ?? '—'}`);
+  }
+  return parts.join(' ');
+}
+
 function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances: string[]; resistSlots: ArmorSlotResist[] } {
   let acBonus = 0;
   const resistances: string[] = [];
@@ -33807,6 +33825,33 @@ function applyEnemyCounter(
   // cover, ward) apply on top of the trimmed base at full value.
   const acFromGear = trimStandingAc(racialAC + armorPieces.acBonus + titleRuinsAc);
   const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));
+  // ⚠ OTA-1124 — THE AC LEDGER. Two device logs in a row show the owner's AC
+  // dropping from 16 to 10 with no line saying why — the second time with a
+  // ~2m40s inventory gap in the middle, which is enough room for anything. The
+  // suspect is the group unequip bar (OTA-1114), but a suspect is not a cause,
+  // and "AC 16" → "AC 10" four minutes apart is not evidence of anything.
+  //
+  // Rather than guess a third time, MEASURE. This is the one place the number
+  // the player actually sees is computed, so a shift of 2 or more prints its
+  // whole derivation: which component moved, and what is worn now. The next
+  // log answers the question outright instead of narrowing it.
+  //
+  // Threshold 2 because ±1 is ordinary (a status ticking on or off), and this
+  // must not become noise in a combat log the owner reads by eye. Debug channel
+  // only; no behaviour change, and deliberately no attempt to FIX anything —
+  // OTA-1109 is the precedent: instrument first, and let the log name the
+  // culprit before writing a line of remedy.
+  {
+    const prev = _lastEffectiveAc;
+    _lastEffectiveAc = effectiveAc;
+    if (prev !== null && Math.abs(effectiveAc - prev) >= 2) {
+      const worn = describeWornForAcLedger(player);
+      get().appendLog('debug',
+        `ac-shift ${prev}→${effectiveAc}: race/base ${racialAC} + gear ${armorPieces.acBonus}`
+        + ` + title ${titleRuinsAc} → trimmed ${acFromGear}`
+        + ` + status ${statusAcAdjustment(player.statusEffects)} | worn: ${worn}`);
+    }
+  }
   // Natural 1 / natural 20 rule — same floor and ceiling that applies
   // to the player. A nat-1 forces a miss regardless of bonuses; a nat-20
   // forces a hit AND doubles the damage roll below.
@@ -38782,6 +38827,20 @@ async function maybeGenerateAmbientArbiter(
       .split(/(?<=[.!?])\s+/)
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
+      // ⚠ OTA-1124 — FIRST-PERSON OPENER. Owner's log: a musing came back about
+      // "my eyes". The Arbiter is a companion and may certainly say "I" inside
+      // a line addressed to the player — but a sentence whose SUBJECT is the
+      // narrator has stopped being a reflection on the PLAYER and become one
+      // about itself, which is not the beat this is.
+      //
+      // ⚠ DELIBERATELY NARROW, AND OTA-1031 IS WHY. That OTA's filter dropped
+      // every sentence starting with "You" — which the voice rules order the
+      // model to do — and silently ate the whole feature: every ambient in the
+      // owner's logs was ∅ across four builds. So this mirrors the `they`
+      // opener directly above and tests the OPENER only. "The road behind is
+      // longer than the one ahead" survives; so does "You have come far, and
+      // my eyes have seen worse." Only "My eyes have seen worse" is dropped.
+      .filter((s) => !/^\s*(i|i'm|i've|i'll|my|mine|me)\b/i.test(s))
       // Ambient is the narrator's own idle musing, not world narration — a
       // second-person ACTION opener ("You step back, surveying...") reads as
       // scene text in the arbiter channel and in practice is an off-scene
@@ -38840,6 +38899,22 @@ async function maybeGenerateAmbientArbiter(
     // a generation the player is still going to hear.
     if (!ambientUsable && !(staleReason && finalText)) noteQwenDiscarded(`ambient:${ambientMark}`);
     get().appendLog('debug', `arbiter: ambient ${ambientMark} ${Date.now() - t0}ms`);
+    // ⚠ OTA-1124 — LOG THE RAW TEXT OF LINES THAT PASSED, TOO.
+    // OTA-1034 added raw logging for FAILURES, and it has paid for itself
+    // repeatedly. But the owner's latest slip was a line that passed every
+    // filter and was still wrong twice over: first person ("my eyes") and
+    // invented scenery ("ancient trees" in the Obsidian Pillars, which has
+    // none). A line that is accepted and bad leaves no trace at all, so the
+    // only evidence is the owner noticing and typing it out by hand.
+    //
+    // ⚠ AND THE SCENERY HALF IS DELIBERATELY NOT "FIXED" HERE. The off-canon
+    // guard covers named ENTITIES; policing generic scenery would need a
+    // whitelist of what may exist in each biome, which is a content system, not
+    // a filter — and guessing at one is how OTA-1031 ate the feature. Measure
+    // how often it happens first. This is the line that will tell us.
+    if (ambientUsable) {
+      get().appendLog('debug', `arbiter: ambient-said "${finalText.slice(0, 160)}"`);
+    }
     // OTA-1034 — WHY it was empty. The owner's logs show ∅ on every ambient
     // attempt across four builds, including one that carries the OTA-1054
     // register fix — so the register filter was NOT the whole story, and the ∅

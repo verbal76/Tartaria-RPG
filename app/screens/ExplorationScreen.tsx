@@ -1278,7 +1278,16 @@ export function ExplorationScreen() {
                   const surfaceReq = searchRequirementFor(surfaceNoun);
                   const surfaceUnlocked = !surfaceReq
                     || (player && playerHasScannerEquipped(player, surfaceReq.scannerBias));
-                  if (surfaceUnlocked) groundCount = 1;
+                  // OTA-1124 — and the SAME elevation gate the scene nouns get
+                  // above. This is the half that made the badge read active
+                  // while the modal was entirely greyed; the chip and the count
+                  // have to agree or the player is told to open a menu that has
+                  // nothing in it.
+                  const gElev = currentScene?.elevatedOn;
+                  const groundOutOfReach = !!gElev && !currentScene?.elevatedOverlayMeta
+                    && !gElev.noun.toLowerCase().includes(surfaceNoun)
+                    && !surfaceNoun.includes(gElev.noun.toLowerCase());
+                  if (surfaceUnlocked && !groundOutOfReach) groundCount = 1;
                 }
               }
               return sceneCount + groundCount + (tutBeat === 'investigate' ? 1 : 0); // tutorial door prop
@@ -1527,7 +1536,35 @@ export function ExplorationScreen() {
             const hasScannerForReq = req && player
               ? playerHasScannerEquipped(player, req.scannerBias)
               : false;
-            const unmetRequirement = req && !hasScannerForReq ? req.shortLabel : undefined;
+            let unmetRequirement = req && !hasScannerForReq ? req.shortLabel : undefined;
+            // ⚠ OTA-1124 — THE PINNED CHIP NEVER GOT THE ELEVATION GATE, and it
+            // is the last chip in the app that lies.
+            //
+            // OTA-166 greyed scene nouns while the player is climbed; OTA-953
+            // took them out of the INVESTIGATE count for the same reason. Both
+            // skipped THIS chip, because it is built separately a few lines up.
+            // So standing on a shelf leaves every reachable noun greyed and the
+            // ground / mud / floor chip alone still bright, with the chip badge
+            // still reading active. Tapping it earns the engine's "You're up on
+            // the {perch}. The ground is down there. Climb down to reach it."
+            // every single time.
+            //
+            // That is the exact shape of the unconfirmed watch-list report —
+            // "tap again → 2 active items" — and the detail the owner was asked
+            // for was WHETHER THEY WERE CLIMBED UP. It is also what OTA-970
+            // describes from the other side: "eight identical salvage attempts
+            // from atop a shelf … the player retried into dead silence, which
+            // reads as a hang."
+            //
+            // Scanner gate wins when both apply: a missing scanner is the more
+            // specific thing to say, and climbing down will not fix it.
+            const pinElev = currentScene?.elevatedOn;
+            if (pinElev && !currentScene?.elevatedOverlayMeta && !unmetRequirement) {
+              const climbed = pinElev.noun.toLowerCase();
+              if (!climbed.includes(key) && !key.includes(climbed)) {
+                unmetRequirement = 'climb down to reach';
+              }
+            }
             return [{ noun, consumed: isAmbientConsumed(key), alwaysShow: true, unmetRequirement }];
           })(),
           // OTA-257 — productively-consumed nouns now STAY VISIBLE as
