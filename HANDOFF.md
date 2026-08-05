@@ -1051,37 +1051,44 @@ rediscovering them.
   encounters."* The novelty gate itself is unchanged and still does its
   anti-farm job.
 
-- **⚠ IN PROGRESS — DIFFICULTY GOES GAME-WIDE (golem OTA-1113 shipped the engine).**
-  Owner: *"aside from what it already does, the difficulty levels should control
-  the spawn rate of enemies and vendors and secret locations. it should limit or
-  grow the number of members in an attack party, it should limit the amount of
-  loot found per tile"*, then, after reading a survey of industry difficulty
-  design: *"go with the best suggestions on each category… the effects should be
-  game wide. Also create a custom selection that fires a popup and lets you check
-  what systems they want to effect."*
-  **DONE:** `pressure.ts` amended (see its header — the founding
-  no-multipliers-on-tuned-systems rule is explicitly reversed, with the identity
-  row as the replacement protection). Nine dials added and tagged by lever type.
-  Wired: `spawn` (encounter roll), `discovery` (vendor / cache / bench weights),
-  `pack` (party size, welded to the swing cap), `loot` (per-tile find chance).
-  CUSTOM tier + `DifficultyCustomModal` checklist shipped; `profileOf` composes
-  so pre-existing consumers are custom-aware untouched.
-  **⚠ NEXT — the rule levers, which the survey rates highest and which are
-  already DEFINED but not yet consumed:**
-  1. `witholdIdentity` — curios stay unidentified. The game already has the
-     identification system (static inference in `itemDefaults` → Qwen synthesis);
-     this decides whether it runs for free. Consumer: the inference/synth path.
-  2. `witholdIntel` — no weakness / resist tags the bestiary has not earned.
-     Consumer: `EnemyPanel` + the resist callouts.
-  3. `hunger` — the clock rate. Consumer: `hungerStaminaPenalty` accrual.
-  4. `elite` — the CONTENT swap, and the highest-value item on the list: a group
-     of grunts sometimes arrives as one tougher body instead. Same encounter
-     count, completely different fight, no damage sponge. Machinery already
-     exists (rarity tiers, boss flags, the Guardian over-level scaler, Aetherkin
-     variants, faction parties in human bodies).
-  **⚠ AND THE RULE THAT MUST NOT BREAK:** every dial's 'owed' value is a
-  mathematical no-op, and `ota1113DifficultySystems` fails if that stops being
-  true. That test is what makes the amendment safe; do not weaken it.
+- **✅ CLOSED — DIFFICULTY GOES GAME-WIDE.** Owner: *"aside from what it already
+  does, the difficulty levels should control the spawn rate of enemies and
+  vendors and secret locations. it should limit or grow the number of members in
+  an attack party, it should limit the amount of loot found per tile"*, then,
+  after reading a survey of industry difficulty design: *"go with the best
+  suggestions on each category… the effects should be game wide. Also create a
+  custom selection that fires a popup and lets you check what systems they want
+  to effect."* Delivered across five OTAs; **every dial has a consumer.**
+  · **OTA-1113** — `pressure.ts` amended (its founding
+    no-multipliers-on-tuned-systems rule explicitly reversed, with the identity
+    row as the replacement protection). Nine dials, tagged by lever type. Wired:
+    `spawn`, `discovery`, `pack` (welded to the swing cap), `loot`. CUSTOM tier +
+    checklist modal.
+  · **OTA-1116** — `elite`, the CONTENT swap. A qualifying
+    party arrives as one named body carrying the pack's own HP budget at the solo
+    attack rate. No new balance constants; the carry pays the party's loot.
+  · **OTA-1117** — `witholdIdentity` and `witholdIntel`, the
+    RULE levers. And **`hunger` was REMOVED rather than wired**: it scaled a
+    mechanic deleted from the game before the dial existed, so it was a checkable
+    control over nothing.
+  · **OTA-1118** — the hunger CARCASS: three unreachable
+    narration lines, a heartbeat ledger + warning, and a field write on every
+    action. Owner: *"we removed hunger, we don't still have that somewhere do
+    we?"*
+  **⚠ THE RULE THAT MUST NOT BREAK:** every dial's `owed` value is a
+  mathematical no-op, and `ota1113DifficultySystems` fails if
+  that stops being true. That test is what makes the amendment safe; do not
+  weaken it. `ota1117RuleDials` adds the second guard — every
+  id in the CUSTOM picker must name a system something actually reads.
+  **⚠ THE ONE THING LEFT IS A DESIGN CALL, NOT A TASK:** hunger is gone from the
+  game entirely, not merely from the dial. If the owner ever wants it back as a
+  real mechanic, that is a fresh design conversation and the dial to scale it is
+  four lines.
+  **⚠ AND THE PATTERN THIS WORKSTREAM KEPT PRODUCING**, worth carrying into the
+  next one: three times running, the bug was not wrong behaviour but DEAD
+  behaviour wearing live clothes — a difficulty checkbox over nothing, narration
+  behind an impossible condition, orphaned computations that outlived their only
+  reader. A removal is not finished until the things that READ it are gone too.
 
 - **QWEN DORMANCY IS FIRING REGULARLY.** Third log in a row ending with
   `qwen-watchdog: Qwen dormant (status='ready' but the native context was
