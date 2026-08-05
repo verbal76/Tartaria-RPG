@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.33';
+export const DISPLAY_VERSION = '4.29.34';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19854,6 +19854,48 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1112/1089 anti-stun-lock + pack math. No app code; the fast gate
 // is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1100 — THE INVENTORY LEARNS THE SAME GRIP.
+// Owner, after the group sell: "yes wire drop, fusable select and scrap
+// the same way." The point is the SAMENESS — one gesture, one meaning,
+// wherever you are: HOLD a row to start a group, TAP to add or remove,
+// act on the lot. A player who never holds a row sees no change.
+//   1. GROUP ACTIONS: DROP, SCRAP, ♡ RESERVE, ♥ RELEASE. Each button
+//      appears only when the SELECTION can actually take that action,
+//      with the count coming from the same predicate the action uses —
+//      a button can never claim a number it cannot deliver. When
+//      nothing can act, the bar says why ("quest-bound items stay with
+//      you") instead of going blank.
+//   2. ELIGIBILITY MIRRORS THE SINGLE-ITEM PATHS EXACTLY. Drop skips
+//      worn and quest-bound rows (the verb's own refusals). Scrap
+//      ALLOWS worn gear because OTA-058 made scrap auto-unequip rather
+//      than refuse — excluding it here would be a stricter, different
+//      rule. Reserve/release route through OTA-1097's
+//      reserveManyForFusion, not a second path.
+//   3. ⚠ THE CONFIRM NAMES SCRAP'S SILENT AUTO-UNEQUIP. At one item
+//      that behaviour is a kindness; at group scale, unsaid, it strips
+//      your kit because you ticked a row you forgot you were wearing.
+//      The confirm itemises everything, names the worn pieces it will
+//      take off, and reports what it SKIPPED.
+//   4. ⚠ DROP IS INSTANCE-EXACT, AND THE FIRST FIX WAS WRONG. I first
+//      threaded the id through `submitPlayerAction('drop <id>')`,
+//      because the drop verb also matches on id — and it passed a probe
+//      with id 'bbb', then failed on 'trinket_junk'. The id has to
+//      survive the intent PARSER to arrive as `parsed.target`, so
+//      resolution depended on whether the id happened to look like a
+//      word. That is a coincidence, not a mechanism. The drop BODY
+//      moved into a new `dropInventoryInstance` store action and BOTH
+//      entry points call it: the typed verb still resolves the noun,
+//      the UI passes the id, and there is exactly ONE implementation of
+//      dropping.
+//   5. THE FUSABLE LONG-PRESS HATCH IS GONE, ON PURPOSE. OTA-1097's
+//      hold-opens-the-item-sheet is superseded by hold-starts-a-group;
+//      one gesture, one meaning. The per-unit "Save 1 for fusion" it
+//      reached is still there — switch off the FUSABLE axis and tap —
+//      and the banner now says so rather than leaving it to be found.
+//      Two OTA-1097 source locks RETARGETED to the new shape.
+// New suite ota1100InventoryGroup (15), including a live-store test that
+// drops the ticked copy of two same-name rows. DISPLAY_VERSION 4.29.34.
+//
 // OTA-1099 — GROUP SELL: HOLD TO PICK, TAP TO ADD, SELL THE LOT.
 // Owner: "if I want to have a hold to start multiple select so I can
 // hold on an item and it gets a check mark then I tap to add others to
@@ -20269,7 +20311,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1099-group-sell';
+export const OTA_BUILD_ID = '2026-08-05-1100-inventory-group';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1099-group-sell';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1098-transcript-and-repair-all';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1097-fusable-select-mode';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1096-frame-and-axes';

@@ -5553,7 +5553,15 @@ interface GameStore {
    *  Mirrors the typed 'drop X' verb so InventoryScreen taps can
    *  invoke it without going through the parser. Refuses equipped items
    *  with an Arbiter line. */
-  dropInventoryItem: (itemName: string) => void;
+  /** OTA-1100 — `itemId` drops that EXACT instance (the drop verb already
+   *  matches on id as well as name), so a group drop takes the rows the player
+   *  ticked rather than whichever same-name row sorts first. */
+  dropInventoryItem: (itemName: string, itemId?: string) => void;
+  /** OTA-1100 — drop one unit of an EXACT instance. The single implementation of
+   *  dropping; the typed `drop <noun>` verb resolves the noun and then calls
+   *  this. UI callers use it directly so an instance id never has to survive the
+   *  intent parser to be honoured. */
+  dropInventoryInstance: (itemId: string) => void;
   /** Use the named item. Consumables call through the eat path (HP
    *  recovery + time advance). Anything else equips into the off-hand
    *  slot per playtest feedback ("to use it, it needs to replace the
@@ -18324,57 +18332,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('arbiter', `The Arbiter shakes their head. "${target} isn't in your pack."`);
           break;
         }
-        // Equipped items can't be dropped without unequipping first —
-        // would otherwise leave the player wielding a phantom blade.
-        const eq = player.equipped ?? {};
-        const equippedSlots = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring', 'ring2', 'ring3'] as const;
-        const isEquipped = equippedSlots.some((slot) => eq[slot] === item.name);
-        if (isEquipped) {
-          get().appendLog('arbiter', `The Arbiter taps your hand. "Unequip the ${item.name} first — you can't drop what you're wielding."`);
-          break;
-        }
-        // v2.4.1 (OTA 052) — quest items (Tartarian Cores etc.) are
-        // bound to the player until the final act. The Order would
-        // hunt the player to the ends of Tartaria for leaving one
-        // in the silt. Refuse the drop with an in-character line.
-        if (isQuestLockedItem(item)) {
-          get().appendLog(
-            'arbiter',
-            `The Arbiter folds your fingers back over the ${item.name}. "Not this one. It does not leave your pack until the end of the road."`,
-          );
-          break;
-        }
-        const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
-        const dropOne: InventoryItem = { ...item, quantity: 1 };
-        // Remove one from player inventory.
-        const newInventory = player.inventory
-          .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
-          .filter((i) => i.quantity > 0);
-        set((s) => {
-          if (!s.player) return s;
-          const room = s.worldMemory.visitedRooms?.[dropKey] ?? {
-            firstVisitAt: Date.now(),
-            lastVisitAt: Date.now(),
-            visitCount: 1,
-          };
-          // Merge with any existing dropped pile (same name → bump qty).
-          const dropped = [...(room.droppedItems ?? [])];
-          const exist = dropped.findIndex((d) => d.name === dropOne.name);
-          if (exist >= 0) dropped[exist] = { ...dropped[exist]!, quantity: dropped[exist]!.quantity + 1 };
-          else dropped.push(dropOne);
-          return {
-            player: { ...s.player, inventory: newInventory },
-            worldMemory: {
-              ...s.worldMemory,
-              visitedRooms: {
-                ...(s.worldMemory.visitedRooms ?? {}),
-                [dropKey]: { ...room, droppedItems: dropped },
-              },
-            },
-          };
-        });
-        get().appendLog('world', `You drop the ${item.name}. It lies on the ground here.`);
-        void get().persist();
+        // OTA-1100 — the drop BODY now lives in dropInventoryInstance so the UI
+        // can drop a specific instance without going through the text parser.
+        // The typed verb keeps resolving the noun; only the doing moved.
+        get().dropInventoryInstance(item.id);
         break;
       }
       case 'pickup': {
@@ -28203,10 +28164,87 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  dropInventoryItem(itemName) {
-    // Route through the typed drop verb so equipped-item refusal,
-    // room-state writes, and persistence all share one code path.
+  dropInventoryItem(itemName, itemId) {
+    // OTA-1100 — with an INSTANCE ID in hand, drop that exact instance directly.
+    // The first attempt threaded the id through `submitPlayerAction('drop <id>')`
+    // because the verb also matches on id — and it worked in a probe, then failed
+    // on a real id, because the id has to survive the intent PARSER to arrive as
+    // `parsed.target`. `trinket_junk` does not; `bbb` does. An identifier whose
+    // resolution depends on whether it happens to look like a word is not a
+    // mechanism, it is a coincidence. So the drop BODY moved into
+    // `dropInventoryInstance` and both entry points call it: the typed verb still
+    // resolves the noun, the UI passes the id, and there is exactly ONE
+    // implementation of dropping.
+    if (itemId) { get().dropInventoryInstance(itemId); return; }
+    // Name only (typed commands, legacy callers) — unchanged: route through the
+    // verb so the parser's noun resolution and its "isn't in your pack" line apply.
     get().submitPlayerAction(`drop ${itemName}`);
+  },
+
+  // OTA-1100 — THE one implementation of DROP. Lifted verbatim out of the
+  // `case 'drop'` handler (equipped refusal, quest-lock refusal, room-pile write,
+  // narration, persist) so a caller holding an instance id never has to
+  // round-trip through the text parser to reach it.
+  dropInventoryInstance(itemId) {
+    const player = get().player;
+    const currentScene = get().currentScene;
+    if (!player || !currentScene) return;
+    const item = player.inventory.find((i) => i.id === itemId);
+    if (!item) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "That isn't in your pack."`);
+      return;
+    }
+    // Equipped items can't be dropped without unequipping first —
+    // would otherwise leave the player wielding a phantom blade.
+    const eq = player.equipped ?? {};
+    const equippedSlots = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring', 'ring2', 'ring3'] as const;
+    const isEquipped = equippedSlots.some((slot) => eq[slot] === item.name);
+    if (isEquipped) {
+      get().appendLog('arbiter', `The Arbiter taps your hand. "Unequip the ${item.name} first — you can't drop what you're wielding."`);
+      return;
+    }
+    // v2.4.1 (OTA 052) — quest items (Tartarian Cores etc.) are
+    // bound to the player until the final act. The Order would
+    // hunt the player to the ends of Tartaria for leaving one
+    // in the silt. Refuse the drop with an in-character line.
+    if (isQuestLockedItem(item)) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter folds your fingers back over the ${item.name}. "Not this one. It does not leave your pack until the end of the road."`,
+      );
+      return;
+    }
+    const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
+    const dropOne: InventoryItem = { ...item, quantity: 1 };
+    // Remove one from player inventory.
+    const newInventory = player.inventory
+      .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+      .filter((i) => i.quantity > 0);
+    set((s) => {
+      if (!s.player) return s;
+      const room = s.worldMemory.visitedRooms?.[dropKey] ?? {
+        firstVisitAt: Date.now(),
+        lastVisitAt: Date.now(),
+        visitCount: 1,
+      };
+      // Merge with any existing dropped pile (same name -> bump qty).
+      const dropped = [...(room.droppedItems ?? [])];
+      const exist = dropped.findIndex((d) => d.name === dropOne.name);
+      if (exist >= 0) dropped[exist] = { ...dropped[exist]!, quantity: dropped[exist]!.quantity + 1 };
+      else dropped.push(dropOne);
+      return {
+        player: { ...s.player, inventory: newInventory },
+        worldMemory: {
+          ...s.worldMemory,
+          visitedRooms: {
+            ...(s.worldMemory.visitedRooms ?? {}),
+            [dropKey]: { ...room, droppedItems: dropped },
+          },
+        },
+      };
+    });
+    get().appendLog('world', `You drop the ${item.name}. It lies on the ground here.`);
+    void get().persist();
   },
 
   useInventoryItem(itemName) {

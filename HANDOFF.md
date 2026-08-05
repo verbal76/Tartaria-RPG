@@ -923,9 +923,41 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.33**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.34**; ledger in `VERSION.md`.
 
-- **GROUP SELL — HOLD TO PICK, TAP TO ADD, SELL THE LOT (2026-08-05, latest).
+- **THE INVENTORY LEARNS THE SAME GRIP (2026-08-05, latest). BOTH LINES.**
+  golem OTA-1100 / HAL OTA-1123. Owner, after the group sell: "yes wire
+  drop, fusable select and scrap the same way." The point is the
+  SAMENESS — one gesture, one meaning, wherever you are: HOLD a row to
+  start a group, TAP to add or remove, act on the lot.
+  (1) **GROUP ACTIONS: DROP, SCRAP, ♡ RESERVE, ♥ RELEASE.** Each button
+  appears only when the SELECTION can take that action, counted by the
+  same predicate the action uses. When nothing can act, the bar says why
+  rather than going blank.
+  (2) **ELIGIBILITY MIRRORS THE SINGLE-ITEM PATHS EXACTLY.** Drop skips
+  worn and quest-bound rows. Scrap ALLOWS worn gear, because scrap
+  auto-unequips rather than refuses — excluding it here would be a
+  stricter, *different* rule. Reserve / release route through the golem
+  OTA-1097 bulk action, not a second path.
+  (3) **⚠ THE CONFIRM NAMES SCRAP'S SILENT AUTO-UNEQUIP.** At one item
+  that is a kindness; at group scale, unsaid, it strips your kit because
+  you ticked a row you forgot you were wearing.
+  (4) **⚠ DROP IS INSTANCE-EXACT — AND THE FIRST FIX WAS WRONG.** The id
+  was threaded through `submitPlayerAction('drop <id>')` because the drop
+  verb also matches on id. It passed a probe with id `bbb`, then failed
+  on `trinket_junk`: the id has to survive the intent PARSER to arrive as
+  `parsed.target`, so resolution depended on whether it happened to look
+  like a word — a coincidence, not a mechanism. The drop BODY moved into
+  a new `dropInventoryInstance` store action and BOTH entry points call
+  it, so there is exactly ONE implementation of dropping.
+  (5) **THE FUSABLE LONG-PRESS HATCH IS GONE, ON PURPOSE.** One gesture
+  has to mean one thing on a screen. The per-unit "Save 1 for fusion" it
+  reached is still there — switch off the FUSABLE axis and tap — and the
+  banner now says so. Two source locks RETARGETED, not deleted. Suite
+  ota1100InventoryGroup (15), including a live-store test that drops the
+  ticked copy of two same-name rows.
+
+- **GROUP SELL — HOLD TO PICK, TAP TO ADD, SELL THE LOT (2026-08-05).
   BOTH LINES.** golem OTA-1099 / HAL OTA-1122. Owner: "if I want to have
   a hold to start multiple select so I can hold on an item and it gets a
   check mark then I tap to add others to that group and sell a group
