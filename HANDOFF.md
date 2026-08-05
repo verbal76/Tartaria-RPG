@@ -923,9 +923,44 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.31**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.32**; ledger in `VERSION.md`.
 
-- **THE FUSABLE VIEW BECOMES A SELECTION SURFACE (2026-08-05, latest).
+- **⚠ THE TALK TRANSCRIPT WAS EMPTY, AND IT WAS MY BUG (2026-08-05, latest).
+  BOTH LINES.** golem OTA-1098 / HAL OTA-1121. Owner, on the conversation
+  view: "I can talk and they can answer, but none of the text is in the
+  popup window, it's still in the exploration window."
+  (1) **ROOT CAUSE — a trap this codebase already documents.** The view
+  marked where a conversation begins with an INDEX
+  (`startedAtLogLen = gameLog.length`) and rendered `gameLog.slice(that)`.
+  But `gameLog` is `.slice(-MAX_LOG_IN_MEMORY)`d on EVERY append, so at
+  500 entries the array stops growing and every existing index shifts
+  DOWN by one per new line. A mark of 500 then sliced past the end
+  forever: the transcript rendered empty and every reply stayed in the
+  exploration feed behind the sheet — precisely the bug the view was
+  built to fix. It only bites once the buffer is full, which is to say in
+  long sessions, which is to say in real ones — and is why a fresh-game
+  test passed it. The OTA-1078 comment on `_playerVisibleLogCount` states
+  this outright and I used a length as a mark anyway. **FIX:**
+  `startedAtTs` is a TIMESTAMP. Trimming drops old entries; it never
+  rewrites the ones that remain, so a ts mark cannot slide. The
+  transcript is `gameLog.filter(e => e.ts >= startedAtTs)`, and
+  appendLog's conversation-boundary merge guard compares timestamps for
+  the same reason. A new test drives the log past its cap and asserts the
+  window still fills — and asserts the old index mark would have found
+  nothing there.
+  (2) **REPAIR ALL.** Owner: "let's also add a select all to the repair
+  tab." Repair has no deferred step — the action IS the repair — so a
+  select-all with nothing to press afterwards would be two taps where
+  there is one job. REPAIR ALL READY mends every row the current view
+  lists as ready, in display order, so on the default EQUIPPED axis worn
+  gear is mended first (which decides who gets the materials when they
+  run short). It acts on the FILTERED view, and that is what makes it a
+  selection: search "boot", tap REPAIR ALL, only boots are mended. It
+  calls the SAME single-row action per item rather than growing a second
+  repair path, so cost, substitutions and eligibility can never disagree
+  between one tap and twelve. Hidden entirely when nothing is ready.
+
+- **THE FUSABLE VIEW BECOMES A SELECTION SURFACE (2026-08-05).
   BOTH LINES.** golem OTA-1097 / HAL OTA-1120. Owner: "we also need a
   select all button on the category headers in inventory when we select
   sort by fusable so you can select a whole category. and if you tap on

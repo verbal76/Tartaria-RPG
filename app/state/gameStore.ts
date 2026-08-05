@@ -5884,11 +5884,24 @@ interface GameStore {
         /** OTA-1090 — teaser taps THIS conversation; rotates the deflection. */
         teaserTaps: number;
         /** OTA-1095 — where this conversation begins in `gameLog`. The
-         *  conversation view renders `gameLog.slice(startedAtLogLen)` as its own
-         *  transcript, so the replies are readable INSIDE the sheet instead of
-         *  behind it. The log stays the single record of truth — nothing is
-         *  duplicated into a second store of conversation lines. */
-        startedAtLogLen: number;
+         *  conversation view renders `gameLog.filter(e => e.ts >= startedAtTs)`
+         *  as its own transcript, so the replies are readable INSIDE the sheet
+         *  instead of behind it. The log stays the single record of truth —
+         *  nothing is duplicated into a second store of conversation lines.
+         *
+         *  ⚠ OTA-1098 — this is a TIMESTAMP, and it must stay one. OTA-1095
+         *  shipped it as an INDEX (`startedAtLogLen = gameLog.length`), which is
+         *  wrong the moment the buffer reaches its cap: `gameLog` is
+         *  `.slice(-MAX_LOG_IN_MEMORY)`d on every append, so at 500 entries the
+         *  array stops growing and every existing index shifts DOWN by one per
+         *  line. A mark of 500 then sliced past the end forever and the
+         *  transcript rendered empty in exactly the long sessions the feature
+         *  was built for. The OTA-1055 comment on `_playerVisibleLogCount` says
+         *  this in as many words — "gameLog.length cannot measure how much has
+         *  happened once the buffer sits at its cap" — and I used it as a mark
+         *  anyway. A ts is immune: trimming drops old entries, it never
+         *  rewrites the ones that remain. */
+        startedAtTs: number;
       }
     | null;
   /** Open a conversation with the named person in the current scene. */
@@ -6340,7 +6353,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       lockedCount, regard: ctx.regard, teaserTaps: 0,
       // OTA-1095 — the high-water mark of the feed at the moment the
       // conversation opens. Everything after it belongs to this exchange.
-      startedAtLogLen: get().gameLog.length,
+      startedAtTs: Date.now(),
     } });
     // OTA-1063 — ONE EXCHANGE AHEAD. Fired at the moment the topic list opens,
     // which is the only place in this feature where there is time to spend: the
@@ -8029,15 +8042,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         (meta as { storyBeat?: boolean } | undefined)?.storyBeat !== true &&
         (lastEntry.meta as { storyBeat?: boolean } | undefined)?.storyBeat !== true &&
         // OTA-1095 — NEVER weld a conversation line onto an entry that predates
-        // the conversation. The talk view renders `gameLog.slice(startedAtLogLen)`
-        // as its transcript, so a first reply merged backwards into the arrival
-        // narration would land OUTSIDE the window and the player would watch
-        // their opening question get no answer — the exact failure this OTA
-        // exists to end, arriving through the debounce instead of the layout.
-        // Merging WITHIN the conversation is still fine and still groups.
-        // (`state.gameLog.length` is the count BEFORE this append, so lastEntry
-        // sits at length-1 and predates the talk exactly when length <= start.)
-        !(state.pendingTalk != null && state.gameLog.length <= state.pendingTalk.startedAtLogLen);
+        // the conversation. The talk view renders the entries at or after
+        // `startedAtTs` as its transcript, so a first reply merged backwards
+        // into the arrival narration would land OUTSIDE the window and the
+        // player would watch their opening question get no answer — the exact
+        // failure that OTA exists to end, arriving through the debounce instead
+        // of the layout. Merging WITHIN the conversation is still fine.
+        // OTA-1098 — compares TIMESTAMPS, not indices, for the same reason the
+        // transcript does: gameLog is trimmed to MAX_LOG_IN_MEMORY on every
+        // append, so an index taken at open time silently slides off.
+        !(state.pendingTalk != null && lastEntry.ts < state.pendingTalk.startedAtTs);
       if (canMerge) {
         const merged = { ...lastEntry, text: `${lastEntry.text}\n\n${text}`, ts: entry.ts };
         const mergedLog = [...state.gameLog.slice(0, -1), merged].slice(-MAX_LOG_IN_MEMORY);

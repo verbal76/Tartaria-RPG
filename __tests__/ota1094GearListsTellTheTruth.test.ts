@@ -157,6 +157,21 @@ describe('OTA-1094 #3 — source locks on the lists that must not regress', () =
     expect(src).not.toContain('if (a.worn !== b.worn) return a.worn ? -1 : 1;\n      switch');
   });
 
+  // OTA-1098 — owner: "let's also add a select all to the repair tab." Repair has
+  // no deferred step (the action IS the repair), so select-all collapses to
+  // repair-all; the SEARCH BOX is what makes it a selection.
+  it('REPAIR ALL acts on the FILTERED view, in display order, and only on READY rows', () => {
+    const src = read('app/screens/CraftingScreen.tsx');
+    // repairableView, not repairable — so searching narrows what the button mends.
+    expect(src).toContain('() => repairableView.filter((r) => r.available).map((r) => r.item.id),');
+    expect(src).toContain('for (const id of repairReadyInView) repairInventoryItem(id);');
+    // It reuses the single-row action rather than growing a second repair path
+    // that could disagree about cost, substitutions, or eligibility.
+    expect(src).not.toMatch(/consumeIngredientsList[\s\S]{0,200}repairAllReady/);
+    // Hidden when there is nothing to do, rather than sitting there dead.
+    expect(src).toContain('{repairReadyInView.length > 0 && (');
+  });
+
   it('the ★ worn marker still shows on EVERY axis, so gear stays findable after a re-sort', () => {
     const src = read('app/screens/CraftingScreen.tsx');
     // Rendered off r.worn, never off the active sort key.
