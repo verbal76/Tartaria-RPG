@@ -923,9 +923,52 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.35**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.36**; ledger in `VERSION.md`.
 
-- **THE GROUP BAR TAKES THE TAB ROW'S PLACE AND HOLDS IT (2026-08-05, latest).
+- **THE REPAIR TAB LEARNS THE GRIP, AND LEARNS TO COUNT (2026-08-05, latest).
+  BOTH LINES.** golem OTA-1102 / HAL OTA-1125. Owner: "I thought we were
+  going to do the same tap and hold to multiselct for repair too. it will
+  have to take into account the items needed for each item you sent and
+  dim make items in selectable if the items you selected consume the items
+  needed." The first sentence is OTA-1099/1100's gesture again — hold a row
+  to start a group, tap to add or remove, act on the lot — and the sameness
+  is the point. The second is what makes REPAIR structurally different from
+  SELL and DROP: those groups are independent (selling a sword does not make
+  the axe unsellable), but repairs all draw from ONE pile, so every pick
+  changes what the next pick can afford.
+  (1) **THE RUNNING BUDGET.** `repairPlan` walks the selection IN ORDER and
+  SIMULATES the spend using the engine's own functions —
+  `missingIngredientsList` to ask "can I still afford this?",
+  `consumeIngredientsList` to spend it. Both are substitution-aware (Cloth
+  Scrap standing in for Patched Cloth, and so on), so the dimming matches to
+  the unit what the repairs will actually cost. Hand-rolled cost arithmetic
+  would drift from the substitution rules the moment anyone touched them,
+  and the drift would surface as a button that lies. First ticked, first
+  served — the same order the repairs then run in.
+  (2) **THE DIMMING SAYS WHY, AND SAYS THE RIGHT WHY.** A row the budget can
+  no longer pay for is dimmed, un-tappable, and carries "The pieces you
+  already picked are spending the materials this needs." A row that was
+  never affordable is blocked too — but it keeps its existing "Missing:"
+  line, because telling that player the group ate their cloth would be a
+  lie. `groupStarved = groupBlocked && r.available` is that distinction.
+  (3) **THE BAR TAKES REPAIR ALL'S SLOT** (the 1101 rule applied here): it
+  sits outside the ScrollView so it cannot scroll away while you tick rows
+  further down, carries the running bill (`Costs: 3× Scrap Metal, …`), and
+  REPAIR ALL is not rendered while a group is open.
+  (4) **THE CONFIRM NAMES THE SKIPS.** Stock can shift under a group — a
+  craft in the next tab, a repair that resolved first — so a picked piece
+  the budget cannot pay for is listed under "Not enough materials for: …
+  These stay damaged." A group that mends six of the seven pieces you picked
+  without saying which one it skipped is the exact bulk-action failure this
+  whole run has been written against.
+  The group calls `repairInventoryItem` per piece, so there is no second
+  repair path that could disagree about cost, substitutions, or eligibility.
+  New suite `ota1102RepairGroup` (source locks plus direct exercises of the
+  simulate/spend pair, including the substitution agreement check). One
+  OTA-1098 lock RETARGETED — REPAIR ALL's `&&` became the middle arm of a
+  ternary when the bar took its slot; the condition it guards is unchanged.
+
+- **THE GROUP BAR TAKES THE TAB ROW'S PLACE AND HOLDS IT (2026-08-05).
   BOTH LINES.** golem OTA-1101 / HAL OTA-1124. Owner: "the new line that
   says sell group needs to stay anchored at the top and replace the buy
   sell buttons until, you either sell the group or cancel the group."

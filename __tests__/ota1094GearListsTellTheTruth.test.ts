@@ -169,7 +169,12 @@ describe('OTA-1094 #3 — source locks on the lists that must not regress', () =
     // that could disagree about cost, substitutions, or eligibility.
     expect(src).not.toMatch(/consumeIngredientsList[\s\S]{0,200}repairAllReady/);
     // Hidden when there is nothing to do, rather than sitting there dead.
-    expect(src).toContain('{repairReadyInView.length > 0 && (');
+    // OTA-1102 — RETARGETED. The `&&` became the middle arm of a ternary when
+    // the group bar took this slot: `{repairSelectMode ? (bar) : readyInView > 0
+    // ? (REPAIR ALL) : null}`. The guarded condition is unchanged — REPAIR ALL
+    // still only exists when there is something ready to mend.
+    expect(src).toContain(') : repairReadyInView.length > 0 ? (');
+    expect(src).toMatch(/repairReadyInView\.length > 0 \? \([\s\S]{0,600}REPAIR ALL READY[\s\S]{0,400}\) : null\}/);
   });
 
   it('the ★ worn marker still shows on EVERY axis, so gear stays findable after a re-sort', () => {
