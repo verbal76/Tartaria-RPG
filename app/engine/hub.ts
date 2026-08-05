@@ -91,6 +91,14 @@ interface FactionRoomOverride {
   name?: string;
   shortName?: string;
   description?: string;
+  /** OTA-1126 — whether THIS faction's skin of the room stands under open
+   *  sky. The weather engine's open-air default is keyed on the base hub
+   *  graph (gate / square / culvert are Reclaimer courtyards), but a
+   *  faction re-skin can move the same room indoors: the Architects' gate
+   *  is "a clerical office with filing cabinets", and a device log showed
+   *  Aetheric arcs biting the player inside it. Omitted = fall back to
+   *  the base graph's call. */
+  open_air?: boolean;
 }
 interface FactionVariantsFile {
   factions: Record<string, Record<string, FactionRoomOverride>>;
@@ -116,6 +124,22 @@ export function hubRoomFor(
     shortName: override.shortName ?? base.shortName,
     description: override.description ?? base.description,
   };
+}
+
+/** OTA-1126 — is this hub room open to the sky for THIS faction's skin?
+ *  `fallback` is the base hub graph's call (the gameStore's open-air room
+ *  set); a faction variant that declares `open_air` overrides it in either
+ *  direction. The weather tick is the consumer: a Conspiracy "gate" is a
+ *  clerical office and must not take Aetheric arcs, while a faction that
+ *  re-skins an interior room into a courtyard would become exposed. */
+export function hubRoomOpenAir(
+  roomId: string | null | undefined,
+  factionId: string | null | undefined,
+  fallback: boolean,
+): boolean {
+  if (!roomId) return fallback;
+  const override = factionId ? VARIANTS.factions?.[factionId]?.[roomId] : undefined;
+  return override?.open_air ?? fallback;
 }
 
 /** Default entry-room id for the hub — the first room in the rooms[]

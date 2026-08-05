@@ -923,9 +923,57 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.36**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.37**; ledger in `VERSION.md`.
 
-- **THE REPAIR TAB LEARNS THE GRIP, AND LEARNS TO COUNT (2026-08-05, latest).
+- **DEVICE-LOG TRIAGE — THE ECHO THAT PAID FOREVER, THE ROOF THAT WASN'T,
+  AND THE ARC THE FALL ERASED (2026-08-05, latest). BOTH LINES.** HAL
+  OTA-1126 / golem OTA-1103. Three defects from one APK-293 playtest log,
+  each reproduced in the log itself.
+  (1) **⚠ ECHO-HOOK FARM (exploit).** OTA-075's cross-room echo plants a
+  thread referencing the player's most recent consumed investigation — and
+  nothing marked the discovery as used, so `findReferenceableInvestigation`
+  re-picked the SAME most-recent entry in every peaceful scene (15% roll per
+  scene). The log shows the Giant Bone Longbow thread completing TWICE in 15
+  seconds — +12 TC, rations and a Rare each pass, repeatable forever by
+  walking rooms. Fix: a memory surfaces ONCE. `InvestigationEntry.echoed` is
+  stamped AT PLANT TIME (stamping at resolve would let an ignored hook
+  re-roll room after room), the scan skips echoed entries and now returns
+  `{ entry, roomKey }` so the store can stamp the source room. Older
+  un-echoed discoveries get their turn; when every memory is spent the scan
+  returns null.
+  (2) **THE ROOF FOLLOWS THE FACTION SKIN.** OTA-1003's "a roof is a roof"
+  exempts the base hub graph's open-air rooms (gate / square / culvert —
+  Reclaimer courtyards). A faction variant can move those rooms indoors: the
+  Architects' gate is "a clerical office with filing cabinets", and the log
+  shows Aetheric arcs biting the player inside it (−2/−2/−3 HP). Every
+  faction variant of `outpost_gate` + `outpost_central` now declares
+  `open_air` judged from its own description (the Monarchs' flagstone court
+  keeps the sky; the Order's vestibule does not), `hubRoomOpenAir()` in
+  `engine/hub.ts` consults the declaration with the base set as fallback,
+  and the weather tick routes through it. A sweep test requires the
+  declaration on every variant so a future skin can't silently inherit the
+  wrong sky.
+  (3) **THE FALL READS HP LIVE.** The climb-fall computed new HP from the
+  `player` snapshot captured at the top of the action pipeline — BEFORE the
+  weather tick that runs in the same submit — then wrote the result
+  absolutely. The log: an arc's −3 lands at 14 HP, the fall 71ms later still
+  reads "pre-fall hp=14", and the player ends at 10 where 7 was owed —
+  damage silently erased, and the same race could under-count a death. The
+  fall now reads HP live (`hpAtFall = get().player?.hp ?? player.hp`); the
+  zero-stamina slide and wall-flee paths already read live and are locked so
+  they stay that way.
+  **Logged, NOT fixed here:** first-entry rooms greeting as revisits with
+  inflated counts ("visit 2"/"visit 3" on genuinely first visits — needs a
+  local repro; the same room-key map stores dropped items, so it deserves a
+  real root-cause, not a guess); the Bog Hound that never acted after the
+  Silt Thief died sits inside a truncated span of the log — watch item, not
+  a verdict; a flourish-generated vendor line with subject-verb disagreement
+  ("Tarek the Tinkerer tinker, repair, and craft…") — model-output polish,
+  not a template fix. New suite `ota1126PlaytestTriage`; one OTA-1003 lock
+  RETARGETED (the roof check is faction-aware now; what it guards is
+  unchanged).
+
+- **THE REPAIR TAB LEARNS THE GRIP, AND LEARNS TO COUNT (2026-08-05).
   BOTH LINES.** HAL OTA-1125 / golem OTA-1102. Owner: "I thought we were
   going to do the same tap and hold to multiselct for repair too. it will
   have to take into account the items needed for each item you sent and
