@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.55**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.56**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1142,7 +1142,58 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE CACHED PREFIX (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ THE BANK (2026-08-05, latest). BOTH LINES.**
+  HAL OTA-1145 / golem OTA-1122. **Step two of the LLM headroom track** (step one was
+  the cached prefix; **step three, homework slots, is still open**).
+  The economics of an ambient musing were upside down. It is generated **on
+  demand**, takes 8–16 seconds, and is *then* checked against the world it was
+  composed for. The OTA-1130 telemetry says **two of three came back unusable**
+  — ~16.6 seconds of model time for lines nobody read — and the single biggest
+  killer is `stale`: the player kept playing while the model wrote, so by the
+  time the line existed it no longer belonged to the moment.
+  **⚠ THAT IS A RACE WE WERE NEVER GOING TO WIN BY GENERATING FASTER.**
+  So stop racing. A musing is **UNPROMPTED by construction** —
+  `AMBIENT_INSTRUCTION` forbids it from reacting to the last action — which is
+  exactly the property that makes it pre-generatable. Write them when the world
+  is standing still; spend them when it isn't.
+  **TWO SOURCES OF STOCK:**
+  · **REST.** The player has explicitly chosen to pass time, the world is
+    standing still by definition, and the shared native-ML lock is as free as it
+    ever gets. Fired **after** the rest resolves (so a slow generation never
+    delays recovery) and **before** the ambush spawn (so a fight leaves the bank
+    untouched rather than poisoning it with lines stamped mid-combat).
+  · **⚠ STALE LINES, WHICH ARE NOT WASTED LINES.** `stale` almost always means
+    *"you walked somewhere else"*, and the line is still perfectly good **for the
+    place it was written about**. Banked against its own stamp, walking back into
+    that room spends it instantly instead of paying for it twice. **The discard
+    that was the headline waste becomes the stock.**
+  **SPENDING IS FREE**, so the withdraw sits **above** the model-readiness and
+  cooldown gates — the bank works while Qwen is reloading, and a line that costs
+  nothing must not be rationed by a cooldown that exists to ration
+  *generations*. It stays **below** the combat and tutorial muzzles, which are
+  about whether a musing is wanted at all.
+  **⚠ VALIDITY IS `ambientStaleReason`, UNCHANGED.** The same five checks the
+  live path already ran, asked at **spend** time instead of at **finish** time.
+  That is the whole trick: **a banked line cannot go stale between being wanted
+  and being spoken, because there is no gap.** Plus the near-duplicate check,
+  which matters more here — a banked line may have sat through a dozen other
+  Arbiter lines since it was written.
+  Bank is session-scoped (deliberately not persisted — a musing is worth
+  seconds, not a save migration), capped at **3**, oldest-out, no duplicates.
+  **⚠ A banked line is DEFERRED work, not WASTED work**, so it no longer counts
+  against `qwenWasteTotals`. That number decides whether a job is worth keeping
+  at all, and it must not indict the fix; the fill path still reports its own
+  misses, so a rest that generated nothing stays visible.
+  New suite `ota1145TheBank` (16 tests), driving the real deposit/withdraw pair
+  through test seams rather than a mocked model. One OTA-1130 assertion
+  retargeted — the discard condition gained its single exclusion.
+  **⚠ WHAT TO WATCH:** `arbiter: ambient ✓ 0ms (banked, N left)` in the debug
+  channel is a musing that cost nothing, and `stale:…→banked` is one that used
+  to be thrown away. If the log shows plenty of `→banked` and no `0ms`, the
+  bank is filling and never matching — that would mean the stamp is too strict
+  in practice, and the fix is the stamp, not the bank.
+
+- **⚠⚠ THE CACHED PREFIX (2026-08-05). BOTH LINES.**
   HAL OTA-1144 / golem OTA-1121. **The first real win of the LLM headroom track, and
   it costs nothing** — no new generation, no new model, no content removed.
   **⚠ OTA-1131 MEASURED PREFIX REUSE AT EXACTLY ZERO** and recorded it as *"the
