@@ -167,7 +167,7 @@ import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGrac
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
-import { setQwenTelemetrySink, qwenCallCount, qwenTelemetrySummary } from '../ai/generation/qwenTelemetry';
+import { setQwenTelemetrySink, setQwenDiscardSink, noteQwenDiscarded, qwenCallCount, qwenTelemetrySummary } from '../ai/generation/qwenTelemetry';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
 import {
   LOCATION_TO_MACRO,
@@ -4385,6 +4385,7 @@ async function prefetchFlourish(
     // it was composed for a conversation that is over.
     const stillTalking = get().pendingTalk?.npcId === npcId;
     if (line && stillTalking) flourishSlot = { npcId, line };
+    else noteQwenDiscarded(line ? 'flourish:stale-walked-away' : 'flourish:empty');
     get().appendLog(
       'debug',
       `flourish: ${line ? (stillTalking ? '✓' : 'stale') : '∅'} ${Date.now() - t0}ms`,
@@ -6569,10 +6570,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // a throwing sink can never break a generation (the recorder swallows).
     setQwenTelemetrySink((r) => {
       const wait = r.waitMs >= 250 ? ` wait ${r.waitMs}ms` : '';
-      get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait} (${r.chars}ch)`);
+      // OTA-1130 — the read/write split llama.cpp hands us. `read` is prefill
+      // (ingesting the prompt) and `write` is generation: the single most
+      // useful pair of numbers in this log, because they point at completely
+      // different fixes (trim the prompt vs cut the token budget).
+      const split = r.prefillMs != null || r.decodeMs != null
+        ? ` read ${r.prefillMs ?? '?'}ms/write ${r.decodeMs ?? '?'}ms`
+        : '';
+      const sizes = r.promptTokens != null ? ` in ${r.promptTokens}t→out ${r.outTokens ?? '?'}t` : '';
+      // A non-zero cache means llama.cpp reused prompt tokens instead of
+      // re-reading them. Persistent ZERO across a session is the signal that a
+      // stable prompt PREFIX would make repeat calls far cheaper.
+      const cache = r.cachedTokens ? ` cache ${r.cachedTokens}t` : '';
+      const stop = r.stop === 'limit' ? ' HIT-CAP' : '';
+      get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait}${split}${sizes}${cache}${stop} (${r.chars}ch)`);
       if (qwenCallCount() % 10 === 0) {
         get().appendLog('debug', `qwen⏱ stats — ${qwenTelemetrySummary()}`);
       }
+    });
+    // OTA-1130 — wasted work, named as it happens. A discarded line cost the
+    // same CPU as a delivered one; until this existed the stats called it a
+    // clean success.
+    setQwenDiscardSink((job, reason, ms) => {
+      get().appendLog('debug', `qwen⏱ ✂ DISCARDED ${job} after ${ms}ms — ${reason}`);
     });
     // One-shot migration from the v1 single-slot save, if present.
     await migrateLegacySlotIfPresent();
@@ -38148,7 +38168,7 @@ async function narrateViaArbiter(
       },
       { maxNewTokens: maxTokens, job: `narration:${intent}` },
     );
-    if (myEpoch !== arbiterGenerationEpoch) return; // cancelled mid-flight
+    if (myEpoch !== arbiterGenerationEpoch) { noteQwenDiscarded('cancelled:player-acted-again'); return; }
     // Trim to the last complete sentence so we never display a partial
     // ending like "...each stroke echoing in the". Falls back to the raw
     // text only when nothing terminal-punctuated is present, then to the
@@ -38197,6 +38217,8 @@ async function narrateViaArbiter(
     // case where the cleaned model output was empty and the template carried it.
     const usedFallback = finalText === trimmed;
     get().appendLog('arbiter', finalText);
+    if (repDup) noteQwenDiscarded('near-duplicate→template');
+    else if (usedFallback) noteQwenDiscarded('empty→template');
     get().appendLog('debug', `arbiter: qwen ✓ ${Date.now() - t0}ms (intent=${intent}${repDup ? ', near-dup→template' : usedFallback ? ', empty→template' : ''})`);
   } catch {
     if (myEpoch === arbiterGenerationEpoch) {
@@ -38396,6 +38418,7 @@ async function maybeGenerateAmbientArbiter(
       : ambientUsable ? '✓'
       : finalText ? 'dup-dropped'
       : '∅';
+    if (!ambientUsable) noteQwenDiscarded(`ambient:${ambientMark}`);
     get().appendLog('debug', `arbiter: ambient ${ambientMark} ${Date.now() - t0}ms`);
     // OTA-1057 — WHY it was empty. The owner's logs show ∅ on every ambient
     // attempt across four builds, including one that carries the OTA-1054

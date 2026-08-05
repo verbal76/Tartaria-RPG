@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.40';
+export const DISPLAY_VERSION = '4.29.41';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20986,6 +20986,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1130 — THE NUMBERS THE NATIVE LAYER WAS ALREADY COMPUTING, AND THE
+// WORK NOBODY EVER SAW. Step 3 of the LLM-headroom track. OTA-1129 proved
+// prefill dominates by INFERRING it from wall-clock; llama.cpp returns a
+// `timings` object on every completion with the exact split, and the runtime
+// was discarding the whole object. Five things the log could not answer:
+//   1. READ vs WRITE, MEASURED — prompt_ms / predicted_ms per call. The two
+//      numbers point at completely different fixes (trim the prompt vs cut
+//      the token budget), and until now telling them apart took a
+//      code-reading session.
+//   2. PROMPT SIZE in the model's own tokens (tokens_evaluated), so the next
+//      thing worth trimming names itself.
+//   3. ⚠ WASTED WORK. A discarded line costs exactly what a delivered one
+//      costs, and every one of them recorded as a clean success: narration
+//      cancelled because the player acted again, ambient filtered as a
+//      near-duplicate or a wrong-shaped opener, a flourish that arrived after
+//      they walked away. `noteQwenDiscarded(reason)` attributes to the last
+//      call — safe because the native-ML lock (arb159) guarantees generations
+//      never overlap — and the rollup ends with "WASTED n calls / Ns". This is
+//      the number that decides whether a job is worth keeping, and the only
+//      honest way to price the background work the track is about to add.
+//   4. STOP REASON — did it end naturally (stopped_eos) or slam into the
+//      token cap mid-sentence (stopped_limit)? Hitting the cap means paying
+//      full price AND getting truncated prose; the log now flags HIT-CAP.
+//   5. CACHE REUSE (tokens_cached). A persistent ZERO means every call
+//      re-reads its whole prompt from scratch — and would make a stable
+//      prompt PREFIX (persona/voice-rules first, volatile scene last) the
+//      next 1129-sized win. The metric decides it instead of a guess.
+// All optional-chained: an older llama.rn or the jest mock returns no timings
+// and records cleanly without them. Suite ota1130DeepTelemetry.
+// DISPLAY_VERSION 4.29.41.
+//
 // OTA-1129 — ⚠ THE STALL WAS THE PROMPT, NOT THE MODEL. OTA-1128's telemetry
 // shipped and the first device log answered the 29-second question two OTAs
 // had been deferring — and CONTRADICTED the assumption behind the deferral:
@@ -21660,7 +21691,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1129-prompt-weight';
+export const OTA_BUILD_ID = '2026-08-05-1130-deep-telemetry';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1129-prompt-weight';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1128-qwen-telemetry';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1127-first-visit-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1126-echo-farm-roof-fall';
