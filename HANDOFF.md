@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.57**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.58**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1142,7 +1142,62 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ HOMEWORK YIELDS (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ THE AC LEDGER, THE VOICE SLIP, AND THE CHIP THAT LIED (2026-08-05, latest). BOTH LINES.**
+  HAL OTA-1147 / golem OTA-1124. Three items off the owner's open list. **Two get
+  MEASURED rather than guessed at a third time; one is fixed outright.**
+  **⚠ 1. AC 16 → AC 10, TWICE NOW.** Two device logs in a row show a six-point
+  drop with no line saying why — the second with a **~2m40s inventory gap** in
+  the middle, which is room for anything at all. The suspect is the group
+  unequip bar. **A suspect is not a cause**, and two timestamps four minutes
+  apart are not evidence of one. So the ONE place the number is computed now
+  prints its **whole derivation** on any shift of 2 or more: race/base, gear,
+  title, the trim, status — and the full worn list **including empty slots**,
+  because *"the chest slot is empty"* is the finding, and a list that silently
+  omits what is missing cannot show it. Threshold 2 because ±1 is ordinary and
+  a noisy ledger gets ignored by eye. Debug channel only, no behaviour change.
+  **OTA-1132 is the precedent:** instrument first, let the log name the culprit,
+  and only then write a line of remedy.
+  **⚠ 2. THE AMBIENT VOICE SLIPPED TWICE IN ONE LINE** — first person (*"my
+  eyes"*) and invented scenery (*"ancient trees"* in the Obsidian Pillars, which
+  has none).
+  · The **first-person half is FIXED, narrowly**: a filter mirroring the
+    existing `they`-opener that tests the **OPENER only**. The Arbiter is a
+    companion and may certainly say "I" inside a line addressed to the player;
+    being the SUBJECT is what stops it being a reflection on the player.
+    **OTA-1054 is why this is narrow** — its broader version dropped every
+    sentence starting with "You", which the voice rules ORDER the model to
+    write, and silently ate the entire feature for four builds.
+  · The **scenery half is deliberately NOT fixed.** The off-canon guard covers
+    named ENTITIES; policing generic scenery needs a per-biome whitelist of what
+    may exist, which is a **content system, not a filter** — and guessing at one
+    is exactly how OTA-1054 happened. What ships instead is **evidence**: an
+    accepted ambient line now logs its raw text. OTA-1057 added that for
+    FAILURES and it has paid for itself since, but a line that passes every
+    filter and is still wrong left **no trace at all**, so the only record was
+    the owner noticing and typing it out by hand.
+  **⚠ 3. THE INVESTIGATE CHIP THAT LIED — and this one needed no log.** The
+  watch list carried *"tap again → 2 active items"* as unconfirmed, noting the
+  detail needed was **whether the player was climbed up**. It was reproducible
+  from a cold read: the **pinned surface chip** (ground / mud / floor) is built
+  separately from the scene nouns and **never received the elevation gate**
+  OTA-166 gave the chips or OTA-953 gave the count. So on a perch every
+  reachable noun greys and the ground chip alone stays bright — badge still
+  reading active — while the engine answers every tap with *"You're up on the
+  {perch}. The ground is down there. Climb down to reach it."* **OTA-970
+  describes the identical thing from the other side:** *"eight identical salvage
+  attempts from atop a shelf … the player retried into dead silence, which reads
+  as a hang."* **Both sides fixed** — the chip greys AND the count drops it,
+  because fixing one alone just moves the lie from the modal to the badge. A
+  missing scanner still wins the label, since climbing down will not conjure one.
+  New suite `ota1147AcLedgerAndVoice` (19 tests).
+  **⚠ THE PATTERN, AGAIN:** two of these three were parked as *"needs a device
+  log"* and neither actually did. The chip was reproducible from reading the
+  code; the AC one needed **instrumentation, not a repro**. Before parking an
+  item as unreproducible, ask whether it can be reproduced in a test or answered
+  by a measurement — the Bog Hound taught this yesterday, and it held twice more
+  today.
+
+- **⚠⚠ HOMEWORK YIELDS (2026-08-05). BOTH LINES.**
   HAL OTA-1146 / golem OTA-1123. **The harness step three of the headroom track will
   run on** — and the answer to the owner's question about it: *"if done right,
   it should cost us [no] time correct?"*
