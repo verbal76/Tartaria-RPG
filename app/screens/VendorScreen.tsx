@@ -529,11 +529,56 @@ export function VendorScreen() {
         </Text>
       )}
 
+      {/* OTA-1124 — while a group is open the bar TAKES THE TAB ROW'S PLACE and
+          holds it. Owner: "the new line that says sell group needs to stay
+          anchored at the top and replace the buy sell buttons until, you either
+          sell the group or cancel the group."
+          Two things follow from that, and both are the point. It is ANCHORED:
+          the tab row lives outside the ScrollView, so putting the bar here means
+          it cannot scroll away from you while you tick rows further down the
+          list — which is exactly when you most want to see the running total.
+          And it REPLACES: BUY is not a thing you can wander into mid-group, so
+          the only two ways out are the two the bar offers. That is what makes
+          the mode honest instead of something you can leave by accident. */}
+      {sellSelectMode ? (
+        <View style={styles.groupBar}>
+          <View style={styles.groupBarInfo}>
+            <Text style={styles.groupBarCount}>
+              ☑ {selectedRows.length} picked{selectedUnits > selectedRows.length ? ` · ${selectedUnits} units` : ''}
+            </Text>
+            <Text style={styles.groupBarTotal}>+{selectedTotal} TC</Text>
+          </View>
+          <View style={styles.groupBarActions}>
+            <TouchableOpacity
+              onPress={exitSellSelect}
+              style={styles.groupBarCancel}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Cancel the group and go back to selling one at a time"
+            >
+              <Text style={styles.groupBarCancelText}>CANCEL</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setGroupSellConfirm(true)}
+              disabled={selectedRows.length === 0}
+              style={[styles.groupBarSell, selectedRows.length === 0 && styles.groupBarSellOff]}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: selectedRows.length === 0 }}
+              accessibilityLabel={`Sell the group of ${selectedRows.length} for ${selectedTotal} trade coin`}
+            >
+              <Text style={styles.groupBarSellText}>SELL GROUP</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : (
       <View style={styles.tabRow}>
         <TouchableOpacity
           style={[styles.tab, mode === 'buy' && styles.tabActive]}
           // OTA-1122 — leaving the SELL tab ends the group. A selection you can
           // no longer see is a hidden mode waiting to surprise you on the way back.
+          // OTA-1124 — belt-and-braces now: while a group is open this row isn't
+          // even rendered, so BUY is unreachable until the group resolves.
           onPress={() => { exitSellSelect(); setMode('buy'); }}
           activeOpacity={0.7}
           accessibilityRole="button"
@@ -564,6 +609,7 @@ export function VendorScreen() {
           </TouchableOpacity>
         )}
       </View>
+      )}
 
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
         {mode === 'buy' ? (
@@ -741,42 +787,11 @@ export function VendorScreen() {
                 ))}
               </View>
             )}
-            {/* OTA-1122 — the group bar. Only present once you've held a row,
-                so it never sits there as a mode you have to notice and dismiss.
-                Shows the pay-out up front: what a group sells for is the whole
-                reason to build one. */}
-            {sellSelectMode && (
-              <View style={styles.groupBar}>
-                <View style={styles.groupBarInfo}>
-                  <Text style={styles.groupBarCount}>
-                    ☑ {selectedRows.length} picked{selectedUnits > selectedRows.length ? ` · ${selectedUnits} units` : ''}
-                  </Text>
-                  <Text style={styles.groupBarTotal}>+{selectedTotal} TC</Text>
-                </View>
-                <View style={styles.groupBarActions}>
-                  <TouchableOpacity
-                    onPress={exitSellSelect}
-                    style={styles.groupBarCancel}
-                    activeOpacity={0.7}
-                    accessibilityRole="button"
-                    accessibilityLabel="Cancel the group and go back to selling one at a time"
-                  >
-                    <Text style={styles.groupBarCancelText}>CANCEL</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => setGroupSellConfirm(true)}
-                    disabled={selectedRows.length === 0}
-                    style={[styles.groupBarSell, selectedRows.length === 0 && styles.groupBarSellOff]}
-                    activeOpacity={0.7}
-                    accessibilityRole="button"
-                    accessibilityState={{ disabled: selectedRows.length === 0 }}
-                    accessibilityLabel={`Sell the group of ${selectedRows.length} for ${selectedTotal} trade coin`}
-                  >
-                    <Text style={styles.groupBarSellText}>SELL GROUP</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
+            {/* OTA-1124 — the group bar moved OUT of this scrolling list and up
+                into the tab row's slot, where it stays anchored. It used to sit
+                here and scroll away the moment you started ticking rows further
+                down — losing sight of the running total exactly when it starts
+                mattering. */}
             {sellable.length === 0 ? (
               <Text style={styles.empty}>
                 Nothing in your pack worth selling. Equipped gear can't be sold — unequip from the

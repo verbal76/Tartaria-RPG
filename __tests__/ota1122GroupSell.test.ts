@@ -79,10 +79,38 @@ describe('OTA-1122 — hold to pick, tap to add', () => {
     expect(view).toContain("onPress={() => { exitSellSelect(); setMode('buy'); }}");
   });
 
+  // OTA-1124 — RETARGETED. The bar was `{sellSelectMode && (…)}` inside the
+  // scrolling list; it is now `{sellSelectMode ? (bar) : (tabRow)}` in the tab
+  // row's slot. What this test guards — the bar exists only while a group does,
+  // and states the pay-out up front — is unchanged; the placement assertion
+  // moved to the anchoring test below.
   it('the bar only exists while a group does, and states the pay-out up front', () => {
-    expect(view).toContain('{sellSelectMode && (');
+    expect(view).toContain('{sellSelectMode ? (');
     expect(view).toContain('+{selectedTotal} TC');
     expect(view).toContain('SELL GROUP');
+  });
+
+  // OTA-1124 — owner: "the new line that says sell group needs to stay anchored
+  // at the top and replace the buy sell buttons until, you either sell the group
+  // or cancel the group."
+  it('⚠ the bar is ANCHORED above the scroll and REPLACES the BUY/SELL tabs', () => {
+    // Anchoring is structural, not cosmetic: the tab row sits OUTSIDE the
+    // ScrollView, so occupying its slot is what stops the bar scrolling away
+    // while you tick rows further down — exactly when the running total matters.
+    const barAt = view.indexOf('{sellSelectMode ? (');
+    const scrollAt = view.indexOf('<ScrollView style={styles.list}');
+    expect(barAt).toBeGreaterThan(-1);
+    expect(scrollAt).toBeGreaterThan(-1);
+    expect(barAt).toBeLessThan(scrollAt);
+    // It REPLACES rather than stacks — the tab row is the else branch, so BUY is
+    // not even rendered while a group is open. The only two ways out are the two
+    // the bar offers, which is what makes the mode honest.
+    const branch = view.slice(barAt, scrollAt);
+    expect(branch).toContain('SELL GROUP');
+    expect(branch).toMatch(/\) : \(\s*<View style=\{styles\.tabRow\}>/);
+    // …and the bar no longer lives inside the list it used to scroll with.
+    const listBody = view.slice(scrollAt);
+    expect(listBody).not.toContain('SELL GROUP');
   });
 });
 
