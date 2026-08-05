@@ -221,9 +221,14 @@ describe('OTA-1131 — item synthesis stops failing silently at full price', () 
     expect(out).toBeNull();
     // The waste is attributable now — this is the whole point of OTA-1130's
     // accounting, and this call site was missing from it.
+    // RETARGETED BY OTA-1132: the unparseable reason now carries the raw text
+    // and its length, because the next log showed this failing three times out
+    // of three without ever saying WHY. The reporting itself is what this test
+    // guards, so it asserts the call, not the exact string it now builds.
     const src2 = src('app/engine/itemSynthesisQwen.ts');
-    expect(src2).toContain("noteQwenDiscarded('item_synth:unparseable')");
+    expect(src2).toContain('noteQwenDiscarded(`item_synth:unparseable');
     expect(src2).toContain("noteQwenDiscarded('item_synth:rejected-by-clamp')");
+    expect(src2).toContain("noteQwenDiscarded('item_synth:empty')");
   });
 
   it('a plain single-object response is unaffected — no regression on the happy path', async () => {
