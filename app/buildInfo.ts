@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.32';
+export const DISPLAY_VERSION = '4.29.33';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20986,6 +20986,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1122 — GROUP SELL: HOLD TO PICK, TAP TO ADD, SELL THE LOT.
+// Owner: "if I want to have a hold to start multiple select so I can
+// hold on an item and it gets a check mark then I tap to add others to
+// that group and sell a group let's make that happen."
+//   1. THE LONG-PRESS IS THE MODE SWITCH, which is what makes this safe
+//      to add: a plain tap keeps meaning "sell this one" until you have
+//      declared otherwise, so NOTHING changes for a player who never
+//      holds a row. Hold → that row is ticked and the group bar appears;
+//      from then on a tap adds or removes. Emptying the group leaves the
+//      mode (no bar reading "0" with nothing to act on), and leaving the
+//      SELL tab ends it (a selection you cannot see is a hidden mode
+//      waiting to surprise you on the way back).
+//   2. WHOLE STACKS, AND THE TOTAL SAYS SO. A ticked row that reads
+//      "(x5)" sells all five; the bar shows the exact pay-out, priced by
+//      the same `price × quantity` the sale uses. What you agreed to is
+//      what you get.
+//   3. ⚠ ONE NEGOTIATION. OTA-727 made a stack sale train Charisma once.
+//      A group sale is that beat at a larger scale, so the `social` flag
+//      goes to the FIRST unit across the WHOLE group — the counter lives
+//      outside both loops. Reset it per item and selling ten things
+//      together farms ten times the social XP of selling them one at a
+//      time: a brand-new exploit introduced by a convenience feature.
+//   4. ⚠ THE WARNINGS SURVIVE. The real risk of any bulk action is that
+//      it quietly does what one action would have stopped to ask about.
+//      The group confirm itemises every piece with its price and carries
+//      both single-sale callouts: the OTA-178 GATE-LOSS warning (this is
+//      your last way to climb / breathe toxic / …) and the arb120
+//      LOADOUT flag (racked in your bandolier or tool pouch). A group
+//      containing a gate loss tints its confirm button destructive.
+//   5. SELECTION IS DERIVED, NEVER STORED. The picked rows are looked up
+//      in the live sell list every render, so a row that stops being
+//      sellable — sold, dropped, equipped — falls OUT of the group
+//      rather than lingering as a dead id the count still claims. The
+//      group is built from the same `sellable` list as always, so the
+//      equipped-instance and unsellable exclusions cannot drift.
+// New suite ota1122GroupSell (13). DISPLAY_VERSION 4.29.33.
+//
 // OTA-1121 — ⚠ THE TALK TRANSCRIPT WAS EMPTY, AND IT WAS MY BUG.
 // Owner, on the OTA-1118 conversation view: "I can talk and they can
 // answer, but none of the text is in the popup window, it's still in
@@ -21364,7 +21401,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1121-transcript-and-repair-all';
+export const OTA_BUILD_ID = '2026-08-05-1122-group-sell';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1121-transcript-and-repair-all';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1120-fusable-select-mode';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1119-frame-and-axes';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1118-talking-is-its-own-screen';

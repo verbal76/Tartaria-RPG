@@ -923,9 +923,47 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.32**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.33**; ledger in `VERSION.md`.
 
-- **⚠ THE TALK TRANSCRIPT WAS EMPTY, AND IT WAS MY BUG (2026-08-05, latest).
+- **GROUP SELL — HOLD TO PICK, TAP TO ADD, SELL THE LOT (2026-08-05, latest).
+  BOTH LINES.** HAL OTA-1122 / golem OTA-1099. Owner: "if I want to have
+  a hold to start multiple select so I can hold on an item and it gets a
+  check mark then I tap to add others to that group and sell a group
+  let's make that happen."
+  (1) **THE LONG-PRESS IS THE MODE SWITCH**, which is what makes this
+  safe to add: a plain tap keeps meaning "sell this one" until you have
+  declared otherwise, so NOTHING changes for a player who never holds a
+  row. Hold → that row is ticked and the group bar appears; from then on
+  a tap adds or removes. Emptying the group leaves the mode (never a bar
+  reading "0" with nothing to act on), and leaving the SELL tab ends it
+  (a selection you cannot see is a hidden mode waiting to surprise you on
+  the way back).
+  (2) **WHOLE STACKS, AND THE TOTAL SAYS SO.** A ticked row reading
+  "(x5)" sells all five; the bar shows the exact pay-out, priced by the
+  same `price × quantity` the sale uses.
+  (3) **⚠ ONE NEGOTIATION.** OTA-727 made a stack sale train Charisma
+  once. A group sale is that beat at a larger scale, so the `social` flag
+  goes to the FIRST unit across the WHOLE group — the counter lives
+  outside both loops. Reset it per item and selling ten things together
+  farms ten times the social XP of selling them one at a time: a
+  brand-new exploit introduced by a convenience feature. The suite
+  asserts the counter's declaration position, not just its use.
+  (4) **⚠ THE WARNINGS SURVIVE.** The real risk of any bulk action is
+  that it quietly does what one action would have stopped to ask about.
+  The group confirm itemises every piece with its price and carries both
+  single-sale callouts: the OTA-178 GATE-LOSS warning (this is your last
+  way to climb / breathe toxic / …) and the arb120 LOADOUT flag (racked
+  in your bandolier or tool pouch). A group containing a gate loss tints
+  its confirm button destructive.
+  (5) **SELECTION IS DERIVED, NEVER STORED.** The picked rows are looked
+  up in the live sell list every render, so a row that stops being
+  sellable — sold, dropped, equipped — falls OUT of the group rather than
+  lingering as a dead id the count still claims. The group is built from
+  the same `sellable` list as always, so the equipped-instance and
+  unsellable exclusions cannot drift into a parallel rule. Suite
+  ota1122GroupSell (13).
+
+- **⚠ THE TALK TRANSCRIPT WAS EMPTY, AND IT WAS MY BUG (2026-08-05).
   BOTH LINES.** HAL OTA-1121 / golem OTA-1098. Owner, on the OTA-1118
   conversation view: "I can talk and they can answer, but none of the
   text is in the popup window, it's still in the exploration window."
