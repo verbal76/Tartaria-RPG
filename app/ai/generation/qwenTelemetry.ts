@@ -100,6 +100,26 @@ interface JobAggregate {
   /** Calls that reported a cache size at all, so a zero can be shown as a
    *  measured zero rather than as "no data". */
   cacheSamples: number;
+  /** ⚠ OTA-1127 — MS PER PROMPT TOKEN, BEST AND WORST. The owner: "fix the
+   *  tracking information in the log so that we can see more clearly what is
+   *  affecting number one."
+   *
+   *  `reuse` has read 0t in every row of every log, before AND after the
+   *  OTA-1121 prefix reorder — which tells us nothing, because a cache that is
+   *  working and a `cachedTokens` field that is not reported look identical
+   *  through it. The number that CANNOT lie is how long the model took per
+   *  prompt token: a cold read on this device measures ~10-13ms/token, and a
+   *  read that reuses its prefix comes in far under that.
+   *
+   *  Averaging destroys the signal — a job whose first call is cold and second
+   *  is warm averages to something meaningless — so the BEST and WORST are kept
+   *  separately. A job whose best is a fraction of its worst is a job the cache
+   *  is helping. A job where the two are equal is one it is not. */
+  bestMsPerPromptTok: number;
+  worstMsPerPromptTok: number;
+  /** Calls that measured a prefill at all (a preempted or dormant call has no
+   *  honest per-token number and must not drag the best/worst either way). */
+  prefillSamples: number;
   hitLimit: number;
   /** Calls whose text never reached the player (cancelled, filtered, stale). */
   discarded: number;
@@ -122,6 +142,7 @@ function emptyAggregate(): JobAggregate {
     count: 0, totalMs: 0, maxMs: 0, waitMs: 0, maxWaitMs: 0, empty: 0, dormant: 0, preempted: 0, error: 0,
     prefillMs: 0, decodeMs: 0, promptTokens: 0, outTokens: 0, cachedTokens: 0,
     reusedTokens: 0, cacheSamples: 0,
+    bestMsPerPromptTok: Infinity, worstMsPerPromptTok: 0, prefillSamples: 0,
     hitLimit: 0, discarded: 0, discardedMs: 0,
   };
 }
@@ -157,6 +178,15 @@ export function recordQwenCall(r: QwenCallRecord): void {
   if (typeof r.cachedTokens === 'number') {
     agg.cacheSamples += 1;
     agg.reusedTokens += Math.max(0, r.cachedTokens - (r.promptTokens ?? 0) - (r.outTokens ?? 0));
+  }
+  // OTA-1127 — the per-token read cost, kept as a range rather than a mean.
+  // Guarded on a real prefill AND a real prompt size: a preempted call or a
+  // zero-token prompt has no honest number and must not move the range.
+  if (typeof r.prefillMs === 'number' && (r.promptTokens ?? 0) > 0 && r.outcome !== 'preempted') {
+    const per = r.prefillMs / (r.promptTokens ?? 1);
+    agg.bestMsPerPromptTok = Math.min(agg.bestMsPerPromptTok, per);
+    agg.worstMsPerPromptTok = Math.max(agg.worstMsPerPromptTok, per);
+    agg.prefillSamples += 1;
   }
   if (r.stop === 'limit') agg.hitLimit += 1;
   jobs.set(r.job, agg);
@@ -230,6 +260,10 @@ export interface QwenJobStats {
    *  next prefill win rather than a guess. */
   reusedTokens: number;
   cacheSamples: number;
+  /** OTA-1127 — ms per prompt token, best and worst. The honest cache signal. */
+  bestMsPerPromptTok: number;
+  worstMsPerPromptTok: number;
+  prefillSamples: number;
   hitLimit: number;
   discarded: number;
   discardedMs: number;
@@ -256,6 +290,9 @@ export function qwenJobStats(): QwenJobStats[] {
       cachedTokens: a.cachedTokens,
       reusedTokens: a.reusedTokens,
       cacheSamples: a.cacheSamples,
+      bestMsPerPromptTok: a.prefillSamples > 0 ? a.bestMsPerPromptTok : 0,
+      worstMsPerPromptTok: a.worstMsPerPromptTok,
+      prefillSamples: a.prefillSamples,
       hitLimit: a.hitLimit,
       discarded: a.discarded,
       discardedMs: a.discardedMs,
@@ -284,13 +321,20 @@ export function qwenTelemetrySummary(): string {
     // OTA-1108 — reuse, shown as a MEASURED zero when the field was reported.
     // "no cache line" and "the cache saved us nothing" are different findings
     // and the OTA-1107 rollup could not tell them apart.
+    // ⚠ OTA-1127 — `reuse` is kept but demoted, and the per-token RANGE is
+    // what the next log gets read for. Shown as best/worst so a warm call and
+    // a cold one stay visible as two different things instead of averaging
+    // into one number that describes neither.
     const cached = j.cacheSamples > 0 ? ` reuse${j.reusedTokens}t` : '';
+    const perTok = j.prefillSamples > 0
+      ? ` ms/tok ${j.bestMsPerPromptTok.toFixed(1)}-${j.worstMsPerPromptTok.toFixed(1)}`
+      : '';
     const capped = j.hitLimit > 0 ? ` cap${j.hitLimit}` : '';
     // OTA-1123 — its own mark, deliberately NOT inside `bad`: yielding to the
     // player is the feature. ⏸ reads as "paused for you", not as a fault.
     const yielded = j.preempted > 0 ? ` ⏸${j.preempted}` : '';
     const waste = j.discarded > 0 ? ` ✂${j.discarded}/${s(j.discardedMs)}` : '';
-    return `${j.job} n${j.count} avg${s(j.avgMs)} max${s(j.maxMs)}${split}${sizes}${cached}${capped}${wait}${bad}${yielded}${waste}`;
+    return `${j.job} n${j.count} avg${s(j.avgMs)} max${s(j.maxMs)}${split}${sizes}${cached}${perTok}${capped}${wait}${bad}${yielded}${waste}`;
   });
   if (parts.length === 0) return 'no calls yet';
   const w = qwenWasteTotals();

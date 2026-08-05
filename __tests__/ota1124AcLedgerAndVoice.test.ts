@@ -43,6 +43,14 @@
 // but a line that passes every filter and is still wrong left no trace at all,
 // so the only record was the owner noticing and typing it out by hand.
 
+// This suite reads source with `require` and has no `import`, which makes the
+// file a SCRIPT rather than a module — so its top-level consts land in the
+// GLOBAL scope and collide by name with any other source-reading suite that
+// picked the same obvious identifier. `export {}` makes it a module and keeps
+// `SRC` local. (Found by the typecheck ratchet the moment a second suite here
+// also reached for `SRC`; two files, two TS2451s, neither one wrong on its own.)
+export {};
+
 jest.setTimeout(60_000);
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports

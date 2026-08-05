@@ -1129,7 +1129,67 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE FILTER THAT MISSED ITS OWN EXAMPLE (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ THE FIRST HOMEWORK SLOT, AND THE METRIC THAT CAN SETTLE THE CACHING
+  QUESTION (2026-08-05, latest). BOTH LINES.** golem OTA-1127 / HAL OTA-1150.
+  Two numbered changes in one push and one build id — 1126 never reached a
+  device on its own, so no `SUPERSEDED` line carries it.
+
+  **1126 — item descriptions as homework.** OTA-1123 built the harness: a
+  priority below voice, and a running idle job that is **cut short** the moment
+  the player acts. This is its first real consumer. The owner picked the slot:
+
+  > *"our problem is screen real estate. so more just scrolls up and blends in
+  > with the chatter and isnt read. I would go with faster, and only do fancy
+  > bespoke writing on screens that are stationary like conversations or other
+  > writing popup."*
+
+  Item descriptions fit that better than anything else in the game. They land
+  in a **popup the player is holding still and reading**, not in the scrolling
+  feed, and the work is pure **speed** — the synthesis already runs on demand
+  the instant an unknown item is opened, so doing it early changes nothing
+  about what the game *contains*. It only moves a 4–13 s wait out of the way.
+
+  ⚠ **The slot is a scheduler and nothing else.** Prompt, clamps, cache and
+  silent-discard-on-bad-row are the existing path untouched — which is the
+  point, because those are five OTAs of hard-won correctness and a second copy
+  would drift from them invisibly. What is new is **when**: a 5 s tick that
+  fires only when Qwen is ready, nothing is generating, no enemies are up, the
+  tutorial is not scripted, the player is not withholding identity, no synth is
+  already in flight, 30 s have passed since the last homework, and the player
+  has been sitting on a stationary screen for 1.5 s. The pack marks itself a
+  homework window on focus and clears it on blur; `submitPlayerAction` clears
+  it as well, at the **one choke point every action passes through**, so "the
+  player is back" cannot be missed by a screen that forgot to unmark.
+
+  **1127 — ms per prompt token, best and worst.** Owner:
+
+  > *"fix the tracking information in the log so that we can see More clearly
+  > what is affecting number one but until we get the data capture portion of
+  > the log for that specific issue fixed, don't chase it anymore. go after the
+  > big ones."*
+
+  Number one is the prompt cache. OTA-1121 reordered every prompt so the stable
+  half sits first; the next log still read `reuse 0t`, which proves nothing
+  either way, because `reuse` is a field llama.cpp may simply not populate on
+  this path. So the signal is replaced with one that cannot lie about itself:
+  **prefill ms ÷ prompt tokens, kept as a best–worst range per job** rather than
+  a mean. A mean hides exactly the thing being looked for; if caching ever
+  engages, the *best* figure collapses while the worst stays put, and a range
+  shows that on one line. `reuse` is kept but demoted. Preempted rows are
+  excluded — a cut-short call's prefill is not a measurement. **Per the owner's
+  instruction the caching investigation stops here** until a log carries the
+  new range.
+
+  New suite `ota1126ItemDescHomework` (19 tests, including the 1127 block).
+
+  ⚠ **And a ratchet catch worth recording.** Two source-reading suites each
+  declared a top-level `const SRC` and neither had an `import`, so both files
+  were **scripts**, their consts landed in the global scope, and they collided.
+  `export {}` on each makes them modules. Nothing was wrong with either file
+  *on its own*; the defect only existed between them, which is exactly the
+  class of thing a count-based gate catches and review does not.
+
+- **⚠⚠ THE FILTER THAT MISSED ITS OWN EXAMPLE (2026-08-05). BOTH LINES.**
   golem OTA-1125 / HAL OTA-1148. The previous OTA shipped a first-person
   **opener** test for the ambient voice slip. The device log arrived minutes
   later carrying the actual line:

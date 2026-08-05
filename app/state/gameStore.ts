@@ -1521,6 +1521,28 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
 // Held at module scope so startQwenWatchdog() can replace it on
 // re-entry without leaking handles.
 let qwenWatchdogTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** ⚠ OTA-1126 — the homework scheduler, installed at hydrate. Held at module
+ *  scope for the same reason the telemetry sink is: the store is a closure and
+ *  the driver below is a plain timer with no access to it. Null until hydrate
+ *  runs, and a null tick is simply skipped — homework is the one subsystem that
+ *  must never be load-bearing. */
+let homeworkTickFn: (() => void) | null = null;
+let homeworkTimer: ReturnType<typeof setInterval> | null = null;
+function setHomeworkTick(fn: (() => void) | null): void {
+  homeworkTickFn = fn;
+  if (homeworkTimer !== null) { clearInterval(homeworkTimer); homeworkTimer = null; }
+  if (!fn) return;
+  // A slow poll on purpose. The tick itself is nearly free (a few guards and an
+  // inventory scan) and the gate inside it decides everything; polling faster
+  // would only burn wakeups to discover the same "not idle" answer.
+  homeworkTimer = setInterval(() => {
+    try { homeworkTickFn?.(); } catch { /* homework must never break the app */ }
+  }, 5_000);
+}
+/** Tests only. */
+export function _homeworkTickForTest(): void { homeworkTickFn?.(); }
+export function _homeworkInstalled(): boolean { return homeworkTickFn !== null; }
 let qwenAppStateSub: { remove: () => void } | null = null;
 // OTA-1032 — ADAPTIVE CADENCE. A flat 60s poll made recovery feel broken: the
 // owner's log spends ~2 minutes on canned templates because every step of the
@@ -5115,6 +5137,16 @@ interface GameStore {
   qwenModelId: string;
   partialArbiterText: string | null;
   isGenerating: boolean;
+  /** ⚠ OTA-1126 — WHEN THE PLAYER STOPPED NEEDING THE ENGINE. Stamped by the
+   *  screens the owner nominated as homework windows — menu, inventory, map —
+   *  where "you're reading, not waiting on the engine". Null everywhere else,
+   *  and null is the safe value: no stamp, no homework. Cleared the instant an
+   *  action is submitted, so a player who taps mid-generation is already out
+   *  of the idle window before the next tick looks. */
+  uiIdleSince: number | null;
+  /** OTA-1126 — screens call this on focus/blur. Idempotent; passing true
+   *  twice keeps the ORIGINAL stamp so the dwell measures real idle time. */
+  markUiIdle: (idle: boolean) => void;
   /** Count of cardinal travel steps since the last wasteland
    *  encounter fired. stepDirection increments this every step;
    *  pickWastelandEncounter resets to 0 when an encounter lands.
@@ -6252,6 +6284,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
   qwenModelId: qwen.getModelId(),
   partialArbiterText: null,
   isGenerating: false,
+  uiIdleSince: null,
+  // OTA-1126 — idempotent on the way IN: a screen that re-focuses must not
+  // restart the dwell clock, or a UI that re-renders every second would keep
+  // resetting it and homework would never see an idle window at all.
+  markUiIdle(idle: boolean) {
+    set((st) => {
+      if (!idle) return st.uiIdleSince === null ? {} : { uiIdleSince: null };
+      return st.uiIdleSince === null ? { uiIdleSince: Date.now() } : {};
+    });
+  },
 
   // OTA-120 Phase 5 — CallDogModal visibility flag.
   callDogModalOpen: false,
@@ -6699,6 +6741,83 @@ export const useGameStore = create<GameStore>((set, get) => ({
         let synthInFlight = false;
         let lastSynthAt = 0;
         const SYNTH_GAP_MS = 20_000;
+        // ⚠ OTA-1126 — THE FIRST HOMEWORK SLOT: ITEM DESCRIPTIONS.
+        //
+        // Owner's governing rule for the whole homework track, and it is the
+        // thing that decided which slot goes first: *"our problem is screen
+        // real estate. more just scrolls up and blends in with the chatter and
+        // isn't read. I would go with faster, and only do fancy bespoke
+        // writing on screens that are stationary like conversations or other
+        // writing popup."*
+        //
+        // Item descriptions are the cleanest fit in the game. They land in a
+        // POPUP the player is holding still and reading — not in the scrolling
+        // feed — so the writing is seen. And the work is pure SPEED: the
+        // synthesis already runs today, on demand, the moment the player opens
+        // an unknown item. Doing it early changes nothing about what the game
+        // contains; it only moves a 4–13 second wait out of the player's way.
+        //
+        // The whole slot is a scheduler. The generation, the prompt, the
+        // clamps, the cache and the silent-discard-on-bad-row are the existing
+        // path untouched — which is the point, because those are five OTAs of
+        // hard-won correctness and a second copy would drift from them.
+        let lastHomeworkAt = 0;
+        /** Spacing between homework generations. Deliberately much wider than
+         *  the interactive gap: this is battery the player did not ask to
+         *  spend, and one description per half-minute of reading is plenty to
+         *  stay ahead of someone thumbing through a pack. */
+        const HOMEWORK_GAP_MS = 30_000;
+        /** ⚠ Pick the item most likely to be OPENED NEXT, not merely the first
+         *  uncached one. Someone reading their pack works down the list, so the
+         *  head of the inventory is the best guess available without tracking
+         *  scroll position — and guessing badly costs a generation, not
+         *  correctness. */
+        const nextHomeworkItem = (): { name: string; tags: readonly string[] } | null => {
+          const inv = get().player?.inventory ?? [];
+          for (const it of inv) {
+            const key = it.name.toLowerCase();
+            if (pending.has(key)) continue;
+            if (synth.readSynthCache(it.name)) continue;
+            return { name: it.name, tags: canonicalItemTags(it) };
+          }
+          return null;
+        };
+        /** ⚠ THE IDLE GATE. Owner chose the windows: menu / inventory / map
+         *  time ("you're reading, not waiting on the engine") and charging-and-
+         *  idle — explicitly NOT while actively moving. `uiIdleSince` is
+         *  stamped by the screens that qualify; anything else leaves it null
+         *  and no homework runs. Combat and the tutorial are hard-muzzled the
+         *  same way ambient is, because a free line is still the wrong line
+         *  mid-fight. */
+        const homeworkTick = (): void => {
+          if (!qwen.isReady() || get().isGenerating) return;
+          if ((get().currentScene?.enemies?.length ?? 0) > 0) return;
+          if (inScriptedTutorialPhase(get)) return;
+          if (profileOf(get().player).witholdIdentity) return;
+          if (synthInFlight) return;
+          if (Date.now() - lastHomeworkAt < HOMEWORK_GAP_MS) return;
+          const idleSince = get().uiIdleSince;
+          if (idleSince === null || Date.now() - idleSince < 1500) return;
+          const target = nextHomeworkItem();
+          if (!target) return;
+          const key = target.name.toLowerCase();
+          synthInFlight = true;
+          lastHomeworkAt = Date.now();
+          pending.add(key);
+          void Promise.resolve().then(async () => {
+            const t0 = Date.now();
+            let got: unknown = null;
+            try {
+              got = await synth.synthesizeItemViaQwen(target.name, target.tags, qwen, { homework: true });
+            } catch { /* fail closed — the static row is already in hand */ }
+            pending.delete(key);
+            synthInFlight = false;
+            lastSynthAt = Date.now();
+            get().appendLog('debug',
+              `homework: item_desc "${target.name}" ${got ? '✓' : '∅'} ${Date.now() - t0}ms`);
+          });
+        };
+        setHomeworkTick(homeworkTick);
         itemDefaults.setQwenSynthRequester((name: string, hintTags: readonly string[]) => {
           const key = name.toLowerCase();
           if (pending.has(key)) return;
@@ -10398,6 +10517,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   submitPlayerAction(text, _opts) {
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
+    // ⚠ OTA-1126 — THE PLAYER IS BACK. Clearing the idle stamp here, at the one
+    // door every action goes through, is what makes homework honest: from this
+    // instant the scheduler sees "not idle" and starts nothing new, and
+    // anything already running is preemptible (OTA-1123). Cheap — a no-op when
+    // the stamp is already null, which is the common case.
+    if (get().uiIdleSince !== null) set({ uiIdleSince: null });
 
     // OTA-1076 — the talk/parley sheets don't lock the screen the way the old
     // modals did (that was the point: the feed stays readable, and so do the

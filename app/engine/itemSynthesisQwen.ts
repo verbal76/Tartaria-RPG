@@ -27,7 +27,7 @@ export interface ItemSynthEngine {
   isReady(): boolean;
   generate(
     messages: ReadonlyArray<{ role: 'system' | 'user' | 'assistant'; content: string }>,
-    opts?: { maxNewTokens?: number; temperature?: number; job?: string },
+    opts?: { maxNewTokens?: number; temperature?: number; job?: string; homework?: boolean },
   ): Promise<string>;
 }
 
@@ -68,6 +68,13 @@ export async function synthesizeItemViaQwen(
   name: string,
   hintTags: readonly string[],
   qwen: ItemSynthEngine,
+  // ⚠ OTA-1126 — HOMEWORK. The first real slot of the headroom track. When the
+  // player is reading a menu rather than waiting on the engine, this runs
+  // ahead of time so the item popup is already written when they open it.
+  // Everything else is identical: same prompt, same clamps, same cache, same
+  // silent discard on a bad row. The ONLY difference is that the call queues
+  // below voice and is cut short the instant the player needs the model.
+  opts?: { homework?: boolean },
 ): Promise<SynthesizedItem | null> {
   if (!qwen.isReady()) return null;
 
@@ -145,7 +152,15 @@ export async function synthesizeItemViaQwen(
       // leaner shape above should make the extra headroom unnecessary in the
       // normal case, and a cap only costs time when it is actually reached —
       // so this is insurance, not a decision to generate more.
-      { maxNewTokens: 240, temperature: 0.1, job: 'item_synthesis' },
+      {
+        maxNewTokens: 240,
+        temperature: 0.1,
+        // OTA-1126 — priced separately so idle work never hides inside the
+        // interactive number. A slot that looks cheap because its cost was
+        // averaged with something else is how a budget gets lost.
+        job: opts?.homework ? 'item_synthesis_hw' : 'item_synthesis',
+        homework: opts?.homework,
+      },
     );
   } catch {
     return null;
