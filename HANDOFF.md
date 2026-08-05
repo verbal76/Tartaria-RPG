@@ -923,10 +923,38 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.37**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.38**; ledger in `VERSION.md`.
+
+- **FIRST VISITS TELL THE TRUTH (2026-08-05, latest). BOTH LINES.** golem
+  OTA-1104 / HAL OTA-1127. Root-caused with a LIVE-STORE REPRO (fresh game,
+  hub walk, per-build call counting) — the log-archaeology theory (double
+  scene builds) was WRONG: `_beginSceneCore` runs once per action. The
+  counter was poisoned inside a single build. Three defects, one
+  visitedRooms map:
+  (1) **PHANTOM PRIOR VISIT.** The OTA-071 investigation-table seeder and
+  the OTA-120 dog smell-find run BEFORE the visit-record block in the same
+  build and CREATED the room record with `visitCount: 1` when missing — the
+  counter then found an "existing" record on a genuinely-first entry, and
+  every room greeted "You've stood here before. (visit 2)" on first sight.
+  Created shells now seed `visitCount: 0`; the greeting requires `>= 1`.
+  (2) **THE WRONG DRAWER AT BOOT.** `candidateKey` read `player.hubRoomId`
+  off the pipeline-top snapshot, but hub AUTO-ENTRY assigns the gate room
+  AFTER that capture — the opening scene filed the gate under a SUFFIXLESS
+  key no later hub move ever touched (why the device log's Reception said
+  "(visit 2)" at boot and "(visit 2)" AGAIN on return). The key now uses
+  the RESOLVED hub room id; the investigation seeder keys the same way.
+  (3) **RE-ENTRY WIPED THE ROOM'S MEMORY** — found by the new suite's own
+  assertion. The visit block's field-by-field record literal dropped
+  `searchNothingCounts`, `groundDigCount`, `firstInvestigateDone` and
+  `roomInvestigationTable` on every re-entry — resetting the investigate
+  consumed-state and un-doing OTA-1103's `echoed` stamps for that room. Now
+  `...existing` + overrides, so a future field survives by default.
+  New suite `ota1104VisitCount`; one playtest-sim repetition cap retargeted
+  12 → 13 (the false greetings had been padding the feed's line variety;
+  the guarded intent is unchanged).
 
 - **DEVICE-LOG TRIAGE — THE ECHO THAT PAID FOREVER, THE ROOF THAT WASN'T,
-  AND THE ARC THE FALL ERASED (2026-08-05, latest). BOTH LINES.** golem
+  AND THE ARC THE FALL ERASED (2026-08-05). BOTH LINES.** golem
   OTA-1103 / HAL OTA-1126. Three defects from one APK-293 playtest log.
   (1) **⚠ ECHO-HOOK FARM (exploit).** The cross-room echo (OTA-075 era)
   plants a thread referencing the player's most recent consumed

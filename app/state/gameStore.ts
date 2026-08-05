@@ -8324,7 +8324,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // long ago) repopulate normally — Tartaria doesn't stay quiet
     // forever. Pulls from the visitedRooms MapGraph + player.hoursElapsed.
     const RESPAWN_QUIET_HOURS = 6;
-    const candidateKey = makeRoomKey(player.currentLocationId, microMicroId, player.mapX, player.mapY, player.hubRoomId);
+    // ⚠ OTA-1104 — key on the RESOLVED hub room, not the snapshot. At boot the
+    // auto-entry above just assigned the gate room to LOCAL `hubRoomId` and
+    // wrote it to the store, but the `player` object captured at the top of
+    // this build still reads hubRoomId=undefined — so the opening scene filed
+    // the gate room under a SUFFIXLESS key while every later hub move filed
+    // the same room under `…@outpost_gate`. One room, two records: the boot
+    // record (visit counts, the seeded investigation table) was orphaned the
+    // moment the player took a step. Device log 2026-08-05: the Reception
+    // greeted "(visit 2)" at boot and "(visit 2)" AGAIN on return.
+    const candidateKey = makeRoomKey(player.currentLocationId, microMicroId, player.mapX, player.mapY, inHub ? hubRoomId : null);
     const priorVisit = worldMemory.visitedRooms?.[candidateKey];
     const hoursElapsed = player.hoursElapsed ?? 0;
     // arb107 — macro-location visit sequence. Bumps whenever the player's
@@ -9275,20 +9284,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // [roomKey] so persistence is automatic via the existing
     // save path.
     if (player) {
+      // OTA-1104 — same resolved-hub key as candidateKey (the snapshot's
+      // hubRoomId is stale at boot; see the candidateKey comment).
       const investigateRoomKey = makeRoomKey(
         player.currentLocationId,
         scene.microMicroId,
         player.mapX,
         player.mapY,
-        player.hubRoomId,
+        inHub ? hubRoomId : null,
       );
       set((s) => {
         const prev = s.worldMemory.visitedRooms?.[investigateRoomKey];
         if (prev?.roomInvestigationTable) return s; // already seeded
+        // ⚠ OTA-1104 — a freshly-CREATED shell seeds visitCount 0, not 1.
+        // This seeder runs BEFORE the visit-record block below in the same
+        // build, so a 1 here was a phantom prior visit: the counter found an
+        // "existing" record on the player's FIRST entry and greeted every
+        // room in the game with "You've stood here before. (visit 2)"
+        // (device log 2026-08-05 — every first entry inflated). The visit
+        // block owns the counting; this table only rides along.
         const base: VisitedRoom = prev ?? {
           firstVisitAt: Date.now(),
           lastVisitAt: Date.now(),
-          visitCount: 1,
+          visitCount: 0,
         };
         const table = seedInvestigationTable(scene.ambientNouns);
         return {
@@ -9397,10 +9415,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // Append the hidden noun + seed an investigation entry.
               set((s) => {
                 if (!s.currentScene) return s;
+                // OTA-1104 — a created shell seeds visitCount 0: this runs
+                // BEFORE the visit-record block in the same build, and a 1
+                // here was a phantom prior visit (see the OTA-071 seeder).
                 const r = s.worldMemory.visitedRooms?.[roomKey] ?? {
                   firstVisitAt: Date.now(),
                   lastVisitAt: Date.now(),
-                  visitCount: 1,
+                  visitCount: 0,
                 };
                 const prevTable = r.roomInvestigationTable ?? {};
                 const updatedTable = {
@@ -9749,7 +9770,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const roomKey = candidateKey;
     const prevVisits = get().worldMemory.visitedRooms ?? {};
     const existing = prevVisits[roomKey];
-    if (existing) {
+    // ⚠ OTA-1104 — greet only on a REAL prior visit. Earlier writers in this
+    // same build (the OTA-071 investigation seeder, the dog smell-find) may
+    // have created the record as a visitCount-0 shell to hang their table on;
+    // greeting off bare existence read every first entry as a return.
+    if (existing && existing.visitCount >= 1) {
       const tag = existing.visitCount >= 5 ? 'many times' : existing.visitCount >= 2 ? 'again' : 'before';
       const clearedNote = recentlyCleared
         ? ` The bodies you left are still here. Nothing has moved in to replace them.`
@@ -9774,31 +9799,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...s.worldMemory,
         visitedRooms: {
           ...(s.worldMemory.visitedRooms ?? {}),
+          // ⚠ OTA-1104 — SPREAD, then override. This literal used to rebuild
+          // the record field-by-field, and the arb107 comment it replaced was
+          // its own indictment: "any un-spread field is dropped." Fields kept
+          // getting added to VisitedRoom (searchNothingCounts, groundDigCount,
+          // firstInvestigateDone, roomInvestigationTable) and every one of
+          // them was silently WIPED on re-entry — the investigation table's
+          // consumed/echoed state reset each time you walked back in, which
+          // is exactly how the "look again later" dedupe and the OTA-1103
+          // echo stamps were being quietly undone. The spread makes the rule
+          // structural: a new field survives re-entry by default, and this
+          // block overrides only what the visit itself changes.
           [roomKey]: {
+            ...existing,
             firstVisitAt: existing?.firstVisitAt ?? Date.now(),
             lastVisitAt: Date.now(),
             visitCount: (existing?.visitCount ?? 0) + 1,
-            enemiesCleared: existing?.enemiesCleared ?? [],
-            lootGrabbed: existing?.lootGrabbed ?? [],
-            // Persist the room's "vandal state" across re-entries —
-            // dropped items + opened containers carry forward
-            // unchanged. The drop / pickup / open handlers mutate
-            // these arrays directly when the player acts.
-            droppedItems: existing?.droppedItems ?? [],
-            containersOpened: existing?.containersOpened ?? [],
-            searchedAmbientNouns: existing?.searchedAmbientNouns ?? [],
             hoursElapsedAtVisit: hoursElapsed,
-            // arb107 — this literal replaces the room object wholesale, so
-            // any un-spread field is dropped. Preserve the loot/restock +
-            // dedup/latch fields so they survive re-entry: the outpost
-            // restock stamp, the investigate flavor-exhaustion record, and
-            // the dog smell-find latch (without this, the latch was wiped
-            // every entry, so the dog re-smelled — and re-trained INT —
-            // on every visit; now it stays latched until a travel-return
-            // restock re-arms it).
-            clearedAtMacroSeq: existing?.clearedAtMacroSeq,
-            flavorExhaustedNouns: existing?.flavorExhaustedNouns ?? [],
-            dogSmelledHere: existing?.dogSmelledHere,
           },
         },
       },
