@@ -923,9 +923,37 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.39**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.40**; ledger in `VERSION.md`.
 
-- **QWEN TELEMETRY — THE MEASUREMENT BEFORE THE CUT (2026-08-05, latest).
+- **⚠ THE STALL WAS THE PROMPT, NOT THE MODEL (2026-08-05, latest). BOTH
+  LINES.** golem OTA-1106 / HAL OTA-1129. Step 2 of the LLM-headroom track;
+  OTA-1105's telemetry paid for itself on its FIRST device log:
+  ```
+  qwen⏱ ambient          ok 16822ms wait 2255ms (139ch)   ← 14.5s GENERATING
+  qwen⏱ investigate_lore ok  1131ms            (132ch)   ← 1.1s, same size
+  ```
+  Same model, same device, near-identical OUTPUT length — 13× the time.
+  **Prefill dominates**: ambient was reading a ~1,145-token scene dossier to
+  write an 18-word aside.
+  ⚠ **THE CORRECTION.** This was assumed to need Phase 6's native rebuild
+  (`n_predict` 120→40, threads, warm context) — the work parked on THIS line.
+  It does not, and an output-cap cut would barely have moved it, because the
+  output was never the cost. The prompt is JavaScript and ships in an OTA.
+  (1) **Ambient reads a lean prompt** (~1,145 → ~542 tokens): its own
+  instruction forbids reacting to the last action, so exits, entities, the
+  environment paragraph, canon lore and the pack manifest were all material it
+  may not use. The location anchor is kept verbatim (the guard against
+  invented place names), as is the read of the player it reflects on. Ambient
+  is also the job most often discarded by the near-duplicate / action-opener
+  filters — the worst place to spend fifteen seconds of CPU.
+  (2) **The pack manifest is capped** (`INVENTORY_PROMPT_CAP = 14`): the
+  device log's salvage pack was ~1,440 characters of item names in EVERY
+  narration prompt. Worn kit still named in full; the stowed list caps with an
+  honest "…and N more". Big-pack narration ~1,081 → ~809 tokens.
+  The check is the next device log's `qwen⏱ ambient` line (~7s, not ~17s).
+  Suite `ota1106PromptWeight`.
+
+- **QWEN TELEMETRY — THE MEASUREMENT BEFORE THE CUT (2026-08-05).
   BOTH LINES.** golem OTA-1105 / HAL OTA-1128. Step 1 of the owner-approved
   LLM-HEADROOM TRACK (owner: "move forward" — un-parking the JS-side LLM
   work wrongly assumed to need a native build; only Phase 6's native config

@@ -215,6 +215,34 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
     : ctx.in_combat
     ? COMBAT_INSTRUCTION
     : PEACEFUL_INSTRUCTION;
+  // ⚠ OTA-1106 — AMBIENT GETS A LEAN PROMPT, AND THE REASON IS MEASURED.
+  // OTA-1105's telemetry showed ambient taking 16.8s (14.5s of it generating,
+  // only 2.3s queued) to produce 139 characters, while investigate_lore made
+  // 132 characters in 1.1s on the same model. Same output size, 13× the time —
+  // because the cost is PREFILL: ambient was reading a ~1,145-token scene
+  // dossier before writing an 18-word aside.
+  //
+  // And it never needed any of it. AMBIENT_INSTRUCTION is explicit: an
+  // UNPROMPTED reflection on the road travelled that must NOT react to the
+  // last action. Exits, entity lists, the environment paragraph, canon lore
+  // and the pack manifest are all scene-reaction material — exactly what this
+  // beat is forbidden to use. What stays is who and where (the location anchor
+  // is kept verbatim: without it the model pulls place names out of training
+  // data — the original reason it exists) and a short read on the player.
+  if (ctx.ambient) {
+    const leanSystem = [
+      'You are the Arbiter, the ancient narrator of Tartaria.',
+      `The player is at "${ctx.room_name}" (${ctx.current_biome}).`,
+      `**If you name any place, it MUST be "${ctx.room_name}". NEVER name "Borderlands", "Aetheric Deep", "Grand Hall", or any other location not listed.**`,
+      `Your read of them: ${ctx.player_stats}`,
+      '',
+      instruction,
+    ].join('\n');
+    return [
+      { role: 'system', content: leanSystem },
+      { role: 'user', content: 'Continue.' },
+    ];
+  }
   // Strict location anchor — playtest log: Qwen narrated "The Borderlands,
   // a twisted shadowy landscape..." while the player was in Tartarian
   // Outskirts. The model needs an explicit "this is the only place that
@@ -373,10 +401,23 @@ function prettyEffect(kind: string): string {
  *
  * Token economy rule (TDD §3.3): comma-separated, never JSON.
  */
+/** ⚠ OTA-1106 — CAP ON THE STOWED LIST. This dumped EVERY row, uncapped, into
+ *  a prompt the model has to READ before it writes a word. A salvage-heavy
+ *  playthrough carries 70+ distinct rows; the device log's pack put ~1,440
+ *  characters of item names into every narration and ambient prompt — a third
+ *  of the whole prompt, and the difference between a 2-second generation and a
+ *  15-second one (see the OTA-1105 telemetry: prompt PREFILL dominates, not
+ *  output). The narrator needs to know what you FIGHT with and roughly what you
+ *  are carrying, never the full manifest — so the worn kit is always named in
+ *  full and the stowed list is capped, with an honest "…and N more" so the
+ *  model knows the pack is deeper than the sample. */
+export const INVENTORY_PROMPT_CAP = 14;
+
 export function stringifyInventory(
   inventory: readonly InventoryItem[],
   equipped: PlayerEquipped | undefined,
   tc: number,
+  maxItems: number = INVENTORY_PROMPT_CAP,
 ): string {
   const items: string[] = [];
   const equippedNames = collectEquippedNames(equipped);
@@ -390,7 +431,10 @@ export function stringifyInventory(
 
   const wornParts = describeEquipped(equipped, equippedNames);
 
-  const stowed = items.length === 0 ? 'Empty pack' : items.join(', ');
+  const capped = maxItems > 0 && items.length > maxItems
+    ? [...items.slice(0, maxItems), `…and ${items.length - maxItems} more`]
+    : items;
+  const stowed = capped.length === 0 ? 'Empty pack' : capped.join(', ');
   return wornParts ? `${stowed} | Wearing: ${wornParts}` : stowed;
 }
 
