@@ -147,7 +147,13 @@ describe('OTA-1132 — the brief stops asking for an essay', () => {
     }
     expect(mod).toContain('consumable');
     expect(mod).toContain('passive');
-    expect(mod).toContain('strength|dexterity|intelligence|wisdom|charisma');
+    // RETARGETED BY OTA-1138: the five stat names are still specified in full,
+    // but as PROSE rather than as a pipe alternation — the alternation is the
+    // thing the model copied into the value position and looped on. Asserting
+    // the pipe form here would now be asserting the bug.
+    for (const stat of ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma']) {
+      expect(mod).toContain(stat);
+    }
   });
 
   it('⚠ the cap rises off the value that was guaranteeing failure', () => {

@@ -225,8 +225,13 @@ describe('OTA-1131 — item synthesis stops failing silently at full price', () 
     // and its length, because the next log showed this failing three times out
     // of three without ever saying WHY. The reporting itself is what this test
     // guards, so it asserts the call, not the exact string it now builds.
+    // RETARGETED AGAIN BY OTA-1138: the parse failure now picks between two
+    // NAMES — the pipe loop earned its own — so the reason is built above the
+    // call instead of inlined into it. What this test guards is that the parse
+    // failure is REPORTED at all, which is still true.
     const src2 = src('app/engine/itemSynthesisQwen.ts');
-    expect(src2).toContain('noteQwenDiscarded(`item_synth:unparseable');
+    expect(src2).toContain("'item_synth:unparseable'");
+    expect(src2).toContain('noteQwenDiscarded(`${reason}');
     expect(src2).toContain("noteQwenDiscarded('item_synth:rejected-by-clamp')");
     expect(src2).toContain("noteQwenDiscarded('item_synth:empty')");
   });
