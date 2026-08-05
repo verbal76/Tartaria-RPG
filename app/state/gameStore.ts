@@ -3679,17 +3679,25 @@ function debugEnemy(e: Record<string, unknown>): string {
   return `enemy: ${g('name')} hp=${g('hp')} ac=${ac} atk=${g('attack')} dmg=${g('damage')} rarity=${g('rarity')} ap=${ap}${e['boss'] ? ' BOSS' : ''}`;
 }
 
-// 2026-05-24 — effective stamina max accounting for hunger penalty.
-// hungerStaminaPenalty (0-5) shrinks the usable cap; the raw staminaMax
-// field is the unmodified character ceiling. Always use this when
-// capping restoreStamina / showing remaining headroom / computing
-// tired-status thresholds.
+// The usable stamina ceiling. Always use this when capping restoreStamina /
+// showing remaining headroom / computing tired-status thresholds — it is the
+// single place that decides the cap, which is exactly why the hunger penalty
+// could be retired by changing one line.
 function effectiveStaminaMax(player: PlayerCharacter): number {
   // HUNGER REMOVED — the hunger stat (hungerStaminaPenalty) was a hidden, unexplained
   // mechanic whose ONLY effect was shrinking this cap; food already tops off HP and
   // water already tops off stamina, so it just added invisible friction. The usable
-  // stamina cap is now simply staminaMax. The penalty field is left on the type for
-  // save compatibility but is ignored everywhere; nothing grows it anymore.
+  // stamina cap is now simply staminaMax.
+  // ⚠ OTA-1141 FINISHED THE JOB. The removal left the mechanic dead but its
+  // carcass in place: three player-facing lines behind `penalty > 0` that could
+  // never print again (a rest refusal, a rest result, a drink result), a
+  // heartbeat ledger entry and an "eat something soon" warning behind hardcoded
+  // zeros, and a write of the field onto every player object that passed through
+  // advanceTime — which is every action in the game. All gone. The field is a
+  // save fossil now (see types.ts); this function returns the raw max and
+  // NOTHING may reduce it. If a future feature wants a stamina ceiling that
+  // moves, it gets its own name — reusing this one would resurrect a mechanic
+  // that was deliberately buried.
   return Math.max(1, player.staminaMax);
 }
 
@@ -3741,12 +3749,6 @@ function spendTravelStamina(player: PlayerCharacter): PlayerCharacter {
 // — travel (long), attack (short), skill check (short) — so the day/night
 // cycle progresses naturally even without explicit camping.
 //
-// 2026-05-24 — also ticks hungerStaminaPenalty: every 8 in-game hours
-// crossed increments the penalty by 1 (cap 5). Eating any consumable
-// resets the penalty to 0 elsewhere. Doing the tick here (instead of in
-// rest specifically) means hunger advances regardless of which time-
-// advancing path the player took — rest, travel, combat, climb, all
-// route through advanceTime eventually.
 
 // OTA-184 — Arbiter address helper. Returns the player's first name
 // ~1/3 of the time when the Arbiter is delivering a personal beat,
@@ -4629,11 +4631,10 @@ function creditTurnIn(
 function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
   const oldHours = player.hoursElapsed ?? 0;
   const newHours = oldHours + hours;
-  const oldBucket = Math.floor(oldHours / 8);
-  const newBucket = Math.floor(newHours / 8);
-  const ticks = Math.max(0, newBucket - oldBucket);
-  void ticks; // HUNGER REMOVED — no longer accrues a stamina-cap penalty over time.
-  const newHunger = 0;
+  // OTA-1141 — the 8-hour hunger bucket is gone with the mechanic. It used to
+  // compute a tick count here and write a penalty onto every player object that
+  // passed through; both were dead the moment effectiveStaminaMax stopped
+  // reading the field, and advanceTime is called on every action in the game.
   // OTA-120 Phase 4 — dog loyalty decay. Every 4 in-game hours WITHOUT
   // a feed costs the dog 1 loyalty. Crossing thresholds 50/30/15/0
   // fires escalating Arbiter beats; 0 = abandonment. Threshold beats
@@ -4662,7 +4663,7 @@ function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
       dog = { ...dog, loyalty: newLoyalty };
     }
   }
-  return { ...player, hoursElapsed: newHours, hungerStaminaPenalty: newHunger, dog };
+  return { ...player, hoursElapsed: newHours, dog };
 }
 
 // arb47 — the player's authoritative ABSOLUTE cell on the canon grid. Reads the
@@ -14937,9 +14938,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           // Eating still costs a slice of the day — half an hour to break
           // and chew a ration, so the clock advances too.
-          // 2026-05-24 — eating any consumable resets hungerStaminaPenalty
-          // to 0 (you've fed yourself; the cap shrink heals immediately).
-          // Trail Rations / Speckled Egg / etc. now have a real role.
+          // OTA-1141 — this used to zero a hunger penalty. Food's role is HP and
+          // stamina, full stop; there is no cap for it to heal.
           const prevHpEat = player.hp;
           const hpMaxEat = player.hpMax;
           set({
@@ -14948,7 +14948,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ...player,
                 hp: player.hp + heal,
                 stamina: player.stamina + stamGain,
-                hungerStaminaPenalty: 0,
                 inventory: newInventory,
                 statusEffects: newStatusEffects,
               }),
@@ -15089,23 +15088,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // if there's a dog to recall — otherwise a full-stamina player could
           // never call the dog back down by resting (the restore lives below).
           const dogToRecall = player.dog?.status === 'waiting_at_base';
-          // OTA-614 — stamRoom <= 0 (not just === 0): when hunger has shrunk the
-          // effective cap to at/below current stamina, rest can recover nothing,
-          // so refuse it rather than burn 8 hours + an ambush roll for +0. And
-          // give the RIGHT reason — a hunger-capped player's wind isn't "full",
-          // it's choked; point them at food, not sleep.
+          // OTA-614 — stamRoom <= 0 (not just === 0): rest that can recover
+          // nothing is refused rather than burning hours + an ambush roll for
+          // +0. (OTA-1141: the <= was originally for a hunger-shrunk cap that
+          // could drive it negative. Nothing shrinks the cap now, so this only
+          // ever reads 0 — kept as a floor rather than tightened to ===, since
+          // a defensive comparison costs nothing and a wrong one costs a rest.)
           const nothingToRest =
             stamRoom <= 0 && (player.corruption ?? 0) === 0 && !dogToRecall
             // OTA-1001 — #120: rest heals now, so open wounds are a reason to sleep.
             && player.hp >= player.hpMax;
           if (nothingToRest) {
-            const hungerCappedRefuse =
-              (player.hungerStaminaPenalty ?? 0) > 0 && player.stamina < player.staminaMax;
+            // OTA-1141 — the "your wind is choked by hunger" alternative used to
+            // live here, behind a penalty that can no longer be non-zero. With
+            // hunger gone there is exactly one reason a rest is refused, so
+            // there is exactly one line.
             get().appendLog(
               'arbiter',
-              hungerCappedRefuse
-                ? `The Arbiter shakes their head. "Sleep won't fill you when it's food you're missing — your wind is choked by hunger, not weariness. Eat, then rest will mean something."`
-                : `The Arbiter shakes their head. "Your wind is full, your wounds are closed, and the Aether carries no shadow on you. Save the hours."`,
+              `The Arbiter shakes their head. "Your wind is full, your wounds are closed, and the Aether carries no shadow on you. Save the hours."`,
             );
             break;
           }
@@ -15150,14 +15150,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // mirroring how escorts already mend on rest. The old no-HP rule (arb37 /
     // OTA-187) is superseded by the owner's call.
     const heal = Math.min(Math.max(0, player.hpMax - player.hp), Math.ceil(player.hpMax * 0.15));
-          // OTA-614 — clamp to >= 0. stamRoom = effectiveStaminaMax - stamina,
-          // and effectiveStaminaMax is the raw cap MINUS the hunger penalty. When
-          // hunger has shrunk the effective cap below current stamina, stamRoom
-          // goes NEGATIVE — and the old Math.min(stamRoom, hours) then DRAINED
-          // stamina down to the hunger cap (e.g. 13 → 10 on an 8-hour rest), which
-          // read to the player as "rest restored nothing / took stamina away".
-          // Rest must never reduce stamina; the worst case is +0 (you're too
-          // hungry to recover more — eat to lift the cap, hinted below).
+          // OTA-614 — clamp to >= 0. The bug this fixed was hunger-specific: a
+          // shrunken effective cap drove stamRoom NEGATIVE and Math.min(stamRoom,
+          // hours) then DRAINED stamina down to it, reading as "rest took my
+          // stamina away". OTA-1141 removed the mechanic that could do that, but
+          // ⚠ THE CLAMP STAYS: the invariant it protects is "rest must never
+          // reduce stamina", which is true regardless of what made it negative.
           const stamGain = Math.max(0, Math.min(stamRoom, hours));
           // Corruption decay — clean rest sheds one point of
           // corruption ONLY when both of:
@@ -15195,12 +15193,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? (curCorr > 30 ? 4 : curCorr > 10 ? 2 : 1)
             : 0;
           const newCorrRest = Math.max(0, curCorr - corrDecay);
-          // 2026-05-24 — route the time advance through advanceTime so
-          // hungerStaminaPenalty ticks consistently across both rest
-          // paths (this one is the parser-routed rest, separate from
-          // the store-method rest() at line ~10880). advanceTime sets
-          // hoursElapsed AND increments hunger; tickPlayerStaminaStatuses
-          // syncs Tired/Exhausted based on the new stamina value.
+          // Route the time advance through advanceTime so both rest paths agree
+          // (this is the parser-routed rest; the store-method rest() is the
+          // other). advanceTime sets hoursElapsed and decays dog loyalty;
+          // tickPlayerStaminaStatuses syncs Tired/Exhausted off the new stamina.
+          // (OTA-1141: it used to increment a hunger penalty here too. It no
+          // longer does — and the DOG's feeding clock below is a different
+          // system that is still very much alive.)
           const restedPlayer = tickPlayerStaminaStatuses(
             advanceTime(
               { ...player, hp: player.hp + heal, stamina: player.stamina + stamGain, corruption: newCorrRest },
@@ -15265,18 +15264,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (heal > 0) parts.push(`+${heal} HP`);
           if (stamGain > 0) parts.push(`+${stamGain} stamina`);
           if (corrDecay > 0) parts.push(`−${corrDecay} corruption`);
-          // OTA-614 — when rest recovers nothing because HUNGER has capped your
-          // usable stamina (effective max < raw max, and you're below the raw
-          // max), say so instead of the misleading "Whole already" — sleep can't
-          // lift the hunger cap, only eating does.
-          const hungerCapped = parts.length === 0
-            && (player.hungerStaminaPenalty ?? 0) > 0
-            && player.stamina < player.staminaMax;
+          // OTA-1141 — OTA-614's hunger-cap explanation is retired with the
+          // mechanic. Nothing can cap the usable stamina below the raw max any
+          // more, so a rest that recovers nothing means exactly one thing.
           const tail = parts.length > 0
             ? parts.join(', ') + ' recovered.'
-            : hungerCapped
-              ? 'Hunger has capped your wind — sleep can\'t lift it. Eat something to recover the rest.'
-              : 'Whole already — the Aetherstone hums steady.';
+            : 'Whole already — the Aetherstone hums steady.';
           get().appendLog('world', `You rest for ${hours} hours. ${tail} (${describeTime(newHours)})`);
           healEscortsOnRest(get, set);
           // 2026-05-25 — ambush spawn. Rest completes (HP / stamina
@@ -16698,17 +16691,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const nowHours = get().player?.hoursElapsed ?? player.hoursElapsed ?? 0;
             set((s) => ({ worldMemory: recordWaterUse(s.worldMemory ?? emptyMemory(), drinkRoomKey, 'drink', nowHours) }));
           }
-          // A 0-gain drink has two very different causes: you're genuinely full, OR
-          // hunger has capped your effective max below your real max (water can't lift
-          // that — only food does). Spell out the hunger case so it never reads as broken.
-          const hungerCapped = stamGained <= 0 && effMax < (player.staminaMax ?? effMax);
+          // OTA-1141 — a 0-gain drink used to have two causes: genuinely full, or
+          // hunger capping the effective max below the real one. effectiveStaminaMax
+          // returns the raw max now, so the second can never happen and its line
+          // could never print. One cause, one line.
           get().appendLog(
             'world',
             stamGained > 0
               ? `You cup the ${drinkSource} in your hands and drink. The wet cuts the dust in your throat. (+${stamGained} stamina, +1 corruption, 5 min)`
-              : hungerCapped
-                ? `You cup the ${drinkSource} in your hands and drink, but hunger has capped your wind — water won't lift it. Eat a ration to recover the rest. (+1 corruption, 5 min)`
-                : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (+1 corruption, 5 min)`,
+              : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (+1 corruption, 5 min)`,
           );
           // The warning lands AFTER the drink (player ruling) — the first sip
           // teaches the rule, the bottle is the clean alternative.
@@ -19623,7 +19614,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-613 — the REST branch that lived here resolved a `rest_hours` roll
     // step, but the only producer of that step (combatRules.buildRestSteps) had
     // no callers, so this block was unreachable. Worse, it healed HP/stamina +
-    // mended the golem WITHOUT the ambush / hunger / weather rolls that the real
+    // mended the golem WITHOUT the ambush / weather rolls that the real
     // rest paths (submitPlayerAction 'rest') enforce — a free, risk-free heal if
     // anyone ever wired it up. Removed along with buildRestSteps so it can't be
     // revived by accident.
@@ -30241,10 +30232,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // somewhere for a while. 4-7 hours per rest, rolled randomly.
     const hoursSlept = rollDie(4) + 3;
     const newHours = (player.hoursElapsed ?? 0) + hoursSlept;
-    // HUNGER REMOVED — rest no longer accrues a hunger penalty, so there is no
-    // "hunger +N" log line, no ≥3 warning, and no cap to reduce.
-    const hungerTicks = 0;
-    const newHungerPenalty = 0;
     // 2026-05-24 — per-hour weather damage during rest. Re-uses the
     // existing tickWeather probabilistic per-action damage by calling
     // it once per hour slept. So sleeping 8 hours in Ash Storm rolls 8
@@ -30290,7 +30277,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `You sit for ${hoursSlept} hours. You came back to yourself at the same place you set out from.`,
       `You sit for ${hoursSlept} hours. Tartaria did not change in any of them you can see.`,
     ];
-    if (stamRoom <= 0 && hungerTicks === 0 && weatherHpDamage === 0 && weatherStamDamage === 0 && !ambushTriggered) {
+    if (stamRoom <= 0 && weatherHpDamage === 0 && weatherStamDamage === 0 && !ambushTriggered) {
       set((s) => (s.player ? { player: { ...s.player, hoursElapsed: newHours } } : s));
       const restLine = FULL_HP_REST_LINES[Math.floor(Math.random() * FULL_HP_REST_LINES.length)]!;
       get().appendLog('world', `${restLine} (${describeTime(newHours)})`);
@@ -30370,20 +30357,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (weatherStamDamage > 0) wParts.push(`-${weatherStamDamage} stamina`);
       parts.push(`weather ${wParts.join(' / ')}`);
     }
-    if (hungerTicks > 0) {
-      parts.push(`hunger +${hungerTicks} (now -${newHungerPenalty} max)`);
-    }
     get().appendLog(
       'world',
       `You rest for ${hoursSlept} hours. ${parts.length ? parts.join(', ') + ' recovered/spent' : 'time passes'}. (${describeTime(newHours)})`,
     );
     healEscortsOnRest(get, set);
-    if (newHungerPenalty >= 3 && (player.hungerStaminaPenalty ?? 0) < 3) {
-      get().appendLog(
-        'arbiter',
-        `The Arbiter watches you stand. "You're running on empty. Eat something soon."`,
-      );
-    }
     // Ambush narration + encounter spawn happens AFTER recovery so the
     // player wakes at full strength but lands in combat / scene.
     if (ambushTriggered) {
