@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.50**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.51**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1113,7 +1113,53 @@ rediscovering them.
   from an earlier log across a truncated span, so it was never confirmed as a
   bug. Still unresolved; needs a log that captures the whole encounter.
 
-- **⚠⚠ THE ELITE SWAP (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ THE RULE DIALS, AND ONE THAT WAS A CONTROL OVER NOTHING (2026-08-05, latest). BOTH LINES.**
+  HAL OTA-1140 / golem OTA-1117. Closes the difficulty set OTA-1136 opened. The
+  survey rates rule changes above multipliers because they cost nothing to
+  compute and change how a fight is PLAYED rather than how long it takes.
+  **`witholdIntel`** — the WIS-granted free read of a foe's resists and
+  weaknesses is switched off. The card shows only what THIS character has
+  personally felt land or wash off.
+  **⚠ Two things it deliberately does NOT take.** Strike-to-learn (the
+  `observed` path, OTA-838) stays live: the earned tags are the REPLACEMENT for
+  the free read, and removing both would be blindness rather than difficulty.
+  And a **BOSS still shows its defenses** — that reveal exists because the owner
+  reported it twice (*"Core Guardians show no weakness/resistance in combat"*),
+  and a difficulty dial does not get to re-break a bug someone had to ask for
+  twice.
+  **`witholdIdentity`** — the Qwen synthesis that writes a curio's description
+  and effect does not run; the item stays what its STATIC row says until the
+  player works the rest out.
+  **⚠ The gate sits on the SYNTHESIS, not the static inference.** The static row
+  is what makes an unknown item FUNCTION — gating that would not withhold
+  identity, it would hand the player a broken item. What this removes is the
+  free enrichment on top, which is what `pressure.ts` always described: the
+  identification system exists; this decides whether it runs for free.
+  Fail-closed is already this path's contract, so withholding needs no second
+  code path and can break nothing. It reads LIVE state, because the requester is
+  installed once at boot and outlives the character that installed it.
+  **⚠⚠ AND THE `hunger` DIAL IS REMOVED — the finding worth keeping.** OTA-1136
+  wrote it as *"MULTIPLIER — hunger clock rate. 1.0 = +1 stamina penalty per 8
+  in-game hours, exactly as shipped."* That was **already false when it was
+  written**. Hunger had been deleted from the game before the dial existed:
+  `effectiveStaminaMax` ignores `hungerStaminaPenalty` outright, both accrual
+  sites are hardcoded to 0, and the removal comment gives the reason — *"a
+  hidden, unexplained mechanic whose ONLY effect was shrinking this cap; food
+  already tops off HP and water already tops off stamina, so it just added
+  invisible friction."* So the dial was a control over nothing: checkable in the
+  CUSTOM picker, scaled by every tier, incapable of moving a single number.
+  **A switch that does nothing is worse than a missing one, because the player
+  believes it.** Reviving hunger to give the dial something to do would have been
+  reversing a shipped design decision in order to justify a config field —
+  exactly backwards. The field goes; the decision stands; if hunger ever returns
+  as a mechanic the owner wants, a dial for it is four lines.
+  **The new suite adds the check that would have caught this:** every id in the
+  CUSTOM picker must name a system something actually reads. New suite
+  `ota1140RuleDials` (22 tests); `ota1136` retargeted off `hunger` in three places.
+  **⚠ ALL OF OTA-1136's DIALS NOW HAVE CONSUMERS.** The difficulty workstream is
+  closed unless a device log says otherwise.
+
+- **⚠⚠ THE ELITE SWAP (2026-08-05). BOTH LINES.**
   HAL OTA-1139 / golem OTA-1116. The last of OTA-1136's nine dials to find a
   consumer, and the one the survey the owner brought back rates highest: the
   CONTENT lever. On a hit, the party that would have crested the rise arrives as
