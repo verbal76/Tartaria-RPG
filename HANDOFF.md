@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.49**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.50**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1113,7 +1113,64 @@ rediscovering them.
   from an earlier log across a truncated span, so it was never confirmed as a
   bug. Still unresolved; needs a log that captures the whole encounter.
 
-- **⚠⚠ THE PIPES WERE THE BUG (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ THE ELITE SWAP (2026-08-05, latest). BOTH LINES.**
+  HAL OTA-1139 / golem OTA-1116. The last of OTA-1136's nine dials to find a
+  consumer, and the one the survey the owner brought back rates highest: the
+  CONTENT lever. On a hit, the party that would have crested the rise arrives as
+  ONE named body instead.
+  **⚠ WHY THIS LEVER AND NOT ANOTHER MULTIPLIER.** A multiplier makes the same
+  fight LONGER — this project has been bitten by that once, and it is why
+  `scaledPackSize` is welded to `scaledSwingCap`. A content swap makes the fight
+  DIFFERENT. Four raiders is a targeting and attrition problem: who is closest,
+  who is shooting, does the swing cap let me finish this. One Reaver-Captain is
+  a puzzle: what is it weak to, do I have that coating, is my resist profile
+  wrong for this. Those are different verbs — and the second set of systems
+  (bestiary, weakness tags, coatings, resistances) is most valuable against ONE
+  durable body and nearly irrelevant against four disposable ones. The swap is
+  the encounter shape that finally makes them pay. It is also structurally
+  incapable of the stall tail: one body is one attacker, so the swing cap can
+  never bind. **It is the ANTI-`pack`**, which is why a tier running both hot is
+  more varied than either alone.
+  **⚠ AND IT ADDS NO NEW BALANCE CONSTANTS**, which is what makes the difficulty
+  claim checkable rather than an opinion. `scaleEncounterForContext` already
+  encodes the rule this needs: a PACK is anchored on one solo-equivalent plus
+  22% per extra body and gets only 0.6× of the attack/AC bump *"because there
+  are several of them"*; a SOLO foe gets the full bump. So the elite is defined
+  as the pack's OWN summed HP concentrated into one body, hitting at the solo
+  rate. The fold therefore runs AFTER pack scaling — the scaled pack's total IS
+  the budget — and the single body is then re-scaled through the solo branch and
+  given that total back. **Durability from the pack, aggression from the solo.**
+  Retune the pack numbers and the elite retunes with them for free.
+  **⚠ THE CARRY IS THE ONLY WAY THIS COULD HAVE UNDERPAID.** Spoils are rolled
+  PER CORPSE, so a body that replaced four would have paid one corpse's worth
+  for a four-body fight — being paid LESS for a harder encounter, which is
+  precisely the fake-difficulty trap the dial exists to avoid. `eliteReplaced`
+  rides on the enemy and buys n−1 extra loot rolls, on the ROLL COUNT rather
+  than as a flat grant, so the spoils stay drawn from its own table and can
+  still come up dupes like any other kill.
+  **WHAT THE AUDIT FOUND** (owner: *"audit the kill-count objectives first"*),
+  recorded in `eliteSwap.ts` so it is not re-litigated:
+  1. **There are NO "kill N of X" objectives in the game.** All 65 faction
+     quests are `fetch` / `escort` / `stages`; only two are combat-flavoured at
+     all, and a staged kill advances ONE stage per kill. A collapsed party costs
+     extra encounters, never a completion, and can never block.
+  2. **The +1 max-HP milestone keys on DISTINCT enemy types, not total kills**
+     (arb119, anti-farm). Three identical grunts were only ever worth one type,
+     so collapsing them costs nothing — and a NAMED elite is a new type, which
+     is a second reason to name them.
+  3. **⚠ Hunts match their target by EXACT NAME.** A renamed target would
+     silently never complete, so this must never touch a hunt or boss spawn.
+     The party path is the only caller and bosses are excluded upstream; the
+     fold refuses a party containing one regardless.
+  Bodies are NAMED for those reasons and one more: an unannounced
+  stat-inflated grunt reads as a bug. Both announce lines now stop claiming a
+  headcount that is no longer true — *"No war party crests the rise — one figure
+  does."* New suite `ota1139EliteSwap` (29 tests).
+  **⚠ REMAINING FROM OTA-1136:** the three RULE dials — `witholdIdentity`,
+  `witholdIntel`, `hunger` — are still defined and picker-visible with no
+  consumers. They are the cheap ones; this was the expensive one.
+
+- **⚠⚠ THE PIPES WERE THE BUG (2026-08-05). BOTH LINES.**
   HAL OTA-1138 / golem OTA-1115. Third OTA in a row on item synthesis, and
   the first one aimed at the actual failure rather than at its symptoms.
   OTA-1131 made the silent failure visible. OTA-1132 shrank the prompt, raised
