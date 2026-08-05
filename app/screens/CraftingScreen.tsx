@@ -12,7 +12,7 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem } from '../engine/types';
 import { getItemPreview } from '../components/itemPreview';
 import { GOLEM_DEFINITIONS, type GolemDefinition } from '../engine/golems';
-import { wornInstanceIds } from '../engine/equipment';
+import { wornInstanceIds, validSlotsForItem } from '../engine/equipment';
 
 // 2026-05-27 OTA-095 — Aethercraft disciplines moved from
 // ActionReferenceScreen's "Recipes" mode (now deleted) into a
@@ -110,12 +110,47 @@ function buildGolemConfirm(g: GolemDefinition, inventory: InventoryItem[]): Gole
 // 'available' floats items the player can fix RIGHT NOW (all
 // materials in stock) to the top. 'cost' sorts by total
 // material count required.
+//
+// OTA-1096 — owner: "let's add some different sorting options in the craft
+// repair tab, still prioritize equipped it's on top as default sort." So
+// EQUIPPED becomes a REAL axis and the default one, rather than an invisible
+// pre-key welded onto every other axis (OTA-1094's first cut). Opening the tab
+// still puts what you're wearing on top — that ask is unchanged — but tapping
+// NAME now actually sorts by name instead of sorting by name *within* worn and
+// unworn. A sort you pick should do the thing it says.
+//
+// The worn ★ badge shows on EVERY axis, so you can still find your gear after
+// switching. Three new axes:
+//   · SLOT   — head-to-toe body order (main → off → head → … → ring), so a
+//              full kit reads like a paper doll instead of an alphabet.
+//   · RARITY — Common → Legendary; desc puts your best pieces first.
+//   · KIND   — weapons together, armor together, tools together.
 const REPAIR_SORT_OPTIONS = [
+  { key: 'equipped', label: 'EQUIPPED' },
   { key: 'available', label: 'READY' },
   { key: 'durability', label: 'DURABILITY' },
+  { key: 'slot', label: 'SLOT' },
+  { key: 'rarity', label: 'RARITY' },
+  { key: 'kind', label: 'KIND' },
   { key: 'name', label: 'NAME' },
   { key: 'cost', label: 'COST' },
 ];
+
+// OTA-1096 — shared ranks for the two new ordering axes. Deliberately the same
+// numbers InventoryScreen uses, so "sorted by slot" means the identical
+// head-to-toe order on both screens.
+const REPAIR_RARITY_RANK: Record<string, number> = {
+  Common: 0, Uncommon: 1, Rare: 2, Legendary: 3,
+};
+const REPAIR_SLOT_RANK: Record<string, number> = {
+  main: 0, off: 1, head: 2, chest: 3, hands: 4, legs: 5, feet: 6, cloak: 7, amulet: 8, ring: 9,
+};
+function repairSlotRank(item: InventoryItem): number {
+  const s = validSlotsForItem(item)[0];
+  // No equip slot (a rope, a lantern, a tool) sorts below the worn kit rather
+  // than scattering through it.
+  return s ? (REPAIR_SLOT_RANK[s] ?? 50) : 99;
+}
 
 // OTA-087 — Craft + Recipes tabs share an axis set. 'ready'
 // is the existing "available first" pre-OTA sort; offered
@@ -267,7 +302,9 @@ export function CraftingScreen() {
   const [recipesSortKey, setRecipesSortKey] = useState('ready');
   const [recipesSortDir, setRecipesSortDir] = useState<SortDirection>('asc');
   const [repairQuery, setRepairQuery] = useState('');
-  const [repairSortKey, setRepairSortKey] = useState('available');
+  // OTA-1096 — EQUIPPED is the default axis. Opening the tab still puts what
+  // you are wearing on top; picking any other axis now genuinely sorts by it.
+  const [repairSortKey, setRepairSortKey] = useState('equipped');
   const [repairSortDir, setRepairSortDir] = useState<SortDirection>('asc');
 
   // OTA 228 — repair list: every durability-tracked item in the
@@ -292,14 +329,45 @@ export function CraftingScreen() {
       : repairable;
     const dir = repairSortDir === 'asc' ? 1 : -1;
     const sorted = [...filtered];
+    const byName = (x: RepairStatus, y: RepairStatus) => x.item.name.localeCompare(y.item.name) * dir;
     sorted.sort((a, b) => {
-      // OTA-1094 — WORN gear outranks every axis and never flips with direction.
-      // Owner: "when you open the repair tab, it should prioritize all of the
-      // things that are equipped that can be repaired at the top." The piece you
-      // are standing in is the one whose durability decides the next fight, so it
-      // stays on top whether you sort by READY, DURABILITY, NAME or COST.
-      if (a.worn !== b.worn) return a.worn ? -1 : 1;
       switch (repairSortKey) {
+        // OTA-1094 → OTA-1096. Worn gear used to be an unconditional pre-key on
+        // every axis. Owner: "when you open the repair tab, it should prioritize
+        // all of the things that are equipped that can be repaired at the top" —
+        // which is about the tab's DEFAULT state, and this axis is now that
+        // default. Making it an axis instead of a hidden pre-key means picking
+        // NAME sorts by name, rather than by name within worn and within unworn.
+        // The piece you are standing in is the one whose durability decides the
+        // next fight, so it still leads the moment you open the tab; within the
+        // worn block, what you can actually fix right now comes first.
+        case 'equipped': {
+          if (a.worn !== b.worn) return (a.worn ? -1 : 1) * dir;
+          if (a.available !== b.available) return a.available ? -1 : 1;
+          return byName(a, b);
+        }
+        // OTA-1096 — head-to-toe body order, so a full kit reads like a paper
+        // doll. Gear with no equip slot (rope, lantern, tools) sits below it.
+        case 'slot': {
+          const ar = repairSlotRank(a.item);
+          const br = repairSlotRank(b.item);
+          if (ar !== br) return (ar - br) * dir;
+          return byName(a, b);
+        }
+        // OTA-1096 — Common → Legendary asc; tap again for your best first.
+        case 'rarity': {
+          const ar = REPAIR_RARITY_RANK[a.item.rarity ?? 'Common'] ?? 0;
+          const br = REPAIR_RARITY_RANK[b.item.rarity ?? 'Common'] ?? 0;
+          if (ar !== br) return (ar - br) * dir;
+          return byName(a, b);
+        }
+        // OTA-1096 — weapons together, armor together, tools together.
+        case 'kind': {
+          const ak = a.item.kind ?? '';
+          const bk = b.item.kind ?? '';
+          if (ak !== bk) return ak.localeCompare(bk) * dir;
+          return byName(a, b);
+        }
         case 'available': {
           // available=true floats to top when asc (the playtester-
           // friendly default — what can I fix RIGHT NOW?).

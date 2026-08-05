@@ -173,7 +173,25 @@ describe('OTA-1095 — source locks on the view that fixes the report', () => {
 
   it('it is a tall overlay, not a bottom strip fighting the feed for room', () => {
     expect(view).toContain('<Modal');
-    expect(view).toMatch(/height: '88%'/);
+    // OTA-1096 — 88% welded to the bottom → 92% floating inside a gutter. The
+    // number moved; the invariant (the exchange gets most of the screen) did not.
+    expect(view).toMatch(/height: '92%'/);
+  });
+
+  // OTA-1096 — owner: "shrink the width of the talk screen so it doesn't touch
+  // the edges of the screen and let's put the outside edge detail [a brighter]
+  // gold color so it pops and you understand a border is there." A panel welded
+  // to the bezel has no readable edge — it reads as the app rather than as a
+  // layer over it.
+  it('the sheet is INSET from every edge, with a border bright enough to see', () => {
+    expect(view).toMatch(/backdrop: \{[\s\S]*?paddingHorizontal: 14,[\s\S]*?paddingVertical: 22,/);
+    // A full radius (not just the two top corners a bottom-welded sheet had).
+    expect(view).toMatch(/borderRadius: 14,/);
+    expect(view).toMatch(/borderWidth: 2,/);
+    // The frame must be BRIGHTER than any gold used inside the sheet, or it
+    // stops being the thing your eye finds first.
+    expect(view).toMatch(/borderColor: '#f0c96a'/);
+    expect(view).not.toMatch(/borderTopLeftRadius/);
   });
 
   it('the topic tray is CAPPED so a 16-topic vendor cannot re-create the bug', () => {

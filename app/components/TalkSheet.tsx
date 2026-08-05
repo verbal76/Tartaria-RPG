@@ -23,6 +23,15 @@
 // it and tap once to come back. Nothing is lost on collapse — same conversation,
 // same scroll, same spent topics.
 //
+// OTA-1096 — the sheet FLOATS. Owner: "let's shrink the width of the talk
+// screen so it doesn't touch the edges of the screen and let's put the outside
+// edge detail [a brighter] gold color so it pops and you understand a border is
+// there." It was welded to the bottom bezel, which gave it no readable edge —
+// it read as the app rather than as a layer over the app. Now it sits inside a
+// gutter on all four sides, framed in a gold brighter than anything inside it,
+// and the darkened world visible around it is what tells you this is something
+// you are standing in and can step out of.
+//
 // No spinner, no async, no model. See engine/dialogue.ts.
 
 import React, { useMemo, useRef, useState } from 'react';
@@ -203,21 +212,31 @@ export function TalkSheet() {
 // House tokens only — the same parchment-on-soot palette the DiceRoller and the
 // old bottom sheet used, so the tall view reads as the same game, just bigger.
 const styles = StyleSheet.create({
-  // 12% of the screen left uncovered at the top: enough to keep the player
-  // oriented (this is a layer over the world, not a different app) without
-  // giving the exchange less room than it needs.
+  // OTA-1096 — the sheet is INSET from every edge rather than welded to the
+  // bottom of the screen. Owner: "let's shrink the width of the talk screen so
+  // it doesn't touch the edges of the screen and let's put the outside edge
+  // detail [a brighter] gold color so it pops and you understand a border is
+  // there." A panel that runs to the bezel has no readable edge — it reads as
+  // the app, not as a thing laid over the app. The darkened world showing in
+  // the gutter is what tells you the conversation is a layer you can leave.
   backdrop: {
     flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.72)',
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 22,
+    backgroundColor: 'rgba(0,0,0,0.78)',
   },
   sheet: {
-    height: '88%',
+    // Was 88% welded to the bottom. Slightly shorter now that it floats, so the
+    // gutter is visible top AND bottom — the border has to be seen to work.
+    height: '92%',
     backgroundColor: '#13110f',
-    borderColor: '#3a342c',
-    borderTopWidth: 1,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    // Brighter than any gold inside the sheet (#c9a86a kicker, #6b5c3a topic
+    // rows), and 2px so it survives a mid-range phone's rounding. The frame is
+    // deliberately the loudest edge on screen.
+    borderColor: '#f0c96a',
+    borderWidth: 2,
+    borderRadius: 14,
     padding: 14,
     gap: 8,
   },
