@@ -21,6 +21,33 @@
 // failed op can't wedge the chain. No nested acquisition (an op never triggers
 // another native-ML op from inside its own locked fn), so it can't deadlock.
 
+/** ⚠ OTA-1146 — HOMEWORK IS BELOW EVERYTHING, AND IT CAN BE CUT OFF.
+ *
+ *  Owner, on whether idle-time generation costs the player anything: *"if done
+ *  right, it should cost us [no] time correct?"* Not automatically — and the
+ *  difference is the whole engineering problem.
+ *
+ *  OTA-634 made this lock priority-aware, but read its own note carefully: *"a
+ *  native call already in flight can't be preempted — `running` guards that —
+ *  so priority only reorders the WAITING set."* That is exactly right for voice
+ *  vs narration, where both are work someone asked for and the only question is
+ *  order. It is NOT enough for homework, which nobody asked for: a homework
+ *  generation six seconds into a ten-second job makes the player's next tap
+ *  wait four seconds, and priority cannot help because the job is already
+ *  running.
+ *
+ *  So homework gets two things:
+ *   1. A priority BELOW voice, so it never jumps any queue; and
+ *   2. an `onPreempt` hook, called the moment higher-priority work arrives.
+ *      llama.cpp's `stopCompletion()` ends the generation early, the promise
+ *      settles with whatever it had, the lock frees, and the player's call
+ *      runs. Partial homework is discarded — it was free work; losing it costs
+ *      nothing, and making the player wait costs the only thing that matters.
+ *
+ *  ⚠ EXCLUSIVITY IS UNTOUCHED. Preemption does not overlap two native ops: it
+ *  asks the running one to FINISH EARLY, and the chain still waits for it to
+ *  settle before pumping. The arb159 crash guarantee is exactly as strong. */
+export const ML_PRIORITY_HOMEWORK = -1;
 /** Lower number = lower priority. Voice yields to LLM narration. */
 export const ML_PRIORITY_VOICE = 0;
 export const ML_PRIORITY_LLM = 1;
@@ -31,11 +58,19 @@ interface PendingMl {
   reject: (e: unknown) => void;
   priority: number;
   seq: number;
+  /** OTA-1146 — cut this op short if higher-priority work arrives. Only
+   *  interruptible work (homework) supplies one; everything else is work
+   *  someone is waiting for, and finishing it IS the point. */
+  onPreempt?: () => void;
 }
 
 const pending: PendingMl[] = [];
 let running = false;
 let seqCounter = 0;
+/** The running op's priority and its cut-it-short hook, when it offered one.
+ *  Exactly one op runs at a time, so a single slot is the whole registry. */
+let runningPriority = ML_PRIORITY_LLM;
+let runningPreempt: (() => void) | null = null;
 
 function pumpMl(): void {
   if (running || pending.length === 0) return;
@@ -50,11 +85,14 @@ function pumpMl(): void {
   }
   const task = pending.splice(bestIdx, 1)[0]!;
   running = true;
+  runningPriority = task.priority;
+  runningPreempt = task.onPreempt ?? null;
   Promise.resolve()
     .then(task.fn)
     .then(task.resolve, task.reject)
     .then(() => {
       running = false;
+      runningPreempt = null;
       pumpMl();
     });
 }
@@ -62,7 +100,11 @@ function pumpMl(): void {
 /** Run `fn` exclusively with respect to every other native-ML call routed
  *  through this lock (Qwen completion + Kokoro synth). Never overlaps. Higher
  *  `priority` waiters run first when the lock frees; equal priority is FIFO. */
-export function runExclusiveNativeMl<T>(fn: () => Promise<T>, priority: number = ML_PRIORITY_LLM): Promise<T> {
+export function runExclusiveNativeMl<T>(
+  fn: () => Promise<T>,
+  priority: number = ML_PRIORITY_LLM,
+  onPreempt?: () => void,
+): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     pending.push({
       fn: fn as () => Promise<unknown>,
@@ -70,7 +112,23 @@ export function runExclusiveNativeMl<T>(fn: () => Promise<T>, priority: number =
       reject,
       priority,
       seq: seqCounter++,
+      onPreempt,
     });
+    // ⚠ OTA-1146 — ask the running op to finish early if this one outranks it.
+    // Fired on ENQUEUE, not on pump: the whole point is to shorten a wait that
+    // has already started, and by pump time the running op has finished anyway.
+    // Idempotent by construction — the hook is cleared when the op settles, and
+    // llama.cpp's stopCompletion is safe to call twice.
+    if (running && runningPreempt && priority > runningPriority) {
+      const cut = runningPreempt;
+      runningPreempt = null;
+      try { cut(); } catch { /* a broken hook must never wedge the chain */ }
+    }
     pumpMl();
   });
+}
+
+/** Tests only — the lock is module state. */
+export function _mlLockState(): { running: boolean; queued: number; runningPriority: number } {
+  return { running, queued: pending.length, runningPriority };
 }

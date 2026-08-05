@@ -96,7 +96,9 @@ describe('OTA-1128 — every consumer is labeled', () => {
     // a detached context under one word. The property this test cares about is
     // unchanged — both paths record — so the assertions just widened to allow
     // the classification. ota1142DormancyWindow owns the split itself.
-    expect(rt).toMatch(/outcome: text\.length > 0 \? 'ok' :/);
+    // RETARGETED BY OTA-1146 — `outcome:` and the `text.length` test are no
+    // longer on the same line (a `preempted` branch was added in front).
+    expect(rt).toMatch(/text\.length > 0 \? 'ok'/);
     expect(rt).toMatch(/outcome: [^\n]*'error',[\s\S]{0,200}throw err;/);
     expect((rt.match(/job: opts\.job \?\? 'unlabeled'/g) ?? []).length).toBe(2);
   });
@@ -111,7 +113,11 @@ describe('OTA-1128 — every consumer is labeled', () => {
     const fusion = src('app/engine/itemFusion.ts');
     // Narration is labeled PER-INTENT — the exact grain OTA-1116 asked for.
     expect(store).toContain('job: `narration:${intent}`');
-    expect(store).toContain("job: 'ambient'");
+    // RETARGETED BY OTA-1146 — the ambient consumer now names TWO jobs: the
+    // live line stays 'ambient', and the bank's rest-filler is 'ambient_fill'
+    // so idle work is priced separately from work the player is waiting on.
+    // The property this guards is unchanged: the consumer labels itself.
+    expect(store).toContain("? 'ambient_fill' : 'ambient'");
     expect(store).toContain("job: 'flourish'");
     expect(store).toContain("job: 'ask_arbiter'");
     expect(store).toContain("job: 'investigate_lore'");

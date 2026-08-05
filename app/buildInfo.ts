@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.56';
+export const DISPLAY_VERSION = '4.29.57';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22394,7 +22394,53 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1145TheBank (16 tests). One OTA-1130 assertion
 // retargeted (the discard condition gained its one exclusion).
 // DISPLAY_VERSION 4.29.56.
-export const OTA_BUILD_ID = '2026-08-05-1145-the-bank';
+// OTA-1146 — HOMEWORK YIELDS. The harness step three of the headroom
+// track will run on, and the answer to the owner's question about
+// it: "if done right, it should cost us [no] time correct?"
+// ⚠ NOT AUTOMATICALLY — and the difference is the whole engineering
+// problem. OTA-634 made the native-ML lock priority-aware, and its
+// own note is precise about the limit: "a native call already in
+// flight can't be preempted — `running` guards that — so priority
+// only reorders the WAITING set." That is exactly right for voice vs
+// narration, where both are work someone asked for and the only
+// question is order. It is NOT enough for homework, which nobody
+// asked for: a homework generation six seconds into a ten-second job
+// makes the player's next tap wait four seconds, and priority cannot
+// help because the job is already running.
+// SO HOMEWORK GETS TWO THINGS, and they only work together:
+//   1. ML_PRIORITY_HOMEWORK, BELOW voice — it never jumps a queue; and
+//   2. an onPreempt hook — the moment higher-priority work is
+//      ENQUEUED (not pumped; by pump time the player has already
+//      waited out the whole job), llama.cpp is told to stop, the
+//      promise settles with whatever it had, the lock frees, and the
+//      player's call runs. Partial homework is discarded: it was free
+//      work, losing it costs nothing, and making the player wait
+//      costs the only thing that matters.
+// ⚠ EXCLUSIVITY IS UNTOUCHED, and that outranks every latency concern
+// here. Preemption does not overlap two native ops — it asks the
+// running one to FINISH EARLY, and the chain still waits for it to
+// settle before pumping. The arb159 crash guarantee is exactly as
+// strong, and the suite asserts max-concurrency is 1 through a
+// preemption with a lingering native call.
+// ⚠ ORDINARY WORK IS NEVER PREEMPTED. Narration and voice supply no
+// hook, so there is nothing to fire — finishing them IS the point.
+// New telemetry outcome 'preempted', deliberately NOT filed with the
+// failures: yielding to the player is the feature working. It gets
+// its own ⏸ mark so a session full of them still shows up (homework
+// scheduled at bad moments burns battery for nothing) without reading
+// as a fault.
+// ⚠ AND IT SHIPS WITH A LIVE CONSUMER rather than as scaffolding: the
+// bank's rest-filler (OTA-1145) is by definition work nobody asked
+// for, so it becomes the first homework job — 'ambient_fill', priced
+// separately from the live 'ambient' line, which is NOT homework
+// because the player is owed it. A priority tier and a flag with no
+// caller would have been exactly the dead code OTA-1140/1141 spent
+// two OTAs deleting.
+// New suite ota1146HomeworkPreempt (15 tests). Three assertions
+// retargeted for a multi-line outcome expression, one for the split
+// ambient job label. DISPLAY_VERSION 4.29.57.
+export const OTA_BUILD_ID = '2026-08-05-1146-homework-yields';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1145-the-bank';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1144-cached-prefix';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1143-volley-after-kill';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1142-dormancy-window';
