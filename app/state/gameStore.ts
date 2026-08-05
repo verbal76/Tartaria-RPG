@@ -15301,15 +15301,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // waking up in a sealed room is that it was already in with you.
               // eslint-disable-next-line @typescript-eslint/no-require-imports
               const restAmb = require('../engine/indoorAmbush') as typeof import('../engine/indoorAmbush');
+              // ⚠ OTA-1135 — THE OUTDOOR HALF OF OTA-1055. That OTA gave the
+              // INDOOR path three lines for each beat and left the outdoor
+              // path on a single hardcoded string for both — so the more
+              // common case, resting in the open, was the one with no variety.
+              // The owner's log has two consecutive rest ambushes printing the
+              // IDENTICAL beat; the RATE measured fine (22% wild / 8% hub,
+              // ×1.3 night — two hits in a session is a ~5% coincidence), so
+              // the repetition was the whole complaint. Five lines each now,
+              // same shape as indoorAmbush so the two paths cannot drift apart
+              // again. Authored, not generated: this fires as the fight starts
+              // and the model's own telemetry says it would arrive after the
+              // first attack roll — see restWakeLines.ts for the full reasoning
+              // and for why rest is nevertheless the best future bank slot.
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const outdoorAmb = require('../engine/restWakeLines') as typeof import('../engine/restWakeLines');
               get().appendLog(
                 'arbiter',
                 restUnderRoof
                   ? restAmb.indoorRestWakeLine()
-                  : `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
+                  : outdoorAmb.outdoorRestWakeLine(),
               );
               get().appendLog('world', restUnderRoof
                 ? restAmb.indoorRestArrivalLine(withArticleCap(enemy.name))
-                : `${withArticleCap(enemy.name)} closes the distance through the dark. The rest is over.`);
+                : outdoorAmb.outdoorRestArrivalLine(withArticleCap(enemy.name)));
               get().appendLog('debug', debugEnemy(enemy as unknown as Record<string, unknown>)); // OTA-354
             } else {
               // No enemy could be spawned — emit a flavor line so the
