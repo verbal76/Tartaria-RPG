@@ -26,7 +26,14 @@
  *  in opposite directions. The device log had one of each and no way to tell
  *  them apart — the second read `empty 8809ms read 0ms/write 0ms in 309t→out
  *  0t`, which is 8.8 seconds of wall time doing literally no native work. */
-export type QwenCallOutcome = 'ok' | 'empty' | 'error' | 'dormant';
+/** ⚠ OTA-1146 — 'preempted' is HOMEWORK CUT SHORT, and it is a SUCCESS, not a
+ *  failure. Idle-time work is interruptible on purpose: the moment the player
+ *  acts, llama.cpp is told to stop so their call runs now. A preempted job
+ *  losing its tokens is the system working exactly as designed, so it must not
+ *  read as an error in the rollup — but it still needs its own mark, because a
+ *  session full of them means homework is being scheduled at the wrong moments
+ *  and burning battery for nothing. */
+export type QwenCallOutcome = 'ok' | 'empty' | 'error' | 'dormant' | 'preempted';
 
 /** OTA-1130 — how generation ended, straight from llama.cpp. `limit` means it
  *  ran into the token cap mid-thought (we are paying full price AND cutting a
@@ -78,6 +85,8 @@ interface JobAggregate {
   empty: number;
   /** OTA-1142 — calls swallowed because the native context was already gone. */
   dormant: number;
+  /** OTA-1146 — homework cut short so the player's call could run. */
+  preempted: number;
   error: number;
   // OTA-1130
   prefillMs: number;
@@ -110,7 +119,7 @@ let discardSink: ((job: string, reason: string, ms: number) => void) | null = nu
 
 function emptyAggregate(): JobAggregate {
   return {
-    count: 0, totalMs: 0, maxMs: 0, waitMs: 0, maxWaitMs: 0, empty: 0, dormant: 0, error: 0,
+    count: 0, totalMs: 0, maxMs: 0, waitMs: 0, maxWaitMs: 0, empty: 0, dormant: 0, preempted: 0, error: 0,
     prefillMs: 0, decodeMs: 0, promptTokens: 0, outTokens: 0, cachedTokens: 0,
     reusedTokens: 0, cacheSamples: 0,
     hitLimit: 0, discarded: 0, discardedMs: 0,
@@ -133,6 +142,7 @@ export function recordQwenCall(r: QwenCallRecord): void {
   agg.maxWaitMs = Math.max(agg.maxWaitMs, r.waitMs);
   if (r.outcome === 'empty') agg.empty += 1;
   if (r.outcome === 'dormant') agg.dormant += 1;
+  if (r.outcome === 'preempted') agg.preempted += 1;
   if (r.outcome === 'error') agg.error += 1;
   agg.prefillMs += r.prefillMs ?? 0;
   agg.decodeMs += r.decodeMs ?? 0;
@@ -206,6 +216,8 @@ export interface QwenJobStats {
   empty: number;
   /** OTA-1142 — swallowed by a dead context, not by a silent model. */
   dormant: number;
+  /** OTA-1146 — yielded to the player. A success, not a failure. */
+  preempted: number;
   error: number;
   // OTA-1130
   avgPrefillMs: number;
@@ -235,6 +247,7 @@ export function qwenJobStats(): QwenJobStats[] {
       maxWaitMs: a.maxWaitMs,
       empty: a.empty,
       dormant: a.dormant,
+      preempted: a.preempted,
       error: a.error,
       avgPrefillMs: Math.round(a.prefillMs / a.count),
       avgDecodeMs: Math.round(a.decodeMs / a.count),
@@ -273,8 +286,11 @@ export function qwenTelemetrySummary(): string {
     // and the OTA-1130 rollup could not tell them apart.
     const cached = j.cacheSamples > 0 ? ` reuse${j.reusedTokens}t` : '';
     const capped = j.hitLimit > 0 ? ` cap${j.hitLimit}` : '';
+    // OTA-1146 — its own mark, deliberately NOT inside `bad`: yielding to the
+    // player is the feature. ⏸ reads as "paused for you", not as a fault.
+    const yielded = j.preempted > 0 ? ` ⏸${j.preempted}` : '';
     const waste = j.discarded > 0 ? ` ✂${j.discarded}/${s(j.discardedMs)}` : '';
-    return `${j.job} n${j.count} avg${s(j.avgMs)} max${s(j.maxMs)}${split}${sizes}${cached}${capped}${wait}${bad}${waste}`;
+    return `${j.job} n${j.count} avg${s(j.avgMs)} max${s(j.maxMs)}${split}${sizes}${cached}${capped}${wait}${bad}${yielded}${waste}`;
   });
   if (parts.length === 0) return 'no calls yet';
   const w = qwenWasteTotals();

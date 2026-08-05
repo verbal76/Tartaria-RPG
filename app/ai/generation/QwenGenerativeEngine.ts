@@ -51,6 +51,9 @@ export interface GenerateOptions {
   topK?: number;
   /** OTA-1128 — telemetry label for this call. See qwenTelemetry.ts. */
   job?: string;
+  /** OTA-1146 — idle-time work nobody asked for: queues below voice AND is cut
+   *  short the moment the player needs the model. See LlamaGenerateOptions. */
+  homework?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -252,6 +255,7 @@ export class QwenGenerativeEngine {
       topP: opts.topP ?? 0.9,
       topK: opts.topK ?? 40,
       job: opts.job,
+      homework: opts.homework,
     });
   }
 
@@ -275,6 +279,7 @@ export class QwenGenerativeEngine {
       topK: opts.topK ?? 40,
       onToken,
       job: opts.job,
+      homework: opts.homework,
     });
   }
 
