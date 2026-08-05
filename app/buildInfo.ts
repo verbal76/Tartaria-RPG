@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.39';
+export const DISPLAY_VERSION = '4.29.40';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20952,6 +20952,40 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1129 — ⚠ THE STALL WAS THE PROMPT, NOT THE MODEL. OTA-1128's telemetry
+// shipped and the first device log answered the 29-second question two OTAs
+// had been deferring — and CONTRADICTED the assumption behind the deferral:
+//     qwen⏱ ambient          ok 16822ms wait 2255ms (139ch)  ← 14.5s GENERATING
+//     qwen⏱ investigate_lore ok  1131ms            (132ch)  ← 1.1s, same size
+//     qwen⏱ item_synthesis   ok  5156ms            (216ch)
+//     flourish (1086 timer)      2087ms
+// Same model, same device, near-identical OUTPUT length — 13× the time. The
+// cost is not what the model WRITES, it is what it has to READ first: prefill
+// dominates. Ambient was reading a ~1,145-token scene dossier to produce an
+// 18-word aside; the fast jobs send a couple hundred tokens.
+// ⚠ THE CORRECTION: this was assumed to need the native rebuild (n_predict
+// 120→40 + threads + warm context — Phase 6, build-bound, parked on golem).
+// It does not, and cutting the OUTPUT cap would have barely moved it, because
+// the output was never the cost. The prompt is JavaScript. It ships in an OTA.
+//   1. AMBIENT READS A LEAN PROMPT (~1,145 → ~542 tokens). Its own
+//      instruction says the beat is UNPROMPTED and must NOT react to the last
+//      action — so exits, entity lists, the environment paragraph, canon lore
+//      and the pack manifest were all scene-reaction material the instruction
+//      forbids using. The location anchor is KEPT verbatim (it is the only
+//      thing stopping the model naming places out of training data), as is the
+//      read of the player the beat reflects on. Ambient is also the job that
+//      most often gets DISCARDED (near-duplicate / action-opener filters), so
+//      it was the worst place in the app to spend fifteen seconds of CPU.
+//   2. THE PACK MANIFEST IS CAPPED (INVENTORY_PROMPT_CAP = 14). This dumped
+//      EVERY row: the log's salvage-heavy pack put ~1,440 characters of item
+//      names into every narration prompt — a third of the whole thing. Worn
+//      kit is still named in full (the narrator swings it); the stowed list
+//      caps with an honest "…and N more" so the model knows the pack is
+//      deeper than the sample. Big-pack narration ~1,081 → ~809 tokens.
+// Expect ambient ≈16.8s → ≈7s and every narration lighter on a full pack; the
+// next device log's qwen⏱ lines are the check. Suite ota1129PromptWeight.
+// DISPLAY_VERSION 4.29.40.
+//
 // OTA-1128 — QWEN TELEMETRY: THE MEASUREMENT BEFORE THE CUT. First step of
 // the owner-approved LLM-headroom track ("move forward", 2026-08-05), and
 // the debt OTA-1116 left on purpose: the 29-second generation "gets
@@ -21592,7 +21626,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1128-qwen-telemetry';
+export const OTA_BUILD_ID = '2026-08-05-1129-prompt-weight';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1128-qwen-telemetry';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1127-first-visit-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1126-echo-farm-roof-fall';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1125-repair-group-budget';

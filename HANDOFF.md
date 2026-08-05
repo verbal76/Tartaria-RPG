@@ -923,9 +923,48 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.39**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.40**; ledger in `VERSION.md`.
 
-- **QWEN TELEMETRY — THE MEASUREMENT BEFORE THE CUT (2026-08-05, latest).
+- **⚠ THE STALL WAS THE PROMPT, NOT THE MODEL (2026-08-05, latest). BOTH
+  LINES.** HAL OTA-1129 / golem OTA-1106. Step 2 of the LLM-headroom track,
+  and OTA-1128's telemetry paid for itself on its FIRST device log:
+  ```
+  qwen⏱ ambient          ok 16822ms wait 2255ms (139ch)   ← 14.5s GENERATING
+  qwen⏱ investigate_lore ok  1131ms            (132ch)   ← 1.1s, same size
+  qwen⏱ item_synthesis   ok  5156ms            (216ch)
+  flourish (1086 timer)      2087ms
+  ```
+  Same model, same device, near-identical OUTPUT length — 13× the time. The
+  cost is not what the model writes, it is what it must READ first: **prefill
+  dominates**. Ambient was reading a ~1,145-token scene dossier to write an
+  18-word aside; the fast jobs send a couple hundred tokens.
+  ⚠ **THE CORRECTION THAT MATTERS.** This was assumed to need the native
+  rebuild (`n_predict` 120→40, more threads, warm context — Phase 6,
+  build-bound, parked on golem). It does NOT, and cutting the output cap would
+  have barely moved it, because the output was never the cost. The prompt is
+  JavaScript; it ships in an OTA. (Same shape as the earlier parking error the
+  owner caught: work assumed build-bound that never was.)
+  (1) **AMBIENT READS A LEAN PROMPT** (~1,145 → ~542 tokens).
+  `AMBIENT_INSTRUCTION` is explicit that the beat is UNPROMPTED and must NOT
+  react to the last action — so exits, entity lists, the environment
+  paragraph, canon lore and the pack manifest were all scene-reaction material
+  the instruction forbids using. The **location anchor is kept verbatim** (the
+  only guard against the model naming places out of training data — the
+  original "Borderlands" bug), as is the read of the player the beat reflects
+  on. Ambient is also the job most often DISCARDED by the near-duplicate /
+  action-opener filters, making it the worst place in the app to spend fifteen
+  seconds of CPU.
+  (2) **THE PACK MANIFEST IS CAPPED** — `INVENTORY_PROMPT_CAP = 14`.
+  `stringifyInventory` dumped EVERY row: the device log's salvage-heavy pack
+  put ~1,440 characters of item names into every narration prompt, a third of
+  the whole thing. Worn kit is still named in full (the narrator swings it);
+  the stowed list caps with an honest "…and N more" so the model knows the
+  pack is deeper than the sample. Big-pack narration ~1,081 → ~809 tokens.
+  **The check is the next device log** — `qwen⏱ ambient` should land near 7s,
+  not 17s. Suite `ota1129PromptWeight` (cap arithmetic, lean-ambient content,
+  anchor retention, scene prompt unchanged, determinism).
+
+- **QWEN TELEMETRY — THE MEASUREMENT BEFORE THE CUT (2026-08-05).
   BOTH LINES.** HAL OTA-1128 / golem OTA-1105. Step 1 of the owner-approved
   LLM-HEADROOM TRACK (owner: "move forward" — un-parking the JS-side LLM
   work wrongly assumed to need a native build; only Phase 6's native config
