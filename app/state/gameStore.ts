@@ -6578,10 +6578,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? ` read ${r.prefillMs ?? '?'}ms/write ${r.decodeMs ?? '?'}ms`
         : '';
       const sizes = r.promptTokens != null ? ` in ${r.promptTokens}t→out ${r.outTokens ?? '?'}t` : '';
-      // A non-zero cache means llama.cpp reused prompt tokens instead of
-      // re-reading them. Persistent ZERO across a session is the signal that a
-      // stable prompt PREFIX would make repeat calls far cheaper.
-      const cache = r.cachedTokens ? ` cache ${r.cachedTokens}t` : '';
+      // ⚠ OTA-1131 — REUSE, derived, not the raw cache size. OTA-1130 printed
+      // `cachedTokens` and read it as "tokens llama.cpp reused". The first
+      // device log settled it: every row came back as exactly in+out (546+31,
+      // 542+31, 309+179, 127+22 …), i.e. the KV cache grew by what the call
+      // itself did and reused nothing. The honest number is the remainder, and
+      // a measured zero is the finding — it says a stable prompt PREFIX is
+      // still entirely on the table.
+      const reused = r.cachedTokens != null
+        ? Math.max(0, r.cachedTokens - (r.promptTokens ?? 0) - (r.outTokens ?? 0))
+        : null;
+      const cache = reused != null ? ` reuse ${reused}t` : '';
       const stop = r.stop === 'limit' ? ' HIT-CAP' : '';
       get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait}${split}${sizes}${cache}${stop} (${r.chars}ch)`);
       if (qwenCallCount() % 10 === 0) {

@@ -170,6 +170,45 @@ const VOICE_RULES =
   'choices in narration so the player learns the system. ' +
   'End on a complete sentence.';
 
+// ⚠ OTA-1131 — THE AMBIENT PROMPT WAS ARGUING WITH ITSELF.
+//
+// OTA-1129 stripped the SYSTEM FACTS block out of the ambient prompt (exits,
+// entities, environment, pack — all scene-reaction material the ambient brief
+// forbids) and left the shared VOICE_RULES in place. VOICE_RULES was written
+// for the reaction path and says, in order: "Only narrate the player's last
+// action and the static facts already present", "not listed in the SYSTEM
+// FACTS above", "DO NOT name any … that is not in the SYSTEM FACTS". Ambient
+// then says "DO NOT narrate or react to their last action".
+//
+// So the beat was being told to narrate the last action AND not to, and twice
+// referred to a section that no longer exists in its own prompt. The OTA-1130
+// device log shows the model resolving that the wrong way — the discard is
+// logged as `reason=action-opener`, which is precisely "it narrated the last
+// action", and the whole 8-second generation is thrown away.
+//
+// Second cost: the action catalog. ~470 characters listing every verb the
+// engine resolves — attack, brawl, throw, dodge … — exists so REACTION
+// narration uses system vocabulary. Ambient narrates no action at all, so it
+// reads ~120 tokens of verb list to write an 18-word reflection, on a device
+// where prefill measures ~11ms/token. That is roughly 1.3 seconds per ambient
+// line spent reading a list the beat is forbidden to use.
+//
+// What survives is what actually guards ambient: the second-person lock (the
+// original failure was third-person recap), the no-invented-places rule
+// (rewritten to point at the anchor line the lean prompt DOES carry), and the
+// finish-your-sentence rule.
+const AMBIENT_VOICE_RULES =
+  "**SECOND PERSON ONLY.** Every sentence MUST address the player as " +
+  "'you' / 'your'. NEVER write 'The player', NEVER write 'they', " +
+  "NEVER write 'the adventurer', 'the figure', 'the explorer', or any " +
+  'third-person stand-in for the player. Sentences must START with ' +
+  '"You" or "Your". If a draft sentence begins with "The player" or ' +
+  '"They", rewrite it. Do not invent events, traps, mechanics, or ' +
+  'outcomes — nothing is happening; this is a quiet moment. Do not name ' +
+  'any place, room, weather or person other than the location named above. ' +
+  'If you would have to invent scenery to fill a sentence, end early. ' +
+  'End on a complete sentence.';
+
 const PEACEFUL_INSTRUCTION =
   'Narrate the situation in a grim, atmospheric tone. Acknowledge the ' +
   'last action; you may subtly reference an available exit or a carried ' +
@@ -207,7 +246,11 @@ const AMBIENT_INSTRUCTION =
   'between moments, not a response to anything. Warm or wry, never advice or ' +
   'instructions. Never repeat or restate any of these directions. ' +
   'ONE short sentence — about 18 words, no more. ' +
-  VOICE_RULES;
+  // OTA-1131 — the ambient voice block, not the reaction one. See
+  // AMBIENT_VOICE_RULES: the shared rules told this beat to narrate the last
+  // action (which its own brief forbids) and referred twice to a SYSTEM FACTS
+  // section OTA-1129 removed from this prompt.
+  AMBIENT_VOICE_RULES;
 
 export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
   const instruction = ctx.ambient

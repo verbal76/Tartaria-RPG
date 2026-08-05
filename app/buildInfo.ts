@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.41';
+export const DISPLAY_VERSION = '4.29.42';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -21657,7 +21657,64 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1130-deep-telemetry';
+// OTA-1131 — WHAT THE FIRST DEEP-TELEMETRY LOG SAID. OTA-1130 shipped
+// the instrumentation; this is the read. Headline: OTA-1129 WORKED —
+// ambient fell from ~1,145 prompt tokens / 16.8s to ~545 / 8–11.8s.
+// Four things the new numbers exposed, all fixed here:
+//   1. ⚠ THE CACHE NUMBER WAS BEING READ BACKWARDS. Every row came
+//      back with cache == in + out EXACTLY (546+31=577, 542+31=573,
+//      309+179=488, 127+22=149, 124+20=144). That is llama.cpp's KV
+//      cache SIZE after the call, not tokens reused — OTA-1130 read
+//      it as reuse and would have concluded the prefix cache was
+//      already working. Reuse is the REMAINDER, and the remainder is
+//      zero: every generation re-reads its whole prompt. The rollup
+//      now prints `reuse<N>t` derived as cached − in − out, and a
+//      MEASURED zero prints (absent data still stays quiet), because
+//      "no cache line" and "the cache saved nothing" are different
+//      findings. This keeps the stable-prefix item on the table
+//      instead of retiring it on a misread.
+//   2. ⚠ THE AMBIENT PROMPT WAS ARGUING WITH ITSELF. OTA-1129 removed
+//      the SYSTEM FACTS block from the ambient prompt and left the
+//      shared VOICE_RULES, which orders "Only narrate the player's
+//      last action" and twice cites a section no longer present —
+//      while AMBIENT_INSTRUCTION says DO NOT react to the last
+//      action. The log shows the model resolving it the wrong way:
+//      `reason=action-opener`, 8.5 seconds binned. New
+//      AMBIENT_VOICE_RULES keeps the guards ambient needs (second
+//      person, no invented places, finish the sentence) and drops the
+//      contradiction plus the ~470-character action-verb catalog a
+//      beat that narrates no action was reading every time. 1,352 →
+//      622 characters of rules; the whole prompt ~2,157 → ~1,427,
+//      roughly 545 → 360 tokens, about two seconds of prefill per
+//      line at the ~11ms/token this device measures.
+//   3. ⚠ ITEM SYNTHESIS WAS FAILING SILENTLY AT FULL PRICE. `ok
+//      9528ms … out 179t … HIT-CAP (813ch)` — 179 tokens against a
+//      180 cap, and 813 characters for a shape that needs ~200. The
+//      model rambled past its JSON and was then cut off, and
+//      extractJsonObject spanned first-brace to LAST-brace, which
+//      parses neither case. Nine and a half seconds returned null
+//      without a word in the log. Now the extractor takes the first
+//      BALANCED object (string- and escape-aware, so a brace in the
+//      description can't move the depth counter) and falls back to
+//      the old span rather than losing anything that used to work —
+//      and both failure exits report through noteQwenDiscarded, so
+//      this call site finally appears in the waste accounting.
+//   4. THE TALK POPUP SHOWED DEBUG LINES. Reported by the owner from
+//      inside the game, typed at the Arbiter: "you are showing the
+//      qwen notes in the talk popup". TalkSheet's transcript filtered
+//      on timestamp only; AdventureFeed drops HIDDEN_LOG_CHANNELS and
+//      it did not, so every `qwen⏱` line landed mid-conversation.
+//      Same set, one import.
+// NOT changed, deliberately: the ambient token cap. Every ambient ends
+// HIT-CAP at 31/32, but this log's discards are `action-opener` and
+// `stale`, not truncation, and the beat is clamped to one sentence
+// anyway — raising it costs decode, lowering it risks the sentence.
+// The cap moves when a log blames it. New suite
+// ota1131AmbientContradiction (21 tests); ota1130 cache test and
+// ota1118 transcript lock retargeted with the reasons in place.
+// DISPLAY_VERSION 4.29.42.
+export const OTA_BUILD_ID = '2026-08-05-1131-ambient-contradiction';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1130-deep-telemetry';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1129-prompt-weight';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1128-qwen-telemetry';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1127-first-visit-truth';
