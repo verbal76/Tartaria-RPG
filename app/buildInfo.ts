@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.34';
+export const DISPLAY_VERSION = '4.29.35';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19854,6 +19854,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1112/1089 anti-stun-lock + pack math. No app code; the fast gate
 // is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1101 — THE GROUP BAR TAKES THE TAB ROW'S PLACE AND HOLDS IT.
+// Owner: "the new line that says sell group needs to stay anchored at
+// the top and replace the buy sell buttons until, you either sell the
+// group or cancel the group." Two things follow from that, and both are
+// the point:
+//   1. ANCHORED. The bar was rendered INSIDE the scrolling sell list, so
+//      it scrolled away the moment you started ticking rows further down
+//      — losing sight of the running total exactly when it starts to
+//      matter. The tab row lives OUTSIDE the ScrollView, so moving the
+//      bar into that slot is what makes it stay put. Anchoring here is
+//      structural, not a style: the test asserts the bar's position in
+//      the tree relative to the ScrollView, not a `position` value.
+//   2. REPLACES. While a group is open the BUY / SELL / CONTRACTS row is
+//      not rendered at all, so BUY is unreachable and the only two ways
+//      out are the two the bar offers — SELL GROUP or CANCEL. OTA-1099
+//      already cleared the group when BUY was tapped; that guard stays
+//      as belt-and-braces, but the tab is now simply not there to tap.
+//      A mode you can leave by accident is not a mode.
+// One OTA-1099 source lock RETARGETED (the bar's `&&` became a `? :`);
+// what it guarded — the bar exists only while a group does, and states
+// the pay-out up front — is unchanged, and the placement claim moved
+// into a new assertion that checks the tree order and that the list no
+// longer contains the bar. DISPLAY_VERSION 4.29.35.
+//
 // OTA-1100 — THE INVENTORY LEARNS THE SAME GRIP.
 // Owner, after the group sell: "yes wire drop, fusable select and scrap
 // the same way." The point is the SAMENESS — one gesture, one meaning,
@@ -20311,7 +20335,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1100-inventory-group';
+export const OTA_BUILD_ID = '2026-08-05-1101-group-bar-anchored';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1100-inventory-group';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1099-group-sell';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1098-transcript-and-repair-all';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1097-fusable-select-mode';

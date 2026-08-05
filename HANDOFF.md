@@ -923,9 +923,28 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.34**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.35**; ledger in `VERSION.md`.
 
-- **THE INVENTORY LEARNS THE SAME GRIP (2026-08-05, latest). BOTH LINES.**
+- **THE GROUP BAR TAKES THE TAB ROW'S PLACE AND HOLDS IT (2026-08-05, latest).
+  BOTH LINES.** golem OTA-1101 / HAL OTA-1124. Owner: "the new line that
+  says sell group needs to stay anchored at the top and replace the buy
+  sell buttons until, you either sell the group or cancel the group."
+  (1) **ANCHORED.** The bar was rendered INSIDE the scrolling sell list,
+  so it scrolled away the moment you started ticking rows further down —
+  losing sight of the running total exactly when it starts to matter. The
+  tab row lives OUTSIDE the `ScrollView`, so moving the bar into that
+  slot is what makes it stay put. Anchoring here is STRUCTURAL, not a
+  style: the test asserts the bar's position in the tree relative to the
+  ScrollView (and that the list no longer contains it), rather than
+  checking a `position` value that would pass while the bar sat in the
+  wrong parent.
+  (2) **REPLACES.** While a group is open the BUY / SELL / CONTRACTS row
+  is not rendered at all, so BUY is unreachable and the only two ways out
+  are SELL GROUP and CANCEL. The earlier clear-on-BUY guard stays as
+  belt-and-braces, but the tab is now simply not there to tap. A mode you
+  can leave by accident is not a mode. One source lock RETARGETED.
+
+- **THE INVENTORY LEARNS THE SAME GRIP (2026-08-05). BOTH LINES.**
   golem OTA-1100 / HAL OTA-1123. Owner, after the group sell: "yes wire
   drop, fusable select and scrap the same way." The point is the
   SAMENESS — one gesture, one meaning, wherever you are: HOLD a row to
