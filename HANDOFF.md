@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.44**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.45**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1045,29 +1045,31 @@ rediscovering them.
   ambushes drew the identical "Something circled while you were out" line, so
   the dedup on that beat is the real complaint. **No rate change warranted.**
 
-- **⚠ THE NOVELTY GATE PENALISES NEW PLAYERS — CONFIRMED, FIX DESIGNED, NOT
-  SHIPPED.** Owner: *"if we are looking for not traveled in the last 50
-  squares, doesn't that penalize new players since they haven't been
-  anywhere?"* Yes, exactly. `tileIsNovel = !recentTileHistory.includes(key)`
-  and the history starts EMPTY, so a brand-new character has every tile novel
-  and rolls the full encounter chance on every step, while an established
-  player working a known region has 50 tiles banked and rolls far less often.
-  The encounter rate is therefore at MAXIMUM when the player is weakest and
-  falls as they get stronger — backwards from any difficulty curve. In
-  fairness the gate was never a difficulty knob: OTA-438 added it to stop
-  someone oscillating between two tiles to farm encounters and loot, and it
-  still does that job. Two candidate changes, both awaiting the owner's call
-  because they are game FEEL, not correctness:
-  **(a) an early-steps ramp** — scale the roll by `recentTileHistory.length`,
-  starting around a third and reaching full by ~25 tiles. The signal already
-  exists and is already used this way: `fleeGraceApplies` gives a free escape
-  while `tilesSeen <= FLEE_GRACE_STEPS (3)`.
-  **(b) the baseline itself** — currently 0.58 auto-travel / 0.45 manual ×
-  1.3 at night = **75% encounter chance per novel step auto-travelling after
-  dark**, which is what "every move was a fight" actually is. The code's own
-  comment at the constant says *"Tune down toward 'desolate' (~4-8%) from here
-  once the feel is dialed in"* and nobody ever did. Proposal on the table:
-  0.58 → ~0.45 and 0.45 → ~0.35.
+- **✅ RESOLVED (OTA-1134) — THE NOVELTY GATE PENALISED NEW PLAYERS.** Owner:
+  *"if we are looking for not traveled in the last 50 squares, doesn't that
+  penalize new players since they haven't been anywhere?"* Confirmed:
+  `recentTileHistory` starts EMPTY, so a new character had every tile novel and
+  rolled the full encounter chance every step while an established player rolled
+  far less. Fixed by **halving the baseline** (0.58 → 0.29 auto-travel,
+  0.45 → 0.225 manual), NOT by the early-game ramp proposed first — owner:
+  *"the 25 step block means they can make it to half of the capitals with no
+  encounters."* The novelty gate itself is unchanged and still does OTA-438's
+  anti-farm job.
+
+- **⚠ OPEN — TIE ENCOUNTER RATE TO THE DIFFICULTY TIER.** Owner, alongside the
+  halving: *"I don't think the numbers for later in the game need adjusted yet,
+  they should be tied to a difficulty level choice in character creation."* The
+  knob already exists — `engine/pressure.ts`, four tiers (`salvage` / `owed` /
+  `let_it_come` / `bury_me`) picked on the last step of creation, lowerable
+  mid-run but never raisable. ⚠ Read that file's header before wiring anything:
+  it declines to scale encounter rate **on purpose** — *"Corruption and weather
+  already bite … re-scaling them from here would put a difficulty multiplier on
+  top of a year of tuning and quietly invalidate all of it."* So this is a
+  design job, not a line change. The question to answer first is whether the
+  encounter ROLL is one of the substrates pressure should own (like TIDE and
+  HOSTILE, which threatened nothing before) or one of the already-balanced ones
+  it deliberately leaves alone. The post-halving baseline is the new reference
+  point, so a tier multiplier would sit on 0.29 / 0.225.
 
 - **QWEN DORMANCY IS FIRING REGULARLY.** Third log in a row ending with
   `qwen-watchdog: Qwen dormant (status='ready' but the native context was
@@ -1086,7 +1088,42 @@ rediscovering them.
   from an earlier log across a truncated span, so it was never confirmed as a
   bug. Still unresolved; needs a log that captures the whole encounter.
 
-- **⚠ THE DEATH SCREEN, AND THE LOCKDOWN AT ZERO (2026-08-05, latest). BOTH LINES.**
+- **HALF (2026-08-05, latest). BOTH LINES.**
+  HAL OTA-1134 / golem OTA-1111. Owner: *"there were sections that every move
+  or rest was a fight … let's just 1/2 the chance percentage."*
+  **The arithmetic he was feeling:** the wasteland encounter roll was 0.58
+  auto-travel / 0.45 manual, times the time-of-day multiplier (1.3 night /
+  0.85 day) — a **75% chance per step** auto-travelling after dark. And the
+  gate meant to space encounters out does the opposite for the player who needs
+  it most: `tileIsNovel` tests `recentTileHistory`, which starts EMPTY, so a
+  brand-new character has every tile novel and rolls the full chance every
+  single step while an established player working known ground rolls far less
+  often. The rate peaked exactly where the character was weakest — which the
+  owner spotted from the description alone, then explained from his own play
+  pattern: *"I have been starting new characters and running them through the
+  paces for 1 to 2 capitals. So of course it looked rough — the 50 paces thing
+  was beating me up since it was early game."*
+  **⚠ Why a flat halving and not the early-game ramp proposed first.** The ramp
+  climbed to full rate over ~25 tiles; the owner rejected it on sight — *"the
+  25 step block means they can make it to half of the capitals with no
+  encounters."* He is right, and the reasoning generalises past the early game:
+  the problem was never that new characters deserve a discount, it is that the
+  BASELINE was too high for everybody and the novelty gate merely made the
+  opening the place you noticed. A ramp would have papered over a bad number
+  with a second mechanic and bought a dead opening in exchange. So: one number,
+  applied everywhere. **0.58 → 0.29, 0.45 → 0.225.** Night auto-travel 75% →
+  ~38%; day manual 38% → ~19%. OTA-713's auto-travel-is-more-eventful ratio is
+  preserved exactly, because halving both preserves it by construction.
+  **Deliberately untouched**, each on instruction or on measurement rather than
+  assumption: late-game scaling (see §WATCH LIST — it belongs to the difficulty
+  tier, and `pressure.ts` declines to own it for a documented reason); REST
+  ambush (22% wild / 8% hub → 18.7%/28.6% with the multiplier; the two-for-two
+  rest in the last log is a ~5% coincidence, and the real fault there is that
+  both drew the IDENTICAL line — a dedup problem, not a rate one); and the
+  novelty gate itself, which is still doing OTA-438's anti-farm job.
+  New suite `ota1134EncounterRate` (11 tests).
+
+- **⚠ THE DEATH SCREEN, AND THE LOCKDOWN AT ZERO (2026-08-05). BOTH LINES.**
   HAL OTA-1133 / golem OTA-1110. Owner: *"The second my HP hits 0 for whatever
   reason there should be a crossfade between the game screen and a new screen
   like the intro screen that gives a brief description of my death lore style
