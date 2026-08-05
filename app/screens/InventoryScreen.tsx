@@ -146,6 +146,7 @@ export function InventoryScreen() {
   const useInventoryItem = useGameStore((s) => s.useInventoryItem);
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
   const toggleReserveForFusion = useGameStore((s) => s.toggleReserveForFusion);
+  const reserveManyForFusion = useGameStore((s) => s.reserveManyForFusion);
   const toggleReserveForQuest = useGameStore((s) => s.toggleReserveForQuest);
   const applyCoating = useGameStore((s) => s.applyCoating);
   const applyCoatingToArmor = useGameStore((s) => s.applyCoatingToArmor);
@@ -292,6 +293,25 @@ export function InventoryScreen() {
   const fusionFiltered = sortKey === 'fusionable'
     ? filtered.filter(isFusionEligible)
     : filtered;
+  // OTA-1097 — the FUSABLE view is a SELECTION surface, not a browsing one: every
+  // row in it is Crucible stock, and the only question is in or out. In this mode
+  // a tap toggles the reserve directly (owner: "if you tap on an item that has
+  // been selected it automatically deselects") and category headers carry a
+  // SELECT ALL. The pouch / bandolier fill modes already own the tap, so they win
+  // — two "armed" tap modes at once would be a coin flip.
+  const fusionSelectMode = sortKey === 'fusionable' && !pouchFilterActive && !bandolierFilterActive;
+  // Which rows in a category the bulk button may act on, and whether they are
+  // already all reserved (which flips the button to CLEAR). Quest-locked rows are
+  // excluded here for the same reason the store skips them — the button must never
+  // claim a count it cannot deliver.
+  const categorySelection = (rows: InventoryItem[]) => {
+    const actionable = rows.filter((i) => !isQuestLockedItem(i) && (i.reservedForFusion || isFusionEligible(i)));
+    return {
+      ids: actionable.map((i) => i.id),
+      eligible: actionable.length,
+      allSelected: actionable.length > 0 && actionable.every((i) => i.reservedForFusion === true),
+    };
+  };
   // OTA-1094 — one worn-instance set for the whole screen: the sort pre-key AND
   // the coating pickers below read it, so what floats to the top and what carries
   // the EQUIPPED tag can never disagree.
@@ -478,7 +498,29 @@ export function InventoryScreen() {
       setBandolierFilterActive(false);
       return;
     }
+    // OTA-1097 — FUSABLE view: a tap IS the selection. Owner: "if you tap on an
+    // item that has been selected it automatically deselects." Deselect-on-tap
+    // without select-on-tap would be maddening, so the tap is a straight toggle
+    // in both directions — and it moves the WHOLE stack, matching the bulk intent
+    // of a view whose headers say "ALL". The per-unit "Save 1 / Free 1" controls
+    // are still one long-press away, and any other sort axis opens the modal as
+    // before. A quest-locked row keeps its modal: it can never be fused, so
+    // swallowing the tap would just look broken.
+    if (fusionSelectMode && !isQuestLockedItem(item)) {
+      toggleReserveForFusion(item.id, item.quantity ?? 1);
+      return;
+    }
     setScrapResult(null); // fresh modal — clear any prior result
+    setPending({ item, slots: validSlotsForItem(item) });
+  };
+
+  // OTA-1097 — the escape hatch from tap-to-toggle: a long press in the FUSABLE
+  // view opens the ordinary item modal, so the single-unit "Save 1 for fusion"
+  // (and everything else on that sheet) is still reachable without leaving the
+  // view. Elsewhere it is a no-op — the tap already opens the modal.
+  const handleItemLongPress = (item: InventoryItem) => {
+    if (!fusionSelectMode) return;
+    setScrapResult(null);
     setPending({ item, slots: validSlotsForItem(item) });
   };
 
@@ -1314,6 +1356,18 @@ export function InventoryScreen() {
             </TouchableOpacity>
           </View>
         )}
+        {/* OTA-1097 — say the mode out loud. The FUSABLE view now behaves
+            differently from every other sort (a tap reserves instead of opening
+            the item sheet), and a screen that silently changes what a tap means
+            is the same silent-rule problem OTA-1094 was written against. One
+            line, only in this view, naming both the tap and the long-press. */}
+        {fusionSelectMode && (
+          <View style={styles.fusionModeBanner}>
+            <Text style={styles.fusionModeText}>
+              Tap to reserve ♡ / release ♥ for the Crucible. Use a category&apos;s ALL button to take the lot; long-press a row for its full menu.
+            </Text>
+          </View>
+        )}
         {CATEGORY_ORDER.map((cat) => {
           const items = grouped[cat];
           if (items.length === 0) return null;
@@ -1342,6 +1396,33 @@ export function InventoryScreen() {
                     {CATEGORY_LABEL[cat].toUpperCase()}
                   </Text>
                 </View>
+                {/* OTA-1097 — SELECT ALL / CLEAR ALL, in the FUSABLE view only.
+                    Owner: "we also need a select all button on the category
+                    headers in inventory when we select sort by fusable so you
+                    can select a whole category." Reserving a category one row at
+                    a time was the same complaint OTA-968 answered for a single
+                    stack, one level up. Rendered INSIDE the header but with its
+                    own press handler, so it never collapses the section it acts
+                    on — the one thing that would make it useless. */}
+                {fusionSelectMode && (() => {
+                  const sel = categorySelection(items);
+                  if (sel.eligible === 0) return null;
+                  return (
+                    <TouchableOpacity
+                      style={[styles.selectAllBtn, sel.allSelected && styles.selectAllBtnOn]}
+                      activeOpacity={0.7}
+                      onPress={() => reserveManyForFusion(sel.ids, !sel.allSelected)}
+                      accessibilityRole="button"
+                      accessibilityLabel={sel.allSelected
+                        ? `Clear all ${sel.eligible} reserved ${CATEGORY_LABEL[cat]} items`
+                        : `Reserve all ${sel.eligible} ${CATEGORY_LABEL[cat]} items for fusion`}
+                    >
+                      <Text style={[styles.selectAllText, sel.allSelected && styles.selectAllTextOn]}>
+                        {sel.allSelected ? `♥ CLEAR ${sel.eligible}` : `♡ ALL ${sel.eligible}`}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })()}
                 <Text style={styles.sectionCount}>
                   {items.reduce((sum, i) => sum + i.quantity, 0)}
                 </Text>
@@ -1366,6 +1447,8 @@ export function InventoryScreen() {
                   slotTaken={!pouchFilterActive && !bandolierFilterActive && itemSlotTaken(item)}
                   stripeColor={companionStripeColor(item)}
                   onPress={() => handleItemTap(item)}
+                  onLongPress={fusionSelectMode ? () => handleItemLongPress(item) : undefined}
+                  selectable={fusionSelectMode}
                 />
                 </View>
               ))}
@@ -1769,6 +1852,8 @@ function ItemRow({
   slotTaken,
   stripeColor,
   onPress,
+  onLongPress,
+  selectable,
 }: {
   item: InventoryItem;
   color: string;
@@ -1781,6 +1866,13 @@ function ItemRow({
   slotTaken: boolean;
   stripeColor: string | null;
   onPress: () => void;
+  /** OTA-1097 — FUSABLE view only: opens the ordinary item modal, since the tap
+   *  is spent on the reserve toggle there. */
+  onLongPress?: () => void;
+  /** OTA-1097 — true in the FUSABLE view, where the row behaves as a checkbox.
+   *  A reserved row gets a lit border so "selected" reads at a glance rather
+   *  than resting entirely on the small ♥ at the end of the meta line. */
+  selectable?: boolean;
 }) {
   const canEquip = validSlotsForItem(item).length > 0;
   // OTA-120 Phase 5 — dog-related tagging.
@@ -1799,10 +1891,23 @@ function ItemRow({
     <TouchableOpacity
       // OTA-684 — a just-forged piece arrives highlighted (gold wash + border) so
       // the eye lands on it after the "View in inventory" jump; it clears itself.
-      style={[styles.row, highlight && styles.rowHighlighted]}
+      style={[
+        styles.row,
+        highlight && styles.rowHighlighted,
+        // OTA-1097 — selection state is a lit border, not just the trailing ♥.
+        selectable && item.reservedForFusion === true && styles.rowSelected,
+      ]}
       onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={350}
       activeOpacity={0.7}
-      accessibilityRole="button"
+      accessibilityRole={selectable ? 'checkbox' : 'button'}
+      accessibilityState={selectable ? { checked: item.reservedForFusion === true } : undefined}
+      accessibilityHint={selectable
+        ? (item.reservedForFusion
+          ? 'Reserved for fusion. Tap to release it. Long-press for the item menu.'
+          : 'Tap to reserve it for fusion. Long-press for the item menu.')
+        : undefined}
     >
       {/* OTA-485 — faint diagonal hatching behind the row for companion-edible/
           usable items. Rendered FIRST so it sits behind the rarity stripe + the
@@ -2011,6 +2116,21 @@ const styles = StyleSheet.create({
   sectionChevron: { fontSize: 11, fontWeight: '900', marginRight: 7, width: 11, textAlign: 'center' },
   sectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 2 },
   sectionCount: { color: '#9a8e74', fontSize: 11 },
+  // OTA-1097 — the per-category SELECT ALL / CLEAR ALL chip in the FUSABLE view.
+  // Sits between the label and the count; its own press handler keeps the tap
+  // off the collapse toggle it lives inside.
+  selectAllBtn: {
+    marginLeft: 'auto',
+    marginRight: 10,
+    borderColor: '#6b5c3a',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  selectAllBtnOn: { borderColor: '#d8b46a', backgroundColor: 'rgba(216,180,106,0.12)' },
+  selectAllText: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  selectAllTextOn: { color: '#e6d8b3' },
   row: {
     flexDirection: 'row',
     backgroundColor: '#13110f',
@@ -2027,6 +2147,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#2a2411',
     borderColor: '#d8b46a',
     borderWidth: 1.5,
+  },
+  // OTA-1097 — a RESERVED row in the FUSABLE view. Quieter than rowHighlighted
+  // (which is a transient "look here" flash) because this is a steady state the
+  // player will be looking at a dozen rows of at once, and a dozen loud rows is
+  // no signal at all. Reads as "checked" beside the unlit rows around it.
+  rowSelected: {
+    borderColor: '#9c8348',
+    backgroundColor: '#1b1710',
   },
   // OTA-485 — companion hatch. `stripeClip` fills the row and clips (the row also
   // has overflow:'hidden'); `stripeField` is an oversized, 45°-rotated flex row of
@@ -2090,6 +2218,19 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   pouchFilterText: { color: '#cdbf99', fontSize: 12, flexShrink: 1, flexGrow: 1 },
+  // OTA-1097 — the FUSABLE-mode explainer. Same plate as the pouch/bandolier
+  // banners (it is the same class of thing: a mode where a tap means something
+  // else), in the Crucible's amber rather than their green.
+  fusionModeBanner: {
+    backgroundColor: '#221a10',
+    borderColor: '#c9a86a',
+    borderLeftWidth: 3,
+    borderRadius: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  fusionModeText: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
   pouchFilterCancel: {
     paddingHorizontal: 10,
     paddingVertical: 4,
