@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.54**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.55**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1142,7 +1142,63 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE VOLLEY AFTER A KILL (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ THE CACHED PREFIX (2026-08-05, latest). BOTH LINES.**
+  HAL OTA-1144 / golem OTA-1121. **The first real win of the LLM headroom track, and
+  it costs nothing** — no new generation, no new model, no content removed.
+  **⚠ OTA-1131 MEASURED PREFIX REUSE AT EXACTLY ZERO** and recorded it as *"the
+  cache saved us nothing"*. That reading was wrong in a useful way. llama.cpp
+  reuses the longest **common prefix** between the previous prompt and this one
+  — and every prompt we built put a VARIABLE line **second** (the room name),
+  so the reusable prefix ended after ~14 tokens no matter how much
+  byte-identical text followed it. The cache was working. Our prompt was
+  shaped so it couldn't bite.
+  Measured on the ambient prompt: **327 tokens, of which 287 were identical on
+  every call, of which 19 were ever reused.** At the measured ~10.5ms/token
+  that is **~2.8 seconds per ambient line spent re-reading text the model had
+  already read.**
+  **FIXED BY ORDER, NOT CONTENT:**
+  ```
+  STABLE PREFIX  ->  VARIABLE BODY  ->  IMPERATIVE TAIL
+  ```
+  Reusable prefix between consecutive calls, **before → after**:
+  | consecutive calls | before | after |
+  |---|---|---|
+  | ambient → ambient | 19 tok | **271 tok** |
+  | narration → combat | 114 tok | **456 tok** |
+  | narration → ambient | 14 tok | **98 tok** |
+  About **2.6s off a repeat ambient line** and **3.6s off a combat line**.
+  **⚠ THE PROMPT DID NOT GET SMALLER** (356 → 359 tokens on ambient). This is
+  pure reordering, and the suite asserts a size FLOOR so that a later edit
+  cannot "improve" the reuse number by quietly deleting content — that would be
+  a different change with different risks.
+  **⚠ THE IMPERATIVE STAYS LAST.** A 0.5B model follows the instruction nearest
+  the generation point best. So the instruction blocks are **split** — rules in
+  front where they cache, task at the back where it binds — rather than moved
+  wholesale. Leaving the task uncached costs ~40 tokens and is worth it.
+  **⚠ THE PREAMBLE IS SHARED ACROSS JOBS ON PURPOSE.** The cache holds ONE
+  sequence, so an ambient call that follows a combat call reuses only what
+  those two prompts share. An identical opening across ambient / peaceful /
+  combat means the preamble survives a job switch. **If you edit it, edit it
+  for all three** — otherwise cross-job reuse silently drops back toward zero
+  and nothing fails, it just gets slower again.
+  Every sentence keeps its original wording. The only rewrites are the
+  `above`/`below` pointers the move forces — **OTA-1131 is the standing lesson
+  that a prompt which lies about its own layout costs a whole generation** — and
+  combat's *"entities listed above"* is deliberately NOT flipped, because its
+  task still sits after the entity block.
+  New suite `ota1144CachedPrefix` (13 tests). Two OTA-1131 assertions retargeted: the
+  `above` pointer, and a rules-size comparison whose slice marker moved into the
+  shared preamble and stopped measuring what it was named for.
+  **⚠ WHAT IS STILL UNVERIFIED:** this is a prompt reshuffle against a 0.5B
+  model, and the last big one (OTA-1053) shipped a visible regression. The
+  latency win is measured; the QUALITY effect is not, and cannot be until a
+  device log. **Watch the next log for:** hallucinated place names (the generic
+  never-name rule moved to the front — the room-specific anchor deliberately
+  stayed in the tail to cover it), and register slips. The `∅` count and the
+  `reuse` figure in the Qwen rollup are the two numbers that say whether this
+  worked.
+
+- **⚠⚠ THE VOLLEY AFTER A KILL (2026-08-05). BOTH LINES.**
   HAL OTA-1143 / golem OTA-1120. The second watch-list item closed in a day, and
   the one that had sat longest without a verdict. Owner: *"Bog Hound sat out a
   fight after the Silt Thief died."* **It did — and so did every packmate of
