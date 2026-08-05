@@ -26556,7 +26556,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // non-combat variety bias passed to the picker below, so the extra
       // events skew toward variety (treasure / npc / fusion bench), not
       // more fights.
-      const baseRollChance = isAutoTravel ? 0.58 : 0.45;
+      //
+      // ⚠ OTA-1111 — HALVED (0.58 → 0.29 auto-travel, 0.45 → 0.225 manual).
+      // Owner: "there were sections that every move or rest was a fight …
+      // let's just 1/2 the chance percentage."
+      //
+      // The arithmetic he was actually feeling: 0.58 × the 1.3 night
+      // multiplier is a 75% encounter chance PER STEP auto-travelling after
+      // dark, and the gate that is supposed to space encounters out
+      // (`tileIsNovel`) does the opposite for the player who needs it most —
+      // `recentTileHistory` starts EMPTY, so a brand-new character has every
+      // tile novel and rolls the full chance every single step, while an
+      // established player working known ground rolls far less often. The
+      // rate peaked exactly where the character was weakest. Owner, on his
+      // own play pattern: "I have been starting new characters and running
+      // them through the paces for 1 to 2 capitals. So of course it looked
+      // rough — the 50 paces thing was beating me up since it was early game."
+      //
+      // ⚠ AND WHY THIS IS A FLAT HALVING RATHER THAN AN EARLY-GAME RAMP, which
+      // is what was proposed first: a ramp reaching full rate at ~25 tiles
+      // would hand new players a near-empty world for the whole opening.
+      // Owner: "the 25 step block means they can make it to half of the
+      // capitals with no encounters." He is right — the tuning problem was
+      // never that the early game specifically needs a discount, it is that
+      // the baseline was too high for everyone, and the novelty gate made the
+      // early game the place you noticed. One number, applied everywhere.
+      //
+      // Late-game scaling is deliberately NOT touched here — owner: "I don't
+      // think the numbers for later in the game need adjusted yet, they should
+      // be tied to a difficulty level choice in character creation." That knob
+      // already exists (engine/pressure.ts, four tiers picked at creation);
+      // see HANDOFF §OPEN ITEMS for why pressure.ts currently declines to
+      // scale encounter rate and what wiring it would mean.
+      const baseRollChance = isAutoTravel ? 0.29 : 0.225;
       const timeMult = encounterRateMultiplier(playerForEnc?.hoursElapsed);
       const effectiveRollChance = Math.min(0.99, baseRollChance * timeMult);
       // 2026-05-25 OTA-045 — JIT-temptation predicate. Depleted on
