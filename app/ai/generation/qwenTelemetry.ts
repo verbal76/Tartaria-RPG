@@ -19,7 +19,14 @@
 // in the debug channel (the device log is the delivery vehicle — same as
 // every diagnosis this project has shipped).
 
-export type QwenCallOutcome = 'ok' | 'empty' | 'error';
+/** ⚠ OTA-1142 — 'dormant' is an EMPTY WITH A KNOWN CAUSE, and it exists
+ *  because 'empty' was hiding two completely different failures. A model that
+ *  genuinely produced nothing is a PROMPT problem; a call that ran against a
+ *  detached native context is a LIFECYCLE problem, and the two get investigated
+ *  in opposite directions. The device log had one of each and no way to tell
+ *  them apart — the second read `empty 8809ms read 0ms/write 0ms in 309t→out
+ *  0t`, which is 8.8 seconds of wall time doing literally no native work. */
+export type QwenCallOutcome = 'ok' | 'empty' | 'error' | 'dormant';
 
 /** OTA-1130 — how generation ended, straight from llama.cpp. `limit` means it
  *  ran into the token cap mid-thought (we are paying full price AND cutting a
@@ -69,6 +76,8 @@ interface JobAggregate {
   waitMs: number;
   maxWaitMs: number;
   empty: number;
+  /** OTA-1142 — calls swallowed because the native context was already gone. */
+  dormant: number;
   error: number;
   // OTA-1130
   prefillMs: number;
@@ -101,7 +110,7 @@ let discardSink: ((job: string, reason: string, ms: number) => void) | null = nu
 
 function emptyAggregate(): JobAggregate {
   return {
-    count: 0, totalMs: 0, maxMs: 0, waitMs: 0, maxWaitMs: 0, empty: 0, error: 0,
+    count: 0, totalMs: 0, maxMs: 0, waitMs: 0, maxWaitMs: 0, empty: 0, dormant: 0, error: 0,
     prefillMs: 0, decodeMs: 0, promptTokens: 0, outTokens: 0, cachedTokens: 0,
     reusedTokens: 0, cacheSamples: 0,
     hitLimit: 0, discarded: 0, discardedMs: 0,
@@ -123,6 +132,7 @@ export function recordQwenCall(r: QwenCallRecord): void {
   agg.waitMs += r.waitMs;
   agg.maxWaitMs = Math.max(agg.maxWaitMs, r.waitMs);
   if (r.outcome === 'empty') agg.empty += 1;
+  if (r.outcome === 'dormant') agg.dormant += 1;
   if (r.outcome === 'error') agg.error += 1;
   agg.prefillMs += r.prefillMs ?? 0;
   agg.decodeMs += r.decodeMs ?? 0;
@@ -194,6 +204,8 @@ export interface QwenJobStats {
   avgWaitMs: number;
   maxWaitMs: number;
   empty: number;
+  /** OTA-1142 — swallowed by a dead context, not by a silent model. */
+  dormant: number;
   error: number;
   // OTA-1130
   avgPrefillMs: number;
@@ -222,6 +234,7 @@ export function qwenJobStats(): QwenJobStats[] {
       avgWaitMs: Math.round(a.waitMs / a.count),
       maxWaitMs: a.maxWaitMs,
       empty: a.empty,
+      dormant: a.dormant,
       error: a.error,
       avgPrefillMs: Math.round(a.prefillMs / a.count),
       avgDecodeMs: Math.round(a.decodeMs / a.count),
@@ -243,7 +256,11 @@ export function qwenTelemetrySummary(): string {
   const s = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
   const parts = qwenJobStats().map((j) => {
     const wait = j.avgWaitMs >= 500 ? ` wait${s(j.avgWaitMs)}` : '';
-    const bad = (j.empty > 0 ? ` ∅${j.empty}` : '') + (j.error > 0 ? ` err${j.error}` : '');
+    // OTA-1142 — a swallowed call gets its own mark. ∅ still means "the model
+    // said nothing"; 💀 means "there was no model to say it".
+    const bad = (j.empty > 0 ? ` ∅${j.empty}` : '')
+      + (j.dormant > 0 ? ` 💀${j.dormant}` : '')
+      + (j.error > 0 ? ` err${j.error}` : '');
     // OTA-1130 — read/write split + prompt size. This is the shape that made
     // OTA-1129 obvious; now it rides every rollup instead of needing a
     // code-reading session to reconstruct.

@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.52**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.53**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1064,56 +1064,130 @@ rediscovering them.
   encounters."* The novelty gate itself is unchanged and still does OTA-438's
   anti-farm job.
 
-- **⚠ IN PROGRESS — DIFFICULTY GOES GAME-WIDE (OTA-1136 shipped the engine).**
-  Owner: *"aside from what it already does, the difficulty levels should control
-  the spawn rate of enemies and vendors and secret locations. it should limit or
-  grow the number of members in an attack party, it should limit the amount of
-  loot found per tile"*, then, after reading a survey of industry difficulty
-  design: *"go with the best suggestions on each category… the effects should be
-  game wide. Also create a custom selection that fires a popup and lets you check
-  what systems they want to effect."*
-  **DONE (OTA-1136):** `pressure.ts` amended (see its header — the founding
-  no-multipliers-on-tuned-systems rule is explicitly reversed, with the identity
-  row as the replacement protection). Nine dials added and tagged by lever type.
-  Wired: `spawn` (encounter roll), `discovery` (vendor / cache / bench weights),
-  `pack` (party size, welded to the OTA-1112 swing cap), `loot` (per-tile find
-  chance). CUSTOM tier + `DifficultyCustomModal` checklist shipped; `profileOf`
-  composes so pre-existing consumers are custom-aware untouched.
-  **⚠ NEXT — the rule levers, which the survey rates highest and which are
-  already DEFINED but not yet consumed:**
-  1. `witholdIdentity` — curios stay unidentified. The game already has the
-     identification system (static inference in `itemDefaults` → Qwen synthesis);
-     this decides whether it runs for free. Consumer: the inference/synth path.
-  2. `witholdIntel` — no weakness / resist tags the bestiary has not earned.
-     Consumer: `EnemyPanel` + the resist callouts.
-  3. `hunger` — the clock rate. Consumer: `hungerStaminaPenalty` accrual.
-  4. `elite` — the CONTENT swap, and the highest-value item on the list: a group
-     of grunts sometimes arrives as one tougher body instead. Same encounter
-     count, completely different fight, no damage sponge. Machinery already
-     exists (rarity tiers, boss flags, the Guardian over-level scaler, Aetherkin
-     variants, faction parties in human bodies).
-  **⚠ AND THE RULE THAT MUST NOT BREAK:** every dial's 'owed' value is a
-  mathematical no-op, and `ota1136DifficultySystems` fails if that stops being
-  true. That test is what makes the amendment safe; do not weaken it.
+- **✅ CLOSED — DIFFICULTY GOES GAME-WIDE.** Owner: *"aside from what it already
+  does, the difficulty levels should control the spawn rate of enemies and
+  vendors and secret locations. it should limit or grow the number of members in
+  an attack party, it should limit the amount of loot found per tile"*, then,
+  after reading a survey of industry difficulty design: *"go with the best
+  suggestions on each category… the effects should be game wide. Also create a
+  custom selection that fires a popup and lets you check what systems they want
+  to effect."* Delivered across five OTAs; **every dial has a consumer.**
+  · **OTA-1136** — `pressure.ts` amended (its founding
+    no-multipliers-on-tuned-systems rule explicitly reversed, with the identity
+    row as the replacement protection). Nine dials, tagged by lever type. Wired:
+    `spawn`, `discovery`, `pack` (welded to the swing cap), `loot`. CUSTOM tier +
+    checklist modal.
+  · **OTA-1139** — `elite`, the CONTENT swap. A qualifying
+    party arrives as one named body carrying the pack's own HP budget at the solo
+    attack rate. No new balance constants; the carry pays the party's loot.
+  · **OTA-1140** — `witholdIdentity` and `witholdIntel`, the
+    RULE levers. And **`hunger` was REMOVED rather than wired**: it scaled a
+    mechanic deleted from the game before the dial existed, so it was a checkable
+    control over nothing.
+  · **OTA-1141** — the hunger CARCASS: three unreachable
+    narration lines, a heartbeat ledger + warning, and a field write on every
+    action. Owner: *"we removed hunger, we don't still have that somewhere do
+    we?"*
+  **⚠ THE RULE THAT MUST NOT BREAK:** every dial's `owed` value is a
+  mathematical no-op, and `ota1136DifficultySystems` fails if
+  that stops being true. That test is what makes the amendment safe; do not
+  weaken it. `ota1140RuleDials` adds the second guard — every
+  id in the CUSTOM picker must name a system something actually reads.
+  **⚠ THE ONE THING LEFT IS A DESIGN CALL, NOT A TASK:** hunger is gone from the
+  game entirely, not merely from the dial. If the owner ever wants it back as a
+  real mechanic, that is a fresh design conversation and the dial to scale it is
+  four lines.
+  **⚠ AND THE PATTERN THIS WORKSTREAM KEPT PRODUCING**, worth carrying into the
+  next one: three times running, the bug was not wrong behaviour but DEAD
+  behaviour wearing live clothes — a difficulty checkbox over nothing, narration
+  behind an impossible condition, orphaned computations that outlived their only
+  reader. A removal is not finished until the things that READ it are gone too.
 
-- **QWEN DORMANCY IS FIRING REGULARLY.** Third log in a row ending with
-  `qwen-watchdog: Qwen dormant (status='ready' but the native context was
-  released — usually app-backgrounding); reinitializing (attempt #1)`. The
-  watchdog is doing its job and recovering, and the ML-health block reports
-  `Status: active, Crash count: 0` — so this is not a crash. But the recovery
-  is not free (a reinit costs a model load) and the same session logged an
-  `item_synthesis empty 8809ms … out 0t` — a full prompt read that returned
-  nothing — moments before the watchdog fired. That empty is now reported as
-  `item_synth:empty` (OTA-1132) precisely so the next log can show whether
-  dormancy is silently eating generations before the watchdog notices.
-  **Check first:** how often does a dormant context swallow a call, and can
-  the AppState hook detach sooner so the call is never started?
+- **✅ RESOLVED (OTA-1142) — QWEN DORMANCY WAS OUR OWN TEARDOWN.** Four logs in a
+  row ended with `qwen-watchdog: Qwen dormant … reinitializing`, and the entry
+  that stood here asked the right question — *"how often does a dormant context
+  swallow a call, and can the AppState hook detach sooner so the call is never
+  started?"* The answer turned out to be neither: **nothing needed to detach
+  sooner, because the dormancy was being manufactured by `dispose()` itself.**
+  `isDormant()` means "status is 'ready' but the runtime is gone", and the
+  engine set `status = 'idle'` only AFTER awaiting a teardown whose first act is
+  to null the context synchronously and whose second is to wait on the shared
+  native-ML lock. That await lasts as long as the in-flight generation — 10.4s
+  in the owner's log — and for every millisecond of it the engine reported
+  ready-over-dead. The OTA-1132 instrumentation this entry asked for is what
+  proved it: `item_synthesis empty 8809ms read 0ms/write 0ms in 309t→out 0t`,
+  8.8 seconds of wall time with zero native work, three seconds before the
+  watchdog fired.
+  **⚠ WHAT TO WATCH NOW:** a `💀` in a Qwen rollup means a call was swallowed by
+  a context that was already gone. It should not appear on OTA reloads any more.
+  If one does, the dormancy is REAL and coming from somewhere else — an OS
+  context kill — and that is a different investigation from this one. `∅` still
+  means the model genuinely said nothing, which is a prompt problem.
 
 - **BOG HOUND SAT OUT A FIGHT** after Silt Thief died (task #175). Carried
   from an earlier log across a truncated span, so it was never confirmed as a
   bug. Still unresolved; needs a log that captures the whole encounter.
 
-- **⚠⚠ THE HUNGER CARCASS (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ THE DORMANCY WINDOW, AND THE WORD THAT HID IT (2026-08-05, latest). BOTH LINES.**
+  HAL OTA-1142 / golem OTA-1119. The watch-list item that has outlived more
+  OTAs than anything else here, closed with a one-line move. The owner's device
+  log, three consecutive lines:
+  ```
+  [06:06:08] OTA session start
+  [06:06:17] item_synthesis empty 8809ms read 0ms/write 0ms in 309t→out 0t (0ch)
+  [06:06:20] qwen-watchdog: Qwen dormant — reinitializing
+  ```
+  **8.8 seconds of wall time with ZERO prefill and ZERO decode.** The model did
+  not think slowly; it never ran.
+  **⚠ ROOT CAUSE, AND IT IS ORDERING.** `isDormant()` is defined as
+  *"status === 'ready' but the runtime is gone"*, and
+  `QwenGenerativeEngine.dispose()` was **producing exactly that state on
+  purpose** for the length of its own teardown:
+  · `LlamaRuntime.dispose()` nulls `this.context` **synchronously** on entry —
+    that is the arb-crash fix, detach before release so no completion can start
+    against a context that is about to be freed;
+  · it then **awaits** `ctx.release()` behind the shared native-ML lock, which
+    means it waits out whatever generation currently holds that lock;
+  · and the engine only set `status = 'idle'` **after** that await returned.
+  So from the first line of the teardown until the lock cleared, the engine
+  reported **ready-over-dead — the watchdog's exact dormancy signature** — for
+  however long the in-flight generation ran. The owner's log has item synthesis
+  holding the lock for 10.4s. And **the OTA session start is the one shutdown
+  path that runs in the FOREGROUND**, where OTA-1107's
+  don't-reload-while-backgrounded guard does not apply — which is why this kept
+  surfacing on OTA reloads specifically.
+  **FIXED by moving one line.** Status leaves `'ready'` first instead of last.
+  It costs nothing and closes the window entirely: an engine that is shutting
+  down now says `'idle'`, which is true, rather than `'ready'`, which stopped
+  being true the moment the context detached. **The OTA-1107 `lifecycleGen`
+  bump still comes first of all** — a load in flight has to see the new
+  generation, and the suite pins that ordering too.
+  **⚠ AND THE SECOND HALF: `empty` was hiding two different failures.** A model
+  that genuinely produced nothing is a PROMPT problem; a call that ran against a
+  detached context is a LIFECYCLE problem, and **the two get investigated in
+  opposite directions**. The log had one of each under the same word, which cost
+  a round of guessing. New outcome `'dormant'`, classified on BOTH the empty and
+  the throw path by checking `this.context` **after** the await — it is null
+  only if dispose() ran underneath the call — with its own mark in the rollup:
+  **∅ still means the model said nothing; 💀 means there was no model to say
+  it.**
+  **⚠ PLUS ONE UNRELATED OWNER REQUEST**, shipped in the same OTA so it reaches
+  the device now: the death screen holds **16s instead of 11s**. Owner:
+  *"increase the delay on death before it goes to the character collection
+  screen by 5 seconds. they can always tap to close if they want."* The
+  tap-to-leave escape is what makes a long hold safe — erring long costs an
+  impatient player one tap, erring short costs a reading player their
+  character's ending. The tap still arms only once the words are legible.
+  New suite `ota1142DormancyWindow` (13 tests). **Its first assertion drives a real
+  teardown against a fake runtime with the true timing — synchronous detach,
+  awaited release — and checks `isDormant()` mid-flight. It fails against the
+  old ordering**, which is the only reason to trust it.
+  **⚠ WHAT TO WATCH NEXT:** the watchdog should now go quiet on OTA reloads. If
+  a `💀` shows up in a rollup, the dormancy is real and coming from somewhere
+  else — an OS context kill, not our own teardown — and that is a different
+  investigation. A `∅` still means the prompt.
+
+- **⚠⚠ THE HUNGER CARCASS (2026-08-05). BOTH LINES.**
   HAL OTA-1141 / golem OTA-1118. Owner, immediately after the previous OTA removed
   the hunger DIAL: *"we removed hunger, we don't still have that somewhere do
   we? we eat for HP not to lower hunger, that's a different mechanic."*

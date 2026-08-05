@@ -31,9 +31,14 @@ const FADE_IN_MS = 1600;
 /** Body text settles in after the dark has taken hold — the fall, then the words. */
 const TEXT_IN_MS = 1400;
 const TEXT_DELAY_MS = 900;
-/** How long the screen holds before handing over on its own. Long enough to
- *  read three short paragraphs unhurried; tap to leave sooner. */
-const DWELL_MS = 11000;
+/** How long the screen holds before handing over on its own.
+ *  OTA-1142 — 11s → 16s on the owner's call: *"increase the delay on death
+ *  before it goes to the character collection screen by 5 seconds. they can
+ *  always tap to close if they want."* The tap-to-leave escape is what makes a
+ *  long hold safe — the floor is how long a player who wants to read gets, and
+ *  the ceiling is their thumb. Erring long costs an impatient player one tap;
+ *  erring short costs a reading player their character's ending. */
+const DWELL_MS = 16000;
 /** Tapping is ignored until the text is actually legible — otherwise a player
  *  mid-tap when they died would skip their own ending without seeing it. */
 const TAP_ARMS_AT_MS = TEXT_DELAY_MS + TEXT_IN_MS;
