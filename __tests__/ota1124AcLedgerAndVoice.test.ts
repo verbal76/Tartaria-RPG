@@ -52,13 +52,30 @@ const SRC: string = require('fs').readFileSync(
 
 /** The ambient first-person opener filter, lifted verbatim from the store so
  *  the cases below test the REAL predicate rather than a paraphrase of it. */
-const FIRST_PERSON_OPENER = /^\s*(i|i'm|i've|i'll|my|mine|me)\b/i;
+// ⚠ OTA-1125 RETARGET. OTA-1124 shipped an OPENER test and the very next
+// device log carried the line it was written for:
+//   "As I walk through the shadows of the Obsidian Pillars, my eyes follow
+//    the ancient trees that seem to whisper secrets to the wind."
+// It opens with "As". The opener test lets it straight through. I had matched
+// the shape I imagined rather than the shape that happened — and a filter that
+// misses its own motivating example is worth nothing.
+// The real rule is about WHO THE SENTENCE IS ABOUT: first person present AND
+// second person absent.
+const NARRATOR_ONLY = (s: string): boolean => {
+  const firstPerson = /\b(i|i'm|i've|i'll|my|mine|me|myself)\b/i.test(s);
+  const secondPerson = /\b(you|your|you're|you've|yours|yourself)\b/i.test(s);
+  return firstPerson && !secondPerson;
+};
+const FIRST_PERSON_OPENER = { test: NARRATOR_ONLY };
 
 describe("OTA-1124 — the first-person opener, and what it must NOT eat", () => {
-  it('⚠ drops the line the owner actually saw', () => {
+  it('⚠ drops narrator-only lines', () => {
     expect(FIRST_PERSON_OPENER.test('My eyes have seen worse roads than this.')).toBe(true);
     expect(FIRST_PERSON_OPENER.test("I've walked longer roads.")).toBe(true);
-    expect(FIRST_PERSON_OPENER.test('I remember when you could barely lift that.')).toBe(true);
+    // RETARGETED BY OTA-1125 — this one contains "you", so under the corrected
+    // rule it is a line ABOUT THE PLAYER and survives. That is right: "I
+    // remember when you could barely lift that" is the companion voice working.
+    expect(FIRST_PERSON_OPENER.test('I remember when you could barely lift that.')).toBe(false);
   });
 
   it('⚠ keeps a second-person line that merely CONTAINS "my"', () => {
@@ -84,9 +101,9 @@ describe("OTA-1124 — the first-person opener, and what it must NOT eat", () =>
   });
 
   it('it sits with the other register filters, not somewhere new', () => {
-    expect(SRC).toContain("!/^\\s*(i|i'm|i've|i'll|my|mine|me)\\b/i.test(s)");
+    // RETARGETED BY OTA-1125 — the opener regex became a two-sided predicate.
     const chain = SRC.slice(SRC.indexOf("!/^\\s*they\\s/i.test(s)"));
-    expect(chain.indexOf("i'll|my|mine|me")).toBeLessThan(chain.indexOf('isSecondPersonActionOpener'));
+    expect(chain.indexOf('const firstPerson =')).toBeLessThan(chain.indexOf('isSecondPersonActionOpener'));
   });
 });
 
@@ -183,5 +200,31 @@ describe('OTA-1124 — the pinned surface chip stops lying on a perch', () => {
     // climb down would be actively misleading.
     const pin = UI.slice(UI.indexOf('const pinElev = currentScene?.elevatedOn;'));
     expect(pin.slice(0, 300)).toContain('&& !unmetRequirement');
+  });
+});
+
+describe('OTA-1125 — the filter now catches the line from the device log', () => {
+  it("⚠ THE ACTUAL LINE. It opens with \"As\", so the opener test missed it", () => {
+    expect(NARRATOR_ONLY(
+      'As I walk through the shadows of the Obsidian Pillars, my eyes follow '
+      + 'the ancient trees that seem to whisper secrets to the wind.')).toBe(true);
+  });
+
+  it('⚠ and it STILL cannot eat the feature — OTA-1031 is the standing warning', () => {
+    expect(NARRATOR_ONLY('You have come far, and my eyes have seen worse.')).toBe(false);
+    expect(NARRATOR_ONLY('The road behind is longer than the one ahead.')).toBe(false);
+    expect(NARRATOR_ONLY('Your shoulders carry more than mine ever did.')).toBe(false);
+    expect(NARRATOR_ONLY('Mud remembers every step taken through it.')).toBe(false);
+  });
+
+  it('the store carries the two-sided rule, not the opener', () => {
+    expect(SRC).toContain("const firstPerson = /\\b(i|i'm|i've|i'll|my|mine|me|myself)\\b/i.test(s);");
+    expect(SRC).toContain("const secondPerson = /\\b(you|your|you're|you've|yours|yourself)\\b/i.test(s);");
+    expect(SRC).toContain('return !(firstPerson && !secondPerson);');
+  });
+
+  it('⚠ the miss is recorded, because it is the lesson', () => {
+    expect(SRC).toContain('RETARGETED THE MOMENT THE LOG ARRIVED');
+    expect(SRC).toContain('matched the shape I imagined rather than the shape that');
   });
 });

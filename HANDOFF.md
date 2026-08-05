@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.58**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.59**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1129,7 +1129,28 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE AC LEDGER, THE VOICE SLIP, AND THE CHIP THAT LIED (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ THE FILTER THAT MISSED ITS OWN EXAMPLE (2026-08-05, latest). BOTH LINES.**
+  golem OTA-1125 / HAL OTA-1148. The previous OTA shipped a first-person
+  **opener** test for the ambient voice slip. The device log arrived minutes
+  later carrying the actual line:
+  > *"As I walk through the shadows of the Obsidian Pillars, my eyes follow the
+  > ancient trees that seem to whisper secrets to the wind."*
+  **⚠ IT OPENS WITH "As".** The opener test would have let it straight through.
+  The shape imagined was matched rather than the shape that happened — and **a
+  filter that misses its own motivating example is worth nothing**.
+  The real rule is about **who the sentence is about**: it speaks of the
+  narrator and never of the player. So — **first person present AND second
+  person absent.** Still narrow, and still unable to eat the feature:
+  · *"As I walk … my eyes …"* → **dropped**
+  · *"You have come far; my eyes have seen worse."* → kept
+  · *"The road behind is longer than the one ahead."* → kept
+  · *"I remember when you could barely lift that."* → kept, **and that is
+    correct** — the companion voice working as intended.
+  **⚠ THE LESSON:** when a log hands you the **exact failing input**, build the
+  guard around **that string**, not a reconstruction of it. Suite extended to
+  23 tests, asserting the real line verbatim.
+
+- **⚠⚠ THE AC LEDGER, THE VOICE SLIP, AND THE CHIP THAT LIED (2026-08-05). BOTH LINES.**
   golem OTA-1124 / HAL OTA-1147. Three items off the owner's open list. **Two get
   MEASURED rather than guessed at a third time; one is fixed outright.**
   **⚠ 1. AC 16 → AC 10, TWICE NOW.** Two device logs in a row show a six-point

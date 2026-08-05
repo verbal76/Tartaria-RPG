@@ -38840,7 +38840,27 @@ async function maybeGenerateAmbientArbiter(
       // opener directly above and tests the OPENER only. "The road behind is
       // longer than the one ahead" survives; so does "You have come far, and
       // my eyes have seen worse." Only "My eyes have seen worse" is dropped.
-      .filter((s) => !/^\s*(i|i'm|i've|i'll|my|mine|me)\b/i.test(s))
+      // ⚠ OTA-1125 — RETARGETED THE MOMENT THE LOG ARRIVED. OTA-1124 shipped
+      // an OPENER test and the very next device log carried the actual line:
+      //   "As I walk through the shadows of the Obsidian Pillars, my eyes
+      //    follow the ancient trees that seem to whisper secrets to the wind."
+      // It opens with "As". The opener test would have let it straight through
+      // — I had matched the shape I imagined rather than the shape that
+      // happened, and a filter that misses its own motivating example is worth
+      // nothing.
+      //
+      // The real rule is about WHO THE SENTENCE IS ABOUT: it speaks of the
+      // narrator and never of the player. So — first person present AND second
+      // person absent. That is still narrow, and it still cannot eat the
+      // feature the way OTA-1031's version did:
+      //   · "As I walk … my eyes …"            → I/my, no you  → DROPPED
+      //   · "You have come far; my eyes…"       → has "you"     → kept
+      //   · "The road behind is longer…"        → neither       → kept
+      .filter((s) => {
+        const firstPerson = /\b(i|i'm|i've|i'll|my|mine|me|myself)\b/i.test(s);
+        const secondPerson = /\b(you|your|you're|you've|yours|yourself)\b/i.test(s);
+        return !(firstPerson && !secondPerson);
+      })
       // Ambient is the narrator's own idle musing, not world narration — a
       // second-person ACTION opener ("You step back, surveying...") reads as
       // scene text in the arbiter channel and in practice is an off-scene
