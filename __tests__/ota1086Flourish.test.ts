@@ -288,7 +288,7 @@ describe('OTA-1086 — in the exchange', () => {
         lockedCount: 0, regard: 'trusted', teaserTaps: 0,
         // OTA-1118 — where this conversation's own transcript begins in the feed.
         // The harness opens the talk by hand, so start at the top of the log.
-        startedAtLogLen: 0,
+        startedAtTs: 0,
       },
     });
     const wm = useGameStore.getState().worldMemory;

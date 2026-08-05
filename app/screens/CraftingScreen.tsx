@@ -415,6 +415,25 @@ export function CraftingScreen() {
   }, [player?.inventory]);
   // Repair badge = what you can fix RIGHT NOW (materials in hand), not every worn item.
   const repairReady = useMemo(() => repairable.filter((r) => r.available).length, [repairable]);
+  // OTA-1121 — what REPAIR ALL would actually touch: the READY rows in the
+  // CURRENT view, in display order. Reading off repairableView (not repairable)
+  // is what lets the search box act as the selection — filter to what you mean,
+  // then mend that. Order carries through, so on the default EQUIPPED axis the
+  // gear you are standing in is mended first, which matters when materials run
+  // out partway.
+  const repairReadyInView = useMemo(
+    () => repairableView.filter((r) => r.available).map((r) => r.item.id),
+    [repairableView],
+  );
+  // Each call re-checks stock against the live inventory and refuses honestly if
+  // an earlier repair drained a shared material, so this is exactly "tapping
+  // every ready row, top to bottom" — no second code path that could disagree
+  // with the single-row one about cost, substitutions, or eligibility. The
+  // per-repair lines land within the feed's 500ms same-channel window, so they
+  // group into one card rather than spraying the log.
+  const repairAllReady = () => {
+    for (const id of repairReadyInView) repairInventoryItem(id);
+  };
 
   if (!player) {
     return (
@@ -673,6 +692,29 @@ export function CraftingScreen() {
             sortDirection={repairSortDir}
             onSortChange={(k, d) => { setRepairSortKey(k); setRepairSortDir(d); }}
           />
+
+          {/* OTA-1121 — REPAIR ALL. Owner: "let's also add a select all to the
+              repair tab." Repair has no deferred step — the action IS the
+              repair — so a select-all with nothing to press afterwards would be
+              two taps where there is one job. This is the same idea aimed at
+              the actual work: fix everything currently listed as READY, in the
+              order shown, so worn gear goes first on the default axis.
+              It acts on the FILTERED view, which is what makes it a selection
+              rather than a blunt instrument: search "boot", tap REPAIR ALL, and
+              only boots get mended. */}
+          {repairReadyInView.length > 0 && (
+            <TouchableOpacity
+              style={styles.repairAllBtn}
+              activeOpacity={0.7}
+              onPress={() => repairAllReady()}
+              accessibilityRole="button"
+              accessibilityLabel={`Repair all ${repairReadyInView.length} ready ${repairReadyInView.length === 1 ? 'piece' : 'pieces'}${repairQuery.trim() ? ' matching your search' : ''}`}
+            >
+              <Text style={styles.repairAllText}>
+                ⚒ REPAIR ALL READY ({repairReadyInView.length}){repairQuery.trim() ? ' — matching search' : ''}
+              </Text>
+            </TouchableOpacity>
+          )}
 
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
             {repairableView.length === 0 ? (
@@ -939,6 +981,19 @@ const styles = StyleSheet.create({
   // OTA-1117 — the worn-gear callout on a REPAIR row. Same gold as the EQUIPPED
   // badge in the Crucible upgrade list so "worn" reads identically everywhere.
   repairWorn: { color: '#e6c67a', fontSize: 10, marginTop: 3, letterSpacing: 0.6, fontWeight: '700' },
+  // OTA-1121 — the REPAIR ALL bar. Green like the per-row "tap to repair" cue,
+  // because it does the same thing at scale; full width so it reads as an
+  // action on the list rather than a filter chip on the bar above it.
+  repairAllBtn: {
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    borderRadius: 4,
+    backgroundColor: '#1a2614',
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  repairAllText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
   // OTA-165 — stats line on REPAIR rows. Same style as RecipesView's
   // recipeStats so the REPAIR tab matches CRAFT / RECIPES visually.
   recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },

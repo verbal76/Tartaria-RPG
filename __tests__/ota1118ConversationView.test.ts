@@ -53,6 +53,26 @@ import { join } from 'path';
 
 const src = (p: string): string => readFileSync(join(__dirname, '..', p), 'utf8');
 
+// OTA-1121 — the mark is a TIMESTAMP, not an index. See the block comment on
+// pendingTalk.startedAtTs: gameLog is trimmed to MAX_LOG_IN_MEMORY on every
+// append, so an index taken at open time slides off once the buffer is full and
+// the transcript renders empty in exactly the long sessions the view is for.
+const openTalkAt = (ts: number) => {
+  useGameStore.setState({
+    pendingTalk: {
+      npcId: 'irma_ironhand', npcName: 'Irma Ironhand', topics: [],
+      role: null, flourishesUsed: [], flourishCount: 0,
+      lockedCount: 0, regard: 'trusted', teaserTaps: 0,
+      startedAtTs: ts,
+    },
+  });
+};
+// What the view actually renders.
+const transcript = () => {
+  const t = useGameStore.getState().pendingTalk!;
+  return useGameStore.getState().gameLog.filter((e) => e.ts >= t.startedAtTs);
+};
+
 describe('OTA-1118 — the conversation carries its own transcript', () => {
   beforeEach(async () => {
     await useGameStore.getState().hydrate();
@@ -60,37 +80,17 @@ describe('OTA-1118 — the conversation carries its own transcript', () => {
     useGameStore.getState().skipTutorial?.();
   });
 
-  it('opening a talk records where the exchange begins in the feed', () => {
-    const before = useGameStore.getState().gameLog.length;
-    useGameStore.setState({
-      pendingTalk: {
-        npcId: 'irma_ironhand', npcName: 'Irma Ironhand', topics: [],
-        role: null, flourishesUsed: [], flourishCount: 0,
-        lockedCount: 0, regard: 'trusted', teaserTaps: 0,
-        startedAtLogLen: before,
-      },
-    });
-    const t = useGameStore.getState().pendingTalk!;
-    expect(t.startedAtLogLen).toBe(before);
-    // The window is empty at the moment it opens — nothing said yet.
-    expect(useGameStore.getState().gameLog.slice(t.startedAtLogLen)).toHaveLength(0);
+  it('the window is empty at the moment the conversation opens', () => {
+    openTalkAt(Date.now() + 1); // strictly after every existing entry
+    expect(transcript()).toHaveLength(0);
   });
 
   it('every line said during the conversation lands INSIDE the window', () => {
-    const start = useGameStore.getState().gameLog.length;
-    useGameStore.setState({
-      pendingTalk: {
-        npcId: 'irma_ironhand', npcName: 'Irma Ironhand', topics: [],
-        role: null, flourishesUsed: [], flourishCount: 0,
-        lockedCount: 0, regard: 'trusted', teaserTaps: 0,
-        startedAtLogLen: start,
-      },
-    });
+    openTalkAt(Date.now());
     useGameStore.getState().appendLog('world', 'She sets the hammer down. "Ask, then."');
     useGameStore.getState().appendLog('world', '"Cheaper than the last one, and it will not fold."');
-    const t = useGameStore.getState().pendingTalk!;
-    const window = useGameStore.getState().gameLog.slice(t.startedAtLogLen);
-    // ≥1 entry: the same-channel 500ms debounce may GROUP consecutive replies
+    const window = transcript();
+    // >=1 entry: the same-channel 500ms debounce may GROUP consecutive replies
     // into one card, which is fine and desirable inside a conversation. What
     // matters is that nothing escaped the window.
     expect(window.length).toBeGreaterThan(0);
@@ -99,45 +99,67 @@ describe('OTA-1118 — the conversation carries its own transcript', () => {
     expect(said).toMatch(/will not fold/);
   });
 
+  it('⚠ THE BUG THE OWNER HIT — the window still works once the log is at its cap', () => {
+    // THE regression. gameLog is capped at MAX_LOG_IN_MEMORY (500) and trimmed
+    // with .slice(-500) on every append, so past the cap the array stops growing
+    // and every index shifts DOWN by one per line. OTA-1118 marked the start of
+    // a conversation with `gameLog.length` — which, at the cap, points one past
+    // the end forever. The transcript rendered EMPTY and every reply stayed in
+    // the exploration feed behind the sheet: the exact bug the view was built to
+    // fix, in exactly the long sessions it was built for.
+    for (let i = 0; i < 620; i++) {
+      useGameStore.getState().appendLog('system', `filler line ${i}`);
+    }
+    const log = useGameStore.getState().gameLog;
+    expect(log.length).toBeLessThanOrEqual(500); // the buffer IS at its cap
+    openTalkAt(Date.now());
+    useGameStore.getState().appendLog('world', 'She looks up. "Well?"');
+    const window = transcript();
+    expect(window.length).toBeGreaterThan(0);
+    expect(window.map((e) => e.text).join('\n')).toMatch(/Well\?/);
+    // And the index-based mark that shipped would have found nothing here —
+    // which is what made the failure invisible to a fresh-game test.
+    const staleIndexMark = 500;
+    expect(useGameStore.getState().gameLog.slice(staleIndexMark)).toHaveLength(0);
+  });
+
   it('THE REGRESSION THAT WOULD HAVE SHIPPED — a first reply is never welded backwards', () => {
     // The same-channel 500ms debounce merges a world line into the PREVIOUS
     // world entry. Without a guard, the first reply of a conversation gets glued
     // onto the arrival narration that predates it — landing outside the window,
-    // so the player watches their opening question get no answer. Exactly the
-    // bug this OTA exists to end, arriving through the debounce instead of the
-    // layout.
+    // so the player watches their opening question get no answer.
     useGameStore.getState().appendLog('world', 'The stall smells of hot iron.');
-    const start = useGameStore.getState().gameLog.length;
-    useGameStore.setState({
-      pendingTalk: {
-        npcId: 'irma_ironhand', npcName: 'Irma Ironhand', topics: [],
-        role: null, flourishesUsed: [], flourishCount: 0,
-        lockedCount: 0, regard: 'trusted', teaserTaps: 0,
-        startedAtLogLen: start,
-      },
-    });
+    // Age the arrival line by 100ms. That keeps it INSIDE the debounce's 500ms
+    // merge window — so the only thing that can stop the weld is the
+    // conversation guard, which is the whole point of this test — while placing
+    // it unambiguously before the mark at millisecond resolution.
+    useGameStore.setState((s) => ({
+      gameLog: s.gameLog.map((e, i) => (i === s.gameLog.length - 1 ? { ...e, ts: e.ts - 100 } : e)),
+    }));
+    const priorTs = useGameStore.getState().gameLog[useGameStore.getState().gameLog.length - 1]!.ts;
+    openTalkAt(priorTs + 50);
     useGameStore.getState().appendLog('world', 'She looks up. "Well?"');
-    const window = useGameStore.getState().gameLog.slice(start);
-    expect(window.length).toBe(1);
-    expect(window[0]!.text).toBe('She looks up. "Well?"');
-    expect(window[0]!.text).not.toMatch(/hot iron/);
+    // The reply must be its OWN entry, not text appended onto the arrival line.
+    // (Other startup entries share the same millisecond as the mark and so also
+    // fall in the window; the count is not the invariant — the weld is.)
+    const log = useGameStore.getState().gameLog;
+    const reply = log.find((e) => e.text.includes('Well?'))!;
+    expect(reply).toBeDefined();
+    expect(reply.text).toBe('She looks up. "Well?"');
+    expect(reply.text).not.toMatch(/hot iron/);
+    // …and the arrival line is still its own separate entry.
+    expect(log.filter((e) => e.text.includes('hot iron'))).toHaveLength(1);
+    expect(log.find((e) => e.text.includes('hot iron'))!.text).not.toMatch(/Well\?/);
+    // The reply is inside the conversation's window.
+    expect(transcript().some((e) => e.text.includes('Well?'))).toBe(true);
   });
 
   it('the transcript is a WINDOW, not a copy — closing the talk leaves the history behind', () => {
-    const start = useGameStore.getState().gameLog.length;
-    useGameStore.setState({
-      pendingTalk: {
-        npcId: 'irma_ironhand', npcName: 'Irma Ironhand', topics: [],
-        role: null, flourishesUsed: [], flourishCount: 0,
-        lockedCount: 0, regard: 'trusted', teaserTaps: 0,
-        startedAtLogLen: start,
-      },
-    });
+    openTalkAt(Date.now());
     useGameStore.getState().appendLog('world', 'A thing she said.');
     const during = useGameStore.getState().gameLog.length;
     useGameStore.getState().closeTalk();
     expect(useGameStore.getState().pendingTalk).toBeNull();
-    // The conversation's lines are still in the feed (plus the sign-off line).
     const after = useGameStore.getState().gameLog;
     expect(after.length).toBeGreaterThanOrEqual(during);
     // (The sign-off may debounce-group into the same card; what matters is the
@@ -145,17 +167,19 @@ describe('OTA-1118 — the conversation carries its own transcript', () => {
     expect(after.some((e) => e.text.includes('A thing she said.'))).toBe(true);
   });
 
-  it('a real talkToNpc stamps the marker off the live feed length', () => {
-    // Drive the store's own opener rather than a hand-built literal, so the
-    // marker cannot silently stop being set at the one place it matters.
-    const before = useGameStore.getState().gameLog.length;
+  it('a real talkToNpc stamps a TIMESTAMP mark, never a log length', () => {
+    // Drive the store's own opener rather than a hand-built literal, so the mark
+    // cannot silently stop being set at the one place it matters — and so a
+    // future edit back to `gameLog.length` reds here instead of on a device.
+    const t0 = Date.now();
     useGameStore.getState().talkToNpc('Irma Ironhand');
     const t = useGameStore.getState().pendingTalk;
     if (t) {
-      // Irma is reachable in this scene — the marker must be the pre-open length.
-      expect(t.startedAtLogLen).toBe(before);
+      expect(t.startedAtTs).toBeGreaterThanOrEqual(t0);
+      // A log length could never be a plausible epoch-ms value.
+      expect(t.startedAtTs).toBeGreaterThan(1_000_000_000_000);
     } else {
-      // Not in this scene; the opener correctly did nothing and left no marker.
+      // Irma is not in this scene; the opener correctly did nothing.
       expect(useGameStore.getState().pendingTalk).toBeNull();
     }
   });
@@ -165,8 +189,10 @@ describe('OTA-1118 — source locks on the view that fixes the report', () => {
   const view = src('app/components/TalkSheet.tsx');
 
   it('the exchange is rendered inside the sheet, sliced off the real log', () => {
-    expect(view).toContain('gameLog.slice(');
-    expect(view).toMatch(/startedAtLogLen/);
+    // OTA-1121 — a TIMESTAMP filter, never an index slice. An index is silently
+    // wrong once gameLog sits at its cap and the buffer starts trimming.
+    expect(view).toContain('gameLog.filter((e) => e.ts >= ctx.startedAtTs)');
+    expect(view).not.toContain('gameLog.slice(');
     // A transcript pane exists and is the flexible one — it gets the space.
     expect(view).toMatch(/transcript: \{\s*flex: 1,/);
   });
