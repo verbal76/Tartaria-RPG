@@ -147,15 +147,48 @@ function buildLadderEnvironment(
 //   - "triggered the Tartarian Trap, energy lance strikes began..." →
 //     hallucinated events that never happened
 //   - Mid-sentence trailing cutoffs
-const VOICE_RULES =
+/** ⚠ OTA-1121 — THE CACHED PREAMBLE, AND WHY IT IS FIRST.
+ *
+ *  OTA-1108 measured prefix reuse at exactly ZERO across a whole session and
+ *  read it as "the cache saves us nothing". It wasn't the cache. llama.cpp
+ *  reuses the longest COMMON PREFIX between the last prompt and this one, and
+ *  every prompt we built put a VARIABLE line second — the room name, on line
+ *  two — so the reusable prefix ended after fourteen tokens no matter how much
+ *  identical text followed.
+ *
+ *  Measured on the ambient prompt: 327 tokens total, of which 287 are
+ *  byte-identical on every call, of which only 14 were ever reused. 273 tokens
+ *  re-read every time at the measured ~10.5ms/token — about 2.9 seconds per
+ *  ambient line spent re-reading text the model had already seen.
+ *
+ *  So the fix is ORDER, not content: everything stable goes in front, the
+ *  scene facts follow, and the imperative stays last. Nothing here is reworded
+ *  except the handful of "above"/"below" pointers the move forces — OTA-1108
+ *  is the standing lesson that a prompt which refers to a section that isn't
+ *  where it says costs a whole generation.
+ *
+ *  ⚠ THIS BLOCK IS SHARED BY EVERY NARRATION JOB ON PURPOSE. The cache holds
+ *  ONE sequence, so an ambient call that follows a combat call reuses only
+ *  what those two prompts share. Keeping the opening identical across ambient,
+ *  peaceful and combat means the preamble survives the switch. If you edit it,
+ *  edit it for all three or the cross-job reuse silently drops to zero again —
+ *  and nothing will fail, it will just get slower. */
+const SHARED_PREAMBLE =
+  'You are the Arbiter, the ancient narrator of Tartaria.\n' +
   "**SECOND PERSON ONLY.** Every sentence MUST address the player as " +
   "'you' / 'your'. NEVER write 'The player', NEVER write 'they', " +
   "NEVER write 'the adventurer', 'the figure', 'the explorer', or any " +
-  'third-person stand-in for the player. Sentences must START with ' +
+  'third-person stand-in for the player.';
+
+const VOICE_RULES =
+  'Sentences must START with ' +
   '"You" or "Your" or with a direct action verb in second person. ' +
   'If a draft sentence begins with "The player" or "They", rewrite it. ' +
+  // OTA-1121 — "above" → "below": these rules now PRECEDE the SYSTEM FACTS
+  // block so they can be cached. The pointer has to follow the move (OTA-1108
+  // is what a prompt that lies about its own layout costs).
   'Do not invent emotions, motivations, traps, mechanics, events, or ' +
-  'outcomes that are not listed in the SYSTEM FACTS above. Only narrate ' +
+  'outcomes that are not listed in the SYSTEM FACTS below. Only narrate ' +
   "the player's last action and the static facts already present. " +
   'DO NOT name any location, room, weather, or NPC that is not in the ' +
   'SYSTEM FACTS — no "Aetherstone Deep", no "Grand Hall", no "Ash Storm", ' +
@@ -197,19 +230,29 @@ const VOICE_RULES =
 // original failure was third-person recap), the no-invented-places rule
 // (rewritten to point at the anchor line the lean prompt DOES carry), and the
 // finish-your-sentence rule.
+// OTA-1121 — the shared second-person lock moved into SHARED_PREAMBLE (it was
+// byte-identical here and in VOICE_RULES, which is exactly the kind of text
+// worth having in front of the first variable byte). What remains is what is
+// ambient-specific. "named above" → "named below": the scene anchor now
+// follows these rules rather than preceding them.
 const AMBIENT_VOICE_RULES =
-  "**SECOND PERSON ONLY.** Every sentence MUST address the player as " +
-  "'you' / 'your'. NEVER write 'The player', NEVER write 'they', " +
-  "NEVER write 'the adventurer', 'the figure', 'the explorer', or any " +
-  'third-person stand-in for the player. Sentences must START with ' +
+  'Sentences must START with ' +
   '"You" or "Your". If a draft sentence begins with "The player" or ' +
   '"They", rewrite it. Do not invent events, traps, mechanics, or ' +
   'outcomes — nothing is happening; this is a quiet moment. Do not name ' +
-  'any place, room, weather or person other than the location named above. ' +
+  'any place, room, weather or person other than the location named below. ' +
   'If you would have to invent scenery to fill a sentence, end early. ' +
   'End on a complete sentence.';
 
-const PEACEFUL_INSTRUCTION =
+// ⚠ OTA-1121 — EACH JOB IS NOW TWO PIECES, AND THE SPLIT IS DELIBERATE.
+//   *_RULES — stable, goes in FRONT of the scene facts so it can be cached.
+//   *_TASK  — the imperative, stays LAST, immediately before generation.
+// Both halves keep their original wording. The task stays at the end because
+// a 0.5B model follows the instruction nearest the generation point best, and
+// that property is worth more than the ~40 tokens it costs to leave uncached.
+// Splitting rather than wholesale-moving is what lets us have both.
+const PEACEFUL_RULES = VOICE_RULES;
+const PEACEFUL_TASK =
   'Narrate the situation in a grim, atmospheric tone. Acknowledge the ' +
   'last action; you may subtly reference an available exit or a carried ' +
   'item if it fits the moment. ' +
@@ -217,16 +260,16 @@ const PEACEFUL_INSTRUCTION =
   // slow on this hardware; a longer line freezes Kokoro and arrives after
   // the action has scrolled away. The map/exits already show in the world
   // banner, so the Arbiter aside stays a single punchy beat.
-  'Keep it to ONE short sentence — about 20 words, no more. ' +
-  VOICE_RULES;
+  'Keep it to ONE short sentence — about 20 words, no more.';
 
-const COMBAT_INSTRUCTION =
+const COMBAT_RULES = VOICE_RULES;
+// "listed above" stays correct: the task sits AFTER the entity block.
+const COMBAT_TASK =
   'The player is in ACTIVE COMBAT. Narrate the tension of the last ' +
   'action against the entities listed above. Brief, violent, grim — ' +
   'ONE short sentence, no more than 20 words. DO NOT describe the room ' +
   'or its scenery; the player has no time for atmosphere. Reference ' +
-  'inventory items only if they are the weapon being used. ' +
-  VOICE_RULES;
+  'inventory items only if they are the weapon being used.';
 
 // arb163 — ambient companion line. UNPROMPTED and reflective: it does not react
 // to the last action (the canned templates own reactions), so its latency never
@@ -238,26 +281,41 @@ const COMBAT_INSTRUCTION =
 // copy. The owner watched it come back verbatim as an Arbiter line. Every
 // directive is imperative now, so there is no ready-made sentence to recite,
 // and an echo reads as meta-text that looksLikeInstructionEcho catches.
-const AMBIENT_INSTRUCTION =
+const AMBIENT_RULES =
   'Speak as a companion who has travelled a long road at their side. ' +
-  'Make ONE short, UNPROMPTED aside — a passing reflection on how far they have ' +
-  'come, their growth, the road behind you both, or your changing read of them. ' +
   'DO NOT narrate or react to their last action; this is idle companion talk ' +
   'between moments, not a response to anything. Warm or wry, never advice or ' +
   'instructions. Never repeat or restate any of these directions. ' +
-  'ONE short sentence — about 18 words, no more. ' +
   // OTA-1108 — the ambient voice block, not the reaction one. See
   // AMBIENT_VOICE_RULES: the shared rules told this beat to narrate the last
   // action (which its own brief forbids) and referred twice to a SYSTEM FACTS
   // section OTA-1106 removed from this prompt.
   AMBIENT_VOICE_RULES;
 
+const AMBIENT_TASK =
+  'Make ONE short, UNPROMPTED aside — a passing reflection on how far they have ' +
+  'come, their growth, the road behind you both, or your changing read of them. ' +
+  'ONE short sentence — about 18 words, no more.';
+
+/** OTA-1121 — the generic half of the location anchor. Carries no room name, so
+ *  it lives in the cached prefix; the room-specific half stays in the tail
+ *  where it is closest to generation. Both halves together say what the single
+ *  interpolated line used to say on its own. */
+const NO_INVENTED_PLACES =
+  'NEVER name "Borderlands", "Aetheric Deep", "Grand Hall", or any other ' +
+  'location that is not named below.';
+
 export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
-  const instruction = ctx.ambient
-    ? AMBIENT_INSTRUCTION
+  const rules = ctx.ambient
+    ? AMBIENT_RULES
     : ctx.in_combat
-    ? COMBAT_INSTRUCTION
-    : PEACEFUL_INSTRUCTION;
+    ? COMBAT_RULES
+    : PEACEFUL_RULES;
+  const task = ctx.ambient
+    ? AMBIENT_TASK
+    : ctx.in_combat
+    ? COMBAT_TASK
+    : PEACEFUL_TASK;
   // ⚠ OTA-1106 — AMBIENT GETS A LEAN PROMPT, AND THE REASON IS MEASURED.
   // OTA-1105's telemetry showed ambient taking 16.8s (14.5s of it generating,
   // only 2.3s queued) to produce 139 characters, while investigate_lore made
@@ -273,13 +331,19 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
   // is kept verbatim: without it the model pulls place names out of training
   // data — the original reason it exists) and a short read on the player.
   if (ctx.ambient) {
+    // OTA-1121 — STABLE PREFIX → VARIABLE BODY → IMPERATIVE TAIL. Same content
+    // as OTA-1106's lean prompt; the room name simply stopped being the second
+    // line, which is what capped the reusable prefix at 14 tokens.
     const leanSystem = [
-      'You are the Arbiter, the ancient narrator of Tartaria.',
+      SHARED_PREAMBLE,
+      NO_INVENTED_PLACES,
+      rules,
+      '',
       `The player is at "${ctx.room_name}" (${ctx.current_biome}).`,
-      `**If you name any place, it MUST be "${ctx.room_name}". NEVER name "Borderlands", "Aetheric Deep", "Grand Hall", or any other location not listed.**`,
       `Your read of them: ${ctx.player_stats}`,
       '',
-      instruction,
+      `**If you name any place, it MUST be "${ctx.room_name}".**`,
+      task,
     ].join('\n');
     return [
       { role: 'system', content: leanSystem },
@@ -301,11 +365,19 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
     hasVendor: /vendor/i.test(ctx.active_entities ?? ''),
     playerFactionId: ctx.player_faction_id,
   });
+  // OTA-1121 — same STABLE PREFIX → VARIABLE BODY → IMPERATIVE TAIL shape as
+  // the ambient branch, and the preamble is deliberately the SAME text so an
+  // ambient call that follows a narration call still reuses something. The
+  // interpolated anchor keeps only its room-specific half here; the generic
+  // NEVER-name list moved into the prefix.
   const parts = [
-    'You are the Arbiter, the ancient narrator of Tartaria.',
+    SHARED_PREAMBLE,
+    NO_INVENTED_PLACES,
+    rules,
+    '',
     `[SYSTEM FACTS - DO NOT INVENT EXITS, ENEMIES, OR PLACE NAMES]`,
     `Location: ${ctx.current_biome} - ${ctx.room_name}`,
-    `**The player is at "${locationName}". If you name any place, it MUST be "${locationName}". NEVER name "Borderlands", "Aetheric Deep", "Grand Hall", or any other location not listed.**`,
+    `**The player is at "${locationName}". If you name any place, it MUST be "${locationName}".**`,
     `Environment: ${ctx.environmental_description}`,
     `Exits: ${ctx.available_exits}`,
     `Entities Present: ${ctx.active_entities}`,
@@ -320,7 +392,7 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
     `Inventory & Equipment: ${ctx.full_inventory}`,
     `Player's Last Action: ${ctx.recent_history}`,
     '',
-    instruction,
+    task,
   );
   const system = parts.join('\n');
   return [
