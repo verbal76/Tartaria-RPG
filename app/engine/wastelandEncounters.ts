@@ -139,6 +139,17 @@ interface PickOptions {
    *  to carry the lens trips over Crucibles roughly twice as often.
    *  Other archetypes unaffected. */
   aethericVision?: boolean;
+  /** ⚠ OTA-1113 — the difficulty tier's `discovery` dial. Multiplies the
+   *  weight of the archetypes that HELP you (vendors, treasure caches,
+   *  fusion benches) rather than the ones that fight you.
+   *
+   *  It is a separate dial from the encounter roll on purpose. The roll
+   *  produces danger AND help from one number, so scaling only the roll would
+   *  make a hard run both thicker in enemies and scarcer in traders — two
+   *  punishments billed as one, and the resource-starvation trap that turns a
+   *  hard game into a tedious one. Above 1.0 a gentler tier finds MORE help.
+   *  Default 1 = the shipped weights, untouched. */
+  discoveryMult?: number;
   /** OTA-216 — directional-find cash-in. When the player has a
    *  `pendingDirectionalFind` matching the travel direction, this
    *  carries the promised archetype id ('abandoned_caravan', etc.).
@@ -289,6 +300,13 @@ export function pickWastelandEncounter(
     // OTA-696 — auto-route variety bias. Lift the NON-combat archetypes so
     // a plotted course brings in more different (non-fight) encounters.
     if (opts.autoTravel && !isCombat(a.type)) mult *= AUTO_TRAVEL_VARIETY_MULT;
+    // ⚠ OTA-1113 — the difficulty tier's generosity with help. Applies to the
+    // archetypes that give rather than take: a vendor stall, a cache, a
+    // Crucible, a hidden site. Combat archetypes are untouched — making a
+    // gentle run find FEWER fights is the `spawn` dial's job, and doing it
+    // here as well would double-count.
+    const helps = a.type === 'treasure' || a.type === 'fusion_bench' || a.type === 'npc';
+    if (helps && opts.discoveryMult && opts.discoveryMult !== 1) mult *= opts.discoveryMult;
     return mult;
   };
   // Weighted pick among eligible archetypes (bias-adjusted).

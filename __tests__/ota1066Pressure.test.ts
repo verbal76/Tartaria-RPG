@@ -59,7 +59,9 @@ import {
 import { useGameStore } from '../app/state/gameStore';
 import type { PlayerCharacter } from '../app/engine/types';
 
-const prof = (t: PressureTier) => PRESSURE_PROFILES[t];
+// OTA-1113 — PRESSURE_PROFILES is keyed by PRESET now ('custom' composes from
+// these four rather than being a fifth row), so this helper takes a preset.
+const prof = (t: Exclude<PressureTier, 'custom'>) => PRESSURE_PROFILES[t];
 const lowest = PRESSURE_ORDER[0]!;
 const highest = PRESSURE_ORDER[PRESSURE_ORDER.length - 1]!;
 
@@ -250,7 +252,13 @@ describe('OTA-1066 — in the real store', () => {
     expect(creation).toMatch(/STEP_ORDER: Step\[\] = \['race', 'faction', 'motive', 'pressure'\]/);
     expect(creation).toContain("const nextLabel = step === 'pressure' ? 'BEGIN' : 'NEXT →';");
     // ...and it is carried into the character.
-    expect(creation).toContain('startNewGame({ name: \'\', raceId, factionId, motiveId, pressure })');
+    // RETARGETED BY OTA-1113: the call gained the optional CUSTOM payload
+    // (`pressureCustom`), which only rides along when the tier is 'custom'.
+    // What this test guards is that the chosen tier reaches startNewGame, so it
+    // asserts the arguments rather than the exact call string.
+    expect(creation).toContain("void startNewGame({");
+    expect(creation).toContain("name: '', raceId, factionId, motiveId, pressure,");
+    expect(creation).toContain("...(pressure === 'custom' && pressureCustom ? { pressureCustom } : {}),");
   });
 
   it('⚠ the dials scale RATES, never what corruption and weather already do', () => {

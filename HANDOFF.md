@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.46**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.47**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1051,20 +1051,37 @@ rediscovering them.
   encounters."* The novelty gate itself is unchanged and still does its
   anti-farm job.
 
-- **⚠ OPEN — TIE ENCOUNTER RATE TO THE DIFFICULTY TIER.** Owner, alongside the
-  halving: *"I don't think the numbers for later in the game need adjusted yet,
-  they should be tied to a difficulty level choice in character creation."* The
-  knob already exists — `engine/pressure.ts`, four tiers (`salvage` / `owed` /
-  `let_it_come` / `bury_me`) picked on the last step of creation, lowerable
-  mid-run but never raisable. ⚠ Read that file's header before wiring anything:
-  it declines to scale encounter rate **on purpose** — *"Corruption and weather
-  already bite … re-scaling them from here would put a difficulty multiplier on
-  top of a year of tuning and quietly invalidate all of it."* So this is a
-  design job, not a line change. The question to answer first is whether the
-  encounter ROLL is one of the substrates pressure should own (like TIDE and
-  HOSTILE, which threatened nothing before) or one of the already-balanced ones
-  it deliberately leaves alone. The post-halving baseline is the new reference
-  point, so a tier multiplier would sit on 0.29 / 0.225.
+- **⚠ IN PROGRESS — DIFFICULTY GOES GAME-WIDE (golem OTA-1113 shipped the engine).**
+  Owner: *"aside from what it already does, the difficulty levels should control
+  the spawn rate of enemies and vendors and secret locations. it should limit or
+  grow the number of members in an attack party, it should limit the amount of
+  loot found per tile"*, then, after reading a survey of industry difficulty
+  design: *"go with the best suggestions on each category… the effects should be
+  game wide. Also create a custom selection that fires a popup and lets you check
+  what systems they want to effect."*
+  **DONE:** `pressure.ts` amended (see its header — the founding
+  no-multipliers-on-tuned-systems rule is explicitly reversed, with the identity
+  row as the replacement protection). Nine dials added and tagged by lever type.
+  Wired: `spawn` (encounter roll), `discovery` (vendor / cache / bench weights),
+  `pack` (party size, welded to the swing cap), `loot` (per-tile find chance).
+  CUSTOM tier + `DifficultyCustomModal` checklist shipped; `profileOf` composes
+  so pre-existing consumers are custom-aware untouched.
+  **⚠ NEXT — the rule levers, which the survey rates highest and which are
+  already DEFINED but not yet consumed:**
+  1. `witholdIdentity` — curios stay unidentified. The game already has the
+     identification system (static inference in `itemDefaults` → Qwen synthesis);
+     this decides whether it runs for free. Consumer: the inference/synth path.
+  2. `witholdIntel` — no weakness / resist tags the bestiary has not earned.
+     Consumer: `EnemyPanel` + the resist callouts.
+  3. `hunger` — the clock rate. Consumer: `hungerStaminaPenalty` accrual.
+  4. `elite` — the CONTENT swap, and the highest-value item on the list: a group
+     of grunts sometimes arrives as one tougher body instead. Same encounter
+     count, completely different fight, no damage sponge. Machinery already
+     exists (rarity tiers, boss flags, the Guardian over-level scaler, Aetherkin
+     variants, faction parties in human bodies).
+  **⚠ AND THE RULE THAT MUST NOT BREAK:** every dial's 'owed' value is a
+  mathematical no-op, and `ota1113DifficultySystems` fails if that stops being
+  true. That test is what makes the amendment safe; do not weaken it.
 
 - **QWEN DORMANCY IS FIRING REGULARLY.** Third log in a row ending with
   `qwen-watchdog: Qwen dormant (status='ready' but the native context was
@@ -1083,7 +1100,65 @@ rediscovering them.
   log across a truncated span, so it was never confirmed as a bug. Still
   unresolved; needs a log that captures the whole encounter.
 
-- **THE OUTDOOR HALF OF THE INDOOR-AMBUSH OTA (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ DIFFICULTY THAT MEANS SOMETHING, AND A CUSTOM PICKER (2026-08-05, latest). BOTH LINES.**
+  golem OTA-1113 / HAL OTA-1136. Owner, after bringing back a survey of how the
+  industry actually builds difficulty: *"go with the best suggestions on each
+  category. let's make the difficulty tiers mean something, the effects should
+  be game wide. Also create a custom selection that fires a popup and let's you
+  check what systems they want to effect."*
+  **⚠ THIS AMENDS `pressure.ts`'s FOUNDING RULE**, deliberately and in writing.
+  That file was built to own only substrates that threatened NOTHING before
+  (elapsed time, faction standing) and to scale only the RATE of accumulation
+  for the two that already bit — *"re-scaling them from here would put a
+  difficulty multiplier on top of a year of tuning and quietly invalidate all of
+  it."* The owner overruled it, correctly: a difficulty setting that only
+  touches prices, patrols and weather is a weather setting, and players read
+  "difficulty" as "how hard are the fights".
+  **⚠ WHAT REPLACES THAT PROTECTION IS THE IDENTITY ROW.** Every new dial is
+  defined so `owed` is a MATHEMATICAL no-op — 1.0, or off. Not "close to
+  unchanged"; unchanged. The default run is still exactly the game a year of
+  tuning produced, and `ota1113DifficultySystems` fails if a future dial lands
+  on that row with a non-identity value. **That test is the load-bearing part of
+  this OTA.**
+  **Nine dials, tagged by the survey's three lever types** so a future one is
+  added with its cost visible rather than defaulting to a multiplier because a
+  multiplier is a config value: MULTIPLIERS (`spawn`, `discovery`, `pack` — both
+  directions, `loot`, `hunger`); RULE CHANGES (`witholdIdentity`,
+  `witholdIntel` — the survey rates these the best value in the medium, free to
+  compute and they feel meaningful rather than fake); CONTENT SWAP (`elite`,
+  which the survey calls *"the good one"*). Wired this OTA: spawn, discovery,
+  pack, loot. The rule dials and the elite swap are defined and picker-visible;
+  their consumers are the next job (see §WATCH LIST).
+  **⚠ Two guards straight out of the fake-difficulty list, both of which this
+  game has been bitten by once:** (1) **pack size is welded to the swing cap** —
+  growing parties without growing the per-round cap does not make a fight
+  harder, it makes it LONGER, and combatStress's stall tail comes straight back;
+  `scaledSwingCap` grows at the SQUARE ROOT of pack so `bury_me` presses without
+  becoming a shredder, and floors at the shipped value so no tier ever swings
+  less than today. (2) **`loot` bottoms out at 0.7**, not lower, and rides the
+  find CHANCE rather than the stack size — a lean tier makes a find rarer, not
+  every find insulting. It stacks with TIDE's price drift, and cutting supply
+  while raising prices is the resource-starvation trap: tedium, not tension.
+  **`discovery` is a separate dial from `spawn` on purpose** — one roll produces
+  danger AND help, so scaling only the roll would make a hard run thicker in
+  enemies AND scarcer in traders, two punishments billed as one.
+  **CUSTOM** is the fifth option, below the four presets — the survey's own
+  compromise ("presets as the front door, custom as an advanced option that maps
+  to the same variables"). Pick an INTENSITY, then check which of twelve SYSTEMS
+  it may touch; everything unchecked runs at `owed`. Rows show their lever type,
+  because a rule change and a multiplier feel completely different at the same
+  nominal difficulty. **⚠ It is not a back door up the ladder:** a custom config
+  is ranked by its intensity, and custom→custom may only ever REMOVE systems, so
+  lower-only-never-raise survives intact. `profileOf()` COMPOSES for a custom
+  character, so every consumer written before this OTA became custom-aware
+  without being touched.
+  **A bug the tests caught:** `isPressureTier()` tested membership of
+  `PRESSURE_ORDER`, which deliberately excludes `'custom'` — so every custom
+  character was silently demoted to the default and the whole picker did
+  nothing. New suite `ota1113DifficultySystems` (34 tests); `ota1066Pressure`
+  retargeted for the preset-keyed profile map.
+
+- **THE OUTDOOR HALF OF THE INDOOR-AMBUSH OTA (2026-08-05). BOTH LINES.**
   golem OTA-1112 / HAL OTA-1135. Owner: *"fix the rest ambush line dedup, or
   should the llm rework be giving a new line for that?"* Neither framing was
   quite it — the cause is smaller than "needs new content". The indoor-ambush

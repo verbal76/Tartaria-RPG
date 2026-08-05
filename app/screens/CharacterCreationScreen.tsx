@@ -4,7 +4,9 @@ import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
 import { getStoryMotives } from '../engine/story'; // OTA-1018
 // OTA-1066 — Phase 4: the last thing you say before you walk.
-import { PRESSURE_ORDER, PRESSURE_PROFILES, DEFAULT_PRESSURE, type PressureTier } from '../engine/pressure';
+import { PRESET_TIERS, PRESSURE_PROFILES, DEFAULT_PRESSURE, DIFFICULTY_SYSTEMS, type PressureTier, type PressureCustom } from '../engine/pressure';
+// OTA-1113 — the CUSTOM row's popup.
+import { DifficultyCustomModal } from '../components/DifficultyCustomModal';
 
 // Tungsten Spire — the 'name' step is gone. New flow: race → faction →
 // BEGIN. The player gives their name in-game when the Arbiter prompts
@@ -48,6 +50,12 @@ export function CharacterCreationScreen() {
   const [factionId, setFactionId] = useState(factions[0]!.id);
   const [motiveId, setMotiveId] = useState(motives[0]!.id);
   const [pressure, setPressure] = useState<PressureTier>(DEFAULT_PRESSURE); // OTA-1066
+  // OTA-1113 — CUSTOM. `pressureCustom` is only sent when the tier is 'custom';
+  // picking a preset afterwards leaves it behind rather than clearing it, so a
+  // player who tries custom, backs out to a preset, then returns finds their
+  // switches where they left them.
+  const [pressureCustom, setPressureCustom] = useState<PressureCustom | undefined>(undefined);
+  const [customOpen, setCustomOpen] = useState(false);
 
   const stepIndex = STEP_ORDER.indexOf(step);
   const selectedRace = races.find((r) => r.id === raceId) ?? races[0]!;
@@ -82,7 +90,10 @@ export function CharacterCreationScreen() {
     // Arbiter prompts for it in the outpost. tutorialStep starts at 0
     // (the name beat) and the InputBox routes the next submission as
     // the player's name. The motive drives the opening crawl.
-    void startNewGame({ name: '', raceId, factionId, motiveId, pressure });
+    void startNewGame({
+      name: '', raceId, factionId, motiveId, pressure,
+      ...(pressure === 'custom' && pressureCustom ? { pressureCustom } : {}),
+    });
   };
 
   const nextLabel = step === 'pressure' ? 'BEGIN' : 'NEXT →';
@@ -207,7 +218,7 @@ export function CharacterCreationScreen() {
             <Text style={styles.contextLine}>
               {selectedRace.name} · {selectedFaction.name} · {motives.find((m) => m.id === motiveId)?.title ?? ''}
             </Text>
-            {PRESSURE_ORDER.map((id) => {
+            {PRESET_TIERS.map((id) => {
               const prof = PRESSURE_PROFILES[id];
               return (
                 <TouchableOpacity
@@ -224,6 +235,35 @@ export function CharacterCreationScreen() {
                 </TouchableOpacity>
               );
             })}
+            {/* OTA-1113 — CUSTOM sits BELOW the four presets on purpose. The
+                survey is explicit that sliders give the best experience and the
+                worst discoverability, so the presets stay the front door and
+                this is the advanced option behind it. */}
+            <TouchableOpacity
+              style={[styles.option, pressure === 'custom' && styles.optionSelected]}
+              onPress={() => setCustomOpen(true)}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityState={{ selected: pressure === 'custom' }}
+              accessibilityLabel="Custom difficulty. Choose which systems the difficulty affects."
+            >
+              <Text style={styles.optionName}>&quot;Let me choose what it takes.&quot;</Text>
+              <Text style={styles.optionDesc}>
+                {pressure === 'custom' && pressureCustom
+                  ? `${pressureCustom.systems.length} of ${DIFFICULTY_SYSTEMS.length} systems · tap to change`
+                  : 'Pick how hard, then pick exactly which systems it is allowed to touch.'}
+              </Text>
+            </TouchableOpacity>
+            <DifficultyCustomModal
+              visible={customOpen}
+              initial={pressureCustom}
+              onCancel={() => setCustomOpen(false)}
+              onConfirm={(c) => {
+                setPressureCustom(c);
+                setPressure('custom');
+                setCustomOpen(false);
+              }}
+            />
             <View style={styles.beginBlock}>
               <Text style={styles.beginHint}>
                 You can ease this later from your character sheet if it turns out to be too much. You can never raise it.

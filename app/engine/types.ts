@@ -1017,6 +1017,11 @@ export interface PlayerCharacter {
    *  finds that too much can drop a tier from Settings without abandoning the
    *  character, which is the escape hatch that makes an honest default safe. */
   pressure?: string;
+  /** ⚠ OTA-1113 — the CUSTOM difficulty payload: `{ intensity, systems[] }`.
+   *  Present only when `pressure === 'custom'`; every preset run leaves it
+   *  absent. See engine/pressure.ts normalizeCustom — it is read tolerantly,
+   *  so a hand-edited or newer save cannot throw here. */
+  pressureCustom?: { intensity: string; systems: string[] };
   /** OTA-1066 — the highest TIDE stage this character has been told about, so
    *  the crossing line fires once per stage rather than on every step inside
    *  it. Derived state would be wrong here: the stage is a function of hours,

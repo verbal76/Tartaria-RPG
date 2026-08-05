@@ -14,7 +14,7 @@ import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
 // OTA-1066 — Phase 4 difficulty, and the only place it can be eased.
 import {
-  PRESSURE_ORDER, PRESSURE_PROFILES, pressureOf, canChangeTo,
+  PRESET_TIERS, PRESSURE_PROFILES, pressureOf, canChangeTo,
 } from '../engine/pressure';
 // OTA-1067 — Phase 5: where the Arbiter stands, and what he thinks of you.
 import { arbiterSheetLines } from '../engine/arbiterPersona';
@@ -197,7 +197,7 @@ export function CharacterScreen() {
         {sectionHeader('pressure', 'HOW MUCH IT TAKES')}
         {!collapsed.pressure && (
         <View style={styles.card}>
-          {PRESSURE_ORDER.map((id) => {
+          {PRESET_TIERS.map((id) => {
             const prof = PRESSURE_PROFILES[id];
             const current = pressureOf(player) === id;
             const lowerable = !current && canChangeTo(pressureOf(player), id);

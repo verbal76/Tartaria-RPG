@@ -63,6 +63,7 @@ import {
 import {
   profileOf, pressureOf, canChangeTo, isPressureTier,
   tideStage, tidePriceMultiplier, tideCrossLine,
+  scaledPackSize, scaledSwingCap, // OTA-1113
   hostileHuntChance, // NB: pressure.worstStandingFaction is deliberately NOT
   // imported — gameStore already has a local one with a different shape.
   scaledCorruptionGain, scaledWeatherBite,
@@ -3496,7 +3497,13 @@ function maybePatrolAmbush(
   const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
   const name = factions.find((f) => f.id === hostile.factionId)?.name ?? hostile.factionId;
   const tide = Math.max(0, s.worldMemory.factionTides?.[hostile.factionId] ?? 0);
-  const partySize = Math.max(2, Math.min(4, 2 + Math.floor(tide / 2)));
+  // ⚠ OTA-1113 — the tier's `pack` dial, both directions: 'salvage' shrinks a
+  // patrol, 'bury_me' grows it. scaledPackSize floors at 1 so no tier can
+  // produce an empty party.
+  const partySize = scaledPackSize(
+    Math.max(2, Math.min(4, 2 + Math.floor(tide / 2))),
+    profileOf(player).pack,
+  );
   const landed = injectFactionParty(get, set, { factionId: hostile.factionId, factionName: name, partySize, noun: 'Patrol' });
   if (!landed) return;
   set((st) => ({ worldMemory: {
@@ -26604,8 +26611,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // see HANDOFF §OPEN ITEMS for why pressure.ts currently declines to
       // scale encounter rate and what wiring it would mean.
       const baseRollChance = isAutoTravel ? 0.29 : 0.225;
+      // ⚠ OTA-1113 — THE DIFFICULTY TIER REACHES THE ENCOUNTER ROLL. Owner:
+      // "let's make the difficulty tiers mean something, the effects should be
+      // game wide." `spawn` is 1.0 on 'owed', so the halved baseline above is
+      // still exactly what the default run plays.
+      const pressureProfile = profileOf(playerForEnc);
       const timeMult = encounterRateMultiplier(playerForEnc?.hoursElapsed);
-      const effectiveRollChance = Math.min(0.99, baseRollChance * timeMult);
+      const effectiveRollChance = Math.min(0.99, baseRollChance * timeMult * pressureProfile.spawn);
       // 2026-05-25 OTA-045 — JIT-temptation predicate. Depleted on
       // any of: HP <25%, stamina <20%, TC <30. When true, the
       // encounter picker biases toward high-value archetypes
@@ -26654,6 +26666,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         threshold: baseThreshold,
         rollChance: effectiveRollChance,
         depleted,
+        // OTA-1113 — how generous this tier is with vendors, caches and
+        // hidden sites. 1.0 on 'owed', so the default run is untouched.
+        discoveryMult: pressureProfile.discovery,
         // OTA-198 — Aetheric Vision Lens doubles the chance the
         // selected encounter is a fusion bench.
         aethericVision: hasAethericVision(player),
@@ -26837,7 +26852,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && !liveScene.vendor;
       const inAnyHubRoom = !!livePlayer?.hubRoomId;
       // arb119 — gate on tileIsNovel so pacing a short loop can't farm free trinkets.
-      if (outdoorPeaceful && !inAnyHubRoom && livePlayer && tileIsNovel && Math.random() < 0.07) {
+      // ⚠ OTA-1113 — the tier's `loot` dial rides the CHANCE, not the stack
+      // size, so a lean tier makes a find rarer rather than making every find
+      // feel insulting. Kept deliberately gentle (0.7 at the hardest): this
+      // stacks with TIDE's price drift, and cutting supply while raising
+      // prices is the resource-starvation trap — tedium, not tension.
+      if (outdoorPeaceful && !inAnyHubRoom && livePlayer && tileIsNovel
+          && Math.random() < 0.07 * profileOf(livePlayer).loot) {
         const trinket = pick(INVESTIGATE_TRINKETS);
         const qty = trinket.qtyMin === trinket.qtyMax
           ? trinket.qtyMin
@@ -33408,7 +33429,15 @@ export function runEnemyGroupCounters(
     // which is the case the reasoning was actually about.
     const inTheScrum = (liveScene.range ?? 'close') === 'close';
     const meleeAttacker = !enemy.boss && (inTheScrum || !isRangedEnemy(enemy));
-    if (meleeAttacker && meleeSwings >= MELEE_PACK_SWINGS_PER_ROUND) {
+    // ⚠ OTA-1113 — THE CAP MOVES WITH THE PACK, AND BY LESS. A tier that grows
+    // parties without growing this cap does not make the fight harder, it makes
+    // it LONGER: the extra bodies queue behind a cap that never lets them act,
+    // and the combatStress stall tail OTA-1089 was written to kill comes
+    // straight back. scaledSwingCap grows at the square root of `pack` and
+    // floors at the shipped value, so 'bury_me' presses harder without becoming
+    // a shredder and no tier ever swings less than the game does today.
+    const swingCap = scaledSwingCap(MELEE_PACK_SWINGS_PER_ROUND, profileOf(get().player).pack);
+    if (meleeAttacker && meleeSwings >= swingCap) {
       crowdedOut.push(enemy.name);
       continue;
     }

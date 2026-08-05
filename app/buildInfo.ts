@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.46';
+export const DISPLAY_VERSION = '4.29.47';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20836,7 +20836,86 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sleep, spend on waking, fall back to these when the bank is empty.
 // That needs the bank built first; noted in HANDOFF §OPEN ITEMS.
 // New suite ota1112OutdoorRestLines (13 tests). DISPLAY_VERSION 4.29.46.
-export const OTA_BUILD_ID = '2026-08-05-1112-outdoor-rest-lines';
+// ⚠⚠ OTA-1113 — DIFFICULTY THAT MEANS SOMETHING, AND A CUSTOM PICKER.
+// Owner, after bringing back a survey of how the industry actually
+// builds difficulty: "go with the best suggestions on each category.
+// let's make the difficulty tiers mean something, the effects should
+// be game wide. Also create a custom selection that fires a popup and
+// lets you check what systems they want to effect."
+//
+// ⚠ THIS AMENDS pressure.ts's FOUNDING RULE, deliberately and in
+// writing. That file was built to own only substrates that threatened
+// NOTHING before (elapsed time, faction standing) and to scale only
+// the RATE of accumulation for the two that already bit (corruption,
+// weather) — because "re-scaling them from here would put a difficulty
+// multiplier on top of a year of tuning and quietly invalidate all of
+// it." The owner overruled it, correctly: a difficulty setting that
+// only touches prices, patrols and weather is a weather setting, and
+// players read "difficulty" as "how hard are the fights".
+//
+// ⚠ WHAT REPLACES THAT PROTECTION IS THE IDENTITY ROW. Every new dial
+// is defined so 'owed' is a MATHEMATICAL no-op — 1.0, or off. Not
+// "close to unchanged"; unchanged. The default run is still exactly
+// the game a year of tuning produced, and ota1113DifficultySystems
+// fails if any future dial lands on that row with a non-identity
+// value. That test is the load-bearing part of this OTA.
+//
+// NINE NEW DIALS, tagged by the survey's three lever types so a future
+// one is added with its cost visible rather than defaulting to a
+// multiplier because a multiplier is a config value:
+//   MULTIPLIERS — spawn (the encounter roll), discovery (how generous
+//     the world is with vendors / caches / benches), pack (bodies in a
+//     party, BOTH directions — salvage shrinks, bury_me grows), loot
+//     (per-tile find chance), hunger.
+//   RULE CHANGES — witholdIdentity (curios stay unidentified),
+//     witholdIntel (no weakness tags the bestiary has not earned). The
+//     survey rates these the best value in the medium: free to compute,
+//     and they feel meaningful rather than fake.
+//   CONTENT SWAP — elite (a group of grunts sometimes arrives as one
+//     dangerous body instead). The survey calls this "the good one".
+// Wired this OTA: spawn, discovery, pack, loot. The rule dials and the
+// elite swap are DEFINED and picker-visible; their consumers land next.
+//
+// ⚠ TWO GUARDS STRAIGHT OUT OF THE SURVEY'S FAKE-DIFFICULTY LIST, both
+// of which this game has already been bitten by once:
+//   1. PACK SIZE IS WELDED TO THE SWING CAP. Growing parties without
+//      growing OTA-1089's per-round cap does not make a fight harder,
+//      it makes it LONGER — the extra bodies queue behind a cap that
+//      never lets them act, and combatStress's stall tail comes back.
+//      scaledSwingCap grows at the SQUARE ROOT of pack, so bury_me
+//      presses without becoming a shredder, and floors at the shipped
+//      value so no tier ever swings less than today.
+//   2. LOOT BOTTOMS OUT AT 0.7, not lower, and rides the find CHANCE
+//      rather than the stack size — a lean tier makes a find rarer,
+//      not every find insulting. It stacks with TIDE's price drift,
+//      and cutting supply while raising prices is the
+//      resource-starvation trap: tedium, not tension.
+// And DISCOVERY is a separate dial from SPAWN on purpose: one roll
+// produces danger AND help, so scaling only the roll would make a hard
+// run thicker in enemies AND scarcer in traders — two punishments
+// billed as one.
+//
+// CUSTOM — the fifth option, below the four presets (the survey's own
+// compromise: presets as the front door, custom as the advanced option
+// mapping to the same variables). Pick an INTENSITY, then check which
+// of twelve SYSTEMS it is allowed to touch; everything unchecked runs
+// at 'owed'. So "let it come, but only for the fights" is expressible,
+// and so is "bury me with them, but leave my loot alone". Rows show
+// their lever type, because a rule change and a multiplier feel
+// completely different at the same nominal difficulty.
+// ⚠ AND IT IS NOT A BACK DOOR UP THE LADDER: a custom config is ranked
+// by its intensity, and custom→custom may only ever REMOVE systems.
+// The lower-only-never-raise rule survives intact.
+// ⚠ profileOf() COMPOSES for a custom character, so every consumer
+// written before this OTA became custom-aware without being touched.
+// A bug the tests caught: isPressureTier() tested membership of
+// PRESSURE_ORDER, which deliberately excludes 'custom' — so every
+// custom character was silently demoted to the default and the whole
+// picker did nothing.
+// New suite ota1113DifficultySystems (34 tests); ota1066Pressure
+// retargeted. DISPLAY_VERSION 4.29.47.
+export const OTA_BUILD_ID = '2026-08-05-1113-difficulty-systems';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1112-outdoor-rest-lines';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1111-half-the-roll';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1110-death-screen';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1109-synth-yields';
