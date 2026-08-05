@@ -91,8 +91,13 @@ describe('OTA-1105 — every consumer is labeled', () => {
     expect(rt).toContain('const result = await runExclusiveNativeMl(() => {');
     expect(rt).toContain('telLockAt = Date.now();');
     // Success and error BOTH record; an unlabeled call still shows up.
-    expect(rt).toMatch(/outcome: text\.length > 0 \? 'ok' : 'empty'/);
-    expect(rt).toMatch(/outcome: 'error',[\s\S]{0,200}throw err;/);
+    // RETARGETED BY OTA-1119: both outcomes now split on whether the native
+    // context survived the call, because `empty` was filing a silent model and
+    // a detached context under one word. The property this test cares about is
+    // unchanged — both paths record — so the assertions just widened to allow
+    // the classification. ota1119DormancyWindow owns the split itself.
+    expect(rt).toMatch(/outcome: text\.length > 0 \? 'ok' :/);
+    expect(rt).toMatch(/outcome: [^\n]*'error',[\s\S]{0,200}throw err;/);
     expect((rt.match(/job: opts\.job \?\? 'unlabeled'/g) ?? []).length).toBe(2);
   });
 

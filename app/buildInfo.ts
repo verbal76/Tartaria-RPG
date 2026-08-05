@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.52';
+export const DISPLAY_VERSION = '4.29.53';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -21125,7 +21125,54 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1118HungerCarcass (15 tests), whose first assertion is that
 // exactly ONE executable line in gameStore still says the word.
 // DISPLAY_VERSION 4.29.52.
-export const OTA_BUILD_ID = '2026-08-05-1118-hunger-carcass';
+// OTA-1119 — THE DORMANCY WINDOW, AND THE WORD THAT HID IT.
+// The owner's device log, three consecutive lines:
+//   [06:06:08] OTA session start
+//   [06:06:17] item_synthesis empty 8809ms read 0ms/write 0ms in
+//              309t->out 0t (0ch)
+//   [06:06:20] qwen-watchdog: Qwen dormant - reinitializing
+// 8.8 seconds of wall time with ZERO prefill and ZERO decode. The
+// model did not think slowly; it never ran.
+// ⚠ ROOT CAUSE, AND IT IS ORDERING. isDormant() is defined as
+// "status==='ready' but the runtime is gone", and
+// QwenGenerativeEngine.dispose() was PRODUCING exactly that state for
+// the length of its own teardown. LlamaRuntime.dispose() nulls its
+// context SYNCHRONOUSLY on entry (the arb crash fix: detach before
+// release so nothing can start a completion against a context about
+// to be freed), then AWAITS ctx.release() behind the shared native-ML
+// lock — so it waits out whatever generation currently holds that
+// lock. The engine only set status='idle' AFTER that await returned.
+// From the first line of the teardown until the lock cleared, the
+// engine reported ready-over-dead — the watchdog's exact dormancy
+// signature — for however long the in-flight generation ran. The
+// owner's log has item synthesis holding it for 10.4s. And the OTA
+// session start is the one shutdown path that runs in the FOREGROUND,
+// where OTA-1084's don't-reload-while-backgrounded guard does not
+// apply.
+// FIXED by moving one line: status leaves 'ready' first instead of
+// last. It costs nothing and closes the window entirely — an engine
+// that is shutting down now says 'idle', which is true, rather than
+// 'ready', which stopped being true the moment the context detached.
+// The OTA-1084 lifecycleGen bump still comes first of all.
+// ⚠ AND THE SECOND HALF: `empty` was hiding two different failures. A
+// model that genuinely produced nothing is a PROMPT problem; a call
+// that ran against a detached context is a LIFECYCLE problem, and the
+// two get investigated in opposite directions. The log had one of
+// each under the same word. New telemetry outcome 'dormant', recorded
+// on both the empty and the throw path by checking this.context AFTER
+// the await, with its own mark in the rollup: ∅ still means the model
+// said nothing, 💀 means there was no model to say it.
+// ⚠ PLUS ONE UNRELATED OWNER REQUEST: the death screen holds 16s
+// instead of 11s — "increase the delay on death before it goes to the
+// character collection screen by 5 seconds. they can always tap to
+// close if they want." The tap-to-leave escape is what makes a long
+// hold safe: erring long costs an impatient player one tap, erring
+// short costs a reading player their character's ending.
+// New suite ota1119DormancyWindow (13 tests) whose first assertion drives
+// a real teardown and checks isDormant() mid-flight — it fails against
+// the old ordering. DISPLAY_VERSION 4.29.53.
+export const OTA_BUILD_ID = '2026-08-05-1119-dormancy-window';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1118-hunger-carcass';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1117-rule-dials';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1116-elite-swap';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1115-pipe-loop';

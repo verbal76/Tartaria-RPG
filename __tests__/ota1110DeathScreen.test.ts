@@ -139,7 +139,12 @@ describe('OTA-1110 — the screen crossfades, holds, and leaves on its own', () 
     // "after a few seconds to read it, it should go to the character
     // collection screen" — a player who put the phone down mid-fight must not
     // come back to a modal waiting on a tap nobody told them to make.
-    expect(view).toContain('const DWELL_MS = 11000;');
+    // RETARGETED BY OTA-1119 — 11s → 16s on the owner's call: "increase the
+    // delay on death before it goes to the character collection screen by 5
+    // seconds. they can always tap to close if they want." The property this
+    // test guards is the HANDOVER, not the number: the screen must still leave
+    // on its own for a player who put the phone down.
+    expect(view).toContain('const DWELL_MS = 16000;');
     expect(view).toContain('setTimeout(() => dismiss(), DWELL_MS)');
   });
 
