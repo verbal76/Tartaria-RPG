@@ -6675,12 +6675,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const synth = require('../engine/itemSynthesisQwen');
       if (typeof itemDefaults.setQwenSynthRequester === 'function') {
         const pending = new Set<string>();
+        // ⚠ OTA-1132 — A PRIORITY INVERSION, MEASURED. The per-name `pending`
+        // set stops the same item being synthesised twice, and stops nothing
+        // else: a salvage haul of five curios fires five calls, and each one
+        // takes the shared native-ML lock for as long as it wants. The
+        // OTA-1131 log is what that costs — `item_synthesis n3 avg13.7s
+        // max19.6s`, and every other job queued behind it:
+        //   investigate_lore wait 6.5s · ambient wait 4.0s
+        // Ambient's prompt trim landed exactly as predicted (545→361 tokens,
+        // read 5.8-9.9s→4.4s) and the line still arrived LATER than before,
+        // because the saving was spent waiting for item synthesis and then
+        // decoding on a device it had saturated (31 tokens took 3.2s, ~2.5×
+        // its usual rate).
+        //
+        // The trade is indefensible stated plainly: a background enrichment
+        // that shows up on the NEXT inventory open was delaying the companion
+        // line and the lore flourish the player is waiting on RIGHT NOW. So
+        // it yields — one at a time, with a gap between. A dropped request is
+        // free: the name simply stays uncached and asks again next lookup,
+        // which is the fire-and-forget contract this path already had.
+        let synthInFlight = false;
+        let lastSynthAt = 0;
+        const SYNTH_GAP_MS = 20_000;
         itemDefaults.setQwenSynthRequester((name: string, hintTags: readonly string[]) => {
           const key = name.toLowerCase();
           if (pending.has(key)) return;
           // Status gate — don't bother spawning the call if Qwen isn't
           // ready. The static row is already in the player's hands.
           if (!qwen.isReady()) return;
+          if (synthInFlight) return;
+          if (Date.now() - lastSynthAt < SYNTH_GAP_MS) return;
+          synthInFlight = true;
+          lastSynthAt = Date.now();
           pending.add(key);
           // Defer to the next microtask so the synchronous caller
           // (a stat resolution inside inventory render) returns first.
@@ -6689,6 +6715,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
               await synth.synthesizeItemViaQwen(name, hintTags, qwen);
             } catch { /* ignore — fail closed, static row stays */ }
             pending.delete(key);
+            // OTA-1132 — the gap is measured from COMPLETION, not from the
+            // start: a 19-second call must not be followed instantly by the
+            // next one just because the clock ran while it held the lock.
+            synthInFlight = false;
+            lastSynthAt = Date.now();
           });
         });
       }

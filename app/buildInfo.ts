@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.42';
+export const DISPLAY_VERSION = '4.29.43';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -21713,7 +21713,74 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ota1131AmbientContradiction (21 tests); ota1130 cache test and
 // ota1118 transcript lock retargeted with the reasons in place.
 // DISPLAY_VERSION 4.29.42.
-export const OTA_BUILD_ID = '2026-08-05-1131-ambient-contradiction';
+// ⚠ OTA-1132 — THE AMBIENT TRIM LANDED AND THE LINE STILL ARRIVED
+// LATER. OTA-1131's own check, from the first device log running it:
+//   investigate_lore n5 avg8.5s  read1.1s/write0.9s in126t→out25t wait6.5s
+//   item_synthesis   n3 avg13.7s max19.6s in310t→out119t cap2 ∅1 ✂2/32.2s
+//   ambient          n2 avg11.6s max14.6s read4.4s/write3.0s in361t→out31t
+//   || WASTED 4 calls / 55.4s   (reuse 0t on every single row)
+//
+// WHAT WORKED, exactly as predicted: ambient's prompt fell 545 → 361
+// tokens (the estimate was ~360) and its READ time fell 5.8-9.9s →
+// 4.4s. The trim is not in question. Prefix reuse also read a
+// measured ZERO on every job, which is the number OTA-1131 corrected
+// and it confirms the stable-prefix item is still entirely open.
+//
+// ⚠ WHAT THE SAME LOG THEN SHOWED: ambient's TOTAL went UP anyway —
+// 8-11.8s before, 11.6s average now — because the saving was handed
+// straight to something else. Ambient now waits 4.0s for the lock and
+// spends 3.0s writing 31 tokens, about 2.5× the ~40ms/token it managed
+// in the OTA-1130 log. Neither number is about ambient. Both are about
+// the device being busy.
+//
+// ⚠ WHAT WAS BUSY: item synthesis. Three calls, THREE failures, 41
+// seconds — `item_synth:unparseable` every time, two having burned the
+// entire 180-token budget without ever closing a brace (472ch and
+// 488ch for a shape that needs ~200). That is 41 of the session's 55.4
+// wasted seconds, and while it burns them it holds the shared
+// native-ML lock (arb159) — which is exactly why every other job in
+// that rollup carries 4-6.5 seconds of queue.
+//
+// Stated plainly the trade was indefensible: a background enrichment
+// that lands on the NEXT inventory open was delaying the companion
+// line and the lore flourish the player is waiting on now. Four
+// changes:
+//   1. IT YIELDS. One synthesis at a time, with a 20s gap measured
+//      from COMPLETION (a 19-second call must not be followed instantly
+//      just because the clock ran while it held the lock). The old
+//      per-name `pending` set stopped duplicates and nothing else, so a
+//      salvage haul of five curios fired five calls. A dropped request
+//      is free — the name stays uncached and asks again on the next
+//      lookup, which is the fire-and-forget contract this path already
+//      had.
+//   2. THE BRIEF SHRINKS. The old one handed a 0.5B model a six-field
+//      nested `effect` object and six prose rules, then asked for "ONLY
+//      a single JSON object on one line". It filled the shape it was
+//      shown and the cap arrived before the braces closed. Now the
+//      shape is one line, holding exactly what the validator reads,
+//      with the rules folded in as inline hints: ~900 → ~430 chars
+//      (≈310 → ≈150 prompt tokens, which is prefill this job pays on
+//      every call).
+//   3. THE CAP RISES 180 → 240. Insurance, not a decision to generate
+//      more: a cap only costs time when it is reached, and 180 was
+//      guaranteeing failure.
+//   4. THE RAW TEXT IS PRINTED on a parse failure (bounded to 160
+//      chars, whitespace-collapsed, riding the existing discard sink) —
+//      `unparseable` does not say whether the model wrote prose, opened
+//      a markdown fence, emitted two objects, or simply ran long. The
+//      ambient ∅ mystery was closed the same way in OTA-1057. And an
+//      EMPTY return is now its own reason: the log's `empty 8809ms …
+//      out 0t` was followed moments later by "Qwen dormant … the native
+//      context was released", so that is the watchdog's bug, not bad
+//      JSON, and filing it under `unparseable` would have aimed the
+//      next investigation at the parser.
+// NOT changed: the ambient token cap, again — its two discards here
+// were `stale:combat-started` and a near-duplicate, not truncation. No
+// `action-opener` discard appeared this session (n=2, weak but the
+// right direction). New suite ota1132SynthStarvation (15 tests); the
+// ota1131 reporting lock retargeted. DISPLAY_VERSION 4.29.43.
+export const OTA_BUILD_ID = '2026-08-05-1132-synth-yields';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1131-ambient-contradiction';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1130-deep-telemetry';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1129-prompt-weight';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1128-qwen-telemetry';
