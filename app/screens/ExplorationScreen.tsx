@@ -51,6 +51,7 @@ import { hasTopicsFor } from '../engine/dialogue';
 import { npcLedgerId } from '../engine/npcMemory';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
+import { profileOf } from '../engine/pressure';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { TUTORIAL_STEPS } from '../components/tutorialSteps';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
@@ -557,6 +558,7 @@ export function ExplorationScreen() {
               playerWisdom={player?.stats?.wisdom}
               enemyIntel={worldMemory?.enemyIntel}
               playerPower={player ? playerPowerScore(player) : undefined}
+              witholdIntel={player ? profileOf(player).witholdIntel : false}
             />
           ) : (
             // OTA-852 — the crest square is idle real estate when peaceful, so it

@@ -156,9 +156,22 @@ export interface PressureProfile {
    *  bestiary has NOT yet earned? false = current behaviour (shown once
    *  discovered). true = discovery only, nothing given away. */
   witholdIntel: boolean;
-  /** MULTIPLIER — hunger clock rate. 1.0 = +1 stamina penalty per 8 in-game
-   *  hours, exactly as shipped. */
-  hunger: number;
+  // ⚠ OTA-1140 — THE `hunger` DIAL IS GONE, AND THIS IS WHY.
+  // OTA-1136 wrote it as "MULTIPLIER — hunger clock rate. 1.0 = +1 stamina
+  // penalty per 8 in-game hours, exactly as shipped." That description was
+  // wrong when it was written. Hunger had ALREADY been removed from the game:
+  // `effectiveStaminaMax` ignores `hungerStaminaPenalty` outright, and both
+  // accrual sites are hardcoded to 0. The comment at the removal says why —
+  // *"a hidden, unexplained mechanic whose ONLY effect was shrinking this cap;
+  // food already tops off HP and water already tops off stamina, so it just
+  // added invisible friction."*
+  // So the dial was a control over nothing: checkable in the CUSTOM picker,
+  // scaled by every tier, and incapable of changing a single number. A switch
+  // that does nothing is worse than a missing one, because the player believes
+  // it. Reviving hunger to give it something to do would be reversing a shipped
+  // design decision to justify a config field, which is exactly backwards — so
+  // the field goes and the decision stands. If hunger ever comes back as a
+  // mechanic the owner wants, a dial for it is four lines.
 }
 
 /** ⚠ Keyed by PRESET, not by PressureTier: 'custom' deliberately has no
@@ -171,7 +184,7 @@ export const PRESSURE_PROFILES: Record<Exclude<PressureTier, 'custom'>, Pressure
     subtitle: 'The mud lets you work. Time costs nothing, old grudges stay cold, and the weather is only weather.',
     tide: 0, hostile: 0, creep: 0.5, exposure: 0.5,
     spawn: 0.6, discovery: 1.4, pack: 0.7, loot: 1.25, elite: 0,
-    witholdIdentity: false, witholdIntel: false, hunger: 0.5,
+    witholdIdentity: false, witholdIntel: false,
   },
   owed: {
     id: 'owed',
@@ -182,7 +195,7 @@ export const PRESSURE_PROFILES: Record<Exclude<PressureTier, 'custom'>, Pressure
     // protects a year of combat tuning from the amendment in the header, and
     // ota1136DifficultySystems asserts it verbatim.
     spawn: 1, discovery: 1, pack: 1, loot: 1, elite: 0,
-    witholdIdentity: false, witholdIntel: false, hunger: 1,
+    witholdIdentity: false, witholdIntel: false,
   },
   let_it_come: {
     id: 'let_it_come',
@@ -190,7 +203,7 @@ export const PRESSURE_PROFILES: Record<Exclude<PressureTier, 'custom'>, Pressure
     subtitle: 'Supplies thin faster, the ones you have crossed start finding you, and a storm is a reason to stop.',
     tide: 1.8, hostile: 1.7, creep: 1.5, exposure: 1.4,
     spawn: 1.35, discovery: 0.85, pack: 1.3, loot: 0.85, elite: 0.15,
-    witholdIdentity: true, witholdIntel: false, hunger: 1.4,
+    witholdIdentity: true, witholdIntel: false,
   },
   bury_me: {
     id: 'bury_me',
@@ -202,7 +215,7 @@ export const PRESSURE_PROFILES: Record<Exclude<PressureTier, 'custom'>, Pressure
     // the resource-starvation trap. The difficulty here is meant to come from
     // `elite` and `pack`, not from an empty world.
     spawn: 1.7, discovery: 0.7, pack: 1.6, loot: 0.7, elite: 0.3,
-    witholdIdentity: true, witholdIntel: true, hunger: 1.8,
+    witholdIdentity: true, witholdIntel: true,
   },
 };
 
@@ -252,7 +265,6 @@ export function profileOf(
     elite: pickOf('elite').elite,
     witholdIdentity: pickOf('identity').witholdIdentity,
     witholdIntel: pickOf('intel').witholdIntel,
-    hunger: pickOf('hunger').hunger,
   };
 }
 
@@ -413,7 +425,7 @@ export function scaledWeatherBite(raw: number, profile: PressureProfile): number
 /** The switches the popup renders. `id` is what persists; keep them stable. */
 export type DifficultySystemId =
   | 'spawn' | 'discovery' | 'pack' | 'loot' | 'elite'
-  | 'identity' | 'intel' | 'hunger'
+  | 'identity' | 'intel'
   | 'tide' | 'hostile' | 'creep' | 'exposure';
 
 export interface DifficultySystem {
@@ -444,8 +456,6 @@ export const DIFFICULTY_SYSTEMS: readonly DifficultySystem[] = [
     blurb: 'Curios are not identified for you — what it is, you work out.' },
   { id: 'intel', label: 'No free weakness intel', kind: 'rule',
     blurb: 'Resistances and weaknesses only from the bestiary you earned.' },
-  { id: 'hunger', label: 'Hunger', kind: 'multiplier',
-    blurb: 'How fast going unfed costs you your wind.' },
   { id: 'tide', label: 'Prices over time', kind: 'multiplier',
     blurb: 'How fast the buried country gets lean and dear.' },
   { id: 'hostile', label: 'Grudges come looking', kind: 'multiplier',

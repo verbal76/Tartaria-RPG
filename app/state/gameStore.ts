@@ -6762,6 +6762,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         itemDefaults.setQwenSynthRequester((name: string, hintTags: readonly string[]) => {
           const key = name.toLowerCase();
           if (pending.has(key)) return;
+          // OTA-1140 — the `witholdIdentity` RULE dial. A hard run does not get
+          // its curios worked out for it: the synthesis that writes a curio's
+          // description and effect simply does not run, and the item stays what
+          // its STATIC row says it is until the player figures the rest out.
+          //
+          // ⚠ WHY THE GATE IS HERE AND NOT DEEPER. The static inference in
+          // itemDefaults is what makes an unknown item FUNCTION at all — gating
+          // that would not withhold identity, it would hand the player a broken
+          // row. What this dial removes is the free enrichment on top, which is
+          // exactly what pressure.ts describes it as: the identification system
+          // already exists; this decides whether it runs for free. Fail-closed
+          // is also already this path's contract — a dropped request leaves the
+          // name uncached and the static row in the player's hands — so
+          // withholding needs no second code path and can break nothing.
+          if (profileOf(get().player).witholdIdentity) return;
           // Status gate — don't bother spawning the call if Qwen isn't
           // ready. The static row is already in the player's hands.
           if (!qwen.isReady()) return;
