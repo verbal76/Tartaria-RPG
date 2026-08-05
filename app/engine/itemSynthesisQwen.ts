@@ -19,6 +19,7 @@
 
 import type { ItemEffect, StatKey } from './itemEffect';
 import { getCachedSynth, setCachedSynth, type SynthesizedItem } from './itemSynthesisCache';
+import { noteQwenDiscarded } from '../ai/generation/qwenTelemetry';
 
 /** Minimal Qwen interface — same shape as llmParser.ts so tests can
  *  pass a mock without dragging in the full LlamaRuntime stack. */
@@ -112,11 +113,25 @@ export async function synthesizeItemViaQwen(
     return null;
   }
 
+  // ⚠ OTA-1108 — this was the app's most expensive silent failure. The
+  // OTA-1107 device log caught one at `item_synthesis ok 9528ms … out 179t …
+  // HIT-CAP (813ch)`: 179 tokens against a 180 cap, so generation was cut off
+  // mid-object, and 813 characters for a shape that needs about 200 means the
+  // model rambled past the JSON before the cap stopped it. Nine and a half
+  // seconds, recorded as `ok`, thrown away without a word. Now the extractor
+  // takes the first BALANCED object (surviving both the trailing ramble and a
+  // truncated tail), and whatever still fails is reported as the waste it is.
   const obj = extractJsonObject(raw);
-  if (!obj) return null;
+  if (!obj) {
+    noteQwenDiscarded('item_synth:unparseable');
+    return null;
+  }
 
   const validated = validateAndClamp(name, obj);
-  if (!validated) return null;
+  if (!validated) {
+    noteQwenDiscarded('item_synth:rejected-by-clamp');
+    return null;
+  }
 
   setCachedSynth(name, validated);
   return validated;
@@ -125,21 +140,57 @@ export async function synthesizeItemViaQwen(
 /** Pull the first {...} block out of a possibly noisy LLM response
  *  and JSON.parse it. Same defensive pattern as llmParser.ts — Qwen
  *  occasionally wraps its JSON in markdown fences or adds a sentence
- *  of prose. Returns null on any failure. */
+ *  of prose. Returns null on any failure.
+ *
+ *  ⚠ OTA-1108 — first-to-LAST brace was the bug. `raw.lastIndexOf('}')` is
+ *  correct only when the response contains exactly one object. Two things in
+ *  the device log break that:
+ *
+ *    - the model keeps talking after the JSON and emits a SECOND object (an
+ *      example, a "here's another") — first-to-last then spans both plus the
+ *      prose between them, and JSON.parse rejects the lot;
+ *    - the 180-token cap cuts the response mid-object — the last `}` on the
+ *      line is the nested "effect" object's, so the slice closes at the wrong
+ *      depth and parse fails again.
+ *
+ *  Scanning for the first BALANCED object fixes both: it stops at the real end
+ *  of object one and ignores everything after, and when a truncated response
+ *  never balances it falls back to the old span rather than losing a response
+ *  that the old code happened to handle. String-aware, because a brace inside
+ *  the description ("a {strange} relic") must not move the depth counter. */
 function extractJsonObject(raw: string): Record<string, unknown> | null {
   const start = raw.indexOf('{');
-  const end = raw.lastIndexOf('}');
-  if (start < 0 || end <= start) return null;
-  const slice = raw.slice(start, end + 1);
-  try {
-    const parsed = JSON.parse(slice) as unknown;
-    if (parsed && typeof parsed === 'object') {
-      return parsed as Record<string, unknown>;
+  if (start < 0) return null;
+  const parse = (slice: string): Record<string, unknown> | null => {
+    try {
+      const parsed = JSON.parse(slice) as unknown;
+      return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : null;
+    } catch {
+      return null;
     }
-  } catch {
-    // ignore
+  };
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = start; i < raw.length; i += 1) {
+    const c = raw[i]!;
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (c === '\\') escaped = true;
+      else if (c === '"') inString = false;
+      continue;
+    }
+    if (c === '"') inString = true;
+    else if (c === '{') depth += 1;
+    else if (c === '}') {
+      depth -= 1;
+      if (depth === 0) return parse(raw.slice(start, i + 1));
+    }
   }
-  return null;
+  // Never balanced — truncated mid-object. Try the old span so a response the
+  // previous extractor could read is not newly lost.
+  const end = raw.lastIndexOf('}');
+  return end > start ? parse(raw.slice(start, end + 1)) : null;
 }
 
 function clamp(v: unknown, max: number): number | undefined {

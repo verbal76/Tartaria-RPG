@@ -69,12 +69,21 @@ describe('OTA-1107 — read vs write, measured', () => {
     expect(line).toContain('cap1');
   });
 
-  it('cache reuse surfaces when llama.cpp reports it, and stays quiet at zero', () => {
-    call('narration:travel', { cachedTokens: 812 });
-    expect(qwenTelemetrySummary()).toContain('cache812t');
+  // RETARGETED BY OTA-1108. This asserted `cache812t` on the assumption that
+  // llama.cpp's `tokens_cached` counts REUSED tokens. The first device log
+  // disproved it — every row reported exactly promptTokens + outTokens — so
+  // the rollup now prints the derived remainder and calls it `reuse`. The
+  // no-data case still stays quiet; a measured zero no longer does, because
+  // "nothing was reused" is the finding.
+  it('prefix reuse is derived from the cache size, and a measured zero shows', () => {
+    call('narration:travel', { cachedTokens: 1012, promptTokens: 180, outTokens: 20 });
+    expect(qwenTelemetrySummary()).toContain('reuse812t');
     resetQwenTelemetry();
-    call('narration:travel', { cachedTokens: 0 });
-    expect(qwenTelemetrySummary()).not.toContain('cache');
+    call('narration:travel', { cachedTokens: 211, promptTokens: 180, outTokens: 31 });
+    expect(qwenTelemetrySummary()).toContain('reuse0t');
+    resetQwenTelemetry();
+    call('narration:travel', {});
+    expect(qwenTelemetrySummary()).not.toContain('reuse');
   });
 
   it('a build with no timings still records cleanly — old llama.rn, jest mocks', () => {

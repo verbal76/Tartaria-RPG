@@ -191,7 +191,13 @@ describe('OTA-1095 — source locks on the view that fixes the report', () => {
   it('the exchange is rendered inside the sheet, sliced off the real log', () => {
     // OTA-1098 — a TIMESTAMP filter, never an index slice. An index is silently
     // wrong once gameLog sits at its cap and the buffer starts trimming.
-    expect(view).toContain('gameLog.filter((e) => e.ts >= ctx.startedAtTs)');
+    // RETARGETED BY OTA-1108: the predicate gained a second clause. The owner
+    // reported debug telemetry rendering mid-conversation ("you are showing the
+    // qwen notes in the talk popup") — a window on the feed has to drop what
+    // the feed drops. The timestamp half is what this test guards; it is
+    // asserted on its own so the channel half can't mask a regression in it.
+    expect(view).toContain('gameLog.filter((e) => e.ts >= ctx.startedAtTs');
+    expect(view).toContain('!HIDDEN_LOG_CHANNELS.has(e.channel)');
     expect(view).not.toContain('gameLog.slice(');
     // A transcript pane exists and is the flexible one — it gets the space.
     expect(view).toMatch(/transcript: \{\s*flex: 1,/);

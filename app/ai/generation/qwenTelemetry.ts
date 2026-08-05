@@ -48,10 +48,13 @@ export interface QwenCallRecord {
   promptTokens?: number;
   /** Tokens emitted. */
   outTokens?: number;
-  /** Prompt tokens llama.cpp reused from cache instead of re-reading. A
-   *  persistently ZERO value across calls means every generation re-reads its
-   *  whole prompt from scratch — and that a stable prompt PREFIX would make
-   *  repeat calls dramatically cheaper. That is the next 1129 if it shows. */
+  /** ⚠ OTA-1108 — NOT reuse. This is llama.cpp's KV cache SIZE after the call,
+   *  which is `reused prefix + prompt tokens evaluated + tokens predicted`.
+   *  OTA-1107 read it as "tokens reused" and the first device log disproved
+   *  that outright: every single row came back as exactly promptTokens +
+   *  outTokens (546+31=577, 542+31=573, 309+179=488, 127+22=149 …), which is
+   *  the signature of a cache that grew by what this call did and reused
+   *  nothing. Reuse is the REMAINDER — see `reusedTokens` on the aggregate. */
   cachedTokens?: number;
   /** Why generation stopped. */
   stop?: QwenStopReason;
@@ -73,6 +76,12 @@ interface JobAggregate {
   promptTokens: number;
   outTokens: number;
   cachedTokens: number;
+  /** OTA-1108 — prefix tokens llama.cpp did NOT have to re-read, derived
+   *  honestly as `cachedTokens - promptTokens - outTokens`. */
+  reusedTokens: number;
+  /** Calls that reported a cache size at all, so a zero can be shown as a
+   *  measured zero rather than as "no data". */
+  cacheSamples: number;
   hitLimit: number;
   /** Calls whose text never reached the player (cancelled, filtered, stale). */
   discarded: number;
@@ -94,6 +103,7 @@ function emptyAggregate(): JobAggregate {
   return {
     count: 0, totalMs: 0, maxMs: 0, waitMs: 0, maxWaitMs: 0, empty: 0, error: 0,
     prefillMs: 0, decodeMs: 0, promptTokens: 0, outTokens: 0, cachedTokens: 0,
+    reusedTokens: 0, cacheSamples: 0,
     hitLimit: 0, discarded: 0, discardedMs: 0,
   };
 }
@@ -119,6 +129,15 @@ export function recordQwenCall(r: QwenCallRecord): void {
   agg.promptTokens += r.promptTokens ?? 0;
   agg.outTokens += r.outTokens ?? 0;
   agg.cachedTokens += r.cachedTokens ?? 0;
+  // OTA-1108 — the reuse number, derived rather than assumed. llama.cpp
+  // reports the cache SIZE after the call; the part it did not have to
+  // re-read is whatever that size exceeds this call's own contribution.
+  // Floored at zero: a build that reports the field differently must show a
+  // conservative zero, never a negative that reads as a saving.
+  if (typeof r.cachedTokens === 'number') {
+    agg.cacheSamples += 1;
+    agg.reusedTokens += Math.max(0, r.cachedTokens - (r.promptTokens ?? 0) - (r.outTokens ?? 0));
+  }
   if (r.stop === 'limit') agg.hitLimit += 1;
   jobs.set(r.job, agg);
   lastCall = { job: r.job, totalMs: r.totalMs };
@@ -182,6 +201,11 @@ export interface QwenJobStats {
   avgPromptTokens: number;
   avgOutTokens: number;
   cachedTokens: number;
+  /** OTA-1108 — measured prefix reuse. Zero across a session means every call
+   *  re-reads its whole prompt, which is what makes a stable prompt PREFIX the
+   *  next prefill win rather than a guess. */
+  reusedTokens: number;
+  cacheSamples: number;
   hitLimit: number;
   discarded: number;
   discardedMs: number;
@@ -204,6 +228,8 @@ export function qwenJobStats(): QwenJobStats[] {
       avgPromptTokens: Math.round(a.promptTokens / a.count),
       avgOutTokens: Math.round(a.outTokens / a.count),
       cachedTokens: a.cachedTokens,
+      reusedTokens: a.reusedTokens,
+      cacheSamples: a.cacheSamples,
       hitLimit: a.hitLimit,
       discarded: a.discarded,
       discardedMs: a.discardedMs,
@@ -225,7 +251,10 @@ export function qwenTelemetrySummary(): string {
       ? ` read${s(j.avgPrefillMs)}/write${s(j.avgDecodeMs)}`
       : '';
     const sizes = j.avgPromptTokens > 0 ? ` in${j.avgPromptTokens}t→out${j.avgOutTokens}t` : '';
-    const cached = j.cachedTokens > 0 ? ` cache${j.cachedTokens}t` : '';
+    // OTA-1108 — reuse, shown as a MEASURED zero when the field was reported.
+    // "no cache line" and "the cache saved us nothing" are different findings
+    // and the OTA-1107 rollup could not tell them apart.
+    const cached = j.cacheSamples > 0 ? ` reuse${j.reusedTokens}t` : '';
     const capped = j.hitLimit > 0 ? ` cap${j.hitLimit}` : '';
     const waste = j.discarded > 0 ? ` ✂${j.discarded}/${s(j.discardedMs)}` : '';
     return `${j.job} n${j.count} avg${s(j.avgMs)} max${s(j.maxMs)}${split}${sizes}${cached}${capped}${wait}${bad}${waste}`;
