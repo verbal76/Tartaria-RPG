@@ -73,6 +73,12 @@ interface Props {
   enemyIntel?: Record<string, { weak: string[]; resist: string[] }>;
   /** OTA-928 — the player's Power rating, to colour each enemy's Power badge by matchup. */
   playerPower?: number;
+  /** OTA-1117 — the `witholdIntel` difficulty dial. When set, the WIS-granted
+   *  free read is switched off: a hard run tells you nothing about a foe that
+   *  the bestiary has not EARNED by hitting it. Never touches the `observed`
+   *  path below — "strike to learn" is the whole point, and a dial that also
+   *  took that away would just be blindness, not difficulty. */
+  witholdIntel?: boolean;
 }
 
 // OTA-382 — fallback width only. The panel lives in the top-right column
@@ -146,8 +152,20 @@ const RESIST_FLAVOR: Record<string, string> = {
   aetheric: 'aether slides off it unheeded',
 };
 
-export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, playerWisdom, enemyIntel, playerPower }: Props) {
-  const canReadDefenses = (playerWisdom ?? 0) >= WEAKNESS_READ_WIS;
+export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, playerWisdom, enemyIntel, playerPower, witholdIntel }: Props) {
+  // OTA-1117 — the RULE dial, and the survey's reason for rating rule changes
+  // above multipliers: this costs nothing to compute and changes how the fight
+  // is PLAYED rather than how long it takes. A high-WIS character normally
+  // reads a foe's resists and weaknesses on sight; under `witholdIntel` that
+  // read is gone and the only tags on the card are ones this character has
+  // personally felt land or wash off.
+  // ⚠ TWO THINGS IT DELIBERATELY DOES NOT TOUCH. The `observed` path below
+  // stays live — strike-to-learn IS the replacement for the free read, and
+  // removing both would be blindness rather than difficulty. And a BOSS still
+  // shows its defenses: that reveal exists because the owner asked for it
+  // twice ("Core Guardians show no weakness/resistance in combat"), and a
+  // difficulty dial has no business re-breaking a bug someone reported twice.
+  const canReadDefenses = !witholdIntel && (playerWisdom ?? 0) >= WEAKNESS_READ_WIS;
   // OTA-838 — per-enemy observed intel lookup (lowercased name). Passed to each card
   // so an already-learned weakness shows even for a low-Wisdom character.
   const intelFor = useCallback(

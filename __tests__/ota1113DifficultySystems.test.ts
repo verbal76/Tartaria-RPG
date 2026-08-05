@@ -62,7 +62,10 @@ describe('OTA-1113 — ⚠ the identity row protects the tuning', () => {
     expect(owed.discovery).toBe(1);
     expect(owed.pack).toBe(1);
     expect(owed.loot).toBe(1);
-    expect(owed.hunger).toBe(1);
+    // RETARGETED BY OTA-1117: the `hunger` dial is gone. It was written to
+    // scale a mechanic that had ALREADY been removed from the game — both
+    // accrual sites are hardcoded to 0 and effectiveStaminaMax ignores the
+    // penalty — so it was a checkable control over nothing.
     expect(owed.tide).toBe(1);
     expect(owed.hostile).toBe(1);
     expect(owed.creep).toBe(1);
@@ -89,7 +92,6 @@ describe('OTA-1113 — ⚠ the identity row protects the tuning', () => {
       expect(cur.spawn).toBeGreaterThanOrEqual(prev.spawn);
       expect(cur.pack).toBeGreaterThanOrEqual(prev.pack);
       expect(cur.elite).toBeGreaterThanOrEqual(prev.elite);
-      expect(cur.hunger).toBeGreaterThanOrEqual(prev.hunger);
       // Generosity falls.
       expect(cur.discovery).toBeLessThanOrEqual(prev.discovery);
       expect(cur.loot).toBeLessThanOrEqual(prev.loot);
@@ -165,7 +167,9 @@ describe('OTA-1113 — CUSTOM: pick the intensity, then pick what it touches', (
     const p = custom('bury_me', []);
     const owed = PRESSURE_PROFILES[DEFAULT_PRESSURE];
     const got = profileOf(p);
-    for (const k of ['spawn', 'discovery', 'pack', 'loot', 'elite', 'hunger', 'tide', 'hostile', 'creep', 'exposure'] as const) {
+    // RETARGETED BY OTA-1117: 'hunger' dropped — the dial was removed because
+    // it scaled a mechanic that no longer exists.
+    for (const k of ['spawn', 'discovery', 'pack', 'loot', 'elite', 'tide', 'hostile', 'creep', 'exposure'] as const) {
       expect(got[k]).toBe(owed[k]);
     }
     expect(got.witholdIdentity).toBe(false);

@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.50';
+export const DISPLAY_VERSION = '4.29.51';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -21041,7 +21041,52 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // unannounced stat-inflated grunt reads as a bug, and the announce
 // lines stop claiming a headcount that is no longer true.
 // New suite ota1116EliteSwap (29 tests). DISPLAY_VERSION 4.29.50.
-export const OTA_BUILD_ID = '2026-08-05-1116-elite-swap';
+// OTA-1117 — THE RULE DIALS, AND ONE THAT WAS A CONTROL OVER NOTHING.
+// Closes the difficulty set OTA-1113 opened. The survey rates rule
+// changes above multipliers because they cost nothing to compute and
+// change how a fight is PLAYED rather than how long it takes, and both
+// of these are exactly that.
+// `witholdIntel` — the WIS-granted free read of a foe's resists and
+// weaknesses is switched off. What the card shows is what THIS
+// character has personally felt land or wash off.
+// ⚠ TWO THINGS IT DELIBERATELY DOES NOT TAKE. Strike-to-learn (the
+// `observed` path, OTA-838) stays live — the earned tags are the
+// REPLACEMENT for the free read, and removing both would be blindness
+// rather than difficulty. And a BOSS still shows its defenses: that
+// reveal exists because the owner reported it twice ("Core Guardians
+// show no weakness/resistance in combat"), and a difficulty dial does
+// not get to re-break a bug someone had to ask for twice.
+// `witholdIdentity` — the Qwen synthesis that writes a curio's
+// description and effect does not run; the item stays what its STATIC
+// row says until the player works the rest out.
+// ⚠ THE GATE SITS ON THE SYNTHESIS, NOT THE STATIC INFERENCE. The
+// static row is what makes an unknown item FUNCTION; gating that would
+// not withhold identity, it would hand the player a broken item. What
+// this removes is the free enrichment on top — which is what
+// pressure.ts always said it was: the identification system exists,
+// this decides whether it runs for free. Fail-closed is already this
+// path's contract (a dropped request leaves the static row in hand),
+// so withholding needs no second code path and can break nothing. It
+// reads LIVE state because the requester is installed once at boot and
+// outlives the character that installed it.
+// ⚠ AND THE `hunger` DIAL IS REMOVED. OTA-1113 wrote it as "hunger
+// clock rate … exactly as shipped". That was already false: hunger had
+// been deleted from the game BEFORE the dial existed —
+// effectiveStaminaMax ignores hungerStaminaPenalty outright and both
+// accrual sites are hardcoded to 0, with the removal comment giving
+// the reason ("a hidden, unexplained mechanic whose ONLY effect was
+// shrinking this cap"). So it was a switch the player could check that
+// could not change a single number, which is worse than a missing one
+// because they believe it. Reviving hunger to give the dial something
+// to do would be reversing a shipped design decision to justify a
+// config field — exactly backwards. The field goes; the decision
+// stands; if hunger ever returns, a dial for it is four lines.
+// The new suite also adds the check that would have caught this: every
+// id in the CUSTOM picker must name a system something actually reads.
+// New suite ota1117RuleDials (22 tests); ota1113 retargeted off `hunger`
+// in three places. DISPLAY_VERSION 4.29.51.
+export const OTA_BUILD_ID = '2026-08-05-1117-rule-dials';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1116-elite-swap';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1115-pipe-loop';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1114-group-equip';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1113-difficulty-systems';
