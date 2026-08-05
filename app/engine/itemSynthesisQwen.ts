@@ -93,12 +93,37 @@ export async function synthesizeItemViaQwen(
   // with the rules folded into it as inline hints rather than a separate
   // section. ~900 → ~430 characters (≈310 → ≈150 prompt tokens), which is
   // also prefill this job pays on every single call.
+  // ⚠ OTA-1115 — THE PIPES WERE THE BUG. OTA-1109 shrank this prompt and gave
+  // the discard reason the raw text, and the very next device log paid that
+  // off by showing what actually fails:
+  //   item_synthesis ok 10374ms … in 219t→out 239t HIT-CAP (604ch)
+  //   ✂ DISCARDED — item_synth:unparseable (604ch)
+  //     raw="{"kind":"misc|invented|lorem|quest|tool|misc|misc|misc|misc|…"
+  // The model was not running out of room and it was not elaborating. It opened
+  // `"kind":"` and then COPIED THE ALTERNATION IT HAD JUST BEEN SHOWN, pipe by
+  // pipe, until the 240-token cap stopped it. `weapon|armor|accessory|…` is
+  // schema notation to a human and a LITERAL STRING VALUE to a 0.5B model — it
+  // is inside the quotes, in the value position, in an object it was told to
+  // imitate. Of course it continued the pattern; the example told it to.
+  //
+  // ⚠ So NO ALTERNATION EVER APPEARS INSIDE THE JSON. The example is now a
+  // CONCRETE, VALID OBJECT — one it can copy verbatim and be right — and the
+  // allowed values live in prose beside it, where a pipe cannot be mistaken for
+  // content. Same fields, same validator, ~same length. This is the third
+  // consecutive OTA on this job, and it is the first one aimed at the actual
+  // failure rather than at its symptoms (180 → 240 tokens, then a smaller
+  // shape); both of those were reasonable reads of the evidence available at
+  // the time, and neither would have helped, because a model looping on `|`
+  // will loop on `|` in any budget at any size.
   const systemPrompt = [
     'Stat-balance one item for a text RPG. Reply with ONE line: a single JSON object, nothing before or after it.',
-    '{"kind":"weapon|armor|accessory|consumable|misc|relic","description":"one short sentence","extraTags":["organic|metal|fiber|stone|glass"],"effect":{...}}',
-    'Omit "effect" unless the item clearly does something. When present, use exactly one of:',
-    '{"kind":"consumable","healHP":1-10,"restoreStamina":1-8} for food, drink, potion, tonic, fungus;',
-    '{"kind":"passive","stat":"strength|dexterity|intelligence|wisdom|charisma","bonus":1-2} for amulets, rings, charms, lockets.',
+    'Example of a correct reply:',
+    '{"kind":"misc","description":"A coil of tarred rope, stiff with age.","extraTags":["fiber"]}',
+    'Allowed "kind" values, pick exactly one: weapon, armor, accessory, consumable, misc, relic.',
+    'Allowed "extraTags" values, pick one or two: organic, metal, fiber, stone, glass.',
+    'Omit "effect" unless the item clearly does something. When present, use exactly one shape:',
+    'food, drink, potion, tonic or fungus takes {"kind":"consumable","healHP":4,"restoreStamina":3} with healHP 1 to 10 and restoreStamina 1 to 8;',
+    'an amulet, ring, charm or locket takes {"kind":"passive","stat":"wisdom","bonus":1} where stat is one of strength, dexterity, intelligence, wisdom, charisma and bonus is 1 or 2.',
     'Tools, rope, lanterns and compasses are "misc" with extraTags and no effect.',
   ].join('\n');
 
@@ -155,8 +180,13 @@ export async function synthesizeItemViaQwen(
     // The ambient ∅ mystery was closed the same way (OTA-1034) by printing
     // the raw text beside the verdict. The reason string rides the existing
     // discard sink into the debug channel, so this needs no new plumbing.
+    // OTA-1115 — and now that the pipe loop is a KNOWN failure with a known
+    // cause, it gets its own name. If it ever comes back, the next log should
+    // say so in one word instead of making someone re-derive it from 160
+    // characters of raw text. `unparseable` stays for everything else.
     const sample = raw.trim().replace(/\s+/g, ' ').slice(0, 160);
-    noteQwenDiscarded(`item_synth:unparseable (${raw.length}ch) raw="${sample}"`);
+    const reason = looksLikeAlternationLoop(raw) ? 'item_synth:alternation-loop' : 'item_synth:unparseable';
+    noteQwenDiscarded(`${reason} (${raw.length}ch) raw="${sample}"`);
     return null;
   }
 
@@ -168,6 +198,19 @@ export async function synthesizeItemViaQwen(
 
   setCachedSynth(name, validated);
   return validated;
+}
+
+/** OTA-1115 — did the model fall into the pipe loop this OTA removed the cause
+ *  of? The signature is a run of `|`-separated fragments where the SAME token
+ *  keeps repeating: `"kind":"misc|invented|lorem|quest|tool|misc|misc|misc|…`.
+ *  Three or more pipes with a repeat among the segments is the pattern; a
+ *  legitimate reply has no pipes in it at all, so this cannot fire on good
+ *  output. Purely a LABEL for the discard reason — it changes no behaviour. */
+export function looksLikeAlternationLoop(raw: string): boolean {
+  const bars = (raw.match(/\|/g) ?? []).length;
+  if (bars < 3) return false;
+  const segs = raw.split('|').map((t) => t.trim().toLowerCase()).filter(Boolean);
+  return new Set(segs).size < segs.length;
 }
 
 /** Pull the first {...} block out of a possibly noisy LLM response

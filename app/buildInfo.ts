@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.48';
+export const DISPLAY_VERSION = '4.29.49';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20958,7 +20958,42 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // taking it off with five raiders on the tile is the last decision the
 // character makes. Same action; only one of them needs saying aloud.
 // New suite ota1114GroupEquip (23 tests). DISPLAY_VERSION 4.29.48.
-export const OTA_BUILD_ID = '2026-08-05-1114-group-equip';
+// OTA-1115 — THE PIPES WERE THE BUG.
+// Third OTA in a row on item synthesis, and the first one aimed at
+// the actual failure rather than at its symptoms.
+// OTA-1108 made the silent failure visible. OTA-1109 shrank the
+// prompt, raised the cap 180 -> 240, and — the part that mattered —
+// put the RAW TEXT into the discard reason. The very next device log
+// paid that off in one line:
+//   item_synthesis ok 10374ms … in 219t→out 239t HIT-CAP (604ch)
+//   ✂ DISCARDED — item_synth:unparseable (604ch)
+//     raw="{"kind":"misc|invented|lorem|quest|tool|misc|misc|misc|…"
+// ⚠ The model was not elaborating and was not short of room. It
+// opened `"kind":"` and then COPIED THE ALTERNATION IT HAD JUST BEEN
+// SHOWN, pipe by pipe, until the 240-token cap stopped it.
+// `weapon|armor|accessory|…` is schema notation to a human and a
+// LITERAL STRING VALUE to a 0.5B model — it sits inside the quotes,
+// in the value position, in an object the model was told to imitate.
+// Of course it continued the pattern. The example told it to.
+// ⚠ SO NO ALTERNATION EVER APPEARS INSIDE THE JSON. The example is
+// now a CONCRETE, VALID OBJECT the model can copy verbatim and be
+// right, and the allowed values live in prose beside it where a pipe
+// cannot be mistaken for content. Same fields, same validator, about
+// the same length — this costs nothing.
+// ⚠ AND WHY NEITHER EARLIER FIX COULD HAVE WORKED, which is the part
+// worth keeping: a model looping on `|` loops on `|` at ANY token
+// budget and ANY prompt length. Both earlier reads were reasonable on
+// the evidence available at the time; only the raw-text
+// instrumentation OTA-1109 added could tell this apart from a model
+// that rambles. The instrumentation was the fix that mattered.
+// The loop also gets its own discard name now
+// (`item_synth:alternation-loop`), so if it ever returns the next log
+// says so in one word instead of making someone re-derive it from 160
+// characters of raw text.
+// New suite ota1115PipeLoop; ota1109 and ota1108 retargeted off the pipe
+// form they were asserting. DISPLAY_VERSION 4.29.49.
+export const OTA_BUILD_ID = '2026-08-05-1115-pipe-loop';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1114-group-equip';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1113-difficulty-systems';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1112-outdoor-rest-lines';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1111-half-the-roll';

@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.48**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.49**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1100,7 +1100,40 @@ rediscovering them.
   log across a truncated span, so it was never confirmed as a bug. Still
   unresolved; needs a log that captures the whole encounter.
 
-- **⚠⚠ GROUP EQUIP / UNEQUIP, AND THE ONE BUTTON THAT WAS LEFT (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ THE PIPES WERE THE BUG (2026-08-05, latest). BOTH LINES.**
+  golem OTA-1115 / HAL OTA-1138. Third OTA in a row on item synthesis, and
+  the first one aimed at the actual failure rather than at its symptoms.
+  OTA-1131 made the silent failure visible. OTA-1132 shrank the prompt, raised
+  the cap 180 → 240, and — the part that mattered — put the RAW TEXT into the
+  discard reason. The very next device log paid that off in one line:
+  ```
+  item_synthesis ok 10374ms … in 219t→out 239t HIT-CAP (604ch)
+  ✂ DISCARDED — item_synth:unparseable (604ch)
+    raw="{"kind":"misc|invented|lorem|quest|tool|misc|misc|misc|misc|…"
+  ```
+  **⚠ The model was not elaborating and was not short of room.** It opened
+  `"kind":"` and then **copied the alternation it had just been shown**, pipe by
+  pipe, until the 240-token cap stopped it. `weapon|armor|accessory|…` is schema
+  notation to a human and a **literal string value** to a 0.5B model — it sits
+  inside the quotes, in the value position, in an object the model was told to
+  imitate. Of course it continued the pattern. The example told it to.
+  **⚠ SO NO ALTERNATION EVER APPEARS INSIDE THE JSON**, and `ota1115PipeLoop`
+  fails if one comes back. The example is now a CONCRETE, VALID OBJECT the model
+  can copy verbatim and be right, with the allowed values in prose beside it
+  where a pipe cannot be mistaken for content. Same fields, same validator,
+  about the same length — this costs nothing.
+  **⚠ AND WHY NEITHER EARLIER FIX COULD HAVE WORKED**, which is the part worth
+  keeping: a model looping on `|` loops on `|` at ANY token budget and ANY
+  prompt length. Both earlier reads were reasonable on the evidence available at
+  the time, and only the raw-text instrumentation OTA-1132 added could tell this
+  apart from a model that rambles. **The instrumentation was the fix that
+  mattered** — that is the transferable lesson, not the prompt edit.
+  The loop also has its own discard name now (`item_synth:alternation-loop`), so
+  a recurrence names itself in one word instead of making someone re-derive it
+  from 160 characters of raw text. `ota1132` and `ota1131` retargeted off the
+  pipe form they were asserting.
+
+- **⚠⚠ GROUP EQUIP / UNEQUIP, AND THE ONE BUTTON THAT WAS LEFT (2026-08-05). BOTH LINES.**
   golem OTA-1114 / HAL OTA-1137. Owner: *"you should be able to pick your armor
   hold and select a group and either equip all or unequip all depending on what
   you selected."* He asked for it the way you ask for a convenience. It is not
