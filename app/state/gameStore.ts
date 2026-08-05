@@ -38768,7 +38768,12 @@ async function maybeGenerateAmbientArbiter(
         }
         set({ partialArbiterText: streamed });
       },
-      { maxNewTokens: 32, job: 'ambient' },
+      // OTA-1123 — THE BANK'S FILLER IS THE FIRST HOMEWORK JOB, and it is the
+      // right one: a rest-window fill is by definition work nobody asked for.
+      // As homework it queues below voice and is cut short the instant the
+      // player acts, so filling the bank can never be the reason a tap waits.
+      // The live ambient path is NOT homework — the player is owed that line.
+      { maxNewTokens: 32, job: opts?.bankOnly ? 'ambient_fill' : 'ambient', homework: !!opts?.bankOnly },
     );
     // OTA-663 — off-canon entity guard (ambient path). A dropped line just stays
     // silent (ambient has no template fallback), which is the safe outcome.

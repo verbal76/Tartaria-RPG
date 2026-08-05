@@ -182,8 +182,12 @@ describe("OTA-1119 — 'dormant' is an empty with a known cause", () => {
   it('⚠ the runtime classifies on BOTH paths — the empty one and the throw', () => {
     // `this.context` is checked after the await, when we know what came back:
     // it is null only if dispose() ran underneath this call.
+    // RETARGETED BY OTA-1123 — the success expression gained a `preempted`
+    // branch and now wraps across lines, so this matches single-line fragments
+    // rather than the whole expression. An assertion that spans a line break
+    // fails on reflow instead of on meaning.
     const rt = src('app/ai/generation/LlamaRuntime.ts');
-    expect(rt).toContain("outcome: text.length > 0 ? 'ok' : (this.context === null ? 'dormant' : 'empty'),");
+    expect(rt).toContain("(this.context === null ? 'dormant' : 'empty'),");
     expect(rt).toContain("outcome: this.context === null ? 'dormant' : 'error',");
   });
 
@@ -191,7 +195,7 @@ describe("OTA-1119 — 'dormant' is an empty with a known cause", () => {
     // The split must not reclassify healthy calls: with a context in place the
     // words are exactly the ones every prior OTA's log used.
     const rt = src('app/ai/generation/LlamaRuntime.ts');
-    expect(rt).toContain("'ok' :");
+    expect(rt).toMatch(/text\.length > 0 \? 'ok'/);
     expect(rt).toMatch(/'dormant' : 'empty'/);
     expect(rt).toMatch(/'dormant' : 'error'/);
   });

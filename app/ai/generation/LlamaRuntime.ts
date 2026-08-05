@@ -1,5 +1,5 @@
 import * as FileSystem from 'expo-file-system';
-import { runExclusiveNativeMl } from '../nativeMlLock';
+import { runExclusiveNativeMl, ML_PRIORITY_LLM, ML_PRIORITY_HOMEWORK } from '../nativeMlLock';
 import { recordQwenCall } from './qwenTelemetry';
 
 // ---------------------------------------------------------------------------
@@ -143,6 +143,17 @@ export interface LlamaGenerateOptions {
    *  consumer that forgets the tag still shows up in the stats instead of
    *  vanishing from them. */
   job?: string;
+  /** ⚠ OTA-1123 — HOMEWORK. Idle-time work nobody asked for. Two consequences,
+   *  and they only make sense together:
+   *    · it queues at ML_PRIORITY_HOMEWORK, BELOW voice, so it never delays
+   *      anything the player is waiting on that hasn't started yet; and
+   *    · it is INTERRUPTIBLE — the moment real work arrives, llama.cpp is told
+   *      to stop and this generation returns whatever it had.
+   *  Without the second, priority alone is not enough: a homework job already
+   *  running still makes the next tap wait, because the lock cannot preempt a
+   *  native call in flight. Owner's requirement was that idle work cost the
+   *  player nothing, and this is the half that delivers it. */
+  homework?: boolean;
 }
 
 export class LlamaRuntime {
@@ -238,6 +249,12 @@ export class LlamaRuntime {
       // arb159 — run the completion through the shared native-ML lock so it
       // never overlaps a Kokoro TTS synth (the two heavy native workloads
       // contending crashed the process on Tensor G5).
+      // OTA-1123 — homework runs below voice and can be cut short. The hook is
+      // handed to the lock, which fires it the instant higher-priority work is
+      // enqueued; llama.cpp then ends the completion early and we keep whatever
+      // tokens had already assembled. `stopCompletion` is the same call the
+      // dispose path uses, and it is safe when nothing is running.
+      let preempted = false;
       const result = await runExclusiveNativeMl(() => {
         telLockAt = Date.now();
         return ctx.completion(
@@ -258,7 +275,17 @@ export class LlamaRuntime {
               }
             : undefined,
         );
-      });
+      },
+      opts.homework ? ML_PRIORITY_HOMEWORK : ML_PRIORITY_LLM,
+      opts.homework
+        ? () => {
+            preempted = true;
+            try {
+              void (ctx as unknown as { stopCompletion?: () => unknown }).stopCompletion?.();
+            } catch { /* unsupported / nothing running — the job just finishes normally */ }
+          }
+        : undefined,
+      );
       // Prefer assembled tokens (already stripped of prompt) but fall back to
       // the final text the native side returns.
       const text = (assembled || result.text || '').trim();
@@ -294,7 +321,13 @@ export class LlamaRuntime {
         // says whether the context outlived the call. A prompt problem and a
         // lifecycle problem get investigated in opposite directions, so filing
         // them under one word cost a whole round of guessing.
-        outcome: text.length > 0 ? 'ok' : (this.context === null ? 'dormant' : 'empty'),
+        // OTA-1123 — a preempted homework job is reported as such whatever it
+        // returned. Partial text from a job we cut short is not an 'ok' the
+        // stats should average latency over, and an empty one is not the
+        // model failing — it is the model being told to stop.
+        outcome: preempted ? 'preempted'
+          : text.length > 0 ? 'ok'
+          : (this.context === null ? 'dormant' : 'empty'),
         at: telT0,
         prefillMs: typeof t?.prompt_ms === 'number' ? Math.round(t.prompt_ms) : undefined,
         decodeMs: typeof t?.predicted_ms === 'number' ? Math.round(t.predicted_ms) : undefined,

@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.56**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.57**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1129,7 +1129,67 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE BANK (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ HOMEWORK YIELDS (2026-08-05, latest). BOTH LINES.**
+  golem OTA-1123 / HAL OTA-1146. **The harness step three of the headroom track will
+  run on** — and the answer to the owner's question about it: *"if done right,
+  it should cost us [no] time correct?"*
+  **⚠ NOT AUTOMATICALLY, and the difference is the whole engineering problem.**
+  OTA-634 made the native-ML lock priority-aware, and its own note is precise
+  about the limit: *"a native call already in flight can't be preempted —
+  `running` guards that — so priority only reorders the WAITING set."* That is
+  exactly right for voice vs narration, where both are work someone asked for
+  and the only question is order. It is **not enough for homework**, which
+  nobody asked for: a homework generation six seconds into a ten-second job
+  makes the player's next tap wait four seconds, and priority cannot help
+  because the job is already running.
+  **SO HOMEWORK GETS TWO THINGS, and they only work together:**
+  1. **`ML_PRIORITY_HOMEWORK`, below voice** — it never jumps a queue; and
+  2. **an `onPreempt` hook** — the moment higher-priority work is **enqueued**
+     (not pumped; by pump time the player has already waited out the whole job),
+     llama.cpp is told to stop, the promise settles with whatever it had, the
+     lock frees, and the player's call runs. Partial homework is discarded: it
+     was free work, losing it costs nothing, and making the player wait costs
+     the only thing that matters.
+  **⚠ EXCLUSIVITY IS UNTOUCHED, AND THAT OUTRANKS EVERY LATENCY CONCERN HERE.**
+  Preemption does not overlap two native ops — it asks the running one to
+  **finish early**, and the chain still waits for it to settle before pumping.
+  The arb159 crash guarantee is exactly as strong, and the suite proves it:
+  max-concurrency stays 1 through a preemption whose native call deliberately
+  lingers after the stop signal, the way a real one does.
+  **⚠ ORDINARY WORK IS NEVER PREEMPTED.** Narration and voice supply no hook, so
+  there is nothing to fire — finishing them IS the point. That is the guard
+  against someone later "generalising" preemption to all priorities.
+  New telemetry outcome **`preempted`**, deliberately **not** filed with the
+  failures: yielding to the player is the feature working. It gets its own **⏸**
+  mark so a session full of them still shows up — homework scheduled at bad
+  moments burns battery for nothing — without reading as a fault.
+  **⚠ AND IT SHIPS WITH A LIVE CONSUMER RATHER THAN AS SCAFFOLDING.** The bank's
+  rest-filler (previous OTA) is by definition work nobody asked for, so it
+  becomes the first homework job — `ambient_fill`, priced separately from the
+  live `ambient` line, **which is NOT homework because the player is owed it.**
+  A priority tier and a flag with no caller would have been exactly the dead
+  code the hunger OTAs spent two rounds deleting.
+  New suite `ota1123HomeworkPreempt` (15 tests). Four assertions retargeted: three for a
+  now-multi-line outcome expression (single-line fragments — an assertion that
+  spans a line break fails on reflow rather than on meaning), one for the split
+  ambient job label.
+  **⚠ WHAT IS NOT BUILT YET — THE SLOTS THEMSELVES.** Owner's answers, recorded
+  so the next session does not re-ask:
+  · **The governing rule, and it is a good one:** *"our problem is screen real
+    estate. more just scrolls up and blends in with the chatter and isn't read.
+    I would go with faster, and only do fancy bespoke writing on screens that
+    are stationary like conversations or other writing popup."* **Generated text
+    belongs where it can be READ, not in the scroll.**
+  · **All five slots approved:** vendor conversation, item descriptions,
+    bestiary flavor, the Arbiter's read of the player, returning-player recap.
+  · **Persistence:** persist the expensive ones (vendor sets, item
+    descriptions), keep the cheap ones in memory.
+  · **Idle windows:** menu / inventory / map time, and charging-and-idle. NOT
+    while the player is actively moving.
+  · **Bad output:** discarded silently, through the same vetting the live paths
+    use.
+
+- **⚠⚠ THE BANK (2026-08-05). BOTH LINES.**
   golem OTA-1122 / HAL OTA-1145. **Step two of the LLM headroom track** (step one was
   the cached prefix; **step three, homework slots, is still open**).
   The economics of an ambient musing were upside down. It is generated **on
