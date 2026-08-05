@@ -272,6 +272,8 @@ export interface CreateCharacterInput {
    *  so sims and legacy callers keep working; absent resolves to
    *  DEFAULT_PRESSURE, which is the game as it has always played. */
   pressure?: string;
+  /** OTA-1136 — the CUSTOM payload, when `pressure === 'custom'`. */
+  pressureCustom?: { intensity: string; systems: string[] };
 }
 
 // v2.4.1 (OTA 029) — canonical per-faction starting location.
@@ -333,6 +335,10 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { isPressureTier, DEFAULT_PRESSURE } = require('./pressure') as typeof import('./pressure');
   const pressure = isPressureTier(input.pressure) ? input.pressure : DEFAULT_PRESSURE;
+  // OTA-1136 — normalised on the way in so nothing downstream ever sees a junk
+  // intensity or an unknown system id. Stored only for a genuinely custom run.
+  const { normalizeCustom } = require('./pressure') as typeof import('./pressure');
+  const pressureCustom = pressure === 'custom' ? normalizeCustom(input.pressureCustom) : undefined;
   const race = races.find((r) => r.id === input.raceId) ?? races[0]!;
   const faction = factions.find((f) => f.id === input.factionId) ?? factions[0]!;
   const stats = rollStats();
@@ -355,6 +361,7 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     name: input.name,
     storyMotive,
     pressure, // OTA-1089
+    ...(pressureCustom ? { pressureCustom } : {}), // OTA-1136
     storyIntroSeen: false,
     // OTA-1045 — a creation-made character never sees the veteran motive
     // picker: an explicit pick IS chosen, and a rolled one (sims, legacy
