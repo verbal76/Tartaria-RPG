@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.41**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.42**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -939,20 +939,42 @@ idle time and stop wasting its working time.
 
 **SHIPPED so far:** OTA-1128 telemetry · OTA-1129 lean ambient + capped pack
 (prefill was the stall — NOT the native rebuild everyone assumed) ·
-OTA-1130 native timings + wasted-work accounting.
+OTA-1130 native timings + wasted-work accounting · OTA-1131 the read on that
+data (reuse metric corrected, ambient prompt de-contradicted, item-synthesis
+silent failure closed, debug lines out of the talk popup).
+
+**WHAT THE FIRST DEEP-TELEMETRY LOG SETTLED (OTA-1130 running, read in 1131):**
+
+- **OTA-1129 worked.** Ambient ~1,145 prompt tokens / 16.8s → ~545 / 8–11.8s.
+- **Prefill still dominates ambient** (~70–80% of wall clock) and runs at a
+  near-constant **~10–11ms per prompt token** across every job — which is what
+  makes prompt SIZE the lever and makes any saving predictable in advance.
+- **`item_synthesis` is the opposite shape** — write 5.8s > read 3.5s, 179 out
+  tokens — because it is the only job with a large output budget.
+- **Prefix reuse is exactly ZERO.** Corrected in 1131: `tokens_cached` is the
+  cache SIZE after the call, not reuse.
+- **Discard rate is the headline risk:** two of three ambient generations in a
+  short session were binned, ~16.6s of work for nothing. One was `stale`, one
+  was `action-opener` — and 1131 found the action-opener was the prompt's own
+  fault, so the next log is the check on whether that rate falls.
 
 **NEXT — in order:**
 
-1. **Read the next device log first.** OTA-1130 hands over read/write splits,
-   prompt token counts, HIT-CAP flags, cache-reuse counts and a wasted-work
-   total. Three of the items below are *decided by that data*, not by opinion.
+1. **Read the next device log first.** The check on OTA-1131: (a) did the
+   ambient discard rate drop once the prompt stopped ordering the beat to
+   narrate the last action; (b) did ambient's prompt land near ~360 tokens and
+   its total near ~5–6s; (c) does `reuse` still read 0 everywhere.
 
-2. **STABLE PROMPT PREFIX (pending cache data).** If `tokens_cached` reads
-   zero all session, every generation re-reads its whole prompt. Reordering
-   `buildSystemPrompt` so the invariant block (persona + voice rules +
-   instruction) comes FIRST and volatile scene facts come LAST would let
-   llama.cpp reuse the cached prefix across calls. Potentially a 1129-sized
-   win on every job at once. Pure JS.
+2. **STABLE PROMPT PREFIX — CONFIRMED WORTH DOING (reuse measured at 0).**
+   Every generation re-reads its whole prompt. Two parts, and the second is
+   the one the log actually argues for: (a) reorder `buildSystemPrompt` so the
+   invariant block (persona + voice rules + instruction) comes FIRST and
+   volatile scene facts LAST; (b) note that jobs INTERLEAVE — an ambient, then
+   a flourish, then an ambient — and llama.cpp keeps one KV cache per context,
+   so a flourish whose prompt shares no prefix with ambient's evicts it.
+   A prefix shared across ALL jobs is therefore worth more than a per-job one.
+   At ~11ms/token, a 300-token shared prefix that survives is ~3s per call.
+   Pure JS.
 
 3. **THE BANK (bank-and-spend).** Generate during moments the player is
    provably busy — an 8-hour rest, a travel leg, a sheet they are reading —
@@ -968,9 +990,16 @@ OTA-1130 native timings + wasted-work accounting.
    Voiced-or-silent follows the channel each line lands in: narration-feed
    lines get TTS for free, codex/journal lines stay read-only.
 
-5. **TOKEN-BUDGET TRIM (pending HIT-CAP data).** If narration routinely stops
-   at the cap, it is being truncated mid-sentence at maximum cost — raise or
-   lower deliberately, per job, using the stop-reason counts.
+5. **TOKEN-BUDGET TRIM — DATA IN, ACTION DEFERRED WITH A REASON.** Every
+   ambient ends `HIT-CAP` at 31 of 32 tokens and `item_synthesis` at 179 of
+   180, so both are truncated at maximum cost. Deliberately NOT changed in
+   1131: ambient's discards in that log were `action-opener` and `stale`, not
+   truncation, and the beat is clamped to one sentence anyway — raising the
+   cap costs decode time, lowering it risks the first sentence. `item_synthesis`
+   is the live candidate: its 180-token budget is genuinely too small for the
+   JSON shape it is asked for, and 1131 only made the truncation survivable
+   (first balanced object) rather than rare. Revisit both with the next log's
+   stop-reason counts; the cap moves when a log blames it.
 
 6. **REMAINING DIAGNOSTICS** (smaller, still useful): lock-holder attribution
    (was the wait behind Kokoro TTS or another generation?) · battery/thermal
@@ -984,7 +1013,62 @@ OTA-1130 native timings + wasted-work accounting.
    work was assumed to live here and mostly does **not**. Only genuinely
    native settings belong on this list.
 
-- **DEEP LLM TELEMETRY (2026-08-05, latest). BOTH LINES.**
+- **⚠ WHAT THE FIRST DEEP-TELEMETRY LOG SAID (2026-08-05, latest). BOTH LINES.**
+  HAL OTA-1131 / golem OTA-1108. Step 4 of the LLM-headroom track — OTA-1130
+  shipped the instrumentation, this is the read on it. **Headline: OTA-1129
+  worked** — ambient fell from ~1,145 prompt tokens / 16.8s to ~545 / 8–11.8s.
+  Four things the numbers exposed:
+  (1) ⚠ **THE CACHE NUMBER WAS BEING READ BACKWARDS.** Every row reported
+  `cache` == in + out EXACTLY (546+31=577, 542+31=573, 309+179=488,
+  127+22=149, 124+20=144). That is llama.cpp's KV cache SIZE after the call,
+  not tokens reused — OTA-1130 read it as reuse, and on that reading the
+  stable-prefix item would have been retired as already solved. Reuse is the
+  REMAINDER, and the remainder is **zero**: every generation re-reads its whole
+  prompt. The rollup and the per-call line now print `reuse<N>t` derived as
+  `cached − in − out`, floored at zero, and a MEASURED zero prints while
+  absent data still stays quiet — "no cache line" and "the cache saved
+  nothing" are different findings and 1130 could not tell them apart.
+  (2) ⚠ **THE AMBIENT PROMPT WAS ARGUING WITH ITSELF.** OTA-1129 removed the
+  SYSTEM FACTS block from the ambient prompt and left the shared VOICE_RULES
+  in place — which orders *"Only narrate the player's last action and the
+  static facts already present"* and twice cites a section that is no longer
+  there, while AMBIENT_INSTRUCTION says *"DO NOT narrate or react to their
+  last action."* The log shows the model resolving that the wrong way:
+  `reason=action-opener`, 8.5 seconds binned. New `AMBIENT_VOICE_RULES` keeps
+  the guards ambient actually needs (second person only, no invented places
+  — repointed at the anchor line the lean prompt DOES carry, end on a complete
+  sentence) and drops the contradiction plus the ~470-character action-verb
+  catalog that a beat narrating no action was reading every time. Rules 1,352
+  → 622 chars; whole prompt ~2,157 → ~1,427, roughly **545 → ~360 tokens**,
+  about two seconds of prefill per line at the ~11ms/token this device
+  measures. The reaction prompt is untouched — this splits the block, it does
+  not rewrite it.
+  (3) ⚠ **ITEM SYNTHESIS WAS FAILING SILENTLY AT FULL PRICE.**
+  `item_synthesis ok 9528ms … out 179t … HIT-CAP (813ch)` — 179 tokens against
+  a 180 cap, and 813 characters for a shape that needs ~200: the model rambled
+  past its JSON and was then cut off. `extractJsonObject` spanned first-brace
+  to LAST-brace, which parses neither a trailing second object nor a truncated
+  tail, so nine and a half seconds returned `null` without a word in the log.
+  The extractor now takes the first **balanced** object (string- and
+  escape-aware, so a brace inside a description can't move the depth counter)
+  and falls back to the old span so nothing that used to parse is newly lost —
+  and both failure exits report through `noteQwenDiscarded`, so this call site
+  finally appears in OTA-1130's waste accounting instead of hiding from it.
+  (4) **THE TALK POPUP SHOWED DEBUG LINES.** Reported by the owner from inside
+  the game, typed at the Arbiter as a command: *"you are showing the qwen notes
+  in the talk popup."* `TalkSheet`'s transcript filtered on timestamp only,
+  while `AdventureFeed` drops `HIDDEN_LOG_CHANNELS` — so every `qwen⏱` line
+  landed mid-conversation, arriving because background generation does not stop
+  while you talk. Same set, one import; a channel hidden later can't leak here
+  again.
+  **NOT changed, deliberately:** the ambient token cap. Every ambient ends
+  HIT-CAP at 31/32, but this log's discards are `action-opener` and `stale`,
+  not truncation, and the beat is clamped to one sentence anyway. The cap moves
+  when a log blames it. New suite `ota1131AmbientContradiction` (21 tests);
+  the OTA-1130 cache test and the OTA-1118 transcript lock retargeted with the
+  reasons written in. **Track continues — see §OPEN ITEMS above.**
+
+- **DEEP LLM TELEMETRY (2026-08-05). BOTH LINES.**
   The native numbers + the wasted work. HAL OTA-1130 / golem OTA-1107. Step 3 of the
   LLM-headroom track. OTA-1129 proved prefill dominance by INFERRING it from
   wall-clock; llama.cpp returns a `timings` object on every completion with

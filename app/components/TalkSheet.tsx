@@ -47,6 +47,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { lockedTeaserLabel } from '../engine/dialogue';
+import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog';
 
 export function TalkSheet() {
   const ctx = useGameStore((s) => s.pendingTalk);
@@ -88,8 +89,20 @@ export function TalkSheet() {
 
   // The exchange itself: every feed line since this conversation opened. Sliced,
   // not stored — the log is the record of truth and this is a window on it.
+  //
+  // ⚠ OTA-1131 — A WINDOW ON THE FEED MUST HIDE WHAT THE FEED HIDES. Reported
+  // by the owner from inside the game, typed at the Arbiter as a command: "you
+  // are showing the qwen notes in the talk popup". Correct, and the cause is
+  // that this filter only ever tested the timestamp. AdventureFeed drops
+  // HIDDEN_LOG_CHANNELS ('cognitive', 'debug') and this did not, so anything
+  // on the debug channel landed in the middle of a conversation — which is
+  // every `qwen⏱` telemetry line OTA-1128..1130 added, arriving mid-dialogue
+  // because background generation does not stop while you talk. Same set, one
+  // import: adding a hidden channel later can't leak here again.
   const transcript = useMemo(
-    () => (ctx ? gameLog.filter((e) => e.ts >= ctx.startedAtTs) : []),
+    () => (ctx
+      ? gameLog.filter((e) => e.ts >= ctx.startedAtTs && !HIDDEN_LOG_CHANNELS.has(e.channel))
+      : []),
     [ctx, gameLog],
   );
 
