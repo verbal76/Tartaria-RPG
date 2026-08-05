@@ -18447,6 +18447,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             return { currentScene: { ...s.currentScene, enemyHps: hps } };
           });
           get().resolveEnemyDefeat();
+          // OTA-1120 — survivors still answer the volley (see runSurvivorVolley).
+          runSurvivorVolley(get, set, player);
         } else {
           set((s) => {
             if (!s.currentScene) return {};
@@ -20948,6 +20950,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Splice this enemy out of the scene (loot + scene clear handled
         // in resolveEnemyDefeat which now operates per-active-enemy).
         get().resolveEnemyDefeat();
+        // ⚠ OTA-1120 — AND THE REST OF THE PACK STILL SWINGS. This branch used
+        // to end here, so a killing blow bought the player the whole group's
+        // round: the owner's Bog Hound "sat out a fight" because the Silt Thief
+        // died on the swing that would otherwise have provoked it. Same round
+        // budget as the non-lethal branch below, same skipDotTick (case 'attack'
+        // ticked at its own top), same enemiesActedFirst rule — a volley the
+        // player already ate to initiative is not owed twice.
+        if (!enemiesActedFirst) runSurvivorVolley(get, set, player, { skipDotTick: true });
       } else {
         // OTA-361 — KNOCKOUT. A single NON-LETHAL blow whose CUMULATIVE
         // damage (`dmg` already sums the weapon roll × traits + weapon-
@@ -28411,6 +28421,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       if (newHp <= 0) {
         get().resolveEnemyDefeat();
+        // OTA-1120 — …and it swings back on a KILL too. The comment below
+        // already promised "the group still swings back"; the else made that
+        // promise conditional on the target surviving, which is the one case a
+        // pack most obviously should answer.
+        runSurvivorVolley(get, set, player);
       } else {
         // A throw is a combat action — the group still swings back (mirrors a
         // knife/axe throw, which routes through the attack path's volley).
@@ -33390,6 +33405,40 @@ function tickEnemyDotsAndMaybeEndFight(
   return false;
 }
 
+/** ⚠ OTA-1120 — THE VOLLEY AFTER A KILL. Owner's log: *"Bog Hound sat out a
+ *  fight after the Silt Thief died."* It did, and so does every packmate of
+ *  anything you drop.
+ *
+ *  Four combat paths were written as `if (kill) resolveEnemyDefeat(); else {
+ *  …volley }` — an else that reads as "the enemy is dead, there is nothing to
+ *  counter with", which is true in the SOLO fight those paths were first
+ *  written for and false the moment a pack is involved. A killing blow bought
+ *  the player the whole group's round: kill one raider of five and the other
+ *  four never swung. Chain it — one kill per round — and a pack fight costs
+ *  nothing at all.
+ *
+ *  The bug is the SHAPE, not any one site, so the guard gets a name and every
+ *  killing blow routes through it. The check is on SURVIVORS, not on whether a
+ *  kill happened: `resolveEnemyDefeat` clears the scene when the last enemy
+ *  falls, so a fight you just ended correctly runs nothing, while a fight that
+ *  still has bodies in it swings back. `runEnemyGroupCounters` already skips
+ *  the dead, the KO'd, and the out-of-reach, so this only has to answer "is
+ *  anyone left".
+ *
+ *  ⚠ The item-throw path (OTA-825) already did this correctly and is the
+ *  model — it closed the identical hole for throws and the reasoning is in its
+ *  comment. This finishes the job for the other four. */
+export function runSurvivorVolley(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  player: PlayerCharacter,
+  opts?: { forceDogEnemyIdx?: number; skipDotTick?: boolean },
+): void {
+  const scene = get().currentScene;
+  if (!scene || scene.enemies.length === 0) return;
+  runEnemyGroupCounters(get, set, get().player ?? player, opts);
+}
+
 export function runEnemyGroupCounters(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -36565,7 +36614,12 @@ function handleDogCombat(
         get().appendLog('world', `${target.name} falls under ${dog.name}'s jaws.`);
         set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: targetIdx } } : s));
         get().resolveEnemyDefeat();
-        return;
+        // ⚠ OTA-1120 — NO EARLY RETURN. This used to `return` here, which
+        // jumped clean over the arb169 volley eighty lines below — the one that
+        // makes commanding the dog cost the player the group's round. So a dog
+        // that KILLED bought the free round that a dog that merely bit did not,
+        // which is the arb169 exploit wearing a kill for a hat. Falling through
+        // reaches that volley, and its own guard already skips a cleared room.
       }
     } else {
       get().appendLog('world', `${dog.name}'s teeth click on empty air.`);
