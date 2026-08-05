@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.44';
+export const DISPLAY_VERSION = '4.29.45';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -21838,7 +21838,63 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // no longer exists IS "something else happening after 0". It is
 // idempotent: a tap racing the dwell timer runs it once.
 // New suite ota1133DeathScreen (26 tests). DISPLAY_VERSION 4.29.44.
-export const OTA_BUILD_ID = '2026-08-05-1133-death-screen';
+// OTA-1134 — HALF. Owner: "there were sections that every move or
+// rest was a fight … let's just 1/2 the chance percentage."
+//
+// THE ARITHMETIC HE WAS FEELING: the wasteland encounter roll was
+// 0.58 auto-travel / 0.45 manual, times the time-of-day multiplier
+// (1.3 night / 0.85 day) — a 75% chance PER STEP auto-travelling after
+// dark. And the gate that is supposed to space encounters out does the
+// opposite for the player who needs it most. `tileIsNovel` tests
+// `recentTileHistory`, which starts EMPTY: a brand-new character has
+// every tile novel and rolls the full chance every single step, while
+// an established player working known ground rolls far less often. The
+// rate peaked exactly where the character was weakest — which the
+// owner spotted from the description alone ("if we are looking for not
+// traveled in the last 50 squares, doesn't that penalize new players
+// since they haven't been anywhere?") and then explained from his own
+// play pattern: "I have been starting new characters and running them
+// through the paces for 1 to 2 capitals. So of course it looked rough
+// — the 50 paces thing was beating me up since it was early game."
+//
+// ⚠ AND WHY THIS IS A FLAT HALVING, NOT THE EARLY-GAME RAMP that was
+// proposed first. The ramp would have climbed to full rate over ~25
+// tiles; the owner rejected it on sight — "the 25 step block means
+// they can make it to half of the capitals with no encounters." He is
+// right, and the reasoning generalises past the early game: the
+// problem was never that new characters deserve a discount, it is that
+// the BASELINE was too high for everybody and the novelty gate merely
+// made the opening the place you noticed. A ramp would have papered
+// over a bad number with a second mechanic and bought a dead opening
+// in exchange. One number, applied everywhere: 0.58 → 0.29 and
+// 0.45 → 0.225. Night auto-travel 75% → ~38%; day manual 38% → ~19%.
+// The auto-travel-is-more-eventful ratio (OTA-713) is preserved
+// exactly, because halving both preserves it by construction.
+//
+// DELIBERATELY UNTOUCHED, all three on the owner's instruction or on
+// measurement rather than assumption:
+//   • LATE-GAME SCALING — "I don't think the numbers for later in the
+//     game need adjusted yet, they should be tied to a difficulty
+//     level choice in character creation." That knob already exists:
+//     engine/pressure.ts, four tiers picked on the last step of
+//     creation, lowerable mid-run but never raisable. It currently
+//     declines to scale encounter rate ON PURPOSE ("re-scaling them
+//     from here would put a difficulty multiplier on top of a year of
+//     tuning"), so wiring this to it is a real design job, not a line
+//     change. Logged in HANDOFF §OPEN ITEMS.
+//   • REST AMBUSH (22% wild / 8% hub) — measured before touching:
+//     with the day/night multiplier that is 18.7%/28.6%, and the
+//     two-for-two rest in the last device log is a ~5% coincidence,
+//     not a broken roll. What IS worth fixing there is that both
+//     ambushes drew the IDENTICAL "Something circled while you were
+//     out" line — a dedup problem, not a rate problem.
+//   • THE NOVELTY GATE ITSELF — it is doing the anti-farm job OTA-438
+//     added it for (oscillating between two tiles farmed unlimited
+//     encounters and loot). Halving the baseline is what actually
+//     fixes the symptom the owner felt.
+// New suite ota1134EncounterRate (11 tests). DISPLAY_VERSION 4.29.45.
+export const OTA_BUILD_ID = '2026-08-05-1134-half-the-roll';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1133-death-screen';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1132-synth-yields';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1131-ambient-contradiction';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1130-deep-telemetry';
