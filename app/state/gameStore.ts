@@ -5925,6 +5925,12 @@ interface GameStore {
         regard: import('../engine/npcMemory').NpcRegard;
         /** OTA-1113 — teaser taps THIS conversation; rotates the deflection. */
         teaserTaps: number;
+        /** OTA-1118 — where this conversation begins in `gameLog`. The
+         *  conversation view renders `gameLog.slice(startedAtLogLen)` as its own
+         *  transcript, so the replies are readable INSIDE the sheet instead of
+         *  behind it. The log stays the single record of truth — nothing is
+         *  duplicated into a second store of conversation lines. */
+        startedAtLogLen: number;
       }
     | null;
   /** Open a conversation with the named person in the current scene. */
@@ -6374,6 +6380,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       npcId, npcName: target.name, topics, role,
       flourishesUsed: [], flourishCount: 0,
       lockedCount, regard: ctx.regard, teaserTaps: 0,
+      // OTA-1118 — the high-water mark of the feed at the moment the
+      // conversation opens. Everything after it belongs to this exchange.
+      startedAtLogLen: get().gameLog.length,
     } });
     // OTA-1086 — ONE EXCHANGE AHEAD. Fired at the moment the topic list opens,
     // which is the only place in this feature where there is time to spend: the
@@ -7992,7 +8001,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // stuck to the end of a radar line. Exactly the complaint OTA-1074 was
         // written to fix, reintroduced by a debounce written years earlier.
         (meta as { storyBeat?: boolean } | undefined)?.storyBeat !== true &&
-        (lastEntry.meta as { storyBeat?: boolean } | undefined)?.storyBeat !== true;
+        (lastEntry.meta as { storyBeat?: boolean } | undefined)?.storyBeat !== true &&
+        // OTA-1118 — NEVER weld a conversation line onto an entry that predates
+        // the conversation. The talk view renders `gameLog.slice(startedAtLogLen)`
+        // as its transcript, so a first reply merged backwards into the arrival
+        // narration would land OUTSIDE the window and the player would watch
+        // their opening question get no answer — the exact failure this OTA
+        // exists to end, arriving through the debounce instead of the layout.
+        // Merging WITHIN the conversation is still fine and still groups.
+        // (`state.gameLog.length` is the count BEFORE this append, so lastEntry
+        // sits at length-1 and predates the talk exactly when length <= start.)
+        !(state.pendingTalk != null && state.gameLog.length <= state.pendingTalk.startedAtLogLen);
       if (canMerge) {
         const merged = { ...lastEntry, text: `${lastEntry.text}\n\n${text}`, ts: entry.ts };
         const mergedLog = [...state.gameLog.slice(0, -1), merged].slice(-MAX_LOG_IN_MEMORY);

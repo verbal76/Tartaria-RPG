@@ -923,9 +923,54 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.28**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.29**; ledger in `VERSION.md`.
 
-- **GEAR LISTS TELL THE TRUTH (2026-08-04, latest). BOTH LINES.** HAL
+- **TALKING IS ITS OWN SCREEN NOW (2026-08-05, latest). BOTH LINES.**
+  HAL OTA-1118 / golem OTA-1095. Owner, from the device: "the talk box
+  is bigger than the exploration window so I don't get to see what he
+  actually says unless I stop talking." Then, weighing the fix: "should
+  talking be a whole separate full or 3/4 screen popup that way the
+  story text is the only thing to read."
+  **The answer is yes — but only because the replies moved in with it.**
+  A full-screen popup that still routed answers to the feed BEHIND it
+  would be the current bug made total: you would have to close the
+  conversation to read every single line. What makes the tall view work
+  is that the exchange is rendered INSIDE it.
+  (1) **THE CONVERSATION VIEW.** TalkSheet is an 88%-height overlay: the
+  exchange on top (the larger share — it is the thing that could not be
+  read), the topic tray below, STOP TALKING at the foot. Ask, read the
+  answer where you are already looking, ask the next thing.
+  (2) **THE TRANSCRIPT IS A WINDOW, NOT A COPY.** `pendingTalk` carries
+  `startedAtLogLen` (the feed's high-water mark when the talk opened) and
+  the view renders `gameLog.slice(startedAtLogLen)`. dialogue.ts still
+  routes every reply through `appendLog` exactly as it always has, so the
+  exploration log remains the whole record and closing the conversation
+  leaves the history intact behind it.
+  (3) **⚠ A REGRESSION THAT WOULD HAVE SHIPPED.** `appendLog`'s
+  same-channel 500ms debounce merges a world line into the PREVIOUS world
+  entry. Unguarded, the FIRST reply of a conversation is welded onto the
+  arrival narration that predates it — landing outside the window, so the
+  player watches their opening question get no answer. That is the exact
+  failure this OTA exists to end, arriving through the debounce instead
+  of the layout. `canMerge` now refuses to weld across the conversation
+  boundary; grouping WITHIN a conversation is untouched. Direct
+  regression test in the suite.
+  (4) **UNASKED FIRST.** The tray sorts unasked topics above asked ones
+  (stable sort, so the authored ladder still reads as a ladder), and an
+  asked topic still renders, still marked "(asked)".
+  (5) **THE COLLAPSE BAR SURVIVES, AS AN OPTION.** OTA-1117's approved
+  breadcrumb is still there — who you are talking to, how many questions
+  remain — holding the controls slot so collapsing never leaves a gap
+  where the input box was. It is no longer REQUIRED to read a reply,
+  which was the point. Tray capped at 34% of the sheet so a 16-topic
+  vendor (OTA-1114 pushed nine of them to 14-16) cannot push the exchange
+  off screen from the other side — the same bug reintroduced by its own
+  fix. **GIFT and PICKPOCKET deliberately unchanged:** both are
+  single-choice pickers that close on the pick, so the reaction is
+  already readable; there is no ongoing exchange for a conversation view
+  to hold. Suite ota1118ConversationView (10).
+
+- **GEAR LISTS TELL THE TRUTH (2026-08-04). BOTH LINES.** HAL
   OTA-1117 / golem OTA-1094. Three reports from the device, and the
   first one's fix is mostly an admission.
   (1) **THE CRUCIBLE'S VANISHING WEAPONS SECTION.** Owner: "went to

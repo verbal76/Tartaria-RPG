@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.28';
+export const DISPLAY_VERSION = '4.29.29';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20952,6 +20952,58 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1118 — TALKING IS ITS OWN SCREEN NOW.
+// Owner, from the device: "the talk box is bigger than the exploration
+// window so I don't get to see what he actually says unless I stop
+// talking." Then, weighing the fix: "should talking be a whole separate
+// full or 3/4 screen popup that way the story text is the only thing to
+// read."
+//   ANSWER: yes — but ONLY because the replies moved in with it. A
+//   full-screen popup that still routed answers to the feed behind it
+//   would be the current bug made total: you would have to close the
+//   conversation to read every single line. What makes the tall view
+//   work is that the exchange is rendered INSIDE it.
+//   1. THE CONVERSATION VIEW. TalkSheet is now an 88%-height overlay:
+//      the exchange on top (the larger share — it is what could not be
+//      read), the topic tray below it, STOP TALKING at the foot. Ask,
+//      read the answer where you are already looking, ask the next
+//      thing. STOP TALKING became a choice instead of a step you were
+//      forced through to see what was said.
+//   2. THE TRANSCRIPT IS A WINDOW, NOT A COPY. pendingTalk carries
+//      `startedAtLogLen` — the feed's high-water mark when the talk
+//      opened — and the view renders `gameLog.slice(startedAtLogLen)`.
+//      dialogue.ts still routes every reply through appendLog exactly
+//      as it always has, so the exploration log stays the whole record
+//      and closing the conversation leaves the history intact behind it.
+//      Nothing is duplicated into a second store of conversation lines.
+//   3. ⚠ A REGRESSION THAT WOULD HAVE SHIPPED. appendLog's same-channel
+//      500ms debounce merges a world line into the PREVIOUS world entry.
+//      Unguarded, the FIRST reply of a conversation gets welded onto the
+//      arrival narration that predates it — landing outside the window,
+//      so the player watches their opening question get no answer. The
+//      exact failure this OTA exists to end, arriving through the
+//      debounce instead of the layout. canMerge now refuses to weld
+//      across the conversation boundary; grouping WITHIN a conversation
+//      is untouched.
+//   4. UNASKED FIRST. The tray sorts unasked topics above asked ones
+//      (stable, so the authored ladder still reads as a ladder), and an
+//      asked topic still renders, still marked "(asked)" — a list that
+//      silently shrinks reads as the game losing content.
+//   5. THE COLLAPSE BAR SURVIVES, AS AN OPTION. OTA-1117's approved
+//      breadcrumb is still there: one row showing who you are talking to
+//      and how many questions remain, holding the controls slot so
+//      collapsing never leaves a gap where the input box was. Tap to
+//      come back — same conversation, same spent topics. It is no longer
+//      REQUIRED to read a reply, which was the point.
+//   Tray capped at 34% of the sheet so a 16-topic vendor (OTA-1114
+//   pushed nine of them to 14-16) cannot push the exchange off screen
+//   from the other side — the same bug, reintroduced by the fix.
+// GIFT and PICKPOCKET are deliberately unchanged: both are single-choice
+// pickers that close on the pick, so the reaction is already readable.
+// There is no ongoing exchange for a conversation view to hold.
+// New suite ota1118ConversationView (10), including a direct regression
+// test for #3. DISPLAY_VERSION 4.29.29.
+//
 // OTA-1117 — GEAR LISTS TELL THE TRUTH. From the device, and the fix is
 // mostly an admission: a permanent design rule was reading as a broken
 // screen because nothing on the screen said the rule existed.
@@ -21159,7 +21211,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-04-1117-gear-lists-tell-the-truth';
+export const OTA_BUILD_ID = '2026-08-05-1118-talking-is-its-own-screen';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1117-gear-lists-tell-the-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1116-from-the-device-log';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1115-secondary-cast';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1114-deep-bench';
