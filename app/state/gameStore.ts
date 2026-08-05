@@ -232,6 +232,7 @@ import {
   HUB,
   isHubLocation,
   hubRoomFor,
+  hubRoomOpenAir,
   hubEntryRoomId,
   hubNameForFaction,
   resolveHubTravel,
@@ -8553,10 +8554,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
         initialHooks.push({
           id: `hook_echo_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
           kind: 'thread',
-          nouns: [ref.noun],
-          plantedLine: buildEchoHookLine(ref),
+          nouns: [ref.entry.noun],
+          plantedLine: buildEchoHookLine(ref.entry),
           stage: 0,
           resolved: false,
+        });
+        // OTA-1103 — spend the memory THE MOMENT it is planted, not when the
+        // thread resolves. Stamping on resolve would let a player who ignores
+        // the hook re-roll it room after room; stamping at plant means one
+        // discovery seeds exactly one echo thread, ever. Without this the
+        // scan re-picked the same most-recent entry in every scene and the
+        // same thread paid out fresh each time (Giant Bone Longbow farm,
+        // device log 2026-08-05: two completions 15 seconds apart).
+        set((s) => {
+          const rooms = s.worldMemory.visitedRooms ?? {};
+          const srcRoom = rooms[ref.roomKey];
+          if (!srcRoom?.roomInvestigationTable) return {};
+          const table = Object.fromEntries(
+            Object.entries(srcRoom.roomInvestigationTable).map(([k, e]) =>
+              e.noun === ref.entry.noun ? [k, { ...e, echoed: true }] : [k, e],
+            ),
+          );
+          return {
+            worldMemory: {
+              ...s.worldMemory,
+              visitedRooms: {
+                ...rooms,
+                [ref.roomKey]: { ...srcRoom, roomInvestigationTable: table },
+              },
+            },
+          };
         });
       }
     }
@@ -10827,9 +10854,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // quarters, lab, vault, chapel, and the whole buried level — is sheltered,
     // as is any building you've stepped inside.
     const hubRoomNow = get().player?.hubRoomId ?? null;
+    // OTA-1103 — the open-air call is per-FACTION-SKIN, not just per room id.
+    // The base graph's gate / square / culvert are Reclaimer courtyards, but a
+    // faction variant can move the same room indoors: the Architects' gate is
+    // "a clerical office with filing cabinets", and a device log showed
+    // Aetheric arcs biting the player inside it (−2/−2/−3 HP under a roof).
+    // hubRoomOpenAir consults the variant's own declaration and falls back to
+    // the base set when the skin doesn't say.
     const underRoof =
       !!get().activeBuildingId ||
-      (!!hubRoomNow && !OPEN_AIR_HUB_ROOMS.has(hubRoomNow));
+      (!!hubRoomNow && !hubRoomOpenAir(hubRoomNow, get().player?.factionId ?? null, OPEN_AIR_HUB_ROOMS.has(hubRoomNow)));
     const wtick = weatherCooldown > 0 || underRoof
       ? { hpDelta: 0, staminaDelta: 0, corruptionDelta: 0, line: null as string | null }
       : tickWeather(get().currentScene?.weather ?? null, player, playerArmorResistKinds(player));
@@ -17067,16 +17101,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const shave = Math.min(fallDamage - 1, tPerksFall.envHazardSaveBonus);
             if (shave > 0) { fallDamage -= shave; fallShaveTag += ` (Aetherbound Survivor absorbs ${shave})`; }
           }
-          const newHp = Math.max(0, player.hp - fallDamage);
+          // ⚠ OTA-1103 — read HP LIVE, not from the `player` snapshot captured
+          // at the top of the action pipeline. The weather tick runs earlier in
+          // this same submit and mutates HP through the store; computing the
+          // fall from the stale snapshot and writing the result absolutely
+          // ERASED that damage — a device log showed an Aetheric arc's −3 land
+          // at 14 HP and the fall 71ms later still reading "pre-fall hp=14",
+          // ending at 10 where 7 was owed.
+          const hpAtFall = get().player?.hp ?? player.hp;
+          const newHp = Math.max(0, hpAtFall - fallDamage);
           // OTA-354 — vitals at the fall, so a log review can reconstruct a
           // fall-death (was the player already low? did the fall over-damage?).
-          get().appendLog('debug', `vitals@fall: hp ${player.hp}/${player.hpMax} stam ${player.stamina}/${player.staminaMax} → fall ${fallDamage} ⇒ hp ${newHp}`);
+          get().appendLog('debug', `vitals@fall: hp ${hpAtFall}/${player.hpMax} stam ${player.stamina}/${player.staminaMax} → fall ${fallDamage} ⇒ hp ${newHp}`);
           get().appendLog('combat', combatReason);
           // OTA-354 — vitals at the fall (would have made the "fell to 0/38"
           // bug-report death reconstructable: pre-fall HP/stamina + the hit).
           get().appendLog(
             'debug',
-            `vitals: pre-fall hp=${player.hp}/${player.hpMax} stam=${player.stamina}/${player.staminaMax} corruption=${player.corruption ?? 0} → fall ${fallDamage} → hp=${newHp}${newHp <= 0 ? ' (DEATH)' : ''}`,
+            `vitals: pre-fall hp=${hpAtFall}/${player.hpMax} stam=${player.stamina}/${player.staminaMax} corruption=${player.corruption ?? 0} → fall ${fallDamage} → hp=${newHp}${newHp <= 0 ? ' (DEATH)' : ''}`,
           );
           get().appendLog(
             'world',

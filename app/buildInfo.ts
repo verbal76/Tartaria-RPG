@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.36';
+export const DISPLAY_VERSION = '4.29.37';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -19854,6 +19854,50 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1112/1089 anti-stun-lock + pack math. No app code; the fast gate
 // is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1103 — ⚠ DEVICE-LOG TRIAGE: THE ECHO THAT PAID FOREVER, THE ROOF
+// THAT WASN'T, AND THE ARC THE FALL ERASED. Three defects from one
+// APK-293 playtest log (2026-08-05), each reproduced in the log itself:
+//   1. ⚠ ECHO-HOOK FARM (exploit). OTA-075's cross-room echo planted a
+//      thread referencing the player's most recent discovery — and
+//      NOTHING marked the discovery as used, so the scan re-picked the
+//      SAME entry in every new peaceful scene (15% roll). The log shows
+//      the Giant Bone Longbow thread completing TWICE in 15 seconds —
+//      +12 TC, rations and a Rare each time, repeatable forever by
+//      walking rooms. A memory now surfaces ONCE: the InvestigationEntry
+//      is stamped `echoed` AT PLANT TIME (stamping at resolve would let
+//      an ignored hook re-roll room after room), the scan skips echoed
+//      entries and returns the entry WITH its room key so the store can
+//      stamp it. Older un-echoed discoveries get their turn; when every
+//      memory is spent the scan returns null.
+//   2. THE ROOF FOLLOWS THE FACTION SKIN. OTA-980's "a roof is a roof"
+//      exempts the base hub graph's open-air rooms (gate / square /
+//      culvert — Reclaimer courtyards). But a faction variant can move
+//      those rooms INDOORS: the Architects' gate is "a clerical office
+//      with filing cabinets", and the log shows Aetheric arcs biting the
+//      player inside it (−2/−2/−3 HP under a roof). Every faction
+//      variant of gate + central now declares `open_air` from its own
+//      description (the Monarchs' flagstone court keeps the sky; the
+//      Order's vestibule does not), hubRoomOpenAir() consults the
+//      declaration with the base set as fallback, and the weather tick
+//      routes through it. A test sweeps the variants so no future skin
+//      can silently inherit the wrong sky.
+//   3. THE FALL READS HP LIVE. The climb-fall computed new HP from the
+//      `player` snapshot captured at the top of the action pipeline —
+//      BEFORE the weather tick that runs in the same submit — then wrote
+//      the result absolutely. The log: an arc's −3 lands at 14 HP, the
+//      fall 71ms later still reads "pre-fall hp=14", and the player ends
+//      at 10 where 7 was owed. Damage silently erased (and the same race
+//      could under-count a death). The fall now reads HP live; the slide
+//      and wall-flee paths already did, and are now locked so they stay
+//      that way.
+// Logged, not fixed here: first-entry rooms greet as revisits with
+// inflated counts ("visit 2"/"visit 3" on genuinely first visits —
+// needs a local repro; same room-key map stores dropped items, so worth
+// a real root-cause); the Bog Hound that never acted after the Silt
+// Thief died sits in a truncated span of the log — watch item, not a
+// verdict. One OTA-980 lock retargeted (the roof check is now
+// faction-aware; what it guards is unchanged). DISPLAY_VERSION 4.29.37.
+//
 // OTA-1102 — THE REPAIR TAB LEARNS THE GRIP, AND LEARNS TO COUNT.
 // Owner: "I thought we were going to do the same tap and hold to
 // multiselct for repair too. it will have to take into account the items
@@ -20379,7 +20423,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1102-repair-group-budget';
+export const OTA_BUILD_ID = '2026-08-05-1103-echo-farm-roof-fall';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1102-repair-group-budget';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1101-group-bar-anchored';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1100-inventory-group';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1099-group-sell';

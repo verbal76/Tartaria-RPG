@@ -90,6 +90,13 @@ export interface InvestigationEntry {
   /** Recorded on first investigate; replayed by callbackLine on
    *  repeat taps so the callback is SPECIFIC, not generic. */
   result: InvestigationResult | null;
+  /** OTA-1103 — set once this discovery has fed a cross-room echo
+   *  hook (OTA-075). A memory surfaces ONCE: without this flag the
+   *  echo scan re-picked the same most-recent entry in every new
+   *  scene, planting the same fully-paying thread forever — a
+   *  device log showed the Giant Bone Longbow thread completing
+   *  twice in 15 seconds, +12 TC and a Rare each time. */
+  echoed?: boolean;
 }
 
 interface Template {
@@ -757,23 +764,30 @@ interface ScanRoomShape {
 export function findReferenceableInvestigation(
   visitedRooms: Record<string, ScanRoomShape>,
   excludeRoomKey: string,
-): InvestigationEntry | null {
-  const candidates: InvestigationEntry[] = [];
+): { entry: InvestigationEntry; roomKey: string } | null {
+  const candidates: Array<{ entry: InvestigationEntry; roomKey: string }> = [];
   for (const [key, room] of Object.entries(visitedRooms)) {
     if (key === excludeRoomKey) continue;
     if (!room.roomInvestigationTable) continue;
     for (const entry of Object.values(room.roomInvestigationTable)) {
       if (!entry.consumed) continue;
       if (!entry.result) continue;
+      // OTA-1103 — a memory surfaces ONCE. The sort below always put the
+      // most-recent discovery first, so without this skip the SAME entry
+      // won the scan in every new scene — the same thread re-planted and
+      // re-paid forever (Giant Bone Longbow, device log 2026-08-05:
+      // two full completions 15 seconds apart). The caller stamps
+      // `echoed` at plant time; from then on this entry is spent.
+      if (entry.echoed) continue;
       // Flavor-only investigates would produce a weak echo;
       // only items and hooks make for a callback worth
       // surfacing.
       if (entry.result.kind === 'flavor') continue;
-      candidates.push(entry);
+      candidates.push({ entry, roomKey: key });
     }
   }
   if (candidates.length === 0) return null;
-  candidates.sort((a, b) => (b.consumedAt ?? 0) - (a.consumedAt ?? 0));
+  candidates.sort((a, b) => (b.entry.consumedAt ?? 0) - (a.entry.consumedAt ?? 0));
   return candidates[0] ?? null;
 }
 

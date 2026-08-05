@@ -923,9 +923,43 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.36**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.37**; ledger in `VERSION.md`.
 
-- **THE REPAIR TAB LEARNS THE GRIP, AND LEARNS TO COUNT (2026-08-05, latest).
+- **DEVICE-LOG TRIAGE — THE ECHO THAT PAID FOREVER, THE ROOF THAT WASN'T,
+  AND THE ARC THE FALL ERASED (2026-08-05, latest). BOTH LINES.** golem
+  OTA-1103 / HAL OTA-1126. Three defects from one APK-293 playtest log.
+  (1) **⚠ ECHO-HOOK FARM (exploit).** The cross-room echo (OTA-075 era)
+  plants a thread referencing the player's most recent consumed
+  investigation — and nothing marked the discovery as used, so
+  `findReferenceableInvestigation` re-picked the SAME most-recent entry in
+  every peaceful scene (15% roll). The log shows the Giant Bone Longbow
+  thread completing TWICE in 15 seconds — +12 TC, rations and a Rare each
+  pass, repeatable forever. Fix: a memory surfaces ONCE.
+  `InvestigationEntry.echoed` is stamped AT PLANT TIME (resolve-time
+  stamping would let an ignored hook re-roll room after room), the scan
+  skips echoed entries and returns `{ entry, roomKey }` so the store can
+  stamp the source room. When every memory is spent the scan returns null.
+  (2) **THE ROOF FOLLOWS THE FACTION SKIN.** The weather tick's open-air
+  exemption (gate / square / culvert) describes Reclaimer courtyards, but a
+  faction re-skin can move those rooms indoors — the Architects' gate is "a
+  clerical office with filing cabinets", and the log shows Aetheric arcs
+  biting the player inside it (−2/−2/−3 HP). Every faction variant of
+  `outpost_gate` + `outpost_central` now declares `open_air` judged from
+  its own description, `hubRoomOpenAir()` in `engine/hub.ts` consults the
+  declaration with the base set as fallback, and a sweep test requires the
+  declaration on every variant.
+  (3) **THE FALL READS HP LIVE.** The climb-fall computed new HP from the
+  `player` snapshot captured before the weather tick in the same submit,
+  then wrote it absolutely — erasing the arc's damage (log: −3 lands at 14
+  HP, fall still reads 14, ends at 10 where 7 was owed). Now reads live;
+  the slide and wall-flee paths already did and are locked.
+  **Logged, NOT fixed:** inflated first-visit counts ("visit 2"/"visit 3"
+  on genuinely first entries — needs a local repro); the Bog Hound that sat
+  out a fight (truncated log span — watch item). Suite `ota1103PlaytestTriage`;
+  one weather-locality lock retargeted, and that legacy suite renamed to its
+  port-rule slot (`ota980WeatherLocality`) in a separate pure-rename commit.
+
+- **THE REPAIR TAB LEARNS THE GRIP, AND LEARNS TO COUNT (2026-08-05).
   BOTH LINES.** golem OTA-1102 / HAL OTA-1125. Owner: "I thought we were
   going to do the same tap and hold to multiselct for repair too. it will
   have to take into account the items needed for each item you sent and
