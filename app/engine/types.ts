@@ -1089,10 +1089,16 @@ export interface PlayerCharacter {
   hpMax: number;
   stamina: number;
   staminaMax: number;
-  /** 2026-05-24 — hunger penalty. Increments by 1 every 8 in-game hours
-   *  without eating, capped at 5. effectiveStaminaMax = staminaMax - this.
-   *  Eating any food consumable resets to 0. Absent for legacy saves,
-   *  backfilled to 0 in backfillPlayer. */
+  /** ⚠ OTA-1141 — SAVE FOSSIL. DO NOT WIRE ANYTHING TO THIS.
+   *  Hunger was a real mechanic once: +1 every 8 in-game hours unfed, capped
+   *  at 5, shrinking the usable stamina ceiling, reset by eating. It was
+   *  REMOVED — "a hidden, unexplained mechanic whose ONLY effect was shrinking
+   *  this cap; food already tops off HP and water already tops off stamina, so
+   *  it just added invisible friction."
+   *  Nothing writes it and nothing reads it. It survives only so a save written
+   *  before the removal still parses, and `backfillPlayer` forces it to 0 on
+   *  load so an old mid-hunger character comes back uncapped. In the game as it
+   *  stands, EATING IS FOR HP AND STAMINA — there is no hunger to lower. */
   hungerStaminaPenalty?: number;
   /** OTA-625 — weather-damage cooldown. After a damaging weather tick this is
    *  set to WEATHER_TICK_GAP and counts down one per action; while > 0 the

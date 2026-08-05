@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.51';
+export const DISPLAY_VERSION = '4.29.52';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22183,7 +22183,48 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // id in the CUSTOM picker must name a system something actually reads.
 // New suite ota1140RuleDials (22 tests); ota1136 retargeted off `hunger`
 // in three places. DISPLAY_VERSION 4.29.51.
-export const OTA_BUILD_ID = '2026-08-05-1140-rule-dials';
+// OTA-1141 — THE HUNGER CARCASS.
+// Owner, after OTA-1140 removed the hunger DIAL: "we removed hunger,
+// we don't still have that somewhere do we? we eat for HP not to lower
+// hunger, that's a different mechanic."
+// Right on both counts — and the audit found the second half was only
+// half true. The MECHANIC was gone: effectiveStaminaMax stopped
+// reading the penalty and both accrual sites were hardcoded to 0, so
+// nothing got hungry and nothing bit. But the CARCASS was still here,
+// and it was the same failure OTA-1140 had just deleted one floor up —
+// code that LOOKS live and is not.
+// ⚠ THREE PLAYER-FACING LINES THAT COULD NEVER PRINT, each behind a
+// penalty that is permanently zero: a rest REFUSAL ("your wind is
+// choked by hunger, not weariness"), a rest RESULT ("Hunger has capped
+// your wind — sleep can't lift it"), and a drink RESULT ("water won't
+// lift it. Eat a ration"). Plus a heartbeat ledger entry
+// `hunger +N (now -M max)` and an "eat something soon" Arbiter warning
+// behind hardcoded zeros.
+// ⚠ AND A WRITE ON EVERY ACTION IN THE GAME. advanceTime computed an
+// 8-hour bucket, derived a tick count it immediately discarded, and
+// stamped hungerStaminaPenalty onto every player object that passed
+// through — and advanceTime runs on rest, travel, combat, climb, every
+// path that moves the clock.
+// Plus comments in five places still describing the tick as live,
+// including one telling the reader that eating "heals the cap shrink
+// immediately". It heals nothing; there is nothing to heal.
+// ALL REMOVED. What stays, deliberately: the backfillPlayer migration
+// that forces the field to 0 on load (so a save written mid-hunger
+// comes back uncapped) and the field itself on the type — now labelled
+// ⚠ SAVE FOSSIL. DO NOT WIRE ANYTHING TO THIS, with the removal reason
+// beside it. Also kept: rest's `Math.max(0, ...)` stamina clamp. Its
+// CAUSE was hunger driving stamRoom negative, but the invariant it
+// protects — rest must never reduce stamina — is true regardless, so
+// the clamp stays and the comment now says why.
+// ⚠ AND THE ONE THING THIS SWEEP HAD TO NOT BREAK: the DOG's feeding
+// clock. `lastFedAtHour` / loyalty decay is a real, live mechanic that
+// happens to use the same word, and the owner's framing named the
+// distinction exactly. It is untouched, and the suite asserts it.
+// New suite ota1141HungerCarcass (15 tests), whose first assertion is that
+// exactly ONE executable line in gameStore still says the word.
+// DISPLAY_VERSION 4.29.52.
+export const OTA_BUILD_ID = '2026-08-05-1141-hunger-carcass';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1140-rule-dials';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1139-elite-swap';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1138-pipe-loop';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1137-group-equip';

@@ -168,8 +168,16 @@ describe('OTA-1140 — ⚠ the hunger dial is gone, and the file says why', () =
   });
 
   it('the claim is verifiable in the store — hunger genuinely accrues nothing', () => {
+    // RETARGETED BY OTA-1141. This used to assert `const newHunger = 0;` — the
+    // hardcoded zero that proved nothing accrued. The owner then asked whether
+    // anything else was left, and the answer was yes: that zero was still being
+    // WRITTEN onto every player object in advanceTime, alongside three
+    // unreachable narration branches. OTA-1141 deleted the lot, so the evidence
+    // this test wants is now the ABSENCE of the accrual rather than a zeroed
+    // version of it. ota1141HungerCarcass owns the full sweep.
     const store = src('app/state/gameStore.ts');
-    expect(store).toContain('const newHunger = 0;');
+    expect(store).not.toContain('const newHunger = 0;');
+    expect(store).not.toContain('hungerStaminaPenalty: newHunger');
     expect(store).toContain('HUNGER REMOVED');
   });
 });
