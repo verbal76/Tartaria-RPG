@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.53**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.54**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1124,11 +1124,75 @@ rediscovering them.
   context kill — and that is a different investigation from this one. `∅` still
   means the model genuinely said nothing, which is a prompt problem.
 
-- **BOG HOUND SAT OUT A FIGHT** after Silt Thief died (task #175). Carried
-  from an earlier log across a truncated span, so it was never confirmed as a
-  bug. Still unresolved; needs a log that captures the whole encounter.
+- **✅ RESOLVED (OTA-1143) — THE BOG HOUND WAS NOT A ONE-OFF.** This entry stood
+  for weeks as *"carried from an earlier log across a truncated span, so it was
+  never confirmed as a bug — needs a log that captures the whole encounter."*
+  **It never needed the log.** The report was reproducible from a cold read of
+  the code and a nine-line probe: build a two-body pack, run the SAME swing
+  twice, and vary only whether the blow was lethal. Non-lethal, the packmate
+  counters. Lethal, it does not. That probe is now the first two cases of
+  `ota1143VolleyAfterKill`.
+  The cause was four combat paths shaped `if (kill) resolveEnemyDefeat(); else
+  Ellipsis` — a killing blow bought the player the whole group's round. See the
+  §9 entry for the full account.
+  **⚠ THE LESSON FOR THIS LIST:** *"needs a repro on device"* was the wrong
+  verdict. The observation was specific enough to test directly, and holding it
+  for a device log cost weeks on a bug that a probe found in one pass. **Before
+  parking an item as unreproducible, ask whether it can be reproduced in a
+  test** — a player-reported behaviour that names two actors and an ordering
+  usually can.
 
-- **⚠⚠ THE DORMANCY WINDOW, AND THE WORD THAT HID IT (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ THE VOLLEY AFTER A KILL (2026-08-05, latest). BOTH LINES.**
+  HAL OTA-1143 / golem OTA-1120. The second watch-list item closed in a day, and
+  the one that had sat longest without a verdict. Owner: *"Bog Hound sat out a
+  fight after the Silt Thief died."* **It did — and so did every packmate of
+  anything the player ever dropped.**
+  **⚠ ROOT CAUSE, AND IT IS A SHAPE RATHER THAN A SITE.** Four combat paths
+  were written as `if (kill) resolveEnemyDefeat(); else { …volley }`. That
+  `else` reads as *"the enemy is dead, there is nothing left to counter with"* —
+  **true in the SOLO fight those paths were first written for, and false the
+  moment a pack is involved.** A killing blow bought the player the ENTIRE
+  group's round: kill one raider of five and the other four never swung. Chain
+  it, one kill per round, and a pack fight costs nothing at all.
+  The four:
+  1. the **melee attack** path — the one the owner saw;
+  2. the **Beacon Rifle bolt volley**;
+  3. the **coating-throw burst**, whose own comment already promised *"the group
+     still swings back"* — the `else` made that promise conditional on the
+     target SURVIVING, which is the one case a pack most obviously should answer;
+  4. the **dog's killing bite**, which `return`ed straight past the arb169
+     volley eighty lines below. So a dog that KILLED bought the free round that a
+     dog which merely BIT did not — **the arb169 exploit wearing a kill for a
+     hat.**
+  **FIXED with one named guard**, `runSurvivorVolley`, that every killing path
+  routes through. It checks **SURVIVORS, not whether a kill happened**:
+  `resolveEnemyDefeat` clears the scene when the last body falls, so a fight you
+  just ended correctly runs nothing, while a fight with bodies left in it swings
+  back. Initiative is still honoured — a volley already spent to losing
+  initiative is not owed twice — and `skipDotTick` still holds where the caller
+  already ticked.
+  **⚠ THE ONE PATH THAT ALREADY DID IT RIGHT** is the item throw (OTA-825),
+  which closed the identical hole for throws and carries the reasoning in its
+  own comment. It is untouched, and the suite pins it as the model — if its
+  shape ever changes, all five sites need re-reading together.
+  **⚠ THIS MAKES PACK FIGHTS HARDER, AND THAT IS THE POINT.** The swings were
+  always owed. Verified against the balance probe and both combat stress
+  harnesses (`combatStress`, `dogGolemCombatStress`): no regression, no new
+  stalls, no crashes, and the full suite green at 667/5796.
+  New suite `ota1143VolleyAfterKill` (10 tests). **Its first two cases are the probe
+  that found the bug, kept verbatim: the same pack, the same swing, the same
+  roll steps — the ONLY variable is whether the blow was lethal.** Pre-fix the
+  control counters and the subject does not.
+  **⚠ WHAT THIS SAYS ABOUT THE REST OF THE CODEBASE:** the bug was written into
+  four places independently because each was authored against a one-enemy
+  mental model and the `else` looked obviously right in that frame. Worth
+  carrying: **an `else` that encodes an assumption about the world is a
+  liability the moment the world grows a second case.** `useRaceAbility` runs no
+  volley at all, kill or not — that is CONSISTENT rather than kill-only, so it
+  is a design question (are race abilities free actions?) and deliberately not
+  changed here.
+
+- **⚠⚠ THE DORMANCY WINDOW, AND THE WORD THAT HID IT (2026-08-05). BOTH LINES.**
   HAL OTA-1142 / golem OTA-1119. The watch-list item that has outlived more
   OTAs than anything else here, closed with a one-line move. The owner's device
   log, three consecutive lines:
