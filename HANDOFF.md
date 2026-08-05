@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.45**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.46**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -988,6 +988,12 @@ wasted seconds and starving every other job behind it).
    target, spend instantly later, authored fallback when empty. The flourish
    slot proves the pattern. Hard rules: **model never in front of a tap**,
    **every slot has an authored fallback.**
+   ⚠ **FIRST SLOT, named by OTA-1112: the rest-ambush wake beat.** Rest is
+   eight in-game hours of provably-busy player — the ideal generation window —
+   and the beat it feeds is one the owner has already noticed repeating. The
+   authored pool now exists (`engine/restWakeLines.ts`), which satisfies the
+   fallback rule before the bank is written, so this is the cheapest possible
+   first proof of the pattern.
 4. **THE HOMEWORK SLOTS:** adjacent-room flavor (cleanest pilot) · bestiary
    flavor on first kill · vendor small-talk variants · chronicle day
    summaries at rest · rumour + echo-thread phrasing variants. Voiced or
@@ -1030,7 +1036,9 @@ rediscovering them.
   (Day 7 afternoon, Day 8 evening) both hitting is roughly a **5%
   coincidence**, not a broken roll. What IS worth a look is the *wording*: both
   ambushes drew the identical "Something circled while you were out" line, so
-  the dedup on that beat is the real complaint. **No rate change warranted.**
+  the dedup on that beat is the real complaint. **No rate change warranted** —
+  and the line repetition is **✅ RESOLVED in OTA-1112** (the outdoor path was
+  the untouched half of the indoor-ambush OTA; five lines each now).
 
 - **✅ RESOLVED (OTA-1111) — THE NOVELTY GATE PENALISED NEW PLAYERS.** Owner:
   *"if we are looking for not traveled in the last 50 squares, doesn't that
@@ -1075,7 +1083,37 @@ rediscovering them.
   log across a truncated span, so it was never confirmed as a bug. Still
   unresolved; needs a log that captures the whole encounter.
 
-- **HALF (2026-08-05, latest). BOTH LINES.**
+- **THE OUTDOOR HALF OF THE INDOOR-AMBUSH OTA (2026-08-05, latest). BOTH LINES.**
+  golem OTA-1112 / HAL OTA-1135. Owner: *"fix the rest ambush line dedup, or
+  should the llm rework be giving a new line for that?"* Neither framing was
+  quite it — the cause is smaller than "needs new content". The indoor-ambush
+  OTA re-voiced the rest ambush for INDOOR scenes (open-ground images like
+  "circled" are wrong in a sealed room; the unsettling part in there is that it
+  was already in with you) and gave that path **three** lines for the wake beat
+  and three for the arrival. It never came back for the outdoor path, which
+  stayed a single hardcoded string for BOTH beats — so the more common case,
+  resting under open sky, was the one with no variety at all. The rate measured
+  fine (see §WATCH LIST), so repetition was the whole complaint. **Five lines
+  each** now, drawn exactly the way `indoorAmbush` draws its three so the two
+  paths cannot drift apart again; the original line stays in the pool, because
+  the owner has read it many times and losing it would read as a different game
+  rather than the same game with more to say.
+  **⚠ And why authored rather than generated**, which is the question actually
+  asked: (1) it fires AS THE FIGHT STARTS, and this device's own telemetry has
+  the fastest job at ~2s, ambient averaging 11.6s and the slowest at 19.6s — a
+  "you wake to something standing over you" line cannot arrive after the first
+  attack roll, and the headroom track's hard rule is that the model never runs
+  in front of a tap; (2) two of three ambient generations in the last log were
+  DISCARDED, and a beat this dramatic getting nothing two times in three is
+  worse than a repeat; (3) every generated slot needs an authored fallback
+  anyway, so the pool has to exist regardless.
+  **Where the model COULD help later, and it is the best fit in the game:**
+  rest is eight in-game hours during which the player is PROVABLY busy — the
+  ideal bank-and-spend slot. Generate during the sleep, spend on waking, fall
+  back to these when the bank is empty. Needs the bank built first (§OPEN
+  ITEMS item 3). New suite `ota1112OutdoorRestLines` (13 tests).
+
+- **HALF (2026-08-05). BOTH LINES.**
   golem OTA-1111 / HAL OTA-1134. Owner: *"there were sections that every move
   or rest was a fight … let's just 1/2 the chance percentage."*
   **The arithmetic he was feeling:** the wasteland encounter roll was 0.58
