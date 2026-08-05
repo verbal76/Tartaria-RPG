@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.58';
+export const DISPLAY_VERSION = '4.29.59';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22488,7 +22488,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // as a hang." BOTH sides fixed — the chip greys AND the count drops
 // it, because fixing one alone just moves the lie to the other.
 // New suite ota1147AcLedgerAndVoice (19 tests). DISPLAY_VERSION 4.29.58.
-export const OTA_BUILD_ID = '2026-08-05-1147-ac-ledger-and-voice';
+// OTA-1148 — THE FILTER THAT MISSED ITS OWN EXAMPLE.
+// OTA-1147 shipped a first-person OPENER test for the ambient voice
+// slip. The device log arrived minutes later carrying the actual
+// line:
+//   "As I walk through the shadows of the Obsidian Pillars, my eyes
+//    follow the ancient trees that seem to whisper secrets to the
+//    wind."
+// ⚠ IT OPENS WITH "As". The opener test would have let it straight
+// through. I had matched the shape I imagined rather than the shape
+// that happened — and a filter that misses its own motivating example
+// is worth nothing, however well-commented.
+// The real rule is about WHO THE SENTENCE IS ABOUT: it speaks of the
+// narrator and never of the player. So: first person present AND
+// second person absent. Still narrow, and it still cannot eat the
+// feature the way OTA-1054's version did —
+//   · "As I walk … my eyes …"        -> I/my, no you -> DROPPED
+//   · "You have come far; my eyes…"  -> has "you"    -> kept
+//   · "The road behind is longer…"   -> neither      -> kept
+//   · "I remember when you could barely lift that."  -> kept, and
+//     that is correct: it is the companion voice working.
+// ⚠ THE LESSON, WRITTEN DOWN BECAUSE IT WILL RECUR: when a device log
+// hands you the exact failing input, build the guard around THAT
+// STRING, not around a reconstruction of it. OTA-1147 had the line
+// available in the owner's report and still generalised from memory.
+// DISPLAY_VERSION 4.29.59.
+export const OTA_BUILD_ID = '2026-08-05-1148-filter-missed-its-example';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1147-ac-ledger-and-voice';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1146-homework-yields';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1145-the-bank';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1144-cached-prefix';
