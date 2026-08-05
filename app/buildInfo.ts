@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.47';
+export const DISPLAY_VERSION = '4.29.48';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22012,7 +22012,52 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // picker did nothing.
 // New suite ota1136DifficultySystems (34 tests); ota1089Pressure
 // retargeted. DISPLAY_VERSION 4.29.47.
-export const OTA_BUILD_ID = '2026-08-05-1136-difficulty-systems';
+// OTA-1137 — GROUP EQUIP / UNEQUIP, AND THE ONE BUTTON THAT WAS LEFT.
+// Owner: "you should be able to pick your armor hold and select a
+// group and either equip all or unequip all depending on what you
+// selected." He asked for it the way you ask for a convenience. It is
+// not one.
+// ⚠ WHAT THE GROUP BAR ACTUALLY OFFERED A SET OF WORN ARMOR. OTA-1123
+// shipped four group actions: DROP excludes worn gear, RESERVE needs
+// fusion eligibility, RELEASE needs an existing reservation. So for a
+// group of armor you are WEARING, exactly one button has ever
+// appeared, and it is SCRAP — which auto-unequips (OTA-058) and then
+// destroys the piece, irreversibly, one tap past a confirm. The owner
+// hit precisely that: "I did the hold to select multiple and there was
+// only scrap." A screen whose only available verb for your armor is
+// DESTROY IT is not missing a feature; it is a trap, and it shipped.
+// The same session's log shows the character's AC drop from 16 to 10
+// mid-fight against five raiders, then take a hit on nearly every
+// incoming swing and die four rounds later — "I could have won that
+// five-person fight just by standing there and punching them."
+// ⚠ WHY A PLANNER AND NOT A LOOP OVER equipItem(). Slots have
+// CAPACITY. Two chest pieces cannot both go on; a two-hander eats both
+// hands; rings have three slots, not one. A for-loop would "succeed"
+// on every call and end with ONE piece worn and four quietly displaced
+// into the pack, while the button had promised five. A group action's
+// count is a PROMISE, so planGroupEquip resolves contention BEFORE the
+// button is drawn: first-in-list wins the slot, and anything crowded
+// out is NAMED in the bar and again in the confirm.
+// Capacity is seeded FULL rather than from what is already worn,
+// because equipping SWAPS — a new helm replaces the old one, exactly
+// as the one-at-a-time path has always done. The only thing the plan
+// refuses is two SELECTED pieces racing each other, which is the one
+// case the player could not have predicted.
+// Ordering is deliberate: EQUIP and TAKE OFF render BEFORE scrap, so
+// the reversible action is the one under your thumb. And the take-off
+// confirm says what it costs — "your armor class drops by what they
+// were worth" — because armor IS armor class, and the log above is
+// what it looks like when nobody says so.
+// UNEQUIP clears SLOTS, not items: a two-handed weapon holds main AND
+// off, and clearing only the first would leave it half-wielded.
+// And the take-off confirm says it LOUDER mid-fight — "you are in a
+// fight; every swing coming at you lands easier the moment this is
+// off" — because taking armor off in a quiet room is housekeeping and
+// taking it off with five raiders on the tile is the last decision the
+// character makes. Same action; only one of them needs saying aloud.
+// New suite ota1137GroupEquip (23 tests). DISPLAY_VERSION 4.29.48.
+export const OTA_BUILD_ID = '2026-08-05-1137-group-equip';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1136-difficulty-systems';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1135-outdoor-rest-lines';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1134-half-the-roll';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1133-death-screen';

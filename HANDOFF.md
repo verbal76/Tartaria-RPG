@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.47**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.48**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1113,7 +1113,47 @@ rediscovering them.
   from an earlier log across a truncated span, so it was never confirmed as a
   bug. Still unresolved; needs a log that captures the whole encounter.
 
-- **⚠⚠ DIFFICULTY THAT MEANS SOMETHING, AND A CUSTOM PICKER (2026-08-05, latest). BOTH LINES.**
+- **⚠⚠ GROUP EQUIP / UNEQUIP, AND THE ONE BUTTON THAT WAS LEFT (2026-08-05, latest). BOTH LINES.**
+  HAL OTA-1137 / golem OTA-1114. Owner: *"you should be able to pick your armor
+  hold and select a group and either equip all or unequip all depending on what
+  you selected."* He asked for it the way you ask for a convenience. It is not
+  one.
+  **⚠ WHAT THE GROUP BAR ACTUALLY OFFERED A SET OF WORN ARMOR.** OTA-1123
+  shipped four group actions. `DROP` excludes worn gear. `RESERVE` needs fusion
+  eligibility. `RELEASE` needs an existing reservation. So for a group of armor
+  you are WEARING, exactly one button has ever appeared — **SCRAP**, which
+  auto-unequips (OTA-058) and then destroys the piece, irreversibly, one tap
+  past a confirm. The owner hit precisely that: *"I did the hold to select
+  multiple and there was only scrap."* A screen whose only available verb for
+  your armor is DESTROY IT is not a missing feature; it is a trap, and it
+  shipped. The same session's log shows the character's AC drop from **16 to
+  10** mid-fight against five raiders, then take a hit on nearly every incoming
+  swing and die four rounds later — *"I could have won that five-person fight
+  just by standing there and punching them."*
+  **⚠ WHY A PLANNER AND NOT A LOOP OVER `equipItem()`.** Slots have CAPACITY.
+  Two chest pieces cannot both go on; a two-hander eats both hands; rings have
+  three slots, not one. A for-loop would "succeed" on every call and end with
+  ONE piece worn and four quietly displaced into the pack, while the button had
+  promised five. **A group action's count is a PROMISE**, so `planGroupEquip`
+  resolves contention BEFORE the button is drawn: first-in-list wins the slot,
+  and anything crowded out is NAMED in the bar and again in the confirm.
+  **Capacity is seeded FULL, not from what is already worn**, because equipping
+  SWAPS — a new helm replaces the old one, exactly as the one-at-a-time path
+  always has. The only thing the plan refuses is two SELECTED pieces racing each
+  other, which is the one case the player could not have predicted.
+  Ordering is deliberate: **EQUIP and TAKE OFF render BEFORE scrap**, so the
+  reversible action is the one under your thumb. The take-off confirm says what
+  it costs — *"your armor class drops by what they were worth"* — because armor
+  IS armor class, and the log above is what it looks like when nobody says so.
+  **UNEQUIP clears SLOTS, not items:** a two-handed weapon holds main AND off,
+  and clearing only the first would leave it half-wielded. New suite
+  `ota1137GroupEquip` (23 tests).
+  **And the take-off confirm says it LOUDER mid-fight** — *"you are in a fight;
+  every swing coming at you lands easier the moment this is off"* — because
+  taking armor off in a quiet room is housekeeping, and taking it off with five
+  raiders on the tile is the last decision the character makes.
+
+- **⚠⚠ DIFFICULTY THAT MEANS SOMETHING, AND A CUSTOM PICKER (2026-08-05). BOTH LINES.**
   HAL OTA-1136 / golem OTA-1113. Owner, after bringing back a survey of how the
   industry actually builds difficulty: *"go with the best suggestions on each
   category. let's make the difficulty tiers mean something, the effects should

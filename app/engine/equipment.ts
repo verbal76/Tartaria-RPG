@@ -146,6 +146,81 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   return [];
 }
 
+// OTA-1137 — GROUP EQUIP / UNEQUIP. Owner: "you should be able to pick your
+// armor hold and select a group and either equip all or unequip all depending
+// on what you selected."
+//
+// ⚠ WHY THIS IS A PLANNER AND NOT A FOR-LOOP OVER equipItem(). Slots have
+// CAPACITY. Two chest pieces cannot both go on, a two-handed weapon eats both
+// hands, and there are three ring slots rather than one. A naive loop would
+// still "succeed" on every call — it would just equip each piece and let the
+// next one displace it, so a group of five armor pieces would end with ONE worn
+// and four quietly set aside, while the button had promised five. The whole
+// point of the group bar is that its count is a promise; this resolves the
+// contention BEFORE the button is drawn, so the number on it is what lands.
+//
+// Capacity is seeded FULL, not from what is already worn, because equipping
+// swaps: putting a helm on replaces the helm you had. What the plan refuses is
+// two selected items racing for the same slot, which is the only case where the
+// player could not have known what they were asking for.
+export interface GroupEquipPlan {
+  /** In list order — the pieces that will actually go on, and where. */
+  equip: Array<{ item: InventoryItem; slot: EquipSlot }>;
+  /** Equippable, but a piece earlier in the list already claimed the slot. */
+  crowdedOut: InventoryItem[];
+  /** Nothing in the selection fits any slot (materials, consumables, quest junk). */
+  notEquippable: InventoryItem[];
+}
+
+/** Slots that hold more than one piece at a time. Rings have three. */
+const SLOT_CAPACITY: Partial<Record<EquipSlot, number>> = { ring: 3 };
+
+// Catalog-only, matching every other two-handed read on this screen
+// (equippedSlotLabelFor, slotFillLabelFor): a FUSED weapon carries no style, so
+// it is treated as one-handed here exactly as it is everywhere else. Getting
+// that wrong in only this one place would be worse than being uniformly wrong.
+function takesBothHands(item: InventoryItem): boolean {
+  return findWeaponByName(item.name)?.style === 'two_handed';
+}
+
+/**
+ * OTA-1137 — resolve a multi-selection into a conflict-free equip plan.
+ * `worn` is the set of instance ids already on the body: those belong to the
+ * UNEQUIP side of the bar and are skipped here rather than counted as failures,
+ * so a mixed selection produces an honest number on each button.
+ */
+export function planGroupEquip(
+  items: readonly InventoryItem[],
+  worn: ReadonlySet<string>,
+): GroupEquipPlan {
+  const plan: GroupEquipPlan = { equip: [], crowdedOut: [], notEquippable: [] };
+  const used: Partial<Record<EquipSlot, number>> = {};
+  const free = (slot: EquipSlot) => (used[slot] ?? 0) < (SLOT_CAPACITY[slot] ?? 1);
+  const claim = (slot: EquipSlot) => { used[slot] = (used[slot] ?? 0) + 1; };
+
+  for (const item of items) {
+    if (worn.has(item.id)) continue;
+    const slots = validSlotsForItem(item);
+    if (slots.length === 0) { plan.notEquippable.push(item); continue; }
+    // A two-hander needs BOTH hands, so it is only placeable when neither is
+    // spoken for, and it consumes both. Otherwise the second selected weapon
+    // would be counted as equippable and then silently displaced on arrival.
+    if (takesBothHands(item)) {
+      if (free('main') && free('off')) {
+        claim('main'); claim('off');
+        plan.equip.push({ item, slot: 'main' });
+      } else {
+        plan.crowdedOut.push(item);
+      }
+      continue;
+    }
+    const target = slots.find(free);
+    if (target) { claim(target); plan.equip.push({ item, slot: target }); }
+    else plan.crowdedOut.push(item);
+  }
+  return plan;
+}
+
 /** Pretty label for a slot. Used in UI prompts and StatsPanel. */
 export const SLOT_LABEL: Record<EquipSlot, string> = {
   main: 'Main hand',
