@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.35';
+export const DISPLAY_VERSION = '4.29.36';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20952,6 +20952,50 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1125 — THE REPAIR TAB LEARNS THE GRIP, AND LEARNS TO COUNT.
+// Owner: "I thought we were going to do the same tap and hold to
+// multiselct for repair too. it will have to take into account the items
+// needed for each item you sent and dim make items in selectable if the
+// items you selected consume the items needed."
+// The first sentence is OTA-1122/1123's gesture again — hold to start,
+// tap to add or remove, act on the lot — and the sameness is the point.
+// The second is what makes REPAIR different from SELL and DROP: those
+// groups are independent (selling a sword doesn't make the axe
+// unsellable), but repairs all draw from ONE pile, so every pick changes
+// what the next pick can afford.
+//   1. THE RUNNING BUDGET. `repairPlan` walks the selection IN ORDER and
+//      SIMULATES the spend with the engine's own functions —
+//      `missingIngredientsList` to ask "can I still afford this?",
+//      `consumeIngredientsList` to spend it. Both are substitution-aware
+//      (Cloth Scrap standing in for Patched Cloth and so on), so the
+//      dimming matches to the unit what the repairs will actually cost.
+//      Hand-rolled cost arithmetic would drift from the substitution
+//      rules the moment anyone touched them, and the drift would show up
+//      as a button that lies. First ticked, first served — the same
+//      order the repairs then run in.
+//   2. THE DIMMING SAYS WHY, AND SAYS THE RIGHT WHY. A row the budget
+//      can no longer pay for is dimmed, un-tappable, and carries "The
+//      pieces you already picked are spending the materials this needs."
+//      A row you were never able to afford is blocked too — but it keeps
+//      its existing "Missing:" line, because telling that player the
+//      group ate their cloth would be a lie.
+//   3. THE BAR TAKES REPAIR ALL'S SLOT (the 1124 rule, applied here): it
+//      sits outside the ScrollView so it can't scroll away while you
+//      tick rows further down, carries the running bill, and REPAIR ALL
+//      is not rendered while a group is open.
+//   4. THE CONFIRM NAMES THE SKIPS. Stock can shift under a group — a
+//      craft in the next tab, a repair that resolved first — so a picked
+//      piece the budget can't pay for is listed as "Not enough materials
+//      for: … These stay damaged." A group that mends six of the seven
+//      pieces you picked without saying which one it skipped is the exact
+//      bulk-action failure this whole run has been written against.
+// The group reuses `repairInventoryItem` per piece, so there is no second
+// repair path to disagree about cost, substitutions, or eligibility. New
+// suite ota1125RepairGroup (source locks + direct exercises of the
+// simulate/spend pair). One OTA-1121 lock RETARGETED — REPAIR ALL's `&&`
+// became the middle arm of a ternary when the bar took its slot; the
+// condition it guards is unchanged. DISPLAY_VERSION 4.29.36.
+//
 // OTA-1124 — THE GROUP BAR TAKES THE TAB ROW'S PLACE AND HOLDS IT.
 // Owner: "the new line that says sell group needs to stay anchored at
 // the top and replace the buy sell buttons until, you either sell the
@@ -21433,7 +21477,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1124-group-bar-anchored';
+export const OTA_BUILD_ID = '2026-08-05-1125-repair-group-budget';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1124-group-bar-anchored';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1123-inventory-group';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1122-group-sell';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1121-transcript-and-repair-all';
