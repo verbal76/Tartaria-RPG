@@ -5925,6 +5925,12 @@ interface GameStore {
         regard: import('../engine/npcMemory').NpcRegard;
         /** OTA-1113 — teaser taps THIS conversation; rotates the deflection. */
         teaserTaps: number;
+        /** OTA-1118 — where this conversation begins in `gameLog`. The
+         *  conversation view renders `gameLog.slice(startedAtLogLen)` as its own
+         *  transcript, so the replies are readable INSIDE the sheet instead of
+         *  behind it. The log stays the single record of truth — nothing is
+         *  duplicated into a second store of conversation lines. */
+        startedAtLogLen: number;
       }
     | null;
   /** Open a conversation with the named person in the current scene. */
@@ -6374,6 +6380,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       npcId, npcName: target.name, topics, role,
       flourishesUsed: [], flourishCount: 0,
       lockedCount, regard: ctx.regard, teaserTaps: 0,
+      // OTA-1118 — the high-water mark of the feed at the moment the
+      // conversation opens. Everything after it belongs to this exchange.
+      startedAtLogLen: get().gameLog.length,
     } });
     // OTA-1086 — ONE EXCHANGE AHEAD. Fired at the moment the topic list opens,
     // which is the only place in this feature where there is time to spend: the
@@ -7992,7 +8001,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // stuck to the end of a radar line. Exactly the complaint OTA-1074 was
         // written to fix, reintroduced by a debounce written years earlier.
         (meta as { storyBeat?: boolean } | undefined)?.storyBeat !== true &&
-        (lastEntry.meta as { storyBeat?: boolean } | undefined)?.storyBeat !== true;
+        (lastEntry.meta as { storyBeat?: boolean } | undefined)?.storyBeat !== true &&
+        // OTA-1118 — NEVER weld a conversation line onto an entry that predates
+        // the conversation. The talk view renders `gameLog.slice(startedAtLogLen)`
+        // as its transcript, so a first reply merged backwards into the arrival
+        // narration would land OUTSIDE the window and the player would watch
+        // their opening question get no answer — the exact failure this OTA
+        // exists to end, arriving through the debounce instead of the layout.
+        // Merging WITHIN the conversation is still fine and still groups.
+        // (`state.gameLog.length` is the count BEFORE this append, so lastEntry
+        // sits at length-1 and predates the talk exactly when length <= start.)
+        !(state.pendingTalk != null && state.gameLog.length <= state.pendingTalk.startedAtLogLen);
       if (canMerge) {
         const merged = { ...lastEntry, text: `${lastEntry.text}\n\n${text}`, ts: entry.ts };
         const mergedLog = [...state.gameLog.slice(0, -1), merged].slice(-MAX_LOG_IN_MEMORY);
@@ -29081,12 +29100,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     // OTA-873 fix — never upgrade a STACK. Stamping coatingSlots / resistCapBonus on a
-    // quantity>1 row would upgrade every copy for one 5-piece cost. The picker only
-    // offers quantity===1 pieces, so this is a belt-and-suspenders guard on the action.
-    if ((piece.quantity ?? 1) > 1) {
-      get().appendLog('world', `You can only upgrade a single piece at the Crucible — you're holding a stack of ${piece.quantity} ${piece.name}. Split one off first.`);
-      return;
-    }
+    // quantity>1 row would upgrade every copy for one 5-piece cost.
+    // OTA-1117 — that used to REFUSE with "split one off first", which is a dead end:
+    // there is no split action anywhere in the game, so a stacked piece could never be
+    // upgraded at all and the picker hid it. Peel one unit into its own instance
+    // instead — exactly what OTA-800 does for coating a stack — and upgrade that.
+    // The stack itself stays bare, so the one-per-five cost still holds.
+    const isStack = (piece.quantity ?? 1) > 1;
     const isWeaponTarget = isCoatableItem(piece);
     const isArmorTarget = !isWeaponTarget && (
       piece.kind === 'armor' || piece.kind === 'dog_armor'
@@ -29126,18 +29146,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const chosenIds = new Set(chosen.map((i) => i.id));
     set((s) => {
       if (!s.player) return s;
-      const inv = s.player.inventory
+      // OTA-1117 — a stacked target is peeled first: one unit leaves the row and
+      // becomes its own instance, and THAT is what the channel is worked into.
+      const peeledId = isStack ? freshInstanceId('upg') : itemId;
+      const stampUpgrade = (i: InventoryItem): InventoryItem => (isWeaponTarget
+        ? { ...i, coatingSlots: 2 }
+        : { ...i, resistCapBonus: (i.resistCapBonus ?? 0) + 1 });
+      let inv = s.player.inventory
         .map((i) => {
           if (i.id === itemId) {
-            return isWeaponTarget
-              ? { ...i, coatingSlots: 2 }
-              : { ...i, resistCapBonus: (i.resistCapBonus ?? 0) + 1 };
+            // The peeled row keeps quantity-1 units and stays UNupgraded; the
+            // single-instance case is stamped in place as before.
+            return isStack ? { ...i, quantity: i.quantity - 1 } : stampUpgrade(i);
           }
           if (chosenIds.has(i.id)) return { ...i, quantity: Math.max(0, i.quantity - 1), reservedForFusion: false };
           return i;
         })
         .filter((i) => i.quantity > 0);
-      return { player: { ...s.player, inventory: inv, fusionPending: false } };
+      let equipped = s.player.equipped;
+      if (isStack) {
+        inv = [...inv, stampUpgrade({ ...piece, id: peeledId, quantity: 1 })];
+        // OTA-814's lesson, applied here: if the stack was the equipped instance,
+        // re-point the slot at the peeled piece so the channel you just paid for is
+        // the one you're actually carrying.
+        if (equipped?.mainId === itemId || equipped?.offId === itemId) {
+          equipped = {
+            ...equipped,
+            ...(equipped.mainId === itemId ? { mainId: peeledId } : {}),
+            ...(equipped.offId === itemId ? { offId: peeledId } : {}),
+          };
+        }
+      }
+      return { player: { ...s.player, inventory: inv, equipped, fusionPending: false } };
     });
     recordTitleProgress(get, set, { fusionsCompleted: 1 });
     get().appendLog(

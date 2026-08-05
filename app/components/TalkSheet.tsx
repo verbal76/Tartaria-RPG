@@ -1,27 +1,32 @@
-// OTA-1099 — THE CONVERSATION LIVES AT THE BOTTOM OF THE SCREEN.
+// OTA-1118 — TALKING IS ITS OWN SCREEN NOW.
 //
-// Owner, from his first live TALK interaction (Tarek, business topic — the
-// old modal stayed covering the screen): "I think the popup should be at the
-// bottom of the screen like the dice rolls and just have a list of things to
-// ask, and then you close when you want to be done talking. I think all
-// talking should be like this."
+// Owner, from the device: "the talk box is bigger than the exploration window
+// so I don't get to see what he actually says unless I stop talking." Then,
+// weighing the fix: "should talking be a whole separate full or 3/4 screen
+// popup that way the story text is the only thing to read."
 //
-// So this is a BOTTOM SHEET, not a modal: it renders in ExplorationScreen's
-// controls slot — exactly where the DiceRoller goes — replacing the input box
-// while the conversation is open. The feed stays visible above it, which is
-// the whole point: replies land in the feed (engine/dialogue.ts routes them
-// there and always has), and now the player can actually READ them while the
-// topic list waits below.
+// Yes — but only because the REPLIES MOVED IN WITH IT. A full-screen popup
+// that still routed answers to the feed behind it would be the current bug
+// made total: you'd have to close the conversation to read every single line.
+// What makes the tall view work is that the exchange is rendered INSIDE it.
+// Ask, read the answer where you're already looking, ask the next thing. STOP
+// TALKING is a choice, never a step you're forced through to see what was said.
 //
-// The exchange STAYS OPEN after a topic is raised — the reply goes to the
-// feed, the list re-renders with that topic spent, and the player asks
-// something else or taps STOP TALKING. That is what makes it a conversation
-// rather than a menu that fires once.
+// The transcript is `gameLog.slice(pendingTalk.startedAtLogLen)` — a WINDOW on
+// the real feed, not a copy. dialogue.ts still routes every reply through
+// appendLog exactly as it always has, so the exploration log remains the whole
+// record and closing the conversation leaves the history intact behind it.
+//
+// The collapse bar (OTA-1117's approved design, kept as an OPTION rather than a
+// requirement): the sheet drops to a single breadcrumb row showing who you're
+// talking to and how many questions are left, so you can read the world behind
+// it and tap once to come back. Nothing is lost on collapse — same conversation,
+// same scroll, same spent topics.
 //
 // No spinner, no async, no model. See engine/dialogue.ts.
 
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import React, { useMemo, useRef, useState } from 'react';
+import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { lockedTeaserLabel } from '../engine/dialogue';
 
@@ -31,86 +36,188 @@ export function TalkSheet() {
   const close = useGameStore((s) => s.closeTalk);
   const tapTeaser = useGameStore((s) => s.tapLockedTeaser);
   const talked = useGameStore((s) => s.worldMemory.talkedTopics);
+  const gameLog = useGameStore((s) => s.gameLog);
+
+  // Collapsed = breadcrumb only. Local state: a conversation that survives a
+  // collapse is the point, so this must NOT live in the store's pendingTalk
+  // (which persists) — it's a view preference for this glance, nothing more.
+  const [collapsed, setCollapsed] = useState(false);
+  const transcriptRef = useRef<ScrollView | null>(null);
+
+  const spent = useMemo(() => {
+    const npcId = ctx?.npcId;
+    return (topicId: string, lineCount: number) =>
+      !!npcId && (talked?.[`${npcId}:${topicId}`] ?? 0) >= lineCount;
+  }, [ctx?.npcId, talked]);
+
+  // Unasked first, asked sunk — but never hidden. A list that silently shrinks
+  // reads as the game losing content, and the player has no way to tell "asked
+  // already" from "never existed". Authored order is preserved inside each half
+  // (Array.prototype.sort is stable), so the ladder still reads as a ladder.
+  const ordered = useMemo(() => {
+    if (!ctx) return [];
+    return [...ctx.topics].sort((a, b) => {
+      const aAsked = spent(a.id, a.lines.length);
+      const bAsked = spent(b.id, b.lines.length);
+      return aAsked === bAsked ? 0 : aAsked ? 1 : -1;
+    });
+  }, [ctx, spent]);
+
+  const remaining = useMemo(
+    () => ordered.filter((t) => !spent(t.id, t.lines.length)).length,
+    [ordered, spent],
+  );
+
+  // The exchange itself: every feed line since this conversation opened. Sliced,
+  // not stored — the log is the record of truth and this is a window on it.
+  const transcript = useMemo(
+    () => (ctx ? gameLog.slice(Math.min(ctx.startedAtLogLen, gameLog.length)) : []),
+    [ctx, gameLog],
+  );
 
   if (!ctx) return null;
 
-  const spent = (topicId: string, lineCount: number) =>
-    (talked?.[`${ctx.npcId}:${topicId}`] ?? 0) >= lineCount;
+  const breadcrumb = (
+    <TouchableOpacity
+      style={styles.bar}
+      onPress={() => setCollapsed(false)}
+      activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={`Talking with ${ctx.npcName}, ${remaining} question${remaining === 1 ? '' : 's'} left. Tap to reopen.`}
+    >
+      <View style={styles.barLeft}>
+        <Text style={styles.barChevron}>▴</Text>
+        <Text style={styles.barName} numberOfLines={1}>{ctx.npcName}</Text>
+      </View>
+      <Text style={styles.barCount}>
+        {remaining > 0 ? `${remaining} left` : 'nothing left to ask'}
+      </Text>
+    </TouchableOpacity>
+  );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.kicker}>CONVERSATION</Text>
-        <Text style={styles.hint}>replies land in the feed above</Text>
-      </View>
-      <Text style={styles.npcName}>{ctx.npcName}</Text>
+    <>
+      {/* The breadcrumb holds the controls slot whether the sheet is up or not,
+          so collapsing never leaves an empty gap where the input box was. */}
+      {breadcrumb}
 
-      {/* The list of things to ask — capped so the sheet never grows into a
-          screen cover; past the cap it scrolls within itself. */}
-      <ScrollView style={styles.topics} contentContainerStyle={styles.topicsInner}>
-        {ctx.topics.map((t) => {
-          const asked = spent(t.id, t.lines.length);
-          return (
+      <Modal
+        visible={!collapsed}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setCollapsed(true)}
+      >
+        <View style={styles.backdrop}>
+          <View style={styles.sheet}>
+            <View style={styles.header}>
+              <View style={styles.headerText}>
+                <Text style={styles.kicker}>CONVERSATION</Text>
+                <Text style={styles.npcName} numberOfLines={1}>{ctx.npcName}</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.collapseBtn}
+                onPress={() => setCollapsed(true)}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Collapse the conversation — it stays open"
+              >
+                <Text style={styles.collapseText}>▾</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* THE EXCHANGE — the reason this view exists. */}
+            <ScrollView
+              ref={transcriptRef}
+              style={styles.transcript}
+              contentContainerStyle={styles.transcriptInner}
+              onContentSizeChange={() => transcriptRef.current?.scrollToEnd({ animated: true })}
+            >
+              {transcript.length === 0 ? (
+                <Text style={styles.transcriptEmpty}>
+                  {ctx.npcName} waits for you to say something.
+                </Text>
+              ) : (
+                transcript.map((e) => (
+                  <Text key={e.id} style={styles.transcriptLine}>{e.text}</Text>
+                ))
+              )}
+            </ScrollView>
+
+            <Text style={styles.trayLabel}>ASK ABOUT</Text>
+
+            <ScrollView style={styles.topics} contentContainerStyle={styles.topicsInner}>
+              {ordered.map((t) => {
+                const asked = spent(t.id, t.lines.length);
+                return (
+                  <TouchableOpacity
+                    key={t.id}
+                    style={[styles.topicBtn, asked && styles.topicBtnSpent]}
+                    onPress={() => raise(t.id)}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel={asked ? `${t.label}, already asked` : t.label}
+                  >
+                    <Text style={[styles.topicText, asked && styles.topicTextSpent]}>
+                      {asked ? `${t.label}  (asked)` : t.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+
+              {/* OTA-1113 — the door the player can see: a COUNT of what's still
+                  gated shut, never the labels. Appears only once this person has
+                  placed you (lockedCount is 0 below `known` and for the wronged).
+                  Tapping it gets an in-voice deflection — the person telling you,
+                  in character, that the rest is earned. */}
+              {ctx.lockedCount > 0 && (
+                <TouchableOpacity
+                  style={styles.teaserBtn}
+                  onPress={tapTeaser}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${ctx.lockedCount} locked topic${ctx.lockedCount > 1 ? 's' : ''} — ask about them`}
+                >
+                  <Text style={styles.teaserText}>
+                    {lockedTeaserLabel(ctx.npcName, ctx.regard, ctx.lockedCount)}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </ScrollView>
+
             <TouchableOpacity
-              key={t.id}
-              // A spent topic stays VISIBLE and marked rather than vanishing: a
-              // list that silently shrinks reads as the game losing content, and
-              // the player has no way to tell "asked already" from "never
-              // existed".
-              style={[styles.topicBtn, asked && styles.topicBtnSpent]}
-              onPress={() => raise(t.id)}
+              style={styles.stopBtn}
+              onPress={close}
               activeOpacity={0.7}
               accessibilityRole="button"
-              accessibilityLabel={asked ? `${t.label}, already asked` : t.label}
+              accessibilityLabel="Stop talking"
             >
-              <Text style={[styles.topicText, asked && styles.topicTextSpent]}>
-                {asked ? `${t.label}  (asked)` : t.label}
-              </Text>
+              <Text style={styles.stopText}>STOP TALKING</Text>
             </TouchableOpacity>
-          );
-        })}
-
-        {/* OTA-1113 — the door the player can see: a COUNT of what's still
-            gated shut, never the labels. Appears only once this person has
-            placed you (lockedCount is 0 below `known` and for the wronged).
-            Tapping it gets an in-voice deflection in the feed — the person
-            telling you, in character, that the rest is earned. */}
-        {ctx.lockedCount > 0 && (
-          <TouchableOpacity
-            style={styles.teaserBtn}
-            onPress={tapTeaser}
-            activeOpacity={0.7}
-            accessibilityRole="button"
-            accessibilityLabel={`${ctx.lockedCount} locked topic${ctx.lockedCount > 1 ? 's' : ''} — ask about them`}
-          >
-            <Text style={styles.teaserText}>
-              {lockedTeaserLabel(ctx.npcName, ctx.regard, ctx.lockedCount)}
-            </Text>
-          </TouchableOpacity>
-        )}
-      </ScrollView>
-
-      <TouchableOpacity
-        style={styles.stopBtn}
-        onPress={close}
-        activeOpacity={0.7}
-        accessibilityRole="button"
-        accessibilityLabel="Stop talking"
-      >
-        <Text style={styles.stopText}>STOP TALKING</Text>
-      </TouchableOpacity>
-    </View>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
-// Same skin as the DiceRoller this sheet shares a slot with — one bottom-of-
-// screen interaction language, house tokens only.
+// House tokens only — the same parchment-on-soot palette the DiceRoller and the
+// old bottom sheet used, so the tall view reads as the same game, just bigger.
 const styles = StyleSheet.create({
-  container: {
+  // 12% of the screen left uncovered at the top: enough to keep the player
+  // oriented (this is a layer over the world, not a different app) without
+  // giving the exchange less room than it needs.
+  backdrop: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.72)',
+  },
+  sheet: {
+    height: '88%',
     backgroundColor: '#13110f',
     borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 6,
+    borderTopWidth: 1,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
     padding: 14,
     gap: 8,
   },
@@ -119,29 +226,51 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  headerText: { flex: 1 },
   kicker: {
     color: '#c9a86a',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 2,
   },
-  hint: {
-    color: '#a2977b',
-    fontSize: 10,
-    fontStyle: 'italic',
-  },
   npcName: {
     color: '#cdbf99',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     letterSpacing: 1,
+    marginTop: 2,
   },
-  topics: {
-    maxHeight: 230,
+  collapseBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#3a342c',
   },
-  topicsInner: {
-    gap: 6,
+  collapseText: { color: '#c9a86a', fontSize: 16, fontWeight: '700' },
+  // The exchange gets the larger share: this is what the owner could not read.
+  transcript: {
+    flex: 1,
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 6,
+    backgroundColor: '#0f0d0b',
+    paddingHorizontal: 10,
   },
+  transcriptInner: { paddingVertical: 10, gap: 10 },
+  transcriptLine: { color: '#e6d8b3', fontSize: 15, lineHeight: 22 },
+  transcriptEmpty: { color: '#a2977b', fontSize: 14, fontStyle: 'italic', lineHeight: 20 },
+  trayLabel: {
+    color: '#8aa0a4',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.6,
+    marginTop: 2,
+  },
+  // Capped so a 16-topic vendor cannot push the exchange off the screen — the
+  // exact failure this OTA exists to fix, reintroduced from the other side.
+  topics: { maxHeight: '34%' },
+  topicsInner: { gap: 6 },
   topicBtn: {
     borderColor: '#6b5c3a',
     borderWidth: 1,
@@ -150,16 +279,9 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     paddingHorizontal: 12,
   },
-  topicBtnSpent: {
-    borderColor: '#3a342c',
-  },
-  topicText: {
-    color: '#e6d8b3',
-    fontSize: 14,
-  },
-  topicTextSpent: {
-    color: '#a2977b',
-  },
+  topicBtnSpent: { borderColor: '#3a342c' },
+  topicText: { color: '#e6d8b3', fontSize: 14 },
+  topicTextSpent: { color: '#a2977b' },
   // OTA-1113 — the teaser row reads as a held door, not a question: dashed
   // border, muted ink, same tap affordance as the topics above it.
   teaserBtn: {
@@ -171,11 +293,7 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     paddingHorizontal: 12,
   },
-  teaserText: {
-    color: '#a2977b',
-    fontSize: 14,
-    fontStyle: 'italic',
-  },
+  teaserText: { color: '#a2977b', fontSize: 14, fontStyle: 'italic' },
   stopBtn: {
     backgroundColor: '#3a342c',
     borderRadius: 4,
@@ -188,4 +306,21 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 2,
   },
+  // The collapsed breadcrumb: one row in the controls slot, same height as the
+  // input box it stands in for, so collapsing doesn't shift the feed.
+  bar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#17150f',
+    borderColor: '#6b5c3a',
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  barLeft: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
+  barChevron: { color: '#c9a86a', fontSize: 14, fontWeight: '700' },
+  barName: { color: '#cdbf99', fontSize: 14, fontWeight: '700', letterSpacing: 1 },
+  barCount: { color: '#a2977b', fontSize: 11, fontStyle: 'italic' },
 });
