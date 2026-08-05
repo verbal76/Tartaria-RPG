@@ -262,6 +262,21 @@ export class LlamaRuntime {
       // Prefer assembled tokens (already stripped of prompt) but fall back to
       // the final text the native side returns.
       const text = (assembled || result.text || '').trim();
+      // ⚠ OTA-1107 — llama.cpp has been computing the exact read/write split
+      // this whole time and we were throwing the object away. OTA-1106's whole
+      // diagnosis (prefill dominates) was INFERRED from wall-clock; `timings`
+      // states it outright, per call, for free. Optional-chained throughout:
+      // the field is absent in older llama.rn builds and in the jest mock, and
+      // a missing number must never cost a generation.
+      const t = (result as { timings?: {
+        prompt_ms?: number; predicted_ms?: number;
+        prompt_n?: number; predicted_n?: number;
+      } }).timings;
+      const r = result as {
+        tokens_evaluated?: number; tokens_predicted?: number;
+        tokens_cached?: number; stopped_eos?: boolean;
+        stopped_limit?: number; stopping_word?: string;
+      };
       recordQwenCall({
         job: opts.job ?? 'unlabeled',
         totalMs: Date.now() - telT0,
@@ -269,6 +284,16 @@ export class LlamaRuntime {
         chars: text.length,
         outcome: text.length > 0 ? 'ok' : 'empty',
         at: telT0,
+        prefillMs: typeof t?.prompt_ms === 'number' ? Math.round(t.prompt_ms) : undefined,
+        decodeMs: typeof t?.predicted_ms === 'number' ? Math.round(t.predicted_ms) : undefined,
+        promptTokens: r.tokens_evaluated ?? t?.prompt_n,
+        outTokens: r.tokens_predicted ?? t?.predicted_n,
+        cachedTokens: r.tokens_cached,
+        stop: r.stopped_eos ? 'eos'
+          : r.stopped_limit ? 'limit'
+          : r.stopping_word ? 'word'
+          : 'unknown',
+        promptChars: prompt.length,
       });
       return text;
     } catch (err) {
@@ -279,6 +304,7 @@ export class LlamaRuntime {
         chars: 0,
         outcome: 'error',
         at: telT0,
+        promptChars: prompt.length,
       });
       throw err;
     } finally {

@@ -923,9 +923,81 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.40**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.41**; ledger in `VERSION.md`.
 
-- **⚠ THE STALL WAS THE PROMPT, NOT THE MODEL (2026-08-05, latest). BOTH
+### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
+
+Owner's direction: *"do it, and log the rest as open items that we can
+continue to work on. I don't want to lose this train of thought."* Everything
+below is **OTA-able and ships to all three lines** unless marked build-bound.
+
+**The premise:** the app pays the full cost of carrying a 400MB on-device
+model and extracts very little from it — while betting on that same model to
+cover the content gap the production audit flagged. The fix is never to put
+the model in front of a tap; it is to spend its idle time and stop wasting
+its working time.
+
+**SHIPPED:** golem OTA-1105 telemetry · OTA-1106 lean ambient + capped pack
+(prefill was the stall — NOT the native rebuild parked on this line) ·
+OTA-1107 native timings + wasted-work accounting.
+
+**NEXT — in order:**
+
+1. **Read the next device log first.** OTA-1107 hands over read/write splits,
+   prompt token counts, HIT-CAP flags, cache-reuse counts and a wasted-work
+   total. Three items below are decided by that data, not by opinion.
+2. **STABLE PROMPT PREFIX (pending cache data).** If `tokens_cached` reads
+   zero all session, every generation re-reads its whole prompt. Reordering
+   `buildSystemPrompt` so the invariant block (persona + voice rules +
+   instruction) comes FIRST and volatile scene facts LAST would let
+   llama.cpp reuse the cached prefix. Potentially a 1106-sized win on every
+   job at once. Pure JS.
+3. **THE BANK (bank-and-spend).** Generate while the player is provably busy
+   (8-hour rest, travel leg, a sheet they are reading), store keyed to its
+   target, spend instantly later, authored fallback when empty. The flourish
+   slot proves the pattern. Hard rules: **model never in front of a tap**,
+   **every slot has an authored fallback.**
+4. **THE HOMEWORK SLOTS:** adjacent-room flavor (cleanest pilot) · bestiary
+   flavor on first kill · vendor small-talk variants · chronicle day
+   summaries at rest · rumour + echo-thread phrasing variants. Voiced or
+   silent follows the channel each line lands in.
+5. **TOKEN-BUDGET TRIM (pending HIT-CAP data).** If narration routinely stops
+   at the cap it is truncated mid-sentence at maximum cost — adjust per job
+   using the stop-reason counts.
+6. **REMAINING DIAGNOSTICS:** lock-holder attribution (waiting behind Kokoro
+   or another generation?) · battery/thermal state so a slow late session
+   reads as throttling · the per-job rollup folded into the bug-report export.
+7. **BUILD-BOUND, STAYS PARKED HERE (Phase 6):** native config only —
+   `n_predict` 120→40, thread count off 4, warm context between turns — plus
+   live LLM NPC conversation. ⚠ Note the correction OTA-1106 forced: speed
+   work was assumed to live here and mostly does **not**.
+
+- **DEEP LLM TELEMETRY (2026-08-05, latest). BOTH LINES.**
+  The native numbers + the wasted work. golem OTA-1107 / HAL OTA-1130. Step 3
+  of the LLM-headroom track. OTA-1106 proved prefill dominance by INFERRING it
+  from wall-clock; llama.cpp returns a `timings` object on every completion
+  with the exact split and the runtime was throwing it away. Five additions:
+  (1) **READ vs WRITE, measured** (`prompt_ms` / `predicted_ms`) — the pair
+  points at completely different fixes (trim the prompt vs cut the budget).
+  (2) **PROMPT SIZE in the model's own tokens** (`tokens_evaluated`).
+  (3) ⚠ **WASTED WORK.** A discarded line costs exactly what a delivered one
+  costs, and every one recorded as a clean success: narration cancelled
+  because the player acted again, ambient filtered as a near-duplicate or a
+  wrong-shaped opener, a flourish arriving after they walked away.
+  `noteQwenDiscarded(reason)` attributes to the LAST call — safe because the
+  native-ML lock (arb159) guarantees generations never overlap — logs
+  `qwen⏱ ✂ DISCARDED …` as it happens, and the rollup ends with
+  `WASTED n calls / Ns`. This is what decides whether a job is worth keeping,
+  and the only honest way to price the background work coming next.
+  (4) **STOP REASON** — natural end vs the token cap; the per-call line flags
+  `HIT-CAP` (full price AND truncated prose).
+  (5) **CACHE REUSE** (`tokens_cached`) — a persistent ZERO means every call
+  re-reads its whole prompt, making a stable prompt PREFIX the next
+  1106-sized win. Decided by the metric, not a guess.
+  All optional-chained for older llama.rn / jest mocks. Suite
+  `ota1107DeepTelemetry`. **Rest of the track: see OPEN ITEMS above.**
+
+- **⚠ THE STALL WAS THE PROMPT, NOT THE MODEL (2026-08-05). BOTH
   LINES.** golem OTA-1106 / HAL OTA-1129. Step 2 of the LLM-headroom track;
   OTA-1105's telemetry paid for itself on its FIRST device log:
   ```
