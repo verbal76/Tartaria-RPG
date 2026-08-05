@@ -285,12 +285,33 @@ export class QwenGenerativeEngine {
   async dispose(): Promise<void> {
     // OTA-1107 — mark any in-flight load stale (see lifecycleGen above).
     this.lifecycleGen += 1;
+    // ⚠ OTA-1142 — STATUS LEAVES 'ready' FIRST, AND THIS IS THE WHOLE FIX.
+    // `isDormant()` is defined as "status==='ready' but the runtime is gone",
+    // and this method used to produce exactly that state for as long as its own
+    // teardown took. LlamaRuntime.dispose() nulls its context SYNCHRONOUSLY on
+    // entry (the OTA-arb crash fix: detach before release so nothing can start
+    // a completion against a freed context) and then AWAITS the release behind
+    // the native-ML lock. So from the first line of that await until this
+    // function returned, the engine reported ready-over-dead — the watchdog's
+    // exact dormancy signature — for however long the in-flight generation held
+    // the lock. The owner's log has item synthesis holding it for 10.4s.
+    // The device log then showed the cost outright:
+    //   OTA session start … → item_synthesis empty 8809ms read 0ms/write 0ms
+    //   in 309t→out 0t (0ch) → qwen-watchdog: Qwen dormant … reinitializing
+    // 8.8 seconds of wall time with ZERO prefill and ZERO decode: a call that
+    // entered a detached context, did no native work, and returned nothing —
+    // and it happened seconds after an OTA session start, which is the one
+    // shutdown path that runs in the FOREGROUND where OTA-1107's
+    // don't-reload-while-backgrounded guard does not apply.
+    // Setting status here costs nothing and closes the window entirely: an
+    // engine that is shutting down now says 'idle', which is true, instead of
+    // 'ready', which was never true once the context was detached.
+    this.status = 'idle';
+    this.downloadFraction = 0;
     if (this.runtime) {
       try { await this.runtime.dispose(); } catch { /* best effort */ }
       this.runtime = null;
     }
-    this.status = 'idle';
-    this.downloadFraction = 0;
   }
 }
 

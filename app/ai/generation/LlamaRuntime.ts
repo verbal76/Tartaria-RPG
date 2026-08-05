@@ -282,7 +282,19 @@ export class LlamaRuntime {
         totalMs: Date.now() - telT0,
         waitMs: Math.max(0, telLockAt - telT0),
         chars: text.length,
-        outcome: text.length > 0 ? 'ok' : 'empty',
+        // ⚠ OTA-1142 — DISTINGUISH "the model said nothing" FROM "there was no
+        // model". Both used to record as `empty`, and the device log had one of
+        // each: a real silent generation, and `empty 8809ms read 0ms/write 0ms
+        // in 309t→out 0t` — 8.8 seconds of wall time with ZERO prefill and ZERO
+        // decode, moments after an OTA session start, three seconds before the
+        // watchdog announced dormancy. That second one never touched the native
+        // side at all; it ran against a context that had already been detached.
+        // `this.context` is nulled synchronously the moment dispose() begins, so
+        // checking it HERE — after the await, when we know what we got back —
+        // says whether the context outlived the call. A prompt problem and a
+        // lifecycle problem get investigated in opposite directions, so filing
+        // them under one word cost a whole round of guessing.
+        outcome: text.length > 0 ? 'ok' : (this.context === null ? 'dormant' : 'empty'),
         at: telT0,
         prefillMs: typeof t?.prompt_ms === 'number' ? Math.round(t.prompt_ms) : undefined,
         decodeMs: typeof t?.predicted_ms === 'number' ? Math.round(t.predicted_ms) : undefined,
@@ -302,7 +314,9 @@ export class LlamaRuntime {
         totalMs: Date.now() - telT0,
         waitMs: Math.max(0, telLockAt - telT0),
         chars: 0,
-        outcome: 'error',
+        // Same split on the throw path: a native call that blew up because the
+        // context vanished under it is a lifecycle event, not a model error.
+        outcome: this.context === null ? 'dormant' : 'error',
         at: telT0,
         promptChars: prompt.length,
       });
