@@ -144,7 +144,14 @@ describe('OTA-1130 — the four waste sites are wired', () => {
   const store = src('app/state/gameStore.ts');
 
   it('⚠ narration cancelled mid-flight is reported, not silently swallowed', () => {
-    expect(store).toContain("noteQwenDiscarded('cancelled:player-acted-again'); return;");
+    // ⚠ RETARGETED BY OTA-1152 — the recurring lesson, again: an assertion that
+    // spans a line break fails on REFLOW rather than on meaning. The reason
+    // string became a ternary (a background fill reports `intro-fill:preempted`
+    // instead, because being cut short is its ordinary outcome and not a loss),
+    // so the call now wraps across four lines. Anchored on the reason itself,
+    // which is what "is reported, not silently swallowed" actually means.
+    expect(store).toContain("'cancelled:player-acted-again'");
+    expect(store).toContain('noteQwenDiscarded(');
   });
 
   it('narration falling back to a template is reported with WHICH reason', () => {

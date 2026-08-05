@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.61';
+export const DISPLAY_VERSION = '4.29.62';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22617,7 +22617,69 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ceiling AND a floor: re-inflation is caught, and so is a second
 // round of cutting done quietly. Four older suites retargeted, each
 // noting WHY its number moved. DISPLAY_VERSION 4.29.61.
-export const OTA_BUILD_ID = '2026-08-05-1151-said-it-four-times';
+// OTA-1152 — THE SCENE INTRO COMES OFF THE CRITICAL PATH.
+// The owner's call, taken with OTA-1151's arithmetic in front of
+// them. That OTA measured the beat and then said plainly it could
+// not fix it: 19.3s = 3.7 wait + 11.0 read + 3.5 write + ~1.0 other,
+// and even a ZERO-token prompt leaves ~8s. There is no prompt small
+// enough. The only move left is to stop the player waiting — which
+// is exactly what OTA-1145's bank did for the ambient musing, aimed
+// now at the arrival beat.
+// ⚠ WHY AN INTRO IS PRE-GENERATABLE. Same reason a musing is: it is
+// about a PLACE, and the place is knowable before the player gets
+// there. `canonicalLocationAtCell` is a plain index lookup, so the
+// named location on each of the four adjacent cells reads for free —
+// nothing is built, rolled, or mutated to find out where they might
+// step. The CURRENT location is a candidate too, and deliberately
+// FIRST: most tiles carry no named location, so a cardinal step
+// usually rebuilds the scene right where the player already stands.
+// That is the most frequently spent entry, not an afterthought.
+// ⚠ WHAT A PRE-WRITTEN INTRO CANNOT KNOW. Weather, hazards, enemies
+// and the vendor are rolled at ARRIVAL by beginScene. The prefetch
+// slice carries the destination's STATIC facts only — name, type,
+// authored description — and passes null for the rest rather than
+// guessing. An intro that says nothing about the sky can never
+// contradict the sky. (SceneSlice.weather became nullable to say so;
+// deriveEnvironment had always guarded `scene.weather?.name`, so the
+// type is catching up with the code.)
+// ⚠ AND THE THREE THINGS A BACKGROUND FILL MUST NOT DO, each of
+// which would have been a real bug:
+//   1. NOT MIRROR ITS TOKENS. partialArbiterText renders live under
+//      "The Arbiter:" — streaming a fill would show the player a
+//      description of a room they are not standing in.
+//   2. NOT OWN THE EPOCH. The epoch cancels an in-flight REACTION on
+//      the player's next action. Bumping it here would cancel a live
+//      narration they ARE waiting on, then cancel the fill itself
+//      the moment they act — throwing away the very work the bank
+//      exists to keep.
+//   3. RELEASE isGenerating ON ITS OWN TERMS, precisely because it
+//      never bumped the epoch: the live path's `myEpoch === epoch`
+//      release would not fire, and every later generation would
+//      wedge behind a background job that had already finished.
+// Everything else is SHARED with the live path on purpose — the
+// prompt, the streaming, and the whole vetting chain — so the bank
+// stores VETTED prose. A spent line has already passed the
+// foreign-word strip, the sentence cap, the third-person filter, the
+// echo detector and the off-canon entity guard. A second, quietly
+// different narrator was the thing to avoid.
+// The fill uses the OTHER idle signal: not `uiIdleSince` (stamped by
+// stationary screens, and never set while walking, which is exactly
+// when an intro is wanted) but TIME SINCE THE LAST ACTION. Six
+// seconds of stillness is reading time, and reading time is when the
+// next room gets written. That lets homework run during normal play,
+// which is only defensible because OTA-1146 built the harness first:
+// the fill queues BELOW the voice and is cut short the instant a real
+// generation is enqueued.
+// New suite ota1152SceneIntroBank (33 tests). Three older suites
+// retargeted — and all three broke the SAME way, worth recording:
+// an assertion anchored on a text WINDOW rather than on structure.
+// One searched the whole file for `if (opts?.bankOnly) {` and found
+// the new block in a different function; two spanned a line break
+// that reflowed. Anchor on the function first, then the block, then
+// on what comes NEXT rather than what encloses.
+// DISPLAY_VERSION 4.29.62.
+export const OTA_BUILD_ID = '2026-08-05-1152-scene-intro-bank';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1151-said-it-four-times';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1150-homework-and-ms-per-token';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1148-filter-missed-its-example';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1147-ac-ledger-and-voice';

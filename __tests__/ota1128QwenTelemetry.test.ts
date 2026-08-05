@@ -112,7 +112,13 @@ describe('OTA-1128 — every consumer is labeled', () => {
     const store = src('app/state/gameStore.ts');
     const fusion = src('app/engine/itemFusion.ts');
     // Narration is labeled PER-INTENT — the exact grain OTA-1116 asked for.
-    expect(store).toContain('job: `narration:${intent}`');
+    // ⚠ RETARGETED BY OTA-1152, same reflow lesson as the ambient label two
+    // lines down: narration now names two jobs too. The live line stays
+    // `narration:<intent>`; a pre-generated one is `narration:<intent>_fill`
+    // so the bank's cost is priced apart from the wait it exists to remove.
+    // Anchored on the two template fragments, neither of which spans a break.
+    expect(store).toContain('`narration:${intent}`');
+    expect(store).toContain('`narration:${intent}_fill`');
     // RETARGETED BY OTA-1146 — the ambient consumer now names TWO jobs: the
     // live line stays 'ambient', and the bank's rest-filler is 'ambient_fill'
     // so idle work is priced separately from work the player is waiting on.
