@@ -8,7 +8,7 @@ import {
   groupInventoryByCategory,
 } from '../components/InventoryCategorize';
 import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types';
-import { validSlotsForItem, SLOT_LABEL, wornInstanceIds, byWornFirst } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, wornInstanceIds, byWornFirst, planGroupEquip } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isFusedInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
@@ -142,6 +142,10 @@ export function InventoryScreen() {
   const legendTextColor = useReadableMuted();
   const equipItem = useGameStore((s) => s.equipItem);
   const unequipSlot = useGameStore((s) => s.unequipSlot);
+  // OTA-1137 — is something swinging at you right now? The take-off confirm
+  // says a different thing mid-fight, because that is the case the owner's
+  // death log actually is: AC 16 → 10 with five raiders on the tile.
+  const inCombatNow = useGameStore((s) => (s.currentScene?.enemies?.length ?? 0) > 0);
   const dropInventoryItem = useGameStore((s) => s.dropInventoryItem);
   const useInventoryItem = useGameStore((s) => s.useInventoryItem);
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
@@ -199,7 +203,7 @@ export function InventoryScreen() {
   const [invSelectMode, setInvSelectMode] = useState(false);
   const [invSelected, setInvSelected] = useState<string[]>([]);
   // Which group action is awaiting confirmation; null = no modal up.
-  const [invGroupAction, setInvGroupAction] = useState<'drop' | 'scrap' | 'reserve' | 'release' | null>(null);
+  const [invGroupAction, setInvGroupAction] = useState<'drop' | 'scrap' | 'reserve' | 'release' | 'equip' | 'unequip' | null>(null);
   // arb108 — per-category collapse. Tapping a section header folds that whole
   // category away so the player can skip past Weapons/Armor to reach Materials /
   // Food without scrolling through every row. Keyed by category id; default open.
@@ -374,6 +378,21 @@ export function InventoryScreen() {
       reserveManyForFusion(reservable.map((i) => i.id), true);
     } else if (invGroupAction === 'release') {
       reserveManyForFusion(releasable.map((i) => i.id), false);
+    } else if (invGroupAction === 'equip') {
+      // OTA-1137 — snapshot the plan before the first equip, because each one
+      // rewrites player.equipped and every derived list this render read from.
+      // The plan already resolved slot contention, so this is a straight walk:
+      // no piece here can displace another piece here.
+      for (const step of equipPlan.equip.map((e) => ({ name: e.item.name, id: e.item.id, slot: e.slot }))) {
+        equipItem(step.name, step.slot, step.id);
+      }
+    } else if (invGroupAction === 'unequip') {
+      // Clear every slot the selection occupies. Slots, not items: a two-handed
+      // weapon holds main AND off, and clearing only the first would leave a
+      // half-wielded weapon behind.
+      for (const slot of [...new Set(unequippable.flatMap((r) => r.slots))]) {
+        unequipSlot(slot);
+      }
     }
     exitInvSelect();
   };
@@ -498,6 +517,31 @@ export function InventoryScreen() {
     const where = equippedSlotLabelFor(item);
     return where ? `${label} · EQUIPPED (${where})` : label;
   };
+  // OTA-1137 — the two GEAR group actions. Owner: "you should be able to pick
+  // your armor hold and select a group and either equip all or unequip all
+  // depending on what you selected."
+  //
+  // ⚠ WHY THIS IS THE FIX AND NOT A NICETY. The group bar shipped in OTA-1123
+  // with four actions — drop, scrap, reserve, release — and DROP excludes worn
+  // gear while RESERVE needs fusion eligibility. So for a group of ARMOR YOU ARE
+  // WEARING, the only button that ever appeared was SCRAP, which is exactly what
+  // the owner hit ("I did the hold to select multiple and there was only
+  // scrap"). Scrap auto-unequips and then destroys the piece. A one-tap
+  // irreversible action as the SOLE option on a set of worn armor is not a
+  // missing feature, it is a trap — and the log from the same session shows the
+  // character's AC drop 16 → 10 mid-fight and die to the next four raider
+  // swings. Whatever produced that particular unequip, a screen where the only
+  // thing you can do to your armor is destroy it should not have shipped.
+  //
+  // These are derived AFTER equippedSlotsById so UNEQUIP knows the real slot of
+  // each worn instance (ring2/ring3 included) rather than guessing from name.
+  const equipPlan = planGroupEquip(selectedItems, wornIds);
+  // Worn selections, paired with every slot that instance occupies — a
+  // two-hander is one item holding main AND off, so it must clear both.
+  const unequippable = selectedItems
+    .filter((i) => wornIds.has(i.id))
+    .map((i) => ({ item: i, slots: equippedSlotsById.get(i.id) ?? [] }))
+    .filter((r) => r.slots.length > 0);
   // arb-fix — the slot an item FILLS, shown on every equippable row (esp. armor:
   // "Chest", "Head", "Feet"…) whether worn or not, so the player can see where a
   // piece goes at a glance. Weapons collapse to "Hand" / "Two-handed".
@@ -1462,6 +1506,20 @@ export function InventoryScreen() {
               </TouchableOpacity>
             </View>
             <View style={styles.groupBarActions}>
+              {/* OTA-1137 — gear first, and DESTRUCTIVE LAST. Before this, a
+                  group of worn armor showed exactly one button and it was
+                  SCRAP; putting EQUIP / UNEQUIP ahead of it means the reversible
+                  thing is the one under your thumb. */}
+              {equipPlan.equip.length > 0 && (
+                <TouchableOpacity onPress={() => setInvGroupAction('equip')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Equip ${equipPlan.equip.length} items`}>
+                  <Text style={styles.groupActText}>EQUIP {equipPlan.equip.length}</Text>
+                </TouchableOpacity>
+              )}
+              {unequippable.length > 0 && (
+                <TouchableOpacity onPress={() => setInvGroupAction('unequip')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Take off ${unequippable.length} items`}>
+                  <Text style={styles.groupActText}>TAKE OFF {unequippable.length}</Text>
+                </TouchableOpacity>
+              )}
               {droppable.length > 0 && (
                 <TouchableOpacity onPress={() => setInvGroupAction('drop')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Drop ${droppable.length} items`}>
                   <Text style={styles.groupActText}>DROP {droppable.length}</Text>
@@ -1485,9 +1543,20 @@ export function InventoryScreen() {
             </View>
             {/* Say what the group CAN'T do, rather than leaving the player to
                 wonder why their quest item has no button. */}
-            {droppable.length + scrappable.length + reservable.length + releasable.length === 0 && (
+            {droppable.length + scrappable.length + reservable.length + releasable.length
+              + equipPlan.equip.length + unequippable.length === 0 && (
               <Text style={styles.groupBarNone}>
-                Nothing here can be dropped, scrapped or reserved — quest-bound items stay with you.
+                Nothing here can be worn, dropped, scrapped or reserved — quest-bound items stay with you.
+              </Text>
+            )}
+            {/* OTA-1137 — say WHY a piece you ticked isn't in the EQUIP count,
+                rather than leaving the player to wonder which of their two
+                chestplates the button meant. */}
+            {equipPlan.crowdedOut.length > 0 && (
+              <Text style={styles.groupBarNone}>
+                {equipPlan.crowdedOut.length === 1
+                  ? `The ${equipPlan.crowdedOut[0]?.name} wants a slot another piece in this group already has.`
+                  : `${equipPlan.crowdedOut.length} pieces want slots others in this group already have.`}
               </Text>
             )}
           </View>
@@ -1655,13 +1724,44 @@ export function InventoryScreen() {
           invGroupAction === 'drop' ? `Drop ${droppable.length}`
             : invGroupAction === 'scrap' ? `Break down ${scrappable.length}`
               : invGroupAction === 'reserve' ? `Reserve ${reservable.length} for the Crucible`
-                : `Release ${releasable.length} from the Crucible`
+                : invGroupAction === 'equip' ? `Put on ${equipPlan.equip.length}`
+                  : invGroupAction === 'unequip' ? `Take off ${unequippable.length}`
+                    : `Release ${releasable.length} from the Crucible`
         }
         body={(() => {
           const rows = invGroupAction === 'drop' ? droppable
             : invGroupAction === 'scrap' ? scrappable
               : invGroupAction === 'reserve' ? reservable
-                : releasable;
+                : invGroupAction === 'equip' ? equipPlan.equip.map((e) => e.item)
+                  : invGroupAction === 'unequip' ? unequippable.map((r) => r.item)
+                    : releasable;
+          // OTA-1137 — the gear rows name their SLOT, because "Put on 4" is
+          // only checkable if you can see it is four different slots.
+          if (invGroupAction === 'equip' || invGroupAction === 'unequip') {
+            const lines = invGroupAction === 'equip'
+              ? equipPlan.equip.map((e) => `· ${e.item.name} — ${SLOT_LABEL[e.slot] ?? e.slot}`)
+              : unequippable.map((r) => `· ${r.item.name} — ${[...new Set(r.slots.map((s) => SLOT_LABEL[s] ?? s))].join(' + ')}`);
+            const gearNotes: string[] = [];
+            if (invGroupAction === 'unequip') {
+              // ⚠ The whole reason this OTA exists. Armor IS armor class; a
+              // player who takes five pieces off mid-run should be told what it
+              // costs before the next thing swings at them, not after.
+              gearNotes.push('Stripped off and back into your pack — your armor class drops by what they were worth.');
+              // ⚠ The exact situation in the owner's death log. Taking armor off
+              // in a quiet room is housekeeping; taking it off with five raiders
+              // on the tile is the last decision the character makes. Same
+              // action, and only one of them needs saying out loud.
+              if (inCombatNow) {
+                gearNotes.push('⚠ You are in a fight. Every swing coming at you lands easier the moment this is off.');
+              }
+            } else {
+              gearNotes.push('Anything already in those slots is set aside into your pack.');
+            }
+            if (equipPlan.crowdedOut.length > 0 && invGroupAction === 'equip') {
+              gearNotes.push(`Skipped: ${equipPlan.crowdedOut.map((i) => i.name).join(', ')} — another piece here wants the same slot.`);
+            }
+            return [lines.join('\n'), ...gearNotes].filter(Boolean).join('\n\n');
+          }
           const list = rows
             .map((i) => `· ${i.name}${(i.quantity ?? 1) > 1 ? ` ×${i.quantity}` : ''}`)
             .join('\n');
@@ -1687,7 +1787,9 @@ export function InventoryScreen() {
           {
             label: invGroupAction === 'drop' ? 'Drop them'
               : invGroupAction === 'scrap' ? 'Break them down'
-                : invGroupAction === 'reserve' ? '♡ Reserve them' : '♥ Release them',
+                : invGroupAction === 'reserve' ? '♡ Reserve them'
+                  : invGroupAction === 'equip' ? 'Put them on'
+                    : invGroupAction === 'unequip' ? 'Take them off' : '♥ Release them',
             onPress: runGroupAction,
             tone: (invGroupAction === 'drop' || invGroupAction === 'scrap')
               ? ('destructive' as const)
