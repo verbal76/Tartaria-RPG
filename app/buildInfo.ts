@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.53';
+export const DISPLAY_VERSION = '4.29.54';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22269,7 +22269,44 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1142DormancyWindow (13 tests) whose first assertion drives
 // a real teardown and checks isDormant() mid-flight — it fails against
 // the old ordering. DISPLAY_VERSION 4.29.53.
-export const OTA_BUILD_ID = '2026-08-05-1142-dormancy-window';
+// OTA-1143 — THE VOLLEY AFTER A KILL.
+// Owner's device log, on the watch list across three OTAs without a
+// verdict: "Bog Hound sat out a fight after the Silt Thief died."
+// It did — and so did every packmate of anything the player ever
+// dropped.
+// ⚠ ROOT CAUSE, AND IT IS A SHAPE, NOT A SITE. Four combat paths were
+// written as `if (kill) resolveEnemyDefeat(); else { …volley }`. That
+// else reads as "the enemy is dead, there is nothing left to counter
+// with" — true in the SOLO fight those paths were first written for,
+// false the moment a pack is involved. A killing blow bought the
+// player the ENTIRE group's round: kill one raider of five and the
+// other four never swung. Chain it, one kill per round, and a pack
+// fight costs nothing at all.
+// The four: the melee attack path, the Beacon Rifle bolt volley, the
+// coating-throw burst (whose own comment already promised "the group
+// still swings back"), and the dog's killing bite — which `return`ed
+// straight past the arb169 volley eighty lines below, so a dog that
+// KILLED bought the free round a dog that merely BIT did not. That is
+// the arb169 exploit wearing a kill for a hat.
+// FIXED with one named guard, runSurvivorVolley, that every killing
+// path now routes through. It checks SURVIVORS, not whether a kill
+// happened: resolveEnemyDefeat clears the scene when the last body
+// falls, so a fight you just ended correctly runs nothing, while a
+// fight with bodies left in it swings back. Initiative is still
+// honoured — a volley already spent to losing initiative is not owed
+// twice — and skipDotTick still holds where the caller already ticked.
+// ⚠ THE ONE PATH THAT ALREADY DID IT RIGHT is the item throw
+// (OTA-825), which closed the identical hole for throws; it is
+// untouched and the suite pins it as the model.
+// ⚠ THIS MAKES PACK FIGHTS HARDER, and that is the point: the swings
+// were always owed. Verified against the balance probe and both combat
+// stress harnesses — no regression, no new stalls, no crashes.
+// New suite ota1143VolleyAfterKill (10 tests) whose first two cases are the
+// probe that found it, kept verbatim: same pack, same swing, same roll
+// steps, the ONLY variable is whether the blow was lethal.
+// DISPLAY_VERSION 4.29.54.
+export const OTA_BUILD_ID = '2026-08-05-1143-volley-after-kill';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1142-dormancy-window';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1141-hunger-carcass';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1140-rule-dials';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1139-elite-swap';
