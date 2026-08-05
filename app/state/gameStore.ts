@@ -124,6 +124,8 @@ import { AETHERKIN_REVERING_FACTIONS, isAetherkin, buildAetherkinEncounter, type
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
 // OTA-1041 — the story spine: motives + the opening crawl.
 import { introPagesFor, assignMotive } from '../engine/story';
+// OTA-1133 — the closing scene, built from the same motive as the opening crawl.
+import { buildDeathScene, daysBelow } from '../engine/deathScene';
 import { generateQuest } from '../engine/questGenerator';
 import {
   pickWeather,
@@ -5516,6 +5518,16 @@ interface GameStore {
   /** OTA-1041 — close the crawl (tap-through or SKIP) and remember on the
    *  CHARACTER that it was seen, so it never re-ambushes this save. */
   dismissStoryIntro: () => void;
+  /** ⚠ OTA-1133 — THE DEATH SCENE. Non-null the instant a character dies;
+   *  DeathOverlay (mounted globally in App.tsx) crossfades in over whatever
+   *  screen you were on and holds. Transient — never persisted; the dead
+   *  character is already written to disk by the time this is raised. */
+  pendingDeath: import('../engine/deathScene').DeathScene | null;
+  /** OTA-1133 — close the death screen and hand over to the character
+   *  collection. Fired by a tap OR by the overlay's own dwell timer, so a
+   *  player who put the phone down still lands somewhere sane. Idempotent:
+   *  a tap racing the timer must not run the handover twice. */
+  dismissDeath: () => void;
   /** OTA-1041 — re-run the opening for the current character (About screen).
    *  No-op without a live character. */
   replayStoryIntro: () => void;
@@ -6204,6 +6216,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   missionCompleteNotice: null,
   contractsNotice: null,
   storyIntro: null,
+  pendingDeath: null, // OTA-1133
   chapterCard: null, // OTA-1043
   pendingFork: null, // OTA-1088
   motivePickerPending: false, // OTA-1045
@@ -27705,7 +27718,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s) => {
         if (!s.player) return s;
         const newMax = Math.max(1, (s.player.hpMax ?? 1) + d);
-        return { player: { ...s.player, hpMax: newMax, hp: Math.max(1, Math.min((s.player.hp ?? 1) + d, newMax)) } };
+        return { player: { ...s.player, hpMax: newMax, hp: hpAfterMaxChange(s.player.hp, d, newMax) } };
       });
     };
     if (slot === 'off' && mainCat?.style === 'two_handed') {
@@ -27838,7 +27851,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => {
           if (!s.player) return s;
           const newMax = Math.max(1, (s.player.hpMax ?? 1) + hpDelta);
-          return { player: { ...s.player, hpMax: newMax, hp: Math.max(1, Math.min((s.player.hp ?? 1) + hpDelta, newMax)) } };
+          return { player: { ...s.player, hpMax: newMax, hp: hpAfterMaxChange(s.player.hp, hpDelta, newMax) } };
         });
       }
     }
@@ -27878,7 +27891,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     // bake-in. The old code only re-clamped `hp` to the new max, so
                     // equipping +HP gear while wounded then unequipping banked the
                     // bonus as free current HP — a repeatable infinite heal.
-                    return { hpMax: newMax, hp: Math.max(1, Math.min((s.player.hp ?? 1) + hpDelta, newMax)) };
+                    return { hpMax: newMax, hp: hpAfterMaxChange(s.player.hp, hpDelta, newMax) };
                   })()
                 : {}),
             },
@@ -29158,6 +29171,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  // ⚠ OTA-1133 — THE HANDOVER OUT OF DEATH. Owner: "after a few seconds to
+  // read it, it should go to the character collection screen." Called by a tap
+  // on the overlay OR by its own dwell timer, whichever comes first — so this
+  // MUST be idempotent. Clearing pendingDeath first is what makes it so: a tap
+  // that races the timer finds it already null and returns.
+  dismissDeath() {
+    if (!get().pendingDeath) return;
+    set({ pendingDeath: null });
+    void get().refreshSlots();
+    set(() => ({
+      currentScreen: 'title',
+      // Clear the in-memory session — the dead character is no longer active.
+      // The slot itself was written to disk by handlePlayerDeath before the
+      // overlay ever went up, so nothing here is lost.
+      player: null,
+      currentScene: null,
+      pendingRolls: null,
+      pendingHookContinue: null,
+      activeSlotId: null,
+      // Anything still queued behind the death is void — a chapter card or a
+      // mission popup surfacing on the title screen over a character who no
+      // longer exists is the exact "something else happened after I hit 0"
+      // this OTA is closing.
+      storyIntro: null,
+      chapterCard: null,
+      pendingFork: null,
+      pendingTalk: null,
+      missionCompleteNotice: null,
+      spotlightNotice: null,
+    }));
+  },
+
   replayStoryIntro() {
     const p = get().player;
     if (!p) return;
@@ -29856,7 +29901,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (!s.player) return s;
           const newEq = { ...(s.player.equipped ?? {}), [nameKey]: undefined, [idKey]: undefined };
           const newMax = Math.max(1, (s.player.hpMax ?? 1) + hpDelta);
-          return { player: { ...s.player, equipped: newEq, hpMax: newMax, hp: Math.max(1, Math.min((s.player.hp ?? 1) + hpDelta, newMax)) } };
+          return { player: { ...s.player, equipped: newEq, hpMax: newMax, hp: hpAfterMaxChange(s.player.hp, hpDelta, newMax) } };
         });
       }
     }
@@ -34161,6 +34206,31 @@ export function recordEnemyIntel(
   });
 }
 
+/** ⚠ OTA-1133 — THE ONE QUESTION EVERY DAMAGE SITE SHOULD ASK. True when the
+ *  player is at or below zero HP and has NOT yet been resolved as dead — i.e.
+ *  the exact window in which the game must stop and nothing else may run.
+ *  Deliberately reads LIVE state rather than a snapshot: the whole class of bug
+ *  this closes is code acting on a player it captured before the killing blow. */
+export function playerIsDownNotDead(get: () => GameStore): boolean {
+  const p = get().player;
+  return !!p && p.hp <= 0 && !p.dead;
+}
+
+/** ⚠ OTA-1133 — HP AFTER AN hpMax CHANGE, WITHOUT RESURRECTING ANYONE.
+ *  Equipping or displacing +HP gear re-bakes hpMax and carries current HP with
+ *  it. The four sites that do this all read `Math.max(1, …)`, whose floor of 1
+ *  exists so a big hpMax cut can never leave a living character on zero — a
+ *  correct instinct with a hole in it: at ZERO HP that same floor quietly
+ *  stands a corpse back up, which is half of the owner's "I was at 0 and kept
+ *  playing." A player already at zero is either about to be resolved dead or
+ *  already is; either way gear must not heal them. Stay at zero and let the
+ *  death path own it. */
+function hpAfterMaxChange(cur: number | undefined, delta: number, newMax: number): number {
+  const now = cur ?? 1;
+  if (now <= 0) return 0;
+  return Math.max(1, Math.min(now + delta, newMax));
+}
+
 function handlePlayerDeath(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -34286,21 +34356,38 @@ function handlePlayerDeath(
     );
   }
 
-  // Hold on the exploration screen for ~3.5s so the player reads the
-  // final messages, then return to title with the refreshed slot list.
-  setTimeout(() => {
-    void get().refreshSlots();
-    set(() => ({
-      currentScreen: 'title',
-      // Clear in-memory session state — the dead character is no longer
-      // active. The slot itself is preserved on disk.
-      player: null,
-      currentScene: null,
-      pendingRolls: null,
-  pendingHookContinue: null,
-      activeSlotId: null,
-    }));
-  }, 3500);
+  // ⚠ OTA-1133 — THE DEATH SCREEN, instead of a 3.5-second stare at the feed.
+  // Owner: "there should be a crossfade between the game screen and a new
+  // screen like the intro screen that gives a brief description of my death
+  // lore style and how it ties to my reason for entering the mud world."
+  //
+  // The opening crawl asks why you came down. Nothing ever answered it: the
+  // old ending was three log lines, a silent 3.5s hold on the exploration
+  // screen, and an abrupt cut to the slot list — the run stopped, but the
+  // story of it never closed. Now the same MOTIVE that wrote the opening
+  // writes the ending, so an exile's death reads differently from a scholar's.
+  //
+  // Raised AFTER the save is written, so the overlay is pure presentation and
+  // nothing on screen can be lost by leaving it. DeathOverlay owns the dwell
+  // and calls dismissDeath() when the reading time is up (or on a tap), which
+  // is what performs the handover to the character collection.
+  {
+    const dead = get().player;
+    const scene = buildDeathScene(
+      {
+        name: dead?.name ?? player.name,
+        placeName: locName,
+        storyMotive: dead?.storyMotive ?? player.storyMotive,
+        days: daysBelow(dead?.hoursElapsed ?? player.hoursElapsed),
+        kills: dead?.milestones?.enemiesDefeated ?? player.milestones?.enemiesDefeated ?? 0,
+      },
+      // Seeds which variant is drawn. Stamped once here rather than inside the
+      // builder so a re-render of the overlay can never reshuffle the words
+      // the player is halfway through reading.
+      `${player.name}|${Date.now()}`,
+    );
+    set(() => ({ pendingDeath: scene }));
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -37260,6 +37347,14 @@ function runParleyOutcome(
       );
       get().appendLog('world', failLine);
       get().appendLog('combat', `${targetName} rakes you for ${hit} damage.`);
+      // ⚠ OTA-1133 — THIS SITE HAD NO DEATH CHECK. Every other place that
+      // takes HP off the player (status DOTs, weather, falls, enemy counters,
+      // effect damage) calls handlePlayerDeath when the result hits zero; this
+      // one dealt 3+d6 and moved on. runEnemyGroupCounters below then bails
+      // instantly at hp<=0, so the player was left standing at exactly 0 with
+      // no epitaph, no screen, and no death — the owner's "a few times my
+      // character was at 0 and I still played."
+      if (playerIsDownNotDead(get)) { void Promise.resolve().then(() => handlePlayerDeath(get, set)); return; }
       if ((get().currentScene?.enemies.length ?? 0) > 0) runEnemyGroupCounters(get, set, get().player ?? player);
     } else {
       // Person turns hostile → spawn them as an enemy; the wanderer is spent.

@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.43';
+export const DISPLAY_VERSION = '4.29.44';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -21779,7 +21779,67 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `action-opener` discard appeared this session (n=2, weak but the
 // right direction). New suite ota1132SynthStarvation (15 tests); the
 // ota1131 reporting lock retargeted. DISPLAY_VERSION 4.29.43.
-export const OTA_BUILD_ID = '2026-08-05-1132-synth-yields';
+// ⚠ OTA-1133 — THE DEATH SCREEN, AND THE LOCKDOWN AT ZERO. Owner:
+// "The second my HP hits 0 for whatever reason there should be a
+// crossfade between the game screen and a new screen like the intro
+// screen that gives a brief description of my death lore style and how
+// it ties to my reason for entering the mud world and after a few
+// seconds to read it, it should go to the character collection screen.
+// This should add immersion and a clean character death, and stop
+// anything else from happening after I hit 0."
+//
+// TWO HALVES, and the second one was broken.
+//
+// THE SCREEN. OTA-1041's opening crawl asks why you came down and
+// offers five motives — debt, missing, exile, calling, record. Nothing
+// ever answered it: death was three log lines, a silent 3.5-second
+// hold on the exploration screen, and a cut to the slot list. The run
+// stopped; the story of it never closed. So the ending is now built
+// from the SAME motive as the opening (engine/deathScene.ts +
+// data/story/death.json — three variants each, so a replayed death is
+// not a rerun): an exile dies "in a place that never learned the
+// name", a scholar's account "ends mid-sentence". Three beats — the
+// fall, the motive's answer, then a plain ledger of days and kills —
+// and the Arbiter's last line held apart from the body text.
+// DeathOverlay is the intro overlay's deliberate sibling: same
+// near-black, same measure, same letterspaced hint. Three differences,
+// all chosen: the fade is SLOW (1.6s — the intro drifts up because you
+// are arriving; this one only darkens); there is NO SKIP (an ending
+// you can decline is not one, though a tap leaves early once the text
+// is legible — arming the tap late is what stops a player mid-tap when
+// they died from dismissing their own death unread); and it LEAVES ON
+// ITS OWN after 11s, so a phone set down mid-fight does not come back
+// to a stuck modal. Variant choice is seeded from the death stamp, so
+// a re-render can never reshuffle words being read.
+//
+// ⚠ THE LOCKDOWN. "Stop anything else from happening after I hit 0"
+// was not rhetorical — the owner played at 0 HP. Two holes:
+//   1. THE PARLEY INTIMIDATE-AN-ANIMAL FAILURE HAD NO DEATH CHECK. It
+//      deals 3+d6 straight to HP and moved on. Every other damage site
+//      in the store — status DOTs, weather, falls, enemy counters,
+//      effect damage — calls handlePlayerDeath at zero; this one did
+//      not, and the enemy-counter volley that follows bails instantly
+//      at hp<=0. The result was a living character standing on exactly
+//      zero with no epitaph, no screen and no death. Now routed
+//      through `playerIsDownNotDead`, which reads LIVE state on
+//      purpose: the whole bug class here is code acting on a player it
+//      captured before the killing blow (cf. OTA-969, OTA-1126).
+//   2. FOUR `Math.max(1, …)` HP FLOORS SILENTLY RESURRECT. They sit on
+//      the equip / displace paths that re-bake hpMax and carry current
+//      HP along, and the floor exists so an hpMax cut cannot strand a
+//      LIVING player on zero — right instinct, one hole: at ZERO the
+//      same floor stands a corpse back up, so equipping gear was a
+//      one-point revive. All four now route through
+//      `hpAfterMaxChange`, which keeps the floor for the living and
+//      returns 0 for the dead.
+// The handover (dismissDeath) also voids anything still queued behind
+// the death — chapter card, mission popup, talk sheet, story fork —
+// because a popup surfacing on the title screen over a character who
+// no longer exists IS "something else happening after 0". It is
+// idempotent: a tap racing the dwell timer runs it once.
+// New suite ota1133DeathScreen (26 tests). DISPLAY_VERSION 4.29.44.
+export const OTA_BUILD_ID = '2026-08-05-1133-death-screen';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1132-synth-yields';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1131-ambient-contradiction';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1130-deep-telemetry';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1129-prompt-weight';
