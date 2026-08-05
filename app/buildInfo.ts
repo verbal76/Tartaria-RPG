@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.38';
+export const DISPLAY_VERSION = '4.29.39';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20952,6 +20952,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1128 — QWEN TELEMETRY: THE MEASUREMENT BEFORE THE CUT. First step of
+// the owner-approved LLM-headroom track ("move forward", 2026-08-05), and
+// the debt OTA-1116 left on purpose: the 29-second generation "gets
+// per-intent timing first rather than a blind budget cut."
+//   1. ONE CHOKE POINT. New app/ai/generation/qwenTelemetry.ts; the runtime
+//      records EVERY generation at the one boundary all nine consumers
+//      cross (LlamaRuntime.generate) — no nine hand-rolled timers. Each
+//      call site passes a job label: narration is labeled PER-INTENT
+//      (`narration:<intent>`), plus ambient, flourish, ask_arbiter,
+//      investigate_lore, fusion_forge, forge_name, parse_fallback,
+//      item_synthesis. An unlabeled future consumer records as 'unlabeled'
+//      instead of vanishing from the stats.
+//   2. THE WAIT/GENERATE SPLIT IS THE DIAGNOSIS. Every completion queues
+//      behind the shared native-ML lock (arb159 — Qwen and Kokoro overlap
+//      crashed Tensor G5), so a "29-second generation" can be four seconds
+//      of generating behind twenty-five of queue. waitMs measures entry →
+//      lock-acquired; a queue problem needs a scheduling fix, a generation
+//      problem needs a token budget — without the split the device log
+//      cannot tell them apart.
+//   3. THE LOG IS THE DELIVERY VEHICLE. hydrate() registers a sink:
+//      `qwen⏱ <job> <ok|empty|error> <ms>ms (wait Nms)` per call, plus a
+//      per-job rollup every tenth call (count/avg/max/wait/∅/err). One
+//      device log now answers where the outliers live. Errors record too;
+//      a throwing sink can never break a generation. Session-scoped by
+//      design — no persistence risk for pure instrumentation.
+// Groundwork this enables next: the bank-and-spend module and the homework
+// slots (adjacent-room flavor, bestiary lines, vendor small talk) — all
+// OTA-able; only Phase 6's native config stays build-bound on golem.
+// Suite ota1128QwenTelemetry (aggregate arithmetic, wait-split source
+// locks, all nine labels, sink cadence). DISPLAY_VERSION 4.29.39.
+//
 // OTA-1127 — ⚠ EVERY FIRST VISIT GREETED YOU AS A RETURNER, AND RE-ENTRY
 // WIPED THE ROOM'S MEMORY. Task #174 root-caused with a LIVE-STORE REPRO
 // (fresh game, hub walk, per-build call counting) — the log-archaeology
@@ -21561,7 +21592,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1127-first-visit-truth';
+export const OTA_BUILD_ID = '2026-08-05-1128-qwen-telemetry';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1127-first-visit-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1126-echo-farm-roof-fall';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1125-repair-group-budget';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1124-group-bar-anchored';

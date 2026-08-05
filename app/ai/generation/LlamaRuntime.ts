@@ -1,5 +1,6 @@
 import * as FileSystem from 'expo-file-system';
 import { runExclusiveNativeMl } from '../nativeMlLock';
+import { recordQwenCall } from './qwenTelemetry';
 
 // ---------------------------------------------------------------------------
 // LlamaRuntime — thin wrapper around the llama.rn native module
@@ -137,6 +138,11 @@ export interface LlamaGenerateOptions {
   topK?: number;
   /** Per-token callback for streaming. Receives just the new token text. */
   onToken?: (token: string) => void;
+  /** OTA-1128 — telemetry label for this call ('flourish', 'forge_name', a
+   *  narration intent…). Unlabeled calls record as 'unlabeled' so a new
+   *  consumer that forgets the tag still shows up in the stats instead of
+   *  vanishing from them. */
+  job?: string;
 }
 
 export class LlamaRuntime {
@@ -220,31 +226,61 @@ export class LlamaRuntime {
       await ml.markQwenCompletionStart();
       markDone = ml.markQwenCompletionDone;
     } catch { /* guard module unavailable — proceed without the breadcrumb */ }
+    // OTA-1128 — telemetry. Measured HERE, at the one boundary every consumer
+    // crosses, so nine call sites get timing without nine hand-rolled timers.
+    // The wait/generate split is the point: this call queues behind the shared
+    // native-ML lock (arb159), so a "29-second generation" can be four seconds
+    // of generating behind twenty-five of queue — and the fix for each is
+    // completely different.
+    const telT0 = Date.now();
+    let telLockAt = telT0;
     try {
       // arb159 — run the completion through the shared native-ML lock so it
       // never overlaps a Kokoro TTS synth (the two heavy native workloads
       // contending crashed the process on Tensor G5).
-      const result = await runExclusiveNativeMl(() => ctx.completion(
-        {
-          prompt,
-          n_predict: opts.maxTokens ?? 120,
-          temperature: opts.temperature ?? 0.8,
-          top_p: opts.topP ?? 0.9,
-          top_k: opts.topK ?? 40,
-          stop: [...QWEN_STOP_TOKENS],
-        },
-        opts.onToken
-          ? (evt) => {
-              if (typeof evt.token === 'string') {
-                assembled += evt.token;
-                try { opts.onToken?.(evt.token); } catch { /* swallow user errors */ }
+      const result = await runExclusiveNativeMl(() => {
+        telLockAt = Date.now();
+        return ctx.completion(
+          {
+            prompt,
+            n_predict: opts.maxTokens ?? 120,
+            temperature: opts.temperature ?? 0.8,
+            top_p: opts.topP ?? 0.9,
+            top_k: opts.topK ?? 40,
+            stop: [...QWEN_STOP_TOKENS],
+          },
+          opts.onToken
+            ? (evt) => {
+                if (typeof evt.token === 'string') {
+                  assembled += evt.token;
+                  try { opts.onToken?.(evt.token); } catch { /* swallow user errors */ }
+                }
               }
-            }
-          : undefined,
-      ));
+            : undefined,
+        );
+      });
       // Prefer assembled tokens (already stripped of prompt) but fall back to
       // the final text the native side returns.
-      return (assembled || result.text || '').trim();
+      const text = (assembled || result.text || '').trim();
+      recordQwenCall({
+        job: opts.job ?? 'unlabeled',
+        totalMs: Date.now() - telT0,
+        waitMs: Math.max(0, telLockAt - telT0),
+        chars: text.length,
+        outcome: text.length > 0 ? 'ok' : 'empty',
+        at: telT0,
+      });
+      return text;
+    } catch (err) {
+      recordQwenCall({
+        job: opts.job ?? 'unlabeled',
+        totalMs: Date.now() - telT0,
+        waitMs: Math.max(0, telLockAt - telT0),
+        chars: 0,
+        outcome: 'error',
+        at: telT0,
+      });
+      throw err;
     } finally {
       // Clears on success OR a JS throw. A NATIVE crash never reaches here —
       // that's the whole point; the breadcrumb survives for next-boot detection.

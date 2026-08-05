@@ -39,7 +39,7 @@ export interface FusionSynthEngine {
   isReady(): boolean;
   generate(
     messages: ReadonlyArray<{ role: 'system' | 'user' | 'assistant'; content: string }>,
-    opts?: { maxNewTokens?: number; temperature?: number },
+    opts?: { maxNewTokens?: number; temperature?: number; job?: string },
   ): Promise<string>;
 }
 
@@ -541,7 +541,7 @@ export async function synthesizeFusionViaQwen(
   if (!qwen.isReady()) return null;
   try {
     const messages = buildPrompt(inputs, tagProfile);
-    const reply = await qwen.generate(messages, { maxNewTokens: 200, temperature: 0.4 });
+    const reply = await qwen.generate(messages, { maxNewTokens: 200, temperature: 0.4, job: 'fusion_forge' });
     const json = extractJsonObject(reply);
     if (!json) return null;
     let parsed: RawFusionResponse;
@@ -624,6 +624,7 @@ export async function synthesizeFusionNameViaQwen(
     const reply = await qwen.generate(buildNamePrompt(stats, inputs, tagProfile), {
       maxNewTokens: 64,
       temperature: 0.6,
+      job: 'forge_name',
     });
     const json = extractJsonObject(reply);
     if (!json) return null;

@@ -167,6 +167,7 @@ import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGrac
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
+import { setQwenTelemetrySink, qwenCallCount, qwenTelemetrySummary } from '../ai/generation/qwenTelemetry';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
 import {
   LOCATION_TO_MACRO,
@@ -880,7 +881,7 @@ async function arbiterPersonaAnswer(question: string, brief = ''): Promise<strin
         { role: 'system', content: brief ? `${ARBITER_PERSONA_SYSTEM} ${brief}` : ARBITER_PERSONA_SYSTEM },
         { role: 'user', content: question },
       ],
-      { maxNewTokens: 90, temperature: 0.7 },
+      { maxNewTokens: 90, temperature: 0.7, job: 'ask_arbiter' },
     );
     // OTA-494 — sieve foreign words from the Ask-the-Arbiter answer too (same
     // model code-switch risk as the narration feed).
@@ -4376,7 +4377,7 @@ async function prefetchFlourish(
         { role: 'system', content: FLOURISH_SYSTEM },
         { role: 'user', content: flourishPrompt(npcName, role, flourishKindFor(npcId, role)) },
       ],
-      { maxNewTokens: 48, temperature: 0.8 },
+      { maxNewTokens: 48, temperature: 0.8, job: 'flourish' },
     );
     const cleaned = repairGluedNarration(stripForeignWords((out ?? '').trim()));
     const line = vetModelFlourish(cleaned, npcName);
@@ -6559,6 +6560,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async hydrate() {
+    // OTA-1128 — Qwen telemetry sink. Every generation records at the runtime
+    // boundary (qwenTelemetry.ts); this surfaces each call in the debug log —
+    // `qwen⏱ <job> <outcome> <total>ms` with the lock-wait share when it is a
+    // real share — plus a per-job rollup every tenth call, so a single device
+    // log answers WHERE the 29-second outliers live (slow generation vs queue
+    // behind TTS) without a second capture session. Assignment is idempotent;
+    // a throwing sink can never break a generation (the recorder swallows).
+    setQwenTelemetrySink((r) => {
+      const wait = r.waitMs >= 250 ? ` wait ${r.waitMs}ms` : '';
+      get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait} (${r.chars}ch)`);
+      if (qwenCallCount() % 10 === 0) {
+        get().appendLog('debug', `qwen⏱ stats — ${qwenTelemetrySummary()}`);
+      }
+    });
     // One-shot migration from the v1 single-slot save, if present.
     await migrateLegacySlotIfPresent();
     // arb38 — read the save-load crash breadcrumb BEFORE any slot can
@@ -13490,7 +13505,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // model code-switch ("huà") can't leak into investigate one-liners
               // or the patched entry.result.line either.
               const qwenGenerator: LoreGenerator | null = qwen.isReady()
-                ? async (messages, opts) => repairGluedNarration(stripForeignWords(await qwen.generate(messages, opts)))
+                ? async (messages, opts) => repairGluedNarration(stripForeignWords(await qwen.generate(messages, { ...opts, job: 'investigate_lore' })))
                 : null;
               const locationName =
                 currentScene.location.name ?? 'this place';
@@ -38131,7 +38146,7 @@ async function narrateViaArbiter(
         }
         set({ partialArbiterText: streamed });
       },
-      { maxNewTokens: maxTokens },
+      { maxNewTokens: maxTokens, job: `narration:${intent}` },
     );
     if (myEpoch !== arbiterGenerationEpoch) return; // cancelled mid-flight
     // Trim to the last complete sentence so we never display a partial
@@ -38338,7 +38353,7 @@ async function maybeGenerateAmbientArbiter(
         }
         set({ partialArbiterText: streamed });
       },
-      { maxNewTokens: 32 },
+      { maxNewTokens: 32, job: 'ambient' },
     );
     // OTA-678 — off-canon entity guard (ambient path). A dropped line just stays
     // silent here (ambient has no template fallback), which is the safe outcome.
