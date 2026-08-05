@@ -177,6 +177,18 @@ export function InventoryScreen() {
   useEffect(() => {
     setScrapQty(1);
   }, [pending?.item.id]);
+  // ⚠ OTA-1149 — THE PACK IS A HOMEWORK WINDOW. Owner named it directly:
+  // *"Menu / inventory / map time? You're reading, not waiting on the
+  // engine."* While this screen is mounted the model may write item
+  // descriptions ahead of the player opening them, so the popup is already
+  // there when they tap. Cleared on unmount, and separately cleared by
+  // submitPlayerAction the instant any real action is taken — a screen that
+  // forgot to clean up can therefore never leave homework running forever.
+  useEffect(() => {
+    const mark = useGameStore.getState().markUiIdle;
+    mark(true);
+    return () => { mark(false); };
+  }, []);
   // OTA-087 — search query + sort axis state. Ephemeral (not
   // persisted across sessions); resets to defaults on each
   // mount. Query is a case-insensitive substring match against
