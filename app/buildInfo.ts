@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.31';
+export const DISPLAY_VERSION = '4.29.32';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -20986,6 +20986,47 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // approved), OTA-1112 anti-stun-lock + pack math for the pack slog.
 // No app code in this OTA — the fast gate is untouched by construction.
 // DISPLAY_VERSION 4.29.21.
+// OTA-1121 — ⚠ THE TALK TRANSCRIPT WAS EMPTY, AND IT WAS MY BUG.
+// Owner, on the OTA-1118 conversation view: "I can talk and they can
+// answer, but none of the text is in the popup window, it's still in
+// the exploration window."
+//   1. ROOT CAUSE, AND IT IS A TRAP THIS CODEBASE ALREADY DOCUMENTS.
+//      OTA-1118 marked where a conversation begins with an INDEX —
+//      `startedAtLogLen = gameLog.length` — and rendered
+//      `gameLog.slice(that)`. But gameLog is `.slice(-MAX_LOG_IN_MEMORY)`d
+//      on EVERY append, so at 500 entries the array stops growing and
+//      every existing index shifts DOWN by one per new line. A mark of
+//      500 then sliced past the end forever: the transcript rendered
+//      empty and every reply stayed in the exploration feed behind the
+//      sheet — precisely the bug the whole view was built to fix. It
+//      only bites once the buffer is full, i.e. in long sessions, i.e.
+//      in real ones, which is why a fresh-game test passed it. The
+//      OTA-1078 comment on `_playerVisibleLogCount` says this in as many
+//      words — "gameLog.length cannot measure how much has happened once
+//      the buffer sits at its cap" — and I used it as a mark anyway.
+//      FIX: `startedAtTs` is a TIMESTAMP. Trimming drops old entries; it
+//      never rewrites the ones that remain, so a ts mark cannot slide.
+//      The transcript is now `gameLog.filter(e => e.ts >= startedAtTs)`
+//      and appendLog's conversation-boundary merge guard compares
+//      timestamps too, for the same reason. A new test drives the log
+//      past its cap and asserts the window still fills — and asserts the
+//      old index mark would have found nothing there.
+//   2. REPAIR ALL. Owner: "let's also add a select all to the repair
+//      tab." Repair has no deferred step — the action IS the repair — so
+//      a select-all with nothing to press afterwards would be two taps
+//      where there is one job. REPAIR ALL READY mends every row the
+//      current view lists as ready, in display order, so on the default
+//      EQUIPPED axis worn gear is mended first (which decides who gets
+//      the materials when they run short). It acts on the FILTERED view,
+//      and that is what makes it a selection rather than a blunt
+//      instrument: search "boot", tap REPAIR ALL, only boots are mended.
+//      It calls the SAME single-row action per item rather than growing
+//      a second repair path, so cost, substitutions and eligibility can
+//      never disagree between one tap and twelve; an item whose material
+//      was drained by an earlier repair refuses honestly through the
+//      existing shortage line. Hidden entirely when nothing is ready.
+// DISPLAY_VERSION 4.29.32.
+//
 // OTA-1120 — THE FUSABLE VIEW BECOMES A SELECTION SURFACE.
 // Owner: "we also need a select all button on the category headers in
 // inventory when we select sort by fusable so you can select a whole
@@ -21323,7 +21364,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REAL store combat (slashing cleaver vs a Construct) through advice →
 // crack → full-bite → intact bestiary intel, plus source locks on the
 // floor and the crack threshold. DISPLAY_VERSION 4.29.22.
-export const OTA_BUILD_ID = '2026-08-05-1120-fusable-select-mode';
+export const OTA_BUILD_ID = '2026-08-05-1121-transcript-and-repair-all';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1120-fusable-select-mode';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1119-frame-and-axes';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1118-talking-is-its-own-screen';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-04-1117-gear-lists-tell-the-truth';

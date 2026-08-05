@@ -12,10 +12,19 @@
 // Ask, read the answer where you're already looking, ask the next thing. STOP
 // TALKING is a choice, never a step you're forced through to see what was said.
 //
-// The transcript is `gameLog.slice(pendingTalk.startedAtLogLen)` — a WINDOW on
-// the real feed, not a copy. dialogue.ts still routes every reply through
-// appendLog exactly as it always has, so the exploration log remains the whole
-// record and closing the conversation leaves the history intact behind it.
+// The transcript is every feed entry stamped at or after `pendingTalk.startedAtTs`
+// — a WINDOW on the real feed, not a copy. dialogue.ts still routes every reply
+// through appendLog exactly as it always has, so the exploration log remains the
+// whole record and closing the conversation leaves the history intact behind it.
+//
+// ⚠ OTA-1121 — the window is keyed on a TIMESTAMP, and it must stay one. The
+// first cut used an INDEX (`gameLog.length` at open), which is silently wrong the
+// moment the buffer reaches its cap: gameLog is `.slice(-MAX_LOG_IN_MEMORY)`d on
+// every append, so past 500 entries the array stops growing and every index
+// shifts down by one per line. The mark then pointed past the end forever and the
+// transcript rendered EMPTY — replies still arriving in the exploration feed
+// behind the sheet, which is precisely the bug this whole view was built to fix.
+// It only showed up in long sessions, which is to say: in real ones.
 //
 // The collapse bar (OTA-1117's approved design, kept as an OPTION rather than a
 // requirement): the sheet drops to a single breadcrumb row showing who you're
@@ -80,7 +89,7 @@ export function TalkSheet() {
   // The exchange itself: every feed line since this conversation opened. Sliced,
   // not stored — the log is the record of truth and this is a window on it.
   const transcript = useMemo(
-    () => (ctx ? gameLog.slice(Math.min(ctx.startedAtLogLen, gameLog.length)) : []),
+    () => (ctx ? gameLog.filter((e) => e.ts >= ctx.startedAtTs) : []),
     [ctx, gameLog],
   );
 
