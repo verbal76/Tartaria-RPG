@@ -923,7 +923,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.43**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.44**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1023,16 +1023,38 @@ either because the sample is thin or because the fix is a design call rather
 than a bug fix. They are here so a later log can promote them instead of
 rediscovering them.
 
-- **⚠ EVERY REST IS AMBUSHED.** The OTA-1108 log rested twice — Day 7 and
-  Day 8 — and both times drew the identical beat: *"The Arbiter goes still.
-  'You weren't alone. Something circled while you were out — and it stopped
-  circling.'"* followed immediately by a spawn (Mud Tortoise, then Aetheric
-  Drone). Two for two, same wording both times. An earlier log showed the same
-  rest → ambush → flee → rest shape. If the roll is meant to be a chance and
-  is reading as a certainty, rest is not a decision the player can make — it
-  is a fight they have to buy. Worth checking the actual probability and the
-  line's dedup before touching either. **Design call: does rest carry risk
-  every single time, or sometimes?**
+- **REST AMBUSH — MEASURED, AND IT IS FINE.** Read the numbers before
+  changing anything (2026-08-05): rest ambush is **22% base in the wild / 8% in
+  a hub**, times the time-of-day multiplier (**1.3 night / 0.85 day**) — so
+  18.7% by day, 28.6% by night in the open. The OTA-1108 log's two rests
+  (Day 7 afternoon, Day 8 evening) both hitting is roughly a **5%
+  coincidence**, not a broken roll. What IS worth a look is the *wording*: both
+  ambushes drew the identical "Something circled while you were out" line, so
+  the dedup on that beat is the real complaint. **No rate change warranted.**
+
+- **⚠ THE NOVELTY GATE PENALISES NEW PLAYERS — CONFIRMED, FIX DESIGNED, NOT
+  SHIPPED.** Owner: *"if we are looking for not traveled in the last 50
+  squares, doesn't that penalize new players since they haven't been
+  anywhere?"* Yes, exactly. `tileIsNovel = !recentTileHistory.includes(key)`
+  and the history starts EMPTY, so a brand-new character has every tile novel
+  and rolls the full encounter chance on every step, while an established
+  player working a known region has 50 tiles banked and rolls far less often.
+  The encounter rate is therefore at MAXIMUM when the player is weakest and
+  falls as they get stronger — backwards from any difficulty curve. In
+  fairness the gate was never a difficulty knob: it was added to stop someone
+  oscillating between two tiles to farm encounters and loot, and it still does
+  that job. Two candidate changes, both awaiting the owner's call because they
+  are game FEEL, not correctness:
+  **(a) an early-steps ramp** — scale the roll by `recentTileHistory.length`,
+  starting around a third and reaching full by ~25 tiles. The signal already
+  exists and is already used this way: `fleeGraceApplies` gives a free escape
+  while `tilesSeen <= FLEE_GRACE_STEPS (3)`.
+  **(b) the baseline itself** — currently 0.58 auto-travel / 0.45 manual ×
+  1.3 at night = **75% encounter chance per novel step auto-travelling after
+  dark**, which is what "every move was a fight" actually is. The code's own
+  comment at the constant says *"Tune down toward 'desolate' (~4-8%) from here
+  once the feel is dialed in"* and nobody ever did. Proposal on the table:
+  0.58 → ~0.45 and 0.45 → ~0.35.
 
 - **QWEN DORMANCY IS FIRING REGULARLY.** Third log in a row ending with
   `qwen-watchdog: Qwen dormant (status='ready' but the native context was
@@ -1051,7 +1073,59 @@ rediscovering them.
   log across a truncated span, so it was never confirmed as a bug. Still
   unresolved; needs a log that captures the whole encounter.
 
-- **⚠ THE AMBIENT TRIM LANDED AND THE LINE STILL ARRIVED LATER (2026-08-05, latest). BOTH LINES.**
+- **⚠ THE DEATH SCREEN, AND THE LOCKDOWN AT ZERO (2026-08-05, latest). BOTH LINES.**
+  golem OTA-1110 / HAL OTA-1133. Owner: *"The second my HP hits 0 for whatever
+  reason there should be a crossfade between the game screen and a new screen
+  like the intro screen that gives a brief description of my death lore style
+  and how it ties to my reason for entering the mud world and after a few
+  seconds to read it, it should go to the character collection screen. This
+  should add immersion and a clean character death, and stop anything else from
+  happening after I hit 0."* Two halves, and the second one was broken.
+  **THE SCREEN.** The opening crawl asks why you came down and offers five
+  motives — debt, missing, exile, calling, record. Nothing ever answered it:
+  death was three log lines, a silent 3.5-second hold on the exploration
+  screen, and a cut to the slot list. The run stopped; the story of it never
+  closed. The ending is now written from the SAME motive as the opening
+  (`engine/deathScene.ts` + `data/story/death.json`, three variants each so a
+  replayed death is not a rerun) — an exile dies *"in a place that never
+  learned the name"*, a scholar's account *"ends mid-sentence"*. Three beats:
+  the fall, the motive's answer, then a plain factual ledger of days and kills;
+  the Arbiter's last line sits apart from the body text. `DeathOverlay` is the
+  intro overlay's deliberate sibling — same near-black, same measure, same
+  letterspaced hint — with three chosen differences: the fade is **slow**
+  (1.6s; the intro drifts UP because you are arriving, this one only darkens),
+  there is **no SKIP** (a tap leaves early, but only once the text is legible,
+  so a player mid-tap when they died cannot dismiss their own death unread),
+  and it **leaves on its own** after 11s so a phone put down mid-fight never
+  returns to a stuck modal. Variant choice is seeded from the death stamp, so a
+  re-render cannot reshuffle words being read. Mounted last in `App.tsx`: a
+  death can land on any screen, and last sibling renders over whatever modal
+  was already on its way in.
+  **⚠ THE LOCKDOWN** — *"stop anything else from happening after I hit 0"* was
+  not rhetorical; the owner played at 0 HP. Two holes:
+  (1) **THE PARLEY INTIMIDATE-AN-ANIMAL FAILURE HAD NO DEATH CHECK.** It deals
+  3+d6 straight to HP and moved on. Every other damage site in the store —
+  status DOTs, weather, falls, enemy counters, effect damage — calls
+  `handlePlayerDeath` at zero; this one did not, and the enemy-counter volley
+  that follows bails instantly at `hp<=0`. The result was a living character
+  standing on exactly zero with no epitaph, no screen, and no death. Now routed
+  through `playerIsDownNotDead`, which reads LIVE state on purpose: the entire
+  bug class here is code acting on a player it captured before the killing blow.
+  (2) **FOUR `Math.max(1, …)` HP FLOORS SILENTLY RESURRECT.** They sit on the
+  equip / displace paths that re-bake `hpMax` and carry current HP along. The
+  floor exists so an hpMax cut cannot strand a LIVING player on zero — right
+  instinct, one hole: at ZERO the same floor stands a corpse back up, so
+  equipping gear was a one-point revive. All four now route through
+  `hpAfterMaxChange`, which keeps the floor for the living and returns 0 for
+  the dead.
+  The handover (`dismissDeath`) also voids everything still queued behind the
+  death — chapter card, mission popup, talk sheet, story fork — because a popup
+  surfacing on the title screen over a character who no longer exists IS
+  "something else happening after 0". It is idempotent, so a tap racing the
+  dwell timer runs it once. New suite `ota1110DeathScreen` (26 tests).
+  **See §WATCH LIST for the encounter-rate question raised alongside this.**
+
+- **⚠ THE AMBIENT TRIM LANDED AND THE LINE STILL ARRIVED LATER (2026-08-05). BOTH LINES.**
   golem OTA-1109 / HAL OTA-1132. Step 5 of the LLM-headroom track, and
   OTA-1108's own check coming back:
   ```

@@ -1,0 +1,50 @@
+{
+  "_comment": "OTA-1110 — THE DEATH SCREEN. Owner: 'a brief description of my death lore style and how it ties to my reason for entering the mud world.' The opening crawl (intro.json) asks why you came down; this answers it. Every character dies against the motive they chose, so an exile's end reads differently from a scholar's. Three variants per motive so a replayed death is not a rerun. Tokens: {name}, {place}, {days}, {kills}.",
+
+  "opening": [
+    "The Aetherstone dims and does not lift.",
+    "The dust settles back into its old patterns.",
+    "Somewhere above, the surface goes on not knowing.",
+    "The buried world takes the weight and does not stagger."
+  ],
+
+  "motives": {
+    "debt": [
+      "{name} came down owing, and the ledger did not care which currency it was paid in. It is settled now, in the only coin the buried world ever really wanted. Somewhere above, a name is still written beside a number, and nobody left alive knows to cross it out.",
+      "The debt brought {name} to {place}, one payment at a time, always one payment short. The dark is not a creditor. It does not collect — it simply keeps what falls into it, and calls the account closed.",
+      "{name} went below to buy a life back. {days} days of it, bought and spent. What was owed above is still owed above; the buried world only ever agreed to take the body in trade."
+    ],
+    "missing": [
+      "{name} came looking, and the looking is what ended it. {place} keeps them both now — the one who was lost and the one who would not stop searching. The buried world has never once returned a person, but it has always been willing to accept another.",
+      "Somewhere down here is the one {name} came for. The search ends {days} days in, a corridor short or a corridor long — there is no way to know which, and no one left to ask. That is the shape of most endings below.",
+      "{name} crossed the mud for someone else's sake and did not cross back. If the missing are still down here, they have company now. It is not the reunion anyone wanted, but the drowned country grants the ones it can."
+    ],
+    "exile": [
+      "The surface would not have {name}. The buried world would — and this is what that welcome always meant. {place} does not cast anyone out. It only ever closes over them.",
+      "{name} came below because there was nowhere left above, and for {days} days the dark was the better country. It asked no questions about who you were before. It asks none now.",
+      "Exile ends the way exile ends: somewhere far from anyone who knew the name. {name} is buried in a place that never learned it, which is either the cruelty or the mercy of the whole arrangement, depending on how you were treated up there."
+    ],
+    "calling": [
+      "The Aether called and {name} answered, and this is what answering costs when you go all the way. It was never a summons. It was a tide, and tides do not stop at the shoreline of a person.",
+      "{name} felt it humming in the blood from the first day above and followed it {days} days down. It has all of them now. Whatever was calling has what it wanted, and has not said what that was.",
+      "The pull that brought {name} to {place} does not release what it draws. The Aetherstone goes quiet over the body — not in mourning. In satisfaction."
+    ],
+    "record": [
+      "{name} came to write down what happened here before it was lost. The account ends mid-sentence, {days} days in, which is how nearly every account of the buried world ends. Someone will find the notes. Someone always does. That is the only continuity this place allows.",
+      "The truth of {place} was going to be written by {name}. It still might be, by someone else, worse. {kills} things were put down for the sake of getting the story out; the story stayed.",
+      "A witness is only useful while they can still speak. {name} kept the record faithfully and became part of it — one more name in the column, filed under the same heading as everyone who tried this before."
+    ]
+  },
+
+  "fallback": [
+    "{name} came down for reasons that were their own, and {place} kept them for reasons of its own. {days} days below, {kills} put down along the way. The buried world does not read motives. It only counts.",
+    "Whatever brought {name} under the mud, it ends here at {place}. The dark is indifferent to why anyone comes — it is only ever interested in how long they last."
+  ],
+
+  "closing": [
+    "The Arbiter watches, and says nothing.",
+    "The Arbiter marks the place and moves on.",
+    "The Arbiter is quiet for a long moment, then turns away.",
+    "The Arbiter does not look away. Someone should be watching when it happens."
+  ]
+}

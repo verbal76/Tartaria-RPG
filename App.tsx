@@ -41,6 +41,7 @@ import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA
 import { StoryForkOverlay } from './app/components/StoryForkOverlay'; // OTA-1065
 import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1022
 import { StoryIntroOverlay } from './app/components/StoryIntroOverlay'; // OTA-1023 — global (was exploration-only)
+import { DeathOverlay } from './app/components/DeathOverlay'; // OTA-1110 — the closing scene, global by necessity
 import { DogOnboardingModal } from './app/components/DogOnboardingModal'; // OTA-1027
 import { GolemNamingModal } from './app/components/GolemNamingModal'; // OTA-1027
 import { KeyboardInputBar } from './app/components/KeyboardInputBar';
@@ -615,6 +616,15 @@ export default function App() {
           it — the CharacterScreen header button included. */}
       <SilentBoundary tag="StoryIntroOverlay">
         <StoryIntroOverlay />
+      </SilentBoundary>
+      {/* ⚠ OTA-1110 — THE DEATH SCREEN, and it mounts LAST on purpose. Owner:
+          "stop anything else from happening after i hit 0." A character can
+          die on the exploration screen, mid-climb, inside a hub room or with
+          another modal already up, so this cannot live on one screen — and
+          being the last sibling means it renders OVER anything that was
+          already on the way in when the killing blow landed. */}
+      <SilentBoundary tag="DeathOverlay">
+        <DeathOverlay />
       </SilentBoundary>
       {/* OTA-1027 — dog onboarding + golem naming moved out of the typed feed
           into blocking popups (a playtester typed "rest" at the breed ask and
