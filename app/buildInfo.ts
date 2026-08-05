@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.55';
+export const DISPLAY_VERSION = '4.29.56';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22383,7 +22383,53 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // retargeted: the "above" pointer, and a rules-size comparison whose
 // slice marker moved into the shared preamble and stopped measuring
 // what it was named for. DISPLAY_VERSION 4.29.55.
-export const OTA_BUILD_ID = '2026-08-05-1144-cached-prefix';
+// OTA-1145 — THE BANK. Step two of the headroom track.
+// The economics of an ambient musing were upside down. It is
+// generated ON DEMAND, takes 8-16 seconds, and is then checked
+// against the world it was composed for. The OTA-1130 telemetry says
+// two of three came back unusable — ~16.6 seconds of model time for
+// lines nobody read — and the single biggest killer is `stale`: the
+// player kept playing while the model wrote, so by the time the line
+// existed it no longer belonged to the moment.
+// ⚠ THAT IS A RACE WE WERE NEVER GOING TO WIN BY GENERATING FASTER.
+// So stop racing. A musing is UNPROMPTED by construction —
+// AMBIENT_INSTRUCTION forbids it from reacting to the last action —
+// which is exactly the property that makes it pre-generatable. Write
+// them when the world is standing still, spend them when it isn't.
+// TWO SOURCES OF STOCK:
+//  · REST. The player has explicitly chosen to pass time, the world
+//    is standing still by definition, and the shared native-ML lock
+//    is as free as it ever gets. Fired AFTER the rest resolves (so a
+//    slow generation never delays recovery) and BEFORE the ambush
+//    spawn (so a fight leaves the bank untouched rather than
+//    poisoning it).
+//  · ⚠ STALE LINES, WHICH ARE NOT WASTED LINES. `stale` almost always
+//    means "you walked somewhere else", and the line is still
+//    perfectly good FOR THE PLACE IT WAS WRITTEN ABOUT. Banked
+//    against its own stamp, walking back into that room spends it
+//    instantly instead of paying for it twice. The discard that was
+//    the headline waste becomes the stock.
+// SPENDING is free, so the withdraw sits ABOVE the model-readiness
+// and cooldown gates: the bank works while Qwen is reloading, and a
+// line that costs nothing is not rationed by a cooldown that exists
+// to ration generations. It stays BELOW the combat and tutorial
+// muzzles, which are about whether a musing is wanted at all.
+// ⚠ VALIDITY IS ambientStaleReason, UNCHANGED — the same five checks
+// the live path already ran, asked at SPEND time instead of at finish
+// time. That is the whole trick: a banked line cannot go stale
+// between being wanted and being spoken, because there is no gap.
+// Plus the near-duplicate check, which matters more here because a
+// banked line may have sat through a dozen others since it was
+// written.
+// Bank is session-scoped, capped at 3, oldest-out, no duplicates. A
+// banked line is DEFERRED work, not WASTED work, so it no longer
+// counts against qwenWasteTotals — that number decides whether a job
+// is worth keeping and must not indict the fix.
+// New suite ota1145TheBank (16 tests). One OTA-1130 assertion
+// retargeted (the discard condition gained its one exclusion).
+// DISPLAY_VERSION 4.29.56.
+export const OTA_BUILD_ID = '2026-08-05-1145-the-bank';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1144-cached-prefix';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1143-volley-after-kill';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1142-dormancy-window';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1141-hunger-carcass';
