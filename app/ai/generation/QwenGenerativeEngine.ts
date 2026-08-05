@@ -49,6 +49,8 @@ export interface GenerateOptions {
   topP?: number;
   /** Top-k sampling. Default 40. */
   topK?: number;
+  /** OTA-1128 — telemetry label for this call. See qwenTelemetry.ts. */
+  job?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -249,6 +251,7 @@ export class QwenGenerativeEngine {
       temperature: opts.temperature ?? 0.8,
       topP: opts.topP ?? 0.9,
       topK: opts.topK ?? 40,
+      job: opts.job,
     });
   }
 
@@ -271,6 +274,7 @@ export class QwenGenerativeEngine {
       topP: opts.topP ?? 0.9,
       topK: opts.topK ?? 40,
       onToken,
+      job: opts.job,
     });
   }
 

@@ -923,9 +923,41 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.38**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.39**; ledger in `VERSION.md`.
 
-- **FIRST VISITS TELL THE TRUTH (2026-08-05, latest). BOTH LINES.** HAL
+- **QWEN TELEMETRY — THE MEASUREMENT BEFORE THE CUT (2026-08-05, latest).
+  BOTH LINES.** HAL OTA-1128 / golem OTA-1105. Step 1 of the owner-approved
+  LLM-HEADROOM TRACK (owner: "move forward" — un-parking the JS-side LLM
+  work wrongly assumed to need a native build; only Phase 6's native config
+  stays build-bound on golem). Also the debt OTA-1116 left deliberately:
+  the 29-second generation "gets per-intent timing first rather than a
+  blind budget cut."
+  (1) **ONE CHOKE POINT.** New `app/ai/generation/qwenTelemetry.ts`; the
+  runtime records EVERY generation at the one boundary all nine consumers
+  cross (`LlamaRuntime.generate`). Each call site passes a job label —
+  narration PER-INTENT (`narration:<intent>`), ambient, flourish,
+  ask_arbiter, investigate_lore, fusion_forge, forge_name, parse_fallback,
+  item_synthesis. An unlabeled future consumer records as 'unlabeled'
+  instead of vanishing.
+  (2) **THE WAIT/GENERATE SPLIT IS THE DIAGNOSIS.** Every completion queues
+  behind the shared native-ML lock (arb159), so a "29s generation" can be
+  4s of generating behind 25s of queue behind a Kokoro synth. `waitMs`
+  measures entry → lock-acquired. A queue problem needs scheduling; a
+  generation problem needs a token budget; without the split a device log
+  cannot tell them apart.
+  (3) **THE LOG IS THE DELIVERY VEHICLE.** `hydrate()` registers a sink:
+  `qwen⏱ <job> <outcome> <ms>ms (wait Nms)` per call + a per-job rollup
+  every tenth call. Errors record; a throwing sink can never break a
+  generation; session-scoped by design.
+  **The track's next steps (all OTA-able, all three lines):** the
+  bank-and-spend module (generate during rest/travel/sheet-reading, spend
+  instantly, authored fallback), then the homework slots — adjacent-room
+  flavor pilot, bestiary first-kill flavor, vendor small-talk variants,
+  chronicle day summaries, rumor/echo variants. Hard rules: the model never
+  runs in front of a tap; every slot has an authored fallback. Suite
+  `ota1128QwenTelemetry`.
+
+- **FIRST VISITS TELL THE TRUTH (2026-08-05). BOTH LINES.** HAL
   OTA-1127 / golem OTA-1104. Task #174, root-caused with a LIVE-STORE REPRO
   (fresh game, hub walk, per-build call counting) — the log-archaeology
   theory (double scene builds) was WRONG: `_beginSceneCore` runs once per
