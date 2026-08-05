@@ -3254,15 +3254,22 @@ function captureBossVictoryLine(channel: string, text: string): void {
   bucket.push(clean);
 }
 
+/** OTA-1116 — what actually landed. `null` = nothing spawned (callers already
+ *  treat that as falsy and bail). `elite` is set only when the OTA-1116 swap
+ *  fired, so the announce line can stop claiming a headcount that is no longer
+ *  true — a "war party, 4 of them" line over a single body is the kind of small
+ *  lie that reads as a bug. */
+type InjectedParty = { elite: Enemy | null } | null;
+
 function injectFactionParty(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   opts: { factionId: string; factionName: string; partySize: number; noun: string },
-): boolean {
+): InjectedParty {
   const s = get();
   const player = s.player;
   const scene = s.currentScene;
-  if (!player || !scene || !scene.location) return false;
+  if (!player || !scene || !scene.location) return null;
   // OTA-1015 — a faction party is made of that faction's PEOPLE. This builder reskins
   // whatever the local wild table rolls (rename + stamp a factionId) and KEEPS
   // every trait, so an Aetherkin roll used to walk in as "<Faction> Patrol 1" —
@@ -3279,7 +3286,7 @@ function injectFactionParty(
     return isAk(e) || isRevenant(e);
   };
   const base = rollEncounter(scene.location).filter((e) => !e.boss && !specialTemplate(e));
-  if (base.length === 0) return false;
+  if (base.length === 0) return null;
   // OTA-1035 — AND THE BODY IS A PERSON. Owner: "let's fix the loot drop issue
   // where humans drop beast loot." The reskin above kept every trait of the WILD
   // roll, so a "Conspiracy Architects Patrol" could be a Mud Cyclops underneath —
@@ -3310,7 +3317,36 @@ function injectFactionParty(
     Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence),
     player.hpMax,
   ) + tide; // escalation: an ascendant faction hits harder
-  const scaled = scaleEncounterForContext(party, scene.location.danger + Math.floor(tide / 2), power);
+  const packDanger = scene.location.danger + Math.floor(tide / 2);
+  let scaled = scaleEncounterForContext(party, packDanger, power);
+  // OTA-1116 — THE ELITE SWAP. The `elite` dial (OTA-1113) finally has a
+  // consumer. On a hit, the party that would have crested the rise arrives as
+  // ONE named body instead — the survey's CONTENT lever rather than another
+  // multiplier, and the only one that makes a fight different instead of
+  // longer.
+  //
+  // ⚠ The fold happens AFTER scaling, on purpose. The scaled pack's summed HP
+  // IS the elite's budget, straight from scaleEncounterForContext's pack
+  // branch, so the elite is exactly as durable as the party would have been —
+  // with no new balance constant to drift. Re-scaling the single body then
+  // routes it through the SOLO branch, which grants the FULL attack/AC bump
+  // rather than the pack's 0.6x; that softening exists precisely BECAUSE there
+  // are several of them, so one body earning the full rate is the shipped rule
+  // and not a new opinion. The pack's HP total is then restored over whatever
+  // the solo path computed: durability from the pack, aggression from the solo.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const eliteSwapMod = require('../engine/eliteSwap') as typeof import('../engine/eliteSwap');
+  const eliteMult = profileOf(player).elite;
+  if (eliteSwapMod.shouldSwapToElite(scaled.length, { eliteMult })) {
+    const folded = eliteSwapMod.foldPartyIntoElite(scaled, {
+      factionName: opts.factionName, noun: opts.noun,
+    });
+    if (folded) {
+      const solo = scaleEncounterForContext([folded.elite], packDanger, power);
+      const body = solo[0] ?? folded.elite;
+      scaled = [{ ...body, hp: folded.hpBudget, eliteReplaced: folded.elite.eliteReplaced }];
+    }
+  }
   const enemyHps = scaled.map((e) => e.hp);
   set((st) => (st.currentScene ? {
     currentScene: {
@@ -3327,7 +3363,7 @@ function injectFactionParty(
       enemiesAtBase: !!st.currentScene.elevatedOn,
     },
   } : st));
-  return true;
+  return { elite: scaled.length === 1 && scaled[0]?.eliteReplaced ? scaled[0] : null };
 }
 
 // OTA-1016 — ARE YOU UNDER A ROOF? The three outdoor world-event spawners below each
@@ -3392,9 +3428,13 @@ function maybeSpawnRaid(
   });
   if (!landed) return;
   set((st) => ({ worldMemory: { ...st.worldMemory, lastRaidHour: hour } }));
+  // OTA-1116 — if the elite swap fired, the headcount is no longer true. One
+  // body gets its own arrival: the war party is what did NOT come.
   get().appendLog(
     'world',
-    `${withArticleCap(plan.raiderName)} war party crests the rise — ${plan.partySize} of them, blades already out. They've marked you for standing with the ${plan.provokedAllyName}.`,
+    landed.elite
+      ? `No war party crests the rise — one figure does. ${withArticleCap(landed.elite.name)} comes alone, unhurried, and does not need the others. You are marked for standing with the ${plan.provokedAllyName}.`
+      : `${withArticleCap(plan.raiderName)} war party crests the rise — ${plan.partySize} of them, blades already out. They've marked you for standing with the ${plan.provokedAllyName}.`,
   );
   get().appendLog(
     'arbiter',
@@ -3443,7 +3483,9 @@ function maybeInterceptPatrol(
   set((st) => ({ worldMemory: { ...st.worldMemory, lastRaidHour: hour } }));
   get().appendLog(
     'world',
-    `${withArticleCap(holderName)} patrol works the ground near their outpost — ${partySize} of them — and spots you closing in. They move to cut you off.`,
+    landed.elite
+      ? `${withArticleCap(landed.elite.name)} works the ground near their outpost alone — no patrol, no escort — and turns toward you the moment you are seen.`
+      : `${withArticleCap(holderName)} patrol works the ground near their outpost — ${partySize} of them — and spots you closing in. They move to cut you off.`,
   );
   get().appendLog(
     'arbiter',
@@ -21526,10 +21568,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       : null;
     const basePool = enemy.loot.length > 0 ? enemy.loot : enemy.boss ? [] : ['Aether Dust'];
     const lootPool = revWeaponName ? basePool.filter((n) => n !== revWeaponName) : basePool;
-    const lootRollCount = enemy.rarity === 'Legendary' ? 3 + Math.floor(Math.random() * 2)
+    // OTA-1116 — ⚠ THE ELITE CARRY, and the one place the swap could have gone
+    // wrong. Spoils are rolled PER CORPSE, so a body that arrived instead of a
+    // party of four would otherwise pay one corpse's worth for four bodies'
+    // fight — being paid LESS for a harder encounter, which is precisely the
+    // fake-difficulty trap the `elite` dial exists to avoid. The corpse owes the
+    // party's worth. One body's worth is already in the rarity roll above, so
+    // the carry is n−1 extra rolls (eliteExtraLootRolls), and it rides the
+    // ROLL COUNT rather than a flat grant so the elite's spoils stay drawn from
+    // its own loot table and can still come up dupes like any other kill.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const eliteMod = require('../engine/eliteSwap') as typeof import('../engine/eliteSwap');
+    const lootRollCount = (enemy.rarity === 'Legendary' ? 3 + Math.floor(Math.random() * 2)
       : enemy.rarity === 'Rare' ? 2 + Math.floor(Math.random() * 2)
       : enemy.rarity === 'Uncommon' ? 2 + Math.floor(Math.random() * 2)
-      : 1 + Math.floor(Math.random() * 2);
+      : 1 + Math.floor(Math.random() * 2)) + eliteMod.eliteExtraLootRolls(enemy);
     const lootDrops: string[] = [];
     // OTA-938 — canonicalize each rolled name (resolveLootItem: case/alias-tolerant catalog
     // match) so the summary line and the granted item agree on the REAL, stackable name.

@@ -258,6 +258,12 @@ export interface Enemy {
    *  might list ["sentinel", "guardian", "statue"] so `attack the sentinel`
    *  resolves to the canonical entity. Lowercase, no punctuation. */
   aliases?: string[];
+  /** OTA-1116 — this body arrived INSTEAD of a party of N (the `elite`
+   *  difficulty dial). Carries the count so the defeat path can pay the
+   *  party's worth in loot rather than one corpse's: spoils are rolled per
+   *  body, and paying less for a harder fight is the fake-difficulty trap the
+   *  dial exists to avoid. Absent on every ordinary enemy. */
+  eliteReplaced?: number;
   /** OTA-897 (SA-5) — one-line codex "voice": a short, evocative field
    *  description shown in the bestiary (once the foe is recorded) and, briefly,
    *  on the combat enemy panel. Pure flavor — never read by combat logic. */
