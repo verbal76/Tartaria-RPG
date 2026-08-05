@@ -128,7 +128,11 @@ describe('OTA-1129 — ambient reads a lean prompt', () => {
     // player stood in the Outskirts. Leaning the prompt must not cost that.
     const p = buildSystemPrompt(ctxOf(bigInvString, true))[0]!.content;
     expect(p).toContain('The Architect\'s Blind');
-    expect(p).toContain('NEVER name "Borderlands"');
+    // RETARGETED BY OTA-1151 — the sentence around this example was rewritten
+    // when four duplicate copies of the no-invented-places rule collapsed into
+    // one. The EXAMPLE is what this test is about (it is the actual playtest
+    // failure), so it is anchored on the example alone now.
+    expect(p).toContain('"Borderlands"');
     expect(p).toContain('You are the Arbiter');
     // …and it still carries the read of the player the beat reflects on.
     expect(p).toContain('STR5 DEX12');

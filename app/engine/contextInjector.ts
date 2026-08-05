@@ -180,27 +180,50 @@ const SHARED_PREAMBLE =
   "NEVER write 'the adventurer', 'the figure', 'the explorer', or any " +
   'third-person stand-in for the player.';
 
+// ⚠ OTA-1151 — THE PROMPT WAS SAYING THE SAME THING FOUR TIMES.
+//
+// Measured, not guessed. A representative scene_intro prompt came to 3,194
+// characters / ~888 tokens, and the device log priced prefill at 12.9 ms per
+// prompt token — 11.0 seconds of reading to produce a 33-token sentence. The
+// section breakdown put a THIRD of the whole prompt in this one constant.
+//
+// Three separate OTAs each added their own "do not invent places" guard, none
+// removing the previous one, so the model was reading the rule FOUR times:
+//   1. NO_INVENTED_PLACES        — 'NEVER name "Borderlands" … not named below'
+//   2. here                      — 'DO NOT name any location, room, weather…'
+//   3. `Location: <biome> - <room>`
+//   4. '**The player is at "<room>". If you name any place, it MUST be…**'
+// Roughly 123 tokens to state one rule. A 0.5B model given the same
+// instruction in four different wordings does not obey it four times as hard;
+// it spends attention reconciling them. Consolidated into ONE statement
+// (NO_INVENTED_PLACES, which now carries the whole rule including the
+// end-early escape hatch) plus ONE interpolated anchor in the body.
+//
+// The third-person ban was doubled the same way: SHARED_PREAMBLE already says
+// NEVER write "The player" / "they" / "the adventurer" / "the figure" /
+// "the explorer" — anywhere in the sentence, which strictly contains the
+// weaker "if a draft sentence BEGINS with…" clause that used to sit here.
+//
+// The verb catalog stays, because its job is real — it teaches the player the
+// engine's vocabulary through narration, and it is the one part of this block
+// the model cannot supply from training data. What goes is the padding: the
+// slash-alternates ("retreat / step back", "hide / sneak"), the parenthetical
+// item list after "use", and the six verbs a one-sentence aside will never
+// reach for. The Aetheric verbs are kept in full; those are the ones a model
+// genuinely does not know.
 const VOICE_RULES =
   'Sentences must START with ' +
   '"You" or "Your" or with a direct action verb in second person. ' +
-  'If a draft sentence begins with "The player" or "They", rewrite it. ' +
   // OTA-1144 — "above" → "below": these rules now PRECEDE the SYSTEM FACTS
   // block so they can be cached. The pointer has to follow the move (OTA-1131
   // is what a prompt that lies about its own layout costs).
   'Do not invent emotions, motivations, traps, mechanics, events, or ' +
   'outcomes that are not listed in the SYSTEM FACTS below. Only narrate ' +
   "the player's last action and the static facts already present. " +
-  'DO NOT name any location, room, weather, or NPC that is not in the ' +
-  'SYSTEM FACTS — no "Aetherstone Deep", no "Grand Hall", no "Ash Storm", ' +
-  'no sarcophagi or vaulted ceilings unless they appear in Environment. ' +
-  'If you would have to invent scenery to fill a sentence, end early. ' +
-  'AVAILABLE PLAYER ACTIONS the engine resolves mechanically: attack, ' +
-  'brawl, throw, dodge, block, advance, retreat / step back, flee / escape, ' +
-  'aim, fire, reload, take cover, dash / sprint, disengage, help, ready, ' +
-  'climb, swim, jump, hide / sneak, search / look, equip / unequip, use ' +
-  '(relic / item / torch / locket), dig, craft, steal, ask, rest. ' +
-  'Aetheric verbs: cast, channel, weave, incant. Use these vocabulary ' +
-  'choices in narration so the player learns the system. ' +
+  'Use the engine\'s own verbs so the player learns the system: attack, ' +
+  'brawl, throw, dodge, block, advance, retreat, flee, aim, fire, climb, ' +
+  'hide, search, equip, use, dig, craft, steal, ask, rest — and the ' +
+  'Aetheric verbs cast, channel, weave, incant. ' +
   'End on a complete sentence.';
 
 // ⚠ OTA-1131 — THE AMBIENT PROMPT WAS ARGUING WITH ITSELF.
@@ -235,13 +258,14 @@ const VOICE_RULES =
 // worth having in front of the first variable byte). What remains is what is
 // ambient-specific. "named above" → "named below": the scene anchor now
 // follows these rules rather than preceding them.
+// OTA-1151 — three clauses removed as duplicates, not as trims: the
+// begins-with-"The player" clause is contained in SHARED_PREAMBLE's blanket
+// ban, and the don't-name-places + end-early pair now live once, in
+// NO_INVENTED_PLACES, which this branch already prints directly above.
 const AMBIENT_VOICE_RULES =
   'Sentences must START with ' +
-  '"You" or "Your". If a draft sentence begins with "The player" or ' +
-  '"They", rewrite it. Do not invent events, traps, mechanics, or ' +
-  'outcomes — nothing is happening; this is a quiet moment. Do not name ' +
-  'any place, room, weather or person other than the location named below. ' +
-  'If you would have to invent scenery to fill a sentence, end early. ' +
+  '"You" or "Your". Do not invent events, traps, mechanics, or ' +
+  'outcomes — nothing is happening; this is a quiet moment. ' +
   'End on a complete sentence.';
 
 // ⚠ OTA-1144 — EACH JOB IS NOW TWO PIECES, AND THE SPLIT IS DELIBERATE.
@@ -301,9 +325,18 @@ const AMBIENT_TASK =
  *  it lives in the cached prefix; the room-specific half stays in the tail
  *  where it is closest to generation. Both halves together say what the single
  *  interpolated line used to say on its own. */
+// OTA-1151 — this is now the ONLY statement of the rule, for both branches.
+// It absorbed the copy that lived in VOICE_RULES (with its examples) and the
+// copy in AMBIENT_VOICE_RULES, plus the end-early escape hatch that both
+// carried. The examples are kept because they are what makes the rule
+// concrete to a small model — the failure it exists for was Qwen narrating
+// "The Borderlands, a twisted shadowy landscape…" while the player stood in
+// the Tartarian Outskirts.
 const NO_INVENTED_PLACES =
-  'NEVER name "Borderlands", "Aetheric Deep", "Grand Hall", or any other ' +
-  'location that is not named below.';
+  'NEVER name a location, room, weather or person that is not named below — ' +
+  'no "Borderlands", no "Grand Hall", no "Ash Storm", no sarcophagi or ' +
+  'vaulted ceilings unless they are named below. If you would have to invent ' +
+  'scenery to fill a sentence, end early.';
 
 export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
   const rules = ctx.ambient
@@ -376,8 +409,15 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
     rules,
     '',
     `[SYSTEM FACTS - DO NOT INVENT EXITS, ENEMIES, OR PLACE NAMES]`,
-    `Location: ${ctx.current_biome} - ${ctx.room_name}`,
-    `**The player is at "${locationName}". If you name any place, it MUST be "${locationName}".**`,
+    // OTA-1151 — ONE anchor line, not two. `Location: <biome> - <room>` and
+    // the bolded "the player is at <room>, if you name any place it MUST be
+    // <room>" said the same thing back to back, and NO_INVENTED_PLACES had
+    // already said it a third time in the prefix. This keeps the bolded form
+    // (the emphasis is what OTA-232's playtest fix was built on) and folds the
+    // biome into it, so nothing is lost but the repetition. Matches the
+    // ambient branch's phrasing, which is worth something on its own: two
+    // prompts that share more bytes share more cache.
+    `**The player is at "${locationName}" (${ctx.current_biome}) — the ONLY place you may name.**`,
     `Environment: ${ctx.environmental_description}`,
     `Exits: ${ctx.available_exits}`,
     `Entities Present: ${ctx.active_entities}`,
