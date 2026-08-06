@@ -94,10 +94,14 @@ describe('OTA-1165 lever 2 — HP milestone every 3 distinct kills', () => {
   });
 });
 
-describe('OTA-1165 lever 3 — acid shreds a boss 7 AC, not 11', () => {
+describe('OTA-1165 lever 3 — acid shreds a boss on a +2 headroom, not +6', () => {
   it('boss cap is ACID_SHRED_MAX + 2', () => {
     expect(acidShredCap({ boss: true })).toBe(ACID_SHRED_MAX + 2);
-    expect(acidShredCap({ boss: true })).toBe(7);
+    // ⚠ Retargeted by OTA-1173. The absolute was 7 back when ACID_SHRED_MAX was
+    // 5; that batch took the BASE cap 5 → 3, so the same +2 headroom now totals
+    // 5. OTA-1165's actual claim — the boss BONUS is 2, not 6 — is the relative
+    // assertion above and is untouched. Only the arithmetic downstream moved.
+    expect(acidShredCap({ boss: true })).toBe(5);
   });
 
   it('non-boss and missing-enemy caps are unchanged at ACID_SHRED_MAX', () => {
