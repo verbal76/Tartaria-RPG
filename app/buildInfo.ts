@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.64';
+export const DISPLAY_VERSION = '4.29.65';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -21688,7 +21688,47 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // lines that must SURVIVE, because a guard that quietly deletes
 // the feature is the recurring failure in this area (OTA-1031).
 // New suite ota1131StopRambling (14 tests). DISPLAY_VERSION 4.29.64.
-export const OTA_BUILD_ID = '2026-08-05-1131-stop-rambling';
+// OTA-1132 — TIMESTAMP THE VOICE, because the owner was timing
+// it by hand. After OTA-1130 shipped: "5-6 second delay between
+// welcome back text and when kokoro fired the same line. this was
+// me clocking it as the player coming back into the game. are the
+// text lines and spoken lines timestamped when they fire? this
+// would help measure the gap."
+// ⚠ THE ANSWER WAS NO, AND THAT IS THE FINDING. appendLog
+// timestamps every TEXT line and the qwen⏱ telemetry prices every
+// generation — but NOTHING fired when audio actually began. The one
+// number the owner cared about was the only one the game did not
+// record, which is why a person with a stopwatch was the best
+// instrument available.
+// ⚠ THREE NUMBERS, NOT ONE, because they have three different
+// fixes: gap (text on screen → first audio, the thing complained
+// about), wait (how long the native-ML lock was held by something
+// else — a Qwen job in front of us), and synth (how long Kokoro
+// itself took once it had the lock). Wait is measured INSIDE
+// runExclusiveNativeMl by stamping on entry to the locked fn, so it
+// is real queue time rather than a guess, and synth subtracts it so
+// the two never double-count.
+// Plus the SOURCE — cached / prefetch / live. That one matters
+// most: if `cached` shows and the gap is still large, OTA-1130's
+// pre-synthesis is not the win it was built to be, and the log will
+// say so instead of leaving it to be argued about.
+// ⚠ ONLY THE FIRST CHUNK REPORTS. A three-sentence line is three
+// queue entries; letting each log a gap would triple the noise AND
+// lie, because the second and third wait on the sentence before
+// them rather than on the delay the player felt.
+// ⚠ AND THE WIRING IS DEFENSIVE FOR A REASON THAT COST A TEST RUN.
+// PiperTTSManager is the native layer and must not import the
+// store, so TTSController installs a log sink into it. The first
+// attempt did that at MODULE SCOPE — and every existing partial
+// mock of PiperTTSManager blew up on import with "setVoiceLogSink
+// is not a function". A debug line is not worth that blast radius,
+// so the install moved into startTTSController and is
+// optional-called: a mock without the export gets no sink and logs
+// nothing, which is correct.
+// New suite ota1132TimestampTheVoice (11 tests).
+// DISPLAY_VERSION 4.29.65.
+export const OTA_BUILD_ID = '2026-08-05-1132-timestamp-the-voice';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1131-stop-rambling';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1130-voice-lands-with-the-text';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1129-scene-intro-bank';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1128-said-it-four-times';

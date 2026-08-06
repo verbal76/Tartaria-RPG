@@ -121,6 +121,10 @@ interface QueuedUtterance {
    *  audio is the wrong voice and gets discarded; we re-run
    *  forward() with the current voice instead. */
   prefetchVoiceId?: string | null;
+  /** OTA-1132 — true for the first chunk of a line. Only the head reports the
+   *  text-to-audio gap; later chunks are waiting on their own predecessor, not
+   *  on the delay the player experienced. */
+  lineHead?: boolean;
   /** ⚠ OTA-1130 — WHEN THIS LINE WENT ON SCREEN. The player has already read it
    *  by the time we get here; this is the clock against which "you read it then
    *  hear it 10 seconds later" is measured. Stamped at enqueue, because that is
@@ -301,15 +305,47 @@ export async function presynthesize(text: string, voiceId?: string | null): Prom
 export function _resetPresynth(): void { presynth.clear(); }
 export function _presynthSize(): number { return presynth.size; }
 
-function inferSerial(model: any, text: string, rate: number): Promise<Float32Array | null> {
+/** ⚠ OTA-1132 — THE VOICE LOG SINK. The owner, after clocking the gap by hand:
+ *  *"are the text lines and spoken lines timestamped when they fire? this would
+ *  help measure the gap."* They were not — `appendLog` timestamps the TEXT, and
+ *  nothing at all fired when audio actually began, so the only instrument was a
+ *  human with a stopwatch. This is the missing half.
+ *
+ *  A settable sink rather than a direct store import: this module is the
+ *  low-level native layer and must not depend on the store (TTSController owns
+ *  that edge and installs the sink at boot). No sink → silence, which is the
+ *  right behaviour under test. */
+let voiceLogSink: ((line: string) => void) | null = null;
+export function setVoiceLogSink(fn: ((line: string) => void) | null): void {
+  voiceLogSink = fn;
+}
+function logv(line: string): void {
+  try { voiceLogSink?.(line); } catch { /* a broken sink must never break audio */ }
+}
+
+/** OTA-1132 — split the lock WAIT from the synthesis itself. Both are "why the
+ *  voice was late", but they have completely different fixes: waiting means
+ *  something else held the native-ML lock (a Qwen job), while a slow synth means
+ *  the line was long or the device was busy. Reporting one number for both would
+ *  hide which. */
+function inferSerial(
+  model: any,
+  text: string,
+  rate: number,
+  timing?: { waitMs: number },
+): Promise<Float32Array | null> {
   // arb159 — route Kokoro synthesis through the SHARED native-ML lock so a synth
   // never overlaps a Qwen completion. The lock STAYS (it's what stopped the
   // crash); the arb161 fix is on the Qwen side — a generation cooldown so Qwen
   // doesn't grab this lock on every beat and starve the voice.
-  // OTA-634 — voice runs at LOW priority so an interactive LLM narration jumps
-  // ahead of queued speech synth (the words land promptly; the voice fills in
-  // behind). The lock still guarantees one-at-a-time, so the crash guard holds.
-  return runExclusiveNativeMl(() => model.forward(text, rate), ML_PRIORITY_VOICE) as Promise<Float32Array | null>;
+  // OTA-1130 — voice now runs ABOVE the LLM (reversing OTA-634): a narration
+  // delayed two seconds is invisible, a voice delayed ten is the most obvious
+  // defect in the game. The lock still guarantees one-at-a-time.
+  const enqueuedAt = Date.now();
+  return runExclusiveNativeMl(() => {
+    if (timing) timing.waitMs = Date.now() - enqueuedAt;
+    return model.forward(text, rate);
+  }, ML_PRIORITY_VOICE) as Promise<Float32Array | null>;
 }
 
 // arb159/OTA — free a native voice module THROUGH the shared native-ML lock. A
@@ -767,12 +803,18 @@ export function speak(text: string, voiceId?: string | null, channel?: string, o
   }
   const chunks = chunkForSpeech(prepared);
   const resolvedVoice = voiceId ?? arbiterVoiceId();
-  for (const chunk of chunks) {
+  for (const [ci, chunk] of chunks.entries()) {
     queue.push({
       id: nextId++, text: chunk, voiceId: resolvedVoice, channel, lineId: id,
       endsSentence: endsOnTerminator(chunk),
-      // OTA-1130 — the read-clock starts now; see STALE_LINE_MS.
+      // OTA-1130 — the read-clock starts now; see STALE_LINE_MS. Stamped on
+      // EVERY chunk so the stale sweep can price any of them.
       queuedAt: Date.now(),
+      // OTA-1132 — but only the FIRST chunk reports the gap. A three-sentence
+      // line would otherwise log three times and the second and third would be
+      // measuring the wrong thing entirely — the wait for their own turn behind
+      // the sentence before them, not the delay the player felt.
+      lineHead: ci === 0,
       // ⚠ OTA-1130 — PRE-SYNTHESISED AUDIO, if this line was banked ahead of
       // time. When it hits, drain() plays without inferring at all and the
       // voice lands with the text instead of behind it.
@@ -841,9 +883,34 @@ async function drain(): Promise<void> {
     // re-infer with the current model.
     const prefetchStillValid = !!next.prefetch
       && (next.prefetchVoiceId === undefined || next.prefetchVoiceId === targetVoice);
+    // ⚠ OTA-1132 — MEASURE THE GAP THE OWNER WAS TIMING BY HAND.
+    // Three separate numbers, because they have three different fixes:
+    //   gap   — text on screen → first audio. The thing actually complained
+    //           about ("5-6 second delay between welcome back text and when
+    //           kokoro fired the same line").
+    //   wait  — of that, how long the native-ML lock was held by something
+    //           else. A Qwen job in front of us.
+    //   synth — how long Kokoro itself took once it had the lock.
+    // Plus whether the audio came from OTA-1130's pre-synthesis cache, which is
+    // the one case where the gap should be near zero — if `cached` shows and
+    // the gap is still large, the cache is not the win it was meant to be.
+    const timing = { waitMs: 0 };
+    const preSynthed = next.resolvedSamples != null && next.resolvedSamples.length > 0;
+    const tBeforeInfer = Date.now();
     const firstSamples: Float32Array = asFloat32(
-      prefetchStillValid ? await next.prefetch! : await inferSerial(model, next.text, settings.rate),
+      preSynthed
+        ? next.resolvedSamples
+        : prefetchStillValid ? await next.prefetch! : await inferSerial(model, next.text, settings.rate, timing),
     );
+    const synthMs = Date.now() - tBeforeInfer - timing.waitMs;
+    if (next.queuedAt != null && next.lineHead) {
+      const source = preSynthed ? 'cached' : prefetchStillValid ? 'prefetch' : 'live';
+      logv(
+        `voice⏱ gap ${Date.now() - next.queuedAt}ms`
+        + ` (wait ${timing.waitMs}ms + synth ${synthMs}ms, ${source})`
+        + ` "${next.text.slice(0, 40)}${next.text.length > 40 ? '…' : ''}"`,
+      );
+    }
     if (!firstSamples || firstSamples.length === 0) {
       currentlySpeaking = null;
       void drain();

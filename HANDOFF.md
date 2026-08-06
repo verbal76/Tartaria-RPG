@@ -1129,7 +1129,60 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE ARBITER STOPS RAMBLING AND THE PROMPT STOPS LEAKING (2026-08-05, latest).
+- **⚠⚠ TIMESTAMP THE VOICE (2026-08-05, latest). BOTH LINES.** golem OTA-1132 /
+  HAL OTA-1155. After OTA-1130 shipped, the owner was still clocking it by
+  hand:
+
+  > *"5-6 second delay between welcome back text and when kokoro fired the same
+  > line. this was me clocking it as the player coming back into the game. are
+  > the text lines and spoken lines timestamped when they fire? this would help
+  > measure the gap."*
+
+  ⚠ **The answer was no, and that is the whole finding.** `appendLog` timestamps
+  every *text* line, and the `qwen⏱` telemetry prices every generation — but
+  **nothing fired when audio actually began**. The one number the owner cared
+  about was the only one the game did not record, which is why a person with a
+  stopwatch was the best instrument available.
+
+  ⚠ **Three numbers, not one**, because they have three different fixes:
+
+  | field | meaning |
+  |---|---|
+  | `gap` | text on screen → first audio. The thing actually complained about. |
+  | `wait` | of that, how long the native-ML lock was held by something else — a Qwen job in front of us. |
+  | `synth` | how long Kokoro itself took once it had the lock. |
+
+  `wait` is measured **inside** `runExclusiveNativeMl`, by stamping on entry to
+  the locked function — real queue time rather than a guess — and `synth`
+  subtracts it so the two never double-count. Plus the **source**: `cached`
+  (OTA-1130 pre-synthesis), `prefetch`, or `live`. That last one matters most:
+  if `cached` shows and the gap is still large, pre-synthesis is not the win it
+  was built to be, and **the log will say so** instead of leaving it to be
+  argued about.
+
+  ⚠ **Only the first chunk reports.** A three-sentence line is three queue
+  entries; letting each log a gap would triple the noise *and* lie, because the
+  second and third are waiting on the sentence before them rather than on the
+  delay the player felt.
+
+  ⚠ **The wiring is defensive for a reason that cost a test run.**
+  `PiperTTSManager` is the native layer and must not import the store, so
+  `TTSController` installs a log sink into it. The first attempt did that at
+  **module scope** — and every existing partial mock of `PiperTTSManager` in the
+  suite blew up on import with `setVoiceLogSink is not a function`. A debug line
+  is not worth that blast radius, so the install moved into
+  `startTTSController` and is optional-called: a mock without the export gets no
+  sink and logs nothing, which is correct.
+
+  New suite `ota1132TimestampTheVoice` (11 tests).
+
+  **What to look for in the next log:** `voice⏱ gap …ms (wait …ms + synth …ms,
+  cached|prefetch|live)`. If the welcome-back still reads 5-6 s, the split says
+  immediately whether it was the lock (a boot-time `item_synthesis` was running
+  in the log that prompted this — 3.8 s, and discarded by the clamp both times)
+  or Kokoro itself.
+
+- **⚠⚠ THE ARBITER STOPS RAMBLING AND THE PROMPT STOPS LEAKING (2026-08-05).
   BOTH LINES.** golem OTA-1131 / HAL OTA-1154. Both findings come from
   **one** device log (4.29.62 / OTA-1129), and neither was reproducible from a
   cold read of the code — this is instrumentation doing the job it exists for.
