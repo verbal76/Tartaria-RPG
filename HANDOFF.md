@@ -1260,7 +1260,56 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE FIRST WORD SURVIVES (2026-08-06, latest). BOTH LINES.** golem
+- **⚠⚠ THE MODIFIER IS EVIDENCE (2026-08-06, latest). BOTH LINES.** golem
+  OTA-1149 / HAL OTA-1172. From the device log on OTA-1166:
+  `craft Frost Paste` → `resolved=Searing Paste`, and a second instance the
+  same session, `craft Blue Cap Draught` → `resolved=mountain capital` — a
+  LOCATION name.
+
+  ⚠ **THE SYMPTOM LOOKED COSMETIC AND WAS NOT.** Both crafts produced the right
+  item, because craft matches RECIPES rather than inventory, so the only visible
+  damage was a wrong word in a debug line. But ~25 gameStore handlers read
+  `parsed.resolvedNoun` BEFORE `parsed.target`. The same resolution under `use`
+  spends the wrong consumable, and the player never learns why. **A debug field
+  that no handler is supposed to trust is still a debug field that 25 handlers
+  trust.**
+
+  Mechanism, `app/engine/parser.ts` `resolveItem`: pass 2 matched on the item's
+  HEAD NOUN — the last word of its name — and never consulted the rest.
+  `"frost paste"` → head `paste` → the first inventory row ending in "paste"
+  wins, and `frost` is discarded. Any pair sharing a last word collides:
+  Searing/Frost Paste, Iron/Brass Key, Poison/Acid Vial, Rusted/Rail Blade.
+
+  ⚠ **THIS IS OTA-093'S BUG SEEN FROM THE OTHER SIDE.** OTA-093 closed the
+  mirror image — adjective-ONLY input (`"bone"` → Bone Fragment) no longer wins
+  — and its comment block says exactly that. Nobody checked the direction where
+  the INPUT is the side carrying the adjective. Same function, same comment,
+  thirteen lines apart. **When a fix says "X can no longer win", ask what
+  happens when the other side supplies X.**
+
+  Fix, in order: **(a)** a candidate whose other name words all appear in the
+  input wins outright — this also settles `"mud-rend blade"` vs `Rusted Blade`
+  without needing the off-hand hint; **(b)** nothing agrees and the input
+  carried no extra token, so nothing is being ignored — keep the historical
+  first-match (`"use the blade"`); **(c)** nothing agrees and the input DID
+  carry a token no candidate accounts for — return undefined. A miss is
+  recoverable ("you have no Frost Paste"); a confident wrong answer spends an
+  item.
+
+  ⚠ **THE GUARD HAD TO COVER PASS 3 TOO**, or it does nothing. Pass 3
+  fuzzy-matches tokens against head nouns, and `fuzzyEqual('paste','paste')` is
+  true — a pass-2-only fix hands Searing Paste straight back one loop later.
+  Both passes now route through one `pickAmong`. Pass 1 (full-name containment)
+  is untouched.
+
+  New suite `ota1149TheModifierIsEvidence` (8 tests), including the
+  must-not-change half. All parser suites re-run green — `resolveItem` is
+  load-bearing for the whole verb table.
+
+  ⚠ Heavy sims NOT run for this one (Actions still down); the change touches no
+  combat, spawn or movement math, so the heavy tier has no reach into it.
+
+- **⚠⚠ THE FIRST WORD SURVIVES (2026-08-06). BOTH LINES.** golem
   OTA-1148 / HAL OTA-1171. Owner: *"there has been a few times where the
   arbiter has started speaking and has either skipped his first word or started
   partway through it."*
