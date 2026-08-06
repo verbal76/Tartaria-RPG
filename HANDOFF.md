@@ -1142,7 +1142,240 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE PROMPT WAS SAYING THE SAME THING FOUR TIMES (2026-08-05, latest).
+- **⚠⚠ THE ARBITER STOPS RAMBLING AND THE PROMPT STOPS LEAKING (2026-08-05, latest).
+  BOTH LINES.** HAL OTA-1154 / golem OTA-1131. Both findings come from
+  **one** device log (4.29.62 / OTA-1152), and neither was reproducible from a
+  cold read of the code — this is instrumentation doing the job it exists for.
+
+  ⚠ **1. Five unrelated lore lines in ten seconds, one tile.**
+
+  | time | line |
+  |---|---|
+  | 00:14:43 | *"You saw the traveler … That memory will rot if you leave it."* |
+  | 00:14:45 | *"Black, polished, magnetic. They were aimed at something in the sky."* |
+  | 00:14:47 | *"The observatory beneath the Pillars charted skies that no longer exist."* |
+  | 00:14:51 | *"Walk between two Pillars and your compass forgets you for a moment."* |
+  | 00:14:53 | *"Birds will not perch here. Birds are wise."* |
+
+  Every one carries `reason=intent-not-allowed:investigate` — the **template**
+  path, which appended a flavor line *unconditionally on every call*. The owner:
+
+  > *"if he has multiple lines and they don't have a gap of time in between and
+  > they are unrelated topics then he just sounds like he is rambling. I don't
+  > want the arbiter to be a chatty Kathy … forcing him to repeatedly say
+  > multiple things in one tile comes across as too much."*
+
+  ⚠ **The fix is a BUDGET, not a filter**, and that distinction is the whole
+  design. Every one of those five lines is good *on its own*; the defect is only
+  that they arrived together. Nothing here judges a line's quality — it rations
+  how often the Arbiter volunteers something unasked. Two limits, because the
+  owner named two different things:
+
+  - **One per tile** — *"multiple things in one tile comes across as too much"*.
+  - **A shared clock** — *"they don't have a gap of time in between"*. Crossing
+    into a new tile resets the count but **not** the clock; otherwise sprinting
+    through four tiles produces four asides, which is the same rambling by
+    another route.
+
+  ⚠ **What is deliberately NOT rationed**, in the owner's own words: *"lore
+  flavor lines are good advice on how to play. like what weapon to choose or he
+  notices that they're resistant to something is good."* Those are **answers**
+  to something the player did — combat cues, resist callouts, refusals, mission
+  beats — and they never pass through this door at all.
+
+  The clock is shared by **every** Arbiter line, not just the budgeted ones: in
+  the same ten seconds an ambient musing landed *between* the asides, so a
+  generated line stamps the clock too, and ambient now waits when he has just
+  spoken. The banked arrival intro **spends** the tile's budget, which is right —
+  it is the line with something to say about where the player now is, and
+  everything after it waits.
+
+  ⚠ **2. The prompt leaked into the feed, and was read aloud.**
+
+  > `[arbiter] Your read of them: HP 24/24, Stamina 8/14, AC 10 You, the
+  > seasoned traveler, have`
+
+  That is the ambient prompt's own line — `Your read of them: ${player_stats}` —
+  recited back and then continued from. OTA-1053 built
+  `looksLikeInstructionEcho` for exactly this class and it carries a dozen
+  patterns; **every one of them is about the model reciting its INSTRUCTIONS.**
+  None covered it reciting the **facts block**, which is just as much prompt and
+  reads worse, because it puts raw numbers in the narrator's mouth.
+
+  Guarded now on the literal strings the prompt emits, per OTA-1148's standing
+  rule: *when a log hands you the exact failing input, build the guard around
+  that string.* The suite asserts the verbatim leaked line, each of its halves,
+  and every other field label — plus **seven ordinary Arbiter lines that must
+  survive**, because a guard that quietly deletes the feature is the recurring
+  failure in this area (OTA-1054 ate the ambient companion for four builds).
+
+  New suite `ota1154StopRambling` (14 tests).
+
+  **Also seen in the same log, recorded and not yet acted on:**
+
+  - `narration:scene_intro_fill preempted 7989ms … out 0t` — the OTA-1152 bank
+    fill started and was cut short by the player acting. The harness behaving
+    exactly as designed, but it means the bank may rarely fill during active
+    play. One sample; worth watching before tuning.
+  - `item_synth:rejected-by-clamp` twice out of two — item synthesis paid full
+    price and produced nothing usable both times.
+  - **AC 10 with a full kit.** The `stats:` debug lines show eight worn pieces
+    and `gear: INT+2,STR+4,DEX+4` — **no AC contribution at all** — while AC
+    reads 10, the bare-skin base. The OTA-1147 `ac-shift` ledger did not fire
+    because it only runs inside `applyEnemyCounter`, and the player fled both
+    fights. That is the data-capture hole the owner asked about: **the ledger
+    needs to fire outside combat too.**
+
+- **⚠⚠ THE VOICE STOPS ARRIVING AFTER YOU ALREADY READ IT (2026-08-05).
+  BOTH LINES.** HAL OTA-1153 / golem OTA-1130. The owner, playing:
+
+  > *"do we need to see the text and then hear it? that's what makes the voice
+  > feel late sometimes, you read it then hear it 10 seconds later."*
+
+  ⚠ **The mechanism, and it was not an accident.** Kokoro and Qwen share **one
+  lock** — arb159 put them there because running both at once SIGSEGV'd the
+  Tensor G5, and that exclusivity is non-negotiable. OTA-634 then made the lock
+  priority-aware and wrote its trade down plainly:
+
+  > *"LLM narration jumps ahead of voice synth so the words land promptly and
+  > the voice fills in behind."*
+
+  So a line **already on screen** had to wait behind whatever the model did
+  next — and OTA-1151 measured what that is: a `scene_intro` generation runs
+  **19.3 seconds**. The voice was not merely trailing; it was trailing by the
+  length of the *next* narration. That is the reported ten seconds, and it is
+  structural rather than occasional.
+
+  ⚠ **The two sides are not symmetrical**, which is the thing OTA-634 could not
+  see from where it stood. A narration delayed two seconds is **invisible** —
+  nothing is shown until it completes anyway. A voice delayed ten seconds is the
+  most obvious defect in the game, because you have already read the line it is
+  reading to you. So the order flips: **voice now outranks the LLM.**
+
+  ⚠ **A reversal needs an answer to the fear it revives.** OTA-634's worry was a
+  voice backlog making responses feel slow. Two things bound it now:
+
+  1. the **total queue cap** of three whole lines — OTA-634's own mitigation; and
+  2. the **stale-line drop** added here: a line whose text has been on screen
+     longer than six seconds is never spoken at all. Past that point the audio is
+     an echo of something the player read and moved on from, laid over whatever
+     is happening now, and silence is better. Whole **lines** are dropped, never
+     half of one.
+
+  The backlog cannot grow old, because old lines do not get spoken.
+
+  ⚠ **Third piece: pre-synthesis.** OTA-1152 banked scene intros so the *text*
+  lands instantly — which made this gap **more** visible, a consequence flagged
+  in that OTA's own handoff rather than left to be discovered. The bank is also
+  what makes the real fix possible for the first time: *if the line exists
+  before it is needed, so can its audio.* A banked line is now synthesised in
+  the same idle window that wrote it, at **homework priority**, and `speak()`
+  finds the PCM already waiting. Text and voice land together — the actual
+  answer to the owner's question.
+
+  ⚠ **One shared chunker.** The cache is keyed per chunk and read at enqueue, so
+  `speak()` and `presynthesize()` **must** split identically. A split differing
+  by one character would miss every single time, and miss *silently* — the
+  feature would simply appear not to help, with nothing in any log to say why.
+  The chunking is now one function with one answer.
+
+  **And the other two questions, answered and recorded** (all three are pinned
+  by tests, so they cannot quietly stop being true):
+
+  - **Item-description homework is written only.** It lands in the item popup
+    and never touches the Arbiter channel, which is the only channel TTS speaks.
+  - **A banked scene intro *is* spoken** — it goes out on the Arbiter channel
+    like any other line.
+  - **The welcome-back is hand-authored**, not generated: five lines with
+    `{name}` substituted. Worth knowing before anyone tries to fix its voice by
+    changing a prompt. Most reactive flavor is the same — Qwen writes the scene
+    intros, ambient musings, item descriptions and lore flourishes, and nothing
+    else.
+
+  New suite `ota1153VoiceLandsWithTheText` (20 tests). Two older suites were
+  ⚠ **re-authored rather than re-numbered**: OTA-634's headline claim ("runs LLM
+  ahead of queued voice") is no longer true, while the mechanism it was written
+  to prove — highest priority first, FIFO within a priority, never two ops in
+  flight — is untouched and still tested. Renaming the test was part of the
+  change, not cosmetics.
+
+- **⚠⚠ THE SCENE INTRO COMES OFF THE CRITICAL PATH (2026-08-05). BOTH
+  LINES.** HAL OTA-1152 / golem OTA-1129. The owner's call, taken with
+  OTA-1151's arithmetic in front of them. That OTA measured the beat and then
+  said plainly that it could not fix it:
+
+  > 19.3 s = 3.7 wait + **11.0 read** + 3.5 write + ~1.0 other
+
+  Trimming the prompt bought ~1.7 s, and a **zero-token** prompt would still
+  leave ~8 s, because the model writes at 107 ms/token and waits ~3.7 s for the
+  native-ML lock. There is no prompt small enough. The only remaining move is to
+  stop the player waiting — which is exactly what OTA-1145's bank did for the
+  ambient musing, aimed now at the arrival beat.
+
+  ⚠ **Why an intro is pre-generatable.** Same reason a musing is: it is about a
+  **place**, and the place is knowable before the player gets there.
+  `canonicalLocationAtCell` is a plain index lookup, so the named location on
+  each of the four adjacent cells reads for free — nothing is built, rolled, or
+  mutated to find out where they might step. And the **current** location is a
+  candidate too, deliberately *first*: most tiles carry no named location, so a
+  cardinal step usually rebuilds the scene right where the player already
+  stands. That is the most frequently spent entry in the bank, not an
+  afterthought.
+
+  ⚠ **What a pre-written intro cannot know, and does not pretend to.** Weather,
+  hazards, enemies and the vendor are rolled at *arrival* by `beginScene`. The
+  prefetch slice carries the destination's **static** facts only — its name, its
+  type, its authored description — and passes null for the rest rather than
+  guessing. *An intro that says nothing about the sky can never contradict the
+  sky.* (`SceneSlice.weather` became nullable to say so in the type;
+  `deriveEnvironment` had always guarded `scene.weather?.name` and simply
+  omitted the clause, so this is the type catching up with the code.)
+
+  ⚠ **The three things a background fill must not do** — each of which would
+  have been a real bug:
+
+  1. **Not mirror its tokens.** `partialArbiterText` renders live under "The
+     Arbiter:". Streaming a fill would show the player a description of a room
+     they are not standing in.
+  2. **Not own the epoch.** The epoch exists so the player's next action cancels
+     an in-flight *reaction*. Bumping it here would cancel a live narration they
+     **are** waiting on, and then cancel the fill itself the moment they act —
+     throwing away the very work the bank exists to keep.
+  3. **Release `isGenerating` on its own terms**, precisely because it never
+     bumped the epoch: the live path's `myEpoch === epoch` release would not
+     fire, and every later generation would wedge behind a background job that
+     had already finished.
+
+  Everything *else* is shared with the live path on purpose — the prompt, the
+  streaming, and the whole vetting chain — so the bank stores **vetted prose**.
+  A spent line has already passed the foreign-word strip, the sentence cap, the
+  third-person filter, the echo detector and the off-canon entity guard. A
+  second, quietly different narrator was the thing to avoid.
+
+  The fill uses the **other** idle signal: not `uiIdleSince` (stamped by
+  stationary screens, and never set while walking, which is exactly when an
+  intro is wanted) but **time since the last action**. Six seconds of stillness
+  is reading time, and reading time is when the next room gets written. That
+  lets homework run during normal play, which is only defensible because
+  OTA-1146 built the harness first — the fill queues *below* the voice and is
+  cut short the instant a real generation is enqueued.
+
+  New suite `ota1152SceneIntroBank` (33 tests). Three older suites retargeted,
+  and ⚠ **all three broke the same way, which is worth recording**: an assertion
+  anchored on a text **window** rather than on structure. One searched the whole
+  file for `if (opts?.bankOnly) {` and found the new block in a different
+  function; two spanned a line break that reflowed. The rule that falls out:
+  **anchor on the function first, then the block, then on what comes NEXT
+  rather than on what encloses.**
+
+  ⚠ **Known consequence, flagged rather than discovered later.** This makes the
+  *text* instant while the *voice* still has to synthesise through the shared
+  native-ML lock — so the read-it-then-hear-it gap the owner reported gets more
+  visible here, not less. The bank is also what makes the fix possible for the
+  first time: audio could be pre-synthesised alongside the banked text so both
+  land together. Next up.
+
+- **⚠⚠ THE PROMPT WAS SAYING THE SAME THING FOUR TIMES (2026-08-05).
   BOTH LINES.** HAL OTA-1151 / golem OTA-1128. Owner: *"go after the big ones."*
   So the big one was **priced**, not guessed at.
 
