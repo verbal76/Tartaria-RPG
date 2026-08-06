@@ -1273,7 +1273,42 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ "ĀTHER" — THE UNCOVERED FAMILY (2026-08-06, latest). BOTH LINES.**
+- **⚠⚠ THE FIRST WORD SURVIVES (2026-08-06, latest). BOTH LINES.** HAL
+  OTA-1171 / golem OTA-1148. Owner: *"there has been a few times where the
+  arbiter has started speaking and has either skipped his first word or started
+  partway through it."*
+
+  ⚠ **THIS IS OTA-790'S BUG AT THE OTHER END OF THE BUFFER, and the fix is the
+  same shape.** OTA-790 widened the TAIL guard 8 → 40ms because *"a fading
+  fricative sits well under the 0.01 threshold"* and was being trimmed to
+  within 8ms of the last loud sample. An ONSET is the same physics in reverse —
+  and the head guard was still 8ms.
+
+  `trimSilenceLeadTrail` scans in from each end to the first sample above 0.01
+  and hands back a guard pad. Every quiet onset is walked straight past, and
+  the Arbiter's own vocabulary is full of the worst cases: **"Welcome"** opens
+  on a /w/ glide that ramps up from near zero, **"The"** on a weak voiced /ð/,
+  and /h/ /s/ /f/ are breath before they are sound. With only 8ms handed back
+  the word began **mid-vowel** — or the consonant vanished entirely and it
+  sounded like a skipped word.
+
+  ⚠ **Head guard 8ms → 45ms**, deliberately wider than the tail's 40: onsets
+  run longer than decays, because aspiration and frication precede voicing. The
+  0.01 threshold and the 200ms-per-end `maxTrim` cap are untouched, so a long
+  silent lead is still trimmed — this only widens what is KEPT in front of the
+  onset. The 90ms playback pad is applied AFTER this, so the cost is a few tens
+  of ms of leading silence the hardware ramp wants anyway.
+
+  ⚠ **THE LESSON FOR THIS LIST:** OTA-790 fixed exactly this at the tail and
+  nobody checked the head, though the two guards sit four lines apart in the
+  same function. **When a symmetric pair of constants exists and one of them
+  turns out to be wrong, look at the other one in the same change.**
+
+  New suite `ota1171TheFirstWordSurvives` (8 tests) — it re-implements the
+  trimmer's arithmetic AND pins its constants against the source, so the model
+  and the code cannot drift apart without one of the two failing.
+
+- **⚠⚠ "ĀTHER" — THE UNCOVERED FAMILY (2026-08-06). BOTH LINES.**
   HAL OTA-1170 / golem OTA-1147. Owner: *"and aether
   should be āther … anything starting with aether should have it start with
   āther for pronunciation not spelling."*

@@ -1198,7 +1198,27 @@ function trimSilenceLeadTrail(samples: Float32Array, sampleRate: number): Float3
   const n = samples.length;
   if (n === 0) return samples;
   const THRESHOLD = 0.01;                            // |amp| counted as "sound"
-  const guardLead = Math.floor(sampleRate * 0.008);   // keep ~8ms padding at the head
+  // ⚠ OTA-1171 — HEAD GUARD 8ms → 45ms. Owner: *"there has been a few times
+  // where the arbiter has started speaking and has either skipped his first
+  // word or started partway through it."*
+  //
+  // This is OTA-790's bug at the other end of the buffer, and the fix is the
+  // same shape. That OTA widened the TAIL guard 8 → 40ms because "a fading
+  // fricative sits well under the 0.01 threshold" and was being trimmed to
+  // within 8ms of the last loud sample. An ONSET is the same physics in
+  // reverse, and the Arbiter's own vocabulary is full of the worst cases:
+  // "Welcome" opens on a /w/ glide that ramps up from near zero, "The" on a
+  // weak voiced /ð/, and /h/ /s/ /f/ are breath before they are sound. The
+  // scan walks straight past all of them to the first sample over 0.01 — the
+  // vowel — and only 8ms was handed back, so the word began mid-vowel, or the
+  // whole consonant vanished and it sounded like a skipped word.
+  //
+  // 45ms rather than the tail's 40: onsets run longer than decays, because
+  // aspiration and frication precede voicing. `maxTrim` still bounds the other
+  // direction, and the 90ms playback pad below is added AFTER this, so a wider
+  // guard costs nothing but a few tens of ms of leading silence that the
+  // hardware ramp wants anyway.
+  const guardLead = Math.floor(sampleRate * 0.045);
   // OTA-790 — tail guard widened 8 → 40ms: a soft trailing decay (a fading
   // fricative sits well under the 0.01 threshold) was trimmed to within 8ms of
   // the last loud sample, running speech right up to the buffer edge and making
