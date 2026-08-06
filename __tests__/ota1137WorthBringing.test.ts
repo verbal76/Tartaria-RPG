@@ -172,11 +172,15 @@ describe('OTA-1137 — ⚠ what the stagger actually costs the boss', () => {
     expect(block).toContain('STAGGERED: no second swing this round.');
   });
 
-  it('⚠ THE FIRST SWING ALWAYS LANDS — hitting a weakness never makes a boss harmless', () => {
-    // The check sits inside the `if (enemy.boss)` second-strike block, AFTER the
-    // ordinary counter has already resolved. Moving it to the top of the volley
-    // would turn a stagger into a skipped round.
-    const bossAt = STORE.indexOf('if (enemy.boss) {\n      const liveAfter = get().player;');
+  it('⚠ a TWO-SWING boss always lands its first — the stagger spends on the second', () => {
+    // ⚠ RE-AUTHORED BY OTA-1141, deliberately. OTA-1137's original claim was
+    // "the first swing ALWAYS lands" — and for two-swing bosses it still does,
+    // asserted here by ordering. The owner's tier gate then removed the second
+    // swing from tier 1-2 Guardians, so for THOSE the stagger now denies the
+    // only swing (otherwise the Searing Paste would be worthless exactly where
+    // he fights). The rule is "a stagger denies ONE swing"; the gated
+    // exception is pinned in the ota1141 suite, not here.
+    const bossAt = STORE.indexOf('if (enemy.boss && bossSwingsTwice(enemy)) {');
     const staggerAt = STORE.indexOf('if (takeStagger(get, set, liveIdx)) {');
     const counterAt = STORE.indexOf('applyEnemyCounter(enemy, livePlayer ?? fallbackPlayer, get, set, liveIdx);');
     expect(counterAt).toBeGreaterThan(0);

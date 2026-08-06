@@ -514,6 +514,30 @@ Key invariants worth knowing:
 
 ## 8. Open issues / watch list (current)
 
+- **⚠⚠ STANDING TUNING LIST (owner directive, 2026-08-06 — "keep these on the tuning list in handoff so we
+  can follow up later"). Source: the OTA-1140 pressure test (20,000-trial Monte Carlo vs the real engine);
+  decisions taken in OTA-1141 are marked DONE, the rest are OPEN owner calls:**
+  - **DONE — boss second swing gated by tier** (OTA-1141): tier 1-2 Core Guardians swing once, tier 3+ and
+    non-Guardian bosses keep two. Stagger now denies ONE swing whichever it is. Verify on-device: the tier-1
+    fight should be survivable-with-the-right-tool now; re-sim after the next device log if it still feels
+    like a wall.
+  - **DONE — hit-floor ceiling 13 → 16 + PLATE** (OTA-1141): armor pays to raw ~21; excess AC soaks 1 dmg
+    per 2 points (max −4), printed as `plate −N`. Watch: heavy-build fights should not stall past the
+    combatStress caps (floor dropped 40% → 25%).
+  - **OPEN — tier-1 Guardian spawn HP**: spawns at **59**, not the authored 42 (`monotoneTierHp` floor ×
+    over-level ≥1). Even single-swing, a fresh 24-HP arrival wins ~rarely fighting fair. If the gate isn't
+    enough on-device, the lever is tier-1's `hpMult` (1.4) in `TIER_PROFILES` / `CANON_BASE_HP` (42).
+  - **OPEN — acid-shred × stagger compounding**: acid strips up to **11 AC off a boss** (`acidShredCap` +
+    `ACID_SHRED_BOSS_BONUS`), pushing weakness-hit uptime toward ~95% swing denial. Two systems fine alone,
+    multiplying. Levers: boss shred cap, or stagger requiring an UN-shredded hit.
+  - **OPEN — the dog redirect eats a boss's round**: 25% (`DOG_TARGET_CHANCE`) of boss swings redirect to
+    the dog AND skip the second-swing block entirely, and `applyEnemyCounterToDog` rolls no boss +1d6. A
+    boss round can silently collapse to one under-rolled swing at the dog.
+  - **OPEN — dodge at very high DEX**: fine at DEX 13 (79-82% contest win, +8-10% net EV). The contest win
+    rate keeps climbing with DEX; re-check ≥17 in a future log before it re-approaches the old dominance.
+  - **OPEN — knee-22 trim vs hit-floor ownership**: two rules both claim "armor has diminishing returns";
+    the trim only ever bites vs high-ATK bosses now. Eventually pick ONE owner of the property.
+
 - **ESCORT SYSTEM — new live subsystem (2026-07-26, HAL 985–989 / golem 962–966; §9).** Knobs if the feel
   needs tuning after on-device play: `ESCORT_COLLATERAL_FRACTION` (0.20), `ESCORT_REST_HEAL_FRACTION`
   (0.10), escortee HP ≈35% player hpMax (clamp 8–45), party clamp 1–5, stranded-hook spawn ~6% on novel
@@ -1129,7 +1153,44 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE PRESSURE TEST (2026-08-06, latest). BOTH LINES.** golem OTA-1140 /
+- **⚠⚠ THE OWNER'S THREE TUNING CALLS (2026-08-06, latest). BOTH LINES.** golem
+  OTA-1141 / HAL OTA-1164. From the pressure-test numbers, the owner picked
+  three levers: *"#5 so suggestions 1 and 2. #2 gate it. and keep these on the
+  tuning list in handoff so we can follow up later."*
+
+  ⚠ **#2 gated — the second swing is a tier privilege.** Tier 1-2 Core
+  Guardians (`tier:N` trait) swing **once**; tier 3+ and every non-Guardian
+  boss keep the two-swing tempo. The sim had priced the second swing as *the*
+  killer (connected round avg 22, 36% full-bar delete vs 24 HP; a single swing
+  can never one-round). The enemy cards follow the truth — a gated Guardian no
+  longer advertises "twice per round."
+
+  ⚠ **And the stagger generalized with it, deliberately.** OTA-1137's stagger
+  cancelled the *second* swing — which the gate just removed from the tiers
+  the owner actually fights. The rule is now **a stagger denies ONE swing**:
+  the second on a big boss, the *only* one on a gated Guardian (checked before
+  its counter, after the dog redirect so a soaked swing never spends it).
+  1160's "first swing always lands" is consciously revised for the gated tiers
+  only; its suite is re-authored to say so.
+
+  ⚠ **#5.1 — hit-floor ceiling 13 → 16.** Armor past raw 18 used to buy
+  nothing vs an ordinary ATK-5 enemy (~40% floor hit chance). At 16 the floor
+  is ~25% — a maxed tank still takes one swing in four, and armor pays to raw
+  ~21.
+
+  ⚠ **#5.2 — capped-off AC becomes PLATE.** Every 2 excess AC points past the
+  cap shave 1 damage from a landed hit (max −4), printed as `plate −N` in the
+  damage clause so the tank can *see* the armor working. Runs before the 30%
+  mitigation floor, so never-immune holds unchanged.
+
+  The **STANDING TUNING LIST** now leads §8 (owner's instruction) with
+  DONE/OPEN status and the sim numbers attached. Watch on-device: the tier-1
+  Guardian fight should now be survivable-with-the-right-tool; heavy-build
+  fights should not stall past the combatStress caps with the lower floor.
+
+  New suite `ota1141TheOwnersTuningCalls` (16 tests).
+
+- **⚠⚠ THE PRESSURE TEST (2026-08-06). BOTH LINES.** golem OTA-1140 /
   HAL OTA-1163. Owner: *"spin up agents and pressure test the game and fully
   the combat system."* Four agents in parallel — combat-math contradiction
   hunter, parallel-array state auditor, exploit hunter, and a Monte Carlo

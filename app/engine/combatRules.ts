@@ -874,10 +874,30 @@ export function buildSkillSteps(
  *  because he priced the fight off the number he was shown.
  *
  *  Nothing about the fight changes here. The card just stops understating it. */
-export function enemyDamageDisplay(enemy: { damage?: unknown; boss?: boolean }): string {
+/** ⚠ OTA-1141 (owner tuning) — DOES THIS BOSS GET THE SECOND SWING? The
+ *  pressure-test sim priced the second swing as THE killer: a connected
+ *  two-swing round averages 22 with a 36% chance of deleting a full 24-HP bar,
+ *  while a single swing can never one-round even a fresh arrival. The owner's
+ *  call: GATE IT BY GUARDIAN TIER — tier 1-2 Core Guardians swing once, so the
+ *  early walls become learnable; tier 3+ and every non-Guardian boss keep the
+ *  two-swing tempo. Guardians carry a `tier:N` trait (spawnGuardianForCapital);
+ *  a boss with no tier trait is not a Guardian and keeps both swings. */
+export function bossSwingsTwice(enemy: { boss?: boolean; traits?: readonly string[] }): boolean {
+  if (!enemy.boss) return false;
+  const t = enemy.traits?.find((x) => x.startsWith('tier:'));
+  if (!t) return true;
+  const n = parseInt(t.split(':')[1] ?? '', 10);
+  return !(Number.isFinite(n) && n >= 1 && n <= 2);
+}
+
+export function enemyDamageDisplay(enemy: { damage?: unknown; boss?: boolean; traits?: readonly string[] }): string {
   const base = String(enemy.damage ?? '').trim() || '1d6';
   if (!enemy.boss) return `${base} damage on a hit`;
-  return `${base}+1d6 damage on a hit, twice per round`;
+  // OTA-1141 — the card keeps telling the truth: a gated (tier 1-2) Guardian
+  // swings once, and saying "twice" here would be OTA-1136's lie reborn.
+  return bossSwingsTwice(enemy)
+    ? `${base}+1d6 damage on a hit, twice per round`
+    : `${base}+1d6 damage on a hit`;
 }
 
 /** OTA-1139 (audit) — the same truth in chip width. The 24-hour audit found the
@@ -885,7 +905,8 @@ export function enemyDamageDisplay(enemy: { damage?: unknown; boss?: boolean }):
  *  bug on the surface the player opens specifically to size a fight up: a boss
  *  read `1d8+3` on its own card while the resolver rolled `1d8+3+1d6` twice.
  *  The long form above doesn't fit a stat chip, so the panel gets this. */
-export function enemyDamageCompact(enemy: { damage?: unknown; boss?: boolean }): string {
+export function enemyDamageCompact(enemy: { damage?: unknown; boss?: boolean; traits?: readonly string[] }): string {
   const base = String(enemy.damage ?? '').trim() || '1d6';
-  return enemy.boss ? `${base}+1d6 ×2` : base;
+  if (!enemy.boss) return base;
+  return bossSwingsTwice(enemy) ? `${base}+1d6 ×2` : `${base}+1d6`;
 }
