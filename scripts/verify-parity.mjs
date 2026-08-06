@@ -52,6 +52,7 @@ if (!halDir || !halRange || !golemDir || !golemRange) {
 const LEGACY_PAIRS = new Map([
   [715, 698],   // reconciled type+trait resist (HAL OTA-715 ↔ golem OTA-698)
   [959, 936],   // named swap-nudge weapon (HAL OTA-959 ↔ golem OTA-936)
+  [954, 931],   // Guardian monotone staging suite (HAL OTA-954 ↔ golem OTA-931; OTA-1165 retargeted its curve)
 ]);
 
 /** ⚠ THE ONE RENUMBER RULE. Every shape an OTA reference takes anywhere in
