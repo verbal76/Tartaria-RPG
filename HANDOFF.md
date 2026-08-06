@@ -1273,7 +1273,54 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE HANDOFF WINDOW (2026-08-06, latest). BOTH LINES.** HAL OTA-1167 /
+- **⚠⚠ NOBODY WAS WAITING ON IT (2026-08-06, latest). BOTH LINES.** HAL
+  OTA-1168 / golem OTA-1145. Owner, rejecting OTA-1167's *shape* of fix:
+  *"we closed it yesterday, I even commented that it was fixed after you
+  dropped it. now we fixed something until it was broke. we reintroduced a
+  delay on the js side."*
+
+  ⚠ **HE IS RIGHT, AND THE DIFF SETTLES IT.** `git diff 4755f1c5..HEAD --
+  app/voice app/ai` (OTA-1157 → the reopening log) contains exactly three
+  substantive changes: the sentence pause he asked for (160→280 ms), the
+  presynth eviction repair — and **OTA-1167's reservation, which makes LLM
+  work wait up to 1200 ms so the voice can go first.** That is a delay, added
+  by us, on the JS side. 1167 arbitrated the collision instead of removing it,
+  and bought the voice its second by making narration pay.
+
+  ⚠ **THE COLLISION HAD A CAUSE — a scheduling bug, not a native one.**
+  `inferGear` runs over the WHOLE INVENTORY during save-load hydration, so a
+  save holding one unclassifiable item fired an INTERACTIVE-priority
+  generation ~160 ms into the load, which then held the native-ML lock through
+  3.5 s of uninterruptible prefill while the greeting the player had already
+  read waited to be spoken.
+
+  ⚠ **Nobody was waiting on that description.** This path's own contract is
+  that the result *"lands in the cache for the NEXT lookup"* — the current
+  render keeps its static row, and OTA-192 restamps later. OTA-1157's note
+  that *"a player who opened an unknown item IS waiting on it"* is true of the
+  POPUP, and was never true of this requester. So it is fixed where it
+  belongs:
+  - it fires only while the player is on a STATIONARY screen (`uiIdleSince`,
+    the owner's own homework signal) — which is null during a load, so a load
+    can no longer start one; and
+  - it runs as **homework**: below voice, and cut short the instant real work
+    arrives. That is what it always was; the flag finally says so.
+
+  ⚠ **And 1167's reservation shrinks 1200 → 350 ms.** With the cause gone it
+  is a guard rail rather than a mechanism, so it is cut to the size of what it
+  actually covers — a model lookup and a breadcrumb write, tens of ms — and
+  can no longer be felt as latency in its own right.
+
+  ⚠ **THE LESSON FOR THIS LIST, and it is the second time this week:** when a
+  fix has to make something else slower, that is the signal the cause has not
+  been found yet. 1167 read the collision correctly and still fixed the wrong
+  end of it. **Ask what STARTED the contending work and whether anyone was
+  waiting on it, before arbitrating who wins.**
+
+  OTA-1132's fire-and-forget pin retargeted to the homework call (which
+  strengthens its claim). New suite `ota1168NobodyWasWaitingOnIt` (8 tests).
+
+- **⚠⚠ THE HANDOFF WINDOW (2026-08-06). BOTH LINES.** HAL OTA-1167 /
   golem OTA-1144. Owner, on the very next load after 1166 shipped:
   *"reintroduced llm lag."*
 

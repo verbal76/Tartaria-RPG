@@ -120,8 +120,22 @@ export const ML_PRIORITY_LLM = 1;
  *  the moment the line's audio is in hand, and it is only taken when a line
  *  actually needs synthesis — a pre-synthesised (OTA-1153 banked) line plays
  *  without the lock and never reserves it. Exclusivity is untouched; this
- *  schedules starts, it does not overlap them. */
-export const VOICE_RESERVATION_MS = 1200;
+ *  schedules starts, it does not overlap them.
+ *
+ *  ⚠ OTA-1168 — 1200 → 350, ON THE OWNER'S OBJECTION, AND HE IS RIGHT.
+ *  *"now we fixed something until it was broke. we reintroduced a delay on the
+ *  js side."* A reservation is a DELAY on LLM work, and 1200 ms of it was the
+ *  wrong shape of fix: it arbitrated a collision instead of removing it, and
+ *  bought the voice its second by making narration wait.
+ *
+ *  OTA-1168 removes the collision at the source — the item-synthesis requester
+ *  no longer fires during save-load hydration, which is what was taking this
+ *  lock 160 ms into a load with nobody waiting on it. With the cause gone this
+ *  reservation is a guard rail, not a mechanism, so it is cut to the size of
+ *  the thing it actually covers: the handoff is tens of milliseconds (a model
+ *  lookup and a breadcrumb write), never a second. At 350 ms it still closes
+ *  the race and can no longer be felt as latency in its own right. */
+export const VOICE_RESERVATION_MS = 350;
 
 interface PendingMl {
   fn: () => Promise<unknown>;

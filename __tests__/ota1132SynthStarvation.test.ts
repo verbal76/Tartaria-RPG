@@ -191,8 +191,13 @@ describe('OTA-1132 — item synthesis yields to the jobs the player is waiting o
 
   it('a dropped request is genuinely free — the requester is still fire-and-forget', () => {
     // Nothing awaits the synthesis; the caller gets the static-inference row.
+    // ⚠ RETARGETED for OTA-1168: the call now carries `{ homework: true }`.
+    // That STRENGTHENS this test's claim rather than weakening it — the
+    // requester was never work anyone waits on (its result lands in the cache
+    // for the NEXT lookup), and the flag finally says so, putting it below the
+    // voice and making it interruptible. Fire-and-forget is unchanged.
     expect(store).toContain('void Promise.resolve().then(async () => {');
-    expect(store).toContain('await synth.synthesizeItemViaQwen(name, hintTags, qwen);');
+    expect(store).toContain('await synth.synthesizeItemViaQwen(name, hintTags, qwen, { homework: true });');
   });
 
   it('the readiness gate still comes first — no work queued at all when Qwen is down', () => {
