@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.74';
+export const DISPLAY_VERSION = '4.29.75';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23300,7 +23300,50 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1164TheOwnersTuningCalls (16 tests); ota1160's
 // first-swing test re-authored, not re-numbered.
 // DISPLAY_VERSION 4.29.74.
-export const OTA_BUILD_ID = '2026-08-06-1164-the-owners-tuning-calls';
+// OTA-1165 — THE FOUR-LEVER BATCH. From the MASTER TUNING
+// REFERENCE (HANDOFF §8): the owner heard the case for four
+// levers and called "yes run the 4 level batch." All four are
+// pure number/gate turns, each pinned in ota1165TheFourLeverBatch:
+// ⚠ 1. TIER-1 GUARDIAN hpMult 1.4 → 1.0 (59 HP → 42). She IS
+// tier 1 — the ×1.4 was tuned against pre-OTA-926 per-Capital
+// bases of 30-50 HP; when OTA-926 flattened the base to a
+// canonical 42, the first rung silently inherited a 40% raise
+// nothing re-derived. Your first Guardian is now the base. Tiers
+// 2+ untouched; the ota954 monotone floor is a no-op here (tier
+// 2's own 42×1.6=67 clears 42) and its suite is retargeted to
+// the re-authored curve [42, 67, 76, ...].
+// ⚠ 2. MILESTONE_KILL_STEP 5 → 3. One-round-death risk stays
+// above 5% until ~28 max HP and a fresh arrival has 24; a faster
+// HP drip is the cleanest "arrivals are too thin" lever — zero
+// enemies touched, pays the player for playing. Travel milestone
+// deliberately stays 5, and the arb119 distinct-kill farm guard
+// matters MORE at the smaller step (still pinned).
+// ⚠ 3. ACID_SHRED_BOSS_BONUS 6 → 2 (boss shred cap 11 → 7).
+// Full parity with the +6 boss AC bonus let acid erase the boss
+// wall outright and compound with weakness-stagger into the
+// stagger-lock exploit (E1). Acid still pays against bosses; it
+// no longer deletes them.
+// ⚠ 4. BOSSES FIGHT THE PERSON IN FRONT OF THEM. The 25% random
+// dog soak no longer fires on a boss — it skipped the second-
+// swing block AND rolled no boss +1d6, an invisible difficulty
+// coin-flip every boss round, with dog HP soaking hits far above
+// its weight. Ordinary enemies keep the soak (that is the dog's
+// job), and a FAILED DISTRACT still redirects on a boss — the
+// player chose that risk (OTA-795 semantics intact).
+// ⚠ SIM RE-RUN (20k trials/cell, engine formulas — Guardian AC
+// 17/atk +6/1d8+3+1d6, player 24 HP/AC 19/2d6): fresh-arrival
+// fair-fight win rate TRIPLES 4.6% → 15.0%; weakness+stagger
+// play 58.8% → 70.9%; by 30 HP (which the faster drip reaches
+// sooner) 22.2% fair / 78.8% weakness. 2-round passive death
+// at 24 HP vs the gated single swing: 8.0% (was 36%/connected
+// two-swing round pre-1164).
+// weaponCoating boss-headroom pin retargeted 6 → 2 (reason
+// documented in-suite); ota1164's redirect anchor retargeted to
+// the boss-gated line (the ordering it pins is unchanged).
+// New suite ota1165TheFourLeverBatch (12 tests).
+// DISPLAY_VERSION 4.29.75.
+export const OTA_BUILD_ID = '2026-08-06-1165-the-four-lever-batch';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1164-the-owners-tuning-calls';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1163-the-pressure-test';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1162-the-audit-batch';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1161-the-comma-that-ate-the-beat';

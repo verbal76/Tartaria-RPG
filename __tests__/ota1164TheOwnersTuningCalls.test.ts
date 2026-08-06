@@ -146,7 +146,10 @@ describe('OTA-1164 — ⚠ a stagger denies ONE swing, whichever swing that is',
   });
 
   it('the gated check runs AFTER the dog redirect, so a soaked swing never spends the stagger', () => {
-    const from = STORE.indexOf('if (dogUp && (forcedOnDog || Math.random() < DOG_TARGET_CHANCE)) {');
+    // ⚠ RETARGETED for OTA-1165: the redirect grew a !enemy.boss gate on the
+    // random soak (bosses fight the person in front of them). The ORDERING this
+    // test pins — redirect first, stagger check after — is unchanged.
+    const from = STORE.indexOf('if (dogUp && (forcedOnDog || (!enemy.boss && Math.random() < DOG_TARGET_CHANCE))) {');
     const staggerAt = STORE.indexOf('if (enemy.boss && !bossSwingsTwice(enemy) && takeStagger(get, set, liveIdx)) {');
     expect(from).toBeGreaterThan(0);
     expect(staggerAt).toBeGreaterThan(from);
@@ -180,11 +183,17 @@ describe('OTA-1164 — ⚠ armor pays again: the floor rises and the excess soak
 
 describe('OTA-1164 — the standing tuning list exists where the owner asked', () => {
   it('HANDOFF §8 carries the list with the sim numbers still attached', () => {
+    // ⚠ RETARGETED for OTA-1165: the four-lever batch moved the tier-1 HP,
+    // acid×stagger, and dog-redirect items from OPEN to DONE (with new
+    // wording), so the anchors are the topics — every 1163 finding must still
+    // be ON the list, whichever status it carries. The list also grew, so the
+    // window widens to cover the DONE block.
     const h = read('HANDOFF.md');
     expect(h).toContain('STANDING TUNING LIST');
-    for (const item of ['59', 'acid', 'dog redirect', 'DEX']) {
-      const at = h.indexOf('STANDING TUNING LIST');
-      expect(h.slice(at, at + 3000).toLowerCase()).toContain(item.toLowerCase());
+    const at = h.indexOf('STANDING TUNING LIST');
+    const win = h.slice(at, at + 5000).toLowerCase();
+    for (const item of ['59', 'acid', 'dog soak', 'DEX']) {
+      expect(win).toContain(item.toLowerCase());
     }
   });
 });

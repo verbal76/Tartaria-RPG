@@ -150,7 +150,12 @@ export const ACID_SHRED_MAX = 5;
  *  worn down to 5+6 = 11 over a long fight, restoring the player's hit rate as
  *  the fight goes. This is the late-game lever a coated golem (the armor-breaker)
  *  drives. */
-export const ACID_SHRED_BOSS_BONUS = 6;
+export // ⚠ OTA-1165 (owner tuning) — 6 → 2. The exploit sweep showed 11 points of
+// boss shred pushing weakness-hit uptime toward ~95%, turning OTA-1160's
+// one-round stagger into a near-permanent lock (two systems fine alone,
+// multiplying). At +2 (boss cap 7) acid stays a real boss tool without
+// deleting the to-hit roll that keeps the stagger honest.
+const ACID_SHRED_BOSS_BONUS = 2;
 /** Per-enemy shred cap: base + boss headroom. */
 export function acidShredCap(enemy: { boss?: boolean } | null | undefined): number {
   return ACID_SHRED_MAX + (enemy?.boss ? ACID_SHRED_BOSS_BONUS : 0);
