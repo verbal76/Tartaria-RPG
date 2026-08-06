@@ -172,7 +172,9 @@ describe('OTA-1153 — ⚠ pre-synthesis: text and voice land together', () => {
 
   it('⚠ pre-synthesis runs at HOMEWORK priority — it must never delay a real line', () => {
     const fn = TTS.slice(TTS.indexOf('export async function presynthesize'));
-    expect(fn.slice(0, 1400)).toContain('ML_PRIORITY_HOMEWORK');
+    // RETARGETED BY OTA-1163 — the eviction comment block sits above the lock
+    // call now, so the window widens; the property (homework priority) holds.
+    expect(fn.slice(0, 2400)).toContain('ML_PRIORITY_HOMEWORK');
   });
 
   it('speak() consumes the cache at enqueue, and it is one-shot', () => {
@@ -202,7 +204,13 @@ describe('OTA-1153 — ⚠ pre-synthesis: text and voice land together', () => {
 
   it('the cache is bounded — PCM is bulky and this is a latency buffer', () => {
     expect(TTS).toContain('const PRESYNTH_CAP = 6;');
-    expect(TTS).toContain('if (presynth.size >= PRESYNTH_CAP) return false;');
+    // RETARGETED BY OTA-1163 (pressure test) — the cap used to REFUSE when
+    // full, and the state audit priced what that cost: six orphaned entries (a
+    // voice change, a bank eviction, a duplicate-skip) wedged pre-synthesis
+    // into a permanent no-op with ~3 MB of PCM pinned. The bound is now a
+    // rolling window: oldest evicted, same six-slot ceiling.
+    expect(TTS).toContain('while (presynth.size >= PRESYNTH_CAP) {');
+    expect(TTS).toContain('presynth.delete(oldest);');
   });
 
   it('it respects the TTS-off setting — no silent battery burn', () => {

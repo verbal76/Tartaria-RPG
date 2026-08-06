@@ -1142,7 +1142,59 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE 24-HOUR AUDIT, AND THE FOUR THINGS IT CAUGHT (2026-08-06, latest).
+- **⚠⚠ THE PRESSURE TEST (2026-08-06, latest). BOTH LINES.** HAL OTA-1163 /
+  golem OTA-1140. Owner: *"spin up agents and pressure test the game and fully
+  the combat system."* Four agents in parallel — combat-math contradiction
+  hunter, parallel-array state auditor, exploit hunter, and a Monte Carlo
+  simulation driving the **real engine** at 20,000 trials per cell. Their
+  deduplicated, confirmed findings are this batch. **Balance questions were
+  reported to the owner, not tuned.**
+
+  ⚠ **The stagger family** (three agents converged independently):
+  `enemyStaggered` was the only per-enemy array **not spliced on enemy
+  removal**; the melee path **staggered corpses** (no survives-the-blow gate);
+  and ~10 wholesale roster sites reset only *some* parallel arrays — a fled
+  Guardian's acid shred was **banked for the re-summon**, and a hunt boss
+  inherited the prior fight's stagger/shred/statuses. `FRESH_ENEMY_ARRAYS` now
+  spreads at every one.
+
+  ⚠ **The exploits:** **step-back kiting** (CRITICAL — nothing ever closed the
+  range toward the player, so one free retreat made every melee enemy, Core
+  Guardians included, permanently unable to fight back → **the pack now
+  pursues**, one band per round when a living enemy was benched by distance);
+  **camping mid-fight** (`rest` never checked for enemies — the camp now
+  refuses with hostiles awake; eating stays OTA-619's free action);
+  **bandolier bypass** (the any-pack-copy fallback is out-of-combat only).
+
+  ⚠ **Three more lying surfaces** (the 1156/1158/1159 family):
+  `effectiveACBreakdown` skipped the resolver's trim (the expanded DEFENSE
+  card over-read every heavy build — trimmed now, with the trim **named as a
+  chip** so sources still sum); `enemyPowerScore` priced a boss at bare
+  notation while the resolver rolls +1d6 **twice** (the badge painted "even"
+  on 3× fights); the **summoned** Guardian card was a second unfixed copy of
+  OTA-1159's card. Plus the to-hit log admits `(needs nat N+ — AC capped)`
+  and the damage clause admits `floor 30%`.
+
+  ⚠ **Parity/plumbing:** stagger fires from typed-throw and burst-fire too;
+  the golem's corruption procs regained the arb118 cap; the melee damage write
+  reads **live** enemy HP (a stale snapshot was erasing lost-initiative
+  regen); the presynth PCM cache **evicts oldest** instead of wedging shut.
+
+  ⚠ **REPORTED, NOT TUNED — the owner's open balance calls, with the measured
+  numbers:**
+  | question | measurement |
+  |---|---|
+  | tier-1 Guardian vs fresh 24 HP arrival | **0.1% win** fighting fair; 9.4% one-round death; spawn HP is **59**, not 42 (over-level floor) |
+  | what kills | the **second swing**: a connected round averages 22, 36% chance of deleting a full 24-HP bar; single swing can never one-round |
+  | weakness + stagger | lifts win to **15.8%** at 24 HP, 36% at 40, **63%** at 60 — works, but cannot rescue a 24-HP arrival |
+  | dodge @ DEX 13 | 79–82% contest win, **+8–10% net EV** — no longer dominant |
+  | armor | dead weight past **raw 18** vs ATK-5 (ENEMY_HIT_NEEDED_CAP=13 floors hit chance ~40%; the knee-22 trim is cosmetic there) |
+  | compounding | acid shred (−11 boss AC) × per-hit weakness stagger → **~95% second-swing denial**; dog redirect (25%) eats a boss's whole second swing |
+
+  New suite `ota1163ThePressureTest` (19 tests); `ota1153`/`1158`/`1159`/`1160`
+  retargeted where their old assertions *were* the seams.
+
+- **⚠⚠ THE 24-HOUR AUDIT, AND THE FOUR THINGS IT CAUGHT (2026-08-06).
   BOTH LINES.** HAL OTA-1162 / golem OTA-1139. Owner: *"run a full audit
   checking and testing everything done in the last 24 hrs."* Scope
   OTA-1151..1161 (golem 1128..1138): every claim re-derived against the live
