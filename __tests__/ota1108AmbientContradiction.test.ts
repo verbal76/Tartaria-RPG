@@ -273,7 +273,15 @@ describe('OTA-1108 — item synthesis stops failing silently at full price', () 
     const src2 = src('app/engine/itemSynthesisQwen.ts');
     expect(src2).toContain("'item_synth:unparseable'");
     expect(src2).toContain('noteQwenDiscarded(`${reason}');
-    expect(src2).toContain("noteQwenDiscarded('item_synth:rejected-by-clamp')");
+    // RETARGETED BY OTA-1134 — the reason is a template literal now, because
+    // the clamp finally NAMES which of its two rejections fired
+    // (`bad-kind="…"` or `no-content`). Four device logs said
+    // `rejected-by-clamp` and none said which, so the cause had to be
+    // re-derived from source. The property here is unchanged: the discard is
+    // reported rather than swallowed.
+    expect(src2).toContain('item_synth:rejected-by-clamp ${why}');
+    expect(src2).toContain("? `bad-kind=");
+    expect(src2).toContain("'no-content'");
     expect(src2).toContain("noteQwenDiscarded('item_synth:empty')");
   });
 

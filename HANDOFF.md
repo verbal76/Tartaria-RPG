@@ -1129,7 +1129,88 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE AC THAT NEVER DROPPED (2026-08-05, latest). BOTH LINES.** golem
+- **⚠⚠ CUT SHORT FOR THE VOICE (2026-08-06, latest). BOTH LINES.** golem
+  OTA-1134 / HAL OTA-1157. OTA-1132 put a timestamp on the voice because the
+  owner was clocking the gap by hand. The very next device log answered him in
+  one line:
+
+  ```
+  voice⏱ gap 4935ms (wait 3940ms + synth 859ms, live) "Welcome back, Verbal."
+  qwen⏱  item_synthesis ok 3847ms → ✂ DISCARDED — item_synth:rejected-by-clamp
+  ```
+
+  Kokoro needed **859 ms**. Everything else was **wait** — and the thing it was
+  waiting for is on the next line of the same log: an item synthesis that ran
+  3.8 seconds and then failed its own validator. **Two separate defects stacked
+  into one visible one**, and this OTA takes both.
+
+  ⚠ **Priority only reorders WAITERS — it cannot stop a job that has started.**
+  OTA-1130 already raised the voice above narration and that was correct, but
+  `runExclusiveNativeMl` guards the running op with `running`, so a synthesis
+  already in flight is unreachable no matter what queues behind it. OTA-1123
+  built the escape hatch (the `onPreempt` hook) and wired it to `homework`,
+  because at the time homework was the only work nobody was waiting on.
+
+  Item synthesis is **not** homework — a player who opened an unknown item *is*
+  waiting on it — so it keeps `ML_PRIORITY_LLM` and gains only the ability to be
+  **cut short**. That splits what used to be one flag into **two axes**:
+
+  | flag | where you queue | can you be stopped |
+  |---|---|---|
+  | `homework` | below everything | yes |
+  | `interruptible` | **unchanged** | yes |
+  | neither (narration) | normal | **no** |
+
+  ⚠ **The trade, stated plainly.** An interrupted synthesis loses its
+  description and the item stays on its static row until the next lookup — which
+  is exactly the fire-and-forget contract that path already had. A voice line
+  four seconds late is the more visible defect, and unlike the description it
+  cannot be retried by reopening a popup.
+
+  ⚠ **Narration takes neither flag, on purpose.** It has no fallback once it has
+  started, and half a sentence is worse than a late one. The suite asserts this
+  harder than it asserts the feature.
+
+  ⚠ **The prompt taught the model to fail its own validator.** Four device logs,
+  four `item_synthesis` calls, four `rejected-by-clamp`, ~4 seconds each —
+  **nothing that job has ever produced has reached the player.** The clamp
+  rejects a `kind` outside the allowed six, and the old brief showed the model
+  this:
+
+  ```
+  Allowed "kind" values … weapon, armor, accessory, consumable, misc, relic
+  … takes {"kind":"consumable","healHP":4,"restoreStamina":3}
+  … takes {"kind":"passive","stat":"wisdom","bonus":1}
+  ```
+
+  The word `kind` named **two different fields at two nesting levels**, and the
+  inner ones were shown as **bare top-level objects** — one of them declaring
+  `"kind":"passive"`, which is not a legal top-level kind at all. A 0.5B model
+  copies the shape it was shown; the validator then rejects exactly that shape.
+  **Same class as the OTA-1115 pipe loop: the prompt and the parser disagreed,
+  and the prompt won.**
+
+  The fix **shows** the nesting rather than describing it — every example is now
+  a complete reply with `"effect"` wrapped where it belongs, so there is no bare
+  object left to copy. OTA-1115's rule (no alternation anywhere in the brief) is
+  re-asserted in the new suite, because rewriting this prompt is precisely the
+  edit that could bring the pipe loop back.
+
+  ⚠ **And the discard finally names its culprit.** This was the last path in the
+  file that reported only *that* it happened. Four logs said `rejected-by-clamp`
+  and not one said **which** of the clamp's two rejections fired, so the cause
+  had to be re-derived from source instead of read off the log. It now prints
+  `bad-kind="…"` or `no-content`, classified against the **same `KNOWN_KINDS`
+  the clamp uses** — a second hand-written list would drift and start lying,
+  which is the failure mode this whole OTA is about.
+
+  New suite `ota1134CutShortForTheVoice` (19 tests). `ota1115`, `ota1108` and
+  `ota1123` retargeted — the last **re-authored rather than re-numbered**: its
+  claim was *"only homework supplies a hook"*, which is no longer true, while
+  what it actually secured (that **narration** never supplies one) still holds
+  and is what it now asserts.
+
+- **⚠⚠ THE AC THAT NEVER DROPPED (2026-08-05). BOTH LINES.** golem
   OTA-1133 / HAL OTA-1156. Reported three separate times as a **drop** —
   *"AC 16 → AC 10, recurring"* — and two builds of instrumentation were aimed at
   catching the moment it fell. **It never fell. There was no moment.**

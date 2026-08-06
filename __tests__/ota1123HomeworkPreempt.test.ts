@@ -215,9 +215,26 @@ describe('OTA-1123 — the wiring, and the first homework job', () => {
     expect(rt).toContain('stopCompletion?.()');
   });
 
-  it('⚠ only homework supplies a hook — ordinary calls pass undefined', () => {
-    expect(rt).toContain('opts.homework\n        ? () => {');
+  it('⚠ NARRATION supplies no hook — it is the one that must never be cut', () => {
+    // ⚠ RE-AUTHORED, NOT RE-NUMBERED. OTA-1123's claim was "only homework
+    // supplies a hook", and that is no longer true: OTA-1134 gave item
+    // synthesis one too, after the device log measured a welcome-back line
+    // waiting 3,940 ms behind a synthesis that then failed its own validator.
+    // Synthesis KEEPS its LLM priority — a player who opened an unknown item is
+    // waiting on it — and only gains the ability to be cut short.
+    //
+    // What OTA-1123 actually secured, and what still holds, is the other side:
+    // NARRATION is never interruptible. It has no fallback once it has started,
+    // and half a sentence is worse than a late one.
+    expect(rt).toContain('(opts.homework || opts.interruptible)');
     expect(rt).toContain('        : undefined,');
+    // The narration call sites must not opt in.
+    const store = src('app/state/gameStore.ts');
+    const nar = store.slice(
+      store.indexOf('async function narrateViaArbiter'),
+      store.indexOf('async function maybeGenerateAmbientArbiter'),
+    );
+    expect(nar).not.toContain('interruptible');
   });
 
   it('⚠ a preempted call is reported as such, not as an error or an ok', () => {

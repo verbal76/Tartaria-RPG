@@ -54,6 +54,10 @@ export interface GenerateOptions {
   /** OTA-1123 — idle-time work nobody asked for: queues below voice AND is cut
    *  short the moment the player needs the model. See LlamaGenerateOptions. */
   homework?: boolean;
+  /** OTA-1134 — keeps its priority but can be cut short when higher-priority
+   *  work arrives. Item synthesis sets this; narration does not. See
+   *  LlamaGenerateOptions.interruptible for the full reasoning. */
+  interruptible?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -256,6 +260,7 @@ export class QwenGenerativeEngine {
       topK: opts.topK ?? 40,
       job: opts.job,
       homework: opts.homework,
+      interruptible: opts.interruptible,
     });
   }
 
@@ -280,6 +285,7 @@ export class QwenGenerativeEngine {
       onToken,
       job: opts.job,
       homework: opts.homework,
+      interruptible: opts.interruptible,
     });
   }
 

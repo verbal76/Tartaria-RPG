@@ -27,7 +27,7 @@ export interface ItemSynthEngine {
   isReady(): boolean;
   generate(
     messages: ReadonlyArray<{ role: 'system' | 'user' | 'assistant'; content: string }>,
-    opts?: { maxNewTokens?: number; temperature?: number; job?: string; homework?: boolean },
+    opts?: { maxNewTokens?: number; temperature?: number; job?: string; homework?: boolean; interruptible?: boolean },
   ): Promise<string>;
 }
 
@@ -122,15 +122,41 @@ export async function synthesizeItemViaQwen(
   // shape); both of those were reasonable reads of the evidence available at
   // the time, and neither would have helped, because a model looping on `|`
   // will loop on `|` in any budget at any size.
+  // ⚠ OTA-1134 — THE PROMPT TAUGHT THE MODEL TO FAIL ITS OWN VALIDATOR, and this
+  // is the fourth consecutive OTA on this job. The previous three chased the
+  // token cap, then the shape, then the pipe loop. Every device log since has
+  // still shown the SAME outcome — four generations, four discards, all
+  // `item_synth:rejected-by-clamp`, ~4 seconds each.
+  //
+  // The clamp has exactly two ways to reject, and the first is a `kind` outside
+  // the allowed set. Read the old brief as a 0.5B model reads it:
+  //
+  //     Allowed "kind" values … weapon, armor, accessory, consumable, misc, relic
+  //     … takes {"kind":"consumable","healHP":4,"restoreStamina":3}
+  //     … takes {"kind":"passive","stat":"wisdom","bonus":1}
+  //
+  // The word "kind" names TWO different fields at two nesting levels, and the
+  // inner ones are shown as BARE TOP-LEVEL OBJECTS. One of them is
+  // `{"kind":"passive"…}` — and "passive" is not a legal top-level kind at all.
+  // A small model copies the shape it was shown; the validator then rejects
+  // exactly that shape. The prompt and the parser disagreed, and the prompt won.
+  //
+  // ⚠ THE FIX IS TO SHOW THE NESTING, NOT TO DESCRIBE IT. Every example is now a
+  // COMPLETE reply with `"effect"` wrapped where it actually belongs, so there
+  // is no bare object to copy and no ambiguity about which "kind" is which. The
+  // allowed-values prose stays (it is what OTA-1115 replaced the pipe
+  // alternation with, and the pipe loop has not returned since).
   const systemPrompt = [
     'Stat-balance one item for a text RPG. Reply with ONE line: a single JSON object, nothing before or after it.',
-    'Example of a correct reply:',
-    '{"kind":"misc","description":"A coil of tarred rope, stiff with age.","extraTags":["fiber"]}',
-    'Allowed "kind" values, pick exactly one: weapon, armor, accessory, consumable, misc, relic.',
+    'Top-level "kind" is required, pick exactly one: weapon, armor, accessory, consumable, misc, relic.',
     'Allowed "extraTags" values, pick one or two: organic, metal, fiber, stone, glass.',
-    'Omit "effect" unless the item clearly does something. When present, use exactly one shape:',
-    'food, drink, potion, tonic or fungus takes {"kind":"consumable","healHP":4,"restoreStamina":3} with healHP 1 to 10 and restoreStamina 1 to 8;',
-    'an amulet, ring, charm or locket takes {"kind":"passive","stat":"wisdom","bonus":1} where stat is one of strength, dexterity, intelligence, wisdom, charisma and bonus is 1 or 2.',
+    'Example reply with no effect:',
+    '{"kind":"misc","description":"A coil of tarred rope, stiff with age.","extraTags":["fiber"]}',
+    'Omit "effect" unless the item clearly does something. It is NESTED and has its own inner kind:',
+    '{"kind":"consumable","description":"Thin broth, still warm.","extraTags":["organic"],"effect":{"kind":"consumable","healHP":4,"restoreStamina":3}}',
+    '{"kind":"accessory","description":"A worn silver band.","extraTags":["metal"],"effect":{"kind":"passive","stat":"wisdom","bonus":1}}',
+    'Food, drink, potions and fungus use the consumable effect: healHP 1 to 10, restoreStamina 1 to 8.',
+    'Amulets, rings, charms and lockets use the passive effect: stat is one of strength, dexterity, intelligence, wisdom, charisma; bonus is 1 or 2.',
     'Tools, rope, lanterns and compasses are "misc" with extraTags and no effect.',
   ].join('\n');
 
@@ -160,6 +186,13 @@ export async function synthesizeItemViaQwen(
         // averaged with something else is how a budget gets lost.
         job: opts?.homework ? 'item_synthesis_hw' : 'item_synthesis',
         homework: opts?.homework,
+        // ⚠ OTA-1134 — CUT ME SHORT IF THE VOICE NEEDS THE LOCK. The device log
+        // measured a welcome-back line waiting 3,940 ms behind one of these,
+        // for a synthesis that then failed its own validator. Enrichment losing
+        // a description is the cheaper loss: the item keeps its static row and
+        // asks again on the next lookup, while a voice line four seconds late
+        // cannot be retried at all.
+        interruptible: true,
       },
     );
   } catch {
@@ -205,9 +238,19 @@ export async function synthesizeItemViaQwen(
     return null;
   }
 
+  // ⚠ OTA-1134 — NAME THE CULPRIT. This was the LAST discard path in the file
+  // that reported only that it happened. Its neighbours all print what they
+  // saw (OTA-1109 added that, OTA-1034 before it), and the payoff is exactly
+  // the same here: four device logs said `rejected-by-clamp` four times and not
+  // one of them said WHICH of the clamp's two rejections fired, so the cause
+  // had to be re-derived from the source instead of read off the log.
   const validated = validateAndClamp(name, obj);
   if (!validated) {
-    noteQwenDiscarded('item_synth:rejected-by-clamp');
+    const kindSeen = typeof obj.kind === 'string' ? obj.kind : `(${typeof obj.kind})`;
+    const why = !(KNOWN_KINDS as readonly string[]).includes(String(obj.kind).toLowerCase())
+      ? `bad-kind="${kindSeen}"`
+      : 'no-content';   // parsed, legal kind, but no description/tags/effect to add
+    noteQwenDiscarded(`item_synth:rejected-by-clamp ${why}`);
     return null;
   }
 

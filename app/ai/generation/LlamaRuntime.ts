@@ -154,6 +154,35 @@ export interface LlamaGenerateOptions {
    *  native call in flight. Owner's requirement was that idle work cost the
    *  player nothing, and this is the half that delivers it. */
   homework?: boolean;
+  /** ⚠ OTA-1134 — INTERRUPTIBLE, BUT NOT DEPRIORITISED. The distinction matters
+   *  and it is the whole of this flag.
+   *
+   *  Homework is both: it queues BELOW everything and it can be cut short.
+   *  Item synthesis is neither today, and the device log priced what that costs:
+   *
+   *    voice⏱ gap 4935ms (wait 3940ms + synth 859ms) "Welcome back, Verbal."
+   *    qwen⏱  item_synthesis ok 3847ms → DISCARDED — item_synth:rejected-by-clamp
+   *
+   *  Kokoro needed 859 ms. It waited 3,940 — almost exactly the length of an
+   *  item synthesis that then threw its own output away. OTA-1130 raised the
+   *  voice above the LLM, but priority only reorders WAITERS; the synthesis had
+   *  already started, and nothing could reach in and stop it.
+   *
+   *  So synthesis keeps its LLM priority — a player who opened an unknown item
+   *  IS waiting on it, and it should not sit behind idle work — but it gains the
+   *  cut-short hook. When the voice arrives mid-generation, llama.cpp is asked
+   *  to stop, the partial result is discarded, and the line the player already
+   *  read gets spoken seconds sooner.
+   *
+   *  ⚠ THE TRADE, STATED PLAINLY: an interrupted synthesis loses its
+   *  description, and the item stays on its static row until the next lookup —
+   *  the fire-and-forget contract this path already had. A voice line arriving
+   *  four seconds late is the more visible defect, and unlike the description it
+   *  cannot be retried by reopening a popup.
+   *
+   *  Narration deliberately does NOT set this. It has no fallback once it has
+   *  started, and a half-written sentence is worse than a late one. */
+  interruptible?: boolean;
 }
 
 export class LlamaRuntime {
@@ -277,7 +306,11 @@ export class LlamaRuntime {
         );
       },
       opts.homework ? ML_PRIORITY_HOMEWORK : ML_PRIORITY_LLM,
-      opts.homework
+      // OTA-1134 — the hook is now independent of the priority. Homework gets it
+      // because it is idle work; item synthesis gets it because it holds the lock
+      // long enough to make the voice late (see `interruptible`). Narration gets
+      // neither, on purpose.
+      (opts.homework || opts.interruptible)
         ? () => {
             preempted = true;
             try {

@@ -68,9 +68,16 @@ describe('OTA-1115 — no alternation survives inside the JSON', () => {
   });
 
   it('every effect example in the brief is itself valid JSON with literal values', () => {
-    const shapes = mod.match(/\{"kind":"(consumable|passive)"[^}]*\}/g) ?? [];
+    // ⚠ RETARGETED BY OTA-1134, and the reason is the point of that OTA. The
+    // effect examples used to sit in the brief as BARE top-level objects —
+    // `{"kind":"passive","stat":"wisdom","bonus":1}` — which is exactly what
+    // taught the model to emit `passive` as a TOP-LEVEL kind and fail the
+    // validator four times out of four. They are nested under `"effect":` now,
+    // so the pattern matches the inner object where it actually lives.
+    const shapes = mod.match(/"effect":(\{"kind":"(?:consumable|passive)"[^}]*\})/g) ?? [];
     expect(shapes.length).toBeGreaterThanOrEqual(2);
-    for (const s of shapes) {
+    for (const raw of shapes) {
+      const s = raw.slice('"effect":'.length);
       const parsed = JSON.parse(s);
       for (const v of Object.values(parsed)) {
         if (typeof v === 'string') expect(v).not.toContain('|');

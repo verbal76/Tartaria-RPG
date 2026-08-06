@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.66';
+export const DISPLAY_VERSION = '4.29.67';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -21771,7 +21771,72 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reproduction: naked 10, five worn pieces 20, and a regression
 // guard that no surface interpolates the raw field again.
 // DISPLAY_VERSION 4.29.66.
-export const OTA_BUILD_ID = '2026-08-05-1133-the-ac-that-never-dropped';
+// OTA-1134 — CUT SHORT FOR THE VOICE.
+// OTA-1132 put a timestamp on the voice because the owner was
+// clocking the gap by hand. The next device log answered him in
+// one line:
+//   voice⏱ gap 4935ms (wait 3940ms + synth 859ms, live)
+//          "Welcome back, Verbal."
+// Kokoro needed 859 ms. The rest was WAIT — and the thing it
+// waited for is in the same log: an item_synthesis that ran
+// 3,847 ms and was then DISCARDED by its own validator. Two
+// separate defects stacked into one visible one, and this OTA
+// takes both.
+// ⚠ 1. PRIORITY ONLY REORDERS WAITERS. OTA-1130 already put the
+// voice above narration and that was right, but a native call
+// already in flight is unreachable — `running` guards it.
+// OTA-1123 built the escape hatch (the onPreempt hook) and wired
+// it to `homework`, because homework was then the only work
+// nobody was waiting on. Item synthesis is NOT homework: a player
+// who opened an unknown item is waiting on it. So it keeps
+// ML_PRIORITY_LLM and gains only the ability to be CUT SHORT.
+// That splits one flag into two axes — priority says where you
+// queue, `interruptible` says whether you can be stopped once you
+// are running.
+// ⚠ THE TRADE, STATED PLAINLY: an interrupted synthesis loses its
+// description and the item stays on its static row until the next
+// lookup — which is the fire-and-forget contract that path
+// already had. A voice line four seconds late is the more visible
+// defect, and unlike the description it cannot be retried.
+// ⚠ NARRATION TAKES NEITHER FLAG, on purpose. It has no fallback
+// once it has started, and half a sentence is worse than a late
+// one. The suite guards that harder than it guards the feature.
+// ⚠ 2. THE PROMPT TAUGHT THE MODEL TO FAIL ITS OWN VALIDATOR.
+// Four device logs, four item_synthesis calls, four
+// `rejected-by-clamp`, ~4 seconds each. Nothing that job has ever
+// produced reached the player. The clamp rejects a `kind` outside
+// the allowed six, and the old brief showed the model this:
+//   … takes {"kind":"consumable","healHP":4,"restoreStamina":3}
+//   … takes {"kind":"passive","stat":"wisdom","bonus":1}
+// The word "kind" named TWO different fields at two nesting
+// levels, and the inner ones were shown as BARE TOP-LEVEL
+// OBJECTS — one declaring `"kind":"passive"`, which is not a
+// legal top-level kind at all. A 0.5B model copies the shape it
+// was shown; the validator then rejects exactly that shape. Same
+// class as the OTA-1115 pipe loop: the prompt and the parser
+// disagreed, and the prompt won.
+// The fix SHOWS the nesting rather than describing it — every
+// example is now a complete reply with "effect" wrapped where it
+// belongs, so there is no bare object left to copy. OTA-1115's
+// rule (no alternation anywhere in the brief) is re-asserted in
+// the new suite, because rewriting the prompt is exactly the edit
+// that could bring the pipe loop back.
+// ⚠ AND THE DISCARD FINALLY NAMES ITS CULPRIT. This was the last
+// path in the file that reported only that it happened; four logs
+// said `rejected-by-clamp` and none said WHICH of the clamp's two
+// rejections fired, so the cause had to be re-derived from source
+// instead of read off the log. It now prints bad-kind="…" or
+// no-content, classified against the same KNOWN_KINDS the clamp
+// uses — a second hand-written list would drift and start lying.
+// New suite ota1134CutShortForTheVoice (19 tests); ota1115,
+// ota1108 and ota1123 retargeted, the last re-authored rather
+// than re-numbered (its claim was "only homework supplies a
+// hook", which is no longer true — what it actually secured, that
+// NARRATION never supplies one, still holds and is what it now
+// asserts).
+// DISPLAY_VERSION 4.29.67.
+export const OTA_BUILD_ID = '2026-08-06-1134-cut-short-for-the-voice';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1133-the-ac-that-never-dropped';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1132-timestamp-the-voice';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1131-stop-rambling';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1130-voice-lands-with-the-text';
