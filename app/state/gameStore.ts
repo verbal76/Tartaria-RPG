@@ -724,6 +724,12 @@ interface CurrentScene {
    *  reads this via the acReduction opt so subsequent attacks land
    *  more easily. Lazily created on first acid proc. */
   enemyArmorShred?: number[];
+  /** ⚠ OTA-1160 — STAGGER, THE REWARD FOR BRINGING THE RIGHT TOOL. Rounds of
+   *  stagger remaining per enemy (parallel to `enemies`). A hit that lands on an
+   *  enemy's declared WEAKNESS sets this to 1; a boss that is staggered forfeits
+   *  its second swing. Lazily created on the first weakness hit, and consumed by
+   *  the thing it prevents — see `staggerEnemy` / the boss second-strike block. */
+  enemyStaggered?: number[];
   /** OTA-362 — accumulated corruption stacks per enemy (parallel to
    *  enemies). Each corruption-coated hit adds a stack; the corruption
    *  DOT ticks harder per stack (coatingDotPerTurn), so tough foes hit
@@ -20973,6 +20979,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // OTA-715 — ONE reconciled line (was two, which could contradict).
       if (effectiveMod.match === 'weak') {
         get().appendLog('combat', `Weakness exposed — ${enemy.name} flinches. (${weaponType} ×${effectiveMod.multiplier} for ${dmg})`);
+        // OTA-1160 — and the flinch is now MECHANICAL, not just a word.
+        staggerEnemy(set, activeIdx);
       } else if (effectiveMod.match === 'resist') {
         get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×${effectiveMod.multiplier} for ${dmg})`);
       }
@@ -28687,6 +28695,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `You hurl the ${item.name}. It bursts across ${target.name} — ${burst} ${dtype} (${perTurn}/turn × ${COATING_DOT_TURNS}${matchNote}). (${newHp} HP left)`,
         { combatOutcome: 'player_dmg' },
       );
+      // ⚠ OTA-1160 — THIS IS THE CASE THE OWNER HIT. A thrown vial on a declared
+      // weakness staggers exactly as a weapon hit does; the whole complaint was
+      // that spending the consumable changed nothing about the round that
+      // followed. One check, not two: `combineDamageTypeMatch` already folds the
+      // enemy's authored `vulnerable:` trait into `weak` (Mara carries the trait,
+      // not the type-table softness), so testing for 'vulnerable' here would be
+      // dead code that silently never fired.
+      if (newHp > 0 && burstCombined.match === 'weak') {
+        staggerEnemy(set, idx);
+        get().appendLog('combat', `${target.name} reels from the ${dtype} — staggered, and slow to recover.`);
+      }
       if (newHp <= 0) {
         get().resolveEnemyDefeat();
         // OTA-1143 — …and it swings back on a KILL too. The comment below
@@ -33395,6 +33414,70 @@ function describeWornForAcLedger(player: PlayerCharacter): string {
   return parts.join(' ');
 }
 
+/** ⚠ OTA-1160 — THE WEAKNESS HAS TO BE WORTH BRINGING, and until now it was not.
+ *
+ *  The owner threw a Searing Paste at a Guardian carrying `vulnerable:burn` —
+ *  her authored weakness, hit with a crafted consumable he had to spend — and
+ *  the device log priced the whole exchange:
+ *
+ *    You hurl the Searing Paste … 9 burn (2/turn × 3, vulnerable). (16 HP left)
+ *    Hierophant Mara-of-Yuldra deals 4 cold damage. You fall.
+ *
+ *  The system worked exactly as designed: base 6, ×1.5 for the vulnerability,
+ *  9 dealt. ⚠ AND THAT IS THE PROBLEM. Correctly identifying a boss's weakness
+ *  and spending a consumable on it bought THREE POINTS of extra damage, in a
+ *  round where she hit for 23. *"the coatings I threw on it were its weaknesses
+ *  but it took no damage."* It did take damage. It did not take NOTICE.
+ *
+ *  ⚠ THE FIX IS NOT A BIGGER MULTIPLIER. Raising ×1.5 to ×2 would have turned
+ *  his 9 into 12 — still noise against a boss doing 23 a round, and it would
+ *  have inflated every ordinary weakness hit in the game to fix one that
+ *  mattered. The problem was never the damage number; it was that the RIGHT
+ *  ANSWER CHANGED NOTHING ABOUT WHAT HAPPENED NEXT.
+ *
+ *  So a weakness hit STAGGERS. A staggered boss forfeits the second swing that
+ *  OTA-1159 measured at half its output. In the owner's own round that is 13
+ *  damage he does not take — larger than the 9 the vial dealt, and it arrives
+ *  as a thing he can SEE working rather than a multiplier he has to compute.
+ *
+ *  ⚠ DELIBERATELY NOT A LOCK. One round, consumed by the swing it prevents, and
+ *  it never stops the FIRST swing — so a boss always answers, and a player who
+ *  keeps hitting the weakness trades a ~half-damage round for the cost of
+ *  carrying the right tool. That is the trade this OTA is buying. */
+function staggerEnemy(
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  idx: number,
+): void {
+  set((s) => {
+    if (!s.currentScene) return s;
+    const n = s.currentScene.enemies.length;
+    if (idx < 0 || idx >= n) return s;
+    const next = [...(s.currentScene.enemyStaggered ?? s.currentScene.enemies.map(() => 0))];
+    while (next.length < n) next.push(0);
+    next[idx] = 1;
+    return { currentScene: { ...s.currentScene, enemyStaggered: next } };
+  });
+}
+
+/** Is `idx` staggered right now, and CONSUME it if so. Consuming here rather
+ *  than on a round tick is what keeps the effect honest: it is spent by the
+ *  swing it prevents, so it can never silently persist into a later round. */
+function takeStagger(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  idx: number,
+): boolean {
+  const cur = get().currentScene?.enemyStaggered?.[idx] ?? 0;
+  if (cur <= 0) return false;
+  set((s) => {
+    if (!s.currentScene) return s;
+    const next = [...(s.currentScene.enemyStaggered ?? [])];
+    next[idx] = 0;
+    return { currentScene: { ...s.currentScene, enemyStaggered: next } };
+  });
+  return true;
+}
+
 // ⚠ OTA-1158 — THE AC HALF OF THIS NOW LIVES IN equipment.ts. What is left here
 // is the RESISTANCE walk, which genuinely belongs to the store: combat weights a
 // resist by the slot it came from, and that per-slot tagging has no other home.
@@ -33854,8 +33937,18 @@ export function runEnemyGroupCounters(
         && (sceneAfter.enemyHps[liveIdx] ?? 0) > 0
         && sceneAfter.enemies[liveIdx] === enemy;
       if (enemyStillAlive) {
-        get().appendLog('combat', `${enemy.name} presses the second strike — bosses do not yield the tempo.`);
-        applyEnemyCounter(enemy, liveAfter, get, set, liveIdx, true);
+        // ⚠ OTA-1160 — AND THIS IS WHAT THE WEAKNESS BUYS. A staggered boss
+        // forfeits the second swing OTA-1159 measured at half its round output.
+        // Checked here rather than at the top of the volley on purpose: the
+        // FIRST swing always lands, so hitting a weakness never makes a boss
+        // harmless — it halves the round and gives the player something they
+        // can watch work.
+        if (takeStagger(get, set, liveIdx)) {
+          get().appendLog('combat', `${enemy.name} gathers for the second strike — and the wound tells. STAGGERED: no second swing this round.`, { combatOutcome: 'enemy_miss' });
+        } else {
+          get().appendLog('combat', `${enemy.name} presses the second strike — bosses do not yield the tempo.`);
+          applyEnemyCounter(enemy, liveAfter, get, set, liveIdx, true);
+        }
       }
     }
   }

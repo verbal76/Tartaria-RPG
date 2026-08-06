@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.69';
+export const DISPLAY_VERSION = '4.29.70';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23041,7 +23041,46 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1159HowHeDiedInOneInput (16 tests), pinning the
 // advertised +1d6 to the resolver line that rolls it.
 // DISPLAY_VERSION 4.29.69.
-export const OTA_BUILD_ID = '2026-08-06-1159-how-he-died-in-one-input';
+// OTA-1160 — THE WEAKNESS HAS TO BE WORTH BRINGING.
+// The owner threw a Searing Paste at a Guardian carrying
+// `vulnerable:burn` — her authored weakness, hit with a crafted
+// consumable he had to spend — and the log priced the exchange:
+//   You hurl the Searing Paste … 9 burn (2/turn x 3, vulnerable).
+//   Hierophant Mara-of-Yuldra deals 4 cold damage. You fall.
+// ⚠ THE SYSTEM WORKED, AND THAT IS THE PROBLEM. Base 6, x1.5 for
+// the vulnerability, 9 dealt — every part correct. Correctly
+// identifying a boss's weakness and spending a consumable on it
+// bought THREE POINTS of extra damage, in a round where she hit
+// for 23. His words: "the coatings I threw on it were its
+// weaknesses but it took no damage." It took damage. It did not
+// take NOTICE.
+// ⚠ AND THE FIX IS NOT A BIGGER MULTIPLIER. x1.5 → x2 turns his 9
+// into 12 — still noise against 23 a round — and inflates every
+// ordinary weakness hit in the game to fix the one that mattered.
+// The problem was never the damage number; it was that THE RIGHT
+// ANSWER CHANGED NOTHING ABOUT WHAT HAPPENED NEXT.
+// So a weakness hit STAGGERS, and a staggered boss forfeits the
+// second swing OTA-1159 measured at half its round output. In the
+// owner's own round that is 13 damage he does not take — larger
+// than the 9 the vial dealt, and it arrives as a thing he can
+// watch work rather than a multiplier he has to compute.
+// ⚠ DELIBERATELY NOT A LOCK: one round; consumed by the swing it
+// prevents rather than by a tick, so it can never silently
+// persist; never touches the FIRST swing, so a boss always
+// answers; and a killing blow does not stagger a corpse. A player
+// who keeps hitting the weakness trades a half-damage round for
+// the cost of carrying the right tool — that trade is the OTA.
+// ⚠ THE THROWN PATH IS THE ONE HE HIT, and it is what the suite
+// tests first. The weapon path already FELT right — the same log
+// has a Cudgel opening an Aetheric Drone for 27 on `bludgeoning
+// x1.5` with the Arbiter coaching the swap. Weapons were never
+// the complaint; consumables were. Both stagger now.
+// No damage multiplier moved. New scene field enemyStaggered
+// (parallel to enemies, like enemyArmorShred), staggerEnemy /
+// takeStagger, and new suite ota1160WorthBringing (17 tests).
+// DISPLAY_VERSION 4.29.70.
+export const OTA_BUILD_ID = '2026-08-06-1160-worth-bringing';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1159-how-he-died-in-one-input';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1158-three-points-of-jewellery';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1157-cut-short-for-the-voice';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1156-the-ac-that-never-dropped';
