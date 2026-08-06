@@ -10552,6 +10552,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const banked = hasEnemies ? null : takeBankedSceneIntro(get, location.id);
         if (banked) {
           get().appendLog('arbiter', banked);
+          // OTA-1154 — the arrival beat IS this tile's one aside. Spending the
+          // budget here is the point: it is the line with something to say
+          // about where the player now is, and everything after it waits.
+          takeArbiterFlavorBudget(get);
           get().appendLog('debug',
             `arbiter: intro ✓ 0ms (banked, ${_sceneIntroBankSize()} left)`);
         } else {
@@ -38838,6 +38842,117 @@ function clampSentences(raw: string, maxSentences: number): string {
   return s;
 }
 
+/** ⚠ OTA-1154 — THE ARBITER STOPS BEING A CHATTY KATHY.
+ *
+ *  Straight from the device log. Ten seconds, one tile, five `investigate`
+ *  taps, five unrelated lore lines:
+ *
+ *    00:14:43  "You saw the traveler … That memory will rot if you leave it."
+ *    00:14:45  "Black, polished, magnetic. They were aimed at something…"
+ *    00:14:47  "The observatory beneath the Pillars charted skies that…"
+ *    00:14:51  "Walk between two Pillars and your compass forgets you…"
+ *    00:14:53  "Birds will not perch here. Birds are wise."
+ *
+ *  Every one is `reason=intent-not-allowed:investigate` — the TEMPLATE path,
+ *  which fires a flavor line unconditionally on every call. Owner:
+ *
+ *    *"if he has multiple lines and they don't have a gap of time in between
+ *     and they are unrelated topics then he just sounds like he is rambling. I
+ *     don't want the arbiter to be a chatty Kathy … forcing him to repeatedly
+ *     say multiple things in one tile comes across as too much."*
+ *
+ *  ⚠ THE FIX IS A BUDGET, NOT A FILTER, and the distinction matters. Each of
+ *  those five lines is fine on its own — the problem is only that they came
+ *  together. Nothing here judges a line's quality; it rations HOW OFTEN the
+ *  Arbiter volunteers something unasked.
+ *
+ *  Two limits, because the owner named two different things:
+ *   · ONE PER TILE — "multiple things in one tile comes across as too much".
+ *     The arrival beat is normally the one that spends it, which is right:
+ *     that is the line with something to say about where you now are.
+ *   · A SHARED CLOCK — "they don't have a gap of time in between". Crossing
+ *     into a new tile resets the per-tile count but NOT the clock, so
+ *     sprinting through four tiles still cannot produce four asides.
+ *
+ *  ⚠ WHAT IS DELIBERATELY *NOT* RATIONED. The owner drew the line himself:
+ *  *"lore flavor lines are good advice on how to play. like what weapon to
+ *  choose or he notices that they're resistant to something is good."* Those
+ *  are ANSWERS to something the player did — combat cues, resist callouts,
+ *  refusals, mission beats — and they do not come through here at all. This
+ *  budget covers only the unsolicited ambience. */
+let lastArbiterFlavorAt = 0;
+let arbiterFlavorTile = '';
+let arbiterFlavorThisTile = 0;
+/** Gap between UNSOLICITED Arbiter asides. Wide on purpose: at 25s a player
+ *  thumbing through a tile's nouns gets one remark, not five, and a player who
+ *  lingers still hears from their companion. */
+const ARBITER_FLAVOR_GAP_MS = 25_000;
+const ARBITER_FLAVOR_PER_TILE = 1;
+
+/** ⚠ THE CLOCK IS SHARED BY EVERY ARBITER LINE, not just the budgeted ones.
+ *  The owner's complaint was about GAPS — "they don't have a gap of time in
+ *  between" — and a gap does not care which code path produced the neighbours.
+ *  In the same ten seconds of that log an ambient musing landed BETWEEN the
+ *  investigate asides; had only the asides been rationed, the Arbiter would
+ *  still have spoken twice in a breath. So a generated line stamps the clock
+ *  too, and the next unsolicited aside waits behind it. */
+function noteArbiterSpoke(): void {
+  lastArbiterFlavorAt = Date.now();
+}
+/** True when enough silence has passed for another unsolicited line. Read-only,
+ *  for the paths that have their own reason to speak and need the SPACING but
+ *  not the per-tile cap. */
+function arbiterHasBeenQuiet(): boolean {
+  return Date.now() - lastArbiterFlavorAt >= ARBITER_FLAVOR_GAP_MS;
+}
+
+/** Tests only — module state. */
+export function _resetArbiterFlavorBudget(): void {
+  lastArbiterFlavorAt = 0;
+  arbiterFlavorTile = '';
+  arbiterFlavorThisTile = 0;
+}
+export const _ARBITER_FLAVOR_GAP_MS = ARBITER_FLAVOR_GAP_MS;
+export const _ARBITER_FLAVOR_PER_TILE = ARBITER_FLAVOR_PER_TILE;
+
+/** The tile the player is standing on, for budget purposes. Location plus room,
+ *  so moving between rooms of one location counts as moving — each is a place
+ *  with its own things to remark on. */
+function arbiterFlavorTileKey(get: () => GameStore): string {
+  const sc = get().currentScene;
+  return `${sc?.location?.id ?? '-'}|${sc?.microMicroId ?? '-'}`;
+}
+
+/** True when the Arbiter may volunteer an unasked line right now. Consumes the
+ *  budget when it says yes — callers do not have to remember to. */
+function takeArbiterFlavorBudget(get: () => GameStore): boolean {
+  const tile = arbiterFlavorTileKey(get);
+  if (tile !== arbiterFlavorTile) {
+    arbiterFlavorTile = tile;
+    arbiterFlavorThisTile = 0;
+  }
+  if (arbiterFlavorThisTile >= ARBITER_FLAVOR_PER_TILE) return false;
+  if (Date.now() - lastArbiterFlavorAt < ARBITER_FLAVOR_GAP_MS) return false;
+  arbiterFlavorThisTile += 1;
+  lastArbiterFlavorAt = Date.now();
+  return true;
+}
+
+/** The ONE door every unsolicited Arbiter aside goes through. Having a single
+ *  choke point is the whole reason the budget can be trusted: the five lines in
+ *  the log came from one code path called five times, and a rule applied at
+ *  three of the four call sites would have left the fifth to ramble. */
+function speakArbiterFlavor(get: () => GameStore, text: string): void {
+  const trimmed = (text ?? '').trim();
+  if (!trimmed) return;
+  if (!takeArbiterFlavorBudget(get)) {
+    get().appendLog('debug', 'arbiter: flavor held (budget — one per tile, 25s apart)');
+    return;
+  }
+  // arb166 — the line always SHOWS; `silent` only thins how many are voiced.
+  get().appendLog('arbiter', trimmed, chance(30) ? undefined : { silent: true });
+}
+
 async function narrateViaArbiter(
   get: () => GameStore,
   set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
@@ -38902,7 +39017,7 @@ async function narrateViaArbiter(
     // so nearly every 60% roll actually spoke and Kokoro "wouldn't shut up", ~20
     // lines/min.) The line still appears on-screen every time; this only thins
     // how many are SPOKEN. `silent` → TTSController skips voicing it.
-    if (trimmed) get().appendLog('arbiter', trimmed, chance(30) ? undefined : { silent: true });
+    speakArbiterFlavor(get, trimmed);
     return;
   }
   const state = get();
@@ -38910,7 +39025,7 @@ async function narrateViaArbiter(
   if (!player || !scene) {
     if (opts?.bankOnly) return;
     get().appendLog('debug', 'arbiter: template (reason=no-scene)');
-    if (trimmed) get().appendLog('arbiter', trimmed, chance(30) ? undefined : { silent: true });
+    speakArbiterFlavor(get, trimmed);
     return;
   }
   // ⚠ OTA-1152 — NARRATING A PLACE THE PLAYER HAS NOT REACHED YET. The slice
@@ -39086,6 +39201,9 @@ async function narrateViaArbiter(
       return;
     }
     get().appendLog('arbiter', finalText);
+    // OTA-1154 — a generated line is still the Arbiter talking; it starts the
+    // quiet period the same as an aside does.
+    noteArbiterSpoke();
     if (repDup) noteQwenDiscarded('near-duplicate→template');
     else if (usedFallback) noteQwenDiscarded('empty→template');
     get().appendLog('debug', `arbiter: qwen ✓ ${Date.now() - t0}ms (intent=${intent}${repDup ? ', near-dup→template' : usedFallback ? ', empty→template' : ''})`);
@@ -39097,7 +39215,7 @@ async function narrateViaArbiter(
     if (myEpoch === arbiterGenerationEpoch) {
       get().appendLog('debug', `arbiter: qwen-error ${Date.now() - t0}ms → template`);
       // arb162 — generation failed → canned fallback; voice it only ~1 in 4.
-      if (trimmed) get().appendLog('arbiter', trimmed, chance(30) ? undefined : { silent: true });
+      speakArbiterFlavor(get, trimmed);
     }
   } finally {
     // Only clear flags if we're still the active generation; otherwise the
@@ -39224,10 +39342,20 @@ async function maybeGenerateAmbientArbiter(
   // should not be rationed by a cooldown that exists to ration generations.
   // It stays below the combat and tutorial muzzles, which are about whether a
   // musing is WANTED at all.
+  // ⚠ OTA-1154 — AND NOT ON TOP OF SOMETHING HE JUST SAID. In the log that
+  // motivated the budget, an ambient musing landed in the middle of five
+  // investigate asides. Ambient keeps its own wide cooldown and its own
+  // reasons; what it gains here is only the SHARED silence, so two Arbiter
+  // lines from different systems cannot arrive in one breath.
+  if (!arbiterHasBeenQuiet()) {
+    get().appendLog('debug', 'arbiter: ambient held (he just spoke)');
+    return;
+  }
   if (!opts?.bankOnly) {
     const banked = takeBankedMusing(get);
     if (banked) {
       get().appendLog('arbiter', banked);
+      noteArbiterSpoke();
       get().appendLog('debug', `arbiter: ambient ✓ 0ms (banked, ${musingBank.length} left)`);
       return;
     }

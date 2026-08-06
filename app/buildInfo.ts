@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.63';
+export const DISPLAY_VERSION = '4.29.64';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22731,7 +22731,63 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // suites RE-AUTHORED rather than re-numbered, because OTA-634's
 // headline claim is no longer true while its mechanism is
 // untouched. DISPLAY_VERSION 4.29.63.
-export const OTA_BUILD_ID = '2026-08-05-1153-voice-lands-with-the-text';
+// OTA-1154 — THE ARBITER STOPS RAMBLING, AND THE PROMPT STOPS
+// LEAKING. Both findings come from ONE device log (4.29.62 /
+// OTA-1152), and neither was reproducible from a cold read.
+// ⚠ 1. FIVE UNRELATED LORE LINES IN TEN SECONDS, ONE TILE:
+//   00:14:43 "You saw the traveler … That memory will rot…"
+//   00:14:45 "Black, polished, magnetic. They were aimed…"
+//   00:14:47 "The observatory beneath the Pillars charted…"
+//   00:14:51 "Walk between two Pillars and your compass…"
+//   00:14:53 "Birds will not perch here. Birds are wise."
+// Every one carries reason=intent-not-allowed:investigate — the
+// TEMPLATE path, which appended a flavor line unconditionally on
+// every call. Owner: "if he has multiple lines and they don't have
+// a gap of time in between and they are unrelated topics then he
+// just sounds like he is rambling. I don't want the arbiter to be a
+// chatty Kathy … forcing him to repeatedly say multiple things in
+// one tile comes across as too much."
+// ⚠ THE FIX IS A BUDGET, NOT A FILTER, and that is the whole
+// design. Every one of those five lines is good ON ITS OWN; the
+// defect is only that they arrived together. Nothing here judges a
+// line's quality — it rations how often the Arbiter volunteers
+// something unasked. Two limits, because the owner named two
+// different things: ONE PER TILE ("multiple things in one tile"),
+// and a SHARED CLOCK ("they don't have a gap of time in between"),
+// where crossing into a new tile resets the count but NOT the
+// clock — otherwise sprinting through four tiles produces four
+// asides, which is the same rambling by another route.
+// ⚠ AND WHAT IS DELIBERATELY NOT RATIONED, in the owner's words:
+// "lore flavor lines are good advice on how to play. like what
+// weapon to choose or he notices that they're resistant to
+// something is good." Those are ANSWERS to something the player
+// did — combat cues, resist callouts, refusals, mission beats —
+// and they never pass through this door at all.
+// The clock is shared by EVERY Arbiter line, not just budgeted
+// ones: in the same ten seconds an ambient musing landed BETWEEN
+// the asides, so a generated line stamps the clock too and ambient
+// now waits when he has just spoken. The banked arrival intro
+// SPENDS the tile's budget, which is right — it is the line with
+// something to say about where the player now is.
+// ⚠ 2. THE PROMPT LEAKED INTO THE FEED, AND WAS READ ALOUD:
+//   [arbiter] Your read of them: HP 24/24, Stamina 8/14, AC 10
+//             You, the seasoned traveler, have
+// That is the ambient prompt's own line — `Your read of them:
+// ${player_stats}` — recited back and continued from. OTA-1053
+// built looksLikeInstructionEcho for exactly this class and it
+// carries a dozen patterns; every one is about the model reciting
+// its INSTRUCTIONS. None covered it reciting the FACTS BLOCK,
+// which is just as much prompt and reads worse, because it puts
+// raw numbers in the narrator's mouth. Guarded now on the literal
+// strings the prompt emits, per OTA-1148's standing rule: when a
+// log hands you the exact failing input, build the guard around
+// THAT STRING. The suite asserts the verbatim leaked line, each of
+// its halves, every other field label — and seven ordinary Arbiter
+// lines that must SURVIVE, because a guard that quietly deletes
+// the feature is the recurring failure in this area (OTA-1054).
+// New suite ota1154StopRambling (14 tests). DISPLAY_VERSION 4.29.64.
+export const OTA_BUILD_ID = '2026-08-05-1154-stop-rambling';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1153-voice-lands-with-the-text';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1152-scene-intro-bank';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1151-said-it-four-times';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1150-homework-and-ms-per-token';
