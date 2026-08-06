@@ -5147,6 +5147,14 @@ interface GameStore {
   /** OTA-1126 — screens call this on focus/blur. Idempotent; passing true
    *  twice keeps the ORIGINAL stamp so the dwell measures real idle time. */
   markUiIdle: (idle: boolean) => void;
+  /** ⚠ OTA-1129 — WHEN THE PLAYER LAST DID ANYTHING. The other idle signal, and
+   *  the one the scene-intro bank needs: `uiIdleSince` only fires on stationary
+   *  screens, which is precisely where a scene intro is NOT wanted. Standing in
+   *  a room for six seconds without typing is reading time, and reading time is
+   *  when the next room gets written. Stamped by `submitPlayerAction` — the one
+   *  door every action passes through — so it cannot drift out of step with
+   *  what the player is actually doing. Null until the first action. */
+  lastPlayerActionAt: number | null;
   /** Count of cardinal travel steps since the last wasteland
    *  encounter fired. stepDirection increments this every step;
    *  pickWastelandEncounter resets to 0 when an encounter lands.
@@ -6285,6 +6293,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   partialArbiterText: null,
   isGenerating: false,
   uiIdleSince: null,
+  lastPlayerActionAt: null,
   // OTA-1126 — idempotent on the way IN: a screen that re-focuses must not
   // restart the dwell clock, or a UI that re-renders every second would keep
   // resetting it and homework would never see an idle window at all.
@@ -6761,6 +6770,64 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // clamps, the cache and the silent-discard-on-bad-row are the existing
         // path untouched — which is the point, because those are five OTAs of
         // hard-won correctness and a second copy would drift from them.
+        // ⚠ OTA-1129 — THE EXPLORATION IDLE SIGNAL, and why it is a different
+        // one. `uiIdleSince` is stamped by STATIONARY SCREENS (the pack, the
+        // map) — exactly right for item descriptions, and exactly wrong here,
+        // because a scene intro is needed while the player is out walking,
+        // which is the one time that stamp is never set. So the intro slot
+        // reads the other honest signal: time since the last player action.
+        // Standing in a room for six seconds without typing is reading time,
+        // and reading time is when the next room should be written.
+        //
+        // ⚠ THIS DELIBERATELY LETS HOMEWORK RUN DURING NORMAL PLAY, which is
+        // only defensible because OTA-1123 built the harness first: the fill
+        // queues BELOW the voice and is cut short the instant a real
+        // generation is enqueued, and `submitPlayerAction` clears the stamp at
+        // the one door every action passes through. Without those two, this
+        // would be the item-synthesis mistake of OTA-1123's own commentary —
+        // background enrichment delaying the line the player is waiting on.
+        let lastIntroFillAt = 0;
+        /** Six seconds of stillness. Long enough that stepping through a
+         *  corridor never triggers it, short enough that a player reading the
+         *  room description has already paid for the next one. */
+        const INTRO_IDLE_MS = 6_000;
+        /** Wider than the item gap: an intro costs a full narration-sized
+         *  generation, and two banked lines per room is the whole target. */
+        const INTRO_FILL_GAP_MS = 45_000;
+        let introFillInFlight = false;
+        /** Returns true when it STARTED a fill, so the tick stops there and the
+         *  item slot waits for the next one — never two model jobs at once. */
+        const introFillTick = (): boolean => {
+          if (introFillInFlight) return false;
+          if (Date.now() - lastIntroFillAt < INTRO_FILL_GAP_MS) return false;
+          const lastAct = get().lastPlayerActionAt;
+          if (lastAct === null || Date.now() - lastAct < INTRO_IDLE_MS) return false;
+          const target = introPrefetchCandidates(get)
+            .find((l) => (sceneIntroBank.get(l.id)?.length ?? 0) < INTRO_BANK_PER_LOC);
+          if (!target) return false;
+          const scene = get().currentScene;
+          const pl = get().player;
+          if (!scene || !pl) return false;
+          introFillInFlight = true;
+          lastIntroFillAt = Date.now();
+          void narrateViaArbiter(
+            get,
+            set,
+            // The template is only a fallback signal here — a fill that lands
+            // on it banks nothing. Built for the DESTINATION so the two paths
+            // agree about which place is being written about.
+            buildArbiterSceneIntro({
+              location: target,
+              enemy: null,
+              player: pl,
+              worldMemory: get().worldMemory,
+            }),
+            'scene_intro',
+            { bankOnly: true, forLocation: target },
+          ).catch(() => { /* fail closed — the live path still works */ })
+            .finally(() => { introFillInFlight = false; });
+          return true;
+        };
         let lastHomeworkAt = 0;
         /** Spacing between homework generations. Deliberately much wider than
          *  the interactive gap: this is battery the player did not ask to
@@ -6793,6 +6860,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (!qwen.isReady() || get().isGenerating) return;
           if ((get().currentScene?.enemies?.length ?? 0) > 0) return;
           if (inScriptedTutorialPhase(get)) return;
+          // ⚠ OTA-1129 — SLOT 2: THE SCENE-INTRO BANK, and it runs BEFORE the
+          // item slot on purpose. An item description is read on the next
+          // inventory open, minutes away; a scene intro is spent on the very
+          // next step. When both are hungry the one with the nearer deadline
+          // wins. (It sits above the `witholdIdentity` gate too — that dial is
+          // about not solving a hard run's CURIOS for it, and has nothing to
+          // say about narrating a room.)
+          if (introFillTick()) return;
           if (profileOf(get().player).witholdIdentity) return;
           if (synthInFlight) return;
           if (Date.now() - lastHomeworkAt < HOMEWORK_GAP_MS) return;
@@ -10469,17 +10544,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // (name → investigate) so Qwen stays fully idle there.
     if (!opts?.isOpening && !inScriptedTutorialPhase(get)) {
       if (chance(45)) {
-        void narrateViaArbiter(
-          get,
-          set,
-          buildArbiterSceneIntro({
-            location,
-            enemy: sceneEnemy,
-            player,
-            worldMemory: get().worldMemory,
-          }),
-          'scene_intro',
-        );
+        // ⚠ OTA-1129 — SPEND BEFORE YOU GENERATE, exactly as the musing bank
+        // does. A pre-written intro costs zero model time, so it lands in the
+        // same millisecond as the scene instead of 19 seconds after it —
+        // which was the whole point of the measurement in OTA-1128.
+        //
+        // Gated on NO ENEMIES for the same reason narrateViaArbiter is: the
+        // combat muzzle is about whether model prose is wanted at all, and a
+        // free line is still the wrong line mid-fight. It was also written
+        // against a scene with no enemies in it, so spending it into an
+        // ambush would describe a room that is no longer the situation.
+        const banked = hasEnemies ? null : takeBankedSceneIntro(get, location.id);
+        if (banked) {
+          get().appendLog('arbiter', banked);
+          get().appendLog('debug',
+            `arbiter: intro ✓ 0ms (banked, ${_sceneIntroBankSize()} left)`);
+        } else {
+          void narrateViaArbiter(
+            get,
+            set,
+            buildArbiterSceneIntro({
+              location,
+              enemy: sceneEnemy,
+              player,
+              worldMemory: get().worldMemory,
+            }),
+            'scene_intro',
+          );
+        }
       } else if (
         shouldArbiterSpeak({
           hasEnemy: !!sceneEnemy,
@@ -10523,6 +10615,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // anything already running is preemptible (OTA-1123). Cheap — a no-op when
     // the stamp is already null, which is the common case.
     if (get().uiIdleSince !== null) set({ uiIdleSince: null });
+    // ⚠ OTA-1129 — and stamp WHEN. Same door, opposite direction: `uiIdleSince`
+    // records that idleness ENDED, this records when it began counting again.
+    // The scene-intro bank measures its stillness from here.
+    set({ lastPlayerActionAt: Date.now() });
 
     // OTA-1076 — the talk/parley sheets don't lock the screen the way the old
     // modals did (that was the point: the feed stays readable, and so do the
@@ -38417,6 +38513,119 @@ export function _takeBankedMusingForTest(): string | null {
 }
 export const _MUSING_BANK_CAP = MUSING_BANK_CAP;
 
+/** ⚠ OTA-1129 — THE SCENE-INTRO BANK. The owner's call, taken with the numbers
+ *  in front of them: OTA-1128 measured `scene_intro` at 19.3 s = 3.7 wait +
+ *  11.0 read + 3.5 write, and showed that even a ZERO-token prompt leaves ~8 s.
+ *  Trimming could not fix it. The only fix is to stop the player waiting.
+ *
+ *  So the same trick as the musing bank, aimed at a different beat. An intro is
+ *  pre-generatable for exactly the reason a musing is: it is about a PLACE, and
+ *  the place is knowable before the player gets there. `stepInDirection` is a
+ *  pure grid lookup, so the destinations of all four cardinal steps can be read
+ *  for free — and most steps land on unnamed ground, where the player stays in
+ *  the location they are already in, which is why the current location is a
+ *  candidate too and the most frequently spent one.
+ *
+ *  ⚠ KEYED BY LOCATION, NOT BY STAMP, and that difference is deliberate. A
+ *  musing is about the player and goes stale when they move; an intro is about
+ *  a room and is only ever spent in that room, so there is nothing to go stale.
+ *  What it CAN do is repeat, which is why entries are one-shot and the
+ *  near-duplicate check runs again at spend time. */
+interface BankedIntro { text: string; at: number; }
+/** Session-scoped like the musing bank, and for the same reason: a pre-written
+ *  line is worth seconds, not a save migration. */
+const sceneIntroBank = new Map<string, BankedIntro[]>();
+/** Two per location — enough that re-entering a room twice does not fall back
+ *  to a cold generation, few enough that the battery cost stays proportionate. */
+const INTRO_BANK_PER_LOC = 2;
+/** …and a ceiling across all locations, so a player criss-crossing a junction
+ *  cannot accumulate an unbounded set of rooms' worth of prose. */
+const INTRO_BANK_TOTAL = 6;
+
+/** Tests only — the bank is module state and the deposit/withdraw pair is the
+ *  behaviour worth exercising directly. */
+export function _resetSceneIntroBank(): void { sceneIntroBank.clear(); }
+export function _sceneIntroBankSize(): number {
+  let n = 0;
+  for (const v of sceneIntroBank.values()) n += v.length;
+  return n;
+}
+export function _bankSceneIntroForTest(locId: string, text: string): void {
+  bankSceneIntro(locId, text);
+}
+export function _takeBankedSceneIntroForTest(locId: string): string | null {
+  return takeBankedSceneIntro(() => useGameStore.getState(), locId);
+}
+export const _INTRO_BANK_PER_LOC = INTRO_BANK_PER_LOC;
+export const _INTRO_BANK_TOTAL = INTRO_BANK_TOTAL;
+
+function bankSceneIntro(locId: string, text: string): void {
+  if (!locId || !text) return;
+  const rows = sceneIntroBank.get(locId) ?? [];
+  if (rows.some((r) => r.text === text)) return;
+  if (rows.length >= INTRO_BANK_PER_LOC) rows.shift();
+  rows.push({ text, at: Date.now() });
+  sceneIntroBank.set(locId, rows);
+  // Total ceiling — evict from the location holding the OLDEST entry, which is
+  // the one the player is least likely to walk back into.
+  while (_sceneIntroBankSize() > INTRO_BANK_TOTAL) {
+    let oldestLoc: string | null = null;
+    let oldestAt = Infinity;
+    for (const [k, v] of sceneIntroBank) {
+      const head = v[0];
+      if (head && head.at < oldestAt) { oldestAt = head.at; oldestLoc = k; }
+    }
+    if (oldestLoc === null) break;
+    const victim = sceneIntroBank.get(oldestLoc)!;
+    victim.shift();
+    if (victim.length === 0) sceneIntroBank.delete(oldestLoc);
+  }
+}
+
+/** Spend a pre-written intro for this location, or null. One-shot, so the same
+ *  sentence never greets the player twice, and the near-duplicate check runs
+ *  again here because a banked line may have sat through a dozen others since
+ *  it was written. */
+function takeBankedSceneIntro(get: () => GameStore, locId: string): string | null {
+  const rows = sceneIntroBank.get(locId);
+  if (!rows || rows.length === 0) return null;
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i]!;
+    if (generatedLineRepeatsRecent(get, r.text)) continue;
+    rows.splice(i, 1);
+    if (rows.length === 0) sceneIntroBank.delete(locId);
+    return r.text;
+  }
+  return null;
+}
+
+/** ⚠ OTA-1129 — WHERE THE PLAYER CAN BE ONE STEP FROM NOW. The current location
+ *  comes FIRST, and not as a formality: a cardinal step onto unnamed ground
+ *  rebuilds the scene right where the player stands, and that is the common
+ *  case by a wide margin — most tiles carry no named location at all. Then any
+ *  named location sitting on one of the four adjacent cells.
+ *
+ *  Reads only. It goes through `playerGridCell` (the one source of truth for
+ *  where the player is, legacy saves included) and `canonicalLocationAtCell`
+ *  (a plain index lookup), so nothing is built, rolled, or mutated to find out
+ *  where the player might go. */
+function introPrefetchCandidates(get: () => GameStore): Location[] {
+  const st = get();
+  const player = st.player;
+  const scene = st.currentScene;
+  if (!player || !scene) return [];
+  const out: Location[] = [scene.location];
+  const here = playerGridCell(player);
+  for (const [dx, dy] of [[0, -1], [1, 0], [0, 1], [-1, 0]] as const) {
+    const cell = clampGridCell(here.x + dx, here.y + dy);
+    const named = canonicalLocationAtCell(cell.x, cell.y);
+    if (!named) continue;
+    if (out.some((l) => l.id === named.locationId)) continue;
+    try { out.push(getLocationById(named.locationId)); } catch { /* unknown id — skip */ }
+  }
+  return out;
+}
+
 function bankMusing(text: string, stamp: AmbientStamp): void {
   if (!text) return;
   if (musingBank.some((m) => m.text === text)) return;
@@ -38594,6 +38803,13 @@ async function narrateViaArbiter(
    * intent lets the scene-entry path through.
    */
   intent: string = 'scene_intro',
+  /** ⚠ OTA-1129 — PRE-GENERATION, and it is the same trick OTA-1122 used for
+   *  ambient. `bankOnly` writes the finished line into the scene-intro bank
+   *  instead of speaking it; `forLocation` narrates a place the player is not
+   *  standing in yet. Everything between — model readiness, prompt assembly,
+   *  streaming, and the whole vetting chain — is shared, because a banked line
+   *  that skipped the filters would be a second, quietly different narrator. */
+  opts?: { bankOnly?: boolean; forLocation?: Location },
 ): Promise<void> {
   const trimmed = (templateFallback ?? '').trim();
   const scene = get().currentScene;
@@ -38611,8 +38827,19 @@ async function narrateViaArbiter(
   // arb161 — cooldown: don't grab the native-ML lock again until enough time has
   // passed, so the voice (which shares the lock) isn't starved by back-to-back
   // generations on every investigate.
-  const cooldownActive = (Date.now() - lastQwenGenStartMs) < QWEN_GEN_COOLDOWN_MS;
+  // ⚠ OTA-1129 — THE COOLDOWN IS A RATION ON THE *VOICE LOCK*, so background
+  // fill is not subject to it. A homework generation already sits below voice
+  // in the lock queue and is cut short the moment a real call arrives
+  // (OTA-1123), which is a stronger guarantee than a timer. Applying the
+  // cooldown here as well would mean the bank could only ever fill in the gaps
+  // between the very generations it exists to eliminate.
+  const cooldownActive = !opts?.bankOnly
+    && (Date.now() - lastQwenGenStartMs) < QWEN_GEN_COOLDOWN_MS;
   if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen || cooldownActive) {
+    // OTA-1129 — a background fill has no line to fall back to and no player
+    // waiting on it. It simply does not run this tick, silently, and the next
+    // tick asks again.
+    if (opts?.bankOnly) return;
     // arb134 — name WHY this turn took the template path, so a pasted log shows
     // unambiguously which Arbiter lines are AI-generated vs template (and why the
     // rest weren't). qwen-not-ready / busy / combat / intent-not-allowed:<intent> /
@@ -38634,24 +38861,38 @@ async function narrateViaArbiter(
   const state = get();
   const player = state.player;
   if (!player || !scene) {
+    if (opts?.bankOnly) return;
     get().appendLog('debug', 'arbiter: template (reason=no-scene)');
     if (trimmed) get().appendLog('arbiter', trimmed, chance(30) ? undefined : { silent: true });
     return;
   }
-  const sceneSlice: SceneSlice = {
-    location: scene.location,
-    weather: scene.weather,
-    hazard: scene.hazard,
-    enemies: scene.enemies,
-    enemyHps: scene.enemyHps,
-    vendor: scene.vendor
-      ? { name: scene.vendor.name, affiliation: scene.vendor.faction ?? undefined }
-      : null,
-  };
+  // ⚠ OTA-1129 — NARRATING A PLACE THE PLAYER HAS NOT REACHED YET. The slice
+  // carries the destination's STATIC facts only: its name, its type tags, its
+  // authored description. Weather, hazards, enemies and the vendor are rolled
+  // at arrival by beginScene and cannot be known now — so they are left out
+  // rather than guessed, and the pre-written line simply does not mention
+  // them. That is a real constraint on the writing, not a bug: an intro that
+  // says nothing about the sky can never contradict the sky.
+  const forLoc = opts?.forLocation ?? null;
+  const sceneSlice: SceneSlice = forLoc
+    ? { location: forLoc, weather: null, hazard: null, enemies: [], enemyHps: [], vendor: null }
+    : {
+      location: scene.location,
+      weather: scene.weather,
+      hazard: scene.hazard,
+      enemies: scene.enemies,
+      enemyHps: scene.enemyHps,
+      vendor: scene.vendor
+        ? { name: scene.vendor.name, affiliation: scene.vendor.faction ?? undefined }
+        : null,
+    };
   // World-ladder override — when beginScene picked a Micro-Micro for this
   // visit, fold it into the context so the Arbiter narrates at the room
   // tier instead of the flat Location tier.
-  const ladder = scene.microMicroId
+  // OTA-1129 — never for a pre-generated destination: the room the ladder
+  // would pick is chosen fresh on arrival, so borrowing the CURRENT room's
+  // ladder would write about the wrong room entirely.
+  const ladder = scene.microMicroId && !forLoc
     ? findMicroMicroAnywhere(scene.microMicroId)
     : null;
   const ctx = buildLlmContext({
@@ -38661,10 +38902,25 @@ async function narrateViaArbiter(
     ladder,
   });
   const messages = buildSystemPrompt(ctx);
-  const myEpoch = ++arbiterGenerationEpoch;
+  // ⚠ OTA-1129 — A BACKGROUND FILL DOES NOT OWN THE EPOCH. The epoch exists so
+  // the player's next action CANCELS an in-flight reaction, because a stale
+  // reaction is wrong. A pre-written intro is never stale in that sense — it is
+  // about a place, not about a keystroke — so bumping the epoch here would do
+  // two harmful things: cancel a live narration the player IS waiting on, and
+  // then cancel itself the moment they act, throwing away the very work the
+  // bank exists to keep. It reads the epoch it was born under and stops if that
+  // changes, which is the weaker claim it is entitled to make.
+  const myEpoch = opts?.bankOnly ? arbiterGenerationEpoch : ++arbiterGenerationEpoch;
   const t0 = Date.now(); // arb134 — Qwen generation latency for the debug marker
-  lastQwenGenStartMs = t0; // arb161 — start the cooldown so the voice gets the lock back
-  set({ isGenerating: true, partialArbiterText: '' });
+  // OTA-1129 — background fill does not arm the voice cooldown either; see the
+  // note on `cooldownActive`. It DOES take `isGenerating`, because that is the
+  // one-job-at-a-time flag and a fill is a job.
+  if (!opts?.bankOnly) lastQwenGenStartMs = t0;
+  // ⚠ AND NO STREAMING PREVIEW. `partialArbiterText` renders live under "The
+  // Arbiter:". A fill is writing about a room the player is not standing in —
+  // mirroring its tokens would show them a description of somewhere else,
+  // which is worse than any latency this OTA saves.
+  set(opts?.bankOnly ? { isGenerating: true } : { isGenerating: true, partialArbiterText: '' });
   try {
     // arb162 — Token budgets are kept TIGHT on purpose. Qwen and Kokoro share
     // one native-ML lock, and on the Tensor G5 kernel each token costs ~256ms,
@@ -38692,7 +38948,8 @@ async function narrateViaArbiter(
         // Only update the buffer if we're still the active generation.
         if (myEpoch !== arbiterGenerationEpoch) return;
         streamed += token;
-        if (previewBlocked) return;
+        // OTA-1129 — a fill accumulates but never mirrors. See above.
+        if (opts?.bankOnly || previewBlocked) return;
         if (looksLikeInstructionEcho(streamed)) {
           previewBlocked = true;
           set({ partialArbiterText: '' });
@@ -38700,9 +38957,22 @@ async function narrateViaArbiter(
         }
         set({ partialArbiterText: streamed });
       },
-      { maxNewTokens: maxTokens, job: `narration:${intent}` },
+      {
+        maxNewTokens: maxTokens,
+        // OTA-1129 — the fill is labelled separately so the telemetry can price
+        // it apart from the narration it is meant to replace, and it rides
+        // OTA-1123's homework priority: below the voice, and cut short the
+        // instant a real call is enqueued.
+        job: opts?.bankOnly ? `narration:${intent}_fill` : `narration:${intent}`,
+        homework: opts?.bankOnly === true,
+      },
     );
-    if (myEpoch !== arbiterGenerationEpoch) { noteQwenDiscarded('cancelled:player-acted-again'); return; }
+    if (myEpoch !== arbiterGenerationEpoch) {
+      // OTA-1129 — for a FILL this is the ordinary outcome, not a loss: the
+      // player acted, the harness cut the job short, and nothing was owed.
+      noteQwenDiscarded(opts?.bankOnly ? 'intro-fill:preempted' : 'cancelled:player-acted-again');
+      return;
+    }
     // Trim to the last complete sentence so we never display a partial
     // ending like "...each stroke echoing in the". Falls back to the raw
     // text only when nothing terminal-punctuated is present, then to the
@@ -38749,11 +39019,33 @@ async function narrateViaArbiter(
     // a template lands in the same millisecond). `usedFallback` flags the rare
     // case where the cleaned model output was empty and the template carried it.
     const usedFallback = finalText === trimmed;
+    // ⚠ OTA-1129 — THE ONLY LINE THAT DIFFERS. Everything above ran exactly as
+    // it does for a live narration, which is the point: the bank stores VETTED
+    // prose, not raw model output, so a spent line has already passed the
+    // foreign-word strip, the sentence cap, the third-person filter, the echo
+    // detector and the off-canon entity guard.
+    if (opts?.bankOnly) {
+      // A fill that fell through to the template banked nothing — the template
+      // is already free and already available at arrival.
+      if (usedFallback || repDup) {
+        noteQwenDiscarded(repDup ? 'intro-fill:near-dup' : 'intro-fill:∅');
+      } else {
+        bankSceneIntro(forLoc?.id ?? scene.location.id, finalText);
+      }
+      get().appendLog('debug',
+        `homework: scene_intro "${forLoc?.name ?? scene.location.name}"`
+        + ` ${usedFallback || repDup ? '∅' : '✓'} ${Date.now() - t0}ms`);
+      return;
+    }
     get().appendLog('arbiter', finalText);
     if (repDup) noteQwenDiscarded('near-duplicate→template');
     else if (usedFallback) noteQwenDiscarded('empty→template');
     get().appendLog('debug', `arbiter: qwen ✓ ${Date.now() - t0}ms (intent=${intent}${repDup ? ', near-dup→template' : usedFallback ? ', empty→template' : ''})`);
   } catch {
+    // OTA-1129 — a failed fill is silent. There is no template to fall back to
+    // because nobody asked for a line yet, and a debug line per failure would
+    // be noise on a path that runs unattended.
+    if (opts?.bankOnly) return;
     if (myEpoch === arbiterGenerationEpoch) {
       get().appendLog('debug', `arbiter: qwen-error ${Date.now() - t0}ms → template`);
       // arb162 — generation failed → canned fallback; voice it only ~1 in 4.
@@ -38762,7 +39054,11 @@ async function narrateViaArbiter(
   } finally {
     // Only clear flags if we're still the active generation; otherwise the
     // newer generation owns them.
-    if (myEpoch === arbiterGenerationEpoch) {
+    // OTA-1129 — a fill never bumped the epoch, so it must release
+    // `isGenerating` on its own terms; leaving it set would wedge every later
+    // generation behind a background job that has already finished.
+    if (opts?.bankOnly) set({ isGenerating: false });
+    else if (myEpoch === arbiterGenerationEpoch) {
       set({ isGenerating: false, partialArbiterText: null });
     }
   }

@@ -231,7 +231,17 @@ describe('OTA-1122 — the wiring, and the rules it must not break', () => {
     // Sliced to the block's OWN end, not to a magic character count. A length
     // window overruns the moment anyone edits inside it, and then this reads
     // the live speaking path below and fails for a reason that isn't real.
-    const start = SRC.indexOf('if (opts?.bankOnly) {');
+    // ⚠ RETARGETED BY OTA-1129 — by the SAME failure mode the comment above
+    // was already warning about, one level up. The window's END was anchored
+    // properly, but its START searched the WHOLE FILE for the first
+    // `if (opts?.bankOnly) {`, and OTA-1129 gave narrateViaArbiter a bankOnly
+    // block of its own that sits earlier in the store. The slice landed in a
+    // different function entirely. The anchor names the FUNCTION first now:
+    // an ambient assertion has to start inside the ambient function, whatever
+    // else in this file learns to bank.
+    const fn = SRC.indexOf('async function maybeGenerateAmbientArbiter');
+    expect(fn).toBeGreaterThan(-1);
+    const start = SRC.indexOf('if (opts?.bankOnly) {', fn);
     const end = SRC.indexOf('const staleReason = ambientStaleReason(get, stamp);', start);
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);

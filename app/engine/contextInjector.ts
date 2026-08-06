@@ -68,7 +68,14 @@ export interface ContextInputs {
 
 export interface SceneSlice {
   location: Location;
-  weather: WeatherEntry;
+  /** ⚠ OTA-1129 — NULLABLE, and this is a type CORRECTION rather than a
+   *  loosening. `deriveEnvironment` has always guarded `scene.weather?.name`
+   *  and simply omitted the weather clause when there was none; the type just
+   *  never admitted it. A pre-generated scene intro narrates a place the player
+   *  has not reached, where the sky has not been rolled yet — so it passes null
+   *  rather than inventing weather it would then have to contradict on
+   *  arrival. */
+  weather: WeatherEntry | null;
   hazard: Hazard | null;
   enemies: readonly Enemy[];
   enemyHps: readonly number[];

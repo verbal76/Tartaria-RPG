@@ -1129,7 +1129,83 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE PROMPT WAS SAYING THE SAME THING FOUR TIMES (2026-08-05, latest).
+- **⚠⚠ THE SCENE INTRO COMES OFF THE CRITICAL PATH (2026-08-05, latest). BOTH
+  LINES.** golem OTA-1129 / HAL OTA-1152. The owner's call, taken with
+  OTA-1128's arithmetic in front of them. That OTA measured the beat and then
+  said plainly that it could not fix it:
+
+  > 19.3 s = 3.7 wait + **11.0 read** + 3.5 write + ~1.0 other
+
+  Trimming the prompt bought ~1.7 s, and a **zero-token** prompt would still
+  leave ~8 s, because the model writes at 107 ms/token and waits ~3.7 s for the
+  native-ML lock. There is no prompt small enough. The only remaining move is to
+  stop the player waiting — which is exactly what OTA-1122's bank did for the
+  ambient musing, aimed now at the arrival beat.
+
+  ⚠ **Why an intro is pre-generatable.** Same reason a musing is: it is about a
+  **place**, and the place is knowable before the player gets there.
+  `canonicalLocationAtCell` is a plain index lookup, so the named location on
+  each of the four adjacent cells reads for free — nothing is built, rolled, or
+  mutated to find out where they might step. And the **current** location is a
+  candidate too, deliberately *first*: most tiles carry no named location, so a
+  cardinal step usually rebuilds the scene right where the player already
+  stands. That is the most frequently spent entry in the bank, not an
+  afterthought.
+
+  ⚠ **What a pre-written intro cannot know, and does not pretend to.** Weather,
+  hazards, enemies and the vendor are rolled at *arrival* by `beginScene`. The
+  prefetch slice carries the destination's **static** facts only — its name, its
+  type, its authored description — and passes null for the rest rather than
+  guessing. *An intro that says nothing about the sky can never contradict the
+  sky.* (`SceneSlice.weather` became nullable to say so in the type;
+  `deriveEnvironment` had always guarded `scene.weather?.name` and simply
+  omitted the clause, so this is the type catching up with the code.)
+
+  ⚠ **The three things a background fill must not do** — each of which would
+  have been a real bug:
+
+  1. **Not mirror its tokens.** `partialArbiterText` renders live under "The
+     Arbiter:". Streaming a fill would show the player a description of a room
+     they are not standing in.
+  2. **Not own the epoch.** The epoch exists so the player's next action cancels
+     an in-flight *reaction*. Bumping it here would cancel a live narration they
+     **are** waiting on, and then cancel the fill itself the moment they act —
+     throwing away the very work the bank exists to keep.
+  3. **Release `isGenerating` on its own terms**, precisely because it never
+     bumped the epoch: the live path's `myEpoch === epoch` release would not
+     fire, and every later generation would wedge behind a background job that
+     had already finished.
+
+  Everything *else* is shared with the live path on purpose — the prompt, the
+  streaming, and the whole vetting chain — so the bank stores **vetted prose**.
+  A spent line has already passed the foreign-word strip, the sentence cap, the
+  third-person filter, the echo detector and the off-canon entity guard. A
+  second, quietly different narrator was the thing to avoid.
+
+  The fill uses the **other** idle signal: not `uiIdleSince` (stamped by
+  stationary screens, and never set while walking, which is exactly when an
+  intro is wanted) but **time since the last action**. Six seconds of stillness
+  is reading time, and reading time is when the next room gets written. That
+  lets homework run during normal play, which is only defensible because
+  OTA-1123 built the harness first — the fill queues *below* the voice and is
+  cut short the instant a real generation is enqueued.
+
+  New suite `ota1129SceneIntroBank` (33 tests). Three older suites retargeted,
+  and ⚠ **all three broke the same way, which is worth recording**: an assertion
+  anchored on a text **window** rather than on structure. One searched the whole
+  file for `if (opts?.bankOnly) {` and found the new block in a different
+  function; two spanned a line break that reflowed. The rule that falls out:
+  **anchor on the function first, then the block, then on what comes NEXT
+  rather than on what encloses.**
+
+  ⚠ **Known consequence, flagged rather than discovered later.** This makes the
+  *text* instant while the *voice* still has to synthesise through the shared
+  native-ML lock — so the read-it-then-hear-it gap the owner reported gets more
+  visible here, not less. The bank is also what makes the fix possible for the
+  first time: audio could be pre-synthesised alongside the banked text so both
+  land together. Next up.
+
+- **⚠⚠ THE PROMPT WAS SAYING THE SAME THING FOUR TIMES (2026-08-05).
   BOTH LINES.** golem OTA-1128 / HAL OTA-1151. Owner: *"go after the big ones."*
   So the big one was **priced**, not guessed at.
 
