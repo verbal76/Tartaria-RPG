@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.65';
+export const DISPLAY_VERSION = '4.29.66';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22825,7 +22825,52 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // nothing, which is correct.
 // New suite ota1155TimestampTheVoice (11 tests).
 // DISPLAY_VERSION 4.29.65.
-export const OTA_BUILD_ID = '2026-08-05-1155-timestamp-the-voice';
+// OTA-1156 — THE AC THAT NEVER DROPPED.
+// Reported three times as a DROP — "AC 16 → AC 10, recurring" —
+// and two builds of instrumentation were aimed at catching the
+// moment it fell. It never fell. There was no moment.
+// ⚠ `player.ac` IS THE RACIAL BASE, AND NOTHING EVER UPDATES IT.
+// Exactly ONE write exists in the whole codebase: `ac: race.baseAC`
+// at character creation. No equip handler touches it, no unequip
+// handler touches it. It is the number the character was born with,
+// for the life of the save.
+// Five consumers knew that and added the worn-armour stack
+// themselves. TWO printed the raw field as though it were the
+// finished number:
+//   · contextInjector `AC ${player.ac}` → the LLM was told AC 10
+//   · the Arbiter's look-you-over line  → and SAID "AC 10" aloud
+// So the character sheet showed 16 while the Arbiter, asked the
+// same question seconds later, answered 10. That is the entire
+// bug: not a drop over time, but two surfaces that never agreed.
+// The device log has it cold — eight worn pieces listed on one
+// line, AC 10 on the next.
+// ⚠ AND THE INSTRUMENTATION MISSED IT FOR A REASON WORTH KEEPING.
+// OTA-1147's ac-shift ledger only fires inside applyEnemyCounter —
+// in combat. The owner fled both fights in that log, so it never
+// ran once. A ledger that can only speak in combat cannot describe
+// a bug that lives on the character sheet. The lesson is not "add
+// more logging"; it is that a measurement has to be able to observe
+// the thing being measured.
+// ⚠ WHY ONE HELPER RATHER THAN TWO PATCHES. The five "correct"
+// consumers did not agree with each other either — each re-derived
+// the sum inline, which is how a field like this drifts in the
+// first place. Patching only the two loud sites would have left
+// five copies of the same arithmetic waiting to disagree again.
+// `standingAc()` in equipment.ts is now the single place that
+// answers "what is my AC", and the sheet, the Arbiter and the
+// prompt all call it.
+// Scope is deliberate: standingAc is the STANDING number (racial
+// base + worn armour, trimmed). Combat's applyEnemyCounter
+// legitimately adds scene-conditional racial context, the
+// ruins-defence title and live status effects, because those exist
+// only inside a fight — effectiveACBreakdown remains the authority
+// there, and it starts from the same base.
+// New suite ota1156TheAcThatNeverDropped (14 tests), including the
+// reproduction: naked 10, five worn pieces 20, and a regression
+// guard that no surface interpolates the raw field again.
+// DISPLAY_VERSION 4.29.66.
+export const OTA_BUILD_ID = '2026-08-05-1156-the-ac-that-never-dropped';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1155-timestamp-the-voice';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1154-stop-rambling';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1153-voice-lands-with-the-text';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1152-scene-intro-bank';
