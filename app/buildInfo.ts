@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.80';
+export const DISPLAY_VERSION = '4.29.81';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22409,7 +22409,35 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // three Aether fixtures retargeted, ota1146's composition test
 // updated, ota1138's block re-authored.
 // DISPLAY_VERSION 4.29.80.
-export const OTA_BUILD_ID = '2026-08-06-1147-ayther-not-ay-thur';
+// OTA-1148 — THE FIRST WORD SURVIVES. Owner: "there has been
+// a few times where the arbiter has started speaking and has
+// either skipped his first word or started partway through it."
+// ⚠ THIS IS OTA-790'S BUG AT THE OTHER END OF THE BUFFER, and
+// the fix is the same shape. OTA-790 widened the TAIL guard 8 →
+// 40ms because "a fading fricative sits well under the 0.01
+// threshold" and was being trimmed to within 8ms of the last
+// loud sample. An ONSET is the same physics in reverse — and the
+// head guard was still 8ms.
+// trimSilenceLeadTrail scans in from each end to the first
+// sample over 0.01 and hands back a guard pad. Every quiet onset
+// is walked straight past: "Welcome" opens on a /w/ glide that
+// ramps from near zero, "The" on a weak voiced /ð/, and /h/ /s/
+// /f/ are breath before they are sound. With 8ms returned, the
+// word began MID-VOWEL — or the consonant vanished outright and
+// it sounded like a skipped word.
+// ⚠ HEAD GUARD 8ms → 45ms, wider than the tail's 40 because
+// onsets run longer than decays (aspiration and frication
+// precede voicing). maxTrim (200ms/end) and the 0.01 threshold
+// are untouched, so a long silent lead is still trimmed; this
+// only widens what is KEPT in front of the onset. The 90ms
+// playback pad is applied AFTER this, so the cost is a few tens
+// of ms of leading silence the hardware ramp wants anyway.
+// New suite ota1148TheFirstWordSurvives (8 tests) — it
+// re-implements the trimmer's arithmetic and pins the constants
+// against the source, so the two cannot drift apart silently.
+// DISPLAY_VERSION 4.29.81.
+export const OTA_BUILD_ID = '2026-08-06-1148-the-first-word-survives';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1147-ayther-not-ay-thur';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1146-the-is-two-words';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1145-nobody-was-waiting-on-it';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1144-the-handoff-window';
