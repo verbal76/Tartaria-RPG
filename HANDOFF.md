@@ -1129,7 +1129,54 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ HOW HE DIED IN ONE INPUT (2026-08-06, latest). BOTH LINES.** golem
+- **⚠⚠ THE WEAKNESS HAS TO BE WORTH BRINGING (2026-08-06, latest). BOTH LINES.**
+  golem OTA-1137 / HAL OTA-1160. The owner threw a Searing Paste at a Guardian
+  carrying `vulnerable:burn` — her authored weakness, hit with a crafted
+  consumable he had to spend — and the device log priced the exchange:
+
+  ```
+  You hurl the Searing Paste … 9 burn (2/turn × 3, vulnerable). (16 HP left)
+  Hierophant Mara-of-Yuldra deals 4 cold damage. You fall.
+  ```
+
+  ⚠ **The system worked, and that is the problem.** Base 6, ×1.5 for the
+  vulnerability, 9 dealt. Every part of that is correct. Correctly identifying a
+  boss's weakness and spending a consumable on it bought **three points** of
+  extra damage, in a round where she hit for 23. His words: *"the coatings I
+  threw on it were its weaknesses but it took no damage."* **It took damage. It
+  did not take notice.**
+
+  ⚠ **And the fix is not a bigger multiplier.** ×1.5 → ×2 turns his 9 into 12 —
+  still noise against 23 a round — and inflates every ordinary weakness hit in
+  the game to fix the one that mattered. The problem was never the damage
+  number. It was that **the right answer changed nothing about what happened
+  next.**
+
+  So a weakness hit **staggers**, and a staggered boss **forfeits the second
+  swing** OTA-1136 measured at half its round output. In the owner's own round
+  that is 13 damage he does not take — larger than the 9 the vial dealt, and it
+  arrives as something he can watch work rather than a multiplier he computes.
+
+  ⚠ **Deliberately not a lock**, and the tests are mostly about that:
+
+  - **one round**, and it is **consumed by the swing it prevents** rather than
+    expiring on a tick — so it can never silently persist into a later round;
+  - it never touches the **first** swing, so a boss always answers;
+  - a **killing blow does not stagger a corpse**.
+
+  A player who keeps hitting the weakness trades a half-damage round for the cost
+  of carrying the right tool. That trade is the whole OTA.
+
+  ⚠ **The thrown path is the one he actually hit**, and the suite tests it first.
+  The weapon path already *felt* right — the same log has a Cudgel opening an
+  Aetheric Drone for 27 on `bludgeoning ×1.5`, with the Arbiter coaching the
+  swap. Weapons were never the complaint; consumables were. Both stagger now.
+
+  **No damage multiplier moved.** New scene field `enemyStaggered` (parallel to
+  `enemies`, like `enemyArmorShred`), `staggerEnemy` / `takeStagger`, and new
+  suite `ota1137WorthBringing` (17 tests).
+
+- **⚠⚠ HOW HE DIED IN ONE INPUT (2026-08-06). BOTH LINES.** golem
   OTA-1136 / HAL OTA-1159. The owner walked into Yuldra-Tul at 24/24 HP, typed
   `approach`, and was dead before he got a second input: *"how did I die so
   fast? all I hit was approach."*
