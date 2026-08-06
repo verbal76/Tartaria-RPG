@@ -1129,7 +1129,61 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ CUT SHORT FOR THE VOICE (2026-08-06, latest). BOTH LINES.** golem
+- **⚠⚠ THE THREE POINTS OF JEWELLERY (2026-08-06, latest). BOTH LINES.** golem
+  OTA-1135 / HAL OTA-1158. OTA-1133 ended on the claim *"one function, one
+  answer, everywhere."* The owner found the hole in it on the next build, in one
+  sentence:
+
+  > my base AC is 10, on the character card's small form it says 15 (armor),
+  > when I click on it to expand it it says 18
+
+  **Both numbers came out of this codebase and neither was a display glitch.**
+  The small form calls `standingAc`. The expanded DEFENCE card calls
+  `effectiveACBreakdown`, which stands on `aggregateArmor` — the same function
+  the enemy-attack resolver stands on. **So the player was defended at 18 and
+  told 15.**
+
+  ⚠ **The missing three points are jewellery.** `aggregateArmor` has summed an
+  equipped amulet and up to three rings since OTA-730. `standingAc` walked
+  `ARMOR_SLOTS` and nothing else. The catalog holds exactly two AC amulets and
+  two AC rings, all `+1` — an amulet and two rings is `+3`, which is the owner's
+  gap to the point.
+
+  ⚠ **And a second, quieter drift sat in the same gap.**
+  `resolveDisplayArmorByName` finds a piece **first-by-name** and returns the
+  **catalog** `acBonus`, while combat resolves the exact worn instance by id and
+  prefers its rolled `instanceStats.acBonus`. Two copies of one piece are
+  *supposed* to differ — that is what the durability roll is for — so the panel
+  could read the wrong copy even before the rings were considered.
+
+  ⚠ **Why the sum moved rather than the rings.** Adding an amulet loop to
+  `standingAc` would have made a **third** inline copy of the same arithmetic —
+  exactly the failure OTA-1133 was written to end, committed by the OTA meant to
+  have ended it. `equippedGearAc()` in `equipment.ts` is now the implementation
+  and **`aggregateArmor` calls it**, so combat and the panel cannot answer
+  differently: there is only one answer to give. The store keeps its
+  **resistance** walk, which genuinely belongs there (combat weights a resist by
+  the slot it came from); only the AC half moved.
+
+  ⚠ **The combat number does not move.** This is a display that was
+  under-reporting, not a buff. The precedence inside `equippedGearAc` is copied
+  from `aggregateArmor` verbatim — fused by name **and** slot, then the rolled
+  instance, then the catalog, and a name in no catalog contributes nothing —
+  including the case where the tempting "improvement" (resolve by id, read
+  `uniqueStats` regardless of slot) would have quietly raised defence. The tests
+  pin that shape so a future tidy-up cannot re-tune defence by accident.
+
+  ⚠ **And the card now names the jewellery.** A single `armor +8` chip over a
+  panel reading 15 is what made this need a report to find. `armor +5 ·
+  accessories +3` answers it on sight — the OTA-1133 lesson about a measurement
+  having to be able to observe the thing it measures, applied to the **surface**
+  instead of the log.
+
+  New suite `ota1135ThreePointsOfJewellery` (22 tests), including the
+  reproduction: the same character with and without the jewellery, differing by
+  exactly 3.
+
+- **⚠⚠ CUT SHORT FOR THE VOICE (2026-08-06). BOTH LINES.** golem
   OTA-1134 / HAL OTA-1157. OTA-1132 put a timestamp on the voice because the
   owner was clocking the gap by hand. The very next device log answered him in
   one line:

@@ -609,18 +609,79 @@ export function trimStandingAc(rawAc: number, knee = 22, rate = 0.4): number {
  *  it starts from this same base. */
 export function standingAc(player: PlayerCharacter | null | undefined): number {
   if (!player) return 10;
-  const base = player.ac ?? 10;
-  let armorAc = 0;
+  const gear = equippedGearAc(player);
+  return trimStandingAc((player.ac ?? 10) + gear.worn + gear.accessories);
+}
+
+/** ⚠ OTA-1135 — THE GEAR STACK, ONCE, WITH THE JEWELLERY IN IT.
+ *
+ *  OTA-1133 said "one function, one answer, everywhere" and then shipped a
+ *  function that answered a DIFFERENT question from the one combat asks. The
+ *  owner found it in one screen: *"my base AC is 10, on the character card's
+ *  small form it says 15 (armor), when I click on it to expand it it says 18."*
+ *
+ *  ⚠ THE THREE MISSING POINTS ARE JEWELLERY. `aggregateArmor` — which is what
+ *  the enemy-attack resolver and the sheet's DEFENCE card both stand on — has
+ *  summed an equipped amulet and up to three rings since OTA-730. `standingAc`
+ *  walked ARMOR_SLOTS only. So a player wearing a +1 amulet and two +1 rings
+ *  reads 15 on the panel, 18 on the sheet, and is defended at 18. The panel was
+ *  not showing a smaller number for a reason; it simply could not see the rings.
+ *
+ *  ⚠ AND A SECOND, QUIETER DRIFT IN THE SAME GAP. `resolveDisplayArmorByName`
+ *  finds a piece FIRST-BY-NAME and returns the CATALOG acBonus, while combat
+ *  resolves the exact worn instance by id and prefers its rolled
+ *  `instanceStats.acBonus`. Two copies of the same piece are supposed to differ
+ *  — that is what stampDurability's roll is for — so the panel could read the
+ *  other copy's number even before the rings were considered.
+ *
+ *  ⚠ THIS IS THE IMPLEMENTATION, AND `aggregateArmor` CALLS IT. Making the
+ *  panel add rings on its own would have produced a third inline copy of the
+ *  same arithmetic — the exact failure OTA-1133 was written to end. The store
+ *  keeps its resistance walk (it needs the per-slot tagging combat weights) but
+ *  no longer owns an AC sum of its own.
+ *
+ *  Returns the two halves separately so the DEFENCE card can name them: a
+ *  player who reads "armor +5 · accessories +3" can see where every point comes
+ *  from, which is the whole reason this took three reports to find. */
+export function equippedGearAc(
+  player: PlayerCharacter | null | undefined,
+): { worn: number; accessories: number } {
+  if (!player) return { worn: 0, accessories: 0 };
+  const eq = player.equipped ?? {};
+  let worn = 0;
   for (const slot of ARMOR_SLOTS) {
-    const name = player.equipped?.[slot];
+    const name = eq[slot];
     if (!name) continue;
-    // Per-instance / fused / accessory AC included — `resolveDisplayArmorByName`
-    // is the same lookup the sheet uses, so a unique piece counts here exactly as
-    // it counts there. (OTA-947's rule: the shown AC and the fought AC must not
-    // drift, and that starts with everyone reading the same function.)
-    armorAc += resolveDisplayArmorByName(name, player.inventory)?.acBonus ?? 0;
+    // ⚠ THE PRECEDENCE IS COPIED FROM `aggregateArmor`, DELIBERATELY UNCHANGED.
+    // This function's job is to end a disagreement, not to start one: the number
+    // combat resolves against must come out bit-identical, so the fused lookup
+    // stays by name+slot (OTA-195) rather than being "improved" to an id lookup
+    // here. A rolled instance then overrides the catalog row (stampDurability),
+    // and a name in no catalog contributes nothing.
+    const fused = (player.inventory ?? []).find((it) =>
+      it.uniqueStats
+      && it.uniqueStats.kind === 'armor'
+      && it.uniqueStats.armorSlot === slot
+      && it.name.toLowerCase() === name.toLowerCase(),
+    );
+    if (fused?.uniqueStats) { worn += fused.uniqueStats.acBonus ?? 0; continue; }
+    // `findArmorByName`, NOT `resolveDisplayArmorByName` — the latter will happily
+    // resolve a fused piece whose armorSlot does not match this slot, and combat
+    // never counted that. Bit-identical or it is not a fix.
+    const piece = findArmorByName(name);
+    if (!piece) continue;
+    worn += resolveEquippedItem(player, slot)?.instanceStats?.acBonus ?? piece.acBonus;
   }
-  return trimStandingAc(base + armorAc);
+  // OTA-730 — defensive accessories: one amulet plus up to three rings, each
+  // able to carry a flat acBonus. A natural 20 always hits, so this can never
+  // buy immunity.
+  let accessories = 0;
+  if (eq.amulet) accessories += findAmuletByName(eq.amulet)?.acBonus ?? 0;
+  for (const ringName of [eq.ring, eq.ring2, eq.ring3]) {
+    if (!ringName) continue;
+    accessories += findRingByName(ringName)?.acBonus ?? 0;
+  }
+  return { worn, accessories };
 }
 
 export function armorHpBonus(name: string | null | undefined): number {
