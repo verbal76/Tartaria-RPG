@@ -895,25 +895,80 @@ function resolveItem(
     if (inputNorm === itemNorm) return item;
     if (inputNorm.includes(itemNorm)) return item;
   }
+  // ⚠ OTA-1172 — THE MODIFIER IS EVIDENCE, NOT DECORATION.
+  //
+  // Passes 2 and 3 match on the HEAD NOUN. OTA-093 wrote them that way to stop
+  // adjective-only matches ("bone" → Bone Fragment) from winning, and that half
+  // still holds. What it never handled is the INVERSE: when the input carries
+  // an adjective of its OWN, the head-noun passes threw it away and returned
+  // whichever same-noun row sat first in the pack.
+  //
+  // Device log, OTA-1166: `craft Frost Paste` resolved to **Searing Paste** —
+  // a Paste the player owned, matched on the shared word "paste" while "frost"
+  // was discarded. Craft itself was unharmed (it matches recipes, not
+  // inventory), but ~25 gameStore handlers read parsed.resolvedNoun FIRST, so
+  // `use frost paste` would have spent the wrong consumable. The same shape
+  // hits Iron/Brass Key, Poison/Acid Vial, Rusted/Rail Blade — any pair that
+  // shares a last word.
+  //
+  // The rule below, in order:
+  //   (a) a candidate whose OTHER name words all appear in the input wins
+  //       outright — that is the player naming the thing precisely, and it also
+  //       settles "mud-rend blade" vs "Rusted Blade" without the off-hand hint.
+  //   (b) nothing agrees, and the input carried NO extra descriptive token —
+  //       "use the blade" with one blade in the pack. Nothing contradicts, so
+  //       keep the historical first-match behaviour.
+  //   (c) nothing agrees and the input DID carry an extra token no candidate
+  //       can account for — the player named something they do not have.
+  //       Return undefined. A miss is recoverable ("you have no Frost Paste");
+  //       a confident wrong answer spends the wrong item.
+  //
+  // ⚠ The guard has to cover pass 3 too. Pass 3 fuzzy-matches tokens against
+  // head nouns, so fixing pass 2 alone would be undone one loop later:
+  // fuzzyEqual('paste', 'paste') is true, and Searing Paste comes right back.
+  const headOf = (item: InventoryItem): string => {
+    const words = normalizeName(item.name).split(/\s+/);
+    return words[words.length - 1] ?? '';
+  };
+  // Every non-head word of the item's own name appears in what was typed.
+  const modifiersAgree = (item: InventoryItem): boolean => {
+    const words = normalizeName(item.name).split(/\s+/);
+    return words.slice(0, -1).every((w) => flatTokens.includes(w));
+  };
+  // Words the player typed that are NOT the noun that matched — the tokens a
+  // wrong candidate would be silently ignoring.
+  const extraBeyond = (matched: string): string[] =>
+    flatTokens.filter((t) => t !== matched);
+  const pickAmong = (
+    candidates: InventoryItem[],
+    matched: string,
+  ): InventoryItem | undefined => {
+    if (!candidates.length) return undefined;
+    const agreeing = candidates.find(modifiersAgree);
+    if (agreeing) return agreeing;
+    return extraBeyond(matched).length === 0 ? candidates[0] : undefined;
+  };
+
   // Pass 2: item's head noun (last word of normalized name)
   // appears as a flat token in the input.
-  for (const item of inventory) {
-    const words = normalizeName(item.name).split(/\s+/);
-    const head = words[words.length - 1];
-    if (head && flatTokens.includes(head)) return item;
+  for (const token of flatTokens) {
+    const picked = pickAmong(inventory.filter((i) => headOf(i) === token), token);
+    if (picked) return picked;
   }
   // Pass 3: fuzzy match against the head noun (typo
   // tolerance). Pre-OTA-093 this loop fuzzy-matched against
   // EVERY word in the item name, which was too loose. Head-
   // noun-only keeps typo tolerance ("lockett" → "locket")
   // without re-introducing adjective ambiguity.
-  for (const item of inventory) {
-    const words = normalizeName(item.name).split(/\s+/);
-    const head = words[words.length - 1];
-    if (!head) continue;
-    for (const t of flatTokens) {
-      if (fuzzyEqual(t, head)) return item;
-    }
+  for (const token of flatTokens) {
+    const picked = pickAmong(
+      inventory.filter((i) => {
+        const head = headOf(i);
+        return !!head && fuzzyEqual(token, head);
+      }),
+      token,
+    );
+    if (picked) return picked;
   }
   return undefined;
 }
