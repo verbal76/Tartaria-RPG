@@ -34,8 +34,24 @@ const MATERIAL_NAMES = new Set(
   (((materialsData as unknown as { materials?: { name: string }[] }).materials ?? []))
     .map((m) => m.name.toLowerCase()),
 );
+// OTA-1057 — SCARCE materials. Owner asked for "limited amounts of Aether Mud
+// to named vendors for sale". Mud is a MATERIAL, and materials otherwise roll
+// 1-10 per visit — enough to walk away with five golems' worth from one
+// counter. These roll a deliberately tight band instead: a real supply you can
+// plan around, never a stockpile. Keyed by lowercased item name; anything not
+// listed keeps its normal roll. Stock re-rolls per vendor INSTANCE — each time
+// you arrive — so the shelf refills between visits without ever being deep.
+const SCARCE_STOCK: Readonly<Record<string, readonly [number, number]>> = {
+  'aether mud': [2, 5],
+};
+
 export function rollOfferQuantity(itemName: string): number {
   const n = itemName.toLowerCase();
+  const scarce = SCARCE_STOCK[n];
+  if (scarce) {
+    const [lo, hi] = scarce;
+    return lo + Math.floor(Math.random() * (hi - lo + 1));
+  }
   if (FOOD_NAMES.has(n)) return 1 + Math.floor(Math.random() * 5); // 1-5
   if (MATERIAL_NAMES.has(n)) return 1 + Math.floor(Math.random() * 10); // 1-10
   return 1;
@@ -72,6 +88,10 @@ interface RoadsideArchetype {
   title: string;
   demeanor: 'honest' | 'sketchy';
   description: string;
+  /** OTA-1078 — the CAST that works this archetype's stall. See
+   *  pickRoadsideTrader. Optional so a pack that omits it still loads (the
+   *  archetype name is then used, which is the pre-OTA-1078 behaviour). */
+  people?: string[];
   pool: RoadsidePoolEntry[];
 }
 const ROADSIDE = (roadsideData as { archetypes: RoadsideArchetype[] });
@@ -167,9 +187,28 @@ export function pickRoadsideTrader(): VendorInstance {
   // OTA-729 — the fence/roadside trader sometimes carries a premium ware too.
   const roadsidePremium = maybePremiumOffer(offers);
   if (roadsidePremium) offers.push(roadsidePremium);
+  // OTA-1078 — A PERSON, NOT A STALL TYPE.
+  //
+  // There are exactly two archetypes, and their `name` fields are furniture:
+  // "Road Hawker" and "Sketchy Stall". OTA-1076 fixed a real leak — the runtime
+  // id carried Date.now(), so the ledger split one trader into an unbounded run
+  // of one-encounter strangers — but keyed the replacement off that name, which
+  // over-corrected into the opposite error: every honest roadside trader on the
+  // map collapsed into ONE ledger person called Road Hawker. From the second
+  // roadside stall a save ever saw, arrival narration was skipped as a familiar
+  // face, tcTraded pooled across strangers, and one caught theft made every
+  // roadside trader in the world charge the wronged markup.
+  //
+  // Neither id was ever an identity, because the data had no people in it. So
+  // the fix is content rather than keying: twelve named traders per archetype.
+  // The archetype still supplies demeanor, stock and description; the person
+  // supplies the name the ledger — and the player — remembers.
+  const person = arch.people?.length
+    ? arch.people[Math.floor(Math.random() * arch.people.length)]!
+    : arch.name;
   return {
     id: `roadside_${arch.demeanor}_${Date.now()}`,
-    name: arch.name,
+    name: person,
     title: arch.title,
     faction: null,
     description: arch.description,

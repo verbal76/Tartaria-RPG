@@ -8,16 +8,23 @@ import { applyLoreLexicon, cleanForSpeech, getLexiconSize } from '../app/voice/l
 
 describe('applyLoreLexicon', () => {
   it('respells Aetheric (case-insensitive)', () => {
-    expect(applyLoreLexicon('Aetheric Spear')).toBe('ay thur ik Spear');
-    expect(applyLoreLexicon('aetheric')).toBe('ay thur ik');
-    expect(applyLoreLexicon('AETHERIC')).toBe('ay thur ik');
+    // ⚠ RETARGETED for OTA-1170: the head is one word ("ayther", the owner's
+    // "āther") instead of two space-separated beats, and the bare -ic suffix
+    // stays attached so the stress lands ay-THER-ik. Case-insensitivity — the
+    // property this test exists for — is unchanged.
+    expect(applyLoreLexicon('Aetheric Spear')).toBe('aytheric Spear');
+    expect(applyLoreLexicon('aetheric')).toBe('aytheric');
+    expect(applyLoreLexicon('AETHERIC')).toBe('aytheric');
   });
 
   it('respells Aetherstone / Aether / Aetherborn distinctly', () => {
-    expect(applyLoreLexicon('the Aetherstone Flood')).toBe('the ay thur stone Flood');
+    // ⚠ RETARGETED for OTA-1170 ("ay thur" → "ayther"). The compound still
+    // keeps its space before the real word "stone" — the distinctness this
+    // test pins is unchanged.
+    expect(applyLoreLexicon('the Aetherstone Flood')).toBe('the ayther stone Flood');
     // Verify Aetherstone matches before plain Aether (longest first).
-    expect(applyLoreLexicon('Aether vs Aetherstone')).toBe('ay thur vs ay thur stone');
-    expect(applyLoreLexicon('an Aetherborn warrior')).toBe('an ay thur born warrior');
+    expect(applyLoreLexicon('Aether vs Aetherstone')).toBe('ayther vs ayther stone');
+    expect(applyLoreLexicon('an Aetherborn warrior')).toBe('an ayther born warrior');
   });
 
   it('respells Tartaria / Tartarian / Tartarians', () => {
@@ -31,7 +38,10 @@ describe('applyLoreLexicon', () => {
     // The trailing apostrophe in "Reclaimers'" stays in place after
     // substitution — TTS reads "ree clay merz Outpost" naturally
     // because the apostrophe isn't pronounced.
-    expect(applyLoreLexicon("the Reclaimers' Outpost")).toBe("the ree clay merz' Outpost");
+    // ⚠ RETARGETED for OTA-1169: the article now takes its schwa reading before
+    // a consonant sound, and the respelling "ree…" is one. The claim this test
+    // makes — that the apostrophe survives substitution — is unchanged.
+    expect(applyLoreLexicon("the Reclaimers' Outpost")).toBe("thuh ree clay merz' Outpost");
   });
 
   it('respells place names (Drakova, Varakush, Asgardar, etc.)', () => {
@@ -40,8 +50,14 @@ describe('applyLoreLexicon', () => {
     expect(applyLoreLexicon('the Asgardar capital')).toBe('the ez gah dor capital');
   });
 
-  it('leaves non-matching text untouched', () => {
-    expect(applyLoreLexicon('Bert steps into the gate.')).toBe('Bert steps into the gate.');
+  it('leaves non-lore words untouched', () => {
+    // ⚠ RETARGETED for OTA-1169. This test used to read "leaves non-matching
+    // text untouched" and prove it with a sentence containing "the" — which the
+    // article rule now (correctly) rewrites to its schwa reading before the
+    // consonant "gate". The property actually worth pinning is that ordinary
+    // NOUNS with no lexicon entry are never touched, so the fixture is one that
+    // isolates that: no article in it at all.
+    expect(applyLoreLexicon('Bert steps into a gate.')).toBe('Bert steps into a gate.');
     expect(applyLoreLexicon('')).toBe('');
   });
 

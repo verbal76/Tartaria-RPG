@@ -7,8 +7,9 @@ import React, { useMemo, useState } from 'react';
 import { Modal, View, Text, StyleSheet, ScrollView, Pressable, TouchableWithoutFeedback } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { canonicalItemTags } from '../engine/crafting';
-import { eligibleInputs, fusionMaterialTags, visibleFusionInputs } from '../engine/itemFusion';
-import { isCoatableItem, coatingCapacity, coatedDisplayName } from '../engine/weaponCoating';
+import { eligibleInputs, fusionMaterialTags, visibleFusionInputs, crucibleUpgradeVerdict, isWeaponRow } from '../engine/itemFusion';
+import { coatedDisplayName } from '../engine/weaponCoating';
+import { wornInstanceIds, equippedInstanceIds } from '../engine/equipment';
 import type { InventoryItem } from '../engine/types';
 
 const MIN_PICK = 3;
@@ -33,6 +34,7 @@ export function FusionPickerModal() {
   const close = useGameStore((s) => s.closeFusionPicker);
   const confirm = useGameStore((s) => s.confirmFusionSelection);
   const upgradeCoating = useGameStore((s) => s.upgradeCoatingSlot);
+  const player = useGameStore((s) => s.player);
 
   const scraps = useMemo<InventoryItem[]>(
     () => (inventory ? eligibleInputs(inventory) : []),
@@ -42,21 +44,62 @@ export function FusionPickerModal() {
     () => (inventory ?? []).filter((i) => i.reservedForFusion && canonicalItemTags(i).includes('faction_gear')),
     [inventory],
   );
-  // OTA-873 — pieces eligible for a coating-channel upgrade. A single-instance
-  // WEAPON that's coatable and not already dual-slot gains a 2nd coating slot; a
-  // single-instance ARMOR / DOG-VEST not already upgraded gains +1 resist capacity.
+  // OTA-873 — pieces eligible for a coating-channel upgrade. A WEAPON that's
+  // coatable and not already dual-slot gains a 2nd coating slot; an ARMOR /
+  // DOG-VEST not already upgraded gains +1 resist capacity.
+  // OTA-1117 — the eligibility test moved into crucibleUpgradeVerdict so the list
+  // and the store's refusal come from one place, and every candidate now carries
+  // the REASON when it can't be upgraded (see the empty-section copy below).
   const isArmorPiece = (i: InventoryItem) =>
     i.kind === 'armor' || i.kind === 'dog_armor'
     || i.uniqueStats?.kind === 'armor' || i.uniqueStats?.kind === 'dog_armor';
-  const upgradeable = useMemo<InventoryItem[]>(
-    () => (inventory ?? []).filter((i) =>
-      i.quantity === 1 && (
-        (isCoatableItem(i) && coatingCapacity(i) < 2)
-        || (isArmorPiece(i) && (i.resistCapBonus ?? 0) < 1)
-      ),
-    ),
+  // OTA-1051 — the upgrade target list, grouped + badged (owner: "listed as all
+  // armor that can be upgraded, then all weapons. and it should say which are
+  // equipped. I want to be able to upgrade what I am wearing"). Worn pieces
+  // sort first in each group and carry an EQUIPPED badge — same instance-id
+  // resolver as the inventory badge, plus the dog's vest (worn on the dog,
+  // never in a player slot).
+  const equippedIds = useMemo<Set<string>>(
+    () => (player ? wornInstanceIds(player) : new Set<string>()),
+    [player],
+  );
+  // The player's OWN slots, so the badge can say "ON <dog>" for the vest instead
+  // of "EQUIPPED" (wornInstanceIds deliberately merges both).
+  const playerEquippedIds = useMemo<Set<string>>(
+    () => (player ? equippedInstanceIds(player) : new Set<string>()),
+    [player],
+  );
+  const isWorn = (i: InventoryItem): boolean => equippedIds.has(i.id);
+  const wornFirst = (a: InventoryItem, b: InventoryItem) => Number(isWorn(b)) - Number(isWorn(a));
+  // OTA-1117 — every candidate, upgradeable or not, with its verdict attached.
+  // A blocked piece is still LISTED (greyed, with the reason) so the player never
+  // faces a heading that just isn't there.
+  type Candidate = { item: InventoryItem; blocked: string | null; group: 'armor' | 'weapon' };
+  const candidates = useMemo<Candidate[]>(
+    () => (inventory ?? [])
+      .filter((i) => i.quantity > 0 && (isArmorPiece(i) || isWeaponRow(i)))
+      .map((i) => {
+        const v = crucibleUpgradeVerdict(i);
+        // Group by the VERDICT's kind where it has one — it resolves catalog armor
+        // that carries no `kind` field, which a bare isArmorPiece check would file
+        // under WEAPONS. Blocked energy weapons have no kind, so they fall back to
+        // the row test and stay under WEAPONS where the player looked for them.
+        return { item: i, blocked: v.blocked, group: v.kind ?? (isArmorPiece(i) ? 'armor' : 'weapon') };
+      }),
     [inventory],
   );
+  const splitGroup = (want: 'armor' | 'weapon') => {
+    const rows = candidates.filter((c) => c.group === want);
+    return {
+      open: rows.filter((c) => !c.blocked).map((c) => c.item).sort(wornFirst),
+      blocked: rows.filter((c) => c.blocked).sort((a, b) => wornFirst(a.item, b.item)),
+    };
+  };
+  const armorGroup = splitGroup('armor');
+  const weaponGroup = splitGroup('weapon');
+  const upgradeableArmor = armorGroup.open;
+  const upgradeableWeapons = weaponGroup.open;
+  const upgradeable = [...upgradeableArmor, ...upgradeableWeapons];
 
   const [picked, setPicked] = useState<string[]>([]);
   const [catalystId, setCatalystId] = useState<string | null>(null);
@@ -135,22 +178,64 @@ export function FusionPickerModal() {
                   <Text style={styles.sub}>
                     Choose the piece to gain a coating channel — a weapon gets a SECOND coating slot; armor or a dog vest gets room for one more worked-in resist. This spends your {UPGRADE_PICK} reserved pieces; it doesn't change the piece's AC, damage, or edge.
                   </Text>
-                  {upgradeable.length === 0 ? (
-                    <Text style={styles.empty}>No eligible piece. You need a single coatable weapon (blade / arrow-arm / bolt-caster) without two coating slots, or a piece of armor or a dog vest that hasn't been upgraded yet.</Text>
+                  {candidates.length === 0 ? (
+                    <Text style={styles.empty}>You are carrying no weapons, armor, or dog vests for the Crucible to work on.</Text>
                   ) : (
                     <ScrollView style={styles.list} nestedScrollEnabled>
-                      {upgradeable.map((w) => {
-                        const armor = isArmorPiece(w);
-                        const detail = armor
-                          ? `${(w.addedResists ?? []).length} resist${(w.addedResists ?? []).length === 1 ? '' : 's'} → +1 slot`
-                          : w.coating ? `has ${w.coating.label.toLowerCase()} → +1 slot` : 'no coating yet → +1 slot';
-                        return (
-                          <Pressable key={w.id} onPress={() => onPickPiece(w.id)} style={[styles.row, styles.rowOn]} accessibilityRole="button">
-                            <Text style={styles.rowName} numberOfLines={1}>{armor ? w.name : coatedDisplayName(w)}</Text>
-                            <Text style={styles.rowType} numberOfLines={1}>{detail}</Text>
-                          </Pressable>
-                        );
-                      })}
+                      {/* OTA-1051 — grouped: ALL upgradeable armor (incl. dog vests), then
+                          ALL weapons; worn pieces first in each group with an EQUIPPED
+                          badge so upgrading what you're wearing is a deliberate,
+                          visible choice.
+                          OTA-1117 — BOTH headings now always render, and a heading with
+                          nothing tappable lists the pieces it had to turn away and why.
+                          Owner: "went to upgrade at the fuse and it only allowed me to
+                          pick armor no weapons." Roughly half the weapon catalog is
+                          energy-based and can never take a coating channel, so the
+                          WEAPONS section used to disappear with no explanation — a
+                          permanent rule reading as a broken screen. */}
+                      {[
+                        { label: 'ARMOR & VESTS', group: armorGroup, none: 'No armor or vest can take another resist channel right now.' },
+                        { label: 'WEAPONS', group: weaponGroup, none: 'No weapon in your pack can take a second coating channel right now.' },
+                      ].map((section) => (
+                        <View key={section.label}>
+                          <Text style={styles.sectionLabel}>{section.label}</Text>
+                          {section.group.open.length === 0 && (
+                            <Text style={styles.sectionNone}>{section.none}</Text>
+                          )}
+                          {section.group.open.map((w) => {
+                            const armor = isArmorPiece(w);
+                            const worn = isWorn(w);
+                            const onDog = worn && !playerEquippedIds.has(w.id);
+                            const detail = armor
+                              ? `${(w.addedResists ?? []).length} resist${(w.addedResists ?? []).length === 1 ? '' : 's'} → +1 slot`
+                              : w.coating ? `has ${w.coating.label.toLowerCase()} → +1 slot` : 'no coating yet → +1 slot';
+                            return (
+                              <Pressable key={w.id} onPress={() => onPickPiece(w.id)} style={[styles.row, styles.rowOn]} accessibilityRole="button" accessibilityLabel={`${w.name}${worn ? ', equipped' : ''}`}>
+                                <View style={styles.rowNameWrap}>
+                                  <Text style={[styles.rowName, styles.rowNameTight]} numberOfLines={1}>{armor ? w.name : coatedDisplayName(w)}</Text>
+                                  {worn ? (
+                                    <Text style={styles.equippedTag}>★ {onDog ? `ON ${(player?.dog?.name ?? 'THE DOG').toUpperCase()}` : 'EQUIPPED'}</Text>
+                                  ) : null}
+                                </View>
+                                <Text style={styles.rowType} numberOfLines={1}>{detail}</Text>
+                              </Pressable>
+                            );
+                          })}
+                          {/* The turned-away pieces, greyed and un-tappable, each carrying
+                              the reason the Crucible won't take it. */}
+                          {section.group.blocked.map((c) => (
+                            <View key={c.item.id} style={[styles.row, styles.rowBlocked]} accessible accessibilityLabel={`${c.item.name} — ${c.blocked}`}>
+                              <View style={styles.rowNameWrap}>
+                                <Text style={[styles.rowName, styles.rowNameTight, styles.rowNameBlocked]} numberOfLines={1}>
+                                  {isArmorPiece(c.item) ? c.item.name : coatedDisplayName(c.item)}
+                                </Text>
+                                {isWorn(c.item) ? <Text style={styles.equippedTagMuted}>★ EQUIPPED</Text> : null}
+                              </View>
+                              <Text style={[styles.rowType, styles.rowTypeBlocked]} numberOfLines={2}>{c.blocked}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      ))}
                     </ScrollView>
                   )}
                   <View style={styles.actions}>
@@ -255,34 +340,48 @@ export function FusionPickerModal() {
 
 const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 20 },
-  card: { backgroundColor: '#141c1e', borderColor: '#8fa6ac', borderWidth: 1.5, borderRadius: 8, padding: 16, maxHeight: '82%' },
+  card: { backgroundColor: '#17150f', borderColor: '#8aa0a4', borderWidth: 1.5, borderRadius: 8, padding: 16, maxHeight: '82%' },
   title: { color: '#d8b46a', fontSize: 16, fontWeight: '700', letterSpacing: 1 },
-  sub: { color: '#9db2b8', fontSize: 12, marginTop: 4, marginBottom: 2 },
+  sub: { color: '#a2977b', fontSize: 12, marginTop: 4, marginBottom: 2 },
   readout: { color: '#d8b46a', fontSize: 11, fontWeight: '700', marginBottom: 8 },
-  empty: { color: '#9db2b8', fontSize: 13, fontStyle: 'italic', paddingVertical: 16, textAlign: 'center' },
+  empty: { color: '#a2977b', fontSize: 13, fontStyle: 'italic', paddingVertical: 16, textAlign: 'center' },
   list: { maxHeight: 260, marginBottom: 6 },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 8, borderRadius: 4, borderWidth: 1, borderColor: 'transparent' },
-  rowOn: { backgroundColor: '#1e2f24', borderColor: '#3d5a2c' },
+  rowOn: { backgroundColor: '#2a2620', borderColor: '#3d5a2c' },
   rowDim: { opacity: 0.4 },
-  check: { color: '#6c8088', fontSize: 16, width: 26 },
+  check: { color: '#a2977b', fontSize: 16, width: 26 },
   checkOn: { color: '#9ec96a' },
-  rowName: { color: '#d6e4e8', fontSize: 13, flex: 1 },
+  rowName: { color: '#e6d8b3', fontSize: 13, flex: 1 },
   // OTA-679 — material type: the primary decision info, so it reads brighter than
   // the (secondary) rarity. Right-aligned so the type column lines up down the list.
-  rowType: { color: '#8fbfa8', fontSize: 11, fontWeight: '600', marginLeft: 8, textAlign: 'right' },
-  rowMeta: { color: '#6c8088', fontSize: 10, marginLeft: 8 },
-  catBlock: { marginTop: 6, borderTopColor: '#2b3a3e', borderTopWidth: 1, paddingTop: 6 },
-  catLabel: { color: '#8fa6ac', fontSize: 10, fontWeight: '700', letterSpacing: 0.6, marginTop: 8, marginBottom: 4 },
+  rowType: { color: '#9ec96a', fontSize: 11, fontWeight: '600', marginLeft: 8, textAlign: 'right' },
+  rowMeta: { color: '#a2977b', fontSize: 10, marginLeft: 8 },
+  // OTA-1051 — upgrade list grouping + worn badge (amber matches the
+  // inventory EQUIPPED badge palette).
+  sectionLabel: { color: '#8aa0a4', fontSize: 10, fontWeight: '700', letterSpacing: 1.2, marginTop: 8, marginBottom: 4 },
+  rowNameWrap: { flex: 1 },
+  rowNameTight: { flex: 0 },
+  equippedTag: { color: '#c9a86a', fontSize: 9, fontWeight: '700', letterSpacing: 1.5, marginTop: 2 },
+  // OTA-1117 — the "nothing here, and here's why" layer. A heading with no
+  // tappable rows says so, then lists the pieces it turned away with the reason,
+  // greyed and inert so they read as explanation rather than as broken buttons.
+  sectionNone: { color: '#a2977b', fontSize: 11, fontStyle: 'italic', marginBottom: 4, paddingHorizontal: 8 },
+  rowBlocked: { backgroundColor: '#241f1a', borderColor: '#3a342c' },
+  rowNameBlocked: { color: '#8f8368' },
+  rowTypeBlocked: { color: '#a2977b', fontWeight: '400', flexShrink: 1, maxWidth: '58%' },
+  equippedTagMuted: { color: '#8f8368', fontSize: 9, fontWeight: '700', letterSpacing: 1.5, marginTop: 2 },
+  catBlock: { marginTop: 6, borderTopColor: '#3a342c', borderTopWidth: 1, paddingTop: 6 },
+  catLabel: { color: '#8aa0a4', fontSize: 10, fontWeight: '700', letterSpacing: 0.6, marginTop: 8, marginBottom: 4 },
   kindRow: { flexDirection: 'row', gap: 8 },
-  kindBtn: { flex: 1, paddingVertical: 10, borderRadius: 4, borderWidth: 1, borderColor: '#2b3a3e', alignItems: 'center' },
-  kindOn: { backgroundColor: '#26313a', borderColor: '#8fa6ac' },
-  kindTxt: { color: '#9db2b8', fontSize: 13, fontWeight: '600' },
-  kindTxtOn: { color: '#e8f0f2' },
+  kindBtn: { flex: 1, paddingVertical: 10, borderRadius: 4, borderWidth: 1, borderColor: '#3a342c', alignItems: 'center' },
+  kindOn: { backgroundColor: '#2a1f12', borderColor: '#8aa0a4' },
+  kindTxt: { color: '#a2977b', fontSize: 13, fontWeight: '600' },
+  kindTxtOn: { color: '#f0e6cc' },
   actions: { flexDirection: 'row', gap: 10, marginTop: 14 },
   actBtn: { flex: 1, paddingVertical: 12, borderRadius: 4, alignItems: 'center' },
-  actNeutral: { backgroundColor: '#26313a' },
-  actNeutralTxt: { color: '#9db2b8', fontSize: 14, fontWeight: '600' },
+  actNeutral: { backgroundColor: '#2a1f12' },
+  actNeutralTxt: { color: '#a2977b', fontSize: 14, fontWeight: '600' },
   actPrimary: { backgroundColor: '#3d5a2c' },
-  actPrimaryTxt: { color: '#e8f0f2', fontSize: 14, fontWeight: '700' },
+  actPrimaryTxt: { color: '#f0e6cc', fontSize: 14, fontWeight: '700' },
   actDisabled: { opacity: 0.4 },
 });

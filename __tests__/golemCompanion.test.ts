@@ -377,25 +377,25 @@ describe('MECHANIC-1b — golem sidekick', () => {
       expect(store.getState().player!.golem!.hp).toBe(4); // 1 + 3
     });
 
-    it('naming takeover: the input after a summon names the golem', async () => {
+    it('naming popup: confirmGolemName seals the name (OTA-1050)', async () => {
       const store = await bootstrap();
       const p0 = store.getState().player!;
       // Simulate the post-summon state the summon path sets.
       store.setState({ player: { ...p0, golem: makeCompanion(GOLEM_DEFINITIONS.mud_golem) }, pendingGolemNaming: true });
 
-      store.getState().submitPlayerAction('Clanker');
+      store.getState().confirmGolemName('Clanker');
 
       const after = store.getState();
       expect(after.pendingGolemNaming).toBe(false);
       expect(after.player!.golem!.name).toBe('Clanker');
     });
 
-    it('naming takeover: "skip" keeps the type label', async () => {
+    it('naming popup: KEEP ITS MAKING keeps the type label (OTA-1050)', async () => {
       const store = await bootstrap();
       const p0 = store.getState().player!;
       store.setState({ player: { ...p0, golem: makeCompanion(GOLEM_DEFINITIONS.mud_golem) }, pendingGolemNaming: true });
 
-      store.getState().submitPlayerAction('skip');
+      store.getState().confirmGolemName(null);
 
       const after = store.getState();
       expect(after.pendingGolemNaming).toBe(false);

@@ -19,6 +19,7 @@
 
 import type { ItemEffect, StatKey } from './itemEffect';
 import { getCachedSynth, setCachedSynth, type SynthesizedItem } from './itemSynthesisCache';
+import { noteQwenDiscarded, lastQwenCallPreempted } from '../ai/generation/qwenTelemetry';
 
 /** Minimal Qwen interface — same shape as llmParser.ts so tests can
  *  pass a mock without dragging in the full LlamaRuntime stack. */
@@ -26,7 +27,7 @@ export interface ItemSynthEngine {
   isReady(): boolean;
   generate(
     messages: ReadonlyArray<{ role: 'system' | 'user' | 'assistant'; content: string }>,
-    opts?: { maxNewTokens?: number; temperature?: number },
+    opts?: { maxNewTokens?: number; temperature?: number; job?: string; homework?: boolean; interruptible?: boolean },
   ): Promise<string>;
 }
 
@@ -67,6 +68,13 @@ export async function synthesizeItemViaQwen(
   name: string,
   hintTags: readonly string[],
   qwen: ItemSynthEngine,
+  // ⚠ OTA-1149 — HOMEWORK. The first real slot of the headroom track. When the
+  // player is reading a menu rather than waiting on the engine, this runs
+  // ahead of time so the item popup is already written when they open it.
+  // Everything else is identical: same prompt, same clamps, same cache, same
+  // silent discard on a bad row. The ONLY difference is that the call queues
+  // below voice and is cut short the instant the player needs the model.
+  opts?: { homework?: boolean },
 ): Promise<SynthesizedItem | null> {
   if (!qwen.isReady()) return null;
 
@@ -74,23 +82,82 @@ export async function synthesizeItemViaQwen(
   const cached = getCachedSynth(name);
   if (cached) return cached;
 
+  // ⚠ OTA-1132 — THE PROMPT WAS A SPECIFICATION, AND IT GOT A SPECIFICATION
+  // BACK. The OTA-1131 log ran this job three times and every one failed:
+  //   item_synthesis n3 avg13.7s max19.6s in310t→out119t cap2 ∅1 ✂2/32.2s
+  // 41 seconds, three `item_synth:unparseable`, nothing cached. Two of the
+  // three ran into the 180-token cap having written 472 and 488 characters
+  // without ever closing an object — which for a shape that needs ~200 means
+  // the model was not writing one row, it was elaborating.
+  //
+  // The old brief handed it a multi-line schema with a SIX-FIELD nested
+  // effect object and six prose rules, then asked for "ONLY a single JSON
+  // object on one line". A 0.5B model given a big shape fills the big shape:
+  // it opens `effect`, works through every field it was shown, and the cap
+  // arrives before the braces close.
+  //
+  // So the shape shrinks to what the validator actually reads, on ONE line,
+  // with the rules folded into it as inline hints rather than a separate
+  // section. ~900 → ~430 characters (≈310 → ≈150 prompt tokens), which is
+  // also prefill this job pays on every single call.
+  // ⚠ OTA-1138 — THE PIPES WERE THE BUG. OTA-1132 shrank this prompt and gave
+  // the discard reason the raw text, and the very next device log paid that
+  // off by showing what actually fails:
+  //   item_synthesis ok 10374ms … in 219t→out 239t HIT-CAP (604ch)
+  //   ✂ DISCARDED — item_synth:unparseable (604ch)
+  //     raw="{"kind":"misc|invented|lorem|quest|tool|misc|misc|misc|misc|…"
+  // The model was not running out of room and it was not elaborating. It opened
+  // `"kind":"` and then COPIED THE ALTERNATION IT HAD JUST BEEN SHOWN, pipe by
+  // pipe, until the 240-token cap stopped it. `weapon|armor|accessory|…` is
+  // schema notation to a human and a LITERAL STRING VALUE to a 0.5B model — it
+  // is inside the quotes, in the value position, in an object it was told to
+  // imitate. Of course it continued the pattern; the example told it to.
+  //
+  // ⚠ So NO ALTERNATION EVER APPEARS INSIDE THE JSON. The example is now a
+  // CONCRETE, VALID OBJECT — one it can copy verbatim and be right — and the
+  // allowed values live in prose beside it, where a pipe cannot be mistaken for
+  // content. Same fields, same validator, ~same length. This is the third
+  // consecutive OTA on this job, and it is the first one aimed at the actual
+  // failure rather than at its symptoms (180 → 240 tokens, then a smaller
+  // shape); both of those were reasonable reads of the evidence available at
+  // the time, and neither would have helped, because a model looping on `|`
+  // will loop on `|` in any budget at any size.
+  // ⚠ OTA-1157 — THE PROMPT TAUGHT THE MODEL TO FAIL ITS OWN VALIDATOR, and this
+  // is the fourth consecutive OTA on this job. The previous three chased the
+  // token cap, then the shape, then the pipe loop. Every device log since has
+  // still shown the SAME outcome — four generations, four discards, all
+  // `item_synth:rejected-by-clamp`, ~4 seconds each.
+  //
+  // The clamp has exactly two ways to reject, and the first is a `kind` outside
+  // the allowed set. Read the old brief as a 0.5B model reads it:
+  //
+  //     Allowed "kind" values … weapon, armor, accessory, consumable, misc, relic
+  //     … takes {"kind":"consumable","healHP":4,"restoreStamina":3}
+  //     … takes {"kind":"passive","stat":"wisdom","bonus":1}
+  //
+  // The word "kind" names TWO different fields at two nesting levels, and the
+  // inner ones are shown as BARE TOP-LEVEL OBJECTS. One of them is
+  // `{"kind":"passive"…}` — and "passive" is not a legal top-level kind at all.
+  // A small model copies the shape it was shown; the validator then rejects
+  // exactly that shape. The prompt and the parser disagreed, and the prompt won.
+  //
+  // ⚠ THE FIX IS TO SHOW THE NESTING, NOT TO DESCRIBE IT. Every example is now a
+  // COMPLETE reply with `"effect"` wrapped where it actually belongs, so there
+  // is no bare object to copy and no ambiguity about which "kind" is which. The
+  // allowed-values prose stays (it is what OTA-1138 replaced the pipe
+  // alternation with, and the pipe loop has not returned since).
   const systemPrompt = [
-    'You stat-balance items for a text RPG. Output ONLY a single JSON object on one line, no markdown, no prose.',
-    '',
-    'Shape:',
-    '{"kind":"weapon|armor|accessory|consumable|misc|relic",',
-    ' "description":"<one short sentence>",',
-    ' "extraTags":["organic","metal","fiber",...],',
-    ' "effect":{"kind":"passive|consumable|gate","stat":"strength|dexterity|intelligence|wisdom|charisma","bonus":<n>,"healHP":<n>,"restoreStamina":<n>,"buffStat":"<stat>","buffBonus":<n>,"buffDuration":<n>}',
-    '}',
-    '',
-    'Rules:',
-    '- Cap healHP at 10, restoreStamina at 8, any bonus at 2, buffDuration at 6.',
-    '- Use "kind":"consumable" + healHP/restoreStamina for food, drink, potion, tonic, fungus.',
-    '- Use "kind":"passive" + stat+bonus for amulets, rings, charms, lockets, and other carry-bonus items.',
-    '- Use "kind":"misc" + extraTags for tools, rope, lantern, compass.',
-    '- Omit the "effect" field entirely if no effect applies.',
-    '- description should explain the item in one short evocative sentence.',
+    'Stat-balance one item for a text RPG. Reply with ONE line: a single JSON object, nothing before or after it.',
+    'Top-level "kind" is required, pick exactly one: weapon, armor, accessory, consumable, misc, relic.',
+    'Allowed "extraTags" values, pick one or two: organic, metal, fiber, stone, glass.',
+    'Example reply with no effect:',
+    '{"kind":"misc","description":"A coil of tarred rope, stiff with age.","extraTags":["fiber"]}',
+    'Omit "effect" unless the item clearly does something. It is NESTED and has its own inner kind:',
+    '{"kind":"consumable","description":"Thin broth, still warm.","extraTags":["organic"],"effect":{"kind":"consumable","healHP":4,"restoreStamina":3}}',
+    '{"kind":"accessory","description":"A worn silver band.","extraTags":["metal"],"effect":{"kind":"passive","stat":"wisdom","bonus":1}}',
+    'Food, drink, potions and fungus use the consumable effect: healHP 1 to 10, restoreStamina 1 to 8.',
+    'Amulets, rings, charms and lockets use the passive effect: stat is one of strength, dexterity, intelligence, wisdom, charisma; bonus is 1 or 2.',
+    'Tools, rope, lanterns and compasses are "misc" with extraTags and no effect.',
   ].join('\n');
 
   const userPrompt = [
@@ -106,40 +173,165 @@ export async function synthesizeItemViaQwen(
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      { maxNewTokens: 180, temperature: 0.1 },
+      // OTA-1132 — 180 was guaranteeing failure: two of three calls in the
+      // OTA-1131 log spent the entire budget and still had an open brace. The
+      // leaner shape above should make the extra headroom unnecessary in the
+      // normal case, and a cap only costs time when it is actually reached —
+      // so this is insurance, not a decision to generate more.
+      {
+        maxNewTokens: 240,
+        temperature: 0.1,
+        // OTA-1149 — priced separately so idle work never hides inside the
+        // interactive number. A slot that looks cheap because its cost was
+        // averaged with something else is how a budget gets lost.
+        job: opts?.homework ? 'item_synthesis_hw' : 'item_synthesis',
+        homework: opts?.homework,
+        // ⚠ OTA-1157 — CUT ME SHORT IF THE VOICE NEEDS THE LOCK. The device log
+        // measured a welcome-back line waiting 3,940 ms behind one of these,
+        // for a synthesis that then failed its own validator. Enrichment losing
+        // a description is the cheaper loss: the item keeps its static row and
+        // asks again on the next lookup, while a voice line four seconds late
+        // cannot be retried at all.
+        interruptible: true,
+      },
     );
   } catch {
     return null;
   }
 
-  const obj = extractJsonObject(raw);
-  if (!obj) return null;
+  // OTA-1132 — an empty return is a DIFFERENT failure from an unparseable
+  // one and must not be filed under it. The OTA-1131 log has
+  // `item_synthesis empty 8809ms read 0ms/write 0ms in 309t→out 0t` moments
+  // before the watchdog reported "Qwen dormant … the native context was
+  // released" — that is the dormancy bug, not a model that wrote bad JSON,
+  // and calling it `unparseable` would have sent the next investigation at
+  // the parser.
+  if (!raw.trim()) {
+    // ⚠ OTA-1161 — AN INTERRUPTED CALL IS NOT AN EMPTY ONE. OTA-1157 made this
+    // job preemptible, and the very next log showed the label lying about it:
+    // `item_synthesis preempted 3535ms` … `DISCARDED — item_synth:empty`. Empty
+    // is the DORMANCY signature (OTA-1142's watchdog keys off it); preempted is
+    // the voice winning the lock, which is the feature working as built. Same
+    // reason twice over: a discard label the next investigation will trust has
+    // to name what actually happened.
+    noteQwenDiscarded(lastQwenCallPreempted() ? 'item_synth:preempted' : 'item_synth:empty');
+    return null;
+  }
 
+  // ⚠ OTA-1131 — this was the app's most expensive silent failure. The
+  // OTA-1130 device log caught one at `item_synthesis ok 9528ms … out 179t …
+  // HIT-CAP (813ch)`: 179 tokens against a 180 cap, so generation was cut off
+  // mid-object, and 813 characters for a shape that needs about 200 means the
+  // model rambled past the JSON before the cap stopped it. Nine and a half
+  // seconds, recorded as `ok`, thrown away without a word. Now the extractor
+  // takes the first BALANCED object (surviving both the trailing ramble and a
+  // truncated tail), and whatever still fails is reported as the waste it is.
+  const obj = extractJsonObject(raw);
+  if (!obj) {
+    // ⚠ OTA-1132 — NAME THE CULPRIT INSTEAD OF GUESSING AT IT. OTA-1131 made
+    // this failure visible and the next log showed it happening three times
+    // out of three — but `unparseable` does not say WHETHER the model wrote
+    // prose, opened a markdown fence, emitted two objects, or simply ran long.
+    // The ambient ∅ mystery was closed the same way (OTA-1057) by printing
+    // the raw text beside the verdict. The reason string rides the existing
+    // discard sink into the debug channel, so this needs no new plumbing.
+    // OTA-1138 — and now that the pipe loop is a KNOWN failure with a known
+    // cause, it gets its own name. If it ever comes back, the next log should
+    // say so in one word instead of making someone re-derive it from 160
+    // characters of raw text. `unparseable` stays for everything else.
+    const sample = raw.trim().replace(/\s+/g, ' ').slice(0, 160);
+    const reason = looksLikeAlternationLoop(raw) ? 'item_synth:alternation-loop' : 'item_synth:unparseable';
+    noteQwenDiscarded(`${reason} (${raw.length}ch) raw="${sample}"`);
+    return null;
+  }
+
+  // ⚠ OTA-1157 — NAME THE CULPRIT. This was the LAST discard path in the file
+  // that reported only that it happened. Its neighbours all print what they
+  // saw (OTA-1132 added that, OTA-1057 before it), and the payoff is exactly
+  // the same here: four device logs said `rejected-by-clamp` four times and not
+  // one of them said WHICH of the clamp's two rejections fired, so the cause
+  // had to be re-derived from the source instead of read off the log.
   const validated = validateAndClamp(name, obj);
-  if (!validated) return null;
+  if (!validated) {
+    const kindSeen = typeof obj.kind === 'string' ? obj.kind : `(${typeof obj.kind})`;
+    const why = !(KNOWN_KINDS as readonly string[]).includes(String(obj.kind).toLowerCase())
+      ? `bad-kind="${kindSeen}"`
+      : 'no-content';   // parsed, legal kind, but no description/tags/effect to add
+    noteQwenDiscarded(`item_synth:rejected-by-clamp ${why}`);
+    return null;
+  }
 
   setCachedSynth(name, validated);
   return validated;
 }
 
+/** OTA-1138 — did the model fall into the pipe loop this OTA removed the cause
+ *  of? The signature is a run of `|`-separated fragments where the SAME token
+ *  keeps repeating: `"kind":"misc|invented|lorem|quest|tool|misc|misc|misc|…`.
+ *  Three or more pipes with a repeat among the segments is the pattern; a
+ *  legitimate reply has no pipes in it at all, so this cannot fire on good
+ *  output. Purely a LABEL for the discard reason — it changes no behaviour. */
+export function looksLikeAlternationLoop(raw: string): boolean {
+  const bars = (raw.match(/\|/g) ?? []).length;
+  if (bars < 3) return false;
+  const segs = raw.split('|').map((t) => t.trim().toLowerCase()).filter(Boolean);
+  return new Set(segs).size < segs.length;
+}
+
 /** Pull the first {...} block out of a possibly noisy LLM response
  *  and JSON.parse it. Same defensive pattern as llmParser.ts — Qwen
  *  occasionally wraps its JSON in markdown fences or adds a sentence
- *  of prose. Returns null on any failure. */
+ *  of prose. Returns null on any failure.
+ *
+ *  ⚠ OTA-1131 — first-to-LAST brace was the bug. `raw.lastIndexOf('}')` is
+ *  correct only when the response contains exactly one object. Two things in
+ *  the device log break that:
+ *
+ *    - the model keeps talking after the JSON and emits a SECOND object (an
+ *      example, a "here's another") — first-to-last then spans both plus the
+ *      prose between them, and JSON.parse rejects the lot;
+ *    - the 180-token cap cuts the response mid-object — the last `}` on the
+ *      line is the nested "effect" object's, so the slice closes at the wrong
+ *      depth and parse fails again.
+ *
+ *  Scanning for the first BALANCED object fixes both: it stops at the real end
+ *  of object one and ignores everything after, and when a truncated response
+ *  never balances it falls back to the old span rather than losing a response
+ *  that the old code happened to handle. String-aware, because a brace inside
+ *  the description ("a {strange} relic") must not move the depth counter. */
 function extractJsonObject(raw: string): Record<string, unknown> | null {
   const start = raw.indexOf('{');
-  const end = raw.lastIndexOf('}');
-  if (start < 0 || end <= start) return null;
-  const slice = raw.slice(start, end + 1);
-  try {
-    const parsed = JSON.parse(slice) as unknown;
-    if (parsed && typeof parsed === 'object') {
-      return parsed as Record<string, unknown>;
+  if (start < 0) return null;
+  const parse = (slice: string): Record<string, unknown> | null => {
+    try {
+      const parsed = JSON.parse(slice) as unknown;
+      return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : null;
+    } catch {
+      return null;
     }
-  } catch {
-    // ignore
+  };
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = start; i < raw.length; i += 1) {
+    const c = raw[i]!;
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (c === '\\') escaped = true;
+      else if (c === '"') inString = false;
+      continue;
+    }
+    if (c === '"') inString = true;
+    else if (c === '{') depth += 1;
+    else if (c === '}') {
+      depth -= 1;
+      if (depth === 0) return parse(raw.slice(start, i + 1));
+    }
   }
-  return null;
+  // Never balanced — truncated mid-object. Try the old span so a response the
+  // previous extractor could read is not newly lost.
+  const end = raw.lastIndexOf('}');
+  return end > start ? parse(raw.slice(start, end + 1)) : null;
 }
 
 function clamp(v: unknown, max: number): number | undefined {

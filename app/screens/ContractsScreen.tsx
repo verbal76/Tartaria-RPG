@@ -10,6 +10,8 @@ import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
 import { findFactionQuestById, FACTION_QUESTS, factionQuestReady } from '../engine/factionQuests';
 import { escortToggleLabel } from '../engine/escort';
 import { FACTIONS } from '../engine/factions';
+// OTA-1073 — Phase 1 slice 2: the Chronicle's people column.
+import { knownPeople, npcRegard, REGARD_LABEL, dealingsSummary } from '../engine/npcMemory';
 import { startingLocationForFaction } from '../engine/character';
 import { missionObjectiveLocationId } from '../engine/missionRouting';
 import { getLocationById } from '../engine/encounter';
@@ -88,11 +90,16 @@ export function ContractsScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
+  const contractsNotice = useGameStore((s) => s.contractsNotice);
+  const clearContractsNotice = useGameStore((s) => s.clearContractsNotice);
   const abandonContract = useGameStore((s) => s.abandonContract);
   const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
   const setContractActive = useGameStore((s) => s.setContractActive);
   const routeMission = useGameStore((s) => s.routeMission);
   const discardLead = useGameStore((s) => s.discardLead);
+  // OTA-1037 — the refusal strip answers THIS visit's taps; don't let a stale line
+  // greet the next visit to the screen.
+  useEffect(() => () => { useGameStore.getState().clearContractsNotice(); }, []);
   const turnInSigil = useGameStore((s) => s.turnInSigil);
   // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
   // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
@@ -610,6 +617,21 @@ export function ContractsScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* OTA-1037 — refusal strip: when a COMPLETE tap is refused (wrong faction, no
+          agent in scene, work not done), the Arbiter's line lands HERE, where
+          the player is looking — not only in the world feed behind this screen. */}
+      {contractsNotice ? (
+        <Pressable
+          style={({ pressed }) => [styles.contractsNotice, pressed && styles.contractsNoticePressed]}
+          onPress={clearContractsNotice}
+          accessibilityRole="button"
+          accessibilityLabel="Dismiss notice"
+        >
+          <Text style={styles.contractsNoticeText}>{contractsNotice.text}</Text>
+          <Text style={styles.contractsNoticeDismiss}>TAP TO DISMISS</Text>
+        </Pressable>
+      ) : null}
+
       {tab === 'collectables' ? (
         <CollectablesTab progress={progress} />
       ) : (
@@ -754,14 +776,40 @@ export function ContractsScreen() {
                   along the way show up here.
                 </Text>
               ) : (
-                (worldMemory.npcsMet ?? []).map((n) => (
-                  <Text key={n.id} style={styles.milestoneDetailRow}>
-                    · {n.name}
-                    {n.role ? ` — ${n.role}` : ''}
-                    {n.locationId ? `  (${n.locationId.replace(/_/g, ' ')})` : ''}
-                  </Text>
-                ))
+                // OTA-1073 — this was a roll-call: a name, a role, a place.
+                // It now reports the RELATIONSHIP, ordered by how each person
+                // regards you, with the dealings that got them there. The
+                // ledger is the same one the greeting layer reads, so the
+                // Chronicle and the world can never disagree about who knows
+                // you. Anyone on the old npcsMet list without a relation (a
+                // Guardian, a pre-OTA-1072 save mid-migration) still shows,
+                // with no claim made about a relationship there is no record
+                // of — the honest blank.
+                (worldMemory.npcsMet ?? []).map((n) => {
+                  const rel = (worldMemory.npcRelations ?? {})[n.id];
+                  const regard = rel ? npcRegard(rel) : null;
+                  const dealings = dealingsSummary(rel);
+                  return (
+                    <View key={n.id} style={styles.npcRow}>
+                      <Text style={styles.milestoneDetailRow}>
+                        · {n.name}
+                        {n.role ? ` — ${n.role}` : ''}
+                        {regard ? `  ·  ${REGARD_LABEL[regard]}` : ''}
+                      </Text>
+                      {dealings ? (
+                        <Text style={styles.npcDealings}>   {dealings}</Text>
+                      ) : null}
+                    </View>
+                  );
+                })
               )}
+              {knownPeople(worldMemory).length > 0 ? (
+                <Text style={styles.npcFootnote}>
+                  Regard is earned in dealings with that person, not in standing
+                  with their faction. Trades, contracts finished, and thefts they
+                  CAUGHT all count.
+                </Text>
+              ) : null}
             </View>
           )}
         </View>
@@ -1172,7 +1220,13 @@ export function ContractsScreen() {
                       const objId = readyToTurnIn ? home : (missionObjectiveLocationId(def) ?? home);
                       let objName = objId;
                       try { objName = getLocationById(objId).name ?? objId; } catch { /* keep id */ }
-                      const routed = player?.routedMission?.id === def.id;
+                      // OTA-1037 — routed requires a LIVE course. Quit-navigating used
+                      // to leave routedMission set, so this note (which replaces
+                      // the ROUTE button) wedged the card until deactivate →
+                      // reactivate. Gating on the course also HEALS saves already
+                      // carrying the stale flag.
+                      const courseLive = !!player?.travelTarget || !!player?.whisperCourse;
+                      const routed = courseLive && player?.routedMission?.id === def.id;
                       const atObj = player?.currentLocationId === objId;
                       if (routed) {
                         const phase = player?.routedMission?.phase;
@@ -1839,6 +1893,9 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginVertical: 1,
   },
+  npcRow: { marginBottom: 2 },
+  npcDealings: { color: '#8a7f6a', fontSize: 11, lineHeight: 15 },
+  npcFootnote: { color: '#6f6656', fontSize: 10, lineHeight: 14, marginTop: 8, fontStyle: 'italic' },
   milestoneDetailEmpty: {
     color: '#a2977b',
     fontSize: 11,
@@ -2005,6 +2062,21 @@ const styles = StyleSheet.create({
   routeBtnPressed: { opacity: 0.7 },
   routeBtnText: { color: '#9ec0ef', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
   routeHereNote: { marginTop: 10, color: '#9ec96a', fontSize: 11, fontStyle: 'italic' },
+  // OTA-1037 — refusal strip: amber warning treatment, distinct from the green route
+  // notes and the teal activate toggle.
+  contractsNotice: {
+    marginTop: 8,
+    marginBottom: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    backgroundColor: '#2a2118',
+    borderColor: '#e0a75f',
+    borderWidth: 1,
+    borderRadius: 3,
+  },
+  contractsNoticePressed: { opacity: 0.7 },
+  contractsNoticeText: { color: '#e8c894', fontSize: 12, lineHeight: 17 },
+  contractsNoticeDismiss: { marginTop: 5, color: '#a98a5e', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
   // Activate / deactivate toggle (single-active). Active = teal; paused = grey.
   trackBtn: {
     marginTop: 8, backgroundColor: 'transparent', borderColor: '#54d6c4',

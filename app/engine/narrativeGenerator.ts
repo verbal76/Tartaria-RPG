@@ -11,6 +11,9 @@ import type {
   WorldMemory,
 } from './types';
 import { withArticle, withArticleCap } from './grammar';
+// OTA-1090 — Phase 5: the Arbiter's arc across the Cores and his opinion of
+// the player, both derived from the save.
+import { arbiterRemark } from './arbiterPersona';
 import { pick, chance, rotatingPick } from './rng';
 import openings from '../data/events/openings.json';
 // OTA-298 — mood, intent, location, and scene flavor JSON files are
@@ -592,8 +595,17 @@ export interface ArbiterContext {
   hasFood?: boolean;
 }
 
-function pickMoodPool(mood: string | undefined): string[] | undefined {
+// OTA-1049 — the mood arrives one action STALE (the cognitive read for the
+// current action lands after this line prints), so the first peaceful action
+// after a fight still reads AGGRESSION — and every AGGRESSION line
+// presupposes a live opponent ("don't make me decide which one of you to
+// leave breathing" fired over a quiet crate salvage in the owner's log).
+// Every other mood reads fine ambient (FEAR is atmosphere, CURIOSITY is
+// looting); AGGRESSION alone is combat-locked, so it only selects its pool
+// when the scene actually holds a live enemy.
+function pickMoodPool(mood: string | undefined, hasLiveEnemy?: boolean): string[] | undefined {
   if (!mood) return undefined;
+  if (mood === 'AGGRESSION' && !hasLiveEnemy) return undefined;
   const pool = getMoodRemarks()[mood];
   return pool && pool.length > 0 ? pool : undefined;
 }
@@ -638,8 +650,13 @@ const COMBAT_REMARKS = [
 // ("the heir atalan-drowned is patient"). Generic creatures still lowercase cleanly
 // ("the mud boar"). Keyed off the `boss` flag (Core Guardians + boss-gate spawns all
 // carry it), so the fix is scoped to exactly the named threats.
-export function combatEnemyLabel(enemy: Pick<Enemy, 'name' | 'boss'>): string {
-  return enemy.boss ? enemy.name : enemy.name.toLowerCase();
+// OTA-1116 — AND FACTION FIGHTERS ARE NAMED TOO. dressFactionFighter builds
+// "<Faction> Raider N" and stamps a factionId, which the boss flag never
+// covered — so the owner's log read "The Arbiter watches the conspiracy
+// architects raider 1." A carried factionId is the same signal as `boss`: this
+// is somebody's name, not a description of a species.
+export function combatEnemyLabel(enemy: Pick<Enemy, 'name' | 'boss' | 'factionId'>): string {
+  return enemy.boss || enemy.factionId ? enemy.name : enemy.name.toLowerCase();
 }
 
 function combatRemark(enemy: Enemy): string {
@@ -853,7 +870,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   ) {
     const lastAction = ctx.recentActions[ctx.recentActions.length - 1];
     if (lastAction && lastAction.trim().length > 0) {
-      const moodPool = pickMoodPool(ctx.mood);
+      const moodPool = pickMoodPool(ctx.mood, !!ctx.enemy);
       const flavor = moodPool ? pick(moodPool).replace('this place', ctx.location.name) : null;
       // OTA 027 — see combat-context site above. Plain "look" gets
       // the rotating LOOK pool instead of the generic templated
@@ -885,7 +902,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   // Mood pool — only fires when the location has no authored flavor
   // (procedural / future content). Replaces "this place" with the
   // actual location name so the line stays anchored.
-  const moodPool = pickMoodPool(ctx.mood);
+  const moodPool = pickMoodPool(ctx.mood, !!ctx.enemy);
   if (moodPool) {
     return pick(moodPool).replace('this place', ctx.location.name);
   }
@@ -1154,8 +1171,27 @@ export function buildArbiterSceneIntro(ctx: SceneIntroContext): string {
     if (pool && pool.length > 0) return pick(pool);
   }
 
-  // ~15% — personal beat (who the Arbiter is, in passing).
+  // ⚠ OTA-1090 — PHASE 5. ~15% — who the Arbiter is, in passing.
+  //
+  // This branch is where the phase lands in play. It used to be a flat pick
+  // from thirteen lines that knew nothing: the same confession on hour two and
+  // hour ninety, to a player who robbed him blind and one who carried nine
+  // Cores out, in identical tone.
+  //
+  // It now asks arbiterPersona what he would say GIVEN where he stands in the
+  // arc and what he thinks of this player, and falls back to the old pool only
+  // when there is no character to read (title-screen previews, fixtures).
+  //
+  // Note the counter rather than a roll — see arbiterRemark's header. WHETHER
+  // he says something personal is still chance; WHICH thing he says is a pure
+  // function of the save, because an opinion decided by a coin is not one.
   if (Math.random() < 0.15) {
+    if (player) {
+      const nth = (worldMemory?.discoveredLocationIds?.length ?? 0)
+        + (worldMemory?.defeatedEnemies?.length ?? 0);
+      const line = arbiterRemark(player, worldMemory, nth);
+      if (line) return line;
+    }
     return pick(ARBITER_PERSONAL_BEATS);
   }
 

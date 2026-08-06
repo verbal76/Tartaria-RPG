@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     opacity: 0.55,
   },
   chipTextConsumed: { color: '#a2977b', fontStyle: 'italic' },
-  chipArrowConsumed: { color: '#5e5547' },
+  chipArrowConsumed: { color: '#6b5c3a' },
   stealthToggle: {
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  stealthToggleActive: { borderColor: '#6a9bbf', backgroundColor: '#1c2a35' },
+  stealthToggleActive: { borderColor: '#6a9bbf', backgroundColor: '#17150f' },
   stealthToggleText: { color: '#a2977b', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   stealthToggleTextActive: { color: '#6a9bbf' },
   takeAllBtn: {

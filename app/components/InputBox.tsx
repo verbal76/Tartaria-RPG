@@ -53,6 +53,11 @@ interface Props {
   /** True when there's nothing to lift here (no vendor, no liftable target) —
    *  greys the PICKPOCKET button so it's never a dead tap. */
   pickpocketBlocked?: boolean;
+  /** OTA-1103 — true when a MARK (a person with pockets) is in reach. Lights
+   *  the PICKPOCKET button the same ready-green the torch uses: the glow
+   *  means "this is a live possibility right now", matching the TALK glow's
+   *  language one row up. */
+  pickpocketPossible?: boolean;
   onOpenAskArbiter: () => void;
   /** arb120 — quick-row MISSIONS button → Contracts screen. Lets the top
    *  main-quest chip slim to a single line for more exploration room. */
@@ -151,7 +156,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb-fix (OTA — adaptive quick row) — the out-of-combat quick row shows the
   // world-interaction verbs (look / rest / investigate / take / salvage / climb /
@@ -636,7 +641,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             )}
             {(moreOpen || tutLock) && (
               <>
-                <QuickBtn label="pickpocket" onPress={onOpenPickpocket} blocked={approachBlocked || !!pickpocketBlocked} />
+                {/* OTA-1103 — ready-green while a mark is in reach, matching
+                    the TALK glow's "live possibility" language. Blocked still
+                    wins (tone resolves to none). */}
+                <QuickBtn label="pickpocket" onPress={onOpenPickpocket} blocked={approachBlocked || !!pickpocketBlocked} tone={pickpocketPossible ? 'ready' : undefined} />
                 <QuickBtn label="craft" onPress={onOpenCrafting} blocked={tutLock} />
                 <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
                 <QuickBtn label="missions" onPress={onOpenMissions} blocked={tutLock} />
@@ -695,6 +703,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             style={styles.input}
             value={text}
             onChangeText={setText}
+            // OTA-1098 — owner, at the rope beat: "the text bar didn't pop up
+            // with the keyboard, i had to back up and hit it again." Android
+            // intermittently drops the native tap→focus→keyboard chain
+            // (worst while a JS-driven pulse animation is saturating the
+            // thread, which is exactly the tutorial's input-row state). An
+            // explicit focus() on press-in is a no-op when the chain worked
+            // and the retry when it did not — first tap always lands.
+            onPressIn={() => inputRef.current?.focus()}
             onFocus={() => setExplorationInputActive(true)}
             placeholder={
               awaitingTutorialName
@@ -829,7 +845,7 @@ function TravelBtn({ label, onPress, blocked, active }: { label: string; onPress
         numberOfLines={isDestination ? 2 : 1}
         ellipsizeMode="tail"
         adjustsFontSizeToFit={!isDestination}
-        minimumFontScale={0.55}
+        minimumFontScale={0.8} // OTA-1048 — was 0.55; below ~80% room names stop being readable
       >
         {active ? `▸ ${label}` : label}
       </Text>
@@ -877,9 +893,16 @@ const styles = StyleSheet.create({
   bandolierInRange: { borderColor: '#4f7a3a' },
   bandolierOutOfRange: { borderColor: '#7a2f2f', backgroundColor: '#241211' },
   bandolierOutOfRangeLabel: { color: '#c45b4a' },
-  travelRow: { flexDirection: 'row', gap: 6, marginBottom: 6 },
+  // OTA-1048 — WRAP, don't shrink. Five equal-width slots on a phone left
+  // ~80pt per button and adjustsFontSizeToFit took "MATERIALS" down to
+  // 55% font — unreadable (owner, in Asgardar: "the text is too small to
+  // read"). The row now wraps onto a second line once buttons would drop
+  // under ~92pt, and the shrink floor is raised so text stays legible.
+  travelRow: { flexDirection: 'row', gap: 6, marginBottom: 6, flexWrap: 'wrap' },
   travelBtn: {
-    flex: 1,
+    flexGrow: 1, // OTA-1048 — grow to fill, but never below minWidth (wrap instead)
+    flexBasis: '22%',
+    minWidth: 92,
     backgroundColor: '#1a1714',
     borderColor: '#5a4a2e',
     borderWidth: 1,

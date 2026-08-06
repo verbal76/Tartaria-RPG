@@ -18,7 +18,7 @@
 
 import { AppState, type AppStateStatus } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { speak, stopAndClear } from './TTSManager';
+import { speak, stopAndClear, clearQueueKeepCurrent } from './TTSManager';
 import { getVoiceSettings, onVoiceSettingsChange } from './voiceSettings';
 import { splitSentences } from './sentenceSplitter';
 import { advanceStream, emptyStreamState } from './streamBundler';
@@ -101,7 +101,7 @@ function spokenRecently(stripped: string): boolean {
 // AsyncStorage chain in.
 import { stripArbiterFrame, detectArbiterSpeaker } from './arbiterFrame';
 import { voiceForSpeaker } from './speakerVoices';
-import { onKokoroStateChange, getKokoroErrorHistory } from './PiperTTSManager';
+import { onKokoroStateChange, getKokoroErrorHistory, setVoiceLogSink as piperSetVoiceLogSink } from './PiperTTSManager';
 
 // arb54 — surface the bundled-voice (Piper/Kokoro) install state into the game
 // log so a tester's LOG export shows WHY narration is silent without digging
@@ -141,6 +141,7 @@ function onAppStateChange(next: AppStateStatus): void {
 function logVoice(line: string): void {
   try { useGameStore.getState().appendLog('debug', line); } catch { /* log not ready */ }
 }
+
 
 function speakArbiter(text: string, front: boolean = false): void {
   const stripped = stripArbiterFrame(text);
@@ -254,6 +255,30 @@ function onState(state: GameState): void {
       // arbiter-only channel (per OTA 123 player request) — frame
       // strip + speak. The SPOKEN_CHANNELS set is now {'arbiter'}
       // so this is always the arbiter path.
+      // OTA-1065 — meta.supersede: this line REPLACES the pending backlog.
+      // The tutorial appends two arbiter lines per beat (an acknowledgement
+      // and the next instruction) while on-device Kokoro is still
+      // synthesising the previous one, so the queue grows faster than it
+      // drains and the voice falls a whole beat behind: the owner heard
+      // "you'll want a weapon" while already typing `take the rope`. A stale
+      // instruction is worse than no instruction — it tells the player to do
+      // something they finished two actions ago.
+      //
+      // clearQueueKeepCurrent (not stopAndClear) on purpose: it drops the
+      // backlog without cutting the sentence already in the air, so there's
+      // no clipped word and no race with piperStopAndClear's async expo-av
+      // teardown. Then the new line goes to the FRONT.
+      //
+      // Note the useful side effect when the voice is NOT behind: with an
+      // empty queue the beat's acknowledgement is already `currentlySpeaking`
+      // rather than queued, so it survives and the instruction simply follows
+      // it. The acknowledgement is only sacrificed when audio is genuinely
+      // lagging — which is exactly when it should be.
+      if (entry.meta?.supersede === true) {
+        clearQueueKeepCurrent();
+        speakArbiter(entry.text, true);
+        continue;
+      }
       // OTA-635 — meta.speakFront (the welcome-back greeting) jumps the voice
       // queue so it's heard immediately instead of behind a backlog.
       speakArbiter(entry.text, entry.meta?.speakFront === true);
@@ -278,6 +303,17 @@ function onState(state: GameState): void {
 /** Bind the controller to the game store + settings observer. Call
  *  once at app boot, AFTER initTTSManager(). */
 export function startTTSController(): void {
+  // ⚠ OTA-1155 — hand the low-level synth layer a way to reach the game log.
+  // PiperTTSManager must not import the store itself (it is the native layer,
+  // and that dependency would run the wrong way), so this module — which
+  // already owns that edge — installs the sink.
+  //
+  // Installed HERE rather than at module scope, and optional-called: a
+  // module-scope side effect broke every existing partial mock of
+  // PiperTTSManager the moment this file was imported, which is a lot of blast
+  // radius for a debug line. A mock without the export simply gets no sink and
+  // logs nothing, which is exactly right under test.
+  try { piperSetVoiceLogSink?.(logVoice); } catch { /* never block startup on a log wire */ }
   if (unsub) return;
   controllerStartedAt = Date.now();
   syncToCurrent(useGameStore.getState());

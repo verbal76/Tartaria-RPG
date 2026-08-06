@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 14,
   },
-  title: { color: '#e0b45f', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
+  title: { color: '#e0c179', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
   bodyScroll: {},
   bodyWrap: { paddingVertical: 2 },

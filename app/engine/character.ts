@@ -265,6 +265,15 @@ export interface CreateCharacterInput {
   raceId: string;
   factionId: string;
   startingLocationId?: string;
+  /** OTA-1041 — the story motive picked on creation step 3. Optional so sims
+   *  and legacy callers keep working; createCharacter rolls one when absent. */
+  motiveId?: string;
+  /** ⚠ OTA-1089 — the Phase 4 difficulty picked on creation step 4. Optional
+   *  so sims and legacy callers keep working; absent resolves to
+   *  DEFAULT_PRESSURE, which is the game as it has always played. */
+  pressure?: string;
+  /** OTA-1136 — the CUSTOM payload, when `pressure === 'custom'`. */
+  pressureCustom?: { intensity: string; systems: string[] };
 }
 
 // v2.4.1 (OTA 029) — canonical per-faction starting location.
@@ -312,6 +321,24 @@ export function startingLocationForFaction(factionId: string): string {
 }
 
 export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
+  // OTA-1041 — every character has a REASON they came down. Callers that
+  // don't pass one (sims, old tests) get a random motive, same as a player
+  // smashing BEGIN without reading.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isStoryMotiveId, STORY_MOTIVE_IDS } = require('./story') as typeof import('./story');
+  const storyMotive = isStoryMotiveId(input.motiveId)
+    ? input.motiveId
+    : STORY_MOTIVE_IDS[Math.floor(Math.random() * STORY_MOTIVE_IDS.length)]!;
+  // OTA-1089 — and how much the mud is allowed to take. An unrecognised value
+  // resolves to DEFAULT_PRESSURE rather than throwing: a difficulty setting is
+  // never worth failing a character creation over.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isPressureTier, DEFAULT_PRESSURE } = require('./pressure') as typeof import('./pressure');
+  const pressure = isPressureTier(input.pressure) ? input.pressure : DEFAULT_PRESSURE;
+  // OTA-1136 — normalised on the way in so nothing downstream ever sees a junk
+  // intensity or an unknown system id. Stored only for a genuinely custom run.
+  const { normalizeCustom } = require('./pressure') as typeof import('./pressure');
+  const pressureCustom = pressure === 'custom' ? normalizeCustom(input.pressureCustom) : undefined;
   const race = races.find((r) => r.id === input.raceId) ?? races[0]!;
   const faction = factions.find((f) => f.id === input.factionId) ?? factions[0]!;
   const stats = rollStats();
@@ -332,6 +359,14 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
 
   return {
     name: input.name,
+    storyMotive,
+    pressure, // OTA-1089
+    ...(pressureCustom ? { pressureCustom } : {}), // OTA-1136
+    storyIntroSeen: false,
+    // OTA-1045 — a creation-made character never sees the veteran motive
+    // picker: an explicit pick IS chosen, and a rolled one (sims, legacy
+    // callers) counts as "smashed BEGIN without reading" — their choice.
+    storyMotiveChosen: true,
     raceId: race.id,
     factionId: faction.id,
     stats,

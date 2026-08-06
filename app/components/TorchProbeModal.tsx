@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   },
   rowPressed: { borderColor: '#c9a86a', opacity: 0.85 },
   rowName: { color: '#e6d8b3', fontSize: 14, flex: 1, marginRight: 8 },
-  rowTag: { color: '#e0b64a', fontSize: 11, letterSpacing: 1, fontWeight: '700' },
+  rowTag: { color: '#e0c179', fontSize: 11, letterSpacing: 1, fontWeight: '700' },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, minWidth: 80, alignItems: 'center' },
   btnPressed: { opacity: 0.7 },
