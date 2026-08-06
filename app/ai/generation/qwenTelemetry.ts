@@ -187,7 +187,13 @@ export function recordQwenCall(r: QwenCallRecord): void {
   // OTA-1127 — the per-token read cost, kept as a range rather than a mean.
   // Guarded on a real prefill AND a real prompt size: a preempted call or a
   // zero-token prompt has no honest number and must not move the range.
-  if (typeof r.prefillMs === 'number' && (r.promptTokens ?? 0) > 0 && r.outcome !== 'preempted') {
+  // ⚠ OTA-1139 (audit) — AND ONLY WHEN THE NUMBER IS POSSIBLE. The device log
+  // carried `investigate_lore ok 5353ms read 54112ms` — a 54-second prefill
+  // inside a 5-second call. llama.rn's `prompt_ms` is native-reported and
+  // evidently not always per-call; a physically impossible sample fed straight
+  // into this range would set worst-ms/tok to garbage, and the parked caching
+  // investigation is waiting on exactly that number to decide anything.
+  if (typeof r.prefillMs === 'number' && r.prefillMs <= r.totalMs && (r.promptTokens ?? 0) > 0 && r.outcome !== 'preempted') {
     const per = r.prefillMs / (r.promptTokens ?? 1);
     agg.bestMsPerPromptTok = Math.min(agg.bestMsPerPromptTok, per);
     agg.worstMsPerPromptTok = Math.max(agg.worstMsPerPromptTok, per);

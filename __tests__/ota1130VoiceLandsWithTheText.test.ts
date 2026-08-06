@@ -153,7 +153,10 @@ describe('OTA-1130 — ⚠ pre-synthesis: text and voice land together', () => {
       STORE.indexOf('function bankSceneIntro'),
       STORE.indexOf('function takeBankedSceneIntro'),
     );
-    expect(fn).toContain('presynthesize(text)');
+    // RETARGETED BY OTA-1139 (audit) — the bank now pre-synthesizes the
+    // STRIPPED text: the live path runs stripArbiterFrame before Kokoro, so a
+    // raw-text cache key could never match a quoted intro's spoken chunks.
+    expect(fn).toContain('presynthesize(safStrip(text))');
   });
 
   it('the fill is fire-and-forget — a failure costs one normal synth, not a line', () => {

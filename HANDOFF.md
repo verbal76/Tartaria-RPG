@@ -1129,7 +1129,50 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE COMMA THAT ATE THE BEAT (2026-08-06, latest). BOTH LINES.** golem
+- **⚠⚠ THE 24-HOUR AUDIT, AND THE FOUR THINGS IT CAUGHT (2026-08-06, latest).
+  BOTH LINES.** golem OTA-1139 / HAL OTA-1162. Owner: *"run a full audit
+  checking and testing everything done in the last 24 hrs."* Scope
+  OTA-1128..1138 (HAL 1151..1161): every claim re-derived against the live
+  code, full gates re-run on both lines, cross-line parity re-verified. Most
+  claims held. **Four did not, and every one is a lesson from the last day
+  applied one file short of everywhere:**
+
+  1. ⚠ **`playerPowerScore` was a FOURTH inline copy of the gear-AC walk** —
+     found by the sweep OTA-1135 said should never be needed again, carrying
+     both of 1158's defects in miniature: no amulet/ring AC, and the catalog
+     `acBonus` where combat prefers the rolled instance. The Power gauge
+     disagreed with the panel by exactly the jewellery, so equipping defensive
+     rings gave **zero feedback** on the one meter built to answer "did that
+     help?" (OTA-929). It now calls `standingAc` — **the same call, not the
+     same idea.**
+
+  2. ⚠ **The EnemyPanel still printed `e.damage` raw in two places** —
+     OTA-1136's boss understatement on the surface a player opens
+     *specifically* to size up a fight. `enemyDamageCompact` (`1d8+3+1d6 ×2`)
+     is the chip-width truth; both sites routed.
+
+  3. ⚠ **The scene-intro bank pre-synthesized RAW text** while the live path
+     strips arbiter frames before Kokoro — so for any intro carrying quoted
+     dialogue the presynth cache key could never match the chunks `speak()`
+     looks up: homework audio computed, paid for, unreachable. The bank now
+     presynthesizes the **stripped** form; quote-free prose is unchanged.
+
+  4. ⚠ **llama.rn's `prompt_ms` is not always per-call.** The device log
+     carried `investigate_lore ok 5353ms read 54112ms` — a 54-second prefill
+     inside a 5-second call — feeding OTA-1127's ms/tok range unguarded, while
+     the **parked caching investigation waits on exactly that range** to decide
+     anything. A prefill exceeding wall-clock no longer moves it.
+
+  **Verified live in the same device log, no change needed:** 1153's presynth
+  (cached voice hits), 1154's flavor budget (held twice), 1155's timing format,
+  1157's interruptible (two clean preempts, ~3.5–4s each returned to the
+  player), and 1160's drone fight — cudgel swap coached by the Arbiter,
+  `bludgeoning ×1.5`, perfect-opening 27 — the weakness loop at its best.
+
+  New suite `ota1139TheAuditBatch` (13 tests); `ota1130` retargeted on the
+  presynth call.
+
+- **⚠⚠ THE COMMA THAT ATE THE BEAT (2026-08-06). BOTH LINES.** golem
   OTA-1138 / HAL OTA-1161. Two fixes and one verification, all from the log
   that confirmed OTA-1136/1160.
 
