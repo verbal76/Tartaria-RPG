@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.77';
+export const DISPLAY_VERSION = '4.29.78';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22284,7 +22284,48 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // pin retargeted to the named `banked` binding (same call, same
 // place, same one-shot delete).
 // DISPLAY_VERSION 4.29.77.
-export const OTA_BUILD_ID = '2026-08-06-1144-the-handoff-window';
+// OTA-1145 — NOBODY WAS WAITING ON IT. Owner, rejecting
+// 1167's shape of fix: "we closed it yesterday, I even
+// commented that it was fixed after you dropped it. now we
+// fixed something until it was broke. we reintroduced a delay
+// on the js side."
+// ⚠ HE IS RIGHT, AND THE DIFF SAYS SO. Between OTA-1134 (the
+// commit he tested and confirmed) and the log that reopened
+// this, the only substantive JS changes on the voice/LLM path
+// were: the sentence pause he asked for (160→280ms), the
+// presynth eviction repair — and OTA-1144's RESERVATION, which
+// makes LLM work wait so the voice can go first. That is a
+// delay, added by us, on the JS side. It arbitrated the
+// collision instead of removing it.
+// ⚠ THE COLLISION HAD A CAUSE, and it is a scheduling bug in
+// the item-synthesis REQUESTER, not in the native layer.
+// `inferGear` runs over the WHOLE INVENTORY during save-load
+// hydration, so a save holding one unclassifiable item fired an
+// interactive-priority generation ~160ms into the load — which
+// then held the native-ML lock through 3.5s of uninterruptible
+// prefill while the greeting waited to be spoken.
+// ⚠ NOBODY WAS WAITING ON THAT DESCRIPTION. This path's own
+// contract is that the result "lands in the cache for the NEXT
+// lookup" — the current render keeps its static row and OTA-192
+// restamps later. OTA-1134's note that "a player who opened an
+// unknown item IS waiting on it" is true of the POPUP, never of
+// this requester. So it is fixed where it belongs:
+//   · it only fires while the player is on a STATIONARY screen
+//     (`uiIdleSince`, the owner's own homework signal — null
+//     during a load, so a load can no longer start one); and
+//   · it runs as HOMEWORK, which is what it always was: below
+//     voice, and cut short the instant real work arrives.
+// ⚠ AND 1167'S RESERVATION SHRINKS 1200 → 350ms. With the cause
+// gone it is a guard rail, not a mechanism, so it is cut to the
+// size of what it actually covers — a model lookup and a
+// breadcrumb write, tens of ms — and can no longer be felt as
+// latency in its own right.
+// OTA-1109's fire-and-forget pin retargeted to the homework
+// call (which strengthens its claim, not weakens it).
+// New suite ota1145NobodyWasWaitingOnIt (8 tests).
+// DISPLAY_VERSION 4.29.78.
+export const OTA_BUILD_ID = '2026-08-06-1145-nobody-was-waiting-on-it';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1144-the-handoff-window';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1143-welcome-back-always-wins';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1142-the-four-lever-batch';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1141-the-owners-tuning-calls';
