@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.79';
+export const DISPLAY_VERSION = '4.29.80';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23463,7 +23463,52 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (one re-scoped to the property it actually pins).
 // New suite ota1169TheIsTwoWords (12 tests).
 // DISPLAY_VERSION 4.29.79.
-export const OTA_BUILD_ID = '2026-08-06-1169-the-is-two-words';
+// OTA-1170 — "ĀTHER", AND THE FAMILY THAT WAS THREE-QUARTERS
+// UNCOVERED. Owner: "and aether should be āther … anything
+// starting with aether should have it start with āther for
+// pronunciation not spelling."
+// ⚠ 1. ONE WORD, NOT TWO. OTA-107 wrote the head as "ay thur" —
+// two space-separated tokens, which the lexicon's own header
+// says espeak treats as two separate WORDS. So it read as two
+// stressed beats, AY · THUR, when the canon is a single smooth
+// trochee: ā-ther. Closing the space is what the macron asks
+// for. OTA-1161 had looked at this in the device log and closed
+// it as working-as-designed; the owner has overruled that, and
+// that block is RE-AUTHORED rather than re-numbered, because its
+// claim ("ay thur ik IS canonical") is the thing that changed.
+// ⚠ 2. IT IS A PREFIX RULE NOW, AND THAT IS THE BIGGER HALF.
+// Five entries were enumerated (Aether / Aetheric / Aetherstone
+// / Aetherborn / Aetherbat); the content carries TWENTY.
+// Aetherkin, Aethercraft, Aethercrafted, Aethercrafters,
+// Aetherium, Aetherforge, Aetherforged, Aetherstorm,
+// Aetherstorms, Aetherwing, Aetherwave, Aetherflame,
+// Aetherlight, Aetherbound, Aethereal, Aetherons — every one
+// fell straight through to espeak's raw letter-to-sound rules,
+// which is the mispronunciation this family was respelled to
+// prevent. "Anything starting with aether" is a prefix rule, and
+// a prefix rule cannot miss the next word someone authors.
+// Named compounds keep their space before a REAL WORD (stone /
+// born / bat / kin) because espeak gives a real word its own
+// clean pass; bare suffixes (-ic, -ium) stay attached so the
+// stress lands ay-THER-ik, not AY-ther · ICK.
+// ⚠ THE SORT NEEDED A SECOND KEY, and length alone got it
+// exactly backwards: the catch-all's source (17 chars) is LONGER
+// than `\bAetherstone\b` (15), so sorting by length would have
+// fired the fallback first and collapsed "ayther stone" into
+// "aytherstone" — silently, since both still sound roughly right
+// and nothing was watching. Catch-alls (a pattern not ending in
+// \b) now sort after every named entry regardless of length.
+// The catch-all also lowercases the tail it keeps, so an
+// all-caps AETHERSTORM cannot reach espeak as a mixed-case run
+// it would spell out letter by letter.
+// PRONUNCIATION, NOT SPELLING — TTS copy only; the log, the item
+// names and the codex still read "Aether".
+// New suite ota1170AytherNotAyThur (14 tests); loreLexicon's
+// three Aether fixtures retargeted, ota1169's composition test
+// updated, ota1161's block re-authored.
+// DISPLAY_VERSION 4.29.80.
+export const OTA_BUILD_ID = '2026-08-06-1170-ayther-not-ay-thur';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1169-the-is-two-words';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1168-nobody-was-waiting-on-it';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1167-the-handoff-window';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1166-welcome-back-always-wins';
