@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.68';
+export const DISPLAY_VERSION = '4.29.69';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23018,7 +23018,65 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the reproduction: the same character with and without the
 // jewellery, differing by exactly 3.
 // DISPLAY_VERSION 4.29.68.
-export const OTA_BUILD_ID = '2026-08-06-1158-three-points-of-jewellery';
+// OTA-1159 — HOW HE DIED IN ONE INPUT.
+// The owner walked into Yuldra-Tul at 24/24 HP, typed
+// `approach`, and was dead before he got a second input: "how did
+// I die so fast? all I hit was approach."
+//   Hierophant Mara closes — Frost Staff Strike ready,
+//   1d8+3 damage on a hit. (range: close) ★ CORE GUARDIAN
+//   d20 16 + ATK 5 = 21 vs your AC 19 — HIT
+//   presses the second strike — bosses do not yield the tempo.
+//   d20 15 + ATK 5 = 20 vs your AC 19 — HIT
+//   deals 13 cold damage [armor -18%]. You have 11 HP remaining.
+//   deals 11 cold damage [armor -18%]. You fall.
+// ⚠ THE ARITHMETIC DOES NOT FIT THE CARD, AND THAT IS THE
+// FINDING. 1d8+3 tops out at ELEVEN. It dealt 13 THROUGH 18%
+// armour — about 16 raw. The card was not describing the attack
+// the resolver runs: applyEnemyCounter adds +1d6 to EVERY
+// connecting swing of a boss-flagged enemy on top of the declared
+// notation, and a boss takes a SECOND swing after the first lands
+// — so one player action, including a plain move, eats two of
+// them. Real envelope 2 × (1d8+3 + 1d6) = 10 to 34, against a 24
+// HP bar. The card advertised 4 to 11. He did not misplay the
+// fight; he priced it off the number he was shown, and that
+// number was a third of the truth.
+// ⚠ AND THE SAME CARD SAID "(range: close)" WHILE THE SPAWN SET
+// 'mid'. Twelve lines above the log call, the Guardian spawn
+// block writes range: 'mid'. So he was told he was already in
+// reach, typed `approach` to act on it, and spent his one action
+// closing a gap the card had denied existed — into a boss that
+// answers any action with two swings.
+// ⚠ THIS IS THE OTA-1156 / 1158 FAMILY, THIRD TIME: a surface
+// disagreeing with the resolver. The sheet said AC 16 while the
+// Arbiter said 10; the panel said AC 15 while combat defended at
+// 18; the card said 1d8+3 while the resolver rolled 1d8+3+1d6
+// twice. NOTHING ABOUT THE FIGHT CHANGES HERE — the card stops
+// understating it, and whether a tier-1 Guardian should be able
+// to erase a full 24 HP bar in one exchange is a balance question
+// for the owner, not a thing to quietly re-tune.
+// ── The greeting, and the beat after the name ──
+// Owner: "remove the Good — it hits weird in the sentence, and
+// there should be a slight delay after the name, like how we use
+// a comma to pause a sentence." Both halves were real. "Good —"
+// read as the Arbiter APPROVING of the return rather than
+// greeting it, and spoken aloud the dash landed as a stumble
+// between the name and the thought.
+// ⚠ AND THE PAUSE WAS A COIN FLIP, which is why it sounded wrong
+// some of the time. arb165 already inserts real silence at a
+// sentence boundary — but only inside joinBatch, which only runs
+// when the drain BUNDLED two or more chunks, which depends on
+// whether the next chunk happened to be inferred yet. So the same
+// sentence paused or did not according to how fast Kokoro was
+// that second. The single-chunk path now pads the same beat when
+// more of the SAME line is queued behind it, so the pause is a
+// property of the punctuation rather than of timing — and 160ms
+// is under what a listener reads as a deliberate beat, so it is
+// 280.
+// New suite ota1159HowHeDiedInOneInput (16 tests), pinning the
+// advertised +1d6 to the resolver line that rolls it.
+// DISPLAY_VERSION 4.29.69.
+export const OTA_BUILD_ID = '2026-08-06-1159-how-he-died-in-one-input';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1158-three-points-of-jewellery';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1157-cut-short-for-the-voice';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1156-the-ac-that-never-dropped';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1155-timestamp-the-voice';

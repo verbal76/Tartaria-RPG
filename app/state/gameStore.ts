@@ -223,7 +223,7 @@ import {
   type ArmorSlotResist,
   type Recipe,
 } from '../engine/crafting';
-import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor } from '../engine/combatRules';
+import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor, enemyDamageDisplay } from '../engine/combatRules';
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
 import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, COATING_RESIST_LAND_CHANCE, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
@@ -1827,7 +1827,12 @@ let lastWelcomeBackAt: number | null = null;
 const WELCOME_BACK_LINES = [
   `The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, {name}. The road kept your place."`,
   `The Arbiter looks up as you return. "Welcome back, {name}. I wondered when you'd take up the thread again."`,
-  `The Arbiter meets your eyes. "Welcome back, {name}. Good — the buried country is no place to walk alone."`,
+  // ⚠ OTA-1159 — "Good —" removed. Owner: *"remove the Good, it hits weird in
+  // the sentence."* It read as the Arbiter approving of the player's return
+  // rather than greeting them, and spoken aloud the dash landed as a stumble
+  // between the name and the thought. The sentence says the same thing without
+  // it, and the full stop after the name now gets a real beat (SENTENCE_PAUSE_MS).
+  `The Arbiter meets your eyes. "Welcome back, {name}. The buried country is no place to walk alone."`,
   `The Arbiter nods, the way you nod at someone you've missed. "Welcome back, {name}. We've still got ground to cover, you and I."`,
   `The Arbiter sets the quiet aside. "Welcome back, {name}. I kept watch while you were gone."`,
 ];
@@ -11793,7 +11798,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('system', corrGain > 0 ? `${pv.system_line} (+${corrGain} corruption)` : pv.system_line);
         }
         if (foe) {
-          get().appendLog('combat', `${foe.name} closes — ${foe.attack} ready, ${foe.damage} damage on a hit. (range: close)`);
+          get().appendLog('combat', `${foe.name} closes — ${foe.attack} ready, ${enemyDamageDisplay(foe)}. (range: close)`);
         }
         void get().persist();
         return;
@@ -12281,9 +12286,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // (range: close) ★ BOSS") matching what regular
               // encounters get, so the boss surfaces in the same UI
               // affordance as every other enemy.
+              // ⚠ OTA-1159 — AND THE CARD SAID "close" WHILE THE SPAWN SET 'mid'.
+              // Twelve lines up this block writes `range: 'mid'`. The player then
+              // typed `approach`, which moved mid → close and cost them the
+              // action that a boss answers with two swings. The card was telling
+              // them they were already there.
               get().appendLog(
                 'combat',
-                `${guardian.name} closes — ${guardian.attack} ready, ${guardian.damage} damage on a hit. (range: close) ★ CORE GUARDIAN`,
+                `${guardian.name} closes — ${guardian.attack} ready, ${enemyDamageDisplay(guardian)}. (range: mid) ★ CORE GUARDIAN`,
               );
               get().appendLog('arbiter', cg.GUARDIANS_BY_CAPITAL[capitalId].approachLine);
               // Record the spawn for the Milestones tab.
@@ -13243,7 +13253,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             get().appendLog(
               'combat',
-              `${finalSpawn.name} — ${finalSpawn.attack} ready, ${finalSpawn.damage} damage on a hit.`,
+              `${finalSpawn.name} — ${finalSpawn.attack} ready, ${enemyDamageDisplay(finalSpawn)}.`,
             );
             get().appendLog('debug', debugEnemy(finalSpawn as unknown as Record<string, unknown>)); // OTA-354
             break;

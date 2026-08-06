@@ -68,7 +68,14 @@ const CROSSFADE_MS = 12;
 // a sentence boundary the batch is joined with SENTENCE_PAUSE_MS of real silence
 // instead of the gap-removing crossfade. EDGE_FADE_MS tapers each chunk into and
 // out of that silence so the join stays click-free.
-const SENTENCE_PAUSE_MS = 160;
+// ⚠ OTA-1159 — 160 → 280. The owner, on the welcome-back line: *"there should
+// be a slight delay after the name, like how we use a comma to pause a
+// sentence."* 160 ms is under the ~200 ms a listener reads as a deliberate
+// beat, so a full stop landed as a breath and the two sentences ran together.
+// 280 ms is a period. (The single-chunk path gets the same beat below — it used
+// to depend on whether the batcher happened to bundle the line, which meant the
+// same sentence paused or did not depending on how fast Kokoro was that second.)
+const SENTENCE_PAUSE_MS = 280;
 const EDGE_FADE_MS = 6;
 // OTA-790 — how long to keep a finished expo-av Sound alive before releasing it.
 // didJustFinish fires when the decoder finishes FEEDING the audio sink, not when
@@ -951,8 +958,18 @@ async function drain(): Promise<void> {
 
     let combined: Float32Array;
     if (batch.length === 1) {
-      // Single chunk — unchanged path; playPcm trims + fades it.
+      // Single chunk — playPcm trims + fades it.
       combined = firstSamples;
+      // ⚠ OTA-1159 — AND IT STILL OWES THE SENTENCE ITS BEAT. The gap above is
+      // applied by joinBatch, which only runs when two or more chunks were
+      // bundled — and bundling depends on whether the NEXT chunk happened to be
+      // inferred yet. So the identical line paused after the full stop or did
+      // not, according to how fast Kokoro was that second. When this chunk ends
+      // a sentence and more of the SAME line is still queued behind it, pad the
+      // beat here so the pause is a property of the punctuation, not of timing.
+      if (next.endsSentence && queue[0] && queue[0].lineId === next.lineId) {
+        try { combined = padSilence(combined, KOKORO_SAMPLE_RATE, 0, SENTENCE_PAUSE_MS); } catch { /* unpadded */ }
+      }
     } else {
       // Trim each member's pad-silence first, then join: a short silence after
       // any member that ends a sentence (arb165), an equal-power crossfade
