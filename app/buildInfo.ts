@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.76';
+export const DISPLAY_VERSION = '4.29.77';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23336,7 +23336,54 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // pin retargeted to the chained substitution (still authored).
 // New suite ota1166WelcomeBackAlwaysWins (8 tests).
 // DISPLAY_VERSION 4.29.76.
-export const OTA_BUILD_ID = '2026-08-06-1166-welcome-back-always-wins';
+// OTA-1167 — THE HANDOFF WINDOW. Owner, on the very next load:
+// "reintroduced llm lag." The device log:
+//   [:25.994] arbiter "Welcome back, Verbal. …"    ← on screen
+//   [:29.722] qwen⏱  item_synthesis preempted 3565ms in 328t→out 0t
+//   [:30.714] voice⏱ gap 4720ms (wait 3604ms + synth 849ms)
+// ⚠ NOT OTA-1166: that load was ~90 min after the last, so
+// neither the ≥6h while-away beat nor the ≥4h offline recap
+// armed — the single greeting is exactly what 1166 promises and
+// pre-1166 code would have printed the same one line. 1166
+// touches no LLM or TTS code.
+// ⚠ TWO HOLES, and OTA-1157 closed neither for this job shape:
+// (1) THE JOB STARTED AFTER THE LINE WAS QUEUED. speak() stamps
+// queuedAt and hands off to drain(), which AWAITS the voice model
+// and a durable crash breadcrumb before it ever calls
+// runExclusiveNativeMl. The synthesis took the lock inside that
+// gap. Priority never got a say — at the moment pumpMl chose, the
+// voice was not in the pending set. Ranking cannot order work
+// that has not arrived.
+// (2) `out 0t` — THE PREEMPT COULD NOT LAND. stopCompletion() is
+// polled in llama.cpp's DECODE loop and this job never reached
+// decode: all 3565 ms was PREFILL of a 328-token prompt (~11
+// ms/tok on Tensor G5). The hook fired, the outcome is correctly
+// filed `preempted`, and it saved ~40 ms of a ~3.6 s wait —
+// against the pre-1157 log's wait 3940 ms behind a 3847 ms
+// synthesis. Interruption only ever covered the decode half; this
+// model spends its time in prefill.
+// ⚠ THE FIX IS TO STOP THE JOB STARTING, since neither reordering
+// nor interrupting can work here. A voice line that needs
+// synthesis RESERVES the native-ML lock the moment it is accepted
+// for speech; work below voice defers until the line arrives or
+// the deadline passes (VOICE_RESERVATION_MS = 1200).
+// ⚠ BOUNDED BY CONSTRUCTION — a leaked reservation would starve
+// the LLM outright: it carries a deadline, it is released the
+// instant the line's audio is in hand (banked, prefetched, or
+// synthesised) and when the queue drains, and it is never taken
+// for a BANKED line, which plays from memory and needs no lock —
+// reserving for those would make OTA-1153's bank cost narration
+// the very time it exists to save.
+// ⚠ EXCLUSIVITY UNTOUCHED: this schedules STARTS, it never
+// overlaps two native ops. The arb159 crash guarantee is pinned
+// by test.
+// New suite ota1167TheHandoffWindow (13 tests) including a live
+// replay of the device ordering; ota1153's presynth-at-enqueue
+// pin retargeted to the named `banked` binding (same call, same
+// place, same one-shot delete).
+// DISPLAY_VERSION 4.29.77.
+export const OTA_BUILD_ID = '2026-08-06-1167-the-handoff-window';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1166-welcome-back-always-wins';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1165-the-four-lever-batch';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1164-the-owners-tuning-calls';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1163-the-pressure-test';

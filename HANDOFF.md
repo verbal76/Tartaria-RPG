@@ -1273,7 +1273,63 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ WELCOME BACK ALWAYS WINS (2026-08-06, latest). BOTH LINES.** HAL
+- **⚠⚠ THE HANDOFF WINDOW (2026-08-06, latest). BOTH LINES.** HAL OTA-1167 /
+  golem OTA-1144. Owner, on the very next load after 1166 shipped:
+  *"reintroduced llm lag."*
+
+  ⚠ **First, what it is NOT.** That load was ~90 minutes after the previous
+  one, so neither the ≥6h while-away beat nor the ≥4h offline recap armed —
+  the single greeting in the log is exactly what OTA-1166 promises, and the
+  pre-1166 code would have printed the same one line. 1166 touches no LLM or
+  TTS code. The lag is older than 1166 and independent of it.
+
+  ⚠ **What it is — two holes, and OTA-1157 closed neither for this job.**
+  The log:
+
+      [:25.994] arbiter "Welcome back, Verbal. …"      ← text on screen
+      [:29.722] qwen⏱  item_synthesis preempted 3565ms in 328t→out 0t
+      [:30.714] voice⏱ gap 4720ms (wait 3604ms + synth 849ms)
+
+  1. **The job started AFTER the line was queued.** `speak()` stamps
+     `queuedAt` and hands off to `drain()`, which *awaits* the voice model and
+     a durable crash breadcrumb before it ever calls `runExclusiveNativeMl`.
+     The synthesis took the lock inside that gap. Priority never got a say:
+     at the moment `pumpMl` chose, the voice was not in the pending set.
+     **Ranking cannot order work that has not arrived.**
+  2. **`out 0t` — the preempt could not land.** `stopCompletion()` is polled
+     in llama.cpp's DECODE loop, and this job never reached decode: all
+     3565 ms was PREFILL of a 328-token prompt (~11 ms/tok on a Tensor G5).
+     The hook fired, the outcome is correctly filed `preempted`, and it saved
+     ~40 ms of a ~3.6 s wait — against the pre-1157 log's *wait 3940 ms behind
+     a 3847 ms synthesis*. **Interruption only ever covered the decode half,
+     and this model spends its time in prefill.**
+
+  ⚠ **So the fix is to stop the job STARTING** — neither reordering nor
+  interrupting can reach it. A voice line that needs synthesis RESERVES the
+  native-ML lock the moment it is accepted for speech; work below voice
+  defers until the line arrives or the deadline passes
+  (`VOICE_RESERVATION_MS` = 1200).
+
+  ⚠ **Bounded by construction**, because a leaked reservation would starve the
+  LLM outright: it carries a deadline; it is released the instant the line's
+  audio is in hand (banked, prefetched, or freshly synthesised) and when the
+  queue drains; and it is **never taken for a BANKED line**, which plays from
+  memory and needs no lock — reserving for those would make OTA-1153's
+  pre-synthesis bank cost narration the very time it exists to save.
+  **Exclusivity is untouched**: this schedules STARTS, it never overlaps two
+  native ops (the arb159 crash guarantee is pinned by test).
+
+  ⚠ **Still open, and unfixable from JS:** if an LLM job is ALREADY mid-prefill
+  when a line is queued, the voice still waits it out. The reservation closes
+  the race; only a shorter prompt or a native prefill-interrupt closes the
+  rest. Item synthesis at 328 tokens is the current worst offender at load.
+
+  New suite `ota1167TheHandoffWindow` (13 tests), including a live replay of
+  the device ordering that fails without the reservation; ota1153's
+  presynth-at-enqueue pin retargeted to the named `banked` binding (same call,
+  same place, same one-shot delete).
+
+- **⚠⚠ WELCOME BACK ALWAYS WINS (2026-08-06). BOTH LINES.** HAL
   OTA-1166 / golem OTA-1143. Owner, from the device minutes after 1165
   landed: *"the arbiter fired 3 lines when I started back in the save file"*
   → *"roll out the welcome back always wins."*
