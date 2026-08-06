@@ -27,7 +27,10 @@ import { applyLoreLexicon, cleanForSpeech } from './loreLexicon';
 import { splitSentences } from './sentenceSplitter';
 import { padSilence } from './audioPad';
 import { setMusicDuck } from '../audio/AudioManager';
-import { runExclusiveNativeMl, ML_PRIORITY_VOICE, ML_PRIORITY_HOMEWORK } from '../ai/nativeMlLock';
+import {
+  runExclusiveNativeMl, ML_PRIORITY_VOICE, ML_PRIORITY_HOMEWORK,
+  reserveVoiceSlot, releaseVoiceSlot,
+} from '../ai/nativeMlLock';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exec = require('react-native-executorch') as {
@@ -825,7 +828,13 @@ export function speak(text: string, voiceId?: string | null, channel?: string, o
   }
   const chunks = chunkForSpeech(prepared);
   const resolvedVoice = voiceId ?? arbiterVoiceId();
+  // ⚠ OTA-1144 — does this line need the native-ML lock at all? A banked
+  // (pre-synthesised) chunk plays straight from memory; only a chunk we still
+  // have to infer will contend with a Qwen job, and only that case may reserve.
+  let needsSynth = false;
   for (const [ci, chunk] of chunks.entries()) {
+    const banked = takePresynth(resolvedVoice, chunk);
+    if (!banked) needsSynth = true;
     queue.push({
       id: nextId++, text: chunk, voiceId: resolvedVoice, channel, lineId: id,
       endsSentence: endsOnTerminator(chunk),
@@ -840,9 +849,15 @@ export function speak(text: string, voiceId?: string | null, channel?: string, o
       // ⚠ OTA-1130 — PRE-SYNTHESISED AUDIO, if this line was banked ahead of
       // time. When it hits, drain() plays without inferring at all and the
       // voice lands with the text instead of behind it.
-      resolvedSamples: takePresynth(resolvedVoice, chunk),
+      resolvedSamples: banked,
     });
   }
+  // ⚠ OTA-1144 — CLAIM THE SLOT NOW, not when drain() finally reaches the lock.
+  // Between this push and that call, drain awaits the voice model and a durable
+  // crash breadcrumb; the device log caught an item synthesis taking the lock
+  // inside exactly that gap and holding it for 3.5 s of uninterruptible prefill
+  // while the greeting the player had already read waited to be spoken.
+  if (needsSynth) reserveVoiceSlot();
   void drain();
   return id;
 }
@@ -875,6 +890,9 @@ async function drain(): Promise<void> {
   if (!next) {
     // Nothing left to speak — restore music to full volume.
     void setMusicDuck(false);
+    // OTA-1144 — the queue drained (every line spoken, or the stale sweep took
+    // them). Nothing is coming to claim the reservation, so drop it now.
+    releaseVoiceSlot();
     return;
   }
   currentlySpeaking = next;
@@ -924,6 +942,11 @@ async function drain(): Promise<void> {
         ? next.resolvedSamples
         : prefetchStillValid ? await next.prefetch! : await inferSerial(model, next.text, settings.rate, timing),
     );
+    // ⚠ OTA-1144 — the audio for this chunk is in hand (banked, prefetched, or
+    // just synthesised under the lock), so the reservation has done its job.
+    // Released HERE rather than left to expire so an LLM job waits the real
+    // handoff — a few hundred ms — and never the whole deadline.
+    releaseVoiceSlot();
     const synthMs = Date.now() - tBeforeInfer - timing.waitMs;
     if (next.queuedAt != null && next.lineHead) {
       const source = preSynthed ? 'cached' : prefetchStillValid ? 'prefetch' : 'live';
