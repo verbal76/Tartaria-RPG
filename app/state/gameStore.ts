@@ -1843,11 +1843,28 @@ const WELCOME_BACK_LINES = [
   `The Arbiter sets the quiet aside. "Welcome back, {name}. I kept watch while you were gone."`,
 ];
 
-function welcomeBackLine(player: PlayerCharacter | null | undefined): string {
+// ⚠ OTA-1143 — WELCOME BACK ALWAYS WINS. When the offline world-recap has
+// something to say, it rides INSIDE the greeting's quote as a follow-on
+// sentence instead of being its own arbiter line — the Arbiter speaks once at
+// load, and the voice reads one warm hello instead of a stack of three.
+// Exported for the ota1143 suite.
+export function welcomeBackLine(
+  player: PlayerCharacter | null | undefined,
+  opts?: { offlineRecap?: boolean },
+): string {
   const first = player?.name?.split(/\s+/)[0];
   const name = first && first.length > 0 ? first : 'friend';
-  const line = WELCOME_BACK_LINES[Math.floor(Math.random() * WELCOME_BACK_LINES.length)]!;
-  return line.replace('{name}', name);
+  let line = WELCOME_BACK_LINES[Math.floor(Math.random() * WELCOME_BACK_LINES.length)]!
+    .replace('{name}', name);
+  if (opts?.offlineRecap) {
+    // Every pool line ends inside a straight double quote; splice the recap in
+    // before it so TTS reads a single continuous Arbiter speech.
+    line = line.replace(
+      /"$/,
+      ` The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."`,
+    );
+  }
+  return line;
 }
 
 // OTA-653 — persistent "current mission" objective line. Playtester was mid-parley
@@ -7866,15 +7883,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // world cue and the Arbiter welcome. Establishes the rhythm
       // that the world doesn't pause for the player — it has been
       // running while they were gone.
+      // ⚠ OTA-1143 — WELCOME BACK ALWAYS WINS. The load beat used to let three
+      // arbiter lines stack (this beat when it drew an arbiter line, the OTA-849
+      // recap, then the greeting) and the voice read the whole pile (owner: "the
+      // arbiter fired 3 lines when I started back in the save file"). The Arbiter
+      // now speaks EXACTLY ONCE at load — the named greeting — so this beat draws
+      // from the WORLD-channel lines only; the arbiter-channel entries stay in the
+      // pool as authored but no longer fire here.
       {
         const livePlayer = get().player;
         const lastEnd = livePlayer?.lastSessionEndedAt;
         const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
         if (lastEnd && Date.now() - lastEnd >= SIX_HOURS_MS) {
-          const beat = WHILE_AWAY_LINES[Math.floor(Math.random() * WHILE_AWAY_LINES.length)]!;
+          const worldBeats = WHILE_AWAY_LINES.filter((l) => l.channel === 'world');
+          const beat = worldBeats[Math.floor(Math.random() * worldBeats.length)]!;
           get().appendLog(beat.channel, beat.line, { skipDedup: true });
         }
       }
+      // OTA-1143 — set by the offline-recap block below, consumed by the welcome
+      // greeting: the recap rides INSIDE the "Welcome back" quote as a second
+      // sentence instead of being its own arbiter line.
+      let offlineRecapPending = false;
       // OTA-849 [living world] — the world actually MOVED while you were away. Real
       // time offline is converted into world pulses (bounded, so a month gone isn't
       // chaos); the faction tides + rumours advance for that gap and the Arbiter
@@ -7921,11 +7950,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               simulatePatrols(get, set, factions, nowH, seed + i + 1);
             }
             if (rumors.length > 0 || (get().worldMemory.patrols ?? []).length > 0) {
-              get().appendLog(
-                'arbiter',
-                `"While you were gone, the waste did not sleep," the Arbiter says. "Blood was spilled and ground changed hands. Read the World for the account."`,
-                { skipDedup: true },
-              );
+              // ⚠ OTA-1143 — no standalone recap line anymore. The recap is folded
+              // into the welcome greeting below (welcome back always wins), so the
+              // Arbiter's return beat is ONE spoken line, not a stack.
+              offlineRecapPending = true;
             }
           }
         }
@@ -7953,7 +7981,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // queue (clears any backlog) instead of waiting behind it.
         get().appendLog(
           'arbiter',
-          welcomeBackLine(get().player),
+          // OTA-1143 — the offline recap (when the world moved) is folded into
+          // this one greeting; see welcomeBackLine. Welcome back always wins.
+          welcomeBackLine(get().player, { offlineRecap: offlineRecapPending }),
           { skipDedup: true, speakFront: true },
         );
         lastWelcomeBackAt = now;

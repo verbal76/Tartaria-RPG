@@ -239,7 +239,10 @@ describe('OTA-1130 — the answers to the other two questions, recorded', () => 
     // Owner asked who writes it. Five authored lines with {name} substituted —
     // the model is not involved, which is worth knowing before anyone tries to
     // fix its voice by changing a prompt.
+    // ⚠ RETARGETED for OTA-1143: welcomeBackLine now chains the {name}
+    // substitution onto the pool pick (so the offline recap can splice in
+    // after it). Still authored, still substituted — the anchor follows.
     expect(STORE).toContain('const WELCOME_BACK_LINES = [');
-    expect(STORE).toContain("line.replace('{name}', name)");
+    expect(STORE).toContain(".replace('{name}', name)");
   });
 });
