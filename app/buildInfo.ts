@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.67';
+export const DISPLAY_VERSION = '4.29.68';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22967,7 +22967,59 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // NARRATION never supplies one, still holds and is what it now
 // asserts).
 // DISPLAY_VERSION 4.29.67.
-export const OTA_BUILD_ID = '2026-08-06-1157-cut-short-for-the-voice';
+// OTA-1158 — THE THREE POINTS OF JEWELLERY.
+// OTA-1156 ended on the claim "one function, one answer,
+// everywhere." The owner found the hole in it on the next build,
+// in one sentence: "my base AC is 10, on the character card's
+// small form it says 15 (armor), when I click on it to expand it
+// it says 18."
+// Both numbers came out of this codebase and neither was a
+// display glitch. The small form calls standingAc. The expanded
+// DEFENCE card calls effectiveACBreakdown, which stands on
+// aggregateArmor — the same function the enemy-attack resolver
+// stands on. So the player was DEFENDED at 18 and TOLD 15.
+// ⚠ THE MISSING THREE POINTS ARE JEWELLERY. aggregateArmor has
+// summed an equipped amulet and up to three rings since OTA-730.
+// standingAc walked ARMOR_SLOTS and nothing else. The catalog
+// holds exactly two AC amulets and two AC rings, all +1 — an
+// amulet and two rings is +3, which is the owner's gap to the
+// point.
+// ⚠ AND A SECOND, QUIETER DRIFT SAT IN THE SAME GAP.
+// resolveDisplayArmorByName finds a piece FIRST-BY-NAME and
+// returns the CATALOG acBonus, while combat resolves the exact
+// worn instance by id and prefers its rolled instanceStats
+// acBonus. Two copies of one piece are SUPPOSED to differ — that
+// is what the durability roll is for — so the panel could read
+// the wrong copy even before the rings were considered.
+// ⚠ WHY THE SUM MOVED RATHER THAN THE RINGS. Adding an amulet
+// loop to standingAc would have made a THIRD inline copy of the
+// same arithmetic — exactly the failure OTA-1156 was written to
+// end, committed by the OTA meant to have ended it.
+// equippedGearAc in equipment.ts is now the implementation and
+// aggregateArmor CALLS it, so combat and the panel cannot answer
+// differently: there is only one answer to give. The store keeps
+// its resistance walk, which genuinely belongs there (combat
+// weights a resist by the slot it came from); only the AC half
+// moved.
+// ⚠ THE COMBAT NUMBER DOES NOT MOVE. This is a display that was
+// under-reporting, not a buff. The precedence inside
+// equippedGearAc is copied from aggregateArmor verbatim — fused
+// by name AND slot, then the rolled instance, then the catalog,
+// and a name in no catalog contributes nothing — including the
+// case where the tempting "improvement" (resolve by id, read
+// uniqueStats regardless of slot) would have quietly raised
+// defence. Tests pin that shape.
+// ⚠ AND THE CARD NOW NAMES THE JEWELLERY. A single "armor +8"
+// chip over a panel reading 15 is what made this need a report to
+// find; "armor +5 · accessories +3" answers it on sight. That is
+// the OTA-1156 lesson about measurements being able to observe
+// what they measure, applied to the surface instead of the log.
+// New suite ota1158ThreePointsOfJewellery (22 tests), including
+// the reproduction: the same character with and without the
+// jewellery, differing by exactly 3.
+// DISPLAY_VERSION 4.29.68.
+export const OTA_BUILD_ID = '2026-08-06-1158-three-points-of-jewellery';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1157-cut-short-for-the-voice';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1156-the-ac-that-never-dropped';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1155-timestamp-the-voice';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1154-stop-rambling';

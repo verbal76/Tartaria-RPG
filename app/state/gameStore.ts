@@ -263,7 +263,7 @@ import {
 import {
   raiseMenace, decayedMenace, menaceIntimidateDcBonus, menaceEncounterBonus,
 } from '../engine/menace';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc, standingAc } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc, standingAc, equippedGearAc } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
 import { applyLegacyItemRenames } from '../engine/itemMigrations';
@@ -33385,8 +33385,17 @@ function describeWornForAcLedger(player: PlayerCharacter): string {
   return parts.join(' ');
 }
 
+// ⚠ OTA-1158 — THE AC HALF OF THIS NOW LIVES IN equipment.ts. What is left here
+// is the RESISTANCE walk, which genuinely belongs to the store: combat weights a
+// resist by the slot it came from, and that per-slot tagging has no other home.
+// The AC sum moved out because it had silently become the second implementation
+// of "what is my gear worth" — this one counted an amulet and three rings,
+// `standingAc` did not, and the owner read 15 on the panel while being defended
+// at 18. One implementation, called from both places, is the only shape that
+// cannot drift again.
 function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances: string[]; resistSlots: ArmorSlotResist[] } {
-  let acBonus = 0;
+  const gearAc = equippedGearAc(player);
+  const acBonus = gearAc.worn + gearAc.accessories;
   const resistances: string[] = [];
   // arb119 — keep each resistance tagged with the SLOT it came from, so combat
   // can weight the diminishing stack (chest counts most, cloak least). The flat
@@ -33407,7 +33416,6 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
       && it.name.toLowerCase() === name.toLowerCase(),
     );
     if (unique?.uniqueStats) {
-      acBonus += unique.uniqueStats.acBonus ?? 0;
       // arb117 — ladder fused armor resistances by rarity too (Rare 2 / Legendary 3),
       // seeded from the synth's single resistance.
       for (const r of fusedArmorResistances(unique.name, unique.uniqueStats.rarity, unique.uniqueStats.resistance)) {
@@ -33424,7 +33432,6 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
     // catalog acBonus so two copies of the same piece differ. Resistances
     // still come from the catalog (not part of the instance roll).
     const inst = resolveEquippedItem(player, slot);
-    acBonus += inst?.instanceStats?.acBonus ?? piece.acBonus;
     // arb116 — rarity/material resistance ladder (not just the ~20 authored pieces).
     for (const r of armorResistances(piece)) {
       resistances.push(r);
@@ -33433,18 +33440,8 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
     // engine_Dev — coating-vial resists worked into this armor instance.
     for (const r of inst?.addedResists ?? []) { resistances.push(r); resistSlots.push({ type: r, slot }); }
   }
-  // OTA-730 — defensive accessories: an equipped amulet + up to three rings can
-  // each carry a flat acBonus that stacks onto the armor AC. (A natural-20 enemy
-  // attack still always hits, so this can't make the player unhittable.)
-  if (eq.amulet) {
-    const a = findAmuletByName(eq.amulet);
-    if (a?.acBonus) acBonus += a.acBonus;
-  }
-  for (const ringName of [eq.ring, eq.ring2, eq.ring3]) {
-    if (!ringName) continue;
-    const r = findRingByName(ringName);
-    if (r?.acBonus) acBonus += r.acBonus;
-  }
+  // OTA-730's amulet + three-ring AC moved into `equippedGearAc` with the rest
+  // of the gear stack (OTA-1158). It was the piece the panel could not see.
   return { acBonus, resistances, resistSlots };
 }
 
@@ -33466,7 +33463,12 @@ export function effectiveACBreakdown(
   const base = player.ac ?? 10;
   const racialAC = effectiveAC(player, scene); // base + race-conditional context delta
   const raceCtxDelta = racialAC - base;
-  const armor = aggregateArmor(player).acBonus;
+  // ⚠ OTA-1158 — SPLIT, so the card can say WHICH gear. A single "armor +8" chip
+  // over a panel reading 15 is what made this take three reports to find; "armor
+  // +5 · accessories +3" answers it on sight.
+  const gearAc = equippedGearAc(player);
+  const armor = gearAc.worn;
+  const accessories = gearAc.accessories;
   // ruins-defense title (Protector / Warden): +AC inside a constructed environment.
   let titleRuinsAc = 0;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -33480,9 +33482,10 @@ export function effectiveACBreakdown(
   const sources: Array<{ label: string; delta: number }> = [];
   if (raceCtxDelta !== 0) sources.push({ label: 'race context', delta: raceCtxDelta });
   if (armor !== 0) sources.push({ label: 'armor', delta: armor });
+  if (accessories !== 0) sources.push({ label: 'accessories', delta: accessories });
   if (titleRuinsAc !== 0) sources.push({ label: 'title (ruins)', delta: titleRuinsAc });
   if (statusAdj !== 0) sources.push({ label: 'stance/cover', delta: statusAdj });
-  const total = Math.max(1, base + raceCtxDelta + armor + titleRuinsAc + statusAdj);
+  const total = Math.max(1, base + raceCtxDelta + armor + accessories + titleRuinsAc + statusAdj);
   return { total, base, sources };
 }
 
