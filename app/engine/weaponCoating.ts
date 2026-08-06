@@ -142,8 +142,9 @@ export const COATING_DOT_TURNS = 3;
 export const COATING_RESIST_LAND_CHANCE = 0.15;
 /** AC reduction an acid coating inflicts per landing hit. */
 export const ACID_SHRED_PER_HIT = 1;
-/** Base cap on accumulated acid armor shred per enemy (normal foes). */
-export const ACID_SHRED_MAX = 5;
+/** Base cap on accumulated acid armor shred per enemy (normal foes).
+ *  ⚠ OTA-1173 (owner tuning) — 5 → 3. See the acid block below for why. */
+export const ACID_SHRED_MAX = 3;
 /** OTA-480 — extra shred headroom against a BOSS, so acid can strip the +6
  *  boss-AC bonus that makes high-tier Core Guardians a "find another way" wall.
  *  A normal enemy still caps at 5 (no trivialising trash); a guardian can be
@@ -159,6 +160,61 @@ const ACID_SHRED_BOSS_BONUS = 2;
 /** Per-enemy shred cap: base + boss headroom. */
 export function acidShredCap(enemy: { boss?: boolean } | null | undefined): number {
   return ACID_SHRED_MAX + (enemy?.boss ? ACID_SHRED_BOSS_BONUS : 0);
+}
+
+// ─── ⚠ OTA-1173 — THE ACID BATCH (owner tuning, three dials) ────────
+//
+// Owner: *"I throw acid on everything and I use the coatings for my weapon and
+// armor for resists and added damage … I'm just mowing through people. I might
+// have made the player too powerful."*
+//
+// ⚠ ACID IS THE ONLY COATING THAT MULTIPLIES THE OTHERS. Poison and corruption
+// add damage; acid adds ACCURACY, and accuracy scales everything else on the
+// swing. Stack it under a dual-coated bludgeon and the acid is what makes the
+// flame and the frost land. It also has the cheapest recipe in the game by a
+// wide margin (Aether Dust ×1 + Scrap Metal ×1 — the only two-ingredient,
+// one-each coating), so it is always available, which is why it is always used.
+// The design problem is not that acid is strong; it is that acid gets STRONGER
+// as enemies get tankier, so ramping difficulty feeds it rather than answering
+// it.
+//
+// Three dials, per the owner's call:
+//
+//   1. ACID_SHRED_MAX 5 → 3 (above). Five points off a ~19 AC boss is roughly a
+//      25-point swing in hit rate, permanent for the fight. Three keeps acid the
+//      clear best opener without ending the to-hit roll.
+//
+//   2. Shred DECAYS (below). It used to be permanent once applied: one flask in
+//      round one carried the entire fight. Now a guard you stop burning knits
+//      back at ACID_SHRED_DECAY_PER_ROUND per round — but ONLY once the acid DOT
+//      has expired, so the coating still HOLDS its ground while it is live.
+//      Keep applying and you keep the shred; walk away and it closes.
+//
+//   3. A second coating lands at SECOND_COAT_EFFECT_MULT. The Crucible's
+//      dual-slot upgrade stays worth having — two elements means two weakness
+//      angles, and that is the reason to want it — but the second slot no longer
+//      pays full freight on top of the first.
+//
+// ⚠ Dial 2 deliberately does NOT decay while the DOT is live. A flat decay would
+// cancel the +1 per hit exactly and shred would never accumulate at all, which
+// deletes the mechanic instead of tuning it.
+
+/** OTA-1173 — AC the target's guard recovers per round once the acid DOT has
+ *  lapsed. Zero while a live acid coat keeps burning. */
+export const ACID_SHRED_DECAY_PER_ROUND = 1;
+
+/** OTA-1173 — effect multiplier on the SECOND coating slot of a dual-coated
+ *  weapon. Scales that proc's rolled value, which is the one number driving both
+ *  its immediate bonus damage and its per-turn DOT, so one multiplier covers
+ *  both. Slot 1 is untouched. Acid shred and corruption stacks are NOT scaled —
+ *  they are already bounded by their own caps, so a second acid coat only
+ *  reaches the same ceiling sooner. */
+export const SECOND_COAT_EFFECT_MULT = 0.5;
+
+/** Apply SECOND_COAT_EFFECT_MULT to a slot-2 proc's rolled value. Floors at 1:
+ *  a coating that landed always does something, or the log reads as a bug. */
+export function secondCoatRolled(rolled: number): number {
+  return Math.max(1, Math.round(rolled * SECOND_COAT_EFFECT_MULT));
 }
 /** Extra DOT-per-turn a corruption coating gains per accumulated stack. */
 export const CORRUPTION_STACK_BONUS = 1;
