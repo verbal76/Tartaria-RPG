@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import type { GameLogEntry, LogChannel } from '../engine/types';
+import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog';
 
 interface Props {
   entries: GameLogEntry[];
@@ -55,12 +56,12 @@ const channelColors: Record<LogChannel, string> = {
   mission: MISSION_COLOR,
 };
 
-// `cognitive` (MiniLM emotion/intent) and `debug` (parser, combat range
-// transitions) are diagnostic noise — kept in the on-disk log via
-// COPY ALL but never shown in-game. `system` is now folded visually into
-// the world voice; the underlying channel is preserved so the on-disk
-// log is still searchable.
-const HIDDEN_CHANNELS: ReadonlySet<LogChannel> = new Set(['cognitive', 'debug']);
+// The hidden-channel list moved to engine/gameLog so the playtest harness can
+// grade the feed the PLAYER reads against the same rule this screen renders
+// by — see HIDDEN_LOG_CHANNELS there for why there is only one copy.
+// `system` is folded visually into the world voice; the underlying channel is
+// preserved so the on-disk log is still searchable.
+const HIDDEN_CHANNELS = HIDDEN_LOG_CHANNELS;
 
 // Only these channels get a label tag above the text. Everything else
 // is rendered as voiceless prose — colored, but without a SYSTEM /
@@ -174,7 +175,15 @@ export function AdventureFeed({ entries, enemyNames }: Props) {
         // for the same at-a-glance scan. Playtester: "if I do damage
         // please put that wording in green ... if they attack and
         // miss me put just the word Miss in green at the end".
-        const meta = entry.meta as { combatOutcome?: 'player_dmg' | 'enemy_miss' } | undefined;
+        // OTA-1074 — `storyBeat` rides alongside combatOutcome on the same
+        // meta bag. A flag rather than a LogChannel member on purpose: the
+        // channel drives TTS routing, HIDDEN_CHANNELS and the copy-all export,
+        // and a story beat needs none of that changed — only how it LOOKS.
+        const meta = entry.meta as {
+          combatOutcome?: 'player_dmg' | 'enemy_miss';
+          storyBeat?: boolean;
+        } | undefined;
+        const isStoryBeat = meta?.storyBeat === true;
         const outcome = entry.channel === 'combat' ? meta?.combatOutcome : undefined;
         const tag = tagForChannel(entry.channel);
         // Enemy highlighting only applies to ambient narration — skip it
@@ -203,6 +212,20 @@ export function AdventureFeed({ entries, enemyNames }: Props) {
         }
 
         const color = channelColors[entry.channel];
+        // OTA-1074 — a story beat keeps its channel voice (the Arbiter still
+        // sounds like the Arbiter) and gains a rule above it plus a STORY chip.
+        // The rule is what actually does the work: it breaks the wall of feed
+        // text so the eye stops, which is the whole complaint — the main quest
+        // turning over scrolled past looking exactly like "✦ Rusted Bolt".
+        if (isStoryBeat) {
+          return (
+            <View key={entry.id} style={styles.storyEntry}>
+              <View style={styles.storyRule} />
+              <Text style={styles.storyTag}>STORY</Text>
+              <Text style={[styles.body, styles.storyBody, { color }]}>{entry.text}</Text>
+            </View>
+          );
+        }
         return (
           <View key={entry.id} style={styles.entry}>
             {tag ? <Text style={[styles.tag, { color }]}>{tag}</Text> : null}
@@ -255,4 +278,19 @@ const styles = StyleSheet.create({
   entry: { marginBottom: 24 },
   tag: { fontSize: 10, fontWeight: '700', letterSpacing: 2, marginBottom: 4 },
   body: { fontSize: 14, lineHeight: 22 },
+  // OTA-1074 — story beats. Extra air above and below so the beat sits in its
+  // own space rather than in the column of loot lines, a gold rule to stop the
+  // eye, and slightly larger, looser type. Gold (#c9a86a) is the house accent
+  // already used by MissionCompleteModal and the naming cards, so a story beat
+  // reads as the same class of event as a VICTORY card without being one.
+  storyEntry: { marginBottom: 28, marginTop: 12 },
+  storyRule: { height: 1, backgroundColor: '#7a6640', marginBottom: 10 },
+  storyTag: {
+    color: '#c9a86a',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 3,
+    marginBottom: 6,
+  },
+  storyBody: { fontSize: 15, lineHeight: 25 },
 });

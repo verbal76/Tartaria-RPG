@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   rowNameCleared: { color: '#c9a86a', fontStyle: 'italic' },
   rowHeight: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, fontWeight: '700' },
   rowHeightCleared: { color: '#c9a86a' },
-  staminaNote: { color: '#8a7a52', fontSize: 12, marginTop: 10, textAlign: 'center', letterSpacing: 1 },
+  staminaNote: { color: '#6b5c3a', fontSize: 12, marginTop: 10, textAlign: 'center', letterSpacing: 1 },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, minWidth: 80, alignItems: 'center' },
   btnPressed: { opacity: 0.7 },

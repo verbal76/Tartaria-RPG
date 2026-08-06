@@ -30,7 +30,14 @@
 // right answer depends on the canonical Tartaria pronunciation and
 // how espeak's letter-to-sound rules treat specific letter combos.
 
-const LEXICON: Array<[RegExp, string]> = [
+// ⚠ OTA-1170 — an entry may now supply a FUNCTION instead of a fixed string.
+// Only the Aether catch-all needs it, and only to keep the file's own
+// convention: every other entry replaces the whole word with a lowercase
+// respelling, but a prefix rule leaves the tail exactly as authored — so
+// "AETHERSTORM" would come out "aytherSTORM", and espeak spells all-caps runs
+// out letter by letter. Lowercasing the tail keeps one word one word.
+type LexiconReplacement = string | ((match: string, ...groups: string[]) => string);
+const LEXICON: Array<[RegExp, LexiconReplacement]> = [
   // Aether family — playtester spec OTA-107 (final, after a
   // round of IPA-driven detours in OTAs 103/105/106). User's
   // canonical pattern is UNIFORM across the family: long-A "ay"
@@ -44,11 +51,45 @@ const LEXICON: Array<[RegExp, string]> = [
   //   Aetherstone  → "ay thur stone"
   //   Aetherborn   → "ay thur born"
   //   Aetherbat    → "ay thur bat"
-  [/\bAetherstone\b/gi, 'ay thur stone'],
-  [/\bAetheric\b/gi, 'ay thur ik'],
-  [/\bAetherborn\b/gi, 'ay thur born'],
-  [/\bAetherbat\b/gi, 'ay thur bat'],
-  [/\bAether\b/gi, 'ay thur'],
+  // ⚠ OTA-1170 — "ay thur" → "ayther", AND IT IS A PREFIX RULE NOW.
+  // Owner: *"aether should be āther … anything starting with aether should
+  // have it start with āther for pronunciation not spelling."*
+  //
+  // TWO CHANGES, and the second is the bigger one.
+  //
+  // 1. ONE WORD, NOT TWO. OTA-107 wrote the head as "ay thur" — two
+  //    space-separated tokens, which is precisely what the file's own header
+  //    says espeak treats as two separate words. So it was read as two
+  //    stressed beats, AY · THUR, when the canon is a single smooth trochee:
+  //    ā-ther. Closing the space makes espeak stress it once and glide the
+  //    schwa, which is what the macron in the owner's "āther" is asking for.
+  //
+  // 2. ⚠ IT NOW COVERS THE WHOLE FAMILY, BECAUSE THE OLD LIST DID NOT. Five
+  //    entries were enumerated (Aether / Aetheric / Aetherstone / Aetherborn
+  //    / Aetherbat) and the content carries TWENTY: Aetherkin, Aethercraft,
+  //    Aethercrafted, Aethercrafters, Aetherium, Aetherforge, Aetherforged,
+  //    Aetherstorm, Aetherstorms, Aetherwing, Aetherwave, Aetherflame,
+  //    Aetherlight, Aetherbound, Aethereal, Aetherons… Every one of those fell
+  //    straight through to espeak's own letter-to-sound rules, which is the
+  //    mispronunciation this family was respelled to prevent in the first
+  //    place. A prefix rule cannot miss the next one someone authors — which
+  //    is exactly what the owner asked for with "anything starting with".
+  //
+  // The named compounds keep their space before a SEPARATE ENGLISH WORD
+  // (stone / born / bat / kin), because espeak gives a real word its own clean
+  // letter-to-sound pass; bare suffixes like -ic and -ium stay attached so the
+  // stress lands ay-THER-ik rather than AY-ther · ICK.
+  [/\bAetherstone\b/gi, 'ayther stone'],
+  [/\bAetherborn\b/gi, 'ayther born'],
+  [/\bAetherbat\b/gi, 'ayther bat'],
+  [/\bAetherkin\b/gi, 'ayther kin'],
+  [/\bAetheric\b/gi, 'aytheric'],
+  [/\bAether\b/gi, 'ayther'],
+  // ⚠ THE CATCH-ALL, and it must sort LAST of the family. Any remaining
+  // Aether-prefixed word keeps its own tail and just gains the right head:
+  // Aetherstorm → aytherstorm, Aethercraft → aythercraft. No \b on the right,
+  // because the whole point is that the word CONTINUES.
+  [/\bAether([a-z]+)/gi, (_m: string, tail: string) => `ayther${tail.toLowerCase()}`],
 
   // Place names — long-vowel + multi-syllable mishaps.
   // Tartar* family is two beats: "tar" + the rest as one rapid stress
@@ -114,8 +155,22 @@ const LEXICON: Array<[RegExp, string]> = [
 // pre-empted by "Aether" matching the first 6 chars (\b boundaries
 // usually prevent this, but the safety belt protects against future
 // authors adding overlapping entries out of order).
-const SORTED_LEXICON: Array<[RegExp, string]> = [...LEXICON]
-  .sort((a, b) => b[0].source.length - a[0].source.length);
+// ⚠ OTA-1170 — and a SECOND key, ahead of length: catch-alls run LAST.
+// Length alone got this exactly backwards for the Aether family. The prefix
+// rule's source (`\bAether(?=[a-z])`, 17 chars) is LONGER than the named
+// compound it must never pre-empt (`\bAetherstone\b`, 15), so sorting by
+// length alone would have fired the catch-all first and turned every
+// "ayther stone" into "aytherstone" — silently, since both still sound
+// roughly right and no test would have been looking. A pattern that ends in a
+// lookahead is by definition the fallback for whatever the named entries
+// missed, so it sorts after all of them regardless of how long it is.
+const isCatchAll = (re: RegExp): boolean => !re.source.endsWith('\\b');
+const SORTED_LEXICON: Array<[RegExp, LexiconReplacement]> = [...LEXICON]
+  .sort((a, b) => {
+    const catchAllDelta = (isCatchAll(a[0]) ? 1 : 0) - (isCatchAll(b[0]) ? 1 : 0);
+    if (catchAllDelta !== 0) return catchAllDelta;
+    return b[0].source.length - a[0].source.length;
+  });
 
 // 2026-05-25 [TTS-1] — IPA-override channel. The user asked "we
 // should see if kokoro can read ipa text" with /tɑːrˈtɑːriə/ as
@@ -159,9 +214,80 @@ const IPA_OVERRIDES_ENABLED = false;
 export function applyLoreLexicon(text: string): string {
   let out = IPA_OVERRIDES_ENABLED ? applyIPAOverrides(text) : text;
   for (const [pattern, replacement] of SORTED_LEXICON) {
-    out = out.replace(pattern, replacement);
+    out = typeof replacement === 'string'
+      ? out.replace(pattern, replacement)
+      : out.replace(pattern, replacement);
   }
-  return out;
+  // ⚠ OTA-1169 — LAST, and that ordering is load-bearing. The article's
+  // pronunciation depends on the sound of the word AFTER it, and the
+  // respellings above CHANGE that sound: "the Aether" becomes "the ay thur",
+  // consonant-initial on the page and vowel-initial in the mouth. Running this
+  // after the loop means it judges the text espeak will actually receive.
+  return respellTheArticle(out);
+}
+
+// ⚠ OTA-1169 — "THE" IS TWO WORDS, and Kokoro only ever says one of them.
+//
+// Owner: *"kokoro pronounces the as thee it should be pronounce thuh or tha."*
+//
+// English has two articles spelled "the": /ðə/ ("thuh") before a consonant
+// SOUND, and /ðiː/ ("thee") before a vowel SOUND. Every native speaker
+// switches between them without noticing, which is exactly why hearing the
+// wrong one is so grating — "thee blade", "thee guardian", "thee dog" reads as
+// someone spelling the word out rather than speaking it.
+//
+// ⚠ IT IS THE SOUND THAT DECIDES, NOT THE LETTER, and that is the whole
+// difficulty. "the hour" is thee (silent h → vowel sound). "the university" is
+// thuh (the u says "yoo" → consonant sound). "the unknown" is thee (the u says
+// "uh"). So a bare /^[aeiou]/ test gets the two most common shapes in this
+// game's prose backwards, and both lists below exist to catch them:
+//   · VOWEL_SOUND  — consonant letter, vowel sound (hour, honest, heir).
+//   · CONSONANT_SOUND — vowel letter, consonant sound (use, unit, one, euro).
+// Both are whole-word anchored on purpose: a `uni` PREFIX match would swallow
+// "uninformed" / "uninvited" / "unimportant", which are vowel-sound words and
+// far more common here than "unicorn".
+const THE_VOWEL_SOUND = /^(?:hour(?:s|ly)?|honest(?:y|ly)?|hono(?:u)?rs?|honou?rable|heirs?|heirloom)$/i;
+const THE_CONSONANT_SOUND = new RegExp('^(?:' + [
+  'use[sdr]?', 'using', 'useful', 'useless', 'usual(?:ly)?',
+  'unit(?:s|e|ed|ing|y)?', 'unions?', 'unique(?:ly)?', 'uniforms?', 'unison',
+  'univers(?:e|es|al|ally|it(?:y|ies))', 'unicorns?', 'unilateral(?:ly)?',
+  'utensils?', 'utilit(?:y|ies)', 'uranium', 'ukuleles?',
+  'eu\\w*', 'ewes?', 'ones?', 'once',
+].join('|') + ')$', 'i');
+
+/** ⚠ THE RESPELLING ITSELF. "thuh" is the owner's own first suggestion and the
+ *  conventional audiobook respelling. If it comes back voiced wrong on device —
+ *  a "thumb" th instead of a "this" th, which is the one real risk, since
+ *  espeak-ng gives word-initial `th` its voiceless reading for words it does
+ *  not know — the alternates to try, in order, are "thuh" → "thu" → "tha".
+ *  Changing this ONE constant is the whole knob; nothing else needs touching. */
+export const THE_SCHWA_RESPELLING = 'thuh';
+
+/** True when the next spoken word BEGINS WITH A VOWEL SOUND, so "the" keeps
+ *  its "thee" reading. Exported for the suite — the two exception lists are the
+ *  part worth pinning. */
+export function startsWithVowelSound(word: string): boolean {
+  const w = word.replace(/^[^A-Za-z]+/, '');
+  if (!w) return false;
+  if (THE_VOWEL_SOUND.test(w)) return true;
+  if (THE_CONSONANT_SOUND.test(w)) return false;
+  return /^[aeiou]/i.test(w);
+}
+
+/** Rewrite the "thuh" article for TTS only. The visible log keeps "the" — this
+ *  runs on the copy handed to the engine, like every other lexicon entry. */
+export function respellTheArticle(text: string): string {
+  // Lookahead, so the following word is inspected but NOT consumed — otherwise
+  // "the the" would leave the second one unexamined.
+  // The optional punctuation class matters: an opening quote or bracket sits
+  // between the article and its noun often enough in this game's prose
+  // (`the "blade"`, `the (broken) rope`) that skipping those lines would leave
+  // the loudest ones — quoted item names — still saying "thee".
+  return text.replace(
+    /\bthe\b(?=(\s+)(["'“‘([]*)([A-Za-z][A-Za-z'’-]*))/gi,
+    (match, _space: string, _punct: string, nextWord: string) =>
+      (startsWithVowelSound(nextWord) ? match : THE_SCHWA_RESPELLING),
+  );
 }
 
 /**

@@ -12,6 +12,12 @@ import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
+// OTA-1089 — Phase 4 difficulty, and the only place it can be eased.
+import {
+  PRESET_TIERS, PRESSURE_PROFILES, pressureOf, canChangeTo,
+} from '../engine/pressure';
+// OTA-1090 — Phase 5: where the Arbiter stands, and what he thinks of you.
+import { arbiterSheetLines } from '../engine/arbiterPersona';
 import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { barehandDamageFor } from '../engine/raceMechanics';
@@ -55,6 +61,7 @@ export function CharacterScreen() {
   const scene = useGameStore((s) => s.currentScene);
   const worldMemory = useGameStore((s) => s.worldMemory);
   const setScreen = useGameStore((s) => s.setScreen);
+  const replayStoryIntro = useGameStore((s) => s.replayStoryIntro); // OTA-1046
   // arb119 — per-section collapse (hook must precede the early return below).
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   // OTA-848 — tap-to-expand: the AC breakdown, and which title's provenance is open.
@@ -88,6 +95,10 @@ export function CharacterScreen() {
     : `${barehand.count}d${barehand.sides}${barehand.bonus > 0 ? '+' : ''}${barehand.bonus}`;
   const tier = corruptionTierOf(player.corruption ?? 0);
 
+  // OTA-1090 [Phase 5] — where the Arbiter stands in the arc, what he thinks
+  // of this character, and the itemised reasons for it.
+  const arbiter = arbiterSheetLines(player, worldMemory);
+
   // OTA-843 [Chronicle] — assemble the character's legend from accreted state
   // (memorable beats + milestones + titles + corruption + main-quest progress).
   const chronicle = buildChronicle(player, worldMemory?.memorableEvents, {
@@ -101,6 +112,8 @@ export function CharacterScreen() {
   // arb119 — section header helper, mirroring the inventory headers: each section
   // title is a tappable plate (semi-transparent backing so the gold label reads
   // over any background) with a ▾/▴ chevron that folds the section away.
+  const setPressure = useGameStore((st) => st.setPressure); // OTA-1089
+
   const sectionHeader = (key: string, label: string) => (
     <TouchableOpacity
       style={styles.sectionHeaderBar}
@@ -132,7 +145,20 @@ export function CharacterScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title} accessibilityRole="header">CHARACTER</Text>
-        <View style={{ width: 80 }} />
+        {/* OTA-1046 — REPLAY OPENING lives here now (owner's placement:
+            "across the top is back, character, and then replay opening").
+            The crawl overlay mounts globally, so it plays right over this
+            screen — no navigation needed. */}
+        <TouchableOpacity
+          onPress={() => replayStoryIntro()}
+          style={styles.replayBtn}
+          hitSlop={8}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Replay the opening crawl"
+        >
+          <Text style={styles.replayText}>REPLAY{'\n'}OPENING</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
@@ -159,6 +185,76 @@ export function CharacterScreen() {
             <Text style={styles.barValue}>{player.stamina}/{player.staminaMax}</Text>
           </View>
         </View>
+
+        {/* ── HOW MUCH IT TAKES ─────────────────────────────────── */}
+        {/* OTA-1089 — PHASE 4's toggle, after creation. It lives on the sheet
+            rather than a settings menu because it is a fact about this
+            character, like their race — and the plan's warning that overtuned
+            pressure is the likeliest way to make the game worse is exactly why
+            the escape hatch has to be somewhere a struggling player will find
+            it. ⚠ LOWER ONLY: higher tiers render as plain text, not buttons,
+            so the rule is visible rather than enforced by a refusal. */}
+        {sectionHeader('pressure', 'HOW MUCH IT TAKES')}
+        {!collapsed.pressure && (
+        <View style={styles.card}>
+          {PRESET_TIERS.map((id) => {
+            const prof = PRESSURE_PROFILES[id];
+            const current = pressureOf(player) === id;
+            const lowerable = !current && canChangeTo(pressureOf(player), id);
+            return (
+              <TouchableOpacity
+                key={id}
+                style={[styles.kvRow, { flexDirection: 'column', alignItems: 'flex-start', opacity: current || lowerable ? 1 : 0.35 }]}
+                onPress={lowerable ? () => setPressure(id) : undefined}
+                disabled={!lowerable}
+                activeOpacity={0.7}
+                accessibilityRole={lowerable ? 'button' : 'text'}
+                accessibilityState={{ selected: current, disabled: !lowerable }}
+                accessibilityLabel={`${prof.label} ${prof.subtitle}${current ? '. Current.' : lowerable ? '. Tap to ease to this.' : '. Cannot be raised.'}`}
+              >
+                <Text style={styles.kvKey}>{current ? '▸ ' : ''}{prof.label}</Text>
+                <Text style={styles.kvValue}>{prof.subtitle}</Text>
+              </TouchableOpacity>
+            );
+          })}
+          <Text style={styles.kvValue}>
+            You can ease what the mud takes at any time. You can never raise it again.
+          </Text>
+        </View>
+        )}
+
+        {/* ── THE ARBITER ───────────────────────────────────────── */}
+        {/* ⚠ OTA-1090 — PHASE 5. Where he stands in the arc, what he currently
+            thinks of you, and the ITEMISED WHY.
+            A hidden opinion score is the same legibility failure the Phase 4
+            tide lines were written to close: the game quietly decides something
+            about the player and never says what moved it, so the character just
+            starts feeling differently-written for no reason they can name.
+            Every contribution regardScore() sums is listed here, signed, in the
+            same words the engine used. */}
+        {arbiter && (
+          <>
+            {sectionHeader('arbiter', 'THE ARBITER')}
+            {!collapsed.arbiter && (
+            <View style={styles.card}>
+              <Text style={styles.kvKey}>{arbiter.stance}</Text>
+              <Text style={styles.kvValue}>{arbiter.regard}</Text>
+              {arbiter.parts.length > 0 && (
+                <View style={{ marginTop: 10 }}>
+                  {arbiter.parts.map((part, i) => (
+                    <View key={i} style={styles.kvRow}>
+                      <Text style={styles.kvValue}>{part.label}</Text>
+                      <Text style={[styles.kvValue, { color: part.value >= 0 ? '#7a8a5a' : '#a85a3a' }]}>
+                        {part.value >= 0 ? '+' : ''}{part.value}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+            )}
+          </>
+        )}
 
         {/* ── CHRONICLE ─────────────────────────────────────────── */}
         {/* OTA-843 — the character's legend: a headline, a short deed-list, and the
@@ -867,6 +963,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  // OTA-1046 — header REPLAY OPENING button; sized to balance the BACK pill.
+  replayBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  replayText: { color: '#8aa0a4', fontSize: 10, letterSpacing: 2, fontWeight: '700', textAlign: 'center', lineHeight: 14 },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
   placeholder: { color: '#c9a86a', textAlign: 'center', marginTop: 80 },
   scroll: { flex: 1 },

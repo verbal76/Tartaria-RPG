@@ -152,7 +152,7 @@ describe('OTA-124 vandalistic — rescue scenario × race matrix (engine surface
       return store;
     }
 
-    it('full flow: spawn captor → kill captor → onboarding fires → 3 stages finalize → dog populated + hooks dead', async () => {
+    it('full flow: spawn captor → kill captor → onboarding fires → popup commit finalizes → dog populated + hooks dead', async () => {
       const store = await bootAetherbornPlayer();
       const captor = spawnRescueCaptor('smelter', store.getState().player?.factionId ?? null);
       // Inject the captor + the chainMemo so completeRescueScenario
@@ -197,16 +197,14 @@ describe('OTA-124 vandalistic — rescue scenario × race matrix (engine surface
       expect(onboarding).toBeTruthy();
       expect(onboarding?.stage).toBe('breed');
       expect(onboarding?.rescueData.scenario).toBe('smelter');
-      // Stage 1: breed
-      store.getState().submitPlayerAction('one-eared mutt');
-      expect(store.getState().worldMemory.pendingDogOnboarding?.stage).toBe('name');
-      expect(store.getState().worldMemory.pendingDogOnboarding?.breed).toBe('one-eared mutt');
-      // Stage 2: name
-      store.getState().submitPlayerAction('Rust');
-      expect(store.getState().worldMemory.pendingDogOnboarding?.stage).toBe('sex');
-      expect(store.getState().worldMemory.pendingDogOnboarding?.name).toBe('Rust');
-      // Stage 3: sex
-      store.getState().submitPlayerAction('boy');
+      // OTA-1050 — typed input is never an answer anymore; the popup commits
+      // all three fields at once. A stray typed line first, to prove it
+      // cannot corrupt the pending ask...
+      store.getState().submitPlayerAction('rest');
+      expect(store.getState().worldMemory.pendingDogOnboarding?.breed).toBeUndefined();
+      expect(store.getState().player?.dog).toBeFalsy();
+      // ...then the DogOnboardingModal commit.
+      store.getState().confirmDogOnboarding('one-eared mutt', 'Rust', 'boy');
       const wm = store.getState().worldMemory;
       expect(wm.pendingDogOnboarding).toBeNull();
       const dog = store.getState().player?.dog;

@@ -6,7 +6,33 @@ describe('stripArbiterFrame', () => {
   });
 
   it('extracts multiple double-quoted spans, joined with a space', () => {
-    expect(stripArbiterFrame('"X," the Arbiter says, "Y."')).toBe('X, Y.');
+    // ⚠ RE-AUTHORED BY OTA-1161. This test used to expect 'X, Y.' — the exact
+    // output the owner heard as a run-on ("…mean to leave, Good"). The comma
+    // after X was the ATTRIBUTION comma; once the attribution is stripped, the
+    // sentence it closed is over, so the comma is promoted to a full stop and
+    // the TTS gets a terminator to pause on.
+    expect(stripArbiterFrame('"X," the Arbiter says, "Y."')).toBe('X. Y.');
+  });
+
+  it('⚠ OTA-1161 — a genuine mid-sentence handoff KEEPS its comma', () => {
+    // "You attack," he said, "as if you mean to leave." — the second span
+    // continues the first sentence (lowercase start), so promoting the comma
+    // would break the sentence in half.
+    expect(stripArbiterFrame('"You attack," he said, "as if you mean to leave."'))
+      .toBe('You attack, as if you mean to leave.');
+  });
+
+  it('⚠ OTA-1161 — the owner\'s exact line from the device log', () => {
+    expect(stripArbiterFrame('"You attack as if you mean to leave," the Arbiter murmurs. "Good."'))
+      .toBe('You attack as if you mean to leave. Good.');
+    expect(stripArbiterFrame('"Footwork over fury," the Arbiter says quietly. "The drone is patient."'))
+      .toBe('Footwork over fury. The drone is patient.');
+  });
+
+  it('⚠ OTA-1161 — a single trailing-comma quote gets its stop too', () => {
+    // No second span at all: the sentence still ended where the attribution
+    // began, so it still deserves the terminator.
+    expect(stripArbiterFrame('"Hold the line," the Arbiter says.')).toBe('Hold the line.');
   });
 
   it('handles curly-quote characters', () => {
@@ -43,7 +69,8 @@ describe('stripArbiterFrame', () => {
 
   it('strips frame even with multiple comma-separated narrator clauses before the quote', () => {
     // Common Arbiter pattern: "X," the Arbiter says, weighing the word, "Y."
-    expect(stripArbiterFrame('"X," the Arbiter says, weighing the word, "Y."')).toBe('X, Y.');
+    // (RETARGETED BY OTA-1161 — the attribution comma promotes to a stop.)
+    expect(stripArbiterFrame('"X," the Arbiter says, weighing the word, "Y."')).toBe('X. Y.');
   });
 
   it('preserves apostrophes inside the speech', () => {

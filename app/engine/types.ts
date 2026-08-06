@@ -17,6 +17,10 @@ export type Intent =
   | 'ask'
   | 'craft'
   | 'equip'
+  /** OTA-1083 — RESTORED. Removed in OTA-803 because gift-for-rep undercut the
+   *  standing economy; see GIFT_STANDING_FACTION_CAP for how that door is kept
+   *  shut this time. */
+  | 'gift'
   | 'steal'
   | 'join'
   | 'dodge'
@@ -254,6 +258,12 @@ export interface Enemy {
    *  might list ["sentinel", "guardian", "statue"] so `attack the sentinel`
    *  resolves to the canonical entity. Lowercase, no punctuation. */
   aliases?: string[];
+  /** OTA-1139 — this body arrived INSTEAD of a party of N (the `elite`
+   *  difficulty dial). Carries the count so the defeat path can pay the
+   *  party's worth in loot rather than one corpse's: spoils are rolled per
+   *  body, and paying less for a harder fight is the fake-difficulty trap the
+   *  dial exists to avoid. Absent on every ordinary enemy. */
+  eliteReplaced?: number;
   /** OTA-897 (SA-5) — one-line codex "voice": a short, evocative field
    *  description shown in the bestiary (once the foe is recorded) and, briefly,
    *  on the combat enemy panel. Pure flavor — never read by combat logic. */
@@ -672,6 +682,11 @@ export interface FactionStanding { factionId: string; standing: number; }
  *  for the whole group; it bleeds collateral in fights and the escort fails when
  *  it hits 0. `label` is the one-word cargo name shown in the HUD. */
 export interface EscortPool {
+  /** OTA-1080 — the one walking at the front, and the only member of the party
+   *  with an identity. An escort was a pool of hit points with a label; when
+   *  ledger coverage came to escorts there was nobody in it to remember. Absent
+   *  on saves written before this OTA. */
+  leaderName?: string;
   label: string;
   hp: number;
   hpMax: number;
@@ -854,6 +869,11 @@ export type StatusEffectKind =
   // hands). Cleared by drinking a cold coating (the warming counter) or by waiting it
   // out. Gives the new cold coating a real player-side ailment so it's drinkable.
   | 'chilled'
+  // OTA-1112 — anti-stun-lock. Granted automatically the moment a stun or
+  // paralyze takes hold: while braced runs, further incapacitations cannot
+  // land, so a pack of concussive hitters re-rolling 20% per landed blow
+  // can't chain the player's turns away (sim: 844 stuns/run before this).
+  | 'braced'
   | 'dodging'
   // OTA-365 — 'blocking' removed (retired: no engine path ever applied
   // it; the dodge rework folded block into dodge).
@@ -979,15 +999,106 @@ export interface PlayerCharacter {
   name: string;
   raceId: string;
   factionId: string;
+  /** OTA-1041 — THE REASON YOU CAME DOWN. One of engine/story's five motive
+   *  ids (debt / missing / exile / calling / record). Picked at character
+   *  creation; saves that predate the feature are dealt one deterministically
+   *  in backfillPlayer so phase-2/3 story beats stay stable per character. */
+  storyMotive?: string;
+  /** OTA-1041 — the opening crawl was seen (or skipped). Old saves are
+   *  backfilled to true so the intro never ambushes an existing character. */
+  storyIntroSeen?: boolean;
+  /** OTA-1045 — TRUE when the player themselves picked this character's
+   *  motive (creation step 3, or the one-time veteran picker). FALSE/absent
+   *  = the motive was dealt by backfill and the load path owes the player
+   *  one "why did you come down?" ask. */
+  storyMotiveChosen?: boolean;
+  /** OTA-1044 — motive-drip beat ids already delivered to the feed (strict
+   *  order, one-shot each; see engine/storyDrip.ts). Absent = none yet. */
+  storyBeatsSeen?: string[];
+  /** ⚠ OTA-1089 — PHASE 4 DIFFICULTY, chosen on the last step of character
+   *  creation and LOWERABLE MID-RUN BUT NEVER RAISABLE (engine/pressure.ts
+   *  canChangeTo). Absent = DEFAULT_PRESSURE ('owed'), which is what every
+   *  save written before this OTA reads as: the game exactly as it has always
+   *  played, plus the two new pressure systems at their gentlest. Anybody who
+   *  finds that too much can drop a tier from Settings without abandoning the
+   *  character, which is the escape hatch that makes an honest default safe. */
+  pressure?: string;
+  /** ⚠ OTA-1136 — the CUSTOM difficulty payload: `{ intensity, systems[] }`.
+   *  Present only when `pressure === 'custom'`; every preset run leaves it
+   *  absent. See engine/pressure.ts normalizeCustom — it is read tolerantly,
+   *  so a hand-edited or newer save cannot throw here. */
+  pressureCustom?: { intensity: string; systems: string[] };
+  /** OTA-1089 — the highest TIDE stage this character has been told about, so
+   *  the crossing line fires once per stage rather than on every step inside
+   *  it. Derived state would be wrong here: the stage is a function of hours,
+   *  and "have you been told" is not. */
+  tideStageSeen?: number;
+  /** ⚠ OTA-1088 — PHASE 3 BRANCH STATE. forkId → optionId, one entry per
+   *  question this character has answered. This is the ONLY thing the fork
+   *  system persists: which fork is due, whether a card should be showing, and
+   *  every downstream consequence are all DERIVED from this map plus state the
+   *  run already carries (see engine/storyForks.ts dueFork).
+   *
+   *  That is deliberate and it is the whole migration story. The build plan
+   *  flagged Phase 3 as "the one place a save-migration bug would be
+   *  unrecoverable for a player mid-arc" — a pending-fork queue can be dropped
+   *  by a crash or a bad backfill, and a dropped fork is a chapter of the
+   *  player's story that silently never happens. A map of answers cannot be
+   *  dropped that way: absent means unanswered means ask again.
+   *
+   *  Absent on every save older than OTA-1088, which reads correctly as "has
+   *  not answered anything yet" — those characters get their questions at the
+   *  next phase they qualify for. Unknown ids from a newer build are ignored
+   *  rather than crashing. */
+  storyChoices?: Record<string, string>;
+  /** ⚠ OTA-1090 — PHASE 5. The one-shot Arbiter beats already SPOKEN
+   *  ('stance:invested', 'regard:warm'), and the only thing the persona system
+   *  persists.
+   *
+   *  His arc and his opinion of you are both PURE FUNCTIONS of the save
+   *  (engine/arbiterPersona.ts) — nothing accumulates a hidden score that a bad
+   *  backfill could drop or a re-entrant world tick could double-count. But
+   *  "has he already said this" is genuinely not derivable from anything else,
+   *  so it is recorded, exactly like tideStageSeen.
+   *
+   *  Absent on every save older than OTA-1090, which reads correctly as "he has
+   *  not said any of it yet" — a long-running character hears the beats they
+   *  have already earned, one per arrival, rather than silently missing the
+   *  whole arc. Unknown keys from a newer build are inert. */
+  arbiterBeatsSeen?: string[];
+  /** ⚠ OTA-1091 — the weather whose stat line the player has ALREADY been
+   *  told about, so the same conditions are not re-announced on every scene.
+   *
+   *  Found by the phases 0-5 playtest harness, which walks a run and reads the
+   *  feed the player actually sees: "Weather effect — Eerie Calm: +1 WIS"
+   *  appeared SIXTEEN times in one walk, because the line fired on every
+   *  beginScene and OTA-1017 persists weather per location for six game-hours
+   *  — so an unchanged sky repeats itself at every arrival.
+   *
+   *  Keyed on the WEATHER, not the location: walking calm → storm → calm should
+   *  say all three, and walking through four calm tiles should say it once.
+   *  Absent on older saves, which reads as "not told yet" and costs one
+   *  redundant line after the update rather than a silence. */
+  weatherEffectSeen?: string;
+  /** OTA-1044 — how The Missing side-thread ended for this character
+   *  ('grave' | 'lie' | 'walker'), set when the resolution fires. Also keys
+   *  the EndingScreen epilogue override. Absent = trail still open. */
+  missingResolved?: string;
   stats: Stats;
   hp: number;
   hpMax: number;
   stamina: number;
   staminaMax: number;
-  /** 2026-05-24 — hunger penalty. Increments by 1 every 8 in-game hours
-   *  without eating, capped at 5. effectiveStaminaMax = staminaMax - this.
-   *  Eating any food consumable resets to 0. Absent for legacy saves,
-   *  backfilled to 0 in backfillPlayer. */
+  /** ⚠ OTA-1141 — SAVE FOSSIL. DO NOT WIRE ANYTHING TO THIS.
+   *  Hunger was a real mechanic once: +1 every 8 in-game hours unfed, capped
+   *  at 5, shrinking the usable stamina ceiling, reset by eating. It was
+   *  REMOVED — "a hidden, unexplained mechanic whose ONLY effect was shrinking
+   *  this cap; food already tops off HP and water already tops off stamina, so
+   *  it just added invisible friction."
+   *  Nothing writes it and nothing reads it. It survives only so a save written
+   *  before the removal still parses, and `backfillPlayer` forces it to 0 on
+   *  load so an old mid-hunger character comes back uncapped. In the game as it
+   *  stands, EATING IS FOR HP AND STAMINA — there is no hunger to lower. */
   hungerStaminaPenalty?: number;
   /** OTA-625 — weather-damage cooldown. After a damaging weather tick this is
    *  set to WEATHER_TICK_GAP and counts down one per action; while > 0 the
@@ -1736,6 +1847,27 @@ export interface WorldMemory {
    *  who they've actually spoken with. Optional + defaulted so
    *  legacy saves load cleanly. */
   npcsMet?: NpcMet[];
+  /** OTA-1072 — per-NPC relationship state, keyed by the same id as npcsMet.
+   *  Absent on saves written before that OTA; seedRelationsFromMet() migrates
+   *  them on first touch rather than in a save-load pass. */
+  npcRelations?: Record<string, NpcRelation>;
+  /** OTA-1077 — recent outpost assaults, newest last, capped. Feeds the "your
+   *  outpost was hit while I was away" beat in a greeting. */
+  recentRaids?: OutpostRaid[];
+  /** OTA-1109 — archetype ids of the last few wasteland encounters, newest
+   *  first, capped at RECENT_ENCOUNTER_MEMORY. The travel picker excludes
+   *  these so an authored set-piece (the Phoenix-Feather scam vendor) can't
+   *  replay back-to-back. */
+  recentEncounterArchetypes?: string[];
+  /** OTA-1081 — how many times each authored talk topic has been raised, keyed
+   *  `<npcId>:<topicId>`. Drives "I have told you that one" rather than
+   *  replaying a line as though neither of you remembers the last two minutes.
+   *  Bounded by the authored topic count, so it cannot grow with play. */
+  talkedTopics?: Record<string, number>;
+  /** OTA-1083 — LIFETIME standing each faction has been granted via gifts.
+   *  Metered against GIFT_STANDING_FACTION_CAP so the verb OTA-803 deleted
+   *  cannot come back as the side door it was deleted for. */
+  giftStandingGranted?: Record<string, number>;
   /** OTA-120 — dog acquisition state machine, lives on world memory
    *  so it survives across screens. ALL player input routes through
    *  the onboarding handler when this is non-null. Cleared on
@@ -1854,6 +1986,123 @@ export interface NpcMet {
   hoursElapsed?: number;
   /** Unix ms timestamp of first meeting. */
   firstMetAt?: number;
+}
+
+/** OTA-1072 — the per-person ledger behind NpcMet. NpcMet answers "have you
+ *  ever stood in a room with this NPC"; this answers "what has passed between
+ *  you". Keyed by the same id. See app/engine/npcMemory.ts. */
+export interface NpcRelation {
+  id: string;
+  name: string;
+  role?: string;
+  factionId?: string;
+  /** Unix ms of the first sighting. */
+  firstMetAt: number;
+  /** Unix ms of the most recent sighting. */
+  lastSeenAt: number;
+  /** player.hoursElapsed at the most recent sighting. */
+  lastSeenHours: number;
+  /** OTA-1075 — player.hoursElapsed at the sighting BEFORE the most recent one.
+   *  This is what an absence line actually needs. `lastSeenHours` is overwritten
+   *  with "now" the moment the player walks in, and the greeting is composed
+   *  after that, so measuring the gap against it always yielded zero — the
+   *  absence line was unreachable in play. Undefined on a first meeting and on
+   *  relations migrated from a pre-OTA-1072 save. */
+  prevSeenHours?: number;
+  /** Scene arrivals in front of this NPC. NOT deduped; repetition is signal. */
+  meetings: number;
+  /** Completed buy/sell transactions. */
+  trades: number;
+  /** TC moved across their table, either direction. */
+  tcTraded: number;
+  contractsTaken: number;
+  contractsTurnedIn: number;
+  /** Thefts, attacks — anything that makes them watch your hands. */
+  wrongs: number;
+  /** OTA-1104 — CLEAN pockets lifted off this person (they never caught you).
+   *  Feeds the delayed "always losing things" mumble: on a later meeting they
+   *  notice the loss out loud WITHOUT suspecting you — the player learns the
+   *  theft registered and that they got away with it. A caught lift records a
+   *  `wrong` instead, never this. */
+  pocketsLifted?: number;
+  /** How many of those losses they have mumbled about. The mumble fires while
+   *  pocketsLifted > pocketsMumbled, once per later meeting — deterministic,
+   *  no roll, and it can never repeat past what was actually taken. */
+  pocketsMumbled?: number;
+  /** OTA-1109 — game-hour stamp of the newest raid this person has told the
+   *  player about. raidNewsFor only surfaces raids NEWER than this, so the
+   *  same sacking is news exactly once (Tarek repeated "the Conspiracy
+   *  Architects raided our outpost" verbatim on four consecutive visits —
+   *  the old gate keyed on prevSeenHours, which quick room-hops inside the
+   *  same hour never advanced). */
+  raidHeardAtHours?: number;
+  /** OTA-1106 — tastes the player has WITNESSED through gift reactions:
+   *  entries like 'loves:metal', 'loves:Aether Mud', 'cold:food'. The gift
+   *  picker shows these — what you've learned, never the authored list. */
+  giftTastes?: string[];
+  /** Gifts that landed LOVED — the proof you honored who they are. Gates the
+   *  return gift alongside trusted regard. */
+  lovedGifts?: number;
+  /** OTA-1106 — the one-time return gift at trusted has been handed over. */
+  returnGiftGiven?: boolean;
+  /** OTA-1076 — TC of honest custom banked toward buying back a caught theft.
+   *  Only coin spent AFTER the wrong counts; see AMENDS_TC_PER_WRONG. */
+  amendsTc?: number;
+  /** How many wrongs have been paid off. Kept so the Chronicle can say a debt
+   *  was settled rather than silently erasing that it ever happened. */
+  amendsCleared?: number;
+  /** OTA-1083 — WHAT YOU GAVE THEM, by name. The owner's requirement in as many
+   *  words: they remember that you gave them that particular item. A warmth
+   *  number would not have been this; the object is the point. Bounded in
+   *  practice by GIFT_BOONS_PER_PERSON plus the repeat decay — there is no
+   *  reason to keep gifting past the cap, and nothing rewards it. */
+  gifts?: { name: string; atHours: number }[];
+  /** ⚠ OTA-1087 — THE LARGEST FACTION-STANDING HIT ALREADY TAKEN FOR BEING
+   *  HOSTILE TO THIS PERSON, as a magnitude. Load-bearing anti-exploit state.
+   *
+   *  applyRepChange propagates HALF of any delta to the target faction's rivals
+   *  with the sign flipped, so a standing LOSS is simultaneously a standing GAIN
+   *  somewhere else. That is fine for a one-off. It is not fine for anything the
+   *  player can repeat at will — and two Phase 1/2 acts were exactly that:
+   *    - a refused gift (-2, and the item is NOT consumed, so it is free);
+   *    - beating a vendor into submission (-12, and they are back next visit).
+   *  Both were unbounded rival-standing farms costing nothing but taps.
+   *
+   *  Recording the MAGNITUDE rather than a boolean is what closes the downgrade
+   *  hole: insulting somebody for -2 must not buy immunity from the -12 for
+   *  putting them on their knees. A later, heavier act tops up the difference; a
+   *  repeat of the same or a lighter one costs nothing, because you have already
+   *  paid for what you are to them. */
+  standingDocked?: number;
+  /** OTA-1083 — how many gifts have actually MOVED this relationship. Capped,
+   *  so warmth stays something you mostly earn by doing rather than shopping. */
+  giftBoons?: number;
+}
+
+/** OTA-1077 — an outpost assault the offscreen war sim actually carried out.
+ *  The sim (OTA-844/864/867) has raided outposts since it shipped, but the
+ *  events it emitted named only FACTIONS and went only to the World board. This
+ *  record keeps the same event joined to the LOCATION and the clock, so the
+ *  people who live there can mention it. */
+export interface OutpostRaid {
+  /** Faction whose outpost was hit. */
+  defenderId: string;
+  defenderName: string;
+  attackerId: string;
+  attackerName: string;
+  /** The defender's home location — FACTION_STARTING_LOCATION[defenderId]. */
+  locationId: string;
+  /** OTA-1078 — the AUTHORED name of that place, resolved at write time.
+   *  The line is spoken by somebody who lives there, and de-slugging the id
+   *  handed them "reclaimer stake" and "pilgrim waycamp" for grounds the game
+   *  calls Reclaimer's Stake and the Tartarian Pilgrim Camp. npcMemory has no
+   *  location catalog and should not grow one, so the store — which already has
+   *  safeLocName — stamps the display name onto the record. Optional: raids
+   *  written before this OTA fall back to the humanised id. */
+  locationName?: string;
+  /** player.hoursElapsed when it happened, so a greeting can ask "since I last
+   *  saw you?" against NpcRelation.prevSeenHours. */
+  atHours: number;
 }
 
 export interface VisitedRoom {

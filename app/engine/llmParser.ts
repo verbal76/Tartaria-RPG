@@ -51,6 +51,7 @@ const CANONICAL_VERB: Record<Intent, string> = {
   stealth: 'sneak',
   attack: 'attack',
   diplomacy: 'talk',
+  gift: 'gift', // OTA-1083 — restored; see parser.ts for why it was removed.
   escape: 'flee',
   investigate: 'search',
   rest: 'rest',
@@ -144,7 +145,7 @@ export interface LLMParseResult {
 export interface LLMParserEngine {
   isReady(): boolean;
   generate(messages: ReadonlyArray<{ role: 'system' | 'user' | 'assistant'; content: string }>,
-    opts?: { maxNewTokens?: number; temperature?: number },
+    opts?: { maxNewTokens?: number; temperature?: number; job?: string },
   ): Promise<string>;
 }
 
@@ -212,7 +213,7 @@ export async function parseInputViaLLM(
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      { maxNewTokens: 60, temperature: 0.1 },
+      { maxNewTokens: 60, temperature: 0.1, job: 'parse_fallback' },
     );
   } catch {
     return null;

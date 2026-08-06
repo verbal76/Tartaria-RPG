@@ -64,11 +64,44 @@ export function escorteeMaxHp(playerHpMax: number): number {
 
 /** Build a fresh shared-pool escort party for an accepted quest. The pool max is
  *  the SUM of `count` members' HP, so a 3-person party is ~3x one member. */
+/** OTA-1080 — WHO IS WALKING AT THE FRONT.
+ *
+ *  An escort was a POOL — label, hp, count — with no individuals in it, so when
+ *  the ledger came to cover escorts there was literally nobody to remember. You
+ *  could walk three people across the flats, lose one, and the survivors had no
+ *  more identity than a stack of rations. Naming the leader is the smallest
+ *  change that makes an escort a relationship rather than a hit-point bar: they
+ *  go on the ledger, they remember whether you got them home, and next time you
+ *  meet them they know you.
+ *
+ *  The name is drawn deterministically from the party's own shape, so the same
+ *  contract accepted twice reads as the same person and a save/reload cannot
+ *  reshuffle who you are walking with. */
+const ESCORT_LEADERS = [
+  'Sena', 'Duvo', 'Halda', 'Ovik', 'Riska', 'Bersk', 'Talla', 'Ymer',
+  'Nell', 'Pell', 'Vosk', 'Ilva', 'Teska', 'Grum', 'Onda', 'Marlow',
+];
+
+export function escortLeaderName(count: number, hpMax: number, label: string): string {
+  let h = 0;
+  for (const ch of `${label}|${count}|${hpMax}`) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return ESCORT_LEADERS[h % ESCORT_LEADERS.length]!;
+}
+
 export function spawnEscortPool(count: number, playerHpMax: number, label: string): EscortPool {
   let hpMax = 0;
   for (let i = 0; i < count; i++) hpMax += escorteeMaxHp(playerHpMax);
   hpMax = Math.max(1, hpMax);
-  return { label: (label && label.trim()) || DEFAULT_ESCORT_LABEL, hp: hpMax, hpMax, count };
+  const finalLabel = (label && label.trim()) || DEFAULT_ESCORT_LABEL;
+  return {
+    label: finalLabel,
+    hp: hpMax,
+    hpMax,
+    count,
+    // OTA-1080 — the person the ledger remembers. Optional on the type so saves
+    // written before this OTA load without one and simply have no leader.
+    leaderName: escortLeaderName(count, hpMax, finalLabel),
+  };
 }
 
 /** The live escort pools across every ACTIVE-and-TRACKED escort quest, for the HUD.

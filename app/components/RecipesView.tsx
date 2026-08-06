@@ -128,9 +128,17 @@ export function RecipesView({
       : all;
     // OTA-087 — search filter (substring on the result name,
     // case-insensitive).
+    // OTA-1061 — the ARMOR SLOT is searchable too. Owner: "under the craft tab
+    // for armor, it needs to list what slot its for. some of the names don't
+    // explain it. it took me a few minutes to find something in the hand slot."
+    // Labelling each row fixes reading it; matching the slot here fixes FINDING
+    // it — typing "hands" now narrows 293 pieces to the 41 you can wear there.
     const q = (query ?? '').trim().toLowerCase();
     const searched = q.length > 0
-      ? kindFiltered.filter((e) => e.recipe.result.toLowerCase().includes(q))
+      ? kindFiltered.filter((e) =>
+          e.recipe.result.toLowerCase().includes(q)
+          || (getItemPreview(e.recipe.result).slot ?? '').includes(q),
+        )
       : kindFiltered;
     // OTA-087 — sort by the parent's chosen axis. The pre-OTA
     // 'ready' default (available first → missing-count asc →
@@ -247,6 +255,18 @@ export function RecipesView({
                       {cat.rarity ?? 'Common'}
                     </Text>
                   </View>
+                  {/* OTA-1061 — WHICH SLOT. The catalog knew all along (previewArmor
+                      builds "Hands Armor") but the craft row only ever rendered
+                      the stats line, so the player had to guess from the name —
+                      and 17 of the 90 nouns armor names end in are ambiguous
+                      across slots: "greaves" is legs AND feet, "mantle" /
+                      "vest" / "jacket" / "coat" are each split between chest and
+                      cloak. Its own line, above the stats, so it reads first. */}
+                  {preview.slot ? (
+                    <Text style={styles.recipeSlot}>
+                      {preview.slot.toUpperCase()} SLOT
+                    </Text>
+                  ) : null}
                   {preview.stats.length > 0 && (
                     <Text style={styles.recipeStats}>
                       {preview.stats.join(' · ')}
@@ -400,6 +420,9 @@ const styles = StyleSheet.create({
   recipeNameMuted: { color: '#a89a7a' },
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
+  // Reads as a label, not as another stat — spaced caps, cool grey, so the eye
+  // can run down the column and find a slot without reading any item names.
+  recipeSlot: { color: '#8aa0a4', fontSize: 10, letterSpacing: 1.5, marginTop: 4 },
   recipeIng: { color: '#a2977b', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeIngLabel: { color: '#a2977b' },
   recipeIngHave: { color: '#9ec96a', fontWeight: '600' },

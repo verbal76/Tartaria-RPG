@@ -671,6 +671,13 @@ export function AboutScreen() {
             <Text style={styles.sessionBtnPrimaryText}>SAVE &amp; EXIT TO TITLE</Text>
           </TouchableOpacity>
 
+          {/* OTA-1046 — REPLAY OPENING moved to the CharacterScreen header
+              (owner: "I went to settings and about and there was no replay
+              opening"). About's normal entry is the TITLE screen, where no
+              character is loaded, so the player-gated button here was
+              invisible on the only path players actually took to it. The
+              character sheet only exists with a live run — no gate needed. */}
+
           <Text style={[styles.sessionLabel, { marginTop: 14 }]} accessibilityRole="header">REPORTING</Text>
           <View style={styles.sessionBtnRow}>
             <TouchableOpacity

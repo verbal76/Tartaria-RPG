@@ -1,0 +1,61 @@
+{
+  "universal": [
+    "A thousand years ago the sky did not fall. The ground rose.\n\nThe Aetherstone Flood came up out of the earth like a tide with no moon to call it, and in nine days the towers of Tartaria drank mud to the waist, to the shoulder, to the crown. The greatest civilization the world had ever raised stopped mid-sentence.",
+    "The world above kept turning. It built its own towers, told its own stories, and taught its children that Tartaria was a fable for the empty corners of maps.\n\nBut the buried country never finished dying. Under the silt the Aether kept humming — through drowned streets, through sealed halls, through the bones of the flood-dead, who did not all stay still.",
+    "Two generations ago they found the first way down. Then more.\n\nSalvage came up: discs of stamped Aether that spend like coin, tools no forge above can copy — and stories. Walking dead wrapped in mud. Machines that never stopped working. Nine buried capitals, each with a heart that still beats.\n\nNine factions went down after those hearts.\n\nNone of that is why you are here."
+  ],
+  "motives": {
+    "debt": {
+      "title": "The Debt",
+      "blurb": "You owe more than a life above can repay. Buried treasure pays buried prices.",
+      "pages": [
+        "You did the sums a hundred times, and a hundred times they came out the same: what you owe cannot be earned above ground. Not in your lifetime. Not in your children's.\n\nWho you owe it to matters less than what they hold over you. You remember the exact sound of the door when they closed it, and the exact words: 'There is always Tartaria.'",
+        "So this is the arithmetic of the buried country: one relic clears a season of the debt. One good salvage run clears a year. One Aetheric Core — one of the nine hearts they whisper about — clears all of it, and buys the silence after.\n\nYou are not here to see the drowned world. You are here to strip it. Every disc of Aether you pry from the mud is a day of your life bought back."
+      ]
+    },
+    "missing": {
+      "title": "The Missing",
+      "blurb": "Someone you love went down before you and never came back up.",
+      "pages": [
+        "The last letter is sewn into your coat. You know it without looking: 'The ninth capital is real. I have seen the light it makes under the mud. One more month, and I will come home rich enough that neither of us works again.'\n\nThat was three years ago. The letters stopped. The faction that took their contract sent back a sealed box of personal effects and a line of condolence — but no body. In Tartaria, they say, there is never a body.",
+        "You have heard what the buried country does with its dead — that the mud keeps them, and the Aether moves them, and sometimes a thing wearing a familiar face walks out of the dark with its old name still half-remembered.\n\nYou came down anyway. Someone has to find out which is true: the grave, the lie, or the thing that walks. You will follow the trail to the ninth capital if that is what it takes."
+      ]
+    },
+    "exile": {
+      "title": "The Exile",
+      "blurb": "The surface cast you out. The drowned country is the only one left that will take you.",
+      "pages": [
+        "They did not execute you. That is the whole of the mercy you were shown.\n\nWhat you did — or what they say you did — closed every door above ground: the guilds struck your name, the cities posted it, and the people who once drank at your table learned to look through you. There is exactly one border on earth with no guard who has read your warrant.\n\nIt runs straight down.",
+        "The mud does not ask for papers. The dead do not gossip. In Tartaria a name is what you can hold at the end of your arm, and nothing more.\n\nYou came down to disappear — but somewhere under the silt there are nine buried thrones and a hundred drowned titles no one living has claimed. The surface took your name.\n\nDown here, you can take a better one."
+      ]
+    },
+    "calling": {
+      "title": "The Calling",
+      "blurb": "The Aether hums in your blood, and it pulled you down.",
+      "pages": [
+        "It started as a sound at the edge of sleep — a hum, low and patient, like a struck bell that never quite finishes. Healers found nothing. Priests found nothing. But you noticed it grew louder walking downhill, and quieter climbing, and one night you woke with your hand pressed flat to the ground, listening.\n\nThe hum has a direction. It has always had a direction.",
+        "Down. Through the silt, through the drowned streets, through nine buried capitals where nine old hearts still beat in time with the ringing in your blood.\n\nYou do not know if the Aether is calling you home, or calling you in the way a lamp calls a moth. You know that above ground the hum will never stop, and that no one up there can teach you what you are.\n\nSomething under the mud can."
+      ]
+    },
+    "record": {
+      "title": "The Record",
+      "blurb": "You came to write down the truth of what happened here — before it is gone.",
+      "pages": [
+        "Every book above ground says the same three things about Tartaria: that it was proud, that it drowned, and that it deserved it. Three things, repeated for a thousand years, by people who never saw a drowned street.\n\nYou have read every account that exists. They disagree on the year, the cause, the gods, even the name of the country. A civilization stopped mid-sentence — and the world above wrote its ending for it, badly.",
+        "So you are going down with empty pages and a straight spine, to read the sentence the mud interrupted.\n\nWhat raised the flood. What the nine hearts actually are. What the dead remember, if they remember. The factions below are stripping the answer for parts and selling it by the disc — someone has to write it down whole before the last true page is melted for coin.\n\nHistory has one more witness. It is you."
+      ]
+    }
+  },
+  "factions": {
+    "reclaimers_guild": "It was the Reclaimers Guild that took you at the rope-head — practical people in patched coats who weighed you with one look and handed you a contract instead of a sermon. They strip the drowned world for salvage and pay honest rates. 'Everything down here is cargo,' they told you. 'Including you. Don't become the kind that doesn't come back up.'",
+    "forgotten_order": "It was the Forgotten Order that took you in — quiet scholars in ash-grey, keepers of every map and misremembered name the flood left behind. They asked you nothing about your past; they asked what you could read, and carry, and keep secret. 'The mud buried a library,' they said. 'We are its last patient readers.'",
+    "mud_monarchs": "It was the Mud Monarchs who claimed you — riders and reavers who rule the open silt by the oldest law there is. They do not recruit; they collect. 'Everything the flood buried belongs to whoever can hold it,' their captain said, looking at you like salvage. 'Hold something, and you're one of us.'",
+    "true_tartarians": "It was the True Tartarians who took you below — solemn folk who never call the flood a disaster, only 'the sleep.' They reinter the flood-dead with washed hands and guard the old halls as shrines. 'You walk in a drowned cathedral,' they warned you. 'Take what you need. Mock nothing. The country is not empty.'",
+    "eternal_dynasty": "It was the Eternal Dynasty that received you — heirs, they say, of Tartaria's last royal line, courteous the way a drawn blade is courteous. They fed you, robed you, and wrote your name in a ledger a thousand years old. 'The country below has one lawful crown,' they said. 'Serve it, and be remembered longer than the world above will remember anyone.'",
+    "conspiracy_architects": "It was the Conspiracy Architects who recruited you — surface-dwellers in good coats who knew your name before you gave it. They believe the flood was engineered, the histories are curated, and the proof is still down there in someone's drowned vault. 'The lie is a thousand years old,' they told you. 'Help us find the receipt.'",
+    "servants_of_giants": "It was the Servants of the Giants who sheltered you — pilgrims who hold that Tartaria was not built by human hands at all, and that the builders sleep deepest of all the buried things. They gave you bread, a bunk, and one rule: 'Wake nothing you cannot feed. We serve what is beneath; we do not command it.'",
+    "stone_builders": "It was the Stone Builders who took you on — masons and engineers who care nothing for treasure and everything for the impossible architecture drowning under the silt. 'A thousand years in the mud and the arches still hold,' their forewoman said, laying her palm on a buried wall like a physician. 'We are going to learn why. Bring your hands.'",
+    "tartarian_revivalists": "It was the Tartarian Revivalists who embraced you — true believers who mean to pump out the streets, relight the lamps, and raise the drowned country whole. Half of them are dreamers, half are dangerous, and all of them work. 'Everyone else came down to take,' they said, pressing a shovel into your hands. 'We came down to give it back.'"
+  },
+  "closing": "So you came down.\n\nThe rope paid out behind you, the light above shrank to a coin, and the hum of the buried country rose to meet your boots. Somewhere in the dark ahead: nine capitals, nine sleeping hearts, and the reason you gave up the sky.\n\nA voice is already waiting for you down here. Every walker below hears it — the Arbiter, who watches, and weighs, and keeps the ledger of what you do next.\n\nWhatever you came for — take your first step."
+}

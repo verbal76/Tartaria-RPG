@@ -846,3 +846,67 @@ export function buildSkillSteps(
       : `d20 + ${statLabel}${assistLabel}${perkLabel}${statusLabel} vs ${dcName || 'DC'} ${dc}`,
   }];
 }
+
+/** ⚠ OTA-1159 — WHAT THE ENEMY CARD SHOULD HAVE BEEN SAYING ALL ALONG.
+ *
+ *  The owner walked into Yuldra-Tul at 24/24 HP, typed `approach`, and was dead
+ *  before he got a second input. The log reads as an ambush; the arithmetic says
+ *  otherwise, and the card is what hid it:
+ *
+ *    Hierophant Mara-of-Yuldra closes — Frost Staff Strike ready,
+ *    1d8+3 damage on a hit. (range: close) ★ CORE GUARDIAN
+ *    …
+ *    deals 13 cold damage [armor −18%]. You have 11 HP remaining.
+ *    deals 11 cold damage [armor −18%]. You fall.
+ *
+ *  `1d8+3` tops out at ELEVEN, and it dealt 13 through 18% armour — about 16
+ *  raw. The card was not describing the attack the resolver runs:
+ *
+ *    · `applyEnemyCounter` adds **+1d6 to every connecting swing** of a
+ *      boss-flagged enemy, on top of the declared notation; and
+ *    · a boss takes a **second swing** after the first lands ("bosses do not
+ *      yield the tempo") — so ONE player action, including a plain move, eats
+ *      two of them.
+ *
+ *  Real envelope: 2 × (1d8+3 + 1d6) = **10 to 34**, against a 24 HP bar. The
+ *  card advertised 4 to 11. This is the OTA-1156/1158 family again — a surface
+ *  that disagrees with the resolver — and it is the one that got him killed,
+ *  because he priced the fight off the number he was shown.
+ *
+ *  Nothing about the fight changes here. The card just stops understating it. */
+/** ⚠ OTA-1164 (owner tuning) — DOES THIS BOSS GET THE SECOND SWING? The
+ *  pressure-test sim priced the second swing as THE killer: a connected
+ *  two-swing round averages 22 with a 36% chance of deleting a full 24-HP bar,
+ *  while a single swing can never one-round even a fresh arrival. The owner's
+ *  call: GATE IT BY GUARDIAN TIER — tier 1-2 Core Guardians swing once, so the
+ *  early walls become learnable; tier 3+ and every non-Guardian boss keep the
+ *  two-swing tempo. Guardians carry a `tier:N` trait (spawnGuardianForCapital);
+ *  a boss with no tier trait is not a Guardian and keeps both swings. */
+export function bossSwingsTwice(enemy: { boss?: boolean; traits?: readonly string[] }): boolean {
+  if (!enemy.boss) return false;
+  const t = enemy.traits?.find((x) => x.startsWith('tier:'));
+  if (!t) return true;
+  const n = parseInt(t.split(':')[1] ?? '', 10);
+  return !(Number.isFinite(n) && n >= 1 && n <= 2);
+}
+
+export function enemyDamageDisplay(enemy: { damage?: unknown; boss?: boolean; traits?: readonly string[] }): string {
+  const base = String(enemy.damage ?? '').trim() || '1d6';
+  if (!enemy.boss) return `${base} damage on a hit`;
+  // OTA-1164 — the card keeps telling the truth: a gated (tier 1-2) Guardian
+  // swings once, and saying "twice" here would be OTA-1159's lie reborn.
+  return bossSwingsTwice(enemy)
+    ? `${base}+1d6 damage on a hit, twice per round`
+    : `${base}+1d6 damage on a hit`;
+}
+
+/** OTA-1162 (audit) — the same truth in chip width. The 24-hour audit found the
+ *  EnemyPanel still printing `e.damage` raw in two places, which is OTA-1159's
+ *  bug on the surface the player opens specifically to size a fight up: a boss
+ *  read `1d8+3` on its own card while the resolver rolled `1d8+3+1d6` twice.
+ *  The long form above doesn't fit a stat chip, so the panel gets this. */
+export function enemyDamageCompact(enemy: { damage?: unknown; boss?: boolean; traits?: readonly string[] }): string {
+  const base = String(enemy.damage ?? '').trim() || '1d6';
+  if (!enemy.boss) return base;
+  return bossSwingsTwice(enemy) ? `${base}+1d6 ×2` : `${base}+1d6`;
+}

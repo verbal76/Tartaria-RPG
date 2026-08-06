@@ -1,0 +1,96 @@
+{
+  "_comment": "OTA-1086 — stage business for a conversation. One short beat of what somebody DOES while they answer you. See app/engine/flourish.ts for why these are authored rather than generated, and why the model can only ever replace one of these lines rather than delay it. {npc} is substituted with the person's name.",
+  "byKind": {
+    "forge": [
+      "{npc} keeps working while they talk — a rag over a joint, a thumb testing an edge that did not need testing.",
+      "Something in the back of {npc}'s shop ticks over and settles, and they do not look up at it.",
+      "{npc} sets a cooling billet down on the stone between you like a piece of punctuation.",
+      "There is a burn on the back of {npc}'s hand old enough to have stopped being a story.",
+      "{npc} talks at the anvil rather than at you, which is habit more than rudeness."
+    ],
+    "arms": [
+      "{npc} turns a piece over twice while they speak and puts it back facing the other way.",
+      "Nothing on {npc}'s rack is dusty, and you notice that they notice you noticing.",
+      "{npc} keeps one hand loose on the counter, near enough to the good stock to mean it.",
+      "Half of what {npc} says is aimed at you and half at the state of your gear.",
+      "{npc} glances at what you are carrying and their mouth does something small."
+    ],
+    "counter": [
+      "{npc} counts something under the counter without looking down, and does not lose the count.",
+      "The tally slate behind {npc} has three names chalked on it and you cannot read them upside down.",
+      "{npc} shifts a crate six inches to the left for no reason either of you could name.",
+      "{npc} answers you and finishes a sum at the same time, and neither one suffers for it.",
+      "A tin of chits goes into {npc}'s apron pocket in the middle of the sentence."
+    ],
+    "curio": [
+      "{npc} sets down whatever they were holding, very gently, before they answer.",
+      "Something in {npc}'s case catches the lamp, and they turn it away from the light.",
+      "{npc}'s fingers keep finding the edge of the tray and letting go of it again.",
+      "Nothing on {npc}'s table is labelled, and you get the sense they prefer it that way."
+    ],
+    "books": [
+      "{npc} keeps a finger in a page the whole time, on the chance that you turn out to be brief.",
+      "{npc} stops to get the wording right, which takes longer than the thought did.",
+      "There is ink on {npc}'s knuckle, fresh enough to still be wet at the edge.",
+      "{npc} answers you the way people answer a question they have already written down somewhere."
+    ],
+    "field": [
+      "{npc} looks past you at the weather while they talk, out of a habit the road gave them.",
+      "{npc} checks a strap hanging on the wall without appearing to decide to.",
+      "{npc} tests a coil of rope against their knee and keeps talking over the creak of it.",
+      "{npc} keeps their voice low enough that it does not carry past the doorway."
+    ],
+    "quarters": [
+      "{npc} says it as though it has already been written down somewhere and signed.",
+      "{npc} does not sit, and does not offer you anywhere to.",
+      "Something is being counted behind {npc}, and neither of you acknowledges it.",
+      "{npc} waits a beat before each answer, the way people do when the answer is policy."
+    ],
+    "road": [
+      "{npc} keeps facing the way they were going, and talks to you sideways.",
+      "{npc} shifts the pack higher on their shoulder and does not put it down.",
+      "{npc} looks at the road behind you before they answer anything at all.",
+      "Whatever {npc} is chewing goes over to the other cheek."
+    ],
+    "escort": [
+      "{npc} counts their people while they talk, and the count comes out right.",
+      "{npc} answers you without breaking stride, because stopping costs more than it looks.",
+      "{npc} keeps their eyes up on the ridgeline through most of it."
+    ],
+    "guardian": [
+      "{npc} does not move at all while they speak, and the stillness is the loudest part of it.",
+      "The air near {npc} does what air does near Aether, and neither of you mentions it.",
+      "{npc} answers as though the answer had been waiting somewhere a long time for the question."
+    ]
+  },
+  "byRegard": {
+    "stranger": [
+      "{npc} keeps the counter between you the whole time, which is only sense.",
+      "{npc} gives you the short version, and you can hear that it is the short version."
+    ],
+    "met": [
+      "{npc} places you, roughly, and adjusts what they were about to say.",
+      "There is half a nod in it — you are a face now, if not much more than one."
+    ],
+    "known": [
+      "{npc} lets the sentence run longer than they would for a stranger.",
+      "{npc} has stopped checking where your hands are."
+    ],
+    "familiar": [
+      "{npc} uses your name in the middle of it without making anything of it.",
+      "{npc} talks to you while doing something else, which is its own kind of trust."
+    ],
+    "trusted": [
+      "{npc} drops their voice, though there is nobody in here but the two of you.",
+      "{npc} tells you the thing and then waits, to see what you do with it."
+    ],
+    "wronged": [
+      "{npc} does not stop watching your hands, and does not pretend otherwise.",
+      "{npc} keeps three feet and a hard look between you the whole time."
+    ]
+  },
+  "fallback": [
+    "{npc} takes a moment with it before answering.",
+    "{npc} looks at you a beat longer than the question needed."
+  ]
+}

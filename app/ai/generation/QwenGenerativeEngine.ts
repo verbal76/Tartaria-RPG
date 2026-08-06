@@ -49,6 +49,15 @@ export interface GenerateOptions {
   topP?: number;
   /** Top-k sampling. Default 40. */
   topK?: number;
+  /** OTA-1128 — telemetry label for this call. See qwenTelemetry.ts. */
+  job?: string;
+  /** OTA-1146 — idle-time work nobody asked for: queues below voice AND is cut
+   *  short the moment the player needs the model. See LlamaGenerateOptions. */
+  homework?: boolean;
+  /** OTA-1157 — keeps its priority but can be cut short when higher-priority
+   *  work arrives. Item synthesis sets this; narration does not. See
+   *  LlamaGenerateOptions.interruptible for the full reasoning. */
+  interruptible?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -78,6 +87,20 @@ export class QwenGenerativeEngine {
   private lastError: string | null = null;
   private runtime: LlamaRuntime | null = null;
   private modelId: string = DEFAULT_QWEN_MODEL_ID;
+  // OTA-1107 — the two guards that stop background-bounce thrash (the
+  // 11-part log-export session: every switch-away disposed the context,
+  // every return kicked a fresh ~400MB load, 10+ overlapping attempts
+  // in a minute):
+  //   initInFlight — one load at a time. dispose() resets status to
+  //     'idle' while a load is still awaiting, which used to defeat the
+  //     'already loading' status guard and let forceReinitialize() stack
+  //     a SECOND concurrent context load (double memory pressure).
+  //   lifecycleGen — dispose() bumps it. A load that started before the
+  //     bump is STALE when it lands: the backgrounding that disposed the
+  //     old context must not be resurrected by a straggler, so the fresh
+  //     runtime is discarded and status stays 'idle'.
+  private initInFlight: Promise<void> | null = null;
+  private lifecycleGen = 0;
 
   getStatus(): QwenStatus {
     return this.status;
@@ -112,6 +135,9 @@ export class QwenGenerativeEngine {
    *  fallback path (e.g., deterministic fusion) covers the current
    *  interaction; the warm-up is for the NEXT one. */
   async forceReinitialize(opts: QwenInitOptions = {}): Promise<void> {
+    // OTA-1107 — a load is already warming up: join it instead of resetting
+    // status underneath it and stacking a second concurrent context load.
+    if (this.initInFlight) return this.initInFlight;
     this.status = 'idle';
     this.runtime = null;
     return this.initialize(opts);
@@ -139,9 +165,24 @@ export class QwenGenerativeEngine {
    * Arbiter when the engine isn't ready.
    */
   async initialize(opts: QwenInitOptions = {}): Promise<void> {
+    if (this.initInFlight) return this.initInFlight;
     if (this.status === 'ready' || this.status === 'loading' || this.status === 'downloading') {
       return;
     }
+    const run = this.runInitialize(opts);
+    this.initInFlight = run;
+    try {
+      await run;
+    } finally {
+      if (this.initInFlight === run) this.initInFlight = null;
+    }
+  }
+
+  private async runInitialize(opts: QwenInitOptions): Promise<void> {
+    // OTA-1107 — snapshot the lifecycle generation. If dispose() runs while
+    // this load is in flight (app backgrounded mid-reload), the result is
+    // stale and must be thrown away, not installed as 'ready'.
+    const gen = this.lifecycleGen;
     const onProgress = opts.onProgress;
     this.status = 'downloading';
     this.downloadFraction = 0;
@@ -164,10 +205,14 @@ export class QwenGenerativeEngine {
         });
       }
     } catch (err) {
+      // Stale (disposed mid-download): the dispose already set the state it
+      // wants ('idle'); don't overwrite it with 'failed'.
+      if (this.lifecycleGen !== gen) return;
       this.status = 'failed';
       this.lastError = err instanceof Error ? `GGUF download failed: ${err.message}` : String(err);
       return;
     }
+    if (this.lifecycleGen !== gen) { this.status = 'idle'; return; }
 
     // ── 2) Load the model into a llama.cpp context ────────────────────────
     this.status = 'loading';
@@ -179,11 +224,21 @@ export class QwenGenerativeEngine {
         contextSize: opts.contextSize ?? 2048,
         threads: opts.threads ?? 2,
       });
+      if (this.lifecycleGen !== gen) {
+        // OTA-1107 — dispose() landed while the context was loading. The app
+        // wanted the memory back; a straggler load must not resurrect a
+        // ~400MB context in the background. Tear the fresh one down.
+        try { await runtime.dispose(); } catch { /* best effort */ }
+        this.status = 'idle';
+        this.runtime = null;
+        return;
+      }
       this.runtime = runtime;
       this.status = 'ready';
       this.downloadFraction = 1;
       onProgress?.('ready', 1);
     } catch (err) {
+      if (this.lifecycleGen !== gen) { this.status = 'idle'; this.runtime = null; return; }
       this.status = 'failed';
       this.lastError = err instanceof Error ? `Load failed: ${err.message}` : String(err);
       this.runtime = null;
@@ -203,6 +258,9 @@ export class QwenGenerativeEngine {
       temperature: opts.temperature ?? 0.8,
       topP: opts.topP ?? 0.9,
       topK: opts.topK ?? 40,
+      job: opts.job,
+      homework: opts.homework,
+      interruptible: opts.interruptible,
     });
   }
 
@@ -225,6 +283,9 @@ export class QwenGenerativeEngine {
       topP: opts.topP ?? 0.9,
       topK: opts.topK ?? 40,
       onToken,
+      job: opts.job,
+      homework: opts.homework,
+      interruptible: opts.interruptible,
     });
   }
 
@@ -233,12 +294,35 @@ export class QwenGenerativeEngine {
    * free memory cleanly.
    */
   async dispose(): Promise<void> {
+    // OTA-1107 — mark any in-flight load stale (see lifecycleGen above).
+    this.lifecycleGen += 1;
+    // ⚠ OTA-1142 — STATUS LEAVES 'ready' FIRST, AND THIS IS THE WHOLE FIX.
+    // `isDormant()` is defined as "status==='ready' but the runtime is gone",
+    // and this method used to produce exactly that state for as long as its own
+    // teardown took. LlamaRuntime.dispose() nulls its context SYNCHRONOUSLY on
+    // entry (the OTA-arb crash fix: detach before release so nothing can start
+    // a completion against a freed context) and then AWAITS the release behind
+    // the native-ML lock. So from the first line of that await until this
+    // function returned, the engine reported ready-over-dead — the watchdog's
+    // exact dormancy signature — for however long the in-flight generation held
+    // the lock. The owner's log has item synthesis holding it for 10.4s.
+    // The device log then showed the cost outright:
+    //   OTA session start … → item_synthesis empty 8809ms read 0ms/write 0ms
+    //   in 309t→out 0t (0ch) → qwen-watchdog: Qwen dormant … reinitializing
+    // 8.8 seconds of wall time with ZERO prefill and ZERO decode: a call that
+    // entered a detached context, did no native work, and returned nothing —
+    // and it happened seconds after an OTA session start, which is the one
+    // shutdown path that runs in the FOREGROUND where OTA-1107's
+    // don't-reload-while-backgrounded guard does not apply.
+    // Setting status here costs nothing and closes the window entirely: an
+    // engine that is shutting down now says 'idle', which is true, instead of
+    // 'ready', which was never true once the context was detached.
+    this.status = 'idle';
+    this.downloadFraction = 0;
     if (this.runtime) {
       try { await this.runtime.dispose(); } catch { /* best effort */ }
       this.runtime = null;
     }
-    this.status = 'idle';
-    this.downloadFraction = 0;
   }
 }
 

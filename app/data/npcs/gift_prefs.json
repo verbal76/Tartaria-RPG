@@ -1,0 +1,174 @@
+{
+ "fallback": {
+  "lovedLine": "{npc} turns the {item} over once and then puts it somewhere safe rather than somewhere convenient. \"Thank you. Genuinely.\"",
+  "likedLine": "{npc} weighs the {item} and nods slowly. \"That is a good thing to be given. I will not forget who gave it.\"",
+  "politeLine": "{npc} takes the {item} with good grace. It goes under the counter, and you suspect it stays there.",
+  "insultLine": "{npc} looks at the {item}, and then at you, for slightly too long. \"No. You keep that.\""
+ },
+ "npcs": {
+  "irma_ironhand": {
+   "lovesTags": [
+    "metal",
+    "ore",
+    "ingot",
+    "armor"
+   ],
+   "lovesItems": [
+    "Aether Mud",
+    "Sentinel Core Plate"
+   ],
+   "coldTags": [
+    "food",
+    "trinket"
+   ],
+   "lovedLine": "Irma stops mid-swing. She takes the {item}, turns it to the light, and makes a small sound she would deny making. \"Where. Where did you get this.\" She does not wait for an answer. \"No. Do not tell me. Thank you.\"",
+   "likedLine": "Irma takes the {item} without ceremony and puts it in the good rack — the one at the back. From her, that is a speech.",
+   "politeLine": "Irma accepts the {item}, looks at it, and sets it down on the bench where things go to be forgotten. \"Kind of you.\"",
+   "insultLine": "Irma does not take her hand off the hammer. \"I have a forge, a rack of plate, and forty years. And you have brought me that.\"",
+   "returnGift": "Sentinel Core Plate",
+   "returnGiftLine": "Irma stops you at the counter and pushes a wrapped weight across it. \"This batch came out better than the last. First one goes to you.\""
+  },
+  "halem_trader": {
+   "lovesTags": [
+    "food",
+    "ration",
+    "curio",
+    "map"
+   ],
+   "coldTags": [
+    "metal",
+    "ore"
+   ],
+   "lovedLine": "Halem's whole face changes. \"Oh, now that is lovely.\" He turns the {item} over twice. \"I am not going to sell this. I want you to know that I thought about it and I am not going to.\"",
+   "likedLine": "\"Well now.\" Halem takes the {item} and finds it a spot on the shelf where he can see it from the counter. \"That was not necessary. Which is rather the point of it.\"",
+   "politeLine": "Halem takes the {item} with the professional warmth of a man who has been given a great many things. \"Very good. Very good.\"",
+   "insultLine": "Halem's cheer holds, barely. \"I trade in a lot of poor goods, friend. I do not accept them as presents.\"",
+   "returnGift": "Hearty Stew",
+   "returnGiftLine": "Halem presses a warm crock into your hands before you can speak. \"You feed my curiosity often enough. Eat.\""
+  },
+  "scrap_broker": {
+   "lovesTags": [
+    "mechanism",
+    "component",
+    "salvage",
+    "relic"
+   ],
+   "coldTags": [
+    "food"
+   ],
+   "lovedLine": "Tellin goes quiet. He turns the {item} slowly, finds the join, and stops. \"This is not from here.\" A long pause. \"I will not ask. But I will remember that it was you who put it in my hand.\"",
+   "likedLine": "Tellin weighs the {item} and writes something down, which from him is the highest form of respect. \"Onto the short shelf.\"",
+   "politeLine": "Tellin takes the {item} and prices it out of habit before catching himself. \"Sorry. Force of the trade. Thank you.\"",
+   "insultLine": "\"I know what that is worth,\" Tellin says. \"To the quarter-weight. Do not do that to me.\"",
+   "returnGift": "Shaped Aetheric Shard",
+   "returnGiftLine": "Tellin slides something across without looking up. \"Came through the pile. Thought of you. Don't make it strange.\""
+  },
+  "odar_flameforge": {
+   "lovesTags": [
+    "fire",
+    "fuel",
+    "ember",
+    "ore"
+   ],
+   "coldTags": [
+    "cloth",
+    "food"
+   ],
+   "lovedLine": "Odar feeds the {item} nothing, holds it near the flame, and watches the light move on it. \"It answers,\" he says, and that is apparently the highest praise available.",
+   "likedLine": "Odar takes the {item} and sets it by the forge, which is where he puts things he intends to keep.",
+   "politeLine": "Odar accepts the {item}. It does not go near the fire, which tells you what he thinks of it.",
+   "insultLine": "Odar looks at the {item}, then at the forge, then back. \"That would not even burn well.\"",
+   "returnGift": "Incendiary Paste",
+   "returnGiftLine": "Odar sets a sealed pot in front of you. \"Burns hotter than what I sell. You've earned the good batch.\""
+  },
+  "yara_windcaller": {
+   "lovesTags": [
+    "cloth",
+    "light",
+    "wind",
+    "mask"
+   ],
+   "coldTags": [
+    "metal",
+    "heavy"
+   ],
+   "lovedLine": "Yara holds the {item} up and lets the air take it, and listens to what it does. \"It does not fight,\" she says, delighted. \"Do you know how rare that is?\"",
+   "likedLine": "Yara folds the {item} into the cloth pile and touches it once more than she needs to.",
+   "politeLine": "Yara takes the {item} and finds it a hook. \"It will be useful to somebody.\"",
+   "insultLine": "\"It will not move,\" Yara says of the {item}, as though that settles it. It does.",
+   "returnGift": "Harpy Feather",
+   "returnGiftLine": "Yara holds it out on an open palm, like something the wind left. \"It wanted to go to you. Who am I to argue.\""
+  },
+  "bran_the_beastmaster": {
+   "lovesTags": [
+    "food",
+    "ration",
+    "pelt",
+    "bone"
+   ],
+   "coldTags": [
+    "relic",
+    "trinket"
+   ],
+   "lovedLine": "Bran takes the {item} and immediately gives half of it to the dog, which he clearly considers the correct handling of a gift. \"She thanks you. I thank you.\"",
+   "likedLine": "Bran turns the {item} over. \"Good. That will go a long way out where I am.\"",
+   "politeLine": "Bran accepts the {item} and puts it in the pile of things that will eventually be traded to somebody who wants them.",
+   "insultLine": "Bran looks at the {item} and then at the dog, who has more sense. \"No, lad. No.\"",
+   "returnGift": "Honey-Glazed Knuckle",
+   "returnGiftLine": "Bran tosses it to you underhand. \"For the dog. Or for you — I don't judge either way.\""
+  },
+  "order_scholar": {
+   "lovesTags": [
+    "book",
+    "record",
+    "map",
+    "relic"
+   ],
+   "coldTags": [
+    "weapon",
+    "food"
+   ],
+   "lovedLine": "Vesryn does not touch the {item} immediately. They clear a space first, and lay a cloth, and only then take it. \"Do you understand what you have handed me? No. That is all right. I do.\"",
+   "likedLine": "Vesryn accepts the {item} and, unusually, does not begin cataloguing it in front of you. \"Later. When I can give it attention.\"",
+   "politeLine": "Vesryn takes the {item} with the courtesy of somebody who receives a great deal of well-meant rubbish. \"Thank you.\"",
+   "insultLine": "\"I am an archivist,\" Vesryn says, not unkindly. \"You have brought me an object with no provenance, no age and no interest. Take it back.\"",
+   "returnGift": "Aetheric Compass",
+   "returnGiftLine": "Vesryn wraps it carefully before handing it over. \"An instrument deserves hands that go somewhere. Yours do.\""
+  },
+  "tarek_tinkerer": {
+   "lovesTags": [
+    "mechanism",
+    "component",
+    "gear",
+    "spring"
+   ],
+   "coldTags": [
+    "food",
+    "cloth"
+   ],
+   "lovedLine": "Tarek makes a noise like a man who has been handed his own childhood. \"Where — no. NO. Do you know how long I have —\" He stops, composes himself, fails. \"Thank you. Go away. I need to look at this.\"",
+   "likedLine": "Tarek takes the {item} apart before he has finished thanking you, which is his way of accepting it.",
+   "politeLine": "Tarek accepts the {item} and sets it on the bench with the other things that are not urgent.",
+   "insultLine": "Tarek turns the {item} once. \"There is nothing inside it,\" he says, sadly. \"Not everything has to be a mechanism, but I would rather you kept it.\"",
+   "returnGift": "Iron-Worm Engine",
+   "returnGiftLine": "Tarek shoves it at you, already talking. \"Doesn't work. Well — doesn't work YET. You'll figure it out, that's why I'm giving it to you.\""
+  },
+  "revivalists_quartermaster": {
+   "lovesTags": [
+    "food",
+    "ration",
+    "medicine",
+    "cloth"
+   ],
+   "coldTags": [
+    "weapon"
+   ],
+   "lovedLine": "Sister Yune takes the {item} in both hands. \"Do you know what this is, in a store like ours? It is four days. Four days of somebody not being frightened.\" She looks up. \"Thank you.\"",
+   "likedLine": "Yune adds the {item} to the store and marks it in the book. \"It goes where it is needed, not where it is asked for. I hope that is all right.\"",
+   "politeLine": "Yune accepts the {item} warmly and finds it a shelf. \"Everything has a use eventually.\"",
+   "insultLine": "Yune's kindness does not falter, which makes it worse. \"We would rather have nothing than be given nothing dressed up as something.\"",
+   "returnGift": "Trauma Kit",
+   "returnGiftLine": "The quartermaster sets the kit down between you, official as a requisition. \"Logged as damaged stock. It isn't. Take it.\""
+  }
+ }
+}

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
-import { missingIngredientsList, craftableRecipeCounts } from '../engine/crafting';
+import { missingIngredientsList, consumeIngredientsList, craftableRecipeCounts } from '../engine/crafting';
 import { RecipesView } from '../components/RecipesView';
 import { CraftRefusalModal } from '../components/CraftRefusalModal';
 import { BrandedModal } from '../components/BrandedModal';
@@ -12,6 +12,7 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem } from '../engine/types';
 import { getItemPreview } from '../components/itemPreview';
 import { GOLEM_DEFINITIONS, type GolemDefinition } from '../engine/golems';
+import { wornInstanceIds, validSlotsForItem } from '../engine/equipment';
 
 // 2026-05-27 OTA-095 — Aethercraft disciplines moved from
 // ActionReferenceScreen's "Recipes" mode (now deleted) into a
@@ -109,12 +110,47 @@ function buildGolemConfirm(g: GolemDefinition, inventory: InventoryItem[]): Gole
 // 'available' floats items the player can fix RIGHT NOW (all
 // materials in stock) to the top. 'cost' sorts by total
 // material count required.
+//
+// OTA-1119 — owner: "let's add some different sorting options in the craft
+// repair tab, still prioritize equipped it's on top as default sort." So
+// EQUIPPED becomes a REAL axis and the default one, rather than an invisible
+// pre-key welded onto every other axis (OTA-1117's first cut). Opening the tab
+// still puts what you're wearing on top — that ask is unchanged — but tapping
+// NAME now actually sorts by name instead of sorting by name *within* worn and
+// unworn. A sort you pick should do the thing it says.
+//
+// The worn ★ badge shows on EVERY axis, so you can still find your gear after
+// switching. Three new axes:
+//   · SLOT   — head-to-toe body order (main → off → head → … → ring), so a
+//              full kit reads like a paper doll instead of an alphabet.
+//   · RARITY — Common → Legendary; desc puts your best pieces first.
+//   · KIND   — weapons together, armor together, tools together.
 const REPAIR_SORT_OPTIONS = [
+  { key: 'equipped', label: 'EQUIPPED' },
   { key: 'available', label: 'READY' },
   { key: 'durability', label: 'DURABILITY' },
+  { key: 'slot', label: 'SLOT' },
+  { key: 'rarity', label: 'RARITY' },
+  { key: 'kind', label: 'KIND' },
   { key: 'name', label: 'NAME' },
   { key: 'cost', label: 'COST' },
 ];
+
+// OTA-1119 — shared ranks for the two new ordering axes. Deliberately the same
+// numbers InventoryScreen uses, so "sorted by slot" means the identical
+// head-to-toe order on both screens.
+const REPAIR_RARITY_RANK: Record<string, number> = {
+  Common: 0, Uncommon: 1, Rare: 2, Legendary: 3,
+};
+const REPAIR_SLOT_RANK: Record<string, number> = {
+  main: 0, off: 1, head: 2, chest: 3, hands: 4, legs: 5, feet: 6, cloak: 7, amulet: 8, ring: 9,
+};
+function repairSlotRank(item: InventoryItem): number {
+  const s = validSlotsForItem(item)[0];
+  // No equip slot (a rope, a lantern, a tool) sorts below the worn kit rather
+  // than scattering through it.
+  return s ? (REPAIR_SLOT_RANK[s] ?? 50) : 99;
+}
 
 // OTA-087 — Craft + Recipes tabs share an axis set. 'ready'
 // is the existing "available first" pre-OTA sort; offered
@@ -131,6 +167,9 @@ interface RepairStatus {
   cost: { name: string; quantity: number }[];
   missing: { name: string; short: number }[];
   available: boolean;
+  // OTA-1117 — is this the piece the player is actually WEARING? Worn gear is what
+  // breaks mid-fight, so it floats above every sort axis and carries a badge.
+  worn: boolean;
 }
 
 // OTA-401 — substitute-aware repair affordability. The engine's
@@ -162,11 +201,21 @@ function buildDisciplineConfirm(d: AethercraftDiscipline, inventory: InventoryIt
   return { title: d.title, phrase, body: d.body, fuel, afford };
 }
 
-function evaluateRepair(item: InventoryItem, inventory: InventoryItem[]): RepairStatus {
+function evaluateRepair(
+  item: InventoryItem,
+  inventory: InventoryItem[],
+  worn: ReadonlySet<string>,
+): RepairStatus {
   const cost = repairCostMaterials(item);
   const short = missingIngredientsList(cost, inventory);
   const missing = short.map((m) => ({ name: m.name, short: m.quantity }));
-  return { item, cost, missing, available: cost.length > 0 && missing.length === 0 };
+  return {
+    item,
+    cost,
+    missing,
+    available: cost.length > 0 && missing.length === 0,
+    worn: worn.has(item.id),
+  };
 }
 
 // 2026-05-26 OTA-059 — three tabs. CRAFT shows every gear/relic
@@ -253,7 +302,21 @@ export function CraftingScreen() {
   const [recipesSortKey, setRecipesSortKey] = useState('ready');
   const [recipesSortDir, setRecipesSortDir] = useState<SortDirection>('asc');
   const [repairQuery, setRepairQuery] = useState('');
-  const [repairSortKey, setRepairSortKey] = useState('available');
+  // OTA-1119 — EQUIPPED is the default axis. Opening the tab still puts what
+  // you are wearing on top; picking any other axis now genuinely sorts by it.
+  const [repairSortKey, setRepairSortKey] = useState('equipped');
+  // OTA-1125 — REPAIR group mode. Owner: "I thought we were going to do the same
+  // tap and hold to multiselect for repair too. it will have to take into
+  // account the items needed for each item you sent and dim make items in
+  // selectable if the items you selected consume the items needed."
+  //
+  // That second sentence is the whole feature. Repairs draw from ONE shared pile
+  // of materials, so unlike sell (where every row is independent) each pick
+  // changes what the next pick can afford. A group builder that ignored that
+  // would happily let you tick eight things and then quietly fix three.
+  const [repairSelectMode, setRepairSelectMode] = useState(false);
+  const [repairSelected, setRepairSelected] = useState<string[]>([]);
+  const [repairGroupConfirm, setRepairGroupConfirm] = useState(false);
   const [repairSortDir, setRepairSortDir] = useState<SortDirection>('asc');
 
   // OTA 228 — repair list: every durability-tracked item in the
@@ -261,10 +324,13 @@ export function CraftingScreen() {
   // (playtester spec). Available when the materials are in stock.
   const repairable = useMemo(() => {
     if (!player) return [] as RepairStatus[];
+    // OTA-1117 — resolve worn instances ONCE per inventory change (it walks every
+    // equip slot), then stamp `worn` on each row.
+    const worn = wornInstanceIds(player);
     return player.inventory
       .filter((i) => i.durability && i.durability.current < i.durability.max)
-      .map((i) => evaluateRepair(i, [...player.inventory]));
-  }, [player?.inventory]);
+      .map((i) => evaluateRepair(i, [...player.inventory], worn));
+  }, [player?.inventory, player?.equipped, player?.dog?.equipped]);
 
   // OTA-087 — filter + sort the repair list. Search matches
   // the item NAME substring; sort axis selectable.
@@ -275,8 +341,45 @@ export function CraftingScreen() {
       : repairable;
     const dir = repairSortDir === 'asc' ? 1 : -1;
     const sorted = [...filtered];
+    const byName = (x: RepairStatus, y: RepairStatus) => x.item.name.localeCompare(y.item.name) * dir;
     sorted.sort((a, b) => {
       switch (repairSortKey) {
+        // OTA-1117 → OTA-1119. Worn gear used to be an unconditional pre-key on
+        // every axis. Owner: "when you open the repair tab, it should prioritize
+        // all of the things that are equipped that can be repaired at the top" —
+        // which is about the tab's DEFAULT state, and this axis is now that
+        // default. Making it an axis instead of a hidden pre-key means picking
+        // NAME sorts by name, rather than by name within worn and within unworn.
+        // The piece you are standing in is the one whose durability decides the
+        // next fight, so it still leads the moment you open the tab; within the
+        // worn block, what you can actually fix right now comes first.
+        case 'equipped': {
+          if (a.worn !== b.worn) return (a.worn ? -1 : 1) * dir;
+          if (a.available !== b.available) return a.available ? -1 : 1;
+          return byName(a, b);
+        }
+        // OTA-1119 — head-to-toe body order, so a full kit reads like a paper
+        // doll. Gear with no equip slot (rope, lantern, tools) sits below it.
+        case 'slot': {
+          const ar = repairSlotRank(a.item);
+          const br = repairSlotRank(b.item);
+          if (ar !== br) return (ar - br) * dir;
+          return byName(a, b);
+        }
+        // OTA-1119 — Common → Legendary asc; tap again for your best first.
+        case 'rarity': {
+          const ar = REPAIR_RARITY_RANK[a.item.rarity ?? 'Common'] ?? 0;
+          const br = REPAIR_RARITY_RANK[b.item.rarity ?? 'Common'] ?? 0;
+          if (ar !== br) return (ar - br) * dir;
+          return byName(a, b);
+        }
+        // OTA-1119 — weapons together, armor together, tools together.
+        case 'kind': {
+          const ak = a.item.kind ?? '';
+          const bk = b.item.kind ?? '';
+          if (ak !== bk) return ak.localeCompare(bk) * dir;
+          return byName(a, b);
+        }
         case 'available': {
           // available=true floats to top when asc (the playtester-
           // friendly default — what can I fix RIGHT NOW?).
@@ -324,6 +427,99 @@ export function CraftingScreen() {
   }, [player?.inventory]);
   // Repair badge = what you can fix RIGHT NOW (materials in hand), not every worn item.
   const repairReady = useMemo(() => repairable.filter((r) => r.available).length, [repairable]);
+  // OTA-1121 — what REPAIR ALL would actually touch: the READY rows in the
+  // CURRENT view, in display order. Reading off repairableView (not repairable)
+  // is what lets the search box act as the selection — filter to what you mean,
+  // then mend that. Order carries through, so on the default EQUIPPED axis the
+  // gear you are standing in is mended first, which matters when materials run
+  // out partway.
+  const repairReadyInView = useMemo(
+    () => repairableView.filter((r) => r.available).map((r) => r.item.id),
+    [repairableView],
+  );
+  // Each call re-checks stock against the live inventory and refuses honestly if
+  // an earlier repair drained a shared material, so this is exactly "tapping
+  // every ready row, top to bottom" — no second code path that could disagree
+  // with the single-row one about cost, substitutions, or eligibility. The
+  // per-repair lines land within the feed's 500ms same-channel window, so they
+  // group into one card rather than spraying the log.
+  const repairAllReady = () => {
+    for (const id of repairReadyInView) repairInventoryItem(id);
+  };
+
+  // OTA-1125 — THE RUNNING MATERIAL BUDGET. This is the part that makes a repair
+  // group different from a sell group: repairs draw from ONE shared pile, so
+  // every pick changes what the next pick can afford.
+  //
+  // Rather than model that with our own arithmetic, we SIMULATE with the engine's
+  // own functions — `missingIngredientsList` to ask "can I afford this against
+  // the stock left?", `consumeIngredientsList` to spend it. Both are
+  // substitution-aware (Cloth Scrap standing in for Patched Cloth, and so on),
+  // so the dimming matches to the unit what the repairs will actually spend. A
+  // hand-rolled cost tally would drift from the substitution rules the moment
+  // someone touched them, and the drift would show up as a button that lies.
+  //
+  // Selection ORDER decides who gets the materials — first ticked, first served,
+  // same as the order the repairs then run in.
+  const repairPlan = useMemo(() => {
+    const picked: RepairStatus[] = [];
+    const starved: RepairStatus[] = [];
+    let stock: InventoryItem[] = [...(player?.inventory ?? [])];
+    for (const id of repairSelected) {
+      const row = repairable.find((r) => r.item.id === id);
+      if (!row) continue; // repaired, dropped or sold since — falls out of the group
+      if (row.cost.length === 0) { starved.push(row); continue; }
+      if (missingIngredientsList(row.cost, stock).length > 0) { starved.push(row); continue; }
+      stock = consumeIngredientsList(stock, row.cost);
+      picked.push(row);
+    }
+    // What is STILL affordable out of the remainder. An unpicked row that fails
+    // here is dimmed and un-tappable — the owner's ask, and the honest answer to
+    // "why can't I add this?": the pieces you already picked are spending it.
+    const affordable = new Set<string>();
+    for (const r of repairable) {
+      if (repairSelected.includes(r.item.id)) continue;
+      if (r.cost.length === 0) continue;
+      if (missingIngredientsList(r.cost, stock).length === 0) affordable.add(r.item.id);
+    }
+    const spend = new Map<string, number>();
+    for (const row of picked) {
+      for (const c of row.cost) spend.set(c.name, (spend.get(c.name) ?? 0) + c.quantity);
+    }
+    return { picked, starved, affordable, spend };
+  }, [player?.inventory, repairable, repairSelected]);
+
+  const exitRepairSelect = () => { setRepairSelectMode(false); setRepairSelected([]); setRepairGroupConfirm(false); };
+  const toggleRepairSelect = (id: string) => {
+    setRepairSelected((cur) => {
+      if (cur.includes(id)) {
+        const next = cur.filter((x) => x !== id);
+        // Emptying the group leaves the mode — never a bar reading "0".
+        if (next.length === 0) setRepairSelectMode(false);
+        return next;
+      }
+      // Adding is gated on affordability against the REMAINING stock, so the
+      // group can never contain something it cannot pay for.
+      if (!repairPlan.affordable.has(id)) return cur;
+      return [...cur, id];
+    });
+  };
+  const beginRepairSelect = (id: string) => {
+    // The first pick only needs to be affordable on its own, which `available`
+    // already says.
+    const row = repairable.find((r) => r.item.id === id);
+    if (!row?.available) return;
+    setRepairSelectMode(true);
+    setRepairSelected([id]);
+  };
+  const runRepairGroup = () => {
+    // Snapshot the ids first — each repair mutates the inventory the plan was
+    // derived from. `repairInventoryItem` re-checks stock itself, so even if
+    // something shifts underneath, the worst case is an honest shortage line
+    // rather than a silent skip.
+    for (const id of repairPlan.picked.map((r) => r.item.id)) repairInventoryItem(id);
+    exitRepairSelect();
+  };
 
   if (!player) {
     return (
@@ -583,6 +779,70 @@ export function CraftingScreen() {
             onSortChange={(k, d) => { setRepairSortKey(k); setRepairSortDir(d); }}
           />
 
+          {/* OTA-1121 — REPAIR ALL. Owner: "let's also add a select all to the
+              repair tab." Repair has no deferred step — the action IS the
+              repair — so a select-all with nothing to press afterwards would be
+              two taps where there is one job. This is the same idea aimed at
+              the actual work: fix everything currently listed as READY, in the
+              order shown, so worn gear goes first on the default axis.
+              It acts on the FILTERED view, which is what makes it a selection
+              rather than a blunt instrument: search "boot", tap REPAIR ALL, and
+              only boots get mended. */}
+          {/* OTA-1125 — while a group is open the bar TAKES REPAIR ALL's place
+              and holds it, the same way the sell group took the tab row (1124).
+              It sits above the ScrollView, so it cannot scroll away from you
+              while you tick rows further down — which is exactly when the
+              running material cost starts to matter. */}
+          {repairSelectMode ? (
+            <View style={styles.groupBar}>
+              <View style={styles.groupBarHead}>
+                <Text style={styles.groupBarCount}>
+                  ☑ {repairPlan.picked.length} to mend
+                </Text>
+                <TouchableOpacity
+                  onPress={exitRepairSelect}
+                  style={styles.groupBarCancel}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel="Cancel the group and go back to repairing one at a time"
+                >
+                  <Text style={styles.groupBarCancelText}>CANCEL</Text>
+                </TouchableOpacity>
+              </View>
+              {/* The running bill. This is the number the dimming is derived
+                  from, so showing it turns "why is that greyed out?" into
+                  "because I already spent the cloth." */}
+              <Text style={styles.groupBarSpend}>
+                {repairPlan.spend.size === 0
+                  ? 'No materials committed yet.'
+                  : `Costs: ${[...repairPlan.spend.entries()].map(([n, q]) => `${q}× ${n}`).join(', ')}`}
+              </Text>
+              <TouchableOpacity
+                onPress={() => setRepairGroupConfirm(true)}
+                disabled={repairPlan.picked.length === 0}
+                style={[styles.groupBarGo, repairPlan.picked.length === 0 && styles.groupBarGoOff]}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: repairPlan.picked.length === 0 }}
+                accessibilityLabel={`Repair the group of ${repairPlan.picked.length}`}
+              >
+                <Text style={styles.groupBarGoText}>⚒ REPAIR GROUP ({repairPlan.picked.length})</Text>
+              </TouchableOpacity>
+            </View>
+          ) : repairReadyInView.length > 0 ? (
+            <TouchableOpacity
+              style={styles.repairAllBtn}
+              activeOpacity={0.7}
+              onPress={() => repairAllReady()}
+              accessibilityRole="button"
+              accessibilityLabel={`Repair all ${repairReadyInView.length} ready ${repairReadyInView.length === 1 ? 'piece' : 'pieces'}${repairQuery.trim() ? ' matching your search' : ''}`}
+            >
+              <Text style={styles.repairAllText}>
+                ⚒ REPAIR ALL READY ({repairReadyInView.length}){repairQuery.trim() ? ' — matching search' : ''}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
             {repairableView.length === 0 ? (
               <Text style={styles.empty}>
@@ -605,26 +865,85 @@ export function CraftingScreen() {
                 // should show the stats for them. that way you know what
                 // you're crafting so you know which one to pick."
                 const preview = getItemPreview(r.item.name);
+                // OTA-1125 — group state for this row. `groupStarved` is the
+                // owner's dimming rule: not picked, and the picks already made
+                // have claimed the materials it would need. Outside group mode
+                // none of this applies and the row behaves exactly as before.
+                const groupPicked = repairSelectMode && repairSelected.includes(r.item.id);
+                const groupBlocked = repairSelectMode && !groupPicked && !repairPlan.affordable.has(r.item.id);
+                // STARVED is the narrower case worth explaining out loud: a row
+                // you COULD afford on its own that the group has already spent
+                // the materials for. A row that was never affordable is blocked
+                // too, but it already carries its own "Missing:" line — telling
+                // that player the group ate their cloth would be a lie.
+                const groupStarved = groupBlocked && r.available;
+                // In group mode a picked row can always be un-picked, and a
+                // blocked one can never be picked. Outside it, the old
+                // "available materials" gate still decides.
+                const rowTappable = repairSelectMode ? (groupPicked || !groupBlocked) : r.available;
                 return (
                   <TouchableOpacity
                     key={r.item.id}
-                    style={[styles.recipeRow, !r.available && styles.recipeRowMuted]}
-                    activeOpacity={r.available ? 0.7 : 1}
-                    disabled={!r.available}
-                    onPress={() => repairInventoryItem(r.item.id)}
-                    accessibilityRole="button"
-                    accessibilityState={{ disabled: !r.available }}
+                    style={[
+                      styles.recipeRow,
+                      !r.available && styles.recipeRowMuted,
+                      // OTA-1125 — a picked row is outlined; a row the group has
+                      // already spent the materials for is DIMMED. Owner: "dim
+                      // make items in selectable if the items you selected
+                      // consume the items needed."
+                      groupPicked && styles.recipeRowPicked,
+                      groupStarved && styles.recipeRowStarved,
+                    ]}
+                    activeOpacity={rowTappable ? 0.7 : 1}
+                    disabled={!rowTappable}
+                    onPress={() => (repairSelectMode
+                      ? toggleRepairSelect(r.item.id)
+                      : repairInventoryItem(r.item.id))}
+                    onLongPress={() => (repairSelectMode
+                      ? toggleRepairSelect(r.item.id)
+                      : beginRepairSelect(r.item.id))}
+                    delayLongPress={350}
+                    accessibilityRole={repairSelectMode ? 'checkbox' : 'button'}
+                    accessibilityLabel={`${r.item.name}${r.worn ? ', equipped' : ''}, ${dur.current} of ${dur.max} durability`}
+                    accessibilityState={repairSelectMode
+                      ? { checked: groupPicked, disabled: !rowTappable }
+                      : { disabled: !r.available }}
+                    accessibilityHint={repairSelectMode
+                      ? (groupPicked
+                        ? 'In the group. Tap to take it out.'
+                        : groupStarved
+                          ? 'Cannot be added — the pieces already picked are spending the materials it needs.'
+                          : groupBlocked
+                            ? 'Cannot be added — you do not have the materials it needs.'
+                            : 'Tap to add it to the group.')
+                      : 'Tap to repair this one. Hold to start a group.'}
                   >
                     <View style={[styles.recipeStripe, { backgroundColor: stripeColor }]} />
                     <View style={styles.recipeBody}>
                       <View style={styles.recipeHead}>
                         <Text style={[styles.recipeName, r.available && styles.recipeNameReady, !r.available && styles.recipeNameMuted]}>
-                          {r.item.name}
+                          {/* OTA-1125 — the group box leads the row, the way a
+                              checklist does. */}
+                          {repairSelectMode ? (groupPicked ? '☑ ' : '☐ ') : ''}
+                          {/* OTA-1117 — the worn marker rides the NAME so it survives
+                              every sort axis and reads at a glance in the top block. */}
+                          {r.worn ? '★ ' : ''}{r.item.name}
                         </Text>
                         <Text style={styles.durabilityChip}>
                           {dur.current}/{dur.max}
                         </Text>
                       </View>
+                      {r.worn && (
+                        <Text style={styles.repairWorn}>EQUIPPED — this is what breaks mid-fight</Text>
+                      )}
+                      {/* OTA-1125 — say WHY it is dimmed. "Greyed out" with no
+                          reason is the silent-rule failure OTA-1117 was written
+                          against; this one has a precise, honest answer. */}
+                      {groupStarved && (
+                        <Text style={styles.repairStarved}>
+                          The pieces you already picked are spending the materials this needs.
+                        </Text>
+                      )}
                       {preview.stats.length > 0 && (
                         <Text style={styles.recipeStats}>
                           {preview.stats.join(' · ')}
@@ -760,6 +1079,37 @@ export function CraftingScreen() {
         ]}
         onRequestClose={() => setDisciplineConfirm(null)}
       />
+
+      {/* OTA-1125 — the group repair confirm. A repair is not reversible and the
+          whole group spends from one pile, so the last screen before the hammer
+          falls itemises what is being mended AND what it costs. The bar above
+          already showed the running bill; this is where it stops being a
+          running number and becomes a bargain you agreed to. */}
+      <BrandedModal
+        visible={repairGroupConfirm}
+        title={`Repair ${repairPlan.picked.length} ${repairPlan.picked.length === 1 ? 'piece' : 'pieces'}?`}
+        body={[
+          repairPlan.picked
+            .map((r) => `· ${r.worn ? '★ ' : ''}${r.item.name} (${r.item.durability?.current ?? 0}/${r.item.durability?.max ?? 0})`)
+            .join('\n'),
+          repairPlan.spend.size > 0
+            ? `\nMaterials spent:\n${[...repairPlan.spend.entries()].map(([n, q]) => `· ${q}× ${n}`).join('\n')}`
+            : '',
+          // A ticked row the budget cannot pay for is NAMED, never dropped in
+          // silence. Stock can shift under a group — a craft in the next tab,
+          // a repair that resolved first — and a group that mends six of the
+          // seven pieces you picked without saying which one it skipped is the
+          // exact bulk-action failure this whole run has been written against.
+          repairPlan.starved.length > 0
+            ? `\nNot enough materials for:\n${repairPlan.starved.map((r) => `· ${r.item.name}`).join('\n')}\nThese stay damaged.`
+            : '',
+        ].filter(Boolean).join('\n')}
+        buttons={[
+          { label: 'Back', tone: 'neutral', onPress: () => setRepairGroupConfirm(false) },
+          { label: '⚒ Repair them', tone: 'primary', onPress: runRepairGroup },
+        ]}
+        onRequestClose={() => setRepairGroupConfirm(false)}
+      />
     </View>
   );
 }
@@ -839,6 +1189,63 @@ const styles = StyleSheet.create({
   recipeNameMuted: { color: '#a89a7a' },
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   durabilityChip: { color: '#c9a86a', fontSize: 11, fontWeight: '700' },
+  // OTA-1117 — the worn-gear callout on a REPAIR row. Same gold as the EQUIPPED
+  // badge in the Crucible upgrade list so "worn" reads identically everywhere.
+  repairWorn: { color: '#e6c67a', fontSize: 10, marginTop: 3, letterSpacing: 0.6, fontWeight: '700' },
+  // OTA-1121 — the REPAIR ALL bar. Green like the per-row "tap to repair" cue,
+  // because it does the same thing at scale; full width so it reads as an
+  // action on the list rather than a filter chip on the bar above it.
+  repairAllBtn: {
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    borderRadius: 4,
+    backgroundColor: '#1a2614',
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  repairAllText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  // OTA-1125 — the repair group bar. Same trade-gold frame as the vendor's
+  // group-sell bar (1122/1124) because it is the same gesture doing the same
+  // job in a different room; it stacks rather than sits in one row because the
+  // running material bill needs a line of its own.
+  groupBar: {
+    backgroundColor: '#1e1a12',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 8,
+    gap: 6,
+  },
+  groupBarHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  groupBarCount: { color: '#e6d8b3', fontSize: 12, fontWeight: '700', flexShrink: 1 },
+  groupBarCancel: {
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  groupBarCancelText: { color: '#a2977b', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  // The running bill — the number every dimmed row downstream is derived from.
+  groupBarSpend: { color: '#c9a86a', fontSize: 11, lineHeight: 15 },
+  groupBarGo: {
+    backgroundColor: '#1a2614',
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  groupBarGoOff: { opacity: 0.4 },
+  groupBarGoText: { color: '#9ec96a', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  // A picked row is outlined in the same gold as the bar, so a group reads as
+  // one block down the list; a starved one is pushed back behind it.
+  recipeRowPicked: { borderColor: '#c9a86a', backgroundColor: '#1e1a12' },
+  recipeRowStarved: { opacity: 0.45 },
+  repairStarved: { color: '#c9a86a', fontSize: 10, marginTop: 3, lineHeight: 14, fontStyle: 'italic' },
   // OTA-165 — stats line on REPAIR rows. Same style as RecipesView's
   // recipeStats so the REPAIR tab matches CRAFT / RECIPES visually.
   recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
