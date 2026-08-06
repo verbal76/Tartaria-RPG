@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.73';
+export const DISPLAY_VERSION = '4.29.74';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23219,7 +23219,55 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1163ThePressureTest (19 tests); ota1153/1158/1159/
 // 1160 retargeted where their old assertions WERE the seams.
 // DISPLAY_VERSION 4.29.73.
-export const OTA_BUILD_ID = '2026-08-06-1163-the-pressure-test';
+// OTA-1164 — THE OWNER'S THREE TUNING CALLS.
+// The pressure test put five measured balance questions in front
+// of the owner in plain terms; he picked three levers: "#5 so
+// suggestions 1 and 2. #2 gate it. and keep these on the tuning
+// list in handoff so we can follow up later."
+// ⚠ #2 GATED — THE SECOND SWING IS A TIER PRIVILEGE. The sim
+// priced the second swing as THE killer (a connected two-swing
+// round averages 22, 36% chance of deleting a full 24-HP bar; a
+// single swing can never one-round even a fresh arrival). Tier
+// 1-2 Core Guardians (the tier:N trait) now swing ONCE; tier 3+
+// and every non-Guardian boss keep the two-swing tempo. The early
+// walls become learnable; the late game keeps its teeth. The
+// enemy cards follow the truth: a gated Guardian no longer
+// advertises "twice per round" — that would be OTA-1159's lie
+// reborn in the other direction.
+// ⚠ AND THE STAGGER RULE GENERALIZED WITH IT, deliberately:
+// OTA-1160's stagger cancelled the SECOND swing, which the gate
+// just removed from the tiers the owner actually fights — his
+// Searing Paste would have become worthless exactly where he uses
+// it. The rule is now A STAGGER DENIES ONE SWING, whichever swing
+// that is: the second on a big boss, the ONLY one on a gated
+// Guardian (checked before its counter, after the dog redirect so
+// a soaked swing never spends it). Same absolute value either
+// way, and the fight stays real — a gated boss swings on every
+// round the player does NOT land a fresh weakness hit. 1160's
+// "first swing always lands" is consciously revised for the gated
+// tiers only; its suite is re-authored to say so.
+// ⚠ #5.1 — THE HIT-FLOOR CEILING RISES 13 → 16. At cap 13 every
+// point of armor past raw 18 bought nothing against an ordinary
+// ATK-5 enemy (~40% floor hit chance), which is the "I upgraded
+// and nothing changed" feeling in one constant. At 16 the floor
+// is ~25% — a maxed tank still takes one swing in four, and armor
+// keeps paying to raw ~21.
+// ⚠ #5.2 — CAPPED-OFF AC BECOMES PLATE. AC past the cap used to
+// buy literally nothing; now every 2 excess points shave 1 damage
+// from a landed hit (max −4), printed as `plate −N` in the damage
+// clause so the tank can SEE the wasted armor working. Runs
+// BEFORE the 30% mitigation floor, so never-immune holds.
+// ⚠ THE STANDING TUNING LIST now leads HANDOFF §8, per the
+// owner's instruction — DONE items marked, OPEN items carrying
+// the sim numbers: tier-1 spawn HP (59 vs authored 42),
+// acid-shred × stagger compounding (~95% swing denial), the dog
+// redirect eating a boss round, dodge at very high DEX, and the
+// knee-trim-vs-cap ownership question.
+// New suite ota1164TheOwnersTuningCalls (16 tests); ota1160's
+// first-swing test re-authored, not re-numbered.
+// DISPLAY_VERSION 4.29.74.
+export const OTA_BUILD_ID = '2026-08-06-1164-the-owners-tuning-calls';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1163-the-pressure-test';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1162-the-audit-batch';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1161-the-comma-that-ate-the-beat';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1160-worth-bringing';
