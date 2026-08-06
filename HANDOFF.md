@@ -1129,7 +1129,91 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE VOICE STOPS ARRIVING AFTER YOU ALREADY READ IT (2026-08-05, latest).
+- **⚠⚠ THE ARBITER STOPS RAMBLING AND THE PROMPT STOPS LEAKING (2026-08-05, latest).
+  BOTH LINES.** golem OTA-1131 / HAL OTA-1154. Both findings come from
+  **one** device log (4.29.62 / OTA-1129), and neither was reproducible from a
+  cold read of the code — this is instrumentation doing the job it exists for.
+
+  ⚠ **1. Five unrelated lore lines in ten seconds, one tile.**
+
+  | time | line |
+  |---|---|
+  | 00:14:43 | *"You saw the traveler … That memory will rot if you leave it."* |
+  | 00:14:45 | *"Black, polished, magnetic. They were aimed at something in the sky."* |
+  | 00:14:47 | *"The observatory beneath the Pillars charted skies that no longer exist."* |
+  | 00:14:51 | *"Walk between two Pillars and your compass forgets you for a moment."* |
+  | 00:14:53 | *"Birds will not perch here. Birds are wise."* |
+
+  Every one carries `reason=intent-not-allowed:investigate` — the **template**
+  path, which appended a flavor line *unconditionally on every call*. The owner:
+
+  > *"if he has multiple lines and they don't have a gap of time in between and
+  > they are unrelated topics then he just sounds like he is rambling. I don't
+  > want the arbiter to be a chatty Kathy … forcing him to repeatedly say
+  > multiple things in one tile comes across as too much."*
+
+  ⚠ **The fix is a BUDGET, not a filter**, and that distinction is the whole
+  design. Every one of those five lines is good *on its own*; the defect is only
+  that they arrived together. Nothing here judges a line's quality — it rations
+  how often the Arbiter volunteers something unasked. Two limits, because the
+  owner named two different things:
+
+  - **One per tile** — *"multiple things in one tile comes across as too much"*.
+  - **A shared clock** — *"they don't have a gap of time in between"*. Crossing
+    into a new tile resets the count but **not** the clock; otherwise sprinting
+    through four tiles produces four asides, which is the same rambling by
+    another route.
+
+  ⚠ **What is deliberately NOT rationed**, in the owner's own words: *"lore
+  flavor lines are good advice on how to play. like what weapon to choose or he
+  notices that they're resistant to something is good."* Those are **answers**
+  to something the player did — combat cues, resist callouts, refusals, mission
+  beats — and they never pass through this door at all.
+
+  The clock is shared by **every** Arbiter line, not just the budgeted ones: in
+  the same ten seconds an ambient musing landed *between* the asides, so a
+  generated line stamps the clock too, and ambient now waits when he has just
+  spoken. The banked arrival intro **spends** the tile's budget, which is right —
+  it is the line with something to say about where the player now is, and
+  everything after it waits.
+
+  ⚠ **2. The prompt leaked into the feed, and was read aloud.**
+
+  > `[arbiter] Your read of them: HP 24/24, Stamina 8/14, AC 10 You, the
+  > seasoned traveler, have`
+
+  That is the ambient prompt's own line — `Your read of them: ${player_stats}` —
+  recited back and then continued from. OTA-1030 built
+  `looksLikeInstructionEcho` for exactly this class and it carries a dozen
+  patterns; **every one of them is about the model reciting its INSTRUCTIONS.**
+  None covered it reciting the **facts block**, which is just as much prompt and
+  reads worse, because it puts raw numbers in the narrator's mouth.
+
+  Guarded now on the literal strings the prompt emits, per OTA-1125's standing
+  rule: *when a log hands you the exact failing input, build the guard around
+  that string.* The suite asserts the verbatim leaked line, each of its halves,
+  and every other field label — plus **seven ordinary Arbiter lines that must
+  survive**, because a guard that quietly deletes the feature is the recurring
+  failure in this area (OTA-1031 ate the ambient companion for four builds).
+
+  New suite `ota1131StopRambling` (14 tests).
+
+  **Also seen in the same log, recorded and not yet acted on:**
+
+  - `narration:scene_intro_fill preempted 7989ms … out 0t` — the OTA-1129 bank
+    fill started and was cut short by the player acting. The harness behaving
+    exactly as designed, but it means the bank may rarely fill during active
+    play. One sample; worth watching before tuning.
+  - `item_synth:rejected-by-clamp` twice out of two — item synthesis paid full
+    price and produced nothing usable both times.
+  - **AC 10 with a full kit.** The `stats:` debug lines show eight worn pieces
+    and `gear: INT+2,STR+4,DEX+4` — **no AC contribution at all** — while AC
+    reads 10, the bare-skin base. The OTA-1124 `ac-shift` ledger did not fire
+    because it only runs inside `applyEnemyCounter`, and the player fled both
+    fights. That is the data-capture hole the owner asked about: **the ledger
+    needs to fire outside combat too.**
+
+- **⚠⚠ THE VOICE STOPS ARRIVING AFTER YOU ALREADY READ IT (2026-08-05).
   BOTH LINES.** golem OTA-1130 / HAL OTA-1153. The owner, playing:
 
   > *"do we need to see the text and then hear it? that's what makes the voice

@@ -71,6 +71,29 @@ const INSTRUCTION_ECHO_PATTERNS: readonly RegExp[] = [
   /\b(the|their) last action\b/i,
   /\bavailable player actions\b/i,
   /\bidle companion talk\b/i,
+  // ⚠ OTA-1131 — THE PROMPT'S OWN FIELD LABELS, TAKEN VERBATIM FROM THE LOG.
+  // The device log for OTA-1129 carried this, on screen AND voiced aloud:
+  //
+  //   [arbiter] Your read of them: HP 24/24, Stamina 8/14, AC 10 You, the
+  //             seasoned traveler, have
+  //
+  // That is the ambient prompt's own line — `Your read of them: ${player_stats}`
+  // — recited back and then continued from. Every guard above is about the
+  // model reciting its INSTRUCTIONS; none covered it reciting the FACTS BLOCK,
+  // which is just as much prompt and reads even worse, because it puts raw
+  // numbers in the narrator's mouth.
+  //
+  // Anchored on the literal strings the prompt emits, per OTA-1125's rule:
+  // when a log hands you the exact failing input, build the guard around THAT
+  // STRING rather than around a reconstruction of it.
+  /\byour read of them\b/i,
+  /\bentities present\b/i,
+  /\binventory & equipment\b/i,
+  /^\s*(stats|location|environment|exits)\s*:/i,
+  // …and the SHAPE of the stat block, which is the half that survived in the
+  // log after its label. No narration ever says "HP 24/24, Stamina 8/14" —
+  // that is a readout, not a sentence.
+  /\bhp \d+\s*\/\s*\d+\s*,\s*stamina \d+\s*\/\s*\d+/i,
   // An imperative ALONE is not a tell — the Arbiter really does say "Do not
   // look behind you." and "Speak carefully." (both authored lines, and an
   // earlier draft of this guard silently ate them). What marks a craft
