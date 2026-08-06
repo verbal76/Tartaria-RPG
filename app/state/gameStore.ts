@@ -7013,6 +7013,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (!qwen.isReady()) return;
           if (synthInFlight) return;
           if (Date.now() - lastSynthAt < SYNTH_GAP_MS) return;
+          // ⚠ OTA-1168 — ONLY WHILE SOMEONE IS ACTUALLY READING. This is the
+          // defect the owner's load log caught, and it is a JS-side scheduling
+          // bug, not a native one: `inferGear` runs over the WHOLE INVENTORY
+          // during save-load hydration, so a save with one unclassifiable item
+          // fired an interactive-priority generation ~160 ms into the load —
+          // and then held the native-ML lock through 3.5 s of uninterruptible
+          // prefill while the greeting the player had already read waited to
+          // be spoken.
+          //
+          // Nobody was waiting on it. This path's own contract is that the
+          // result "lands in the cache for the NEXT lookup" (the current render
+          // keeps its static row, and OTA-192 restamps later), so it was never
+          // interactive work — OTA-1157's note that "a player who opened an
+          // unknown item IS waiting on it" is true of the POPUP, not of this
+          // requester. Gating on `uiIdleSince` — the owner's own homework
+          // signal, stamped only by stationary screens (pack / map / menu) —
+          // makes it fire exactly when someone is reading and never during a
+          // load, when that stamp is null.
+          if (get().uiIdleSince === null) return;
           synthInFlight = true;
           lastSynthAt = Date.now();
           pending.add(key);
@@ -7020,7 +7039,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // (a stat resolution inside inventory render) returns first.
           void Promise.resolve().then(async () => {
             try {
-              await synth.synthesizeItemViaQwen(name, hintTags, qwen);
+              // ⚠ OTA-1168 — and it runs as HOMEWORK, which is what it always
+              // was: below voice, and cut short the instant real work arrives.
+              // Priority alone never fixed this (a started job cannot be
+              // outranked) but it is the honest label, and it stops this path
+              // ever queueing ahead of a line the player is waiting to hear.
+              await synth.synthesizeItemViaQwen(name, hintTags, qwen, { homework: true });
             } catch { /* ignore — fail closed, static row stays */ }
             pending.delete(key);
             // OTA-1132 — the gap is measured from COMPLETION, not from the
