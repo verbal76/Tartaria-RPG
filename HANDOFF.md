@@ -516,7 +516,7 @@ Key invariants worth knowing:
 
 - **⚠⚠ STANDING TUNING LIST (owner directive, 2026-08-06 — "keep these on the tuning list in handoff so we
   can follow up later"). Source: the OTA-1140 pressure test (20,000-trial Monte Carlo vs the real engine);
-  decisions taken in OTA-1141 are marked DONE, the rest are OPEN owner calls:**
+  decisions taken in OTA-1141/1142 are marked DONE, the rest are OPEN owner calls:**
   - **DONE — boss second swing gated by tier** (OTA-1141): tier 1-2 Core Guardians swing once, tier 3+ and
     non-Guardian bosses keep two. Stagger now denies ONE swing whichever it is. Verify on-device: the tier-1
     fight should be survivable-with-the-right-tool now; re-sim after the next device log if it still feels
@@ -524,15 +524,19 @@ Key invariants worth knowing:
   - **DONE — hit-floor ceiling 13 → 16 + PLATE** (OTA-1141): armor pays to raw ~21; excess AC soaks 1 dmg
     per 2 points (max −4), printed as `plate −N`. Watch: heavy-build fights should not stall past the
     combatStress caps (floor dropped 40% → 25%).
-  - **OPEN — tier-1 Guardian spawn HP**: spawns at **59**, not the authored 42 (`monotoneTierHp` floor ×
-    over-level ≥1). Even single-swing, a fresh 24-HP arrival wins ~rarely fighting fair. If the gate isn't
-    enough on-device, the lever is tier-1's `hpMult` (1.4) in `TIER_PROFILES` / `CANON_BASE_HP` (42).
-  - **OPEN — acid-shred × stagger compounding**: acid strips up to **11 AC off a boss** (`acidShredCap` +
-    `ACID_SHRED_BOSS_BONUS`), pushing weakness-hit uptime toward ~95% swing denial. Two systems fine alone,
-    multiplying. Levers: boss shred cap, or stagger requiring an UN-shredded hit.
-  - **OPEN — the dog redirect eats a boss's round**: 25% (`DOG_TARGET_CHANCE`) of boss swings redirect to
-    the dog AND skip the second-swing block entirely, and `applyEnemyCounterToDog` rolls no boss +1d6. A
-    boss round can silently collapse to one under-rolled swing at the dog.
+  - **DONE — tier-1 Guardian spawn HP 59 → 42** (OTA-1142): `hpMult` 1.4 → 1.0. She was ALWAYS tier 1 —
+    the ×1.4 was tuned against pre-OTA-926 per-Capital bases (30-50 HP) and never re-derived after the
+    canonical-42 switch. Sim re-run: fresh-arrival fair-fight win 4.6% → 15.0%, weakness+stagger 58.8% →
+    70.9%. Tiers 2+ untouched.
+  - **DONE — HP milestone every 3 distinct kills** (OTA-1142): `MILESTONE_KILL_STEP` 5 → 3 (travel stays
+    5). One-round-death risk stays >5% until ~28 max HP; the faster drip is the cleanest "arrivals are too
+    thin" lever. arb119 distinct-kill farm guard unchanged and pinned.
+  - **DONE — acid boss shred cap 11 → 7** (OTA-1142): `ACID_SHRED_BOSS_BONUS` 6 → 2. Parity with the +6
+    boss AC bonus let acid erase the wall and compound with stagger into the stagger-lock exploit (E1).
+    Watch on-device: acid should still feel worth carrying into boss fights, just not mandatory.
+  - **DONE — bosses fight the person in front of them** (OTA-1142): the 25% random dog soak no longer
+    fires on a boss (it skipped the second-swing block and rolled no boss +1d6). Ordinary enemies keep the
+    soak; a FAILED DISTRACT still redirects on a boss (OTA-795 — the player chose that risk).
   - **OPEN — dodge at very high DEX**: fine at DEX 13 (79-82% contest win, +8-10% net EV). The contest win
     rate keeps climbing with DEX; re-check ≥17 in a future log before it re-approaches the old dominance.
   - **OPEN — knee-22 trim vs hit-floor ownership**: two rules both claim "armor has diminishing returns";
@@ -562,7 +566,7 @@ Key invariants worth knowing:
   - Boss bonus die **+1d6/swing** (inline, applyEnemyCounter) — the hidden boss damage rider.
   - `bossSwingsTwice` tier threshold **≤2 = one swing** (`combatRules.ts`) — which Guardian tiers get the second swing. Raise to 3 to soften tier 3 too.
   - Stagger duration **1 round / denies 1 swing** (staggerEnemy/takeStagger) — the weakness reward.
-  - `CANON_BASE_HP` (42) × `TIER_PROFILES[t].hpMult` (1.4 → 7.0) — Guardian HP curve. Tier-1's 1.4 is the OPEN item (spawns at 59).
+  - `CANON_BASE_HP` (42) × `TIER_PROFILES[t].hpMult` (1.0 → 7.0) — Guardian HP curve. Tier-1 re-authored to 1.0 in OTA-1142 (spawns at 42; the drifted ×1.4 = 59 is DONE above).
   - `TIER_PROFILES` acBonus / damage per tier — Guardian AC and dice ladder.
   - `FINAL_GUARDIAN_HP` (660) — the last boss's ~20-round wall.
   - `guardianOverLevel` cap **1.9** — how hard over-leveled players get scaled up; expected-power curve ~17→41.
@@ -572,7 +576,7 @@ Key invariants worth knowing:
 
   **C. Coatings / DOTs / shred (`weaponCoating.ts`)**
   - `COATING_DOT_TURNS` (3) — DOT length; also multiplies the thrown-vial burst (perTurn × this).
-  - `ACID_SHRED_PER_HIT` (1) / `ACID_SHRED_MAX` (5) / `ACID_SHRED_BOSS_BONUS` (+6 → 11 on bosses) — the AC-strip ladder. The boss bonus is the OPEN acid×stagger compounding item.
+  - `ACID_SHRED_PER_HIT` (1) / `ACID_SHRED_MAX` (5) / `ACID_SHRED_BOSS_BONUS` (+2 → 7 on bosses, OTA-1142) — the AC-strip ladder. The old +6 (=11) was the acid×stagger compounding item, now DONE above.
   - `CORRUPTION_STACK_MAX` (5) / `CORRUPTION_STACK_BOSS_BONUS` (+6) / `CORRUPTION_STACK_BONUS` (+1 DOT per stack) — the ramping-rot ceiling.
   - `COATING_RESIST_LAND_CHANCE` (0.15) — chance a coating still takes on a resistant enemy.
   - `LOOT_COATING_CHANCE` (0.18) — how often dropped weapons arrive pre-coated.
@@ -580,7 +584,7 @@ Key invariants worth knowing:
   - `ADDED_RESIST_CAP` (3, gameStore) — max coating-vial resists worked into one armor piece.
 
   **D. Companions (dog / golem)**
-  - `DOG_TARGET_CHANCE` (0.25, gameStore) — how often an enemy swing redirects onto the dog. The OPEN boss-round-collapse item.
+  - `DOG_TARGET_CHANCE` (0.25, gameStore) — how often an ORDINARY enemy swing redirects onto the dog. Bosses excluded since OTA-1142 (the boss-round-collapse item, DONE above); forced distract still redirects on bosses.
   - `DOG_BLEED_OUT_HOURS` (24) — rescue window for a downed dog. `REVIVE_DOG_COST` (300, vendorServices).
   - Dog AC = 10 + DEXmod + vest (inline) — vest value lives in dogGear acBonus.
   - `FEED_PER_STEP` (3, gameStore) — golem feed drain cadence; `HP_PER_LEVEL` (3, golems.ts).
@@ -588,7 +592,7 @@ Key invariants worth knowing:
 
   **E. Player growth / healing / stamina**
   - `scaledHealHP` **15% kit / 4% meal** floor flat-5 (`itemEffect.ts`) + rest heal **15% hpMax** — the healing economy (owner-set OTA-978).
-  - `MILESTONE_KILL_STEP` / `MILESTONE_TRAVEL_STEP` (5) — +1 maxHP per 5 kills, +1 maxStamina per 5 travels. THE arrival-HP curve: lower these to fatten early characters (the sim's "arrival needs ~28-30 HP" lever).
+  - `MILESTONE_KILL_STEP` (3, OTA-1142) / `MILESTONE_TRAVEL_STEP` (5) — +1 maxHP per 3 distinct kills, +1 maxStamina per 5 travels. THE arrival-HP curve; the kill step was lowered from 5 as the sim's "arrival needs ~28-30 HP" lever.
   - `LEVEL_UP_THRESHOLD` (100) / `MAX_TRAINED_STAT` (30) / `NEAR_MISS_*` (statTraining) — stat growth pace.
   - `HP_REGEN_CAP` (2) / `STAMINA_REGEN_CAP` (3) (`equipment.ts`) — max gear regen per tick.
   - `PASSIVE_STAT_CAP` (2, itemEffect) — max accessory stat bonus.
@@ -1256,7 +1260,50 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE OWNER'S THREE TUNING CALLS (2026-08-06, latest). BOTH LINES.** golem
+- **⚠⚠ THE FOUR-LEVER BATCH (2026-08-06, latest). BOTH LINES.** golem OTA-1142 /
+  HAL OTA-1165. From the MASTER TUNING REFERENCE, the recommended four; the
+  owner: *"yes run the 4 level batch."* All pure number/gate turns, all moved
+  to DONE on the STANDING TUNING LIST in §8:
+
+  ⚠ **1. Tier-1 Guardian hpMult 1.4 → 1.0 (59 HP → 42).** She IS tier 1 —
+  the answer to the owner's *"why isn't she spawning at the right tier?"* is
+  that the tier was right and the *multiplier* had drifted: ×1.4 was tuned
+  against pre-OTA-926 per-Capital bases (30-50 HP) and nothing re-derived it
+  after the canonical-42 switch, so the first rung carried a silent 40% raise.
+  Tiers 2+ untouched; `ota931GuardianMonotoneStaging` retargeted to the
+  re-authored curve `[42, 67, 76, …]` (the monotone floor is a no-op at the
+  old inversion site now — tier 2's raw 67 clears 42 on its own).
+
+  ⚠ **2. MILESTONE_KILL_STEP 5 → 3** (travel stays 5). One-round-death risk
+  stays >5% until ~28 max HP and a fresh arrival has 24; the faster HP drip
+  touches zero enemies and pays the player for playing. The arb119
+  distinct-kill guard matters MORE at the smaller step — still pinned.
+
+  ⚠ **3. ACID_SHRED_BOSS_BONUS 6 → 2** (boss shred cap 11 → 7). Parity with
+  the +6 boss AC bonus let acid erase the boss wall outright and compound
+  with weakness-stagger into the stagger-lock exploit (E1). Acid still pays
+  against bosses; it no longer deletes them.
+
+  ⚠ **4. Bosses fight the person in front of them.** The 25% random dog soak
+  no longer fires on a boss — it skipped the second-swing block AND rolled no
+  boss +1d6, an invisible difficulty coin-flip every boss round. Ordinary
+  enemies keep the soak (that is the dog doing its job); a FAILED DISTRACT
+  still redirects on a boss (OTA-795 — the player chose that risk).
+
+  ⚠ **Sim re-run** (20k trials/cell, engine formulas — Guardian AC 17 / atk
+  +6 / 1d8+3+1d6 single swing; player 24 HP / AC 19 / 2d6): fresh-arrival
+  fair-fight win **4.6% → 15.0%** (triples), weakness+stagger play **58.8% →
+  70.9%**; at 30 HP (reached sooner via the faster drip) 22.2% fair / 78.8%
+  weakness; 2-round passive death 8.0%. The wall is now a lesson, not a coin
+  flip — and the weakness game is clearly the intended path without being
+  an auto-win.
+
+  New suite `ota1142TheFourLeverBatch` (12 tests); `weaponCoating`'s
+  boss-headroom pin retargeted 6 → 2 with the reason in-suite; `ota1141`'s
+  redirect anchor retargeted to the boss-gated line (its ordering claim is
+  unchanged).
+
+- **⚠⚠ THE OWNER'S THREE TUNING CALLS (2026-08-06). BOTH LINES.** golem
   OTA-1141 / HAL OTA-1164. From the pressure-test numbers, the owner picked
   three levers: *"#5 so suggestions 1 and 2. #2 gate it. and keep these on the
   tuning list in handoff so we can follow up later."*

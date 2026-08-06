@@ -65,17 +65,29 @@ describe('OTA-931 Guardian monotone staging floor', () => {
     }
   });
 
-  it('lifts the known review-found inversion (power 20: T1 69 HP, T2 was 67)', () => {
+  it('the review-found inversion site stays monotone (power 20: T1 vs T2)', () => {
+    // ⚠ RETARGETED for OTA-1142 (owner tuning): tier 1's hpMult went 1.4 → 1.0,
+    // so the very inversion this test pinned (T1 69 > T2 67 raw) no longer
+    // arises at this power — T2's raw 67 now clears T1's 49 on its own and the
+    // OTA-931 floor is a no-op here. The floor mechanism itself is still
+    // exercised by the full power-sweep test above; this test now pins the
+    // re-authored values and the ordering at the historical trouble spot.
     const t1 = spawnGuardianForCapital(makePlayer(10, []), TARGET)!;
     const t2 = spawnGuardianForCapital(makePlayer(10, LOST_CAPITAL_LOCATIONS.slice(0, 1)), TARGET)!;
-    expect(t1.hp).toBe(69); // authored T1 × over-level, unchanged
-    expect(t2.hp).toBe(70); // was 67 — floored to strictly above T1
+    expect(t1.hp).toBe(49); // 42 × 1.0 × over-level (was 69 under the ×1.4)
+    expect(t2.hp).toBe(67); // raw curve value — no floor needed anymore
+    expect(t2.hp).toBeGreaterThan(t1.hp);
   });
 
   it('on-curve fights stage byte-identically to the authored OTA-926 curve', () => {
     // power 12 (< every tier's expected power) → over = 1 everywhere → the floor is a
     // no-op and the authored curve must come through untouched.
-    const authored = [59, 67, 76, 84, 92, 101, 168, 231];
+    // ⚠ Tier 1 RETARGETED 59 → 42 for OTA-1142 (owner tuning): hpMult 1.4 → 1.0.
+    // The ×1.4 was tuned against pre-OTA-926 per-Capital bases (30-50 HP); when
+    // OTA-926 flattened the base to 42 for everyone, the first rung silently
+    // inherited a 40% raise nothing re-derived. Tiers 2+ are untouched, and the
+    // monotone floor stays a no-op here since tier 2's own 42×1.6=67 clears 42.
+    const authored = [42, 67, 76, 84, 92, 101, 168, 231];
     const aps: number[] = [];
     for (let cores = 0; cores <= 7; cores++) {
       const g = spawnGuardianForCapital(makePlayer(2, LOST_CAPITAL_LOCATIONS.slice(0, cores)), TARGET)!;

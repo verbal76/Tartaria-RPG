@@ -212,12 +212,17 @@ describe('Disease Sample crafted items (OTA-370)', () => {
     }
   });
 
-  // OTA-480 — armor-shred cap scales on bosses so acid can strip the +6 boss-AC
-  // wall (a normal foe still caps at base, no trivialising trash).
-  it('acidShredCap: normal foe caps at base, a boss gets the boss headroom', () => {
+  // OTA-480 — armor-shred cap scales on bosses so acid gets SOME extra headroom
+  // against the +6 boss-AC wall (a normal foe still caps at base).
+  // ⚠ RETARGETED for OTA-1142 (owner tuning): the bonus was 6 — full parity with
+  // the boss AC bonus — which let acid strip a boss 11 AC and, combined with
+  // weakness-stagger, turned bosses into training dummies (exploit report E1,
+  // stagger-lock). Now 2: acid still pays against bosses, it just can't erase
+  // the wall.
+  it('acidShredCap: normal foe caps at base, a boss gets modest headroom', () => {
     expect(acidShredCap({ boss: false })).toBe(ACID_SHRED_MAX);
     expect(acidShredCap(null)).toBe(ACID_SHRED_MAX);
     expect(acidShredCap({ boss: true })).toBe(ACID_SHRED_MAX + ACID_SHRED_BOSS_BONUS);
-    expect(ACID_SHRED_BOSS_BONUS).toBe(6); // matches the boss AC bonus it's meant to strip
+    expect(ACID_SHRED_BOSS_BONUS).toBe(2); // deliberately LESS than the +6 boss AC bonus
   });
 });

@@ -3594,7 +3594,11 @@ function maybePatrolAmbush(
 // Milestone thresholds. Hit one of these counters and the character gets a
 // permanent stat bump. Numbers are intentionally generous so growth feels
 // earned, not handed out.
-const MILESTONE_KILL_STEP = 5;     // every 5 enemies defeated → +1 HP max
+// ⚠ OTA-1142 (owner tuning) — 5 → 3. The sim: one-round-death risk does not
+// fall under 5% until ~28 max HP, and a fresh arrival has 24. This is the
+// cleanest "arrivals are too thin" lever — it touches zero enemies and pays
+// the player for playing. Travel milestone deliberately stays at 5.
+const MILESTONE_KILL_STEP = 3;     // every 3 enemies defeated → +1 HP max
 const MILESTONE_TRAVEL_STEP = 5;   // every 5 travels → +1 stamina max
 // OTA 058 — MILESTONE_CHECK_STEP retired. Skill-check stat growth is
 // now per-use via engine/statTraining (Skyrim model). HP and stamina
@@ -33966,7 +33970,15 @@ export function runEnemyGroupCounters(
     const dogUp = !!dogNow && dogNow.status === 'with_player' && dogNow.hp > 0;
     // OTA-795 — failed-distract redirect wins over the random soak roll.
     const forcedOnDog = dogUp && opts?.forceDogEnemyIdx === liveIdx;
-    if (dogUp && (forcedOnDog || Math.random() < DOG_TARGET_CHANCE)) {
+    // ⚠ OTA-1142 (owner tuning) — BOSSES FIGHT THE PERSON IN FRONT OF THEM.
+    // The random soak silently collapsed 25% of boss rounds to one under-rolled
+    // swing at the dog (the redirect skips the second-swing block AND
+    // applyEnemyCounterToDog rolls no boss +1d6) — an invisible difficulty
+    // coin-flip every boss round, and dog HP fed into hits far above its
+    // weight. Ordinary enemies keep the soak: that is the dog doing its job.
+    // A FAILED DISTRACT still redirects even on a boss — commanding the dog at
+    // a boss and blowing the roll is a consequence the player chose (OTA-795).
+    if (dogUp && (forcedOnDog || (!enemy.boss && Math.random() < DOG_TARGET_CHANCE))) {
       applyEnemyCounterToDog(enemy, get, set);
       continue;
     }
