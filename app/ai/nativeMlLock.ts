@@ -48,8 +48,38 @@
  *  asks the running one to FINISH EARLY, and the chain still waits for it to
  *  settle before pumping. The arb159 crash guarantee is exactly as strong. */
 export const ML_PRIORITY_HOMEWORK = -1;
-/** Lower number = lower priority. Voice yields to LLM narration. */
-export const ML_PRIORITY_VOICE = 0;
+/** ⚠ OTA-1130 — THE VOICE NOW OUTRANKS THE LLM, REVERSING OTA-634.
+ *
+ *  This is not a bug fix. It is a design call being overruled by the person who
+ *  has to live with it. OTA-634 wrote its trade down plainly — *"LLM narration
+ *  jumps ahead of voice synth so the words land promptly and the voice fills in
+ *  behind"* — and that reasoning is coherent on its own terms. The owner,
+ *  playing the result:
+ *
+ *    *"do we need to see the text and then hear it? that's what makes the voice
+ *     feel late sometimes, you read it then hear it 10 seconds later."*
+ *
+ *  ⚠ THE ARITHMETIC SETTLES IT. OTA-1128 measured one scene_intro generation at
+ *  19.3 s. Under the old order a line ALREADY ON SCREEN had to wait behind that
+ *  entire generation before a single syllable could be synthesised — so the
+ *  voice did not merely trail, it trailed by the length of the NEXT narration.
+ *  That is the reported ten seconds, and it is structural rather than
+ *  occasional.
+ *
+ *  And the two sides are not symmetrical, which is the thing OTA-634 could not
+ *  see from where it stood: a narration delayed two seconds is INVISIBLE,
+ *  because nothing is shown until it completes anyway. A voice delayed ten
+ *  seconds is the most obvious defect in the game — you have already read the
+ *  line it is reading to you.
+ *
+ *  ⚠ WHAT MAKES THE REVERSAL SAFE, and did not exist in OTA-634's day: the
+ *  total queue cap (three whole lines — OTA-634's own mitigation), and
+ *  OTA-1130's stale-line drop, which refuses to speak a line the player has
+ *  already read past. Together those bound how long the voice can hold the
+ *  lock, which is the failure mode OTA-634 was actually defending against.
+ *
+ *  Homework stays below everything, so idle work still yields to both. */
+export const ML_PRIORITY_VOICE = 2;
 export const ML_PRIORITY_LLM = 1;
 
 interface PendingMl {

@@ -42,9 +42,21 @@ const src = (p: string): string => readFileSync(join(__dirname, '..', p), 'utf8'
 const tick = (): Promise<void> => new Promise((r) => setTimeout(r, 0));
 
 describe('OTA-1123 — homework is the lowest priority there is', () => {
-  it('the tiers are ordered homework < voice < narration', () => {
-    expect(ML_PRIORITY_HOMEWORK).toBeLessThan(ML_PRIORITY_VOICE);
-    expect(ML_PRIORITY_VOICE).toBeLessThan(ML_PRIORITY_LLM);
+  it('⚠ the tiers are ordered homework < narration < VOICE (reordered by OTA-1130)', () => {
+    // ⚠ RE-AUTHORED, NOT RE-NUMBERED. OTA-1123's claim was "homework is the
+    // lowest priority there is", and THAT part is untouched and still the
+    // point of this suite. What changed above it is a separate decision:
+    // OTA-1130 put the voice ABOVE narration, reversing OTA-634, because the
+    // owner reported reading a line and then hearing it ten seconds later —
+    // the voice was waiting out a whole 19-second scene_intro generation.
+    // Asserting the old order here would be asserting a design the game no
+    // longer has.
+    expect(ML_PRIORITY_HOMEWORK).toBeLessThan(ML_PRIORITY_LLM);
+    expect(ML_PRIORITY_LLM).toBeLessThan(ML_PRIORITY_VOICE);
+    // The invariant OTA-1123 actually owns, stated directly: nothing ranks
+    // below homework.
+    expect(Math.min(ML_PRIORITY_HOMEWORK, ML_PRIORITY_VOICE, ML_PRIORITY_LLM))
+      .toBe(ML_PRIORITY_HOMEWORK);
   });
 
   it('⚠ a queued homework job runs LAST, behind voice and narration', async () => {
@@ -56,7 +68,10 @@ describe('OTA-1123 — homework is the lowest priority there is', () => {
     const voice = runExclusiveNativeMl(async () => { order.push('voice'); }, ML_PRIORITY_VOICE);
     const llm = runExclusiveNativeMl(async () => { order.push('llm'); }, ML_PRIORITY_LLM);
     await Promise.all([blocker, hw, voice, llm]);
-    expect(order).toEqual(['blocker', 'llm', 'voice', 'homework']);
+    // ⚠ RETARGETED BY OTA-1130 — voice and llm swap places. Homework still runs
+    // LAST, which is what this test is named for and what OTA-1123 secured.
+    expect(order).toEqual(['blocker', 'voice', 'llm', 'homework']);
+    expect(order[order.length - 1]).toBe('homework');
   });
 });
 

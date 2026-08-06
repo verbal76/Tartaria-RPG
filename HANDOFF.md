@@ -1129,7 +1129,80 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE SCENE INTRO COMES OFF THE CRITICAL PATH (2026-08-05, latest). BOTH
+- **⚠⚠ THE VOICE STOPS ARRIVING AFTER YOU ALREADY READ IT (2026-08-05, latest).
+  BOTH LINES.** golem OTA-1130 / HAL OTA-1153. The owner, playing:
+
+  > *"do we need to see the text and then hear it? that's what makes the voice
+  > feel late sometimes, you read it then hear it 10 seconds later."*
+
+  ⚠ **The mechanism, and it was not an accident.** Kokoro and Qwen share **one
+  lock** — arb159 put them there because running both at once SIGSEGV'd the
+  Tensor G5, and that exclusivity is non-negotiable. OTA-634 then made the lock
+  priority-aware and wrote its trade down plainly:
+
+  > *"LLM narration jumps ahead of voice synth so the words land promptly and
+  > the voice fills in behind."*
+
+  So a line **already on screen** had to wait behind whatever the model did
+  next — and OTA-1128 measured what that is: a `scene_intro` generation runs
+  **19.3 seconds**. The voice was not merely trailing; it was trailing by the
+  length of the *next* narration. That is the reported ten seconds, and it is
+  structural rather than occasional.
+
+  ⚠ **The two sides are not symmetrical**, which is the thing OTA-634 could not
+  see from where it stood. A narration delayed two seconds is **invisible** —
+  nothing is shown until it completes anyway. A voice delayed ten seconds is the
+  most obvious defect in the game, because you have already read the line it is
+  reading to you. So the order flips: **voice now outranks the LLM.**
+
+  ⚠ **A reversal needs an answer to the fear it revives.** OTA-634's worry was a
+  voice backlog making responses feel slow. Two things bound it now:
+
+  1. the **total queue cap** of three whole lines — OTA-634's own mitigation; and
+  2. the **stale-line drop** added here: a line whose text has been on screen
+     longer than six seconds is never spoken at all. Past that point the audio is
+     an echo of something the player read and moved on from, laid over whatever
+     is happening now, and silence is better. Whole **lines** are dropped, never
+     half of one.
+
+  The backlog cannot grow old, because old lines do not get spoken.
+
+  ⚠ **Third piece: pre-synthesis.** OTA-1129 banked scene intros so the *text*
+  lands instantly — which made this gap **more** visible, a consequence flagged
+  in that OTA's own handoff rather than left to be discovered. The bank is also
+  what makes the real fix possible for the first time: *if the line exists
+  before it is needed, so can its audio.* A banked line is now synthesised in
+  the same idle window that wrote it, at **homework priority**, and `speak()`
+  finds the PCM already waiting. Text and voice land together — the actual
+  answer to the owner's question.
+
+  ⚠ **One shared chunker.** The cache is keyed per chunk and read at enqueue, so
+  `speak()` and `presynthesize()` **must** split identically. A split differing
+  by one character would miss every single time, and miss *silently* — the
+  feature would simply appear not to help, with nothing in any log to say why.
+  The chunking is now one function with one answer.
+
+  **And the other two questions, answered and recorded** (all three are pinned
+  by tests, so they cannot quietly stop being true):
+
+  - **Item-description homework is written only.** It lands in the item popup
+    and never touches the Arbiter channel, which is the only channel TTS speaks.
+  - **A banked scene intro *is* spoken** — it goes out on the Arbiter channel
+    like any other line.
+  - **The welcome-back is hand-authored**, not generated: five lines with
+    `{name}` substituted. Worth knowing before anyone tries to fix its voice by
+    changing a prompt. Most reactive flavor is the same — Qwen writes the scene
+    intros, ambient musings, item descriptions and lore flourishes, and nothing
+    else.
+
+  New suite `ota1130VoiceLandsWithTheText` (20 tests). Two older suites were
+  ⚠ **re-authored rather than re-numbered**: OTA-634's headline claim ("runs LLM
+  ahead of queued voice") is no longer true, while the mechanism it was written
+  to prove — highest priority first, FIFO within a priority, never two ops in
+  flight — is untouched and still tested. Renaming the test was part of the
+  change, not cosmetics.
+
+- **⚠⚠ THE SCENE INTRO COMES OFF THE CRITICAL PATH (2026-08-05). BOTH
   LINES.** golem OTA-1129 / HAL OTA-1152. The owner's call, taken with
   OTA-1128's arithmetic in front of them. That OTA measured the beat and then
   said plainly that it could not fix it:
