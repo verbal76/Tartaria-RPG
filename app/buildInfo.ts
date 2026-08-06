@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.62';
+export const DISPLAY_VERSION = '4.29.63';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22678,7 +22678,61 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // that reflowed. Anchor on the function first, then the block, then
 // on what comes NEXT rather than what encloses.
 // DISPLAY_VERSION 4.29.62.
-export const OTA_BUILD_ID = '2026-08-05-1152-scene-intro-bank';
+// OTA-1153 — THE VOICE STOPS ARRIVING AFTER YOU ALREADY READ IT.
+// Owner: "do we need to see the text and then hear it? that's
+// what makes the voice feel late sometimes, you read it then hear
+// it 10 seconds later."
+// ⚠ THE MECHANISM, AND IT WAS NOT AN ACCIDENT. Kokoro and Qwen
+// share ONE lock — arb159 put them there because running both at
+// once SIGSEGV'd the Tensor G5, and that exclusivity is
+// non-negotiable. OTA-634 then made the lock priority-aware and
+// wrote its trade down plainly: "LLM narration jumps ahead of
+// voice synth so the words land promptly and the voice fills in
+// behind." So a line ALREADY ON SCREEN waited behind whatever the
+// model did next — and OTA-1151 measured what that is: a
+// scene_intro generation runs 19.3 seconds. The voice was not
+// merely trailing, it was trailing by the length of the NEXT
+// narration. That is the reported ten seconds, and it is
+// structural rather than occasional.
+// ⚠ THE TWO SIDES ARE NOT SYMMETRICAL, which is the thing OTA-634
+// could not see from where it stood. A narration delayed two
+// seconds is INVISIBLE — nothing is shown until it completes
+// anyway. A voice delayed ten seconds is the most obvious defect
+// in the game, because you have already read the line it is
+// reading to you. So the order flips: VOICE now outranks the LLM.
+// ⚠ AND A REVERSAL NEEDS AN ANSWER TO THE FEAR IT REVIVES.
+// OTA-634's worry was a voice backlog making responses feel slow.
+// Two things bound it: the total queue cap of three whole lines
+// (OTA-634's own mitigation), and the STALE-LINE DROP added here —
+// a line whose text has been on screen longer than six seconds is
+// never spoken at all. Past that the audio is an echo of something
+// the player read and moved on from, laid over whatever is
+// happening now, and silence is better. Whole LINES are dropped,
+// never half of one. The backlog cannot grow old.
+// ⚠ THIRD PIECE: PRE-SYNTHESIS. OTA-1152 banked scene intros so
+// the TEXT lands instantly, which made this gap MORE visible — a
+// consequence flagged in that OTA's own handoff rather than left
+// to be discovered. The bank is also what makes the real fix
+// possible for the first time: if the line exists before it is
+// needed, so can its audio. A banked line is now synthesised in
+// the same idle window that wrote it, at HOMEWORK priority, and
+// speak() finds the PCM already waiting. Text and voice land
+// together — the actual answer to the owner's question.
+// ⚠ ONE SHARED CHUNKER. The cache is keyed per chunk and read at
+// enqueue, so speak() and presynthesize() MUST split identically;
+// a split differing by one character would miss every time, and
+// miss SILENTLY. The chunking is now one function with one answer.
+// Also recorded, since the owner asked: item-description homework
+// is WRITTEN only and never reaches the spoken channel; a banked
+// scene intro IS spoken; and the welcome-back is five HAND-AUTHORED
+// lines with {name} substituted, not model output — worth knowing
+// before anyone tries to fix its voice by changing a prompt.
+// New suite ota1153VoiceLandsWithTheText (20 tests). Two older
+// suites RE-AUTHORED rather than re-numbered, because OTA-634's
+// headline claim is no longer true while its mechanism is
+// untouched. DISPLAY_VERSION 4.29.63.
+export const OTA_BUILD_ID = '2026-08-05-1153-voice-lands-with-the-text';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1152-scene-intro-bank';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1151-said-it-four-times';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1150-homework-and-ms-per-token';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-05-1148-filter-missed-its-example';

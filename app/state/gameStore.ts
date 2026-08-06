@@ -38595,6 +38595,23 @@ function bankSceneIntro(locId: string, text: string): void {
   if (rows.length >= INTRO_BANK_PER_LOC) rows.shift();
   rows.push({ text, at: Date.now() });
   sceneIntroBank.set(locId, rows);
+  // ⚠ OTA-1153 — AND WRITE THE AUDIO WHILE WE ARE HERE. OTA-1152 made the text
+  // free and, in doing so, made the read-then-hear gap MORE visible: the words
+  // became instant while the voice still had to be synthesised on arrival. The
+  // owner named the symptom exactly — "you read it then hear it 10 seconds
+  // later" — and a banked line is the one case where both halves can be ready
+  // at once. Fire-and-forget at homework priority: if it never finishes, the
+  // line is still spoken the ordinary way and nothing is lost but the head start.
+  //
+  // Lazily required, like every other voice touch in this file: the TTS module
+  // pulls in native audio, and importing it at module scope would drag that
+  // into every consumer of the store — including the test suites that never
+  // speak a word.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const piper = require('../voice/PiperTTSManager') as typeof import('../voice/PiperTTSManager');
+    void piper.presynthesize(text).catch(() => { /* a miss costs one normal synth */ });
+  } catch { /* voice unavailable (tests, or TTS off) — the text bank still works */ }
   // Total ceiling — evict from the location holding the OLDEST entry, which is
   // the one the player is least likely to walk back into.
   while (_sceneIntroBankSize() > INTRO_BANK_TOTAL) {

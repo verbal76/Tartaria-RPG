@@ -27,7 +27,7 @@ import { applyLoreLexicon, cleanForSpeech } from './loreLexicon';
 import { splitSentences } from './sentenceSplitter';
 import { padSilence } from './audioPad';
 import { setMusicDuck } from '../audio/AudioManager';
-import { runExclusiveNativeMl, ML_PRIORITY_VOICE } from '../ai/nativeMlLock';
+import { runExclusiveNativeMl, ML_PRIORITY_VOICE, ML_PRIORITY_HOMEWORK } from '../ai/nativeMlLock';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exec = require('react-native-executorch') as {
@@ -121,7 +121,29 @@ interface QueuedUtterance {
    *  audio is the wrong voice and gets discarded; we re-run
    *  forward() with the current voice instead. */
   prefetchVoiceId?: string | null;
+  /** ⚠ OTA-1153 — WHEN THIS LINE WENT ON SCREEN. The player has already read it
+   *  by the time we get here; this is the clock against which "you read it then
+   *  hear it 10 seconds later" is measured. Stamped at enqueue, because that is
+   *  the same instant `appendLog` put the text in the feed. */
+  queuedAt?: number;
 }
+
+/** ⚠ OTA-1153 — HOW LATE IS TOO LATE. Owner: *"that's what makes the voice feel
+ *  late sometimes, you read it then hear it 10 seconds later."* Past this point
+ *  speaking the line is worse than silence: the player has read it, moved on,
+ *  and the audio arrives as an echo of something they already know, laid over
+ *  whatever is happening now.
+ *
+ *  Six seconds sits just past a normal synth — a one-sentence line takes ~1-3 s
+ *  to infer and start, so an ordinary line is never at risk. Only lines that
+ *  lost a real fight for the lock get dropped, which is exactly the set being
+ *  complained about.
+ *
+ *  ⚠ AND THIS IS WHAT LICENSES THE PRIORITY REVERSAL in nativeMlLock. The voice
+ *  now outranks the LLM, so OTA-634's fear — a voice backlog making responses
+ *  feel slow — needs an answer. This is it: the backlog cannot grow old,
+ *  because old lines are never spoken at all. */
+const STALE_LINE_MS = 6_000;
 
 // Voice pool. Holds at most POOL_MAX loaded Kokoro instances. The
 // Arbiter slot is sticky (never evicted) — the player hears it most.
@@ -165,6 +187,120 @@ const queue: QueuedUtterance[] = [];
 // never overlaps a Qwen completion (the two together crashed Tensor G5 —
 // CONFIRMED: with the lock, a full session ran with zero crashes).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+const endsOnTerminator = (s: string): boolean => /[.!?]['")\]]*$/.test(s.trim());
+
+/** ⚠ OTA-1153 — EXTRACTED SO TWO CALLERS SPLIT IDENTICALLY. `speak()` has always
+ *  chunked here; `presynthesize()` now has to produce the SAME chunks, because
+ *  the pre-synthesis cache is keyed per chunk and read at enqueue. A split that
+ *  differed by one character between the two would miss every single time, and
+ *  miss SILENTLY — the feature would simply appear not to help, with nothing in
+ *  any log to say why. One function, one answer.
+ *
+ *  The behaviour below is unchanged from what `speak()` did:
+ *
+ *  Split into sentence-sized chunks so the first audio plays as soon as one
+ *  sentence finishes inference — without this, a big intro paragraph would take
+ *  10-30 seconds to phonemize + run through Kokoro before ANY sound starts.
+ *  Subsequent sentences queue behind the first and stream as they're produced.
+ *
+ *  arb165 — ONE sentence per chunk. The old arb7 merge bundled sentences up to
+ *  MERGE_TARGET_CHARS into a single Kokoro read so they flowed as one breath —
+ *  but that is exactly what made them "run together", with no pause at the
+ *  periods. Now a piece is glued onto the previous chunk only when that previous
+ *  chunk is NOT already a finished sentence (i.e. a stray, terminator-less
+ *  fragment), so a real sentence boundary is never buried inside a chunk and
+ *  drain() can drop a pause after it. */
+function chunkForSpeech(prepared: string): string[] {
+  const { sentences, remainder } = splitSentences(prepared);
+  const rawChunks = sentences.length > 0 ? [...sentences] : [];
+  if (remainder.trim()) rawChunks.push(remainder.trim());
+  // Fallback: if the text has zero terminators (rare — usually a status line),
+  // speak it as one chunk.
+  if (rawChunks.length === 0) rawChunks.push(prepared);
+  const chunks: string[] = [];
+  for (const piece of rawChunks) {
+    const last = chunks.length > 0 ? chunks[chunks.length - 1]! : null;
+    if (last !== null && !endsOnTerminator(last)
+        && last.length + 1 + piece.length <= MERGE_TARGET_CHARS) {
+      chunks[chunks.length - 1] = `${last} ${piece}`;
+    } else {
+      chunks.push(piece);
+    }
+  }
+  return chunks;
+}
+
+// ⚠ OTA-1153 — THE PRE-SYNTHESIS CACHE, and why it exists at all.
+//
+// OTA-1152 banked scene intros so the TEXT lands the instant the player walks
+// in. That made the read-then-hear gap MORE visible, not less: the words became
+// free while the voice still had to be synthesised on arrival. The bank is also
+// what makes the real fix possible for the first time — if the line exists
+// before it is needed, so can its audio.
+//
+// So a banked line is spoken from PCM that was computed during the same idle
+// window that wrote it. Text and voice land together, which is the answer to
+// the owner's actual question — *"do we need to see the text and then hear
+// it?"* No. They should arrive at once.
+//
+// Keyed by voice AND chunk text, because the player can change the Arbiter's
+// voice at any time and audio in the wrong voice is worse than a short wait.
+// Small on purpose: PCM is bulky (~24 kHz float, so a six-second line is well
+// over half a megabyte) and this is a latency buffer, not a sound library.
+const presynth: Map<string, Float32Array> = new Map();
+const PRESYNTH_CAP = 6;
+const presynthKey = (voiceId: string, chunk: string): string => `${voiceId}::${chunk}`;
+
+/** Take (and remove) pre-synthesised audio for a chunk, or undefined. One-shot,
+ *  matching the text bank above it — a line is spent once. */
+function takePresynth(voiceId: string, chunk: string): Float32Array | undefined {
+  const k = presynthKey(voiceId, chunk);
+  const hit = presynth.get(k);
+  if (!hit) return undefined;
+  presynth.delete(k);
+  return hit;
+}
+
+/** ⚠ Synthesise a line AHEAD of being asked for it, at HOMEWORK priority.
+ *
+ *  The priority is the whole safety argument. This runs during idle time and
+ *  must never delay a line the player is waiting on, so it sits below both the
+ *  live voice and the LLM — and OTA-1146's harness cuts it short the moment
+ *  either arrives. Failure is free: the cache simply misses and the line is
+ *  synthesised the ordinary way.
+ *
+ *  Chunked exactly as `speak()` chunks it, because the cache is read per-chunk
+ *  at enqueue. A different split here would miss every time, silently, which is
+ *  the kind of bug that looks like "the feature just doesn't help". */
+export async function presynthesize(text: string, voiceId?: string | null): Promise<boolean> {
+  const settings = getVoiceSettings();
+  if (!settings.ttsEnabled) return false;
+  if (presynth.size >= PRESYNTH_CAP) return false;
+  const prepared = cleanForSpeech(applyLoreLexicon(text)).trim();
+  if (!prepared) return false;
+  const resolvedVoice = voiceId ?? arbiterVoiceId();
+  const model = await ensureLoaded(resolvedVoice);
+  if (!model) return false;
+  let wrote = false;
+  for (const chunk of chunkForSpeech(prepared)) {
+    if (presynth.size >= PRESYNTH_CAP) break;
+    const k = presynthKey(resolvedVoice, chunk);
+    if (presynth.has(k)) continue;
+    try {
+      const samples = await runExclusiveNativeMl(
+        () => model.forward(chunk, settings.rate),
+        ML_PRIORITY_HOMEWORK,
+      ) as Float32Array | null;
+      if (samples && samples.length > 0) { presynth.set(k, asFloat32(samples)); wrote = true; }
+    } catch { return wrote; /* fail closed — a miss costs a normal synth */ }
+  }
+  return wrote;
+}
+
+/** Tests only — the cache is module state. */
+export function _resetPresynth(): void { presynth.clear(); }
+export function _presynthSize(): number { return presynth.size; }
+
 function inferSerial(model: any, text: string, rate: number): Promise<Float32Array | null> {
   // arb159 — route Kokoro synthesis through the SHARED native-ML lock so a synth
   // never overlaps a Qwen completion. The lock STAYS (it's what stopped the
@@ -629,45 +765,18 @@ export function speak(text: string, voiceId?: string | null, channel?: string, o
       }
     }
   }
-  // Split into sentence-sized chunks so the first audio plays as
-  // soon as one sentence finishes inference — without this, a big
-  // intro paragraph would take 10-30 seconds to phonemize + run
-  // through Kokoro before ANY sound starts. Subsequent sentences
-  // queue behind the first and stream as they're produced.
-  const { sentences, remainder } = splitSentences(prepared);
-  const rawChunks = sentences.length > 0 ? [...sentences] : [];
-  if (remainder.trim()) rawChunks.push(remainder.trim());
-  // Fallback: if the text has zero terminators (rare — usually a
-  // status line), speak it as one chunk.
-  if (rawChunks.length === 0) rawChunks.push(prepared);
-  // arb7 prosody — greedily merge short consecutive sentences up to
-  // MERGE_TARGET_CHARS so Kokoro reads them as one inflected breath
-  // instead of a string of choppy one-clip-per-sentence reads. (Streamed
-  // narration is pre-bundled upstream in TTSController; this also catches
-  // the many pre-written multi-sentence lines delivered in one speak().)
-  // arb165 — ONE sentence per chunk. The old arb7 merge bundled sentences up to
-  // MERGE_TARGET_CHARS into a single Kokoro read so they flowed as one breath —
-  // but that's exactly what made them "run together", with no pause at the
-  // periods. Now we only glue a piece onto the previous chunk when that previous
-  // chunk is NOT already a finished sentence (i.e. a stray, terminator-less
-  // fragment), so a real sentence boundary is never buried inside a chunk and
-  // drain() can drop a pause after it.
-  const endsOnTerminator = (s: string) => /[.!?]['")\]]*$/.test(s.trim());
-  const chunks: string[] = [];
-  for (const piece of rawChunks) {
-    const last = chunks.length > 0 ? chunks[chunks.length - 1]! : null;
-    if (last !== null && !endsOnTerminator(last)
-        && last.length + 1 + piece.length <= MERGE_TARGET_CHARS) {
-      chunks[chunks.length - 1] = `${last} ${piece}`;
-    } else {
-      chunks.push(piece);
-    }
-  }
+  const chunks = chunkForSpeech(prepared);
   const resolvedVoice = voiceId ?? arbiterVoiceId();
   for (const chunk of chunks) {
     queue.push({
       id: nextId++, text: chunk, voiceId: resolvedVoice, channel, lineId: id,
       endsSentence: endsOnTerminator(chunk),
+      // OTA-1153 — the read-clock starts now; see STALE_LINE_MS.
+      queuedAt: Date.now(),
+      // ⚠ OTA-1153 — PRE-SYNTHESISED AUDIO, if this line was banked ahead of
+      // time. When it hits, drain() plays without inferring at all and the
+      // voice lands with the text instead of behind it.
+      resolvedSamples: takePresynth(resolvedVoice, chunk),
     });
   }
   void drain();
@@ -676,6 +785,28 @@ export function speak(text: string, voiceId?: string | null, channel?: string, o
 
 async function drain(): Promise<void> {
   if (currentlySpeaking) return;
+  // ⚠ OTA-1153 — DON'T READ ME SOMETHING I FINISHED READING. Drop whole lines
+  // whose text has been on screen longer than STALE_LINE_MS before a syllable
+  // of them ever played. Keyed by lineId so a line is dropped ENTIRE — never
+  // half-spoken, which would be worse than either extreme.
+  //
+  // Deliberately checked here, at the moment of speaking, rather than at
+  // enqueue: a line that waits three seconds and then plays is fine, and only
+  // the lock knows in advance which lines will lose that fight.
+  {
+    const now = Date.now();
+    const staleLineIds = new Set<number>();
+    for (const q of queue) {
+      if (q.queuedAt != null && now - q.queuedAt > STALE_LINE_MS && q.lineId != null) {
+        staleLineIds.add(q.lineId);
+      }
+    }
+    if (staleLineIds.size > 0) {
+      for (let i = queue.length - 1; i >= 0; i--) {
+        if (queue[i]!.lineId != null && staleLineIds.has(queue[i]!.lineId!)) queue.splice(i, 1);
+      }
+    }
+  }
   const next = queue.shift();
   if (!next) {
     // Nothing left to speak — restore music to full volume.
