@@ -19,7 +19,7 @@
 
 import type { ItemEffect, StatKey } from './itemEffect';
 import { getCachedSynth, setCachedSynth, type SynthesizedItem } from './itemSynthesisCache';
-import { noteQwenDiscarded } from '../ai/generation/qwenTelemetry';
+import { noteQwenDiscarded, lastQwenCallPreempted } from '../ai/generation/qwenTelemetry';
 
 /** Minimal Qwen interface — same shape as llmParser.ts so tests can
  *  pass a mock without dragging in the full LlamaRuntime stack. */
@@ -207,7 +207,14 @@ export async function synthesizeItemViaQwen(
   // and calling it `unparseable` would have sent the next investigation at
   // the parser.
   if (!raw.trim()) {
-    noteQwenDiscarded('item_synth:empty');
+    // ⚠ OTA-1161 — AN INTERRUPTED CALL IS NOT AN EMPTY ONE. OTA-1157 made this
+    // job preemptible, and the very next log showed the label lying about it:
+    // `item_synthesis preempted 3535ms` … `DISCARDED — item_synth:empty`. Empty
+    // is the DORMANCY signature (OTA-1142's watchdog keys off it); preempted is
+    // the voice winning the lock, which is the feature working as built. Same
+    // reason twice over: a discard label the next investigation will trust has
+    // to name what actually happened.
+    noteQwenDiscarded(lastQwenCallPreempted() ? 'item_synth:preempted' : 'item_synth:empty');
     return null;
   }
 

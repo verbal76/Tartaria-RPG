@@ -134,7 +134,12 @@ let sink: ((r: QwenCallRecord) => void) | null = null;
  *  behind the shared native-ML lock (arb159), so exactly one generation is in
  *  flight at a time and "the last call" is unambiguous — which is what lets a
  *  consumer report a discard without threading an id back through the runtime. */
-let lastCall: { job: string; totalMs: number } | null = null;
+// OTA-1161 — `preempted` rides along so a discard filed against this call can
+// tell "the model returned nothing" apart from "we told it to stop". The owner's
+// log had `item_synthesis preempted 3535ms` followed by `DISCARDED —
+// item_synth:empty` — the second line contradicting the first, because the
+// discard classifier could not see the outcome the record line had just printed.
+let lastCall: { job: string; totalMs: number; preempted: boolean } | null = null;
 let discardSink: ((job: string, reason: string, ms: number) => void) | null = null;
 
 function emptyAggregate(): JobAggregate {
@@ -190,12 +195,23 @@ export function recordQwenCall(r: QwenCallRecord): void {
   }
   if (r.stop === 'limit') agg.hitLimit += 1;
   jobs.set(r.job, agg);
-  lastCall = { job: r.job, totalMs: r.totalMs };
+  lastCall = { job: r.job, totalMs: r.totalMs, preempted: r.outcome === 'preempted' };
   try { sink?.(r); } catch { /* a broken sink must never break a generation */ }
 }
 
 export function qwenCallCount(): number {
   return callCount;
+}
+
+/** ⚠ OTA-1161 — was the call a discard is about to be filed against CUT SHORT
+ *  rather than genuinely empty? An interrupted job returning '' is the
+ *  preemption feature working; a model returning '' unprompted is the dormancy
+ *  bug OTA-1142 chased for a week. Filing both under one name is exactly how
+ *  that hunt got long, so callers without their own epoch (item synthesis)
+ *  read this before classifying. Valid until noteQwenDiscarded consumes the
+ *  call; false when nothing is in flight. */
+export function lastQwenCallPreempted(): boolean {
+  return lastCall?.preempted === true;
 }
 
 /** OTA-1130 — the store registers this to log discards as they happen. */
