@@ -13,6 +13,7 @@ import type { ChatMessage } from '../ai/generation/QwenGenerativeEngine';
 import type { MacroLocation, MicroLocation, MicroMicroLocation } from './worldLadder';
 import { describeTraits } from './enemyTraits';
 import { buildCanonFactsParagraph } from './canonFacts';
+import { standingAc } from './equipment';
 
 /**
  * The strict, comma-light fact sheet that gets injected into the Qwen
@@ -528,7 +529,11 @@ export function formatPlayerStats(player: PlayerCharacter | null): string {
   const parts: string[] = [];
   parts.push(`HP ${player.hp}/${player.hpMax}`);
   parts.push(`Stamina ${player.stamina}/${player.staminaMax}`);
-  parts.push(`AC ${player.ac}`);
+  // ⚠ OTA-1133 — `player.ac` is the RACIAL BASE and is never updated on equip,
+  // so this line told the model "AC 10" while the player's sheet read 16 in
+  // eight pieces of armour. The model then repeated it — one device log has the
+  // whole stat block leaking into the feed with AC 10 in it.
+  parts.push(`AC ${standingAc(player)}`);
   if (typeof player.corruption === 'number' && player.corruption > 0) {
     parts.push(`Corruption ${player.corruption}`);
   }

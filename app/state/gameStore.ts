@@ -263,7 +263,7 @@ import {
 import {
   raiseMenace, decayedMenace, menaceIntimidateDcBonus, menaceEncounterBonus,
 } from '../engine/menace';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc, standingAc } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
 import { applyLegacyItemRenames } from '../engine/itemMigrations';
@@ -16433,7 +16433,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : '';
           get().appendLog(
             'arbiter',
-            `The Arbiter looks you over. "${condition}. ${player.hp}/${player.hpMax} HP, ${player.stamina}/${player.staminaMax} stamina, AC ${player.ac}.${corrLine}"`,
+            `The Arbiter looks you over. "${condition}. ${player.hp}/${player.hpMax} HP, ${player.stamina}/${player.staminaMax} stamina, AC ${standingAc(player)}.${corrLine}"`,
           );
           break;
         }

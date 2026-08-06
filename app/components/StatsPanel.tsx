@@ -4,7 +4,7 @@ import type { PlayerCharacter } from '../engine/types';
 import racesData from '../data/races/races.json';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { coatedDisplayName } from '../engine/weaponCoating';
-import { ARMOR_SLOTS, effectiveStats, aethericVisionEquipped, trimStandingAc } from '../engine/equipment';
+import { ARMOR_SLOTS, effectiveStats, aethericVisionEquipped, standingAc } from '../engine/equipment';
 import { playerPowerScore, powerMatchup } from '../engine/powerRating';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -175,14 +175,13 @@ export function StatsPanel({ player, enemyPower }: Props) {
   // catalog-absent) contributes its acBonus to the displayed AC. Without
   // this the StatsPanel desyncs from aggregateArmor (gameStore.ts:17372)
   // which already handles uniqueStats — combat saw +2 AC, display showed 0.
-  let armorAc = 0;
-  for (const slot of ARMOR_SLOTS) {
-    const name = player.equipped?.[slot];
-    if (!name) continue;
-    armorAc += resolveDisplayArmorByName(name, player.inventory)?.acBonus ?? 0;
-  }
   // OTA-924 — show the trimmed standing AC so the panel matches what combat resolves against.
-  const effectiveAc = trimStandingAc(player.ac + armorAc);
+  // ⚠ OTA-1133 — and it is the SHARED helper now, not a fourth inline copy of
+  // the same sum. This panel was right all along; what was wrong is that the
+  // Arbiter and the LLM prompt printed the raw `player.ac` (the RACIAL BASE)
+  // instead, so the sheet said 16 while the Arbiter answered 10 to the same
+  // question. One function, one answer, everywhere.
+  const effectiveAc = standingAc(player);
 
   // Stats with accessory + armor bonuses folded in so the player sees the
   // numbers combat will actually use.

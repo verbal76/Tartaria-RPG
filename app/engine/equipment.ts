@@ -5,6 +5,7 @@ import { itemIsThrowable } from './bandolierEligibility';
 import { aggregateInventoryPassives, inventoryHasGate, isScanner, type EffectResolver, type GateKind, type ScannerBias } from './itemEffect';
 import { racialStatBonusesFor } from './raceMechanics';
 import { corruptionTierOf, corruptionStatPenalty } from './corruption';
+import { resolveDisplayArmorByName } from './itemResolution';
 
 /**
  * Return the list of slots an item could legally be equipped into.
@@ -575,6 +576,51 @@ export function aggregateEquippedRegen(player: PlayerCharacter): { stamina: numb
 export function trimStandingAc(rawAc: number, knee = 22, rate = 0.4): number {
   if (rawAc <= knee) return rawAc;
   return Math.round(knee + (rawAc - knee) * rate);
+}
+
+/** ⚠ OTA-1133 — THE ONE ANSWER TO "WHAT IS MY AC", AND WHY IT HAD TO EXIST.
+ *
+ *  The owner reported this three times as a DROP — *"AC 16 → AC 10, recurring"* —
+ *  and it was never a drop. It was two surfaces disagreeing, permanently.
+ *
+ *  ⚠ `player.ac` IS THE RACIAL BASE, NOT THE EFFECTIVE AC. There is exactly one
+ *  write to it in the whole codebase — `ac: race.baseAC` at character creation
+ *  (character.ts) — and nothing updates it when armour is equipped, ever. Five
+ *  consumers knew that and added the gear stack themselves; TWO printed the raw
+ *  field as though it were the finished number:
+ *
+ *    · the LLM prompt          `AC ${player.ac}`  → the model was told AC 10
+ *    · the Arbiter status line                    → and SAID "AC 10" out loud
+ *
+ *  So the character sheet showed 16 (base 10 + six points of worn armour) while
+ *  the Arbiter, asked the same question a moment later, answered 10. The device
+ *  log has the player in eight pieces of gear with `AC 10` in the same breath.
+ *
+ *  ⚠ AND THE FIVE "CORRECT" CONSUMERS DID NOT AGREE WITH EACH OTHER EITHER —
+ *  each re-derived the sum inline, which is how a field like this drifts in the
+ *  first place. This is now the single place that answers the question, so a
+ *  sixth surface cannot invent a seventh number.
+ *
+ *  ⚠ SCOPE — deliberately the STANDING number: racial base + worn armour,
+ *  trimmed. It is what the sheet shows and what the player means when they ask.
+ *  Combat's `applyEnemyCounter` legitimately adds more (scene-conditional racial
+ *  context, the ruins-defence title, live status effects) because those exist
+ *  only inside a fight; `effectiveACBreakdown` remains the authority there, and
+ *  it starts from this same base. */
+export function standingAc(player: PlayerCharacter | null | undefined): number {
+  if (!player) return 10;
+  const base = player.ac ?? 10;
+  let armorAc = 0;
+  for (const slot of ARMOR_SLOTS) {
+    const name = player.equipped?.[slot];
+    if (!name) continue;
+    // Per-instance / fused / accessory AC included — `resolveDisplayArmorByName`
+    // is the same lookup the sheet uses, so a unique piece counts here exactly as
+    // it counts there. (OTA-947's rule: the shown AC and the fought AC must not
+    // drift, and that starts with everyone reading the same function.)
+    armorAc += resolveDisplayArmorByName(name, player.inventory)?.acBonus ?? 0;
+  }
+  return trimStandingAc(base + armorAc);
 }
 
 export function armorHpBonus(name: string | null | undefined): number {
