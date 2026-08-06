@@ -27,6 +27,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { findEnemyByName } from '../app/engine/encounter';
+import { secondCoatRolled } from '../app/engine/weaponCoating';
 
 jest.setTimeout(20000);
 
@@ -95,7 +96,7 @@ function poisonDot(): number {
 }
 
 describe('OTA-873 — same-element dual coating sums its DOT', () => {
-  it('a dual-poison weapon lands ONE poison DOT that ticks for 2× a single-poison weapon', async () => {
+  it('a dual-poison weapon lands ONE poison DOT ticking for slot 1 + HALF of slot 2', async () => {
     // single-poison baseline
     await boot(); plantBoar(); equip(false);
     await attackMaxRolls();
@@ -110,8 +111,15 @@ describe('OTA-873 — same-element dual coating sums its DOT', () => {
     await attackMaxRolls();
     const dual = poisonDot();
     const sc2 = useGameStore.getState().currentScene!;
-    // still ONE merged poison DOT, but ticking for the SUM of both slots (2× single)
+    // Still ONE merged poison DOT — that is OTA-873's actual claim and it holds.
     expect((sc2.enemyStatuses?.[0] ?? []).filter((st: any) => st.kind === 'poison_coat')).toHaveLength(1);
-    expect(dual).toBe(single * 2);
+    // ⚠ Retargeted by OTA-1173, and the SUM half of the claim genuinely changed.
+    // This used to be 2× — both slots paying full freight. That batch capped the
+    // SECOND slot at SECOND_COAT_EFFECT_MULT, so a same-element dual now ticks
+    // for slot 1 plus half of slot 2. The merge behaviour (one status, not two)
+    // is what OTA-873 was defending and is untouched; only the total moved.
+    expect(dual).toBe(single + secondCoatRolled(single));
+    expect(dual).toBeLessThan(single * 2);
+    expect(dual).toBeGreaterThan(single);
   });
 });

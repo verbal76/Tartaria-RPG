@@ -14,7 +14,15 @@ function defer<T = void>() {
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
 describe('OTA-634 — priority native-ML lock', () => {
-  it('runs LLM ahead of queued voice, FIFO within a priority, never overlapping', async () => {
+  // ⚠ RE-AUTHORED BY OTA-1153, and the rename is the point. OTA-634's headline
+  // claim — "runs LLM ahead of queued voice" — is no longer true, because the
+  // owner overruled the trade behind it: they were reading a line and then
+  // hearing it ten seconds later, since the voice sat behind an entire
+  // 19-second scene_intro generation. The MECHANISM this test was written to
+  // prove is untouched and still tested below: highest priority first, FIFO
+  // within a priority, and never two ops in flight. Only which tier outranks
+  // which has moved.
+  it('runs the HIGHEST priority first, FIFO within a priority, never overlapping', async () => {
     const order: string[] = [];
     let inFlight = 0;
     let maxInFlight = 0;
@@ -30,17 +38,20 @@ describe('OTA-634 — priority native-ML lock', () => {
       }, priority);
 
     // A is the op already running (it blocks on a gate). While it holds the lock,
-    // queue B (voice), C (LLM), D (voice) — all arrive while A is in flight.
-    const pA = run('A', ML_PRIORITY_VOICE, gateA.promise);
-    const pB = run('B', ML_PRIORITY_VOICE);
-    const pC = run('C', ML_PRIORITY_LLM);
-    const pD = run('D', ML_PRIORITY_VOICE);
+    // queue B (LLM), C (voice), D (LLM) — all arrive while A is in flight.
+    // ⚠ The tiers are swapped from OTA-634's version so the test still exercises
+    // a real overtake: the single high-priority op arrives SECOND and must still
+    // go first, while the two equal-priority ops keep their arrival order.
+    const pA = run('A', ML_PRIORITY_LLM, gateA.promise);
+    const pB = run('B', ML_PRIORITY_LLM);
+    const pC = run('C', ML_PRIORITY_VOICE);
+    const pD = run('D', ML_PRIORITY_LLM);
     await tick(); // let A actually start + block on its gate
     gateA.resolve();
     await Promise.all([pA, pB, pC, pD]);
 
-    // A first (it was already running); then C jumps ahead (LLM priority); then
-    // B before D (FIFO among the equal-priority voice ops).
+    // A first (it was already running); then C jumps ahead (VOICE outranks the
+    // LLM as of OTA-1153); then B before D (FIFO among the equal-priority ops).
     expect(order).toEqual(['A', 'C', 'B', 'D']);
     expect(maxInFlight).toBe(1); // exclusivity preserved
   });

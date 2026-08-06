@@ -221,29 +221,58 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     // (move on, never hang the player) so we use a local helper
     // that resolves with null on the deadline.
     const disposeWithDeadline = <T,>(label: string, p: Promise<T> | T, ms = 3000): Promise<T | null> => {
+      // OTA-1064 — hold the deadline timer so it can be cleared when the
+      // dispose wins the race. Before this the timer stayed armed for its
+      // full 3s after the work had already finished; harmless in production
+      // (reloadAsync follows immediately) but it kept four dangling handles
+      // alive and made the jest run warn about unstopped async work.
+      let timer: ReturnType<typeof setTimeout> | undefined;
       return Promise.race([
         Promise.resolve(p).catch((e) => {
           // eslint-disable-next-line no-console
           console.warn(`OTA dispose failed: ${label}:`, e);
           return null as unknown as T;
         }),
-        new Promise<null>((resolve) => setTimeout(() => {
-          // eslint-disable-next-line no-console
-          console.warn(`OTA dispose timed out after ${ms}ms: ${label}`);
-          resolve(null);
-        }, ms)),
-      ]);
+        new Promise<null>((resolve) => {
+          timer = setTimeout(() => {
+            // eslint-disable-next-line no-console
+            console.warn(`OTA dispose timed out after ${ms}ms: ${label}`);
+            resolve(null);
+          }, ms);
+        }),
+      ]).finally(() => { if (timer !== undefined) clearTimeout(timer); });
     };
-    await disposeWithDeadline('disposeAudio', disposeAudio());
-    await disposeWithDeadline('shutdownCognitive', useGameStore.getState().shutdownCognitive());
-    await disposeWithDeadline('shutdownQwen', useGameStore.getState().shutdownQwen());
-    // Voice native handles — both engines AND the controller's store
-    // subscription. Without these, the executorch (Kokoro) module's
-    // PyTorch handle and the expo-av Sound created by playPcm can
-    // keep the bridge from cleanly tearing down on reloadAsync.
+    // OTA-1064 — the four disposes used to run in SERIES, each with its own
+    // 3-second deadline. Worst case that is 12 seconds of a screen that looks
+    // frozen, with no progress indication beyond a static "Releasing
+    // resources…". That window is the leading suspect for the reported
+    // FabricUIManager.markActiveTouchForTag NPE: the player, seeing a dead
+    // screen, taps it; the touch dispatches into a surface that teardown has
+    // already torn down; SurfaceMountingManager is null; crash — and it lands
+    // BEFORE reloadAsync commits, which is why the update appeared to run
+    // twice.
+    //
+    // The four are independent native subsystems — expo-av, ONNX Runtime,
+    // llama.rn, executorch — with no teardown ordering between them, so they
+    // race their deadlines concurrently instead of consecutively. Worst case
+    // drops from ~12s to ~3s.
+    //
+    // Voice native handles come FIRST and synchronously: stopTTSController
+    // drops the store subscription and stopTTS halts playback, which releases
+    // the expo-av Sound that playPcm created. Doing that before disposeAudio
+    // starts means audio teardown isn't racing a still-playing clip. The
+    // executorch (Kokoro) PyTorch handle is then freed by disposePiperEngine
+    // inside the concurrent group.
     try { stopTTSController(); } catch { /* ignore */ }
     try { stopTTS(); } catch { /* ignore */ }
-    await disposeWithDeadline('disposePiperEngine', disposePiperEngine());
+    // Promise.all is safe here: disposeWithDeadline catches its own rejection
+    // and resolves null, so no member of the group can reject the whole set.
+    await Promise.all([
+      disposeWithDeadline('disposeAudio', disposeAudio()),
+      disposeWithDeadline('shutdownCognitive', useGameStore.getState().shutdownCognitive()),
+      disposeWithDeadline('shutdownQwen', useGameStore.getState().shutdownQwen()),
+      disposeWithDeadline('disposePiperEngine', disposePiperEngine()),
+    ]);
     if (Platform.OS === 'ios') {
       // iOS belt-and-suspenders: give the native side an extra
       // event-loop tick to fully release.

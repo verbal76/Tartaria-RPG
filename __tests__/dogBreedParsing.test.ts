@@ -10,6 +10,10 @@
 // "kind of a", etc.) before storing. Cap at 24 chars after stripping.
 // When no preamble matches, the raw input is preserved (no false-
 // positive stripping). Trailing punctuation is stripped too.
+//
+// OTA-1050 UPDATE — the typed three-step takeover was replaced by the
+// DogOnboardingModal popup; the same parsing now runs inside
+// confirmDogOnboarding. These tests drive the popup commit directly.
 
 jest.setTimeout(15000);
 
@@ -95,38 +99,34 @@ describe('OTA-142 smart breed parsing — strips role-play preambles', () => {
     ['looks like a Pitbull!', 'Pitbull'],
   ])('input %j → breed stored as %j', async (input, expectedBreed) => {
     const store = await bootInBreedStage();
-    store.getState().submitPlayerAction(input);
-    const next = store.getState().worldMemory.pendingDogOnboarding;
-    expect(next).toBeTruthy();
-    expect(next?.stage).toBe('name'); // advanced to name stage
-    expect(next?.breed).toBe(expectedBreed);
+    store.getState().confirmDogOnboarding(input, 'Rex', 'boy');
+    expect(store.getState().worldMemory.pendingDogOnboarding).toBeNull();
+    expect(store.getState().player?.dog?.breed).toBe(expectedBreed);
   });
 
   it('input without preamble preserves the raw text', async () => {
     const store = await bootInBreedStage();
-    store.getState().submitPlayerAction('Pitbull');
-    expect(store.getState().worldMemory.pendingDogOnboarding?.breed).toBe('Pitbull');
+    store.getState().confirmDogOnboarding('Pitbull', 'Rex', 'boy');
+    expect(store.getState().player?.dog?.breed).toBe('Pitbull');
   });
 
   it('long input still caps at 24 chars after stripping', async () => {
     const store = await bootInBreedStage();
-    store.getState().submitPlayerAction('looks like a very-long-breed-name-that-overflows');
-    const breed = store.getState().worldMemory.pendingDogOnboarding?.breed ?? '';
+    store.getState().confirmDogOnboarding('looks like a very-long-breed-name-that-overflows', 'Rex', 'boy');
+    const breed = store.getState().player?.dog?.breed ?? '';
     expect(breed.length).toBeLessThanOrEqual(24);
     expect(breed.startsWith('very-long-breed-name')).toBe(true);
   });
 
-  it('whitespace-only input is a no-op (submitPlayerAction filters before handler runs)', async () => {
+  it('whitespace-only breed falls back to "mutt" (the popup has no empty-trim guard)', async () => {
     const store = await bootInBreedStage();
-    store.getState().submitPlayerAction('  ');
-    // Onboarding stays at 'breed' — the empty input never reached the
-    // handler because submitPlayerAction trim-checks at the top.
-    expect(store.getState().worldMemory.pendingDogOnboarding?.stage).toBe('breed');
+    store.getState().confirmDogOnboarding('  ', 'Rex', 'boy');
+    expect(store.getState().player?.dog?.breed).toBe('mutt');
   });
 
   it('preserves capitalization on the breed token', async () => {
     const store = await bootInBreedStage();
-    store.getState().submitPlayerAction('looks like a German Shepherd');
-    expect(store.getState().worldMemory.pendingDogOnboarding?.breed).toBe('German Shepherd');
+    store.getState().confirmDogOnboarding('looks like a German Shepherd', 'Rex', 'boy');
+    expect(store.getState().player?.dog?.breed).toBe('German Shepherd');
   });
 });

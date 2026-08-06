@@ -1,5 +1,6 @@
 import * as FileSystem from 'expo-file-system';
-import { runExclusiveNativeMl } from '../nativeMlLock';
+import { runExclusiveNativeMl, ML_PRIORITY_LLM, ML_PRIORITY_HOMEWORK } from '../nativeMlLock';
+import { recordQwenCall } from './qwenTelemetry';
 
 // ---------------------------------------------------------------------------
 // LlamaRuntime — thin wrapper around the llama.rn native module
@@ -137,6 +138,51 @@ export interface LlamaGenerateOptions {
   topK?: number;
   /** Per-token callback for streaming. Receives just the new token text. */
   onToken?: (token: string) => void;
+  /** OTA-1128 — telemetry label for this call ('flourish', 'forge_name', a
+   *  narration intent…). Unlabeled calls record as 'unlabeled' so a new
+   *  consumer that forgets the tag still shows up in the stats instead of
+   *  vanishing from them. */
+  job?: string;
+  /** ⚠ OTA-1146 — HOMEWORK. Idle-time work nobody asked for. Two consequences,
+   *  and they only make sense together:
+   *    · it queues at ML_PRIORITY_HOMEWORK, BELOW voice, so it never delays
+   *      anything the player is waiting on that hasn't started yet; and
+   *    · it is INTERRUPTIBLE — the moment real work arrives, llama.cpp is told
+   *      to stop and this generation returns whatever it had.
+   *  Without the second, priority alone is not enough: a homework job already
+   *  running still makes the next tap wait, because the lock cannot preempt a
+   *  native call in flight. Owner's requirement was that idle work cost the
+   *  player nothing, and this is the half that delivers it. */
+  homework?: boolean;
+  /** ⚠ OTA-1157 — INTERRUPTIBLE, BUT NOT DEPRIORITISED. The distinction matters
+   *  and it is the whole of this flag.
+   *
+   *  Homework is both: it queues BELOW everything and it can be cut short.
+   *  Item synthesis is neither today, and the device log priced what that costs:
+   *
+   *    voice⏱ gap 4935ms (wait 3940ms + synth 859ms) "Welcome back, Verbal."
+   *    qwen⏱  item_synthesis ok 3847ms → DISCARDED — item_synth:rejected-by-clamp
+   *
+   *  Kokoro needed 859 ms. It waited 3,940 — almost exactly the length of an
+   *  item synthesis that then threw its own output away. OTA-1153 raised the
+   *  voice above the LLM, but priority only reorders WAITERS; the synthesis had
+   *  already started, and nothing could reach in and stop it.
+   *
+   *  So synthesis keeps its LLM priority — a player who opened an unknown item
+   *  IS waiting on it, and it should not sit behind idle work — but it gains the
+   *  cut-short hook. When the voice arrives mid-generation, llama.cpp is asked
+   *  to stop, the partial result is discarded, and the line the player already
+   *  read gets spoken seconds sooner.
+   *
+   *  ⚠ THE TRADE, STATED PLAINLY: an interrupted synthesis loses its
+   *  description, and the item stays on its static row until the next lookup —
+   *  the fire-and-forget contract this path already had. A voice line arriving
+   *  four seconds late is the more visible defect, and unlike the description it
+   *  cannot be retried by reopening a popup.
+   *
+   *  Narration deliberately does NOT set this. It has no fallback once it has
+   *  started, and a half-written sentence is worse than a late one. */
+  interruptible?: boolean;
 }
 
 export class LlamaRuntime {
@@ -220,31 +266,127 @@ export class LlamaRuntime {
       await ml.markQwenCompletionStart();
       markDone = ml.markQwenCompletionDone;
     } catch { /* guard module unavailable — proceed without the breadcrumb */ }
+    // OTA-1128 — telemetry. Measured HERE, at the one boundary every consumer
+    // crosses, so nine call sites get timing without nine hand-rolled timers.
+    // The wait/generate split is the point: this call queues behind the shared
+    // native-ML lock (arb159), so a "29-second generation" can be four seconds
+    // of generating behind twenty-five of queue — and the fix for each is
+    // completely different.
+    const telT0 = Date.now();
+    let telLockAt = telT0;
     try {
       // arb159 — run the completion through the shared native-ML lock so it
       // never overlaps a Kokoro TTS synth (the two heavy native workloads
       // contending crashed the process on Tensor G5).
-      const result = await runExclusiveNativeMl(() => ctx.completion(
-        {
-          prompt,
-          n_predict: opts.maxTokens ?? 120,
-          temperature: opts.temperature ?? 0.8,
-          top_p: opts.topP ?? 0.9,
-          top_k: opts.topK ?? 40,
-          stop: [...QWEN_STOP_TOKENS],
-        },
-        opts.onToken
-          ? (evt) => {
-              if (typeof evt.token === 'string') {
-                assembled += evt.token;
-                try { opts.onToken?.(evt.token); } catch { /* swallow user errors */ }
+      // OTA-1146 — homework runs below voice and can be cut short. The hook is
+      // handed to the lock, which fires it the instant higher-priority work is
+      // enqueued; llama.cpp then ends the completion early and we keep whatever
+      // tokens had already assembled. `stopCompletion` is the same call the
+      // dispose path uses, and it is safe when nothing is running.
+      let preempted = false;
+      const result = await runExclusiveNativeMl(() => {
+        telLockAt = Date.now();
+        return ctx.completion(
+          {
+            prompt,
+            n_predict: opts.maxTokens ?? 120,
+            temperature: opts.temperature ?? 0.8,
+            top_p: opts.topP ?? 0.9,
+            top_k: opts.topK ?? 40,
+            stop: [...QWEN_STOP_TOKENS],
+          },
+          opts.onToken
+            ? (evt) => {
+                if (typeof evt.token === 'string') {
+                  assembled += evt.token;
+                  try { opts.onToken?.(evt.token); } catch { /* swallow user errors */ }
+                }
               }
-            }
-          : undefined,
-      ));
+            : undefined,
+        );
+      },
+      opts.homework ? ML_PRIORITY_HOMEWORK : ML_PRIORITY_LLM,
+      // OTA-1157 — the hook is now independent of the priority. Homework gets it
+      // because it is idle work; item synthesis gets it because it holds the lock
+      // long enough to make the voice late (see `interruptible`). Narration gets
+      // neither, on purpose.
+      (opts.homework || opts.interruptible)
+        ? () => {
+            preempted = true;
+            try {
+              void (ctx as unknown as { stopCompletion?: () => unknown }).stopCompletion?.();
+            } catch { /* unsupported / nothing running — the job just finishes normally */ }
+          }
+        : undefined,
+      );
       // Prefer assembled tokens (already stripped of prompt) but fall back to
       // the final text the native side returns.
-      return (assembled || result.text || '').trim();
+      const text = (assembled || result.text || '').trim();
+      // ⚠ OTA-1130 — llama.cpp has been computing the exact read/write split
+      // this whole time and we were throwing the object away. OTA-1129's whole
+      // diagnosis (prefill dominates) was INFERRED from wall-clock; `timings`
+      // states it outright, per call, for free. Optional-chained throughout:
+      // the field is absent in older llama.rn builds and in the jest mock, and
+      // a missing number must never cost a generation.
+      const t = (result as { timings?: {
+        prompt_ms?: number; predicted_ms?: number;
+        prompt_n?: number; predicted_n?: number;
+      } }).timings;
+      const r = result as {
+        tokens_evaluated?: number; tokens_predicted?: number;
+        tokens_cached?: number; stopped_eos?: boolean;
+        stopped_limit?: number; stopping_word?: string;
+      };
+      recordQwenCall({
+        job: opts.job ?? 'unlabeled',
+        totalMs: Date.now() - telT0,
+        waitMs: Math.max(0, telLockAt - telT0),
+        chars: text.length,
+        // ⚠ OTA-1142 — DISTINGUISH "the model said nothing" FROM "there was no
+        // model". Both used to record as `empty`, and the device log had one of
+        // each: a real silent generation, and `empty 8809ms read 0ms/write 0ms
+        // in 309t→out 0t` — 8.8 seconds of wall time with ZERO prefill and ZERO
+        // decode, moments after an OTA session start, three seconds before the
+        // watchdog announced dormancy. That second one never touched the native
+        // side at all; it ran against a context that had already been detached.
+        // `this.context` is nulled synchronously the moment dispose() begins, so
+        // checking it HERE — after the await, when we know what we got back —
+        // says whether the context outlived the call. A prompt problem and a
+        // lifecycle problem get investigated in opposite directions, so filing
+        // them under one word cost a whole round of guessing.
+        // OTA-1146 — a preempted homework job is reported as such whatever it
+        // returned. Partial text from a job we cut short is not an 'ok' the
+        // stats should average latency over, and an empty one is not the
+        // model failing — it is the model being told to stop.
+        outcome: preempted ? 'preempted'
+          : text.length > 0 ? 'ok'
+          : (this.context === null ? 'dormant' : 'empty'),
+        at: telT0,
+        prefillMs: typeof t?.prompt_ms === 'number' ? Math.round(t.prompt_ms) : undefined,
+        decodeMs: typeof t?.predicted_ms === 'number' ? Math.round(t.predicted_ms) : undefined,
+        promptTokens: r.tokens_evaluated ?? t?.prompt_n,
+        outTokens: r.tokens_predicted ?? t?.predicted_n,
+        cachedTokens: r.tokens_cached,
+        stop: r.stopped_eos ? 'eos'
+          : r.stopped_limit ? 'limit'
+          : r.stopping_word ? 'word'
+          : 'unknown',
+        promptChars: prompt.length,
+      });
+      return text;
+    } catch (err) {
+      recordQwenCall({
+        job: opts.job ?? 'unlabeled',
+        totalMs: Date.now() - telT0,
+        waitMs: Math.max(0, telLockAt - telT0),
+        chars: 0,
+        // Same split on the throw path: a native call that blew up because the
+        // context vanished under it is a lifecycle event, not a model error.
+        outcome: this.context === null ? 'dormant' : 'error',
+        at: telT0,
+        promptChars: prompt.length,
+      });
+      throw err;
     } finally {
       // Clears on success OR a JS throw. A NATIVE crash never reaches here —
       // that's the whole point; the breadcrumb survives for next-boot detection.

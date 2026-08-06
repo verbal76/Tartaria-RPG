@@ -21,6 +21,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { endingLine, LOST_CAPITAL_LOCATIONS, LOST_CAPITAL_NAMES } from '../engine/mainQuest';
+import { epilogueMotiveLine } from '../engine/chapters'; // OTA-1043
+import { epilogueChoiceLines } from '../engine/storyForks'; // OTA-1088
+import { motiveById } from '../engine/story'; // OTA-1043
+import { missingResolvedEpilogue } from '../engine/storyDrip'; // OTA-1044
+import { arbiterVerdict, arbiterNameBeat } from '../engine/arbiterPersona'; // OTA-1090
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 
@@ -81,6 +86,9 @@ function buildHomewardBeats(player: {
 export function EndingScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
+  // OTA-1090 — the Arbiter's regard reads the per-person ledger, which lives
+  // on worldMemory rather than the character.
+  const worldMemory = useGameStore((s) => s.worldMemory);
   const [stage, setStage] = useState<'splash' | 'homeward'>('splash');
 
   if (!player || !player.mainQuest || player.mainQuest.phase !== 'ended' || !player.mainQuest.ending) {
@@ -108,6 +116,29 @@ export function EndingScreen() {
 
   const endingLabel = ending.toUpperCase();
   const endingColor = ending === 'seal' ? '#5a6b8a' : ending === 'unleash' ? '#a85a3a' : '#7a8a5a';
+  // OTA-1043 — the per-motive epilogue: how THIS ending answers the reason
+  // this character came down (the OTA-1041 story motive). Rendered under the
+  // faction ending prose so the run closes on the personal thread, not just
+  // the political one. OTA-1044 — if The Missing side-thread RESOLVED in-run
+  // (grave / lie / walker), its own closing replaces the standard 'missing'
+  // epilogue, which assumes the question is still open.
+  const motiveLine = missingResolvedEpilogue(player) ?? epilogueMotiveLine(ending, player.storyMotive);
+  const motiveTitle = motiveById(player.storyMotive).title;
+  // ⚠ OTA-1088 — THE SECOND PLACE A PHASE 3 DECISION LANDS, and the permanent
+  // one. The motive epilogue above still closes the arc — that is what the
+  // motive was FOR. These are what you DID inside it, one sentence per
+  // question answered, in authored fork order so a second run through the same
+  // choices reads the same way. Empty for a character who was never asked.
+  const choiceLines = epilogueChoiceLines(player);
+  // ⚠ OTA-1090 — PHASE 5, AND THE ONLY PLACE HE SPEAKS *ABOUT* YOU RATHER THAN
+  // TO YOU. The ending prose is the world's verdict and the motive epilogue is
+  // the character's; this is the verdict of the one person who was standing
+  // there for all of it. Derived from the save like everything else in the
+  // persona system, so it is the honest summary of the run and not a reward
+  // for reaching the screen — a player who spent the run robbing people gets
+  // told so, at the door, by name.
+  const verdict = arbiterVerdict(player, worldMemory);
+  const nameBeat = arbiterNameBeat(player, worldMemory);
 
   return (
     <View style={styles.container}>
@@ -117,6 +148,32 @@ export function EndingScreen() {
         <View style={styles.rule} />
 
         <Text style={styles.body}>{line}</Text>
+
+        {motiveLine != null && (
+          <View style={styles.motiveBlock}>
+            <Text style={styles.motiveTag}>{motiveTitle.toUpperCase()}</Text>
+            <Text style={styles.motiveLine}>{motiveLine}</Text>
+          </View>
+        )}
+
+        {choiceLines.length > 0 && (
+          <View style={styles.motiveBlock}>
+            <Text style={styles.motiveTag}>WHAT YOU CHOSE</Text>
+            {choiceLines.map((l, i) => (
+              <Text key={i} style={[styles.motiveLine, i > 0 && { marginTop: 10 }]}>{l}</Text>
+            ))}
+          </View>
+        )}
+
+        {verdict != null && (
+          <View style={styles.motiveBlock}>
+            <Text style={styles.motiveTag}>THE ARBITER</Text>
+            <Text style={styles.motiveLine}>{verdict}</Text>
+            {nameBeat != null && (
+              <Text style={[styles.motiveLine, { marginTop: 10 }]}>{nameBeat}</Text>
+            )}
+          </View>
+        )}
 
         <View style={[styles.rule, { marginTop: 28 }]} />
 
@@ -242,6 +299,10 @@ const styles = StyleSheet.create({
   summaryKey: { color: '#a2977b', fontSize: 12, letterSpacing: 1 },
   summaryVal: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
   coresList: { color: '#cdbf99', fontSize: 11, fontStyle: 'italic', marginTop: 6 },
+  // OTA-1043 — motive epilogue block.
+  motiveBlock: { marginTop: 20 },
+  motiveTag: { color: '#7a8a5a', fontSize: 10, letterSpacing: 4, fontWeight: '700', marginBottom: 6 },
+  motiveLine: { color: '#cdbf99', fontSize: 13, lineHeight: 21, fontStyle: 'italic' },
   btnRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 24, gap: 8 },
   btn: {
     flex: 1,

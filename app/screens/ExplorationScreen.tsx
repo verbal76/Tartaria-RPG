@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { playerWeaponReach, useGameStore, makeRoomKey } from '../state/gameStore';
+import { playerWeaponReach, useGameStore, makeRoomKey, chipDismissTileKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -36,14 +36,22 @@ import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
 import { enemyIsAerial } from '../engine/enemyTraits';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
-import { PickpocketModal } from '../components/PickpocketModal';
+import { PickpocketSheet } from '../components/PickpocketSheet';
 import { MissionBoardModal } from '../components/MissionBoardModal';
 import { FusionPickerModal } from '../components/FusionPickerModal';
 import { FusionBlockedModal } from '../components/FusionBlockedModal';
 import { MissionCompleteModal } from '../components/MissionCompleteModal';
-import { ParleyModal } from '../components/ParleyModal';
+import { ParleySheet } from '../components/ParleySheet';
+import { PayoffSheet } from '../components/PayoffSheet';
+import { TalkSheet } from '../components/TalkSheet';
+import { GiftModal } from '../components/GiftModal';
+import { hasTopicsFor } from '../engine/dialogue';
+// OTA-1087 — the SAME identity function the store and the ledger use. See the
+// TALK chip below for what asking in the wrong namespace cost.
+import { npcLedgerId } from '../engine/npcMemory';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
+import { profileOf } from '../engine/pressure';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { TUTORIAL_STEPS } from '../components/tutorialSteps';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
@@ -88,6 +96,8 @@ export function ExplorationScreen() {
   const submit = useGameStore((s) => s.submitPlayerAction);
   const setInputModalOpen = useGameStore((s) => s.setInputModalOpen);
   const setScreen = useGameStore((s) => s.setScreen);
+  // OTA-1082 — the Phase 2 talk exchange, reachable by tap rather than only by typing.
+  const talkToNpc = useGameStore((s) => s.talkToNpc);
   const currentScene = useGameStore((s) => s.currentScene);
   // OTA-507 — drives the hidden-location "?" so the travel row doesn't leak the
   // real name before arrival/discovery.
@@ -118,6 +128,34 @@ export function ExplorationScreen() {
     && !tutorialExploreChosen;
   const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
+  // OTA-1099 — the talk/parley sheets share the DiceRoller's controls slot;
+  // these drive which occupant renders. Rolls win: a parley choice that starts
+  // a roll hands the slot straight to the dice.
+  const pendingTalk = useGameStore((s) => s.pendingTalk);
+  const pendingParley = useGameStore((s) => s.pendingParley);
+  // OTA-1104 — the shakedown outranks every other sheet: your wrist is in
+  // their grip, and the store refuses all actions until you pay or fight.
+  const pendingPayoff = useGameStore((s) => s.pendingPayoff);
+  // OTA-1104 — escort leaders walking with you are pickpocket marks too.
+  // Select the stable quests reference; derive the names in a memo so the
+  // selector never mints a fresh array (which would re-render on every tick).
+  const activeQuestsForMarks = useGameStore((s) => s.player?.activeFactionQuests);
+  const escortLeaderMarks = React.useMemo(
+    () => (activeQuestsForMarks ?? [])
+      .filter((q) => q.tracked !== false && !!q.escort?.leaderName && (q.escort?.hp ?? 0) > 0)
+      .map((q) => q.escort!.leaderName!),
+    [activeQuestsForMarks],
+  );
+  // OTA-1102 — the TALK glow. Subscribing to talkedTopics is what keeps the
+  // light honest: it goes out the moment the last unread line is heard, and
+  // comes back when a warmth/story gate opens a new topic on this vendor.
+  const talkedTopics = useGameStore((s) => s.worldMemory.talkedTopics);
+  const glowVendorName = useGameStore((s) => s.currentScene?.vendor?.name);
+  const vendorTalkGlow = React.useMemo(
+    () => (glowVendorName ? useGameStore.getState().hasUnspokenTalk(glowVendorName) : false),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- talkedTopics is the invalidation signal
+    [glowVendorName, talkedTopics],
+  );
   // OTA-841 [did-you-mean] — runnable command suggestions from the last low-confidence
   // parse, rendered as a tappable chip row above the input.
   const parseSuggestions = useGameStore((s) => s.parseSuggestions);
@@ -166,20 +204,23 @@ export function ExplorationScreen() {
       player.completedFactionQuestIds ?? [],
     ).length > 0;
   }, [currentScene?.missionBoard, player]);
-  // arb152 — a per-location dismiss for the Fusing Crucible chip (X on the chip).
-  // Reset whenever the location or building changes (re-entering re-shows it).
-  // arb-fix — the dismiss lives in the STORE (crucibleChipDismissedKey), NOT local
-  // useState: entering a vendor UNMOUNTS this screen (App.tsx renders exploration vs
-  // vendor by a flag), so a local flag was lost on the round-trip and the chip popped
-  // back on return. Keying the stored dismiss to the view-key still auto-re-shows the
-  // chip when you actually move to a different location (key mismatch).
-  // arb154 — include activeBuildingRoomId: moving between ROOMS of a building
-  // (market stalls etc.) changes only this, not activeBuildingId — so without it
-  // a dismiss in one room stuck for the whole building ("disabled in all rooms").
-  const crucibleViewKey = `${currentScene?.location.id ?? ''}|${activeBuildingId ?? ''}|${activeBuildingRoomId ?? ''}|${player?.hubRoomId ?? ''}`;
+  // arb152 — a dismiss (✕) for the Fusing Crucible chip, and OTA-1052 the same for
+  // the vendor chip. arb-fix — the dismiss lives in the STORE, NOT local useState:
+  // entering a vendor UNMOUNTS this screen (App.tsx renders exploration vs vendor by
+  // a flag), so a local flag was lost on the round-trip and the chip popped back on
+  // return.
+  // OTA-1052 — the scope is the macro TILE, not the room (reversing arb154's
+  // room-keyed shape). Owner: "the crucible once dismissed can stay dismissed until
+  // we leave the capital tile and come back" — a capital is a dozen rooms on ONE
+  // tile, so a room-keyed dismiss re-showed the chip on every interior hop. Leaving
+  // the tile clears the key in beginScene, so a return visit shows it again.
+  const chipViewKey = chipDismissTileKey(player);
   const crucibleDismissedKey = useGameStore((s) => s.crucibleChipDismissedKey);
   const setCrucibleChipDismissedKey = useGameStore((s) => s.setCrucibleChipDismissedKey);
-  const crucibleDismissed = !!crucibleDismissedKey && crucibleDismissedKey === crucibleViewKey;
+  const crucibleDismissed = !!crucibleDismissedKey && crucibleDismissedKey === chipViewKey;
+  const vendorDismissedKey = useGameStore((s) => s.vendorChipDismissedKey);
+  const setVendorChipDismissedKey = useGameStore((s) => s.setVendorChipDismissedKey);
+  const vendorChipDismissed = !!vendorDismissedKey && vendorDismissedKey === chipViewKey;
   const [takeOpen, setTakeOpen] = useState(false);
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
@@ -231,13 +272,13 @@ export function ExplorationScreen() {
     const t = setTimeout(() => setDoorModalVisible(true), 450);
     return () => clearTimeout(t);
   }, [doorBeatOpen]);
-  // 2026-05-25 — branded vendor-leave prompt (POLISH-4). Replaces
-  // the native Alert that was breaking the dark+amber palette. Holds
-  // {vendorName, pendingText} so confirmation dispatches the
-  // originally-typed move command.
-  const [vendorLeavePrompt, setVendorLeavePrompt] = useState<
-    { vendorName: string; pendingText: string } | null
-  >(null);
+  // OTA-1052 — the vendor-leave prompt (POLISH-4, 2026-05-25) is GONE. It gated
+  // every cardinal move while a vendor stood in the scene — and a capital's room
+  // hops ARE cardinal moves, so walking Workshop → Armory asked "leave Tarek
+  // behind?" every single time (owner: "it just feels disorganized... we don't
+  // need the stay or leave popup when we switch rooms"). Vendors are anchored to
+  // their rooms (hub anchorNpc), so walking back in finds them exactly where they
+  // were; the chip's ✕ is the deliberate way to wave one off.
   // OTA-180 — feedbackOpen state dropped alongside the 📝 button.
   // OTA 223 — transient "COPIED" flash on the FULL LOG button so
   // the tap-to-copy shortcut gives visible confirmation without a
@@ -517,6 +558,7 @@ export function ExplorationScreen() {
               playerWisdom={player?.stats?.wisdom}
               enemyIntel={worldMemory?.enemyIntel}
               playerPower={player ? playerPowerScore(player) : undefined}
+              witholdIntel={player ? profileOf(player).witholdIntel : false}
             />
           ) : (
             // OTA-852 — the crest square is idle real estate when peaceful, so it
@@ -695,19 +737,100 @@ export function ExplorationScreen() {
           top is redundant and breaks the walked-into-a-building feel. Suppress
           it while inside a building; the stall's own Trade + Crucible actions
           render inside the room instead (block just below). */}
-      {currentScene?.vendor && !inCombat && !activeBuildingId && currentScene?.location?.id !== 'hidden_market' && (
+      {/* OTA-1052 — ONE compact row for everything standing in this place: the
+          trader, the board, a wanderer, the Crucible. Owner (at Asgardar): "having
+          the map line, the weather line, the vendor line and the fuse line takes up
+          a lot of screen real estate at a capital." Each was a full-width two-line
+          banner; they now sit two-across as short chips, so four stacked banners
+          become one row and the feed keeps the height. */}
+      <View style={styles.placeChipRow}>
+      {currentScene?.vendor && !inCombat && !activeBuildingId && !vendorChipDismissed && currentScene?.location?.id !== 'hidden_market' && (
         <TouchableOpacity
-          style={styles.vendorBanner}
+          style={[styles.placeChip, styles.vendorChip]}
           onPress={() => setScreen('vendor')}
           activeOpacity={0.7}
           accessibilityRole="button"
         >
           <View style={styles.vendorBannerStripe} />
-          <View style={styles.vendorBannerBody}>
-            <Text style={styles.vendorBannerName}>{currentScene.vendor.name}</Text>
-            <Text style={styles.vendorBannerHint}>tap to approach · {currentScene.vendor.offers.length} offers</Text>
+          <View style={styles.placeChipBody}>
+            <Text style={styles.vendorBannerName} numberOfLines={1}>{currentScene.vendor.name}</Text>
+            <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.vendor.offers.length} offers · tap to trade</Text>
           </View>
-          <Text style={styles.vendorBannerArrow}>›</Text>
+          {/* OTA-1082 — TALK. The Phase 2 exchange shipped in OTA-1081 with no
+              way to reach it but typing `talk to <name>`, which is a feature
+              nobody finds. Shown ONLY for the authored cast — a TALK button on
+              somebody with nothing to say is a worse lie than no button. Nested
+              touchable, so it does not open the stall.
+              ⚠ OTA-1087 — npcLedgerId, NOT `vendor.id`. The raw id is the SPAWN
+              id (`roadside_<seed>`, `overlay_<id>_<ms>`); the topic sets are
+              keyed on who the person IS (`roadside:grit_maalen`). Asking in the
+              wrong namespace answered `false` for all 24 roadside and 5 overlay
+              traders, so this button only ever appeared for the 30 named vendors
+              whose raw id happens to equal their ledger id — and it was the only
+              route into their conversation that a player would ever find. */}
+          {hasTopicsFor(npcLedgerId(currentScene.vendor)) ? (
+            // OTA-1102 — the glow means "something NEW to hear": green while
+            // any gate-open topic still has unread lines, back to gold once
+            // the player has heard them all. Same spent-math as the sheet's
+            // "(asked)" marks, via hasUnspokenTalk.
+            <TouchableOpacity
+              style={[styles.placeChipTalk, vendorTalkGlow && styles.placeChipTalkUnspoken]}
+              onPress={() => talkToNpc(currentScene.vendor?.name ?? '')}
+              hitSlop={8}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel={
+                vendorTalkGlow
+                  ? `Talk to ${currentScene.vendor.name}, they have something new to say`
+                  : `Talk to ${currentScene.vendor.name}`
+              }
+            >
+              <Text style={[styles.placeChipTalkText, vendorTalkGlow && styles.placeChipTalkTextUnspoken]}>TALK</Text>
+            </TouchableOpacity>
+          ) : null}
+          {/* OTA-1106 — GIFT beside TALK. The verb existed since OTA-1083 but
+              only as typed input ("I didn't see a gift button" — owner). Same
+              quiet affordance as TALK; opens the OTA-1083 picker. */}
+          <TouchableOpacity
+            style={styles.placeChipTalk}
+            onPress={() => useGameStore.getState().openGift()}
+            hitSlop={8}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Give a gift`}
+          >
+            <Text style={styles.placeChipTalkText}>GIFT</Text>
+          </TouchableOpacity>
+          {/* OTA-1052 — ✕ on the trader, matching the Crucible's. Nested touchable
+              handles its own tap (doesn't open the stall). Hides the chip for this
+              tile only: the vendor stays anchored to the room, so walking back in
+              — or typing "trade" — still reaches them. */}
+          <TouchableOpacity
+            style={styles.placeChipX}
+            onPress={() => {
+              // OTA-1105 — the ✕ doesn't route through submitPlayerAction, so
+              // it was the one exit the talk sheet's walk-away guard didn't
+              // cover: owner hit ✕ mid-conversation and the vendor left while
+              // the sheet stayed open. Dismissing the person you're talking
+              // to walks away from the conversation first (same feed line as
+              // STOP TALKING). A conversation with somebody ELSE (a wanderer)
+              // is not touched — match on the ledger id. And mid-shakedown
+              // the ✕ does nothing: their grip is on your wrist.
+              const st = useGameStore.getState();
+              if (st.pendingPayoff) return;
+              if (st.pendingTalk && currentScene.vendor
+                && st.pendingTalk.npcId === npcLedgerId(currentScene.vendor)) {
+                st.closeTalk();
+              }
+              setVendorChipDismissedKey(chipViewKey);
+            }}
+            hitSlop={10}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Dismiss ${currentScene.vendor.name}`}
+          >
+            <Text style={styles.vendorChipX}>✕</Text>
+          </TouchableOpacity>
         </TouchableOpacity>
       )}
 
@@ -722,17 +845,17 @@ export function ExplorationScreen() {
           so a brand-new character has an immediate quest on-ramp. */}
       {currentScene?.missionBoard && missionBoardHasPostings && (
         <TouchableOpacity
-          style={styles.missionBoardBanner}
+          style={[styles.placeChip, styles.missionBoardChip]}
           onPress={() => setMissionBoardOpen(true)}
           activeOpacity={0.7}
           accessibilityRole="button"
         >
           <View style={styles.missionBoardStripe} />
-          <View style={styles.vendorBannerBody}>
-            <Text style={styles.missionBoardName}>⚑ MISSION BOARD</Text>
-            <Text style={styles.vendorBannerHint}>tap to view &amp; accept postings</Text>
+          <View style={styles.placeChipBody}>
+            <Text style={styles.missionBoardName} numberOfLines={1}>⚑ MISSION BOARD</Text>
+            <Text style={styles.placeChipHint} numberOfLines={1}>tap to view postings</Text>
           </View>
-          <Text style={styles.missionBoardArrow}>›</Text>
+          <Text style={styles.placeChipArrow}>›</Text>
         </TouchableOpacity>
       )}
 
@@ -742,17 +865,17 @@ export function ExplorationScreen() {
           standing nudge). Hidden in combat. */}
       {currentScene?.wanderer && !inCombat && (
         <TouchableOpacity
-          style={styles.wandererBanner}
+          style={[styles.placeChip, styles.wandererChip]}
           onPress={() => submit(`talk to ${currentScene.wanderer!.name}`)}
           activeOpacity={0.7}
           accessibilityRole="button"
         >
           <View style={styles.wandererStripe} />
-          <View style={styles.vendorBannerBody}>
-            <Text style={styles.wandererName}>☺ {currentScene.wanderer.name}</Text>
-            <Text style={styles.vendorBannerHint}>{currentScene.wanderer.role} · tap to speak</Text>
+          <View style={styles.placeChipBody}>
+            <Text style={styles.wandererName} numberOfLines={1}>☺ {currentScene.wanderer.name}</Text>
+            <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.wanderer.role} · tap to speak</Text>
           </View>
-          <Text style={styles.wandererArrow}>›</Text>
+          <Text style={styles.placeChipArrow}>›</Text>
         </TouchableOpacity>
       )}
 
@@ -807,32 +930,35 @@ export function ExplorationScreen() {
         // A location forge is free via 'fuse' (a vendor's paid Crucible lives in the
         // vendor screen now).
         const fireCrucible = () => useGameStore.getState().submitPlayerAction('fuse');
-        const readyName = '★★ Fusing Crucible ready';
-        const readyHint = 'tap to fuse · spends your ♥ reserved items';
+        const readyName = '★★ Crucible ready';
+        const readyHint = 'tap to fuse · spends ♥ items';
         return (
         <TouchableOpacity
-          style={styles.fusionBanner}
+          style={[styles.placeChip, styles.fusionChip]}
           onPress={fireCrucible}
           activeOpacity={0.7}
           accessibilityRole="button"
         >
           <View style={styles.fusionBannerStripe} />
-          <View style={styles.vendorBannerBody}>
-            <Text style={styles.fusionBannerName}>
-              {gate.ok ? readyName : '★★ Fusing Crucible · needs prep'}
+          <View style={styles.placeChipBody}>
+            <Text style={styles.fusionBannerName} numberOfLines={1}>
+              {gate.ok ? readyName : '★★ Crucible · needs prep'}
             </Text>
-            <Text style={styles.vendorBannerHint}>
+            {/* OTA-220's reason line survives the OTA-1052 squeeze: the READY case
+                is a one-liner, but a BLOCKED Crucible still spells out what's
+                missing (a player once tapped fuse 5× not knowing). */}
+            <Text style={styles.placeChipHint} numberOfLines={gate.ok ? 1 : 2}>
               {gate.ok
                 ? readyHint
                 : (gate.reason ?? 'tap for details')}
             </Text>
           </View>
-          {/* arb152 — dismiss the Crucible chip for this visit if you don't need
-              it. Nested touchable handles its own tap (doesn't fire the fuse);
-              'fuse' can still be typed, and re-entering re-shows the chip. */}
+          {/* arb152 — dismiss the Crucible chip if you don't need it. Nested
+              touchable handles its own tap (doesn't fire the fuse); 'fuse' can
+              still be typed, and OTA-1052 leaving the tile re-shows the chip. */}
           <TouchableOpacity
-            style={styles.crucibleDismiss}
-            onPress={() => setCrucibleChipDismissedKey(crucibleViewKey)}
+            style={styles.placeChipX}
+            onPress={() => setCrucibleChipDismissedKey(chipViewKey)}
             hitSlop={10}
             activeOpacity={0.7}
             accessibilityRole="button"
@@ -843,6 +969,7 @@ export function ExplorationScreen() {
         </TouchableOpacity>
         );
       })()}
+      </View>
 
       {/* OTA-777 — the torch is a small quick-use button in the bottom action
           row (see InputBox `torch` QuickBtn), NOT a top banner. */}
@@ -867,6 +994,30 @@ export function ExplorationScreen() {
             onRoll={resolveRollStep}
             onCancel={cancelPendingRolls}
           />
+        ) : pendingPayoff ? (
+          // OTA-1104 — the shakedown. No cancel: pay, or fight.
+          <PayoffSheet />
+        ) : pendingTalk ? (
+          // OTA-1099 — an open conversation takes the input's place, dice-
+          // roller style: topic list at the bottom, replies in the feed,
+          // STOP TALKING to hand the slot back.
+          <TalkSheet />
+        ) : pendingParley ? (
+          <ParleySheet />
+        ) : pickpocketOpen ? (
+          // OTA-1100 — the pickpocket picker joins the slot: choose the mark
+          // at the bottom, the Stealth roll and outcome land in the feed.
+          // OTA-1101 — marks are PEOPLE (vendor / wanderer), and the payout
+          // is what's in their pockets, not their table (pickpocketPerson →
+          // engine/pocketLoot.ts). Items stay with the steal/take verbs.
+          <PickpocketSheet
+            marks={[currentScene?.vendor?.name, currentScene?.wanderer?.name, ...escortLeaderMarks].filter((n): n is string => !!n)}
+            onPick={(mark) => {
+              setPickpocketOpen(false);
+              useGameStore.getState().pickpocketPerson(mark);
+            }}
+            onCancel={() => setPickpocketOpen(false)}
+          />
         ) : (
           <>
           {/* OTA-841 [did-you-mean] — after a low-confidence / unresolved parse, the
@@ -890,24 +1041,11 @@ export function ExplorationScreen() {
           )}
           <InputBox
             onSubmit={(text) => {
-              // 2026-05-25 [POLISH-4] — warn before leaving a vendor.
-              // When a cardinal direction or 'continue travel' submit
-              // comes through while a vendor banner is on the scene,
-              // prompt the player "leave [vendor]?" before actually
-              // moving. Yes → submit (stepDirection clears vendor on
-              // next-tile move); No → cancel the move, vendor stays
-              // visible. Typed direction commands ("n", "go north")
-              // are caught by the regex too. Anti-nag toggle is a
-              // follow-up (file as ANTINAG-1).
-              const vendor = currentScene?.vendor;
-              const isMove = /^(go\s+|head\s+|walk\s+|move\s+)?(north|south|east|west|northeast|northwest|southeast|southwest|n|s|e|w|ne|nw|se|sw|continue|continue travel|onward)$/i.test(text.trim());
-              if (vendor && isMove) {
-                // 2026-05-25 — branded modal (BrandedModal below)
-                // replaces the OS Alert. Same yes/no/dismiss shape;
-                // matches the rest of the game's popup palette.
-                setVendorLeavePrompt({ vendorName: vendor.name, pendingText: text });
-                return;
-              }
+              // OTA-1052 — no vendor-leave gate. Every cardinal move used to be
+              // intercepted while a vendor stood in the scene, which meant every
+              // capital ROOM hop (the room chips submit "go <dir>") asked whether
+              // to leave the trader behind. Vendors stay anchored to their rooms;
+              // the chip's ✕ is the way to dismiss one.
               submit(text);
             }}
             onOpenInventory={() => setScreen('inventory')}
@@ -933,7 +1071,11 @@ export function ExplorationScreen() {
             // OTA-847 (STEALTH SYSTEM) — peaceful PICKPOCKET. Greyed when there's
             // no vendor and nothing liftable in the scene.
             onOpenPickpocket={() => { Keyboard.dismiss(); setPickpocketOpen(true); }}
-            pickpocketBlocked={!currentScene?.vendor && (currentScene?.ambientNouns ?? []).length === 0}
+            // OTA-1103 — marks are PEOPLE now (OTA-1101), so both the block
+            // and the glow key on presence of someone with pockets. OTA-1104
+            // adds escort leaders walking with you to that set.
+            pickpocketBlocked={!currentScene?.vendor && !currentScene?.wanderer && escortLeaderMarks.length === 0}
+            pickpocketPossible={!!(currentScene?.vendor || currentScene?.wanderer) || escortLeaderMarks.length > 0}
             onOpenAskArbiter={() => setAskArbiterOpen(true)}
             onOpenMissions={() => { useGameStore.getState().maybeAdvanceTutorial('main_quest'); setScreen('contracts'); }}
             onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}
@@ -1123,7 +1265,16 @@ export function ExplorationScreen() {
                   const surfaceReq = searchRequirementFor(surfaceNoun);
                   const surfaceUnlocked = !surfaceReq
                     || (player && playerHasScannerEquipped(player, surfaceReq.scannerBias));
-                  if (surfaceUnlocked) groundCount = 1;
+                  // OTA-1147 — and the SAME elevation gate the scene nouns get
+                  // above. This is the half that made the badge read active
+                  // while the modal was entirely greyed; the chip and the count
+                  // have to agree or the player is told to open a menu that has
+                  // nothing in it.
+                  const gElev = currentScene?.elevatedOn;
+                  const groundOutOfReach = !!gElev && !currentScene?.elevatedOverlayMeta
+                    && !gElev.noun.toLowerCase().includes(surfaceNoun)
+                    && !surfaceNoun.includes(gElev.noun.toLowerCase());
+                  if (surfaceUnlocked && !groundOutOfReach) groundCount = 1;
                 }
               }
               return sceneCount + groundCount + (tutBeat === 'investigate' ? 1 : 0); // tutorial door prop
@@ -1293,8 +1444,8 @@ export function ExplorationScreen() {
           full thread arc without fighting the scrim; LATER replaced
           with ABANDON (which marks the hook resolved — explicit
           walk-away). OTA-1030 — the terminal stage shows COMPLETE
-          alone; it dismisses the arc and THEN raises the held
-          completion popup (dismissHookContinue). */}
+          alone (dismissHookContinue). OTA-1050 — no follow-up popup;
+          the modal's own reward strip shows the payout. */}
       <HookContinueModal
         visible={pendingHookContinue !== null}
         noun={pendingHookContinue?.noun ?? ''}
@@ -1374,7 +1525,35 @@ export function ExplorationScreen() {
             const hasScannerForReq = req && player
               ? playerHasScannerEquipped(player, req.scannerBias)
               : false;
-            const unmetRequirement = req && !hasScannerForReq ? req.shortLabel : undefined;
+            let unmetRequirement = req && !hasScannerForReq ? req.shortLabel : undefined;
+            // ⚠ OTA-1147 — THE PINNED CHIP NEVER GOT THE ELEVATION GATE, and it
+            // is the last chip in the app that lies.
+            //
+            // OTA-166 greyed scene nouns while the player is climbed; OTA-953
+            // took them out of the INVESTIGATE count for the same reason. Both
+            // skipped THIS chip, because it is built separately a few lines up.
+            // So standing on a shelf leaves every reachable noun greyed and the
+            // ground / mud / floor chip alone still bright, with the chip badge
+            // still reading active. Tapping it earns the engine's "You're up on
+            // the {perch}. The ground is down there. Climb down to reach it."
+            // every single time.
+            //
+            // That is the exact shape of the unconfirmed watch-list report —
+            // "tap again → 2 active items" — and the detail the owner was asked
+            // for was WHETHER THEY WERE CLIMBED UP. It is also what OTA-970
+            // describes from the other side: "eight identical salvage attempts
+            // from atop a shelf … the player retried into dead silence, which
+            // reads as a hang."
+            //
+            // Scanner gate wins when both apply: a missing scanner is the more
+            // specific thing to say, and climbing down will not fix it.
+            const pinElev = currentScene?.elevatedOn;
+            if (pinElev && !currentScene?.elevatedOverlayMeta && !unmetRequirement) {
+              const climbed = pinElev.noun.toLowerCase();
+              if (!climbed.includes(key) && !key.includes(climbed)) {
+                unmetRequirement = 'climb down to reach';
+              }
+            }
             return [{ noun, consumed: isAmbientConsumed(key), alwaysShow: true, unmetRequirement }];
           })(),
           // OTA-257 — productively-consumed nouns now STAY VISIBLE as
@@ -1563,9 +1742,15 @@ export function ExplorationScreen() {
       <FusionPickerModal />
       <FusionBlockedModal />
       <MissionCompleteModal />
+      {/* OTA-1046 — the opening crawl moved to App.tsx's GLOBAL overlay
+          stack so REPLAY OPENING plays over any screen. */}
 
-      {/* OTA-808 — the two-button parley chooser (self-mounts off pendingParley). */}
-      <ParleyModal />
+      {/* OTA-1099 — the parley chooser and the topic exchange moved out of the
+          overlay stack into the controls slot below (bottom sheets, dice-
+          roller pattern) at the owner's direction: the feed must stay
+          readable while talking. */}
+      {/* OTA-1083 — the gift picker, self-mounting off pendingGift. */}
+      <GiftModal />
 
       {/* OTA-180 — FeedbackModal render removed alongside the 📝
           button. Component file kept for any future re-add. */}
@@ -1586,21 +1771,11 @@ export function ExplorationScreen() {
         onCancel={() => setApproachOpen(false)}
       />
 
-      {/* OTA-847 (STEALTH SYSTEM) — PICKPOCKET picker (peaceful). Vendor offers
-          become lift targets; ambient nouns become opportunistic grabs. Routes
-          to stealthTakeAmbientNoun, which dispatches vendor theft (Stealth vs
-          the vendor's DC, high-STE quiet-fail) or a sleight-of-hand grab. */}
-      <PickpocketModal
-        visible={pickpocketOpen}
-        vendorName={currentScene?.vendor?.name}
-        vendorOffers={(currentScene?.vendor?.offers ?? []).map((o) => o.itemName)}
-        npcHints={currentScene?.vendor ? [] : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])}
-        onSubmit={(target) => {
-          setPickpocketOpen(false);
-          useGameStore.getState().stealthTakeAmbientNoun(target);
-        }}
-        onCancel={() => setPickpocketOpen(false)}
-      />
+      {/* OTA-1100 — the PICKPOCKET picker moved out of the overlay stack into
+          the controls slot above (bottom sheet, dice-roller pattern). It
+          routes to stealthTakeAmbientNoun, which dispatches vendor theft
+          (Stealth vs the vendor's DC, high-STE quiet-fail) or a
+          sleight-of-hand grab. */}
 
       {/* OTA 046 — CLIMB picker. Pull climbables from the same scene
           noun pool the other modals read (displayedAmbientNouns →
@@ -1715,31 +1890,6 @@ export function ExplorationScreen() {
           },
         ]}
         onRequestClose={() => chooseTutorialExplore()}
-      />
-
-      <BrandedModal
-        visible={vendorLeavePrompt !== null}
-        title="Vendor present"
-        body={vendorLeavePrompt
-          ? `${vendorLeavePrompt.vendorName} is still set up here. Leave them behind and move on?`
-          : undefined}
-        buttons={[
-          {
-            label: 'Stay',
-            onPress: () => setVendorLeavePrompt(null),
-            tone: 'neutral',
-          },
-          {
-            label: 'Move on',
-            onPress: () => {
-              const text = vendorLeavePrompt?.pendingText ?? '';
-              setVendorLeavePrompt(null);
-              if (text) submit(text);
-            },
-            tone: 'primary',
-          },
-        ]}
-        onRequestClose={() => setVendorLeavePrompt(null)}
       />
 
       {/* arb-fix — equipped faction catalyst confirmation. When the only
@@ -2021,51 +2171,54 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1.5,
   },
-  vendorBanner: {
+  // OTA-1052 — the "what's standing here" chip system. Was four full-width,
+  // two-line, 44px-tall banners stacked down the screen (trader / board /
+  // wanderer / Crucible); at a capital that ate the feed. They now share one
+  // wrapping row two-across: same information, ~a third of the height. Each keeps
+  // its own accent colour so the family stays readable at a glance.
+  placeChipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 5 },
+  placeChip: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
     borderWidth: 1,
     borderRadius: 4,
     overflow: 'hidden',
-    minHeight: 44,
+    minHeight: 34,
+    flexGrow: 1,
+    flexBasis: '47%',
+    minWidth: 150,
   },
+  placeChipBody: { flex: 1, paddingHorizontal: 7, paddingVertical: 3, minWidth: 0 },
+  placeChipHint: { color: '#a2977b', fontSize: 9, letterSpacing: 0.5, marginTop: 1 },
+  placeChipArrow: { color: '#8a8070', fontSize: 16, paddingHorizontal: 7 },
+  placeChipX: { paddingHorizontal: 9, paddingVertical: 7, alignSelf: 'center' },
+  vendorChip: { borderColor: '#c9a86a' },
+  missionBoardChip: { borderColor: '#8b7355' },
+  wandererChip: { borderColor: '#6e8f4e' },
+  fusionChip: { borderColor: '#b88ce0' },
+  vendorChipX: { color: '#8a7448', fontSize: 15, fontWeight: '800' },
   vendorBannerStripe: { width: 4, backgroundColor: '#c9a86a', alignSelf: 'stretch' },
-  vendorBannerBody: { flex: 1, paddingHorizontal: 10, paddingVertical: 6 },
-  vendorBannerName: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
-  vendorBannerHint: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginTop: 1 },
-  vendorBannerArrow: { color: '#c9a86a', fontSize: 22, paddingHorizontal: 12 },
+  // OTA-1082 — the TALK affordance on the vendor chip. Deliberately quieter
+  // than the chip itself: trading is still the primary action at a counter.
+  placeChipTalk: {
+    paddingHorizontal: 8, paddingVertical: 4, marginRight: 4,
+    borderWidth: 1, borderColor: '#7a6640', borderRadius: 4,
+  },
+  placeChipTalkText: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  // OTA-1102 — unspoken-dialogue glow: the house green (#9ec96a, the wanderer/
+  // social accent) on border + text while this person still has unread lines.
+  placeChipTalkUnspoken: { borderColor: '#9ec96a' },
+  placeChipTalkTextUnspoken: { color: '#9ec96a' },
+  vendorBannerName: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
   // OTA-451 — Mission Board chip. Parchment/brown accent to distinguish from the
   // vendor's amber and the Crucible's purple.
-  missionBoardBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#13110f',
-    borderColor: '#8b7355',
-    borderWidth: 1,
-    borderRadius: 4,
-    overflow: 'hidden',
-    minHeight: 44,
-  },
   missionBoardStripe: { width: 4, backgroundColor: '#8b7355', alignSelf: 'stretch' },
-  missionBoardName: { color: '#b89a6a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
-  missionBoardArrow: { color: '#8b7355', fontSize: 22, paddingHorizontal: 12 },
+  missionBoardName: { color: '#b89a6a', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
   // OTA-807 — Wandering NPC banner. Soft green stripe (a friendly, social beat) to
   // set it apart from the vendor gold and mission-board brown.
-  wandererBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#12140f',
-    borderColor: '#6e8f4e',
-    borderWidth: 1,
-    borderRadius: 4,
-    overflow: 'hidden',
-    minHeight: 44,
-  },
   wandererStripe: { width: 4, backgroundColor: '#6e8f4e', alignSelf: 'stretch' },
-  wandererName: { color: '#9ec96a', fontSize: 13, fontWeight: '700', letterSpacing: 0.5 },
-  wandererArrow: { color: '#6e8f4e', fontSize: 22, paddingHorizontal: 12 },
+  wandererName: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
   // OTA-217 — Crucible permit banner. Purple stripe to differentiate
   // from the vendor banner's amber, matching the OTA-199 Rare rarity
   // color so the visual signal reads "rare event, act now."
@@ -2074,21 +2227,10 @@ const styles = StyleSheet.create({
   // it reads as a sibling of the quest box / vendor banner rather than a
   // detached, narrower chip. Mirrors `vendorBanner`'s box model; only the
   // purple accent colour distinguishes it.
-  fusionBanner: {
-    backgroundColor: '#13110f',
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#b88ce0',
-    borderWidth: 1,
-    borderRadius: 4,
-    overflow: 'hidden',
-    minHeight: 44,
-  },
   fusionBannerStripe: { width: 4, backgroundColor: '#b88ce0', alignSelf: 'stretch' },
-  fusionBannerName: { color: '#b88ce0', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  fusionBannerName: { color: '#b88ce0', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
   // arb152 — dismiss (✕) on the Fusing Crucible chip.
-  crucibleDismiss: { paddingHorizontal: 14, paddingVertical: 8, alignSelf: 'center' },
-  crucibleDismissText: { color: '#8a6fa8', fontSize: 16, fontWeight: '800' },
+  crucibleDismissText: { color: '#8a6fa8', fontSize: 15, fontWeight: '800' },
   placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
 });
 

@@ -308,11 +308,59 @@ export function wornDogVestInstanceId(player: {
   return byName?.id ?? null;
 }
 
-/** Pick a default fall-back name from the breed for players who skip
- *  the name stage. Three flavor names rotate per session. */
+// OTA-1066 — the ROLL button's name pool. This used to be three hardcoded
+// names drawn WITH REPLACEMENT, so the owner tapping ROLL fifteen times saw
+// the same two names come back: with a pool of 3 the chance of a repeat on
+// any given tap is 1 in 3, and there was nothing else it could ever show.
+// Fifty names now, and they come out of a SHUFFLE BAG rather than a fresh
+// random draw — consecutive taps walk a shuffled ordering and cannot repeat
+// until every name has been offered once. That is what "roll through a list"
+// should feel like.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const DOG_NAME_POOL: string[] = (require('../data/dogs/dog-names.json') as { names: string[] }).names;
+
+/** Remaining names in the current bag, in the order they'll be handed out. */
+let dogNameBag: string[] = [];
+/** The last name handed out, so a bag refill can't hand back the same name
+ *  twice across the seam (bag empties on Onyx, reshuffles, Onyx first again). */
+let lastDogName: string | null = null;
+
+function refillDogNameBag(): void {
+  const next = [...DOG_NAME_POOL];
+  // Fisher-Yates.
+  for (let i = next.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [next[i], next[j]] = [next[j]!, next[i]!];
+  }
+  // Don't let the reshuffle repeat the name that just came out. Names are
+  // taken with pop(), i.e. from the END of the array, so the guard has to
+  // look at the tail — checking next[0] would guard the wrong end and let a
+  // double-tap repeat straight through the seam.
+  const last = next.length - 1;
+  if (next.length > 1 && next[last] === lastDogName) {
+    [next[last], next[0]] = [next[0]!, next[last]!];
+  }
+  dogNameBag = next;
+}
+
+/** Pick a name for a dog the player hasn't named. Also backs the ROLL button
+ *  in DogOnboardingModal, which is the path that actually gets hammered. */
 export function defaultDogName(): string {
-  const names = ['Rust', 'Cinder', 'Marrow'];
-  return names[Math.floor(Math.random() * names.length)]!;
+  if (dogNameBag.length === 0) refillDogNameBag();
+  const name = dogNameBag.pop() ?? DOG_NAME_POOL[0]!;
+  lastDogName = name;
+  return name;
+}
+
+/** Test seam — reset the bag so a spec starts from a known state. */
+export function _resetDogNameBag(): void {
+  dogNameBag = [];
+  lastDogName = null;
+}
+
+/** Test seam — the full authored pool. */
+export function dogNamePool(): readonly string[] {
+  return DOG_NAME_POOL;
 }
 
 // ----- Train dog stat -------------------------------------------------

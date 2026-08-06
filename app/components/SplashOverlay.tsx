@@ -82,9 +82,9 @@ export function SplashOverlay() {
 }
 
 const styles = StyleSheet.create({
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: '#0b0a09', zIndex: 1000, elevation: 1000 },
+  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: '#0a0908', zIndex: 1000, elevation: 1000 },
   barWrap: { position: 'absolute', left: 28, right: 28, bottom: 56, alignItems: 'center' },
   barTrack: { width: '100%', height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: 2, backgroundColor: '#c9a86a' },
-  barLabel: { marginTop: 10, color: '#e6dcc2', fontSize: 11, letterSpacing: 1.5, textShadowColor: 'rgba(0,0,0,0.9)', textShadowRadius: 4 },
+  barLabel: { marginTop: 10, color: '#e6d8b3', fontSize: 11, letterSpacing: 1.5, textShadowColor: 'rgba(0,0,0,0.9)', textShadowRadius: 4 },
 });

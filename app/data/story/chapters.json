@@ -1,0 +1,81 @@
+{
+  "chapters": {
+    "revelation": {
+      "kicker": "CHAPTER II",
+      "title": "NINE HEARTS",
+      "body": "It is true, then — not rumor, not a drunk salvager's brag. Nine capitals. Nine Cores, each one still beating under its drowned city like a heart that missed the news of its own death.\n\nWhoever gathers all nine can stand in the Mud Flood Nexus and decide what the buried country becomes. The work in front of you finally has a shape.",
+      "motives": {
+        "debt": "You do the new arithmetic without meaning to: one Core clears the debt. Nine clear it nine times over. For the first time since the door closed on you, the number on the wrong side of the ledger looks small.",
+        "missing": "Three years of letters, and every one of them circled this — the ninth capital, the light under the mud. Whoever you are following was walking THIS road. Now you walk it behind them, reading their steps.",
+        "exile": "Nine drowned thrones, and not one warrant posted in any of them. The surface took your name; these nine cities have nine chances to give you a bigger one.",
+        "calling": "The hum in your blood has split into a chord — nine notes, nine directions, nine hearts calling in a register only you seem to hear. It was never one voice. It was a choir.",
+        "record": "Every history you have read got this wrong, and now you can prove it. Nine hearts, still beating. Write it down exactly as you found it: the buried country is not a ruin. It is a patient."
+      }
+    },
+    "cores": {
+      "kicker": "CHAPTER III",
+      "title": "THE FIRST HEART",
+      "body": "The Core rides your pack like a second pulse, warm through the canvas, faintly out of time with your own. One of nine. The buried country knows what you are carrying — you feel it in the way the dark leans a little closer now, the way the mud holds your boot a half-beat longer.\n\nEight hearts left. The road has stopped being a rumor and started being a count.",
+      "motives": {
+        "debt": "Season by season, the arithmetic works: this one Core is worth more than they ever claimed you owed — and you are not stopping at one. When you finally pay them, you want them to understand what it cost the world to be paid.",
+        "missing": "You catch yourself talking to the Core at night, low, the way you used to read the letters aloud. If they got this far — if they ever carried one of these — you would know it. You would feel it. Keep walking.",
+        "exile": "Let the surface post its warrants. You are carrying a thing no magistrate up there could lift, and eight cities are waiting to see whether you can hold more. A name is what you can hold at the end of your arm.",
+        "calling": "The hum has changed since you lifted it. It is not calling you down anymore — it is singing along, one voice of nine, and your blood carries the harmony like it was born knowing it.",
+        "record": "You have written eleven pages about the housing alone. The Core is realer than every book above ground put together — and it is in YOUR pack, and the page it fills is yours."
+      }
+    },
+    "descent": {
+      "kicker": "CHAPTER IV",
+      "title": "THE ENDLESS STAIR",
+      "body": "Nine. The word has weight now — nine hearts in one pack, pulling each other into a single slow rhythm that your own heart keeps trying to join.\n\nThe Endless Stair, shut for a thousand years, stands open ahead: flight after flight falling away into a dark the flood never reached. Everything you told yourself at the rope-head comes down the Stair with you.",
+      "motives": {
+        "debt": "You could climb out right now and buy the debt nine times over, and both of you know why you don't. Somewhere on the way down, this stopped being about what you owe them. It became about what the world owes you back.",
+        "missing": "If they made it anywhere, they made it here — and no one has carried the full set in a thousand years. Whatever waits at the bottom of the Stair, it is the end of the trail. The last letter is still sewn into your coat.",
+        "exile": "The Stair does not check warrants. Below this step there is no surface law, no posted name, no struck record — only what you are about to do, and the title it will carry. They exiled a person. What climbs back out is up to you.",
+        "calling": "The hum is not below you anymore. It is around you — in the stone of every tread, in your teeth, in your blood — nine hearts and yours making ten. You are not following the call now. You are part of it.",
+        "record": "No account of the Stair exists past the third flight. Every step below that line is a page no one has ever written. You go down with a straight spine and a full inkwell — history's one witness, exactly where a witness is needed."
+      }
+    },
+    "choice": {
+      "kicker": "CHAPTER V",
+      "title": "THE MUD FLOOD NEXUS",
+      "body": "This is the room the flood came from. It is older than every kingdom on every honest map, and it has waited a thousand years for someone to walk in carrying nine hearts.\n\nSeal it. Unleash it. Or carry the keys away and let the question keep. Whatever you came down for, it ends — or begins — with what you choose here.",
+      "motives": {
+        "debt": "You came down owing. You stand here owed. Whatever you choose at the mantle, choose it as the one person in the world whose ledger is finally, entirely, your own.",
+        "missing": "This is where the trail ends — the place every letter pointed. Choose the way they would have wanted... no. Choose the way you need it chosen. You are the one who came back this far.",
+        "exile": "The surface wrote your ending years ago and got it wrong. This room writes endings that stick. No judge above ground will ever have jurisdiction over what you decide next.",
+        "calling": "The hum is deafening here — and underneath it, for the first time, you can hear it listening back. Whatever you choose, you are the only one it will hear.",
+        "record": "The last true page of a thousand-year story is blank in front of you, and the pen is in your hand. Whatever you write, write it whole. That is what you came down to do."
+      }
+    }
+  },
+  "epilogue": {
+    "seal": {
+      "motives": {
+        "debt": "The debt is paid — in coin, from the salvage, to the exact figure and then some. You keep the receipt. They keep their distance. The quiet under your ribs, where the arithmetic used to run day and night, is the part no one told you the money would buy.",
+        "missing": "You never found a grave, and after the sealing you stopped needing one. The buried country is at rest now, and whoever you loved is at rest inside it — nothing walks below wearing their face, and nothing ever will. You go home carrying the last letter, and a quiet you can finally live in.",
+        "exile": "The country that cast you out will never know you saved it from the country underneath. That is fine. You know. The name you carry now was earned in nine drowned capitals and sealed into the deepest room on earth — no magistrate can strike THAT record.",
+        "calling": "The hum is gone. For the first week the silence was a wound; by the second it was a room you could finally live in. Whatever the Aether wanted of you, you gave it — and it let you go gently, which you now understand was the whole answer.",
+        "record": "You wrote it whole: the flood, the hearts, the sealing, the why. One copy sits in a faction archive, one in your pack, one in a place only you know. The world above may shelve it as a fable. The mud knows it is a history. Both of you are right."
+      }
+    },
+    "unleash": {
+      "motives": {
+        "debt": "In the world the Unleashing made, your creditors' ledgers are ash and their doors answer to salvage lords now. Nobody owns you. You did not just clear the debt — you repealed the arithmetic that made it possible.",
+        "missing": "In the risen country, the dead remember. You found them — or the thing the Aether kept of them — three months after the Unleashing, waiting where the last letter said. What you said to each other belongs to no record. It was enough. It will always have been enough.",
+        "exile": "The world that exiled you is gone by sunrise, and the world that replaces it takes its names from whoever was standing at the Nexus when it turned. You are done taking names. You are giving them out now.",
+        "calling": "The Aether is everywhere now, and everyone can hear a little of what only you could hear before. You are not an oddity in the risen world — you are its first speaker, the one who was fluent before the language went public.",
+        "record": "You did not just witness the turn of the age — you triggered it, wrote it, and published it. The first history of the risen country carries your name on its spine. Every account that comes after will begin by arguing with you. That is what a record is for."
+      }
+    },
+    "preserve": {
+      "motives": {
+        "debt": "You paid the debt with ordinary salvage and kept the nine extraordinary things. Somewhere up there they are still counting what they think you owe. Let them count. The nine heaviest arguments on earth ride in your pack, and you owe nothing to anyone.",
+        "missing": "You never learned which it was — the grave, the lie, or the thing that walks. The Cores could have told you; opening that door meant opening every door. You carry the letter AND the keys now. Some nights that feels like faithfulness. Some nights the question was the only thing of theirs you had left — so you kept it.",
+        "exile": "They struck your name; you pocketed nine kingdoms' hearts and walked out unsigned. The surface still thinks you are nobody. Being nobody, you have noticed, is the only rank that can carry these.",
+        "calling": "The hum settled when you shouldered the pack for good — not silent, not calling, just with you, the way a heartbeat is. You asked the deep what you are. The answer, apparently, is: the one who carries it. You can live on that.",
+        "record": "The truth is written, witnessed, and not published — held, the way the mantle is held: live, unsigned. History's last witness became its keeper. When the world is ready to read it, it will find the pages kept perfectly. You check on them every night."
+      }
+    }
+  }
+}

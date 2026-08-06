@@ -7,10 +7,9 @@
 // so training a stat or upgrading a weapon/armour visibly moves the number. Player and
 // enemy use the same four terms so "yours 46 vs its 38" reads as "you're favoured".
 import type { Enemy, PlayerCharacter } from './types';
-import { effectiveStats, ARMOR_SLOTS, trimStandingAc } from './equipment';
+import { effectiveStats, standingAc } from './equipment';
 import { getEquippedWeapon } from './combatRules';
 import { traitACBonus } from './enemyTraits';
-import { resolveDisplayArmorByName } from './itemResolution';
 
 /** Average of a dice-notation string like "2d6+3" → count*(sides+1)/2 + flat. Falls
  *  back to a plain integer, else 2, for odd/empty notations. */
@@ -32,12 +31,13 @@ export function avgDamageNotation(notation: string | undefined | null): number {
 export function playerPowerScore(player: PlayerCharacter): number {
   const eff = effectiveStats(player);
   const bestStat = Math.max(eff.strength, eff.dexterity, eff.intelligence);
-  let armorAc = 0;
-  for (const slot of ARMOR_SLOTS) {
-    const name = player.equipped?.[slot];
-    if (!name) continue;
-    armorAc += resolveDisplayArmorByName(name, player.inventory ?? [])?.acBonus ?? 0;
-  }
+  // ⚠ OTA-1162 (audit) — this was the FOURTH inline copy of the gear-AC walk,
+  // found by the very sweep OTA-1158 said should never be needed again. It had
+  // both of 1158's defects in miniature: no amulet/ring AC, and the catalog
+  // acBonus where combat prefers the rolled instance. The gauge therefore
+  // disagreed with the panel by exactly the jewellery. One function, one
+  // answer — the OTA-955 promise below ("equals the AC the player SEES and
+  // FIGHTS with") is finally literally true, because it is the same call.
   // OTA-955 — the gauge's AC term runs through the OTA-947 standing-AC trim so it equals
   // the AC the player SEES (StatsPanel) and FIGHTS with (applyEnemyCounter) exactly.
   // Pre-OTA it summed the raw stack, so a tank's Power kept quoting the untrimmed
@@ -49,7 +49,7 @@ export function playerPowerScore(player: PlayerCharacter): number {
   // drift near the knee is out of scope here.) The correction lands SILENTLY across
   // an update: the OTA-929 delta flash seeds its prev-ref on mount, so a value that
   // changed between sessions never fires it — only in-session gear/stat moves do.
-  const ac = trimStandingAc((player.ac ?? 10) + armorAc);
+  const ac = standingAc(player);
   const weapon = getEquippedWeapon(player, 'main');
   const dmg = weapon ? avgDamageNotation(weapon.damageDice) : 2;
   const hp = player.hpMax ?? 10;
@@ -63,7 +63,16 @@ export function enemyPowerScore(enemy: Enemy): number {
   const apNum = apMatch ? parseInt(apMatch[0], 10) : 4;
   const baseAc = Math.max(5, Math.min(18, 5 + apNum));
   const ac = Math.max(1, baseAc + traitACBonus(enemy.traits) + (enemy.boss ? 6 : 0));
-  const dmg = avgDamageNotation(enemy.damage);
+  // ⚠ OTA-1163 (pressure test) — the damage term now prices what the resolver
+  // actually rolls. This function already knew about bosses (the +6 AC above)
+  // but scored their damage from the bare notation, while applyEnemyCounter
+  // adds +1d6 to every connecting boss swing AND takes a second swing per
+  // round. A 1d8+3 boss therefore scored 7.5 where its round averages
+  // 2 × (7.5 + 3.5) = 22 — so the matchup badge painted "even" on fights
+  // outputting three times what the gauge priced. The identical lie OTA-1159
+  // and OTA-1162 already fixed on the damage chip, one meter to its left.
+  const perSwing = avgDamageNotation(enemy.damage) + (enemy.boss ? 3.5 : 0);
+  const dmg = enemy.boss ? perSwing * 2 : perSwing;
   const hp = enemy.hp ?? 1;
   return Math.max(1, Math.round(apNum + dmg + ac + hp / 10));
 }
