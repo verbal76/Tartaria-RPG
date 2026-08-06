@@ -146,13 +146,15 @@ describe('OTA-1137 — ⚠ a weapon hit on a weakness staggers too', () => {
   it('the flinch is mechanical now, not just a word', () => {
     expect(STORE).toContain('Weakness exposed — ${enemy.name} flinches.');
     const from = STORE.indexOf('Weakness exposed — ${enemy.name} flinches.');
-    const block = STORE.slice(from, from + 500);
-    expect(block).toContain('staggerEnemy(set, activeIdx);');
+    const block = STORE.slice(from, from + 800);
+    // RETARGETED BY OTA-1140 — the melee stagger is now gated on surviving the
+    // blow, closing the corpse-stagger seam the pressure test found.
+    expect(block).toContain('if (newEnemyHp > 0) staggerEnemy(set, activeIdx);');
   });
 
   it('⚠ a RESISTED hit does not — the branch is the weakness branch', () => {
     const from = STORE.indexOf('Weakness exposed — ${enemy.name} flinches.');
-    const block = STORE.slice(from, from + 500);
+    const block = STORE.slice(from, from + 800);
     // The resist branch begins right after; nothing between it and the stagger.
     const resistAt = block.indexOf('shrugs off the');
     const staggerAt = block.indexOf('staggerEnemy(set, activeIdx);');

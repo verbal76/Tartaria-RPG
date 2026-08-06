@@ -284,7 +284,11 @@ describe('OTA-1135 — ⚠ the card names which gear, so this is visible next ti
   it('and the total counts both — splitting a label must not drop a term', () => {
     const from = STORE.indexOf('export function effectiveACBreakdown(');
     const body = STORE.slice(from, from + 3000);
-    expect(body).toContain('base + raceCtxDelta + armor + accessories + titleRuinsAc + statusAdj');
+    // RETARGETED BY OTA-1140 (pressure test) — the breakdown now applies the
+    // OTA-947 trim exactly as the resolver does (it had been skipping it, so
+    // the expanded card over-read a heavy build). Both terms still counted:
+    expect(body).toContain('base + raceCtxDelta + armor + accessories + titleRuinsAc');
+    expect(body).toContain('trimStandingAc(standingRaw) + statusAdj');
   });
 
   it('the breakdown draws its gear from the same helper the panel does', () => {

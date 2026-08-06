@@ -286,7 +286,18 @@ function takePresynth(voiceId: string, chunk: string): Float32Array | undefined 
 export async function presynthesize(text: string, voiceId?: string | null): Promise<boolean> {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) return false;
-  if (presynth.size >= PRESYNTH_CAP) return false;
+  // ⚠ OTA-1140 (pressure test) — EVICT, DON'T WEDGE. The cap used to REFUSE
+  // when full, and nothing but an exact-key hit ever removed an entry — so six
+  // orphans (a voice change invalidates every key; a bank eviction strands its
+  // audio; a duplicate-skip leaves one unspent) made pre-synthesis a permanent
+  // no-op for the rest of the session with ~3 MB of PCM pinned. Insertion order
+  // IS age on a JS Map, so dropping the oldest turns the same six slots into a
+  // rolling window that self-heals from every orphan class at once.
+  while (presynth.size >= PRESYNTH_CAP) {
+    const oldest = presynth.keys().next().value;
+    if (oldest === undefined) break;
+    presynth.delete(oldest);
+  }
   const prepared = cleanForSpeech(applyLoreLexicon(text)).trim();
   if (!prepared) return false;
   const resolvedVoice = voiceId ?? arbiterVoiceId();
@@ -294,7 +305,11 @@ export async function presynthesize(text: string, voiceId?: string | null): Prom
   if (!model) return false;
   let wrote = false;
   for (const chunk of chunkForSpeech(prepared)) {
-    if (presynth.size >= PRESYNTH_CAP) break;
+    while (presynth.size >= PRESYNTH_CAP) {
+      const oldest = presynth.keys().next().value;
+      if (oldest === undefined) break;
+      presynth.delete(oldest);
+    }
     const k = presynthKey(resolvedVoice, chunk);
     if (presynth.has(k)) continue;
     try {

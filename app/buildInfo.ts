@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.72';
+export const DISPLAY_VERSION = '4.29.73';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22060,7 +22060,69 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1139TheAuditBatch (13 tests); ota1130 retargeted
 // on the presynth call.
 // DISPLAY_VERSION 4.29.72.
-export const OTA_BUILD_ID = '2026-08-06-1139-the-audit-batch';
+// OTA-1140 — THE PRESSURE TEST.
+// Owner: "spin up agents and pressure test the game and fully
+// the combat system." Four agents ran in parallel — a combat-math
+// contradiction hunter, a parallel-array state auditor, an
+// exploit hunter, and a Monte Carlo simulation agent driving the
+// REAL engine at 20,000 trials per cell. Their confirmed
+// findings, deduplicated, are this batch. The balance questions
+// they raised are NOT tuned here — reported to the owner instead.
+// ⚠ THE STAGGER FAMILY (three agents converged independently):
+// enemyStaggered was the only per-enemy array not spliced on
+// enemy removal (a kill slid the boss onto the dead mook's index
+// while the flag stayed put — a paid stagger voided, or a free
+// one inherited); the melee path staggered CORPSES (no
+// survives-the-blow gate; the thrown path had one); and ~10 sites
+// replace or clear the roster wholesale while resetting only SOME
+// parallel arrays — a fled Guardian's ground-off acid shred was
+// BANKED for the re-summon, and a hunt boss inherited the prior
+// fight's stagger/shred/statuses. FRESH_ENEMY_ARRAYS is now
+// spread at every one of them.
+// ⚠ THE EXPLOITS: STEP-BACK KITING (rated CRITICAL — nothing ever
+// closed the range toward the player, so one free retreat made
+// every melee enemy, Core Guardians included, permanently unable
+// to fight back: THE PACK NOW PURSUES, one band per round when a
+// living enemy was benched by distance). CAMPING MID-FIGHT
+// ("rest" never checked for enemies — 8 hours, +15% max HP, no
+// swing taken; the camp now refuses with hostiles awake, while
+// eating stays OTA-619's free action). BANDOLIER BYPASS (an
+// emptied rack fell back to any pack copy in combat, making
+// BANDOLIER_MAX cosmetic; the fallback is out-of-combat only).
+// ⚠ THREE MORE LYING SURFACES (the 1156/1158/1159 family):
+// effectiveACBreakdown skipped the trim the resolver applies, so
+// the expanded DEFENSE card over-read every heavy build — trimmed
+// now, with the trim NAMED as a chip so sources still sum;
+// enemyPowerScore priced a boss at its bare notation while the
+// resolver rolls +1d6 twice per round, so the matchup badge
+// painted "even" on 3× fights; and the SUMMONED Guardian card was
+// a second copy of the card OTA-1136 fixed, still carrying both
+// lies. Also: the to-hit log admits "(needs nat N+ — AC capped)"
+// when ENEMY_HIT_NEEDED_CAP decided, and the damage clause admits
+// "floor 30%" when MITIGATION_FLOOR overrode the printed stack.
+// ⚠ PARITY AND PLUMBING: stagger now fires from the typed-throw
+// and burst-fire paths (the same weakness staggered from one hand
+// and not the other); the golem's corruption procs regained the
+// arb118 cap the player path always had (unbounded DOT reopened
+// through the golem's hands); the melee damage write reads LIVE
+// enemy HP (a lost-initiative regen was silently erased by a
+// stale snapshot); and the presynth PCM cache evicts oldest
+// instead of wedging shut at 6 entries after a voice change.
+// ⚠ REPORTED, NOT TUNED (owner's calls): the tier-1 Guardian is
+// 0.1%-winnable for a fresh 24-HP arrival (9.4% one-round death,
+// 59 spawn HP not 42, second swing = the killer at 36% full-bar
+// per connected round); weakness+stagger lifts that to 15.8% at
+// 24 HP / 63% at 60 HP; dodge is no longer dominant (+8-10% net
+// EV); armor past raw 18 buys nothing vs ordinary ATK-5 enemies
+// because ENEMY_HIT_NEEDED_CAP=13 floors hit chance at ~40%, not
+// because of the knee-22 trim; acid shred (up to 11 off a boss)
+// compounds with per-hit weakness stagger toward ~95% second-swing
+// denial; and the dog redirect eats a boss's entire second swing.
+// New suite ota1140ThePressureTest (19 tests); ota1130/1158/1159/
+// 1160 retargeted where their old assertions WERE the seams.
+// DISPLAY_VERSION 4.29.73.
+export const OTA_BUILD_ID = '2026-08-06-1140-the-pressure-test';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1139-the-audit-batch';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1138-the-comma-that-ate-the-beat';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1137-worth-bringing';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1136-how-he-died-in-one-input';
