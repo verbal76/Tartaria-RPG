@@ -223,7 +223,7 @@ import {
   type ArmorSlotResist,
   type Recipe,
 } from '../engine/crafting';
-import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor, enemyDamageDisplay, enemyDamageCompact } from '../engine/combatRules';
+import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor, enemyDamageDisplay, enemyDamageCompact, bossSwingsTwice } from '../engine/combatRules';
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
 import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, COATING_RESIST_LAND_CHANCE, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
@@ -34041,6 +34041,19 @@ export function runEnemyGroupCounters(
       crowdedOut.push(enemy.name);
       continue;
     }
+    // ⚠ OTA-1164 (owner tuning) — A STAGGER DENIES ONE SWING, WHICHEVER SWING
+    // THAT IS. OTA-1160's stagger cancelled the SECOND swing; the owner's tier
+    // gate below removes that swing from tier 1-2 Guardians, which would have
+    // made the Searing Paste worthless exactly where he fights. So on a gated
+    // single-swing boss the stagger denies the ONLY swing this round. That is
+    // the same absolute value it has against a big boss (one swing per round),
+    // and the fight stays real: the boss swings on every round the player does
+    // NOT land a fresh weakness hit. (1160's "first swing always lands" note
+    // is deliberately revised for the gated tiers — the trade the owner chose.)
+    if (enemy.boss && !bossSwingsTwice(enemy) && takeStagger(get, set, liveIdx)) {
+      get().appendLog('combat', `${enemy.name} reels — STAGGERED: no swing this round.`, { combatOutcome: 'enemy_miss' });
+      continue;
+    }
     // Pass live index so applyEnemyCounter can resolve ambush_strike
     // (one-shot +2 to the first counter for enemies with the trait).
     applyEnemyCounter(enemy, livePlayer ?? fallbackPlayer, get, set, liveIdx);
@@ -34048,7 +34061,7 @@ export function runEnemyGroupCounters(
     // Boss tier: a second counter swing after the first lands. Skipped
     // if the first counter killed the player, or if the enemy itself
     // dropped (riposte / fight-back path).
-    if (enemy.boss) {
+    if (enemy.boss && bossSwingsTwice(enemy)) {
       const liveAfter = get().player;
       const sceneAfter = get().currentScene;
       if (!liveAfter || liveAfter.hp <= 0 || liveAfter.dead) return;
@@ -34414,7 +34427,14 @@ function applyEnemyCounter(
   // AC math (atkTotal >= effectiveAc); it only bites a maxed-out defensive build, floating
   // its hit chance up to ~P(d20 >= ENEMY_HIT_NEEDED_CAP). AC still matters — it pushes the
   // needed roll UP toward the cap (fewer hits), it just can't push it past. Adjustable knob.
-  const ENEMY_HIT_NEEDED_CAP = 13; // d20>=13 -> ~40% floor hit chance vs any AC
+  // ⚠ OTA-1164 (owner tuning) — 13 → 16. The pressure-test sim showed every
+  // point of armor past raw 18 bought NOTHING against an ordinary ATK-5 enemy:
+  // the cap floored their hit chance at ~40% long before the knee-22 trim ever
+  // engaged, so a Legendary set landed the "I upgraded and nothing changed"
+  // feeling. At 16 the floor is ~25% — a maxed tank still gets hit one swing
+  // in four (never unhittable, fights still end), but armor keeps paying until
+  // raw ~21, and the excess past the cap now converts to plate (below).
+  const ENEMY_HIT_NEEDED_CAP = 16; // d20>=16 -> ~25% floor hit chance vs any AC
   const acHitNat = Math.max(2, Math.min(ENEMY_HIT_NEEDED_CAP, effectiveAc - (atkTotal - atkRoll)));
   // ⚠ OTA-1163 (pressure test) — SAY SO WHEN THE CAP DECIDED. At high AC the
   // resolver needs only a natural ENEMY_HIT_NEEDED_CAP, so the log's
@@ -34615,6 +34635,17 @@ function applyEnemyCounter(
     // roll: resists still soak MOST of a matched hit, but a MISMATCHED one visibly leaks
     // damage. The stone ward below is a spent absorb pool (not a passive resist), so it still
     // runs after this and may legitimately zero a hit. Adjustable knob.
+    // ⚠ OTA-1164 (owner tuning) — PLATE: the armor the cap wasted now soaks.
+    // Past ENEMY_HIT_NEEDED_CAP, extra AC used to buy literally nothing. Now
+    // every 2 points of capped-off AC shave 1 damage from a landed hit (max
+    // −4), so heavy armor stops making you unhittable and starts making hits
+    // weaker — which is what plate is FOR. Runs before the mitigation floor,
+    // so the 30%-of-raw minimum still holds: a maxed tank is hurt less, never
+    // immune.
+    const plateDr = acCapEngaged
+      ? Math.min(4, Math.floor(((effectiveAc - (atkTotal - atkRoll)) - ENEMY_HIT_NEEDED_CAP) / 2))
+      : 0;
+    if (plateDr > 0 && dmg > 1) dmg = Math.max(1, dmg - plateDr);
     const MITIGATION_FLOOR = 0.30;
     // ⚠ OTA-1163 (pressure test) — when the floor overrides the stack, SAY SO.
     // The bracket clause printed the layer percentages ("[armor −72%, title ½]")
@@ -34718,6 +34749,7 @@ function applyEnemyCounter(
         shield: !!shieldTag,
         wardTag,
         floorEngaged: mitFloorEngaged, // OTA-1163 — the clause admits the clamp
+        plate: plateDr,                // OTA-1164 — capped-off AC soaks instead
       });
       const msg = killed
         ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}. You fall.`
@@ -34875,6 +34907,9 @@ export function damageModClause(opts: {
    *  product. Without this marker a player auditing the percentages against
    *  the damage taken can never make them reconcile. */
   floorEngaged?: boolean;
+  /** OTA-1164 — flat soak from AC past the hit-floor cap (2 excess AC = −1
+   *  damage, max −4). Named so a tank can SEE the wasted armor working. */
+  plate?: number;
 }): string {
   const strip = (t: string) => t.replace(/^\s*\(/, '').replace(/\)\s*$/, '').trim();
   const mods: string[] = [];
@@ -34884,6 +34919,7 @@ export function damageModClause(opts: {
   if (opts.raceTag) mods.push(strip(opts.raceTag));
   if (opts.shield) mods.push('shield ½');
   if (opts.wardTag) mods.push(strip(opts.wardTag));
+  if (opts.plate && opts.plate > 0) mods.push(`plate −${opts.plate}`);
   if (opts.floorEngaged) mods.push('floor 30%');
   return mods.length ? ` [${mods.join(', ')}]` : '';
 }
