@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.82';
+export const DISPLAY_VERSION = '4.29.83';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22473,7 +22473,50 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // parser suites re-run green (297 tests) — resolveItem is
 // load-bearing for the whole verb table.
 // DISPLAY_VERSION 4.29.82.
-export const OTA_BUILD_ID = '2026-08-06-1149-the-modifier-is-evidence';
+// OTA-1150 — THE ACID BATCH (owner tuning, three dials). Owner:
+// *"I throw acid on everything and I use the coatings for my weapon
+// and armor for resists and added damage … I'm just mowing through
+// people. I might have made the player too powerful."*
+// ⚠ ACID IS THE ONLY COATING THAT MULTIPLIES THE OTHERS. Poison and
+// corruption add DAMAGE; acid adds ACCURACY, and accuracy scales
+// everything else on the swing — under a dual-coated bludgeon, the
+// acid is what makes the flame and the frost land. It is also the
+// only two-ingredient, one-each recipe in the game (Aether Dust ×1 +
+// Scrap Metal ×1), so it is always available, which is why it was
+// always used. And its value SCALES WITH FIGHT LENGTH, so ramping
+// enemy HP feeds it rather than answering it. That is what made this
+// a structural call and not a number tweak.
+// Three dials, all owner-called:
+//   1. ACID_SHRED_MAX 5 → 3. Five points off a ~19 AC boss is roughly
+//      a 25-point swing in hit rate, permanent for the fight. Three
+//      keeps acid the clear best opener without ending the to-hit
+//      roll. Boss headroom stays +2 (OTA-1142 tuned that half), so the
+//      boss cap moves 7 → 5.
+//   2. Shred now DECAYS. It used to be permanent once applied — one
+//      flask in round one carried the whole fight.
+//      ⚠ THE GATE IS "NO LIVE ACID COAT", NOT "EVERY ROUND". A flat
+//      per-round decay would cancel the +1 ACID_SHRED_PER_HIT exactly,
+//      shred would never accumulate past 1, and the dial would have
+//      DELETED the mechanic instead of tuning it. While the coat still
+//      burns the shred holds and climbs; the round the DOT lapses the
+//      guard knits back at ACID_SHRED_DECAY_PER_ROUND.
+//   3. The SECOND coating slot lands at SECOND_COAT_EFFECT_MULT (0.5),
+//      scaling that proc's `rolled` — the one number driving both its
+//      immediate damage and its DOT, so one multiplier covers both.
+//      The Crucible's dual-slot upgrade keeps its real value (a second
+//      ELEMENT is a second weakness angle); it stops paying full
+//      freight twice on one swing. Slot 1 untouched. Acid shred and
+//      corruption stacks are NOT scaled — both are already bounded by
+//      their own caps, so a second acid coat only reaches the same
+//      ceiling sooner.
+// New suite ota1150TheAcidBatch (10 tests). Two suites retargeted, both
+// genuine behaviour changes rather than regressions: ota1142's absolute
+// boss cap 7 → 5 (its relative ACID_SHRED_MAX + 2 claim unchanged), and
+// ota873's dual-poison total 2× → slot 1 + half of slot 2 (its
+// one-merged-status claim unchanged).
+// DISPLAY_VERSION 4.29.83.
+export const OTA_BUILD_ID = '2026-08-06-1150-the-acid-batch';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1149-the-modifier-is-evidence';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1148-the-first-word-survives';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1147-ayther-not-ay-thur';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1146-the-is-two-words';

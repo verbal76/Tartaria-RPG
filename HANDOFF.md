@@ -1260,7 +1260,59 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE MODIFIER IS EVIDENCE (2026-08-06, latest). BOTH LINES.** golem
+- **⚠⚠ THE ACID BATCH (2026-08-06, latest). BOTH LINES.** golem OTA-1150 /
+  HAL OTA-1173. Owner tuning, three dials, all owner-called. Owner: *"I throw
+  acid on everything and I use the coatings for my weapon and armor for resists
+  and added damage … I'm just mowing through people. I might have made the
+  player too powerful."*
+
+  ⚠ **ACID IS THE ONLY COATING THAT MULTIPLIES THE OTHERS.** Poison and
+  corruption add DAMAGE. Acid adds ACCURACY — and accuracy scales everything
+  else on the swing, so under a dual-coated bludgeon the acid is what makes the
+  flame and the frost land. It is also the only two-ingredient, one-each recipe
+  in the game (Aether Dust ×1 + Scrap Metal ×1); every other coating wants ×2 of
+  something or a gated drop. It was always available, so it was always used.
+
+  ⚠ **AND ITS VALUE SCALES WITH FIGHT LENGTH**, which is what made this a
+  structural call rather than a number tweak: raising enemy HP to compensate
+  FEEDS acid instead of answering it. Difficulty ramps cannot catch this one.
+
+  **Dial 1 — `ACID_SHRED_MAX` 5 → 3.** Five points off a ~19 AC boss is roughly
+  a 25-point swing in hit rate, permanent for the fight. The boss headroom stays
+  +2 (OTA-1142 tuned that half), so the boss cap moves 7 → 5.
+
+  **Dial 2 — shred DECAYS.** It used to be permanent once applied: one flask in
+  round one carried you to the last blow.
+
+  ⚠ **THE GATE IS "NO LIVE ACID COAT", NOT "EVERY ROUND".** A flat per-round
+  decay would cancel the +1 `ACID_SHRED_PER_HIT` exactly — shred would never
+  accumulate past 1 and the dial would have DELETED the mechanic instead of
+  tuning it. While the coat still burns, shred holds and climbs to the cap; the
+  round the DOT lapses, the guard knits back at `ACID_SHRED_DECAY_PER_ROUND`.
+  The store reads the POST-tick status array, so a coat that expired this tick
+  starts decaying next round rather than getting a free round of grace.
+
+  **Dial 3 — the SECOND coating slot lands at `SECOND_COAT_EFFECT_MULT` (0.5).**
+  Scaling that proc's `rolled` is the trick: it is the one number driving both
+  the immediate bonus damage AND the per-turn DOT, so a single multiplier
+  applied before either read covers both halves. The Crucible's dual-slot
+  upgrade keeps its real value — a second ELEMENT is a second weakness angle —
+  it just stops paying full freight twice on one swing. Slot 1 untouched. Acid
+  shred and corruption stacks are NOT scaled: both are already bounded by their
+  own caps, so a second acid coat only reaches the same ceiling sooner.
+
+  ⚠ **I ARGUED AGAINST DIAL 3 AND THE OWNER CALLED IT ANYWAY.** Recorded because
+  the reasoning was "the dual-coat is a Crucible upgrade you earned" — which the
+  0.5 multiplier preserves (the upgrade still buys a second element) rather than
+  refutes. The concern was narrower than it sounded.
+
+  New suite `ota1150TheAcidBatch` (10 tests). Two suites retargeted, and both
+  are GENUINE BEHAVIOUR CHANGES rather than regressions — noted so a later reader
+  doesn't "fix" them back: `ota1142`'s absolute boss cap 7 → 5 (its relative
+  `ACID_SHRED_MAX + 2` claim still passes), and `ota873`'s dual-poison total
+  2× → slot 1 + half of slot 2 (its one-merged-status claim still passes).
+
+- **⚠⚠ THE MODIFIER IS EVIDENCE (2026-08-06). BOTH LINES.** golem
   OTA-1149 / HAL OTA-1172. From the device log on OTA-1166:
   `craft Frost Paste` → `resolved=Searing Paste`, and a second instance the
   same session, `craft Blue Cap Draught` → `resolved=mountain capital` — a

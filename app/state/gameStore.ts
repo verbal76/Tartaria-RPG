@@ -226,7 +226,7 @@ import {
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor, enemyDamageDisplay, enemyDamageCompact, bossSwingsTwice } from '../engine/combatRules';
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
-import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, COATING_RESIST_LAND_CHANCE, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
+import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, COATING_RESIST_LAND_CHANCE, ACID_SHRED_PER_HIT, ACID_SHRED_DECAY_PER_ROUND, acidShredCap, corruptionStackCap, rollLootCoating, secondCoatRolled } from '../engine/weaponCoating';
 import { inferWeapon, inferArmor } from '../engine/itemDefaults';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
@@ -21036,6 +21036,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         };
         coatingProc = resolveCoatingProc(coatInst?.coating, 'coating');
         coatingProc2 = resolveCoatingProc(coatInst?.coating2, 'coating2');
+        // ⚠ OTA-1150 (owner tuning) — the SECOND slot lands at half effect.
+        // Scaling `rolled` HERE — before it is added to `dmg` and before
+        // applyCoatingProc reads it to seed the DOT — is what lets one
+        // multiplier cover both halves of the proc. The dual-slot Crucible
+        // upgrade keeps its real value (a second ELEMENT is a second weakness
+        // angle) without paying full freight twice on the same swing.
+        if (coatingProc2) {
+          coatingProc2 = { ...coatingProc2, rolled: secondCoatRolled(coatingProc2.rolled) };
+        }
         if (coatingProc) dmg += coatingProc.rolled;
         if (coatingProc2) dmg += coatingProc2.rolled;
       }
@@ -33881,8 +33890,40 @@ function tickEnemyDotsAndMaybeEndFight(
         }
         newStatuses[i] = remaining;
       }
+      // ⚠ OTA-1150 (owner tuning) — ACID SHRED CLOSES BACK UP. It used to be
+      // permanent for the fight: one flask in round one carried you to the last
+      // blow, which is most of why acid outclassed every other coating.
+      //
+      // ⚠ THE GATE IS "NO LIVE ACID COAT", NOT "EVERY ROUND". A flat per-round
+      // decay would cancel the +1 ACID_SHRED_PER_HIT exactly, shred would never
+      // accumulate at all, and the mechanic would be deleted rather than tuned.
+      // While the coating is still burning, the shred HOLDS and keeps climbing to
+      // the cap; the round the DOT lapses, the guard starts knitting back at
+      // ACID_SHRED_DECAY_PER_ROUND. Keep it up and you keep the opening.
+      //
+      // Read off `newStatuses` (post-tick), not the pre-tick scene, so the coat
+      // that expired on THIS tick starts decaying on the NEXT round rather than
+      // getting one free round of grace.
+      let newShred = sceneNow.enemyArmorShred;
+      if (newShred?.some((v) => (v ?? 0) > 0)) {
+        const decayed = [...newShred];
+        for (let i = 0; i < sceneNow.enemies.length; i++) {
+          if ((decayed[i] ?? 0) <= 0) continue;
+          if ((newHps[i] ?? 0) <= 0) continue;
+          if ((newStatuses[i] ?? []).some((st) => st.kind === 'acid_coat')) continue;
+          decayed[i] = Math.max(0, (decayed[i] ?? 0) - ACID_SHRED_DECAY_PER_ROUND);
+        }
+        newShred = decayed;
+      }
       set((s) => s.currentScene
-        ? { currentScene: { ...s.currentScene, enemyHps: newHps, enemyStatuses: newStatuses } }
+        ? {
+          currentScene: {
+            ...s.currentScene,
+            enemyHps: newHps,
+            enemyStatuses: newStatuses,
+            ...(newShred ? { enemyArmorShred: newShred } : {}),
+          },
+        }
         : s);
     }
   }
