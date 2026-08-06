@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.81';
+export const DISPLAY_VERSION = '4.29.82';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23568,7 +23568,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // re-implements the trimmer's arithmetic and pins the constants
 // against the source, so the two cannot drift apart silently.
 // DISPLAY_VERSION 4.29.81.
-export const OTA_BUILD_ID = '2026-08-06-1171-the-first-word-survives';
+// OTA-1172 — THE MODIFIER IS EVIDENCE. From the device log on
+// OTA-1166: `craft Frost Paste` → `resolved=Searing Paste`, and
+// a second instance the same session, `craft Blue Cap Draught`
+// → `resolved=mountain capital`.
+// ⚠ THE SYMPTOM LOOKED COSMETIC AND WAS NOT. Both crafts made
+// the right item, because craft matches RECIPES, not inventory —
+// so the only visible damage was a wrong word in a debug line.
+// But ~25 gameStore handlers read `parsed.resolvedNoun` BEFORE
+// `parsed.target`. The same resolution under `use` spends the
+// wrong consumable, and the player never learns why.
+// Mechanism, engine/parser.ts resolveItem: pass 2 matched on the
+// item's HEAD NOUN (last word of the name) and never consulted
+// the rest. "frost paste" → head "paste" → the first inventory
+// row ending in "paste" wins, and "frost" is discarded.
+// ⚠ THIS IS OTA-093'S BUG SEEN FROM THE OTHER SIDE. OTA-093
+// closed the mirror image — adjective-ONLY input ("bone" →
+// Bone Fragment) no longer wins — and its comment says so in as
+// many words. Nobody checked the direction where the INPUT is
+// the side carrying the adjective. Same function, same comment
+// block, thirteen lines apart.
+// Fix, in order: (a) a candidate whose other name words all
+// appear in the input wins outright — which also settles
+// "mud-rend blade" vs "Rusted Blade" without the off-hand hint;
+// (b) nothing agrees and the input carried no extra token, so
+// nothing is being ignored — keep the historical first-match
+// ("use the blade"); (c) nothing agrees and the input DID carry
+// a token no candidate accounts for — return undefined. A miss
+// is recoverable; a confident wrong answer spends an item.
+// ⚠ THE GUARD HAD TO COVER PASS 3 TOO, or it does nothing:
+// pass 3 fuzzy-matches tokens against head nouns, and
+// fuzzyEqual('paste','paste') hands Searing Paste straight back
+// one loop later. Both passes now route through one picker.
+// Pass 1 (full-name containment) is untouched.
+// New suite ota1172TheModifierIsEvidence (8 tests). All 11
+// parser suites re-run green (297 tests) — resolveItem is
+// load-bearing for the whole verb table.
+// DISPLAY_VERSION 4.29.82.
+export const OTA_BUILD_ID = '2026-08-06-1172-the-modifier-is-evidence';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1171-the-first-word-survives';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1170-ayther-not-ay-thur';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1169-the-is-two-words';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1168-nobody-was-waiting-on-it';
