@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.75';
+export const DISPLAY_VERSION = '4.29.76';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23308,7 +23308,36 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the boss-gated line (the ordering it pins is unchanged).
 // New suite ota1165TheFourLeverBatch (12 tests).
 // DISPLAY_VERSION 4.29.75.
-export const OTA_BUILD_ID = '2026-08-06-1165-the-four-lever-batch';
+// OTA-1166 — WELCOME BACK ALWAYS WINS. Owner, from the device
+// right after 1165 landed: "the arbiter fired 3 lines when I
+// started back in the save file" → "roll out the welcome back
+// always wins."
+// ⚠ ROOT CAUSE: three separate load-time systems each fired one
+// arbiter line and nobody owned the TOTAL — the OTA-046
+// while-away beat (when it drew an arbiter-channel line), the
+// OTA-849 offline world-recap, and the arb164 named greeting.
+// Return after a day away and the voice read all three back to
+// back. The ambient one-per-tile/25s budget never covered the
+// load path.
+// ⚠ THE RULE NOW: the Arbiter speaks EXACTLY ONCE at load — the
+// named greeting, which still leads with "Welcome back, {name}"
+// every time (arb164 non-negotiable, unchanged).
+// ⚠ The while-away beat draws from the pool's WORLD-channel
+// lines only; the four arbiter-channel entries stay authored in
+// the pool but no longer fire at load.
+// ⚠ The offline recap no longer prints its own line: it sets a
+// pending flag the greeting consumes, splicing the recap INSIDE
+// the greeting's closing quote — "Welcome back, Verbal. … The
+// waste did not sleep while you were gone — blood was spilled
+// and ground changed hands. Read the World for the account." One
+// continuous spoken hello; the World board still carries the
+// full account.
+// welcomeBackLine exported for the suite; ota1153's hand-authored
+// pin retargeted to the chained substitution (still authored).
+// New suite ota1166WelcomeBackAlwaysWins (8 tests).
+// DISPLAY_VERSION 4.29.76.
+export const OTA_BUILD_ID = '2026-08-06-1166-welcome-back-always-wins';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1165-the-four-lever-batch';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1164-the-owners-tuning-calls';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1163-the-pressure-test';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1162-the-audit-batch';

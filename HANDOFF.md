@@ -1273,7 +1273,34 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE FOUR-LEVER BATCH (2026-08-06, latest). BOTH LINES.** HAL OTA-1165 /
+- **⚠⚠ WELCOME BACK ALWAYS WINS (2026-08-06, latest). BOTH LINES.** HAL
+  OTA-1166 / golem OTA-1143. Owner, from the device minutes after 1165
+  landed: *"the arbiter fired 3 lines when I started back in the save file"*
+  → *"roll out the welcome back always wins."*
+
+  ⚠ **Root cause:** three separate load-time systems each fired one arbiter
+  line and nobody owned the TOTAL — the OTA-046 while-away beat (when it
+  drew an arbiter-channel line), the OTA-849 offline world-recap, and the
+  arb164 named greeting. Return after a day away (≥6h arms the beat, ≥4h
+  arms the recap) and the voice read all three back to back. The ambient
+  one-per-tile/25s budget never covered the load path.
+
+  ⚠ **The rule now: the Arbiter speaks EXACTLY ONCE at load** — the named
+  greeting, still leading with "Welcome back, {name}" every time (arb164
+  non-negotiable, unchanged, still speakFront).
+  - The while-away beat draws from the pool's WORLD-channel lines only; the
+    four arbiter-channel entries stay authored in `WHILE_AWAY_LINES` but no
+    longer fire at load (available to a future surface).
+  - The offline recap no longer prints its own line: the pulse block sets
+    `offlineRecapPending`, and `welcomeBackLine(player, { offlineRecap })`
+    splices the recap INSIDE the greeting's closing quote — one continuous
+    spoken hello. The World board still carries the full account.
+
+  New suite `ota1166WelcomeBackAlwaysWins` (8 tests); `welcomeBackLine`
+  exported for it; ota1153's hand-authored pin retargeted to the chained
+  `{name}` substitution (still authored, still substituted).
+
+- **⚠⚠ THE FOUR-LEVER BATCH (2026-08-06). BOTH LINES.** HAL OTA-1165 /
   golem OTA-1142. From the MASTER TUNING REFERENCE, the recommended four; the
   owner: *"yes run the 4 level batch."* All pure number/gate turns, all moved
   to DONE on the STANDING TUNING LIST in §8:
