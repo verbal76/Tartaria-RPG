@@ -101,7 +101,7 @@ function spokenRecently(stripped: string): boolean {
 // AsyncStorage chain in.
 import { stripArbiterFrame, detectArbiterSpeaker } from './arbiterFrame';
 import { voiceForSpeaker } from './speakerVoices';
-import { onKokoroStateChange, getKokoroErrorHistory } from './PiperTTSManager';
+import { onKokoroStateChange, getKokoroErrorHistory, setVoiceLogSink as piperSetVoiceLogSink } from './PiperTTSManager';
 
 // arb54 — surface the bundled-voice (Piper/Kokoro) install state into the game
 // log so a tester's LOG export shows WHY narration is silent without digging
@@ -141,6 +141,7 @@ function onAppStateChange(next: AppStateStatus): void {
 function logVoice(line: string): void {
   try { useGameStore.getState().appendLog('debug', line); } catch { /* log not ready */ }
 }
+
 
 function speakArbiter(text: string, front: boolean = false): void {
   const stripped = stripArbiterFrame(text);
@@ -302,6 +303,17 @@ function onState(state: GameState): void {
 /** Bind the controller to the game store + settings observer. Call
  *  once at app boot, AFTER initTTSManager(). */
 export function startTTSController(): void {
+  // ⚠ OTA-1155 — hand the low-level synth layer a way to reach the game log.
+  // PiperTTSManager must not import the store itself (it is the native layer,
+  // and that dependency would run the wrong way), so this module — which
+  // already owns that edge — installs the sink.
+  //
+  // Installed HERE rather than at module scope, and optional-called: a
+  // module-scope side effect broke every existing partial mock of
+  // PiperTTSManager the moment this file was imported, which is a lot of blast
+  // radius for a debug line. A mock without the export simply gets no sink and
+  // logs nothing, which is exactly right under test.
+  try { piperSetVoiceLogSink?.(logVoice); } catch { /* never block startup on a log wire */ }
   if (unsub) return;
   controllerStartedAt = Date.now();
   syncToCurrent(useGameStore.getState());
