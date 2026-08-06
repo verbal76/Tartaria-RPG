@@ -30,7 +30,14 @@
 // right answer depends on the canonical Tartaria pronunciation and
 // how espeak's letter-to-sound rules treat specific letter combos.
 
-const LEXICON: Array<[RegExp, string]> = [
+// ⚠ OTA-1147 — an entry may now supply a FUNCTION instead of a fixed string.
+// Only the Aether catch-all needs it, and only to keep the file's own
+// convention: every other entry replaces the whole word with a lowercase
+// respelling, but a prefix rule leaves the tail exactly as authored — so
+// "AETHERSTORM" would come out "aytherSTORM", and espeak spells all-caps runs
+// out letter by letter. Lowercasing the tail keeps one word one word.
+type LexiconReplacement = string | ((match: string, ...groups: string[]) => string);
+const LEXICON: Array<[RegExp, LexiconReplacement]> = [
   // Aether family — playtester spec OTA-107 (final, after a
   // round of IPA-driven detours in OTAs 103/105/106). User's
   // canonical pattern is UNIFORM across the family: long-A "ay"
@@ -44,11 +51,45 @@ const LEXICON: Array<[RegExp, string]> = [
   //   Aetherstone  → "ay thur stone"
   //   Aetherborn   → "ay thur born"
   //   Aetherbat    → "ay thur bat"
-  [/\bAetherstone\b/gi, 'ay thur stone'],
-  [/\bAetheric\b/gi, 'ay thur ik'],
-  [/\bAetherborn\b/gi, 'ay thur born'],
-  [/\bAetherbat\b/gi, 'ay thur bat'],
-  [/\bAether\b/gi, 'ay thur'],
+  // ⚠ OTA-1147 — "ay thur" → "ayther", AND IT IS A PREFIX RULE NOW.
+  // Owner: *"aether should be āther … anything starting with aether should
+  // have it start with āther for pronunciation not spelling."*
+  //
+  // TWO CHANGES, and the second is the bigger one.
+  //
+  // 1. ONE WORD, NOT TWO. OTA-107 wrote the head as "ay thur" — two
+  //    space-separated tokens, which is precisely what the file's own header
+  //    says espeak treats as two separate words. So it was read as two
+  //    stressed beats, AY · THUR, when the canon is a single smooth trochee:
+  //    ā-ther. Closing the space makes espeak stress it once and glide the
+  //    schwa, which is what the macron in the owner's "āther" is asking for.
+  //
+  // 2. ⚠ IT NOW COVERS THE WHOLE FAMILY, BECAUSE THE OLD LIST DID NOT. Five
+  //    entries were enumerated (Aether / Aetheric / Aetherstone / Aetherborn
+  //    / Aetherbat) and the content carries TWENTY: Aetherkin, Aethercraft,
+  //    Aethercrafted, Aethercrafters, Aetherium, Aetherforge, Aetherforged,
+  //    Aetherstorm, Aetherstorms, Aetherwing, Aetherwave, Aetherflame,
+  //    Aetherlight, Aetherbound, Aethereal, Aetherons… Every one of those fell
+  //    straight through to espeak's own letter-to-sound rules, which is the
+  //    mispronunciation this family was respelled to prevent in the first
+  //    place. A prefix rule cannot miss the next one someone authors — which
+  //    is exactly what the owner asked for with "anything starting with".
+  //
+  // The named compounds keep their space before a SEPARATE ENGLISH WORD
+  // (stone / born / bat / kin), because espeak gives a real word its own clean
+  // letter-to-sound pass; bare suffixes like -ic and -ium stay attached so the
+  // stress lands ay-THER-ik rather than AY-ther · ICK.
+  [/\bAetherstone\b/gi, 'ayther stone'],
+  [/\bAetherborn\b/gi, 'ayther born'],
+  [/\bAetherbat\b/gi, 'ayther bat'],
+  [/\bAetherkin\b/gi, 'ayther kin'],
+  [/\bAetheric\b/gi, 'aytheric'],
+  [/\bAether\b/gi, 'ayther'],
+  // ⚠ THE CATCH-ALL, and it must sort LAST of the family. Any remaining
+  // Aether-prefixed word keeps its own tail and just gains the right head:
+  // Aetherstorm → aytherstorm, Aethercraft → aythercraft. No \b on the right,
+  // because the whole point is that the word CONTINUES.
+  [/\bAether([a-z]+)/gi, (_m: string, tail: string) => `ayther${tail.toLowerCase()}`],
 
   // Place names — long-vowel + multi-syllable mishaps.
   // Tartar* family is two beats: "tar" + the rest as one rapid stress
@@ -114,8 +155,22 @@ const LEXICON: Array<[RegExp, string]> = [
 // pre-empted by "Aether" matching the first 6 chars (\b boundaries
 // usually prevent this, but the safety belt protects against future
 // authors adding overlapping entries out of order).
-const SORTED_LEXICON: Array<[RegExp, string]> = [...LEXICON]
-  .sort((a, b) => b[0].source.length - a[0].source.length);
+// ⚠ OTA-1147 — and a SECOND key, ahead of length: catch-alls run LAST.
+// Length alone got this exactly backwards for the Aether family. The prefix
+// rule's source (`\bAether(?=[a-z])`, 17 chars) is LONGER than the named
+// compound it must never pre-empt (`\bAetherstone\b`, 15), so sorting by
+// length alone would have fired the catch-all first and turned every
+// "ayther stone" into "aytherstone" — silently, since both still sound
+// roughly right and no test would have been looking. A pattern that ends in a
+// lookahead is by definition the fallback for whatever the named entries
+// missed, so it sorts after all of them regardless of how long it is.
+const isCatchAll = (re: RegExp): boolean => !re.source.endsWith('\\b');
+const SORTED_LEXICON: Array<[RegExp, LexiconReplacement]> = [...LEXICON]
+  .sort((a, b) => {
+    const catchAllDelta = (isCatchAll(a[0]) ? 1 : 0) - (isCatchAll(b[0]) ? 1 : 0);
+    if (catchAllDelta !== 0) return catchAllDelta;
+    return b[0].source.length - a[0].source.length;
+  });
 
 // 2026-05-25 [TTS-1] — IPA-override channel. The user asked "we
 // should see if kokoro can read ipa text" with /tɑːrˈtɑːriə/ as
@@ -159,7 +214,9 @@ const IPA_OVERRIDES_ENABLED = false;
 export function applyLoreLexicon(text: string): string {
   let out = IPA_OVERRIDES_ENABLED ? applyIPAOverrides(text) : text;
   for (const [pattern, replacement] of SORTED_LEXICON) {
-    out = out.replace(pattern, replacement);
+    out = typeof replacement === 'string'
+      ? out.replace(pattern, replacement)
+      : out.replace(pattern, replacement);
   }
   // ⚠ OTA-1146 — LAST, and that ordering is load-bearing. The article's
   // pronunciation depends on the sound of the word AFTER it, and the

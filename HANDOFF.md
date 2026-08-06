@@ -1260,7 +1260,47 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ "THE" IS TWO WORDS (2026-08-06, latest). BOTH LINES.** golem OTA-1146 /
+- **⚠⚠ "ĀTHER" — THE UNCOVERED FAMILY (2026-08-06, latest). BOTH LINES.**
+  golem OTA-1147 / HAL OTA-1170. Owner: *"and aether should be āther … anything
+  starting with aether should have it start with āther for pronunciation not
+  spelling."*
+
+  ⚠ **1. One word, not two.** The head was `ay thur` — two space-separated
+  tokens, which this file's own header says espeak treats as two separate
+  WORDS. So it came out as two stressed beats, AY · THUR, when the canon is a
+  single smooth trochee: ā-ther. ⚠ The earlier OTA had looked at this in the
+  device log and closed it as working-as-designed ("the canonical respelling,
+  not a mispronunciation"); the owner has overruled that, so **that block is
+  RE-AUTHORED rather than re-numbered** — its claim is the thing that changed,
+  and a swapped string under the old title would assert something false.
+
+  ⚠ **2. It is a PREFIX rule now, and that is the bigger half.** Five entries
+  were enumerated (Aether / Aetheric / Aetherstone / Aetherborn / Aetherbat)
+  and the content carries **twenty**: Aetherkin, Aethercraft, Aethercrafted,
+  Aethercrafters, Aetherium, Aetherforge, Aetherforged, Aetherstorm,
+  Aetherstorms, Aetherwing, Aetherwave, Aetherflame, Aetherlight, Aetherbound,
+  Aethereal, Aetherons. Every one fell straight through to espeak's raw
+  letter-to-sound rules — the exact mispronunciation this family was respelled
+  to prevent. "Anything starting with aether" **is** a prefix rule, and a
+  prefix rule cannot miss the next word someone authors. Named compounds keep
+  their space before a REAL WORD (stone / born / bat / kin); bare suffixes
+  (-ic, -ium) stay attached so the stress lands ay-THER-ik.
+
+  ⚠ **THE SORT NEEDED A SECOND KEY, and length alone got it exactly backwards.**
+  The catch-all's source (`\bAether([a-z]+)`, 17 chars) is LONGER than
+  `\bAetherstone\b` (15), so the existing length-descending sort would have
+  fired the fallback FIRST and collapsed "ayther stone" into "aytherstone" —
+  **silently**, because both still sound roughly right and no test was looking.
+  Catch-alls (a pattern not ending in `\b`) now sort after every named entry.
+  The catch-all also lowercases the tail it keeps, so an all-caps AETHERSTORM
+  cannot reach espeak as a mixed-case run it would spell out letter by letter.
+
+  **Pronunciation, not spelling** — TTS copy only. New suite
+  `ota1147AytherNotAyThur` (14 tests); loreLexicon's three Aether fixtures
+  retargeted, the article suite's composition test updated, the earlier Aether
+  block re-authored.
+
+- **⚠⚠ "THE" IS TWO WORDS (2026-08-06). BOTH LINES.** golem OTA-1146 /
   HAL OTA-1169. Owner: *"kokoro pronounces the as thee it should be pronounce
   thuh or tha."*
 

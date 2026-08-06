@@ -93,10 +93,11 @@ describe('OTA-1146 — it does not touch anything else', () => {
 
 describe('OTA-1146 — it runs LAST, after the respellings', () => {
   it('⚠ judges the text espeak WILL SEE, not the text we were handed', () => {
-    // The lexicon turns "Aether" into "ay thur" — consonant-initial on the page,
-    // vowel-initial in the mouth. Running the article rule after the loop is
-    // what makes "the Aether" come out as "thee ay thur" rather than "thuh".
-    expect(applyLoreLexicon('the Aether')).toBe('the ay thur');
+    // The lexicon turns "Aether" into "ayther" (OTA-1147; was "ay thur") —
+    // consonant-initial on the page, vowel-initial in the mouth. Running the
+    // article rule after the loop is what makes "the Aether" come out as
+    // "thee ayther" rather than "thuh".
+    expect(applyLoreLexicon('the Aether')).toBe('the ayther');
     // And the reverse: a respelling that stays consonant-initial takes "thuh".
     expect(applyLoreLexicon('the Tartaria')).toContain(THE_SCHWA_RESPELLING);
   });

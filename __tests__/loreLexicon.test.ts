@@ -8,16 +8,23 @@ import { applyLoreLexicon, cleanForSpeech, getLexiconSize } from '../app/voice/l
 
 describe('applyLoreLexicon', () => {
   it('respells Aetheric (case-insensitive)', () => {
-    expect(applyLoreLexicon('Aetheric Spear')).toBe('ay thur ik Spear');
-    expect(applyLoreLexicon('aetheric')).toBe('ay thur ik');
-    expect(applyLoreLexicon('AETHERIC')).toBe('ay thur ik');
+    // ⚠ RETARGETED for OTA-1147: the head is one word ("ayther", the owner's
+    // "āther") instead of two space-separated beats, and the bare -ic suffix
+    // stays attached so the stress lands ay-THER-ik. Case-insensitivity — the
+    // property this test exists for — is unchanged.
+    expect(applyLoreLexicon('Aetheric Spear')).toBe('aytheric Spear');
+    expect(applyLoreLexicon('aetheric')).toBe('aytheric');
+    expect(applyLoreLexicon('AETHERIC')).toBe('aytheric');
   });
 
   it('respells Aetherstone / Aether / Aetherborn distinctly', () => {
-    expect(applyLoreLexicon('the Aetherstone Flood')).toBe('the ay thur stone Flood');
+    // ⚠ RETARGETED for OTA-1147 ("ay thur" → "ayther"). The compound still
+    // keeps its space before the real word "stone" — the distinctness this
+    // test pins is unchanged.
+    expect(applyLoreLexicon('the Aetherstone Flood')).toBe('the ayther stone Flood');
     // Verify Aetherstone matches before plain Aether (longest first).
-    expect(applyLoreLexicon('Aether vs Aetherstone')).toBe('ay thur vs ay thur stone');
-    expect(applyLoreLexicon('an Aetherborn warrior')).toBe('an ay thur born warrior');
+    expect(applyLoreLexicon('Aether vs Aetherstone')).toBe('ayther vs ayther stone');
+    expect(applyLoreLexicon('an Aetherborn warrior')).toBe('an ayther born warrior');
   });
 
   it('respells Tartaria / Tartarian / Tartarians', () => {

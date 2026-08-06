@@ -141,18 +141,31 @@ describe('OTA-1138 — ⚠ a preempted synthesis is no longer filed as empty', (
   });
 });
 
-describe('OTA-1138 — ⚠ verified, not changed: the Aether family pronunciation is authored', () => {
-  it('"ay thur ik" IS the canonical respelling, not a mispronunciation', () => {
-    // Flagged from the device log as Kokoro "spelling it out". It is the lore
-    // lexicon working to the playtester spec (OTA-107): uniform "ay thur" stem
-    // across the family. The log preview prints post-lexicon text.
-    expect(applyLoreLexicon('Aetheric')).toBe('ay thur ik');
-    expect(applyLoreLexicon('Aether')).toBe('ay thur');
-    expect(applyLoreLexicon('Aetherstone')).toBe('ay thur stone');
+// ⚠ RE-AUTHORED BY OTA-1147, NOT RE-NUMBERED — the CLAIM changed, not the
+// string. This block used to assert that "ay thur ik" *IS the canonical
+// respelling, not a mispronunciation*: OTA-1138 looked at the device log,
+// decided the two-beat reading was working as designed, and closed it. The
+// owner has since overruled that outright — *"aether should be āther"* — so
+// keeping the old expectation with a swapped string would leave a test whose
+// title asserts something now false. What survives, and what this block is
+// really for, is the STRUCTURAL claim OTA-1138 needed: the family is respelled
+// by the lexicon (not by Kokoro guessing), and the log preview prints
+// POST-lexicon text, which is why it looks odd in the log and correct in the ear.
+describe('OTA-1138 — the Aether family is respelled by the lexicon, not by Kokoro', () => {
+  it('the family carries the authored head (OTA-1147: "ayther")', () => {
+    expect(applyLoreLexicon('Aetheric')).toBe('aytheric');
+    expect(applyLoreLexicon('Aether')).toBe('ayther');
+    expect(applyLoreLexicon('Aetherstone')).toBe('ayther stone');
+  });
+
+  it('⚠ the two-beat "ay thur" reading OTA-1138 defended is retired', () => {
+    for (const w of ['Aether', 'Aetheric', 'Aetherstone', 'Aetherkin', 'Aetherstorm']) {
+      expect(applyLoreLexicon(w)).not.toContain('ay thur');
+    }
   });
 
   it('the respelling survives inside a sentence', () => {
     expect(applyLoreLexicon('The Aetheric drone is patient.'))
-      .toBe('The ay thur ik drone is patient.');
+      .toBe('The aytheric drone is patient.');
   });
 });
