@@ -1273,8 +1273,8 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ "ĀTHER", AND THE FAMILY THAT WAS THREE-QUARTERS UNCOVERED (2026-08-06,
-  latest). BOTH LINES.** HAL OTA-1170 / golem OTA-1147. Owner: *"and aether
+- **⚠⚠ "ĀTHER" — THE UNCOVERED FAMILY (2026-08-06, latest). BOTH LINES.**
+  HAL OTA-1170 / golem OTA-1147. Owner: *"and aether
   should be āther … anything starting with aether should have it start with
   āther for pronunciation not spelling."*
 
