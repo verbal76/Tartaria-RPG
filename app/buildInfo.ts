@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.70';
+export const DISPLAY_VERSION = '4.29.71';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -21981,7 +21981,47 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (parallel to enemies, like enemyArmorShred), staggerEnemy /
 // takeStagger, and new suite ota1137WorthBringing (17 tests).
 // DISPLAY_VERSION 4.29.70.
-export const OTA_BUILD_ID = '2026-08-06-1137-worth-bringing';
+// OTA-1138 — THE COMMA THAT ATE THE BEAT.
+// Two small fixes and one verification, all from the log that
+// confirmed OTA-1136/1160.
+// ⚠ 1. THE ATTRIBUTION COMMA SURVIVED THE ATTRIBUTION. The voice
+// preview showed what Kokoro was actually given: "You attack as
+// if you mean to leave, Good…". The source line was fine — two
+// properly terminated sentences with narration between the
+// quotes. stripArbiterFrame removes that narration (the owner's
+// own immersion ask, still correct) but joined the quoted pieces
+// RAW — and dialogue convention puts a comma INSIDE the closing
+// quote when narration follows. With the narration deleted, the
+// comma had nothing to hand off to: it fused the sentences into
+// a run-on, chunkForSpeech found no terminator, and OTA-1136's
+// 280ms sentence beat NEVER FIRED on exactly the class of line
+// it was built for. One bug, two symptoms. The comma now
+// promotes to a full stop ONLY when it was the attribution comma
+// — next quoted piece starts a new sentence (capital) or there
+// is none. A mid-sentence handoff ("You attack," he said, "as if
+// you mean to leave.") keeps its comma: the continuation starts
+// lowercase, and THAT is the whole rule.
+// ⚠ 2. A PREEMPTED SYNTHESIS WAS FILED AS EMPTY. Two adjacent
+// log lines contradicted each other: `item_synthesis preempted
+// 3535ms` then `DISCARDED — item_synth:empty`. Empty is the
+// DORMANCY signature — the OTA-1119 watchdog's cue, the thing
+// that once cost a week to chase. Preempted is OTA-1134 working
+// as built. The discard classifier could not see the outcome the
+// record line had just printed because lastCall did not carry
+// it; it does now (lastQwenCallPreempted, consumed with the
+// call), and item synthesis asks before classifying.
+// ⚠ 3. VERIFIED, NOT CHANGED: "ay thur ik" in the same log is
+// the AUTHORED pronunciation, not a bug. The lore lexicon
+// (playtester spec OTA-107) respells the whole Aether family as
+// "ay thur …" on purpose, and the voice log prints post-lexicon
+// text. Pinned in the suite so a lexicon edit that drops the
+// family gets caught.
+// New suite ota1138TheCommaThatAteTheBeat (14 tests);
+// stripArbiterFrame suite re-authored where it asserted the
+// run-on join, ota1108/ota1134 retargeted on the discard label.
+// DISPLAY_VERSION 4.29.71.
+export const OTA_BUILD_ID = '2026-08-06-1138-the-comma-that-ate-the-beat';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1137-worth-bringing';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1136-how-he-died-in-one-input';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1135-three-points-of-jewellery';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1134-cut-short-for-the-voice';

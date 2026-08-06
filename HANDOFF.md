@@ -1129,7 +1129,59 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE WEAKNESS HAS TO BE WORTH BRINGING (2026-08-06, latest). BOTH LINES.**
+- **⚠⚠ THE COMMA THAT ATE THE BEAT (2026-08-06, latest). BOTH LINES.** golem
+  OTA-1138 / HAL OTA-1161. Two fixes and one verification, all from the log
+  that confirmed OTA-1136/1160.
+
+  ⚠ **The attribution comma survived the attribution.** The voice preview showed
+  what Kokoro was actually given:
+
+  ```
+  voice⏱ … "You attack as if you mean to leave, Good…"
+  ```
+
+  The source line was fine — `"You attack as if you mean to leave," the Arbiter
+  murmurs. "Good."` — two terminated sentences. `stripArbiterFrame` removes the
+  narration between the quotes (the owner's own immersion ask, still correct)
+  but joined the quoted pieces **raw**, and dialogue convention puts a comma
+  *inside* the closing quote when narration follows. With the narration deleted,
+  the comma had nothing to hand off to: it fused the sentences into a run-on,
+  `chunkForSpeech` found no terminator, and **OTA-1136's 280 ms sentence beat
+  never fired on exactly the class of line it was built for.** One bug, two
+  symptoms.
+
+  The comma promotes to a full stop **only when it was the attribution comma** —
+  the next quoted piece starts a new sentence (capital letter), or there is no
+  next piece. A genuine mid-sentence handoff (*"You attack," he said, "as if you
+  mean to leave."*) keeps its comma because the continuation starts lowercase.
+  The capital/lowercase test is the whole rule.
+
+  ⚠ **A preempted synthesis was filed as empty.** Two adjacent log lines
+  contradicted each other:
+
+  ```
+  qwen⏱ item_synthesis preempted 3535ms … out 0t
+  qwen⏱ ✂ DISCARDED item_synthesis after 3535ms — item_synth:empty
+  ```
+
+  `empty` is the **dormancy** signature — the OTA-1119 watchdog's cue, the hunt
+  that once cost a week. `preempted` is OTA-1134 **working as built**. The
+  discard classifier could not see the outcome the record line had just printed
+  because `lastCall` did not carry it. It does now — `lastQwenCallPreempted()`,
+  consumed with the call so a stale flag can never leak onto the next job — and
+  item synthesis asks before classifying.
+
+  ⚠ **Verified, not changed: "ay thur ik" is the authored pronunciation.**
+  Flagged from the same log as a mispronunciation; it is not one. The lore
+  lexicon (playtester spec OTA-107) respells the whole Aether family as
+  "ay thur …" on purpose, and the voice log prints **post-lexicon** text. Pinned
+  in the suite so a lexicon edit that drops the family gets caught.
+
+  New suite `ota1138TheCommaThatAteTheBeat` (14 tests); the `stripArbiterFrame`
+  suite re-authored where it asserted the run-on join (its old expectation *was*
+  the bug); `ota1108`/`ota1134` retargeted on the discard label.
+
+- **⚠⚠ THE WEAKNESS HAS TO BE WORTH BRINGING (2026-08-06). BOTH LINES.**
   golem OTA-1137 / HAL OTA-1160. The owner threw a Searing Paste at a Guardian
   carrying `vulnerable:burn` — her authored weakness, hit with a crafted
   consumable he had to spend — and the device log priced the exchange:

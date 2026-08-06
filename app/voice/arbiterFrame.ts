@@ -30,7 +30,30 @@ export function stripArbiterFrame(text: string): string {
     if (m[1]) quoted.push(m[1].trim());
   }
   if (quoted.length > 0) {
-    return quoted.join(' ').trim();
+    // ⚠ OTA-1138 — THE ATTRIBUTION COMMA CAME ALONG FOR THE RIDE. Dialogue
+    // convention puts a comma INSIDE the closing quote when narration follows:
+    //
+    //   "You attack as if you mean to leave," the Arbiter murmurs. "Good."
+    //
+    // Stripping the narration (this function's whole job, per the owner's
+    // immersion ask) used to join the pieces raw, producing
+    // "…mean to leave, Good." — the two sentences fused by a comma that only
+    // ever existed to hand off to the attribution we just deleted. Kokoro then
+    // read them as one run-on, and the OTA-1136 sentence beat never fired
+    // because there was no terminator left to fire on.
+    //
+    // The comma is promoted to a full stop ONLY when it was the attribution
+    // comma — i.e. the next quoted piece starts a NEW sentence (capital
+    // letter), or there is no next piece. A genuine mid-sentence handoff
+    // ("You attack," he said, "as if you mean to leave.") keeps its comma,
+    // because the continuation starts lowercase.
+    const parts = quoted.map((q, i) => {
+      if (!/[,;]$/.test(q)) return q;
+      const next = quoted[i + 1];
+      const continuesSentence = next !== undefined && /^[a-z]/.test(next);
+      return continuesSentence ? q : q.replace(/[,;]$/, '.');
+    });
+    return parts.join(' ').trim();
   }
   // No quoted dialogue — try to strip a leading narrator clause.
   // "The Arbiter notes, X" / "The Arbiter shrugs. X" → "X"
