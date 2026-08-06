@@ -522,6 +522,109 @@ Key invariants worth knowing:
   - **OPEN — knee-22 trim vs hit-floor ownership**: two rules both claim "armor has diminishing returns";
     the trim only ever bites vs high-ATK bosses now. Eventually pick ONE owner of the property.
 
+- **⚠⚠ MASTER TUNING REFERENCE (owner-requested, 2026-08-06 — "let's make a master list of available
+  tuning options"). Every deliberate gameplay lever in the code, by domain, with what it controls in plain
+  terms. Change any of these ONLY on an owner call; when one is changed, move it to the STANDING TUNING
+  LIST above with the reason. Player-facing difficulty (the OTA-1136 dial system in
+  `app/engine/pressure.ts`) already exposes `spawn / discovery / pack / loot / elite` multipliers + rule
+  swaps per preset with a CUSTOM picker — the levers below are the DESIGNER layer underneath it.**
+
+  **A. Combat core (`gameStore.ts` unless noted)**
+  - `ENEMY_HIT_NEEDED_CAP` (16) — nat-roll floor: any enemy always hits on d20 ≥ this. Lower = tanks get hit more; higher = armor pays longer (armor stops mattering at raw AC ≈ ATK + this).
+  - `plateDr` divisor **2** / cap **4** (inline, applyEnemyCounter) — excess AC past the cap → damage soak. Divisor down = plate stronger; cap up = heavier max soak.
+  - `MITIGATION_FLOOR` (0.30) — a landed hit always deals ≥30% of its raw roll through any resist stack. The "never immune" number.
+  - `trimStandingAc` knee **22** / rate **0.4** (`equipment.ts`) — raw AC past 22 counts at 40%. The anti-godmode bend for stacked Legendary sets.
+  - `MELEE_PACK_SWINGS_PER_ROUND` (3, scaled by √pack) — how many melee bodies actually swing per round; the anti-mob-shredder cap.
+  - `DODGE_BEATEN_MARGIN` (8, `enemyTraits.ts`) — lose the dodge contest by ≥8 and the enemy's hit upgrades. The dodge-gamble downside.
+  - `BRACED_ROUNDS` (3) — how long take-cover/brace lasts.
+  - `FLEE_GRACE_STEPS` (3, `combatRules.ts`) — tiles after combat before flee stops being free.
+  - Pack pursuit **1 band/round** (inline, runEnemyGroupCounters) — how fast benched melee closes distance on a kiting player.
+  - `POST_BOSS_GRACE_HOURS` (3) — no ambush window after a boss kill.
+  - Enemy typed-proc bonus **1d3** vs player **1d4** (inline) — the deliberate player-favoring on-hit asymmetry.
+
+  **B. Bosses / Core Guardians (`coreGuardians.ts` unless noted)**
+  - Boss bonus die **+1d6/swing** (inline, applyEnemyCounter) — the hidden boss damage rider.
+  - `bossSwingsTwice` tier threshold **≤2 = one swing** (`combatRules.ts`) — which Guardian tiers get the second swing. Raise to 3 to soften tier 3 too.
+  - Stagger duration **1 round / denies 1 swing** (staggerEnemy/takeStagger) — the weakness reward.
+  - `CANON_BASE_HP` (42) × `TIER_PROFILES[t].hpMult` (1.4 → 7.0) — Guardian HP curve. Tier-1's 1.4 is the OPEN item (spawns at 59).
+  - `TIER_PROFILES` acBonus / damage per tier — Guardian AC and dice ladder.
+  - `FINAL_GUARDIAN_HP` (660) — the last boss's ~20-round wall.
+  - `guardianOverLevel` cap **1.9** — how hard over-leveled players get scaled up; expected-power curve ~17→41.
+  - `staticExpectedPower` **26 boss / 20 Legendary** — the two-sided HP scaler for non-Guardian apex enemies.
+  - `GUARD_CRACK_HITS` (3) — landed resisted hits before an enemy's resist pair cracks.
+  - `POST_BOSS` spoils: boss gem guarantee + `PITY_KILL_INTERVAL` (100) — pity-loot cadence.
+
+  **C. Coatings / DOTs / shred (`weaponCoating.ts`)**
+  - `COATING_DOT_TURNS` (3) — DOT length; also multiplies the thrown-vial burst (perTurn × this).
+  - `ACID_SHRED_PER_HIT` (1) / `ACID_SHRED_MAX` (5) / `ACID_SHRED_BOSS_BONUS` (+6 → 11 on bosses) — the AC-strip ladder. The boss bonus is the OPEN acid×stagger compounding item.
+  - `CORRUPTION_STACK_MAX` (5) / `CORRUPTION_STACK_BOSS_BONUS` (+6) / `CORRUPTION_STACK_BONUS` (+1 DOT per stack) — the ramping-rot ceiling.
+  - `COATING_RESIST_LAND_CHANCE` (0.15) — chance a coating still takes on a resistant enemy.
+  - `LOOT_COATING_CHANCE` (0.18) — how often dropped weapons arrive pre-coated.
+  - `BANDOLIER_MAX` (5, gameStore) — racked throwable slots (stacks count as one slot).
+  - `ADDED_RESIST_CAP` (3, gameStore) — max coating-vial resists worked into one armor piece.
+
+  **D. Companions (dog / golem)**
+  - `DOG_TARGET_CHANCE` (0.25, gameStore) — how often an enemy swing redirects onto the dog. The OPEN boss-round-collapse item.
+  - `DOG_BLEED_OUT_HOURS` (24) — rescue window for a downed dog. `REVIVE_DOG_COST` (300, vendorServices).
+  - Dog AC = 10 + DEXmod + vest (inline) — vest value lives in dogGear acBonus.
+  - `FEED_PER_STEP` (3, gameStore) — golem feed drain cadence; `HP_PER_LEVEL` (3, golems.ts).
+  - `DOG_/GOLEM_LEVEL_UP_THRESHOLD` (100) / `MAX_TRAINED_STAT` (30) — companion growth pace and ceiling.
+
+  **E. Player growth / healing / stamina**
+  - `scaledHealHP` **15% kit / 4% meal** floor flat-5 (`itemEffect.ts`) + rest heal **15% hpMax** — the healing economy (owner-set OTA-1001).
+  - `MILESTONE_KILL_STEP` / `MILESTONE_TRAVEL_STEP` (5) — +1 maxHP per 5 kills, +1 maxStamina per 5 travels. THE arrival-HP curve: lower these to fatten early characters (the sim's "arrival needs ~28-30 HP" lever).
+  - `LEVEL_UP_THRESHOLD` (100) / `MAX_TRAINED_STAT` (30) / `NEAR_MISS_*` (statTraining) — stat growth pace.
+  - `HP_REGEN_CAP` (2) / `STAMINA_REGEN_CAP` (3) (`equipment.ts`) — max gear regen per tick.
+  - `PASSIVE_STAT_CAP` (2, itemEffect) — max accessory stat bonus.
+  - `STAMINA_COSTS` table (gameStore) — per-action stamina; `ROPE_WEAR_PER_TIER` (15) — climb rope burn.
+  - `CORRUPTION_MAX` (50) — the corruption bar.
+
+  **F. Economy / loot / crafting**
+  - `SELL_FRACTION` (0.4, sellPrice) — vendor buyback rate; `BOTTLENECK_CRAFTING_SELL` (3) — floor for craft-mats.
+  - `FENCE_STOLEN_CUT` (0.4, gameStore) — fence's take on stolen goods.
+  - `CURIO_CHANCE` (0.18) / `NOTHING_CHANCE` (0.05) (salvagePools) — salvage table spice.
+  - `HARD_WON_COMBAT_BONUS_CHANCE` (0.22) / `LORE_HOOK_BONUS_CHANCE` (0.4) / rarity cutoffs 0.68/0.94 (bonusDrops) — bonus-drop faucets.
+  - Recipe discovery: mission 0.25 / loreHook 0.18 / hardWon 0.10 / loot 0.06 (recipeDiscovery).
+  - `DEFAULT_DURABILITY` (25) / `PERK_CAP` (5) / `MAX_CRAFT_BATCH` (20) / `MAX_ARMOR_RESIST` (0.8) (crafting/durability).
+  - `JOURNEY_TC_PER_CELL` (6) cap 1.5× (contractMarkers) — long-haul contract pay.
+  - `PAY_TRAIN_PER_POINT` (50, cap 15) / vendor fee **25 TC** (Crucible) — coin sinks.
+  - `GIFT_*` (gifting.ts): floor 12 TC, boons 4/person, repeat decay 0.35, standing ±2/4.
+  - `RESONANCE` probe: base hit 0.18 + WIS steps (resonanceLantern) — lantern treasure odds.
+
+  **G. World / spawns / pressure**
+  - `HOSTILE_BASE_CHANCE` (0.05) → `HOSTILE_MAX_CHANCE` (0.22) (pressure.ts) — wild-tile ambush band, scaled by TIDE stage (96h/stage, 6 max, +4% prices/stage).
+  - Hollowed: wild boss **4%** / rumour **5%** / power-gate hpMax ≥ 60 (stepDirection).
+  - Aetherkin: building 0.28 / open-mud 0.07 (gameStore).
+  - `ELITE_MIN_PARTY` (3, eliteSwap) + difficulty `elite` dial — grunt-pack → elite conversion.
+  - `OVERLAY_TRIGGER_CHANCE` (0.30) + bands (elevatedOverlay) — climbable set-piece frequency/height.
+  - `BUILDING_TILE_CHANCE` (22) / `PERCH_CHANCE` (35) — tile furniture rates.
+  - Raids: `RAID_MIN_HOURS` (20) / `RAID_TRIGGER_CHANCE` (0.3); patrols `PATROL_MIN_HOURS` (6), soft cap 100.
+  - `WORLD_TICK_HOURS` (2) / offline pulse per 4 real hours, cap 6 — how fast the world moves without you.
+  - `RESPAWN_QUIET_HOURS` (6) / `WATER_REARM_HOURS` (6) / `NOTHING_SEARCH_CAP` (2) — tile-reuse pacing.
+  - Weather: `WEATHER_TICK_GAP` (5) + `WEATHER_LOCALE_BIAS` + ~6h persistence (encounter.ts) — owner-set OTA-1003.
+  - Escort: collateral 0.20 / rest-heal 0.10 / escortee 35% hpMax clamp 8-45 / stranded-hook ~6%.
+
+  **H. Social / factions / NPCs**
+  - `TALKDOWN_BASE_DC` (10) +2/extra enemy +2/tier — in-combat CHA disengage difficulty. `WANDERER_TALK_DC` (12); `BASE_PARLEY_DC` (11).
+  - `JOIN_THRESHOLD` / `FRIENDLY_AT` (20) / `REP_MAX` (100) — faction standing bands; `BUY_REP_TC_PER_STANDING` (500).
+  - `MENACE_*` (menace.ts): +8/person +4/animal, decay 0.4/h, max 100 — intimidation heat.
+  - `AMENDS_TC_PER_WRONG` (600) / `TC_FOR_FAMILIAR` (400) / `TC_FOR_TRUSTED` (1500) / `MEETINGS_FOR_NAME` (3) (npcMemory) — relationship pacing.
+  - `GIFT_STANDING_FACTION_CAP` (10) — max standing purchasable via gifts.
+  - `PARLEY_CALM_REP` (1) / `PARLEY_EXTORT_REP` (6) — talk-down standing swing.
+  - `ACCEPT_CHA_COOLDOWN_HOURS` (3) — contract-pitch charm cadence.
+
+  **I. Arbiter / narration pacing (feel, not economy)**
+  - `ARBITER_FLAVOR_GAP_MS` (25s) / `ARBITER_FLAVOR_PER_TILE` (1) — chatty-Kathy throttle (owner-set OTA-1154).
+  - `AMBIENT_GEN_COOLDOWN_MS` (90s) / `FLOURISH_GEN_COOLDOWN_MS` (45s) / `FLOURISH_MAX_PER_CONVERSATION` (3) — generated-line cadence.
+  - `INTRO_BANK_PER_LOC` (2) / `INTRO_BANK_TOTAL` (6) / `INTRO_FILL_GAP_MS` (45s) / `INTRO_IDLE_MS` (6s) — scene-intro pre-generation.
+  - `WELCOME_BACK_MIN_MS` (60s) — how long away before the Arbiter greets again.
+  - Voice: `SENTENCE_PAUSE_MS` (280) / `STALE_LINE_MS` (6s) / `PRESYNTH_CAP` (6) (PiperTTSManager) — the spoken-line feel.
+
+  **J. Session / meta**
+  - `REST_REWARD_COOLDOWN_HOURS` (24) — rested-bonus cadence; `OFFLINE_PULSE_CAP` (6) — max catch-up drift.
+  - `FALLEN_CAP` (25, saveSystem) — Fallen roll length; `MAX_ACTIVE_BOUNTIES` (3); `BOUNTY_DEADLINE_HOURS` (24).
+  - Difficulty presets themselves (`pressure.ts` PROFILES): the per-preset values of spawn/discovery/pack/loot/elite — the coarse knobs a player sees.
+
 - **ESCORT SYSTEM — new live subsystem (2026-07-26, HAL 985–989 / golem 962–966; §9).** Knobs if the feel
   needs tuning after on-device play: `ESCORT_COLLATERAL_FRACTION` (0.20), `ESCORT_REST_HEAL_FRACTION`
   (0.10), escortee HP ≈35% player hpMax (clamp 8–45), party clamp 1–5, stranded-hook spawn ~6% on novel
