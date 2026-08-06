@@ -223,7 +223,7 @@ import {
   type ArmorSlotResist,
   type Recipe,
 } from '../engine/crafting';
-import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor, enemyDamageDisplay } from '../engine/combatRules';
+import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor, enemyDamageDisplay, enemyDamageCompact } from '../engine/combatRules';
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
 import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, COATING_RESIST_LAND_CHANCE, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
@@ -4274,6 +4274,7 @@ function vendorCatchesThief(
             vendor: null,
             // OTA-1079 — but not gone. See CurrentScene.vendorInFight.
             vendorInFight: vendor,
+            ...FRESH_ENEMY_ARRAYS,
             enemies: [enemy],
             enemyHps: [enemy.hp],
             activeEnemyIdx: 0,
@@ -4624,6 +4625,7 @@ function resolveVendorSubmission(
         // there — you are just not standing at it. On the road they leave.
         vendor: null,
         vendorInFight: null,
+        ...FRESH_ENEMY_ARRAYS,
         enemies: [],
         enemyHps: [],
         activeEnemyIdx: 0,
@@ -4896,6 +4898,7 @@ function patchSceneForBuildingRoom(
         displayedAmbientNouns: nouns,
         transitArea: `${b.name} · ${room.shortName}`,
         // Indoors is peaceful — clear any wilderness combat / hooks.
+        ...FRESH_ENEMY_ARRAYS,
         enemies: [],
         enemyHps: [],
         activeEnemyIdx: 0,
@@ -4957,6 +4960,7 @@ function spawnAetherkin(
   set((s) => (s.currentScene ? {
     currentScene: {
       ...s.currentScene,
+      ...FRESH_ENEMY_ARRAYS,
       enemies: scaled,
       enemyHps: hps,
       activeEnemyIdx: 0,
@@ -15062,6 +15066,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'rest': {
+        // ⚠ OTA-1163 (pressure test) — YOU CANNOT CAMP IN FRONT OF SOMETHING
+        // TRYING TO KILL YOU. The exploit sweep typed "camp" mid-boss-fight and
+        // got the full 8-hour rest — +15% max HP, stamina to full — while the
+        // enemies standing in arm's reach never swung: this path never calls
+        // runEnemyGroupCounters, and its 22% ambush roll SETS range 'far',
+        // which disengages the melee pack already in the scene as a failure
+        // bonus. Eating a consumable stays a free action (OTA-619's deliberate
+        // design, locked by combatHealNoCounter) — the parser routes "eat X"
+        // here with resolvedItemId, and that branch below is untouched. It is
+        // the CAMP that ends: same shape as OTA-1039's honest wall-rest
+        // refusal, and the same reason.
+        if (!parsed.resolvedItemId
+            && (currentScene?.enemies.length ?? 0) > 0
+            && (currentScene?.enemyHps ?? []).some((h, i) => h > 0 && !(currentScene?.enemyKnockedOut?.[i]))) {
+          get().appendLog('arbiter', `The Arbiter does not look away from the fight. "Rest? Nothing here has agreed to that. Deal with what's in front of you, or put real ground between you first."`);
+          break;
+        }
         // If the player resolved a consumable inventory item (e.g. "eat ration"),
         // consume one and heal from the item's per-catalog effect if any,
         // falling back to a 2d6 roll for legacy consumables (Trail Rations,
@@ -17060,11 +17081,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // DOT is still exclusive to the equipped-attack/bandolier path.)
             const throwCoat = itemUsed?.coating;
             let coatBonus = 0;
+            // OTA-1163 (pressure test) — carry the weakness verdict out of the
+            // damage math so the throw can STAGGER on it, same as the bandolier
+            // path. The exploit sweep found the two hands disagreeing: the same
+            // vulnerable:burn boss staggered when the vial came off the rack and
+            // shrugged when the identical coated knife was thrown by name.
+            let coatMatch: 'weak' | 'resist' | 'normal' = 'normal';
             if (throwCoat) {
               const raw = Math.max(1, rollFromNotation(throwCoat.dice));
-              coatBonus = (throwCoat.kind === 'electrical' || throwCoat.kind === 'burn' || throwCoat.kind === 'cold')
-                ? Math.max(1, Math.round(raw * combineDamageTypeMatch(applyDamageTypeModifier(raw, throwCoat.kind, enemyHit.type).match, traitDamageMultiplier(enemyHit.traits, throwCoat.kind).match).multiplier))
-                : raw;
+              if (throwCoat.kind === 'electrical' || throwCoat.kind === 'burn' || throwCoat.kind === 'cold') {
+                const m = combineDamageTypeMatch(applyDamageTypeModifier(raw, throwCoat.kind, enemyHit.type).match, traitDamageMultiplier(enemyHit.traits, throwCoat.kind).match);
+                coatBonus = Math.max(1, Math.round(raw * m.multiplier));
+                coatMatch = m.match;
+              } else {
+                coatBonus = raw;
+              }
               dmg += coatBonus;
             }
             const wLabel = itemUsed ? ` (${weightLabel(itemWeight(itemUsed))})` : '';
@@ -17084,6 +17115,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if ((hps[idx] ?? 0) > 0 && throwCoat && coatBonus > 0) {
               applyWeaponCoatingProc(set, idx, { kind: throwCoat.kind, rolled: coatBonus, source: itemUsed?.name });
               get().appendLog('combat', `The ${throwCoat.kind} coating clings to ${enemyHit.name}.`);
+              if (coatMatch === 'weak') {
+                staggerEnemy(set, idx);
+                get().appendLog('combat', `${enemyHit.name} reels from the ${throwCoat.kind} — staggered, and slow to recover.`);
+              }
             }
             if ((hps[idx] ?? 0) <= 0) get().resolveEnemyDefeat();
           } else {
@@ -17162,7 +17197,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const hasSummitBoss = currentScene.enemies.some((e) => summitClimbIdFromEnemy(e) != null);
             if (hasSummitBoss) {
               set((s) => (s.currentScene
-                ? { currentScene: { ...s.currentScene, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
+                ? { currentScene: { ...s.currentScene, ...FRESH_ENEMY_ARRAYS, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
                 : s));
               get().appendLog(
                 'world',
@@ -18152,6 +18187,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   ...baseScene,
                   ambientNouns: overrides.ambientNouns,
                   displayedAmbientNouns: overrides.displayedAmbientNouns,
+                  ...FRESH_ENEMY_ARRAYS,
                   enemies: overrides.enemies,
                   enemyHps: overrides.enemyHps,
                   enemyAmbushUsed: overrides.enemyAmbushUsed,
@@ -18653,6 +18689,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const statLabel = equipped.stat.slice(0, 3).toUpperCase();
         let livingHp = currentScene.enemyHps[currentScene.activeEnemyIdx] ?? targetEnemy.hp;
         let killed = false;
+        let burstFoundWeakness = false; // OTA-1163 — stagger parity for burst fire
         for (let i = 0; i < burstCount && livingHp > 0; i++) {
           const penalty = i * 2;
           const roll = rollDie(20);
@@ -18681,6 +18718,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const shotTag = shotMod.match === 'weak' ? ' (weak — bites deep!)' : shotMod.match === 'resist' ? ' (resisted)' : '';
             // OTA-838 — record the observed match from ranged fire too.
             recordEnemyIntel(get, set, targetEnemy.name, shotType, shotMod.match);
+            // OTA-1163 (pressure test) — a burst that finds the weakness earns
+            // the stagger too (parity with the primary attack, which routes
+            // through the melee path's OTA-1160 hook). Latched here, applied
+            // once below when the target survives.
+            if (shotMod.match === 'weak') burstFoundWeakness = true;
             livingHp = Math.max(0, livingHp - dmg);
             get().appendLog('combat', `Bolt ${i + 1} hits ${targetEnemy.name} for ${dmg}${shotTag}. (${livingHp}/${targetEnemy.hp} HP)`, { combatOutcome: 'player_dmg' });
             if (livingHp <= 0) {
@@ -18706,6 +18748,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             hps[s.currentScene.activeEnemyIdx] = livingHp;
             return { currentScene: { ...s.currentScene, enemyHps: hps } };
           });
+          if (burstFoundWeakness) {
+            staggerEnemy(set, get().currentScene?.activeEnemyIdx ?? 0);
+            get().appendLog('combat', `${targetEnemy.name} reels under the burst — staggered, and slow to recover.`);
+          }
           runEnemyGroupCounters(get, set, player);
         }
         break;
@@ -20255,6 +20301,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   currentScene: {
                     ...baseScene,
                     elevatedOn: null,
+                    ...FRESH_ENEMY_ARRAYS,
                     enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null,
                   },
                   player: sf.player
@@ -20300,7 +20347,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
             if (currentScene.enemies.length > 0) {
               set((s) => (s.currentScene
-                ? { currentScene: { ...s.currentScene, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
+                ? { currentScene: { ...s.currentScene, ...FRESH_ENEMY_ARRAYS, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
                 : s));
             }
             // OTA-455 — the first-steps grace caught this one. Mark the near miss
@@ -20964,7 +21011,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
       const prevHp = currentScene.enemyHps[activeIdx] ?? enemy.hp;
-      let newEnemyHp = prevHp - dmg;
+      // ⚠ OTA-1163 (pressure test) — prevHp must be LIVE, not the function-entry
+      // snapshot: a lost-initiative volley can mutate enemyHps before this line
+      // (a fast_regen boss regenerates, logs it, and the stale write here then
+      // silently erased the regen the log had just announced).
+      const livePrevHp = get().currentScene?.enemyHps[activeIdx] ?? prevHp;
+      let newEnemyHp = livePrevHp - dmg;
 
       // 2026-05-25 — removed dead OTA-039 'golem_companion' status
       // follow-up block. The status kind is no longer emitted by any
@@ -20980,7 +21032,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (effectiveMod.match === 'weak') {
         get().appendLog('combat', `Weakness exposed — ${enemy.name} flinches. (${weaponType} ×${effectiveMod.multiplier} for ${dmg})`);
         // OTA-1160 — and the flinch is now MECHANICAL, not just a word.
-        staggerEnemy(set, activeIdx);
+        // ⚠ OTA-1163 (pressure test) — gated on surviving the blow. The thrown
+        // path shipped with this guard; this path did not, so a weakness KILL
+        // wrote a stagger onto the dying enemy's index — which the splice bug
+        // then left behind for whoever inherited the slot.
+        if (newEnemyHp > 0) staggerEnemy(set, activeIdx);
       } else if (effectiveMod.match === 'resist') {
         get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×${effectiveMod.multiplier} for ${dmg})`);
       }
@@ -21959,6 +22015,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           enemyArmorShred: dropAt(currentScene.enemyArmorShred),
           enemyCorruptionStacks: dropAt(currentScene.enemyCorruptionStacks),
           enemyAmbushUsed: dropAt(currentScene.enemyAmbushUsed),
+          // ⚠ OTA-1163 (pressure test) — the SEVENTH parallel array. OTA-1160
+          // shipped enemyStaggered without adding it to this splice, so killing
+          // the mook in [mook, boss] slid the boss onto the mook's index while
+          // its stagger flag stayed put: a paid stagger silently voided, or a
+          // free one handed to whoever slid into the vacated slot.
+          enemyStaggered: dropAt(currentScene.enemyStaggered),
           activeEnemyIdx: nextActiveIdx,
           range: stillFighting ? currentScene.range : null,
           hooks: currentScene.hooks ?? [],
@@ -22776,6 +22838,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           enemyArmorShred: dropAt(s.currentScene.enemyArmorShred),
           enemyCorruptionStacks: dropAt(s.currentScene.enemyCorruptionStacks),
           enemyAmbushUsed: dropAt(s.currentScene.enemyAmbushUsed),
+          enemyStaggered: dropAt(s.currentScene.enemyStaggered), // OTA-1163 — same splice, same reason
           activeEnemyIdx: nextActiveIdx,
           range: stillFighting ? s.currentScene.range : null,
         },
@@ -24576,6 +24639,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? {
                 currentScene: {
                   ...s.currentScene,
+                  ...FRESH_ENEMY_ARRAYS,
                   enemies: [boss],
                   enemyHps: [boss.hp],
                   activeEnemyIdx: 0,
@@ -26599,6 +26663,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             set((s2) => (s2.currentScene ? {
               currentScene: {
                 ...s2.currentScene,
+                ...FRESH_ENEMY_ARRAYS,
                 enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
                 enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
                 resistWear: {}, resistCracked: [],
@@ -26704,6 +26769,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             set((s) => s.currentScene && s.player ? {
               currentScene: {
                 ...s.currentScene,
+                ...FRESH_ENEMY_ARRAYS,
                 enemies: [{ ...purifier }],
                 enemyHps: [purifier.hp],
                 activeEnemyIdx: 0,
@@ -26729,6 +26795,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               set((s) => s.currentScene ? {
                 currentScene: {
                   ...s.currentScene,
+                  ...FRESH_ENEMY_ARRAYS,
                   enemies: [{ ...apparition }],
                   enemyHps: [apparition.hp],
                   activeEnemyIdx: 0,
@@ -27147,7 +27214,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // OTA-218 — combat started: reset the starvation counter.
             set(() => ({ stepsSinceCombat: 0 }));
             const flavour = finalSpawn.boss
-              ? `${finalSpawn.name} unfolds into the world — ${finalSpawn.attack}, ${finalSpawn.damage} per swing, and the air itself goes thin around it. This is not a fight you can win head-on. Find another way, or run. (range: close)`
+              ? `${finalSpawn.name} unfolds into the world — ${finalSpawn.attack}, ${enemyDamageCompact(finalSpawn)} per swing, and the air itself goes thin around it. This is not a fight you can win head-on. Find another way, or run. (range: close)`
               : enc.type === 'mini_dungeon'
                 ? `${finalSpawn.name} steps out of the shadows of the place — ${finalSpawn.attack} ready, ${finalSpawn.damage} damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)`
                 : `${finalSpawn.name} closes — ${finalSpawn.attack} ready, ${finalSpawn.damage} damage on a hit. (range: close)`;
@@ -28621,14 +28688,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // a bare name match could throw a DIFFERENT (uncoated) knife, so the coating
     // never procced. The tapped id guarantees the painted knife is the one hurled.
     const racked = player.equipped?.bandolierIds ?? [];
+    // ⚠ OTA-1163 (pressure test) — the any-pack-copy fallback is now
+    // OUT-OF-COMBAT ONLY. In a fight it silently bypassed the bandolier: once
+    // a racked stack emptied, this kept feeding throws from the pack, so
+    // BANDOLIER_MAX capped nothing and the rack was cosmetic. Out of combat
+    // the courtesy stands — fishing a vial from the pack at leisure is fine.
+    const inCombat = scene.enemies.some((_, i) => (scene.enemyHps[i] ?? 0) > 0 && !scene.enemyKnockedOut?.[i]);
     const item = (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0 && racked.includes(i.id)) : undefined)
       ?? player.inventory.find(
         (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0 && racked.includes(i.id),
-      ) ?? player.inventory.find(
+      ) ?? (inCombat ? undefined : player.inventory.find(
         (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
-      );
+      ));
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter looks at the bandolier. "Nothing left of the ${itemName} to throw."`);
+      get().appendLog('arbiter', `The Arbiter looks at the bandolier. "Nothing racked of the ${itemName} — the fight leaves no time to dig through the pack."`);
       return;
     }
     // OTA-690 — COATING VIAL thrown as a one-shot burst. A coating painted on a
@@ -30899,9 +30972,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s
     ));
+    // ⚠ OTA-1163 (pressure test) — OTA-1159 fixed the ambient-spawn copy of this
+    // card and missed this one: the SUMMONED Guardian still advertised the
+    // notation third of its damage and claimed "close" while the set above
+    // writes range: 'mid'. Same lie, second copy — now the same fix.
     get().appendLog(
       'combat',
-      `${guardian.name} closes — ${guardian.attack} ready, ${guardian.damage} damage on a hit. (range: close) ★ CORE GUARDIAN`,
+      `${guardian.name} closes — ${guardian.attack} ready, ${enemyDamageDisplay(guardian)}. (range: mid) ★ CORE GUARDIAN`,
     );
     get().appendLog('arbiter', cg.GUARDIANS_BY_CAPITAL[capitalId].approachLine);
     recordMemorableEvent(get, set, {
@@ -31188,7 +31265,7 @@ function applyHookEffect(
         : rawSpawn;
       set((s) =>
         s.currentScene
-          ? { currentScene: { ...s.currentScene, enemies: [spawn], enemyHps: [spawn.hp], activeEnemyIdx: 0, range: 'mid' } }
+          ? { currentScene: { ...s.currentScene, ...FRESH_ENEMY_ARRAYS, enemies: [spawn], enemyHps: [spawn.hp], activeEnemyIdx: 0, range: 'mid' } }
           : s,
       );
       // OTA-1109 — the old line said "close range" while the state above sets
@@ -31329,7 +31406,8 @@ function applyHookEffect(
       set((s2) => (s2.currentScene ? {
         currentScene: {
           ...s2.currentScene,
-          enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
+          ...FRESH_ENEMY_ARRAYS,
+                enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
           enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
           resistWear: {}, resistCracked: [],
         },
@@ -33114,7 +33192,8 @@ function advanceStoryDrip(
         set({
           currentScene: {
             ...scene,
-            enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
+            ...FRESH_ENEMY_ARRAYS,
+                enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
             enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
             resistWear: {}, resistCracked: [],
           },
@@ -33414,6 +33493,24 @@ function describeWornForAcLedger(player: PlayerCharacter): string {
   return parts.join(' ');
 }
 
+/** ⚠ OTA-1163 (pressure test) — EVERY per-enemy parallel array, reset in one
+ *  place. Three agents independently converged on the same defect class: sites
+ *  that replace or clear the `enemies` roster wholesale reset SOME of the
+ *  parallel arrays and leave the rest — so a hunt boss spawned into a scene
+ *  that held an acid-shredded enemy was born at reduced AC, a fled Guardian's
+ *  ground-off armor was BANKED for the re-summon (the ":20271 flee can't chip
+ *  them down" promise held for HP and silently failed for AC), and a stagger
+ *  latched on a non-boss survived into the next roster. Spread this FIRST in
+ *  any wholesale roster write; explicit per-site resets after it still win. */
+const FRESH_ENEMY_ARRAYS = {
+  enemyStatuses: undefined,
+  enemyArmorShred: undefined,
+  enemyCorruptionStacks: undefined,
+  enemyStaggered: undefined,
+  enemyKnockedOut: undefined,
+  enemyAmbushUsed: undefined,
+} as const;
+
 /** ⚠ OTA-1160 — THE WEAKNESS HAS TO BE WORTH BRINGING, and until now it was not.
  *
  *  The owner threw a Searing Paste at a Guardian carrying `vulnerable:burn` —
@@ -33578,7 +33675,18 @@ export function effectiveACBreakdown(
   if (accessories !== 0) sources.push({ label: 'accessories', delta: accessories });
   if (titleRuinsAc !== 0) sources.push({ label: 'title (ruins)', delta: titleRuinsAc });
   if (statusAdj !== 0) sources.push({ label: 'stance/cover', delta: statusAdj });
-  const total = Math.max(1, base + raceCtxDelta + armor + accessories + titleRuinsAc + statusAdj);
+  // ⚠ OTA-1163 (pressure test) — THE TRIM, WHICH THIS BREAKDOWN SKIPPED. The
+  // resolver trims the standing subtotal (OTA-947) and adds status mods on top
+  // at full value; this function claimed to be "the authority" while omitting
+  // the trim entirely, so a raw-27 build read 27 on the expanded DEFENSE card,
+  // 24 on the panel, and was defended at 24 — the 1156/1158 shape, on the
+  // surface OTA-836 built specifically to explain the number. The trim is now
+  // applied identically and NAMED as a source when it bites, so the chips
+  // still sum to the total the player reads.
+  const standingRaw = base + raceCtxDelta + armor + accessories + titleRuinsAc;
+  const trimDelta = trimStandingAc(standingRaw) - standingRaw;
+  if (trimDelta !== 0) sources.push({ label: 'bulk trim', delta: trimDelta });
+  const total = Math.max(1, trimStandingAc(standingRaw) + statusAdj);
   return { total, base, sources };
 }
 
@@ -33851,6 +33959,17 @@ export function runEnemyGroupCounters(
   const benchedBelow: string[] = [];
   const crowdedOut: string[] = [];
   let meleeSwings = 0;
+  // ⚠ OTA-1163 (pressure test) — THE PACK PURSUES. The exploit sweep rated
+  // step-back kiting CRITICAL: nothing in the codebase ever closed the range
+  // toward the player — the only mid-combat writer of scene.range was the
+  // player's own advance/retreat, the mid→far retreat drew no counter and cost
+  // no stamina, and a ranged weapon reaches all four bands. One free "retreat"
+  // therefore turned every melee enemy in the game, Core Guardians included
+  // ("Frost Staff Strike" matches no projectile word), into a target that
+  // never fights back. Now: when a living, conscious enemy spent its turn out
+  // of reach, the pack closes ONE band at the end of the volley — kiting still
+  // buys the round it always bought, it just stops buying the whole fight.
+  const outOfReach: string[] = [];
   for (let i = 0; i < volleyOrder.length; i++) {
     const enemy = volleyOrder[i]!;
     // Skip enemies that died earlier this round (HP <= 0 in the live
@@ -33867,7 +33986,7 @@ export function runEnemyGroupCounters(
     // 'far'. Ranged enemies (matched on attack/damage flavor) reach
     // all bands. Mirrors enemyCanReach used by movement intents.
     const liveRange = liveScene.range ?? 'close';
-    if (!enemyCanReach(enemy, liveRange)) continue;
+    if (!enemyCanReach(enemy, liveRange)) { outOfReach.push(enemy.name); continue; }
     // Bail if the player is dead.
     const livePlayer = get().player;
     if (!livePlayer || livePlayer.hp <= 0 || livePlayer.dead) return;
@@ -33950,6 +34069,24 @@ export function runEnemyGroupCounters(
           applyEnemyCounter(enemy, liveAfter, get, set, liveIdx, true);
         }
       }
+    }
+  }
+  // OTA-1163 — the pursuit itself. One band per round, never past 'close',
+  // and only when someone real was actually benched by distance (elevation
+  // benching is its own system and stays out of this).
+  if (outOfReach.length > 0 && (get().player?.hp ?? 0) > 0) {
+    const cur = get().currentScene?.range ?? null;
+    const closed: CombatRange | null = cur === 'distant' ? 'far' : cur === 'far' ? 'mid' : cur === 'mid' ? 'close' : null;
+    if (closed) {
+      set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, range: closed } } : s));
+      const first = outOfReach[0]!;
+      const rest = outOfReach.length - 1;
+      get().appendLog(
+        'combat',
+        rest > 0
+          ? `${first} and ${rest} other${rest > 1 ? 's' : ''} close the distance. (range: ${closed})`
+          : `${first} closes the distance. (range: ${closed})`,
+      );
     }
   }
   // OTA-983 — the grounded melee pack that can't reach an elevated player gets ONE
@@ -34279,6 +34416,11 @@ function applyEnemyCounter(
   // needed roll UP toward the cap (fewer hits), it just can't push it past. Adjustable knob.
   const ENEMY_HIT_NEEDED_CAP = 13; // d20>=13 -> ~40% floor hit chance vs any AC
   const acHitNat = Math.max(2, Math.min(ENEMY_HIT_NEEDED_CAP, effectiveAc - (atkTotal - atkRoll)));
+  // ⚠ OTA-1163 (pressure test) — SAY SO WHEN THE CAP DECIDED. At high AC the
+  // resolver needs only a natural ENEMY_HIT_NEEDED_CAP, so the log's
+  // "= 17 vs your AC 25 — ✓ HIT" read as a contradiction with no explanation:
+  // every tank build saw hits its own log said should have missed.
+  const acCapEngaged = effectiveAc - (atkTotal - atkRoll) > ENEMY_HIT_NEEDED_CAP;
   const hit = dodgeWin === true
     ? false
     : enemyFumble ? false : enemyCrit ? true : atkRoll >= acHitNat;
@@ -34296,7 +34438,7 @@ function applyEnemyCounter(
   // didn't land without scanning the whole red roll line.
   get().appendLog(
     'combat',
-    `${enemy.name} — d20 → ${atkRoll}${advLabel} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc} — ${outcomeTag}`,
+    `${enemy.name} — d20 → ${atkRoll}${advLabel} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc}${acCapEngaged ? ` (needs nat ${acHitNat}+ — AC capped)` : ''} — ${outcomeTag}`,
     hit ? undefined : { combatOutcome: 'enemy_miss' },
   );
   if (dodgeLine) {
@@ -34474,9 +34616,14 @@ function applyEnemyCounter(
     // damage. The stone ward below is a spent absorb pool (not a passive resist), so it still
     // runs after this and may legitimately zero a hit. Adjustable knob.
     const MITIGATION_FLOOR = 0.30;
+    // ⚠ OTA-1163 (pressure test) — when the floor overrides the stack, SAY SO.
+    // The bracket clause printed the layer percentages ("[armor −72%, title ½]")
+    // computed pre-clamp, so a player auditing their resist stack against the
+    // printed numbers could never reconcile them with the damage taken.
+    let mitFloorEngaged = false;
     if (dmg > 0) {
       const mitFloor = Math.round(rawDmg * MITIGATION_FLOOR);
-      if (mitFloor > dmg) dmg = mitFloor;
+      if (mitFloor > dmg) { dmg = mitFloor; mitFloorEngaged = true; }
     }
     // engine_Dev (Combat-Parity II) — enemy TYPED on-hit proc on the player. Only EXPLICITLY-typed
     // enemies proc at full chance; an inferred (bare-dice) type procs at 0.4× — so the ~95 enemies
@@ -34570,6 +34717,7 @@ function applyEnemyCounter(
         raceTag: raceResistTag,
         shield: !!shieldTag,
         wardTag,
+        floorEngaged: mitFloorEngaged, // OTA-1163 — the clause admits the clamp
       });
       const msg = killed
         ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}. You fall.`
@@ -34722,6 +34870,11 @@ export function damageModClause(opts: {
   raceTag?: string;       // raceResistLabel output — raw " (…)" or ''
   shield?: boolean;       // Defensive Protocols shield active
   wardTag?: string;       // stone-ward soak — raw " (…)" or ''
+  /** OTA-1163 — the MITIGATION_FLOOR clamp overrode the stack: the layers above
+   *  are printed as authored, but the delivered damage is raw×0.30, not their
+   *  product. Without this marker a player auditing the percentages against
+   *  the damage taken can never make them reconcile. */
+  floorEngaged?: boolean;
 }): string {
   const strip = (t: string) => t.replace(/^\s*\(/, '').replace(/\)\s*$/, '').trim();
   const mods: string[] = [];
@@ -34731,6 +34884,7 @@ export function damageModClause(opts: {
   if (opts.raceTag) mods.push(strip(opts.raceTag));
   if (opts.shield) mods.push('shield ½');
   if (opts.wardTag) mods.push(strip(opts.wardTag));
+  if (opts.floorEngaged) mods.push('floor 30%');
   return mods.length ? ` [${mods.join(', ')}]` : '';
 }
 
@@ -36328,7 +36482,14 @@ function applyWeaponCoatingProc(
     if (proc.kind === 'corruption') {
       corr = [...(corr ?? s.currentScene.enemies.map(() => 0))];
       while (corr.length < n) corr.push(0);
-      corr[activeIdx] = (corr[activeIdx] ?? 0) + 1;
+      // ⚠ OTA-1163 (pressure test) — the arb118 CAP, which the player path has
+      // and this golem mirror silently dropped: uncapped stacks scale
+      // coatingDotPerTurn without limit, the exact "unbounded DOT exploit"
+      // arb118 closed — reopened through the golem's hands.
+      corr[activeIdx] = Math.min(
+        corruptionStackCap(s.currentScene.enemies[activeIdx]),
+        (corr[activeIdx] ?? 0) + 1,
+      );
       stacksAfter = corr[activeIdx]!;
     }
     let shred = s.currentScene.enemyArmorShred;
@@ -37797,7 +37958,7 @@ function runParleyOutcome(
         }
         return {
           player: p,
-          currentScene: { ...s.currentScene, enemies: [], enemyHps: [], enemyKnockedOut: [], enemyAmbushUsed: [], activeEnemyIdx: 0, range: null },
+          currentScene: { ...s.currentScene, ...FRESH_ENEMY_ARRAYS, enemies: [], enemyHps: [], enemyKnockedOut: [], enemyAmbushUsed: [], activeEnemyIdx: 0, range: null },
         };
       });
       get().appendLog('world', parleySuccessLine(choice, kind, targetName));

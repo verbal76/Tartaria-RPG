@@ -63,7 +63,16 @@ export function enemyPowerScore(enemy: Enemy): number {
   const apNum = apMatch ? parseInt(apMatch[0], 10) : 4;
   const baseAc = Math.max(5, Math.min(18, 5 + apNum));
   const ac = Math.max(1, baseAc + traitACBonus(enemy.traits) + (enemy.boss ? 6 : 0));
-  const dmg = avgDamageNotation(enemy.damage);
+  // ⚠ OTA-1163 (pressure test) — the damage term now prices what the resolver
+  // actually rolls. This function already knew about bosses (the +6 AC above)
+  // but scored their damage from the bare notation, while applyEnemyCounter
+  // adds +1d6 to every connecting boss swing AND takes a second swing per
+  // round. A 1d8+3 boss therefore scored 7.5 where its round averages
+  // 2 × (7.5 + 3.5) = 22 — so the matchup badge painted "even" on fights
+  // outputting three times what the gauge priced. The identical lie OTA-1159
+  // and OTA-1162 already fixed on the damage chip, one meter to its left.
+  const perSwing = avgDamageNotation(enemy.damage) + (enemy.boss ? 3.5 : 0);
+  const dmg = enemy.boss ? perSwing * 2 : perSwing;
   const hp = enemy.hp ?? 1;
   return Math.max(1, Math.round(apNum + dmg + ac + hp / 10));
 }
