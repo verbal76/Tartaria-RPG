@@ -1129,7 +1129,74 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE THREE POINTS OF JEWELLERY (2026-08-06, latest). BOTH LINES.** golem
+- **⚠⚠ HOW HE DIED IN ONE INPUT (2026-08-06, latest). BOTH LINES.** golem
+  OTA-1136 / HAL OTA-1159. The owner walked into Yuldra-Tul at 24/24 HP, typed
+  `approach`, and was dead before he got a second input: *"how did I die so
+  fast? all I hit was approach."*
+
+  ```
+  Hierophant Mara-of-Yuldra closes — Frost Staff Strike ready,
+  1d8+3 damage on a hit. (range: close) ★ CORE GUARDIAN
+  d20 → 16 + ATK 5 = 21 vs your AC 19 — ✓ HIT
+  presses the second strike — bosses do not yield the tempo.
+  d20 → 15 + ATK 5 = 20 vs your AC 19 — ✓ HIT
+  deals 13 cold damage [armor −18%]. You have 11 HP remaining.
+  deals 11 cold damage [armor −18%]. You fall.
+  ```
+
+  ⚠ **The arithmetic does not fit the card, and that is the finding.** `1d8+3`
+  tops out at **eleven**. It dealt **13 through 18% armour** — about 16 raw. The
+  card was not describing the attack the resolver runs:
+
+  - `applyEnemyCounter` adds **+1d6 to every connecting swing** of a
+    boss-flagged enemy, on top of the declared notation; and
+  - a boss takes a **second swing** after the first lands, so one player action
+    — including a plain move — eats two of them.
+
+  Real envelope: **2 × (1d8+3 + 1d6) = 10 to 34**, against a 24 HP bar. The card
+  advertised 4 to 11. He did not misplay the fight; he priced it off the number
+  he was shown, and that number was a third of the truth.
+
+  ⚠ **And the same card said `(range: close)` while the spawn set `mid`.**
+  Twelve lines above the log call, the Guardian spawn block writes
+  `range: 'mid'`. So the player was told he was already in reach, typed
+  `approach` to act on it, and spent his one action closing a gap the card had
+  denied existed — into a boss that answers any action with two swings.
+
+  ⚠ **This is the OTA-1133 / OTA-1135 family, third time.** A surface
+  disagreeing with the resolver:
+
+  | surface said | resolver used |
+  |---|---|
+  | sheet AC 16 | Arbiter answered AC 10 (OTA-1133) |
+  | panel AC 15 | combat defended at 18 (OTA-1135) |
+  | `1d8+3` | `1d8+3 + 1d6`, **twice** (this one) |
+
+  **Nothing about the fight changes here** — the card stops understating it.
+  Whether a tier-1 Guardian should be able to erase a full 24 HP bar in one
+  exchange is a **balance question for the owner**, not something to quietly
+  re-tune under a bug fix.
+
+  ⚠ **The greeting, and the beat after the name.** Owner: *"remove the Good — it
+  hits weird in the sentence, and there should be a slight delay after the name,
+  like how we use a comma to pause a sentence."* Both halves were real. "Good —"
+  read as the Arbiter **approving** of the return rather than greeting it, and
+  spoken aloud the dash landed as a stumble between the name and the thought.
+
+  ⚠ **And the pause was a coin flip** — which is why it sounded wrong only *some*
+  of the time. arb165 already inserts real silence at a sentence boundary, but
+  only inside `joinBatch`, which only runs when the drain **bundled** two or more
+  chunks, which depends on whether the next chunk happened to be inferred yet.
+  The same sentence therefore paused or did not according to how fast Kokoro was
+  that second. The single-chunk path now pads the same beat when more of the
+  **same line** is queued behind it, so the pause is a property of the
+  punctuation rather than of timing; and 160 ms — under what a listener reads as
+  a deliberate beat — is now 280.
+
+  New suite `ota1136HowHeDiedInOneInput` (16 tests), pinning the advertised
+  `+1d6` to the resolver line that rolls it.
+
+- **⚠⚠ THE THREE POINTS OF JEWELLERY (2026-08-06). BOTH LINES.** golem
   OTA-1135 / HAL OTA-1158. OTA-1133 ended on the claim *"one function, one
   answer, everywhere."* The owner found the hole in it on the next build, in one
   sentence:

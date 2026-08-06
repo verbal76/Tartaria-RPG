@@ -846,3 +846,36 @@ export function buildSkillSteps(
       : `d20 + ${statLabel}${assistLabel}${perkLabel}${statusLabel} vs ${dcName || 'DC'} ${dc}`,
   }];
 }
+
+/** ⚠ OTA-1136 — WHAT THE ENEMY CARD SHOULD HAVE BEEN SAYING ALL ALONG.
+ *
+ *  The owner walked into Yuldra-Tul at 24/24 HP, typed `approach`, and was dead
+ *  before he got a second input. The log reads as an ambush; the arithmetic says
+ *  otherwise, and the card is what hid it:
+ *
+ *    Hierophant Mara-of-Yuldra closes — Frost Staff Strike ready,
+ *    1d8+3 damage on a hit. (range: close) ★ CORE GUARDIAN
+ *    …
+ *    deals 13 cold damage [armor −18%]. You have 11 HP remaining.
+ *    deals 11 cold damage [armor −18%]. You fall.
+ *
+ *  `1d8+3` tops out at ELEVEN, and it dealt 13 through 18% armour — about 16
+ *  raw. The card was not describing the attack the resolver runs:
+ *
+ *    · `applyEnemyCounter` adds **+1d6 to every connecting swing** of a
+ *      boss-flagged enemy, on top of the declared notation; and
+ *    · a boss takes a **second swing** after the first lands ("bosses do not
+ *      yield the tempo") — so ONE player action, including a plain move, eats
+ *      two of them.
+ *
+ *  Real envelope: 2 × (1d8+3 + 1d6) = **10 to 34**, against a 24 HP bar. The
+ *  card advertised 4 to 11. This is the OTA-1133/1158 family again — a surface
+ *  that disagrees with the resolver — and it is the one that got him killed,
+ *  because he priced the fight off the number he was shown.
+ *
+ *  Nothing about the fight changes here. The card just stops understating it. */
+export function enemyDamageDisplay(enemy: { damage?: unknown; boss?: boolean }): string {
+  const base = String(enemy.damage ?? '').trim() || '1d6';
+  if (!enemy.boss) return `${base} damage on a hit`;
+  return `${base}+1d6 damage on a hit, twice per round`;
+}
