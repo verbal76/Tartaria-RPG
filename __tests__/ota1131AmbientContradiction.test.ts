@@ -282,7 +282,10 @@ describe('OTA-1131 — item synthesis stops failing silently at full price', () 
     expect(src2).toContain('item_synth:rejected-by-clamp ${why}');
     expect(src2).toContain("? `bad-kind=");
     expect(src2).toContain("'no-content'");
-    expect(src2).toContain("noteQwenDiscarded('item_synth:empty')");
+    // RETARGETED BY OTA-1161 — empty is still its own reason; it just yields
+    // to 'preempted' when the runtime was told to stop (a different fact).
+    expect(src2).toContain("'item_synth:empty'");
+    expect(src2).toContain("'item_synth:preempted'");
   });
 
   it('a plain single-object response is unaffected — no regression on the happy path', async () => {

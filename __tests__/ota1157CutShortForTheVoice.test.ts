@@ -183,7 +183,9 @@ describe('OTA-1157 — the last unnamed discard finally names its culprit', () =
   });
 
   it('its neighbours keep the instrumentation that made THIS bug findable', () => {
-    expect(SYNTH).toContain("noteQwenDiscarded('item_synth:empty')");
+    // RETARGETED BY OTA-1161 — the empty discard now classifies preemption
+    // first, because an interrupted call is this OTA's own feature working.
+    expect(SYNTH).toContain("lastQwenCallPreempted() ? 'item_synth:preempted' : 'item_synth:empty'");
     expect(SYNTH).toContain('noteQwenDiscarded(`${reason} (${raw.length}ch) raw="${sample}"`)');
   });
 });
