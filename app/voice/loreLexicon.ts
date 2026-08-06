@@ -161,7 +161,76 @@ export function applyLoreLexicon(text: string): string {
   for (const [pattern, replacement] of SORTED_LEXICON) {
     out = out.replace(pattern, replacement);
   }
-  return out;
+  // ⚠ OTA-1169 — LAST, and that ordering is load-bearing. The article's
+  // pronunciation depends on the sound of the word AFTER it, and the
+  // respellings above CHANGE that sound: "the Aether" becomes "the ay thur",
+  // consonant-initial on the page and vowel-initial in the mouth. Running this
+  // after the loop means it judges the text espeak will actually receive.
+  return respellTheArticle(out);
+}
+
+// ⚠ OTA-1169 — "THE" IS TWO WORDS, and Kokoro only ever says one of them.
+//
+// Owner: *"kokoro pronounces the as thee it should be pronounce thuh or tha."*
+//
+// English has two articles spelled "the": /ðə/ ("thuh") before a consonant
+// SOUND, and /ðiː/ ("thee") before a vowel SOUND. Every native speaker
+// switches between them without noticing, which is exactly why hearing the
+// wrong one is so grating — "thee blade", "thee guardian", "thee dog" reads as
+// someone spelling the word out rather than speaking it.
+//
+// ⚠ IT IS THE SOUND THAT DECIDES, NOT THE LETTER, and that is the whole
+// difficulty. "the hour" is thee (silent h → vowel sound). "the university" is
+// thuh (the u says "yoo" → consonant sound). "the unknown" is thee (the u says
+// "uh"). So a bare /^[aeiou]/ test gets the two most common shapes in this
+// game's prose backwards, and both lists below exist to catch them:
+//   · VOWEL_SOUND  — consonant letter, vowel sound (hour, honest, heir).
+//   · CONSONANT_SOUND — vowel letter, consonant sound (use, unit, one, euro).
+// Both are whole-word anchored on purpose: a `uni` PREFIX match would swallow
+// "uninformed" / "uninvited" / "unimportant", which are vowel-sound words and
+// far more common here than "unicorn".
+const THE_VOWEL_SOUND = /^(?:hour(?:s|ly)?|honest(?:y|ly)?|hono(?:u)?rs?|honou?rable|heirs?|heirloom)$/i;
+const THE_CONSONANT_SOUND = new RegExp('^(?:' + [
+  'use[sdr]?', 'using', 'useful', 'useless', 'usual(?:ly)?',
+  'unit(?:s|e|ed|ing|y)?', 'unions?', 'unique(?:ly)?', 'uniforms?', 'unison',
+  'univers(?:e|es|al|ally|it(?:y|ies))', 'unicorns?', 'unilateral(?:ly)?',
+  'utensils?', 'utilit(?:y|ies)', 'uranium', 'ukuleles?',
+  'eu\\w*', 'ewes?', 'ones?', 'once',
+].join('|') + ')$', 'i');
+
+/** ⚠ THE RESPELLING ITSELF. "thuh" is the owner's own first suggestion and the
+ *  conventional audiobook respelling. If it comes back voiced wrong on device —
+ *  a "thumb" th instead of a "this" th, which is the one real risk, since
+ *  espeak-ng gives word-initial `th` its voiceless reading for words it does
+ *  not know — the alternates to try, in order, are "thuh" → "thu" → "tha".
+ *  Changing this ONE constant is the whole knob; nothing else needs touching. */
+export const THE_SCHWA_RESPELLING = 'thuh';
+
+/** True when the next spoken word BEGINS WITH A VOWEL SOUND, so "the" keeps
+ *  its "thee" reading. Exported for the suite — the two exception lists are the
+ *  part worth pinning. */
+export function startsWithVowelSound(word: string): boolean {
+  const w = word.replace(/^[^A-Za-z]+/, '');
+  if (!w) return false;
+  if (THE_VOWEL_SOUND.test(w)) return true;
+  if (THE_CONSONANT_SOUND.test(w)) return false;
+  return /^[aeiou]/i.test(w);
+}
+
+/** Rewrite the "thuh" article for TTS only. The visible log keeps "the" — this
+ *  runs on the copy handed to the engine, like every other lexicon entry. */
+export function respellTheArticle(text: string): string {
+  // Lookahead, so the following word is inspected but NOT consumed — otherwise
+  // "the the" would leave the second one unexamined.
+  // The optional punctuation class matters: an opening quote or bracket sits
+  // between the article and its noun often enough in this game's prose
+  // (`the "blade"`, `the (broken) rope`) that skipping those lines would leave
+  // the loudest ones — quoted item names — still saying "thee".
+  return text.replace(
+    /\bthe\b(?=(\s+)(["'“‘([]*)([A-Za-z][A-Za-z'’-]*))/gi,
+    (match, _space: string, _punct: string, nextWord: string) =>
+      (startsWithVowelSound(nextWord) ? match : THE_SCHWA_RESPELLING),
+  );
 }
 
 /**

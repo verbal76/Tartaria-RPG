@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.78';
+export const DISPLAY_VERSION = '4.29.79';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23456,7 +23456,49 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // call (which strengthens its claim, not weakens it).
 // New suite ota1168NobodyWasWaitingOnIt (8 tests).
 // DISPLAY_VERSION 4.29.78.
-export const OTA_BUILD_ID = '2026-08-06-1168-nobody-was-waiting-on-it';
+// OTA-1169 — "THE" IS TWO WORDS, and Kokoro only ever said
+// one of them. Owner: "kokoro pronounces the as thee it
+// should be pronounce thuh or tha."
+// English has two articles spelled "the": /ðə/ ("thuh")
+// before a consonant SOUND, /ðiː/ ("thee") before a vowel
+// sound. Speakers switch without noticing, which is why the
+// wrong one grates — "thee blade", "thee guardian", "thee
+// dog" reads as someone spelling the word, not saying it.
+// ⚠ THE SOUND DECIDES, NOT THE LETTER, and that is the whole
+// difficulty: a bare /^[aeiou]/ test gets the two commonest
+// shapes in this game's prose backwards. "the hour" is THEE
+// (silent h → vowel sound). "the university" is THUH (u says
+// "yoo" → consonant sound). "the unknown" is THEE (u says
+// "uh"). So two whole-word exception lists carry it:
+//   · vowel sound behind a consonant letter (hour, honest,
+//     honour, heir, heirloom); and
+//   · consonant sound behind a vowel letter (use, unit,
+//     union, unique, uniform, universe, utility, euro, ewe,
+//     one, once).
+// Both are ANCHORED whole-word on purpose — a `uni` prefix
+// match would swallow "uninformed" / "uninvited" /
+// "unimportant", which are vowel-sound words and far more
+// common here than "unicorn".
+// ⚠ IT RUNS LAST, AFTER THE RESPELLINGS, and that ordering is
+// load-bearing: the lexicon turns "Aether" into "ay thur" —
+// consonant-initial on the page, vowel-initial in the mouth —
+// so the rule has to judge the text espeak will actually
+// receive. "the Aether" therefore stays THEE, correctly.
+// ⚠ THE ONE KNOB: THE_SCHWA_RESPELLING = 'thuh' (the owner's
+// own first suggestion, and the conventional audiobook
+// respelling). The single real risk is voicing — espeak-ng
+// gives word-initial `th` its VOICELESS reading for words it
+// does not know, so this could come back as a "thumb" th
+// rather than a "this" th. If it does, the alternates to try
+// in order are "thuh" → "thu" → "tha"; changing that one
+// constant is the whole fix, nothing else moves.
+// TTS-only, like every lexicon entry — the visible log keeps
+// "the". loreLexicon's two article-bearing fixtures retargeted
+// (one re-scoped to the property it actually pins).
+// New suite ota1169TheIsTwoWords (12 tests).
+// DISPLAY_VERSION 4.29.79.
+export const OTA_BUILD_ID = '2026-08-06-1169-the-is-two-words';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1168-nobody-was-waiting-on-it';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1167-the-handoff-window';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1166-welcome-back-always-wins';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1165-the-four-lever-batch';
