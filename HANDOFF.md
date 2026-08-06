@@ -1260,7 +1260,48 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ NOBODY WAS WAITING ON IT (2026-08-06, latest). BOTH LINES.** golem
+- **⚠⚠ "THE" IS TWO WORDS (2026-08-06, latest). BOTH LINES.** golem OTA-1146 /
+  HAL OTA-1169. Owner: *"kokoro pronounces the as thee it should be pronounce
+  thuh or tha."*
+
+  English has two articles spelled "the": /ðə/ ("thuh") before a consonant
+  SOUND, /ðiː/ ("thee") before a vowel sound. Every speaker switches without
+  noticing, which is exactly why hearing the wrong one grates — "thee blade",
+  "thee guardian", "thee dog" reads as someone spelling the word rather than
+  saying it.
+
+  ⚠ **THE SOUND DECIDES, NOT THE LETTER**, and that is the whole difficulty. A
+  bare `/^[aeiou]/` test gets the two commonest shapes in this game's prose
+  backwards: *the hour* is THEE (silent h → vowel sound), *the university* is
+  THUH (u says "yoo" → consonant sound), *the unknown* is THEE (u says "uh").
+  Two exception lists carry it — vowel-sound-behind-a-consonant-letter (hour,
+  honest, honour, heir, heirloom) and consonant-sound-behind-a-vowel-letter
+  (use, unit, union, unique, uniform, universe, utility, euro, ewe, one, once)
+  — and both are **whole-word anchored on purpose**: a `uni` PREFIX match would
+  swallow "uninformed" / "uninvited" / "unimportant", which are vowel-sound
+  words and far more common here than "unicorn".
+
+  ⚠ **It runs LAST, after the respellings, and that ordering is load-bearing.**
+  The lexicon turns "Aether" into "ay thur" — consonant-initial on the page,
+  vowel-initial in the mouth — so the rule has to judge the text espeak will
+  actually receive. "the Aether" therefore stays THEE, correctly. (So does
+  "the Arbiter", which is why the two readings sit in one sentence.)
+
+  ⚠ **ONE KNOB, AND ONE REAL RISK.** `THE_SCHWA_RESPELLING = 'thuh'` (the
+  owner's own first suggestion, and the conventional audiobook respelling). The
+  risk is VOICING: espeak-ng gives word-initial `th` its VOICELESS reading for
+  words it does not know, so this could come back as a "thumb" th rather than a
+  "this" th. If it does, the alternates to try in order are **"thuh" → "thu" →
+  "tha"** — changing that one constant is the entire fix, nothing else moves.
+  ⚠ **NEEDS AN EAR ON DEVICE**: this is the one class of change the suite
+  cannot settle, because Kokoro is mocked in jest. The tests prove WHICH words
+  get respelled; only the owner can confirm it SOUNDS right.
+
+  TTS-only, like every lexicon entry — the visible log keeps "the". New suite
+  `ota1146TheIsTwoWords` (12 tests); loreLexicon's two article-bearing fixtures
+  retargeted (one re-scoped to the property it actually pins).
+
+- **⚠⚠ NOBODY WAS WAITING ON IT (2026-08-06). BOTH LINES.** golem
   OTA-1145 / HAL OTA-1168. Owner, rejecting the handoff-window OTA's *shape*
   of fix: *"we closed it yesterday, I even commented that it was fixed after
   you dropped it. now we fixed something until it was broke. we reintroduced a
