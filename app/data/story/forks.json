@@ -1,0 +1,375 @@
+{
+  "_comment": "OTA-1088 — PHASE 3. Two genuine forks per story motive, asked once, with no correct answer and no take-backs. See app/engine/storyForks.ts for why these are DERIVED from save state rather than queued, and for the three places every answer lands: the feed now, the ending screen forever, and the mouths of the Phase 2 cast. No placeholders — the authoring guard rejects a '{' anywhere in this file.",
+  "forks": [
+    {
+      "id": "debt_collector",
+      "motive": "debt",
+      "minPhase": "revelation",
+      "kicker": "A DECISION",
+      "title": "THE MAN WHO CAME DOWN AFTER YOU",
+      "body": "He is not a fighter and he does not pretend to be. He has a coat too good for the mud, a ledger in an oilcloth wrap, and your name in it in a hand you recognise. He came down the same stair you did, which means somebody paid for him to. He waits while you look at him, because waiting is most of his job.\n\n\"Not a threat,\" he says. \"An accounting. They want to know whether you are working or hiding. I write down which, and I climb back out, and what happens after that is not mine.\"",
+      "question": "What does he carry back up?",
+      "options": [
+        {
+          "id": "pay_partial",
+          "label": "Empty your purse into his hands",
+          "hint": "Costs everything you are carrying. Buys quiet above ground for people who cannot buy it themselves.",
+          "line": "You count it out on the flat of a stone and it is not enough and both of you know it. He writes the figure anyway, in a small careful hand, and underlines it. \"Working,\" he says. \"That is the word I will use.\" He does not thank you. He climbs, and above you somewhere a door does not get knocked on this month.",
+          "epilogue": "You paid a stranger in a good coat everything you had, one year down, so that a door above ground would go unknocked. Nobody up there will ever know it was you. That was rather the point.",
+          "effects": { "tc": -140 }
+        },
+        {
+          "id": "refuse",
+          "label": "Send him back empty",
+          "hint": "You keep every coin. The figure compounds, and the next one they send will not come alone.",
+          "line": "\"Nothing,\" you tell him. He nods as though you had said something reasonable, and writes that down too. \"Hiding, then.\" He is not angry. That is the part that stays with you afterwards — that a man can write the word that ruins you without any feeling about it at all, and then ask you the best way back to the stair.",
+          "epilogue": "You told the collector's man nothing and kept your coin, and the figure went on growing above you the whole way down, the way a tide grows behind somebody wading out.",
+          "effects": {}
+        },
+        {
+          "id": "turn_them",
+          "label": "Offer him a share of the ninth capital",
+          "hint": "He takes it. The debt above goes quiet — and you now owe a second person, and this one is down here with you.",
+          "line": "He stops writing. That is how you know it has landed. \"A ninth,\" he repeats, and you can hear him doing the same sums you did, and getting the same answer. He tears the page out, folds it, puts it inside his coat rather than in the wrap. \"I will say working. I will say it every month.\" Then, at the stair: \"I know your face now.\"",
+          "epilogue": "You bought the collector's man with a share of something you had not found yet, and he kept his half of it, and knowing his face in a crowd stopped being a comfort somewhere around the fourth Core.",
+          "effects": { "tc": 40 }
+        }
+      ]
+    },
+    {
+      "id": "debt_claim",
+      "motive": "debt",
+      "minPhase": "cores",
+      "minCores": 3,
+      "kicker": "A DECISION",
+      "title": "WHAT A HEART IS WORTH",
+      "body": "The Guild factor does not ask to see what you are carrying. She has read it off how you walk. She puts a writ on the table between you, weighted at one corner with a chunk of raw Aetherstone so it will not curl, and turns it so it faces you.\n\n\"We buy debts,\" she says. \"Yours specifically. Cleared today, in full, in front of a witness. And the Guild holds a claim on the first heart you bring up. Not this one. The first one you bring UP.\"",
+      "question": "Do you sell the claim?",
+      "options": [
+        {
+          "id": "sell_the_claim",
+          "label": "Sign it",
+          "hint": "The debt is gone today. The Guild owns your first Core, and everybody below will know it.",
+          "line": "The witness is a bored Reclaimer with ink on his thumb. It takes less time than a haircut. When it is done the factor pours two measures of something that tastes of rust and says, \"You will hate us in about a year,\" quite pleasantly, and you understand that she has watched this go the same way many times. The weight comes off you anyway. It comes off like a coat.",
+          "epilogue": "You sold the claim on your first heart to clear the debt in one afternoon, and you walked lighter ever after, and every Reclaimer who nodded to you was nodding at something they already owned.",
+          "effects": { "tc": 900, "standing": { "factionId": "reclaimers_guild", "delta": 12 } }
+        },
+        {
+          "id": "keep_the_heart",
+          "label": "Push the writ back across the table",
+          "hint": "Nothing changes. You carry the debt down with you, and whatever you find stays yours.",
+          "line": "You do not give a reason. She does not need one and does not ask, only rolls the writ back around the Aetherstone with the ease of somebody who has done it a hundred times and will do it a hundred more. \"Then it stays yours,\" she says. \"All of it. That is not the compliment people think it is.\"",
+          "epilogue": "You refused to sell the claim, and the debt walked down every stair beside you, and the first heart you brought up was yours entirely — which turned out to mean the weight was too.",
+          "effects": {}
+        }
+      ]
+    },
+
+    {
+      "id": "missing_letters",
+      "motive": "missing",
+      "minPhase": "revelation",
+      "kicker": "A DECISION",
+      "title": "THE ONES THEY NEVER SENT",
+      "body": "The cache is under a floor that has not been a floor for a long time: oilcloth, twice wrapped, and inside it a bundle of letters in a hand you would know upside down in the dark. They are addressed to you. None of them were sent.\n\nThe first four are the letters you did get, drafted and redrafted, the lies getting smoother each time. The fifth is not. The fifth says they had found what they came for two months earlier, and that it was not enough, and that they had decided not to come home.",
+      "question": "What do you do with the fifth letter?",
+      "options": [
+        {
+          "id": "burn_them",
+          "label": "Burn the fifth and keep the four",
+          "hint": "You go on with the person you came down for. You will never be sure again which of them was real.",
+          "line": "It takes a while to catch. Damp paper always does, and you sit with it longer than you meant to, watching the smooth lies survive in your other hand. When it is ash you put the four back in the oilcloth and the oilcloth back inside your coat, next to the one you have carried the whole way, and you go on looking for somebody who wanted to be found.",
+          "epilogue": "You burned the letter that told the truth and kept the four that did not, and you carried the version of them you came down for all the way to the bottom, which is a kind of loyalty and a kind of lie and you stopped separating them.",
+          "effects": {}
+        },
+        {
+          "id": "carry_them",
+          "label": "Keep all five",
+          "hint": "You will read the fifth again at the end, whatever the end turns out to be.",
+          "line": "You read it twice more, standing, and then a third time sitting down, and then you put all five together in the oilcloth and the oilcloth inside your coat where the last letter has been for three years. It is heavier. That is not possible and it is true. You go on, and the thing you are looking for has changed shape, and you have not decided yet into what.",
+          "epilogue": "You kept all five letters, the lies and the one that was not, and read the fifth again at the bottom of the world where it had always been going to be read.",
+          "effects": {
+            "item": {
+              "name": "The Fifth Letter",
+              "description": "Damp-swollen, twice folded, addressed to you and never sent. It says they had decided not to come home. You have read it enough times to say it with your eyes shut and you read it again anyway."
+            }
+          }
+        },
+        {
+          "id": "sell_them",
+          "label": "Sell the bundle to a Tomekeeper",
+          "hint": "A first-hand descent account is worth real coin. You need coin. They were going to be yours alone forever.",
+          "line": "The Tomekeeper reads two lines, stops, and looks up at you over the top of the page with an expression you will think about later. \"You understand what this is.\" It is not a question, so you do not answer it. The coin is good — better than good, and counted out slowly, which you take to be a courtesy. You leave without the bundle and get most of the way to the door before it lands.",
+          "epilogue": "You sold their letters to a Tomekeeper for coin that got you three capitals further down, and somewhere above ground a stranger can now recite them better than you can.",
+          "effects": { "tc": 320 }
+        }
+      ]
+    },
+    {
+      "id": "missing_searcher",
+      "motive": "missing",
+      "minPhase": "cores",
+      "minCores": 2,
+      "kicker": "A DECISION",
+      "title": "SOMEBODY ELSE'S TURN",
+      "body": "She is four days down and has the look you must have had at the start: too much gear, none of it used, eyes going to every sound. Her brother came below eleven months ago. She has his last letter too, and it says almost exactly what yours says, in a different hand, about a different capital.\n\nShe asks you, straight out and steadily, whether people find them.",
+      "question": "What do you tell her?",
+      "options": [
+        {
+          "id": "take_them_along",
+          "label": "Tell her to walk with you a while",
+          "hint": "Slower going, two sets of eyes, and one more person whose ending you are now standing near.",
+          "line": "She is not much use for eight days and then she is, in the abrupt way people become useful when there is no alternative. She spots a floor you would have gone through. You show her which hum means leave. Neither of you says what you are both doing, which is rehearsing, on somebody else's search, the thing you cannot do on your own.",
+          "epilogue": "You let another searcher walk with you, and taught her which hum means leave, and neither of you ever said aloud that you were practising on each other's grief.",
+          "effects": {}
+        },
+        {
+          "id": "send_them_up",
+          "label": "Give her your rations and turn her around",
+          "hint": "She will hate you for it. Eleven months down is not a search any more.",
+          "line": "You do not soften it, because softening it is how she stays. Eleven months. The mud. What the Aether does with what the mud keeps. You put your rations in her pack while you say it and she lets you, which is how you know some part of her already knew. At the stair she does not thank you either. Nobody down here thanks anybody for this.",
+          "epilogue": "You turned another searcher around at the stair and gave her your rations to climb with, and you have no idea whether that was mercy or the theft of the only year she had left to hope in.",
+          "effects": { "tc": -60 }
+        },
+        {
+          "id": "tell_them_the_truth",
+          "label": "Tell her exactly what the mud does",
+          "hint": "All of it — the keeping, the moving, the faces. She goes on anyway, and differently.",
+          "line": "You tell her the whole of it, in order, without arranging it to be bearable: what the mud keeps, what the Aether moves, and what sometimes walks out of a dead room with a name half-remembered and the right face on. She listens the entire way through without once looking away. Then she checks her straps and goes on down, and the way she walks has changed.",
+          "epilogue": "You told a stranger the whole truth about what walks below and let her go on carrying it, and you have wondered since whether that was honesty or just the relief of finally saying it out loud to somebody.",
+          "effects": {}
+        }
+      ]
+    },
+
+    {
+      "id": "exile_warrant",
+      "motive": "exile",
+      "minPhase": "revelation",
+      "kicker": "A DECISION",
+      "title": "YOUR NAME, IN SOMEBODY'S POCKET",
+      "body": "The courier is young enough to still be frightened of the dark and he is carrying a warrant with your name on it, folded into a wallet with nine others. He is not hunting you. He is delivering — down to the garrisons, then back up with whatever they give him, and your name is one line of an errand.\n\nHe has already seen your face. He knows. He has known for about a minute and is being very careful about where he puts his hands.",
+      "question": "What happens to the warrant?",
+      "options": [
+        {
+          "id": "buy_the_warrant",
+          "label": "Buy the page off him",
+          "hint": "Expensive, and he is the sort who stays bought. Above ground your name goes quiet.",
+          "line": "He names a figure, then halves it before you have answered, which tells you everything about how his month is going. The page comes out of the wallet cleanly. You watch him refold the other nine so the gap does not show, and he does it well, and you realise this is not the first page he has sold. Somewhere above, a clerk will file a delivery of nine and think nothing.",
+          "epilogue": "You bought your own name out of a frightened courier's wallet, and above ground the accusation simply stopped being repeated, which is not the same as being cleared and was all that was ever on offer.",
+          "effects": { "tc": -260 }
+        },
+        {
+          "id": "let_it_stand",
+          "label": "Let him carry it down",
+          "hint": "Keep your coin. Every garrison between here and the Nexus gets your name and what they say you did.",
+          "line": "You step out of the way and tell him to go on, and he does, fast, not quite running. The warrant goes where warrants go. Within a month there are places you cannot buy at and a road you cannot take, and a soldier at the Reclaimer's Stake looks at you a half-second too long. None of it is a surprise. All of it is the shape of the thing you came down here to leave behind, following you at a walk.",
+          "epilogue": "You let the warrant go down ahead of you and it did what warrants do, and you learned the buried country has clerks too, and that a name travels faster than a person.",
+          "effects": {}
+        },
+        {
+          "id": "take_it_by_force",
+          "label": "Take the wallet off him",
+          "hint": "Free, and immediate, and he climbs out with a story about the exile who robbed the post.",
+          "line": "It takes no violence at all, which is somehow worse — he holds the wallet out at arm's length with his face turned away, the way you would hand meat to a dog. You take the page. You take all nine, because leaving eight would name you, and burning eight strangers' warrants is a thing you decide to feel nothing about. He goes up. He will be believed. He will be believed loudly.",
+          "epilogue": "You took the post off a boy who was too frightened to argue and burned nine warrants including your own, and the story that climbed out of the mud after you was true, and worse than the one you came down to escape.",
+          "effects": { "standing": { "factionId": "mud_monarchs", "delta": -14 } }
+        }
+      ]
+    },
+    {
+      "id": "exile_throne",
+      "motive": "exile",
+      "minPhase": "descent",
+      "kicker": "A DECISION",
+      "title": "A DROWNED TITLE, GOING SPARE",
+      "body": "The claim is real. That is the difficulty. A hundred drowned titles below and no living claimants, and this one has a seat, a district of flooded street, and four families who would stand behind whoever held it — and the True Tartarians have decided, for reasons of their own, that it should be you.\n\nAbove ground your name is a thing people learned to look past. Down here somebody has written it on a claim in good ink.",
+      "question": "Do you take it?",
+      "options": [
+        {
+          "id": "take_the_title",
+          "label": "Take the seat",
+          "hint": "A name again, and everything a name drags behind it. You came down to be nobody.",
+          "line": "The investiture is four minutes long, held in water to the shin, and nobody smiles. Afterwards the four families come past one at a time and say the name — the drowned one, the one on the claim — and each time it lands slightly less strangely. On the third day you catch yourself answering to it before you have decided to. That is the moment it is done.",
+          "epilogue": "You took a drowned seat and four families' loyalty and a name written in good ink, having come down specifically to have none of those things, and you never satisfactorily explained that to yourself.",
+          "effects": {
+            "standing": { "factionId": "true_tartarians", "delta": 15 },
+            "item": {
+              "name": "Seal of a Flooded District",
+              "description": "Cold brass on a wet cord, the device worn almost smooth. It makes you somebody in four streets that are under two feet of water. You have caught yourself reaching for it in conversation."
+            }
+          }
+        },
+        {
+          "id": "refuse_it",
+          "label": "Refuse it",
+          "hint": "You finish disappearing. The families find somebody else and remember that you would not.",
+          "line": "You say no once, plainly, and then a second time because the first is treated as negotiation. The Tartarian who brought it takes it better than expected — he tells you that the last three refused as well, and that the seat has been vacant so long the water has changed the shape of the room. You walk out with exactly what you came in with, which was the entire point of coming down.",
+          "epilogue": "You refused a drowned seat twice in one afternoon and went back to being nobody in particular, which is what you came below for, and which stayed harder than it sounds.",
+          "effects": {}
+        },
+        {
+          "id": "give_it_away",
+          "label": "Hand the claim to one of the four families",
+          "hint": "It costs you nothing you wanted. The Tartarians will not forgive being decided for.",
+          "line": "You pick the family with the most children and the least standing and you put the claim in the mother's hands in front of everybody, which is the part that cannot be undone. The Tartarians' man does not object out loud. He objects with his face, for a long moment, and then he writes it down, because a claim given in public is a claim given. The four families are one family and three witnesses now.",
+          "epilogue": "You gave the drowned seat away to the family that needed it in front of witnesses so it could not be taken back, and made an enemy of the people who offered it to you, and would do it again.",
+          "effects": { "standing": { "factionId": "true_tartarians", "delta": -10 } }
+        }
+      ]
+    },
+
+    {
+      "id": "calling_hum",
+      "motive": "calling",
+      "minPhase": "revelation",
+      "kicker": "A DECISION",
+      "title": "IT HAS STOPPED BEING A SOUND",
+      "body": "For a year it was a hum. Since the first Lost Capital it has been something with edges — it comes and goes with the shape of the ground, it goes quiet near the dead and loud near the intact, and twice now it has been early. Not louder. Early. It went tight in your teeth a full breath before the floor gave.\n\nA thing that warns you is a thing that is paying attention.",
+      "question": "What do you do with it?",
+      "options": [
+        {
+          "id": "follow_it",
+          "label": "Start doing what it tells you",
+          "hint": "It gets better at warning you. It gets harder to tell from your own judgement.",
+          "line": "You stop arguing with it, and within a fortnight you are walking a route no reasonable person would pick and arriving intact. It is not language. It is nearer to appetite — a wanting, in a direction. The trouble is not that you cannot tell what it wants. The trouble is the morning you turn left for no reason at all and it takes you until evening to notice that nothing had hummed.",
+          "epilogue": "You gave the hum the benefit of the doubt and it kept you alive, and by the end you had stopped being able to say which of your good decisions had been yours.",
+          "effects": {
+            "item": {
+              "name": "Tuning Bead",
+              "description": "A pinch of Aetherstone in a twist of wire that you started carrying to hold against your jaw. It does nothing. The habit does something, and you have stopped examining which."
+            }
+          }
+        },
+        {
+          "id": "stop_your_ears",
+          "label": "Refuse it and use your own eyes",
+          "hint": "Slower and more dangerous, and every decision stays yours.",
+          "line": "You make a rule and you keep it: nothing gets decided by the ringing. You test floors that are obviously sound. You take the long way round places that feel wrong for no reason you can defend. It costs you time and twice it costs you skin, and the hum goes on regardless, patient as a bell, entirely uninsulted — which you like even less.",
+          "epilogue": "You made a rule that the hum did not get a vote and you kept it the whole way down, and it never once took offence, and that steadiness was the most frightening thing about it.",
+          "effects": {}
+        },
+        {
+          "id": "ask_the_order",
+          "label": "Take it to the Forgotten Order",
+          "hint": "They have a word for what you are. Having a word for it means being known by name.",
+          "line": "They do not seem surprised, which is the first bad sign, and they have a word for it, which is the second. It is an old word and they use it carefully. They ask to hear it — to sit with you in a dry room while it happens and write down what you say — and they pay for the privilege, and by the third session you understand that you are not the one being studied. Not primarily.",
+          "epilogue": "You carried the hum to the Order and let them write down what you said while it was on you, and somewhere in a dry archive there is now a record of you in a hand that is not yours.",
+          "effects": { "tc": 180, "standing": { "factionId": "forgotten_order", "delta": 12 } }
+        }
+      ]
+    },
+    {
+      "id": "calling_price",
+      "motive": "calling",
+      "minPhase": "cores",
+      "minCores": 4,
+      "kicker": "A DECISION",
+      "title": "IT ASKS",
+      "body": "Four hearts in and the hum has changed register. It is no longer describing the ground. It is describing you — where you are thin, what you have been keeping, the exact places you do not look. And under it, unmistakably, there is a shape that is not a warning.\n\nIt is asking for something. You cannot make out what. You can make out, quite clearly, that an answer is expected.",
+      "question": "What do you give it?",
+      "options": [
+        {
+          "id": "give_it",
+          "label": "Give it what it is reaching for",
+          "hint": "You will not know what you handed over until later, and possibly not then.",
+          "line": "You stop holding the door shut. That is the only way you can describe it afterwards and it is not a good description. Something goes across — not memory exactly, not strength exactly, some load-bearing thing you had not known was structural — and the hum resolves for one whole second into something almost like a sentence, and then it is a hum again and you are on your knees in the wet with your ears ringing and the taste of iron. You feel lighter. You would like to know of what.",
+          "epilogue": "You opened the door and let the Aether take whatever it had been reaching for, and you were lighter afterwards, and you never did work out what had been carried out of you.",
+          "effects": {}
+        },
+        {
+          "id": "bargain",
+          "label": "Offer it something you choose",
+          "hint": "It accepts. That does not mean it took only what you offered.",
+          "line": "You pick the thing you will miss least and you push it out deliberately, like paying a toll, and the hum takes it. Then it goes on taking, unhurried, for as long as the door is open, and by the time you get it shut you have been standing in the same six inches of water long enough for your feet to go numb. It is satisfied. You are the one who does not know the figure.",
+          "epilogue": "You tried to pay the Aether a price of your own choosing and it accepted, and went on accepting, and you never got the accounting you would have needed to know whether you had been robbed.",
+          "effects": { "tc": 240 }
+        },
+        {
+          "id": "refuse",
+          "label": "Give it nothing",
+          "hint": "It goes quiet. You have spent a year learning to hear it and now you cannot.",
+          "line": "You say no, in words, out loud, standing in an empty street with your hand on a wall — and the hum stops. Not fades. Stops, the way a held note stops, and the silence it leaves is the loudest thing you have experienced in the buried country. You do not sleep for two days. You keep touching your jaw. It does not come back for a long while, and when it does it is only weather again, and you cannot tell if you were forgiven or filed.",
+          "epilogue": "You refused the Aether and it went silent on you for a season, and when it came back it was only weather, and you have never decided whether that was a mercy or a verdict.",
+          "effects": {}
+        }
+      ]
+    },
+
+    {
+      "id": "record_first_pages",
+      "motive": "record",
+      "minPhase": "revelation",
+      "kicker": "A DECISION",
+      "title": "THE FIRST PAGES ARE WRONG ENOUGH TO MATTER",
+      "body": "You have thirty pages. They are not the book. But three of them establish, from what you have stood in front of and measured, that the flood did not come the way every account above ground says it came — not the timing, not the direction, and not to a city that had any warning.\n\nThirty pages is not proof. Thirty pages is a claim with a witness, and there is a courier going up on Thursday.",
+      "question": "Do the pages go up now?",
+      "options": [
+        {
+          "id": "send_it_up",
+          "label": "Send them with the courier",
+          "hint": "The correction starts moving a year early — and everybody below learns you are a person who publishes.",
+          "line": "You copy them out twice because you have read enough history to know what happens to sole copies, and the courier takes the wrapped bundle without curiosity, which is the best possible sign. Six weeks later a Tomekeeper mentions, carefully, that something is circulating. And within two months you notice that people below have started editing themselves in front of you.",
+          "epilogue": "You sent the first thirty pages up before they were safe and the correction was moving a year early, and for the rest of the descent everybody below spoke to you like somebody taking notes, because you were.",
+          "effects": { "standing": { "factionId": "forgotten_order", "delta": 10 } }
+        },
+        {
+          "id": "hold_it_back",
+          "label": "Hold everything until it is unarguable",
+          "hint": "Nothing leaves until the book is finished. If you do not come back up, none of it existed.",
+          "line": "You put the thirty pages at the bottom of the pack under the oilcloth and you make yourself a promise about completeness that sounds, when you say it, exactly like every scholar who has ever been talked out of publishing. You keep it anyway. The work gets better. The stack gets thicker. And every time a floor gives under you the calculation runs, unbidden, of what would be lost in that second.",
+          "epilogue": "You held every page back until the book was unarguable, and each time a floor moved you did the arithmetic of what would go under with you, and the answer never once made you send it early.",
+          "effects": {}
+        },
+        {
+          "id": "write_what_they_want",
+          "label": "Write a version somebody will actually publish",
+          "hint": "Accurate, but shaped. It gets read. You will know exactly which paragraphs you softened.",
+          "line": "Nothing in it is false. That is the defence you assemble while you are doing it and it holds up perfectly and you go on feeling the way you feel. Two claims get their teeth filed off. One name is not printed. A house above ground that would not have touched the true version takes this one gladly, and pays, and it is read — genuinely read, by people who believed the old story that morning.",
+          "epilogue": "You wrote a true account with its teeth filed off because a filed account gets read, and it was read, and you can still recite the two paragraphs you softened.",
+          "effects": { "tc": 420 }
+        }
+      ]
+    },
+    {
+      "id": "record_dangerous",
+      "motive": "record",
+      "minPhase": "descent",
+      "kicker": "A DECISION",
+      "title": "THE THING THAT SHOULD NOT BE WRITTEN DOWN",
+      "body": "You have it now — how the hearts are actually seated, and therefore how they could be taken out by somebody who did not care what came after. It is four paragraphs. It is the most valuable thing in your pack and it took nine months and two capitals to assemble, and it is the truest work you have ever done.\n\nAnd every faction below is stripping this country for parts, and you know precisely which of them would use it, and roughly how many people are living on top of the answer.",
+      "question": "Does it go in the book?",
+      "options": [
+        {
+          "id": "write_it_anyway",
+          "label": "Write it in full",
+          "hint": "The record is the record or it is nothing. What people do with a true thing is not the historian's clause.",
+          "line": "You write it out cleanly, with the diagrams, because a truth you have hedged is a truth somebody else will have to find again from scratch. You do not pretend it is safe. You write a paragraph at the head of it saying exactly what it is and exactly what it would let somebody do, and you sign that paragraph, which is the only part of the whole book you sign.",
+          "epilogue": "You put the four dangerous paragraphs in the book with a signed warning at their head, because a record with a hole in it is not a record, and you have never argued yourself out of that and never entirely slept either.",
+          "effects": {}
+        },
+        {
+          "id": "leave_it_out",
+          "label": "Leave it out entirely",
+          "hint": "The book has a hole in it exactly where its heart should be, and you are the only person who will ever know.",
+          "line": "It comes out in one evening — four paragraphs and the diagrams, into the fire, and then the working notes, because working notes are how a thing gets reconstructed. What remains is a very good book with a soft place at the centre that a careful reader will feel and not be able to name. You will be that careful reader for the rest of your life.",
+          "epilogue": "You burned the four paragraphs that were the best work you ever did, and published a very good book with a soft place at its centre that only you could ever feel.",
+          "effects": {}
+        },
+        {
+          "id": "seal_it",
+          "label": "Write it and seal it for later",
+          "hint": "A sealed packet, held by somebody you trust to be dull about it. You are deciding for whoever opens it.",
+          "line": "You write it properly, seal it properly, and give it to an archivist chosen entirely for being incurious — a woman who files things and does not read them and says so with something like pride. Sealed until fifty years after the flood is understood, which is a condition nobody can enforce and everybody will honour or not. You have not resolved anything. You have moved it downstream and handed the decision to a stranger who is not born yet.",
+          "epilogue": "You sealed the dangerous paragraphs and gave them to an incurious archivist under a condition nobody could enforce, which was not a decision so much as a decision handed forward to somebody not yet born.",
+          "effects": {
+            "item": {
+              "name": "Sealed Packet, Not To Be Opened",
+              "description": "Wax over cord over oilcloth, in your own hand: the four paragraphs and the diagrams. You kept the second copy. You have told yourself several different reasons why."
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -89,7 +89,15 @@ interface TierProfile {
 // (+3/+4/+5). HP, damage, and the trait layering are unchanged, so the fight
 // still has teeth and the late-game stays demanding.
 const TIER_PROFILES: Record<GuardianTier, TierProfile> = {
-  1: { hpMult: 1.4, acBonus: -3, damage: '1d8+3',  extraTraits: [] },
+  // ⚠ OTA-1165 (owner tuning) — 1.4 → 1.0: YOUR FIRST GUARDIAN IS THE BASE.
+  // The ×1.4 predates OTA-926's canonical-base switch: it was tuned against
+  // per-Capital sheets of 30-50 HP, where tier 1 landed ~42-70. When the base
+  // became a flat 42 for everyone, the first rung quietly inherited a 40%
+  // raise (59) that nothing re-derived. The pressure-test sim priced the
+  // result: 0.1% win for the intended fresh arrival, ~16 hitting-rounds
+  // needed. At 1.0 the first fight is the 42 the fiction always claimed; the
+  // ladder still strictly climbs via the monotone floor.
+  1: { hpMult: 1.0, acBonus: -3, damage: '1d8+3',  extraTraits: [] },
   2: { hpMult: 1.6, acBonus: -2, damage: '1d8+4',  extraTraits: ['armored'] },
   3: { hpMult: 1.8, acBonus: -1, damage: '1d10+4', extraTraits: ['armored', 'quick'] },
   4: { hpMult: 2.0, acBonus: 0,  damage: '1d10+4', extraTraits: ['armored', 'quick'] },
@@ -207,6 +215,28 @@ export function monotoneTierApDelta(player: PlayerCharacter, tier: GuardianTier)
   return run;
 }
 
+/** OTA-1048 — OVER-LEVEL DAMAGE BONUS. The over-level factor lifts HP, AC and
+ *  attack, but the damage DIE stayed the authored tier value — so against an
+ *  over-leveled player the Guardian lived longer and hit more often, yet each
+ *  hit stayed tuned for a fresh arrival's HP pool. Owner, after the 2nd
+ *  Guardian at ~28 power (tier expectation 20, 137 HP pool vs 1d8+4): "the
+ *  second boss was a fairly easy fight." A flat bonus now rides the tier die,
+ *  scaled by the same over-level factor: +0 at/under the curve (the OTA-448
+ *  fresh-arrival promise holds byte-identically), ~+4 at the owner's measured
+ *  over-level (1d8+4 → 1d8+8: ~11 net per hit through his −18% armor, twice a
+ *  round — the fight now spends about half his pool over its length), +9 at
+ *  the 1.9 cap. Runs through the same running-max staging as HP/AP so the
+ *  tier-over-tier damage ramp never inverts at a fixed player power. */
+export function monotoneTierDmgBonus(player: PlayerCharacter, tier: GuardianTier): number {
+  let run = 0;
+  for (let k = 1; k <= tier; k++) {
+    const t = k as GuardianTier;
+    const b = Math.round((guardianOverLevel(player, t) - 1) * 10);
+    run = k === 1 ? b : Math.max(b, run);
+  }
+  return run;
+}
+
 /** Returns the live-fight Enemy for the Guardian at this Capital,
  *  scaled to the player's current kill count AND actual power. Returns
  *  null when the locationId is not a Lost Capital. */
@@ -253,11 +283,18 @@ export function spawnGuardianForCapital(
     ...(def.base.traits ?? []),
     ...profile.extraTraits,
   ]));
+  // OTA-1048 — the tier die plus the over-level flat bonus (see
+  // monotoneTierDmgBonus). Authored 'NdM+K' shape is preserved.
+  const dmgBonus = monotoneTierDmgBonus(player, tier);
+  const dm = profile.damage.match(/^(\d+d\d+)\+(\d+)$/);
+  const scaledDamage = dmgBonus > 0 && dm
+    ? `${dm[1]}+${parseInt(dm[2]!, 10) + dmgBonus}`
+    : profile.damage;
   return {
     ...def.base,
     hp,
     abilityPoint: scaledAp,
-    damage: profile.damage,
+    damage: scaledDamage,
     traits,
     boss: true,
     // Loot fields stay empty; resolveEnemyDefeat dispenses the

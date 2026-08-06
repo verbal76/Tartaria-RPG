@@ -73,7 +73,22 @@ export interface TutorialStep {
   /** Line the Arbiter speaks when this step opens. Routed through
    *  appendLog('arbiter', ...). Falls back to body if not set. */
   arbiter?: string;
+  /** Short imperative the Arbiter restates when the tutorial lockdown
+   *  refuses an off-script command. The refusal used to say only "do what
+   *  I've asked of you" — unusable once the instruction has scrolled off
+   *  the feed, because it tells the player they are wrong without telling
+   *  them what right looks like. Lowercase, no trailing period: it is
+   *  interpolated mid-sentence. */
+  remind?: string;
 }
+
+/** OTA-1063 — verbs the tutorial lockdown always lets through while an
+ *  enemy is live. Self-defence, disengagement, and consumables: everything
+ *  a cornered player needs. Deliberately NOT world verbs (travel, craft,
+ *  fuse, rest) — the lockdown still holds for those, so the tutorial can't
+ *  be walked out of sideways. */
+export const TUTORIAL_SELF_DEFENCE =
+  /\b(attack|strike|hit|swing|shoot|fire|stab|slash|punch|kick|throw|flee|run|escape|retreat|dodge|block|sneak|hide|use|drink|eat|equip|wield|talk|parley)\b/i;
 
 // Tungsten Spire — the new 10-beat in-feed sequence. Each beat is
 // driven by a specific player action; the state machine in gameStore
@@ -81,6 +96,7 @@ export interface TutorialStep {
 export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'name',
+    remind: 'type your name, then tap ACT',
     screen: 'exploration',
     area: 'input-row',
     inputPulse: true,
@@ -90,7 +106,33 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'The Arbiter looks up. "Your name, traveler. Type it, then tap ACT."',
   },
   {
+    // OTA-1094 — CONVERGED FROM GOLEM-LINE, at the owner's direction: "never
+    // noted that lapse in the tutorial, HAL should have the look around you
+    // beat as well." golem commit 5d23d6fd added this beat on that line only
+    // and it was never flagged for porting; the tutorial walk exposed the gap
+    // a month later. The store handler (maybeAdvanceTutorial('look') at the
+    // end of the look-around function) and the InputBox chip-lighting were
+    // ALREADY here — only this step definition was missing, so the beat is
+    // one insertion, verbatim from golem.
+    //
+    // The orientation tool — taught FIRST, before the player picks anything up,
+    // because it's the "where am I / re-read the room" button. Tapping LOOK
+    // AROUND YOU calls maybeAdvanceTutorial('look') and InputBox lights this
+    // chip green for currentBeatId === 'look', so it advances to the cudgel beat.
+    // Looking around at the very start also surfaces the props (cudgel, rope,
+    // plate, locked door) the next beats walk the player through.
+    id: 'look',
+    screen: 'exploration',
+    area: 'quick-row',
+    pulse: true,
+    title: 'Look Around',
+    body: 'Start here. Tap LOOK AROUND YOU to get your bearings — it re-reads the room: what\'s here, your exits, and any open leads you\'re chasing. Use it any time you lose the thread.',
+    arbiter:
+      '"First, get your bearings. Tap LOOK AROUND YOU — I\'ll read the room for you: what\'s here, your way out, and whatever you\'re still chasing. Use it any time you\'re lost."',
+  },
+  {
     id: 'cudgel',
+    remind: 'take the cudgel at your feet',
     screen: 'exploration',
     area: 'quick-row',
     pulse: true,
@@ -101,6 +143,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id: 'rope',
+    remind: 'type take rope, then tap ACT',
     screen: 'exploration',
     area: 'input-row',
     inputPulse: true,
@@ -111,6 +154,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id: 'scrap',
+    remind: 'salvage the broken chest plate',
     screen: 'exploration',
     area: 'quick-row',
     pulse: true,
@@ -121,16 +165,18 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id: 'climb',
+    remind: 'finish the climb — climb again to go higher, or climb down to come back',
     screen: 'exploration',
     area: 'quick-row',
     pulse: true,
     title: 'Climb',
     body: 'There\'s something here worth getting on top of. Tap CLIMB and pick what to scale — your rope makes it possible.',
     arbiter:
-      '"Now the rope earns its keep. Tap CLIMB. You go up in stages, each pull burns stamina, and empty means a fall. Top out, then climb back down."',
+      '"Now the rope earns its keep. Tap CLIMB — top out, then climb back down."',
   },
   {
     id: 'investigate',
+    remind: 'investigate the north door',
     screen: 'exploration',
     area: 'quick-row',
     pulse: true,
@@ -149,6 +195,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     // LEAVE (or later typing 'leave outpost') advances; see
     // finishOutpostTutorial in gameStore.
     id: 'explore_or_leave',
+    remind: 'pick this place over, or type leave outpost to set out',
     screen: 'exploration',
     area: 'fullscreen',
     title: 'The Door Is Open',

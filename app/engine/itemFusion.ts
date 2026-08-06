@@ -24,6 +24,14 @@
 import type { InventoryItem, UniqueItemStats } from './types';
 import { canonicalItemTags, isInferredItem, isRecipeIngredientName, findWeaponByName, findArmorByName } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
+// OTA-1109 — the salvage-curio catalog, so the forge can refuse to name its
+// product after stock salvage (see the input-echo rejection in the namer).
+import curiosData from '../data/relics/curios.json';
+
+// OTA-1109 — lowercase curio-name set for the forge-name rejection ladder.
+const CURIO_NAME_SET: ReadonlySet<string> = new Set(
+  ((curiosData as { curios: { name: string }[] }).curios ?? []).map((c) => c.name.trim().toLowerCase()),
+);
 
 /** Minimal Qwen interface — matches itemSynthesisQwen.ts so tests can
  *  pass a mock without dragging the full LlamaRuntime stack. */
@@ -31,7 +39,7 @@ export interface FusionSynthEngine {
   isReady(): boolean;
   generate(
     messages: ReadonlyArray<{ role: 'system' | 'user' | 'assistant'; content: string }>,
-    opts?: { maxNewTokens?: number; temperature?: number },
+    opts?: { maxNewTokens?: number; temperature?: number; job?: string },
   ): Promise<string>;
 }
 
@@ -185,6 +193,65 @@ export function eligibleInputs(inventory: readonly InventoryItem[]): InventoryIt
     out.push(it);
   }
   return out;
+}
+
+/** OTA-1117 — what the Crucible's UPGRADE channel can do with one piece, and when
+ *  it can't, WHY.
+ *
+ *  Owner, from the device: "went to upgrade at the fuse and it only allowed me to
+ *  pick armor no weapons." The upgrade list rendered ARMOR & VESTS and then
+ *  silently dropped the WEAPONS section whenever nothing qualified — and roughly
+ *  half the weapon catalog can never qualify, because the upgrade grants a COATING
+ *  CHANNEL and energy weapons (runecasters, burn/aetheric/electrical casters) have
+ *  no edge to carry a coating. Nothing on screen said so, so a permanent rule read
+ *  as a broken screen.
+ *
+ *  One verdict function now answers for both the picker and the store action, so
+ *  the list you can tap and the refusal you'd get can't disagree.
+ *
+ *  `kind` is what the upgrade WOULD grant (null = this piece takes no channel at
+ *  all); `blocked` is null when the piece is upgradeable right now, otherwise the
+ *  player-facing reason. */
+export type CrucibleUpgradeKind = 'weapon' | 'armor';
+export interface CrucibleUpgradeVerdict {
+  kind: CrucibleUpgradeKind | null;
+  blocked: string | null;
+}
+export function crucibleUpgradeVerdict(item: InventoryItem): CrucibleUpgradeVerdict {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isCoatableItem, coatingCapacity } = require('./weaponCoating') as typeof import('./weaponCoating');
+  // The great-climb rewards are earned, not forged — same lock the store applies.
+  if (canonicalItemTags(item).includes('collect_only')) {
+    return { kind: null, blocked: 'earned on the great climbs — the Crucible has no purchase on it' };
+  }
+  if (isCoatableItem(item)) {
+    return coatingCapacity(item) >= 2
+      ? { kind: 'weapon', blocked: 'already carries two coating channels' }
+      : { kind: 'weapon', blocked: null };
+  }
+  const isArmor = item.kind === 'armor' || item.kind === 'dog_armor'
+    || item.uniqueStats?.kind === 'armor' || item.uniqueStats?.kind === 'dog_armor'
+    || !!findArmorByName(item.name);
+  if (isArmor) {
+    return (item.resistCapBonus ?? 0) >= 1
+      ? { kind: 'armor', blocked: 'already carries an extra resist channel' }
+      : { kind: 'armor', blocked: null };
+  }
+  // A real weapon that simply can't hold a coating — the common case behind the
+  // vanishing WEAPONS section, and the one that most needs saying out loud.
+  if (item.kind === 'weapon' || item.uniqueStats?.kind === 'weapon' || !!findWeaponByName(item.name)) {
+    return { kind: null, blocked: 'fires no edge to carry a coating — energy weapons take no channel' };
+  }
+  return { kind: null, blocked: 'not a weapon, a piece of armor, or a dog vest' };
+}
+
+/** OTA-1117 — is this inventory row a WEAPON at all (catalog, fused, or tagged)?
+ *  The upgrade list uses it to decide what belongs under the WEAPONS heading —
+ *  including the ones it has to explain rather than offer. */
+export function isWeaponRow(item: InventoryItem): boolean {
+  return item.kind === 'weapon'
+    || item.uniqueStats?.kind === 'weapon'
+    || !!findWeaponByName(item.name);
 }
 
 /** Gate fusion against the live inventory. Returns the eligible inputs
@@ -474,7 +541,7 @@ export async function synthesizeFusionViaQwen(
   if (!qwen.isReady()) return null;
   try {
     const messages = buildPrompt(inputs, tagProfile);
-    const reply = await qwen.generate(messages, { maxNewTokens: 200, temperature: 0.4 });
+    const reply = await qwen.generate(messages, { maxNewTokens: 200, temperature: 0.4, job: 'fusion_forge' });
     const json = extractJsonObject(reply);
     if (!json) return null;
     let parsed: RawFusionResponse;
@@ -557,6 +624,7 @@ export async function synthesizeFusionNameViaQwen(
     const reply = await qwen.generate(buildNamePrompt(stats, inputs, tagProfile), {
       maxNewTokens: 64,
       temperature: 0.6,
+      job: 'forge_name',
     });
     const json = extractJsonObject(reply);
     if (!json) return null;
@@ -586,7 +654,16 @@ export async function synthesizeFusionNameViaQwen(
     // OTA-801 — and reject a WEAPON name that ends in a soft / non-weapon noun
     // ("Aetheric Thread", "Resonant Veil") so the deterministic weapon pool names it.
     const weaponReadsSoft = stats.kind === 'weapon' && fusedWeaponNameReadsSoft(name);
-    if (endsWithKindWord || collidesCrossKind || isLowQualityForgeName(name) || weaponReadsSoft) return null;
+    // OTA-1109 — reject an INPUT ECHO / curio-catalog name. The prompt lists
+    // the reserved pieces by name and the model can hand one straight back:
+    // the owner's Legendary chest armor came out named "Hollow Quill Sheaf" —
+    // the exact Uncommon curio he fed into the forge. A forged product must
+    // never share a name with an ingredient or with salvage stock; when it
+    // would, fall back to the deterministic theme+noun name.
+    const lowerName = name.trim().toLowerCase();
+    const echoesInput = inputs.some((i) => i.name.trim().toLowerCase() === lowerName);
+    const isCurioName = CURIO_NAME_SET.has(lowerName);
+    if (endsWithKindWord || collidesCrossKind || echoesInput || isCurioName || isLowQualityForgeName(name) || weaponReadsSoft) return null;
     return { name, description };
   } catch {
     return null;

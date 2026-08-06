@@ -87,6 +87,20 @@ export function VendorScreen() {
   // `buy_<cat>` / `sell_<cat>`; ALL sections default CLOSED (?? true), so a
   // vendor opens as a tidy category index the player expands into.
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  // OTA-1122 — GROUP SELL. Owner: "if I want to have a hold to start multiple
+  // select so I can hold on an item and it gets a check mark then I tap to add
+  // others to that group and sell a group let's make that happen."
+  //
+  // The standard mobile pattern, and the reason it works is that the LONG-PRESS
+  // is the mode switch: a plain tap keeps meaning "sell this one" until you have
+  // declared otherwise, so nothing at all changes for a player who never holds a
+  // row. Selection is by INSTANCE ID for the same reason the sell list filters
+  // by it — two rows can share a name and be different copies.
+  const [sellSelectMode, setSellSelectMode] = useState(false);
+  const [sellSelected, setSellSelected] = useState<string[]>([]);
+  // The group-sale confirmation. Held separately from `pending` so the existing
+  // single-item flow — stepper, Sell All, gate-loss branch — is untouched.
+  const [groupSellConfirm, setGroupSellConfirm] = useState(false);
 
   const vendor = scene?.vendor ?? null;
 
@@ -336,6 +350,56 @@ export function VendorScreen() {
       return b.price - a.price; // default: most valuable first
     });
 
+  // OTA-1122 — the group-sell working set. Derived from `sellable` every render
+  // rather than stored, so a selected row that stops being sellable (sold,
+  // dropped, equipped, or the vendor dismissed) simply falls out of the group
+  // instead of lingering as a stale id the SELL button would silently skip.
+  const sellableById = new Map(sellable.map((row) => [row.item.id, row]));
+  const selectedRows = sellSelected
+    .map((id) => sellableById.get(id))
+    .filter((r): r is NonNullable<typeof r> => !!r);
+  // Whole stacks, matching the label: a row that reads "(x5)" and is ticked sells
+  // all five, and the total below says exactly what that pays.
+  const selectedUnits = selectedRows.reduce((n, r) => n + (r.item.quantity ?? 1), 0);
+  const selectedTotal = selectedRows.reduce((n, r) => n + r.price * (r.item.quantity ?? 1), 0);
+  // Warnings the single-item confirm would have shown, gathered for the group so
+  // a bulk sale can't quietly do what one sale would have stopped to ask about.
+  const selectedGateLosses = selectedRows
+    .map((r) => ({ name: r.item.name, loss: gateLossFor(r.item.name) }))
+    .filter((x): x is { name: string; loss: NonNullable<ReturnType<typeof gateLossFor>> } => !!x.loss);
+  const selectedLoadout = selectedRows
+    .filter((r) => bandolierIds.has(r.item.id) || toolPouchIds.has(r.item.id))
+    .map((r) => r.item.name);
+
+  const exitSellSelect = () => { setSellSelectMode(false); setSellSelected([]); };
+  const toggleSellSelect = (id: string) => {
+    setSellSelected((cur) => {
+      const next = cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id];
+      // Emptying the group leaves the mode — otherwise the player is parked in a
+      // state with nothing to act on and a bar that says "0".
+      if (next.length === 0) setSellSelectMode(false);
+      return next;
+    });
+  };
+  const beginSellSelect = (id: string) => { setSellSelectMode(true); setSellSelected([id]); };
+  const doGroupSell = () => {
+    // Snapshot first: each sale mutates the inventory the rows were derived from.
+    const plan = selectedRows.map((r) => ({ name: r.item.name, id: r.item.id, qty: r.item.quantity ?? 1 }));
+    let unit = 0;
+    for (const p of plan) {
+      for (let i = 0; i < p.qty; i++) {
+        // OTA-727's rule, applied to the whole group: a bulk sale is ONE
+        // negotiation, so only the very first unit across the entire group
+        // trains Charisma. Selling ten things at once must not pay ten times the
+        // social XP of selling them one at a time.
+        sellToVendor(p.name, p.id, { social: unit === 0 });
+        unit++;
+      }
+    }
+    setGroupSellConfirm(false);
+    exitSellSelect();
+  };
+
   // OTA-686 — file a vendor BUY offer (just a name) into an inventory category.
   // findCatalogItem resolves the wares' kind + tags so categorizeItem buckets it
   // exactly like the same item would sit in the player's pack; unknown/inferred
@@ -422,7 +486,15 @@ export function VendorScreen() {
             activeOpacity={0.7}
             accessibilityRole="button"
           >
-            <Text style={styles.crucibleBtnText}>★★ USE CRUCIBLE · 25 TC</Text>
+            {/* OTA-1047 — say the fee AND the balance BEFORE the tap. The
+                owner spent down to 11 TC, tapped, and learned about the fee
+                from a buried system line — a lit button that doesn't fire.
+                Short-of-coin now reads amber with the exact shortfall. */}
+            <Text style={[styles.crucibleBtnText, (player?.tc ?? 0) < 25 && styles.crucibleBtnShort]}>
+              {(player?.tc ?? 0) < 25
+                ? `★★ USE CRUCIBLE · 25 TC — you have ${player?.tc ?? 0}`
+                : '★★ USE CRUCIBLE · 25 TC'}
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -457,10 +529,57 @@ export function VendorScreen() {
         </Text>
       )}
 
+      {/* OTA-1124 — while a group is open the bar TAKES THE TAB ROW'S PLACE and
+          holds it. Owner: "the new line that says sell group needs to stay
+          anchored at the top and replace the buy sell buttons until, you either
+          sell the group or cancel the group."
+          Two things follow from that, and both are the point. It is ANCHORED:
+          the tab row lives outside the ScrollView, so putting the bar here means
+          it cannot scroll away from you while you tick rows further down the
+          list — which is exactly when you most want to see the running total.
+          And it REPLACES: BUY is not a thing you can wander into mid-group, so
+          the only two ways out are the two the bar offers. That is what makes
+          the mode honest instead of something you can leave by accident. */}
+      {sellSelectMode ? (
+        <View style={styles.groupBar}>
+          <View style={styles.groupBarInfo}>
+            <Text style={styles.groupBarCount}>
+              ☑ {selectedRows.length} picked{selectedUnits > selectedRows.length ? ` · ${selectedUnits} units` : ''}
+            </Text>
+            <Text style={styles.groupBarTotal}>+{selectedTotal} TC</Text>
+          </View>
+          <View style={styles.groupBarActions}>
+            <TouchableOpacity
+              onPress={exitSellSelect}
+              style={styles.groupBarCancel}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Cancel the group and go back to selling one at a time"
+            >
+              <Text style={styles.groupBarCancelText}>CANCEL</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setGroupSellConfirm(true)}
+              disabled={selectedRows.length === 0}
+              style={[styles.groupBarSell, selectedRows.length === 0 && styles.groupBarSellOff]}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: selectedRows.length === 0 }}
+              accessibilityLabel={`Sell the group of ${selectedRows.length} for ${selectedTotal} trade coin`}
+            >
+              <Text style={styles.groupBarSellText}>SELL GROUP</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : (
       <View style={styles.tabRow}>
         <TouchableOpacity
           style={[styles.tab, mode === 'buy' && styles.tabActive]}
-          onPress={() => setMode('buy')}
+          // OTA-1122 — leaving the SELL tab ends the group. A selection you can
+          // no longer see is a hidden mode waiting to surprise you on the way back.
+          // OTA-1124 — belt-and-braces now: while a group is open this row isn't
+          // even rendered, so BUY is unreachable until the group resolves.
+          onPress={() => { exitSellSelect(); setMode('buy'); }}
           activeOpacity={0.7}
           accessibilityRole="button"
           accessibilityState={{ selected: mode === 'buy' }}
@@ -490,6 +609,7 @@ export function VendorScreen() {
           </TouchableOpacity>
         )}
       </View>
+      )}
 
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
         {mode === 'buy' ? (
@@ -667,6 +787,11 @@ export function VendorScreen() {
                 ))}
               </View>
             )}
+            {/* OTA-1124 — the group bar moved OUT of this scrolling list and up
+                into the tab row's slot, where it stays anchored. It used to sit
+                here and scroll away the moment you started ticking rows further
+                down — losing sight of the running total exactly when it starts
+                mattering. */}
             {sellable.length === 0 ? (
               <Text style={styles.empty}>
                 Nothing in your pack worth selling. Equipped gear can't be sold — unequip from the
@@ -694,15 +819,30 @@ export function VendorScreen() {
               return (
                 <TouchableOpacity
                   key={`sell_${item.id}`}
-                  style={styles.offerRow}
-                  onPress={() => openSell(item.name, price, item.id)}
+                  // OTA-1122 — a ticked row is outlined so the group reads at a
+                  // glance down the list, not just from the ✓ at its head.
+                  style={[styles.offerRow, sellSelected.includes(item.id) && styles.offerRowPicked]}
+                  // Hold to start a group; once in the mode a plain tap adds or
+                  // removes. Outside the mode a tap is the ordinary single sale.
+                  onPress={() => (sellSelectMode ? toggleSellSelect(item.id) : openSell(item.name, price, item.id))}
+                  onLongPress={() => (sellSelectMode ? toggleSellSelect(item.id) : beginSellSelect(item.id))}
+                  delayLongPress={350}
                   activeOpacity={0.7}
-                  accessibilityRole="button"
+                  accessibilityRole={sellSelectMode ? 'checkbox' : 'button'}
+                  accessibilityState={sellSelectMode ? { checked: sellSelected.includes(item.id) } : undefined}
+                  accessibilityHint={sellSelectMode
+                    ? 'Tap to add or remove this from the group.'
+                    : 'Tap to sell this one. Hold to start selecting a group.'}
                 >
                   <View style={[styles.offerStripe, { backgroundColor: rarityColor(preview.rarity) }]} />
                   <View style={styles.offerBody}>
                     <View style={styles.offerHead}>
                       <Text style={styles.offerName} numberOfLines={1}>
+                        {sellSelectMode ? (
+                          <Text style={sellSelected.includes(item.id) ? styles.pickTick : styles.pickTickOff}>
+                            {sellSelected.includes(item.id) ? '☑ ' : '☐ '}
+                          </Text>
+                        ) : null}
                         {item.name}{item.quantity > 1 ? ` (x${item.quantity})` : ''}
                         {bandolierIds.has(item.id)
                           ? <Text style={styles.loadoutTag}>  ⚑ in bandolier</Text>
@@ -840,6 +980,37 @@ export function VendorScreen() {
         onRequestClose={cancel}
       />
 
+      {/* OTA-1122 — group-sale confirmation. It carries the SAME warnings the
+          single-item confirm would have raised, because the whole risk of a bulk
+          action is that it quietly does what one action would have stopped to
+          ask about: the gate-loss warning (selling your only climbing strap) and
+          the loadout flag (something racked in your bandolier or pouch). */}
+      <BrandedModal
+        visible={groupSellConfirm}
+        title={`Sell ${selectedRows.length} to ${vendor.name}`}
+        contextLine={`+${selectedTotal} TC${selectedUnits > selectedRows.length ? ` for ${selectedUnits} units` : ''}`}
+        body={[
+          selectedRows
+            .map((r) => `· ${r.item.name}${(r.item.quantity ?? 1) > 1 ? ` ×${r.item.quantity}` : ''} — +${r.price * (r.item.quantity ?? 1)} TC`)
+            .join('\n'),
+          selectedLoadout.length > 0
+            ? `⚑ Part of your working loadout: ${selectedLoadout.join(', ')}.`
+            : '',
+          selectedGateLosses.length > 0
+            ? `⚠ This is your last way to ${[...new Set(selectedGateLosses.map((g) => g.loss.label))].join(', and your last way to ')}. Sell it and you lose that until you find another.`
+            : '',
+        ].filter(Boolean).join('\n\n')}
+        buttons={[
+          { label: 'Back', onPress: () => setGroupSellConfirm(false), tone: 'neutral' as const },
+          {
+            label: `Sell group (+${selectedTotal} TC)`,
+            onPress: doGroupSell,
+            tone: selectedGateLosses.length > 0 ? ('destructive' as const) : ('primary' as const),
+          },
+        ]}
+        onRequestClose={() => setGroupSellConfirm(false)}
+      />
+
       {/* Buy & Equip — hand choice for weapons (main vs off). Single-slot gear
           equips without this prompt. */}
       <BrandedModal
@@ -954,6 +1125,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   crucibleBtnText: { color: '#d9b8f0', fontSize: 12, fontWeight: '800', letterSpacing: 1 },
+  crucibleBtnShort: { color: '#e0a75f' }, // OTA-1047 — short-of-coin amber
   walletRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1030,6 +1202,48 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   offerRowBroke: { opacity: 0.45 },
+  // OTA-1122 — group-sell selection. The ticked row is outlined in the same
+  // trade-gold the sell prices use, so a group reads as one block down the list.
+  offerRowPicked: { borderColor: '#c9a86a', backgroundColor: '#1e1a12' },
+  pickTick: { color: '#c9a86a', fontWeight: '700' },
+  pickTickOff: { color: '#6b5c3a' },
+  // The bar only exists while a group does; it states the pay-out up front,
+  // because what the group is worth is the whole reason to build one.
+  groupBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1e1a12',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 8,
+    gap: 8,
+  },
+  groupBarInfo: { flexShrink: 1 },
+  groupBarCount: { color: '#e6d8b3', fontSize: 12, fontWeight: '700' },
+  groupBarTotal: { color: '#9ec96a', fontSize: 13, fontWeight: '700', marginTop: 2 },
+  groupBarActions: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  groupBarCancel: {
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  groupBarCancelText: { color: '#a2977b', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  groupBarSell: {
+    backgroundColor: '#3d5a2c',
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  groupBarSellOff: { opacity: 0.4 },
+  groupBarSellText: { color: '#e6d8b3', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   offerStripe: { width: 4 },
   offerBody: { flex: 1, padding: 10 },
   // CONTRACTS tab — vendor-side list of available hunts / mysteries

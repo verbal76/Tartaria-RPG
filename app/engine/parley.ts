@@ -1,7 +1,7 @@
 // OTA-808 — Parley: the two-button social encounter. When you speak to a wild NPC
 // or an animal you're fighting, the game surfaces a CHOICE with real, asymmetric
 // stakes instead of a flat "roll to talk." This module is the pure decision core;
-// the store orchestrates it and ParleyModal renders it.
+// the store orchestrates it and ParleySheet renders it.
 //
 // THE LOCK-AND-KEY. Every target has a TEMPERAMENT, and exactly one approach is the
 // "key" that fits it:

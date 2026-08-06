@@ -122,8 +122,14 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
     { line: 'A thread of cold air leaks from somewhere behind the rubble.', nouns: ['cold', 'air', 'draft', 'breeze'] },
   ],
   resonance: [
-    { line: 'A faint resonance pulses from the south. Something there is awake.', nouns: ['resonance', 'pulse', 'hum', 'vibration'] },
+    // OTA-1048 — pool widened 2 → 5 (and the hardcoded compass direction cut): with
+    // only two lines this hook repeated verbatim often enough that the owner
+    // called it overused even before the weight cut.
+    { line: 'A faint resonance pulses from somewhere close. Something there is awake.', nouns: ['resonance', 'pulse', 'hum', 'vibration'] },
     { line: 'The Aetheric haze thickens around one specific spot. You cannot tell why.', nouns: ['haze', 'thickening', 'spot', 'aether'] },
+    { line: 'A low harmonic rises out of the ground and fades, as if something beneath just turned over in its sleep.', nouns: ['resonance', 'harmonic', 'hum', 'ground'] },
+    { line: 'Grit on the mud jumps in small, patient rings — a pulse underfoot with no visible source.', nouns: ['pulse', 'rings', 'grit', 'vibration'] },
+    { line: 'Your teeth buzz for half a breath. Somewhere near, the Aether is keeping a beat.', nouns: ['resonance', 'buzz', 'beat', 'aether'] },
   ],
   half_buried_spire: [
     { line: 'Half a Tartarian spire juts from the mud like the bone of a long-dead beast, the top three storeys still defiant.', nouns: ['spire', 'tower', 'top', 'building'] },
@@ -260,6 +266,12 @@ export type HookEffect =
   | { type: 'grant_tc'; amount: number }
   | { type: 'grant_item'; name: string }
   | { type: 'spawn_enemy_tag'; tag: string }
+  // OTA-1109 — spawn a NAMED enemy. For hooks whose narration promises a
+  // specific creature: mud_golem_stir narrated "a hulking shape of stone and
+  // silt … The Golem turns toward your scent" and then spawn_enemy_tag
+  // 'Construct' rolled an Aetheric Scarab (owner's log). When the prose
+  // names the monster, the spawn must honor the name.
+  | { type: 'spawn_enemy_name'; name: string }
   | { type: 'heal'; amount: number }
   | { type: 'damage'; amount: number; cause: string }
   | { type: 'unlock_location'; locationId: string }
@@ -583,7 +595,8 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     {
       line: 'The Golem turns toward your scent. It has decided.',
       arbiterLine: '"Aether Golems do not negotiate," the Arbiter says.',
-      effects: [{ type: 'spawn_enemy_tag', tag: 'Construct' }],
+      // OTA-1109 — the narration names a golem, so a golem is what stands up.
+      effects: [{ type: 'spawn_enemy_name', name: 'Mud Golem' }],
       done: true,
     },
   ],
@@ -1007,7 +1020,7 @@ export const HOOK_WEIGHTS: Record<HookKind, number> = {
   glint: 10,
   handprint: 6,
   thread: 8,
-  resonance: 5,
+  resonance: 2, // OTA-1048 — was 5; the owner called it overused, and with the smallest line pool it repeated hardest
   half_buried_spire: 8,
   etheric_storm: 5,
   pulsing_mud: 9,

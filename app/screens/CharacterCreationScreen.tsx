@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
+import { getStoryMotives } from '../engine/story'; // OTA-1041
+// OTA-1089 — Phase 4: the last thing you say before you walk.
+import { PRESET_TIERS, PRESSURE_PROFILES, DEFAULT_PRESSURE, DIFFICULTY_SYSTEMS, type PressureTier, type PressureCustom } from '../engine/pressure';
+// OTA-1136 — the CUSTOM row's popup.
+import { DifficultyCustomModal } from '../components/DifficultyCustomModal';
 
 // Tungsten Spire — the 'name' step is gone. New flow: race → faction →
 // BEGIN. The player gives their name in-game when the Arbiter prompts
@@ -9,12 +14,26 @@ import { getRaces, getFactions } from '../engine/character';
 // removes the in-screen TextInput that was driving the Android soft-
 // keyboard race the Nickel Tine + Zinc Anvil OTAs were chasing.
 
-type Step = 'race' | 'faction';
+// OTA-1041 — a third step: THE REASON YOU CAME DOWN. The motive shapes the
+// opening crawl and (phases 2-3) the story beats woven through the main quest.
+// OTA-1089 — a fourth and final step: HOW MUCH DOES THE MUD TAKE? It sits
+// AFTER the motive on purpose. You say why you came down, and then you say what
+// you are prepared to have it cost — which is the same order the Arbiter would
+// ask in, and the last thing decided before the crawl starts.
+type Step = 'race' | 'faction' | 'motive' | 'pressure';
 
-const STEP_ORDER: Step[] = ['race', 'faction'];
+const STEP_ORDER: Step[] = ['race', 'faction', 'motive', 'pressure'];
 const STEP_TITLE: Record<Step, string> = {
   race: 'CHOOSE YOUR RACE',
   faction: 'CHOOSE YOUR FACTION',
+  motive: 'WHY DID YOU COME DOWN?',
+  // OTA-1097 — was 'HOW MUCH DOES IT TAKE?'. Owner: "replace it with a more
+  // recognizable difficulty level title." The evocative header worked as
+  // flavor but failed as signage — a new player picking a permanent,
+  // never-raisable setting deserves to know instantly that THIS is the
+  // difficulty screen. The flavor lives on where it belongs: in the four
+  // first-person tier names and their plain subtitles below.
+  pressure: 'CHOOSE YOUR DIFFICULTY',
 };
 
 export function CharacterCreationScreen() {
@@ -24,9 +43,19 @@ export function CharacterCreationScreen() {
   const races = getRaces();
   const factions = getFactions();
 
+  const motives = getStoryMotives();
+
   const [step, setStep] = useState<Step>('race');
   const [raceId, setRaceId] = useState(races[0]!.id);
   const [factionId, setFactionId] = useState(factions[0]!.id);
+  const [motiveId, setMotiveId] = useState(motives[0]!.id);
+  const [pressure, setPressure] = useState<PressureTier>(DEFAULT_PRESSURE); // OTA-1089
+  // OTA-1136 — CUSTOM. `pressureCustom` is only sent when the tier is 'custom';
+  // picking a preset afterwards leaves it behind rather than clearing it, so a
+  // player who tries custom, backs out to a preset, then returns finds their
+  // switches where they left them.
+  const [pressureCustom, setPressureCustom] = useState<PressureCustom | undefined>(undefined);
+  const [customOpen, setCustomOpen] = useState(false);
 
   const stepIndex = STEP_ORDER.indexOf(step);
   const selectedRace = races.find((r) => r.id === raceId) ?? races[0]!;
@@ -35,8 +64,12 @@ export function CharacterCreationScreen() {
   const goBack = () => {
     if (step === 'race') {
       setScreen('title');
-    } else {
+    } else if (step === 'faction') {
       setStep('race');
+    } else if (step === 'motive') {
+      setStep('faction');
+    } else {
+      setStep('motive');
     }
   };
 
@@ -45,14 +78,25 @@ export function CharacterCreationScreen() {
       setStep('faction');
       return;
     }
-    // Faction step → straight into the game with an empty name; the
+    if (step === 'faction') {
+      setStep('motive');
+      return;
+    }
+    if (step === 'motive') {
+      setStep('pressure');
+      return;
+    }
+    // Motive step → straight into the game with an empty name; the
     // Arbiter prompts for it in the outpost. tutorialStep starts at 0
     // (the name beat) and the InputBox routes the next submission as
-    // the player's name.
-    void startNewGame({ name: '', raceId, factionId });
+    // the player's name. The motive drives the opening crawl.
+    void startNewGame({
+      name: '', raceId, factionId, motiveId, pressure,
+      ...(pressure === 'custom' && pressureCustom ? { pressureCustom } : {}),
+    });
   };
 
-  const nextLabel = step === 'faction' ? 'BEGIN' : 'NEXT →';
+  const nextLabel = step === 'pressure' ? 'BEGIN' : 'NEXT →';
 
   return (
     <View style={styles.container}>
@@ -130,6 +174,99 @@ export function CharacterCreationScreen() {
             <View style={styles.beginBlock}>
               <Text style={styles.contextLine}>
                 {selectedRace.name} · {selectedFaction.name}
+              </Text>
+              <Text style={styles.beginHint}>
+                One more step: the reason you came down.
+              </Text>
+            </View>
+          </>
+        )}
+
+        {step === 'motive' && (
+          <>
+            {/* OTA-1041 — THE REASON YOU CAME DOWN. The pick shapes the opening
+                crawl now and the story beats woven through the main quest in
+                later phases. There is no wrong answer and no stat attached —
+                this is who you are, not what you roll. */}
+            <Text style={styles.contextLine}>
+              {selectedRace.name} · {selectedFaction.name}
+            </Text>
+            {motives.map((m) => (
+              <TouchableOpacity
+                key={m.id}
+                style={[styles.option, motiveId === m.id && styles.optionSelected]}
+                onPress={() => setMotiveId(m.id)}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityState={{ selected: motiveId === m.id }}
+              >
+                <Text style={styles.optionName}>{m.title}</Text>
+                <Text style={styles.optionDesc}>{m.blurb}</Text>
+                {motiveId === m.id && (
+                  <Text style={styles.optionFlavor}>{m.pages[0]?.split('\n')[0] ?? ''}</Text>
+                )}
+              </TouchableOpacity>
+            ))}
+          </>
+        )}
+
+        {step === 'pressure' && (
+          <>
+            {/* OTA-1089 — PHASE 4 BEHIND ITS TOGGLE. Every option carries a
+                plain subtitle: a difficulty name that sounds good and explains
+                nothing is a trap on a screen you cannot revisit. */}
+            <Text style={styles.contextLine}>
+              {selectedRace.name} · {selectedFaction.name} · {motives.find((m) => m.id === motiveId)?.title ?? ''}
+            </Text>
+            {PRESET_TIERS.map((id) => {
+              const prof = PRESSURE_PROFILES[id];
+              return (
+                <TouchableOpacity
+                  key={id}
+                  style={[styles.option, pressure === id && styles.optionSelected]}
+                  onPress={() => setPressure(id)}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: pressure === id }}
+                  accessibilityLabel={`${prof.label} ${prof.subtitle}`}
+                >
+                  <Text style={styles.optionName}>{prof.label}</Text>
+                  <Text style={styles.optionDesc}>{prof.subtitle}</Text>
+                </TouchableOpacity>
+              );
+            })}
+            {/* OTA-1136 — CUSTOM sits BELOW the four presets on purpose. The
+                survey is explicit that sliders give the best experience and the
+                worst discoverability, so the presets stay the front door and
+                this is the advanced option behind it. */}
+            <TouchableOpacity
+              style={[styles.option, pressure === 'custom' && styles.optionSelected]}
+              onPress={() => setCustomOpen(true)}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityState={{ selected: pressure === 'custom' }}
+              accessibilityLabel="Custom difficulty. Choose which systems the difficulty affects."
+            >
+              <Text style={styles.optionName}>&quot;Let me choose what it takes.&quot;</Text>
+              <Text style={styles.optionDesc}>
+                {pressure === 'custom' && pressureCustom
+                  ? `${pressureCustom.systems.length} of ${DIFFICULTY_SYSTEMS.length} systems · tap to change`
+                  : 'Pick how hard, then pick exactly which systems it is allowed to touch.'}
+              </Text>
+            </TouchableOpacity>
+            <DifficultyCustomModal
+              visible={customOpen}
+              initial={pressureCustom}
+              onCancel={() => setCustomOpen(false)}
+              onConfirm={(c) => {
+                setPressureCustom(c);
+                setPressure('custom');
+                setCustomOpen(false);
+              }}
+            />
+            <View style={styles.beginBlock}>
+              <Text style={styles.beginHint}>
+                You can ease this later from your character sheet if it turns out to be too much. You can never raise it.
               </Text>
               <Text style={styles.beginHint}>
                 Tap BEGIN below. The Arbiter will greet you in the outpost and ask your name.
