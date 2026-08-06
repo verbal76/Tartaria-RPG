@@ -38720,7 +38720,16 @@ function bankSceneIntro(locId: string, text: string): void {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const piper = require('../voice/PiperTTSManager') as typeof import('../voice/PiperTTSManager');
-    void piper.presynthesize(text).catch(() => { /* a miss costs one normal synth */ });
+    // ⚠ OTA-1162 (audit) — presynthesize what will actually be SPOKEN. The live
+    // path runs every arbiter line through stripArbiterFrame before Kokoro sees
+    // it (TTSController), but the bank was pre-synthesizing the RAW text — so
+    // for any intro carrying quoted dialogue, the cache key could never match
+    // the chunks speak() looks up: the homework audio was computed, paid for,
+    // and unreachable. Quote-free prose passes through the strip unchanged, so
+    // this is a no-op for the common case and the fix for the rest.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { stripArbiterFrame: safStrip } = require('../voice/arbiterFrame') as typeof import('../voice/arbiterFrame');
+    void piper.presynthesize(safStrip(text)).catch(() => { /* a miss costs one normal synth */ });
   } catch { /* voice unavailable (tests, or TTS off) — the text bank still works */ }
   // Total ceiling — evict from the location holding the OLDEST entry, which is
   // the one the player is least likely to walk back into.

@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.71';
+export const DISPLAY_VERSION = '4.29.72';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23118,7 +23118,48 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stripArbiterFrame suite re-authored where it asserted the
 // run-on join, ota1131/ota1157 retargeted on the discard label.
 // DISPLAY_VERSION 4.29.71.
-export const OTA_BUILD_ID = '2026-08-06-1161-the-comma-that-ate-the-beat';
+// OTA-1162 — THE 24-HOUR AUDIT, AND THE FOUR THINGS IT CAUGHT.
+// Owner: "run a full audit checking and testing everything done
+// in the last 24 hrs." Scope OTA-1151..1161 (golem 1128..1138) —
+// every claim re-derived against live code, full gates re-run on
+// both lines, cross-line parity re-verified. Most claims held.
+// Four did not, and every one is a lesson from the last day
+// applied one file short of everywhere:
+// ⚠ 1. playerPowerScore WAS A FOURTH INLINE COPY OF THE GEAR-AC
+// WALK — found by the sweep OTA-1158 said should never be needed
+// again, carrying both of 1158's defects in miniature: no
+// amulet/ring AC, and the catalog acBonus where combat prefers
+// the rolled instance. The Power gauge disagreed with the panel
+// by exactly the jewellery, so defensive rings gave zero feedback
+// on the one meter built to answer "did that help?" (OTA-929).
+// It now calls standingAc — the same call, not the same idea.
+// ⚠ 2. THE ENEMY PANEL STILL PRINTED e.damage RAW in two places —
+// OTA-1159's boss understatement on the surface a player opens
+// SPECIFICALLY to size up a fight: the boss card read 1d8+3 while
+// the resolver rolled 1d8+3+1d6 twice. enemyDamageCompact
+// ("1d8+3+1d6 ×2") is the chip-width truth; both sites routed.
+// ⚠ 3. THE SCENE-INTRO BANK PRE-SYNTHESIZED RAW TEXT while the
+// live path strips arbiter frames before Kokoro — so for any
+// intro carrying quoted dialogue the presynth cache key could
+// never match the chunks speak() looks up: homework audio
+// computed, paid for, unreachable. The bank now presynthesizes
+// the STRIPPED form; quote-free prose passes through unchanged.
+// ⚠ 4. llama.rn's prompt_ms IS NOT ALWAYS PER-CALL. The device
+// log carried `investigate_lore ok 5353ms read 54112ms` — a
+// 54-second prefill inside a 5-second call. That impossible
+// sample fed OTA-1150's ms/tok range unguarded, and the PARKED
+// caching investigation is waiting on exactly that range to
+// decide anything. A prefill exceeding wall-clock no longer
+// moves it.
+// Verified live in the same log, no change needed: 1153 presynth
+// (cached hits), 1154 flavor budget (held twice), 1155 timing
+// format, 1157 interruptible (two clean preempts), 1160's drone
+// fight showing the weakness loop at its best.
+// New suite ota1162TheAuditBatch (13 tests); ota1153 retargeted
+// on the presynth call.
+// DISPLAY_VERSION 4.29.72.
+export const OTA_BUILD_ID = '2026-08-06-1162-the-audit-batch';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1161-the-comma-that-ate-the-beat';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1160-worth-bringing';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1159-how-he-died-in-one-input';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1158-three-points-of-jewellery';

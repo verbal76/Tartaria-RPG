@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { enemyDamageCompact } from '../engine/combatRules';
 import {
   View,
   Text,
@@ -301,7 +302,8 @@ function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { weak: s
   }
   lines.push('');
   lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}`);
-  lines.push(`Attack ${atkLabel}     Damage ${e.damage}${dealsType ? ` (${cap(dealsType)})` : ''}`);
+  // OTA-1162 (audit) — a boss's real per-round output, not the notation third of it.
+  lines.push(`Attack ${atkLabel}     Damage ${enemyDamageCompact(e)}${dealsType ? ` (${cap(dealsType)})` : ''}`);
   // OTA-818/819 — a non-boss enemy's (randomized) defenses are WIS-gated: read them up
   // front only with enough Wisdom, else discover by hitting. OTA-819 — the read is
   // DIEGETIC: narrate what you notice, with the damage type in parens.
@@ -417,7 +419,7 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
         <Stat label="HP" value={`${view.currentHp}/${view.enemy.hp}`} />
         <Stat label="AC" value={String(ac)} />
         <Stat label="ATK" value={atkLabel} />
-        <Stat label="DMG" value={String(view.enemy.damage)} />
+        <Stat label="DMG" value={enemyDamageCompact(view.enemy)} />
       </View>
       <View style={styles.defs}>
         {/* OTA-818 — a non-boss enemy's randomized RESIST/WEAK are WIS-gated (read

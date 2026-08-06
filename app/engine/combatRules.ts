@@ -879,3 +879,13 @@ export function enemyDamageDisplay(enemy: { damage?: unknown; boss?: boolean }):
   if (!enemy.boss) return `${base} damage on a hit`;
   return `${base}+1d6 damage on a hit, twice per round`;
 }
+
+/** OTA-1162 (audit) — the same truth in chip width. The 24-hour audit found the
+ *  EnemyPanel still printing `e.damage` raw in two places, which is OTA-1159's
+ *  bug on the surface the player opens specifically to size a fight up: a boss
+ *  read `1d8+3` on its own card while the resolver rolled `1d8+3+1d6` twice.
+ *  The long form above doesn't fit a stat chip, so the panel gets this. */
+export function enemyDamageCompact(enemy: { damage?: unknown; boss?: boolean }): string {
+  const base = String(enemy.damage ?? '').trim() || '1d6';
+  return enemy.boss ? `${base}+1d6 ×2` : base;
+}
