@@ -1142,7 +1142,58 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ TIMESTAMP THE VOICE (2026-08-05, latest). BOTH LINES.** HAL OTA-1155 /
+- **⚠⚠ THE AC THAT NEVER DROPPED (2026-08-05, latest). BOTH LINES.** HAL
+  OTA-1156 / golem OTA-1133. Reported three separate times as a **drop** —
+  *"AC 16 → AC 10, recurring"* — and two builds of instrumentation were aimed at
+  catching the moment it fell. **It never fell. There was no moment.**
+
+  ⚠ **`player.ac` is the racial base, and nothing ever updates it.** There is
+  exactly one write to that field in the entire codebase:
+
+  ```ts
+  ac: race.baseAC,        // character.ts, at creation
+  ```
+
+  No equip handler touches it. No unequip handler touches it. It is the number
+  the character was born with, for the whole life of the save.
+
+  Five consumers knew that and added the worn-armour stack themselves. **Two
+  printed the raw field as though it were the finished number:**
+
+  - `contextInjector` — `AC ${player.ac}` → **the LLM was told AC 10**
+  - the Arbiter's look-you-over line → **and said "AC 10" out loud**
+
+  So the character sheet showed **16** while the Arbiter, asked the same question
+  seconds later, answered **10**. That is the entire bug: not a drop over time,
+  but two surfaces that never agreed. The device log has it cold — eight pieces
+  of worn gear listed on one line, `AC 10` on the next.
+
+  ⚠ **And the instrumentation missed it for a reason worth recording.**
+  OTA-1147's `ac-shift` ledger only fires inside `applyEnemyCounter` — *in
+  combat*. The owner fled both fights in that log, so it never ran once. **A
+  ledger that can only speak in combat cannot describe a bug that lives on the
+  character sheet.** The lesson is not "add more logging"; it is that a
+  measurement has to be able to observe the thing being measured.
+
+  ⚠ **Why one helper rather than two patches.** The five "correct" consumers did
+  not agree with *each other* either — each re-derived the sum inline, which is
+  how a field like this drifts in the first place. Patching only the two loud
+  sites would have left five copies of the same arithmetic waiting to disagree
+  again. **`standingAc()`** in `equipment.ts` is now the single place that
+  answers "what is my AC", and the sheet, the Arbiter and the prompt all call it.
+
+  **Scope is deliberate.** `standingAc` is the *standing* number: racial base +
+  worn armour, trimmed. Combat's `applyEnemyCounter` legitimately adds
+  scene-conditional racial context, the ruins-defence title, and live status
+  effects, because those exist only inside a fight — `effectiveACBreakdown`
+  remains the authority there, and **it starts from the same base**, which is
+  what stops the two drifting.
+
+  New suite `ota1156TheAcThatNeverDropped` (14 tests), including the
+  reproduction (naked 10, five worn pieces 20) and a regression guard that no
+  surface interpolates the raw field as an answer again.
+
+- **⚠⚠ TIMESTAMP THE VOICE (2026-08-05). BOTH LINES.** HAL OTA-1155 /
   golem OTA-1132. After OTA-1153 shipped, the owner was still clocking it by
   hand:
 
