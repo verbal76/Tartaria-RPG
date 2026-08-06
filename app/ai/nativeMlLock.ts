@@ -82,6 +82,47 @@ export const ML_PRIORITY_HOMEWORK = -1;
 export const ML_PRIORITY_VOICE = 2;
 export const ML_PRIORITY_LLM = 1;
 
+/** ⚠ OTA-1167 — THE HANDOFF WINDOW: PRIORITY CANNOT RANK WORK THAT HASN'T
+ *  ARRIVED YET.
+ *
+ *  OTA-1153 put the voice above the LLM and OTA-1157 made item synthesis
+ *  interruptible, and the device log still showed this on a save load:
+ *
+ *    [:25.994] arbiter  "Welcome back, Verbal. …"        ← text on screen
+ *    [:29.722] qwen⏱   item_synthesis preempted 3565ms  in 328t→out 0t
+ *    [:30.714] voice⏱  gap 4720ms (wait 3604ms + synth 849ms)
+ *
+ *  Two facts, and together they explain the whole 4.7 s:
+ *
+ *  1. THE JOB STARTED AFTER THE LINE WAS QUEUED. The greeting is stamped
+ *     `queuedAt` and handed to drain(), which then AWAITS the voice model and a
+ *     durable crash breadcrumb before it ever calls runExclusiveNativeMl. The
+ *     synthesis grabbed the lock inside that gap. Priority never got a say: at
+ *     the moment pumpMl chose, the voice was not in the pending set.
+ *
+ *  2. `out 0t` — THE PREEMPT COULD NOT LAND. stopCompletion() is checked in
+ *     llama.cpp's DECODE loop, and this job never reached decode: all 3565 ms
+ *     was PREFILL of a 328-token prompt (~11 ms/token on a Tensor G5). The hook
+ *     fired, the outcome is correctly filed as `preempted`, and it saved ~40 ms
+ *     of a ~3.6 s wait. OTA-1157's note — "when the voice arrives mid-generation
+ *     llama.cpp is asked to stop" — holds only once tokens are being written.
+ *     Prefill is uninterruptible, and prefill is where this model spends its
+ *     time.
+ *
+ *  So the fix cannot be another reordering or another interrupt. It has to stop
+ *  the job from STARTING: a voice line that has been accepted for speech RESERVES
+ *  the lock for the few hundred milliseconds it needs to get here, and anything
+ *  below voice waits that out instead of claiming a slot it will hold for
+ *  seconds.
+ *
+ *  ⚠ BOUNDED BY CONSTRUCTION, because a reservation that leaks would starve the
+ *  LLM outright: it carries a deadline (VOICE_RESERVATION_MS), it is released
+ *  the moment the line's audio is in hand, and it is only taken when a line
+ *  actually needs synthesis — a pre-synthesised (OTA-1153 banked) line plays
+ *  without the lock and never reserves it. Exclusivity is untouched; this
+ *  schedules starts, it does not overlap them. */
+export const VOICE_RESERVATION_MS = 1200;
+
 interface PendingMl {
   fn: () => Promise<unknown>;
   resolve: (v: unknown) => void;
@@ -101,6 +142,12 @@ let seqCounter = 0;
  *  Exactly one op runs at a time, so a single slot is the whole registry. */
 let runningPriority = ML_PRIORITY_LLM;
 let runningPreempt: (() => void) | null = null;
+/** OTA-1167 — epoch (ms) until which a queued-but-not-yet-arrived voice line
+ *  holds the lock open. 0 = no reservation. */
+let voiceReservedUntil = 0;
+/** The single pending re-pump scheduled for when a reservation expires. One
+ *  timer at a time — a deferred pump re-evaluates the whole queue anyway. */
+let deferTimer: ReturnType<typeof setTimeout> | null = null;
 
 function pumpMl(): void {
   if (running || pending.length === 0) return;
@@ -112,6 +159,20 @@ function pumpMl(): void {
     const a = pending[i]!;
     const b = pending[bestIdx]!;
     if (a.priority > b.priority || (a.priority === b.priority && a.seq < b.seq)) bestIdx = i;
+  }
+  // ⚠ OTA-1167 — hold the slot for a voice line that is on its way but has not
+  // reached the lock yet (see VOICE_RESERVATION_MS). Only work BELOW voice
+  // waits: a voice op is the thing being waited for, and homework already
+  // yields to everything. The deadline makes this self-clearing, so a line that
+  // never arrives costs the LLM one short deferral and nothing more.
+  if (pending[bestIdx]!.priority < ML_PRIORITY_VOICE) {
+    const holdMs = voiceReservedUntil - Date.now();
+    if (holdMs > 0) {
+      if (deferTimer === null) {
+        deferTimer = setTimeout(() => { deferTimer = null; pumpMl(); }, holdMs + 1);
+      }
+      return;
+    }
   }
   const task = pending.splice(bestIdx, 1)[0]!;
   running = true;
@@ -158,7 +219,36 @@ export function runExclusiveNativeMl<T>(
   });
 }
 
+/** ⚠ OTA-1167 — a voice line has been accepted for speech and is on its way to
+ *  this lock. Hold the slot: work below voice defers until the line arrives or
+ *  the deadline passes, whichever comes first. Call ONLY for lines that will
+ *  actually be synthesised — a banked (pre-synthesised) line never takes the
+ *  lock, so reserving for it would stall the LLM for nothing. */
+export function reserveVoiceSlot(ms: number = VOICE_RESERVATION_MS): void {
+  voiceReservedUntil = Math.max(voiceReservedUntil, Date.now() + ms);
+}
+
+/** OTA-1167 — the reserved line has its audio (it acquired the lock, or the
+ *  bank had it, or it was dropped). Release immediately and pump, so the LLM
+ *  waits the real handoff and not the whole deadline. */
+export function releaseVoiceSlot(): void {
+  voiceReservedUntil = 0;
+  if (deferTimer !== null) { clearTimeout(deferTimer); deferTimer = null; }
+  pumpMl();
+}
+
 /** Tests only — the lock is module state. */
-export function _mlLockState(): { running: boolean; queued: number; runningPriority: number } {
-  return { running, queued: pending.length, runningPriority };
+export function _mlLockState(): {
+  running: boolean; queued: number; runningPriority: number; voiceReserved: boolean;
+} {
+  return {
+    running, queued: pending.length, runningPriority,
+    voiceReserved: Date.now() < voiceReservedUntil,
+  };
+}
+
+/** Tests only — drop any reservation so suites don't leak state into each other. */
+export function _clearVoiceReservation(): void {
+  voiceReservedUntil = 0;
+  if (deferTimer !== null) { clearTimeout(deferTimer); deferTimer = null; }
 }

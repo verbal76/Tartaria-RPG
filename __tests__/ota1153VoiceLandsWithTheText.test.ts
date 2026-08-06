@@ -178,7 +178,12 @@ describe('OTA-1153 — ⚠ pre-synthesis: text and voice land together', () => {
   });
 
   it('speak() consumes the cache at enqueue, and it is one-shot', () => {
-    expect(TTS).toContain('resolvedSamples: takePresynth(resolvedVoice, chunk),');
+    // ⚠ RETARGETED for OTA-1167: the take is now bound to `banked` first, because
+    // the reservation has to know whether this line needs the lock at all before
+    // it decides to claim one. Same single call, same place (enqueue), same
+    // one-shot delete — only the inline expression became a named one.
+    expect(TTS).toContain('const banked = takePresynth(resolvedVoice, chunk);');
+    expect(TTS).toContain('resolvedSamples: banked,');
     const take = TTS.slice(TTS.indexOf('function takePresynth'));
     expect(take.slice(0, 400)).toContain('presynth.delete(k)');
   });
