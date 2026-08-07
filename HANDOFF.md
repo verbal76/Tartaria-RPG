@@ -712,6 +712,45 @@ Key invariants worth knowing:
   Legendary), NOT input rarity. Variety matters, not rarity.
 
 ## 8. Open issues / watch list (current)
+- **✅ ANSWERED (2026-08-07) — THE HEAVY SIMS JOB IS RED ON EVERY RECENT COMMIT, AND
+  IT IS NOT A REGRESSION. Do not re-investigate from scratch.** `jest (heavy sims ·
+  reported)` fails on golem `efc30c52` (OTA-1155, HAL OTA-1178) with **exactly the same three tests
+  and exactly the same numbers** as on `a7a21de9` (OTA-1154, the commit before it):
+
+  | test | expected | received |
+  |---|---|---|
+  | `playerInputChaosSim` — head-noun match resolves the right item | ≥ 0.95 | **0.03** |
+  | `movementStress` — approach success rate | ≥ 0.75 | 0.7142857142857143 |
+  | `encounterStress` — stepDirection spawns a skirmish enemy | true | false |
+
+  Byte-identical across both runs, so OTA-1155 moved nothing here. The job is
+  `continue-on-error: true` in ci.yml by design, so the CI run still reports
+  success; you have to open the job to see it.
+
+  **⚠ THE 0.03 LOOKS LIKE A CATASTROPHE AND IS A STALE TEST.** It reads as "item
+  resolution is 3% correct", which would mean `use the torch` is broken for every
+  player. It is not. The fuzzer feeds a WRONG adjective against a single-item
+  inventory and demands a match anyway — sampled misses, verbatim from the run:
+  `Rusted Blade ← "use the monarch blade"`, `Stone Spear ← "use the titan spear"`,
+  `Pocket Knife ← "use the mud knife"`. **OTA-1149 deliberately stopped doing that**,
+  in its own words: *"nothing agrees and the input DID carry a token no candidate
+  accounts for — return undefined, because a miss is recoverable and a confident
+  wrong answer spends an item."* The test asserts the contract OTA-1149 replaced.
+
+  Verified by hand against the same single-item inventory (`Rusted Blade`),
+  2026-08-07: `use the rusted blade` → Rusted Blade · `use the blade` → Rusted
+  Blade · `use rusted blade` → Rusted Blade · `use blade` → Rusted Blade. Every
+  honest phrasing resolves; only the invented adjective refuses. **The gameplay is
+  correct and the assertion is out of date.**
+
+  What to do about it — an owner call, not a silent fix: either retarget the
+  fuzzer to the OTA-1149 contract (wrong-adjective inputs SHOULD miss, which turns
+  0.03 into the passing figure), or split it into two assertions — honest inputs
+  ≥95%, invented-adjective inputs ≤5%. The second is better; it would have caught
+  OTA-1149's own bug in the first place. `movementStress` is a 0.036 miss against a
+  threshold its own comment calls approximate, and `encounterStress` is a random
+  spawn; both are noise beside this one.
+
 - **⚠ NEXT BATCH, MEASURED AND NOT SHIPPED (2026-08-07, from the OTA-1155 log
   sweep).** These were traced to source during the OTA-1155 investigation and
   deliberately **left out of that push** — it already carried eight fixes, and
