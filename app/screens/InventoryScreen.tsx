@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import {
   CATEGORY_COLORS,
@@ -18,6 +18,7 @@ import { isWeaponCoatingItem } from '../engine/weaponCoating';
 import { canonicalItemRarity, canonicalItemTags } from '../engine/crafting';
 import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
+import { giftBlockReason } from '../engine/giftEligibility';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { fusionMaterialTags, isForgeReservableItem } from '../engine/itemFusion';
 import { coatingItemDrinkable } from '../engine/coatingRemedy';
@@ -134,6 +135,10 @@ function sortInventoryItems(
 
 export function InventoryScreen() {
   const player = useGameStore((s) => s.player);
+  // OTA-1154 — gift mode: who we are giving to while the player browses.
+  const giftMode = useGameStore((s) => s.giftMode);
+  const giveGift = useGameStore((s) => s.giveGift);
+  const cancelGiftMode = useGameStore((s) => s.cancelGiftMode);
   const setScreen = useGameStore((s) => s.setScreen);
   // arb103 → shared. The bottom legend text washed out when the player tuned a
   // lighter/brighter background. The auto-contrast tone (dark ink on a light
@@ -727,6 +732,22 @@ export function InventoryScreen() {
     // in for their purpose, so the modal offers nothing but Close.
     if (isQuestLockedItem(pending.item)) {
       return [{ label: 'Close', onPress: closeModal, tone: 'neutral' }];
+    }
+    // ⚠ OTA-1154 — IN GIFT MODE, GIVE COMES FIRST AND CROWDS NOTHING OUT.
+    // The player entered the pack for exactly one reason, so the action they came
+    // for leads. It is drawn only when giftBlockReason says the item may go —
+    // the same call the store makes before moving anything — so a blocked item
+    // simply has no GIVE rather than offering one that gets refused on tap.
+    // (Quest-locked items never reach here: the branch above already ends them.)
+    if (giftMode && player && giftBlockReason(pending.item, player) === null) {
+      return [
+        {
+          label: `Give to ${giftMode.toName}`,
+          onPress: () => { const id = pending.item.id; closeModal(); giveGift(id); },
+          tone: 'primary' as const,
+        },
+        { label: 'Close', onPress: closeModal, tone: 'neutral' as const },
+      ];
     }
     try {
     // Only show Unequip buttons when THIS specific item is the equipped one
@@ -1406,6 +1427,25 @@ export function InventoryScreen() {
 
   return (
     <View style={styles.container}>
+      {/* ⚠ OTA-1154 — GIFT MODE BANNER. The player arrived here from a GIVE
+          affordance in the world, so the pack has to say why it opened and offer
+          a way back out. Without this the inventory looks identical to a normal
+          visit and the only clue is an extra button inside a modal you have to
+          open first — a mode with no visible state is a mode players get stuck
+          in. Tapping the banner leaves gift mode without giving anything. */}
+      {giftMode && (
+        <Pressable
+          onPress={cancelGiftMode}
+          style={({ pressed }) => [styles.giftModeBar, pressed && { opacity: 0.7 }]}
+          accessibilityRole="button"
+          accessibilityLabel={`Giving to ${giftMode.toName}. Tap to cancel.`}
+        >
+          <Text style={styles.giftModeText}>✦ GIVING TO {giftMode.toName.toUpperCase()}</Text>
+          <Text style={styles.giftModeHint}>
+            tap an item to offer it · worn, racked and contract-bound things cannot be given · tap here to cancel
+          </Text>
+        </Pressable>
+      )}
       {/* OTA-230 — first-time inventory hint. Pops once per install
           when the player first opens the pack; dismissable.
           Authoring rule: ~25 words, 2 sentences max. */}
@@ -2381,6 +2421,20 @@ function rarityHexColor(rarity: string | null | undefined): string {
 
 const styles = StyleSheet.create({
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
+  // OTA-1154 — gift mode banner. Completion-green, matching the COMPLETE button
+  // and the READY sort, so "this is the thing you came to do" reads the same
+  // everywhere in the game.
+  giftModeBar: {
+    backgroundColor: '#161c12',
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    marginBottom: 8,
+  },
+  giftModeText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  giftModeHint: { color: '#a2977b', fontSize: 9, letterSpacing: 0.5, marginTop: 2 },
   container: { flex: 1, backgroundColor: 'transparent', padding: 12, width: '100%', maxWidth: 600, alignSelf: 'center' },
   header: {
     flexDirection: 'row',
