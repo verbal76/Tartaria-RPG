@@ -6,6 +6,7 @@
 
 import type { FactionMeta } from './worldPulse';
 import { JOIN_THRESHOLD } from './factions';
+import { travelHoursFor } from './travelTime';
 
 export interface FactionBounty {
   /** The favored faction paying the bounty. */
@@ -33,16 +34,43 @@ export interface FactionBounty {
   deadlineHours?: number;
 }
 
-/** OTA-862 — the BASE window a bounty gives you, before distance is added. In-game time
- *  only advances when you act, so this is a real "get moving" pressure, not a wall-clock
- *  countdown that drains while the app is closed. */
+/** OTA-862 — the JOB BUDGET: how long the contract gives you to actually land the kills,
+ *  before any travel is priced in. In-game time only advances when you act, so this is a
+ *  real "get moving" pressure, not a wall-clock countdown that drains while the app is
+ *  closed.
+ *
+ *  ⚠ OTA-1162 — THIS IS ALSO THE FLOOR, AND THAT IS THE POINT. A contract on the outpost
+ *  you are standing next to is still 3-9 kills; the JOB does not shrink just because the
+ *  WALK did. Keep this term additive. A first pass at OTA-1162 replaced the whole formula
+ *  with a pure per-tile multiplier, which fixed the long contract by breaking every short
+ *  one (6 tiles → 15h for up to 9 kills; 0 tiles → 0h). The original OTA-863 shape was
+ *  right — job budget PLUS travel budget — and only its travel term was mis-sized.
+ *  Still the fallback for a legacy contract with no stored `deadlineHours`. */
 export const BOUNTY_DEADLINE_HOURS = 24;
 
-/** OTA-863 — a bounty's full deadline: 24h base + one hour per tile you must cross to
- *  reach the quarry's outpost (travel is ~0.25h/tile, but the buffer also covers the
- *  fights the route runs you through, the kills at the far end, and the odd rest). */
+/** ⚠ OTA-1162 — JOB BUDGET + AN HONESTLY PRICED JOURNEY.
+ *
+ *  Was `24 + 1h per tile`. The 24 was right. The per-tile hour was not: it was sized
+ *  against WALKING time (~0.25h), which is real and irrelevant, because a tile ALSO costs
+ *  2 stamina (`STAMINA_COSTS.travel`) and the only thing that repays stamina is rest — a
+ *  flat 8 points per 8 hours, i.e. one hour per point. The true all-in cost of a tile is
+ *  ~2.25h, nine times what the old term budgeted for it.
+ *
+ *  Measured against a real device log: a 23-tile contract was given 47h, of which
+ *  arriving consumed ~39h — leaving ~8 hours to hunt down three raiders after a four-day
+ *  march. Owner: "9 hours would never happen."
+ *
+ *  Now: the 24h job budget, PLUS honest travel (HOURS_PER_TILE_TRUE, 2.5h/tile — the
+ *  ~2.25h real cost rounded UP, the rounding being slack for fights, wrong turns, and
+ *  waiting on a quarry that comes hunting you on its own schedule). The same 23 tiles now
+ *  budget 81.5h, of which the walk is ~52h — leaving the job its full window.
+ *
+ *  ⚠ The two terms measure DIFFERENT things and must not be collapsed into one. If the
+ *  job gets harder (bountyTerms raises `count`), the 24 moves. If the map gets more
+ *  expensive to cross, HOURS_PER_TILE_TRUE moves. Neither should be retuned by editing
+ *  the other. */
 export function bountyDeadlineFor(distanceTiles: number): number {
-  return BOUNTY_DEADLINE_HOURS + Math.max(0, Math.round(distanceTiles));
+  return BOUNTY_DEADLINE_HOURS + travelHoursFor(Math.max(0, Math.round(distanceTiles)));
 }
 
 /** Hours of in-game time left on a bounty (Infinity for a legacy one with no stamp). */
