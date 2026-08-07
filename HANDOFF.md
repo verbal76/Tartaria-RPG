@@ -1256,8 +1256,16 @@ Key invariants worth knowing:
   secondary "tap again → 2 active items" report is unconfirmed and likely a
   downstream artifact of the same count/modal mismatch. If it recurs, capture the
   EXACT chip noun that won't clear and whether the player was climbed up.
+- **⚠ `steam_Dev` IS NOW A STANDING LINE (owner, 2026-08-07) — ship it in the same
+  pass as HAL and golem, not on request.** See the directive block in §2. Current at
+  **`442f7729`, merged to the OTA-1175 baseline**, identity + platform shims
+  verified intact, lock verified in sync, and **all gates run locally green** (see
+  the correction below). ⚠ steam publishes NO OTA: `steam_Dev` is absent from
+  `eas-update.yml`'s branch trigger list AND falls to the skip arm of its `case`, so
+  a push there ships nothing to a device — it builds via `build-steam-exe.yml`.
 - **Spin-off sync status — ALL FIVE CURRENT as of 2026-08-06** (owner: *"let's try
-  to catch all the lines up now. push them all"*). steam_Dev `0c5f9220`, mac_dev
+  to catch all the lines up now. push them all"*). steam_Dev now `442f7729` (2026-08-07,
+  OTA-1175 baseline; the `0c5f9220` below was the 1174 pass), mac_dev
   `120ad008`, html_dev `ea42b1d6`, linux_dev `98dbdcd4`, apple_ios `dc260282` —
   each merged up to HaL2001 at the OTA-1174 baseline via `git merge -X theirs
   HaL2001`, identity + platform shims preserved, all pushed. ⚠ **apple_ios was
@@ -1265,12 +1273,21 @@ Key invariants worth knowing:
   one line with no worktree, so every earlier "catch all the lines up" pass
   silently skipped it. Its worktree now exists at `/tmp/spin-apple_ios`; **confirm
   all five worktrees exist before believing a catch-up pass was complete.**
-  ⚠ **NONE of the five can be gated locally — no spin-off worktree has ever had
-  `node_modules`.** What WAS verified by hand on each: package-lock/package.json in
-  sync (the failure mode documented directly below), payload constants present, and
-  only the intended platform overrides diverging from HAL. Everything else is
-  CI-verified, not locally verified — report it that way rather than implying a
-  green local run. `Dev_engine_PC` tracks `engine_Dev` (not Tartaria) and was
+  ⚠⚠ **THAT CLAIM IS FALSE AND WAS DISPROVED 2026-08-07 — SPIN-OFFS *CAN* BE GATED
+  LOCALLY.** This entry used to read "NONE of the five can be gated locally — no
+  spin-off worktree has ever had `node_modules`," which stated a HABIT as if it were
+  a limitation. `npm install` in a spin-off worktree simply works: on steam_Dev it
+  took ~25s for 1147 packages, and the **full gate set then ran clean — typecheck,
+  lint, test-typecheck ratchet at baseline 200, and `test:ci:fast` at 697 suites /
+  6245 tests.** Do this on every spin-off catch-up from now on; "CI-verified only"
+  is no longer an acceptable report for a spin-off, it just means the install was
+  skipped.
+  ⚠ One real gotcha: `npm install --package-lock-only` FAILS in a fresh spin-off
+  worktree (exit 127) because the `prepare` script runs `patch-package`, which needs
+  `node_modules`. That is not a broken lock — do the full `npm install` first, then
+  `npm ci --dry-run` to prove lock/package.json sync.
+  Also verify by hand each pass: payload constants present, and only the intended
+  platform overrides diverging from HAL. `Dev_engine_PC` tracks `engine_Dev` (not Tartaria) and was
   left alone; `arbiters-line` is retired. Native/desktop/web builds were NOT
   compiled in the SDK container — verify via each line's build workflow.
   **⚠ MANDATORY STEP THE RECIPE WAS MISSING (learned the hard way 2026-07-29):
