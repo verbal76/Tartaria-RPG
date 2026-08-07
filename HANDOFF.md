@@ -57,6 +57,20 @@ at 01:49:26Z. Run `typecheck:ci`, `lint`, the test-typecheck ratchet and
 first commit's run via branch concurrency, which permanently destroys the CI record
 of the commit that actually shipped.
 
+## ⚠ Prohibitions in these docs need receipts
+
+HANDOFF.md is a one-way write channel between sessions with no review step, so a
+confident WRONG sentence travels exactly as far as a right one. The dangerous shape
+is a **prohibition**: a wrong instruction fails loudly the first time someone
+follows it, but a wrong prohibition fails silently forever, because nobody attempts
+the thing and nothing looks broken. Two got through this way — *"you cannot gate
+spin-offs locally"* (disproved 2026-08-07 by running `npm install`) and *"there are
+no PRs on line branches"* (contradicted by the handoff's own step 6).
+
+**So: if you write that something is impossible, say how you established it and
+when.** Policy is exempt — "do NOT push to main" is a directive, not a claim.
+Enforced on the line branches by `npm run check:handoff`, a blocking CI step.
+
 ## Every line is isolated — no cross-pollination
 
 Each line publishes ONLY to its own channel / app id: **Tartaria (HaL2001) → the
