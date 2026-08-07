@@ -40,6 +40,7 @@ import { raidNewsFor, raidNewsLine, RAID_MEMORY_CAP } from '../engine/npcMemory'
 import type { OutpostRaid } from '../engine/types';
 // OTA-1083 — giving somebody something, and them remembering the object.
 import { resolveGift, giftMemoryLine, GIFT_STANDING_FACTION_CAP, tasteDiscoveries, returnGiftFor, type GiftItem } from '../engine/gifting';
+import { giftBlockReason } from '../engine/giftEligibility';
 // OTA-1081 — Phase 2 slice: the topic-based talk exchange.
 import {
   hasTopicsFor, topicsFor, topicReply, alreadySaidLine, nothingToSayLine,
@@ -6098,9 +6099,22 @@ interface GameStore {
         toName: string | null;
       }
     | null;
+  /** OTA-1177 — GIFT MODE. Owner: *"would it be better to just have the gift
+   *  button open your inventory and then you can pick an item and while you are
+   *  in gift mode that button will be added to the pop-up menu when you tap on
+   *  the item."* Yes, for two reasons the old modal could not fix: it listed only
+   *  your TWELVE most valuable items, so a cheap thing a vendor specifically
+   *  loves was unofferable if you carried twelve pricier ones; and it was a
+   *  second place that had to decide what you may give, which is how the
+   *  worn-armour trap got in. The inventory already knows what is equipped,
+   *  racked, reserved and contract-bound, so the pick happens there.
+   *  Non-null while the player is browsing for something to hand over. */
+  giftMode: { toId: string; toName: string } | null;
   /** Open the gift flow against whoever is present. */
   openGift: () => void;
   chooseGiftRecipient: (id: string) => void;
+  /** Leave gift mode without giving anything. */
+  cancelGiftMode: () => void;
   /** Hand it over. */
   giveGift: (itemId: string) => void;
   closeGift: () => void;
@@ -6441,7 +6455,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // OTA-1083 — GIFTS. See engine/gifting.ts for the three exploits this shape
   // exists to close (gift-farm, trash-flood, buy-back loop).
   pendingGift: null,
-  closeGift: () => set({ pendingGift: null }),
+  giftMode: null,
+  closeGift: () => set({ pendingGift: null, giftMode: null }),
   openGift: () => {
     const scene = get().currentScene;
     if (!get().player) return;
@@ -6463,45 +6478,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', 'There is nobody here to give anything to.');
       return;
     }
-    set({
-      pendingGift: {
-        candidates,
-        // One person present is not a choice; do not make the player confirm it.
-        toId: candidates.length === 1 ? candidates[0]!.id : null,
-        toName: candidates.length === 1 ? candidates[0]!.name : null,
-      },
-    });
+    // One person present is not a choice; do not make the player confirm it —
+    // OTA-1177 sends them straight to the pack with the recipient already set.
+    if (candidates.length === 1) {
+      set({ pendingGift: null, giftMode: { toId: candidates[0]!.id, toName: candidates[0]!.name } });
+      get().setScreen('inventory');
+      return;
+    }
+    set({ pendingGift: { candidates, toId: null, toName: null } });
   },
   chooseGiftRecipient: (id) => {
     const g = get().pendingGift;
     const who = g?.candidates.find((c) => c.id === id);
     if (!g || !who) return;
-    set({ pendingGift: { ...g, toId: who.id, toName: who.name } });
+    // OTA-1177 — the recipient is settled, so the modal's work is done: hand off
+    // to the inventory rather than drawing a second, smaller item list.
+    set({ pendingGift: null, giftMode: { toId: who.id, toName: who.name } });
+    get().setScreen('inventory');
   },
+  cancelGiftMode: () => set({ giftMode: null }),
   giveGift: (itemId) => {
-    const g = get().pendingGift;
+    // OTA-1177 — the recipient now rides on giftMode (the player is in their pack,
+    // not in the picker modal). pendingGift is still read as a fallback so a
+    // half-finished flow from an older save state cannot strand the action.
+    const gm = get().giftMode;
+    const pg = get().pendingGift;
+    const g = gm ? { toId: gm.toId, toName: gm.toName } : { toId: pg?.toId, toName: pg?.toName };
     const player = get().player;
     if (!g?.toId || !g.toName || !player) return;
     const item = player.inventory.find((i) => i.id === itemId);
     if (!item) return;
-    // ⚠ OTA-1116 — YOU CANNOT GIVE AWAY WHAT YOU ARE WEARING. giveGift
-    // decremented the inventory row and never looked at `equipped`, so gifting
-    // a worn piece left the slot naming an instance that no longer existed — a
-    // ghost item on the sheet, and its id dangling for every consumer that
-    // resolves gear by instance. Refuse it and say which slot, rather than
-    // silently unequipping: taking somebody's armour off as a side effect of a
-    // social action is exactly the kind of thing OTA-977 was written against.
-    const wornSlot = ARMOR_SLOTS.find((sl) => player.equipped?.[sl] === item.name)
-      ?? (player.equipped?.main === item.name ? 'main'
-        : player.equipped?.off === item.name ? 'off' : null);
-    if (wornSlot) {
-      get().appendLog(
-        'system',
-        `You are still wearing the ${item.name} (${wornSlot}). Take it off first if you mean to give it away.`,
-      );
-      set({ pendingGift: null });
+    // ⚠ OTA-1177 — THE SAME PREDICATE THE INVENTORY USED TO DRAW THE BUTTON.
+    // The UI hides GIVE on anything blocked, so reaching this is either a stale
+    // tap or a caller that skipped the UI; either way it refuses with the reason
+    // rather than moving the item. One answer, asked twice — see giftEligibility.
+    const blocked = giftBlockReason(item, player);
+    if (blocked) {
+      get().appendLog('system', `You cannot give away the ${item.name} — ${blocked}.`);
       return;
     }
+    // OTA-1177 — the OTA-1116 worn-item guard that stood here is gone: it
+    // matched by NAME (so a second identical copy was refused too) and knew
+    // nothing about the bandolier, the tool pouch, fusion reservations or
+    // contract fetches. giftBlockReason above covers all of it, by instance id.
+
     const rel = getRelation(get().worldMemory, g.toId);
     // ⚠ OTA-1087 — NO ROW, NO GIFT. The accept path writes the memory inside a
     // `prev ? ... : st.worldMemory` branch but decrements the inventory outside
