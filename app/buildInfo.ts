@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.92';
+export const DISPLAY_VERSION = '4.29.93';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24162,7 +24162,52 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // skirmish-spawn test fails, and it fails IDENTICALLY on clean
 // HEAD — it is the known-red suite already documented in §5.
 // DISPLAY_VERSION 4.29.92.
-export const OTA_BUILD_ID = '2026-08-07-1182-scaler-and-refusal';
+// 2026-08-07 OTA-1183 — REGEN WAS INVISIBLE ON EVERY SURFACE.
+// Owner, with a screenshot of his own inventory: "how am I
+// supposed to know I had regen, I almost sold these. this is how
+// we see them." He was wearing Echoing Steps Boots — hpRegen 2,
+// which is the ENTIRE HP_REGEN_CAP, the most HP regen the game
+// will grant from any number of pieces — and the row read
+// "AC +2 · DEX +2". Nothing anywhere said the boots were healing
+// him every action; he nearly sold them, then asked why his
+// health kept refilling.
+//   ⚠ NOT ONE ITEM. 93 of 293 armour pieces carry regen (31
+//   hpRegen, 62 staminaRegen). `previewArmor` built AC / Resists /
+//   statBonus / Durability and stopped — there was no regen branch
+//   at all, so not one of the 93 ever said so, on any surface: not
+//   the inventory row, not the item card, not the vendor list. A
+//   property the player cannot see is one they sell by accident,
+//   and on several Commons it is the best line on the item.
+//   The line names the CADENCE — "Regen: +2 HP per action" —
+//   because that is what was misjudged. It ticks once per command
+//   in submitPlayerAction, not per hour and not per rest; a bare
+//   "+2" reads as something slower, which is precisely how a
+//   capped-out passive went unnoticed for the life of the item.
+//   ⚠ FUSED PIECES SHOW IT TOO, and that is not incidental.
+//   `aggregateEquippedRegen` resolves the worn piece by NAME via
+//   findArmorByName and never consults uniqueStats, so a fused
+//   copy keeps paying out — while the fused preview branch builds
+//   its lines from the ROLL and would have dropped the only
+//   mention of it. That branch now reads ARMOR by name, the same
+//   key the payout uses. The ROLLED-instance path needed nothing:
+//   it rebuilds by keeping every line that is not AC / stat /
+//   durability, so placing the regen line before Durability
+//   carries it for free.
+// New suite ota1183RegenIsVisible (8 tests), which walks the WHOLE
+// catalogue rather than spot-checking the reported item — the
+// defect was a missing branch, so one item proves nothing.
+// ⚠ TWO CORRECTIONS TO THE RECORD, both mine, both from this
+// session's device-log reads:
+//   1. "the player has never defeated an enemy" — WRONG. The
+//      `defeated=0` in the persist line is saveTrim's KILOBYTE
+//      measurement of worldMemory.defeatedEnemies, not a count; 28
+//      short names round to 0 KB. His sheet reads 28 defeated.
+//      Read saveSizeBreakdown before quoting any of its numbers.
+//   2. There is NO HP-milestone bug. Starting HP is rollDice(5,10)
+//      + race bonus, so 29 at day 26 is an ordinary roll.
+// DISPLAY_VERSION 4.29.93.
+export const OTA_BUILD_ID = '2026-08-07-1183-regen-is-visible';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1182-scaler-and-refusal';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1181-standing-text-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1180-no-ambient-standing';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1179-faction-wiring';

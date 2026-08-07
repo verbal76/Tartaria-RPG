@@ -1335,8 +1335,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1182`**,
-**golem-line `2026-08-07-1159`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1183`**,
+**golem-line `2026-08-07-1160`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1565,7 +1565,53 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE LAST TWO DESIGN CALLS (2026-08-07, latest). HAL + GOLEM.** HAL OTA-1182 /
+- **⚠⚠ REGEN WAS INVISIBLE ON EVERY SURFACE (2026-08-07, latest). HAL + GOLEM.** HAL
+  OTA-1183 / golem OTA-1160. **steam NOT included — batched (§2).** Owner, with a
+  screenshot of his own inventory: *"how am I supposed to know I had regen, I almost
+  sold these. this is how we see them."*
+
+  He was wearing **Echoing Steps Boots — `hpRegen: 2`, which is the ENTIRE
+  `HP_REGEN_CAP`**, the most HP regen the game will grant from any number of pieces —
+  and the inventory row read `AC +2 · DEX +2`. Nothing anywhere said the boots healed
+  him every action. He nearly sold them, and then asked why his health kept refilling.
+
+  **⚠ It was never one item.** 93 of 293 armour pieces carry regen (31 `hpRegen`, 62
+  `staminaRegen`). `previewArmor` built AC / Resists / statBonus / Durability and
+  stopped — **there was no regen branch at all**, so not one of the 93 said so on any
+  surface: not the row, not the item card, not the vendor list.
+
+  - The line names the **cadence** — `Regen: +2 HP per action` — because that is what
+    was misjudged. It ticks once per command in `submitPlayerAction`, not per hour and
+    not per rest, and a bare "+2" reads as something slower.
+  - ⚠ **Fused pieces show it too, and that is not incidental.**
+    `aggregateEquippedRegen` resolves the worn piece by NAME via `findArmorByName` and
+    never consults `uniqueStats`, so a fused copy keeps paying out — while the fused
+    preview branch builds its lines from the ROLL and would have dropped the only
+    mention. That branch now reads `ARMOR` by name, the same key the payout uses.
+  - The **rolled-instance** path needed nothing: it rebuilds by keeping every line
+    that is not AC / stat / durability, so putting the regen line before Durability
+    carries it for free. That ordering is load-bearing — do not move it.
+
+  New suite `ota1183RegenIsVisible` (8 tests). ⚠ It walks the **whole catalogue**
+  rather than spot-checking the reported boots: the defect was a missing branch, so
+  asserting on one item would have proved nothing about the other 92.
+
+  **⚠⚠ TWO CORRECTIONS TO THIS DOC'S OWN RECORD, both from device-log reads earlier
+  the same session. Read them before quoting a persist line again:**
+  1. *"The player has never defeated an enemy"* — **WRONG, and stated to the owner
+     before it was checked.** The `defeated=0` in a `persist sizes(KB)` line is
+     `saveTrim.saveSizeBreakdown`'s **KILOBYTE** measurement of
+     `worldMemory.defeatedEnemies`, not a count — 28 short names round to 0 KB. His
+     character sheet reads **28 defeated**. *(Receipt, 2026-08-07: read
+     `saveTrim.saveSizeBreakdown` — every interpolation on that line goes through its
+     local `kb()`, which is `round(utf8ByteLength(JSON.stringify(x)) / 1024)`. So
+     `rooms` / `events` / `memos` / `npcs` / `defeated` / `tags` / `discovered` are
+     all kilobytes, and any small array rounds to 0.)*
+  2. There is **no HP-milestone bug**. Starting HP is `rollDice(5, 10)` + the race
+     bonus, so 29 max HP on day 26 is an ordinary roll, not evidence of a broken
+     milestone. A whole death-spiral theory was built on (1) before it was verified.
+
+- **⚠⚠ THE LAST TWO DESIGN CALLS (2026-08-07). HAL + GOLEM.** HAL OTA-1182 /
   golem OTA-1159. **steam NOT included — batched (§2).** The third and fourth of the
   four OTA-1179 held, decided together.
 
