@@ -1260,7 +1260,44 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE ACID BATCH (2026-08-06, latest). BOTH LINES.** golem OTA-1150 /
+- **⚠⚠ THE CONVERSATION REMEMBERS (2026-08-07, latest). BOTH LINES.** golem
+  OTA-1151 / HAL OTA-1174. Owner: *"I would like the talk screens to remember
+  the conversations and type the question on an off-white so later we know what
+  we asked. with so many conversations it will get confusing without a
+  history."*
+
+  ⚠ **READING THAT AS A STYLING REQUEST UNDERSELLS IT — THERE WAS NOTHING TO
+  STYLE.** `raiseTopic` only ever logged the NPC's REPLY. Both the talk sheet
+  and the exploration feed were a wall of answers with the questions missing,
+  and the only surviving evidence of what you had raised was the topic list
+  sinking asked entries to the bottom — which tells you a question was spent,
+  never which answer belonged to it. **When a request asks you to style
+  something, check the thing exists first.**
+
+  **1 — the question is logged**, on the `'player'` channel: already what a
+  typed command uses, so speaking and acting read as the same person, and it
+  gives the sheet a field to paint off. Before the reply, and on the
+  already-asked path too — a re-ask is a thing you did.
+
+  **2 — `worldMemory.npcTranscripts`.** ⚠ This had to be a STORE, not another
+  view: the sheet's transcript is a WINDOW on gameLog (OTA-1118, and correct),
+  but that window closes with the conversation and gameLog is itself
+  `.slice(-MAX_LOG_IN_MEMORY)`d. Neither survives walking away. Bounded at
+  `TALK_HISTORY_MAX = 40` — worldMemory persists on every action.
+
+  **3 — TalkSheet** paints `channel === 'player'` on an off-white plate with a
+  gold left rule, the only light fill in the sheet. Prior visits render above
+  the live window under an `EARLIER` divider, filtered on `ts < startedAtTs` so
+  this visit's turns are not drawn twice.
+
+  New suite `ota1151TheConversationRemembers` (8 tests).
+
+  ⚠ **RUNNING IT:** `hydrate + startNewGame` costs ~15s, so a boot per test put
+  the suite over its own timeout and read as a hang. One `beforeAll` boot. Also
+  `npx jest` on a single suite here does not exit on its own — use
+  `--forceExit` in isolation.
+
+- **⚠⚠ THE ACID BATCH (2026-08-06). BOTH LINES.** golem OTA-1150 /
   HAL OTA-1173. Owner tuning, three dials, all owner-called. Owner: *"I throw
   acid on everything and I use the coatings for my weapon and armor for resists
   and added damage … I'm just mowing through people. I might have made the

@@ -55,6 +55,7 @@ export function TalkSheet() {
   const close = useGameStore((s) => s.closeTalk);
   const tapTeaser = useGameStore((s) => s.tapLockedTeaser);
   const talked = useGameStore((s) => s.worldMemory.talkedTopics);
+  const transcripts = useGameStore((s) => s.worldMemory.npcTranscripts);
   const gameLog = useGameStore((s) => s.gameLog);
 
   // Collapsed = breadcrumb only. Local state: a conversation that survives a
@@ -104,6 +105,16 @@ export function TalkSheet() {
       ? gameLog.filter((e) => e.ts >= ctx.startedAtTs && !HIDDEN_LOG_CHANNELS.has(e.channel))
       : []),
     [ctx, gameLog],
+  );
+
+  // ⚠ OTA-1151 — everything said to this person BEFORE this conversation opened.
+  // Filtered on startedAtTs so a turn recorded during THIS visit is not drawn
+  // twice: recordTalkTurn writes to the store and appendLog writes to the feed
+  // on the same tap, so without this the live half would render under EARLIER as
+  // well as under NOW, and the sheet would look like it was stuttering.
+  const history = useMemo(
+    () => (ctx ? (transcripts?.[ctx.npcId] ?? []).filter((t) => t.ts < ctx.startedAtTs) : []),
+    [ctx, transcripts],
   );
 
   if (!ctx) return null;
@@ -163,13 +174,39 @@ export function TalkSheet() {
               contentContainerStyle={styles.transcriptInner}
               onContentSizeChange={() => transcriptRef.current?.scrollToEnd({ animated: true })}
             >
-              {transcript.length === 0 ? (
+              {/* ⚠ OTA-1151 — EARLIER VISITS, above the live window. The
+                  transcript below is a slice of the CURRENT session's feed and
+                  always was; walk away and it is gone. This block is the durable
+                  per-NPC record, so re-opening someone you spoke to yesterday
+                  opens on what you already asked them, not a blank sheet. */}
+              {history.length > 0 && (
+                <>
+                  <Text style={styles.historyDivider}>EARLIER</Text>
+                  {history.map((turn, i) => (
+                    <View key={`h${turn.ts}-${i}`}>
+                      <Text style={[styles.transcriptLine, styles.askedLine]}>{turn.q}</Text>
+                      <Text style={styles.transcriptLine}>{turn.a}</Text>
+                    </View>
+                  ))}
+                  <Text style={styles.historyDivider}>NOW</Text>
+                </>
+              )}
+
+              {transcript.length === 0 && history.length === 0 ? (
                 <Text style={styles.transcriptEmpty}>
                   {ctx.npcName} waits for you to say something.
                 </Text>
               ) : (
                 transcript.map((e) => (
-                  <Text key={e.id} style={styles.transcriptLine}>{e.text}</Text>
+                  // The QUESTION carries the off-white plate. It is the one line
+                  // in the exchange the player authored, and being able to scan
+                  // back for it is the whole of the owner's ask.
+                  <Text
+                    key={e.id}
+                    style={[styles.transcriptLine, e.channel === 'player' && styles.askedLine]}
+                  >
+                    {e.text}
+                  </Text>
                 ))
               )}
             </ScrollView>
@@ -300,6 +337,35 @@ const styles = StyleSheet.create({
   },
   transcriptInner: { paddingVertical: 10, gap: 10 },
   transcriptLine: { color: '#e6d8b3', fontSize: 15, lineHeight: 22 },
+  // ⚠ OTA-1151 — THE OFF-WHITE PLATE, and it is deliberately the only light
+  // fill inside the sheet. Owner: *"type the question on an off-white so later
+  // we know what we asked."* A parchment ground with dark ink on it inverts the
+  // sheet's whole scheme for exactly one kind of line, so scanning back for
+  // "what did I ask this person" is a glance rather than a read. The left rule
+  // carries the same job at small sizes and for anyone who cannot separate the
+  // two backgrounds by value alone.
+  askedLine: {
+    backgroundColor: '#f2ead6',
+    color: '#2b2419',
+    fontWeight: '600',
+    paddingVertical: 5,
+    paddingHorizontal: 9,
+    borderRadius: 4,
+    borderLeftWidth: 3,
+    borderLeftColor: '#c8a44d',
+    marginTop: 6,
+    marginBottom: 2,
+    overflow: 'hidden',
+  },
+  // The seam between what you asked before and what you are asking now.
+  historyDivider: {
+    color: '#8aa0a4',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.6,
+    marginTop: 8,
+    marginBottom: 2,
+  },
   transcriptEmpty: { color: '#a2977b', fontSize: 14, fontStyle: 'italic', lineHeight: 20 },
   trayLabel: {
     color: '#8aa0a4',

@@ -2589,6 +2589,33 @@ function describeTime(hours: number): string {
   return `Day ${day}, ${part}`;
 }
 
+/** ⚠ OTA-1151 — how many exchanges are kept per NPC. worldMemory is persisted
+ *  on EVERY action (the device log prints `wm=57KB` after an hour), so an
+ *  unbounded transcript is a save-size leak that only shows up in the long
+ *  sessions this feature exists to serve. Authored topics run 14-16 per NPC
+ *  since OTA-1091, so 40 holds every first answer plus a healthy run of
+ *  re-asks; past that the oldest turn falls off the front. */
+const TALK_HISTORY_MAX = 40;
+
+/** OTA-1151 — append one question/answer pair to an NPC's durable transcript.
+ *  Separate from appendLog on purpose: the feed is the record of the SESSION
+ *  and is capped and channel-filtered, while this is the record of the
+ *  RELATIONSHIP and has to survive both the conversation closing and the log
+ *  buffer rolling over. */
+function recordTalkTurn(
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  npcId: string,
+  q: string,
+  a: string,
+): void {
+  set((s) => {
+    const all = s.worldMemory.npcTranscripts ?? {};
+    const prior = all[npcId] ?? [];
+    const next = [...prior, { q, a, ts: Date.now() }].slice(-TALK_HISTORY_MAX);
+    return { worldMemory: { ...s.worldMemory, npcTranscripts: { ...all, [npcId]: next } } };
+  });
+}
+
 // Record a discrete memorable event on the world memory. Used for the
 // Arbiter's "I remember when you..." callbacks. Kept lightweight (string +
 // kind + timestamp) — full per-event metadata isn't needed yet.
@@ -6560,14 +6587,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const topic = t.topics.find((x) => x.id === topicId);
     if (!topic) return;
     const asked = get().worldMemory.talkedTopics?.[`${t.npcId}:${topic.id}`] ?? 0;
+    // ⚠ OTA-1151 — THE QUESTION GOES IN THE RECORD, and it never used to.
+    // Owner: *"type the question on an off-white so later we know what we
+    // asked."* Reading that as a styling request undersells it — there was
+    // NOTHING TO STYLE. This handler only ever logged the NPC's reply, so both
+    // the transcript and the exploration feed were a wall of answers with the
+    // questions missing, and a topic list that sinks asked entries to the
+    // bottom was the only surviving evidence of what you had raised.
+    //
+    // The 'player' channel is the right home: it is already what a typed
+    // command uses, so a spoken question and a typed action read as the same
+    // person doing the same kind of thing. Logged BEFORE the reply so the pair
+    // reads in the order it happened, and logged on the already-asked path too
+    // — asking again is a thing you did, and hiding it would make the "I have
+    // told you that one" answer look like it arrived unprompted.
+    get().appendLog('player', topic.label);
     // Repetition is acknowledged rather than replayed. An NPC who answers the
     // same question twice as though it were the first time is the exact
     // "checklist, not a relationship" failure Phase 1 was written against.
     if (asked >= topic.lines.length) {
-      get().appendLog('world', alreadySaidLine(t.npcName));
+      const dup = alreadySaidLine(t.npcName);
+      get().appendLog('world', dup);
+      recordTalkTurn(set, t.npcId, topic.label, dup);
       return;
     }
-    get().appendLog('world', topicReply(topic, asked));
+    const reply = topicReply(topic, asked);
+    get().appendLog('world', reply);
+    recordTalkTurn(set, t.npcId, topic.label, reply);
     // ⚠ OTA-1061 — THE GRANT FIRES ON THE FIRST RAISE ONLY, and `asked === 0`
     // is that fact rather than a separate flag. The counter below is the same
     // one that drives "I have told you that one", so the payout and the
