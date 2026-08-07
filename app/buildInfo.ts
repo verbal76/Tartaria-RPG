@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.90';
+export const DISPLAY_VERSION = '4.29.91';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24031,7 +24031,50 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // a held call makes the decision as hard to undo as the hold was.
 // Three of the four calls are still held and still asserted.
 // DISPLAY_VERSION 4.29.90.
-export const OTA_BUILD_ID = '2026-08-07-1180-no-ambient-standing';
+// 2026-08-07 OTA-1181 — THE STANDING TEXT SAYS WHAT THE CODE
+// DOES, AND SAYS THE PART IT NEVER SAID.
+// The second of the four design calls OTA-1179 held. Owner:
+// "correct the incorrect wording and make sure they know a
+// certain - standing will get them hunted."
+//   THE WRONG NUMBERS. The glossary and the concepts catalogue
+//   both described standing as a currency "exchanged" or "spent"
+//   for gear, areas and abilities. It is neither — it is a
+//   threshold you stand above, it is never consumed, and telling
+//   the player otherwise invites them to hoard for a cash-out
+//   that does not exist. The join entry priced purchases at "+1"
+//   with no denominator, off by the whole 500 TC constant. Gifts
+//   were quoted flat "+5"; the real grants are +4 loved / +2
+//   liked / -2 insulted, under a LIFETIME per-faction cap of 10,
+//   none of which was stated. Theft was quoted at -10, but a
+//   caught theft on another faction's ground docks -10 TWICE, to
+//   two different factions.
+//   ⚠ THE MISSING RULE, AND IT IS THE ONE THAT MATTERS. Nothing
+//   anywhere in the game — sheet, glossary, catalogue — told the
+//   player that low standing gets them HUNTED. The sheet marked
+//   the good end (a checkmark at JOIN_THRESHOLD) and left the bad
+//   end to a shade of orange nothing explained. Now: every row at
+//   or under HOSTILE_STANDING carries a "☠ hunted" tag, rows
+//   inside the last 10 before it carry "⚠ close", and a warning
+//   line under the list names BOTH thresholds, because they are
+//   different numbers doing different jobs — below 0 a patrol may
+//   engage, at -25 it goes looking for you. The early tag is the
+//   useful half: one contract for a rival moves you about 4, so a
+//   bare at-the-line mark arrives too late to act on.
+//   The text also states the rival cost, because that is how
+//   players actually fall — every point earned with one faction
+//   costs their enemies half as much the other way.
+//   BUY_REP_TC_PER_STANDING moved from a function-local const in
+//   buyFromVendor to engine/factions.ts and is imported by both
+//   readers. A number two surfaces must agree on does not get two
+//   homes — the same cleanup OTA-1179 #8 did for JOIN_THRESHOLD,
+//   and the reason the "+1" was wrong for so long.
+// New suite ota1181StandingTextTruth (10 tests). Every assertion
+// pins the text against the CONSTANT that drives the behaviour,
+// so re-tuning a threshold fails the suite instead of quietly
+// making the help text lie again.
+// DISPLAY_VERSION 4.29.91.
+export const OTA_BUILD_ID = '2026-08-07-1181-standing-text-truth';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1180-no-ambient-standing';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1179-faction-wiring';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1178-from-the-log';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1177-gift-mode';

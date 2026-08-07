@@ -129,3 +129,11 @@ export const JOIN_THRESHOLD = 20;
 export function meetsJoinThreshold(standing: readonly FactionStanding[], factionId: string): boolean {
   return getStanding(standing, factionId) >= JOIN_THRESHOLD;
 }
+
+/** ⚠ OTA-1181 — TC of honest custom that banks 1 standing with a faction's traders.
+ *  Lifted out of `gameStore.buyFromVendor`, where it was a function-local const, so
+ *  the character sheet can STATE the rule instead of printing a second copy of the
+ *  number. The in-game glossary said purchases were worth "+1" with no denominator
+ *  at all — off by this entire constant, and exactly the drift OTA-1179 #8 cleaned
+ *  up for JOIN_THRESHOLD. One definition, two readers. */
+export const BUY_REP_TC_PER_STANDING = 500;

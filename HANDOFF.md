@@ -1335,8 +1335,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1180`**,
-**golem-line `2026-08-07-1157`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1181`**,
+**golem-line `2026-08-07-1158`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1565,7 +1565,64 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE WORLD DOES NOT MOVE YOUR STANDING (2026-08-07, latest). HAL + GOLEM.**
+- **⚠⚠ THE STANDING TEXT SAYS WHAT THE CODE DOES (2026-08-07, latest). HAL + GOLEM.**
+  HAL OTA-1181 / golem OTA-1158. **steam NOT included — batched (§2).** The SECOND
+  of the four design calls OTA-1179 held. Owner: *"correct the incorrect wording and
+  make sure they know a certain − standing will get them hunted."*
+
+  **The wrong numbers.** `glossary.json` and `concepts.json` both described standing
+  as a currency *"exchanged"* / *"spent"* for gear, restricted areas and abilities.
+  It is neither — it is a **threshold you stand above**, never consumed, and saying
+  otherwise invites the player to hoard for a cash-out that does not exist. Also:
+  - the join entry priced purchases at **"+1"** with **no denominator** — off by the
+    entire `BUY_REP_TC_PER_STANDING` (500 TC);
+  - gifts were quoted at a flat **"+5"**, a number that appears nowhere in the code.
+    Real: **+4 loved / +2 liked / −2 insulted**, under a **lifetime per-faction cap
+    of 10** (`GIFT_STANDING_FACTION_CAP`), which was never stated at all;
+  - theft was quoted at **−10**. A caught theft on ground another faction holds docks
+    **−10 twice, to two different factions** — the store applies both.
+
+  **⚠ THE MISSING RULE, AND IT IS THE ONE THAT MATTERS.** Nothing anywhere in the
+  game — character sheet, glossary, concepts catalogue — told the player that low
+  standing gets them **hunted**. The sheet marked the GOOD end (a ✓ at
+  `JOIN_THRESHOLD`) and left the bad end to a shade of orange nothing explained.
+  Now: every row at or under `HOSTILE_STANDING` carries **☠ hunted**, rows inside
+  the last 10 before it carry **⚠ close**, and a warning line under the list names
+  **both** thresholds — they are different numbers doing different jobs, since below
+  0 a patrol may engage and at −25 it goes looking for you. ⚠ The EARLY tag is the
+  useful half: one contract for a rival moves you about 4, so a bare at-the-line
+  mark arrives too late to act on. The text also states the **rival cost**, because
+  that is how players actually fall — every point earned with one faction costs
+  their enemies half as much the other way.
+
+  **`BUY_REP_TC_PER_STANDING` moved to `engine/factions.ts`** and is imported by both
+  the store and the sheet. It was a function-local const inside `buyFromVendor`, so
+  the sheet had no way to state the rule and the glossary just guessed — which is
+  why the "+1" survived so long. Same cleanup OTA-1179 #8 did for `JOIN_THRESHOLD`:
+  a number two surfaces must agree on does not get two homes.
+
+  **One existing test RETARGETED, not weakened.** `ota1179FactionWiring`'s buy-pool
+  test anchored its slice on the function-local `const BUY_REP_TC_PER_STANDING =
+  500;` that this OTA promoted. Its claim — the pool is debited only when the grant
+  lands — is unchanged and still fully asserted; the anchor moved onto the pool
+  arithmetic itself, and it now ALSO asserts the constant's new single home and the
+  store's import of it, so the move cannot be undone into a second copy.
+
+  **New suite `ota1181StandingTextTruth` (10 tests).** ⚠ Every assertion pins the
+  TEXT against the CONSTANT that drives the behaviour, so re-tuning a threshold
+  fails the suite instead of quietly making the help text lie again — which is the
+  exact failure this OTA exists to clean up. ⚠ Two assertions were deliberately
+  narrowed after tripping on truthful text: a blanket `/spend/` sweep flags the
+  stamina entry (*"Travel and combat spend it"* — correct, stamina really is spent)
+  and the replacement wording itself (*"You never SPEND standing"*), so the check
+  matches the AFFIRMATIVE claim only, and only inside entries about standing.
+
+  **Two of the four design calls are now decided** (the ambient ratchet in OTA-1180,
+  the text here). Still held and still asserted in `ota1179FactionWiring`: the
+  defensive term in the difficulty scaler, and the contract-refusal wording — plus
+  the theft/extort spillover meters.
+
+- **⚠⚠ THE WORLD DOES NOT MOVE YOUR STANDING (2026-08-07). HAL + GOLEM.**
   HAL OTA-1180 / golem OTA-1157. **steam NOT included — batched (§2).** The FIRST
   of the four design calls OTA-1179 held, decided by the owner: *"why are we doing
   ambient standing raises when we have multiple ways to gain standing. you should
