@@ -23,6 +23,23 @@ git worktree add /tmp/hal-golem golem-line
 git worktree add /tmp/hal-eng7 engine_Dev
 ```
 
+⚠ **The five SPIN-OFF lines need worktrees too, and the recipe kept omitting them —
+which is exactly how `apple_ios` went ~140 OTAs stale unnoticed** (§8). Make all five,
+not four:
+
+```bash
+git fetch origin steam_Dev mac_dev html_dev linux_dev apple_ios
+git worktree add /tmp/spin-steam    steam_Dev
+git worktree add /tmp/spin-mac_dev  mac_dev
+git worktree add /tmp/spin-html_dev html_dev
+git worktree add /tmp/spin-linux_dev linux_dev
+git worktree add /tmp/spin-apple_ios apple_ios   # ← the one that gets forgotten
+```
+
+⚠ **No spin-off worktree has `node_modules` and none ever has** — you cannot gate them
+locally. Verify by hand (lock/package.json sync, payload constants, intended overrides
+only) and report them as CI-verified, not locally verified.
+
 - **The harness-designated `claude/*` branch is NOT where work ships.** The user
   directs work to the three named line branches above. Pushing to them requires
   the user's authorization, granted per-session (§2) — once granted, push each
@@ -35,7 +52,18 @@ git worktree add /tmp/hal-eng7 engine_Dev
 - **Working style:** the user playtests on-device (Android, OTA-delivered) and
   pastes in-game logs. For a bug report, DIAGNOSE first — root cause + proposed
   fix, briefly — and implement only after approval (unless the message says
-  "fix it"). ALL diagnosis + fixing follows the §3a ROOT-CAUSE PLAYBOOK. Use AskUserQuestion for genuine UX forks with 2-4 options.
+  "fix it"). ALL diagnosis + fixing follows the §3a ROOT-CAUSE PLAYBOOK.
+- **⚠⚠ DO NOT USE THE `AskUserQuestion` TOOL. Owner directive, standing.** He had a
+  bad question-loop experience with it. **Ask questions in PROSE, inside your normal
+  reply.** (This line previously said the opposite — "use AskUserQuestion for genuine
+  UX forks" — which is now countermanded. If you see that phrasing anywhere else in
+  these docs, it is stale.) The owner still WANTS to be asked about genuine forks;
+  he wants it asked like a person, not as a widget.
+- **⚠⚠ DO NOT TOUCH THE OWNER'S APPLE DEVELOPER ACCOUNT OR ANY CREDENTIALS.**
+  Reading CI logs is fine. Certificates, provisioning profiles, signing identities,
+  App Store Connect — owner-only, every time, no exceptions.
+- **⚠ NEVER put the model identifier in a commit message, PR title/body, code
+  comment, or any artifact pushed to a repo.** Chat replies only.
 - **Judging "clean":** filter typecheck output to `app/**`, and additionally
   ignore the pre-existing `expo-document-picker` errors in engine_Dev app
   source (3 of them) plus the long-standing test-file type errors on all lines
@@ -83,6 +111,43 @@ one line is applied **per-line, code-specifically** (see §4).
 | **apple_ios** | Tartaria Realms (Apple iOS Dev) | `…tartarprim.appleios` | `apple-ios` | Native iOS (forked from golem-line) |
 | **Dev_engine_PC** | RPG Engine (dev) | `…tartarprim.engine` | `engine_Dev` | engine_Dev's Windows `.exe` standing branch |
 | **arbiters-line** | Tartaria Realms ARB | `…tartarprim.arbiters` | `arbiters-line` (dead channel) | Isolated APK scratch line — publishes nothing |
+
+> ## ⚠⚠ OWNER DIRECTIVE, 2026-08-07 — THIS SUPERSEDES THE LINE ROLES BELOW
+>
+> Owner, verbatim: *"hal is the live branch that my testers have access to, golem
+> is the testing ground for big changes, steam line stays up to date for my PC
+> testing and possible steam submissions. so unless there is a high chance we are
+> doing game braking changes keep all 3 current. you will get logs from me almost
+> always from Hal. we will be making quick surgical well thought out changes. we
+> are currently in the qol improvements and balancing phase. we also test the crap
+> out of everything before we push."*
+>
+> **THE THREE LINES TO KEEP CURRENT ARE `HaL2001`, `golem-line` AND `steam_Dev`.**
+> This is the change: `steam_Dev` was previously treated as a downstream packaging
+> line, topped up only when asked. It is now a STANDING line that ships in the same
+> pass as HAL and golem. **`engine_Dev` is still a separate product and is NOT part
+> of the default pass** — it takes engine-level fixes only, exactly as before, but
+> it is no longer one of the three you keep in step.
+>
+> - **`HaL2001`** — live, at testers. **Device logs come from here almost always.**
+> - **`golem-line`** — the testing ground for BIG changes; still kept current
+>   otherwise, so the fork point is never stale.
+> - **`steam_Dev`** — the owner's PC testing line and the possible Steam
+>   submission path. Keep it current. ⚠ It has **no `node_modules` and never has**,
+>   so it cannot be gated locally — verify by hand and report it as CI-verified.
+>
+> **The bar for NOT shipping to all three is "a high chance of game-breaking
+> changes."** That is a high bar: default to all three, and fork to golem alone only
+> when the change is genuinely engine-threatening.
+>
+> **⚠⚠ `engine_Dev` IS OFF LIMITS (owner, 2026-08-07): *"engine_dev is a separate
+> project, leave it be for now, it's off limits unless I tell you."*** Do not commit
+> to it, do not port to it, do not include it in a pass. Only the owner reopens it.
+>
+> **Working phase: QoL improvements and balancing.** Quick, surgical, well-thought-out
+> changes — and **test the crap out of everything before pushing.** The gates are the
+> floor, not the ceiling; when a change touches combat maths, run the heavy sims too
+> rather than leaning on the fast suite alone.
 
 **The three MAIN lines are `HaL2001`, `golem-line`, and `engine_Dev`** — roles
 as clarified by the user on 2026-07-13:
@@ -195,6 +260,57 @@ checklist: CLAUDE.md "FIX RULE".
 6. After pushing, ensure an **open draft PR** exists for the branch (create one if
    not). PRs already exist for the standing lines (#2 HaL2001, #7 golem-line,
    #13 engine_Dev, etc.).
+
+### ⚠⚠ CI ON A LINE BRANCH RUNS **AFTER** THE OTA IS ALREADY ON THE PHONE (proven 2026-08-07)
+
+**The local gates in step 2 are the ONLY gate that runs before the player gets the
+code.** A push fires the publish workflow and the CI workflow at the same moment,
+and publishing finishes first — it is not close:
+
+| golem push `d8ed7c79` (OTA-1152) | created | finished |
+|---|---|---|
+| **Publish · OTA** | 01:47:14Z | **01:48:50Z — on the device** |
+| **CI** (typecheck/lint/ratchet/jest) | 01:47:14Z | still running at 01:49:26Z |
+
+Publishing takes ~90 seconds; CI takes ~5 minutes. **CI can never gate an OTA
+here.** Do not describe it as if it does, and never treat "CI will catch it" as
+cover for a thin local run. Run the full gates in the worktree, every time, before
+the push — that is the real gate, and it is the only one.
+
+### ⚠⚠ A SECOND PUSH INSIDE THE CI WINDOW CANCELS THE FIRST COMMIT'S RUN
+
+GitHub's branch concurrency group kills the in-flight run when a newer commit lands
+on the same branch. Same session, same process, opposite outcomes purely on timing:
+
+- HAL `202e5b6d` (OTA-1175) — 11 minutes before the next commit → **full green run.**
+- golem `d8ed7c79` (OTA-1152) — 2 minutes → **run cancelled, permanently.** The
+  commit that actually shipped to the device carries a cancelled CI record forever.
+
+The code was still covered (the follow-up was docs-only, so the app tree that went
+green at `acfb9f9c` is byte-identical under `app/`), but **the shipped SHA's own
+record is gone**, and had the follow-up carried code it would have been a real hole.
+
+**So: one commit per OTA per line, docs included** — `buildInfo`, `VERSION.md` and
+`HANDOFF.md` ride WITH the code, which is what step 4 above already says. And if a
+follow-up genuinely must go out, either let the CI window close first or accept and
+SAY that the prior commit's run was cancelled rather than reporting it as failed or
+in-flight.
+
+⚠ **Run the §3a.E self-audit BEFORE committing, not after.** The 2026-08-07 case: the
+exploit-lens check on the OTA-1175 roll-up (does the new COMPLETE door bypass a gate
+the card enforced?) was done after the push, so its finding needed a second commit —
+which is what cancelled golem's run. The audit is listed as "before declaring done";
+treat "done" as "before `git commit`".
+
+⚠ **Key every CI check to the branch HEAD SHA explicitly.** Listing runs by branch
+returns superseded runs too, and a cancelled run for an older SHA sitting above a
+live one is easy to misread. Resolve HEAD first, then read that SHA's jobs.
+
+⚠ **CORRECTION TO A PLAUSIBLE-SOUNDING CLAIM:** it is NOT true that the line branches
+carry no PRs. Step 6 above requires an open draft PR per line, and **#2 (HaL2001) and
+#7 (golem-line) are open right now** and track those branches. What IS true is that
+those PRs are long-lived drafts nobody merges, so their checks are a record, not a
+gate — which is the same conclusion by a different route: the gate is local.
 
 **Docs-only safety:** `**.md`, `docs/**`, `.github/**`, `app.json`, lockfiles etc.
 are in every `eas-update.yml`'s `paths-ignore`, so a HANDOFF/docs-only push does
@@ -410,6 +526,54 @@ per port in a scratch heredoc, and each fresh copy missed a shape
 (lowercase refs, bare slugs, a wrong cutoff). One committed rule, one
 committed comparison, zero scratch regexes — that is how the category dies.
 
+### The mechanical HAL → golem port recipe (was session-memory only until 2026-08-07)
+
+```bash
+# 1. cut the patch from the HAL commit — CODE ONLY, docs are done by hand
+cd /tmp/hal-main-fix
+git diff <sha>~1..<sha> -- app __tests__ scripts App.tsx > /tmp/p<ota>.patch
+
+# 2. renumber HAL's OTA refs onto golem's (−23), all shapes
+python3 <scratchpad>/renumber.py /tmp/p<ota>.patch
+
+# 3. apply in the golem worktree
+cd /tmp/hal-golem
+patch -p1 --fuzz=3 < /tmp/p<ota>.patch
+find . -name "*.orig" -delete          # ⚠ patch leaves these; they poison the parity diff
+
+# 4. ⚠⚠ STAGE BEFORE VERIFYING — verify-parity.mjs reads the INDEX, not the worktree.
+#    Skip this and it compares against nothing and cheerfully exits 0.
+git add -A
+
+# 5. now verify
+node /tmp/hal-main-fix/scripts/verify-parity.mjs /tmp/hal-main-fix '<hal-range>' /tmp/hal-golem 'HEAD'
+```
+
+Then golem's **docs by hand** (buildInfo narrative, VERSION.md, HANDOFF) — never
+patched across, because the two lines' doc history genuinely diverges and a
+patched doc silently imports HAL's numbering. Then golem's own gates, commit, push.
+
+### Gate commands + the current ratchet ceilings
+
+Run in each line's worktree before pushing that line:
+
+```bash
+npm run typecheck:ci
+npm run lint
+node scripts/ci-typecheck-tests.mjs     # test-file type-debt ratchet
+npm run test:ci:fast
+```
+
+**Ratchet ceiling: HAL 200 / golem 202.** Over by even one and the gate fails.
+⚠ The usual cause of a surprise +1 is a **new jest mock written with an implicit
+`any`** — `static createAsync = jest.fn(...)` trips TS7022. Annotate it
+(`static createAsync: any = jest.fn(...)`, which is what the canonical
+`preamble.txt` mock block uses) and the count drops back.
+
+**Heavy sims are NOT part of the gates** — `combatStress` (~435 s),
+`dogGolemCombatStress`, `encounterStress`. Run them deliberately when a change
+reaches into combat maths; don't wire them into the fast path.
+
 
 ### ⚠ PHASE 6 IS GOLEM-LINE ONLY (owner directive, 2026-08-03)
 
@@ -498,6 +662,71 @@ Key invariants worth knowing:
 
 ## 8. Open issues / watch list (current)
 
+- **✅ SHIPPED (HAL OTA-1175 / golem OTA-1152) — the Contracts "READY TO HAND IN" sort.** Full account in
+  §9. The blocker this entry warned about was real and is now closed at the root: "ready" was THREE inline
+  predicates and is now one, `missionTurnInReady` in **new `app/engine/missionReady.ts`**, which every card
+  pill, every COMPLETE gate and the new sort route through.
+
+  **⚠ ONE INTERPRETATION CALL THE OWNER SHOULD CONFIRM ON DEVICE.** *"I want it to pull from the groups.
+  all the ones that are ready to hand in right to the top"* was read as a **cross-group ROLL-UP** — a
+  READY TO HAND IN list above every section, gathering all five kinds, nearest first — rather than a
+  ready-first float inside each section. Reason: floating within a section does not put anything "right to
+  the top"; a ready faction contract still sits below Hunts, Mysteries and Storylines, which is most of a
+  screen. The sections ALSO rank ready-first now, so both readings are served — but if he wanted only the
+  in-section float and finds the roll-up redundant, deleting it is one JSX block and the `readyRows` build;
+  the shared predicate stays either way.
+
+  **⚠ PAUSED-BUT-READY CONTRACTS DO LIST, AND THAT IS DELIBERATE — checked, not assumed.** The exploit
+  lens asks whether a new door bypasses a gate the old door enforced. It does not: the card's COMPLETE has
+  ALWAYS been gated on `open && ready` with **no `tracked` term**, so a paused contract could already be
+  handed in from its own card. The only oddity is pre-existing and cosmetic — the card's pill prints
+  `⏸ PAUSED` in the slot where it would otherwise print `READY`, so a paused-and-finished contract shows
+  PAUSED while still offering COMPLETE. The roll-up shows it as ready, which is the truthful half. If the
+  owner would rather paused contracts stay out of the roll-up, that is a one-line filter on `tracked`; if
+  he would rather the CARD stop saying PAUSED over a live COMPLETE, that is the pill expression. Do not
+  "fix" either unprompted — they are two different answers to a question he has not been asked.
+
+  **⚠ AND A SECOND THING TO WATCH:** the roll-up's COMPLETE rows are the same `completeContractFromUI` the
+  cards call, so the **hunts face-to-face gate still refuses** from the roll-up when no paying agent is in
+  scene (OTA-810's rule, deliberately not bypassed). If that reads as "the button doesn't work", the answer
+  is the refusal strip's wording, not the gate.
+
+- **⚠ OPEN OWNER CALLS — analysed and presented, NOT decided. Do not implement unprompted.**
+  - **Sell value for Commons is too low.** Owner: *"I sold the other day like 11 items. I got 81 TC … I
+    think our floor is too low on selling Commons."* ⚠ **ROOT CAUSE FOUND, and it is dead code:** the
+    intended ~11 TC for Common gear can never be paid, because `RARITY_BUY_FLOOR.Common = 5` clamps it,
+    and **0 of 276 weapons carry a `tcBuy`**, so OTA-922's per-item escape hatch never applies to weapons
+    at all. Two options on the table — author `tcBuy` across the 276, or raise the flat floor. Owner's own
+    proposal was to tier it by durability: *"two bone compound bows, one 10/10, one 32/32 … one sells for
+    11 or 12."* ⚠ **The recommendation given was to price the WHOLE INSTANCE, not one channel:** in
+    `durability.ts:179-200` a single `temper` roll drives durability max UP and the perk budget DOWN, so
+    pricing on durability alone systematically UNDERPRICES glass cannons — lerp 5→11 off durability max
+    **plus** `instanceStats`. Files: `engine/sellPrice.ts`, `engine/durability.ts`.
+  - **Faction standing has no positive ladder.** Owner: *"what the hell do I actually do at faction
+    standing? I've traded with the vendor that I had a negative 90 on … there's no real benefit to have
+    good standing. I could be a giant asshole to everybody."* ⚠ **He is right, and it is verifiable:**
+    `factionRapport.ts:44` `vendorPriceMod(charisma, completedFactionQuestIds, vendorFaction)` **does not
+    read standing at all**, and `pressure.ts` only uses it to punish (`HOSTILE_STANDING = -25`, hunt
+    chance 0.05→0.22). Standing is punishment-only. **Recommendation was to build the ladder BEFORE the
+    atmospheric line** — a vague line about a number that does nothing just advertises the hole.
+  - **The faction-shift line itself.** Owner wants the six-shift wall replaced with one vague Tartarian
+    line — *"many people view you differently now"* — plus threshold-only lines when a tier is actually
+    crossed. He agreed to drop the "just organize the wall better" alternative (*"we still get a wall of
+    text, it's just more organized"*). Gated behind the ladder above.
+  - **Acid lore.** Owner: *"we could work acid somehow into the lore."* Sketch he liked: a vendor topic +
+    an Arbiter line + an Acid Flask description rewrite. Not scheduled.
+  - **Mud monster memory.** Owner tried to preempt a mud fight from a remembered beat — *"you examine the
+    mud. the mud changes shape"* — and from the original design where **any edged metal item scrapes the
+    ground**. `engine/hooks.ts:151,591` has `mud_golem_stir` (weight 4). The scrape-with-an-edge affordance
+    is what he was reaching for and it is not wired.
+
+- **⚠ TEST VERDICTS OWED (promised unprompted — deliver without being asked again).**
+  - **`encounterStress.test.ts:276`** — still failing. **Confirmed NOT caused by the acid batch:** it was
+    already failing on `78c75a8` before OTA-1173 and is unchanged after. Verdict flake-vs-real-regression
+    is still owed.
+  - **`movementStress`** — the classification is wrong, not the movement. It does not count story-thread
+    or dog-quest resolutions as approach successes, so it under-reports. Fix the classifier and raise N.
+
 - **⚠⚠ STANDING TUNING LIST (owner directive, 2026-08-06 — "keep these on the tuning list in handoff so we
   can follow up later"). Source: the OTA-1163 pressure test (20,000-trial Monte Carlo vs the real engine);
   decisions taken in OTA-1164/1165 are marked DONE, the rest are OPEN owner calls:**
@@ -517,7 +746,24 @@ Key invariants worth knowing:
     thin" lever. arb119 distinct-kill farm guard unchanged and pinned.
   - **DONE — acid boss shred cap 11 → 7** (OTA-1165): `ACID_SHRED_BOSS_BONUS` 6 → 2. Parity with the +6
     boss AC bonus let acid erase the wall and compound with stagger into the stagger-lock exploit (E1).
-    Watch on-device: acid should still feel worth carrying into boss fights, just not mandatory.
+    ⚠ **SUPERSEDED BY OTA-1173 — the boss cap is now 5, not 7.** 1165 tuned only the boss HEADROOM (+2,
+    unchanged); 1173 dropped the base `ACID_SHRED_MAX` 5 → 3 underneath it, so the boss total moved with
+    it. Do not read the "7" above as current.
+  - **DONE — the acid batch** (OTA-1173, owner call — *"I throw acid on everything … I might have made the
+    player too powerful"*). Three dials on the one coating that outclassed the other five, because acid is
+    the only one that MULTIPLIES the others: poison/corruption add damage, acid adds ACCURACY, and accuracy
+    scales everything else on the swing. It is also the only two-ingredient one-each recipe in the game
+    (Aether Dust ×1 + Scrap Metal ×1), so it is always available — and its value SCALES WITH FIGHT LENGTH,
+    so ramping enemy HP fed it rather than answering it. **(1)** `ACID_SHRED_MAX` 5 → 3. **(2)**
+    `ACID_SHRED_DECAY_PER_ROUND` = 1, gated on **"no live acid coat"**, NOT on every round — ⚠ a flat
+    per-round decay would cancel the +1 per hit exactly, shred would never pass 1, and the dial would have
+    DELETED the mechanic instead of tuning it. **(3)** `SECOND_COAT_EFFECT_MULT` = 0.5 scaling slot 2's
+    `rolled` (the one number driving both its immediate damage and its DOT). All three in
+    `engine/weaponCoating.ts` — **exported constants, tunable without touching logic.**
+    ⚠ **WATCH LIST, unresolved (owner: "watch listing for now"):** (a) is the player still too strong with
+    acid; (b) **is any coating other than acid EVER chosen** — if the next device logs still show acid on
+    everything, the problem is the other five being weak, not acid being strong, and the fix is on their
+    side. Judge from device logs, not from sims.
   - **DONE — bosses fight the person in front of them** (OTA-1165): the 25% random dog soak no longer
     fires on a boss (it skipped the second-swing block and rolled no boss +1d6). Ordinary enemies keep the
     soak; a FAILED DISTRACT still redirects on a boss (OTA-795 — the player chose that risk).
@@ -1010,11 +1256,21 @@ Key invariants worth knowing:
   secondary "tap again → 2 active items" report is unconfirmed and likely a
   downstream artifact of the same count/modal mismatch. If it recurs, capture the
   EXACT chip noun that won't clear and whether the player was climbed up.
-- **Spin-off sync status** — steam_Dev / mac_dev / linux_dev / html_dev / apple_ios
-  were merged up to the current Tartaria game code (`git merge -X theirs HaL2001`,
-  identity + platform shims preserved) at the **OTA-660 baseline**; they're now
-  **now ~370 OTAs behind** (reconciled 2026-07-28: HaL2001 at 1034, merge baseline still OTA-660) — re-run the same merge to top them
-  up when the user asks. `Dev_engine_PC` tracks `engine_Dev` (not Tartaria) and was
+- **Spin-off sync status — ALL FIVE CURRENT as of 2026-08-06** (owner: *"let's try
+  to catch all the lines up now. push them all"*). steam_Dev `0c5f9220`, mac_dev
+  `120ad008`, html_dev `ea42b1d6`, linux_dev `98dbdcd4`, apple_ios `dc260282` —
+  each merged up to HaL2001 at the OTA-1174 baseline via `git merge -X theirs
+  HaL2001`, identity + platform shims preserved, all pushed. ⚠ **apple_ios was
+  STRANDED at OTA-1035 / 4.28.46 — roughly 140 OTAs behind** — because it was the
+  one line with no worktree, so every earlier "catch all the lines up" pass
+  silently skipped it. Its worktree now exists at `/tmp/spin-apple_ios`; **confirm
+  all five worktrees exist before believing a catch-up pass was complete.**
+  ⚠ **NONE of the five can be gated locally — no spin-off worktree has ever had
+  `node_modules`.** What WAS verified by hand on each: package-lock/package.json in
+  sync (the failure mode documented directly below), payload constants present, and
+  only the intended platform overrides diverging from HAL. Everything else is
+  CI-verified, not locally verified — report it that way rather than implying a
+  green local run. `Dev_engine_PC` tracks `engine_Dev` (not Tartaria) and was
   left alone; `arbiters-line` is retired. Native/desktop/web builds were NOT
   compiled in the SDK container — verify via each line's build workflow.
   **⚠ MANDATORY STEP THE RECIPE WAS MISSING (learned the hard way 2026-07-29):
@@ -1044,8 +1300,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1106`**,
-**golem-line `2026-08-03-1083`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1175`**,
+**golem-line `2026-08-07-1152`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1054,7 +1310,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.59**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.85**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1273,7 +1529,75 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE CONVERSATION REMEMBERS (2026-08-07, latest). BOTH LINES.** HAL
+- **⚠⚠ READY TO HAND IN (2026-08-07, latest). BOTH LINES.** HAL OTA-1175 /
+  golem OTA-1152. Owner: *"also under contracts you have sort by distance and when
+  I click on it it says you know grouped so each group sorts by distance. I want
+  another sort button there. same style as that. just put it to the right of it and
+  I wanted to say sort by ready to hand in and I want it to pull from the groups.
+  all the ones that are ready to hand in right to the top and sort those by
+  distance automatically."*
+
+  ⚠ **THE BUTTON WAS THE SMALL HALF.** "Ready" was not one predicate — it was
+  THREE, each computed inline in a different section of `ContractsScreen.tsx`,
+  with nothing tying them together:
+
+  | contract kind | how "ready" WAS decided | where |
+  |---|---|---|
+  | hunts / mysteries / storylines | `run.stage >= def.stages.length` | three separate copies |
+  | faction contracts | `factionQuestReady(def, stage, countItem)` | the faction map body |
+  | broker alliance legs | every demanded relic held | top-of-component |
+
+  Wire a new sort to any ONE of them and it floats that kind correctly while
+  **silently missing the others** — a finished hunt would simply never rise and
+  nothing would look broken. So the three were unified FIRST into new
+  **`app/engine/missionReady.ts`** (`missionTurnInReady`), and every existing card
+  pill and COMPLETE gate now routes through it.
+
+  ⚠ **THE GREP FOUND MORE SITES THAN THE PLAN DID.** The scoping note in §8 listed
+  the stage predicate at two line numbers; there are **three** (hunts, mysteries,
+  storylines are three kinds and each carries its own copy). Re-grepping by PATTERN
+  rather than trusting the enumeration is what caught it — §3a.A.4, working exactly
+  as advertised.
+
+  ⚠ **THE EXTRACTION IS BEHAVIOUR-PRESERVING ON PURPOSE, MISSING GUARD AND ALL.**
+  The stage arm still says a stage-less def is ready (`0 >= 0`), because that is
+  what the screen has always done. This OTA moved WHERE the answer is computed, not
+  WHAT it answers; there is a test asserting exactly that, so a later "tidy-up" that
+  adds a `stageCount > 0` guard fails loudly instead of quietly changing which cards
+  can be handed in.
+
+  **1 — A ROLL-UP, not a per-group float.** *"Pull from the groups … right to the
+  top"* cannot be served by sorting inside a section: a ready faction contract sits
+  below Hunts, Mysteries and Storylines, so "top of its group" is still most of a
+  screen down. READY mode gathers every ready contract across all five kinds into
+  one list ABOVE everything, nearest first; the full cards stay in their sections,
+  which also rank ready-first now. ⚠ Each row's COMPLETE calls the **same**
+  `completeContractFromUI` the card's button calls — not a second turn-in path, so
+  a refusal (the hunts face-to-face gate) refuses identically wherever the player
+  taps. The alliance lists with a route note and no button: it seals at the Parley
+  Ground rather than through a COMPLETE tap.
+
+  **2 — ONE MODE, TWO BUTTONS.** Two independent toggles would allow four states and
+  two of them are nonsense ("ready first, but don't sort by distance" — ready ones
+  sort by distance by definition). A single `'default' | 'distance' | 'ready'` makes
+  the impossible states unrepresentable and each button clears the other.
+
+  **3 — A DISTANCE BUG FOUND ON THE WAY.** A ready faction card shows the distance
+  to the faction HOME it hands in at, but the SORT was still keying off the
+  OBJECTIVE — so BY DISTANCE ordered ready faction contracts by a number their own
+  cards were not displaying. One helper (`factionSortLocId`) now feeds both.
+
+  The 9-Capital compact toggle deliberately does NOT get the new mode: a Capital is
+  a boss objective, not a contract, so it has nothing to hand in. It still lights
+  while READY runs, because that mode orders the Capitals by distance too.
+
+  New suite `ota1175ReadyToHandIn` (20 tests). ⚠ Its locks assert the three OLD
+  inline shapes are **GONE** and that **every** section passes its readiness
+  accessor — a lock asserting only the new shape would have gone green over exactly
+  the miss this OTA was about. Verified by running the old-shape patterns against
+  `git show HEAD:…ContractsScreen.tsx`: every lock fails on the pre-change file.
+
+- **⚠⚠ THE CONVERSATION REMEMBERS (2026-08-07). BOTH LINES.** HAL
   OTA-1174 / golem OTA-1151. Owner: *"I would like the talk screens to remember
   the conversations and type the question on an off-white so later we know what
   we asked. with so many conversations it will get confusing without a
