@@ -23,6 +23,23 @@ git worktree add /tmp/hal-golem golem-line
 git worktree add /tmp/hal-eng7 engine_Dev
 ```
 
+⚠ **The five SPIN-OFF lines need worktrees too, and the recipe kept omitting them —
+which is exactly how `apple_ios` went ~140 OTAs stale unnoticed** (§8). Make all five,
+not four:
+
+```bash
+git fetch origin steam_Dev mac_dev html_dev linux_dev apple_ios
+git worktree add /tmp/spin-steam    steam_Dev
+git worktree add /tmp/spin-mac_dev  mac_dev
+git worktree add /tmp/spin-html_dev html_dev
+git worktree add /tmp/spin-linux_dev linux_dev
+git worktree add /tmp/spin-apple_ios apple_ios   # ← the one that gets forgotten
+```
+
+⚠ **No spin-off worktree has `node_modules` and none ever has** — you cannot gate them
+locally. Verify by hand (lock/package.json sync, payload constants, intended overrides
+only) and report them as CI-verified, not locally verified.
+
 - **The harness-designated `claude/*` branch is NOT where work ships.** The user
   directs work to the three named line branches above. Pushing to them requires
   the user's authorization, granted per-session (§2) — once granted, push each
@@ -35,7 +52,18 @@ git worktree add /tmp/hal-eng7 engine_Dev
 - **Working style:** the user playtests on-device (Android, OTA-delivered) and
   pastes in-game logs. For a bug report, DIAGNOSE first — root cause + proposed
   fix, briefly — and implement only after approval (unless the message says
-  "fix it"). ALL diagnosis + fixing follows the §3a ROOT-CAUSE PLAYBOOK. Use AskUserQuestion for genuine UX forks with 2-4 options.
+  "fix it"). ALL diagnosis + fixing follows the §3a ROOT-CAUSE PLAYBOOK.
+- **⚠⚠ DO NOT USE THE `AskUserQuestion` TOOL. Owner directive, standing.** He had a
+  bad question-loop experience with it. **Ask questions in PROSE, inside your normal
+  reply.** (This line previously said the opposite — "use AskUserQuestion for genuine
+  UX forks" — which is now countermanded. If you see that phrasing anywhere else in
+  these docs, it is stale.) The owner still WANTS to be asked about genuine forks;
+  he wants it asked like a person, not as a widget.
+- **⚠⚠ DO NOT TOUCH THE OWNER'S APPLE DEVELOPER ACCOUNT OR ANY CREDENTIALS.**
+  Reading CI logs is fine. Certificates, provisioning profiles, signing identities,
+  App Store Connect — owner-only, every time, no exceptions.
+- **⚠ NEVER put the model identifier in a commit message, PR title/body, code
+  comment, or any artifact pushed to a repo.** Chat replies only.
 - **Judging "clean":** filter typecheck output to `app/**`, and additionally
   ignore the pre-existing `expo-document-picker` errors in engine_Dev app
   source (3 of them) plus the long-standing test-file type errors on all lines
@@ -410,6 +438,54 @@ per port in a scratch heredoc, and each fresh copy missed a shape
 (lowercase refs, bare slugs, a wrong cutoff). One committed rule, one
 committed comparison, zero scratch regexes — that is how the category dies.
 
+### The mechanical HAL → golem port recipe (was session-memory only until 2026-08-07)
+
+```bash
+# 1. cut the patch from the HAL commit — CODE ONLY, docs are done by hand
+cd /tmp/hal-main-fix
+git diff <sha>~1..<sha> -- app __tests__ scripts App.tsx > /tmp/p<ota>.patch
+
+# 2. renumber HAL's OTA refs onto golem's (−23), all shapes
+python3 <scratchpad>/renumber.py /tmp/p<ota>.patch
+
+# 3. apply in the golem worktree
+cd /tmp/hal-golem
+patch -p1 --fuzz=3 < /tmp/p<ota>.patch
+find . -name "*.orig" -delete          # ⚠ patch leaves these; they poison the parity diff
+
+# 4. ⚠⚠ STAGE BEFORE VERIFYING — verify-parity.mjs reads the INDEX, not the worktree.
+#    Skip this and it compares against nothing and cheerfully exits 0.
+git add -A
+
+# 5. now verify
+node /tmp/hal-main-fix/scripts/verify-parity.mjs /tmp/hal-main-fix '<hal-range>' /tmp/hal-golem 'HEAD'
+```
+
+Then golem's **docs by hand** (buildInfo narrative, VERSION.md, HANDOFF) — never
+patched across, because the two lines' doc history genuinely diverges and a
+patched doc silently imports HAL's numbering. Then golem's own gates, commit, push.
+
+### Gate commands + the current ratchet ceilings
+
+Run in each line's worktree before pushing that line:
+
+```bash
+npm run typecheck:ci
+npm run lint
+node scripts/ci-typecheck-tests.mjs     # test-file type-debt ratchet
+npm run test:ci:fast
+```
+
+**Ratchet ceiling: HAL 200 / golem 202.** Over by even one and the gate fails.
+⚠ The usual cause of a surprise +1 is a **new jest mock written with an implicit
+`any`** — `static createAsync = jest.fn(...)` trips TS7022. Annotate it
+(`static createAsync: any = jest.fn(...)`, which is what the canonical
+`preamble.txt` mock block uses) and the count drops back.
+
+**Heavy sims are NOT part of the gates** — `combatStress` (~435 s),
+`dogGolemCombatStress`, `encounterStress`. Run them deliberately when a change
+reaches into combat maths; don't wire them into the fast path.
+
 
 ### ⚠ PHASE 6 IS GOLEM-LINE ONLY (owner directive, 2026-08-03)
 
@@ -498,6 +574,81 @@ Key invariants worth knowing:
 
 ## 8. Open issues / watch list (current)
 
+- **⚠⚠ NEXT UP — SCOPED, INVESTIGATED, NOT BUILT: the Contracts "READY TO HAND IN" sort
+  (HAL OTA-1175 / golem OTA-1152).** Owner, verbatim: *"also under contracts you have sort by distance and
+  when I click on it it says you know grouped so each group sorts by distance. I want another sort button
+  there. same style as that. just put it to the right of it and I wanted to say sort by ready to hand in
+  and I want it to pull from the groups. all the ones that are ready to hand in right to the top and sort
+  those by distance automatically."*
+
+  ⚠ **THE BLOCKER IS THAT "READY" IS NOT ONE PREDICATE — IT IS THREE**, each computed inline in a
+  different section of `ContractsScreen.tsx`, with no shared definition:
+  | contract kind | how "ready" is decided | site |
+  |---|---|---|
+  | faction contracts | `factionQuestReady(def, rec.stage, countItem)` — stages OR fetch-count | `ContractsScreen.tsx:1191` → `engine/factionQuests.ts:97` |
+  | hunts / mysteries / storylines | `run.stage >= def.stages.length` — stage counter only | `ContractsScreen.tsx:892`, `:1042` |
+  | broker legs | `brokerLegs.every((l) => hasRelic(l.itemName))` — inventory check | `ContractsScreen.tsx:340` |
+
+  **Wire the button to any ONE of them and it floats that kind correctly while silently missing the
+  others** — a hunt sitting ready would never rise. So step one is extracting a single
+  `missionTurnInReady()` that all three existing call sites route through, which also stops the three
+  sections being able to disagree with each other. **Do not invent a fourth definition of ready** — it
+  must agree with whatever the COMPLETE tap already checks, or the button lies.
+
+  **Decision already taken (owner told, not yet contradicted): make it a THREE-WAY SELECTOR, not a second
+  independent toggle.** The existing control is a boolean `sortByDistance`. Two independent toggles give
+  four states and two are nonsense ("ready first, but don't sort by distance" — the owner explicitly said
+  ready ones sort by distance automatically). So: DEFAULT → BY DISTANCE → READY FIRST, tapping one clears
+  the other, same visual style, sitting to the right. If the owner comes back wanting two literal
+  buttons, that's a small change from here.
+
+  **Everything needed, already located in `ContractsScreen.tsx`:**
+  - `:120` — `const [sortByDistance, setSortByDistance] = useState(false);` (add the new state beside it)
+  - `:230-234` — the section sorter; `if (!sortByDistance) return arr as T[];`
+  - `:642-653` — the main sort bar `Pressable`; styles `sortBar` / `sortBarOn` / `sortBarPressed` /
+    `sortBarText` / `sortBarHint`. **This is the one the owner means** — put the new button to its right.
+  - `:469-476` — a second COMPACT variant of the same control (styles `mqSortBtn` / `mqSortBtnOn` /
+    `mqSortText`). Easy to miss; decide deliberately whether it gets the new mode too.
+
+  Then the usual: new suite, gates (typecheck / lint / ratchet **200** / `test:ci:fast`), docs ritual,
+  commit + push HAL, port to golem via renumber + `verify-parity.mjs`, then the steam merge.
+
+- **⚠ OPEN OWNER CALLS — analysed and presented, NOT decided. Do not implement unprompted.**
+  - **Sell value for Commons is too low.** Owner: *"I sold the other day like 11 items. I got 81 TC … I
+    think our floor is too low on selling Commons."* ⚠ **ROOT CAUSE FOUND, and it is dead code:** the
+    intended ~11 TC for Common gear can never be paid, because `RARITY_BUY_FLOOR.Common = 5` clamps it,
+    and **0 of 276 weapons carry a `tcBuy`**, so OTA-922's per-item escape hatch never applies to weapons
+    at all. Two options on the table — author `tcBuy` across the 276, or raise the flat floor. Owner's own
+    proposal was to tier it by durability: *"two bone compound bows, one 10/10, one 32/32 … one sells for
+    11 or 12."* ⚠ **The recommendation given was to price the WHOLE INSTANCE, not one channel:** in
+    `durability.ts:179-200` a single `temper` roll drives durability max UP and the perk budget DOWN, so
+    pricing on durability alone systematically UNDERPRICES glass cannons — lerp 5→11 off durability max
+    **plus** `instanceStats`. Files: `engine/sellPrice.ts`, `engine/durability.ts`.
+  - **Faction standing has no positive ladder.** Owner: *"what the hell do I actually do at faction
+    standing? I've traded with the vendor that I had a negative 90 on … there's no real benefit to have
+    good standing. I could be a giant asshole to everybody."* ⚠ **He is right, and it is verifiable:**
+    `factionRapport.ts:44` `vendorPriceMod(charisma, completedFactionQuestIds, vendorFaction)` **does not
+    read standing at all**, and `pressure.ts` only uses it to punish (`HOSTILE_STANDING = -25`, hunt
+    chance 0.05→0.22). Standing is punishment-only. **Recommendation was to build the ladder BEFORE the
+    atmospheric line** — a vague line about a number that does nothing just advertises the hole.
+  - **The faction-shift line itself.** Owner wants the six-shift wall replaced with one vague Tartarian
+    line — *"many people view you differently now"* — plus threshold-only lines when a tier is actually
+    crossed. He agreed to drop the "just organize the wall better" alternative (*"we still get a wall of
+    text, it's just more organized"*). Gated behind the ladder above.
+  - **Acid lore.** Owner: *"we could work acid somehow into the lore."* Sketch he liked: a vendor topic +
+    an Arbiter line + an Acid Flask description rewrite. Not scheduled.
+  - **Mud monster memory.** Owner tried to preempt a mud fight from a remembered beat — *"you examine the
+    mud. the mud changes shape"* — and from the original design where **any edged metal item scrapes the
+    ground**. `engine/hooks.ts:151,591` has `mud_golem_stir` (weight 4). The scrape-with-an-edge affordance
+    is what he was reaching for and it is not wired.
+
+- **⚠ TEST VERDICTS OWED (promised unprompted — deliver without being asked again).**
+  - **`encounterStress.test.ts:276`** — still failing. **Confirmed NOT caused by the acid batch:** it was
+    already failing on `78c75a8` before OTA-1173 and is unchanged after. Verdict flake-vs-real-regression
+    is still owed.
+  - **`movementStress`** — the classification is wrong, not the movement. It does not count story-thread
+    or dog-quest resolutions as approach successes, so it under-reports. Fix the classifier and raise N.
+
 - **⚠⚠ STANDING TUNING LIST (owner directive, 2026-08-06 — "keep these on the tuning list in handoff so we
   can follow up later"). Source: the OTA-1163 pressure test (20,000-trial Monte Carlo vs the real engine);
   decisions taken in OTA-1164/1165 are marked DONE, the rest are OPEN owner calls:**
@@ -517,7 +668,24 @@ Key invariants worth knowing:
     thin" lever. arb119 distinct-kill farm guard unchanged and pinned.
   - **DONE — acid boss shred cap 11 → 7** (OTA-1165): `ACID_SHRED_BOSS_BONUS` 6 → 2. Parity with the +6
     boss AC bonus let acid erase the wall and compound with stagger into the stagger-lock exploit (E1).
-    Watch on-device: acid should still feel worth carrying into boss fights, just not mandatory.
+    ⚠ **SUPERSEDED BY OTA-1173 — the boss cap is now 5, not 7.** 1165 tuned only the boss HEADROOM (+2,
+    unchanged); 1173 dropped the base `ACID_SHRED_MAX` 5 → 3 underneath it, so the boss total moved with
+    it. Do not read the "7" above as current.
+  - **DONE — the acid batch** (OTA-1173, owner call — *"I throw acid on everything … I might have made the
+    player too powerful"*). Three dials on the one coating that outclassed the other five, because acid is
+    the only one that MULTIPLIES the others: poison/corruption add damage, acid adds ACCURACY, and accuracy
+    scales everything else on the swing. It is also the only two-ingredient one-each recipe in the game
+    (Aether Dust ×1 + Scrap Metal ×1), so it is always available — and its value SCALES WITH FIGHT LENGTH,
+    so ramping enemy HP fed it rather than answering it. **(1)** `ACID_SHRED_MAX` 5 → 3. **(2)**
+    `ACID_SHRED_DECAY_PER_ROUND` = 1, gated on **"no live acid coat"**, NOT on every round — ⚠ a flat
+    per-round decay would cancel the +1 per hit exactly, shred would never pass 1, and the dial would have
+    DELETED the mechanic instead of tuning it. **(3)** `SECOND_COAT_EFFECT_MULT` = 0.5 scaling slot 2's
+    `rolled` (the one number driving both its immediate damage and its DOT). All three in
+    `engine/weaponCoating.ts` — **exported constants, tunable without touching logic.**
+    ⚠ **WATCH LIST, unresolved (owner: "watch listing for now"):** (a) is the player still too strong with
+    acid; (b) **is any coating other than acid EVER chosen** — if the next device logs still show acid on
+    everything, the problem is the other five being weak, not acid being strong, and the fix is on their
+    side. Judge from device logs, not from sims.
   - **DONE — bosses fight the person in front of them** (OTA-1165): the 25% random dog soak no longer
     fires on a boss (it skipped the second-swing block and rolled no boss +1d6). Ordinary enemies keep the
     soak; a FAILED DISTRACT still redirects on a boss (OTA-795 — the player chose that risk).
@@ -1010,11 +1178,21 @@ Key invariants worth knowing:
   secondary "tap again → 2 active items" report is unconfirmed and likely a
   downstream artifact of the same count/modal mismatch. If it recurs, capture the
   EXACT chip noun that won't clear and whether the player was climbed up.
-- **Spin-off sync status** — steam_Dev / mac_dev / linux_dev / html_dev / apple_ios
-  were merged up to the current Tartaria game code (`git merge -X theirs HaL2001`,
-  identity + platform shims preserved) at the **OTA-660 baseline**; they're now
-  **now ~370 OTAs behind** (reconciled 2026-07-28: HaL2001 at 1034, merge baseline still OTA-660) — re-run the same merge to top them
-  up when the user asks. `Dev_engine_PC` tracks `engine_Dev` (not Tartaria) and was
+- **Spin-off sync status — ALL FIVE CURRENT as of 2026-08-06** (owner: *"let's try
+  to catch all the lines up now. push them all"*). steam_Dev `0c5f9220`, mac_dev
+  `120ad008`, html_dev `ea42b1d6`, linux_dev `98dbdcd4`, apple_ios `dc260282` —
+  each merged up to HaL2001 at the OTA-1174 baseline via `git merge -X theirs
+  HaL2001`, identity + platform shims preserved, all pushed. ⚠ **apple_ios was
+  STRANDED at OTA-1035 / 4.28.46 — roughly 140 OTAs behind** — because it was the
+  one line with no worktree, so every earlier "catch all the lines up" pass
+  silently skipped it. Its worktree now exists at `/tmp/spin-apple_ios`; **confirm
+  all five worktrees exist before believing a catch-up pass was complete.**
+  ⚠ **NONE of the five can be gated locally — no spin-off worktree has ever had
+  `node_modules`.** What WAS verified by hand on each: package-lock/package.json in
+  sync (the failure mode documented directly below), payload constants present, and
+  only the intended platform overrides diverging from HAL. Everything else is
+  CI-verified, not locally verified — report it that way rather than implying a
+  green local run. `Dev_engine_PC` tracks `engine_Dev` (not Tartaria) and was
   left alone; `arbiters-line` is retired. Native/desktop/web builds were NOT
   compiled in the SDK container — verify via each line's build workflow.
   **⚠ MANDATORY STEP THE RECIPE WAS MISSING (learned the hard way 2026-07-29):
