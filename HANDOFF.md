@@ -58,8 +58,20 @@ and **test the crap out of everything before pushing.**
 On a line branch the OTA publish finishes in ~90 seconds while CI takes ~5 minutes,
 and both fire on the same push — so CI *structurally cannot* gate an OTA here.
 Measured 2026-08-07: golem's publish completed at 01:48:50Z with CI still running
-at 01:49:26Z. Run `typecheck:ci`, `lint`, the test-typecheck ratchet and
-`test:ci:fast` in the worktree **before** you push, every time.
+at 01:49:26Z. Run **all five** in the worktree **before** you push, every time:
+`typecheck:ci`, `lint`, `typecheck:tests` (the test-typecheck ratchet),
+`check:handoff` (the claims ratchet) and `test:ci:fast`.
+
+⚠ **The two RATCHETS block, and they block on things a green test run will not
+catch.** Both compare against a committed baseline and fail on *growth*, so they
+catch the debt a change adds rather than the debt it inherits:
+- `typecheck:tests` — new test code must typecheck. Verified 2026-08-07: a new
+  suite copied an older suite's `expo-av` mock, inheriting a `TS7022` that is part
+  of the tolerated baseline; the ratchet failed at 201 > 200. **The fix is to
+  annotate the new code, not to run `--update-baseline`.**
+- `check:handoff` — see the receipts section below. Verified 2026-08-07: it failed
+  at 15 > 13 on two sentences in a handoff entry written moments earlier, one of
+  which was a real unreceipted claim and one a turn of phrase.
 
 ⚠ **One commit per OTA per line, docs included** (`buildInfo`, `VERSION.md`,
 `HANDOFF.md` ride with the code). A second push inside the CI window cancels the
@@ -78,7 +90,9 @@ no PRs on line branches"* (contradicted by the handoff's own step 6).
 
 **So: if you write that something is impossible, say how you established it and
 when.** Policy is exempt — "do NOT push to main" is a directive, not a claim.
-Enforced on the line branches by `npm run check:handoff`, a blocking CI step.
+Enforced on the line branches by `npm run check:handoff` — **a pre-push gate, not
+only a CI step.** Since CI cannot gate an OTA here (see above), running it locally
+is the only thing standing between a wrong prohibition and every future session.
 
 ## Every line is isolated — no cross-pollination
 
