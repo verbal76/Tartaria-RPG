@@ -140,6 +140,10 @@ one line is applied **per-line, code-specifically** (see §4).
 > changes."** That is a high bar: default to all three, and fork to golem alone only
 > when the change is genuinely engine-threatening.
 >
+> **⚠⚠ `engine_Dev` IS OFF LIMITS (owner, 2026-08-07): *"engine_dev is a separate
+> project, leave it be for now, it's off limits unless I tell you."*** Do not commit
+> to it, do not port to it, do not include it in a pass. Only the owner reopens it.
+>
 > **Working phase: QoL improvements and balancing.** Quick, surgical, well-thought-out
 > changes — and **test the crap out of everything before pushing.** The gates are the
 > floor, not the ceiling; when a change touches combat maths, run the heavy sims too
@@ -256,6 +260,57 @@ checklist: CLAUDE.md "FIX RULE".
 6. After pushing, ensure an **open draft PR** exists for the branch (create one if
    not). PRs already exist for the standing lines (#2 HaL2001, #7 golem-line,
    #13 engine_Dev, etc.).
+
+### ⚠⚠ CI ON A LINE BRANCH RUNS **AFTER** THE OTA IS ALREADY ON THE PHONE (proven 2026-08-07)
+
+**The local gates in step 2 are the ONLY gate that runs before the player gets the
+code.** A push fires the publish workflow and the CI workflow at the same moment,
+and publishing finishes first — it is not close:
+
+| golem push `d8ed7c79` (OTA-1152) | created | finished |
+|---|---|---|
+| **Publish · OTA** | 01:47:14Z | **01:48:50Z — on the device** |
+| **CI** (typecheck/lint/ratchet/jest) | 01:47:14Z | still running at 01:49:26Z |
+
+Publishing takes ~90 seconds; CI takes ~5 minutes. **CI can never gate an OTA
+here.** Do not describe it as if it does, and never treat "CI will catch it" as
+cover for a thin local run. Run the full gates in the worktree, every time, before
+the push — that is the real gate, and it is the only one.
+
+### ⚠⚠ A SECOND PUSH INSIDE THE CI WINDOW CANCELS THE FIRST COMMIT'S RUN
+
+GitHub's branch concurrency group kills the in-flight run when a newer commit lands
+on the same branch. Same session, same process, opposite outcomes purely on timing:
+
+- HAL `202e5b6d` (OTA-1175) — 11 minutes before the next commit → **full green run.**
+- golem `d8ed7c79` (OTA-1152) — 2 minutes → **run cancelled, permanently.** The
+  commit that actually shipped to the device carries a cancelled CI record forever.
+
+The code was still covered (the follow-up was docs-only, so the app tree that went
+green at `acfb9f9c` is byte-identical under `app/`), but **the shipped SHA's own
+record is gone**, and had the follow-up carried code it would have been a real hole.
+
+**So: one commit per OTA per line, docs included** — `buildInfo`, `VERSION.md` and
+`HANDOFF.md` ride WITH the code, which is what step 4 above already says. And if a
+follow-up genuinely must go out, either let the CI window close first or accept and
+SAY that the prior commit's run was cancelled rather than reporting it as failed or
+in-flight.
+
+⚠ **Run the §3a.E self-audit BEFORE committing, not after.** The 2026-08-07 case: the
+exploit-lens check on the OTA-1175 roll-up (does the new COMPLETE door bypass a gate
+the card enforced?) was done after the push, so its finding needed a second commit —
+which is what cancelled golem's run. The audit is listed as "before declaring done";
+treat "done" as "before `git commit`".
+
+⚠ **Key every CI check to the branch HEAD SHA explicitly.** Listing runs by branch
+returns superseded runs too, and a cancelled run for an older SHA sitting above a
+live one is easy to misread. Resolve HEAD first, then read that SHA's jobs.
+
+⚠ **CORRECTION TO A PLAUSIBLE-SOUNDING CLAIM:** it is NOT true that the line branches
+carry no PRs. Step 6 above requires an open draft PR per line, and **#2 (HaL2001) and
+#7 (golem-line) are open right now** and track those branches. What IS true is that
+those PRs are long-lived drafts nobody merges, so their checks are a record, not a
+gate — which is the same conclusion by a different route: the gate is local.
 
 **Docs-only safety:** `**.md`, `docs/**`, `.github/**`, `app.json`, lockfiles etc.
 are in every `eas-update.yml`'s `paths-ignore`, so a HANDOFF/docs-only push does
