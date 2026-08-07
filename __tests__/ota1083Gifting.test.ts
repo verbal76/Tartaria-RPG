@@ -58,9 +58,17 @@ const rel = (over: Partial<NpcRelation> = {}): NpcRelation => ({
   id: 'irma_ironhand', name: 'Irma', meetings: 3, firstMetAt: 1, lastSeenAt: 1, lastSeenHours: 0,
   trades: 1, tcTraded: 100, contractsTaken: 0, contractsTurnedIn: 0, wrongs: 0, ...over,
 } as NpcRelation);
-const ingot: GiftItem = { name: 'Iron Ingot', tags: ['metal'], worth: 40 };
-const nail: GiftItem = { name: 'Bent Nail', tags: ['junk'], worth: 2 };
-const jewel: GiftItem = { name: 'Cut Glass', tags: ['trinket'], worth: 200 };
+// ⚠ OTA-1176 — RETARGETED TO REAL CATALOG ITEMS AND REAL TAGS.
+// These fixtures used to be `Iron Ingot` (tags ['metal']), `Cut Glass` (['trinket'])
+// and `Bead String` (['trinket']). NONE of those three items exists, and `trinket`
+// is not a tag any item in the game carries. That is not a nitpick — it is why the
+// dead-taste bug survived so long: this suite was green the whole time because it
+// asserted against invented data, so it could not tell that Irma's authored tastes
+// never fired on anything a player could actually pick up. Fixtures use REAL
+// catalog items (§3a-D), and now they do.
+const ingot: GiftItem = { name: 'Titanforged Cuirass', tags: ['plate', 'titanforged', 'armor'], worth: 200 };
+const nail: GiftItem = { name: 'Bent Nail', tags: ['junk', 'metal', 'scrap'], worth: 2 };
+const jewel: GiftItem = { name: 'Blue Cap Mushroom', tags: ['mushroom', 'foraged'], worth: 200 };
 
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
@@ -84,7 +92,7 @@ describe('OTA-1083 — the door OTA-803 closed stays closed', () => {
   it('GIFT-FARM: the same item again and again stops counting', () => {
     // Twenty of the same thing must not buy twenty steps of warmth.
     const given = (n: number) =>
-      rel({ gifts: Array.from({ length: n }, () => ({ name: 'Iron Ingot', atHours: 0 })) });
+      rel({ gifts: Array.from({ length: n }, () => ({ name: 'Titanforged Cuirass', atHours: 0 })) });
     expect(resolveGift('irma_ironhand', 'Irma', ingot, given(0)).countsAsBoon).toBe(true);
     expect(resolveGift('irma_ironhand', 'Irma', ingot, given(1)).countsAsBoon).toBe(true);
     const third = resolveGift('irma_ironhand', 'Irma', ingot, given(2));
@@ -93,8 +101,11 @@ describe('OTA-1083 — the door OTA-803 closed stays closed', () => {
   });
 
   it('...but a DIFFERENT item still lands', () => {
-    const r = rel({ gifts: [{ name: 'Iron Ingot', atHours: 0 }, { name: 'Iron Ingot', atHours: 1 }] });
-    expect(resolveGift('irma_ironhand', 'Irma', { name: 'Aether Mud', tags: ['ore'], worth: 60 }, r)
+    const r = rel({ gifts: [{ name: 'Titanforged Cuirass', atHours: 0 }, { name: 'Titanforged Cuirass', atHours: 1 }] });
+    // OTA-1176 — was `{ name: 'Aether Mud', tags: ['ore'] }`. `ore` is another tag
+    // no item in the game carries, so this asserted a match that could never occur
+    // in play. Irma really does like gauntlets.
+    expect(resolveGift('irma_ironhand', 'Irma', { name: "Titan's Gauntlets", tags: ['gauntlets', 'armor'], worth: 60 }, r)
       .countsAsBoon).toBe(true);
   });
 
@@ -117,9 +128,17 @@ describe('OTA-1083 — the door OTA-803 closed stays closed', () => {
 });
 
 describe('OTA-1083 — who they are decides what it is worth', () => {
-  it('a smith is delighted by metal and unmoved by trinkets', () => {
+  it('a smith is delighted by PLATE and actively unmoved by forage', () => {
+    // OTA-1176 — the assertion is the same claim, made against things that exist.
+    // Irma is a heavy armorer for the Tartarian Giants: plate is her love, and
+    // `metal` deliberately is NOT (it covers Bent Nails and Pry Bars — being
+    // delighted by a pry bar would make her indiscriminate, which is the failure
+    // this rewrite was meant to cure).
     expect(reactionFor('irma_ironhand', ingot)).toBe('loved');
-    expect(reactionFor('irma_ironhand', { name: 'Bead String', tags: ['trinket'], worth: 40 })).toBe('polite');
+    expect(reactionFor('irma_ironhand', { name: 'Iron Core', tags: ['metal', 'core'], worth: 40 })).toBe('liked');
+    // A mushroom is now a real DISLIKE rather than an indifferent shrug — the tier
+    // the owner asked for and the schema did not previously have.
+    expect(reactionFor('irma_ironhand', { name: 'Blue Cap Mushroom', tags: ['mushroom'], worth: 40 })).toBe('disliked');
   });
 
   it('a general trader is the other way round', () => {
@@ -130,7 +149,11 @@ describe('OTA-1083 — who they are decides what it is worth', () => {
   it('something genuinely valuable is welcome from anybody', () => {
     // Otherwise a specialist could never be given anything outside their trade,
     // which reads as a lookup table rather than a person.
-    expect(reactionFor('drakos_mercenary', jewel)).toBe('liked');
+    // OTA-1176 — `jewel` is now a real item (Blue Cap Mushroom) and Drakos really
+    // does dislike forage, so it can no longer stand for "no opinion". The claim
+    // under test is the PRICE FALLBACK, so the fixture has to be something he has
+    // no view on at all: a runecaster is outside a two-hander merchant's trade.
+    expect(reactionFor('drakos_mercenary', { name: 'Aetheric Ward', tags: ['runecaster', 'spell'], worth: 200 })).toBe('liked');
   });
 
   it('a person with no authored preferences still reacts sensibly', () => {
