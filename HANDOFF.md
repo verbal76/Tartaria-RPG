@@ -3,65 +3,126 @@
 **You are on `main`. Do NOT develop here.** `main` is an (essentially empty)
 base/PR-target branch. Real work happens on one of the lines below.
 
-## ⛔ First thing, every session: ask which branch to work on
+## The lines, and the order of a pass (owner directive, 2026-08-07)
 
-Before making ANY change, ask the user **which of the three main branches** this
-session is for, and switch to that branch's worktree. Do not guess, and do not
-start editing on `main`. Each line has its own app identity, its own OTA channel,
-and its own full `HANDOFF.md` (read that branch's handoff once you're on it).
+Owner, verbatim: *"hal is the live branch that my testers have access to, golem is
+the testing ground for big changes, steam line stays up to date for my PC testing
+and possible steam submissions. so unless there is a high chance we are doing game
+braking changes keep all 3 current."*
 
-## The three main branches
+…and, **amended later the same day**: *"you can stack updates for the exe and we
+can do an update and push when a full exe is needed. we still push Hal first and
+then port to golem."*
 
-1. **`HaL2001` — the LIVE game (at testers).**
-   The distributed Tartaria Realms build real testers are playing. A code push
-   here publishes an OTA to their devices (channels `hal2001` + `preview` +
-   `ios-preview`). Treat it as production: only ship vetted changes, and only when
-   the user says to.
+**So a pass is TWO lines, in this order: `HaL2001` FIRST, then port to
+`golem-line`.** Per-line OTA bumps, one commit + push per line. Fork to golem alone
+only when a change has a high chance of breaking the game; that is a HIGH bar.
+**`steam_Dev` is BATCHED** — it accumulates and comes up in one merge when the
+owner wants an `.exe`.
 
-2. **`golem-line` — HAL's WARM STANDBY (role clarified 2026-07-13).**
-   Not a trial scratch pad: golem must STAY CURRENT with HAL. Minor changes and
-   upgrades land on BOTH `HaL2001` and `golem-line` in the same pass (per-line OTA
-   bumps, one commit + push per line) so the parity gap never widens. Its purpose:
-   when a major, potentially engine-breaking change begins, development forks onto
-   golem so production Tartaria is never at risk. Same game as HAL, separate app
-   id/channel (`golem-line`), installs side-by-side.
+1. **`HaL2001` — the LIVE game, at testers.** Push here FIRST. A push publishes an
+   OTA to their devices (channels `hal2001` + `preview` + `ios-preview`). Treat it
+   as production. **Device logs come from here almost always.**
 
-3. **`engine_Dev` — a SEPARATE project.**
-   The lore-agnostic RPG **Engine** (content is upload/pack-driven) — *not* the
-   Tartaria game. It shares a lot of engine code with HAL/golem but is its own
-   product with its own app id/channel (`engine_Dev`). Don't conflate it with the
-   Tartaria game; a "HAL improvement" does not automatically belong here.
+2. **`golem-line` — the testing ground for BIG changes.** When a major,
+   potentially engine-breaking change begins, development forks onto golem so
+   production Tartaria is never at risk. Otherwise it is ported right after HAL in
+   the same pass, so the fork point is never stale. Separate app id/channel
+   (`golem-line`); installs side-by-side. Parity offset: **golem = HAL − 23.**
 
-> Typical flow for a Tartaria-game change: ship it to **HaL2001 AND golem-line in
-> the same pass** (golem-as-trial is reserved for changes the user explicitly wants
-> staged). An engine change belongs on **engine_Dev** and stands alone.
+3. **`steam_Dev` — the PC line, BATCHED: the owner's PC testing and possible Steam
+   submission path.** ⚠ It was briefly promoted to a standing per-pass line on
+   2026-08-07 and demoted again hours later — an `.exe` only matters when the owner
+   sits down to test on PC, so topping it up every OTA spent CI on an artifact
+   nobody was going to run. **Bring it up as a single merge of `HaL2001`'s current
+   tip when an `.exe` is wanted, and do not poll its build** — the owner watches
+   those. Windows/Electron via `build-steam-exe.yml`; updates ship through the
+   Steam depot, **not** OTA — a push to `steam_Dev` publishes nothing to any
+   device. It is also the PR base for `mac_dev`, `html_dev` and `linux_dev`, so it
+   should not be left arbitrarily far behind — catch it up when you build.
+
+## ⛔ `engine_Dev` is OFF LIMITS
+
+Owner, 2026-08-07: *"engine_dev is a separate project, leave it be for now, it's
+off limits unless I tell you."* Do not commit to it, do not port to it, do not
+include it in a pass. **Only the owner reopens it.** (It is the lore-agnostic RPG
+Engine — content is upload/pack-driven — and was previously listed here as one of
+the three main lines. That is no longer true and was the reason for this rewrite.)
+
+## Working phase and standards
+
+**QoL improvements and balancing.** Quick, surgical, well-thought-out changes —
+and **test the crap out of everything before pushing.**
+
+⚠ **The local gates are the ONLY gate that runs before the player gets the code.**
+On a line branch the OTA publish finishes in ~90 seconds while CI takes ~5 minutes,
+and both fire on the same push — so CI *structurally cannot* gate an OTA here.
+Measured 2026-08-07: golem's publish completed at 01:48:50Z with CI still running
+at 01:49:26Z. Run **all five** in the worktree **before** you push, every time:
+`typecheck:ci`, `lint`, `typecheck:tests` (the test-typecheck ratchet),
+`check:handoff` (the claims ratchet) and `test:ci:fast`.
+
+⚠ **The two RATCHETS block, and they block on things a green test run will not
+catch.** Both compare against a committed baseline and fail on *growth*, so they
+catch the debt a change adds rather than the debt it inherits:
+- `typecheck:tests` — new test code must typecheck. Verified 2026-08-07: a new
+  suite copied an older suite's `expo-av` mock, inheriting a `TS7022` that is part
+  of the tolerated baseline; the ratchet failed at 201 > 200. **The fix is to
+  annotate the new code, not to run `--update-baseline`.**
+- `check:handoff` — see the receipts section below. Verified 2026-08-07: it failed
+  at 15 > 13 on two sentences in a handoff entry written moments earlier, one of
+  which was a real unreceipted claim and one a turn of phrase.
+
+⚠ **One commit per OTA per line, docs included** (`buildInfo`, `VERSION.md`,
+`HANDOFF.md` ride with the code). A second push inside the CI window cancels the
+first commit's run via branch concurrency, which permanently destroys the CI record
+of the commit that actually shipped.
+
+## ⚠ Prohibitions in these docs need receipts
+
+HANDOFF.md is a one-way write channel between sessions with no review step, so a
+confident WRONG sentence travels exactly as far as a right one. The dangerous shape
+is a **prohibition**: a wrong instruction fails loudly the first time someone
+follows it, but a wrong prohibition fails silently forever, because nobody attempts
+the thing and nothing looks broken. Two got through this way — *"you cannot gate
+spin-offs locally"* (disproved 2026-08-07 by running `npm install`) and *"there are
+no PRs on line branches"* (contradicted by the handoff's own step 6).
+
+**So: if you write that something is impossible, say how you established it and
+when.** Policy is exempt — "do NOT push to main" is a directive, not a claim.
+Enforced on the line branches by `npm run check:handoff` — **a pre-push gate, not
+only a CI step.** Since CI cannot gate an OTA here (see above), running it locally
+is the only thing standing between a wrong prohibition and every future session.
 
 ## Every line is isolated — no cross-pollination
 
 Each line publishes ONLY to its own channel / app id: **Tartaria (HaL2001) → the
-`hal2001` channel only, golem → `golem-line` only, engine → `engine_Dev` only.** A
-push to one line can never reach another line's testers. This is enforced in CI
-(the shared `eas-update.yml` gates on a per-pushed-branch `case`, defaulting to
-_skip_; golem has its own firewall workflow `eas-update-golem.yml`), and the
-desktop/web builds are isolated by their own build workflows + app ids. Never copy
-one line's publish step into another. (Full detail is in each line's own HANDOFF.)
+`hal2001` channel only, golem → `golem-line` only.** A push to one line can never
+reach another line's testers. This is enforced in CI (the shared `eas-update.yml`
+gates on a per-pushed-branch `case`, defaulting to _skip_; golem has its own
+firewall workflow `eas-update-golem.yml`), and the desktop/web builds are isolated
+by their own build workflows + app ids. Never copy one line's publish step into
+another. (Full detail is in each line's own HANDOFF.)
 
-## Other branches (not the three mains)
+## Other branches (not the three named above)
 
-Downstream / packaging lines forked from the above — **`steam_Dev`**, **`mac_dev`**,
-**`linux_dev`**, **`html_dev`** (desktop/web builds), **`apple_ios`**,
-**`Dev_engine_PC`** (engine's Windows `.exe`), and the retired **`arbiters-line`**.
-Plus utility/parked branches (`iOS-initial`, `release/**`, `revert`,
-`submit-workflow-to-main`) and ephemeral `claude/*` feature branches. These are not
-where new work starts unless the user names one specifically.
+Downstream / packaging lines forked from the above — **`mac_dev`**, **`linux_dev`**,
+**`html_dev`** (desktop/web builds, all based on `steam_Dev`), **`apple_ios`**, and
+the retired **`arbiters-line`**. Plus `Dev_engine_PC` (engine's Windows `.exe`,
+which tracks the off-limits `engine_Dev` — leave it alone), utility/parked branches
+(`iOS-initial`, `release/**`, `revert`, `submit-workflow-to-main`) and ephemeral
+`claude/*` feature branches. These are not where new work starts unless the user
+names one specifically.
+
+⚠ Spin-off worktrees **can** be gated locally — `npm install` in one just works
+(~25s). An earlier claim that they never can was a habit mistaken for a limitation.
 
 ## Once you're on a line
 
-Read that branch's own `HANDOFF.md` — it carries the current operating model
-(multi-line, descriptive OTA slugs, push-each cadence), the per-line identity
-table, the change loop, cross-line parity rules, and the current open issues. Full
-historical issue tracker + OTA changelog for each branch is preserved in its
-`HANDOFF-ARCHIVE.md`.
+Read that branch's own `HANDOFF.md` — it carries the current operating model, the
+per-line identity table, the change loop, the root-cause playbook, cross-line
+parity rules, and the current open issues. Full historical issue tracker + OTA
+changelog for each branch is preserved in its `HANDOFF-ARCHIVE.md`.
 
 ---
 _This `main` handoff is intentionally short — it only routes you to the right
