@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { withArticle, withArticleCap, anOrA, theCap, theLower, describeEnemyPartyCap } from '../engine/grammar';
 import type {
   PlayerCharacter,
+  FactionStanding, // OTA-1182 — meterSpiteGains rewrites standing rows directly
   WorldMemory,
   GameLogEntry,
   ScreenName,
@@ -139,6 +140,9 @@ import {
   pickEncounterFromLadder,
   findEnemyByName,
   enemyScalePower,
+  // OTA-1182 — the fallback when gear cannot be read; these make gearPowerTerm 0.
+  AC_POWER_BASELINE,
+  DMG_POWER_BASELINE,
   scaleEncounterForContext,
   scaledEnemyForContext,
   rollExtraPackMembers,
@@ -318,6 +322,7 @@ import {
 import {
   findFactionQuestById,
   availableFactionQuests,
+  repLockedFactionQuests, // OTA-1182 — why the board is empty, so the refusal can say
   fuzzyFindFactionQuest,
   factionQuestReady,
 } from '../engine/factionQuests';
@@ -350,7 +355,9 @@ import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
 import { resolveLootItem } from '../engine/crafting';
 import { canonicalItemKind, canonicalItemRarity, canonicalItemTags } from '../engine/crafting';
 import { rollBossSpoils } from '../engine/bossLoot';
-import { enemyPowerScore } from '../engine/powerRating';
+// OTA-1182 — avgDamageNotation is the SAME damage proxy playerPowerScore uses, so the
+// difficulty curve and the Power gauge price a weapon identically.
+import { enemyPowerScore, avgDamageNotation } from '../engine/powerRating';
 import { levenshtein } from '../engine/editDistance';
 import { matchLocationByName } from '../engine/locationMatch';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
@@ -3458,6 +3465,113 @@ function captureBossVictoryLine(channel: string, text: string): void {
  *  lie that reads as a bug. */
 type InjectedParty = { elite: Enemy | null } | null;
 
+/** ⚠ OTA-1182 — THE GAIN SIDE OF A HOSTILE CASCADE IS METERED. THE LOSS SIDE IS NOT.
+ *
+ *  Every standing LOSS cascades through `applyRepChange`: allies take half, and rivals
+ *  take the INVERSE — so they gain. A caught theft is −10 to the victim, −5 to their
+ *  allies and **+5 to every rival**; a successful extortion is −6 / −3 / **+3**. Gifts
+ *  have carried a lifetime per-faction budget since OTA-803
+ *  (`GIFT_STANDING_FACTION_CAP`), and this path had nothing — so shaking down a
+ *  faction's enemies was an unbounded way to climb with them. Conspiracy Architects
+ *  have four rivals and start at −20; roughly fourteen extortions of their enemies
+ *  reached the join threshold, repeatable forever.
+ *
+ *  ⚠ ONLY THE GAINS ARE CAPPED, and the asymmetry is the whole point — the same shape
+ *  the gift path uses and for the same reason. Being HATED must stay uncapped:
+ *  consequences should not have a ceiling, and a capped loss would let a player be
+ *  hostile for free once the budget ran out. Being LOVED BY PROXY is what gets a
+ *  budget, because it is a reward nobody aimed at you.
+ *
+ *  ⚠ The excess is ROLLED BACK off the standing rows, not merely omitted from the log
+ *  — an over-budget gain that still moved the number while going unreported would be
+ *  the OTA-1179 defect (a log that disagrees with the save) pointing the other way.
+ *  The returned `changed` list is trimmed to match, so the feed shows exactly what
+ *  landed. A gain clamped to zero disappears from both. */
+const SPITE_STANDING_FACTION_CAP = 10;
+
+type RepChanged = { factionId: string; delta: number; newStanding: number };
+
+function meterSpiteGains(
+  get: () => GameStore,
+  set: (partial: (s: GameStore) => Partial<GameStore>) => void,
+  result: { standing: FactionStanding[]; changed: RepChanged[] },
+): { standing: FactionStanding[]; changed: RepChanged[] } {
+  if (!result.changed.some((c) => c.delta > 0)) return result;
+  const granted = { ...(get().worldMemory.spiteStandingGranted ?? {}) };
+  let rows = result.standing.map((r) => ({ ...r }));
+  const out: RepChanged[] = [];
+  let touched = false;
+  for (const c of result.changed) {
+    if (c.delta <= 0) { out.push(c); continue; }
+    const spent = granted[c.factionId] ?? 0;
+    const allowed = Math.max(0, Math.min(c.delta, SPITE_STANDING_FACTION_CAP - spent));
+    if (allowed === c.delta) {
+      granted[c.factionId] = spent + allowed;
+      out.push(c);
+      continue;
+    }
+    touched = true;
+    const excess = c.delta - allowed;
+    rows = rows.map((r) => (r.factionId === c.factionId
+      ? { ...r, standing: r.standing - excess }
+      : r));
+    if (allowed > 0) {
+      granted[c.factionId] = spent + allowed;
+      out.push({ ...c, delta: allowed, newStanding: c.newStanding - excess });
+    }
+  }
+  if (touched || out.some((c) => c.delta > 0)) {
+    set((st) => ({ worldMemory: { ...st.worldMemory, spiteStandingGranted: granted } }));
+  }
+  return { standing: rows, changed: out };
+}
+
+/** ⚠ OTA-1182 — ONE ANSWER TO "HOW STRONG IS THIS CHARACTER", ASKED IN ONE PLACE.
+ *
+ *  SEVEN call sites each hand-rolled `enemyScalePower(Math.max(str, dex, int),
+ *  hpMax)`. That is eight copies of a formula, which is how the AC term went missing
+ *  for as long as it did — there was nowhere to add it once. This is the only thing
+ *  that builds a scale power now, so the gear terms reach every spawner that scales:
+ *  wild encounters, faction raids, static bosses, climb ambushes, rest ambushes and
+ *  the scripted spawn effect, all at the same weight.
+ *
+ *  ⚠ AC comes from `standingAc`, NOT from a local re-derivation. That is the same
+ *  trimmed number the player reads on their sheet and the same one `applyEnemyCounter`
+ *  defends at — OTA-1156 exists because two surfaces disagreed about AC, and adding a
+ *  third spelling of it here would rebuild that bug inside the difficulty curve.
+ *  Scene-conditional racial/title AC is deliberately NOT included: it swings by room,
+ *  and an enemy roster that re-scales when you step indoors is worse than one that is
+ *  slightly conservative. */
+function scalePowerOf(player: PlayerCharacter): number {
+  const base = Math.max(
+    player.stats.strength, player.stats.dexterity, player.stats.intelligence,
+  );
+  // ⚠ THIS READ MUST NOT BE ABLE TO THROW, AND THE FIRST CUT OF IT COULD.
+  //
+  // `getEquippedWeapon` does `for (const it of player.inventory)` with no guard, so a
+  // player object without an inventory raises `player.inventory is not iterable`.
+  // That is not hypothetical: encounterStress builds exactly such a fixture, and the
+  // throw took down the whole SPAWN — `stepDirection` is called inside a `try {} catch
+  // {}` there, so 200 consecutive attempts produced no enemy at all and the only
+  // symptom was `spawned=false`. A difficulty PROXY that can abort an encounter is a
+  // far worse bug than the one this OTA set out to fix.
+  //
+  // ⚠ The fallback is the BASELINES, which make `gearPowerTerm` exactly 0 — i.e. the
+  // pre-OTA-1182 number. If we cannot see what the player is carrying, we scale as if
+  // they carry nothing rather than inventing difficulty from a guess.
+  let gear = { ac: AC_POWER_BASELINE, avgWeaponDamage: DMG_POWER_BASELINE };
+  try {
+    const weapon = getEquippedWeapon(player, 'main');
+    gear = {
+      ac: standingAc(player),
+      avgWeaponDamage: avgDamageNotation(weapon?.damageDice),
+    };
+  } catch {
+    // degrade to the authored curve; never let gear inspection kill a spawn
+  }
+  return enemyScalePower(base, player.hpMax, gear);
+}
+
 function injectFactionParty(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -3510,10 +3624,7 @@ function injectFactionParty(
     ));
   }
   const tide = Math.max(0, s.worldMemory.factionTides?.[opts.factionId] ?? 0);
-  const power = enemyScalePower(
-    Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence),
-    player.hpMax,
-  ) + tide; // escalation: an ascendant faction hits harder
+  const power = scalePowerOf(player) + tide; // escalation: an ascendant faction hits harder
   const packDanger = scene.location.danger + Math.floor(tide / 2);
   let scaled = scaleEncounterForContext(party, packDanger, power);
   // OTA-1139 — THE ELITE SWAP. The `elite` dial (OTA-1136) finally has a
@@ -3778,7 +3889,13 @@ function maybePatrolAmbush(
 // fall under 5% until ~28 max HP, and a fresh arrival has 24. This is the
 // cleanest "arrivals are too thin" lever — it touches zero enemies and pays
 // the player for playing. Travel milestone deliberately stays at 5.
-const MILESTONE_KILL_STEP = 3;     // every 3 enemies defeated → +1 HP max
+// ⚠ OTA-1182 — "every 3 enemies defeated" is what this comment used to say, and it
+// is NOT what the code does. arb119 moved the gate to `firstOfType &&
+// checkMilestone(distinctKills, …)` so a respawnable enemy could not be farmed for
+// unbounded hpMax — and left this line describing the retired rule, which is how a
+// session came to tell the owner that grinding the same patrol builds HP. It does
+// not: your tenth Mud Skulker pays nothing. HP comes from VARIETY, not volume.
+const MILESTONE_KILL_STEP = 3;     // every 3 DISTINCT enemy types beaten → +1 HP max
 const MILESTONE_TRAVEL_STEP = 5;   // every 5 travels → +1 stamina max
 // OTA 058 — MILESTONE_CHECK_STEP retired. Skill-check stat growth is
 // now per-use via engine/statTraining (Skyrim model). HP and stamina
@@ -4461,12 +4578,12 @@ function vendorCatchesThief(
   if (nativeFaction && nativeFaction !== vendorFaction) {
     repStanding = applyRepChange(repStanding, nativeFaction, -10).standing;
   }
-  const repResult = {
+  const repResult = meterSpiteGains(get, set, {
     standing: repStanding,
     changed: repStanding
       .map((r) => ({ factionId: r.factionId, delta: r.standing - (origById.get(r.factionId) ?? r.standing), newStanding: r.standing }))
       .filter((c) => c.delta !== 0),
-  };
+  });
   const enemy = buildTraderEnemy(vendor);
   set((s) =>
     s.player && s.currentScene
@@ -5153,10 +5270,7 @@ function spawnAetherkin(
   const enc = buildAetherkinEncounter(where);
   const base = (enemiesData as Enemy[]).find((e) => e.name === enc.enemyName);
   if (!base) return false;
-  const power = enemyScalePower(
-    Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence),
-    player.hpMax,
-  );
+  const power = scalePowerOf(player);
   const danger = scene.location?.danger ?? 0;
   const scaled = scaleEncounterForContext([{ ...base }], danger, power);
   const hps = scaled.map((e) => e.hp);
@@ -9082,7 +9196,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // harder than the frontier. Guardians/story bosses are skipped inside the scaler
     // (they carry their own curve). A fresh arrival on a danger-0 tile is untouched.
     const scalePower = player
-      ? enemyScalePower(Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence), player.hpMax)
+      ? scalePowerOf(player)
       : 0;
     const enemies: Enemy[] = scaleEncounterForContext(encounter, location.danger, scalePower);
     const enemyHps: number[] = enemies.map((e) => e.hp);
@@ -15955,7 +16069,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? scaledEnemyForContext(
                   rawRestEnemy,
                   restScene.location.danger,
-                  enemyScalePower(Math.max(restPlayer.stats.strength, restPlayer.stats.dexterity, restPlayer.stats.intelligence), restPlayer.hpMax),
+                  scalePowerOf(restPlayer),
                 )
               : rawRestEnemy;
             if (enemy) {
@@ -18285,10 +18399,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 const bossBase = buildSummitBoss(greatClimb.id);
                 if (bossDef && bossBase) {
                   const livePlTop = get().player ?? player;
-                  const bossPower = enemyScalePower(
-                    Math.max(livePlTop.stats.strength, livePlTop.stats.dexterity, livePlTop.stats.intelligence),
-                    livePlTop.hpMax,
-                  );
+                  const bossPower = scalePowerOf(livePlTop);
                   const boss = scaleStaticBoss(bossPower, bossBase);
                   set((s) => (s.currentScene ? {
                     currentScene: {
@@ -18454,10 +18565,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (sceneNow && sceneNow.enemies.length === 0 && climbEncounterAtTier(currentTier, totalTiers)) {
               const enc = buildClimbEncounter(currentTier, totalTiers);
               const livePl = get().player ?? player;
-              const climbPower = enemyScalePower(
-                Math.max(livePl.stats.strength, livePl.stats.dexterity, livePl.stats.intelligence),
-                livePl.hpMax,
-              );
+              const climbPower = scalePowerOf(livePl);
               const climbDanger = sceneNow.location?.danger ?? 3;
               const scaledEnc = scaleEncounterForContext(enc.enemies, climbDanger, climbPower);
               const scaledEncHps = scaledEnc.map((e) => e.hp);
@@ -19541,11 +19649,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
               player.completedFactionQuestIds ?? [],
             );
             const titles = pool.map((q) => `"${q.title}"`).join(', ');
+            // ⚠ OTA-1182 — AN EMPTY LIST HAS TWO CAUSES AND THEY NEED OPPOSITE ACTIONS.
+            //
+            // This used to say "Nothing for you right now — check back after I've
+            // travelled." There is NO restock: `availableFactionQuests` filters a
+            // STATIC authored pool by rep and by what the player already took, so
+            // travelling changes nothing, ever. The line promised a mechanic that does
+            // not exist and sent the player away to do the one thing that cannot help
+            // — the OTA-1181 defect class, in the one place it costs them time rather
+            // than only misinforming them.
+            //   LOCKED  → more work is here, standing is too low. Earn rep, come back.
+            //   CLEARED → they have taken everything these people offer. Go elsewhere.
+            // Both facts were already computable right here; now they are computed.
+            const lockedHere = repLockedFactionQuests(
+              vendor.faction,
+              getStanding(player.factionStanding, vendor.faction),
+              player.activeFactionQuestIds ?? [],
+              player.completedFactionQuestIds ?? [],
+            );
+            const emptyLine = lockedHere.count > 0
+              // ⚠ Names the CHEAPEST rung still out of reach, not the highest — telling
+              // someone two points off a rep-8 contract that they need 25 is the same
+              // unhelpfulness in a new costume.
+              ? `${vendor.name} looks you over. "Nothing I'd trust you with yet. There's ${lockedHere.count === 1 ? 'work' : `${lockedHere.count} more jobs`} on this board for someone we owe — stand at ${lockedHere.nextRep} with us and we'll talk."`
+              : `${vendor.name} spreads their hands. "You've had everything we have. Nothing here is going to change that — try another banner."`;
             get().appendLog(
               'arbiter',
               titles
                 ? `${vendor.name} folds their arms. "On offer: ${titles}. Type 'accept <title>' to take one."`
-                : `${vendor.name} shrugs. "Nothing for you right now — check back after I've travelled."`,
+                : emptyLine,
             );
           } else {
             get().appendLog('arbiter', `The Arbiter raises a brow. "Accept what? Find a faction vendor and ask what's on offer."`);
@@ -31663,7 +31795,7 @@ function applyHookEffect(
         ? scaledEnemyForContext(
             rawSpawn,
             spawnLoc.danger,
-            enemyScalePower(Math.max(spawnPlayer.stats.strength, spawnPlayer.stats.dexterity, spawnPlayer.stats.intelligence), spawnPlayer.hpMax),
+            scalePowerOf(spawnPlayer),
           )
         : rawSpawn;
       set((s) =>
@@ -38509,7 +38641,13 @@ function runParleyOutcome(
         }
         p = { ...p, inventory: inv };
         if (faction) {
-          const rr = applyRepChange(p.factionStanding, faction, -PARLEY_EXTORT_REP);
+          // ⚠ OTA-1182 — metered on the GAIN side only. Extorting a faction pays +3
+          // to each of their rivals, and this was the cheaper of the two farms: a
+          // successful shakedown costs nothing and can be repeated on every patrol.
+          // See meterSpiteGains — the loss stays uncapped on purpose.
+          const rr = meterSpiteGains(
+            get, set, applyRepChange(p.factionStanding, faction, -PARLEY_EXTORT_REP),
+          );
           p = { ...p, factionStanding: rr.standing };
           repChanged = rr.changed;
         }

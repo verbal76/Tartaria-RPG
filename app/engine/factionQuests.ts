@@ -145,6 +145,45 @@ export function availableFactionQuests(
   );
 }
 
+/** ⚠ OTA-1182 — WHY THE LIST IS EMPTY, WHICH IS NEVER "BECAUSE I HAVE NOT TRAVELLED".
+ *
+ *  The vendor's refusal used to read *"Nothing for you right now — check back after
+ *  I've travelled."* There is NO restock anywhere in this file: the pool is authored
+ *  and static, filtered only by rep and by what the player has already taken. So the
+ *  line promised a mechanic that does not exist AND sent the player off to do the one
+ *  thing that provably cannot help — the OTA-1181 defect class, in the one place it
+ *  costs the player time rather than just misinforming them.
+ *
+ *  An empty list is always one of exactly two situations, and they call for opposite
+ *  actions from the player:
+ *    - LOCKED  — more work exists here, the player's standing is too low. Earn rep.
+ *    - CLEARED — they have genuinely taken everything this faction offers. Move on.
+ *  This returns the count and the CHEAPEST rep still out of reach, so the caller can
+ *  say which one it is instead of guessing. `_stranded_` is excluded on the same
+ *  grounds as above: a board never posts one, so it is not work the player is
+ *  "missing" and naming it would send them looking for something unfindable. */
+export function repLockedFactionQuests(
+  factionId: string,
+  playerRep: number,
+  active: readonly string[],
+  completed: readonly string[],
+): { count: number; nextRep: number | null } {
+  const locked = FACTION_QUESTS.filter(
+    (q) =>
+      q.factionId === factionId &&
+      !/_stranded_/.test(q.id) &&
+      playerRep < q.requirement.rep &&
+      !active.includes(q.id) &&
+      !completed.includes(q.id),
+  );
+  return {
+    count: locked.length,
+    nextRep: locked.length
+      ? locked.reduce((lo, q) => Math.min(lo, q.requirement.rep), Infinity)
+      : null,
+  };
+}
+
 // Pick a quest by partial-title match. Used when the player types
 // "accept salvage" — finds "Salvage the buried lens".
 export function fuzzyFindFactionQuest(text: string, pool: readonly FactionQuestDef[]): FactionQuestDef | null {

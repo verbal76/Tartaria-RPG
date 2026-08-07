@@ -1897,6 +1897,13 @@ export interface WorldMemory {
    *  Metered against GIFT_STANDING_FACTION_CAP so the verb OTA-803 deleted
    *  cannot come back as the side door it was deleted for. */
   giftStandingGranted?: Record<string, number>;
+  /** ⚠ OTA-1182 — LIFETIME standing each faction has been granted as SPILLOVER from
+   *  a hostile act against one of their rivals. Any standing loss cascades the
+   *  inverse to rivals, so a caught theft pays +5 and an extortion +3 to everyone
+   *  who hates the victim — uncapped, where a GIFT has been budgeted since OTA-803.
+   *  Metered against SPITE_STANDING_FACTION_CAP. ⚠ Gains only: being hated stays
+   *  uncapped, because a capped consequence is a consequence you can spend past. */
+  spiteStandingGranted?: Record<string, number>;
   /** OTA-120 — dog acquisition state machine, lives on world memory
    *  so it survives across screens. ALL player input routes through
    *  the onboarding handler when this is non-null. Cleared on

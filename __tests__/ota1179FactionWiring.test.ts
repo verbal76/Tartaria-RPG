@@ -320,8 +320,45 @@ describe('OTA-1179 — the held decisions are untouched', () => {
   // repDelta count is ZERO. Deciding a held item does not retire its lock; it
   // inverts it, so the decision is as hard to undo as the hold was.
 
-  it('the difficulty scaler still has no defensive term', () => {
-    const enc = read('app', 'engine', 'encounter.ts');
-    expect(enc).toContain('return bestCombatStat + hpMax / 10;');
+  // ⚠ THE DIFFICULTY-SCALER ASSERTION THAT LIVED HERE IS ALSO GONE ON PURPOSE, and
+  // for the same reason as the ratchet above: the owner DECIDED it (2026-08-07,
+  // "do your suggestion with number 3") and OTA-1182 shipped it. Its replacement is
+  // ota1182ScalerKnowsGear, which asserts the opposite — that AC and weapon damage
+  // DO reach the curve, that a fresh arrival is untouched to the decimal, and that
+  // nothing saturates overLevelT.
+
+  // ⚠ ALL FOUR HOLDS ARE NOW DISCHARGED, AND THIS BLOCK IS THE RECORD OF THAT.
+  // Each was asserted UNCHANGED here while the owner decided, and each assertion was
+  // INVERTED — not deleted — into the suite that shipped the decision:
+  //   1. the ambient standing ratchet   → OTA-1180, ota1180AmbientStandingOff
+  //   2. the in-game explainer text     → OTA-1181, ota1181StandingTextTruth
+  //   3. the difficulty scaler          → OTA-1182, ota1182ScalerKnowsGear
+  //   4. the contract-refusal wording   → OTA-1182, ota1182RefusalTellsTruth
+  // The fifth item, the theft/extort spillover, was DECIDED TOO — see below.
+
+  it('⚠ DECIDED — the spillover is capped on the GAIN side and only there', () => {
+    // ⚠ Any standing LOSS cascades: allies take half, rivals take the inverse, so
+    // they GAIN. A caught theft is -10 to the victim, -5 to their allies and +5 to
+    // EVERY rival; a successful extortion is -6 / -3 / +3. Gifts have been budgeted
+    // since OTA-803 (GIFT_STANDING_FACTION_CAP); this path had nothing, so shaking
+    // down a faction's enemies was an unbounded climb with them.
+    //
+    // The owner's call, in two steps and the second supersedes the first: "leave it",
+    // then "just nerf it a bit like you suggested" (2026-08-07). OTA-1182 meters the
+    // GAINS against a lifetime per-faction budget and leaves the LOSSES uncapped.
+    // ⚠ Do not "finish the job" by capping the losses too. The asymmetry is the
+    // design: being hated must have no ceiling, or a player can spend past their own
+    // consequences; being loved by proxy is the part nobody aimed at you.
+    const store = read('app', 'state', 'gameStore.ts');
+    expect(store).toContain('const SPITE_STANDING_FACTION_CAP = 10;');
+    // both hostile paths route through the meter
+    expect(store).toContain('const repResult = meterSpiteGains(get, set, {');
+    expect(store).toContain('applyRepChange(p.factionStanding, faction, -PARLEY_EXTORT_REP),');
+    // the raw magnitudes are UNCHANGED — this caps the spillover, not the punishment
+    expect(store).toContain('applyRepChange(repStanding, vendorFaction, -10).standing');
+    expect(store).toContain('const PARLEY_EXTORT_REP = 6;');
+    // the cascade itself — half to allies, the inverse to rivals — is the mechanism
+    expect(read('app', 'engine', 'factions.ts'))
+      .toContain('if (rivalIds.has(row.factionId) && halfDelta !== 0) return apply(row, -halfDelta);');
   });
 });
