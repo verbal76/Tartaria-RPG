@@ -6097,9 +6097,13 @@ interface GameStore {
   /** OTA-1035 — `flavor` (story beats) and `heading` (a kicker that isn't
    *  "<KIND> COMPLETE") are set by the boss VICTORY card; both are absent on an
    *  ordinary mission notice, which renders exactly as it did before. */
+  /** OTA-1163 — `takeLabel` renames the "THE TAKE" divider (the lines beneath it are
+   *  not always a payout); `holdMs` lengthens the auto-close valve and can only ever
+   *  raise it. Both absent on every ordinary notice, which renders unchanged. */
   missionCompleteNotice: {
     kind: string; title: string; rewards: string[];
     flavor?: string[]; heading?: string;
+    takeLabel?: string; holdMs?: number;
   } | null;
   clearMissionCompleteNotice: () => void;
   /** OTA-1014 — Contracts-screen refusal strip. A COMPLETE tap that does NOT end in
@@ -6126,7 +6130,11 @@ interface GameStore {
    *  SPOTLIGHT: a custom kicker, story above the take, gold instead of the
    *  mission green. Use it for a milestone the player would otherwise only learn
    *  about from a feed line that scrolls away. */
-  raiseSpotlightNotice: (heading: string, title: string, flavor: string[], rewards: string[]) => void;
+  raiseSpotlightNotice: (
+    heading: string, title: string, flavor: string[], rewards: string[],
+    /** OTA-1163 — presentation only; see missionCompleteNotice. */
+    opts?: { takeLabel?: string; holdMs?: number },
+  ) => void;
   fusionBlockedNotice: { title: string; body: string; hint?: string } | null;
   clearFusionBlockedNotice: () => void;
   closeFusionPicker: () => void;
@@ -26226,9 +26234,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const hadCourse = slate.length > 0;
     // OTA-862 — stamp the accept hour so the contract can lapse after its in-game deadline.
     const acceptedAtHour = player.hoursElapsed ?? 0;
-    // OTA-863 — DISTANCE-AWARE deadline: 24h base + one hour per tile between the player
-    // and the quarry's outpost, so a far contract isn't unreachable in time. Measured from
-    // the player's absolute cell at accept.
+    // OTA-863 — DISTANCE-AWARE deadline. ⚠ OTA-1162 resized the travel term: it is the
+    // 24h JOB budget plus 2.5h per tile (the honest all-in cost of crossing one), not the
+    // old bare hour. Measured from the player's absolute cell at accept.
     const grid = playerGridCell(player);
     const tiles = canonicalDistanceFromGrid(grid.x, grid.y, bounty.targetLocationId);
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -26238,12 +26246,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog(
       'arbiter',
       hadCourse
-        ? `"Another contract," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down around ${bounty.targetLocationName}. Added to your slate — your current course holds."`
-        : `"A contract, then," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — and they'll be thick around ${bounty.targetLocationName}. Setting your course there now."`,
+        // ⚠ OTA-1163 — "around <place>" USED TO READ AS A REQUIREMENT and it never was
+        // one: killCountsForBounty tests faction only, with no location term anywhere in
+        // it. The place is a tip about where they gather. Both lines now say so, because
+        // the owner ran a full contract believing he had to do the killing there.
+        ? `"Another contract," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — anywhere you find them, though they're thickest around ${bounty.targetLocationName}. Added to your slate — your current course holds."`
+        : `"A contract, then," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — anywhere you find them, though they'll be thick around ${bounty.targetLocationName}. Setting your course there now."`,
     );
     // Route the player to the quarry's outpost — but only if they weren't already on a
     // bounty course. Stacking a second contract must not yank you off the first one's road.
     if (!hadCourse) get().setTravelCourse(bounty.targetLocationId);
+    // ⚠ OTA-1163 — THE FIRST CONTRACT COMES WITH SOMEONE TO EXPLAIN IT. Owner: "the first
+    // time someone accepts a bounty gets a pop-up and it does it in character… since this
+    // is your first bounty I'll show you the ropes." Raised LAST so it sits on top of the
+    // routing, and gated on a one-shot flag rather than `slate.length === 0` — a player
+    // who finished a contract has still seen the ropes, and an empty slate would show them
+    // the card again every time they cleared it.
+    if (!player.bountyPrimerSeen) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { bountyPrimerCard } = require('../engine/bountyPrimer') as typeof import('../engine/bountyPrimer');
+      const card = bountyPrimerCard(bounty, deadlineHours, getStanding(player.factionStanding, bounty.giverFactionId));
+      set((s) => (s.player ? { player: { ...s.player, bountyPrimerSeen: true } } : s));
+      get().raiseSpotlightNotice(card.heading, card.title, card.flavor, card.rewards, {
+        takeLabel: card.takeLabel,
+        // Four paragraphs, shown once in a playthrough, with no way back to it.
+        holdMs: 240000,
+      });
+    }
   },
 
   worldRealtimeTick() {
@@ -30354,7 +30383,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().raiseSpotlightNotice('VICTORY', name, flavor, rewards);
   },
 
-  raiseSpotlightNotice(heading, title, flavor, rewards) {
+  raiseSpotlightNotice(heading, title, flavor, rewards, opts) {
     const prev = get().missionCompleteNotice;
     const same = prev?.title === title;
     set({
@@ -30367,6 +30396,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // than dropped — its reward lines were captured too, and mergeRewardLines
         // dedupes the overlap.
         rewards: mergeRewardLines(prev?.rewards ?? [], rewards),
+        // OTA-1163 — presentation carries across a merge, and the LONGER hold wins:
+        // absorbing a card that asked to be readable must not shorten its valve.
+        takeLabel: opts?.takeLabel ?? (same ? prev?.takeLabel : undefined),
+        holdMs: Math.max(opts?.holdMs ?? 0, (same ? prev?.holdMs : 0) ?? 0) || undefined,
       },
     });
   },
