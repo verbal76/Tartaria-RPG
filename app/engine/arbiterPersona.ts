@@ -111,6 +111,10 @@ export interface RegardPart {
   /** Shown on the character sheet. The player is allowed to know why. */
   label: string;
   value: number;
+  /** OTA-1161 — marks a row the sheet can DRILL INTO. Only 'gifts' so far: the
+   *  count is a summary of `npcRelations[].gifts`, and the player asked to see
+   *  what he gave, to whom, and how it landed. Absent = a plain, flat row. */
+  kind?: 'gifts';
 }
 
 const FORK_REGARD: Record<string, number> = personaData.forkRegard as Record<string, number>;
@@ -139,7 +143,15 @@ export function regardParts(
   }
   if (outstanding > 0) parts.push({ label: `${outstanding} wrong${outstanding === 1 ? '' : 's'} still standing`, value: clamp(outstanding * -6, -24, 0) });
   if (cleared > 0) parts.push({ label: `${cleared} debt${cleared === 1 ? '' : 's'} made good`, value: clamp(cleared * 4, 0, 12) });
-  if (gifts > 0) parts.push({ label: `${gifts} thing${gifts === 1 ? '' : 's'} given away`, value: clamp(gifts, 0, 6) });
+  // ⚠ OTA-1161 — "things given away" → "gifts given". The owner's wording, and the
+  // better one: "given away" reads as loss or charity when the mechanic is a gift
+  // with a named recipient and a reaction. It is also the word every OTHER surface
+  // uses (the GIVE button, the gift picker, giftBoons, giftTastes) — this sheet row
+  // was the only place calling it something else.
+  // ⚠ `kind: 'gifts'` is what makes the row tappable on the sheet. The count here and
+  // the ledger it opens are built from the SAME npcRelations[].gifts arrays, so the
+  // number and the list can never disagree.
+  if (gifts > 0) parts.push({ label: `${gifts} gift${gifts === 1 ? '' : 's'} given`, value: clamp(gifts, 0, 6), kind: 'gifts' });
 
   // ── What you carry ──
   const corruption = p.corruption ?? 0;

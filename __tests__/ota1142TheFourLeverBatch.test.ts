@@ -80,7 +80,19 @@ describe('OTA-1142 lever 1 — first Guardian IS the base (hpMult 1.0)', () => {
 
 describe('OTA-1142 lever 2 — HP milestone every 3 distinct kills', () => {
   it('MILESTONE_KILL_STEP is 3', () => {
-    expect(gameStoreSrc).toContain('const MILESTONE_KILL_STEP = 3;');
+    // ⚠ OTA-1161 RETARGET, NOT A REGRESSION. This pinned the constant's DECLARATION
+    // inside gameStore. OTA-1161 moved it to engine/hpBreakdown so the character
+    // sheet can EXPLAIN the number using the same constant the store awards it with
+    // — a threshold that is both quoted and enforced must have exactly one home.
+    // The claim (the step is 3) is unchanged, and asserting the EXPORTED VALUE is
+    // strictly stronger than matching a source string: it survives the next move,
+    // and it still fails if the number changes without this batch being revisited.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { MILESTONE_KILL_STEP } = require('../app/engine/hpBreakdown') as typeof import('../app/engine/hpBreakdown');
+    expect(MILESTONE_KILL_STEP).toBe(3);
+    // ...and the store awards it from that one home, not a second copy.
+    expect(gameStoreSrc).toContain("import { MILESTONE_KILL_STEP } from '../engine/hpBreakdown';");
+    expect(gameStoreSrc).not.toMatch(/^const MILESTONE_KILL_STEP = \d/m);
   });
 
   it('the travel milestone deliberately stays at 5', () => {
