@@ -1670,6 +1670,17 @@ export interface GameLogEntry {
   meta?: Record<string, unknown>;
 }
 
+/** OTA-1174 — one exchange with one NPC: what you asked and what they said.
+ *  Stored rather than derived, because the log window that used to carry it
+ *  closes with the conversation and the log itself is capped. */
+export interface TalkTurn {
+  /** The topic's authored label — the words on the button the player tapped. */
+  q: string;
+  /** Their reply, exactly as it went to the feed. */
+  a: string;
+  ts: number;
+}
+
 export interface MemorableEvent {
   id: string;
   kind:
@@ -1864,6 +1875,24 @@ export interface WorldMemory {
    *  replaying a line as though neither of you remembers the last two minutes.
    *  Bounded by the authored topic count, so it cannot grow with play. */
   talkedTopics?: Record<string, number>;
+  /** ⚠ OTA-1174 — THE CONVERSATION REMEMBERS. Owner: *"I would like the talk
+   *  screens to remember the conversations and type the question on an
+   *  off-white so later we know what we asked. with so many conversations it
+   *  will get confusing without a history."*
+   *
+   *  Keyed by npcId, oldest turn first. TalkSheet's live transcript is a WINDOW
+   *  on gameLog (see its header) and that window closes when the conversation
+   *  does — so before this, walking away from a vendor erased any record of
+   *  what you had asked them. gameLog is also `.slice(-MAX_LOG_IN_MEMORY)`d, so
+   *  even the exploration feed forgets it in a long session. This is the only
+   *  durable record of an exchange, which is why it is a STORE rather than
+   *  another view.
+   *
+   *  ⚠ BOUNDED, because worldMemory is persisted on every action. Authored
+   *  topics per NPC are finite (14-16 since OTA-1114), so the natural ceiling
+   *  is low — but re-asks and secondary cast pools are not, hence the hard cap
+   *  in recordTalkTurn. */
+  npcTranscripts?: Record<string, TalkTurn[]>;
   /** OTA-1083 — LIFETIME standing each faction has been granted via gifts.
    *  Metered against GIFT_STANDING_FACTION_CAP so the verb OTA-803 deleted
    *  cannot come back as the side door it was deleted for. */

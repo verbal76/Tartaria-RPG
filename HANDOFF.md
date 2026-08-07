@@ -1273,7 +1273,57 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE ACID BATCH (2026-08-06, latest). BOTH LINES.** HAL OTA-1173 /
+- **⚠⚠ THE CONVERSATION REMEMBERS (2026-08-07, latest). BOTH LINES.** HAL
+  OTA-1174 / golem OTA-1151. Owner: *"I would like the talk screens to remember
+  the conversations and type the question on an off-white so later we know what
+  we asked. with so many conversations it will get confusing without a
+  history."*
+
+  ⚠ **READING THAT AS A STYLING REQUEST UNDERSELLS IT — THERE WAS NOTHING TO
+  STYLE.** `raiseTopic` only ever logged the NPC's REPLY. Both the talk sheet
+  and the exploration feed were a wall of answers with the questions missing,
+  and the only surviving evidence of what you had raised was the topic list
+  sinking asked entries to the bottom — which tells you a question was spent,
+  never which answer belonged to it. **When a request asks you to style
+  something, check the thing exists first.**
+
+  **1 — the question is logged**, on the `'player'` channel. That is already
+  what a typed command uses, so speaking and acting read as the same person
+  doing the same kind of thing, and it gives the sheet a field to paint off.
+  Placed BEFORE the reply so the pair reads in order, and logged on the
+  already-asked path too: a re-ask is a thing you did, and hiding it makes the
+  "I have told you that one" answer look like the NPC volunteered it.
+
+  **2 — `worldMemory.npcTranscripts`**, the exchange stored per NPC.
+
+  ⚠ **THIS HAD TO BE A STORE, NOT ANOTHER VIEW.** The sheet's transcript is a
+  WINDOW on gameLog (OTA-1118's design, and correct) — but that window closes
+  with the conversation, and gameLog is itself `.slice(-MAX_LOG_IN_MEMORY)`d.
+  Neither survives walking away, which is precisely the span the owner wants to
+  look back across. Bounded at `TALK_HISTORY_MAX = 40`: worldMemory persists on
+  every action, so an unbounded transcript is a save-size leak that only appears
+  in the long sessions this feature exists to serve.
+
+  **3 — TalkSheet** paints `channel === 'player'` on an off-white plate with a
+  gold left rule, deliberately the only light fill in the sheet, so scanning
+  back for "what did I ask this person" is a glance rather than a read. Prior
+  visits render above the live window under an `EARLIER` divider.
+
+  ⚠ The history block is filtered on `ts < ctx.startedAtTs`. `recordTalkTurn`
+  and `appendLog` both fire on the same tap, so without that filter this visit's
+  turns would draw under EARLIER *and* under NOW and the sheet would look like
+  it was stuttering.
+
+  New suite `ota1174TheConversationRemembers` (8 tests).
+
+  ⚠ **A NOTE ON RUNNING IT:** `hydrate + startNewGame` costs ~15s, so a boot per
+  test put the suite over its own timeout and the failure LOOKED like a hang.
+  One `beforeAll` boot, state reset in `beforeEach`. Separately, `npx jest` on a
+  single suite does not exit on its own here (the open-handle warning this repo
+  prints on every run) — use `--forceExit` when running one in isolation, or it
+  reads as a hang a second time.
+
+- **⚠⚠ THE ACID BATCH (2026-08-06). BOTH LINES.** HAL OTA-1173 /
   golem OTA-1150. Owner tuning, three dials, all owner-called. Owner: *"I throw
   acid on everything and I use the coatings for my weapon and armor for resists
   and added damage … I'm just mowing through people. I might have made the

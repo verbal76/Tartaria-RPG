@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.83';
+export const DISPLAY_VERSION = '4.29.84';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23613,7 +23613,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ota873's dual-poison total 2× → slot 1 + half of slot 2 (its
 // one-merged-status claim unchanged).
 // DISPLAY_VERSION 4.29.83.
-export const OTA_BUILD_ID = '2026-08-06-1173-the-acid-batch';
+// OTA-1174 — THE CONVERSATION REMEMBERS. Owner: *"I would
+// like the talk screens to remember the conversations and type
+// the question on an off-white so later we know what we asked.
+// with so many conversations it will get confusing without a
+// history."*
+// ⚠ READING THAT AS A STYLING REQUEST UNDERSELLS IT — THERE WAS
+// NOTHING TO STYLE. `raiseTopic` only ever logged the NPC's
+// REPLY. Both the talk sheet and the exploration feed were a
+// wall of answers with the questions missing; the only surviving
+// evidence of what you had raised was the topic list sinking
+// asked entries to the bottom, which tells you a question was
+// spent but never which answer belonged to it.
+// Three parts:
+//   1. The question is logged, on the 'player' channel — already
+//      what a typed command uses, so speaking and acting read as
+//      the same person doing the same kind of thing. Logged
+//      BEFORE the reply, and on the already-asked path too: a
+//      re-ask is a thing you did, and hiding it makes the "I have
+//      told you that one" answer look unprompted.
+//   2. worldMemory.npcTranscripts — the exchange STORED per NPC.
+//      ⚠ The sheet's transcript is a WINDOW on gameLog (OTA-1118)
+//      and that window closes with the conversation; gameLog is
+//      itself .slice(-MAX_LOG_IN_MEMORY)'d. Neither survives
+//      walking away, which is exactly the span the owner wants to
+//      look back across, so this had to be a store and not
+//      another view. BOUNDED at TALK_HISTORY_MAX=40 — worldMemory
+//      persists on every action, and an unbounded transcript is a
+//      save-size leak that only shows up in the long sessions the
+//      feature exists to serve.
+//   3. TalkSheet paints `channel === 'player'` on an off-white
+//      plate with a gold left rule — the only light fill in the
+//      sheet, so scanning back for "what did I ask" is a glance.
+//      Prior visits render above the live window under an EARLIER
+//      divider, filtered on startedAtTs so this visit's turns are
+//      not drawn twice.
+// New suite ota1174TheConversationRemembers (8 tests).
+// DISPLAY_VERSION 4.29.84.
+export const OTA_BUILD_ID = '2026-08-07-1174-the-conversation-remembers';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1173-the-acid-batch';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1172-the-modifier-is-evidence';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1171-the-first-word-survives';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1170-ayther-not-ay-thur';
