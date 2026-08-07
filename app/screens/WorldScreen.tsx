@@ -11,6 +11,7 @@ import { useGameStore } from '../state/gameStore';
 import factionsData from '../data/factions/factions.json';
 import type { Faction } from '../engine/types';
 import { tideLabel } from '../engine/worldPulse';
+import { JOIN_THRESHOLD } from '../engine/factions';
 import { listBounties, bountyKey, bountyHoursLeft, giverDifficulty, bountyDeadlineFor, BOUNTY_DEADLINE_HOURS } from '../engine/factionBounty';
 import { canonicalCellOf, canonicalDistanceFromGrid } from '../engine/worldMap';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
@@ -196,7 +197,8 @@ export function WorldScreen() {
             const tag = tideLabel(m);
             const standing = standingOf(f.id);
             const tagColor = m > 0 ? '#9ec96a' : m < 0 ? '#c98a6a' : '#a2977b';
-            const standColor = standing >= 20 ? '#9ec96a' : standing >= 0 ? '#cdbf99' : standing >= -10 ? '#c9a86a' : '#e07a5f';
+            // OTA-1156 — same ladder as the character sheet, same constant as the rule.
+            const standColor = standing >= JOIN_THRESHOLD ? '#9ec96a' : standing >= 0 ? '#cdbf99' : standing >= -10 ? '#c9a86a' : '#e07a5f';
             // A little momentum meter: −5…+5 mapped to a 11-cell bar with the center marked.
             const cells = Array.from({ length: 11 }, (_, i) => i - 5);
             return (

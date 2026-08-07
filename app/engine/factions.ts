@@ -101,8 +101,23 @@ export function applyRepChange(
   return { standing: next, changed };
 }
 
+/** ⚠ OTA-1156 — READS HEAL THE ID TOO, not just writes.
+ *
+ *  OTA-1155 taught `applyRepChange`'s callers to canonicalise, because a legacy
+ *  race id on an old save made a gift grant nothing while claiming success. The
+ *  READ side was left as it was, and it has the same hole with a quieter failure:
+ *  this returns **0 — indistinguishable from genuinely neutral** — so a player who
+ *  had ground a faction to +30 through a vendor recorded under a bad id reads as a
+ *  stranger to every consumer at once. Roughly fifteen call sites inherit it:
+ *  pricing, contract availability, hostility, brokering, titles, the character
+ *  sheet.
+ *
+ *  ⚠ The fallback is `factionId`, not null: an id this build's roster does not know
+ *  might be NEWER than the roster rather than older, and silently rewriting it to
+ *  nothing would be the same class of mistake in the other direction. */
 export function getStanding(standing: readonly FactionStanding[], factionId: string): number {
-  return standing.find((s) => s.factionId === factionId)?.standing ?? 0;
+  const id = canonicalFactionId(factionId) ?? factionId;
+  return standing.find((s) => s.factionId === id)?.standing ?? 0;
 }
 
 // Minimum standing to be admitted into a faction. Most factions in the

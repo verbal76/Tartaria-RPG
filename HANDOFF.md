@@ -831,7 +831,10 @@ Key invariants worth knowing:
     answers the question OTA-1127 parked as unknowable, using the metric
     OTA-1127 shipped for it.
 
-  - **⚠ FACTION STANDING IS A ONE-WAY RATCHET DRIVEN BY THE CLOCK.** Not decay,
+  - **⚠ FACTION STANDING IS A ONE-WAY RATCHET DRIVEN BY THE CLOCK.** *(2026-08-07:
+    a full read+write audit of the whole system has since run — see the OTA-1156
+    §9 entry for what shipped and, more importantly, for the FOUR DESIGN CALLS
+    still held for the owner, of which this is one. Do not re-derive it.)* Not decay,
     and not per-rest — the suspicion that it was is wrong, and the log disproves
     it (15 rests, 6 standing blocks; two of the six fire after a 15-minute
     salvage). It is `worldTideCheck`, a ≥2-in-game-hour accumulator. The defect
@@ -1329,8 +1332,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1178`**,
-**golem-line `2026-08-07-1155`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1179`**,
+**golem-line `2026-08-07-1156`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1546,6 +1549,68 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠ THE FACTION STANDING WIRING (2026-08-07, latest). HAL + GOLEM.** golem
+  OTA-1156 / HAL OTA-1179. **steam NOT included — it is batched now (§2).** Owner:
+  *"track all of the math and all of the wires for the faction standings ... make
+  sure nothing's broken."* A full read+write audit of the system; this shipped the
+  DEFECTS and **held the DESIGN calls**. Nine fixes, and the theme is one thing:
+  **OTA-1155 fixed ONE caller that announced a standing grant it never verified, and
+  the same shape was in five more places plus the entire READ side.**
+  1. **The read side never healed a faction id.** `getStanding` returns 0 for a
+     legacy race id — indistinguishable from neutral — across ~15 consumers.
+     `hasFactionRapport` builds a QUEST ID from it, so the CHA discount was
+     permanently 0 for a vendor whose rapport quest the player had completed.
+  2. **⚠ Honest custom was being confiscated.** Every roadside trader has
+     `faction: null`, and the buy-rep pool was debited unconditionally — 500 TC of
+     credit burned for nothing, permanently.
+  3. Four more writers announced unverified grants. `dockHostileStanding` stamped
+     its ONE-SHOT ledger *before* confirming, which made the real dock impossible.
+  4. **⚠ The hunt roll used the global worst standing** while a different faction's
+     patrol spawned.
+  5. Every faction now gets a standing row — `applyRepChange` could never create
+     one, so a tenth faction would have been unreachable on every live save.
+  6. The vendor screen showed a price it did not charge (4 factors vs 6).
+  7. The gift ally/rival cascade was invisible in the log.
+  8. One join threshold instead of four literals + two UI copies.
+  9. Two pieces of text describing a rule the code does not have.
+
+  **⚠ HELD FOR THE OWNER — DO NOT IMPLEMENT AS "CLEANUP".** He is deciding on
+  these, and `ota1156FactionWiring` asserts they are unchanged so a later session
+  cannot quietly ship them:
+  - **The ambient standing ratchet.** `worldEvents` has exactly two `repDelta`
+    events, both POSITIVE, both gated on `favored` (≥ 10) — which is the
+    eligibility gate AND the target pool, so it is self-reinforcing. Simulation:
+    the home faction crosses the +20 join threshold at ~150 in-game hours and
+    Conspiracy Architects cross the hostile line at ~350, with **zero player
+    input**, identically on every save.
+  - **The in-game explainer text.** "at −20 or below they turn hostile … it shapes
+    vendor prices" — the hunting gate is −25, patrols engage below 0, and standing
+    has NO path to price at all (that is rapport-quest + CHA, plus faction tide).
+    Two of its three claims are false.
+  - **A defensive term in the difficulty scaler.** `enemyScalePower(bestStat, hpMax)`
+    has no AC, resistance or gear term. The owner's AC 20→26 is ~7.5× survivability;
+    the scaler registered ~+1%. It also reads RAW stats, except the Roused Construct
+    spawner, which reads effective — two proxies that disagree.
+  - **The contract-refusal wording.** 24 contracts sit behind rep 8-25 and the
+    refusal blames travel ("check back after I've travelled"). The board chip
+    silently vanishes too.
+  - **The theft / extort spillover meters** — unmetered, and each pays +5/+3 to
+    every rival. Held because "how much should the world move standing" is the same
+    question as the ratchet.
+
+  **One existing test RETARGETED, not weakened.** `ota1066Pressure`'s
+  hostile-ground test pinned the literal `hostileHuntChance(player.factionStanding,
+  profileOf(player))`, which fix 4 changed on purpose. Its real claim — the ambush
+  is gated by `hostileHuntChance` on the pressure profile — is still asserted, and
+  the test now ALSO pins the single-row lookup and asserts the whole table is not
+  handed in any more, so fix 4 cannot be quietly undone. Same treatment as
+  ota1093's gift lock (OTA-1154) and ota1129's label (OTA-1155).
+
+  **⚠ ONE CONSEQUENCE TO WATCH ON THE NEXT DEVICE LOG:** fix 2 means a long
+  roadside-only shopping stretch now banks in a LUMP at the next faction vendor,
+  because the pool carries instead of evaporating. That is the stated design paid
+  honestly for the first time — but +20 is the join threshold. If it reads badly the
+  answer is a per-purchase grant cap, which is a design call and was not made.
 - **⚠⚠ FROM THE DEVICE LOG (2026-08-07, latest). ALL THREE LINES.** golem
   OTA-1155 / HAL OTA-1178 / steam merged. A 16-part log off the owner's Pixel
   10 Pro XL plus two things he typed out by hand. **Eight fixes; the two loudest

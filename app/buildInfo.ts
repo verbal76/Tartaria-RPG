@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.88';
+export const DISPLAY_VERSION = '4.29.89';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22805,7 +22805,98 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1155SitAndGiftReturn (34 tests). Log evaluated in
 // full: 13 encounters, 63 enemy swings, 30 player swings.
 // DISPLAY_VERSION 4.29.88.
-export const OTA_BUILD_ID = '2026-08-07-1155-from-the-log';
+// 2026-08-07 OTA-1156 — THE FACTION STANDING WIRING.
+// Owner: "track all of the math and all of the wires for the
+// faction standings ... search every part of this code for where
+// the faction standings have any kind of application and how
+// they're wired and make sure nothing's broken." A full read+write
+// audit of the system followed; this ships the DEFECTS it found.
+// Four DESIGN calls are deliberately held for the owner and are
+// untouched here — the one-directional ambient standing ratchet,
+// the in-game explainer text, a defensive term in the difficulty
+// scaler, and the contract-refusal wording. Also held: the
+// theft/extort spillover meters, because "how much should the
+// world move standing" is the same question he is deciding. The
+// new suite asserts the held items are unchanged, so a later
+// session cannot implement his pending decisions as "cleanup".
+//   ⚠ 1. THE READ SIDE NEVER HEALED A FACTION ID. OTA-1155 taught
+//      the WRITE side to canonicalise; no reader did. `getStanding`
+//      returns 0 for a legacy race id — indistinguishable from
+//      genuinely neutral — so a player who ground a faction to +30
+//      through a vendor recorded under a bad id read as a STRANGER
+//      to ~15 consumers at once: pricing, contracts, hostility,
+//      brokering, titles, the sheet. `hasFactionRapport` was worse:
+//      it builds a QUEST ID out of the faction id, so a legacy id
+//      yields `fq_architectural_sentinels_rapport`, which exists
+//      nowhere — the CHA discount was permanently 0, silently, for
+//      a vendor whose rapport quest the player HAD completed.
+//   ⚠ 2. HONEST CUSTOM WAS BEING CONFISCATED. Buying banks TC into
+//      a hidden pool, +1 standing per 500. The pool was debited
+//      unconditionally — and EVERY roadside trader has
+//      `faction: null`, so crossing 500 TC at a roadside stall
+//      burned 500 TC of credit and granted nothing, permanently.
+//      Same loss at REP_MAX and for a stale race id. Now the pool
+//      is only spent when `changed` is non-empty. ⚠ CONSEQUENCE TO
+//      WATCH ON DEVICE: a long roadside-only stretch now banks in a
+//      LUMP at the next faction vendor. That is the stated design
+//      paid honestly, but +20 is the join threshold; a per-purchase
+//      cap is a DESIGN call and deliberately not made here.
+//   3. FOUR MORE WRITERS ANNOUNCED WHAT THEY NEVER VERIFIED — the
+//      OTA-1155 shape again. The story fork was the closest twin:
+//      bare `.standing`, `changed` discarded, log unconditional,
+//      and the RAW UNDERSCORED ID shown to the player.
+//      `dockHostileStanding` was worse than the gift version: it
+//      stamped its ONE-SHOT ledger BEFORE confirming, so an
+//      unresolvable id burned the ledger, moved nothing, reported a
+//      dock — and made the real dock impossible forever. Order is
+//      now resolve → apply → confirm → stamp.
+//   ⚠ 4. THE HUNT ROLL WAS ABOUT THE WRONG FACTION. A patrol
+//      qualifies on ITS faction being below 0; the roll for whether
+//      it hunts you then took `hostileHuntChance(player.factionStanding)`,
+//      which reduces to the MINIMUM over the whole table. At −30
+//      with the Mud Monarchs and −1 with the Reclaimers, a
+//      Reclaimer patrol hunted you at the Mud Monarchs' rate. Now
+//      it passes the single row, so `depth` measures how badly
+//      THESE people want you — which is what its own comment says
+//      it means.
+//   5. EVERY FACTION GETS A ROW, FOREVER. `applyRepChange` is a
+//      pure `.map()` — it can update a row, never create one — and
+//      rows were minted only at character creation. Adding a TENTH
+//      faction would have given every live save a faction it could
+//      never gain standing with, reading 0 and absorbing every
+//      grant. Backfilled, with legacy race-id rows MERGED onto the
+//      real faction keeping whichever value is further from
+//      neutral, so neither an earned positive nor an earned grudge
+//      is lost. ⚠ Placed AFTER backfillPlayer's try/catch, not
+//      inside it: the inner pass is degrade-safe and swallows its
+//      own exceptions, so a migration that threw for an unrelated
+//      reason would have cost the save its faction rows.
+//   6. THE VENDOR SCREEN SHOWED A PRICE IT DID NOT CHARGE. The
+//      display passed FOUR price factors; the purchase passes SIX.
+//      Missing: OTA-1053 per-person regard and OTA-1066's Phase-4
+//      pressure tide — so shown and charged disagreed for any
+//      vendor who liked or disliked you, inside `vendorPricing.ts`,
+//      the file whose entire stated purpose is that they cannot.
+//   7. THE GIFT CASCADE WAS INVISIBLE. `applyGiftStanding` printed
+//      one hand-rolled line and never called `logRepChanges`, so
+//      the ±half to every ally and rival never appeared: you read
+//      "+5 Forgotten Order" and never learned you had just taken
+//      −2 with the Mud Monarchs. In a system whose whole tension is
+//      that helping one side costs you with another, hiding the
+//      cost is the one thing it must not do. Same for story forks.
+//   8. ONE JOIN THRESHOLD. Four independent literal 20s plus two
+//      hardcoded UI copies; `JOIN_THRESHOLD` had exactly one
+//      consumer. CharacterScreen even cited it in a comment and
+//      then hardcoded 20 twice, so its ✓ and its colour could
+//      disagree with the rule they claim to show.
+//   9. Two pieces of text that described a rule the code does not
+//      have: the `scion_of_the_giants` requirement never mentioned
+//      the standing 25 it needs, and a comment claimed stealing is
+//      standing-gated (standing is a CONSEQUENCE of being caught).
+// New suite ota1156FactionWiring (24 tests).
+// DISPLAY_VERSION 4.29.89.
+export const OTA_BUILD_ID = '2026-08-07-1156-faction-wiring';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1155-from-the-log';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1154-gift-mode';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1153-vendor-tastes';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1152-ready-to-hand-in';

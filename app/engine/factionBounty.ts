@@ -5,6 +5,7 @@
 // exposure. Pure + testable; the store handles offer / accept / route / turn-in.
 
 import type { FactionMeta } from './worldPulse';
+import { JOIN_THRESHOLD } from './factions';
 
 export interface FactionBounty {
   /** The favored faction paying the bounty. */
@@ -62,7 +63,7 @@ export function bountyExpired(bounty: FactionBounty, nowHour: number): boolean {
  *  MORE standing, so bounties are the road back into any faction's good graces. */
 export function giverDifficulty(giverStanding: number | undefined): number {
   const s = giverStanding ?? 0;
-  if (s >= 20) return 0;   // favored — the easy, trusting job
+  if (s >= JOIN_THRESHOLD) return 0;   // favored — the easy, trusting job
   if (s >= 0) return 1;    // neutral/acquainted
   if (s >= -20) return 2;  // disliked
   return 3;                // hostile — prove yourself
@@ -110,7 +111,8 @@ export function bountyKey(b: Pick<FactionBounty, 'giverFactionId' | 'targetFacti
  *  with a known outpost), most ASCENDANT first. Shared by pickBounty + listBounties. */
 // OTA-862 — a faction won't hire you to hunt someone you're genuinely allied with. At or
 // above this standing with the QUARRY, that contract is withheld (you'd never take it).
-const FRIENDLY_QUARRY = 20;
+// OTA-1156 — same number as joining, and now the same constant.
+const FRIENDLY_QUARRY = JOIN_THRESHOLD;
 
 function bountyCandidates(
   factions: readonly FactionMeta[],

@@ -2121,6 +2121,38 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   // storyIntroSeen backfills TRUE: the crawl introduces a new character, it
   // must never ambush someone forty days into a run. REPLAY OPENING exists
   // for saves that want to read it.
+  // ⚠ OTA-1156 — EVERY FACTION GETS A ROW, and legacy race ids get healed.
+  //
+  // `applyRepChange` is a pure `.map()` — it can update a row but it can never
+  // CREATE one. Rows are minted in exactly one place, character creation. So a
+  // faction id absent from the array reads 0 forever AND silently absorbs every
+  // grant aimed at it: the OTA-1155 failure mode with a completely different
+  // cause. Latent today (nine factions, none added since the array was authored),
+  // and it is a one-line landmine — **adding a tenth faction would give every
+  // existing save a faction it could never gain standing with.** Backfilled here
+  // so that stays impossible rather than merely unlikely.
+  //
+  // Row ids are canonicalised on the same pass: a save that recorded standing
+  // under one of the four legacy RACE ids gets it merged onto the real faction
+  // (keeping whichever value is further from neutral, so neither an earned
+  // positive nor an earned grudge is thrown away by the merge).
+  if (Array.isArray(out.factionStanding)) {
+    const merged = new Map<string, number>();
+    for (const row of out.factionStanding) {
+      if (!row?.factionId) continue;
+      const id = canonicalFactionId(row.factionId) ?? row.factionId;
+      const prev = merged.get(id);
+      const val = row.standing ?? 0;
+      merged.set(id, prev === undefined ? val : (Math.abs(val) > Math.abs(prev) ? val : prev));
+    }
+    for (const f of FACTIONS) if (!merged.has(f.id)) merged.set(f.id, f.startingStanding ?? 0);
+    const rebuilt = Array.from(merged, ([factionId, standing]) => ({ factionId, standing }));
+    // Only replace when something actually changed — a no-op rewrite on every
+    // load would churn the save and defeat the persist-size work.
+    const same = rebuilt.length === out.factionStanding.length
+      && rebuilt.every((r) => out.factionStanding.some((o) => o.factionId === r.factionId && o.standing === r.standing));
+    if (!same) out = { ...out, factionStanding: rebuilt };
+  }
   if (!out.storyMotive) {
     out = {
       ...out,
@@ -3635,7 +3667,24 @@ function maybePatrolAmbush(
   // so no combination of tier and standing can make a road impassable.
   // A bounty target is exempt — that is a contract the player took on purpose.
   if (!bountyTargets.has(hostile.factionId)) {
-    const chance = hostileHuntChance(player.factionStanding, profileOf(player));
+    // ⚠ OTA-1156 — ROLL FOR *THIS* FACTION, NOT FOR YOUR WORST ENEMY ANYWHERE.
+    //
+    // `hostileHuntChance` reduces the array it is handed to its minimum, and this
+    // used to hand it the WHOLE standing table. So the patrol qualified on its own
+    // faction being below 0 (line above), and then the roll for whether it actually
+    // hunts you was computed from your worst standing with ANYBODY: at −30 with the
+    // Mud Monarchs and −1 with the Reclaimers, a Reclaimer patrol hunted you at the
+    // Mud Monarchs' rate. The faction identity was dropped on the way in.
+    //
+    // Passing the single row keeps the function and its OTA-1066 tests untouched —
+    // the reduce over one row IS that faction's standing — and the `depth` ladder
+    // now measures how badly THESE people want you, which is what it was written to
+    // mean ("being loathed by one faction is worse than being disliked by four").
+    const hostileStanding = player.factionStanding.find((r) => r.factionId === hostile.factionId);
+    const chance = hostileHuntChance(
+      hostileStanding ? [hostileStanding] : [],
+      profileOf(player),
+    );
     if (chance <= 0 || Math.random() > chance) return;
   }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -3996,6 +4045,36 @@ function dockHostileStanding(
   const already = rel?.standingDocked ?? 0;
   const applied = Math.max(0, magnitude - already);
   if (applied <= 0) return 0;
+  // ⚠ OTA-1156 — RESOLVE, APPLY, CONFIRM, *THEN* STAMP THE LEDGER.
+  //
+  // The order used to be: stamp the one-dock ledger, then apply, then return
+  // `applied` as if it had. `applyRepChange` no-ops silently on an id it does not
+  // know, and the ids reaching here are RAW (`vendor.faction`, `vendor.nativeFaction`)
+  // with no canonicalisation — so a legacy race id on an old save burned the ledger,
+  // moved nothing, and reported a dock that never happened. Worse than the gift
+  // version of this bug, because the ledger is what makes the dock one-shot: once
+  // stamped, the real dock can never be applied.
+  const resolved = factionIds
+    .map((f) => canonicalFactionId(f))
+    .filter((f): f is string => !!f);
+  let anyLanded = false;
+  for (const f of resolved) {
+    set((st) => {
+      if (!st.player) return {};
+      const r = applyRepChange(st.player.factionStanding, f, -applied);
+      if (r.changed.length > 0) anyLanded = true;
+      return { player: { ...st.player, factionStanding: r.standing } };
+    });
+  }
+  // Nothing moved — an unresolvable id, or every target already pinned at REP_MIN.
+  // Leave the ledger clean so a later, valid dock is still possible, and report 0
+  // so callers do not announce a punishment that was not delivered.
+  if (!anyLanded) {
+    if (factionIds.some((f) => !!f)) {
+      get().appendLog('debug', `dock: standing no-op (${factionIds.filter(Boolean).join(', ')})`);
+    }
+    return 0;
+  }
   set((st) => {
     const relations = st.worldMemory.npcRelations ?? {};
     const prev = relations[npcId];
@@ -4003,12 +4082,6 @@ function dockHostileStanding(
       ? { worldMemory: { ...st.worldMemory, npcRelations: { ...relations, [npcId]: { ...prev, standingDocked: magnitude } } } }
       : {};
   });
-  for (const f of factionIds) {
-    if (!f) continue;
-    set((st) => (st.player
-      ? { player: { ...st.player, factionStanding: applyRepChange(st.player.factionStanding, f, -applied).standing } }
-      : {}));
-  }
   return applied;
 }
 
@@ -4076,12 +4149,23 @@ function applyGiftStanding(
       },
     }));
   }
+  // ⚠ OTA-1156 — SHOW THE CASCADE. This printed one hand-rolled line for the named
+  // faction and never called logRepChanges, so the ±half that `applyRepChange` sends
+  // to every ally and rival was completely invisible: you gifted the Forgotten Order,
+  // read "+5 Forgotten Order", and never learned you had just taken −2 with the Mud
+  // Monarchs. In a system whose whole tension is that helping one side costs you with
+  // another, hiding the cost is the one thing it must not do. The bespoke line is kept
+  // as the headline (it names the ITEM's recipient, which logRepChanges cannot know)
+  // and the real per-faction numbers follow it.
+  let giftChanges: { factionId: string; delta: number; newStanding: number }[] = [];
   set((st) => {
     if (!st.player) return {};
     const r = applyRepChange(st.player.factionStanding, faction, applied);
+    giftChanges = r.changed;
     return { player: { ...st.player, factionStanding: r.standing } };
   });
   get().appendLog('system', `Standing ${applied > 0 ? '+' : ''}${applied} — ${factionLabel}.`);
+  logRepChanges(get, giftChanges);
 }
 
 /** OTA-1058 — everything the topic gates need, gathered here so engine/dialogue
@@ -4236,11 +4320,28 @@ function applyForkEffects(
     // built out of repeatable acts; this is safe for the opposite reason
     // rather than by a guard — a fork can only ever be answered once, so this
     // line can only ever run once per character, ever.
+    // ⚠ OTA-1156 — REPORT WHAT LANDED, NOT WHAT WAS AUTHORED. This was the closest
+    // structural twin of the gift bug OTA-1155 fixed: bare `.standing`, `changed`
+    // thrown away, the log line printed unconditionally, and the RAW UNDERSCORED ID
+    // shown to the player. A fork aimed at a faction already pinned at REP_MAX
+    // printed a reward that did not exist, and the ally/rival spillover — which for
+    // a big fork delta is half again as much movement — never appeared at all.
+    // Routed through logRepChanges like every other well-behaved writer, so the
+    // player sees the real numbers and the cascade.
     const { factionId, delta } = fx.standing;
-    set((st) => (st.player
-      ? { player: { ...st.player, factionStanding: applyRepChange(st.player.factionStanding, factionId, delta).standing } }
-      : {}));
-    get().appendLog('system', `Standing ${delta > 0 ? '+' : ''}${delta} — ${factionId.replace(/_/g, ' ')}.`);
+    const forkFaction = canonicalFactionId(factionId);
+    if (!forkFaction) {
+      get().appendLog('debug', `story-fork: standing skipped — "${factionId}" is not a faction`);
+    } else {
+      let forkChanges: { factionId: string; delta: number; newStanding: number }[] = [];
+      set((st) => {
+        if (!st.player) return {};
+        const r = applyRepChange(st.player.factionStanding, forkFaction, delta);
+        forkChanges = r.changed;
+        return { player: { ...st.player, factionStanding: r.standing } };
+      });
+      logRepChanges(get, forkChanges);
+    }
   }
 }
 
@@ -23320,13 +23421,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // faction-agnostic; it banks into whoever you're buying from when it crosses,
     // a benign cross-faction bleed for an afterthought lever.
     const BUY_REP_TC_PER_STANDING = 500;
-    const vendorFaction = scene.vendor.faction;
+    // ⚠ OTA-1156 — CANONICALISE, THEN ONLY SPEND THE POOL IF THE GRANT CAN LAND.
+    //
+    // The pool used to be debited unconditionally: `nextBuyRepProgress` was
+    // computed from `buyRepGranted` and written whether or not `applyRepChange`
+    // did anything. **Every roadside trader in the game has `faction: null`**
+    // (engine/vendors.ts), so crossing 500 TC at a roadside stall silently burned
+    // 500 TC of accumulated honest custom and granted nothing — permanently, since
+    // the pool does not refund. Same loss at REP_MAX, and same loss for a vendor
+    // whose recorded faction is one of the legacy race ids (see canonicalFactionId).
+    //
+    // ⚠ THE REMAINDER IS NOT THE SAME AS THE GRANT. Only the part that was
+    // converted into standing is spent; the sub-500 remainder always carries, which
+    // is what makes this a grind rather than a lottery. So on a landing grant we
+    // keep the remainder, and on a no-op we keep the WHOLE pool — the coin is still
+    // honest custom, it just has nobody to bank it with yet.
+    //
+    // ⚠ ONE CONSEQUENCE THE OWNER SHOULD SEE ON DEVICE BEFORE IT IS TUNED: a long
+    // stretch of roadside-only shopping now banks in a LUMP at the next faction
+    // vendor, because the pool carries instead of evaporating. That is the stated
+    // design ("faction-agnostic; it banks into whoever you're buying from when it
+    // crosses") paid out honestly for the first time — 10,000 TC of custom is worth
+    // +20 either way. But it arrives all at once, and +20 is the join threshold. If
+    // that reads badly in play the answer is a per-purchase grant cap, which is a
+    // DESIGN call and is deliberately not made here.
+    const vendorFaction = canonicalFactionId(scene.vendor.faction);
     const buyRepPool = (player.buyRepProgress ?? 0) + totalCost;
     const buyRepGranted = Math.floor(buyRepPool / BUY_REP_TC_PER_STANDING);
-    const nextBuyRepProgress = buyRepPool - buyRepGranted * BUY_REP_TC_PER_STANDING;
     const repResult = (vendorFaction && buyRepGranted > 0)
       ? applyRepChange(player.factionStanding, vendorFaction, buyRepGranted)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+    // `changed` is empty when the id was unknown OR the faction was already pinned
+    // at REP_MAX — in both cases nothing moved, so nothing should be charged.
+    const buyRepLanded = repResult.changed.length > 0;
+    const nextBuyRepProgress = buyRepLanded
+      ? buyRepPool - buyRepGranted * BUY_REP_TC_PER_STANDING
+      : buyRepPool;
     set((s) => {
       if (!s.player || !s.currentScene?.vendor) return s;
       // OTA 036 — filter by (itemName, price) instead of reference
