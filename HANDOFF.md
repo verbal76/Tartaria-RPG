@@ -588,6 +588,16 @@ Key invariants worth knowing:
   in-section float and finds the roll-up redundant, deleting it is one JSX block and the `readyRows` build;
   the shared predicate stays either way.
 
+  **⚠ PAUSED-BUT-READY CONTRACTS DO LIST, AND THAT IS DELIBERATE — checked, not assumed.** The exploit
+  lens asks whether a new door bypasses a gate the old door enforced. It does not: the card's COMPLETE has
+  ALWAYS been gated on `open && ready` with **no `tracked` term**, so a paused contract could already be
+  handed in from its own card. The only oddity is pre-existing and cosmetic — the card's pill prints
+  `⏸ PAUSED` in the slot where it would otherwise print `READY`, so a paused-and-finished contract shows
+  PAUSED while still offering COMPLETE. The roll-up shows it as ready, which is the truthful half. If the
+  owner would rather paused contracts stay out of the roll-up, that is a one-line filter on `tracked`; if
+  he would rather the CARD stop saying PAUSED over a live COMPLETE, that is the pill expression. Do not
+  "fix" either unprompted — they are two different answers to a question he has not been asked.
+
   **⚠ AND A SECOND THING TO WATCH:** the roll-up's COMPLETE rows are the same `completeContractFromUI` the
   cards call, so the **hunts face-to-face gate still refuses** from the roll-up when no paying agent is in
   scene (OTA-810's rule, deliberately not bypassed). If that reads as "the button doesn't work", the answer
