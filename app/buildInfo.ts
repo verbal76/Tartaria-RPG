@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.91';
+export const DISPLAY_VERSION = '4.29.92';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -22974,7 +22974,97 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // so re-tuning a threshold fails the suite instead of quietly
 // making the help text lie again.
 // DISPLAY_VERSION 4.29.91.
-export const OTA_BUILD_ID = '2026-08-07-1158-standing-text-truth';
+// 2026-08-07 OTA-1159 — THE LAST TWO DESIGN CALLS. The third and
+// fourth of the four OTA-1156 held, decided together.
+//   ⚠ 3. THE SCALER NOW KNOWS WHAT YOU ARE WEARING AND SWINGING.
+//      Owner: his AC went 20 -> 26 and the difficulty did not move.
+//      It could not — `enemyScalePower` was `bestCombatStat +
+//      hpMax/10`, and AC was not an input, nor was weapon damage.
+//      Meanwhile powerRating.playerPowerScore — the number on the
+//      player's own sheet — is `bestStat + damage + AC + hp/10`.
+//      TWO answers to "how strong is this character", and the one
+//      the player SAW counted their armour while the one that SET
+//      THE DIFFICULTY did not.
+//      ⚠ The terms are SCALED, not added. overLevelT maps power
+//      14 -> 32 and raw AC is 10-26 — the same magnitude as the
+//      whole formula — so adding it pins every armoured character
+//      at max difficulty. Both new terms are measured ABOVE a
+//      fresh-arrival baseline and divided into a 0-4 band, the
+//      same width as the HP term, because AC and HP are the two
+//      survivability axes and neither should drown the other.
+//      ⚠ A FRESH ARRIVAL IS UNCHANGED TO THE DECIMAL, by
+//      construction: at the baselines both terms are zero or
+//      negative and they clamp at zero, so gear can never make the
+//      world EASIER than authored. Measured: fresh 0.000 -> 0.000,
+//      owner AC20 0.444 -> 0.542, owner AC26 0.444 -> 0.583,
+//      end-game fused 0.722 -> 0.917. Nothing saturates.
+//      Ships at HALF weight (GEAR_POWER_BLEND 0.5) so the curve
+//      moves once, visibly, and can be read off a device log
+//      before we commit. Full weight is that one token.
+//      SEVEN spawners each hand-rolled the formula — which is
+//      exactly why AC stayed missing, there was nowhere to add it
+//      once. All route through `scalePowerOf` now, taking AC from
+//      `standingAc` rather than a third re-derivation of it.
+//      ⚠ LATENT BUG FOUND AND GUARDED: getEquippedWeapon does
+//      `for (const it of player.inventory)` with no guard and
+//      throws on an inventory-less player. Several spawn paths
+//      call this inside a try/catch that swallows, so the throw
+//      would not surface as an error — it would surface as an
+//      encounter that silently never happens. Falls back to the
+//      baselines (gear term exactly 0, i.e. the old number): if we
+//      cannot see the gear we scale as if there is none rather
+//      than inventing difficulty from a guess.
+//   ⚠ 4. THE CONTRACT REFUSAL STOPS BLAMING TRAVEL. The empty-list
+//      line was "Nothing for you right now — check back after I've
+//      travelled." There is NO restock: availableFactionQuests
+//      filters a STATIC authored pool by rep and by what the
+//      player already took, so travelling changes nothing, ever.
+//      It promised a mechanic that does not exist and sent the
+//      player away to do the one thing that cannot help — the
+//      OTA-1158 class, in the one place it costs them time rather
+//      than only misinforming them. An empty list has exactly two
+//      causes needing OPPOSITE actions, so it now says which:
+//      LOCKED names the count and the CHEAPEST rung still out of
+//      reach (not the highest — telling someone two points off a
+//      rep-8 contract that they need 25 is the same unhelpfulness
+//      in a new costume); CLEARED says to try another banner.
+//      Measured: 38 of 65 faction quests are rep-gated, 5 -> 25,
+//      with EIGHT at rep 25 — above the join threshold of 20. But
+//      every faction offers exactly 2 at rep 0, so no fresh player
+//      ever meets an empty board.
+//   ⚠ 5. THE HOSTILE SPILLOVER IS METERED ON THE GAIN SIDE.
+//      Owner: "just nerf it a bit like you suggested",
+//      superseding an earlier "leave it" on the same item. Every
+//      standing LOSS cascades — allies take half, RIVALS take the
+//      inverse and GAIN. A caught theft is -10 / -5 / +5 to every
+//      rival; an extortion -6 / -3 / +3. Gifts have carried a
+//      lifetime per-faction budget since OTA-803 and this path had
+//      NOTHING, so shaking down a faction's enemies was an
+//      unbounded climb with them: Conspiracy Architects have four
+//      rivals and start at -20, and ~14 extortions of their
+//      enemies reached the join threshold, repeatable forever. Now
+//      metered against SPITE_STANDING_FACTION_CAP (10 lifetime per
+//      faction) — 20 shakedowns pay +10 once instead of +60.
+//      ⚠ ONLY THE GAINS. Being HATED stays uncapped: a capped
+//      consequence is one a player can spend past, and the raw
+//      -10 / -6 magnitudes are untouched. Same asymmetry, and the
+//      same reason, as the gift budget it mirrors.
+//      ⚠ The excess is ROLLED BACK off the standing rows, not just
+//      omitted from the log — a gain that moved the number while
+//      going unreported would be the OTA-1156 defect (a log that
+//      disagrees with the save) pointing the other way.
+//   ⚠ ALL FOUR HELD CALLS ARE NOW DISCHARGED, and each hold was
+//   INVERTED rather than deleted, so every decision is as hard to
+//   undo as the hold was.
+// New suites ota1159ScalerKnowsGear (12),
+// ota1159RefusalTellsTruth (8) and ota1159SpiteMeter (8).
+// ⚠ NOT claimed: the heavy sims. combatStress and
+// statGrowthBalanceSim PASS with this change; encounterStress's
+// skirmish-spawn test fails, and it fails IDENTICALLY on clean
+// HEAD — it is the known-red suite already documented in §5.
+// DISPLAY_VERSION 4.29.92.
+export const OTA_BUILD_ID = '2026-08-07-1159-scaler-and-refusal';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1158-standing-text-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1157-no-ambient-standing';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1156-faction-wiring';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1155-from-the-log';

@@ -1338,8 +1338,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1181`**,
-**golem-line `2026-08-07-1158`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1182`**,
+**golem-line `2026-08-07-1159`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1555,7 +1555,96 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE STANDING TEXT SAYS WHAT THE CODE DOES (2026-08-07, latest). HAL + GOLEM.**
+- **⚠⚠ THE LAST TWO DESIGN CALLS (2026-08-07, latest). HAL + GOLEM.** golem OTA-1159 /
+  HAL OTA-1182. **steam NOT included — batched (§2).** The third and fourth of the
+  four OTA-1156 held, decided together.
+
+  **⚠ 3. THE SCALER NOW KNOWS WHAT YOU ARE WEARING AND SWINGING.** Owner: his AC went
+  20 → 26 and the difficulty did not move. It could not — `enemyScalePower` was
+  `bestCombatStat + hpMax/10`, and AC was not an input at all, nor was weapon damage.
+  Meanwhile `powerRating.playerPowerScore`, the number on the player's own sheet, is
+  `bestStat + damage + AC + hp/10`. **Two answers to "how strong is this character",
+  and the one the player SAW counted their armour while the one that SET THE
+  DIFFICULTY did not.**
+  - ⚠ **The terms are SCALED, not added.** `overLevelT` maps power 14 → 32; raw AC is
+    10-26, the same magnitude as the ENTIRE old formula, so adding it whole pins every
+    armoured character at max difficulty. Both are measured **above a fresh-arrival
+    baseline** and divided into a 0-4 band — the same width as the HP term, because AC
+    and HP are the two survivability axes and neither should drown the other.
+  - ⚠ **A fresh arrival is unchanged to the decimal, by construction.** At the
+    baselines both terms are zero or negative and they clamp at zero, so gear can
+    never make the world EASIER than authored. Measured: fresh `0.000 → 0.000`, owner
+    at AC 20 `0.444 → 0.542`, at AC 26 `0.444 → 0.583`, end-game fused
+    `0.722 → 0.917`. Nothing saturates.
+  - Ships at **half weight** (`GEAR_POWER_BLEND = 0.5`) so the curve moves once,
+    visibly, and gets read off a device log before we commit. Full weight is that one
+    token and no other edit.
+  - **Seven spawners each hand-rolled the formula** — which is exactly why AC stayed
+    missing, there was nowhere to add it once. All route through `scalePowerOf` now,
+    taking AC from `standingAc` rather than a third re-derivation of the number
+    OTA-1133 exists to settle.
+  - ⚠ **Latent bug found and guarded.** `getEquippedWeapon` does `for (const it of
+    player.inventory)` with no guard and throws on an inventory-less player. Several
+    spawn paths call it inside a `try/catch` that swallows, so the throw does not
+    surface as an error — it surfaces as **an encounter that silently never happens**.
+    The fallback is the baselines (gear term exactly 0, the pre-OTA number): if we
+    cannot see the gear we scale as though there is none rather than guessing.
+
+  **⚠ 4. THE CONTRACT REFUSAL STOPS BLAMING TRAVEL.** The empty-list line was
+  *"Nothing for you right now — check back after I've travelled."* **There is no
+  restock** — `availableFactionQuests` filters a STATIC authored pool by rep and by
+  what the player already took, so travelling changes nothing, ever. It promised a
+  mechanic that does not exist and sent the player away to do the one thing that
+  provably cannot help: the OTA-1158 class, in the one place it costs the player TIME
+  rather than only misinforming them. An empty list has exactly two causes needing
+  opposite actions, so it now says which — LOCKED names the count and the **cheapest**
+  rung still out of reach (not the highest; telling someone two points off a rep-8
+  contract they need 25 is the same unhelpfulness in a new costume), CLEARED says to
+  try another banner.
+  ⚠ Measured, and it corrects an earlier session's numbers: **38 of 65 faction quests
+  are rep-gated, 5 → 25, with EIGHT at rep 25 — above the join threshold of 20.** But
+  **every faction offers exactly 2 at rep 0**, so no fresh player ever meets an empty
+  board; the refusal only fires once the reachable ones are gone. The claim of "24
+  contracts behind rep 8-25, new players hit a wall" was wrong on both counts.
+
+  **⚠ ALL FOUR HELD CALLS ARE NOW DISCHARGED**, and every hold was **inverted rather
+  than deleted**, so each decision is as hard to undo as the hold was:
+  1. ambient standing ratchet → OTA-1157, `ota1157AmbientStandingOff`
+  2. the in-game explainer text → OTA-1158, `ota1158StandingTextTruth`
+  3. the difficulty scaler → OTA-1159, `ota1159ScalerKnowsGear`
+  4. the contract-refusal wording → OTA-1159, `ota1159RefusalTellsTruth`
+  …and the fifth item, the theft/extort spillover, is metered — see below.
+
+  **⚠ 5. THE HOSTILE SPILLOVER IS METERED ON THE GAIN SIDE.** Owner: *"just nerf it a
+  bit like you suggested"* — superseding an earlier *"leave it"* on the same item, in
+  the same session. Any standing LOSS cascades: allies take half, **rivals take the
+  inverse and GAIN** — a caught theft is −10 / −5 / **+5 to every rival**, an
+  extortion −6 / −3 / **+3**. Gifts have carried a lifetime per-faction budget since
+  OTA-803 (`GIFT_STANDING_FACTION_CAP`) and this path had **none**, so shaking down a
+  faction's enemies was an unbounded climb with them: Conspiracy Architects have four
+  rivals and start at −20, and ~14 extortions of their enemies reached the join
+  threshold, repeatable forever. Metered now against `SPITE_STANDING_FACTION_CAP`
+  (10 lifetime per faction) — **20 shakedowns pay +10 once instead of +60.**
+  - ⚠ **ONLY THE GAINS, and do not "finish the job" by capping the losses.** Being
+    HATED must have no ceiling or a player can spend past their own consequences; the
+    raw −10 / −6 magnitudes are untouched. This caps spillover, not punishment. Same
+    asymmetry and the same reasoning as the gift budget it mirrors.
+  - ⚠ The excess is **rolled back off the standing rows**, not merely dropped from the
+    log. A gain that moved the number while going unreported would be the OTA-1156
+    defect — a log that disagrees with the save — pointing the other way. The reported
+    `changed` list is trimmed to match, so a fully-capped gain vanishes from both.
+  - Budget lives on `worldMemory.spiteStandingGranted`, mirroring the gift budget, so
+    it survives save/load the same way.
+
+  ⚠ **Heavy sims NOT claimed green.** `combatStress` and `statGrowthBalanceSim` PASS
+  with this change. `encounterStress`'s skirmish-spawn test FAILS — and fails
+  **identically on clean HEAD**, verified by stashing the change and re-running. It is
+  the known-red suite already tabled in §5. An earlier read of this session called the
+  failure self-inflicted before the baseline came back; it was not.
+
+- **⚠⚠ THE STANDING TEXT SAYS WHAT THE CODE DOES (2026-08-07). HAL + GOLEM.**
+
+- **⚠⚠ THE STANDING TEXT SAYS WHAT THE CODE DOES (2026-08-07). HAL + GOLEM.**
   golem OTA-1158 / HAL OTA-1181. **steam NOT included — batched (§2).** The SECOND
   of the four design calls OTA-1156 held. Owner: *"correct the incorrect wording and
   make sure they know a certain − standing will get them hunted."*
@@ -1638,9 +1727,15 @@ rediscovering them.
     starting at 0). **The attack gate runs on earned rep, and always did.**
 
   ⚠ Also checked, because it was the owner's second reason to keep the drift: low
-  standing does **not** farm HP. The +1 hpMax milestone keys off **5 DISTINCT enemy
+  standing does **not** farm HP. The +1 hpMax milestone keys off **DISTINCT enemy
   types** (arb119), and patrols recycle a handful of names — repeat ambushes stop
   paying almost immediately.
+  *(⚠ CORRECTION, OTA-1159: this said "5 distinct types" when it shipped. The step
+  is `MILESTONE_KILL_STEP = 3` — OTA-1142 tuned it 5 → 3 and this entry quoted the
+  retired number. The conclusion is unchanged and in fact slightly understated: the
+  gate is DISTINCTNESS, not the step. 111 authored enemies ≈ 37 hpMax over a full
+  run, plus faction-dressed variants, which carry their own names and count
+  separately. Verified 2026-08-07 by reading the constant and its one caller.)*
 
   **⚠ THE RUMORS WERE REWRITTEN WITH THE EFFECT, NOT LEFT BEHIND.** *"they count you
   a friend now"* and *"remembered your name"* are STANDING CLAIMS. Deleting the

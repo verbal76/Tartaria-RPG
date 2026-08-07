@@ -96,10 +96,64 @@ export function pickHazardForLocation(location: Location, dangerBoost = 0): Haza
 // big Legendary doesn't explode, and a fresh arrival in a danger-0 zone is left
 // EXACTLY as authored — "low level is still low level". Knobs are all here.
 
-/** How strong is this character. Best offensive stat + a slice of the HP pool — the
- *  same proxy the Guardian scaler uses, kept in sync deliberately. */
-export function enemyScalePower(bestCombatStat: number, hpMax: number): number {
-  return bestCombatStat + hpMax / 10;
+// ⚠ OTA-1159 — THE SCALER NOW KNOWS WHAT YOU ARE WEARING AND SWINGING.
+//
+// Owner: his AC went 20 → 26 and the difficulty did not move. It could not — the
+// power proxy below was `bestCombatStat + hpMax / 10`, and AC was not an input at
+// all, nor was weapon damage. Meanwhile `powerRating.playerPowerScore` — the number
+// shown to the player on their own sheet — is `bestStat + damage + AC + hp/10`. Two
+// answers to "how strong is this character", and the one the player SEES counted
+// their armour while the one that SET THE DIFFICULTY did not.
+//
+// ⚠ WHY THE TERMS ARE SCALED, NOT JUST ADDED. `overLevelT` maps power 14 → 32, and
+// the existing inputs live inside that window (a best stat of 10-18, hp/10 from
+// ~2.4 at a fresh arrival to ~6 late). RAW AC is 10-26 — the same magnitude as the
+// ENTIRE formula — so adding it whole pins `overLevelT` at 1 for anyone wearing
+// armour. That is not "difficulty responds to gear", it is "difficulty is always
+// maxed". Both new terms are therefore measured ABOVE A FRESH-ARRIVAL BASELINE and
+// divided into a 0-4 band — deliberately the same width as the HP term's 2.4-6,
+// because AC and HP are the two survivability axes and neither should drown the
+// other.
+//
+// ⚠ A FRESH ARRIVAL IS EXACTLY UNCHANGED, BY CONSTRUCTION. Racial base AC is 8-12
+// and the unarmed damage proxy is 2, so at the baselines both terms are zero or
+// negative — and they are clamped at zero, so gear can never make the world EASIER
+// than it was authored. "A fresh arrival in a danger-0 zone is left EXACTLY as
+// authored" (see the header) survives this untouched.
+
+/** Racial base AC — 8 (mud golem) to 12 (giant), 10 for most. Below this, no credit. */
+export const AC_POWER_BASELINE = 10;
+/** Just above the unarmed damage proxy (2), so a first real weapon reads as ~0. */
+export const DMG_POWER_BASELINE = 3;
+/** Puts each gear term in a 0-4 band, matching the HP term's width. */
+export const GEAR_POWER_DIVISOR = 4;
+/** ⚠ THE DIAL, AND IT IS DELIBERATELY NOT 1. 1.0 is the designed full weight of the
+ *  two gear terms; this ships at HALF so the curve moves once, visibly, and can be
+ *  read off a real device log before we commit to the rest. Going to full weight is
+ *  a one-token change here and needs no other edit anywhere. */
+export const GEAR_POWER_BLEND = 0.5;
+
+/** The gear half of the power proxy: what your armour and your weapon are worth above
+ *  what you walked in with. Clamped at 0 — gear never lowers difficulty. */
+export function gearPowerTerm(ac: number, avgWeaponDamage: number): number {
+  const acTerm = Math.max(0, ac - AC_POWER_BASELINE) / GEAR_POWER_DIVISOR;
+  const dmgTerm = Math.max(0, avgWeaponDamage - DMG_POWER_BASELINE) / GEAR_POWER_DIVISOR;
+  return GEAR_POWER_BLEND * (acTerm + dmgTerm);
+}
+
+/** How strong is this character. Best offensive stat + a slice of the HP pool, plus —
+ *  since OTA-1159 — a scaled slice of what they are WEARING and SWINGING.
+ *  ⚠ `gear` is OPTIONAL so the pure stat/HP proxy stays callable for tooling and for
+ *  the Guardian curve this is kept in sync with. Omitting it reproduces the old value
+ *  EXACTLY, which is what keeps the OTA-1159 diff readable and its blast radius the
+ *  set of call sites that opted in. */
+export function enemyScalePower(
+  bestCombatStat: number,
+  hpMax: number,
+  gear?: { ac: number; avgWeaponDamage: number },
+): number {
+  const base = bestCombatStat + hpMax / 10;
+  return gear ? base + gearPowerTerm(gear.ac, gear.avgWeaponDamage) : base;
 }
 
 function bumpAbilityPointNumber(ap: string | number | undefined, bonus: number): string {
