@@ -97,8 +97,14 @@ only) and report them as CI-verified, not locally verified.
   carry a copy; a correction landed on one is NOT landed until it is on all three.
   ⚠ Ordering bites: on 2026-08-07 steam was merged one commit BEFORE the gating
   correction was pushed to HAL, so steam carried the disproved claim for an hour while
-  HAL and golem read clean. **Push the doc fix to every line in the same pass, or
-  re-merge the laggard.**
+  HAL and golem read clean. **Push the doc fix to HAL and golem in the same pass.**
+  ⚠ **STEAM IS THE EXCEPTION NOW, and it is a deliberate one:** since steam is
+  batched (§2 amendment), its copy is allowed to run BEHIND between `.exe` merges —
+  it catches up in the merge, which carries the doc commits with everything else. So
+  "not landed until it is on all three" now means *all three once steam is next
+  brought up*, not *within the hour*. **The thing to actually guard is that steam is
+  never brought up from a stale HAL**: merge `HaL2001` at its current tip, never
+  cherry-pick, or its handoff and its code disagree about what shipped.
 - **Judging "clean":** filter typecheck output to `app/**`, and additionally
   ignore the pre-existing `expo-document-picker` errors in engine_Dev app
   source (3 of them) plus the long-standing test-file type errors on all lines
@@ -157,23 +163,56 @@ one line is applied **per-line, code-specifically** (see §4).
 > are currently in the qol improvements and balancing phase. we also test the crap
 > out of everything before we push."*
 >
-> **THE THREE LINES TO KEEP CURRENT ARE `HaL2001`, `golem-line` AND `steam_Dev`.**
-> This is the change: `steam_Dev` was previously treated as a downstream packaging
-> line, topped up only when asked. It is now a STANDING line that ships in the same
-> pass as HAL and golem. **`engine_Dev` is still a separate product and is NOT part
-> of the default pass** — it takes engine-level fixes only, exactly as before, but
-> it is no longer one of the three you keep in step.
+> ### ⚠⚠ AMENDED LATER THE SAME DAY — STEAM IS BATCHED, NOT PER-PASS
 >
-> - **`HaL2001`** — live, at testers. **Device logs come from here almost always.**
-> - **`golem-line`** — the testing ground for BIG changes; still kept current
->   otherwise, so the fork point is never stale.
-> - **`steam_Dev`** — the owner's PC testing line and the possible Steam
->   submission path. Keep it current. ⚠ It has **no `node_modules` and never has**,
->   so it cannot be gated locally — verify by hand and report it as CI-verified.
+> Owner, verbatim: *"you can stack updates for the exe and we can do an update and
+> push when a full exe is needed. we still push Hal first and then port to golem."*
+> And on the check-ins: *"no need to run an hourly check on the exe pushes, I'll eye
+> those. I only push an exe build when I need to push and test."*
 >
-> **The bar for NOT shipping to all three is "a high chance of game-breaking
-> changes."** That is a high bar: default to all three, and fork to golem alone only
-> when the change is genuinely engine-threatening.
+> **The default pass is TWO lines, in this order: `HaL2001` FIRST, then port to
+> `golem-line`.** `steam_Dev` **accumulates**, and is brought up in one merge when an
+> `.exe` is actually wanted — the owner decides when that is. Do NOT merge to
+> `steam_Dev` on every OTA, and do NOT poll its build.
+>
+> ⚠ This REPLACES the "ship to all three in the same pass" rule written earlier the
+> same day (kept below, so the change is legible rather than silently rewritten). The
+> reason it moved: an `.exe` only matters when the owner sits down to test on PC, so
+> topping steam up every OTA spent CI on an artifact nobody was going to run.
+>
+> **⚠ WHEN YOU DO BRING STEAM UP** it is a MERGE of `HaL2001`, not a hand-port, and
+> it may carry several OTAs at once — read the range you are merging and name the
+> OTAs it carries in the merge message.
+>
+> - **`HaL2001`** — live, at testers. Push here FIRST. **Device logs come from here
+>   almost always.**
+> - **`golem-line`** — the testing ground for BIG changes; ported immediately after
+>   HAL in the same pass, so the fork point is never stale. Parity offset HAL − 23.
+> - **`steam_Dev`** — the owner's PC testing line and the possible Steam submission
+>   path. **BATCHED.** Bring it up when an `.exe` is needed.
+>
+> ⚠ **AND STEAM *CAN* BE GATED LOCALLY.** This block used to read "it has **no
+> `node_modules` and never has**, so it cannot be gated locally — verify by hand."
+> That is false, and it was a habit mistaken for a limitation: `npm install` in the
+> spin-off worktree just works (~25s), and on 2026-08-07 `typecheck:ci`, `lint` and
+> the new OTA-1155 suite all ran green there before the push. Gate it like any other
+> line.
+>
+> **The bar for NOT shipping to BOTH HAL and golem is "a high chance of
+> game-breaking changes."** That is a high bar: default to both, and fork to golem
+> alone only when the change is genuinely engine-threatening.
+>
+> <details><summary>Superseded earlier-same-day wording (kept for legibility)</summary>
+>
+> > **THE THREE LINES TO KEEP CURRENT ARE `HaL2001`, `golem-line` AND `steam_Dev`.**
+> > `steam_Dev` was previously a downstream packaging line topped up only when asked.
+> > It is now a STANDING line that ships in the same pass as HAL and golem. The bar
+> > for NOT shipping to all three is "a high chance of game-breaking changes."
+>
+> </details>
+>
+> **`engine_Dev` is still a separate product and is NOT part of any pass** — it takes
+> engine-level fixes only, and see the stop block below.
 >
 > **⚠⚠ `engine_Dev` IS OFF LIMITS (owner, 2026-08-07): *"engine_dev is a separate
 > project, leave it be for now, it's off limits unless I tell you."*** Do not commit
@@ -262,6 +301,12 @@ Prove the root cause (instrument if needed), fix at the shared choke point,
 grep-verify every other instance of the pattern, add a category-lock test
 where practical, and report category-complete vs named residuals. Full
 checklist: CLAUDE.md "FIX RULE".
+
+**⚠ THE ORDER OF A PASS (owner, 2026-08-07): `HaL2001` FIRST, then port to
+`golem-line`. `steam_Dev` is BATCHED — it is not part of the pass.** Steps 1-6
+below run twice, once per line, HAL leading; run `scripts/verify-parity.mjs`
+between them. Bring steam up only when the owner wants an `.exe`, and then as a
+single merge of HAL's current tip. Full directive + the reason it changed: §2.
 
 1. Edit code under `app/` in that line's worktree.
 2. **CI gates (all BLOCKING on HAL + golem — run before pushing; a red gate now
@@ -1233,9 +1278,14 @@ Key invariants worth knowing:
   secondary "tap again → 2 active items" report is unconfirmed and likely a
   downstream artifact of the same count/modal mismatch. If it recurs, capture the
   EXACT chip noun that won't clear and whether the player was climbed up.
-- **⚠ `steam_Dev` IS NOW A STANDING LINE (owner, 2026-08-07) — ship it in the same
-  pass as HAL and golem, not on request.** See the directive block in §2. Current at
-  **`442f7729`, merged to the OTA-1175 baseline**, identity + platform shims
+- **⚠ `steam_Dev` IS BATCHED (owner, 2026-08-07, amended later the same day) — do
+  NOT merge it every pass.** *"you can stack updates for the exe and we can do an
+  update and push when a full exe is needed. we still push Hal first and then port
+  to golem."* It briefly WAS a standing per-pass line earlier that day; that lasted
+  hours. Stack the OTAs and bring steam up in ONE merge when an `.exe` is wanted.
+  ⚠ Do not poll its build either — the owner watches those himself. See the amended
+  directive block in §2. Last brought up at **`3123789e` (the OTA-1178 pass)**;
+  before that `442f7729`, merged to the OTA-1175 baseline, identity + platform shims
   verified intact, lock verified in sync, and **all gates run locally green** (see
   the correction below). ⚠ steam publishes NO OTA: `steam_Dev` is absent from
   `eas-update.yml`'s branch trigger list AND falls to the skip arm of its `case`, so
@@ -1295,7 +1345,8 @@ re-architecture. Currently **4.29.87**; ledger in `VERSION.md`.
 
 Owner's direction: *"do it, and log the rest as open items that we can
 continue to work on. I don't want to lose this train of thought."* Everything
-below is **OTA-able and ships to all three lines** unless marked build-bound.
+below is **OTA-able and ships to HAL + golem** unless marked build-bound (steam is
+batched now — see the §0 amendment).
 
 **The premise:** the app pays the full cost of carrying a 400MB on-device
 model and extracts very little from it — while betting on that same model to
