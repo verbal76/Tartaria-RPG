@@ -7,7 +7,8 @@ import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weapon
 import { getItemPreview } from '../components/itemPreview';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
 import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
-import { findFactionQuestById, FACTION_QUESTS, factionQuestReady } from '../engine/factionQuests';
+import { findFactionQuestById, FACTION_QUESTS, type FactionQuestDef } from '../engine/factionQuests';
+import { missionTurnInReady } from '../engine/missionReady';
 import { escortToggleLabel } from '../engine/escort';
 import { FACTIONS } from '../engine/factions';
 // OTA-1050 — Phase 1 slice 2: the Chronicle's people column.
@@ -117,7 +118,20 @@ export function ContractsScreen() {
   // list, never merge them). One flag drives both the main screen toggle and the
   // toggle inside the expanded Primary Objective box. Local state (view option),
   // matching the screen's other toggles; not persisted.
-  const [sortByDistance, setSortByDistance] = useState(false);
+  //
+  // OTA-1152 — the boolean became a THREE-WAY MODE when READY TO HAND IN joined
+  // it. Two independent toggles would have allowed four states, two of them
+  // nonsense ("ready first, but don't sort by distance" — ready contracts sort by
+  // distance BY DEFINITION here). One mode, two buttons, each tap clearing the
+  // other, keeps the impossible states unrepresentable.
+  type SortMode = 'default' | 'distance' | 'ready';
+  const [sortMode, setSortMode] = useState<SortMode>('default');
+  // Tapping an active mode returns to the default order — same as the old toggle.
+  const pickSort = (m: Exclude<SortMode, 'default'>) =>
+    setSortMode((cur) => (cur === m ? 'default' : m));
+  // Both non-default modes order by distance, so everything that only cares
+  // "is a distance sort running" reads this and is unchanged by the new mode.
+  const sortByDistance = sortMode !== 'default';
   // OTA-606 — honor a deep-link tab request (e.g. the first-collectible popup
   // wants the Collectibles tab, not the default Contracts tab). Apply it once
   // on entry, then clear it so a later normal open lands on the default.
@@ -230,13 +244,23 @@ export function ContractsScreen() {
   // Sort a section's list by distance (nearest first) WHEN sortByDistance is on,
   // else leave the order untouched. Placeless entries (null) sort last. Sections
   // are never merged — this only reorders within one type, keeping the grouping.
-  const byMoves = <T,>(arr: readonly T[], locOf: (t: T) => string | null | undefined): T[] => {
+  //
+  // OTA-1152 — in READY mode the ready-to-hand-in entries rise to the top of
+  // their section first, THEN distance breaks the tie inside each half. Sections
+  // that pass no `readyOf` (nothing in them can be handed in) simply sort by
+  // distance in both modes, which is what they did before.
+  const byMoves = <T,>(
+    arr: readonly T[],
+    locOf: (t: T) => string | null | undefined,
+    readyOf?: (t: T) => boolean,
+  ): T[] => {
     if (!sortByDistance) return arr as T[];
-    const key = (t: T) => {
+    const dist = (t: T) => {
       const m = movesTo(locOf(t));
       return m === null ? Number.POSITIVE_INFINITY : m;
     };
-    return [...arr].sort((a, b) => key(a) - key(b));
+    const rank = (t: T) => (sortMode === 'ready' && readyOf?.(t) ? 0 : 1);
+    return [...arr].sort((a, b) => rank(a) - rank(b) || dist(a) - dist(b));
   };
 
   // Uniform ACTIVATE / DEACTIVATE (pause) toggle for any contract kind, mirroring
@@ -337,7 +361,119 @@ export function ContractsScreen() {
   const brokerLegs = brokerMission ? (missionLegs(brokerMission) ?? []) : [];
   const hasRelic = (name: string) =>
     (player.inventory ?? []).some((i) => i.name === name && (i.quantity ?? 1) > 0);
-  const brokerReady = brokerLegs.length > 0 && brokerLegs.every((l) => hasRelic(l.itemName));
+
+  // OTA-1152 — READINESS, ONCE, FOR EVERY KIND. These three wrappers are the only
+  // places this screen asks "can it be handed in?", and all three go through
+  // engine/missionReady. The card pills, the COMPLETE gates and the READY TO HAND
+  // IN sort therefore cannot disagree — which they could before, when each section
+  // computed its own answer inline.
+  //
+  // ⚠ A record whose DEF no longer resolves is never ready: the cards already
+  // filter orphans out (`if (!def) return null`), and a sort that floated a card
+  // that does not render would leave a gap the player cannot act on.
+  const countItem = (name: string) =>
+    (player?.inventory ?? [])
+      .filter((it) => it.name.toLowerCase() === name.toLowerCase())
+      .reduce((n, it) => n + (it.quantity ?? 1), 0);
+  const stageRunReady = (
+    kind: 'hunt' | 'mystery' | 'storyline',
+    run: { stage: number },
+    def: { stages: readonly unknown[] } | null | undefined,
+  ): boolean => !!def && missionTurnInReady({ kind, stage: run.stage, stageCount: def.stages.length });
+  const factionRecReady = (
+    rec: { stage: number },
+    def: FactionQuestDef | null | undefined,
+  ): boolean =>
+    !!def && missionTurnInReady({ kind: 'faction_quest', def, stage: rec.stage, countItem });
+  const brokerReady = missionTurnInReady({
+    kind: 'broker',
+    legs: brokerLegs,
+    hasItem: hasRelic,
+  });
+
+  // OTA-1152 — a faction contract's card swaps the distance it shows once the work
+  // is done: en route it points at the OBJECTIVE, ready it points at the faction
+  // HOME you hand it in at. The distance SORT was still keying off the objective,
+  // so a ready contract sorted by a number its own card was not displaying. One
+  // helper now feeds both, and they agree in every mode.
+  const factionSortLocId = (fq: { rec: { stage: number }; def: FactionQuestDef | null }) => {
+    if (!fq.def) return null;
+    const home = startingLocationForFaction(fq.def.factionId);
+    return factionRecReady(fq.rec, fq.def) ? home : (missionObjectiveLocationId(fq.def) ?? home);
+  };
+
+  // OTA-1152 — THE READY TO HAND IN ROLL-UP. The owner asked for the ready ones
+  // "right to the top", pulled FROM the groups — floating them inside their own
+  // section would not have done that: a ready faction contract sits below Hunts,
+  // Mysteries and Storylines, so "top of its group" can still be most of a screen
+  // down. This gathers them across every kind into one list above everything else,
+  // nearest first, while the full cards stay where they were.
+  //
+  // ⚠ Each row's COMPLETE calls the SAME completeContractFromUI the card's button
+  // calls — it is not a second turn-in path. Anything that store refuses (the
+  // face-to-face gate on hunts, for one) is refused identically here and surfaces
+  // on the same refusal strip.
+  type ReadyRow = {
+    key: string;
+    tag: string;
+    title: string;
+    locId: string | null;
+    onComplete: (() => void) | null;
+    note: string;
+  };
+  const readyRows: ReadyRow[] = [];
+  for (const h of hunts) {
+    const d = h.def;
+    if (d && stageRunReady('hunt', h.run, d))
+      readyRows.push({
+        key: `rh_${h.run.id}`, tag: 'HUNT', title: d.title,
+        locId: markerLocId(`h_${h.run.id}`),
+        note: 'paid face to face — a vendor or the posting faction’s agent',
+        onComplete: () => completeContractFromUI('hunt', d.id),
+      });
+  }
+  for (const m of mysteries) {
+    const d = m.def;
+    if (d && stageRunReady('mystery', m.run, d))
+      readyRows.push({
+        key: `rm_${m.run.id}`, tag: 'MYSTERY', title: d.title,
+        locId: markerLocId(`m_${m.run.id}`), note: 'claim the reward',
+        onComplete: () => completeContractFromUI('mystery', d.id),
+      });
+  }
+  for (const sl of storylines) {
+    const d = sl.def;
+    if (d && stageRunReady('storyline', sl.run, d))
+      readyRows.push({
+        key: `rs_${sl.run.id}`, tag: 'STORYLINE', title: d.title,
+        locId: markerLocId(`s_${sl.run.id}`), note: 'claim the reward',
+        onComplete: () => completeContractFromUI('storyline', d.id),
+      });
+  }
+  for (const fq of factionQuests) {
+    const d = fq.def;
+    if (d && factionRecReady(fq.rec, d))
+      readyRows.push({
+        key: `rf_${d.id}`, tag: 'FACTION', title: d.title,
+        locId: factionSortLocId(fq),
+        note: 'hand in at a same-faction agent for FULL reward',
+        onComplete: () => completeContractFromUI('faction_quest', d.id),
+      });
+  }
+  // The alliance seals at the Parley Ground rather than through a COMPLETE tap,
+  // so it lists (it IS ready to hand in) with a route note and no button.
+  if (brokerReady) {
+    readyRows.push({
+      key: 'rb_broker', tag: 'ALLIANCE', title: 'Parley of Factions',
+      locId: 'parley_ground', note: 'seal the alliance at the Parley Ground',
+      onComplete: null,
+    });
+  }
+  readyRows.sort(
+    (a, b) =>
+      (movesTo(a.locId) ?? Number.POSITIVE_INFINITY) -
+      (movesTo(b.locId) ?? Number.POSITIVE_INFINITY),
+  );
 
   // OTA-1002 — count only records whose DEF still resolves: the cards filter
   // orphans out, and the header must agree (never "6 ACTIVE" over 5 cards).
@@ -464,9 +600,13 @@ export function ContractsScreen() {
                 <View style={styles.mqTrackerHeadRow}>
                   <Text style={styles.mqTrackerHead}>9 CAPITALS · {recoveredCount}/9 CORES</Text>
                   {/* arb-fix — same SORT BY DISTANCE toggle, here for the Capital list.
-                      Reorders the 9 Capitals nearest-first (finished ones sink). */}
+                      Reorders the 9 Capitals nearest-first (finished ones sink).
+                      OTA-1152 — deliberately NOT given the READY mode: a Capital is a
+                      boss objective, not a contract, so it has nothing to hand in. It
+                      still lights while READY mode runs, because that mode orders the
+                      Capitals by distance too — the button is telling the truth. */}
                   <Pressable
-                    onPress={() => setSortByDistance((v) => !v)}
+                    onPress={() => pickSort('distance')}
                     hitSlop={6}
                     style={({ pressed }) => [styles.mqSortBtn, sortByDistance && styles.mqSortBtnOn, pressed && styles.sortBarPressed]}
                     accessibilityRole="button"
@@ -637,20 +777,73 @@ export function ContractsScreen() {
       ) : (
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         {/* arb-fix — SORT BY DISTANCE toggle. Reorders every mission section by
-            moves-to-target (nearest first) while keeping each type grouped. */}
-        <Pressable
-          onPress={() => setSortByDistance((v) => !v)}
-          style={({ pressed }) => [styles.sortBar, sortByDistance && styles.sortBarOn, pressed && styles.sortBarPressed]}
-          accessibilityRole="button"
-          accessibilityState={{ selected: sortByDistance }}
-        >
-          <Text style={[styles.sortBarText, sortByDistance && styles.sortBarTextOn]}>
-            {sortByDistance ? '◈ SORTED BY DISTANCE (grouped by type)' : '◈ SORT BY DISTANCE'}
-          </Text>
-          <Text style={[styles.sortBarHint, sortByDistance && styles.sortBarTextOn]}>
-            {sortByDistance ? 'tap for default order' : 'nearest first, within each type'}
-          </Text>
-        </Pressable>
+            moves-to-target (nearest first) while keeping each type grouped.
+            OTA-1152 — READY TO HAND IN joins it on the right, same style. The two
+            share one mode, so lighting either one clears the other. */}
+        <View style={styles.sortRow}>
+          <Pressable
+            onPress={() => pickSort('distance')}
+            style={({ pressed }) => [styles.sortBar, styles.sortBarHalf, sortMode === 'distance' && styles.sortBarOn, pressed && styles.sortBarPressed]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: sortMode === 'distance' }}
+          >
+            <Text style={[styles.sortBarText, sortMode === 'distance' && styles.sortBarTextOn]}>
+              {sortMode === 'distance' ? '◈ SORTED BY DISTANCE' : '◈ SORT BY DISTANCE'}
+            </Text>
+            <Text style={[styles.sortBarHint, sortMode === 'distance' && styles.sortBarTextOn]}>
+              {sortMode === 'distance' ? 'tap for default order' : 'nearest first, within each type'}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => pickSort('ready')}
+            style={({ pressed }) => [styles.sortBar, styles.sortBarHalf, sortMode === 'ready' && styles.sortBarReadyOn, pressed && styles.sortBarPressed]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: sortMode === 'ready' }}
+          >
+            <Text style={[styles.sortBarText, sortMode === 'ready' && styles.sortBarReadyText]}>
+              {sortMode === 'ready' ? `✦ READY TO HAND IN · ${readyRows.length}` : '✦ SORT BY READY TO HAND IN'}
+            </Text>
+            <Text style={[styles.sortBarHint, sortMode === 'ready' && styles.sortBarReadyText]}>
+              {sortMode === 'ready' ? 'tap for default order' : 'finished work first, nearest first'}
+            </Text>
+          </Pressable>
+        </View>
+        {/* OTA-1152 — the roll-up itself: every ready contract, pulled from its
+            group to the top, nearest first. Only in READY mode; the full cards
+            stay in their sections below either way. */}
+        {sortMode === 'ready' && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle} accessibilityRole="header">
+              ✦ READY TO HAND IN {readyRows.length > 0 ? `· ${readyRows.length}` : ''}
+            </Text>
+            {readyRows.length === 0 ? (
+              <Text style={styles.readyEmpty}>
+                Nothing is ready to hand in yet — finish a contract’s work and it appears here.
+              </Text>
+            ) : (
+              readyRows.map((r) => (
+                <View key={r.key} style={[styles.card, styles.readyCard]}>
+                  <View style={styles.cardHead}>
+                    <Text style={styles.cardTitle}>{r.title}</Text>
+                    <Text style={styles.readyTag}>{r.tag}</Text>
+                  </View>
+                  {movesLine(r.locId)}
+                  <Text style={styles.cardHint}>{r.note}</Text>
+                  {r.onComplete && (
+                    <Pressable
+                      style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
+                      onPress={r.onComplete}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Complete ${r.title}`}
+                    >
+                      <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
+                    </Pressable>
+                  )}
+                </View>
+              ))
+            )}
+          </View>
+        )}
         {(() => {
           // OTA-912 — great-climb missions. A climb becomes a listed mission once
           // its Skyreacher Chart is used (id in unlockedGreatClimbs); it clears
@@ -885,11 +1078,11 @@ export function ContractsScreen() {
         {hunts.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">HUNTS</Text>
-              {byMoves(hunts, (h) => markerLocId(`h_${h.run.id}`)).map(({ run, def }) => {
+              {byMoves(hunts, (h) => markerLocId(`h_${h.run.id}`), (h) => stageRunReady('hunt', h.run, h.def)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `h_${run.id}`;
                 const open = !!expanded[key];
-                const ready = run.stage >= def.stages.length;
+                const ready = stageRunReady('hunt', run, def);
                 const tracked = run.tracked !== false;
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityRole="button" accessibilityState={{ expanded: open }}>
@@ -1035,11 +1228,11 @@ export function ContractsScreen() {
           {mysteries.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">MYSTERIES</Text>
-              {byMoves(mysteries, (m) => markerLocId(`m_${m.run.id}`)).map(({ run, def }) => {
+              {byMoves(mysteries, (m) => markerLocId(`m_${m.run.id}`), (m) => stageRunReady('mystery', m.run, m.def)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `m_${run.id}`;
                 const open = !!expanded[key];
-                const ready = run.stage >= def.stages.length;
+                const ready = stageRunReady('mystery', run, def);
                 const tracked = run.tracked !== false;
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityRole="button" accessibilityState={{ expanded: open }}>
@@ -1105,11 +1298,11 @@ export function ContractsScreen() {
           {storylines.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">STORYLINES</Text>
-              {byMoves(storylines, (sl) => markerLocId(`s_${sl.run.id}`)).map(({ run, def }) => {
+              {byMoves(storylines, (sl) => markerLocId(`s_${sl.run.id}`), (sl) => stageRunReady('storyline', sl.run, sl.def)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `s_${run.id}`;
                 const open = !!expanded[key];
-                const ready = run.stage >= def.stages.length;
+                const ready = stageRunReady('storyline', run, def);
                 const tracked = run.tracked !== false;
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityRole="button" accessibilityState={{ expanded: open }}>
@@ -1175,7 +1368,7 @@ export function ContractsScreen() {
           {factionQuests.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">FACTION QUESTS</Text>
-              {byMoves(factionQuests, (fq) => fq.def ? (missionObjectiveLocationId(fq.def) ?? startingLocationForFaction(fq.def.factionId)) : null).map(({ rec, def }, i) => {
+              {byMoves(factionQuests, (fq) => factionSortLocId(fq), (fq) => factionRecReady(fq.rec, fq.def)).map(({ rec, def }, i) => {
                 if (!def) return null;
                 const key = `q_${def.id}_${i}`;
                 const open = !!expanded[key];
@@ -1184,11 +1377,7 @@ export function ContractsScreen() {
                 // stages played; FETCH → the items are in hand; legacy → always.
                 // (The old code hard-coded fetch/legacy as ready and the pill as
                 // "OPEN" forever, so a gather quest read "open" even when done.)
-                const countItem = (name: string) =>
-                  (player?.inventory ?? [])
-                    .filter((it) => it.name.toLowerCase() === name.toLowerCase())
-                    .reduce((n, it) => n + (it.quantity ?? 1), 0);
-                const readyToTurnIn = factionQuestReady(def, rec.stage, countItem);
+                const readyToTurnIn = factionRecReady(rec, def);
                 const staged = !!(def.stages && def.stages.length > 0);
                 const fetchHeld = def.fetch ? countItem(def.fetch.itemName) : 0;
                 // SINGLE-ACTIVE — tracked absent/true = active (the one you're on);
@@ -1999,6 +2188,16 @@ const styles = StyleSheet.create({
   },
   sortBarOn: { borderColor: '#7fb0a8', backgroundColor: '#141d1c' },
   sortBarPressed: { opacity: 0.7 },
+  // OTA-1152 — the two sort buttons share the row; READY sits to the right of
+  // BY DISTANCE, same shape, and lights the completion-green the COMPLETE button
+  // uses so "ready" reads as the same idea in both places.
+  sortRow: { flexDirection: 'row', gap: 6 },
+  sortBarHalf: { flex: 1 },
+  sortBarReadyOn: { borderColor: '#9ec96a', backgroundColor: '#161c12' },
+  sortBarReadyText: { color: '#9ec96a' },
+  readyCard: { borderColor: '#9ec96a' },
+  readyTag: { color: '#9ec96a', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
+  readyEmpty: { color: '#a2977b', fontSize: 11, fontStyle: 'italic', letterSpacing: 0.5 },
   sortBarText: { color: '#cdbf99', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
   sortBarTextOn: { color: '#7fb0a8' },
   sortBarHint: { color: '#a2977b', fontSize: 9, letterSpacing: 0.5, marginTop: 2 },
