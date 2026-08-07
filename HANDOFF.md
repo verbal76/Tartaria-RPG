@@ -112,6 +112,39 @@ one line is applied **per-line, code-specifically** (see §4).
 | **Dev_engine_PC** | RPG Engine (dev) | `…tartarprim.engine` | `engine_Dev` | engine_Dev's Windows `.exe` standing branch |
 | **arbiters-line** | Tartaria Realms ARB | `…tartarprim.arbiters` | `arbiters-line` (dead channel) | Isolated APK scratch line — publishes nothing |
 
+> ## ⚠⚠ OWNER DIRECTIVE, 2026-08-07 — THIS SUPERSEDES THE LINE ROLES BELOW
+>
+> Owner, verbatim: *"hal is the live branch that my testers have access to, golem
+> is the testing ground for big changes, steam line stays up to date for my PC
+> testing and possible steam submissions. so unless there is a high chance we are
+> doing game braking changes keep all 3 current. you will get logs from me almost
+> always from Hal. we will be making quick surgical well thought out changes. we
+> are currently in the qol improvements and balancing phase. we also test the crap
+> out of everything before we push."*
+>
+> **THE THREE LINES TO KEEP CURRENT ARE `HaL2001`, `golem-line` AND `steam_Dev`.**
+> This is the change: `steam_Dev` was previously treated as a downstream packaging
+> line, topped up only when asked. It is now a STANDING line that ships in the same
+> pass as HAL and golem. **`engine_Dev` is still a separate product and is NOT part
+> of the default pass** — it takes engine-level fixes only, exactly as before, but
+> it is no longer one of the three you keep in step.
+>
+> - **`HaL2001`** — live, at testers. **Device logs come from here almost always.**
+> - **`golem-line`** — the testing ground for BIG changes; still kept current
+>   otherwise, so the fork point is never stale.
+> - **`steam_Dev`** — the owner's PC testing line and the possible Steam
+>   submission path. Keep it current. ⚠ It has **no `node_modules` and never has**,
+>   so it cannot be gated locally — verify by hand and report it as CI-verified.
+>
+> **The bar for NOT shipping to all three is "a high chance of game-breaking
+> changes."** That is a high bar: default to all three, and fork to golem alone only
+> when the change is genuinely engine-threatening.
+>
+> **Working phase: QoL improvements and balancing.** Quick, surgical, well-thought-out
+> changes — and **test the crap out of everything before pushing.** The gates are the
+> floor, not the ceiling; when a change touches combat maths, run the heavy sims too
+> rather than leaning on the fast suite alone.
+
 **The three MAIN lines are `HaL2001`, `golem-line`, and `engine_Dev`** — roles
 as clarified by the user on 2026-07-13:
 
