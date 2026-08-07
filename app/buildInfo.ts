@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.89';
+export const DISPLAY_VERSION = '4.29.90';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23994,7 +23994,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //      standing-gated (standing is a CONSEQUENCE of being caught).
 // New suite ota1179FactionWiring (24 tests).
 // DISPLAY_VERSION 4.29.89.
-export const OTA_BUILD_ID = '2026-08-07-1179-faction-wiring';
+// 2026-08-07 OTA-1180 — THE WORLD DOES NOT MOVE YOUR STANDING.
+// The first of the four design calls OTA-1179 held, decided by
+// the owner: "why are we doing ambient standing raises when we
+// have multiple ways to gain standing. you should work to get
+// standing, not earn it by breathing."
+// The world pulse had exactly two `repDelta` events — defector
+// (+2) and windfall (+1). Both POSITIVE, both gated on `favored`
+// (>= 10), which is the eligibility test AND the target pool, so
+// it fed whoever was already ahead — from a home faction that
+// character creation seeds AT 10. Nothing in the pool ever moved
+// standing down. The needle went one way, on a clock the player
+// never touches, identically on every save.
+//   MEASURED BEFORE REMOVING IT, because the owner's worry was
+//   that the ambient fed the NEGATIVE side that gates patrol
+//   attacks. It does, but barely: the +2 cascades -1 to each
+//   rival, which works out to -1 per 39 in-game hours. One median
+//   authored contract (+9) sends -4 to each rival — the work of
+//   155 hours of drift. Committing to a faction makes an enemy
+//   hunt you in 2-7 contracts. That machinery is untouched here,
+//   and ota1180AmbientStandingOff asserts it.
+//   ⚠ THE RUMORS WERE REWRITTEN WITH THE EFFECT, NOT LEFT BEHIND.
+//   "they count you a friend now" / "remembered your name" are
+//   STANDING CLAIMS; deleting the effect and keeping the text
+//   would have been OTA-1179 finding 9 re-introduced on purpose.
+//   Both now pay a TIDE — a defection and a windfall genuinely
+//   make a faction stronger, tides already drive prices, patrol
+//   counts and raid strength, and it is about the world instead
+//   of about the player. Pool size (16) and total weight (97) are
+//   unchanged, so no other event's draw odds moved.
+//   The `repDelta` field and the store's handler are KEPT, for an
+//   authored beat the player walks into. The rule is that the
+//   AMBIENT TICK may not grant standing, not that nothing may.
+// New suite ota1180AmbientStandingOff (9 tests). The hold that
+// OTA-1179 wrote for this item is INVERTED, not deleted: deciding
+// a held call makes the decision as hard to undo as the hold was.
+// Three of the four calls are still held and still asserted.
+// DISPLAY_VERSION 4.29.90.
+export const OTA_BUILD_ID = '2026-08-07-1180-no-ambient-standing';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1179-faction-wiring';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1178-from-the-log';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1177-gift-mode';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1176-vendor-tastes';

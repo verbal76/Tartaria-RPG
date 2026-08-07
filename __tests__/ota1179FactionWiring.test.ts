@@ -297,15 +297,16 @@ describe('OTA-1179 — text that described the wrong rule', () => {
   });
 });
 
-describe('OTA-1179 — the four held decisions are untouched', () => {
+describe('OTA-1179 — the held decisions are untouched', () => {
   // ⚠ These assertions exist so a future session cannot quietly implement the
   // owner's pending design calls as "cleanup". He is deciding on them.
-  it('the ambient world-pulse rep events are exactly as they were', () => {
-    const we = read('app', 'engine', 'worldEvents.ts');
-    const deltas = we.match(/repDelta: \{ factionId: ally\.id, delta: (\d+) \}/g) ?? [];
-    expect(deltas.length).toBe(2);
-    expect(we).toContain('standingOf(ctx, f.id) >= 10');
-  });
+  //
+  // ⚠ THE AMBIENT-RATCHET ASSERTION THAT LIVED HERE IS GONE ON PURPOSE. The owner
+  // DECIDED that one on 2026-08-07 ("you should work to get standing, not earn it
+  // by breathing") and OTA-1180 shipped it. Its replacement lives in
+  // ota1180AmbientStandingOff and asserts the OPPOSITE — that the catalogue's
+  // repDelta count is ZERO. Deciding a held item does not retire its lock; it
+  // inverts it, so the decision is as hard to undo as the hold was.
 
   it('the difficulty scaler still has no defensive term', () => {
     const enc = read('app', 'engine', 'encounter.ts');

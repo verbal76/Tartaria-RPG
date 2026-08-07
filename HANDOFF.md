@@ -817,10 +817,14 @@ Key invariants worth knowing:
     answers the question OTA-1150 parked as unknowable, using the metric
     OTA-1150 shipped for it.
 
-  - **⚠ FACTION STANDING IS A ONE-WAY RATCHET DRIVEN BY THE CLOCK.** *(2026-08-07:
-    a full read+write audit of the whole system has since run — see the OTA-1179
-    §9 entry for what shipped and, more importantly, for the FOUR DESIGN CALLS
-    still held for the owner, of which this is one. Do not re-derive it.)* Not decay,
+  - **⚠ FIXED IN OTA-1180 — KEPT AS THE DIAGNOSIS, NOT AS A LIVE DEFECT.**
+    *(2026-08-07: the owner decided this one — "you should work to get standing,
+    not earn it by breathing" — and OTA-1180 removed both grants; the two events
+    pay a TIDE now. Read on for WHY it was wrong and for the receipts, but do not
+    go looking for the bug: `ota1180AmbientStandingOff` asserts the catalogue's
+    repDelta count is zero. Three of OTA-1179's four design calls are still held —
+    see that §9 entry.)* **FACTION STANDING WAS A ONE-WAY RATCHET DRIVEN BY THE
+    CLOCK.** Not decay,
     and not per-rest — the suspicion that it was is wrong, and the log disproves
     it (15 rests, 6 standing blocks; two of the six fire after a 15-minute
     salvage). It is `worldTideCheck`, a ≥2-in-game-hour accumulator. The defect
@@ -833,9 +837,11 @@ Key invariants worth knowing:
     ever interacting with them**, and Forgotten Order crossed the −20 hostility
     line at 01:01:03 — with the war party arriving at 03:24:30 *"They've marked
     you for standing with the Conspiracy Architects."* That is the fight in
-    OTA-1178 #3. Two candidate fixes: a symmetric negative ambient event, and/or
-    metering the world-pulse rep path so drift alone cannot carry a faction
-    across ±20.
+    OTA-1178 #3. ⚠ **The two candidate fixes recorded here — a symmetric negative
+    ambient event, and metering the path — were both REJECTED.** The owner took a
+    third option, which is that the world should not touch your standing at all.
+    Both events kept their slot and their weight and now pay a `tideDelta`, so the
+    world still churns and no other event's draw odds moved.
 
   - **The item-synthesis prompt teaches the model to fail its own validator.**
     Last line of the system prompt: *'Tools, rope, lanterns and compasses are
@@ -1329,8 +1335,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1179`**,
-**golem-line `2026-08-07-1156`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1180`**,
+**golem-line `2026-08-07-1157`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1559,7 +1565,70 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE FACTION STANDING WIRING (2026-08-07, latest). HAL + GOLEM.** HAL
+- **⚠⚠ THE WORLD DOES NOT MOVE YOUR STANDING (2026-08-07, latest). HAL + GOLEM.**
+  HAL OTA-1180 / golem OTA-1157. **steam NOT included — batched (§2).** The FIRST
+  of the four design calls OTA-1179 held, decided by the owner: *"why are we doing
+  ambient standing raises when we have multiple ways to gain standing. you should
+  work to get standing, not earn it by breathing."*
+  The world pulse had exactly two `repDelta` events, `defector` (+2) and
+  `windfall` (+1). **Both POSITIVE, both gated on `favored` (≥ 10)** — which is
+  simultaneously the eligibility test AND the target pool, so it fed whoever was
+  already ahead, starting from a home faction that character creation seeds AT 10.
+  Nothing in the pool ever moved standing down. Both are gone.
+
+  **⚠ MEASURED BEFORE REMOVING IT — and the measurement is the reusable part.** The
+  owner's objection was not to the giveaway; it was that the ambient also fed the
+  NEGATIVE side that gates patrol attacks (*"they attack gate at rep standing,
+  that's a big part of the game"*). It does, and it is nearly nothing:
+  - a +2 cascades **−1 to each rival**, at 5/97 event weight on a ≥2-hour tick →
+    **−1 per 39 in-game hours**;
+  - the median authored reward is **+9**, which cascades **−4 to each rival** — one
+    contract is the work of **155 hours** of ambient drift;
+  - committing to a faction and running its work puts a hunter (≤ −25) on you in
+    **2 contracts** (Conspiracy Architects, who start at −20) to **7** (a faction
+    starting at 0). **The attack gate runs on earned rep, and always did.**
+
+  ⚠ Also checked, because it was the owner's second reason to keep the drift: low
+  standing does **not** farm HP. The +1 hpMax milestone keys off **5 DISTINCT enemy
+  types** (arb119), and patrols recycle a handful of names — repeat ambushes stop
+  paying almost immediately.
+
+  **⚠ THE RUMORS WERE REWRITTEN WITH THE EFFECT, NOT LEFT BEHIND.** *"they count you
+  a friend now"* and *"remembered your name"* are STANDING CLAIMS. Deleting the
+  effect and keeping the text would have been **OTA-1179 finding 9 re-introduced on
+  purpose** — text describing a rule the code does not have. Both events keep their
+  slot and their weight and now pay a `tideDelta`: a defection and a windfall
+  genuinely make a faction stronger, tides already drive vendor prices, patrol
+  counts and raid strength, and it is about the world instead of about the player.
+  Pool size (16) and total weight (97) unchanged, so no other event's draw odds
+  moved. ⚠ The `repDelta` field and the store's handler are **KEPT** — the rule is
+  that the AMBIENT TICK may not grant standing, not that nothing may; quests,
+  contracts, gifts, sigils, parley and forks all still do, and an authored beat the
+  player walks into could legitimately want that path.
+
+  **⚠ A HOLD THAT GETS DECIDED IS INVERTED, NOT DELETED.** OTA-1179's suite asserted
+  these two grants were UNCHANGED while the owner decided. That assertion is gone,
+  and `ota1180AmbientStandingOff` (9 tests) asserts the OPPOSITE — repDelta count
+  ZERO, both rumors free of any standing claim, pool size and weights intact, the
+  `favored` gate still standing (`setback` and `bounty` use it and post CONTRACTS),
+  and the whole attack-gate machinery untouched. **Three of the four design calls
+  are still held and still asserted in `ota1179FactionWiring`.**
+
+  **⚠ FOUND WHILE BRIEFING THE SECOND CALL, NOT FIXED — THE CLIMB BACK OUT IS A
+  WALL.** *(Receipt, 2026-08-07: read all 18 `applyRepChange` call sites in the
+  store and every `minRep` consumer — `factionStorylines.ts:44`, `hunts.ts:200`,
+  `mysteries.ts:47` — each gating on `playerRep >= minRep`. The only POSITIVE
+  writers that ignore standing are the sigil turn-in, parley-calm, gifts and the
+  buy pool. This is a CODE READING, not a played session: treat the ~25-act figure
+  as arithmetic off those constants, not as a measured playthrough.)*
+  Contracts are gated `playerRep >= minRep`, so the moment a faction reaches −25 and
+  starts hunting you, every FAST route to repair it closes. What is left is sigil
+  turn-in (**+1**, and you must carry it to their home tile, where they are hunting
+  you), parley-calm (**+1**, mid-ambush), gifts, and the buy pool. Climbing −25 → 0
+  is ~25 separate acts. If *"raise rep to stay safe"* is the intended loop, that
+  loop is currently a wall. Scoped, NOT authorised, and not started.
+
+- **⚠⚠ THE FACTION STANDING WIRING (2026-08-07). HAL + GOLEM.** HAL
   OTA-1179 / golem OTA-1156. **steam NOT included — it is batched now (§2).** Owner:
   *"track all of the math and all of the wires for the faction standings ... make
   sure nothing's broken."* A full read+write audit of the system; this shipped the
