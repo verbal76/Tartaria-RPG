@@ -87,6 +87,40 @@ export function dressFactionFighter(
     ...body,
     name: label,
     factionId,
+    // ⚠⚠ OTA-1155 — A DRESSED FIGHTER IS RANK AND FILE. NEVER A BOSS.
+    //
+    // The roster's only Legendary human is the Tartarian Reaver — 310 HP, 3D8,
+    // Strength 12, `boss: true` — so a Legendary tile roll picks it with
+    // certainty, and `...body` above forwarded that flag into a mook called
+    // "Forgotten Order Raider 1". Device log 2026-08-07T03:24, against a 29 HP
+    // player: TWO of them at 248 HP each, AC 25, ATK 16/14, both taking the
+    // second swing. The owner fled, which was the only correct play — 9 damage a
+    // hit into 496 HP is roughly fifty rounds while taking ~24 a round.
+    //
+    // One flag, six systems, because everything asks it independently:
+    //   1. scaleEncounterForContext builds `nonBossIdx` and routes a party of
+    //      all-bosses down the SOLO branch — so packHpCeiling (70-120 for the
+    //      whole party) never applied, and each body kept its full boss scale.
+    //   2. scaleStaticBoss's 0.8 boss floor: 310 × 0.8 = 248. The log's number.
+    //   3. combatRules AC: min(18, 5+12) + 2 armored + 6 BOSS = 25. The log's.
+    //   4. bossSwingsTwice → the second strike every round.
+    //   5. +1d6 on every boss swing.
+    //   6. Exemption from MELEE_PACK_SWINGS_PER_ROUND.
+    // Plus, had the player won: boss spoils, post-boss grace and a gem key
+    // written to permanent world memory under a mook's name.
+    //
+    // ⚠ THE GATE UPSTREAM WAS ALREADY RIGHT and that is what hid this. The wild
+    // roll filters `!e.boss` before ever reaching here — but OTA-1035 then
+    // REPLACES the filtered template with a body picked fresh from the roster,
+    // downstream of the filter, so the filter guards a value that gets thrown
+    // away. The raid builder's own comment promises "difficulty is unmoved …
+    // anchors the pack on its mean HP"; this flag is precisely what broke that
+    // promise. Fixed here rather than in FACTION_BODIES because both the outdoor
+    // raid and the indoor ambush come through this one function — and because
+    // dropping the Reaver from the list would make pickFactionBody return null
+    // at Legendary, whose `?? tmpl` fallback reinstates the beast-loot bug
+    // OTA-1035 existed to kill.
+    boss: false,
     aliases: [
       noun.toLowerCase(), 'soldier', 'raider', 'intruder',
       factionName.toLowerCase(),

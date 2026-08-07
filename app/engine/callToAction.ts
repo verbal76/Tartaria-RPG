@@ -22,7 +22,11 @@ export type GestureFamily =
   | 'vocal'
   | 'touch'
   | 'reverent'
-  | 'manipulate';
+  | 'manipulate'
+  // OTA-1155 — sitting down, which the game's own prose invites constantly
+  // ("there's a bowl of something hot for you if you'll sit") and which no verb
+  // list accepted until now.
+  | 'settle';
 
 /** Map a raw verb (matchedVerb) to its flavor family. Falls back to
  *  'touch' — the most neutral "you interact with it" family — so an
@@ -34,6 +38,9 @@ export function gestureFamily(verb: string | null | undefined): GestureFamily {
   if (['whistle', 'shout', 'chant', 'hum', 'answer', 'respond', 'sing', 'call'].includes(v)) return 'vocal';
   if (['pray', 'kneel', 'salute', 'bow', 'beckon'].includes(v)) return 'reverent';
   if (['touch', 'feel', 'stroke', 'caress'].includes(v)) return 'touch';
+  // The collapsed forms are what the parser's multi-word pass hands back
+  // ('sit down' → 'sitdown'), so both spellings have to be listed here.
+  if (['sit', 'sitdown', 'takeaseat', 'seat'].includes(v)) return 'settle';
   if (['push', 'pull', 'turn', 'twist', 'press', 'rotate', 'tilt', 'shove', 'nudge', 'tug', 'yank', 'crank', 'wind', 'wrench', 'torque', 'depress', 'mash', 'spin', 'revolve'].includes(v)) return 'manipulate';
   return 'touch';
 }
@@ -71,6 +78,27 @@ const LINES: Record<GestureFamily, string[]> = {
     'You lean into {noun}. It resists the way everything down here resists: not with malice, only with the sheer stubborn weight of time. Nothing gives, but something is noted.',
     'You test {noun}. Whatever mechanism it once served has long since seized, but your effort dislodges a fine rain of dust — and, for a moment, the sense of a room waking up.',
   ],
+  settle: [
+    'You sit down with {noun}. The road keeps going without you for a while, and that turns out to be exactly what you needed.',
+    'You take a seat by {noun} and let the weight go out of your legs. Nothing gets decided in the quiet, but nothing gets lost in it either.',
+    'You settle in beside {noun}. Tartaria does not stop for it — but for the length of a held breath, it stops chasing you.',
+  ],
+};
+
+/** OTA-1155 — lines for a gesture the player made at NOTHING IN PARTICULAR.
+ *
+ *  ⚠ The other six families lean on `fillNoun`'s "the dark ahead" for a bare
+ *  verb, and that reads fine when you are reaching out at an unlit room. It does
+ *  not survive sitting down: *"You sit down with the dark ahead"* is nonsense,
+ *  and bare "sit" is the single most likely way a player answers an invitation
+ *  to sit. So `settle` carries its own no-noun pool. Any future family that
+ *  can't borrow "the dark ahead" belongs here too. */
+const BARE_LINES: Partial<Record<GestureFamily, string[]>> = {
+  settle: [
+    'You sit down where you are and let the weight go out of your legs. The buried country goes on being buried; you go on being tired, but rather less of it.',
+    'You take a seat, elbows on knees, and give the road a moment to catch up with you. It turns out not to have much to say.',
+    'You settle where you stood. Nothing gets decided in the quiet — but the ache in your legs finally gets a hearing, and that is something.',
+  ],
 };
 
 function fillNoun(noun: string | null | undefined): string {
@@ -85,14 +113,28 @@ function fillNoun(noun: string | null | undefined): string {
 /** Deterministic-ish flavor line for a call-to-action gesture that found
  *  no hook. `verb` is the parsed matchedVerb; `noun` is the player's
  *  target (may be empty). Pure aside from Math.random line-selection,
- *  matching the rest of the flavor pools in this engine. */
-export function callToActionLine(verb: string | null | undefined, noun: string | null | undefined): string {
+ *  matching the rest of the flavor pools in this engine.
+ *
+ *  ⚠ OTA-1155 — `opts.person` suppresses the definite article. Every line here
+ *  hardcoded `the {noun}`, which is right for a door and wrong for a human being:
+ *  "You lay a hand on THE Halem the Trader". Nobody had hit it before because the
+ *  only gestures anyone aimed at a person were vocal ones, and OTA-1155's `sit`
+ *  is aimed at a person almost every time it is typed. The caller decides, because
+ *  the caller is the one holding the scene's people (matchTalkable) — capitalisation
+ *  cannot decide it, since catalog nouns are Title Case too and DO want the article. */
+export function callToActionLine(
+  verb: string | null | undefined,
+  noun: string | null | undefined,
+  opts?: { person?: boolean },
+): string {
   const family = gestureFamily(verb);
-  const pool = LINES[family];
+  const named = (noun ?? '').trim().length > 0;
+  const pool = (!named && BARE_LINES[family]) ? BARE_LINES[family]! : LINES[family];
   const line = pool[Math.floor(Math.random() * pool.length)] ?? pool[0]!;
   const filled = fillNoun(noun);
-  // "the dark ahead" already reads as a phrase; for a named noun, prefix
-  // "the" so it slots grammatically ("knock at the steeple door").
-  const nounPhrase = filled === 'the dark ahead' ? filled : `the ${filled}`;
+  // "the dark ahead" already reads as a phrase; a person is their own name; for
+  // any other named noun, prefix "the" so it slots grammatically ("knock at the
+  // steeple door").
+  const nounPhrase = filled === 'the dark ahead' || opts?.person ? filled : `the ${filled}`;
   return line.replace(/\{noun\}/g, nounPhrase);
 }

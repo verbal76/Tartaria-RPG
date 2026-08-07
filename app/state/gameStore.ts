@@ -155,7 +155,7 @@ import {
   QWEN_ALLOWED_INTENTS,
   getLocationFlavors,
 } from '../engine/narrativeGenerator';
-import { parseInput, splitClauses, type ParseContext } from '../engine/parser';
+import { parseInput, splitClauses, mentionsWaitVerb, type ParseContext } from '../engine/parser';
 import { parseInputViaLLM } from '../engine/llmParser';
 import {
   classifyContainer,
@@ -308,6 +308,7 @@ import {
 import {
   FACTIONS,
   findFaction,
+  canonicalFactionId,
   applyRepChange,
   getStanding,
   meetsJoinThreshold,
@@ -816,12 +817,6 @@ function collectSceneNouns(scene: CurrentScene): string[] {
     // name. Empty / missing arrays are safe — the spread is a no-op.
     if (e.aliases) nouns.push(...e.aliases);
   }
-  // Location aliases — "workroom" / "arch" / "hollow" should resolve to
-  // a Tartarian Arch even though we don't pool the canonical Location
-  // name itself. The parser uses recentNouns for matchAmbientNoun, so
-  // adding the aliases here lets a player type "search the workroom"
-  // and have the engine recognize it.
-  if (scene.location?.aliases) nouns.push(...scene.location.aliases);
   // Ambient nouns from the location description so the parser can resolve
   // "investigate the traps" / "ask about buried cities" against the same
   // content the player just read in the scene paragraph.
@@ -832,6 +827,30 @@ function collectSceneNouns(scene: CurrentScene): string[] {
       if (!h.resolved) nouns.push(...h.nouns);
     }
   }
+  // Location aliases — "workroom" / "arch" / "hollow" should resolve to
+  // a Tartarian Arch even though we don't pool the canonical Location
+  // name itself. The parser uses recentNouns for matchAmbientNoun, so
+  // adding the aliases here lets a player type "search the workroom"
+  // and have the engine recognize it.
+  //
+  // ⚠ OTA-1155 — AND THEY GO LAST, WHICH IS THE WHOLE POINT OF MOVING THEM.
+  // They used to be pushed BEFORE ambientNouns and hooks. `resolveContextNoun`
+  // breaks a substring tie by ARRAY ORDER (parser.ts, `return matches[0]`), so a
+  // container's alias beat every authored prop in the room. Device log
+  // 2026-08-07T00:30:37: the owner typo'd `climb river-xord` in Ostragar, which
+  // has an interactable literally called `river-cord` — and it resolved to
+  // `river capital`, an ALIAS OF THE CITY THEY WERE STANDING IN, then narrated
+  // the city as an object: "The Arbiter glances at the river capital."
+  //
+  // ⚠ This is OTA-1149's own bug report, the half it did not fix. That OTA opened
+  // with `craft Blue Cap Draught` → "mountain capital" and then repaired only
+  // `resolveItem`; `resolveContextNoun` was never touched, and the same shape came
+  // back one OTA later. Fixed HERE rather than in the tiebreak because the comment
+  // at the top of this function already states the rule — locations are containers,
+  // not interactable targets — and pushing their aliases ahead of the real props
+  // was simply that rule being broken three lines after it was written. Aliases
+  // still resolve when they are the ONLY match, which is all they were ever for.
+  if (scene.location?.aliases) nouns.push(...scene.location.aliases);
   // When a vendor is present, the scene has all the trappings of a market
   // even if the location description doesn't spell it out. Add the obvious
   // commerce vocabulary so the player can type "search the market" /
@@ -3204,7 +3223,12 @@ export function qwenRephraseRejection(
       return 'invented an action unrelated to what the player typed';
     }
   }
-  if (intent === 'wait' && !/\b(wait|hold|stay|linger|pause|bide)\b/i.test(rawText)) {
+  // ⚠ OTA-1155 — asks the VERB TABLE, not a hand-typed copy of it. The literal
+  // /wait|hold|stay|linger|pause|bide/ that stood here was six of the wait
+  // intent's ten synonyms, so "still", "tarry", "idle" and "remain" were words
+  // the guard did not believe anyone could mean — and an honest repair of them
+  // got thrown away as an invention. See mentionsWaitVerb in engine/parser.
+  if (intent === 'wait' && !mentionsWaitVerb(rawText)) {
     return 'invented a wait the player never asked for';
   }
   return null;
@@ -3988,6 +4012,18 @@ function dockHostileStanding(
   return applied;
 }
 
+/** OTA-1155 — the screen a gift began on, which is where the GIVE returns you.
+ *
+ *  ⚠ THE `'inventory'` CLAUSE IS THE WHOLE POINT. Gift mode's one job is to send
+ *  you INTO the pack, so if the mode were ever entered while the pack was already
+ *  open, `returnTo` would capture `'inventory'` and the give would "return" you to
+ *  the screen you were trying to leave — the exact bug this exists to fix, wearing
+ *  a different hat. No live entry point does that today (both are chips on the
+ *  world screen), which is precisely why it would go unnoticed when one does. */
+function giftReturnScreen(s: GameStore): ScreenName {
+  return s.currentScreen === 'inventory' ? 'exploration' : s.currentScreen;
+}
+
 /** OTA-1060 — a gift's standing effect, applied to the recipient's faction.
  *  Factored out because the refused path needs it too and duplicating an
  *  applyRepChange call is how the two drift. */
@@ -3998,8 +4034,24 @@ function applyGiftStanding(
   delta: number,
 ): void {
   const rel = getRelation(get().worldMemory, npcId);
-  const faction = rel?.factionId;
-  if (!faction) return;
+  // ⚠ OTA-1155 — THE ID HAS TO BE REAL BEFORE WE SPEND ANYTHING AGAINST IT.
+  // `applyRepChange` returns an untouched array for an id it does not recognise —
+  // a SILENT no-op — while everything below it logged "Standing +2" and debited
+  // the lifetime gift budget regardless. The owner handed Odar Flameforge a Rare
+  // Core Relic on 2026-08-06 and was told it bought +2 with the "architectural
+  // sentinels", which is a RACE, not a faction: no standing moved, and the budget
+  // that would have let a later gift work was spent on the lie. canonicalFactionId
+  // heals the four legacy race ids OTA-834 remapped in the roster but never
+  // migrated in saves; anything still unresolvable ends the path quietly rather
+  // than claiming a reward that cannot land.
+  const faction = canonicalFactionId(rel?.factionId);
+  if (!faction) {
+    if (rel?.factionId) {
+      get().appendLog('debug', `gift: standing skipped — "${rel.factionId}" is not a faction`);
+    }
+    return;
+  }
+  const factionLabel = findFaction(faction)?.name ?? faction.replace(/_/g, ' ');
   // ⚠ THE DOOR OTA-803 CLOSED, KEPT CLOSED. See GIFT_STANDING_FACTION_CAP.
   // Gains are metered against a LIFETIME per-faction budget; losses are not,
   // because an insult should always land and a capped insult would let a player
@@ -4009,7 +4061,7 @@ function applyGiftStanding(
   // rule so it cannot be farmed for rival standing. See dockHostileStanding.
   if (delta < 0) {
     const applied = dockHostileStanding(get, set, npcId, [faction], -delta);
-    if (applied > 0) get().appendLog('system', `Standing -${applied} — ${faction.replace(/_/g, ' ')}.`);
+    if (applied > 0) get().appendLog('system', `Standing -${applied} — ${factionLabel}.`);
     return;
   }
   let applied = delta;
@@ -4029,7 +4081,7 @@ function applyGiftStanding(
     const r = applyRepChange(st.player.factionStanding, faction, applied);
     return { player: { ...st.player, factionStanding: r.standing } };
   });
-  get().appendLog('system', `Standing ${applied > 0 ? '+' : ''}${applied} — ${faction.replace(/_/g, ' ')}.`);
+  get().appendLog('system', `Standing ${applied > 0 ? '+' : ''}${applied} — ${factionLabel}.`);
 }
 
 /** OTA-1058 — everything the topic gates need, gathered here so engine/dialogue
@@ -6048,7 +6100,13 @@ interface GameStore {
    *  worn-armour trap got in. The inventory already knows what is equipped,
    *  racked, reserved and contract-bound, so the pick happens there.
    *  Non-null while the player is browsing for something to hand over. */
-  giftMode: { toId: string; toName: string } | null;
+  // OTA-1155 — `returnTo` is the screen the GIVE puts you back on. Owner: *"when I
+  // gift something to somebody it stays in the inventory menu … it should pop back
+  // to the main world screen so you can see the response."* The reaction line is
+  // written to the world feed, which the pack is covering, so a gift that lands
+  // silently is a gift the player never sees land. Captured on ENTRY rather than
+  // hardcoded so a gift begun from anywhere returns where it began.
+  giftMode: { toId: string; toName: string; returnTo: ScreenName } | null;
   /** Open the gift flow against whoever is present. */
   openGift: () => void;
   chooseGiftRecipient: (id: string) => void;
@@ -6420,7 +6478,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // One person present is not a choice; do not make the player confirm it —
     // OTA-1154 sends them straight to the pack with the recipient already set.
     if (candidates.length === 1) {
-      set({ pendingGift: null, giftMode: { toId: candidates[0]!.id, toName: candidates[0]!.name } });
+      set({
+        pendingGift: null,
+        giftMode: { toId: candidates[0]!.id, toName: candidates[0]!.name, returnTo: giftReturnScreen(get()) },
+      });
       get().setScreen('inventory');
       return;
     }
@@ -6432,7 +6493,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!g || !who) return;
     // OTA-1154 — the recipient is settled, so the modal's work is done: hand off
     // to the inventory rather than drawing a second, smaller item list.
-    set({ pendingGift: null, giftMode: { toId: who.id, toName: who.name } });
+    set({ pendingGift: null, giftMode: { toId: who.id, toName: who.name, returnTo: giftReturnScreen(get()) } });
     get().setScreen('inventory');
   },
   cancelGiftMode: () => set({ giftMode: null }),
@@ -6444,9 +6505,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const pg = get().pendingGift;
     const g = gm ? { toId: gm.toId, toName: gm.toName } : { toId: pg?.toId, toName: pg?.toName };
     const player = get().player;
-    if (!g?.toId || !g.toName || !player) return;
+    // ⚠ OTA-1155 — EVERY OUTCOME OF A GIVE TAP IS SOMETHING THE PLAYER MUST READ,
+    // and all of them are written to the world feed, which the open pack is
+    // covering. Owner: *"it should pop back to the main world screen so you can see
+    // the response."* So the tap ends the mode and leaves the pack no matter WHICH
+    // way it goes — landed, refused, blocked or a stranger. The old code only ever
+    // cleared `pendingGift`, which by OTA-1154 was no longer the field the flow ran
+    // on: the player was left standing in their inventory with the vendor's reply
+    // scrolling past behind it, and nothing on screen had changed.
+    const done = () => {
+      set({ pendingGift: null, giftMode: null });
+      get().setScreen(gm?.returnTo ?? 'exploration');
+    };
+    if (!g?.toId || !g.toName || !player) { done(); return; }
     const item = player.inventory.find((i) => i.id === itemId);
-    if (!item) return;
+    if (!item) { done(); return; }
     // ⚠ OTA-1154 — THE SAME PREDICATE THE INVENTORY USED TO DRAW THE BUTTON.
     // The UI hides GIVE on anything blocked, so reaching this is either a stale
     // tap or a caller that skipped the UI; either way it refuses with the reason
@@ -6454,6 +6527,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const blocked = giftBlockReason(item, player);
     if (blocked) {
       get().appendLog('system', `You cannot give away the ${item.name} — ${blocked}.`);
+      done();
       return;
     }
     // OTA-1154 — the OTA-1093 worn-item guard that stood here is gone: it
@@ -6468,7 +6542,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Every live path sights first, so this is a guard against the next one.
     if (!rel) {
       get().appendLog('system', `${g.toName} is not somebody you have properly met yet.`);
-      set({ pendingGift: null });
+      done();
       return;
     }
     const worth = sellPriceFor(item, get().currentScene?.vendor ?? null, 0);
@@ -6488,7 +6562,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // ⚠ The item is NOT consumed. Accepting worthless gifts would let a
       // player empty a pack of junk into somebody at a cost of taps only.
       if (out.standingDelta !== 0) applyGiftStanding(get, set, g.toId, out.standingDelta);
-      set({ pendingGift: null });
+      done();
       void get().persist();
       return;
     }
@@ -6532,7 +6606,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       };
     });
     if (out.standingDelta !== 0) applyGiftStanding(get, set, g.toId, out.standingDelta);
-    set({ pendingGift: null });
+    done();
     void get().persist();
   },
 
@@ -9539,8 +9613,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const perchConsumed = roomConsumedSet(get().worldMemory, perchRoomKey);
       const liveNouns = seeded.nouns.filter((n) => !isConsumedNoun(perchConsumed, n));
       if (liveNouns.length > 0) {
+        // ⚠ OTA-1155 — THE STRUCTURE COMES WITH IT. A perch is only ever reachable
+        // by climbing the thing it sits on, so showing the perch while hiding the
+        // structure advertises loot behind an invisible door.
+        //
+        // Device log 2026-08-06T00:29-00:36, Ostragar: the Arbiter said *"The
+        // snagged climbing cache is up on the stone bridge, tier 2. Climb for it"*
+        // EIGHT times, and `stone bridge` appeared in neither look-around
+        // ("You see: snagged climbing cache, silt floor, dynastic seal, wet
+        // stair") nor the climb chips. The owner investigated the cache eight
+        // times, tried to take it, and tried to climb it three times.
+        //
+        // The cause is the display cap upstream: it reserves exactly ONE climbable
+        // slot, and Ostragar has two (`stone bridge`, `wet stair`). The stair won
+        // the draw, so the bridge fell out of `displayedAmbientNouns` — which is
+        // the strict set both look-around and the chip pool read. `climbables`
+        // above is filtered from the AMBIENT pool, so the perch can seed onto a
+        // structure the player will never be shown. Re-adding it here rather than
+        // enlarging the cap: this is the one structure the game has already
+        // committed to naming out loud.
+        const perchStructures = liveNouns
+          .map((n) => seeded.placements[n]?.structure)
+          .filter((s): s is string => !!s);
         sceneAmbientNouns = Array.from(new Set([...sceneAmbientNouns, ...liveNouns]));
-        sceneDisplayedNouns = Array.from(new Set([...sceneDisplayedNouns, ...liveNouns]));
+        sceneDisplayedNouns = Array.from(new Set([...sceneDisplayedNouns, ...liveNouns, ...perchStructures]));
         scenePerchPlacements = Object.fromEntries(liveNouns.map((n) => [n, seeded.placements[n]!]));
       }
     }
@@ -12530,12 +12626,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if ((parsed.intent === 'knock' || parsed.intent === 'gesture')
       && currentScene.enemies.length === 0) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { callToActionLine } = require('../engine/callToAction') as typeof import('../engine/callToAction');
+      const { callToActionLine, gestureFamily } = require('../engine/callToAction') as typeof import('../engine/callToAction');
       const ctaNoun = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
+      // OTA-1155 — is the thing they gestured at a PERSON? The scene already knows
+      // (it is the same population the talk and gift verbs draw from), and the
+      // flavour line needs the answer to decide whether to write "the" in front of
+      // it. Asking matchTalkable rather than guessing from capitalisation, because
+      // catalog nouns are Title Case too and those genuinely want the article.
+      const ctaPerson = ctaNoun ? matchTalkable(talkablePeople(get), ctaNoun) : null;
       // A small stamina/time cost so the gesture reads as a real beat,
       // matching the hook-engage cost above.
-      set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.1) } : sLive));
-      get().appendLog('world', callToActionLine(parsed.matchedVerb, ctaNoun));
+      // ⚠ OTA-1155 — except SITTING DOWN, which is the one gesture in the family
+      // that is the opposite of exertion. Charging stamina to sit is the kind of
+      // small wrongness a tester notices immediately and can never unsee. It still
+      // spends the six minutes, so it is a beat and not a free tap.
+      const ctaFree = gestureFamily(parsed.matchedVerb) === 'settle';
+      set((sLive) => (sLive.player
+        ? { player: advanceTime(ctaFree ? sLive.player : spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.1) }
+        : sLive));
+      get().appendLog(
+        'world',
+        callToActionLine(parsed.matchedVerb, ctaPerson?.name ?? ctaNoun, { person: !!ctaPerson }),
+      );
       void get().persist();
       return;
     }
@@ -12854,7 +12966,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               if (!atPerch) {
                 get().appendLog(
                   'arbiter',
-                  `The Arbiter follows your gaze up. "${theCap(rawTarget)} is up on the ${placedAtk.structure}, tier ${placedAtk.tier}. Climb for it."`,
+                  `The Arbiter follows your gaze up. "${theCap(rawTarget)} is up on the ${placedAtk.structure}, tier ${placedAtk.tier}. Climb the ${placedAtk.structure} for it."`,
                   { skipDedup: true },
                 );
               } else {
@@ -13561,7 +13673,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (placedG) {
             get().appendLog(
               'arbiter',
-              `The Arbiter follows your gaze up. "${theCap(rawTarget)} is up on the ${placedG.structure}, tier ${placedG.tier}. Climb for it."`,
+              `The Arbiter follows your gaze up. "${theCap(rawTarget)} is up on the ${placedG.structure}, tier ${placedG.tier}. Climb the ${placedG.structure} for it."`,
               { skipDedup: true },
             );
             break;
@@ -17454,7 +17566,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const climbSceneMatch = climbRaw
           ? matchAmbientNoun(climbRaw, climbSceneNouns)
           : null;
-        const climbTarget = climbSceneMatch ?? parsed.resolvedNoun ?? (climbRaw.length > 0 ? climbRaw : '');
+        let climbTarget = climbSceneMatch ?? parsed.resolvedNoun ?? (climbRaw.length > 0 ? climbRaw : '');
+        // ⚠ OTA-1155 — "CLIMB FOR IT" MEANS CLIMB THE THING IT IS ON.
+        // The Arbiter tells you a perch "is up on the stone bridge, tier 2", so the
+        // plainest reading of that sentence is `climb the cache` — and isClimbable
+        // says no, because a cache is not a wall. Device log 2026-08-06T00:30:15,
+        // after eight of those invitations: `climb for the vache` → "Not something
+        // hands take to. Pick a pole, ladder, wall, stair, vine." The placement
+        // already records exactly which structure the perch hangs on, so take the
+        // player there instead of lecturing them about grip.
+        if (climbTarget && !isClimbable(climbTarget)) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { placementFor: pfClimb } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+          const perchOn = pfClimb(climbTarget.toLowerCase(), currentScene.nounPlacements);
+          if (perchOn?.structure && isClimbable(perchOn.structure)) {
+            get().appendLog('world', `The ${climbTarget} is up on the ${perchOn.structure}. You go for the ${perchOn.structure}.`);
+            climbTarget = perchOn.structure;
+          }
+        }
         if (climbTarget && !isClimbable(climbTarget)) {
           get().appendLog(
             'arbiter',
@@ -33951,9 +34080,22 @@ function tickEnemyDotsAndMaybeEndFight(
             if (st.turnsRemaining - 1 > 0) {
               remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });
             } else {
+              // ⚠ OTA-1155 — SAY WHICH COATING. `sourceName` is the WEAPON, and one
+              // weapon can carry two coatings: the owner's "acid-etched smoldering
+              // foundry-born slinger" runs acid AND fire. Both lapsed on the same
+              // tick at 2026-08-07T03:23:50 and printed the SAME sentence twice,
+              // which is indistinguishable from a double-emit — it was reported as
+              // one. The tick lines a few lines above already name the element;
+              // this one threw that away at the last moment.
+              const coatWord = st.kind === 'acid_coat' ? 'acid'
+                : st.kind === 'burn_coat' ? 'fire'
+                : st.kind === 'poison_coat' ? 'poison'
+                : st.kind === 'corruption_coat' ? 'corruption'
+                : st.kind === 'electrical_coat' ? 'current'
+                : 'coating';
               get().appendLog(
                 'combat',
-                `${enemyName}${st.kind === 'infected' ? "'s fever breaks" : ' shakes off the last of the coating'} — the ${st.sourceName} has run its course.`,
+                `${enemyName}${st.kind === 'infected' ? "'s fever breaks" : ` shakes off the last of the ${coatWord}`} — the ${st.sourceName} has run its course.`,
               );
             }
           } else {
@@ -39231,6 +39373,32 @@ function narrationAllowStatic(): Set<string> {
       for (const k of (c.keywords ?? [])) names.push(k);
     }
   } catch { /* concepts optional */ }
+  // ⚠ OTA-1155 — THE WORLD LADDER NAMES PLACES TOO, and leaving it out meant the
+  // narrator could not say the name of the room it was standing in.
+  //
+  // `allLocations` is locations.json only — 36 entries. Biomes, districts and
+  // sub-rooms live in worldLadder.json, and those are the names the context
+  // injector actually hands the model. Device log, three of eight ambient
+  // generations killed by `off-canon-entity`, every one of them real content:
+  //   21:00:50  "…the journey back to Etheric Engine Chamber…"   (a sub-room)
+  //   00:29:30  "…the ancient halls of Etheric Engine Chamber…"  (same room)
+  //   03:24:36  "You've traversed the Silt Wastes…"              (a top biome)
+  // The player was in Etheric Engine Chamber at the time — look-around said so.
+  // We told the model where it was, then threw away every sentence that repeated
+  // it back. That is a large share of the long-running "ambient is always empty"
+  // complaint (OTA-1031/1057/1147), and it cost 6-11s of on-device model time per
+  // discarded line. Built once and cached with the rest of this set.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { MACRO_LOCATIONS } = require('../engine/worldLadder') as typeof import('../engine/worldLadder');
+    for (const macro of MACRO_LOCATIONS) {
+      if (macro?.name) names.push(macro.name);
+      for (const micro of (macro.microLocations ?? [])) {
+        if (micro?.name) names.push(micro.name);
+        for (const mm of (micro.microMicroLocations ?? [])) if (mm?.name) names.push(mm.name);
+      }
+    }
+  } catch { /* ladder optional */ }
   names.push('Tartaria', 'Aether', 'Aetheric', 'Aetherstone', 'the Arbiter', 'Arbiter');
   _narrationAllowStatic = buildEntityAllowList(names);
   return _narrationAllowStatic;
@@ -39242,6 +39410,18 @@ function narrationEntityAllow(get: () => GameStore): ReadonlySet<string> {
   const dyn: string[] = [];
   if (p?.name) dyn.push(p.name);
   if (scene?.location?.name) dyn.push(scene.location.name);
+  // ⚠ OTA-1155 — AND THE SUB-ROOM, not just its parent Location. `location.name`
+  // was "Ostragar" while the player stood in "Etheric Engine Chamber" — the name
+  // the context injector hands the model, and the name look-around prints. We
+  // told it where it was and then binned every sentence that said so.
+  if (scene?.microMicroId) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { findMicroMicroAnywhere } = require('../engine/worldLadder') as typeof import('../engine/worldLadder');
+      const room = findMicroMicroAnywhere(scene.microMicroId);
+      if (room?.microMicro?.name) dyn.push(room.microMicro.name);
+    } catch { /* ladder optional */ }
+  }
   for (const e of (scene?.enemies ?? [])) if (e?.name) dyn.push(e.name);
   if (scene?.vendor?.name) dyn.push(scene.vendor.name);
   if (dyn.length === 0) return base;

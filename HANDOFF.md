@@ -712,6 +712,120 @@ Key invariants worth knowing:
   Legendary), NOT input rarity. Variety matters, not rarity.
 
 ## 8. Open issues / watch list (current)
+- **⚠ NEXT BATCH, MEASURED AND NOT SHIPPED (2026-08-07, from the OTA-1155 log
+  sweep).** These were traced to source during the OTA-1155 investigation and
+  deliberately **left out of that push** — it already carried eight fixes, and
+  these are performance and balance rather than correctness, so they deserve
+  their own test pass and their own bisect point. Present them to the owner
+  before implementing; do not ship them unprompted.
+
+  - **A THIRD OF THE ON-DEVICE MODEL'S TIME IS THROWN AWAY. Measured: 224.5s
+    discarded of 684.5s total, across 113 calls in one session.** The biggest
+    single consumer in the whole app is `narration:scene_intro_fill` — 264.6s
+    over 25 calls, 38.7% of all model time — for **four** delivered lines.
+    Three separable causes, cheapest first:
+    - **The trigger is shorter than the job.** `INTRO_IDLE_MS = 6_000` arms a
+      job whose own telemetry reports `avg 9.5s max 11.4s`. Preemption is
+      therefore the EXPECTED outcome, not the exception.
+    - **Finished, bankable text is binned.** `narrateViaArbiter`'s epoch check
+      runs before the cleaners and the bank write, and twice in the log a
+      generation that reported `ok ... (168ch)` / `ok ... (147ch)` was
+      discarded as `intro-fill:preempted`. ⚠ The comment sixty lines above it
+      argues the case AGAINST itself: an intro "is about a place, not about a
+      keystroke", which is exactly why it should be banked rather than obeyed
+      by the epoch. The ambient path already gets this right (OTA-1122).
+    - **⚠ The preempt hook structurally cannot fire for this job.** Seven
+      preemptions, all `out 0t / 0ch`: `stopCompletion()` is checked in the
+      DECODE loop and a 750-token prompt never reaches decode — that is
+      8.6-9.8s of *uninterruptible prefill* at the measured 11.6-13.2 ms/token.
+      **This is OTA-1144's finding, verbatim, on a bigger prompt.** So
+      `ML_PRIORITY_HOMEWORK`'s guarantee ("filling the bank can never be the
+      reason a tap waits") does not hold, and the log has the receipt: a player
+      tap waited 3.2s behind a homework job that had already been told to stop.
+    ⚠ Also worth recording: `ms/tok` best≈worst on intro-fill (11.6-14.8) says
+    it gets **zero prompt-prefix reuse**, while short jobs show 0.0 lows. That
+    answers the question OTA-1127 parked as unknowable, using the metric
+    OTA-1127 shipped for it.
+
+  - **⚠ FACTION STANDING IS A ONE-WAY RATCHET DRIVEN BY THE CLOCK.** Not decay,
+    and not per-rest — the suspicion that it was is wrong, and the log disproves
+    it (15 rests, 6 standing blocks; two of the six fire after a 15-minute
+    salvage). It is `worldTideCheck`, a ≥2-in-game-hour accumulator. The defect
+    is that **`worldEvents.ts` has exactly two events carrying a `repDelta` and
+    both are positive**, both aimed at a faction you already like — so a patron
+    above +10 gets random gifts forever, and `applyRepChange` docks each of
+    their rivals on every one. Unlike gifts (`GIFT_STANDING_FACTION_CAP`) and
+    hostility (`dockHostileStanding`), this path has **no budget at all**.
+    Receipts from the log: Reclaimers Guild fell **+5 → −2 without the player
+    ever interacting with them**, and Forgotten Order crossed the −20 hostility
+    line at 01:01:03 — with the war party arriving at 03:24:30 *"They've marked
+    you for standing with the Conspiracy Architects."* That is the fight in
+    OTA-1155 #3. Two candidate fixes: a symmetric negative ambient event, and/or
+    metering the world-pulse rep path so drift alone cannot carry a faction
+    across ±20.
+
+  - **The item-synthesis prompt teaches the model to fail its own validator.**
+    Last line of the system prompt: *'Tools, rope, lanterns and compasses are
+    "misc"...'* — and the rejection in the log is `bad-kind="tool"` on
+    **Reclaimer's Rope**, the one item named in that sentence. ⚠ **This is
+    OTA-1134's finding recurring**; that OTA removed a bad example and left a
+    sentence whose first word is an illegal kind sitting next to a legal one in
+    quotes. Worse, the clamp `return null`s the whole row over `kind` — a field
+    `SynthesizedItem` **does not store**, and its own comment admits it is not
+    needed. A 202-character response with a usable description was destroyed.
+    Also: `KNOWN_KINDS` lists `accessory` (not a real kind) and omits
+    `runecaster` and `dog_armor` (both real).
+
+  - **Crystal golem: ~18% success, 4 bottleneck materials burned per failure,
+    DC never shown.** DC 22 = tier 19 + a flat +3 race modifier for any
+    non-mud-dweller/non-aetherborn, against an effective INT of 2-5. Three
+    attempts in the log, three failures, 12 scarce mats gone. Design working as
+    written and tuned past fairness — an owner call, not a defect.
+
+  - **⚠ SWEEP THE AUTHORED PROSE FOR VERBS THE PARSER DOES NOT HAVE.** OTA-1155
+    #2 (`sit`) was found the expensive way — the owner typed it three times on
+    his phone and got refused three times. It is trivially findable the cheap
+    way: pull the imperative/invitation verbs out of the content data and diff
+    them against `VERB_SYNONYMS`. Running that over `gift_prefs.json` alone
+    (2026-08-07, after the sit fix) leaves exactly one word: **`come`** —
+    *"Come nearer to the fire, you've earned it"* and *"Come see the hounds
+    before you head off"*. Not shipped, because `come` is a GREEDY token (the
+    same file has "where did you come by it", "folk come asking", "it will come
+    out better"), so adding it to the verb table needs its own thought about
+    over-match — and unlike `sit` there is no log evidence a player has been
+    blocked by it. `see` is missing from the investigate pool too, and is much
+    lower-risk. **The real ask here is the SWEEP, not these two words:** run it
+    across dialogue, hooks, investigation flavour and location prose, which have
+    never been checked at all.
+
+  - **A dead enemy appears to act, and it is a LOGGING artifact — diagnosed, not
+    fixed.** The log reads: killing blow → "Aetheric Worm defeated" → "Aetheric
+    Worm deals 7 acid damage" → "Aetheric Worm regenerates 1 HP (12/18)". ⚠ It
+    is not a dead enemy acting and the HP is not stale: the worm WON initiative
+    (OTA-1017 genuinely reorders the round — "Aetheric Worm moves first" is in
+    the log), so its volley resolved before the player's swing, and 11 + 1 = 12
+    was accurate at the moment it ran. The inversion is that damage is applied
+    synchronously inside `set()` while its log line is deferred to a microtask
+    (`void Promise.resolve().then(...)`, because `checkLowHpWarning` calls
+    `set()` and that cannot nest), so the defeat lines — which log
+    synchronously — overtake it. Also ruled out: stale closure over the enemy
+    array (the regen re-derives its index live), regen on a corpse (guarded on
+    `cur > 0`), and multi-enemy index drift. The fix is to hoist the emission
+    out of the updater rather than defer it, and BOTH lines have to move
+    together or the interleaving just changes shape. Left out of OTA-1155
+    because it is cosmetic and it edits a combat `set()` boundary, which is not
+    a thing to do in a push that already changes combat.
+
+  - **Two telemetry defects that will cost the NEXT investigation.** (a) Prefill
+    values longer than the whole call are still printed and still summed
+    (`ok 10194ms ... read 14063ms`); OTA-1139's plausibility guard covers the
+    ms/tok range only. (b) The intro-fill `∅` path logs no reason string, while
+    the ambient path's `reason=`/`raw=` block is what made OTA-1155 #6 findable
+    at all. Porting it is ~10 lines.
+
+
+**golem-line `2026-08-07-1132`** (parity offset still HAL − 23 — every gameplay
+
 
 - **✅ SHIPPED (golem OTA-1152 / HAL OTA-1175) — the Contracts "READY TO HAND IN" sort.** Full account in
   §9. The blocker this entry warned about was real and is now closed at the root: "ready" was THREE inline
@@ -1126,8 +1240,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1177`**,
-**golem-line `2026-08-03-1083`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1178`**,
+**golem-line `2026-08-07-1155`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1341,6 +1455,61 @@ rediscovering them.
   parking an item as unreproducible, ask whether it can be reproduced in a
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
+
+- **⚠⚠ FROM THE DEVICE LOG (2026-08-07, latest). ALL THREE LINES.** golem
+  OTA-1155 / HAL OTA-1178 / steam merged. A 16-part log off the owner's Pixel
+  10 Pro XL plus two things he typed out by hand. **Eight fixes; the two loudest
+  are #3 and #7.**
+  1. **The GIVE put you nowhere.** *"when I gift something to somebody it stays
+     in the inventory menu ... it should pop back to the main world screen so you
+     can see the response."* ⚠ This was OTA-1154's own miss, one push old:
+     that OTA moved the recipient onto `giftMode` and sent the player into their
+     pack, and did **not** move the cleanup — every exit from `giveGift` still
+     cleared only `pendingGift`, a field the flow no longer ran on. Every exit
+     now clears both and returns to the screen the gift STARTED on.
+  2. **The game invited a thing it refused.** *"narration is suggesting things
+     that I can't do."* Halem's gift line — **ours, authored in OTA-1153** — ends
+     *"there's a bowl of something hot for you if you'll sit"*, and `sit` was in
+     no verb list in the game. `sit` is now a gesture verb with a `settle`
+     flavour family, and the store's Qwen-repair guard asks the verb table
+     (`parser.mentionsWaitVerb`) instead of its own hand-typed six-of-ten copy.
+  3. **⚠⚠ Rank-and-file raiders were arriving as BOSSES.** Two "Forgotten Order
+     Raiders" at 248 HP each, AC 25, ATK 16/14, both taking the boss second
+     swing, against a 29 HP player. Unwinnable; the owner fled. One field on the
+     faction-fighter dresser (`boss: false`) fixes six systems at once. See the
+     lesson below.
+  4. **A container is not a prop.** Location aliases were pooled ahead of the
+     room's own interactables, and the substring tiebreak is array order — so
+     `climb river-xord` in Ostragar resolved to `river capital`, an alias of the
+     city. ⚠ **OTA-1149's own bug report, the half it never fixed.**
+  5. **"Climb for it" pointed at an invisible structure**, eight times.
+  6. **The narrator could not say where it was** — the off-canon guard's
+     allow-list was `locations.json` only, so the whole world ladder (including
+     the room the player was standing in) read as invented.
+  7. **⚠⚠ A gift claimed standing it never granted.** A Rare Core Relic bought
+     *"Standing +2 — architectural sentinels"*, which is a RACE id. `applyRepChange`
+     no-ops silently on an unknown id; the success line printed anyway and the
+     LIFETIME gift budget was debited. OTA-834 remapped four such ids in the
+     roster and shipped no save migration, and a recorded `factionId` is sticky.
+  8. Two coatings on one weapon printed the same expiry sentence twice.
+
+  **⚠ THE LESSON, and it is the same one twice.** #3, #4 and #7 are all *a fix
+  that landed one layer away from where the value is actually read*:
+  - #3 — the wild encounter roll filters `!e.boss` correctly, and OTA-1035 then
+    **replaces the filtered template** downstream of the filter. The guard was
+    guarding a value that got thrown away three lines later.
+  - #4 — OTA-1149 repaired `resolveItem` and left `resolveContextNoun`, which
+    reaches the same wrong answer by a different route. Its own commit message
+    named the recurrence ("mountain capital") and fixed the other half.
+  - #7 — OTA-834 fixed the ROSTER and not the SAVES, and saves are where the
+    value is read from.
+  **So when you fix a bad value, ask what else writes it, and what reads it after
+  you.** A filter, a repair and a data fix all failed the same way here.
+
+  **⚠ AND #2 IS A SELF-INFLICTED ONE WORTH REMEMBERING.** OTA-1153 authored 72
+  vendor taste profiles including prose that invites the player to *sit*. Nobody
+  checked that the game accepts the verbs its new prose asks for. **When you
+  author content that suggests an action, grep the verb table for it.**
 
 - **⚠⚠ GIFT MODE (2026-08-07, latest). ALL THREE LINES.** golem OTA-1154 /
   HAL OTA-1177 / steam merged. Owner, two asks in one message: *"the list we
