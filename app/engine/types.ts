@@ -1015,6 +1015,16 @@ export interface PlayerCharacter {
   /** OTA-1044 — motive-drip beat ids already delivered to the feed (strict
    *  order, one-shot each; see engine/storyDrip.ts). Absent = none yet. */
   storyBeatsSeen?: string[];
+  /** OTA-1186 — Jakar Nine-Halls has already explained how bounties work. One-shot,
+   *  set on the first accepted contract.
+   *  ⚠ DELIBERATELY NOT BACKFILLED TO TRUE ON OLD SAVES, which is the opposite of what
+   *  `storyIntroSeen` does. That flag hides a cutscene an existing character has already
+   *  effectively lived through; this one gates RULES THAT HAVE NEVER BEEN SHOWN TO
+   *  ANYBODY — that kills count anywhere, that there is no turn-in, that accepting makes
+   *  the quarry hunt you. A veteran save needs them MORE than a fresh one, not less: the
+   *  owner ran a 23-tile contract on the wrong model of all three. Absent reads as false,
+   *  so every existing character gets it once on their next accept. */
+  bountyPrimerSeen?: boolean;
   /** ⚠ OTA-1089 — PHASE 4 DIFFICULTY, chosen on the last step of character
    *  creation and LOWERABLE MID-RUN BUT NEVER RAISABLE (engine/pressure.ts
    *  canChangeTo). Absent = DEFAULT_PRESSURE ('owed'), which is what every

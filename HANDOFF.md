@@ -1565,8 +1565,76 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ ONE PRICE FOR A TILE, AND A DEADLINE THAT PAYS FOR THE WALK (2026-08-07,
-  latest). HAL + GOLEM.** HAL OTA-1185 / golem OTA-1162. **steam NOT included —
+- **⚠⚠ THE FIRST CONTRACT COMES WITH SOMEONE TO EXPLAIN IT (2026-08-07, latest). HAL
+  + GOLEM.** HAL OTA-1186 / golem OTA-1163. **steam NOT included — batched (§2).**
+  Owner: *"we have first time touch pop-ups all through the game. so how about the
+  first time someone accepts a bounty gets a pop-up and it does it in character…
+  since this is your first bounty I'll show you the ropes. I'm going to send you to
+  an area that's thick with enemy but they know you're coming so they're going to be
+  looking for you."*
+
+  **⚠ THIS EXISTS BECAUSE THE MECHANICS WERE ALREADY RIGHT AND THE GAME NEVER SAID
+  SO.** The owner ran a full 23-tile contract believing he had to travel to the named
+  outpost, do the killing there, and hand something in. **All three are false — traced
+  end to end through the source on 2026-08-07, and each is now pinned by a test in
+  `ota1186BountyPrimer` that asserts against the implementing code rather than against
+  the card's own wording:**
+  - `killCountsForBounty` tests **faction only — there is no location term in it at
+    all.** The named outpost is where the quarry is DENSE, not where the kill counts.
+  - **There is no turn-in.** The last kill fires `announceMissionComplete` and pays TC
+    + standing on the spot, wherever the player is standing.
+  - **Accepting flips the quarry's patrols to hunting the player** — bounty targets
+    skip the hunt-chance roll and qualify even at positive standing.
+
+  New `engine/bountyPrimer.ts` — **Jakar Nine-Halls**, raised as a one-shot
+  `raiseSpotlightNotice` card on the first accepted contract.
+  - ⚠ **He is a PERSON, not a guild and not a faction.** A bounty guild would be a
+    tenth power in a nine-power world needing standing, an outpost, rivals and a tide.
+    He is one man with a sheaf of paper — he carries the voice, and he stays out of
+    the systems entirely. **Keep him that way.**
+  - ⚠ **The card is DESCRIPTIVE, and its three claims are pinned against the code that
+    implements them** — not against itself. If a future change makes one false the
+    suite fails rather than the card quietly lying to a first-timer.
+  - The **kill count explains itself** rather than becoming a new mechanic. The owner
+    reached for *"three for full standing, six for them to even look at you"*; that is
+    already real — `count = 3 + ceil(tide/2) + giverDifficulty(standing)` — so Jakar
+    says WHY the number is what it is, across all four `giverDifficulty` tiers. **No
+    tiered payout was added.**
+
+  **⚠ NOT BACKFILLED TO TRUE ON OLD SAVES — the opposite of `storyIntroSeen`, and
+  deliberate.** That flag hides a cutscene a veteran has effectively already lived
+  through; `bountyPrimerSeen` gates **rules that have never been shown to anybody**. A
+  veteran needs them MORE, not less — the owner is the proof. Absent reads as false,
+  so every existing character gets the card once on their next accept.
+  ⚠ Gated on the **flag**, never on `slate.length === 0`: a player who finished a
+  contract has still seen the ropes, and an empty slate would re-show it on every
+  clear.
+
+  **The feed line that caused the confusion is fixed too.** Both accept variants said
+  the quarry should be *"put down around <place>"*, which reads as an instruction when
+  the place is only a tip. They now say **"anywhere you find them, though they're
+  thickest around…"**.
+
+  ⚠ **Two small shared-surface changes, both widening-only.** `missionCompleteNotice`
+  gained `takeLabel` (the lines under the divider are not always a payout — calling
+  four facts about how bounties work "THE TAKE" reads as rewards never received) and
+  `holdMs` (four paragraphs seen once, with no way back, against a 60s valve). **The
+  modal `Math.max`es the hold and the store keeps the LONGER one across a merge**, so
+  neither can shorten a card or wedge the screen. Every ordinary notice sets neither
+  and renders exactly as before — pinned by test.
+
+  New suite `ota1186BountyPrimer` (19 tests). ⚠ Its `expo-av` mock carries an
+  **explicit `createAsync` annotation**, unlike the copies of that preamble in older
+  suites: without one tsc reports TS7022, which is a chunk of the test-typecheck
+  baseline. **New test code typechecks rather than growing the baseline** — the
+  ratchet caught this at 201 > 200 and the fix was the annotation, not an
+  `--update-baseline`.
+
+  Blocking gates green on both lines: typecheck:ci, lint, the test-typecheck ratchet,
+  the handoff-claims ratchet, and test:ci:fast (**710 suites / 6436 tests**).
+
+- **⚠⚠ ONE PRICE FOR A TILE, AND A DEADLINE THAT PAYS FOR THE WALK (2026-08-07).
+  HAL + GOLEM.** HAL OTA-1185 / golem OTA-1162. **steam NOT included —
   batched (§2).** Owner, after a 23-tile bounty lapsed one kill from done: *"let's
   make .25 the standard. let's make a mathematical variable 2.5 and let's make the
   time 2.5 times the steps. it's just those three changes. I still want time to be
