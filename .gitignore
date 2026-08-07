@@ -21,3 +21,6 @@ android/
 .tmp/
 coverage/
 .tartaria-tmp/
+
+# Claude Code agent worktrees + local session scratch — never commit this.
+.claude/
