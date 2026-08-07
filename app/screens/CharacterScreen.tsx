@@ -10,6 +10,7 @@ import { useGameStore, effectiveACBreakdown, playerArmorResistKinds } from '../s
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
+import { JOIN_THRESHOLD } from '../engine/factions';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
 // OTA-1089 — Phase 4 difficulty, and the only place it can be eased.
@@ -425,9 +426,13 @@ export function CharacterScreen() {
             }
             return rows.map(({ row, meta }) => {
               const standing = row.standing;
-              const qualifies = standing >= 20;
+              // OTA-1179 — the constant, not a copy of it. The comment above this
+              // block already cited "per JOIN_THRESHOLD in engine/factions.ts" while
+              // hardcoding 20 twice, so the ✓ and the colour could disagree with the
+              // rule they claim to show if the threshold ever moved.
+              const qualifies = standing >= JOIN_THRESHOLD;
               const isOwn = row.factionId === player.factionId;
-              const color = standing >= 20 ? '#9ec96a'
+              const color = standing >= JOIN_THRESHOLD ? '#9ec96a'
                 : standing >= 0 ? '#cdbf99'
                 : standing >= -10 ? '#c9a86a'
                 : '#e07a5f';
