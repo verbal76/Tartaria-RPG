@@ -316,12 +316,31 @@ single merge of HAL's current tip. Full directive + the reason it changed: §2.
      file type debt is frozen at `.ci-typecheck-tests-baseline`; new/edited tests
      must typecheck, the count may only shrink. If you clear some, lower the
      baseline (`node scripts/ci-typecheck-tests.mjs --update-baseline`).
-   - `npm run test:ci:fast` — the deterministic suites (530 as of 2026-07-26; the real jest
+     ⚠ **`--update-baseline` LOWERS it. It is not the way past a failure.** When
+     this gate fails, YOUR new test code did not typecheck — fix the code. Hit
+     2026-08-07 at 201 > 200 on HAL: a new suite copied an older suite's `expo-av`
+     mock and inherited its baseline `TS7022` along with it; the fix was annotating
+     the mock, and raising the baseline would have quietly admitted the debt the
+     ratchet exists to keep out.
+   - ⚠ `npm run check:handoff` — the CLAIMS RATCHET, and it belongs in this list:
+     it is a **pre-push gate**, not merely the CI step §2 describes. Unreceipted
+     prohibitions are frozen at a baseline the same way; a new one fails the run.
+     Hit 2026-08-07 at 15 > 13 on two sentences in a handoff entry written minutes
+     earlier — one a genuine unreceipted claim, one a turn of phrase the detector
+     reads as a prohibition. **That is the ordinary case, so run it every time you
+     touch this file** — which, per step 5, is every OTA.
+   - `npm run test:ci:fast` — the deterministic suites (710 as of 2026-08-07; the real jest
      ratchet). `jest.setup.js` seeds Math.random + pins incidental weather, so
      runs are deterministic — a failure here is real, not a flake. (`test:ci:heavy`
      = the memory-hungry sims, non-blocking / reported everywhere — Open Item #2.)
+     ⚠ A SINGLE-SUITE run can hang after its tests pass (open handles); the npm
+     script's own `--ci` plus `--forceExit` is the way to iterate on one file.
    - `npm run lint` — ESLint 9 flat config (`eslint.config.js`), a lean high-
      signal rule set; must be 0 errors.
+   ⚠ **FIVE, not four.** `check:handoff` was missing from this list while being
+   enforced, which is the same drift the `main` router carried (PR #24). A gate
+   that only runs in CI protects nobody here: the OTA publishes in ~90s and CI
+   takes ~5min, so **local is the only gate that runs before the players get it.**
    NOTE — on **engine_Dev** the `test:ci:fast` (jest) job is **reported, not
    blocking** yet (Open Item #1: engine's own ~16-suite backlog); still run it,
    just don't be surprised the pre-existing engine reds are red. Lint IS blocking
