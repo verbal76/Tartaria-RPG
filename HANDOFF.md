@@ -574,44 +574,24 @@ Key invariants worth knowing:
 
 ## 8. Open issues / watch list (current)
 
-- **⚠⚠ NEXT UP — SCOPED, INVESTIGATED, NOT BUILT: the Contracts "READY TO HAND IN" sort
-  (HAL OTA-1175 / golem OTA-1152).** Owner, verbatim: *"also under contracts you have sort by distance and
-  when I click on it it says you know grouped so each group sorts by distance. I want another sort button
-  there. same style as that. just put it to the right of it and I wanted to say sort by ready to hand in
-  and I want it to pull from the groups. all the ones that are ready to hand in right to the top and sort
-  those by distance automatically."*
+- **✅ SHIPPED (HAL OTA-1175 / golem OTA-1152) — the Contracts "READY TO HAND IN" sort.** Full account in
+  §9. The blocker this entry warned about was real and is now closed at the root: "ready" was THREE inline
+  predicates and is now one, `missionTurnInReady` in **new `app/engine/missionReady.ts`**, which every card
+  pill, every COMPLETE gate and the new sort route through.
 
-  ⚠ **THE BLOCKER IS THAT "READY" IS NOT ONE PREDICATE — IT IS THREE**, each computed inline in a
-  different section of `ContractsScreen.tsx`, with no shared definition:
-  | contract kind | how "ready" is decided | site |
-  |---|---|---|
-  | faction contracts | `factionQuestReady(def, rec.stage, countItem)` — stages OR fetch-count | `ContractsScreen.tsx:1191` → `engine/factionQuests.ts:97` |
-  | hunts / mysteries / storylines | `run.stage >= def.stages.length` — stage counter only | `ContractsScreen.tsx:892`, `:1042` |
-  | broker legs | `brokerLegs.every((l) => hasRelic(l.itemName))` — inventory check | `ContractsScreen.tsx:340` |
+  **⚠ ONE INTERPRETATION CALL THE OWNER SHOULD CONFIRM ON DEVICE.** *"I want it to pull from the groups.
+  all the ones that are ready to hand in right to the top"* was read as a **cross-group ROLL-UP** — a
+  READY TO HAND IN list above every section, gathering all five kinds, nearest first — rather than a
+  ready-first float inside each section. Reason: floating within a section does not put anything "right to
+  the top"; a ready faction contract still sits below Hunts, Mysteries and Storylines, which is most of a
+  screen. The sections ALSO rank ready-first now, so both readings are served — but if he wanted only the
+  in-section float and finds the roll-up redundant, deleting it is one JSX block and the `readyRows` build;
+  the shared predicate stays either way.
 
-  **Wire the button to any ONE of them and it floats that kind correctly while silently missing the
-  others** — a hunt sitting ready would never rise. So step one is extracting a single
-  `missionTurnInReady()` that all three existing call sites route through, which also stops the three
-  sections being able to disagree with each other. **Do not invent a fourth definition of ready** — it
-  must agree with whatever the COMPLETE tap already checks, or the button lies.
-
-  **Decision already taken (owner told, not yet contradicted): make it a THREE-WAY SELECTOR, not a second
-  independent toggle.** The existing control is a boolean `sortByDistance`. Two independent toggles give
-  four states and two are nonsense ("ready first, but don't sort by distance" — the owner explicitly said
-  ready ones sort by distance automatically). So: DEFAULT → BY DISTANCE → READY FIRST, tapping one clears
-  the other, same visual style, sitting to the right. If the owner comes back wanting two literal
-  buttons, that's a small change from here.
-
-  **Everything needed, already located in `ContractsScreen.tsx`:**
-  - `:120` — `const [sortByDistance, setSortByDistance] = useState(false);` (add the new state beside it)
-  - `:230-234` — the section sorter; `if (!sortByDistance) return arr as T[];`
-  - `:642-653` — the main sort bar `Pressable`; styles `sortBar` / `sortBarOn` / `sortBarPressed` /
-    `sortBarText` / `sortBarHint`. **This is the one the owner means** — put the new button to its right.
-  - `:469-476` — a second COMPACT variant of the same control (styles `mqSortBtn` / `mqSortBtnOn` /
-    `mqSortText`). Easy to miss; decide deliberately whether it gets the new mode too.
-
-  Then the usual: new suite, gates (typecheck / lint / ratchet **200** / `test:ci:fast`), docs ritual,
-  commit + push HAL, port to golem via renumber + `verify-parity.mjs`, then the steam merge.
+  **⚠ AND A SECOND THING TO WATCH:** the roll-up's COMPLETE rows are the same `completeContractFromUI` the
+  cards call, so the **hunts face-to-face gate still refuses** from the roll-up when no paying agent is in
+  scene (OTA-810's rule, deliberately not bypassed). If that reads as "the button doesn't work", the answer
+  is the refusal strip's wording, not the gate.
 
 - **⚠ OPEN OWNER CALLS — analysed and presented, NOT decided. Do not implement unprompted.**
   - **Sell value for Commons is too low.** Owner: *"I sold the other day like 11 items. I got 81 TC … I
@@ -1222,8 +1202,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-03-1106`**,
-**golem-line `2026-08-03-1083`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1175`**,
+**golem-line `2026-08-07-1152`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1232,7 +1212,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.59**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.85**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1451,7 +1431,75 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE CONVERSATION REMEMBERS (2026-08-07, latest). BOTH LINES.** HAL
+- **⚠⚠ READY TO HAND IN (2026-08-07, latest). BOTH LINES.** HAL OTA-1175 /
+  golem OTA-1152. Owner: *"also under contracts you have sort by distance and when
+  I click on it it says you know grouped so each group sorts by distance. I want
+  another sort button there. same style as that. just put it to the right of it and
+  I wanted to say sort by ready to hand in and I want it to pull from the groups.
+  all the ones that are ready to hand in right to the top and sort those by
+  distance automatically."*
+
+  ⚠ **THE BUTTON WAS THE SMALL HALF.** "Ready" was not one predicate — it was
+  THREE, each computed inline in a different section of `ContractsScreen.tsx`,
+  with nothing tying them together:
+
+  | contract kind | how "ready" WAS decided | where |
+  |---|---|---|
+  | hunts / mysteries / storylines | `run.stage >= def.stages.length` | three separate copies |
+  | faction contracts | `factionQuestReady(def, stage, countItem)` | the faction map body |
+  | broker alliance legs | every demanded relic held | top-of-component |
+
+  Wire a new sort to any ONE of them and it floats that kind correctly while
+  **silently missing the others** — a finished hunt would simply never rise and
+  nothing would look broken. So the three were unified FIRST into new
+  **`app/engine/missionReady.ts`** (`missionTurnInReady`), and every existing card
+  pill and COMPLETE gate now routes through it.
+
+  ⚠ **THE GREP FOUND MORE SITES THAN THE PLAN DID.** The scoping note in §8 listed
+  the stage predicate at two line numbers; there are **three** (hunts, mysteries,
+  storylines are three kinds and each carries its own copy). Re-grepping by PATTERN
+  rather than trusting the enumeration is what caught it — §3a.A.4, working exactly
+  as advertised.
+
+  ⚠ **THE EXTRACTION IS BEHAVIOUR-PRESERVING ON PURPOSE, MISSING GUARD AND ALL.**
+  The stage arm still says a stage-less def is ready (`0 >= 0`), because that is
+  what the screen has always done. This OTA moved WHERE the answer is computed, not
+  WHAT it answers; there is a test asserting exactly that, so a later "tidy-up" that
+  adds a `stageCount > 0` guard fails loudly instead of quietly changing which cards
+  can be handed in.
+
+  **1 — A ROLL-UP, not a per-group float.** *"Pull from the groups … right to the
+  top"* cannot be served by sorting inside a section: a ready faction contract sits
+  below Hunts, Mysteries and Storylines, so "top of its group" is still most of a
+  screen down. READY mode gathers every ready contract across all five kinds into
+  one list ABOVE everything, nearest first; the full cards stay in their sections,
+  which also rank ready-first now. ⚠ Each row's COMPLETE calls the **same**
+  `completeContractFromUI` the card's button calls — not a second turn-in path, so
+  a refusal (the hunts face-to-face gate) refuses identically wherever the player
+  taps. The alliance lists with a route note and no button: it seals at the Parley
+  Ground rather than through a COMPLETE tap.
+
+  **2 — ONE MODE, TWO BUTTONS.** Two independent toggles would allow four states and
+  two of them are nonsense ("ready first, but don't sort by distance" — ready ones
+  sort by distance by definition). A single `'default' | 'distance' | 'ready'` makes
+  the impossible states unrepresentable and each button clears the other.
+
+  **3 — A DISTANCE BUG FOUND ON THE WAY.** A ready faction card shows the distance
+  to the faction HOME it hands in at, but the SORT was still keying off the
+  OBJECTIVE — so BY DISTANCE ordered ready faction contracts by a number their own
+  cards were not displaying. One helper (`factionSortLocId`) now feeds both.
+
+  The 9-Capital compact toggle deliberately does NOT get the new mode: a Capital is
+  a boss objective, not a contract, so it has nothing to hand in. It still lights
+  while READY runs, because that mode orders the Capitals by distance too.
+
+  New suite `ota1175ReadyToHandIn` (20 tests). ⚠ Its locks assert the three OLD
+  inline shapes are **GONE** and that **every** section passes its readiness
+  accessor — a lock asserting only the new shape would have gone green over exactly
+  the miss this OTA was about. Verified by running the old-shape patterns against
+  `git show HEAD:…ContractsScreen.tsx`: every lock fails on the pre-change file.
+
+- **⚠⚠ THE CONVERSATION REMEMBERS (2026-08-07). BOTH LINES.** HAL
   OTA-1174 / golem OTA-1151. Owner: *"I would like the talk screens to remember
   the conversations and type the question on an off-white so later we know what
   we asked. with so many conversations it will get confusing without a

@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.84';
+export const DISPLAY_VERSION = '4.29.85';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23650,7 +23650,63 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //      not drawn twice.
 // New suite ota1174TheConversationRemembers (8 tests).
 // DISPLAY_VERSION 4.29.84.
-export const OTA_BUILD_ID = '2026-08-07-1174-the-conversation-remembers';
+// OTA-1175 — READY TO HAND IN. Owner: *"also under contracts you
+// have sort by distance and when I click on it it says you know
+// grouped so each group sorts by distance. I want another sort
+// button there. same style as that. just put it to the right of
+// it and I wanted to say sort by ready to hand in and I want it
+// to pull from the groups. all the ones that are ready to hand
+// in right to the top and sort those by distance automatically."*
+// ⚠ THE BUTTON WAS THE SMALL HALF. "Ready" was not one predicate
+// — it was THREE, each computed inline in a different section of
+// ContractsScreen with nothing tying them together:
+//     hunts / mysteries / storylines -> run.stage >= def.stages.length
+//     faction contracts              -> factionQuestReady(def, stage, countItem)
+//     the broker's alliance legs     -> every demanded relic held
+// Wire the new sort to any ONE of them and it floats that kind
+// correctly while SILENTLY missing the others — a finished hunt
+// would simply never rise and nothing would look broken. So the
+// three were unified FIRST, into engine/missionReady, and every
+// existing card pill and COMPLETE gate now routes through it.
+// ⚠ The extraction is behaviour-preserving on purpose, missing
+// guard and all: the stage arm still says a stage-less def is
+// ready, because that is what the screen has always done. This
+// OTA moved WHERE the answer is computed, not WHAT it answers.
+// Three parts:
+//   1. THE ROLL-UP, not a per-group float. "Pull from the groups
+//      ... right to the top" cannot be served by sorting inside a
+//      section: a ready faction contract sits below Hunts,
+//      Mysteries and Storylines, so "top of its group" is still
+//      most of a screen down. READY mode gathers every ready
+//      contract across all five kinds into one list ABOVE
+//      everything, nearest first; the full cards stay in their
+//      sections. ⚠ Each row's COMPLETE calls the SAME
+//      completeContractFromUI the card's button calls — not a
+//      second turn-in path, so the hunts face-to-face gate
+//      refuses identically wherever the player taps.
+//   2. ONE MODE, TWO BUTTONS. Two independent toggles would allow
+//      four states and two are nonsense ("ready first, but don't
+//      sort by distance" — ready ones sort by distance by
+//      definition). A single 'default' | 'distance' | 'ready'
+//      makes the impossible states unrepresentable; each button
+//      clears the other. Within the sections, READY also ranks
+//      ready-first and breaks ties on distance.
+//   3. A DISTANCE BUG FOUND ON THE WAY. A ready faction card
+//      shows the distance to the faction HOME it hands in at, but
+//      the sort was still keying off the OBJECTIVE — so BY
+//      DISTANCE ordered ready contracts by a number their own
+//      cards were not displaying. One helper now feeds both.
+// The 9-Capital compact toggle deliberately does NOT get the new
+// mode: a Capital is a boss objective, not a contract, so it has
+// nothing to hand in.
+// New suite ota1175ReadyToHandIn (20 tests), including locks that
+// assert the three OLD inline shapes are GONE and that every
+// section passes its readiness accessor — a lock asserting only
+// the new shape would go green over exactly the miss this OTA
+// was about.
+// DISPLAY_VERSION 4.29.85.
+export const OTA_BUILD_ID = '2026-08-07-1175-ready-to-hand-in';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1174-the-conversation-remembers';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1173-the-acid-batch';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1172-the-modifier-is-evidence';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1171-the-first-word-survives';
