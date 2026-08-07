@@ -21,6 +21,8 @@
 import type { NpcRelation, NpcMet, OutpostRaid, WorldMemory } from './types';
 // OTA-1075 — rememberNpcMeeting pairs the two stores; see below.
 import { recordNpcMet } from './worldMemory';
+// OTA-1178 — see healFactionId, just above recordNpcSighting.
+import { canonicalFactionId } from './factions';
 
 /** Three separate arrivals in front of someone and they know your face. */
 export const MEETINGS_FOR_NAME = 3;
@@ -143,6 +145,26 @@ export function getRelation(memory: WorldMemory, id: string): NpcRelation | null
 
 /** One arrival in front of this NPC. Unlike recordNpcMet this is NOT
  *  idempotent — repetition is the whole signal. */
+/** ⚠ OTA-1178 — A RECORDED factionId IS STICKY, so a bad one is permanent.
+ *
+ *  OTA-834 found four stall reps carrying RACE ids where faction ids belong and
+ *  fixed the ROSTER — but never the saves. A player who met one of those vendors
+ *  before that OTA keeps the race id, `applyRepChange` silently ignores it, and
+ *  every rep gain through that person quietly goes nowhere (device log
+ *  2026-08-06: a Rare Core Relic to Odar Flameforge, "Standing +2 — architectural
+ *  sentinels", nothing moved). Healing on the WRITE means the save corrects
+ *  itself the next time you stand in front of them, rather than needing every
+ *  reader to remember. An id nothing answers to is kept as-is: it is somebody
+ *  else's data and this is not the place to guess at it.
+ *
+ *  ⚠ The `??` is not redundant with canonicalFactionId's null — that null means
+ *  "unresolvable", and dropping the field on unresolvable would silently strip a
+ *  faction from an NPC whose id is merely NEWER than this build's roster. */
+function healFactionId(id: string | undefined): string | undefined {
+  if (!id) return id;
+  return canonicalFactionId(id) ?? id;
+}
+
 export function recordNpcSighting(
   memory: WorldMemory,
   npc: NpcMet,
@@ -176,7 +198,7 @@ export function recordNpcSighting(
       ...prev,
       name: npc.name || prev.name,
       role: npc.role ?? prev.role,
-      factionId: npc.factionId ?? prev.factionId,
+      factionId: healFactionId(npc.factionId ?? prev.factionId),
       lastSeenAt: opts.nowMs,
     };
     return { ...seeded, npcRelations: { ...(seeded.npcRelations ?? {}), [npc.id]: refreshed } };
@@ -187,7 +209,7 @@ export function recordNpcSighting(
     // Refresh the display fields — a vendor can be re-minted with a new title.
     name: npc.name || base.name,
     role: npc.role ?? base.role,
-    factionId: npc.factionId ?? base.factionId,
+    factionId: healFactionId(npc.factionId ?? base.factionId),
     meetings: base.meetings + 1,
     // OTA-1075 — remember WHEN THEY LAST SAW YOU before overwriting it with
     // "now". The greeting is composed after this write, so an absence line
