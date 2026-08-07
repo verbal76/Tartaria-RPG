@@ -16,7 +16,8 @@
     "typecheck:tests": "node scripts/ci-typecheck-tests.mjs",
     "test:ci": "npm run test:ci:fast && npm run test:ci:heavy",
     "test:ci:fast": "jest --ci --testPathIgnorePatterns /node_modules/ Stress stressMode Chaos Probe Smoke Sweep Sim",
-    "test:ci:heavy": "jest --ci --maxWorkers=1 --workerIdleMemoryLimit=200MB --testPathPattern \"(Stress|stressMode|Chaos|Probe|Smoke|Sweep|Sim)\""
+    "test:ci:heavy": "jest --ci --maxWorkers=1 --workerIdleMemoryLimit=200MB --testPathPattern \"(Stress|stressMode|Chaos|Probe|Smoke|Sweep|Sim)\"",
+    "check:handoff": "node scripts/check-handoff-claims.mjs"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.23.1",
