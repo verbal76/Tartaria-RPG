@@ -2092,7 +2092,22 @@ export interface NpcRelation {
    *  number would not have been this; the object is the point. Bounded in
    *  practice by GIFT_BOONS_PER_PERSON plus the repeat decay — there is no
    *  reason to keep gifting past the cap, and nothing rewards it. */
-  gifts?: { name: string; atHours: number }[];
+  gifts?: {
+    name: string;
+    atHours: number;
+    /** ⚠ OTA-1184 — HOW THEY TOOK IT. Owner: the ledger should show "what you gave
+     *  to whom and how they received it." The reaction was computed by `resolveGift`
+     *  at the moment of giving and then thrown away, so a gift that INSULTED
+     *  somebody looked identical on the record to one they loved.
+     *  ⚠ Optional, and it stays optional: every gift on an existing save predates
+     *  this field, and the ledger must render those as "reaction not recorded"
+     *  rather than inventing one. Do not backfill it — a guessed reaction on a
+     *  historical gift is worse than an honest blank, because tastes have changed
+     *  since (OTA-1176 rewrote the whole preference table). */
+    reaction?: 'loved' | 'liked' | 'polite' | 'disliked' | 'insulted';
+    /** The standing that actually moved, as reported at the time. */
+    standingDelta?: number;
+  }[];
   /** ⚠ OTA-1087 — THE LARGEST FACTION-STANDING HIT ALREADY TAKEN FOR BEING
    *  HOSTILE TO THIS PERSON, as a magnitude. Load-bearing anti-exploit state.
    *

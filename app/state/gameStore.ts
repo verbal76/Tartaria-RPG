@@ -269,6 +269,9 @@ import {
   raiseMenace, decayedMenace, menaceIntimidateDcBonus, menaceEncounterBonus,
 } from '../engine/menace';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc, standingAc, equippedGearAc } from '../engine/equipment';
+// OTA-1184 — the milestone step lives with the code that EXPLAINS it on the sheet,
+// so the award and the explanation can never quote different numbers.
+import { MILESTONE_KILL_STEP } from '../engine/hpBreakdown';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
 import { applyLegacyItemRenames } from '../engine/itemMigrations';
@@ -3895,7 +3898,11 @@ function maybePatrolAmbush(
 // unbounded hpMax — and left this line describing the retired rule, which is how a
 // session came to tell the owner that grinding the same patrol builds HP. It does
 // not: your tenth Mud Skulker pays nothing. HP comes from VARIETY, not volume.
-const MILESTONE_KILL_STEP = 3;     // every 3 DISTINCT enemy types beaten → +1 HP max
+// ⚠ OTA-1184 — the value MOVED to engine/hpBreakdown.ts and is imported at the top
+// of this file. The character sheet now EXPLAINS the number using this constant, and
+// a threshold the sheet quotes while the store awards it must have exactly one home
+// — the same cleanup OTA-1179 #8 did for JOIN_THRESHOLD and OTA-1181 for
+// BUY_REP_TC_PER_STANDING. // every 3 DISTINCT enemy types beaten → +1 HP max
 const MILESTONE_TRAVEL_STEP = 5;   // every 5 travels → +1 stamina max
 // OTA 058 — MILESTONE_CHECK_STEP retired. Skill-check stat growth is
 // now per-use via engine/statTraining (Skyrim model). HP and stamina
@@ -6863,7 +6870,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 [g.toId!]: {
                   ...prev,
                   // THE CLAUSE THAT MATTERS: the object, by name.
-                  gifts: [...(prev.gifts ?? []), { name: item.name, atHours: hours }],
+                  // ⚠ OTA-1184 — and HOW THEY TOOK IT, which was computed right here
+                  // and then discarded. Owner asked the sheet to show "what you gave
+                  // to whom and how they received it"; without the reaction a gift
+                  // that INSULTED somebody read identically to one they loved.
+                  gifts: [...(prev.gifts ?? []), {
+                    name: item.name,
+                    atHours: hours,
+                    reaction: out.reaction,
+                    standingDelta: out.standingDelta,
+                  }],
                   giftBoons: (prev.giftBoons ?? 0) + (out.countsAsBoon ? 1 : 0),
                   // A gift that lands counts as business done — it is what lifts
                   // somebody off the 'met' rung without a purchase.

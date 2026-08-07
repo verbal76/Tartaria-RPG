@@ -1335,8 +1335,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1183`**,
-**golem-line `2026-08-07-1160`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1184`**,
+**golem-line `2026-08-07-1161`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1565,7 +1565,61 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ REGEN WAS INVISIBLE ON EVERY SURFACE (2026-08-07, latest). HAL + GOLEM.** HAL
+- **⚠⚠ THE SHEET SHOWS WHERE ITS NUMBERS CAME FROM (2026-08-07, latest). HAL +
+  GOLEM.** HAL OTA-1184 / golem OTA-1161. **steam NOT included — batched (§2).**
+  Owner, on his own character sheet: *"for AC it shows your base and your buffs. HP
+  just says HP not what my base number was so I can see the progression, I didn't
+  roll a 29 at start. and instead of things given away under arbitor, it should say
+  gifts given, and if you tap it, it should show you what you gave to whom and how
+  they received it."* Three asks, one theme, and it is the theme of OTA-1181 and
+  OTA-1183 too: **the game knows something about the player it never shows them.**
+
+  **⚠ 1. WHERE MAX HP CAME FROM.** `hpMax` is a **baked** total — three sources add
+  into one field and nothing recorded which contributed what: the creation roll
+  (`rollDice(5, 10)` + race bonus), distinct-kill milestones, and gear (baked on
+  equip, stripped on unequip since OTA-796). The bar read `29/29`, and the owner
+  correctly knew he had not rolled 29. The row now carries
+  **`base 27 · +2 earned · +1 gear`** plus how many kinds are beaten and how far the
+  next +1 is.
+  - ⚠ **Nothing new is persisted.** The base is recovered by SUBTRACTION
+    (total − earned − gear), so it works on every existing save with no migration.
+    That makes base a **residual**: anything that grows `hpMax` in future MUST be
+    added to `engine/hpBreakdown` at the same time, or it lands silently in "base"
+    instead of surfacing as a discrepancy.
+  - ⚠ It counts **DISTINCT kinds**, never the lifetime tally.
+    `milestones.enemiesDefeated` counts every kill and would overstate the
+    progression on any save with grinding in it.
+  - `MILESTONE_KILL_STEP` moved to `engine/hpBreakdown`. A threshold the sheet
+    **quotes** while the store **awards** it must have exactly one home — OTA-1179 #8
+    did this for `JOIN_THRESHOLD`, OTA-1181 for `BUY_REP_TC_PER_STANDING`.
+
+  **2. "N things given away" → "N gifts given".** The owner's wording and the better
+  one: "given away" reads as loss or charity when the mechanic is a gift with a named
+  recipient and a reaction — and it is the word every OTHER surface already used
+  (GIVE, the picker, `giftBoons`, `giftTastes`). The sheet was the odd one out.
+
+  **⚠ 3. THE ROW OPENS.** `npcRelations[].gifts` has recorded the object by name
+  since OTA-1083 and **nothing ever read it back**. Tapping now lists every gift,
+  newest first, across everyone: *"Cracked Lens — Halem took it as an insult · day 3
+  · standing −2"*.
+  - **Not grouped by person**, deliberately: the player is asking about the exchange
+    he just made, and grouping would bury it under someone he stopped dealing with on
+    day three.
+  - The **reaction** was computed by `resolveGift` at give-time and then **discarded**,
+    so a gift somebody LOVED was indistinguishable on the record from one that
+    INSULTED them. It is recorded now (`gifts[].reaction`, `gifts[].standingDelta`).
+  - ⚠ **HISTORICAL GIFTS ARE LEFT BLANK ON PURPOSE.** They read *"reaction not
+    recorded"* rather than a recomputed guess. OTA-1176 rewrote the entire taste
+    table underneath those entries, so a recomputed reaction would be a confident lie
+    about how somebody once felt. **Do not backfill it.**
+
+  New suite `ota1184SheetProvenance` (16 tests). ⚠ `ota1165`'s `MILESTONE_KILL_STEP`
+  pin **retargeted, not weakened** — it matched the constant's *declaration* in
+  gameStore; it now asserts the **exported value** plus the store's import of it,
+  which is strictly stronger: it survives the next move and still fails if the number
+  changes.
+
+- **⚠⚠ REGEN WAS INVISIBLE ON EVERY SURFACE (2026-08-07). HAL + GOLEM.** HAL
   OTA-1183 / golem OTA-1160. **steam NOT included — batched (§2).** Owner, with a
   screenshot of his own inventory: *"how am I supposed to know I had regen, I almost
   sold these. this is how we see them."*

@@ -24,6 +24,8 @@ import {
 } from '../engine/pressure';
 // OTA-1090 — Phase 5: where the Arbiter stands, and what he thinks of you.
 import { arbiterSheetLines } from '../engine/arbiterPersona';
+import { hpBreakdown, hpBreakdownLine } from '../engine/hpBreakdown';
+import { giftLedger, giftLedgerLine } from '../engine/giftLedger';
 import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { barehandDamageFor } from '../engine/raceMechanics';
@@ -73,6 +75,8 @@ export function CharacterScreen() {
   // OTA-848 — tap-to-expand: the AC breakdown, and which title's provenance is open.
   const [acOpen, setAcOpen] = useState(false);
   const [openTitle, setOpenTitle] = useState<string | null>(null);
+  // OTA-1184 — the gift ledger drills into the Arbiter's "N gifts given" row.
+  const [giftsOpen, setGiftsOpen] = useState(false);
 
   if (!player) {
     return (
@@ -104,6 +108,10 @@ export function CharacterScreen() {
   // OTA-1090 [Phase 5] — where the Arbiter stands in the arc, what he thinks
   // of this character, and the itemised reasons for it.
   const arbiter = arbiterSheetLines(player, worldMemory);
+  // OTA-1184 — the two read models this sheet gained: where hpMax came from, and
+  // what was given to whom. Both derive from state already saved; neither writes.
+  const hpParts = hpBreakdown(player, worldMemory);
+  const ledger = giftLedger(worldMemory);
 
   // OTA-843 [Chronicle] — assemble the character's legend from accreted state
   // (memorable beats + milestones + titles + corruption + main-quest progress).
@@ -183,6 +191,21 @@ export function CharacterScreen() {
             </View>
             <Text style={styles.barValue}>{player.hp}/{player.hpMax}</Text>
           </View>
+          {/* ⚠ OTA-1184 — WHERE THE MAX CAME FROM. Owner: "for AC it shows your base
+              and your buffs. HP just says HP not what my base number was so I can see
+              the progression, I didn't roll a 29 at start." hpMax is a BAKED total —
+              creation roll + distinct-kill milestones + gear — and nothing recorded
+              which was which. The base is recovered by subtraction (see
+              engine/hpBreakdown), so this needs no new save field and works on every
+              existing character. */}
+          {hpParts && (
+            <Text style={styles.hpBreakdown}>
+              {hpBreakdownLine(hpParts)}
+              {hpParts.distinctKills > 0
+                ? `  ·  ${hpParts.distinctKills} kinds beaten, ${hpParts.toNextMilestone} to the next +1`
+                : ''}
+            </Text>
+          )}
           <View style={styles.barRow}>
             <Text style={styles.barLabel}>STA</Text>
             <View style={styles.barBg}>
@@ -247,14 +270,50 @@ export function CharacterScreen() {
               <Text style={styles.kvValue}>{arbiter.regard}</Text>
               {arbiter.parts.length > 0 && (
                 <View style={{ marginTop: 10 }}>
-                  {arbiter.parts.map((part, i) => (
-                    <View key={i} style={styles.kvRow}>
-                      <Text style={styles.kvValue}>{part.label}</Text>
-                      <Text style={[styles.kvValue, { color: part.value >= 0 ? '#7a8a5a' : '#a85a3a' }]}>
-                        {part.value >= 0 ? '+' : ''}{part.value}
-                      </Text>
-                    </View>
-                  ))}
+                  {arbiter.parts.map((part, i) => {
+                    const row = (
+                      <View style={styles.kvRow}>
+                        <Text style={styles.kvValue}>
+                          {part.label}
+                          {/* ⚠ OTA-1184 — the affordance. A tappable row that looks
+                              identical to a flat one is a feature nobody finds. */}
+                          {part.kind === 'gifts' ? <Text style={styles.tapHint}>{giftsOpen ? '  ▾' : '  ›'}</Text> : null}
+                        </Text>
+                        <Text style={[styles.kvValue, { color: part.value >= 0 ? '#7a8a5a' : '#a85a3a' }]}>
+                          {part.value >= 0 ? '+' : ''}{part.value}
+                        </Text>
+                      </View>
+                    );
+                    if (part.kind !== 'gifts') return <View key={i}>{row}</View>;
+                    return (
+                      <View key={i}>
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => setGiftsOpen((v) => !v)} accessibilityRole="button">
+                          {row}
+                        </TouchableOpacity>
+                        {giftsOpen && (
+                          <View style={styles.giftLedger}>
+                            {ledger.length === 0
+                              ? <Text style={styles.kvSub}>Nothing recorded yet.</Text>
+                              : ledger.map((e, j) => (
+                                <View key={j} style={styles.giftRow}>
+                                  <Text style={styles.giftLine}>{giftLedgerLine(e)}</Text>
+                                  <Text style={styles.giftMeta}>
+                                    day {e.day}
+                                    {/* ⚠ Only shown when it was actually recorded — a
+                                        gift given before OTA-1184 has no reaction on
+                                        file, and inventing one would be worse than a
+                                        blank: OTA-1176 rewrote the taste table under
+                                        those older entries. */}
+                                    {e.standingDelta ? ` · standing ${e.standingDelta > 0 ? '+' : ''}${e.standingDelta}` : ''}
+                                    {!e.reaction ? ' · reaction not recorded' : ''}
+                                  </Text>
+                                </View>
+                              ))}
+                          </View>
+                        )}
+                      </View>
+                    );
+                  })}
                 </View>
               )}
             </View>
@@ -1116,6 +1175,12 @@ const styles = StyleSheet.create({
   tideWaning: { color: '#c98a6a', fontSize: 10, fontWeight: '400' },
   kvValue: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   kvSub: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
+  // OTA-1184 — the HP provenance line and the gift ledger.
+  hpBreakdown: { color: '#8a7a5a', fontSize: 10, marginTop: -2, marginBottom: 2, marginLeft: 46 },
+  giftLedger: { marginTop: 6, marginBottom: 4, paddingLeft: 10, borderLeftWidth: 2, borderLeftColor: '#3a3226' },
+  giftRow: { marginBottom: 6 },
+  giftLine: { color: '#e6d8b3', fontSize: 12 },
+  giftMeta: { color: '#8a7a5a', fontSize: 10, fontStyle: 'italic' },
   // OTA-1181 — the threat end of a standing row, and the rule under the list.
   // Deliberately NOT italic like kvSub: this one is a warning, not a footnote.
   huntedTag: { color: '#e07a5f', fontSize: 10, fontWeight: '700' },
