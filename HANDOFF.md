@@ -90,7 +90,7 @@ firewall workflow `eas-update-golem.yml`), and the desktop/web builds are isolat
 by their own build workflows + app ids. Never copy one line's publish step into
 another. (Full detail is in each line's own HANDOFF.)
 
-## Other branches (not the three you keep current)
+## Other branches (not the three named above)
 
 Downstream / packaging lines forked from the above — **`mac_dev`**, **`linux_dev`**,
 **`html_dev`** (desktop/web builds, all based on `steam_Dev`), **`apple_ios`**, and
