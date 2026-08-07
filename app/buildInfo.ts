@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.87';
+export const DISPLAY_VERSION = '4.29.88';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23813,7 +23813,99 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // is unchanged and still asserted; it had pinned the old guard's
 // literal string, which no longer exists.
 // DISPLAY_VERSION 4.29.87.
-export const OTA_BUILD_ID = '2026-08-07-1177-gift-mode';
+
+// 2026-08-07 OTA-1178 — FROM THE DEVICE LOG, AND TWO THE OWNER
+// TYPED OUT BY HAND.
+//   1. THE GIVE PUT YOU NOWHERE. Owner: "when I gift something to
+//      somebody it stays in the inventory menu ... it should pop
+//      back to the main world screen so you can see the response."
+//      OTA-1177 moved the recipient onto `giftMode` and sent the
+//      player into their pack; it did not move the CLEANUP, so
+//      every exit from giveGift still cleared only `pendingGift` —
+//      a field the flow no longer ran on. The vendor's reply went
+//      to the world feed while the player sat looking at their
+//      inventory. Every exit now clears both and returns to the
+//      screen the gift STARTED on (captured on entry, never
+//      'inventory' — see giftReturnScreen).
+//   2. THE GAME INVITED A THING IT REFUSED. Owner: "narration is
+//      suggesting things that I can't do." Halem's gift line —
+//      ours, from OTA-1176 — ends "there's a bowl of something hot
+//      for you if you'll sit," and `sit` was in NO verb list.
+//      Log: sit / I'll sit / sit with halem, three soft refusals in
+//      seventy seconds. Qwen read all three correctly (intent=wait)
+//      and the store's repair guard binned each one, because that
+//      guard carried a hand-typed SIX-word copy of the wait
+//      intent's TEN synonyms. Now: `sit` is a gesture verb with its
+//      own `settle` flavour family (a call-to-action beat, not an
+//      eight-hour sleep, and no stamina — charging to sit down is
+//      the kind of wrong a tester never unsees); and the guard asks
+//      the verb table via parser.mentionsWaitVerb instead of
+//      remembering it.
+//   ⚠ 3. RANK-AND-FILE RAIDERS WERE ARRIVING AS BOSSES. 03:24:35:
+//      "Forgotten Order Raider 1 presses the second strike — bosses
+//      do not yield the tempo." Two of them, 248 HP each, AC 25,
+//      ATK 16/14, against a 29 HP player, who fled — correctly; it
+//      was ~50 rounds of work while taking ~24 a round. The roster's
+//      only Legendary human is the Tartarian Reaver (310 HP, 3D8,
+//      boss:true), so a Legendary tile picks it with CERTAINTY, and
+//      dressFactionFighter spread the flag into a mook. The wild
+//      roll's `!e.boss` filter was already right — OTA-1058 then
+//      REPLACES the filtered template downstream of it, so the
+//      filter guarded a value that got thrown away. One field
+//      (`boss: false`) fixes six systems: the pack HP budget stops
+//      being bypassed (all-boss parties routed down the SOLO
+//      branch), the +6 AC, the second swing, the +1d6, the
+//      swing-cap exemption, and boss spoils/grace/gem-keys paid to
+//      a mook. Same encounter with a RARE body, earlier in the same
+//      log: 43 HP, AC 9.
+//   4. A CONTAINER IS NOT A PROP. `climb river-xord` in Ostragar —
+//      which has an interactable literally called `river-cord` —
+//      resolved to `river capital`, an ALIAS OF THE CITY, and the
+//      Arbiter narrated the city as an object. resolveContextNoun
+//      breaks a substring tie by ARRAY ORDER, and collectSceneNouns
+//      pushed location aliases BEFORE the room's own nouns — three
+//      lines after its own header says locations are containers,
+//      not targets. ⚠ This is OTA-1172's own bug report ("craft Blue
+//      Cap Draught" → "mountain capital"), the half it never fixed:
+//      that OTA repaired resolveItem only. Aliases now go last.
+//   5. "CLIMB FOR IT" POINTED AT AN INVISIBLE STRUCTURE. The Arbiter
+//      said "The snagged climbing cache is up on the stone bridge,
+//      tier 2. Climb for it" EIGHT times in a room whose look-around
+//      never listed a stone bridge — the display cap reserves ONE
+//      climbable slot and the wet stair won it, while perches seed
+//      off the AMBIENT pool. The owner investigated the cache eight
+//      times and tried to climb it three. Now the perch's structure
+//      is forced into the displayed set with the perch, the
+//      imperative NAMES it ("Climb the stone bridge for it"), and
+//      `climb <perch>` walks you to its structure instead of
+//      lecturing you about grip.
+//   6. THE NARRATOR COULD NOT SAY WHERE IT WAS. Three of eight
+//      ambient generations died to `off-canon-entity` naming
+//      "Etheric Engine Chamber" (the room the player was standing
+//      in) and "The Silt Wastes" (a top-level biome). The allow-list
+//      was locations.json only — 36 entries — and the whole world
+//      ladder was missing, as was the live sub-room. We told the
+//      model where it was and binned every sentence that said so, at
+//      6-11s of on-device model time each.
+//   ⚠ 7. A GIFT CLAIMED STANDING IT NEVER GRANTED. 20:46:30: a Rare
+//      Core Relic to Odar Flameforge → "Standing +2 — architectural
+//      sentinels." That is a RACE id, not a faction; applyRepChange
+//      silently no-ops on an id it does not know, the success line
+//      was logged unconditionally, and the LIFETIME gift budget was
+//      debited for it. OTA-834 remapped four such race ids in the
+//      stall roster and shipped no save migration, and a recorded
+//      factionId is sticky. Now: canonicalFactionId heals all four
+//      BEFORE the budget is touched, an unresolvable id ends the
+//      path quietly instead of lying, the line prints the faction's
+//      NAME, and a sighting heals the id in the save.
+//   8. Two coatings on one weapon printed the same expiry sentence
+//      twice ("shakes off the last of the coating"), which reads
+//      exactly like a double-emit. It names the coating now.
+// New suite ota1178SitAndGiftReturn (34 tests). Log evaluated in
+// full: 13 encounters, 63 enemy swings, 30 player swings.
+// DISPLAY_VERSION 4.29.88.
+export const OTA_BUILD_ID = '2026-08-07-1178-from-the-log';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1177-gift-mode';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1176-vendor-tastes';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1175-ready-to-hand-in';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1174-the-conversation-remembers';

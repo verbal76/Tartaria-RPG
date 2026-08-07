@@ -25,6 +25,37 @@ export function findFaction(id: string): Faction | null {
   return FACTIONS.find((f) => f.id === id) ?? null;
 }
 
+/** ⚠ OTA-1178 — RACE IDS SITTING WHERE FACTION IDS BELONG.
+ *
+ *  OTA-834 found four stall reps carrying RACE ids instead of faction ids and
+ *  remapped the ROSTER — but a save that had already met one of those vendors
+ *  keeps the bad id forever, because a recorded factionId is sticky. And
+ *  `applyRepChange` silently no-ops on an id it does not know, so every rep gain
+ *  routed through that NPC went nowhere while the game reported success. Device
+ *  log 2026-08-06T20:46:30, the owner's install: a Rare **Core Relic** handed to
+ *  Odar Flameforge, then "Standing +2 — architectural sentinels." Nothing moved,
+ *  and the gift budget was debited for it.
+ *
+ *  The mapping is OTA-834's own, quoted from engine/vendors.ts: each race id goes
+ *  to the faction that actually owns that theme. */
+const LEGACY_FACTION_ALIASES: Readonly<Record<string, string>> = {
+  architectural_sentinels: 'stone_builders',   // Sacred Architecture
+  unknowing_masses: 'conspiracy_architects',   // they keep the Unknowing Masses ignorant
+  aetherborn: 'eternal_dynasty',               // the Aetherborn Cabal
+  mud_golems: 'mud_monarchs',                  // mud
+};
+
+/** The real faction id behind `id`, healing the four legacy race ids above.
+ *  Returns null when nothing in the roster answers to it — which callers must
+ *  treat as "no standing changed", never as success. */
+export function canonicalFactionId(id: string | null | undefined): string | null {
+  const raw = (id ?? '').trim();
+  if (!raw) return null;
+  if (isKnownFactionId(raw)) return raw;
+  const mapped = LEGACY_FACTION_ALIASES[raw];
+  return mapped && isKnownFactionId(mapped) ? mapped : null;
+}
+
 /**
  * Apply a reputation change with `withFaction`, propagating ±half to
  * allies and the opposite ±half to rivals. Unknown faction refs are
