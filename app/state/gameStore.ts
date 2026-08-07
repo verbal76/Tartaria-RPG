@@ -272,6 +272,8 @@ import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats
 // OTA-1184 — the milestone step lives with the code that EXPLAINS it on the sheet,
 // so the award and the explanation can never quote different numbers.
 import { MILESTONE_KILL_STEP } from '../engine/hpBreakdown';
+// OTA-1185 — one owner for what a tile costs the clock.
+import { TILE_HOURS } from '../engine/travelTime';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
 import { applyLegacyItemRenames } from '../engine/itemMigrations';
@@ -16344,7 +16346,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (isContinueCommand(trimmed)) {
           const last = player.lastTravelDirection;
           if (last) {
-            set({ player: advanceTime(spendTravelStamina(player), 1) });
+            // ⚠ OTA-1185 — a tile costs TILE_HOURS however you asked for it. This charged
+            // 1h while the → TARGET button charged 0.25h for the identical move, so
+            // typing was 4× more expensive than tapping.
+            set({ player: advanceTime(spendTravelStamina(player), TILE_HOURS) });
             get().stepDirection(last);
           } else {
             get().appendLog(
@@ -16417,7 +16422,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // player is committed to open ground.
             break;
           }
-          set({ player: advanceTime(spendTravelStamina(player), 1) });
+          // ⚠ OTA-1185 — same tile, same price, typed or tapped. Was 1h here.
+          set({ player: advanceTime(spendTravelStamina(player), TILE_HOURS) });
           get().stepDirection(dir);
           break;
         }
@@ -26410,7 +26416,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // COURSE is already set above; a depleted player keeps the planned route (the
     // travel row shows) and is told to rest, instead of losing the route entirely.
     if (firstDir && get().player!.stamina >= STAMINA_COSTS.wander) {
-      set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), 0.25) });
+      set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), TILE_HOURS) });
       get().stepDirection(firstDir);
       // arb103 — arrival is cell-based; and ALWAYS re-plot the badge from the new
       // cell. stepDirection skips its own re-plot when the first step lands ON a
@@ -26538,7 +26544,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // v2.4.1 (OTA 053) — burn stamina + advance time per step. The
     // cost is wander (1) per tile, matching the cardinal-walk cost.
-    set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), 0.25) });
+    // ⚠ OTA-1185 — the literal 0.25 that used to sit here IS the standard, and now
+    // says so. Unchanged in value on purpose: this is the path players actually use,
+    // so it is the one every other path was pulled TOWARD, not away from.
+    set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), TILE_HOURS) });
     get().stepDirection(dir);
     // If the step landed us on the target, stepDirection's own
     // travelTo() handler clears mapX/mapY and switches currentLocationId.
@@ -26653,7 +26662,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Spend stamina + time, then take the cardinal step. stepDirection runs the
     // normal walk — encounters, whisper-beat fires, tile-novelty — so arriving on
     // the objective tile triggers the chain (e.g. fireYulkaFetch spawns the thief).
-    set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), 0.25) });
+    // ⚠ OTA-1185 — through the constant, same value. A whisper course is a tile walk.
+    set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), TILE_HOURS) });
     get().stepDirection(dir);
     const after = get().player;
     if (after && (after.mapX ?? WORLD_MAP_CENTER_X) === tgt.mapX && (after.mapY ?? WORLD_MAP_CENTER_Y) === tgt.mapY) {

@@ -73,11 +73,19 @@ describe('OTA-862 — the 24 in-game-hour deadline', () => {
     expect(bountyExpired({ ...b, acceptedAtHour: undefined }, 9999)).toBe(false);
   });
 
-  it('OTA-863 — the deadline is distance-aware: 24h base + one hour per tile', () => {
+  // ⚠ RETARGETED BY OTA-1185, NOT WEAKENED. OTA-863's CLAIM — a job budget plus a
+  // distance term, floored at the base — is unchanged and still asserted below. Only
+  // the SIZE of the distance term moved: 1h/tile was priced against walking time and
+  // ignored that a tile also costs 2 stamina, which rest repays at 1h per point. The
+  // real cost is ~2.25h/tile, rounded up to HOURS_PER_TILE_TRUE (2.5).
+  it('OTA-863 — the deadline is distance-aware: 24h job budget + honest travel per tile', () => {
     expect(bountyDeadlineFor(0)).toBe(BOUNTY_DEADLINE_HOURS);
-    expect(bountyDeadlineFor(10)).toBe(BOUNTY_DEADLINE_HOURS + 10);
-    expect(bountyDeadlineFor(31)).toBe(BOUNTY_DEADLINE_HOURS + 31);
+    expect(bountyDeadlineFor(10)).toBe(BOUNTY_DEADLINE_HOURS + 25);
+    expect(bountyDeadlineFor(31)).toBe(BOUNTY_DEADLINE_HOURS + 77.5);
     expect(bountyDeadlineFor(-5)).toBe(BOUNTY_DEADLINE_HOURS); // never below base
+    // ⚠ THE FLOOR IS THE ASSERTION. The job does not shrink with the walk — a contract
+    // on the outpost underfoot is still 3-9 kills — so the base must survive at 0 tiles.
+    expect(bountyDeadlineFor(0)).toBeGreaterThan(0);
     // A bounty carrying its own longer deadline uses it, not the 24h base.
     const far: FactionBounty = {
       giverFactionId: 'g', giverName: 'G', targetFactionId: 't', targetName: 'T',

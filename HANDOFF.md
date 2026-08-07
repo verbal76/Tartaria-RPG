@@ -1565,7 +1565,83 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE SHEET SHOWS WHERE ITS NUMBERS CAME FROM (2026-08-07, latest). HAL +
+- **⚠⚠ ONE PRICE FOR A TILE, AND A DEADLINE THAT PAYS FOR THE WALK (2026-08-07,
+  latest). HAL + GOLEM.** HAL OTA-1185 / golem OTA-1162. **steam NOT included —
+  batched (§2).** Owner, after a 23-tile bounty lapsed one kill from done: *"let's
+  make .25 the standard. let's make a mathematical variable 2.5 and let's make the
+  time 2.5 times the steps. it's just those three changes. I still want time to be
+  seen as time in the game days, hours, things like that."*
+
+  **⚠ 1. FOUR THINGS BELIEVED FOUR DIFFERENT PRICES FOR ONE TILE.** The → TARGET
+  button charged **0.25 h**; typing *"go north"* charged **1 h** for the identical
+  move; `stepDirection` itself charged **nothing** (all cost lived in callers); the
+  autoroute banner called a tile **"1 day"**. New `engine/travelTime.ts` owns
+  `TILE_HOURS = 0.25` and all **five** tile-crossing sites now spell it that way
+  (typed cardinal, `continue`, `continueTravel`, autoroute step, whisper course —
+  the last two already charged the right number by hand).
+  - ⚠ **0.25 was chosen because it is what the button already charged**, and the
+    button is the path players use. Standardising *up* to 1 h would have quadrupled
+    the rate the whole world sim advances while travelling — `hoursElapsed` drives
+    day/night, the pressure tide (prices AND difficulty), world events, faction
+    tides, NPC memory decay, story drip, race cooldowns. **Anyone playing by typing
+    was aging the world 4× faster than anyone tapping.** That is the bug.
+  - ⚠ **Seven `advanceTime(spendTravelStamina(…), 1)` sites are deliberately
+    untouched** — hub-gate exits and micro-micro room moves. None is followed by a
+    `stepDirection`, which is what defines a tile crossing. Test pins the count.
+
+  **⚠ 2. `HOURS_PER_TILE_TRUE = 2.5`, AND THE DERIVATION IS THE PART THAT WILL ROT.**
+  A tile costs 0.25 h of walking **AND 2 stamina** (`STAMINA_COSTS.travel`). Stamina
+  is only repaid by rest, and the parser rest returns `min(room, 8)` over a fixed 8
+  hours — **exactly 1 h per point**. All-in: **~2.25 h/tile**, nine times what the
+  clock visibly charges. Rounded up to 2.5 as slack.
+  - ⚠ **THE RATE DOES NOT IMPROVE WITH A BIGGER TANK.** Owner asked directly. Rest
+    pays 8 points per 8 hours regardless of `staminaMax` (floor 12 + STR/2, always
+    above 8), so 1 h/point holds at every cap. A larger tank buys a **longer
+    unbroken run** between stops, not a cheaper tile. The only real discounts are
+    identity: **Pathfinder** title (1.5 stam/tile → ~1.75 h) and **Architectural
+    Sentinel** (half → ~1.25 h).
+  - ⚠ **DO NOT RE-DERIVE THIS FROM `rest()`.** The store-method `rest()` rolls **d4**
+    stamina over **d4+3** hours while *printing* **"d6+2"** — wrong on both counts —
+    and it has **zero callers**; every typed or tapped rest hits the parser path. An
+    earlier draft of this OTA derived 2.5 from that dead code and got ~1.70 h.
+
+  **⚠ 3. THE DEADLINE IS `24 + 2.5 × tiles`, AND THE 24 IS A FLOOR, NOT PADDING.**
+  Was `24 + 1 h/tile` (OTA-863). The 24 was right; the travel term was ~9× too
+  small. Real log: 23 tiles budgeted 47 h, of which arriving consumed ~39 h. Now
+  **81.5 h**, walk ~52 h, job window ~29 h.
+  - ⚠ **A FIRST PASS REPLACED THE WHOLE FORMULA WITH A PURE MULTIPLIER AND THAT WAS
+    WRONG.** It fixed the long contract by breaking every short one: 6 tiles fell
+    30 h → 15 h for up to 9 kills, and 0 tiles gave **0 hours**. OTA-863's own test
+    said `never below base` out loud. **The JOB does not shrink because the WALK
+    did** — a contract on the outpost underfoot is still 3-9 kills. The two terms
+    measure different things and must not be collapsed: if `bountyTerms` raises
+    `count`, the 24 moves; if the map gets dearer to cross, 2.5 moves.
+
+  **⚠ HOW A BOUNTY ACTUALLY WORKS — the owner's model was right and the game never
+  said so.** `killCountsForBounty` checks **faction only, no location**. There is
+  **no turn-in**: the last kill fires `announceMissionComplete` and pays TC +
+  standing on the spot, wherever the player is standing. The named outpost is only
+  where the quarry is *dense* — kills count anywhere on the map. One corpse ticks
+  **every** matching bounty at once. Accepting flips the quarry's patrols to hunting
+  the player, skipping the usual hunt roll even at positive standing.
+  ⚠ **The contract text still reads as "go there", which is a WORDING gap, not a
+  mechanics gap — flagged to the owner, NOT changed (out of scope).**
+
+  New suite `ota1185TileTime` (14 tests). ⚠ **`ota862BountyDeadline`'s OTA-863 curve
+  test RETARGETED, not weakened** — its claim (job budget + distance term, floored at
+  the base) is unchanged and now asserts the floor explicitly; only the size of the
+  travel term moved.
+  ⚠ **Two self-inflicted test traps worth remembering.** (a) `[^)]*` in a call-site
+  regex silently walks past `get().player!`'s nested parens — it counted 2 of 5 sites
+  and 4 of 7 and read as a finding; use `.*?`. (b) A sweep for *"no bare 0.25 charge"*
+  caught **~25 skill-check and combat sites** that share the duration by coincidence —
+  a quarter hour is also what a short action costs. **Scope the assertion to what the
+  OTA actually claims:** the tile charge is the one followed by `stepDirection`.
+
+  Blocking gates green on both lines: typecheck:ci, lint, the test-typecheck ratchet,
+  the handoff-claims ratchet, and test:ci:fast (**709 suites / 6417 tests**).
+
+- **⚠⚠ THE SHEET SHOWS WHERE ITS NUMBERS CAME FROM (2026-08-07). HAL +
   GOLEM.** HAL OTA-1184 / golem OTA-1161. **steam NOT included — batched (§2).**
   Owner, on his own character sheet: *"for AC it shows your base and your buffs. HP
   just says HP not what my base number was so I can see the progression, I didn't
