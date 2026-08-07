@@ -6514,7 +6514,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const worth = sellPriceFor(item, get().currentScene?.vendor ?? null, 0);
-    const gi: GiftItem = { name: item.name, tags: item.tags ?? [], worth };
+    // ⚠ OTA-1176 — CANONICAL TAGS, NOT THE INSTANCE'S. "What KIND of thing is
+    // this?" is an IDENTITY question (§3a-F), and identity is answered by the LIVE
+    // catalog, never by the tags frozen onto the copy in your pack. Reading
+    // `item.tags` meant a months-old save judged a gift on whatever the catalog
+    // said the day that copy was minted — so a vendor's taste could quietly stop
+    // matching an item whose tags had since been re-authored. The owner's install
+    // is exactly that old, which is what makes this live rather than theoretical.
+    const gi: GiftItem = { name: item.name, tags: canonicalItemTags(item), worth };
     const out = resolveGift(g.toId, g.toName, gi, rel);
 
     get().appendLog('world', out.line);
@@ -6557,7 +6564,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   // gates the return gift alongside trusted regard.
                   giftTastes: Array.from(new Set([
                     ...(prev.giftTastes ?? []),
-                    ...tasteDiscoveries(g.toId!, gi, out.reaction),
+                    ...tasteDiscoveries(g.toId!, gi, out.reaction, g.toName ?? undefined),
                   ])),
                   lovedGifts: (prev.lovedGifts ?? 0) + (out.reaction === 'loved' ? 1 : 0),
                 },
@@ -10443,7 +10450,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // later arrival they push something back across the counter. Only the
         // authored cast carries one — a return requires tastes to have hit.
         if (rel && !rel.returnGiftGiven && npcRegard(rel) === 'trusted' && (rel.lovedGifts ?? 0) > 0) {
-          const rg = returnGiftFor(vendorNpcId(vendor));
+          const rg = returnGiftFor(vendorNpcId(vendor), vendor.name);
           const rgCat = rg ? findCatalogItem(rg.item) : null;
           if (rg && rgCat) {
             const given: InventoryItem = stampDurability({

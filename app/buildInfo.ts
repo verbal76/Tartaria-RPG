@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.85';
+export const DISPLAY_VERSION = '4.29.86';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23739,7 +23739,70 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the new shape would go green over exactly the miss this OTA
 // was about.
 // DISPLAY_VERSION 4.29.85.
-export const OTA_BUILD_ID = '2026-08-07-1175-ready-to-hand-in';
+// OTA-1176 — EVERY VENDOR HAS TASTES, AND EVERY TASTE POINTS
+// AT SOMETHING REAL. Owner: *"all vendor need a fully fledged
+// like, love and dislike list. that needs generated and it needs
+// to fit the description of who they are that you got from
+// talking to them or their stall type. And I don't want a tiny
+// list with like six items. make them fully flushed out."*
+// ⚠ THE ASK WAS THE SMALL HALF. 21 of 30 shopkeepers had no
+// tastes — but the 9 that did were mostly DEAD. Every one of them
+// named tags no item carries: ore, ingot, trinket, ration, curio,
+// mechanism, component, ember, wind, pelt, book, record, spring,
+// medicine. The author reached for words that sounded like the
+// vendor; the real vocabulary is mechanical (armor, weapon, metal,
+// food, potion, plate). Yara the wind-dealer loved `wind`. Nothing
+// is tagged `wind`. Her taste never fired once, and nothing looked
+// broken, because a taste that never matches is invisible.
+// ⚠ AND IT WAS UNREACHABLE FOR MOST OF THE CAST. Prefs were a flat
+// map keyed on the whole ledger id, which only matches the 30 fixed
+// shopkeepers. Roadside traders key `roadside:<name>`, Hidden
+// Market staff `hidden_market_<cat>:<name>`, lookout traders
+// `overlay:<name>`, wanderers `wanderer:<arch>:<name>` — 112 ids
+// for 7 archetypes. All of them fell to the generic fallback and
+// reacted on PRICE ALONE.
+// Four parts:
+//   1. THREE REAL TIERS. `disliked` is new: the schema had loves
+//      and `coldTags`, and cold resolved to 'polite' — so a smith
+//      shrugging at a pastry and a smith who actively does not want
+//      your poison read identically. ⚠ Disliked is NOT an insult:
+//      it is accepted, costs nothing, and buys nothing. 'insulted'
+//      stays reserved for sub-floor junk. Punishing a player for
+//      guessing wrong is the opposite of a system meant to reward
+//      learning who people are. Exact NAMES beat tags at every
+//      tier; dislikes sit ABOVE likes so a broad like cannot
+//      rescue something they were written to refuse.
+//   2. THE LOOKUP CHAIN: exact id -> the person by name -> their
+//      group/archetype -> generic. ⚠ Plus an ALIAS map, because
+//      twelve shopkeepers also work a Hidden Market stall under a
+//      different spelling (the shop knows `halem_trader`, the
+//      Market calls him "Halem the Trader"). Two entries for one
+//      person is two things to drift apart; aliases point at one.
+//   3. CANONICAL TAGS (§3a-F). The reaction read `item.tags` — the
+//      snapshot frozen into the save when the copy was minted —
+//      to answer an IDENTITY question. Now reads
+//      canonicalItemTags. The owner's install is months old, which
+//      is what makes this live rather than theoretical.
+//   4. 72 PROFILES + 12 ALIASES, every one validated against the
+//      catalog: 30 shopkeepers, 24 roadside traders, 4 Market stall
+//      fallbacks, 5 lookout traders, 7 wanderer archetypes.
+// ⚠ THE PICKER WOULD HAVE LIED. knownTastesLine read
+// `kind === 'loves' ? loves : 'no use for'`, so the new `likes:`
+// discoveries would have rendered as "no use for" — telling the
+// player the exact opposite of what they had just witnessed.
+// New suite ota1176VendorTastes (17 tests). Its first block is the
+// root-cause lock: every tag must exist in the live catalog and
+// every item name must be real. ⚠ Two older suites were RETARGETED
+// and this is a genuine correction, not a regression: they asserted
+// against `Iron Ingot`, `Cut Glass`, `Bead String` and the tags
+// `trinket` and `ore` — none of which exist. That is exactly why
+// the dead-taste bug survived: the tests validated fiction. Also
+// caught by the new lock: "Pavel (allegedly)" keys as
+// `overlay:pavel_allegedly_` WITH a trailing underscore, because
+// npcLedgerId's slug does not strip it.
+// DISPLAY_VERSION 4.29.86.
+export const OTA_BUILD_ID = '2026-08-07-1176-vendor-tastes';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1175-ready-to-hand-in';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1174-the-conversation-remembers';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1173-the-acid-batch';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1172-the-modifier-is-evidence';
