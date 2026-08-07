@@ -10619,7 +10619,7 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.86';
+export const DISPLAY_VERSION = '4.29.87';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23801,7 +23801,54 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `overlay:pavel_allegedly_` WITH a trailing underscore, because
 // npcLedgerId's slug does not strip it.
 // DISPLAY_VERSION 4.29.86.
-export const OTA_BUILD_ID = '2026-08-07-1176-vendor-tastes';
+// OTA-1177 — GIFT MODE, AND THE LIST THAT OFFERED WHAT IT WOULD
+// REFUSE. Owner, two asks: *"the list we pick from to give out
+// must exclude all equipped gear, armor and anything in the
+// bandolier or tool pouch. also no item that is given away would
+// break a mission or storyline beat."* and *"would it be better
+// to just have the gift button open your inventory and then you
+// can pick an item and while you are in gift mode that button
+// will be added to the pop-up menu when you tap on the item."*
+// ⚠ THE SECOND ASK IS WHAT FIXES THE FIRST. The old picker was a
+// modal listing your TWELVE most valuable items (sort by worth,
+// slice 12) — so a cheap thing a vendor specifically LOVES was
+// unofferable if you carried twelve pricier ones, which quietly
+// defeats the taste system OTA-1176 had just built. It also
+// listed worn armour and then refused the tap. Both are one
+// fault: a SECOND place deciding what you may give.
+//   1. NEW engine/giftEligibility.giftBlockReason — one answer,
+//      asked twice: the inventory asks before drawing GIVE, the
+//      store asks again before moving anything. Blocks worn gear
+//      (via wornInstanceIds, so the DOG's vest counts too),
+//      bandolier, tool pouch, Crucible reservations, quest-locked
+//      items, and — the real mission-breaker — ordinary catalog
+//      items an accepted FETCH contract is waiting on, which
+//      carry no lock flag at all and just make the contract
+//      uncompletable if you hand over your last one.
+//   ⚠ The OTA-1116 guard it replaces matched by NAME, so a SECOND
+//      identical locket was refused because the FIRST was worn.
+//      giftBlockReason is instance-id exact.
+//   2. GIFT MODE: the button opens the pack with the recipient
+//      remembered, a green banner says who you are giving to and
+//      how to back out, and GIVE leads the item's own popup. The
+//      twelve-item cap is gone with the old modal; GiftModal is
+//      now a recipient picker and appears only when more than one
+//      person is present.
+//   3. BUTTONS FOR EVERYONE. The only GIFT button in the game sat
+//      inside the vendor chip, which was gated `location.id !==
+//      'hidden_market'` — so every Hidden Market face was
+//      ungiftable by button, including twelve shopkeepers who
+//      work a Market stall and had tastes authored for them in
+//      1176. Wanderers had no button either, though all seven
+//      archetypes have tastes and openGift always accepted them.
+//      Market exclusion removed; wanderer chip gets its own GIFT.
+// New suite ota1177GiftMode (12 tests). ⚠ ota1116's gift lock was
+// RETARGETED, not broken: its claim (refuse before the decrement)
+// is unchanged and still asserted; it had pinned the old guard's
+// literal string, which no longer exists.
+// DISPLAY_VERSION 4.29.87.
+export const OTA_BUILD_ID = '2026-08-07-1177-gift-mode';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1176-vendor-tastes';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1175-ready-to-hand-in';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1174-the-conversation-remembers';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-06-1173-the-acid-batch';

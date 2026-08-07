@@ -744,7 +744,12 @@ export function ExplorationScreen() {
           banner; they now sit two-across as short chips, so four stacked banners
           become one row and the feed keeps the height. */}
       <View style={styles.placeChipRow}>
-      {currentScene?.vendor && !inCombat && !activeBuildingId && !vendorChipDismissed && currentScene?.location?.id !== 'hidden_market' && (
+      {/* ⚠ OTA-1177 — the Hidden Market exclusion is GONE from this chip's gate.
+          It hid the whole vendor chip there, and the GIFT button lives inside it,
+          so every Market face was ungiftable by button — including the twelve
+          shopkeepers who work a Market stall and had tastes written for them.
+          Typing "gift" always reached them; the affordance never did. */}
+      {currentScene?.vendor && !inCombat && !activeBuildingId && !vendorChipDismissed && (
         <TouchableOpacity
           style={[styles.placeChip, styles.vendorChip]}
           onPress={() => setScreen('vendor')}
@@ -875,6 +880,22 @@ export function ExplorationScreen() {
             <Text style={styles.wandererName} numberOfLines={1}>☺ {currentScene.wanderer.name}</Text>
             <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.wanderer.role} · tap to speak</Text>
           </View>
+          {/* ⚠ OTA-1177 — GIFT reaches the wanderer now. They were always a valid
+              recipient (openGift reads talkablePeople, which includes them) and
+              all seven archetypes have authored tastes, but the only GIFT button
+              in the game sat on the VENDOR chip — so the affordance existed for
+              shopkeepers and nobody else. Stops propagation so the chip's own
+              tap-to-speak does not also fire. */}
+          <TouchableOpacity
+            style={styles.placeChipTalk}
+            onPress={(e) => { e.stopPropagation(); useGameStore.getState().openGift(); }}
+            hitSlop={8}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Give a gift to ${currentScene.wanderer.name}`}
+          >
+            <Text style={styles.placeChipTalkText}>GIFT</Text>
+          </TouchableOpacity>
           <Text style={styles.placeChipArrow}>›</Text>
         </TouchableOpacity>
       )}

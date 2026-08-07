@@ -1124,8 +1124,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1176`**,
-**golem-line `2026-08-07-1153`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1177`**,
+**golem-line `2026-08-07-1154`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1134,7 +1134,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.86**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.87**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1353,7 +1353,51 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ VENDOR TASTES (2026-08-07, latest). ALL THREE LINES.** HAL OTA-1176 /
+- **⚠⚠ GIFT MODE (2026-08-07, latest). ALL THREE LINES.** HAL OTA-1177 /
+  golem OTA-1154 / steam merged. Owner, two asks in one message: *"the list we
+  pick from to give out must exclude all equipped gear, armor and anything in the
+  bandolier or tool pouch. also no item that is given away would break a mission
+  or storyline beat."* and *"would it be better to just have the gift button open
+  your inventory and then you can pick an item and while you are in gift mode that
+  button will be added to the pop-up menu when you tap on the item."*
+
+  ⚠ **THE SECOND ASK IS WHAT FIXES THE FIRST.** The old picker was a modal listing
+  your TWELVE most valuable items (`sort by worth`, `slice(0, 12)`). A cheap thing
+  a vendor specifically LOVES was therefore **unofferable** if you carried twelve
+  pricier ones — which quietly defeats the taste system OTA-1176 had just built.
+  It also listed worn armour and then refused the tap. Both are one fault: a
+  SECOND place deciding what you may give.
+
+  **1 — `engine/giftEligibility.giftBlockReason`: one answer, asked twice.** The
+  inventory asks before drawing GIVE; the store asks again before moving anything.
+  Blocks worn gear (through `wornInstanceIds`, so the DOG's vest counts too), the
+  bandolier, the tool pouch, Crucible reservations, quest-locked items, and — the
+  real mission-breaker — **ordinary catalog items an accepted FETCH contract is
+  waiting on**, which carry no lock flag at all and simply make the contract
+  uncompletable if you hand over your last one.
+  ⚠ **The OTA-1116 guard it replaces matched by NAME**, so a SECOND identical
+  locket was refused because the FIRST was worn, and it knew nothing about the
+  pouches, reservations or fetches. `giftBlockReason` is instance-id exact.
+
+  **2 — GIFT MODE.** The button opens the pack with the recipient remembered, a
+  green banner names them and offers a way out, and GIVE leads the item's own
+  popup. The twelve-item cap dies with the old modal. `GiftModal` is now a
+  RECIPIENT picker only, and appears only when more than one person is present.
+
+  **3 — BUTTONS FOR EVERYONE.** The only GIFT button in the game sat inside the
+  vendor chip, which was gated `location.id !== 'hidden_market'` — so **every
+  Hidden Market face was ungiftable by button**, including the twelve shopkeepers
+  who also work a Market stall and had tastes authored for them the OTA before.
+  Wanderers had no button either, though all seven archetypes have tastes and
+  `openGift` always accepted them. Market exclusion removed; the wanderer chip has
+  its own GIFT.
+
+  New suite `ota1177GiftMode` (12 tests). ⚠ **`ota1116`'s gift lock was RETARGETED,
+  not broken:** its claim — refuse before the inventory decrement — is unchanged and
+  still asserted. It had pinned the old guard's literal refusal string, which no
+  longer exists.
+
+- **⚠⚠ VENDOR TASTES (2026-08-07). ALL THREE LINES.** HAL OTA-1176 /
   golem OTA-1153 / steam merged. Owner: *"all vendor need a fully fledged like,
   love and dislike list ... it needs to fit the description of who they are that
   you got from talking to them or their stall type. And I don't want a tiny list
