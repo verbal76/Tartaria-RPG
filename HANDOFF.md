@@ -3,34 +3,43 @@
 **You are on `main`. Do NOT develop here.** `main` is an (essentially empty)
 base/PR-target branch. Real work happens on one of the lines below.
 
-## The three lines you keep CURRENT (owner directive, 2026-08-07)
+## The lines, and the order of a pass (owner directive, 2026-08-07)
 
 Owner, verbatim: *"hal is the live branch that my testers have access to, golem is
 the testing ground for big changes, steam line stays up to date for my PC testing
 and possible steam submissions. so unless there is a high chance we are doing game
 braking changes keep all 3 current."*
 
-So the default is **not** "pick one line" — it is **ship to all three in the same
-pass**, per-line OTA bumps, one commit + push per line. Fork to golem alone only
-when a change has a high chance of breaking the game; that is a HIGH bar.
+…and, **amended later the same day**: *"you can stack updates for the exe and we
+can do an update and push when a full exe is needed. we still push Hal first and
+then port to golem."*
 
-1. **`HaL2001` — the LIVE game, at testers.** A push here publishes an OTA to their
-   devices (channels `hal2001` + `preview` + `ios-preview`). Treat it as
-   production. **Device logs come from here almost always.**
+**So a pass is TWO lines, in this order: `HaL2001` FIRST, then port to
+`golem-line`.** Per-line OTA bumps, one commit + push per line. Fork to golem alone
+only when a change has a high chance of breaking the game; that is a HIGH bar.
+**`steam_Dev` is BATCHED** — it accumulates and comes up in one merge when the
+owner wants an `.exe`.
+
+1. **`HaL2001` — the LIVE game, at testers.** Push here FIRST. A push publishes an
+   OTA to their devices (channels `hal2001` + `preview` + `ios-preview`). Treat it
+   as production. **Device logs come from here almost always.**
 
 2. **`golem-line` — the testing ground for BIG changes.** When a major,
    potentially engine-breaking change begins, development forks onto golem so
-   production Tartaria is never at risk. Otherwise it stays CURRENT with HAL in the
-   same pass, so the fork point is never stale. Separate app id/channel
+   production Tartaria is never at risk. Otherwise it is ported right after HAL in
+   the same pass, so the fork point is never stale. Separate app id/channel
    (`golem-line`); installs side-by-side. Parity offset: **golem = HAL − 23.**
 
-3. **`steam_Dev` — the PC line: the owner's PC testing and possible Steam
-   submission path.** Kept current in the same pass (promoted from "downstream
-   packaging, topped up on request" on 2026-08-07). Windows/Electron via
-   `build-steam-exe.yml`; updates ship through the Steam depot, **not** OTA — a
-   push to `steam_Dev` publishes nothing to any device. It is also the PR base for
-   `mac_dev`, `html_dev` and `linux_dev`, so leaving it behind while its children
-   are current inverts the tree.
+3. **`steam_Dev` — the PC line, BATCHED: the owner's PC testing and possible Steam
+   submission path.** ⚠ It was briefly promoted to a standing per-pass line on
+   2026-08-07 and demoted again hours later — an `.exe` only matters when the owner
+   sits down to test on PC, so topping it up every OTA spent CI on an artifact
+   nobody was going to run. **Bring it up as a single merge of `HaL2001`'s current
+   tip when an `.exe` is wanted, and do not poll its build** — the owner watches
+   those. Windows/Electron via `build-steam-exe.yml`; updates ship through the
+   Steam depot, **not** OTA — a push to `steam_Dev` publishes nothing to any
+   device. It is also the PR base for `mac_dev`, `html_dev` and `linux_dev`, so it
+   should not be left arbitrarily far behind — catch it up when you build.
 
 ## ⛔ `engine_Dev` is OFF LIMITS
 
