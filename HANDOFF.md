@@ -1126,7 +1126,7 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1175`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1176`**,
 **golem-line `2026-08-03-1083`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1136,7 +1136,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.85**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.86**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1342,7 +1342,74 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ READY TO HAND IN (2026-08-07, latest). BOTH LINES.** golem OTA-1152 /
+- **⚠⚠ VENDOR TASTES (2026-08-07, latest). ALL THREE LINES.** golem OTA-1153 /
+  HAL OTA-1176 / steam merged. Owner: *"all vendor need a fully fledged like,
+  love and dislike list ... it needs to fit the description of who they are that
+  you got from talking to them or their stall type. And I don't want a tiny list
+  with like six items. make them fully flushed out."*
+
+  ⚠ **THE ASK WAS THE SMALL HALF — THE FEATURE WAS ALREADY MOSTLY DEAD.** 21 of 30
+  shopkeepers had no tastes, but the 9 that did named tags **no item in the game
+  carries**: `ore`, `ingot`, `trinket`, `ration`, `curio`, `mechanism`,
+  `component`, `ember`, `wind`, `pelt`, `book`, `record`, `spring`, `medicine`.
+  The real vocabulary is mechanical (`armor`, `plate`, `metal`, `food`, `potion`).
+  Yara the wind-dealer loved `wind`; nothing is tagged `wind`. **Her taste never
+  fired once, and nothing looked broken, because a taste that never matches is
+  invisible.** (Verified 2026-08-07 by a tag census over `app/data/items/**`.)
+
+  ⚠ **AND IT WAS UNREACHABLE FOR MOST OF THE CAST.** Prefs were a flat map keyed on
+  the whole ledger id, which only matches the 30 fixed shopkeepers. Roadside
+  traders key `roadside:<name>`, Hidden Market staff `hidden_market_<cat>:<name>`,
+  lookout traders `overlay:<name>`, wanderers `wanderer:<arch>:<name>` — 112 ids
+  for 7 archetypes. Every one of them fell to the generic fallback and reacted on
+  PRICE ALONE.
+
+  **1 — THREE REAL TIERS.** `disliked` is a new reaction. The schema had loves and
+  `coldTags`, and cold resolved to `polite`, so a smith shrugging at a pastry and a
+  smith who actively refuses your poison read identically. ⚠ **Disliked is NOT an
+  insult:** accepted, costs nothing, buys nothing. `insulted` stays reserved for
+  sub-`GIFT_FLOOR_TC` junk. Punishing a player for guessing wrong is the opposite of
+  a system meant to reward learning who people are. Exact NAMES beat tags at every
+  tier, and dislikes sit ABOVE likes so a broad like cannot rescue something the
+  same person was written to refuse.
+
+  **2 — THE LOOKUP CHAIN:** exact id → the person by name slug → their
+  group/archetype → generic. Plus an **alias map**: twelve shopkeepers also work a
+  Hidden Market stall under a different spelling (the shop knows `halem_trader`,
+  the Market calls him "Halem the Trader"). ⚠ Two entries for one person is two
+  things to keep in sync and they WILL drift — aliases point at one canonical
+  profile, and the suite asserts an alias can never also be a duplicate entry.
+
+  **3 — CANONICAL TAGS (§3a-F).** The reaction read `item.tags` — the snapshot
+  frozen into the save when that copy was minted — to answer an IDENTITY question.
+  Now reads `canonicalItemTags`. The owner's install is months old, which is what
+  makes this live rather than theoretical.
+
+  **4 — 72 PROFILES + 12 ALIASES:** 30 shopkeepers, 24 roadside traders, 4 Market
+  stall fallbacks, 5 lookout traders, 7 wanderer archetypes.
+
+  ⚠ **THE PICKER WOULD HAVE LIED.** `knownTastesLine` in GiftModal read
+  `kind === 'loves' ? loves : 'no use for'`, so the moment `likes:` discoveries
+  existed they would have rendered as "no use for" — telling the player the exact
+  opposite of what they had just witnessed. `cold:` is the pre-1176 spelling of
+  `dislikes:` and still sits in old saves' ledgers, so it is READ rather than
+  migrated.
+
+  New suite `ota1153VendorTastes` (17 tests). Its first block is the root-cause
+  lock: every authored tag must exist in the live catalog and every item name must
+  be real. ⚠ **Two older suites were RETARGETED, and that is a correction rather
+  than a regression** — `ota1060Gifting` and `ota1083GiftEconomy` asserted against
+  `Iron Ingot`, `Cut Glass`, `Bead String` and the tags `trinket` and `ore`, none of
+  which exist. **That is exactly why the dead-taste bug survived: the tests
+  validated fiction.** Fixtures use REAL catalog items now (§3a-D).
+
+  ⚠ **A SLUG TRAP THE NEW LOCK CAUGHT:** "Pavel (allegedly)" keys as
+  `overlay:pavel_allegedly_` — WITH a trailing underscore — because `npcLedgerId`'s
+  slug replaces non-alphanumeric runs and does NOT strip the trailing one. Content
+  authored against a hand-rolled slug missed it; the test uses `npcLedgerId` itself,
+  which is the only way to be right about this.
+
+- **⚠⚠ READY TO HAND IN (2026-08-07). BOTH LINES.** golem OTA-1152 /
   HAL OTA-1175. Owner: *"also under contracts you have sort by distance and when
   I click on it it says you know grouped so each group sorts by distance. I want
   another sort button there. same style as that. just put it to the right of it and

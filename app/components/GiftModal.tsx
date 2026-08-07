@@ -26,7 +26,15 @@ function knownTastesLine(tastes: readonly string[] | undefined): string | null {
   if (!tastes || tastes.length === 0) return null;
   const phrased = tastes.map((t) => {
     const [kind, subject] = [t.slice(0, t.indexOf(':')), t.slice(t.indexOf(':') + 1)];
-    return kind === 'loves' ? `loves ${subject}` : `no use for ${subject}`;
+    // ⚠ OTA-1153 — THREE TIERS NOW, AND THE ELSE-BRANCH USED TO SWALLOW THEM.
+    // This was `kind === 'loves' ? loves : 'no use for'`, so the moment `likes:`
+    // discoveries existed they would have rendered as "no use for" — the picker
+    // telling the player the exact opposite of what they had just witnessed.
+    // `cold:` is the pre-OTA-1153 spelling of `dislikes:` and still sits in old
+    // saves' ledgers, so it is read here rather than migrated.
+    if (kind === 'loves') return `loves ${subject}`;
+    if (kind === 'likes') return `likes ${subject}`;
+    return `no use for ${subject}`;
   });
   return `You know of them: ${phrased.join(' · ')}.`;
 }

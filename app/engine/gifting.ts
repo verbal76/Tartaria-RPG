@@ -67,14 +67,35 @@ export const STANDING_INSULT = 2;
  *  (OTA-1053 regardPriceMult), and it cannot cascade to anybody else. */
 export const GIFT_STANDING_FACTION_CAP = 10;
 
-export type GiftReaction = 'loved' | 'liked' | 'polite' | 'insulted';
+/** OTA-1153 — 'disliked' is a NEW tier between polite and insulted. The owner
+ *  asked for like / love / DISLIKE lists, and the schema had no dislike: the old
+ *  `coldTags` resolved to 'polite', which is what an item they have no opinion
+ *  about gets. So a smith shrugging at a pastry and a smith who actively does not
+ *  want your poison read identically.
+ *  ⚠ DISLIKED IS NOT AN INSULT, deliberately. 'insulted' is reserved for anything
+ *  under GIFT_FLOOR_TC — the bent-nail case — and it REFUSES the gift and costs
+ *  standing. A disliked gift is still accepted and still costs you nothing: they
+ *  simply take no pleasure in it and it buys no warmth. Making dislike cost
+ *  standing would punish a player for guessing wrong about somebody's taste,
+ *  which is the opposite of a system meant to reward learning who people are. */
+export type GiftReaction = 'loved' | 'liked' | 'disliked' | 'polite' | 'insulted';
 
 interface GiftPref {
   /** Item tags this person is delighted by. */
   lovesTags?: string[];
   /** Exact item names they are delighted by — sharper than a tag. */
   lovesItems?: string[];
-  /** Tags they have no use for. Not an insult; just a shrug. */
+  /** OTA-1153 — the MIDDLE tier: things that suit them without delighting them.
+   *  Before this, 'liked' could only be reached by raw price (>= 6x the floor),
+   *  so a cheap thing perfectly matched to somebody's trade was a shrug while any
+   *  expensive thing was a win. That made the whole system a price check wearing
+   *  a personality. */
+  likesTags?: string[];
+  likesItems?: string[];
+  /** OTA-1153 — things they actively do not want. */
+  dislikesTags?: string[];
+  dislikesItems?: string[];
+  /** Legacy name for dislikesTags, still read so old data keeps working. */
   coldTags?: string[];
   /** OTA-1083 — the one-time return gift at trusted: the item they push
    *  across the counter, and the words they do it with. Only the authored
@@ -84,15 +105,67 @@ interface GiftPref {
   /** Said when they love it. `{item}` is replaced. */
   lovedLine?: string;
   likedLine?: string;
+  /** OTA-1153 — said when it is something they actively did not want. */
+  dislikeLine?: string;
   politeLine?: string;
   insultLine?: string;
 }
 
 const PREFS = (rawPrefs as { npcs: Record<string, GiftPref>; fallback: GiftPref }).npcs;
 const FALLBACK = (rawPrefs as { fallback: GiftPref }).fallback;
+/** OTA-1153 — ONE PERSON, TWO NAMES. Five shopkeepers also work a Hidden Market
+ *  stall, and the Market spells some of them differently: the shop knows
+ *  `halem_trader`, the Market calls him "Halem the Trader", which slugs to
+ *  `halem_the_trader`. Without this map those are two strangers who happen to
+ *  look alike, and the two taste lists drift apart the first time one is edited.
+ *  Aliases point the spelling at the canonical entry — never a second copy. */
+const ALIASES = ((rawPrefs as { aliases?: Record<string, string> }).aliases ?? {});
 
-export function giftPrefFor(npcId: string): GiftPref {
-  return PREFS[npcId] ?? FALLBACK;
+/** OTA-1153 — THE LOOKUP CHAIN, and why a flat map could never have covered the cast.
+ *
+ *  Ledger ids are not all authored constants (see npcLedgerId). Fixed shopkeepers
+ *  key as `irma_ironhand`, but roadside traders key as `roadside:<name>`, Hidden
+ *  Market staff as `hidden_market_<category>:<name>`, lookout traders as
+ *  `overlay:<name>`, and wanderers as `wanderer:<archetype>:<name>`. A flat map
+ *  keyed on the whole id reached the 30 fixed shopkeepers and NOBODY ELSE — every
+ *  roadside stall, every Market stall and all 112 possible wanderers fell to the
+ *  generic fallback and reacted on price alone.
+ *
+ *  ⚠ AND THE SAME PERSON HAD TWO IDENTITIES. Halem, Bran, Tarek, Silvan and Mara
+ *  work both their own shop and a Hidden Market stall, under different ids. Two
+ *  entries for one person is two things to keep in sync, and they WILL drift — so
+ *  the chain falls back to the person's NAME, and one entry covers them wherever
+ *  they are standing.
+ *
+ *  Order, most specific first:
+ *    1. the exact ledger id            — `irma_ironhand`, `roadside:grit_maalen`
+ *    2. the person, by name slug       — `halem the trader` -> `halem_the_trader`
+ *    3. the group / archetype          — `wanderer:tinker`, `hidden_market_food`
+ *    4. the generic fallback           — price only, no tastes
+ *
+ *  112 wanderer ids collapse to 7 archetype entries this way, which is the right
+ *  granularity: the archetype is the person, the first name is a coin flip. */
+export function giftPrefFor(npcId: string, npcName?: string): GiftPref {
+  const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  const deref = (k: string): GiftPref | null => {
+    const target = ALIASES[k] ?? k;
+    return PREFS[target] ?? null;
+  };
+  const direct = deref(npcId);
+  if (direct) return direct;
+  // 2 — the person themselves, however you met them.
+  const tail = npcId.includes(':') ? npcId.slice(npcId.lastIndexOf(':') + 1) : '';
+  if (tail) { const p = deref(tail); if (p) return p; }
+  if (npcName) { const p = deref(slug(npcName)); if (p) return p; }
+  // 3 — the group they belong to. `wanderer:tinker:corin` -> `wanderer:tinker`,
+  // then `hidden_market_food:halem` -> `hidden_market_food`, then `roadside:x` ->
+  // `roadside`. Longest prefix first so an archetype beats a bare group.
+  const parts = npcId.split(':');
+  for (let take = parts.length - 1; take >= 1; take--) {
+    const p = deref(parts.slice(0, take).join(':'));
+    if (p) return p;
+  }
+  return FALLBACK;
 }
 
 export interface GiftItem {
@@ -111,14 +184,32 @@ export function giftBoonsUsed(rel: NpcRelation | null | undefined): number {
   return rel?.giftBoons ?? 0;
 }
 
-/** The reaction, before any decay. Pure function of who they are and what it is. */
-export function reactionFor(npcId: string, item: GiftItem): GiftReaction {
+/** OTA-1153 — every tag/name test in this file goes through these two, so a
+ *  casing or whitespace difference cannot make one tier match where another
+ *  would not. */
+const hasTag = (list: string[] | undefined, tags: string[]) =>
+  (list ?? []).some((t) => tags.includes(t.trim().toLowerCase()));
+const isNamed = (list: string[] | undefined, name: string) =>
+  (list ?? []).some((n) => n.trim().toLowerCase() === name.trim().toLowerCase());
+
+/** The reaction, before any decay. Pure function of who they are and what it is.
+ *
+ *  ⚠ ORDER IS THE DESIGN. Exact NAMES beat tags at every tier, because a named
+ *  favourite is the sharper statement about a person. Then loves, then dislikes,
+ *  then likes: dislikes sit ABOVE likes so a broad `likesTags` cannot rescue
+ *  something the same person was written to not want. Price is the LAST word and
+ *  only for items nobody has an opinion about — before OTA-1153 it was effectively
+ *  the only word, which made the whole system a price check in a costume. */
+export function reactionFor(npcId: string, item: GiftItem, npcName?: string): GiftReaction {
   if (item.worth < GIFT_FLOOR_TC) return 'insulted';
-  const p = giftPrefFor(npcId);
-  const tags = item.tags.map((t) => t.toLowerCase());
-  if ((p.lovesItems ?? []).some((n) => n.toLowerCase() === item.name.toLowerCase())) return 'loved';
-  if ((p.lovesTags ?? []).some((t) => tags.includes(t.toLowerCase()))) return 'loved';
-  if ((p.coldTags ?? []).some((t) => tags.includes(t.toLowerCase()))) return 'polite';
+  const p = giftPrefFor(npcId, npcName);
+  const tags = item.tags.map((t) => t.trim().toLowerCase());
+  if (isNamed(p.lovesItems, item.name)) return 'loved';
+  if (isNamed(p.dislikesItems, item.name)) return 'disliked';
+  if (isNamed(p.likesItems, item.name)) return 'liked';
+  if (hasTag(p.lovesTags, tags)) return 'loved';
+  if (hasTag(p.dislikesTags ?? p.coldTags, tags)) return 'disliked';
+  if (hasTag(p.likesTags, tags)) return 'liked';
   // Something genuinely valuable is welcome from anybody, whatever their trade.
   return item.worth >= GIFT_FLOOR_TC * 6 ? 'liked' : 'polite';
 }
@@ -142,10 +233,10 @@ export function resolveGift(
   item: GiftItem,
   rel: NpcRelation | null | undefined,
 ): GiftOutcome {
-  const p = giftPrefFor(npcId);
+  const p = giftPrefFor(npcId, npcName);
   const say = (tpl: string | undefined, fallback: string) =>
     (tpl ?? fallback).replace(/\{item\}/g, item.name).replace(/\{npc\}/g, npcName);
-  const reaction = reactionFor(npcId, item);
+  const reaction = reactionFor(npcId, item, npcName);
 
   if (reaction === 'insulted') {
     // ⚠ REFUSED, not accepted-and-ignored. If a worthless gift were taken, a
@@ -162,12 +253,15 @@ export function resolveGift(
   const capped = giftBoonsUsed(rel) >= GIFT_BOONS_PER_PERSON;
   // The second identical present is not a surprise, and the fifth is a habit.
   const decayed = already > 0 && Math.pow(REPEAT_DECAY, already) < 0.3;
-  const counts = !capped && !decayed && reaction !== 'polite';
+  // ⚠ 'disliked' joins 'polite' here: accepted, remembered, but it buys nothing.
+  // A gift they did not want is not a boon, and it is not a punishment either.
+  const counts = !capped && !decayed && reaction !== 'polite' && reaction !== 'disliked';
 
   const standingDelta = !counts ? 0 : reaction === 'loved' ? STANDING_LOVED : STANDING_LIKED;
   const base =
     reaction === 'loved' ? say(p.lovedLine, `${npcName} takes the {item} carefully. "This — yes. Thank you."`)
     : reaction === 'liked' ? say(p.likedLine, `${npcName} weighs the {item} and nods. "That is a good thing to be given."`)
+    : reaction === 'disliked' ? say(p.dislikeLine, `${npcName} takes the {item} without much enthusiasm. "It is not really my sort of thing. But thank you."`)
     : say(p.politeLine, `${npcName} accepts the {item} politely. It goes under the counter and you suspect it stays there.`);
 
   const suffix = capped
@@ -199,23 +293,31 @@ export const GIFT_PREF_NPC_IDS = Object.keys(PREFS);
  *  POLITE reaction on a matched cold tag reveals the shrug. Returns ledger
  *  entries like 'loves:metal', 'loves:Aether Mud', 'cold:food' — the gift
  *  picker shows what has been WITNESSED, never the authored list itself. */
-export function tasteDiscoveries(npcId: string, item: GiftItem, reaction: GiftReaction): string[] {
-  const p = giftPrefFor(npcId);
-  const tags = item.tags.map((t) => t.toLowerCase());
+export function tasteDiscoveries(npcId: string, item: GiftItem, reaction: GiftReaction, npcName?: string): string[] {
+  const p = giftPrefFor(npcId, npcName);
+  const tags = item.tags.map((t) => t.trim().toLowerCase());
   const found: string[] = [];
   if (reaction === 'loved') {
-    if ((p.lovesItems ?? []).some((n) => n.toLowerCase() === item.name.toLowerCase())) found.push(`loves:${item.name}`);
-    for (const t of p.lovesTags ?? []) if (tags.includes(t.toLowerCase())) found.push(`loves:${t}`);
+    if (isNamed(p.lovesItems, item.name)) found.push(`loves:${item.name}`);
+    for (const t of p.lovesTags ?? []) if (tags.includes(t.trim().toLowerCase())) found.push(`loves:${t}`);
   }
-  if (reaction === 'polite') {
-    for (const t of p.coldTags ?? []) if (tags.includes(t.toLowerCase())) found.push(`cold:${t}`);
+  // OTA-1153 — the middle and negative tiers are learnable too. Without this the
+  // picker could only ever show what somebody LOVES, so a player had no way to
+  // record "asked, and they did not want it" except by remembering it themselves.
+  if (reaction === 'liked') {
+    if (isNamed(p.likesItems, item.name)) found.push(`likes:${item.name}`);
+    for (const t of p.likesTags ?? []) if (tags.includes(t.trim().toLowerCase())) found.push(`likes:${t}`);
+  }
+  if (reaction === 'disliked') {
+    if (isNamed(p.dislikesItems, item.name)) found.push(`dislikes:${item.name}`);
+    for (const t of p.dislikesTags ?? p.coldTags ?? []) if (tags.includes(t.trim().toLowerCase())) found.push(`dislikes:${t}`);
   }
   return found;
 }
 
 /** OTA-1083 — the authored return gift, if this person has one. */
-export function returnGiftFor(npcId: string): { item: string; line: string } | null {
-  const p = giftPrefFor(npcId);
+export function returnGiftFor(npcId: string, npcName?: string): { item: string; line: string } | null {
+  const p = giftPrefFor(npcId, npcName);
   if (!p.returnGift) return null;
   return { item: p.returnGift, line: p.returnGiftLine ?? 'They push something across the counter. "No charge. You have been good to me."' };
 }
