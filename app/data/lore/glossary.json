@@ -28,7 +28,7 @@
     {
       "id": "faction_points",
       "term": "Faction Points (FP)",
-      "definition": "A game mechanic representing loyalty to specific factions, earned by completing faction-specific tasks. FP can be exchanged for exclusive gear, access to restricted areas, or new abilities within that faction. Tracked in-game as faction standing."
+      "definition": "A game mechanic representing where a faction holds you, earned by completing their contracts, hunts and mysteries, by gifts, by returning their sigils, and by trade. It is never exchanged or spent — it is a threshold you stand above, and it stays where you left it. High enough and their gear, their restricted holdings and their deeper work open to you; 20 lets you join. Low enough and it turns: below zero their patrols will engage you, and at −25 they hunt you on their own ground. Tracked in-game as faction standing."
     },
     {
       "id": "blinded",

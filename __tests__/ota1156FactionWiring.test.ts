@@ -248,12 +248,24 @@ describe('OTA-1156 — honest custom is not confiscated', () => {
     // Every roadside trader has `faction: null`, so crossing 500 TC at one used to
     // burn 500 TC of accumulated credit and grant nothing — permanently, because
     // the pool does not refund. Same loss at REP_MAX.
-    const i = STORE.indexOf('const BUY_REP_TC_PER_STANDING = 500;');
-    const block = STORE.slice(i, i + 2600);
+    // ⚠ OTA-1158 RETARGET, NOT A REGRESSION. This used to anchor its slice on
+    // `const BUY_REP_TC_PER_STANDING = 500;` — a function-local declaration that
+    // OTA-1158 promoted to engine/factions.ts so the character sheet could state
+    // the rule instead of printing a second copy of the number. The claim being
+    // asserted (the pool is debited only when the grant lands) is unchanged and is
+    // still asserted in full; only the anchor moved, onto the pool arithmetic
+    // itself, which is the thing this test is actually about and cannot relocate
+    // without the behaviour relocating with it.
+    const i = STORE.indexOf('const buyRepPool = (player.buyRepProgress ?? 0) + totalCost;');
     expect(i).toBeGreaterThan(0);
+    const block = STORE.slice(i, i + 2600);
     expect(block).toContain('const buyRepLanded = repResult.changed.length > 0;');
     expect(block).toContain('const nextBuyRepProgress = buyRepLanded');
-    expect(block).toContain('canonicalFactionId(scene.vendor.faction)');
+    expect(STORE).toContain('canonicalFactionId(scene.vendor.faction)');
+    // and the constant still exists, at its new single home
+    expect(read('app', 'engine', 'factions.ts'))
+      .toContain('export const BUY_REP_TC_PER_STANDING = 500;');
+    expect(STORE).toContain('BUY_REP_TC_PER_STANDING, // OTA-1158');
   });
 
   it('the roadside vendors this protects really do have no faction', () => {

@@ -10,12 +10,17 @@ import { useGameStore, effectiveACBreakdown, playerArmorResistKinds } from '../s
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
-import { JOIN_THRESHOLD } from '../engine/factions';
+import { JOIN_THRESHOLD, BUY_REP_TC_PER_STANDING } from '../engine/factions';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
 // OTA-1066 — Phase 4 difficulty, and the only place it can be eased.
 import {
   PRESET_TIERS, PRESSURE_PROFILES, pressureOf, canChangeTo,
+  // ⚠ OTA-1158 — the REAL hunting line, not a copy of it. This screen has form
+  // for hardcoding a threshold next to a comment citing the constant (see the
+  // OTA-1156 note below); the whole point of the new warning is that it agrees
+  // with the code that acts on it.
+  HOSTILE_STANDING,
 } from '../engine/pressure';
 // OTA-1067 — Phase 5: where the Arbiter stands, and what he thinks of you.
 import { arbiterSheetLines } from '../engine/arbiterPersona';
@@ -404,11 +409,17 @@ export function CharacterScreen() {
             saw rep changes log in the world feed and asked "shouldn't
             I see that on my character page?" Lists every faction the
             player has any standing in, sorted highest first. The join
-            threshold is +20 (per JOIN_THRESHOLD in engine/factions.ts);
-            shows a checkmark on factions the player qualifies to join.
+            threshold is JOIN_THRESHOLD (engine/factions.ts) — read, not
+            copied, since OTA-1156; shows a checkmark on factions the
+            player qualifies to join.
             Each faction's standing gates quest / hunt / mystery /
             storyline visibility via minRep; high standing means more
-            contracts surface from that faction's vendors. */}
+            contracts surface from that faction's vendors.
+            ⚠ OTA-1158 — and it runs the OTHER way too, which this panel
+            never said. Below 0 a faction's patrols engage; at
+            HOSTILE_STANDING they hunt you on their ground. That end now
+            gets a ☠/⚠ tag per row and a warning line under the list,
+            both off the real constants. */}
         {sectionHeader('factions', 'FACTION STANDINGS')}
         {!collapsed.factions && (
         <View style={styles.card}>
@@ -432,6 +443,17 @@ export function CharacterScreen() {
               // rule they claim to show if the threshold ever moved.
               const qualifies = standing >= JOIN_THRESHOLD;
               const isOwn = row.factionId === player.factionId;
+              // ⚠ OTA-1158 — THE DANGEROUS END OF THIS NUMBER GETS A WORD, NOT JUST A
+              // COLOUR. The sheet has always marked the good end (✓ at JOIN_THRESHOLD)
+              // and left the bad end to a shade of orange nothing explains. Standing at
+              // or below HOSTILE_STANDING is the single most consequential state in the
+              // system — those patrols stop passing you by and start hunting you on
+              // their ground — and NOTHING anywhere in the game said so. Two marks, both
+              // read off the real constants: 'hunted' once you are past the line, and
+              // 'close' inside the last 10 before it, which is the warning that is
+              // actually worth having, since one contract for their rival moves you 4.
+              const hunted = standing <= HOSTILE_STANDING;
+              const nearHunted = !hunted && standing <= HOSTILE_STANDING + 10;
               const color = standing >= JOIN_THRESHOLD ? '#9ec96a'
                 : standing >= 0 ? '#cdbf99'
                 : standing >= -10 ? '#c9a86a'
@@ -447,16 +469,30 @@ export function CharacterScreen() {
                   </Text>
                   <Text style={[styles.kvValue, { color }]}>
                     {standing >= 0 ? '+' : ''}{standing}{qualifies && !isOwn ? ' ✓' : ''}
+                    {hunted ? <Text style={styles.huntedTag}>{'  ☠ hunted'}</Text> : null}
+                    {nearHunted ? <Text style={styles.nearHuntedTag}>{'  ⚠ close'}</Text> : null}
                   </Text>
                 </View>
               );
             });
           })()}
           <Text style={styles.kvSub}>
-            ↳ Standing rises with trades, gifts, and finished contracts; falls with theft, killing
-            faction members, and rival favors. +20 unlocks joining the faction; high standing
-            with a faction surfaces more of their contracts (hunts, mysteries, storylines) when
-            you meet their vendors.
+            ↳ Standing rises with trades ({BUY_REP_TC_PER_STANDING} TC spent is worth 1), gifts, and finished
+            contracts; falls with theft, killing faction members, and work done for their rivals —
+            every point you earn with one faction costs their enemies half as much the other way.
+            +{JOIN_THRESHOLD} unlocks joining, and high standing surfaces more of their contracts
+            (hunts, mysteries, storylines) when you meet their vendors.
+          </Text>
+          {/* ⚠ OTA-1158 — SEPARATE LINE, AND IT IS THE ONE THAT MATTERS. The rule
+              nothing in the game stated: standing is not only an unlock ladder, it is
+              a threat gauge. Kept out of the paragraph above so it cannot be skimmed
+              past, and it names both thresholds because they are DIFFERENT numbers
+              doing different jobs — below 0 a patrol may engage, at HOSTILE_STANDING
+              it goes looking for you. */}
+          <Text style={styles.kvWarn}>
+            ⚠ Below 0, a faction&apos;s patrols will engage you on sight. At {HOSTILE_STANDING} they
+            hunt you on their own ground — marked ☠ above. One contract for their rival moves
+            you about 4, so the drop is faster than it looks.
           </Text>
           {/* OTA-849 — jump to the WORLD view: the full balance of power + rumours. */}
           <TouchableOpacity style={styles.worldLink} activeOpacity={0.7} onPress={() => setScreen('world')} accessibilityRole="button">
@@ -1080,6 +1116,11 @@ const styles = StyleSheet.create({
   tideWaning: { color: '#c98a6a', fontSize: 10, fontWeight: '400' },
   kvValue: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   kvSub: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
+  // OTA-1158 — the threat end of a standing row, and the rule under the list.
+  // Deliberately NOT italic like kvSub: this one is a warning, not a footnote.
+  huntedTag: { color: '#e07a5f', fontSize: 10, fontWeight: '700' },
+  nearHuntedTag: { color: '#c98a6a', fontSize: 10, fontWeight: '400' },
+  kvWarn: { color: '#e07a5f', fontSize: 10, marginTop: 2, marginBottom: 4 },
   warning: { color: '#c9a86a' },
   danger: { color: '#e07a5f' },
 

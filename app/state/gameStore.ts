@@ -313,6 +313,7 @@ import {
   getStanding,
   meetsJoinThreshold,
   JOIN_THRESHOLD,
+  BUY_REP_TC_PER_STANDING, // OTA-1158 — was a local const in buyFromVendor
 } from '../engine/factions';
 import {
   findFactionQuestById,
@@ -23420,7 +23421,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // dwarf it (joining needs 20 standing ≈ 10,000 TC spent this way). The pool is
     // faction-agnostic; it banks into whoever you're buying from when it crosses,
     // a benign cross-faction bleed for an afterthought lever.
-    const BUY_REP_TC_PER_STANDING = 500;
+    // ⚠ OTA-1158 — the value now lives in engine/factions.ts and is IMPORTED. It was
+    // a function-local const, so the character sheet had no way to state the rule and
+    // the in-game glossary just said purchases were worth "+1" — off by this whole
+    // constant. A number two surfaces have to agree on does not get two homes.
     // ⚠ OTA-1156 — CANONICALISE, THEN ONLY SPEND THE POOL IF THE GRANT CAN LAND.
     //
     // The pool used to be debited unconditionally: `nextBuyRepProgress` was
