@@ -3749,6 +3749,76 @@ function maybeInterceptPatrol(
 // into ANYWHERE, not just near its outpost (that's maybeInterceptPatrol). Checked at
 // the end of every action: if a hostile / bounty-target faction's patrol is within 2
 // tiles of the player, it engages. The patrol that engages is consumed into the fight.
+/** ⚠ OTA-1166 — ARRIVING ON A CONTRACT'S GROUND PUTS THE QUARRY ON IT.
+ *
+ *  Called from both arrival paths. If the player's cell is a held bounty's target cell and
+ *  that contract has not been seeded yet, three groups of the quarry are placed in
+ *  different directions, 3-5 tiles out, as ORDINARY ROAMING PATROLS.
+ *
+ *  ⚠ NOTHING NEW ENGAGES THEM. They roam via `stepPatrol` and are picked up by
+ *  `maybePatrolAmbush`, which already skips the hunt-chance roll for a bounty target. So
+ *  the player meets them exactly the way they would meet any patrol — which is the point:
+ *  the seeding must be undetectable, or it stops feeling like a hunt and starts feeling
+ *  like a spawner.
+ *
+ *  ⚠ ONE-SHOT PER CONTRACT, flagged on the bounty itself rather than on the location. A
+ *  location flag would refuse to re-seed for a SECOND contract on the same outpost, and
+ *  walking in and out must not re-arm the trap. */
+function maybeSeedQuarry(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const s = get();
+  const player = s.player;
+  if (!player) return;
+  const slate = activeBountiesOf(player);
+  if (slate.length === 0) return;
+  const cell = playerGridCell(player);
+  const due = slate.filter((b) => {
+    if (b.quarrySeeded) return false;
+    const t = canonicalCellOf(b.targetLocationId);
+    return t.x === cell.x && t.y === cell.y;
+  });
+  if (due.length === 0) return;
+
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const QS = require('../engine/quarrySeed') as typeof import('../engine/quarrySeed');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('../data/factions/factions.json') as Array<{ id: string; name: string }>;
+
+  for (const b of due) {
+    const home = canonicalCellOf(b.targetLocationId);
+    // Salt from the contract itself so two different contracts on the same outpost lay
+    // different rings, and the same contract would re-create the same one.
+    const salt = (b.acceptedAtHour ?? 0) * 131 + b.targetFactionId.length * 17 + b.count;
+    const cells = QS.quarrySeedCells(cell.x, cell.y, QS.QUARRY_GROUPS, salt);
+    set((st) => ({ worldMemory: {
+      ...st.worldMemory,
+      patrols: [
+        ...(st.worldMemory.patrols ?? []),
+        ...cells.map((c) => ({
+          factionId: b.targetFactionId,
+          gx: c.gx, gy: c.gy,
+          // ⚠ Home is the QUARRY'S OWN OUTPOST, not the spawn cell, so once they have
+          // roamed they behave like any other patrol of that faction rather than orbiting
+          // a point the engine has no other reason to care about.
+          homeX: home.x, homeY: home.y,
+          phase: c.phase,
+        })),
+      ],
+    } }));
+    const fname = factions.find((f) => f.id === b.targetFactionId)?.name ?? b.targetName;
+    get().appendLog('arbiter', QS.arrivalBeat(fname, b.targetLocationName));
+  }
+
+  // Mark them seeded. Done in one write after the loop so a mid-loop failure cannot leave
+  // a contract flagged but unseeded.
+  const seededKeys = new Set(due.map((b) => `${b.giverFactionId}|${b.targetFactionId}|${b.targetLocationId}`));
+  set((st) => (st.player ? { player: { ...st.player, activeBounties: (st.player.activeBounties ?? []).map((b) =>
+    seededKeys.has(`${b.giverFactionId}|${b.targetFactionId}|${b.targetLocationId}`) ? { ...b, quarrySeeded: true } : b,
+  ) } } : st));
+}
+
 function maybePatrolAmbush(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -20201,6 +20271,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // who's taken a side. No-op unless the cooldown has passed and the scene is a safe
     // outdoor moment.
     maybeSpawnRaid(get, set);
+    // ⚠ OTA-1166 — CATCH-ALL for standing on a contract's ground. The two travel-arrival
+    // paths call this too, and the redundancy is deliberate: those only cover AUTOROUTED
+    // arrivals, and a player who walks the last tiles with typed cardinals would otherwise
+    // reach the outpost and find nothing there — which is the exact failure this OTA
+    // exists to remove. Idempotent by construction (one-shot flag on the contract), so
+    // being called from three places costs nothing but cannot silently miss a route in.
+    maybeSeedQuarry(get, set);
     // OTA-851 — a roaming faction patrol can cross your path in the open, anywhere.
     if ((get().currentScene?.enemies?.length ?? 0) === 0) maybePatrolAmbush(get, set);
     void get().persist();
@@ -26582,6 +26659,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const arrived = !!ag && ag.x === tgtCell.x && ag.y === tgtCell.y;
       if (arrived) {
         set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+        // OTA-1166 — arriving on a contract's ground puts the quarry on it.
+        maybeSeedQuarry(get, set);
       } else if (after?.travelTarget && ag) {
         const d = canonicalDistanceFromGrid(ag.x, ag.y, locationId);
         set((s) => (s.player?.travelTarget ? {
@@ -26716,6 +26795,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         player: { ...s.player, travelTarget: undefined },
         currentScene: s.currentScene ? { ...s.currentScene, transitArea: null } : s.currentScene,
       } : s));
+      // OTA-1166 — arriving on a contract's ground puts the quarry on it. Both arrival
+      // paths call this; the helper is one-shot per contract, so a player who reaches the
+      // same tile through setTravelCourse and then again through continueTravel does not
+      // double-seed.
+      maybeSeedQuarry(get, set);
     } else if (after?.travelTarget && afterGrid) {
       // arb47 — EXACT distance from the player's absolute cell to the target's
       // fixed canon cell, fresh each step. Walks down monotonically as auto-travel

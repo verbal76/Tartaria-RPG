@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.98';
+export const DISPLAY_VERSION = '4.29.99';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23206,7 +23206,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // job was getting a 3-kill job's clock.
 // New suite ota1165FrozenBoard (27 tests).
 // DISPLAY_VERSION 4.29.98.
-export const OTA_BUILD_ID = '2026-08-08-1165-the-board-you-froze';
+// OTA-1166 — ARRIVING SOMEWHERE MEANS FINDING SOMEONE.
+// A bounty's real cost was never travel, it was WAITING: maybePatrolAmbush
+// won't fire twice inside a 6h cooldown and only fires at all if a patrol of
+// the right faction is within 2 tiles, so a player could arrive on time, play
+// perfectly and meet nobody. OTA-1165 widened the DEADLINE, which bought time
+// to keep waiting instead of removing the wait.
+// Standing on a held contract's target cell now places three groups of the
+// quarry at 3-5 tiles, ONE PER QUADRANT, as ordinary roaming patrols.
+// Nothing new engages them - they are picked up by maybePatrolAmbush, which
+// already skips the hunt roll for a bounty target. The seeding has to be
+// undetectable or it stops feeling like a hunt and starts feeling like a
+// spawner, so the arrival beat never admits it.
+// One-shot per CONTRACT (not per location), and wired at three call sites so
+// a player who walks the last tiles by typed cardinal is covered too.
+// New suite ota1166QuarrySeed (16 tests).
+// DISPLAY_VERSION 4.29.99.
+export const OTA_BUILD_ID = '2026-08-08-1166-arriving-finds-someone';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1165-the-board-you-froze';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1164-set-course-speaks';
 // ⚠⚠ 1162 AND 1163 SHIPPED UNDER THE 1161 STAMP — A REAL GAP, RECORDED RATHER
 // THAN QUIETLY CLOSED. Both were pushed to HAL and golem without step 3 of the

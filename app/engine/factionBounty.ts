@@ -38,6 +38,11 @@ export interface FactionBounty {
    *  it. The payout reads THIS, not the world as it is at completion: the board you froze
    *  is the deal you get. Absent on a legacy contract, which falls back to a live read. */
   politics?: import('./bountyPolitics').BountyPolitics;
+  /** ⚠ OTA-1166 — the quarry has been placed on this contract's ground. One-shot: set the
+   *  first time the player stands on `targetLocationId`, so walking in and out cannot
+   *  re-arm it. Flagged on the CONTRACT, not the location, so a second contract at the same
+   *  outpost still gets its own groups. */
+  quarrySeeded?: boolean;
 }
 
 /** OTA-862 — the JOB BUDGET: how long the contract gives you to actually land the kills,
