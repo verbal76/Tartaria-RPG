@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.97';
+export const DISPLAY_VERSION = '4.29.98';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24286,7 +24286,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1187BountyCourse (14 tests).
 // DISPLAY_VERSION 4.29.97 — PATCH +3, not +1, because two OTAs shipped
 // without a bump (see the gap note below).
-export const OTA_BUILD_ID = '2026-08-08-1187-set-course-speaks';
+// OTA-1188 — THE BOARD YOU FROZE IS THE DEAL YOU GET.
+// The GRUDGES & ALLIANCES panel showed a LIVE, symmetric relations matrix
+// that patrols move as they gut each other, while the player's standing
+// spillover read `factions.json`'s static, ASYMMETRIC allies/rivals arrays.
+// The panel was the honest one. `applyRepChange` now takes the ally/rival
+// sets a contract FROZE AT ACCEPT, so the board you read is the deal you
+// get even if those two go to war a second later.
+// FREEZE THE BOARD is the snapshot: one press discards the old one, takes a
+// fresh one and unlocks accepting; a successful accept auto-releases it, and
+// leaving the World screen releases it too (no spending a stale reading).
+// ⚠ It freezes the VIEW, never the sim — that same heartbeat roams the
+// patrols that bring a bounty's quarry to you.
+// Three refusals, all of which SPEAK: standing on the target, camping one
+// board, and the board still running (that line points at the button).
+// The deadline gained a third term — HOURS_PER_REQUIRED_KILL (6) — because
+// the patrol cooldown put a hard 6h floor between engagements and a 9-kill
+// job was getting a 3-kill job's clock.
+// New suite ota1188FrozenBoard (27 tests).
+// DISPLAY_VERSION 4.29.98.
+export const OTA_BUILD_ID = '2026-08-08-1188-the-board-you-froze';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1187-set-course-speaks';
 // ⚠⚠ 1185 AND 1186 SHIPPED UNDER THE 1184 STAMP — A REAL GAP, RECORDED RATHER
 // THAN QUIETLY CLOSED. Both were pushed to HAL and golem without step 3 of the
 // change loop: this constant was never bumped. So any device log captured

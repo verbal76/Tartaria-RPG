@@ -1584,7 +1584,81 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE SET-COURSE CONTROL TELLS YOU WHAT IT DID (2026-08-08, latest). HAL +
+- **⚠⚠ THE BOARD YOU FROZE IS THE DEAL YOU GET (2026-08-08, latest). HAL + GOLEM.**
+  HAL OTA-1188 / golem OTA-1165. **steam NOT included — batched (§2).** Owner: *"if you
+  see that faction bounty is allied with the faction that you're trying to build rep
+  with… and accept that bounty then it locks it in. so even if they go to war one second
+  later, you still had that locked in faction standing outcome."*
+
+  **⚠ 1. TWO SYSTEMS DISAGREED ABOUT WHO IS ALLIED WITH WHOM, AND THE WRONG ONE PAID.**
+  `worldMemory.factionRelations` is a **live −100…+100 matrix, symmetric by
+  construction** (every write lands under both keys), seeded from `LORE_RELATIONS` and
+  then EARNED as patrols gut each other. It is what **GRUDGES & ALLIANCES** renders and
+  what decides who fights whom. `factions.json`'s `allies`/`rivals` are static,
+  hand-written and **asymmetric** — Forgotten Order counts the Reclaimers a friend; the
+  Reclaimers list nobody. **`applyRepChange` read the static one.** Owner: *"which one is
+  the truth? do we treat the ever-evolving map as the truth?"* — it now does.
+  - ⚠ **The JSON arrays are NOT deleted and must not be.** They are the **seed** the
+    matrix is built from — the old treaties everyone started from. They are simply no
+    longer consulted about who is allied *now*.
+  - ⚠ Symmetry came **free**: there was nothing to hand-author. Two factions
+    (Eternal Dynasty, Stone Builders) were **unreachable by spillover entirely** under
+    the static data — nobody listed them as an ally. Under the matrix they are reachable,
+    and the Dynasty's lore-authored friendlessness can now *thaw* via shared-enemy warmth
+    instead of being a dead end.
+
+  **⚠ 2. THE FREEZE IS THE SNAPSHOT — one press runs the whole cycle.** Owner: *"clear
+  memory, save snapshot, unlock bounties… has bounty been accepted? yes cool unpause."*
+  Pressing FREEZE **discards any previous snapshot and takes a fresh one**, unlocks
+  accepting, and a successful accept **auto-releases** it. The unpause button is only the
+  escape hatch (*"in case you just want to see the cool green and red lights flicker"*).
+  - ⚠ **IT FREEZES THE VIEW, NOT THE WORLD.** The same heartbeat that churns this panel
+    also **roams the patrols** — and roaming patrols are what bring a bounty's quarry to
+    the player. Pausing the sim would freeze the machinery a contract depends on. It is
+    safe to leave running *precisely because* the snapshot is a complete record: the
+    ally/rival lookup was **the only thing still read live at payout**; count, TC, rep and
+    deadline are all stamped at accept.
+  - ⚠ **Leaving the World screen releases it.** A freeze that survived navigation would
+    break the owner's own rule — hold the board, wander three in-game days, come back and
+    accept, and the contract locks in politics from before the war moved.
+  - ⚠ **A REFUSED accept deliberately keeps the board held**, so the player can fix what
+    was wrong and retry without re-reading. (This bit the test patch: a blind toggle after
+    a refusal *releases* instead of re-taking.)
+
+  **⚠ 3. THREE REFUSALS, AND EVERY ONE SPEAKS.** `standing_on_target` (the 0-tile
+  contract that started this: a 24h window with no travel in it, against a 6h patrol
+  cooldown, needing 3-9 kills — not winnable), `camping` (no repeat work from a board you
+  just collected on), and `board_running`, whose line **points at the freeze button**.
+  Owner: *"it shouldn't be dead… you should get the buzz like when you have no stamina."*
+  The ACCEPT button stays **live and tappable** while locked and explains on tap —
+  a disabled control that explains nothing is the OTA-1187 defect in a new hat.
+  ⚠ Refusal ORDER matters: a fixable reason beats the freeze nag, so a player standing on
+  the target is told *that* rather than sent to freeze a board that will refuse anyway.
+
+  **⚠ 4. THE DEADLINE FINALLY PRICES THE WAITING.** Travel was priced (OTA-1185); the
+  waiting never was. `maybePatrolAmbush` will not fire twice inside `PATROL_MIN_HOURS`
+  (6), so a hard 6-hour floor sits between engagements — which meant **a 3-kill and a
+  9-kill contract at the same distance got identical time.** Third term:
+  `HOURS_PER_REQUIRED_KILL = 6`. `count` is optional so every legacy caller compiles and
+  gets the old two-term number.
+  ⚠ The World board's estimate **now passes `count` too** — it did not, so a card
+  advertised a shorter window than the accepted contract carried. Same defect class as
+  OTA-1179 #8 (a vendor showing a price it does not charge).
+
+  New suite `ota1188FrozenBoard` (27 tests). ⚠ **Four existing suites updated to the real
+  flow, and that is fallout, not breakage** — they accepted bounties without freezing. The
+  gate lives in the STORE, not the UI, deliberately: the snapshot is a mechanical record on
+  the contract, and a UI-only gate would let any other caller mint a contract with no
+  politics at all.
+  ⚠ `ota1186`'s CLAIM-2 slice **widened, not weakened** — a fixed 2400-char window is a
+  brittle way to say "in the same block", and the anti-camp bookkeeping pushed
+  `announceMissionComplete` past it. The claim it makes is unchanged and now also asserts
+  no turn-in verb gates the payout.
+
+  Blocking gates green on both lines: typecheck:ci, lint, the test-typecheck ratchet,
+  the handoff-claims ratchet, and test:ci:fast (**712 suites / 6477 tests**).
+
+- **⚠⚠ THE SET-COURSE CONTROL TELLS YOU WHAT IT DID (2026-08-08). HAL +
   GOLEM.** HAL OTA-1187 / golem OTA-1164. **steam NOT included — batched (§2).**
   Owner: *"once you accept a bounty there's a separate block that asks you to auto
   route. it changes colors cuz it registers your choice but it doesn't actually auto

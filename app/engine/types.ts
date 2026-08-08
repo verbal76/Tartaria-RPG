@@ -1781,6 +1781,13 @@ export interface WorldMemory {
    *  concept the player has with factions. Seeded from lore, then earned through actual
    *  patrol clashes; decides who fights whom. Two neutrals can grudge into war from zero. */
   factionRelations?: import('./factionRelations').RelationsMatrix;
+  /** ⚠ OTA-1188 — where the player last CLOSED a bounty. The anti-camp rule refuses a new
+   *  contract from that same board until one has been cleared somewhere else, so a player
+   *  cannot park at one outpost farming its board forever. Absent on every existing save,
+   *  which reads as "no camp in progress" — the permissive direction, deliberately: a
+   *  migration must never retroactively lock a player out of work they could take
+   *  yesterday. */
+  lastBountyClearedOutpostId?: string;
   /** In-game hour of the last world pulse (gates the next one). */
   lastWorldTickHour?: number;
   /** Recent world rumours (newest last), capped. The world moving, in the player's ear. */

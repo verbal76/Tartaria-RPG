@@ -5831,6 +5831,21 @@ interface GameStore {
   /** OTA-850 — accept a faction bounty: store it and set course for the quarry's
    *  outpost (routing the player into patrolled ground). */
   acceptBounty: (bounty: import('../engine/factionBounty').FactionBounty) => void;
+  /** ⚠ OTA-1188 — THE FROZEN BOARD. Transient (never persisted): a snapshot of who stood
+   *  with whom at the instant the player hit FREEZE, plus the hour it was taken.
+   *  Non-null = the board is frozen and a bounty may be accepted.
+   *
+   *  ⚠ FREEZING STOPS THE VIEW, NOT THE WORLD. The same heartbeat that churns this panel
+   *  also ROAMS THE PATROLS — and roaming patrols are what bring a bounty's quarry to the
+   *  player. Pausing the simulation would freeze the very machinery a contract depends on.
+   *  It is safe to leave it running precisely because this snapshot is a COMPLETE record
+   *  of everything the payout still reads live (see engine/bountyPolitics). */
+  frozenBoard: { relations: import('../engine/factionRelations').RelationsMatrix; takenAtHour: number } | null;
+  /** ⚠ ONE PRESS RUNS THE WHOLE CYCLE — owner: "clear memory, save snapshot, unlock
+   *  bounties… then unpause automatically once the bounty's accepted." Pressing FREEZE
+   *  always DISCARDS any previous snapshot and takes a fresh one, so a stale board can
+   *  never be the one a contract locks in. Pressing it while frozen simply releases. */
+  toggleBoardFreeze: () => void;
   /** OTA-857 — the world's REAL-TIME heartbeat. Driven by a wall-clock timer in
    *  App.tsx (not in-game hours), so the war advances no matter what screen is
    *  open or whether the player is acting — the World board is a live scroll. */
@@ -6673,6 +6688,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   fusionPickerOpen: false,
   missionCompleteNotice: null,
   contractsNotice: null,
+  // OTA-1188 — transient by design; a frozen board must never survive a reload.
+  frozenBoard: null,
   storyIntro: null,
   pendingDeath: null, // OTA-1133
   chapterCard: null, // OTA-1043
@@ -8596,6 +8613,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   setScreen(screen) {
+    // ⚠ OTA-1188 — LEAVING THE WORLD SCREEN RELEASES THE FREEZE. Owner's rule for the
+    // snapshot was "an automatic wipe and reset and recapture — that way you're never
+    // looking at old data." A freeze that survived navigation would break exactly that:
+    // hold the board, wander off for three in-game days, come back and accept, and the
+    // contract locks in politics from before the war moved. A snapshot may only ever be
+    // spent on the visit that took it.
+    if (screen !== 'world' && get().frozenBoard) set({ frozenBoard: null });
     // OTA-791 — the trade screen is unreachable mid-fight. A resonance-hook
     // combat began while the market vendor was still attached to the scene;
     // the player tapped into TRADE unaware, every sell bounced off the arb166
@@ -22958,13 +22982,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
         for (const b of completed) {
           const payer = get().player;
           if (!payer) break;
-          const rep = applyRepChange(payer.factionStanding, b.giverFactionId, b.rewardRep);
+          // ⚠ OTA-1188 — PAY OUT ON THE POLITICS THE CONTRACT WAS SIGNED UNDER, not the
+          // world as it stands now. `b.politics` was frozen from the board the player
+          // read at accept; a contract from before this OTA carries none and falls back
+          // to the live/static read, which is exactly the old behaviour.
+          const rep = applyRepChange(
+            payer.factionStanding, b.giverFactionId, b.rewardRep,
+            b.politics ? { allies: b.politics.allies, rivals: b.politics.rivals } : undefined,
+          );
           set((s) => (s.player ? { player: {
             ...s.player,
             tc: (s.player.tc ?? 0) + b.rewardTc,
             factionStanding: rep.standing,
           } } : s));
           logRepChanges(get, rep.changed);
+          // ⚠ OTA-1188 — REMEMBER WHERE THIS ONE WAS CLOSED. The anti-camp rule reads it:
+          // no second contract from the board you just collected on until you have closed
+          // one somewhere else. Owner: "otherwise people are just going to keep standing
+          // there, collecting bounties." Stored as the location the player is IN at
+          // payout — which, since kills count anywhere, is wherever they finished it.
+          set((s) => ({ worldMemory: {
+            ...s.worldMemory,
+            lastBountyClearedOutpostId: s.player?.currentLocationId,
+          } }));
           get().announceMissionComplete('Bounty', `${b.giverName} bounty`, `✦ Bounty complete — the ${b.giverName} pay out ${b.rewardTc} TC.`);
           get().appendLog('arbiter', `"The ${b.giverName} will hear of this," the Arbiter says. "You've done what they could not."`);
         }
@@ -26246,6 +26286,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', `Your bounty slate is full (${MAX_ACTIVE_BOUNTIES}). Finish or abandon one first.`);
       return;
     }
+    // ⚠ OTA-1188 — THE THREE REFUSALS, AND EVERY ONE OF THEM SPEAKS. Standing on the
+    // quarry's own outpost (the 0-tile contract that started this: a 24h window with no
+    // travel in it, against a 6h patrol cooldown, needing 3-9 kills); camping one board
+    // for repeat work; and the board still running, which means no snapshot exists to
+    // lock the politics in. The last one POINTS AT THE FREEZE BUTTON rather than merely
+    // saying no — the whole of OTA-1187 was a control that refused in silence.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const BP = require('../engine/bountyPolitics') as typeof import('../engine/bountyPolitics');
+    const hereCell = playerGridCell(player);
+    const tgtCell0 = canonicalCellOf(bounty.targetLocationId);
+    const verdict = BP.canAcceptBounty({
+      atTargetCell: hereCell.x === tgtCell0.x && hereCell.y === tgtCell0.y,
+      targetLocationName: bounty.targetLocationName,
+      currentOutpostId: player.currentLocationId,
+      currentOutpostName: (() => {
+        try { return getLocationById(player.currentLocationId).name ?? player.currentLocationId; }
+        catch { return player.currentLocationId; }
+      })(),
+      lastClearedOutpostId: get().worldMemory.lastBountyClearedOutpostId,
+      boardFrozen: !!get().frozenBoard,
+    });
+    if (!verdict.ok) {
+      const line = BP.refusalLine(verdict);
+      if (line) {
+        get().appendLog('arbiter', line);
+        // The Contracts/World strip renders this; the feed alone scrolls away.
+        set({ contractsNotice: { text: line, ts: Date.now() } });
+      }
+      buzzBlocked();
+      return;
+    }
     // ⚠ OTA-1187 — A LIVE COURSE, not merely another contract on the slate. This read
     // `slate.length > 0`, which conflated "you already hold a bounty" with "you are
     // already walking somewhere" — and `travelTarget` is CLEARED the moment you arrive.
@@ -26264,8 +26335,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const tiles = canonicalDistanceFromGrid(grid.x, grid.y, bounty.targetLocationId);
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { bountyDeadlineFor } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
-    const deadlineHours = bountyDeadlineFor(tiles);
-    set((s) => (s.player ? { player: { ...s.player, activeBounties: [...slate, { ...bounty, progress: 0, acceptedAtHour, deadlineHours }], activeBounty: undefined } } : s));
+    // ⚠ OTA-1188 — `count` is passed now, so the window includes the WAITING. The patrol
+    // cooldown puts a hard 6h floor between engagements, so a 9-kill job cannot be done in
+    // a 3-kill job's time no matter how well it is played.
+    const deadlineHours = bountyDeadlineFor(tiles, bounty.count);
+    // ⚠ OTA-1188 — FREEZE THE POLITICS ONTO THE CONTRACT. Taken from the SNAPSHOT the
+    // player froze, never from the live matrix: the board they read is the deal they get,
+    // even if those two factions are at war by the time the last body drops.
+    const frozen = get().frozenBoard;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const allFactions = (require('../data/factions/factions.json') as Array<{ id: string }>).map((f) => f.id);
+    const politics = BP.politicsOf(
+      frozen?.relations ?? get().worldMemory.factionRelations,
+      bounty.giverFactionId,
+      allFactions,
+      frozen?.takenAtHour ?? acceptedAtHour,
+    );
+    set((s) => (s.player ? { player: { ...s.player, activeBounties: [...slate, { ...bounty, progress: 0, acceptedAtHour, deadlineHours, politics }], activeBounty: undefined } } : s));
+    // ⚠ AUTO-RELEASE. Owner: "once you accept the bounty it automatically unfreezes."
+    // The press that froze the board is spent the moment it is used, so the next contract
+    // must take its own fresh reading rather than inheriting this one.
+    set({ frozenBoard: null });
     get().appendLog(
       'arbiter',
       hadCourse
@@ -26296,6 +26386,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
         holdMs: 240000,
       });
     }
+  },
+
+  toggleBoardFreeze() {
+    const s = get();
+    if (s.frozenBoard) {
+      // Release. The manual escape hatch — owner: "in case you hit the pause button, then
+      // decide you don't want to do a bounty… or maybe you just want to see the cool green
+      // and red lights flicker."
+      set({ frozenBoard: null });
+      get().appendLog('system', 'The board runs again — the war picks up where it never actually stopped.');
+      return;
+    }
+    // ⚠ CLEAR, THEN CAPTURE, EVERY TIME. There is deliberately no reuse of a previous
+    // snapshot: the press that creates one is the press that unlocks accepting, and
+    // accepting releases the freeze, so a snapshot cannot outlive the decision it was
+    // taken for. That is the whole reason it can never go stale.
+    const hour = s.player?.hoursElapsed ?? 0;
+    set({ frozenBoard: { relations: { ...(s.worldMemory.factionRelations ?? {}) }, takenAtHour: hour } });
+    get().appendLog(
+      'system',
+      'You hold the board still. Whoever stands together right now is who your standing will carry to — take the contract on this reading.',
+    );
   },
 
   worldRealtimeTick() {
