@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.106';
+export const DISPLAY_VERSION = '4.29.107';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23353,7 +23353,38 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1173MemoryDefence (17 tests). ota1032/1084/1172 assertions
 // RETARGETED, not weakened - each keeps the claim its own name makes.
 // DISPLAY_VERSION 4.29.106.
-export const OTA_BUILD_ID = '2026-08-08-1173-memory-defence';
+// OTA-1174 — THE UPDATE PATH SAYS WHAT IT DID.
+// Owner, stuck on 1171 while 1172 and 1173 sat published and unreachable:
+// 'it hasn't been able to pull an update after that... so whatever we've
+// done since it pulled the three lever update, it's probably something
+// stopping it.'
+// ⚠ SERVER SIDE WAS VERIFIED CLEAN both times: Channel 'hal2001' (ios) AND
+// 'preview' (ios) published at runtimeVersion 2.4.1 — exactly what his
+// TestFlight build asks for. So the refusal was happening ON the device, and
+// the device could not say one word about why.
+// TWO THINGS, BOTH ADDITIVE:
+//   1. The boot-front OTA check now logs to the DEVICE log: what expo
+//      thinks it is running (updateId/channel/rt), every status line from
+//      the check+download, every error, and the final result. It previously
+//      swallowed all of it into console.warn, which no pasted bug report
+//      has ever carried, and passed silent:true which discarded the status
+//      and error callbacks entirely.
+//   2. A test that actually IMPORTS and RUNS aboutSummary. OTA-1172 added
+//      `import { runtimePressureSnapshot } from '../state/gameStore'` to it
+//      — a 44k-line store pulled into the bug-report path — and NOTHING
+//      executed that chain: the 1172 suite reads the file as TEXT. A grep
+//      proves a string is present; it cannot prove a module loads, and a
+//      bundle that dies on startup is silently rolled back by iOS, which
+//      looks identical to 'it never downloaded'. It loads clean, so that
+//      was not the cause — but the gap was real and is now closed.
+// ⚠ NOT ONE LINE OF UPDATE CONTROL FLOW CHANGED.
+// ⚠ RESOLVED ON HAL: the owner reinstalled from TestFlight (clearing the
+// updates cache) and landed on 1197/this. The 1195+1196 bundles were never
+// accepted by that device; a fresh install was what broke the loop.
+// New suite ota1174BugReportLoads (10 tests).
+// DISPLAY_VERSION 4.29.107.
+export const OTA_BUILD_ID = '2026-08-08-1174-update-telemetry';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1173-memory-defence';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1172-runtime-pressure';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1171-difficulty-ladder';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1170-dodge-cooldown';
