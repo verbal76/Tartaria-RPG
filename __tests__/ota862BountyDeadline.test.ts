@@ -107,7 +107,10 @@ describe('OTA-862 — the 24 in-game-hour deadline', () => {
       targetName: 'Mud Monarchs', targetLocationId: 'monarch_waystation', targetLocationName: 'Waystation',
       count: 3, progress: 0, rewardTc: 50, rewardRep: 8,
     };
-    useGameStore.getState().acceptBounty(bounty);
+    // ⚠ OTA-1165 — accepting now requires a FROZEN BOARD: the contract stamps the
+    // politics it was signed under, so there must be a snapshot to stamp. The freeze
+    // AUTO-RELEASES on accept, which is why it is re-taken before each one.
+    useGameStore.getState().toggleBoardFreeze(); useGameStore.getState().acceptBounty(bounty);
     const held = useGameStore.getState().player!.activeBounties ?? [];
     expect(held.length).toBe(1);
     expect(held[0]!.acceptedAtHour).toBeDefined();       // stamped on accept

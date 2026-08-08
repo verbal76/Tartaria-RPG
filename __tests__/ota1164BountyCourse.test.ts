@@ -188,11 +188,14 @@ describe('OTA-1164 — accepting a second contract routes when no road is runnin
       targetLocationId: loc, targetLocationName: loc,
       count: 3, progress: 0, rewardTc: 50, rewardRep: 8,
     });
-    useGameStore.getState().acceptBounty(b('monarch_waystation') as never);
+    // ⚠ OTA-1165 — accepting now requires a FROZEN BOARD: the contract stamps the
+    // politics it was signed under, so there must be a snapshot to stamp. The freeze
+    // AUTO-RELEASES on accept, which is why it is re-taken before each one.
+    useGameStore.getState().toggleBoardFreeze(); useGameStore.getState().acceptBounty(b('monarch_waystation') as never);
     const first = useGameStore.getState().player!.travelTarget;
     expect(first).toBeTruthy(); // the first contract routed
 
-    useGameStore.getState().acceptBounty(b('dynasty_hold') as never);
+    useGameStore.getState().toggleBoardFreeze(); useGameStore.getState().acceptBounty(b('dynasty_hold') as never);
     // Still pointed at the FIRST contract — stacking must not divert a live road.
     expect(useGameStore.getState().player!.travelTarget?.locationId).toBe(first!.locationId);
   });

@@ -116,9 +116,16 @@ describe('OTA-1163 — the card tells the truth about the job', () => {
     // ticks progress is the one that pays.
     const i = STORE.indexOf('killCountsForBounty(b, enemy.factionId)');
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 2400);
+    // ⚠ WIDENED, NOT WEAKENED. A fixed character slice is a brittle way to say "in the
+    // same block": OTA-1165 added the anti-camp bookkeeping between the kill check and the
+    // payout, which pushed `announceMissionComplete` past a 2400-char window and failed a
+    // claim that is still perfectly true. The assertion — the payout fires from the KILL
+    // path, not a hand-in verb — is unchanged; only the window it looks through grew.
+    const block = STORE.slice(i, i + 4000);
     expect(block).toContain('announceMissionComplete');
     expect(block).toContain('rewardTc');
+    // And the real guarantee behind the claim: no turn-in verb gates it.
+    expect(block).not.toMatch(/\bturnIn|handIn\b/);
   });
 
   it('⚠ CLAIM 3 — "they are hunting you now"', () => {
@@ -174,6 +181,9 @@ describe('OTA-1163 — it fires once, on the first contract', () => {
     await useGameStore.getState().startNewGame({ name: 'Ropes', raceId: 'reclaimer', factionId: 'reclaimers_guild' });
     useGameStore.getState().skipTutorial?.();
     useGameStore.getState().clearMissionCompleteNotice();
+    // ⚠ OTA-1165 — accepting now requires a FROZEN BOARD: the contract stamps the
+    // politics it was signed under, so there must be a snapshot to stamp. The freeze
+    // AUTO-RELEASES on accept, which is why it is re-taken before each one.
   });
 
   it('a fresh character has not seen it', () => {
@@ -184,7 +194,7 @@ describe('OTA-1163 — it fires once, on the first contract', () => {
   });
 
   it('the first accept raises the card and sets the flag', () => {
-    useGameStore.getState().acceptBounty(BOUNTY);
+    useGameStore.getState().toggleBoardFreeze(); useGameStore.getState().acceptBounty(BOUNTY);
     const n = useGameStore.getState().missionCompleteNotice;
     expect(n).toBeTruthy();
     expect(n!.title).toBe(BOUNTY_BROKER);
@@ -195,18 +205,18 @@ describe('OTA-1163 — it fires once, on the first contract', () => {
   });
 
   it('⚠ AND NEVER AGAIN — including after the slate empties', () => {
-    useGameStore.getState().acceptBounty(BOUNTY);
+    useGameStore.getState().toggleBoardFreeze(); useGameStore.getState().acceptBounty(BOUNTY);
     useGameStore.getState().clearMissionCompleteNotice();
     // Clear the slate outright: a player who finished a contract has still seen the
     // ropes, so gating on `slate.length === 0` would re-show it every time they cleared.
     const p = useGameStore.getState().player!;
     useGameStore.setState({ player: { ...p, activeBounties: [] } });
-    useGameStore.getState().acceptBounty({ ...BOUNTY, targetLocationId: 'another_camp' });
+    useGameStore.getState().toggleBoardFreeze(); useGameStore.getState().acceptBounty({ ...BOUNTY, targetLocationId: 'another_camp' });
     expect(useGameStore.getState().missionCompleteNotice).toBeNull();
   });
 
   it('the card describes the contract that was actually stamped', () => {
-    useGameStore.getState().acceptBounty(BOUNTY);
+    useGameStore.getState().toggleBoardFreeze(); useGameStore.getState().acceptBounty(BOUNTY);
     const held = useGameStore.getState().player!.activeBounties![0]!;
     const lines = useGameStore.getState().missionCompleteNotice!.rewards.join('\n');
     // The window quoted is THIS contract's stored deadline, not a constant.

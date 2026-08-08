@@ -65,17 +65,32 @@ export function applyRepChange(
   standing: readonly FactionStanding[],
   withFaction: string,
   delta: number,
+  /** ⚠ OTA-1165 — WHO COUNTS AS FRIEND AND FOE, supplied by the caller.
+   *
+   *  The default (omitting this) reads `factions.json`'s static `allies`/`rivals`, which
+   *  are the ORIGINAL TREATIES and never change — while the GRUDGES & ALLIANCES panel
+   *  shows a LIVE, symmetric relations matrix that patrols move as they gut each other.
+   *  Those two disagreed, and the panel was the honest one. Owner: *"which one is the
+   *  truth? do we treat the ever-evolving map as the truth?"* — yes.
+   *
+   *  A bounty passes the sets FROZEN ONTO IT AT ACCEPT (see engine/bountyPolitics), so the
+   *  board you read is the deal you get even if they go to war a second later. The static
+   *  fallback stays for every other caller and for legacy contracts carrying no snapshot;
+   *  the JSON arrays are still the SEED the matrix is built from and must not be deleted. */
+  override?: { allies: readonly string[]; rivals: readonly string[] },
 ): { standing: FactionStanding[]; changed: { factionId: string; delta: number; newStanding: number }[] } {
   const faction = findFaction(withFaction);
-  if (!faction) return { standing: standing.map((s) => ({ ...s })), changed: [] };
+  // ⚠ An override is honoured even for an unknown faction id: the snapshot already
+  // resolved the ids, so refusing here would silently drop a payout the player earned.
+  if (!faction && !override) return { standing: standing.map((s) => ({ ...s })), changed: [] };
 
   const allyIds = new Set(
-    (faction.allies ?? [])
+    (override ? override.allies : (faction?.allies ?? []))
       .map(normalizeRef)
       .filter(isKnownFactionId),
   );
   const rivalIds = new Set(
-    (faction.rivals ?? [])
+    (override ? override.rivals : (faction?.rivals ?? []))
       .map(normalizeRef)
       .filter(isKnownFactionId),
   );

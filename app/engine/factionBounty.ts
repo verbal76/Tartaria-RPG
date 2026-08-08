@@ -32,6 +32,12 @@ export interface FactionBounty {
    *  accept to 24 + the tiles between the player and the quarry's outpost, so a far job
    *  isn't impossible to reach in time. Falls back to the 24h base when absent. */
   deadlineHours?: number;
+  /** ⚠ OTA-1165 — THE POLITICS THIS CONTRACT WAS SIGNED UNDER, frozen at accept.
+   *  The GRUDGES & ALLIANCES board is a LIVE matrix that patrols move as they gut each
+   *  other, so who the giver stands with can change between accepting a job and finishing
+   *  it. The payout reads THIS, not the world as it is at completion: the board you froze
+   *  is the deal you get. Absent on a legacy contract, which falls back to a live read. */
+  politics?: import('./bountyPolitics').BountyPolitics;
 }
 
 /** OTA-862 — the JOB BUDGET: how long the contract gives you to actually land the kills,
@@ -65,12 +71,22 @@ export const BOUNTY_DEADLINE_HOURS = 24;
  *  waiting on a quarry that comes hunting you on its own schedule). The same 23 tiles now
  *  budget 81.5h, of which the walk is ~52h — leaving the job its full window.
  *
- *  ⚠ The two terms measure DIFFERENT things and must not be collapsed into one. If the
- *  job gets harder (bountyTerms raises `count`), the 24 moves. If the map gets more
- *  expensive to cross, HOURS_PER_TILE_TRUE moves. Neither should be retuned by editing
- *  the other. */
-export function bountyDeadlineFor(distanceTiles: number): number {
-  return BOUNTY_DEADLINE_HOURS + travelHoursFor(Math.max(0, Math.round(distanceTiles)));
+ *  ⚠ The three terms measure DIFFERENT things and must not be collapsed. If the map gets
+ *  more expensive to cross, HOURS_PER_TILE_TRUE moves. If the WAITING gets slower (the
+ *  patrol cooldown), HOURS_PER_REQUIRED_KILL moves. The 24 is the fixed overhead of taking
+ *  a job at all. Never retune one by editing another.
+ *
+ *  ⚠ OTA-1165 ADDED THE THIRD TERM, AND IT IS THE ONE THAT WAS MISSING ALL ALONG. Travel
+ *  was priced; WAITING never was. `maybePatrolAmbush` refuses to fire twice inside
+ *  PATROL_MIN_HOURS (6), so a hard 6-hour floor sits between you and each engagement no
+ *  matter what you do — which meant a 3-kill and a 9-kill contract at the same distance
+ *  got IDENTICAL time. `count` is passed optionally so every legacy caller still
+ *  compiles and simply gets the old two-term number. */
+export function bountyDeadlineFor(distanceTiles: number, count?: number): number {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { killWindowHours } = require('./bountyPolitics') as typeof import('./bountyPolitics');
+  const job = count === undefined ? 0 : killWindowHours(count);
+  return BOUNTY_DEADLINE_HOURS + travelHoursFor(Math.max(0, Math.round(distanceTiles))) + job;
 }
 
 /** Hours of in-game time left on a bounty (Infinity for a legacy one with no stamp). */
