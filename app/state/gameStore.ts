@@ -1620,7 +1620,22 @@ const QWEN_REINIT_HANG_MS = 150_000;
 //      so even a pathological state costs one reload a minute, not twelve.
 //      A fresh return to foreground resets the backoff for one fast retry.
 const QWEN_WATCHDOG_FREE_RETRIES = 4;
+// ⚠⚠ OTA-1196 — A LIFETIME CEILING ON RELOADS, BECAUSE QWEN OFF BEATS THE APP DEAD.
+// The backoff ladder spreads retries out but never stops them, so a device that simply
+// cannot hold the ~400MB context retries forever — each attempt a fresh allocation spike,
+// on the platform whose response to that is to kill the process. The owner's iPhone took
+// a crash straight to the home screen with "Last JS crash: none recorded" (a NATIVE
+// death) and, on the run before, a hard freeze. After this many failures we stop asking
+// and play on templates, which is a game that works rather than a game that dies.
+// ⚠ Reset on a REAL foreground return, so a later session is never punished for this one.
+const QWEN_MAX_REINITS_PER_STRETCH = 8;
 let qwenReinitInFlightSince = 0;
+let qwenReinitCeilingLogged = false;
+// ⚠ OTA-1196 — 'inactive' IS NOT 'background'. iOS reports `inactive` for a notification
+// banner, a Control Center pull and a peek at the app switcher; only `background` means
+// the app was genuinely put away and the context genuinely disposed. Tracking the two
+// separately is what stops an incidental twitch from buying a 400MB reload.
+let qwenTrulyBackgrounded = false;
 let qwenReinitAttempts = 0;
 let qwenBackoffLevel = 0;
 let qwenHeldWhileBackgroundLogged = false;
@@ -1697,6 +1712,19 @@ function runQwenHealthCheck(
         return false;
       }
       qwenHeldWhileBackgroundLogged = false;
+      // ⚠⚠ OTA-1196 — THE CEILING. See QWEN_MAX_REINITS_PER_STRETCH: past this many
+      // failed reloads we stop allocating and let the game run on templates. Logged once,
+      // not per tick, so the log says it plainly and then goes quiet.
+      if (qwenReinitAttempts >= QWEN_MAX_REINITS_PER_STRETCH) {
+        if (!qwenReinitCeilingLogged) {
+          qwenReinitCeilingLogged = true;
+          get().appendLog('debug',
+            `qwen-watchdog: ${qwenReinitAttempts} reloads without recovery — STANDING DOWN. `
+            + `Each attempt is a ~400MB allocation and this device is refusing them; `
+            + `narration stays on templates until the app is backgrounded and returns.`);
+        }
+        return false;
+      }
       // Not ready and not making progress (idle / failed / dormant ready-but-
       // dead / wedged): kick a fresh reinit. Keeps retrying so a transient
       // memory-pressure failure doesn't strand Qwen for the session — but
@@ -1758,6 +1786,10 @@ function startQwenWatchdog(
   qwenReinitAttempts = 0;
   qwenBackoffLevel = 0;
   qwenHeldWhileBackgroundLogged = false;
+  // OTA-1196 — the ceiling and the true-background flag reset with everything else, so a
+  // re-hydrate starts from a clean slate rather than inheriting the last run's refusals.
+  qwenReinitCeilingLogged = false;
+  qwenTrulyBackgrounded = false;
 
   const schedule = (ms: number): void => {
     if (qwenWatchdogTimer !== null) clearTimeout(qwenWatchdogTimer);
@@ -1782,7 +1814,28 @@ function startQwenWatchdog(
       // OTA-1107 — a fresh return to foreground clears the backoff ladder:
       // the player is present again, so the first retry should be fast even
       // if the last background stretch burned through the free attempts.
-      if (next === 'active') { qwenBackoffLevel = 0; tick(); }
+      // ⚠⚠ OTA-1196 — BUT ONLY AFTER A REAL BACKGROUND STRETCH, AND THIS IS THE DEFECT
+      // THE PREVIOUS OTA DELIBERATELY LEFT IN PLACE TO MEASURE. `active` fires on iOS for
+      // a notification banner, a Control Center pull, or a peek at the app switcher —
+      // iOS bounces active → inactive → active for all of them, and Android does not. The
+      // owner's freeze log caught it three times, each pair ~350ms apart:
+      //     12:30:19.917  holding revival until foreground
+      //     12:30:20.266  reinitializing (attempt #3)
+      // Half his reloads that window were incidental twitches, not the player returning,
+      // and OTA-1107's own comment says "kicking a ~400MB context load from the
+      // background is guaranteed wasted work". iOS walked straight through that rule.
+      // Requiring a genuine `background` first is what closes it.
+      if (next === 'background') { qwenTrulyBackgrounded = true; return; }
+      if (next !== 'active') return; // `inactive` alone is a twitch, not a return.
+      if (!qwenTrulyBackgrounded) return;
+      qwenTrulyBackgrounded = false;
+      qwenBackoffLevel = 0;
+      // ⚠ The ceiling resets HERE and only here: a genuine put-away-and-return is the
+      // player asking for a fresh start, and it is also when iOS has actually reclaimed
+      // whatever it needed. A twitch is not that.
+      qwenReinitAttempts = 0;
+      qwenReinitCeilingLogged = false;
+      tick();
     }) as { remove: () => void } | null;
   } catch { /* AppState unavailable (headless/test) — the poll alone still recovers */ }
 
@@ -1879,6 +1932,26 @@ function startRuntimePressureWatch(
           saveKb: rpLastSaveKb ?? undefined,
         }));
       } catch { /* never let instrumentation throw into the host */ }
+      // ⚠⚠ OTA-1196 — AND NOW WE ACTUALLY ANSWER IT. OTA-1195 logged the warning and did
+      // NOTHING, which is only half a fix: iOS raises this precisely so an app can hand
+      // memory back BEFORE the OS takes the process instead. The single largest thing we
+      // hold is the ~400MB llama context, we have a `dispose()` for it, and narration
+      // degrades to templates without it — the game keeps playing.
+      // ⚠ Qwen switched off is enormously better than the app dying. The owner's report
+      // is a crash straight to the home screen with "Last JS crash: none recorded", i.e.
+      // a native death, and losing a session costs far more than losing prose.
+      // ⚠ The watchdog is deliberately NOT suppressed here: it reads the real status and
+      // will bring Qwen back once there is room, which is the behaviour we want — release
+      // under pressure, recover when the pressure lifts.
+      try {
+        if (typeof (qwen as { dispose?: () => Promise<void> }).dispose === 'function') {
+          void (qwen as { dispose: () => Promise<void> }).dispose()
+            .then(() => {
+              try { get().appendLog('debug', 'memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.'); } catch { /* ignore */ }
+            })
+            .catch(() => { /* a failed release must never escalate a memory warning into a crash */ });
+        }
+      } catch { /* ditto */ }
     }) as { remove: () => void } | null;
   } catch { /* AppState unavailable (headless/test) */ }
 

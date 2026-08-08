@@ -208,7 +208,26 @@ export class LlamaRuntime {
     if (!info.exists) {
       throw new Error(`GGUF model file not found at ${opts.modelPath}`);
     }
-    this.context = await mod.initLlama({
+    // ⚠⚠ OTA-1196 — THE MODEL LOAD NOW TAKES THE NATIVE-ML LOCK. IT NEVER DID, AND IT IS
+    // THE BIGGEST ALLOCATION IN THE APP.
+    //
+    // Completion took the lock (OTA-459's Tensor G5 SIGSEGV). Release took the lock
+    // (OTA-1146). The ~400MB CONTEXT LOAD — larger than either — was the one native call
+    // going in unserialized, so a reload could land on top of a Kokoro synth and a Qwen
+    // completion at the same instant.
+    //
+    // ⚠ THAT IS NOT HYPOTHETICAL — it is the owner's crash, to the second:
+    //     12:46:27.037  qwen-watchdog: Qwen not ready ('failed'); reinitializing (#2)
+    //     12:46:27.931  player: investigate the floor
+    //     12:46:28.008  cognitive neutral (70ms)
+    //     [app gone — relaunched 10s later, and "Last JS crash: none recorded"]
+    // A crash to the home screen with NO JS error recorded is a NATIVE death, and on iOS
+    // the overwhelmingly common cause is the OS reclaiming a process that asked for too
+    // much too fast. A 400MB load racing an inference is exactly that shape.
+    //
+    // ⚠ ML_PRIORITY_LLM, so a voice line still OUTRANKS a reload: the player hears the
+    // Arbiter on time and the reload waits its turn, which is the right trade both ways.
+    this.context = await runExclusiveNativeMl(() => mod.initLlama({
       model: opts.modelPath,
       n_ctx: opts.contextSize ?? 2048,
       n_gpu_layers: 0, // mobile CPU only — GPU offload is desktop territory
@@ -223,7 +242,7 @@ export class LlamaRuntime {
       // peak RAM drops too. Conservative values that keep prefill throughput sane.
       n_batch: opts.batch ?? 512,
       n_ubatch: opts.ubatch ?? 128,
-    });
+    }), ML_PRIORITY_LLM);
     this.modelPath = opts.modelPath;
     // arb129 — record which native kernel variant llama.rn selected + the CPU/SoC
     // signature (forwarded by the patched llama.rn) into mlHealth, so the copyable
