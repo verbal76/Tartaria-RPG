@@ -1584,8 +1584,46 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE OTA-1196 FIX WAS BUILDING A LOOP, AND THE INSTRUMENTS CAUGHT IT (2026-08-08,
-  latest). HAL + GOLEM.** HAL OTA-1198 / golem OTA-1175. **steam NOT included — batched
+- **⚠ THE INSTRUMENT STOPS WHEN NOBODY IS LOOKING (2026-08-08, latest). HAL + GOLEM.** HAL
+  OTA-1199 / golem OTA-1176. **steam NOT included — batched (§2).** Owner sent a React
+  Native / Hermes memory checklist. **Item 2 — *"subscriptions, intervals, or event
+  listeners that never get cleared"* — was MINE**, from OTA-1195 the same afternoon: a
+  self-recursing `requestAnimationFrame` loop, a rescheduling `setTimeout`, and **two**
+  `AppState` listeners, with **no teardown anywhere**.
+
+  ⚠ **As a leak it is small** — two listener objects, and Hermes reclaims the per-frame
+  closure. It was never going to account for 400MB. ⚠⚠ **As a behaviour it was wrong:**
+  the loop woke the JS thread **60×/sec for the whole life of the process, including
+  backgrounded**, and the detector **threw those samples away** — it only judges while
+  foregrounded. Pure waste, and a backgrounded app doing steady work is what iOS reclaims
+  first. **The instrument was making the thing it measures slightly worse.**
+
+  1. `stopRuntimePressureWatch()` exists, and the **starter calls it** instead of
+     hand-rolling a copy — which had already drifted from what it should clear. One
+     implementation is the point, not tidiness.
+  2. The frame clock **starts and stops with foreground state**, guarded so two loops can
+     never stack.
+
+  **⚠⚠ ON THE REST OF THAT CHECKLIST — recorded so nobody re-derives it wrongly: the
+  dominant memory term here is NATIVE, not the JS heap.** A ~400MB llama.cpp context is
+  invisible to Hermes GC, so `global.gc()` and the Hermes sampling profiler would both show
+  a flat, healthy heap while the device dies. Good React Native advice pointed at the wrong
+  pool for this bug. Likewise `[weak self]` / Combine / `prepareForReuse` — no Swift here.
+
+  ⚠ **The image assets ARE real and second-order, measured:** nine outpost PNGs at
+  **1254×1254 → 6.3MB decoded each (~57MB for the set)**, plus a 1774×887 atlas at 6.3MB
+  and a 1024² icon at 4.2MB — all oversized for a 414pt screen, and RN's image cache holds
+  them after first display. Worth downsampling to ~640² (saves ~42MB). But it is **one
+  sixth of a single model load**, and the log shows seven of those in forty seconds. Do not
+  mistake it for the cause. ⚠ `LogScreen` also uses `ScrollView`, not `FlatList`, so all
+  128 entries mount at once — cheap to fix, small payoff.
+
+  New tests folded into `ota1198MemoryInterlock` (15 total). ⚠ **`ota1195` assertions
+  RETARGETED, not weakened** — the idempotence test now pins ONE shared teardown instead of
+  a hand-rolled copy, which is a stronger claim than it made before.
+
+- **⚠⚠ THE OTA-1196 FIX WAS BUILDING A LOOP, AND THE INSTRUMENTS CAUGHT IT (2026-08-08).
+  HAL + GOLEM.** HAL OTA-1198 / golem OTA-1175. **steam NOT included — batched
   (§2).** First device log on 1197, indicting OTA-1196 in its own words:
 
   ```

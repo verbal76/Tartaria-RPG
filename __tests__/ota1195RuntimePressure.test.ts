@@ -324,12 +324,19 @@ describe('OTA-1195 — this OTA changes no behaviour, deliberately', () => {
   });
 
   it('the instruments are idempotent — a re-hydrate must not stack timers', () => {
+    // ⚠ RETARGETED BY OTA-1199, NOT WEAKENED — and the claim is now stronger than it was.
+    // The starter used to hand-roll its own teardown, which had already drifted from what
+    // it should clear. Both paths now go through ONE `stopRuntimePressureWatch()`, so
+    // idempotence is true by construction rather than by the starter remembering.
     const i = STORE.indexOf('function startRuntimePressureWatch');
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 1200);
-    expect(block).toContain('if (rpSampleTimer !== null)');
-    expect(block).toContain('cancelAnimationFrame');
-    expect(block).toContain('rpMemorySub.remove()');
+    expect(STORE.slice(i, i + 900)).toContain('stopRuntimePressureWatch();');
+    const j = STORE.indexOf('export function stopRuntimePressureWatch(): void {');
+    expect(j).toBeGreaterThan(-1);
+    const stopper = STORE.slice(j, j + 700);
+    expect(stopper).toContain('if (rpSampleTimer !== null)');
+    expect(stopper).toContain('rpStopFrameClock()');
+    expect(stopper).toContain('rpMemorySub.remove()');
   });
 
   it('⚠ EVERY LISTENER IS GUARDED — headless and test environments have no AppState', () => {
@@ -341,6 +348,12 @@ describe('OTA-1195 — this OTA changes no behaviour, deliberately', () => {
     // Each addEventListener sits inside its own try/catch.
     const listeners = (block.match(/AppState\.addEventListener/g) ?? []).length;
     expect(listeners).toBe(2);
-    expect(block).toContain("typeof requestAnimationFrame === 'function'");
+    // ⚠ RETARGETED BY OTA-1199 — the rAF guard moved into `rpStartFrameClock` when the
+    // frame clock learned to pause on background. Same guard, one place instead of two.
+    const raf = STORE.indexOf('function rpStartFrameClock(): void {');
+    expect(raf).toBeGreaterThan(-1);
+    const rafBlock = STORE.slice(raf, raf + 500);
+    expect(rafBlock).toContain("typeof requestAnimationFrame !== 'function'");
+    expect(rafBlock).toContain('catch');
   });
 });

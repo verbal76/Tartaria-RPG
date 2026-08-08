@@ -1940,18 +1940,48 @@ export function logUiTap(label: string): void {
   } catch { /* never let instrumentation break a control */ }
 }
 
+/** ⚠ OTA-1199 — the frame clock, hoisted so app-state can pause it. A self-recursing rAF
+ *  is the cheapest way to notice frames stopping, but only while anyone is looking. */
+function rpStartFrameClock(): void {
+  if (rpFrameRaf !== null) return; // already running — never stack two loops
+  if (typeof requestAnimationFrame !== 'function') return;
+  const frameTick = (): void => {
+    rpLastFrameAt = Date.now();
+    try { rpFrameRaf = requestAnimationFrame(frameTick) as unknown as number; } catch { rpFrameRaf = null; }
+  };
+  try { rpFrameRaf = requestAnimationFrame(frameTick) as unknown as number; } catch { rpFrameRaf = null; }
+}
+
+function rpStopFrameClock(): void {
+  if (rpFrameRaf === null) return;
+  if (typeof cancelAnimationFrame === 'function') {
+    try { cancelAnimationFrame(rpFrameRaf); } catch { /* ignore */ }
+  }
+  rpFrameRaf = null;
+}
+
+/** ⚠⚠ OTA-1199 — THE TEARDOWN OTA-1195 SHIPPED WITHOUT.
+ *  Two AppState subscriptions, a rescheduling timer and an rAF loop, and nothing anywhere
+ *  stopped any of them. It is a small leak in bytes — the listeners are two objects and
+ *  Hermes reclaims the per-frame closure — but "started forever, stopped never" is the
+ *  shape that becomes a real one the moment somebody calls the starter twice from a new
+ *  place. Idempotence covered that; an explicit stop is what makes it true by construction
+ *  rather than by the starter remembering to be careful. */
+export function stopRuntimePressureWatch(): void {
+  if (rpSampleTimer !== null) { clearTimeout(rpSampleTimer); rpSampleTimer = null; }
+  rpStopFrameClock();
+  if (rpMemorySub) { try { rpMemorySub.remove(); } catch { /* ignore */ } rpMemorySub = null; }
+  if (rpAppStateSub) { try { rpAppStateSub.remove(); } catch { /* ignore */ } rpAppStateSub = null; }
+}
+
 function startRuntimePressureWatch(
   get: () => GameStore,
   _set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
 ): void {
   // Idempotent: a re-hydrate must not stack a second set of timers and listeners.
-  if (rpSampleTimer !== null) { clearTimeout(rpSampleTimer); rpSampleTimer = null; }
-  if (rpFrameRaf !== null && typeof cancelAnimationFrame === 'function') {
-    try { cancelAnimationFrame(rpFrameRaf); } catch { /* ignore */ }
-  }
-  rpFrameRaf = null;
-  if (rpMemorySub) { try { rpMemorySub.remove(); } catch { /* ignore */ } rpMemorySub = null; }
-  if (rpAppStateSub) { try { rpAppStateSub.remove(); } catch { /* ignore */ } rpAppStateSub = null; }
+  // ⚠ OTA-1199 — goes through the SAME teardown a caller would use, so the two can never
+  // drift. The hand-rolled copy this replaces already differed from what it should clear.
+  stopRuntimePressureWatch();
 
   const now = Date.now();
   rpLastFrameAt = now;
@@ -2026,21 +2056,26 @@ function startRuntimePressureWatch(
       // A fresh foreground restarts both clocks: a backgrounded app legitimately stops
       // painting, and counting that as a render stall would cry wolf every time the
       // player checks a message.
-      if (nextStr === 'active') { rpLastFrameAt = t; rpLastJsAt = t; }
+      // ⚠⚠ OTA-1199 — THE FRAME CLOCK STOPS WHEN THE APP DOES.
+      // OTA-1195 ran this rAF loop for the entire life of the process, backgrounded or
+      // not — 60 wakeups a second that the detector then THREW AWAY, because it only
+      // judges while foregrounded. Pure waste, and a backgrounded app doing steady work is
+      // what iOS reclaims first. On the device we are trying to keep alive, the instrument
+      // was making the measurement slightly worse.
+      if (nextStr === 'active') {
+        rpLastFrameAt = t; rpLastJsAt = t;
+        rpStartFrameClock();
+      } else {
+        rpStopFrameClock();
+      }
     }) as { remove: () => void } | null;
   } catch { /* AppState unavailable (headless/test) */ }
 
   // Clock A — frames. Driven by the NATIVE frame callback, so it stops when the render
   // side stops even while JS keeps running.
-  const frameTick = (): void => {
-    rpLastFrameAt = Date.now();
-    if (typeof requestAnimationFrame === 'function') {
-      try { rpFrameRaf = requestAnimationFrame(frameTick) as unknown as number; } catch { rpFrameRaf = null; }
-    }
-  };
-  if (typeof requestAnimationFrame === 'function') {
-    try { rpFrameRaf = requestAnimationFrame(frameTick) as unknown as number; } catch { rpFrameRaf = null; }
-  }
+  // ⚠ OTA-1199 — started and stopped with the app's foreground state; see the AppState
+  // handler above and rpStopFrameClock/rpStartFrameClock below.
+  rpStartFrameClock();
 
   // Clock B — plain JS. Serviced by the JS thread alone. The PAIR is the discriminator;
   // neither clock on its own can tell a frozen screen from a wedged engine.

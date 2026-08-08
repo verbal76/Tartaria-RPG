@@ -134,6 +134,48 @@ describe('OTA-1198 — a memory warning now silences the watchdog', () => {
   });
 });
 
+describe('OTA-1199 — the instrument stops when nobody is looking', () => {
+  it('⚠⚠ OTA-1195 SHIPPED A STARTER WITH NO STOPPER — two listeners, a timer, an rAF loop', () => {
+    // Owner's RN/Hermes checklist, item 2: "subscriptions, intervals, or event listeners
+    // that never get cleared." That one was mine, from the same afternoon.
+    expect(STORE).toContain('export function stopRuntimePressureWatch(): void {');
+    const i = STORE.indexOf('export function stopRuntimePressureWatch(): void {');
+    const block = STORE.slice(i, i + 700);
+    expect(block).toContain('clearTimeout(rpSampleTimer)');
+    expect(block).toContain('rpStopFrameClock()');
+    expect(block).toContain('rpMemorySub.remove()');
+    expect(block).toContain('rpAppStateSub.remove()');
+  });
+
+  it('⚠ THE STARTER REUSES THE STOPPER, so the two cannot drift', () => {
+    // The hand-rolled teardown inside the starter already differed from what it should
+    // have cleared. One implementation, used by both paths.
+    const i = STORE.indexOf('function startRuntimePressureWatch(');
+    const block = STORE.slice(i, i + 900);
+    expect(block).toContain('stopRuntimePressureWatch();');
+  });
+
+  it('⚠⚠ THE FRAME CLOCK PAUSES WHEN THE APP IS NOT FOREGROUNDED', () => {
+    // The detector only JUDGES while foregrounded, so 60 wakeups a second in the
+    // background were being thrown away — and a backgrounded app doing steady work is what
+    // iOS reclaims first. The instrument was making the thing it measures slightly worse.
+    expect(STORE).toContain('rpStartFrameClock();');
+    expect(STORE).toContain('rpStopFrameClock();');
+    const i = STORE.indexOf("if (nextStr === 'active') {");
+    expect(i).toBeGreaterThan(-1);
+    const block = STORE.slice(i, i + 500);
+    expect(block).toContain('rpStartFrameClock();');
+    expect(block).toContain('} else {');
+    expect(block).toContain('rpStopFrameClock();');
+  });
+
+  it('⚠ AND TWO LOOPS CAN NEVER STACK — the starter is guarded', () => {
+    const i = STORE.indexOf('function rpStartFrameClock(): void {');
+    expect(i).toBeGreaterThan(-1);
+    expect(STORE.slice(i, i + 260)).toContain('if (rpFrameRaf !== null) return;');
+  });
+});
+
 describe('OTA-1198 — what the log also settled, on the record', () => {
   it('⚠⚠ THE DEVICE READS CHANNEL `preview`, NOT `hal2001` — measured, not assumed', () => {
     // `ota: boot check — enabled=true channel=preview rt=2.4.1` — the OTA-1197 telemetry

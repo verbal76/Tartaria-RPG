@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.108';
+export const DISPLAY_VERSION = '4.29.109';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24511,7 +24511,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // only channel reaching this device is the one whose failure goes unnoticed.
 // New suite ota1198MemoryInterlock (11 tests).
 // DISPLAY_VERSION 4.29.108.
-export const OTA_BUILD_ID = '2026-08-08-1198-memory-interlock';
+// OTA-1199 — THE INSTRUMENT STOPS WHEN NOBODY IS LOOKING.
+// Owner sent a React Native / Hermes memory checklist. Item 2 — 'useEffect
+// missing cleanups: subscriptions, intervals, or event listeners that never
+// get cleared' — was MINE, from OTA-1195 the same afternoon: a
+// self-recursing requestAnimationFrame loop, a rescheduling setTimeout, and
+// TWO AppState listeners, with no teardown anywhere.
+// ⚠ AS A LEAK IT IS SMALL - two listener objects, and Hermes reclaims the
+// per-frame closure. It was never going to account for 400MB.
+// ⚠⚠ AS A BEHAVIOUR IT WAS WRONG: that loop woke the JS thread 60x/sec for
+// the whole life of the process INCLUDING BACKGROUNDED, and the detector
+// then threw those samples away (it only judges while foregrounded). Pure
+// waste - and a backgrounded app doing steady work is what iOS reclaims
+// first. The instrument was making the thing it measures slightly worse.
+// TWO FIXES:
+//   1. stopRuntimePressureWatch() exists, and the STARTER now calls it
+//      instead of hand-rolling a copy that had already drifted.
+//   2. The frame clock starts/stops with the app's foreground state.
+// ⚠ ON THE REST OF THE CHECKLIST, recorded so it is not re-derived: the
+// dominant memory term here is NATIVE, not the JS heap. A ~400MB llama.cpp
+// context is invisible to Hermes GC, so global.gc() and the Hermes sampling
+// profiler would show a flat healthy heap while the device dies. Good RN
+// advice, aimed at the wrong pool for this bug.
+// New tests folded into ota1198MemoryInterlock (15 total). ota1195
+// assertions RETARGETED, not weakened - both came out stronger.
+// DISPLAY_VERSION 4.29.109.
+export const OTA_BUILD_ID = '2026-08-08-1199-instrument-teardown';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1198-memory-interlock';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1197-update-telemetry';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1196-memory-defence';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1195-runtime-pressure';
