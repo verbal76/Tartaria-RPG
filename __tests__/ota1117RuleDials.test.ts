@@ -200,9 +200,22 @@ describe('OTA-1117 — every remaining dial has a consumer', () => {
       creep: 'app/state/gameStore.ts',
       exposure: 'app/state/gameStore.ts',
       prices: 'app/engine/vendorPricing.ts',
+      // OTA-1171 — the three combat-feel dials.
+      dodgeLock: 'app/state/gameStore.ts',
+      mend: 'app/state/gameStore.ts',
+      gearBlend: 'app/state/gameStore.ts',
     };
     for (const sys of DIFFICULTY_SYSTEMS) {
       expect(Object.keys(wired)).toContain(sys.id);
+    }
+    // ⚠ OTA-1171 STRENGTHENED THIS. The list above was BOOKKEEPING — it proved a dial had
+    // been written down, not that anything read it, which is not the claim in the comment
+    // and not the lesson the hunger dial taught. A dial can now only be listed if the file
+    // named beside it genuinely mentions it. Case-insensitive because two ids are spelled
+    // as `withold…` fields at the consumer (`identity` → `witholdIdentity`).
+    for (const sys of DIFFICULTY_SYSTEMS) {
+      const consumer = src(wired[sys.id]!).toLowerCase();
+      expect(consumer).toContain(sys.id.toLowerCase());
     }
   });
 

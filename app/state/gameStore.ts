@@ -69,6 +69,7 @@ import {
   hostileHuntChance, // NB: pressure.worstStandingFaction is deliberately NOT
   // imported — gameStore already has a local one with a different shape.
   scaledCorruptionGain, scaledWeatherBite,
+  dialOf, scaledRegen, // OTA-1171 — the three combat-feel dials
   type PressureTier,
 } from '../engine/pressure';
 // OTA-1067 — Phase 5: the Arbiter becomes someone.
@@ -3505,12 +3506,20 @@ function scalePowerOf(player: PlayerCharacter): number {
   // ⚠ The fallback is the BASELINES, which make `gearPowerTerm` exactly 0 — i.e. the
   // pre-OTA-1159 number. If we cannot see what the player is carrying, we scale as if
   // they carry nothing rather than inventing difficulty from a guess.
-  let gear = { ac: AC_POWER_BASELINE, avgWeaponDamage: DMG_POWER_BASELINE };
+  //
+  // ⚠ OTA-1171 — THE TIER'S WEIGHT ON THE GEAR TERMS IS READ HERE, at the one choke
+  // point, for exactly the reason the choke point exists: seven spawners route through
+  // this function, and adding a dial at each of them is how the AC term went missing for
+  // as long as it did. `dialOf`, not `profileOf`, so a CUSTOM character who left "The
+  // world reads your kit" unchecked gets the 'owed' weight for it.
+  const tierBlend = dialOf(player, 'gearBlend');
+  let gear = { ac: AC_POWER_BASELINE, avgWeaponDamage: DMG_POWER_BASELINE, tierBlend };
   try {
     const weapon = getEquippedWeapon(player, 'main');
     gear = {
       ac: standingAc(player),
       avgWeaponDamage: avgDamageNotation(weapon?.damageDice),
+      tierBlend,
     };
   } catch {
     // degrade to the authored curve; never let gear inspection kill a spawn
@@ -12086,8 +12095,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const crossedTile = _lastRegenCell !== null && _lastRegenCell !== cellNow;
         _lastRegenCell = cellNow;
         const stamGain = Math.min(regen.stamina, Math.max(0, (live.staminaMax ?? 0) - live.stamina));
+        // ⚠ OTA-1171 — SCALED BY TIER. salvage ×1.5, owed ×1 (identity), let_it_come
+        // ×0.75, bury_me ×0.5. Only the HP half moves: `stamGain` above is untouched, for
+        // the same reason OTA-1169 left it per-action — stamina is barely a combat
+        // resource and tiles already drain it, so metering it here would be a second
+        // punishment billed as one.
+        const tierRegenHp = scaledRegen(regen.hp, dialOf(live, 'mend'));
         const hpGain = crossedTile
-          ? Math.min(regen.hp, Math.max(0, (live.hpMax ?? 0) - live.hp))
+          ? Math.min(tierRegenHp, Math.max(0, (live.hpMax ?? 0) - live.hp))
           : 0;
         if (stamGain > 0 || hpGain > 0) {
           set((s) => s.player
@@ -16934,7 +16949,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 // DODGE_COOLDOWN_ROUNDS - 1 rounds locked and the stance usable again on
                 // the third action. Off-by-one here is the difference between "every
                 // other round" and the intended cadence.
-                dodgeCooldown: (require('../engine/dodgeCooldown') as typeof import('../engine/dodgeCooldown')).DODGE_COOLDOWN_ROUNDS,
+                // ⚠ OTA-1171 — the tier decides the count, not the bare constant.
+                // salvage resolves to 0, which arms nothing and leaves the stance free —
+                // the pre-OTA-1170 game, deliberately, on the tier whose whole promise is
+                // that the mud lets you work.
+                dodgeCooldown: (require('../engine/dodgeCooldown') as typeof import('../engine/dodgeCooldown'))
+                  .dodgeCooldownRounds(dialOf(s.player, 'dodgeLock')),
               }, 1), 0.1) }
             : s,
         );

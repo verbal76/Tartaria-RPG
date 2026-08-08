@@ -156,6 +156,55 @@ export interface PressureProfile {
    *  bestiary has NOT yet earned? false = current behaviour (shown once
    *  discovered). true = discovery only, nothing given away. */
   witholdIntel: boolean;
+
+  // ── OTA-1171 — THE THREE COMBAT-FEEL DIALS ────────────────────────────
+  // Owner, after the OTA-1169/1193 balance pass landed: *"if I'm tuning this to
+  // be normal difficulty level just above the bottom, can you use this as a
+  // baseline and tune the other levels accordingly."*
+  //
+  // ⚠ WHY THESE THREE AND NOT A NEW MULTIPLIER. OTA-1167 through 1193 changed
+  // how the game FEELS in a fight — the hunt scaler learned to read gear, HP
+  // regen moved to per-tile, and dodge got a cooldown. Every one of those is a
+  // GLOBAL constant. So the gentlest tier took the identical nerf the owner's
+  // over-geared run did, and the player least able to absorb it absorbed all of
+  // it. A difficulty ladder whose rungs cannot express the levers that actually
+  // decide whether you feel invincible is not a ladder.
+  //
+  // ⚠⚠ AND `gearBlend` KNOWINGLY CROSSES THIS FILE'S OWN LINE — recorded here
+  // rather than quietly worked around, the same way OTA-1113 recorded its
+  // reversal. The header says: *"NO dial here scales enemy HP or damage."* This
+  // one does, at one remove: it changes how much of your kit `overLevelT` can
+  // see, which moves the spawn's tier, which moves its stats.
+  //   • WHY IT IS STILL RIGHT — the prohibition exists to forbid DAMAGE SPONGES
+  //     (see OTA-1088 guard-crack and the combatStress stall metric). This is
+  //     the opposite failure mode: the complaint is that a fully-kitted
+  //     character fights the world a fresh arrival fights. Scaling the blend
+  //     makes the world MATCH the player rather than inflating a health bar,
+  //     and the fight still ends in the same number of rounds.
+  //   • ⚠ WHAT STILL PROTECTS THE TUNING — the identity row, unchanged. At
+  //     'owed' all three are exact no-ops (0 rounds of change, ×1, ×1), so the
+  //     baseline the owner is playing right now is the baseline that ships.
+
+  /** MULTIPLIER on `DODGE_COOLDOWN_ROUNDS` (3). ⚠ `salvage` is **0**, i.e. no
+   *  cooldown at all — deliberately the pre-OTA-1170 behaviour, because the
+   *  free-dodge loop is exactly the safety net a struggling player is asking
+   *  for when they pick the gentlest tier. Written as thirds so the product is
+   *  a whole number of rounds and the intent is readable at the call site. */
+  dodgeLock: number;
+  /** MULTIPLIER on HP regen from worn armour. ⚠ Only the PER-TILE HP half —
+   *  stamina regen is untouched, for the same reason OTA-1169 left it alone
+   *  (it is barely a combat resource, and tiles already drain it). Above 1.0 a
+   *  gentler tier mends faster on the road. */
+  mend: number;
+  /** MULTIPLIER on `GEAR_POWER_BLEND` (0.5). 1.0 = the shipped half weight. At
+   *  `bury_me` this reaches **2.0 → the full designed weight of 1.0**, which
+   *  OTA-1159 wrote and then deliberately shipped at half awaiting device
+   *  evidence: the top tier is where that evidence costs least. ⚠ It can never
+   *  make the world EASIER than authored — `gearPowerTerm` clamps both terms at
+   *  0 above a fresh-arrival baseline, so a multiplier only scales something
+   *  already non-negative. */
+  gearBlend: number;
+
   // ⚠ OTA-1117 — THE `hunger` DIAL IS GONE, AND THIS IS WHY.
   // OTA-1113 wrote it as "MULTIPLIER — hunger clock rate. 1.0 = +1 stamina
   // penalty per 8 in-game hours, exactly as shipped." That description was
@@ -185,6 +234,10 @@ export const PRESSURE_PROFILES: Record<Exclude<PressureTier, 'custom'>, Pressure
     tide: 0, hostile: 0, creep: 0.5, exposure: 0.5,
     spawn: 0.6, discovery: 1.4, pack: 0.7, loot: 1.25, elite: 0,
     witholdIdentity: false, witholdIntel: false,
+    // ⚠ dodgeLock 0 = NO cooldown, the pre-OTA-1170 game. This tier's whole
+    // promise is "the mud lets you work"; taking the safety net away from the
+    // player who asked for one is the wrong direction on the wrong rung.
+    dodgeLock: 0, mend: 1.5, gearBlend: 0.5,
   },
   owed: {
     id: 'owed',
@@ -196,6 +249,10 @@ export const PRESSURE_PROFILES: Record<Exclude<PressureTier, 'custom'>, Pressure
     // ota1113DifficultySystems asserts it verbatim.
     spawn: 1, discovery: 1, pack: 1, loot: 1, elite: 0,
     witholdIdentity: false, witholdIntel: false,
+    // ⚠ THE IDENTITY ROW CONTINUES. 1 × 3 rounds = the shipped 3, ×1 regen, and
+    // ×1 on a GEAR_POWER_BLEND that is itself already 0.5. This is the tier the
+    // owner is playing while tuning, so it must remain the thing that ships.
+    dodgeLock: 1, mend: 1, gearBlend: 1,
   },
   let_it_come: {
     id: 'let_it_come',
@@ -204,6 +261,9 @@ export const PRESSURE_PROFILES: Record<Exclude<PressureTier, 'custom'>, Pressure
     tide: 1.8, hostile: 1.7, creep: 1.5, exposure: 1.4,
     spawn: 1.35, discovery: 0.85, pack: 1.3, loot: 0.85, elite: 0.15,
     witholdIdentity: true, witholdIntel: false,
+    // 4/3 × 3 = 4 rounds. Written as a fraction of the base so the whole-number
+    // intent survives someone re-tuning DODGE_COOLDOWN_ROUNDS.
+    dodgeLock: 4 / 3, mend: 0.75, gearBlend: 1.5,
   },
   bury_me: {
     id: 'bury_me',
@@ -216,6 +276,13 @@ export const PRESSURE_PROFILES: Record<Exclude<PressureTier, 'custom'>, Pressure
     // `elite` and `pack`, not from an empty world.
     spawn: 1.7, discovery: 0.7, pack: 1.6, loot: 0.7, elite: 0.3,
     witholdIdentity: true, witholdIntel: true,
+    // 5/3 × 3 = 5 rounds — roughly one dodge per two ordinary skirmishes.
+    // ⚠ It stops at 5 rather than climbing further: raiders die in 2-4 rounds,
+    // so a longer lock would delete the stance from normal play rather than
+    // rationing it, and a tool you never get to use is not a harder game.
+    // ⚠ gearBlend 2 takes GEAR_POWER_BLEND to its full designed 1.0 — the
+    // weight OTA-1159 wrote and shipped at half pending evidence.
+    dodgeLock: 5 / 3, mend: 0.5, gearBlend: 2,
   },
 };
 
@@ -265,6 +332,11 @@ export function profileOf(
     elite: pickOf('elite').elite,
     witholdIdentity: pickOf('identity').witholdIdentity,
     witholdIntel: pickOf('intel').witholdIntel,
+    // OTA-1171 — each governed by its own switch, so "let it come, but leave my
+    // dodge alone" is expressible like every other system here.
+    dodgeLock: pickOf('dodgeLock').dodgeLock,
+    mend: pickOf('mend').mend,
+    gearBlend: pickOf('gearBlend').gearBlend,
   };
 }
 
@@ -426,7 +498,9 @@ export function scaledWeatherBite(raw: number, profile: PressureProfile): number
 export type DifficultySystemId =
   | 'spawn' | 'discovery' | 'pack' | 'loot' | 'elite'
   | 'identity' | 'intel'
-  | 'tide' | 'hostile' | 'creep' | 'exposure';
+  | 'tide' | 'hostile' | 'creep' | 'exposure'
+  // OTA-1171 — the three combat-feel dials.
+  | 'dodgeLock' | 'mend' | 'gearBlend';
 
 export interface DifficultySystem {
   id: DifficultySystemId;
@@ -448,6 +522,14 @@ export const DIFFICULTY_SYSTEMS: readonly DifficultySystem[] = [
     blurb: 'How many bodies come at you at once.' },
   { id: 'elite', label: 'Elites instead of numbers', kind: 'content',
     blurb: 'A group of common foes sometimes arrives as one dangerous one instead.' },
+  // OTA-1171 — grouped with the other fight dials, above the world dials,
+  // because these are the three the player will feel first.
+  { id: 'dodgeLock', label: 'Dodge recharge', kind: 'multiplier',
+    blurb: 'How many beats you spend recovering your footing before you can set for another dodge.' },
+  { id: 'mend', label: 'Armour mends you on the road', kind: 'multiplier',
+    blurb: 'How much health your worn gear gives back for each tile you cross.' },
+  { id: 'gearBlend', label: 'The world reads your kit', kind: 'multiplier',
+    blurb: 'How closely what you meet is matched to the armour and weapon you are actually carrying.' },
   { id: 'discovery', label: 'Vendors and hidden places', kind: 'multiplier',
     blurb: 'How readily the world offers you traders, caches and secret sites.' },
   { id: 'loot', label: 'Loot per tile', kind: 'multiplier',
@@ -512,6 +594,22 @@ export function dialOf<K extends keyof PressureProfile>(
  *  the sim's stall tail comes straight back. Both consumers call this. */
 export function scaledPackSize(base: number, mult: number): number {
   return Math.max(1, Math.round(base * mult));
+}
+
+/** ⚠ OTA-1171 — PER-TILE HP REGEN, SCALED BY TIER. Rounds rather than floors, and that
+ *  choice is load-bearing in both directions:
+ *   • At the cap — `HP_REGEN_CAP` is 2, and the owner's run wears the full 2 — bury_me's
+ *     ×0.5 gives 1. That is the real halving, landing exactly where the problem was
+ *     measured (he GAINED HP during fights at +2 a round).
+ *   • At the margin, a single +1 piece survives: 1 × 0.5 = 0.5, and JS rounds a tie UP.
+ *     Flooring would zero it, which turns a worn item into a dead stat and reads as a
+ *     bug rather than as difficulty.
+ *  ⚠ Never returns more than the base at a tier that is meant to give MORE only because
+ *  `mend` says so — there is no clamp to base here on purpose, because salvage's 1.5 is
+ *  supposed to exceed it. */
+export function scaledRegen(base: number, mult: number): number {
+  const m = Number.isFinite(mult) ? Math.max(0, mult) : 1;
+  return Math.max(0, Math.round(base * m));
 }
 
 /** Deliberately a SMALLER growth than pack size: three more bodies should not

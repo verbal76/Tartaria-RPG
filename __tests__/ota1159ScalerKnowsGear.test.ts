@@ -156,8 +156,16 @@ describe('OTA-1159 — one place builds a scale power', () => {
     // ⚠ and the fallback must be the BASELINES — which make gearPowerTerm exactly 0,
     // i.e. the pre-OTA-1159 number. If we cannot see the gear we scale as though there
     // is none, rather than inventing difficulty from a guess.
-    expect(STORE).toContain('let gear = { ac: AC_POWER_BASELINE, avgWeaponDamage: DMG_POWER_BASELINE };');
+    // ⚠ OTA-1171 RETARGETED THIS, IT DID NOT WEAKEN IT. The line gained `tierBlend` when
+    // the difficulty tier learned to weight the gear terms. The CLAIM is unchanged — the
+    // two baselines are still the fallback — and it is now asserted more tightly than
+    // before: the fallback must read exactly 0 AT EVERY TIER WEIGHT, which is the
+    // property the original assertion was really protecting.
+    expect(STORE).toContain('let gear = { ac: AC_POWER_BASELINE, avgWeaponDamage: DMG_POWER_BASELINE, tierBlend };');
     expect(gearPowerTerm(AC_POWER_BASELINE, DMG_POWER_BASELINE)).toBe(0);
+    for (const blend of [0, 0.5, 1, 1.5, 2]) {
+      expect(gearPowerTerm(AC_POWER_BASELINE, DMG_POWER_BASELINE, blend)).toBe(0);
+    }
   });
 
   it('the damage proxy is the same one the Power gauge uses', () => {

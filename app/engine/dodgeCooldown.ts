@@ -26,13 +26,40 @@
  *  tool in a long fight (~11 uses) instead of being removed from boss play. */
 export const DODGE_COOLDOWN_ROUNDS = 3;
 
+/** ⚠ OTA-1171 — THE LOCK IS PER DIFFICULTY TIER NOW, and this is the only place that
+ *  turns the tier's multiplier into rounds. Owner: *"use this as a baseline and tune the
+ *  other levels accordingly."* The constant above stays the BASELINE — it is what 'owed',
+ *  the identity row, resolves to — and the tiers are multiples of it: salvage 0 (no
+ *  cooldown at all, the pre-OTA-1170 game), owed 3, let_it_come 4, bury_me 5.
+ *
+ *  ⚠ Takes a plain number rather than a player, deliberately: this file imports NOTHING,
+ *  and it stays that way so `pressure.ts` can depend on it without a cycle. The caller
+ *  reads `dialOf(player, 'dodgeLock')`.
+ *
+ *  ⚠ Absent reads as 1, not 0. A missing dial must mean "the baseline", never "no
+ *  cooldown" — an undefined slipping through as a free dodge is a balance change nobody
+ *  chose, and it would silently hand every unmigrated save the salvage rules. */
+export function dodgeCooldownRounds(dodgeLock: number | undefined): number {
+  const mult = Number.isFinite(dodgeLock) ? Math.max(0, dodgeLock as number) : 1;
+  return Math.max(0, Math.round(DODGE_COOLDOWN_ROUNDS * mult));
+}
+
 /** 0…1 — how far the bar has refilled. 0 = just used (full red), 1 = ready (full blue).
  *  ⚠ Returns DISCRETE steps, one per action, because the refill is tied to rounds rather
  *  than to time. The owner asked for a hard edge and no fade; a continuous value here
- *  would invite the renderer to animate between frames and undo that. */
-export function dodgeFill(cooldown: number | undefined): number {
-  const c = Math.max(0, Math.min(DODGE_COOLDOWN_ROUNDS, Math.round(cooldown ?? 0)));
-  return (DODGE_COOLDOWN_ROUNDS - c) / DODGE_COOLDOWN_ROUNDS;
+ *  would invite the renderer to animate between frames and undo that.
+ *
+ *  ⚠ OTA-1171 — `max` is THE TIER'S round count, not the constant. The denominator has to
+ *  be the same number the store armed, or the bar lies: at bury_me's 5 rounds a bar
+ *  divided by 3 would read full blue with two beats still locked, and the chip would
+ *  refuse a tap it visibly invited. Defaults to the baseline so every existing caller and
+ *  every save without a tier is unchanged.
+ *  ⚠ A max of 0 (salvage — no cooldown) is always full: dividing by it would be NaN. */
+export function dodgeFill(cooldown: number | undefined, max: number = DODGE_COOLDOWN_ROUNDS): number {
+  const m = Number.isFinite(max) ? Math.max(0, Math.round(max)) : DODGE_COOLDOWN_ROUNDS;
+  if (m <= 0) return 1;
+  const c = Math.max(0, Math.min(m, Math.round(cooldown ?? 0)));
+  return (m - c) / m;
 }
 
 /** Ready to dodge again? Absent/0 = ready, which is what every existing save reads as —

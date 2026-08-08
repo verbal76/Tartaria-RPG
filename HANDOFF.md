@@ -1574,7 +1574,79 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ DODGE GETS A COOLDOWN, AND THE BUTTON SHOWS IT (2026-08-08, latest). HAL +
+- **⚠⚠ THE THREE COMBAT-FEEL LEVERS GET RUNGS ON THE LADDER (2026-08-08, latest). HAL +
+  GOLEM.** HAL OTA-1194 / golem OTA-1171. **steam NOT included — batched (§2).** Owner:
+  *"if I'm tuning this to be normal difficulty level just above the bottom, can you use
+  this as a baseline and tune the other levels accordingly"* — then, after I deferred it
+  asking for a device log on the 3-round cooldown first, *"so you didn't add the 3 new
+  levers to the other levels?"* **Asked twice, so it is his call and it is built.**
+
+  **⚠ HALF THE REQUEST NEEDED NOTHING, AND SAYING SO IS THE USEFUL HALF OF THE ANSWER.**
+  `owed` is the **identity row** — every dial on it is a mathematical no-op — and the other
+  three tiers are defined as multiples *of it*, not as absolute numbers. So the OTA-1167 →
+  1193 balance pass carried to all four rungs automatically. Nothing to hand-adjust, and
+  that identity row is exactly the protection OTA-1113 built for this situation.
+
+  **THE DEFECT RAN THE OTHER WAY.** Dodge cooldown, per-tile HP regen and the gear-aware
+  scaler were all **global constants** with no per-tier expression whatsoever, so the
+  gentlest tier took the identical nerf the owner's over-geared run did — and the player
+  least able to absorb it absorbed all of it.
+
+  **Three new dials, every one a no-op at `owed`:**
+  - `dodgeLock` → **0 / 3 / 4 / 5 rounds.** ⚠ `salvage` gets **no cooldown at all**,
+    deliberately the pre-1193 game: the free-dodge loop is precisely the safety net a
+    player picking the gentlest tier is asking for. ⚠ It stops at **5** because ordinary
+    raiders die in 2-4 rounds — past that the lock *deletes* the stance rather than
+    rationing it, which is pressure.ts's own "longer, not harder" trap.
+  - `mend` → **×1.5 / ×1 / ×0.75 / ×0.5**, on the **per-tile HP half only.** Stamina regen
+    is untouched for the same reason OTA-1169 left it per-action. At `HP_REGEN_CAP`'s 2 —
+    what the owner actually wears — bury_me is a real halving to 1, while a marginal +1
+    piece is **not** silently zeroed: the consumer ROUNDS (ties up), because flooring
+    turns a worn item into a dead stat and reads as a bug rather than as difficulty.
+  - `gearBlend` → **×0.5 / ×1 / ×1.5 / ×2** on `GEAR_POWER_BLEND`, so **bury_me reaches
+    the full designed 1.0** that OTA-1159 wrote and then shipped at half awaiting exactly
+    this kind of evidence. The top tier is where that evidence costs least.
+
+  All three are in the CUSTOM picker, so *"bury me with them, but leave my dodge alone"* is
+  expressible like every other system — and `DifficultyCustomModal` renders the registry
+  generically, so it needed no edit at all.
+
+  **⚠⚠ `gearBlend` KNOWINGLY CROSSES `pressure.ts`'s OWN PROHIBITION — recorded, not
+  quietly worked around.** The header says *"NO dial here scales enemy HP or damage"*; this
+  one does, at one remove, by changing how much of your kit `overLevelT` can see. The
+  amendment is written into the file the way OTA-1113 wrote its reversal, and pinned by
+  test, because a prohibition that is silently violated stops protecting anything. Why it
+  is still right: the rule exists to forbid **damage sponges** (OTA-1088 guard-crack, the
+  combatStress stall metric) and this is the opposite failure mode — the complaint is that
+  a fully-kitted character fights the world a fresh arrival fights. The fight still ends in
+  the same number of rounds; the world just matches the player.
+
+  **⚠ NO TIER CAN MAKE THE WORLD EASIER THAN AUTHORED.** Both gear terms are clamped at 0
+  above a fresh-arrival baseline, so a fresh arrival reads exactly 0 at every rung, and a
+  junk or negative blend degrades to the baseline rather than inverting it. ⚠ An **absent**
+  dodge dial reads as **1 (the baseline), never 0** — an undefined slipping through as a
+  free dodge would hand every unmigrated save the salvage rules, a balance change nobody
+  chose and invisible until someone read a log. ⚠ The bar's **denominator is the tier's
+  count**, not the constant: divide bury_me's 5-round lock by 3 and the chip paints full
+  blue with two beats still locked, inviting a tap it will then refuse.
+
+  ⚠ The gear weight is read at the **one choke point** — `scalePowerOf`, which all seven
+  spawners route through — and via **`dialOf`, not `profileOf`**, or a custom character
+  would read the intensity for a system they left unchecked.
+
+  New suite `ota1171DifficultyLadder` (26 tests). ⚠ **`ota1159` and `ota1170` assertions
+  RETARGETED, NOT WEAKENED** — both came out tighter: the 1182 gear fallback is now proven
+  to read 0 at *every* tier weight rather than at one, and 1193 now pins the bar's
+  denominator against the store's armed count.
+
+  ⚠ **STILL NOT PULLED, and deliberately:** the `owed` column itself is untouched, so the
+  baseline the owner is playing while he tunes is the baseline that ships. The other three
+  columns are written *around* it and want a device log before any of them is retuned.
+
+  Blocking gates green on both lines: typecheck:ci, lint, the test-typecheck ratchet,
+  the handoff-claims ratchet, and test:ci:fast.
+
+- **⚠⚠ DODGE GETS A COOLDOWN, AND THE BUTTON SHOWS IT (2026-08-08). HAL +
   GOLEM.** HAL OTA-1193 / golem OTA-1170. **steam NOT included — batched (§2).** Owner:
   *"put a cooldown timer on dodge. once it's used have it turn red and slowly fill back to
   blue… fill left to right with no fade. now how long is the cool down timer? 10 seconds?
