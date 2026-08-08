@@ -128,9 +128,13 @@ describe('OTA-1182 — one place builds a scale power', () => {
     const calls = codeOnly.match(/[^.\w]enemyScalePower\(/g) ?? [];
     expect(calls.length).toBe(1);
     expect(STORE).toContain('return enemyScalePower(base, player.hpMax, gear);');
-    // seven spawners + the helper's own declaration
+    // ⚠ WAS 8 (seven spawners + the helper's own declaration). OTA-1190 routed an EIGHTH
+    // spawner through it — `scaleHuntBoss`, which had been scaling on `hpMax` alone and
+    // was the one this OTA missed. A RISING count here is this test's claim getting
+    // STRONGER: "every spawner routes through scalePowerOf" is more true than it was.
+    // If it ever DROPS, a spawner has gone back to rolling its own measure.
     const uses = STORE.match(/scalePowerOf\(/g) ?? [];
-    expect(uses.length).toBe(8);
+    expect(uses.length).toBe(9);
   });
 
   it('AC comes from standingAc, not a third re-derivation', () => {

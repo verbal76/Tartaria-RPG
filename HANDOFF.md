@@ -1584,7 +1584,69 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ ARRIVING SOMEWHERE MEANS FINDING SOMEONE (2026-08-08, latest). HAL + GOLEM.**
+- **⚠⚠ THREE OTAs IN ONE PUSH — 1190, 1191, 1192 (2026-08-08, latest). HAL + GOLEM.**
+  HAL OTA-1190/1191/1192 / golem OTA-1167/1168/1169. **steam NOT included — batched
+  (§2).** ⚠ **Three commits, ONE push, deliberately:** §3 forbids a second push inside the
+  CI window (branch concurrency cancels the first run and destroys the record of the commit
+  that shipped). `buildInfo` therefore stamps **1192** and carries all three; VERSION.md
+  has a row each.
+
+  **⚠ OTA-1190 — THE HUNT SEES YOUR GEAR, AND TWO LINES STOPPED LYING ABOUT THE CLOCK.**
+  - `scaleHuntBoss` scaled on `hpMax` ALONE — `min(1.6, max(1.0, hpMax/30))`, which is
+    **1.0 (no scaling at all)** for anyone under 30 max HP, and blind to stats, weapon and
+    AC. OTA-1182 built `enemyScalePower` because "how strong is this character" had two
+    answers, and routed seven spawners through it. **This was the spawner it missed.** Now
+    reads the shared `overLevelT` curve; ceiling 1.6 → **2.2**.
+  - ⚠ **A CORRECTION TO THE REPORT:** the owner's "15 HP monster" was **not a hunt boss**.
+    The weakest of 18 hunt targets is the Silt Serpent at **30** base HP; most are 100-360.
+    He fought a wild **Scrap Drone** en route. Pinned by test so the anecdote cannot be
+    re-cited as evidence that bosses spawn tiny.
+  - `contractRoute` offered **ROUTE on a PAUSED contract**, so a player could walk the whole
+    way to an objective for a run that is not advancing — which is exactly the session that
+    ended in a Core Guardian and no hunt beat.
+  - ⚠ **"Type 'rest' to recover (≈4h)" — REST IS 8 HOURS.** Half the cost, mis-stated, on
+    the line a player budgets a contract window from. And the course banner called every
+    tile **"1 day"** (`Estimated ${tiles} days`), the last surface still quoting the
+    pre-1185 fiction. Both were live when the owner's contract lapsed.
+
+  **⚠ OTA-1191 — THE ARBITER STOPS TYPING IN FRONT OF YOU, AND THE ROAD BUILDS YOU UP.**
+  - The streaming tail rendered `partialArbiterText` token by token, so a generated line was
+    read TWICE — and a **discarded** one (device log: `WASTED 10 calls / 102.4s`) had been
+    read in full before a template replaced it. ⚠ **The indicator STAYS** — measured
+    generations run **6.6-11.6s** and this was the only sign the engine was working.
+  - The road odometer: **+1 max stamina per 40 credits, a cardinal step worth 2.** ⚠ There
+    is **no ceiling** — the ~7 cap belongs to `MILESTONE_TRAVEL_STEP` (36 locations ÷ 5),
+    which is why that track never read as trainable. ⚠ **Ring of the last 8 cells** defeats
+    pacing, the exact hole arb118 closed on the other track. ⚠ Awards by **threshold
+    crossing**, not `% === 0` — a 2-credit step can jump 39 → 41 and skip the payout.
+
+  **⚠ OTA-1192 — HP REGEN IS PER TILE, NOT PER ACTION.** Owner: *"I feel invincible… is it
+  the +5 AC armor stacking or the +2 regen on every action?"* **Measured from the log, not
+  guessed:** enemies hit a **flat 25%** (`needs nat 16+ — AC capped`, so AC past ~20 does
+  nothing), and the ~4 that lands after `armor −47%, plate −2` averages **~1 HP a round
+  against +2 of regen — he GAINED HP during fights.** Eight combats, never below 26 of 32.
+  Tile-gating makes combat regen exactly **zero** while the road still mends.
+  - ⚠ **Stamina regen stays per-action** — never the problem, and tile-gating it would nerf
+    the one pool tiles already drain. (It is farmable by action-spam; **pre-existing**, out
+    of scope, noted so it is not blamed on this OTA.)
+  - ⚠ A reload cannot farm a tick: `_lastRegenCell` is transient and `null` reads as "no
+    tile crossed".
+  - ⚠ **NOT DONE, ON PURPOSE — two further levers, one per session so the feel is
+    attributable.** (a) **Dodge is a ~95% free ×2**: `d20 + DEX ≥ enemy attack total`, and
+    at DEX 19 only a natural 1 fails — the owner's log shows **5 dodges, 5 wins, including
+    a nat 2 and a nat 3**, each feeding a ×2-dice strike that then rolled `slashing ×2.25
+    for 52`. (b) **`GEAR_POWER_BLEND` is still 0.5**, shipped at half weight in OTA-1182
+    awaiting exactly this log. Do NOT stack either onto the regen change blind.
+
+  New suites `ota1190HuntFixes` (16), `ota1191RoadAndQuiet` (16), `ota1192RegenPerTile` (6).
+  ⚠ `ota1182`'s spawner count **8 → 9**: a RISING count is that test's claim getting
+  stronger ("every spawner routes through scalePowerOf"). If it ever DROPS, a spawner has
+  gone back to rolling its own measure.
+
+  Blocking gates green on both lines: typecheck:ci, lint, the test-typecheck ratchet,
+  the handoff-claims ratchet, and test:ci:fast (**716 suites / 6530 tests**).
+
+- **⚠⚠ ARRIVING SOMEWHERE MEANS FINDING SOMEONE (2026-08-08). HAL + GOLEM.**
   HAL OTA-1189 / golem OTA-1166. **steam NOT included — batched (§2).** Owner: *"once you
   reach that location it spawns a set number, say three groups within five blocks of you
   in different directions, so that you always have a chance of running into them… those

@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.99';
+export const DISPLAY_VERSION = '4.29.102';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24321,7 +24321,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // a player who walks the last tiles by typed cardinal is covered too.
 // New suite ota1189QuarrySeed (16 tests).
 // DISPLAY_VERSION 4.29.99.
-export const OTA_BUILD_ID = '2026-08-08-1189-arriving-finds-someone';
+// OTA-1190/1191/1192 — THREE OTAs, ONE PUSH (§3 forbids a second push inside
+// the CI window; branch concurrency would cancel the first run).
+// 1190: scaleHuntBoss scaled on hpMax ALONE - 1.0x, i.e. NOTHING, under 30 max
+//   HP, and blind to stats/weapon/AC. It was the spawner OTA-1182 missed. Now
+//   reads the shared overLevelT curve, ceiling 1.6 -> 2.2. ROUTE no longer
+//   offered on a PAUSED contract. And two lines that lied about the clock:
+//   the rest refusal said 4h when rest is 8, and the course banner called
+//   every tile 'a day'. Both were live when the owner's contract lapsed.
+//   NOTE: his '15 HP monster' was a wild Scrap Drone, NOT a hunt boss - the
+//   weakest of 18 hunt targets is 30 HP and most are 100-360.
+// 1191: the Arbiter no longer types in front of you (the streaming tail is
+//   gone; the working-indicator stays, generations run 6.6-11.6s). Plus the
+//   road odometer: +1 max stamina per 40 credits, a cardinal step worth 2,
+//   NO ceiling - the ~7 cap is the distinct-destination track, not this one.
+// 1192: HP regen is PER TILE, not per action. Measured: enemies hit a flat
+//   25% (AC capped), ~4 lands after armor, averaging ~1 HP/round against +2
+//   of regen - the player GAINED HP mid-fight and never fell below 26 of 32
+//   across eight combats. Combat regen is now exactly zero; the road still
+//   mends. Stamina regen stays per-action on purpose.
+// ⚠ NOT DONE, deliberately, one lever per session: dodge is a ~95% free x2
+//   at DEX 19, and GEAR_POWER_BLEND is still 0.5. Do not stack them blind.
+// New suites ota1190HuntFixes, ota1191RoadAndQuiet, ota1192RegenPerTile.
+// DISPLAY_VERSION 4.29.102 (PATCH +3 for three OTAs; NOT a MINOR roll — that is
+// reserved for closing a feature wave, and three fixes is not one).
+export const OTA_BUILD_ID = '2026-08-08-1192-regen-per-tile';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1191-quiet-arbiter-road';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1190-hunts-and-clock-lies';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1189-arriving-finds-someone';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1188-the-board-you-froze';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1187-set-course-speaks';
 // ⚠⚠ 1185 AND 1186 SHIPPED UNDER THE 1184 STAMP — A REAL GAP, RECORDED RATHER
