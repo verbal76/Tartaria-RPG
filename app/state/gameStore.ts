@@ -26246,7 +26246,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', `Your bounty slate is full (${MAX_ACTIVE_BOUNTIES}). Finish or abandon one first.`);
       return;
     }
-    const hadCourse = slate.length > 0;
+    // ⚠ OTA-1187 — A LIVE COURSE, not merely another contract on the slate. This read
+    // `slate.length > 0`, which conflated "you already hold a bounty" with "you are
+    // already walking somewhere" — and `travelTarget` is CLEARED the moment you arrive.
+    // So the moment you reached your first contract's outpost, every later contract
+    // silently refused to route, while the Arbiter told you *"your current course
+    // holds"* over a course that no longer existed. The intent (see the routing call
+    // below: stacking must not yank you off the first one's road) is preserved exactly
+    // — there is simply nothing to protect when no road is running.
+    const hadCourse = !!player.travelTarget || !!player.whisperCourse;
     // OTA-862 — stamp the accept hour so the contract can lapse after its in-game deadline.
     const acceptedAtHour = player.hoursElapsed ?? 0;
     // OTA-863 — DISTANCE-AWARE deadline. ⚠ OTA-1185 resized the travel term: it is the
@@ -26370,6 +26378,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s2) => (s2.player ? { player: { ...s2.player, hubRoomId: null }, activeBuildingId: null } : s2));
       get().appendLog('world', 'You step out under open sky and take your bearings.');
     }
+    // ⚠ OTA-1187 — RESOLVE THE DESTINATION FIRST. This check used to sit BELOW the
+    // same-cell guard, and the ordering was the bug: an id the map cannot place
+    // collapses to a default cell, which sometimes equals the player's own — so an
+    // unresolvable destination took the SILENT return below instead of this
+    // explanatory one. Resolve first, then compare cells, and the honest refusal
+    // always wins.
+    const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
+    const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
+    const tgtPos = map.positions[locationId];
+    if (!tgtPos) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "That destination doesn't sit on any map I can see from here."`);
+      return;
+    }
     // arb47 — block only when the player is ACTUALLY standing on the target's
     // fixed canon cell. (You can have wandered paces away from your home location
     // in open ground — currentLocationId still reads it — and re-route back to it
@@ -26377,14 +26398,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     {
       const grid0 = playerGridCell(player);
       const tgtCell0 = canonicalCellOf(locationId);
-      if (grid0.x === tgtCell0.x && grid0.y === tgtCell0.y) return;
-    }
-    const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
-    const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
-    const tgtPos = map.positions[locationId];
-    if (!tgtPos) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "That destination doesn't sit on any map I can see from here."`);
-      return;
+      if (grid0.x === tgtCell0.x && grid0.y === tgtCell0.y) {
+        // ⚠ OTA-1187 — IT USED TO RETURN IN COMPLETE SILENCE, and that is what the
+        // owner reported as "it changes colours but it doesn't actually auto route."
+        // The colour was never confirmation — `activeOpacity` fires on any tap, so a
+        // no-op and a success looked identical. Standing on your own destination is
+        // the ONE refusal here that a player is guaranteed to hit (a bounty names the
+        // outpost its quarry gathers at, and you walk there), so it is the one that
+        // most needed a voice. Every other early return in this function already had
+        // one; this was the gap.
+        const hereName = revealedLocationName(
+          locationId, getLocationById(locationId).name ?? locationId, get().worldMemory?.discoveredLocationIds,
+        );
+        get().appendLog('arbiter', `"You're standing in ${hereName}," the Arbiter says. "There's no road to set — you're already on it."`);
+        return;
+      }
     }
     // OTA-615 — setting a course is PLANNING; it no longer requires stamina.
     // Previously this returned early when stamina < wander (before travelTarget

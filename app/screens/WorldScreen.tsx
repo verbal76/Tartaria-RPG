@@ -14,6 +14,7 @@ import { tideLabel } from '../engine/worldPulse';
 import { JOIN_THRESHOLD } from '../engine/factions';
 import { listBounties, bountyKey, bountyHoursLeft, giverDifficulty, bountyDeadlineFor, BOUNTY_DEADLINE_HOURS } from '../engine/factionBounty';
 import { canonicalCellOf, canonicalDistanceFromGrid } from '../engine/worldMap';
+import { bountyCourseState, bountyCourseLabel, bountyCourseIsButton } from '../engine/bountyCourse';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { getLocationById } from '../engine/encounter';
@@ -78,6 +79,20 @@ export function WorldScreen() {
     const cell = canonicalCellOf(player.currentLocationId);
     return bountyDeadlineFor(canonicalDistanceFromGrid(cell.x, cell.y, targetLocationId));
   };
+  // ⚠ OTA-1187 — "am I standing on it" is a GRID-CELL question, not a string compare on
+  // currentLocationId: you can be paces off a place in open ground and still read its id.
+  // Same frame setTravelCourse itself uses, so the card and the store always agree about
+  // whether there is a road to set.
+  const atTile = (targetLocationId: string): boolean => {
+    if (!player) return false;
+    const here = canonicalCellOf(player.currentLocationId);
+    const there = canonicalCellOf(targetLocationId);
+    return here.x === there.x && here.y === there.y;
+  };
+  const courseStateFor = (b: { targetLocationId: string; targetLocationName: string }) =>
+    bountyCourseState(player, b.targetLocationId, b.targetLocationName,
+      (id) => { try { return getLocationById(id).name ?? id; } catch { return id; } },
+      atTile(b.targetLocationId));
   // OTA-862 — a faction that dislikes you still offers work, just a harder job. Frame it.
   const difficultyNote = (giverId: string): string | null => {
     const s = player?.factionStanding.find((r) => r.factionId === giverId)?.standing ?? 0;
@@ -136,14 +151,27 @@ export function WorldScreen() {
             <Text style={styles.bountyProgress}>
               {b.progress}/{b.count} put down · reward {b.rewardTc} TC · {timeLabel(b)}
             </Text>
-            <TouchableOpacity
-              style={styles.bountySecondaryBtn}
-              activeOpacity={0.8}
-              onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
-              accessibilityRole="button"
-            >
-              <Text style={styles.bountySecondaryText}>SET COURSE TO {b.targetLocationName.toUpperCase()} ›</Text>
-            </TouchableOpacity>
+            {/* ⚠ OTA-1187 — FOUR STATES, ONE OF WHICH IS A BUTTON. This was
+                unconditionally a button that called setTravelCourse and navigated away,
+                so standing on the quarry's own outpost rendered an inviting control that
+                did nothing and said nothing — the owner's report. `activeOpacity` dims on
+                any tap, so the colour change was never confirmation of anything. */}
+            {(() => {
+              const cs = courseStateFor(b);
+              if (!bountyCourseIsButton(cs)) {
+                return <Text style={styles.bountyCourseNote}>{bountyCourseLabel(cs)}</Text>;
+              }
+              return (
+                <TouchableOpacity
+                  style={styles.bountySecondaryBtn}
+                  activeOpacity={0.8}
+                  onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.bountySecondaryText}>{bountyCourseLabel(cs)}</Text>
+                </TouchableOpacity>
+              );
+            })()}
           </View>
         ))}
 
@@ -365,4 +393,7 @@ const styles = StyleSheet.create({
   // OTA-859 — re-route to a held bounty (outline button, secondary to the gold ACCEPT).
   bountySecondaryBtn: { marginTop: 9, borderColor: '#c9a86a', borderWidth: 1, borderRadius: 3, paddingVertical: 8, alignItems: 'center' },
   bountySecondaryText: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  // OTA-1187 — the non-tappable states. Deliberately NOT button-shaped: no border, no
+  // chevron, so it never invites a tap it will not answer.
+  bountyCourseNote: { marginTop: 9, color: '#a2977b', fontSize: 12, lineHeight: 18, fontStyle: 'italic' },
 });
