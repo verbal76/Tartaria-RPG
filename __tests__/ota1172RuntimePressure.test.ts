@@ -313,10 +313,14 @@ describe('OTA-1172 — this OTA changes no behaviour, deliberately', () => {
     expect(block).toMatch(/backoff ladder/i);
   });
 
-  it('the watchdog still resets the ladder on `active` — untouched this OTA', () => {
-    // Pinned so the hold is visible: when the fix lands, THIS assertion is what changes,
-    // which makes the behaviour change impossible to slip in unannounced.
-    expect(STORE).toContain("if (next === 'active') { qwenBackoffLevel = 0; tick(); }");
+  it('⚠ THE HOLD IS OVER — OTA-1173 LANDED THE FIX, and this is the assertion that changed', () => {
+    // This test was written to pin the OLD behaviour so the eventual change could not slip
+    // in unannounced. It has now done its job: a second device report escalated the
+    // symptom from a freeze to a CRASH TO THE HOME SCREEN with "Last JS crash: none
+    // recorded" — a native death — so the fix shipped rather than waiting for a cleaner
+    // measurement. The bare reset is gone; `inactive` alone no longer counts as a return.
+    expect(STORE).not.toContain("if (next === 'active') { qwenBackoffLevel = 0; tick(); }");
+    expect(STORE).toContain("if (!qwenTrulyBackgrounded) return;");
   });
 
   it('the instruments are idempotent — a re-hydrate must not stack timers', () => {
@@ -330,7 +334,10 @@ describe('OTA-1172 — this OTA changes no behaviour, deliberately', () => {
 
   it('⚠ EVERY LISTENER IS GUARDED — headless and test environments have no AppState', () => {
     const i = STORE.indexOf('function startRuntimePressureWatch');
-    const block = STORE.slice(i, i + 4200);
+    // ⚠ Widened by OTA-1173, which added the memory-warning RESPONSE (a dispose) between
+    // the listener and the frame clock. A fixed slice that stops short reads as a missing
+    // guard rather than as a moved one — the ota1163 defect in a new costume.
+    const block = STORE.slice(i, i + 6000);
     // Each addEventListener sits inside its own try/catch.
     const listeners = (block.match(/AppState\.addEventListener/g) ?? []).length;
     expect(listeners).toBe(2);

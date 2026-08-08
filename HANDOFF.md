@@ -1574,7 +1574,74 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ MEMORY WARNINGS, APP-STATE CHURN, AND A FREEZE DETECTOR (2026-08-08, latest). HAL +
+- **⚠⚠ STOP ASKING iOS FOR MEMORY IT HAS ALREADY REFUSED (2026-08-08, latest). HAL +
+  GOLEM.** HAL OTA-1196 / golem OTA-1173. **steam NOT included — batched (§2).** Second
+  device report, and the symptom **escalated**. Owner: *"On the last run through I hit
+  investigate and the game crashed to home screen. On this run… I went to the mission board
+  and accepted all the missions and then set the location auto route to the nearest
+  Guardian, and when I went back to the main screen it was completely frozen again. I had
+  to hard stop the app."*
+
+  **⚠ THE CRASH IS THE MORE DIAGNOSTIC OF THE TWO,** and the log dates it to the second:
+
+  ```
+  12:46:27.037  qwen-watchdog: Qwen not ready (status='failed'); reinitializing (#2)
+  12:46:27.931  player: investigate the floor
+  12:46:28.008  cognitive neutral (70ms)
+  [nothing — voice engine re-inits at 12:46:38, i.e. a fresh app launch]
+  ```
+
+  The report says **`Last JS crash: none recorded`**. A crash to the home screen with **no
+  JS error captured is a NATIVE death**, and on iOS the overwhelmingly common native death
+  is the OS reclaiming a process that asked for too much too fast. A ~400MB load racing an
+  inference is exactly that shape.
+
+  **Four changes, each defensible on its own terms:**
+  1. **⚠⚠ THE MODEL LOAD TAKES THE NATIVE-ML LOCK — IT NEVER DID.** Completion took it
+     (OTA-459's Tensor G5 SIGSEGV), release took it (OTA-1123); the **~400MB context load,
+     larger than either, was the one native call going in unserialized.** So a reload could
+     land on top of a Kokoro synth and a Qwen completion at the same instant. ⚠ At
+     `ML_PRIORITY_LLM`, so a voice line still **outranks** a reload — the player hears the
+     Arbiter on time and the load waits its turn, the right trade in both directions.
+  2. **⚠⚠ A MEMORY WARNING IS ANSWERED, NOT JUST WRITTEN DOWN.** OTA-1172 logged it and did
+     **nothing** — half a fix. iOS raises it precisely so an app can hand memory back
+     *before* the OS takes the process instead; we hold a ~400MB context and have a
+     `dispose()` for it. **Qwen off beats the app dead**, and narration degrades to
+     templates while the game keeps playing. ⚠ The watchdog is deliberately **not**
+     suppressed — release under pressure, recover when it lifts.
+  3. **⚠⚠ AN iOS TWITCH NO LONGER BUYS A 400MB RELOAD** — the defect OTA-1172 held back.
+     `'active'` fires on iOS for a notification banner, a Control Center pull or a peek at
+     the app switcher, and it wiped the backoff ladder and kicked an immediate reload. A
+     genuine `'background'` must now precede an `'active'` before either resets.
+  4. **A LIFETIME CEILING of 8 reloads per stretch.** The ladder spread retries out but
+     never stopped them, so a device that cannot hold the context retried forever — each
+     attempt another allocation spike. It stands down, says so **once**, and lifts only on
+     a real put-away-and-return.
+
+  **⚠⚠ THE OTA-1172 HOLD IS OVER, AND THE REVERSAL IS ON THE RECORD.** That OTA shipped
+  instruments only, so the next log would measure the bug untouched. Overtaken: **this
+  report arrived still on 1194 — the instruments never ran** — and the symptom went from a
+  freeze to a lost session. Sitting on a plausible mitigation for methodological purity
+  while the owner loses runs is the wrong trade. ⚠ **The cause is still a HYPOTHESIS** —
+  no memory warning has yet been *observed* — and the source hedges rather than asserting
+  it. If the crashes survive this, memory-via-reloads is wrong and the next look is
+  elsewhere.
+
+  New suite `ota1173MemoryDefence` (17 tests). ⚠ **`ota1032` / `ota1084` / `ota1172`
+  assertions RETARGETED, not weakened** — each keeps the claim its own name makes
+  (*"the backoff resets on a fresh return to foreground"* is still asserted; this OTA only
+  made *fresh return* mean an actual one), and ota1172's deliberately-pinned hold is the
+  assertion that changed, exactly as it was designed to.
+
+  ⚠ **SIXTH SELF-INFLICTED TEST TRAP, and the rule is now sharper.** A draft scanned for
+  `inactive` near an assignment and matched **its own trailing comment**. `codeOnly` strips
+  comment BLOCKS and line-start `//`, but **not a trailing `//`** — and stripping those
+  blindly would eat every `https://` in the file. **Assert on STRUCTURE, not on prose
+  proximity:** count the assignments and pin the one branch they live in.
+
+  Blocking gates green on both lines.
+
+- **⚠⚠ MEMORY WARNINGS, APP-STATE CHURN, AND A FREEZE DETECTOR (2026-08-08). HAL +
   GOLEM.** HAL OTA-1195 / golem OTA-1172. **steam NOT included — batched (§2).** Owner,
   after a hard lock on an iPhone this log could not explain: *"add in memory warning codes
   to the log so you can track them, whatever debug information you need. add that to

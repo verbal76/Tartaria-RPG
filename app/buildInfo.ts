@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.105';
+export const DISPLAY_VERSION = '4.29.106';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23319,7 +23319,42 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // next device log cannot say which change moved it.
 // New suite ota1172RuntimePressure (35 tests).
 // DISPLAY_VERSION 4.29.105.
-export const OTA_BUILD_ID = '2026-08-08-1172-runtime-pressure';
+// OTA-1173 — STOP ASKING iOS FOR MEMORY IT HAS ALREADY REFUSED.
+// Second device report, and the symptom ESCALATED: 'I hit investigate and
+// the game crashed to home screen', then a second freeze needing a hard
+// stop. The crash is the more diagnostic of the two, dated to the second:
+//   12:46:27.037 qwen-watchdog: not ready ('failed'); reinitializing (#2)
+//   12:46:27.931 player: investigate the floor
+//   12:46:28.008 cognitive neutral (70ms)
+//   [gone - voice engine re-inits 10s later, i.e. a fresh launch]
+// ⚠ 'Last JS crash: none recorded' - a crash to the home screen with NO JS
+// error captured is a NATIVE death, and on iOS the overwhelmingly common
+// native death is the OS reclaiming a process that asked for too much too
+// fast. A ~400MB load racing an inference is exactly that shape.
+// FOUR CHANGES, all defensible on their own terms:
+//   1. THE MODEL LOAD TAKES THE NATIVE-ML LOCK. Completion took it
+//      (OTA-436), release took it (OTA-1123); the ~400MB CONTEXT LOAD -
+//      bigger than either - was the one native call going in unserialized.
+//      At ML_PRIORITY_LLM, so a voice line still outranks a reload.
+//   2. A MEMORY WARNING IS ANSWERED. OTA-1172 logged it and did NOTHING.
+//      iOS raises it so an app can hand memory back before the OS takes the
+//      process instead; we now dispose the context. Qwen off beats app dead.
+//   3. AN iOS TWITCH NO LONGER BUYS A RELOAD. 'active' fires for a
+//      notification banner / Control Center / app switcher, and reset the
+//      backoff + kicked a load. Now a real 'background' must precede it.
+//   4. A LIFETIME CEILING (8) on reloads per stretch. The ladder spread
+//      retries out but never stopped them.
+// ⚠ THE OTA-1172 HOLD IS OVER, and the reason is on the record: that OTA
+// shipped instruments only so the next log would measure the bug untouched.
+// This report arrived still on 1171 - the instruments never ran - and the
+// symptom went from a freeze to a lost session. Sitting on a mitigation for
+// methodological purity while the owner loses runs is the wrong trade.
+// ⚠ CAUSE IS STILL A HYPOTHESIS: no memory warning has been OBSERVED yet.
+// New suite ota1173MemoryDefence (17 tests). ota1032/1084/1172 assertions
+// RETARGETED, not weakened - each keeps the claim its own name makes.
+// DISPLAY_VERSION 4.29.106.
+export const OTA_BUILD_ID = '2026-08-08-1173-memory-defence';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1172-runtime-pressure';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1171-difficulty-ladder';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1170-dodge-cooldown';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1169-regen-per-tile';
