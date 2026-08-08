@@ -10619,7 +10619,11 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.94';
+// ⚠ OTA-1164 — 4.29.94 → 4.29.97 is PATCH +3, not the usual +1. OTA-1162 and
+// OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
+// +1 PER OTA, so catching up is three, not one. See the gap note beside
+// OTA_BUILD_ID before reading any device log stamped 1161.
+export const DISPLAY_VERSION = '4.29.97';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23166,7 +23170,36 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // is strictly stronger — it survives the next move and still fails
 // if the number changes.
 // DISPLAY_VERSION 4.29.94.
-export const OTA_BUILD_ID = '2026-08-07-1161-sheet-provenance';
+//
+// OTA-1164 — THE SET-COURSE CONTROL TELLS YOU WHAT IT DID.
+// Standing on the quarry's own outpost, the control rendered an inviting
+// button that returned in SILENCE — the only early return in
+// setTravelCourse without a voice, and the one refusal every player is
+// guaranteed to hit. `activeOpacity` dims on any tap, so a no-op and a
+// successful route looked identical. Four states now (arrived / routed /
+// busy / offer) from one engine module, so WorldScreen and ContractsScreen
+// cannot drift; only `offer` is tappable.
+// Also: the same-cell guard ran BEFORE map resolution, so an unplaceable
+// destination took the silent path instead of the explanatory one; and
+// `hadCourse` read the bounty SLATE rather than a live course, so once you
+// arrived anywhere, every later contract silently refused to route while
+// the Arbiter said "your current course holds".
+// New suite ota1164BountyCourse (14 tests).
+// DISPLAY_VERSION 4.29.97 — PATCH +3, not +1, because two OTAs shipped
+// without a bump (see the gap note below).
+export const OTA_BUILD_ID = '2026-08-08-1164-set-course-speaks';
+// ⚠⚠ 1162 AND 1163 SHIPPED UNDER THE 1161 STAMP — A REAL GAP, RECORDED RATHER
+// THAN QUIETLY CLOSED. Both were pushed to HAL and golem without step 3 of the
+// change loop: this constant was never bumped. So any device log captured
+// between the 1161 push and this one reports `2026-08-07-1161-sheet-provenance`
+// while actually running 1162 (one price for a tile + the 24h+2.5/tile bounty
+// deadline) or 1163 (the first-contract primer, Jakar Nine-Halls).
+// ⚠ DO NOT TRUST A BUILD ID IN THAT WINDOW to identify which code a tester was
+// on — use the OTA publish timestamps. The two ids they SHOULD have carried are
+// listed so the gap is visible instead of merely absent.
+// UNSTAMPED (shipped, id never bumped): '2026-08-07-1163-first-contract-ropes';
+// UNSTAMPED (shipped, id never bumped): '2026-08-07-1162-one-price-for-a-tile';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1161-sheet-provenance';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1160-regen-is-visible';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1159-scaler-and-refusal';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1158-standing-text-truth';

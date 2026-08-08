@@ -24,7 +24,8 @@ import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMark
 import { openContractMarkers } from '../engine/contractMarkers';
 import { missionLegs } from '../engine/broker';
 import { carriedSigils } from '../engine/sigils';
-import { canonicalDistanceFromGrid, canonicalDistanceFromPlayer, canonicalDistance } from '../engine/worldMap';
+import { canonicalDistanceFromGrid, canonicalDistanceFromPlayer, canonicalDistance, canonicalCellOf } from '../engine/worldMap';
+import { bountyCourseState, bountyCourseLabel, bountyCourseIsButton } from '../engine/bountyCourse';
 import {
   ensureMainQuest,
   phaseLabel,
@@ -1046,12 +1047,30 @@ export function ContractsScreen() {
                 const timerLabel = !hasClock ? 'no deadline'
                   : lapsed ? '⏳ LAPSED'
                   : `⏳ ${Math.ceil(left)}h left`;
+                // ⚠ OTA-1164 — THE WHOLE CARD WAS A SET-COURSE BUTTON, and it stayed one
+                // even when there was no course to set. Standing on the quarry's outpost,
+                // a tap did nothing and said nothing while the card still read "tap to set
+                // course". Same four-state machine the World screen uses, from the same
+                // engine module, so the two screens cannot drift apart.
+                const cs = bountyCourseState(
+                  player, b.targetLocationId, b.targetLocationName, safeLocName,
+                  (() => {
+                    if (!player) return false;
+                    const here = canonicalCellOf(player.currentLocationId);
+                    const there = canonicalCellOf(b.targetLocationId);
+                    return here.x === there.x && here.y === there.y;
+                  })(),
+                );
+                const canRoute = bountyCourseIsButton(cs);
                 return (
                   <Pressable
                     key={`b_${bountyKey(b)}`}
-                    onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
+                    onPress={canRoute
+                      ? () => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }
+                      : undefined}
+                    disabled={!canRoute}
                     style={styles.card}
-                    accessibilityRole="button"
+                    accessibilityRole={canRoute ? 'button' : 'text'}
                   >
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{b.giverName} bounty</Text>
@@ -1067,7 +1086,13 @@ export function ContractsScreen() {
                     <Text style={styles.cardLocation}>📍 {b.targetLocationName}</Text>
                     {movesLine(b.targetLocationId)}
                     <Text style={styles.cardHint}>
-                      {b.progress}/{b.count} put down · pays {b.rewardTc} TC + {b.giverName} standing · tap to set course
+                      {b.progress}/{b.count} put down · pays {b.rewardTc} TC + {b.giverName} standing
+                    </Text>
+                    {/* ⚠ OTA-1164 — this line used to be a flat "· tap to set course" that
+                        was a lie in three of the four states. It now says what tapping will
+                        actually do, or why there is nothing to tap. */}
+                    <Text style={canRoute ? styles.cardHint : styles.bountyCourseNote}>
+                      {canRoute ? 'Tap to set course' : bountyCourseLabel(cs)}
                     </Text>
                   </Pressable>
                 );
@@ -2222,6 +2247,9 @@ const styles = StyleSheet.create({
   difficultyChipDangerous: { color: '#e07a5f' },
   cardBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
   cardHint: { color: '#c9a86a', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
+  // OTA-1164 — the non-tappable course states. Muted, not the gold call-to-action
+  // colour, so a status line never reads as something to press.
+  bountyCourseNote: { color: '#a2977b', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
   // OTA-866 — bounty countdown: a bordered time pill + a draining bar.
   bountyTimerPill: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, borderWidth: 1, borderRadius: 3, paddingHorizontal: 6, paddingVertical: 2, overflow: 'hidden' },
   bountyTimerTrack: { height: 4, borderRadius: 2, backgroundColor: 'rgba(122,112,92,0.25)', marginTop: 6, marginBottom: 2, overflow: 'hidden' },

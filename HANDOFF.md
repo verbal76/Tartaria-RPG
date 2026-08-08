@@ -1574,7 +1574,67 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE FIRST CONTRACT COMES WITH SOMEONE TO EXPLAIN IT (2026-08-07, latest). HAL
+- **⚠⚠ THE SET-COURSE CONTROL TELLS YOU WHAT IT DID (2026-08-08, latest). HAL +
+  GOLEM.** golem OTA-1164 / HAL OTA-1187. **steam NOT included — batched (§2).**
+  Owner: *"once you accept a bounty there's a separate block that asks you to auto
+  route. it changes colors cuz it registers your choice but it doesn't actually auto
+  route… you should have the set auto route on both pages in case they miss it and
+  have it disappear once they do it."*
+
+  **⚠ THE COLOUR WAS NEVER CONFIRMATION.** `activeOpacity` dims a `TouchableOpacity`
+  on **any** tap, so a silent no-op and a successful route looked identical. Nothing
+  on the card ever changed either way — unlike the faction MISSION card, which has
+  swapped its ROUTE button for *"▸ Auto-routing — objective: X"* since OTA-1014.
+
+  **⚠ 1. THE SILENT RETURN.** `setTravelCourse` refuses when you already stand on the
+  target's canon cell — correct — but did it with a **bare `return;` and no log line**,
+  the only early return in that function without a voice. **This is the one refusal
+  every player is guaranteed to hit:** a bounty names the outpost its quarry gathers
+  at, and you walk there. It now says *"You're standing in X — there's no road to set."*
+
+  **⚠ 2. THE GUARD ORDER WAS THE OTHER HALF.** The same-cell compare ran **before** the
+  map-resolution check. An id the map cannot place collapses to a default cell that can
+  equal the player's own — so an unresolvable destination took the **silent** path
+  instead of the explanatory *"doesn't sit on any map"* one. Resolve first, compare
+  second; pinned by an index-order assertion.
+
+  **⚠ 3. `hadCourse` READ THE SLATE, NOT A LIVE COURSE.** `acceptBounty` gated routing
+  on `slate.length > 0`, conflating *"you hold a contract"* with *"you are walking
+  somewhere"* — and `travelTarget` is **cleared on arrival**. So the moment you reached
+  your first contract's outpost, every later contract silently refused to route while
+  the Arbiter said *"your current course holds"* over a course that no longer existed.
+  Now `!!player.travelTarget || !!player.whisperCourse`. The original intent (stacking
+  must not yank you off a live road) is preserved and separately tested.
+
+  **4. FOUR STATES, ONE OF WHICH IS A BUTTON** — new `engine/bountyCourse.ts`:
+  **arrived** / **routed** / **busy** / **offer**, with only `offer` tappable. That is
+  the owner's *"have it disappear once they do it."*
+  - ⚠ **It lives in the engine because TWO screens render it.** `WorldScreen` and
+    `ContractsScreen` carried byte-identical copies of the control — which is exactly
+    how the two drift: fix one, ship, and the other still lies.
+  - ⚠ **On Contracts the WHOLE CARD was the tap target**, and stayed one when the tap
+    could not work, while the card read *"tap to set course"*. Now `disabled` outside
+    the offer state, and the hint line says what tapping will do or why there is
+    nothing to tap.
+  - ⚠ **"Am I standing on it" is a GRID-CELL question**, not a `currentLocationId`
+    string compare — you can be paces off a place in open ground and still read its id.
+    Both screens pass the real cell answer in, matching the frame the store uses.
+
+  New suite `ota1164BountyCourse` (14 tests).
+  ⚠ **THE FEED IS `gameLog`, NOT `log`.** The first repro read `.log`, which does not
+  exist on the store; `?? []` swallowed it and the run reported *"zero log lines"*
+  regardless of what the code did — and that non-result was briefly cited as evidence.
+  The conclusion held on direct code inspection (the branch was a bare `return;`), but
+  **an assertion that cannot fail is worse than no assertion.** The suite now asserts
+  `Array.isArray(gameLog)` first, so the guard itself is guarded.
+  ⚠ A source-sweep for the old `"· tap to set course"` wording flagged **this OTA's own
+  comment quoting it** — the third time that shape has bitten in one session. **Assert
+  on what shipped, not on prose about it.**
+
+  Blocking gates green on both lines: typecheck:ci, lint, the test-typecheck ratchet,
+  the handoff-claims ratchet, and test:ci:fast (**711 suites / 6450 tests**).
+
+- **⚠⚠ THE FIRST CONTRACT COMES WITH SOMEONE TO EXPLAIN IT (2026-08-07). HAL
   + GOLEM.** golem OTA-1163 / HAL OTA-1186. **steam NOT included — batched (§2).**
   Owner: *"we have first time touch pop-ups all through the game. so how about the
   first time someone accepts a bounty gets a pop-up and it does it in character…
