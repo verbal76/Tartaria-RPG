@@ -16893,6 +16893,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('world', `You're already committed to the dodge — no need to spend another beat on it.`);
           break;
         }
+        // ⚠ OTA-1193 — THE COOLDOWN GATE. Dodge resolves as `d20 + DEX >= the enemy's
+        // attack total`, so at DEX 19 only a natural 1 fails: the owner's log shows five
+        // dodges and five wins (including a nat 2 and a nat 3), each granting a ×2-dice
+        // opening that then rolled `slashing ×2.25 for 52`. Alternating dodge→attack put
+        // roughly half his attacks at double dice for no risk. This caps the UPTIME
+        // without touching the dodge maths, so the move stays a read rather than becoming
+        // a coin flip.
+        // ⚠ The refusal SPEAKS and BUZZES and does NOT spend the turn — a cooldown that
+        // silently eats the action is the OTA-1187 defect wearing armour.
+        {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const DC = require('../engine/dodgeCooldown') as typeof import('../engine/dodgeCooldown');
+          if (!DC.dodgeReady(player.dodgeCooldown)) {
+            get().appendLog('world', DC.dodgeCooldownLine(player.dodgeCooldown));
+            buzzBlocked();
+            break;
+          }
+        }
         const dodging: StatusEffect = {
           kind: 'dodging',
           // Single-shot reaction. Consumed by the next incoming
@@ -16908,7 +16926,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // risk-free stat farming against a pet weak enemy in zero game time.
         set((s) =>
           s.player
-            ? { player: advanceTime(spendStamina({ ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], dodging) }, 1), 0.1) }
+            ? { player: advanceTime(spendStamina({
+                ...s.player,
+                statusEffects: applyEffect(s.player.statusEffects ?? [], dodging),
+                // ⚠ OTA-1193 — armed here, ticked down by the per-action tail. The tail
+                // runs on THIS action too, so setting the full count leaves exactly
+                // DODGE_COOLDOWN_ROUNDS - 1 rounds locked and the stance usable again on
+                // the third action. Off-by-one here is the difference between "every
+                // other round" and the intended cadence.
+                dodgeCooldown: (require('../engine/dodgeCooldown') as typeof import('../engine/dodgeCooldown')).DODGE_COOLDOWN_ROUNDS,
+              }, 1), 0.1) }
             : s,
         );
         // OTA-795 — the stance line spells out the new stakes: dodge is an
@@ -20405,6 +20432,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     maybeSeedQuarry(get, set);
     // OTA-1191 — the road odometer. Self-guards: no movement, no tick.
     tickRoadOdometer(get, set);
+    // ⚠ OTA-1193 — the dodge cooldown refills one step per ACTION, which is what makes the
+    // bar fill because of something the player did rather than because time passed. Ticks
+    // on every action, in or out of combat, so walking away recharges it too.
+    {
+      const dc = get().player?.dodgeCooldown ?? 0;
+      if (dc > 0) set((s) => (s.player ? { player: { ...s.player, dodgeCooldown: dc - 1 } } : s));
+    }
     // OTA-851 — a roaming faction patrol can cross your path in the open, anywhere.
     if ((get().currentScene?.enemies?.length ?? 0) === 0) maybePatrolAmbush(get, set);
     void get().persist();

@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.102';
+export const DISPLAY_VERSION = '4.29.103';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24345,7 +24345,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suites ota1190HuntFixes, ota1191RoadAndQuiet, ota1192RegenPerTile.
 // DISPLAY_VERSION 4.29.102 (PATCH +3 for three OTAs; NOT a MINOR roll — that is
 // reserved for closing a feature wave, and three fixes is not one).
-export const OTA_BUILD_ID = '2026-08-08-1192-regen-per-tile';
+// OTA-1193 — DODGE GETS A COOLDOWN, AND THE BUTTON SHOWS IT.
+// Dodge resolves as d20 + DEX >= the enemy's attack TOTAL, so at DEX 19 only
+// a natural 1 fails: the log shows 5 dodges, 5 wins (incl. a nat 2 and a nat
+// 3), each granting a x2-dice opening that rolled 'slashing x2.25 for 52'.
+// Alternating dodge->attack put ~half of all attacks at double dice for no
+// risk. DODGE_COOLDOWN_ROUNDS = 3 caps the UPTIME; the dodge maths is
+// untouched.
+// ROUNDS, NOT SECONDS - a deliberate push-back on the owner's '10-15s'. He
+// acts every 1-2s in combat, so a 15s lock costs 7-10 actions and makes the
+// optimal play 'put the phone down'. Dead air is worse than the mashing.
+// The bar: two flat layers, blue filling from the LEFT, no gradient and no
+// Animated - the width JUMPS one step per action. Chip stays tappable while
+// red; the engine buzzes and names the beats left.
+// New suite ota1193DodgeCooldown (16 tests).
+// DISPLAY_VERSION 4.29.103.
+export const OTA_BUILD_ID = '2026-08-08-1193-dodge-cooldown';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1192-regen-per-tile';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1191-quiet-arbiter-road';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1190-hunts-and-clock-lies';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1189-arriving-finds-someone';
