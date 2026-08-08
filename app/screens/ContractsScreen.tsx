@@ -194,10 +194,24 @@ export function ContractsScreen() {
     const info = ck ? contractMarkerByKey[ck] : undefined;
     return info ? <Text style={styles.contractBadge}>{info.number}◆ </Text> : null;
   };
-  const contractRoute = (toggleKey: string) => {
+  // ⚠ OTA-1167 — `tracked` GATES THE ROUTE. This offered ROUTE on a PAUSED contract, so
+  // a player could walk the whole way to an objective for a run that is not advancing,
+  // arrive, meet nothing to do with the contract, and reasonably conclude the hunt was
+  // broken. (Reported: routed to a hunt anchor, fought a Core Guardian, no hunt beat —
+  // because the run had never been activated.) The card already SAID "⏸ PAUSED" two rows
+  // up; the button beneath it disagreed. Same defect family as OTA-1164: a control that
+  // acts without the state that gives it meaning.
+  const contractRoute = (toggleKey: string, tracked = true) => {
     const ck = toContractKey(toggleKey);
     const info = ck ? contractMarkerByKey[ck] : undefined;
     if (!info) return null;
+    if (!tracked) {
+      return (
+        <Text style={styles.routeHereNote}>
+          ▸ Paused — activate it below before setting a course, or you'll walk to {info.anchorName} for a contract that isn't running.
+        </Text>
+      );
+    }
     if (player?.currentLocationId === info.anchorId) {
       return <Text style={styles.routeHereNote}>▸ {info.number}◆ You're at {info.anchorName}.</Text>;
     }
@@ -1117,7 +1131,7 @@ export function ContractsScreen() {
                         {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
-                    {contractRoute(key)}
+                    {contractRoute(key, tracked)}
                     {trackToggle('hunt', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {/* 2026-05-26 OTA-053 — playtester ask: hunt card
@@ -1267,7 +1281,7 @@ export function ContractsScreen() {
                         {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
-                    {contractRoute(key)}
+                    {contractRoute(key, tracked)}
                     {movesLine(markerLocId(key))}
                     {trackToggle('mystery', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
@@ -1337,7 +1351,7 @@ export function ContractsScreen() {
                         {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
-                    {contractRoute(key)}
+                    {contractRoute(key, tracked)}
                     {movesLine(markerLocId(key))}
                     {trackToggle('storyline', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
@@ -1716,7 +1730,7 @@ export function ContractsScreen() {
                     </View>
                     <Text style={styles.cardFaction}>Lead · {q.location.name}</Text>
                     {movesLine(q.location?.id)}
-                    {contractRoute(key)}
+                    {contractRoute(key, tracked)}
                     {trackToggle('lead', q.id, tracked)}
                     {!open && (
                       <>

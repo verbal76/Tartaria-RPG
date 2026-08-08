@@ -273,7 +273,9 @@ import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats
 // so the award and the explanation can never quote different numbers.
 import { MILESTONE_KILL_STEP } from '../engine/hpBreakdown';
 // OTA-1162 — one owner for what a tile costs the clock.
-import { TILE_HOURS } from '../engine/travelTime';
+import { TILE_HOURS, travelHoursFor } from '../engine/travelTime';
+// OTA-1167 — the course banner now quotes travel in the same units the deadline uses.
+import { formatWindow } from '../engine/bountyPrimer';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
 import { applyLegacyItemRenames } from '../engine/itemMigrations';
@@ -3749,6 +3751,55 @@ function maybeInterceptPatrol(
 // into ANYWHERE, not just near its outpost (that's maybeInterceptPatrol). Checked at
 // the end of every action: if a hostile / bounty-target faction's patrol is within 2
 // tiles of the player, it engages. The patrol that engages is consumed into the fight.
+/** ⚠ OTA-1168 — THE ROAD BUILDS YOU UP, SLOWLY, AND FOREVER.
+ *
+ *  Called from the per-action tail rather than hooked into movement, which is why it needs
+ *  no changes to any of the five tile-crossing paths: it simply asks "is the cell I am
+ *  standing on one of the last few I stood on?" A player who did not move is trivially in
+ *  their own recent list and counts nothing, so ordinary actions are free.
+ *
+ *  ⚠ THE RING IS THE ANTI-FARM, and it is not optional. A raw tile count would restore the
+ *  exact hole arb118 closed on the distinct-destination track ("bouncing between two tiles
+ *  farmed permanent staminaMax forever"). With a memory of ODOMETER_MEMORY cells, pacing
+ *  inside a small loop never advances it; a real march advances it every step. */
+function tickRoadOdometer(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const s = get();
+  const player = s.player;
+  if (!player) return;
+  const cell = playerGridCell(player);
+  const key = `${cell.x},${cell.y}`;
+  const recent = s.worldMemory.recentCells ?? [];
+  // ⚠ Consume the cardinal flag whether or not the step counts, so it can never carry
+  // over to a later action and pay double for an autorouted step.
+  const credit = _lastStepWasCardinal ? ODOMETER_CARDINAL : 1;
+  _lastStepWasCardinal = false;
+  if (recent.includes(key)) return; // standing still, or walking a loop we just walked
+  const nextRecent = [...recent, key].slice(-ODOMETER_MEMORY);
+  const prevOdo = s.worldMemory.travelOdometer ?? 0;
+  const nextOdo = prevOdo + credit;
+  set((st) => ({ worldMemory: { ...st.worldMemory, recentCells: nextRecent, travelOdometer: nextOdo } }));
+  // ⚠ THRESHOLD CROSSING, NOT `% === 0`. A cardinal step is worth 2, so an exact-modulo
+  // check can step 39 → 41 and skip the award entirely — the reward would silently vanish
+  // for the players doing the thing this is meant to encourage. Count how many multiples
+  // the odometer crossed instead; that is also correct if the credit ever grows again.
+  const earned = Math.floor(nextOdo / ODOMETER_STEP) - Math.floor(prevOdo / ODOMETER_STEP);
+  if (earned <= 0) return;
+  set((st) => (st.player ? { player: {
+    ...st.player,
+    staminaMax: st.player.staminaMax + earned,
+    // Award the points as usable stamina too, so the reward is felt now rather than at the
+    // next rest — the same courtesy the distinct-destination milestone extends.
+    stamina: st.player.stamina + earned,
+  } } : st));
+  get().appendLog(
+    'reward',
+    `✦ The miles have done their work — you carry the road better than you did. +${earned} max stamina (now ${get().player?.staminaMax ?? 0}). [${nextOdo} on the odometer]`,
+  );
+}
+
 /** ⚠ OTA-1166 — ARRIVING ON A CONTRACT'S GROUND PUTS THE QUARRY ON IT.
  *
  *  Called from both arrival paths. If the player's cell is a held bounty's target cell and
@@ -3914,7 +3965,52 @@ function maybePatrolAmbush(
 // a threshold the sheet quotes while the store awards it must have exactly one home
 // — the same cleanup OTA-1156 #8 did for JOIN_THRESHOLD and OTA-1158 for
 // BUY_REP_TC_PER_STANDING. // every 3 DISTINCT enemy types beaten → +1 HP max
-const MILESTONE_TRAVEL_STEP = 5;   // every 5 travels → +1 stamina max
+const MILESTONE_TRAVEL_STEP = 5;   // every 5 DISTINCT destinations → +1 stamina max
+
+/** ⚠ OTA-1168 — THE ROAD ITSELF BUILDS YOU UP, AND IT NEVER RUNS OUT.
+ *
+ *  Owner: *"stamina should be able to be trained up but at a very slow rate… maybe just
+ *  generically travel, and then if you run long enough you get in good shape."*
+ *
+ *  `MILESTONE_TRAVEL_STEP` above already does this — but it counts DISTINCT destinations,
+ *  and there are only 36 locations in the game. So it pays out ~7 times across an entire
+ *  playthrough and then is **permanently dead**, which is why it does not read as
+ *  something you can train. This is the second, slower track: an ODOMETER over tiles
+ *  actually walked, which keeps paying forever.
+ *
+ *  ⚠ AND IT MUST RESIST PACING, because that is exactly how the first one broke (arb118:
+ *  "the code counted EVERY travel… bouncing between two tiles farmed permanent staminaMax
+ *  forever"). A raw tile count would restore that hole immediately — the owner has
+ *  literally described stepping east-west repeatedly to pass time. So a step only counts
+ *  when it lands on a cell that is NOT in the last `ODOMETER_MEMORY` cells walked: a long
+ *  march counts every step, while bouncing inside a small loop counts nothing.
+ *
+ *  ⚠ THERE IS NO CEILING ON THIS TRACK. The ~7 ceiling belongs entirely to the
+ *  distinct-destination milestone above (36 locations ÷ 5). The odometer keeps paying at
+ *  the same rate forever — 700 tiles is +7, 1400 is +14, and so on.
+ *
+ *  ⚠ A CARDINAL STEP IS WORTH DOUBLE, and that is a deliberate nudge. Owner: *"how about
+ *  if we double the generation rate for cardinal direction travel to get them to explore
+ *  more?"* Autoroute walks a straight line to somewhere already known; walking it by hand
+ *  is how a player finds what is not on their map. Both count — hand-walking counts twice.
+ *
+ *  ⚠ IT LOOSENS EVERY CONTRACT CLOCK, and that is worth knowing before retuning it. Rest
+ *  is 8 hours for at most 8 stamina, so a bigger tank means FEWER rests per journey, and
+ *  rests are the dominant cost in a bounty window. Growing max stamina makes deadlines
+ *  easier — which is a fair veteran reward, but it is a difficulty dial, not just a stat. */
+const ODOMETER_STEP = 40;    // credits per +1 max stamina (a cardinal step is worth 2)
+const ODOMETER_CARDINAL = 2; // hand-walked steps count double — explore, don't autoroute
+const ODOMETER_MEMORY = 8;   // recent cells that do not re-count; defeats short loops
+
+/** ⚠ Set by the two TYPED CARDINAL paths only, consumed by the odometer on the same
+ *  action. Module-scoped because it lives for exactly one action and must never persist —
+ *  a saved "the last step was cardinal" would pay double on the next load. */
+let _lastStepWasCardinal = false;
+
+/** ⚠ OTA-1169 — the cell HP regen last ticked on. Module-scoped and transient: on a fresh
+ *  load it is null, and the FIRST action after load deliberately pays nothing (a null is
+ *  treated as "no tile crossed"), so reloading can never be used to farm a regen tick. */
+let _lastRegenCell: string | null = null;
 // OTA 058 — MILESTONE_CHECK_STEP retired. Skill-check stat growth is
 // now per-use via engine/statTraining (Skyrim model). HP and stamina
 // growth still use the milestone counters above.
@@ -11970,12 +12066,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // per-action log spam); only fills when there's room. tickPlayerStamina-
     // Statuses re-syncs tired/exhausted as stamina rises. On top of the
     // pieces' AC / stat bonuses.
+    // ⚠ OTA-1169 — HP REGEN IS PER TILE NOW, NOT PER ACTION. Owner: "I feel invincible…
+    // would +2 regen per tile traveled be better? I'm never low in health except mid
+    // battle." Measured from his device log: enemies hit a flat 25% (`needs nat 16+ — AC
+    // capped`), and the ~4 damage that lands after `armor −47%, plate −2` averages about
+    // 1 HP a round — against +2 a round of regen. HE GAINED HP DURING FIGHTS. Across eight
+    // combats in one session he never fell below 26 of 32.
+    // Ticking on tile entry means combat regen is exactly ZERO (you do not walk mid-fight)
+    // while the road still mends you, so nobody is pushed back into rest-spam.
+    // ⚠ STAMINA REGEN STAYS PER-ACTION, deliberately. It was never the problem — stamina
+    // is barely a combat resource — and tile-gating it would nerf the one pool that tiles
+    // already drain. (It IS farmable by spamming any action; that is pre-existing, out of
+    // scope here, and noted so it is not mistaken for something this OTA introduced.)
     {
       const live = get().player;
       if (live && !live.dead) {
         const regen = aggregateEquippedRegen(live);
+        const cellNow = `${playerGridCell(live).x},${playerGridCell(live).y}`;
+        const crossedTile = _lastRegenCell !== null && _lastRegenCell !== cellNow;
+        _lastRegenCell = cellNow;
         const stamGain = Math.min(regen.stamina, Math.max(0, (live.staminaMax ?? 0) - live.stamina));
-        const hpGain = Math.min(regen.hp, Math.max(0, (live.hpMax ?? 0) - live.hp));
+        const hpGain = crossedTile
+          ? Math.min(regen.hp, Math.max(0, (live.hpMax ?? 0) - live.hp))
+          : 0;
         if (stamGain > 0 || hpGain > 0) {
           set((s) => s.player
             ? { player: tickPlayerStaminaStatuses({ ...s.player, stamina: s.player.stamina + stamGain, hp: s.player.hp + hpGain }) }
@@ -16393,7 +16506,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // native build — pure-JS OTA can't vibrate.
           get().appendLog(
             'world',
-            `You have no stamina left — you can't travel. Type 'rest' to recover (≈4h), then back to the road.`,
+            // ⚠ OTA-1167 — IT SAID "≈4h" AND REST TAKES 8. The parser-routed rest uses a
+            // FIXED `hours = 8`; there is no 4-hour rest anywhere in the game. A player
+            // budgeting a contract's window off this line under-counts every stop by half
+            // — and the owner lost a contract to exactly that arithmetic, resting three
+            // times inside a 26h window he had been told cost 4h a stop.
+            `You have no stamina left — you can't travel. Type 'rest' to recover (8h), then back to the road.`,
           );
           buzzBlocked(); // arb41 — physical "can't move" signal
           break;
@@ -16453,6 +16571,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // 1h while the → TARGET button charged 0.25h for the identical move, so
             // typing was 4× more expensive than tapping.
             set({ player: advanceTime(spendTravelStamina(player), TILE_HOURS) });
+            // OTA-1168 — hand-walked, so the road odometer pays double for it.
+            _lastStepWasCardinal = true;
             get().stepDirection(last);
           } else {
             get().appendLog(
@@ -16527,6 +16647,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           // ⚠ OTA-1162 — same tile, same price, typed or tapped. Was 1h here.
           set({ player: advanceTime(spendTravelStamina(player), TILE_HOURS) });
+          // ⚠ OTA-1168 — THE TYPED CARDINAL WALK IS THE ONE WORTH DOUBLE. Autoroute runs a
+          // straight line to a place already on your map; this is the one that finds what
+          // is not. Owner: "double the generation rate for cardinal direction travel to get
+          // them to explore more."
+          _lastStepWasCardinal = true;
           get().stepDirection(dir);
           break;
         }
@@ -20278,6 +20403,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // exists to remove. Idempotent by construction (one-shot flag on the contract), so
     // being called from three places costs nothing but cannot silently miss a route in.
     maybeSeedQuarry(get, set);
+    // OTA-1168 — the road odometer. Self-guards: no movement, no tick.
+    tickRoadOdometer(get, set);
     // OTA-851 — a roaming faction patrol can cross your path in the open, anywhere.
     if ((get().currentScene?.enemies?.length ?? 0) === 0) maybePatrolAmbush(get, set);
     void get().persist();
@@ -25299,7 +25426,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const freezeForKill = stageDef.checkKind === 'boss' && record.stage === lastBossIndex;
     if (stageDef.checkKind === 'boss') {
-      const boss = scaleHuntBoss(player, hunt);
+      // ⚠ OTA-1167 — pass the REAL power measure, so the boss sees stats, weapon and AC
+      // rather than max HP alone. `scalePowerOf` carries the guarded gear read.
+      const boss = scaleHuntBoss(player, hunt, scalePowerOf(player));
       if (boss) {
         set((s) =>
           s.currentScene
@@ -26617,7 +26746,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles }, whisperCourse: null, ...(dropChain ? { routedMission: null } : {}) } } : s));
     get().appendLog(
       'world',
-      `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. Tap the → ${tgtName.toUpperCase()} button on the travel row to press on; STOP TRAVEL to halt.`,
+      // ⚠ OTA-1167 — IT CALLED EVERY TILE "A DAY". A tile costs TILE_HOURS (0.25h) on the
+      // clock and ~2.5h all-in once the stamina is rested back (OTA-1162) — so a 1-tile
+      // hop announced itself as "1 day of travel" and a 23-tile march as "23 days". The
+      // banner was the last surface still quoting the pre-1185 fiction, and a player
+      // reading it cannot budget a contract window at all. Now it quotes the SAME number
+      // the deadline is built from, in the same units the deadline is expressed in.
+      `You set course for ${tgtName}. ${tiles} tile${tiles === 1 ? '' : 's'} — about ${formatWindow(travelHoursFor(tiles))} of travel, all in. Tap the → ${tgtName.toUpperCase()} button on the travel row to press on; STOP TRAVEL to halt.`,
     );
     // Tungsten Spire — during the pick_city tutorial beat, picking a Capital
     // marks the road but does NOT auto-depart: the Arbiter hands control back

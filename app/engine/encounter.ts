@@ -165,7 +165,7 @@ function bumpAbilityPointNumber(ap: string | number | undefined, bonus: number):
 }
 
 /** Over-level term: 0 at a fresh arrival → 1 at end-game. Shared by solo + pack. */
-function overLevelT(power: number): number {
+export function overLevelT(power: number): number {
   return Math.max(0, Math.min(1, (power - 14) / 18));
 }
 

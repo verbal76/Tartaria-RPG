@@ -1787,6 +1787,16 @@ export interface WorldMemory {
    *  migration must never retroactively lock a player out of work they could take
    *  yesterday. */
   lastBountyClearedOutpostId?: string;
+  /** ⚠ OTA-1168 — THE ROAD ODOMETER. Tiles walked that were not already in the recent-cell
+   *  ring below; every `ODOMETER_STEP` of them is +1 max stamina, forever. Distinct from
+   *  the `MILESTONE_TRAVEL_STEP` track, which counts DISTINCT DESTINATIONS and therefore
+   *  stops paying out once the 36 locations are seen. Absent = 0 on every existing save,
+   *  so nobody is retroactively granted stamina they never walked for. */
+  travelOdometer?: number;
+  /** ⚠ The last few grid cells walked, newest last. A step only advances the odometer if
+   *  its cell is NOT in here — which is what stops a player pacing east-west from farming
+   *  permanent max stamina, the exact hole arb118 had to close on the other track. */
+  recentCells?: string[];
   /** In-game hour of the last world pulse (gates the next one). */
   lastWorldTickHour?: number;
   /** Recent world rumours (newest last), capped. The world moving, in the player's ear. */
