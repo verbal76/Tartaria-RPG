@@ -134,11 +134,20 @@ export const GEAR_POWER_DIVISOR = 4;
 export const GEAR_POWER_BLEND = 0.5;
 
 /** The gear half of the power proxy: what your armour and your weapon are worth above
- *  what you walked in with. Clamped at 0 — gear never lowers difficulty. */
-export function gearPowerTerm(ac: number, avgWeaponDamage: number): number {
+ *  what you walked in with. Clamped at 0 — gear never lowers difficulty.
+ *
+ *  ⚠ OTA-1194 — `tierBlend` is the DIFFICULTY TIER's multiplier on top of the shipped
+ *  half weight: salvage 0.5 (effective 0.25), owed 1 (effective 0.5 — the identity row,
+ *  unchanged), let_it_come 1.5, bury_me 2 (effective 1.0, the full designed weight
+ *  OTA-1182 wrote and then held back pending device evidence).
+ *  ⚠ It multiplies terms that are ALREADY clamped at 0, so no tier can make the world
+ *  easier than authored — a fresh arrival reads exactly 0 at every rung. Defaults to 1,
+ *  so every existing caller and every tooling call is bit-for-bit unchanged. */
+export function gearPowerTerm(ac: number, avgWeaponDamage: number, tierBlend: number = 1): number {
   const acTerm = Math.max(0, ac - AC_POWER_BASELINE) / GEAR_POWER_DIVISOR;
   const dmgTerm = Math.max(0, avgWeaponDamage - DMG_POWER_BASELINE) / GEAR_POWER_DIVISOR;
-  return GEAR_POWER_BLEND * (acTerm + dmgTerm);
+  const blend = Number.isFinite(tierBlend) ? Math.max(0, tierBlend) : 1;
+  return GEAR_POWER_BLEND * blend * (acTerm + dmgTerm);
 }
 
 /** How strong is this character. Best offensive stat + a slice of the HP pool, plus —
@@ -150,10 +159,13 @@ export function gearPowerTerm(ac: number, avgWeaponDamage: number): number {
 export function enemyScalePower(
   bestCombatStat: number,
   hpMax: number,
-  gear?: { ac: number; avgWeaponDamage: number },
+  /** ⚠ OTA-1194 — `tierBlend` is the difficulty tier's weight on the gear terms.
+   *  Absent = 1 = the shipped half weight, so an omitted tier is the baseline and never
+   *  accidentally a free pass. */
+  gear?: { ac: number; avgWeaponDamage: number; tierBlend?: number },
 ): number {
   const base = bestCombatStat + hpMax / 10;
-  return gear ? base + gearPowerTerm(gear.ac, gear.avgWeaponDamage) : base;
+  return gear ? base + gearPowerTerm(gear.ac, gear.avgWeaponDamage, gear.tierBlend ?? 1) : base;
 }
 
 function bumpAbilityPointNumber(ap: string | number | undefined, bonus: number): string {

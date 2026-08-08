@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.103';
+export const DISPLAY_VERSION = '4.29.104';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24360,7 +24360,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // red; the engine buzzes and names the beats left.
 // New suite ota1193DodgeCooldown (16 tests).
 // DISPLAY_VERSION 4.29.103.
-export const OTA_BUILD_ID = '2026-08-08-1193-dodge-cooldown';
+// OTA-1194 — THE THREE COMBAT-FEEL LEVERS GET RUNGS ON THE LADDER.
+// Owner: 'if I'm tuning this to be normal difficulty level just above the
+// bottom, can you use this as a baseline and tune the other levels
+// accordingly' - then, when I deferred it: 'so you didn't add the 3 new
+// levers to the other levels?'. Asked twice, so it is built.
+// The balance pass ALREADY carried to every tier - 'owed' is the identity
+// row, so the other three are defined as multiples of it. The defect ran the
+// other way: dodge cooldown, per-tile regen and the gear-aware scaler were
+// GLOBAL constants, so the gentlest tier took the identical nerf an
+// over-geared run did.
+// Three new dials, all no-ops at 'owed':
+//   dodgeLock  0 / 3 / 4 / 5 rounds (salvage has NO cooldown - the
+//              pre-1193 game, on the tier that asked for a safety net)
+//   mend       x1.5 / x1 / x0.75 / x0.5 on PER-TILE HP regen only
+//   gearBlend  x0.5 / x1 / x1.5 / x2 on GEAR_POWER_BLEND, so bury_me
+//              reaches the full designed 1.0 OTA-1182 held back
+// All three are in the CUSTOM picker, so 'bury me, but leave my dodge alone'
+// is expressible like every other system.
+// ⚠ gearBlend KNOWINGLY crosses this file's 'no dial scales enemy HP or
+// damage' rule, recorded in pressure.ts the way OTA-1136 recorded its own
+// reversal. The rule forbids DAMAGE SPONGES; this is the opposite failure
+// mode, and the fight still ends in the same number of rounds.
+// New suite ota1194DifficultyLadder (26 tests). ota1182 and ota1193
+// assertions RETARGETED, not weakened - both got tighter.
+// DISPLAY_VERSION 4.29.104.
+export const OTA_BUILD_ID = '2026-08-08-1194-difficulty-ladder';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1193-dodge-cooldown';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1192-regen-per-tile';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1191-quiet-arbiter-road';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1190-hunts-and-clock-lies';

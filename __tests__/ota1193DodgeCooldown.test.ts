@@ -182,13 +182,21 @@ describe('OTA-1193 — the button shows it', () => {
     // remove. The tap goes through and the store buzzes + explains.
     const i = INPUT.indexOf('OTA-1193 — DODGE carries a recharge bar');
     const block = INPUT.slice(i, i + 400);
-    expect(block).toContain('cooldownFill={dodgeFill(dodgeCooldown)}');
+    // ⚠ OTA-1194 RETARGETED, NOT RELAXED — the bar's DENOMINATOR is now the character's
+    // difficulty tier. Divide bury_me's 5-round lock by the bare constant 3 and the chip
+    // paints full blue with two beats still locked, inviting a tap it will then refuse.
+    expect(block).toContain('cooldownFill={dodgeFill(dodgeCooldown, dodgeMax)}');
+    expect(block).not.toContain('dodgeFill(dodgeCooldown)');
     expect(block).not.toContain('blocked');
   });
 
   it('the fill is clipped to the chip and read from ONE place', () => {
     expect(INPUT).toContain("overflow: 'hidden'");
-    expect(INPUT).toContain("import { dodgeFill } from '../engine/dodgeCooldown'");
+    expect(INPUT).toContain("import { dodgeFill, dodgeCooldownRounds } from '../engine/dodgeCooldown'");
+    // ⚠ ONE PLACE still means one place: the fill fraction and the tier's round count
+    // both come out of engine/dodgeCooldown, and the component derives neither itself.
+    expect(INPUT).not.toMatch(/DODGE_COOLDOWN_ROUNDS/);
+    expect(INPUT).toContain("dodgeCooldownRounds(dialOf(s.player, 'dodgeLock'))");
   });
 
   it('a recharging chip announces itself to a screen reader', () => {

@@ -21,7 +21,9 @@ import { hubRoomFor, isLeaveHubCommand } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 import { reachBandsFor } from '../engine/types';
 // OTA-1193 — the dodge recharge bar reads its fill from one place.
-import { dodgeFill } from '../engine/dodgeCooldown';
+import { dodgeFill, dodgeCooldownRounds } from '../engine/dodgeCooldown';
+// OTA-1194 — the dodge lock is per difficulty tier; dialOf resolves CUSTOM per system.
+import { dialOf } from '../engine/pressure';
 import type { InventoryItem, CombatRange, PlayerCharacter } from '../engine/types';
 
 /** OTA-1029 — the quick-button highlight reads reach from the SAME resolver the
@@ -191,6 +193,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const reachPlayer = useGameStore((s) => s.player ?? null);
   // OTA-1193 — rounds left on the dodge lockout; 0/absent = ready (full blue).
   const dodgeCooldown = useGameStore((s) => s.player?.dodgeCooldown ?? 0);
+  // ⚠ OTA-1194 — the bar's DENOMINATOR is this character's difficulty tier, not the bare
+  // constant. Divide bury_me's 5-round lock by 3 and the chip reads full blue with two
+  // beats still locked — a control that visibly invites a tap it will then refuse, which
+  // is the whole defect class OTA-1187 exists to prevent.
+  const dodgeMax = useGameStore((s) => dodgeCooldownRounds(dialOf(s.player, 'dodgeLock')));
   const tutorialStep = useGameStore((s) => s.tutorialStep);
   const awaitingTutorialName = useGameStore((s) => s.awaitingTutorialName);
   const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
@@ -552,7 +559,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   Hidden here (the engine also refuses them defensively). */}
               {/* OTA-1193 — DODGE carries a recharge bar. Still tappable while red: the
                   engine buzzes and names the beats left rather than refusing in silence. */}
-              {!elevatedOn ? <QuickBtn label="dodge" defensive cooldownFill={dodgeFill(dodgeCooldown)} onPress={() => onSubmit('dodge')} /> : null}
+              {!elevatedOn ? <QuickBtn label="dodge" defensive cooldownFill={dodgeFill(dodgeCooldown, dodgeMax)} onPress={() => onSubmit('dodge')} /> : null}
               {/* OTA-847 (STEALTH SYSTEM) — in-combat STEALTH. First action of the
                   fight = SNEAK ATTACK (free STE check for the drop); mid-combat =
                   BACKSTAB attempt (costs your turn, STE initiative race). The
