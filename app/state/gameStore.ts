@@ -1712,6 +1712,36 @@ function runQwenHealthCheck(
         return false;
       }
       qwenHeldWhileBackgroundLogged = false;
+      // ⚠⚠ OTA-1198 — THE MEMORY INTERLOCK, AND IT EXISTS BECAUSE OTA-1196 BUILT A LOOP.
+      //
+      // The owner's device log, 40 seconds of it, caught by the instruments OTA-1195 added:
+      //     11:08.99  ⚠⚠ MEMORY WARNING #2 — qwen='loading' · reloads=3
+      //     11:09.03  memory: released the Qwen context (~400MB)
+      //     11:09.88  ⚠⚠ MEMORY WARNING #3 (0.9s later) — reloads=3
+      //     11:12.02  reinitializing (attempt #4)
+      //     11:12.41  ⚠⚠ MEMORY WARNING #4 — qwen='downloading' · reloads=4
+      //     … through ⚠⚠ MEMORY WARNING #7 · reloads=7 at 11:47
+      //
+      // ⚠ EVERY reinit settled to 'idle' — `reinit #N settled in 2676ms → status='idle'` —
+      // because the dispose OTA-1196 added marks an in-flight load STALE (OTA-1107's
+      // lifecycleGen). So: watchdog loads → OS complains → we free it mid-load → watchdog
+      // sees 'idle' → loads again. **Seven ~400MB allocations in forty seconds, and the
+      // fix was the engine.** Freeing memory under pressure is still right; doing it with
+      // nothing to stop the reload was not.
+      //
+      // ⚠ The ceiling below bounded it at 8 and the backoff stretched it to 40s, so it was
+      // not unbounded — but bounded thrash is still thrash, and this is what stops it.
+      if (rpQwenStoodDownForMemory || Date.now() < rpMemoryPressureUntil) {
+        if (!rpMemoryQuietLogged) {
+          rpMemoryQuietLogged = true;
+          get().appendLog('debug', rpQwenStoodDownForMemory
+            ? `qwen-watchdog: ${rpMemoryWarnings} memory warnings this session — STANDING DOWN for good. `
+              + `This device will not hold the context; narration stays on templates.`
+            : `qwen-watchdog: holding reloads for ${Math.round(MEMORY_PRESSURE_QUIET_MS / 1000)}s — `
+              + `the OS just asked for memory back and a reload is the biggest thing we could do to it.`);
+        }
+        return false;
+      }
       // ⚠⚠ OTA-1196 — THE CEILING. See QWEN_MAX_REINITS_PER_STRETCH: past this many
       // failed reloads we stop allocating and let the game run on templates. Logged once,
       // not per tick, so the log says it plainly and then goes quiet.
@@ -1790,6 +1820,10 @@ function startQwenWatchdog(
   // re-hydrate starts from a clean slate rather than inheriting the last run's refusals.
   qwenReinitCeilingLogged = false;
   qwenTrulyBackgrounded = false;
+  // OTA-1198 — the memory interlock resets with the rest of the ledger.
+  rpMemoryPressureUntil = 0;
+  rpQwenStoodDownForMemory = false;
+  rpMemoryQuietLogged = false;
 
   const schedule = (ms: number): void => {
     if (qwenWatchdogTimer !== null) clearTimeout(qwenWatchdogTimer);
@@ -1862,6 +1896,19 @@ let rpSampleTimer: ReturnType<typeof setTimeout> | null = null;
 let rpMemorySub: { remove: () => void } | null = null;
 let rpAppStateSub: { remove: () => void } | null = null;
 let rpLastSaveKb: number | null = null;
+// ⚠⚠ OTA-1198 — MEMORY-PRESSURE QUIET WINDOW. See the block in runQwenHealthCheck: the
+// OTA-1196 dispose and the watchdog formed a loop that fired SEVEN ~400MB loads in 40
+// seconds on the owner's device. This is the interlock between them.
+let rpMemoryPressureUntil = 0;
+let rpQwenStoodDownForMemory = false;
+let rpMemoryQuietLogged = false;
+/** ⚠ After a warning, no reload for this long. Longer than the backoff ladder's first
+ *  rungs on purpose — the point is to let the OS settle, not to shave a retry. */
+const MEMORY_PRESSURE_QUIET_MS = 90_000;
+/** ⚠ And after this many warnings in one session, stop asking for the session. A device
+ *  that has refused three times is telling us something; the eighth ask is not going to
+ *  be the one it says yes to, and each ask is another 400MB spike. */
+const MEMORY_WARNINGS_BEFORE_STANDDOWN = 3;
 
 /** Read by the bug-report exporter so the counts land in the HEADER, not only in 146 log
  *  lines someone has to reconstruct by hand. */
@@ -1943,6 +1990,13 @@ function startRuntimePressureWatch(
       // ⚠ The watchdog is deliberately NOT suppressed here: it reads the real status and
       // will bring Qwen back once there is room, which is the behaviour we want — release
       // under pressure, recover when the pressure lifts.
+      // ⚠⚠ OTA-1198 — AND TELL THE WATCHDOG TO STAND DOWN BEFORE FREEING ANYTHING.
+      // Setting this BEFORE the dispose is load-bearing: the dispose marks any in-flight
+      // load stale, the watchdog's next tick sees 'idle', and without this flag it kicks a
+      // fresh ~400MB load straight back into the pressure that just fired the warning.
+      rpMemoryPressureUntil = Date.now() + MEMORY_PRESSURE_QUIET_MS;
+      rpMemoryQuietLogged = false;
+      if (rpMemoryWarnings >= MEMORY_WARNINGS_BEFORE_STANDDOWN) rpQwenStoodDownForMemory = true;
       try {
         if (typeof (qwen as { dispose?: () => Promise<void> }).dispose === 'function') {
           void (qwen as { dispose: () => Promise<void> }).dispose()

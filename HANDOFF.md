@@ -1584,7 +1584,66 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE UPDATE PATH SAYS WHAT IT DID (2026-08-08, latest). HAL + GOLEM.** HAL OTA-1197 /
+- **⚠⚠ THE OTA-1196 FIX WAS BUILDING A LOOP, AND THE INSTRUMENTS CAUGHT IT (2026-08-08,
+  latest). HAL + GOLEM.** HAL OTA-1198 / golem OTA-1175. **steam NOT included — batched
+  (§2).** First device log on 1197, indicting OTA-1196 in its own words:
+
+  ```
+  19:11:08.99  ⚠⚠ MEMORY WARNING #2 from the OS — app=active · qwen='loading' · reloads=3
+  19:11:09.03  memory: released the Qwen context (~400MB) in response to the warning
+  19:11:09.88  ⚠⚠ MEMORY WARNING #3 (0.9s since the last one) — qwen='idle' · reloads=3
+  19:11:10.58  qwen-watchdog: reinit #3 settled in 3575ms → status='idle'
+  19:11:12.02  qwen-watchdog: reinitializing (attempt #4)
+  19:11:12.41  ⚠⚠ MEMORY WARNING #4 (2.5s) — qwen='downloading' · reloads=4
+  …           ⚠⚠ MEMORY WARNING #7 (19.9s) — qwen='downloading' · reloads=7
+  ```
+
+  **⚠⚠ SEVEN ~400MB ALLOCATIONS IN FORTY SECONDS, AND THE FIX WAS THE ENGINE.** The loop:
+  the watchdog kicks a load → iOS fires a memory warning → OTA-1196's handler disposes the
+  context to free memory → **the dispose marks the IN-FLIGHT load stale** (OTA-1107's
+  `lifecycleGen`) → the load settles to `'idle'` → the watchdog sees not-ready and kicks
+  another. ⚠ Every `reinit #N settled` line in that log reads `→ status='idle'` — that is
+  the loop's fingerprint, and it is how to recognise this shape again.
+
+  ⚠ **Freeing memory under pressure is still right. Doing it with nothing to stop the
+  reload was not.** This adds the missing interlock; it does NOT revert OTA-1196:
+  - A **90-second quiet window** after any warning. ⚠ Set **BEFORE** the dispose — the
+    ordering is the fix, because the dispose is what makes the next tick see `'idle'`.
+    Setting it after leaves exactly the window the loop lives in.
+  - **Stand down for the session after 3 warnings.** A device that has refused three times
+    is not going to say yes on the eighth ask, and each ask is another 400MB spike.
+  - ⚠ The window is deliberately longer than the ladder's top rung (~40s observed), or the
+    next rung simply steps over it.
+
+  **⚠ WHAT WORKED IS ON THE RECORD TOO, and it matters.** OTA-1196's ceiling bounded the
+  storm at 8 and its backoff stretched the gap 10s → 20s → 40s, so it was never unbounded.
+  Bounded thrash is still thrash — but those guards did exactly what they were written to
+  do. And **without OTA-1195's instruments none of this would have been visible**: the
+  entire diagnosis is three log lines that did not exist this morning.
+
+  **⚠⚠ ALSO SETTLED BY THE SAME LOG, MEASURED RATHER THAN ASSUMED.**
+  `ota: boot check — enabled=true channel=preview rt=2.4.1` — **the iOS device reads
+  channel `preview`, NOT `hal2001`**, exactly as the workflow's own OTA-303 note warns (the
+  production TestFlight build is stamped by the eas.json production profile, not by
+  app.json's `expo-channel-name`). ⚠ **That matters:** `preview (ios)` is the workflow's
+  **best-effort** publish line (`optional=true`), so **the only channel reaching this
+  device is the one whose failure leaves the run green.** Read the job log, never the
+  checkmark. Worth hardening next.
+
+  ⚠ **A READING TRAP FOR THE NEXT REPORT:** the `Runtime pressure` header block is
+  **per-session**, so it read `Memory warnings: none this session` while the log carried
+  SEVEN — the app had relaunched between the freeze and the export. Not a bug, but
+  **trust the log over the header whenever they disagree about a past session.**
+
+  ⚠ **THE FREEZE ITSELF IS STILL UNEXPLAINED.** No `FREEZE WATCH` verdict fired, and there
+  is no `ui: tap` after the 19:12:06 salvage — so either no tap was made, or taps were
+  being swallowed while frames kept rendering. That combination does NOT point at a render
+  stall, which is what the two-clock watch was built to catch. Next look is the input
+  layer, not the renderer.
+
+  New suite `ota1198MemoryInterlock` (11 tests).
+
+- **⚠⚠ THE UPDATE PATH SAYS WHAT IT DID (2026-08-08). HAL + GOLEM.** HAL OTA-1197 /
   golem OTA-1174. **steam NOT included — batched (§2).** Owner, stuck on OTA-1194 while
   1195 and 1196 sat published and unreachable: *"it hasn't been able to pull an update
   after that… so whatever we've done since it pulled the three lever update, it's probably

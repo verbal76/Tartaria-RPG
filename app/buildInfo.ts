@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.107';
+export const DISPLAY_VERSION = '4.29.108';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24481,7 +24481,38 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // leaves the player unable to receive the correction.
 // New suite ota1197BugReportLoads (10 tests).
 // DISPLAY_VERSION 4.29.107.
-export const OTA_BUILD_ID = '2026-08-08-1197-update-telemetry';
+// OTA-1198 — THE OTA-1196 FIX WAS BUILDING A LOOP. THE INSTRUMENTS CAUGHT IT.
+// First device log on 1197, and it indicts 1196 in its own words - 40s:
+//   11:08.99 ⚠⚠ MEMORY WARNING #2 - qwen='loading' · reloads=3
+//   11:09.03 memory: released the Qwen context (~400MB)
+//   11:09.88 ⚠⚠ MEMORY WARNING #3 (0.9s later)
+//   11:12.02 reinitializing (attempt #4)
+//   11:12.41 ⚠⚠ MEMORY WARNING #4 - qwen='downloading' · reloads=4
+//   ... through ⚠⚠ MEMORY WARNING #7 · reloads=7 at 11:47
+// ⚠⚠ SEVEN ~400MB ALLOCATIONS IN FORTY SECONDS, AND MY FIX WAS THE ENGINE.
+// The loop: watchdog loads -> iOS complains -> the 1196 handler disposes to
+// free memory -> the dispose marks the IN-FLIGHT load stale (OTA-1107
+// lifecycleGen) -> it settles 'idle' -> watchdog sees not-ready -> loads
+// again. Every 'reinit #N settled' line in that log reads status='idle',
+// which is the loop's fingerprint.
+// ⚠ FREEING MEMORY UNDER PRESSURE IS STILL RIGHT; doing it with nothing to
+// stop the reload was not. This adds the missing interlock, it does not
+// revert 1196:
+//   - a 90s QUIET WINDOW after any warning, set BEFORE the dispose (the
+//     ordering is the fix - after it leaves the same window open)
+//   - STAND DOWN for the session after 3 warnings. A device that refused
+//     three times is not going to say yes on the eighth ask.
+// ⚠ WHAT WORKED, recorded too: the 1196 ceiling bounded it at 8 and the
+// backoff stretched 10s->20s->40s. Bounded thrash is still thrash, but the
+// guards did their job, and without 1195's instruments none of this was
+// visible at all.
+// ⚠ ALSO SETTLED BY THE SAME LOG: the device reads channel 'preview', NOT
+// hal2001 - and that is the workflow's BEST-EFFORT publish line, i.e. the
+// only channel reaching this device is the one whose failure goes unnoticed.
+// New suite ota1198MemoryInterlock (11 tests).
+// DISPLAY_VERSION 4.29.108.
+export const OTA_BUILD_ID = '2026-08-08-1198-memory-interlock';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1197-update-telemetry';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1196-memory-defence';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1195-runtime-pressure';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1194-difficulty-ladder';
