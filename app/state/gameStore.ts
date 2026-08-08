@@ -97,6 +97,12 @@ import {
   getCrashedSlotIds,
 } from '../diagnostics/saveLoadHealth';
 import { loadLastCrash } from '../diagnostics/lastCrash';
+// OTA-1172 — memory warnings, app-state churn and the two-clock freeze detector.
+import {
+  FREEZE_SAMPLE_MS, APPSTATE_TRAIL_MAX,
+  freezeVerdict, freezeVerdictLine, memoryWarningLine, appStateLine,
+  type FreezeVerdict, type PressureSnapshot,
+} from '../diagnostics/runtimePressure';
 import {
   listSlots,
   loadSlot,
@@ -1714,11 +1720,23 @@ function runQwenHealthCheck(
       if (qwenBackoffLevel > 0) {
         get().appendLog('debug', `qwen-watchdog: ${qwenReinitAttempts} attempts without recovery — backing off (next check in ~${Math.round(qwenRecoveringDelayMs() / 1000)}s).`);
       }
+      // ⚠ OTA-1172 — TIME THE RELOAD AND NAME WHAT IT SETTLED INTO. The reported freeze
+      // showed six attempts that each went idle → idle, i.e. possibly costing a ~400MB
+      // allocation and achieving nothing. Whether a reload is expensive-and-working or
+      // expensive-and-futile is the difference between tuning the cadence and removing
+      // the call, and the old log could not tell them apart.
+      const rpAttemptNo = qwenReinitAttempts;
+      const rpReinitStarted = Date.now();
       void q.forceReinitialize()
-        .then(() => { qwenReinitInFlightSince = 0; })
+        .then(() => {
+          qwenReinitInFlightSince = 0;
+          let after = '?';
+          try { after = typeof q.getStatus === 'function' ? q.getStatus() : '?'; } catch { /* best effort */ }
+          get().appendLog('debug', `qwen-watchdog: reinit #${rpAttemptNo} settled in ${Date.now() - rpReinitStarted}ms → status='${after}'.`);
+        })
         .catch((err: unknown) => {
           qwenReinitInFlightSince = 0;
-          get().appendLog('debug', `qwen-watchdog: reinit attempt #${qwenReinitAttempts} threw: ${String(err)}`);
+          get().appendLog('debug', `qwen-watchdog: reinit attempt #${rpAttemptNo} threw after ${Date.now() - rpReinitStarted}ms: ${String(err)}`);
         });
       return false;
     }
@@ -1769,6 +1787,159 @@ function startQwenWatchdog(
   } catch { /* AppState unavailable (headless/test) — the poll alone still recovers */ }
 
   schedule(QWEN_WATCHDOG_HEALTHY_MS);
+}
+
+// ── OTA-1172 — RUNTIME PRESSURE INSTRUMENTS ───────────────────────────────
+// Owner: "add in memory warning codes to the log so you can track them, whatever debug
+// information you need." Three holes in the freeze report, three instruments. See
+// engine-side reasoning in app/diagnostics/runtimePressure.ts.
+let rpMemoryWarnings = 0;
+let rpLastMemoryWarningAt: number | null = null;
+let rpAppStateTrail: string[] = [];
+let rpAppState: string = 'active';
+let rpAppStateSince = 0;
+let rpLastVerdict: FreezeVerdict = 'ok';
+let rpWorstFrameGapMs = 0;
+let rpWorstJsGapMs = 0;
+let rpUiStalls = 0;
+let rpLastFrameAt = 0;
+let rpLastJsAt = 0;
+let rpFrameRaf: number | null = null;
+let rpSampleTimer: ReturnType<typeof setTimeout> | null = null;
+let rpMemorySub: { remove: () => void } | null = null;
+let rpAppStateSub: { remove: () => void } | null = null;
+let rpLastSaveKb: number | null = null;
+
+/** Read by the bug-report exporter so the counts land in the HEADER, not only in 146 log
+ *  lines someone has to reconstruct by hand. */
+export function runtimePressureSnapshot(): PressureSnapshot {
+  return {
+    memoryWarnings: rpMemoryWarnings,
+    lastMemoryWarningAt: rpLastMemoryWarningAt,
+    appStateTrail: rpAppStateTrail,
+    lastVerdict: rpLastVerdict,
+    worstFrameGapMs: rpWorstFrameGapMs,
+    worstJsGapMs: rpWorstJsGapMs,
+    uiStalls: rpUiStalls,
+  };
+}
+
+/** ⚠ Called from the persist path so a memory-warning line can name the save size without
+ *  rebuilding the blob — measuring it here would itself allocate, which is the last thing
+ *  to do while the OS is asking for memory back. */
+export function noteSaveKb(kb: number): void { rpLastSaveKb = kb; }
+
+/** ⚠ THE BREADCRUMB. The freeze report had NO record of a tap between the last salvage and
+ *  90 seconds of silence, so there was no way to tell "the tap never arrived" (screen
+ *  frozen) from "the tap arrived and the work hung" (engine frozen). This is logged the
+ *  instant a control is touched, BEFORE any work — that ordering is the entire point, and
+ *  a future edit that moves it after the handler destroys the signal. */
+export function logUiTap(label: string): void {
+  try {
+    useGameStore.getState().appendLog('debug', `ui: tap "${label}"`);
+  } catch { /* never let instrumentation break a control */ }
+}
+
+function startRuntimePressureWatch(
+  get: () => GameStore,
+  _set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+): void {
+  // Idempotent: a re-hydrate must not stack a second set of timers and listeners.
+  if (rpSampleTimer !== null) { clearTimeout(rpSampleTimer); rpSampleTimer = null; }
+  if (rpFrameRaf !== null && typeof cancelAnimationFrame === 'function') {
+    try { cancelAnimationFrame(rpFrameRaf); } catch { /* ignore */ }
+  }
+  rpFrameRaf = null;
+  if (rpMemorySub) { try { rpMemorySub.remove(); } catch { /* ignore */ } rpMemorySub = null; }
+  if (rpAppStateSub) { try { rpAppStateSub.remove(); } catch { /* ignore */ } rpAppStateSub = null; }
+
+  const now = Date.now();
+  rpLastFrameAt = now;
+  rpLastJsAt = now;
+  rpAppStateSince = now;
+  try { rpAppState = String(AppState.currentState ?? 'active'); } catch { rpAppState = 'active'; }
+
+  // ⚠⚠ THE ONE THE OWNER ASKED FOR, AND NOTHING IN THIS APP LISTENED FOR IT BEFORE.
+  // On iOS the OS warns before it stalls the app and again before it kills it, so this is
+  // the highest-value signal available for a frozen-but-alive report — and it was being
+  // discarded. React Native surfaces it on AppState for both platforms.
+  try {
+    rpMemorySub = AppState.addEventListener('memoryWarning', () => {
+      rpMemoryWarnings += 1;
+      const t = Date.now();
+      const since = rpLastMemoryWarningAt == null ? null : t - rpLastMemoryWarningAt;
+      rpLastMemoryWarningAt = t;
+      let qwenStatus: string | undefined;
+      try { qwenStatus = typeof qwen.getStatus === 'function' ? qwen.getStatus() : undefined; } catch { /* best effort */ }
+      try {
+        get().appendLog('debug', memoryWarningLine(rpMemoryWarnings, since, {
+          appState: rpAppState,
+          qwenStatus,
+          qwenReinitAttempts,
+          saveKb: rpLastSaveKb ?? undefined,
+        }));
+      } catch { /* never let instrumentation throw into the host */ }
+    }) as { remove: () => void } | null;
+  } catch { /* AppState unavailable (headless/test) */ }
+
+  // ⚠ EVERY TRANSITION, `inactive` INCLUDED — that is the evidence, not the noise. The
+  // reported freeze showed three `active` bounces ~350ms apart, each of which bought a
+  // fresh ~400MB model reload, and without the transitions written down the watchdog log
+  // read as a self-contradiction ("holding revival" then reinitializing 350ms later).
+  try {
+    rpAppStateSub = AppState.addEventListener('change', (next) => {
+      const t = Date.now();
+      const prev = rpAppState;
+      const nextStr = String(next);
+      if (nextStr === prev) return;
+      try { get().appendLog('debug', appStateLine(prev, nextStr, t - rpAppStateSince)); } catch { /* ignore */ }
+      rpAppStateTrail = [...rpAppStateTrail, nextStr].slice(-APPSTATE_TRAIL_MAX);
+      rpAppState = nextStr;
+      rpAppStateSince = t;
+      // A fresh foreground restarts both clocks: a backgrounded app legitimately stops
+      // painting, and counting that as a render stall would cry wolf every time the
+      // player checks a message.
+      if (nextStr === 'active') { rpLastFrameAt = t; rpLastJsAt = t; }
+    }) as { remove: () => void } | null;
+  } catch { /* AppState unavailable (headless/test) */ }
+
+  // Clock A — frames. Driven by the NATIVE frame callback, so it stops when the render
+  // side stops even while JS keeps running.
+  const frameTick = (): void => {
+    rpLastFrameAt = Date.now();
+    if (typeof requestAnimationFrame === 'function') {
+      try { rpFrameRaf = requestAnimationFrame(frameTick) as unknown as number; } catch { rpFrameRaf = null; }
+    }
+  };
+  if (typeof requestAnimationFrame === 'function') {
+    try { rpFrameRaf = requestAnimationFrame(frameTick) as unknown as number; } catch { rpFrameRaf = null; }
+  }
+
+  // Clock B — plain JS. Serviced by the JS thread alone. The PAIR is the discriminator;
+  // neither clock on its own can tell a frozen screen from a wedged engine.
+  const sample = (): void => {
+    const t = Date.now();
+    const jsGap = t - rpLastJsAt - FREEZE_SAMPLE_MS;
+    const frameGap = t - rpLastFrameAt;
+    rpLastJsAt = t;
+    // Only judge while the app is actually foregrounded — see the note above.
+    if (rpAppState === 'active') {
+      const v = freezeVerdict(Math.max(0, jsGap), frameGap);
+      if (frameGap > rpWorstFrameGapMs) rpWorstFrameGapMs = frameGap;
+      if (jsGap > rpWorstJsGapMs) rpWorstJsGapMs = Math.max(0, jsGap);
+      // ⚠ Log on the EDGE, not every sample. A sustained freeze would otherwise write a
+      // line every 5 seconds and bury the transition that actually matters.
+      if (v !== 'ok' && v !== rpLastVerdict) {
+        if (v === 'ui-stalled' || v === 'both-stalled') rpUiStalls += 1;
+        try { get().appendLog('debug', freezeVerdictLine(v, Math.max(0, jsGap), frameGap)); } catch { /* ignore */ }
+      } else if (v === 'ok' && rpLastVerdict !== 'ok') {
+        try { get().appendLog('debug', `freeze watch: recovered — painting again after ${Math.round(rpWorstFrameGapMs)}ms quiet.`); } catch { /* ignore */ }
+      }
+      rpLastVerdict = v;
+    }
+    rpSampleTimer = setTimeout(sample, FREEZE_SAMPLE_MS);
+  };
+  rpSampleTimer = setTimeout(sample, FREEZE_SAMPLE_MS);
 }
 
 // Casual-look narration: the player asked to look around but didn't target
@@ -31849,6 +32020,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // next time the player triggers narration or fusion. Idempotent —
     // starting twice replaces the timer cleanly.
     startQwenWatchdog(get, set);
+    // OTA-1172 — instruments alongside the watchdog: same lifecycle, same teardown rules.
+    startRuntimePressureWatch(get, set);
   },
 
   async shutdownQwen() {
@@ -32104,7 +32277,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (saveErr || trim.trimmed || persistSizeSampleCounter % PERSIST_SIZE_SAMPLE_EVERY === 0) {
       // OTA-413 — report the ACTUALLY-SAVED (pruned + trimmed) blob, not the raw
       // in-memory builtState, so the heartbeat reflects what landed on disk.
-      get().appendLog('debug', saveSizeBreakdown(trim.state));
+      const rpBreakdown = saveSizeBreakdown(trim.state);
+      // OTA-1172 — bank the size so a memory-warning line can name it without rebuilding
+      // the blob; allocating to measure while the OS asks for memory back is exactly the
+      // wrong move.
+      const rpKb = /total=(\d+)/.exec(rpBreakdown);
+      if (rpKb) noteSaveKb(parseInt(rpKb[1]!, 10));
+      get().appendLog('debug', rpBreakdown);
     }
     return !saveErr;
     };

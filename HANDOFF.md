@@ -1574,7 +1574,68 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE THREE COMBAT-FEEL LEVERS GET RUNGS ON THE LADDER (2026-08-08, latest). HAL +
+- **⚠⚠ MEMORY WARNINGS, APP-STATE CHURN, AND A FREEZE DETECTOR (2026-08-08, latest). HAL +
+  GOLEM.** HAL OTA-1195 / golem OTA-1172. **steam NOT included — batched (§2).** Owner,
+  after a hard lock on an iPhone this log could not explain: *"add in memory warning codes
+  to the log so you can track them, whatever debug information you need. add that to
+  whatever you can immediately put in as an OTA and push it. I want that done now."*
+
+  **⚠ WHAT THE FREEZE REPORT PROVED, AND WHERE IT RAN OUT.** The qwen-watchdog ticked every
+  ~10s **straight through the freeze** (12:29:58 → 12:31:27) and a save landed at 12:31:02
+  — **the JS thread was alive the entire time the screen was dead.** That rules out an
+  infinite loop and every pure-logic suspect, including both levers shipped the same day
+  (the dodge bar cannot render outside combat and he was in an outpost with `enemies=0`).
+  Having ruled those out, the log had nothing left: no record of a tap arriving, none of
+  the screen painting, none of memory pressure. Three holes, three instruments.
+
+  **⚠⚠ NOTHING IN THIS APP LISTENED FOR `memoryWarning` — verified by grep, not assumed.**
+  On the platform the bug was filed from that is the highest-value signal there is: iOS
+  warns before it stalls the app and again before it kills it, and *frozen-but-alive is
+  exactly what memory pressure looks like from the inside.*
+
+  **The five instruments:**
+  - **Memory-warning line** — carries an **ordinal**, because on iOS the COUNT is the
+    severity (it escalates before it jetsams), plus the gap since the last one and the
+    context that indicts the suspect: qwen status, **reload count**, save KB.
+  - **Freeze watch — TWO clocks.** `setTimeout` is serviced by the JS thread alone;
+    `requestAnimationFrame` is driven by the native frame callback and stops when the
+    RENDER side stops. ⚠ Neither alone can tell a frozen screen from a wedged engine —
+    **the pair can**, which is precisely the question this report left open and I had to
+    ask the owner by hand. ⚠ **Measured differently on purpose:** the JS gap is NET of the
+    sample interval (or the sampler indicts itself every tick); the frame gap is RAW,
+    because rAF should fire at ~16ms whatever the sample rate. A first draft of the test
+    asserted both were net, which would have hidden every stall shorter than 5s. ⚠ Judges
+    only while foregrounded (a backgrounded app rightly stops painting) and logs on the
+    **edge**, not per sample.
+  - **App-state trail** — **every** transition, `inactive` included. On iOS that is the
+    evidence, not the noise.
+  - **Tap breadcrumb** — logged **before any handler**, and that ordering IS the signal:
+    tap logged with no parser line = the engine hung; **no tap line at all = the screen was
+    frozen.** A future edit that moves it below the handler destroys it.
+  - **Reload timing** — ms and resulting status. Six attempts went `idle → idle` and
+    nothing recorded whether they were expensive-and-working or expensive-and-futile; the
+    attempt number is captured at KICK time, not read at settle time, or the timing would
+    be attributed to whichever attempt happened to be current.
+
+  **⚠⚠ DIAGNOSTICS ONLY, AND THE FIX IS HELD BACK ON PURPOSE.** The same log shows a **real
+  defect**: `AppState` `'active'` **wipes the Qwen backoff ladder and immediately kicks a
+  ~400MB model reload** — and iOS fires `'active'` for a notification banner, a Control
+  Center pull or a peek at the app switcher, so **three of the six reloads in that window
+  were incidental twitches, not the player returning.** OTA-1084's own comment reads
+  *"kicking a ~400MB context load from the background is guaranteed wasted work"*; iOS
+  walks straight through that rule. **Instrument first, then fix** — shipping both together
+  would leave us unable to say which change moved the next log. ⚠ The current behaviour is
+  **pinned by test**, so the hold is visible and the change cannot land unannounced; when
+  the fix comes, that assertion is what changes.
+
+  ⚠ Every listener is guarded (headless/test have no AppState), the watch is idempotent
+  across a re-hydrate, and instrumentation can never throw into a press handler or break
+  the bug-report export — a diagnostic that fails when things are already going wrong is
+  worse than none at all.
+
+  New suite `ota1172RuntimePressure` (35 tests). Blocking gates green on both lines.
+
+- **⚠⚠ THE THREE COMBAT-FEEL LEVERS GET RUNGS ON THE LADDER (2026-08-08). HAL +
   GOLEM.** HAL OTA-1194 / golem OTA-1171. **steam NOT included — batched (§2).** Owner:
   *"if I'm tuning this to be normal difficulty level just above the bottom, can you use
   this as a baseline and tune the other levels accordingly"* — then, after I deferred it

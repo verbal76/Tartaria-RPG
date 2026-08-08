@@ -18,6 +18,20 @@ import { Platform, Dimensions, PixelRatio } from 'react-native';
 import { OTA_BUILD_ID, DISPLAY_VERSION } from '../buildInfo';
 import { getBuildCodename, getApkCodename } from '../buildCodename';
 import { mlHealthSummary } from './mlHealth';
+// OTA-1172 — memory warnings / freeze watch / app-state trail.
+import { runtimePressureSummary } from './runtimePressure';
+import { runtimePressureSnapshot } from '../state/gameStore';
+
+/** ⚠ Isolated behind a try/catch and a lazy read: the bug-report exporter must NEVER be
+ *  the thing that fails when the app is already in trouble, and this block is at its most
+ *  valuable in exactly the sessions where something is going wrong. */
+function runtimePressureBlock(): string {
+  try {
+    return runtimePressureSummary(runtimePressureSnapshot());
+  } catch {
+    return 'Runtime pressure\n  (unavailable this session)';
+  }
+}
 import { saveLoadHealthSummary } from './saveLoadHealth';
 import { lastCrashSummary } from './lastCrash';
 
@@ -123,6 +137,12 @@ export function buildBasicDeviceSummary(): string {
     // global ErrorUtils handler captures non-ML, non-load crashes here; without
     // this line they never reached the pasted report and we'd be guessing.
     lastCrashSummary(),
+    // ⚠ OTA-1172 — RUNTIME PRESSURE. Memory warnings, render stalls and the app-state
+    // trail. This block exists because a hard-lock report arrived with no way to answer
+    // "did the OS ask for memory back" or "did the screen stop painting" — the two
+    // questions that decide which half of the codebase to look in. The counts belong in
+    // the HEADER, not only reconstructable from 146 log lines.
+    runtimePressureBlock(),
   ];
   return lines.join('\n');
 }
