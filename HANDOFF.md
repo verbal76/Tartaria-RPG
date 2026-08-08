@@ -1584,7 +1584,51 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ STOP ASKING iOS FOR MEMORY IT HAS ALREADY REFUSED (2026-08-08, latest). HAL +
+- **⚠⚠ THE UPDATE PATH SAYS WHAT IT DID (2026-08-08, latest). HAL + GOLEM.** HAL OTA-1197 /
+  golem OTA-1174. **steam NOT included — batched (§2).** Owner, stuck on OTA-1194 while
+  1195 and 1196 sat published and unreachable: *"it hasn't been able to pull an update
+  after that… so whatever we've done since it pulled the three lever update, it's probably
+  something stopping it."*
+
+  **⚠ THE SERVER SIDE WAS VERIFIED CLEAN, BOTH TIMES.** `Channel 'hal2001' (ios)` AND
+  `Channel 'preview' (ios)` published at `runtimeVersion 2.4.1` — exactly what the iOS
+  TestFlight build asks for — at 13:36 (1195) and 15:34 (1196). ⚠ Worth knowing for the
+  next one of these: the iOS publish in that workflow is **best-effort (`optional=true`)**,
+  so a green run does NOT prove iOS published. Both were confirmed by reading the job log,
+  not by trusting the checkmark. So the refusal is happening **on the device** — and the
+  device could not say one word about why.
+
+  **Two things, both additive:**
+  1. **The boot-front OTA check now reports to the DEVICE log** — what expo thinks it is
+     running (`updateId` / channel / runtimeVersion) *before* asking for anything, every
+     status line from check+download, every error, and the final result. It previously
+     swallowed all of it into a **`console.warn`, which no pasted bug report has ever
+     carried**, and passed `silent: true`, which discarded the status and error callbacks
+     outright. An update path with no telemetry can only be debugged by guessing.
+  2. **A test that actually IMPORTS and RUNS `aboutSummary`.** ⚠ OTA-1195 added
+     `import { runtimePressureSnapshot } from '../state/gameStore'` to it — a 44k-line
+     store and its whole import graph, pulled into the bug-report path — and **nothing
+     executed that chain**: the 1195 suite reads the file as TEXT. **A grep proves a string
+     is present; it cannot prove a module loads**, and a bundle that dies during startup is
+     silently rolled back by iOS, which is indistinguishable from "it never downloaded". It
+     loads clean, so that was **not** the cause — but the gap was real, had never once been
+     executed on CI or a device, and is now closed. ⚠ **General rule: when an OTA adds an
+     import, at least one test must EXECUTE the importer.**
+
+  **⚠⚠ NOT ONE LINE OF UPDATE CONTROL FLOW CHANGED** — same call, same options, same
+  branches, same fall-through, and that is pinned by test. This is the one path in the app
+  where a clever fix that goes wrong leaves the player unable to receive the correction, so
+  it gets logging and nothing else. ⚠ The logging cannot block the boot: every write is
+  wrapped.
+
+  ⚠ **STILL UNRESOLVED, and the honest state of it:** the device is on 1194 with two good
+  bundles it will not take. Publishing this OTA is also a deliberate attempt at the fix —
+  a **fresh update ID**, because iOS marks an update that fails to launch and stops
+  retrying *that one*. If 1197 lands and 1195/1196 did not, that mechanism is confirmed.
+
+  New suite `ota1197BugReportLoads` (10 tests).
+
+- **⚠⚠ STOP ASKING iOS FOR MEMORY IT HAS ALREADY REFUSED (2026-08-08). HAL +
   GOLEM.** HAL OTA-1196 / golem OTA-1173. **steam NOT included — batched (§2).** Second
   device report, and the symptom **escalated**. Owner: *"On the last run through I hit
   investigate and the game crashed to home screen. On this run… I went to the mission board

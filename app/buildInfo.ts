@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.106';
+export const DISPLAY_VERSION = '4.29.107';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24452,7 +24452,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1196MemoryDefence (17 tests). ota1055/1107/1195 assertions
 // RETARGETED, not weakened - each keeps the claim its own name makes.
 // DISPLAY_VERSION 4.29.106.
-export const OTA_BUILD_ID = '2026-08-08-1196-memory-defence';
+// OTA-1197 — THE UPDATE PATH SAYS WHAT IT DID.
+// Owner, stuck on 1194 while 1195 and 1196 sat published and unreachable:
+// 'it hasn't been able to pull an update after that... so whatever we've
+// done since it pulled the three lever update, it's probably something
+// stopping it.'
+// ⚠ SERVER SIDE WAS VERIFIED CLEAN both times: Channel 'hal2001' (ios) AND
+// 'preview' (ios) published at runtimeVersion 2.4.1 — exactly what his
+// TestFlight build asks for. So the refusal is happening ON the device, and
+// the device could not say one word about why.
+// TWO THINGS, BOTH ADDITIVE:
+//   1. The boot-front OTA check now logs to the DEVICE log: what expo
+//      thinks it is running (updateId/channel/rt), every status line from
+//      the check+download, every error, and the final result. It previously
+//      swallowed all of it into console.warn, which no pasted bug report
+//      has ever carried, and passed silent:true which discarded the status
+//      and error callbacks entirely.
+//   2. A test that actually IMPORTS and RUNS aboutSummary. OTA-1195 added
+//      `import { runtimePressureSnapshot } from '../state/gameStore'` to it
+//      — a 44k-line store pulled into the bug-report path — and NOTHING
+//      executed that chain: the 1195 suite reads the file as TEXT. A grep
+//      proves a string is present; it cannot prove a module loads, and a
+//      bundle that dies on startup is silently rolled back by iOS, which
+//      looks identical to 'it never downloaded'. It loads clean, so that
+//      was not the cause — but the gap was real and is now closed.
+// ⚠ NOT ONE LINE OF UPDATE CONTROL FLOW CHANGED. Same call, same options,
+// same branches. This is the one path where a clever fix that goes wrong
+// leaves the player unable to receive the correction.
+// New suite ota1197BugReportLoads (10 tests).
+// DISPLAY_VERSION 4.29.107.
+export const OTA_BUILD_ID = '2026-08-08-1197-update-telemetry';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1196-memory-defence';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1195-runtime-pressure';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1194-difficulty-ladder';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1193-dodge-cooldown';
