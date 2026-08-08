@@ -15,7 +15,7 @@ import { TutorialTarget } from './TutorialTarget';
 import { visibleBuildingRooms } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS } from './tutorialSteps';
-import { playerWeaponReach, useGameStore } from '../state/gameStore';
+import { playerWeaponReach, useGameStore, logUiTap } from '../state/gameStore';
 import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, isLeaveHubCommand } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
@@ -811,6 +811,11 @@ function QuickBtn({
     blocked && styles.quickDisabledText,
   ];
   const handlePress = () => {
+    // ⚠ OTA-1195 — THE BREADCRUMB, AND IT IS FIRST ON PURPOSE. The freeze report had no
+    // record of a tap between the last salvage and 90 seconds of silence, so there was no
+    // way to tell "the tap never arrived" (screen frozen) from "the tap arrived and the
+    // work hung" (engine frozen). Moving this below any handler destroys that signal.
+    logUiTap(label);
     if (blocked) {
       // arb109 — wrong control for this tutorial beat. A stronger double-pulse
       // (clearly an "error" buzz, not a tap) PLUS an on-screen Arbiter nudge,
@@ -861,6 +866,7 @@ function TravelBtn({ label, onPress, blocked, active }: { label: string; onPress
   // buzz (double-pulse) + drop an Arbiter nudge instead of moving, so the
   // player can't wander off-script and gets clear "wrong" feedback.
   const handlePress = () => {
+    logUiTap(label); // OTA-1195 — before any handler; see the note in QuickBtn.
     if (blocked) { buzzWrong(); useGameStore.getState().nudgeTutorialBlocked(); return; }
     onPress();
   };

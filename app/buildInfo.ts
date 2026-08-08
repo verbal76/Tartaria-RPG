@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.104';
+export const DISPLAY_VERSION = '4.29.105';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24385,7 +24385,41 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1194DifficultyLadder (26 tests). ota1182 and ota1193
 // assertions RETARGETED, not weakened - both got tighter.
 // DISPLAY_VERSION 4.29.104.
-export const OTA_BUILD_ID = '2026-08-08-1194-difficulty-ladder';
+// OTA-1195 — MEMORY WARNINGS, APP-STATE CHURN, AND A FREEZE DETECTOR.
+// Owner, after an unexplained hard lock on iPhone: 'add in memory warning
+// codes to the log so you can track them, whatever debug information you
+// need. add that to whatever you can immediately put in as an OTA and push
+// it. I want that done now.'
+// WHAT THE FREEZE REPORT PROVED, then ran out of: the qwen-watchdog ticked
+// every ~10s straight THROUGH the freeze and a save landed mid-way, so the
+// JS thread was alive while the screen was dead. That rules out an infinite
+// loop and every pure-logic suspect - and then the log had nothing left. No
+// record of a tap arriving, of the screen painting, or of memory pressure.
+// ⚠⚠ NOTHING listened for memoryWarning anywhere in the app - checked, not
+// assumed. On iOS the OS warns before it stalls and again before it kills;
+// that was the best signal the platform offers and it went in the bin.
+// Five instruments, no behaviour change:
+//   memoryWarning listener - ordinal (the COUNT is the severity), gap since
+//     the last, plus qwen status / reload count / save KB as context
+//   freeze watch - TWO clocks. setTimeout is serviced by JS alone; rAF is
+//     driven by the native frame callback. Neither alone can tell a frozen
+//     screen from a wedged engine; the PAIR can.
+//   appstate trail - EVERY transition incl. 'inactive'. On iOS that is the
+//     evidence, not the noise.
+//   tap breadcrumb - logged BEFORE any handler. Tap logged + no parser line
+//     = engine hung; no tap line = screen frozen.
+//   reinit timing - ms and resulting status, so an expensive-and-futile
+//     reload is told from an expensive-and-working one.
+// ⚠ DIAGNOSTICS ONLY, DELIBERATELY. The same log shows a REAL defect - an
+// iOS 'active' transition wipes the Qwen backoff ladder and immediately
+// kicks a ~400MB reload, and iOS fires 'active' for a notification banner,
+// so 3 of the 6 reloads in that window were incidental twitches. That fix
+// is HELD to the next OTA on purpose: instrument first, then fix, or the
+// next device log cannot say which change moved it.
+// New suite ota1195RuntimePressure (35 tests).
+// DISPLAY_VERSION 4.29.105.
+export const OTA_BUILD_ID = '2026-08-08-1195-runtime-pressure';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1194-difficulty-ladder';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1193-dodge-cooldown';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1192-regen-per-tile';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1191-quiet-arbiter-road';
