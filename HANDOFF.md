@@ -1584,7 +1584,58 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE BOARD YOU FROZE IS THE DEAL YOU GET (2026-08-08, latest). HAL + GOLEM.**
+- **⚠⚠ ARRIVING SOMEWHERE MEANS FINDING SOMEONE (2026-08-08, latest). HAL + GOLEM.**
+  HAL OTA-1189 / golem OTA-1166. **steam NOT included — batched (§2).** Owner: *"once you
+  reach that location it spawns a set number, say three groups within five blocks of you
+  in different directions, so that you always have a chance of running into them… those
+  three groups are now actively hunting you… that eliminates the wait factor. now it's
+  just how well are you geared up."*
+
+  **⚠ THIS REPLACES A WORKAROUND WITH A FIX, AND THE OWNER CALLED IT.** A bounty's real
+  cost was never travel — it was **WAITING**. `maybePatrolAmbush` will not fire twice
+  inside `PATROL_MIN_HOURS` (6), and only fires at all if a patrol of the right faction
+  happens to be within 2 tiles. So a player could arrive on time, play perfectly, and
+  **meet nobody** — especially once rival hordes had thinned the quarry off that ground.
+  **OTA-1188 answered that by widening the DEADLINE** (`HOURS_PER_REQUIRED_KILL`), which
+  bought time to keep waiting instead of removing the wait. Owner: *"sometimes we spend an
+  hour going back and forth on the best way to step around that cardboard box on the
+  sidewalk instead of just picking it up and throwing it away."* He was right.
+  ⚠ **The 1188 kill term is now largely redundant and is deliberately LEFT IN** — it is
+  still correct for the stretch before arrival. **DO NOT retune it until there is device
+  evidence:** changing a just-shipped clock in the same pass that changes what fills it
+  leaves two variables moving at once, and a bad session then has two candidate causes.
+
+  New `engine/quarrySeed.ts`. Standing on a held contract's target cell places
+  **`QUARRY_GROUPS` (3)** patrols of the quarry faction at **3-5 tiles**, one per quadrant.
+  - ⚠ **NOTHING NEW ENGAGES THEM.** They go into `worldMemory.patrols`, roam via
+    `stepPatrol`, and are picked up by `maybePatrolAmbush` — which already skips the
+    hunt-chance roll for a bounty target. **The seeding has to be undetectable**, or it
+    stops feeling like a hunt and starts feeling like a spawner. Pinned by a test that
+    fails if this ever grows its own engagement path.
+  - ⚠ **DIFFERENT DIRECTIONS IS THE DESIGN, not decoration.** Three groups bunched on one
+    side leaves a clean escape and a player who walks the wrong way still meets nobody —
+    the exact failure being removed. One per quadrant, rotating with a per-contract salt so
+    two contracts at the same outpost do not lay the same ring.
+  - ⚠ **A MINIMUM RADIUS EXISTS ON PURPOSE.** A group at distance 0-1 would engage on the
+    very next action and read as an ambush waiting at the gate. They have to CLOSE.
+  - ⚠ **ONE-SHOT, FLAGGED ON THE CONTRACT** (`quarrySeeded`), not on the location: a
+    location flag would refuse to seed a SECOND contract at the same outpost, and walking
+    in and out must not re-arm the trap.
+  - ⚠ **THREE CALL SITES, AND THE REDUNDANCY IS DELIBERATE.** The two travel-arrival hooks
+    only cover AUTOROUTED arrivals; a player walking the last tiles with typed cardinals
+    would reach the outpost and find nothing — reintroducing the whole bug. The per-action
+    catch-all closes it, and the one-shot flag makes the overlap free.
+
+  **The arrival beat never admits the placement.** Owner: *"nobody knows that we're
+  prepping you. they still think they found them, or they found you."* Asserted by a test
+  that fails on the words *spawn / placed / three groups / generated*.
+
+  New suite `ota1189QuarrySeed` (16 tests).
+
+  Blocking gates green on both lines: typecheck:ci, lint, the test-typecheck ratchet,
+  the handoff-claims ratchet, and test:ci:fast (**713 suites / 6493 tests**).
+
+- **⚠⚠ THE BOARD YOU FROZE IS THE DEAL YOU GET (2026-08-08). HAL + GOLEM.**
   HAL OTA-1188 / golem OTA-1165. **steam NOT included — batched (§2).** Owner: *"if you
   see that faction bounty is allied with the faction that you're trying to build rep
   with… and accept that bounty then it locks it in. so even if they go to war one second
