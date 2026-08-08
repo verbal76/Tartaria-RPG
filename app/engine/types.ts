@@ -1025,6 +1025,12 @@ export interface PlayerCharacter {
    *  owner ran a 23-tile contract on the wrong model of all three. Absent reads as false,
    *  so every existing character gets it once on their next accept. */
   bountyPrimerSeen?: boolean;
+  /** ⚠ OTA-1170 — rounds until DODGE can be set again. Counts DOWN by one per action
+   *  taken; 0/absent = ready. Absent on every existing save, which reads as READY — a
+   *  migration must never lock a player out of a move they had yesterday.
+   *  Rounds, not seconds: see engine/dodgeCooldown for why the owner's "10-15 seconds"
+   *  was deliberately translated into turns. */
+  dodgeCooldown?: number;
   /** ⚠ OTA-1066 — PHASE 4 DIFFICULTY, chosen on the last step of character
    *  creation and LOWERABLE MID-RUN BUT NEVER RAISABLE (engine/pressure.ts
    *  canChangeTo). Absent = DEFAULT_PRESSURE ('owed'), which is what every

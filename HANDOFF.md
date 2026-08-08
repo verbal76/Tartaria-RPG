@@ -1574,7 +1574,54 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THREE OTAs IN ONE PUSH — 1167, 1168, 1169 (2026-08-08, latest). HAL + GOLEM.**
+- **⚠⚠ DODGE GETS A COOLDOWN, AND THE BUTTON SHOWS IT (2026-08-08, latest). HAL +
+  GOLEM.** HAL OTA-1193 / golem OTA-1170. **steam NOT included — batched (§2).** Owner:
+  *"put a cooldown timer on dodge. once it's used have it turn red and slowly fill back to
+  blue… fill left to right with no fade. now how long is the cool down timer? 10 seconds?
+  15?"*
+
+  **⚠ THE ANSWER WAS ROUNDS, NOT SECONDS — a deliberate push-back on the brief, agreed by
+  the owner before building.** The game is turn-based and his log shows him acting every
+  **1-2 seconds** in combat (`02:46:14 dodge → 02:46:15 attack`), so a 15-second wall-clock
+  lock would cost **seven to ten actions** and make the optimal play "put the phone down".
+  That is dead air — worse than the mashing it replaces — and it punishes fast players
+  while rewarding slow ones for nothing skillful. `DODGE_COOLDOWN_ROUNDS = 3`: dodge, two
+  rounds red, ready on the third.
+
+  **⚠ WHY IT WAS NEEDED, from the device log.** Dodge resolves as `d20 + DEX >= the
+  enemy's attack TOTAL`, so at **DEX 19 only a natural 1 fails**. The log shows **five
+  dodges, five wins — including a nat 2 and a nat 3** — each granting a PERFECT OPENING
+  (×2 dice) that then rolled `slashing ×2.25 for 52` into a 47 HP raider. Alternating
+  dodge→attack put roughly **half of all his attacks at double dice for no risk**. ⚠ The
+  dodge MATHS is untouched; only the **uptime** is capped, so it stays a read rather than
+  becoming a coin flip. Sized against real fights: raiders die in 2-4 rounds (≈one dodge a
+  skirmish) while the Core Guardian ran 34 (≈11 uses, still a tool in a long fight).
+
+  **⚠ THE REFUSAL SPEAKS, BUZZES, AND DOES NOT SPEND THE TURN.** It names **beats**, not
+  seconds, so the player learns the unit the bar counts in. A cooldown that silently eats
+  the action is the OTA-1164 defect wearing armour.
+
+  **The bar:** two flat absolute layers behind the chip label — red across the whole chip,
+  blue laid over it from the **left** to the fill fraction. ⚠ **No gradient and no
+  `Animated` anywhere**: the width JUMPS one step per action, because the cooldown counts
+  rounds and a smooth tween would imply time is what refills it. `overflow: 'hidden'` clips
+  it to the chip radius. ⚠ **The chip stays TAPPABLE while red** — disabling it in the UI
+  would refuse in silence, which is the thing OTA-1164 existed to remove.
+
+  New suite `ota1170DodgeCooldown` (16 tests).
+  ⚠ **FIFTH SELF-INFLICTED TEST TRAP THIS SESSION, and the fix is now written down.** A
+  sweep asserting "no `Animated` in this JSX" matched **the comment saying there is no
+  Animated**. A per-LINE comment filter did not help: a JSX comment's continuation lines
+  carry no marker at all. **Strip whole comment BLOCKS by regex** (`{/* … */}`, `/* … */`,
+  `//…`) before asserting on source. Assert on code, never on prose about code.
+
+  Blocking gates green on both lines: typecheck:ci, lint, the test-typecheck ratchet,
+  the handoff-claims ratchet, and test:ci:fast — **717 suites on both**, 6546 tests on HAL
+  and **6540 here**. ⚠ The two lines genuinely carry different test COUNTS (the ratchet
+  baselines differ too: 200/13 on HAL, 202/12 here), so a golem entry quoting HAL's number
+  is a claim nobody measured. Measured on this line.
+
+- **⚠⚠ THREE OTAs IN ONE PUSH — 1167, 1168, 1169 (2026-08-08). HAL + GOLEM.**
   golem OTA-1167/1168/1169 / HAL OTA-1190/1191/1192. **steam NOT included — batched
   (§2).** ⚠ **Three commits, ONE push, deliberately:** §3 forbids a second push inside the
   CI window (branch concurrency cancels the first run and destroys the record of the commit
