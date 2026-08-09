@@ -144,10 +144,15 @@ export interface TitlePerks {
    *  path beside the mechanical-damage die; a perk with no consumer is a new
    *  "ends in nothing" and this one is wired. */
   electricalDamageBonus: number;
+  /** ⚠ OTA-1212 — passive +CHA from the Siren of Zharak's Teeth story. Folds into
+   *  `effectiveStats` the same way OTA-910's Skyreacher DEX does, so the two live
+   *  consumers — diplomacy checks and the CHA vendor discount — pick it up with no
+   *  new plumbing and no call site able to miss it. */
+  charismaBonus: number;
 }
 
 export const EMPTY_TITLE_PERKS: TitlePerks = {
-  electricalDamageBonus: 0,
+  electricalDamageBonus: 0, charismaBonus: 0,
   investigationBonus: 0, loreBonus: 0, tradeBonus: 0, repairBonus: 0,
   socialBonus: 0, leadershipBonus: 0, mechanicalDamageDice: 0,
   golemEdge: false, ethericDamageResist: false, envHazardSaveBonus: 0,
@@ -479,5 +484,6 @@ export function titlePerkModifiers(player: PlayerCharacter): TitlePerks {
   acc.ruinsDefenseBonus += sp.ruinsDefenseBonus;
   acc.mechanicalDamageDice += sp.mechanicalDamageDice;
   acc.electricalDamageBonus += sp.electricalDamageBonus;
+  acc.charismaBonus += sp.charismaBonus;
   return acc;
 }

@@ -1376,7 +1376,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1211`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1212`**,
 **golem-line `2026-08-09-1177`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1386,7 +1386,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.121**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.122**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,7 +1606,67 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ PUNCHLIST P3 CLOSED — THE COURIER IS BACK, FOR REPORTS ONLY (2026-08-09, latest).
+- **⚠⚠ PUNCHLIST P6 CLOSED — THE SIREN PAYS +1 CHARISMA — plus the SECOND-ROUND AUDIT of
+  the 14 untraced loops (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1212 / golem OTA-1189.
+  **steam NOT included — batched (§2).**
+
+  Owner: *"charisma go, audit the other 14 loops when done give me a new punch list."*
+
+  **THE PERK.** The owner picked six stories in OTA-1207 and five shipped. The Siren was
+  held back because the obvious perk is resistance to her lure and **the game has no charm,
+  compulsion or mental-influence mechanic** — inventing a status effect to justify a buff is
+  backwards, so it was filed as P6 rather than quietly substituted.
+
+  ⚠ **The fiction carries charisma as well as resistance would have.** Five verses scratched
+  inside a Reclaimer's flask, the hand growing more careful as it goes, the flask found
+  empty. He is not resisting her; he is writing her down. What the player inherits is not
+  immunity to a voice — it is knowing how a voice takes hold.
+
+  ⚠⚠ **TWO LIVE CONSUMERS, NEITHER BUILT FOR THIS:** diplomacy checks
+  (`combatRules.ts:736` maps the skill to charisma) and the CHA vendor discount
+  (`chaPriceDiscount`, OTA-805). Injected into `effectiveStats`, the single funnel every
+  stat read passes, exactly as OTA-910's Skyreacher +DEX already is — one injection, no
+  call site able to miss it. Both consumers are pinned by test, because a perk that
+  aggregates and is never read is the "ends in nothing" defect in miniature.
+
+  ⚠ **Three OTA-1207 assertions retargeted.** They pinned *exactly five perks* and *the
+  Siren carries no perk* — both correct when written, both deliberately changed here. They
+  now pin what that OTA actually decided and leave the total to the OTA that owns it. ⚠ One
+  assertion in the new suite was retargeted before landing: a regex using `[^)]*` that
+  cannot cross the `)` in `(bonus.charisma ?? 0)`, so it could never have matched the
+  correct code. Third time this session a regex has been written that could not tell the
+  fix from the defect.
+
+  **THE SECOND-ROUND AUDIT — ALL 14 REMAINING LOOPS CHECKED.**
+
+  ✅ **Ten traced and paying:** faction bounties (TC + standing in the kill handler, five
+  guards), escorts (scaled by surviving party; failure narrates), chapters
+  (`chapterCardFor` consumed at `gameStore.ts:34792`), story forks (3 importers), Aetherkin,
+  crafting/Aethercraft (39 importers), corruption, Core Guardians (`core_recovered`
+  advances the main-quest phase, which drives chapters, Arbiter stance and the ending),
+  titles, whispers, mysteries-finding.
+
+  ⚠ **Two PARTIAL, named rather than claimed clean:** the dog rescue arc and the golem
+  companion arc. Every mechanic checked works; neither has a completion event to trace. That
+  may mean they are open-ended by design rather than broken — **saying so is not the same as
+  having proved it**, and this list does not get to round that up to green.
+
+  ❌ **Three new findings — P13, P14, P15.** An imperfect Labyrinth run reaches the maze's
+  heart and pays two lines of text (no TC, no item, no counter, run discarded) while being
+  one of the six live Tier-C challenges; `engine/buriedSkyscraper.ts` is a complete
+  100-floor dungeon with an entry gate that **nothing imports**; and `relics.json` (13) +
+  `loot_tables.json` (113) have zero importers, with `worldLadder.ts` naming the latter in a
+  COMMENT while importing nothing from it.
+
+  ⚠⚠ **P4 + P14 + P15 ARE ONE DEFECT THREE TIMES: authored content wired to nothing.** 34
+  weapons, 10 spells, a 100-floor dungeon and 126 relic/loot rows sit in the repo
+  unreachable. None of it is broken; none of it is connected.
+
+  **Tests:** new suite ota1212SirenCharisma (13). Gates: typecheck:ci, lint,
+  typecheck:tests (200), check:handoff, check:reachability, test:ci:fast (740 suites /
+  6,904 tests) — all green.
+
+- **⚠⚠ PUNCHLIST P3 CLOSED — THE COURIER IS BACK, FOR REPORTS ONLY (2026-08-09).
   HAL + GOLEM.** HAL OTA-1211 / golem OTA-1188. **steam NOT included — batched (§2).**
 
   Owner: *"push p 3, 5, 7 and 8."*

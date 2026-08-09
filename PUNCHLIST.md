@@ -597,6 +597,66 @@ instead of stranding the contract. **P9 can now be taken purely on its merits.**
 
 ---
 
+### P13 — Finishing the Labyrinth imperfectly ends in nothing
+
+- **Kind:** ENDS IN NOTHING
+- **Found:** 2026-08-09, second-round audit of the 14 untraced loops
+
+`gameStore.ts:1297` — on reaching the maze's heart:
+
+| Run | What you get |
+|---|---|
+| **Clean** (no wrong turns) | narration + `labyrinthCleanRuns` → the Wayfarer title |
+| **Any other run** | **two lines of text.** No TC, no item, no progress counter. |
+
+The run is then discarded (`labyrinthRun: undefined`). ⚠ **The Labyrinth of Shadows is one
+of the six Tier-C challenges P5 just confirmed are all LIVE**, so this is reachable in
+ordinary play — and a maze walked with one wrong turn pays exactly the same as one walked
+with nine: nothing.
+
+⚠ **What is NOT claimed:** that the clean-run reward is wrong. Reserving the title for a
+perfect run is good design. The defect is that an imperfect run — the ordinary outcome —
+produces no outcome at all.
+
+---
+
+### P14 — `engine/buriedSkyscraper.ts` is a 100-floor dungeon nothing imports
+
+- **Kind:** UNFINISHABLE *(unreachable — no entry point exists)*
+- **Found:** 2026-08-09, second-round audit
+
+The module is complete: floor archetypes, a 2D grid per floor, `emptyBuildingState`,
+`canEnterSkyscraper` with its own refusal copy, and a documented **1–100 floor** descent
+(`buriedSkyscraper.ts:264`).
+
+⚠ **`grep -rn "from '.*buriedSkyscraper'"` across `app/` returns NOTHING.** The only
+references anywhere are comments in `buildInfo.ts`. `canEnterSkyscraper` and
+`emptyBuildingState` have no callers outside their own file. **There is no way in.**
+
+⚠ This is the same class as P4 but larger: authored, finished-looking, and connected to
+nothing. Whether it is dead weight or a feature that lost its entry point is the owner's
+call, exactly as with the runecasters.
+
+---
+
+### P15 — Two of the three relic data files have no importers
+
+- **Kind:** *(dead data — same class as P4)*
+- **Found:** 2026-08-09, second-round audit
+
+| File | Entries | Importers |
+|---|---|---|
+| `data/relics/curios.json` | — | **3** (`portability`, `itemFusion`, `salvagePools`) ✅ |
+| `data/relics/relics.json` | **13** | **0** |
+| `data/relics/loot_tables.json` | **113** | **0** |
+
+⚠ `worldLadder.ts:23` names `loot_tables.json` **in a comment** — *"names of loot items
+(matching loot_tables.json)"* — while importing nothing from it. So a file with 113 entries
+is being treated as the source of truth by convention and by nothing else, which means
+nothing checks that the two still agree.
+
+---
+
 ### P12 — A typed contract name that fits two titles silently closes one of them
 
 - **Kind:** WRONG TARGET *(pre-existing; found 2026-08-09 while building OTA-1211)*
@@ -685,6 +745,8 @@ line either way.
 ---
 
 ### P6 — The Siren of Zharak's Teeth was chosen for a perk, and there is nothing to attach it to
+
+## ✅ **CLOSED — OTA-1212.** Owner: *"p6 charisma?"* — +1 CHA, consumed by diplomacy checks and the CHA vendor discount, injected at `effectiveStats`.
 
 - **Kind:** *(open design question — raised by OTA-1207, not a defect)*
 - **Found:** 2026-08-09, while building the story perks
@@ -923,6 +985,36 @@ inline with explicit `kind: 'relic'`, `rarity: 'Rare'`, tags and description
 (`crafting.ts:230`). So a *genuinely* missing reward name would not error; it would silently
 hand the player junk with the right name. Nothing currently hits that, and the catalog check
 above is what keeps it that way.
+
+## SECOND-ROUND AUDIT — the 14, all checked (2026-08-09)
+
+Owner: *"audit the other 14 loops when done give me a new punch list."*
+
+| Loop | Verdict |
+|---|---|
+| Faction bounties | ✅ **TRACED** — pays TC + standing inside the kill handler; five guards (anti-camp, standing-on-target, board-freeze, deadline, slate cap) |
+| Escort missions | ✅ **TRACED** — completion pays scaled by surviving party (`escortPayMult`); failure drops the contract with narration |
+| Chapters | ✅ wired — `chapterCardFor` consumed at `gameStore.ts:34792` |
+| Story forks | ✅ wired — 3 importers incl. the ending screen |
+| Aetherkin | ✅ wired — encounter builder + reverence delta both live |
+| Crafting / Aethercraft | ✅ wired — 39 importers |
+| Corruption arc | ✅ wired — 4 importers; tiers drive stats, prices, encounter rate |
+| Core Guardians | ✅ **TRACED** — `core_recovered` advances the main-quest phase, which drives chapters, Arbiter stance and the ending |
+| Titles | ✅ **TRACED** — every engine title has a data row and vice versa (pinned by test since OTA-1206) |
+| Whispers | ✅ pays — TC on completion (`gameStore.ts:34435`) |
+| Dog rescue arc | ⚠ **PARTIAL** — rescue hooks and the `dog_quest` channel are live; the arc's *end* was not traced |
+| Golem companion arc | ⚠ **PARTIAL** — summon/arm/dismiss all live; no "arc" completion exists to trace |
+| Mysteries (the finding half) | ✅ wired — stage advance + artifact gate; turn-in closed by OTA-1208 |
+| **Maze / Labyrinth** | ❌ **P13** — an imperfect run ends in nothing |
+| **Buried Skyscraper** | ❌ **P14** — 100-floor dungeon, no entry point |
+| *(found alongside)* Relics data | ❌ **P15** — 2 of 3 files orphaned, 126 entries |
+
+⚠ **Two remain PARTIAL and are named rather than claimed clean.** The dog and golem arcs
+have working mechanics at every point checked, but neither has a completion event to trace
+— which may mean they are open-ended by design rather than broken. Saying so is not the
+same as having proved it.
+
+---
 
 ## NOT YET AUDITED
 

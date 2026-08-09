@@ -33,27 +33,39 @@ const idsOf = (storyId: string) =>
   CHARACTER_STORIES.find((s) => s.id === storyId)!.fragments.map((f) => f.id);
 
 describe('OTA-1207 — the five perks the owner picked', () => {
-  test('exactly the five chosen stories carry a perk', () => {
-    expect(STORY_PERKS.map((p) => p.storyId).sort()).toEqual([
-      'story_giant',
-      'story_reclaimer_greed',
-      'story_sentinel',
-      'story_siege',
-      'story_zalmar_cascade',
-    ]);
+  test('the five the owner chose here all carry a perk', () => {
+    // ⚠ RETARGETED BY OTA-1212. This asserted the perk list was EXACTLY these five, which
+    // was right when it was written and became wrong the moment PUNCHLIST P6 closed and the
+    // Siren joined them. It now pins what this OTA actually decided — that these five were
+    // chosen and shipped — and leaves the total to the OTA that owns it.
+    const ids = new Set(STORY_PERKS.map((p) => p.storyId));
+    for (const id of [
+      'story_giant', 'story_reclaimer_greed', 'story_sentinel',
+      'story_siege', 'story_zalmar_cascade',
+    ]) expect(ids.has(id)).toBe(true);
   });
 
   test('⚠ The Family in the Mud pays lore only — dropped by the owner', () => {
     expect(storyPerkLabel('story_family')).toBeNull();
   });
 
-  test('⚠ The Siren carries no perk — there is no charm mechanic to resist', () => {
-    expect(storyPerkLabel('story_siren')).toBeNull();
+  test('⚠⚠ the Siren was the SIXTH pick and did not ship here — closed later by OTA-1212', () => {
+    // The owner picked six; this OTA shipped five. The Siren was held back because the
+    // obvious perk was charm resistance and the game had no charm mechanic — inventing a
+    // status effect to justify a buff is backwards. It was filed as PUNCHLIST P6 and the
+    // owner answered it with charisma, so it now carries a perk. What matters to THIS
+    // suite is that it was not quietly substituted at the time, and it was not.
+    const src = fs.readFileSync(path.join(__dirname, '..', 'app/engine/collectables.ts'), 'utf8');
+    expect(src).toContain('OTA-1212 (PUNCHLIST P6 CLOSED)');
+    expect(storyPerkLabel('story_siren')).toMatch(/charisma/i);
   });
 
-  test('half the stories pay nothing, which is what keeps the five meaningful', () => {
+  test('most stories still pay nothing, which is what keeps the perks meaningful', () => {
+    // ⚠ RETARGETED: was a hardcoded 5. The rule is what matters — a perk on every story
+    // would make finishing any particular one unremarkable — and the rule survives a
+    // sixth perk being added, which a fixed count does not.
     const withPerk = CHARACTER_STORIES.filter((s) => storyPerkLabel(s.id) !== null).length;
-    expect(withPerk).toBe(5);
+    expect(withPerk).toBeGreaterThanOrEqual(5);
     expect(withPerk).toBeLessThan(CHARACTER_STORIES.length);
   });
 
