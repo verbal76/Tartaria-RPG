@@ -165,8 +165,14 @@ even when it is the second.
 
 **STEP 1 — P3 first: turn on the remote hand-in.** Small, already written, already
 documented as working. It removes the unfinishable state for all 17 quest lines
-immediately, and — critically — **it is the safety net that makes Step 2 safe.** Needs
-exactly one decision from the owner: what it costs (courier fee / delay / rep).
+immediately, and — critically — **it is the safety net that makes Step 2 safe.**
+
+⚠ **UPDATED 2026-08-09 by the P3 full audit (below).** The cost is no longer an open
+question — the audit proposes it concretely (25% TC cut, full rep, no long-haul bonus,
+12 in-game hours to credit) and shows that the anti-farming rationale this was switched
+off for **was never the actual rationale**, and does not apply to this content. The audit
+also adds a piece Step 1 needs: **P3-C**, the board/hall turn-in fallback, without which
+hunts/mysteries/storylines still cannot be handed in at the board that posted them.
 
 **STEP 2 — faction-site anchoring, using `FACTION_STARTING_LOCATION` as the ownership map.**
 - At **your own** faction's site: nothing changes. Your reskin, your board, your agents.
@@ -207,9 +213,162 @@ call site (`gameStore.ts:20426–20432`, `26759–26773`, `36835`) uses the defa
 remote path is dead in `turnInFactionQuest` and `turnInHunt` too, where it *is* implemented.
 
 **Why this is filed separately from P2:** P2 is the reachability symptom; this is a
-mechanism that already exists, is documented as existing, and is switched off. What it
-should cost the player (a courier fee, a delay, a rep penalty) is a design decision and is
-**not** proposed here.
+mechanism that already exists, is documented as existing, and is switched off.
+
+---
+
+## P3 — FULL AUDIT (2026-08-09)
+
+Owner: *"remote hand in was turned off to ensure that players had to work to turn in, find
+the discussion it was an attempt to counter mission farming. much has changed since then.
+is it still a concern. full audit before you answer and have a recomendation."*
+
+### 1. What the original discussion actually said
+
+Recovered from the commits themselves, not from memory.
+
+**`abbc4461` — OTA-456, 2026-06-10, remote hand-in ADDED.** Hybrid by quest type: FETCH
+must be delivered in person ("you can't mail the goods"); DEED quests could "send word" for
+full rep and a **15% TC cut**. The commit's own stated intent: *"Face-to-face still pays in
+full, so travel stays the optimal play."*
+
+**`c0fdb933` — OTA-810, 2026-07-15, hunts made face-to-face.** Two separate things in one
+commit, and they are not the same kind of thing:
+- Flavour: *"A bounty's proof is the trophy, and proof is shown in person."*
+- **A real exploit:** *"completeContractFromUI('hunt') — the Contracts-UI COMPLETE that
+  used to pay FULL from any tile (the actual B2 exploit)."*
+
+**`dc2aedb9` — OTA-824, 2026-07-15, remote hand-in KILLED for everything.** The owner's
+own words are in the commit body:
+
+> *"Player: kill all remote hand-ins, make all routable, but make the journey worth the
+> loot — no 32-time trip worth 20 TC."*
+
+⚠ **That is not an anti-farming call.** It is a *make-travel-pay* call. The words "farm",
+"farming", "grind" and "repeat" appear nowhere in OTA-456, OTA-810, OTA-824 or OTA-900.
+
+**What was actually being closed was an exploit, not a farm:** `completeContractFromUI`
+paid **full reward from any tile with no counterparty check at all**. That is not "remote
+hand-in", that is "hand-in with nobody on the other side of the table". Killing the
+15%-cut courier alongside it was a much bigger hammer than that nail needed.
+
+### 2. Is farming still a concern? No — and it never could have been on this content
+
+**All four contract types are one-shot, off finite static catalogs.**
+
+| Type | Count | Repeat gate |
+|---|---|---|
+| Hunts | 18 | `completedHuntIds` |
+| Mysteries | 18 | `completedMysteryIds` |
+| Storylines | 14 | `completedStorylineIds` |
+| Faction quests | 65 (18 fetch) | `completedFactionQuestIds` |
+
+**115 contracts, each closable exactly once.** `availableFactionQuests` filters the board
+by the completed list; the hook-grant path (`gameStore.ts:33417`) and the neutral-accept
+path (`25733`) both refuse an already-done contract. **There is no repeatable contract in
+this set to farm.**
+
+### 3. ⚠ The one thing that CAN be farmed already pays out remotely — and always did
+
+The **faction bounty** is the only procedurally generated, repeatable contract in the game.
+Its payout fires **inside the kill handler** (`gameStore.ts:23705–23730`): TC and standing
+are credited on the killing blow. **No vendor. No turn-in. No trip back.**
+
+So the face-to-face rule was applied to the 115 one-shot contracts that cannot be farmed,
+and **not** to the one contract type that can be.
+
+### 4. The guards that actually contain bounty farming — all added AFTER OTA-824
+
+| Guard | OTA | Date | What it stops |
+|---|---|---|---|
+| Anti-camp (`lastBountyClearedOutpostId`) | 1188 | 2026-08 | *"no second contract from the board you just collected on"* |
+| Standing-on-target refusal | 1188 | 2026-08 | 0-tile contracts — accept and finish without moving |
+| Board must be FROZEN to accept | 1187/1188 | 2026-08 | Politics-shopping the payout |
+| `MAX_ACTIVE_BOUNTIES = 3` | 850/859 | 2026-07 | Unbounded slate stacking |
+| Distance-aware deadline | 862/863/1185 | 2026-07→08 | 24h + 2.5h/tile + 6h per required kill |
+
+⚠ **Four of the five did not exist when remote hand-in was killed.** The farm risk is
+contained today by rules aimed precisely at the loop that has it. The face-to-face rule is
+a blunt instrument pointed at a different loop entirely.
+
+### 5. ⚠⚠ The long-haul bonus does not measure the journey
+
+The compensation the owner asked for — *"make the journey worth the loot"* — is
+`contractJourneyBonusTc` (`contractMarkers.ts:138`):
+
+```
+remoteness = Manhattan distance of the TURN-IN TILE from `tartarian_outskirts`
+bonus      = min(remoteness × 6 TC, 1.5 × base)
+```
+
+**It measures where you are standing when you hand in. It does not measure how far you
+walked.** Three consequences, all live today:
+
+1. A player who accepts, kills and hands in **entirely inside a deep capital** collects the
+   **maximum** bonus having travelled nothing.
+2. A player who treks from a deep capital **back to the starter hub** collects **zero**.
+3. It permanently under-pays every contract belonging to the starter-region factions,
+   regardless of how the player played it.
+
+⚠ This is the owner's stated requirement, implemented backwards. It is a defect
+independent of anything to do with remote hand-in.
+
+### 6. The face-to-face gate is a presence gate, not a geography gate
+
+All four handlers require a vendor **of the posting faction in scene**. But market stall
+reps **rotate across factions daily in real time** (OTA-784, `vendors.ts:371`) — the
+"right agent" is usually whoever happens to be rotated into the nearest market, not that
+faction's home. So the rule mostly costs the player **searching**, not **travelling**.
+That is P2 restated.
+
+### 7. ⚠ A stranded-contract trap exists today
+
+`turnInFactionQuest` accepts a same-faction **vendor OR mission board OR the faction's home
+hall** (OTA-451/617). `turnInHunt`, `turnInMystery` and `turnInStoryline` require
+`scene.vendor` **strictly**. **A player can stand at the board that posted a hunt, holding
+the trophy, and be refused.** That is an ENDS IN NOTHING in its own right.
+
+---
+
+## THE RECOMMENDATION (P3)
+
+Farming is not the concern it was framed as, and the face-to-face rule never addressed it.
+But blanket-restoring remote hand-in is also wrong — it would delete the only travel the
+contract loop has, and the owner's actual ask is still unmet. Three parts, in priority order.
+
+**A. Fix the long-haul bonus to measure the journey. (Do this first — it is the owner's
+original requirement and it is currently inverted.)**
+Stamp the accept cell on the contract record (`acceptedAtCell`), and pay on
+`distance(accept cell → turn-in cell)` instead of remoteness-from-hub. Same 6 TC/cell,
+same 1.5× cap, so tuning is unchanged. Contained: one function in `contractMarkers.ts`
+plus one field. **This is the actual bug** — the reward the owner asked for pays the wrong
+players.
+
+**B. Keep face-to-face for hunts and fetch quests. Restore the courier for mysteries,
+storylines and non-fetch deeds — with a specific cost.**
+A trophy and a physical delivery are objects that change hands; a report is not, and OTA-456
+drew that line correctly. Proposed cost, concrete:
+
+- **25% TC cut** (up from OTA-456's 15% — the bonus in (A) makes walking worth more now)
+- **full rep** (the work was done)
+- **no long-haul bonus** (you didn't make the haul)
+- **12 in-game hours before it credits** — a runner takes time, and the delay is what makes
+  it a fallback rather than a default
+
+With (A) in place, walking pays `base + up to 1.5×base`; couriering pays `0.75×base`,
+delayed. **Travel stays the optimal play by roughly 3:1** — which is exactly what OTA-456
+said it was for.
+
+**C. Give hunts, mysteries and storylines the board/hall fallback that faction quests
+already have.** A posting board should take back what it posted. Closes §7 regardless of
+what happens with A and B.
+
+**If only one ships: A.** B is comfort; C is a trap fix; A is the requirement that is
+already in the code and already wrong.
+
+⚠ **A and C are defect fixes and need no design decision. B is a design change** — it
+restores a mechanic the owner deliberately switched off, and the numbers above are a
+proposal, not an assumption.
 
 ### P6 — The Siren of Zharak's Teeth was chosen for a perk, and there is nothing to attach it to
 
