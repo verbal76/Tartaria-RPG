@@ -1357,8 +1357,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1205`**,
-**golem-line `2026-08-09-1182`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1207`**,
+**golem-line `2026-08-09-1184`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1367,7 +1367,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.115**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.117**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1574,7 +1574,113 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ MAKE THE APPLE SIGNALS USABLE (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1205 /
+- **⚠⚠ COMPLETED COLLECTIBLE STORIES NOW GRANT PERMANENT BUFFS (2026-08-09, latest).
+  HAL + GOLEM.** HAL OTA-1207 / golem OTA-1184. **steam NOT included — batched (§2).**
+
+  Owner: *"see if there are certain stories that lead well into adding an active buff…
+  it doesn't have to be for all of them, but enough to make it worthwhile collecting
+  them."* Then, on the shortlist: *"I like 5 of the 6, drop the mud family and add the st.
+  petersburg perk story."*
+
+  **The five, each drawn from its own text:**
+  - **Elior Zalmar** — built the Aetheric Engine → **+1 damage on electrical/aetheric swings**
+  - **The Giant's Watch** — inscriptions carved into the Ural cliffs → **cold resistance**
+  - **The Greedy Reclaimer** — a merchant tracing one relic to the Mud Seas → **+1 Trade**
+  - **Logic Core 04-B** — a Sentinel learning to wonder → **+1d6 vs machines**
+  - **The Siege of St. Petersburg** — a tunnel soldier who held for three days → **+1 defence in ruins**
+
+  ⚠ **Only a COMPLETED set pays.** A partial collection grants nothing — that is what makes
+  finishing one worth doing, and half the stories still pay lore only (owner's design), so
+  the five that do stay meaningful.
+
+  **⚠⚠ THE RULE THIS SHIPPED UNDER, and it is the important part: EVERY PERK HAS A VERIFIED
+  CONSUMPTION POINT.** A buff that aggregates and is never read is a NEW "ends in nothing" —
+  the exact defect P1 was filed for. **Adding five unread buffs while closing P1 would have
+  been the funniest possible own goal**, so most of the test suite asserts the consumers
+  exist rather than the perks compute.
+
+  - Three ride EXISTING consumers — `tradeBonus` (sell price), `ruinsDefenseBonus` (AC in a
+    `constructed_environment`), `mechanicalDamageDice` (attack path) — by merging into the
+    **one** accumulator every consumer already calls (`titlePerkModifiers`). ⚠ A parallel
+    `collectionPerkModifiers` would have meant finding and updating every call site, and
+    **missing one silently is exactly how a buff ends up aggregated and never read.**
+  - **Electrical damage** is newly wired beside the mechanical die. ⚠ **Gated on the
+    WEAPON's damage type, not the enemy's** — Zalmar taught how to drive the current, not
+    what to point it at.
+  - **Cold resist** is injected into `playerArmorResistKinds` — the single function that
+    ~16 sites read (weather ticks, weather stat modifiers, attack penalties, visibility).
+    ⚠ Injecting at the source means no site is silently missed, and it will not double-add
+    over armour that already resists cold.
+
+  **⚠⚠ THE SIREN OF ZHARAK'S TEETH WAS CHOSEN AND IS NOT SHIPPED — see PUNCHLIST P6.**
+  The theme fits (five verses scratched inside an empty flask), but **the game has no
+  charm, compulsion or mental-influence mechanic to resist** — verified across
+  `statusEffects.ts` and `combatRules.ts`. Shipping it would have meant inventing a status
+  effect to justify a buff, which is backwards; quietly swapping it for something else
+  would have hidden a decision the owner made. It is filed as an open design question with
+  two ways to close it.
+
+  **Tests:** new suite `ota1184StoryPerks` (19). Gates green — 730 suites / 6774 tests.
+
+- **⚠⚠ PUNCHLIST P1 CLOSED — A COMPLETED COLLECTIBLE SET NOW PAYS OUT (2026-08-09). HAL + GOLEM.** HAL OTA-1206 / golem OTA-1183. **steam NOT included — batched
+  (§2).**
+
+  **57 fragments across 10 character stories** — the largest gather loop in the game — used
+  to complete into a pill style and a banner on a screen the player had to navigate to.
+
+  ⚠⚠ **THE PAYOFF IS THE OWNER'S DESIGN, NOT MINE.** The punch list exists so findings are
+  catalogued and payoffs are decided by him; this is the first entry to come back with a
+  decision attached:
+
+  > *"they should end in story screen like the chapters screens that put the whole story
+  > together to read, and it should say whatever the collectable sets name is is complete.
+  > you should get a title for completing all of them, some types of historian title, and
+  > it should add an investigate all button like the take all and salvage all."*
+
+  **1. THE STORY SCREEN** — `StoryRevealOverlay`, modelled on `ChapterCardOverlay`, with
+  one deliberate difference: **it does not dismiss on a stray tap.** A chapter card is a
+  marker over narration already waiting underneath; this is what the player spent 5–7
+  fragments earning, and losing several pages of it to a thumb mid-scroll would be the loop
+  ending in nothing all over again. ⚠ It re-derives from the player's OWN collectables at
+  render time, so it can never display a fragment that was not earned, and a stale reveal
+  surviving a reload cannot resurrect one. ⚠ A **READ THE WHOLE STORY** button on every
+  completed set makes it re-readable — without it the single auto-raise would be the only
+  moment the assembled story was ever legible, which is the same defect one step along.
+
+  **2. IT NAMES THE SET** — *"<Character>'s story is complete"* via
+  `announceMissionComplete`, so it lands in the feed the player is already reading instead
+  of waiting on a screen visit.
+
+  **3. THE HISTORIAN TITLE** — `historian_of_the_buried_world`, earned at all 10 stories,
+  +2 Lore / +1 Investigation. ⚠⚠ **This is the 22nd title and the FIRST not from the
+  owner's canon document.** `data/lore/arbiter-titles.json` was ingested verbatim from
+  `Arbiter_Assigned_Titles_for_Players.docx` and held exactly 21, all of them wired. The
+  new row carries a `note` saying so, and **the NAME is the owner's to change** — only the
+  id is load-bearing. ⚠ The counter tracks **stories, not fragments**: 5–7 per story means
+  a fragment threshold would land the title before the last set closed.
+
+  **4. INVESTIGATE ALL** — mirrors SALVAGE ALL / TAKE ALL including the 2+ threshold, and
+  sweeps only **actionable** chips (never consumed, never 🔒-locked), so the number on the
+  button is the number of things that will actually happen. ⚠ It **loops the real
+  investigate submit** rather than adding a bulk resolver: `salvageAllAmbient` is a ~270
+  line aggregator built to fix output ordering, and investigate resolves through hooks,
+  ambient nouns, items, puzzles and elevation gates. Re-implementing that ordering in bulk
+  would be a new set of failure modes for a cosmetic gain; looping the real path cannot
+  resolve differently from the manual taps it replaces.
+
+  **Tests:** new suite `ota1183CollectionPayoff` (27). ⚠ **Four older assertions retargeted
+  (`ota1010`, `canonFacts`, `arbiterTitlesScreen`, `titles`) and all four are now
+  self-maintaining.** They hardcoded "21 titles" and "7 announce sites", which turned every
+  future title and every new completion path into a red test — punishing the exact thing
+  those locks exist to encourage. They now pin floors plus the category list, which is what
+  actually catches a rogue path. Gates green — 729 suites / 6755 tests.
+
+  ⚠ **STILL NOT PROVEN, and named so it is not assumed:** that 57 fragments are realistically
+  gatherable at an 8% biome-gated substitution rate. The loop now *ends* somewhere; whether
+  the grind to reach that end is reasonable is a BALANCE question, and balance is parked
+  until completability is clear.
+
+- **⚠⚠ MAKE THE APPLE SIGNALS USABLE (2026-08-09). HAL + GOLEM.** HAL OTA-1205 /
   golem OTA-1182. **steam NOT included — batched (§2).**
 
   Owner, setting the priority: *"I have Apple testers, they need to be able to play test.
