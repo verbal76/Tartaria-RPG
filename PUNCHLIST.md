@@ -89,6 +89,20 @@ Eternal Dynasty, Conspiracy Architects and Tartarian Revivalists.
 | conspiracy_architects | 1 | 1 |
 | tartarian_revivalists | 1 | 1 |
 
+⚠⚠ **AND THE DESIGN INTENT IS DOCUMENTED, IN THE DATA, AS THE OPPOSITE OF WHAT SHIPS.**
+`data/world/hub_faction_variants.json` describes the hub anchors in its own header:
+
+> *"Same room ids, same exits, same anchorNpcs (**faction-neutral characters who serve all
+> comers**); only `name`, `shortName`, and `description` vary per faction."*
+
+The variants are cosmetic — names and descriptions only, confirming point 3 above. But
+three of the four anchors are **not** faction-neutral in the data: Irma carries
+`true_tartarians`, Tarek `reclaimers_guild`, Jorah `forgotten_order`. Only Halem is
+factionless. ⚠ And the gate is `if (candidate.factionId && candidate.factionId !==
+scene?.vendor?.faction)`, so a **genuinely** neutral vendor (faction `null`) accepts
+*nothing* with a factionId. Whatever "serve all comers" was meant to mean, the quest
+turn-in path does not honour it either way.
+
 ⚠ **These are not the player's own faction's quests only** — a Stone Builders *character*
 hits this on their own Stone Builders mysteries, because the mission board does not accept
 mysteries at all.
@@ -140,6 +154,60 @@ Recorded so the audit is not re-run on them, and so a future regression has a ba
 | Ending screen | — | exits to title (two routes, plus a no-ending fallback) | `EndingScreen.tsx:100,108,216` |
 
 ---
+
+## LOOP INVENTORY
+
+Built 2026-08-09 from the engine and data trees, in answer to *"we have the tower loop, the
+9 cores loop, hunts, bounties, missions, collectables, titles. what other loops"*.
+
+⚠ **Confidence is marked per row and is not uniform.** "Verified" means I read the
+completion path. "Present" means the system exists and carries completion state, but the
+arc has not been traced end to end — it is a candidate for the audit, not a claim about it.
+
+### Named by the owner
+
+| Loop | Scale | Status |
+|---|---|---|
+| Tower / Great Climbs | 5 Skyreacher pieces | **Verified** — summit grants `rewardArmor` |
+| The 9 Cores → endings | 9 capitals, 3 endings, 27 badge combos | **Verified** — ending splash + install-wide badge |
+| Hunts | `data/quests/hunts.json` | **Verified** — pays trophy + item + TC |
+| Bounties | `bountyCourse` / `bountyPolitics` / `factionBounty` | **Not audited** |
+| Missions (faction quests) | 65 | **Verified** — pays; mission-board turn-in works |
+| Collectables | 10 stories / 57 fragments | **P1 — ends in nothing** |
+| Titles | ~21 titles + `titleChallenges` | **Present** — heavy completion logic, not yet traced |
+
+### NOT named — these are also loops
+
+| Loop | Where | Status |
+|---|---|---|
+| **Mysteries** | 18, `data/quests/mysteries.json` | **P2** — 9 stranded |
+| **Faction storylines** | 14, `data/quests/faction-storylines.json` | **P2** — 8 stranded |
+| **Whispers** | `whispers.ts`, `completedWhisperIds` | **Present** — chain quests with stages |
+| **Labyrinth of Shadows** | `labyrinth.ts`, `data/maze/` | **Present** — a grid maze with a `titleId` reward |
+| **Buried Skyscraper** | `buriedSkyscraper.ts` | **Present** — descent arc |
+| **Recipe discovery** | `recipeDiscovery.ts` | **Present** — unlockable recipe pool |
+| **Sigils** | `sigils.ts` | **Verified** — `turnInSigil` pays +1 standing |
+| **The Fallen / revenants** | `fallenRevenants.ts`, install-wide roll (cap 25) | **Present** — avenge a dead character |
+| **Faction standing** | `factions.ts`, −100…+100 per faction × 9 | **Present** — no terminal state by design |
+| **Dog rescue → companion** | `dogCompanion.ts`, `dog_quest` channel | **Not audited** |
+| **Golem companion** | `golems.ts` | **Not audited** |
+| **Escorts** | `escort.ts` | **Not audited** |
+| **Story forks / chapters** | `storyForks.ts`, `chapters.ts`, `story/forks.json` | **Not audited** |
+| **Crafting / fusion** | `crafting.ts`, `itemFusion.ts` | **Not audited** |
+| **Relics & curios** | `data/relics/` | **Not audited** |
+| **Runecasters / spells** | `data/spells/runecasters.json` | **Not audited** |
+| **Corruption** | `corruption.ts` | **Not audited** |
+| **Aetherkin** | `aetherkin.ts` | **Not audited** |
+| **Stat training** | `statTraining.ts`, `statProgress` | **Present** — per-stat 0→100 bars |
+| **Hidden locations** | `hiddenLocations.ts` | **Not audited** |
+| **Hook puzzles** | `hookPuzzles.ts` | **Not audited** |
+| **Location challenges** | `locationChallenges.ts` | **Not audited** |
+| **Gifting / gift ledger** | `gifting.ts`, `giftLedger.ts` | **Not audited** |
+| **Resurrection gems** | install-wide stash | **Present** — spend-only, no completion |
+
+⚠ **Ongoing systems, NOT loops** — listed so they are not mistaken for gaps: menace,
+weather, hazards, time of day, world pulse, NPC memory, parley/talk-down, vendor pricing
+and services, scrap, durability, status effects, digging, perches.
 
 ## REACHABILITY — checked and clean
 
