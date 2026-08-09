@@ -34,6 +34,11 @@ accumulates guesses is a punch list nobody trusts by item twenty.
 - **Kind:** UNFINISHABLE *(in practice — completable only by grinding random spawns)*
 - **Scale:** **9 of 18 mysteries, 8 of 14 storylines**, across **6 of the 9 factions**
 - **Found:** 2026-08-09 reachability pass
+- ## ✅ **CLOSED — OTA-1185.** The trading post brokers any faction's contract for 20%.
+- ⚠ **The scale line above is WRONG in both directions** — corrected below, after the
+  original text. It is left standing rather than edited so the mistake is legible.
+- ⚠ **The world-feel half of this was NOT closed here** and is now **P9** (anchor the
+  vendors to the site). Nothing is unfinishable while it stays open.
 
 **The chain, each link verified:**
 
@@ -78,9 +83,62 @@ scene?.vendor?.faction)`, so a **genuinely** neutral vendor (faction `null`) acc
 *nothing* with a factionId. Whatever "serve all comers" was meant to mean, the quest
 turn-in path does not honour it either way.
 
-⚠ **These are not the player's own faction's quests only** — a Stone Builders *character*
-hits this on their own Stone Builders mysteries, because the mission board does not accept
-mysteries at all.
+---
+
+## ⚠⚠ P2 — CORRECTED 2026-08-09, AND IT WAS WRONG IN BOTH DIRECTIONS
+
+**Everything above this line is the original entry, kept as written.** Building the fix
+meant driving the real store instead of reading it, and two of the claims above did not
+survive that. Both corrections are pinned by `ota1185BrokerLive`.
+
+### Correction 1 — the claim about your OWN faction is FALSE
+
+The line that stood here read: *"a Stone Builders character hits this on their own Stone
+Builders mysteries."* **They do not.**
+
+`beginScene` re-points the Irma anchor to the **host** faction, and reads "host" from
+`player.factionId` — so at **every** outpost in the world, the armory quartermaster
+answers for the player's own faction. Verified live: a Stone Builders character standing
+in the **Monarch Waystation** armory gets `Irma.faction === 'stone_builders'`, and turns in
+a Stone Builders mystery there at full pay.
+
+⚠ That behaviour predates this punch list (`arbAnchorVendorFaction`, arb-fix). I read the
+vendor roster and the turn-in gate and did not read the scene builder that sits between
+them. **A defect overstated is the same failure as a defect missed** — it sends work at
+something that already works.
+
+### Correction 2 — and the table is missing a faction, for the same reason
+
+Because Irma is re-pointed **away** from her own `true_tartarians`, no anchor answers for
+the True Tartarians at all unless the player is one. **They belong in the table above and
+are absent from it.**
+
+### The verified picture
+
+Anchored at every outpost, and who they actually answer for:
+
+| Anchor | Room | Answers for |
+|---|---|---|
+| Irma Ironhand | armory | **the player's own faction** (re-pointed) |
+| Tarek the Tinkerer | workshop | `reclaimers_guild` (not re-pointed) |
+| Jorah the Scholar | lab | `forgotten_order` (not re-pointed) |
+| Halem the Trader | gate, mess | nobody — `faction: null` refused everything |
+
+So before OTA-1185, always reachable = **your own faction + Reclaimers + Forgotten Order**.
+Everything else needed the 1-in-30 roll:
+
+| The player is… | Contracts gated behind a 1-in-30 roll |
+|---|---|
+| True Tartarian | 17 |
+| Mud Monarch / Dynasty / Architect / Builder / Giant-servant / Revivalist | **16** |
+| Reclaimer or Forgotten Order | **20** |
+
+⚠ **The scale was roughly right; the composition was not.** The original flat "17" was
+close by coincidence — it dropped the player's own faction and added True Tartarians in
+almost equal measure.
+
+**None of this changes the fix.** The broker covers every row of that table uniformly,
+which is exactly why it was the right shape.
 
 ---
 
@@ -493,6 +551,69 @@ either one alone leaves the other.
 
 **The fix:** give the three handlers the same source resolution `turnInFactionQuest`
 already has, rather than writing a second one. One shared helper, four call sites.
+
+---
+
+### P9 — Anchor the vendors to the site, not to the player
+
+- **Kind:** DESIGN — *the world does not feel like factions hold ground*
+- **Filed:** 2026-08-09 at the owner's instruction: *"let's put #3 as a new punch list item"*
+- ⚠ **Not a defect.** Nothing is unfinishable here. This is the third and largest of the
+  three P2 jobs, deliberately separated from the two that shipped.
+
+**The three jobs, and where they now stand:**
+
+| | Status |
+|---|---|
+| Halem the broker | ✅ shipped, OTA-1185 |
+| Skin the rooms by the SITE's faction | ✅ shipped, OTA-1186 |
+| **Anchor the VENDORS by the site's faction** | **this item** |
+
+**What is left.** OTA-1186 makes the Architect Blind *read* as Architect ground. It does
+not change **who stands in it**. The armory quartermaster there is still the Irma anchor
+re-pointed to the player's own faction, and the workshop and lab still answer for the
+Reclaimers and the Forgotten Order at every site in the world.
+
+**Why it is the big one, measured (see P2-ANALYSIS):** `vendor.faction` does not only
+decide who a vendor *is* — it also filters **which quests, mysteries, storylines and hunts
+they offer** (`gameStore.ts:11571 / 11596 / 11621 / 11646`). So anchoring vendors changes
+where you *get* work as well as where you hand it in. That is the 55 `vendor.faction` reads,
+and it is the part that deserves the caution the owner has been giving it.
+
+⚠⚠ **THE SEAM OTA-1186 LEAVES, WRITTEN DOWN SO IT IS NOT LATER FOUND AS A BUG:** after the
+reskin, a site's rooms carry that faction's names while its armory quartermaster still
+answers for the player's faction. It is invisible in play — Irma's own name and dialogue
+do not change — but it is a real inconsistency and it is this item's to close.
+
+⚠ **The hostility trap that used to block this is closed.** With the broker shipped, being
+hostile to the Architects and unable to enter the Blind costs you 20% at the trading post
+instead of stranding the contract. **P9 can now be taken purely on its merits.**
+
+---
+
+### P10 — The Hidden Market hands out contracts it cannot take back
+
+- **Kind:** INCOHERENCE *(no longer a dead end — the broker covers it)*
+- **Found:** 2026-08-09, while building OTA-1185
+
+A Hidden Market stall is already a broker on the **accept** side: `isBrokerVendorId`
+(`gameStore.ts:5750`, `VendorContractsModal.tsx:23`) makes `hidden_market_*` stalls post
+**every** faction's open work, not just their own rostered faction's — *"so there's always
+a board to pick from no matter who you've been running with."*
+
+⚠ **But the turn-in gate was never given the same rule.** A stall rostered to a Stone
+Builders rep will hand you a Mud Monarch mystery and then refuse to take it back. **A
+broker that only brokers in one direction.**
+
+⚠ **Deliberately NOT fixed in OTA-1185, and the reasoning matters:** including
+`hidden_market_*` in `isContractBroker` would have been a one-line change, but it would
+also have started charging a 20% cut at an existing, working location the owner did not
+ask me to touch. And it is no longer a dead end — Halem takes those contracts at any
+outpost gate, so leaving it strands nothing.
+
+**The question for the owner:** should a broker take back what a broker hands out — i.e.
+should `isContractBroker` cover the Hidden Market stalls too, at the same 20%? It is one
+line either way.
 
 ---
 
