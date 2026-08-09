@@ -1354,7 +1354,7 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1202`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1203`**,
 **golem-line `2026-08-09-1177`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1364,7 +1364,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.112**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.113**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1584,8 +1584,74 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠ A FAILED MODEL LOAD WAS RECORDED AS AN INIT SUCCESS — AND IT WAS WIPING THE CRASH
+  GUARD (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1203 / golem OTA-1180. **steam NOT
+  included — batched (§2).**
+
+  **MEASURED: owner report, 2026-08-09, build `2026-08-09-1202`.** The header claims a
+  healthy init while every other signal in the same report says the model never loaded:
+
+  ```
+  Boot stage: qwen:done
+  Last init success: 2026-08-09T03:28:28.017Z
+  Status: active (no crashes detected) · Crash count: 0
+  Model contexts — Opened: 0 · Released: 0 · Live now: 0    ← never loaded
+  ⚠⚠ MEMORY WARNING #1 — app=active · qwen='failed' …       ← never loaded
+  arbiter: template (reason=qwen-not-ready)                  ← never loaded
+  ```
+
+  **THE CAUSE, and `bootQwen()` says it in its own comment:** *"qwen.initialize() swallows
+  errors and sets its own internal status to 'failed' rather than throwing"*. It then sets
+  `qwenStatus: 'failed'` and **returns normally**. App.tsx's `.then()` therefore ran on the
+  failure path and called `setStage('qwen:done')` and `markMLInitSucceeded()`.
+
+  **⚠⚠ AND IT IS NOT COSMETIC — THIS IS THE PART THAT MATTERS.**
+  `markMLInitSucceeded()` deliberately wipes `KEY_CRASH_COUNT` and `KEY_DISABLED` (arb124:
+  a genuine success proves the device can load the model, so stale suspicion is cleared).
+  Calling it after a FAILED load **resets the very guard that exists to bench Qwen after
+  repeated failures** — the counter can never reach its threshold of 2, so the protection
+  is permanently defeated. `Crash count: 0` in that report is the guard being wiped on
+  every boot, **not** a healthy device.
+
+  **FIX.** Both success-recording call sites now read `qwenStatus === 'ready'` before
+  marking anything, and the boot stage reports `qwen:failed` when it failed. ⚠ The other
+  two `void bootQwen()` sites (a `.catch`-only fallback and the AppState-resume call)
+  record no success and were correctly left alone.
+
+  **⚠⚠ THIRD INSTANCE OF ONE DEFECT IN THREE DAYS, AND THE PATTERN IS THE FINDING:**
+  - **OTA-1201** — `importSaveAsNewSlot` would have announced a restored character over a
+    slot that did not exist, because `saveSlot` never throws.
+  - **OTA-1202** — the memory handler claimed "released ~400MB" whenever `dispose()`
+    resolved, whether or not anything was held.
+  - **OTA-1203** — this one.
+
+  Every one is a caller treating *"the promise resolved"* as *"the work succeeded"*,
+  against a callee that **deliberately never rejects**. ⚠ **A function that swallows its
+  own errors needs its result CHECKED, not awaited.** Worth grepping for the next time:
+  any `.then()` on a function whose own comment says it swallows errors.
+
+  ⚠ The report block now prints `Narration engine: <status>` beside the context count, so
+  `Opened: 0` reads correctly in place instead of needing a memory-warning line forty
+  entries down the log to interpret it.
+
+  **⚠ STANDING ITEM — FIXED-SIZE SOURCE SLICES IN TESTS ARE AGING FASTER THAN THEY ARE
+  BEING FIXED.** Four separate assertions needed their windows widened this session alone
+  (`ota1195`, `ota1196`, `ota1198`, `ota1200`), every time because a handler grew a comment
+  and a `STORE.slice(i, i + N)` stopped reaching its target. The claims were right each
+  time; the magic numbers went stale. ⚠ A slice that falls short reads as "the code is
+  missing" rather than "my window is too small", which is a false failure that costs a
+  triage cycle. These want a brace-matched `functionBody(src, name)` helper. Not done here
+  — recorded so it is picked up deliberately rather than patched a fifth time.
+
+  **Tests:** new suite `ota1203QwenSuccessIsChecked` (7). Mutation-checked 2026-08-09:
+  removing the `if (ok)` guard kills two. ⚠ **My first version of that suite was wrong** —
+  it asserted all four `void bootQwen()` sites needed the guard, when only two record
+  success. Retargeted to the actual rule (*any continuation that marks success must have
+  checked*), which also survives a fifth call site appearing. Gates green — 726 suites /
+  6710 tests.
+
 - **⚠⚠ THE MEMORY LINE SAYS WHAT IT ACTUALLY FREED — IT USED TO LIE, AND IT LIED TO ME
-  (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1202 / golem OTA-1179. **steam NOT included
+  (2026-08-09). HAL + GOLEM.** HAL OTA-1202 / golem OTA-1179. **steam NOT included
   — batched (§2).**
 
   **MEASURED: owner bug report, 2026-08-09, build `2026-08-09-1200`.** Five memory

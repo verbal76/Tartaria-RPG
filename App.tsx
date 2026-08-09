@@ -356,8 +356,12 @@ export default function App() {
                 void markMLInitAttempted();
                 void bootQwen()
                   .then(() => {
-                    setStage('qwen:done');
-                    void markMLInitSucceeded();
+                    // ⚠⚠ OTA-1203 — CHECK, DON'T ASSUME. `bootQwen()` RESOLVES ON FAILURE.
+                    // See the twin call site below for the measurement and the consequence;
+                    // both sites had the identical defect and both are fixed.
+                    const ok = useGameStore.getState().qwenStatus === 'ready';
+                    setStage(ok ? 'qwen:done' : 'qwen:failed');
+                    if (ok) void markMLInitSucceeded();
                   })
                   .catch((e) => {
                     // eslint-disable-next-line no-console
@@ -405,8 +409,32 @@ export default function App() {
               void markMLInitAttempted();
               void bootQwen()
                 .then(() => {
-                  setStage('qwen:done');
-                  void markMLInitSucceeded();
+                  // ⚠⚠ OTA-1203 — `bootQwen()` RESOLVES WHETHER OR NOT THE MODEL LOADED, AND
+                  // THIS TREATED THAT AS SUCCESS. Its own comment says so outright:
+                  // "qwen.initialize() swallows errors and sets its own internal status to
+                  // 'failed' rather than throwing" — it then sets `qwenStatus: 'failed'` and
+                  // returns normally. So a failed load reached `.then()` and was recorded as
+                  // an init success.
+                  //
+                  // ⚠⚠ MEASURED — owner's report, 2026-08-09, build 1202. The header claims
+                  // a healthy init while every other signal says the model never loaded:
+                  //     Boot stage: qwen:done
+                  //     Last init success: 2026-08-09T03:28:28.017Z
+                  //     Status: active (no crashes detected) · Crash count: 0
+                  //     Model contexts — Opened: 0 · Live now: 0     ← never loaded
+                  //     ⚠⚠ MEMORY WARNING #1 — qwen='failed'          ← never loaded
+                  //     arbiter: template (reason=qwen-not-ready)     ← never loaded
+                  //
+                  // ⚠⚠ AND IT IS NOT COSMETIC. `markMLInitSucceeded()` deliberately WIPES
+                  // `KEY_CRASH_COUNT` and `KEY_DISABLED` (arb124: a real success proves the
+                  // device can load the model). Calling it after a FAILED load resets the
+                  // guard that exists to bench Qwen after repeated failures — so the counter
+                  // can never reach its threshold of 2, and the protection is permanently
+                  // defeated. `Crash count: 0` in that report is the guard being wiped, not
+                  // a healthy device.
+                  const ok = useGameStore.getState().qwenStatus === 'ready';
+                  setStage(ok ? 'qwen:done' : 'qwen:failed');
+                  if (ok) void markMLInitSucceeded();
                 })
                 .catch((e) => {
                   // eslint-disable-next-line no-console

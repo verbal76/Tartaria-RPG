@@ -20,7 +20,7 @@ import { getBuildCodename, getApkCodename } from '../buildCodename';
 import { mlHealthSummary } from './mlHealth';
 // OTA-1195 — memory warnings / freeze watch / app-state trail.
 import { runtimePressureSummary } from './runtimePressure';
-import { runtimePressureSnapshot } from '../state/gameStore';
+import { runtimePressureSnapshot, useGameStore } from '../state/gameStore';
 // OTA-1200 — how many ~400MB model contexts are live, and how many disposes freed nothing.
 import { contextLedgerSummary } from '../ai/generation/contextLedger';
 
@@ -39,7 +39,15 @@ function runtimePressureBlock(): string {
  *  same reason: this is worth the most in the report from the session that died. */
 function contextLedgerBlock(): string {
   try {
-    return contextLedgerSummary();
+    // ⚠ OTA-1203 — the ENGINE STATUS belongs next to the context count, because the two
+    // together are the whole reading and either alone misleads. The owner's 2026-08-09
+    // report showed `Opened: 0` beside a header claiming a healthy init; a reader had to
+    // cross-reference a memory-warning line 40 entries down the log to learn the model had
+    // never loaded. Now the block says it in place.
+    let status = '';
+    try { status = String(useGameStore.getState().qwenStatus ?? ''); } catch { /* best effort */ }
+    const ledger = contextLedgerSummary();
+    return status ? `${ledger}\n  Narration engine: ${status}` : ledger;
   } catch {
     return 'Model contexts\n  (unavailable this session)';
   }
