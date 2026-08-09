@@ -974,6 +974,7 @@ const styles = StyleSheet.create({
   travelBtnText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 2 },
   travelBtnDest: { paddingVertical: 8 },
   travelBtnBlocked: { borderColor: '#2a2620', backgroundColor: '#141210', opacity: 0.5 },
+  // you-are-here: the room the player currently stands in, inside a building.
   travelBtnActive: { borderColor: '#c9a86a', backgroundColor: '#2a2418' },
   travelBtnTextActive: { color: '#f0dca8' },
   travelBtnTextDest: { fontSize: 14, lineHeight: 17, letterSpacing: 1.5, textAlign: 'center' },

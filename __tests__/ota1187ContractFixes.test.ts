@@ -98,10 +98,15 @@ describe('⚠⚠ OTA-1187 / P7 — the stamp is written and read everywhere', ()
   test('⚠ the legacy backfill is deliberately NOT stamped', () => {
     // Contracts migrated from a pre-OTA-1187 save were accepted somewhere unknowable;
     // inventing a cell for them would fabricate a journey the player may not have made.
-    const i = STORE.indexOf('activeFactionQuests: ((p.activeFactionQuests');
+    // ⚠ Anchored on the migration COMMENT and the next field, both of which the two
+    // lines share. The first spelling of this pinned `activeFactionQuests: ((p.` and the
+    // SINGLE-ACTIVE backfill — HaL2001-only text, so it could never have run on
+    // golem-line, where that backfill does not exist.
+    const i = STORE.indexOf('// Migrate legacy flat-id list into the new staged shape');
     expect(i).toBeGreaterThan(-1);
-    const backfill = STORE.slice(i, STORE.indexOf('SINGLE-ACTIVE backfill', i));
-    expect(backfill).not.toContain('acceptCellStamp');
+    const end = STORE.indexOf('completedFactionQuestIds:', i);
+    expect(end).toBeGreaterThan(i);
+    expect(STORE.slice(i, end)).not.toContain('acceptCellStamp');
   });
 
   test('every payout reads the stamp off the contract record', () => {

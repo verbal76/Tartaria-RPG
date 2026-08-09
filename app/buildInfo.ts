@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.119';
+export const DISPLAY_VERSION = '4.29.126';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23383,7 +23383,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // accepted by that device; a fresh install was what broke the loop.
 // New suite ota1174BugReportLoads (10 tests).
 // DISPLAY_VERSION 4.29.107.
-export const OTA_BUILD_ID = '2026-08-09-1186-site-skin';
+export const OTA_BUILD_ID = '2026-08-09-1194-exit-gate';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1193-ambiguous-title';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1192-market-broker';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1191-aether-techniques';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1190-labyrinth-heart';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1189-siren-charisma';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1188-courier';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1187-contract-fixes';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1186-site-skin';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1185-contract-broker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1184-story-perks';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1183-collection-payoff';

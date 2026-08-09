@@ -1357,8 +1357,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1209`**,
-**golem-line `2026-08-09-1186`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1217`**,
+**golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1367,7 +1367,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.119**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.126**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1574,7 +1574,280 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ A FACTION'S SITE WEARS ITS OWN COLOURS NOW, NOT THE VISITOR'S (2026-08-09, latest).
+- **⚠⚠ PUNCHLIST P12 + P11 CLOSED — AMBIGUOUS NAMES REFUSE, AND HAL GAINS THE GATE RULE
+  (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1216/1217 / golem OTA-1193/1194.
+  **steam NOT included — batched (§2).**
+
+  **P12 — THE SUBSTRING TIER NO LONGER GUESSES.** `pool.find()` returned the FIRST match
+  even when several fit, so a query contained by two titles silently closed one of them,
+  with a real payout and no way for the player to know a choice had been made for them. It
+  now refuses on two or more, and **deliberately stops there rather than falling through to
+  tokens** — a query that fits several titles as a substring fits the same several as
+  tokens, so continuing would reach the same ambiguity by a longer road.
+
+  ⚠⚠ **IT CAUGHT A LIVE CASE THE MOMENT IT LANDED.** `accept drakova` matches TWO hunts —
+  *The Bog Dragon of Old Drakova* and *The Siren of Drowned Drakova* — and **a shipped test
+  was pinning the arbitrary pick as correct behaviour.** Retargeted to `accept old drakova`,
+  which keeps the OTA-185 guarantee it exists for (a LOCATION word, not a category word,
+  still finds a hunt) and adds a case proving the ambiguous form now takes nothing.
+
+  ⚠ **VERIFIED BEFORE CHANGING IT (2026-08-09): the refusal is not a wall.** The accept
+  handler lists every posted title on a miss — *"Not that one. Currently posted: …"* — so
+  ambiguity shows the player both and lets them choose. Had it only said "not on your
+  slate", this would have traded a wrong guess for a dead end and P12 would have stayed
+  open with that recorded.
+
+  ⚠ The OTA-1188 test that DOCUMENTED the guess is **flipped into a guarantee** rather than
+  deleted. A defect test becoming a guarantee test is the record that the thing was actually
+  fixed and not merely reworded.
+
+  **P11 — HaL2001 BROUGHT UP TO golem's VERSION.** Owner: *"ok then bring hal up to the
+  better version."* `fix(golem-line)` e04a6ed5 gated the EXIT chip to the entrance-tagged
+  Gate on 2026-06-27 and was never ported up, so **the live line — the one with the Apple
+  testers on it — has been letting players walk out of an outpost through the armory or the
+  mess hall.** Ported UP rather than stripped from golem: the live line gains the correct
+  geography and `InputBox.tsx` stops diverging on every future port.
+
+  ⚠ **THE FALLBACK IS THE POINT.** When no room is tagged `entrance`, EXIT stays available
+  everywhere. A gating rule whose failure mode is *"the player cannot leave the building"*
+  would be a far worse defect than the one it fixes.
+
+  ⚠ **Added beyond golem's version:** the rule must survive OTA-1186's per-site skins.
+  `hubRoomFor` merges only name/shortName/description so tags come from the base room — but
+  if a skin could ever drop the `entrance` tag, a player at a foreign site would lose the
+  ability to leave. Now asserted across all nine factions.
+
+  **Tests:** ota1193AmbiguousTitle (9), ota1194HubExitGate (7). Gates green: 745 suites /
+  6,975 tests.
+
+- **⚠⚠ PUNCHLIST P10 CLOSED — THE HIDDEN MARKET TAKES BACK WHAT IT HANDS OUT (2026-08-09).
+  HAL + GOLEM.** HAL OTA-1215 / golem OTA-1192. **steam NOT included — batched (§2).**
+
+  Its stalls have posted EVERY faction's open work since OTA-782; the turn-in gate was never
+  given the same rule, so a stall rostered to a Stone Builders rep would hand you a Mud
+  Monarch mystery and then refuse to take it back.
+
+  ⚠⚠ **AND IT CHARGES 10% AGAINST THE TRADING POST'S 20% — GEOGRAPHY, NOT GENEROSITY.**
+  Halem stands at the gate of every outpost in the world; the Hidden Market is ONE location
+  out past the frontier camps. The same rate at both would make the trip pointless, and
+  OTA-1187 spent a whole change establishing that travel pays. The ladder now reads
+  **direct 100% + long-haul → market 90% → trading post 80%**, asserted at every distance.
+
+  ⚠ **`contractPayoutTc` TAKES THE SHARE NOW, NOT A BOOLEAN.** A boolean cannot express two
+  brokers, and a second flag beside it would have been the same mistake with more words.
+  Changing the TYPE rather than adding a flag made the compiler find all five payout sites
+  in the store and fourteen stale assertions in two suites — none of which a new
+  quietly-defaulting boolean would have surfaced.
+
+  ⚠ **A lie caught before landing:** the broker's spoken line read `BROKER_PLAYER_SHARE`
+  directly, so a player at a market stall would have been TOLD 20% while being charged 10%.
+
+  **Tests:** ota1192HiddenMarketBroker (16).
+
+- **⚠⚠ AETHER TECHNIQUES — THE MAGE GAP, FILLED WITH SCIENCE (2026-08-09, foundation).
+  HAL + GOLEM.** HAL OTA-1214 / golem OTA-1191. **steam NOT included — batched (§2).**
+
+  See PUNCHLIST P16 — the engine module and its rules are shipped and tested; the runner,
+  the combat turn cost, the four effects, an acquisition route and the tab remain. All four
+  effects have confirmed homes in shipped machinery, which was the risk that could have sunk
+  it: Shield → `statusAcAdjustment` (precedent `shaped_stone_ward`), Slip → the combat damage
+  site (precedent `defensive_protocols`), Veil → the existing `stealthed` status, Cascade →
+  ordinary damage resolution.
+
+- **⚠⚠ PUNCHLIST P13 CLOSED — THE LABYRINTH OF SHADOWS HAS AN ENDING (2026-08-09).
+  HAL + GOLEM.** HAL OTA-1213 / golem OTA-1190. **steam NOT included — batched (§2).**
+
+  Owner: *"we need an ending to p13 the labyrinth. it should already award a title, make it
+  have a lore enriching ending."*
+
+  **WHAT IT WAS.** A clean run printed one line and ticked the Wayfarer counter. **Any
+  other run printed two lines and nothing else** — no TC, no item, no progress — and the
+  run object was discarded. A maze walked with one wrong turn paid exactly what a maze
+  walked with nine paid, on a challenge OTA-1187 had just confirmed is live.
+
+  ⚠⚠ **THE LORE WAS ALREADY IN THE DATA — none of it was invented.** `locations.json` on
+  Iskan-Veil: *"The Conspiracy Architects' hidden city — a maze of false doors and overlaid
+  corridors. Every map of Iskan-Veil is wrong by design; the true Core seat is behind the
+  door you didn't see."* And `concepts.json` names each of the nine Cores' jobs; Iskan-Veil's
+  is **masking**. So the reveal is the answer to what the place IS, not a consolation prize
+  bolted onto a failure state.
+
+  The chamber at the heart is small and perfectly plain — no seat, no Core, no Guardian,
+  just dressed stone and a low ring of benches. On the wall, cut shallow and without
+  ceremony, a map of the labyrinth that the player has just walked and therefore knows at a
+  glance is WRONG, corridor for corridor. The Arbiter: *"You were told the maze guards the
+  Core seat. It does not. The maze IS the Core seat, still running, still masking, a
+  thousand years after the water… You did not solve it. You outlasted one of its lies."*
+  Keepsake: **Rubbing of the False Map**, quest-tagged so it can never be sold, gifted,
+  scrapped or fused.
+
+  ⚠⚠ **ONCE PER CHARACTER, AND THAT IS LOAD-BEARING.** `enterLabyrinth` carries no attempt
+  gate — the maze is fully re-enterable — so a per-run reward would be farmable, and **the
+  fix for an ends-in-nothing must not become a farm.** Gated on the new
+  `labyrinthHeartSeen`; a repeat visit gets one line and nothing else. The Wayfarer title
+  still rides the CLEAN run only (its threshold is `>= 1`, so re-earning it was already a
+  no-op), and the *"walk it again, cleaner"* steer now comes AFTER the ending, so an
+  imperfect first walk reads as *you learned something, now do it properly* rather than as a
+  refusal.
+
+  ⚠ **A full pack does not silently eat the keepsake** — the grant is checked and the
+  failure is spoken. The one artifact of the ending vanishing without a word would be the
+  same defect in miniature.
+
+  **Tests:** new suite ota1190LabyrinthEnding (14). ⚠ One assertion retargeted before
+  landing: it assumed `locations.json` was `{ locations: [...] }` when it is a bare array —
+  a data shape worth reading rather than guessing, even for a one-line check.
+
+- **⚠⚠ PUNCHLIST P6 CLOSED — THE SIREN PAYS +1 CHARISMA — plus the SECOND-ROUND AUDIT of
+  the 14 untraced loops (2026-08-09). HAL + GOLEM.** HAL OTA-1212 / golem OTA-1189.
+  **steam NOT included — batched (§2).**
+
+  Owner: *"charisma go, audit the other 14 loops when done give me a new punch list."*
+
+  **THE PERK.** The owner picked six stories in OTA-1184 and five shipped. The Siren was
+  held back because the obvious perk is resistance to her lure and **the game has no charm,
+  compulsion or mental-influence mechanic** — inventing a status effect to justify a buff is
+  backwards, so it was filed as P6 rather than quietly substituted.
+
+  ⚠ **The fiction carries charisma as well as resistance would have.** Five verses scratched
+  inside a Reclaimer's flask, the hand growing more careful as it goes, the flask found
+  empty. He is not resisting her; he is writing her down. What the player inherits is not
+  immunity to a voice — it is knowing how a voice takes hold.
+
+  ⚠⚠ **TWO LIVE CONSUMERS, NEITHER BUILT FOR THIS:** diplomacy checks
+  (`combatRules.ts:736` maps the skill to charisma) and the CHA vendor discount
+  (`chaPriceDiscount`, OTA-805). Injected into `effectiveStats`, the single funnel every
+  stat read passes, exactly as OTA-910's Skyreacher +DEX already is — one injection, no
+  call site able to miss it. Both consumers are pinned by test, because a perk that
+  aggregates and is never read is the "ends in nothing" defect in miniature.
+
+  ⚠ **Three OTA-1184 assertions retargeted.** They pinned *exactly five perks* and *the
+  Siren carries no perk* — both correct when written, both deliberately changed here. They
+  now pin what that OTA actually decided and leave the total to the OTA that owns it. ⚠ One
+  assertion in the new suite was retargeted before landing: a regex using `[^)]*` that
+  cannot cross the `)` in `(bonus.charisma ?? 0)`, so it could never have matched the
+  correct code. Third time this session a regex has been written that could not tell the
+  fix from the defect.
+
+  **THE SECOND-ROUND AUDIT — ALL 14 REMAINING LOOPS CHECKED.**
+
+  ✅ **Ten traced and paying:** faction bounties (TC + standing in the kill handler, five
+  guards), escorts (scaled by surviving party; failure narrates), chapters
+  (`chapterCardFor` consumed at `gameStore.ts:34792`), story forks (3 importers), Aetherkin,
+  crafting/Aethercraft (39 importers), corruption, Core Guardians (`core_recovered`
+  advances the main-quest phase, which drives chapters, Arbiter stance and the ending),
+  titles, whispers, mysteries-finding.
+
+  ⚠ **Two PARTIAL, named rather than claimed clean:** the dog rescue arc and the golem
+  companion arc. Every mechanic checked works; neither has a completion event to trace. That
+  may mean they are open-ended by design rather than broken — **saying so is not the same as
+  having proved it**, and this list does not get to round that up to green.
+
+  ❌ **Three new findings — P13, P14, P15.** An imperfect Labyrinth run reaches the maze's
+  heart and pays two lines of text (no TC, no item, no counter, run discarded) while being
+  one of the six live Tier-C challenges; `engine/buriedSkyscraper.ts` is a complete
+  100-floor dungeon with an entry gate that **nothing imports**; and `relics.json` (13) +
+  `loot_tables.json` (113) have zero importers, with `worldLadder.ts` naming the latter in a
+  COMMENT while importing nothing from it.
+
+  ⚠⚠ **P4 + P14 + P15 ARE ONE DEFECT THREE TIMES: authored content wired to nothing.** 34
+  weapons, 10 spells, a 100-floor dungeon and 126 relic/loot rows sit in the repo
+  unreachable. None of it is broken; none of it is connected.
+
+  **Tests:** new suite ota1189SirenCharisma (13). Gates: typecheck:ci, lint,
+  typecheck:tests (200), check:handoff, check:reachability, test:ci:fast (740 suites /
+  6,904 tests) — all green.
+
+- **⚠⚠ PUNCHLIST P3 CLOSED — THE COURIER IS BACK, FOR REPORTS ONLY (2026-08-09).
+  HAL + GOLEM.** HAL OTA-1211 / golem OTA-1188. **steam NOT included — batched (§2).**
+
+  Owner: *"push p 3, 5, 7 and 8."*
+
+  A runner carries a MYSTERY, a STORYLINE or a non-fetch FACTION DEED for **25% cut, full
+  rep, no long-haul bonus, and 12 in-game hours.** ⚠⚠ **HUNTS and FETCH DELIVERIES still
+  refuse it** — OTA-810 (*"a bounty is paid face to face"*) and OTA-456 (*"you can't mail
+  the goods"*). Both refusals are **VERIFIED by test (2026-08-09)**, source-pinned and
+  exercised live: a hunt sent by runner from open country stays on the slate. A runner
+  carries a REPORT, which is the line OTA-456 itself drew.
+
+  ⚠⚠ **THE HOURS ARE CHARGED UP FRONT — A DELIBERATE DEPARTURE FROM THE AUDIT'S OWN
+  PROPOSAL** of *"12 in-game hours before it credits."* A deferred payout needs a persisted
+  queue, a maturing tick, a credit path and a save migration — a new system whose failure
+  mode is **a reward that never arrives.** P1 and P2 were both filed for loops that end in
+  nothing; closing P3 by building a fourth one would be an own goal. Charging the hours
+  immediately costs the player the same thing (deadlines, weather, dog loyalty all tick)
+  with nothing that can go missing. A test asserts no pending-payout queue exists.
+
+  ⚠⚠ **THE LIVE TEST FOUND A PRE-EXISTING BUG BIGGER THAN THE FEATURE.** A probe typed
+  `send word Fragment of the Red Tower` while holding exactly that mystery. **MEASURED
+  (2026-08-09):** the parser resolved it perfectly — `intent=turn_in conf=1.00 target=
+  fragment red tower` — and the turn-in was refused with *"You have no active contracts."*
+
+  All four contract finders were the same six lines: exact, then substring either way.
+  **The parser strips "of the"; the finders required it.** Neither string contains the
+  other. That breaks the typed turn-in of **any** contract whose title carries a dropped
+  word — invisible until now because "send word" was refused before it ever reached a
+  finder, and because the Contracts COMPLETE button passes an id rather than a typed title.
+
+  New `engine/titleMatch.ts` adds a **THIRD tier** — token subset, order-insensitive,
+  ambiguity refuses rather than guesses — that runs **only where the old code returned
+  null**. ⚠ Strictly additive is the whole safety argument for dropping a shared resolver
+  into four widely-used finders: it can widen what matches, never change an answer the old
+  code already gave. Turn-in routing now also resolves against the player's ACTIVE slate
+  before falling back to the catalog.
+
+  ⚠⚠ **A SECOND DEFECT, FOUND BY MY OWN ASSERTION AND DELIBERATELY NOT FIXED HERE.** The
+  suite asserted that ambiguity should refuse; it failed, because the **substring** tier
+  runs first and `pool.find()` takes the first of several matches — so two similarly-named
+  contracts plus a phrase that fits both silently closes one, with a real payout. Filed as
+  **P12**, with a test that documents the guess rather than blessing it. Fixing it inside
+  this change would have broken the strictly-additive promise the rest of it rests on.
+
+  **Tests:** ota1188Courier (18), ota1188CourierLive (3), ota1188TitleMatch (14).
+
+- **⚠⚠ PUNCHLIST P5, P7 AND P8 — THREE DEFECTS, NO DESIGN CALLS (2026-08-09). HAL + GOLEM.**
+  HAL OTA-1210 / golem OTA-1187. **steam NOT included — batched (§2).**
+
+  **P7 — THE LONG-HAUL BONUS MEASURED WHERE YOU STOOD, NOT THE TRIP YOU MADE.** OTA-824's
+  requirement is in its own commit body — *"make the journey worth the loot — no 32-time
+  trip worth 20 TC"* — but `contractJourneyBonusTc` scored the remoteness of the TURN-IN
+  TILE from the starter hub and never looked at where the player came from. Accept, kill and
+  hand in inside a deep capital → **maximum** bonus for no travel. Haul from a deep capital
+  back to the hub → **zero**. Starter-region factions under-paid forever. It now measures
+  `accept cell → turn-in cell`; same 6 TC/cell, same 1.5× cap, so no tuning number moves.
+
+  ⚠ The accept cell is stamped at all **nine** accept sites through ONE helper — they spell
+  the player variable four different ways, and a stamp right at eight of them is a contract
+  that silently pays the legacy rate at the ninth. ⚠ Pre-OTA contracts carry no stamp and
+  fall back to the old read, so a trip already half-made still pays something. ⚠ The legacy
+  save-migration backfill is deliberately NOT stamped: those were accepted somewhere
+  unknowable, and inventing a cell would fabricate a journey.
+
+  **P8 — A FINISHED BOUNTY COULD NOT BE HANDED IN AT THE BOARD THAT POSTED IT.**
+  `turnInFactionQuest` has accepted a same-faction vendor, the mission board (OTA-451) or
+  the faction's own hall (OTA-617) since those shipped; the other three required
+  `scene.vendor` and nothing else. One shared `turnInCounterparty` now answers for all four
+  paths plus the Contracts button, replacing three different refusal wordings for one rule.
+
+  **P5 — A COMMENT CLAIMED THE LOCATION CHALLENGES WERE SWITCHED OFF.** `TIER_C_ENABLED` is
+  `true` and all six carry `enabled: true`, every one with handlers outside its definition
+  file. A false "this is inert" is how a working system gets skipped in an audit — it cost
+  the completability pass a detour to disprove.
+
+  ⚠ **TWO EXISTING SUITES RETARGETED, AND BOTH WERE ASSERTING THE DEFECT:**
+  `starterFetchQuests` computed its expected payout from the old formula, so it passed while
+  pinning a bonus no journey had earned; and `ota810HuntFaceToFace` read "no vendor" as "no
+  counterparty" while the player stood in their own faction's hall. The B2 protection it
+  exists for is about closing a bounty FROM ANYWHERE, so it now tests from open country.
+
+  ⚠ **The P5 premise check was retargeted before landing too** — it grepped for
+  `enabled: false` and matched two COMMENTS explaining how to switch a challenge off. Prose,
+  not behaviour; it now reads the module.
+
+  **Tests:** ota1187ContractFixes (24) + ota1187HallTurnInLive (3 — real store, real hall
+  hand-in with no vendor anywhere in the room).
+
+- **⚠⚠ A FACTION'S SITE WEARS ITS OWN COLOURS NOW, NOT THE VISITOR'S (2026-08-09).
   HAL + GOLEM.** HAL OTA-1209 / golem OTA-1186. **steam NOT included — batched (§2).**
 
   Owner: *"do halem and the reskin"* — and, on why it matters: *"each outpost has a
@@ -1598,7 +1871,7 @@ rediscovering them.
   **Who those anchors ANSWER FOR is untouched, and is PUNCHLIST P9** — the third and
   largest of the three P2 jobs, filed at the owner's instruction rather than done here.
 
-  ⚠ **Specifically pinned: the OTA-1208 broker is still at `outpost_gate` under all nine
+  ⚠ **Specifically pinned: the OTA-1185 broker is still at `outpost_gate` under all nine
   skins.** If a skin could move an anchor, the trading post could vanish from a site and
   take the P2 fallback with it.
 
