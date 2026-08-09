@@ -387,6 +387,75 @@ already in the code and already wrong.
 restores a mechanic the owner deliberately switched off, and the numbers above are a
 proposal, not an assumption.
 
+⚠ **A and C are FILED AS THEIR OWN ITEMS below (P7, P8).** Owner, 2026-08-09: *"make the
+bounty issue as a new punch list item and get back to p2."* They came out of the P3 audit
+but neither is about remote hand-in, and a defect buried in the prose of an audit about a
+different question is a defect nobody works. **B stays inside P3, because B *is* P3.**
+
+---
+
+### P7 — The long-haul bonus pays for where you STAND, not for the trip you made
+
+- **Kind:** WRONG PAYOUT *(a shipped requirement, implemented inverted)*
+- **Found:** 2026-08-09, during the P3 audit
+- **Needs no design decision** — this is the owner's own requirement, backwards
+
+Owner's requirement, recorded verbatim in OTA-824's commit body: *"make the journey worth
+the loot — no 32-time trip worth 20 TC."* What was built (`contractMarkers.ts:138`):
+
+```
+remoteness = Manhattan distance of the TURN-IN TILE from `tartarian_outskirts`
+bonus      = min(remoteness × 6 TC, 1.5 × base)
+```
+
+⚠ **It never looks at where the player came from.** Three live consequences:
+
+1. Accept, kill and hand in **without leaving a deep capital** → **maximum** bonus, zero travel.
+2. Trek from a deep capital **back to the starter hub** → **zero** bonus.
+3. Every contract belonging to a starter-region faction is permanently under-paid,
+   regardless of how it was played.
+
+**The fix, and it is contained:** stamp the player's cell on the contract record at accept
+(`acceptedAtCell`), and pay on `distance(accept cell → turn-in cell)`. Same 6 TC/cell, same
+1.5× cap, so nothing needs re-tuning. One function in `contractMarkers.ts`, one new field,
+and the four turn-in handlers already call the function.
+
+⚠ **Legacy saves:** a contract accepted before the field exists has no accept cell. Fall
+back to today's remoteness read so an in-flight contract still pays something, rather than
+silently paying zero on a trip the player already made.
+
+---
+
+### P8 — A finished bounty cannot be handed in at the board that posted it
+
+- **Kind:** ENDS IN NOTHING *(a real stranding, reachable in ordinary play)*
+- **Found:** 2026-08-09, during the P3 audit
+- **Needs no design decision**
+
+`turnInFactionQuest` accepts a same-faction **vendor OR mission board OR the faction's home
+hall** (OTA-451, then OTA-617 added the building-level case). The other three handlers do
+not:
+
+| Handler | Accepts |
+|---|---|
+| `turnInFactionQuest` | vendor **or** mission board **or** home hall |
+| `turnInHunt` | `scene.vendor` only |
+| `turnInMystery` | `scene.vendor` only |
+| `turnInStoryline` | `scene.vendor` only |
+
+⚠ **So a player can stand at the board that posted a hunt, holding the trophy, and be told
+to go find a vendor.** The board is the poster. It should take back what it put up.
+
+⚠ **This compounds P2**, and is why it is filed rather than folded into it: P2 is about the
+*faction* of the agent being a 1-in-30 roll. This is about there being **no agent at all**
+at a site that has a board — two independent ways to reach the same dead end, and fixing
+either one alone leaves the other.
+
+**The fix:** give the three handlers the same source resolution `turnInFactionQuest`
+already has, rather than writing a second one. One shared helper, four call sites.
+
+---
+
 ### P6 — The Siren of Zharak's Teeth was chosen for a perk, and there is nothing to attach it to
 
 - **Kind:** *(open design question — raised by OTA-1207, not a defect)*
