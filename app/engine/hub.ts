@@ -206,20 +206,34 @@ export function hubEntryRoomId(): string {
   return HUB.rooms[0]?.id ?? '';
 }
 
-/** True when this room is the hub's way OUT — the gate/entrance (tagged
- *  "entrance" in the layout; the Gate is the only one). The EXIT chip
- *  belongs only here: you leave the outpost through the gate, not the
- *  armory or the mess. Tags survive the per-faction string overrides
- *  (hubRoomFor only re-skins name/description), so this holds for every
- *  faction's hub. */
+// ⚠⚠ OTA-1194 (PUNCHLIST P11) — PORTED UP FROM golem-line, WHERE IT HAS LIVED SINCE
+// 2026-06-27 (`fix(golem-line): EXIT chip only in the gate room`, e04a6ed5).
+//
+// It was never brought across, so the LIVE line — the one with the Apple testers on it —
+// has been letting players walk out of an outpost through the armory or the mess hall.
+// The outpost is a 15-room interior entered and left through the Gate; leaving from any
+// room is not a shortcut, it is a hole in the geography. `verify-parity` has flagged
+// `InputBox.tsx` on every port that touched it since, which is how it surfaced.
+//
+// Owner, on being shown that the better version was on the branch nobody plays:
+// *"ok then bring hal up to the better version."*
+
+/** True when this room is the hub's way OUT — the gate/entrance (tagged "entrance" in the
+ *  layout; the Gate is the only one). The EXIT chip belongs only here.
+ *
+ *  ⚠ Tags survive the per-faction string overrides — `hubRoomFor` re-skins name,
+ *  shortName and description and nothing else — so this holds for every faction's hub,
+ *  including under OTA-1186's skin-by-site. */
 export function roomIsExit(room: HubRoom | null | undefined): boolean {
   return !!room && Array.isArray(room.tags) && room.tags.includes('entrance');
 }
 
-/** True when the hub layout marks an explicit exit/gate room at all. When it
- *  does, the EXIT chip is gated to that room; when it doesn't (a legacy layout
- *  that never tagged a gate), EXIT stays available from every room so no one
- *  is ever stranded. */
+/** True when the hub layout marks an explicit exit/gate room at all.
+ *
+ *  ⚠ THE FALLBACK IS THE POINT: when no room is tagged `entrance` — a legacy layout, or a
+ *  future one that forgets — EXIT stays available everywhere rather than nowhere. A gating
+ *  rule whose failure mode is "the player cannot leave the building" would be a far worse
+ *  defect than the one it fixes. */
 export function hubDefinesExitRoom(): boolean {
   return HUB.rooms.some((r) => Array.isArray(r.tags) && r.tags.includes('entrance'));
 }

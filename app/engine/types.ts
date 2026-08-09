@@ -1340,7 +1340,7 @@ export interface PlayerCharacter {
   /** Active faction quests with per-stage progress. Mirrors activeHunts
    *  / activeMysteries / activeStorylines so all four contract types
    *  share the same accept / advance / turn-in flow. */
-  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; escort?: EscortPool; tracked?: boolean }[];
+  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; escort?: EscortPool; tracked?: boolean }[];
   /** Mission ROUTE CHAIN in progress (set by ROUTE TO on a contract). The engine
    *  courses to the objective, then auto-courses to the turn-in once the work is
    *  done. Cleared on turn-in, abandon, deactivate, or a manual divert. */
@@ -1351,7 +1351,7 @@ export interface PlayerCharacter {
    *  player has DEACTIVATED (paused) this hunt: it stays on the slate but its
    *  stages don't auto-advance until re-activated (per-contract, independent of
    *  other hunts). Absent/true = active. */
-  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
+  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; tracked?: boolean }[];
   /** IDs of hunts that have been turned in. */
   completedHuntIds?: string[];
   /** OTA-850 [faction bounty] — LEGACY single active kill-bounty. Superseded by
@@ -1365,11 +1365,11 @@ export interface PlayerCharacter {
    *  and drops off the slate. Holding several lets the player grind faction standing. */
   activeBounties?: import('./factionBounty').FactionBounty[];
   /** Active mystery-object quests. `tracked === false` = paused (see activeHunts). */
-  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
+  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; tracked?: boolean }[];
   /** IDs of mystery quests turned in. */
   completedMysteryIds?: string[];
   /** Active long-form faction storylines (5-10 step). `tracked === false` = paused. */
-  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
+  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; tracked?: boolean }[];
   /** IDs of storylines completed. */
   completedStorylineIds?: string[];
   /** Active Whispers — informal NPC-to-NPC tips the player has
@@ -1384,6 +1384,22 @@ export interface PlayerCharacter {
    *  completed, expired, declined). Prevents re-planting the same
    *  whisper twice on the same character. */
   completedWhisperIds?: string[];
+  /** ⚠ OTA-1190 (PUNCHLIST P13) — the heart of the Labyrinth has been reached ONCE.
+   *  The maze is fully re-enterable (`enterLabyrinth` carries no attempt gate), so the
+   *  lore ending and its keepsake are gated on this rather than paid per run — a
+   *  repeatable loop with a repeatable reward is a farm, which is the one thing the
+   *  fix for an ends-in-nothing must not become. Absent on an old save reads as
+   *  "not yet seen", so a character who already walked it gets the ending next time. */
+  labyrinthHeartSeen?: boolean;
+
+  /** ⚠ OTA-1191 — AETHER TECHNIQUES the character has learned. Ids from
+   *  `engine/aetherTechniques.ts`. Absent on an old save reads as "knows none", which is
+   *  correct: they are acquired, never granted at creation. */
+  knownTechniques?: string[];
+  /** ⚠ OTA-1191 — per-technique practice count, keyed by technique id (owner: growth is
+   *  per-technique, not one global aether skill, so a character specialises into what they
+   *  actually practise). Only MEANINGFUL uses increment it — see `practiceCounts`. */
+  techniqueProficiency?: Record<string, number>;
   /** Deterministic seed used to generate this character's procedural world map. */
   mapSeed?: string;
   /** Last spot key the player dug at (`locationId:x:y`). Must move away
@@ -1720,7 +1736,12 @@ export interface MemorableEvent {
     // OTA-843 [Chronicle] — the character first crossed INTO a worse corruption tier
     // (Tainted / Corrupted / Hollowed). Records the aether's arc on the soul so the
     // Chronicle can show how far they've fallen, not just the current number.
-    | 'corruption_tier';
+    | 'corruption_tier'
+    // ⚠ OTA-1190 (PUNCHLIST P13) — the player stood at the heart of the Labyrinth of
+    // Shadows and learned what Iskan-Veil's masking Core actually does. Recorded so
+    // the Arbiter can reference it and the Chronicle can show it; a lore beat this
+    // size should leave a mark on the character, not just scroll past in the feed.
+    | 'labyrinth_heart';
   text: string;
   timestamp: number;
   factionId?: string;

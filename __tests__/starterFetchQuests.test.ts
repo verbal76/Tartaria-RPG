@@ -29,10 +29,18 @@ import { contractJourneyBonusTc } from '../app/engine/contractMarkers';
 // B2 — turn-in pays the base reward PLUS a distance-scaled long-haul bonus
 // (contractJourneyBonusTc). Compute the exact expected pay so the test tracks
 // the reward without hard-coding the location-dependent bonus.
-const expectedPay = (base: number): number => {
-  const loc = useGameStore.getState().player!.currentLocationId;
-  return base + contractJourneyBonusTc(loc, base);
-};
+/** ⚠ OTA-1187 (PUNCHLIST P7) — RETARGETED, AND IT WAS ASSERTING THE DEFECT.
+ *
+ *  This used to read `base + contractJourneyBonusTc(loc, base)` — the long-haul bonus for
+ *  the remoteness of the turn-in tile from the starter hub. That was the P7 defect itself:
+ *  the bonus paid for WHERE THE PLAYER STOOD rather than the trip they made, so this test
+ *  passed while pinning a payout no journey had earned.
+ *
+ *  These quests are accepted and handed in without the player moving a single tile, so the
+ *  correct long-haul bonus is now exactly ZERO. Asserting the rule rather than recomputing
+ *  the formula also means a future tuning change to TC-per-cell cannot silently drag this
+ *  expectation along with it. */
+const expectedPay = (base: number): number => base;
 
 async function boot(name: string, factionId: string) {
   const store = useGameStore;

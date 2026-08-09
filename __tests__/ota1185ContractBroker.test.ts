@@ -122,12 +122,17 @@ describe('OTA-1185 — who may take a contract', () => {
 });
 
 describe('OTA-1185 — what the broker costs', () => {
+  // ⚠ RETARGETED BY OTA-1192. `contractPayoutTc` took a boolean `viaBroker` until the
+  // Hidden Market arrived charging a different rate — a boolean cannot express two
+  // brokers. It now takes the player's SHARE (or null for a direct hand-in), so these
+  // pass BROKER_PLAYER_SHARE where they used to pass `true`. The rule each one guards is
+  // unchanged; only how the rate is spelled has moved.
   test('a direct hand-in pays base plus the long-haul bonus', () => {
-    expect(contractPayoutTc(100, 40, false)).toBe(140);
+    expect(contractPayoutTc(100, 40, null)).toBe(140);
   });
 
   test('the broker pays 80% of base', () => {
-    expect(contractPayoutTc(100, 0, true)).toBe(80);
+    expect(contractPayoutTc(100, 0, BROKER_PLAYER_SHARE)).toBe(80);
     expect(BROKER_PLAYER_SHARE).toBe(0.8);
   });
 
@@ -135,30 +140,30 @@ describe('OTA-1185 — what the broker costs', () => {
     // The bonus is paid for making the trip to the faction. A hand-in that skips finding
     // them has not made that trip. Taking a cut of it instead would leave the fallback
     // competitive with the real thing at distance, which is backwards.
-    expect(contractPayoutTc(100, 150, true)).toBe(80);
-    expect(contractPayoutTc(100, 150, true)).toBeLessThan(contractPayoutTc(100, 150, false));
+    expect(contractPayoutTc(100, 150, BROKER_PLAYER_SHARE)).toBe(80);
+    expect(contractPayoutTc(100, 150, BROKER_PLAYER_SHARE)).toBeLessThan(contractPayoutTc(100, 150, null));
   });
 
   test('⚠ going to the right people always pays more, at every distance', () => {
     for (const bonus of [0, 5, 30, 150]) {
-      expect(contractPayoutTc(100, bonus, false)).toBeGreaterThan(contractPayoutTc(100, bonus, true));
+      expect(contractPayoutTc(100, bonus, null)).toBeGreaterThan(contractPayoutTc(100, bonus, BROKER_PLAYER_SHARE));
     }
   });
 
   test('⚠ a contract that paid something never brokers down to nothing', () => {
     // A 0 TC result on a small contract reads as "the hand-in did nothing" — the exact
     // complaint P1 was filed for. Floored at 1.
-    expect(contractPayoutTc(1, 0, true)).toBe(1);
-    expect(contractPayoutTc(2, 0, true)).toBeGreaterThanOrEqual(1);
+    expect(contractPayoutTc(1, 0, BROKER_PLAYER_SHARE)).toBe(1);
+    expect(contractPayoutTc(2, 0, BROKER_PLAYER_SHARE)).toBeGreaterThanOrEqual(1);
   });
 
   test('a contract that paid nothing still pays nothing', () => {
-    expect(contractPayoutTc(0, 0, true)).toBe(0);
+    expect(contractPayoutTc(0, 0, BROKER_PLAYER_SHARE)).toBe(0);
   });
 
   test('negative or fractional inputs cannot produce a negative payout', () => {
-    expect(contractPayoutTc(-50, -10, false)).toBe(0);
-    expect(contractPayoutTc(-50, -10, true)).toBe(0);
+    expect(contractPayoutTc(-50, -10, null)).toBe(0);
+    expect(contractPayoutTc(-50, -10, BROKER_PLAYER_SHARE)).toBe(0);
   });
 
   test('the line he says names the same cut the maths applies', () => {
@@ -201,7 +206,11 @@ describe('⚠⚠ OTA-1185 — every turn-in path routes through the ONE resolver
     // defect in reward copy would read as the player being paid a bonus they were not.
     const bad = STORE.match(/\$\{journeyTc > 0 \? ` \(incl\./g) ?? [];
     expect(bad).toHaveLength(0);
-    const guarded = STORE.match(/!\w*[Vv]iaBroker && journeyTc > 0/g) ?? [];
+    // ⚠ Widened by OTA-1188: two of these now also exclude the COURIER, so the guard reads
+    // `!xViaBroker && !xViaCourier && journeyTc > 0`. The rule is unchanged — a reward line
+    // may not claim a bonus that was not paid — so the pattern matches the rule, not one
+    // particular spelling of it.
+    const guarded = STORE.match(/!\w*[Vv]iaBroker && (!\w*[Vv]iaCourier && )?journeyTc > 0/g) ?? [];
     expect(guarded.length).toBeGreaterThanOrEqual(3);
   });
 
@@ -262,9 +271,15 @@ describe('⚠⚠ OTA-1185 — the broker DOES take deliveries, and this suite is
     expect(payout).toBeGreaterThan(consume);
   });
 
-  test('⚠ the typed "send word" courier is still refused — this did not reopen OTA-824', () => {
-    // The broker is a face-to-face hand-in at an outpost. Remote hand-in stays dead.
-    expect(STORE).toMatch(/send word\|courier\|send a runner/);
-    expect(STORE).toContain('No couriers for this.');
+  test('⚠⚠ the BROKER is not the courier — it still requires being there in person', () => {
+    // ⚠ RETARGETED BY OTA-1188, which deliberately restored the courier for reports. This
+    // assertion used to pin `"No couriers for this."` — a line that OTA-1188 removes on
+    // purpose, so leaving it would have failed the build for a change that was intended.
+    //
+    // What OTA-1185 actually guarantees is narrower and still true: the BROKER path is a
+    // face-to-face hand-in. It is reached only through a vendor in scene, so it can never
+    // become a way to close a contract from open country.
+    expect(STORE).toContain('CB.isContractBroker(scene?.vendor)');
+    expect(STORE).not.toMatch(/isContractBroker\((?!scene)/);
   });
 });

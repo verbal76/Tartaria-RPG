@@ -309,16 +309,17 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     return out;
   }, [hubRoom, skinFactionId]);
 
-  // The EXIT chip belongs ONLY in the gate room (the entrance-tagged room — the
-  // outpost's "way out"). Showing it in every room let the player leave through
-  // the armory/mess/etc., which isn't how the outpost is laid out. When the hub
-  // marks a gate room, gate EXIT to it; a legacy layout with no gate keeps EXIT
-  // everywhere so no one is stranded. (The Gate is also the spawn room, so EXIT
-  // is present where the tutorial's explore_or_leave beat needs it.)
+  // ⚠ OTA-1194 (PUNCHLIST P11) — the EXIT chip belongs ONLY in the gate room. Showing it in
+  // every room let the player leave through the armory or the mess, which is not how the
+  // outpost is laid out. Ported up from golem-line, where it has been correct since
+  // 2026-06-27 while the live line was not.
+  //
+  // ⚠ The Gate is also the spawn room, so EXIT is still present where the tutorial's
+  // `explore_or_leave` beat needs it — the beat is unaffected.
   const showExitChip = useMemo(() => {
     if (!hubRoom) return false;
     if (hubDefinesExitRoom()) return roomIsExit(hubRoom);
-    return true;
+    return true;   // no gate tagged anywhere → never strand the player
   }, [hubRoom]);
 
   // TAKE / SALVAGE / INVESTIGATE during their tutorial beats now OPEN the

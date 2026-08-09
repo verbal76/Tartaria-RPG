@@ -290,6 +290,8 @@ negotiable.
 
 ### P3 — The remote hand-in was designed as the escape hatch for exactly this, and is dead code
 
+## ✅ **CLOSED — OTA-1188.** The courier carries REPORTS: 25% cut, full rep, no long-haul bonus, 12 in-game hours charged up front. Hunts and fetch deliveries still refuse it.
+
 - **Kind:** UNFINISHABLE *(contributing cause of P2)*
 - **Found:** 2026-08-09, while verifying P2
 
@@ -494,6 +496,8 @@ different question is a defect nobody works. **B stays inside P3, because B *is*
 
 ### P7 — The long-haul bonus pays for where you STAND, not for the trip you made
 
+## ✅ **CLOSED — OTA-1187.** It measures accept-cell → turn-in-cell now.
+
 - **Kind:** WRONG PAYOUT *(a shipped requirement, implemented inverted)*
 - **Found:** 2026-08-09, during the P3 audit
 - **Needs no design decision** — this is the owner's own requirement, backwards
@@ -525,6 +529,8 @@ silently paying zero on a trip the player already made.
 ---
 
 ### P8 — A finished bounty cannot be handed in at the board that posted it
+
+## ✅ **CLOSED — OTA-1187.** Board and hall take it back, via one shared resolver.
 
 - **Kind:** ENDS IN NOTHING *(a real stranding, reachable in ordinary play)*
 - **Found:** 2026-08-09, during the P3 audit
@@ -626,7 +632,184 @@ only option that keeps `InputBox.tsx` diverging forever.
 
 ---
 
+### P13 — Finishing the Labyrinth imperfectly ends in nothing
+
+## ✅ **CLOSED — OTA-1190.** The heart of the maze now reveals what Iskan-Veil's masking Core is still doing, with a keepsake. Once per character; the Wayfarer title still rides the clean run only.
+
+- **Kind:** ENDS IN NOTHING
+- **Found:** 2026-08-09, second-round audit of the 14 untraced loops
+
+`gameStore.ts:1297` — on reaching the maze's heart:
+
+| Run | What you get |
+|---|---|
+| **Clean** (no wrong turns) | narration + `labyrinthCleanRuns` → the Wayfarer title |
+| **Any other run** | **two lines of text.** No TC, no item, no progress counter. |
+
+The run is then discarded (`labyrinthRun: undefined`). ⚠ **The Labyrinth of Shadows is one
+of the six Tier-C challenges P5 just confirmed are all LIVE**, so this is reachable in
+ordinary play — and a maze walked with one wrong turn pays exactly the same as one walked
+with nine: nothing.
+
+⚠ **What is NOT claimed:** that the clean-run reward is wrong. Reserving the title for a
+perfect run is good design. The defect is that an imperfect run — the ordinary outcome —
+produces no outcome at all.
+
+---
+
+### P14 — `engine/buriedSkyscraper.ts` is a 100-floor dungeon nothing imports
+
+## ⛔ **NOT A DEFECT — RECLASSIFIED 2026-08-09 on the owner's word:** *"p14 is correct, it's a blocked door to an unwritten expansion."*
+
+⚠ **Left on the list deliberately, as a RESERVATION rather than a finding.** A complete module with an entry gate and no caller is indistinguishable from an accident to anyone auditing it — this entry exists so the next pass does not re-file it. The shape is exactly what you would build to hold an entrance open: `canEnterSkyscraper` with its own refusal copy, and nothing behind it yet.
+
+- **Kind:** ~~UNFINISHABLE~~ → **RESERVED** *(no entry point BY DESIGN)*
+- **Found:** 2026-08-09, second-round audit
+
+The module is complete: floor archetypes, a 2D grid per floor, `emptyBuildingState`,
+`canEnterSkyscraper` with its own refusal copy, and a documented **1–100 floor** descent
+(`buriedSkyscraper.ts:264`).
+
+⚠ **`grep -rn "from '.*buriedSkyscraper'"` across `app/` returns NOTHING.** The only
+references anywhere are comments in `buildInfo.ts`. `canEnterSkyscraper` and
+`emptyBuildingState` have no callers outside their own file. **There is no way in.**
+
+⚠ This is the same class as P4 but larger: authored, finished-looking, and connected to
+nothing. Whether it is dead weight or a feature that lost its entry point is the owner's
+call, exactly as with the runecasters.
+
+---
+
+### P16 — Aether techniques: foundation shipped, not yet reachable
+
+- **Kind:** IN PROGRESS *(deliberately on this list until a player can use one)*
+- **Started:** 2026-08-09, at the owner's direction
+
+Owner: *"I would like to have players get aether powers based off of the spells, once this
+is working we will mirror it to enemies and have them applied like the resists are. this
+fills the mage gap, but these are science not magic."*
+
+**Shipped so far** — `engine/aetherTechniques.ts` + 24 tests:
+
+| | |
+|---|---|
+| The four techniques | Aether Shield, Temporal Slip, Veil of Ether, Resonance Cascade |
+| Dose | scaled by tier (1 → 8); a FAILED channel still doses at half; Aetherborn take half |
+| Growth | per-technique, five ranks, and it shaves the DC rather than raising output |
+| Anti-farm guard | practice counts only on a **success under pressure** |
+
+⚠ **Only four of the ten, and that is not a shortfall.** Seven of the orphaned spell file's
+entries already exist in the shipped game — shape/summon/mend are the Aethercraft
+disciplines, and bolt/lance/pulse are runecasters, which are instruments rather than
+techniques. Building all ten would have shipped seven of them twice under two rule sets.
+
+**⚠⚠ WHY IT IS ON THIS LIST AT ALL: a module nothing calls is P4 and P14's defect.** It is
+committed as foundation with its next step named rather than abandoned, but it does not
+come off this list until a player can channel one.
+
+**What remains, in the order I would take it:**
+1. The channel runner — fuel, race-gated DC, d20, dose. Mirrors `runAethercraft` exactly.
+2. The combat turn cost (owner's call: channelling costs your turn).
+3. The four effects. **All four have confirmed homes in shipped machinery**, which was the
+   risk that would have sunk this: Shield → `statusAcAdjustment` (precedent:
+   `shaped_stone_ward`); Slip → the combat damage site (precedent: `defensive_protocols`);
+   Veil → the existing `stealthed` status; Cascade → ordinary damage resolution.
+4. **One acquisition route, or the loop ends in nothing.** Owner's answer: found texts,
+   contract rewards, and purchase from vendors you have rapport with. The rapport gate
+   (`hasFactionRapport`) already exists and is the deterministic one, so it goes first.
+5. The Aetheric tab UI — the tab already exists and holds the three disciplines.
+
+**Then, per the owner:** mirror to enemies, applied per spawn from type pools exactly the
+way `randomizeEnemyDefense` already stamps resists.
+
+---
+
+### P15 — Two of the three relic data files have no importers
+
+- **Kind:** *(dead data — same class as P4)*
+- **Found:** 2026-08-09, second-round audit
+
+| File | Entries | Importers |
+|---|---|---|
+| `data/relics/curios.json` | — | **3** (`portability`, `itemFusion`, `salvagePools`) ✅ |
+| `data/relics/relics.json` | **13** | **0** |
+| `data/relics/loot_tables.json` | **113** | **0** |
+
+⚠ `worldLadder.ts:23` names `loot_tables.json` **in a comment** — *"names of loot items
+(matching loot_tables.json)"* — while importing nothing from it. So a file with 113 entries
+is being treated as the source of truth by convention and by nothing else, which means
+nothing checks that the two still agree.
+
+---
+
+### P12 — A typed contract name that fits two titles silently closes one of them
+
+## ✅ **CLOSED — OTA-1193.** The substring tier refuses instead of guessing. ⚠ It caught a live case immediately: `accept drakova` matched TWO hunts and a shipped test was pinning the arbitrary pick as correct.
+
+- **Kind:** WRONG TARGET *(pre-existing; found 2026-08-09 while building OTA-1188)*
+- ⚠ **Not introduced by OTA-1188, and deliberately not fixed there.**
+
+All four contract finders resolve a typed title in tiers: exact, then substring either way,
+then (as of OTA-1188) token match. **The substring tier uses `pool.find()`, which returns
+the FIRST match even when several fit.** So a player holding *"Red Tower Fragment Cache"*
+and *"Red Tower Fragment Vault"* who types `turn in red tower fragment` closes whichever
+happens to sit earlier in the catalog — silently, with a real payout attached.
+
+⚠ **The OTA-1188 token tier already refuses on ambiguity**, so the new behaviour is safe.
+The old tier is the one that guesses.
+
+⚠ **Why it was left alone:** the entire safety argument for dropping a shared resolver into
+four widely-used finders was that it is **strictly additive** — it can only widen what
+matches, never change an answer the old code already gave. Making the substring tier refuse
+would have broken that promise inside the same change. Pinned by a test that documents the
+guess rather than asserting it is correct.
+
+**The fix, when wanted:** collect substring matches instead of taking the first, and refuse
+when more than one survives — the same rule the token tier already follows. It is a
+behaviour change, which is why it is a decision rather than a patch.
+
+---
+
+### P11 — HaL2001 lets you leave the outpost from any room; golem-line does not
+
+## ✅ **CLOSED — OTA-1194.** Owner: *"ok then bring hal up to the better version."* The fix was ported UP rather than stripped from golem, so the live line gained the correct geography and `InputBox.tsx` stops diverging.
+
+- **Kind:** LINE DIVERGENCE *(not a defect on either line — a decision that was only ever made on one of them)*
+- **Found:** 2026-08-09, when `verify-parity` flagged `InputBox.tsx` during the OTA-1186 port
+- ⚠ **Not an "ends in nothing."** Filed here because it is the owner's call and because it
+  will keep flagging parity on every future port that touches this file.
+
+`fix(golem-line): EXIT chip only in the gate room` (`e04a6ed5`, 2026-06-27) added
+`roomIsExit` / `hubDefinesExitRoom` to golem's `hub.ts` and gated the hub OUT chip:
+
+> *"The outpost is a 15-room layout entered/left through `outpost_gate` (tagged 'entrance',
+> and the spawn room). But InputBox rendered the EXIT chip in EVERY hub room, so the player
+> could leave through the armory/mess/etc. — not how the outpost is laid out."*
+
+**It was never ported up.** So today:
+
+| Line | Leaving an outpost |
+|---|---|
+| golem-line | walk to the Gate, then OUT |
+| **HaL2001 (the live line)** | **OUT from any of the 15 rooms** |
+
+⚠ **The live line is the one without the fix**, which is the wrong way round — and the
+reasoning in that commit applies to HAL exactly as written, since both lines share the
+same 15-room layout and the same `entrance`-tagged gate.
+
+⚠ **NOT ported here, deliberately.** It came from `engine_Dev`, which is off limits, and
+it changes how every player leaves every outpost — that is a feel decision, not a defect
+fix, and it is not what "do halem and the reskin" asked for.
+
+**The question for the owner:** port it up to HAL so both lines agree, or drop it from
+golem so both lines agree the other way? Either closes the parity flag; leaving it is the
+only option that keeps `InputBox.tsx` diverging forever.
+
+---
+
 ### P10 — The Hidden Market hands out contracts it cannot take back
+
+## ✅ **CLOSED — OTA-1192.** Its stalls broker at **10%**, against the trading post's 20% — geography, not generosity: one location you travel to versus a broker at every gate.
 
 - **Kind:** INCOHERENCE *(no longer a dead end — the broker covers it)*
 - **Found:** 2026-08-09, while building OTA-1185
@@ -654,6 +837,8 @@ line either way.
 
 ### P6 — The Siren of Zharak's Teeth was chosen for a perk, and there is nothing to attach it to
 
+## ✅ **CLOSED — OTA-1189.** Owner: *"p6 charisma?"* — +1 CHA, consumed by diplomacy checks and the CHA vendor discount, injected at `effectiveStats`.
+
 - **Kind:** *(open design question — raised by OTA-1184, not a defect)*
 - **Found:** 2026-08-09, while building the story perks
 
@@ -678,13 +863,49 @@ is backwards, and quietly swapping the perk would have hidden a decision the own
 
 ### P4 — `data/spells/runecasters.json` is orphaned: 10 entries, zero importers
 
-- **Kind:** UNFINISHABLE *(content that cannot be reached because nothing loads it)*
+## ⛔ **NOT A DEFECT — SUPERSEDED, and the project's own docs said so three weeks before I filed it.**
+
+`docs/tartaria-hack-v2.5.txt`, annotated 2026-07-20: *"Shipped recipes are: 1x 'Blank Runecaster Casing (rarity)' + two ordinary reagents… gated at effective INT 11 (the INT-11 gate MATCHES the outline). **[PLANNED] the relic + transmutative-material structure described here survives only in an unused data file.**"* That unused data file is this one.
+
+⚠⚠ **I FILED A KNOWN, DOCUMENTED LEFTOVER AS A NEW DISCOVERY, TWICE, AND GOT THE SCALE WRONG BOTH TIMES.** See the corrected measurement below. The lesson for this list: **when a data file looks orphaned, read the docs before writing the entry** — this one had already been found, understood and annotated.
+
+- **Kind:** ~~UNFINISHABLE~~ → **SUPERSEDED** *(the design draft the shipped version replaced)*
 - **Found:** 2026-08-09 full loop audit
 
 `app/data/spells/runecasters.json` holds **10 entries** and **no file in `app/**` imports
 it** — verified by searching for the filename and for `spells/` across all `.ts`/`.tsx`.
-A separate, larger `app/data/items/runecasters.json` (**49 entries**) is the one the
-runecaster *weapon* class uses.
+⚠⚠ **CORRECTED 2026-08-09 — the sentence that stood here was WRONG.** It read: *"A
+separate, larger `app/data/items/runecasters.json` (49 entries) is the one the runecaster
+weapon class uses."* **It is not. Neither file is imported anywhere** — the 2026-07-20
+doc-vs-game audit already said so (`docs/tartaria-doc-vs-game-audit-2026-07-20.md:241`)
+and this entry read past it.
+
+**The measured picture, both files:**
+
+| File | Entries | Status |
+|---|---|---|
+| `data/spells/runecasters.json` | 10 spells, Common→Legendary, INT 6→18 | imported nowhere |
+| `data/items/runecasters.json` | 49 runecaster weapons | imported nowhere |
+
+⚠ Of the 49 weapons, **15 also exist in `weapons.json`** and are therefore reachable
+through the live catalog. **34 are not in `weapons.json` at all** — Whispering Flame,
+Tempest Call, Shockwave, Ice Vein, Emberstrike and 29 more exist nowhere in the game.
+
+**What `cast` does today:** the verb is live and routes to **Aethercraft** — shape /
+summon / mend, a real system with skill checks, race modifiers, corruption interaction and
+golem recipes. Roughly three of the ten spells overlap it under other names
+(`shape_aetherstone`, `summon_mud_arm`, `mold_ether`); **the other seven have no
+equivalent** — no ranged aetheric attack, no shield, no AoE, no evasion, no stealth.
+
+Both files date to the first commit (`d4698a3f`, 2026-05-15, "playable vertical slice") —
+original design the build grew past.
+
+**So it is three questions, not one:**
+1. **The 34 unreachable weapons** — authored and statted; they need catalog rows. Data
+   entry, not design. The cheapest content in the game.
+2. **The 7 unbuilt spells** — a genuine feature. Aethercraft is the spine that would carry
+   them, but it is a build, not a wiring job.
+3. **The 3 overlapping spells** — already exist as Aethercraft under other names.
 
 ⚠ **What this is NOT:** a claim that the spell system is broken. Runecasters exist as a
 class (`gameStore.ts:11137` gates them on INT ≥ 9) and their weapons resolve. The finding
@@ -695,6 +916,8 @@ were meant to be, and that is the owner's answer, not mine.
 ---
 
 ### P5 — The store says the location challenges are switched off. They are all on.
+
+## ✅ **CLOSED — OTA-1187.** The false comment is gone; a test pins the premise.
 
 - **Kind:** *(neither — a stale claim that would mislead the next audit)*
 - **Found:** 2026-08-09 full loop audit
@@ -859,6 +1082,36 @@ inline with explicit `kind: 'relic'`, `rarity: 'Rare'`, tags and description
 (`crafting.ts:230`). So a *genuinely* missing reward name would not error; it would silently
 hand the player junk with the right name. Nothing currently hits that, and the catalog check
 above is what keeps it that way.
+
+## SECOND-ROUND AUDIT — the 14, all checked (2026-08-09)
+
+Owner: *"audit the other 14 loops when done give me a new punch list."*
+
+| Loop | Verdict |
+|---|---|
+| Faction bounties | ✅ **TRACED** — pays TC + standing inside the kill handler; five guards (anti-camp, standing-on-target, board-freeze, deadline, slate cap) |
+| Escort missions | ✅ **TRACED** — completion pays scaled by surviving party (`escortPayMult`); failure drops the contract with narration |
+| Chapters | ✅ wired — `chapterCardFor` consumed at `gameStore.ts:34792` |
+| Story forks | ✅ wired — 3 importers incl. the ending screen |
+| Aetherkin | ✅ wired — encounter builder + reverence delta both live |
+| Crafting / Aethercraft | ✅ wired — 39 importers |
+| Corruption arc | ✅ wired — 4 importers; tiers drive stats, prices, encounter rate |
+| Core Guardians | ✅ **TRACED** — `core_recovered` advances the main-quest phase, which drives chapters, Arbiter stance and the ending |
+| Titles | ✅ **TRACED** — every engine title has a data row and vice versa (pinned by test since OTA-1183) |
+| Whispers | ✅ pays — TC on completion (`gameStore.ts:34435`) |
+| Dog rescue arc | ⚠ **PARTIAL** — rescue hooks and the `dog_quest` channel are live; the arc's *end* was not traced |
+| Golem companion arc | ⚠ **PARTIAL** — summon/arm/dismiss all live; no "arc" completion exists to trace |
+| Mysteries (the finding half) | ✅ wired — stage advance + artifact gate; turn-in closed by OTA-1185 |
+| **Maze / Labyrinth** | ❌ **P13** — an imperfect run ends in nothing |
+| **Buried Skyscraper** | ❌ **P14** — 100-floor dungeon, no entry point |
+| *(found alongside)* Relics data | ❌ **P15** — 2 of 3 files orphaned, 126 entries |
+
+⚠ **Two remain PARTIAL and are named rather than claimed clean.** The dog and golem arcs
+have working mechanics at every point checked, but neither has a completion event to trace
+— which may mean they are open-ended by design rather than broken. Saying so is not the
+same as having proved it.
+
+---
 
 ## NOT YET AUDITED
 

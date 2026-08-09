@@ -1,3 +1,4 @@
+import { findByTitle } from './titleMatch';
 // Hunt engine — long-form, multi-stage monster hunts (5-9 prep stages + a
 // final boss combat). Hunts are accepted from vendors or from beast-sign
 // hooks, scale the target enemy to the player's current power level, and
@@ -206,12 +207,12 @@ export function availableHunts(
   );
 }
 
+// ⚠ OTA-1188 — delegates to the shared three-tier resolver. The first two tiers are
+// the exact behaviour this function always had; the third catches the case the
+// parser creates by stripping stop words ("fragment red tower" vs "Fragment of the
+// Red Tower"), and only ever runs where this used to return null. See titleMatch.ts.
 export function fuzzyFindHunt(text: string, pool: readonly HuntDef[]): HuntDef | null {
-  const t = text.toLowerCase().trim();
-  if (!t) return null;
-  const exact = pool.find((h) => h.title.toLowerCase() === t);
-  if (exact) return exact;
-  return pool.find((h) => h.title.toLowerCase().includes(t) || t.includes(h.title.toLowerCase())) ?? null;
+  return findByTitle(text, pool);
 }
 
 /** ⚠ OTA-1167 — ceiling on the boss HP multiplier at full over-level. The old curve

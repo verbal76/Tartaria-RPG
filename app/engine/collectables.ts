@@ -225,11 +225,38 @@ export interface StoryPerk {
     ruinsDefenseBonus: number;
     mechanicalDamageDice: number;
     electricalDamageBonus: number;
+    charismaBonus: number;
     grantsColdResist: boolean;
   }) => void;
 }
 
 export const STORY_PERKS: readonly StoryPerk[] = [
+  {
+    // ⚠⚠ OTA-1189 (PUNCHLIST P6 CLOSED) — THE SIREN OF ZHARAK'S TEETH, at last.
+    //
+    // The owner picked this story for a perk in OTA-1184 and it was the one of six that did
+    // NOT ship: the obvious reading is resistance to the Siren's lure, and **the game has no
+    // charm, compulsion or mental-influence mechanic** (verified across statusEffects.ts and
+    // combatRules.ts). Inventing a status effect to justify a buff is backwards, so it was
+    // filed as an open design question instead of quietly substituted.
+    //
+    // Owner's answer (2026-08-09): *"p6 charisma?"* — and it fits both ways.
+    //
+    // ⚠ THE FICTION: five verses scratched inside a Reclaimer's flask, the hand growing more
+    // careful as it goes, the flask found empty. He is not resisting her. He is writing her
+    // down. What you inherit is not immunity to a voice — it is knowing how a voice takes
+    // hold, and being able to use it.
+    //
+    // ⚠ CONSUMED IN TWO PLACES, both already live and neither built for this:
+    //   • DIPLOMACY checks — `combatRules.ts:736` maps the diplomacy skill to charisma.
+    //   • VENDOR PRICING — `factionRapport.chaPriceDiscount` cuts buys and lifts sell-backs
+    //     once a faction's rapport quest is done (OTA-805).
+    // Injected into `effectiveStats`, the single funnel every stat read passes through, the
+    // same way OTA-910's Skyreacher DEX already is — so no call site can miss it.
+    storyId: 'story_siren',
+    label: '+1 Charisma — you know how a voice takes hold',
+    apply: (a) => { a.charismaBonus += 1; },
+  },
   {
     // Elior Zalmar built the Aetheric Engine. His logs trace the empire's last week from
     // triumph to mud — he understood the current better than anyone alive.
@@ -281,6 +308,7 @@ export function storyPerkModifiers(playerCollectables: readonly string[]): {
   ruinsDefenseBonus: number;
   mechanicalDamageDice: number;
   electricalDamageBonus: number;
+  charismaBonus: number;
   grantsColdResist: boolean;
 } {
   const acc = {
@@ -288,6 +316,7 @@ export function storyPerkModifiers(playerCollectables: readonly string[]): {
     ruinsDefenseBonus: 0,
     mechanicalDamageDice: 0,
     electricalDamageBonus: 0,
+    charismaBonus: 0,
     grantsColdResist: false,
   };
   const done = new Set(
