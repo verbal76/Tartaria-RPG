@@ -40,7 +40,9 @@ import { composeAndSendBugReport } from '../diagnostics/bugReport';
 import { loadCrashSave, clearCrashSave, buildCrashSaveExport, type CrashSaveCapture } from '../diagnostics/crashSave';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
-import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
+import { readSlotLog, loadSlot, importSaveAsNewSlot, type SlotSummary } from '../engine/saveSystem';
+// OTA-1178 — character backup / restore.
+import { encodeSaveExport, decodeSaveExport } from '../engine/saveExport';
 import { OTA_BUILD_ID, MINIMUM_RECOMMENDED_APK_BUILD } from '../buildInfo';
 import { getBuildCodename, getBuildCodenameOrNull, getApkCodename } from '../buildCodename';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -117,6 +119,12 @@ export function TitleScreen() {
     | { kind: 'resurrect'; slot: SlotSummary }
     | { kind: 'fallen'; slot: SlotSummary }
     | { kind: 'exit' }
+    // OTA-1178 — restore result. One modal for both outcomes: a restore that
+    // failed has to say WHY in words the player can act on (almost always
+    // "something truncated your paste"), and a restore that worked has to name
+    // the character so they know the right one came back.
+    | { kind: 'restored'; playerName: string; trimmed: boolean }
+    | { kind: 'restoreFailed'; reason: string }
     | null
   >(null);
 
@@ -258,6 +266,8 @@ export function TitleScreen() {
   // OTA 006 — separate latch for the SHARE action so the COPIED
   // and SHARED flashes don't fight each other on the same row.
   const [sharedSlotId, setSharedSlotId] = useState<string | null>(null);
+  // OTA-1178 — per-row "✓ BACKED UP" flash, same cadence as COPIED / SHARED.
+  const [backedUpSlotId, setBackedUpSlotId] = useState<string | null>(null);
   // OTA-063 — bug-report modal state. Open via the REPORT BUG button
   // on the bottom bar. On send, build the full report (description +
   // device summary + slot log), stage it on the clipboard, then open
@@ -452,6 +462,70 @@ export function TitleScreen() {
       setTimeout(() => setSharedSlotId((cur) => (cur === slot.slotId ? null : cur)), 1500);
     } catch {
       // User-cancelled or unsupported — no-op.
+    }
+  };
+
+  // ⚠⚠ OTA-1178 — BACK UP A CHARACTER. The owner reinstalled to clear a memory
+  // kill on 2026-08-08 and the character was gone for good: every save lives in
+  // AsyncStorage, which iOS deletes with the app, and nothing anywhere held a
+  // copy. OTA-344's atomic writes and OTA-395's trimming protect a save from
+  // processes; neither protects it from the phone.
+  //
+  // ⚠ SHARE FIRST, CLIPBOARD SECOND, and that order is from this app's own scar
+  // tissue. A save runs far past the 25,000 characters at which TitleScreen
+  // already chunks dead-character logs because "most chat clients silently
+  // truncate larger pastes" (OTA-023), and Share exists here precisely to bypass
+  // that (OTA-006/215). The clipboard copy still happens so a short save can be
+  // pasted straight into a note, but the share sheet is what opens.
+  const backUpSlot = async (slot: SlotSummary) => {
+    try {
+      const state = await loadSlot(slot.slotId);
+      if (!state) {
+        setPendingAction({ kind: 'restoreFailed', reason: `${slot.playerName}'s save could not be read from storage.` });
+        return;
+      }
+      const text = encodeSaveExport(state, {
+        playerName: slot.playerName,
+        raceName: slot.raceId,
+        locationName: slot.locationId,
+        exportedAt: Date.now(),
+      });
+      // Clipboard first so it is already there if the player dismisses the
+      // sheet — a cancelled share should not cost them the backup.
+      await Clipboard.setStringAsync(text).catch(() => { /* share is the real path */ });
+      setBackedUpSlotId(slot.slotId);
+      setTimeout(() => setBackedUpSlotId((cur) => (cur === slot.slotId ? null : cur)), 2000);
+      try {
+        await Share.share({ message: text, title: `Tartaria backup — ${slot.playerName}` });
+      } catch {
+        // Cancelled or unsupported — the clipboard copy above still stands.
+      }
+    } catch {
+      setPendingAction({ kind: 'restoreFailed', reason: 'The backup could not be created.' });
+    }
+  };
+
+  // ⚠⚠ OTA-1178 — RESTORE. Reads the clipboard, and NEVER overwrites: an import
+  // always mints a new slot (importSaveAsNewSlot). A player restoring a backup
+  // has already lost a character once, and no confirm dialog is a good enough
+  // guard against a mis-tap costing them a second one.
+  const restoreFromClipboard = async () => {
+    try {
+      const text = await Clipboard.getStringAsync();
+      const decoded = decodeSaveExport(text ?? '');
+      if (!decoded.ok) {
+        setPendingAction({ kind: 'restoreFailed', reason: decoded.reason });
+        return;
+      }
+      const written = await importSaveAsNewSlot(decoded.state);
+      if (!written.ok) {
+        setPendingAction({ kind: 'restoreFailed', reason: written.reason });
+        return;
+      }
+      await refreshSlots();
+      setPendingAction({ kind: 'restored', playerName: decoded.playerName, trimmed: written.trimmed });
+    } catch {
+      setPendingAction({ kind: 'restoreFailed', reason: 'The clipboard could not be read.' });
     }
   };
 
@@ -724,6 +798,26 @@ export function TitleScreen() {
             )}
           </Text>
         )}
+        {/* ⚠ OTA-1178 — BACK UP, on EVERY row, living and dead. The living
+            character is the one worth protecting; the dead one is the one whose
+            log you still want. Placed outside the `item.dead` block on purpose —
+            a backup you can only take after the character dies is not a backup. */}
+        <View style={styles.deadActions}>
+          <TouchableOpacity
+            style={styles.shareLogBtn}
+            onPress={(e) => {
+              e.stopPropagation?.();
+              void backUpSlot(item);
+            }}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Back up ${item.playerName}`}
+          >
+            <Text style={styles.shareLogText}>
+              {backedUpSlotId === item.slotId ? '✓ BACKED UP' : 'BACK UP'}
+            </Text>
+          </TouchableOpacity>
+        </View>
         {item.dead && (
           // Dead characters can't be loaded into a live session, so the
           // LogScreen path is closed to the player. Two row-local
@@ -1053,6 +1147,20 @@ export function TitleScreen() {
                 {bootGateOpen ? 'New Tartarian' : `${bootGateReason}`}
               </Text>
             </TouchableOpacity>
+            {/* OTA-1178 — restore a backed-up character from the clipboard.
+                Sits under New Tartarian because that is where a player goes when
+                they have no character and want one. It never overwrites: a
+                restore always arrives as an additional character. */}
+            <TouchableOpacity
+              style={[styles.secondaryBtn, !bootGateOpen && styles.btnDisabled]}
+              onPress={() => { void restoreFromClipboard(); }}
+              activeOpacity={0.7}
+              disabled={!bootGateOpen}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !bootGateOpen }}
+            >
+              <Text style={styles.secondaryBtnText}>Restore from backup</Text>
+            </TouchableOpacity>
             {/* 2026-05-25 — manual CHECK FOR OTA UPDATE button restored.
                 Removed in v2.4.1 (OTA 051) on the theory that the auto-
                 check in useEffect was sufficient. Playtester report:
@@ -1250,6 +1358,8 @@ export function TitleScreen() {
           : pendingAction?.kind === 'resurrect' ? 'Resurrect Tartarian'
           : pendingAction?.kind === 'fallen' ? 'Fallen'
           : pendingAction?.kind === 'exit' ? 'Exit Game'
+          : pendingAction?.kind === 'restored' ? 'Character restored'
+          : pendingAction?.kind === 'restoreFailed' ? 'Restore failed'
           : ''
         }
         body={
@@ -1261,6 +1371,17 @@ export function TitleScreen() {
             ? `${pendingAction.slot.playerName} has fallen and you hold no Resurrection Gems. The buried world keeps them for now.`
           : pendingAction?.kind === 'exit'
             ? 'Close Tartaria Realms? Any unsaved progress will be lost — use SAVE & EXIT from in-game to keep it.'
+          : pendingAction?.kind === 'restored'
+            // ⚠ Says "added" rather than "restored over", because that is what
+            // happened — the restore never replaces an existing character, and
+            // the player should not go looking for one that vanished.
+            ? `${pendingAction.playerName} has been added to your characters.${
+                pendingAction.trimmed
+                  ? ' The save was large, so some regenerable world detail was trimmed to fit. Your character, gear and progress are intact.'
+                  : ''
+              }`
+          : pendingAction?.kind === 'restoreFailed'
+            ? pendingAction.reason
           : undefined
         }
         buttons={
