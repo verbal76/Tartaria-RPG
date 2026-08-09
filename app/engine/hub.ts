@@ -77,6 +77,64 @@ export function hubNameForFaction(factionId: string | null | undefined): string 
   return map[factionId] ?? fallback;
 }
 
+// ⚠⚠ OTA-1209 — WHOSE COLOURS A HUB SITE WEARS. It used to be the PLAYER'S, everywhere.
+//
+// `hubRoomFor` and `hubNameForFaction` were called with `player.factionId` at all 17 of
+// their call sites, so a Mud Monarch saw "The Atrium" and "Monarch Court" at every outpost
+// in the world — including the Architects' own. One map wearing your colours wherever you
+// went, which is precisely why the world did not read as though factions held ground.
+//
+// ⚠ AND THE WORLD MAP ALREADY DISAGREED WITH IT. `MapScreen.OUTPOST_NAME_BY_LOCATION`
+// (arb105) tags each of the nine faction tiles with its OWNER'S outpost name, so the travel
+// list has always said "Monarch Waystation (Monarch Court)" — and then the interior called
+// itself yours. This makes the inside agree with the list that already shipped.
+//
+// ⚠ THE LAYOUT DOES NOT MOVE. This changes which set of NAMES is applied, nothing else:
+// `hubRoomFor` merges only name/shortName/description/open_air and takes exits,
+// interactables, tags and **anchorNpc** from the base room. Same graph, same doors, same
+// people. Who those people ANSWER FOR is a separate job and is PUNCHLIST P9.
+let OWNER_BY_LOCATION: Record<string, string> | null = null;
+function ownerByLocation(): Record<string, string> {
+  if (!OWNER_BY_LOCATION) {
+    // Lazy so `hub.ts` does not pull `character.ts`'s whole import chain at module load;
+    // it is a plain constant map, read once and cached.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { FACTION_STARTING_LOCATION } = require('./character') as typeof import('./character');
+    OWNER_BY_LOCATION = Object.fromEntries(
+      Object.entries(FACTION_STARTING_LOCATION).map(([factionId, locId]) => [locId, factionId]),
+    );
+  }
+  return OWNER_BY_LOCATION;
+}
+
+/** The faction that OWNS this hub site, or `null` where nobody does. */
+export function hubOwnerFaction(locationId: string | null | undefined): string | null {
+  if (!locationId) return null;
+  return ownerByLocation()[locationId] ?? null;
+}
+
+/** Whose colours to draw this hub site in.
+ *
+ *  ⚠⚠ AN OWNED SITE WEARS ITS OWNER'S COLOURS; EVERYWHERE ELSE IS UNCHANGED. Only nine of
+ *  the fourteen hub macro-locations have an owner in `FACTION_STARTING_LOCATION`. The
+ *  other five — the starter outskirts and the four lost capitals — fall back to the
+ *  player's faction, which is exactly today's behaviour, so this OTA moves nine sites and
+ *  regresses none.
+ *
+ *  ⚠ THE FIRST VERSION RETURNED `null` FOR THOSE FIVE, reasoning that neutral ground
+ *  should read as neutral. That is wrong on the data: `hubNameForFaction(null)` resolves to
+ *  `HUB.hubName`, which is **"Reclaimers' Outpost"** (the pre-OTA-030 single hub, still
+ *  anchored at `tartarian_outskirts` in `static_hub.json`). It would therefore have
+ *  renamed Asgardar, the Buried Cities, the Giant Vault and Drakova — four LOST CAPITALS,
+ *  owned by nobody and Reclaimer in no sense — to the Reclaimers' Outpost. Making a change
+ *  that improves nine places and spoils four is not an improvement. */
+export function hubSkinFactionFor(
+  locationId: string | null | undefined,
+  playerFactionId: string | null | undefined,
+): string | null {
+  return hubOwnerFaction(locationId) ?? playerFactionId ?? null;
+}
+
 export function findHubRoom(roomId: string | null | undefined): HubRoom | null {
   if (!roomId) return null;
   return HUB.rooms.find((r) => r.id === roomId) ?? null;

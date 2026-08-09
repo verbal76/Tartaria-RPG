@@ -1376,7 +1376,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1208`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1209`**,
 **golem-line `2026-08-09-1177`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1386,7 +1386,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.118**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.119**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,8 +1606,70 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ PUNCHLIST P2 CLOSED — THE TRADING POST TAKES ANY FACTION'S CONTRACT (2026-08-09,
-  latest). HAL + GOLEM.** HAL OTA-1208 / golem OTA-1185. **steam NOT included — batched (§2).**
+- **⚠⚠ A FACTION'S SITE WEARS ITS OWN COLOURS NOW, NOT THE VISITOR'S (2026-08-09, latest).
+  HAL + GOLEM.** HAL OTA-1209 / golem OTA-1186. **steam NOT included — batched (§2).**
+
+  Owner: *"do halem and the reskin"* — and, on why it matters: *"each outpost has a
+  separate physical map and they display in the map room, and the names are different."*
+
+  **WHAT IT WAS.** `hubRoomFor` and `hubNameForFaction` were called with `player.factionId`
+  at every one of their 17 call sites. A Mud Monarch saw "The Atrium" and "Monarch Court"
+  at every outpost in the world — the Architects' included. One map wearing your colours
+  wherever you went, which is why the world never read as though factions held ground.
+
+  ⚠⚠ **AND THE WORLD MAP ALREADY DISAGREED WITH THE INTERIOR.**
+  `MapScreen.OUTPOST_NAME_BY_LOCATION` (arb105) has tagged each of the nine faction tiles
+  with its OWNER'S outpost name since it shipped, so the travel list has always said
+  "Monarch Waystation (Monarch Court)" — and then the inside called itself yours. **This is
+  the interior being brought into line with a list that already shipped**, which is why it
+  is a correction rather than a new design.
+
+  ⚠ **THE LAYOUT DOES NOT MOVE.** Same 15-room graph, same exits, same tags, same
+  `anchorNpc`. `hubRoomFor` merges only name/shortName/description/open_air, and a test now
+  asserts every room keeps its exits, anchor, tags and interactables under a foreign skin.
+  **Who those anchors ANSWER FOR is untouched, and is PUNCHLIST P9** — the third and
+  largest of the three P2 jobs, filed at the owner's instruction rather than done here.
+
+  ⚠ **Specifically pinned: the OTA-1208 broker is still at `outpost_gate` under all nine
+  skins.** If a skin could move an anchor, the trading post could vanish from a site and
+  take the P2 fallback with it.
+
+  ⚠⚠ **THE FIRST VERSION RETURNED `null` FOR UNOWNED SITES**, on the reasoning that neutral
+  ground should read as neutral. **VERIFIED WRONG (2026-08-09)** against the data:
+  `hubNameForFaction(null)` resolves to `HUB.hubName`, which is **"Reclaimers' Outpost"**
+  (the pre-OTA-030 single hub, still anchored at `tartarian_outskirts` in
+  `static_hub.json`). It would have renamed Asgardar, the Buried Cities, the Giant Vault and
+  Drakova — four LOST CAPITALS, owned by nobody and Reclaimer in no sense — to the
+  Reclaimers' Outpost. **Nine sites move; the other five keep today's behaviour exactly.**
+  A change that improves nine places and spoils four is not an improvement.
+
+  **Tests:** new suites `ota1209SiteSkin` (16) and `ota1209SiteSkinLive` (5).
+
+  ⚠⚠ **THE LIVE SUITE EXISTS BECAUSE THE UNIT SUITE COULD NOT HAVE CAUGHT A NO-OP.** The
+  16 unit tests call `hubSkinFactionFor` directly, so they prove the resolver is right and
+  say nothing about whether the app hands it the arguments it needs. The whole change hangs
+  on `player.currentLocationId` holding the hub MACRO-location while the player is inside a
+  room — had it held the room id, every lookup would miss, the fallback would return the
+  player's faction, and the OTA would have shipped as a silent no-op with 16 green tests
+  behind it. That is the same failure that put two wrong claims in the P2 entry: reading the
+  layer above and the layer below without running the one between. It is now asserted live.
+
+  ⚠ **Three assertions retargeted before landing, and all three are worth reading:**
+  1. The regex meant to catch *"a call site passing the player's faction raw"* **matched the
+     FIXED code** — the nested `hubSkinFactionFor(player.currentLocationId, player.factionId)`
+     ends in exactly that text. A pattern that cannot tell the fix from the defect guards
+     nothing. Now checked per call site, accepting the inline resolver or its hoisted result.
+  2. The live suite first asserted `currentScene.hubName` and got `undefined` three times:
+     `hubName` is an ARGUMENT to `buildOpeningNarrative`, not a field on the scene. The
+     header the player reads is a world log line.
+  3. Rewritten onto the log, it then joined the WHOLE feed and failed — the character's own
+     opening scene at their own starting site is still in it, so "Monarch Court" was present
+     at the Architect Blind, written three arrivals earlier. **A feed assertion that does not
+     bound its window is reading someone else's sentence.** Now scoped to the lines this
+     arrival emitted.
+
+- **⚠⚠ PUNCHLIST P2 CLOSED — THE TRADING POST TAKES ANY FACTION'S CONTRACT (2026-08-09).
+  HAL + GOLEM.** HAL OTA-1208 / golem OTA-1185. **steam NOT included — batched (§2).**
 
   Owner, on the P2 options: *"so the best path for p2 is the Halem anchor? and this can be
   done without restructuring the whole game?"* — then *"do halem."*
