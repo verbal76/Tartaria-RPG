@@ -1392,6 +1392,15 @@ export interface PlayerCharacter {
    *  fix for an ends-in-nothing must not become. Absent on an old save reads as
    *  "not yet seen", so a character who already walked it gets the ending next time. */
   labyrinthHeartSeen?: boolean;
+
+  /** ⚠ OTA-1214 — AETHER TECHNIQUES the character has learned. Ids from
+   *  `engine/aetherTechniques.ts`. Absent on an old save reads as "knows none", which is
+   *  correct: they are acquired, never granted at creation. */
+  knownTechniques?: string[];
+  /** ⚠ OTA-1214 — per-technique practice count, keyed by technique id (owner: growth is
+   *  per-technique, not one global aether skill, so a character specialises into what they
+   *  actually practise). Only MEANINGFUL uses increment it — see `practiceCounts`. */
+  techniqueProficiency?: Record<string, number>;
   /** Deterministic seed used to generate this character's procedural world map. */
   mapSeed?: string;
   /** Last spot key the player dug at (`locationId:x:y`). Must move away
