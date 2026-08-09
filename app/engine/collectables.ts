@@ -190,3 +190,116 @@ export function assembledStory(
   const owned = new Set(playerCollectables);
   return { story, parts: story.fragments.filter((f) => owned.has(f.id)) };
 }
+
+// ---------------------------------------------------------------------------
+// OTA-1207 — STORY PERKS. Owner's call (2026-08-09): *"see if there are certain stories
+// that lead well into adding an active buff… it doesn't have to be for all of them, but
+// enough to make it worthwhile collecting them."*
+// ---------------------------------------------------------------------------
+//
+// ⚠⚠ EVERY PERK HERE HAS A VERIFIED CONSUMPTION POINT. That is the rule this table lives
+// under, and it is not decoration: a perk that aggregates and is never read is a NEW
+// "ends in nothing" — the exact defect P1 was filed for. Each row below names where it
+// lands, and there is a test asserting the consumer exists.
+//
+// ⚠ THE SIREN OF ZHARAK'S TEETH IS DELIBERATELY ABSENT. The owner picked it (charm
+// resistance, from the verses scratched inside an empty flask) and it is a good fit —
+// but **the game has no charm or mental-influence mechanic to resist.** Searched
+// `statusEffects.ts` and `combatRules.ts`: nothing. Shipping it would have meant
+// inventing a status effect to justify a buff, which is backwards. It stays on the punch
+// list as a design question, not a silent omission.
+//
+// ⚠ THE FAMILY IN THE MUD is absent by the owner's own instruction — dropped in favour of
+// The Siege of St. Petersburg. It remains pure lore, which is the point: not every story
+// pays a buff, so the ones that do stay meaningful.
+
+/** A completed story's passive contribution. Field names match `TitlePerks` so both
+ *  sources merge into one accumulator and every existing consumer sees them. */
+export interface StoryPerk {
+  /** The completed story. */
+  storyId: string;
+  /** One line, player-facing, shown on the Collectibles tab. */
+  label: string;
+  apply: (acc: {
+    tradeBonus: number;
+    ruinsDefenseBonus: number;
+    mechanicalDamageDice: number;
+    electricalDamageBonus: number;
+    grantsColdResist: boolean;
+  }) => void;
+}
+
+export const STORY_PERKS: readonly StoryPerk[] = [
+  {
+    // Elior Zalmar built the Aetheric Engine. His logs trace the empire's last week from
+    // triumph to mud — he understood the current better than anyone alive.
+    // ⚠ Consumed: gameStore attack path, beside the Bane-of-Sentinels die roll.
+    storyId: 'story_zalmar_cascade',
+    label: '+1 damage with electrical and Aetheric weapons',
+    apply: (a) => { a.electricalDamageBonus += 1; },
+  },
+  {
+    // Five inscriptions carved into the cliffs above the Urals, letters taller than a
+    // person. Whoever carved them stood in that cold long enough to finish.
+    // ⚠ Consumed: `playerArmorResistKinds` — ONE function, ~16 call sites (weather ticks,
+    // stat modifiers, attack penalties, visibility). Adding the kind there means the perk
+    // works everywhere resistance already matters, with no new plumbing.
+    storyId: 'story_giant',
+    label: 'You endure cold as though armoured against it',
+    apply: (a) => { a.grantsColdResist = true; },
+  },
+  {
+    // A merchant turned Reclaimer, seven journal entries tracing one relic from purchase
+    // to the Mud Seas, hand cramping worse with each. He learned what things really cost.
+    // ⚠ Consumed: sell pricing (`tradeBonus` → +5% per point on relic trades).
+    storyId: 'story_reclaimer_greed',
+    label: '+1 Trade — you know what a thing is worth',
+    apply: (a) => { a.tradeBonus += 1; },
+  },
+  {
+    // Logic Core 04-B guarded the Grand Spire and, over seven timestamped chits, learned
+    // to wonder. Reading it is reading how the machines think.
+    // ⚠ Consumed: the existing mechanical-damage die roll vs automation/construct/sentinel.
+    storyId: 'story_sentinel',
+    label: '+1d6 damage against machines',
+    apply: (a) => { a.mechanicalDamageDice += 1; },
+  },
+  {
+    // Six diary days from a tunnel soldier who survived a three-day battle the official
+    // record says never happened. He learned what a wall is worth.
+    // ⚠ Consumed: AC in a `constructed_environment` context.
+    storyId: 'story_siege',
+    label: '+1 defence inside ruins and structures',
+    apply: (a) => { a.ruinsDefenseBonus += 1; },
+  },
+];
+
+/** Aggregate the perks the player has actually earned. ⚠ Reads COMPLETED sets only —
+ *  a partial collection grants nothing, which is what makes finishing one worth doing. */
+export function storyPerkModifiers(playerCollectables: readonly string[]): {
+  tradeBonus: number;
+  ruinsDefenseBonus: number;
+  mechanicalDamageDice: number;
+  electricalDamageBonus: number;
+  grantsColdResist: boolean;
+} {
+  const acc = {
+    tradeBonus: 0,
+    ruinsDefenseBonus: 0,
+    mechanicalDamageDice: 0,
+    electricalDamageBonus: 0,
+    grantsColdResist: false,
+  };
+  const done = new Set(
+    computeAllProgress(playerCollectables).filter((p) => p.complete).map((p) => p.story.id),
+  );
+  for (const perk of STORY_PERKS) {
+    if (done.has(perk.storyId)) perk.apply(acc);
+  }
+  return acc;
+}
+
+/** The perk line for a story, or null if it pays lore only. Drives the Collectibles tab. */
+export function storyPerkLabel(storyId: string): string | null {
+  return STORY_PERKS.find((p) => p.storyId === storyId)?.label ?? null;
+}

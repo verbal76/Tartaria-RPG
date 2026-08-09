@@ -1376,7 +1376,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1206`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1207`**,
 **golem-line `2026-08-09-1177`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1386,7 +1386,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.116**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.117**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,8 +1606,55 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ PUNCHLIST P1 CLOSED — A COMPLETED COLLECTIBLE SET NOW PAYS OUT (2026-08-09,
-  latest). HAL + GOLEM.** HAL OTA-1206 / golem OTA-1183. **steam NOT included — batched
+- **⚠⚠ COMPLETED COLLECTIBLE STORIES NOW GRANT PERMANENT BUFFS (2026-08-09, latest).
+  HAL + GOLEM.** HAL OTA-1207 / golem OTA-1184. **steam NOT included — batched (§2).**
+
+  Owner: *"see if there are certain stories that lead well into adding an active buff…
+  it doesn't have to be for all of them, but enough to make it worthwhile collecting
+  them."* Then, on the shortlist: *"I like 5 of the 6, drop the mud family and add the st.
+  petersburg perk story."*
+
+  **The five, each drawn from its own text:**
+  - **Elior Zalmar** — built the Aetheric Engine → **+1 damage on electrical/aetheric swings**
+  - **The Giant's Watch** — inscriptions carved into the Ural cliffs → **cold resistance**
+  - **The Greedy Reclaimer** — a merchant tracing one relic to the Mud Seas → **+1 Trade**
+  - **Logic Core 04-B** — a Sentinel learning to wonder → **+1d6 vs machines**
+  - **The Siege of St. Petersburg** — a tunnel soldier who held for three days → **+1 defence in ruins**
+
+  ⚠ **Only a COMPLETED set pays.** A partial collection grants nothing — that is what makes
+  finishing one worth doing, and half the stories still pay lore only (owner's design), so
+  the five that do stay meaningful.
+
+  **⚠⚠ THE RULE THIS SHIPPED UNDER, and it is the important part: EVERY PERK HAS A VERIFIED
+  CONSUMPTION POINT.** A buff that aggregates and is never read is a NEW "ends in nothing" —
+  the exact defect P1 was filed for. **Adding five unread buffs while closing P1 would have
+  been the funniest possible own goal**, so most of the test suite asserts the consumers
+  exist rather than the perks compute.
+
+  - Three ride EXISTING consumers — `tradeBonus` (sell price), `ruinsDefenseBonus` (AC in a
+    `constructed_environment`), `mechanicalDamageDice` (attack path) — by merging into the
+    **one** accumulator every consumer already calls (`titlePerkModifiers`). ⚠ A parallel
+    `collectionPerkModifiers` would have meant finding and updating every call site, and
+    **missing one silently is exactly how a buff ends up aggregated and never read.**
+  - **Electrical damage** is newly wired beside the mechanical die. ⚠ **Gated on the
+    WEAPON's damage type, not the enemy's** — Zalmar taught how to drive the current, not
+    what to point it at.
+  - **Cold resist** is injected into `playerArmorResistKinds` — the single function that
+    ~16 sites read (weather ticks, weather stat modifiers, attack penalties, visibility).
+    ⚠ Injecting at the source means no site is silently missed, and it will not double-add
+    over armour that already resists cold.
+
+  **⚠⚠ THE SIREN OF ZHARAK'S TEETH WAS CHOSEN AND IS NOT SHIPPED — see PUNCHLIST P6.**
+  The theme fits (five verses scratched inside an empty flask), but **the game has no
+  charm, compulsion or mental-influence mechanic to resist** — verified across
+  `statusEffects.ts` and `combatRules.ts`. Shipping it would have meant inventing a status
+  effect to justify a buff, which is backwards; quietly swapping it for something else
+  would have hidden a decision the owner made. It is filed as an open design question with
+  two ways to close it.
+
+  **Tests:** new suite `ota1207StoryPerks` (19). Gates green — 730 suites / 6774 tests.
+
+- **⚠⚠ PUNCHLIST P1 CLOSED — A COMPLETED COLLECTIBLE SET NOW PAYS OUT (2026-08-09). HAL + GOLEM.** HAL OTA-1206 / golem OTA-1183. **steam NOT included — batched
   (§2).**
 
   **57 fragments across 10 character stories** — the largest gather loop in the game — used

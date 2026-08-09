@@ -139,9 +139,15 @@ export interface TitlePerks {
   // ── Skyreacher (OTA-910) ──────────────────────────────────────────────
   climbFallHalved: boolean;     // Skyreacher — halves climb-fall damage
   dexterityBonus: number;       // Skyreacher — passive +DEX (folds into effectiveStats)
+  /** OTA-1207 — flat damage added when the swing's type is electrical or aetheric.
+   *  Granted by the Elior Zalmar collectible story. ⚠ Consumed in the store's attack
+   *  path beside the mechanical-damage die; a perk with no consumer is a new
+   *  "ends in nothing" and this one is wired. */
+  electricalDamageBonus: number;
 }
 
 export const EMPTY_TITLE_PERKS: TitlePerks = {
+  electricalDamageBonus: 0,
   investigationBonus: 0, loreBonus: 0, tradeBonus: 0, repairBonus: 0,
   socialBonus: 0, leadershipBonus: 0, mechanicalDamageDice: 0,
   golemEdge: false, ethericDamageResist: false, envHazardSaveBonus: 0,
@@ -449,12 +455,29 @@ export function newlyEarnedTitles(player: PlayerCharacter): string[] {
   return evaluateEarnedTitles(player).filter((id) => !already.has(id));
 }
 
-/** Aggregate passive perks from the player's earned titles. */
+/** Aggregate passive perks from the player's earned titles AND completed collectible
+ *  stories.
+ *
+ *  ⚠⚠ OTA-1207 — STORY PERKS MERGE HERE, INTO THE ONE ACCUMULATOR, ON PURPOSE. Every
+ *  existing consumer already calls this function (`equipment.ts:779`,
+ *  `combatRules.ts:828`, the sell-price path, the ruins-AC path), so folding the story
+ *  perks in at the source means `tradeBonus`, `ruinsDefenseBonus` and
+ *  `mechanicalDamageDice` start working for collectibles with ZERO new consumption code.
+ *  A parallel `collectionPerkModifiers` would have meant finding and updating every one
+ *  of those sites — and missing one silently is exactly how a buff ends up aggregated
+ *  and never read. */
 export function titlePerkModifiers(player: PlayerCharacter): TitlePerks {
   const acc: TitlePerks = { ...EMPTY_TITLE_PERKS };
   const earned = new Set(player.earnedTitles ?? []);
   for (const t of WIRED_TITLES) {
     if (earned.has(t.id)) t.perk(acc);
   }
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { storyPerkModifiers } = require('./collectables') as typeof import('./collectables');
+  const sp = storyPerkModifiers(player.collectables ?? []);
+  acc.tradeBonus += sp.tradeBonus;
+  acc.ruinsDefenseBonus += sp.ruinsDefenseBonus;
+  acc.mechanicalDamageDice += sp.mechanicalDamageDice;
+  acc.electricalDamageBonus += sp.electricalDamageBonus;
   return acc;
 }
