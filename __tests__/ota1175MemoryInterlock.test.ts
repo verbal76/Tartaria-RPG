@@ -94,7 +94,17 @@ describe('OTA-1175 — a memory warning now silences the watchdog', () => {
     expect(STORE).toContain('if (rpQwenStoodDownForMemory || Date.now() < rpMemoryPressureUntil)');
     const i = STORE.indexOf('if (rpQwenStoodDownForMemory || Date.now() < rpMemoryPressureUntil)');
     // Must RETURN, not fall through to the kick.
-    expect(STORE.slice(i, i + 1000)).toContain('return false;');
+    // ⚠ WINDOW-FREE, and deliberately so. This was `STORE.slice(i, i + 1000)` and it is the
+    // FIFTH fixed-size source slice to age this session — OTA-1181 restructured the two
+    // stand-down messages onto separate branches and pushed `return false;` past the
+    // magic number. The claim never changed; the window kept going stale, and a slice that
+    // falls short reads as "the guard is gone" rather than "my window is too small".
+    // Anchored on real landmarks instead: the refusal must come after the gate and BEFORE
+    // the reload kick, which is the actual property.
+    const ret = STORE.indexOf('return false;', i);
+    const kick = STORE.indexOf('qwenReinitAttempts += 1;', i);
+    expect(ret).toBeGreaterThan(i);
+    expect(kick).toBeGreaterThan(ret);
   });
 
   it('⚠⚠ AND THE GATE SITS BEFORE THE KICK, not after it', () => {

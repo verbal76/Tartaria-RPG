@@ -124,7 +124,10 @@ describe('OTA-1180 — the report block says whether the model loaded', () => {
     // the engine believed it was ready; the owner had to be told to cross-reference a
     // memory-warning line forty entries down the log.
     expect(code).toContain('Narration engine:');
-    expect(code).toContain('useGameStore.getState().qwenStatus');
+    // ⚠ RETARGETED BY OTA-1181, which destructured the read to also pull `qwenError`.
+    // The claim is "the block reads the live engine status", not "it reads it on one line".
+    expect(code).toContain('useGameStore.getState()');
+    expect(code).toContain('st.qwenStatus');
   });
 
   test('and it cannot break the export', () => {
