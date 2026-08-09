@@ -591,6 +591,41 @@ instead of stranding the contract. **P9 can now be taken purely on its merits.**
 
 ---
 
+### P11 — HaL2001 lets you leave the outpost from any room; golem-line does not
+
+- **Kind:** LINE DIVERGENCE *(not a defect on either line — a decision that was only ever made on one of them)*
+- **Found:** 2026-08-09, when `verify-parity` flagged `InputBox.tsx` during the OTA-1186 port
+- ⚠ **Not an "ends in nothing."** Filed here because it is the owner's call and because it
+  will keep flagging parity on every future port that touches this file.
+
+`fix(golem-line): EXIT chip only in the gate room` (`e04a6ed5`, 2026-06-27) added
+`roomIsExit` / `hubDefinesExitRoom` to golem's `hub.ts` and gated the hub OUT chip:
+
+> *"The outpost is a 15-room layout entered/left through `outpost_gate` (tagged 'entrance',
+> and the spawn room). But InputBox rendered the EXIT chip in EVERY hub room, so the player
+> could leave through the armory/mess/etc. — not how the outpost is laid out."*
+
+**It was never ported up.** So today:
+
+| Line | Leaving an outpost |
+|---|---|
+| golem-line | walk to the Gate, then OUT |
+| **HaL2001 (the live line)** | **OUT from any of the 15 rooms** |
+
+⚠ **The live line is the one without the fix**, which is the wrong way round — and the
+reasoning in that commit applies to HAL exactly as written, since both lines share the
+same 15-room layout and the same `entrance`-tagged gate.
+
+⚠ **NOT ported here, deliberately.** It came from `engine_Dev`, which is off limits, and
+it changes how every player leaves every outpost — that is a feel decision, not a defect
+fix, and it is not what "do halem and the reskin" asked for.
+
+**The question for the owner:** port it up to HAL so both lines agree, or drop it from
+golem so both lines agree the other way? Either closes the parity flag; leaving it is the
+only option that keeps `InputBox.tsx` diverging forever.
+
+---
+
 ### P10 — The Hidden Market hands out contracts it cannot take back
 
 - **Kind:** INCOHERENCE *(no longer a dead end — the broker covers it)*
