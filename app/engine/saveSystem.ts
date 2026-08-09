@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { FallenGearPiece, SaveState } from './types';
 import { capDiskLog } from './diskLogCap';
+// OTA-1201 — import path trims like the store's persist path does; saveSlot does not.
+import { trimSaveStateToFit } from './saveTrim';
 
 // v2 schema: multi-slot. Each character is its own keyed save with its
 // own log; an index file lists summaries for the title screen.
@@ -485,6 +487,55 @@ async function readCreatedAt(slotId: string): Promise<number | null> {
   const all = await listSlots();
   const found = all.find((s) => s.slotId === slotId);
   return found?.createdAt ?? null;
+}
+
+/** OTA-1201 — restore an exported character. ⚠⚠ ALWAYS A NEW SLOT, NEVER AN
+ *  OVERWRITE, and this is the property the whole feature is built around: a
+ *  player restoring a backup has already lost something once, and no confirm
+ *  dialog is a good enough guard against a mis-tap that would cost them a second
+ *  character. There is no overwrite path here, not even opt-in.
+ *
+ *  ⚠ AND IT VERIFIES INSTEAD OF ASSUMING. `saveSlot` deliberately NEVER THROWS —
+ *  its callers `void persist()` fire-and-forget, so it stamps `lastSaveWriteError`
+ *  and returns quietly on a failed write. An importer that just awaited it would
+ *  report "restored!" over a slot that does not exist, which is precisely the
+ *  class of bug this codebase has hunted before: a writer claiming success
+ *  without checking. So this reads the character back off disk before it says a
+ *  word. */
+export async function importSaveAsNewSlot(
+  state: SaveState,
+): Promise<{ ok: true; slotId: string; trimmed: boolean } | { ok: false; reason: string }> {
+  const slotId = newSlotId();
+  clearLastSaveWriteError();
+
+  // ⚠ Trim on the way in. `saveSlot` does NOT trim — the store's persist path
+  // does (OTA-395/396), so a save arriving through this door would skip it
+  // entirely and fail the readback verify on an oversized blob. An import from a
+  // device with a bigger storage window is exactly how that happens.
+  const trim = trimSaveStateToFit({ ...state, version: 1, savedAt: Date.now() });
+
+  await saveSlot(slotId, trim.state);
+
+  const writeErr = getLastSaveWriteError();
+  if (writeErr) {
+    clearLastSaveWriteError();
+    return { ok: false, reason: `The restored character could not be written to storage — ${writeErr}` };
+  }
+
+  // Read it back. Cheap, and it is the difference between reporting what we did
+  // and reporting what we hoped.
+  const back = await loadSlot(slotId);
+  if (!back || !back.player) {
+    return { ok: false, reason: 'The restored character did not survive the write. Nothing was changed.' };
+  }
+  const listed = (await listSlots()).some((s) => s.slotId === slotId);
+  if (!listed) {
+    // The save landed but the title screen would never show it — worse than a
+    // clean failure, because the player would think it worked.
+    return { ok: false, reason: 'The character was saved but did not appear in the character list. Nothing was changed.' };
+  }
+
+  return { ok: true, slotId, trimmed: trim.trimmed };
 }
 
 export async function deleteSlot(slotId: string): Promise<void> {

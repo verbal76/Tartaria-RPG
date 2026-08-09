@@ -1354,7 +1354,7 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1200`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1201`**,
 **golem-line `2026-08-09-1177`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1364,7 +1364,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.110**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.111**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1584,7 +1584,7 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE FIRST HARD NUMBER, AND AN INSTRUMENT INSTEAD OF A FIX (2026-08-09, latest).
+- **⚠⚠ THE FIRST HARD NUMBER, AND AN INSTRUMENT INSTEAD OF A FIX (2026-08-09).
   HAL + GOLEM.** HAL OTA-1200 / golem OTA-1177. **steam NOT included — batched (§2).**
 
   **MEASURED: 2026-08-08, three JetsamEvent reports off the owner's iPhone XR (3GB),
