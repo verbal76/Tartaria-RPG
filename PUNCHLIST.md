@@ -163,16 +163,55 @@ even when it is the second.
 
 **Sequence matters more than the individual pieces.**
 
-**STEP 1 — P3 first: turn on the remote hand-in.** Small, already written, already
-documented as working. It removes the unfinishable state for all 17 quest lines
-immediately, and — critically — **it is the safety net that makes Step 2 safe.**
+**STEP 1 — a safety net that does not reverse a single owner decision.**
 
-⚠ **UPDATED 2026-08-09 by the P3 full audit (below).** The cost is no longer an open
-question — the audit proposes it concretely (25% TC cut, full rep, no long-haul bonus,
-12 in-game hours to credit) and shows that the anti-farming rationale this was switched
-off for **was never the actual rationale**, and does not apply to this content. The audit
-also adds a piece Step 1 needs: **P3-C**, the board/hall turn-in fallback, without which
-hunts/mysteries/storylines still cannot be handed in at the board that posted them.
+⚠⚠ **REVISED 2026-08-09. The original Step 1 was "turn the remote hand-in back on", which
+made P2 wait on a design call the owner has not made** (*"we are still debating wiring
+changes for p2"*). There is a cheaper net that needs no such call, and it was already
+standing in every outpost.
+
+**HALEM THE TRADER — the broker.**
+
+| Fact | Verified at |
+|---|---|
+| `faction: null` | `data/npcs/vendors.json` |
+| Anchored in **two rooms** of the shared hub layout | `data/world/static_hub.json:45, :126` |
+| That layout is used by **every outpost in the game** | P2, point 3 |
+| *"General Goods… runs the village trading post"* | his own data row |
+
+He is already written as the man everything passes through — *"Everything on this post came
+off somebody who needed something else more… things that have changed hands enough times
+to look new."* (`dialogue_topics.json:173`)
+
+**Why this beats the courier as the net:**
+
+1. ⚠ **It reverses nothing.** The owner's call was *"kill all remote hand-ins, make all
+   routable, but make the journey worth the loot."* A hand-in to Halem is **face to face at
+   an outpost you travelled to.** Every word of that instruction still holds.
+2. **It is smaller.** No remote path revived, no delay timer, no courier fiction, no
+   parser route. One branch ahead of the faction gate in four handlers.
+3. **It needs no placement work.** He is already at every outpost, in two rooms.
+4. **It closes the hostility trap that blocks Step 2.** Hostile to the Architects and
+   unable to enter the Blind? Halem takes it.
+5. **It fixes P2 on its own**, before any anchoring work at all.
+
+**Proposed terms:** **full rep, 20% TC cut, no long-haul bonus.** The faction's own agent
+therefore pays base + up to 1.5× base + full rep; Halem pays 0.8× base and no bonus. Same
+shape as the OTA-456 courier that the owner approved, minus the part he later removed.
+
+⚠ **Scope it to Halem by ID (`halem_trader`), NOT to "any vendor with a null faction."**
+Six vendors are factionless, and four of them — Naha, Thalan, Velar, Elara — are wanderers
+and specialists who turn up **on the road**. Keying on `faction: null` would make the
+fallback available anywhere a drifter spawns and delete the travel entirely, which is the
+one thing OTA-824 was actually about. Keying on the trading post keeps the rule *"reach an
+outpost."*
+
+⚠ **Still needs P8** (the board/hall fallback), which is a separate item and a separate
+defect: Halem answers *"the right faction's agent isn't here"*; P8 answers *"there is no
+agent here at all."*
+
+⚠ **This does not close P3.** The courier question is still open and still the owner's —
+this only removes P3 from P2's critical path.
 
 **STEP 2 — faction-site anchoring, using `FACTION_STARTING_LOCATION` as the ownership map.**
 - At **your own** faction's site: nothing changes. Your reskin, your board, your agents.
@@ -183,8 +222,9 @@ hunts/mysteries/storylines still cannot be handed in at the board that posted th
 
 **STEP 3 — the hostility consequence stops being a trap and becomes a mechanic.** With
 Step 1 in place, being hostile to the Architects means you cannot walk into the Blind, so
-you pay the courier premium instead. That is a decision with a cost, which is a game.
-**Without Step 1 it is a dead end**, which is why the order is not negotiable.
+you take the broker's cut at the trading post instead. That is a decision with a cost,
+which is a game. **Without Step 1 it is a dead end**, which is why the order is not
+negotiable.
 
 ⚠ **Do NOT ship Step 2 before Step 1.** It would trade one unfinishable state for another.
 
