@@ -1354,7 +1354,7 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1203`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1204`**,
 **golem-line `2026-08-09-1177`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1364,7 +1364,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.113**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.114**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1584,8 +1584,67 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠ THE REASON, NOT JUST THE VERDICT (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1204
+  / golem OTA-1181. **steam NOT included — batched (§2).**
+
+  **MEASURED: owner report, 2026-08-09, build `2026-08-09-1203` — and the good news first,
+  because OTA-1203's fix is confirmed working end to end:**
+
+  ```
+  Boot stage: qwen:failed          ← was falsely `qwen:done` one build ago
+  Narration engine: failed         ← the new line, correct
+  Last init attempt:  03:50:28.146Z
+  Last init success:  03:50:25.130Z  ← success now PRECEDES the attempt: the attempt
+                                       failed and wrote nothing. Exactly the signature
+                                       that was inverted before.
+  ```
+
+  **⚠⚠ AND WHAT IT COULD NOT ANSWER, WHICH IS THIS OTA.** Three reports in a row have now
+  said the model does not load. **Not one could say WHY.** `qwenError` has been in the
+  store the entire time — `bootQwen()` writes it on every failure
+  (`qwen.getLastError() ?? 'Qwen failed to initialize'`) — and it was surfaced **nowhere**:
+  not the report, not `mlHealth`, not the log. Every theory about that failure has been
+  inference over an answer the app already had. The report now prints `Why: <error>`
+  beneath the engine line. ⚠ Only when the status is actually `failed` — a stale error
+  string under a healthy engine would read as a live failure on a working session.
+
+  **⚠ SECOND FIX — A PERMANENT MESSAGE THAT REPEATED.** The same log:
+
+  ```
+  03:53:17.845  qwen-watchdog: 3 memory warnings this session — STANDING DOWN for good.
+  03:53:52.943  qwen-watchdog: 5 memory warnings this session — STANDING DOWN for good.
+  03:53:57.963  qwen-watchdog: 6 memory warnings this session — STANDING DOWN for good.
+  ```
+
+  ⚠ **The BEHAVIOUR was right** — no reload followed any of them, the interlock did its
+  job. But `rpMemoryQuietLogged` is reset by every memory warning, which is correct for the
+  90-second quiet notice (each warning genuinely opens a new window) and wrong for the
+  permanent stand-down, whose entire claim is that it happens once. They were sharing one
+  flag because they shared one ternary. Now separate branches, separate flags; the
+  stand-down flag is cleared only by the watchdog restart. **A line that says "for good"
+  three times reads as a loop that is not happening**, which is the worst thing a
+  diagnostic log can do.
+
+  **⚠ WHAT THIS SESSION'S REPORT ALSO SETTLED ABOUT THE MEMORY HUNT, stated as measurement
+  and not as conclusion:** six memory warnings, every one `qwen='idle'`/`'downloading'`
+  with `voice='ready'`, `Opened: 0` contexts all session, and **no kill** — the owner
+  played a full five-raider fight, died, resurrected, and the app survived. So: the ~400MB
+  LLM is definitively **not** what the OS is objecting to (it was never loaded), the
+  OTA-1198 stand-down is what is keeping the session alive, and the cost is
+  template-only narration. ⚠ The voice model is the only large native allocation
+  demonstrably resident during those warnings — **a candidate, still unmeasured**, and
+  deliberately not acted on. The `Why:` line above is the next real datum.
+
+  **Tests:** new suite `ota1204WhyItFailed` (9). ⚠ **Two assertions retargeted
+  (`ota1198`, `ota1203`), and the `ota1198` one is now WINDOW-FREE.** It was the **fifth**
+  fixed-size source slice to age this session, so rather than pick a sixth magic number it
+  is anchored on real landmarks: the refusal must fall between the gate and the reload
+  kick, which is the actual property being claimed. The standing item recorded under
+  OTA-1203 is being worked off rather than re-patched. Gates green — 727 suites / 6719
+  tests.
+
 - **⚠⚠ A FAILED MODEL LOAD WAS RECORDED AS AN INIT SUCCESS — AND IT WAS WIPING THE CRASH
-  GUARD (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1203 / golem OTA-1180. **steam NOT
+  GUARD (2026-08-09). HAL + GOLEM.** HAL OTA-1203 / golem OTA-1180. **steam NOT
   included — batched (§2).**
 
   **MEASURED: owner report, 2026-08-09, build `2026-08-09-1202`.** The header claims a

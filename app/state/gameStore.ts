@@ -1736,13 +1736,29 @@ function runQwenHealthCheck(
       // ⚠ The ceiling below bounded it at 8 and the backoff stretched it to 40s, so it was
       // not unbounded — but bounded thrash is still thrash, and this is what stops it.
       if (rpQwenStoodDownForMemory || Date.now() < rpMemoryPressureUntil) {
-        if (!rpMemoryQuietLogged) {
+        // ⚠⚠ OTA-1204 — TWO MESSAGES, TWO LIFETIMES, AND THEY WERE SHARING ONE FLAG.
+        // `rpMemoryQuietLogged` is reset by EVERY memory warning, which is correct for the
+        // 90-second quiet notice (each warning genuinely opens a new window) and wrong for
+        // the permanent stand-down, whose whole claim is that it happens once. The owner's
+        // 2026-08-09 log on build 1203 shows it three times:
+        //     03:53:17.845  qwen-watchdog: 3 memory warnings this session — STANDING DOWN for good.
+        //     03:53:52.943  qwen-watchdog: 5 memory warnings this session — STANDING DOWN for good.
+        //     03:53:57.963  qwen-watchdog: 6 memory warnings this session — STANDING DOWN for good.
+        // ⚠ The BEHAVIOUR was right — no reload followed any of them. Only the log repeated,
+        // and a line that says "for good" three times reads as a loop that is not happening,
+        // which is precisely the wrong thing for a log whose job is to be trusted.
+        if (rpQwenStoodDownForMemory) {
+          if (!rpStandDownLogged) {
+            rpStandDownLogged = true;
+            get().appendLog('debug',
+              `qwen-watchdog: ${rpMemoryWarnings} memory warnings this session — STANDING DOWN for good. `
+              + `This device will not hold the context; narration stays on templates.`);
+          }
+        } else if (!rpMemoryQuietLogged) {
           rpMemoryQuietLogged = true;
-          get().appendLog('debug', rpQwenStoodDownForMemory
-            ? `qwen-watchdog: ${rpMemoryWarnings} memory warnings this session — STANDING DOWN for good. `
-              + `This device will not hold the context; narration stays on templates.`
-            : `qwen-watchdog: holding reloads for ${Math.round(MEMORY_PRESSURE_QUIET_MS / 1000)}s — `
-              + `the OS just asked for memory back and a reload is the biggest thing we could do to it.`);
+          get().appendLog('debug',
+            `qwen-watchdog: holding reloads for ${Math.round(MEMORY_PRESSURE_QUIET_MS / 1000)}s — `
+            + `the OS just asked for memory back and a reload is the biggest thing we could do to it.`);
         }
         return false;
       }
@@ -1828,6 +1844,7 @@ function startQwenWatchdog(
   rpMemoryPressureUntil = 0;
   rpQwenStoodDownForMemory = false;
   rpMemoryQuietLogged = false;
+  rpStandDownLogged = false;
 
   const schedule = (ms: number): void => {
     if (qwenWatchdogTimer !== null) clearTimeout(qwenWatchdogTimer);
@@ -1906,6 +1923,10 @@ let rpLastSaveKb: number | null = null;
 let rpMemoryPressureUntil = 0;
 let rpQwenStoodDownForMemory = false;
 let rpMemoryQuietLogged = false;
+/** ⚠ OTA-1204 — SEPARATE FROM `rpMemoryQuietLogged`, and that separation is the fix.
+ *  A memory warning re-arms the quiet notice (a new window really did open) but must NOT
+ *  re-arm the permanent one. Only the watchdog restart clears this. */
+let rpStandDownLogged = false;
 /** ⚠ After a warning, no reload for this long. Longer than the backoff ladder's first
  *  rungs on purpose — the point is to let the OS settle, not to shave a retry. */
 const MEMORY_PRESSURE_QUIET_MS = 90_000;

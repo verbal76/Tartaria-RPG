@@ -45,9 +45,22 @@ function contextLedgerBlock(): string {
     // cross-reference a memory-warning line 40 entries down the log to learn the model had
     // never loaded. Now the block says it in place.
     let status = '';
-    try { status = String(useGameStore.getState().qwenStatus ?? ''); } catch { /* best effort */ }
+    let err = '';
+    try {
+      const st = useGameStore.getState();
+      status = String(st.qwenStatus ?? '');
+      err = String(st.qwenError ?? '');
+    } catch { /* best effort */ }
     const ledger = contextLedgerSummary();
-    return status ? `${ledger}\n  Narration engine: ${status}` : ledger;
+    if (!status) return ledger;
+    // ⚠⚠ OTA-1204 — THE REASON, NOT JUST THE VERDICT. `qwenError` has existed in the store
+    // since the engine was written and was surfaced NOWHERE — not here, not in mlHealth.
+    // The owner's 2026-08-09 report on build 1203 reads `Narration engine: failed` with no
+    // hint of why, and the answer was sitting in state the whole time. Three reports in a
+    // row have now said the model does not load; none could say what it said on the way
+    // down, so every theory about it has been inference.
+    const why = status === 'failed' && err ? `\n  Why: ${err}` : '';
+    return `${ledger}\n  Narration engine: ${status}${why}`;
   } catch {
     return 'Model contexts\n  (unavailable this session)';
   }
