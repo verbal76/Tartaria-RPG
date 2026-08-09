@@ -292,9 +292,17 @@ and **not** to the one contract type that can be.
      first element — a bare `1187/1188` in the table above ported to golem still
      reading HAL's numbers, which is how this note came to exist. -->
 
-⚠ Four of the five reference an OTA at or above the renumber floor, so **on golem-line
-these read 23 lower** (OTA-1188 → OTA-1165, and so on). The pre-983 ones are shared
-history and are the same number on both lines.
+⚠ Four of the five sit at or above the renumber floor, so **the same commit carries a
+different number on each line** — each line's copy of this table is already correct for
+itself, and the two are not meant to match. The pre-floor references are shared history
+from before the split and read the same on both.
+
+<!-- ⚠ THAT PARAGRAPH DELIBERATELY CONTAINS NO EXAMPLE PAIR. It first read
+     "on golem-line these read 23 lower (OTA-1188 → OTA-1165)" — and the renumberer
+     rewrote BOTH sides on the way across, so golem's copy explained the offset using
+     golem's own numbers on both ends and said nothing at all. Any sentence here that
+     has to stay true on both lines must not name a number. -->
+
 
 ⚠ **Four of the five did not exist when remote hand-in was killed.** The farm risk is
 contained today by rules aimed precisely at the loop that has it. The face-to-face rule is
