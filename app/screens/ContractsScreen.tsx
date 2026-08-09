@@ -18,7 +18,7 @@ import { missionObjectiveLocationId } from '../engine/missionRouting';
 import { getLocationById } from '../engine/encounter';
 import { GREAT_CLIMBS } from '../engine/greatClimbs';
 import { theLower } from '../engine/grammar';
-import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
+import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS, storyPerkLabel } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
 import { openContractMarkers } from '../engine/contractMarkers';
@@ -1967,6 +1967,12 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
                     <Text style={styles.completeBanner}>
                       ✦ {story.characterName}&apos;s story is complete — every fragment recovered.
                     </Text>
+                    {/* OTA-1184 — the standing buff this story pays, if it pays one.
+                        ⚠ Not every story does, by the owner's design, so the absence of a
+                        line here is correct rather than a missing feature. */}
+                    {storyPerkLabel(story.id) && (
+                      <Text style={styles.perkLine}>✦ {storyPerkLabel(story.id)}</Text>
+                    )}
                     {/* ⚠ OTA-1183 — READ IT WHOLE, ON DEMAND. The completion screen raises
                         itself once, at the moment the set closes. Without this button that
                         is the ONLY time the assembled story is ever readable end to end,
@@ -1999,6 +2005,8 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: '#3a4348', backgroundColor: '#141a1d',
   },
   readStoryText: { color: '#cdbf99', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
+  // OTA-1184 — the permanent buff a completed story grants.
+  perkLine: { color: '#8fbf9f', fontSize: 12, marginTop: 6, fontStyle: 'italic', lineHeight: 18 },
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
   // v2.4.1 (OTA 033) — Primary Objective card. Sits at the top of
   // the Contracts screen above the tab row. Warm-gold border to

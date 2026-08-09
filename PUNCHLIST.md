@@ -111,6 +111,30 @@ mechanism that already exists, is documented as existing, and is switched off. W
 should cost the player (a courier fee, a delay, a rep penalty) is a design decision and is
 **not** proposed here.
 
+### P6 — The Siren of Zharak's Teeth was chosen for a perk, and there is nothing to attach it to
+
+- **Kind:** *(open design question — raised by OTA-1184, not a defect)*
+- **Found:** 2026-08-09, while building the story perks
+
+The owner picked six stories for buffs; five shipped. **The Siren of Zharak's Teeth did
+not** — five verses scratched inside a Reclaimer's flask, the hand growing more careful as
+they go on, the flask empty. The natural buff is resistance to whatever the Siren does.
+
+⚠ **The game has no charm, compulsion or mental-influence mechanic.** Verified across
+`statusEffects.ts` and `combatRules.ts` — nothing to resist. `mud_siren_lair` exists as a
+location tag, so the fiction is there; the mechanic is not.
+
+**Two ways to close it, and both are the owner's call:**
+1. Build a charm/lure status (a siren pulls you toward it, costs a turn or a stat check),
+   and the perk resists it. Makes the flask verses mean something mechanically.
+2. Give the story a different perk that fits the fiction — it is also a drowning/coastal
+   story, and the Reclaimer died with an empty flask.
+
+⚠ **Filed rather than silently substituted.** Inventing a status effect to justify a buff
+is backwards, and quietly swapping the perk would have hidden a decision the owner made.
+
+---
+
 ### P4 — `data/spells/runecasters.json` is orphaned: 10 entries, zero importers
 
 - **Kind:** UNFINISHABLE *(content that cannot be reached because nothing loads it)*

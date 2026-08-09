@@ -22161,6 +22161,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           && /automation|mechanism|construct|sentinel|drone/i.test(`${enemy.name} ${enemy.type ?? ''}`)) {
         for (let i = 0; i < tPerksAtk.mechanicalDamageDice; i++) titleDmgBonus += rollDie(6);
       }
+      // ⚠ OTA-1184 — ELIOR ZALMAR's story: +1 flat when the swing's own damage type is
+      // electrical or aetheric. Gated on the WEAPON's type, not the enemy's — the man
+      // built the Aetheric Engine, so what he teaches is how to drive the current, not
+      // what to point it at. Sits beside the mechanical die because this is the one place
+      // a flat, perk-sourced damage addition belongs.
+      if (tPerksAtk.electricalDamageBonus > 0) {
+        const swingType = String(weaponType ?? '').toLowerCase();
+        if (swingType === 'electrical' || swingType === 'aetheric') {
+          titleDmgBonus += tPerksAtk.electricalDamageBonus;
+        }
+      }
       // arb-fix — ethericSurge title (Aetherborn Awakened): once per combat, the
       // first qualifying hit detonates an Aetheric surge (+1d8). Keyed to the
       // enemy lineup so it re-arms for each new fight.
@@ -34915,7 +34926,21 @@ export function playerColdResist(player: PlayerCharacter | null): boolean {
 // generalising playerColdResist beyond cold only.
 export function playerArmorResistKinds(player: PlayerCharacter | null): string[] {
   if (!player) return [];
-  return aggregateArmor(player).resistances.map((r) => r.toLowerCase());
+  const kinds = aggregateArmor(player).resistances.map((r) => r.toLowerCase());
+  // ⚠⚠ OTA-1184 — THE GIANT'S WATCH grants cold resistance, and it is injected HERE
+  // because this one function feeds ~16 call sites: weather ticks, weather stat
+  // modifiers, attack penalties, visibility. Adding the kind at the source means the
+  // perk works everywhere resistance already matters, with no new plumbing and no site
+  // silently missed. (Five inscriptions carved into the Ural cliffs by someone who stood
+  // in that cold long enough to finish them.)
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { storyPerkModifiers } = require('../engine/collectables') as typeof import('../engine/collectables');
+    if (storyPerkModifiers(player.collectables ?? []).grantsColdResist && !kinds.includes('cold')) {
+      kinds.push('cold');
+    }
+  } catch { /* a perk lookup must never break the resist read */ }
+  return kinds;
 }
 
 /** OTA-1124 — the AC ledger's memory. Session-scoped and combat-local: it only
