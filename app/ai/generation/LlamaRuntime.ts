@@ -1,6 +1,11 @@
 import * as FileSystem from 'expo-file-system';
 import { runExclusiveNativeMl, ML_PRIORITY_LLM, ML_PRIORITY_HOMEWORK } from '../nativeMlLock';
 import { recordQwenCall } from './qwenTelemetry';
+import {
+  noteContextOpened,
+  noteContextReleased,
+  noteDisposeFoundNothing,
+} from './contextLedger';
 
 // ---------------------------------------------------------------------------
 // LlamaRuntime — thin wrapper around the llama.rn native module
@@ -189,6 +194,19 @@ export class LlamaRuntime {
   private context: LlamaContext | null = null;
   private modelPath: string | null = null;
 
+  /** ⚠ OTA-1177 — TELLS THE TWO REASONS `dispose()` FINDS NOTHING APART, AND THE
+   *  INSTRUMENT IS WORTHLESS WITHOUT IT.
+   *
+   *  `dispose()` bails on `if (!ctx) return;` in two completely different situations:
+   *    1. Nothing was ever loaded, or this is a second dispose. Harmless, and COMMON —
+   *       App.tsx disposes on every backgrounding whether or not Qwen was up.
+   *    2. `initLlama` is STILL RUNNING, so `this.context` has not been assigned yet.
+   *       That one frees nothing and then lets a ~400MB context land on an object
+   *       nobody holds — the orphan we are hunting.
+   *  Logging both as the leak signature would bury the real event under routine noise,
+   *  and we would be reading a story again instead of a measurement. */
+  private loadInFlight = false;
+
   isReady(): boolean {
     return this.context !== null;
   }
@@ -227,6 +245,10 @@ export class LlamaRuntime {
     //
     // ⚠ ML_PRIORITY_LLM, so a voice line still OUTRANKS a reload: the player hears the
     // Arbiter on time and the reload waits its turn, which is the right trade both ways.
+    // OTA-1177 — the flag is raised BEFORE the await and lowered in a `.finally`, so it is
+    // true for exactly the window in which `this.context` is still null but a ~400MB
+    // allocation is already under way. That window is the one dispose() cannot free.
+    this.loadInFlight = true;
     this.context = await runExclusiveNativeMl(() => mod.initLlama({
       model: opts.modelPath,
       n_ctx: opts.contextSize ?? 2048,
@@ -242,7 +264,11 @@ export class LlamaRuntime {
       // peak RAM drops too. Conservative values that keep prefill throughput sane.
       n_batch: opts.batch ?? 512,
       n_ubatch: opts.ubatch ?? 128,
-    }), ML_PRIORITY_LLM);
+    }), ML_PRIORITY_LLM).finally(() => { this.loadInFlight = false; });
+    // OTA-1177 — a native context now exists. Counted here and NOT one line earlier:
+    // before `initLlama` resolves there is nothing allocated we could account for, and a
+    // load that throws must not inflate the count.
+    noteContextOpened();
     this.modelPath = opts.modelPath;
     // arb129 — record which native kernel variant llama.rn selected + the CPU/SoC
     // signature (forwarded by the patched llama.rn) into mlHealth, so the copyable
@@ -429,7 +455,16 @@ export class LlamaRuntime {
     const ctx = this.context;
     this.context = null;
     this.modelPath = null;
-    if (!ctx) return;
+    if (!ctx) {
+      // ⚠⚠ OTA-1177 — THE LINE THIS OTA WAS BUILT TO PRODUCE. Nothing changes here; we
+      // only record WHICH of the two empty disposes this was. `loadInFlight` true means a
+      // ~400MB load is running right now and this call freed zero bytes — see the field's
+      // comment. False is the routine case (never loaded, or disposed twice) and stays
+      // silent, because an instrument that cries every backgrounding teaches you to
+      // ignore it.
+      if (this.loadInFlight) noteDisposeFoundNothing('load-in-flight');
+      return;
+    }
     try {
       await (ctx as unknown as { stopCompletion?: () => unknown }).stopCompletion?.();
     } catch {
@@ -437,6 +472,10 @@ export class LlamaRuntime {
     }
     try {
       await runExclusiveNativeMl(() => Promise.resolve(ctx.release()));
+      // OTA-1177 — counted only on the path where release() actually returned. A throw
+      // below leaves the context unaccounted for, which is exactly the honest reading:
+      // we do not know that it was freed.
+      noteContextReleased();
     } catch {
       // best effort — native side may already be torn down
     }

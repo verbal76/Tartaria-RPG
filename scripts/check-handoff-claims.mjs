@@ -49,6 +49,9 @@ import { dirname, join } from 'node:path';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const baselineFile = join(root, '.ci-handoff-claims-baseline');
+// OTA-1177 — second ratchet, own baseline. Separate files so one debt shrinking cannot
+// mask the other growing.
+const causeBaselineFile = join(root, '.ci-handoff-causes-baseline');
 // HANDOFF-ARCHIVE.md is deliberately NOT scanned: it is frozen history, kept
 // verbatim on purpose, and rewriting it would destroy the record it exists to hold.
 const targets = ['HANDOFF.md'];
@@ -87,44 +90,124 @@ const PROHIBITION = new RegExp(
 const RECEIPT = /\b(verified|measured|tested|proved|disproved|confirmed|checked|reproduced|demonstrated)\b/i;
 const ISO_DATE = /\b20\d\d-\d\d-\d\d\b/;
 
-function offendersIn(file) {
+// ---------------------------------------------------------------------------
+// SECOND RATCHET — MEASURE THE CAUSE, OR SAY YOU DIDN'T.
+// ---------------------------------------------------------------------------
+//
+// ⚠⚠ WHY THIS EXISTS, and it cost a full day to learn. 2026-08-08: a crash arrived with
+// no JS error recorded. I reasoned my way to "memory pressure from an unserialized
+// ~400MB model load", wrote a persuasive paragraph, and shipped a BEHAVIOUR change on
+// it (OTA-1173). It built a reload loop — seven ~400MB allocations in forty seconds —
+// which OTA-1175 then had to interlock. The measurement finally arrived as three
+// JetsamEvent reports (2026-08-08): `per-process-limit`, 118454–121207 rpages, i.e.
+// ~1.9GB. Memory WAS the domain; the mechanism I asserted was not the one, and the fix
+// aimed at it made things worse.
+//
+// ⚠ AND THE SECOND HALF OF THE SAME LESSON: an estimate that gets repeated becomes a
+// premise. "~425MB for the model" was stated once as a guess and then cited as fact in
+// five later messages, and used to argue the phone should cope comfortably. The
+// measurement came back 4.5x higher. Nobody lied; nobody re-checked either.
+//
+// THE RULE THE OWNER AND I AGREED: **measure the cause, or ship an instrument.** This
+// gate is the enforcement, because the previous enforcement was me remembering — and
+// OTA-1172 had already WRITTEN that rule into its own source before OTA-1173 overrode
+// it the same afternoon. A rule that lives only in prose loses to a good argument.
+//
+// WHAT TRIPS IT: a sentence ASSERTING a cause ("the cause was X", "caused by Y", "the
+// culprit was Z"). Not a mention of the concept — "do the root cause dig" is a
+// directive and is left alone, same as the prohibition pass leaves policy alone.
+//
+// HOW TO SATISFY IT — any ONE of three, and note that all three are cheap:
+//   1. `MEASURED:` in the neighbourhood, followed by the actual observation. The
+//      preferred form. Quote the number and where it came from.
+//   2. A verification verb near an ISO date, the same receipt the prohibition pass
+//      takes.
+//   3. HEDGE IT HONESTLY — "candidate", "hypothesis", "suspected", "unmeasured". This
+//      is not a loophole, it is the OTHER half of the rule working: OTA-1177 shipped a
+//      counter for an orphaned-context THEORY and said so in those words, which is
+//      exactly the behaviour this gate wants. Naming a guess as a guess costs one word
+//      and stops it hardening into a premise three messages later.
+const CAUSE_CLAIM = new RegExp(
+  [
+    String.raw`\bthe root cause (?:is|was|turned out)\b`,
+    String.raw`\bthe cause (?:is|was)\b`,
+    String.raw`\b(?:is|was|were|are) caused by\b`,
+    String.raw`\bthe culprit (?:is|was)\b`,
+    String.raw`\bwhat (?:caused|killed|crashed) (?:it|us|the app|the game)\b`,
+    String.raw`\bis what (?:caused|killed|crashed|froze)\b`,
+  ].join('|'),
+  'i',
+);
+const MEASURED = /\bMEASURED:/;
+// ⚠ Deliberately generous. The goal is not to make hedging hard — it is to make the
+// UNHEDGED, UNMEASURED assertion the one thing you cannot do quietly.
+const HEDGE = /\b(candidate|hypothesis|unmeasured|not measured|suspect|suspected|theory|guess|inferred|unproven|likely|probably|presumed)\b/i;
+
+/** Both passes share this shape: find lines matching `pattern`, keep the ones whose
+ *  ±RECEIPT_WINDOW neighbourhood fails `satisfied`. Kept generic so the two ratchets
+ *  cannot drift apart in how they read a window. */
+function offendersIn(file, pattern, satisfied) {
   const path = join(root, file);
   if (!existsSync(path)) return [];
   const lines = readFileSync(path, 'utf8').split('\n');
   const out = [];
   for (let i = 0; i < lines.length; i++) {
-    if (!PROHIBITION.test(lines[i])) continue;
+    if (!pattern.test(lines[i])) continue;
     const from = Math.max(0, i - RECEIPT_WINDOW);
     const to = Math.min(lines.length, i + RECEIPT_WINDOW + 1);
     const window = lines.slice(from, to).join('\n');
-    // A receipt is a verification verb AND a date in the neighbourhood. Requiring
-    // both is what stops "this was never tested" from counting as its own receipt.
-    if (RECEIPT.test(window) && ISO_DATE.test(window)) continue;
+    if (satisfied(window)) continue;
     out.push({ file, line: i + 1, text: lines[i].trim() });
   }
   return out;
 }
 
-const offenders = targets.flatMap(offendersIn);
+// A receipt is a verification verb AND a date in the neighbourhood. Requiring both is
+// what stops "this was never tested" from counting as its own receipt.
+const hasReceipt = (w) => RECEIPT.test(w) && ISO_DATE.test(w);
+
+const offenders = targets.flatMap((f) => offendersIn(f, PROHIBITION, hasReceipt));
 const count = offenders.length;
+
+const causeOffenders = targets.flatMap((f) => offendersIn(
+  f,
+  CAUSE_CLAIM,
+  (w) => MEASURED.test(w) || hasReceipt(w) || HEDGE.test(w),
+));
+const causeCount = causeOffenders.length;
 
 if (process.argv.includes('--list')) {
   for (const o of offenders) console.log(`${o.file}:${o.line}  ${o.text.slice(0, 140)}`);
   console.log(`\n${count} unreceipted prohibition(s).`);
+  console.log('');
+  for (const o of causeOffenders) console.log(`${o.file}:${o.line}  ${o.text.slice(0, 140)}`);
+  console.log(`\n${causeCount} unmeasured cause claim(s).`);
   process.exit(0);
 }
 
 if (process.argv.includes('--update-baseline')) {
   writeFileSync(baselineFile, `${count}\n`);
-  console.log(`[check-handoff-claims] baseline updated to ${count}.`);
+  writeFileSync(causeBaselineFile, `${causeCount}\n`);
+  console.log(`[check-handoff-claims] baselines updated — prohibitions ${count}, cause claims ${causeCount}.`);
   process.exit(0);
 }
 
-const baseline = existsSync(baselineFile)
-  ? Number.parseInt(readFileSync(baselineFile, 'utf8').trim(), 10)
-  : Number.POSITIVE_INFINITY;
+function readBaseline(file) {
+  return existsSync(file)
+    ? Number.parseInt(readFileSync(file, 'utf8').trim(), 10)
+    : Number.POSITIVE_INFINITY;
+}
+
+const baseline = readBaseline(baselineFile);
+const causeBaseline = readBaseline(causeBaselineFile);
+
+// ⚠ BOTH RATCHETS ARE EVALUATED BEFORE ANYTHING EXITS. The single-pass version returned
+// early on a shrinking count, which would have let a new unmeasured cause claim through
+// on any run where the prohibition debt happened to drop. Collect, then decide.
+let failed = false;
 
 if (count > baseline) {
+  failed = true;
   console.error(
     `[check-handoff-claims] FAIL — ${count} unreceipted prohibitions, baseline ${baseline}.\n\n` +
       'A new sentence tells a future session something is IMPOSSIBLE without saying how\n' +
@@ -133,16 +216,42 @@ if (count > baseline) {
       'reword it as a directive if it is policy rather than fact, or delete it.\n',
   );
   for (const o of offenders.slice(-12)) console.error(`  ${o.file}:${o.line}  ${o.text.slice(0, 120)}`);
-  console.error('\n  (node scripts/check-handoff-claims.mjs --list  shows all of them)');
-  process.exit(1);
-}
-
-if (count < baseline) {
+  console.error('');
+} else if (count < baseline) {
   console.log(
     `[check-handoff-claims] OK — ${count} unreceipted prohibitions, below the baseline of ${baseline}.\n` +
       '  Debt shrank. Lower it: node scripts/check-handoff-claims.mjs --update-baseline',
   );
-  process.exit(0);
+} else {
+  console.log(`[check-handoff-claims] OK — unreceipted prohibitions at baseline (${count}). No growth.`);
 }
 
-console.log(`[check-handoff-claims] OK — unreceipted prohibitions at baseline (${count}). No growth.`);
+if (causeCount > causeBaseline) {
+  failed = true;
+  console.error(
+    `[check-handoff-claims] FAIL — ${causeCount} unmeasured cause claims, baseline ${causeBaseline}.\n\n` +
+      'A new sentence names the CAUSE of something without saying how that was established.\n' +
+      'That is the exact move that produced OTA-1173: a well-argued mechanism, shipped as a\n' +
+      'behaviour change, that built a reload loop — while the real measurement (three\n' +
+      'JetsamEvent reports, ~1.9GB, per-process-limit) did not arrive until a day later.\n\n' +
+      'Fix it in one of three ways, and the third is fully legitimate:\n' +
+      '  1. Put `MEASURED:` beside it with the actual observation and where it came from.\n' +
+      '  2. Add a verification verb and an ISO date, same receipt the prohibition pass takes.\n' +
+      '  3. HEDGE IT — "candidate", "suspected", "hypothesis". If it is a guess, say so, and\n' +
+      '     ship an instrument instead of a fix. Measure the cause, or ship an instrument.\n',
+  );
+  for (const o of causeOffenders.slice(-12)) console.error(`  ${o.file}:${o.line}  ${o.text.slice(0, 120)}`);
+  console.error('');
+} else if (causeCount < causeBaseline) {
+  console.log(
+    `[check-handoff-claims] OK — ${causeCount} unmeasured cause claims, below the baseline of ${causeBaseline}.\n` +
+      '  Debt shrank. Lower it: node scripts/check-handoff-claims.mjs --update-baseline',
+  );
+} else {
+  console.log(`[check-handoff-claims] OK — unmeasured cause claims at baseline (${causeCount}). No growth.`);
+}
+
+if (failed) {
+  console.error('  (node scripts/check-handoff-claims.mjs --list  shows all of them)');
+  process.exit(1);
+}

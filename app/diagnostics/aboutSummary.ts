@@ -21,6 +21,8 @@ import { mlHealthSummary } from './mlHealth';
 // OTA-1172 — memory warnings / freeze watch / app-state trail.
 import { runtimePressureSummary } from './runtimePressure';
 import { runtimePressureSnapshot } from '../state/gameStore';
+// OTA-1177 — how many ~400MB model contexts are live, and how many disposes freed nothing.
+import { contextLedgerSummary } from '../ai/generation/contextLedger';
 
 /** ⚠ Isolated behind a try/catch and a lazy read: the bug-report exporter must NEVER be
  *  the thing that fails when the app is already in trouble, and this block is at its most
@@ -30,6 +32,16 @@ function runtimePressureBlock(): string {
     return runtimePressureSummary(runtimePressureSnapshot());
   } catch {
     return 'Runtime pressure\n  (unavailable this session)';
+  }
+}
+
+/** OTA-1177 — live llama-context count. Same isolation as the block above, and for the
+ *  same reason: this is worth the most in the report from the session that died. */
+function contextLedgerBlock(): string {
+  try {
+    return contextLedgerSummary();
+  } catch {
+    return 'Model contexts\n  (unavailable this session)';
   }
 }
 import { saveLoadHealthSummary } from './saveLoadHealth';
@@ -143,6 +155,12 @@ export function buildBasicDeviceSummary(): string {
     // questions that decide which half of the codebase to look in. The counts belong in
     // the HEADER, not only reconstructable from 146 log lines.
     runtimePressureBlock(),
+    // ⚠⚠ OTA-1177 — LIVE MODEL CONTEXTS. Three JetsamEvent reports put this process at
+    // ~1.9GB on a 3GB phone with reason `per-process-limit`; the model is ~400MB of that
+    // and the rest was never accounted for. One number in the header — how many contexts
+    // are live right now — separates "we are holding four of them" from "look elsewhere",
+    // and no amount of reading the code answers it.
+    contextLedgerBlock(),
   ];
   return lines.join('\n');
 }

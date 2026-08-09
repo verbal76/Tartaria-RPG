@@ -183,6 +183,8 @@ import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrat
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
 import { setQwenTelemetrySink, setQwenDiscardSink, noteQwenDiscarded, qwenCallCount, qwenTelemetrySummary } from '../ai/generation/qwenTelemetry';
+// OTA-1177 — live llama-context counter. Instrument only; changes no behaviour.
+import { setContextLedgerSink } from '../ai/generation/contextLedger';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
 import {
   LOCATION_TO_MACRO,
@@ -1712,6 +1714,36 @@ function runQwenHealthCheck(
         return false;
       }
       qwenHeldWhileBackgroundLogged = false;
+      // ⚠⚠ OTA-1175 — THE MEMORY INTERLOCK, AND IT EXISTS BECAUSE OTA-1173 BUILT A LOOP.
+      //
+      // The owner's device log, 40 seconds of it, caught by the instruments OTA-1172 added:
+      //     11:08.99  ⚠⚠ MEMORY WARNING #2 — qwen='loading' · reloads=3
+      //     11:09.03  memory: released the Qwen context (~400MB)
+      //     11:09.88  ⚠⚠ MEMORY WARNING #3 (0.9s later) — reloads=3
+      //     11:12.02  reinitializing (attempt #4)
+      //     11:12.41  ⚠⚠ MEMORY WARNING #4 — qwen='downloading' · reloads=4
+      //     … through ⚠⚠ MEMORY WARNING #7 · reloads=7 at 11:47
+      //
+      // ⚠ EVERY reinit settled to 'idle' — `reinit #N settled in 2676ms → status='idle'` —
+      // because the dispose OTA-1173 added marks an in-flight load STALE (OTA-1084's
+      // lifecycleGen). So: watchdog loads → OS complains → we free it mid-load → watchdog
+      // sees 'idle' → loads again. **Seven ~400MB allocations in forty seconds, and the
+      // fix was the engine.** Freeing memory under pressure is still right; doing it with
+      // nothing to stop the reload was not.
+      //
+      // ⚠ The ceiling below bounded it at 8 and the backoff stretched it to 40s, so it was
+      // not unbounded — but bounded thrash is still thrash, and this is what stops it.
+      if (rpQwenStoodDownForMemory || Date.now() < rpMemoryPressureUntil) {
+        if (!rpMemoryQuietLogged) {
+          rpMemoryQuietLogged = true;
+          get().appendLog('debug', rpQwenStoodDownForMemory
+            ? `qwen-watchdog: ${rpMemoryWarnings} memory warnings this session — STANDING DOWN for good. `
+              + `This device will not hold the context; narration stays on templates.`
+            : `qwen-watchdog: holding reloads for ${Math.round(MEMORY_PRESSURE_QUIET_MS / 1000)}s — `
+              + `the OS just asked for memory back and a reload is the biggest thing we could do to it.`);
+        }
+        return false;
+      }
       // ⚠⚠ OTA-1173 — THE CEILING. See QWEN_MAX_REINITS_PER_STRETCH: past this many
       // failed reloads we stop allocating and let the game run on templates. Logged once,
       // not per tick, so the log says it plainly and then goes quiet.
@@ -1790,6 +1822,10 @@ function startQwenWatchdog(
   // re-hydrate starts from a clean slate rather than inheriting the last run's refusals.
   qwenReinitCeilingLogged = false;
   qwenTrulyBackgrounded = false;
+  // OTA-1175 — the memory interlock resets with the rest of the ledger.
+  rpMemoryPressureUntil = 0;
+  rpQwenStoodDownForMemory = false;
+  rpMemoryQuietLogged = false;
 
   const schedule = (ms: number): void => {
     if (qwenWatchdogTimer !== null) clearTimeout(qwenWatchdogTimer);
@@ -1862,6 +1898,19 @@ let rpSampleTimer: ReturnType<typeof setTimeout> | null = null;
 let rpMemorySub: { remove: () => void } | null = null;
 let rpAppStateSub: { remove: () => void } | null = null;
 let rpLastSaveKb: number | null = null;
+// ⚠⚠ OTA-1175 — MEMORY-PRESSURE QUIET WINDOW. See the block in runQwenHealthCheck: the
+// OTA-1173 dispose and the watchdog formed a loop that fired SEVEN ~400MB loads in 40
+// seconds on the owner's device. This is the interlock between them.
+let rpMemoryPressureUntil = 0;
+let rpQwenStoodDownForMemory = false;
+let rpMemoryQuietLogged = false;
+/** ⚠ After a warning, no reload for this long. Longer than the backoff ladder's first
+ *  rungs on purpose — the point is to let the OS settle, not to shave a retry. */
+const MEMORY_PRESSURE_QUIET_MS = 90_000;
+/** ⚠ And after this many warnings in one session, stop asking for the session. A device
+ *  that has refused three times is telling us something; the eighth ask is not going to
+ *  be the one it says yes to, and each ask is another 400MB spike. */
+const MEMORY_WARNINGS_BEFORE_STANDDOWN = 3;
 
 /** Read by the bug-report exporter so the counts land in the HEADER, not only in 146 log
  *  lines someone has to reconstruct by hand. */
@@ -1893,18 +1942,48 @@ export function logUiTap(label: string): void {
   } catch { /* never let instrumentation break a control */ }
 }
 
+/** ⚠ OTA-1176 — the frame clock, hoisted so app-state can pause it. A self-recursing rAF
+ *  is the cheapest way to notice frames stopping, but only while anyone is looking. */
+function rpStartFrameClock(): void {
+  if (rpFrameRaf !== null) return; // already running — never stack two loops
+  if (typeof requestAnimationFrame !== 'function') return;
+  const frameTick = (): void => {
+    rpLastFrameAt = Date.now();
+    try { rpFrameRaf = requestAnimationFrame(frameTick) as unknown as number; } catch { rpFrameRaf = null; }
+  };
+  try { rpFrameRaf = requestAnimationFrame(frameTick) as unknown as number; } catch { rpFrameRaf = null; }
+}
+
+function rpStopFrameClock(): void {
+  if (rpFrameRaf === null) return;
+  if (typeof cancelAnimationFrame === 'function') {
+    try { cancelAnimationFrame(rpFrameRaf); } catch { /* ignore */ }
+  }
+  rpFrameRaf = null;
+}
+
+/** ⚠⚠ OTA-1176 — THE TEARDOWN OTA-1172 SHIPPED WITHOUT.
+ *  Two AppState subscriptions, a rescheduling timer and an rAF loop, and nothing anywhere
+ *  stopped any of them. It is a small leak in bytes — the listeners are two objects and
+ *  Hermes reclaims the per-frame closure — but "started forever, stopped never" is the
+ *  shape that becomes a real one the moment somebody calls the starter twice from a new
+ *  place. Idempotence covered that; an explicit stop is what makes it true by construction
+ *  rather than by the starter remembering to be careful. */
+export function stopRuntimePressureWatch(): void {
+  if (rpSampleTimer !== null) { clearTimeout(rpSampleTimer); rpSampleTimer = null; }
+  rpStopFrameClock();
+  if (rpMemorySub) { try { rpMemorySub.remove(); } catch { /* ignore */ } rpMemorySub = null; }
+  if (rpAppStateSub) { try { rpAppStateSub.remove(); } catch { /* ignore */ } rpAppStateSub = null; }
+}
+
 function startRuntimePressureWatch(
   get: () => GameStore,
   _set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
 ): void {
   // Idempotent: a re-hydrate must not stack a second set of timers and listeners.
-  if (rpSampleTimer !== null) { clearTimeout(rpSampleTimer); rpSampleTimer = null; }
-  if (rpFrameRaf !== null && typeof cancelAnimationFrame === 'function') {
-    try { cancelAnimationFrame(rpFrameRaf); } catch { /* ignore */ }
-  }
-  rpFrameRaf = null;
-  if (rpMemorySub) { try { rpMemorySub.remove(); } catch { /* ignore */ } rpMemorySub = null; }
-  if (rpAppStateSub) { try { rpAppStateSub.remove(); } catch { /* ignore */ } rpAppStateSub = null; }
+  // ⚠ OTA-1176 — goes through the SAME teardown a caller would use, so the two can never
+  // drift. The hand-rolled copy this replaces already differed from what it should clear.
+  stopRuntimePressureWatch();
 
   const now = Date.now();
   rpLastFrameAt = now;
@@ -1943,6 +2022,13 @@ function startRuntimePressureWatch(
       // ⚠ The watchdog is deliberately NOT suppressed here: it reads the real status and
       // will bring Qwen back once there is room, which is the behaviour we want — release
       // under pressure, recover when the pressure lifts.
+      // ⚠⚠ OTA-1175 — AND TELL THE WATCHDOG TO STAND DOWN BEFORE FREEING ANYTHING.
+      // Setting this BEFORE the dispose is load-bearing: the dispose marks any in-flight
+      // load stale, the watchdog's next tick sees 'idle', and without this flag it kicks a
+      // fresh ~400MB load straight back into the pressure that just fired the warning.
+      rpMemoryPressureUntil = Date.now() + MEMORY_PRESSURE_QUIET_MS;
+      rpMemoryQuietLogged = false;
+      if (rpMemoryWarnings >= MEMORY_WARNINGS_BEFORE_STANDDOWN) rpQwenStoodDownForMemory = true;
       try {
         if (typeof (qwen as { dispose?: () => Promise<void> }).dispose === 'function') {
           void (qwen as { dispose: () => Promise<void> }).dispose()
@@ -1972,21 +2058,26 @@ function startRuntimePressureWatch(
       // A fresh foreground restarts both clocks: a backgrounded app legitimately stops
       // painting, and counting that as a render stall would cry wolf every time the
       // player checks a message.
-      if (nextStr === 'active') { rpLastFrameAt = t; rpLastJsAt = t; }
+      // ⚠⚠ OTA-1176 — THE FRAME CLOCK STOPS WHEN THE APP DOES.
+      // OTA-1172 ran this rAF loop for the entire life of the process, backgrounded or
+      // not — 60 wakeups a second that the detector then THREW AWAY, because it only
+      // judges while foregrounded. Pure waste, and a backgrounded app doing steady work is
+      // what iOS reclaims first. On the device we are trying to keep alive, the instrument
+      // was making the measurement slightly worse.
+      if (nextStr === 'active') {
+        rpLastFrameAt = t; rpLastJsAt = t;
+        rpStartFrameClock();
+      } else {
+        rpStopFrameClock();
+      }
     }) as { remove: () => void } | null;
   } catch { /* AppState unavailable (headless/test) */ }
 
   // Clock A — frames. Driven by the NATIVE frame callback, so it stops when the render
   // side stops even while JS keeps running.
-  const frameTick = (): void => {
-    rpLastFrameAt = Date.now();
-    if (typeof requestAnimationFrame === 'function') {
-      try { rpFrameRaf = requestAnimationFrame(frameTick) as unknown as number; } catch { rpFrameRaf = null; }
-    }
-  };
-  if (typeof requestAnimationFrame === 'function') {
-    try { rpFrameRaf = requestAnimationFrame(frameTick) as unknown as number; } catch { rpFrameRaf = null; }
-  }
+  // ⚠ OTA-1176 — started and stopped with the app's foreground state; see the AppState
+  // handler above and rpStopFrameClock/rpStartFrameClock below.
+  rpStartFrameClock();
 
   // Clock B — plain JS. Serviced by the JS thread alone. The PAIR is the discriminator;
   // neither clock on its own can tell a frozen screen from a wedged engine.
@@ -7513,6 +7604,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // clean success.
     setQwenDiscardSink((job, reason, ms) => {
       get().appendLog('debug', `qwen⏱ ✂ DISCARDED ${job} after ${ms}ms — ${reason}`);
+    });
+    // ⚠⚠ OTA-1177 — MODEL-CONTEXT LEDGER SINK. Installed HERE, beside the other two, and
+    // not in startRuntimePressureWatch: this must be live before anything can load a
+    // context, and the very first load is the one most likely to race a dispose. A sink
+    // armed after the fact would miss the event we built this to catch.
+    setContextLedgerSink((line) => {
+      get().appendLog('debug', line);
     });
     // One-shot migration from the v1 single-slot save, if present.
     await migrateLegacySlotIfPresent();
