@@ -84,6 +84,73 @@ mysteries at all.
 
 ---
 
+### P2-ANALYSIS — blast radius of "a faction site holds that faction's people"
+
+Owner, 2026-08-09: *"if we go that the faction hub only has that factions people, how many
+other things in the game will that break? there seems to be a lot of things tied to
+vendors locations, mission turn ins, boards and starting points… this seems from my memory
+to be a significant shift in coding and multiple systems wirings."*
+
+**Measured, not estimated:**
+
+| Surface | Reads | Where |
+|---|---|---|
+| `scene.vendor` | 136 | broad |
+| `vendor.faction` | **55** | 47 store, 4 VendorScreen, 2 vendors.ts, 2 VendorContractsModal |
+| `missionBoard` | 23 | store |
+| `hubRoomFor` | 9 | store, InputBox |
+
+**⚠⚠ THE BIGGEST FINDING DE-RISKS IT: THE OWNERSHIP MAP ALREADY EXISTS.**
+`character.ts:307` — `FACTION_STARTING_LOCATION` maps **all nine factions to their own
+site**, and it is exactly the list the location tags produce:
+
+```
+reclaimers_guild → reclaimer_stake        forgotten_order → varakush
+mud_monarchs → monarch_waystation         true_tartarians → pilgrim_waycamp
+eternal_dynasty → dynasty_border_post     conspiracy_architects → architect_blind
+servants_of_giants → giant_watch_shrine   stone_builders → builders_survey_camp
+tartarian_revivalists → revivalist_field_camp
+```
+
+**Nothing needs inventing.** "Which faction owns this place" is already answered in code
+and already drives where a new character spawns. The change is to *use* that mapping for
+vendor anchoring too.
+
+**⚠ IT IS BIGGER THAN "PLACEMENT", THOUGH — `vendor.faction` GATES THE OFFER SIDE TOO.**
+`gameStore.ts:11571 / 11596 / 11621 / 11646` filter quests, mysteries, storylines and
+hunts by `def.factionId === vendor.faction`. So a faction's vendor both **gives** and
+**takes** that faction's work. Changing anchors changes where you *get* work, not only
+where you hand it in. That is the intended effect — it is also a larger behavioural change
+than the word "placement" suggests, and it is why this is filed as analysis rather than a
+one-line fix.
+
+**⚠⚠ AND THERE IS ONE GENUINE TRAP, WHICH IS THE REASON P3 MUST LAND FIRST OR ALONGSIDE:**
+
+At −20 standing a faction turns hostile. If the Conspiracy Architects' only turn-in becomes
+the Architect Blind, then **a player hostile to them holds an unfinishable quest again** —
+the same defect in a new costume, and arguably worse, because today's random vendor at
+least does not care where the player is standing. **The remote hand-in (P3) is the fallback
+that makes faction-site anchoring safe.** Shipping the anchoring without it trades one
+unfinishable state for another.
+
+**What is NOT at risk:**
+- **Starting points.** Every faction already spawns at its own site, so a new character
+  meets their own faction's agent immediately — this *improves* the on-ramp.
+- **Your own faction's work.** The mission board posts the player's own faction in
+  `outpost_central` regardless of where they are; that safety net stays.
+- **The other 130-odd `scene.vendor` reads.** They read name/offers/prices/dialogue, not
+  faction identity, and are unaffected by which vendor is anchored.
+
+**Honest scale:** not a rewrite, not a patch. A contained change across ~4 surfaces
+(anchor selection, the 9 `hubRoomFor` sites if sites keep their own identity, offer
+filtering, turn-in) with **one trap that must be closed first**.
+
+⚠ **STILL UNVERIFIED, and it decides part of the work:** whether the reskin-to-player
+behaviour (`hubRoomFor(roomId, player.factionId)`) is deliberate or another omission. Not
+yet checked, and not assumed.
+
+---
+
 ### P3 — The remote hand-in was designed as the escape hatch for exactly this, and is dead code
 
 - **Kind:** UNFINISHABLE *(contributing cause of P2)*
