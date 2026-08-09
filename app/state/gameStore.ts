@@ -183,6 +183,8 @@ import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrat
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
 import { setQwenTelemetrySink, setQwenDiscardSink, noteQwenDiscarded, qwenCallCount, qwenTelemetrySummary } from '../ai/generation/qwenTelemetry';
+// OTA-1200 — live llama-context counter. Instrument only; changes no behaviour.
+import { setContextLedgerSink } from '../ai/generation/contextLedger';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
 import {
   LOCATION_TO_MACRO,
@@ -7664,6 +7666,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // clean success.
     setQwenDiscardSink((job, reason, ms) => {
       get().appendLog('debug', `qwen⏱ ✂ DISCARDED ${job} after ${ms}ms — ${reason}`);
+    });
+    // ⚠⚠ OTA-1200 — MODEL-CONTEXT LEDGER SINK. Installed HERE, beside the other two, and
+    // not in startRuntimePressureWatch: this must be live before anything can load a
+    // context, and the very first load is the one most likely to race a dispose. A sink
+    // armed after the fact would miss the event we built this to catch.
+    setContextLedgerSink((line) => {
+      get().appendLog('debug', line);
     });
     // One-shot migration from the v1 single-slot save, if present.
     await migrateLegacySlotIfPresent();

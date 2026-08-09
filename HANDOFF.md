@@ -1354,8 +1354,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-07-1184`**,
-**golem-line `2026-08-07-1161`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1200`**,
+**golem-line `2026-08-09-1177`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1364,7 +1364,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.87**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.110**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1584,7 +1584,90 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠ THE INSTRUMENT STOPS WHEN NOBODY IS LOOKING (2026-08-08, latest). HAL + GOLEM.** HAL
+- **⚠⚠ THE FIRST HARD NUMBER, AND AN INSTRUMENT INSTEAD OF A FIX (2026-08-09, latest).
+  HAL + GOLEM.** HAL OTA-1200 / golem OTA-1177. **steam NOT included — batched (§2).**
+
+  **MEASURED: 2026-08-08, three JetsamEvent reports off the owner's iPhone XR (3GB),
+  all three naming us:**
+
+  ```
+  "largestProcess" : "TartariaRealmsHAL"
+  "reason"         : "per-process-limit"
+  "rpages"         : 118454   →  1.85 GB
+  "rpages"         : 121207   →  1.89 GB
+  ```
+
+  Every other process in those lists is 100–1,200 pages (2–19MB); we were at 121,000.
+  `per-process-limit` means iOS killed us for blowing **our own** cap, not because the
+  system was short — and ~50 daemons died of `vm-pageshortage` in the seconds before us,
+  so we starved the phone on the way down. **That is the freeze and the crash, both.**
+  Verified 2026-08-08 by reading the reports directly, not inferred from behaviour.
+
+  ⚠ **The model is ~400MB of that. Roughly 1.5GB has no owner yet.**
+
+  **⚠⚠ THE CANDIDATE — recorded as a candidate on purpose, and NOT acted on.**
+  `LlamaRuntime.dispose()` reads `const ctx = this.context; this.context = null; if (!ctx)
+  return;`. A dispose landing while `initLlama` is still in flight frees **nothing**,
+  because `this.context` has not been assigned yet — and the load then completes and hands
+  a ~400MB native context to an object nobody holds. Four or five orphans is 1.6–2.0GB,
+  which fits the measurement, and it is exactly the shape of the OTA-1196 loop
+  (load → warning → dispose that frees nothing → load again). **Suspected. Unmeasured.
+  So this OTA changes no behaviour at all**, and there is a test pinning that.
+
+  **WHAT SHIPPED — `app/ai/generation/contextLedger.ts`, dependency-free with a pluggable
+  sink** so `LlamaRuntime` stays a leaf and no import cycle is possible (the store installs
+  the sink in `hydrate()`, beside the two Qwen ones — armed before the first load, because
+  the first load is the one most likely to race a dispose):
+
+  1. **opened / released / live / peak**, and a loud line the instant `live > 1`. There is
+     never a legitimate reason to hold two contexts; the engine keeps a single runtime.
+  2. **The orphan signature, by name** — but ⚠ **gated on a new `loadInFlight` flag.**
+     `dispose()` finds nothing in two completely different situations, and the routine one
+     (never loaded, or disposed twice) fires on **every backgrounding**. Logging both would
+     bury the real event under noise, and an instrument nobody reads by Thursday is worse
+     than none. The routine case stays silent.
+  3. **The straggler teardown in `QwenGenerativeEngine` is counted too.** That guard looks
+     correct on the page and was still the leading suspect after the jetsam reports —
+     precisely because nothing proved it executes. ⚠ **If orphans climb while stragglers
+     sit at 0, the guard is not running and the read was wrong.**
+  4. **A block in the bug-report header**, behind its own try/catch like the OTA-1195 one.
+     Reads flat and unalarming on a clean session.
+
+  **⚠⚠ AND THE RULE, ENFORCED BY CI RATHER THAN BY MEMORY.** Owner: *"what rule can we put
+  in place to keep this cycle of decisions from happening again"*. The rule is **measure
+  the cause, or ship an instrument** — and prose was already tried and already lost:
+  OTA-1195 wrote *instrument first, then fix* into its own source, and OTA-1196 overrode it
+  the same afternoon with a well-argued paragraph and built a reload loop that OTA-1198 had
+  to interlock. So `scripts/check-handoff-claims.mjs` gains a **second ratchet**: a sentence
+  **asserting** a cause must carry `MEASURED:` beside it, a dated verification receipt, or
+  an honest hedge (*candidate / suspected / hypothesis*). Baseline **4** legacy claims in
+  `.ci-handoff-causes-baseline`; ratchets down only, same as the prohibition pass. ⚠ Both
+  passes are now evaluated **before anything exits** — the single-pass version returned
+  early on a shrinking count, which would have let a new unmeasured claim through on any
+  run where the other debt happened to drop.
+
+  ⚠ **The hedge escape is not a loophole, it is the other half of the rule working.** This
+  very entry uses it: the orphan theory above is labelled *suspected*, and the response was
+  a counter rather than a fix. Naming a guess as a guess costs one word and stops it
+  hardening into a premise three messages later — which is the second thing that went wrong
+  this week, when a **~425MB estimate** was stated once as a guess and then cited as fact
+  five times, and used to argue the phone should cope comfortably. The measurement came back
+  **4.5× higher**.
+
+  **Tests:** new suite `ota1200ContextLedger` (21). ⚠ The centre of it is a **real
+  `LlamaRuntime` driven against a held-open fake load**, so the dispose-mid-load race is
+  *executed* and asserted (dispose frees nothing → load lands → `live=1` with nobody
+  holding it), not described in a comment. Mutation-checked 2026-08-09: removing the
+  `loadInFlight` gate kills three tests; the new CI ratchet was verified the same way —
+  an unhedged cause claim exits 1, hedged and `MEASURED:` both exit 0.
+
+  **WHAT THIS BUYS AND WHAT IT DOES NOT.** It does not fix anything. The next device log
+  answers one question — *is it four orphaned contexts, or is the 1.5GB somewhere else
+  entirely* — and the fix gets written against that number. ⚠ **If `live` reads 1 and
+  orphans read 0, the leak is NOT the model and the search moves**, which is worth as much
+  as a confirmation and is the reason this ships alone.
+
+- **⚠ THE INSTRUMENT STOPS WHEN NOBODY IS LOOKING (2026-08-08). HAL + GOLEM.** HAL
   OTA-1199 / golem OTA-1176. **steam NOT included — batched (§2).** Owner sent a React
   Native / Hermes memory checklist. **Item 2 — *"subscriptions, intervals, or event
   listeners that never get cleared"* — was MINE**, from OTA-1195 the same afternoon: a
