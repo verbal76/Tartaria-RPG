@@ -443,7 +443,7 @@ export function ContractsScreen() {
       readyRows.push({
         key: `rh_${h.run.id}`, tag: 'HUNT', title: d.title,
         locId: markerLocId(`h_${h.run.id}`),
-        note: 'paid face to face — a vendor or the posting faction’s agent',
+        note: 'paid face to face — the posting faction’s agent, or the trading post for 80%',
         onComplete: () => completeContractFromUI('hunt', d.id),
       });
   }
@@ -452,7 +452,8 @@ export function ContractsScreen() {
     if (d && stageRunReady('mystery', m.run, d))
       readyRows.push({
         key: `rm_${m.run.id}`, tag: 'MYSTERY', title: d.title,
-        locId: markerLocId(`m_${m.run.id}`), note: 'claim the reward',
+        locId: markerLocId(`m_${m.run.id}`),
+        note: 'hand to the posting faction’s agent, or the trading post for 80%',
         onComplete: () => completeContractFromUI('mystery', d.id),
       });
   }
@@ -461,7 +462,8 @@ export function ContractsScreen() {
     if (d && stageRunReady('storyline', sl.run, d))
       readyRows.push({
         key: `rs_${sl.run.id}`, tag: 'STORYLINE', title: d.title,
-        locId: markerLocId(`s_${sl.run.id}`), note: 'claim the reward',
+        locId: markerLocId(`s_${sl.run.id}`),
+        note: 'hand to the posting faction’s agent, or the trading post for 80%',
         onComplete: () => completeContractFromUI('storyline', d.id),
       });
   }
@@ -471,7 +473,7 @@ export function ContractsScreen() {
       readyRows.push({
         key: `rf_${d.id}`, tag: 'FACTION', title: d.title,
         locId: factionSortLocId(fq),
-        note: 'hand in at a same-faction agent for FULL reward',
+        note: 'same-faction agent pays FULL; the trading post brokers it for 80%',
         onComplete: () => completeContractFromUI('faction_quest', d.id),
       });
   }

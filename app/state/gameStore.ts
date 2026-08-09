@@ -25422,6 +25422,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-451 — turn in to a same-faction VENDOR or the OUTPOST MISSION BOARD.
     // OTA-456 — or REMOTELY by courier ("send word <quest>") from anywhere, for a
     // 15% TC cut (full rep). Travel to claim in full stays the optimal play.
+    // OTA-1208 — the trading post brokers ANY faction's contract for a cut (PUNCHLIST P2).
+    // ⚠ Resolved here, before `turnFaction`, because this handler decides who it is
+    // dealing with BEFORE it knows which contract is meant — and the broker's whole point
+    // is that he does not need to match. Without this the outskirts gate (a hub with no
+    // owning faction, so no hall fallback) would refuse him at the early return below.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
+    const atBroker = CB.isContractBroker(scene?.vendor);
     let turnFaction = scene?.vendor?.faction ?? scene?.missionBoard?.faction ?? null;
     let turnSourceName = scene?.vendor?.name ?? (scene?.missionBoard ? 'The mission board' : null);
     // OTA-617 — BUILDING-LEVEL in-person turn-in. If you're inside a faction's
@@ -25440,7 +25448,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         turnSourceName = `the ${homeFaction.name} hall`;
       }
     }
-    if (!turnFaction || !turnSourceName) {
+    if ((!turnFaction && !atBroker) || !turnSourceName) {
       // If the player named a specific contract, fuzzy-match it and tell
       // them the exact faction + sample vendor names. Otherwise fall
       // back to listing the factions they owe across all active quests.
@@ -25509,10 +25517,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    if (candidate.factionId !== turnFaction) {
+    // OTA-1208 — brokered when the trading post is standing in for a faction that is not
+    // its own. Computed here rather than reused from `atBroker` so a contract the broker
+    // could have taken anyway (unaligned, or his own) is NOT charged a cut.
+    const questViaBroker = atBroker && candidate.factionId !== turnFaction;
+    if (!questViaBroker && candidate.factionId !== turnFaction) {
       get().appendLog(
         'arbiter',
-        `${sourceLabel} won't take it — wrong faction. Bring it to ${candidate.factionId.replace(/_/g, ' ')}.`,
+        `${sourceLabel} won't take it — wrong faction. Bring it to ${candidate.factionId.replace(/_/g, ' ')}, or to the trading post at any outpost gate.`,
       );
       return;
     }
@@ -25543,6 +25555,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    // ⚠⚠ OTA-1208 — THE BROKER DOES TAKE DELIVERIES, and the first version of this did
+    // not. Getting that wrong would have opened a NEW unfinishable state while closing
+    // P2, so the reasoning is recorded here rather than left to be re-derived.
+    //
+    //   The first pass refused a fetch quest at the broker, on the strength of OTA-456
+    //   ("a FETCH quest is a PHYSICAL delivery … you can't mail the goods"), and argued it
+    //   cost no reachability because faction quests come from the player's OWN mission
+    //   board. ⚠ THAT SECOND CLAIM IS FALSE, and this suite's own premise check caught it:
+    //   faction quests are ALSO offered by vendors (`acceptFaction`, from the scene
+    //   vendor), and a Hidden Market stall searches EVERY faction's pool. A player can
+    //   therefore be holding an unreachable faction's fetch quest — exactly the contract
+    //   this OTA exists to un-strand — and the refusal would have stranded it.
+    //
+    //   ⚠ OTA-456's rule is not violated by allowing it. Its words are about goods
+    //   travelling by word of mouth with nobody present. Here the player stands at the
+    //   counter and the items leave their hands: the fetch gate immediately below still
+    //   verifies the player HOLDS them and still consumes them. The goods change hands in
+    //   person. Only the final destination is delegated, which is what a broker is.
+    //
     // OTA-450 — fetch gate. The generic per-faction starter quests require the
     // player to actually HOLD the items; verify, then consume them on turn-in so
     // it's a real "gather N, bring them back" loop (not a free narrative close).
@@ -25583,7 +25614,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const e = activeRecord.escort;
       if (e.hpMax > 0) escortPayMult = Math.max(0.1, Math.min(1, e.hp / e.hpMax));
     }
-    const payTc = Math.max(1, Math.round((candidate.reward.tc + journeyTc) * escortPayMult));
+    // OTA-1208 — the broker takes his cut and forfeits the long-haul bonus; the escort
+    // multiplier still applies on top, because that one prices how many of the party you
+    // actually walked home and has nothing to do with who paid you.
+    const baseAndJourneyTc = CB.contractPayoutTc(candidate.reward.tc, journeyTc, questViaBroker);
+    const payTc = Math.max(1, Math.round(baseAndJourneyTc * escortPayMult));
+    // ⚠ The announce line must not claim a long-haul bonus the broker did not pay.
+    const shownJourneyTc = questViaBroker ? 0 : journeyTc;
+    if (questViaBroker) {
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId.replace(/_/g, ' ')));
+    }
     const payRep = candidate.reward.rep;
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, payRep);
     set((s) =>
@@ -25604,7 +25644,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().announceMissionComplete(
       'Contract',
       candidate.title,
-      `✦ Faction contract complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${payRep > 0 ? `, +${payRep} rep with ${fLabel}` : ''}.`,
+      `✦ Faction contract complete — ${candidate.title}. +${payTc} TC${shownJourneyTc > 0 ? ` (incl. +${shownJourneyTc} long-haul)` : ''}${questViaBroker ? ` (broker's cut taken)` : ''}${payRep > 0 ? `, +${payRep} rep with ${fLabel}` : ''}.`,
     );
     // OTA-1073 — the agent who took it back remembers that you finished it.
     creditTurnIn(get, set, remote);
@@ -26044,10 +26084,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    if (!remote && candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
+    // OTA-1208 — the trading post brokers another faction's bounty for a cut (PUNCHLIST
+    // P2). ⚠ The trophy still changes hands IN PERSON, at an outpost the player walked to
+    // — OTA-810's rule ("a bounty is paid face to face, not sent by runner") is intact.
+    // What is gone is the requirement that the RIGHT faction's agent happen to be
+    // standing there when you arrive.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
+    const huntViaBroker = CB.isContractBroker(scene?.vendor)
+      && !!candidate.factionId && candidate.factionId !== scene?.vendor?.faction;
+    if (!remote && !CB.vendorCanTakeContract(scene?.vendor, candidate.factionId)) {
       get().appendLog(
         'arbiter',
-        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId.replace(/_/g, ' ')} posted that one."`,
+        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId!.replace(/_/g, ' ')} posted that one — them, or the trading post at any outpost gate."`,
       );
       return;
     }
@@ -26094,7 +26143,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // scaled to how far you carried the trophy.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc);
-    const payTc = candidate.rewardTc + journeyTc;
+    // OTA-1208 — 80% and no long-haul bonus when the trading post carried it.
+    const payTc = CB.contractPayoutTc(candidate.rewardTc, journeyTc, huntViaBroker);
+    if (huntViaBroker) {
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' ')));
+    }
     set((s) =>
       s.player
         ? {
@@ -26112,7 +26165,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().announceMissionComplete(
       'Hunt',
       candidate.title,
-      `✦ Hunt complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
+      `✦ Hunt complete — ${candidate.title}. +${payTc} TC${!huntViaBroker && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${huntViaBroker ? ` (broker's cut taken)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
     );
     // OTA-1073 — the agent who took it back remembers that you finished it.
     creditTurnIn(get, set, false);
@@ -26372,10 +26425,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    if (candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
+    // OTA-1208 — the trading post brokers another faction's work for a cut (PUNCHLIST P2).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
+    const mysteryViaBroker = CB.isContractBroker(scene?.vendor)
+      && !!candidate.factionId && candidate.factionId !== scene?.vendor?.faction;
+    if (!CB.vendorCanTakeContract(scene?.vendor, candidate.factionId)) {
       get().appendLog(
         'arbiter',
-        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId.replace(/_/g, ' ')} posted that."`,
+        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId!.replace(/_/g, ' ')} posted that — take it to them, or to the trading post at any outpost gate."`,
       );
       return;
     }
@@ -26414,9 +26472,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
     // B2 — full pay + a LONG-HAUL bonus scaled to how far you carried it.
+    // OTA-1208 — unless the trading post brokered it, which pays 80% and no bonus.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc);
-    const payTc = candidate.rewardTc + journeyTc;
+    const payTc = CB.contractPayoutTc(candidate.rewardTc, journeyTc, mysteryViaBroker);
+    if (mysteryViaBroker) {
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' ')));
+    }
     set((s) =>
       s.player
         ? {
@@ -26434,7 +26496,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().announceMissionComplete(
       'Mystery',
       candidate.title,
-      `✦ Mystery complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
+      `✦ Mystery complete — ${candidate.title}. +${payTc} TC${!mysteryViaBroker && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${mysteryViaBroker ? ` (broker's cut taken)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
     );
     // OTA-1073 — the agent who took it back remembers that you finished it.
     creditTurnIn(get, set, false);
@@ -26643,10 +26705,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // storyline ever ships with factionId=null (none currently do,
     // but schema allows it) the old bare !== check would reject
     // every vendor; the && short-circuits that.
-    if (candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
+    // OTA-1208 — the trading post brokers another faction's work for a cut (PUNCHLIST P2).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
+    const storyViaBroker = CB.isContractBroker(scene?.vendor)
+      && !!candidate.factionId && candidate.factionId !== scene?.vendor?.faction;
+    if (!CB.vendorCanTakeContract(scene?.vendor, candidate.factionId)) {
       get().appendLog(
         'arbiter',
-        `${sourceLabel} shakes their head. "Wrong faction. ${candidate.factionId.replace(/_/g, ' ')} posted that one."`,
+        `${sourceLabel} shakes their head. "Wrong faction. ${candidate.factionId!.replace(/_/g, ' ')} posted that one — them, or the trading post at any outpost gate."`,
       );
       return;
     }
@@ -26663,7 +26730,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       : [...player.inventory];
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc);
-    const payTc = candidate.rewardTc + journeyTc;
+    // OTA-1208 — 80% and no long-haul bonus when the trading post carried it.
+    const payTc = CB.contractPayoutTc(candidate.rewardTc, journeyTc, storyViaBroker);
+    if (storyViaBroker) {
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' ')));
+    }
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep);
     set((s) =>
       s.player
@@ -26682,7 +26753,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().announceMissionComplete(
       'Storyline',
       candidate.title,
-      `✦ Storyline complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
+      `✦ Storyline complete — ${candidate.title}. +${payTc} TC${!storyViaBroker && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${storyViaBroker ? ` (broker's cut taken)` : ''}, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
     );
     // OTA-1073 — the agent who took it back remembers that you finished it.
     creditTurnIn(get, set, false);
@@ -26759,8 +26830,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('arbiter', `The Arbiter folds their arms. "A bounty's settled in person — stand in front of a vendor or faction agent and show them the trophy."`);
         return;
       }
-      if (def.factionId && def.factionId !== scene.vendor.faction) {
-        get().appendLog('arbiter', `${scene.vendor.name} waves you off. "Wrong agent. ${def.factionId.replace(/_/g, ' ')} posted that bounty — take it to their people."`);
+      // OTA-1208 — the trading post brokers it for a cut (PUNCHLIST P2). Same rule as the
+      // typed turn-in above, resolved by the same function so the button and the command
+      // cannot disagree about who may take a contract.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
+      const huntUiViaBroker = CB.isContractBroker(scene.vendor)
+        && !!def.factionId && def.factionId !== scene.vendor.faction;
+      if (!CB.vendorCanTakeContract(scene.vendor, def.factionId)) {
+        get().appendLog('arbiter', `${scene.vendor.name} waves you off. "Wrong agent. ${def.factionId!.replace(/_/g, ' ')} posted that bounty — take it to their people, or to the trading post at any outpost gate."`);
         return;
       }
       const trophy: InventoryItem = stampDurability({
@@ -26790,7 +26868,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // B2 — long-haul bonus, same as the typed turn-in.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const huntJourneyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, def.rewardTc);
-      const huntPayTc = def.rewardTc + huntJourneyTc;
+      // OTA-1208 — 80% and NO long-haul bonus when the trading post carried it.
+      const huntPayTc = CB.contractPayoutTc(def.rewardTc, huntJourneyTc, huntUiViaBroker);
+      // ⚠ And the announce line below must not claim a bonus that was not paid — the
+      // OTA-1179 defect (a diagnostic stating an outcome nobody checked) in reward copy.
+      const huntShownJourneyTc = huntUiViaBroker ? 0 : huntJourneyTc;
+      if (huntUiViaBroker) {
+        get().appendLog('arbiter', CB.brokerAcceptLine(scene.vendor.name, def.factionId!.replace(/_/g, ' ')));
+      }
       set((s) => (s.player ? {
         player: {
           ...s.player,
@@ -26804,7 +26889,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().announceMissionComplete(
         'Hunt',
         def.title,
-        `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${huntPayTc} TC${huntJourneyTc > 0 ? ` (incl. +${huntJourneyTc} long-haul)` : ''}${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
+        `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${huntPayTc} TC${huntShownJourneyTc > 0 ? ` (incl. +${huntShownJourneyTc} long-haul)` : ''}${huntUiViaBroker ? ` (broker's cut taken)` : ''}${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
       // OTA-1073 — the agent who took it back remembers that you finished it.
       creditTurnIn(get, set, false);

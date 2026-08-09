@@ -1376,7 +1376,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1207`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1208`**,
 **golem-line `2026-08-09-1177`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1386,7 +1386,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.117**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.118**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,7 +1606,72 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ COMPLETED COLLECTIBLE STORIES NOW GRANT PERMANENT BUFFS (2026-08-09, latest).
+- **⚠⚠ PUNCHLIST P2 CLOSED — THE TRADING POST TAKES ANY FACTION'S CONTRACT (2026-08-09,
+  latest). HAL + GOLEM.** HAL OTA-1208 / golem OTA-1185. **steam NOT included — batched (§2).**
+
+  Owner, on the P2 options: *"so the best path for p2 is the Halem anchor? and this can be
+  done without restructuring the whole game?"* — then *"do halem."*
+
+  **WHAT IT WAS.** A mystery or storyline could only be handed to a vendor whose faction
+  posted it. Four vendors are anchored in the shared outpost layout and stand at every
+  outpost in the game, but between them they answer for only three factions; any other
+  faction's agent arrives solely through `pickRandomVendor()`, a uniform roll over 30.
+
+  **THE FIX.** `Halem the Trader` — anchored at `outpost_gate` and `outpost_messhall`, the
+  first face inside any gate in the world — brokers any faction's contract at **80% of
+  base, full rep, and no long-haul bonus.**
+
+  ⚠⚠ **WHY A BROKER AND NOT THE COURIER (P3).** Switching remote hand-in back on would
+  reverse the owner's OTA-824 call: *"kill all remote hand-ins, make all routable, but make
+  the journey worth the loot."* A hand-in at the trading post reverses **nothing** — still
+  face to face, still at an outpost the player travelled to. The typed "send word" courier
+  stays refused, pinned by test so this cannot be read later as having reopened it.
+
+  ⚠ **THE BONUS IS FORFEIT, NOT SHARED.** It is paid for making the trip to the faction; a
+  hand-in that skips finding them has not made that trip. Taking a cut of it instead would
+  leave the fallback competitive with the real thing at distance. Going to the right people
+  pays more at every distance, asserted across the range.
+
+  ⚠⚠ **SCOPED TO HALEM BY ID, NEVER TO `faction === null`.** Six vendors are factionless
+  and **four of them are wanderers who spawn ON THE ROAD** via the roadside roll. Matching
+  on the field would let contracts close at any drifter between tiles, deleting the travel
+  OTA-824 exists to protect. Keying on the trading post keeps the rule *reach an outpost*.
+
+  **ONE RESOLVER.** `vendorCanTakeContract` now answers for all four typed handlers plus
+  the Contracts button, replacing three different spellings of the same rule; a test fails
+  the build if a fifth spelling appears. Reward lines are gated so none can claim a
+  long-haul bonus the broker did not pay (the OTA-1179 defect in reward copy).
+
+  ⚠⚠ **THE ORIGINAL P2 WRITE-UP WAS WRONG IN BOTH DIRECTIONS, and driving the real store
+  is what found it.** It claimed a player could not finish their OWN faction's mysteries —
+  they could: `beginScene` re-points the Irma anchor to the HOST faction and reads "host"
+  from `player.factionId`, so she answers for the player at **every** outpost. And it
+  OMITTED `true_tartarians` for exactly that reason — she is re-pointed away from them.
+  Corrected in PUNCHLIST with verified per-faction counts (16 / 17 / 20, not a flat 17).
+  **A defect overstated is the same failure as a defect missed.**
+
+  ⚠⚠ **A HOLE THE SUITE'S OWN PREMISE CHECK CAUGHT BEFORE IT SHIPPED.** The first version
+  refused fetch quests at the broker, citing OTA-456's *"you can't mail the goods"*, and
+  justified it as costing no reachability because faction quests come from the player's own
+  mission board. **VERIFIED FALSE (2026-08-09)** — the suite's premise assertion failed on
+  it: `availableFactionQuests` is fed from `searchFactions`, which is derived from the
+  SCENE VENDOR, and a Hidden Market stall iterates every faction. So the refusal would have
+  stranded the exact contract this OTA exists to un-strand. The assertion that killed it
+  checks the premise, not the outcome, and is kept for that reason.
+
+  **Tests:** new suites `ota1208ContractBroker` (31) and `ota1208BrokerLive` (3 — real
+  store, real hand-in of a foreign faction's mystery, real payout check). ⚠ Two more
+  fixed-size source slices retargeted to landmarks before landing, the sixth and seventh
+  this session. Gates: typecheck:ci, lint, typecheck:tests (200 — the new live suite's four
+  errors were FIXED rather than baselined), check:handoff, check:reachability, test:ci:fast
+  (732 suites / 6,808 tests) — all green.
+
+  **Filed, not fixed:** **P9** (anchor the vendors to the site — the big one, 55
+  `vendor.faction` reads) and **P10** (the Hidden Market brokers on the accept side only —
+  one line either way, but it would change an existing location's economics, so it is the
+  owner's call).
+
+- **⚠⚠ COMPLETED COLLECTIBLE STORIES NOW GRANT PERMANENT BUFFS (2026-08-09).
   HAL + GOLEM.** HAL OTA-1207 / golem OTA-1184. **steam NOT included — batched (§2).**
 
   Owner: *"see if there are certain stories that lead well into adding an active buff…
