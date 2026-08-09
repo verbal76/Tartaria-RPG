@@ -54,6 +54,74 @@ Contracts → Collectibles and notice a banner. ⚠ Verified by searching every 
 **Why it matters against the bar:** 57 fragments is the largest gather loop in the game and
 it is the one the owner could not describe the ending of, which is itself the symptom.
 
+### P2 — 17 mysteries and storylines can only be turned in to a 1-in-30 random vendor
+
+- **Kind:** UNFINISHABLE *(in practice — completable only by grinding random spawns)*
+- **Scale:** **9 of 18 mysteries, 8 of 14 storylines**, across **6 of the 9 factions**
+- **Found:** 2026-08-09 reachability pass
+
+**The chain, each link verified:**
+
+1. Mystery and storyline turn-in gates on the vendor's faction and **nothing else**
+   (`gameStore.ts:26313`, `26546+`): `if (candidate.factionId !== scene?.vendor?.faction)`
+   → *"Wrong agent."* ⚠ Unlike `turnInFactionQuest` (`gameStore.ts:25362`), which also
+   accepts `scene?.missionBoard?.faction`, these two have **no mission-board fallback**.
+2. The mission board only ever posts the **player's own** faction, and only in
+   `outpost_central` (`gameStore.ts:10377`).
+3. **Every outpost in the game shares one room layout** (`data/world/static_hub.json`), so
+   every outpost anchors the same three faction vendors and no others:
+   Irma Ironhand (`true_tartarians`), Tarek the Tinkerer (`reclaimers_guild`),
+   Jorah the Scholar (`forgotten_order`). Halem the Trader is factionless.
+4. Any other faction's vendor can only arrive via `pickRandomVendor()`
+   (`app/engine/vendors.ts:152`), which is a **uniform pick over all 30 vendors**.
+5. Each of the six unanchored factions has **exactly one** vendor in `vendors.json`.
+
+**Net effect:** to finish a Stone Builders mystery you must roll Foreman Drest Holloway
+specifically — 1 in 30 per vendor encounter. Same for Mud Monarchs, Servants of Giants,
+Eternal Dynasty, Conspiracy Architects and Tartarian Revivalists.
+
+| Faction | Mysteries | Storylines |
+|---|---|---|
+| mud_monarchs | 2 | 2 |
+| servants_of_giants | 2 | 1 |
+| stone_builders | 2 | 1 |
+| eternal_dynasty | 1 | 2 |
+| conspiracy_architects | 1 | 1 |
+| tartarian_revivalists | 1 | 1 |
+
+⚠ **These are not the player's own faction's quests only** — a Stone Builders *character*
+hits this on their own Stone Builders mysteries, because the mission board does not accept
+mysteries at all.
+
+---
+
+### P3 — The remote hand-in was designed as the escape hatch for exactly this, and is dead code
+
+- **Kind:** UNFINISHABLE *(contributing cause of P2)*
+- **Found:** 2026-08-09, while verifying P2
+
+`turnInHunt` explains the intended design in its own comment (`gameStore.ts:25944`):
+
+> *"the remote 'send word' courier option is removed for hunts. (Mysteries / storylines /
+> faction deeds keep their remote cut; a bounty specifically is paid at the …)"*
+
+**So remote turn-in was meant to work for mysteries and storylines. It does not.**
+
+- `turnInMystery(titleOrId, _remote = false)` — `gameStore.ts:26279`
+- `turnInStoryline(titleOrId, _remote = false)` — `gameStore.ts:26546`
+
+⚠ The parameter is **underscore-prefixed in both**, i.e. accepted and never read. The
+faction-vendor gate runs unconditionally.
+
+⚠ **And no caller passes `true` anywhere in the app** — verified across `app/**`. Every
+call site (`gameStore.ts:20426–20432`, `26759–26773`, `36835`) uses the default. So the
+remote path is dead in `turnInFactionQuest` and `turnInHunt` too, where it *is* implemented.
+
+**Why this is filed separately from P2:** P2 is the reachability symptom; this is a
+mechanism that already exists, is documented as existing, and is switched off. What it
+should cost the player (a courier fee, a delay, a rep penalty) is a design decision and is
+**not** proposed here.
+
 ---
 
 ## CLEARED — checked, and these do pay out
@@ -72,6 +140,28 @@ Recorded so the audit is not re-run on them, and so a future regression has a ba
 | Ending screen | — | exits to title (two routes, plus a no-ending fallback) | `EndingScreen.tsx:100,108,216` |
 
 ---
+
+## REACHABILITY — checked and clean
+
+Run 2026-08-09. Recorded because a clean reachability result is worth as much as a finding:
+it is the difference between "no problem" and "not looked at".
+
+| Check | Result |
+|---|---|
+| All 57 collectible fragments' `biomeTags` intersect a real location's `tags` | **0 unreachable** |
+| Quest `rewardItem` names resolve in the item catalogs (866 names) | **0 missing** — mysteries 17/17, storylines 14/14 |
+| Quest `factionId`s resolve against `factions.json` | **0 unknown** — all 9 used |
+| `minRep` gates vs the standing cap (`REP_MAX = 100`) | max gate is **10** — ample headroom |
+| Every quest-giving faction has at least one vendor | **9/9** |
+
+⚠ **One false alarm, recorded so it is not "re-found".** 17 of 18 mystery `trophyName`s are
+absent from the item catalogs — which looks alarming, and is fine: trophies are minted
+inline with explicit `kind: 'relic'`, `rarity: 'Rare'`, tags and description
+(`gameStore.ts:26319`), never through `lookupCraftedItem`. ⚠ Worth knowing anyway:
+`lookupCraftedItem` **never returns null** — it falls back to a tagless Common `misc`
+(`crafting.ts:230`). So a *genuinely* missing reward name would not error; it would silently
+hand the player junk with the right name. Nothing currently hits that, and the catalog check
+above is what keeps it that way.
 
 ## NOT YET AUDITED
 
