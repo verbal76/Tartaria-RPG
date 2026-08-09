@@ -73,15 +73,19 @@ describe('⚠⚠ OTA-1211 — the new tier is STRICTLY ADDITIVE', () => {
     expect(findByTitle('red fragment tower cache', pool)).toBeNull();
   });
 
-  test('⚠⚠ BUT THE SUBSTRING TIER STILL GUESSES — pre-existing, and now FILED (P12)', () => {
-    // This assertion documents a defect rather than a guarantee, which is why it is worded
-    // as it is. `pool.find()` returns the FIRST substring match even when several fit, so
-    // a query contained by two titles silently picks one. That behaviour predates this OTA
-    // by a long way and is NOT changed here: the whole safety argument for dropping this
-    // resolver into four widely-used finders is that it is strictly additive. Quietly
-    // making the substring tier refuse would break that promise mid-change.
+  test('⚠⚠ THE SUBSTRING TIER NO LONGER GUESSES — closed by OTA-1216 (P12)', () => {
+    // ⚠ This assertion used to document a DEFECT rather than a guarantee: `pool.find()`
+    // returned the first substring match even when several fit, so a query contained by two
+    // titles silently closed one of them with a real payout attached. It was deliberately
+    // left alone here, because OTA-1211's whole safety argument for dropping a shared
+    // resolver into four widely-used finders was that it could only ever WIDEN what
+    // matched. It was filed as P12 and fixed on its own.
+    //
+    // The test is kept rather than deleted, and flipped: the same input that once picked
+    // arbitrarily now refuses. A defect test becoming a guarantee test is the record that
+    // the thing was actually fixed and not merely reworded.
     const pool = [{ title: 'Red Tower Fragment Cache' }, { title: 'Red Tower Fragment Vault' }];
-    expect(findByTitle('red tower fragment', pool)).toBe(pool[0]);
+    expect(findByTitle('red tower fragment', pool)).toBeNull();
   });
 
   test('an empty pool is safe', () => {

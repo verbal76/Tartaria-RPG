@@ -62,12 +62,36 @@ export function findByTitle<T extends { title: string }>(
 ): T | null {
   const t = text.toLowerCase().trim();
   if (!t) return null;
+  // ⚠ EXACT still wins outright, and it is the only tier allowed to. A player who typed
+  // the whole title has told us exactly which contract they mean; if two contracts somehow
+  // share a title verbatim, that is a data defect and picking the first is the least of the
+  // problems it causes.
   const exact = pool.find((x) => x.title.toLowerCase() === t);
   if (exact) return exact;
-  const substring = pool.find(
+
+  // ⚠⚠ OTA-1216 (PUNCHLIST P12) — SUBSTRING NO LONGER GUESSES.
+  //
+  // This was `pool.find(...)`, which returns the FIRST match even when several fit. Hold
+  // "Red Tower Fragment Cache" and "Red Tower Fragment Vault", type `turn in red tower
+  // fragment`, and the game silently closed whichever happened to sit earlier in the
+  // catalog — with a real payout attached and no way for the player to know it had chosen.
+  //
+  // ⚠ It was left alone deliberately in OTA-1211: that change dropped a shared resolver
+  // into four widely-used finders, and its entire safety argument was that it could only
+  // ever WIDEN what matched, never change an answer the old code already gave. Fixing this
+  // inside it would have broken that promise. It was filed as P12 instead, with a test
+  // documenting the guess rather than blessing it, and is now fixed on its own.
+  const substrings = pool.filter(
     (x) => x.title.toLowerCase().includes(t) || t.includes(x.title.toLowerCase()),
   );
-  if (substring) return substring;
+  if (substrings.length === 1) return substrings[0]!;
+  // ⚠ Two or more, and we stop HERE rather than falling through to tokens. A query that
+  // fits several titles as a substring will fit the same several as tokens, so continuing
+  // would only reach the same ambiguity by a longer road — and a caller that got `null`
+  // from the substring tier and a guess from the token tier would be the same defect wearing
+  // a different hat.
+  if (substrings.length > 1) return null;
+
   const byTokens = pool.filter((x) => titleTokensMatch(t, x.title));
   return byTokens.length === 1 ? byTokens[0]! : null;
 }

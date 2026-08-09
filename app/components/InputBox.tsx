@@ -17,7 +17,7 @@ import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS } from './tutorialSteps';
 import { playerWeaponReach, useGameStore, logUiTap } from '../state/gameStore';
 import { useReduceMotion } from '../state/accessibility';
-import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand } from '../engine/hub';
+import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 import { reachBandsFor } from '../engine/types';
 // OTA-1193 — the dodge recharge bar reads its fill from one place.
@@ -309,6 +309,19 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     return out;
   }, [hubRoom, skinFactionId]);
 
+  // ⚠ OTA-1217 (PUNCHLIST P11) — the EXIT chip belongs ONLY in the gate room. Showing it in
+  // every room let the player leave through the armory or the mess, which is not how the
+  // outpost is laid out. Ported up from golem-line, where it has been correct since
+  // 2026-06-27 while the live line was not.
+  //
+  // ⚠ The Gate is also the spawn room, so EXIT is still present where the tutorial's
+  // `explore_or_leave` beat needs it — the beat is unaffected.
+  const showExitChip = useMemo(() => {
+    if (!hubRoom) return false;
+    if (hubDefinesExitRoom()) return roomIsExit(hubRoom);
+    return true;   // no gate tagged anywhere → never strand the player
+  }, [hubRoom]);
+
   // TAKE / SALVAGE / INVESTIGATE during their tutorial beats now OPEN the
   // real picker menu so the player learns the actual interaction — the demo
   // prop (cudgel / broken chest plate / door) is injected into the matching
@@ -458,7 +471,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 // choice (the player's way out of the outpost + the tutorial).
                 <TravelBtn key={c.submit} label={c.label} onPress={() => onSubmit(c.submit)} blocked={tutLock} />
               ))}
-              <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
+              {showExitChip ? (
+                <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
+              ) : null}
             </>
           ) : sceneBuilding ? (
             // arb36 — a structure stands on this tile: offer ENTER alongside

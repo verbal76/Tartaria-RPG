@@ -1376,7 +1376,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1213`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1217`**,
 **golem-line `2026-08-09-1177`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1386,7 +1386,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.123**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.126**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,7 +1606,87 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ PUNCHLIST P13 CLOSED — THE LABYRINTH OF SHADOWS HAS AN ENDING (2026-08-09, latest).
+- **⚠⚠ PUNCHLIST P12 + P11 CLOSED — AMBIGUOUS NAMES REFUSE, AND HAL GAINS THE GATE RULE
+  (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1216/1217 / golem OTA-1193/1194.
+  **steam NOT included — batched (§2).**
+
+  **P12 — THE SUBSTRING TIER NO LONGER GUESSES.** `pool.find()` returned the FIRST match
+  even when several fit, so a query contained by two titles silently closed one of them,
+  with a real payout and no way for the player to know a choice had been made for them. It
+  now refuses on two or more, and **deliberately stops there rather than falling through to
+  tokens** — a query that fits several titles as a substring fits the same several as
+  tokens, so continuing would reach the same ambiguity by a longer road.
+
+  ⚠⚠ **IT CAUGHT A LIVE CASE THE MOMENT IT LANDED.** `accept drakova` matches TWO hunts —
+  *The Bog Dragon of Old Drakova* and *The Siren of Drowned Drakova* — and **a shipped test
+  was pinning the arbitrary pick as correct behaviour.** Retargeted to `accept old drakova`,
+  which keeps the OTA-185 guarantee it exists for (a LOCATION word, not a category word,
+  still finds a hunt) and adds a case proving the ambiguous form now takes nothing.
+
+  ⚠ **VERIFIED BEFORE CHANGING IT (2026-08-09): the refusal is not a wall.** The accept
+  handler lists every posted title on a miss — *"Not that one. Currently posted: …"* — so
+  ambiguity shows the player both and lets them choose. Had it only said "not on your
+  slate", this would have traded a wrong guess for a dead end and P12 would have stayed
+  open with that recorded.
+
+  ⚠ The OTA-1211 test that DOCUMENTED the guess is **flipped into a guarantee** rather than
+  deleted. A defect test becoming a guarantee test is the record that the thing was actually
+  fixed and not merely reworded.
+
+  **P11 — HaL2001 BROUGHT UP TO golem's VERSION.** Owner: *"ok then bring hal up to the
+  better version."* `fix(golem-line)` e04a6ed5 gated the EXIT chip to the entrance-tagged
+  Gate on 2026-06-27 and was never ported up, so **the live line — the one with the Apple
+  testers on it — has been letting players walk out of an outpost through the armory or the
+  mess hall.** Ported UP rather than stripped from golem: the live line gains the correct
+  geography and `InputBox.tsx` stops diverging on every future port.
+
+  ⚠ **THE FALLBACK IS THE POINT.** When no room is tagged `entrance`, EXIT stays available
+  everywhere. A gating rule whose failure mode is *"the player cannot leave the building"*
+  would be a far worse defect than the one it fixes.
+
+  ⚠ **Added beyond golem's version:** the rule must survive OTA-1209's per-site skins.
+  `hubRoomFor` merges only name/shortName/description so tags come from the base room — but
+  if a skin could ever drop the `entrance` tag, a player at a foreign site would lose the
+  ability to leave. Now asserted across all nine factions.
+
+  **Tests:** ota1216AmbiguousTitle (9), ota1217HubExitGate (7). Gates green: 745 suites /
+  6,975 tests.
+
+- **⚠⚠ PUNCHLIST P10 CLOSED — THE HIDDEN MARKET TAKES BACK WHAT IT HANDS OUT (2026-08-09).
+  HAL + GOLEM.** HAL OTA-1215 / golem OTA-1192. **steam NOT included — batched (§2).**
+
+  Its stalls have posted EVERY faction's open work since OTA-782; the turn-in gate was never
+  given the same rule, so a stall rostered to a Stone Builders rep would hand you a Mud
+  Monarch mystery and then refuse to take it back.
+
+  ⚠⚠ **AND IT CHARGES 10% AGAINST THE TRADING POST'S 20% — GEOGRAPHY, NOT GENEROSITY.**
+  Halem stands at the gate of every outpost in the world; the Hidden Market is ONE location
+  out past the frontier camps. The same rate at both would make the trip pointless, and
+  OTA-1210 spent a whole change establishing that travel pays. The ladder now reads
+  **direct 100% + long-haul → market 90% → trading post 80%**, asserted at every distance.
+
+  ⚠ **`contractPayoutTc` TAKES THE SHARE NOW, NOT A BOOLEAN.** A boolean cannot express two
+  brokers, and a second flag beside it would have been the same mistake with more words.
+  Changing the TYPE rather than adding a flag made the compiler find all five payout sites
+  in the store and fourteen stale assertions in two suites — none of which a new
+  quietly-defaulting boolean would have surfaced.
+
+  ⚠ **A lie caught before landing:** the broker's spoken line read `BROKER_PLAYER_SHARE`
+  directly, so a player at a market stall would have been TOLD 20% while being charged 10%.
+
+  **Tests:** ota1215HiddenMarketBroker (16).
+
+- **⚠⚠ AETHER TECHNIQUES — THE MAGE GAP, FILLED WITH SCIENCE (2026-08-09, foundation).
+  HAL + GOLEM.** HAL OTA-1214 / golem OTA-1191. **steam NOT included — batched (§2).**
+
+  See PUNCHLIST P16 — the engine module and its rules are shipped and tested; the runner,
+  the combat turn cost, the four effects, an acquisition route and the tab remain. All four
+  effects have confirmed homes in shipped machinery, which was the risk that could have sunk
+  it: Shield → `statusAcAdjustment` (precedent `shaped_stone_ward`), Slip → the combat damage
+  site (precedent `defensive_protocols`), Veil → the existing `stealthed` status, Cascade →
+  ordinary damage resolution.
+
+- **⚠⚠ PUNCHLIST P13 CLOSED — THE LABYRINTH OF SHADOWS HAS AN ENDING (2026-08-09).
   HAL + GOLEM.** HAL OTA-1213 / golem OTA-1190. **steam NOT included — batched (§2).**
 
   Owner: *"we need an ending to p13 the labyrinth. it should already award a title, make it

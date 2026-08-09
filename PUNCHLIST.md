@@ -709,6 +709,8 @@ nothing checks that the two still agree.
 
 ### P12 — A typed contract name that fits two titles silently closes one of them
 
+## ✅ **CLOSED — OTA-1216.** The substring tier refuses instead of guessing. ⚠ It caught a live case immediately: `accept drakova` matched TWO hunts and a shipped test was pinning the arbitrary pick as correct.
+
 - **Kind:** WRONG TARGET *(pre-existing; found 2026-08-09 while building OTA-1211)*
 - ⚠ **Not introduced by OTA-1211, and deliberately not fixed there.**
 
@@ -734,6 +736,8 @@ behaviour change, which is why it is a decision rather than a patch.
 ---
 
 ### P11 — HaL2001 lets you leave the outpost from any room; golem-line does not
+
+## ✅ **CLOSED — OTA-1217.** Owner: *"ok then bring hal up to the better version."* The fix was ported UP rather than stripped from golem, so the live line gained the correct geography and `InputBox.tsx` stops diverging.
 
 - **Kind:** LINE DIVERGENCE *(not a defect on either line — a decision that was only ever made on one of them)*
 - **Found:** 2026-08-09, when `verify-parity` flagged `InputBox.tsx` during the OTA-1209 port
@@ -769,6 +773,8 @@ only option that keeps `InputBox.tsx` diverging forever.
 ---
 
 ### P10 — The Hidden Market hands out contracts it cannot take back
+
+## ✅ **CLOSED — OTA-1215.** Its stalls broker at **10%**, against the trading post's 20% — geography, not generosity: one location you travel to versus a broker at every gate.
 
 - **Kind:** INCOHERENCE *(no longer a dead end — the broker covers it)*
 - **Found:** 2026-08-09, while building OTA-1208

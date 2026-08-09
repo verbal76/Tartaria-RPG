@@ -36,8 +36,8 @@ describe('OTA-1211 — what the courier costs', () => {
   test('⚠ it is worse than the broker, which is worse than going yourself', () => {
     // The ladder has to hold at every rung or the fallback becomes the default.
     const base = 200, bonus = 90;
-    const inPerson = contractPayoutTc(base, bonus, false);
-    const broker = contractPayoutTc(base, bonus, true);
+    const inPerson = contractPayoutTc(base, bonus, null);
+    const broker = contractPayoutTc(base, bonus, BROKER_PLAYER_SHARE);
     const courier = courierPayoutTc(base);
     expect(inPerson).toBeGreaterThan(broker);
     expect(broker).toBeGreaterThan(courier);

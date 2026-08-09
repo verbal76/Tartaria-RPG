@@ -25793,12 +25793,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-1208 — the broker takes his cut and forfeits the long-haul bonus; the escort
     // multiplier still applies on top, because that one prices how many of the party you
     // actually walked home and has nothing to do with who paid you.
-    const baseAndJourneyTc = CB.contractPayoutTc(candidate.reward.tc, journeyTc, questViaBroker);
+    const baseAndJourneyTc = CB.contractPayoutTc(candidate.reward.tc, journeyTc, questViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
     const payTc = Math.max(1, Math.round(baseAndJourneyTc * escortPayMult));
     // ⚠ The announce line must not claim a long-haul bonus the broker did not pay.
     const shownJourneyTc = questViaBroker ? 0 : journeyTc;
     if (questViaBroker) {
-      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId.replace(/_/g, ' ')));
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
     }
     const payRep = candidate.reward.rep;
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, payRep);
@@ -26324,9 +26324,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc, record?.acceptedAtCell);
     // OTA-1208 — 80% and no long-haul bonus when the trading post carried it.
-    const payTc = CB.contractPayoutTc(candidate.rewardTc, journeyTc, huntViaBroker);
+    const payTc = CB.contractPayoutTc(candidate.rewardTc, journeyTc, huntViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
     if (huntViaBroker) {
-      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' ')));
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
     }
     set((s) =>
       s.player
@@ -26664,13 +26664,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ⚠ OTA-1211 — a courier hand-in pays the runner's rate and NO long-haul bonus.
     const payTc = mystViaCourier
       ? CB.courierPayoutTc(candidate.rewardTc)
-      : CB.contractPayoutTc(candidate.rewardTc, journeyTc, mysteryViaBroker);
+      : CB.contractPayoutTc(candidate.rewardTc, journeyTc, mysteryViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
     if (mystViaCourier) {
       get().appendLog('arbiter', CB.courierSentLine(candidate.title, payTc));
       set((st) => (st.player ? { player: advanceTime(st.player, CB.COURIER_DELAY_HOURS) } : st));
     }
     if (mysteryViaBroker) {
-      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' ')));
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
     }
     set((s) =>
       s.player
@@ -26931,13 +26931,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ⚠ OTA-1211 — courier rate, no long-haul bonus.
     const payTc = storyViaCourier
       ? CB.courierPayoutTc(candidate.rewardTc)
-      : CB.contractPayoutTc(candidate.rewardTc, journeyTc, storyViaBroker);
+      : CB.contractPayoutTc(candidate.rewardTc, journeyTc, storyViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
     if (storyViaCourier) {
       get().appendLog('arbiter', CB.courierSentLine(candidate.title, payTc));
       set((st) => (st.player ? { player: advanceTime(st.player, CB.COURIER_DELAY_HOURS) } : st));
     }
     if (storyViaBroker) {
-      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' ')));
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
     }
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep);
     set((s) =>
@@ -27076,12 +27076,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const huntJourneyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, def.rewardTc, rec?.acceptedAtCell);
       // OTA-1208 — 80% and NO long-haul bonus when the trading post carried it.
-      const huntPayTc = CB.contractPayoutTc(def.rewardTc, huntJourneyTc, huntUiViaBroker);
+      const huntPayTc = CB.contractPayoutTc(def.rewardTc, huntJourneyTc, huntUiViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
       // ⚠ And the announce line below must not claim a bonus that was not paid — the
       // OTA-1179 defect (a diagnostic stating an outcome nobody checked) in reward copy.
       const huntShownJourneyTc = huntUiViaBroker ? 0 : huntJourneyTc;
       if (huntUiViaBroker) {
-        get().appendLog('arbiter', CB.brokerAcceptLine(huntUiParty.name, def.factionId!.replace(/_/g, ' ')));
+        get().appendLog('arbiter', CB.brokerAcceptLine(huntUiParty.name, def.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
       }
       set((s) => (s.player ? {
         player: {

@@ -122,12 +122,17 @@ describe('OTA-1208 — who may take a contract', () => {
 });
 
 describe('OTA-1208 — what the broker costs', () => {
+  // ⚠ RETARGETED BY OTA-1215. `contractPayoutTc` took a boolean `viaBroker` until the
+  // Hidden Market arrived charging a different rate — a boolean cannot express two
+  // brokers. It now takes the player's SHARE (or null for a direct hand-in), so these
+  // pass BROKER_PLAYER_SHARE where they used to pass `true`. The rule each one guards is
+  // unchanged; only how the rate is spelled has moved.
   test('a direct hand-in pays base plus the long-haul bonus', () => {
-    expect(contractPayoutTc(100, 40, false)).toBe(140);
+    expect(contractPayoutTc(100, 40, null)).toBe(140);
   });
 
   test('the broker pays 80% of base', () => {
-    expect(contractPayoutTc(100, 0, true)).toBe(80);
+    expect(contractPayoutTc(100, 0, BROKER_PLAYER_SHARE)).toBe(80);
     expect(BROKER_PLAYER_SHARE).toBe(0.8);
   });
 
@@ -135,30 +140,30 @@ describe('OTA-1208 — what the broker costs', () => {
     // The bonus is paid for making the trip to the faction. A hand-in that skips finding
     // them has not made that trip. Taking a cut of it instead would leave the fallback
     // competitive with the real thing at distance, which is backwards.
-    expect(contractPayoutTc(100, 150, true)).toBe(80);
-    expect(contractPayoutTc(100, 150, true)).toBeLessThan(contractPayoutTc(100, 150, false));
+    expect(contractPayoutTc(100, 150, BROKER_PLAYER_SHARE)).toBe(80);
+    expect(contractPayoutTc(100, 150, BROKER_PLAYER_SHARE)).toBeLessThan(contractPayoutTc(100, 150, null));
   });
 
   test('⚠ going to the right people always pays more, at every distance', () => {
     for (const bonus of [0, 5, 30, 150]) {
-      expect(contractPayoutTc(100, bonus, false)).toBeGreaterThan(contractPayoutTc(100, bonus, true));
+      expect(contractPayoutTc(100, bonus, null)).toBeGreaterThan(contractPayoutTc(100, bonus, BROKER_PLAYER_SHARE));
     }
   });
 
   test('⚠ a contract that paid something never brokers down to nothing', () => {
     // A 0 TC result on a small contract reads as "the hand-in did nothing" — the exact
     // complaint P1 was filed for. Floored at 1.
-    expect(contractPayoutTc(1, 0, true)).toBe(1);
-    expect(contractPayoutTc(2, 0, true)).toBeGreaterThanOrEqual(1);
+    expect(contractPayoutTc(1, 0, BROKER_PLAYER_SHARE)).toBe(1);
+    expect(contractPayoutTc(2, 0, BROKER_PLAYER_SHARE)).toBeGreaterThanOrEqual(1);
   });
 
   test('a contract that paid nothing still pays nothing', () => {
-    expect(contractPayoutTc(0, 0, true)).toBe(0);
+    expect(contractPayoutTc(0, 0, BROKER_PLAYER_SHARE)).toBe(0);
   });
 
   test('negative or fractional inputs cannot produce a negative payout', () => {
-    expect(contractPayoutTc(-50, -10, false)).toBe(0);
-    expect(contractPayoutTc(-50, -10, true)).toBe(0);
+    expect(contractPayoutTc(-50, -10, null)).toBe(0);
+    expect(contractPayoutTc(-50, -10, BROKER_PLAYER_SHARE)).toBe(0);
   });
 
   test('the line he says names the same cut the maths applies', () => {
