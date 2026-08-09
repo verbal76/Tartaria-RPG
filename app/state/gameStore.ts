@@ -184,7 +184,9 @@ import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
 import { setQwenTelemetrySink, setQwenDiscardSink, noteQwenDiscarded, qwenCallCount, qwenTelemetrySummary } from '../ai/generation/qwenTelemetry';
 // OTA-1177 — live llama-context counter. Instrument only; changes no behaviour.
-import { setContextLedgerSink } from '../ai/generation/contextLedger';
+// OTA-1179 — the ledger is now READ as well as fed: the memory handler compares the
+// release count across a dispose so it can report what it actually freed.
+import { setContextLedgerSink, contextLedger, APPROX_CONTEXT_MB } from '../ai/generation/contextLedger';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
 import {
   LOCATION_TO_MACRO,
@@ -2003,10 +2005,18 @@ function startRuntimePressureWatch(
       rpLastMemoryWarningAt = t;
       let qwenStatus: string | undefined;
       try { qwenStatus = typeof qwen.getStatus === 'function' ? qwen.getStatus() : undefined; } catch { /* best effort */ }
+      // OTA-1179 — the OTHER native model. Read lazily and behind its own guard so the
+      // voice subsystem can never break the memory instrument.
+      let kokoroPhase: string | undefined;
+      try {
+        const p = require('../voice/PiperTTSManager') as typeof import('../voice/PiperTTSManager');
+        kokoroPhase = p.getKokoroState().phase;
+      } catch { /* best effort */ }
       try {
         get().appendLog('debug', memoryWarningLine(rpMemoryWarnings, since, {
           appState: rpAppState,
           qwenStatus,
+          kokoroPhase,
           qwenReinitAttempts,
           saveKb: rpLastSaveKb ?? undefined,
         }));
@@ -2031,9 +2041,37 @@ function startRuntimePressureWatch(
       if (rpMemoryWarnings >= MEMORY_WARNINGS_BEFORE_STANDDOWN) rpQwenStoodDownForMemory = true;
       try {
         if (typeof (qwen as { dispose?: () => Promise<void> }).dispose === 'function') {
+          // ⚠⚠ OTA-1179 — SNAPSHOT BEFORE, COMPARE AFTER. THIS LINE USED TO LIE, AND IT
+          // LIED TO ME FOR A WEEK.
+          //
+          // It printed "released the Qwen context (~400MB)" unconditionally once dispose()
+          // resolved — whether or not there was anything to release. The owner's 2026-08-09
+          // report on OTA-1177 prints it FIVE TIMES, and every one of those warnings reads
+          // `qwen='idle'` or `qwen='failed'`, i.e. no model was loaded and the call freed
+          // nothing:
+          //     02:50:45.915  ⚠⚠ MEMORY WARNING #1 — qwen='failed' · reloads=0
+          //     02:50:45.964  memory: released the Qwen context (~400MB)   ← freed nothing
+          //     02:51:36.232  ⚠⚠ MEMORY WARNING #5 — qwen='idle'  · reloads=0
+          //     02:51:36.293  memory: released the Qwen context (~400MB)   ← freed nothing
+          //
+          // ⚠ I QUOTED THESE LINES AS EVIDENCE in the OTA-1175 analysis. A diagnostic that
+          // states an outcome it never checked is worse than no diagnostic, because it is
+          // read as measurement — which is the whole failure this week's rule exists to
+          // stop, sitting inside the instrumentation itself.
+          const before = contextLedger().released;
+          const statusAtWarning = qwenStatus ?? 'unknown';
           void (qwen as { dispose: () => Promise<void> }).dispose()
             .then(() => {
-              try { get().appendLog('debug', 'memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.'); } catch { /* ignore */ }
+              try {
+                const freed = contextLedger().released > before;
+                get().appendLog('debug', freed
+                  ? `memory: released the Qwen context (~${APPROX_CONTEXT_MB}MB est) in response to the warning; narration falls back to templates until it recovers.`
+                  // ⚠⚠ THE DIAGNOSTIC SENTENCE THIS WHOLE INVESTIGATION NEEDED. If the OS is
+                  // asking for memory back while we hold no model, the model is not what it
+                  // is asking about, and the search moves.
+                  : `memory: NOTHING TO RELEASE — no model was loaded (qwen='${statusAtWarning}'), so this freed 0 bytes. `
+                    + `The pressure is coming from something else.`);
+              } catch { /* ignore */ }
             })
             .catch(() => { /* a failed release must never escalate a memory warning into a crash */ });
         }

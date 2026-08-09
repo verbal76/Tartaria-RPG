@@ -1357,8 +1357,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1201`**,
-**golem-line `2026-08-09-1178`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1202`**,
+**golem-line `2026-08-09-1179`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1367,7 +1367,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.111**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.112**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1574,7 +1574,70 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ A CHARACTER YOU CAN GET BACK — SAVE BACKUP / RESTORE (2026-08-09, latest).
+- **⚠⚠ THE MEMORY LINE SAYS WHAT IT ACTUALLY FREED — IT USED TO LIE, AND IT LIED TO ME
+  (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1202 / golem OTA-1179. **steam NOT included
+  — batched (§2).**
+
+  **MEASURED: owner bug report, 2026-08-09, **HAL** build `2026-08-09-1200` (the owner's device runs the HAL line, so this id is
+  deliberately NOT renumbered — golem 1177 was never on that phone).** Five memory
+  warnings, and every one of them says no model was loaded:
+
+  ```
+  02:50:45.915  ⚠⚠ MEMORY WARNING #1 from the OS — app=active · qwen='failed' · reloads=0
+  02:50:45.964  memory: released the Qwen context (~400MB) …        ← freed nothing
+  02:50:51.191  ⚠⚠ MEMORY WARNING #2 (5.3s)  — qwen='idle' · reloads=0
+  02:50:51.281  ⚠⚠ MEMORY WARNING #3 (0.1s)  — qwen='idle' · reloads=0
+  02:51:35.205  ⚠⚠ MEMORY WARNING #4 (43.9s) — qwen='idle' · reloads=0 · save=86KB
+  02:51:36.232  ⚠⚠ MEMORY WARNING #5 (1.0s)  — qwen='idle' · reloads=0 · save=86KB
+  ```
+
+  `'idle'`/`'failed'` means **there was no context**. Every dispose freed zero bytes and
+  the log announced ~400MB anyway, because the line was printed unconditionally the moment
+  `dispose()` resolved — an outcome stated without ever being checked.
+
+  **⚠⚠ AND I QUOTED THOSE LINES AS EVIDENCE.** The OTA-1175 write-up cites
+  `memory: released the Qwen context (~400MB)` as part of its reload-loop reconstruction.
+  A diagnostic that asserts an unverified outcome is worse than no diagnostic, because it
+  reads as measurement — **the exact failure this week's handoff gate exists to stop,
+  living inside the instrumentation itself.**
+
+  **THE FIX.** The handler snapshots `contextLedger().released` before the dispose and
+  compares after. It now either reports a real release, or says:
+
+  > `memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0
+  > bytes. The pressure is coming from something else.`
+
+  ⚠ **That second sentence is the most valuable output this investigation could have, and
+  the old line was actively suppressing it.** If the OS asks for memory back while we hold
+  no model, the model is not what it is asking about and the search moves.
+
+  **⚠ SECOND CHANGE — AN INSTRUMENT, NOT A FIX.** The warning line now also names the
+  OTHER native model, the bundled Kokoro voice (`voice='ready'` beside `qwen='idle'`). The
+  same report reads `Kokoro state: ready` at every warning while Qwen was down, so the only
+  large model we demonstrably held at those moments was the voice — and TTSManager's own
+  comment prices a voice swap at *"~100 MB to the pool"*. ⚠⚠ **A CANDIDATE, NOT A VERDICT:
+  ~100MB does not explain a 1.9GB jetsam**, and this field exists so the next report
+  settles it either way rather than to argue a case.
+
+  **⚠ WHAT THE CONTEXT LEDGER SAID, AND WHY IT IS NOT YET AN ANSWER.** The report's block
+  reads `Live now: 0 · Opened: 0 · Released: 0 · Peak live: 0`. **That is not a finding.**
+  The session was **twelve seconds old** at capture (OTA session start 02:51:52, report
+  02:52:04) and Qwen had not loaded in it at all, so a zero is exactly what an empty
+  session prints. The ledger needs a session with real play in it before it says anything.
+
+  ⚠ **Also visible in that log and worth carrying forward:** a full boot sequence at
+  02:51:42–52 with no `Restarting to apply` before it, six seconds after warning #5 — i.e.
+  **the app was killed and relaunched again on 1200**. `Last JS crash: none recorded`,
+  which is what a jetsam looks like from inside the process.
+
+  **Tests:** new suite `ota1179HonestMemoryLine` (9). ⚠ **Four assertions retargeted across
+  `ota1172` / `ota1173` / `ota1175`, and two are now STRONGER than what they replaced** —
+  they pinned the literal unconditional string, which means **they were pinning the
+  defect**; they now pin that the claim is gated on a real release. The other two were
+  fixed-size source slices that aged as the handler grew. Gates green — 725 suites / 6703
+  tests.
+
+- **⚠⚠ A CHARACTER YOU CAN GET BACK — SAVE BACKUP / RESTORE (2026-08-09).
   HAL + GOLEM.** HAL OTA-1201 / golem OTA-1178. **steam NOT included — batched (§2).**
 
   **The event this answers, 2026-08-08:** the owner reinstalled the app to clear a memory

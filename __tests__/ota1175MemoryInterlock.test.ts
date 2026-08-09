@@ -77,7 +77,12 @@ describe('OTA-1175 — a memory warning now silences the watchdog', () => {
     // observed loop can restart — which is the bug, not a smaller version of it.
     const i = STORE.indexOf("AppState.addEventListener('memoryWarning'");
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 4000);
+    // ⚠ OTA-1179 widened this window. The handler grew a long comment recording that its
+    // old release line asserted an outcome it never checked, which pushed `.dispose()`
+    // past the previous 4,000-char slice and made this test read -1 for "not found"
+    // rather than for "out of order". The ORDERING CLAIM below is unchanged and is still
+    // the whole point — only the window it is measured in moved.
+    const block = STORE.slice(i, i + 9000);
     const flag = block.indexOf('rpMemoryPressureUntil = Date.now() + MEMORY_PRESSURE_QUIET_MS;');
     const dispose = block.indexOf('.dispose()');
     expect(flag).toBeGreaterThan(-1);
@@ -123,7 +128,20 @@ describe('OTA-1175 — a memory warning now silences the watchdog', () => {
   it('⚠ THE DISPOSE ITSELF IS NOT REVERTED — freeing under pressure is still right', () => {
     // This OTA adds an interlock; it does not undo OTA-1173. Handing memory back when the
     // OS asks is correct and stays.
-    expect(STORE).toContain('released the Qwen context (~400MB) in response to the warning');
+    //
+    // ⚠⚠ RETARGETED BY OTA-1179, AND THE NEW ASSERTION IS STRONGER THAN THE OLD ONE.
+    // This used to pin the literal string "released the Qwen context (~400MB) in response
+    // to the warning" — a line that turned out to be printed UNCONDITIONALLY, whether or
+    // not anything was freed. The owner's 2026-08-09 report shows it five times with
+    // `qwen='idle'`, i.e. five claims of ~400MB released when no model was loaded. Pinning
+    // that string was pinning the defect. What actually matters here is that the DISPOSE
+    // still happens under pressure, so that is what this now checks — plus that the
+    // release claim is now conditional on a real release.
+    const i = STORE.indexOf("AppState.addEventListener('memoryWarning'");
+    expect(i).toBeGreaterThan(-1);
+    const block = STORE.slice(i, i + 9000);
+    expect(block).toContain('.dispose()');
+    expect(block).toContain('const freed = contextLedger().released > before;');
   });
 
   it('and a re-hydrate clears the interlock rather than inheriting it', () => {
