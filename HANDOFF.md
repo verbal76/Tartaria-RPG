@@ -761,6 +761,28 @@ Key invariants worth knowing:
 
 ## 8. Open issues / watch list (current)
 
+### ⚠⚠ THE COMPLETABILITY PUNCH LIST — `PUNCHLIST.md` (owner directive, 2026-08-09)
+
+**The bar, verbatim:** *"When I say fully functional I mean every mechanical aspect of the
+game has to be able to be finished."* And: *"When you find a loop that ends in nothing, you
+need to mark it as a part of our punch list. I want everything completable before we expand
+on that base."*
+
+⚠ **This outranks QoL and balancing until it is clear.** The owner has Apple testers on a
+TestFlight internal build and needs the mechanics finishable, not prettier.
+
+⚠ **Qwen narration is explicitly NOT on this list.** Owner: *"Qwen not allowing the Arbiter
+to ad-hoc lines is flavor compared to the mechanics."* Template narration is a complete
+game; generated prose is an enhancement. Do not let the memory investigation displace this.
+
+⚠ **CATALOGUE, DO NOT INVENT.** Payoffs are design decisions and they are the owner's.
+An entry records what is MISSING, never what should replace it.
+
+⚠ **Nothing goes on the list from a grep.** Every entry names the file and line that proves
+it and states what was checked to rule out a consumer elsewhere.
+
+
+
 - **✅ ANSWERED (2026-08-07) — THE HEAVY SIMS JOB IS RED ON EVERY RECENT COMMIT, AND
   IT IS NOT A REGRESSION. Do not re-investigate from scratch.** `jest (heavy sims ·
   reported)` fails on HAL `b2b8222a` (OTA-1178) with **exactly the same three tests
