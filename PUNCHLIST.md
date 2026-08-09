@@ -599,6 +599,8 @@ instead of stranding the contract. **P9 can now be taken purely on its merits.**
 
 ### P13 — Finishing the Labyrinth imperfectly ends in nothing
 
+## ✅ **CLOSED — OTA-1213.** The heart of the maze now reveals what Iskan-Veil's masking Core is still doing, with a keepsake. Once per character; the Wayfarer title still rides the clean run only.
+
 - **Kind:** ENDS IN NOTHING
 - **Found:** 2026-08-09, second-round audit of the 14 untraced loops
 
@@ -622,7 +624,11 @@ produces no outcome at all.
 
 ### P14 — `engine/buriedSkyscraper.ts` is a 100-floor dungeon nothing imports
 
-- **Kind:** UNFINISHABLE *(unreachable — no entry point exists)*
+## ⛔ **NOT A DEFECT — RECLASSIFIED 2026-08-09 on the owner's word:** *"p14 is correct, it's a blocked door to an unwritten expansion."*
+
+⚠ **Left on the list deliberately, as a RESERVATION rather than a finding.** A complete module with an entry gate and no caller is indistinguishable from an accident to anyone auditing it — this entry exists so the next pass does not re-file it. The shape is exactly what you would build to hold an entrance open: `canEnterSkyscraper` with its own refusal copy, and nothing behind it yet.
+
+- **Kind:** ~~UNFINISHABLE~~ → **RESERVED** *(no entry point BY DESIGN)*
 - **Found:** 2026-08-09, second-round audit
 
 The module is complete: floor archetypes, a 2D grid per floor, `emptyBuildingState`,
@@ -636,6 +642,50 @@ references anywhere are comments in `buildInfo.ts`. `canEnterSkyscraper` and
 ⚠ This is the same class as P4 but larger: authored, finished-looking, and connected to
 nothing. Whether it is dead weight or a feature that lost its entry point is the owner's
 call, exactly as with the runecasters.
+
+---
+
+### P16 — Aether techniques: foundation shipped, not yet reachable
+
+- **Kind:** IN PROGRESS *(deliberately on this list until a player can use one)*
+- **Started:** 2026-08-09, at the owner's direction
+
+Owner: *"I would like to have players get aether powers based off of the spells, once this
+is working we will mirror it to enemies and have them applied like the resists are. this
+fills the mage gap, but these are science not magic."*
+
+**Shipped so far** — `engine/aetherTechniques.ts` + 24 tests:
+
+| | |
+|---|---|
+| The four techniques | Aether Shield, Temporal Slip, Veil of Ether, Resonance Cascade |
+| Dose | scaled by tier (1 → 8); a FAILED channel still doses at half; Aetherborn take half |
+| Growth | per-technique, five ranks, and it shaves the DC rather than raising output |
+| Anti-farm guard | practice counts only on a **success under pressure** |
+
+⚠ **Only four of the ten, and that is not a shortfall.** Seven of the orphaned spell file's
+entries already exist in the shipped game — shape/summon/mend are the Aethercraft
+disciplines, and bolt/lance/pulse are runecasters, which are instruments rather than
+techniques. Building all ten would have shipped seven of them twice under two rule sets.
+
+**⚠⚠ WHY IT IS ON THIS LIST AT ALL: a module nothing calls is P4 and P14's defect.** It is
+committed as foundation with its next step named rather than abandoned, but it does not
+come off this list until a player can channel one.
+
+**What remains, in the order I would take it:**
+1. The channel runner — fuel, race-gated DC, d20, dose. Mirrors `runAethercraft` exactly.
+2. The combat turn cost (owner's call: channelling costs your turn).
+3. The four effects. **All four have confirmed homes in shipped machinery**, which was the
+   risk that would have sunk this: Shield → `statusAcAdjustment` (precedent:
+   `shaped_stone_ward`); Slip → the combat damage site (precedent: `defensive_protocols`);
+   Veil → the existing `stealthed` status; Cascade → ordinary damage resolution.
+4. **One acquisition route, or the loop ends in nothing.** Owner's answer: found texts,
+   contract rewards, and purchase from vendors you have rapport with. The rapport gate
+   (`hasFactionRapport`) already exists and is the deterministic one, so it goes first.
+5. The Aetheric tab UI — the tab already exists and holds the three disciplines.
+
+**Then, per the owner:** mirror to enemies, applied per spawn from type pools exactly the
+way `randomizeEnemyDefense` already stamps resists.
 
 ---
 
@@ -772,7 +822,13 @@ is backwards, and quietly swapping the perk would have hidden a decision the own
 
 ### P4 — `data/spells/runecasters.json` is orphaned: 10 entries, zero importers
 
-- **Kind:** UNFINISHABLE *(content that cannot be reached because nothing loads it)*
+## ⛔ **NOT A DEFECT — SUPERSEDED, and the project's own docs said so three weeks before I filed it.**
+
+`docs/tartaria-hack-v2.5.txt`, annotated 2026-07-20: *"Shipped recipes are: 1x 'Blank Runecaster Casing (rarity)' + two ordinary reagents… gated at effective INT 11 (the INT-11 gate MATCHES the outline). **[PLANNED] the relic + transmutative-material structure described here survives only in an unused data file.**"* That unused data file is this one.
+
+⚠⚠ **I FILED A KNOWN, DOCUMENTED LEFTOVER AS A NEW DISCOVERY, TWICE, AND GOT THE SCALE WRONG BOTH TIMES.** See the corrected measurement below. The lesson for this list: **when a data file looks orphaned, read the docs before writing the entry** — this one had already been found, understood and annotated.
+
+- **Kind:** ~~UNFINISHABLE~~ → **SUPERSEDED** *(the design draft the shipped version replaced)*
 - **Found:** 2026-08-09 full loop audit
 
 `app/data/spells/runecasters.json` holds **10 entries** and **no file in `app/**` imports
