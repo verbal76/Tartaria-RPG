@@ -1,3 +1,4 @@
+import { findByTitle } from './titleMatch';
 // Faction storyline engine — 5-10 stage chains tied to a single faction.
 // Mechanically identical to mysteries (no boss spawn at the end; the final
 // stage just unlocks turn-in) but bigger rewards and longer commitment.
@@ -47,10 +48,10 @@ export function availableStorylines(
   );
 }
 
+// ⚠ OTA-1211 — delegates to the shared three-tier resolver. The first two tiers are
+// the exact behaviour this function always had; the third catches the case the
+// parser creates by stripping stop words ("fragment red tower" vs "Fragment of the
+// Red Tower"), and only ever runs where this used to return null. See titleMatch.ts.
 export function fuzzyFindStoryline(text: string, pool: readonly StorylineDef[]): StorylineDef | null {
-  const t = text.toLowerCase().trim();
-  if (!t) return null;
-  const exact = pool.find((s) => s.title.toLowerCase() === t);
-  if (exact) return exact;
-  return pool.find((s) => s.title.toLowerCase().includes(t) || t.includes(s.title.toLowerCase())) ?? null;
+  return findByTitle(text, pool);
 }

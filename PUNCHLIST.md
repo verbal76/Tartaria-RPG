@@ -290,6 +290,8 @@ negotiable.
 
 ### P3 — The remote hand-in was designed as the escape hatch for exactly this, and is dead code
 
+## ✅ **CLOSED — OTA-1211.** The courier carries REPORTS: 25% cut, full rep, no long-haul bonus, 12 in-game hours charged up front. Hunts and fetch deliveries still refuse it.
+
 - **Kind:** UNFINISHABLE *(contributing cause of P2)*
 - **Found:** 2026-08-09, while verifying P2
 
@@ -494,6 +496,8 @@ different question is a defect nobody works. **B stays inside P3, because B *is*
 
 ### P7 — The long-haul bonus pays for where you STAND, not for the trip you made
 
+## ✅ **CLOSED — OTA-1210.** It measures accept-cell → turn-in-cell now.
+
 - **Kind:** WRONG PAYOUT *(a shipped requirement, implemented inverted)*
 - **Found:** 2026-08-09, during the P3 audit
 - **Needs no design decision** — this is the owner's own requirement, backwards
@@ -525,6 +529,8 @@ silently paying zero on a trip the player already made.
 ---
 
 ### P8 — A finished bounty cannot be handed in at the board that posted it
+
+## ✅ **CLOSED — OTA-1210.** Board and hall take it back, via one shared resolver.
 
 - **Kind:** ENDS IN NOTHING *(a real stranding, reachable in ordinary play)*
 - **Found:** 2026-08-09, during the P3 audit
@@ -588,6 +594,32 @@ do not change — but it is a real inconsistency and it is this item's to close.
 ⚠ **The hostility trap that used to block this is closed.** With the broker shipped, being
 hostile to the Architects and unable to enter the Blind costs you 20% at the trading post
 instead of stranding the contract. **P9 can now be taken purely on its merits.**
+
+---
+
+### P12 — A typed contract name that fits two titles silently closes one of them
+
+- **Kind:** WRONG TARGET *(pre-existing; found 2026-08-09 while building OTA-1211)*
+- ⚠ **Not introduced by OTA-1211, and deliberately not fixed there.**
+
+All four contract finders resolve a typed title in tiers: exact, then substring either way,
+then (as of OTA-1211) token match. **The substring tier uses `pool.find()`, which returns
+the FIRST match even when several fit.** So a player holding *"Red Tower Fragment Cache"*
+and *"Red Tower Fragment Vault"* who types `turn in red tower fragment` closes whichever
+happens to sit earlier in the catalog — silently, with a real payout attached.
+
+⚠ **The OTA-1211 token tier already refuses on ambiguity**, so the new behaviour is safe.
+The old tier is the one that guesses.
+
+⚠ **Why it was left alone:** the entire safety argument for dropping a shared resolver into
+four widely-used finders was that it is **strictly additive** — it can only widen what
+matches, never change an answer the old code already gave. Making the substring tier refuse
+would have broken that promise inside the same change. Pinned by a test that documents the
+guess rather than asserting it is correct.
+
+**The fix, when wanted:** collect substring matches instead of taking the first, and refuse
+when more than one survives — the same rule the token tier already follows. It is a
+behaviour change, which is why it is a decision rather than a patch.
 
 ---
 
@@ -683,8 +715,38 @@ is backwards, and quietly swapping the perk would have hidden a decision the own
 
 `app/data/spells/runecasters.json` holds **10 entries** and **no file in `app/**` imports
 it** — verified by searching for the filename and for `spells/` across all `.ts`/`.tsx`.
-A separate, larger `app/data/items/runecasters.json` (**49 entries**) is the one the
-runecaster *weapon* class uses.
+⚠⚠ **CORRECTED 2026-08-09 — the sentence that stood here was WRONG.** It read: *"A
+separate, larger `app/data/items/runecasters.json` (49 entries) is the one the runecaster
+weapon class uses."* **It is not. Neither file is imported anywhere** — the 2026-07-20
+doc-vs-game audit already said so (`docs/tartaria-doc-vs-game-audit-2026-07-20.md:241`)
+and this entry read past it.
+
+**The measured picture, both files:**
+
+| File | Entries | Status |
+|---|---|---|
+| `data/spells/runecasters.json` | 10 spells, Common→Legendary, INT 6→18 | imported nowhere |
+| `data/items/runecasters.json` | 49 runecaster weapons | imported nowhere |
+
+⚠ Of the 49 weapons, **15 also exist in `weapons.json`** and are therefore reachable
+through the live catalog. **34 are not in `weapons.json` at all** — Whispering Flame,
+Tempest Call, Shockwave, Ice Vein, Emberstrike and 29 more exist nowhere in the game.
+
+**What `cast` does today:** the verb is live and routes to **Aethercraft** — shape /
+summon / mend, a real system with skill checks, race modifiers, corruption interaction and
+golem recipes. Roughly three of the ten spells overlap it under other names
+(`shape_aetherstone`, `summon_mud_arm`, `mold_ether`); **the other seven have no
+equivalent** — no ranged aetheric attack, no shield, no AoE, no evasion, no stealth.
+
+Both files date to the first commit (`d4698a3f`, 2026-05-15, "playable vertical slice") —
+original design the build grew past.
+
+**So it is three questions, not one:**
+1. **The 34 unreachable weapons** — authored and statted; they need catalog rows. Data
+   entry, not design. The cheapest content in the game.
+2. **The 7 unbuilt spells** — a genuine feature. Aethercraft is the spine that would carry
+   them, but it is a build, not a wiring job.
+3. **The 3 overlapping spells** — already exist as Aethercraft under other names.
 
 ⚠ **What this is NOT:** a claim that the spell system is broken. Runecasters exist as a
 class (`gameStore.ts:11137` gates them on INT ≥ 9) and their weapons resolve. The finding
@@ -695,6 +757,8 @@ were meant to be, and that is the owner's answer, not mine.
 ---
 
 ### P5 — The store says the location challenges are switched off. They are all on.
+
+## ✅ **CLOSED — OTA-1210.** The false comment is gone; a test pins the premise.
 
 - **Kind:** *(neither — a stale claim that would mislead the next audit)*
 - **Found:** 2026-08-09 full loop audit

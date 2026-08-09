@@ -1341,7 +1341,7 @@ export interface PlayerCharacter {
   /** Active faction quests with per-stage progress. Mirrors activeHunts
    *  / activeMysteries / activeStorylines so all four contract types
    *  share the same accept / advance / turn-in flow. */
-  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; escort?: EscortPool; tracked?: boolean }[];
+  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; escort?: EscortPool; tracked?: boolean }[];
   /** Mission ROUTE CHAIN in progress (set by ROUTE TO on a contract). The engine
    *  courses to the objective, then auto-courses to the turn-in once the work is
    *  done. Cleared on turn-in, abandon, deactivate, or a manual divert. */
@@ -1352,7 +1352,7 @@ export interface PlayerCharacter {
    *  player has DEACTIVATED (paused) this hunt: it stays on the slate but its
    *  stages don't auto-advance until re-activated (per-contract, independent of
    *  other hunts). Absent/true = active. */
-  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
+  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; tracked?: boolean }[];
   /** IDs of hunts that have been turned in. */
   completedHuntIds?: string[];
   /** OTA-850 [faction bounty] — LEGACY single active kill-bounty. Superseded by
@@ -1366,11 +1366,11 @@ export interface PlayerCharacter {
    *  and drops off the slate. Holding several lets the player grind faction standing. */
   activeBounties?: import('./factionBounty').FactionBounty[];
   /** Active mystery-object quests. `tracked === false` = paused (see activeHunts). */
-  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
+  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; tracked?: boolean }[];
   /** IDs of mystery quests turned in. */
   completedMysteryIds?: string[];
   /** Active long-form faction storylines (5-10 step). `tracked === false` = paused. */
-  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
+  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; tracked?: boolean }[];
   /** IDs of storylines completed. */
   completedStorylineIds?: string[];
   /** Active Whispers — informal NPC-to-NPC tips the player has

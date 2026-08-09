@@ -1,4 +1,5 @@
 import factionQuestsData from '../data/quests/faction-quests.json';
+import { findByTitle } from './titleMatch';
 
 /** What kind of player action advances this stage.
  *   - 'kill'   — only enemy defeats trigger progress (the quest is
@@ -186,10 +187,10 @@ export function repLockedFactionQuests(
 
 // Pick a quest by partial-title match. Used when the player types
 // "accept salvage" — finds "Salvage the buried lens".
+// ⚠ OTA-1211 — delegates to the shared three-tier resolver. The first two tiers are
+// the exact behaviour this function always had; the third catches the case the
+// parser creates by stripping stop words ("fragment red tower" vs "Fragment of the
+// Red Tower"), and only ever runs where this used to return null. See titleMatch.ts.
 export function fuzzyFindFactionQuest(text: string, pool: readonly FactionQuestDef[]): FactionQuestDef | null {
-  const t = text.toLowerCase().trim();
-  if (!t) return null;
-  const exact = pool.find((q) => q.title.toLowerCase() === t);
-  if (exact) return exact;
-  return pool.find((q) => q.title.toLowerCase().includes(t) || t.includes(q.title.toLowerCase())) ?? null;
+  return findByTitle(text, pool);
 }

@@ -1376,7 +1376,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1209`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1211`**,
 **golem-line `2026-08-09-1177`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1386,7 +1386,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.119**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.121**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,7 +1606,96 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ A FACTION'S SITE WEARS ITS OWN COLOURS NOW, NOT THE VISITOR'S (2026-08-09, latest).
+- **⚠⚠ PUNCHLIST P3 CLOSED — THE COURIER IS BACK, FOR REPORTS ONLY (2026-08-09, latest).
+  HAL + GOLEM.** HAL OTA-1211 / golem OTA-1188. **steam NOT included — batched (§2).**
+
+  Owner: *"push p 3, 5, 7 and 8."*
+
+  A runner carries a MYSTERY, a STORYLINE or a non-fetch FACTION DEED for **25% cut, full
+  rep, no long-haul bonus, and 12 in-game hours.** ⚠⚠ **HUNTS and FETCH DELIVERIES still
+  refuse it** — OTA-810 (*"a bounty is paid face to face"*) and OTA-456 (*"you can't mail
+  the goods"*). Both refusals are **VERIFIED by test (2026-08-09)**, source-pinned and
+  exercised live: a hunt sent by runner from open country stays on the slate. A runner
+  carries a REPORT, which is the line OTA-456 itself drew.
+
+  ⚠⚠ **THE HOURS ARE CHARGED UP FRONT — A DELIBERATE DEPARTURE FROM THE AUDIT'S OWN
+  PROPOSAL** of *"12 in-game hours before it credits."* A deferred payout needs a persisted
+  queue, a maturing tick, a credit path and a save migration — a new system whose failure
+  mode is **a reward that never arrives.** P1 and P2 were both filed for loops that end in
+  nothing; closing P3 by building a fourth one would be an own goal. Charging the hours
+  immediately costs the player the same thing (deadlines, weather, dog loyalty all tick)
+  with nothing that can go missing. A test asserts no pending-payout queue exists.
+
+  ⚠⚠ **THE LIVE TEST FOUND A PRE-EXISTING BUG BIGGER THAN THE FEATURE.** A probe typed
+  `send word Fragment of the Red Tower` while holding exactly that mystery. **MEASURED
+  (2026-08-09):** the parser resolved it perfectly — `intent=turn_in conf=1.00 target=
+  fragment red tower` — and the turn-in was refused with *"You have no active contracts."*
+
+  All four contract finders were the same six lines: exact, then substring either way.
+  **The parser strips "of the"; the finders required it.** Neither string contains the
+  other. That breaks the typed turn-in of **any** contract whose title carries a dropped
+  word — invisible until now because "send word" was refused before it ever reached a
+  finder, and because the Contracts COMPLETE button passes an id rather than a typed title.
+
+  New `engine/titleMatch.ts` adds a **THIRD tier** — token subset, order-insensitive,
+  ambiguity refuses rather than guesses — that runs **only where the old code returned
+  null**. ⚠ Strictly additive is the whole safety argument for dropping a shared resolver
+  into four widely-used finders: it can widen what matches, never change an answer the old
+  code already gave. Turn-in routing now also resolves against the player's ACTIVE slate
+  before falling back to the catalog.
+
+  ⚠⚠ **A SECOND DEFECT, FOUND BY MY OWN ASSERTION AND DELIBERATELY NOT FIXED HERE.** The
+  suite asserted that ambiguity should refuse; it failed, because the **substring** tier
+  runs first and `pool.find()` takes the first of several matches — so two similarly-named
+  contracts plus a phrase that fits both silently closes one, with a real payout. Filed as
+  **P12**, with a test that documents the guess rather than blessing it. Fixing it inside
+  this change would have broken the strictly-additive promise the rest of it rests on.
+
+  **Tests:** ota1211Courier (18), ota1211CourierLive (3), ota1211TitleMatch (14).
+
+- **⚠⚠ PUNCHLIST P5, P7 AND P8 — THREE DEFECTS, NO DESIGN CALLS (2026-08-09). HAL + GOLEM.**
+  HAL OTA-1210 / golem OTA-1187. **steam NOT included — batched (§2).**
+
+  **P7 — THE LONG-HAUL BONUS MEASURED WHERE YOU STOOD, NOT THE TRIP YOU MADE.** OTA-824's
+  requirement is in its own commit body — *"make the journey worth the loot — no 32-time
+  trip worth 20 TC"* — but `contractJourneyBonusTc` scored the remoteness of the TURN-IN
+  TILE from the starter hub and never looked at where the player came from. Accept, kill and
+  hand in inside a deep capital → **maximum** bonus for no travel. Haul from a deep capital
+  back to the hub → **zero**. Starter-region factions under-paid forever. It now measures
+  `accept cell → turn-in cell`; same 6 TC/cell, same 1.5× cap, so no tuning number moves.
+
+  ⚠ The accept cell is stamped at all **nine** accept sites through ONE helper — they spell
+  the player variable four different ways, and a stamp right at eight of them is a contract
+  that silently pays the legacy rate at the ninth. ⚠ Pre-OTA contracts carry no stamp and
+  fall back to the old read, so a trip already half-made still pays something. ⚠ The legacy
+  save-migration backfill is deliberately NOT stamped: those were accepted somewhere
+  unknowable, and inventing a cell would fabricate a journey.
+
+  **P8 — A FINISHED BOUNTY COULD NOT BE HANDED IN AT THE BOARD THAT POSTED IT.**
+  `turnInFactionQuest` has accepted a same-faction vendor, the mission board (OTA-451) or
+  the faction's own hall (OTA-617) since those shipped; the other three required
+  `scene.vendor` and nothing else. One shared `turnInCounterparty` now answers for all four
+  paths plus the Contracts button, replacing three different refusal wordings for one rule.
+
+  **P5 — A COMMENT CLAIMED THE LOCATION CHALLENGES WERE SWITCHED OFF.** `TIER_C_ENABLED` is
+  `true` and all six carry `enabled: true`, every one with handlers outside its definition
+  file. A false "this is inert" is how a working system gets skipped in an audit — it cost
+  the completability pass a detour to disprove.
+
+  ⚠ **TWO EXISTING SUITES RETARGETED, AND BOTH WERE ASSERTING THE DEFECT:**
+  `starterFetchQuests` computed its expected payout from the old formula, so it passed while
+  pinning a bonus no journey had earned; and `ota810HuntFaceToFace` read "no vendor" as "no
+  counterparty" while the player stood in their own faction's hall. The B2 protection it
+  exists for is about closing a bounty FROM ANYWHERE, so it now tests from open country.
+
+  ⚠ **The P5 premise check was retargeted before landing too** — it grepped for
+  `enabled: false` and matched two COMMENTS explaining how to switch a challenge off. Prose,
+  not behaviour; it now reads the module.
+
+  **Tests:** ota1210ContractFixes (24) + ota1210HallTurnInLive (3 — real store, real hall
+  hand-in with no vendor anywhere in the room).
+
+- **⚠⚠ A FACTION'S SITE WEARS ITS OWN COLOURS NOW, NOT THE VISITOR'S (2026-08-09).
   HAL + GOLEM.** HAL OTA-1209 / golem OTA-1186. **steam NOT included — batched (§2).**
 
   Owner: *"do halem and the reskin"* — and, on why it matters: *"each outpost has a

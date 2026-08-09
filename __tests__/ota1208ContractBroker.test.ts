@@ -201,7 +201,11 @@ describe('⚠⚠ OTA-1208 — every turn-in path routes through the ONE resolver
     // defect in reward copy would read as the player being paid a bonus they were not.
     const bad = STORE.match(/\$\{journeyTc > 0 \? ` \(incl\./g) ?? [];
     expect(bad).toHaveLength(0);
-    const guarded = STORE.match(/!\w*[Vv]iaBroker && journeyTc > 0/g) ?? [];
+    // ⚠ Widened by OTA-1211: two of these now also exclude the COURIER, so the guard reads
+    // `!xViaBroker && !xViaCourier && journeyTc > 0`. The rule is unchanged — a reward line
+    // may not claim a bonus that was not paid — so the pattern matches the rule, not one
+    // particular spelling of it.
+    const guarded = STORE.match(/!\w*[Vv]iaBroker && (!\w*[Vv]iaCourier && )?journeyTc > 0/g) ?? [];
     expect(guarded.length).toBeGreaterThanOrEqual(3);
   });
 
@@ -262,9 +266,15 @@ describe('⚠⚠ OTA-1208 — the broker DOES take deliveries, and this suite is
     expect(payout).toBeGreaterThan(consume);
   });
 
-  test('⚠ the typed "send word" courier is still refused — this did not reopen OTA-824', () => {
-    // The broker is a face-to-face hand-in at an outpost. Remote hand-in stays dead.
-    expect(STORE).toMatch(/send word\|courier\|send a runner/);
-    expect(STORE).toContain('No couriers for this.');
+  test('⚠⚠ the BROKER is not the courier — it still requires being there in person', () => {
+    // ⚠ RETARGETED BY OTA-1211, which deliberately restored the courier for reports. This
+    // assertion used to pin `"No couriers for this."` — a line that OTA-1211 removes on
+    // purpose, so leaving it would have failed the build for a change that was intended.
+    //
+    // What OTA-1208 actually guarantees is narrower and still true: the BROKER path is a
+    // face-to-face hand-in. It is reached only through a vendor in scene, so it can never
+    // become a way to close a contract from open country.
+    expect(STORE).toContain('CB.isContractBroker(scene?.vendor)');
+    expect(STORE).not.toMatch(/isContractBroker\((?!scene)/);
   });
 });

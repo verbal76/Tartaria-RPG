@@ -133,10 +133,35 @@ export function contractTurnInRemoteness(anchorId: string): number {
   return Math.abs(a.x - hub.x) + Math.abs(a.y - hub.y);
 }
 
-/** Long-haul TC bonus for turning a contract in at `anchorId`, given its base TC reward.
- *  0 for a turn-in near the starter; scales with remoteness, capped at 1.5× the base. */
-export function contractJourneyBonusTc(anchorId: string, baseTc: number): number {
-  const dist = contractTurnInRemoteness(anchorId);
+/** ⚠⚠ OTA-1210 (PUNCHLIST P7) — THE BONUS NOW MEASURES THE TRIP THE PLAYER MADE.
+ *
+ *  The requirement is in OTA-824's own commit body: *"make the journey worth the loot — no
+ *  32-time trip worth 20 TC."* What shipped measured `contractTurnInRemoteness` — how far
+ *  the TURN-IN TILE sits from the starter hub — and never looked at where the player came
+ *  from. Three consequences, all live until this OTA:
+ *
+ *    1. Accept, kill and hand in without leaving a deep capital → MAXIMUM bonus, no travel.
+ *    2. Haul a contract from a deep capital back to the starter hub → ZERO.
+ *    3. Every contract belonging to a starter-region faction under-paid, forever.
+ *
+ *  It now measures `accept cell → turn-in cell`. Same 6 TC/cell, same 1.5× cap, so no
+ *  tuning number moves — only which players get paid.
+ *
+ *  ⚠ `acceptedAtCell` is optional and its absence is NOT an error: a contract accepted
+ *  before this OTA carries no stamp. Those fall back to the old remoteness read, so a trip
+ *  already half-made still pays something rather than silently dropping to zero for a
+ *  journey the player really did make. Every new accept stamps it. */
+export function contractJourneyBonusTc(
+  anchorId: string,
+  baseTc: number,
+  acceptedAtCell?: { x: number; y: number } | null,
+): number {
+  const dist = acceptedAtCell
+    ? (() => {
+        const a = canonicalCellOf(anchorId);
+        return Math.abs(a.x - acceptedAtCell.x) + Math.abs(a.y - acceptedAtCell.y);
+      })()
+    : contractTurnInRemoteness(anchorId);
   const raw = dist * JOURNEY_TC_PER_CELL;
   const cap = Math.round(Math.max(0, baseTc) * JOURNEY_BONUS_CAP_FRAC);
   return Math.max(0, Math.min(raw, cap));
