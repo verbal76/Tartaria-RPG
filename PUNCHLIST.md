@@ -136,6 +136,47 @@ mechanism that already exists, is documented as existing, and is switched off. W
 should cost the player (a courier fee, a delay, a rep penalty) is a design decision and is
 **not** proposed here.
 
+### P4 — `data/spells/runecasters.json` is orphaned: 10 entries, zero importers
+
+- **Kind:** UNFINISHABLE *(content that cannot be reached because nothing loads it)*
+- **Found:** 2026-08-09 full loop audit
+
+`app/data/spells/runecasters.json` holds **10 entries** and **no file in `app/**` imports
+it** — verified by searching for the filename and for `spells/` across all `.ts`/`.tsx`.
+A separate, larger `app/data/items/runecasters.json` (**49 entries**) is the one the
+runecaster *weapon* class uses.
+
+⚠ **What this is NOT:** a claim that the spell system is broken. Runecasters exist as a
+class (`gameStore.ts:11137` gates them on INT ≥ 9) and their weapons resolve. The finding
+is narrower and checkable: **this data file is dead weight, or it is a feature that was
+authored and never connected.** Which of the two it is depends on what those 10 entries
+were meant to be, and that is the owner's answer, not mine.
+
+---
+
+### P5 — The store says the location challenges are switched off. They are all on.
+
+- **Kind:** *(neither — a stale claim that would mislead the next audit)*
+- **Found:** 2026-08-09 full loop audit
+
+`gameStore.ts:22789` reads:
+
+> *"activeChallengesAt() returns [] while the challenges are switched OFF
+> (locationChallenges.TIER_C_ENABLED / per-challenge enabled both false), **so this loop is
+> inert today**."*
+
+**It is not inert.** `locationChallenges.ts:47` has `TIER_C_ENABLED = true`, and **all six**
+challenges carry `enabled: true` — `labyrinth_of_shadows`, `tongue_of_the_red_tower`,
+`warden_of_the_cathedral`, `trap_dives_of_the_stair`, `defense_of_the_enclave`,
+`parley_of_factions`. All six also have handler references outside the definition file, so
+none is a live-but-dead entry.
+
+⚠ **Filed because a false "this is off" comment is how a working system gets skipped in an
+audit** — including this one. It cost a detour to disprove, and the next person pays the
+same toll. No gameplay defect; the fix is deleting a sentence.
+
+---
+
 ---
 
 ## CLEARED — checked, and these do pay out
@@ -155,59 +196,68 @@ Recorded so the audit is not re-run on them, and so a future regression has a ba
 
 ---
 
-## LOOP INVENTORY
+## AUDIT LEDGER — all 31 loops, every one checked
 
-Built 2026-08-09 from the engine and data trees, in answer to *"we have the tower loop, the
-9 cores loop, hunts, bounties, missions, collectables, titles. what other loops"*.
+Owner, 2026-08-09: *"I want every single one audited and I want a punch list of the things
+that we need to approach and I want a list of every single one that you audited… we keep
+listing that we have all these things for the players to do and then we find out that half
+of them don't even work."*
 
-⚠ **Confidence is marked per row and is not uniform.** "Verified" means I read the
-completion path. "Present" means the system exists and carries completion state, but the
-arc has not been traced end to end — it is a candidate for the audit, not a claim about it.
+**Depth key — this is the honest part, so read it first:**
 
-### Named by the owner
+| Depth | What it means |
+|---|---|
+| **TRACED** | I read the completion path and the payout. Highest confidence. |
+| **WIRED** | Confirmed it has consumers, a completion write and a reward/acknowledgement. Not walked end to end. |
+| **BROKEN** | On the punch list above, with evidence. |
+| **SCAFFOLD** | Exists as code but is declared unfinished in its own source. Not a defect. |
 
-| Loop | Scale | Status |
-|---|---|---|
-| Tower / Great Climbs | 5 Skyreacher pieces | **Verified** — summit grants `rewardArmor` |
-| The 9 Cores → endings | 9 capitals, 3 endings, 27 badge combos | **Verified** — ending splash + install-wide badge |
-| Hunts | `data/quests/hunts.json` | **Verified** — pays trophy + item + TC |
-| Bounties | `bountyCourse` / `bountyPolitics` / `factionBounty` | **Not audited** |
-| Missions (faction quests) | 65 | **Verified** — pays; mission-board turn-in works |
-| Collectables | 10 stories / 57 fragments | **P1 — ends in nothing** |
-| Titles | ~21 titles + `titleChallenges` | **Present** — heavy completion logic, not yet traced |
+⚠ **TRACED means "it pays out", not "it is reachable."** Mysteries sat in the traced-and-
+paying column right up until the reachability pass proved 9 of them cannot be handed in. A
+loop can be correct and unreachable at the same time. Reachability is the separate pass
+below.
 
-### NOT named — these are also loops
+| # | Loop | Depth | Result |
+|---|---|---|---|
+| 1 | Tower / Great Climbs | TRACED | Summit grants `rewardArmor` (Skyreacher, 5 pieces) |
+| 2 | The 9 Cores → endings | TRACED | Ending splash + install-wide badge (27 combos) |
+| 3 | Hunts | TRACED | Trophy + `rewardItem` + TC |
+| 4 | Missions (faction quests, 65) | TRACED | Item + TC + standing; mission-board turn-in works |
+| 5 | Sigils | TRACED | +1 standing, sigil spent |
+| 6 | **Bounties** | TRACED | TC + rep, politics frozen at accept, `announceMissionComplete`; **expiry is narrated, not silent** (`gameStore.ts:3208`) |
+| 7 | **Escorts** | TRACED | Pays via faction-quest turn-in with `escortPayMult`; a dead party fails the contract and says so |
+| 8 | Mysteries (18) | TRACED + **BROKEN** | Pays — but **P2**, 9 of 18 unreachable |
+| 9 | Faction storylines (14) | TRACED + **BROKEN** | Pays — but **P2**, 8 of 14 unreachable |
+| 10 | Collectables (10/57) | TRACED + **BROKEN** | **P1** — completes into a banner |
+| 11 | **Whispers** | WIRED | Chains resolve, write `completedWhisperIds`, pay items/TC |
+| 12 | **Labyrinth of Shadows** | WIRED | Clean run → `recordTitleProgress({labyrinthCleanRuns:1})` → Wayfarer title |
+| 13 | **Location challenges (6)** | WIRED | All six live and handler-backed — see **P5** for the stale comment |
+| 14 | **Titles (~21)** | WIRED | `newlyEarnedTitles` + `TITLE_PASSIVE_PERK`; a prior write-back bug is fixed in-source |
+| 15 | **Recipe discovery** | WIRED | `pickRecipeToLearn` → `knownRecipes`, reward-logged |
+| 16 | **Crafting / fusion** | WIRED | 5 consumers, craft + fuse paths |
+| 17 | **Corruption** | WIRED | 172 store refs, 5 consumers — deeply integrated |
+| 18 | **Aetherkin** | WIRED | 50 store refs |
+| 19 | **Golem companion** | WIRED | Bind, repair, power-level (`✦ Power rises to…`) |
+| 20 | **Dog rescue → companion** | WIRED | Rescue resolves, dog named and joins |
+| 21 | **The Fallen / revenants** | WIRED | Install-wide roll (cap 25), avenge path |
+| 22 | **Stat training** | WIRED | Per-stat 0→100 progress |
+| 23 | **Story forks / chapters** | WIRED | 3 + 2 consumers incl. EndingScreen |
+| 24 | **Hidden locations** | WIRED | 6 consumers incl. worldMap + codex |
+| 25 | **Hook puzzles** | WIRED | Input/solve handlers in store |
+| 26 | **Relics & curios** | WIRED | Loot tables + reward paths |
+| 27 | **Gifting / gift ledger** | WIRED | Engine + ledger; a prior GIVE-flow bug is already fixed |
+| 28 | **Faction standing (×9)** | WIRED | −100…+100; **no terminal state by design** |
+| 29 | **Resurrection gems** | WIRED | Install-wide, spend-only; **no completion by design** |
+| 30 | **Runecaster spells** | **BROKEN** | **P4** — the 10-entry data file has no importer |
+| 31 | **Buried Skyscraper** | SCAFFOLD | Header says *"FRAMEWORK ONLY… no quest hooks land here yet"*; post-ending, gated on `phase === 'ended'`. **Not a defect — an unbuilt feature.** ⚠ If it appears on any player-facing or investor-facing feature list, that listing is ahead of the code. |
 
-| Loop | Where | Status |
-|---|---|---|
-| **Mysteries** | 18, `data/quests/mysteries.json` | **P2** — 9 stranded |
-| **Faction storylines** | 14, `data/quests/faction-storylines.json` | **P2** — 8 stranded |
-| **Whispers** | `whispers.ts`, `completedWhisperIds` | **Present** — chain quests with stages |
-| **Labyrinth of Shadows** | `labyrinth.ts`, `data/maze/` | **Present** — a grid maze with a `titleId` reward |
-| **Buried Skyscraper** | `buriedSkyscraper.ts` | **Present** — descent arc |
-| **Recipe discovery** | `recipeDiscovery.ts` | **Present** — unlockable recipe pool |
-| **Sigils** | `sigils.ts` | **Verified** — `turnInSigil` pays +1 standing |
-| **The Fallen / revenants** | `fallenRevenants.ts`, install-wide roll (cap 25) | **Present** — avenge a dead character |
-| **Faction standing** | `factions.ts`, −100…+100 per faction × 9 | **Present** — no terminal state by design |
-| **Dog rescue → companion** | `dogCompanion.ts`, `dog_quest` channel | **Not audited** |
-| **Golem companion** | `golems.ts` | **Not audited** |
-| **Escorts** | `escort.ts` | **Not audited** |
-| **Story forks / chapters** | `storyForks.ts`, `chapters.ts`, `story/forks.json` | **Not audited** |
-| **Crafting / fusion** | `crafting.ts`, `itemFusion.ts` | **Not audited** |
-| **Relics & curios** | `data/relics/` | **Not audited** |
-| **Runecasters / spells** | `data/spells/runecasters.json` | **Not audited** |
-| **Corruption** | `corruption.ts` | **Not audited** |
-| **Aetherkin** | `aetherkin.ts` | **Not audited** |
-| **Stat training** | `statTraining.ts`, `statProgress` | **Present** — per-stat 0→100 bars |
-| **Hidden locations** | `hiddenLocations.ts` | **Not audited** |
-| **Hook puzzles** | `hookPuzzles.ts` | **Not audited** |
-| **Location challenges** | `locationChallenges.ts` | **Not audited** |
-| **Gifting / gift ledger** | `gifting.ts`, `giftLedger.ts` | **Not audited** |
-| **Resurrection gems** | install-wide stash | **Present** — spend-only, no completion |
+**Score: 31 audited. 7 traced clean · 2 traced-and-reachable-broken · 1 ends-in-nothing ·
+1 orphaned data file · 1 stale claim · 18 wired · 1 declared scaffold.**
 
-⚠ **Ongoing systems, NOT loops** — listed so they are not mistaken for gaps: menace,
-weather, hazards, time of day, world pulse, NPC memory, parley/talk-down, vendor pricing
-and services, scrap, durability, status effects, digging, perches.
+⚠ **The 18 "wired" rows are the remaining risk.** Each has a completion path and a payoff,
+which is what the bar asks — but none has been walked end to end the way mysteries were,
+and mysteries is precisely the loop that looked fine until it didn't. **I am not claiming
+these are proven.**
 
 ## REACHABILITY — checked and clean
 
