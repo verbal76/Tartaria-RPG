@@ -281,11 +281,20 @@ and **not** to the one contract type that can be.
 
 | Guard | OTA | Date | What it stops |
 |---|---|---|---|
-| Anti-camp (`lastBountyClearedOutpostId`) | 1188 | 2026-08 | *"no second contract from the board you just collected on"* |
-| Standing-on-target refusal | 1188 | 2026-08 | 0-tile contracts — accept and finish without moving |
-| Board must be FROZEN to accept | 1187/1188 | 2026-08 | Politics-shopping the payout |
-| `MAX_ACTIVE_BOUNTIES = 3` | 850/859 | 2026-07 | Unbounded slate stacking |
-| Distance-aware deadline | 862/863/1185 | 2026-07→08 | 24h + 2.5h/tile + 6h per required kill |
+| Anti-camp (`lastBountyClearedOutpostId`) | OTA-1165 | 2026-08 | *"no second contract from the board you just collected on"* |
+| Standing-on-target refusal | OTA-1165 | 2026-08 | 0-tile contracts — accept and finish without moving |
+| Board must be FROZEN to accept | OTA-1164 / OTA-1165 | 2026-08 | Politics-shopping the payout |
+| `MAX_ACTIVE_BOUNTIES = 3` | OTA-850 / OTA-859 | 2026-07 | Unbounded slate stacking |
+| Distance-aware deadline | OTA-862 / OTA-863 / OTA-1162 | 2026-07→08 | 24h + 2.5h/tile + 6h per required kill |
+
+<!-- ⚠ Every OTA reference in this file carries its `OTA-` prefix on purpose. The
+     golem renumberer only rewrites prefixed numbers, and in a slash list only the
+     first element — a bare `1187/1188` in the table above ported to golem still
+     reading HAL's numbers, which is how this note came to exist. -->
+
+⚠ Four of the five reference an OTA at or above the renumber floor, so **on golem-line
+these read 23 lower** (OTA-1165 → OTA-1142, and so on). The pre-983 ones are shared
+history and are the same number on both lines.
 
 ⚠ **Four of the five did not exist when remote hand-in was killed.** The farm risk is
 contained today by rules aimed precisely at the loop that has it. The face-to-face rule is
