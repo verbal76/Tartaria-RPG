@@ -1584,6 +1584,85 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠ A CHARACTER YOU CAN GET BACK — SAVE BACKUP / RESTORE (2026-08-09, latest).
+  HAL + GOLEM.** HAL OTA-1201 / golem OTA-1178. **steam NOT included — batched (§2).**
+
+  **The event this answers, 2026-08-08:** the owner reinstalled the app to clear a memory
+  kill and **the character was gone permanently.** Every save lives in AsyncStorage, which
+  iOS deletes with the app, and no copy existed anywhere — no export, no backup, no sync.
+  Hours of play, unrecoverable, as the ordinary cost of a routine troubleshooting step.
+
+  ⚠ The save system was already careful about the failures it knew: OTA-344 writes the
+  live slot atomically with a `.bak` fallback, OTA-395/396 trims oversized blobs so a
+  truncated write cannot land. **All of that protects a save from PROCESSES. None of it
+  protected a save from the phone.**
+
+  **WHAT SHIPPED.** `BACK UP` on every character row — living and dead, deliberately
+  outside the `item.dead` block, because **a backup you can only take after the character
+  dies is not a backup.** It opens the Share sheet (and copies to the clipboard first, so
+  a cancelled share does not cost the backup). `Restore from backup` under New Tartarian
+  reads the clipboard.
+
+  **⚠⚠ THE SAFETY PROPERTY, and every decision serves it: an import can NEVER destroy a
+  character you already have.** Restore always mints a NEW slot. There is no overwrite
+  path, not even opt-in — a player restoring a backup is by definition already having a
+  bad day, and a confirm dialog is not a good enough guard against a mis-tap costing them
+  a second character. Pinned by a test that imports over a populated store and asserts the
+  original's bytes are *identical*, not merely present.
+
+  **⚠ THE ENVELOPE IS BUILT FOR TRUNCATION, because on this app that is the EXPECTED
+  failure and not the exotic one.** A save runs to 800,000 characters (`SAFE_BLOB_CHARS`),
+  far past the 25,000 at which TitleScreen already chunks dead-character logs because
+  *"most chat clients silently truncate larger pastes"* (OTA-023), and past whatever ate
+  the pastes that motivated OTA-018's HEADER/FOOTER envelope and OTA-006/215's Share path.
+  So the export carries a declared character count **and** an FNV-1a checksum, and the END
+  marker is written last — a clipped paste loses it first, which is a definitive answer
+  before the checksum is even consulted. ⚠ Every failure returns a sentence a PLAYER can
+  act on — *"this save is cut short, 41,002 characters arrived out of 68,551 — use SHARE
+  instead of copy/paste"* — never a code. The person reading it has just lost a character.
+
+  **⚠⚠ A REAL BUG THE TESTS CAUGHT, and it would have been invisible until it mattered.**
+  The payload is game data, and game data contains arbitrary player text: a character name
+  or any typed log line can itself contain `--- END SAVE ---`. `indexOf` found that
+  embedded copy before the real terminator, cut the save there, and **that character's
+  backup could never be restored** — a backup feature that silently excludes some
+  characters is worse than none, because you only discover it at the moment you need it.
+  Fixed to **first-BEGIN / last-END**: the real BEGIN always precedes the payload and the
+  real END always follows it, so the pair is exact regardless of contents. ⚠ Truncation
+  detection is unaffected — a clipped paste loses the real END, and if an embedded one is
+  found instead, the character count catches the shortfall. The two checks cover each
+  other. ⚠ **I found this because my own test was weak** (it accepted either outcome via
+  an if/else); pinning it hard is what exposed the defect.
+
+  **⚠ AND THE IMPORTER REPORTS WHAT HAPPENED, NOT WHAT IT HOPED.** `saveSlot` NEVER THROWS
+  by design — its callers `void persist()` fire-and-forget, so it stamps
+  `lastSaveWriteError` and returns quietly. An importer that merely awaited it would
+  announce "restored!" over a slot that does not exist, which is exactly the bug class
+  this repo has hunted before (standing writers that claim success without checking). So
+  `importSaveAsNewSlot` checks the write error, reads the character back off disk, **and**
+  confirms it reached the index — a save that lands but never appears in the character
+  list is worse than a clean failure, because the player believes it worked. It also trims
+  on the way in, since `saveSlot` does not (the store's persist path does), so an import
+  from a device with a bigger storage window cannot fail the readback verify.
+
+  **NOT IN THIS OTA, and named so nobody assumes otherwise:** the install-wide GlobalStash
+  (Resurrection Gems, the Fallen roll, ending badges) is **not** exported. Importing it
+  would let a player duplicate gems by re-importing the same backup, and getting that
+  wrong silently is worse than the gap. The character, gear and progress are what travel.
+
+  ⚠⚠ **AND A PROCESS NOTE WORTH MORE THAN THE FEATURE.** The first attempt to write this
+  very entry SILENTLY DID NOTHING: the script demoted the previous entry's "(latest)"
+  marker before inserting, which destroyed the anchor string it was about to search for,
+  and **`str.replace` on a missing substring is a no-op that returns the original**. The
+  assert had already run, before the mutation. HAL shipped 1201 with a correct VERSION row
+  and no handoff entry. ⚠ **Assert AFTER the write, not before it** — this is the same
+  failure the OTA itself is about (`importSaveAsNewSlot` reads the character back for
+  exactly this reason), committed by the tooling that documented it.
+
+  **Tests:** new suite `ota1201SaveExport` (22), weighted toward damaged text rather than
+  the happy path. Mutation-checked 2026-08-09: reverting the marker fix kills the test
+  that found it. Gates green — 724 suites / 6694 tests.
+
 - **⚠⚠ THE FIRST HARD NUMBER, AND AN INSTRUMENT INSTEAD OF A FIX (2026-08-09).
   HAL + GOLEM.** HAL OTA-1200 / golem OTA-1177. **steam NOT included — batched (§2).**
 
