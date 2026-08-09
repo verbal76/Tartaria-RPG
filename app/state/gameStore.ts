@@ -32233,14 +32233,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
           qwenModelId: qwen.getModelId(),
         });
       } else {
-        set({
-          qwenStatus: 'failed',
-          qwenError: qwen.getLastError() ?? 'Qwen failed to initialize',
-        });
+        const why = qwen.getLastError() ?? 'Qwen failed to initialize';
+        set({ qwenStatus: 'failed', qwenError: why });
+        // ⚠⚠ OTA-1182 — SAY IT IN THE LOG, NOT ONLY IN STATE. OTA-1181 put this reason in
+        // the bug-report header, which requires the player to get far enough to send one.
+        // The owner needs the game working on Apple for TestFlight testers, and a tester
+        // who never files a report is the common case — but the log ships with any report,
+        // including one about something else entirely. This is the single line that says
+        // whether the narration engine is missing, out of memory, or out of disk.
+        try { get().appendLog('debug', `qwen: LOAD FAILED — ${why}`); } catch { /* ignore */ }
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       set({ qwenStatus: 'failed', qwenError: message });
+      // OTA-1182 — the throwing path says so too. `initialize()` mostly swallows, but a
+      // missing native module throws outright, and that is the one answer that no OTA can
+      // fix: it means llama.rn is not in the installed build.
+      try { get().appendLog('debug', `qwen: LOAD THREW — ${message}`); } catch { /* ignore */ }
     }
     // OTA-223 — start the background dormancy watchdog after the
     // first successful boot. The watchdog polls every 60s; if Qwen

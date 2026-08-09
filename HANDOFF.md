@@ -1357,8 +1357,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1204`**,
-**golem-line `2026-08-09-1181`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1205`**,
+**golem-line `2026-08-09-1182`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1367,7 +1367,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.114**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.115**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1574,7 +1574,66 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE REASON, NOT JUST THE VERDICT (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1204
+- **⚠⚠ MAKE THE APPLE SIGNALS USABLE (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1205 /
+  golem OTA-1182. **steam NOT included — batched (§2).**
+
+  Owner, setting the priority: *"I have Apple testers, they need to be able to play test.
+  I need the game running fully on Apple before I worry about QoL or balancing."* Two
+  things were hiding the answer to "is iOS healthy", and both are removed here.
+
+  **⚠⚠ 1. THE iOS BUILD CHECK HAS BEEN RED ON EVERY ORDINARY PUSH, FOREVER, FOR A REASON
+  THAT IS NOT ABOUT iOS.** `build-ios.yml` defaults to the `preview` profile;
+  `preview` is `distribution: internal` in eas.json and needs ad-hoc provisioning
+  credentials this project does not hold. The workflow's own footer records the identical
+  failure twice already (arb172, OTA-302: *"the preview profile (no internal-distribution
+  creds) and failed"*).
+
+  ⚠ **The danger is not the noise, it is what the noise taught.** On 2026-08-09 I reported
+  that failure to the owner as *"pre-existing, not from these changes"* — true, and exactly
+  what someone would say about a real regression. **A genuine iOS build failure would have
+  been indistinguishable.** The job now SKIPS loudly instead of failing, and prints the
+  three ways to get a TestFlight-ready IPA. A red iOS check now means something.
+
+  ⚠ **No credential is read, written or referenced by this change** — the added step only
+  echoes, and there is a test pinning that (it looks for `secrets.`, credential commands,
+  and any non-echo line). Owner directive stands: certificates, provisioning profiles,
+  signing identities and App Store Connect are owner-only.
+
+  **HOW A TESTFLIGHT BUILD IS ACTUALLY MADE (the part that kept being relearned):**
+  - title the commit `[build-ios] OTA-XXXX — description` (the marker must LEAD the first
+    line — a trailing marker falls through to `preview` and, before this OTA, failed), or
+  - push a tag matching `v*-ios`, or
+  - dispatch the workflow manually with `profile=production`.
+  Add `[submit-ios]` to the title as well to auto-submit to TestFlight.
+
+  **⚠⚠ 2. THE NARRATION ENGINE'S FAILURE REASON WAS INVISIBLE.** OTA-1181 put `qwenError`
+  in the bug-report header — which requires a player to get far enough to SEND a report,
+  and a TestFlight tester who never files one is the ordinary case. The reason is now
+  written to the LOG at the moment of failure, on both paths (`qwen: LOAD FAILED — …` when
+  `initialize()` swallows, `qwen: LOAD THREW — …` when it throws), from the same string
+  that goes into state so the two can never disagree.
+
+  ⚠ **That single line decides between three unrelated fixes**, which is why it is worth an
+  OTA on its own:
+  - `llama.rn not available in this build` → the native module is not in the installed IPA.
+    **No OTA can fix that** — only a new build.
+  - `GGUF download failed: …` → network or disk. Fixable in JS.
+  - `Load failed: <native error>` → memory, or a native fault on this device.
+
+  **⚠ STATE OF THE APPLE QUESTION AS OF THIS OTA, measured:** the model has never loaded on
+  the owner's iPhone this install (`Qwen kernel variant: (not yet loaded this install)`,
+  `Opened: 0` contexts across every report), so testers are on template narration. The app
+  itself is stable — the last session survived a full five-raider fight, a death and a
+  resurrection with six memory warnings and no kill, because the OTA-1175 stand-down
+  refuses to load the model. **Stable and not "fully running" are both true right now.**
+  The `Why:` line is the next datum and it has not been read yet.
+
+  **Tests:** new suite `ota1182AppleSignal` (9). ⚠ One assertion retargeted before landing:
+  it matched the WORD *provisioning* inside the skip step's own explanation of itself —
+  prose, not behaviour, the same proximity trap this repo keeps hitting. It now pins that
+  the step reads no secret and runs no command. Gates green — 728 suites / 6722 tests (golem's own count; HAL runs 6 more).
+
+- **⚠⚠ THE REASON, NOT JUST THE VERDICT (2026-08-09). HAL + GOLEM.** HAL OTA-1204
   / golem OTA-1181. **steam NOT included — batched (§2).**
 
   **MEASURED: owner report, 2026-08-09, **HAL** build `2026-08-09-1203` (the owner runs the HAL line) — and the good news first,
