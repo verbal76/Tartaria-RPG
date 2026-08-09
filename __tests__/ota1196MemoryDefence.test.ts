@@ -98,17 +98,27 @@ describe('OTA-1196 — a memory warning is ANSWERED, not just written down', () 
     // process instead. We hold a ~400MB context and we have a dispose() for it.
     const i = STORE.indexOf('AppState.addEventListener(\'memoryWarning\'');
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 3000);
+    const block = STORE.slice(i, i + 9000);
     expect(block).toContain('.dispose()');
   });
 
   it('the release is reported, so a log shows the app defended itself', () => {
-    expect(STORE).toContain('released the Qwen context (~400MB) in response to the warning');
+    // ⚠⚠ RETARGETED BY OTA-1202, AND THE NEW CLAIM IS STRONGER. This pinned the literal
+    // "released the Qwen context (~400MB) in response to the warning" — which turned out
+    // to be printed UNCONDITIONALLY, whether or not anything was freed. The owner's
+    // 2026-08-09 report shows it five times with `qwen='idle'`: five reports of ~400MB
+    // released while no model was loaded. The old assertion was pinning the bug.
+    // "The app defended itself" is only worth logging when it is TRUE, so what this
+    // checks now is that the claim is gated on an actual release.
+    expect(STORE).toContain('const freed = contextLedger().released > before;');
+    expect(STORE).toContain('(~${APPROX_CONTEXT_MB}MB est)');
+    // And the honest alternative exists for when nothing was held.
+    expect(STORE).toContain('NOTHING TO RELEASE');
   });
 
   it('⚠ A FAILED RELEASE CANNOT ESCALATE A WARNING INTO A CRASH', () => {
     const i = STORE.indexOf('AppState.addEventListener(\'memoryWarning\'');
-    const block = STORE.slice(i, i + 3000);
+    const block = STORE.slice(i, i + 9000);
     expect(block).toContain('a failed release must never escalate a memory warning into a crash');
     expect(block).toMatch(/\.catch\(/);
   });
@@ -117,7 +127,7 @@ describe('OTA-1196 — a memory warning is ANSWERED, not just written down', () 
     // Disposing without letting the watchdog bring Qwen back would turn one memory
     // warning into permanently template-only narration for the rest of the session.
     const i = STORE.indexOf('AppState.addEventListener(\'memoryWarning\'');
-    const block = STORE.slice(i, i + 3000);
+    const block = STORE.slice(i, i + 9000);
     expect(block).toMatch(/watchdog is deliberately NOT suppressed/i);
   });
 });

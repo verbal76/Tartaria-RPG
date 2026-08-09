@@ -344,7 +344,10 @@ describe('OTA-1195 — this OTA changes no behaviour, deliberately', () => {
     // ⚠ Widened by OTA-1196, which added the memory-warning RESPONSE (a dispose) between
     // the listener and the frame clock. A fixed slice that stops short reads as a missing
     // guard rather than as a moved one — the ota1186 defect in a new costume.
-    const block = STORE.slice(i, i + 6000);
+    // ⚠ Widened again by OTA-1202, which recorded inside this handler why its own release
+    // line used to assert an outcome it never checked. Third time a fixed slice here has
+    // needed moving — the count claim is sound, the window keeps aging.
+    const block = STORE.slice(i, i + 12000);
     // Each addEventListener sits inside its own try/catch.
     const listeners = (block.match(/AppState\.addEventListener/g) ?? []).length;
     expect(listeners).toBe(2);

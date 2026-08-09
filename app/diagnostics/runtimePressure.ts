@@ -93,6 +93,17 @@ export interface MemoryWarningContext {
   appState?: string;
   /** Most recent persisted save size in KB, when known. */
   saveKb?: number;
+  /** ⚠⚠ OTA-1202 — THE OTHER NATIVE MODEL, AND IT WAS MISSING FROM THIS LINE ENTIRELY.
+   *  Qwen is not the only large native allocation in this app: the bundled voice
+   *  (Kokoro, via react-native-executorch) is a second one, and TTSManager's own comment
+   *  prices a voice swap at "~100 MB to the pool". The owner's 2026-08-09 report is the
+   *  reason this field exists — every memory warning in it reads `qwen='idle'` or
+   *  `qwen='failed'` while `Kokoro state: ready`, i.e. the OS was asking for memory back
+   *  at moments when the ONLY large model we held was the voice.
+   *  ⚠ That is a lead, NOT a verdict: ~100MB does not explain a 1.9GB jetsam on its own,
+   *  and this field is here to make the next report say so either way rather than to
+   *  argue a case. */
+  kokoroPhase?: string;
 }
 
 /** ⚠ THE LINE THE OWNER ASKED FOR. It is deliberately loud (a ⚠ and an ordinal) because
@@ -107,6 +118,10 @@ export function memoryWarningLine(
   const bits: string[] = [];
   if (ctx.appState) bits.push(`app=${ctx.appState}`);
   if (ctx.qwenStatus) bits.push(`qwen='${ctx.qwenStatus}'`);
+  // OTA-1202 — sits next to qwen deliberately: the pair is the question ("which of our
+  // two native models was actually up when the OS complained"), and split across two
+  // lines it would not read as one.
+  if (ctx.kokoroPhase) bits.push(`voice='${ctx.kokoroPhase}'`);
   if (ctx.qwenReinitAttempts != null) bits.push(`reloads=${ctx.qwenReinitAttempts}`);
   if (ctx.saveKb != null) bits.push(`save=${ctx.saveKb}KB`);
   const since = msSincePrevious == null
