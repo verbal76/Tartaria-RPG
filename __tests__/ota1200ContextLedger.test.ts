@@ -173,7 +173,7 @@ describe('OTA-1200 — the summary block', () => {
     const src = SRC('app/diagnostics/aboutSummary.ts');
     expect(src).toContain('contextLedgerBlock()');
     // ⚠ Widened by OTA-1203, which added the narration-engine line inside this block.
-    // FOURTH fixed-size source slice to age this session (ota1195/1196/1198/1200) — the
+    // FOURTH fixed-size source slice to age this session (ota1195 / ota1196 / ota1198 / ota1200) — the
     // claims keep being right while the windows keep going stale. Noted in HANDOFF as a
     // standing item: these want brace-matched extraction, not a magic number.
     const body = src.slice(src.indexOf('function contextLedgerBlock'), src.indexOf('function contextLedgerBlock') + 1200);
