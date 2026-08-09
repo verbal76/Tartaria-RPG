@@ -143,3 +143,50 @@ export function computeAllProgress(playerCollectables: readonly string[]): Chara
     return { story, found, missing, fraction, complete: missing.length === 0 };
   });
 }
+
+// ---------------------------------------------------------------------------
+// OTA-1183 — SET COMPLETION. The payoff the owner specified.
+// ---------------------------------------------------------------------------
+//
+// ⚠ Before this, finishing a 5–7 fragment story flipped a pill style and printed a banner
+// on a screen the player had to navigate to. PUNCHLIST P1. Owner's call on what it should
+// be instead (2026-08-09): *"they should end in story screen like the chapters screens that
+// put the whole story together to read, and it should say whatever the collectable sets
+// name is is complete. you should get a title for completing all of them, some types of
+// historian title."*
+
+/** How many stories are fully assembled. Drives the Historian title (needs all 10).
+ *  ⚠ Counts STORIES, not fragments — the 57 fragments are spread 5–7 per story, so a
+ *  fragment threshold would let the title land before the last story closed. */
+export function completedStoryCount(playerCollectables: readonly string[]): number {
+  return computeAllProgress(playerCollectables).filter((p) => p.complete).length;
+}
+
+/** ⚠ THE STORY THAT *THIS* FRAGMENT JUST FINISHED, or null if it finished none.
+ *  Called with the collectables list as it stood BEFORE the grant. Returning the story
+ *  rather than a boolean is what lets the caller name it — "Zalmar's account is complete"
+ *  reads as an event; "a story is complete" reads as a system message. */
+export function storyCompletedBy(
+  fragmentId: string,
+  ownedBefore: readonly string[],
+): CharacterStory | null {
+  const story = findStoryByFragmentId(fragmentId);
+  if (!story) return null;
+  // Already owned → this grant changes nothing, so it completed nothing.
+  if (ownedBefore.includes(fragmentId)) return null;
+  const after = new Set([...ownedBefore, fragmentId]);
+  return story.fragments.every((f) => after.has(f.id)) ? story : null;
+}
+
+/** The assembled story, in author order, for the completion screen. ⚠ Returns the
+ *  fragments the PLAYER holds, not the catalog — a screen that renders unowned bodies
+ *  would hand over text that was never earned. */
+export function assembledStory(
+  storyId: string,
+  playerCollectables: readonly string[],
+): { story: CharacterStory; parts: CollectableFragment[] } | null {
+  const story = findStoryById(storyId);
+  if (!story) return null;
+  const owned = new Set(playerCollectables);
+  return { story, parts: story.fragments.filter((f) => owned.has(f.id)) };
+}

@@ -38,6 +38,7 @@ import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1020
+import { StoryRevealOverlay } from './app/components/StoryRevealOverlay'; // OTA-1183
 import { StoryForkOverlay } from './app/components/StoryForkOverlay'; // OTA-1065
 import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1022
 import { StoryIntroOverlay } from './app/components/StoryIntroOverlay'; // OTA-1023 — global (was exploration-only)
@@ -672,6 +673,12 @@ export default function App() {
       </SilentBoundary>
       <SilentBoundary tag="ChapterCardOverlay">
         <ChapterCardOverlay />
+      </SilentBoundary>
+      {/* OTA-1183 — a completed collectible story, read whole. Mounted beside the
+          chapter card because it is the same register of beat, and globally because a
+          set can close from any screen that can grant loot. */}
+      <SilentBoundary tag="StoryRevealOverlay">
+        <StoryRevealOverlay />
       </SilentBoundary>
       {/* OTA-1022 — one-time veteran motive picker, raised by the load paths
           for saves whose motive was dealt by backfill rather than chosen. */}

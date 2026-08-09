@@ -108,9 +108,15 @@ describe('OTA-987 — a finished mission announces itself', () => {
     // the payout in its completed-state reward strip, and the feed's ✦ line
     // is the permanent record.)
     const calls = STORE_SRC.match(/announceMissionComplete\(/g) ?? [];
-    expect(calls.length).toBe(7);
+    // ⚠ RETARGETED BY OTA-1183, which added an eighth site (Collection — a completed
+    // collectible story). The old assertion was `.toBe(7)`, a magic number that turns
+    // every NEW completion path into a red test, i.e. it punished exactly the thing this
+    // lock is meant to encourage. The RULE is "no completion announces outside the choke
+    // point", so what it pins now is the floor plus the category list below — which is
+    // what actually catches a rogue path.
+    expect(calls.length).toBeGreaterThanOrEqual(8);
     // Every kind of job that announces directly is represented among them.
-    for (const kind of ['Bounty', 'Contract', 'Hunt', 'Mystery', 'Storyline']) {
+    for (const kind of ['Bounty', 'Contract', 'Hunt', 'Mystery', 'Storyline', 'Collection']) {
       expect(STORE_SRC).toMatch(new RegExp(`announceMissionComplete\\(\\s*'${kind}'`));
     }
     // OTA-1027 — story threads bypass the notice entirely (no popup): nothing

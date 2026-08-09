@@ -1903,6 +1903,9 @@ function cap(s: string): string {
 // Found fragments show their full body; undiscovered fragments show
 // the discovery hint as a teaser.
 function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllProgress> }) {
+  // OTA-1183 — opens the full-story overlay. The store action re-checks completeness, so
+  // this button cannot show a story the player has not actually finished.
+  const openStoryReveal = useGameStore((s) => s.openStoryReveal);
   const [openId, setOpenId] = useState<string | null>(null);
   if (CHARACTER_STORIES.length === 0) {
     return (
@@ -1960,9 +1963,25 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
                   );
                 })}
                 {missing.length === 0 && (
-                  <Text style={styles.completeBanner}>
-                    ✦ Story complete — every fragment recovered.
-                  </Text>
+                  <>
+                    <Text style={styles.completeBanner}>
+                      ✦ {story.characterName}&apos;s story is complete — every fragment recovered.
+                    </Text>
+                    {/* ⚠ OTA-1183 — READ IT WHOLE, ON DEMAND. The completion screen raises
+                        itself once, at the moment the set closes. Without this button that
+                        is the ONLY time the assembled story is ever readable end to end,
+                        which is the same "ends in nothing" defect one step further along
+                        (PUNCHLIST P1). */}
+                    <TouchableOpacity
+                      style={styles.readStoryBtn}
+                      onPress={() => openStoryReveal(story.id)}
+                      activeOpacity={0.7}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Read ${story.characterName}'s story`}
+                    >
+                      <Text style={styles.readStoryText}>READ THE WHOLE STORY</Text>
+                    </TouchableOpacity>
+                  </>
                 )}
               </View>
             )}
@@ -1974,6 +1993,12 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
 }
 
 const styles = StyleSheet.create({
+  // OTA-1183 — READ THE WHOLE STORY, on a completed set.
+  readStoryBtn: {
+    alignSelf: 'flex-start', marginTop: 10, paddingVertical: 8, paddingHorizontal: 16,
+    borderWidth: 1, borderColor: '#3a4348', backgroundColor: '#141a1d',
+  },
+  readStoryText: { color: '#cdbf99', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
   // v2.4.1 (OTA 033) — Primary Objective card. Sits at the top of
   // the Contracts screen above the tab row. Warm-gold border to

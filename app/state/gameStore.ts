@@ -424,7 +424,7 @@ import {
   describeWhisperStage,
 } from '../engine/whispers';
 import { TUTORIAL_STEPS, TUTORIAL_SELF_DEFENCE, type TutorialStep } from '../components/tutorialSteps';
-import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome } from '../engine/collectables';
+import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome, storyCompletedBy, completedStoryCount, assembledStory, CHARACTER_STORIES } from '../engine/collectables';
 
 interface Concept {
   id: string;
@@ -6872,6 +6872,15 @@ interface GameStore {
    *  scene (same pipeline the gate-verb path uses) and switches
    *  to exploration so the fight surfaces. Returns ok / reason so
    *  the UI can disable / hide the button when preconditions fail. */
+  /** OTA-1183 — a collectible character-story just closed; show it whole.
+   *  ⚠ Holds only the id. The screen re-derives the text from the player's OWN
+   *  collectables at render time, so it can never display a fragment that was not
+   *  earned, and a stale reveal left over a reload cannot resurrect one. */
+  storyReveal: { storyId: string } | null;
+  dismissStoryReveal: () => void;
+  /** OTA-1183 — read an already-completed story again from the Collectibles tab.
+   *  Same screen, reached deliberately instead of by finishing. */
+  openStoryReveal: (storyId: string) => void;
   summonCoreGuardian: () => { ok: boolean; reason?: string };
 
   /** OTA-120 Phase 5 — CallDogModal visibility flag. Set by the parser
@@ -7162,6 +7171,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
   discoveryReveal: null,
   dismissDiscoveryReveal() {
     set({ discoveryReveal: null });
+  },
+  storyReveal: null,
+  dismissStoryReveal() {
+    set({ storyReveal: null });
+  },
+  openStoryReveal(storyId) {
+    // ⚠ Refuse a story the player has not actually finished. The Collectibles tab only
+    // offers READ on complete sets, but a store action is reachable from anywhere and
+    // should not depend on its caller being careful.
+    const owned = get().player?.collectables ?? [];
+    const built = assembledStory(storyId, owned);
+    if (!built) return;
+    if (built.parts.length !== built.story.fragments.length) return;
+    set({ storyReveal: { storyId } });
   },
   pendingContractsTab: null,
   requestContractsTab(tab) {
@@ -8079,8 +8102,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // alone scrolled past unnoticed — "there should be a pop-up… tap to open
     // collectible screen"). Only the FIRST collectible ever raises the overlay;
     // after that the player knows where they live and the log line carries it.
+    // ⚠⚠ OTA-1183 — SET COMPLETION, WHICH USED TO BE NOTHING. Computed from `owned`, the
+    // list as it stood BEFORE this grant, so it fires exactly once and only for the
+    // fragment that actually closed the set. PUNCHLIST P1.
+    const finished = storyCompletedBy(fragmentId, owned);
+    if (finished) {
+      const done = completedStoryCount(get().player?.collectables ?? []);
+      // The title tracks STORIES, not fragments — see TitleProgress.collectableStoriesCompleted.
+      recordTitleProgress(get, set, { collectableStoriesCompleted: done });
+      // ⚠ Announced through the same channel as any other finished contract, so it lands
+      // in the feed the player is already reading instead of waiting on a screen visit.
+      get().announceMissionComplete(
+        'Collection',
+        `${finished.characterName}'s story`,
+        `✦ ${finished.characterName}'s story is complete — every fragment recovered.`,
+      );
+      // The read-it-whole screen. Owner: "they should end in story screen like the
+      // chapters screens that put the whole story together to read."
+      set({ storyReveal: { storyId: finished.id } });
+      if (done >= CHARACTER_STORIES.length) {
+        get().appendLog(
+          'reward',
+          `✦ Every story recovered — all ${CHARACTER_STORIES.length} lives read end to end.`,
+        );
+      }
+    }
     const totalOwned = (get().player?.collectables ?? []).length;
-    if (totalOwned <= 1) {
+    // ⚠ The first-ever-collectible tutorial overlay must not fight the completion screen
+    // for the same slot. A set can only close on a later fragment than the first, so in
+    // practice these never collide — but `finished &&` makes that a rule, not a
+    // coincidence that a future data edit could break.
+    if (totalOwned <= 1 && !finished) {
       set({
         discoveryReveal: {
           title: 'Collectible found',

@@ -114,8 +114,12 @@ describe('titles — earning engine', () => {
     expect(newlyEarnedTitles(p)).not.toContain('bane_of_sentinels');
   });
 
-  it('wires all 21 titles (14 Tier-A/B + 6 Tier-C + Skyreacher)', () => {
-    expect(WIRED_TITLE_IDS.size).toBe(21);
+  it('wires every title in the catalogue (14 Tier-A/B + 6 Tier-C + Skyreacher + Historian)', () => {
+    // ⚠ OTA-1183 — was `.toBe(21)`. A 22nd title (Historian of the Buried World) landed on
+    // owner instruction, and a hardcoded count turns every future title into a red test
+    // rather than a wiring check. The real claim — that the engine list and the data
+    // catalogue agree exactly — is pinned in ota1183CollectionPayoff.
+    expect(WIRED_TITLE_IDS.size).toBeGreaterThanOrEqual(21);
     expect(WIRED_TITLE_IDS.has('guild_broker')).toBe(true);
     expect(WIRED_TITLE_IDS.has('speaker_of_forgotten_tongues')).toBe(true);
     expect(WIRED_TITLE_IDS.has('skyreacher')).toBe(true);

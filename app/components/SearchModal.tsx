@@ -27,13 +27,22 @@ interface Props {
   chips?: InteractableChip[];
   onSubmit: (target: string) => void;
   onCancel: () => void;
+  /** ⚠ OTA-1183 — INVESTIGATE ALL, on the owner's instruction (2026-08-09): *"it should
+   *  add an investigate all button like the take all and salvage all."*
+   *
+   *  Fires once per ACTIONABLE chip — not consumed, and not locked behind an unmet
+   *  requirement. Passing a locked noun would spend the tap on a refusal line the player
+   *  can already see greyed with a 🔒, which is the exact "the button didn't do anything"
+   *  complaint SALVAGE ALL collected in OTA-037. Hidden below 2 targets: with one chip
+   *  the button is just a second way to press the chip. */
+  onInvestigateAll?: (nouns: string[]) => void;
 }
 
 // Branded modal that prompts the player to type what they're searching
 // for. The submitted text is routed to the investigate intent with the
 // target — letting the engine try hook, ambient noun, item, then
 // re-prompt if nothing matches.
-export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
+export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateAll }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
 
@@ -97,6 +106,9 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
   const visibleChips = (chips ?? [])
     .filter((c) => !c.consumed)
     .sort((a, b) => (a.consumed ? 1 : 0) - (b.consumed ? 1 : 0));
+  // OTA-1183 — what INVESTIGATE ALL will actually act on. Locked chips are visible (so the
+  // player learns what they need) but are NOT swept.
+  const actionableChips = visibleChips.filter((c) => !c.unmetRequirement);
   // 2026-05-25 — Common-hints section removed. Per playtester:
   // the canned chips ("the wall" / "the rubble" / "the silt" /
   // "the doorway") cluttered the modal without adding value once
@@ -208,6 +220,20 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                       );
                     })}
                   </ScrollView>
+                  {/* ⚠ OTA-1183 — INVESTIGATE ALL. Mirrors SALVAGE ALL (SalvageModal:342)
+                      and TAKE ALL (TakeModal:149), including the 2+ threshold. Counts and
+                      sweeps only ACTIONABLE chips, so the number on the button is the
+                      number of things that will actually happen. */}
+                  {onInvestigateAll && actionableChips.length >= 2 && (
+                    <Pressable
+                      style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed, { marginTop: 8 }]}
+                      onPress={() => onInvestigateAll(actionableChips.map((c) => c.noun))}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Investigate all ${actionableChips.length} surfaces`}
+                    >
+                      <Text style={styles.btnTextPrimary}>INVESTIGATE ALL ({actionableChips.length})</Text>
+                    </Pressable>
+                  )}
                 </>
               )}
               {/* 2026-05-25 — Common-hints section removed. The

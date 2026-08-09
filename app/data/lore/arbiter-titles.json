@@ -1,26 +1,254 @@
 {
   "_comment": "OTA-232 — ingested verbatim from Arbiter_Assigned_Titles_for_Players.docx. The 20 titles the Arbiter may confer on a player. Stored as lore today (surfaced to Qwen so the Arbiter knows the titles exist and can foreshadow them in narration). A future OTA can wire the requirements to runtime trackers + perks to mechanical effects; this file is the canonical source either way.",
   "titles": [
-    { "id": "seeker_of_lost_relics", "title": "Seeker of Lost Relics", "requirement": "Discover three Tartarian relics", "perk": "+2 to Investigation when dealing with ancient artifacts.", "tags": ["relic", "discovery", "investigation"] },
-    { "id": "aetheric_attuned", "title": "Aetheric Attuned", "requirement": "Survive a direct encounter with an Aetheric anomaly", "perk": "Once per day, gain temporary resistance to Aetheric damage for 3 rounds.", "tags": ["aetheric", "anomaly", "survival", "resistance"] },
-    { "id": "protector_of_the_forgotten", "title": "Protector of the Forgotten", "requirement": "Successfully defend a True Tartarian settlement from invaders", "perk": "+1 to Defense when fighting in defense of settlements or relics.", "tags": ["true tartarian", "defense", "settlement"] },
-    { "id": "architects_eye", "title": "Architect's Eye", "requirement": "Repair or restore a piece of ancient Tartarian architecture", "perk": "+2 to Engineering or Repair skills when dealing with ancient structures.", "tags": ["repair", "architecture", "engineering"] },
-    { "id": "etherbound_survivor", "title": "Aetherbound Survivor", "requirement": "Survive an Aetheric storm", "perk": "Once per day, reroll a failed saving throw against environmental hazards.", "tags": ["aetheric storm", "survival", "saving throw"] },
-    { "id": "golem_whisperer", "title": "Golem Whisperer", "requirement": "Successfully control an Aether Golem", "perk": "Once per encounter, temporarily disable an Aether Golem.", "tags": ["golem", "aether", "control"] },
-    { "id": "shadow_diver", "title": "Shadow Diver", "requirement": "Complete three dives into Tartarian ruins without triggering traps", "perk": "+1 to Stealth and the ability to bypass one trap per dive.", "tags": ["ruins", "stealth", "traps", "dive"] },
-    { "id": "aetherborn_awakened", "title": "Aetherborn Awakened", "requirement": "Unlock the latent powers of an Aetherborn character", "perk": "Once per day, activate a powerful Aetheric surge to enhance movement or strength for 2 rounds.", "tags": ["aetherborn", "awakening", "surge"] },
-    { "id": "scholar_of_forgotten_lore", "title": "Scholar of Forgotten Lore", "requirement": "Decipher three pieces of ancient Tartarian text", "perk": "+2 to Lore or History checks when studying ancient civilizations.", "tags": ["scholar", "lore", "history", "decipher"] },
-    { "id": "bane_of_sentinels", "title": "Bane of Sentinels", "requirement": "Defeat five Architectural Sentinels", "perk": "Once per day, deal an extra damage die against mechanical foes.", "tags": ["sentinel", "combat", "mechanical"] },
-    { "id": "relic_trader", "title": "Relic Trader", "requirement": "Successfully barter or trade five Tartarian relics", "perk": "+2 to Persuasion when negotiating trades involving relics.", "tags": ["trade", "barter", "persuasion", "relic"] },
-    { "id": "etheric_explorer", "title": "Aetheric Explorer", "requirement": "Lead an expedition deep into unexplored Tartarian ruins", "perk": "+1 to Leadership when guiding a party through ruins or unknown terrain.", "tags": ["explorer", "expedition", "leadership"] },
-    { "id": "scion_of_the_giants", "title": "Scion of the Giants", "requirement": "Prove direct descent from the Tartarian Giants \u2014 reach 25 standing with a faction that honours the Tartarian legacy", "perk": "+2 to Charisma when dealing with factions that respect the Tartarian legacy.", "tags": ["giants", "lineage", "charisma"] },
-    { "id": "survivor_of_aetherstone", "title": "Survivor of Aetherstone", "requirement": "Survive prolonged exposure to Aetherstone", "perk": "Gain advantage on Constitution checks against Aetheric corruption or radiation.", "tags": ["aetherstone", "corruption", "constitution"] },
-    { "id": "wayfarer_of_the_lost_paths", "title": "Wayfarer of the Lost Paths", "requirement": "Navigate through the Labyrinth of Shadows without getting lost", "perk": "Once per day, instantly determine the correct path in a complex environment.", "tags": ["labyrinth", "navigation", "wayfarer"] },
-    { "id": "master_of_aethercraft", "title": "Master of Aethercraft", "requirement": "Successfully create or enhance an Aether Golem", "perk": "Once per encounter, temporarily enhance a summoned Aether Golem's abilities.", "tags": ["aethercraft", "golem", "summon"] },
-    { "id": "warden_of_the_old_world", "title": "Warden of the Old World", "requirement": "Preserve an ancient Tartarian relic or building from destruction", "perk": "+1 to all Defense rolls when in or around ancient ruins.", "tags": ["warden", "preservation", "old world"] },
-    { "id": "speaker_of_forgotten_tongues", "title": "Speaker of Forgotten Tongues", "requirement": "Learn to fluently speak the ancient Tartarian language", "perk": "Once per session, communicate with Tartarian machines or relics.", "tags": ["language", "tartarian", "speaker"] },
-    { "id": "stormcaller", "title": "Stormcaller", "requirement": "Survive or navigate through an Aetheric storm and save a party member", "perk": "Once per day, create a small Aetheric shield that deflects energy attacks.", "tags": ["storm", "shield", "rescue"] },
-    { "id": "guild_broker", "title": "Guild Broker", "requirement": "Successfully negotiate a truce or alliance between two factions", "perk": "+1 to Diplomacy and a reroll once per day when brokering peace or deals.", "tags": ["diplomacy", "alliance", "factions"] },
-    { "id": "skyreacher", "title": "Skyreacher", "requirement": "Crest all five great climbs and complete the Skyreacher armor set", "perk": "Climbing falls deal half damage; +2 Dexterity, always on.", "tags": ["climb", "height", "legendary", "skyreacher", "mastery"] }
+    {
+      "id": "seeker_of_lost_relics",
+      "title": "Seeker of Lost Relics",
+      "requirement": "Discover three Tartarian relics",
+      "perk": "+2 to Investigation when dealing with ancient artifacts.",
+      "tags": [
+        "relic",
+        "discovery",
+        "investigation"
+      ]
+    },
+    {
+      "id": "aetheric_attuned",
+      "title": "Aetheric Attuned",
+      "requirement": "Survive a direct encounter with an Aetheric anomaly",
+      "perk": "Once per day, gain temporary resistance to Aetheric damage for 3 rounds.",
+      "tags": [
+        "aetheric",
+        "anomaly",
+        "survival",
+        "resistance"
+      ]
+    },
+    {
+      "id": "protector_of_the_forgotten",
+      "title": "Protector of the Forgotten",
+      "requirement": "Successfully defend a True Tartarian settlement from invaders",
+      "perk": "+1 to Defense when fighting in defense of settlements or relics.",
+      "tags": [
+        "true tartarian",
+        "defense",
+        "settlement"
+      ]
+    },
+    {
+      "id": "architects_eye",
+      "title": "Architect's Eye",
+      "requirement": "Repair or restore a piece of ancient Tartarian architecture",
+      "perk": "+2 to Engineering or Repair skills when dealing with ancient structures.",
+      "tags": [
+        "repair",
+        "architecture",
+        "engineering"
+      ]
+    },
+    {
+      "id": "etherbound_survivor",
+      "title": "Aetherbound Survivor",
+      "requirement": "Survive an Aetheric storm",
+      "perk": "Once per day, reroll a failed saving throw against environmental hazards.",
+      "tags": [
+        "aetheric storm",
+        "survival",
+        "saving throw"
+      ]
+    },
+    {
+      "id": "golem_whisperer",
+      "title": "Golem Whisperer",
+      "requirement": "Successfully control an Aether Golem",
+      "perk": "Once per encounter, temporarily disable an Aether Golem.",
+      "tags": [
+        "golem",
+        "aether",
+        "control"
+      ]
+    },
+    {
+      "id": "shadow_diver",
+      "title": "Shadow Diver",
+      "requirement": "Complete three dives into Tartarian ruins without triggering traps",
+      "perk": "+1 to Stealth and the ability to bypass one trap per dive.",
+      "tags": [
+        "ruins",
+        "stealth",
+        "traps",
+        "dive"
+      ]
+    },
+    {
+      "id": "aetherborn_awakened",
+      "title": "Aetherborn Awakened",
+      "requirement": "Unlock the latent powers of an Aetherborn character",
+      "perk": "Once per day, activate a powerful Aetheric surge to enhance movement or strength for 2 rounds.",
+      "tags": [
+        "aetherborn",
+        "awakening",
+        "surge"
+      ]
+    },
+    {
+      "id": "scholar_of_forgotten_lore",
+      "title": "Scholar of Forgotten Lore",
+      "requirement": "Decipher three pieces of ancient Tartarian text",
+      "perk": "+2 to Lore or History checks when studying ancient civilizations.",
+      "tags": [
+        "scholar",
+        "lore",
+        "history",
+        "decipher"
+      ]
+    },
+    {
+      "id": "bane_of_sentinels",
+      "title": "Bane of Sentinels",
+      "requirement": "Defeat five Architectural Sentinels",
+      "perk": "Once per day, deal an extra damage die against mechanical foes.",
+      "tags": [
+        "sentinel",
+        "combat",
+        "mechanical"
+      ]
+    },
+    {
+      "id": "relic_trader",
+      "title": "Relic Trader",
+      "requirement": "Successfully barter or trade five Tartarian relics",
+      "perk": "+2 to Persuasion when negotiating trades involving relics.",
+      "tags": [
+        "trade",
+        "barter",
+        "persuasion",
+        "relic"
+      ]
+    },
+    {
+      "id": "etheric_explorer",
+      "title": "Aetheric Explorer",
+      "requirement": "Lead an expedition deep into unexplored Tartarian ruins",
+      "perk": "+1 to Leadership when guiding a party through ruins or unknown terrain.",
+      "tags": [
+        "explorer",
+        "expedition",
+        "leadership"
+      ]
+    },
+    {
+      "id": "scion_of_the_giants",
+      "title": "Scion of the Giants",
+      "requirement": "Prove direct descent from the Tartarian Giants — reach 25 standing with a faction that honours the Tartarian legacy",
+      "perk": "+2 to Charisma when dealing with factions that respect the Tartarian legacy.",
+      "tags": [
+        "giants",
+        "lineage",
+        "charisma"
+      ]
+    },
+    {
+      "id": "survivor_of_aetherstone",
+      "title": "Survivor of Aetherstone",
+      "requirement": "Survive prolonged exposure to Aetherstone",
+      "perk": "Gain advantage on Constitution checks against Aetheric corruption or radiation.",
+      "tags": [
+        "aetherstone",
+        "corruption",
+        "constitution"
+      ]
+    },
+    {
+      "id": "wayfarer_of_the_lost_paths",
+      "title": "Wayfarer of the Lost Paths",
+      "requirement": "Navigate through the Labyrinth of Shadows without getting lost",
+      "perk": "Once per day, instantly determine the correct path in a complex environment.",
+      "tags": [
+        "labyrinth",
+        "navigation",
+        "wayfarer"
+      ]
+    },
+    {
+      "id": "master_of_aethercraft",
+      "title": "Master of Aethercraft",
+      "requirement": "Successfully create or enhance an Aether Golem",
+      "perk": "Once per encounter, temporarily enhance a summoned Aether Golem's abilities.",
+      "tags": [
+        "aethercraft",
+        "golem",
+        "summon"
+      ]
+    },
+    {
+      "id": "warden_of_the_old_world",
+      "title": "Warden of the Old World",
+      "requirement": "Preserve an ancient Tartarian relic or building from destruction",
+      "perk": "+1 to all Defense rolls when in or around ancient ruins.",
+      "tags": [
+        "warden",
+        "preservation",
+        "old world"
+      ]
+    },
+    {
+      "id": "speaker_of_forgotten_tongues",
+      "title": "Speaker of Forgotten Tongues",
+      "requirement": "Learn to fluently speak the ancient Tartarian language",
+      "perk": "Once per session, communicate with Tartarian machines or relics.",
+      "tags": [
+        "language",
+        "tartarian",
+        "speaker"
+      ]
+    },
+    {
+      "id": "stormcaller",
+      "title": "Stormcaller",
+      "requirement": "Survive or navigate through an Aetheric storm and save a party member",
+      "perk": "Once per day, create a small Aetheric shield that deflects energy attacks.",
+      "tags": [
+        "storm",
+        "shield",
+        "rescue"
+      ]
+    },
+    {
+      "id": "guild_broker",
+      "title": "Guild Broker",
+      "requirement": "Successfully negotiate a truce or alliance between two factions",
+      "perk": "+1 to Diplomacy and a reroll once per day when brokering peace or deals.",
+      "tags": [
+        "diplomacy",
+        "alliance",
+        "factions"
+      ]
+    },
+    {
+      "id": "skyreacher",
+      "title": "Skyreacher",
+      "requirement": "Crest all five great climbs and complete the Skyreacher armor set",
+      "perk": "Climbing falls deal half damage; +2 Dexterity, always on.",
+      "tags": [
+        "climb",
+        "height",
+        "legendary",
+        "skyreacher",
+        "mastery"
+      ]
+    },
+    {
+      "id": "historian_of_the_buried_world",
+      "title": "Historian of the Buried World",
+      "requirement": "Recover every fragment of all ten character stories and read each one whole",
+      "perk": "You read what the dead left behind as though they were still speaking (+2 Lore, +1 Investigation).",
+      "tags": [
+        "collectables",
+        "lore",
+        "historian"
+      ],
+      "note": "OTA-1183 — added on owner instruction 2026-08-09; NOT from the original Arbiter_Assigned_Titles_for_Players.docx, which held 21. Name is provisional and the owner's to change."
+    }
   ]
 }
