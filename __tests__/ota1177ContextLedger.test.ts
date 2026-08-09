@@ -172,7 +172,11 @@ describe('OTA-1177 — the summary block', () => {
     // The exporter must never be the thing that fails when the app is already in trouble.
     const src = SRC('app/diagnostics/aboutSummary.ts');
     expect(src).toContain('contextLedgerBlock()');
-    const body = src.slice(src.indexOf('function contextLedgerBlock'), src.indexOf('function contextLedgerBlock') + 400);
+    // ⚠ Widened by OTA-1180, which added the narration-engine line inside this block.
+    // FOURTH fixed-size source slice to age this session (ota1172 / ota1173 / ota1175 / ota1177) — the
+    // claims keep being right while the windows keep going stale. Noted in HANDOFF as a
+    // standing item: these want brace-matched extraction, not a magic number.
+    const body = src.slice(src.indexOf('function contextLedgerBlock'), src.indexOf('function contextLedgerBlock') + 1200);
     expect(body).toContain('try {');
     expect(body).toContain('catch');
   });
