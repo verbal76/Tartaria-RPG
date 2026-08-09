@@ -255,6 +255,7 @@ import {
   hubRoomOpenAir,
   hubEntryRoomId,
   hubNameForFaction,
+  hubSkinFactionFor,
   resolveHubTravel,
   isLeaveHubCommand,
 } from '../engine/hub';
@@ -8772,7 +8773,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const baseNouns = (loc.interactables && loc.interactables.length > 0)
           ? [...loc.interactables]
           : extractAmbientNouns(loc.description);
-        const hubRoom = hubRoomFor(player.hubRoomId, player.factionId);
+        const hubRoom = hubRoomFor(player.hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
         const hubNouns = (hubRoom?.interactables ?? []);
         // Micro-Micro nouns: the scene already carries microMicroId; we
         // resolve via the worldLadder lookup so we mirror beginScene
@@ -9750,7 +9751,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hubRoomId = hubEntryRoomId();
       set((s) => (s.player ? { player: { ...s.player, hubRoomId } } : s));
     }
-    const hubRoom = inHub && hubRoomId ? hubRoomFor(hubRoomId, player.factionId) : null;
+    const hubRoom = inHub && hubRoomId ? hubRoomFor(hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId)) : null;
     get().appendLog('debug', `scene: loc=${location.id} hub=${hubRoomId ?? '-'} arrival=${opts?.arrivalFromName ? 'y' : 'n'} opening=${opts?.isOpening ? 'y' : 'n'} passing=${passingThrough ? 'y' : 'n'}`);
     if (!inHub && hubRoomId) {
       // Player left the hub — clear the hubRoomId.
@@ -10997,7 +10998,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // entirely — its location-pool prose doesn't apply when you're
     // standing inside a hand-authored room.
     const sceneText = hubRoom
-      ? `${hubNameForFaction(player.factionId)} — ${hubRoom.name}. ${hubRoom.description}`
+      ? `${hubNameForFaction(hubSkinFactionFor(player.currentLocationId, player.factionId))} — ${hubRoom.name}. ${hubRoom.description}`
       : buildScene({ weather, location, hazard, enemy: sceneEnemy, quest: player.activeQuests[0] });
     // Opening scene — emit a three-paragraph introduction narrative as
     // SEPARATE log entries so AdventureFeed renders real paragraph
@@ -11018,7 +11019,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         location,
         hubRoomName: hubRoom?.name ?? null,
         hubRoomDescription: hubRoom?.description ?? null,
-        hubName: hubNameForFaction(player.factionId),
+        hubName: hubNameForFaction(hubSkinFactionFor(player.currentLocationId, player.factionId)),
       });
       get().appendLog('world', p1);
       get().appendLog('world', p2);
@@ -11058,7 +11059,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && !livePlayerForHubHint.milestones?.firstOutpostHintShown
         && get().tutorialStep === null
       ) {
-        const hubLabel = hubNameForFaction(livePlayerForHubHint.factionId)
+        const hubLabel = hubNameForFaction(hubSkinFactionFor(livePlayerForHubHint.currentLocationId, livePlayerForHubHint.factionId))
           || hubRoom?.name
           || 'the outpost';
         get().appendLog(
@@ -11150,7 +11151,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (hubRoom) {
         get().appendLog(
           'world',
-          `You pass through the gate into ${hubNameForFaction(player.factionId)} — ${hubRoom.name}. ${hubRoom.description}`,
+          `You pass through the gate into ${hubNameForFaction(hubSkinFactionFor(player.currentLocationId, player.factionId))} — ${hubRoom.name}. ${hubRoom.description}`,
         );
       }
     } else {
@@ -11351,7 +11352,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const labels = dirs
         .filter((d) => d.id)
         .map((d) => {
-          const r = hubRoomFor(d.id, player.factionId);
+          const r = hubRoomFor(d.id, hubSkinFactionFor(player.currentLocationId, player.factionId));
           return r ? `${d.dir} to ${r.shortName}` : null;
         })
         .filter(Boolean) as string[];
@@ -16936,7 +16937,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const interiorMove = resolveHubTravel(player.hubRoomId, trimmed, hubVisited);
           if (interiorMove) {
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: interiorMove.roomId } } : s));
-            const dest = hubRoomFor(interiorMove.roomId, player.factionId);
+            const dest = hubRoomFor(interiorMove.roomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
             if (dest) {
               get().appendLog(
                 'world',
@@ -37419,7 +37420,7 @@ function narrateCasualLook(
   // arrival narration; the look button is for re-checking your
   // bearings without re-reading 70 words of mood prose.
   const inHub = isHubLocation(player?.currentLocationId ?? null) && !!player?.hubRoomId;
-  const hubRoom = inHub ? hubRoomFor(player!.hubRoomId!, player!.factionId) : null;
+  const hubRoom = inHub ? hubRoomFor(player!.hubRoomId!, hubSkinFactionFor(player!.currentLocationId, player!.factionId)) : null;
   // OTA-659 — inside a building the scene's microMicroId is a synthetic
   // "building:<id>:<room>" key (stable per-room anti-farm id), which never
   // resolves to a real micro-micro; use the scene's transitArea ("Outpost ·
@@ -37606,7 +37607,7 @@ function narrateCasualLook(
     for (const dir of ['north', 'east', 'south', 'west'] as const) {
       const id = hubRoom.exits[dir];
       if (!id) continue;
-      const r = hubRoomFor(id, player?.factionId);
+      const r = hubRoomFor(id, hubSkinFactionFor(player?.currentLocationId, player?.factionId));
       if (r) labels.push(`${dir} to ${r.shortName}`);
     }
     if (labels.length > 0) parts.push(`Exits: ${labels.join(' · ')}.`);

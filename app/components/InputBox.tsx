@@ -17,7 +17,7 @@ import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS } from './tutorialSteps';
 import { playerWeaponReach, useGameStore, logUiTap } from '../state/gameStore';
 import { useReduceMotion } from '../state/accessibility';
-import { hubRoomFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
+import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 import { reachBandsFor } from '../engine/types';
 // OTA-1170 — the dodge recharge bar reads its fill from one place.
@@ -203,6 +203,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
   const hubRoomId = useGameStore((s) => s.player?.hubRoomId ?? null);
   const factionId = useGameStore((s) => s.player?.factionId ?? null);
+  // OTA-1186 — the room chips must read the SITE's names, not the player's, or the
+  // exit labels disagree with the room the player is standing in.
+  const hubLocationId = useGameStore((s) => s.player?.currentLocationId ?? null);
+  const skinFactionId = hubSkinFactionFor(hubLocationId, factionId);
   // arb25 — enterable buildings: when inside one, the travel row shows the
   // building's rooms + EXIT instead of cardinals / faction-hub exits.
   const activeBuildingId = useGameStore((s) => s.activeBuildingId);
@@ -291,19 +295,19 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // onPress still submits 'go <direction>' so resolveHubTravel does
   // its existing thing; only the chip LABEL changes. Outside a hub
   // the row renders cardinals as before.
-  const hubRoom = useMemo(() => (hubRoomId ? hubRoomFor(hubRoomId, factionId) : null), [hubRoomId, factionId]);
+  const hubRoom = useMemo(() => (hubRoomId ? hubRoomFor(hubRoomId, skinFactionId) : null), [hubRoomId, skinFactionId]);
   const hubExitChips: Array<{ label: string; submit: string }> = useMemo(() => {
     if (!hubRoom) return [];
     const out: Array<{ label: string; submit: string }> = [];
     for (const dir of ['north', 'south', 'east', 'west'] as const) {
       const targetId = hubRoom.exits[dir];
       if (!targetId) continue;
-      const targetRoom = hubRoomFor(targetId, factionId);
+      const targetRoom = hubRoomFor(targetId, skinFactionId);
       const label = targetRoom?.shortName?.toUpperCase() ?? dir.toUpperCase();
       out.push({ label, submit: `go ${dir}` });
     }
     return out;
-  }, [hubRoom, factionId]);
+  }, [hubRoom, skinFactionId]);
 
   // The EXIT chip belongs ONLY in the gate room (the entrance-tagged room — the
   // outpost's "way out"). Showing it in every room let the player leave through
