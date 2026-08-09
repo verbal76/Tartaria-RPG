@@ -145,9 +145,42 @@ unfinishable state for another.
 (anchor selection, the 9 `hubRoomFor` sites if sites keep their own identity, offer
 filtering, turn-in) with **one trap that must be closed first**.
 
-⚠ **STILL UNVERIFIED, and it decides part of the work:** whether the reskin-to-player
-behaviour (`hubRoomFor(roomId, player.factionId)`) is deliberate or another omission. Not
-yet checked, and not assumed.
+**✅ THE RESKIN QUESTION IS ANSWERED — it is deliberate.** `git log` on
+`hub_faction_variants.json` (commit `33092eca`, 2026-05-23): *"take a pass at per faction
+room names and per faction flavored room descriptions."* 80 variants, 8 factions × 10
+rooms, and the commit states the base room's exits, anchorNpc, interactables and tags stay
+shared **on purpose** so the navigation graph is identical for everyone.
+
+⚠ **So it is not an omission — it is a DIFFERENT FEATURE that never met this one.** The
+reskin exists so **your own** outpost wears your colours. It was never about territory.
+Two things were then conflated: "the player's home base" and "a faction's site in the
+world" are treated as the same object, and today every outpost is rendered as the first
+even when it is the second.
+
+---
+
+## THE RECOMMENDATION (2026-08-09)
+
+**Sequence matters more than the individual pieces.**
+
+**STEP 1 — P3 first: turn on the remote hand-in.** Small, already written, already
+documented as working. It removes the unfinishable state for all 17 quest lines
+immediately, and — critically — **it is the safety net that makes Step 2 safe.** Needs
+exactly one decision from the owner: what it costs (courier fee / delay / rep).
+
+**STEP 2 — faction-site anchoring, using `FACTION_STARTING_LOCATION` as the ownership map.**
+- At **your own** faction's site: nothing changes. Your reskin, your board, your agents.
+- At **another** faction's site: their agent, their work, their prices, their standing gates.
+- The reskin rule becomes *"skin to the SITE's faction"* rather than *"skin to the
+  player's"* — and your own site still skins to you, because it **is** yours. That is one
+  argument at 9 call sites, not a rendering rewrite.
+
+**STEP 3 — the hostility consequence stops being a trap and becomes a mechanic.** With
+Step 1 in place, being hostile to the Architects means you cannot walk into the Blind, so
+you pay the courier premium instead. That is a decision with a cost, which is a game.
+**Without Step 1 it is a dead end**, which is why the order is not negotiable.
+
+⚠ **Do NOT ship Step 2 before Step 1.** It would trade one unfinishable state for another.
 
 ---
 
