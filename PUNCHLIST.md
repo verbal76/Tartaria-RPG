@@ -29,31 +29,6 @@ accumulates guesses is a punch list nobody trusts by item twenty.
 
 ## OPEN
 
-### P1 — Collectible story sets complete into a banner and nothing else
-
-- **Kind:** ENDS IN NOTHING
-- **Scale:** **10 stories, 57 fragments** (`app/data/collectables/character_stories.json`)
-- **Found:** 2026-08-09, in response to the owner asking *"what happens when you finish a
-  collectible? I don't even know."*
-
-**What happens now.** `grantCollectableFragment` (`app/state/gameStore.ts:8116`) adds the
-fragment, writes a `reward` log line, and raises a one-time overlay on the player's very
-first collectible ever. `computeAllProgress` (`app/engine/collectables.ts:132`) computes
-`complete: missing.length === 0`.
-
-**What consumes that `complete` flag — the entire list:**
-- `app/screens/ContractsScreen.tsx:1932` — swaps a pill style.
-- `app/screens/ContractsScreen.tsx:1964` — renders `✦ Story complete — every fragment recovered.`
-
-**That is all of it.** No item, no TC, no standing, no title, no log line, no notification.
-The player is not told at the moment it happens — they must navigate to
-Contracts → Collectibles and notice a banner. ⚠ Verified by searching every reference to
-`computeAllProgress` and every occurrence of a story/fragment completion reward across
-`app/**` — one consumer, one banner.
-
-**Why it matters against the bar:** 57 fragments is the largest gather loop in the game and
-it is the one the owner could not describe the ending of, which is itself the symptom.
-
 ### P2 — 17 mysteries and storylines can only be turned in to a 1-in-30 random vendor
 
 - **Kind:** UNFINISHABLE *(in practice — completable only by grinding random spawns)*
@@ -195,6 +170,45 @@ Recorded so the audit is not re-run on them, and so a future regression has a ba
 | Ending screen | — | exits to title (two routes, plus a no-ending fallback) | `EndingScreen.tsx:100,108,216` |
 
 ---
+
+---
+
+## CLOSED
+
+### ✅ P1 — Collectible story sets (closed by OTA-1206, 2026-08-09)
+
+**Was:** 10 stories / 57 fragments completing into a pill style and a banner on a screen
+the player had to navigate to. No reward, no title, no notification.
+
+**The payoff was specified by the owner**, not chosen here:
+
+> *"they should end in story screen like the chapters screens that put the whole story
+> together to read, and it should say whatever the collectable sets name is is complete.
+> you should get a title for completing all of them, some types of historian title, and it
+> should add an investigate all button like the take all and salvage all."*
+
+**Shipped, all four:**
+
+1. **`StoryRevealOverlay`** — the assembled story, read whole. Raised automatically when a
+   set closes, and re-openable any time via **READ THE WHOLE STORY** on the Collectibles
+   tab. ⚠ Does **not** dismiss on a stray tap (the chapter card does); ⚠ re-derives from
+   the player's own collectables, so it can never render an unearned fragment.
+2. **Names the set** — *"<Character>'s story is complete"*, through
+   `announceMissionComplete`, in the feed the player is already reading.
+3. **`historian_of_the_buried_world`** at all 10 stories (+2 Lore, +1 Investigation).
+   ⚠ **22nd title, and the first not from the owner's canon docx** — flagged in its own
+   data row; **the name is the owner's to change.**
+4. **INVESTIGATE ALL** — mirrors SALVAGE ALL / TAKE ALL; sweeps only actionable chips.
+
+**Tests:** `ota1206CollectionPayoff` (27). Four older assertions retargeted from hardcoded
+counts to self-maintaining ones — they had turned every future title and every new
+completion path into a red test.
+
+⚠ **What is still NOT proven:** that a player can realistically gather 57 fragments at an
+8% biome-gated substitution rate. The loop now *ends* somewhere; whether the grind to reach
+that end is reasonable is a balance question, and balance is explicitly parked until
+completability is clear.
+
 
 ## AUDIT LEDGER — all 31 loops, every one checked
 

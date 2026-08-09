@@ -1661,6 +1661,18 @@ export function ExplorationScreen() {
           // change.
           submit(`investigate ${target}`);
         }}
+        // ⚠ OTA-1206 — INVESTIGATE ALL. Deliberately loops the SAME submit path a player
+        // tapping each chip would take, rather than adding a bulk resolver.
+        // `salvageAllAmbient` is a ~270-line aggregator built to fix SALVAGE ALL's
+        // interleaved output; investigate resolves through hooks, ambient nouns, items,
+        // puzzles and elevation gates, and re-implementing that ordering in bulk would be
+        // a new set of failure modes for a cosmetic gain. Looping the real path cannot
+        // resolve anything differently from the manual taps it replaces — which is the
+        // property that matters for a completability fix.
+        onInvestigateAll={(nouns) => {
+          setSearchOpen(false);
+          for (const n of nouns) submit(`investigate ${n}`);
+        }}
         onCancel={() => setSearchOpen(false)}
       />
 

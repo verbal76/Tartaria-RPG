@@ -79,6 +79,11 @@ export interface TitleProgress {
   /** Distinct great climbs crested (of 5). At 5 the Skyreacher title lands
    *  and the Skyreacher armor set is complete. */
   greatClimbsCompleted: number;
+  /** OTA-1206 — collectible character-stories fully assembled (of 10). At 10 the
+   *  Historian title lands. ⚠ Counts COMPLETED STORIES, not fragments: 57 fragments
+   *  spread unevenly across 10 stories (5–7 each), so a fragment count would make the
+   *  last story worth the same as the first and the title would land early. */
+  collectableStoriesCompleted: number;
 }
 
 export const EMPTY_TITLE_PROGRESS: TitleProgress = {
@@ -99,6 +104,7 @@ export const EMPTY_TITLE_PROGRESS: TitleProgress = {
   relicsPreserved: 0,
   alliancesBrokered: 0,
   greatClimbsCompleted: 0,
+  collectableStoriesCompleted: 0,
 };
 
 export function withTitleProgress(p?: Partial<TitleProgress>): TitleProgress {
@@ -268,6 +274,20 @@ export const WIRED_TITLES: TitleDef[] = [
     earned: (_pl, p) => p.labyrinthCleanRuns >= 1,
     // OTA-350 — one who reads the unseen paths also moves along them unseen.
     perk: (a) => { a.pathfinder = true; a.stealthBonus += 1; },
+  },
+  // ⚠ OTA-1206 — THE 22nd TITLE, AND THE FIRST NOT FROM THE OWNER'S CANON DOCX.
+  // `data/lore/arbiter-titles.json` was ingested verbatim from
+  // Arbiter_Assigned_Titles_for_Players.docx and held exactly 21, all of them wired.
+  // This one is new, added on the owner's instruction (2026-08-09): *"you should get a
+  // title for completing all of them, some types of historian title."* Named from the
+  // game's own established phrase — "the buried world" runs through the narration — but
+  // the NAME IS THE OWNER'S TO CHANGE; only the id is load-bearing.
+  {
+    id: 'historian_of_the_buried_world',
+    earned: (_pl, p) => p.collectableStoriesCompleted >= 10,
+    // Ten lives read end to end. The perk matches what the doing of it teaches: you know
+    // where people leave things, and you know what you are looking at when you find it.
+    perk: (a) => { a.loreBonus += 2; a.investigationBonus += 1; },
   },
   {
     id: 'guild_broker',
