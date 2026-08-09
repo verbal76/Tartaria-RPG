@@ -1297,12 +1297,104 @@ function handleLabyrinthStep(getStore: StoreGet, setStore: StoreSet, trimmed: st
   if (res.reachedFinish) {
     const clean = lab.isCleanRun(res.run);
     setStore((s) => (s.player ? { player: { ...s.player, labyrinthRun: undefined } } : s));
+
+    // ⚠⚠ OTA-1213 (PUNCHLIST P13) — THE MAZE HAS AN ENDING NOW.
+    //
+    // What it was: a clean run printed one line and ticked the Wayfarer counter; **any
+    // other run printed two lines and nothing else** — no TC, no item, no progress — and
+    // the run object was discarded. A maze walked with one wrong turn paid exactly what a
+    // maze walked with nine paid. That is an ENDS IN NOTHING on a challenge P5 confirmed
+    // is live, and the owner's call was: *"we need an ending to p13 the labyrinth. it
+    // should already award a title, make it have a lore enriching ending."*
+    //
+    // ⚠ THE LORE IS THE PAYOUT, and it was sitting in the data the whole time.
+    // `locations.json` on Iskan-Veil: *"The Conspiracy Architects' hidden city — a maze of
+    // false doors and overlaid corridors. Every map of Iskan-Veil is wrong by design; the
+    // true Core seat is behind the door you didn't see."* And `concepts.json` names its
+    // Core's function among the nine: **masking.** So the reveal at the heart is not a
+    // consolation prize bolted on — it is the answer to what this place IS. The labyrinth
+    // is not a puzzle guarding the Core. **The labyrinth is the Core still working.**
+    //
+    // ⚠⚠ ONCE PER CHARACTER, AND THAT IS LOAD-BEARING. `enterLabyrinth` carries no attempt
+    // gate — the maze is fully re-enterable — so a per-run reward would be farmable, and
+    // the fix for an ends-in-nothing must not become a farm. The reveal and its keepsake
+    // are gated on `labyrinthHeartSeen`; the Wayfarer counter is unaffected because its
+    // threshold is >= 1, so re-earning it is already a no-op.
+    const heartSeen = !!getStore().player?.labyrinthHeartSeen;
     if (clean) {
       getStore().appendLog('world', "The corridors open onto a still chamber at the maze's heart. You walked it clean — the true path never left your hands.");
       recordTitleProgress(getStore, setStore, { labyrinthCleanRuns: 1 });
     } else {
       const n = res.run.wrongTurns;
       getStore().appendLog('world', `You reach the heart of the maze — but you strayed ${n} time${n === 1 ? '' : 's'} onto false paths along the way.`);
+    }
+
+    if (!heartSeen) {
+      // ⚠ Three beats, not one wall of text: AdventureFeed renders separate entries as
+      // real paragraphs, and this is the largest single piece of lore the challenge holds.
+      getStore().appendLog('world',
+        'The chamber is small, and perfectly plain. No door but the one you came through. '
+        + 'No seat, no Core, no Guardian — a floor of dressed stone and a low ring of benches, '
+        + 'as though the Architects meant people to sit here and wait for something.');
+      getStore().appendLog('world',
+        'On the wall opposite, cut shallow and without ceremony: a map of the labyrinth. '
+        + 'You have just walked it, so you know at a glance that it is wrong. Not damaged, '
+        + 'not old — WRONG, corridor for corridor, every turn mirrored from the one you took. '
+        + 'Someone carved a lie here carefully enough to be mistaken for a courtesy.');
+      getStore().appendLog('arbiter',
+        '"Iskan-Veil masked the grid," the Arbiter says quietly. "Nine Cores, nine tasks — '
+        + 'Asgardar held the spire, Ostragar the cadence, and this place hid the rest. That '
+        + 'was its work." A pause. "You were told the maze guards the Core seat. It does not. '
+        + 'The maze IS the Core seat, still running, still masking, a thousand years after '
+        + 'the water. Every map of this city is wrong because something down here is still '
+        + 'making them wrong. You did not solve it. You outlasted one of its lies."');
+
+      // ⚠ A keepsake, not a reward roll. Quest-tagged so it can never be sold, gifted,
+      // scrapped or fused (engine/questItems.ts) — the point is that the player keeps the
+      // thing that proves the map lied, not that they can pawn it.
+      const rubbing: InventoryItem = {
+        id: freshInstanceId('labyrinth_heart'),
+        name: 'Rubbing of the False Map',
+        kind: 'relic',
+        rarity: 'Legendary',
+        quantity: 1,
+        tags: ['quest', 'story', 'keepsake', 'lore'],
+        description:
+          "Charcoal on hide, taken from the wall at the heart of the Labyrinth of Shadows. "
+          + "It shows the maze mirrored — every turn the wrong way round. Iskan-Veil's Core "
+          + "masked the Tartarian grid, and it has never stopped: this is what it is still "
+          + "producing, patiently, for nobody. Proof that the lie is maintained.",
+      };
+      const grant = grantItem(getStore().player!.inventory, rubbing);
+      setStore((st) => (st.player ? { player: {
+        ...st.player,
+        inventory: grant.inventory,
+        labyrinthHeartSeen: true,
+      } } : st));
+      if (grant.accepted > 0) {
+        getStore().appendLog('reward', `✦ ${rubbing.name} — you take a rubbing before you leave.`);
+      } else {
+        // ⚠ A full pack must not silently eat the one artifact of the ending. The flag is
+        // still set (the lore was delivered and should not repeat), so this says plainly
+        // that the item was lost rather than leaving the player to notice its absence.
+        getStore().appendLog('world',
+          `Your pack is full — there is nowhere to put the rubbing, and you leave it on the wall.`);
+      }
+      recordMemorableEvent(getStore, setStore, {
+        kind: 'labyrinth_heart',
+        text: 'stood at the heart of the Labyrinth of Shadows and read the false map',
+        locationId: 'iskan_veil',
+        locationName: 'Iskan-Veil',
+      });
+    } else {
+      getStore().appendLog('world',
+        'The still chamber again, and the false map on its wall — mirrored, patient, wrong. '
+        + 'Whatever is making it has not tired.');
+    }
+
+    // ⚠ The steer toward a clean run comes AFTER the ending, so an imperfect first walk
+    // reads as "you learned something, now go do it properly" rather than as a refusal.
+    if (!clean) {
       getStore().appendLog('arbiter', '"You found the center, not the path. The Wayfarer\'s name is for those who never lose it. Walk it again — cleaner."');
     }
     return true;

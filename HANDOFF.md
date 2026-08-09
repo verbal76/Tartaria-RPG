@@ -1376,7 +1376,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1212`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1213`**,
 **golem-line `2026-08-09-1177`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1386,7 +1386,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.122**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.123**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,8 +1606,52 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠ PUNCHLIST P13 CLOSED — THE LABYRINTH OF SHADOWS HAS AN ENDING (2026-08-09, latest).
+  HAL + GOLEM.** HAL OTA-1213 / golem OTA-1190. **steam NOT included — batched (§2).**
+
+  Owner: *"we need an ending to p13 the labyrinth. it should already award a title, make it
+  have a lore enriching ending."*
+
+  **WHAT IT WAS.** A clean run printed one line and ticked the Wayfarer counter. **Any
+  other run printed two lines and nothing else** — no TC, no item, no progress — and the
+  run object was discarded. A maze walked with one wrong turn paid exactly what a maze
+  walked with nine paid, on a challenge OTA-1210 had just confirmed is live.
+
+  ⚠⚠ **THE LORE WAS ALREADY IN THE DATA — none of it was invented.** `locations.json` on
+  Iskan-Veil: *"The Conspiracy Architects' hidden city — a maze of false doors and overlaid
+  corridors. Every map of Iskan-Veil is wrong by design; the true Core seat is behind the
+  door you didn't see."* And `concepts.json` names each of the nine Cores' jobs; Iskan-Veil's
+  is **masking**. So the reveal is the answer to what the place IS, not a consolation prize
+  bolted onto a failure state.
+
+  The chamber at the heart is small and perfectly plain — no seat, no Core, no Guardian,
+  just dressed stone and a low ring of benches. On the wall, cut shallow and without
+  ceremony, a map of the labyrinth that the player has just walked and therefore knows at a
+  glance is WRONG, corridor for corridor. The Arbiter: *"You were told the maze guards the
+  Core seat. It does not. The maze IS the Core seat, still running, still masking, a
+  thousand years after the water… You did not solve it. You outlasted one of its lies."*
+  Keepsake: **Rubbing of the False Map**, quest-tagged so it can never be sold, gifted,
+  scrapped or fused.
+
+  ⚠⚠ **ONCE PER CHARACTER, AND THAT IS LOAD-BEARING.** `enterLabyrinth` carries no attempt
+  gate — the maze is fully re-enterable — so a per-run reward would be farmable, and **the
+  fix for an ends-in-nothing must not become a farm.** Gated on the new
+  `labyrinthHeartSeen`; a repeat visit gets one line and nothing else. The Wayfarer title
+  still rides the CLEAN run only (its threshold is `>= 1`, so re-earning it was already a
+  no-op), and the *"walk it again, cleaner"* steer now comes AFTER the ending, so an
+  imperfect first walk reads as *you learned something, now do it properly* rather than as a
+  refusal.
+
+  ⚠ **A full pack does not silently eat the keepsake** — the grant is checked and the
+  failure is spoken. The one artifact of the ending vanishing without a word would be the
+  same defect in miniature.
+
+  **Tests:** new suite ota1213LabyrinthEnding (14). ⚠ One assertion retargeted before
+  landing: it assumed `locations.json` was `{ locations: [...] }` when it is a bare array —
+  a data shape worth reading rather than guessing, even for a one-line check.
+
 - **⚠⚠ PUNCHLIST P6 CLOSED — THE SIREN PAYS +1 CHARISMA — plus the SECOND-ROUND AUDIT of
-  the 14 untraced loops (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1212 / golem OTA-1189.
+  the 14 untraced loops (2026-08-09). HAL + GOLEM.** HAL OTA-1212 / golem OTA-1189.
   **steam NOT included — batched (§2).**
 
   Owner: *"charisma go, audit the other 14 loops when done give me a new punch list."*

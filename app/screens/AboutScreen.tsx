@@ -1294,7 +1294,18 @@ export function AboutScreen() {
         )}
 
         {tab === 'about' && (
-        <Text style={styles.mono}>{info}</Text>
+        <>
+          <Text style={styles.mono}>{info}</Text>
+          <View style={styles.dedication}>
+            <Text style={styles.dedicationRule}>· · ·</Text>
+            <Text style={styles.dedicationBody}>
+              For my wife and my children — who put up with a man who was always on his
+              phone, building this. You were the reason I kept going, and the reason I
+              should have looked up more. Thank you for the patience I did not earn.
+            </Text>
+            <Text style={styles.dedicationSign}>— Verbal</Text>
+          </View>
+        </>
         )}
 
         {tab === 'notices' && (
@@ -1445,6 +1456,32 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 14,
     backgroundColor: '#1a1714',
+  },
+  dedication: {
+    marginTop: 28,
+    marginBottom: 12,
+    paddingHorizontal: 6,
+  },
+  dedicationRule: {
+    color: '#3a4348',
+    fontSize: 13,
+    letterSpacing: 6,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  dedicationBody: {
+    color: '#8aa0a4',
+    fontSize: 13,
+    fontStyle: 'italic',
+    lineHeight: 21,
+    textAlign: 'center',
+  },
+  dedicationSign: {
+    color: '#cdbf99',
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: 12,
+    letterSpacing: 1,
   },
   // v2.4.1 (OTA 047) — SESSION tab styles. Primary button (save &
   // exit) is warm gold + filled, the two secondaries (copy / clear

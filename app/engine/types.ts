@@ -1385,6 +1385,13 @@ export interface PlayerCharacter {
    *  completed, expired, declined). Prevents re-planting the same
    *  whisper twice on the same character. */
   completedWhisperIds?: string[];
+  /** ⚠ OTA-1213 (PUNCHLIST P13) — the heart of the Labyrinth has been reached ONCE.
+   *  The maze is fully re-enterable (`enterLabyrinth` carries no attempt gate), so the
+   *  lore ending and its keepsake are gated on this rather than paid per run — a
+   *  repeatable loop with a repeatable reward is a farm, which is the one thing the
+   *  fix for an ends-in-nothing must not become. Absent on an old save reads as
+   *  "not yet seen", so a character who already walked it gets the ending next time. */
+  labyrinthHeartSeen?: boolean;
   /** Deterministic seed used to generate this character's procedural world map. */
   mapSeed?: string;
   /** Last spot key the player dug at (`locationId:x:y`). Must move away
@@ -1721,7 +1728,12 @@ export interface MemorableEvent {
     // OTA-843 [Chronicle] — the character first crossed INTO a worse corruption tier
     // (Tainted / Corrupted / Hollowed). Records the aether's arc on the soul so the
     // Chronicle can show how far they've fallen, not just the current number.
-    | 'corruption_tier';
+    | 'corruption_tier'
+    // ⚠ OTA-1213 (PUNCHLIST P13) — the player stood at the heart of the Labyrinth of
+    // Shadows and learned what Iskan-Veil's masking Core actually does. Recorded so
+    // the Arbiter can reference it and the Chronicle can show it; a lore beat this
+    // size should leave a mark on the character, not just scroll past in the feed.
+    | 'labyrinth_heart';
   text: string;
   timestamp: number;
   factionId?: string;
