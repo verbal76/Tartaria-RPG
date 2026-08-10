@@ -470,6 +470,24 @@ function creditLoreRead(get: StoreGet, set: StoreSet, conceptKey: string): void 
   recordTitleProgress(get, set, { loreRead: 1 });
 }
 
+/** ⚠ OTA-1222 (PUNCHLIST P15) — this place's own authored loot rows, for the area-search
+ *  substitution. Resolved through `ladderLootPool` so the unique-quest-reward exclusion and
+ *  the name resolution are the SAME ones `pickLootFromLadder` uses. Returns [] when the
+ *  scene has no ladder micro-micro, which leaves search behaving exactly as before. */
+/** ⚠ EXPORTED for the live wiring test. The unit suite builds a `siteLoot` array by hand,
+ *  so it proves the roller and says nothing about whether the STORE hands one over — if
+ *  this returned [] on every real scene the feature would ship doing nothing with green
+ *  tests behind it (the OTA-1209 lesson). Asserting on a search OUTCOME cannot cover it
+ *  either: a noun can only be searched once per room, so a sampling loop is refused after
+ *  the first try. This is the seam, so this is what the test reads. */
+export function siteLootForScene(get: StoreGet): { name: string; rarity: import('../engine/types').Rarity }[] {
+  const mmId = get().currentScene?.microMicroId;
+  if (!mmId) return [];
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const enc = require('../engine/encounter') as typeof import('../engine/encounter');
+  return enc.ladderLootPool(findMicroMicroAnywhere(mmId));
+}
+
 function findConcept(targetText: string | undefined): Concept | null {
   if (!targetText) return null;
   const t = targetText.toLowerCase();
@@ -14345,6 +14363,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               rareLootBias: raceLootBias(player, get().currentScene),
               // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
               biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
+              // OTA-1222 — a small chance the find is swapped for something this PLACE
+              // authored. Replacement, not addition: the drop rate does not move.
+              siteLoot: siteLootForScene(get),
             });
             set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
             // OTA-200 — visible lens cue. When the player carries the
@@ -14923,6 +14944,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               rareLootBias: raceLootBias(player, get().currentScene),
               // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
               biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
+              // OTA-1222 — a small chance the find is swapped for something this PLACE
+              // authored. Replacement, not addition: the drop rate does not move.
+              siteLoot: siteLootForScene(get),
             });
             // OTA 23-015 — `kind: 'nothing'` no longer leaves the noun
             // unconsumed. Playtest log: a player typed `salvage gate`
@@ -15854,6 +15878,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             rareLootBias: raceLootBias(player, get().currentScene),
             // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
             biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
+            // OTA-1222 — same substitution on investigate.
+            siteLoot: siteLootForScene(get),
           });
           if (investigateLensActive && outcome.kind === 'hook') {
             get().appendLog(

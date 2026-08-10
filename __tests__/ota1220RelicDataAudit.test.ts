@@ -28,41 +28,36 @@ function catalogNames(): Set<string> {
   return names;
 }
 
-describe('OTA-1220 / P15 — loot_tables.json: imported, resolving, and READ BY NOBODY', () => {
+describe('OTA-1220 / P15 — loot_tables.json: imported, resolving, and (since OTA-1222) READ', () => {
   const ENCOUNTER = readFileSync(join(ROOT, 'app/engine/encounter.ts'), 'utf8');
 
   test('⚠⚠ it IS imported — the original "zero importers" claim was false', () => {
     expect(ENCOUNTER).toContain("import lootData from '../data/relics/loot_tables.json'");
   });
 
-  test('⚠⚠ and its ONLY reader has no production caller — that is the real defect', () => {
-    // `pickLootFromLadder` is the single function that touches the table. If the game
-    // called it, this test should fail and P15's loot half is closed.
+  test('⚠⚠ its reader IS called now — this test documented the defect and now guarantees the fix', () => {
+    // ⚠⚠ THIS ASSERTION WAS WRITTEN INVERTED, ON PURPOSE. In OTA-1220 it read "no caller
+    // anywhere" and passed, recording that `loot_tables.json` was imported, parsed, indexed
+    // on boot and read by nobody. OTA-1222 gave it a caller and this went RED — which is
+    // the test doing exactly the job it was built for. Flipped rather than deleted: a
+    // defect test becoming a guarantee test is the record that the thing was actually
+    // fixed and not merely reworded (the same move OTA-1216 made for P12).
     expect(ENCOUNTER).toContain('export function pickLootFromLadder(');
-    const callers: string[] = [];
-    const walk = (rel: string) => {
-      for (const f of readdirSync(join(ROOT, rel), { withFileTypes: true })) {
-        if (f.isDirectory()) { walk(`${rel}/${f.name}`); continue; }
-        if (!/\.tsx?$/.test(f.name)) continue;
-        const src = readFileSync(join(ROOT, rel, f.name), 'utf8');
-        // A CALL, not the declaration and not an import line.
-        for (const line of src.split('\n')) {
-          if (!line.includes('pickLootFromLadder')) continue;
-          if (/export function pickLootFromLadder/.test(line)) continue;
-          if (/^\s*(import|\s*pickLootFromLadder,)/.test(line)) continue;
-          callers.push(`${rel}/${f.name}: ${line.trim().slice(0, 70)}`);
-        }
-      }
-    };
-    walk('app');
-    expect(callers).toEqual([]);
+    expect(ENCOUNTER).toContain('export function ladderLootPool(');
+    // The store hands the resolved pool to the area-search roller.
+    const STORE = readFileSync(join(ROOT, 'app/state/gameStore.ts'), 'utf8');
+    expect(STORE).toContain('enc.ladderLootPool(findMicroMicroAnywhere(mmId))');
+    expect((STORE.match(/siteLoot: siteLootForScene\(get\)/g) ?? []).length).toBe(3);
   });
 
-  test('⚠ the SIBLING half of the same pair IS wired — which is what makes this an omission', () => {
+  test('⚠ BOTH halves of the pair are wired — the asymmetry P15 was filed for is gone', () => {
     // `pickEncounterFromLadder` (enemies) is called by the store. The loot twin is not.
+    // ⚠ Also retargeted by OTA-1222: this asserted the store did NOT call the loot half,
+    // which was the asymmetry P15 was filed for. Both halves are wired now, so what it
+    // guards is that they STAY wired.
     const STORE = readFileSync(join(ROOT, 'app/state/gameStore.ts'), 'utf8');
     expect(STORE).toContain('pickEncounterFromLadder(ladderTriple)');
-    expect(STORE).not.toContain('pickLootFromLadder(');
+    expect(STORE).toContain('siteLootForScene(get)');
   });
 
   test('⚠⚠ the DATA is sound — every ladder loot name resolves, 153 of 153', () => {

@@ -569,11 +569,33 @@ export function pickEncounterFromLadder(triple: LadderTriple | null | undefined)
  * fail to resolve. The caller (area-search, dig, etc.) builds the actual
  * InventoryItem from the name via lookupCraftedItem.
  */
-export function pickLootFromLadder(triple: LadderTriple | null | undefined): string | null {
-  if (!triple) return null;
-  const pool = triple.microMicro.lootTable
+/** ⚠⚠ OTA-1222 (PUNCHLIST P15) — NEVER AS RANDOM SEARCH LOOT.
+ *
+ *  Both of these are somebody's PAYOUT. `Mud Monarch Seal` is the reward for a faction
+ *  storyline; `Mask of Tartaria's Last King` is a Legendary exploration piece. They sit in
+ *  the authored ladder pools, and finding a storyline's unique reward by poking the mud
+ *  devalues the storyline that pays it — the player who ran seven stages for it gets the
+ *  same object as the player who searched a ruin twice.
+ *
+ *  Excluded HERE, at the one resolver both callers share, rather than by editing the data:
+ *  the pools are authored content and this is a game-design rule about them. */
+export const LADDER_LOOT_EXCLUDED: ReadonlySet<string> = new Set([
+  'Mud Monarch Seal',
+  "Mask of Tartaria's Last King",
+]);
+
+/** The resolved, playable loot rows for a place. ⚠ One resolver, so the exclusion above and
+ *  the name-resolution both apply everywhere — `pickLootFromLadder` and the area-search
+ *  substitution must not be able to disagree about what this place can drop. */
+export function ladderLootPool(triple: LadderTriple | null | undefined): LootEntry[] {
+  if (!triple) return [];
+  return triple.microMicro.lootTable
     .map((name) => lootByName.get(name))
-    .filter((l): l is LootEntry => !!l);
+    .filter((l): l is LootEntry => !!l && !LADDER_LOOT_EXCLUDED.has(l.name));
+}
+
+export function pickLootFromLadder(triple: LadderTriple | null | undefined): string | null {
+  const pool = ladderLootPool(triple);
   if (pool.length === 0) return null;
   return pickWeighted(pool, (l) => rarityWeights[l.rarity]).name;
 }

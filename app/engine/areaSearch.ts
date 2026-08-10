@@ -277,6 +277,11 @@ function pickWeightedBiome<T extends { weight: number; name: string }>(
 const RARITY_RANK: Record<string, number> = {
   Common: 0, Uncommon: 1, Rare: 2, Epic: 3, Legendary: 4,
 };
+/** OTA-1222 — the same rarity curve `pickLootFromLadder` uses, so a substitution drawn
+ *  here and one drawn there cannot skew differently. Legendary stays rare INSIDE an
+ *  already-rare 10% window. */
+const SITE_RARITY_WEIGHT: Record<Rarity, number> = { Common: 10, Uncommon: 5, Rare: 2, Legendary: 1 };
+
 function rarityRank(r: Rarity): number {
   return RARITY_RANK[r] ?? 0;
 }
@@ -374,9 +379,36 @@ function format(line: string, target: string): string {
  *  Search / harvest stay loot-heavy; investigate becomes hook-heavy
  *  so the player who CHOOSES to investigate is rewarded with story
  *  threads, not loot they could grind from search. */
+/** ⚠⚠ OTA-1222 (PUNCHLIST P15) — THE SITE-LOOT SUBSTITUTION RATE.
+ *
+ *  Owner: *"it goes from the tuned pool and has a small percentage to pull from the
+ *  alternate loot table as a replacement item for something already on the list."*
+ *
+ *  So the tuned pool decides IF you find something and how often — none of that moves —
+ *  and this only decides WHAT, occasionally. ⚠ That is a REPLACEMENT, not an addition:
+ *  the drop cadence is untouched and no extra objects enter the economy, which is what
+ *  makes it safe to turn on without a rebalance.
+ *
+ *  ⚠⚠ WHY IT COULD NOT SIMPLY REPLACE THE POOL: the 27 authored ladder pools carry ONE of
+ *  the eleven materials the crafting and golem loops depend on (Scrap Metal). Swapping the
+ *  pool outright would re-break every complaint OTA-444/446/447 were written to fix — no
+ *  golem fuel, no club-and-spear stock, no recipe staples. At this rate roughly nine finds
+ *  in ten are still the tuned pool.
+ *
+ *  One number, deliberately: dial it here. */
+export const SITE_LOOT_SUBSTITUTION_RATE = 0.10;
+
 export function rollAreaSearch(
   target: string,
-  opts?: { hookBonus?: number; intent?: 'search' | 'investigate' | 'harvest'; rareLootBias?: number; biomeTags?: readonly string[] },
+  opts?: {
+    hookBonus?: number;
+    intent?: 'search' | 'investigate' | 'harvest';
+    rareLootBias?: number;
+    biomeTags?: readonly string[];
+    /** OTA-1222 — this place's OWN authored loot rows (engine/encounter.ts
+     *  `ladderLootPool`). Empty or absent leaves behaviour exactly as it was. */
+    siteLoot?: readonly { name: string; rarity: Rarity }[];
+  },
 ): AreaSearchOutcome {
   const bonus = Math.max(0, Math.min(0.4, opts?.hookBonus ?? 0));
   // arb-fix — race loot-luck (Reclaimer / Aetherborn always; Mud Dweller
@@ -421,6 +453,23 @@ export function rollAreaSearch(
         const alt = pickWeightedBiome(pool, opts?.biomeTags);
         if (rarityRank(alt.rarity) > rarityRank(found.rarity)) found = alt;
       }
+    }
+    // ⚠⚠ OTA-1222 — THE SUBSTITUTION, and it happens LAST. Everything above — the find
+    // window, loot-luck, the biome weighting — has already decided that a find happens and
+    // what tier it is. This swaps the OBJECT and nothing else, so a place that authored its
+    // own loot occasionally hands you something that belongs to it instead of another
+    // Small Rock.
+    const site = opts?.siteLoot ?? [];
+    if (site.length > 0 && Math.random() < SITE_LOOT_SUBSTITUTION_RATE) {
+      const swap = pickWeighted(
+        site.map((l) => ({ ...l, weight: SITE_RARITY_WEIGHT[l.rarity] ?? 1 })),
+      );
+      return {
+        kind: 'material',
+        itemName: swap.name,
+        rarity: swap.rarity,
+        line: format(pick(MATERIAL_LINES), target),
+      };
     }
     return {
       kind: 'material',

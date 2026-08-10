@@ -1376,7 +1376,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1221`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1222`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1386,7 +1386,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.128**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.129**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,8 +1606,54 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠ PUNCHLIST P15 — A PLACE'S OWN LOOT CAN TURN UP WHEN YOU SEARCH IT (2026-08-10,
+  latest). HAL ONLY so far — golem port pending.** HAL OTA-1222. **steam NOT included —
+  batched (§2).**
+
+  Owner's call, verbatim: *"it goes from the tuned pool and has a small percentage to pull
+  from the alternate loot table as a replacement item for something already on the list."*
+
+  **WHAT IT WAS.** 27 authored ladder loot pools — 153 entries, every one resolving — were
+  imported, parsed and indexed on boot, and the single function that read them
+  (`pickLootFromLadder`) had **no caller anywhere**. Its enemy twin,
+  `pickEncounterFromLadder`, written beside it and reading the same ladder, is called twice
+  by the store. The enemy half of the pair was live; the loot half had no door.
+
+  ⚠⚠ **REPLACEMENT, NOT ADDITION — the whole safety argument.** The tuned pool still decides
+  IF you find something and how often. This decides WHAT, at **10%**, from one constant
+  (`SITE_LOOT_SUBSTITUTION_RATE`). No drop rate moves and no extra objects enter the economy.
+
+  ⚠⚠ **WHY IT COULD NOT SIMPLY REPLACE THE POOL, and this is the number that decided it:**
+  the 27 ladder pools carry **ONE of the eleven** materials the crafting and golem loops
+  depend on (Scrap Metal). Swapping outright would have re-broken every complaint
+  OTA-444/446/447 were written to fix — no golem fuel, no club-and-spear stock, no recipe
+  staples. A test asserts the staples still come through a 3,000-find sample.
+
+  ⚠ **Two unique QUEST REWARDS pulled out of the pools:** `Mud Monarch Seal` (a faction
+  storyline's payout) and `Mask of Tartaria's Last King`. Finding a storyline's unique
+  reward by poking the mud devalues the storyline that pays it. Excluded at the SHARED
+  resolver (`ladderLootPool`) rather than by editing the data, so both callers get it and
+  cannot drift apart.
+
+  ⚠ Substituted finds keep the pool row's own rarity (no free upgrades), and the ~100 names
+  with no catalog row mint through OTA-961's `resolveLootItem` as sellable trophies at the
+  right rarity rather than as 2-TC junk.
+
+  **Tests:** ota1222SiteLoot (8) + ota1222SiteLootLive (3).
+
+  ⚠⚠ **THE LIVE SUITE READS THE SEAM RATHER THAN AN OUTCOME, AND THE GAME FORCED THAT.** A
+  noun can only be searched ONCE per room, so a sampling loop is refused after the first
+  attempt — my first live test spent 900 iterations against that wall and reported the
+  feature dead. And a single 10% roll asserted as an outcome is a coin flip wearing a
+  test's clothes. So it asserts what the store would HAND the roller (empty is the silent
+  no-op this suite exists to catch) and that a hub room correctly hands over nothing.
+
+  ⚠ **Two more of my own assumptions went red before this landed:** that `search <noun>`
+  reaches the area roller — the per-noun SALVAGE pool answers first — and that setting
+  `hubRoomId` puts a character in a hub, when `inHub` is decided by the LOCATION.
+
 - **⚠⚠ PUNCHLIST P17 — A TITLE THAT COULD NOT BE EARNED WITHOUT THE NARRATION MODEL
-  (2026-08-10, latest). HAL ONLY so far — golem port pending.** HAL OTA-1221.
+  (2026-08-10). HAL ONLY so far — golem port pending.** HAL OTA-1221.
   **steam NOT included — batched (§2).**
 
   **WHAT IT WAS.** `titleProgress.loreRead` — the counter gating **Scholar of Forgotten
