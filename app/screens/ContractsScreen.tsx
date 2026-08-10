@@ -514,10 +514,12 @@ export function ContractsScreen() {
 
   return (
     <View style={styles.container}>
+      {/* OTA-1205 — v2 id: the body gained the host hand-in rule (OTA-1201) and dismissals
+          are per-install, so the old id would hide the new line from existing testers. */}
       <FirstTimeHint
-        id="contracts_first_open"
+        id="contracts_first_open_v2"
         title="Your missions"
-        body="Everything you've taken on lives here — hunts, faction work, and bounties. Tap one to set a course or check your progress."
+        body="Everything you've taken on lives here — hunts, faction work, and bounties. Tap one to set a course or check your progress. Hand-ins answer to whoever owns the ground you stand on — if they won't take your work, a broker, courier, or the Hidden Market will, for a cut."
       />
       <View style={styles.header}>
         <TouchableOpacity

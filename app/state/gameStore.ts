@@ -492,11 +492,17 @@ function teachFromProcedureText(
 /** OTA-1203 — resolve a typed target against the Procedure Texts actually IN THE PACK.
  *  Token-subset match; two candidates REFUSE (the P12 rule) rather than guessing which
  *  procedure the player meant to study. */
+function AT_isProcedureTextName(name: string): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+  return AT.isProcedureTextName(name);
+}
+
 function findHeldProcedureText(
   player: PlayerCharacter,
   targetText: string,
 ): { item: InventoryItem | null; ambiguous: string[] } {
-  const texts = player.inventory.filter((i) => i.name.startsWith('Procedure Text:') && i.quantity > 0);
+  const texts = player.inventory.filter((i) => AT_isProcedureTextName(i.name) && i.quantity > 0);
   if (texts.length === 0) return { item: null, ambiguous: [] };
   const words = targetText.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
   const hits = texts.filter((i) => {
@@ -31042,6 +31048,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     if (!item) {
       get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see ${withArticle(itemName)} on you."`);
+      return;
+    }
+    // ⚠ OTA-1205 — a Procedure Text's tap-action is READING it. It carries no authored
+    // `effect`, so without this branch it fell through the effect router to nothing —
+    // the pack's READ button and the typed `read` land on the same teacher.
+    if (AT_isProcedureTextName(item.name)) {
+      void get().submitPlayerAction(`read ${item.name}`);
       return;
     }
     // OTA 024 — items with a consumable-shaped effect route through

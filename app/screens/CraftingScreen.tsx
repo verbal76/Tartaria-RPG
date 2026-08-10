@@ -266,7 +266,10 @@ type Tab = 'craft' | 'repair' | 'recipes' | 'aetheric';
 // install when the player first lands on that tab. Authoring rule:
 // ~25 words / 2 sentences max — longer copy goes in the future
 // Tutorial Replay docs (TUTORIAL_DOCS_FULL).
-const TAB_HINTS: Record<Tab, { title: string; body: string }> = {
+// OTA-1205 — exported so the copy can be pinned by test: the aetheric card shipped
+// stale for a full feature wave (it described only the three disciplines while the
+// tab's headline became the four techniques), and nothing could notice.
+export const TAB_HINTS: Record<Tab, { title: string; body: string; id?: string }> = {
   craft: {
     title: 'Craft tab',
     body: 'Every gear / relic blueprint. Ready-to-craft ones are highlighted; the rest list what you\'re missing.',
@@ -280,8 +283,12 @@ const TAB_HINTS: Record<Tab, { title: string; body: string }> = {
     body: 'Food, tonics, elixirs. Tap a recipe with materials in hand to fire it. Same craftable-highlight rule as Craft.',
   },
   aetheric: {
+    // ⚠ v2 id, deliberately: hint dismissals are per-install, so an edited body under
+    // the old id would never be seen by a tester who dismissed the pre-technique card.
+    // Bump the id again if this card is ever rewritten again.
+    id: 'crafting_tab_aetheric_v2',
     title: 'Aetheric tab',
-    body: 'Aethercraft disciplines — shape stone, summon golem, mend wounds. Per-race DC + stat bonuses apply.',
+    body: 'Your aether techniques live here — tap Channel to raise one; each channel costs a dose, and practice raises your rank. Techniques are learned from Procedure Texts: bought from a faction that trusts you, found at aether-heavy ruins, or earned in stories. Below them, the three disciplines — shape stone, summon golem, mend wounds.',
   },
 };
 
@@ -564,7 +571,7 @@ export function CraftingScreen() {
   return (
     <View style={styles.container}>
       <FirstTimeHint
-        id={`crafting_tab_${tab}`}
+        id={hint.id ?? `crafting_tab_${tab}`}
         title={hint.title}
         body={hint.body}
       />
