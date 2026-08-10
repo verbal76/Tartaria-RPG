@@ -351,6 +351,17 @@ export function ExplorationScreen() {
     currentScene?.microMicroId,
     worldMemory.visitedRooms,
   ]);
+  // OTA-1211 — a RESOLVED hook's noun must grey like any spent chip. The
+  // engine's investigate handler hard-refuses these (step 4.6 — "You already
+  // searched the eddy") but nothing writes the noun into searchedAmbientNouns,
+  // so the chip stayed bright and tappable forever. The owner filed this from
+  // INSIDE the game: "on investigate it should be consumed." Same matcher the
+  // engine's refusal uses, so the chip and the engine cannot disagree again.
+  const isExhaustedHookNoun = (n: string): boolean => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { matchAnyHookNoun } = require('../engine/hooks') as typeof import('../engine/hooks');
+    return matchAnyHookNoun(n, currentScene?.hooks ?? [])?.resolved === true;
+  };
   const flavorExhaustedSet = useMemo(() => {
     if (!player || !currentScene) return new Set<string>();
     // OTA-164 — see productivelyConsumedSet above. Same hub-key bug.
@@ -1282,6 +1293,7 @@ export function ExplorationScreen() {
                   // pools, mirroring the engine's accept/refuse
                   // decision. Was exact set.has(n.toLowerCase()).
                   if (isFuzzyConsumed(n, productivelyConsumedSet)) return false;
+                  if (isExhaustedHookNoun(n)) return false;
                   if (isNounFlavorExhausted(n, flavorExhaustedSet)) return false;
                   const req = searchRequirementFor(n);
                   if (req && player && !playerHasScannerEquipped(player, req.scannerBias)) {
@@ -1336,7 +1348,8 @@ export function ExplorationScreen() {
               const eyeOnlyCount = (currentScene?.arbiterEye ?? []).filter(
                 (m) => !buildChipPool(currentScene).some((n) => n.toLowerCase() === m.toLowerCase())
                   && !isFuzzyConsumed(m, productivelyConsumedSet)
-                  && !isNounFlavorExhausted(m, flavorExhaustedSet),
+                  && !isNounFlavorExhausted(m, flavorExhaustedSet)
+                  && !isExhaustedHookNoun(m),
               ).length;
               return sceneCount + groundCount + eyeOnlyCount + (tutBeat === 'investigate' ? 1 : 0); // tutorial door prop
             })()}
@@ -1676,7 +1689,8 @@ export function ExplorationScreen() {
                 // bench" vs chip "bench") per OTA-070's pattern.
                 consumed:
                   isFuzzyConsumed(n, productivelyConsumedSet) ||
-                  isNounFlavorExhausted(n, flavorExhaustedSet),
+                  isNounFlavorExhausted(n, flavorExhaustedSet) ||
+                  isExhaustedHookNoun(n),
                 unmetRequirement,
                 // OTA-1206 — ✦ when the Aetheric Torch has flagged this noun as
                 // actually worth the look (scene.arbiterEye, stamped on torch use).
@@ -1696,7 +1710,8 @@ export function ExplorationScreen() {
               noun: m,
               consumed:
                 isFuzzyConsumed(m, productivelyConsumedSet) ||
-                isNounFlavorExhausted(m, flavorExhaustedSet),
+                isNounFlavorExhausted(m, flavorExhaustedSet) ||
+                isExhaustedHookNoun(m),
               marked: true,
             })),
         ]}
@@ -1793,7 +1808,8 @@ export function ExplorationScreen() {
                 // catalog items the player didn't own and kept chips lit.
                 consumed:
                   isFuzzyConsumed(n, productivelyConsumedSet) ||
-                  isNounFlavorExhausted(n, flavorExhaustedSet),
+                  isNounFlavorExhausted(n, flavorExhaustedSet) ||
+                  isExhaustedHookNoun(n),
               }))
         }
         onSubmit={(target) => {
