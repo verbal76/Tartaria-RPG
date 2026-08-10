@@ -1427,8 +1427,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1229`**,
-**golem-line `2026-08-10-1206`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1230`**,
+**golem-line `2026-08-10-1207`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1437,7 +1437,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.136**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.137**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1644,7 +1644,15 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE ARBITER'S EYE (2026-08-10, latest). HAL + GOLEM.** HAL OTA-1229 /
+- **⚠⚠ USE IS NOT A HOOK + THE LOCKET CLASS (2026-08-10, latest). HAL + GOLEM.**
+  HAL OTA-1230 / golem OTA-1207. Off the owner's device log, minutes after the
+  Arbiter's eye landed: `use Aetheric Torch` was hijacked by an etheric_storm hook
+  (the ITEM'S adjective matched the hook's nouns) — now a use-intent naming a
+  CARRIED item always reaches the item path. And six treasure lore_notes asserted
+  possession of maybe-rolled loot — rewritten as scenery, with a category-lock
+  test. Full story: the VERSION.md 4.29.137 row.
+
+- **⚠⚠ THE ARBITER'S EYE (2026-08-10). HAL + GOLEM.** HAL OTA-1229 /
   golem OTA-1206. A torch use now marks (✦ on the investigate chips) the nouns that
   actually pay — hooks, unread recipe notes, unharvested perches — so investigate is
   a choice, not a lottery you clear, and the torch has a job free "look around"
