@@ -195,8 +195,14 @@ one line is applied **per-line, code-specifically** (see §4).
 > the owner starts testing on device while the rest happens. **`golem-line` is
 > BATCHED per sitting**: port the accumulated OTA range in ONE pass (one patch, one
 > doc pass, one gate run) at the end of a work block, or every ~4-6 OTAs, whichever
-> comes first — never leave a sitting with golem unported. `steam_Dev` stays batched
-> as before (owner-triggered, when an `.exe` is wanted).
+> comes first — never leave a sitting with golem unported.
+>
+> **`steam_Dev` rides the SAME batch cadence as golem** (owner, 2026-08-10, verbatim:
+> *"let's push the steam version with the same batch count at golem."*): whenever the
+> golem batch runs, merge `HaL2001`'s current tip into `steam_Dev` in the same
+> sitting. This supersedes the 2026-08-07 owner-triggered-only cadence — steam is no
+> longer waiting for an explicit `.exe` ask, but it is still a BATCH: never per-OTA,
+> and still never poll its build.
 >
 > ⚠⚠ **TO EVERY FUTURE THREAD, ON ANY MODEL — this is an OWNER DIRECTIVE, not a
 > style choice a new session may "correct."** The 2026-08-07 text above ("we still
@@ -214,10 +220,10 @@ one line is applied **per-line, code-specifically** (see §4).
 > **What batching does NOT change:** HAL's gates. Every HAL push still runs the full
 > five-gate set including `test:ci:fast` BEFORE pushing — a HAL push is live on
 > testers' phones in ~90s and local gates are the only thing in front of them. The
-> golem batch, when it runs, is also fully gated (the same five, once per batch).
-> HAL-first ordering is unchanged. Parity is unchanged — every gameplay OTA still
-> reaches golem, in batches; "high chance of game-breaking changes" still forks to
-> golem alone first.
+> golem and steam batches, when they run, are also fully gated (the same five, once
+> per batch per line). HAL-first ordering is unchanged. Parity is unchanged — every
+> gameplay OTA still reaches golem and steam, in batches; "high chance of
+> game-breaking changes" still forks to golem alone first.
 >
 > **Two companion trims, same review, same owner go-ahead (token + time cost):**
 > 1. **One story, one home.** The full OTA write-up lives in `VERSION.md`'s row
@@ -241,7 +247,8 @@ one line is applied **per-line, code-specifically** (see §4).
 >   above): port the accumulated range in one pass at the end of a work block or
 >   every ~4-6 OTAs. Parity offset HAL − 23.
 > - **`steam_Dev`** — the owner's PC testing line and the possible Steam submission
->   path. **BATCHED.** Bring it up when an `.exe` is needed.
+>   path. **BATCHED on the same cadence as golem** (2026-08-10 amendment): merge
+>   HAL's current tip whenever the golem batch runs.
 >
 > ⚠ **AND STEAM *CAN* BE GATED LOCALLY.** This block used to read "it has **no
 > `node_modules` and never has**, so it cannot be gated locally — verify by hand."
@@ -360,9 +367,10 @@ steps 1-6 on HAL, push, and the owner starts testing. **`golem-line` is BATCHED
 per sitting**: at the end of a work block (or every ~4-6 OTAs) port the whole
 accumulated range in ONE pass — one patch, one renumber/doc pass, one full gate
 run — running steps 2-6 once for the batch, with `scripts/verify-parity.mjs`
-after. Never leave a sitting with golem unported. `steam_Dev` stays batched on
-the owner's trigger, as a single merge of HAL's current tip. Full directives +
-the timing history that forced the change: §2.
+after. Never leave a sitting with golem unported. **`steam_Dev` merges HAL's
+current tip in the SAME sitting the golem batch runs** (owner, 2026-08-10 —
+same cadence, still a batch, still no build polling). Full directives + the
+timing history that forced the change: §2.
 
 1. Edit code under `app/` in that line's worktree.
 2. **CI gates (all BLOCKING on HAL + golem — run before pushing; a red gate now
