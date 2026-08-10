@@ -1251,6 +1251,44 @@ export function withSkyreacherChartOffer(vendor: VendorInstance | null, wm: Worl
   return { ...vendor, offers: [...vendor.offers, { itemName: pick.name, price: pick.price, quantity: 1 }] };
 }
 
+/** ⚠ OTA-1218 — THE ONE WAY INTO AETHER TECHNIQUES (PUNCHLIST P16). Owner: *"buy from
+ *  friendly vendors you developed repor with."*
+ *
+ *  Modelled on `withSkyreacherChartOffer` directly above — same shape, same place in
+ *  `beginScene`, same "append one conditional row" contract — with one deliberate
+ *  difference: **there is no die roll.** A chart is a bonus you may or may not stumble on;
+ *  this is the ONLY route into a whole feature, and a route that appears 18% of the time
+ *  is indistinguishable from a route that does not exist. A faction's vendors always carry
+ *  that faction's procedure, so a player can go and get it.
+ *
+ *  The gates live in `techniqueTextOfferFor` so they can be tested without a store. */
+export function withTechniqueTextOffer(
+  vendor: VendorInstance | null,
+  player: PlayerCharacter | null,
+): VendorInstance | null {
+  if (!vendor || !player) return vendor;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { hasFactionRapport } = require('../engine/factionRapport') as typeof import('../engine/factionRapport');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { effectiveStats } = require('../engine/equipment') as typeof import('../engine/equipment');
+  // ⚠ nativeFaction first: OTA-1209 skins a site to its OWNER, and the Irma path rewrites
+  // `faction` to the visitor's. The procedure belongs to whoever the vendor really answers
+  // for, or a Mud Monarch would be sold the Architects' text by an Architect wearing his
+  // colours.
+  const faction = vendor.nativeFaction ?? vendor.faction;
+  const offer = AT.techniqueTextOfferFor({
+    vendorFaction: faction,
+    hasRapport: hasFactionRapport(player.completedFactionQuestIds, faction),
+    knownTechniques: player.knownTechniques,
+    effectiveInt: effectiveStats(player).intelligence,
+  });
+  if (!offer) return vendor;
+  if (vendor.offers.some((o) => o.itemName === offer.itemName)) return vendor;
+  return { ...vendor, offers: [...vendor.offers, offer] };
+}
+
 // arb48 — Labyrinth of Shadows (Wayfarer of the Lost Paths). Both helpers are
 // store-driving wrappers around the pure engine in engine/labyrinth.ts.
 type StoreGet = () => GameStore;
@@ -10061,7 +10099,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // without permanently flooding the world with vendors.
     const tilesSeen = player?.recentTileHistory?.length ?? 0;
     const roadsideRate = tilesSeen >= 24 ? 0.25 : 0.5 - (0.25 * tilesSeen) / 24;
-    const vendor: VendorInstance | null = ((): VendorInstance | null => {
+    // ⚠ OTA-1218 — the technique text is appended to whatever this resolves to, OUTSIDE
+    // the IIFE, because the IIFE has two returns and a stamp at one of them is a row that
+    // silently never appears on the other path. (The identical mistake is written up in
+    // OTA-1210's accept-cell stamp: eight sites of nine.)
+    const vendor: VendorInstance | null = withTechniqueTextOffer(((): VendorInstance | null => {
       let base: VendorInstance | null = opts?.isOpening
         ? null
         : hubRoom && hubRoom.anchorNpc
@@ -10104,7 +10146,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return { ...base, faction: player.factionId, nativeFaction: base.faction, offers };
       }
       return base;
-    })();
+    })(), player);
     // OTA-550 — enemies open at 'mid' range: close enough to be a problem but
     // not already swinging. The player advances (distant→far→mid→close) to
     // land melee, or holds the gap for a ranged/throwable shot. (This is the
@@ -16086,6 +16128,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
             runAethercraft(discipline, get, set, player, currentScene, golemKindHint);
             break;
+          }
+          // ⚠ OTA-1218 — AETHER TECHNIQUES (PUNCHLIST P16), and the ORDER matters: this
+          // runs AFTER the three disciplines, never before. `channel` was already a
+          // synonym of `cast` in the parser's verb table, so a technique needed no new
+          // intent — but "shape stone", "summon golem" and "mend wounds" have meant those
+          // disciplines since OTA-039 and must keep meaning them.
+          //
+          // ⚠ `findTechniqueByName` REFUSES an ambiguous match rather than picking one
+          // (the P12 rule, from this same session). "channel ether" fits both Aether
+          // Shield and Veil of Ether, so it takes neither, and the miss below names the
+          // four so the player can be specific.
+          {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+            const query = (parsed.target ?? '').trim() || verbLow.replace(/^\s*(channel|cast|invoke|unleash|evoke)\s+/, '');
+            const tech = AT.findTechniqueByName(query);
+            if (tech) {
+              runAetherTechnique(tech.id, get, set, player, currentScene);
+              break;
+            }
+            // Only speak up when the player was plainly reaching for one of these — a
+            // bare "cast" that meant a relic must still fall through to the relic path.
+            if (/\b(channel|technique|aether shield|temporal|veil|resonance|cascade|slip)\b/.test(`${verbLow} ${query}`)) {
+              const known = (player.knownTechniques ?? []);
+              get().appendLog('system', known.length === 0
+                ? `You know no aether techniques yet. They are taught, not found — a faction you have rapport with will sell you the procedure.`
+                : `Which procedure? You know: ${AT.AETHER_TECHNIQUES.filter((t) => known.includes(t.id)).map((t) => t.name).join(', ')}.`);
+              break;
+            }
           }
         }
         // OTA 192 — effect-driven consumable use. If the resolved
@@ -24359,6 +24430,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (state.tutorialDemoVendor) {
       get().appendLog('system', 'Tour mode — purchases disabled while the tutorial is running.');
       return;
+    }
+
+    // ⚠ OTA-1218 — PROCEDURE TEXTS (PUNCHLIST P16). Buying one TEACHES the technique; it
+    // never mints an item. This sits beside the OTA-726 recipe branch and works the same
+    // way for the same reason: what you are buying is knowledge, and a physical book would
+    // need a catalog row, a `use` handler and a read path before it taught anything —
+    // three more places for the loop to end in nothing.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+      const tech = AT.findTechniqueByTextName(itemName);
+      if (tech) {
+        const rowName = AT.techniqueTextName(tech);
+        // ⚠ The vendor must actually be OFFERING it. Without this, `buy procedure text:
+        // resonance cascade` would teach a Legendary technique at any stall in the world,
+        // which deletes the rapport gate that is the whole acquisition design.
+        const row = scene.vendor.offers.find((o) => o.itemName.toLowerCase() === rowName.toLowerCase());
+        if (!row) {
+          get().appendLog('system', `${scene.vendor.name} doesn't carry the ${tech.name} procedure.`);
+          return;
+        }
+        if ((player.knownTechniques ?? []).includes(tech.id)) {
+          get().appendLog('system', `You already carry the ${tech.name} in your hands.`);
+          return;
+        }
+        if (player.tc < row.price) {
+          get().appendLog('system', `${scene.vendor.name} rests a hand on the folder. "The ${tech.name} runs ${row.price} TC. It is not a thing I discount."`);
+          return;
+        }
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            tc: s.player.tc - row.price,
+            knownTechniques: [...(s.player.knownTechniques ?? []), tech.id],
+          },
+        } : s));
+        get().appendLog(
+          'reward',
+          `Bought the ${tech.name} procedure for ${row.price} TC. ✦ Technique learned — type \`channel ${tech.name.toLowerCase()}\`.`
+          + ` It costs Aetheric fuel and ${tech.baseDose} corruption a run, and it will cost you your turn in a fight.`,
+        );
+        void get().persist();
+        return;
+      }
     }
 
     // OTA-726 — RECIPE offers. A vendor teaches a small, stable slice of the
@@ -35708,26 +35823,49 @@ function tickEnemyDotsAndMaybeEndFight(
   // same tick. Every dead index now routes through resolveEnemyDefeat (loot,
   // kill bookkeeping, bounty credit), and the player's living TARGET is
   // re-pointed afterward so the sweep never silently retargets them.
-  {
-    const swept = get().currentScene;
-    if (swept && swept.enemies.length > 0 && swept.enemyHps.some((h) => (h ?? 0) <= 0)) {
-      const targetBefore = swept.enemies[swept.activeEnemyIdx] ?? null;
-      let guard = 0;
-      while (++guard <= 16) {
-        const sc = get().currentScene;
-        if (!sc || sc.enemies.length === 0) break;
-        const deadIdx = sc.enemyHps.findIndex((h) => (h ?? 0) <= 0);
-        if (deadIdx < 0) break;
-        set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: deadIdx } } : s));
-        get().resolveEnemyDefeat();
-      }
-      const scEnd = get().currentScene;
-      if (!scEnd || scEnd.enemies.length === 0) return true;
-      if (targetBefore) {
-        const keep = scEnd.enemies.indexOf(targetBefore);
-        if (keep >= 0 && keep !== scEnd.activeEnemyIdx) {
-          set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: keep } } : s));
-        }
+  return sweepDeadEnemies(get, set);
+}
+
+/** ⚠ OTA-1218 — EXTRACTED VERBATIM FROM `tickEnemyDotsAndMaybeEndFight`, WHICH IS THE
+ *  POINT. Resonance Cascade (PUNCHLIST P16) is the second thing in the game that can drop
+ *  several enemies at once, and the DOT tick is the first — so it needed exactly this
+ *  block. Copying it would have put two spellings of "who died, in what order, and who is
+ *  the player still aiming at" in one file, which is how the two drift.
+ *
+ *  Returns TRUE if the sweep ended the fight (no enemies left).
+ *
+ *  Original comment, unchanged, because the reasoning is still the reasoning:
+ *
+ *  OTA-980 — (was: last-enemy-only) a DOT tick that drops ANY enemy to 0 kills it
+ *  NOW. The old sweep only fired when EVERY enemy was dead; in a MIXED fight
+ *  the corpse was left standing at 0 HP "for the next attack to clean up" —
+ *  owner's log shows a raider at 0/28 hanging around until a whole extra swing
+ *  formally killed it, while a solo-fight Aetherkin died instantly from the
+ *  same tick. Every dead index now routes through resolveEnemyDefeat (loot,
+ *  kill bookkeeping, bounty credit), and the player's living TARGET is
+ *  re-pointed afterward so the sweep never silently retargets them. */
+function sweepDeadEnemies(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): boolean {
+  const swept = get().currentScene;
+  if (swept && swept.enemies.length > 0 && swept.enemyHps.some((h) => (h ?? 0) <= 0)) {
+    const targetBefore = swept.enemies[swept.activeEnemyIdx] ?? null;
+    let guard = 0;
+    while (++guard <= 16) {
+      const sc = get().currentScene;
+      if (!sc || sc.enemies.length === 0) break;
+      const deadIdx = sc.enemyHps.findIndex((h) => (h ?? 0) <= 0);
+      if (deadIdx < 0) break;
+      set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: deadIdx } } : s));
+      get().resolveEnemyDefeat();
+    }
+    const scEnd = get().currentScene;
+    if (!scEnd || scEnd.enemies.length === 0) return true;
+    if (targetBefore) {
+      const keep = scEnd.enemies.indexOf(targetBefore);
+      if (keep >= 0 && keep !== scEnd.activeEnemyIdx) {
+        set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: keep } } : s));
       }
     }
   }
@@ -36288,10 +36426,33 @@ function applyEnemyCounter(
   // "= 17 vs your AC 25 — ✓ HIT" read as a contradiction with no explanation:
   // every tank build saw hits its own log said should have missed.
   const acCapEngaged = effectiveAc - (atkTotal - atkRoll) > ENEMY_HIT_NEEDED_CAP;
-  const hit = dodgeWin === true
+  const wouldHit = dodgeWin === true
     ? false
     : enemyFumble ? false : enemyCrit ? true : atkRoll >= acHitNat;
-  const outcomeTag = dodgeWin === true
+  // ⚠ OTA-1218 — TEMPORAL SLIP (PUNCHLIST P16). A held slip eats one blow that would
+  // otherwise have landed, then is spent. It sits HERE, at the to-hit verdict, rather than
+  // in the damage stack, because the technique's claim is that the blow did not arrive —
+  // not that it arrived softened. Nothing downstream (armor, resists, wards) runs.
+  //
+  // ⚠⚠ IT DOES NOT STOP A NATURAL 20, and that exclusion is the whole reason this is safe.
+  // OTA-815 established the rule when the dodge rework threatened the same thing: no
+  // defensive stack may buy literal immunity, so an enemy always lands ~1 swing in 20. A
+  // slip that beat a crit, re-channelled every three rounds, would be exactly the
+  // untouchable build that rule forbids — and it would cost only fuel and corruption.
+  const slipHeld = (player.statusEffects ?? []).some((e) => e.kind === 'temporal_slip');
+  const slipped = wouldHit && !enemyCrit && slipHeld;
+  const hit = wouldHit && !slipped;
+  if (slipped) {
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        statusEffects: (s.player.statusEffects ?? []).filter((e) => e.kind !== 'temporal_slip'),
+      },
+    } : s));
+  }
+  const outcomeTag = slipped
+    ? '✗ SLIPPED'
+    : dodgeWin === true
     ? '✗ EVADED'
     : enemyCrit
       ? '✓ CRITICAL HIT'
@@ -36308,6 +36469,15 @@ function applyEnemyCounter(
     `${enemy.name} — d20 → ${atkRoll}${advLabel} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc}${acCapEngaged ? ` (needs nat ${acHitNat}+ — AC capped)` : ''} — ${outcomeTag}`,
     hit ? undefined : { combatOutcome: 'enemy_miss' },
   );
+  if (slipped) {
+    // OTA-1218 — say it in the world, not only in the roll line. A blow that connects on
+    // the maths and then does not arrive reads as a bug unless something names the reason.
+    get().appendLog(
+      'world',
+      `The blow arrives and you are already a half-second past it. The Temporal Slip closes behind you, spent.`,
+      { combatOutcome: 'enemy_miss' },
+    );
+  }
   if (dodgeLine) {
     get().appendLog('combat', dodgeLine, dodgeWin ? { combatOutcome: 'enemy_miss' } : undefined);
   }
@@ -38345,6 +38515,237 @@ function runAethercraft(
     }
   }
   set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 2), 0.5) } : s);
+}
+
+// ─── OTA-1218 — THE CHANNEL RUNNER (PUNCHLIST P16) ──────────────────────────────────────
+//
+// `engine/aetherTechniques.ts` shipped in OTA-1214 as rules with no caller, which is the
+// P4 / P14 defect (authored content wired to nothing) with my own name on it. This is the
+// path that makes a technique reachable: `channel <name>`.
+//
+// ⚠ IT MIRRORS `runAethercraft` DELIBERATELY, STEP FOR STEP — fuel cheapest-first, race DC
+// ladder, d20 + INT, fuel spent either way, outcome. Four disciplines that all drive the
+// same hazard should not resolve by four different procedures, and every one of those
+// steps carries a bug fix that was paid for once already (OTA-970's fuel picker, OTA-145's
+// channel split, OTA-147's outcome verbs).
+//
+// WHAT IT ADDS, and each of these is an owner call from 2026-08-09:
+//   • DOSE — corruption scaled by tier ("scale it"), taken on success AND, at half, on
+//     failure. You stood in it either way.
+//   • GROWTH — per-technique ("I agree"), and only on a success under pressure, which is
+//     the anti-farm guard `practiceCounts` exists for.
+//   • THE TURN — channelling in combat costs the turn ("yes"), so the enemy group swings.
+function runAetherTechnique(
+  techId: string,
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  player: PlayerCharacter,
+  scene: CurrentScene,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { aethercraftDcModifier, aethercraftStatBonus } = require('../engine/raceMechanics');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { effectiveStats } = require('../engine/equipment');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { weatherStatModifiers } = require('../engine/weatherEffects');
+
+  const tech = AT.findTechnique(techId);
+  if (!tech) return;
+
+  const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerArmorResistKinds(player)));
+  const racialBonus = aethercraftStatBonus(player.raceId);
+  const intValue = stats.intelligence + (racialBonus.intelligence ?? 0);
+
+  // 1. May they attempt it? Both refusals SPEAK — a channel that does nothing and says
+  //    nothing is the loop ending in nothing at the very first step.
+  const gate = AT.canAttempt(player, tech, intValue);
+  if (!gate.ok) {
+    get().appendLog('arbiter', gate.reason === 'unknown'
+      ? `"You have never been taught the ${tech.name}," the Arbiter says. "Reaching for it anyway would only cost you."`
+      : `"The ${tech.name} needs a steadier head than that," the Arbiter says. "INT ${gate.needed}. You are running ${intValue}."`);
+    return;
+  }
+
+  // 2. Fuel — cheapest-first, same list and same order as the shape discipline.
+  let fuelItem: InventoryItem | null = null;
+  for (const name of AT.TECHNIQUE_FUEL_PREFERENCE) {
+    const found = player.inventory.find(
+      (i) => i.quantity > 0 && i.name.toLowerCase() === name.toLowerCase(),
+    );
+    if (found) { fuelItem = found; break; }
+  }
+  if (!fuelItem) {
+    get().appendLog(
+      'arbiter',
+      `"The Aether reaches for you," the Arbiter says, "finds nothing to pull on, and returns to itself."`,
+    );
+    return;
+  }
+
+  // 3. The check. Rank shaves the DC (growth buys reliability, not output); the race
+  //    ladder is the same one every Aethercraft discipline climbs.
+  const rank = AT.proficiencyRank(AT.usesOf(player, tech.id));
+  const dc = AT.dcForRank(tech.baseDc, rank) + aethercraftDcModifier(player.raceId);
+  const roll = rollDie(20);
+  const total = roll + intValue;
+  const success = total >= dc;
+  const racialNote = (racialBonus.intelligence ?? 0) > 0
+    ? ` (+${racialBonus.intelligence} Aethercraft Mastery)` : '';
+  const rankNote = rank > 0 ? ` (−${rank} practised)` : '';
+  get().appendLog(
+    success ? 'reward' : 'combat',
+    `${tech.name} — d20 ${roll} + INT ${intValue}${racialNote} = ${total} vs DC ${dc}${rankNote}`
+    + ` — ${success ? '✓ CHANNELLED' : '✗ LOST'}`,
+  );
+
+  // 4. Fuel is spent either way — the aether takes its due, exactly as the disciplines do.
+  {
+    const spent = player.inventory
+      .map((i) => (i.id === fuelItem!.id ? { ...i, quantity: i.quantity - 1 } : i))
+      .filter((i) => i.quantity > 0);
+    set((s) => (s.player ? { player: { ...s.player, inventory: spent } } : s));
+    get().appendLog('world', `(1 ${fuelItem.name} consumed.)`);
+  }
+
+  // 5. THE DOSE. ⚠ Charged before the effect lands and before any turn is spent, so a
+  //    channel can never resolve without it — a technique whose cost is conditional on a
+  //    later branch is one refactor away from being free.
+  {
+    const live = get().player ?? player;
+    const dose = AT.dosageFor(tech, { success, raceId: live.raceId });
+    const prevTier = corruptionTierOf(live.corruption ?? 0);
+    const newCorr = Math.min(CORRUPTION_MAX, (live.corruption ?? 0) + dose);
+    const nextTier = corruptionTierOf(newCorr);
+    set((s) => (s.player ? { player: { ...s.player, corruption: newCorr } } : s));
+    get().appendLog('world', success
+      ? `You take the dose standing. +${dose} corruption.`
+      : `The procedure slips, and the exposure does not care that it did. +${dose} corruption.`);
+    const crossLine = tierCrossLine(prevTier, nextTier);
+    if (crossLine) get().appendLog('reward', crossLine);
+  }
+
+  const underPressure = (scene.enemies?.length ?? 0) > 0;
+
+  if (!success) {
+    get().appendLog('world', `The field will not hold. It comes apart in your hands and is gone.`);
+  } else {
+    get().appendLog('arbiter', tech.successLine);
+    applyTechniqueEffect(tech, get, set, underPressure);
+  }
+
+  // 6. GROWTH. `practiceCounts` is the guard: a success in an empty room teaches nothing,
+  //    so the rank cannot be farmed off a wall.
+  if (AT.practiceCounts({ success, underPressure })) {
+    const live = get().player;
+    if (live) {
+      const before = AT.usesOf(live, tech.id);
+      const after = before + 1;
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          techniqueProficiency: { ...(s.player.techniqueProficiency ?? {}), [tech.id]: after },
+        },
+      } : s));
+      const rankBefore = AT.proficiencyRank(before);
+      const rankAfter = AT.proficiencyRank(after);
+      if (rankAfter > rankBefore) {
+        get().appendLog(
+          'reward',
+          `✦ ${tech.name} — ${AT.proficiencyLabel(rankAfter)}. It comes to hand faster now (DC ${AT.dcForRank(tech.baseDc, rankAfter)}).`,
+        );
+      }
+    }
+  }
+
+  // 7. THE CLOCK, AND THE TURN. Out of combat a channel takes its authored minutes. In
+  //    combat it takes the ROUND (owner: channelling costs your turn), so the enemy group
+  //    answers — which is what stops a Shield from being a free action you open every
+  //    fight with.
+  set((s) => (s.player
+    ? { player: advanceTime(spendStamina(s.player, 2), underPressure ? 0.1 : tech.minutes / 60) }
+    : s));
+  if ((get().currentScene?.enemies?.length ?? 0) > 0) {
+    runSurvivorVolley(get, set, get().player ?? player);
+  }
+  void get().persist();
+}
+
+/** OTA-1218 — the four outcomes. ⚠ Every one of them lands in machinery that already
+ *  shipped, and that was the condition for building them at all: a technique whose effect
+ *  needs a new subsystem is a technique that ends in nothing while the subsystem is
+ *  written. Shield → statusAcAdjustment. Slip → the to-hit verdict in applyEnemyCounter.
+ *  Veil → the existing `stealthed` status. Cascade → the DOT sweep's own death handling. */
+function applyTechniqueEffect(
+  tech: import('../engine/aetherTechniques').AetherTechnique,
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  underPressure: boolean,
+): void {
+  if (tech.id === 'aether_shield') {
+    const eff: StatusEffect = { kind: 'aether_shield', remainingRounds: 3, label: 'aether shield (+3 AC)' };
+    set((s) => (s.player ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], eff) } } : s));
+    get().appendLog('world', `+3 AC for 3 rounds while you hold it.`);
+    return;
+  }
+  if (tech.id === 'temporal_slip') {
+    const eff: StatusEffect = { kind: 'temporal_slip', remainingRounds: 3, label: 'temporal slip (one blow)' };
+    set((s) => (s.player ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], eff) } } : s));
+    get().appendLog('world', `The next blow that would land inside three rounds will not. Once.`);
+    return;
+  }
+  if (tech.id === 'veil_of_ether') {
+    // ⚠ The EXISTING stealth status, not a new one. `stealthed` is already read by the
+    // attack path (+5, consumed once) and by the backstab check in combatRules — a
+    // parallel "veiled" kind would have needed both taught about it.
+    const eff: StatusEffect = { kind: 'stealthed', remainingRounds: 3, label: 'veiled (light declines to leave)' };
+    set((s) => (s.player ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], eff) } } : s));
+    get().appendLog('world', `Nothing can currently prove you are there. Your next strike comes out of that.`);
+    return;
+  }
+  if (tech.id === 'resonance_cascade') {
+    // ⚠⚠ THE ONLY TECHNIQUE THAT DOES SOMETHING OUTSIDE THE PLAYER, and the only one that
+    // can kill several things at once. It runs 5d10 across every living enemy and 1d10
+    // back into the operator — the original data's numbers, kept, because a forbidden
+    // procedure that hurts you on SUCCESS is the clearest thing this feature says.
+    const scene = get().currentScene;
+    if (!scene || scene.enemies.length === 0) {
+      // Channelled at nothing. It still cost fuel, a dose and the minutes; say so plainly
+      // rather than let the player think the technique is broken.
+      get().appendLog('world', `The shockwave goes out across empty ground and finds nothing to move.`);
+    } else {
+      let out = 0;
+      for (let d = 0; d < 5; d++) out += rollDie(10);
+      const hps = [...scene.enemyHps];
+      const struck: string[] = [];
+      for (let i = 0; i < scene.enemies.length; i++) {
+        if ((hps[i] ?? 0) <= 0) continue;
+        hps[i] = Math.max(0, (hps[i] ?? 0) - out);
+        struck.push(`${scene.enemies[i]!.name} ${hps[i]}/${scene.enemies[i]!.hp}`);
+      }
+      set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: hps } } : s));
+      get().appendLog('combat', `Resonance Cascade — 5d10 → ${out} to everything standing. (${struck.join(', ')})`);
+      // ⚠ The shared sweep, not a second spelling of it: loot, kill credit and the
+      // player's retarget all have to happen for EVERY body this dropped.
+      sweepDeadEnemies(get, set);
+    }
+    // The kickback lands whether or not anything was standing there.
+    const back = rollDie(10);
+    const live = get().player;
+    if (live) {
+      const newHp = Math.max(1, live.hp - back);
+      set((s) => (s.player ? { player: { ...s.player, hp: newHp } } : s));
+      get().appendLog('combat', `The second half of it comes back through you — 1d10 → ${back}. (HP ${newHp}/${live.hpMax})`);
+    }
+    return;
+  }
+  // Unreachable while AETHER_TECHNIQUES holds exactly these four. If a fifth is ever added
+  // without an effect, this says so out loud rather than channelling into silence.
+  get().appendLog('world', `The ${tech.name} resolves, and nothing in the world answers it.`);
+  void underPressure;
 }
 
 // OTA-479 — apply a weapon coating's ON-HIT effects to the active enemy: acid

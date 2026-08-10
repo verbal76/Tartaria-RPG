@@ -647,8 +647,11 @@ call, exactly as with the runecasters.
 
 ### P16 — Aether techniques: foundation shipped, not yet reachable
 
+## 🟡 **REACHABLE — OTA-1218.** A player can now buy a procedure from a rapport vendor, see all four in the Aetheric tab, and `channel` one; the effect lands, the dose is charged, and in a fight it costs the round. **Steps 1–5 done.** ⚠ It stays OPEN for the owner's last instruction on it — *"once this is working we will mirror it to enemies and have them applied like the resists are"* — and for the two acquisition routes not yet built (found texts, contract rewards).
+
 - **Kind:** IN PROGRESS *(deliberately on this list until a player can use one)*
 - **Started:** 2026-08-09, at the owner's direction
+- **Reachable:** 2026-08-10 (OTA-1218)
 
 Owner: *"I would like to have players get aether powers based off of the spells, once this
 is working we will mirror it to enemies and have them applied like the resists are. this
@@ -672,20 +675,27 @@ techniques. Building all ten would have shipped seven of them twice under two ru
 committed as foundation with its next step named rather than abandoned, but it does not
 come off this list until a player can channel one.
 
-**What remains, in the order I would take it:**
-1. The channel runner — fuel, race-gated DC, d20, dose. Mirrors `runAethercraft` exactly.
-2. The combat turn cost (owner's call: channelling costs your turn).
-3. The four effects. **All four have confirmed homes in shipped machinery**, which was the
-   risk that would have sunk this: Shield → `statusAcAdjustment` (precedent:
-   `shaped_stone_ward`); Slip → the combat damage site (precedent: `defensive_protocols`);
-   Veil → the existing `stealthed` status; Cascade → ordinary damage resolution.
-4. **One acquisition route, or the loop ends in nothing.** Owner's answer: found texts,
-   contract rewards, and purchase from vendors you have rapport with. The rapport gate
-   (`hasFactionRapport`) already exists and is the deterministic one, so it goes first.
-5. The Aetheric tab UI — the tab already exists and holds the three disciplines.
+**The five steps, all shipped in OTA-1218:**
 
-**Then, per the owner:** mirror to enemies, applied per spawn from type pools exactly the
-way `randomizeEnemyDefense` already stamps resists.
+| | | |
+|---|---|---|
+| 1 | The channel runner | `runAetherTechnique` — mirrors `runAethercraft` step for step, incl. OTA-970's cheapest-first fuel order |
+| 2 | The combat turn cost | channelling calls `runSurvivorVolley`; the enemy group answers |
+| 3 | The four effects | Shield → `statusAcAdjustment` +3/3 rounds · Slip → the to-hit verdict · Veil → the existing `stealthed` · Cascade → 5d10 out, 1d10 back |
+| 4 | One acquisition route | a rapport vendor's **Procedure Text**; buying it teaches, exactly as OTA-726's recipe row does |
+| 5 | The Aetheric tab | all four listed, locked ones dimmed rather than hidden |
+
+⚠ **Two decisions inside those worth keeping:** `sweepDeadEnemies` was EXTRACTED from the
+DOT tick rather than copied, because Cascade is the second thing that can kill several
+enemies at once; and the Slip deliberately does NOT stop a natural 20, because OTA-815's
+rule is that no defensive stack buys literal immunity.
+
+**WHAT KEEPS THIS ITEM OPEN:**
+1. **Mirror to enemies** — the owner's own next step: *"once this is working we will mirror
+   it to enemies and have them applied like the resists are."* Per spawn, from type pools,
+   the way `randomizeEnemyDefense` already stamps `vulnerable:` / `resist:` / `inured:`.
+2. **The other two acquisition routes** — found texts and contract rewards. Only the
+   deterministic one (rapport purchase) shipped, deliberately: one working door first.
 
 ---
 

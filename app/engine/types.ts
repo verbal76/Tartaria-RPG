@@ -930,7 +930,17 @@ export type StatusEffectKind =
   | 'perfect_opening'
   // OTA-936 — successful-dodge GROUP defense: while you're still moving off a read, the
   // OTHER attackers this volley swing at +3 to your AC. Lasts one volley, then clears.
-  | 'evasive';
+  | 'evasive'
+  // OTA-1218 — AETHER TECHNIQUES (PUNCHLIST P16). Two of the four techniques need a
+  // status to live in; the other two ride machinery that already exists (Veil of Ether
+  // applies 'stealthed', Resonance Cascade is ordinary damage).
+  //
+  // ⚠ Both are deliberately shaped like statuses the game already carries, not new
+  // subsystems: aether_shield is read by statusAcAdjustment exactly as
+  // shaped_stone_ward is, and temporal_slip is consumed at the damage site exactly as
+  // 'shielded' (the Sentinel's Defensive Protocols) is.
+  | 'aether_shield'  // +3 AC while the field is held (3 rounds)
+  | 'temporal_slip'; // negates ONE incoming blow entirely, then is consumed
 
 export interface StatusEffect {
   kind: StatusEffectKind;

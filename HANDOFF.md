@@ -1376,8 +1376,8 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1217`**,
-**golem-line `2026-08-09-1177`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1218`**,
+**golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1386,7 +1386,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.126**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.127**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,8 +1606,93 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠ PUNCHLIST P16 — THE AETHER TECHNIQUES ARE REACHABLE (2026-08-10, latest). HAL
+  ONLY so far — golem port pending.** HAL OTA-1218. **steam NOT included — batched (§2).**
+
+  **WHAT IT WAS.** OTA-1214 shipped `engine/aetherTechniques.ts` with 24 green tests and
+  **no caller**. That is the P4 / P14 defect — authored content wired to nothing — written
+  here rather than inherited, which is why it went on the punch list with its next step
+  named instead of being quietly left. `channel <name>` now runs one.
+
+  **THE RUNNER MIRRORS `runAethercraft` STEP FOR STEP.** Fuel cheapest-first off the same
+  list in the same order, race DC ladder, d20 + INT, fuel spent whether it holds or not.
+  ⚠ The ORDER of that list is not cosmetic: it is OTA-970's fix, made after "shape stone"
+  silently ate a playtester's EQUIPPED Aetheric Locket. A technique that reached into
+  inventory order instead would have re-opened that bug on a second path.
+
+  **WHAT IT ADDS — the three owner calls of 2026-08-09** (*"1. I agree. 2. scale it.
+  3. yes."*):
+  1. **Dose**, scaled by tier, charged BEFORE the effect lands and before any turn is
+     spent, so no later branch can resolve a channel for free.
+  2. **Growth**, per technique, through `practiceCounts` — a success in an empty room
+     teaches nothing. Growth-through-use is farmable by construction, and this session has
+     already closed two loops that paid out on repetition.
+  3. **The turn.** Channelling in a fight costs the round; the enemy group answers.
+
+  ⚠⚠ **ALL FOUR EFFECTS LAND IN MACHINERY THAT ALREADY SHIPPED, and that was the condition
+  for building them at all.** An effect that needs a new subsystem is a technique that ends
+  in nothing while the subsystem gets written.
+  - Aether Shield → `statusAcAdjustment`, +3 for 3 rounds. Deliberately under
+    `shaped_stone_ward`'s +4-for-one-round: the longer field is the weaker one per round,
+    or there would be no reason to shape stone again.
+  - Temporal Slip → the to-hit verdict in `applyEnemyCounter`, not the damage stack. The
+    technique's claim is that the blow did not arrive, so nothing downstream runs.
+  - Veil of Ether → the EXISTING `stealthed` status. A parallel "veiled" kind would have
+    needed the attack path and the backstab check taught about it.
+  - Resonance Cascade → 5d10 across every standing enemy, 1d10 back into the operator,
+    floored so the kickback alone can never kill.
+
+  ⚠ **`sweepDeadEnemies` WAS EXTRACTED, NOT COPIED.** Cascade is the second thing in the
+  game that can drop several enemies at once; the DOT tick was the first. Two spellings of
+  *who died, in what order, and who are you still aiming at* in one file is how the two
+  drift, so both now call one function.
+
+  ⚠⚠ **THE SLIP DOES NOT STOP A NATURAL 20.** OTA-815 set the rule when the dodge rework
+  threatened the same thing: no defensive stack may buy literal immunity, so an enemy
+  always lands about one swing in twenty. A slip that beat a crit and could be re-channelled
+  every three rounds would be exactly the untouchable build that rule forbids — for the
+  price of fuel and a dose.
+
+  **ACQUISITION — ONE ROUTE, OR THE LOOP ENDS IN NOTHING.** Owner: *"make them grow rewards
+  and texts you. an buy from friendly vendors you developed repor with."* The purchase ships
+  first because the rapport gate is the only one of the three that is deterministic. A
+  rapport vendor stocks one **Procedure Text**; buying it TEACHES the technique the way
+  OTA-726's recipe row teaches a working, and mints no object.
+  - ⚠ **No die roll**, unlike `withSkyreacherChartOffer` which it is otherwise modelled on.
+    A chart is a bonus you may stumble on; this is the only door into a whole feature, and
+    a door that opens 18% of the time is indistinguishable from one that is not there.
+  - ⚠ It reads the vendor's **native** faction, so OTA-1209's site skin cannot have an
+    Architect in Monarch colours sell a Mud Monarch the Architects' text.
+  - ⚠ The row is gated on INT: a text you cannot yet run is a purchase that ends in nothing
+    until some later level-up. **Verified 2026-08-10** — a test drives the boundary from
+    both sides, asserting the row appears at exactly `intRequired` and is absent one point
+    below it.
+
+  **THE AETHERIC TAB LISTS ALL FOUR**, locked ones dimmed rather than hidden. A hidden list
+  means a player who has never met a rapport vendor has no way to learn the feature exists,
+  so the only route in would depend on stumbling across it.
+
+  ⚠ **One data string changed to match what shipped.** Temporal Slip's card promised *"once
+  per encounter"*, which the implementation cannot honestly claim — it is a 3-round status,
+  so it can lapse unused and be re-channelled in the same fight for another dose and another
+  turn. The text now says what the engine does.
+
+  **Tests:** ota1218AetherTechniques (30) + **ota1218ChannelLive (11)**.
+  ⚠⚠ **The live suite is the point of the OTA.** OTA-1214 was provably correct and provably
+  unreachable and unit tests cannot tell those apart, so every claim in the live suite drives
+  the real store: real parser, real vendor row, real combat volley. ⚠ One assertion in it
+  went red for the right reason and was retargeted — it read the Cascade kickback off the
+  player's FINAL HP, but the channel costs the turn, so three surviving serpents swing
+  immediately afterwards. It would have failed on a good volley roll and passed on a bad one
+  while claiming to be about the 1d10; it now reads the kickback off its own log line.
+
+  **STILL OPEN ON P16:** mirroring techniques to ENEMIES per spawn, the way
+  `randomizeEnemyDefense` already stamps resists (owner: *"once this is working we will
+  mirror it to enemies"*), plus the other two acquisition routes (found texts, contract
+  rewards).
+
 - **⚠⚠ PUNCHLIST P12 + P11 CLOSED — AMBIGUOUS NAMES REFUSE, AND HAL GAINS THE GATE RULE
-  (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1216/1217 / golem OTA-1193/1194.
+  (2026-08-09). HAL + GOLEM.** HAL OTA-1216/1217 / golem OTA-1193/1194.
   **steam NOT included — batched (§2).**
 
   **P12 — THE SUBSTRING TIER NO LONGER GUESSES.** `pool.find()` returned the FIRST match
