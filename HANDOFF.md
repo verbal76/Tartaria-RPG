@@ -1316,8 +1316,10 @@ it and states what was checked to rule out a consumer elsewhere.
   to golem."* It briefly WAS a standing per-pass line earlier that day; that lasted
   hours. Stack the OTAs and bring steam up in ONE merge when an `.exe` is wanted.
   ⚠ Do not poll its build either — the owner watches those himself. See the amended
-  directive block in §2. Last brought up at **`3123789e` (the OTA-1178 pass)**;
-  before that `442f7729`, merged to the OTA-1175 baseline, identity + platform shims
+  directive block in §2. Last brought up at **`d6bb6862` (2026-08-10, owner-triggered
+  batch merge to the OTA-1226 baseline — identity + shims verified, full local gates
+  green: 759 suites / 7104 tests)**; before that `3123789e` (the OTA-1178 pass) and
+  `442f7729`, merged to the OTA-1175 baseline, identity + platform shims
   verified intact, lock verified in sync, and **all gates run locally green** (see
   the correction below). ⚠ steam publishes NO OTA: `steam_Dev` is absent from
   `eas-update.yml`'s branch trigger list AND falls to the skip arm of its `case`, so
@@ -1376,7 +1378,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1226`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1227`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1386,7 +1388,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.133**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.134**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,9 +1608,39 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ PUNCHLIST P16 CLOSED — EVERY TECHNIQUE THROUGH EVERY DOOR (2026-08-10, latest).
-  HAL ONLY so far — golem port pending.** HAL OTA-1226. **steam NOT included — batched
-  (§2).** **The punch list now stands at ZERO open items.**
+- **⚠ TROPHY COHERENCE ACROSS EVERY MINT (2026-08-10, latest). HAL ONLY so far — golem
+  port pending.** HAL OTA-1227.
+
+  The audit's own pricing gap, closed at the owner's direction: an uncatalogued part
+  minted by a SEARCH sold at full rarity base while the identical KILL-minted part was
+  trophy-halved (OTA-966) — same part, two prices, decided by the producing verb. EV
+  trivial (~0.14 TC/search); a coherence fix, not an economy fix.
+
+  **A classifier swap, not a new rule:** every noun-harvest mint (break, attack-fallback,
+  two salvage handlers, scan, search, three rest-trinket copies) now classifies through
+  `resolveLootItem` — the kill path's OWN canonical resolver (OTA-961), whose
+  uncatalogued fallback carries the trophy tag — instead of `lookupCraftedItem`, whose
+  fallback is TAGLESS. Name and rarity still come from the outcome. OTA-1023's
+  catalog-authoritative sale check already retires the discount on promotion.
+
+  ⚠ The audit counted six gap sites; the suite's per-mint source pin found NINE mints and
+  caught a second salvage handler and two more rest copies the hand count missed. The
+  hard-coded sleight-of-hand grant (authored tags, no classifier) is legitimately exempt.
+  **Tests:** ota1227TrophyCoherence (8). ⚠ The pin's first spelling flagged NEIGHBOURS'
+  `lookupCraftedItem` calls (the recipe-learned log line, the medkit mint) — retargeted
+  to judge the mint's own `const itemCat =` assignment line, nothing around it.
+
+  **Also in this push, no OTA numbers of their own:** the perches + escort live suites
+  de-flaked (fixed 5–25ms sleeps raced the store's async work under a loaded parallel
+  run; actions now awaited, sleeps replaced by condition polls with 4s deadlines — the
+  assertions unchanged), and **`steam_Dev` brought up in its batch merge** to the
+  OTA-1226 baseline (owner-triggered): clean merge, identity + shims verified, full
+  local gates green (759 suites / 7104 tests), pushed `3123789e..d6bb6862`.
+
+- **⚠⚠ PUNCHLIST P16 CLOSED — EVERY TECHNIQUE THROUGH EVERY DOOR (2026-08-10).
+  HAL + GOLEM.** HAL OTA-1226 / golem OTA-1203. **steam NOT included at the time —
+  batched (§2); included in the batch merge above.** **The punch list now stands at
+  ZERO open items.**
 
   Owner, superseding the tiered split I proposed: *"push it through all routes, three
   doors makes it accessable even with bad faction standing"* — ALL FOUR techniques through
@@ -1742,10 +1774,11 @@ rediscovering them.
   2026-08-10 audit:** the OTA-1222 write-up said uncatalogued names mint through OTA-961's
   `resolveLootItem` — they do not; the search path mints via `lookupCraftedItem` with the
   outcome's own rarity stamped. The RESULT is the same (right rarity, sellable) but the
-  mechanism differs, and it leaves one coherence gap: a search-minted uncatalogued part
-  carries no `trophy` tag, so it sells at FULL rarity base while the identical kill-minted
-  part is trophy-halved (OTA-966). EV measured trivial (~0.14 TC/search worst case) — a
-  consistency nit, not an exploit.
+  mechanism differs, and it left one coherence gap: a search-minted uncatalogued part
+  carried no `trophy` tag, so it sold at FULL rarity base while the identical kill-minted
+  part was trophy-halved (OTA-966). EV measured trivial (~0.14 TC/search worst case) — a
+  consistency nit, not an exploit. **CLOSED by OTA-1227:** every noun-harvest mint now
+  classifies through `resolveLootItem`, the kill path's own resolver (see the §9 entry).
 
   **Tests:** ota1222SiteLoot (8) + ota1222SiteLootLive (3).
 
