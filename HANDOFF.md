@@ -97,14 +97,16 @@ only) and report them as CI-verified, not locally verified.
   carry a copy; a correction landed on one is NOT landed until it is on all three.
   ⚠ Ordering bites: on 2026-08-07 steam was merged one commit BEFORE the gating
   correction was pushed to HAL, so steam carried the disproved claim for an hour while
-  HAL and golem read clean. **Push the doc fix to HAL and golem in the same pass.**
-  ⚠ **STEAM IS THE EXCEPTION NOW, and it is a deliberate one:** since steam is
-  batched (§2 amendment), its copy is allowed to run BEHIND between `.exe` merges —
-  it catches up in the merge, which carries the doc commits with everything else. So
-  "not landed until it is on all three" now means *all three once steam is next
-  brought up*, not *within the hour*. **The thing to actually guard is that steam is
-  never brought up from a stale HAL**: merge `HaL2001` at its current tip, never
-  cherry-pick, or its handoff and its code disagree about what shipped.
+  HAL and golem read clean. **Land the doc fix on HAL at once; it reaches golem and
+  steam in their next batch.**
+  ⚠ **STEAM AND GOLEM ARE THE EXCEPTION NOW, and it is a deliberate one:** both are
+  batched (§2 amendments, 2026-08-07 steam / 2026-08-10 golem), so their copies are
+  allowed to run BEHIND between batches — each catches up in its batch, which carries
+  the doc commits with everything else. So "not landed until it is on all three" now
+  means *all three once each is next brought up*, not *within the hour*. **The thing
+  to actually guard is that a batch never starts from a stale HAL**: steam merges
+  `HaL2001` at its current tip (never cherry-pick), and a golem batch ports the whole
+  accumulated range, or its handoff and its code disagree about what shipped.
 - **Judging "clean":** filter typecheck output to `app/**`, and additionally
   ignore the pre-existing `expo-document-picker` errors in engine_Dev app
   source (3 of them) plus the long-standing test-file type errors on all lines
@@ -180,14 +182,62 @@ one line is applied **per-line, code-specifically** (see §4).
 > reason it moved: an `.exe` only matters when the owner sits down to test on PC, so
 > topping steam up every OTA spent CI on an artifact nobody was going to run.
 >
+> ### ⚠⚠ AMENDED 2026-08-10 — GOLEM IS BATCHED TOO. DO NOT UNDO THIS.
+>
+> Owner, verbatim, after a timing review found per-OTA golem ports were doubling the
+> cost of every push: *"so if we can get out tested push [HAL]'s OTA and then bring
+> Golem and steam up to par with those after the fact that's fine. especially if we
+> can speed it up cuz I have a feeling we're just cruising through my tokens. if you
+> think this can be done, make it happen and put it in a way that that opus knows
+> not to undo it."*
+>
+> **The default pass is now ONE line: `HaL2001`, fully gated, pushed immediately** —
+> the owner starts testing on device while the rest happens. **`golem-line` is
+> BATCHED per sitting**: port the accumulated OTA range in ONE pass (one patch, one
+> doc pass, one gate run) at the end of a work block, or every ~4-6 OTAs, whichever
+> comes first — never leave a sitting with golem unported. `steam_Dev` stays batched
+> as before (owner-triggered, when an `.exe` is wanted).
+>
+> ⚠⚠ **TO EVERY FUTURE THREAD, ON ANY MODEL — this is an OWNER DIRECTIVE, not a
+> style choice a new session may "correct."** The 2026-08-07 text above ("we still
+> push Hal first and then port to golem") was read by one thread as port-per-OTA;
+> that reading doubled every push (each OTA carried its own patch repair, renumber
+> audit, doc pass, and full 760-suite gate run on golem) and the owner explicitly
+> retired it. Reverting to per-OTA golem ports is UNDOING AN OWNER DECISION.
+> The measured history, so nobody re-derives this: the 2026-08-08/09 thread batched
+> golem ports (e.g. one commit carrying OTA-1210..1217) and was twice as fast at the
+> same quality; the 2026-08-10 thread ported 1201/1202/1203/1204 individually and
+> the owner noticed the slowdown the same day.
+>
+> **What batching does NOT change:** HAL's gates. Every HAL push still runs the full
+> five-gate set including `test:ci:fast` BEFORE pushing — a HAL push is live on
+> testers' phones in ~90s and local gates are the only thing in front of them. The
+> golem batch, when it runs, is also fully gated (the same five, once per batch).
+> HAL-first ordering is unchanged. Parity is unchanged — every gameplay OTA still
+> reaches golem, in batches; "high chance of game-breaking changes" still forks to
+> golem alone first.
+>
+> **Two companion trims, same review, same owner go-ahead (token + time cost):**
+> 1. **One story, one home.** The full OTA write-up lives in `VERSION.md`'s row
+>    ONLY. The HANDOFF §9 entry is 2-4 lines — what shipped, the one ⚠ that bites,
+>    a pointer to the VERSION.md row. Stop writing the same 2,700 characters twice
+>    per line.
+> 2. **Behavior tests over source-pin tests.** Pins that read the code text broke
+>    twice in one day on innocent neighboring edits and had to be re-tuned — tests
+>    about tests. Pin source only when a silent no-op cannot be caught any other
+>    way (the OTA-1209 lesson stands), and scope the pin to the exact assignment,
+>    never a window.
+>
 > **⚠ WHEN YOU DO BRING STEAM UP** it is a MERGE of `HaL2001`, not a hand-port, and
 > it may carry several OTAs at once — read the range you are merging and name the
 > OTAs it carries in the merge message.
 >
 > - **`HaL2001`** — live, at testers. Push here FIRST. **Device logs come from here
 >   almost always.**
-> - **`golem-line`** — the testing ground for BIG changes; ported immediately after
->   HAL in the same pass, so the fork point is never stale. Parity offset HAL − 23.
+> - **`golem-line`** — the testing ground for BIG changes and the owner's advanced-
+>   changes testers when needed. **BATCHED per sitting** (2026-08-10 amendment
+>   above): port the accumulated range in one pass at the end of a work block or
+>   every ~4-6 OTAs. Parity offset HAL − 23.
 > - **`steam_Dev`** — the owner's PC testing line and the possible Steam submission
 >   path. **BATCHED.** Bring it up when an `.exe` is needed.
 >
@@ -302,11 +352,15 @@ grep-verify every other instance of the pattern, add a category-lock test
 where practical, and report category-complete vs named residuals. Full
 checklist: CLAUDE.md "FIX RULE".
 
-**⚠ THE ORDER OF A PASS (owner, 2026-08-07): `HaL2001` FIRST, then port to
-`golem-line`. `steam_Dev` is BATCHED — it is not part of the pass.** Steps 1-6
-below run twice, once per line, HAL leading; run `scripts/verify-parity.mjs`
-between them. Bring steam up only when the owner wants an `.exe`, and then as a
-single merge of HAL's current tip. Full directive + the reason it changed: §2.
+**⚠ THE ORDER OF A PASS (owner, 2026-08-07; golem batching owner-amended
+2026-08-10 — see §2, and DO NOT UNDO IT): the pass is `HaL2001` ALONE.** Run
+steps 1-6 on HAL, push, and the owner starts testing. **`golem-line` is BATCHED
+per sitting**: at the end of a work block (or every ~4-6 OTAs) port the whole
+accumulated range in ONE pass — one patch, one renumber/doc pass, one full gate
+run — running steps 2-6 once for the batch, with `scripts/verify-parity.mjs`
+after. Never leave a sitting with golem unported. `steam_Dev` stays batched on
+the owner's trigger, as a single merge of HAL's current tip. Full directives +
+the timing history that forced the change: §2.
 
 1. Edit code under `app/` in that line's worktree.
 2. **CI gates (all BLOCKING on HAL + golem — run before pushing; a red gate now
@@ -352,7 +406,10 @@ single merge of HAL's current tip. Full directive + the reason it changed: §2.
    every OTA; MINOR +1 with PATCH→0 when the OTA closes a significant feature
    wave (log MINOR/MAJOR moves in `VERSION.md`, scheme + catch-up ledger there).
 4. Update this `HANDOFF.md` (open-issues / recent-OTAs) in the same commit when
-   the change is notable.
+   the change is notable. ⚠ **The full story lives in `VERSION.md`'s row ONLY**
+   (owner-approved trim, 2026-08-10 — §2 amendment): the §9 entry here is 2-4
+   lines — what shipped, the one ⚠ that bites, a pointer to the row. Do not
+   write the same 2,700 characters twice per line.
 5. Commit with the trailers in §6, then push that line's branch (`git push -u
    origin <branch>`). All three worktrees are now checked out ON their branches
    (no detached HEAD). Retry network failures with exponential backoff.
