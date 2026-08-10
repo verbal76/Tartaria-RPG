@@ -116,7 +116,11 @@ describe('OTA-1218 / P16 — acquisition', () => {
   });
 
   test('⚠⚠ the buy path requires the vendor to actually be OFFERING it', () => {
-    const buy = between('PROCEDURE TEXTS (PUNCHLIST P16)', 'OTA-726 — RECIPE offers');
+    // ⚠ Landmark is NUMBER-FREE on purpose: this pinned 'OTA-726 — RECIPE offers', but
+    // 726 is below the port renumberer's floor (983) and golem's copy of that comment
+    // historically reads OTA-709 — so the ported test searched for text its own line
+    // never carried. The prose is what both lines share.
+    const buy = between('PROCEDURE TEXTS (PUNCHLIST P16)', 'RECIPE offers. A vendor teaches');
     expect(buy).toContain('scene.vendor.offers.find(');
     expect(buy).toMatch(/if \(!row\)/);
     // And it teaches rather than minting an object.
