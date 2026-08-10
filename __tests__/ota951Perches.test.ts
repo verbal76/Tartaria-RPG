@@ -120,13 +120,37 @@ describe('OTA-951 — tier-gated loot roller', () => {
   });
 });
 
+/** Poll until pred() holds or the deadline passes. The assertion AFTER the poll still
+ *  does the real judging — this only replaces the fixed sleeps that made the suite
+ *  flake on a loaded parallel run (it passed 17/17 isolated; a 5ms window raced the
+ *  store's own async work and lost only when the box was busy). */
+async function settle(pred: () => boolean, deadlineMs = 4000) {
+  const t0 = Date.now();
+  while (!pred() && Date.now() - t0 < deadlineMs) {
+    await new Promise((r) => setTimeout(r, 15));
+  }
+}
+
+/** Wait for the boot's trailing fire-and-forget writes to drain: the log length must
+ *  hold still across two samples, or a late write can clobber an injected scene. */
+async function quiesce(store: typeof useGameStore) {
+  let last = -1;
+  await settle(() => {
+    const n = store.getState().gameLog.length;
+    const stable = n === last;
+    last = n;
+    return stable;
+  });
+}
+
 describe('OTA-951 — harvest flow in the store', () => {
   async function bootPerched(elevated: boolean) {
     const store = useGameStore;
     await store.getState().hydrate();
     await store.getState().startNewGame({ name: 'Percher', raceId: getRaces()[0]!.id, factionId: getFactions()[0]!.id });
     store.getState().skipTutorial?.();
-    await new Promise((r) => setTimeout(r, 25));
+    await settle(() => !!store.getState().currentScene);
+    await quiesce(store);
     const scene = store.getState().currentScene!;
     store.setState({
       currentScene: {
@@ -144,14 +168,14 @@ describe('OTA-951 — harvest flow in the store', () => {
   it('at the perch: investigate harvests catalog loot ONCE, then reads picked-clean', async () => {
     const store = await bootPerched(true);
     const inv0 = store.getState().player!.inventory.reduce((a, i) => a + (i.quantity ?? 1), 0);
-    store.getState().submitPlayerAction('investigate the satchel');
-    await new Promise((r) => setTimeout(r, 5));
+    await store.getState().submitPlayerAction('investigate the satchel');
+    await settle(() => store.getState().gameLog.some((e) => e.channel === 'reward' && e.text.startsWith('✦')));
     const rewards = store.getState().gameLog.filter((e) => e.channel === 'reward' && e.text.startsWith('✦'));
     expect(rewards.length).toBe(1);
     const inv1 = store.getState().player!.inventory.reduce((a, i) => a + (i.quantity ?? 1), 0);
     expect(inv1).toBeGreaterThan(inv0);
-    store.getState().submitPlayerAction('investigate the satchel');
-    await new Promise((r) => setTimeout(r, 5));
+    await store.getState().submitPlayerAction('investigate the satchel');
+    await settle(() => store.getState().gameLog.some((e) => e.text.includes('picked the wax-sealed satchel clean')));
     expect(store.getState().gameLog.some((e) => e.text.includes('picked the wax-sealed satchel clean'))).toBe(true);
     const rewards2 = store.getState().gameLog.filter((e) => e.channel === 'reward' && e.text.startsWith('✦'));
     expect(rewards2.length).toBe(1);
@@ -159,8 +183,8 @@ describe('OTA-951 — harvest flow in the store', () => {
 
   it('from the ground, ATTACKING the perch is refused with directions, not loot', async () => {
     const store = await bootPerched(false);
-    store.getState().submitPlayerAction('attack the satchel');
-    await new Promise((r) => setTimeout(r, 5));
+    await store.getState().submitPlayerAction('attack the satchel');
+    await settle(() => store.getState().gameLog.some((e) => e.text.includes('up on the guard tower')));
     expect(store.getState().gameLog.some((e) => e.text.includes('up on the guard tower'))).toBe(true);
     expect(store.getState().gameLog.some((e) => e.channel === 'reward' && e.text.startsWith('✦'))).toBe(false);
   });
