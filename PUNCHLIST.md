@@ -27,6 +27,33 @@ accumulates guesses is a punch list nobody trusts by item twenty.
 
 ---
 
+## STILL OPEN — the whole list, 2026-08-10
+
+⚠ Sixteen items have been filed. **Eleven are closed, two were reclassified as
+not-defects, and three are open.** The closed and reclassified entries are kept below
+with their reasoning rather than deleted — a punch list you can only read forwards is a
+punch list nobody can audit.
+
+| # | Item | Kind | Where it stands |
+|---|---|---|---|
+| **P9** | Anchor the vendors to the site, not to the player | DESIGN | Untouched. The largest of the three P2 jobs; the other two shipped (OTA-1208/1209). **55 `vendor.faction` reads**, and that field decides which work a vendor OFFERS as well as who they are. |
+| **P15** | `relics.json` (13) + `loot_tables.json` (113) have no importers | DEAD DATA | Untouched. ⚠ **Check the project docs FIRST** — P4 looked identical and turned out to be superseded content the docs had already marked `[PLANNED]`. Filing it twice would be filing it wrong twice. |
+| **P16** | Aether techniques | IN PROGRESS | 🟡 **Reachable as of OTA-1218** — buy, channel, four effects, tab. Open for the owner's stated next step (**mirror to enemies per spawn**) and the two acquisition routes not built (found texts, contract rewards). |
+
+**And two things that are NOT punch-list items but are also not proved:**
+
+| | Status |
+|---|---|
+| Dog rescue arc | ⚠ **PARTIAL.** Rescue hooks and the `dog_quest` channel are live; the arc's *end* was never traced. May be open-ended by design. |
+| Golem companion arc | ⚠ **PARTIAL.** Summon / arm / dismiss all live; no "arc" completion exists to trace. Same caveat. |
+
+⚠⚠ **THE REAL REMAINING RISK IS NOT ON THIS LIST — it is the 18 WIRED rows in the audit
+ledger.** Each has a completion path and a payoff, which is what the bar asks. None has
+been walked end to end the way mysteries were, and mysteries is exactly the loop that
+looked fine until it didn't.
+
+---
+
 ## OPEN
 
 ### P2 — 17 mysteries and storylines can only be turned in to a 1-in-30 random vendor
@@ -1090,21 +1117,24 @@ same as having proved it.
 
 ## NOT YET AUDITED
 
-⚠ Listed so the gaps in the audit are as visible as its findings. **Absence from the OPEN
-section above means NOT CHECKED, not "fine".**
+⚠ Listed so the gaps in the audit are as visible as its findings.
 
-- Faction bounties (`bountyCourse.ts`, `bountyPolitics.ts`, `factionBounty.ts`)
-- Dog rescue arc (`dog_quest` channel, `dogCompanion.ts`)
-- Golem companion arc
-- Escort missions (`escort.ts`) — completion and failure both
-- Chapters / story forks (`chapters.ts`, `data/story/forks.json`)
-- Aetherkin (`aetherkin.ts`)
-- Crafting / Aethercraft trees (`crafting.ts`)
-- Relics (`data/relics`)
-- Maze, Buried Skyscraper (`buriedSkyscraper.ts`)
-- Core Guardians (`coreGuardians.ts`) — spawn is reachable via the Contracts card (OTA-148);
-  the completion payoff is not yet traced
-- Titles (`earnedTitles`, `titleProgress`)
-- Whispers (`completedWhisperIds`)
-- Corruption arc (`corruption.ts`)
-- Mysteries beyond the turn-in (the *finding* half of the loop)
+⚠⚠ **THIS SECTION WAS STALE AND IS REWRITTEN (2026-08-10).** It still listed fourteen
+loops as unchecked — every one of which the second-round audit above had since checked and
+recorded. A "not audited" list that names already-audited work is worse than no list: it
+sends the next pass to re-do finished work and hides where the real gaps are. The stale
+names are gone; what replaces them is what is genuinely not proved.
+
+**Nothing is unaudited. What is UNPROVEN is a different thing, and here it is:**
+
+1. **The 18 WIRED rows in the audit ledger.** Confirmed to have a consumer, a completion
+   write and a payoff — not walked end to end. That is a lower bar than TRACED and it is
+   named as such in the ledger's own footer.
+2. **The dog rescue arc and the golem companion arc** — PARTIAL. Mechanics live at every
+   point checked; no completion event found to trace. Possibly open-ended by design, which
+   is a thing to confirm rather than assume.
+3. **P15's two data files** — filed but not investigated. The docs may already have
+   superseded them, exactly as they had for P4.
+
+⚠ **Absence from the OPEN list means CHECKED-AND-CLEAR OR WIRED-BUT-UNWALKED. It has never
+meant "proved".**
