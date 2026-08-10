@@ -263,6 +263,19 @@ export function randomizeEnemyDefense(enemy: Enemy, rng: () => number = Math.ran
     const wall = pick(map.resist.filter((r) => r !== newWeak));
     if (wall && !traits.includes(`resist:${wall}`)) traits.push(`resist:${wall}`);
   }
+  // ⚠ OTA-1225 (PUNCHLIST P16) — the technique roll rides the SAME profiler, so it is
+  // per-spawn, idempotent via `profiled`, and listed in the portrait like the resists.
+  // ⚠⚠ IT DRAWS FROM `rng` LAST, after every legacy roll, and that ordering is
+  // LOAD-BEARING: the first placement sat between the weakness and the wall draws, which
+  // shifted the seeded stream and flipped ota818's balance guarantees — a wall landed on a
+  // type the suite proves always stays >= x0.5. New consumers of a shared seeded rng
+  // append; they never insert.
+  {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const AT = require('./aetherTechniques') as typeof import('./aetherTechniques');
+    const techTrait = AT.rollEnemyTechnique(enemy, rng);
+    if (techTrait && !traits.some((t) => t.startsWith('technique'))) traits.push(techTrait);
+  }
   traits.push('profiled');
   return { ...enemy, traits };
 }
