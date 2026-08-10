@@ -1406,6 +1406,11 @@ export interface PlayerCharacter {
   /** ⚠ OTA-1214 — AETHER TECHNIQUES the character has learned. Ids from
    *  `engine/aetherTechniques.ts`. Absent on an old save reads as "knows none", which is
    *  correct: they are acquired, never granted at creation. */
+  /** ⚠ OTA-1221 (PUNCHLIST P17) — the lore concepts this character has actually had
+   *  answered, by id. `titleProgress.loreRead` counts DISTINCT entries here rather than
+   *  every ask, so Scholar of Forgotten Lore means three different things read, not one
+   *  thing read three times. Absent on older saves; `?? []` covers them. */
+  loreConceptsRead?: string[];
   knownTechniques?: string[];
   /** ⚠ OTA-1214 — per-technique practice count, keyed by technique id (owner: growth is
    *  per-technique, not one global aether skill, so a character specialises into what they

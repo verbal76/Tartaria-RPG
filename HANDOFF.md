@@ -1376,7 +1376,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1218`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1221`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1386,7 +1386,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.127**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.128**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,7 +1606,62 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ PUNCHLIST P16 — THE AETHER TECHNIQUES ARE REACHABLE (2026-08-10, latest). HAL
+- **⚠⚠ PUNCHLIST P17 — A TITLE THAT COULD NOT BE EARNED WITHOUT THE NARRATION MODEL
+  (2026-08-10, latest). HAL ONLY so far — golem port pending.** HAL OTA-1221.
+  **steam NOT included — batched (§2).**
+
+  **WHAT IT WAS.** `titleProgress.loreRead` — the counter gating **Scholar of Forgotten
+  Lore** — had **exactly one writer in the entire codebase**, and it sat inside
+  `if (cognitive.isReady())`. The counter only moved when the LLM answered a lore question.
+
+  ⚠⚠ **So on a device where the narration model does not load, the title was unearnable.**
+  That is measured, not theoretical: the owner's device reads `Narration engine: failed`
+  across OTA-1180, 1181 and 1182.
+
+  ⚠⚠ **AND THE GAME WAS ANSWERING THOSE QUESTIONS THE WHOLE TIME.** A keyword lookup over
+  `concepts.json` has answered lore offline since OTA-233 — and then `break`s, before the
+  counter. A player could read thirty lore entries on a model-less device and the game
+  recorded that they had read none. **The answer was never the missing part; the credit
+  was.**
+
+  **THE FIX, THREE PARTS.**
+  1. **`creditLoreRead` — one place that decides an answer was earned.** Three paths answer
+     a lore question (keyword concepts, the embedder, the bank match); only the middle one
+     credited the player. All three route through one helper now, rather than three copies
+     of the bookkeeping that would drift back apart.
+  2. **`findLoreConceptOffline`** — the same three-tier shape as `titleMatch.ts`: exact
+     label, substring with ambiguity REFUSING, then a token subset. ⚠ The embedder still
+     runs FIRST and is untouched — it is better at a loose ask. This is what runs when it
+     cannot, and it makes the ~180-entry concept BANK (canon events, titles, glossary)
+     reachable without a model, which the keyword path never covered.
+  3. **DISTINCT concepts, not asks.** The old tick counted every answer, so asking the same
+     question three times earned the title. Two loops that pay out on repetition have
+     already been closed this session; opening two more doors onto this one without the
+     guard would have made a farm of it.
+
+  ⚠⚠ **A SECOND DEFECT THE FIX EXPOSED, AND IT WOULD HAVE BEEN THE FARM.** The keyword
+  lookup matched the RAW parsed target, which for *"ask the arbiter about X"* still carries
+  the word **arbiter** — and `arbiter` is itself a lore keyword. So **any** ask matched
+  something whenever nothing longer beat it. Harmless while that branch only printed prose;
+  the moment it also credits the title, three nonsense questions earn it. The address is
+  stripped before matching now, pinned by test.
+
+  ⚠ **THE LOOP AUDIT'S OWN TITLE SWEEP DID NOT CATCH THIS.** It set `loreRead` to 9999 and
+  confirmed the threshold fires — it proved the THRESHOLD, not that a player can move the
+  number. That is the WIRED-vs-TRACED gap reappearing inside a test written to close it,
+  and it is the reason every case in the new suite moves the number the way a player does.
+
+  **Tests:** ota1221OfflineLore (12), every live case driven with **no narration model at
+  all** — the condition under test, not a workaround. ⚠ Two assertions retargeted: one of
+  mine asserted that a deliberately forgiving substring match was a miss, and ota1090's
+  ordering check pinned `findConcept(lookup)` by its ARGUMENT rather than by the call, so a
+  rename reddened a guarantee that had not moved.
+
+  ⚠ **HOW IT WAS FOUND:** reading P15's loot tables. Five lore texts sit in those pools,
+  which raised the question *"how does a player read lore at all?"* — and the answer was
+  that on an affected device they could not be credited for it.
+
+- **⚠⚠ PUNCHLIST P16 — THE AETHER TECHNIQUES ARE REACHABLE (2026-08-10). HAL
   ONLY so far — golem port pending.** HAL OTA-1218. **steam NOT included — batched (§2).**
 
   **WHAT IT WAS.** OTA-1214 shipped `engine/aetherTechniques.ts` with 24 green tests and

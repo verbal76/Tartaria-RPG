@@ -29,7 +29,7 @@ accumulates guesses is a punch list nobody trusts by item twenty.
 
 ## STILL OPEN — the whole list, 2026-08-10
 
-⚠ Sixteen items have been filed. **Eleven are closed, two were reclassified as
+⚠ Seventeen items have been filed. **Twelve are closed, two were reclassified as
 not-defects, and three are open.** The closed and reclassified entries are kept below
 with their reasoning rather than deleted — a punch list you can only read forwards is a
 punch list nobody can audit.
@@ -38,6 +38,7 @@ punch list nobody can audit.
 |---|---|---|---|
 | **P9** | Anchor the vendors to the site, not to the player | DESIGN | Untouched. The largest of the three P2 jobs; the other two shipped (OTA-1208/1209). **55 `vendor.faction` reads**, and that field decides which work a vendor OFFERS as well as who they are. |
 | **P15** | The ladder's loot half is never called | WIRING | ⚠⚠ **Re-measured 2026-08-10 (OTA-1220) and the original filing was WRONG** — `loot_tables.json` IS imported. The real defect: `pickLootFromLadder` has **no caller**, while its enemy twin `pickEncounterFromLadder` is called twice. 27 pools / 153 entries, all resolving, with no door. **Blocked on one owner decision** (see the entry). `relics.json` is SUPERSEDED — 7 of 13 already ship. |
+| **P17** | *(closed 2026-08-10, OTA-1221)* Scholar of Forgotten Lore was unearnable without the narration model | UNFINISHABLE | ✅ **CLOSED.** The offline answer path already existed since OTA-233 — it just never credited the player. Also closed the nonsense-ask farm the credit would have opened. |
 | **P16** | Aether techniques | IN PROGRESS | 🟡 **Reachable as of OTA-1218** — buy, channel, four effects, tab. Open for the owner's stated next step (**mirror to enemies per spawn**) and the two acquisition routes not built (found texts, contract rewards). |
 
 **And two things that are NOT punch-list items but are also not proved:**
@@ -727,6 +728,59 @@ rule is that no defensive stack buys literal immunity.
 
 ---
 
+### P17 — Scholar of Forgotten Lore could not be earned without the narration model
+
+## ✅ **CLOSED — OTA-1221.** The offline answer path now counts as reading lore, and it counts DISTINCT concepts rather than asks.
+
+- **Kind:** UNFINISHABLE *(a title with no reachable route on an affected device)*
+- **Found:** 2026-08-10, while reading P15's loot tables — five lore texts in the pools led to the question "how does a player read lore at all?"
+
+**WHAT IT WAS.** `titleProgress.loreRead` — the counter gating **Scholar of Forgotten Lore**
+(+2 Lore) — had exactly **one writer in the entire codebase**, and it sat inside
+`if (cognitive.isReady())`. So the counter only moved when the **LLM** answered a lore
+question.
+
+⚠⚠ **On a device where the narration model does not load, the title was unearnable.** That
+is not hypothetical: the owner's own device reads `Narration engine: failed` across
+OTA-1180, 1181 and 1182.
+
+⚠⚠ **AND THE GAME WAS ANSWERING THE QUESTIONS THE WHOLE TIME.** A keyword lookup over
+`concepts.json` has answered lore offline since OTA-233 — and then `break`s, before the
+counter. **The answer was never the missing part; the credit was.** A player could read
+thirty lore entries on a model-less device and the game recorded that they had read none.
+
+**THE FIX, in three parts:**
+1. **`creditLoreRead` — one place that decides an answer was earned.** Three paths answer a
+   lore question (keyword concepts, the embedder, the bank match) and only the middle one
+   credited the player. All three now route through one helper, rather than three copies of
+   the bookkeeping that would drift apart.
+2. **An offline bank matcher** (`findLoreConceptOffline`), same three-tier shape as
+   `titleMatch.ts` — exact label, substring with ambiguity refusing, then a token subset.
+   The embedder still runs FIRST and is untouched; this is what runs when it cannot.
+   ⚠ It makes the ~180-entry concept BANK (canon events, titles, glossary) reachable
+   without a model, which the keyword path never covered.
+3. **DISTINCT concepts, not asks.** The old tick counted every answer, so asking the same
+   question three times earned the title. Two loops that paid out on repetition have already
+   been closed this session; opening two more doors onto this one without the guard would
+   have made a farm of it.
+
+⚠⚠ **A SECOND DEFECT THE FIX EXPOSED, AND IT WOULD HAVE BEEN THE FARM.** The keyword lookup
+matched against the RAW parsed target, which for *"ask the arbiter about X"* still carries
+the word **arbiter** — and `arbiter` is itself a lore keyword. So **any** ask matched
+something whenever nothing longer beat it. Harmless while the branch only printed prose;
+the moment it also credits the title, three nonsense questions earn it. The address is now
+stripped before matching, pinned by test.
+
+⚠ **THE LOOP-AUDIT TITLE SWEEP DID NOT CATCH THIS, and that is worth recording.** It set
+`loreRead` to 9999 and confirmed the threshold fires — it proved the THRESHOLD, not that a
+player can move the number. That is the WIRED-vs-TRACED gap reappearing inside a test
+written to close it.
+
+**Tests:** `ota1221OfflineLore` (12), every live case driven with **no narration model at
+all** — which is the condition under test, not a workaround.
+
+---
+
 ### P15 — Two of the three relic data files have no importers
 
 ## ⚠⚠ **CORRECTED 2026-08-10 (OTA-1220) — THE ORIGINAL FILING WAS WRONG, AND IN THE SAME WAY P4 WAS.** It said `loot_tables.json` has **zero importers**. It has one, `engine/encounter.ts:8`, and I filed it off a search rather than a read. The original text is left below the correction so the mistake stays legible. The real defect is narrower, sharper, and still real.
@@ -774,6 +828,11 @@ table, or keep pulling from the flat Common pool it uses today?**
 catalog row. The other 100 would mint through OTA-961's `resolveLootItem`, which turns an
 unknown name into a **sellable trophy at the enemy's rarity** rather than 2-TC junk — so
 wiring it would pay, it just would not pay *authored* items until someone curates them.
+
+⚠ **THE LORE HALF OF THIS SPLIT OUT AS P17 and is closed.** Reading these pools raised the
+question *"how does a player read lore at all?"*, and the answer was: on a device whose
+model does not load, they could not be credited for it. That was a completability defect in
+its own right and did not belong inside a loot-economy decision.
 
 ### ⛔ `relics.json` — superseded, the P4 shape again
 

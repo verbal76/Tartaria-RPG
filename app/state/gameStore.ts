@@ -449,6 +449,27 @@ function getAllConcepts(): Concept[] {
 // Match a player's "what is X / explain X / tell me about X" target text
 // against the concepts knowledge base. First substring hit on any keyword
 // wins; returns null if nothing matches so the caller can fall back.
+/** ⚠⚠ OTA-1221 (PUNCHLIST P17) — one place that decides a lore answer was EARNED.
+ *
+ *  Three different paths answer a lore question (keyword concepts, the embedder, and the
+ *  offline bank match), and before this only the middle one credited the player. Rather
+ *  than repeat the bookkeeping three times — which is how two of them would drift back out
+ *  of agreement — they all call this.
+ *
+ *  ⚠ DISTINCT CONCEPTS, NOT ASKS. The old tick counted every answer, so asking the same
+ *  question three times earned the title. A title called Scholar of Forgotten Lore should
+ *  mean three different things read; growth-through-repetition has been closed twice this
+ *  session already and opening two more doors onto it would have made a farm of it. */
+function creditLoreRead(get: StoreGet, set: StoreSet, conceptKey: string): void {
+  const seen = get().player?.loreConceptsRead ?? [];
+  if (seen.includes(conceptKey)) return;
+  set((st) => (st.player
+    ? { player: { ...st.player, loreConceptsRead: [...(st.player.loreConceptsRead ?? []), conceptKey] } }
+    : st));
+  // arb45 — Scholar of Forgotten Lore: each deciphered text counts (3 needed).
+  recordTitleProgress(get, set, { loreRead: 1 });
+}
+
 function findConcept(targetText: string | undefined): Concept | null {
   if (!targetText) return null;
   const t = targetText.toLowerCase();
@@ -18044,9 +18065,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         // Otherwise normal concept lookup.
-        const concept = findConcept(lookup);
+        // ⚠⚠ OTA-1221 — MATCH THE TOPIC, NOT THE WHOLE SENTENCE. `lookup` is the raw parsed
+        // target, so for "ask the arbiter about <X>" it still carries the word *arbiter* —
+        // and `arbiter` is itself a concept keyword. So ANY ask matched the Arbiter concept
+        // whenever nothing longer beat it, which is why "ask the arbiter about zzzzz
+        // nonsense" returned an answer at all. Harmless while this branch only printed
+        // prose; the moment it also credits `loreRead` (below) it becomes a farm: ask
+        // nonsense three times, earn Scholar of Forgotten Lore. Strip the address first.
+        const conceptQuery = (require('../engine/askArbiter') as typeof import('../engine/askArbiter'))
+          .extractLoreQuery(trimmed) || lookup;
+        const concept = findConcept(conceptQuery);
         if (concept) {
           get().appendLog('arbiter', `"${concept.title}," the Arbiter says. "${concept.answer}"`);
+          // ⚠⚠ OTA-1221 (PUNCHLIST P17) — AND IT COUNTS AS READING LORE. This branch has
+          // answered lore offline, from concepts.json keywords, since OTA-233 — and then
+          // `break`s, so it never reached the `loreRead` tick further down. That tick lived
+          // ONLY inside the embedder branch, so on a device where the narration model does
+          // not load (the owner's own, OTA-1180/1181/1182: `Narration engine: failed`) the
+          // counter could never move and **Scholar of Forgotten Lore was unearnable** —
+          // while the game was answering the player's lore questions perfectly well the
+          // whole time. The answer was never the missing part; the credit was.
+          creditLoreRead(get, set, `concept_${concept.id}`);
           break;
         }
         // OTA-233 — MiniLM lore lookup. The keyword findConcept covers
@@ -18083,20 +18122,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const aa = require('../engine/askArbiter');
           let answered = false;
+          const loreQuery = aa.extractLoreQuery(trimmed) || lookup;
+          // ⚠ The embedder still goes FIRST and is unchanged — it is better at a loose ask
+          // ("what's the mud thing?") than any text match will be.
+          let hit: { concept: { id: string } } | null = null;
           if (cognitive.isReady()) {
             try {
-              const loreQuery = aa.extractLoreQuery(trimmed) || lookup;
-              const hit = await aa.findClosestLoreConcept(loreQuery, cognitive);
-              if (hit) {
-                get().appendLog('arbiter', aa.formatArbiterAnswer(hit.concept));
-                answered = true;
-                // arb45 — Scholar of Forgotten Lore: each canon lore answer
-                // is a deciphered text (3 needed).
-                recordTitleProgress(get, set, { loreRead: 1 });
-              }
+              hit = await aa.findClosestLoreConcept(loreQuery, cognitive);
             } catch {
-              /* lore lookup failed — fall through to the persona */
+              /* lore lookup failed — the offline path below still gets a turn */
             }
+          }
+          // ⚠⚠ OTA-1221 (PUNCHLIST P17) — THE OFFLINE PATH. Everything above needs a model
+          // that loads. On the owner's own device it does not (OTA-1180/1181/1182 all read
+          // `Narration engine: failed`), and `loreRead` was ticked ONLY inside that branch —
+          // so 177 authored lore concepts were unreachable and Scholar of Forgotten Lore
+          // could not be earned at all. The bank is plain text and never needed the model.
+          if (!hit) {
+            try {
+              hit = aa.findLoreConceptOffline(loreQuery);
+            } catch {
+              /* offline lookup failed — fall through to the persona */
+            }
+          }
+          if (hit) {
+            get().appendLog('arbiter', aa.formatArbiterAnswer(hit.concept as never));
+            answered = true;
+            // arb45 — Scholar of Forgotten Lore: each canon lore answer is a deciphered
+            // text (3 needed).
+            // ⚠⚠ OTA-1221 — DISTINCT CONCEPTS, NOT ASKS. This counted every answer, so
+            // asking the same question three times earned the title. A title called
+            // Scholar of Forgotten Lore should mean you read three DIFFERENT things, and
+            // this session has already closed two loops that paid out on repetition —
+            // opening the offline door without this would have made a farm of it.
+            creditLoreRead(get, set, `bank_${hit.concept.id}`);
           }
           if (!answered) {
             // OTA-1090 — read the brief HERE rather than closing over a stale
