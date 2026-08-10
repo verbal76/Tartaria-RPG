@@ -1376,7 +1376,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1225`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1226`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1386,7 +1386,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.132**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.133**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,7 +1606,36 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ PUNCHLIST P16 — ENEMIES CHANNEL TOO (2026-08-10, latest). HAL ONLY so far — golem
+- **⚠⚠ PUNCHLIST P16 CLOSED — EVERY TECHNIQUE THROUGH EVERY DOOR (2026-08-10, latest).
+  HAL ONLY so far — golem port pending.** HAL OTA-1226. **steam NOT included — batched
+  (§2).** **The punch list now stands at ZERO open items.**
+
+  Owner, superseding the tiered split I proposed: *"push it through all routes, three
+  doors makes it accessable even with bad faction standing"* — ALL FOUR techniques through
+  ALL THREE doors, so a player the Revivalists hate can still learn everything.
+
+  **Door 1 — rapport purchase** (OTA-1218, unchanged). **Door 2 — found in the world:**
+  four Procedure Text rows in the relic loot ledger (113 → 117), PLACED in the world
+  ladder's `lootTable` arrays at the four sites whose fiction earns them (Aethercraft
+  Workshop → Shield, Crystal Pylon Chamber → Slip, Etheric Engine Chamber → Veil,
+  Tartarian Archives → Cascade); OTA-1222's site-substitution roll is the delivery
+  mechanism, zero standing required. ⚠ Catalogued in `exploration.json` for price/rarity
+  identity, but that file is deliberately NOT stall-readable — a flooded market would
+  delete Door 1. **Door 3 — storyline rewards:** four storyline completions each grant a
+  text ON TOP of their authored reward (Scripture in Stone → Shield, Sasha's Gambit →
+  Slip, Silence Protocol → Veil, Drowned Library → Cascade).
+
+  **ONE teaching seam for every door:** `teachFromProcedureText` — INT-gated at READ time
+  (refusal KEEPS the text), already-known keeps it with a line, clean read teaches and
+  consumes. `read/study/peruse` intercepts at the TOP of the investigate case (⚠ `read`
+  parses as intent=investigate and the resolver otherwise drags the target to ambient
+  events — the suite caught this before it shipped); `use` on the item delegates to the
+  same function. Ambiguous token match refuses with "Which text?".
+
+  **Tests:** ota1226TextsAllRoutes (7). ota1220's relic-count pin retargeted 113 → 117
+  with the reason in place.
+
+- **⚠⚠ PUNCHLIST P16 — ENEMIES CHANNEL TOO (2026-08-10). HAL ONLY so far — golem
   port pending.** HAL OTA-1225. **steam NOT included — batched (§2).**
 
   Owner: *"mirror it to enemies and have them applied like the resists are"* — and the
@@ -1631,8 +1660,8 @@ rediscovering them.
   DICE MODAL and resolves nothing, and `concludeRolls` on unrolled steps is the same
   mistake politer. The ota976 `resolveRollStep` step-through is how the app swings.
 
-  **STILL OPEN ON P16:** the two acquisition routes (found texts, contract rewards) —
-  explained to the owner, awaiting his go.
+  **P16's remaining half — the acquisition routes — closed the same day by OTA-1226
+  (see the entry above).**
 
 - **⚠⚠ PUNCHLIST P9 CLOSED — AT AN OWNED SITE, THE PEOPLE ANSWER FOR THE HOST (2026-08-10,
   latest). HAL ONLY so far — golem port pending.** HAL OTA-1224. **steam NOT included —
