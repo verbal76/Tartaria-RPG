@@ -38655,6 +38655,21 @@ function runAetherTechnique(
     return;
   }
 
+  // ⚠⚠ OTA-1223 (PUNCHLIST P18) — THE VEIL REFUSES AN EMPTY ROOM, before fuel is touched.
+  // The Veil grants the existing `stealthed` status, and `stealthed` is combat-only by
+  // OTA-358's rule: the first action taken with no enemies present expires it. So an
+  // out-of-combat channel succeeded, charged fuel + 4 dose + 10 minutes, printed its
+  // success line — and the player's very next step silently deleted the effect. A
+  // purchase that ends in nothing, found by the 2026-08-10 audit and filed as P18;
+  // owner's call was fix 1: refuse, with the reason spoken, at zero cost.
+  if (tech.id === 'veil_of_ether' && (scene.enemies?.length ?? 0) === 0) {
+    get().appendLog(
+      'arbiter',
+      `"The Veil bends the light around a body something is looking for," the Arbiter says. "Nothing here is looking. Keep the dose."`,
+    );
+    return;
+  }
+
   // 2. Fuel — cheapest-first, same list and same order as the shape discipline.
   let fuelItem: InventoryItem | null = null;
   for (const name of AT.TECHNIQUE_FUEL_PREFERENCE) {

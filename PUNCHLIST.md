@@ -29,8 +29,8 @@ accumulates guesses is a punch list nobody trusts by item twenty.
 
 ## STILL OPEN — the whole list, 2026-08-10
 
-⚠ Seventeen items have been filed. **Thirteen are closed, two were reclassified as
-not-defects, and three are open** (P9, P16, P18). The closed and reclassified entries are kept below
+⚠ Seventeen items have been filed. **Fourteen are closed, two were reclassified as
+not-defects, and two are open** (P9 and P16). The closed and reclassified entries are kept below
 with their reasoning rather than deleted — a punch list you can only read forwards is a
 punch list nobody can audit.
 
@@ -38,7 +38,7 @@ punch list nobody can audit.
 |---|---|---|---|
 | **P9** | Anchor the vendors to the site, not to the player | DESIGN | Untouched. The largest of the three P2 jobs; the other two shipped (OTA-1208/1209). **55 `vendor.faction` reads**, and that field decides which work a vendor OFFERS as well as who they are. |
 | **P15** | *(loot half closed 2026-08-10, OTA-1222)* The ladder's loot half was never called | WIRING | ⚠⚠ **Re-measured 2026-08-10 (OTA-1220) and the original filing was WRONG** — `loot_tables.json` IS imported. The real defect: `pickLootFromLadder` has **no caller**, while its enemy twin `pickEncounterFromLadder` is called twice. 27 pools / 153 entries, all resolving, with no door. **Blocked on one owner decision** (see the entry). `relics.json` is SUPERSEDED — 7 of 13 already ship. |
-| **P18** | Veil of Ether channelled outside combat pays for nothing | ENDS IN NOTHING | ⚠ Found by the 2026-08-10 audit. The channel succeeds and the next out-of-combat action silently deletes the `stealthed` it granted. Two candidate fixes filed; owner's call. In-combat Veil is unaffected. |
+| **P18** | *(closed 2026-08-10, OTA-1223)* Veil outside combat paid for nothing | ENDS IN NOTHING | ✅ **CLOSED — fix 1.** Refuses an empty room at zero cost. The fix's test also caught `channel veil of ether` failing to resolve (dropped-word class); token tier added. |
 | **P17** | *(closed 2026-08-10, OTA-1221)* Scholar of Forgotten Lore was unearnable without the narration model | UNFINISHABLE | ✅ **CLOSED.** The offline answer path already existed since OTA-233 — it just never credited the player. Also closed the nonsense-ask farm the credit would have opened. |
 | **P16** | Aether techniques | IN PROGRESS | 🟡 **Reachable as of OTA-1218** — buy, channel, four effects, tab. Open for the owner's stated next step (**mirror to enemies per spawn**) and the two acquisition routes not built (found texts, contract rewards). |
 
@@ -676,6 +676,8 @@ call, exactly as with the runecasters.
 ---
 
 ### P18 — Veil of Ether channelled outside combat pays for nothing
+
+## ✅ **CLOSED — OTA-1223, fix 1.** The Veil now refuses an empty room before fuel is touched, with the reason spoken and zero cost. ⚠ The fix's own test found a second OTA-1218 defect: the parser strips small words, so `channel veil of ether` could not resolve the technique under its own name — `findTechniqueByName` now carries titleMatch's token tier, ambiguity still refusing. Shield/Slip pre-channelling confirmed deliberate and left as designed.
 
 - **Kind:** ENDS IN NOTHING *(a successful channel whose effect the next action deletes)*
 - **Found:** 2026-08-10, Monday full audit of the weekend's work (OTA-1218's own review)

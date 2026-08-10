@@ -1376,7 +1376,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1222`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1223`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1386,7 +1386,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.129**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.130**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1606,8 +1606,27 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ PUNCHLIST P15 — A PLACE'S OWN LOOT CAN TURN UP WHEN YOU SEARCH IT (2026-08-10,
-  latest). HAL ONLY so far — golem port pending.** HAL OTA-1222. **steam NOT included —
+- **⚠⚠ PUNCHLIST P18 CLOSED — THE VEIL REFUSES AN EMPTY ROOM (2026-08-10, latest). HAL +
+  GOLEM.** HAL OTA-1223 / golem OTA-1200. **steam NOT included — batched (§2).**
+
+  The Monday audit filed P18: Veil of Ether grants the existing `stealthed` status, which
+  is combat-only — the first enemy-less action expires it — so an out-of-combat channel
+  charged fuel + 4 dose + 10 in-game minutes for an effect the next step deleted. Owner's
+  call was fix 1: **refuse, spoken, at zero cost, before fuel is reached.** In-combat Veil
+  is untouched; Shield and Slip still pre-channel deliberately.
+
+  ⚠⚠ **THE FIX'S OWN TEST FOUND A SECOND OTA-1218 DEFECT.** The parser strips small words,
+  so `channel veil of ether` reached the finder as *veil ether* — and the technique could
+  not be resolved under ITS OWN NAME. That is the dropped-word defect OTA-1211 found in
+  the contract finders, rebuilt five days later in a brand-new finder.
+  `findTechniqueByName` now carries the same third tier `titleMatch.ts` does: tokens,
+  order-insensitive, running only where substring found NOTHING. Two substring hits still
+  REFUSE — *ether* fits both Veil and Shield and must take neither — and a token tie
+  refuses too. Both OTA-1218 suites re-run green, so the ambiguity guarantee held.
+
+  **Tests:** ota1223VeilGate (3, live).
+
+- **⚠⚠ PUNCHLIST P15 — A PLACE'S OWN LOOT CAN TURN UP WHEN YOU SEARCH IT (2026-08-10). HAL ONLY so far — golem port pending.** HAL OTA-1222. **steam NOT included —
   batched (§2).**
 
   Owner's call, verbatim: *"it goes from the tuned pool and has a small percentage to pull
