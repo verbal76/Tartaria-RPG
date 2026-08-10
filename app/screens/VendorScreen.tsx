@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useGameStore } from '../state/gameStore';
+import { useGameStore, vendorNpcId } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { BrandedModal } from '../components/BrandedModal';
 import { VendorContractsModal } from '../components/VendorContractsModal';
@@ -16,6 +16,9 @@ import { corruptionTierOf, corruptionPriceMultiplier } from '../engine/corruptio
 import { warPriceFactor, finalBuyPrice, priceArrow } from '../engine/vendorPricing';
 import { localWarHeat, contestedFactions } from '../engine/worldEvents';
 import { tideVendorPriceMult } from '../engine/worldPulse';
+// OTA-1179 — the two price factors the display was missing; see `priceParts` below.
+import { npcRegard, regardPriceMult, getRelation } from '../engine/npcMemory';
+import { profileOf, tideStage, tidePriceMultiplier } from '../engine/pressure';
 import { canonicalCellOf } from '../engine/worldMap';
 import factionsData from '../data/factions/factions.json';
 import {
@@ -296,6 +299,19 @@ export function VendorScreen() {
   // display used to omit: the vendor faction's fortunes (tide teeth) and LOCAL WAR HEAT.
   // Computed here so the screen shows exactly what buyFromVendor / sellToVendor charge.
   const vendorTideMult = vendor?.faction ? tideVendorPriceMult(worldMemory?.factionTides?.[vendor.faction]) : 1;
+  // ⚠ OTA-1179 — THE TWO THIS SCREEN STILL DROPPED, and the comment above has been
+  // wrong since they landed. `buyFromVendor` multiplies in SIX factors; this screen
+  // passed FOUR. Missing: OTA-1076's per-person regard (a vendor who likes or
+  // dislikes you moves the price) and OTA-1089's Phase-4 pressure tide. So the shown
+  // price and the charged price silently disagreed for any non-neutral vendor —
+  // inside `vendorPricing.ts`, whose entire stated purpose is that these two can
+  // never drift. Computed from the same helpers the store uses, not re-derived.
+  const vendorRegardMult = vendor && worldMemory
+    ? regardPriceMult(npcRegard(getRelation(worldMemory, vendorNpcId(vendor))))
+    : 1;
+  const pressureTideMult = player
+    ? tidePriceMultiplier(tideStage(player.hoursElapsed ?? 0, profileOf(player)))
+    : 1;
   const warCell = player ? canonicalCellOf(player.currentLocationId) : { x: 0, y: 0 };
   const warHeat = localWarHeat(worldMemory?.patrols ?? [], warCell.x, warCell.y);
   const { buyMult: warBuyMult, sellMult: warSellMult } = warPriceFactor(warHeat);
@@ -637,7 +653,7 @@ export function VendorScreen() {
               // OTA-865 — the FULL buy price (now including faction-tide + war heat, which
               // the display used to drop), from the same helper buyFromVendor uses so the
               // shown price is exactly what transacts. The ▲/▼ ticker compares it to base.
-              const effPrice = finalBuyPrice(o.price, { corruptionMult, buyDiscount: rapportMod, tideMult: vendorTideMult, warBuyMult });
+              const effPrice = finalBuyPrice(o.price, { corruptionMult, buyDiscount: rapportMod, tideMult: vendorTideMult, warBuyMult, regardMult: vendorRegardMult, pressureTideMult });
               const buyTick = priceArrow(effPrice, o.price, 'buy');
               const canAfford = player.tc >= effPrice;
               const itemPreview = getItemPreview(o.itemName);
@@ -650,8 +666,8 @@ export function VendorScreen() {
                 // was applied here, which dimmed everything inside the row
                 // including the STEAL button on the right — backwards
                 // affordance, since stealing is what a broke player would
-                // want to reach for. Steal has its own gates (DC roll, faction
-                // standing, witness checks in `stealFromVendor`) and never
+                // want to reach for. Steal has its own gates (DC roll, witness
+                // checks in `stealFromVendor`) and never
                 // touched TC affordability anyway. Now: BUY body dims when
                 // unaffordable, STEAL stays full bright.
                 <View

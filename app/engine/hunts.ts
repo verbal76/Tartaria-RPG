@@ -1,3 +1,4 @@
+import { findByTitle } from './titleMatch';
 // Hunt engine — long-form, multi-stage monster hunts (5-9 prep stages + a
 // final boss combat). Hunts are accepted from vendors or from beast-sign
 // hooks, scale the target enemy to the player's current power level, and
@@ -6,6 +7,9 @@
 import huntsData from '../data/quests/hunts.json';
 import type { PlayerCharacter, Enemy } from './types';
 import enemiesData from '../data/enemies/enemies.json';
+// OTA-1190 — the shared over-level curve, so a hunt boss reads the player the same way
+// every other spawner does rather than inventing its own measure.
+import { overLevelT } from './encounter';
 
 export type HuntCheckKind =
   | null
@@ -203,27 +207,50 @@ export function availableHunts(
   );
 }
 
+// ⚠ OTA-1211 — delegates to the shared three-tier resolver. The first two tiers are
+// the exact behaviour this function always had; the third catches the case the
+// parser creates by stripping stop words ("fragment red tower" vs "Fragment of the
+// Red Tower"), and only ever runs where this used to return null. See titleMatch.ts.
 export function fuzzyFindHunt(text: string, pool: readonly HuntDef[]): HuntDef | null {
-  const t = text.toLowerCase().trim();
-  if (!t) return null;
-  const exact = pool.find((h) => h.title.toLowerCase() === t);
-  if (exact) return exact;
-  return pool.find((h) => h.title.toLowerCase().includes(t) || t.includes(h.title.toLowerCase())) ?? null;
+  return findByTitle(text, pool);
 }
 
-// Build a scaled clone of the target enemy. Scaling is gentle but
-// noticeable: HP scales with player HP (1.0× base if player is at
-// starting hpMax of ~30, up to ~1.6× by hpMax 80), damage scales by a
-// flat +1 to each die count when the player has hpMax > 50.
-export function scaleHuntBoss(player: PlayerCharacter, def: HuntDef): Enemy | null {
+/** ⚠ OTA-1190 — ceiling on the boss HP multiplier at full over-level. The old curve
+ *  topped out at an effective 1.6, driven by `hpMax` alone. */
+export const HUNT_HP_CEILING = 2.2;
+/** Over-level fraction at which the boss gains a damage die. Was `hpMax > 50`, which a
+ *  heavily-armoured character at 40 HP never reached no matter what they swung. */
+export const HUNT_DAMAGE_STEP_T = 0.5;
+
+// Build a scaled clone of the target enemy.
+//
+// ⚠ OTA-1190 — IT USED TO SCALE ON `hpMax` AND NOTHING ELSE:
+//     hpFactor = min(1.6, max(1.0, hpMax / 30))
+// which is 1.0 — NO SCALING WHATSOEVER — for every character under 30 max HP, and blind
+// to stats, weapon damage and AC. OTA-1182 built `enemyScalePower` precisely because
+// "how strong is this character" had two different answers, and routed seven spawners
+// through it. THIS WAS THE SPAWNER THAT GOT MISSED: a fully kitted character at 29 max
+// HP fought exactly the boss a fresh arrival did.
+//
+// ⚠ `power` IS SUPPLIED BY THE CALLER, DELIBERATELY. The store's `scalePowerOf` wraps
+// its gear read in a try/catch because `getEquippedWeapon` throws on an inventory-less
+// player, and a throw here would abort the whole spawn — surfacing as an encounter that
+// silently never happens. Re-deriving power inside this module would duplicate that
+// hazard. Omitting it falls back to the old hpMax curve, so every legacy caller works.
+export function scaleHuntBoss(player: PlayerCharacter, def: HuntDef, power?: number): Enemy | null {
   const base = (enemiesData as Enemy[]).find((e) => e.name === def.targetEnemyName);
   if (!base) return null;
-  const hpFactor = Math.min(1.6, Math.max(1.0, player.hpMax / 30));
+  // 0 at a fresh arrival → 1 at end-game; the same term every other spawner reads.
+  const t = power === undefined ? null : overLevelT(power);
+  const hpFactor = t === null
+    ? Math.min(1.6, Math.max(1.0, player.hpMax / 30))
+    : 1 + t * (HUNT_HP_CEILING - 1);
   const hp = Math.round(base.hp * hpFactor);
   // Bump damage by adding one die to the lowest die-count if the player
   // is well-established. Format like "4D10" → "5D10".
   let damage = String(base.damage);
-  if (player.hpMax > 50) {
+  const dangerous = t === null ? player.hpMax > 50 : t >= HUNT_DAMAGE_STEP_T;
+  if (dangerous) {
     damage = damage.replace(/(\d+)([dD]\d+)/, (_m, c, rest) => `${parseInt(c, 10) + 1}${rest}`);
   }
   return {

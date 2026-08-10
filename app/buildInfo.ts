@@ -10619,7 +10619,11 @@
 // OTAs since the last wave (escorts, OTA-989). Full wave ledger: VERSION.md.
 // RULES (VERSION.md): PATCH +1 every OTA · MINOR +1 (PATCH->0) when an OTA
 // closes a significant feature wave · MAJOR only on a milestone/lineage jump.
-export const DISPLAY_VERSION = '4.29.88';
+// ⚠ OTA-1187 — 4.29.94 → 4.29.97 is PATCH +3, not the usual +1. OTA-1185 and
+// OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
+// +1 PER OTA, so catching up is three, not one. See the gap note beside
+// OTA_BUILD_ID before reading any device log stamped 1184.
+export const DISPLAY_VERSION = '4.29.133';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23938,7 +23942,690 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1178SitAndGiftReturn (34 tests). Log evaluated in
 // full: 13 encounters, 63 enemy swings, 30 player swings.
 // DISPLAY_VERSION 4.29.88.
-export const OTA_BUILD_ID = '2026-08-07-1178-from-the-log';
+// 2026-08-07 OTA-1179 — THE FACTION STANDING WIRING.
+// Owner: "track all of the math and all of the wires for the
+// faction standings ... search every part of this code for where
+// the faction standings have any kind of application and how
+// they're wired and make sure nothing's broken." A full read+write
+// audit of the system followed; this ships the DEFECTS it found.
+// Four DESIGN calls are deliberately held for the owner and are
+// untouched here — the one-directional ambient standing ratchet,
+// the in-game explainer text, a defensive term in the difficulty
+// scaler, and the contract-refusal wording. Also held: the
+// theft/extort spillover meters, because "how much should the
+// world move standing" is the same question he is deciding. The
+// new suite asserts the held items are unchanged, so a later
+// session cannot implement his pending decisions as "cleanup".
+//   ⚠ 1. THE READ SIDE NEVER HEALED A FACTION ID. OTA-1178 taught
+//      the WRITE side to canonicalise; no reader did. `getStanding`
+//      returns 0 for a legacy race id — indistinguishable from
+//      genuinely neutral — so a player who ground a faction to +30
+//      through a vendor recorded under a bad id read as a STRANGER
+//      to ~15 consumers at once: pricing, contracts, hostility,
+//      brokering, titles, the sheet. `hasFactionRapport` was worse:
+//      it builds a QUEST ID out of the faction id, so a legacy id
+//      yields `fq_architectural_sentinels_rapport`, which exists
+//      nowhere — the CHA discount was permanently 0, silently, for
+//      a vendor whose rapport quest the player HAD completed.
+//   ⚠ 2. HONEST CUSTOM WAS BEING CONFISCATED. Buying banks TC into
+//      a hidden pool, +1 standing per 500. The pool was debited
+//      unconditionally — and EVERY roadside trader has
+//      `faction: null`, so crossing 500 TC at a roadside stall
+//      burned 500 TC of credit and granted nothing, permanently.
+//      Same loss at REP_MAX and for a stale race id. Now the pool
+//      is only spent when `changed` is non-empty. ⚠ CONSEQUENCE TO
+//      WATCH ON DEVICE: a long roadside-only stretch now banks in a
+//      LUMP at the next faction vendor. That is the stated design
+//      paid honestly, but +20 is the join threshold; a per-purchase
+//      cap is a DESIGN call and deliberately not made here.
+//   3. FOUR MORE WRITERS ANNOUNCED WHAT THEY NEVER VERIFIED — the
+//      OTA-1178 shape again. The story fork was the closest twin:
+//      bare `.standing`, `changed` discarded, log unconditional,
+//      and the RAW UNDERSCORED ID shown to the player.
+//      `dockHostileStanding` was worse than the gift version: it
+//      stamped its ONE-SHOT ledger BEFORE confirming, so an
+//      unresolvable id burned the ledger, moved nothing, reported a
+//      dock — and made the real dock impossible forever. Order is
+//      now resolve → apply → confirm → stamp.
+//   ⚠ 4. THE HUNT ROLL WAS ABOUT THE WRONG FACTION. A patrol
+//      qualifies on ITS faction being below 0; the roll for whether
+//      it hunts you then took `hostileHuntChance(player.factionStanding)`,
+//      which reduces to the MINIMUM over the whole table. At −30
+//      with the Mud Monarchs and −1 with the Reclaimers, a
+//      Reclaimer patrol hunted you at the Mud Monarchs' rate. Now
+//      it passes the single row, so `depth` measures how badly
+//      THESE people want you — which is what its own comment says
+//      it means.
+//   5. EVERY FACTION GETS A ROW, FOREVER. `applyRepChange` is a
+//      pure `.map()` — it can update a row, never create one — and
+//      rows were minted only at character creation. Adding a TENTH
+//      faction would have given every live save a faction it could
+//      never gain standing with, reading 0 and absorbing every
+//      grant. Backfilled, with legacy race-id rows MERGED onto the
+//      real faction keeping whichever value is further from
+//      neutral, so neither an earned positive nor an earned grudge
+//      is lost. ⚠ Placed AFTER backfillPlayer's try/catch, not
+//      inside it: the inner pass is degrade-safe and swallows its
+//      own exceptions, so a migration that threw for an unrelated
+//      reason would have cost the save its faction rows.
+//   6. THE VENDOR SCREEN SHOWED A PRICE IT DID NOT CHARGE. The
+//      display passed FOUR price factors; the purchase passes SIX.
+//      Missing: OTA-1076 per-person regard and OTA-1089's Phase-4
+//      pressure tide — so shown and charged disagreed for any
+//      vendor who liked or disliked you, inside `vendorPricing.ts`,
+//      the file whose entire stated purpose is that they cannot.
+//   7. THE GIFT CASCADE WAS INVISIBLE. `applyGiftStanding` printed
+//      one hand-rolled line and never called `logRepChanges`, so
+//      the ±half to every ally and rival never appeared: you read
+//      "+5 Forgotten Order" and never learned you had just taken
+//      −2 with the Mud Monarchs. In a system whose whole tension is
+//      that helping one side costs you with another, hiding the
+//      cost is the one thing it must not do. Same for story forks.
+//   8. ONE JOIN THRESHOLD. Four independent literal 20s plus two
+//      hardcoded UI copies; `JOIN_THRESHOLD` had exactly one
+//      consumer. CharacterScreen even cited it in a comment and
+//      then hardcoded 20 twice, so its ✓ and its colour could
+//      disagree with the rule they claim to show.
+//   9. Two pieces of text that described a rule the code does not
+//      have: the `scion_of_the_giants` requirement never mentioned
+//      the standing 25 it needs, and a comment claimed stealing is
+//      standing-gated (standing is a CONSEQUENCE of being caught).
+// New suite ota1179FactionWiring (24 tests).
+// DISPLAY_VERSION 4.29.89.
+// 2026-08-07 OTA-1180 — THE WORLD DOES NOT MOVE YOUR STANDING.
+// The first of the four design calls OTA-1179 held, decided by
+// the owner: "why are we doing ambient standing raises when we
+// have multiple ways to gain standing. you should work to get
+// standing, not earn it by breathing."
+// The world pulse had exactly two `repDelta` events — defector
+// (+2) and windfall (+1). Both POSITIVE, both gated on `favored`
+// (>= 10), which is the eligibility test AND the target pool, so
+// it fed whoever was already ahead — from a home faction that
+// character creation seeds AT 10. Nothing in the pool ever moved
+// standing down. The needle went one way, on a clock the player
+// never touches, identically on every save.
+//   MEASURED BEFORE REMOVING IT, because the owner's worry was
+//   that the ambient fed the NEGATIVE side that gates patrol
+//   attacks. It does, but barely: the +2 cascades -1 to each
+//   rival, which works out to -1 per 39 in-game hours. One median
+//   authored contract (+9) sends -4 to each rival — the work of
+//   155 hours of drift. Committing to a faction makes an enemy
+//   hunt you in 2-7 contracts. That machinery is untouched here,
+//   and ota1180AmbientStandingOff asserts it.
+//   ⚠ THE RUMORS WERE REWRITTEN WITH THE EFFECT, NOT LEFT BEHIND.
+//   "they count you a friend now" / "remembered your name" are
+//   STANDING CLAIMS; deleting the effect and keeping the text
+//   would have been OTA-1179 finding 9 re-introduced on purpose.
+//   Both now pay a TIDE — a defection and a windfall genuinely
+//   make a faction stronger, tides already drive prices, patrol
+//   counts and raid strength, and it is about the world instead
+//   of about the player. Pool size (16) and total weight (97) are
+//   unchanged, so no other event's draw odds moved.
+//   The `repDelta` field and the store's handler are KEPT, for an
+//   authored beat the player walks into. The rule is that the
+//   AMBIENT TICK may not grant standing, not that nothing may.
+// New suite ota1180AmbientStandingOff (9 tests). The hold that
+// OTA-1179 wrote for this item is INVERTED, not deleted: deciding
+// a held call makes the decision as hard to undo as the hold was.
+// Three of the four calls are still held and still asserted.
+// DISPLAY_VERSION 4.29.90.
+// 2026-08-07 OTA-1181 — THE STANDING TEXT SAYS WHAT THE CODE
+// DOES, AND SAYS THE PART IT NEVER SAID.
+// The second of the four design calls OTA-1179 held. Owner:
+// "correct the incorrect wording and make sure they know a
+// certain - standing will get them hunted."
+//   THE WRONG NUMBERS. The glossary and the concepts catalogue
+//   both described standing as a currency "exchanged" or "spent"
+//   for gear, areas and abilities. It is neither — it is a
+//   threshold you stand above, it is never consumed, and telling
+//   the player otherwise invites them to hoard for a cash-out
+//   that does not exist. The join entry priced purchases at "+1"
+//   with no denominator, off by the whole 500 TC constant. Gifts
+//   were quoted flat "+5"; the real grants are +4 loved / +2
+//   liked / -2 insulted, under a LIFETIME per-faction cap of 10,
+//   none of which was stated. Theft was quoted at -10, but a
+//   caught theft on another faction's ground docks -10 TWICE, to
+//   two different factions.
+//   ⚠ THE MISSING RULE, AND IT IS THE ONE THAT MATTERS. Nothing
+//   anywhere in the game — sheet, glossary, catalogue — told the
+//   player that low standing gets them HUNTED. The sheet marked
+//   the good end (a checkmark at JOIN_THRESHOLD) and left the bad
+//   end to a shade of orange nothing explained. Now: every row at
+//   or under HOSTILE_STANDING carries a "☠ hunted" tag, rows
+//   inside the last 10 before it carry "⚠ close", and a warning
+//   line under the list names BOTH thresholds, because they are
+//   different numbers doing different jobs — below 0 a patrol may
+//   engage, at -25 it goes looking for you. The early tag is the
+//   useful half: one contract for a rival moves you about 4, so a
+//   bare at-the-line mark arrives too late to act on.
+//   The text also states the rival cost, because that is how
+//   players actually fall — every point earned with one faction
+//   costs their enemies half as much the other way.
+//   BUY_REP_TC_PER_STANDING moved from a function-local const in
+//   buyFromVendor to engine/factions.ts and is imported by both
+//   readers. A number two surfaces must agree on does not get two
+//   homes — the same cleanup OTA-1179 #8 did for JOIN_THRESHOLD,
+//   and the reason the "+1" was wrong for so long.
+// New suite ota1181StandingTextTruth (10 tests). Every assertion
+// pins the text against the CONSTANT that drives the behaviour,
+// so re-tuning a threshold fails the suite instead of quietly
+// making the help text lie again.
+// DISPLAY_VERSION 4.29.91.
+// 2026-08-07 OTA-1182 — THE LAST TWO DESIGN CALLS. The third and
+// fourth of the four OTA-1179 held, decided together.
+//   ⚠ 3. THE SCALER NOW KNOWS WHAT YOU ARE WEARING AND SWINGING.
+//      Owner: his AC went 20 -> 26 and the difficulty did not move.
+//      It could not — `enemyScalePower` was `bestCombatStat +
+//      hpMax/10`, and AC was not an input, nor was weapon damage.
+//      Meanwhile powerRating.playerPowerScore — the number on the
+//      player's own sheet — is `bestStat + damage + AC + hp/10`.
+//      TWO answers to "how strong is this character", and the one
+//      the player SAW counted their armour while the one that SET
+//      THE DIFFICULTY did not.
+//      ⚠ The terms are SCALED, not added. overLevelT maps power
+//      14 -> 32 and raw AC is 10-26 — the same magnitude as the
+//      whole formula — so adding it pins every armoured character
+//      at max difficulty. Both new terms are measured ABOVE a
+//      fresh-arrival baseline and divided into a 0-4 band, the
+//      same width as the HP term, because AC and HP are the two
+//      survivability axes and neither should drown the other.
+//      ⚠ A FRESH ARRIVAL IS UNCHANGED TO THE DECIMAL, by
+//      construction: at the baselines both terms are zero or
+//      negative and they clamp at zero, so gear can never make the
+//      world EASIER than authored. Measured: fresh 0.000 -> 0.000,
+//      owner AC20 0.444 -> 0.542, owner AC26 0.444 -> 0.583,
+//      end-game fused 0.722 -> 0.917. Nothing saturates.
+//      Ships at HALF weight (GEAR_POWER_BLEND 0.5) so the curve
+//      moves once, visibly, and can be read off a device log
+//      before we commit. Full weight is that one token.
+//      SEVEN spawners each hand-rolled the formula — which is
+//      exactly why AC stayed missing, there was nowhere to add it
+//      once. All route through `scalePowerOf` now, taking AC from
+//      `standingAc` rather than a third re-derivation of it.
+//      ⚠ LATENT BUG FOUND AND GUARDED: getEquippedWeapon does
+//      `for (const it of player.inventory)` with no guard and
+//      throws on an inventory-less player. Several spawn paths
+//      call this inside a try/catch that swallows, so the throw
+//      would not surface as an error — it would surface as an
+//      encounter that silently never happens. Falls back to the
+//      baselines (gear term exactly 0, i.e. the old number): if we
+//      cannot see the gear we scale as if there is none rather
+//      than inventing difficulty from a guess.
+//   ⚠ 4. THE CONTRACT REFUSAL STOPS BLAMING TRAVEL. The empty-list
+//      line was "Nothing for you right now — check back after I've
+//      travelled." There is NO restock: availableFactionQuests
+//      filters a STATIC authored pool by rep and by what the
+//      player already took, so travelling changes nothing, ever.
+//      It promised a mechanic that does not exist and sent the
+//      player away to do the one thing that cannot help — the
+//      OTA-1181 class, in the one place it costs them time rather
+//      than only misinforming them. An empty list has exactly two
+//      causes needing OPPOSITE actions, so it now says which:
+//      LOCKED names the count and the CHEAPEST rung still out of
+//      reach (not the highest — telling someone two points off a
+//      rep-8 contract that they need 25 is the same unhelpfulness
+//      in a new costume); CLEARED says to try another banner.
+//      Measured: 38 of 65 faction quests are rep-gated, 5 -> 25,
+//      with EIGHT at rep 25 — above the join threshold of 20. But
+//      every faction offers exactly 2 at rep 0, so no fresh player
+//      ever meets an empty board.
+//   ⚠ 5. THE HOSTILE SPILLOVER IS METERED ON THE GAIN SIDE.
+//      Owner: "just nerf it a bit like you suggested",
+//      superseding an earlier "leave it" on the same item. Every
+//      standing LOSS cascades — allies take half, RIVALS take the
+//      inverse and GAIN. A caught theft is -10 / -5 / +5 to every
+//      rival; an extortion -6 / -3 / +3. Gifts have carried a
+//      lifetime per-faction budget since OTA-803 and this path had
+//      NOTHING, so shaking down a faction's enemies was an
+//      unbounded climb with them: Conspiracy Architects have four
+//      rivals and start at -20, and ~14 extortions of their
+//      enemies reached the join threshold, repeatable forever. Now
+//      metered against SPITE_STANDING_FACTION_CAP (10 lifetime per
+//      faction) — 20 shakedowns pay +10 once instead of +60.
+//      ⚠ ONLY THE GAINS. Being HATED stays uncapped: a capped
+//      consequence is one a player can spend past, and the raw
+//      -10 / -6 magnitudes are untouched. Same asymmetry, and the
+//      same reason, as the gift budget it mirrors.
+//      ⚠ The excess is ROLLED BACK off the standing rows, not just
+//      omitted from the log — a gain that moved the number while
+//      going unreported would be the OTA-1179 defect (a log that
+//      disagrees with the save) pointing the other way.
+//   ⚠ ALL FOUR HELD CALLS ARE NOW DISCHARGED, and each hold was
+//   INVERTED rather than deleted, so every decision is as hard to
+//   undo as the hold was.
+// New suites ota1182ScalerKnowsGear (12),
+// ota1182RefusalTellsTruth (8) and ota1182SpiteMeter (8).
+// ⚠ NOT claimed: the heavy sims. combatStress and
+// statGrowthBalanceSim PASS with this change; encounterStress's
+// skirmish-spawn test fails, and it fails IDENTICALLY on clean
+// HEAD — it is the known-red suite already documented in §5.
+// DISPLAY_VERSION 4.29.92.
+// 2026-08-07 OTA-1183 — REGEN WAS INVISIBLE ON EVERY SURFACE.
+// Owner, with a screenshot of his own inventory: "how am I
+// supposed to know I had regen, I almost sold these. this is how
+// we see them." He was wearing Echoing Steps Boots — hpRegen 2,
+// which is the ENTIRE HP_REGEN_CAP, the most HP regen the game
+// will grant from any number of pieces — and the row read
+// "AC +2 · DEX +2". Nothing anywhere said the boots were healing
+// him every action; he nearly sold them, then asked why his
+// health kept refilling.
+//   ⚠ NOT ONE ITEM. 93 of 293 armour pieces carry regen (31
+//   hpRegen, 62 staminaRegen). `previewArmor` built AC / Resists /
+//   statBonus / Durability and stopped — there was no regen branch
+//   at all, so not one of the 93 ever said so, on any surface: not
+//   the inventory row, not the item card, not the vendor list. A
+//   property the player cannot see is one they sell by accident,
+//   and on several Commons it is the best line on the item.
+//   The line names the CADENCE — "Regen: +2 HP per action" —
+//   because that is what was misjudged. It ticks once per command
+//   in submitPlayerAction, not per hour and not per rest; a bare
+//   "+2" reads as something slower, which is precisely how a
+//   capped-out passive went unnoticed for the life of the item.
+//   ⚠ FUSED PIECES SHOW IT TOO, and that is not incidental.
+//   `aggregateEquippedRegen` resolves the worn piece by NAME via
+//   findArmorByName and never consults uniqueStats, so a fused
+//   copy keeps paying out — while the fused preview branch builds
+//   its lines from the ROLL and would have dropped the only
+//   mention of it. That branch now reads ARMOR by name, the same
+//   key the payout uses. The ROLLED-instance path needed nothing:
+//   it rebuilds by keeping every line that is not AC / stat /
+//   durability, so placing the regen line before Durability
+//   carries it for free.
+// New suite ota1183RegenIsVisible (8 tests), which walks the WHOLE
+// catalogue rather than spot-checking the reported item — the
+// defect was a missing branch, so one item proves nothing.
+// ⚠ TWO CORRECTIONS TO THE RECORD, both mine, both from this
+// session's device-log reads:
+//   1. "the player has never defeated an enemy" — WRONG. The
+//      `defeated=0` in the persist line is saveTrim's KILOBYTE
+//      measurement of worldMemory.defeatedEnemies, not a count; 28
+//      short names round to 0 KB. His sheet reads 28 defeated.
+//      Read saveSizeBreakdown before quoting any of its numbers.
+//   2. There is NO HP-milestone bug. Starting HP is rollDice(5,10)
+//      + race bonus, so 29 at day 26 is an ordinary roll.
+// DISPLAY_VERSION 4.29.93.
+// 2026-08-07 OTA-1184 — THE SHEET SHOWS WHERE ITS NUMBERS CAME
+// FROM. Owner, on his own character sheet: "for AC it shows your
+// base and your buffs. HP just says HP not what my base number
+// was so I can see the progression, I didn't roll a 29 at start.
+// and instead of things given away under arbitor, it should say
+// gifts given, and if you tap it, it should show you what you gave
+// to whom and how they received it."
+// Three asks, one theme — the same one as OTA-1181 and OTA-1183:
+// the game knows something about the player it never shows them.
+//   ⚠ 1. WHERE MAX HP CAME FROM. `hpMax` is a BAKED total. Three
+//      sources add into the one field and nothing recorded which
+//      contributed what: the creation roll (rollDice(5,10) + the
+//      race bonus), distinct-kill milestones, and gear (baked on
+//      equip, stripped on unequip since OTA-796). The bar read
+//      "29/29" and the owner correctly knew he had not rolled 29.
+//      The HP row now carries "base 27 · +2 earned · +1 gear",
+//      plus how many kinds are beaten and how far the next +1 is.
+//      ⚠ NOTHING NEW IS PERSISTED — the base is recovered by
+//      SUBTRACTION (total − earned − gear), so it works on every
+//      existing save with no migration. That makes base a
+//      RESIDUAL: anything that grows hpMax in future must be added
+//      to engine/hpBreakdown at the same time, or it will land
+//      silently in "base" instead of showing as a discrepancy.
+//      ⚠ It counts DISTINCT kinds, never the lifetime tally —
+//      milestones.enemiesDefeated counts every kill and would
+//      overstate the progression on any save with grinding.
+//      MILESTONE_KILL_STEP moved to engine/hpBreakdown: a
+//      threshold the sheet QUOTES while the store AWARDS it must
+//      have one home (OTA-1179 #8 for JOIN_THRESHOLD, OTA-1181 for
+//      BUY_REP_TC_PER_STANDING, this one now).
+//   2. "N things given away" → "N gifts given". The owner's
+//      wording and the better one: "given away" reads as loss or
+//      charity when the mechanic is a gift with a named recipient
+//      and a reaction — and it is the word every OTHER surface
+//      already used (GIVE, the picker, giftBoons, giftTastes).
+//   ⚠ 3. THE ROW OPENS. npcRelations[].gifts has recorded the
+//      object by name since OTA-1083 and nothing ever read it
+//      back. Tapping the row now lists every gift, newest first,
+//      across everyone: "Cracked Lens — Halem took it as an
+//      insult · day 3 · standing −2". NOT grouped by person — the
+//      player is asking about the exchange he just made, and
+//      grouping would bury it under someone he stopped dealing
+//      with on day three.
+//      The REACTION was computed by resolveGift at give-time and
+//      then discarded, so a gift somebody LOVED was indis-
+//      tinguishable on the record from one that INSULTED them. It
+//      is recorded now.
+//      ⚠ HISTORICAL GIFTS ARE LEFT BLANK ON PURPOSE — they read
+//      "reaction not recorded" rather than a recomputed guess.
+//      OTA-1176 rewrote the entire taste table underneath those
+//      entries, so a recomputed reaction would be a confident lie
+//      about how somebody once felt. Do not backfill it.
+// New suite ota1184SheetProvenance (16 tests).
+// ⚠ ota1165's MILESTONE_KILL_STEP pin RETARGETED, not weakened:
+// it matched the constant's DECLARATION in gameStore. It now
+// asserts the EXPORTED VALUE plus the store's import of it, which
+// is strictly stronger — it survives the next move and still fails
+// if the number changes.
+// DISPLAY_VERSION 4.29.94.
+//
+// OTA-1187 — THE SET-COURSE CONTROL TELLS YOU WHAT IT DID.
+// Standing on the quarry's own outpost, the control rendered an inviting
+// button that returned in SILENCE — the only early return in
+// setTravelCourse without a voice, and the one refusal every player is
+// guaranteed to hit. `activeOpacity` dims on any tap, so a no-op and a
+// successful route looked identical. Four states now (arrived / routed /
+// busy / offer) from one engine module, so WorldScreen and ContractsScreen
+// cannot drift; only `offer` is tappable.
+// Also: the same-cell guard ran BEFORE map resolution, so an unplaceable
+// destination took the silent path instead of the explanatory one; and
+// `hadCourse` read the bounty SLATE rather than a live course, so once you
+// arrived anywhere, every later contract silently refused to route while
+// the Arbiter said "your current course holds".
+// New suite ota1187BountyCourse (14 tests).
+// DISPLAY_VERSION 4.29.97 — PATCH +3, not +1, because two OTAs shipped
+// without a bump (see the gap note below).
+// OTA-1188 — THE BOARD YOU FROZE IS THE DEAL YOU GET.
+// The GRUDGES & ALLIANCES panel showed a LIVE, symmetric relations matrix
+// that patrols move as they gut each other, while the player's standing
+// spillover read `factions.json`'s static, ASYMMETRIC allies/rivals arrays.
+// The panel was the honest one. `applyRepChange` now takes the ally/rival
+// sets a contract FROZE AT ACCEPT, so the board you read is the deal you
+// get even if those two go to war a second later.
+// FREEZE THE BOARD is the snapshot: one press discards the old one, takes a
+// fresh one and unlocks accepting; a successful accept auto-releases it, and
+// leaving the World screen releases it too (no spending a stale reading).
+// ⚠ It freezes the VIEW, never the sim — that same heartbeat roams the
+// patrols that bring a bounty's quarry to you.
+// Three refusals, all of which SPEAK: standing on the target, camping one
+// board, and the board still running (that line points at the button).
+// The deadline gained a third term — HOURS_PER_REQUIRED_KILL (6) — because
+// the patrol cooldown put a hard 6h floor between engagements and a 9-kill
+// job was getting a 3-kill job's clock.
+// New suite ota1188FrozenBoard (27 tests).
+// DISPLAY_VERSION 4.29.98.
+// OTA-1189 — ARRIVING SOMEWHERE MEANS FINDING SOMEONE.
+// A bounty's real cost was never travel, it was WAITING: maybePatrolAmbush
+// won't fire twice inside a 6h cooldown and only fires at all if a patrol of
+// the right faction is within 2 tiles, so a player could arrive on time, play
+// perfectly and meet nobody. OTA-1188 widened the DEADLINE, which bought time
+// to keep waiting instead of removing the wait.
+// Standing on a held contract's target cell now places three groups of the
+// quarry at 3-5 tiles, ONE PER QUADRANT, as ordinary roaming patrols.
+// Nothing new engages them - they are picked up by maybePatrolAmbush, which
+// already skips the hunt roll for a bounty target. The seeding has to be
+// undetectable or it stops feeling like a hunt and starts feeling like a
+// spawner, so the arrival beat never admits it.
+// One-shot per CONTRACT (not per location), and wired at three call sites so
+// a player who walks the last tiles by typed cardinal is covered too.
+// New suite ota1189QuarrySeed (16 tests).
+// DISPLAY_VERSION 4.29.99.
+// OTA-1190/1191/1192 — THREE OTAs, ONE PUSH (§3 forbids a second push inside
+// the CI window; branch concurrency would cancel the first run).
+// 1190: scaleHuntBoss scaled on hpMax ALONE - 1.0x, i.e. NOTHING, under 30 max
+//   HP, and blind to stats/weapon/AC. It was the spawner OTA-1182 missed. Now
+//   reads the shared overLevelT curve, ceiling 1.6 -> 2.2. ROUTE no longer
+//   offered on a PAUSED contract. And two lines that lied about the clock:
+//   the rest refusal said 4h when rest is 8, and the course banner called
+//   every tile 'a day'. Both were live when the owner's contract lapsed.
+//   NOTE: his '15 HP monster' was a wild Scrap Drone, NOT a hunt boss - the
+//   weakest of 18 hunt targets is 30 HP and most are 100-360.
+// 1191: the Arbiter no longer types in front of you (the streaming tail is
+//   gone; the working-indicator stays, generations run 6.6-11.6s). Plus the
+//   road odometer: +1 max stamina per 40 credits, a cardinal step worth 2,
+//   NO ceiling - the ~7 cap is the distinct-destination track, not this one.
+// 1192: HP regen is PER TILE, not per action. Measured: enemies hit a flat
+//   25% (AC capped), ~4 lands after armor, averaging ~1 HP/round against +2
+//   of regen - the player GAINED HP mid-fight and never fell below 26 of 32
+//   across eight combats. Combat regen is now exactly zero; the road still
+//   mends. Stamina regen stays per-action on purpose.
+// ⚠ NOT DONE, deliberately, one lever per session: dodge is a ~95% free x2
+//   at DEX 19, and GEAR_POWER_BLEND is still 0.5. Do not stack them blind.
+// New suites ota1190HuntFixes, ota1191RoadAndQuiet, ota1192RegenPerTile.
+// DISPLAY_VERSION 4.29.102 (PATCH +3 for three OTAs; NOT a MINOR roll — that is
+// reserved for closing a feature wave, and three fixes is not one).
+// OTA-1193 — DODGE GETS A COOLDOWN, AND THE BUTTON SHOWS IT.
+// Dodge resolves as d20 + DEX >= the enemy's attack TOTAL, so at DEX 19 only
+// a natural 1 fails: the log shows 5 dodges, 5 wins (incl. a nat 2 and a nat
+// 3), each granting a x2-dice opening that rolled 'slashing x2.25 for 52'.
+// Alternating dodge->attack put ~half of all attacks at double dice for no
+// risk. DODGE_COOLDOWN_ROUNDS = 3 caps the UPTIME; the dodge maths is
+// untouched.
+// ROUNDS, NOT SECONDS - a deliberate push-back on the owner's '10-15s'. He
+// acts every 1-2s in combat, so a 15s lock costs 7-10 actions and makes the
+// optimal play 'put the phone down'. Dead air is worse than the mashing.
+// The bar: two flat layers, blue filling from the LEFT, no gradient and no
+// Animated - the width JUMPS one step per action. Chip stays tappable while
+// red; the engine buzzes and names the beats left.
+// New suite ota1193DodgeCooldown (16 tests).
+// DISPLAY_VERSION 4.29.103.
+// OTA-1194 — THE THREE COMBAT-FEEL LEVERS GET RUNGS ON THE LADDER.
+// Owner: 'if I'm tuning this to be normal difficulty level just above the
+// bottom, can you use this as a baseline and tune the other levels
+// accordingly' - then, when I deferred it: 'so you didn't add the 3 new
+// levers to the other levels?'. Asked twice, so it is built.
+// The balance pass ALREADY carried to every tier - 'owed' is the identity
+// row, so the other three are defined as multiples of it. The defect ran the
+// other way: dodge cooldown, per-tile regen and the gear-aware scaler were
+// GLOBAL constants, so the gentlest tier took the identical nerf an
+// over-geared run did.
+// Three new dials, all no-ops at 'owed':
+//   dodgeLock  0 / 3 / 4 / 5 rounds (salvage has NO cooldown - the
+//              pre-1193 game, on the tier that asked for a safety net)
+//   mend       x1.5 / x1 / x0.75 / x0.5 on PER-TILE HP regen only
+//   gearBlend  x0.5 / x1 / x1.5 / x2 on GEAR_POWER_BLEND, so bury_me
+//              reaches the full designed 1.0 OTA-1182 held back
+// All three are in the CUSTOM picker, so 'bury me, but leave my dodge alone'
+// is expressible like every other system.
+// ⚠ gearBlend KNOWINGLY crosses this file's 'no dial scales enemy HP or
+// damage' rule, recorded in pressure.ts the way OTA-1136 recorded its own
+// reversal. The rule forbids DAMAGE SPONGES; this is the opposite failure
+// mode, and the fight still ends in the same number of rounds.
+// New suite ota1194DifficultyLadder (26 tests). ota1182 and ota1193
+// assertions RETARGETED, not weakened - both got tighter.
+// DISPLAY_VERSION 4.29.104.
+// OTA-1195 — MEMORY WARNINGS, APP-STATE CHURN, AND A FREEZE DETECTOR.
+// Owner, after an unexplained hard lock on iPhone: 'add in memory warning
+// codes to the log so you can track them, whatever debug information you
+// need. add that to whatever you can immediately put in as an OTA and push
+// it. I want that done now.'
+// WHAT THE FREEZE REPORT PROVED, then ran out of: the qwen-watchdog ticked
+// every ~10s straight THROUGH the freeze and a save landed mid-way, so the
+// JS thread was alive while the screen was dead. That rules out an infinite
+// loop and every pure-logic suspect - and then the log had nothing left. No
+// record of a tap arriving, of the screen painting, or of memory pressure.
+// ⚠⚠ NOTHING listened for memoryWarning anywhere in the app - checked, not
+// assumed. On iOS the OS warns before it stalls and again before it kills;
+// that was the best signal the platform offers and it went in the bin.
+// Five instruments, no behaviour change:
+//   memoryWarning listener - ordinal (the COUNT is the severity), gap since
+//     the last, plus qwen status / reload count / save KB as context
+//   freeze watch - TWO clocks. setTimeout is serviced by JS alone; rAF is
+//     driven by the native frame callback. Neither alone can tell a frozen
+//     screen from a wedged engine; the PAIR can.
+//   appstate trail - EVERY transition incl. 'inactive'. On iOS that is the
+//     evidence, not the noise.
+//   tap breadcrumb - logged BEFORE any handler. Tap logged + no parser line
+//     = engine hung; no tap line = screen frozen.
+//   reinit timing - ms and resulting status, so an expensive-and-futile
+//     reload is told from an expensive-and-working one.
+// ⚠ DIAGNOSTICS ONLY, DELIBERATELY. The same log shows a REAL defect - an
+// iOS 'active' transition wipes the Qwen backoff ladder and immediately
+// kicks a ~400MB reload, and iOS fires 'active' for a notification banner,
+// so 3 of the 6 reloads in that window were incidental twitches. That fix
+// is HELD to the next OTA on purpose: instrument first, then fix, or the
+// next device log cannot say which change moved it.
+// New suite ota1195RuntimePressure (35 tests).
+// DISPLAY_VERSION 4.29.105.
+// OTA-1196 — STOP ASKING iOS FOR MEMORY IT HAS ALREADY REFUSED.
+// Second device report, and the symptom ESCALATED: 'I hit investigate and
+// the game crashed to home screen', then a second freeze needing a hard
+// stop. The crash is the more diagnostic of the two, dated to the second:
+//   12:46:27.037 qwen-watchdog: not ready ('failed'); reinitializing (#2)
+//   12:46:27.931 player: investigate the floor
+//   12:46:28.008 cognitive neutral (70ms)
+//   [gone - voice engine re-inits 10s later, i.e. a fresh launch]
+// ⚠ 'Last JS crash: none recorded' - a crash to the home screen with NO JS
+// error captured is a NATIVE death, and on iOS the overwhelmingly common
+// native death is the OS reclaiming a process that asked for too much too
+// fast. A ~400MB load racing an inference is exactly that shape.
+// FOUR CHANGES, all defensible on their own terms:
+//   1. THE MODEL LOAD TAKES THE NATIVE-ML LOCK. Completion took it
+//      (OTA-459), release took it (OTA-1146); the ~400MB CONTEXT LOAD -
+//      bigger than either - was the one native call going in unserialized.
+//      At ML_PRIORITY_LLM, so a voice line still outranks a reload.
+//   2. A MEMORY WARNING IS ANSWERED. OTA-1195 logged it and did NOTHING.
+//      iOS raises it so an app can hand memory back before the OS takes the
+//      process instead; we now dispose the context. Qwen off beats app dead.
+//   3. AN iOS TWITCH NO LONGER BUYS A RELOAD. 'active' fires for a
+//      notification banner / Control Center / app switcher, and reset the
+//      backoff + kicked a load. Now a real 'background' must precede it.
+//   4. A LIFETIME CEILING (8) on reloads per stretch. The ladder spread
+//      retries out but never stopped them.
+// ⚠ THE OTA-1195 HOLD IS OVER, and the reason is on the record: that OTA
+// shipped instruments only so the next log would measure the bug untouched.
+// This report arrived still on 1194 - the instruments never ran - and the
+// symptom went from a freeze to a lost session. Sitting on a mitigation for
+// methodological purity while the owner loses runs is the wrong trade.
+// ⚠ CAUSE IS STILL A HYPOTHESIS: no memory warning has been OBSERVED yet.
+// New suite ota1196MemoryDefence (17 tests). ota1055/1107/1195 assertions
+// RETARGETED, not weakened - each keeps the claim its own name makes.
+// DISPLAY_VERSION 4.29.106.
+// OTA-1197 — THE UPDATE PATH SAYS WHAT IT DID.
+// Owner, stuck on 1194 while 1195 and 1196 sat published and unreachable:
+// 'it hasn't been able to pull an update after that... so whatever we've
+// done since it pulled the three lever update, it's probably something
+// stopping it.'
+// ⚠ SERVER SIDE WAS VERIFIED CLEAN both times: Channel 'hal2001' (ios) AND
+// 'preview' (ios) published at runtimeVersion 2.4.1 — exactly what his
+// TestFlight build asks for. So the refusal is happening ON the device, and
+// the device could not say one word about why.
+// TWO THINGS, BOTH ADDITIVE:
+//   1. The boot-front OTA check now logs to the DEVICE log: what expo
+//      thinks it is running (updateId/channel/rt), every status line from
+//      the check+download, every error, and the final result. It previously
+//      swallowed all of it into console.warn, which no pasted bug report
+//      has ever carried, and passed silent:true which discarded the status
+//      and error callbacks entirely.
+//   2. A test that actually IMPORTS and RUNS aboutSummary. OTA-1195 added
+//      `import { runtimePressureSnapshot } from '../state/gameStore'` to it
+//      — a 44k-line store pulled into the bug-report path — and NOTHING
+//      executed that chain: the 1195 suite reads the file as TEXT. A grep
+//      proves a string is present; it cannot prove a module loads, and a
+//      bundle that dies on startup is silently rolled back by iOS, which
+//      looks identical to 'it never downloaded'. It loads clean, so that
+//      was not the cause — but the gap was real and is now closed.
+// ⚠ NOT ONE LINE OF UPDATE CONTROL FLOW CHANGED. Same call, same options,
+// same branches. This is the one path where a clever fix that goes wrong
+// leaves the player unable to receive the correction.
+// New suite ota1197BugReportLoads (10 tests).
+// DISPLAY_VERSION 4.29.107.
+// OTA-1198 — THE OTA-1196 FIX WAS BUILDING A LOOP. THE INSTRUMENTS CAUGHT IT.
+// First device log on 1197, and it indicts 1196 in its own words - 40s:
+//   11:08.99 ⚠⚠ MEMORY WARNING #2 - qwen='loading' · reloads=3
+//   11:09.03 memory: released the Qwen context (~400MB)
+//   11:09.88 ⚠⚠ MEMORY WARNING #3 (0.9s later)
+//   11:12.02 reinitializing (attempt #4)
+//   11:12.41 ⚠⚠ MEMORY WARNING #4 - qwen='downloading' · reloads=4
+//   ... through ⚠⚠ MEMORY WARNING #7 · reloads=7 at 11:47
+// ⚠⚠ SEVEN ~400MB ALLOCATIONS IN FORTY SECONDS, AND MY FIX WAS THE ENGINE.
+// The loop: watchdog loads -> iOS complains -> the 1196 handler disposes to
+// free memory -> the dispose marks the IN-FLIGHT load stale (OTA-1107
+// lifecycleGen) -> it settles 'idle' -> watchdog sees not-ready -> loads
+// again. Every 'reinit #N settled' line in that log reads status='idle',
+// which is the loop's fingerprint.
+// ⚠ FREEING MEMORY UNDER PRESSURE IS STILL RIGHT; doing it with nothing to
+// stop the reload was not. This adds the missing interlock, it does not
+// revert 1196:
+//   - a 90s QUIET WINDOW after any warning, set BEFORE the dispose (the
+//     ordering is the fix - after it leaves the same window open)
+//   - STAND DOWN for the session after 3 warnings. A device that refused
+//     three times is not going to say yes on the eighth ask.
+// ⚠ WHAT WORKED, recorded too: the 1196 ceiling bounded it at 8 and the
+// backoff stretched 10s->20s->40s. Bounded thrash is still thrash, but the
+// guards did their job, and without 1195's instruments none of this was
+// visible at all.
+// ⚠ ALSO SETTLED BY THE SAME LOG: the device reads channel 'preview', NOT
+// hal2001 - and that is the workflow's BEST-EFFORT publish line, i.e. the
+// only channel reaching this device is the one whose failure goes unnoticed.
+// New suite ota1198MemoryInterlock (11 tests).
+// DISPLAY_VERSION 4.29.108.
+// OTA-1199 — THE INSTRUMENT STOPS WHEN NOBODY IS LOOKING.
+// Owner sent a React Native / Hermes memory checklist. Item 2 — 'useEffect
+// missing cleanups: subscriptions, intervals, or event listeners that never
+// get cleared' — was MINE, from OTA-1195 the same afternoon: a
+// self-recursing requestAnimationFrame loop, a rescheduling setTimeout, and
+// TWO AppState listeners, with no teardown anywhere.
+// ⚠ AS A LEAK IT IS SMALL - two listener objects, and Hermes reclaims the
+// per-frame closure. It was never going to account for 400MB.
+// ⚠⚠ AS A BEHAVIOUR IT WAS WRONG: that loop woke the JS thread 60x/sec for
+// the whole life of the process INCLUDING BACKGROUNDED, and the detector
+// then threw those samples away (it only judges while foregrounded). Pure
+// waste - and a backgrounded app doing steady work is what iOS reclaims
+// first. The instrument was making the thing it measures slightly worse.
+// TWO FIXES:
+//   1. stopRuntimePressureWatch() exists, and the STARTER now calls it
+//      instead of hand-rolling a copy that had already drifted.
+//   2. The frame clock starts/stops with the app's foreground state.
+// ⚠ ON THE REST OF THE CHECKLIST, recorded so it is not re-derived: the
+// dominant memory term here is NATIVE, not the JS heap. A ~400MB llama.cpp
+// context is invisible to Hermes GC, so global.gc() and the Hermes sampling
+// profiler would show a flat healthy heap while the device dies. Good RN
+// advice, aimed at the wrong pool for this bug.
+// New tests folded into ota1198MemoryInterlock (15 total). ota1195
+// assertions RETARGETED, not weakened - both came out stronger.
+// DISPLAY_VERSION 4.29.109.
+export const OTA_BUILD_ID = '2026-08-10-1226-texts-all-routes';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-10-1225-enemy-techniques';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-10-1224-host-handin';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-10-1223-veil-gate';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-10-1222-site-loot';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-10-1221-offline-lore';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-10-1218-aether-techniques-live';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1217-exit-gate';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1216-ambiguous-title';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1215-market-broker';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1214-aether-techniques';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1213-labyrinth-heart';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1212-siren-charisma';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1211-courier';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1210-contract-fixes';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1209-site-skin';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1208-contract-broker';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1207-story-perks';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1206-collection-payoff';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1205-apple-signal';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1204-why-it-failed';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1203-qwen-success-checked';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1202-honest-memory-line';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1201-save-backup';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-09-1200-context-ledger';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1199-instrument-teardown';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1198-memory-interlock';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1197-update-telemetry';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1196-memory-defence';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1195-runtime-pressure';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1194-difficulty-ladder';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1193-dodge-cooldown';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1192-regen-per-tile';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1191-quiet-arbiter-road';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1190-hunts-and-clock-lies';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1189-arriving-finds-someone';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1188-the-board-you-froze';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-08-1187-set-course-speaks';
+// ⚠⚠ 1185 AND 1186 SHIPPED UNDER THE 1184 STAMP — A REAL GAP, RECORDED RATHER
+// THAN QUIETLY CLOSED. Both were pushed to HAL and golem without step 3 of the
+// change loop: this constant was never bumped. So any device log captured
+// between the 1184 push and this one reports `2026-08-07-1184-sheet-provenance`
+// while actually running 1185 (one price for a tile + the 24h+2.5/tile bounty
+// deadline) or 1186 (the first-contract primer, Jakar Nine-Halls).
+// ⚠ DO NOT TRUST A BUILD ID IN THAT WINDOW to identify which code a tester was
+// on — use the OTA publish timestamps. The two ids they SHOULD have carried are
+// listed so the gap is visible instead of merely absent.
+// UNSTAMPED (shipped, id never bumped): '2026-08-07-1186-first-contract-ropes';
+// UNSTAMPED (shipped, id never bumped): '2026-08-07-1185-one-price-for-a-tile';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1184-sheet-provenance';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1183-regen-is-visible';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1182-scaler-and-refusal';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1181-standing-text-truth';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1180-no-ambient-standing';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1179-faction-wiring';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1178-from-the-log';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1177-gift-mode';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1176-vendor-tastes';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-07-1175-ready-to-hand-in';

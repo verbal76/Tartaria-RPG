@@ -997,13 +997,21 @@ export function ExplorationScreen() {
 
       <TutorialTarget area="feed" style={styles.feed}>
         <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
+        {/* ⚠ OTA-1191 — THE LIVE TEXT IS NO LONGER SHOWN. Owner: "while the arbiter is
+            typing live, can we keep that hidden and just see the end result on the screen
+            like the rest of the text."
+            It used to tail-render `partialArbiterText` token by token with a ▍ cursor, so
+            a generated line got read TWICE — once as it was written, once filed into the
+            feed. Worse: a line that was later DISCARDED had already been read in full
+            before a template replaced it, and the device log shows ~3 wasted generations a
+            session (`cancelled:player-acted-again`, `empty→template`).
+            ⚠ THE INDICATOR STAYS, DELIBERATELY. This was the ONLY signal the engine is
+            working, and measured on-device generations run 6.6-10.9 SECONDS. Dropping it
+            entirely buys silence at the price of looking frozen. No words, no cursor —
+            just a sign that someone is composing. */}
         {isGenerating && (partialArbiterText || partialArbiterText === '') && (
           <View style={styles.streamingTail}>
-            <Text style={styles.streamingPrefix}>The Arbiter:</Text>
-            <Text style={styles.streamingText}>
-              {partialArbiterText}
-              <Text style={styles.streamingCursor}>▍</Text>
-            </Text>
+            <Text style={styles.streamingPrefix}>The Arbiter is choosing their words…</Text>
           </View>
         )}
       </TutorialTarget>
@@ -1652,6 +1660,18 @@ export function ExplorationScreen() {
           // read "investigate the trap" now) — no engine behavior
           // change.
           submit(`investigate ${target}`);
+        }}
+        // ⚠ OTA-1206 — INVESTIGATE ALL. Deliberately loops the SAME submit path a player
+        // tapping each chip would take, rather than adding a bulk resolver.
+        // `salvageAllAmbient` is a ~270-line aggregator built to fix SALVAGE ALL's
+        // interleaved output; investigate resolves through hooks, ambient nouns, items,
+        // puzzles and elevation gates, and re-implementing that ordering in bulk would be
+        // a new set of failure modes for a cosmetic gain. Looping the real path cannot
+        // resolve anything differently from the manual taps it replaces — which is the
+        // property that matters for a completability fix.
+        onInvestigateAll={(nouns) => {
+          setSearchOpen(false);
+          for (const n of nouns) submit(`investigate ${n}`);
         }}
         onCancel={() => setSearchOpen(false)}
       />

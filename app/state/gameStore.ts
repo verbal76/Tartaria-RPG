@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { withArticle, withArticleCap, anOrA, theCap, theLower, describeEnemyPartyCap } from '../engine/grammar';
 import type {
   PlayerCharacter,
+  FactionStanding, // OTA-1182 — meterSpiteGains rewrites standing rows directly
   WorldMemory,
   GameLogEntry,
   ScreenName,
@@ -68,6 +69,7 @@ import {
   hostileHuntChance, // NB: pressure.worstStandingFaction is deliberately NOT
   // imported — gameStore already has a local one with a different shape.
   scaledCorruptionGain, scaledWeatherBite,
+  dialOf, scaledRegen, // OTA-1194 — the three combat-feel dials
   type PressureTier,
 } from '../engine/pressure';
 // OTA-1090 — Phase 5: the Arbiter becomes someone.
@@ -95,6 +97,12 @@ import {
   getCrashedSlotIds,
 } from '../diagnostics/saveLoadHealth';
 import { loadLastCrash } from '../diagnostics/lastCrash';
+// OTA-1195 — memory warnings, app-state churn and the two-clock freeze detector.
+import {
+  FREEZE_SAMPLE_MS, APPSTATE_TRAIL_MAX,
+  freezeVerdict, freezeVerdictLine, memoryWarningLine, appStateLine,
+  type FreezeVerdict, type PressureSnapshot,
+} from '../diagnostics/runtimePressure';
 import {
   listSlots,
   loadSlot,
@@ -139,6 +147,9 @@ import {
   pickEncounterFromLadder,
   findEnemyByName,
   enemyScalePower,
+  // OTA-1182 — the fallback when gear cannot be read; these make gearPowerTerm 0.
+  AC_POWER_BASELINE,
+  DMG_POWER_BASELINE,
   scaleEncounterForContext,
   scaledEnemyForContext,
   rollExtraPackMembers,
@@ -172,6 +183,10 @@ import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrat
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
 import { setQwenTelemetrySink, setQwenDiscardSink, noteQwenDiscarded, qwenCallCount, qwenTelemetrySummary } from '../ai/generation/qwenTelemetry';
+// OTA-1200 — live llama-context counter. Instrument only; changes no behaviour.
+// OTA-1202 — the ledger is now READ as well as fed: the memory handler compares the
+// release count across a dispose so it can report what it actually freed.
+import { setContextLedgerSink, contextLedger, APPROX_CONTEXT_MB } from '../ai/generation/contextLedger';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
 import {
   LOCATION_TO_MACRO,
@@ -240,6 +255,8 @@ import {
   hubRoomOpenAir,
   hubEntryRoomId,
   hubNameForFaction,
+  hubSkinFactionFor,
+  hubOwnerFaction,
   resolveHubTravel,
   isLeaveHubCommand,
 } from '../engine/hub';
@@ -265,6 +282,13 @@ import {
   raiseMenace, decayedMenace, menaceIntimidateDcBonus, menaceEncounterBonus,
 } from '../engine/menace';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc, standingAc, equippedGearAc } from '../engine/equipment';
+// OTA-1184 — the milestone step lives with the code that EXPLAINS it on the sheet,
+// so the award and the explanation can never quote different numbers.
+import { MILESTONE_KILL_STEP } from '../engine/hpBreakdown';
+// OTA-1185 — one owner for what a tile costs the clock.
+import { TILE_HOURS, travelHoursFor } from '../engine/travelTime';
+// OTA-1190 — the course banner now quotes travel in the same units the deadline uses.
+import { formatWindow } from '../engine/bountyPrimer';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
 import { applyLegacyItemRenames } from '../engine/itemMigrations';
@@ -313,10 +337,12 @@ import {
   getStanding,
   meetsJoinThreshold,
   JOIN_THRESHOLD,
+  BUY_REP_TC_PER_STANDING, // OTA-1181 — was a local const in buyFromVendor
 } from '../engine/factions';
 import {
   findFactionQuestById,
   availableFactionQuests,
+  repLockedFactionQuests, // OTA-1182 — why the board is empty, so the refusal can say
   fuzzyFindFactionQuest,
   factionQuestReady,
 } from '../engine/factionQuests';
@@ -349,7 +375,9 @@ import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
 import { resolveLootItem } from '../engine/crafting';
 import { canonicalItemKind, canonicalItemRarity, canonicalItemTags } from '../engine/crafting';
 import { rollBossSpoils } from '../engine/bossLoot';
-import { enemyPowerScore } from '../engine/powerRating';
+// OTA-1182 — avgDamageNotation is the SAME damage proxy playerPowerScore uses, so the
+// difficulty curve and the Power gauge price a weapon identically.
+import { enemyPowerScore, avgDamageNotation } from '../engine/powerRating';
 import { levenshtein } from '../engine/editDistance';
 import { matchLocationByName } from '../engine/locationMatch';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
@@ -398,7 +426,7 @@ import {
   describeWhisperStage,
 } from '../engine/whispers';
 import { TUTORIAL_STEPS, TUTORIAL_SELF_DEFENCE, type TutorialStep } from '../components/tutorialSteps';
-import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome } from '../engine/collectables';
+import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome, storyCompletedBy, completedStoryCount, assembledStory, CHARACTER_STORIES } from '../engine/collectables';
 
 interface Concept {
   id: string;
@@ -422,6 +450,103 @@ function getAllConcepts(): Concept[] {
 // Match a player's "what is X / explain X / tell me about X" target text
 // against the concepts knowledge base. First substring hit on any keyword
 // wins; returns null if nothing matches so the caller can fall back.
+/** ⚠⚠ OTA-1226 (PUNCHLIST P16, doors 2+3) — THE ONE TEACHER for a held Procedure Text.
+ *  Reads the text: already-known keeps it (sellable), INT short keeps it (banked, never
+ *  wasted — a purchase that ends in nothing is the punch list's founding defect), a clean
+ *  read TEACHES and consumes it. Called from BOTH verbs that reach a held object —
+ *  `use` (the item path) and `read` (which parses as investigate) — so the two doors
+ *  cannot drift. Returns true when it consumed the action. */
+function teachFromProcedureText(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  player: PlayerCharacter,
+  item: InventoryItem,
+): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+  const tech = AT.findTechniqueByTextName(item.name);
+  if (!tech) return false;
+  if ((player.knownTechniques ?? []).includes(tech.id)) {
+    get().appendLog('system', `You already carry the ${tech.name}. The text has nothing left to teach you — a collector might pay for it.`);
+    return true;
+  }
+  const stats = effectiveStats(player);
+  if (stats.intelligence < tech.intRequired) {
+    get().appendLog('arbiter', `"The ${tech.name} needs INT ${tech.intRequired} and you are running ${stats.intelligence}," the Arbiter says. "Keep the text. Grow into it."`);
+    return true;
+  }
+  set((st) => (st.player ? {
+    player: {
+      ...st.player,
+      knownTechniques: [...(st.player.knownTechniques ?? []), tech.id],
+      inventory: st.player.inventory
+        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => i.quantity > 0),
+    },
+  } : st));
+  get().appendLog('reward', `✦ You work through the ${tech.name} procedure line by line until your hands know it. Technique learned — type \`channel ${tech.name.toLowerCase()}\`. The text is spent in the learning.`);
+  void get().persist();
+  return true;
+}
+
+/** OTA-1226 — resolve a typed target against the Procedure Texts actually IN THE PACK.
+ *  Token-subset match; two candidates REFUSE (the P12 rule) rather than guessing which
+ *  procedure the player meant to study. */
+function findHeldProcedureText(
+  player: PlayerCharacter,
+  targetText: string,
+): { item: InventoryItem | null; ambiguous: string[] } {
+  const texts = player.inventory.filter((i) => i.name.startsWith('Procedure Text:') && i.quantity > 0);
+  if (texts.length === 0) return { item: null, ambiguous: [] };
+  const words = targetText.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
+  const hits = texts.filter((i) => {
+    const toks = i.name.toLowerCase().split(/[^a-z0-9]+/);
+    return words.length > 0 && words.every((w) => toks.includes(w));
+  });
+  if (hits.length === 1) return { item: hits[0]!, ambiguous: [] };
+  if (hits.length > 1) return { item: null, ambiguous: hits.map((i) => i.name) };
+  return { item: null, ambiguous: [] };
+}
+
+/** ⚠⚠ OTA-1221 (PUNCHLIST P17) — one place that decides a lore answer was EARNED.
+ *
+ *  Three different paths answer a lore question (keyword concepts, the embedder, and the
+ *  offline bank match), and before this only the middle one credited the player. Rather
+ *  than repeat the bookkeeping three times — which is how two of them would drift back out
+ *  of agreement — they all call this.
+ *
+ *  ⚠ DISTINCT CONCEPTS, NOT ASKS. The old tick counted every answer, so asking the same
+ *  question three times earned the title. A title called Scholar of Forgotten Lore should
+ *  mean three different things read; growth-through-repetition has been closed twice this
+ *  session already and opening two more doors onto it would have made a farm of it. */
+function creditLoreRead(get: StoreGet, set: StoreSet, conceptKey: string): void {
+  const seen = get().player?.loreConceptsRead ?? [];
+  if (seen.includes(conceptKey)) return;
+  set((st) => (st.player
+    ? { player: { ...st.player, loreConceptsRead: [...(st.player.loreConceptsRead ?? []), conceptKey] } }
+    : st));
+  // arb45 — Scholar of Forgotten Lore: each deciphered text counts (3 needed).
+  recordTitleProgress(get, set, { loreRead: 1 });
+}
+
+/** ⚠ OTA-1222 (PUNCHLIST P15) — this place's own authored loot rows, for the area-search
+ *  substitution. Resolved through `ladderLootPool` so the unique-quest-reward exclusion and
+ *  the name resolution are the SAME ones `pickLootFromLadder` uses. Returns [] when the
+ *  scene has no ladder micro-micro, which leaves search behaving exactly as before. */
+/** ⚠ EXPORTED for the live wiring test. The unit suite builds a `siteLoot` array by hand,
+ *  so it proves the roller and says nothing about whether the STORE hands one over — if
+ *  this returned [] on every real scene the feature would ship doing nothing with green
+ *  tests behind it (the OTA-1209 lesson). Asserting on a search OUTCOME cannot cover it
+ *  either: a noun can only be searched once per room, so a sampling loop is refused after
+ *  the first try. This is the seam, so this is what the test reads. */
+export function siteLootForScene(get: StoreGet): { name: string; rarity: import('../engine/types').Rarity }[] {
+  const mmId = get().currentScene?.microMicroId;
+  if (!mmId) return [];
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const enc = require('../engine/encounter') as typeof import('../engine/encounter');
+  return enc.ladderLootPool(findMicroMicroAnywhere(mmId));
+}
+
 function findConcept(targetText: string | undefined): Concept | null {
   if (!targetText) return null;
   const t = targetText.toLowerCase();
@@ -1224,6 +1349,44 @@ export function withSkyreacherChartOffer(vendor: VendorInstance | null, wm: Worl
   return { ...vendor, offers: [...vendor.offers, { itemName: pick.name, price: pick.price, quantity: 1 }] };
 }
 
+/** ⚠ OTA-1218 — THE ONE WAY INTO AETHER TECHNIQUES (PUNCHLIST P16). Owner: *"buy from
+ *  friendly vendors you developed repor with."*
+ *
+ *  Modelled on `withSkyreacherChartOffer` directly above — same shape, same place in
+ *  `beginScene`, same "append one conditional row" contract — with one deliberate
+ *  difference: **there is no die roll.** A chart is a bonus you may or may not stumble on;
+ *  this is the ONLY route into a whole feature, and a route that appears 18% of the time
+ *  is indistinguishable from a route that does not exist. A faction's vendors always carry
+ *  that faction's procedure, so a player can go and get it.
+ *
+ *  The gates live in `techniqueTextOfferFor` so they can be tested without a store. */
+export function withTechniqueTextOffer(
+  vendor: VendorInstance | null,
+  player: PlayerCharacter | null,
+): VendorInstance | null {
+  if (!vendor || !player) return vendor;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { hasFactionRapport } = require('../engine/factionRapport') as typeof import('../engine/factionRapport');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { effectiveStats } = require('../engine/equipment') as typeof import('../engine/equipment');
+  // ⚠ nativeFaction first: OTA-1209 skins a site to its OWNER, and the Irma path rewrites
+  // `faction` to the visitor's. The procedure belongs to whoever the vendor really answers
+  // for, or a Mud Monarch would be sold the Architects' text by an Architect wearing his
+  // colours.
+  const faction = vendor.nativeFaction ?? vendor.faction;
+  const offer = AT.techniqueTextOfferFor({
+    vendorFaction: faction,
+    hasRapport: hasFactionRapport(player.completedFactionQuestIds, faction),
+    knownTechniques: player.knownTechniques,
+    effectiveInt: effectiveStats(player).intelligence,
+  });
+  if (!offer) return vendor;
+  if (vendor.offers.some((o) => o.itemName === offer.itemName)) return vendor;
+  return { ...vendor, offers: [...vendor.offers, offer] };
+}
+
 // arb48 — Labyrinth of Shadows (Wayfarer of the Lost Paths). Both helpers are
 // store-driving wrappers around the pure engine in engine/labyrinth.ts.
 type StoreGet = () => GameStore;
@@ -1270,12 +1433,104 @@ function handleLabyrinthStep(getStore: StoreGet, setStore: StoreSet, trimmed: st
   if (res.reachedFinish) {
     const clean = lab.isCleanRun(res.run);
     setStore((s) => (s.player ? { player: { ...s.player, labyrinthRun: undefined } } : s));
+
+    // ⚠⚠ OTA-1213 (PUNCHLIST P13) — THE MAZE HAS AN ENDING NOW.
+    //
+    // What it was: a clean run printed one line and ticked the Wayfarer counter; **any
+    // other run printed two lines and nothing else** — no TC, no item, no progress — and
+    // the run object was discarded. A maze walked with one wrong turn paid exactly what a
+    // maze walked with nine paid. That is an ENDS IN NOTHING on a challenge P5 confirmed
+    // is live, and the owner's call was: *"we need an ending to p13 the labyrinth. it
+    // should already award a title, make it have a lore enriching ending."*
+    //
+    // ⚠ THE LORE IS THE PAYOUT, and it was sitting in the data the whole time.
+    // `locations.json` on Iskan-Veil: *"The Conspiracy Architects' hidden city — a maze of
+    // false doors and overlaid corridors. Every map of Iskan-Veil is wrong by design; the
+    // true Core seat is behind the door you didn't see."* And `concepts.json` names its
+    // Core's function among the nine: **masking.** So the reveal at the heart is not a
+    // consolation prize bolted on — it is the answer to what this place IS. The labyrinth
+    // is not a puzzle guarding the Core. **The labyrinth is the Core still working.**
+    //
+    // ⚠⚠ ONCE PER CHARACTER, AND THAT IS LOAD-BEARING. `enterLabyrinth` carries no attempt
+    // gate — the maze is fully re-enterable — so a per-run reward would be farmable, and
+    // the fix for an ends-in-nothing must not become a farm. The reveal and its keepsake
+    // are gated on `labyrinthHeartSeen`; the Wayfarer counter is unaffected because its
+    // threshold is >= 1, so re-earning it is already a no-op.
+    const heartSeen = !!getStore().player?.labyrinthHeartSeen;
     if (clean) {
       getStore().appendLog('world', "The corridors open onto a still chamber at the maze's heart. You walked it clean — the true path never left your hands.");
       recordTitleProgress(getStore, setStore, { labyrinthCleanRuns: 1 });
     } else {
       const n = res.run.wrongTurns;
       getStore().appendLog('world', `You reach the heart of the maze — but you strayed ${n} time${n === 1 ? '' : 's'} onto false paths along the way.`);
+    }
+
+    if (!heartSeen) {
+      // ⚠ Three beats, not one wall of text: AdventureFeed renders separate entries as
+      // real paragraphs, and this is the largest single piece of lore the challenge holds.
+      getStore().appendLog('world',
+        'The chamber is small, and perfectly plain. No door but the one you came through. '
+        + 'No seat, no Core, no Guardian — a floor of dressed stone and a low ring of benches, '
+        + 'as though the Architects meant people to sit here and wait for something.');
+      getStore().appendLog('world',
+        'On the wall opposite, cut shallow and without ceremony: a map of the labyrinth. '
+        + 'You have just walked it, so you know at a glance that it is wrong. Not damaged, '
+        + 'not old — WRONG, corridor for corridor, every turn mirrored from the one you took. '
+        + 'Someone carved a lie here carefully enough to be mistaken for a courtesy.');
+      getStore().appendLog('arbiter',
+        '"Iskan-Veil masked the grid," the Arbiter says quietly. "Nine Cores, nine tasks — '
+        + 'Asgardar held the spire, Ostragar the cadence, and this place hid the rest. That '
+        + 'was its work." A pause. "You were told the maze guards the Core seat. It does not. '
+        + 'The maze IS the Core seat, still running, still masking, a thousand years after '
+        + 'the water. Every map of this city is wrong because something down here is still '
+        + 'making them wrong. You did not solve it. You outlasted one of its lies."');
+
+      // ⚠ A keepsake, not a reward roll. Quest-tagged so it can never be sold, gifted,
+      // scrapped or fused (engine/questItems.ts) — the point is that the player keeps the
+      // thing that proves the map lied, not that they can pawn it.
+      const rubbing: InventoryItem = {
+        id: freshInstanceId('labyrinth_heart'),
+        name: 'Rubbing of the False Map',
+        kind: 'relic',
+        rarity: 'Legendary',
+        quantity: 1,
+        tags: ['quest', 'story', 'keepsake', 'lore'],
+        description:
+          "Charcoal on hide, taken from the wall at the heart of the Labyrinth of Shadows. "
+          + "It shows the maze mirrored — every turn the wrong way round. Iskan-Veil's Core "
+          + "masked the Tartarian grid, and it has never stopped: this is what it is still "
+          + "producing, patiently, for nobody. Proof that the lie is maintained.",
+      };
+      const grant = grantItem(getStore().player!.inventory, rubbing);
+      setStore((st) => (st.player ? { player: {
+        ...st.player,
+        inventory: grant.inventory,
+        labyrinthHeartSeen: true,
+      } } : st));
+      if (grant.accepted > 0) {
+        getStore().appendLog('reward', `✦ ${rubbing.name} — you take a rubbing before you leave.`);
+      } else {
+        // ⚠ A full pack must not silently eat the one artifact of the ending. The flag is
+        // still set (the lore was delivered and should not repeat), so this says plainly
+        // that the item was lost rather than leaving the player to notice its absence.
+        getStore().appendLog('world',
+          `Your pack is full — there is nowhere to put the rubbing, and you leave it on the wall.`);
+      }
+      recordMemorableEvent(getStore, setStore, {
+        kind: 'labyrinth_heart',
+        text: 'stood at the heart of the Labyrinth of Shadows and read the false map',
+        locationId: 'iskan_veil',
+        locationName: 'Iskan-Veil',
+      });
+    } else {
+      getStore().appendLog('world',
+        'The still chamber again, and the false map on its wall — mirrored, patient, wrong. '
+        + 'Whatever is making it has not tired.');
+    }
+
+    // ⚠ The steer toward a clean run comes AFTER the ending, so an imperfect first walk
+    // reads as "you learned something, now go do it properly" rather than as a refusal.
+    if (!clean) {
       getStore().appendLog('arbiter', '"You found the center, not the path. The Wayfarer\'s name is for those who never lose it. Walk it again — cleaner."');
     }
     return true;
@@ -1598,7 +1853,22 @@ const QWEN_REINIT_HANG_MS = 150_000;
 //      so even a pathological state costs one reload a minute, not twelve.
 //      A fresh return to foreground resets the backoff for one fast retry.
 const QWEN_WATCHDOG_FREE_RETRIES = 4;
+// ⚠⚠ OTA-1196 — A LIFETIME CEILING ON RELOADS, BECAUSE QWEN OFF BEATS THE APP DEAD.
+// The backoff ladder spreads retries out but never stops them, so a device that simply
+// cannot hold the ~400MB context retries forever — each attempt a fresh allocation spike,
+// on the platform whose response to that is to kill the process. The owner's iPhone took
+// a crash straight to the home screen with "Last JS crash: none recorded" (a NATIVE
+// death) and, on the run before, a hard freeze. After this many failures we stop asking
+// and play on templates, which is a game that works rather than a game that dies.
+// ⚠ Reset on a REAL foreground return, so a later session is never punished for this one.
+const QWEN_MAX_REINITS_PER_STRETCH = 8;
 let qwenReinitInFlightSince = 0;
+let qwenReinitCeilingLogged = false;
+// ⚠ OTA-1196 — 'inactive' IS NOT 'background'. iOS reports `inactive` for a notification
+// banner, a Control Center pull and a peek at the app switcher; only `background` means
+// the app was genuinely put away and the context genuinely disposed. Tracking the two
+// separately is what stops an incidental twitch from buying a 400MB reload.
+let qwenTrulyBackgrounded = false;
 let qwenReinitAttempts = 0;
 let qwenBackoffLevel = 0;
 let qwenHeldWhileBackgroundLogged = false;
@@ -1675,6 +1945,65 @@ function runQwenHealthCheck(
         return false;
       }
       qwenHeldWhileBackgroundLogged = false;
+      // ⚠⚠ OTA-1198 — THE MEMORY INTERLOCK, AND IT EXISTS BECAUSE OTA-1196 BUILT A LOOP.
+      //
+      // The owner's device log, 40 seconds of it, caught by the instruments OTA-1195 added:
+      //     11:08.99  ⚠⚠ MEMORY WARNING #2 — qwen='loading' · reloads=3
+      //     11:09.03  memory: released the Qwen context (~400MB)
+      //     11:09.88  ⚠⚠ MEMORY WARNING #3 (0.9s later) — reloads=3
+      //     11:12.02  reinitializing (attempt #4)
+      //     11:12.41  ⚠⚠ MEMORY WARNING #4 — qwen='downloading' · reloads=4
+      //     … through ⚠⚠ MEMORY WARNING #7 · reloads=7 at 11:47
+      //
+      // ⚠ EVERY reinit settled to 'idle' — `reinit #N settled in 2676ms → status='idle'` —
+      // because the dispose OTA-1196 added marks an in-flight load STALE (OTA-1107's
+      // lifecycleGen). So: watchdog loads → OS complains → we free it mid-load → watchdog
+      // sees 'idle' → loads again. **Seven ~400MB allocations in forty seconds, and the
+      // fix was the engine.** Freeing memory under pressure is still right; doing it with
+      // nothing to stop the reload was not.
+      //
+      // ⚠ The ceiling below bounded it at 8 and the backoff stretched it to 40s, so it was
+      // not unbounded — but bounded thrash is still thrash, and this is what stops it.
+      if (rpQwenStoodDownForMemory || Date.now() < rpMemoryPressureUntil) {
+        // ⚠⚠ OTA-1204 — TWO MESSAGES, TWO LIFETIMES, AND THEY WERE SHARING ONE FLAG.
+        // `rpMemoryQuietLogged` is reset by EVERY memory warning, which is correct for the
+        // 90-second quiet notice (each warning genuinely opens a new window) and wrong for
+        // the permanent stand-down, whose whole claim is that it happens once. The owner's
+        // 2026-08-09 log on build 1203 shows it three times:
+        //     03:53:17.845  qwen-watchdog: 3 memory warnings this session — STANDING DOWN for good.
+        //     03:53:52.943  qwen-watchdog: 5 memory warnings this session — STANDING DOWN for good.
+        //     03:53:57.963  qwen-watchdog: 6 memory warnings this session — STANDING DOWN for good.
+        // ⚠ The BEHAVIOUR was right — no reload followed any of them. Only the log repeated,
+        // and a line that says "for good" three times reads as a loop that is not happening,
+        // which is precisely the wrong thing for a log whose job is to be trusted.
+        if (rpQwenStoodDownForMemory) {
+          if (!rpStandDownLogged) {
+            rpStandDownLogged = true;
+            get().appendLog('debug',
+              `qwen-watchdog: ${rpMemoryWarnings} memory warnings this session — STANDING DOWN for good. `
+              + `This device will not hold the context; narration stays on templates.`);
+          }
+        } else if (!rpMemoryQuietLogged) {
+          rpMemoryQuietLogged = true;
+          get().appendLog('debug',
+            `qwen-watchdog: holding reloads for ${Math.round(MEMORY_PRESSURE_QUIET_MS / 1000)}s — `
+            + `the OS just asked for memory back and a reload is the biggest thing we could do to it.`);
+        }
+        return false;
+      }
+      // ⚠⚠ OTA-1196 — THE CEILING. See QWEN_MAX_REINITS_PER_STRETCH: past this many
+      // failed reloads we stop allocating and let the game run on templates. Logged once,
+      // not per tick, so the log says it plainly and then goes quiet.
+      if (qwenReinitAttempts >= QWEN_MAX_REINITS_PER_STRETCH) {
+        if (!qwenReinitCeilingLogged) {
+          qwenReinitCeilingLogged = true;
+          get().appendLog('debug',
+            `qwen-watchdog: ${qwenReinitAttempts} reloads without recovery — STANDING DOWN. `
+            + `Each attempt is a ~400MB allocation and this device is refusing them; `
+            + `narration stays on templates until the app is backgrounded and returns.`);
+        }
+        return false;
+      }
       // Not ready and not making progress (idle / failed / dormant ready-but-
       // dead / wedged): kick a fresh reinit. Keeps retrying so a transient
       // memory-pressure failure doesn't strand Qwen for the session — but
@@ -1698,11 +2027,23 @@ function runQwenHealthCheck(
       if (qwenBackoffLevel > 0) {
         get().appendLog('debug', `qwen-watchdog: ${qwenReinitAttempts} attempts without recovery — backing off (next check in ~${Math.round(qwenRecoveringDelayMs() / 1000)}s).`);
       }
+      // ⚠ OTA-1195 — TIME THE RELOAD AND NAME WHAT IT SETTLED INTO. The reported freeze
+      // showed six attempts that each went idle → idle, i.e. possibly costing a ~400MB
+      // allocation and achieving nothing. Whether a reload is expensive-and-working or
+      // expensive-and-futile is the difference between tuning the cadence and removing
+      // the call, and the old log could not tell them apart.
+      const rpAttemptNo = qwenReinitAttempts;
+      const rpReinitStarted = Date.now();
       void q.forceReinitialize()
-        .then(() => { qwenReinitInFlightSince = 0; })
+        .then(() => {
+          qwenReinitInFlightSince = 0;
+          let after = '?';
+          try { after = typeof q.getStatus === 'function' ? q.getStatus() : '?'; } catch { /* best effort */ }
+          get().appendLog('debug', `qwen-watchdog: reinit #${rpAttemptNo} settled in ${Date.now() - rpReinitStarted}ms → status='${after}'.`);
+        })
         .catch((err: unknown) => {
           qwenReinitInFlightSince = 0;
-          get().appendLog('debug', `qwen-watchdog: reinit attempt #${qwenReinitAttempts} threw: ${String(err)}`);
+          get().appendLog('debug', `qwen-watchdog: reinit attempt #${rpAttemptNo} threw after ${Date.now() - rpReinitStarted}ms: ${String(err)}`);
         });
       return false;
     }
@@ -1724,6 +2065,15 @@ function startQwenWatchdog(
   qwenReinitAttempts = 0;
   qwenBackoffLevel = 0;
   qwenHeldWhileBackgroundLogged = false;
+  // OTA-1196 — the ceiling and the true-background flag reset with everything else, so a
+  // re-hydrate starts from a clean slate rather than inheriting the last run's refusals.
+  qwenReinitCeilingLogged = false;
+  qwenTrulyBackgrounded = false;
+  // OTA-1198 — the memory interlock resets with the rest of the ledger.
+  rpMemoryPressureUntil = 0;
+  rpQwenStoodDownForMemory = false;
+  rpMemoryQuietLogged = false;
+  rpStandDownLogged = false;
 
   const schedule = (ms: number): void => {
     if (qwenWatchdogTimer !== null) clearTimeout(qwenWatchdogTimer);
@@ -1748,11 +2098,300 @@ function startQwenWatchdog(
       // OTA-1107 — a fresh return to foreground clears the backoff ladder:
       // the player is present again, so the first retry should be fast even
       // if the last background stretch burned through the free attempts.
-      if (next === 'active') { qwenBackoffLevel = 0; tick(); }
+      // ⚠⚠ OTA-1196 — BUT ONLY AFTER A REAL BACKGROUND STRETCH, AND THIS IS THE DEFECT
+      // THE PREVIOUS OTA DELIBERATELY LEFT IN PLACE TO MEASURE. `active` fires on iOS for
+      // a notification banner, a Control Center pull, or a peek at the app switcher —
+      // iOS bounces active → inactive → active for all of them, and Android does not. The
+      // owner's freeze log caught it three times, each pair ~350ms apart:
+      //     12:30:19.917  holding revival until foreground
+      //     12:30:20.266  reinitializing (attempt #3)
+      // Half his reloads that window were incidental twitches, not the player returning,
+      // and OTA-1107's own comment says "kicking a ~400MB context load from the
+      // background is guaranteed wasted work". iOS walked straight through that rule.
+      // Requiring a genuine `background` first is what closes it.
+      if (next === 'background') { qwenTrulyBackgrounded = true; return; }
+      if (next !== 'active') return; // `inactive` alone is a twitch, not a return.
+      if (!qwenTrulyBackgrounded) return;
+      qwenTrulyBackgrounded = false;
+      qwenBackoffLevel = 0;
+      // ⚠ The ceiling resets HERE and only here: a genuine put-away-and-return is the
+      // player asking for a fresh start, and it is also when iOS has actually reclaimed
+      // whatever it needed. A twitch is not that.
+      qwenReinitAttempts = 0;
+      qwenReinitCeilingLogged = false;
+      tick();
     }) as { remove: () => void } | null;
   } catch { /* AppState unavailable (headless/test) — the poll alone still recovers */ }
 
   schedule(QWEN_WATCHDOG_HEALTHY_MS);
+}
+
+// ── OTA-1195 — RUNTIME PRESSURE INSTRUMENTS ───────────────────────────────
+// Owner: "add in memory warning codes to the log so you can track them, whatever debug
+// information you need." Three holes in the freeze report, three instruments. See
+// engine-side reasoning in app/diagnostics/runtimePressure.ts.
+let rpMemoryWarnings = 0;
+let rpLastMemoryWarningAt: number | null = null;
+let rpAppStateTrail: string[] = [];
+let rpAppState: string = 'active';
+let rpAppStateSince = 0;
+let rpLastVerdict: FreezeVerdict = 'ok';
+let rpWorstFrameGapMs = 0;
+let rpWorstJsGapMs = 0;
+let rpUiStalls = 0;
+let rpLastFrameAt = 0;
+let rpLastJsAt = 0;
+let rpFrameRaf: number | null = null;
+let rpSampleTimer: ReturnType<typeof setTimeout> | null = null;
+let rpMemorySub: { remove: () => void } | null = null;
+let rpAppStateSub: { remove: () => void } | null = null;
+let rpLastSaveKb: number | null = null;
+// ⚠⚠ OTA-1198 — MEMORY-PRESSURE QUIET WINDOW. See the block in runQwenHealthCheck: the
+// OTA-1196 dispose and the watchdog formed a loop that fired SEVEN ~400MB loads in 40
+// seconds on the owner's device. This is the interlock between them.
+let rpMemoryPressureUntil = 0;
+let rpQwenStoodDownForMemory = false;
+let rpMemoryQuietLogged = false;
+/** ⚠ OTA-1204 — SEPARATE FROM `rpMemoryQuietLogged`, and that separation is the fix.
+ *  A memory warning re-arms the quiet notice (a new window really did open) but must NOT
+ *  re-arm the permanent one. Only the watchdog restart clears this. */
+let rpStandDownLogged = false;
+/** ⚠ After a warning, no reload for this long. Longer than the backoff ladder's first
+ *  rungs on purpose — the point is to let the OS settle, not to shave a retry. */
+const MEMORY_PRESSURE_QUIET_MS = 90_000;
+/** ⚠ And after this many warnings in one session, stop asking for the session. A device
+ *  that has refused three times is telling us something; the eighth ask is not going to
+ *  be the one it says yes to, and each ask is another 400MB spike. */
+const MEMORY_WARNINGS_BEFORE_STANDDOWN = 3;
+
+/** Read by the bug-report exporter so the counts land in the HEADER, not only in 146 log
+ *  lines someone has to reconstruct by hand. */
+export function runtimePressureSnapshot(): PressureSnapshot {
+  return {
+    memoryWarnings: rpMemoryWarnings,
+    lastMemoryWarningAt: rpLastMemoryWarningAt,
+    appStateTrail: rpAppStateTrail,
+    lastVerdict: rpLastVerdict,
+    worstFrameGapMs: rpWorstFrameGapMs,
+    worstJsGapMs: rpWorstJsGapMs,
+    uiStalls: rpUiStalls,
+  };
+}
+
+/** ⚠ Called from the persist path so a memory-warning line can name the save size without
+ *  rebuilding the blob — measuring it here would itself allocate, which is the last thing
+ *  to do while the OS is asking for memory back. */
+export function noteSaveKb(kb: number): void { rpLastSaveKb = kb; }
+
+/** ⚠ THE BREADCRUMB. The freeze report had NO record of a tap between the last salvage and
+ *  90 seconds of silence, so there was no way to tell "the tap never arrived" (screen
+ *  frozen) from "the tap arrived and the work hung" (engine frozen). This is logged the
+ *  instant a control is touched, BEFORE any work — that ordering is the entire point, and
+ *  a future edit that moves it after the handler destroys the signal. */
+export function logUiTap(label: string): void {
+  try {
+    useGameStore.getState().appendLog('debug', `ui: tap "${label}"`);
+  } catch { /* never let instrumentation break a control */ }
+}
+
+/** ⚠ OTA-1199 — the frame clock, hoisted so app-state can pause it. A self-recursing rAF
+ *  is the cheapest way to notice frames stopping, but only while anyone is looking. */
+function rpStartFrameClock(): void {
+  if (rpFrameRaf !== null) return; // already running — never stack two loops
+  if (typeof requestAnimationFrame !== 'function') return;
+  const frameTick = (): void => {
+    rpLastFrameAt = Date.now();
+    try { rpFrameRaf = requestAnimationFrame(frameTick) as unknown as number; } catch { rpFrameRaf = null; }
+  };
+  try { rpFrameRaf = requestAnimationFrame(frameTick) as unknown as number; } catch { rpFrameRaf = null; }
+}
+
+function rpStopFrameClock(): void {
+  if (rpFrameRaf === null) return;
+  if (typeof cancelAnimationFrame === 'function') {
+    try { cancelAnimationFrame(rpFrameRaf); } catch { /* ignore */ }
+  }
+  rpFrameRaf = null;
+}
+
+/** ⚠⚠ OTA-1199 — THE TEARDOWN OTA-1195 SHIPPED WITHOUT.
+ *  Two AppState subscriptions, a rescheduling timer and an rAF loop, and nothing anywhere
+ *  stopped any of them. It is a small leak in bytes — the listeners are two objects and
+ *  Hermes reclaims the per-frame closure — but "started forever, stopped never" is the
+ *  shape that becomes a real one the moment somebody calls the starter twice from a new
+ *  place. Idempotence covered that; an explicit stop is what makes it true by construction
+ *  rather than by the starter remembering to be careful. */
+export function stopRuntimePressureWatch(): void {
+  if (rpSampleTimer !== null) { clearTimeout(rpSampleTimer); rpSampleTimer = null; }
+  rpStopFrameClock();
+  if (rpMemorySub) { try { rpMemorySub.remove(); } catch { /* ignore */ } rpMemorySub = null; }
+  if (rpAppStateSub) { try { rpAppStateSub.remove(); } catch { /* ignore */ } rpAppStateSub = null; }
+}
+
+function startRuntimePressureWatch(
+  get: () => GameStore,
+  _set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+): void {
+  // Idempotent: a re-hydrate must not stack a second set of timers and listeners.
+  // ⚠ OTA-1199 — goes through the SAME teardown a caller would use, so the two can never
+  // drift. The hand-rolled copy this replaces already differed from what it should clear.
+  stopRuntimePressureWatch();
+
+  const now = Date.now();
+  rpLastFrameAt = now;
+  rpLastJsAt = now;
+  rpAppStateSince = now;
+  try { rpAppState = String(AppState.currentState ?? 'active'); } catch { rpAppState = 'active'; }
+
+  // ⚠⚠ THE ONE THE OWNER ASKED FOR, AND NOTHING IN THIS APP LISTENED FOR IT BEFORE.
+  // On iOS the OS warns before it stalls the app and again before it kills it, so this is
+  // the highest-value signal available for a frozen-but-alive report — and it was being
+  // discarded. React Native surfaces it on AppState for both platforms.
+  try {
+    rpMemorySub = AppState.addEventListener('memoryWarning', () => {
+      rpMemoryWarnings += 1;
+      const t = Date.now();
+      const since = rpLastMemoryWarningAt == null ? null : t - rpLastMemoryWarningAt;
+      rpLastMemoryWarningAt = t;
+      let qwenStatus: string | undefined;
+      try { qwenStatus = typeof qwen.getStatus === 'function' ? qwen.getStatus() : undefined; } catch { /* best effort */ }
+      // OTA-1202 — the OTHER native model. Read lazily and behind its own guard so the
+      // voice subsystem can never break the memory instrument.
+      let kokoroPhase: string | undefined;
+      try {
+        const p = require('../voice/PiperTTSManager') as typeof import('../voice/PiperTTSManager');
+        kokoroPhase = p.getKokoroState().phase;
+      } catch { /* best effort */ }
+      try {
+        get().appendLog('debug', memoryWarningLine(rpMemoryWarnings, since, {
+          appState: rpAppState,
+          qwenStatus,
+          kokoroPhase,
+          qwenReinitAttempts,
+          saveKb: rpLastSaveKb ?? undefined,
+        }));
+      } catch { /* never let instrumentation throw into the host */ }
+      // ⚠⚠ OTA-1196 — AND NOW WE ACTUALLY ANSWER IT. OTA-1195 logged the warning and did
+      // NOTHING, which is only half a fix: iOS raises this precisely so an app can hand
+      // memory back BEFORE the OS takes the process instead. The single largest thing we
+      // hold is the ~400MB llama context, we have a `dispose()` for it, and narration
+      // degrades to templates without it — the game keeps playing.
+      // ⚠ Qwen switched off is enormously better than the app dying. The owner's report
+      // is a crash straight to the home screen with "Last JS crash: none recorded", i.e.
+      // a native death, and losing a session costs far more than losing prose.
+      // ⚠ The watchdog is deliberately NOT suppressed here: it reads the real status and
+      // will bring Qwen back once there is room, which is the behaviour we want — release
+      // under pressure, recover when the pressure lifts.
+      // ⚠⚠ OTA-1198 — AND TELL THE WATCHDOG TO STAND DOWN BEFORE FREEING ANYTHING.
+      // Setting this BEFORE the dispose is load-bearing: the dispose marks any in-flight
+      // load stale, the watchdog's next tick sees 'idle', and without this flag it kicks a
+      // fresh ~400MB load straight back into the pressure that just fired the warning.
+      rpMemoryPressureUntil = Date.now() + MEMORY_PRESSURE_QUIET_MS;
+      rpMemoryQuietLogged = false;
+      if (rpMemoryWarnings >= MEMORY_WARNINGS_BEFORE_STANDDOWN) rpQwenStoodDownForMemory = true;
+      try {
+        if (typeof (qwen as { dispose?: () => Promise<void> }).dispose === 'function') {
+          // ⚠⚠ OTA-1202 — SNAPSHOT BEFORE, COMPARE AFTER. THIS LINE USED TO LIE, AND IT
+          // LIED TO ME FOR A WEEK.
+          //
+          // It printed "released the Qwen context (~400MB)" unconditionally once dispose()
+          // resolved — whether or not there was anything to release. The owner's 2026-08-09
+          // report on OTA-1200 prints it FIVE TIMES, and every one of those warnings reads
+          // `qwen='idle'` or `qwen='failed'`, i.e. no model was loaded and the call freed
+          // nothing:
+          //     02:50:45.915  ⚠⚠ MEMORY WARNING #1 — qwen='failed' · reloads=0
+          //     02:50:45.964  memory: released the Qwen context (~400MB)   ← freed nothing
+          //     02:51:36.232  ⚠⚠ MEMORY WARNING #5 — qwen='idle'  · reloads=0
+          //     02:51:36.293  memory: released the Qwen context (~400MB)   ← freed nothing
+          //
+          // ⚠ I QUOTED THESE LINES AS EVIDENCE in the OTA-1198 analysis. A diagnostic that
+          // states an outcome it never checked is worse than no diagnostic, because it is
+          // read as measurement — which is the whole failure this week's rule exists to
+          // stop, sitting inside the instrumentation itself.
+          const before = contextLedger().released;
+          const statusAtWarning = qwenStatus ?? 'unknown';
+          void (qwen as { dispose: () => Promise<void> }).dispose()
+            .then(() => {
+              try {
+                const freed = contextLedger().released > before;
+                get().appendLog('debug', freed
+                  ? `memory: released the Qwen context (~${APPROX_CONTEXT_MB}MB est) in response to the warning; narration falls back to templates until it recovers.`
+                  // ⚠⚠ THE DIAGNOSTIC SENTENCE THIS WHOLE INVESTIGATION NEEDED. If the OS is
+                  // asking for memory back while we hold no model, the model is not what it
+                  // is asking about, and the search moves.
+                  : `memory: NOTHING TO RELEASE — no model was loaded (qwen='${statusAtWarning}'), so this freed 0 bytes. `
+                    + `The pressure is coming from something else.`);
+              } catch { /* ignore */ }
+            })
+            .catch(() => { /* a failed release must never escalate a memory warning into a crash */ });
+        }
+      } catch { /* ditto */ }
+    }) as { remove: () => void } | null;
+  } catch { /* AppState unavailable (headless/test) */ }
+
+  // ⚠ EVERY TRANSITION, `inactive` INCLUDED — that is the evidence, not the noise. The
+  // reported freeze showed three `active` bounces ~350ms apart, each of which bought a
+  // fresh ~400MB model reload, and without the transitions written down the watchdog log
+  // read as a self-contradiction ("holding revival" then reinitializing 350ms later).
+  try {
+    rpAppStateSub = AppState.addEventListener('change', (next) => {
+      const t = Date.now();
+      const prev = rpAppState;
+      const nextStr = String(next);
+      if (nextStr === prev) return;
+      try { get().appendLog('debug', appStateLine(prev, nextStr, t - rpAppStateSince)); } catch { /* ignore */ }
+      rpAppStateTrail = [...rpAppStateTrail, nextStr].slice(-APPSTATE_TRAIL_MAX);
+      rpAppState = nextStr;
+      rpAppStateSince = t;
+      // A fresh foreground restarts both clocks: a backgrounded app legitimately stops
+      // painting, and counting that as a render stall would cry wolf every time the
+      // player checks a message.
+      // ⚠⚠ OTA-1199 — THE FRAME CLOCK STOPS WHEN THE APP DOES.
+      // OTA-1195 ran this rAF loop for the entire life of the process, backgrounded or
+      // not — 60 wakeups a second that the detector then THREW AWAY, because it only
+      // judges while foregrounded. Pure waste, and a backgrounded app doing steady work is
+      // what iOS reclaims first. On the device we are trying to keep alive, the instrument
+      // was making the measurement slightly worse.
+      if (nextStr === 'active') {
+        rpLastFrameAt = t; rpLastJsAt = t;
+        rpStartFrameClock();
+      } else {
+        rpStopFrameClock();
+      }
+    }) as { remove: () => void } | null;
+  } catch { /* AppState unavailable (headless/test) */ }
+
+  // Clock A — frames. Driven by the NATIVE frame callback, so it stops when the render
+  // side stops even while JS keeps running.
+  // ⚠ OTA-1199 — started and stopped with the app's foreground state; see the AppState
+  // handler above and rpStopFrameClock/rpStartFrameClock below.
+  rpStartFrameClock();
+
+  // Clock B — plain JS. Serviced by the JS thread alone. The PAIR is the discriminator;
+  // neither clock on its own can tell a frozen screen from a wedged engine.
+  const sample = (): void => {
+    const t = Date.now();
+    const jsGap = t - rpLastJsAt - FREEZE_SAMPLE_MS;
+    const frameGap = t - rpLastFrameAt;
+    rpLastJsAt = t;
+    // Only judge while the app is actually foregrounded — see the note above.
+    if (rpAppState === 'active') {
+      const v = freezeVerdict(Math.max(0, jsGap), frameGap);
+      if (frameGap > rpWorstFrameGapMs) rpWorstFrameGapMs = frameGap;
+      if (jsGap > rpWorstJsGapMs) rpWorstJsGapMs = Math.max(0, jsGap);
+      // ⚠ Log on the EDGE, not every sample. A sustained freeze would otherwise write a
+      // line every 5 seconds and bury the transition that actually matters.
+      if (v !== 'ok' && v !== rpLastVerdict) {
+        if (v === 'ui-stalled' || v === 'both-stalled') rpUiStalls += 1;
+        try { get().appendLog('debug', freezeVerdictLine(v, Math.max(0, jsGap), frameGap)); } catch { /* ignore */ }
+      } else if (v === 'ok' && rpLastVerdict !== 'ok') {
+        try { get().appendLog('debug', `freeze watch: recovered — painting again after ${Math.round(rpWorstFrameGapMs)}ms quiet.`); } catch { /* ignore */ }
+      }
+      rpLastVerdict = v;
+    }
+    rpSampleTimer = setTimeout(sample, FREEZE_SAMPLE_MS);
+  };
+  rpSampleTimer = setTimeout(sample, FREEZE_SAMPLE_MS);
 }
 
 // Casual-look narration: the player asked to look around but didn't target
@@ -2162,6 +2801,38 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   // storyIntroSeen backfills TRUE: the crawl introduces a new character, it
   // must never ambush someone forty days into a run. REPLAY OPENING exists
   // for saves that want to read it.
+  // ⚠ OTA-1179 — EVERY FACTION GETS A ROW, and legacy race ids get healed.
+  //
+  // `applyRepChange` is a pure `.map()` — it can update a row but it can never
+  // CREATE one. Rows are minted in exactly one place, character creation. So a
+  // faction id absent from the array reads 0 forever AND silently absorbs every
+  // grant aimed at it: the OTA-1178 failure mode with a completely different
+  // cause. Latent today (nine factions, none added since the array was authored),
+  // and it is a one-line landmine — **adding a tenth faction would give every
+  // existing save a faction it could never gain standing with.** Backfilled here
+  // so that stays impossible rather than merely unlikely.
+  //
+  // Row ids are canonicalised on the same pass: a save that recorded standing
+  // under one of the four legacy RACE ids gets it merged onto the real faction
+  // (keeping whichever value is further from neutral, so neither an earned
+  // positive nor an earned grudge is thrown away by the merge).
+  if (Array.isArray(out.factionStanding)) {
+    const merged = new Map<string, number>();
+    for (const row of out.factionStanding) {
+      if (!row?.factionId) continue;
+      const id = canonicalFactionId(row.factionId) ?? row.factionId;
+      const prev = merged.get(id);
+      const val = row.standing ?? 0;
+      merged.set(id, prev === undefined ? val : (Math.abs(val) > Math.abs(prev) ? val : prev));
+    }
+    for (const f of FACTIONS) if (!merged.has(f.id)) merged.set(f.id, f.startingStanding ?? 0);
+    const rebuilt = Array.from(merged, ([factionId, standing]) => ({ factionId, standing }));
+    // Only replace when something actually changed — a no-op rewrite on every
+    // load would churn the save and defeat the persist-size work.
+    const same = rebuilt.length === out.factionStanding.length
+      && rebuilt.every((r) => out.factionStanding.some((o) => o.factionId === r.factionId && o.standing === r.standing));
+    if (!same) out = { ...out, factionStanding: rebuilt };
+  }
   if (!out.storyMotive) {
     out = {
       ...out,
@@ -3425,6 +4096,121 @@ function captureBossVictoryLine(channel: string, text: string): void {
  *  lie that reads as a bug. */
 type InjectedParty = { elite: Enemy | null } | null;
 
+/** ⚠ OTA-1182 — THE GAIN SIDE OF A HOSTILE CASCADE IS METERED. THE LOSS SIDE IS NOT.
+ *
+ *  Every standing LOSS cascades through `applyRepChange`: allies take half, and rivals
+ *  take the INVERSE — so they gain. A caught theft is −10 to the victim, −5 to their
+ *  allies and **+5 to every rival**; a successful extortion is −6 / −3 / **+3**. Gifts
+ *  have carried a lifetime per-faction budget since OTA-803
+ *  (`GIFT_STANDING_FACTION_CAP`), and this path had nothing — so shaking down a
+ *  faction's enemies was an unbounded way to climb with them. Conspiracy Architects
+ *  have four rivals and start at −20; roughly fourteen extortions of their enemies
+ *  reached the join threshold, repeatable forever.
+ *
+ *  ⚠ ONLY THE GAINS ARE CAPPED, and the asymmetry is the whole point — the same shape
+ *  the gift path uses and for the same reason. Being HATED must stay uncapped:
+ *  consequences should not have a ceiling, and a capped loss would let a player be
+ *  hostile for free once the budget ran out. Being LOVED BY PROXY is what gets a
+ *  budget, because it is a reward nobody aimed at you.
+ *
+ *  ⚠ The excess is ROLLED BACK off the standing rows, not merely omitted from the log
+ *  — an over-budget gain that still moved the number while going unreported would be
+ *  the OTA-1179 defect (a log that disagrees with the save) pointing the other way.
+ *  The returned `changed` list is trimmed to match, so the feed shows exactly what
+ *  landed. A gain clamped to zero disappears from both. */
+const SPITE_STANDING_FACTION_CAP = 10;
+
+type RepChanged = { factionId: string; delta: number; newStanding: number };
+
+function meterSpiteGains(
+  get: () => GameStore,
+  set: (partial: (s: GameStore) => Partial<GameStore>) => void,
+  result: { standing: FactionStanding[]; changed: RepChanged[] },
+): { standing: FactionStanding[]; changed: RepChanged[] } {
+  if (!result.changed.some((c) => c.delta > 0)) return result;
+  const granted = { ...(get().worldMemory.spiteStandingGranted ?? {}) };
+  let rows = result.standing.map((r) => ({ ...r }));
+  const out: RepChanged[] = [];
+  let touched = false;
+  for (const c of result.changed) {
+    if (c.delta <= 0) { out.push(c); continue; }
+    const spent = granted[c.factionId] ?? 0;
+    const allowed = Math.max(0, Math.min(c.delta, SPITE_STANDING_FACTION_CAP - spent));
+    if (allowed === c.delta) {
+      granted[c.factionId] = spent + allowed;
+      out.push(c);
+      continue;
+    }
+    touched = true;
+    const excess = c.delta - allowed;
+    rows = rows.map((r) => (r.factionId === c.factionId
+      ? { ...r, standing: r.standing - excess }
+      : r));
+    if (allowed > 0) {
+      granted[c.factionId] = spent + allowed;
+      out.push({ ...c, delta: allowed, newStanding: c.newStanding - excess });
+    }
+  }
+  if (touched || out.some((c) => c.delta > 0)) {
+    set((st) => ({ worldMemory: { ...st.worldMemory, spiteStandingGranted: granted } }));
+  }
+  return { standing: rows, changed: out };
+}
+
+/** ⚠ OTA-1182 — ONE ANSWER TO "HOW STRONG IS THIS CHARACTER", ASKED IN ONE PLACE.
+ *
+ *  SEVEN call sites each hand-rolled `enemyScalePower(Math.max(str, dex, int),
+ *  hpMax)`. That is eight copies of a formula, which is how the AC term went missing
+ *  for as long as it did — there was nowhere to add it once. This is the only thing
+ *  that builds a scale power now, so the gear terms reach every spawner that scales:
+ *  wild encounters, faction raids, static bosses, climb ambushes, rest ambushes and
+ *  the scripted spawn effect, all at the same weight.
+ *
+ *  ⚠ AC comes from `standingAc`, NOT from a local re-derivation. That is the same
+ *  trimmed number the player reads on their sheet and the same one `applyEnemyCounter`
+ *  defends at — OTA-1156 exists because two surfaces disagreed about AC, and adding a
+ *  third spelling of it here would rebuild that bug inside the difficulty curve.
+ *  Scene-conditional racial/title AC is deliberately NOT included: it swings by room,
+ *  and an enemy roster that re-scales when you step indoors is worse than one that is
+ *  slightly conservative. */
+function scalePowerOf(player: PlayerCharacter): number {
+  const base = Math.max(
+    player.stats.strength, player.stats.dexterity, player.stats.intelligence,
+  );
+  // ⚠ THIS READ MUST NOT BE ABLE TO THROW, AND THE FIRST CUT OF IT COULD.
+  //
+  // `getEquippedWeapon` does `for (const it of player.inventory)` with no guard, so a
+  // player object without an inventory raises `player.inventory is not iterable`.
+  // That is not hypothetical: encounterStress builds exactly such a fixture, and the
+  // throw took down the whole SPAWN — `stepDirection` is called inside a `try {} catch
+  // {}` there, so 200 consecutive attempts produced no enemy at all and the only
+  // symptom was `spawned=false`. A difficulty PROXY that can abort an encounter is a
+  // far worse bug than the one this OTA set out to fix.
+  //
+  // ⚠ The fallback is the BASELINES, which make `gearPowerTerm` exactly 0 — i.e. the
+  // pre-OTA-1182 number. If we cannot see what the player is carrying, we scale as if
+  // they carry nothing rather than inventing difficulty from a guess.
+  //
+  // ⚠ OTA-1194 — THE TIER'S WEIGHT ON THE GEAR TERMS IS READ HERE, at the one choke
+  // point, for exactly the reason the choke point exists: seven spawners route through
+  // this function, and adding a dial at each of them is how the AC term went missing for
+  // as long as it did. `dialOf`, not `profileOf`, so a CUSTOM character who left "The
+  // world reads your kit" unchecked gets the 'owed' weight for it.
+  const tierBlend = dialOf(player, 'gearBlend');
+  let gear = { ac: AC_POWER_BASELINE, avgWeaponDamage: DMG_POWER_BASELINE, tierBlend };
+  try {
+    const weapon = getEquippedWeapon(player, 'main');
+    gear = {
+      ac: standingAc(player),
+      avgWeaponDamage: avgDamageNotation(weapon?.damageDice),
+      tierBlend,
+    };
+  } catch {
+    // degrade to the authored curve; never let gear inspection kill a spawn
+  }
+  return enemyScalePower(base, player.hpMax, gear);
+}
+
 function injectFactionParty(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -3477,10 +4263,7 @@ function injectFactionParty(
     ));
   }
   const tide = Math.max(0, s.worldMemory.factionTides?.[opts.factionId] ?? 0);
-  const power = enemyScalePower(
-    Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence),
-    player.hpMax,
-  ) + tide; // escalation: an ascendant faction hits harder
+  const power = scalePowerOf(player) + tide; // escalation: an ascendant faction hits harder
   const packDanger = scene.location.danger + Math.floor(tide / 2);
   let scaled = scaleEncounterForContext(party, packDanger, power);
   // OTA-1139 — THE ELITE SWAP. The `elite` dial (OTA-1136) finally has a
@@ -3661,6 +4444,125 @@ function maybeInterceptPatrol(
 // into ANYWHERE, not just near its outpost (that's maybeInterceptPatrol). Checked at
 // the end of every action: if a hostile / bounty-target faction's patrol is within 2
 // tiles of the player, it engages. The patrol that engages is consumed into the fight.
+/** ⚠ OTA-1191 — THE ROAD BUILDS YOU UP, SLOWLY, AND FOREVER.
+ *
+ *  Called from the per-action tail rather than hooked into movement, which is why it needs
+ *  no changes to any of the five tile-crossing paths: it simply asks "is the cell I am
+ *  standing on one of the last few I stood on?" A player who did not move is trivially in
+ *  their own recent list and counts nothing, so ordinary actions are free.
+ *
+ *  ⚠ THE RING IS THE ANTI-FARM, and it is not optional. A raw tile count would restore the
+ *  exact hole arb118 closed on the distinct-destination track ("bouncing between two tiles
+ *  farmed permanent staminaMax forever"). With a memory of ODOMETER_MEMORY cells, pacing
+ *  inside a small loop never advances it; a real march advances it every step. */
+function tickRoadOdometer(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const s = get();
+  const player = s.player;
+  if (!player) return;
+  const cell = playerGridCell(player);
+  const key = `${cell.x},${cell.y}`;
+  const recent = s.worldMemory.recentCells ?? [];
+  // ⚠ Consume the cardinal flag whether or not the step counts, so it can never carry
+  // over to a later action and pay double for an autorouted step.
+  const credit = _lastStepWasCardinal ? ODOMETER_CARDINAL : 1;
+  _lastStepWasCardinal = false;
+  if (recent.includes(key)) return; // standing still, or walking a loop we just walked
+  const nextRecent = [...recent, key].slice(-ODOMETER_MEMORY);
+  const prevOdo = s.worldMemory.travelOdometer ?? 0;
+  const nextOdo = prevOdo + credit;
+  set((st) => ({ worldMemory: { ...st.worldMemory, recentCells: nextRecent, travelOdometer: nextOdo } }));
+  // ⚠ THRESHOLD CROSSING, NOT `% === 0`. A cardinal step is worth 2, so an exact-modulo
+  // check can step 39 → 41 and skip the award entirely — the reward would silently vanish
+  // for the players doing the thing this is meant to encourage. Count how many multiples
+  // the odometer crossed instead; that is also correct if the credit ever grows again.
+  const earned = Math.floor(nextOdo / ODOMETER_STEP) - Math.floor(prevOdo / ODOMETER_STEP);
+  if (earned <= 0) return;
+  set((st) => (st.player ? { player: {
+    ...st.player,
+    staminaMax: st.player.staminaMax + earned,
+    // Award the points as usable stamina too, so the reward is felt now rather than at the
+    // next rest — the same courtesy the distinct-destination milestone extends.
+    stamina: st.player.stamina + earned,
+  } } : st));
+  get().appendLog(
+    'reward',
+    `✦ The miles have done their work — you carry the road better than you did. +${earned} max stamina (now ${get().player?.staminaMax ?? 0}). [${nextOdo} on the odometer]`,
+  );
+}
+
+/** ⚠ OTA-1189 — ARRIVING ON A CONTRACT'S GROUND PUTS THE QUARRY ON IT.
+ *
+ *  Called from both arrival paths. If the player's cell is a held bounty's target cell and
+ *  that contract has not been seeded yet, three groups of the quarry are placed in
+ *  different directions, 3-5 tiles out, as ORDINARY ROAMING PATROLS.
+ *
+ *  ⚠ NOTHING NEW ENGAGES THEM. They roam via `stepPatrol` and are picked up by
+ *  `maybePatrolAmbush`, which already skips the hunt-chance roll for a bounty target. So
+ *  the player meets them exactly the way they would meet any patrol — which is the point:
+ *  the seeding must be undetectable, or it stops feeling like a hunt and starts feeling
+ *  like a spawner.
+ *
+ *  ⚠ ONE-SHOT PER CONTRACT, flagged on the bounty itself rather than on the location. A
+ *  location flag would refuse to re-seed for a SECOND contract on the same outpost, and
+ *  walking in and out must not re-arm the trap. */
+function maybeSeedQuarry(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const s = get();
+  const player = s.player;
+  if (!player) return;
+  const slate = activeBountiesOf(player);
+  if (slate.length === 0) return;
+  const cell = playerGridCell(player);
+  const due = slate.filter((b) => {
+    if (b.quarrySeeded) return false;
+    const t = canonicalCellOf(b.targetLocationId);
+    return t.x === cell.x && t.y === cell.y;
+  });
+  if (due.length === 0) return;
+
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const QS = require('../engine/quarrySeed') as typeof import('../engine/quarrySeed');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('../data/factions/factions.json') as Array<{ id: string; name: string }>;
+
+  for (const b of due) {
+    const home = canonicalCellOf(b.targetLocationId);
+    // Salt from the contract itself so two different contracts on the same outpost lay
+    // different rings, and the same contract would re-create the same one.
+    const salt = (b.acceptedAtHour ?? 0) * 131 + b.targetFactionId.length * 17 + b.count;
+    const cells = QS.quarrySeedCells(cell.x, cell.y, QS.QUARRY_GROUPS, salt);
+    set((st) => ({ worldMemory: {
+      ...st.worldMemory,
+      patrols: [
+        ...(st.worldMemory.patrols ?? []),
+        ...cells.map((c) => ({
+          factionId: b.targetFactionId,
+          gx: c.gx, gy: c.gy,
+          // ⚠ Home is the QUARRY'S OWN OUTPOST, not the spawn cell, so once they have
+          // roamed they behave like any other patrol of that faction rather than orbiting
+          // a point the engine has no other reason to care about.
+          homeX: home.x, homeY: home.y,
+          phase: c.phase,
+        })),
+      ],
+    } }));
+    const fname = factions.find((f) => f.id === b.targetFactionId)?.name ?? b.targetName;
+    get().appendLog('arbiter', QS.arrivalBeat(fname, b.targetLocationName));
+  }
+
+  // Mark them seeded. Done in one write after the loop so a mid-loop failure cannot leave
+  // a contract flagged but unseeded.
+  const seededKeys = new Set(due.map((b) => `${b.giverFactionId}|${b.targetFactionId}|${b.targetLocationId}`));
+  set((st) => (st.player ? { player: { ...st.player, activeBounties: (st.player.activeBounties ?? []).map((b) =>
+    seededKeys.has(`${b.giverFactionId}|${b.targetFactionId}|${b.targetLocationId}`) ? { ...b, quarrySeeded: true } : b,
+  ) } } : st));
+}
+
 function maybePatrolAmbush(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -3696,7 +4598,24 @@ function maybePatrolAmbush(
   // so no combination of tier and standing can make a road impassable.
   // A bounty target is exempt — that is a contract the player took on purpose.
   if (!bountyTargets.has(hostile.factionId)) {
-    const chance = hostileHuntChance(player.factionStanding, profileOf(player));
+    // ⚠ OTA-1179 — ROLL FOR *THIS* FACTION, NOT FOR YOUR WORST ENEMY ANYWHERE.
+    //
+    // `hostileHuntChance` reduces the array it is handed to its minimum, and this
+    // used to hand it the WHOLE standing table. So the patrol qualified on its own
+    // faction being below 0 (line above), and then the roll for whether it actually
+    // hunts you was computed from your worst standing with ANYBODY: at −30 with the
+    // Mud Monarchs and −1 with the Reclaimers, a Reclaimer patrol hunted you at the
+    // Mud Monarchs' rate. The faction identity was dropped on the way in.
+    //
+    // Passing the single row keeps the function and its OTA-1089 tests untouched —
+    // the reduce over one row IS that faction's standing — and the `depth` ladder
+    // now measures how badly THESE people want you, which is what it was written to
+    // mean ("being loathed by one faction is worse than being disliked by four").
+    const hostileStanding = player.factionStanding.find((r) => r.factionId === hostile.factionId);
+    const chance = hostileHuntChance(
+      hostileStanding ? [hostileStanding] : [],
+      profileOf(player),
+    );
     if (chance <= 0 || Math.random() > chance) return;
   }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -3728,8 +4647,63 @@ function maybePatrolAmbush(
 // fall under 5% until ~28 max HP, and a fresh arrival has 24. This is the
 // cleanest "arrivals are too thin" lever — it touches zero enemies and pays
 // the player for playing. Travel milestone deliberately stays at 5.
-const MILESTONE_KILL_STEP = 3;     // every 3 enemies defeated → +1 HP max
-const MILESTONE_TRAVEL_STEP = 5;   // every 5 travels → +1 stamina max
+// ⚠ OTA-1182 — "every 3 enemies defeated" is what this comment used to say, and it
+// is NOT what the code does. arb119 moved the gate to `firstOfType &&
+// checkMilestone(distinctKills, …)` so a respawnable enemy could not be farmed for
+// unbounded hpMax — and left this line describing the retired rule, which is how a
+// session came to tell the owner that grinding the same patrol builds HP. It does
+// not: your tenth Mud Skulker pays nothing. HP comes from VARIETY, not volume.
+// ⚠ OTA-1184 — the value MOVED to engine/hpBreakdown.ts and is imported at the top
+// of this file. The character sheet now EXPLAINS the number using this constant, and
+// a threshold the sheet quotes while the store awards it must have exactly one home
+// — the same cleanup OTA-1179 #8 did for JOIN_THRESHOLD and OTA-1181 for
+// BUY_REP_TC_PER_STANDING. // every 3 DISTINCT enemy types beaten → +1 HP max
+const MILESTONE_TRAVEL_STEP = 5;   // every 5 DISTINCT destinations → +1 stamina max
+
+/** ⚠ OTA-1191 — THE ROAD ITSELF BUILDS YOU UP, AND IT NEVER RUNS OUT.
+ *
+ *  Owner: *"stamina should be able to be trained up but at a very slow rate… maybe just
+ *  generically travel, and then if you run long enough you get in good shape."*
+ *
+ *  `MILESTONE_TRAVEL_STEP` above already does this — but it counts DISTINCT destinations,
+ *  and there are only 36 locations in the game. So it pays out ~7 times across an entire
+ *  playthrough and then is **permanently dead**, which is why it does not read as
+ *  something you can train. This is the second, slower track: an ODOMETER over tiles
+ *  actually walked, which keeps paying forever.
+ *
+ *  ⚠ AND IT MUST RESIST PACING, because that is exactly how the first one broke (arb118:
+ *  "the code counted EVERY travel… bouncing between two tiles farmed permanent staminaMax
+ *  forever"). A raw tile count would restore that hole immediately — the owner has
+ *  literally described stepping east-west repeatedly to pass time. So a step only counts
+ *  when it lands on a cell that is NOT in the last `ODOMETER_MEMORY` cells walked: a long
+ *  march counts every step, while bouncing inside a small loop counts nothing.
+ *
+ *  ⚠ THERE IS NO CEILING ON THIS TRACK. The ~7 ceiling belongs entirely to the
+ *  distinct-destination milestone above (36 locations ÷ 5). The odometer keeps paying at
+ *  the same rate forever — 700 tiles is +7, 1400 is +14, and so on.
+ *
+ *  ⚠ A CARDINAL STEP IS WORTH DOUBLE, and that is a deliberate nudge. Owner: *"how about
+ *  if we double the generation rate for cardinal direction travel to get them to explore
+ *  more?"* Autoroute walks a straight line to somewhere already known; walking it by hand
+ *  is how a player finds what is not on their map. Both count — hand-walking counts twice.
+ *
+ *  ⚠ IT LOOSENS EVERY CONTRACT CLOCK, and that is worth knowing before retuning it. Rest
+ *  is 8 hours for at most 8 stamina, so a bigger tank means FEWER rests per journey, and
+ *  rests are the dominant cost in a bounty window. Growing max stamina makes deadlines
+ *  easier — which is a fair veteran reward, but it is a difficulty dial, not just a stat. */
+const ODOMETER_STEP = 40;    // credits per +1 max stamina (a cardinal step is worth 2)
+const ODOMETER_CARDINAL = 2; // hand-walked steps count double — explore, don't autoroute
+const ODOMETER_MEMORY = 8;   // recent cells that do not re-count; defeats short loops
+
+/** ⚠ Set by the two TYPED CARDINAL paths only, consumed by the odometer on the same
+ *  action. Module-scoped because it lives for exactly one action and must never persist —
+ *  a saved "the last step was cardinal" would pay double on the next load. */
+let _lastStepWasCardinal = false;
+
+/** ⚠ OTA-1192 — the cell HP regen last ticked on. Module-scoped and transient: on a fresh
+ *  load it is null, and the FIRST action after load deliberately pays nothing (a null is
+ *  treated as "no tile crossed"), so reloading can never be used to farm a regen tick. */
+let _lastRegenCell: string | null = null;
 // OTA 058 — MILESTONE_CHECK_STEP retired. Skill-check stat growth is
 // now per-use via engine/statTraining (Skyrim model). HP and stamina
 // growth still use the milestone counters above.
@@ -4057,6 +5031,36 @@ function dockHostileStanding(
   const already = rel?.standingDocked ?? 0;
   const applied = Math.max(0, magnitude - already);
   if (applied <= 0) return 0;
+  // ⚠ OTA-1179 — RESOLVE, APPLY, CONFIRM, *THEN* STAMP THE LEDGER.
+  //
+  // The order used to be: stamp the one-dock ledger, then apply, then return
+  // `applied` as if it had. `applyRepChange` no-ops silently on an id it does not
+  // know, and the ids reaching here are RAW (`vendor.faction`, `vendor.nativeFaction`)
+  // with no canonicalisation — so a legacy race id on an old save burned the ledger,
+  // moved nothing, and reported a dock that never happened. Worse than the gift
+  // version of this bug, because the ledger is what makes the dock one-shot: once
+  // stamped, the real dock can never be applied.
+  const resolved = factionIds
+    .map((f) => canonicalFactionId(f))
+    .filter((f): f is string => !!f);
+  let anyLanded = false;
+  for (const f of resolved) {
+    set((st) => {
+      if (!st.player) return {};
+      const r = applyRepChange(st.player.factionStanding, f, -applied);
+      if (r.changed.length > 0) anyLanded = true;
+      return { player: { ...st.player, factionStanding: r.standing } };
+    });
+  }
+  // Nothing moved — an unresolvable id, or every target already pinned at REP_MIN.
+  // Leave the ledger clean so a later, valid dock is still possible, and report 0
+  // so callers do not announce a punishment that was not delivered.
+  if (!anyLanded) {
+    if (factionIds.some((f) => !!f)) {
+      get().appendLog('debug', `dock: standing no-op (${factionIds.filter(Boolean).join(', ')})`);
+    }
+    return 0;
+  }
   set((st) => {
     const relations = st.worldMemory.npcRelations ?? {};
     const prev = relations[npcId];
@@ -4064,12 +5068,6 @@ function dockHostileStanding(
       ? { worldMemory: { ...st.worldMemory, npcRelations: { ...relations, [npcId]: { ...prev, standingDocked: magnitude } } } }
       : {};
   });
-  for (const f of factionIds) {
-    if (!f) continue;
-    set((st) => (st.player
-      ? { player: { ...st.player, factionStanding: applyRepChange(st.player.factionStanding, f, -applied).standing } }
-      : {}));
-  }
   return applied;
 }
 
@@ -4137,12 +5135,23 @@ function applyGiftStanding(
       },
     }));
   }
+  // ⚠ OTA-1179 — SHOW THE CASCADE. This printed one hand-rolled line for the named
+  // faction and never called logRepChanges, so the ±half that `applyRepChange` sends
+  // to every ally and rival was completely invisible: you gifted the Forgotten Order,
+  // read "+5 Forgotten Order", and never learned you had just taken −2 with the Mud
+  // Monarchs. In a system whose whole tension is that helping one side costs you with
+  // another, hiding the cost is the one thing it must not do. The bespoke line is kept
+  // as the headline (it names the ITEM's recipient, which logRepChanges cannot know)
+  // and the real per-faction numbers follow it.
+  let giftChanges: { factionId: string; delta: number; newStanding: number }[] = [];
   set((st) => {
     if (!st.player) return {};
     const r = applyRepChange(st.player.factionStanding, faction, applied);
+    giftChanges = r.changed;
     return { player: { ...st.player, factionStanding: r.standing } };
   });
   get().appendLog('system', `Standing ${applied > 0 ? '+' : ''}${applied} — ${factionLabel}.`);
+  logRepChanges(get, giftChanges);
 }
 
 /** OTA-1081 — everything the topic gates need, gathered here so engine/dialogue
@@ -4297,11 +5306,28 @@ function applyForkEffects(
     // built out of repeatable acts; this is safe for the opposite reason
     // rather than by a guard — a fork can only ever be answered once, so this
     // line can only ever run once per character, ever.
+    // ⚠ OTA-1179 — REPORT WHAT LANDED, NOT WHAT WAS AUTHORED. This was the closest
+    // structural twin of the gift bug OTA-1178 fixed: bare `.standing`, `changed`
+    // thrown away, the log line printed unconditionally, and the RAW UNDERSCORED ID
+    // shown to the player. A fork aimed at a faction already pinned at REP_MAX
+    // printed a reward that did not exist, and the ally/rival spillover — which for
+    // a big fork delta is half again as much movement — never appeared at all.
+    // Routed through logRepChanges like every other well-behaved writer, so the
+    // player sees the real numbers and the cascade.
     const { factionId, delta } = fx.standing;
-    set((st) => (st.player
-      ? { player: { ...st.player, factionStanding: applyRepChange(st.player.factionStanding, factionId, delta).standing } }
-      : {}));
-    get().appendLog('system', `Standing ${delta > 0 ? '+' : ''}${delta} — ${factionId.replace(/_/g, ' ')}.`);
+    const forkFaction = canonicalFactionId(factionId);
+    if (!forkFaction) {
+      get().appendLog('debug', `story-fork: standing skipped — "${factionId}" is not a faction`);
+    } else {
+      let forkChanges: { factionId: string; delta: number; newStanding: number }[] = [];
+      set((st) => {
+        if (!st.player) return {};
+        const r = applyRepChange(st.player.factionStanding, forkFaction, delta);
+        forkChanges = r.changed;
+        return { player: { ...st.player, factionStanding: r.standing } };
+      });
+      logRepChanges(get, forkChanges);
+    }
   }
 }
 
@@ -4359,12 +5385,12 @@ function vendorCatchesThief(
   if (nativeFaction && nativeFaction !== vendorFaction) {
     repStanding = applyRepChange(repStanding, nativeFaction, -10).standing;
   }
-  const repResult = {
+  const repResult = meterSpiteGains(get, set, {
     standing: repStanding,
     changed: repStanding
       .map((r) => ({ factionId: r.factionId, delta: r.standing - (origById.get(r.factionId) ?? r.standing), newStanding: r.standing }))
       .filter((c) => c.delta !== 0),
-  };
+  });
   const enemy = buildTraderEnemy(vendor);
   set((s) =>
     s.player && s.currentScene
@@ -4743,6 +5769,73 @@ function resolveVendorSubmission(
   void get().persist();
 }
 
+/** ⚠⚠ OTA-1210 (PUNCHLIST P8) — WHO CAN TAKE A CONTRACT HERE.
+ *
+ *  `turnInFactionQuest` has accepted a same-faction VENDOR, the OUTPOST MISSION BOARD
+ *  (OTA-451) or the faction's own HALL (OTA-617) since those OTAs shipped. The other three
+ *  handlers required `scene.vendor` and nothing else — so **a player could stand at the
+ *  board that posted a hunt, holding the trophy, and be told to go find a vendor.** The
+ *  board is the poster; it should take back what it put up.
+ *
+ *  ⚠ ONE resolver rather than a fourth hand-rolled copy. The three handlers had three
+ *  different refusal wordings for the same rule already, which is exactly how they drifted
+ *  apart in the first place.
+ *
+ *  Returns `null` when there is genuinely nobody here to hand anything to. */
+function turnInCounterparty(
+  get: () => GameStore,
+  player: PlayerCharacter,
+  scene: CurrentScene | null | undefined,
+): { faction: string | null; name: string; vendorPresent: boolean } | null {
+  const v = scene?.vendor;
+  if (v) {
+    // ⚠⚠ OTA-1224 (PUNCHLIST P9) — AT AN OWNED SITE, THE PEOPLE ANSWER FOR THE HOST.
+    // Owner's ruling: *"keep the grab like it is … make handin specific."* The hub anchors
+    // used to take work for whatever faction THEY carried — Irma re-pointed to the
+    // player's, Tarek a Reclaimer everywhere, Jorah Forgotten Order everywhere — so
+    // hand-ins never cared whose ground you stood on. Now the counterparty a hub anchor
+    // answers for is the SITE OWNER (OTA-1209's `hubOwnerFaction`, the map that already
+    // drives the room skins): host work is taken face to face at 100%, and anything else
+    // goes through the paid fallbacks (Halem 80% at this very gate, market 90%,
+    // courier 75%).
+    //
+    // ⚠ Scoped exactly: only inside a hub room, only at one of the NINE owned sites, and
+    // never for the broker — Halem's whole job is taking any faction's work, and a host
+    // stamp on him would DELETE the fallback this rule depends on. Random vendors, the
+    // outskirts hub, capitals and stalls keep today's behaviour, and the GRAB side (which
+    // work a vendor OFFERS, driven by `vendor.faction`) is deliberately untouched.
+    // ⚠ ANCHOR-PRECISE, not location-wide: the stamp applies only when the vendor in the
+    // scene IS the current room's anchor (matched by the room's own `anchorNpc`). The
+    // first spelling stamped ANY vendor standing in a hub — which is the anchor in real
+    // play, but the rule is about the anchors, and guarding by location made the seam
+    // claim more than the ruling says. (It also broke four suites that inject matching-
+    // faction agents into hub scenes — an artificial state, and still the correct hint.)
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
+    const room = isHubLocation(player.currentLocationId) && player.hubRoomId
+      ? hubRoomFor(player.hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId))
+      : null;
+    const isRoomAnchor = !!room && room.anchorNpc === v.name;
+    const host = isRoomAnchor && !CB.isContractBroker(scene?.vendor)
+      ? hubOwnerFaction(player.currentLocationId)
+      : null;
+    return { faction: host ?? (v.faction ?? null), name: v.name, vendorPresent: true };
+  }
+  const board = scene?.missionBoard;
+  if (board) return { faction: board.faction ?? null, name: 'The mission board', vendorPresent: false };
+  // OTA-617 — building-level: inside a faction's own hub, that faction's hall takes its
+  // own work with no specific agent in the room.
+  if (isHubLocation(player.currentLocationId)) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { startingLocationForFaction } = require('../engine/character') as typeof import('../engine/character');
+    const home = FACTIONS.find((f) => {
+      try { return startingLocationForFaction(f.id) === player.currentLocationId; } catch { return false; }
+    });
+    if (home) return { faction: home.id, name: `the ${home.name} hall`, vendorPresent: false };
+  }
+  return null;
+}
+
 /** OTA-1073 — credit a finished contract to the person who took it back.
  *
  *  Called from the five announceMissionComplete sites rather than from inside
@@ -4816,6 +5909,19 @@ function playerGridCell(player: PlayerCharacter): { x: number; y: number } {
     x: cur.x + ((player.mapX ?? WORLD_MAP_CENTER_X) - WORLD_MAP_CENTER_X),
     y: cur.y + ((player.mapY ?? WORLD_MAP_CENTER_Y) - WORLD_MAP_CENTER_Y),
   };
+}
+
+/** ⚠ OTA-1210 (PUNCHLIST P7) — stamp WHERE the player stood when they took the contract,
+ *  so the long-haul bonus can price the trip they actually made instead of the remoteness
+ *  of wherever they happened to hand it in.
+ *
+ *  One helper rather than nine inline copies: the nine accept sites already spell the
+ *  player variable four different ways, and a stamp that is right at eight of them is a
+ *  contract that silently pays the legacy rate at the ninth. Returns an EMPTY object when
+ *  there is no player, so spreading it is always safe and never writes `undefined`. */
+function acceptCellStamp(get: () => GameStore): { acceptedAtCell?: { x: number; y: number } } {
+  const p = get().player;
+  return p ? { acceptedAtCell: playerGridCell(p) } : {};
 }
 
 // OTA-503 — resolve the grid event the player has ARRIVED on (their canonical
@@ -5051,10 +6157,7 @@ function spawnAetherkin(
   const enc = buildAetherkinEncounter(where);
   const base = (enemiesData as Enemy[]).find((e) => e.name === enc.enemyName);
   if (!base) return false;
-  const power = enemyScalePower(
-    Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence),
-    player.hpMax,
-  );
+  const power = scalePowerOf(player);
   const danger = scene.location?.danger ?? 0;
   const scaled = scaleEncounterForContext([{ ...base }], danger, power);
   const hps = scaled.map((e) => e.hp);
@@ -5606,6 +6709,21 @@ interface GameStore {
   /** OTA-850 — accept a faction bounty: store it and set course for the quarry's
    *  outpost (routing the player into patrolled ground). */
   acceptBounty: (bounty: import('../engine/factionBounty').FactionBounty) => void;
+  /** ⚠ OTA-1188 — THE FROZEN BOARD. Transient (never persisted): a snapshot of who stood
+   *  with whom at the instant the player hit FREEZE, plus the hour it was taken.
+   *  Non-null = the board is frozen and a bounty may be accepted.
+   *
+   *  ⚠ FREEZING STOPS THE VIEW, NOT THE WORLD. The same heartbeat that churns this panel
+   *  also ROAMS THE PATROLS — and roaming patrols are what bring a bounty's quarry to the
+   *  player. Pausing the simulation would freeze the very machinery a contract depends on.
+   *  It is safe to leave it running precisely because this snapshot is a COMPLETE record
+   *  of everything the payout still reads live (see engine/bountyPolitics). */
+  frozenBoard: { relations: import('../engine/factionRelations').RelationsMatrix; takenAtHour: number } | null;
+  /** ⚠ ONE PRESS RUNS THE WHOLE CYCLE — owner: "clear memory, save snapshot, unlock
+   *  bounties… then unpause automatically once the bounty's accepted." Pressing FREEZE
+   *  always DISCARDS any previous snapshot and takes a fresh one, so a stale board can
+   *  never be the one a contract locks in. Pressing it while frozen simply releases. */
+  toggleBoardFreeze: () => void;
   /** OTA-857 — the world's REAL-TIME heartbeat. Driven by a wall-clock timer in
    *  App.tsx (not in-game hours), so the war advances no matter what screen is
    *  open or whether the player is acting — the World board is a live scroll. */
@@ -5933,9 +7051,13 @@ interface GameStore {
   /** OTA-1058 — `flavor` (story beats) and `heading` (a kicker that isn't
    *  "<KIND> COMPLETE") are set by the boss VICTORY card; both are absent on an
    *  ordinary mission notice, which renders exactly as it did before. */
+  /** OTA-1186 — `takeLabel` renames the "THE TAKE" divider (the lines beneath it are
+   *  not always a payout); `holdMs` lengthens the auto-close valve and can only ever
+   *  raise it. Both absent on every ordinary notice, which renders unchanged. */
   missionCompleteNotice: {
     kind: string; title: string; rewards: string[];
     flavor?: string[]; heading?: string;
+    takeLabel?: string; holdMs?: number;
   } | null;
   clearMissionCompleteNotice: () => void;
   /** OTA-1037 — Contracts-screen refusal strip. A COMPLETE tap that does NOT end in
@@ -5962,7 +7084,11 @@ interface GameStore {
    *  SPOTLIGHT: a custom kicker, story above the take, gold instead of the
    *  mission green. Use it for a milestone the player would otherwise only learn
    *  about from a feed line that scrolls away. */
-  raiseSpotlightNotice: (heading: string, title: string, flavor: string[], rewards: string[]) => void;
+  raiseSpotlightNotice: (
+    heading: string, title: string, flavor: string[], rewards: string[],
+    /** OTA-1186 — presentation only; see missionCompleteNotice. */
+    opts?: { takeLabel?: string; holdMs?: number },
+  ) => void;
   fusionBlockedNotice: { title: string; body: string; hint?: string } | null;
   clearFusionBlockedNotice: () => void;
   closeFusionPicker: () => void;
@@ -6055,6 +7181,15 @@ interface GameStore {
   } | null;
   /** Dismiss the discovery reveal overlay. */
   dismissDiscoveryReveal: () => void;
+  /** OTA-1206 — a collectible character-story just closed; show it whole.
+   *  ⚠ Holds only the id. The screen re-derives the text from the player's OWN
+   *  collectables at render time, so it can never display a fragment that was not
+   *  earned, and a stale reveal left over a reload cannot resurrect one. */
+  storyReveal: { storyId: string } | null;
+  dismissStoryReveal: () => void;
+  /** OTA-1206 — read an already-completed story again from the Collectibles tab.
+   *  Same screen, reached deliberately instead of by finishing. */
+  openStoryReveal: (storyId: string) => void;
   /** OTA-683 — when a deep-link wants the Inventory screen to open with a
    *  specific category section EXPANDED (sections default collapsed), this
    *  carries that category id (e.g. a Crucible-forged 'armor' piece). The
@@ -6407,6 +7542,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
   dismissDiscoveryReveal() {
     set({ discoveryReveal: null });
   },
+  storyReveal: null,
+  dismissStoryReveal() {
+    set({ storyReveal: null });
+  },
+  openStoryReveal(storyId) {
+    // ⚠ Refuse a story the player has not actually finished. The Collectibles tab only
+    // offers READ on complete sets, but a store action is reachable from anywhere and
+    // should not depend on its caller being careful.
+    const owned = get().player?.collectables ?? [];
+    const built = assembledStory(storyId, owned);
+    if (!built) return;
+    if (built.parts.length !== built.story.fragments.length) return;
+    set({ storyReveal: { storyId } });
+  },
   pendingContractsTab: null,
   requestContractsTab(tab) {
     set({ pendingContractsTab: tab });
@@ -6440,6 +7589,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   fusionPickerOpen: false,
   missionCompleteNotice: null,
   contractsNotice: null,
+  // OTA-1188 — transient by design; a frozen board must never survive a reload.
+  frozenBoard: null,
   storyIntro: null,
   pendingDeath: null, // OTA-1133
   chapterCard: null, // OTA-1043
@@ -6647,7 +7798,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 [g.toId!]: {
                   ...prev,
                   // THE CLAUSE THAT MATTERS: the object, by name.
-                  gifts: [...(prev.gifts ?? []), { name: item.name, atHours: hours }],
+                  // ⚠ OTA-1184 — and HOW THEY TOOK IT, which was computed right here
+                  // and then discarded. Owner asked the sheet to show "what you gave
+                  // to whom and how they received it"; without the reaction a gift
+                  // that INSULTED somebody read identically to one they loved.
+                  gifts: [...(prev.gifts ?? []), {
+                    name: item.name,
+                    atHours: hours,
+                    reaction: out.reaction,
+                    standingDelta: out.standingDelta,
+                  }],
                   giftBoons: (prev.giftBoons ?? 0) + (out.countsAsBoon ? 1 : 0),
                   // A gift that lands counts as business done — it is what lifts
                   // somebody off the 'met' rung without a purchase.
@@ -6897,6 +8057,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // clean success.
     setQwenDiscardSink((job, reason, ms) => {
       get().appendLog('debug', `qwen⏱ ✂ DISCARDED ${job} after ${ms}ms — ${reason}`);
+    });
+    // ⚠⚠ OTA-1200 — MODEL-CONTEXT LEDGER SINK. Installed HERE, beside the other two, and
+    // not in startRuntimePressureWatch: this must be live before anything can load a
+    // context, and the very first load is the one most likely to race a dispose. A sink
+    // armed after the fact would miss the event we built this to catch.
+    setContextLedgerSink((line) => {
+      get().appendLog('debug', line);
     });
     // One-shot migration from the v1 single-slot save, if present.
     await migrateLegacySlotIfPresent();
@@ -7306,8 +8473,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // alone scrolled past unnoticed — "there should be a pop-up… tap to open
     // collectible screen"). Only the FIRST collectible ever raises the overlay;
     // after that the player knows where they live and the log line carries it.
+    // ⚠⚠ OTA-1206 — SET COMPLETION, WHICH USED TO BE NOTHING. Computed from `owned`, the
+    // list as it stood BEFORE this grant, so it fires exactly once and only for the
+    // fragment that actually closed the set. PUNCHLIST P1.
+    const finished = storyCompletedBy(fragmentId, owned);
+    if (finished) {
+      const done = completedStoryCount(get().player?.collectables ?? []);
+      // The title tracks STORIES, not fragments — see TitleProgress.collectableStoriesCompleted.
+      recordTitleProgress(get, set, { collectableStoriesCompleted: done });
+      // ⚠ Announced through the same channel as any other finished contract, so it lands
+      // in the feed the player is already reading instead of waiting on a screen visit.
+      get().announceMissionComplete(
+        'Collection',
+        `${finished.characterName}'s story`,
+        `✦ ${finished.characterName}'s story is complete — every fragment recovered.`,
+      );
+      // The read-it-whole screen. Owner: "they should end in story screen like the
+      // chapters screens that put the whole story together to read."
+      set({ storyReveal: { storyId: finished.id } });
+      if (done >= CHARACTER_STORIES.length) {
+        get().appendLog(
+          'reward',
+          `✦ Every story recovered — all ${CHARACTER_STORIES.length} lives read end to end.`,
+        );
+      }
+    }
     const totalOwned = (get().player?.collectables ?? []).length;
-    if (totalOwned <= 1) {
+    // ⚠ The first-ever-collectible tutorial overlay must not fight the completion screen
+    // for the same slot. A set can only close on a later fragment than the first, so in
+    // practice these never collide — but `finished &&` makes that a rule, not a
+    // coincidence that a future data edit could break.
+    if (totalOwned <= 1 && !finished) {
       set({
         discoveryReveal: {
           title: 'Collectible found',
@@ -7947,7 +9143,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const baseNouns = (loc.interactables && loc.interactables.length > 0)
           ? [...loc.interactables]
           : extractAmbientNouns(loc.description);
-        const hubRoom = hubRoomFor(player.hubRoomId, player.factionId);
+        const hubRoom = hubRoomFor(player.hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
         const hubNouns = (hubRoom?.interactables ?? []);
         // Micro-Micro nouns: the scene already carries microMicroId; we
         // resolve via the worldLadder lookup so we mirror beginScene
@@ -8354,6 +9550,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   setScreen(screen) {
+    // ⚠ OTA-1188 — LEAVING THE WORLD SCREEN RELEASES THE FREEZE. Owner's rule for the
+    // snapshot was "an automatic wipe and reset and recapture — that way you're never
+    // looking at old data." A freeze that survived navigation would break exactly that:
+    // hold the board, wander off for three in-game days, come back and accept, and the
+    // contract locks in politics from before the war moved. A snapshot may only ever be
+    // spent on the visit that took it.
+    if (screen !== 'world' && get().frozenBoard) set({ frozenBoard: null });
     // OTA-791 — the trade screen is unreachable mid-fight. A resonance-hook
     // combat began while the market vendor was still attached to the scene;
     // the player tapped into TRADE unaware, every sell bounced off the arb166
@@ -8850,7 +10053,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hubRoomId = hubEntryRoomId();
       set((s) => (s.player ? { player: { ...s.player, hubRoomId } } : s));
     }
-    const hubRoom = inHub && hubRoomId ? hubRoomFor(hubRoomId, player.factionId) : null;
+    const hubRoom = inHub && hubRoomId ? hubRoomFor(hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId)) : null;
     get().appendLog('debug', `scene: loc=${location.id} hub=${hubRoomId ?? '-'} arrival=${opts?.arrivalFromName ? 'y' : 'n'} opening=${opts?.isOpening ? 'y' : 'n'} passing=${passingThrough ? 'y' : 'n'}`);
     if (!inHub && hubRoomId) {
       // Player left the hub — clear the hubRoomId.
@@ -8980,7 +10183,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // harder than the frontier. Guardians/story bosses are skipped inside the scaler
     // (they carry their own curve). A fresh arrival on a danger-0 tile is untouched.
     const scalePower = player
-      ? enemyScalePower(Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence), player.hpMax)
+      ? scalePowerOf(player)
       : 0;
     const enemies: Enemy[] = scaleEncounterForContext(encounter, location.danger, scalePower);
     const enemyHps: number[] = enemies.map((e) => e.hp);
@@ -9026,7 +10229,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // without permanently flooding the world with vendors.
     const tilesSeen = player?.recentTileHistory?.length ?? 0;
     const roadsideRate = tilesSeen >= 24 ? 0.25 : 0.5 - (0.25 * tilesSeen) / 24;
-    const vendor: VendorInstance | null = ((): VendorInstance | null => {
+    // ⚠ OTA-1218 — the technique text is appended to whatever this resolves to, OUTSIDE
+    // the IIFE, because the IIFE has two returns and a stamp at one of them is a row that
+    // silently never appears on the other path. (The identical mistake is written up in
+    // OTA-1210's accept-cell stamp: eight sites of nine.)
+    const vendor: VendorInstance | null = withTechniqueTextOffer(((): VendorInstance | null => {
       let base: VendorInstance | null = opts?.isOpening
         ? null
         : hubRoom && hubRoom.anchorNpc
@@ -9058,7 +10265,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // (Foreign capitals use the separate atCoreCapital vendor path above, so
       // this only ever fires for the player's own home-hub armory anchor.)
       if (base && hubRoom?.anchorNpc === 'Irma Ironhand' && player.factionId) {
-        const facOffers = factionGearOffers(player.factionId);
+        // ⚠ OTA-1224 (PUNCHLIST P9) — the armory stocks the HOST's line, behind standing.
+        // Owner: *"host gear depending on faction status."* At an owned site the gear on
+        // the racks belongs to whoever owns the ground, and Irma only opens it to someone
+        // the host trusts: a MEMBER, or standing at the JOIN threshold. At home you are
+        // the host, so nothing changes there. The outskirts hub has no owner and keeps
+        // the old behaviour (your own faction's line) exactly.
+        const gearHost = hubOwnerFaction(player.currentLocationId);
+        const gearFaction = gearHost ?? player.factionId;
+        const trusted = gearHost
+          ? (player.factionId === gearHost || meetsJoinThreshold(player.factionStanding, gearHost))
+          : true;
+        const facOffers = trusted ? factionGearOffers(gearFaction) : [];
         const have = new Set(base.offers.map((o) => o.itemName));
         const offers = facOffers.length > 0
           ? [...base.offers, ...facOffers.filter((o) => !have.has(o.itemName))]
@@ -9069,7 +10287,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return { ...base, faction: player.factionId, nativeFaction: base.faction, offers };
       }
       return base;
-    })();
+    })(), player);
     // OTA-550 — enemies open at 'mid' range: close enough to be a problem but
     // not already swinging. The player advances (distant→far→mid→close) to
     // land melee, or holds the gap for a ranged/throwable shot. (This is the
@@ -10099,7 +11317,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // entirely — its location-pool prose doesn't apply when you're
     // standing inside a hand-authored room.
     const sceneText = hubRoom
-      ? `${hubNameForFaction(player.factionId)} — ${hubRoom.name}. ${hubRoom.description}`
+      ? `${hubNameForFaction(hubSkinFactionFor(player.currentLocationId, player.factionId))} — ${hubRoom.name}. ${hubRoom.description}`
       : buildScene({ weather, location, hazard, enemy: sceneEnemy, quest: player.activeQuests[0] });
     // Opening scene — emit a three-paragraph introduction narrative as
     // SEPARATE log entries so AdventureFeed renders real paragraph
@@ -10120,7 +11338,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         location,
         hubRoomName: hubRoom?.name ?? null,
         hubRoomDescription: hubRoom?.description ?? null,
-        hubName: hubNameForFaction(player.factionId),
+        hubName: hubNameForFaction(hubSkinFactionFor(player.currentLocationId, player.factionId)),
       });
       get().appendLog('world', p1);
       get().appendLog('world', p2);
@@ -10160,7 +11378,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && !livePlayerForHubHint.milestones?.firstOutpostHintShown
         && get().tutorialStep === null
       ) {
-        const hubLabel = hubNameForFaction(livePlayerForHubHint.factionId)
+        const hubLabel = hubNameForFaction(hubSkinFactionFor(livePlayerForHubHint.currentLocationId, livePlayerForHubHint.factionId))
           || hubRoom?.name
           || 'the outpost';
         get().appendLog(
@@ -10252,7 +11470,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (hubRoom) {
         get().appendLog(
           'world',
-          `You pass through the gate into ${hubNameForFaction(player.factionId)} — ${hubRoom.name}. ${hubRoom.description}`,
+          `You pass through the gate into ${hubNameForFaction(hubSkinFactionFor(player.currentLocationId, player.factionId))} — ${hubRoom.name}. ${hubRoom.description}`,
         );
       }
     } else {
@@ -10453,7 +11671,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const labels = dirs
         .filter((d) => d.id)
         .map((d) => {
-          const r = hubRoomFor(d.id, player.factionId);
+          const r = hubRoomFor(d.id, hubSkinFactionFor(player.currentLocationId, player.factionId));
           return r ? `${d.dir} to ${r.shortName}` : null;
         })
         .filter(Boolean) as string[];
@@ -11630,12 +12848,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // per-action log spam); only fills when there's room. tickPlayerStamina-
     // Statuses re-syncs tired/exhausted as stamina rises. On top of the
     // pieces' AC / stat bonuses.
+    // ⚠ OTA-1192 — HP REGEN IS PER TILE NOW, NOT PER ACTION. Owner: "I feel invincible…
+    // would +2 regen per tile traveled be better? I'm never low in health except mid
+    // battle." Measured from his device log: enemies hit a flat 25% (`needs nat 16+ — AC
+    // capped`), and the ~4 damage that lands after `armor −47%, plate −2` averages about
+    // 1 HP a round — against +2 a round of regen. HE GAINED HP DURING FIGHTS. Across eight
+    // combats in one session he never fell below 26 of 32.
+    // Ticking on tile entry means combat regen is exactly ZERO (you do not walk mid-fight)
+    // while the road still mends you, so nobody is pushed back into rest-spam.
+    // ⚠ STAMINA REGEN STAYS PER-ACTION, deliberately. It was never the problem — stamina
+    // is barely a combat resource — and tile-gating it would nerf the one pool that tiles
+    // already drain. (It IS farmable by spamming any action; that is pre-existing, out of
+    // scope here, and noted so it is not mistaken for something this OTA introduced.)
     {
       const live = get().player;
       if (live && !live.dead) {
         const regen = aggregateEquippedRegen(live);
+        const cellNow = `${playerGridCell(live).x},${playerGridCell(live).y}`;
+        const crossedTile = _lastRegenCell !== null && _lastRegenCell !== cellNow;
+        _lastRegenCell = cellNow;
         const stamGain = Math.min(regen.stamina, Math.max(0, (live.staminaMax ?? 0) - live.stamina));
-        const hpGain = Math.min(regen.hp, Math.max(0, (live.hpMax ?? 0) - live.hp));
+        // ⚠ OTA-1194 — SCALED BY TIER. salvage ×1.5, owed ×1 (identity), let_it_come
+        // ×0.75, bury_me ×0.5. Only the HP half moves: `stamGain` above is untouched, for
+        // the same reason OTA-1192 left it per-action — stamina is barely a combat
+        // resource and tiles already drain it, so metering it here would be a second
+        // punishment billed as one.
+        const tierRegenHp = scaledRegen(regen.hp, dialOf(live, 'mend'));
+        const hpGain = crossedTile
+          ? Math.min(tierRegenHp, Math.max(0, (live.hpMax ?? 0) - live.hp))
+          : 0;
         if (stamGain > 0 || hpGain > 0) {
           set((s) => s.player
             ? { player: tickPlayerStaminaStatuses({ ...s.player, stamina: s.player.stamina + stamGain, hp: s.player.hp + hpGain }) }
@@ -13224,6 +14465,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               rareLootBias: raceLootBias(player, get().currentScene),
               // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
               biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
+              // OTA-1222 — a small chance the find is swapped for something this PLACE
+              // authored. Replacement, not addition: the drop rate does not move.
+              siteLoot: siteLootForScene(get),
             });
             set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
             // OTA-200 — visible lens cue. When the player carries the
@@ -13376,6 +14620,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'investigate': {
+        // ⚠ OTA-1226 — `read` PARSES AS INVESTIGATE, and a held Procedure Text is the one
+        // thing a player will type `read` at expecting it to matter. Checked before the
+        // ambient-noun machinery, or the resolver drags the target to a scene noun (the
+        // probe watched it resolve "procedure text" to an Aetheric Storm Burst). Two held
+        // texts matching one query REFUSE and name both — the P12 rule.
+        if (/^(read|study|peruse)\b/.test(trimmed.toLowerCase())) {
+          const q = (parsed.target ?? trimmed.replace(/^(read|study|peruse)\s+/i, '')).toString();
+          const held = findHeldProcedureText(player, q);
+          if (held.ambiguous.length > 1) {
+            get().appendLog('system', `Which text? You are carrying: ${held.ambiguous.join(', ')}.`);
+            break;
+          }
+          if (held.item && teachFromProcedureText(get, set, player, held.item)) break;
+        }
         // 1) "find a way / look for a path / which direction" — surface options, no roll.
         if (DIRECTION_KEYWORDS.test(trimmed)) {
           narratePossibleDirections(get, set, currentScene);
@@ -13802,6 +15060,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               rareLootBias: raceLootBias(player, get().currentScene),
               // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
               biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
+              // OTA-1222 — a small chance the find is swapped for something this PLACE
+              // authored. Replacement, not addition: the drop rate does not move.
+              siteLoot: siteLootForScene(get),
             });
             // OTA 23-015 — `kind: 'nothing'` no longer leaves the noun
             // unconsumed. Playtest log: a player typed `salvage gate`
@@ -14733,6 +15994,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             rareLootBias: raceLootBias(player, get().currentScene),
             // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
             biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
+            // OTA-1222 — same substitution on investigate.
+            siteLoot: siteLootForScene(get),
           });
           if (investigateLensActive && outcome.kind === 'hook') {
             get().appendLog(
@@ -15029,6 +16292,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
             runAethercraft(discipline, get, set, player, currentScene, golemKindHint);
             break;
           }
+          // ⚠ OTA-1218 — AETHER TECHNIQUES (PUNCHLIST P16), and the ORDER matters: this
+          // runs AFTER the three disciplines, never before. `channel` was already a
+          // synonym of `cast` in the parser's verb table, so a technique needed no new
+          // intent — but "shape stone", "summon golem" and "mend wounds" have meant those
+          // disciplines since OTA-039 and must keep meaning them.
+          //
+          // ⚠ `findTechniqueByName` REFUSES an ambiguous match rather than picking one
+          // (the P12 rule, from this same session). "channel ether" fits both Aether
+          // Shield and Veil of Ether, so it takes neither, and the miss below names the
+          // four so the player can be specific.
+          {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+            const query = (parsed.target ?? '').trim() || verbLow.replace(/^\s*(channel|cast|invoke|unleash|evoke)\s+/, '');
+            const tech = AT.findTechniqueByName(query);
+            if (tech) {
+              runAetherTechnique(tech.id, get, set, player, currentScene);
+              break;
+            }
+            // Only speak up when the player was plainly reaching for one of these — a
+            // bare "cast" that meant a relic must still fall through to the relic path.
+            if (/\b(channel|technique|aether shield|temporal|veil|resonance|cascade|slip)\b/.test(`${verbLow} ${query}`)) {
+              const known = (player.knownTechniques ?? []);
+              get().appendLog('system', known.length === 0
+                ? `You know no aether techniques yet. They are taught, not found — a faction you have rapport with will sell you the procedure.`
+                : `Which procedure? You know: ${AT.AETHER_TECHNIQUES.filter((t) => known.includes(t.id)).map((t) => t.name).join(', ')}.`);
+              break;
+            }
+          }
         }
         // OTA 192 — effect-driven consumable use. If the resolved
         // inventory item has effect.kind === 'consumable' in its
@@ -15042,6 +16334,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (parsed.resolvedItemId) {
           const used = player.inventory.find((i) => i.id === parsed.resolvedItemId);
           if (used) {
+            // ⚠⚠ OTA-1226 (PUNCHLIST P16, route B/C) — READING A PROCEDURE TEXT TEACHES IT.
+            // A found or story-earned text is a physical object in the pack; `read`/`use`
+            // is the door, and it is the ONE teaching seam both routes share — the vendor
+            // buy stays the only path that teaches without an object. ⚠ INT-gated at READ
+            // time, not at pickup, so an early find is never wasted, just waiting — and a
+            // refusal KEEPS the text (a purchase that ends in nothing is the whole punch
+            // list's founding defect). Consumed only on a successful teach.
+            if (teachFromProcedureText(get, set, player, used)) break;
             const { resolveItemEffect } = require('../engine/itemEffect');
             const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
             const resolvers = [findExplorationItemByName, findGearByName, findMaterialByName];
@@ -15853,7 +17153,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? scaledEnemyForContext(
                   rawRestEnemy,
                   restScene.location.danger,
-                  enemyScalePower(Math.max(restPlayer.stats.strength, restPlayer.stats.dexterity, restPlayer.stats.intelligence), restPlayer.hpMax),
+                  scalePowerOf(restPlayer),
                 )
               : rawRestEnemy;
             if (enemy) {
@@ -16018,7 +17318,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const interiorMove = resolveHubTravel(player.hubRoomId, trimmed, hubVisited);
           if (interiorMove) {
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: interiorMove.roomId } } : s));
-            const dest = hubRoomFor(interiorMove.roomId, player.factionId);
+            const dest = hubRoomFor(interiorMove.roomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
             if (dest) {
               get().appendLog(
                 'world',
@@ -16056,7 +17356,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // native build — pure-JS OTA can't vibrate.
           get().appendLog(
             'world',
-            `You have no stamina left — you can't travel. Type 'rest' to recover (≈4h), then back to the road.`,
+            // ⚠ OTA-1190 — IT SAID "≈4h" AND REST TAKES 8. The parser-routed rest uses a
+            // FIXED `hours = 8`; there is no 4-hour rest anywhere in the game. A player
+            // budgeting a contract's window off this line under-counts every stop by half
+            // — and the owner lost a contract to exactly that arithmetic, resting three
+            // times inside a 26h window he had been told cost 4h a stop.
+            `You have no stamina left — you can't travel. Type 'rest' to recover (8h), then back to the road.`,
           );
           buzzBlocked(); // arb41 — physical "can't move" signal
           break;
@@ -16112,7 +17417,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (isContinueCommand(trimmed)) {
           const last = player.lastTravelDirection;
           if (last) {
-            set({ player: advanceTime(spendTravelStamina(player), 1) });
+            // ⚠ OTA-1185 — a tile costs TILE_HOURS however you asked for it. This charged
+            // 1h while the → TARGET button charged 0.25h for the identical move, so
+            // typing was 4× more expensive than tapping.
+            set({ player: advanceTime(spendTravelStamina(player), TILE_HOURS) });
+            // OTA-1191 — hand-walked, so the road odometer pays double for it.
+            _lastStepWasCardinal = true;
             get().stepDirection(last);
           } else {
             get().appendLog(
@@ -16185,7 +17495,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // player is committed to open ground.
             break;
           }
-          set({ player: advanceTime(spendTravelStamina(player), 1) });
+          // ⚠ OTA-1185 — same tile, same price, typed or tapped. Was 1h here.
+          set({ player: advanceTime(spendTravelStamina(player), TILE_HOURS) });
+          // ⚠ OTA-1191 — THE TYPED CARDINAL WALK IS THE ONE WORTH DOUBLE. Autoroute runs a
+          // straight line to a place already on your map; this is the one that finds what
+          // is not. Owner: "double the generation rate for cardinal direction travel to get
+          // them to explore more."
+          _lastStepWasCardinal = true;
           get().stepDirection(dir);
           break;
         }
@@ -16428,6 +17744,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('world', `You're already committed to the dodge — no need to spend another beat on it.`);
           break;
         }
+        // ⚠ OTA-1193 — THE COOLDOWN GATE. Dodge resolves as `d20 + DEX >= the enemy's
+        // attack total`, so at DEX 19 only a natural 1 fails: the owner's log shows five
+        // dodges and five wins (including a nat 2 and a nat 3), each granting a ×2-dice
+        // opening that then rolled `slashing ×2.25 for 52`. Alternating dodge→attack put
+        // roughly half his attacks at double dice for no risk. This caps the UPTIME
+        // without touching the dodge maths, so the move stays a read rather than becoming
+        // a coin flip.
+        // ⚠ The refusal SPEAKS and BUZZES and does NOT spend the turn — a cooldown that
+        // silently eats the action is the OTA-1187 defect wearing armour.
+        {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const DC = require('../engine/dodgeCooldown') as typeof import('../engine/dodgeCooldown');
+          if (!DC.dodgeReady(player.dodgeCooldown)) {
+            get().appendLog('world', DC.dodgeCooldownLine(player.dodgeCooldown));
+            buzzBlocked();
+            break;
+          }
+        }
         const dodging: StatusEffect = {
           kind: 'dodging',
           // Single-shot reaction. Consumed by the next incoming
@@ -16443,7 +17777,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // risk-free stat farming against a pet weak enemy in zero game time.
         set((s) =>
           s.player
-            ? { player: advanceTime(spendStamina({ ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], dodging) }, 1), 0.1) }
+            ? { player: advanceTime(spendStamina({
+                ...s.player,
+                statusEffects: applyEffect(s.player.statusEffects ?? [], dodging),
+                // ⚠ OTA-1193 — armed here, ticked down by the per-action tail. The tail
+                // runs on THIS action too, so setting the full count leaves exactly
+                // DODGE_COOLDOWN_ROUNDS - 1 rounds locked and the stance usable again on
+                // the third action. Off-by-one here is the difference between "every
+                // other round" and the intended cadence.
+                // ⚠ OTA-1194 — the tier decides the count, not the bare constant.
+                // salvage resolves to 0, which arms nothing and leaves the stance free —
+                // the pre-OTA-1193 game, deliberately, on the tier whose whole promise is
+                // that the mud lets you work.
+                dodgeCooldown: (require('../engine/dodgeCooldown') as typeof import('../engine/dodgeCooldown'))
+                  .dodgeCooldownRounds(dialOf(s.player, 'dodgeLock')),
+              }, 1), 0.1) }
             : s,
         );
         // OTA-795 — the stance line spells out the new stakes: dodge is an
@@ -16867,9 +18215,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         // Otherwise normal concept lookup.
-        const concept = findConcept(lookup);
+        // ⚠⚠ OTA-1221 — MATCH THE TOPIC, NOT THE WHOLE SENTENCE. `lookup` is the raw parsed
+        // target, so for "ask the arbiter about <X>" it still carries the word *arbiter* —
+        // and `arbiter` is itself a concept keyword. So ANY ask matched the Arbiter concept
+        // whenever nothing longer beat it, which is why "ask the arbiter about zzzzz
+        // nonsense" returned an answer at all. Harmless while this branch only printed
+        // prose; the moment it also credits `loreRead` (below) it becomes a farm: ask
+        // nonsense three times, earn Scholar of Forgotten Lore. Strip the address first.
+        const conceptQuery = (require('../engine/askArbiter') as typeof import('../engine/askArbiter'))
+          .extractLoreQuery(trimmed) || lookup;
+        const concept = findConcept(conceptQuery);
         if (concept) {
           get().appendLog('arbiter', `"${concept.title}," the Arbiter says. "${concept.answer}"`);
+          // ⚠⚠ OTA-1221 (PUNCHLIST P17) — AND IT COUNTS AS READING LORE. This branch has
+          // answered lore offline, from concepts.json keywords, since OTA-233 — and then
+          // `break`s, so it never reached the `loreRead` tick further down. That tick lived
+          // ONLY inside the embedder branch, so on a device where the narration model does
+          // not load (the owner's own, OTA-1203 / OTA-1204 / OTA-1205: `Narration engine: failed`) the
+          // counter could never move and **Scholar of Forgotten Lore was unearnable** —
+          // while the game was answering the player's lore questions perfectly well the
+          // whole time. The answer was never the missing part; the credit was.
+          creditLoreRead(get, set, `concept_${concept.id}`);
           break;
         }
         // OTA-233 — MiniLM lore lookup. The keyword findConcept covers
@@ -16906,20 +18272,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const aa = require('../engine/askArbiter');
           let answered = false;
+          const loreQuery = aa.extractLoreQuery(trimmed) || lookup;
+          // ⚠ The embedder still goes FIRST and is unchanged — it is better at a loose ask
+          // ("what's the mud thing?") than any text match will be.
+          let hit: { concept: { id: string } } | null = null;
           if (cognitive.isReady()) {
             try {
-              const loreQuery = aa.extractLoreQuery(trimmed) || lookup;
-              const hit = await aa.findClosestLoreConcept(loreQuery, cognitive);
-              if (hit) {
-                get().appendLog('arbiter', aa.formatArbiterAnswer(hit.concept));
-                answered = true;
-                // arb45 — Scholar of Forgotten Lore: each canon lore answer
-                // is a deciphered text (3 needed).
-                recordTitleProgress(get, set, { loreRead: 1 });
-              }
+              hit = await aa.findClosestLoreConcept(loreQuery, cognitive);
             } catch {
-              /* lore lookup failed — fall through to the persona */
+              /* lore lookup failed — the offline path below still gets a turn */
             }
+          }
+          // ⚠⚠ OTA-1221 (PUNCHLIST P17) — THE OFFLINE PATH. Everything above needs a model
+          // that loads. On the owner's own device it does not (OTA-1203 / OTA-1204 / OTA-1205 all read
+          // `Narration engine: failed`), and `loreRead` was ticked ONLY inside that branch —
+          // so 177 authored lore concepts were unreachable and Scholar of Forgotten Lore
+          // could not be earned at all. The bank is plain text and never needed the model.
+          if (!hit) {
+            try {
+              hit = aa.findLoreConceptOffline(loreQuery);
+            } catch {
+              /* offline lookup failed — fall through to the persona */
+            }
+          }
+          if (hit) {
+            get().appendLog('arbiter', aa.formatArbiterAnswer(hit.concept as never));
+            answered = true;
+            // arb45 — Scholar of Forgotten Lore: each canon lore answer is a deciphered
+            // text (3 needed).
+            // ⚠⚠ OTA-1221 — DISTINCT CONCEPTS, NOT ASKS. This counted every answer, so
+            // asking the same question three times earned the title. A title called
+            // Scholar of Forgotten Lore should mean you read three DIFFERENT things, and
+            // this session has already closed two loops that paid out on repetition —
+            // opening the offline door without this would have made a farm of it.
+            creditLoreRead(get, set, `bank_${hit.concept.id}`);
           }
           if (!answered) {
             // OTA-1090 — read the brief HERE rather than closing over a stale
@@ -18183,10 +19569,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 const bossBase = buildSummitBoss(greatClimb.id);
                 if (bossDef && bossBase) {
                   const livePlTop = get().player ?? player;
-                  const bossPower = enemyScalePower(
-                    Math.max(livePlTop.stats.strength, livePlTop.stats.dexterity, livePlTop.stats.intelligence),
-                    livePlTop.hpMax,
-                  );
+                  const bossPower = scalePowerOf(livePlTop);
                   const boss = scaleStaticBoss(bossPower, bossBase);
                   set((s) => (s.currentScene ? {
                     currentScene: {
@@ -18352,10 +19735,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (sceneNow && sceneNow.enemies.length === 0 && climbEncounterAtTier(currentTier, totalTiers)) {
               const enc = buildClimbEncounter(currentTier, totalTiers);
               const livePl = get().player ?? player;
-              const climbPower = enemyScalePower(
-                Math.max(livePl.stats.strength, livePl.stats.dexterity, livePl.stats.intelligence),
-                livePl.hpMax,
-              );
+              const climbPower = scalePowerOf(livePl);
               const climbDanger = sceneNow.location?.danger ?? 3;
               const scaledEnc = scaleEncounterForContext(enc.enemies, climbDanger, climbPower);
               const scaledEncHps = scaledEnc.map((e) => e.hp);
@@ -19439,11 +20819,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
               player.completedFactionQuestIds ?? [],
             );
             const titles = pool.map((q) => `"${q.title}"`).join(', ');
+            // ⚠ OTA-1182 — AN EMPTY LIST HAS TWO CAUSES AND THEY NEED OPPOSITE ACTIONS.
+            //
+            // This used to say "Nothing for you right now — check back after I've
+            // travelled." There is NO restock: `availableFactionQuests` filters a
+            // STATIC authored pool by rep and by what the player already took, so
+            // travelling changes nothing, ever. The line promised a mechanic that does
+            // not exist and sent the player away to do the one thing that cannot help
+            // — the OTA-1181 defect class, in the one place it costs them time rather
+            // than only misinforming them.
+            //   LOCKED  → more work is here, standing is too low. Earn rep, come back.
+            //   CLEARED → they have taken everything these people offer. Go elsewhere.
+            // Both facts were already computable right here; now they are computed.
+            const lockedHere = repLockedFactionQuests(
+              vendor.faction,
+              getStanding(player.factionStanding, vendor.faction),
+              player.activeFactionQuestIds ?? [],
+              player.completedFactionQuestIds ?? [],
+            );
+            const emptyLine = lockedHere.count > 0
+              // ⚠ Names the CHEAPEST rung still out of reach, not the highest — telling
+              // someone two points off a rep-8 contract that they need 25 is the same
+              // unhelpfulness in a new costume.
+              ? `${vendor.name} looks you over. "Nothing I'd trust you with yet. There's ${lockedHere.count === 1 ? 'work' : `${lockedHere.count} more jobs`} on this board for someone we owe — stand at ${lockedHere.nextRep} with us and we'll talk."`
+              : `${vendor.name} spreads their hands. "You've had everything we have. Nothing here is going to change that — try another banner."`;
             get().appendLog(
               'arbiter',
               titles
                 ? `${vendor.name} folds their arms. "On offer: ${titles}. Type 'accept <title>' to take one."`
-                : `${vendor.name} shrugs. "Nothing for you right now — check back after I've travelled."`,
+                : emptyLine,
             );
           } else {
             get().appendLog('arbiter', `The Arbiter raises a brow. "Accept what? Find a faction vendor and ask what's on offer."`);
@@ -19479,26 +20883,52 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         const lower = target.toLowerCase();
-        // B2 (player: "kill all remote hand ins, make all routable") — the OTA-456
-        // "send word / courier" REMOTE turn-in is GONE for every contract type. A
-        // hand-in is now face-to-face: travel to the right agent (the Contracts atlas
-        // pins + SET COURSE route you there) and turn it in for full pay + a long-haul
-        // bonus scaled to the trek. A typed "send word …" is refused with that steer.
-        if (/\b(send word|courier|send a runner)\b/i.test(trimmed)) {
-          get().appendLog('arbiter', `The Arbiter shakes their head. "No couriers for this. Carry it to a posting agent yourself — the trip pays. Open Contracts and set a course to the ◆ pin."`);
-          break;
-        }
+        // ⚠ OTA-1211 (PUNCHLIST P3) — THE COURIER IS BACK, FOR REPORTS ONLY. B2 killed it
+        // for every contract type; the P3 audit showed the anti-farming rationale it was
+        // remembered for was never the actual one, and cannot apply to one-shot content.
+        // A runner now carries a MYSTERY, a STORYLINE or a non-fetch FACTION DEED for a
+        // 25% cut, full rep, no long-haul bonus, and 12 in-game hours off your clock.
+        // Hunts and fetch deliveries are still refused BY THEIR OWN HANDLERS — the trophy
+        // is shown in person (OTA-810) and the goods cannot be mailed (OTA-456).
+        const viaCourier = /\b(send word|courier|send a runner)\b/i.test(trimmed);
         const huntHint = /hunt|bounty|titan|dragon|behemoth|chimera|wyvern|monarch|siren|queen|trophy/.test(lower);
         const mysteryHint = /mystery|fragment|compass|orb|eye|watch|red tower|cradle|leviathan|obsidian|temporal/.test(lower);
         const storyHint = /storyline|story|path|ascension|run|relic run|silence|red tower|tartarian path/.test(lower);
-        if (storyHint && fuzzyFindStoryline(target, STORYLINES)) {
-          get().turnInStoryline(target);
+        // ⚠⚠ OTA-1211 — ROUTE AGAINST WHAT THE PLAYER IS ACTUALLY CARRYING, FIRST.
+        //
+        // The keyword hints above plus a fuzzy match over the WHOLE catalog decide which
+        // handler gets the command. That is a weak filter, and restoring the courier made
+        // it matter: a live probe typed `send word Fragment of the Red Tower` while
+        // holding exactly that mystery, the parser resolved it correctly
+        // (`intent=turn_in target=fragment red tower`), and the routing still fell through
+        // to `turnInFactionQuest`, which answered *"You have no active contracts."* — the
+        // catalog-wide fuzzy match could not tie the stop-word-stripped target back to the
+        // full title.
+        //
+        // ⚠ The player's own slate is both a far better match pool and the only one that
+        // can possibly be right: you cannot turn in a contract you are not carrying. The
+        // handlers themselves have always searched the active list; only this routing step
+        // did not. Catalog-wide matching stays as the fallback so nothing that resolved
+        // before stops resolving now.
+        const activeOf = <T,>(ids: { id: string }[] | undefined, find: (id: string) => T | null): T[] =>
+          (ids ?? []).map((r) => find(r.id)).filter((x): x is T => !!x);
+        const mineStorylines = activeOf(player.activeStorylines, findStorylineById);
+        const mineMysteries = activeOf(player.activeMysteries, findMysteryById);
+        const mineHunts = activeOf(player.activeHunts, findHuntById);
+        if (fuzzyFindStoryline(target, mineStorylines)) {
+          get().turnInStoryline(target, viaCourier);
+        } else if (fuzzyFindMystery(target, mineMysteries)) {
+          get().turnInMystery(target, viaCourier);
+        } else if (fuzzyFindHunt(target, mineHunts)) {
+          get().turnInHunt(target, viaCourier);
+        } else if (storyHint && fuzzyFindStoryline(target, STORYLINES)) {
+          get().turnInStoryline(target, viaCourier);
         } else if (mysteryHint && fuzzyFindMystery(target, MYSTERIES)) {
-          get().turnInMystery(target);
+          get().turnInMystery(target, viaCourier);
         } else if (huntHint && fuzzyFindHunt(target, HUNTS)) {
-          get().turnInHunt(target);
+          get().turnInHunt(target, viaCourier);
         } else {
-          get().turnInFactionQuest(target);
+          get().turnInFactionQuest(target, viaCourier);
         }
         break;
       }
@@ -19913,6 +21343,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // who's taken a side. No-op unless the cooldown has passed and the scene is a safe
     // outdoor moment.
     maybeSpawnRaid(get, set);
+    // ⚠ OTA-1189 — CATCH-ALL for standing on a contract's ground. The two travel-arrival
+    // paths call this too, and the redundancy is deliberate: those only cover AUTOROUTED
+    // arrivals, and a player who walks the last tiles with typed cardinals would otherwise
+    // reach the outpost and find nothing there — which is the exact failure this OTA
+    // exists to remove. Idempotent by construction (one-shot flag on the contract), so
+    // being called from three places costs nothing but cannot silently miss a route in.
+    maybeSeedQuarry(get, set);
+    // OTA-1191 — the road odometer. Self-guards: no movement, no tick.
+    tickRoadOdometer(get, set);
+    // ⚠ OTA-1193 — the dodge cooldown refills one step per ACTION, which is what makes the
+    // bar fill because of something the player did rather than because time passed. Ticks
+    // on every action, in or out of combat, so walking away recharges it too.
+    {
+      const dc = get().player?.dodgeCooldown ?? 0;
+      if (dc > 0) set((s) => (s.player ? { player: { ...s.player, dodgeCooldown: dc - 1 } } : s));
+    }
     // OTA-851 — a roaming faction patrol can cross your path in the open, anywhere.
     if ((get().currentScene?.enemies?.length ?? 0) === 0) maybePatrolAmbush(get, set);
     void get().persist();
@@ -21032,11 +22478,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // twisted clear (at the reduced trait rate).
       enemyDodged = enemyDodgesHit(enemy.traits, attack.total, attack.target, !!attack.critical);
     }
+    // ⚠ OTA-1225 — A HELD SLIP EATS THE BLOW, the enemy-side mirror of the player's
+    // Temporal Slip at the to-hit verdict (OTA-1218). Same exclusion, same reason: a
+    // NATURAL 20 pierces it — OTA-815's rule that nothing buys literal immunity cuts both
+    // ways, or a slip-holding enemy the player cannot crit through would be the wall the
+    // rule forbids. Consumed on use; the channel already cost it a whole swing.
+    let enemySlipped = false;
+    if (!enemyDodged && attack?.success && !attack.critical
+        && (enemy.traits ?? []).includes('slip_held')) {
+      enemySlipped = true;
+      const idxNow = get().currentScene?.enemies.findIndex((e) => e === enemy) ?? -1;
+      if (idxNow >= 0) {
+        set((s) => {
+          if (!s.currentScene) return s;
+          const enemies = s.currentScene.enemies.map((e, i) => (
+            i === idxNow ? { ...e, traits: (e.traits ?? []).filter((t) => t !== 'slip_held') } : e
+          ));
+          return { currentScene: { ...s.currentScene, enemies } };
+        });
+      }
+    }
 
     if (attack && typeof attack.total === 'number' && attack.target !== undefined) {
       const naturalRoll = attack.values?.[0] ?? attack.total - attack.bonus;
       const acTag = `vs ${enemy.name} AC ${attack.target}`;
-      const outcome = enemyDodged
+      const outcome = enemySlipped
+        ? '✗ SLIPPED'
+        : enemyDodged
         ? '✗ DODGED'
         : attack.critical
         ? '✓ CRITICAL HIT'
@@ -21050,6 +22518,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     if (attack?.success) {
+      // OTA-1225 — the slip resolves exactly like a dodge: the blow finds nothing, the
+      // action is spent, the reaching pack still answers.
+      if (enemySlipped) {
+        get().appendLog(
+          'combat',
+          `Your blow lands where ${enemy.name} WAS — it is a half-second past the spot, and the slip closes behind it, spent.`,
+        );
+        if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player);
+        const hoursAfterSlip = get().player?.hoursElapsed ?? hoursBeforeConclude;
+        const dtSlip = hoursAfterSlip - hoursBeforeConclude;
+        if (dtSlip > 0) {
+          const label = dtSlip < 1 ? `${Math.round(dtSlip * 60)} min` : `${Math.round(dtSlip * 10) / 10}h`;
+          get().appendLog('system', `⏳ Time passed: ${label}`);
+        }
+        void get().persist();
+        return;
+      }
       // Agile / quick enemies get a save against the incoming hit (rolled
       // above). Success completely negates damage AND the on-hit status that
       // would have applied. Misses fall through to normal damage math.
@@ -21165,6 +22650,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (tPerksAtk.mechanicalDamageDice > 0
           && /automation|mechanism|construct|sentinel|drone/i.test(`${enemy.name} ${enemy.type ?? ''}`)) {
         for (let i = 0; i < tPerksAtk.mechanicalDamageDice; i++) titleDmgBonus += rollDie(6);
+      }
+      // ⚠ OTA-1207 — ELIOR ZALMAR's story: +1 flat when the swing's own damage type is
+      // electrical or aetheric. Gated on the WEAPON's type, not the enemy's — the man
+      // built the Aetheric Engine, so what he teaches is how to drive the current, not
+      // what to point it at. Sits beside the mechanical die because this is the one place
+      // a flat, perk-sourced damage addition belongs.
+      if (tPerksAtk.electricalDamageBonus > 0) {
+        const swingType = String(weaponType ?? '').toLowerCase();
+        if (swingType === 'electrical' || swingType === 'aetheric') {
+          titleDmgBonus += tPerksAtk.electricalDamageBonus;
+        }
       }
       // arb-fix — ethericSurge title (Aetherborn Awakened): once per combat, the
       // first qualifying hit detonates an Aetheric surge (+1d8). Keyed to the
@@ -21838,12 +23334,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     }
     advanceActiveFactionQuests(get, set, 'travel');
-    // arb46 — Tier-C location-challenge entry hooks. activeChallengesAt()
-    // returns [] while the challenges are switched OFF (locationChallenges
-    // .TIER_C_ENABLED / per-challenge enabled both false), so this loop is
-    // inert today. When a challenge is reviewed + turned on, its entry hook
-    // surfaces here on arrival. The full interaction handlers are wired when
-    // the user supplies each challenge's layout.
+    // arb46 — Tier-C location-challenge entry hooks: a challenge's entry hook surfaces
+    // here on arrival.
+    //
+    // ⚠ OTA-1210 (PUNCHLIST P5) — THIS COMMENT USED TO SAY THE LOOP WAS INERT. It read
+    // "activeChallengesAt() returns [] while the challenges are switched OFF
+    // (TIER_C_ENABLED / per-challenge enabled both false), so this loop is inert today."
+    // **That has not been true for some time.** `locationChallenges.ts` has
+    // `TIER_C_ENABLED = true` and all six challenges carry `enabled: true` —
+    // labyrinth_of_shadows, tongue_of_the_red_tower, warden_of_the_cathedral,
+    // trap_dives_of_the_stair, defense_of_the_enclave, parley_of_factions — and all six
+    // have handler references outside their definition file.
+    //
+    // ⚠ Filed and fixed because a false "this is switched off" is how a WORKING system
+    // gets skipped in an audit. It cost the 2026-08-09 completability pass a detour to
+    // disprove, and the next reader would have paid the same toll.
     for (const ch of activeChallengesAt(locationId)) {
       const attempt = get().player?.challengeAttempts?.[ch.id];
       if (ch.id === 'labyrinth_of_shadows') {
@@ -22694,13 +24199,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
         for (const b of completed) {
           const payer = get().player;
           if (!payer) break;
-          const rep = applyRepChange(payer.factionStanding, b.giverFactionId, b.rewardRep);
+          // ⚠ OTA-1188 — PAY OUT ON THE POLITICS THE CONTRACT WAS SIGNED UNDER, not the
+          // world as it stands now. `b.politics` was frozen from the board the player
+          // read at accept; a contract from before this OTA carries none and falls back
+          // to the live/static read, which is exactly the old behaviour.
+          const rep = applyRepChange(
+            payer.factionStanding, b.giverFactionId, b.rewardRep,
+            b.politics ? { allies: b.politics.allies, rivals: b.politics.rivals } : undefined,
+          );
           set((s) => (s.player ? { player: {
             ...s.player,
             tc: (s.player.tc ?? 0) + b.rewardTc,
             factionStanding: rep.standing,
           } } : s));
           logRepChanges(get, rep.changed);
+          // ⚠ OTA-1188 — REMEMBER WHERE THIS ONE WAS CLOSED. The anti-camp rule reads it:
+          // no second contract from the board you just collected on until you have closed
+          // one somewhere else. Owner: "otherwise people are just going to keep standing
+          // there, collecting bounties." Stored as the location the player is IN at
+          // payout — which, since kills count anywhere, is wherever they finished it.
+          set((s) => ({ worldMemory: {
+            ...s.worldMemory,
+            lastBountyClearedOutpostId: s.player?.currentLocationId,
+          } }));
           get().announceMissionComplete('Bounty', `${b.giverName} bounty`, `✦ Bounty complete — the ${b.giverName} pay out ${b.rewardTc} TC.`);
           get().appendLog('arbiter', `"The ${b.giverName} will hear of this," the Arbiter says. "You've done what they could not."`);
         }
@@ -23159,6 +24680,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // ⚠ OTA-1218 — PROCEDURE TEXTS (PUNCHLIST P16). Buying one TEACHES the technique; it
+    // never mints an item. This sits beside the OTA-726 recipe branch and works the same
+    // way for the same reason: what you are buying is knowledge, and a physical book would
+    // need a catalog row, a `use` handler and a read path before it taught anything —
+    // three more places for the loop to end in nothing.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+      const tech = AT.findTechniqueByTextName(itemName);
+      if (tech) {
+        const rowName = AT.techniqueTextName(tech);
+        // ⚠ The vendor must actually be OFFERING it. Without this, `buy procedure text:
+        // resonance cascade` would teach a Legendary technique at any stall in the world,
+        // which deletes the rapport gate that is the whole acquisition design.
+        const row = scene.vendor.offers.find((o) => o.itemName.toLowerCase() === rowName.toLowerCase());
+        if (!row) {
+          get().appendLog('system', `${scene.vendor.name} doesn't carry the ${tech.name} procedure.`);
+          return;
+        }
+        if ((player.knownTechniques ?? []).includes(tech.id)) {
+          get().appendLog('system', `You already carry the ${tech.name} in your hands.`);
+          return;
+        }
+        if (player.tc < row.price) {
+          get().appendLog('system', `${scene.vendor.name} rests a hand on the folder. "The ${tech.name} runs ${row.price} TC. It is not a thing I discount."`);
+          return;
+        }
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            tc: s.player.tc - row.price,
+            knownTechniques: [...(s.player.knownTechniques ?? []), tech.id],
+          },
+        } : s));
+        get().appendLog(
+          'reward',
+          `Bought the ${tech.name} procedure for ${row.price} TC. ✦ Technique learned — type \`channel ${tech.name.toLowerCase()}\`.`
+          + ` It costs Aetheric fuel and ${tech.baseDose} corruption a run, and it will cost you your turn in a fight.`,
+        );
+        void get().persist();
+        return;
+      }
+    }
+
     // OTA-726 — RECIPE offers. A vendor teaches a small, stable slice of the
     // rare/legendary recipes you haven't learned yet (a gold sink + a reliable,
     // pricey way to get a working you never stumbled on). `buy <recipe name>`
@@ -23329,14 +24894,46 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // dwarf it (joining needs 20 standing ≈ 10,000 TC spent this way). The pool is
     // faction-agnostic; it banks into whoever you're buying from when it crosses,
     // a benign cross-faction bleed for an afterthought lever.
-    const BUY_REP_TC_PER_STANDING = 500;
-    const vendorFaction = scene.vendor.faction;
+    // ⚠ OTA-1181 — the value now lives in engine/factions.ts and is IMPORTED. It was
+    // a function-local const, so the character sheet had no way to state the rule and
+    // the in-game glossary just said purchases were worth "+1" — off by this whole
+    // constant. A number two surfaces have to agree on does not get two homes.
+    // ⚠ OTA-1179 — CANONICALISE, THEN ONLY SPEND THE POOL IF THE GRANT CAN LAND.
+    //
+    // The pool used to be debited unconditionally: `nextBuyRepProgress` was
+    // computed from `buyRepGranted` and written whether or not `applyRepChange`
+    // did anything. **Every roadside trader in the game has `faction: null`**
+    // (engine/vendors.ts), so crossing 500 TC at a roadside stall silently burned
+    // 500 TC of accumulated honest custom and granted nothing — permanently, since
+    // the pool does not refund. Same loss at REP_MAX, and same loss for a vendor
+    // whose recorded faction is one of the legacy race ids (see canonicalFactionId).
+    //
+    // ⚠ THE REMAINDER IS NOT THE SAME AS THE GRANT. Only the part that was
+    // converted into standing is spent; the sub-500 remainder always carries, which
+    // is what makes this a grind rather than a lottery. So on a landing grant we
+    // keep the remainder, and on a no-op we keep the WHOLE pool — the coin is still
+    // honest custom, it just has nobody to bank it with yet.
+    //
+    // ⚠ ONE CONSEQUENCE THE OWNER SHOULD SEE ON DEVICE BEFORE IT IS TUNED: a long
+    // stretch of roadside-only shopping now banks in a LUMP at the next faction
+    // vendor, because the pool carries instead of evaporating. That is the stated
+    // design ("faction-agnostic; it banks into whoever you're buying from when it
+    // crosses") paid out honestly for the first time — 10,000 TC of custom is worth
+    // +20 either way. But it arrives all at once, and +20 is the join threshold. If
+    // that reads badly in play the answer is a per-purchase grant cap, which is a
+    // DESIGN call and is deliberately not made here.
+    const vendorFaction = canonicalFactionId(scene.vendor.faction);
     const buyRepPool = (player.buyRepProgress ?? 0) + totalCost;
     const buyRepGranted = Math.floor(buyRepPool / BUY_REP_TC_PER_STANDING);
-    const nextBuyRepProgress = buyRepPool - buyRepGranted * BUY_REP_TC_PER_STANDING;
     const repResult = (vendorFaction && buyRepGranted > 0)
       ? applyRepChange(player.factionStanding, vendorFaction, buyRepGranted)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+    // `changed` is empty when the id was unknown OR the faction was already pinned
+    // at REP_MAX — in both cases nothing moved, so nothing should be charged.
+    const buyRepLanded = repResult.changed.length > 0;
+    const nextBuyRepProgress = buyRepLanded
+      ? buyRepPool - buyRepGranted * BUY_REP_TC_PER_STANDING
+      : buyRepPool;
     set((s) => {
       if (!s.player || !s.currentScene?.vendor) return s;
       // OTA 036 — filter by (itemName, price) instead of reference
@@ -24116,7 +25713,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), quest.id],
               activeFactionQuests: [
                 ...(s.player.activeFactionQuests ?? []),
-                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: newTracked, ...(escort ? { escort } : {}) },
+                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: newTracked, ...(escort ? { escort } : {}), ...acceptCellStamp(get) },
               ],
             },
           }
@@ -24364,6 +25961,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-451 — turn in to a same-faction VENDOR or the OUTPOST MISSION BOARD.
     // OTA-456 — or REMOTELY by courier ("send word <quest>") from anywhere, for a
     // 15% TC cut (full rep). Travel to claim in full stays the optimal play.
+    // OTA-1208 — the trading post brokers ANY faction's contract for a cut (PUNCHLIST P2).
+    // ⚠ Resolved here, before `turnFaction`, because this handler decides who it is
+    // dealing with BEFORE it knows which contract is meant — and the broker's whole point
+    // is that he does not need to match. Without this the outskirts gate (a hub with no
+    // owning faction, so no hall fallback) would refuse him at the early return below.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
+    const atBroker = CB.isContractBroker(scene?.vendor);
     let turnFaction = scene?.vendor?.faction ?? scene?.missionBoard?.faction ?? null;
     let turnSourceName = scene?.vendor?.name ?? (scene?.missionBoard ? 'The mission board' : null);
     // OTA-617 — BUILDING-LEVEL in-person turn-in. If you're inside a faction's
@@ -24382,7 +25987,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         turnSourceName = `the ${homeFaction.name} hall`;
       }
     }
-    if (!turnFaction || !turnSourceName) {
+    if ((!turnFaction && !atBroker) || !turnSourceName) {
       // If the player named a specific contract, fuzzy-match it and tell
       // them the exact faction + sample vendor names. Otherwise fall
       // back to listing the factions they owe across all active quests.
@@ -24451,10 +26056,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    if (candidate.factionId !== turnFaction) {
+    // OTA-1208 — brokered when the trading post is standing in for a faction that is not
+    // its own. Computed here rather than reused from `atBroker` so a contract the broker
+    // could have taken anyway (unaligned, or his own) is NOT charged a cut.
+    const questViaBroker = atBroker && candidate.factionId !== turnFaction;
+    if (!questViaBroker && candidate.factionId !== turnFaction) {
       get().appendLog(
         'arbiter',
-        `${sourceLabel} won't take it — wrong faction. Bring it to ${candidate.factionId.replace(/_/g, ' ')}.`,
+        `${sourceLabel} won't take it — wrong faction. Bring it to ${candidate.factionId.replace(/_/g, ' ')}, or to the trading post at any outpost gate.`,
       );
       return;
     }
@@ -24485,6 +26094,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    // ⚠⚠ OTA-1208 — THE BROKER DOES TAKE DELIVERIES, and the first version of this did
+    // not. Getting that wrong would have opened a NEW unfinishable state while closing
+    // P2, so the reasoning is recorded here rather than left to be re-derived.
+    //
+    //   The first pass refused a fetch quest at the broker, on the strength of OTA-456
+    //   ("a FETCH quest is a PHYSICAL delivery … you can't mail the goods"), and argued it
+    //   cost no reachability because faction quests come from the player's OWN mission
+    //   board. ⚠ THAT SECOND CLAIM IS FALSE, and this suite's own premise check caught it:
+    //   faction quests are ALSO offered by vendors (`acceptFaction`, from the scene
+    //   vendor), and a Hidden Market stall searches EVERY faction's pool. A player can
+    //   therefore be holding an unreachable faction's fetch quest — exactly the contract
+    //   this OTA exists to un-strand — and the refusal would have stranded it.
+    //
+    //   ⚠ OTA-456's rule is not violated by allowing it. Its words are about goods
+    //   travelling by word of mouth with nobody present. Here the player stands at the
+    //   counter and the items leave their hands: the fetch gate immediately below still
+    //   verifies the player HOLDS them and still consumes them. The goods change hands in
+    //   person. Only the final destination is delegated, which is what a broker is.
+    //
     // OTA-450 — fetch gate. The generic per-faction starter quests require the
     // player to actually HOLD the items; verify, then consume them on turn-in so
     // it's a real "gather N, bring them back" loop (not a free narrative close).
@@ -24513,7 +26141,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // B2 — full pay in person + a long-haul TC bonus scaled to how far you carried it.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.reward.tc);
+    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.reward.tc, activeRecord?.acceptedAtCell);
     // OTA-987 — ESCORT pay model (owner: "go with the scaled party for most
     // escorts, but make the higher tier escorts all or nothing"). Scaled
     // escorts pay the TC fee times the fraction of the party still standing
@@ -24525,7 +26153,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const e = activeRecord.escort;
       if (e.hpMax > 0) escortPayMult = Math.max(0.1, Math.min(1, e.hp / e.hpMax));
     }
-    const payTc = Math.max(1, Math.round((candidate.reward.tc + journeyTc) * escortPayMult));
+    // OTA-1208 — the broker takes his cut and forfeits the long-haul bonus; the escort
+    // multiplier still applies on top, because that one prices how many of the party you
+    // actually walked home and has nothing to do with who paid you.
+    const baseAndJourneyTc = CB.contractPayoutTc(candidate.reward.tc, journeyTc, questViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
+    const payTc = Math.max(1, Math.round(baseAndJourneyTc * escortPayMult));
+    // ⚠ The announce line must not claim a long-haul bonus the broker did not pay.
+    const shownJourneyTc = questViaBroker ? 0 : journeyTc;
+    if (questViaBroker) {
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
+    }
     const payRep = candidate.reward.rep;
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, payRep);
     set((s) =>
@@ -24546,7 +26183,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().announceMissionComplete(
       'Contract',
       candidate.title,
-      `✦ Faction contract complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${payRep > 0 ? `, +${payRep} rep with ${fLabel}` : ''}.`,
+      `✦ Faction contract complete — ${candidate.title}. +${payTc} TC${shownJourneyTc > 0 ? ` (incl. +${shownJourneyTc} long-haul)` : ''}${questViaBroker ? ` (broker's cut taken)` : ''}${payRep > 0 ? `, +${payRep} rep with ${fLabel}` : ''}.`,
     );
     // OTA-1073 — the agent who took it back remembers that you finished it.
     creditTurnIn(get, set, remote);
@@ -24689,7 +26326,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ...s.player,
             activeHunts: [
               ...(s.player.activeHunts ?? []),
-              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked },
+              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked, ...acceptCellStamp(get) },
             ],
           },
         } : s));
@@ -24777,7 +26414,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...s.player,
               activeHunts: [
                 ...(s.player.activeHunts ?? []),
-                { id: hunt.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: huntTracked },
+                { id: hunt.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: huntTracked, ...acceptCellStamp(get) },
               ],
             },
           }
@@ -24901,7 +26538,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const freezeForKill = stageDef.checkKind === 'boss' && record.stage === lastBossIndex;
     if (stageDef.checkKind === 'boss') {
-      const boss = scaleHuntBoss(player, hunt);
+      // ⚠ OTA-1190 — pass the REAL power measure, so the boss sees stats, weapon and AC
+      // rather than max HP alone. `scalePowerOf` carries the guarded gear read.
+      const boss = scaleHuntBoss(player, hunt, scalePowerOf(player));
       if (boss) {
         set((s) =>
           s.currentScene
@@ -24954,14 +26593,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    if (!scene?.vendor) {
+    // OTA-1210 (PUNCHLIST P8) — the posting BOARD and the faction's own HALL take it back
+    // too, exactly as they always have for faction quests. A trophy handed over at the
+    // board that posted the bounty is still a face-to-face hand-in.
+    const huntParty = turnInCounterparty(get, player, scene);
+    if (!huntParty) {
       get().appendLog(
         'arbiter',
-        `The Arbiter folds their arms. "A bounty's settled in person — find a vendor or faction agent and show them the trophy."`,
+        `The Arbiter folds their arms. "A bounty's settled in person — find a vendor, a posting board, or the faction's own hall and show them the trophy."`,
       );
       return;
     }
-    const sourceLabel = scene?.vendor?.name ?? 'A runner';
+    const sourceLabel = huntParty.name;
     const active = player.activeHunts ?? [];
     const direct = findHuntById(titleOrId);
     const candidate = direct ?? fuzzyFindHunt(
@@ -24984,10 +26627,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    if (!remote && candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
+    // OTA-1208 — the trading post brokers another faction's bounty for a cut (PUNCHLIST
+    // P2). ⚠ The trophy still changes hands IN PERSON, at an outpost the player walked to
+    // — OTA-810's rule ("a bounty is paid face to face, not sent by runner") is intact.
+    // What is gone is the requirement that the RIGHT faction's agent happen to be
+    // standing there when you arrive.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
+    const huntViaBroker = CB.isContractBroker(scene?.vendor)
+      && !!candidate.factionId && candidate.factionId !== huntParty.faction;
+    if (!remote && !CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: huntParty.faction }, candidate.factionId)) {
       get().appendLog(
         'arbiter',
-        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId.replace(/_/g, ' ')} posted that one."`,
+        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId!.replace(/_/g, ' ')} posted that one — them, or the trading post at any outpost gate."`,
       );
       return;
     }
@@ -25033,8 +26685,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-810 — face-to-face only, so always full pay. B2 — plus a long-haul bonus
     // scaled to how far you carried the trophy.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc);
-    const payTc = candidate.rewardTc + journeyTc;
+    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc, record?.acceptedAtCell);
+    // OTA-1208 — 80% and no long-haul bonus when the trading post carried it.
+    const payTc = CB.contractPayoutTc(candidate.rewardTc, journeyTc, huntViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
+    if (huntViaBroker) {
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
+    }
     set((s) =>
       s.player
         ? {
@@ -25052,7 +26708,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().announceMissionComplete(
       'Hunt',
       candidate.title,
-      `✦ Hunt complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
+      `✦ Hunt complete — ${candidate.title}. +${payTc} TC${!huntViaBroker && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${huntViaBroker ? ` (broker's cut taken)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
     );
     // OTA-1073 — the agent who took it back remembers that you finished it.
     creditTurnIn(get, set, false);
@@ -25106,7 +26762,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ...s.player,
             activeMysteries: [
               ...(s.player.activeMysteries ?? []),
-              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked },
+              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked, ...acceptCellStamp(get) },
             ],
           },
         } : s));
@@ -25188,7 +26844,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...s.player,
               activeMysteries: [
                 ...(s.player.activeMysteries ?? []),
-                { id: m.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: mysteryTracked },
+                { id: m.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: mysteryTracked, ...acceptCellStamp(get) },
               ],
             },
           }
@@ -25279,17 +26935,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  turnInMystery(titleOrId, _remote = false) {
+  turnInMystery(titleOrId, remote = false) {
     const state = get();
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
+    // ⚠ OTA-1211 (PUNCHLIST P3) — a mystery is a REPORT, so a runner can carry it. The
+    // counterparty check below is skipped for a courier hand-in; everything else (the
+    // stage gate, the artifact-is-the-proof check) still applies.
+    const mystViaCourier = remote;
     // B2 — the artifact is the proof and it changes hands IN PERSON now (no courier).
-    if (!scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Need a buyer, in the flesh. Carry the proof to a vendor — set a course to the ◆ pin in Contracts."`);
+    // OTA-1210 (PUNCHLIST P8) — board and hall count, same as for faction quests.
+    const mystParty = turnInCounterparty(get, player, scene);
+    if (!mystViaCourier && !mystParty) {
+      get().appendLog('arbiter', `The Arbiter folds their arms. "Need a buyer, in the flesh. Carry the proof to a vendor, a posting board, or the faction's hall — set a course to the ◆ pin in Contracts."`);
       return;
     }
-    const sourceLabel = scene?.vendor?.name ?? 'A runner';
+    const sourceLabel = mystViaCourier ? 'A runner' : mystParty!.name;
     const active = player.activeMysteries ?? [];
     const direct = findMysteryById(titleOrId);
     const candidate = direct ?? fuzzyFindMystery(
@@ -25312,10 +26974,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    if (candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
+    // OTA-1208 — the trading post brokers another faction's work for a cut (PUNCHLIST P2).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
+    const mysteryViaBroker = !mystViaCourier && CB.isContractBroker(scene?.vendor)
+      && !!candidate.factionId && candidate.factionId !== mystParty?.faction;
+    if (!mystViaCourier && !CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: mystParty!.faction }, candidate.factionId)) {
       get().appendLog(
         'arbiter',
-        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId.replace(/_/g, ' ')} posted that."`,
+        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId!.replace(/_/g, ' ')} posted that — take it to them, or to the trading post at any outpost gate."`,
       );
       return;
     }
@@ -25354,9 +27021,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
     // B2 — full pay + a LONG-HAUL bonus scaled to how far you carried it.
+    // OTA-1208 — unless the trading post brokered it, which pays 80% and no bonus.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc);
-    const payTc = candidate.rewardTc + journeyTc;
+    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc, record?.acceptedAtCell);
+    // ⚠ OTA-1211 — a courier hand-in pays the runner's rate and NO long-haul bonus.
+    const payTc = mystViaCourier
+      ? CB.courierPayoutTc(candidate.rewardTc)
+      : CB.contractPayoutTc(candidate.rewardTc, journeyTc, mysteryViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
+    if (mystViaCourier) {
+      get().appendLog('arbiter', CB.courierSentLine(candidate.title, payTc));
+      set((st) => (st.player ? { player: advanceTime(st.player, CB.COURIER_DELAY_HOURS) } : st));
+    }
+    if (mysteryViaBroker) {
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
+    }
     set((s) =>
       s.player
         ? {
@@ -25374,10 +27052,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().announceMissionComplete(
       'Mystery',
       candidate.title,
-      `✦ Mystery complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
+      `✦ Mystery complete — ${candidate.title}. +${payTc} TC${!mysteryViaBroker && !mystViaCourier && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${mysteryViaBroker ? ` (broker's cut taken)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
     );
     // OTA-1073 — the agent who took it back remembers that you finished it.
-    creditTurnIn(get, set, false);
+    creditTurnIn(get, set, mystViaCourier);
     applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
     plantNextContractHint(get, candidate.factionId ?? null, 'mystery');
@@ -25458,7 +27136,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...st.player,
               activeStorylines: [
                 ...(st.player.activeStorylines ?? []),
-                { id: s.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: storyTracked },
+                { id: s.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: storyTracked, ...acceptCellStamp(get) },
               ],
             },
           }
@@ -25546,17 +27224,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  turnInStoryline(titleOrId, _remote = false) {
+  turnInStoryline(titleOrId, remote = false) {
     const state = get();
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
+    // ⚠ OTA-1211 (PUNCHLIST P3) — a storyline closes with a report, so a runner can carry it.
+    const storyViaCourier = remote;
     // B2 — a storyline arc is closed FACE TO FACE now (no courier).
-    if (!scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Find the agent in person. Open Contracts, set a course to the ◆ pin, and close it there — the trip pays."`);
+    // OTA-1210 (PUNCHLIST P8) — board and hall count, same as for faction quests.
+    const storyParty = turnInCounterparty(get, player, scene);
+    if (!storyViaCourier && !storyParty) {
+      get().appendLog('arbiter', `The Arbiter folds their arms. "Find the agent in person — a vendor, the posting board, or the faction's hall. Open Contracts, set a course to the ◆ pin, and close it there. The trip pays."`);
       return;
     }
-    const sourceLabel = scene?.vendor?.name ?? 'A runner';
+    const sourceLabel = storyViaCourier ? 'A runner' : storyParty!.name;
     const active = player.activeStorylines ?? [];
     const direct = findStorylineById(titleOrId);
     const candidate = direct ?? fuzzyFindStoryline(
@@ -25583,10 +27265,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // storyline ever ships with factionId=null (none currently do,
     // but schema allows it) the old bare !== check would reject
     // every vendor; the && short-circuits that.
-    if (candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
+    // OTA-1208 — the trading post brokers another faction's work for a cut (PUNCHLIST P2).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
+    const storyViaBroker = !storyViaCourier && CB.isContractBroker(scene?.vendor)
+      && !!candidate.factionId && candidate.factionId !== storyParty?.faction;
+    if (!storyViaCourier && !CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: storyParty!.faction }, candidate.factionId)) {
       get().appendLog(
         'arbiter',
-        `${sourceLabel} shakes their head. "Wrong faction. ${candidate.factionId.replace(/_/g, ' ')} posted that one."`,
+        `${sourceLabel} shakes their head. "Wrong faction. ${candidate.factionId!.replace(/_/g, ' ')} posted that one — them, or the trading post at any outpost gate."`,
       );
       return;
     }
@@ -25602,8 +27289,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         })]
       : [...player.inventory];
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc);
-    const payTc = candidate.rewardTc + journeyTc;
+    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc, record?.acceptedAtCell);
+    // OTA-1208 — 80% and no long-haul bonus when the trading post carried it.
+    // ⚠ OTA-1211 — courier rate, no long-haul bonus.
+    const payTc = storyViaCourier
+      ? CB.courierPayoutTc(candidate.rewardTc)
+      : CB.contractPayoutTc(candidate.rewardTc, journeyTc, storyViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
+    if (storyViaCourier) {
+      get().appendLog('arbiter', CB.courierSentLine(candidate.title, payTc));
+      set((st) => (st.player ? { player: advanceTime(st.player, CB.COURIER_DELAY_HOURS) } : st));
+    }
+    if (storyViaBroker) {
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
+    }
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep);
     set((s) =>
       s.player
@@ -25622,10 +27320,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().announceMissionComplete(
       'Storyline',
       candidate.title,
-      `✦ Storyline complete — ${candidate.title}. +${payTc} TC${journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
+      `✦ Storyline complete — ${candidate.title}. +${payTc} TC${!storyViaBroker && !storyViaCourier && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${storyViaBroker ? ` (broker's cut taken)` : ''}, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
     );
+    // ⚠ OTA-1226 (PUNCHLIST P16, route C) — four storylines ALSO hand over the faction's
+    // Procedure Text, alongside (never instead of) the authored reward. The text is an
+    // OBJECT; the read path teaches and INT-gates, so an arc finished early banks the
+    // technique rather than wasting it.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+      const textTechId = AT.STORYLINE_TEXT_REWARDS[candidate.id];
+      const textTech = AT.findTechnique(textTechId ?? null);
+      if (textTech) {
+        const textName = AT.techniqueTextName(textTech);
+        const cat = lookupCraftedItem(textName);
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            inventory: mergeOrPushItem(s.player.inventory, stampDurability({
+              id: freshInstanceId('text'),
+              name: textName,
+              kind: cat.kind,
+              rarity: cat.rarity,
+              quantity: 1,
+              tags: cat.tags,
+            })),
+          },
+        } : s));
+        get().appendLog('reward', `✦ ${textName} — the written procedure itself, handed over with the rest. Read it when your head is ready for it.`);
+      }
+    }
     // OTA-1073 — the agent who took it back remembers that you finished it.
-    creditTurnIn(get, set, false);
+    creditTurnIn(get, set, storyViaCourier);
     maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-724
     applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
     applyTrainAndLog(get, set, 'charisma', '✦ Word of the chapter spreads. +1 CHA (now {to}).');
@@ -25695,12 +27421,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // closed from a safe hub). Now it requires a paying agent present, and the
       // RIGHT faction's agent, exactly like the typed turn-in.
       const scene = get().currentScene;
-      if (!scene?.vendor) {
-        get().appendLog('arbiter', `The Arbiter folds their arms. "A bounty's settled in person — stand in front of a vendor or faction agent and show them the trophy."`);
+      // OTA-1210 (PUNCHLIST P8) — board and hall count here too, so the COMPLETE button
+      // and the typed turn-in cannot disagree about who may take a bounty back.
+      const huntUiParty = turnInCounterparty(get, player, scene);
+      if (!huntUiParty) {
+        get().appendLog('arbiter', `The Arbiter folds their arms. "A bounty's settled in person — stand in front of a vendor, a posting board, or the faction's own hall and show them the trophy."`);
         return;
       }
-      if (def.factionId && def.factionId !== scene.vendor.faction) {
-        get().appendLog('arbiter', `${scene.vendor.name} waves you off. "Wrong agent. ${def.factionId.replace(/_/g, ' ')} posted that bounty — take it to their people."`);
+      // OTA-1208 — the trading post brokers it for a cut (PUNCHLIST P2). Same rule as the
+      // typed turn-in above, resolved by the same function so the button and the command
+      // cannot disagree about who may take a contract.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
+      const huntUiViaBroker = CB.isContractBroker(scene?.vendor)
+        && !!def.factionId && def.factionId !== huntUiParty.faction;
+      if (!CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: huntUiParty.faction }, def.factionId)) {
+        get().appendLog('arbiter', `${huntUiParty.name} waves you off. "Wrong agent. ${def.factionId!.replace(/_/g, ' ')} posted that bounty — take it to their people, or to the trading post at any outpost gate."`);
         return;
       }
       const trophy: InventoryItem = stampDurability({
@@ -25729,8 +27465,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
       // B2 — long-haul bonus, same as the typed turn-in.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const huntJourneyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, def.rewardTc);
-      const huntPayTc = def.rewardTc + huntJourneyTc;
+      const huntJourneyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, def.rewardTc, rec?.acceptedAtCell);
+      // OTA-1208 — 80% and NO long-haul bonus when the trading post carried it.
+      const huntPayTc = CB.contractPayoutTc(def.rewardTc, huntJourneyTc, huntUiViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
+      // ⚠ And the announce line below must not claim a bonus that was not paid — the
+      // OTA-1179 defect (a diagnostic stating an outcome nobody checked) in reward copy.
+      const huntShownJourneyTc = huntUiViaBroker ? 0 : huntJourneyTc;
+      if (huntUiViaBroker) {
+        get().appendLog('arbiter', CB.brokerAcceptLine(huntUiParty.name, def.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
+      }
       set((s) => (s.player ? {
         player: {
           ...s.player,
@@ -25744,7 +27487,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().announceMissionComplete(
         'Hunt',
         def.title,
-        `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${huntPayTc} TC${huntJourneyTc > 0 ? ` (incl. +${huntJourneyTc} long-haul)` : ''}${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
+        `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${huntPayTc} TC${huntShownJourneyTc > 0 ? ` (incl. +${huntShownJourneyTc} long-haul)` : ''}${huntUiViaBroker ? ` (broker's cut taken)` : ''}${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
       // OTA-1073 — the agent who took it back remembers that you finished it.
       creditTurnIn(get, set, false);
@@ -25950,27 +27693,128 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', `Your bounty slate is full (${MAX_ACTIVE_BOUNTIES}). Finish or abandon one first.`);
       return;
     }
-    const hadCourse = slate.length > 0;
+    // ⚠ OTA-1188 — THE THREE REFUSALS, AND EVERY ONE OF THEM SPEAKS. Standing on the
+    // quarry's own outpost (the 0-tile contract that started this: a 24h window with no
+    // travel in it, against a 6h patrol cooldown, needing 3-9 kills); camping one board
+    // for repeat work; and the board still running, which means no snapshot exists to
+    // lock the politics in. The last one POINTS AT THE FREEZE BUTTON rather than merely
+    // saying no — the whole of OTA-1187 was a control that refused in silence.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const BP = require('../engine/bountyPolitics') as typeof import('../engine/bountyPolitics');
+    const hereCell = playerGridCell(player);
+    const tgtCell0 = canonicalCellOf(bounty.targetLocationId);
+    const verdict = BP.canAcceptBounty({
+      atTargetCell: hereCell.x === tgtCell0.x && hereCell.y === tgtCell0.y,
+      targetLocationName: bounty.targetLocationName,
+      currentOutpostId: player.currentLocationId,
+      currentOutpostName: (() => {
+        try { return getLocationById(player.currentLocationId).name ?? player.currentLocationId; }
+        catch { return player.currentLocationId; }
+      })(),
+      lastClearedOutpostId: get().worldMemory.lastBountyClearedOutpostId,
+      boardFrozen: !!get().frozenBoard,
+    });
+    if (!verdict.ok) {
+      const line = BP.refusalLine(verdict);
+      if (line) {
+        get().appendLog('arbiter', line);
+        // The Contracts/World strip renders this; the feed alone scrolls away.
+        set({ contractsNotice: { text: line, ts: Date.now() } });
+      }
+      buzzBlocked();
+      return;
+    }
+    // ⚠ OTA-1187 — A LIVE COURSE, not merely another contract on the slate. This read
+    // `slate.length > 0`, which conflated "you already hold a bounty" with "you are
+    // already walking somewhere" — and `travelTarget` is CLEARED the moment you arrive.
+    // So the moment you reached your first contract's outpost, every later contract
+    // silently refused to route, while the Arbiter told you *"your current course
+    // holds"* over a course that no longer existed. The intent (see the routing call
+    // below: stacking must not yank you off the first one's road) is preserved exactly
+    // — there is simply nothing to protect when no road is running.
+    const hadCourse = !!player.travelTarget || !!player.whisperCourse;
     // OTA-862 — stamp the accept hour so the contract can lapse after its in-game deadline.
     const acceptedAtHour = player.hoursElapsed ?? 0;
-    // OTA-863 — DISTANCE-AWARE deadline: 24h base + one hour per tile between the player
-    // and the quarry's outpost, so a far contract isn't unreachable in time. Measured from
-    // the player's absolute cell at accept.
+    // OTA-863 — DISTANCE-AWARE deadline. ⚠ OTA-1185 resized the travel term: it is the
+    // 24h JOB budget plus 2.5h per tile (the honest all-in cost of crossing one), not the
+    // old bare hour. Measured from the player's absolute cell at accept.
     const grid = playerGridCell(player);
     const tiles = canonicalDistanceFromGrid(grid.x, grid.y, bounty.targetLocationId);
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { bountyDeadlineFor } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
-    const deadlineHours = bountyDeadlineFor(tiles);
-    set((s) => (s.player ? { player: { ...s.player, activeBounties: [...slate, { ...bounty, progress: 0, acceptedAtHour, deadlineHours }], activeBounty: undefined } } : s));
+    // ⚠ OTA-1188 — `count` is passed now, so the window includes the WAITING. The patrol
+    // cooldown puts a hard 6h floor between engagements, so a 9-kill job cannot be done in
+    // a 3-kill job's time no matter how well it is played.
+    const deadlineHours = bountyDeadlineFor(tiles, bounty.count);
+    // ⚠ OTA-1188 — FREEZE THE POLITICS ONTO THE CONTRACT. Taken from the SNAPSHOT the
+    // player froze, never from the live matrix: the board they read is the deal they get,
+    // even if those two factions are at war by the time the last body drops.
+    const frozen = get().frozenBoard;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const allFactions = (require('../data/factions/factions.json') as Array<{ id: string }>).map((f) => f.id);
+    const politics = BP.politicsOf(
+      frozen?.relations ?? get().worldMemory.factionRelations,
+      bounty.giverFactionId,
+      allFactions,
+      frozen?.takenAtHour ?? acceptedAtHour,
+    );
+    set((s) => (s.player ? { player: { ...s.player, activeBounties: [...slate, { ...bounty, progress: 0, acceptedAtHour, deadlineHours, politics }], activeBounty: undefined } } : s));
+    // ⚠ AUTO-RELEASE. Owner: "once you accept the bounty it automatically unfreezes."
+    // The press that froze the board is spent the moment it is used, so the next contract
+    // must take its own fresh reading rather than inheriting this one.
+    set({ frozenBoard: null });
     get().appendLog(
       'arbiter',
       hadCourse
-        ? `"Another contract," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down around ${bounty.targetLocationName}. Added to your slate — your current course holds."`
-        : `"A contract, then," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — and they'll be thick around ${bounty.targetLocationName}. Setting your course there now."`,
+        // ⚠ OTA-1186 — "around <place>" USED TO READ AS A REQUIREMENT and it never was
+        // one: killCountsForBounty tests faction only, with no location term anywhere in
+        // it. The place is a tip about where they gather. Both lines now say so, because
+        // the owner ran a full contract believing he had to do the killing there.
+        ? `"Another contract," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — anywhere you find them, though they're thickest around ${bounty.targetLocationName}. Added to your slate — your current course holds."`
+        : `"A contract, then," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — anywhere you find them, though they'll be thick around ${bounty.targetLocationName}. Setting your course there now."`,
     );
     // Route the player to the quarry's outpost — but only if they weren't already on a
     // bounty course. Stacking a second contract must not yank you off the first one's road.
     if (!hadCourse) get().setTravelCourse(bounty.targetLocationId);
+    // ⚠ OTA-1186 — THE FIRST CONTRACT COMES WITH SOMEONE TO EXPLAIN IT. Owner: "the first
+    // time someone accepts a bounty gets a pop-up and it does it in character… since this
+    // is your first bounty I'll show you the ropes." Raised LAST so it sits on top of the
+    // routing, and gated on a one-shot flag rather than `slate.length === 0` — a player
+    // who finished a contract has still seen the ropes, and an empty slate would show them
+    // the card again every time they cleared it.
+    if (!player.bountyPrimerSeen) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { bountyPrimerCard } = require('../engine/bountyPrimer') as typeof import('../engine/bountyPrimer');
+      const card = bountyPrimerCard(bounty, deadlineHours, getStanding(player.factionStanding, bounty.giverFactionId));
+      set((s) => (s.player ? { player: { ...s.player, bountyPrimerSeen: true } } : s));
+      get().raiseSpotlightNotice(card.heading, card.title, card.flavor, card.rewards, {
+        takeLabel: card.takeLabel,
+        // Four paragraphs, shown once in a playthrough, with no way back to it.
+        holdMs: 240000,
+      });
+    }
+  },
+
+  toggleBoardFreeze() {
+    const s = get();
+    if (s.frozenBoard) {
+      // Release. The manual escape hatch — owner: "in case you hit the pause button, then
+      // decide you don't want to do a bounty… or maybe you just want to see the cool green
+      // and red lights flicker."
+      set({ frozenBoard: null });
+      get().appendLog('system', 'The board runs again — the war picks up where it never actually stopped.');
+      return;
+    }
+    // ⚠ CLEAR, THEN CAPTURE, EVERY TIME. There is deliberately no reuse of a previous
+    // snapshot: the press that creates one is the press that unlocks accepting, and
+    // accepting releases the freeze, so a snapshot cannot outlive the decision it was
+    // taken for. That is the whole reason it can never go stale.
+    const hour = s.player?.hoursElapsed ?? 0;
+    set({ frozenBoard: { relations: { ...(s.worldMemory.factionRelations ?? {}) }, takenAtHour: hour } });
+    get().appendLog(
+      'system',
+      'You hold the board still. Whoever stands together right now is who your standing will carry to — take the contract on this reading.',
+    );
   },
 
   worldRealtimeTick() {
@@ -26053,6 +27897,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s2) => (s2.player ? { player: { ...s2.player, hubRoomId: null }, activeBuildingId: null } : s2));
       get().appendLog('world', 'You step out under open sky and take your bearings.');
     }
+    // ⚠ OTA-1187 — RESOLVE THE DESTINATION FIRST. This check used to sit BELOW the
+    // same-cell guard, and the ordering was the bug: an id the map cannot place
+    // collapses to a default cell, which sometimes equals the player's own — so an
+    // unresolvable destination took the SILENT return below instead of this
+    // explanatory one. Resolve first, then compare cells, and the honest refusal
+    // always wins.
+    const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
+    const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
+    const tgtPos = map.positions[locationId];
+    if (!tgtPos) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "That destination doesn't sit on any map I can see from here."`);
+      return;
+    }
     // arb47 — block only when the player is ACTUALLY standing on the target's
     // fixed canon cell. (You can have wandered paces away from your home location
     // in open ground — currentLocationId still reads it — and re-route back to it
@@ -26060,14 +27917,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     {
       const grid0 = playerGridCell(player);
       const tgtCell0 = canonicalCellOf(locationId);
-      if (grid0.x === tgtCell0.x && grid0.y === tgtCell0.y) return;
-    }
-    const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
-    const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
-    const tgtPos = map.positions[locationId];
-    if (!tgtPos) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "That destination doesn't sit on any map I can see from here."`);
-      return;
+      if (grid0.x === tgtCell0.x && grid0.y === tgtCell0.y) {
+        // ⚠ OTA-1187 — IT USED TO RETURN IN COMPLETE SILENCE, and that is what the
+        // owner reported as "it changes colours but it doesn't actually auto route."
+        // The colour was never confirmation — `activeOpacity` fires on any tap, so a
+        // no-op and a success looked identical. Standing on your own destination is
+        // the ONE refusal here that a player is guaranteed to hit (a bounty names the
+        // outpost its quarry gathers at, and you walk there), so it is the one that
+        // most needed a voice. Every other early return in this function already had
+        // one; this was the gap.
+        const hereName = revealedLocationName(
+          locationId, getLocationById(locationId).name ?? locationId, get().worldMemory?.discoveredLocationIds,
+        );
+        get().appendLog('arbiter', `"You're standing in ${hereName}," the Arbiter says. "There's no road to set — you're already on it."`);
+        return;
+      }
     }
     // OTA-615 — setting a course is PLANNING; it no longer requires stamina.
     // Previously this returned early when stamina < wander (before travelTarget
@@ -26098,7 +27962,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles }, whisperCourse: null, ...(dropChain ? { routedMission: null } : {}) } } : s));
     get().appendLog(
       'world',
-      `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. Tap the → ${tgtName.toUpperCase()} button on the travel row to press on; STOP TRAVEL to halt.`,
+      // ⚠ OTA-1190 — IT CALLED EVERY TILE "A DAY". A tile costs TILE_HOURS (0.25h) on the
+      // clock and ~2.5h all-in once the stamina is rested back (OTA-1185) — so a 1-tile
+      // hop announced itself as "1 day of travel" and a 23-tile march as "23 days". The
+      // banner was the last surface still quoting the pre-1185 fiction, and a player
+      // reading it cannot budget a contract window at all. Now it quotes the SAME number
+      // the deadline is built from, in the same units the deadline is expressed in.
+      `You set course for ${tgtName}. ${tiles} tile${tiles === 1 ? '' : 's'} — about ${formatWindow(travelHoursFor(tiles))} of travel, all in. Tap the → ${tgtName.toUpperCase()} button on the travel row to press on; STOP TRAVEL to halt.`,
     );
     // Tungsten Spire — during the pick_city tutorial beat, picking a Capital
     // marks the road but does NOT auto-depart: the Arbiter hands control back
@@ -26128,7 +27998,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // COURSE is already set above; a depleted player keeps the planned route (the
     // travel row shows) and is told to rest, instead of losing the route entirely.
     if (firstDir && get().player!.stamina >= STAMINA_COSTS.wander) {
-      set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), 0.25) });
+      set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), TILE_HOURS) });
       get().stepDirection(firstDir);
       // arb103 — arrival is cell-based; and ALWAYS re-plot the badge from the new
       // cell. stepDirection skips its own re-plot when the first step lands ON a
@@ -26140,6 +28010,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const arrived = !!ag && ag.x === tgtCell.x && ag.y === tgtCell.y;
       if (arrived) {
         set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+        // OTA-1189 — arriving on a contract's ground puts the quarry on it.
+        maybeSeedQuarry(get, set);
       } else if (after?.travelTarget && ag) {
         const d = canonicalDistanceFromGrid(ag.x, ag.y, locationId);
         set((s) => (s.player?.travelTarget ? {
@@ -26256,7 +28128,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // v2.4.1 (OTA 053) — burn stamina + advance time per step. The
     // cost is wander (1) per tile, matching the cardinal-walk cost.
-    set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), 0.25) });
+    // ⚠ OTA-1185 — the literal 0.25 that used to sit here IS the standard, and now
+    // says so. Unchanged in value on purpose: this is the path players actually use,
+    // so it is the one every other path was pulled TOWARD, not away from.
+    set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), TILE_HOURS) });
     get().stepDirection(dir);
     // If the step landed us on the target, stepDirection's own
     // travelTo() handler clears mapX/mapY and switches currentLocationId.
@@ -26271,6 +28146,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         player: { ...s.player, travelTarget: undefined },
         currentScene: s.currentScene ? { ...s.currentScene, transitArea: null } : s.currentScene,
       } : s));
+      // OTA-1189 — arriving on a contract's ground puts the quarry on it. Both arrival
+      // paths call this; the helper is one-shot per contract, so a player who reaches the
+      // same tile through setTravelCourse and then again through continueTravel does not
+      // double-seed.
+      maybeSeedQuarry(get, set);
     } else if (after?.travelTarget && afterGrid) {
       // arb47 — EXACT distance from the player's absolute cell to the target's
       // fixed canon cell, fresh each step. Walks down monotonically as auto-travel
@@ -26371,7 +28251,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Spend stamina + time, then take the cardinal step. stepDirection runs the
     // normal walk — encounters, whisper-beat fires, tile-novelty — so arriving on
     // the objective tile triggers the chain (e.g. fireYulkaFetch spawns the thief).
-    set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), 0.25) });
+    // ⚠ OTA-1185 — through the constant, same value. A whisper course is a tile walk.
+    set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), TILE_HOURS) });
     get().stepDirection(dir);
     const after = get().player;
     if (after && (after.mapX ?? WORLD_MAP_CENTER_X) === tgt.mapX && (after.mapY ?? WORLD_MAP_CENTER_Y) === tgt.mapY) {
@@ -30094,7 +31975,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().raiseSpotlightNotice('VICTORY', name, flavor, rewards);
   },
 
-  raiseSpotlightNotice(heading, title, flavor, rewards) {
+  raiseSpotlightNotice(heading, title, flavor, rewards, opts) {
     const prev = get().missionCompleteNotice;
     const same = prev?.title === title;
     set({
@@ -30107,6 +31988,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // than dropped — its reward lines were captured too, and mergeRewardLines
         // dedupes the overlap.
         rewards: mergeRewardLines(prev?.rewards ?? [], rewards),
+        // OTA-1186 — presentation carries across a merge, and the LONGER hold wins:
+        // absorbing a card that asked to be readable must not shorten its valve.
+        takeLabel: opts?.takeLabel ?? (same ? prev?.takeLabel : undefined),
+        holdMs: Math.max(opts?.holdMs ?? 0, (same ? prev?.holdMs : 0) ?? 0) || undefined,
       },
     });
   },
@@ -31128,14 +33013,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
           qwenModelId: qwen.getModelId(),
         });
       } else {
-        set({
-          qwenStatus: 'failed',
-          qwenError: qwen.getLastError() ?? 'Qwen failed to initialize',
-        });
+        const why = qwen.getLastError() ?? 'Qwen failed to initialize';
+        set({ qwenStatus: 'failed', qwenError: why });
+        // ⚠⚠ OTA-1205 — SAY IT IN THE LOG, NOT ONLY IN STATE. OTA-1204 put this reason in
+        // the bug-report header, which requires the player to get far enough to send one.
+        // The owner needs the game working on Apple for TestFlight testers, and a tester
+        // who never files a report is the common case — but the log ships with any report,
+        // including one about something else entirely. This is the single line that says
+        // whether the narration engine is missing, out of memory, or out of disk.
+        try { get().appendLog('debug', `qwen: LOAD FAILED — ${why}`); } catch { /* ignore */ }
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       set({ qwenStatus: 'failed', qwenError: message });
+      // OTA-1205 — the throwing path says so too. `initialize()` mostly swallows, but a
+      // missing native module throws outright, and that is the one answer that no OTA can
+      // fix: it means llama.rn is not in the installed build.
+      try { get().appendLog('debug', `qwen: LOAD THREW — ${message}`); } catch { /* ignore */ }
     }
     // OTA-223 — start the background dormancy watchdog after the
     // first successful boot. The watchdog polls every 60s; if Qwen
@@ -31145,6 +33039,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // next time the player triggers narration or fusion. Idempotent —
     // starting twice replaces the timer cleanly.
     startQwenWatchdog(get, set);
+    // OTA-1195 — instruments alongside the watchdog: same lifecycle, same teardown rules.
+    startRuntimePressureWatch(get, set);
   },
 
   async shutdownQwen() {
@@ -31400,7 +33296,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (saveErr || trim.trimmed || persistSizeSampleCounter % PERSIST_SIZE_SAMPLE_EVERY === 0) {
       // OTA-413 — report the ACTUALLY-SAVED (pruned + trimmed) blob, not the raw
       // in-memory builtState, so the heartbeat reflects what landed on disk.
-      get().appendLog('debug', saveSizeBreakdown(trim.state));
+      const rpBreakdown = saveSizeBreakdown(trim.state);
+      // OTA-1195 — bank the size so a memory-warning line can name it without rebuilding
+      // the blob; allocating to measure while the OS asks for memory back is exactly the
+      // wrong move.
+      const rpKb = /total=(\d+)/.exec(rpBreakdown);
+      if (rpKb) noteSaveKb(parseInt(rpKb[1]!, 10));
+      get().appendLog('debug', rpBreakdown);
     }
     return !saveErr;
     };
@@ -31529,7 +33431,7 @@ function applyHookEffect(
         ? scaledEnemyForContext(
             rawSpawn,
             spawnLoc.danger,
-            enemyScalePower(Math.max(spawnPlayer.stats.strength, spawnPlayer.stats.dexterity, spawnPlayer.stats.intelligence), spawnPlayer.hpMax),
+            scalePowerOf(spawnPlayer),
           )
         : rawSpawn;
       set((s) =>
@@ -31729,7 +33631,7 @@ function applyHookEffect(
           activeFactionQuestIds: [...(s2.player.activeFactionQuestIds ?? []), def.id],
           activeFactionQuests: [
             ...(s2.player.activeFactionQuests ?? []),
-            { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now(), tracked: newTracked, ...(escort ? { escort } : {}) },
+            { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now(), tracked: newTracked, ...(escort ? { escort } : {}), ...acceptCellStamp(get) },
           ],
         },
       } : s2));
@@ -32205,7 +34107,7 @@ function grantQuestHook(
               ...s.player,
               activeHunts: [
                 ...(s.player.activeHunts ?? []),
-                { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now(), tracked: grantTracked },
+                { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now(), tracked: grantTracked, ...acceptCellStamp(get) },
               ],
             },
           }
@@ -32258,7 +34160,7 @@ function grantQuestHook(
             ...s.player,
             activeMysteries: [
               ...(s.player.activeMysteries ?? []),
-              { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now(), tracked: grantTracked },
+              { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now(), tracked: grantTracked, ...acceptCellStamp(get) },
             ],
           },
         }
@@ -33741,7 +35643,21 @@ export function playerColdResist(player: PlayerCharacter | null): boolean {
 // generalising playerColdResist beyond cold only.
 export function playerArmorResistKinds(player: PlayerCharacter | null): string[] {
   if (!player) return [];
-  return aggregateArmor(player).resistances.map((r) => r.toLowerCase());
+  const kinds = aggregateArmor(player).resistances.map((r) => r.toLowerCase());
+  // ⚠⚠ OTA-1207 — THE GIANT'S WATCH grants cold resistance, and it is injected HERE
+  // because this one function feeds ~16 call sites: weather ticks, weather stat
+  // modifiers, attack penalties, visibility. Adding the kind at the source means the
+  // perk works everywhere resistance already matters, with no new plumbing and no site
+  // silently missed. (Five inscriptions carved into the Ural cliffs by someone who stood
+  // in that cold long enough to finish them.)
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { storyPerkModifiers } = require('../engine/collectables') as typeof import('../engine/collectables');
+    if (storyPerkModifiers(player.collectables ?? []).grantsColdResist && !kinds.includes('cold')) {
+      kinds.push('cold');
+    }
+  } catch { /* a perk lookup must never break the resist read */ }
+  return kinds;
 }
 
 /** OTA-1147 — the AC ledger's memory. Session-scoped and combat-local: it only
@@ -34183,26 +36099,49 @@ function tickEnemyDotsAndMaybeEndFight(
   // same tick. Every dead index now routes through resolveEnemyDefeat (loot,
   // kill bookkeeping, bounty credit), and the player's living TARGET is
   // re-pointed afterward so the sweep never silently retargets them.
-  {
-    const swept = get().currentScene;
-    if (swept && swept.enemies.length > 0 && swept.enemyHps.some((h) => (h ?? 0) <= 0)) {
-      const targetBefore = swept.enemies[swept.activeEnemyIdx] ?? null;
-      let guard = 0;
-      while (++guard <= 16) {
-        const sc = get().currentScene;
-        if (!sc || sc.enemies.length === 0) break;
-        const deadIdx = sc.enemyHps.findIndex((h) => (h ?? 0) <= 0);
-        if (deadIdx < 0) break;
-        set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: deadIdx } } : s));
-        get().resolveEnemyDefeat();
-      }
-      const scEnd = get().currentScene;
-      if (!scEnd || scEnd.enemies.length === 0) return true;
-      if (targetBefore) {
-        const keep = scEnd.enemies.indexOf(targetBefore);
-        if (keep >= 0 && keep !== scEnd.activeEnemyIdx) {
-          set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: keep } } : s));
-        }
+  return sweepDeadEnemies(get, set);
+}
+
+/** ⚠ OTA-1218 — EXTRACTED VERBATIM FROM `tickEnemyDotsAndMaybeEndFight`, WHICH IS THE
+ *  POINT. Resonance Cascade (PUNCHLIST P16) is the second thing in the game that can drop
+ *  several enemies at once, and the DOT tick is the first — so it needed exactly this
+ *  block. Copying it would have put two spellings of "who died, in what order, and who is
+ *  the player still aiming at" in one file, which is how the two drift.
+ *
+ *  Returns TRUE if the sweep ended the fight (no enemies left).
+ *
+ *  Original comment, unchanged, because the reasoning is still the reasoning:
+ *
+ *  OTA-980 — (was: last-enemy-only) a DOT tick that drops ANY enemy to 0 kills it
+ *  NOW. The old sweep only fired when EVERY enemy was dead; in a MIXED fight
+ *  the corpse was left standing at 0 HP "for the next attack to clean up" —
+ *  owner's log shows a raider at 0/28 hanging around until a whole extra swing
+ *  formally killed it, while a solo-fight Aetherkin died instantly from the
+ *  same tick. Every dead index now routes through resolveEnemyDefeat (loot,
+ *  kill bookkeeping, bounty credit), and the player's living TARGET is
+ *  re-pointed afterward so the sweep never silently retargets them. */
+function sweepDeadEnemies(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): boolean {
+  const swept = get().currentScene;
+  if (swept && swept.enemies.length > 0 && swept.enemyHps.some((h) => (h ?? 0) <= 0)) {
+    const targetBefore = swept.enemies[swept.activeEnemyIdx] ?? null;
+    let guard = 0;
+    while (++guard <= 16) {
+      const sc = get().currentScene;
+      if (!sc || sc.enemies.length === 0) break;
+      const deadIdx = sc.enemyHps.findIndex((h) => (h ?? 0) <= 0);
+      if (deadIdx < 0) break;
+      set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: deadIdx } } : s));
+      get().resolveEnemyDefeat();
+    }
+    const scEnd = get().currentScene;
+    if (!scEnd || scEnd.enemies.length === 0) return true;
+    if (targetBefore) {
+      const keep = scEnd.enemies.indexOf(targetBefore);
+      if (keep >= 0 && keep !== scEnd.activeEnemyIdx) {
+        set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: keep } } : s));
       }
     }
   }
@@ -34241,6 +36180,96 @@ export function runSurvivorVolley(
   const scene = get().currentScene;
   if (!scene || scene.enemies.length === 0) return;
   runEnemyGroupCounters(get, set, get().player ?? player, opts);
+}
+
+/** OTA-1225 — swap one trait for another on a live enemy, by index. The technique
+ *  lifecycle lives entirely in TRAITS (technique: → field:/slip_held/veiled_strike →
+ *  technique_spent:) so it persists with the scene and shows in the portrait at every
+ *  stage, exactly as the resists do. */
+function swapEnemyTrait(
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  idx: number,
+  drop: (t: string) => boolean,
+  add: string[],
+): void {
+  set((s) => {
+    if (!s.currentScene) return s;
+    const enemies = s.currentScene.enemies.map((e, i) => (
+      i === idx
+        ? { ...e, traits: [...(e.traits ?? []).filter((t) => !drop(t)), ...add] }
+        : e
+    ));
+    return { currentScene: { ...s.currentScene, enemies } };
+  });
+}
+
+/** OTA-1225 — an enemy with an unspent technique CHANNELS instead of swinging (the cost
+ *  mirror, owner: "agree" — exactly the player's turn cost, reflected). Returns true if
+ *  the enemy spent its action here. Cascade holders WAIT until cornered (hp < 35%) —
+ *  burning the burst on round one would waste the drama and the tactic. */
+function enemyChannelsTechnique(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  enemy: Enemy,
+  idx: number,
+): boolean {
+  const traits = enemy.traits ?? [];
+  const tech = traits.find((t) => t.startsWith('technique:'));
+  if (!tech) return false;
+  const id = tech.slice('technique:'.length);
+  const scene = get().currentScene;
+  if (!scene) return false;
+
+  if (id === 'resonance_cascade') {
+    const hp = scene.enemyHps[idx] ?? 0;
+    const max = scene.enemies[idx]?.hp ?? 1;
+    if (hp / max >= 0.35) return false;   // not cornered yet — it fights on, holding it
+    // ⚠ THE BURST. 5d10 at the player — halved by carried aetheric resistance, the same
+    // read the weather uses — and 1d10 back through the thing itself, the kickback the
+    // player's own Cascade pays. Once, ever: the trait goes to spent before damage lands
+    // so no re-entry can double-fire it.
+    swapEnemyTrait(set, idx, (t) => t === tech, [`technique_spent:${id}`]);
+    let out = 0; for (let d = 0; d < 5; d++) out += rollDie(10);
+    const resists = playerArmorResistKinds(get().player!).includes('aetheric');
+    const dmg = Math.max(1, resists ? Math.ceil(out / 2) : out);
+    const kick = rollDie(10);
+    get().appendLog('combat',
+      `${enemy.name} is cornered — and LETS IT RUN. Resonance Cascade: 5d10 → ${out}${resists ? ` (aetheric resist halves it to ${dmg})` : ''} slams into you, and 1d10 → ${kick} tears back through it.`);
+    set((s) => (s.player ? { player: { ...s.player, hp: Math.max(0, s.player.hp - dmg) } } : s));
+    set((s) => {
+      if (!s.currentScene) return s;
+      const hps = [...s.currentScene.enemyHps];
+      hps[idx] = Math.max(0, (hps[idx] ?? 0) - kick);
+      return { currentScene: { ...s.currentScene, enemyHps: hps } };
+    });
+    checkLowHpWarning((get().player?.hp ?? 0) + dmg, get().player?.hp ?? 0, get().player?.hpMax ?? 1, get, set);
+    sweepDeadEnemies(get, set);
+    return true;
+  }
+
+  // The three held fields: channel now (this IS the swing), effect lands as a trait.
+  if (id === 'aether_shield') {
+    swapEnemyTrait(set, idx, (t) => t === tech, ['field:aether_shield', `technique_spent:${id}`]);
+    get().appendLog('combat',
+      `${enemy.name} stops — and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).`,
+      { combatOutcome: 'enemy_miss' });
+    return true;
+  }
+  if (id === 'temporal_slip') {
+    swapEnemyTrait(set, idx, (t) => t === tech, ['slip_held', `technique_spent:${id}`]);
+    get().appendLog('combat',
+      `${enemy.name} goes still, half a beat out of step with the room. It holds a TEMPORAL SLIP instead of swinging — your next clean hit may find nothing.`,
+      { combatOutcome: 'enemy_miss' });
+    return true;
+  }
+  if (id === 'veil_of_ether') {
+    swapEnemyTrait(set, idx, (t) => t === tech, ['veiled_strike', `technique_spent:${id}`]);
+    get().appendLog('combat',
+      `The light around ${enemy.name} bends and declines to leave. It spends the beat VEILED — the next strike will come from somewhere you are not watching.`,
+      { combatOutcome: 'enemy_miss' });
+    return true;
+  }
+  return false;
 }
 
 export function runEnemyGroupCounters(
@@ -34374,6 +36403,13 @@ export function runEnemyGroupCounters(
     // is deliberately revised for the gated tiers — the trade the owner chose.)
     if (enemy.boss && !bossSwingsTwice(enemy) && takeStagger(get, set, liveIdx)) {
       get().appendLog('combat', `${enemy.name} reels — STAGGERED: no swing this round.`, { combatOutcome: 'enemy_miss' });
+      continue;
+    }
+    // ⚠ OTA-1225 — an unspent technique is channelled HERE, consuming the swing (the
+    // cost mirror). Placed after every skip/bench check so a benched or staggered enemy
+    // does not get a free channel the player never saw.
+    if (enemyChannelsTechnique(get, set, enemy, liveIdx)) {
+      if (meleeAttacker) meleeSwings++;
       continue;
     }
     // Pass live index so applyEnemyCounter can resolve ambush_strike
@@ -34606,7 +36642,22 @@ function applyEnemyCounter(
     }
     return bonus;
   })();
-  const atkBonus = baseAtk + traitAtk + ambushBonus;
+  // ⚠ OTA-1225 — the VEILED strike lands. The Veil channel spent last round's swing; the
+  // payoff is +5 on THIS one — the same +5 the player's `stealthed` grants — consumed on
+  // use, exactly like ambush_strike above it.
+  const veiledBonus = (() => {
+    if (enemyIdx == null || !(enemy.traits ?? []).includes('veiled_strike')) return 0;
+    set((s) => {
+      if (!s.currentScene) return s;
+      const enemies = s.currentScene.enemies.map((e, i) => (
+        i === enemyIdx ? { ...e, traits: (e.traits ?? []).filter((t) => t !== 'veiled_strike') } : e
+      ));
+      return { currentScene: { ...s.currentScene, enemies } };
+    });
+    get().appendLog('combat', `${enemy.name} strikes OUT OF THE VEIL — the blow comes from nowhere you were watching (+5).`);
+    return 5;
+  })();
+  const atkBonus = baseAtk + traitAtk + ambushBonus + veiledBonus;
   // HANDOFF #14 — true advantage/disadvantage for defensive status
   // effects. When the player has cover/dodge/block active, the enemy's
   // attack rolls 2d20 and takes the LOWER (disadvantage on attacker).
@@ -34763,10 +36814,33 @@ function applyEnemyCounter(
   // "= 17 vs your AC 25 — ✓ HIT" read as a contradiction with no explanation:
   // every tank build saw hits its own log said should have missed.
   const acCapEngaged = effectiveAc - (atkTotal - atkRoll) > ENEMY_HIT_NEEDED_CAP;
-  const hit = dodgeWin === true
+  const wouldHit = dodgeWin === true
     ? false
     : enemyFumble ? false : enemyCrit ? true : atkRoll >= acHitNat;
-  const outcomeTag = dodgeWin === true
+  // ⚠ OTA-1218 — TEMPORAL SLIP (PUNCHLIST P16). A held slip eats one blow that would
+  // otherwise have landed, then is spent. It sits HERE, at the to-hit verdict, rather than
+  // in the damage stack, because the technique's claim is that the blow did not arrive —
+  // not that it arrived softened. Nothing downstream (armor, resists, wards) runs.
+  //
+  // ⚠⚠ IT DOES NOT STOP A NATURAL 20, and that exclusion is the whole reason this is safe.
+  // OTA-815 established the rule when the dodge rework threatened the same thing: no
+  // defensive stack may buy literal immunity, so an enemy always lands ~1 swing in 20. A
+  // slip that beat a crit, re-channelled every three rounds, would be exactly the
+  // untouchable build that rule forbids — and it would cost only fuel and corruption.
+  const slipHeld = (player.statusEffects ?? []).some((e) => e.kind === 'temporal_slip');
+  const slipped = wouldHit && !enemyCrit && slipHeld;
+  const hit = wouldHit && !slipped;
+  if (slipped) {
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        statusEffects: (s.player.statusEffects ?? []).filter((e) => e.kind !== 'temporal_slip'),
+      },
+    } : s));
+  }
+  const outcomeTag = slipped
+    ? '✗ SLIPPED'
+    : dodgeWin === true
     ? '✗ EVADED'
     : enemyCrit
       ? '✓ CRITICAL HIT'
@@ -34783,6 +36857,15 @@ function applyEnemyCounter(
     `${enemy.name} — d20 → ${atkRoll}${advLabel} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc}${acCapEngaged ? ` (needs nat ${acHitNat}+ — AC capped)` : ''} — ${outcomeTag}`,
     hit ? undefined : { combatOutcome: 'enemy_miss' },
   );
+  if (slipped) {
+    // OTA-1218 — say it in the world, not only in the roll line. A blow that connects on
+    // the maths and then does not arrive reads as a bug unless something names the reason.
+    get().appendLog(
+      'world',
+      `The blow arrives and you are already a half-second past it. The Temporal Slip closes behind you, spent.`,
+      { combatOutcome: 'enemy_miss' },
+    );
+  }
   if (dodgeLine) {
     get().appendLog('combat', dodgeLine, dodgeWin ? { combatOutcome: 'enemy_miss' } : undefined);
   }
@@ -36135,7 +38218,7 @@ function narrateCasualLook(
   // arrival narration; the look button is for re-checking your
   // bearings without re-reading 70 words of mood prose.
   const inHub = isHubLocation(player?.currentLocationId ?? null) && !!player?.hubRoomId;
-  const hubRoom = inHub ? hubRoomFor(player!.hubRoomId!, player!.factionId) : null;
+  const hubRoom = inHub ? hubRoomFor(player!.hubRoomId!, hubSkinFactionFor(player!.currentLocationId, player!.factionId)) : null;
   // OTA-674 — inside a building the scene's microMicroId is a synthetic
   // "building:<id>:<room>" key (stable per-room anti-farm id), which never
   // resolves to a real micro-micro; use the scene's transitArea ("Outpost ·
@@ -36322,7 +38405,7 @@ function narrateCasualLook(
     for (const dir of ['north', 'east', 'south', 'west'] as const) {
       const id = hubRoom.exits[dir];
       if (!id) continue;
-      const r = hubRoomFor(id, player?.factionId);
+      const r = hubRoomFor(id, hubSkinFactionFor(player?.currentLocationId, player?.factionId));
       if (r) labels.push(`${dir} to ${r.shortName}`);
     }
     if (labels.length > 0) parts.push(`Exits: ${labels.join(' · ')}.`);
@@ -36820,6 +38903,252 @@ function runAethercraft(
     }
   }
   set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 2), 0.5) } : s);
+}
+
+// ─── OTA-1218 — THE CHANNEL RUNNER (PUNCHLIST P16) ──────────────────────────────────────
+//
+// `engine/aetherTechniques.ts` shipped in OTA-1214 as rules with no caller, which is the
+// P4 / P14 defect (authored content wired to nothing) with my own name on it. This is the
+// path that makes a technique reachable: `channel <name>`.
+//
+// ⚠ IT MIRRORS `runAethercraft` DELIBERATELY, STEP FOR STEP — fuel cheapest-first, race DC
+// ladder, d20 + INT, fuel spent either way, outcome. Four disciplines that all drive the
+// same hazard should not resolve by four different procedures, and every one of those
+// steps carries a bug fix that was paid for once already (OTA-970's fuel picker, OTA-145's
+// channel split, OTA-147's outcome verbs).
+//
+// WHAT IT ADDS, and each of these is an owner call from 2026-08-09:
+//   • DOSE — corruption scaled by tier ("scale it"), taken on success AND, at half, on
+//     failure. You stood in it either way.
+//   • GROWTH — per-technique ("I agree"), and only on a success under pressure, which is
+//     the anti-farm guard `practiceCounts` exists for.
+//   • THE TURN — channelling in combat costs the turn ("yes"), so the enemy group swings.
+function runAetherTechnique(
+  techId: string,
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  player: PlayerCharacter,
+  scene: CurrentScene,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { aethercraftDcModifier, aethercraftStatBonus } = require('../engine/raceMechanics');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { effectiveStats } = require('../engine/equipment');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { weatherStatModifiers } = require('../engine/weatherEffects');
+
+  const tech = AT.findTechnique(techId);
+  if (!tech) return;
+
+  const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerArmorResistKinds(player)));
+  const racialBonus = aethercraftStatBonus(player.raceId);
+  const intValue = stats.intelligence + (racialBonus.intelligence ?? 0);
+
+  // 1. May they attempt it? Both refusals SPEAK — a channel that does nothing and says
+  //    nothing is the loop ending in nothing at the very first step.
+  const gate = AT.canAttempt(player, tech, intValue);
+  if (!gate.ok) {
+    get().appendLog('arbiter', gate.reason === 'unknown'
+      ? `"You have never been taught the ${tech.name}," the Arbiter says. "Reaching for it anyway would only cost you."`
+      : `"The ${tech.name} needs a steadier head than that," the Arbiter says. "INT ${gate.needed}. You are running ${intValue}."`);
+    return;
+  }
+
+  // ⚠⚠ OTA-1223 (PUNCHLIST P18) — THE VEIL REFUSES AN EMPTY ROOM, before fuel is touched.
+  // The Veil grants the existing `stealthed` status, and `stealthed` is combat-only by
+  // OTA-358's rule: the first action taken with no enemies present expires it. So an
+  // out-of-combat channel succeeded, charged fuel + 4 dose + 10 minutes, printed its
+  // success line — and the player's very next step silently deleted the effect. A
+  // purchase that ends in nothing, found by the 2026-08-10 audit and filed as P18;
+  // owner's call was fix 1: refuse, with the reason spoken, at zero cost.
+  if (tech.id === 'veil_of_ether' && (scene.enemies?.length ?? 0) === 0) {
+    get().appendLog(
+      'arbiter',
+      `"The Veil bends the light around a body something is looking for," the Arbiter says. "Nothing here is looking. Keep the dose."`,
+    );
+    return;
+  }
+
+  // 2. Fuel — cheapest-first, same list and same order as the shape discipline.
+  let fuelItem: InventoryItem | null = null;
+  for (const name of AT.TECHNIQUE_FUEL_PREFERENCE) {
+    const found = player.inventory.find(
+      (i) => i.quantity > 0 && i.name.toLowerCase() === name.toLowerCase(),
+    );
+    if (found) { fuelItem = found; break; }
+  }
+  if (!fuelItem) {
+    get().appendLog(
+      'arbiter',
+      `"The Aether reaches for you," the Arbiter says, "finds nothing to pull on, and returns to itself."`,
+    );
+    return;
+  }
+
+  // 3. The check. Rank shaves the DC (growth buys reliability, not output); the race
+  //    ladder is the same one every Aethercraft discipline climbs.
+  const rank = AT.proficiencyRank(AT.usesOf(player, tech.id));
+  const dc = AT.dcForRank(tech.baseDc, rank) + aethercraftDcModifier(player.raceId);
+  const roll = rollDie(20);
+  const total = roll + intValue;
+  const success = total >= dc;
+  const racialNote = (racialBonus.intelligence ?? 0) > 0
+    ? ` (+${racialBonus.intelligence} Aethercraft Mastery)` : '';
+  const rankNote = rank > 0 ? ` (−${rank} practised)` : '';
+  get().appendLog(
+    success ? 'reward' : 'combat',
+    `${tech.name} — d20 ${roll} + INT ${intValue}${racialNote} = ${total} vs DC ${dc}${rankNote}`
+    + ` — ${success ? '✓ CHANNELLED' : '✗ LOST'}`,
+  );
+
+  // 4. Fuel is spent either way — the aether takes its due, exactly as the disciplines do.
+  {
+    const spent = player.inventory
+      .map((i) => (i.id === fuelItem!.id ? { ...i, quantity: i.quantity - 1 } : i))
+      .filter((i) => i.quantity > 0);
+    set((s) => (s.player ? { player: { ...s.player, inventory: spent } } : s));
+    get().appendLog('world', `(1 ${fuelItem.name} consumed.)`);
+  }
+
+  // 5. THE DOSE. ⚠ Charged before the effect lands and before any turn is spent, so a
+  //    channel can never resolve without it — a technique whose cost is conditional on a
+  //    later branch is one refactor away from being free.
+  {
+    const live = get().player ?? player;
+    const dose = AT.dosageFor(tech, { success, raceId: live.raceId });
+    const prevTier = corruptionTierOf(live.corruption ?? 0);
+    const newCorr = Math.min(CORRUPTION_MAX, (live.corruption ?? 0) + dose);
+    const nextTier = corruptionTierOf(newCorr);
+    set((s) => (s.player ? { player: { ...s.player, corruption: newCorr } } : s));
+    get().appendLog('world', success
+      ? `You take the dose standing. +${dose} corruption.`
+      : `The procedure slips, and the exposure does not care that it did. +${dose} corruption.`);
+    const crossLine = tierCrossLine(prevTier, nextTier);
+    if (crossLine) get().appendLog('reward', crossLine);
+  }
+
+  const underPressure = (scene.enemies?.length ?? 0) > 0;
+
+  if (!success) {
+    get().appendLog('world', `The field will not hold. It comes apart in your hands and is gone.`);
+  } else {
+    get().appendLog('arbiter', tech.successLine);
+    applyTechniqueEffect(tech, get, set, underPressure);
+  }
+
+  // 6. GROWTH. `practiceCounts` is the guard: a success in an empty room teaches nothing,
+  //    so the rank cannot be farmed off a wall.
+  if (AT.practiceCounts({ success, underPressure })) {
+    const live = get().player;
+    if (live) {
+      const before = AT.usesOf(live, tech.id);
+      const after = before + 1;
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          techniqueProficiency: { ...(s.player.techniqueProficiency ?? {}), [tech.id]: after },
+        },
+      } : s));
+      const rankBefore = AT.proficiencyRank(before);
+      const rankAfter = AT.proficiencyRank(after);
+      if (rankAfter > rankBefore) {
+        get().appendLog(
+          'reward',
+          `✦ ${tech.name} — ${AT.proficiencyLabel(rankAfter)}. It comes to hand faster now (DC ${AT.dcForRank(tech.baseDc, rankAfter)}).`,
+        );
+      }
+    }
+  }
+
+  // 7. THE CLOCK, AND THE TURN. Out of combat a channel takes its authored minutes. In
+  //    combat it takes the ROUND (owner: channelling costs your turn), so the enemy group
+  //    answers — which is what stops a Shield from being a free action you open every
+  //    fight with.
+  set((s) => (s.player
+    ? { player: advanceTime(spendStamina(s.player, 2), underPressure ? 0.1 : tech.minutes / 60) }
+    : s));
+  if ((get().currentScene?.enemies?.length ?? 0) > 0) {
+    runSurvivorVolley(get, set, get().player ?? player);
+  }
+  void get().persist();
+}
+
+/** OTA-1218 — the four outcomes. ⚠ Every one of them lands in machinery that already
+ *  shipped, and that was the condition for building them at all: a technique whose effect
+ *  needs a new subsystem is a technique that ends in nothing while the subsystem is
+ *  written. Shield → statusAcAdjustment. Slip → the to-hit verdict in applyEnemyCounter.
+ *  Veil → the existing `stealthed` status. Cascade → the DOT sweep's own death handling. */
+function applyTechniqueEffect(
+  tech: import('../engine/aetherTechniques').AetherTechnique,
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  underPressure: boolean,
+): void {
+  if (tech.id === 'aether_shield') {
+    const eff: StatusEffect = { kind: 'aether_shield', remainingRounds: 3, label: 'aether shield (+3 AC)' };
+    set((s) => (s.player ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], eff) } } : s));
+    get().appendLog('world', `+3 AC for 3 rounds while you hold it.`);
+    return;
+  }
+  if (tech.id === 'temporal_slip') {
+    const eff: StatusEffect = { kind: 'temporal_slip', remainingRounds: 3, label: 'temporal slip (one blow)' };
+    set((s) => (s.player ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], eff) } } : s));
+    get().appendLog('world', `The next blow that would land inside three rounds will not. Once.`);
+    return;
+  }
+  if (tech.id === 'veil_of_ether') {
+    // ⚠ The EXISTING stealth status, not a new one. `stealthed` is already read by the
+    // attack path (+5, consumed once) and by the backstab check in combatRules — a
+    // parallel "veiled" kind would have needed both taught about it.
+    const eff: StatusEffect = { kind: 'stealthed', remainingRounds: 3, label: 'veiled (light declines to leave)' };
+    set((s) => (s.player ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], eff) } } : s));
+    get().appendLog('world', `Nothing can currently prove you are there. Your next strike comes out of that.`);
+    return;
+  }
+  if (tech.id === 'resonance_cascade') {
+    // ⚠⚠ THE ONLY TECHNIQUE THAT DOES SOMETHING OUTSIDE THE PLAYER, and the only one that
+    // can kill several things at once. It runs 5d10 across every living enemy and 1d10
+    // back into the operator — the original data's numbers, kept, because a forbidden
+    // procedure that hurts you on SUCCESS is the clearest thing this feature says.
+    const scene = get().currentScene;
+    if (!scene || scene.enemies.length === 0) {
+      // Channelled at nothing. It still cost fuel, a dose and the minutes; say so plainly
+      // rather than let the player think the technique is broken.
+      get().appendLog('world', `The shockwave goes out across empty ground and finds nothing to move.`);
+    } else {
+      let out = 0;
+      for (let d = 0; d < 5; d++) out += rollDie(10);
+      const hps = [...scene.enemyHps];
+      const struck: string[] = [];
+      for (let i = 0; i < scene.enemies.length; i++) {
+        if ((hps[i] ?? 0) <= 0) continue;
+        hps[i] = Math.max(0, (hps[i] ?? 0) - out);
+        struck.push(`${scene.enemies[i]!.name} ${hps[i]}/${scene.enemies[i]!.hp}`);
+      }
+      set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: hps } } : s));
+      get().appendLog('combat', `Resonance Cascade — 5d10 → ${out} to everything standing. (${struck.join(', ')})`);
+      // ⚠ The shared sweep, not a second spelling of it: loot, kill credit and the
+      // player's retarget all have to happen for EVERY body this dropped.
+      sweepDeadEnemies(get, set);
+    }
+    // The kickback lands whether or not anything was standing there.
+    const back = rollDie(10);
+    const live = get().player;
+    if (live) {
+      const newHp = Math.max(1, live.hp - back);
+      set((s) => (s.player ? { player: { ...s.player, hp: newHp } } : s));
+      get().appendLog('combat', `The second half of it comes back through you — 1d10 → ${back}. (HP ${newHp}/${live.hpMax})`);
+    }
+    return;
+  }
+  // Unreachable while AETHER_TECHNIQUES holds exactly these four. If a fifth is ever added
+  // without an effect, this says so out loud rather than channelling into silence.
+  get().appendLog('world', `The ${tech.name} resolves, and nothing in the world answers it.`);
+  void underPressure;
 }
 
 // OTA-479 — apply a weapon coating's ON-HIT effects to the active enemy: acid
@@ -38375,7 +40704,13 @@ function runParleyOutcome(
         }
         p = { ...p, inventory: inv };
         if (faction) {
-          const rr = applyRepChange(p.factionStanding, faction, -PARLEY_EXTORT_REP);
+          // ⚠ OTA-1182 — metered on the GAIN side only. Extorting a faction pays +3
+          // to each of their rivals, and this was the cheaper of the two farms: a
+          // successful shakedown costs nothing and can be repeated on every patrol.
+          // See meterSpiteGains — the loss stays uncapped on purpose.
+          const rr = meterSpiteGains(
+            get, set, applyRepChange(p.factionStanding, faction, -PARLEY_EXTORT_REP),
+          );
           p = { ...p, factionStanding: rr.standing };
           repChanged = rr.changed;
         }

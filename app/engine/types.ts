@@ -930,7 +930,17 @@ export type StatusEffectKind =
   | 'perfect_opening'
   // OTA-936 — successful-dodge GROUP defense: while you're still moving off a read, the
   // OTHER attackers this volley swing at +3 to your AC. Lasts one volley, then clears.
-  | 'evasive';
+  | 'evasive'
+  // OTA-1218 — AETHER TECHNIQUES (PUNCHLIST P16). Two of the four techniques need a
+  // status to live in; the other two ride machinery that already exists (Veil of Ether
+  // applies 'stealthed', Resonance Cascade is ordinary damage).
+  //
+  // ⚠ Both are deliberately shaped like statuses the game already carries, not new
+  // subsystems: aether_shield is read by statusAcAdjustment exactly as
+  // shaped_stone_ward is, and temporal_slip is consumed at the damage site exactly as
+  // 'shielded' (the Sentinel's Defensive Protocols) is.
+  | 'aether_shield'  // +3 AC while the field is held (3 rounds)
+  | 'temporal_slip'; // negates ONE incoming blow entirely, then is consumed
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -1015,6 +1025,22 @@ export interface PlayerCharacter {
   /** OTA-1044 — motive-drip beat ids already delivered to the feed (strict
    *  order, one-shot each; see engine/storyDrip.ts). Absent = none yet. */
   storyBeatsSeen?: string[];
+  /** OTA-1186 — Jakar Nine-Halls has already explained how bounties work. One-shot,
+   *  set on the first accepted contract.
+   *  ⚠ DELIBERATELY NOT BACKFILLED TO TRUE ON OLD SAVES, which is the opposite of what
+   *  `storyIntroSeen` does. That flag hides a cutscene an existing character has already
+   *  effectively lived through; this one gates RULES THAT HAVE NEVER BEEN SHOWN TO
+   *  ANYBODY — that kills count anywhere, that there is no turn-in, that accepting makes
+   *  the quarry hunt you. A veteran save needs them MORE than a fresh one, not less: the
+   *  owner ran a 23-tile contract on the wrong model of all three. Absent reads as false,
+   *  so every existing character gets it once on their next accept. */
+  bountyPrimerSeen?: boolean;
+  /** ⚠ OTA-1193 — rounds until DODGE can be set again. Counts DOWN by one per action
+   *  taken; 0/absent = ready. Absent on every existing save, which reads as READY — a
+   *  migration must never lock a player out of a move they had yesterday.
+   *  Rounds, not seconds: see engine/dodgeCooldown for why the owner's "10-15 seconds"
+   *  was deliberately translated into turns. */
+  dodgeCooldown?: number;
   /** ⚠ OTA-1089 — PHASE 4 DIFFICULTY, chosen on the last step of character
    *  creation and LOWERABLE MID-RUN BUT NEVER RAISABLE (engine/pressure.ts
    *  canChangeTo). Absent = DEFAULT_PRESSURE ('owed'), which is what every
@@ -1325,7 +1351,7 @@ export interface PlayerCharacter {
   /** Active faction quests with per-stage progress. Mirrors activeHunts
    *  / activeMysteries / activeStorylines so all four contract types
    *  share the same accept / advance / turn-in flow. */
-  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; escort?: EscortPool; tracked?: boolean }[];
+  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; escort?: EscortPool; tracked?: boolean }[];
   /** Mission ROUTE CHAIN in progress (set by ROUTE TO on a contract). The engine
    *  courses to the objective, then auto-courses to the turn-in once the work is
    *  done. Cleared on turn-in, abandon, deactivate, or a manual divert. */
@@ -1336,7 +1362,7 @@ export interface PlayerCharacter {
    *  player has DEACTIVATED (paused) this hunt: it stays on the slate but its
    *  stages don't auto-advance until re-activated (per-contract, independent of
    *  other hunts). Absent/true = active. */
-  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
+  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; tracked?: boolean }[];
   /** IDs of hunts that have been turned in. */
   completedHuntIds?: string[];
   /** OTA-850 [faction bounty] — LEGACY single active kill-bounty. Superseded by
@@ -1350,11 +1376,11 @@ export interface PlayerCharacter {
    *  and drops off the slate. Holding several lets the player grind faction standing. */
   activeBounties?: import('./factionBounty').FactionBounty[];
   /** Active mystery-object quests. `tracked === false` = paused (see activeHunts). */
-  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
+  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; tracked?: boolean }[];
   /** IDs of mystery quests turned in. */
   completedMysteryIds?: string[];
   /** Active long-form faction storylines (5-10 step). `tracked === false` = paused. */
-  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
+  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; tracked?: boolean }[];
   /** IDs of storylines completed. */
   completedStorylineIds?: string[];
   /** Active Whispers — informal NPC-to-NPC tips the player has
@@ -1369,6 +1395,27 @@ export interface PlayerCharacter {
    *  completed, expired, declined). Prevents re-planting the same
    *  whisper twice on the same character. */
   completedWhisperIds?: string[];
+  /** ⚠ OTA-1213 (PUNCHLIST P13) — the heart of the Labyrinth has been reached ONCE.
+   *  The maze is fully re-enterable (`enterLabyrinth` carries no attempt gate), so the
+   *  lore ending and its keepsake are gated on this rather than paid per run — a
+   *  repeatable loop with a repeatable reward is a farm, which is the one thing the
+   *  fix for an ends-in-nothing must not become. Absent on an old save reads as
+   *  "not yet seen", so a character who already walked it gets the ending next time. */
+  labyrinthHeartSeen?: boolean;
+
+  /** ⚠ OTA-1214 — AETHER TECHNIQUES the character has learned. Ids from
+   *  `engine/aetherTechniques.ts`. Absent on an old save reads as "knows none", which is
+   *  correct: they are acquired, never granted at creation. */
+  /** ⚠ OTA-1221 (PUNCHLIST P17) — the lore concepts this character has actually had
+   *  answered, by id. `titleProgress.loreRead` counts DISTINCT entries here rather than
+   *  every ask, so Scholar of Forgotten Lore means three different things read, not one
+   *  thing read three times. Absent on older saves; `?? []` covers them. */
+  loreConceptsRead?: string[];
+  knownTechniques?: string[];
+  /** ⚠ OTA-1214 — per-technique practice count, keyed by technique id (owner: growth is
+   *  per-technique, not one global aether skill, so a character specialises into what they
+   *  actually practise). Only MEANINGFUL uses increment it — see `practiceCounts`. */
+  techniqueProficiency?: Record<string, number>;
   /** Deterministic seed used to generate this character's procedural world map. */
   mapSeed?: string;
   /** Last spot key the player dug at (`locationId:x:y`). Must move away
@@ -1705,7 +1752,12 @@ export interface MemorableEvent {
     // OTA-843 [Chronicle] — the character first crossed INTO a worse corruption tier
     // (Tainted / Corrupted / Hollowed). Records the aether's arc on the soul so the
     // Chronicle can show how far they've fallen, not just the current number.
-    | 'corruption_tier';
+    | 'corruption_tier'
+    // ⚠ OTA-1213 (PUNCHLIST P13) — the player stood at the heart of the Labyrinth of
+    // Shadows and learned what Iskan-Veil's masking Core actually does. Recorded so
+    // the Arbiter can reference it and the Chronicle can show it; a lore beat this
+    // size should leave a mark on the character, not just scroll past in the feed.
+    | 'labyrinth_heart';
   text: string;
   timestamp: number;
   factionId?: string;
@@ -1771,6 +1823,23 @@ export interface WorldMemory {
    *  concept the player has with factions. Seeded from lore, then earned through actual
    *  patrol clashes; decides who fights whom. Two neutrals can grudge into war from zero. */
   factionRelations?: import('./factionRelations').RelationsMatrix;
+  /** ⚠ OTA-1188 — where the player last CLOSED a bounty. The anti-camp rule refuses a new
+   *  contract from that same board until one has been cleared somewhere else, so a player
+   *  cannot park at one outpost farming its board forever. Absent on every existing save,
+   *  which reads as "no camp in progress" — the permissive direction, deliberately: a
+   *  migration must never retroactively lock a player out of work they could take
+   *  yesterday. */
+  lastBountyClearedOutpostId?: string;
+  /** ⚠ OTA-1191 — THE ROAD ODOMETER. Tiles walked that were not already in the recent-cell
+   *  ring below; every `ODOMETER_STEP` of them is +1 max stamina, forever. Distinct from
+   *  the `MILESTONE_TRAVEL_STEP` track, which counts DISTINCT DESTINATIONS and therefore
+   *  stops paying out once the 36 locations are seen. Absent = 0 on every existing save,
+   *  so nobody is retroactively granted stamina they never walked for. */
+  travelOdometer?: number;
+  /** ⚠ The last few grid cells walked, newest last. A step only advances the odometer if
+   *  its cell is NOT in here — which is what stops a player pacing east-west from farming
+   *  permanent max stamina, the exact hole arb118 had to close on the other track. */
+  recentCells?: string[];
   /** In-game hour of the last world pulse (gates the next one). */
   lastWorldTickHour?: number;
   /** Recent world rumours (newest last), capped. The world moving, in the player's ear. */
@@ -1897,6 +1966,13 @@ export interface WorldMemory {
    *  Metered against GIFT_STANDING_FACTION_CAP so the verb OTA-803 deleted
    *  cannot come back as the side door it was deleted for. */
   giftStandingGranted?: Record<string, number>;
+  /** ⚠ OTA-1182 — LIFETIME standing each faction has been granted as SPILLOVER from
+   *  a hostile act against one of their rivals. Any standing loss cascades the
+   *  inverse to rivals, so a caught theft pays +5 and an extortion +3 to everyone
+   *  who hates the victim — uncapped, where a GIFT has been budgeted since OTA-803.
+   *  Metered against SPITE_STANDING_FACTION_CAP. ⚠ Gains only: being hated stays
+   *  uncapped, because a capped consequence is a consequence you can spend past. */
+  spiteStandingGranted?: Record<string, number>;
   /** OTA-120 — dog acquisition state machine, lives on world memory
    *  so it survives across screens. ALL player input routes through
    *  the onboarding handler when this is non-null. Cleared on
@@ -2085,7 +2161,22 @@ export interface NpcRelation {
    *  number would not have been this; the object is the point. Bounded in
    *  practice by GIFT_BOONS_PER_PERSON plus the repeat decay — there is no
    *  reason to keep gifting past the cap, and nothing rewards it. */
-  gifts?: { name: string; atHours: number }[];
+  gifts?: {
+    name: string;
+    atHours: number;
+    /** ⚠ OTA-1184 — HOW THEY TOOK IT. Owner: the ledger should show "what you gave
+     *  to whom and how they received it." The reaction was computed by `resolveGift`
+     *  at the moment of giving and then thrown away, so a gift that INSULTED
+     *  somebody looked identical on the record to one they loved.
+     *  ⚠ Optional, and it stays optional: every gift on an existing save predates
+     *  this field, and the ledger must render those as "reaction not recorded"
+     *  rather than inventing one. Do not backfill it — a guessed reaction on a
+     *  historical gift is worse than an honest blank, because tastes have changed
+     *  since (OTA-1176 rewrote the whole preference table). */
+    reaction?: 'loved' | 'liked' | 'polite' | 'disliked' | 'insulted';
+    /** The standing that actually moved, as reported at the time. */
+    standingDelta?: number;
+  }[];
   /** ⚠ OTA-1087 — THE LARGEST FACTION-STANDING HIT ALREADY TAKEN FOR BEING
    *  HOSTILE TO THIS PERSON, as a magnitude. Load-bearing anti-exploit state.
    *

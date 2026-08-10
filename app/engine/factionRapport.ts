@@ -10,6 +10,8 @@
 // sell price × (1 + mod). Even at the +20% sell cap the SELL_FRACTION (0.4) gap
 // keeps buy-then-sell a loss, so no arbitrage — it's a merchant-build perk.
 
+import { canonicalFactionId } from './factions';
+
 /** The stable rapport-quest id for a faction (authored in faction-quests.json).
  *  Completion of this quest (tracked in player.completedFactionQuestIds) unlocks
  *  dealing with that faction's vendors — no separate persisted flag needed. */
@@ -23,7 +25,13 @@ export function hasFactionRapport(
   factionId: string | null | undefined,
 ): boolean {
   if (!factionId) return false;
-  return (completedFactionQuestIds ?? []).includes(rapportQuestId(factionId));
+  // ⚠ OTA-1179 — heal the id BEFORE building a quest id out of it. A legacy race id
+  // yields `fq_architectural_sentinels_rapport`, which exists in no quest catalogue,
+  // so this returns false and the CHA discount is PERMANENTLY 0, with no log line —
+  // for a vendor whose rapport quest the player did actually complete. Same root as
+  // the OTA-1178 gift bug, failing silently on the read side instead of loudly.
+  const id = canonicalFactionId(factionId) ?? factionId;
+  return (completedFactionQuestIds ?? []).includes(rapportQuestId(id));
 }
 
 export const CHA_PRICE_DISCOUNT_PER_POINT = 0.02;

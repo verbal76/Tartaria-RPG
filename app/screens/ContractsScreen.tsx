@@ -18,13 +18,14 @@ import { missionObjectiveLocationId } from '../engine/missionRouting';
 import { getLocationById } from '../engine/encounter';
 import { GREAT_CLIMBS } from '../engine/greatClimbs';
 import { theLower } from '../engine/grammar';
-import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
+import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS, storyPerkLabel } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
 import { openContractMarkers } from '../engine/contractMarkers';
 import { missionLegs } from '../engine/broker';
 import { carriedSigils } from '../engine/sigils';
-import { canonicalDistanceFromGrid, canonicalDistanceFromPlayer, canonicalDistance } from '../engine/worldMap';
+import { canonicalDistanceFromGrid, canonicalDistanceFromPlayer, canonicalDistance, canonicalCellOf } from '../engine/worldMap';
+import { bountyCourseState, bountyCourseLabel, bountyCourseIsButton } from '../engine/bountyCourse';
 import {
   ensureMainQuest,
   phaseLabel,
@@ -193,10 +194,24 @@ export function ContractsScreen() {
     const info = ck ? contractMarkerByKey[ck] : undefined;
     return info ? <Text style={styles.contractBadge}>{info.number}◆ </Text> : null;
   };
-  const contractRoute = (toggleKey: string) => {
+  // ⚠ OTA-1190 — `tracked` GATES THE ROUTE. This offered ROUTE on a PAUSED contract, so
+  // a player could walk the whole way to an objective for a run that is not advancing,
+  // arrive, meet nothing to do with the contract, and reasonably conclude the hunt was
+  // broken. (Reported: routed to a hunt anchor, fought a Core Guardian, no hunt beat —
+  // because the run had never been activated.) The card already SAID "⏸ PAUSED" two rows
+  // up; the button beneath it disagreed. Same defect family as OTA-1187: a control that
+  // acts without the state that gives it meaning.
+  const contractRoute = (toggleKey: string, tracked = true) => {
     const ck = toContractKey(toggleKey);
     const info = ck ? contractMarkerByKey[ck] : undefined;
     if (!info) return null;
+    if (!tracked) {
+      return (
+        <Text style={styles.routeHereNote}>
+          ▸ Paused — activate it below before setting a course, or you'll walk to {info.anchorName} for a contract that isn't running.
+        </Text>
+      );
+    }
     if (player?.currentLocationId === info.anchorId) {
       return <Text style={styles.routeHereNote}>▸ {info.number}◆ You're at {info.anchorName}.</Text>;
     }
@@ -428,7 +443,7 @@ export function ContractsScreen() {
       readyRows.push({
         key: `rh_${h.run.id}`, tag: 'HUNT', title: d.title,
         locId: markerLocId(`h_${h.run.id}`),
-        note: 'paid face to face — a vendor or the posting faction’s agent',
+        note: 'paid face to face — the posting faction’s agent, or the trading post for 80%',
         onComplete: () => completeContractFromUI('hunt', d.id),
       });
   }
@@ -437,7 +452,8 @@ export function ContractsScreen() {
     if (d && stageRunReady('mystery', m.run, d))
       readyRows.push({
         key: `rm_${m.run.id}`, tag: 'MYSTERY', title: d.title,
-        locId: markerLocId(`m_${m.run.id}`), note: 'claim the reward',
+        locId: markerLocId(`m_${m.run.id}`),
+        note: 'hand to the posting faction’s agent, or the trading post for 80%',
         onComplete: () => completeContractFromUI('mystery', d.id),
       });
   }
@@ -446,7 +462,8 @@ export function ContractsScreen() {
     if (d && stageRunReady('storyline', sl.run, d))
       readyRows.push({
         key: `rs_${sl.run.id}`, tag: 'STORYLINE', title: d.title,
-        locId: markerLocId(`s_${sl.run.id}`), note: 'claim the reward',
+        locId: markerLocId(`s_${sl.run.id}`),
+        note: 'hand to the posting faction’s agent, or the trading post for 80%',
         onComplete: () => completeContractFromUI('storyline', d.id),
       });
   }
@@ -456,7 +473,7 @@ export function ContractsScreen() {
       readyRows.push({
         key: `rf_${d.id}`, tag: 'FACTION', title: d.title,
         locId: factionSortLocId(fq),
-        note: 'hand in at a same-faction agent for FULL reward',
+        note: 'same-faction agent pays FULL; the trading post brokers it for 80%',
         onComplete: () => completeContractFromUI('faction_quest', d.id),
       });
   }
@@ -1046,12 +1063,30 @@ export function ContractsScreen() {
                 const timerLabel = !hasClock ? 'no deadline'
                   : lapsed ? '⏳ LAPSED'
                   : `⏳ ${Math.ceil(left)}h left`;
+                // ⚠ OTA-1187 — THE WHOLE CARD WAS A SET-COURSE BUTTON, and it stayed one
+                // even when there was no course to set. Standing on the quarry's outpost,
+                // a tap did nothing and said nothing while the card still read "tap to set
+                // course". Same four-state machine the World screen uses, from the same
+                // engine module, so the two screens cannot drift apart.
+                const cs = bountyCourseState(
+                  player, b.targetLocationId, b.targetLocationName, safeLocName,
+                  (() => {
+                    if (!player) return false;
+                    const here = canonicalCellOf(player.currentLocationId);
+                    const there = canonicalCellOf(b.targetLocationId);
+                    return here.x === there.x && here.y === there.y;
+                  })(),
+                );
+                const canRoute = bountyCourseIsButton(cs);
                 return (
                   <Pressable
                     key={`b_${bountyKey(b)}`}
-                    onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
+                    onPress={canRoute
+                      ? () => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }
+                      : undefined}
+                    disabled={!canRoute}
                     style={styles.card}
-                    accessibilityRole="button"
+                    accessibilityRole={canRoute ? 'button' : 'text'}
                   >
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{b.giverName} bounty</Text>
@@ -1067,7 +1102,13 @@ export function ContractsScreen() {
                     <Text style={styles.cardLocation}>📍 {b.targetLocationName}</Text>
                     {movesLine(b.targetLocationId)}
                     <Text style={styles.cardHint}>
-                      {b.progress}/{b.count} put down · pays {b.rewardTc} TC + {b.giverName} standing · tap to set course
+                      {b.progress}/{b.count} put down · pays {b.rewardTc} TC + {b.giverName} standing
+                    </Text>
+                    {/* ⚠ OTA-1187 — this line used to be a flat "· tap to set course" that
+                        was a lie in three of the four states. It now says what tapping will
+                        actually do, or why there is nothing to tap. */}
+                    <Text style={canRoute ? styles.cardHint : styles.bountyCourseNote}>
+                      {canRoute ? 'Tap to set course' : bountyCourseLabel(cs)}
                     </Text>
                   </Pressable>
                 );
@@ -1092,7 +1133,7 @@ export function ContractsScreen() {
                         {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
-                    {contractRoute(key)}
+                    {contractRoute(key, tracked)}
                     {trackToggle('hunt', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {/* 2026-05-26 OTA-053 — playtester ask: hunt card
@@ -1242,7 +1283,7 @@ export function ContractsScreen() {
                         {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
-                    {contractRoute(key)}
+                    {contractRoute(key, tracked)}
                     {movesLine(markerLocId(key))}
                     {trackToggle('mystery', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
@@ -1312,7 +1353,7 @@ export function ContractsScreen() {
                         {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
-                    {contractRoute(key)}
+                    {contractRoute(key, tracked)}
                     {movesLine(markerLocId(key))}
                     {trackToggle('storyline', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
@@ -1691,7 +1732,7 @@ export function ContractsScreen() {
                     </View>
                     <Text style={styles.cardFaction}>Lead · {q.location.name}</Text>
                     {movesLine(q.location?.id)}
-                    {contractRoute(key)}
+                    {contractRoute(key, tracked)}
                     {trackToggle('lead', q.id, tracked)}
                     {!open && (
                       <>
@@ -1864,6 +1905,9 @@ function cap(s: string): string {
 // Found fragments show their full body; undiscovered fragments show
 // the discovery hint as a teaser.
 function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllProgress> }) {
+  // OTA-1206 — opens the full-story overlay. The store action re-checks completeness, so
+  // this button cannot show a story the player has not actually finished.
+  const openStoryReveal = useGameStore((s) => s.openStoryReveal);
   const [openId, setOpenId] = useState<string | null>(null);
   if (CHARACTER_STORIES.length === 0) {
     return (
@@ -1921,9 +1965,31 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
                   );
                 })}
                 {missing.length === 0 && (
-                  <Text style={styles.completeBanner}>
-                    ✦ Story complete — every fragment recovered.
-                  </Text>
+                  <>
+                    <Text style={styles.completeBanner}>
+                      ✦ {story.characterName}&apos;s story is complete — every fragment recovered.
+                    </Text>
+                    {/* OTA-1207 — the standing buff this story pays, if it pays one.
+                        ⚠ Not every story does, by the owner's design, so the absence of a
+                        line here is correct rather than a missing feature. */}
+                    {storyPerkLabel(story.id) && (
+                      <Text style={styles.perkLine}>✦ {storyPerkLabel(story.id)}</Text>
+                    )}
+                    {/* ⚠ OTA-1206 — READ IT WHOLE, ON DEMAND. The completion screen raises
+                        itself once, at the moment the set closes. Without this button that
+                        is the ONLY time the assembled story is ever readable end to end,
+                        which is the same "ends in nothing" defect one step further along
+                        (PUNCHLIST P1). */}
+                    <TouchableOpacity
+                      style={styles.readStoryBtn}
+                      onPress={() => openStoryReveal(story.id)}
+                      activeOpacity={0.7}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Read ${story.characterName}'s story`}
+                    >
+                      <Text style={styles.readStoryText}>READ THE WHOLE STORY</Text>
+                    </TouchableOpacity>
+                  </>
                 )}
               </View>
             )}
@@ -1935,6 +2001,14 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
 }
 
 const styles = StyleSheet.create({
+  // OTA-1206 — READ THE WHOLE STORY, on a completed set.
+  readStoryBtn: {
+    alignSelf: 'flex-start', marginTop: 10, paddingVertical: 8, paddingHorizontal: 16,
+    borderWidth: 1, borderColor: '#3a4348', backgroundColor: '#141a1d',
+  },
+  readStoryText: { color: '#cdbf99', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
+  // OTA-1207 — the permanent buff a completed story grants.
+  perkLine: { color: '#8fbf9f', fontSize: 12, marginTop: 6, fontStyle: 'italic', lineHeight: 18 },
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
   // v2.4.1 (OTA 033) — Primary Objective card. Sits at the top of
   // the Contracts screen above the tab row. Warm-gold border to
@@ -2222,6 +2296,9 @@ const styles = StyleSheet.create({
   difficultyChipDangerous: { color: '#e07a5f' },
   cardBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
   cardHint: { color: '#c9a86a', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
+  // OTA-1187 — the non-tappable course states. Muted, not the gold call-to-action
+  // colour, so a status line never reads as something to press.
+  bountyCourseNote: { color: '#a2977b', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
   // OTA-866 — bounty countdown: a bordered time pill + a draining bar.
   bountyTimerPill: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, borderWidth: 1, borderRadius: 3, paddingHorizontal: 6, paddingVertical: 2, overflow: 'hidden' },
   bountyTimerTrack: { height: 4, borderRadius: 2, backgroundColor: 'rgba(122,112,92,0.25)', marginTop: 6, marginBottom: 2, overflow: 'hidden' },

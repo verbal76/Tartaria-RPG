@@ -92,6 +92,16 @@ export function getItemPreviewForInstance(item: {
       stats.push(`Resists: ${u.resistance}`);
     }
     if (u.special) stats.push(`Special: ${u.special}`);
+    // ⚠ OTA-1183 — A FUSED PIECE STILL EARNS ITS CATALOG REGEN, so it must still say
+    // so. `aggregateEquippedRegen` resolves the worn piece with `findArmorByName`
+    // and never looks at uniqueStats, so fusing "Echoing Steps Boots" keeps the
+    // hpRegen 2 while this branch — which builds its lines from the ROLL, not the
+    // catalog — would have dropped the only mention of it. Read from ARMOR by name,
+    // the same key the payout uses.
+    if (u.kind === 'armor') {
+      const regen = regenLine(ARMOR.find((p) => p.name === item.name));
+      if (regen) stats.push(regen);
+    }
     stats.push(`Durability: ${u.durability.current}/${u.durability.max}`);
     return {
       name: item.name,
@@ -229,8 +239,37 @@ function previewArmor(a: CatalogArmor): ItemPreview {
   const resists = armorResistances(a);
   if (resists.length > 0) stats.push(`Resists: ${resists.join(', ')}`);
   if (a.statBonus) stats.push(`${a.statBonus.stat.toUpperCase().slice(0, 3)} +${a.statBonus.amount}`);
+  // ⚠ OTA-1183 — REGEN WAS INVISIBLE ON EVERY SURFACE. Owner: "how am I supposed to
+  // know I had regen, I almost sold these." He was wearing Echoing Steps Boots —
+  // hpRegen 2, which is the ENTIRE HP_REGEN_CAP — and the inventory row read
+  // "AC +2 · DEX +2". 93 of 293 armour pieces carry regen (31 hpRegen, 62
+  // staminaRegen) and not one of them said so anywhere: not the row, not the
+  // preview, not the vendor list. A property the player cannot see is one they sell
+  // by accident, and on several Commons it is the best line on the item.
+  // ⚠ Placed BEFORE Durability deliberately. The instance path below rebuilds a
+  // fused piece by KEEPING every line that is not AC / stat / durability, so a line
+  // added here survives fusion for free — which matters, because
+  // aggregateEquippedRegen looks the piece up by NAME and pays out on a fused copy
+  // exactly the same.
+  const regen = regenLine(a);
+  if (regen) stats.push(regen);
   if (a.baseDurability !== undefined) stats.push(`Durability: ${a.baseDurability}`);
   return { name: a.name, kindLabel: `${slotLabel} Armor`, slot: a.slot, rarity: a.rarity, description: a.description, stats };
+}
+
+/** OTA-1183 — ONE spelling of the regen line, so the row, the preview and the fused
+ *  path can never word it differently. Null when the piece has none.
+ *  ⚠ It says "per action" because that is the real cadence: it ticks once per
+ *  command inside submitPlayerAction — not per hour, not per rest. A player who
+ *  assumes "per hour" will badly under-rate a +2, which is exactly what happened. */
+export function regenLine(
+  a: { hpRegen?: number; staminaRegen?: number } | null | undefined,
+): string | null {
+  if (!a) return null;
+  const parts: string[] = [];
+  if (a.hpRegen) parts.push(`+${a.hpRegen} HP`);
+  if (a.staminaRegen) parts.push(`+${a.staminaRegen} stamina`);
+  return parts.length ? `Regen: ${parts.join(' / ')} per action` : null;
 }
 
 function previewAccessory(x: CatalogAccessory, kind: 'Amulet' | 'Ring'): ItemPreview {

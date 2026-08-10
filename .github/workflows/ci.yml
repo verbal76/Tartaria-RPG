@@ -98,6 +98,12 @@ jobs:
       - name: HANDOFF claims ratchet (blocking)
         run: npm run check:handoff
 
+      # Content reachability — authored content the player can never get to is the same
+      # defect as content never written, and harder to notice. Data references only; see
+      # PUNCHLIST.md for what this cannot see.
+      - name: Content reachability (blocking)
+        run: npm run check:reachability
+
   test:
     name: jest (fast · required)
     runs-on: ubuntu-latest

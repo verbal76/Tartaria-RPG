@@ -1,3 +1,4 @@
+import { findByTitle } from './titleMatch';
 // Mystery-object quest engine — 3-5 step chains to find lore-canonical
 // artifacts (Red Tower fragment, Cradle compass, Leviathan eye, etc.).
 // Mechanically these are stripped-down hunts: same stage structure, but
@@ -50,10 +51,10 @@ export function availableMysteries(
   );
 }
 
+// ⚠ OTA-1211 — delegates to the shared three-tier resolver. The first two tiers are
+// the exact behaviour this function always had; the third catches the case the
+// parser creates by stripping stop words ("fragment red tower" vs "Fragment of the
+// Red Tower"), and only ever runs where this used to return null. See titleMatch.ts.
 export function fuzzyFindMystery(text: string, pool: readonly MysteryDef[]): MysteryDef | null {
-  const t = text.toLowerCase().trim();
-  if (!t) return null;
-  const exact = pool.find((m) => m.title.toLowerCase() === t);
-  if (exact) return exact;
-  return pool.find((m) => m.title.toLowerCase().includes(t) || t.includes(m.title.toLowerCase())) ?? null;
+  return findByTitle(text, pool);
 }

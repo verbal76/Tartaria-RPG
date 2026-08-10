@@ -81,15 +81,26 @@ describe('OTA-859 — the store holds several bounties and grinds them together'
     const bB = mkBounty('beta', 'monarchs', 'monarch_waystation2', 3);
     const bC = mkBounty('gamma', 'ghost', 'ghost_hollow', 3);
 
-    useGameStore.getState().acceptBounty(bA);
-    useGameStore.getState().acceptBounty(bA); // duplicate — must be refused
-    useGameStore.getState().acceptBounty(bB);
-    useGameStore.getState().acceptBounty(bC);
+    // ⚠ OTA-1188 — accepting now requires a FROZEN BOARD: the contract stamps the politics
+    // it was signed under, so there must be a snapshot to stamp. The freeze AUTO-RELEASES
+    // on a SUCCESSFUL accept — but a REFUSED one deliberately leaves it held, so the player
+    // can fix what was wrong and try again without re-reading the board. That is why this
+    // ENSURES frozen rather than toggling: a blind toggle after the refused duplicate
+    // below would RELEASE the board instead of taking a fresh snapshot, and the next two
+    // contracts would be turned away for the wrong reason.
+    const accept = (b: ReturnType<typeof mkBounty>) => {
+      if (!useGameStore.getState().frozenBoard) useGameStore.getState().toggleBoardFreeze();
+      useGameStore.getState().acceptBounty(b);
+    };
+    accept(bA);
+    accept(bA); // duplicate — must be refused
+    accept(bB);
+    accept(bC);
     let slate = useGameStore.getState().player!.activeBounties ?? [];
     expect(slate.length).toBe(3); // bA, bB, bC — the dup did not stack
 
     // A fourth distinct contract overflows the cap of 3 and is refused.
-    useGameStore.getState().acceptBounty(mkBounty('delta', 'order', 'order_camp', 3));
+    accept(mkBounty('delta', 'order', 'order_camp', 3));
     expect((useGameStore.getState().player!.activeBounties ?? []).length).toBe(3);
 
     // A single monarchs kill advances BOTH monarchs contracts, not the ghost one.

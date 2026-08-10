@@ -55,7 +55,7 @@ import { revealedLocationName, isLocationRevealed, isHiddenLocation, HIDDEN_LOCA
 import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
-import { isHubLocation, hubRoomFor, hubNameForFaction } from '../engine/hub';
+import { isHubLocation, hubRoomFor, hubNameForFaction, hubSkinFactionFor } from '../engine/hub';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 // OTA 051 — locations.json carries the human-readable name we want
 // to surface in the "You are here: <name>" chip when the player is
@@ -637,10 +637,10 @@ export function MapScreen() {
   // variant overlay (so a Forgotten Order character reads
   // "Order Cloister — The Threshold" instead of "Tartarian Outskirts").
   const hubRoomDisplay = inHub
-    ? hubRoomFor(player?.hubRoomId, player?.factionId)
+    ? hubRoomFor(player?.hubRoomId, hubSkinFactionFor(player?.currentLocationId, player?.factionId))
     : null;
   const hubLabel = inHub
-    ? `${hubNameForFaction(player?.factionId)} — ${hubRoomDisplay?.name ?? 'Hub'}`
+    ? `${hubNameForFaction(hubSkinFactionFor(player?.currentLocationId, player?.factionId))} — ${hubRoomDisplay?.name ?? 'Hub'}`
     : null;
   const whereLine = hubLabel
     ?? (atCenter && currentLocation
@@ -653,7 +653,7 @@ export function MapScreen() {
   // orientation cue). Inside a hub we just name the outpost; out in the world
   // we describe the region + the nearest drawn landmarks.
   const whereaboutsLine = inHub
-    ? `Inside the ${hubNameForFaction(player?.factionId)} — a fixed outpost interior.`
+    ? `Inside the ${hubNameForFaction(hubSkinFactionFor(player?.currentLocationId, player?.factionId))} — a fixed outpost interior.`
     : describeWhereabouts(player.currentLocationId, LOCATIONS);
 
   return (
@@ -772,7 +772,7 @@ export function MapScreen() {
         ) : null}
         <Text style={styles.footerDist}>
           {inHub
-            ? `Inside the ${hubNameForFaction(player?.factionId)}.`
+            ? `Inside the ${hubNameForFaction(hubSkinFactionFor(player?.currentLocationId, player?.factionId))}.`
             : tiles === 0
               ? `At ${fromName}.`
               : `${tiles} day${tiles === 1 ? '' : 's'} of travel from ${fromName}.`}

@@ -15,11 +15,15 @@ import { TutorialTarget } from './TutorialTarget';
 import { visibleBuildingRooms } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS } from './tutorialSteps';
-import { playerWeaponReach, useGameStore } from '../state/gameStore';
+import { playerWeaponReach, useGameStore, logUiTap } from '../state/gameStore';
 import { useReduceMotion } from '../state/accessibility';
-import { hubRoomFor, isLeaveHubCommand } from '../engine/hub';
+import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 import { reachBandsFor } from '../engine/types';
+// OTA-1193 — the dodge recharge bar reads its fill from one place.
+import { dodgeFill, dodgeCooldownRounds } from '../engine/dodgeCooldown';
+// OTA-1194 — the dodge lock is per difficulty tier; dialOf resolves CUSTOM per system.
+import { dialOf } from '../engine/pressure';
 import type { InventoryItem, CombatRange, PlayerCharacter } from '../engine/types';
 
 /** OTA-1029 — the quick-button highlight reads reach from the SAME resolver the
@@ -187,11 +191,22 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // OTA-1029 — the whole player, for the shared reach resolver behind the weapon
   // quick-button tones (replaces the old intelligence-only read).
   const reachPlayer = useGameStore((s) => s.player ?? null);
+  // OTA-1193 — rounds left on the dodge lockout; 0/absent = ready (full blue).
+  const dodgeCooldown = useGameStore((s) => s.player?.dodgeCooldown ?? 0);
+  // ⚠ OTA-1194 — the bar's DENOMINATOR is this character's difficulty tier, not the bare
+  // constant. Divide bury_me's 5-round lock by 3 and the chip reads full blue with two
+  // beats still locked — a control that visibly invites a tap it will then refuse, which
+  // is the whole defect class OTA-1187 exists to prevent.
+  const dodgeMax = useGameStore((s) => dodgeCooldownRounds(dialOf(s.player, 'dodgeLock')));
   const tutorialStep = useGameStore((s) => s.tutorialStep);
   const awaitingTutorialName = useGameStore((s) => s.awaitingTutorialName);
   const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
   const hubRoomId = useGameStore((s) => s.player?.hubRoomId ?? null);
   const factionId = useGameStore((s) => s.player?.factionId ?? null);
+  // OTA-1209 — the room chips must read the SITE's names, not the player's, or the
+  // exit labels disagree with the room the player is standing in.
+  const hubLocationId = useGameStore((s) => s.player?.currentLocationId ?? null);
+  const skinFactionId = hubSkinFactionFor(hubLocationId, factionId);
   // arb25 — enterable buildings: when inside one, the travel row shows the
   // building's rooms + EXIT instead of cardinals / faction-hub exits.
   const activeBuildingId = useGameStore((s) => s.activeBuildingId);
@@ -280,19 +295,32 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // onPress still submits 'go <direction>' so resolveHubTravel does
   // its existing thing; only the chip LABEL changes. Outside a hub
   // the row renders cardinals as before.
-  const hubRoom = useMemo(() => (hubRoomId ? hubRoomFor(hubRoomId, factionId) : null), [hubRoomId, factionId]);
+  const hubRoom = useMemo(() => (hubRoomId ? hubRoomFor(hubRoomId, skinFactionId) : null), [hubRoomId, skinFactionId]);
   const hubExitChips: Array<{ label: string; submit: string }> = useMemo(() => {
     if (!hubRoom) return [];
     const out: Array<{ label: string; submit: string }> = [];
     for (const dir of ['north', 'south', 'east', 'west'] as const) {
       const targetId = hubRoom.exits[dir];
       if (!targetId) continue;
-      const targetRoom = hubRoomFor(targetId, factionId);
+      const targetRoom = hubRoomFor(targetId, skinFactionId);
       const label = targetRoom?.shortName?.toUpperCase() ?? dir.toUpperCase();
       out.push({ label, submit: `go ${dir}` });
     }
     return out;
-  }, [hubRoom, factionId]);
+  }, [hubRoom, skinFactionId]);
+
+  // ⚠ OTA-1217 (PUNCHLIST P11) — the EXIT chip belongs ONLY in the gate room. Showing it in
+  // every room let the player leave through the armory or the mess, which is not how the
+  // outpost is laid out. Ported up from golem-line, where it has been correct since
+  // 2026-06-27 while the live line was not.
+  //
+  // ⚠ The Gate is also the spawn room, so EXIT is still present where the tutorial's
+  // `explore_or_leave` beat needs it — the beat is unaffected.
+  const showExitChip = useMemo(() => {
+    if (!hubRoom) return false;
+    if (hubDefinesExitRoom()) return roomIsExit(hubRoom);
+    return true;   // no gate tagged anywhere → never strand the player
+  }, [hubRoom]);
 
   // TAKE / SALVAGE / INVESTIGATE during their tutorial beats now OPEN the
   // real picker menu so the player learns the actual interaction — the demo
@@ -443,7 +471,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 // choice (the player's way out of the outpost + the tutorial).
                 <TravelBtn key={c.submit} label={c.label} onPress={() => onSubmit(c.submit)} blocked={tutLock} />
               ))}
-              <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
+              {showExitChip ? (
+                <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
+              ) : null}
             </>
           ) : sceneBuilding ? (
             // arb36 — a structure stands on this tile: offer ENTER alongside
@@ -546,7 +576,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {/* OTA-911 — dodge and flee are off while you're on a climb: no
                   footing to weave a parry, nowhere to flee but straight down.
                   Hidden here (the engine also refuses them defensively). */}
-              {!elevatedOn ? <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} /> : null}
+              {/* OTA-1193 — DODGE carries a recharge bar. Still tappable while red: the
+                  engine buzzes and names the beats left rather than refusing in silence. */}
+              {!elevatedOn ? <QuickBtn label="dodge" defensive cooldownFill={dodgeFill(dodgeCooldown, dodgeMax)} onPress={() => onSubmit('dodge')} /> : null}
               {/* OTA-847 (STEALTH SYSTEM) — in-combat STEALTH. First action of the
                   fight = SNEAK ATTACK (free STE check for the drop); mid-combat =
                   BACKSTAB attempt (costs your turn, STE initiative race). The
@@ -754,6 +786,7 @@ function QuickBtn({
   tone,
   blocked,
   outOfRange,
+  cooldownFill,
 }: {
   label: string;
   onPress: () => void;
@@ -769,6 +802,11 @@ function QuickBtn({
    *  used to treat an out-of-range attack as a free approach, which let
    *  PUNCH double as APPROACH. Now you must hit APPROACH yourself. */
   outOfRange?: boolean;
+  /** ⚠ OTA-1193 — COOLDOWN FILL, 0…1. Undefined on every chip without a cooldown, which
+   *  is all of them but DODGE. 0 renders full red (just used), 1 renders full blue (ready).
+   *  ⚠ The chip stays TAPPABLE while red: the engine answers with a buzz and a line naming
+   *  the beats remaining, because a control that refuses in silence is the OTA-1187 bug. */
+  cooldownFill?: number;
 }) {
   const resolvedTone: QuickBtnTone | undefined = blocked
     ? undefined
@@ -792,6 +830,11 @@ function QuickBtn({
     blocked && styles.quickDisabledText,
   ];
   const handlePress = () => {
+    // ⚠ OTA-1195 — THE BREADCRUMB, AND IT IS FIRST ON PURPOSE. The freeze report had no
+    // record of a tap between the last salvage and 90 seconds of silence, so there was no
+    // way to tell "the tap never arrived" (screen frozen) from "the tap arrived and the
+    // work hung" (engine frozen). Moving this below any handler destroys that signal.
+    logUiTap(label);
     if (blocked) {
       // arb109 — wrong control for this tutorial beat. A stronger double-pulse
       // (clearly an "error" buzz, not a tap) PLUS an on-screen Arbiter nudge,
@@ -814,9 +857,23 @@ function QuickBtn({
       style={containerStyle}
       onPress={handlePress}
       accessibilityRole="button"
-      accessibilityLabel={label}
+      accessibilityLabel={cooldownFill !== undefined && cooldownFill < 1
+        ? `${label}, recharging, ${Math.round(cooldownFill * 100)} percent`
+        : label}
       accessibilityState={{ disabled: !!blocked }}
     >
+      {/* ⚠ OTA-1193 — THE RECHARGE BAR, behind the label. Owner: "have it turn red and
+          slowly fill back to blue… make the color fill left to right with no fade."
+          Two absolute layers: red across the whole chip, then blue laid over it from the
+          left to `cooldownFill`. No gradient and no Animated value anywhere — the fill is
+          a hard edge that JUMPS one step per action, because the cooldown counts ROUNDS,
+          not seconds, and a smooth tween would imply time is what refills it. */}
+      {cooldownFill !== undefined && cooldownFill < 1 ? (
+        <>
+          <View style={styles.cooldownTrack} pointerEvents="none" />
+          <View style={[styles.cooldownFill, { width: `${Math.max(0, Math.min(1, cooldownFill)) * 100}%` }]} pointerEvents="none" />
+        </>
+      ) : null}
       <Text style={textStyle}>{label.toUpperCase()}</Text>
     </TouchableOpacity>
   );
@@ -828,6 +885,7 @@ function TravelBtn({ label, onPress, blocked, active }: { label: string; onPress
   // buzz (double-pulse) + drop an Arbiter nudge instead of moving, so the
   // player can't wander off-script and gets clear "wrong" feedback.
   const handlePress = () => {
+    logUiTap(label); // OTA-1195 — before any handler; see the note in QuickBtn.
     if (blocked) { buzzWrong(); useGameStore.getState().nudgeTutorialBlocked(); return; }
     onPress();
   };
@@ -940,8 +998,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 4,
+    // OTA-1193 — clips the cooldown fill to the chip's rounded corners.
+    overflow: 'hidden',
   },
   quickDefensive: { borderColor: '#6a9bbf' },
+  // ⚠ OTA-1193 — the dodge recharge bar. Two absolute layers INSIDE the chip and behind
+  // the label, clipped by the chip's own radius. `overflow: 'hidden'` on `quick` is what
+  // keeps the fill from spilling past the rounded corners.
+  // ⚠ NO GRADIENT, NO ANIMATION. Owner: "fill left to right with no fade." The blue is a
+  // flat block whose WIDTH jumps one step per action; the red is simply what shows where
+  // the blue has not reached yet. Blue matches `quickDefensive`'s border, so a full bar
+  // reads as the chip's ordinary ready state rather than as a new colour.
+  cooldownTrack: { position: 'absolute', left: 0, top: 0, bottom: 0, right: 0, backgroundColor: '#4a1f1a' },
+  cooldownFill: { position: 'absolute', left: 0, top: 0, bottom: 0, backgroundColor: '#24455c' },
   // arb86 — was backgroundColor '#1a201410' (alpha ~6% → near-transparent).
   // Against the old near-black bg it read as a faint green tint, but with the
   // player-tunable background a bright hue FLOODED through the chip ("weird

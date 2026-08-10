@@ -65,17 +65,32 @@ export function applyRepChange(
   standing: readonly FactionStanding[],
   withFaction: string,
   delta: number,
+  /** ⚠ OTA-1188 — WHO COUNTS AS FRIEND AND FOE, supplied by the caller.
+   *
+   *  The default (omitting this) reads `factions.json`'s static `allies`/`rivals`, which
+   *  are the ORIGINAL TREATIES and never change — while the GRUDGES & ALLIANCES panel
+   *  shows a LIVE, symmetric relations matrix that patrols move as they gut each other.
+   *  Those two disagreed, and the panel was the honest one. Owner: *"which one is the
+   *  truth? do we treat the ever-evolving map as the truth?"* — yes.
+   *
+   *  A bounty passes the sets FROZEN ONTO IT AT ACCEPT (see engine/bountyPolitics), so the
+   *  board you read is the deal you get even if they go to war a second later. The static
+   *  fallback stays for every other caller and for legacy contracts carrying no snapshot;
+   *  the JSON arrays are still the SEED the matrix is built from and must not be deleted. */
+  override?: { allies: readonly string[]; rivals: readonly string[] },
 ): { standing: FactionStanding[]; changed: { factionId: string; delta: number; newStanding: number }[] } {
   const faction = findFaction(withFaction);
-  if (!faction) return { standing: standing.map((s) => ({ ...s })), changed: [] };
+  // ⚠ An override is honoured even for an unknown faction id: the snapshot already
+  // resolved the ids, so refusing here would silently drop a payout the player earned.
+  if (!faction && !override) return { standing: standing.map((s) => ({ ...s })), changed: [] };
 
   const allyIds = new Set(
-    (faction.allies ?? [])
+    (override ? override.allies : (faction?.allies ?? []))
       .map(normalizeRef)
       .filter(isKnownFactionId),
   );
   const rivalIds = new Set(
-    (faction.rivals ?? [])
+    (override ? override.rivals : (faction?.rivals ?? []))
       .map(normalizeRef)
       .filter(isKnownFactionId),
   );
@@ -101,8 +116,23 @@ export function applyRepChange(
   return { standing: next, changed };
 }
 
+/** ⚠ OTA-1179 — READS HEAL THE ID TOO, not just writes.
+ *
+ *  OTA-1178 taught `applyRepChange`'s callers to canonicalise, because a legacy
+ *  race id on an old save made a gift grant nothing while claiming success. The
+ *  READ side was left as it was, and it has the same hole with a quieter failure:
+ *  this returns **0 — indistinguishable from genuinely neutral** — so a player who
+ *  had ground a faction to +30 through a vendor recorded under a bad id reads as a
+ *  stranger to every consumer at once. Roughly fifteen call sites inherit it:
+ *  pricing, contract availability, hostility, brokering, titles, the character
+ *  sheet.
+ *
+ *  ⚠ The fallback is `factionId`, not null: an id this build's roster does not know
+ *  might be NEWER than the roster rather than older, and silently rewriting it to
+ *  nothing would be the same class of mistake in the other direction. */
 export function getStanding(standing: readonly FactionStanding[], factionId: string): number {
-  return standing.find((s) => s.factionId === factionId)?.standing ?? 0;
+  const id = canonicalFactionId(factionId) ?? factionId;
+  return standing.find((s) => s.factionId === id)?.standing ?? 0;
 }
 
 // Minimum standing to be admitted into a faction. Most factions in the
@@ -114,3 +144,11 @@ export const JOIN_THRESHOLD = 20;
 export function meetsJoinThreshold(standing: readonly FactionStanding[], factionId: string): boolean {
   return getStanding(standing, factionId) >= JOIN_THRESHOLD;
 }
+
+/** ⚠ OTA-1181 — TC of honest custom that banks 1 standing with a faction's traders.
+ *  Lifted out of `gameStore.buyFromVendor`, where it was a function-local const, so
+ *  the character sheet can STATE the rule instead of printing a second copy of the
+ *  number. The in-game glossary said purchases were worth "+1" with no denominator
+ *  at all — off by this entire constant, and exactly the drift OTA-1179 #8 cleaned
+ *  up for JOIN_THRESHOLD. One definition, two readers. */
+export const BUY_REP_TC_PER_STANDING = 500;

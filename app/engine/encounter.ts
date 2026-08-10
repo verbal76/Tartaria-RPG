@@ -96,10 +96,76 @@ export function pickHazardForLocation(location: Location, dangerBoost = 0): Haza
 // big Legendary doesn't explode, and a fresh arrival in a danger-0 zone is left
 // EXACTLY as authored — "low level is still low level". Knobs are all here.
 
-/** How strong is this character. Best offensive stat + a slice of the HP pool — the
- *  same proxy the Guardian scaler uses, kept in sync deliberately. */
-export function enemyScalePower(bestCombatStat: number, hpMax: number): number {
-  return bestCombatStat + hpMax / 10;
+// ⚠ OTA-1182 — THE SCALER NOW KNOWS WHAT YOU ARE WEARING AND SWINGING.
+//
+// Owner: his AC went 20 → 26 and the difficulty did not move. It could not — the
+// power proxy below was `bestCombatStat + hpMax / 10`, and AC was not an input at
+// all, nor was weapon damage. Meanwhile `powerRating.playerPowerScore` — the number
+// shown to the player on their own sheet — is `bestStat + damage + AC + hp/10`. Two
+// answers to "how strong is this character", and the one the player SEES counted
+// their armour while the one that SET THE DIFFICULTY did not.
+//
+// ⚠ WHY THE TERMS ARE SCALED, NOT JUST ADDED. `overLevelT` maps power 14 → 32, and
+// the existing inputs live inside that window (a best stat of 10-18, hp/10 from
+// ~2.4 at a fresh arrival to ~6 late). RAW AC is 10-26 — the same magnitude as the
+// ENTIRE formula — so adding it whole pins `overLevelT` at 1 for anyone wearing
+// armour. That is not "difficulty responds to gear", it is "difficulty is always
+// maxed". Both new terms are therefore measured ABOVE A FRESH-ARRIVAL BASELINE and
+// divided into a 0-4 band — deliberately the same width as the HP term's 2.4-6,
+// because AC and HP are the two survivability axes and neither should drown the
+// other.
+//
+// ⚠ A FRESH ARRIVAL IS EXACTLY UNCHANGED, BY CONSTRUCTION. Racial base AC is 8-12
+// and the unarmed damage proxy is 2, so at the baselines both terms are zero or
+// negative — and they are clamped at zero, so gear can never make the world EASIER
+// than it was authored. "A fresh arrival in a danger-0 zone is left EXACTLY as
+// authored" (see the header) survives this untouched.
+
+/** Racial base AC — 8 (mud golem) to 12 (giant), 10 for most. Below this, no credit. */
+export const AC_POWER_BASELINE = 10;
+/** Just above the unarmed damage proxy (2), so a first real weapon reads as ~0. */
+export const DMG_POWER_BASELINE = 3;
+/** Puts each gear term in a 0-4 band, matching the HP term's width. */
+export const GEAR_POWER_DIVISOR = 4;
+/** ⚠ THE DIAL, AND IT IS DELIBERATELY NOT 1. 1.0 is the designed full weight of the
+ *  two gear terms; this ships at HALF so the curve moves once, visibly, and can be
+ *  read off a real device log before we commit to the rest. Going to full weight is
+ *  a one-token change here and needs no other edit anywhere. */
+export const GEAR_POWER_BLEND = 0.5;
+
+/** The gear half of the power proxy: what your armour and your weapon are worth above
+ *  what you walked in with. Clamped at 0 — gear never lowers difficulty.
+ *
+ *  ⚠ OTA-1194 — `tierBlend` is the DIFFICULTY TIER's multiplier on top of the shipped
+ *  half weight: salvage 0.5 (effective 0.25), owed 1 (effective 0.5 — the identity row,
+ *  unchanged), let_it_come 1.5, bury_me 2 (effective 1.0, the full designed weight
+ *  OTA-1182 wrote and then held back pending device evidence).
+ *  ⚠ It multiplies terms that are ALREADY clamped at 0, so no tier can make the world
+ *  easier than authored — a fresh arrival reads exactly 0 at every rung. Defaults to 1,
+ *  so every existing caller and every tooling call is bit-for-bit unchanged. */
+export function gearPowerTerm(ac: number, avgWeaponDamage: number, tierBlend: number = 1): number {
+  const acTerm = Math.max(0, ac - AC_POWER_BASELINE) / GEAR_POWER_DIVISOR;
+  const dmgTerm = Math.max(0, avgWeaponDamage - DMG_POWER_BASELINE) / GEAR_POWER_DIVISOR;
+  const blend = Number.isFinite(tierBlend) ? Math.max(0, tierBlend) : 1;
+  return GEAR_POWER_BLEND * blend * (acTerm + dmgTerm);
+}
+
+/** How strong is this character. Best offensive stat + a slice of the HP pool, plus —
+ *  since OTA-1182 — a scaled slice of what they are WEARING and SWINGING.
+ *  ⚠ `gear` is OPTIONAL so the pure stat/HP proxy stays callable for tooling and for
+ *  the Guardian curve this is kept in sync with. Omitting it reproduces the old value
+ *  EXACTLY, which is what keeps the OTA-1182 diff readable and its blast radius the
+ *  set of call sites that opted in. */
+export function enemyScalePower(
+  bestCombatStat: number,
+  hpMax: number,
+  /** ⚠ OTA-1194 — `tierBlend` is the difficulty tier's weight on the gear terms.
+   *  Absent = 1 = the shipped half weight, so an omitted tier is the baseline and never
+   *  accidentally a free pass. */
+  gear?: { ac: number; avgWeaponDamage: number; tierBlend?: number },
+): number {
+  const base = bestCombatStat + hpMax / 10;
+  return gear ? base + gearPowerTerm(gear.ac, gear.avgWeaponDamage, gear.tierBlend ?? 1) : base;
 }
 
 function bumpAbilityPointNumber(ap: string | number | undefined, bonus: number): string {
@@ -111,7 +177,7 @@ function bumpAbilityPointNumber(ap: string | number | undefined, bonus: number):
 }
 
 /** Over-level term: 0 at a fresh arrival → 1 at end-game. Shared by solo + pack. */
-function overLevelT(power: number): number {
+export function overLevelT(power: number): number {
   return Math.max(0, Math.min(1, (power - 14) / 18));
 }
 
@@ -196,6 +262,19 @@ export function randomizeEnemyDefense(enemy: Enemy, rng: () => number = Math.ran
   if (rng() < 0.35 && map.resist.length) {
     const wall = pick(map.resist.filter((r) => r !== newWeak));
     if (wall && !traits.includes(`resist:${wall}`)) traits.push(`resist:${wall}`);
+  }
+  // ⚠ OTA-1225 (PUNCHLIST P16) — the technique roll rides the SAME profiler, so it is
+  // per-spawn, idempotent via `profiled`, and listed in the portrait like the resists.
+  // ⚠⚠ IT DRAWS FROM `rng` LAST, after every legacy roll, and that ordering is
+  // LOAD-BEARING: the first placement sat between the weakness and the wall draws, which
+  // shifted the seeded stream and flipped ota818's balance guarantees — a wall landed on a
+  // type the suite proves always stays >= x0.5. New consumers of a shared seeded rng
+  // append; they never insert.
+  {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const AT = require('./aetherTechniques') as typeof import('./aetherTechniques');
+    const techTrait = AT.rollEnemyTechnique(enemy, rng);
+    if (techTrait && !traits.some((t) => t.startsWith('technique'))) traits.push(techTrait);
   }
   traits.push('profiled');
   return { ...enemy, traits };
@@ -503,11 +582,33 @@ export function pickEncounterFromLadder(triple: LadderTriple | null | undefined)
  * fail to resolve. The caller (area-search, dig, etc.) builds the actual
  * InventoryItem from the name via lookupCraftedItem.
  */
-export function pickLootFromLadder(triple: LadderTriple | null | undefined): string | null {
-  if (!triple) return null;
-  const pool = triple.microMicro.lootTable
+/** ⚠⚠ OTA-1222 (PUNCHLIST P15) — NEVER AS RANDOM SEARCH LOOT.
+ *
+ *  Both of these are somebody's PAYOUT. `Mud Monarch Seal` is the reward for a faction
+ *  storyline; `Mask of Tartaria's Last King` is a Legendary exploration piece. They sit in
+ *  the authored ladder pools, and finding a storyline's unique reward by poking the mud
+ *  devalues the storyline that pays it — the player who ran seven stages for it gets the
+ *  same object as the player who searched a ruin twice.
+ *
+ *  Excluded HERE, at the one resolver both callers share, rather than by editing the data:
+ *  the pools are authored content and this is a game-design rule about them. */
+export const LADDER_LOOT_EXCLUDED: ReadonlySet<string> = new Set([
+  'Mud Monarch Seal',
+  "Mask of Tartaria's Last King",
+]);
+
+/** The resolved, playable loot rows for a place. ⚠ One resolver, so the exclusion above and
+ *  the name-resolution both apply everywhere — `pickLootFromLadder` and the area-search
+ *  substitution must not be able to disagree about what this place can drop. */
+export function ladderLootPool(triple: LadderTriple | null | undefined): LootEntry[] {
+  if (!triple) return [];
+  return triple.microMicro.lootTable
     .map((name) => lootByName.get(name))
-    .filter((l): l is LootEntry => !!l);
+    .filter((l): l is LootEntry => !!l && !LADDER_LOOT_EXCLUDED.has(l.name));
+}
+
+export function pickLootFromLadder(triple: LadderTriple | null | undefined): string | null {
+  const pool = ladderLootPool(triple);
   if (pool.length === 0) return null;
   return pickWeighted(pool, (l) => rarityWeights[l.rarity]).name;
 }

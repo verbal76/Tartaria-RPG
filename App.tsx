@@ -39,6 +39,7 @@ import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1043
+import { StoryRevealOverlay } from './app/components/StoryRevealOverlay'; // OTA-1206
 import { StoryForkOverlay } from './app/components/StoryForkOverlay'; // OTA-1088
 import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1045
 import { StoryIntroOverlay } from './app/components/StoryIntroOverlay'; // OTA-1046 — global (was exploration-only)
@@ -52,6 +53,8 @@ import { initTTSManager } from './app/voice/TTSManager';
 import { startTTSController, stopTTSController } from './app/voice/TTSController';
 import { createExpoFileSystemAdapter } from './app/voice/executorchAdapter';
 import { checkAndApplyOTA } from './app/updates/checkAndApplyOTA';
+// OTA-1197 — read what expo thinks it is running, for the boot-check log line.
+import * as Updates from 'expo-updates';
 import { useUiScale } from './app/ui/uiScale';
 import { loadDisplaySettings, useDisplaySettings, baseColorOf } from './app/ui/displaySettings';
 
@@ -254,9 +257,43 @@ export default function App() {
         // offline check (capped at 5s), or any error all fall THROUGH to
         // the normal boot below. The check resolves fast when up to date;
         // it only blocks longer while actually downloading an update.
+        // ⚠⚠ OTA-1197 — THE UPDATE PATH NOW SAYS WHAT IT DID, ON THE DEVICE LOG.
+        //
+        // Owner, stuck on OTA-1194 while 1195 and 1196 sat published and unreachable:
+        // *"it hasn't been able to pull an update after that."* Both were verified
+        // published to hal2001 AND preview, iOS, runtimeVersion 2.4.1 — the server side
+        // was provably fine — and there was NOTHING on the device that could say why they
+        // were not landing. This block swallowed every failure into a `console.warn`,
+        // which no bug report has ever carried, and `silent: true` threw away the status
+        // and error callbacks entirely. An update path with no telemetry is one you can
+        // only debug by guessing, which is exactly the afternoon that produced this.
+        //
+        // ⚠ ADDITIVE ONLY, AND DELIBERATELY SO. Not one line of control flow changes
+        // here: same call, same options, same branches, same fall-through. This is the
+        // one code path where a clever fix that goes wrong leaves the player with no way
+        // to receive the correction — so it gets logging and nothing else.
+        const otaLog = (m: string): void => {
+          try { useGameStore.getState().appendLog('debug', m); } catch { /* never block boot */ }
+        };
         try {
           setStage('ota:check');
-          const otaResult = await checkAndApplyOTA({ silent: true, checkTimeoutMs: 5000, skipTeardown: true });
+          // What expo thinks it is running RIGHT NOW, before we ask for anything. If this
+          // disagrees with OTA_BUILD_ID the device is running a bundle it did not expect.
+          try {
+            const U = Updates as unknown as { isEnabled?: boolean; updateId?: string | null; channel?: string | null; runtimeVersion?: string | null };
+            otaLog(`ota: boot check — enabled=${U.isEnabled} channel=${U.channel ?? '?'} rt=${U.runtimeVersion ?? '?'} updateId=${U.updateId ?? '(embedded)'}`);
+          } catch { /* diagnostics must never gate the check */ }
+          const otaResult = await checkAndApplyOTA({
+            silent: true,
+            checkTimeoutMs: 5000,
+            skipTeardown: true,
+            // ⚠ `silent` only suppresses UI. These now land in the device log, so a
+            // report shows 'Checking…' → 'Downloading…' → what happened, or where it
+            // stopped. A stall between two of these lines names its own step.
+            onStatus: (m) => otaLog(`ota: ${m}`),
+            onError: (m) => otaLog(`⚠ ota error: ${m}`),
+          });
+          otaLog(`ota: boot check result = ${otaResult}`);
           if (otaResult === 'applied') {
             // reloadAsync fired — the JS bridge is restarting onto the new
             // bundle. Do NOT boot the native models; this context is dead.
@@ -268,6 +305,10 @@ export default function App() {
         } catch (otaErr) {
           // eslint-disable-next-line no-console
           console.warn('boot-front OTA check failed (proceeding to load):', otaErr);
+          // ⚠ AND ON THE DEVICE LOG TOO. A console.warn reaches a developer with a cable
+          // attached; it has never once reached a pasted bug report, which is the only
+          // channel that actually exists between this app and the person fixing it.
+          otaLog(`⚠ ota: boot check FAILED — ${otaErr instanceof Error ? otaErr.message : String(otaErr)} (staying on this bundle)`);
         }
         // OTA-405 — GATE A: the boot OTA check is done and we are staying on
         // THIS bundle this launch (the 'applied' path returned above). Open
@@ -317,8 +358,12 @@ export default function App() {
                 void markMLInitAttempted();
                 void bootQwen()
                   .then(() => {
-                    setStage('qwen:done');
-                    void markMLInitSucceeded();
+                    // ⚠⚠ OTA-1203 — CHECK, DON'T ASSUME. `bootQwen()` RESOLVES ON FAILURE.
+                    // See the twin call site below for the measurement and the consequence;
+                    // both sites had the identical defect and both are fixed.
+                    const ok = useGameStore.getState().qwenStatus === 'ready';
+                    setStage(ok ? 'qwen:done' : 'qwen:failed');
+                    if (ok) void markMLInitSucceeded();
                   })
                   .catch((e) => {
                     // eslint-disable-next-line no-console
@@ -366,8 +411,32 @@ export default function App() {
               void markMLInitAttempted();
               void bootQwen()
                 .then(() => {
-                  setStage('qwen:done');
-                  void markMLInitSucceeded();
+                  // ⚠⚠ OTA-1203 — `bootQwen()` RESOLVES WHETHER OR NOT THE MODEL LOADED, AND
+                  // THIS TREATED THAT AS SUCCESS. Its own comment says so outright:
+                  // "qwen.initialize() swallows errors and sets its own internal status to
+                  // 'failed' rather than throwing" — it then sets `qwenStatus: 'failed'` and
+                  // returns normally. So a failed load reached `.then()` and was recorded as
+                  // an init success.
+                  //
+                  // ⚠⚠ MEASURED — owner's report, 2026-08-09, build 1202. The header claims
+                  // a healthy init while every other signal says the model never loaded:
+                  //     Boot stage: qwen:done
+                  //     Last init success: 2026-08-09T03:28:28.017Z
+                  //     Status: active (no crashes detected) · Crash count: 0
+                  //     Model contexts — Opened: 0 · Live now: 0     ← never loaded
+                  //     ⚠⚠ MEMORY WARNING #1 — qwen='failed'          ← never loaded
+                  //     arbiter: template (reason=qwen-not-ready)     ← never loaded
+                  //
+                  // ⚠⚠ AND IT IS NOT COSMETIC. `markMLInitSucceeded()` deliberately WIPES
+                  // `KEY_CRASH_COUNT` and `KEY_DISABLED` (arb124: a real success proves the
+                  // device can load the model). Calling it after a FAILED load resets the
+                  // guard that exists to bench Qwen after repeated failures — so the counter
+                  // can never reach its threshold of 2, and the protection is permanently
+                  // defeated. `Crash count: 0` in that report is the guard being wiped, not
+                  // a healthy device.
+                  const ok = useGameStore.getState().qwenStatus === 'ready';
+                  setStage(ok ? 'qwen:done' : 'qwen:failed');
+                  if (ok) void markMLInitSucceeded();
                 })
                 .catch((e) => {
                   // eslint-disable-next-line no-console
@@ -605,6 +674,12 @@ export default function App() {
       </SilentBoundary>
       <SilentBoundary tag="ChapterCardOverlay">
         <ChapterCardOverlay />
+      </SilentBoundary>
+      {/* OTA-1206 — a completed collectible story, read whole. Mounted beside the
+          chapter card because it is the same register of beat, and globally because a
+          set can close from any screen that can grant loot. */}
+      <SilentBoundary tag="StoryRevealOverlay">
+        <StoryRevealOverlay />
       </SilentBoundary>
       {/* OTA-1045 — one-time veteran motive picker, raised by the load paths
           for saves whose motive was dealt by backfill rather than chosen. */}

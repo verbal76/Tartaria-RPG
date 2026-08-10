@@ -214,6 +214,11 @@ export function statusAcAdjustment(current: readonly StatusEffect[] | undefined)
     if (e.kind === 'shaped_stone_ward') adj += 4;
     // OTA-936 — successful-dodge group defense: harder for the rest of the volley to land.
     if (e.kind === 'evasive') adj += 3;
+    // OTA-1218 — Aether Shield (PUNCHLIST P16). Deliberately +3 against
+    // shaped_stone_ward's +4: the ward is one round off a discipline that also needs a
+    // Small Rock, this is three rounds off a technique. The longer field is the weaker
+    // one per round, or there would be no reason to shape stone again.
+    if (e.kind === 'aether_shield') adj += 3;
     // 'dodging' deliberately NOT here as of 2026-05-21 — the dodge
     // rework moved it from a passive +4 AC into an active post-hit
     // parry roll handled in applyEnemyCounter. The roll itself is
