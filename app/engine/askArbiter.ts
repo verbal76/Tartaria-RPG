@@ -116,6 +116,67 @@ export function extractLoreQuery(rawText: string): string {
   return t;
 }
 
+/** ⚠⚠ OTA-1198 — THE OFFLINE LORE PATH (PUNCHLIST P17).
+ *
+ *  `findClosestLoreConcept` returns null the moment the embedder is not ready, and the
+ *  store's ask-handler ticked `loreRead` ONLY inside that branch. So on any device where
+ *  the narration model fails to load — which is the owner's own device across OTA-1157,
+ *  1181 and 1182 (`Narration engine: failed`) — the counter never moved and **Scholar of
+ *  Forgotten Lore could not be earned at all.** 177 authored concepts, unreachable, because
+ *  the only door needed a model that was not there.
+ *
+ *  ⚠ The lore bank does not need a model. Every concept carries a `label` and prose
+ *  `searchText`; matching a typed topic against those is ordinary text work. The embedder
+ *  is better at "what's the mud thing?" — it stays FIRST and nothing about it changes. This
+ *  is what runs when it is unavailable, or when it looks and finds nothing.
+ *
+ *  Three tiers, deliberately the same shape as `titleMatch.ts` (OTA-1188/1216):
+ *    1. exact label,
+ *    2. label substring — ambiguity REFUSES rather than guessing,
+ *    3. token subset over label + searchText, scored, best distinct winner.
+ *
+ *  ⚠ Tier 3 requires every query token to appear, so "mud" alone will not drag back a
+ *  random Mud concept, and a two-word query has to earn both words. A wrong answer here is
+ *  worse than silence: the Arbiter is the game's canon voice. */
+export function findLoreConceptOffline(
+  query: string,
+  bank: readonly LoreConcept[] = loadLoreConceptBank(),
+): { concept: LoreConcept; score: number } | null {
+  const t = query.toLowerCase().trim();
+  if (!t || bank.length === 0) return null;
+
+  const label = (c: LoreConcept) => c.label.toLowerCase();
+
+  const exact = bank.find((c) => label(c) === t);
+  if (exact) return { concept: exact, score: 1 };
+
+  const subs = bank.filter((c) => label(c).includes(t) || t.includes(label(c)));
+  if (subs.length === 1) return { concept: subs[0]!, score: 0.9 };
+  // ⚠ Two or more: stop. A query contained by several labels fits the same several by
+  // token too, so falling through would reach the same ambiguity by a longer road.
+  if (subs.length > 1) return null;
+
+  // ⚠ Tokens of 3+ chars only. "of", "the" and "a" match everything and would turn a
+  // subset test into a coin flip.
+  const words = t.split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
+  if (words.length === 0) return null;
+
+  let best: { concept: LoreConcept; score: number } | null = null;
+  let tied = false;
+  for (const c of bank) {
+    const hay = `${label(c)} ${c.searchText.toLowerCase()}`;
+    if (!words.every((w) => hay.includes(w))) continue;
+    // A hit in the LABEL is worth more than one buried in the prose — the label is what
+    // the concept is called, and that is what a player types.
+    const inLabel = words.filter((w) => label(c).includes(w)).length;
+    const score = 0.5 + (0.4 * inLabel) / words.length;
+    if (!best || score > best.score) { best = { concept: c, score }; tied = false; }
+    else if (score === best.score) tied = true;
+  }
+  // ⚠ A tie is ambiguity wearing a number. Refuse it, exactly as tier 2 does.
+  return best && !tied ? best : null;
+}
+
 /** Default fallback line when no concept hits the threshold. */
 export const ARBITER_SILENT_LINE = 'The Arbiter is silent on that. The name does not surface in the lore.';
 

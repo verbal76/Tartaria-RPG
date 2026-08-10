@@ -27,6 +27,36 @@ accumulates guesses is a punch list nobody trusts by item twenty.
 
 ---
 
+## STILL OPEN — the whole list, 2026-08-10
+
+⚠ Seventeen items have been filed. **Thirteen are closed, two were reclassified as
+not-defects, and three are open** (P9, P16, P18). The closed and reclassified entries are kept below
+with their reasoning rather than deleted — a punch list you can only read forwards is a
+punch list nobody can audit.
+
+| # | Item | Kind | Where it stands |
+|---|---|---|---|
+| **P9** | Anchor the vendors to the site, not to the player | DESIGN | Untouched. The largest of the three P2 jobs; the other two shipped (OTA-1185/1209). **55 `vendor.faction` reads**, and that field decides which work a vendor OFFERS as well as who they are. |
+| **P15** | *(loot half closed 2026-08-10, OTA-1199)* The ladder's loot half was never called | WIRING | ⚠⚠ **Re-measured 2026-08-10 (OTA-1197) and the original filing was WRONG** — `loot_tables.json` IS imported. The real defect: `pickLootFromLadder` has **no caller**, while its enemy twin `pickEncounterFromLadder` is called twice. 27 pools / 153 entries, all resolving, with no door. **Blocked on one owner decision** (see the entry). `relics.json` is SUPERSEDED — 7 of 13 already ship. |
+| **P18** | Veil of Ether channelled outside combat pays for nothing | ENDS IN NOTHING | ⚠ Found by the 2026-08-10 audit. The channel succeeds and the next out-of-combat action silently deletes the `stealthed` it granted. Two candidate fixes filed; owner's call. In-combat Veil is unaffected. |
+| **P17** | *(closed 2026-08-10, OTA-1198)* Scholar of Forgotten Lore was unearnable without the narration model | UNFINISHABLE | ✅ **CLOSED.** The offline answer path already existed since OTA-233 — it just never credited the player. Also closed the nonsense-ask farm the credit would have opened. |
+| **P16** | Aether techniques | IN PROGRESS | 🟡 **Reachable as of OTA-1195** — buy, channel, four effects, tab. Open for the owner's stated next step (**mirror to enemies per spawn**) and the two acquisition routes not built (found texts, contract rewards). |
+
+**And two things that are NOT punch-list items but are also not proved:**
+
+| | Status |
+|---|---|
+| Dog rescue arc | ⚠ **PARTIAL.** Rescue hooks and the `dog_quest` channel are live; the arc's *end* was never traced. May be open-ended by design. |
+| Golem companion arc | ⚠ **PARTIAL.** Summon / arm / dismiss all live; no "arc" completion exists to trace. Same caveat. |
+
+✅ **THE 18 WIRED ROWS ARE NOW TRACED (2026-08-10, OTA-1196).** Every one was walked live:
+started from a state a player could be in, finished through the public action the UI calls,
+and asserted on a payoff the player can see. See **WIRED → TRACED** in the audit ledger
+below for the per-loop evidence. ⚠ Five of my own assertions flagged healthy code and were
+wrong; all five are written up there rather than quietly fixed.
+
+---
+
 ## OPEN
 
 ### P2 — 17 mysteries and storylines can only be turned in to a 1-in-30 random vendor
@@ -645,10 +675,43 @@ call, exactly as with the runecasters.
 
 ---
 
+### P18 — Veil of Ether channelled outside combat pays for nothing
+
+- **Kind:** ENDS IN NOTHING *(a successful channel whose effect the next action deletes)*
+- **Found:** 2026-08-10, Monday full audit of the weekend's work (OTA-1195's own review)
+
+**What happens.** Veil of Ether applies the existing `stealthed` status — a deliberate
+OTA-1195 decision, and the right one in combat. But `stealthed` is in
+`COMBAT_ONLY_STATUSES`, and the tick expires every combat-only status on the first action
+taken with **no enemies present**. So a Veil channelled out of combat costs the fuel, the
+4-corruption dose and 10 in-game minutes, succeeds, prints its success line — and the very
+next action (a step, a search, anything) silently deletes it. It can never cover an
+approach, which is the one thing an out-of-combat stealth field is for.
+
+⚠ In combat it works exactly as designed (+5 next attack, backstab flag). Only the
+out-of-combat channel is a purchase that ends in nothing.
+
+**Two candidate fixes, owner's call:**
+1. **Refuse the channel with no enemies in the scene** — before fuel is touched, with a
+   spoken reason ("nothing here to hide from"). Cheapest, honest, loses the approach use.
+2. **Let a Veil persist until the next fight begins** — needs `stealthed` split or a
+   veil-specific carrier so the approach case actually works. More design surface.
+
+⚠ Sibling note, a DECISION to confirm rather than a defect: `aether_shield` and
+`temporal_slip` are deliberately NOT combat-only, so a field channelled before a fight
+survives into it (3 actions max, dose and fuel paid). That matches the "standing field,
+held by hand" fiction but is an asymmetry against every other tactical stance. Confirm
+intended.
+
+---
+
 ### P16 — Aether techniques: foundation shipped, not yet reachable
+
+## 🟡 **REACHABLE — OTA-1195.** A player can now buy a procedure from a rapport vendor, see all four in the Aetheric tab, and `channel` one; the effect lands, the dose is charged, and in a fight it costs the round. **Steps 1–5 done.** ⚠ It stays OPEN for the owner's last instruction on it — *"once this is working we will mirror it to enemies and have them applied like the resists are"* — and for the two acquisition routes not yet built (found texts, contract rewards).
 
 - **Kind:** IN PROGRESS *(deliberately on this list until a player can use one)*
 - **Started:** 2026-08-09, at the owner's direction
+- **Reachable:** 2026-08-10 (OTA-1195)
 
 Owner: *"I would like to have players get aether powers based off of the spells, once this
 is working we will mirror it to enemies and have them applied like the resists are. this
@@ -672,27 +735,159 @@ techniques. Building all ten would have shipped seven of them twice under two ru
 committed as foundation with its next step named rather than abandoned, but it does not
 come off this list until a player can channel one.
 
-**What remains, in the order I would take it:**
-1. The channel runner — fuel, race-gated DC, d20, dose. Mirrors `runAethercraft` exactly.
-2. The combat turn cost (owner's call: channelling costs your turn).
-3. The four effects. **All four have confirmed homes in shipped machinery**, which was the
-   risk that would have sunk this: Shield → `statusAcAdjustment` (precedent:
-   `shaped_stone_ward`); Slip → the combat damage site (precedent: `defensive_protocols`);
-   Veil → the existing `stealthed` status; Cascade → ordinary damage resolution.
-4. **One acquisition route, or the loop ends in nothing.** Owner's answer: found texts,
-   contract rewards, and purchase from vendors you have rapport with. The rapport gate
-   (`hasFactionRapport`) already exists and is the deterministic one, so it goes first.
-5. The Aetheric tab UI — the tab already exists and holds the three disciplines.
+**The five steps, all shipped in OTA-1195:**
 
-**Then, per the owner:** mirror to enemies, applied per spawn from type pools exactly the
-way `randomizeEnemyDefense` already stamps resists.
+| | | |
+|---|---|---|
+| 1 | The channel runner | `runAetherTechnique` — mirrors `runAethercraft` step for step, incl. OTA-970's cheapest-first fuel order |
+| 2 | The combat turn cost | channelling calls `runSurvivorVolley`; the enemy group answers |
+| 3 | The four effects | Shield → `statusAcAdjustment` +3/3 rounds · Slip → the to-hit verdict · Veil → the existing `stealthed` · Cascade → 5d10 out, 1d10 back |
+| 4 | One acquisition route | a rapport vendor's **Procedure Text**; buying it teaches, exactly as OTA-726's recipe row does |
+| 5 | The Aetheric tab | all four listed, locked ones dimmed rather than hidden |
+
+⚠ **Two decisions inside those worth keeping:** `sweepDeadEnemies` was EXTRACTED from the
+DOT tick rather than copied, because Cascade is the second thing that can kill several
+enemies at once; and the Slip deliberately does NOT stop a natural 20, because OTA-815's
+rule is that no defensive stack buys literal immunity.
+
+**WHAT KEEPS THIS ITEM OPEN:**
+1. **Mirror to enemies** — the owner's own next step: *"once this is working we will mirror
+   it to enemies and have them applied like the resists are."* Per spawn, from type pools,
+   the way `randomizeEnemyDefense` already stamps `vulnerable:` / `resist:` / `inured:`.
+2. **The other two acquisition routes** — found texts and contract rewards. Only the
+   deterministic one (rapport purchase) shipped, deliberately: one working door first.
+
+---
+
+### P17 — Scholar of Forgotten Lore could not be earned without the narration model
+
+## ✅ **CLOSED — OTA-1198.** The offline answer path now counts as reading lore, and it counts DISTINCT concepts rather than asks.
+
+- **Kind:** UNFINISHABLE *(a title with no reachable route on an affected device)*
+- **Found:** 2026-08-10, while reading P15's loot tables — five lore texts in the pools led to the question "how does a player read lore at all?"
+
+**WHAT IT WAS.** `titleProgress.loreRead` — the counter gating **Scholar of Forgotten Lore**
+(+2 Lore) — had exactly **one writer in the entire codebase**, and it sat inside
+`if (cognitive.isReady())`. So the counter only moved when the **LLM** answered a lore
+question.
+
+⚠⚠ **On a device where the narration model does not load, the title was unearnable.** That
+is not hypothetical: the owner's own device reads `Narration engine: failed` across
+OTA-1157, 1181 and 1182.
+
+⚠⚠ **AND THE GAME WAS ANSWERING THE QUESTIONS THE WHOLE TIME.** A keyword lookup over
+`concepts.json` has answered lore offline since OTA-233 — and then `break`s, before the
+counter. **The answer was never the missing part; the credit was.** A player could read
+thirty lore entries on a model-less device and the game recorded that they had read none.
+
+**THE FIX, in three parts:**
+1. **`creditLoreRead` — one place that decides an answer was earned.** Three paths answer a
+   lore question (keyword concepts, the embedder, the bank match) and only the middle one
+   credited the player. All three now route through one helper, rather than three copies of
+   the bookkeeping that would drift apart.
+2. **An offline bank matcher** (`findLoreConceptOffline`), same three-tier shape as
+   `titleMatch.ts` — exact label, substring with ambiguity refusing, then a token subset.
+   The embedder still runs FIRST and is untouched; this is what runs when it cannot.
+   ⚠ It makes the ~180-entry concept BANK (canon events, titles, glossary) reachable
+   without a model, which the keyword path never covered.
+3. **DISTINCT concepts, not asks.** The old tick counted every answer, so asking the same
+   question three times earned the title. Two loops that paid out on repetition have already
+   been closed this session; opening two more doors onto this one without the guard would
+   have made a farm of it.
+
+⚠⚠ **A SECOND DEFECT THE FIX EXPOSED, AND IT WOULD HAVE BEEN THE FARM.** The keyword lookup
+matched against the RAW parsed target, which for *"ask the arbiter about X"* still carries
+the word **arbiter** — and `arbiter` is itself a lore keyword. So **any** ask matched
+something whenever nothing longer beat it. Harmless while the branch only printed prose;
+the moment it also credits the title, three nonsense questions earn it. The address is now
+stripped before matching, pinned by test.
+
+⚠ **THE LOOP-AUDIT TITLE SWEEP DID NOT CATCH THIS, and that is worth recording.** It set
+`loreRead` to 9999 and confirmed the threshold fires — it proved the THRESHOLD, not that a
+player can move the number. That is the WIRED-vs-TRACED gap reappearing inside a test
+written to close it.
+
+**Tests:** `ota1198OfflineLore` (12), every live case driven with **no narration model at
+all** — which is the condition under test, not a workaround.
 
 ---
 
 ### P15 — Two of the three relic data files have no importers
 
-- **Kind:** *(dead data — same class as P4)*
-- **Found:** 2026-08-09, second-round audit
+## ✅ **THE LOOT HALF IS CLOSED — OTA-1199.** Owner's call: *"it goes from the tuned pool and has a small percentage to pull from the alternate loot table as a replacement item for something already on the list."* Shipped at **10%**, one constant, REPLACEMENT not addition — the drop rate does not move and no extra objects enter the economy. The two unique quest rewards are excluded at the shared resolver. ⛔ `relics.json` stays SUPERSEDED — nothing to do.
+
+## ⚠⚠ **CORRECTED 2026-08-10 (OTA-1197) — THE ORIGINAL FILING WAS WRONG, AND IN THE SAME WAY P4 WAS.** It said `loot_tables.json` has **zero importers**. It has one, `engine/encounter.ts:8`, and I filed it off a search rather than a read. The original text is left below the correction so the mistake stays legible. The real defect is narrower, sharper, and still real.
+
+- **Kind:** *(one wiring omission + one superseded file)*
+- **Found:** 2026-08-09, second-round audit · **Measured:** 2026-08-10, suite `ota1197RelicDataAudit` (8)
+
+### What a READ establishes
+
+| File | Entries | Verdict |
+|---|---|---|
+| `curios.json` | — | ✅ **WIRED** — 3 importers (`portability`, `itemFusion`, `salvagePools`) |
+| `loot_tables.json` | **113** | ⚠⚠ **IMPORTED BUT UNREACHABLE** — see below |
+| `relics.json` | **13** | ⛔ **SUPERSEDED** — 7 of 13 already ship as live items; the other 6 are unbuilt concepts |
+
+### ⚠⚠ THE ACTUAL DEFECT: an unused half of a matched pair
+
+`encounter.ts` exports **two** ladder pickers, written together and documented together:
+
+| | Reader | Called from the game? |
+|---|---|---|
+| `pickEncounterFromLadder` (enemies) | ladder `possibleEncounters` | ✅ **yes** — `gameStore.ts`, 2 sites |
+| `pickLootFromLadder` (loot) | ladder `lootTable` | ⛔ **NO CALLER ANYWHERE** |
+
+So the loot table is imported, parsed and indexed on boot, and the one function that reads
+it is never called. **27 ladder loot pools, 153 entries, and every single one resolves** —
+the authoring is correct and agrees with itself; nothing is dangling. It simply has no door.
+
+⚠ **The function's own doc comment names the intended caller** — *"the caller (area-search,
+dig, etc.) builds the actual InventoryItem from the name"* — so this reads as an omission,
+not a decision.
+
+### ⚠ WHY IT IS NOT FIXED HERE, AND WHAT THE OWNER HAS TO DECIDE
+
+Area-search already has its own loot source: a deliberate **Common-only** pool
+(`areaSearch.ts`), with digging as the separate "chunky relic" path. Wiring ladder loot into
+search would not fill a hole — it would **replace a tuned pool with a per-location curated
+one that includes Rare and Legendary rows.** That is a loot-economy decision, and this file
+catalogues rather than invents.
+
+**The question was, in one line: should searching a place pull from that place's authored
+loot table, or keep pulling from the pool it uses today?** ✅ **ANSWERED (OTA-1199):
+both — the tuned pool stays primary and 10% of finds are swapped for something the place
+authored.** ⚠ The pool is not "flat Common", which I said once and had to correct: it is two
+tuned pools retuned across five OTAs against specific playtester complaints.
+
+⚠ **Measured, so the decision has numbers:** only **13 of the 113** names have a live
+catalog row. The other 100 would mint through OTA-961's `resolveLootItem`, which turns an
+unknown name into a **sellable trophy at the enemy's rarity** rather than 2-TC junk — so
+wiring it would pay, it just would not pay *authored* items until someone curates them.
+
+⚠ **THE LORE HALF OF THIS SPLIT OUT AS P17 and is closed.** Reading these pools raised the
+question *"how does a player read lore at all?"*, and the answer was: on a device whose
+model does not load, they could not be credited for it. That was a completability defect in
+its own right and did not belong inside a loot-economy decision.
+
+### ⛔ `relics.json` — superseded, the P4 shape again
+
+**7 of its 13 entries already ship** under the live catalogs (Aetheric Core, Aetheric Torch,
+Aether-Binder Tool, Aether-Breath Mask, Aether Grip Pads, Aetheric Vision Lens, Aetheric
+Locket). The file is largely a duplicate of shipped content, so *"13 orphaned entries"*
+overstated it by half. The remaining **6 are names in no catalog at all** — Architect's Key,
+Tartarian Obelisk, Void Compass, Memory Prism, Resonance Lantern, Temporal Lens. **Unbuilt
+concepts, not broken wiring:** nothing reaches for them and fails. Listed so the next pass
+does not rediscover them as a defect.
+
+⚠ **The docs were checked first this time** (the promise made when P4 turned out to be
+superseded). Neither file carries a `[PLANNED]` annotation — but `docs/open-audits-2026-07-20.md`
+item 6 already names a *"content reachability / dead-content sweep"* as an outstanding batch,
+which is this work.
+
+---
+
+**ORIGINAL TEXT, LEFT STANDING (2026-08-09) — the "zero importers" line is the error:**
 
 | File | Entries | Importers |
 |---|---|---|
@@ -1021,10 +1216,56 @@ below.
 **Score: 31 audited. 7 traced clean · 2 traced-and-reachable-broken · 1 ends-in-nothing ·
 1 orphaned data file · 1 stale claim · 18 wired · 1 declared scaffold.**
 
-⚠ **The 18 "wired" rows are the remaining risk.** Each has a completion path and a payoff,
-which is what the bar asks — but none has been walked end to end the way mysteries were,
-and mysteries is precisely the loop that looked fine until it didn't. **I am not claiming
-these are proven.**
+⚠ **The 18 "wired" rows WERE the remaining risk.** Each had a completion path and a payoff,
+which is what the bar asks — but none had been walked end to end the way mysteries were,
+and mysteries is precisely the loop that looked fine until it didn't.
+
+## ⚠⚠ WIRED → TRACED (2026-08-10, OTA-1196)
+
+Owner: *"audit this for traced and make sure the loops are functional."* Every WIRED row was
+then walked. The bar for a promotion was the same three things, live, against the real
+store: **start it from a state a player could be in, finish it through the PUBLIC action the
+UI calls, and assert a payoff the PLAYER can see.**
+
+| Loop | Now | How it was proved |
+|---|---|---|
+| Crafting | **TRACED** | `craftRecipe` → the object is in the pack, the materials are gone, the feed says so; and it refuses with nothing |
+| Fusion | **TRACED** | `confirmFusionSelection` → a named weapon exists, all three inputs are consumed |
+| Recipe discovery | **TRACED** | the picker drained 200 times: every pick is NEW, and it terminates |
+| Stat training | **TRACED** | the ledger fills and the stat on the sheet actually rises |
+| Gifting | **TRACED** | `giveGift` → item leaves, the NPC remembers, the taste is learned; and an UNMET recipient is refused WITHOUT eating the item (the OTA-1064 guard) |
+| Titles | **TRACED** | every WIRED title is earnable under some race × faction × maxed sheet — none is a dead entry; every passive perk is attached to a real title |
+| Corruption | **TRACED** | a corrupted sheet rolls measurably worse, pays more, and draws more encounters; all four tiers reachable, every crossing has a line |
+| Golem companion | **TRACED** | `summon golem` → a companion with real HP and a real attack die |
+| Location challenges | **TRACED** | all six enabled, every tile EXISTS in `locations.json`, every one reachable through the store or `titleChallenges` |
+| Labyrinth | **TRACED** | walked LIVE from the entrance to the heart (route solved off the engine's own adjacency, then TYPED) → the keepsake lands, and a second walk pays nothing |
+| Hidden locations | **TRACED** | every hidden tile has a real world row; unrevealed reads as the placeholder, revealed reads as the name |
+| Chapters | **TRACED** | every phase × every motive produces a card — no phase advances into silence |
+| Faction standing | **TRACED** | a live bounty turn-in raises the posting faction's standing; bounds hold |
+| Aetherkin | **TRACED** | encounters build in both contexts and EVERY authored variant name resolves to a real enemy; the revering factions are real factions |
+| Hook puzzles | **TRACED** | every hook kind has a chain and every chain ENDS in something |
+| The Fallen | **TRACED** | a fallen hero becomes a fightable enemy, defeat has words, and avenging writes back so the same ghost is not raised twice |
+| Story forks | **TRACED** | already proved end to end by `ota1065StoryForks` — answer → TC change → narration → never returns |
+| Resurrection gems | **TRACED** | already proved end to end by `resurrectSlotGemSafety` — revives at the backfilled hpMax spending EXACTLY one gem, refuses with none |
+
+**Suites:** `ota1196LoopAuditA/B/C/D`. ⚠ Two loops were NOT re-tested (forks, gems) because
+existing suites already drive them end to end; a second weaker version would add a file and
+prove nothing.
+
+⚠⚠ **FIVE OF MY OWN ASSERTIONS WERE WRONG AND FLAGGED HEALTHY CODE.** Worth recording,
+because a completability audit that cries wolf is the thing that gets ignored:
+1. The title sweep maxed the counters and called three titles dead — `scion_of_the_giants`
+   wants a GIANT standing well with a giant-respecting faction, `aetherborn_awakened` wants
+   an AETHERBORN carrying dose, `etheric_explorer` wants a recovered CORE. None is a counter.
+   It also built `factionStanding` as a record when it is an ARRAY.
+2. The challenge sweep looked only in `gameStore` and called three challenges orphaned —
+   they route through `titleChallenges.ts`, which the store calls generically.
+3. The Labyrinth walk typed north/east and never arrived. The maze is AUTHORED, not a grid.
+4. The Aetherkin check read `enc.enemy`; the encounter carries an enemy NAME.
+5. The gift check asserted the log GREW — `appendLog` merges same-channel writes, so a
+   working gift left the count unchanged.
+
+**Nothing in the game was broken by any of the five.** Every failure was the test.
 
 ## REACHABILITY — checked and clean
 
@@ -1080,21 +1321,24 @@ same as having proved it.
 
 ## NOT YET AUDITED
 
-⚠ Listed so the gaps in the audit are as visible as its findings. **Absence from the OPEN
-section above means NOT CHECKED, not "fine".**
+⚠ Listed so the gaps in the audit are as visible as its findings.
 
-- Faction bounties (`bountyCourse.ts`, `bountyPolitics.ts`, `factionBounty.ts`)
-- Dog rescue arc (`dog_quest` channel, `dogCompanion.ts`)
-- Golem companion arc
-- Escort missions (`escort.ts`) — completion and failure both
-- Chapters / story forks (`chapters.ts`, `data/story/forks.json`)
-- Aetherkin (`aetherkin.ts`)
-- Crafting / Aethercraft trees (`crafting.ts`)
-- Relics (`data/relics`)
-- Maze, Buried Skyscraper (`buriedSkyscraper.ts`)
-- Core Guardians (`coreGuardians.ts`) — spawn is reachable via the Contracts card (OTA-148);
-  the completion payoff is not yet traced
-- Titles (`earnedTitles`, `titleProgress`)
-- Whispers (`completedWhisperIds`)
-- Corruption arc (`corruption.ts`)
-- Mysteries beyond the turn-in (the *finding* half of the loop)
+⚠⚠ **THIS SECTION WAS STALE AND IS REWRITTEN (2026-08-10).** It still listed fourteen
+loops as unchecked — every one of which the second-round audit above had since checked and
+recorded. A "not audited" list that names already-audited work is worse than no list: it
+sends the next pass to re-do finished work and hides where the real gaps are. The stale
+names are gone; what replaces them is what is genuinely not proved.
+
+**Nothing is unaudited. What is UNPROVEN is a different thing, and here it is:**
+
+1. **The 18 WIRED rows in the audit ledger.** Confirmed to have a consumer, a completion
+   write and a payoff — not walked end to end. That is a lower bar than TRACED and it is
+   named as such in the ledger's own footer.
+2. **The dog rescue arc and the golem companion arc** — PARTIAL. Mechanics live at every
+   point checked; no completion event found to trace. Possibly open-ended by design, which
+   is a thing to confirm rather than assume.
+3. **P15's two data files** — filed but not investigated. The docs may already have
+   superseded them, exactly as they had for P4.
+
+⚠ **Absence from the OPEN list means CHECKED-AND-CLEAR OR WIRED-BUT-UNWALKED. It has never
+meant "proved".**

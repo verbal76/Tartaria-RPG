@@ -930,7 +930,17 @@ export type StatusEffectKind =
   | 'perfect_opening'
   // OTA-913 — successful-dodge GROUP defense: while you're still moving off a read, the
   // OTHER attackers this volley swing at +3 to your AC. Lasts one volley, then clears.
-  | 'evasive';
+  | 'evasive'
+  // OTA-1195 — AETHER TECHNIQUES (PUNCHLIST P16). Two of the four techniques need a
+  // status to live in; the other two ride machinery that already exists (Veil of Ether
+  // applies 'stealthed', Resonance Cascade is ordinary damage).
+  //
+  // ⚠ Both are deliberately shaped like statuses the game already carries, not new
+  // subsystems: aether_shield is read by statusAcAdjustment exactly as
+  // shaped_stone_ward is, and temporal_slip is consumed at the damage site exactly as
+  // 'shielded' (the Sentinel's Defensive Protocols) is.
+  | 'aether_shield'  // +3 AC while the field is held (3 rounds)
+  | 'temporal_slip'; // negates ONE incoming blow entirely, then is consumed
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -1395,6 +1405,11 @@ export interface PlayerCharacter {
   /** ⚠ OTA-1191 — AETHER TECHNIQUES the character has learned. Ids from
    *  `engine/aetherTechniques.ts`. Absent on an old save reads as "knows none", which is
    *  correct: they are acquired, never granted at creation. */
+  /** ⚠ OTA-1198 (PUNCHLIST P17) — the lore concepts this character has actually had
+   *  answered, by id. `titleProgress.loreRead` counts DISTINCT entries here rather than
+   *  every ask, so Scholar of Forgotten Lore means three different things read, not one
+   *  thing read three times. Absent on older saves; `?? []` covers them. */
+  loreConceptsRead?: string[];
   knownTechniques?: string[];
   /** ⚠ OTA-1191 — per-technique practice count, keyed by technique id (owner: growth is
    *  per-technique, not one global aether skill, so a character specialises into what they

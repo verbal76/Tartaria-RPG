@@ -68,7 +68,12 @@ export const AETHER_TECHNIQUES: readonly AetherTechnique[] = [
     intRequired: 14,
     baseDc: 15,
     baseDose: 3,
-    effect: 'Once per encounter, step out of one incoming blow entirely.',
+    // ⚠ OTA-1195 — REWORDED TO MATCH WHAT SHIPPED. This said "once per encounter", which
+    // the implementation cannot honestly claim: the slip is a 3-round status like every
+    // other held field, so it can lapse unused and it can be re-channelled in the same
+    // fight (for another dose, and another turn). A tab that promises one thing while the
+    // engine does another is its own defect, so the text moved to the engine.
+    effect: 'Held for 3 rounds. The first blow that would land in that window does not.',
     successLine:
       'You step a half-second sideways. To anything watching you were simply not where the '
       + 'blow went, and the world closes over the gap without comment.',
@@ -202,6 +207,84 @@ export function knowsTechnique(player: PlayerCharacter | null | undefined, id: s
 
 export function usesOf(player: PlayerCharacter | null | undefined, id: string): number {
   return player?.techniqueProficiency?.[id] ?? 0;
+}
+
+// ─── Fuel ───────────────────────────────────────────────────────────────────────────────
+
+/** ⚠ OTA-1195 — THE SAME LIST THE `shape` DISCIPLINE USES, IN THE SAME ORDER, AND THAT IS
+ *  DELIBERATE. `runAethercraft` picks fuel CHEAPEST-FIRST after OTA-970, where reaching
+ *  into inventory order silently ate a playtester's equipped Aetheric Locket. A technique
+ *  that reached differently would re-open that bug on a second path, so it reaches the
+ *  same way — and the Locket is a detection relic, so it is absent here too.
+ *
+ *  Exported rather than inlined at the call site so a test can pin the ORDER, which is the
+ *  part that carries the fix. */
+export const TECHNIQUE_FUEL_PREFERENCE: readonly string[] = [
+  'Aether Residue', 'Aether Mud', 'Aether Crystal', 'Aetheric Shard', 'Golem Core',
+];
+
+// ─── Acquisition ────────────────────────────────────────────────────────────────────────
+//
+// Owner, on how a player should come by these: *"make them grow rewards and texts you. an
+// buy from friendly vendors you developed repor with"* — three routes. This file ships the
+// PURCHASE one, because the rapport gate is the only one of the three that is
+// deterministic: `hasFactionRapport` already exists, already has a completed-quest receipt
+// behind it, and needs no new drop table or hook to be reachable.
+//
+// ⚠ It is modelled on the OTA-726 recipe offer, not on an item: buying teaches into
+// `knownTechniques` the way buying a working teaches into `knownRecipes`. A physical text
+// would need a catalog row, a `use` handler and a read path before it taught anything —
+// three more places to end in nothing, for the same outcome.
+
+export const TECHNIQUE_TEXT_PREFIX = 'Procedure Text: ';
+
+/** The row a vendor shows. Named as an object, not a technique, because it is the thing a
+ *  player buys — and because `buy aether shield` should not be ambiguous with channelling
+ *  one. */
+export function techniqueTextName(tech: AetherTechnique): string {
+  return `${TECHNIQUE_TEXT_PREFIX}${tech.name}`;
+}
+
+/** Priced by tier. A Legendary procedure is a real gold sink; an Uncommon one is roughly a
+ *  good weapon, which is the correct comparison — it is a permanent capability. */
+export function techniqueTextPrice(tech: AetherTechnique): number {
+  return tech.tier === 'Uncommon' ? 250 : tech.tier === 'Rare' ? 600 : 1400;
+}
+
+export function findTechniqueByTextName(name: string): AetherTechnique | null {
+  const n = name.toLowerCase().trim();
+  if (!n.startsWith(TECHNIQUE_TEXT_PREFIX.toLowerCase())) return null;
+  const rest = n.slice(TECHNIQUE_TEXT_PREFIX.length).trim();
+  return AETHER_TECHNIQUES.find((t) => t.name.toLowerCase() === rest) ?? null;
+}
+
+/** ⚠ Stable per faction, not rolled. Deliberately: a text that appears on a die roll turns
+ *  the only acquisition route into a slot machine, and the player has no way to tell
+ *  "this vendor never sells them" from "not today". A given faction always keeps the same
+ *  procedure, so a player who wants Temporal Slip can find out where it lives and go. */
+export function techniqueForFaction(factionId: string): AetherTechnique {
+  let h = 0;
+  for (let i = 0; i < factionId.length; i++) h = (h * 31 + factionId.charCodeAt(i)) >>> 0;
+  return AETHER_TECHNIQUES[h % AETHER_TECHNIQUES.length]!;
+}
+
+/** The offer a rapport vendor adds, or null.
+ *
+ *  Three gates, and the INT one is the interesting one: a text you cannot run is a purchase
+ *  that ends in nothing until some later level-up, which is the exact defect this whole
+ *  punch list exists for. So the row only appears once the character can actually channel
+ *  what it teaches. */
+export function techniqueTextOfferFor(opts: {
+  vendorFaction: string | null | undefined;
+  hasRapport: boolean;
+  knownTechniques: readonly string[] | undefined;
+  effectiveInt: number;
+}): { itemName: string; price: number; quantity: number } | null {
+  if (!opts.vendorFaction || !opts.hasRapport) return null;
+  const tech = techniqueForFaction(opts.vendorFaction);
+  if ((opts.knownTechniques ?? []).includes(tech.id)) return null;
+  if (opts.effectiveInt < tech.intRequired) return null;
+  return { itemName: techniqueTextName(tech), price: techniqueTextPrice(tech), quantity: 1 };
 }
 
 /** Can this character attempt it at all? Knowing it is not enough — the INT gate is the

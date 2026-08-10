@@ -643,7 +643,11 @@ describe('OTA-1067 — ⚠ every route into this content is real', () => {
   it('the name question is answered BEFORE any lookup that could swallow it', () => {
     const store = src('app/state/gameStore.ts');
     const nameAt = store.indexOf('if (isNameQuestion(trimmed))');
-    const conceptAt = store.indexOf('const concept = findConcept(lookup)');
+    // ⚠ OTA-1198 — anchored on the CALL, not its argument. This pinned
+    // `findConcept(lookup)`; the argument was renamed to a stripped query (so the word
+    // "arbiter" in the address stops matching the arbiter concept) and this went red
+    // without the guarantee changing at all. The ordering is what matters here.
+    const conceptAt = store.indexOf('const concept = findConcept(');
     const knowledgeAt = store.indexOf('answerWorldKnowledge(trimmed');
     expect(nameAt).toBeGreaterThan(0);
     expect(nameAt).toBeLessThan(conceptAt);
