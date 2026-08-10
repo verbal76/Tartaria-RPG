@@ -37,7 +37,7 @@ punch list nobody can audit.
 | # | Item | Kind | Where it stands |
 |---|---|---|---|
 | **P9** | Anchor the vendors to the site, not to the player | DESIGN | Untouched. The largest of the three P2 jobs; the other two shipped (OTA-1208/1209). **55 `vendor.faction` reads**, and that field decides which work a vendor OFFERS as well as who they are. |
-| **P15** | `relics.json` (13) + `loot_tables.json` (113) have no importers | DEAD DATA | Untouched. ⚠ **Check the project docs FIRST** — P4 looked identical and turned out to be superseded content the docs had already marked `[PLANNED]`. Filing it twice would be filing it wrong twice. |
+| **P15** | The ladder's loot half is never called | WIRING | ⚠⚠ **Re-measured 2026-08-10 (OTA-1220) and the original filing was WRONG** — `loot_tables.json` IS imported. The real defect: `pickLootFromLadder` has **no caller**, while its enemy twin `pickEncounterFromLadder` is called twice. 27 pools / 153 entries, all resolving, with no door. **Blocked on one owner decision** (see the entry). `relics.json` is SUPERSEDED — 7 of 13 already ship. |
 | **P16** | Aether techniques | IN PROGRESS | 🟡 **Reachable as of OTA-1218** — buy, channel, four effects, tab. Open for the owner's stated next step (**mirror to enemies per spawn**) and the two acquisition routes not built (found texts, contract rewards). |
 
 **And two things that are NOT punch-list items but are also not proved:**
@@ -729,8 +729,70 @@ rule is that no defensive stack buys literal immunity.
 
 ### P15 — Two of the three relic data files have no importers
 
-- **Kind:** *(dead data — same class as P4)*
-- **Found:** 2026-08-09, second-round audit
+## ⚠⚠ **CORRECTED 2026-08-10 (OTA-1220) — THE ORIGINAL FILING WAS WRONG, AND IN THE SAME WAY P4 WAS.** It said `loot_tables.json` has **zero importers**. It has one, `engine/encounter.ts:8`, and I filed it off a search rather than a read. The original text is left below the correction so the mistake stays legible. The real defect is narrower, sharper, and still real.
+
+- **Kind:** *(one wiring omission + one superseded file)*
+- **Found:** 2026-08-09, second-round audit · **Measured:** 2026-08-10, suite `ota1220RelicDataAudit` (8)
+
+### What a READ establishes
+
+| File | Entries | Verdict |
+|---|---|---|
+| `curios.json` | — | ✅ **WIRED** — 3 importers (`portability`, `itemFusion`, `salvagePools`) |
+| `loot_tables.json` | **113** | ⚠⚠ **IMPORTED BUT UNREACHABLE** — see below |
+| `relics.json` | **13** | ⛔ **SUPERSEDED** — 7 of 13 already ship as live items; the other 6 are unbuilt concepts |
+
+### ⚠⚠ THE ACTUAL DEFECT: an unused half of a matched pair
+
+`encounter.ts` exports **two** ladder pickers, written together and documented together:
+
+| | Reader | Called from the game? |
+|---|---|---|
+| `pickEncounterFromLadder` (enemies) | ladder `possibleEncounters` | ✅ **yes** — `gameStore.ts`, 2 sites |
+| `pickLootFromLadder` (loot) | ladder `lootTable` | ⛔ **NO CALLER ANYWHERE** |
+
+So the loot table is imported, parsed and indexed on boot, and the one function that reads
+it is never called. **27 ladder loot pools, 153 entries, and every single one resolves** —
+the authoring is correct and agrees with itself; nothing is dangling. It simply has no door.
+
+⚠ **The function's own doc comment names the intended caller** — *"the caller (area-search,
+dig, etc.) builds the actual InventoryItem from the name"* — so this reads as an omission,
+not a decision.
+
+### ⚠ WHY IT IS NOT FIXED HERE, AND WHAT THE OWNER HAS TO DECIDE
+
+Area-search already has its own loot source: a deliberate **Common-only** pool
+(`areaSearch.ts`), with digging as the separate "chunky relic" path. Wiring ladder loot into
+search would not fill a hole — it would **replace a tuned pool with a per-location curated
+one that includes Rare and Legendary rows.** That is a loot-economy decision, and this file
+catalogues rather than invents.
+
+**The question, in one line: should searching a place pull from that place's authored loot
+table, or keep pulling from the flat Common pool it uses today?**
+
+⚠ **Measured, so the decision has numbers:** only **13 of the 113** names have a live
+catalog row. The other 100 would mint through OTA-961's `resolveLootItem`, which turns an
+unknown name into a **sellable trophy at the enemy's rarity** rather than 2-TC junk — so
+wiring it would pay, it just would not pay *authored* items until someone curates them.
+
+### ⛔ `relics.json` — superseded, the P4 shape again
+
+**7 of its 13 entries already ship** under the live catalogs (Aetheric Core, Aetheric Torch,
+Aether-Binder Tool, Aether-Breath Mask, Aether Grip Pads, Aetheric Vision Lens, Aetheric
+Locket). The file is largely a duplicate of shipped content, so *"13 orphaned entries"*
+overstated it by half. The remaining **6 are names in no catalog at all** — Architect's Key,
+Tartarian Obelisk, Void Compass, Memory Prism, Resonance Lantern, Temporal Lens. **Unbuilt
+concepts, not broken wiring:** nothing reaches for them and fails. Listed so the next pass
+does not rediscover them as a defect.
+
+⚠ **The docs were checked first this time** (the promise made when P4 turned out to be
+superseded). Neither file carries a `[PLANNED]` annotation — but `docs/open-audits-2026-07-20.md`
+item 6 already names a *"content reachability / dead-content sweep"* as an outstanding batch,
+which is this work.
+
+---
+
+**ORIGINAL TEXT, LEFT STANDING (2026-08-09) — the "zero importers" line is the error:**
 
 | File | Entries | Importers |
 |---|---|---|
