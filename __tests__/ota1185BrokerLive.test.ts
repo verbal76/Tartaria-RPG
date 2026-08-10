@@ -131,7 +131,14 @@ describe('OTA-1185 — a foreign faction’s mystery closes at the trading post'
     expect(after.completedMysteryIds ?? []).not.toContain(target!.id);
   });
 
-  test('⚠⚠ P2 CORRECTED: the player’s OWN faction was always closable at any armory', async () => {
+  test('⚠⚠ FLIPPED BY OTA-1201 (P9): a foreign armory now REFUSES your own faction\'s work', async () => {
+    // ⚠⚠ THIS TEST USED TO GUARANTEE THE OPPOSITE — "the player's OWN faction was always
+    // closable at any armory," pinned during P2 as a correction to a wrong write-up. It
+    // was true, and the owner then ruled it away (2026-08-10): *"make handin specific."*
+    // At an owned site the anchor answers for the HOST, so a Stone Builder at the Monarch
+    // Waystation pays the broker's cut or walks home. Flipped into the new guarantee
+    // rather than deleted — the OTA-1193 pattern: a documented behaviour becoming its own
+    // inverse should leave a record of both states.
     const store = useGameStore;
     await store.getState().hydrate();
     await store.getState().startNewGame({ name: 'Own Faction Probe', raceId: 'tartarian_giant', factionId: 'stone_builders' });
@@ -141,16 +148,24 @@ describe('OTA-1185 — a foreign faction’s mystery closes at the trading post'
     expect(own).toBeDefined();
     putOnSlate(own!.id, own!.stages.length, own!.factionId ?? null);
 
-    // A FOREIGN outpost's armory — the Irma anchor reads as the player's faction here.
+    // A FOREIGN owned outpost's armory — Irma still READS as the player's faction (the
+    // grab side, untouched)…
     const irma = await standAt('outpost_armory', 'Irma Ironhand', 'monarch_waystation');
     expect(irma).not.toBeNull();
     expect(irma!.faction).toBe('stone_builders');
 
+    // …but the hand-in counterparty is the HOST, so this refuses.
+    store.getState().turnInMystery(own!.id);
+    expect(store.getState().player!.completedMysteryIds ?? []).not.toContain(own!.id);
+
+    // AND THE WORK IS NOT STRANDED: at the player's OWN site the same hand-in pays full.
+    const p = store.getState().player!;
+    useGameStore.setState({ player: { ...p, currentLocationId: 'builders_survey_camp', hubRoomId: 'outpost_armory' } });
+    await store.getState().beginScene?.();
     const tcBefore = store.getState().player!.tc ?? 0;
     store.getState().turnInMystery(own!.id);
     const after = store.getState().player!;
     expect(after.completedMysteryIds ?? []).toContain(own!.id);
-    // ⚠ FULL pay — she is the posting faction here, so no broker cut is taken.
     expect((after.tc ?? 0) - tcBefore).toBeGreaterThanOrEqual(own!.rewardTc);
   });
 });

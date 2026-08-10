@@ -1357,8 +1357,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1223`**,
-**golem-line `2026-08-10-1200`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1224`**,
+**golem-line `2026-08-10-1201`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1367,7 +1367,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.130**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.131**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1574,7 +1574,34 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ PUNCHLIST P18 CLOSED — THE VEIL REFUSES AN EMPTY ROOM (2026-08-10, latest). HAL +
+- **⚠⚠ PUNCHLIST P9 CLOSED — AT AN OWNED SITE, THE PEOPLE ANSWER FOR THE HOST (2026-08-10,
+  latest). HAL + GOLEM.** HAL OTA-1224 / golem OTA-1201. **steam NOT included —
+  batched (§2).**
+
+  The last of the three P2 jobs (broker OTA-1185, site skins OTA-1186, this). The world
+  LOOKED owned after the reskin; it did not BEHAVE owned — the hub anchors took work for
+  whatever faction THEY carried, at every site in the world.
+
+  **The owner's four rulings, implemented verbatim:**
+  1. *"keep the grab like it is, and keep them at random vendors … make handin specific."*
+     The counterparty a hub anchor answers for is now the SITE OWNER, resolved through
+     OTA-1186's own `hubOwnerFaction` map. Host work: face to face, 100%. Anything else:
+     the paid roads — Halem 80% at this very gate, market 90%, courier 75%. ⚠ ONE seam
+     (`turnInCounterparty`), which all four typed handlers and the Contracts button
+     already flow through. ⚠ The OFFER side is deliberately untouched and PINNED: where
+     you get work does not move, and random vendors keep taking their own faction's work.
+  2. *"host gear depending on faction status."* The armory stocks the HOST's line, open to
+     a member or standing at the JOIN threshold (20) — an existing constant, not a new
+     number. At home you ARE the host; a stranger at a foreign armory sees no racks.
+  3. Hostile ground rides the already-shipped paid roads — which is exactly why P9 became
+     safe to take at all.
+  4. Anchors only. ⚠ Halem is EXCLUDED by the broker check — a host stamp on him would
+     DELETE the fallback this rule depends on. The outskirts hub has no owner and keeps
+     today's behaviour to the letter.
+
+  **Tests:** ota1201HostHandIn (7, live).
+
+- **⚠⚠ PUNCHLIST P18 CLOSED — THE VEIL REFUSES AN EMPTY ROOM (2026-08-10). HAL +
   GOLEM.** HAL OTA-1223 / golem OTA-1200. **steam NOT included — batched (§2).**
 
   The Monday audit filed P18: Veil of Ether grants the existing `stealthed` status, which
