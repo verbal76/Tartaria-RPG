@@ -205,7 +205,10 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                             ]}
                             numberOfLines={1}
                           >
-                            {c.noun}{c.consumed ? ' ✓' : c.unmetRequirement ? ' 🔒' : ''}
+                            {/* OTA-1206 — ✦ = the torch marked this noun as actually
+                                worth the look (scene.arbiterEye). Suppressed once
+                                consumed: a spent noun's mark is history, not signal. */}
+                            {c.marked && !c.consumed ? '✦ ' : ''}{c.noun}{c.consumed ? ' ✓' : c.unmetRequirement ? ' 🔒' : ''}
                           </Text>
                           {c.unmetRequirement && !c.consumed ? (
                             <Text style={styles.chipFullHint} numberOfLines={1}>

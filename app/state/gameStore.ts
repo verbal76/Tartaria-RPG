@@ -514,6 +514,29 @@ function findHeldProcedureText(
   return { item: null, ambiguous: [] };
 }
 
+/** OTA-1206 — what the torchlight flags as worth investigating in the CURRENT
+ *  scene, resolved against this room's own memory (read notes and harvested
+ *  perches don't glow). One caller shape for both torch paths — the aimed
+ *  charge and the no-lead sweep — so the mark can't mean two things. */
+function computeArbiterEye(get: () => GameStore): string[] {
+  const scene = get().currentScene;
+  const player = get().player;
+  if (!scene || !player) return [];
+  const roomKey = makeRoomKey(
+    player.currentLocationId, scene.microMicroId, player.mapX, player.mapY, player.hubRoomId,
+  );
+  const mem = get().worldMemory.visitedRooms?.[roomKey];
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { arbiterEyeNouns } = require('../engine/arbiterEye') as typeof import('../engine/arbiterEye');
+  return arbiterEyeNouns({
+    displayedNouns: scene.displayedAmbientNouns ?? scene.ambientNouns ?? [],
+    hooks: scene.hooks ?? [],
+    nounPlacements: scene.nounPlacements ?? null,
+    flavorExhaustedNouns: mem?.flavorExhaustedNouns ?? [],
+    searchedAmbientNouns: mem?.searchedAmbientNouns ?? [],
+  });
+}
+
 /** ⚠⚠ OTA-1198 (PUNCHLIST P17) — one place that decides a lore answer was EARNED.
  *
  *  Three different paths answer a lore question (keyword concepts, the embedder, and the
@@ -801,6 +824,12 @@ interface CurrentScene {
    *  (noun → structure + tier). Absent/empty = everything is on the ground,
    *  which is every scene until the Phase-B seeder ships. */
   nounPlacements?: Record<string, { structure: string; tier: number }>;
+  /** OTA-1206 — nouns the Aetheric Torch has marked as actually worth
+   *  investigating in THIS scene (✦ on the investigate chips). Stamped by
+   *  torch use, computed by engine/arbiterEye.ts against the real payoff
+   *  branches. Absent until a torch is spent here; not persisted across
+   *  scene rebuilds — the light fades when you move on. */
+  arbiterEye?: string[];
   /** When this Location maps to a Macro biome in worldLadder.json, the
    *  scene picks a specific Micro-Micro room to flavor the Arbiter's
    *  narration. Stored here (not regenerated each turn) so a single
@@ -16394,7 +16423,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   if (target) {
                     get().applyTorchToHook(target.id);
                   } else if (chargeable.length === 0) {
-                    get().appendLog('arbiter', `There's no open lead here to aim the ${used.name} at. You keep the charge for a room that holds one.`);
+                    // ⚠ OTA-1206 — NO LEAD DOESN'T MEAN NO USE ANY MORE. The owner's
+                    // read after 75 hours: the torch rotted in the pack because free
+                    // "look around" covered its old reveal. Now a no-lead room gets a
+                    // SWEEP: spend the charge, and the light marks (✦, on the
+                    // investigate chips) what in this room actually repays a closer
+                    // look — the thing no free verb will tell you. A room with
+                    // nothing worth marking still refuses UNSPENT (the OTA-212 rule:
+                    // never burn stock for a no-op).
+                    const eye = computeArbiterEye(get);
+                    if (eye.length > 0) {
+                      set((s) => {
+                        if (!s.currentScene || !s.player) return {};
+                        const inv = s.player.inventory
+                          .map((i) => (i.id === used.id ? { ...i, quantity: i.quantity - 1 } : i))
+                          .filter((i) => i.quantity > 0);
+                        return {
+                          player: advanceTime({ ...s.player, inventory: inv }, 0.25),
+                          currentScene: { ...s.currentScene, arbiterEye: eye },
+                        };
+                      });
+                      const named = eye.slice(0, 4).join(', ');
+                      get().appendLog(
+                        'world',
+                        `You sweep the ${used.name} slowly around the room. The light leans toward the ${named} — ✦ marked under INVESTIGATE. The rest is silt and old stone.`,
+                      );
+                      void get().persist();
+                    } else {
+                      get().appendLog('arbiter', `There's no open lead here to aim the ${used.name} at, and nothing in this room repays a closer look. You keep the charge.`);
+                    }
                   } else {
                     const list = chargeable.map((h) => h.nouns[0] ?? h.kind).slice(0, 6).join(', ');
                     get().appendLog('arbiter', `Several leads here — the ${used.name} takes only one. Tap the 🔦 button to choose, or say "use torch on <lead>". Open leads: ${list}.`);
@@ -25449,6 +25506,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       };
     });
+    // OTA-1206 — the same spent charge also reads the room: mark (✦) every chip
+    // that actually repays an investigate. Computed AFTER the charge lands so the
+    // charged hook's own noun glows too.
+    {
+      const eye = computeArbiterEye(get);
+      if (eye.length > 0) {
+        set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, arbiterEye: eye } } : {}));
+      }
+    }
     // OTA-1026 — the mark line repeated VERBATIM per torch use (twice in ten
     // minutes in the owner's log) and leaned on "resonance", the same word
     // the owner already flagged as overused. Four variants, one keeper.
