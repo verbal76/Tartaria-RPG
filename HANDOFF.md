@@ -1635,9 +1635,14 @@ rediscovering them.
   resolver (`ladderLootPool`) rather than by editing the data, so both callers get it and
   cannot drift apart.
 
-  ⚠ Substituted finds keep the pool row's own rarity (no free upgrades), and the ~100 names
-  with no catalog row mint through OTA-961's `resolveLootItem` as sellable trophies at the
-  right rarity rather than as 2-TC junk.
+  ⚠ Substituted finds keep the pool row's own rarity (no free upgrades). **Corrected by the
+  2026-08-10 audit:** the OTA-1222 write-up said uncatalogued names mint through OTA-961's
+  `resolveLootItem` — they do not; the search path mints via `lookupCraftedItem` with the
+  outcome's own rarity stamped. The RESULT is the same (right rarity, sellable) but the
+  mechanism differs, and it leaves one coherence gap: a search-minted uncatalogued part
+  carries no `trophy` tag, so it sells at FULL rarity base while the identical kill-minted
+  part is trophy-halved (OTA-966). EV measured trivial (~0.14 TC/search worst case) — a
+  consistency nit, not an exploit.
 
   **Tests:** ota1222SiteLoot (8) + ota1222SiteLootLive (3).
 

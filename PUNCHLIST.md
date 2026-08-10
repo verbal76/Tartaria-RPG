@@ -30,7 +30,7 @@ accumulates guesses is a punch list nobody trusts by item twenty.
 ## STILL OPEN — the whole list, 2026-08-10
 
 ⚠ Seventeen items have been filed. **Thirteen are closed, two were reclassified as
-not-defects, and two are open** (P9 and P16). The closed and reclassified entries are kept below
+not-defects, and three are open** (P9, P16, P18). The closed and reclassified entries are kept below
 with their reasoning rather than deleted — a punch list you can only read forwards is a
 punch list nobody can audit.
 
@@ -38,6 +38,7 @@ punch list nobody can audit.
 |---|---|---|---|
 | **P9** | Anchor the vendors to the site, not to the player | DESIGN | Untouched. The largest of the three P2 jobs; the other two shipped (OTA-1208/1209). **55 `vendor.faction` reads**, and that field decides which work a vendor OFFERS as well as who they are. |
 | **P15** | *(loot half closed 2026-08-10, OTA-1222)* The ladder's loot half was never called | WIRING | ⚠⚠ **Re-measured 2026-08-10 (OTA-1220) and the original filing was WRONG** — `loot_tables.json` IS imported. The real defect: `pickLootFromLadder` has **no caller**, while its enemy twin `pickEncounterFromLadder` is called twice. 27 pools / 153 entries, all resolving, with no door. **Blocked on one owner decision** (see the entry). `relics.json` is SUPERSEDED — 7 of 13 already ship. |
+| **P18** | Veil of Ether channelled outside combat pays for nothing | ENDS IN NOTHING | ⚠ Found by the 2026-08-10 audit. The channel succeeds and the next out-of-combat action silently deletes the `stealthed` it granted. Two candidate fixes filed; owner's call. In-combat Veil is unaffected. |
 | **P17** | *(closed 2026-08-10, OTA-1221)* Scholar of Forgotten Lore was unearnable without the narration model | UNFINISHABLE | ✅ **CLOSED.** The offline answer path already existed since OTA-233 — it just never credited the player. Also closed the nonsense-ask farm the credit would have opened. |
 | **P16** | Aether techniques | IN PROGRESS | 🟡 **Reachable as of OTA-1218** — buy, channel, four effects, tab. Open for the owner's stated next step (**mirror to enemies per spawn**) and the two acquisition routes not built (found texts, contract rewards). |
 
@@ -671,6 +672,36 @@ references anywhere are comments in `buildInfo.ts`. `canEnterSkyscraper` and
 ⚠ This is the same class as P4 but larger: authored, finished-looking, and connected to
 nothing. Whether it is dead weight or a feature that lost its entry point is the owner's
 call, exactly as with the runecasters.
+
+---
+
+### P18 — Veil of Ether channelled outside combat pays for nothing
+
+- **Kind:** ENDS IN NOTHING *(a successful channel whose effect the next action deletes)*
+- **Found:** 2026-08-10, Monday full audit of the weekend's work (OTA-1218's own review)
+
+**What happens.** Veil of Ether applies the existing `stealthed` status — a deliberate
+OTA-1218 decision, and the right one in combat. But `stealthed` is in
+`COMBAT_ONLY_STATUSES`, and the tick expires every combat-only status on the first action
+taken with **no enemies present**. So a Veil channelled out of combat costs the fuel, the
+4-corruption dose and 10 in-game minutes, succeeds, prints its success line — and the very
+next action (a step, a search, anything) silently deletes it. It can never cover an
+approach, which is the one thing an out-of-combat stealth field is for.
+
+⚠ In combat it works exactly as designed (+5 next attack, backstab flag). Only the
+out-of-combat channel is a purchase that ends in nothing.
+
+**Two candidate fixes, owner's call:**
+1. **Refuse the channel with no enemies in the scene** — before fuel is touched, with a
+   spoken reason ("nothing here to hide from"). Cheapest, honest, loses the approach use.
+2. **Let a Veil persist until the next fight begins** — needs `stealthed` split or a
+   veil-specific carrier so the approach case actually works. More design surface.
+
+⚠ Sibling note, a DECISION to confirm rather than a defect: `aether_shield` and
+`temporal_slip` are deliberately NOT combat-only, so a field channelled before a fight
+survives into it (3 actions max, dose and fuel paid). That matches the "standing field,
+held by hand" fiction but is an asymmetry against every other tactical stance. Confirm
+intended.
 
 ---
 
