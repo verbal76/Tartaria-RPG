@@ -14322,7 +14322,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
               const loot = rollBreakLoot(material);
               if (loot) {
-                const itemCat = lookupCraftedItem(loot.itemName);
+                const itemCat = resolveLootItem(loot.itemName, loot.rarity);
                 const newItem: InventoryItem = stampDurability({
                   id: `break_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
                   name: loot.itemName,
@@ -14500,7 +14500,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // hook-no-op.
             let producedFb = false;
             if (outcome.kind === 'material') {
-              const itemCat = lookupCraftedItem(outcome.itemName);
+              const itemCat = resolveLootItem(outcome.itemName, outcome.rarity);
               const newItem: InventoryItem = stampDurability({
                 id: `search_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
                 name: outcome.itemName,
@@ -15090,7 +15090,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // attempts in long runs landed here).
             let produced = outcome.kind === 'nothing';
             if (outcome.kind === 'material') {
-              const itemCat = lookupCraftedItem(outcome.itemName!);
+              const itemCat = resolveLootItem(outcome.itemName!, outcome.rarity);
               const qty = ('quantity' in outcome && typeof outcome.quantity === 'number')
                 ? outcome.quantity
                 : 1;
@@ -15740,7 +15740,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   const qty = pick.qty[0] === pick.qty[1]
                     ? pick.qty[0]
                     : pick.qty[0] + Math.floor(Math.random() * (pick.qty[1] - pick.qty[0] + 1));
-                  const itemCat = lookupCraftedItem(pick.name);
+                  const itemCat = resolveLootItem(pick.name, pick.rarity);
                   const newItem: InventoryItem = stampDurability({
                     id: `scan_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
                     name: pick.name,
@@ -16045,7 +16045,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // and do NOT consume the noun.
           let producedInv = false;
           if (outcome.kind === 'material') {
-            const itemCat = lookupCraftedItem(outcome.itemName);
+            // ⚠ OTA-1227 — classify through the KILL path's own resolver, so an
+            // uncatalogued part minted by a SEARCH carries the same 'trophy' tag (and
+            // the same OTA-966 half-rate sale) as the identical part minted by a kill.
+            // lookupCraftedItem's uncatalogued fallback is TAGLESS, which quietly paid
+            // full rarity base here while the kill path halved — the 2026-08-10 audit's
+            // coherence gap. Same swap at every noun-harvest mint (break/search-
+            // fallback/salvage/scan/rest); name and rarity still come from the outcome.
+            const itemCat = resolveLootItem(outcome.itemName, outcome.rarity);
             const isStackableCommodity = itemCat.kind === 'consumable' || itemCat.kind === 'misc';
             const searchRoomKey = makeRoomKey(
               player.currentLocationId,
@@ -17235,7 +17242,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   const qty = trinket.qtyMin === trinket.qtyMax
                     ? trinket.qtyMin
                     : trinket.qtyMin + Math.floor(Math.random() * (trinket.qtyMax - trinket.qtyMin + 1));
-                  const itemCat = lookupCraftedItem(trinket.name);
+                  const itemCat = resolveLootItem(trinket.name, trinket.rarity);
                   const newItem: InventoryItem = stampDurability({
                     id: `rest_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
                     name: trinket.name,
@@ -30096,7 +30103,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       if (outcome.kind === 'material' && outcome.itemName) {
         narrationLines.push(outcome.line);
-        const itemCat = lookupCraftedItem(outcome.itemName);
+        const itemCat = resolveLootItem(outcome.itemName, outcome.rarity);
         const qty = ('quantity' in outcome && typeof outcome.quantity === 'number')
           ? outcome.quantity
           : 1;
@@ -32799,7 +32806,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const qty = trinket.qtyMin === trinket.qtyMax
               ? trinket.qtyMin
               : trinket.qtyMin + Math.floor(Math.random() * (trinket.qtyMax - trinket.qtyMin + 1));
-            const itemCat = lookupCraftedItem(trinket.name);
+            const itemCat = resolveLootItem(trinket.name, trinket.rarity);
             const newItem: InventoryItem = stampDurability({
               id: `rest_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
               name: trinket.name,
@@ -32903,7 +32910,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const qty = trinket.qtyMin === trinket.qtyMax
             ? trinket.qtyMin
             : trinket.qtyMin + Math.floor(Math.random() * (trinket.qtyMax - trinket.qtyMin + 1));
-          const itemCat = lookupCraftedItem(trinket.name);
+          const itemCat = resolveLootItem(trinket.name, trinket.rarity);
           const newItem: InventoryItem = stampDurability({
             id: `rest_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
             name: trinket.name,
