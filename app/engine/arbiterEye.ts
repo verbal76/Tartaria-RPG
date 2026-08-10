@@ -55,5 +55,24 @@ export function arbiterEyeNouns(args: ArbiterEyeArgs): string[] {
     const holdsPerch = !!args.nounPlacements?.[noun] && !searched.has(ln);
     if (holdsHook || holdsNote || holdsPerch) out.push(noun);
   }
+  // ⚠ OTA-1233 — THE LEAD ITSELF IS THE STRONGEST MARK, and it was invisible.
+  // The owner's device log, first real session with the eye: the torch charged
+  // the submerged-steeple lead and paid a Rare — but no ✦ ever appeared,
+  // because a story lead is usually NOT an ambient chip, and this function
+  // marked only displayed nouns. "We sure the light is doing the new work? it
+  // just worked like we had it before." Now every unresolved lead whose noun
+  // no displayed chip already covers is returned too; the chip row renders
+  // eye nouns even when they are not ambient, so both torch paths show their
+  // marks. Tapping the lead chip engages the hook — the most honest ✦ there is.
+  for (const h of args.hooks) {
+    if (h.resolved) continue;
+    const lead = h.nouns[0]?.toLowerCase();
+    if (!lead) continue;
+    const covered = out.some((n) => {
+      const ln = n.toLowerCase();
+      return ln.includes(lead) || lead.includes(ln);
+    });
+    if (!covered && !out.includes(h.nouns[0]!)) out.push(h.nouns[0]!);
+  }
   return out;
 }
