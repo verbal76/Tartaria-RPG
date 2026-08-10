@@ -1330,7 +1330,15 @@ export function ExplorationScreen() {
                   if (surfaceUnlocked && !groundOutOfReach) groundCount = 1;
                 }
               }
-              return sceneCount + groundCount + (tutBeat === 'investigate' ? 1 : 0); // tutorial door prop
+              // OTA-1210 — eye-only chips (a marked story lead that is not an
+              // ambient noun) are actionable too; the count and the modal must
+              // agree, per the OTA-1124 rule.
+              const eyeOnlyCount = (currentScene?.arbiterEye ?? []).filter(
+                (m) => !buildChipPool(currentScene).some((n) => n.toLowerCase() === m.toLowerCase())
+                  && !isFuzzyConsumed(m, productivelyConsumedSet)
+                  && !isNounFlavorExhausted(m, flavorExhaustedSet),
+              ).length;
+              return sceneCount + groundCount + eyeOnlyCount + (tutBeat === 'investigate' ? 1 : 0); // tutorial door prop
             })()}
             // OTA-188 — drives the CLIMB button's red/amber/green
             // ladder. inventoryHasGate checks every inventory item's
@@ -1677,6 +1685,20 @@ export function ExplorationScreen() {
                 ),
               };
             }),
+          // ⚠ OTA-1210 — eye nouns that are NOT ambient chips (a charged story
+          // lead, most often) render as their own ✦ chips, or the torch's mark
+          // is invisible in exactly the rooms that hold a lead — the owner's
+          // first live session with the eye showed precisely that. Tapping one
+          // fires the same `investigate <noun>` a typed engagement would.
+          ...(currentScene?.arbiterEye ?? [])
+            .filter((m) => !buildChipPool(currentScene).some((n) => n.toLowerCase() === m.toLowerCase()))
+            .map((m) => ({
+              noun: m,
+              consumed:
+                isFuzzyConsumed(m, productivelyConsumedSet) ||
+                isNounFlavorExhausted(m, flavorExhaustedSet),
+              marked: true,
+            })),
         ]}
         onSubmit={(target) => {
           setSearchOpen(false);
