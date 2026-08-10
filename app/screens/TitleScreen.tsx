@@ -477,30 +477,19 @@ export function TitleScreen() {
   // truncate larger pastes" (OTA-023), and Share exists here precisely to bypass
   // that (OTA-006/215). The clipboard copy still happens so a short save can be
   // pasted straight into a note, but the share sheet is what opens.
+  // OTA-1208 — the encode/share body moved to app/ui/backupCharacter.ts so
+  // Settings → RUN (the living character's door now) and this screen (the dead
+  // rows' only door) cannot drift apart.
   const backUpSlot = async (slot: SlotSummary) => {
-    try {
-      const state = await loadSlot(slot.slotId);
-      if (!state) {
-        setPendingAction({ kind: 'restoreFailed', reason: `${slot.playerName}'s save could not be read from storage.` });
-        return;
-      }
-      const text = encodeSaveExport(state, {
-        playerName: slot.playerName,
-        raceName: slot.raceId,
-        locationName: slot.locationId,
-        exportedAt: Date.now(),
-      });
-      // Clipboard first so it is already there if the player dismisses the
-      // sheet — a cancelled share should not cost them the backup.
-      await Clipboard.setStringAsync(text).catch(() => { /* share is the real path */ });
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { backUpCharacterSlot } = require('../ui/backupCharacter') as typeof import('../ui/backupCharacter');
+    const result = await backUpCharacterSlot(slot);
+    if (result === 'ok') {
       setBackedUpSlotId(slot.slotId);
       setTimeout(() => setBackedUpSlotId((cur) => (cur === slot.slotId ? null : cur)), 2000);
-      try {
-        await Share.share({ message: text, title: `Tartaria backup — ${slot.playerName}` });
-      } catch {
-        // Cancelled or unsupported — the clipboard copy above still stands.
-      }
-    } catch {
+    } else if (result === 'unreadable') {
+      setPendingAction({ kind: 'restoreFailed', reason: `${slot.playerName}'s save could not be read from storage.` });
+    } else {
       setPendingAction({ kind: 'restoreFailed', reason: 'The backup could not be created.' });
     }
   };
@@ -798,26 +787,32 @@ export function TitleScreen() {
             )}
           </Text>
         )}
-        {/* ⚠ OTA-1178 — BACK UP, on EVERY row, living and dead. The living
-            character is the one worth protecting; the dead one is the one whose
-            log you still want. Placed outside the `item.dead` block on purpose —
-            a backup you can only take after the character dies is not a backup. */}
-        <View style={styles.deadActions}>
-          <TouchableOpacity
-            style={styles.shareLogBtn}
-            onPress={(e) => {
-              e.stopPropagation?.();
-              void backUpSlot(item);
-            }}
-            activeOpacity={0.7}
-            accessibilityRole="button"
-            accessibilityLabel={`Back up ${item.playerName}`}
-          >
-            <Text style={styles.shareLogText}>
-              {backedUpSlotId === item.slotId ? '✓ BACKED UP' : 'BACK UP'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {/* ⚠ OTA-1208 — BACK UP on DEAD rows only (owner: the button on every
+            living row "makes the game look broken to testers"). A dead
+            character can never be loaded into a session, so this row is its
+            ONLY door — the button stays. A LIVING character backs up from
+            Settings → RUN, beside SAVE, where the thought actually occurs.
+            OTA-1178's rule ("a backup you can only take after the character
+            dies is not a backup") still holds — the capability moved rooms,
+            it did not narrow. */}
+        {item.dead && (
+          <View style={styles.deadActions}>
+            <TouchableOpacity
+              style={styles.shareLogBtn}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                void backUpSlot(item);
+              }}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel={`Back up ${item.playerName}`}
+            >
+              <Text style={styles.shareLogText}>
+                {backedUpSlotId === item.slotId ? '✓ BACKED UP' : 'BACK UP'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
         {item.dead && (
           // Dead characters can't be loaded into a live session, so the
           // LogScreen path is closed to the player. Two row-local
