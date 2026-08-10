@@ -118,6 +118,8 @@ export function AboutScreen() {
   // Manual SAVE button feedback. 'saving' while the write runs, then a 'saved'
   // / 'failed' flash reflecting whether the atomic write actually landed.
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
+  // OTA-1231 — the RUN card's BACK UP CHARACTER button (moved from the title rows).
+  const [backupState, setBackupState] = useState<'idle' | 'busy' | 'done' | 'failed'>('idle');
   // OTA-203 — dedicated COPY INVENTORY button. Separate from the log
   // export so the player can choose which one to paste back.
   const [invCopied, setInvCopied] = useState(false);
@@ -155,6 +157,39 @@ export function AboutScreen() {
     }
     setSaveState(ok ? 'saved' : 'failed');
     setTimeout(() => setSaveState('idle'), 3000);
+  };
+
+  // ⚠ OTA-1231 — BACK UP moved HERE from every title-screen character row
+  // (owner: the per-row buttons "make the game look broken to testers"; dead
+  // rows keep theirs — a dead save has no other door). SAVES FIRST, always:
+  // a backup of a stale slot silently loses the session the player is
+  // standing in, which is the OTA-1201 wound in a new place.
+  const handleBackUp = async () => {
+    const p = useGameStore.getState().player;
+    const slotId = useGameStore.getState().activeSlotId;
+    if (!p || !slotId) return;
+    setBackupState('busy');
+    let ok = false;
+    try {
+      ok = await persist();
+    } catch {
+      ok = false;
+    }
+    if (!ok) {
+      setBackupState('failed');
+      setTimeout(() => setBackupState('idle'), 3000);
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { backUpCharacterSlot } = require('../ui/backupCharacter') as typeof import('../ui/backupCharacter');
+    const result = await backUpCharacterSlot({
+      slotId,
+      playerName: p.name,
+      raceId: p.raceId,
+      locationId: p.currentLocationId,
+    });
+    setBackupState(result === 'ok' ? 'done' : 'failed');
+    setTimeout(() => setBackupState('idle'), 3000);
   };
   async function handleCopyLog() {
     try {
@@ -661,6 +696,27 @@ export function AboutScreen() {
                 : 'SAVE'}
             </Text>
           </TouchableOpacity>
+
+          {/* OTA-1231 — the living character's backup door (title rows carry it
+              only for the dead now). Saves first, then opens the share sheet
+              with the fresh export; clipboard gets a copy either way. */}
+          {player && (
+            <TouchableOpacity
+              style={[styles.sessionBtn, styles.sessionBtnSecondary, backupState === 'failed' && styles.sessionBtnDanger]}
+              onPress={() => { void handleBackUp(); }}
+              activeOpacity={0.7}
+              disabled={backupState === 'busy'}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: backupState === 'busy' }}
+            >
+              <Text style={styles.sessionBtnSecondaryText}>
+                {backupState === 'busy' ? 'BACKING UP…'
+                  : backupState === 'done' ? '✓ BACKED UP (share or paste it somewhere safe)'
+                  : backupState === 'failed' ? '✗ BACKUP FAILED'
+                  : 'BACK UP CHARACTER'}
+              </Text>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             style={[styles.sessionBtn, styles.sessionBtnPrimary]}
