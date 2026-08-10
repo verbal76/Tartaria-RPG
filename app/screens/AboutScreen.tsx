@@ -19,6 +19,7 @@ import {
 } from '../ui/displaySettings';
 import { LoreCodexBody } from '../components/LoreCodexBody';
 import { useHintsDisabled, setHintsDisabled, resetAllFirstTimeHints } from '../components/useFirstTimeHint';
+import { useAutosaveDisabled, setAutosaveDisabled } from '../ui/autosave';
 import { useAccessibility } from '../state/accessibility';
 import { THIRD_PARTY_NOTICES, NOTICES_PREAMBLE, NOTICES_VERIFIED_AT } from '../data/thirdPartyNotices';
 import {
@@ -101,6 +102,7 @@ export function AboutScreen() {
   const [tab, setTab] = useState<'session' | 'sfx' | 'display' | 'lore' | 'about' | 'notices'>('session');
   // OTA-860 — global first-time-tips kill-switch (per-install, reactive).
   const hintsDisabled = useHintsDisabled();
+  const autosaveDisabled = useAutosaveDisabled();
   // OTA-898 (SA-6) — device reduce-motion preference (reactive).
   const reduceMotion = useAccessibility((s) => s.reduceMotion);
   const setReduceMotion = useAccessibility((s) => s.setReduceMotion);
@@ -726,6 +728,30 @@ export function AboutScreen() {
           >
             <Text style={styles.sessionBtnPrimaryText}>SAVE &amp; EXIT TO TITLE</Text>
           </TouchableOpacity>
+
+          {/* OTA-1232 — the 90-second autosave's toggle (the autosave itself is
+              OTA-368 and ships ON). Here beside SAVE so the player who lost a
+              session to a swipe-close can SEE the net exists. */}
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Autosave (every 90s)</Text>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={() => { void setAutosaveDisabled(!autosaveDisabled); }}
+              style={[styles.musicToggle, !autosaveDisabled && styles.musicToggleOn]}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Autosave"
+              accessibilityState={{ selected: !autosaveDisabled }}
+            >
+              <Text style={[styles.musicToggleText, !autosaveDisabled && styles.musicToggleTextOn]}>
+                {autosaveDisabled ? 'OFF' : 'ON'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.sessionHint}>
+            The game also saves after every action and when the app goes to the
+            background — this timer just bounds what an idle stretch could lose.
+          </Text>
 
           {/* OTA-1046 — REPLAY OPENING moved to the CharacterScreen header
               (owner: "I went to settings and about and there was no replay
