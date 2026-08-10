@@ -29,14 +29,14 @@ accumulates guesses is a punch list nobody trusts by item twenty.
 
 ## STILL OPEN — the whole list, 2026-08-10
 
-⚠ Seventeen items have been filed. **Fourteen are closed, two were reclassified as
-not-defects, and two are open** (P9 and P16). The closed and reclassified entries are kept below
+⚠ Seventeen items have been filed. **Fifteen are closed, two were reclassified as
+not-defects, and one is open** (P16). The closed and reclassified entries are kept below
 with their reasoning rather than deleted — a punch list you can only read forwards is a
 punch list nobody can audit.
 
 | # | Item | Kind | Where it stands |
 |---|---|---|---|
-| **P9** | Anchor the vendors to the site, not to the player | DESIGN | Untouched. The largest of the three P2 jobs; the other two shipped (OTA-1208/1209). **55 `vendor.faction` reads**, and that field decides which work a vendor OFFERS as well as who they are. |
+| **P9** | *(closed 2026-08-10, OTA-1224)* Anchor the vendors to the site | DESIGN | ✅ **CLOSED to the owner's four rulings.** Hand-in host-specific through ONE seam; grab untouched and pinned; host gear behind the join threshold; paid roads carry the hostile case. |
 | **P15** | *(loot half closed 2026-08-10, OTA-1222)* The ladder's loot half was never called | WIRING | ⚠⚠ **Re-measured 2026-08-10 (OTA-1220) and the original filing was WRONG** — `loot_tables.json` IS imported. The real defect: `pickLootFromLadder` has **no caller**, while its enemy twin `pickEncounterFromLadder` is called twice. 27 pools / 153 entries, all resolving, with no door. **Blocked on one owner decision** (see the entry). `relics.json` is SUPERSEDED — 7 of 13 already ship. |
 | **P18** | *(closed 2026-08-10, OTA-1223)* Veil outside combat paid for nothing | ENDS IN NOTHING | ✅ **CLOSED — fix 1.** Refuses an empty room at zero cost. The fix's test also caught `channel veil of ether` failing to resolve (dropped-word class); token tier added. |
 | **P17** | *(closed 2026-08-10, OTA-1221)* Scholar of Forgotten Lore was unearnable without the narration model | UNFINISHABLE | ✅ **CLOSED.** The offline answer path already existed since OTA-233 — it just never credited the player. Also closed the nonsense-ask farm the credit would have opened. |
@@ -599,6 +599,9 @@ already has, rather than writing a second one. One shared helper, four call site
 ---
 
 ### P9 — Anchor the vendors to the site, not to the player
+
+## ✅ **CLOSED — OTA-1224, to the owner's four rulings (2026-08-10):** *(1) "keep the grab like it is … make handin specific"* — hand-in counterparty is now the SITE OWNER at the nine owned sites, through the one seam every handler shares; the offer side is untouched and pinned. *(2) "host gear depending on faction status"* — the armory stocks the host's line behind the JOIN threshold. *(3)* hostile ground uses the already-shipped paid roads (courier 75% / market 90% / Halem 80%). *(4)* anchors only; Halem stays the factionless broker; Irma stays Irma. Live suite ota1224HostHandIn (7).
+
 
 - **Kind:** DESIGN — *the world does not feel like factions hold ground*
 - **Filed:** 2026-08-09 at the owner's instruction: *"let's put #3 as a new punch list item"*

@@ -256,6 +256,7 @@ import {
   hubEntryRoomId,
   hubNameForFaction,
   hubSkinFactionFor,
+  hubOwnerFaction,
   resolveHubTravel,
   isLeaveHubCommand,
 } from '../engine/hub';
@@ -5729,7 +5730,39 @@ function turnInCounterparty(
   scene: CurrentScene | null | undefined,
 ): { faction: string | null; name: string; vendorPresent: boolean } | null {
   const v = scene?.vendor;
-  if (v) return { faction: v.faction ?? null, name: v.name, vendorPresent: true };
+  if (v) {
+    // ⚠⚠ OTA-1224 (PUNCHLIST P9) — AT AN OWNED SITE, THE PEOPLE ANSWER FOR THE HOST.
+    // Owner's ruling: *"keep the grab like it is … make handin specific."* The hub anchors
+    // used to take work for whatever faction THEY carried — Irma re-pointed to the
+    // player's, Tarek a Reclaimer everywhere, Jorah Forgotten Order everywhere — so
+    // hand-ins never cared whose ground you stood on. Now the counterparty a hub anchor
+    // answers for is the SITE OWNER (OTA-1209's `hubOwnerFaction`, the map that already
+    // drives the room skins): host work is taken face to face at 100%, and anything else
+    // goes through the paid fallbacks (Halem 80% at this very gate, market 90%,
+    // courier 75%).
+    //
+    // ⚠ Scoped exactly: only inside a hub room, only at one of the NINE owned sites, and
+    // never for the broker — Halem's whole job is taking any faction's work, and a host
+    // stamp on him would DELETE the fallback this rule depends on. Random vendors, the
+    // outskirts hub, capitals and stalls keep today's behaviour, and the GRAB side (which
+    // work a vendor OFFERS, driven by `vendor.faction`) is deliberately untouched.
+    // ⚠ ANCHOR-PRECISE, not location-wide: the stamp applies only when the vendor in the
+    // scene IS the current room's anchor (matched by the room's own `anchorNpc`). The
+    // first spelling stamped ANY vendor standing in a hub — which is the anchor in real
+    // play, but the rule is about the anchors, and guarding by location made the seam
+    // claim more than the ruling says. (It also broke four suites that inject matching-
+    // faction agents into hub scenes — an artificial state, and still the correct hint.)
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
+    const room = isHubLocation(player.currentLocationId) && player.hubRoomId
+      ? hubRoomFor(player.hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId))
+      : null;
+    const isRoomAnchor = !!room && room.anchorNpc === v.name;
+    const host = isRoomAnchor && !CB.isContractBroker(scene?.vendor)
+      ? hubOwnerFaction(player.currentLocationId)
+      : null;
+    return { faction: host ?? (v.faction ?? null), name: v.name, vendorPresent: true };
+  }
   const board = scene?.missionBoard;
   if (board) return { faction: board.faction ?? null, name: 'The mission board', vendorPresent: false };
   // OTA-617 — building-level: inside a faction's own hub, that faction's hall takes its
@@ -10174,7 +10207,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // (Foreign capitals use the separate atCoreCapital vendor path above, so
       // this only ever fires for the player's own home-hub armory anchor.)
       if (base && hubRoom?.anchorNpc === 'Irma Ironhand' && player.factionId) {
-        const facOffers = factionGearOffers(player.factionId);
+        // ⚠ OTA-1224 (PUNCHLIST P9) — the armory stocks the HOST's line, behind standing.
+        // Owner: *"host gear depending on faction status."* At an owned site the gear on
+        // the racks belongs to whoever owns the ground, and Irma only opens it to someone
+        // the host trusts: a MEMBER, or standing at the JOIN threshold. At home you are
+        // the host, so nothing changes there. The outskirts hub has no owner and keeps
+        // the old behaviour (your own faction's line) exactly.
+        const gearHost = hubOwnerFaction(player.currentLocationId);
+        const gearFaction = gearHost ?? player.factionId;
+        const trusted = gearHost
+          ? (player.factionId === gearHost || meetsJoinThreshold(player.factionStanding, gearHost))
+          : true;
+        const facOffers = trusted ? factionGearOffers(gearFaction) : [];
         const have = new Set(base.offers.map((o) => o.itemName));
         const offers = facOffers.length > 0
           ? [...base.offers, ...facOffers.filter((o) => !have.has(o.itemName))]
