@@ -1316,9 +1316,10 @@ it and states what was checked to rule out a consumer elsewhere.
   to golem."* It briefly WAS a standing per-pass line earlier that day; that lasted
   hours. Stack the OTAs and bring steam up in ONE merge when an `.exe` is wanted.
   ⚠ Do not poll its build either — the owner watches those himself. See the amended
-  directive block in §2. Last brought up at **`d6bb6862` (2026-08-10, owner-triggered
-  batch merge to the OTA-1226 baseline — identity + shims verified, full local gates
-  green: 759 suites / 7104 tests)**; before that `3123789e` (the OTA-1178 pass) and
+  directive block in §2. Last brought up at **`8f6b3671` (2026-08-10, owner-triggered
+  batch: `d6bb6862` merged the OTA-1226 baseline, then a same-sitting top-up to
+  OTA-1227 — identity + shims verified, full local gates green on BOTH merges:
+  760 suites / 7112 tests on the second)**; before that `3123789e` (the OTA-1178 pass) and
   `442f7729`, merged to the OTA-1175 baseline, identity + platform shims
   verified intact, lock verified in sync, and **all gates run locally green** (see
   the correction below). ⚠ steam publishes NO OTA: `steam_Dev` is absent from
@@ -1635,7 +1636,9 @@ rediscovering them.
   run; actions now awaited, sleeps replaced by condition polls with 4s deadlines — the
   assertions unchanged), and **`steam_Dev` brought up in its batch merge** to the
   OTA-1226 baseline (owner-triggered): clean merge, identity + shims verified, full
-  local gates green (759 suites / 7104 tests), pushed `3123789e..d6bb6862`.
+  local gates green (759 suites / 7104 tests), pushed `3123789e..d6bb6862` — then
+  topped up the same sitting to OTA-1227 (`8f6b3671`, 760 suites / 7112 tests green),
+  so the batch carries this whole day.
 
 - **⚠⚠ PUNCHLIST P16 CLOSED — EVERY TECHNIQUE THROUGH EVERY DOOR (2026-08-10).
   HAL + GOLEM.** HAL OTA-1226 / golem OTA-1203. **steam NOT included at the time —
