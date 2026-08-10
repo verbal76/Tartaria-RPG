@@ -158,7 +158,11 @@ describe('OTA-1017 — only the Hardened Climbing Strap anchors a rest', () => {
     expect(src).toMatch(/const lostInitiative = !!initiative && !initiative\.success;/);
     expect(src).toMatch(/let enemiesActedFirst = false;/);
     const guarded = src.match(/if \(!enemiesActedFirst\) runEnemyGroupCounters\(/g) ?? [];
-    // All four post-strike volley sites: dodged, barehand-gate, hit, miss.
-    expect(guarded.length).toBe(4);
+    // All five post-strike volley sites: dodged, SLIPPED (OTA-1202 — an enemy's held
+    // Temporal Slip resolves exactly like a dodge and therefore needs exactly this
+    // guard), barehand-gate, hit, miss. The count grew for the right reason: a new
+    // negation path that FORGOT the guard would double-volley, which is what this lock
+    // exists to catch.
+    expect(guarded.length).toBe(5);
   });
 });

@@ -1357,8 +1357,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1224`**,
-**golem-line `2026-08-10-1201`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1225`**,
+**golem-line `2026-08-10-1202`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1367,7 +1367,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.131**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.132**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1573,6 +1573,33 @@ rediscovering them.
   parking an item as unreproducible, ask whether it can be reproduced in a
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
+
+- **⚠⚠ PUNCHLIST P16 — ENEMIES CHANNEL TOO (2026-08-10, latest). HAL + GOLEM.** HAL OTA-1225 / golem OTA-1202. **steam NOT included — batched (§2).**
+
+  Owner: *"mirror it to enemies and have them applied like the resists are"* — and the
+  resists are TRAITS. So techniques ride the identical rail: `technique:<id>`, rolled per
+  spawn inside `randomizeEnemyDefense` (idempotent via `profiled`), from type pools,
+  visible in the portrait at every stage of its lifecycle.
+
+  **WHO (ruling 1):** aether kinds, MUD kinds, machines — and any human fighting for the
+  **Tartarian Revivalists** (*"reactivate Tartaria's Aetheric Power systems"* is their
+  written goal). Wolves and plain raiders never; bosses keep their authored kits.
+  **RATE (ruling 2):** ~1 in 4 eligible spawns. **CASCADE (ruling 3): IN** — held until
+  cornered (hp < 35%), then 5d10 into the player (halved by carried aetheric resistance)
+  and 1d10 back through ITSELF, once ever. **COST (ruling 4):** channelling consumes the
+  enemy's swing that volley — the player's turn cost, reflected.
+
+  ⚠ **The slip does not stop a natural 20 — OTA-815's no-immunity rule cuts BOTH ways.**
+  ⚠ The shield is `field:aether_shield` read by the SAME `traitACBonus` that `enemyAC` and
+  the panel share — zero new plumbing, and the panel's AC updates for free.
+
+  **Tests:** ota1202EnemyTechniques (11: 7 unit + 4 live volleys). ⚠ Two live-test
+  spellings went red before the real one: a bare `submitPlayerAction('attack')` opens the
+  DICE MODAL and resolves nothing, and `concludeRolls` on unrolled steps is the same
+  mistake politer. The ota976 `resolveRollStep` step-through is how the app swings.
+
+  **STILL OPEN ON P16:** the two acquisition routes (found texts, contract rewards) —
+  explained to the owner, awaiting his go.
 
 - **⚠⚠ PUNCHLIST P9 CLOSED — AT AN OWNED SITE, THE PEOPLE ANSWER FOR THE HOST (2026-08-10,
   latest). HAL + GOLEM.** HAL OTA-1224 / golem OTA-1201. **steam NOT included —

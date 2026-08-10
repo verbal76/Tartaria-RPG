@@ -22397,11 +22397,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // twisted clear (at the reduced trait rate).
       enemyDodged = enemyDodgesHit(enemy.traits, attack.total, attack.target, !!attack.critical);
     }
+    // ⚠ OTA-1202 — A HELD SLIP EATS THE BLOW, the enemy-side mirror of the player's
+    // Temporal Slip at the to-hit verdict (OTA-1195). Same exclusion, same reason: a
+    // NATURAL 20 pierces it — OTA-815's rule that nothing buys literal immunity cuts both
+    // ways, or a slip-holding enemy the player cannot crit through would be the wall the
+    // rule forbids. Consumed on use; the channel already cost it a whole swing.
+    let enemySlipped = false;
+    if (!enemyDodged && attack?.success && !attack.critical
+        && (enemy.traits ?? []).includes('slip_held')) {
+      enemySlipped = true;
+      const idxNow = get().currentScene?.enemies.findIndex((e) => e === enemy) ?? -1;
+      if (idxNow >= 0) {
+        set((s) => {
+          if (!s.currentScene) return s;
+          const enemies = s.currentScene.enemies.map((e, i) => (
+            i === idxNow ? { ...e, traits: (e.traits ?? []).filter((t) => t !== 'slip_held') } : e
+          ));
+          return { currentScene: { ...s.currentScene, enemies } };
+        });
+      }
+    }
 
     if (attack && typeof attack.total === 'number' && attack.target !== undefined) {
       const naturalRoll = attack.values?.[0] ?? attack.total - attack.bonus;
       const acTag = `vs ${enemy.name} AC ${attack.target}`;
-      const outcome = enemyDodged
+      const outcome = enemySlipped
+        ? '✗ SLIPPED'
+        : enemyDodged
         ? '✗ DODGED'
         : attack.critical
         ? '✓ CRITICAL HIT'
@@ -22415,6 +22437,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     if (attack?.success) {
+      // OTA-1202 — the slip resolves exactly like a dodge: the blow finds nothing, the
+      // action is spent, the reaching pack still answers.
+      if (enemySlipped) {
+        get().appendLog(
+          'combat',
+          `Your blow lands where ${enemy.name} WAS — it is a half-second past the spot, and the slip closes behind it, spent.`,
+        );
+        if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player);
+        const hoursAfterSlip = get().player?.hoursElapsed ?? hoursBeforeConclude;
+        const dtSlip = hoursAfterSlip - hoursBeforeConclude;
+        if (dtSlip > 0) {
+          const label = dtSlip < 1 ? `${Math.round(dtSlip * 60)} min` : `${Math.round(dtSlip * 10) / 10}h`;
+          get().appendLog('system', `⏳ Time passed: ${label}`);
+        }
+        void get().persist();
+        return;
+      }
       // Agile / quick enemies get a save against the incoming hit (rolled
       // above). Success completely negates damage AND the on-hit status that
       // would have applied. Misses fall through to normal damage math.
@@ -36001,6 +36040,96 @@ export function runSurvivorVolley(
   runEnemyGroupCounters(get, set, get().player ?? player, opts);
 }
 
+/** OTA-1202 — swap one trait for another on a live enemy, by index. The technique
+ *  lifecycle lives entirely in TRAITS (technique: → field:/slip_held/veiled_strike →
+ *  technique_spent:) so it persists with the scene and shows in the portrait at every
+ *  stage, exactly as the resists do. */
+function swapEnemyTrait(
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  idx: number,
+  drop: (t: string) => boolean,
+  add: string[],
+): void {
+  set((s) => {
+    if (!s.currentScene) return s;
+    const enemies = s.currentScene.enemies.map((e, i) => (
+      i === idx
+        ? { ...e, traits: [...(e.traits ?? []).filter((t) => !drop(t)), ...add] }
+        : e
+    ));
+    return { currentScene: { ...s.currentScene, enemies } };
+  });
+}
+
+/** OTA-1202 — an enemy with an unspent technique CHANNELS instead of swinging (the cost
+ *  mirror, owner: "agree" — exactly the player's turn cost, reflected). Returns true if
+ *  the enemy spent its action here. Cascade holders WAIT until cornered (hp < 35%) —
+ *  burning the burst on round one would waste the drama and the tactic. */
+function enemyChannelsTechnique(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  enemy: Enemy,
+  idx: number,
+): boolean {
+  const traits = enemy.traits ?? [];
+  const tech = traits.find((t) => t.startsWith('technique:'));
+  if (!tech) return false;
+  const id = tech.slice('technique:'.length);
+  const scene = get().currentScene;
+  if (!scene) return false;
+
+  if (id === 'resonance_cascade') {
+    const hp = scene.enemyHps[idx] ?? 0;
+    const max = scene.enemies[idx]?.hp ?? 1;
+    if (hp / max >= 0.35) return false;   // not cornered yet — it fights on, holding it
+    // ⚠ THE BURST. 5d10 at the player — halved by carried aetheric resistance, the same
+    // read the weather uses — and 1d10 back through the thing itself, the kickback the
+    // player's own Cascade pays. Once, ever: the trait goes to spent before damage lands
+    // so no re-entry can double-fire it.
+    swapEnemyTrait(set, idx, (t) => t === tech, [`technique_spent:${id}`]);
+    let out = 0; for (let d = 0; d < 5; d++) out += rollDie(10);
+    const resists = playerArmorResistKinds(get().player!).includes('aetheric');
+    const dmg = Math.max(1, resists ? Math.ceil(out / 2) : out);
+    const kick = rollDie(10);
+    get().appendLog('combat',
+      `${enemy.name} is cornered — and LETS IT RUN. Resonance Cascade: 5d10 → ${out}${resists ? ` (aetheric resist halves it to ${dmg})` : ''} slams into you, and 1d10 → ${kick} tears back through it.`);
+    set((s) => (s.player ? { player: { ...s.player, hp: Math.max(0, s.player.hp - dmg) } } : s));
+    set((s) => {
+      if (!s.currentScene) return s;
+      const hps = [...s.currentScene.enemyHps];
+      hps[idx] = Math.max(0, (hps[idx] ?? 0) - kick);
+      return { currentScene: { ...s.currentScene, enemyHps: hps } };
+    });
+    checkLowHpWarning((get().player?.hp ?? 0) + dmg, get().player?.hp ?? 0, get().player?.hpMax ?? 1, get, set);
+    sweepDeadEnemies(get, set);
+    return true;
+  }
+
+  // The three held fields: channel now (this IS the swing), effect lands as a trait.
+  if (id === 'aether_shield') {
+    swapEnemyTrait(set, idx, (t) => t === tech, ['field:aether_shield', `technique_spent:${id}`]);
+    get().appendLog('combat',
+      `${enemy.name} stops — and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).`,
+      { combatOutcome: 'enemy_miss' });
+    return true;
+  }
+  if (id === 'temporal_slip') {
+    swapEnemyTrait(set, idx, (t) => t === tech, ['slip_held', `technique_spent:${id}`]);
+    get().appendLog('combat',
+      `${enemy.name} goes still, half a beat out of step with the room. It holds a TEMPORAL SLIP instead of swinging — your next clean hit may find nothing.`,
+      { combatOutcome: 'enemy_miss' });
+    return true;
+  }
+  if (id === 'veil_of_ether') {
+    swapEnemyTrait(set, idx, (t) => t === tech, ['veiled_strike', `technique_spent:${id}`]);
+    get().appendLog('combat',
+      `The light around ${enemy.name} bends and declines to leave. It spends the beat VEILED — the next strike will come from somewhere you are not watching.`,
+      { combatOutcome: 'enemy_miss' });
+    return true;
+  }
+  return false;
+}
+
 export function runEnemyGroupCounters(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -36132,6 +36261,13 @@ export function runEnemyGroupCounters(
     // is deliberately revised for the gated tiers — the trade the owner chose.)
     if (enemy.boss && !bossSwingsTwice(enemy) && takeStagger(get, set, liveIdx)) {
       get().appendLog('combat', `${enemy.name} reels — STAGGERED: no swing this round.`, { combatOutcome: 'enemy_miss' });
+      continue;
+    }
+    // ⚠ OTA-1202 — an unspent technique is channelled HERE, consuming the swing (the
+    // cost mirror). Placed after every skip/bench check so a benched or staggered enemy
+    // does not get a free channel the player never saw.
+    if (enemyChannelsTechnique(get, set, enemy, liveIdx)) {
+      if (meleeAttacker) meleeSwings++;
       continue;
     }
     // Pass live index so applyEnemyCounter can resolve ambush_strike
@@ -36364,7 +36500,22 @@ function applyEnemyCounter(
     }
     return bonus;
   })();
-  const atkBonus = baseAtk + traitAtk + ambushBonus;
+  // ⚠ OTA-1202 — the VEILED strike lands. The Veil channel spent last round's swing; the
+  // payoff is +5 on THIS one — the same +5 the player's `stealthed` grants — consumed on
+  // use, exactly like ambush_strike above it.
+  const veiledBonus = (() => {
+    if (enemyIdx == null || !(enemy.traits ?? []).includes('veiled_strike')) return 0;
+    set((s) => {
+      if (!s.currentScene) return s;
+      const enemies = s.currentScene.enemies.map((e, i) => (
+        i === enemyIdx ? { ...e, traits: (e.traits ?? []).filter((t) => t !== 'veiled_strike') } : e
+      ));
+      return { currentScene: { ...s.currentScene, enemies } };
+    });
+    get().appendLog('combat', `${enemy.name} strikes OUT OF THE VEIL — the blow comes from nowhere you were watching (+5).`);
+    return 5;
+  })();
+  const atkBonus = baseAtk + traitAtk + ambushBonus + veiledBonus;
   // HANDOFF #14 — true advantage/disadvantage for defensive status
   // effects. When the player has cover/dodge/block active, the enemy's
   // attack rolls 2d20 and takes the LOWER (disadvantage on attacker).

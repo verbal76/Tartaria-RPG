@@ -720,6 +720,8 @@ intended.
 
 ### P16 — Aether techniques: foundation shipped, not yet reachable
 
+## 🟡 **MIRRORED — OTA-1202 (2026-08-10).** Enemies channel too, per the owner's rulings: aether + mud kinds + Revivalist humans, ~1 in 4, Cascade IN (cornered, kickback and all), and the channel costs the enemy its swing — the player's turn cost, reflected. Ridden on the trait rail so the portrait shows every stage, exactly like the resists. **Still open:** the two acquisition routes (found texts, contract rewards) — explained to the owner, awaiting go.
+
 ## 🟡 **REACHABLE — OTA-1195.** A player can now buy a procedure from a rapport vendor, see all four in the Aetheric tab, and `channel` one; the effect lands, the dose is charged, and in a fight it costs the round. **Steps 1–5 done.** ⚠ It stays OPEN for the owner's last instruction on it — *"once this is working we will mirror it to enemies and have them applied like the resists are"* — and for the two acquisition routes not yet built (found texts, contract rewards).
 
 - **Kind:** IN PROGRESS *(deliberately on this list until a player can use one)*

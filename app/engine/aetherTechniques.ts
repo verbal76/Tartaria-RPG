@@ -145,6 +145,71 @@ export function findTechniqueByName(text: string): AetherTechnique | null {
   return byTokens.length === 1 ? byTokens[0]! : null;
 }
 
+// ─── OTA-1202 — ENEMIES CHANNEL TOO (PUNCHLIST P16, the mirror) ─────────────────────────
+//
+// Owner (2026-08-09): *"once this is working we will mirror it to enemies and have them
+// applied like the resists are"* — and the resists are TRAITS, stamped per spawn by
+// `randomizeEnemyDefense` from type pools and listed in the portrait. So techniques ride
+// the identical rail: a `technique:<id>` trait, rolled at spawn, visible before the first
+// swing lands.
+//
+// WHO (owner's ruling, 2026-08-10: *"aether and mud animals, and the faction seeking the
+// old ways"*): the aether-natured kinds, the MUD kinds, and any HUMAN fighting for the
+// **Tartarian Revivalists** — the faction whose written goal is *"reactivate Tartaria's
+// Aetheric Power systems."* A plain raider does not slip time; a Revivalist zealot has
+// been practising.
+export const ENEMY_TECHNIQUE_POOLS: Record<string, readonly string[]> = {
+  'aetheric creature': ['aether_shield', 'veil_of_ether'],
+  'aetheric mutation': ['temporal_slip', 'resonance_cascade'],
+  'aetheric undead':   ['veil_of_ether', 'aether_shield'],
+  'automation':        ['aether_shield', 'temporal_slip'],
+  'mechanism':         ['aether_shield', 'temporal_slip'],
+  'mech-construct':    ['aether_shield', 'temporal_slip'],
+  // waterlogged things that live half-in the silt: the mud hides them, or hardens on them.
+  'mud creature':      ['veil_of_ether', 'aether_shield'],
+};
+export const TECHNIQUE_FACTION = 'tartarian_revivalists';
+const REVIVALIST_POOL: readonly string[] = ['aether_shield', 'temporal_slip', 'veil_of_ether'];
+
+/** ⚠ ~1 in 4 eligible spawns (owner: "agree") — the same occasional-not-every-fight feel
+ *  as the ~35% hard-wall roll on resists. */
+export const ENEMY_TECHNIQUE_RATE = 0.25;
+
+/** The pool an enemy draws from, or null if its kind never channels. ⚠ Bosses excluded —
+ *  they keep their authored kits, exactly as `randomizeEnemyDefense` leaves them alone. */
+export function enemyTechniquePool(
+  enemy: { type?: string | null; factionId?: string | null; boss?: boolean },
+): readonly string[] | null {
+  if (enemy.boss) return null;
+  if (enemy.factionId === TECHNIQUE_FACTION) return REVIVALIST_POOL;
+  return ENEMY_TECHNIQUE_POOLS[(enemy.type ?? '').toLowerCase()] ?? null;
+}
+
+/** Roll the spawn's technique trait, or null. Pure; rng injectable like the resists. */
+export function rollEnemyTechnique(
+  enemy: { type?: string | null; factionId?: string | null; boss?: boolean },
+  rng: () => number = Math.random,
+): string | null {
+  const pool = enemyTechniquePool(enemy);
+  if (!pool || pool.length === 0) return null;
+  if (rng() >= ENEMY_TECHNIQUE_RATE) return null;
+  const id = pool[Math.floor(rng() * pool.length)]!;
+  return `technique:${id}`;
+}
+
+/** Portrait text for the technique-family traits — the promise that the player can READ
+ *  the threat before the first swing, exactly as they read the resists. */
+export function describeTechniqueTrait(t: string): string | null {
+  const [key, arg] = t.split(':');
+  const name = (id: string) => findTechnique(id)?.name ?? id;
+  if (key === 'technique' && arg) return `Channels: ${name(arg)}`;
+  if (key === 'technique_spent' && arg) return `Spent: ${name(arg)}`;
+  if (t === 'field:aether_shield') return 'Aether Shield raised (+3 AC)';
+  if (t === 'slip_held') return 'Temporal Slip held';
+  if (t === 'veiled_strike') return 'Veiled — the next strike comes unseen';
+  return null;
+}
+
 // ─── Proficiency ────────────────────────────────────────────────────────────────────────
 //
 // Owner: *"make them grow"*, and on the shape: per-technique rather than one global skill,

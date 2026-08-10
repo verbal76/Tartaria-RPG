@@ -30,6 +30,9 @@ export function traitACBonus(traits: readonly string[] | undefined): number {
   let bonus = 0;
   for (const t of traits) {
     if (t === 'armored') bonus += 2;
+    // OTA-1202 — a raised Aether Shield IS armour while it stands: same +3 the player's
+    // field grants, read here so enemyAC and the panel agree for free.
+    else if (t === 'field:aether_shield') bonus += 3;
     else if (t === 'weak_armor') bonus -= 2;
     else if (t === 'agile') bonus += 1;
   }
@@ -226,6 +229,13 @@ const TRAIT_LABEL: Record<string, string> = {
 };
 
 export function describeTrait(t: string): string {
+  {
+    // OTA-1202 — technique-family traits get real names in the portrait.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const AT = require('./aetherTechniques') as typeof import('./aetherTechniques');
+    const tech = AT.describeTechniqueTrait(t);
+    if (tech) return tech;
+  }
   // resist:slashing / vulnerable:burn → "Resist Slashing" / "Vuln Burn"
   const [key, arg] = t.split(':');
   if (arg) {
