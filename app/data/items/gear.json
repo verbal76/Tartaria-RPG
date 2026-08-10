@@ -506,7 +506,7 @@
         "light",
         "relic"
       ],
-      "description": "A hand-held aether-light that resonates with the buried. USE it in a room that still holds an unexplored lead — its flame reaches for what the mud swallowed, and on a lucky pull shakes loose a rare or legendary find (higher Wisdom, better odds and better tier). A miss burns the charge for nothing. Scarce and hard to come by — spend it where a lead remains.",
+      "description": "A hand-held aether-light that resonates with the buried. USE it on a room's open lead — its flame charges the lead, and working it can shake loose a rare or legendary find (higher Wisdom, better odds and better tier). In a room with no lead, a sweep of the light instead marks ✦ what actually repays a closer look under INVESTIGATE — the one thing a free look around will never tell you. A room holding neither keeps the charge unspent. Scarce and hard to come by.",
       "effect": {
         "kind": "consumable",
         "revealScene": true

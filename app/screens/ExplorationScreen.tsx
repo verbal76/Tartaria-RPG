@@ -1659,6 +1659,11 @@ export function ExplorationScreen() {
                   isFuzzyConsumed(n, productivelyConsumedSet) ||
                   isNounFlavorExhausted(n, flavorExhaustedSet),
                 unmetRequirement,
+                // OTA-1229 — ✦ when the Aetheric Torch has flagged this noun as
+                // actually worth the look (scene.arbiterEye, stamped on torch use).
+                marked: (currentScene?.arbiterEye ?? []).some(
+                  (m) => m.toLowerCase() === n.toLowerCase(),
+                ),
               };
             }),
         ]}
