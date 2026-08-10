@@ -204,10 +204,12 @@ one line is applied **per-line, code-specifically** (see §4).
 > that reading doubled every push (each OTA carried its own patch repair, renumber
 > audit, doc pass, and full 760-suite gate run on golem) and the owner explicitly
 > retired it. Reverting to per-OTA golem ports is UNDOING AN OWNER DECISION.
-> The measured history, so nobody re-derives this: the 2026-08-08/09 thread batched
-> golem ports (e.g. one commit carrying OTA-1210..1217) and was twice as fast at the
-> same quality; the 2026-08-10 thread ported 1201/1202/1203/1204 individually and
-> the owner noticed the slowdown the same day.
+> The measured history, so nobody re-derives this (numbers left OUT deliberately —
+> this paragraph ports across lines and bare OTA numbers renumber wrong): the
+> 2026-08-08/09 thread batched golem ports, one commit carrying a whole eight-OTA
+> range, and was twice as fast at the same quality; the 2026-08-10 thread ported
+> four consecutive OTAs individually and the owner noticed the slowdown the same
+> day.
 >
 > **What batching does NOT change:** HAL's gates. Every HAL push still runs the full
 > five-gate set including `test:ci:fast` BEFORE pushing — a HAL push is live on
