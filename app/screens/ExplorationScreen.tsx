@@ -521,6 +521,17 @@ export function ExplorationScreen() {
           body="Type what you do — strike, aim, or use a skill. You can also STEALTH for a sneak hit, or try to talk a foe down or scare them off."
         />
       )}
+      {/* OTA-1228 — the first Procedure Text in the pack. The vendor-buy door teaches
+          instantly and the storyline door says "read it" in its reward line, but the
+          FOUND door (site loot) drops the text with no instruction at all — and it is
+          the one door open at zero standing, so for many players it comes first. */}
+      {(player?.inventory ?? []).some((i) => i.name.startsWith('Procedure Text:') && i.quantity > 0) && (
+        <FirstTimeHint
+          id="procedure_text_first"
+          title="A procedure text"
+          body="You're carrying a Procedure Text — an aether technique, written down. READ it to learn the technique: tap it in your pack, or type read and its name. If it's beyond you today, it keeps — nothing is wasted."
+        />
+      )}
       {/* OTA-928 — introduce the Power rating the first time a fight is on-screen, when
           both the player badge (top-right) and the enemy badge (top-left) are visible. */}
       {(currentScene?.enemies?.length ?? 0) > 0 && (

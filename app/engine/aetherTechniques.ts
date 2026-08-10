@@ -332,6 +332,13 @@ export function techniqueTextPrice(tech: AetherTechnique): number {
   return tech.tier === 'Uncommon' ? 250 : tech.tier === 'Rare' ? 600 : 1400;
 }
 
+/** OTA-1228 — the ONE spelling of "is this item a Procedure Text". The pack search,
+ *  the inventory READ button, and the first-time card all key off it; three inline
+ *  copies of the prefix check is how one of them drifts. */
+export function isProcedureTextName(name: string): boolean {
+  return name.startsWith(TECHNIQUE_TEXT_PREFIX);
+}
+
 export function findTechniqueByTextName(name: string): AetherTechnique | null {
   const n = name.toLowerCase().trim();
   if (!n.startsWith(TECHNIQUE_TEXT_PREFIX.toLowerCase())) return null;

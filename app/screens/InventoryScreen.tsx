@@ -833,11 +833,21 @@ export function InventoryScreen() {
     // are too important for that: match on the name and wire Use directly.
     // (Legacy 'Skyreacher Chart' names are renamed on load, but match them too.)
     const isSkyMap = /^Skyreacher (Map|Chart)\b/.test(pending.item.name);
+    // OTA-1228 — a Procedure Text's real action is READING it, and the generic gate
+    // can't see that (texts carry no authored `effect`, deliberately — they are not
+    // consumables). Same dedicated-button pattern as the Skyreacher Maps above, for
+    // the same reason: the found-in-the-world door hands a player this item with no
+    // vendor line telling them what to do with it.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const isProcedureText = (require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques')).isProcedureTextName(pending.item.name);
     const useIsRealAction = (isConsumable || hasEffect || (offEligible && isThrowableItem)) && coatingItemDrinkable(pending.item);
+    if (isProcedureText) {
+      buttons.push({ label: 'Read — learn the technique', onPress: doUse, tone: 'primary' });
+    }
     if (isSkyMap) {
       buttons.push({ label: 'Use — add the location to your MAP', onPress: doUse, tone: 'primary' });
     }
-    if (useIsRealAction && !isSkyMap) {
+    if (useIsRealAction && !isSkyMap && !isProcedureText) {
       // arb106 — show YOUR current HP on the eat/drink button so you can see at a
       // glance whether you actually need it (player ask).
       const hpTag = isConsumable && player ? `  ${player.hp}/${player.hpMax}` : '';

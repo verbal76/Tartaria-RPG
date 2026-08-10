@@ -448,10 +448,12 @@ export function VendorScreen() {
 
   return (
     <View style={styles.container}>
+      {/* OTA-1228 — v2 id: the body gained the host-gear rule (OTA-1224) and dismissals
+          are per-install, so the old id would hide the new line from existing testers. */}
       <FirstTimeHint
-        id="vendor_first_open"
+        id="vendor_first_open_v2"
         title="The trader"
-        body="Buy and sell here. Prices swing with the seller's faction power and your standing — a favored trader deals kinder."
+        body="Buy and sell here. Prices swing with the seller's faction power and your standing — a favored trader deals kinder. At a faction's own site, the armory only racks faction gear for people the host trusts."
       />
       <View style={styles.header}>
         <TouchableOpacity

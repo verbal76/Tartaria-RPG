@@ -1446,7 +1446,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1227`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1228`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1456,7 +1456,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.134**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.135**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1676,8 +1676,15 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠ TROPHY COHERENCE ACROSS EVERY MINT (2026-08-10, latest). HAL ONLY so far — golem
-  port pending.** HAL OTA-1227.
+- **⚠ FIRST-USE CARDS CATCH UP (2026-08-10, latest). HAL ONLY so far — golem batch
+  pending.** HAL OTA-1228. All 13 cards audited; the stale aetheric-tab card rewritten,
+  found Procedure Texts got a pack READ button + a first-time card, vendor/contracts
+  refreshed with the host rules. ⚠ Every rewritten card carries a NEW id — dismissals
+  are per-install, so edited copy under an old id shows nobody anything. Full story:
+  the VERSION.md 4.29.135 row.
+
+- **⚠ TROPHY COHERENCE ACROSS EVERY MINT (2026-08-10). HAL + GOLEM.** HAL OTA-1227 /
+  golem OTA-1204.
 
   The audit's own pricing gap, closed at the owner's direction: an uncatalogued part
   minted by a SEARCH sold at full rarity base while the identical KILL-minted part was
