@@ -188,7 +188,7 @@
             {
               "id": "buried_strip_mall",
               "name": "Buried Market Row",
-              "environmental_description": "A row of shopfronts, glass long since shattered, signage half-erased. The tool-monger\u2019s stall has been picked over but not stripped — somebody comes back for these supplies.",
+              "environmental_description": "A row of shopfronts, glass long since shattered, signage half-erased. The tool-monger’s stall has been picked over but not stripped — somebody comes back for these supplies.",
               "exits": [
                 "out to the wagon court",
                 "behind the counter",
@@ -260,7 +260,8 @@
                 "Etheric Core",
                 "Aether Core Crystal",
                 "Etheric Stabilizer",
-                "Etheric Battery"
+                "Etheric Battery",
+                "Procedure Text: Temporal Slip"
               ],
               "interactables": [
                 "pylon",
@@ -686,7 +687,8 @@
                 "Magnetic Ether Sphere",
                 "Etheric Infusion Rod",
                 "Etheric Wand",
-                "Aetherstorm Shard"
+                "Aetherstorm Shard",
+                "Procedure Text: Veil of Ether"
               ],
               "interactables": [
                 "engine",
@@ -755,7 +757,8 @@
                 "Tartarian Writing Tablet",
                 "Leatherbound Tome",
                 "Whispering Cipher",
-                "Tartarian Map Fragment"
+                "Tartarian Map Fragment",
+                "Procedure Text: Resonance Cascade"
               ],
               "interactables": [
                 "shelf",
@@ -837,7 +840,8 @@
                 "Tartarian Rune Inscription Kit",
                 "Etheric Chain",
                 "Etheric Gauntlet",
-                "True Tartarian Gauntlet"
+                "True Tartarian Gauntlet",
+                "Procedure Text: Aether Shield"
               ],
               "interactables": [
                 "forge",

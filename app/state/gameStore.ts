@@ -450,6 +450,64 @@ function getAllConcepts(): Concept[] {
 // Match a player's "what is X / explain X / tell me about X" target text
 // against the concepts knowledge base. First substring hit on any keyword
 // wins; returns null if nothing matches so the caller can fall back.
+/** ⚠⚠ OTA-1203 (PUNCHLIST P16, doors 2+3) — THE ONE TEACHER for a held Procedure Text.
+ *  Reads the text: already-known keeps it (sellable), INT short keeps it (banked, never
+ *  wasted — a purchase that ends in nothing is the punch list's founding defect), a clean
+ *  read TEACHES and consumes it. Called from BOTH verbs that reach a held object —
+ *  `use` (the item path) and `read` (which parses as investigate) — so the two doors
+ *  cannot drift. Returns true when it consumed the action. */
+function teachFromProcedureText(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  player: PlayerCharacter,
+  item: InventoryItem,
+): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+  const tech = AT.findTechniqueByTextName(item.name);
+  if (!tech) return false;
+  if ((player.knownTechniques ?? []).includes(tech.id)) {
+    get().appendLog('system', `You already carry the ${tech.name}. The text has nothing left to teach you — a collector might pay for it.`);
+    return true;
+  }
+  const stats = effectiveStats(player);
+  if (stats.intelligence < tech.intRequired) {
+    get().appendLog('arbiter', `"The ${tech.name} needs INT ${tech.intRequired} and you are running ${stats.intelligence}," the Arbiter says. "Keep the text. Grow into it."`);
+    return true;
+  }
+  set((st) => (st.player ? {
+    player: {
+      ...st.player,
+      knownTechniques: [...(st.player.knownTechniques ?? []), tech.id],
+      inventory: st.player.inventory
+        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => i.quantity > 0),
+    },
+  } : st));
+  get().appendLog('reward', `✦ You work through the ${tech.name} procedure line by line until your hands know it. Technique learned — type \`channel ${tech.name.toLowerCase()}\`. The text is spent in the learning.`);
+  void get().persist();
+  return true;
+}
+
+/** OTA-1203 — resolve a typed target against the Procedure Texts actually IN THE PACK.
+ *  Token-subset match; two candidates REFUSE (the P12 rule) rather than guessing which
+ *  procedure the player meant to study. */
+function findHeldProcedureText(
+  player: PlayerCharacter,
+  targetText: string,
+): { item: InventoryItem | null; ambiguous: string[] } {
+  const texts = player.inventory.filter((i) => i.name.startsWith('Procedure Text:') && i.quantity > 0);
+  if (texts.length === 0) return { item: null, ambiguous: [] };
+  const words = targetText.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
+  const hits = texts.filter((i) => {
+    const toks = i.name.toLowerCase().split(/[^a-z0-9]+/);
+    return words.length > 0 && words.every((w) => toks.includes(w));
+  });
+  if (hits.length === 1) return { item: hits[0]!, ambiguous: [] };
+  if (hits.length > 1) return { item: null, ambiguous: hits.map((i) => i.name) };
+  return { item: null, ambiguous: [] };
+}
+
 /** ⚠⚠ OTA-1198 (PUNCHLIST P17) — one place that decides a lore answer was EARNED.
  *
  *  Three different paths answer a lore question (keyword concepts, the embedder, and the
@@ -14565,6 +14623,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'investigate': {
+        // ⚠ OTA-1203 — `read` PARSES AS INVESTIGATE, and a held Procedure Text is the one
+        // thing a player will type `read` at expecting it to matter. Checked before the
+        // ambient-noun machinery, or the resolver drags the target to a scene noun (the
+        // probe watched it resolve "procedure text" to an Aetheric Storm Burst). Two held
+        // texts matching one query REFUSE and name both — the P12 rule.
+        if (/^(read|study|peruse)\b/.test(trimmed.toLowerCase())) {
+          const q = (parsed.target ?? trimmed.replace(/^(read|study|peruse)\s+/i, '')).toString();
+          const held = findHeldProcedureText(player, q);
+          if (held.ambiguous.length > 1) {
+            get().appendLog('system', `Which text? You are carrying: ${held.ambiguous.join(', ')}.`);
+            break;
+          }
+          if (held.item && teachFromProcedureText(get, set, player, held.item)) break;
+        }
         // 1) "find a way / look for a path / which direction" — surface options, no roll.
         if (DIRECTION_KEYWORDS.test(trimmed)) {
           narratePossibleDirections(get, set, currentScene);
@@ -16265,6 +16337,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (parsed.resolvedItemId) {
           const used = player.inventory.find((i) => i.id === parsed.resolvedItemId);
           if (used) {
+            // ⚠⚠ OTA-1203 (PUNCHLIST P16, route B/C) — READING A PROCEDURE TEXT TEACHES IT.
+            // A found or story-earned text is a physical object in the pack; `read`/`use`
+            // is the door, and it is the ONE teaching seam both routes share — the vendor
+            // buy stays the only path that teaches without an object. ⚠ INT-gated at READ
+            // time, not at pickup, so an early find is never wasted, just waiting — and a
+            // refusal KEEPS the text (a purchase that ends in nothing is the whole punch
+            // list's founding defect). Consumed only on a successful teach.
+            if (teachFromProcedureText(get, set, player, used)) break;
             const { resolveItemEffect } = require('../engine/itemEffect');
             const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
             const resolvers = [findExplorationItemByName, findGearByName, findMaterialByName];
@@ -27227,6 +27307,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
       candidate.title,
       `✦ Storyline complete — ${candidate.title}. +${payTc} TC${!storyViaBroker && !storyViaCourier && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${storyViaBroker ? ` (broker's cut taken)` : ''}, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
     );
+    // ⚠ OTA-1203 (PUNCHLIST P16, route C) — four storylines ALSO hand over the faction's
+    // Procedure Text, alongside (never instead of) the authored reward. The text is an
+    // OBJECT; the read path teaches and INT-gates, so an arc finished early banks the
+    // technique rather than wasting it.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
+      const textTechId = AT.STORYLINE_TEXT_REWARDS[candidate.id];
+      const textTech = AT.findTechnique(textTechId ?? null);
+      if (textTech) {
+        const textName = AT.techniqueTextName(textTech);
+        const cat = lookupCraftedItem(textName);
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            inventory: mergeOrPushItem(s.player.inventory, stampDurability({
+              id: freshInstanceId('text'),
+              name: textName,
+              kind: cat.kind,
+              rarity: cat.rarity,
+              quantity: 1,
+              tags: cat.tags,
+            })),
+          },
+        } : s));
+        get().appendLog('reward', `✦ ${textName} — the written procedure itself, handed over with the rest. Read it when your head is ready for it.`);
+      }
+    }
     // OTA-1050 — the agent who took it back remembers that you finished it.
     creditTurnIn(get, set, storyViaCourier);
     maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706

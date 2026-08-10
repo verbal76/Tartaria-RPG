@@ -349,6 +349,32 @@ export function techniqueForFaction(factionId: string): AetherTechnique {
   return AETHER_TECHNIQUES[h % AETHER_TECHNIQUES.length]!;
 }
 
+/** ⚠⚠ OTA-1203 (PUNCHLIST P16, route C) — FOUR STORYLINES PAY A PROCEDURE TEXT.
+ *
+ *  Owner: *"push it through all routes, three doors makes it accessible even with bad
+ *  faction standing."* This is the story door: finish the arc, the faction hands you the
+ *  written procedure alongside its authored reward — the authored reward is NOT replaced
+ *  (removing shipped content to make room would be the P4 defect in reverse).
+ *
+ *  The pairings are thematic, one per technique, spread across four factions:
+ *    Scripture in Stone (Stone Builders, minRep 4) → Aether Shield — wards written in rock,
+ *      and deliberately the LOWEST bar for the cheapest technique.
+ *    Sasha's Gambit (Revivalists) → Temporal Slip — the old-ways faction whose own
+ *      fighters channel it (OTA-1202).
+ *    The Silence Protocol (Conspiracy Architects) → Veil of Ether — concealment is their
+ *      entire creed.
+ *    The Drowned Library (Forgotten Order) → Resonance Cascade — a forbidden procedure
+ *      recovered by the scholars who dig such things up.
+ *
+ *  ⚠ The text TEACHES NOTHING at grant. It is an object; the read path is the teacher and
+ *  the INT gate lives there — so a story finished early is a text banked, never wasted. */
+export const STORYLINE_TEXT_REWARDS: Record<string, string> = {
+  story_builders_scripture_in_stone: 'aether_shield',
+  story_revivalist_sashas_gambit: 'temporal_slip',
+  story_architect_silence_protocol: 'veil_of_ether',
+  story_order_drowned_library: 'resonance_cascade',
+};
+
 /** The offer a rapport vendor adds, or null.
  *
  *  Three gates, and the INT one is the interesting one: a text you cannot run is a purchase

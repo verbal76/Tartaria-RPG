@@ -29,10 +29,10 @@ accumulates guesses is a punch list nobody trusts by item twenty.
 
 ## STILL OPEN — the whole list, 2026-08-10
 
-⚠ Seventeen items have been filed. **Fifteen are closed, two were reclassified as
-not-defects, and one is open** (P16). The closed and reclassified entries are kept below
-with their reasoning rather than deleted — a punch list you can only read forwards is a
-punch list nobody can audit.
+⚠ Seventeen items have been filed. **Sixteen are closed and two were reclassified as
+not-defects — the list stands at ZERO open items as of OTA-1203 (2026-08-10).** The
+closed and reclassified entries are kept below with their reasoning rather than deleted —
+a punch list you can only read forwards is a punch list nobody can audit.
 
 | # | Item | Kind | Where it stands |
 |---|---|---|---|
@@ -40,7 +40,7 @@ punch list nobody can audit.
 | **P15** | *(loot half closed 2026-08-10, OTA-1199)* The ladder's loot half was never called | WIRING | ⚠⚠ **Re-measured 2026-08-10 (OTA-1197) and the original filing was WRONG** — `loot_tables.json` IS imported. The real defect: `pickLootFromLadder` has **no caller**, while its enemy twin `pickEncounterFromLadder` is called twice. 27 pools / 153 entries, all resolving, with no door. **Blocked on one owner decision** (see the entry). `relics.json` is SUPERSEDED — 7 of 13 already ship. |
 | **P18** | *(closed 2026-08-10, OTA-1200)* Veil outside combat paid for nothing | ENDS IN NOTHING | ✅ **CLOSED — fix 1.** Refuses an empty room at zero cost. The fix's test also caught `channel veil of ether` failing to resolve (dropped-word class); token tier added. |
 | **P17** | *(closed 2026-08-10, OTA-1198)* Scholar of Forgotten Lore was unearnable without the narration model | UNFINISHABLE | ✅ **CLOSED.** The offline answer path already existed since OTA-233 — it just never credited the player. Also closed the nonsense-ask farm the credit would have opened. |
-| **P16** | Aether techniques | IN PROGRESS | 🟡 **Reachable as of OTA-1195** — buy, channel, four effects, tab. Open for the owner's stated next step (**mirror to enemies per spawn**) and the two acquisition routes not built (found texts, contract rewards). |
+| **P16** | *(closed 2026-08-10, OTA-1195/1202/1203)* Aether techniques | IN PROGRESS | ✅ **CLOSED in three passes.** Player side (OTA-1195: buy, channel, four effects, tab), enemy mirror (OTA-1202: trait rail, ~1 in 4, channel costs the swing), and all three acquisition doors (OTA-1203: rapport purchase, found texts at four aether sites, storyline grants — owner: *"push it through all routes"*). |
 
 **The two former PARTIALs — RESOLVED by owner ruling (2026-08-10):**
 
@@ -720,13 +720,15 @@ intended.
 
 ### P16 — Aether techniques: foundation shipped, not yet reachable
 
-## 🟡 **MIRRORED — OTA-1202 (2026-08-10).** Enemies channel too, per the owner's rulings: aether + mud kinds + Revivalist humans, ~1 in 4, Cascade IN (cornered, kickback and all), and the channel costs the enemy its swing — the player's turn cost, reflected. Ridden on the trait rail so the portrait shows every stage, exactly like the resists. **Still open:** the two acquisition routes (found texts, contract rewards) — explained to the owner, awaiting go.
+## ✅ **CLOSED — OTA-1203 (2026-08-10).** All three acquisition doors open, per the owner's ruling — *"push it through all routes, three doors makes it accessable even with bad faction standing"*: rapport purchase (1195), found texts at the four aether-heavy ladder sites through OTA-1199's own substitution roll (zero standing required), and storyline grants on top of the authored rewards. One teaching seam (`teachFromProcedureText`), INT-gated at read time, refusals keep the text. With 1195 (player side) and 1202 (enemy mirror), P16 is done end to end.
+
+## 🟡 **MIRRORED — OTA-1202 (2026-08-10).** Enemies channel too, per the owner's rulings: aether + mud kinds + Revivalist humans, ~1 in 4, Cascade IN (cornered, kickback and all), and the channel costs the enemy its swing — the player's turn cost, reflected. Ridden on the trait rail so the portrait shows every stage, exactly like the resists.
 
 ## 🟡 **REACHABLE — OTA-1195.** A player can now buy a procedure from a rapport vendor, see all four in the Aetheric tab, and `channel` one; the effect lands, the dose is charged, and in a fight it costs the round. **Steps 1–5 done.** ⚠ It stays OPEN for the owner's last instruction on it — *"once this is working we will mirror it to enemies and have them applied like the resists are"* — and for the two acquisition routes not yet built (found texts, contract rewards).
 
-- **Kind:** IN PROGRESS *(deliberately on this list until a player can use one)*
+- **Kind:** IN PROGRESS *(kept on this list until a player could use one — they can)*
 - **Started:** 2026-08-09, at the owner's direction
-- **Reachable:** 2026-08-10 (OTA-1195)
+- **Reachable:** 2026-08-10 (OTA-1195) · **Mirrored:** OTA-1202 · **Closed:** OTA-1203
 
 Owner: *"I would like to have players get aether powers based off of the spells, once this
 is working we will mirror it to enemies and have them applied like the resists are. this

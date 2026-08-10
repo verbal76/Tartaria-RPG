@@ -87,7 +87,9 @@ describe('OTA-1197 / P15 — loot_tables.json: imported, resolving, and (since O
     // so an unknown loot name mints as a sellable trophy at the enemy's rarity rather than
     // as 2-TC junk. So wiring the caller would pay, it just would not pay AUTHORED items
     // until someone curates them. That is the owner's call, not mine.
-    expect(loot.length).toBe(113);
+    // ⚠ 113 → 117 (OTA-1203): the four Procedure Texts joined the table so the site-loot
+    // substitution can surface them — the zero-standing door into the techniques.
+    expect(loot.length).toBe(117);
     expect(inCatalog.length).toBeLessThan(loot.length);
     expect(readFileSync(join(ROOT, 'app/engine/crafting.ts'), 'utf8'))
       .toContain('export function resolveLootItem(');
