@@ -1357,8 +1357,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-09-1217`**,
-**golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-10-1223`**,
+**golem-line `2026-08-10-1200`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1367,7 +1367,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.126**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.130**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1574,8 +1574,218 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠ PUNCHLIST P18 CLOSED — THE VEIL REFUSES AN EMPTY ROOM (2026-08-10, latest). HAL +
+  GOLEM.** HAL OTA-1223 / golem OTA-1200. **steam NOT included — batched (§2).**
+
+  The Monday audit filed P18: Veil of Ether grants the existing `stealthed` status, which
+  is combat-only — the first enemy-less action expires it — so an out-of-combat channel
+  charged fuel + 4 dose + 10 in-game minutes for an effect the next step deleted. Owner's
+  call was fix 1: **refuse, spoken, at zero cost, before fuel is reached.** In-combat Veil
+  is untouched; Shield and Slip still pre-channel deliberately.
+
+  ⚠⚠ **THE FIX'S OWN TEST FOUND A SECOND OTA-1195 DEFECT.** The parser strips small words,
+  so `channel veil of ether` reached the finder as *veil ether* — and the technique could
+  not be resolved under ITS OWN NAME. That is the dropped-word defect OTA-1188 found in
+  the contract finders, rebuilt five days later in a brand-new finder.
+  `findTechniqueByName` now carries the same third tier `titleMatch.ts` does: tokens,
+  order-insensitive, running only where substring found NOTHING. Two substring hits still
+  REFUSE — *ether* fits both Veil and Shield and must take neither — and a token tie
+  refuses too. Both OTA-1195 suites re-run green, so the ambiguity guarantee held.
+
+  **Tests:** ota1200VeilGate (3, live).
+
+- **⚠⚠ PUNCHLIST P15 — A PLACE'S OWN LOOT CAN TURN UP WHEN YOU SEARCH IT (2026-08-10).
+  HAL + GOLEM.** HAL OTA-1222 / golem OTA-1199. **steam NOT included —
+  batched (§2).**
+
+  Owner's call, verbatim: *"it goes from the tuned pool and has a small percentage to pull
+  from the alternate loot table as a replacement item for something already on the list."*
+
+  **WHAT IT WAS.** 27 authored ladder loot pools — 153 entries, every one resolving — were
+  imported, parsed and indexed on boot, and the single function that read them
+  (`pickLootFromLadder`) had **no caller anywhere**. Its enemy twin,
+  `pickEncounterFromLadder`, written beside it and reading the same ladder, is called twice
+  by the store. The enemy half of the pair was live; the loot half had no door.
+
+  ⚠⚠ **REPLACEMENT, NOT ADDITION — the whole safety argument.** The tuned pool still decides
+  IF you find something and how often. This decides WHAT, at **10%**, from one constant
+  (`SITE_LOOT_SUBSTITUTION_RATE`). No drop rate moves and no extra objects enter the economy.
+
+  ⚠⚠ **WHY IT COULD NOT SIMPLY REPLACE THE POOL, and this is the number that decided it:**
+  the 27 ladder pools carry **ONE of the eleven** materials the crafting and golem loops
+  depend on (Scrap Metal). Swapping outright would have re-broken every complaint
+  OTA-444/446/447 were written to fix — no golem fuel, no club-and-spear stock, no recipe
+  staples. A test asserts the staples still come through a 3,000-find sample.
+
+  ⚠ **Two unique QUEST REWARDS pulled out of the pools:** `Mud Monarch Seal` (a faction
+  storyline's payout) and `Mask of Tartaria's Last King`. Finding a storyline's unique
+  reward by poking the mud devalues the storyline that pays it. Excluded at the SHARED
+  resolver (`ladderLootPool`) rather than by editing the data, so both callers get it and
+  cannot drift apart.
+
+  ⚠ Substituted finds keep the pool row's own rarity (no free upgrades). **Corrected by the
+  2026-08-10 audit:** the OTA-1199 write-up said uncatalogued names mint through OTA-961's
+  `resolveLootItem` — they do not; the search path mints via `lookupCraftedItem` with the
+  outcome's own rarity stamped. The RESULT is the same (right rarity, sellable) but the
+  mechanism differs, and it leaves one coherence gap: a search-minted uncatalogued part
+  carries no `trophy` tag, so it sells at FULL rarity base while the identical kill-minted
+  part is trophy-halved (OTA-966). EV measured trivial (~0.14 TC/search worst case) — a
+  consistency nit, not an exploit.
+
+  **Tests:** ota1199SiteLoot (8) + ota1199SiteLootLive (3).
+
+  ⚠⚠ **THE LIVE SUITE READS THE SEAM RATHER THAN AN OUTCOME, AND THE GAME FORCED THAT.** A
+  noun can only be searched ONCE per room, so a sampling loop is refused after the first
+  attempt — my first live test spent 900 iterations against that wall and reported the
+  feature dead. And a single 10% roll asserted as an outcome is a coin flip wearing a
+  test's clothes. So it asserts what the store would HAND the roller (empty is the silent
+  no-op this suite exists to catch) and that a hub room correctly hands over nothing.
+
+  ⚠ **Two more of my own assumptions went red before this landed:** that `search <noun>`
+  reaches the area roller — the per-noun SALVAGE pool answers first — and that setting
+  `hubRoomId` puts a character in a hub, when `inHub` is decided by the LOCATION.
+
+- **⚠⚠ PUNCHLIST P17 — A TITLE THAT COULD NOT BE EARNED WITHOUT THE NARRATION MODEL
+  (2026-08-10). HAL + GOLEM.** HAL OTA-1221 / golem OTA-1198.
+  **steam NOT included — batched (§2).**
+
+  **WHAT IT WAS.** `titleProgress.loreRead` — the counter gating **Scholar of Forgotten
+  Lore** — had **exactly one writer in the entire codebase**, and it sat inside
+  `if (cognitive.isReady())`. The counter only moved when the LLM answered a lore question.
+
+  ⚠⚠ **So on a device where the narration model does not load, the title was unearnable.**
+  That is measured, not theoretical: the owner's device reads `Narration engine: failed`
+  across OTA-1180, OTA-1181 and OTA-1182.
+
+  ⚠⚠ **AND THE GAME WAS ANSWERING THOSE QUESTIONS THE WHOLE TIME.** A keyword lookup over
+  `concepts.json` has answered lore offline since OTA-233 — and then `break`s, before the
+  counter. A player could read thirty lore entries on a model-less device and the game
+  recorded that they had read none. **The answer was never the missing part; the credit
+  was.**
+
+  **THE FIX, THREE PARTS.**
+  1. **`creditLoreRead` — one place that decides an answer was earned.** Three paths answer
+     a lore question (keyword concepts, the embedder, the bank match); only the middle one
+     credited the player. All three route through one helper now, rather than three copies
+     of the bookkeeping that would drift back apart.
+  2. **`findLoreConceptOffline`** — the same three-tier shape as `titleMatch.ts`: exact
+     label, substring with ambiguity REFUSING, then a token subset. ⚠ The embedder still
+     runs FIRST and is untouched — it is better at a loose ask. This is what runs when it
+     cannot, and it makes the ~180-entry concept BANK (canon events, titles, glossary)
+     reachable without a model, which the keyword path never covered.
+  3. **DISTINCT concepts, not asks.** The old tick counted every answer, so asking the same
+     question three times earned the title. Two loops that pay out on repetition have
+     already been closed this session; opening two more doors onto this one without the
+     guard would have made a farm of it.
+
+  ⚠⚠ **A SECOND DEFECT THE FIX EXPOSED, AND IT WOULD HAVE BEEN THE FARM.** The keyword
+  lookup matched the RAW parsed target, which for *"ask the arbiter about X"* still carries
+  the word **arbiter** — and `arbiter` is itself a lore keyword. So **any** ask matched
+  something whenever nothing longer beat it. Harmless while that branch only printed prose;
+  the moment it also credits the title, three nonsense questions earn it. The address is
+  stripped before matching now, pinned by test.
+
+  ⚠ **THE LOOP AUDIT'S OWN TITLE SWEEP DID NOT CATCH THIS.** It set `loreRead` to 9999 and
+  confirmed the threshold fires — it proved the THRESHOLD, not that a player can move the
+  number. That is the WIRED-vs-TRACED gap reappearing inside a test written to close it,
+  and it is the reason every case in the new suite moves the number the way a player does.
+
+  **Tests:** ota1198OfflineLore (12), every live case driven with **no narration model at
+  all** — the condition under test, not a workaround. ⚠ Two assertions retargeted: one of
+  mine asserted that a deliberately forgiving substring match was a miss, and ota1067's
+  ordering check pinned `findConcept(lookup)` by its ARGUMENT rather than by the call, so a
+  rename reddened a guarantee that had not moved.
+
+  ⚠ **HOW IT WAS FOUND:** reading P15's loot tables. Five lore texts sit in those pools,
+  which raised the question *"how does a player read lore at all?"* — and the answer was
+  that on an affected device they could not be credited for it.
+
+- **⚠⚠ PUNCHLIST P16 — THE AETHER TECHNIQUES ARE REACHABLE (2026-08-10).
+  HAL + GOLEM.** HAL OTA-1218 / golem OTA-1195. **steam NOT included — batched (§2).**
+
+  **WHAT IT WAS.** OTA-1191 shipped `engine/aetherTechniques.ts` with 24 green tests and
+  **no caller**. That is the P4 / P14 defect — authored content wired to nothing — written
+  here rather than inherited, which is why it went on the punch list with its next step
+  named instead of being quietly left. `channel <name>` now runs one.
+
+  **THE RUNNER MIRRORS `runAethercraft` STEP FOR STEP.** Fuel cheapest-first off the same
+  list in the same order, race DC ladder, d20 + INT, fuel spent whether it holds or not.
+  ⚠ The ORDER of that list is not cosmetic: it is OTA-970's fix, made after "shape stone"
+  silently ate a playtester's EQUIPPED Aetheric Locket. A technique that reached into
+  inventory order instead would have re-opened that bug on a second path.
+
+  **WHAT IT ADDS — the three owner calls of 2026-08-09** (*"1. I agree. 2. scale it.
+  3. yes."*):
+  1. **Dose**, scaled by tier, charged BEFORE the effect lands and before any turn is
+     spent, so no later branch can resolve a channel for free.
+  2. **Growth**, per technique, through `practiceCounts` — a success in an empty room
+     teaches nothing. Growth-through-use is farmable by construction, and this session has
+     already closed two loops that paid out on repetition.
+  3. **The turn.** Channelling in a fight costs the round; the enemy group answers.
+
+  ⚠⚠ **ALL FOUR EFFECTS LAND IN MACHINERY THAT ALREADY SHIPPED, and that was the condition
+  for building them at all.** An effect that needs a new subsystem is a technique that ends
+  in nothing while the subsystem gets written.
+  - Aether Shield → `statusAcAdjustment`, +3 for 3 rounds. Deliberately under
+    `shaped_stone_ward`'s +4-for-one-round: the longer field is the weaker one per round,
+    or there would be no reason to shape stone again.
+  - Temporal Slip → the to-hit verdict in `applyEnemyCounter`, not the damage stack. The
+    technique's claim is that the blow did not arrive, so nothing downstream runs.
+  - Veil of Ether → the EXISTING `stealthed` status. A parallel "veiled" kind would have
+    needed the attack path and the backstab check taught about it.
+  - Resonance Cascade → 5d10 across every standing enemy, 1d10 back into the operator,
+    floored so the kickback alone can never kill.
+
+  ⚠ **`sweepDeadEnemies` WAS EXTRACTED, NOT COPIED.** Cascade is the second thing in the
+  game that can drop several enemies at once; the DOT tick was the first. Two spellings of
+  *who died, in what order, and who are you still aiming at* in one file is how the two
+  drift, so both now call one function.
+
+  ⚠⚠ **THE SLIP DOES NOT STOP A NATURAL 20.** OTA-815 set the rule when the dodge rework
+  threatened the same thing: no defensive stack may buy literal immunity, so an enemy
+  always lands about one swing in twenty. A slip that beat a crit and could be re-channelled
+  every three rounds would be exactly the untouchable build that rule forbids — for the
+  price of fuel and a dose.
+
+  **ACQUISITION — ONE ROUTE, OR THE LOOP ENDS IN NOTHING.** Owner: *"make them grow rewards
+  and texts you. an buy from friendly vendors you developed repor with."* The purchase ships
+  first because the rapport gate is the only one of the three that is deterministic. A
+  rapport vendor stocks one **Procedure Text**; buying it TEACHES the technique the way
+  OTA-726's recipe row teaches a working, and mints no object.
+  - ⚠ **No die roll**, unlike `withSkyreacherChartOffer` which it is otherwise modelled on.
+    A chart is a bonus you may stumble on; this is the only door into a whole feature, and
+    a door that opens 18% of the time is indistinguishable from one that is not there.
+  - ⚠ It reads the vendor's **native** faction, so OTA-1186's site skin cannot have an
+    Architect in Monarch colours sell a Mud Monarch the Architects' text.
+  - ⚠ The row is gated on INT: a text you cannot yet run is a purchase that ends in nothing
+    until some later level-up. **Verified 2026-08-10** — a test drives the boundary from
+    both sides, asserting the row appears at exactly `intRequired` and is absent one point
+    below it.
+
+  **THE AETHERIC TAB LISTS ALL FOUR**, locked ones dimmed rather than hidden. A hidden list
+  means a player who has never met a rapport vendor has no way to learn the feature exists,
+  so the only route in would depend on stumbling across it.
+
+  ⚠ **One data string changed to match what shipped.** Temporal Slip's card promised *"once
+  per encounter"*, which the implementation cannot honestly claim — it is a 3-round status,
+  so it can lapse unused and be re-channelled in the same fight for another dose and another
+  turn. The text now says what the engine does.
+
+  **Tests:** ota1195AetherTechniques (35) + **ota1195ChannelLive (11)**. ⚠ Five of those 35 read the SCREEN source: this project has no React render harness, so a claim the write-up makes about the tab ("all four listed, locked ones dimmed rather than hidden") would otherwise have had nothing guarding it.
+  ⚠⚠ **The live suite is the point of the OTA.** OTA-1191 was provably correct and provably
+  unreachable and unit tests cannot tell those apart, so every claim in the live suite drives
+  the real store: real parser, real vendor row, real combat volley. ⚠ One assertion in it
+  went red for the right reason and was retargeted — it read the Cascade kickback off the
+  player's FINAL HP, but the channel costs the turn, so three surviving serpents swing
+  immediately afterwards. It would have failed on a good volley roll and passed on a bad one
+  while claiming to be about the 1d10; it now reads the kickback off its own log line.
+
+  **STILL OPEN ON P16:** mirroring techniques to ENEMIES per spawn, the way
+  `randomizeEnemyDefense` already stamps resists (owner: *"once this is working we will
+  mirror it to enemies"*), plus the other two acquisition routes (found texts, contract
+  rewards).
 - **⚠⚠ PUNCHLIST P12 + P11 CLOSED — AMBIGUOUS NAMES REFUSE, AND HAL GAINS THE GATE RULE
-  (2026-08-09, latest). HAL + GOLEM.** HAL OTA-1216/1217 / golem OTA-1193/1194.
+  (2026-08-09). HAL + GOLEM.** HAL OTA-1216/1217 / golem OTA-1193/1194.
   **steam NOT included — batched (§2).**
 
   **P12 — THE SUBSTRING TIER NO LONGER GUESSES.** `pool.find()` returned the FIRST match

@@ -18107,7 +18107,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // answered lore offline, from concepts.json keywords, since OTA-233 — and then
           // `break`s, so it never reached the `loreRead` tick further down. That tick lived
           // ONLY inside the embedder branch, so on a device where the narration model does
-          // not load (the owner's own, OTA-1157/1181/1182: `Narration engine: failed`) the
+          // not load (the owner's own, OTA-1180 / OTA-1181 / OTA-1182: `Narration engine: failed`) the
           // counter could never move and **Scholar of Forgotten Lore was unearnable** —
           // while the game was answering the player's lore questions perfectly well the
           // whole time. The answer was never the missing part; the credit was.
@@ -18160,7 +18160,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
           // ⚠⚠ OTA-1198 (PUNCHLIST P17) — THE OFFLINE PATH. Everything above needs a model
-          // that loads. On the owner's own device it does not (OTA-1157/1181/1182 all read
+          // that loads. On the owner's own device it does not (OTA-1180 / OTA-1181 / OTA-1182 all read
           // `Narration engine: failed`), and `loreRead` was ticked ONLY inside that branch —
           // so 177 authored lore concepts were unreachable and Scholar of Forgotten Lore
           // could not be earned at all. The bank is plain text and never needed the model.
@@ -24509,14 +24509,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // OTA-709 — RECIPE offers. A vendor teaches a small, stable slice of the
-    // rare/legendary recipes you haven't learned yet (a gold sink + a reliable,
-    // pricey way to get a working you never stumbled on). `buy <recipe name>`
-    // routes here before the normal item lookup. Teaches into knownRecipes —
-    // you still have to gather the materials and forge it.
-    {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const rd = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
     // ⚠ OTA-1195 — PROCEDURE TEXTS (PUNCHLIST P16). Buying one TEACHES the technique; it
     // never mints an item. This sits beside the OTA-726 recipe branch and works the same
     // way for the same reason: what you are buying is knowledge, and a physical book would
@@ -24561,6 +24553,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
+    // OTA-709 — RECIPE offers. A vendor teaches a small, stable slice of the
+    // rare/legendary recipes you haven't learned yet (a gold sink + a reliable,
+    // pricey way to get a working you never stumbled on). `buy <recipe name>`
+    // routes here before the normal item lookup. Teaches into knownRecipes —
+    // you still have to gather the materials and forge it.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const rd = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { RECIPES } = require('../engine/crafting') as typeof import('../engine/crafting');
       const recipeOffers = rd.vendorRecipeOffers(RECIPES, player.knownRecipes, rd.vendorSeed(scene.vendor.name));
@@ -38624,6 +38624,21 @@ function runAetherTechnique(
     get().appendLog('arbiter', gate.reason === 'unknown'
       ? `"You have never been taught the ${tech.name}," the Arbiter says. "Reaching for it anyway would only cost you."`
       : `"The ${tech.name} needs a steadier head than that," the Arbiter says. "INT ${gate.needed}. You are running ${intValue}."`);
+    return;
+  }
+
+  // ⚠⚠ OTA-1200 (PUNCHLIST P18) — THE VEIL REFUSES AN EMPTY ROOM, before fuel is touched.
+  // The Veil grants the existing `stealthed` status, and `stealthed` is combat-only by
+  // OTA-358's rule: the first action taken with no enemies present expires it. So an
+  // out-of-combat channel succeeded, charged fuel + 4 dose + 10 minutes, printed its
+  // success line — and the player's very next step silently deleted the effect. A
+  // purchase that ends in nothing, found by the 2026-08-10 audit and filed as P18;
+  // owner's call was fix 1: refuse, with the reason spoken, at zero cost.
+  if (tech.id === 'veil_of_ether' && (scene.enemies?.length ?? 0) === 0) {
+    get().appendLog(
+      'arbiter',
+      `"The Veil bends the light around a body something is looking for," the Arbiter says. "Nothing here is looking. Keep the dose."`,
+    );
     return;
   }
 

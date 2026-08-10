@@ -120,8 +120,8 @@ export function extractLoreQuery(rawText: string): string {
  *
  *  `findClosestLoreConcept` returns null the moment the embedder is not ready, and the
  *  store's ask-handler ticked `loreRead` ONLY inside that branch. So on any device where
- *  the narration model fails to load — which is the owner's own device across OTA-1157,
- *  1181 and 1182 (`Narration engine: failed`) — the counter never moved and **Scholar of
+ *  the narration model fails to load — which is the owner's own device across OTA-1180,
+ *  OTA-1181 and OTA-1182 (`Narration engine: failed`) — the counter never moved and **Scholar of
  *  Forgotten Lore could not be earned at all.** 177 authored concepts, unreachable, because
  *  the only door needed a model that was not there.
  *

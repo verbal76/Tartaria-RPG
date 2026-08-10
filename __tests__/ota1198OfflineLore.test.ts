@@ -41,7 +41,7 @@ jest.mock('expo-updates', () => ({}));
 //
 // ⚠⚠ THE DEFECT, MEASURED. `titleProgress.loreRead` had exactly ONE writer in the whole
 // codebase, and it sat inside `if (cognitive.isReady())`. On a device where the model fails
-// to load — the owner's own, across OTA-1157/1181/1182, all reading
+// to load — the owner's own, across OTA-1180 / OTA-1181 / OTA-1182, all reading
 // `Narration engine: failed` — the counter never moved, so Scholar of Forgotten Lore was
 // UNEARNABLE and 177 authored lore concepts were unreachable.
 //

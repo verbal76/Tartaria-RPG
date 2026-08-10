@@ -117,7 +117,15 @@ export function findTechnique(id: string | null | undefined): AetherTechnique | 
 }
 
 /** Loose name match, for the parser. Deliberately strict about which techniques it will
- *  answer to — an ambiguous match returns null rather than guessing, the P12 rule. */
+ *  answer to — an ambiguous match returns null rather than guessing, the P12 rule.
+ *
+ *  ⚠⚠ OTA-1200 — A THIRD TIER, tokens, because the parser strips small words. `channel
+ *  veil of ether` reaches this as "veil ether", and two tiers of matching could not find
+ *  the technique under ITS OWN NAME — the exact dropped-word defect OTA-1188 found in the
+ *  contract finders, rebuilt here five days later. Found by the P18 fix's own test.
+ *  Same rules as titleMatch.ts: the tier runs only where substring found NOTHING (two
+ *  substring hits still REFUSE — "ether" fits both Veil and Shield and must take
+ *  neither), and a token tie refuses too. */
 export function findTechniqueByName(text: string): AetherTechnique | null {
   const t = text.toLowerCase().trim();
   if (!t) return null;
@@ -126,7 +134,15 @@ export function findTechniqueByName(text: string): AetherTechnique | null {
   const hits = AETHER_TECHNIQUES.filter(
     (x) => x.name.toLowerCase().includes(t) || t.includes(x.name.toLowerCase()),
   );
-  return hits.length === 1 ? hits[0]! : null;
+  if (hits.length === 1) return hits[0]!;
+  if (hits.length > 1) return null;
+  const words = t.split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
+  if (words.length === 0) return null;
+  const byTokens = AETHER_TECHNIQUES.filter((x) => {
+    const nameTokens = x.name.toLowerCase().split(/[^a-z0-9]+/);
+    return words.every((w) => nameTokens.includes(w));
+  });
+  return byTokens.length === 1 ? byTokens[0]! : null;
 }
 
 // ─── Proficiency ────────────────────────────────────────────────────────────────────────
