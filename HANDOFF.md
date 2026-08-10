@@ -1677,7 +1677,7 @@ rediscovering them.
   so it can lapse unused and be re-channelled in the same fight for another dose and another
   turn. The text now says what the engine does.
 
-  **Tests:** ota1218AetherTechniques (30) + **ota1218ChannelLive (11)**.
+  **Tests:** ota1218AetherTechniques (35) + **ota1218ChannelLive (11)**. ⚠ Five of those 35 read the SCREEN source: this project has no React render harness, so a claim the write-up makes about the tab ("all four listed, locked ones dimmed rather than hidden") would otherwise have had nothing guarding it.
   ⚠⚠ **The live suite is the point of the OTA.** OTA-1214 was provably correct and provably
   unreachable and unit tests cannot tell those apart, so every claim in the live suite drives
   the real store: real parser, real vendor row, real combat volley. ⚠ One assertion in it

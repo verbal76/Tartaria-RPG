@@ -222,3 +222,49 @@ describe('OTA-1218 / P16 — the costs', () => {
     expect(cast.indexOf('runAethercraft(discipline')).toBeLessThan(cast.indexOf('runAetherTechnique('));
   });
 });
+
+// ─── THE AETHERIC TAB ───────────────────────────────────────────────────────────────────
+//
+// ⚠ This project has no React render harness — screens are covered by driving their engine
+// helpers and by reading the source. So these are SOURCE assertions, and they are here
+// because the OTA's write-up makes claims about the tab ("locked rows are listed, not
+// hidden") that would otherwise have nothing guarding them at all.
+describe('OTA-1218 / P16 — the Aetheric tab', () => {
+  const SCREEN = readFileSync(join(__dirname, '../app/screens/CraftingScreen.tsx'), 'utf8');
+
+  test('⚠⚠ ALL FOUR are listed — locked ones are dimmed, not filtered out', () => {
+    expect(SCREEN).toContain('AETHER_TECHNIQUES.map((t) => {');
+    // A `.filter(known)` before the map would be the hidden-list design this rejects.
+    expect(SCREEN).not.toMatch(/AETHER_TECHNIQUES\s*\n?\s*\.filter/);
+    expect(SCREEN).toContain('techCardLocked');
+  });
+
+  test('an untaught row cannot be tapped, and says where the procedure is sold', () => {
+    expect(SCREEN).toContain('disabled={!known}');
+    expect(SCREEN).toMatch(/rapport you have earned sells this procedure/);
+  });
+
+  test('⚠ the confirm says CHANNEL, not CAST — nothing here is a spell', () => {
+    expect(SCREEN).toContain("label: disciplineConfirm?.technique ? 'Channel' : 'Cast'");
+  });
+
+  test('⚠ and it states the dose before the player commits', () => {
+    const build = between2(SCREEN, 'function buildTechniqueConfirm(', 'function evaluateRepair(');
+    expect(build).toContain('Dose ${tech.baseDose} corruption');
+    expect(build).toContain('channel ${tech.name.toLowerCase()}');
+  });
+
+  test('the card shows the RANK-ADJUSTED DC, not the base one', () => {
+    // Showing baseDc would mean a practised operator reads a number they never roll against.
+    expect(SCREEN).toContain('dcForRank(t.baseDc, rank)');
+  });
+});
+
+/** Same landmark-anchored slice, for a second file. */
+function between2(src: string, from: string, to: string): string {
+  const i = src.indexOf(from);
+  expect(i).toBeGreaterThan(-1);
+  const j = src.indexOf(to, i);
+  expect(j).toBeGreaterThan(i);
+  return src.slice(i, j);
+}
