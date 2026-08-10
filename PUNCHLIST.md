@@ -42,12 +42,20 @@ punch list nobody can audit.
 | **P17** | *(closed 2026-08-10, OTA-1198)* Scholar of Forgotten Lore was unearnable without the narration model | UNFINISHABLE | ✅ **CLOSED.** The offline answer path already existed since OTA-233 — it just never credited the player. Also closed the nonsense-ask farm the credit would have opened. |
 | **P16** | Aether techniques | IN PROGRESS | 🟡 **Reachable as of OTA-1195** — buy, channel, four effects, tab. Open for the owner's stated next step (**mirror to enemies per spawn**) and the two acquisition routes not built (found texts, contract rewards). |
 
-**And two things that are NOT punch-list items but are also not proved:**
+**The two former PARTIALs — RESOLVED by owner ruling (2026-08-10):**
+
+> *"There is no completion — these aren't story loops, these are how you get your
+> companions. The naming popup for each and the Arbiter's comment is the closing of that
+> loop."*
 
 | | Status |
 |---|---|
-| Dog rescue arc | ⚠ **PARTIAL.** Rescue hooks and the `dog_quest` channel are live; the arc's *end* was never traced. May be open-ended by design. |
-| Golem companion arc | ⚠ **PARTIAL.** Summon / arm / dismiss all live; no "arc" completion exists to trace. Same caveat. |
+| Dog rescue | ✅ **CLOSED AS DESIGNED.** The loop is ACQUISITION: rescue → the naming popup (`confirmDogOnboarding`) → the dog joins with the Arbiter's acknowledgement. Verified: `dogRescueIntegration` + `ota1027DogGolemPopups`. |
+| Golem creation | ✅ **CLOSED AS DESIGNED.** Summon → `pendingGolemNaming` popup → *"You gave it life. You might as well give it a name."* Verified: `golemCompanion` + `ota1027DogGolemPopups`. 70 tests across the three suites, re-run green 2026-08-10. |
+
+⚠ The audit called these "no completion event to trace" — which was true as an
+observation and wrong as a diagnosis: it was looking for a STORY ending on loops whose
+entire purpose is to hand you a companion. The companion, named, IS the payout.
 
 ✅ **THE 18 WIRED ROWS ARE NOW TRACED (2026-08-10, OTA-1196).** Every one was walked live:
 started from a state a player could be in, finished through the public action the UI calls,
@@ -1307,17 +1315,18 @@ Owner: *"audit the other 14 loops when done give me a new punch list."*
 | Core Guardians | ✅ **TRACED** — `core_recovered` advances the main-quest phase, which drives chapters, Arbiter stance and the ending |
 | Titles | ✅ **TRACED** — every engine title has a data row and vice versa (pinned by test since OTA-1183) |
 | Whispers | ✅ pays — TC on completion (`gameStore.ts:34435`) |
-| Dog rescue arc | ⚠ **PARTIAL** — rescue hooks and the `dog_quest` channel are live; the arc's *end* was not traced |
-| Golem companion arc | ⚠ **PARTIAL** — summon/arm/dismiss all live; no "arc" completion exists to trace |
+| Dog rescue arc | ✅ **CLOSED AS DESIGNED** *(owner ruling 2026-08-10: acquisition loop — the naming popup + Arbiter comment IS the completion; was marked PARTIAL for lacking a story ending it was never meant to have)* |
+| Golem companion arc | ✅ **CLOSED AS DESIGNED** *(same ruling; summon → naming popup → Arbiter acknowledgement, all tested)* |
 | Mysteries (the finding half) | ✅ wired — stage advance + artifact gate; turn-in closed by OTA-1185 |
 | **Maze / Labyrinth** | ❌ **P13** — an imperfect run ends in nothing |
 | **Buried Skyscraper** | ❌ **P14** — 100-floor dungeon, no entry point |
 | *(found alongside)* Relics data | ❌ **P15** — 2 of 3 files orphaned, 126 entries |
 
-⚠ **Two remain PARTIAL and are named rather than claimed clean.** The dog and golem arcs
-have working mechanics at every point checked, but neither has a completion event to trace
-— which may mean they are open-ended by design rather than broken. Saying so is not the
-same as having proved it.
+⚠ **The two PARTIALs are resolved (owner ruling, 2026-08-10).** They are acquisition
+loops, not story arcs: the naming popup and the Arbiter's comment are the completion, and
+both are live and tested (70 tests across three suites). The original caution is left
+above so the reasoning stays legible — it looked for an ending these loops were never
+meant to have.
 
 ---
 
