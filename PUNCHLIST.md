@@ -47,10 +47,11 @@ punch list nobody can audit.
 | Dog rescue arc | ⚠ **PARTIAL.** Rescue hooks and the `dog_quest` channel are live; the arc's *end* was never traced. May be open-ended by design. |
 | Golem companion arc | ⚠ **PARTIAL.** Summon / arm / dismiss all live; no "arc" completion exists to trace. Same caveat. |
 
-⚠⚠ **THE REAL REMAINING RISK IS NOT ON THIS LIST — it is the 18 WIRED rows in the audit
-ledger.** Each has a completion path and a payoff, which is what the bar asks. None has
-been walked end to end the way mysteries were, and mysteries is exactly the loop that
-looked fine until it didn't.
+✅ **THE 18 WIRED ROWS ARE NOW TRACED (2026-08-10, OTA-1219).** Every one was walked live:
+started from a state a player could be in, finished through the public action the UI calls,
+and asserted on a payoff the player can see. See **WIRED → TRACED** in the audit ledger
+below for the per-loop evidence. ⚠ Five of my own assertions flagged healthy code and were
+wrong; all five are written up there rather than quietly fixed.
 
 ---
 
@@ -1058,10 +1059,56 @@ below.
 **Score: 31 audited. 7 traced clean · 2 traced-and-reachable-broken · 1 ends-in-nothing ·
 1 orphaned data file · 1 stale claim · 18 wired · 1 declared scaffold.**
 
-⚠ **The 18 "wired" rows are the remaining risk.** Each has a completion path and a payoff,
-which is what the bar asks — but none has been walked end to end the way mysteries were,
-and mysteries is precisely the loop that looked fine until it didn't. **I am not claiming
-these are proven.**
+⚠ **The 18 "wired" rows WERE the remaining risk.** Each had a completion path and a payoff,
+which is what the bar asks — but none had been walked end to end the way mysteries were,
+and mysteries is precisely the loop that looked fine until it didn't.
+
+## ⚠⚠ WIRED → TRACED (2026-08-10, OTA-1219)
+
+Owner: *"audit this for traced and make sure the loops are functional."* Every WIRED row was
+then walked. The bar for a promotion was the same three things, live, against the real
+store: **start it from a state a player could be in, finish it through the PUBLIC action the
+UI calls, and assert a payoff the PLAYER can see.**
+
+| Loop | Now | How it was proved |
+|---|---|---|
+| Crafting | **TRACED** | `craftRecipe` → the object is in the pack, the materials are gone, the feed says so; and it refuses with nothing |
+| Fusion | **TRACED** | `confirmFusionSelection` → a named weapon exists, all three inputs are consumed |
+| Recipe discovery | **TRACED** | the picker drained 200 times: every pick is NEW, and it terminates |
+| Stat training | **TRACED** | the ledger fills and the stat on the sheet actually rises |
+| Gifting | **TRACED** | `giveGift` → item leaves, the NPC remembers, the taste is learned; and an UNMET recipient is refused WITHOUT eating the item (the OTA-1087 guard) |
+| Titles | **TRACED** | every WIRED title is earnable under some race × faction × maxed sheet — none is a dead entry; every passive perk is attached to a real title |
+| Corruption | **TRACED** | a corrupted sheet rolls measurably worse, pays more, and draws more encounters; all four tiers reachable, every crossing has a line |
+| Golem companion | **TRACED** | `summon golem` → a companion with real HP and a real attack die |
+| Location challenges | **TRACED** | all six enabled, every tile EXISTS in `locations.json`, every one reachable through the store or `titleChallenges` |
+| Labyrinth | **TRACED** | walked LIVE from the entrance to the heart (route solved off the engine's own adjacency, then TYPED) → the keepsake lands, and a second walk pays nothing |
+| Hidden locations | **TRACED** | every hidden tile has a real world row; unrevealed reads as the placeholder, revealed reads as the name |
+| Chapters | **TRACED** | every phase × every motive produces a card — no phase advances into silence |
+| Faction standing | **TRACED** | a live bounty turn-in raises the posting faction's standing; bounds hold |
+| Aetherkin | **TRACED** | encounters build in both contexts and EVERY authored variant name resolves to a real enemy; the revering factions are real factions |
+| Hook puzzles | **TRACED** | every hook kind has a chain and every chain ENDS in something |
+| The Fallen | **TRACED** | a fallen hero becomes a fightable enemy, defeat has words, and avenging writes back so the same ghost is not raised twice |
+| Story forks | **TRACED** | already proved end to end by `ota1088StoryForks` — answer → TC change → narration → never returns |
+| Resurrection gems | **TRACED** | already proved end to end by `resurrectSlotGemSafety` — revives at the backfilled hpMax spending EXACTLY one gem, refuses with none |
+
+**Suites:** `ota1219LoopAuditA/B/C/D`. ⚠ Two loops were NOT re-tested (forks, gems) because
+existing suites already drive them end to end; a second weaker version would add a file and
+prove nothing.
+
+⚠⚠ **FIVE OF MY OWN ASSERTIONS WERE WRONG AND FLAGGED HEALTHY CODE.** Worth recording,
+because a completability audit that cries wolf is the thing that gets ignored:
+1. The title sweep maxed the counters and called three titles dead — `scion_of_the_giants`
+   wants a GIANT standing well with a giant-respecting faction, `aetherborn_awakened` wants
+   an AETHERBORN carrying dose, `etheric_explorer` wants a recovered CORE. None is a counter.
+   It also built `factionStanding` as a record when it is an ARRAY.
+2. The challenge sweep looked only in `gameStore` and called three challenges orphaned —
+   they route through `titleChallenges.ts`, which the store calls generically.
+3. The Labyrinth walk typed north/east and never arrived. The maze is AUTHORED, not a grid.
+4. The Aetherkin check read `enc.enemy`; the encounter carries an enemy NAME.
+5. The gift check asserted the log GREW — `appendLog` merges same-channel writes, so a
+   working gift left the count unchanged.
+
+**Nothing in the game was broken by any of the five.** Every failure was the test.
 
 ## REACHABILITY — checked and clean
 
