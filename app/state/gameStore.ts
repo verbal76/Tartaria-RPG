@@ -13585,7 +13585,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // still "★★ STORY THREAD COMPLETE — you part ways, +25 TC" and then be
     // killed in the same exchange. While a live enemy is in the scene, these
     // verbs fall through to the combat handlers below instead.
-    if (hookEligible.includes(parsed.intent) && currentScene.hooks && currentScene.hooks.length > 0 && currentScene.enemies.length === 0) {
+    // ⚠ OTA-1230 — "use <thing I'm carrying>" is NOT hook engagement. Device log
+    // (2026-08-10, Pixel): `use Aetheric Torch` was hijacked by an etheric_storm
+    // hook because the ITEM'S adjective ('aetheric') sits in the hook's noun list —
+    // the player asked for their torch and got a storm beat instead, and the
+    // torch's own lead-aiming (OTA-776) never ran. When a use-intent's resolved
+    // target names an item actually IN THE PACK, the item path owns the action; a
+    // hook that wants an item applied names a SCENE noun, not pack contents. No
+    // puzzle lists 'use_relic' in its intentList, so nothing else routes this way.
+    const useTargetLower = (parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase().trim();
+    const useNamesCarriedItem = parsed.intent === 'use_relic'
+      && !!useTargetLower
+      && player.inventory.some((i) => i.name.toLowerCase() === useTargetLower && i.quantity > 0);
+    if (!useNamesCarriedItem && hookEligible.includes(parsed.intent) && currentScene.hooks && currentScene.hooks.length > 0 && currentScene.enemies.length === 0) {
       const targetText = (parsed.resolvedNoun ?? parsed.target ?? trimmed).toLowerCase();
       let hook = matchHookNoun(targetText, currentScene.hooks);
       // OTA-130 — direction-only fallback. If the player typed
