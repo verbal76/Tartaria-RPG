@@ -1667,7 +1667,7 @@ rediscovering them.
 
   ⚠⚠ **So on a device where the narration model does not load, the title was unearnable.**
   That is measured, not theoretical: the owner's device reads `Narration engine: failed`
-  across OTA-1180, 1181 and 1182.
+  across OTA-1203, OTA-1204 and OTA-1205.
 
   ⚠⚠ **AND THE GAME WAS ANSWERING THOSE QUESTIONS THE WHOLE TIME.** A keyword lookup over
   `concepts.json` has answered lore offline since OTA-233 — and then `break`s, before the

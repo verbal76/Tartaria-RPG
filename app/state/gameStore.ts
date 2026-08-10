@@ -18107,7 +18107,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // answered lore offline, from concepts.json keywords, since OTA-233 — and then
           // `break`s, so it never reached the `loreRead` tick further down. That tick lived
           // ONLY inside the embedder branch, so on a device where the narration model does
-          // not load (the owner's own, OTA-1180/1181/1182: `Narration engine: failed`) the
+          // not load (the owner's own, OTA-1203 / OTA-1204 / OTA-1205: `Narration engine: failed`) the
           // counter could never move and **Scholar of Forgotten Lore was unearnable** —
           // while the game was answering the player's lore questions perfectly well the
           // whole time. The answer was never the missing part; the credit was.
@@ -18160,7 +18160,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
           // ⚠⚠ OTA-1221 (PUNCHLIST P17) — THE OFFLINE PATH. Everything above needs a model
-          // that loads. On the owner's own device it does not (OTA-1180/1181/1182 all read
+          // that loads. On the owner's own device it does not (OTA-1203 / OTA-1204 / OTA-1205 all read
           // `Narration engine: failed`), and `loreRead` was ticked ONLY inside that branch —
           // so 177 authored lore concepts were unreachable and Scholar of Forgotten Lore
           // could not be earned at all. The bank is plain text and never needed the model.
