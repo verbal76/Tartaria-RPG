@@ -1676,8 +1676,7 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ NO DEV NOTES IN THE FEED (2026-08-11, latest). HAL ONLY so far — golem
-  batch pending.** HAL OTA-1247. The main quest's `cores` fallback was a
+- **⚠⚠ NO DEV NOTES IN THE FEED (2026-08-11, latest). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1247. The main quest's `cores` fallback was a
   note-to-self from the week it was built — *"being authored in a coming
   OTA…"* — in the Arbiter's voice, in a live switch, and by now factually
   false (all nine factions have real Core routes). Unreachable, not
