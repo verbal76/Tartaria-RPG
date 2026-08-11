@@ -24,7 +24,7 @@ import { endingLine, LOST_CAPITAL_LOCATIONS, LOST_CAPITAL_NAMES } from '../engin
 import { epilogueMotiveLine } from '../engine/chapters'; // OTA-1043
 import { epilogueChoiceLines } from '../engine/storyForks'; // OTA-1088
 import { motiveById } from '../engine/story'; // OTA-1043
-import { missingResolvedEpilogue } from '../engine/storyDrip'; // OTA-1044
+import { resolvedEpilogue } from '../engine/storyDrip'; // OTA-1246 — every motive, not just The Missing // OTA-1044
 import { arbiterVerdict, arbiterNameBeat } from '../engine/arbiterPersona'; // OTA-1090
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
@@ -122,7 +122,7 @@ export function EndingScreen() {
   // the political one. OTA-1044 — if The Missing side-thread RESOLVED in-run
   // (grave / lie / walker), its own closing replaces the standard 'missing'
   // epilogue, which assumes the question is still open.
-  const motiveLine = missingResolvedEpilogue(player) ?? epilogueMotiveLine(ending, player.storyMotive);
+  const motiveLine = resolvedEpilogue(player) ?? epilogueMotiveLine(ending, player.storyMotive);
   const motiveTitle = motiveById(player.storyMotive).title;
   // ⚠ OTA-1088 — THE SECOND PLACE A PHASE 3 DECISION LANDS, and the permanent
   // one. The motive epilogue above still closes the arc — that is what the

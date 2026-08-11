@@ -24440,17 +24440,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const dripMod = require('../engine/storyDrip') as typeof import('../engine/storyDrip');
       const pWalk = get().player;
-      if (pWalk && dripMod.isMissingWalker(enemy)) {
-        const person = dripMod.missingPersonName(dripMod.storySeed(pWalk));
-        const res = dripMod.missingResolution('walker', person);
+      const bossTag = dripMod.motiveBossFromEnemy(enemy);
+      if (pWalk && bossTag) {
+        const person = dripMod.motiveFigureName(bossTag.motive, dripMod.storySeed(pWalk));
+        const res = dripMod.resolutionBlock(bossTag.motive, bossTag.kind, person);
         for (const line of res.defeat ?? []) get().appendLog(line.speaker, line.text);
         const keep: InventoryItem = {
           id: freshInstanceId('story_keepsake'),
           name: res.keepsake.name, kind: 'relic', rarity: 'Legendary', quantity: 1,
           tags: ['quest', 'story', 'keepsake'], description: res.keepsake.description,
         };
-        set((s2) => (s2.player ? { player: { ...s2.player, missingResolved: 'walker', inventory: mergeOrPushItem(s2.player.inventory, keep) } } : s2));
-        get().appendLog('reward', `✦ ${keep.name} — it was theirs the whole time. Yours now to carry home.`);
+        set((s2) => (s2.player ? { player: {
+          ...s2.player,
+          motiveResolved: bossTag.kind,
+          ...(bossTag.motive === 'missing' ? { missingResolved: bossTag.kind } : {}),
+          inventory: mergeOrPushItem(s2.player.inventory, keep),
+        } } : s2));
+        get().appendLog('reward', `✦ ${keep.name} — carried out of the dark, and yours now.`);
       }
     }
     // OTA-1014 — putting a revenant to rest is a mercy, never a hunt. Guarded by
@@ -35676,16 +35682,20 @@ function advanceStoryDrip(
   // NOTHING — resolution + keepsake land in the defeat hook, so a fled
   // fight re-offers the walker at the next Capital instead of losing the
   // ending forever (same retry semantics as the Hollowed).
-  if (drip.missingResolutionDue(player) && mq.LOST_CAPITAL_LOCATIONS.includes(arrivedAt)) {
+  if (drip.resolutionDue(player) && mq.LOST_CAPITAL_LOCATIONS.includes(arrivedAt)) {
     const seed = drip.storySeed(player);
-    const person = drip.missingPersonName(seed);
-    const kind = drip.missingResolutionFor(seed);
-    const res = drip.missingResolution(kind, person);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const storyMod = require('../engine/story') as typeof import('../engine/story');
+    const motiveId = storyMod.motiveById(player.storyMotive).id;
+    const person = drip.motiveFigureName(motiveId, seed);
+    const kind = drip.resolutionKindFor(motiveId, seed);
+    const res = drip.resolutionBlock(motiveId, kind, person);
+    const bossKind = drip.bossKindFor(motiveId);
     // OTA-1074 — the end of The Missing's trail is the single biggest story
     // moment a character reaches; it must not scroll past as scenery.
     for (const line of res.arrival) get().appendLog(line.speaker, line.text, { ...STORY_BEAT_META });
-    if (kind === 'walker') {
-      const foe = drip.missingWalkerEnemy(player.hpMax, person);
+    if (kind === bossKind) {
+      const foe = drip.resolutionBossEnemy(motiveId, player.hpMax, person);
       const scene = get().currentScene;
       if (scene) {
         set({
@@ -35706,10 +35716,17 @@ function advanceStoryDrip(
         name: res.keepsake.name, kind: 'relic', rarity: 'Legendary', quantity: 1,
         tags: ['quest', 'story', 'keepsake'], description: res.keepsake.description,
       };
-      set({ player: { ...cur, missingResolved: kind, inventory: mergeOrPushItem(cur.inventory, keep) } });
+      set({ player: {
+        ...cur,
+        motiveResolved: kind,
+        // Mirror the original field for the Missing motive so every pre-OTA-1246
+        // reader (and its suite) keeps seeing what it always saw.
+        ...(motiveId === 'missing' ? { missingResolved: kind } : {}),
+        inventory: mergeOrPushItem(cur.inventory, keep),
+      } });
       get().appendLog('reward', `✦ ${keep.name} — ${keep.description}`);
     }
-    get().appendLog('debug', `story: missing resolution '${kind}' fired at ${arrivedAt}`);
+    get().appendLog('debug', `story: ${motiveId} resolution '${kind}' fired at ${arrivedAt}`);
     return;
   }
   const beat = drip.nextDripBeat(player);

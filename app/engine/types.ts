@@ -1110,6 +1110,13 @@ export interface PlayerCharacter {
    *  ('grave' | 'lie' | 'walker'), set when the resolution fires. Also keys
    *  the EndingScreen epilogue override. Absent = trail still open. */
   missingResolved?: string;
+  /** ⚠ OTA-1246 — how THIS character's motive answered itself, for all five
+   *  reasons ('settled'/'collector'/'pardon'/'choir'/'censor'/…). Set when the
+   *  resolution fires; keys the EndingScreen epilogue override. Absent = the
+   *  question is still open, and the open-question epilogue still reads true.
+   *  `missingResolved` above stays authoritative for the Missing motive so a
+   *  save that finished that trail before this OTA needs no migration. */
+  motiveResolved?: string;
   stats: Stats;
   hp: number;
   hpMax: number;
