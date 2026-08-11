@@ -605,8 +605,14 @@ function advanceStagesOnIntent(
         (!inCombat && next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
         (next.checkKind === 'escape' && intent === 'escape') ||
         (!inCombat && next.checkKind === 'cast' && intent === 'cast') ||
-        (next.checkKind === 'attack_provoke' && intent === 'attack') ||
-        (next.checkKind === 'boss' && intent === 'attack')
+        // ⚠⚠ OTA-1217 — the attack rows are OUT-OF-COMBAT DELIBERATE ACTIONS
+        // too (escape alone stays in-combat: fleeing IS combat). Without the
+        // guard, the frozen apex stage (OTA-796) re-matched on EVERY swing of
+        // the boss fight itself — each attack re-ran advanceHunt, which
+        // re-spawned the boss at FULL HP, reset the range, and re-logged the
+        // apex narration. The fight literally could not be won.
+        (!inCombat && next.checkKind === 'attack_provoke' && intent === 'attack') ||
+        (!inCombat && next.checkKind === 'boss' && intent === 'attack')
       );
     });
   if (huntMatch && huntMatch.def) {
