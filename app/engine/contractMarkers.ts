@@ -54,6 +54,13 @@ export interface ContractMarker {
   number: number;
 }
 
+/** OTA-1236 — THE hunt's anchor, exported: the same tile the card's "You're at",
+ *  the atlas pin, and (new) the stage-advancement gate all read. One spelling of
+ *  "where this hunt happens" — the gate and the pin can never disagree. */
+export function huntAnchorId(def: { biomeTag?: string; factionId?: string | null }): string {
+  return (def.biomeTag ? BIOME_ANCHOR[def.biomeTag] : undefined) ?? anchorForFaction(def.factionId);
+}
+
 function anchorForFaction(factionId: string | null | undefined): string {
   if (!factionId) return NEUTRAL_ANCHOR;
   try {
@@ -79,8 +86,7 @@ export function openContractMarkers(player: PlayerCharacter | null | undefined):
   for (const h of player.activeHunts ?? []) {
     const def = findHuntById(h.id);
     if (!def) continue;
-    const anchor = BIOME_ANCHOR[def.biomeTag] ?? anchorForFaction(def.factionId);
-    add('hunt', h.id, def.title, anchor);
+    add('hunt', h.id, def.title, huntAnchorId(def));
   }
   for (const m of player.activeMysteries ?? []) {
     const def = findMysteryById(m.id);
