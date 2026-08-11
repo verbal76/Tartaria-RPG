@@ -352,6 +352,7 @@ import {
   availableHunts,
   fuzzyFindHunt,
   scaleHuntBoss,
+  firstActionableHuntStage,
 } from '../engine/hunts';
 import {
   MYSTERIES,
@@ -3079,6 +3080,24 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   if (!out.dead && (out.hp ?? 0) <= 0) {
     const safeMax = out.hpMax && out.hpMax > 0 ? out.hpMax : 1;
     out = { ...out, hp: safeMax, stamina: out.staminaMax ?? out.stamina ?? 0 };
+  }
+  // ⚠⚠ OTA-1242 — heal hunts wedged on a pure-narration stage. The OTA-1236
+  // verb matcher can never match a null checkKind, and hunts (unlike mysteries
+  // and storylines, OTA-871) never auto-consumed narration stages — so every
+  // hunt accepted after 1236 sat at stage 0 with NO verb able to move it.
+  // Accept now starts past leading nulls; this pass moves the records already
+  // stuck on one (their narration played at accept, nothing is skipped).
+  if (out.activeHunts?.some((h) => findHuntById(h.id)?.stages[h.stage]?.checkKind === null)) {
+    out = {
+      ...out,
+      activeHunts: out.activeHunts.map((h) => {
+        const def = findHuntById(h.id);
+        if (!def) return h;
+        let st = h.stage;
+        while (st < def.stages.length && def.stages[st]!.checkKind === null) st++;
+        return st !== h.stage ? { ...h, stage: st } : h;
+      }),
+    };
   }
   // OTA-991 — 'Skyreacher Chart (N of 5)' became 'Skyreacher Map N of 5 — <tower>'.
   // Rename legacy charts sitting in old saves so the catalog row — and with it
@@ -26568,7 +26587,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ...s.player,
             activeHunts: [
               ...(s.player.activeHunts ?? []),
-              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked, ...acceptCellStamp(get) },
+              { id: neutralMatch.id, stage: firstActionableHuntStage(neutralMatch), postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked, ...acceptCellStamp(get) },
             ],
           },
         } : s));
@@ -26656,7 +26675,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...s.player,
               activeHunts: [
                 ...(s.player.activeHunts ?? []),
-                { id: hunt.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: huntTracked, ...acceptCellStamp(get) },
+                { id: hunt.id, stage: firstActionableHuntStage(hunt), postedByFaction: factionId, acceptedAt: Date.now(), tracked: huntTracked, ...acceptCellStamp(get) },
               ],
             },
           }
@@ -26802,13 +26821,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
     if (!freezeForKill) {
+      // ⚠ OTA-1242 — auto-consume pure-narration (checkKind: null) stages, the
+      // OTA-871 loop mysteries and storylines always had and hunts never got.
+      // No hunt authors a mid-chain null today, but the day one does, a stage
+      // no verb can match must not wedge the chain (that is exactly how every
+      // freshly-accepted hunt got stuck at stage 0 until this OTA).
+      let nextStage = record.stage + 1;
+      while (nextStage < hunt.stages.length && hunt.stages[nextStage]!.checkKind === null) {
+        const epi = hunt.stages[nextStage]!;
+        get().appendLog('world', epi.narration);
+        if (epi.arbiter) get().appendLog('arbiter', epi.arbiter);
+        nextStage++;
+      }
       set((s) =>
         s.player
           ? {
               player: {
                 ...s.player,
                 activeHunts: (s.player.activeHunts ?? []).map((h) =>
-                  h.id === huntId ? { ...h, stage: h.stage + 1 } : h,
+                  h.id === huntId ? { ...h, stage: nextStage } : h,
                 ),
               },
             }

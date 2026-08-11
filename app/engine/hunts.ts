@@ -188,6 +188,20 @@ export function findHuntById(id: string): HuntDef | null {
   return HUNTS.find((h) => h.id === id) ?? null;
 }
 
+/** ⚠⚠ OTA-1242 — THE FIRST STAGE A VERB CAN PAY. Every hunt opens on a
+ *  pure-narration stage (checkKind: null) whose text plays at ACCEPT — but the
+ *  record used to START at that index, and the OTA-1236 verb matcher can never
+ *  match a null kind. Mysteries and storylines auto-consume narration stages
+ *  (OTA-871); hunts never got that loop, so every hunt accepted after 1236 was
+ *  wedged at stage 0 forever — no verb, no dice, nothing could move it. The
+ *  hunt walker found it on its first step. Accept starts the record HERE, and
+ *  advanceHunt + the save backfill consume any nulls mid-chain. */
+export function firstActionableHuntStage(hunt: Pick<HuntDef, 'stages'>): number {
+  let i = 0;
+  while (i < hunt.stages.length && hunt.stages[i]!.checkKind === null) i++;
+  return i;
+}
+
 // Available to a player from a given vendor or in general. Filters by
 // faction (vendors aligned with a faction only post their own hunts —
 // hunts with factionId=null are open contracts anyone can offer),
