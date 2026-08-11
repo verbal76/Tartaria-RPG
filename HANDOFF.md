@@ -1676,8 +1676,7 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE POSTER IS THE GATE (2026-08-11, latest). HAL ONLY so far — golem
-  batch pending.** HAL OTA-1241. The owner's "map locations mismatch": 15 of 18
+- **⚠⚠ THE POSTER IS THE GATE (2026-08-11, latest). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1241. The owner's "map locations mismatch": 15 of 18
   hunt posters name a real atlas location while the anchor sat on the generic
   biome cell — walking to the named place earned the "Not here" refusal.
   `huntAnchorId` now resolves the poster's named place first (alias-aware,
