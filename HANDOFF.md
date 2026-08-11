@@ -1644,7 +1644,20 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE FOURTH DOOR — GAP 2 CLOSED (2026-08-11, latest). HAL + GOLEM.** HAL
+- **⚠⚠ THE MAIN QUEST WALKER (2026-08-11, latest). HAL + GOLEM.** Test-only
+  (golem suite ota1226MainQuestWalker / HAL ota1249, no version bump — it
+  found NO defect, which is the headline: the spine is sound). The one road no
+  walker had walked: creation → hook → revelation → nine Core Guardians →
+  descent → Nexus → ending. Walked for ALL NINE factions (motives rotated),
+  81 Guardian kills through the real dice via ★ SUMMON, Core granted as a
+  real item each time, all FOUR endings chosen and recorded (STAY on
+  kin-seeded runs, Reckoning asserted). ⚠ "RUN CHUCK NORRIS" IS NOW SIX
+  SUITES:
+  `npx jest ota1219HuntWalker ota1220MysteryStorylineWalker ota1221LeadsBountiesWalker ota1222ClimbsWhispersWalker ota1226MainQuestWalker --forceExit`
+  (golem names; HAL twins 1242/1243/1244/1245/1249). The game is PROVEN
+  completable, nine ways in, four ways out.
+
+- **⚠⚠ THE FOURTH DOOR — GAP 2 CLOSED (2026-08-11). HAL + GOLEM.** HAL
   OTA-1248 / golem OTA-1225. The ending choice read nothing the player did.
   Now: **STAY**, an EARNED fourth ending (you don't walk out — you mind the
   Engine, and the Arbiter finally says thank you and goes quiet), 9 faction
