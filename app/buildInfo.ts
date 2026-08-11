@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.146';
+export const DISPLAY_VERSION = '4.29.147';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23383,7 +23383,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // accepted by that device; a fresh install was what broke the loop.
 // New suite ota1174BugReportLoads (10 tests).
 // DISPLAY_VERSION 4.29.107.
-export const OTA_BUILD_ID = '2026-08-11-1217-apex-respawn-guard';
+export const OTA_BUILD_ID = '2026-08-11-1218-poster-is-the-gate';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1217-apex-respawn-guard';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1215-burst-guard';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1214-leads-complete';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1213-stage-triggers-work';

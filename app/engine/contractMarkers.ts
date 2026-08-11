@@ -19,6 +19,7 @@
 
 import type { PlayerCharacter } from './types';
 import { canonicalCellOf } from './worldMap';
+import locationsData from '../data/locations/locations.json';
 import { findHuntById } from './hunts';
 import { findMysteryById } from './mysteries';
 import { findStorylineById } from './factionStorylines';
@@ -54,11 +55,56 @@ export interface ContractMarker {
   number: number;
 }
 
+/** ⚠⚠ OTA-1218 — THE POSTER STOPS LYING ABOUT THE MAP. 15 of 18 hunts NAME a
+ *  real, walkable location on their poster ("Drakova", "Yuldra-Tul", "the
+ *  Obsidian Pillars"...) while the anchor sat at the generic BIOME cell — a
+ *  player who read the poster and walked to the named place got the "Not here"
+ *  refusal, and SET COURSE routed them somewhere else entirely. The named place
+ *  IS the hunt's ground now: strip the poster's parenthetical flavor, resolve
+ *  the name (or an alias) against the static atlas, and only a pure-flavor name
+ *  ("the Sentinel Ward (inner archive)") falls back to the biome anchor. Static
+ *  locations only, by construction — a hunt poster cannot name a place that is
+ *  born at runtime. */
+let _posterIndex: Map<string, string> | null = null;
+function posterLocationIndex(): Map<string, string> {
+  if (!_posterIndex) {
+    const raw = locationsData as unknown as
+      | { locations: Array<{ id: string; name: string; aliases?: string[] }> }
+      | Array<{ id: string; name: string; aliases?: string[] }>;
+    const list = Array.isArray(raw) ? raw : raw.locations;
+    const idx = new Map<string, string>();
+    for (const l of list) {
+      idx.set(l.name.toLowerCase(), l.id);
+      for (const a of l.aliases ?? []) idx.set(a.toLowerCase(), l.id);
+    }
+    _posterIndex = idx;
+  }
+  return _posterIndex;
+}
+
+/** The location a hunt poster actually names, if it names one at all. */
+export function resolvePosterLocation(targetLocationName: string | null | undefined): string | undefined {
+  if (!targetLocationName) return undefined;
+  const cleaned = targetLocationName.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+  if (!cleaned) return undefined;
+  const idx = posterLocationIndex();
+  return idx.get(cleaned) ?? idx.get(cleaned.replace(/^the\s+/, '')) ?? idx.get(`the ${cleaned}`);
+}
+
 /** OTA-1213 — THE hunt's anchor, exported: the same tile the card's "You're at",
- *  the atlas pin, and (new) the stage-advancement gate all read. One spelling of
- *  "where this hunt happens" — the gate and the pin can never disagree. */
-export function huntAnchorId(def: { biomeTag?: string; factionId?: string | null }): string {
-  return (def.biomeTag ? BIOME_ANCHOR[def.biomeTag] : undefined) ?? anchorForFaction(def.factionId);
+ *  the atlas pin, and the stage-advancement gate all read. One spelling of
+ *  "where this hunt happens" — the gate and the pin can never disagree.
+ *  OTA-1218 — and that one spelling now honors the place the POSTER names. */
+export function huntAnchorId(def: {
+  biomeTag?: string;
+  factionId?: string | null;
+  targetLocationName?: string | null;
+}): string {
+  return (
+    resolvePosterLocation(def.targetLocationName) ??
+    (def.biomeTag ? BIOME_ANCHOR[def.biomeTag] : undefined) ??
+    anchorForFaction(def.factionId)
+  );
 }
 
 function anchorForFaction(factionId: string | null | undefined): string {
