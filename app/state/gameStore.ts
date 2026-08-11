@@ -124,7 +124,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { AppState } from 'react-native'; // OTA-1055 — foreground hook for the Qwen watchdog
+import { AppState, Platform } from 'react-native'; // OTA-1055 — foreground hook for the Qwen watchdog; OTA-1251 — desktop guard
 import { stripForeignWords, repairGluedNarration, looksLikeInstructionEcho, isSecondPersonActionOpener } from '../engine/foreignText';
 import { sentenceNamesOffCanonEntity, buildEntityAllowList, normalizeEntity } from '../engine/entityGuard';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -2280,6 +2280,17 @@ function startQwenWatchdog(
   get: () => GameStore,
   set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
 ): void {
+  // ⚠ OTA-1251 — NOT ON DESKTOP. The watchdog exists to revive a Qwen context that
+  // Android's OOM killer reclaimed; on web there is no context to revive, because
+  // llama.rn is a native module that does not exist in the bundle. So it re-tried a
+  // load that cannot ever succeed, on a timer, forever. From the owner's PC log:
+  //     qwen-watchdog: Qwen not ready (status='failed'); reinitializing (attempt #2).
+  //     qwen-watchdog: reinit #2 settled in 18ms → status='failed'.
+  //     ...#3 ...#4 ...#5 — backing off ... #6 — backing off ...
+  // and then the backoff RESET to attempt #1 on the next foreground, so it never
+  // stopped. 16 lines of a 4.4k-character bug report were this loop talking to
+  // itself, which is the real cost: it buries the report the owner actually sent.
+  if (Platform.OS === 'web') return;
   if (qwenWatchdogTimer !== null) {
     clearTimeout(qwenWatchdogTimer);
     qwenWatchdogTimer = null;

@@ -1446,7 +1446,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1250`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1251`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1456,7 +1456,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.155**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.156**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1676,7 +1676,36 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE PC COLUMN + UI SCALE (2026-08-11, latest). HAL ONLY so far — golem
+- **⚠⚠ THE DESKTOP FIRST RUN THAT NEVER FINISHED (2026-08-11, latest). HAL ONLY
+  so far — golem batch pending.** HAL OTA-1251. Owner, on the PC build: *"the
+  arbiter first time setup has frozen... hanging at 51%."* Not slow — stuck, and
+  51% was a permanent number. **⚠ MEASURED BEFORE IT WAS CHANGED**: the same web
+  bundle exported and driven headless in Chromium, sampled at 8/20/35s, returned
+  `{stage:"qwen:failed", kokoro:{"phase":"loading"}, exec:"true"}` every time —
+  and the owner's copied PC diagnostic agreed (`Platform: web · Boot stage:
+  qwen:failed`). Three desktop-only faults meeting at one number:
+  (1) **the freeze** — Kokoro's ExecuTorch prewarm ran on web, where
+  `TextToSpeechModule.fromModelName` EXISTS (so the old guard passed) but never
+  resolves NOR rejects, so nothing could catch it; guarded now at both entry
+  points, left on `'idle'` rather than faked `'ready'`/`'error'` because
+  `speak()` gates on `phase !== 'error'` and the ONNX desktop voice route must
+  stay open. (2) **the Qwen watchdog** re-tried a native module that cannot
+  exist on desktop, forever, resetting its backoff on every foreground — 16
+  lines of a 4.4k-char bug report were the loop talking to itself. (3) **the bar
+  arithmetic** scored a settled `'failed'`/`'skipped'` Qwen as 0.1 instead of 1;
+  `(0.10 + 0.92)/2 = 0.51`. That math moved OUT of inline JSX into
+  `app/ui/modelBootProgress.ts` so a test can reach it — inline JSX math is
+  untestable math, which is how this shipped. Same pass: `KeyboardInputBar` no
+  longer mounts on a machine with no soft keyboard (it positions in device-pixel
+  space outside the centred column BY DESIGN, so on desktop it spanned a 2259px
+  window), and the title marker reads **⟁ STEAM BETA BUILD** on web
+  (`Application.applicationId` is empty on desktop, so every id test fell
+  through to the phone label). ⚠ Every guard is `Platform.OS === 'web'` — inert
+  on HAL, and jest-expo runs NATIVE so the suite executes with them all switched
+  off. New suite ota1251DesktopFirstRun (11). Full story: the VERSION.md
+  4.29.156 row.
+
+- **⚠⚠ THE PC COLUMN + UI SCALE (2026-08-11). HAL ONLY so far — golem
   batch pending; the DESKTOP half is on steam.** HAL OTA-1250. Five screens
   hard-coded `maxWidth: 600` (a phone assumption nobody revisited at port
   time), so the PC build was a 600px ribbon in a maximized window. All five now
