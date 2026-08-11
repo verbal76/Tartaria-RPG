@@ -4338,6 +4338,24 @@ function maybeSpawnRaid(
   const last = s.worldMemory.lastRaidHour;
   if (last !== undefined && hour - last < RAID_MIN_HOURS) return;
   if (Math.random() > RAID_TRIGGER_CHANCE) return;
+  // ⚠ OTA-1212 — SACRED GROUND HOLDS THE BLADE. Owner, after a war party killed
+  // Verbal at the Hidden Market: "sacred tartarian ground... like holy ground on
+  // the Highlander and the Continental in John Wick." Checked AFTER the trigger
+  // roll on purpose: the line below narrates only when a raid genuinely would
+  // have landed, so the truce is something the player occasionally SEES working
+  // rather than a silent rule. No lastRaidHour stamp — the grudge is not spent,
+  // it waits for the road outside.
+  {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isSacredGround } = require('../engine/sacredGround') as typeof import('../engine/sacredGround');
+    if (isSacredGround(scene.location)) {
+      get().appendLog(
+        'world',
+        'Steel glints out past the stalls — and stays there. The Market\'s truce is older than any grudge; whoever wants you settles for watching you trade.',
+      );
+      return;
+    }
+  }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -10176,8 +10194,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // any tile — a swamp crab on arrival then SUPPRESSED the market building
     // (below), so the player stood in "The Hidden Market" with no market. A
     // 'market'-tagged location is a safe trade ground; never spawn a fight there.
-    const isNeutralMarket = location.id === 'hidden_market'
-      || (location.tags ?? []).some((t) => String(t).toLowerCase() === 'market');
+    // OTA-1212 — one spelling for the truce (engine/sacredGround.ts).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const isNeutralMarket = (require('../engine/sacredGround') as typeof import('../engine/sacredGround')).isSacredGround(location);
     // OTA-801 — post-boss grace window. A boss kill stamps player.
     // bossDefeatGraceUntilHours (resolveEnemyDefeat); while it holds, arrival
     // encounters are suppressed so stepping out of the outpost you just cleared
@@ -14778,9 +14797,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // these; this closes the investigate-ambush loophole that let a leech
         // spring on the player mid-trade at The Hidden Market.
         const ambushLoc = currentScene?.location;
+        // OTA-1212 — one spelling for the truce (engine/sacredGround.ts).
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const inSafeZone = isHubLocation(ambushLoc?.id)
-          || ambushLoc?.id === 'hidden_market'
-          || (ambushLoc?.tags ?? []).some((t) => String(t).toLowerCase() === 'market');
+          || (require('../engine/sacredGround') as typeof import('../engine/sacredGround')).isSacredGround(ambushLoc);
         if (
           currentScene.enemies.length === 0
           && !get().pendingRolls
@@ -17029,7 +17049,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // "capital" / "buried") so the picker biases toward city-
           // flavor archetypes when the player is in a Capital tile.
           const restInSafeZone = restLoc ? isHubLocation(restLoc.id) : !!player.hubRoomId;
-          const restAmbushBase = restInSafeZone ? 0.08 : 0.22;
+          // OTA-1212 — sacred ground (the Market truce) rolls ZERO, not the hub's
+          // 8%: a hub is a city with alleys, the Market is the Continental.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { isSacredGround: restSacred } = require('../engine/sacredGround') as typeof import('../engine/sacredGround');
+          const restAmbushBase = restSacred(restLoc) ? 0 : restInSafeZone ? 0.08 : 0.22;
           const restAmbushChance = restAmbushBase * rateMultRest(player.hoursElapsed);
           const restAmbush = Math.random() < restAmbushChance;
           const hours = 8;

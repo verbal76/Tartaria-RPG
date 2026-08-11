@@ -126,7 +126,8 @@ describe('OTA-1112 — wired at the one site that had the hardcoded string', () 
   });
 
   it('the ambush RATE is untouched — this was never a rate fix', () => {
-    expect(store).toContain('const restAmbushBase = restInSafeZone ? 0.08 : 0.22;');
+    expect(store).toContain(// OTA-1212 prepended the sacred-ground zero; the 8%/22% this pin protects are intact.
+    'const restAmbushBase = restSacred(restLoc) ? 0 : restInSafeZone ? 0.08 : 0.22;');
   });
 
   it('the module records WHY it is authored rather than generated', () => {
