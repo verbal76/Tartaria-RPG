@@ -115,7 +115,7 @@ export function EndingScreen() {
   const allCoresInOrder = LOST_CAPITAL_LOCATIONS.filter((c) => coresInOrder.includes(c));
 
   const endingLabel = ending.toUpperCase();
-  const endingColor = ending === 'seal' ? '#5a6b8a' : ending === 'unleash' ? '#a85a3a' : '#7a8a5a';
+  const endingColor = ending === 'seal' ? '#5a6b8a' : ending === 'unleash' ? '#a85a3a' : ending === 'stay' ? '#8a7a5a' : '#7a8a5a';
   // OTA-1043 — the per-motive epilogue: how THIS ending answers the reason
   // this character came down (the OTA-1041 story motive). Rendered under the
   // faction ending prose so the run closes on the personal thread, not just
