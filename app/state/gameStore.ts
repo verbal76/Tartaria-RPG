@@ -570,6 +570,16 @@ function resolveLeadCompletion(
  *  No dice anywhere in it: the stage IS the content, and a die that can only
  *  delay or hide content earns nothing (the OTA-053 auto-advance note already
  *  said stages with no check are narration; now the check is the VERB). */
+/** ⚠⚠ OTA-1215 — THE BURST GUARD. INVESTIGATE ALL fires one submit per chip in
+ *  a single loop WITHOUT awaiting, so every submit's synchronous prefix — including
+ *  advanceStagesOnIntent — runs before the first queued advance lands. On the
+ *  owner's device, three chips meant three matches against the SAME stage and a
+ *  3-stage jump: the diplomacy beat skipped and the mid-hunt boss spawned into the
+ *  marsh unannounced ("I hit it and was confronted with the Bog dragon"). One
+ *  advance may be in flight per mission at a time; the burst's extras are dropped,
+ *  and the next real action re-reads the fresh stage. */
+const stageAdvancesInFlight = new Set<string>();
+
 function advanceStagesOnIntent(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -602,7 +612,13 @@ function advanceStagesOnIntent(
   if (huntMatch && huntMatch.def) {
     const anchor = huntAnchorId(huntMatch.def);
     if (player.currentLocationId === anchor) {
-      void Promise.resolve().then(() => get().advanceHunt(huntMatch.rec.id));
+      const flightKey = `hunt:${huntMatch.rec.id}`;
+      if (!stageAdvancesInFlight.has(flightKey)) {
+        stageAdvancesInFlight.add(flightKey);
+        void Promise.resolve().then(() => {
+          try { get().advanceHunt(huntMatch.rec.id); } finally { stageAdvancesInFlight.delete(flightKey); }
+        });
+      }
     } else if (!inCombat) {
       // The verb matched, the ground didn't — say so instead of the old silence.
       // Throttled: skip if the same line is already in the recent log.
@@ -629,7 +645,13 @@ function advanceStagesOnIntent(
       );
     });
   if (mysteryMatch && !inCombat) {
-    void Promise.resolve().then(() => get().advanceMystery(mysteryMatch.rec.id));
+    const flightKey = `mystery:${mysteryMatch.rec.id}`;
+    if (!stageAdvancesInFlight.has(flightKey)) {
+      stageAdvancesInFlight.add(flightKey);
+      void Promise.resolve().then(() => {
+        try { get().advanceMystery(mysteryMatch.rec.id); } finally { stageAdvancesInFlight.delete(flightKey); }
+      });
+    }
   }
 
   const storyMatch = (player.activeStorylines ?? [])
@@ -650,7 +672,13 @@ function advanceStagesOnIntent(
       );
     });
   if (storyMatch && !inCombat) {
-    void Promise.resolve().then(() => get().advanceStoryline(storyMatch.rec.id));
+    const flightKey = `storyline:${storyMatch.rec.id}`;
+    if (!stageAdvancesInFlight.has(flightKey)) {
+      stageAdvancesInFlight.add(flightKey);
+      void Promise.resolve().then(() => {
+        try { get().advanceStoryline(storyMatch.rec.id); } finally { stageAdvancesInFlight.delete(flightKey); }
+      });
+    }
   }
 
   // ⚠⚠ OTA-1214 — LEADS. At the lead's own pinned location, the objective's
