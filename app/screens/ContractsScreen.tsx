@@ -32,6 +32,7 @@ import {
   phaseHint,
   LOST_CAPITAL_LOCATIONS,
   coreGateNextAction,
+  canStayAtTheNexus, // OTA-1248 — the earned fourth door
 } from '../engine/mainQuest';
 import { GUARDIANS_BY_CAPITAL } from '../engine/coreGuardians';
 
@@ -548,6 +549,8 @@ export function ContractsScreen() {
         // they've attempted, and which Capitals are still untouched.
         if (!player) return null;
         const mq = ensureMainQuest(player.mainQuest);
+        // OTA-1248 — asked once per render, at the same place the phase is read.
+        const canStay = canStayAtTheNexus(player, worldMemory);
         const recoveredCount = mq.coresRecovered.length;
         const fledByCapital = (worldMemory.memorableEvents ?? []).reduce<Record<string, number>>(
           (acc, e) => {
@@ -740,6 +743,20 @@ export function ContractsScreen() {
                 >
                   <Text style={styles.mainQuestChoiceText}>PRESERVE</Text>
                 </TouchableOpacity>
+                {/* ⚠⚠ OTA-1248 — THE EARNED FOURTH. Rendered only when the run
+                    earned it, and NEVER as a disabled or greyed row: a player
+                    who has not earned STAY must not be shown a door they cannot
+                    open. The three above are unconditional and always will be. */}
+                {canStay && (
+                  <TouchableOpacity
+                    style={[styles.mainQuestChoiceBtn, { borderColor: '#8a7a5a' }]}
+                    onPress={() => useGameStore.getState().chooseEndingMainQuest('stay')}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                  >
+                    <Text style={styles.mainQuestChoiceText}>STAY</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             )}
             {mq.phase === 'ended' && mq.ending && (

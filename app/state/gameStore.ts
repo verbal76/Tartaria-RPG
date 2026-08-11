@@ -7537,7 +7537,7 @@ interface GameStore {
 
   /** v2.4.1 (OTA 033) — make The Choice at the Mud Flood Nexus.
    *  Only valid when mainQuest.phase === 'choice'. Final. */
-  chooseEndingMainQuest: (ending: 'seal' | 'unleash' | 'preserve') => void;
+  chooseEndingMainQuest: (ending: 'seal' | 'unleash' | 'preserve' | 'stay') => void;
 
   /** OTA-148 — Contracts-screen SUMMON button handler. When the
    *  player is standing in a Lost Capital whose Core they haven't
@@ -33400,9 +33400,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // v2.4.1 (OTA 033) — Mud Flood Nexus main quest action: the player
   // makes The Choice from the Contracts screen. Ending must be one
   // of 'seal' | 'unleash' | 'preserve'; the choice is final.
-  chooseEndingMainQuest(ending: 'seal' | 'unleash' | 'preserve') {
+  chooseEndingMainQuest(ending: 'seal' | 'unleash' | 'preserve' | 'stay') {
     const player = get().player;
     if (!player) return;
+    // ⚠⚠ OTA-1248 — THE ENGINE IS THE RULE, THE UI IS A COURTESY. The fourth
+    // door is re-checked here, at the one place an ending is actually recorded,
+    // so a stale screen, a replayed tap or anything reaching this action by
+    // another route cannot hand out an ending the run did not earn. The three
+    // base endings are never checked against anything — they belong to every
+    // character who reaches this chamber, and always will.
+    if (ending === 'stay') {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mqStay = require('../engine/mainQuest') as typeof import('../engine/mainQuest');
+      if (!mqStay.canStayAtTheNexus(player, get().worldMemory)) {
+        get().appendLog('arbiter', 'The Arbiter does not answer. Whatever you were reaching for is not there — and the three that are yours are still yours. Choose one of them.');
+        return;
+      }
+    }
     triggerMainQuest(get, set, { kind: 'chose_ending', ending });
     // v2.4.1 (OTA 040) — navigate to the ending splash.
     set({ currentScreen: 'ending' });
@@ -35527,7 +35541,7 @@ type MainQuestTrigger =
   | { kind: 'first_capital_visit'; locationId: string }
   | { kind: 'core_recovered'; locationId: string }
   | { kind: 'reached_nexus' }
-  | { kind: 'chose_ending'; ending: 'seal' | 'unleash' | 'preserve' };
+  | { kind: 'chose_ending'; ending: 'seal' | 'unleash' | 'preserve' | 'stay' };
 
 function triggerMainQuest(
   get: () => GameStore,
@@ -35649,9 +35663,17 @@ function triggerMainQuest(
   // entries so the feed reads as paragraphs. The choice buttons on
   // ContractsScreen already wire up to chooseEndingMainQuest.
   if (prevState.phase === 'descent' && nextState.phase === 'choice') {
-    const cine = mq.nexusArrivalCinematic();
+    // ⚠⚠ OTA-1248 — the walk-up now knows whether the FOURTH door is open, so a
+    // character who has not earned STAY is never told it exists (an earned door
+    // must not read as a withheld one), and then THE RECKONING plays: the
+    // Arbiter reads the run back before the buttons. It gates nothing.
+    const stayOpen = mq.canStayAtTheNexus(get().player, get().worldMemory);
+    const cine = mq.nexusArrivalCinematic(stayOpen);
     for (const line of cine) {
       get().appendLog('arbiter', line);
+    }
+    for (const line of mq.theReckoning(get().player, get().worldMemory)) {
+      get().appendLog('arbiter', line, { ...STORY_BEAT_META });
     }
   }
 }
