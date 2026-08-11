@@ -1676,8 +1676,7 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE COMPLETIONIST RUN (2026-08-11, latest). HAL ONLY so far — golem
-  batch pending.** Test-only, two new ON-DEMAND sweeps (the "Sweep" in the
+- **⚠⚠ THE COMPLETIONIST RUN (2026-08-11, latest). HAL + GOLEM (batch ran 2026-08-11).** Test-only, two new ON-DEMAND sweeps (the "Sweep" in the
   filenames keeps them out of test:ci:fast, same exclusion as the stress
   sims): `completionistSpineSweep` — the FULL identity cross, 9 factions × 5
   motives × 4 endings = 180 complete games played live, creation to credits
