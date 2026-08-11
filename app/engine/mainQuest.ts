@@ -547,20 +547,39 @@ export function endingLine(ending: MainQuestEnding, factionId: string | undefine
   return CHOICE_LINE_BY_ENDING[ending];
 }
 
-const FACTION_ROUTE_PLACEHOLDER = (factionId: string): string => {
-  const name: Record<string, string> = {
-    reclaimers_guild: "the Reclaimers' salvage route",
-    forgotten_order: "the Forgotten Order's scholarship route",
-    mud_monarchs: "the Mud Monarchs' claim-by-blood route",
-    true_tartarians: "the True Tartarians' reverent route",
-    eternal_dynasty: "the Eternal Dynasty's lineage route",
-    conspiracy_architects: "the Conspiracy Architects' infiltration route",
-    servants_of_giants: "the Servants' vigil route",
-    stone_builders: "the Stone Builders' Aethercraft route",
-    tartarian_revivalists: "the Revivalists' public-recovery route",
+/** ⚠⚠ OTA-1247 — WAS A DEV NOTE IN THE ARBITER'S VOICE, AND IT WAS WRONG.
+ *  This fallback used to read *"the Reclaimers' salvage route for the Cores is
+ *  being authored in a coming OTA… other factions will get their authored
+ *  variants soon"* — a note-to-self from the week the main quest was first
+ *  built, written in the player-facing register and left in a live switch.
+ *  Two things were true about it by the time it was found: it was UNREACHABLE
+ *  (proved by exhaustion — see ota1247, and the reasoning below), and it had
+ *  become FACTUALLY FALSE, because all nine factions have carried real authored
+ *  Core routes in FACTION_CORE_GATES for a long time. It promised work that was
+ *  already done, in a voice the player trusts, from inside the main story.
+ *
+ *  ⚠ WHY IT COULD NOT FIRE, and why that is not a guarantee: `phase: 'cores'`
+ *  is produced by exactly ONE branch of advanceMainQuest — `core_recovered` —
+ *  and the store's only general caller sets the core context on precisely that
+ *  trigger, so the `if` above this always takes the real line. That is a
+ *  property of today's state machine, not a law. Any future path that lands
+ *  'cores' without a recovery (a save-repair, a debug jump) arms this fallback.
+ *  So it is now an honest in-world line: the worst case is harmless flavour,
+ *  and ota1247 fails the build the day the branch becomes reachable at all. */
+const FACTION_ROUTE_LINE = (factionId: string): string => {
+  const route: Record<string, string> = {
+    reclaimers_guild: 'a trowel and a salvager\'s patience',
+    forgotten_order: 'the binding text, read through',
+    mud_monarchs: 'force or a Monarch\'s address',
+    true_tartarians: 'the asking, and the vigil that follows it',
+    eternal_dynasty: 'the old voice and a proven lineage',
+    conspiracy_architects: 'a back door and nobody watching it',
+    servants_of_giants: 'the silent hour, sat out in full',
+    stone_builders: 'Aethercraft worked against the seat',
+    tartarian_revivalists: 'the recovery, documented for the cell',
   };
-  const route = name[factionId] ?? 'your faction route';
-  return `${route} for the Cores is being authored in a coming OTA. For now, recover each Core however the world lets you — visit each Lost Capital and the engine will register the Core when you carry one back to your hub. The reference route (Reclaimers' salvage) is fully live; other factions will get their authored variants soon.`;
+  const how = route[factionId] ?? 'whatever your own road allows';
+  return `Nine Cores, nine Lost Capitals, and each one comes free by ${how}. Open CONTRACTS and read the Primary Objective — it names the Capital you are owed next, and the act that lifts its Core.`;
 };
 
 /** Pick a variant from a per-faction pool deterministically by a
@@ -601,7 +620,7 @@ export function narrationForPhase(
       if (context?.coreRecovered && context?.coresCount != null) {
         return CORE_RECOVERED_LINE(factionId, context.coreRecovered, context.coresCount);
       }
-      return FACTION_ROUTE_PLACEHOLDER(factionId);
+      return FACTION_ROUTE_LINE(factionId);
     case 'descent':
       return pickFactionVariant(DESCENT_VARIANTS_BY_FACTION, DESCENT_LINE_BY_FACTION, factionId, seed, 'descent');
     case 'nexus':

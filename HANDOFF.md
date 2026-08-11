@@ -1446,7 +1446,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1246`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1247`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1456,7 +1456,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.152**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.153**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1676,8 +1676,20 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ EVERY MOTIVE ENDS SOMEWHERE (2026-08-11, latest). HAL ONLY so far —
-  golem batch pending.** HAL OTA-1246. The owner's arc read found the biggest
+- **⚠⚠ NO DEV NOTES IN THE FEED (2026-08-11, latest). HAL ONLY so far — golem
+  batch pending.** HAL OTA-1247. The main quest's `cores` fallback was a
+  note-to-self from the week it was built — *"being authored in a coming
+  OTA…"* — in the Arbiter's voice, in a live switch, and by now factually
+  false (all nine factions have real Core routes). Unreachable, not
+  unreferenced, which is why no tool ever flagged it. Now honest in-world
+  prose, plus TWO permanent locks: an exhaustion proof (every phase × cores
+  held × trigger, mirroring the store's guards, names the path the day one
+  reaches it) and a content lock across the five story engines forbidding
+  "coming OTA / being authored / placeholder / coming soon / TBD" in any
+  player-facing string. New suite ota1247NoDevNotesInTheFeed. Full story: the
+  VERSION.md 4.29.153 row.
+
+- **⚠⚠ EVERY MOTIVE ENDS SOMEWHERE (2026-08-11). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1246. The owner's arc read found the biggest
   asymmetry in the story: only THE MISSING had an in-world payoff scene; Debt,
   Exile, Calling and Record had beats, forks and an epilogue but no moment
   where the thing you came for is in front of you. Twelve new authored answers
