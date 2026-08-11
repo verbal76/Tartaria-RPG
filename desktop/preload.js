@@ -23,9 +23,20 @@ try {
   });
 } catch { /* window not ready — non-fatal */ }
 
+// OTA-1250 — UI SCALE. The renderer owns its own zoom via webFrame, so this
+// needs no main-process round trip. Clamped here as well as in the game: the
+// bridge is the last line before Electron, and a bad factor makes the window
+// unusable with no way back to Settings.
+const { webFrame } = require('electron');
+
 contextBridge.exposeInMainWorld('tartariaDesktop', {
   isDesktop: true,
   platform: process.platform,
   unlockAchievement: (achievementId) =>
     ipcRenderer.invoke('steam:achievement', achievementId),
+  setZoom: (factor) => {
+    const f = Number(factor);
+    if (!Number.isFinite(f)) return;
+    try { webFrame.setZoomFactor(Math.max(0.5, Math.min(2, f))); } catch { /* non-fatal */ }
+  },
 });

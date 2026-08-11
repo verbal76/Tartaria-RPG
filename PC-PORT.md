@@ -107,3 +107,42 @@ signing only when prepping a standalone release.
 - `desktop/main.js` — Electron main; loads the web build; optional Steam init.
 - `desktop/preload.js` — safe `window.tartariaDesktop` bridge (achievements).
 - `desktop/package.json` — desktop-only npm package (Electron + steamworks.js).
+
+## Display: column width and UI scale (OTA-1250)
+
+Two things the mobile layout got wrong on a monitor, and how they are fixed.
+
+**The column.** Five screens (Exploration, Title, Inventory, Vendor, About)
+hard-coded `maxWidth: 600`. On a phone that is a no-op — phones are narrower.
+On a maximized desktop window it was a 600px ribbon with the rest of the screen
+empty. They now share `CONTENT_MAX_WIDTH` from `app/ui/displayScale.ts`:
+**1024 on web/desktop, 600 on native.** One constant, so the screens cannot
+drift apart; `__tests__/ota1250DisplayScale.test.ts` fails if a screen
+re-introduces a bare 600, and its first assertion is that NATIVE is still 600
+(the guard against the desktop widening leaking onto phones).
+
+**The scale.** Settings → **Display size (S / M / L)**. Deliberately not a
+resolution picker: inside a maximized window the OS owns the resolution.
+S/M/L map to Electron zoom factors 0.85 / 1.0 / 1.25 — medium is 1.0, so the
+default is the game as it always looked.
+
+Wiring, renderer → Electron:
+
+    app/ui/displayScale.ts  setUiScale()
+      → window.tartariaDesktop.setZoom(factor)     [desktop/preload.js]
+        → webFrame.setZoomFactor(clamped 0.5–2.0)
+
+`webFrame` lives in the renderer, so there is no main-process round trip. The
+factor is clamped in the bridge as well as the game — the bridge is the last
+line before Electron, and a bad zoom makes the window unusable with no way back
+to Settings.
+
+⚠ The setting is persisted per install and **re-applied on boot from `App.tsx`**
+(`loadUiScale()`), because Electron does not remember zoom across launches —
+without that, a player on 'large' relaunches small.
+
+⚠ The Settings row **feature-detects the bridge** and is absent entirely on
+mobile and in a plain browser, rather than offering a switch that moves nothing.
+
+⚠ Layout is not covered by the walker fleet — the game engine is untouched by
+all of this, so no walker can observe it. It needs eyes on a real window.
