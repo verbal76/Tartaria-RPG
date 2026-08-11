@@ -514,6 +514,113 @@ function findHeldProcedureText(
   return { item: null, ambiguous: [] };
 }
 
+/** ⚠⚠ OTA-1236 — DETERMINISTIC STAGE TRIGGERS. Owner, stuck on the Bog Dragon at
+ *  stage 2/7 with the card reading "You're at Mud Seas": "I investigated
+ *  everything in the area, I hit investigate when the area was empty, nothing
+ *  is happening... we need to make sure every stage of every mission has a
+ *  working trigger."
+ *
+ *  THE OLD CONTRACT, written out, was indefensible: a stage advanced only when
+ *  the matching verb happened to reach the generic SKILL ROLL (most investigate
+ *  inputs break earlier — chip flavor, already-searched refusals, hooks, empty
+ *  modals) AND the d20 passed (his INT 4 failed most rolls) — and NO input in an
+ *  exhausted tile reaches the roll at all, so the stage was unreachable from
+ *  the exact place the card told him to stand. Silently. And with no location
+ *  gate, a lucky roll advanced "investigate the area" from across the map.
+ *
+ *  THE NEW CONTRACT: performing the stage's verb IS the trigger.
+ *    - Hunts: the verb must be performed AT the hunt's anchor tile — the SAME
+ *      id the card's "You're at" line and the atlas pin read (huntAnchorId).
+ *      At the wrong place, the matching verb draws a throttled routing line
+ *      instead of silence, so the player is never left tapping into a void.
+ *    - Mysteries / storylines: verb alone (their marker anchors are faction
+ *      hubs — turn-in doors, not field sites; gating on them would be wrong).
+ *    - Combat gating unchanged: exploration kinds hold in combat; escape /
+ *      attack_provoke / boss work mid-fight. Kind→intent maps preserved
+ *      verbatim from the old matchers, quirks included.
+ *  No dice anywhere in it: the stage IS the content, and a die that can only
+ *  delay or hide content earns nothing (the OTA-053 auto-advance note already
+ *  said stages with no check are narration; now the check is the VERB). */
+function advanceStagesOnIntent(get: () => GameStore, intent: Intent): void {
+  const player = get().player;
+  const currentScene = get().currentScene;
+  if (!player || !currentScene) return;
+  const inCombat = (currentScene.enemies?.length ?? 0) > 0;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { huntAnchorId } = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
+
+  const huntMatch = (player.activeHunts ?? [])
+    .map((rec) => ({ rec, def: findHuntById(rec.id) }))
+    .find(({ rec, def }) => {
+      if (!def) return false;
+      if (rec.tracked === false) return false; // DEACTIVATED (paused) — frozen
+      const next = def.stages[rec.stage];
+      if (!next) return false;
+      return (
+        (!inCombat && next.checkKind === 'investigate' && intent === 'investigate') ||
+        (!inCombat && next.checkKind === 'stealth' && intent === 'stealth') ||
+        (!inCombat && next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
+        (next.checkKind === 'escape' && intent === 'escape') ||
+        (!inCombat && next.checkKind === 'cast' && intent === 'cast') ||
+        (next.checkKind === 'attack_provoke' && intent === 'attack') ||
+        (next.checkKind === 'boss' && intent === 'attack')
+      );
+    });
+  if (huntMatch && huntMatch.def) {
+    const anchor = huntAnchorId(huntMatch.def);
+    if (player.currentLocationId === anchor) {
+      void Promise.resolve().then(() => get().advanceHunt(huntMatch.rec.id));
+    } else if (!inCombat) {
+      // The verb matched, the ground didn't — say so instead of the old silence.
+      // Throttled: skip if the same line is already in the recent log.
+      const line = `The Arbiter taps the slate. "Not here. ${huntMatch.def.title} points elsewhere — set a course from Contracts and do it there."`;
+      const recent = get().gameLog.slice(-30).some((e) => e.text === line);
+      if (!recent) get().appendLog('arbiter', line);
+    }
+  }
+
+  const mysteryMatch = (player.activeMysteries ?? [])
+    .map((rec) => ({ rec, def: findMysteryById(rec.id) }))
+    .find(({ rec, def }) => {
+      if (!def) return false;
+      if (rec.tracked === false) return false; // DEACTIVATED (paused) — frozen
+      const next = def.stages[rec.stage];
+      if (!next) return false;
+      return (
+        (next.checkKind === 'investigate' && intent === 'investigate') ||
+        (next.checkKind === 'stealth' && intent === 'stealth') ||
+        (next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
+        (next.checkKind === 'escape' && intent === 'escape') ||
+        (next.checkKind === 'cast' && intent === 'cast') ||
+        (next.checkKind === 'boss' && intent === 'investigate')
+      );
+    });
+  if (mysteryMatch && !inCombat) {
+    void Promise.resolve().then(() => get().advanceMystery(mysteryMatch.rec.id));
+  }
+
+  const storyMatch = (player.activeStorylines ?? [])
+    .map((rec) => ({ rec, def: findStorylineById(rec.id) }))
+    .find(({ rec, def }) => {
+      if (!def) return false;
+      if (rec.tracked === false) return false; // DEACTIVATED (paused) — frozen
+      const next = def.stages[rec.stage];
+      if (!next) return false;
+      return (
+        (next.checkKind === 'investigate' && intent === 'investigate') ||
+        (next.checkKind === 'stealth' && intent === 'stealth') ||
+        (next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
+        (next.checkKind === 'escape' && intent === 'escape') ||
+        (next.checkKind === 'cast' && intent === 'cast') ||
+        (next.checkKind === 'attack_provoke' && intent === 'attack') ||
+        (next.checkKind === 'boss' && intent === 'diplomacy')
+      );
+    });
+  if (storyMatch && !inCombat) {
+    void Promise.resolve().then(() => get().advanceStoryline(storyMatch.rec.id));
+  }
+}
+
 /** OTA-1229 — what the torchlight flags as worth investigating in the CURRENT
  *  scene, resolved against this room's own memory (read notes and harvested
  *  perches don't glow). One caller shape for both torch paths — the aimed
@@ -13955,6 +14062,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // ⚠ OTA-1236 — deterministic stage triggers fire on the VERB, at the choke
+    // point every action passes, so no downstream branch (refusal, flavor,
+    // hook, empty modal) can eat a mission beat. See advanceStagesOnIntent.
+    advanceStagesOnIntent(get, parsed.intent);
+
     switch (parsed.intent) {
       case 'attack': {
         // OTA-210/362/429 — tick enemy DOT statuses at the START of the attack
@@ -21808,78 +21920,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
       if (skill.success) {
-        // arb-fix — quest ARRIVAL/exploration stages (investigate/stealth/
-        // diplomacy/escape/cast) must not auto-advance mid-combat: a stealth
-        // check during a fight was advancing an unrelated mystery and dumping its
-        // "you make your way to the Cradle's edge…" arrival scene into the combat
-        // log. Only the hunt's genuine COMBAT stages (attack_provoke / boss) may
-        // advance while enemies are present.
-        const inCombat = (currentScene.enemies?.length ?? 0) > 0;
-        // Hunt advancement: if the player has an active hunt whose next
-        // stage expects this skill intent, advance one stage of the hunt.
-        const huntMatch = (player.activeHunts ?? [])
-          .map((rec) => ({ rec, def: findHuntById(rec.id) }))
-          .find(({ rec, def }) => {
-            if (!def) return false;
-            if (rec.tracked === false) return false; // DEACTIVATED (paused) — frozen
-            const next = def.stages[rec.stage];
-            if (!next) return false;
-            // Map intents to the hunt's expected check kinds. Any of these
-            // intent matches advances the hunt one beat.
-            return (
-              (!inCombat && next.checkKind === 'investigate' && intent === 'investigate') ||
-              (!inCombat && next.checkKind === 'stealth' && intent === 'stealth') ||
-              (!inCombat && next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
-              (next.checkKind === 'escape' && intent === 'escape') || // combat flee can advance an escape stage
-              (!inCombat && next.checkKind === 'cast' && intent === 'cast') ||
-              (next.checkKind === 'attack_provoke' && intent === 'attack') ||
-              (next.checkKind === 'boss' && intent === 'attack')
-            );
-          });
-        if (huntMatch) {
-          void Promise.resolve().then(() => get().advanceHunt(huntMatch.rec.id));
-        }
-        // Mystery auto-advance — same rule, no boss spawn at the end.
-        const mysteryMatch = (player.activeMysteries ?? [])
-          .map((rec) => ({ rec, def: findMysteryById(rec.id) }))
-          .find(({ rec, def }) => {
-            if (!def) return false;
-            if (rec.tracked === false) return false; // DEACTIVATED (paused) — frozen
-            const next = def.stages[rec.stage];
-            if (!next) return false;
-            return (
-              (next.checkKind === 'investigate' && intent === 'investigate') ||
-              (next.checkKind === 'stealth' && intent === 'stealth') ||
-              (next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
-              (next.checkKind === 'escape' && intent === 'escape') ||
-              (next.checkKind === 'cast' && intent === 'cast') ||
-              (next.checkKind === 'boss' && intent === 'investigate')
-            );
-          });
-        if (mysteryMatch && !inCombat) {
-          void Promise.resolve().then(() => get().advanceMystery(mysteryMatch.rec.id));
-        }
-        // Storyline auto-advance — same rule.
-        const storyMatch = (player.activeStorylines ?? [])
-          .map((rec) => ({ rec, def: findStorylineById(rec.id) }))
-          .find(({ rec, def }) => {
-            if (!def) return false;
-            if (rec.tracked === false) return false; // DEACTIVATED (paused) — frozen
-            const next = def.stages[rec.stage];
-            if (!next) return false;
-            return (
-              (next.checkKind === 'investigate' && intent === 'investigate') ||
-              (next.checkKind === 'stealth' && intent === 'stealth') ||
-              (next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
-              (next.checkKind === 'escape' && intent === 'escape') ||
-              (next.checkKind === 'cast' && intent === 'cast') ||
-              (next.checkKind === 'attack_provoke' && intent === 'attack') ||
-              (next.checkKind === 'boss' && intent === 'diplomacy')
-            );
-          });
-        if (storyMatch && !inCombat) {
-          void Promise.resolve().then(() => get().advanceStoryline(storyMatch.rec.id));
-        }
+        // ⚠ OTA-1236 — stage advancement MOVED OUT of skill.success entirely, to
+        // advanceStagesOnIntent (called once per action at the intent choke
+        // point). The dice gate was the owner's Bog Dragon wall: in an exhausted
+        // tile no investigate input even REACHES this skill roll, so an
+        // investigate-stage hunt was unreachable from there — silently. See the
+        // helper for the full trigger contract.
 
         // OTA 058 — use-based stat progression. Replaces the
         // OTA 040-era "every 10 successful checks → +1 stat" milestone
