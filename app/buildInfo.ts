@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.150';
+export const DISPLAY_VERSION = '4.29.151';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24570,7 +24570,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New tests folded into ota1198MemoryInterlock (15 total). ota1195
 // assertions RETARGETED, not weakened - both came out stronger.
 // DISPLAY_VERSION 4.29.109.
-export const OTA_BUILD_ID = '2026-08-11-1244-leads-bounties-walker';
+export const OTA_BUILD_ID = '2026-08-11-1245-climbs-whispers-walker';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1244-leads-bounties-walker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1243-mystery-storyline-walker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1242-hunt-walker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1241-poster-is-the-gate';
