@@ -20144,7 +20144,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // tutorial is done or skipped.
             const inTutorial =
               get().tutorialStep !== null && !get().tutorialExploreChosen;
-            const overlay = inTutorial ? null : rollElevatedOverlay(totalTiers);
+            // ⚠⚠ OTA-1222 — NO RANDOM OVERLAY ON A GREAT CLIMB'S CROWN. The
+            // summit-boss branch above just spawned the tower's guardian into
+            // the scene — and this chance-rolled overlay REPLACED the whole
+            // scene (enemies included), DELETING the boss the moment after its
+            // approach line printed. The spawn is once-per-topping, so the
+            // crest became unreachable until a climb-down (boss resets) and a
+            // luckier re-top. Chance-based, live since the Great Climbs
+            // shipped; the climb walker caught it because two of five towers
+            // rolled the overlay on the run. A great climb's crown is
+            // AUTHORED ground — the guardian is the summit content.
+            const overlay = inTutorial || greatClimb ? null : rollElevatedOverlay(totalTiers);
             if (overlay) {
               // Branch on kind. Encounter spawns an enemy.
               // Trader spawns a VendorInstance on scene.vendor.
