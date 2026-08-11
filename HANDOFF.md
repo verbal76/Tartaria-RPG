@@ -1676,7 +1676,23 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE FOURTH DOOR — GAP 2 CLOSED (2026-08-11, latest). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1248. The ending choice read nothing the
+- **⚠⚠ THE MAIN QUEST WALKER (2026-08-11, latest). HAL ONLY so far — golem
+  batch pending.** Test-only (suite ota1249MainQuestWalker, no version bump —
+  it found NO defect, which is the headline: the spine is sound). The one road
+  no walker had ever walked: creation → hook → revelation → nine Core
+  Guardians → descent → Nexus → ending. Now walked for ALL NINE factions
+  (motives rotated), 81 Guardian kills through the real dice via the canonical
+  ★ SUMMON route, Core granted as a real item each time, all FOUR endings
+  chosen and recorded (STAY on kin-seeded runs, with the Reckoning and the
+  four-door walk-up asserted in the feed). ~16s for the whole suite. Two new
+  harness traps in its header (travel-don't-teleport; the Guardian object
+  carries the capital id — never rebuild it). ⚠ "RUN CHUCK NORRIS" IS NOW SIX
+  SUITES — the five family walkers PLUS this one:
+  `npx jest ota1242HuntWalker ota1243MysteryStorylineWalker ota1244LeadsBountiesWalker ota1245ClimbsWhispersWalker ota1249MainQuestWalker --forceExit`
+  (HAL names; golem twins 1219/1220/1221/1222/1226). The game is PROVEN
+  completable, nine ways in, four ways out.
+
+- **⚠⚠ THE FOURTH DOOR — GAP 2 CLOSED (2026-08-11). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1248. The ending choice read nothing the
   player did. Now: **STAY**, an EARNED fourth ending (you don't walk out — you
   mind the Engine, and the Arbiter finally says thank you and goes quiet), 9
   faction futures + 5 motive epilogues. ⚠⚠ THE DESIGN LAW, and it must not be
