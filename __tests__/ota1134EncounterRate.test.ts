@@ -92,7 +92,8 @@ describe('OTA-1134 — the encounter roll is halved', () => {
 describe('OTA-1134 — what was deliberately left alone', () => {
   it('⚠ REST ambush keeps its rates — measured, not assumed', () => {
     // 22% wild / 8% hub. Two rests ambushed in one log is ~5%, not a bug.
-    expect(store).toContain('const restAmbushBase = restInSafeZone ? 0.08 : 0.22;');
+    expect(store).toContain(// OTA-1235 prepended the sacred-ground zero; the 8%/22% this pin protects are intact.
+    'const restAmbushBase = restSacred(restLoc) ? 0 : restInSafeZone ? 0.08 : 0.22;');
   });
 
   it('⚠ there is no early-game ramp — the owner rejected it, with a reason', () => {
