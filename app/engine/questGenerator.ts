@@ -6,6 +6,43 @@ import rewardsData from '../data/quests/rewards.json';
 import locationsData from '../data/locations/locations.json';
 
 const objectives = objectivesData as QuestObjective[];
+
+/** ⚠⚠ OTA-1214 — EVERY LEAD VERB HAS A TRIGGER. The owner asked, after the hunt
+ *  fix: "every mission, hunt, whisper, and every other style of side quest?" —
+ *  and the check found LEADS effectively 100% uncompletable: the only
+ *  completion trigger was kill-verb name matching ('kill/slay/defeat/hunt/
+ *  retrieve'), and not one of the 18 authored objectives uses those verbs.
+ *  Every lead ever generated accumulated forever (the OTA-011 note even
+ *  recorded that history, then fixed only the kill shape).
+ *
+ *  The contract, same law as OTA-1213: AT the lead's own pinned location,
+ *  performing a verb-matched intent completes it; kill-shaped verbs also
+ *  complete on any enemy defeated at the site. The audit test walks
+ *  objectives.json and fails the build if a verb ever ships without an entry
+ *  here — an uncompletable lead can no longer be authored. */
+export const LEAD_VERB_TRIGGERS: Record<string, { intents?: readonly string[]; onKillAtSite?: boolean }> = {
+  // search-the-place shapes
+  investigate: { intents: ['investigate'] },
+  trace: { intents: ['investigate'] },
+  map: { intents: ['investigate'] },
+  recover: { intents: ['investigate'] },
+  extract: { intents: ['investigate'] },
+  collect: { intents: ['investigate'] },
+  retrieve: { intents: ['investigate'] },
+  rescue: { intents: ['investigate'] },
+  seal: { intents: ['investigate', 'cast'] },
+  // talk-at-the-place shapes
+  deliver: { intents: ['diplomacy'] },
+  escort: { intents: ['diplomacy'] },
+  broker: { intents: ['diplomacy'] },
+  interrogate: { intents: ['diplomacy'] },
+  smuggle: { intents: ['diplomacy'] },
+  // violence shapes — the attempt at the site completes, and so does any kill there
+  silence: { intents: ['attack'], onKillAtSite: true },
+  destroy: { intents: ['attack'], onKillAtSite: true },
+  disable: { intents: ['attack'], onKillAtSite: true },
+  raid: { intents: ['investigate'], onKillAtSite: true },
+};
 const complications = complicationsData as QuestComplication[];
 const rewards = rewardsData as QuestReward[];
 const locations = locationsData as Location[];

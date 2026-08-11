@@ -514,6 +514,35 @@ function findHeldProcedureText(
   return { item: null, ambiguous: [] };
 }
 
+/** OTA-1214 — ONE completion body for a lead, shared by the kill-name path
+ *  (OTA 011), the at-site verb path, and the at-site kill path — three doors,
+ *  one settlement, so reward and state can never drift by entry point. */
+function resolveLeadCompletion(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  lead: NonNullable<PlayerCharacter['activeQuests']>[number],
+): void {
+  const reward = lead.reward;
+  if (reward.type === 'currency' && reward.amount) {
+    set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + reward.amount! } } : s));
+    get().appendLog('reward', `Lead resolved: ${lead.objective.verb} ${lead.objective.target}. +${reward.amount} TC.`);
+  } else {
+    get().appendLog('reward', `Lead resolved: ${lead.objective.verb} ${lead.objective.target}. (${reward.label})`);
+  }
+  set((s) =>
+    s.player
+      ? {
+          player: {
+            ...s.player,
+            activeQuests: s.player.activeQuests.map((q) =>
+              q.id === lead.id ? { ...q, state: 'completed' as const } : q,
+            ),
+          },
+        }
+      : s,
+  );
+}
+
 /** ⚠⚠ OTA-1213 — DETERMINISTIC STAGE TRIGGERS. Owner, stuck on the Bog Dragon at
  *  stage 2/7 with the card reading "You're at Mud Seas": "I investigated
  *  everything in the area, I hit investigate when the area was empty, nothing
@@ -541,7 +570,11 @@ function findHeldProcedureText(
  *  No dice anywhere in it: the stage IS the content, and a die that can only
  *  delay or hide content earns nothing (the OTA-053 auto-advance note already
  *  said stages with no check are narration; now the check is the VERB). */
-function advanceStagesOnIntent(get: () => GameStore, intent: Intent): void {
+function advanceStagesOnIntent(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  intent: Intent,
+): void {
   const player = get().player;
   const currentScene = get().currentScene;
   if (!player || !currentScene) return;
@@ -618,6 +651,23 @@ function advanceStagesOnIntent(get: () => GameStore, intent: Intent): void {
     });
   if (storyMatch && !inCombat) {
     void Promise.resolve().then(() => get().advanceStoryline(storyMatch.rec.id));
+  }
+
+  // ⚠⚠ OTA-1214 — LEADS. At the lead's own pinned location, the objective's
+  // verb-matched intent completes it. Before this, the only trigger was
+  // kill-verb name matching, which not one of the 18 authored objectives could
+  // ever satisfy — the whole family accumulated forever.
+  if (!inCombat) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { LEAD_VERB_TRIGGERS } = require('../engine/questGenerator') as typeof import('../engine/questGenerator');
+    const readyLeads = (player.activeQuests ?? []).filter(
+      (q) =>
+        (q.state === 'open' || q.state === 'in_progress') &&
+        q.tracked !== false &&
+        q.location?.id === player.currentLocationId &&
+        (LEAD_VERB_TRIGGERS[q.objective.verb.toLowerCase()]?.intents ?? []).includes(intent),
+    );
+    for (const lead of readyLeads) resolveLeadCompletion(get, set, lead);
   }
 }
 
@@ -14069,7 +14119,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ⚠ OTA-1213 — deterministic stage triggers fire on the VERB, at the choke
     // point every action passes, so no downstream branch (refusal, flavor,
     // hook, empty modal) can eat a mission beat. See advanceStagesOnIntent.
-    advanceStagesOnIntent(get, parsed.intent);
+    advanceStagesOnIntent(get, set, parsed.intent);
 
     switch (parsed.intent) {
       case 'attack': {
@@ -23772,26 +23822,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
         killVerbs.has(q.objective.verb.toLowerCase()) &&
         q.objective.target.toLowerCase().includes(enemy.name.toLowerCase().replace(/ \(hunted\)$/i, '')),
     );
-    for (const lead of matchingLeads) {
-      const reward = lead.reward;
-      if (reward.type === 'currency' && reward.amount) {
-        set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + reward.amount! } } : s));
-        get().appendLog('reward', `Lead resolved: ${lead.objective.verb} ${lead.objective.target}. +${reward.amount} TC.`);
-      } else {
-        get().appendLog('reward', `Lead resolved: ${lead.objective.verb} ${lead.objective.target}. (${reward.label})`);
+    // OTA-1214 — kill-shaped verbs ALSO complete on any enemy defeated at the
+    // lead's own site: 'Silence a witness' settles when the fight at the marked
+    // place ends, whatever the combatant was called.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { LEAD_VERB_TRIGGERS: LVT } = require('../engine/questGenerator') as typeof import('../engine/questGenerator');
+      for (const q of player.activeQuests ?? []) {
+        if (q.state !== 'open' && q.state !== 'in_progress') continue;
+        if (q.tracked === false) continue;
+        if (q.location?.id !== player.currentLocationId) continue;
+        if (!LVT[q.objective.verb.toLowerCase()]?.onKillAtSite) continue;
+        if (matchingLeads.some((m) => m.id === q.id)) continue; // name path already has it
+        matchingLeads.push(q);
       }
-      set((s) =>
-        s.player
-          ? {
-              player: {
-                ...s.player,
-                activeQuests: s.player.activeQuests.map((q) =>
-                  q.id === lead.id ? { ...q, state: 'completed' as const } : q,
-                ),
-              },
-            }
-          : s,
-      );
+    }
+    for (const lead of matchingLeads) {
+      resolveLeadCompletion(get, set, lead);
     }
     // OTA 029 — multi-item loot drop. Playtester: "I defeated a
     // not-so-hard enemy harder than my level and all I got was one
