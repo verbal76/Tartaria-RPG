@@ -1676,8 +1676,7 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ EVERY MOTIVE ENDS SOMEWHERE (2026-08-11, latest). HAL ONLY so far —
-  golem batch pending.** HAL OTA-1246. The owner's arc read found the biggest
+- **⚠⚠ EVERY MOTIVE ENDS SOMEWHERE (2026-08-11, latest). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1246. The owner's arc read found the biggest
   asymmetry in the story: only THE MISSING had an in-world payoff scene; Debt,
   Exile, Calling and Record had beats, forks and an epilogue but no moment
   where the thing you came for is in front of you. Twelve new authored answers
