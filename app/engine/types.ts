@@ -984,7 +984,12 @@ export type MainQuestPhase =
   | 'choice'
   | 'ended';
 
-export type MainQuestEnding = 'seal' | 'unleash' | 'preserve';
+/** ⚠⚠ OTA-1225 — 'stay' is the EARNED fourth ending. It is never offered by
+ *  default and it never replaces one of the three: the base doors stay open to
+ *  every character forever, so nothing is ever taken away from a player who
+ *  cannot see why. See `canStayAtTheNexus` — the gate is the Arbiter's regard
+ *  at its top band, which is conduct-earned and impossible to grind. */
+export type MainQuestEnding = 'seal' | 'unleash' | 'preserve' | 'stay';
 
 export interface MainQuestState {
   phase: MainQuestPhase;

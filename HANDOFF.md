@@ -1427,8 +1427,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1247`**,
-**golem-line `2026-08-11-1224`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1248`**,
+**golem-line `2026-08-11-1225`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1437,7 +1437,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.153**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.154**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1644,7 +1644,25 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ NO DEV NOTES IN THE FEED (2026-08-11, latest). HAL + GOLEM.** HAL
+- **⚠⚠ THE FOURTH DOOR — GAP 2 CLOSED (2026-08-11, latest). HAL + GOLEM.** HAL
+  OTA-1248 / golem OTA-1225. The ending choice read nothing the player did.
+  Now: **STAY**, an EARNED fourth ending (you don't walk out — you mind the
+  Engine, and the Arbiter finally says thank you and goes quiet), 9 faction
+  futures + 5 motive epilogues. ⚠⚠ THE DESIGN LAW, and it must not be undone:
+  **the gate is ADDITIVE.** SEAL/UNLEASH/PRESERVE stay unconditional for every
+  character forever — never gated, never greyed, never named-then-withheld —
+  because a withheld door reads as being cheated (owner's own call). A run that
+  hasn't earned STAY is never told it exists. Bar is the Arbiter's top regard
+  band `kin`, un-grindable by construction (ceilings total 45 vs a bar of 40).
+  The STORE re-checks the gate where the ending is recorded — the UI hiding a
+  button is only a courtesy. Bundled: **THE RECKONING**, the Arbiter reading
+  the run back before the doors, for everyone, gating nothing; it may name the
+  RUN but never the DOORS. New suite ota1225TheFourthDoor — includes a tripwire
+  that fails if anyone ever puts a condition on one of the three base endings.
+  Full story: the VERSION.md 4.29.154 row. ⚠ THE CHARACTER ARC HAS NO OPEN
+  ITEMS.
+
+- **⚠⚠ NO DEV NOTES IN THE FEED (2026-08-11). HAL + GOLEM.** HAL
   OTA-1247 / golem OTA-1224. The main quest's `cores` fallback was a
   note-to-self from the week it was built — *"being authored in a coming
   OTA…"* — in the Arbiter's voice, in a live switch, and by now factually
