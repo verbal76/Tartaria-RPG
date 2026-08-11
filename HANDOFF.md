@@ -1676,8 +1676,7 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE WALKER FLEET IS COMPLETE (2026-08-11, latest). HAL ONLY so far —
-  golem batch pending.** HAL OTA-1245. Climbs + whispers walker
+- **⚠⚠ THE WALKER FLEET IS COMPLETE (2026-08-11, latest). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1245. Climbs + whispers walker
   (ota1245ClimbsWhispersWalker: 5 towers cresting through real gear gates +
   the full Yulka chain on real map steps). It caught the biggest one yet: the
   summit's chance-rolled elevated overlay (OTA-089) REPLACED the scene on the
