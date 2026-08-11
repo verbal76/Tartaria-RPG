@@ -16,6 +16,11 @@ on:
       - 'docs/**'
   workflow_dispatch:
 
+# The Release step needs write access to publish; the default token is
+# read-only on this repo.
+permissions:
+  contents: write
+
 jobs:
   build-exe:
     runs-on: windows-latest
@@ -66,3 +71,41 @@ jobs:
           name: tartaria-pc-exe
           path: desktop/release/*.exe
           if-no-files-found: error
+
+      # ⚠ THE ARTIFACT ABOVE IS FOR THE MAINTAINER; THE RELEASE BELOW IS FOR
+      # TESTERS. A workflow artifact can ONLY be downloaded by someone signed
+      # in to GitHub (it 404s otherwise, even on a public repo) and it
+      # self-deletes after 90 days — so it is useless for "here, try this on
+      # your computer". A Release is a plain public URL that works signed-out,
+      # on any machine, and does not expire. Both are published: the artifact
+      # keeps existing tooling working, the Release is the link to hand out.
+      - name: Read the build version
+        id: ver
+        shell: bash
+        run: |
+          V=$(grep -oE "DISPLAY_VERSION = '[^']+'" app/buildInfo.ts | head -1 | grep -oE "[0-9]+\.[0-9]+\.[0-9]+")
+          echo "version=${V:-0.0.0}" >> "$GITHUB_OUTPUT"
+          echo "Building release for $V"
+
+      - name: Publish the PC build as a Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # One rolling tag per version, so a re-run of the same version
+          # replaces its build rather than piling up half-tested downloads.
+          tag_name: pc-v${{ steps.ver.outputs.version }}
+          name: Tartaria Realms — PC ${{ steps.ver.outputs.version }}
+          body: |
+            **Windows portable build — no installer, just run the .exe.**
+
+            Version ${{ steps.ver.outputs.version }} · commit ${{ github.sha }}
+
+            Mouse, keyboard and controller are all supported. If the window
+            looks too big or too small, open **Settings → Display size (S/M/L)**.
+            **F11** toggles fullscreen.
+
+            _If you hit a bug, the in-game bug reporter copies a log to your
+            clipboard — send that along with what you were doing._
+          files: desktop/release/*.exe
+          draft: false
+          prerelease: true
+          fail_on_unmatched_files: true
