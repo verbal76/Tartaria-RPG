@@ -1446,7 +1446,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1240`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1241`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1456,7 +1456,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.146**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.147**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1676,23 +1676,30 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE APEX RESPAWN GUARD (2026-08-11, latest). HAL ONLY so far — golem
-  batch pending.** HAL OTA-1240. The owner's ordered back-half test
+- **⚠⚠ THE POSTER IS THE GATE (2026-08-11, latest). HAL ONLY so far — golem
+  batch pending.** HAL OTA-1241. The owner's "map locations mismatch": 15 of 18
+  hunt posters name a real atlas location while the anchor sat on the generic
+  biome cell — walking to the named place earned the "Not here" refusal.
+  `huntAnchorId` now resolves the poster's named place first (alias-aware,
+  flavor-parenthetical stripped), biome cell only as flavor-name fallback; the
+  card, pin, route and gate all move together. Audit suite
+  ota1241PosterIsTheGate makes the agreement law. Full story: the VERSION.md
+  4.29.147 row.
+
+- **⚠⚠ THE APEX RESPAWN GUARD (2026-08-11). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1240. The owner's ordered back-half test
   (ota1240BogDragonBackHalf, stages 5→7 from his exact save) caught the apex
   fight being UNWINNABLE: OTA-1236's `attack_provoke`/`boss` matcher rows had no
   in-combat guard, so every swing of the frozen apex fight re-ran advanceHunt
   and re-spawned the boss at full HP. Both rows now gate on out-of-combat
   (escape alone stays in-combat). Full story: the VERSION.md 4.29.146 row.
 
-- **⚠⚠ THE BURST GUARD (2026-08-11). HAL ONLY so far — golem batch
-  pending.** HAL OTA-1238. OTA-1236's stage triggers raced INVESTIGATE ALL's
+- **⚠⚠ THE BURST GUARD (2026-08-11). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1238. OTA-1236's stage triggers raced INVESTIGATE ALL's
   un-awaited submit loop — three chips matched the same stage before the first
   advance landed and the owner's Bog Dragon hunt jumped three stages (mid-hunt
   boss spawned unannounced). One advance in flight per mission now, all three
   families. Full story: the VERSION.md 4.29.145 row.
 
-- **⚠⚠ LEADS COMPLETE (2026-08-11). HAL ONLY so far — golem batch
-  pending.** HAL OTA-1237. The owner's "every other style of side quest?"
+- **⚠⚠ LEADS COMPLETE (2026-08-11). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1237. The owner's "every other style of side quest?"
   follow-up found LEADS effectively 100% uncompletable — the only trigger was
   kill-verb name matching no authored objective can satisfy. Now the verb at
   the lead's own site completes it (LEAD_VERB_TRIGGERS), kill shapes settle on
@@ -1700,16 +1707,14 @@ rediscovering them.
   lead unauthorable + pin every whisper chain to a dispatcher arm. All other
   families verified covered. Full story: the VERSION.md 4.29.144 row.
 
-- **⚠⚠ STAGE TRIGGERS WORK (2026-08-11). HAL ONLY so far — golem batch
-  pending.** HAL OTA-1236. The owner hit an unreachable hunt stage standing
+- **⚠⚠ STAGE TRIGGERS WORK (2026-08-11). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1236. The owner hit an unreachable hunt stage standing
   exactly where the card routed him — the old trigger was a dice roll most
   inputs never reached. Now the VERB is the trigger, hunts gate on the same
   anchor the card reads, wrong-place answers with a routing line, and an audit
   test pins every stage of every mission to a handled trigger kind forever.
   Full story: the VERSION.md 4.29.143 row.
 
-- **⚠⚠ SACRED GROUND (2026-08-11). HAL ONLY so far — golem batch
-  pending.** HAL OTA-1235. Owner's ruling on Verbal's death: the Hidden Market
+- **⚠⚠ SACRED GROUND (2026-08-11). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1235. Owner's ruling on Verbal's death: the Hidden Market
   is holy ground (Highlander / the Continental). One predicate
   (engine/sacredGround.ts) now guards all four spawn doors — the raid that
   killed him had NO market check, and the rest ambush rolled a wilderness 22%.
@@ -1717,36 +1722,31 @@ rediscovering them.
   violence and the roads outside are unchanged. Full story: the VERSION.md
   4.29.142 row.
 
-- **⚠ A SPENT LEAD'S CHIP GREYS (2026-08-11). HAL ONLY so far — golem
-  batch pending.** HAL OTA-1234. The owner filed it from inside the game: a
+- **⚠ A SPENT LEAD'S CHIP GREYS (2026-08-11). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1234. The owner filed it from inside the game: a
   completed lead's chip stayed bright while the engine refused every tap. The
   chip surfaces now consult the engine's own resolved-hook matcher — five
   sites, count-pinned. ⚠ Flagged for the owner, not fixed: a war party spawned
   ON market ground and killed Verbal. Full story: the VERSION.md 4.29.141 row.
 
-- **⚠ THE LEAD IS THE MARK (2026-08-10). HAL ONLY so far — golem batch
-  pending.** HAL OTA-1233. The owner's first live session with the Arbiter's eye
+- **⚠ THE LEAD IS THE MARK (2026-08-10). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1233. The owner's first live session with the Arbiter's eye
   showed the marks invisible in exactly the rooms that hold a lead — story leads
   are not ambient chips, and the eye marked only displayed nouns. Unresolved
   leads now mark themselves; eye-only nouns render as their own ✦ chips and
   count toward the badge. Full story: the VERSION.md 4.29.140 row.
 
-- **⚠ THE AUTOSAVE TOGGLE (2026-08-10). HAL ONLY so far — golem batch
-  pending.** HAL OTA-1232. The autosave itself is OLD — four layers already
+- **⚠ THE AUTOSAVE TOGGLE (2026-08-10). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1232. The autosave itself is OLD — four layers already
   shipped (per-action persist, the OTA-368 90s timer, the background flush,
   atomic writes). This adds control + visibility only: a Settings → RUN toggle
   (default ON) and a testable gate on the existing timer. 90s beats the 2-10 min
   industry span — do not loosen it. Full story: the VERSION.md 4.29.139 row.
 
-- **⚠ THE BACKUP MOVED ROOMS (2026-08-10). HAL ONLY so far — golem batch
-  pending.** HAL OTA-1231. Living characters back up from Settings → RUN (saves
+- **⚠ THE BACKUP MOVED ROOMS (2026-08-10). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1231. Living characters back up from Settings → RUN (saves
   first, then shares); dead rows keep their title-screen button (their only
   door); one shared routine serves both. ⚠ Open design question recorded in the
   VERSION.md 4.29.138 row: fully-automatic backup needs the Android SAF
   folder-grant (iOS forbids silent out-of-sandbox writes) — awaiting the owner.
 
-- **⚠⚠ USE IS NOT A HOOK + THE LOCKET CLASS (2026-08-10). HAL ONLY so far —
-  golem batch pending.** HAL OTA-1230. Off the owner's device log, minutes after
+- **⚠⚠ USE IS NOT A HOOK + THE LOCKET CLASS (2026-08-10). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1230. Off the owner's device log, minutes after
   1229 landed: `use Aetheric Torch` was hijacked by an etheric_storm hook (the
   ITEM'S adjective matched the hook's nouns) — now a use-intent naming a CARRIED
   item always reaches the item path. And six treasure lore_notes asserted
@@ -1755,15 +1755,13 @@ rediscovering them.
   Two LLM-waste observations from the same log filed on the headroom track.
   Full story: the VERSION.md 4.29.137 row.
 
-- **⚠⚠ THE ARBITER'S EYE (2026-08-10). HAL ONLY so far — golem batch
-  pending.** HAL OTA-1229. A torch use now marks (✦ on the investigate chips) the
+- **⚠⚠ THE ARBITER'S EYE (2026-08-10). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1229. A torch use now marks (✦ on the investigate chips) the
   nouns that actually pay — hooks, unread recipe notes, unharvested perches — so
   investigate is a choice, not a lottery you clear, and the torch has a job free
   "look around" can't do. No-lead rooms accept a sweep; nothing-worthy rooms still
   refuse unspent. Full story: the VERSION.md 4.29.136 row.
 
-- **⚠ FIRST-USE CARDS CATCH UP (2026-08-10). HAL ONLY so far — golem batch
-  pending.** HAL OTA-1228. All 13 cards audited; the stale aetheric-tab card rewritten,
+- **⚠ FIRST-USE CARDS CATCH UP (2026-08-10). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1228. All 13 cards audited; the stale aetheric-tab card rewritten,
   found Procedure Texts got a pack READ button + a first-time card, vendor/contracts
   refreshed with the host rules. ⚠ Every rewritten card carries a NEW id — dismissals
   are per-install, so edited copy under an old id shows nobody anything. Full story:
@@ -1830,8 +1828,7 @@ rediscovering them.
   **Tests:** ota1226TextsAllRoutes (7). ota1220's relic-count pin retargeted 113 → 117
   with the reason in place.
 
-- **⚠⚠ PUNCHLIST P16 — ENEMIES CHANNEL TOO (2026-08-10). HAL ONLY so far — golem
-  port pending.** HAL OTA-1225. **steam NOT included — batched (§2).**
+- **⚠⚠ PUNCHLIST P16 — ENEMIES CHANNEL TOO (2026-08-10). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1225. **steam NOT included — batched (§2).**
 
   Owner: *"mirror it to enemies and have them applied like the resists are"* — and the
   resists are TRAITS. So techniques ride the identical rail: `technique:<id>`, rolled per
@@ -1859,7 +1856,7 @@ rediscovering them.
   (see the entry above).**
 
 - **⚠⚠ PUNCHLIST P9 CLOSED — AT AN OWNED SITE, THE PEOPLE ANSWER FOR THE HOST (2026-08-10,
-  latest). HAL ONLY so far — golem port pending.** HAL OTA-1224. **steam NOT included —
+  latest). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1224. **steam NOT included —
   batched (§2).**
 
   The last of the three P2 jobs (broker OTA-1208, site skins OTA-1209, this). The world
@@ -1905,7 +1902,7 @@ rediscovering them.
 
   **Tests:** ota1223VeilGate (3, live).
 
-- **⚠⚠ PUNCHLIST P15 — A PLACE'S OWN LOOT CAN TURN UP WHEN YOU SEARCH IT (2026-08-10). HAL ONLY so far — golem port pending.** HAL OTA-1222. **steam NOT included —
+- **⚠⚠ PUNCHLIST P15 — A PLACE'S OWN LOOT CAN TURN UP WHEN YOU SEARCH IT (2026-08-10). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1222. **steam NOT included —
   batched (§2).**
 
   Owner's call, verbatim: *"it goes from the tuned pool and has a small percentage to pull
@@ -1957,7 +1954,7 @@ rediscovering them.
   `hubRoomId` puts a character in a hub, when `inHub` is decided by the LOCATION.
 
 - **⚠⚠ PUNCHLIST P17 — A TITLE THAT COULD NOT BE EARNED WITHOUT THE NARRATION MODEL
-  (2026-08-10). HAL ONLY so far — golem port pending.** HAL OTA-1221.
+  (2026-08-10). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1221.
   **steam NOT included — batched (§2).**
 
   **WHAT IT WAS.** `titleProgress.loreRead` — the counter gating **Scholar of Forgotten
