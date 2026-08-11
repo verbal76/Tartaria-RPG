@@ -3058,6 +3058,33 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
       }),
     };
   }
+  // ⚠ OTA-1220 — same heal for MYSTERIES (the neutral accept door never bumped
+  // past stage 0 the way the vendor door always has — the three faction-neutral
+  // mysteries wedged identically) and, belt-and-braces, for storylines.
+  if (out.activeMysteries?.some((m) => findMysteryById(m.id)?.stages[m.stage]?.checkKind === null)) {
+    out = {
+      ...out,
+      activeMysteries: out.activeMysteries.map((m) => {
+        const def = findMysteryById(m.id);
+        if (!def) return m;
+        let st = m.stage;
+        while (st < def.stages.length && def.stages[st]!.checkKind === null) st++;
+        return st !== m.stage ? { ...m, stage: st } : m;
+      }),
+    };
+  }
+  if (out.activeStorylines?.some((r) => findStorylineById(r.id)?.stages[r.stage]?.checkKind === null)) {
+    out = {
+      ...out,
+      activeStorylines: out.activeStorylines.map((r) => {
+        const def = findStorylineById(r.id);
+        if (!def) return r;
+        let st = r.stage;
+        while (st < def.stages.length && def.stages[st]!.checkKind === null) st++;
+        return st !== r.stage ? { ...r, stage: st } : r;
+      }),
+    };
+  }
   // OTA-968 — 'Skyreacher Chart (N of 5)' became 'Skyreacher Map N of 5 — <tower>'.
   // Rename legacy charts sitting in old saves so the catalog row — and with it
   // the Use effect that unlocks the great climb — resolves again.
@@ -3707,7 +3734,11 @@ function maintainPatrols(
   const tides = get().worldMemory.factionTides ?? {};
   const cur = get().worldMemory.patrols ?? [];
   const idxByFaction = new Map<string, number[]>();
-  cur.forEach((p, i) => { const a = idxByFaction.get(p.factionId) ?? []; a.push(i); idxByFaction.set(p.factionId, a); });
+  // ⚠ OTA-1221 — quarry groups (bounty contracts, OTA-1166) are OUTSIDE the army
+  // ledger: they neither count toward a faction's patrol target nor get culled as
+  // excess. Before this, the trim dropped from the tail — which is exactly where the
+  // just-seeded quarry sat — and every bounty's quarry evaporated on the next tick.
+  cur.forEach((p, i) => { if (p.quarry) return; const a = idxByFaction.get(p.factionId) ?? []; a.push(i); idxByFaction.set(p.factionId, a); });
   let next = [...cur];
   const dropIdx = new Set<number>();
   for (const f of factions) {
@@ -4750,6 +4781,7 @@ function maybeSeedQuarry(
           // a point the engine has no other reason to care about.
           homeX: home.x, homeY: home.y,
           phase: c.phase,
+          quarry: true, // OTA-1221 — exempt from the war-maintenance cull (see Patrol type)
         })),
       ],
     } }));
@@ -27020,7 +27052,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ...s.player,
             activeMysteries: [
               ...(s.player.activeMysteries ?? []),
-              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked, ...acceptCellStamp(get) },
+              // ⚠ OTA-1220 — start past the leading pure-narration stage. The VENDOR
+              // branch has always bumped to stage 1 after playing stage-0's text;
+              // this branch never did, and the OTA-1213 matcher can't match a null
+              // checkKind — so every faction-NEUTRAL mystery accepted without a
+              // vendor in scene was wedged at stage 0 forever. Same class as the
+              // hunt wedge (OTA-1219); the walker caught this one too.
+              { id: neutralMatch.id, stage: firstActionableHuntStage(neutralMatch), postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked, ...acceptCellStamp(get) },
             ],
           },
         } : s));
