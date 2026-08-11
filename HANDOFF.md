@@ -1676,8 +1676,7 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE HUNT WALKER (2026-08-11, latest). HAL ONLY so far — golem batch
-  pending.** HAL OTA-1242. Owner commissioned it: one generic live test that
+- **⚠⚠ THE HUNT WALKER (2026-08-11, latest). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1242. Owner commissioned it: one generic live test that
   plays EVERY hunt end to end (accept → each stage on its own verb → apex
   freeze → kill → turn-in line), auto-covering new hunts. Its first step found
   that hunts had NO way off stage 0 (null checkKind, no OTA-871 consume loop,
@@ -1685,8 +1684,12 @@ rediscovering them.
   forever. Fix: accept starts at firstActionableHuntStage, advanceHunt
   consumes nulls, backfill heals wedged saves. ⚠ The walker's five harness
   traps are documented in the suite header (__tests__/ota1242HuntWalker) —
-  READ THEM before extending it to other families. Full story: the VERSION.md
-  4.29.148 row.
+  READ THEM before extending it to other families. ⚠ OWNER'S NAME FOR IT:
+  **"TEXAS RANGER"** — when the owner says "run Texas Ranger" or "run Chuck
+  Norris", he means run this suite:
+  `npx jest __tests__/ota1242HuntWalker.test.ts --forceExit` (HAL; golem's
+  twin is ota1219HuntWalker). Run it, read the failures, report — it costs
+  nothing but the read. Full story: the VERSION.md 4.29.148 row.
 
 - **⚠⚠ THE POSTER IS THE GATE (2026-08-11). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1241. The owner's "map locations mismatch": 15 of 18
   hunt posters name a real atlas location while the anchor sat on the generic
