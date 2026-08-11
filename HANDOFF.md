@@ -1676,8 +1676,26 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE MAIN QUEST WALKER (2026-08-11, latest). HAL ONLY so far — golem
-  batch pending.** Test-only (suite ota1249MainQuestWalker, no version bump —
+- **⚠⚠ THE COMPLETIONIST RUN (2026-08-11, latest). HAL ONLY so far — golem
+  batch pending.** Test-only, two new ON-DEMAND sweeps (the "Sweep" in the
+  filenames keeps them out of test:ci:fast, same exclusion as the stress
+  sims): `completionistSpineSweep` — the FULL identity cross, 9 factions × 5
+  motives × 4 endings = 180 complete games played live, creation to credits
+  (~4 min); `completionistOutcomeSweep` — every motive forced through all
+  THREE of its resolutions live (15, dealer-searched by name), every bounty
+  giver×target pair live (72), and the full 540-cell ending-text matrix
+  enumerated (no hole, no raw {name}, no dev-note vocabulary). First full
+  run: 180/180 + 89/89 green, plus the whole walker fleet and every live walk
+  (tutorial, phases 0-5, labyrinth, faction quests, escorts, whisper) —
+  475 end-to-end tests, ZERO defects. ⚠ RUN IT with:
+  `npx jest completionist --forceExit` (both sweeps; ~5 min) — before store
+  pushes or after story-engine surgery, not per-push. ⚠ Honest scope note for
+  future threads: this exhausts every AUTHORED combination; cross-family
+  interference (a hunt advancing while a bounty ticks, etc.) is guarded by the
+  in-flight/burst machinery and its suites, not enumerated — free-text input
+  space is unbounded and no sweep claims it.
+
+- **⚠⚠ THE MAIN QUEST WALKER (2026-08-11). HAL + GOLEM (batch ran 2026-08-11).** Test-only (suite ota1249MainQuestWalker, no version bump —
   it found NO defect, which is the headline: the spine is sound). The one road
   no walker had ever walked: creation → hook → revelation → nine Core
   Guardians → descent → Nexus → ending. Now walked for ALL NINE factions
