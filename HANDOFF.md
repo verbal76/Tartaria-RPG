@@ -1676,8 +1676,7 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE FOURTH DOOR — GAP 2 CLOSED (2026-08-11, latest). HAL ONLY so far —
-  golem batch pending.** HAL OTA-1248. The ending choice read nothing the
+- **⚠⚠ THE FOURTH DOOR — GAP 2 CLOSED (2026-08-11, latest). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1248. The ending choice read nothing the
   player did. Now: **STAY**, an EARNED fourth ending (you don't walk out — you
   mind the Engine, and the Arbiter finally says thank you and goes quiet), 9
   faction futures + 5 motive epilogues. ⚠⚠ THE DESIGN LAW, and it must not be
