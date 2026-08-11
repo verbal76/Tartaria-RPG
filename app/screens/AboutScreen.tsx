@@ -20,6 +20,7 @@ import {
 import { LoreCodexBody } from '../components/LoreCodexBody';
 import { useHintsDisabled, setHintsDisabled, resetAllFirstTimeHints } from '../components/useFirstTimeHint';
 import { useAutosaveDisabled, setAutosaveDisabled } from '../ui/autosave';
+import { useUiScale, setUiScale, UI_SCALES, displayScaleSupported, type UiScale } from '../ui/displayScale'; // OTA-1250
 import { useAccessibility } from '../state/accessibility';
 import { THIRD_PARTY_NOTICES, NOTICES_PREAMBLE, NOTICES_VERIFIED_AT } from '../data/thirdPartyNotices';
 import {
@@ -59,6 +60,7 @@ import {
 } from '../voice/PiperTTSManager';
 import type * as Speech from 'expo-speech';
 import { resetMLHealth, mlHealthSummary } from '../diagnostics/mlHealth';
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1250 — one column width, platform-aware
 
 export function AboutScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -103,6 +105,8 @@ export function AboutScreen() {
   // OTA-860 — global first-time-tips kill-switch (per-install, reactive).
   const hintsDisabled = useHintsDisabled();
   const autosaveDisabled = useAutosaveDisabled();
+  const uiScale = useUiScale(); // OTA-1250 — desktop only; the row hides itself elsewhere
+  const scaleSupported = displayScaleSupported();
   // OTA-898 (SA-6) — device reduce-motion preference (reactive).
   const reduceMotion = useAccessibility((s) => s.reduceMotion);
   const setReduceMotion = useAccessibility((s) => s.setReduceMotion);
@@ -752,6 +756,39 @@ export function AboutScreen() {
             The game also saves after every action and when the app goes to the
             background — this timer just bounds what an idle stretch could lose.
           </Text>
+
+          {/* ⚠ OTA-1250 — UI SCALE (desktop/Steam only). Deliberately NOT a
+              resolution picker: inside a maximized window the OS owns the
+              resolution, and a dropdown fighting it is a mobile-porting
+              anti-pattern. This is the desktop convention — scale the whole
+              interface, text and controls together, via the Electron zoom.
+              The row is absent entirely off-desktop rather than shown inert. */}
+          {scaleSupported && (
+            <>
+              <View style={styles.musicRow}>
+                <Text style={styles.musicLabel}>Display size</Text>
+                <View style={{ flex: 1 }} />
+                {UI_SCALES.map((s2: UiScale) => (
+                  <TouchableOpacity
+                    key={s2}
+                    onPress={() => { void setUiScale(s2); }}
+                    style={[styles.musicToggle, uiScale === s2 && styles.musicToggleOn, { marginLeft: 6 }]}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Display size ${s2}`}
+                    accessibilityState={{ selected: uiScale === s2 }}
+                  >
+                    <Text style={[styles.musicToggleText, uiScale === s2 && styles.musicToggleTextOn]}>
+                      {s2 === 'small' ? 'S' : s2 === 'medium' ? 'M' : 'L'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <Text style={styles.sessionHint}>
+                Scales the whole interface for your monitor. F11 toggles fullscreen.
+              </Text>
+            </>
+          )}
 
           {/* OTA-1046 — REPLAY OPENING moved to the CharacterScreen header
               (owner: "I went to settings and about and there was no replay
@@ -1469,7 +1506,7 @@ function safeUpdates<T>(fn: () => T): string {
 
 const styles = StyleSheet.create({
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
-  container: { flex: 1, backgroundColor: 'transparent', padding: 12, width: '100%', maxWidth: 600, alignSelf: 'center' },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 12, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

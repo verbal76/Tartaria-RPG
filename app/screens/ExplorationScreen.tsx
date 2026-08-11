@@ -56,6 +56,7 @@ import { TutorialTarget } from '../components/TutorialTarget';
 import { TUTORIAL_STEPS } from '../components/tutorialSteps';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
 import type { CombatRange } from '../engine/types';
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1250 — one column width, platform-aware
 
 function describeTime(hours: number): string {
   const day = Math.floor(hours / 24) + 1;
@@ -2124,7 +2125,7 @@ const styles = StyleSheet.create({
   didYouMeanChip: { backgroundColor: '#1a1714', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, paddingHorizontal: 10, paddingVertical: 6 },
   didYouMeanChipText: { color: '#e6d8b3', fontSize: 12, letterSpacing: 0.5 },
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
-  container: { flex: 1, backgroundColor: 'transparent', padding: 8, gap: 6, width: '100%', maxWidth: 600, alignSelf: 'center' },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 8, gap: 6, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
   // minHeight (not fixed height) — characters with multiple active
   // contracts / effects / a companion overflow 165px; the fixed height
   // clipped the bottom rows behind the scene bar. Letting the row grow

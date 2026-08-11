@@ -1446,7 +1446,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1248`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1250`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1456,7 +1456,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.154**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.155**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1676,8 +1676,21 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE COMPLETIONIST RUN (2026-08-11, latest). HAL ONLY so far — golem
-  batch pending.** Test-only, two new ON-DEMAND sweeps (the "Sweep" in the
+- **⚠⚠ THE PC COLUMN + UI SCALE (2026-08-11, latest). HAL ONLY so far — golem
+  batch pending; the DESKTOP half is on steam.** HAL OTA-1250. Five screens
+  hard-coded `maxWidth: 600` (a phone assumption nobody revisited at port
+  time), so the PC build was a 600px ribbon in a maximized window. All five now
+  share `CONTENT_MAX_WIDTH` in `app/ui/displayScale.ts` — 1024 on web/desktop,
+  **unchanged 600 on native**. Plus Settings → Display size (S/M/L) driving the
+  Electron zoom via the preload bridge, persisted per install and re-applied on
+  boot (Electron forgets zoom across launches). ⚠ The row feature-detects the
+  bridge and is ABSENT on mobile. ⚠ MOBILE MUST NOT MOVE: ota1250DisplayScale's
+  first assertion is that the native column is still exactly 600 — if the PC
+  widening ever leaks onto phones that fails first. ⚠ LAYOUT IS UNWALKABLE:
+  the engine is untouched, so no walker can see any of this; it needs eyes on a
+  real window. Full story: the VERSION.md 4.29.155 row.
+
+- **⚠⚠ THE COMPLETIONIST RUN (2026-08-11). HAL + GOLEM (batch ran 2026-08-11).** Test-only, two new ON-DEMAND sweeps (the "Sweep" in the
   filenames keeps them out of test:ci:fast, same exclusion as the stress
   sims): `completionistSpineSweep` — the FULL identity cross, 9 factions × 5
   motives × 4 endings = 180 complete games played live, creation to credits
