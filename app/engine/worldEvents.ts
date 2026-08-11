@@ -312,6 +312,13 @@ export interface Patrol {
   homeY: number;
   /** Per-patrol phase so two patrols of the same faction don't overlap. */
   phase: number;
+  /** ⚠ OTA-1244 — a QUARRY group placed by a bounty contract (OTA-1189), not part of
+   *  the faction's fielded army. maintainPatrols must neither count these toward the
+   *  faction's patrol target nor cull them as excess — without the flag, the war
+   *  maintenance tick deleted the freshly-seeded quarry within the hour (they append
+   *  LAST, and the trim drops from the tail), so the player arrived to an empty
+   *  contract ground: the exact failure OTA-1189 exists to remove. */
+  quarry?: boolean;
 }
 
 /** OTA-853 — patrols ROAM THE WHOLE MAP now (no home leash). A deterministic wander:

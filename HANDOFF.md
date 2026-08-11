@@ -1446,7 +1446,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1242`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1244`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1456,7 +1456,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.148**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.150**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1676,7 +1676,24 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE HUNT WALKER (2026-08-11, latest). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1242. Owner commissioned it: one generic live test that
+- **⚠⚠ TEXAS RANGER RIDES EVERYTHING (2026-08-11, latest). HAL ONLY so far —
+  golem batch pending.** HAL OTA-1243 + OTA-1244. The walker now covers ALL
+  FOUR stage/contract families: mysteries + storylines (ota1243, 32 walks) and
+  leads + bounties (ota1244, 20 walks) join the hunts (ota1242). Each new
+  walker found a live bug on its first run: (1243) acceptMystery's NEUTRAL
+  branch never bumped past the stage-0 narration stage — the three
+  faction-neutral mysteries wedged forever (the OTA-1242 wedge class, third
+  member; fixed + backfill heal extended); (1244) the bounty quarry seeded by
+  OTA-1189 was CULLED by the war-maintenance tick within the hour (patrol trim
+  drops from the tail, where the quarry sits) — fixed with a `quarry: true`
+  flag the maintenance ledger ignores. ⚠ "RUN CHUCK NORRIS" / "TEXAS RANGER"
+  NOW MEANS ALL FOUR SUITES:
+  `npx jest ota1242HuntWalker ota1243MysteryStorylineWalker ota1244LeadsBountiesWalker --forceExit`
+  (HAL names; golem twins are 1219/1220/1221). Harness traps live in the
+  ota1242 header — read before extending. Full stories: VERSION.md 4.29.149
+  and 4.29.150 rows.
+
+- **⚠⚠ THE HUNT WALKER (2026-08-11). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1242. Owner commissioned it: one generic live test that
   plays EVERY hunt end to end (accept → each stage on its own verb → apex
   freeze → kill → turn-in line), auto-covering new hunts. Its first step found
   that hunts had NO way off stage 0 (null checkKind, no OTA-871 consume loop,

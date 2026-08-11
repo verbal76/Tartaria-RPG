@@ -196,7 +196,7 @@ export function findHuntById(id: string): HuntDef | null {
  *  wedged at stage 0 forever — no verb, no dice, nothing could move it. The
  *  hunt walker found it on its first step. Accept starts the record HERE, and
  *  advanceHunt + the save backfill consume any nulls mid-chain. */
-export function firstActionableHuntStage(hunt: Pick<HuntDef, 'stages'>): number {
+export function firstActionableHuntStage(hunt: { stages: ReadonlyArray<{ checkKind: string | null }> }): number {
   let i = 0;
   while (i < hunt.stages.length && hunt.stages[i]!.checkKind === null) i++;
   return i;
