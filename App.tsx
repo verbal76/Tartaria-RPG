@@ -57,6 +57,7 @@ import * as Updates from 'expo-updates';
 import { useUiScale } from './app/ui/uiScale';
 import { loadDisplaySettings, useDisplaySettings, baseColorOf } from './app/ui/displaySettings';
 import { autosaveTick, loadAutosaveDisabled, AUTOSAVE_INTERVAL_MS } from './app/ui/autosave';
+import { loadUiScale } from './app/ui/displayScale'; // OTA-1250
 
 // Lazy-load expo-navigation-bar. The package is a native module bridged
 // only in APKs built AFTER it was added to dependencies — older
@@ -609,6 +610,9 @@ export default function App() {
   // the 2-10 minute industry span, do not loosen it to look "standard".
   useEffect(() => {
     void loadAutosaveDisabled(); // warm the per-install flag before the first beat
+    // OTA-1250 — and re-apply the saved UI scale: Electron does not remember
+    // the zoom across launches, so without this a 'large' player relaunches small.
+    void loadUiScale();
     const timer = setInterval(() => {
       const s = useGameStore.getState();
       void autosaveTick({ persist: s.persist, player: s.player, activeSlotId: s.activeSlotId });

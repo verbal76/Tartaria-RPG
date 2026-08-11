@@ -21,6 +21,7 @@ import { npcRegard, regardPriceMult, getRelation } from '../engine/npcMemory';
 import { profileOf, tideStage, tidePriceMultiplier } from '../engine/pressure';
 import { canonicalCellOf } from '../engine/worldMap';
 import factionsData from '../data/factions/factions.json';
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1250 — one column width, platform-aware
 import {
   CATEGORY_ORDER,
   CATEGORY_LABEL,
@@ -1058,7 +1059,7 @@ export function VendorScreen() {
 
 const styles = StyleSheet.create({
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
-  container: { flex: 1, backgroundColor: 'transparent', padding: 12, width: '100%', maxWidth: 600, alignSelf: 'center' },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 12, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
