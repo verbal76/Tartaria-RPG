@@ -1446,7 +1446,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1237`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1238`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1456,7 +1456,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.144**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.145**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1676,7 +1676,14 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ LEADS COMPLETE (2026-08-11, latest). HAL ONLY so far — golem batch
+- **⚠⚠ THE BURST GUARD (2026-08-11, latest). HAL ONLY so far — golem batch
+  pending.** HAL OTA-1238. OTA-1236's stage triggers raced INVESTIGATE ALL's
+  un-awaited submit loop — three chips matched the same stage before the first
+  advance landed and the owner's Bog Dragon hunt jumped three stages (mid-hunt
+  boss spawned unannounced). One advance in flight per mission now, all three
+  families. Full story: the VERSION.md 4.29.145 row.
+
+- **⚠⚠ LEADS COMPLETE (2026-08-11). HAL ONLY so far — golem batch
   pending.** HAL OTA-1237. The owner's "every other style of side quest?"
   follow-up found LEADS effectively 100% uncompletable — the only trigger was
   kill-verb name matching no authored objective can satisfy. Now the verb at
