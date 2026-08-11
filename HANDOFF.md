@@ -1427,8 +1427,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1241`**,
-**golem-line `2026-08-11-1218`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1242`**,
+**golem-line `2026-08-11-1219`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1437,7 +1437,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.147**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.148**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1644,7 +1644,18 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE POSTER IS THE GATE (2026-08-11, latest). HAL + GOLEM.** HAL
+- **⚠⚠ THE HUNT WALKER (2026-08-11, latest). HAL + GOLEM.** HAL OTA-1242 /
+  golem OTA-1219. Owner-commissioned: one generic live test that plays EVERY
+  hunt end to end (accept → each stage on its own verb → apex freeze → kill →
+  turn-in line), auto-covering new hunts. Its first step found that hunts had
+  NO way off stage 0 (null checkKind, no auto-consume loop, matcher can't
+  match null) — every hunt accepted after the trigger-law OTA was wedged
+  forever. Fix: accept starts at firstActionableHuntStage, advanceHunt
+  consumes nulls, backfill heals wedged saves. ⚠ The walker's five harness
+  traps are documented in the suite header (__tests__/ota1219HuntWalker) —
+  READ THEM before extending it. Full story: the VERSION.md 4.29.148 row.
+
+- **⚠⚠ THE POSTER IS THE GATE (2026-08-11). HAL + GOLEM.** HAL
   OTA-1241 / golem OTA-1218. The owner's "map locations mismatch": 15 of 18
   hunt posters name a real atlas location while the anchor sat on the generic
   biome cell — walking to the named place earned the "Not here" refusal.
