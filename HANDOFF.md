@@ -1676,8 +1676,7 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE MAIN QUEST WALKER (2026-08-11, latest). HAL ONLY so far — golem
-  batch pending.** Test-only (suite ota1249MainQuestWalker, no version bump —
+- **⚠⚠ THE MAIN QUEST WALKER (2026-08-11, latest). HAL + GOLEM (batch ran 2026-08-11).** Test-only (suite ota1249MainQuestWalker, no version bump —
   it found NO defect, which is the headline: the spine is sound). The one road
   no walker had ever walked: creation → hook → revelation → nine Core
   Guardians → descent → Nexus → ending. Now walked for ALL NINE factions
