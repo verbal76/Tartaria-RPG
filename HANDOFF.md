@@ -1427,8 +1427,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1245`**,
-**golem-line `2026-08-11-1222`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1246`**,
+**golem-line `2026-08-11-1223`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1437,7 +1437,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.151**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.152**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1644,7 +1644,23 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE WALKER FLEET IS COMPLETE (2026-08-11, latest). HAL + GOLEM.** HAL
+- **⚠⚠ EVERY MOTIVE ENDS SOMEWHERE (2026-08-11, latest). HAL + GOLEM.** HAL
+  OTA-1246 / golem OTA-1223. The owner's arc read found the biggest asymmetry
+  in the story: only THE MISSING had an in-world payoff scene; Debt, Exile,
+  Calling and Record had beats, forks and an epilogue but no moment where the
+  thing you came for is in front of you. Twelve new authored answers (three per
+  motive, one a boss each) close it on the Missing's own machine — same dealer,
+  same gate (all beats + 3 Cores + a Lost Capital arrival), same
+  keepsake-on-the-kill retry semantics. `motiveResolved` stores it;
+  `missingResolved` stays authoritative for The Missing so old saves need no
+  migration. ⚠ The suite caught a two-year-old latent bug: the keepsake fields
+  were never `{name}`-filled (invisible until an authored keepsake used the
+  token). New suite ota1223EveryMotiveEnds. ⚠⚠ GAP 2 IS OPEN AND OWNER-HELD:
+  nothing you did — standing, titles, fork answers — gates SEAL/UNLEASH/
+  PRESERVE. Do NOT implement it as cleanup; the owner is deciding it.
+  Full story: the VERSION.md 4.29.152 row.
+
+- **⚠⚠ THE WALKER FLEET IS COMPLETE (2026-08-11). HAL + GOLEM.** HAL
   OTA-1245 / golem OTA-1222. Climbs + whispers walker
   (ota1222ClimbsWhispersWalker here: 5 towers cresting through real gear
   gates + the full Yulka chain on real map steps). It caught the biggest one
