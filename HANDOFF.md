@@ -1644,7 +1644,21 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE MAIN QUEST WALKER (2026-08-11, latest). HAL + GOLEM.** Test-only
+- **⚠⚠ THE COMPLETIONIST RUN (2026-08-11, latest). HAL + GOLEM.** Test-only,
+  two ON-DEMAND sweeps ("Sweep" filenames stay out of test:ci:fast):
+  `completionistSpineSweep` — 9 factions × 5 motives × 4 endings = 180
+  complete games played live, creation to credits (~4 min);
+  `completionistOutcomeSweep` — all 15 motive×resolution cells live
+  (dealer-searched by name), all 72 bounty giver×target pairs live, and the
+  full 540-cell ending-text matrix enumerated. First full run on HAL:
+  180/180 + 89/89 + the whole fleet — 475 end-to-end tests, ZERO defects.
+  ⚠ RUN IT: `npx jest completionist --forceExit` (~5 min) — before store
+  pushes or after story-engine surgery, not per-push. Scope note: exhausts
+  every AUTHORED combination; cross-family interference stays guarded by the
+  in-flight/burst machinery, and free-text input space is unbounded — no
+  sweep claims it.
+
+- **⚠⚠ THE MAIN QUEST WALKER (2026-08-11). HAL + GOLEM.** Test-only
   (golem suite ota1226MainQuestWalker / HAL ota1249, no version bump — it
   found NO defect, which is the headline: the spine is sound). The one road no
   walker had walked: creation → hook → revelation → nine Core Guardians →
