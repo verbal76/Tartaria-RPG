@@ -1676,8 +1676,7 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ TEXAS RANGER RIDES EVERYTHING (2026-08-11, latest). HAL ONLY so far —
-  golem batch pending.** HAL OTA-1243 + OTA-1244. The walker now covers ALL
+- **⚠⚠ TEXAS RANGER RIDES EVERYTHING (2026-08-11, latest). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1243 + OTA-1244. The walker now covers ALL
   FOUR stage/contract families: mysteries + storylines (ota1243, 32 walks) and
   leads + bounties (ota1244, 20 walks) join the hunts (ota1242). Each new
   walker found a live bug on its first run: (1243) acceptMystery's NEUTRAL
