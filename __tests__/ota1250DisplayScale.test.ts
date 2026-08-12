@@ -48,7 +48,11 @@ describe('OTA-1250 — one column width, and a scale control that only exists wh
   });
 
   it('⚠ the desktop width is genuinely wider — the whole point of the change', () => {
-    const src = readFileSync(join(__dirname, '..', 'app', 'ui', 'displayScale.ts'), 'utf8');
+    // ⚠ OTA-1252 moved the pure constants to ./layoutConstants (displayScale
+    // needs AsyncStorage, and a width should not cost a render path a storage
+    // dependency). displayScale re-exports both, so the five screens below are
+    // unchanged — only where the NUMBER is written moved.
+    const src = readFileSync(join(__dirname, '..', 'app', 'ui', 'layoutConstants.ts'), 'utf8');
     expect(src).toMatch(/Platform\.OS === 'web' \? (\d+) : 600/);
     const web = Number(/Platform\.OS === 'web' \? (\d+) : 600/.exec(src)![1]);
     expect(web).toBeGreaterThan(600);

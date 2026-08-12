@@ -102,7 +102,7 @@ describe('OTA-1240 — Bog Dragon back half, in order, each stage on its own ver
         hubRoomId: null,
         hp: 500, hpMax: 500, stamina: 50, staminaMax: 50,
         stats: { ...p.stats, strength: 20, dexterity: 20 },
-        activeHunts: [{ id: 'hunt_bog_dragon', stage: 4, tracked: true }],
+        activeHunts: [{ id: 'hunt_bog_dragon', stage: 4, tracked: true, postedByFaction: null, acceptedAt: 0 }],
       },
     });
     const scene = store.getState().currentScene!;

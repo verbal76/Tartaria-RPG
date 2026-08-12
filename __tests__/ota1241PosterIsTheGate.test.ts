@@ -12,7 +12,10 @@ import { HUNTS } from '../app/engine/hunts';
 import { canonicalCellOf } from '../app/engine/worldMap';
 import locationsData from '../app/data/locations/locations.json';
 
-const locations = (locationsData as { locations: Array<{ id: string }> }).locations
+// ⚠ OTA-1252 — `as unknown as` on BOTH arms. locations.json is a bare ARRAY, so the
+// `{ locations: [...] }` probe is a shape tsc can prove will never match — it was a
+// hard type error, not a warning, and it sat in the ratchet as silent debt.
+const locations = (locationsData as unknown as { locations?: Array<{ id: string }> }).locations
   ?? (locationsData as unknown as Array<{ id: string }>);
 const isRealLocation = (id: string) => locations.some((l) => l.id === id);
 

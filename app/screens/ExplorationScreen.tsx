@@ -57,6 +57,7 @@ import { TUTORIAL_STEPS } from '../components/tutorialSteps';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
 import type { CombatRange } from '../engine/types';
 import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1250 — one column width, platform-aware
+import { useBackAction } from '../ui/desktopBack'; // OTA-1252 — right-click / Escape closes the top popup
 
 function describeTime(hours: number): string {
   const day = Math.floor(hours / 24) + 1;
@@ -257,6 +258,33 @@ export function ExplorationScreen() {
     if (anyPopupOpen) Keyboard.dismiss();
   }, [searchOpen, approachOpen, askArbiterOpen, salvageOpen, climbOpen, takeOpen, doorBeatOpen, setInputModalOpen]);
   useEffect(() => () => setInputModalOpen(false), [setInputModalOpen]);
+  // ⚠⚠ OTA-1252 — RIGHT-CLICK / ESCAPE CLOSES THE POPUP ON TOP. Owner, on the
+  // PC build: *"right click on the mouse should be the back button."* On a
+  // phone each of these <Modal>s already answers Android's hardware back
+  // through `onRequestClose`; a PC has no such button, so every picker had
+  // exactly one exit — finding and hitting its small CANCEL.
+  //
+  // ⚠ THE DOOR BEAT IS DELIBERATELY ABSENT from this list. It is a TUTORIAL
+  // GATE, not a convenience popup — the run cannot continue until the player
+  // chooses, so a back action that dismissed it would strand them on a screen
+  // with nothing to press. Everything here is a picker the player opened and
+  // may simply not want.
+  //
+  // Registered AFTER the AppShell handler, so it is consulted BEFORE it: with a
+  // picker open the click closes the picker, and only once nothing is open does
+  // the click fall through to "leave this sub-screen".
+  useBackAction(true, () => {
+    if (torchChooserOpen) { setTorchChooserOpen(false); return true; }
+    if (takeOpen) { setTakeOpen(false); return true; }
+    if (salvageOpen) { setSalvageOpen(false); return true; }
+    if (climbOpen) { setClimbOpen(false); return true; }
+    if (searchOpen) { setSearchOpen(false); return true; }
+    if (approachOpen) { setApproachOpen(false); return true; }
+    if (pickpocketOpen) { setPickpocketOpen(false); return true; }
+    if (askArbiterOpen) { setAskArbiterOpen(false); return true; }
+    if (missionBoardOpen) { setMissionBoardOpen(false); return true; }
+    return false;
+  });
   // arb72 (iOS door-popup fix) — the leave/stay popup is a native <Modal>, and
   // its `visible` used to flip true the instant the explore_or_leave beat
   // advanced (mid store-driven re-render, with the keyboard still dismissing
@@ -1755,6 +1783,11 @@ export function ExplorationScreen() {
           }
           takeAmbientNoun(noun);
         }}
+        // ⚠ OTA-1252 — the toggle only exists when a vendor is here to steal
+        // from. `stealthTakeAmbientNoun` routes to `stealFromVendor` on exactly
+        // this condition; without a vendor it fell through to a sleight-of-hand
+        // roll against nobody, which could only lose the player the item.
+        stealthMeaningful={!!currentScene?.vendor}
         onStealthTake={(noun) => {
           Keyboard.dismiss();
           setTakeOpen(false);
