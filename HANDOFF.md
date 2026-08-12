@@ -1427,8 +1427,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-12-1253`**,
-**golem-line `2026-08-12-1230`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-12-1254`**,
+**golem-line `2026-08-12-1231`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1437,7 +1437,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.158**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.159**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1644,7 +1644,30 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE NAME LINE, AND THE INJECTION AUDIT (2026-08-12, latest). HAL + GOLEM
+- **⚠⚠ THREE VERBS SHARING TWO MARKERS (2026-08-12, latest). HAL + GOLEM (batch
+  ran 2026-08-12).** Golem OTA-1231, ported from HAL 1254. Owner, from a phone
+  session: *"investigate kills salvage sometimes, salvage can kill items in
+  take."* Both true, and **the contract is written down in
+  `app/engine/types.ts` on the marker itself** — `flavorExhaustedNouns` says
+  *"only the investigate verb consults this list"*. Three places read it anyway.
+  (1) **Engine.** `salvage <noun>` parses to `intent=investigate` (salvage is a
+  verb synonym so it can reuse the noun matcher), so it hit a gate meant for
+  repeat LORE reads. From the device log: investigate a brick → lore; take it →
+  *"…Leave it. Or salvage it."*; salvage it → *"You've already examined the
+  brick."* **The game named the verb, he used it, the game refused** — and the
+  brick is a real rubble-pool yield, so it cost the loot it pointed at.
+  (2) **UI, and worse because the engine DISAGREED.** The take picker greyed on
+  the flavor set while `takeAmbientNoun` reads only `searchedAmbientNouns` and
+  never has. ⚠ The SEARCH picker keeps its check: **a SPLIT, not a deletion**.
+  (3) ⚠⚠ **The silent one.** Salvage writes `searchedAmbientNouns`, TAKE reads
+  it, so bulk SALVAGE ALL scrapped items the player could have pocketed.
+  **Overlap measured, not assumed.** The bulk sweep now skips catalog items;
+  **a TYPED salvage is still honoured**, and the skip gets its own honest line
+  rather than "Already worked over", which would describe a state the game is
+  not in. New suite ota1231VerbsDoNotEatEachOther (8). Full story: the
+  VERSION.md 4.29.159 row.
+
+- **⚠⚠ THE NAME LINE, AND THE INJECTION AUDIT (2026-08-12). HAL + GOLEM
   (batch ran 2026-08-12).** Golem OTA-1230, ported from HAL 1253. Owner asked
   whether emoji and special characters can be kept out of the name line, then
   whether anything typed there could be malicious. OTA-612 already stripped to

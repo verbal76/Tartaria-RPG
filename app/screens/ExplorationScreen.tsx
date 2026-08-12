@@ -425,11 +425,24 @@ export function ExplorationScreen() {
     // too. Self-heal logic below stays intact (only treat as
     // consumed if the catalog item is in inventory, otherwise
     // ungrey so the player isn't stuck on a sold/lost item).
-    // OTA-930 — split pools: searched keeps the loose fuzzy rule, flavor is word-level.
-    if (
-      !isFuzzyConsumed(noun, productivelyConsumedSet)
-      && !isNounFlavorExhausted(noun, flavorExhaustedSet)
-    ) return false;
+    // ⚠⚠ OTA-1231 — THE FLAVOR LIST IS NOT A CONSUMPTION LIST, AND READING IT HERE
+    // GREYED CHIPS THE ENGINE WOULD HAVE ACCEPTED. Owner: *"investigate kills
+    // salvage sometimes, salvage can kill items in take."* This helper is used for
+    // BOTH the take and salvage pickers, and it OR-ed in `flavorExhaustedSet` —
+    // so investigating a noun for lore greyed its TAKE chip.
+    //
+    // ⚠ MEASURED: `takeAmbientNoun` reads ONLY `searchedAmbientNouns`. It has never
+    // consulted the flavor list, which means the engine would happily have taken
+    // the item — the UI was refusing on its own authority, and the player had no
+    // way to tell the difference from a genuinely spent noun. The type declaring
+    // `flavorExhaustedNouns` says so outright: *"only the investigate verb consults
+    // this list"*, and this was one of three places that broke it.
+    //
+    // ⚠ The comment below about a lit chip never earning a refusal still holds —
+    // it now holds in the honest direction: the chip is lit exactly when the
+    // engine would say yes.
+    // OTA-930 — searched keeps the loose fuzzy rule.
+    if (!isFuzzyConsumed(noun, productivelyConsumedSet)) return false;
     // OTA-958 — taken is taken. The ownership tail un-greyed the chip the moment
     // the item left the pack — but USING it also empties the pack, so the chip
     // re-lit and take -> use -> take farmed forever. Mirrors the engine's
@@ -1836,13 +1849,23 @@ export function ExplorationScreen() {
                 currentScene?.elevatedOn?.tier ?? 0,
               ).map((n) => ({
                 noun: n,
-                // OTA-167 — salvage chip greys on the engine's per-room
-                // consumed state directly (searched + flavor-exhausted),
-                // NOT isAmbientConsumed's self-heal, which fuzzy-matched
-                // catalog items the player didn't own and kept chips lit.
+                // OTA-167 — salvage chip greys on the engine's per-room consumed
+                // state directly, NOT isAmbientConsumed's self-heal, which
+                // fuzzy-matched catalog items the player didn't own and kept
+                // chips lit.
+                // ⚠⚠ OTA-1231 — `isNounFlavorExhausted` REMOVED from this predicate.
+                // A noun you read for lore is not a noun you have broken down for
+                // parts, and greying it here was the VISIBLE half of the owner's
+                // "investigate kills salvage": the chip went dead, and typing the
+                // word instead hit the matching engine gate (fixed in the same OTA,
+                // in gameStore's investigate handler). Salvage's real consumption
+                // marker is `searchedAmbientNouns` — the first term below — and it
+                // is written where the pool actually rolls.
+                // ⚠ The SEARCH picker above KEEPS its flavor check, and that is the
+                // point of the split: investigate is the one verb the flavor list
+                // was ever meant to gate.
                 consumed:
                   isFuzzyConsumed(n, productivelyConsumedSet) ||
-                  isNounFlavorExhausted(n, flavorExhaustedSet) ||
                   isExhaustedHookNoun(n),
               }))
         }
