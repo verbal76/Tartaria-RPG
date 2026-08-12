@@ -25,6 +25,17 @@ import {
 // hide-vs-grey behaviour now.
 export type { InteractableChip as TakeableChip } from './InteractableChip';
 
+// ⚠⚠ OTA-1232 — the sort, the icons and the ★ upgrade mark live in the ENGINE
+// (app/engine/gatherSort.ts), not here. Owner: *"can we have the nouns sorted
+// maybe place a sword on weapons, a shield on armor and have them first."* Keeping
+// the ordering and the icon in one engine module means the mark on a row and the
+// lane it sorts into can never disagree — a picker that shows ⚔ on a row it filed
+// under armor is worse than one with no icons at all.
+import {
+  classifyGatherNoun, isUpgradeOverEquipped, sortGatherRows, gatherIcon,
+} from '../engine/gatherSort';
+import type { PlayerCharacter } from '../engine/types';
+
 interface Props {
   visible: boolean;
   /** Pre-filtered list of takeable ambient nouns — catalog-resolvable
@@ -45,6 +56,10 @@ interface Props {
    *  have use stealth in the take popup? thats not how stealth works
    *  anymore."* Right on both counts — see the note on the toggle below. */
   stealthMeaningful: boolean;
+  /** ⚠ OTA-1232 — needed for the ★ mark, which compares each row against what is
+   *  equipped RIGHT NOW. Nullable: with no player there is simply no ★, rather
+   *  than a crash in a picker whose job is to be tapped in a hurry. */
+  player: PlayerCharacter | null;
   /** OTA 222 — batch open-take. Fires onTake for every visible
    *  non-consumed chip in sequence, then closes. Only surfaced when
    *  there are 2+ visible items and stealth is OFF (batch DEX rolls
@@ -55,7 +70,7 @@ interface Props {
   onCancel: () => void;
 }
 
-export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll, onCancel, stealthMeaningful }: Props) {
+export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll, onCancel, stealthMeaningful, player }: Props) {
   const [useStealth, setUseStealth] = useState(false);
   // Reset the toggle each time the modal opens so the player has to
   // re-arm the sneaky path on purpose — no surprise pickpockets.
@@ -124,7 +139,21 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
                 // disappear entirely once grabbed. This matches the
                 // playtester spec ("once successful, it is removed
                 // from that locations noun list on all actions").
-                const visible = takeable.filter((c) => !c.consumed || c.alwaysShow);
+                const unsorted = takeable.filter((c) => !c.consumed || c.alwaysShow);
+                // ⚠ OTA-1232 — decisions first, sweepable last: ★ upgrades, then
+                // ⚔ weapons, then 🛡 armor, then the rest. The player manages the
+                // rows that need a judgement call and bulk-handles the remainder,
+                // which is exactly the flow the owner described.
+                const rows = sortGatherRows(unsorted.map((c) => ({
+                  noun: c.noun,
+                  kind: classifyGatherNoun(c.noun),
+                  upgrade: isUpgradeOverEquipped(player, c.noun),
+                  consumed: !!c.consumed,
+                })));
+                const visible = rows.map((r) => ({
+                  ...r,
+                  alwaysShow: unsorted.find((c) => c.noun === r.noun)?.alwaysShow,
+                }));
                 return visible.length === 0 ? (
                 <Text style={styles.empty}>
                   Nothing here you can pocket. Scene features (pillars, walls,
@@ -132,7 +161,7 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
                 </Text>
               ) : (
                 <ScrollView style={styles.chipScroll} contentContainerStyle={styles.chipList}>
-                  {visible.map(({ noun, consumed }) => (
+                  {visible.map(({ noun, consumed, kind, upgrade }) => (
                     <Pressable
                       key={noun}
                       style={({ pressed }) => [
@@ -146,6 +175,13 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
                       accessibilityState={{ disabled: consumed }}
                     >
                       <Text style={[styles.chipText, consumed && styles.chipTextConsumed]}>
+                        {/* ⚠ ONE mark, at the left, and nothing else added to the
+                            row. At 443px of phone the name is what the player
+                            reads; an icon earns its place only by staying out of
+                            the way of it. */}
+                        <Text style={[styles.chipIcon, upgrade && styles.chipIconUpgrade]}>
+                          {gatherIcon({ kind, upgrade })}{' '}
+                        </Text>
                         {noun}
                       </Text>
                       <Text
@@ -243,6 +279,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   chipPressed: { opacity: 0.7 },
+  // ⚠ OTA-1232 — the ★ is the only mark that gets a colour of its own. It is the
+  // one that answers a question ("is this better than what I'm wearing"); the
+  // others merely say what a thing is, and colouring those too would flatten the
+  // difference back out.
+  chipIcon: { color: '#a2977b', fontSize: 13 },
+  chipIconUpgrade: { color: '#9ec96a', fontWeight: '700' },
   chipText: { color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
   chipArrow: { color: '#9ec96a', fontSize: 11, letterSpacing: 1 },
   chipArrowStealth: { color: '#6a9bbf', fontSize: 11, letterSpacing: 1 },

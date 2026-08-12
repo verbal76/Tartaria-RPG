@@ -1812,6 +1812,9 @@ export function ExplorationScreen() {
         // this condition; without a vendor it fell through to a sleight-of-hand
         // roll against nobody, which could only lose the player the item.
         stealthMeaningful={!!currentScene?.vendor}
+        // ⚠ OTA-1232 — drives the ★ upgrade mark, compared against what is
+        // equipped right now rather than a snapshot taken when the room spawned.
+        player={player}
         onStealthTake={(noun) => {
           Keyboard.dismiss();
           setTakeOpen(false);

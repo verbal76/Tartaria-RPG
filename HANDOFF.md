@@ -1428,7 +1428,7 @@ Key invariants worth knowing:
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
 history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-12-1254`**,
-**golem-line `2026-08-12-1231`** (parity offset still HAL − 23 — every gameplay
+**golem-line `2026-08-12-1232`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1437,7 +1437,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.159**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.160**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1644,7 +1644,33 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THREE VERBS SHARING TWO MARKERS (2026-08-12, latest). HAL + GOLEM (batch
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE LOOT/SHOP TRIAL (2026-08-12, latest). GOLEM
+  ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1232. Owner: *"let's try this setup
+  for the golem line only, I'll take it for a spin."*
+  ⚠⚠ **THIS BREAKS THE SAME-PASS PARITY RULE ON PURPOSE, AND IT CARRIES A
+  DECISION POINT: MERGE TO HAL, OR REVERT.** It is a UX trial, not a fix. The
+  first HAL OTA that touches `TakeModal`, `VendorScreen` or `portability.ts` will
+  conflict on port, and whoever hits that conflict needs to know this divergence
+  was chosen rather than accidental. **Do not let it age quietly into permanent
+  drift** — either it earns its way onto HAL after the owner has played it, or it
+  comes out.
+  Three changes: (1) the loot picker SORTS — ★ upgrades → ⚔ weapons → 🛡 armor →
+  other → scenery — with the ★ computed from real catalog numbers (armor
+  `acBonus` in the same slot, weapon average damage vs the main hand), strict
+  enough to be trustworthy (a tie is NOT an upgrade; an unknown never is).
+  (2) **SELL ALL COMMON GEAR** with the count and total on the button face — gear
+  only, because Common covers rations, Scrap Metal and Aether Dust; keyed on
+  `rarity === 'Common'` and NOT on the beige colour, which is the `default:`
+  branch and also catches unknowns; Crucible-forged pieces excluded.
+  (3) The scene-feature refusals stop advertising SALVAGE on nouns with no
+  salvage pool (`sign`, `arch`, `wall`), via a new pure `hasSalvageYield`.
+  ⚠ NOT in this OTA: the full merge of the take and salvage popups. Sort/icons/★
+  are; the physical merge needs SalvageModal's results phase, elevation filter
+  and two tutorial beats moved without loss, and it lands with the tutorial +
+  refusal copy pass. New suite ota1232GatherAndBulkSell (16). Full story: the
+  VERSION.md 4.29.160 row.
+
+- **⚠⚠ THREE VERBS SHARING TWO MARKERS (2026-08-12). HAL + GOLEM (batch
   ran 2026-08-12).** Golem OTA-1231, ported from HAL 1254. Owner, from a phone
   session: *"investigate kills salvage sometimes, salvage can kill items in
   take."* Both true, and **the contract is written down in

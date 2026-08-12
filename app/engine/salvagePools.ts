@@ -425,6 +425,28 @@ function pickWeighted(items: PoolEntry[], rng: () => number): PoolEntry {
  *  2026-05-25 [POLISH-2] — the "nothing" branch now rolls from
  *  JUNK_POOL so the player always walks away with at least one
  *  item; the empty outcome is gone from this path. */
+/** ⚠⚠ OTA-1232 — DOES THIS NOUN HAVE A SALVAGE YIELD AT ALL? Pure, deterministic,
+ *  and rolls nothing — the question a REFUSAL LINE has to answer before it tells
+ *  the player to go and salvage something.
+ *
+ *  Owner, after the take/salvage audit: the eight scene-feature refusals all ended
+ *  with "(Try SALVAGE.)" unconditionally (OTA-137 made it universal so a hoarder
+ *  would learn the verb). Measured against the shipped pools, `sign` and `arch`
+ *  match NO pool — so on those nouns the advice sent the player somewhere empty,
+ *  which is the same defect class as the contract refusal that used to blame
+ *  travel: a message that costs the player a turn doing the one thing that
+ *  provably cannot help.
+ *
+ *  ⚠ It mirrors `rollSalvagePool`'s FIRST TWO decisions and nothing after them —
+ *  the sigil head-noun gate, then `pickPool`. Everything past that point is the
+ *  random half (nothing-chance, curio valve, weighted pick), which changes WHAT
+ *  you get, never WHETHER there is anything. Reproducing more of it here would
+ *  make the two drift; reproducing less would make this lie. */
+export function hasSalvageYield(noun: string): boolean {
+  if (/(?:^|[\s-])(sigil|crest)s?\s*$/i.test(noun.trim())) return true;
+  return pickPool(noun) !== null;
+}
+
 export function rollSalvagePool(noun: string, rng: () => number = Math.random): SalvageOutcome | null {
   // OTA-977 — a SIGIL/CREST noun is a faction's mark, not scrap (owner: "a pried
   // sigil awards coin? it should give me a faction sigil"). Faction inferred
