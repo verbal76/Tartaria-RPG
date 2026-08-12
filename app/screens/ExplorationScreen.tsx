@@ -56,6 +56,8 @@ import { TutorialTarget } from '../components/TutorialTarget';
 import { TUTORIAL_STEPS } from '../components/tutorialSteps';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
 import type { CombatRange } from '../engine/types';
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
+import { useBackAction } from '../ui/desktopBack'; // OTA-1229 — right-click / Escape closes the top popup
 
 function describeTime(hours: number): string {
   const day = Math.floor(hours / 24) + 1;
@@ -256,6 +258,33 @@ export function ExplorationScreen() {
     if (anyPopupOpen) Keyboard.dismiss();
   }, [searchOpen, approachOpen, askArbiterOpen, salvageOpen, climbOpen, takeOpen, doorBeatOpen, setInputModalOpen]);
   useEffect(() => () => setInputModalOpen(false), [setInputModalOpen]);
+  // ⚠⚠ OTA-1229 — RIGHT-CLICK / ESCAPE CLOSES THE POPUP ON TOP. Owner, on the
+  // PC build: *"right click on the mouse should be the back button."* On a
+  // phone each of these <Modal>s already answers Android's hardware back
+  // through `onRequestClose`; a PC has no such button, so every picker had
+  // exactly one exit — finding and hitting its small CANCEL.
+  //
+  // ⚠ THE DOOR BEAT IS DELIBERATELY ABSENT from this list. It is a TUTORIAL
+  // GATE, not a convenience popup — the run cannot continue until the player
+  // chooses, so a back action that dismissed it would strand them on a screen
+  // with nothing to press. Everything here is a picker the player opened and
+  // may simply not want.
+  //
+  // Registered AFTER the AppShell handler, so it is consulted BEFORE it: with a
+  // picker open the click closes the picker, and only once nothing is open does
+  // the click fall through to "leave this sub-screen".
+  useBackAction(true, () => {
+    if (torchChooserOpen) { setTorchChooserOpen(false); return true; }
+    if (takeOpen) { setTakeOpen(false); return true; }
+    if (salvageOpen) { setSalvageOpen(false); return true; }
+    if (climbOpen) { setClimbOpen(false); return true; }
+    if (searchOpen) { setSearchOpen(false); return true; }
+    if (approachOpen) { setApproachOpen(false); return true; }
+    if (pickpocketOpen) { setPickpocketOpen(false); return true; }
+    if (askArbiterOpen) { setAskArbiterOpen(false); return true; }
+    if (missionBoardOpen) { setMissionBoardOpen(false); return true; }
+    return false;
+  });
   // arb72 (iOS door-popup fix) — the leave/stay popup is a native <Modal>, and
   // its `visible` used to flip true the instant the explore_or_leave beat
   // advanced (mid store-driven re-render, with the keyboard still dismissing
@@ -1765,6 +1794,11 @@ export function ExplorationScreen() {
           }
           takeAmbientNoun(noun);
         }}
+        // ⚠ OTA-1229 — the toggle only exists when a vendor is here to steal
+        // from. `stealthTakeAmbientNoun` routes to `stealFromVendor` on exactly
+        // this condition; without a vendor it fell through to a sleight-of-hand
+        // roll against nobody, which could only lose the player the item.
+        stealthMeaningful={!!currentScene?.vendor}
         onStealthTake={(noun) => {
           Keyboard.dismiss();
           setTakeOpen(false);
@@ -2135,7 +2169,7 @@ const styles = StyleSheet.create({
   didYouMeanChip: { backgroundColor: '#1a1714', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, paddingHorizontal: 10, paddingVertical: 6 },
   didYouMeanChipText: { color: '#e6d8b3', fontSize: 12, letterSpacing: 0.5 },
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
-  container: { flex: 1, backgroundColor: 'transparent', padding: 8, gap: 6, width: '100%', maxWidth: 600, alignSelf: 'center' },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 8, gap: 6, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
   // minHeight (not fixed height) — characters with multiple active
   // contracts / effects / a companion overflow 165px; the fixed height
   // clipped the bottom rows behind the scene bar. Letting the row grow

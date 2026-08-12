@@ -1427,8 +1427,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1248`**,
-**golem-line `2026-08-11-1225`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1252`**,
+**golem-line `2026-08-11-1229`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1437,7 +1437,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.154**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.157**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1644,7 +1644,31 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE COMPLETIONIST RUN (2026-08-11, latest). HAL + GOLEM.** Test-only,
+- **⚠⚠ THE DESKTOP BATCH (2026-08-11, latest). HAL + GOLEM (batch ran
+  2026-08-12).** Golem OTA-1227 / 1228 / 1229, ported from HAL 1250 / 1251 /
+  1252. All of it is `Platform.OS === 'web'`-guarded desktop work — **inert on
+  this line by construction**, and it ships here anyway so the branches cannot
+  diverge. It is on golem because the ONLY way a phone can be affected is if a
+  guard is written wrong, and the suites (ota1227DisplayScale 7,
+  ota1228DesktopFirstRun 11, ota1229DesktopControls 13) run on the NATIVE
+  platform under jest-expo — so every mobile assertion executes with the desktop
+  paths switched off. That is the whole reason to carry it.
+  · **1227** — five screens shared one platform-aware `CONTENT_MAX_WIDTH` (1024
+  web / **unchanged 600 native**) plus a desktop UI-scale setting.
+  · **1228** — the PC first run that hung at 51% forever: an ExecuTorch voice
+  prewarm that on web neither resolves nor rejects, a Qwen watchdog re-trying a
+  native module that cannot exist there, and a progress formula scoring a
+  settled `'failed'` as 0.1. Measured headless before it was touched.
+  · **1229** — the TAKE popup's stealth toggle (a pure downside with nobody
+  watching, and a label naming DEX after OTA-348 moved the roll to STEALTH), a
+  global back stack for right-click/Escape, and the stat row's
+  `STAT_ROW_MAX_WIDTH` cap (**`undefined` on native**, so the key is absent
+  rather than merely unbound). Also paid down the `typecheck:tests` ratchet,
+  which had been red at 207 vs baseline 200 — all seven were this iteration's
+  own fixture-shape debt. Full stories: the VERSION.md 4.29.155 / .156 / .157
+  rows.
+
+- **⚠⚠ THE COMPLETIONIST RUN (2026-08-11). HAL + GOLEM.** Test-only,
   two ON-DEMAND sweeps ("Sweep" filenames stay out of test:ci:fast):
   `completionistSpineSweep` — 9 factions × 5 motives × 4 endings = 180
   complete games played live, creation to credits (~4 min);

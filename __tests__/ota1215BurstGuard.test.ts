@@ -67,7 +67,7 @@ describe("OTA-1215 — the owner's three-chip burst advances exactly ONE stage",
         ...p,
         currentLocationId: huntAnchorId(def),
         hubRoomId: null,
-        activeHunts: [{ id: 'hunt_bog_dragon', stage: 1, tracked: true }],
+        activeHunts: [{ id: 'hunt_bog_dragon', stage: 1, tracked: true, postedByFaction: null, acceptedAt: 0 }],
       },
     });
     const scene = store.getState().currentScene!;

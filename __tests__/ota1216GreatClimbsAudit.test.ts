@@ -15,7 +15,10 @@ import { join } from 'path';
 import locationsData from '../app/data/locations/locations.json';
 import { OUTSIDE_CLIMBABLES, INSIDE_CLIMBABLES } from '../app/engine/climbableSpawns';
 
-const locations = (locationsData as { locations: Array<{ id: string }> }).locations
+// ⚠ OTA-1229 — `as unknown as` on BOTH arms. locations.json is a bare ARRAY, so the
+// `{ locations: [...] }` probe is a shape tsc can prove will never match — it was a
+// hard type error, not a warning, and it sat in the ratchet as silent debt.
+const locations = (locationsData as unknown as { locations?: Array<{ id: string }> }).locations
   ?? (locationsData as unknown as Array<{ id: string }>);
 
 describe('OTA-1216 — every tower is reachable, climbable, and pays', () => {

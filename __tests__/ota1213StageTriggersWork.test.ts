@@ -122,7 +122,7 @@ describe("OTA-1213 — LIVE: the owner's exact wall, torn down", () => {
         hubRoomId: null,
         // Stage index 1 = the card's "Stage 2/7 — The First Friction", the
         // owner's exact position. Tracked (activated), like his screenshot.
-        activeHunts: [{ id: 'hunt_bog_dragon', stage: 1, tracked: true }],
+        activeHunts: [{ id: 'hunt_bog_dragon', stage: 1, tracked: true, postedByFaction: null, acceptedAt: 0 }],
       },
     });
     const scene = store.getState().currentScene!;
@@ -155,7 +155,7 @@ describe("OTA-1213 — LIVE: the owner's exact wall, torn down", () => {
     const { store, anchor } = await bootWithBogDragon(true);
     const p = store.getState().player!;
     useGameStore.setState({
-      player: { ...p, currentLocationId: anchor, activeHunts: [{ id: 'hunt_bog_dragon', stage: 1, tracked: false }] },
+      player: { ...p, currentLocationId: anchor, activeHunts: [{ id: 'hunt_bog_dragon', stage: 1, tracked: false, postedByFaction: null, acceptedAt: 0 }] },
     });
     await store.getState().submitPlayerAction('investigate the area');
     await new Promise((r) => setTimeout(r, 400));

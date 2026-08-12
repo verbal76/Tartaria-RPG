@@ -57,6 +57,8 @@ import * as Updates from 'expo-updates';
 import { useUiScale } from './app/ui/uiScale';
 import { loadDisplaySettings, useDisplaySettings, baseColorOf } from './app/ui/displaySettings';
 import { autosaveTick, loadAutosaveDisabled, AUTOSAVE_INTERVAL_MS } from './app/ui/autosave';
+import { loadUiScale } from './app/ui/displayScale'; // OTA-1227
+import { initDesktopBack, useBackAction } from './app/ui/desktopBack'; // OTA-1229 — right-click / Escape = back
 
 // Lazy-load expo-navigation-bar. The package is a native module bridged
 // only in APKs built AFTER it was added to dependencies — older
@@ -609,6 +611,12 @@ export default function App() {
   // the 2-10 minute industry span, do not loosen it to look "standard".
   useEffect(() => {
     void loadAutosaveDisabled(); // warm the per-install flag before the first beat
+    // OTA-1227 — and re-apply the saved UI scale: Electron does not remember
+    // the zoom across launches, so without this a 'large' player relaunches small.
+    void loadUiScale();
+    // OTA-1229 — attach the desktop back routes (right-click + Escape). No-op
+    // on a phone, and idempotent, so a re-run of this effect costs nothing.
+    initDesktopBack();
     const timer = setInterval(() => {
       const s = useGameStore.getState();
       void autosaveTick({ persist: s.persist, player: s.player, activeSlotId: s.activeSlotId });
@@ -858,6 +866,25 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
   // scale recomputes. Every screen rendered below inherits the new
   // scale via the wrapper transform — no per-screen changes needed.
   const ui = useUiScale();
+  // ⚠⚠ OTA-1229 — THE BOTTOM OF THE BACK STACK. Owner, on the PC build: *"right
+  // click on the mouse should be the back button."* This is the FIRST handler
+  // registered, and the stack runs top-down, so it is the LAST consulted — a
+  // right-click inside the TAKE popup closes TAKE, not the screen beneath it.
+  //
+  // ⚠ AND AT THE GAME ITSELF, BACK DOES NOTHING. 'exploration', 'title',
+  // 'character_creation' and 'ending' all fall through deliberately: a
+  // right-click that dumped the player out of a fight, or off the ending they
+  // just earned, is the worst possible reading of the convention. Back only
+  // ever means "leave this sub-screen" — which is what a PC player expects, and
+  // the only thing it can safely do here.
+  useBackAction(true, () => {
+    if (screen === 'exploration' || screen === 'title' || screen === 'character_creation' || screen === 'ending') {
+      return false;
+    }
+    const st = useGameStore.getState();
+    st.setScreen(st.player ? 'exploration' : 'title');
+    return true;
+  });
   // arb78 — player-tunable background. Re-renders live as sliders change.
   const display = useDisplaySettings();
   // OTA-182 — keyboard-aware interior height. The wrapper View has

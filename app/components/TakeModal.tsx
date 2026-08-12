@@ -37,9 +37,14 @@ interface Props {
   takeable: import('./InteractableChip').InteractableChip[];
   /** Open take (no roll, always succeeds). */
   onTake: (noun: string) => void;
-  /** Stealth take — DEX vs DC 10 sleight check. Routes to
+  /** Stealth take — STEALTH vs DC 10 sleight check. Routes to
    *  stealFromVendor when a vendor is present in the scene. */
   onStealthTake: (noun: string) => void;
+  /** ⚠⚠ OTA-1229 — IS THERE ANYONE TO HIDE FROM? True only when a vendor is
+   *  standing in this scene. Owner, from inside the game: *"why do we still
+   *  have use stealth in the take popup? thats not how stealth works
+   *  anymore."* Right on both counts — see the note on the toggle below. */
+  stealthMeaningful: boolean;
   /** OTA 222 — batch open-take. Fires onTake for every visible
    *  non-consumed chip in sequence, then closes. Only surfaced when
    *  there are 2+ visible items and stealth is OFF (batch DEX rolls
@@ -50,7 +55,7 @@ interface Props {
   onCancel: () => void;
 }
 
-export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll, onCancel }: Props) {
+export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll, onCancel, stealthMeaningful }: Props) {
   const [useStealth, setUseStealth] = useState(false);
   // Reset the toggle each time the modal opens so the player has to
   // re-arm the sneaky path on purpose — no surprise pickpockets.
@@ -76,25 +81,42 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll,
                 in your pack with full stats. No re-tapping needed.
               </Text>
 
-              {/* USE STEALTH toggle. When on, taps route through the
-                  stealth handler — DEX vs DC 10 sleight check, vendor
-                  theft when a vendor is in the scene. Defaults to OFF
-                  on every modal open so casual takes don't accidentally
-                  cost the player their faction standing. */}
-              <Pressable
-                style={({ pressed }) => [
-                  styles.stealthToggle,
-                  useStealth && styles.stealthToggleActive,
-                  pressed && styles.chipPressed,
-                ]}
-                onPress={() => setUseStealth((s) => !s)}
-                accessibilityRole="button"
-                accessibilityState={{ selected: useStealth }}
-              >
-                <Text style={[styles.stealthToggleText, useStealth && styles.stealthToggleTextActive]}>
-                  {useStealth ? '✓ USE STEALTH (DEX roll)' : 'USE STEALTH (off)'}
-                </Text>
-              </Pressable>
+              {/* ⚠⚠ OTA-1229 — THE TOGGLE ONLY EXISTS WHEN THERE IS SOMEONE TO
+                  HIDE FROM. Owner, typed straight into the game: *"why do we
+                  still have use stealth in the take popup? thats not how
+                  stealth works anymore."* Two separate faults, both real:
+
+                  ⚠ (1) IT WAS A PURE DOWNSIDE IN AN EMPTY ROOM. An open take
+                  never rolls and never fails. Arming stealth in a room with
+                  nobody in it swapped that certainty for a d20 vs DC 10 that
+                  can only lose — same item, same pack, worse odds, and a
+                  stamina cost besides. Nobody was watching the rock. So the
+                  toggle now renders ONLY when a vendor is standing here, which
+                  is the one case where it means something: taking their goods
+                  quietly is a THEFT, and the label says so instead of calling
+                  it a roll.
+
+                  ⚠ (2) THE LABEL NAMED THE WRONG STAT — this is the literal
+                  "not how stealth works anymore". OTA-348 moved sleight of
+                  hand from DEX to STEALTH and the handler has rolled STE ever
+                  since; this button went on advertising a DEX roll. A player
+                  reading it would build the wrong character for it. */}
+              {stealthMeaningful && (
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.stealthToggle,
+                    useStealth && styles.stealthToggleActive,
+                    pressed && styles.chipPressed,
+                  ]}
+                  onPress={() => setUseStealth((s) => !s)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: useStealth }}
+                >
+                  <Text style={[styles.stealthToggleText, useStealth && styles.stealthToggleTextActive]}>
+                    {useStealth ? '✓ POCKET IT QUIETLY (STE roll — theft)' : 'POCKET IT QUIETLY (off)'}
+                  </Text>
+                </Pressable>
+              )}
 
               {(() => {
                 // Per OTA 191: hide consumed chips unless alwaysShow.

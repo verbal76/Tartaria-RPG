@@ -21,6 +21,7 @@
 // All errors are swallowed → if the model fails to load, the caller
 // (TTSManager) falls back to expo-speech transparently.
 
+import { Platform } from 'react-native';
 import { Audio } from 'expo-av';
 import { getVoiceSettings } from './voiceSettings';
 import { applyLoreLexicon, cleanForSpeech } from './loreLexicon';
@@ -563,6 +564,40 @@ let prewarmStarted = false;
  *  to call when the model is already ready (returns immediately). */
 export async function prewarmKokoro(): Promise<void> {
   if (prewarmStarted) return;
+  // ⚠⚠ OTA-1228 — NOT ON DESKTOP. THIS IS THE 51% FREEZE.
+  //
+  // Owner, on the PC build: *"I think the arbiter first time setup has frozen,
+  // it did this before on my Steam Deck. it's been a few minutes and it's
+  // hanging at 51%."* It had not frozen for a few minutes; it was never going
+  // to finish.
+  //
+  // MEASURED, not reasoned about — the web bundle run headless against the same
+  // export the owner installed:
+  //     BOOT_STAGE = qwen:failed
+  //     kokoro     = {"phase":"loading"}      ← still, at t=8s, 20s and 35s
+  //     exec.TextToSpeechModule.fromModelName exists → true
+  // and the owner's own copied diagnostic from the desktop build agrees:
+  //     Platform: web · Boot stage: qwen:failed
+  //
+  // That is the whole bug, and 51% is its arithmetic. The title bar averages the
+  // two engines: Qwen fails fast on desktop (0.10, correct — llama.rn is a native
+  // module and the Arbiter narrates from templates there) and Kokoro sits on
+  // 'loading' (0.92) forever. (0.10 + 0.92) / 2 = 51%, to the digit, permanently.
+  //
+  // WHY IT HANGS: react-native-executorch's JS resolves in a web bundle, so the
+  // `fromModelName` guard below passes — but the call behind it reaches for a
+  // native runtime that isn't there and neither resolves NOR rejects. A promise
+  // that never settles cannot be caught, so no error state was ever reached.
+  //
+  // WHY IT IS PURE WASTE ANYWAY: on web, TTSManager.speak() does not use this
+  // pool at all — it routes to the ONNX kokoro-js engine. So the desktop voice
+  // never needed this prewarm; it only ever needed it not to run.
+  //
+  // ⚠ MOBILE IS UNTOUCHED: Platform.OS is 'ios'/'android' on the HAL line, so
+  // this returns false and the prewarm runs exactly as it always has. Leaving
+  // the state on 'idle' (rather than faking 'ready') is deliberate — speak()
+  // gates on `phase !== 'error'`, so the desktop voice route stays open.
+  if (Platform.OS === 'web') return;
   prewarmStarted = true;
   try {
     // Load the Arbiter voice — sticky, drives the public state machine
@@ -630,6 +665,13 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
   }
   const inFlight = LOADING.get(voiceId);
   if (inFlight) return inFlight;
+  // ⚠ OTA-1228 — the second half of the desktop guard, and the load-bearing one.
+  // The prewarm is the only caller at boot, but a vendor voice swap reaches here
+  // too, and one un-awaited executorch call is all it takes to re-wedge the state
+  // machine at 'loading'. The existing `fromModelName` check below does NOT cover
+  // it: that symbol EXISTS in a web bundle (measured: true) — it just never
+  // settles when called.
+  if (Platform.OS === 'web') return null;
   if (!exec?.TextToSpeechModule?.fromModelName) return null;
   const sticky = voiceId === arbiterVoiceId();
   // Evict BEFORE registering the new in-flight load so two concurrent

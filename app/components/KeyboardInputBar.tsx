@@ -201,6 +201,26 @@ export function KeyboardInputBar() {
     return () => clearInterval(pollTimer);
   }, [active]);
 
+  // ⚠⚠ OTA-1228 — NEVER ON DESKTOP. This whole component solves ONE problem:
+  // a soft keyboard covering the input field. A PC has no soft keyboard, so on
+  // the desktop build it mounted for no reason and rendered as a stray bar
+  // stretched edge-to-edge across the middle of a 2259px window, floating over
+  // the game with a second copy of the text the player was typing.
+  //
+  // Owner, on the PC build: *"clicked the text bar and this is how it popped
+  // up ... i should just be able to type in the existing text bar, not have it
+  // create a new one."* Exactly right — the in-flow InputBox is never covered
+  // on desktop, so there is nothing to lift it above.
+  //
+  // ⚠ It also positions in DEVICE-PIXEL space on purpose (see the header note),
+  // deliberately outside the AppShell's scaled/centred wrapper — which is why
+  // it ignores CONTENT_MAX_WIDTH and spans the whole window rather than the
+  // game column. That is correct for its real job and wrong for every part of
+  // this one, so the fix is not to constrain it: it is not to mount it.
+  //
+  // ⚠ MOBILE IS UNTOUCHED — Platform.OS is 'ios'/'android' there and the bar
+  // behaves exactly as OTA-190/215 built it.
+  if (Platform.OS === 'web') return null;
   // Only render on the Exploration screen. Other screens have their
   // own input fields that aren't covered by the keyboard, so a
   // floating popup would just clutter them.

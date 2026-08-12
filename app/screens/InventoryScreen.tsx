@@ -31,6 +31,7 @@ import { activeFetchItemNames } from '../engine/factionQuests';
 import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon, golemRepairHeal, golemSubstituteHeal } from '../engine/golems';
 import { healBatchCount, HEAL_BATCH_NOTE } from '../engine/healBatch';
 import { isQuestLockedItem } from '../engine/questItems';
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
 
 // 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
 // has a default direction baked in (alphabetical asc, rarity
@@ -2445,7 +2446,7 @@ const styles = StyleSheet.create({
   },
   giftModeText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
   giftModeHint: { color: '#a2977b', fontSize: 9, letterSpacing: 0.5, marginTop: 2 },
-  container: { flex: 1, backgroundColor: 'transparent', padding: 12, width: '100%', maxWidth: 600, alignSelf: 'center' },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 12, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

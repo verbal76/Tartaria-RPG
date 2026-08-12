@@ -56,6 +56,8 @@ import { speak as ttsSpeak } from '../voice/TTSManager';
 import type { MainQuestPhase } from '../engine/types';
 import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
 import { useReadableMuted } from '../ui/displaySettings';
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
+import { modelBootPercent, modelsStillLoading } from '../ui/modelBootProgress'; // OTA-1228 — the 51% bar, made testable
 
 const races = racesData as { id: string; name: string }[];
 const locations = locationsData as { id: string; name: string }[];
@@ -175,9 +177,7 @@ export function TitleScreen() {
   // OTA-471 — the opening splash now lives in <SplashOverlay/> at the AppShell
   // root (full-bleed). The title screen just renders the menu + a compact loading
   // bar (below) if a first-install download is still running.
-  const modelsLoading =
-    qwenStatus === 'downloading' || qwenStatus === 'loading'
-    || kokoroPhase.phase === 'downloading' || kokoroPhase.phase === 'loading';
+  const modelsLoading = modelsStillLoading(qwenStatus, kokoroPhase);
   // OTA-468 — the verbose per-engine MIND/VOICE labels were retired with the old
   // loading banner; the splash + compact bar now carry progress as a single fill.
   useEffect(() => {
@@ -888,15 +888,25 @@ export function TitleScreen() {
         // .golem → GOLEM, .engine → ENGINE, base (.tartarprim) → TARTARIA.
         // (Previously everything that wasn't .arbiters fell through to "GOLEM",
         // so the HaL / Tartaria build mislabeled itself as GOLEM.)
+        // ⚠ OTA-1228 — THE DESKTOP LINE NEEDS ITS OWN NAME. Owner, on the PC
+        // build: *"this says Tartaria Build, that's HAL — this should be Steam
+        // Beta Build."* Right, and the reason it said TARTARIA is that the
+        // mapping above reads `Application.applicationId`, which on desktop is
+        // the empty string (the owner's copied diagnostic: `App ID: (unknown)`).
+        // Every unrecognised id fell through to the base label, so the PC build
+        // claimed to be the phone build. Platform is checked FIRST because it is
+        // the one fact desktop actually knows about itself.
         const appId = Application.applicationId ?? '';
-        const isArb = appId.endsWith('.arbiters');
-        const isGolem = appId.endsWith('.golem');
-        const isEngine = appId.endsWith('.engine');
-        const buildLine = isArb ? '⟁ ARBITER BUILD'
+        const isSteam = Platform.OS === 'web';
+        const isArb = !isSteam && appId.endsWith('.arbiters');
+        const isGolem = !isSteam && appId.endsWith('.golem');
+        const isEngine = !isSteam && appId.endsWith('.engine');
+        const buildLine = isSteam ? '⟁ STEAM BETA BUILD'
+          : isArb ? '⟁ ARBITER BUILD'
           : isGolem ? '⟁ GOLEM BUILD'
           : isEngine ? '⟁ ENGINE BUILD'
           : '⟁ TARTARIA BUILD';
-        const buildColor = isArb ? '#7ec8e3' : isEngine ? '#9ec96a' : '#c9a86a';
+        const buildColor = isSteam ? '#d08bd0' : isArb ? '#7ec8e3' : isEngine ? '#9ec96a' : '#c9a86a';
         return (
           <Text style={[styles.buildMarker, { color: buildColor }]}>
             {buildLine}
@@ -925,13 +935,11 @@ export function TitleScreen() {
           is still running after the splash, this thin bar carries the progress +
           a short keep-open hint instead of the old wall of text. */}
       {modelsLoading && (() => {
-        const q = qwenStatus === 'ready' ? 1
-          : qwenStatus === 'downloading' ? qwenFraction
-          : qwenStatus === 'loading' ? 0.92 : 0.1;
-        const k = (kokoroPhase.phase === 'ready' || kokoroPhase.phase === 'error') ? 1
-          : kokoroPhase.phase === 'downloading' ? kokoroPhase.fraction
-          : kokoroPhase.phase === 'loading' ? 0.92 : 0.1;
-        const pct = Math.round(((q + k) / 2) * 100);
+        // ⚠ OTA-1228 — the arithmetic moved to app/ui/modelBootProgress.ts, where a
+        // test can reach it. It had a real defect while it lived inline here (Qwen's
+        // 'failed'/'skipped' scored 0.1 instead of 1) and that defect was half of the
+        // owner's frozen 51%. Inline JSX math is untestable math.
+        const pct = modelBootPercent(qwenStatus, qwenFraction, kokoroPhase);
         return (
           <View style={styles.compactLoadWrap}>
             <View style={styles.splashBarTrack}>
@@ -1460,7 +1468,7 @@ const styles = StyleSheet.create({
   // OTA-275 — width cap for tablets. Phones (<600pt wide) render
   // unchanged. iPad portrait (744-1024pt) + landscape (1024-1366pt)
   // get the layout centered at 600pt instead of edge-to-edge buttons.
-  container: { flex: 1, backgroundColor: 'transparent', padding: 16, paddingTop: 24, width: '100%', maxWidth: 600, alignSelf: 'center' },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 16, paddingTop: 24, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
   crest: { width: 180, height: 180, alignSelf: 'center', marginBottom: 8 },
   title: { fontSize: 36, color: '#e6d8b3', letterSpacing: 8, fontWeight: '800', textAlign: 'center' },
   subtitle: { fontSize: 14, color: '#c9a86a', letterSpacing: 14, marginTop: -4, textAlign: 'center' },
