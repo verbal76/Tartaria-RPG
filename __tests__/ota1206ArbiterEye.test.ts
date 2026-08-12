@@ -181,7 +181,14 @@ describe('OTA-1206 — the mark actually renders', () => {
   // renderer ships the whole feature dead behind green engine tests.
   it('SearchModal draws ✦ for marked chips; ExplorationScreen feeds the flag', () => {
     const modal = readFileSync(join(__dirname, '..', 'app', 'components', 'SearchModal.tsx'), 'utf8');
-    expect(modal).toContain("c.marked && !c.consumed ? '✦ ' : ''");
+    // ⚠⚠ OTA-1236 — the RULE is unchanged and asserted in both halves; the exact
+    // expression grew a second source. A ✦ now also marks a LEAD (a story hook or a
+    // live dog-rescue noun), which is the same claim the torch's mark makes — "this
+    // one is actually worth the look" — so it earns the same glyph. What must not
+    // change: a marked chip draws it, and a CONSUMED chip never does (a spent noun's
+    // mark is history, not signal).
+    expect(modal).toContain('c.marked');
+    expect(modal).toMatch(/c\.marked[^\n]*&& !c\.consumed \? '✦ ' : ''/);
     const screen = readFileSync(join(__dirname, '..', 'app', 'screens', 'ExplorationScreen.tsx'), 'utf8');
     expect(screen).toContain('currentScene?.arbiterEye ?? []');
   });

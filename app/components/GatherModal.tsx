@@ -71,6 +71,16 @@ interface Props {
    *  the store (OTA-1231) and this lane mirrors it so the button and the engine
    *  agree about what is about to happen. */
   onSalvageAll: (nouns: string[]) => void;
+  /** ⚠⚠ OTA-1236 — INVESTIGATE a lead. The lead lane's single tap does NOT take and
+   *  does NOT salvage: investigate is the verb that fires the dog rescue and opens
+   *  a story hook, and it is the only verb that can. */
+  onInvestigate: (noun: string) => void;
+  /** ⚠⚠ OTA-1236 — nouns in this room that carry a next step (a scene story hook,
+   *  or a live dog-rescue hook). Computed by the screen, which is the layer that
+   *  knows the scene's hooks and whether the player already has a dog — this
+   *  component stays a renderer. They get their own lane, LAST, and no bulk button
+   *  will ever touch them. */
+  leadNouns?: readonly string[];
   /** Stealth take — only meaningful with a vendor present, where it is a THEFT. */
   onStealthTake: (noun: string) => void;
   stealthMeaningful: boolean;
@@ -83,12 +93,22 @@ const LANE_HEADING: Record<GatherLane, string> = {
   gear: 'GEAR',
   items: 'ITEMS',
   scrap: 'SCRAP',
+  lead: 'WORTH A LOOK',
 };
 
 export function GatherModal({
   visible, chips, player, onTake, onSalvage, onTakeAll, onSalvageAll,
-  onStealthTake, stealthMeaningful, onCancel,
+  onInvestigate, leadNouns, onStealthTake, stealthMeaningful, onCancel,
 }: Props) {
+  // ⚠ Matched on the same case-insensitive substring rule the engine's rescue
+  // dispatch uses, so a noun the engine treats as the dog hook is a noun this
+  // picker treats as a lead. A protector matching a different set from the firer
+  // is the same bug as no protector.
+  const leadSet = (leadNouns ?? []).map((n) => n.toLowerCase());
+  const isLead = (noun: string): boolean => {
+    const t = noun.toLowerCase();
+    return leadSet.some((l) => t.includes(l) || l.includes(t));
+  };
   const [useStealth, setUseStealth] = useState(false);
   useEffect(() => { if (visible) setUseStealth(false); }, [visible]);
 
@@ -97,7 +117,11 @@ export function GatherModal({
       .filter((c) => !c.consumed || c.alwaysShow)
       .map((c) => ({
         noun: c.noun,
-        kind: classifyGatherNoun(c.noun),
+        // ⚠⚠ OTA-1236 — THE LEAD CLASSIFICATION WINS OVER THE CATALOG ONE. Ten of
+        // the twenty dog-rescue nouns match a salvage pool, so without this the
+        // chain the dog is on renders as a yellow SCRAP block with a one-tap
+        // sweep button over it.
+        kind: isLead(c.noun) ? ('lead' as const) : classifyGatherNoun(c.noun),
         upgrade: isUpgradeOverEquipped(player, c.noun),
         consumed: !!c.consumed,
       }))
@@ -118,6 +142,7 @@ export function GatherModal({
   const gear = inLane('gear');
   const items = inLane('items');
   const scrap = inLane('scrap');
+  const leads = inLane('lead');
   const sweepable = (lane: GatherRow[]): string[] =>
     lane.filter((r) => !r.consumed).map((r) => r.noun);
 
@@ -131,6 +156,7 @@ export function GatherModal({
           lane === 'gear' && styles.blockGear,
           lane === 'items' && styles.blockItems,
           lane === 'scrap' && styles.blockScrap,
+          lane === 'lead' && styles.blockLead,
           // ⚠ An upgrade brightens its block WITHIN the gear hue rather than
           // borrowing another lane's colour — the colour has one job here and
           // stealing it for a second meaning is how the code stops being read.
@@ -140,6 +166,7 @@ export function GatherModal({
         ]}
         disabled={consumed}
         onPress={() => {
+          if (lane === 'lead') { onInvestigate(noun); return; }
           if (lane === 'scrap') { onSalvage(noun); return; }
           if (useStealth) { onStealthTake(noun); return; }
           onTake(noun);
@@ -147,7 +174,9 @@ export function GatherModal({
         accessibilityRole="button"
         accessibilityState={{ disabled: consumed }}
         accessibilityLabel={
-          `${upgrade ? 'Upgrade. ' : ''}${noun}. ${lane === 'scrap' ? 'Tap to salvage' : 'Tap to take'}`
+          lane === 'lead'
+            ? `${noun}. Worth a look. Tap to investigate. No bulk action will touch this.`
+            : `${upgrade ? 'Upgrade. ' : ''}${noun}. ${lane === 'scrap' ? 'Tap to salvage' : 'Tap to take'}`
         }
       >
         <Text style={[
@@ -155,7 +184,8 @@ export function GatherModal({
           lane === 'gear' && styles.iconGear,
           lane === 'items' && styles.iconItems,
           lane === 'scrap' && styles.iconScrap,
-          upgrade && styles.iconUpgrade,
+          lane === 'lead' && styles.iconLead,
+          upgrade && lane !== 'lead' && styles.iconUpgrade,
         ]}>
           {gatherIcon({ kind, upgrade })}
         </Text>
@@ -165,7 +195,8 @@ export function GatherModal({
         >
           {noun}
         </Text>
-        {upgrade && <Text style={styles.upgradeTag}>BETTER</Text>}
+        {upgrade && lane !== 'lead' && <Text style={styles.upgradeTag}>BETTER</Text>}
+        {lane === 'lead' && <Text style={styles.leadTag}>INVESTIGATE</Text>}
       </Pressable>
     );
   };
@@ -176,8 +207,8 @@ export function GatherModal({
   const renderLane = (
     lane: GatherLane,
     laneRows: GatherRow[],
-    buttonLabel: (n: number) => string,
-    onSweep: (nouns: string[]) => void,
+    buttonLabel: ((n: number) => string) | null,
+    onSweep: ((nouns: string[]) => void) | null,
   ) => {
     if (laneRows.length === 0) return null;
     const nouns = sweepable(laneRows);
@@ -188,11 +219,15 @@ export function GatherModal({
           lane === 'gear' && styles.textGear,
           lane === 'items' && styles.textItems,
           lane === 'scrap' && styles.textScrap,
+          lane === 'lead' && styles.textLead,
         ]}>
           {LANE_HEADING[lane]}
         </Text>
         <View style={styles.grid}>{laneRows.map((r) => renderBlock(r, lane))}</View>
-        {nouns.length > 0 && (
+        {/* ⚠⚠ OTA-1236 — THE LEAD LANE HAS NO BUTTON, and its absence is the
+            message. Every other colour here promises a matching button will
+            clear it; this colour promises nothing bulk will touch it. */}
+        {buttonLabel && onSweep && nouns.length > 0 && (
           <Pressable
             style={({ pressed }) => [
               styles.sweep,
@@ -270,6 +305,11 @@ export function GatherModal({
                     (n) => `⚒ SALVAGE ALL (${n})`,
                     onSalvageAll,
                   )}
+                  {/* ⚠⚠ LAST, ALWAYS. Owner: *"if it is there it should always be
+                      the last thing listed so the next step is right there to
+                      see."* The buttons sit at the bottom of the card, so the
+                      last block is the one his thumb is already next to. */}
+                  {renderLane('lead', leads, null, null)}
                 </ScrollView>
               )}
 
@@ -297,6 +337,10 @@ const GEAR = '#e08a3c';
 const ITEMS = '#7fbf5f';
 const SCRAP = '#d8c04a';
 const IGNORE = '#b5533f';
+// ⚠ The lead's hue is the ONE cool colour in a warm card, so it does not read as
+// a fourth thing you can sweep — and it is the same pale violet the Aetheric
+// Torch's ✦ already uses for "worth a look", so the player has met it before.
+const LEAD = '#b9a3e3';
 
 const styles = StyleSheet.create({
   scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.72)', justifyContent: 'center', padding: 18 },
@@ -316,6 +360,7 @@ const styles = StyleSheet.create({
   textGear: { color: GEAR },
   textItems: { color: ITEMS },
   textScrap: { color: SCRAP },
+  textLead: { color: LEAD },
 
   // ⚠ A WRAPPED GRID, NOT A COLUMN. `flexBasis` at 30% with a minWidth floor
   // gives three squares across on a phone and lets a long noun claim a wider
@@ -331,6 +376,7 @@ const styles = StyleSheet.create({
   blockGear: { borderColor: GEAR, backgroundColor: '#2a1a0e' },
   blockItems: { borderColor: ITEMS, backgroundColor: '#16210f' },
   blockScrap: { borderColor: SCRAP, backgroundColor: '#221e0c' },
+  blockLead: { borderColor: LEAD, backgroundColor: '#1c1726' },
   // ⚠⚠ THE UPGRADE BLOCK IS BRIGHTER GEAR, not a fourth colour.
   rowUpgrade: { borderColor: '#ffb066', backgroundColor: '#3a2410' },
   blockConsumed: { opacity: 0.35 },
@@ -342,11 +388,13 @@ const styles = StyleSheet.create({
   iconGear: { color: GEAR },
   iconItems: { color: ITEMS },
   iconScrap: { color: SCRAP },
+  iconLead: { color: LEAD },
   iconUpgrade: { color: '#ffb066' },
 
   blockText: { color: '#e6d8b3', fontSize: 12, fontWeight: '600', textAlign: 'center' },
   rowTextConsumed: { color: '#6f6759', textDecorationLine: 'line-through' },
   upgradeTag: { color: '#ffb066', fontSize: 9, fontWeight: '700', letterSpacing: 1, marginTop: 3 },
+  leadTag: { color: LEAD, fontSize: 9, fontWeight: '700', letterSpacing: 1, marginTop: 3 },
 
   sweep: {
     borderWidth: 1, borderRadius: 3, paddingVertical: 10,

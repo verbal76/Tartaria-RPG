@@ -237,7 +237,21 @@ describe('OTA-1183 — INVESTIGATE ALL', () => {
     // Investigate resolves through hooks, ambient nouns, items, puzzles and elevation
     // gates. A bulk re-implementation would be a new set of failure modes; looping the
     // real submit cannot resolve differently from the manual taps it replaces.
+    //
+    // ⚠⚠ OTA-1236 — THE RULE IS UNCHANGED; THE LINE IT WAS PINNED TO MOVED. The loop
+    // still calls the same `submit(\`investigate <noun>\`)` a manual tap makes — that
+    // is the property this test exists to protect, and it still holds. What was added
+    // around it is ORDER (ordinary nouns, then story hooks, then the dog rescue) and a
+    // BREAK when an enemy appears, because the rescue spawns a captor and every
+    // investigate queued behind it would land during combat and be refused. Neither
+    // resolves anything; both decide what gets submitted and when to stop.
     const src = SRC('app/screens/ExplorationScreen.tsx');
-    expect(src).toContain('for (const n of nouns) submit(`investigate ${n}`);');
+    const i = src.indexOf('onInvestigateAll={(nouns) => {');
+    expect(i).toBeGreaterThan(-1);
+    const block = src.slice(i, i + 600);
+    expect(block).toContain('submit(`investigate ${n}`)');
+    // Still a loop over nouns, still no bulk resolver anywhere.
+    expect(block).toMatch(/for \(const n of [A-Za-z]+\)/);
+    expect(src).not.toContain('investigateAllAmbient');
   });
 });

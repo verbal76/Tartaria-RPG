@@ -31,6 +31,10 @@ import {
   trainDogStat,
   type RescueScenarioId,
 } from '../engine/dogCompanion';
+// ⚠ OTA-1236 — ONE rule for "this noun carries a next step", shared by the engine
+// dispatch, the bulk-salvage guard, the loot picker's lead lane and the
+// INVESTIGATE ALL ordering. See engine/storyNouns.ts for why they must agree.
+import { rescueScenarioForNoun } from '../engine/storyNouns';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse } from '../engine/worldMemory';
 // OTA-1049 — Phase 1: the per-person ledger the greeting layer reads.
 import { rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName, vendorLedgerId, pocketLossMumble } from '../engine/npcMemory';
@@ -30403,6 +30407,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // of lie this project keeps hunting: a message that describes a state the game
     // is not in. They get their own line, which names the verb that DOES work.
     const skippedTakeable: string[] = [];
+    // ⚠⚠ OTA-1236 — ITS OWN BUCKET AGAIN, for the nouns that carry a next step.
+    // Owner: *"I don't like that salvage all can bury the dog quest."* It could,
+    // and this is measured rather than argued: TEN of the twenty dog-rescue hook
+    // nouns match a salvage pool — chain, wagon, wagon wheel, overturned wagon,
+    // cellar door, trapdoor, buried structure, snare pit, snare, trapper camp,
+    // trap. Salvage writes `searchedAmbientNouns` and every picker reads it, so
+    // one tap pried the chain apart and **the rescue noun left the investigate
+    // list entirely.** The quest stayed typeable and stopped being tappable, which
+    // is the worse failure: nobody types a noun the game has stopped showing them.
+    const skippedLead: string[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isLeadNoun: isBulkLeadNoun } = require('../engine/storyNouns') as typeof import('../engine/storyNouns');
+    const bulkLeadCtx = {
+      hooks: scene.hooks ?? [],
+      // ⚠ The same conditions the engine's own rescue dispatch checks. Once the
+      // player HAS a dog, a snare is just a snare again — protecting it forever
+      // would keep scrap out of their hands for a quest that already happened.
+      rescueEligible: !get().player?.dog && !get().worldMemory.pendingDogOnboarding,
+    };
     // 2026-05-25 OTA-037 — track nouns that the modal surfaced but
     // rollSalvagePool didn't recognize. Previously these were swallowed
     // silently, so a SALVAGE ALL where every chip was unmatched
@@ -30455,6 +30478,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // aimed at the room's furniture, and it must not quietly spend the loot.
       if (findCatalogItem(noun) !== null) {
         skippedTakeable.push(noun);
+        continue;
+      }
+
+      // ⚠⚠ OTA-1236 — AND NEVER THE NOUN THE STORY IS ATTACHED TO. A bulk sweep is
+      // aimed at the room's furniture by definition; it is not the place to spend
+      // the one thing here that has a next step on it. A typed `salvage chain` is
+      // still honoured — deliberately breaking the dog's chain is the player's call
+      // to make, one noun at a time — exactly the distinction OTA-1231 drew for
+      // takeables.
+      if (isBulkLeadNoun(noun, bulkLeadCtx)) {
+        skippedLead.push(noun);
         continue;
       }
 
@@ -30624,6 +30658,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const overflow = skippedTakeable.length > 4 ? ` and ${skippedTakeable.length - 4} more` : '';
       get().appendLog('world', `Left whole — worth more in your pack than in pieces: ${names}${overflow}. (TAKE them.)`);
     }
+    // ⚠⚠ OTA-1236 — and the lead says so LOUDLY, on the arbiter channel, because
+    // this is the one line in a bulk salvage that is a next step rather than a
+    // receipt. Owner: *"the next step is right there to see."*
+    if (skippedLead.length > 0) {
+      const names = skippedLead.slice(0, 3).join(', ');
+      const overflow = skippedLead.length > 3 ? ` and ${skippedLead.length - 3} more` : '';
+      get().appendLog(
+        'arbiter',
+        `✦ Left untouched — there is something here worth understanding first: ${names}${overflow}. (INVESTIGATE.)`,
+      );
+    }
     // Emit the aggregated reward summary as the last block.
     if (itemTotals.size > 0 || tcGained > 0) {
       // One header line so the haul reads as one event, not a
@@ -30652,6 +30697,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // owns the nothing-at-all batch.
     const hadOtherOutput =
       narrationLines.length > 0 || skippedAlready.length > 0 || skippedTakeable.length > 0
+      || skippedLead.length > 0   // ⚠ OTA-1236 — a lead line IS output; without this a
+                                  // lead-only batch falls to the "button did nothing" path.
       || itemTotals.size > 0 || tcGained > 0;
     if (unmatchedNouns.length > 0 && hadOtherOutput) {
       get().appendLog(
@@ -30663,6 +30710,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       narrationLines.length === 0
       && skippedAlready.length === 0
       && skippedTakeable.length === 0
+      && skippedLead.length === 0
       && itemTotals.size === 0
       && tcGained === 0
     ) {
@@ -39997,18 +40045,16 @@ function pickHiddenSmellNounsForLocation(location: Location): string[] {
 
 /** Returns the rescue-scenario id whose hookNouns contain the given
  *  text, or null when no scenario matches. Case-insensitive
- *  substring; the first match wins. */
+ *  substring; the first match wins.
+ *
+ *  ⚠⚠ OTA-1236 — THE RULE MOVED TO `engine/storyNouns` AND THIS DELEGATES TO IT.
+ *  It is not only the dispatch that needs to know a rescue noun now: the bulk
+ *  salvage guard must refuse to scrap one, the loot picker must show it as a lead
+ *  instead of scrap, and INVESTIGATE ALL must run it last. **A protector using a
+ *  different rule from the firer is the same bug as no protector** — a noun the
+ *  engine treats as the dog hook could still be swept. One rule, one place. */
 function matchRescueHookNoun(text: string): RescueScenarioId | null {
-  const t = text.toLowerCase().trim();
-  if (!t) return null;
-  for (const id of Object.keys(RESCUE_SCENARIOS) as RescueScenarioId[]) {
-    const scenario = RESCUE_SCENARIOS[id];
-    for (const noun of scenario.hookNouns) {
-      const nl = noun.toLowerCase();
-      if (t.includes(nl) || nl.includes(t)) return id;
-    }
-  }
-  return null;
+  return rescueScenarioForNoun(text);
 }
 
 /** Spawn the rescue captor for the given scenario into the current

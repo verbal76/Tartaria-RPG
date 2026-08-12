@@ -1644,7 +1644,58 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE COLOUR-CODED ROOM (2026-08-12, latest).
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE LEAD IS NEVER SWEPT (2026-08-12, latest).
+  GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1236. **Same merge-or-revert
+  decision point — now also covering the new `engine/storyNouns.ts`,
+  `SearchModal` and `salvageAllAmbient`.**
+
+  ⚠⚠ **THE BUG WAS LATENT BEFORE THE COLOUR LANES AND LIVE AFTER THEM.** TEN of
+  the twenty dog-rescue hook nouns match a salvage pool — chain, wagon, wagon
+  wheel, overturned wagon, cellar door, trapdoor, buried structure, snare pit,
+  snare, trapper camp, trap. `salvageAllAmbient` skipped catalog items
+  (OTA-1231) and **nothing else**, so SALVAGE ALL pried apart the chain the dog
+  is on. ⚠⚠ **And salvage writes `searchedAmbientNouns`, which EVERY picker
+  reads — so the rescue noun then left the investigate list entirely.** The
+  quest stayed typeable and stopped being tappable, which is the worse half:
+  nobody types a noun the game has stopped showing them. OTA-1235's yellow SCRAP
+  lane is what turned a latent overlap into a one-tap hazard.
+
+  ⚠⚠ **THE LESSON FOR THIS LIST, AND IT IS THE SECOND TIME IN THREE OTAS:** a new
+  bulk button inherits every "which nouns may this touch" question the single-tap
+  verb already settled — and it starts with zero of those answers written into it.
+  Measured twice now: OTA-1231 for takeables (4 catalog items overlapped a salvage
+  pool), OTA-1236 for story nouns (10 of 20 rescue nouns did). **Before adding a
+  sweep, enumerate what the individual verb is allowed to spend — and check whether
+  anything ELSE in the game has attached meaning to those nouns since.**
+
+  **THE GUARD:** new pure `engine/storyNouns.ts` holds ONE rule for "this noun
+  carries a next step" (scene hook, or live dog-rescue hook). Bulk salvage skips
+  them in their own bucket with an arbiter-channel line naming INVESTIGATE; a
+  TYPED `salvage chain` is still honoured (the OTA-1231 distinction). The
+  protection LIFTS once the player has a dog or an onboarding is pending — the
+  same conditions the engine dispatch checks. ⚠ `matchRescueHookNoun` in gameStore
+  now DELEGATES to it: a protector matching a different set from the firer is the
+  same bug as no protector.
+
+  **THE LANE:** 🟪 WORTH A LOOK, rendered LAST, with **no sweep button** — the one
+  lane whose colour promises that nothing bulk will touch it. Owner: *"if it is
+  there should always be the last thing listed so the next step is right there to
+  see."* A single tap INVESTIGATES.
+
+  **THE SWEEP:** INVESTIGATE ALL runs ordinary nouns → story hooks → dog rescue,
+  and BREAKS when an enemy appears. ⚠ Not cosmetic — the rescue spawns a captor,
+  and every investigate queued behind it landed during combat and was refused
+  ("Not while the Reclaimer Deserter is on you"), so an early hit silently ate the
+  rest of the room. OTA-1183's no-second-resolver rule is intact: it still loops
+  the real `submit`.
+
+  ⚠ **NOT DONE, FLAGGED:** "skips the dead ends" is only half-delivered. Lore-only
+  lines are pushed above the story beat but NOT collapsed into one summary the way
+  SALVAGE ALL aggregates its haul. Investigate resolves through eight branches and
+  collapsing one would make the picker quiet in some rooms and loud in others.
+  New suite ota1236LeadNeverSwept (16). Full story: the VERSION.md 4.29.164 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE COLOUR-CODED ROOM (2026-08-12).
   GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1234 + OTA-1235, one push,
   **same merge-or-revert decision point as 1232/1233 — now also covering
   `gatherSort.ts`'s `'inert'` kind and `laneForKind`.**

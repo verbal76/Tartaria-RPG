@@ -36,13 +36,20 @@ interface Props {
    *  complaint SALVAGE ALL collected in OTA-037. Hidden below 2 targets: with one chip
    *  the button is just a second way to press the chip. */
   onInvestigateAll?: (nouns: string[]) => void;
+  /** ⚠⚠ OTA-1236 — nouns in this room that carry a next step: a scene story hook,
+   *  or a live dog-rescue hook. They sort LAST in the list AND last in the sweep.
+   *  Owner: *"investigate all skips the dead ends, shows what was found on
+   *  investigate or does a story hook pop-up, then does the dog quest."* Computed
+   *  by the screen, which is the layer that knows the scene's hooks and whether the
+   *  player already has a dog. */
+  leadNouns?: readonly string[];
 }
 
 // Branded modal that prompts the player to type what they're searching
 // for. The submitted text is routed to the investigate intent with the
 // target — letting the engine try hook, ambient noun, item, then
 // re-prompt if nothing matches.
-export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateAll }: Props) {
+export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateAll, leadNouns }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
 
@@ -103,9 +110,28 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
   // it marks it consumed, and only THEN does it disappear, exactly like a one-shot prop.
   // LOCKED chips (unmetRequirement, not yet consumed) still remain so the player sees
   // what needs a scanner / climb-down.
-  const visibleChips = (chips ?? [])
-    .filter((c) => !c.consumed)
-    .sort((a, b) => (a.consumed ? 1 : 0) - (b.consumed ? 1 : 0));
+  // ⚠⚠ OTA-1236 — THE LEAD GOES LAST, IN THE LIST AND IN THE SWEEP, AND IT IS THE
+  // SAME ORDER FOR BOTH. Owner: *"if it is there it should always be the last thing
+  // listed so the next step is right there to see... then does the dog quest."*
+  //
+  // ⚠ IT IS NOT COSMETIC. The dog rescue SPAWNS A CAPTOR AND STARTS A FIGHT. If
+  // INVESTIGATE ALL reaches it mid-sweep, every remaining `investigate` in the loop
+  // lands during combat and is refused — *"Not while the Reclaimer Deserter is on
+  // you."* A story hook is the milder version of the same thing: it opens a popup
+  // that the lines queued behind it push straight out of sight. Last means the
+  // sweep has nothing left to bury it with.
+  const leadLowers = (leadNouns ?? []).map((n) => n.toLowerCase());
+  const isLeadChip = (noun: string): boolean => {
+    const t = noun.toLowerCase();
+    return leadLowers.some((l) => t.includes(l) || l.includes(t));
+  };
+  // ⚠ A stable partition, not a comparator — chips keep their incoming order
+  // inside each tier, so the list the player read is the order the sweep runs.
+  const notConsumed = (chips ?? []).filter((c) => !c.consumed);
+  const visibleChips = [
+    ...notConsumed.filter((c) => !isLeadChip(c.noun)),
+    ...notConsumed.filter((c) => isLeadChip(c.noun)),
+  ];
   // OTA-1183 — what INVESTIGATE ALL will actually act on. Locked chips are visible (so the
   // player learns what they need) but are NOT swept.
   const actionableChips = visibleChips.filter((c) => !c.unmetRequirement);
@@ -208,7 +234,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                             {/* OTA-1206 — ✦ = the torch marked this noun as actually
                                 worth the look (scene.arbiterEye). Suppressed once
                                 consumed: a spent noun's mark is history, not signal. */}
-                            {c.marked && !c.consumed ? '✦ ' : ''}{c.noun}{c.consumed ? ' ✓' : c.unmetRequirement ? ' 🔒' : ''}
+                            {(c.marked || isLeadChip(c.noun)) && !c.consumed ? '✦ ' : ''}{c.noun}{c.consumed ? ' ✓' : c.unmetRequirement ? ' 🔒' : ''}
                           </Text>
                           {c.unmetRequirement && !c.consumed ? (
                             <Text style={styles.chipFullHint} numberOfLines={1}>

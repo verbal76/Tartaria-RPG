@@ -45,6 +45,7 @@ function renderRoom(chips: { noun: string; consumed?: boolean }[], player = null
       onSalvage={() => {}}
       onTakeAll={() => {}}
       onSalvageAll={() => {}}
+      onInvestigate={() => {}}
       onStealthTake={() => {}}
       stealthMeaningful={false}
       onCancel={() => {}}

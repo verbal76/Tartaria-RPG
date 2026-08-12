@@ -25,7 +25,7 @@ import type { PlayerCharacter, InventoryItem, EquipSlot } from './types';
 import { WEAPONS, ARMOR, findCatalogItem } from './crafting';
 import { resolveEquippedItem } from './equipment';
 
-export type GatherKind = 'weapon' | 'armor' | 'other' | 'scenery' | 'inert';
+export type GatherKind = 'weapon' | 'armor' | 'other' | 'scenery' | 'inert' | 'lead';
 
 /** Mean roll of an NdM dice string ("2d6" → 7). Returns 0 on anything
  *  unparseable, which keeps an unreadable weapon out of the upgrade lane
@@ -162,11 +162,22 @@ export interface GatherRow {
  *  half-looted room does not reshuffle under the player's thumb between taps.
  *  Ties break alphabetically so the list is STABLE — a picker that reorders
  *  itself while you read it is worse than one sorted badly. */
-const KIND_RANK: Record<GatherKind, number> = { weapon: 1, armor: 2, other: 3, scenery: 4, inert: 5 };
+// ⚠⚠ OTA-1236 — A LEAD RANKS LAST, AND THAT IS DELIBERATE INVERSION. Everything
+// else in this picker sorts decisions-first; the lead sorts LAST because the
+// owner asked for it there and his reason is better than the convention: *"if it
+// is there it should always be the last thing listed so the next step is right
+// there to see."* The bulk buttons sit at the bottom of the card, so the last
+// block is the one the player's thumb is already next to — and it is the one
+// thing here no bulk button will touch.
+const KIND_RANK: Record<GatherKind, number> = { weapon: 1, armor: 2, other: 3, scenery: 4, lead: 5, inert: 6 };
 
 export function sortGatherRows(rows: readonly GatherRow[]): GatherRow[] {
   return [...rows].sort((a, b) => {
     if (a.consumed !== b.consumed) return a.consumed ? 1 : -1;
+    // ⚠ OTA-1236 — the lead's rank beats the upgrade star, checked BEFORE it. A
+    // lead is normally a non-catalog noun so `upgrade` is false anyway, but
+    // "normally" is not a guarantee and the owner asked for last, not usually-last.
+    if ((a.kind === 'lead') !== (b.kind === 'lead')) return a.kind === 'lead' ? 1 : -1;
     if (a.upgrade !== b.upgrade) return a.upgrade ? -1 : 1;
     const rank = KIND_RANK[a.kind] - KIND_RANK[b.kind];
     if (rank !== 0) return rank;
@@ -177,6 +188,10 @@ export function sortGatherRows(rows: readonly GatherRow[]): GatherRow[] {
 /** The mark shown at the left of a row. Kept here beside the sort so the icon
  *  and the ordering can never disagree about what a row is. */
 export function gatherIcon(row: { kind: GatherKind; upgrade: boolean }): string {
+  // ⚠ The lead's ✦ outranks even the upgrade star: a better helm can wait, and
+  // the same ✦ is what the Aetheric Torch already marks a worth-a-look noun with,
+  // so the player has seen it mean exactly this before.
+  if (row.kind === 'lead') return '✦';
   if (row.upgrade) return '★';
   if (row.kind === 'weapon') return '⚔';
   if (row.kind === 'armor') return '🛡';
@@ -210,11 +225,26 @@ export function isActionableGatherKind(kind: GatherKind): boolean {
  *  different decisions. Gear is a comparison — is this better than what I have.
  *  An item is not; it just goes in the pack. Sweeping the second is free, and
  *  sweeping the first is what makes a player miss an upgrade. */
-export type GatherLane = 'gear' | 'items' | 'scrap';
+export type GatherLane = 'gear' | 'items' | 'scrap' | 'lead';
 
 export function laneForKind(kind: GatherKind): GatherLane | null {
   if (kind === 'weapon' || kind === 'armor') return 'gear';
   if (kind === 'other') return 'items';
   if (kind === 'scenery') return 'scrap';
+  if (kind === 'lead') return 'lead';
   return null; // inert — no lane, no colour, no button
+}
+
+/** ⚠⚠ OTA-1236 — THE LEAD LANE HAS NO SWEEP BUTTON, AND THAT IS THE POINT.
+ *
+ *  Every other lane's colour is a promise that a matching button will clear it.
+ *  The lead's colour promises the opposite: nothing bulk will touch this. Owner:
+ *  *"I don't like that salvage all can bury the dog quest."* It could — ten of the
+ *  twenty dog-rescue nouns match a salvage pool, so the yellow SCRAP lane was
+ *  offering the chain the dog is on with a one-tap sweep over it.
+ *
+ *  A single tap still works, and it INVESTIGATES rather than salvaging, because
+ *  investigate is the verb that fires the rescue. */
+export function laneHasSweep(lane: GatherLane): boolean {
+  return lane !== 'lead';
 }

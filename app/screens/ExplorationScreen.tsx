@@ -61,6 +61,9 @@ import { reachBandsFor, RANGE_LABELS } from '../engine/types';
 import type { CombatRange } from '../engine/types';
 import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
 import { useBackAction } from '../ui/desktopBack'; // OTA-1229 — right-click / Escape closes the top popup
+// ⚠⚠ OTA-1236 — the ONE rule for "this noun carries a next step", shared with the
+// engine's rescue dispatch and the bulk-salvage guard. See engine/storyNouns.ts.
+import { isLeadNoun, orderByStoryTier } from '../engine/storyNouns';
 
 function describeTime(hours: number): string {
   const day = Math.floor(hours / 24) + 1;
@@ -394,6 +397,38 @@ export function ExplorationScreen() {
     const { matchAnyHookNoun } = require('../engine/hooks') as typeof import('../engine/hooks');
     return matchAnyHookNoun(n, currentScene?.hooks ?? [])?.resolved === true;
   };
+  // ⚠⚠ OTA-1236 — WHICH NOUNS IN THIS ROOM CARRY A NEXT STEP.
+  //
+  // Owner: *"I don't like that salvage all can bury the dog quest."* It could, and
+  // the overlap is measured, not guessed: TEN of the twenty dog-rescue hook nouns
+  // match a salvage pool (chain, wagon, overturned wagon, cellar door, trapdoor,
+  // snare pit, snare, trap...). The OTA-1235 yellow SCRAP lane put the chain the
+  // dog is on one tap from being pried apart, with a bulk button over it — and
+  // salvage writes `searchedAmbientNouns`, which every picker reads, so the rescue
+  // noun then LEFT the investigate list entirely.
+  //
+  // ⚠ THE ELIGIBILITY CHECK IS THE SAME ONE THE ENGINE'S DISPATCH MAKES. Once the
+  // player has a dog, a snare is a snare again: protecting it forever would keep
+  // scrap out of their hands for a quest that already happened.
+  const leadCtx = useMemo(
+    () => ({
+      hooks: currentScene?.hooks ?? [],
+      rescueEligible: !player?.dog && !worldMemory.pendingDogOnboarding,
+    }),
+    [currentScene?.hooks, player?.dog, worldMemory.pendingDogOnboarding],
+  );
+  const leadNouns = useMemo(
+    () =>
+      (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
+        .filter((n) => isLeadNoun(n, leadCtx))
+        // ⚠ A SPENT lead is not a lead. A resolved hook still matches the noun
+        // list, and pinning it in the un-sweepable lane forever would protect
+        // scrap the player is entitled to and keep pointing at a step that is
+        // already behind them.
+        .filter((n) => !isExhaustedHookNoun(n)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentScene?.displayedAmbientNouns, currentScene?.ambientNouns, leadCtx],
+  );
   const flavorExhaustedSet = useMemo(() => {
     if (!player || !currentScene) return new Set<string>();
     // OTA-164 — see productivelyConsumedSet above. Same hub-key bug.
@@ -1778,10 +1813,27 @@ export function ExplorationScreen() {
         // a new set of failure modes for a cosmetic gain. Looping the real path cannot
         // resolve anything differently from the manual taps it replaces — which is the
         // property that matters for a completability fix.
+        // ⚠⚠ OTA-1236 — THE SWEEP RUNS IN THE OWNER'S ORDER, AND IT STOPS IF A
+        // FIGHT STARTS. His sentence, in order: *"investigate all skips the dead
+        // ends, shows what was found on investigate or does a story hook pop-up,
+        // then does the dog quest."*
+        //
+        // ⚠ ORDERING IS NOT COSMETIC HERE. The dog rescue SPAWNS A CAPTOR. Reached
+        // mid-sweep, every remaining `investigate` lands during combat and is
+        // refused — *"Not while the Reclaimer Deserter is on you."* So the loop
+        // both runs the lead LAST and breaks the moment an enemy is on the board:
+        // firing commands into a fight the player has not seen yet is how a sweep
+        // silently eats half the room. A story hook is the milder case of the same
+        // thing — it opens a popup the queued lines push out of sight.
         onInvestigateAll={(nouns) => {
           setSearchOpen(false);
-          for (const n of nouns) submit(`investigate ${n}`);
+          const ordered = orderByStoryTier(nouns, (n) => n, leadCtx);
+          for (const n of ordered) {
+            if ((useGameStore.getState().currentScene?.enemies ?? []).length > 0) break;
+            submit(`investigate ${n}`);
+          }
         }}
+        leadNouns={leadNouns}
         onCancel={() => setSearchOpen(false)}
       />
 
@@ -1842,6 +1894,15 @@ export function ExplorationScreen() {
           // have (OTA-117 made 'salvage' an investigate verb synonym for that).
           submit(`salvage ${noun}`);
         }}
+        // ⚠⚠ OTA-1236 — the lead lane's single tap INVESTIGATES. It is the only
+        // verb that fires the dog rescue or opens a story hook; taking or salvaging
+        // the noun spends it and takes the next step with it.
+        onInvestigate={(noun) => {
+          Keyboard.dismiss();
+          setTakeOpen(false);
+          submit(`investigate ${noun}`);
+        }}
+        leadNouns={leadNouns}
         // ⚠ OTA-1229 — only meaningful with a vendor present, where it is a THEFT.
         stealthMeaningful={!!currentScene?.vendor}
         onStealthTake={(noun) => {

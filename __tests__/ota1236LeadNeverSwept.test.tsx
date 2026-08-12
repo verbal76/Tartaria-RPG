@@ -1,0 +1,287 @@
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+);
+
+// ⚠⚠ OTA-1236 — THE BULK BUTTON THAT COULD EAT THE DOG QUEST.
+//
+// Owner: *"I don't like that salvage all can bury the dog quest, that if it is
+// there should always be the last thing listed so the next step is right there to
+// see. So investigate all skips the dead ends, shows what was found on investigate
+// or does a story hook pop-up, then does the dog quest."*
+//
+// ⚠⚠ THE FIRST CLAUSE IS A BUG, AND THIS SUITE MEASURES IT FROM THE SHIPPED DATA
+// RATHER THAN ASSERTING IT. Ten of the twenty dog-rescue hook nouns match a
+// salvage pool. `salvageAllAmbient` skipped catalog items (OTA-1231) and nothing
+// else, so one tap of SALVAGE ALL pried apart the chain the dog is on. Salvage
+// writes `searchedAmbientNouns`; every picker reads it. **The rescue noun then
+// left the investigate list entirely** — still typeable, which is worse than
+// useless, because nobody types a noun the game has stopped showing them. And
+// OTA-1235's yellow SCRAP lane had just put those nouns under a one-tap sweep.
+//
+// ⚠ THE SECOND CLAUSE IS AN ORDERING RULE WITH TEETH. The rescue SPAWNS A CAPTOR
+// AND STARTS A FIGHT. Reached mid-sweep, every remaining `investigate` in the loop
+// lands during combat and is refused. "Then does the dog quest" is not decoration:
+// anywhere but last breaks the rest of the sweep.
+import React from 'react';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const renderer = require('react-test-renderer') as {
+  create(el: React.ReactElement): { toJSON(): unknown };
+};
+import { GatherModal } from '../app/components/GatherModal';
+import { laneForKind, laneHasSweep } from '../app/engine/gatherSort';
+import {
+  rescueScenarioForNoun, isLeadNoun, storyTier, orderByStoryTier,
+} from '../app/engine/storyNouns';
+import { RESCUE_SCENARIOS } from '../app/engine/dogCompanion';
+import { hasSalvageYield } from '../app/engine/salvagePools';
+import type { Hook } from '../app/engine/hooks';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
+
+function renderRoom(chips: { noun: string }[], leadNouns: string[]) {
+  const tree = renderer.create(
+    <GatherModal
+      visible
+      player={null}
+      chips={chips}
+      leadNouns={leadNouns}
+      onTake={() => {}}
+      onSalvage={() => {}}
+      onTakeAll={() => {}}
+      onSalvageAll={() => {}}
+      onInvestigate={() => {}}
+      onStealthTake={() => {}}
+      stealthMeaningful={false}
+      onCancel={() => {}}
+    />,
+  );
+  const out: string[] = [];
+  const walk = (n: unknown): void => {
+    if (typeof n === 'string') { out.push(n); return; }
+    if (Array.isArray(n)) { n.forEach(walk); return; }
+    const node = n as { children?: unknown[] } | null;
+    if (node && node.children) node.children.forEach(walk);
+  };
+  walk(tree.toJSON());
+  return out.join('|');
+}
+
+describe('OTA-1236 — the exposure, measured from the shipped data', () => {
+  it('⚠⚠ TEN of the twenty dog-rescue nouns ARE salvageable — this is the bug, not a worry', () => {
+    const salvageable: string[] = [];
+    const all: string[] = [];
+    for (const s of Object.values(RESCUE_SCENARIOS)) {
+      for (const n of s.hookNouns) {
+        all.push(n);
+        if (hasSalvageYield(n)) salvageable.push(n);
+      }
+    }
+    expect(all.length).toBe(20);
+    // If this number moves, the pools or the scenarios changed — re-read the
+    // guard below before assuming it still covers them.
+    expect(salvageable.length).toBeGreaterThanOrEqual(10);
+    // Named, because the abstract count does not carry the point.
+    for (const n of ['chain', 'overturned wagon', 'cellar door', 'snare pit', 'trap']) {
+      expect(hasSalvageYield(n)).toBe(true);
+      expect(rescueScenarioForNoun(n)).not.toBeNull();
+    }
+  });
+
+  it('⚠⚠ the guard uses the SAME rule the engine dispatch fires on — one place, not two', () => {
+    // A protector matching a different set from the firer is the same bug as no
+    // protector: a noun the engine treats as the dog hook could still be swept.
+    const store = src('app', 'state', 'gameStore.ts');
+    expect(store).toContain("import { rescueScenarioForNoun } from '../engine/storyNouns'");
+    const i = store.indexOf('function matchRescueHookNoun(');
+    expect(i).toBeGreaterThan(-1);
+    const body = store.slice(i, i + 200);
+    expect(body).toContain('return rescueScenarioForNoun(text);');
+  });
+});
+
+describe('OTA-1236 — SALVAGE ALL leaves the lead alone, and says so', () => {
+  it('⚠⚠ the bulk loop SKIPS a lead noun, in its own bucket', () => {
+    const store = src('app', 'state', 'gameStore.ts');
+    const i = store.indexOf('salvageAllAmbient(nouns) {');
+    expect(i).toBeGreaterThan(-1);
+    const fn = store.slice(i, i + 14000);
+    expect(fn).toContain('const skippedLead: string[] = []');
+    expect(fn).toContain('isBulkLeadNoun(noun, bulkLeadCtx)');
+    expect(fn).toContain('skippedLead.push(noun)');
+    // Its own bucket, exactly like OTA-1231's takeable skip — folding it into
+    // "already worked over" would be a message describing a state the game is
+    // not in.
+    expect(fn).not.toContain('skippedAlready.push(noun); // lead');
+  });
+
+  it('⚠⚠ ...and the player is TOLD, on the arbiter channel, with the verb that works', () => {
+    const store = src('app', 'state', 'gameStore.ts');
+    const i = store.indexOf('if (skippedLead.length > 0)');
+    expect(i).toBeGreaterThan(-1);
+    const block = store.slice(i, i + 500);
+    expect(block).toContain("'arbiter'");
+    expect(block).toContain('(INVESTIGATE.)');
+  });
+
+  it('⚠ a lead-only batch is NOT the "button did nothing" case', () => {
+    // Both empty-output guards have to count the lead line as output, or a room
+    // whose only scrap-shaped noun is the dog chain reports the sweep as broken.
+    const store = src('app', 'state', 'gameStore.ts');
+    const i = store.indexOf('const hadOtherOutput =');
+    expect(store.slice(i, i + 400)).toContain('skippedLead.length > 0');
+    const j = store.indexOf('&& skippedTakeable.length === 0');
+    expect(store.slice(j, j + 200)).toContain('&& skippedLead.length === 0');
+  });
+
+  it('⚠⚠ the protection LIFTS once the quest cannot fire — a snare is a snare again', () => {
+    // Protecting it forever would keep scrap out of the player's hands for a
+    // quest that already happened.
+    expect(isLeadNoun('snare pit', { rescueEligible: true })).toBe(true);
+    expect(isLeadNoun('snare pit', { rescueEligible: false })).toBe(false);
+    const store = src('app', 'state', 'gameStore.ts');
+    const i = store.indexOf('const bulkLeadCtx =');
+    const block = store.slice(i, i + 400);
+    expect(block).toContain('rescueEligible');
+    expect(block).toContain('player?.dog');
+    expect(block).toContain('pendingDogOnboarding');
+  });
+});
+
+describe('OTA-1236 — RENDERED: the lead is last, and no button touches it', () => {
+  const SMELTER = [
+    { noun: 'chain' }, { noun: 'bench' },
+    { noun: 'Aetheric Torch' }, { noun: 'Compact Blaster' },
+  ];
+
+  it('⚠⚠ the chain leaves the SCRAP lane, and the salvage count drops with it', () => {
+    const guarded = renderRoom(SMELTER, ['chain']);
+    expect(guarded).toContain('WORTH A LOOK');
+    expect(guarded).toContain('✦|chain|INVESTIGATE');
+    // The scrap sweep now counts the bench and ONLY the bench.
+    expect(guarded).toContain('⚒ SALVAGE ALL (1)');
+    // ⚠ The control: with no live rescue the same noun is scrap again and the
+    // count goes back to 2. If this half were missing, the fix would be a
+    // permanent tax on the salvage economy rather than a guard.
+    const unguarded = renderRoom(SMELTER, []);
+    expect(unguarded).not.toContain('WORTH A LOOK');
+    expect(unguarded).toContain('⚒|chain');
+    expect(unguarded).toContain('⚒ SALVAGE ALL (2)');
+  });
+
+  it('⚠⚠ the lead lane is LAST — after gear, after items, after scrap', () => {
+    // Owner: *"if it is there should always be the last thing listed so the next
+    // step is right there to see."* The buttons sit at the bottom of the card, so
+    // the last block is the one the thumb is already next to.
+    const text = renderRoom(SMELTER, ['chain']);
+    expect(text.indexOf('WORTH A LOOK')).toBeGreaterThan(text.indexOf('GEAR'));
+    expect(text.indexOf('WORTH A LOOK')).toBeGreaterThan(text.indexOf('ITEMS'));
+    expect(text.indexOf('WORTH A LOOK')).toBeGreaterThan(text.indexOf('SCRAP'));
+    expect(text.indexOf('chain')).toBeGreaterThan(text.indexOf('bench'));
+    // ...and still above the way out, so it is the last thing READ.
+    expect(text.indexOf('WORTH A LOOK')).toBeLessThan(text.indexOf('IGNORE THE REST'));
+  });
+
+  it('⚠⚠ THE LEAD LANE HAS NO SWEEP BUTTON, and its absence is the whole message', () => {
+    // Every other colour promises a matching button will clear it. This colour
+    // promises the opposite.
+    expect(laneHasSweep('gear')).toBe(true);
+    expect(laneHasSweep('items')).toBe(true);
+    expect(laneHasSweep('scrap')).toBe(true);
+    expect(laneHasSweep('lead')).toBe(false);
+    // A room of nothing BUT leads offers no bulk action at all.
+    const leadOnly = renderRoom([{ noun: 'chain' }, { noun: 'cage' }], ['chain', 'cage']);
+    expect(leadOnly).toContain('WORTH A LOOK');
+    expect(leadOnly).not.toContain('TAKE ALL');
+    expect(leadOnly).not.toContain('SALVAGE ALL');
+    expect(leadOnly).toContain('IGNORE THE REST');
+  });
+
+  it('⚠ the lead has its own lane and its own hue — never a fourth sweepable colour', () => {
+    expect(laneForKind('lead')).toBe('lead');
+    const mod = src('app', 'components', 'GatherModal.tsx');
+    const m = /^const LEAD = '(#[0-9a-f]{6})';/m.exec(mod);
+    expect(m).not.toBeNull();
+    // Distinct from all three sweep hues.
+    for (const other of ['GEAR', 'ITEMS', 'SCRAP', 'IGNORE']) {
+      const o = new RegExp(`^const ${other} = '(#[0-9a-f]{6})';`, 'm').exec(mod);
+      expect(o![1]).not.toBe(m![1]);
+    }
+    expect(mod).toContain('blockLead: { borderColor: LEAD');
+    expect(mod).toContain('textLead: { color: LEAD }');
+  });
+
+  it('⚠⚠ tapping a lead INVESTIGATES — the only verb that fires the rescue', () => {
+    const mod = src('app', 'components', 'GatherModal.tsx');
+    // Checked FIRST in the press handler, before the scrap and take branches.
+    const i = mod.indexOf('onPress={() => {');
+    const handler = mod.slice(i, i + 320);
+    expect(handler.indexOf("lane === 'lead'")).toBeLessThan(handler.indexOf("lane === 'scrap'"));
+    expect(handler).toContain('onInvestigate(noun)');
+    const screen = src('app', 'screens', 'ExplorationScreen.tsx');
+    expect(screen).toContain('onInvestigate={(noun) => {');
+    expect(screen).toContain('submit(`investigate ${noun}`)');
+  });
+});
+
+describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a fight', () => {
+  const hook = (nouns: string[]): Hook =>
+    ({ kind: 'smoke', stage: 0, nouns, resolved: false } as unknown as Hook);
+
+  it('⚠⚠ ordinary nouns → story hook → dog quest, exactly the sentence he wrote', () => {
+    const ctx = { hooks: [hook(['column'])], rescueEligible: true };
+    expect(storyTier('bench', ctx)).toBe('ordinary');
+    expect(storyTier('column', ctx)).toBe('hook');
+    expect(storyTier('snare pit', ctx)).toBe('rescue');
+    const ordered = orderByStoryTier(
+      ['snare pit', 'bench', 'column', 'shelf'], (n) => n, ctx,
+    );
+    expect(ordered).toEqual(['bench', 'shelf', 'column', 'snare pit']);
+  });
+
+  it('⚠ the order is a STABLE PARTITION — the list you read is the order that runs', () => {
+    const ctx = { hooks: [], rescueEligible: true };
+    const input = ['zeta', 'alpha', 'mid'];
+    expect(orderByStoryTier(input, (n) => n, ctx)).toEqual(input);
+    // And a rescue noun anywhere in the input still lands last, once.
+    expect(orderByStoryTier(['trap', 'zeta', 'alpha'], (n) => n, ctx))
+      .toEqual(['zeta', 'alpha', 'trap']);
+  });
+
+  it('⚠⚠ THE SWEEP BREAKS THE MOMENT AN ENEMY IS ON THE BOARD', () => {
+    // The rescue spawns a captor. Without this, the investigates queued behind it
+    // fire into a fight the player has not seen yet and are refused one by one —
+    // "Not while the Reclaimer Deserter is on you." Ordering alone does not fix
+    // that, because a hook can start a fight too.
+    const screen = src('app', 'screens', 'ExplorationScreen.tsx');
+    const i = screen.indexOf('onInvestigateAll={(nouns) => {');
+    expect(i).toBeGreaterThan(-1);
+    const block = screen.slice(i, i + 600);
+    expect(block).toContain('orderByStoryTier(nouns');
+    expect(block).toContain('currentScene?.enemies ?? []).length > 0');
+    expect(block).toContain('break;');
+  });
+
+  it('⚠⚠ the investigate picker LISTS in the same order it SWEEPS', () => {
+    // A list ordered one way and a sweep ordered another is a picker that lies
+    // about what it is about to do.
+    const modal = src('app', 'components', 'SearchModal.tsx');
+    expect(modal).toContain('leadNouns');
+    const i = modal.indexOf('const visibleChips = [');
+    expect(i).toBeGreaterThan(-1);
+    const block = modal.slice(i, i + 260);
+    expect(block).toContain('!isLeadChip(c.noun)');
+    // Non-leads first, leads appended after — the same partition as the sweep.
+    expect(block.indexOf('!isLeadChip')).toBeLessThan(block.lastIndexOf('isLeadChip'));
+    const screen = src('app', 'screens', 'ExplorationScreen.tsx');
+    expect(screen).toContain('leadNouns={leadNouns}');
+  });
+
+  it('⚠ a SPENT lead stops being one — it must not pin scrap out of reach forever', () => {
+    const screen = src('app', 'screens', 'ExplorationScreen.tsx');
+    const i = screen.indexOf('const leadNouns = useMemo(');
+    expect(i).toBeGreaterThan(-1);
+    expect(screen.slice(i, i + 900)).toContain('!isExhaustedHookNoun(n)');
+  });
+});
