@@ -123,7 +123,7 @@ import {
 } from '../engine/saveSystem';
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
-import { sanitizePlayerName } from '../engine/playerName';
+import { sanitizePlayerName, nameWasAltered } from '../engine/playerName';
 import { AppState, Platform } from 'react-native'; // OTA-1055 — foreground hook for the Qwen watchdog; OTA-1251 — desktop guard
 import { stripForeignWords, repairGluedNarration, looksLikeInstructionEcho, isSecondPersonActionOpener } from '../engine/foreignText';
 import { sentenceNamesOffCanonEntity, buildEntityAllowList, normalizeEntity } from '../engine/entityGuard';
@@ -12459,6 +12459,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           player: { ...s.player, name: cleanName },
           awaitingTutorialName: false,
         } : { awaitingTutorialName: false }));
+        // ⚠ OTA-1253 — SAY SO WHEN THE NAME CHANGED. The clean used to be
+        // silent: type "Verbal123" and you were simply Verbal from then on,
+        // with nothing anywhere admitting the game had edited your answer. The
+        // first place a player found out was the character sheet, and by then
+        // it reads as a bug rather than a rule. One line, in the Arbiter's own
+        // register, only when the text actually differs from what was typed.
+        if (nameWasAltered(trimmed, cleanName)) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter writes it down as "${cleanName}". "I keep the letters I can say aloud — the rest I leave off the page."`,
+          );
+        }
         get().appendLog('arbiter', `"Well met, ${cleanName}. To business."`);
         // OTA-948 — DEV STARTER GRANT (new-character only). The dev names get their test
         // scaffolding at CREATION, not retroactively on every load: a Resurrection Gem up
