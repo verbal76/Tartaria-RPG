@@ -1446,7 +1446,7 @@ it and states what was checked to rule out a consumer elsewhere.
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1251`**,
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1252`**,
 **golem-line `2026-08-09-1194`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1456,7 +1456,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.156**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.157**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1676,7 +1676,37 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE DESKTOP FIRST RUN THAT NEVER FINISHED (2026-08-11, latest). HAL ONLY
+- **⚠⚠ THE PC MOUSE PASS (2026-08-11, latest). HAL ONLY so far — golem batch
+  pending.** HAL OTA-1252. Three findings from one PC session, two of them typed
+  into the game's own command box (so they arrived in the device log, not chat),
+  plus a gate nobody was reading.
+  (1) **The TAKE popup's stealth toggle** — *"that's not how stealth works
+  anymore"*, right on two counts. It was a PURE DOWNSIDE in an empty room (an
+  open take never rolls; arming stealth swapped certainty for a d20 vs DC 10
+  that can only lose), so it now renders only when a vendor is present — which
+  is precisely the condition `stealthTakeAmbientNoun` already used to route to
+  `stealFromVendor`. And its label advertised a **DEX roll** long after OTA-348
+  moved sleight of hand to STEALTH.
+  (2) **Right-click = back**, via a new LIFO stack in `app/ui/desktopBack.ts`.
+  ⚠ THE GAME HAD NO GLOBAL BACK AT ALL — on a phone Android's hardware back is
+  wired per-`<Modal>`; on a PC a picker had exactly one exit. Escape shares the
+  stack. ⚠ Back declines on exploration/title/creation/ending, and the tutorial
+  door beat is deliberately NOT dismissible (it is a gate, not a convenience).
+  ⚠ The handler is read through a REF — the registration effect keys on `active`
+  only, so registering the closure would either churn the stack order LIFO needs
+  or freeze state at first mount.
+  (3) **The stat header stretched** — `stat: { flex: 1 }` splits whatever width
+  it is given, so OTA-1250's 1024 column turned five ~70px phone columns into
+  ~100px ones with the same 9px type. `STAT_ROW_MAX_WIDTH` (420 web,
+  **`undefined` on native** so the key is absent rather than merely unbound).
+  (4) ⚠⚠ **`typecheck:tests` was RED at 207 vs baseline 200** — a growth gate,
+  failing, unread. All seven were THIS iteration's own suites and all were
+  fixture-shape debt (hunt records missing `postedByFaction`/`acceptedAt`; two
+  `as` casts between provably non-overlapping shapes). Paid at source rather
+  than re-baselined; back to 200, green. New suite ota1252DesktopControls (13).
+  Full story: the VERSION.md 4.29.157 row.
+
+- **⚠⚠ THE DESKTOP FIRST RUN THAT NEVER FINISHED (2026-08-11). HAL ONLY
   so far — golem batch pending.** HAL OTA-1251. Owner, on the PC build: *"the
   arbiter first time setup has frozen... hanging at 51%."* Not slow — stuck, and
   51% was a permanent number. **⚠ MEASURED BEFORE IT WAS CHANGED**: the same web

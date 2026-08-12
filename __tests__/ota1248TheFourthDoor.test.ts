@@ -87,7 +87,11 @@ function kinWorldMemory() {
       a: { wrongs: 0, amendsCleared: 3, gifts: [{ item: 'x' }, { item: 'y' }, { item: 'z' }] },
       b: { wrongs: 0, amendsCleared: 2, gifts: [{ item: 'x' }, { item: 'y' }, { item: 'z' }] },
     },
-  } as typeof wm;
+    // ⚠ OTA-1252 — `as unknown as`, because the literal above deliberately gives
+    // npcRelations a REDUCED shape: only the three fields the regard bands read.
+    // A direct cast between non-overlapping shapes is a hard type error, not a
+    // warning, and it had been sitting in the ratchet as silent debt.
+  } as unknown as typeof wm;
 }
 
 function playerAtRegard(band: 'cold' | 'kin') {

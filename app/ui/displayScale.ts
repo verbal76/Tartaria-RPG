@@ -25,13 +25,13 @@ import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-/** ⚠ The reading column. 600 on a phone is the full screen; on desktop it was
- *  a ribbon. 1024 keeps prose at a comfortable measure (a 600px column of text
- *  at desktop font sizes is ~55 characters — this lands nearer 90, which is
- *  still inside the readable band and stops the window looking broken) while
- *  leaving the layout centred rather than stretched edge to edge, which is what
- *  a text game should look like on a wide monitor. */
-export const CONTENT_MAX_WIDTH = Platform.OS === 'web' ? 1024 : 600;
+// ⚠ OTA-1252 — the two pure layout numbers moved to ./layoutConstants, and are
+// RE-EXPORTED here so the five screens keep the import OTA-1250 gave them.
+// Reason for the move: this module needs AsyncStorage for the scale setting, so
+// a component that wanted nothing but a width paid for a storage dependency —
+// which broke `healthCardTint` on a native-module require for a StatsPanel that
+// stores nothing. Layout constants must be importable from a pure render path.
+export { CONTENT_MAX_WIDTH, STAT_ROW_MAX_WIDTH } from './layoutConstants';
 
 export type UiScale = 'small' | 'medium' | 'large';
 export const UI_SCALES: readonly UiScale[] = ['small', 'medium', 'large'] as const;
