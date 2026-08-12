@@ -632,17 +632,26 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               tone={investigateTone}
               blocked={investigateBlocked}
             />
+            {/* ⚠⚠ OTA-1233 — ONE BUTTON. TAKE and SALVAGE were two buttons over the
+                same list of scene nouns, and the seam between them is where
+                OTA-1231's bugs lived. The merged picker (GatherModal) shows the
+                room once and chooses the verb per row.
+
+                ⚠ The TUTORIAL OVERRIDES ARE BOTH HONOURED HERE. Its 'cudgel' beat
+                drives `takeOverride` and its 'scrap' beat drives
+                `salvageOverride`, and each beat force-shows its own prop. With one
+                button, whichever override is armed wins — take first, because the
+                cudgel beat comes first and a beat that cannot be tapped is a
+                stalled tutorial, which is the one failure this merge must not
+                introduce.
+
+                ⚠ Tone and blocked-state OR the two, so the button lights when
+                EITHER kind of thing is present and only greys when neither is. */}
             <QuickBtn
-              label="take"
-              onPress={takeOverride ?? onOpenTake}
-              tone={takeTone}
-              blocked={takeBlocked}
-            />
-            <QuickBtn
-              label="salvage"
-              onPress={salvageOverride ?? onOpenSalvage}
-              tone={salvageTone}
-              blocked={salvageBlocked}
+              label="take / salvage"
+              onPress={takeOverride ?? salvageOverride ?? onOpenTake}
+              tone={takeTone ?? salvageTone}
+              blocked={takeBlocked && salvageBlocked}
             />
             {!elevatedOn ? (
               <QuickBtn

@@ -1428,7 +1428,7 @@ Key invariants worth knowing:
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
 history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-12-1254`**,
-**golem-line `2026-08-12-1232`** (parity offset still HAL − 23 — every gameplay
+**golem-line `2026-08-12-1233`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1437,7 +1437,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.160**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.161**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1644,7 +1644,34 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE LOOT/SHOP TRIAL (2026-08-12, latest). GOLEM
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — ONE PICKER (2026-08-12, latest). GOLEM ONLY, NOT
+  ON HAL, BY DECISION.** Golem OTA-1233, extending the same divergence as 1232 —
+  **same merge-or-revert decision point, now covering `GatherModal` and
+  `InputBox` as well.**
+  TAKE and SALVAGE are one popup. They were two modals over the SAME
+  `displayedAmbientNouns`, each with its own consumed-predicate — **the seam
+  OTA-1231's bugs lived in.** One sorted list (★ → ⚔ → 🛡 → ◆ → ⚒), tap any row
+  to take or pry, `TAKE ALL (n)` and `⚒ SALVAGE n FIXTURES` both counted. ⚠ They
+  are NOT peers: take is reversible, salvage is a one-way door, so SALVAGE ALL is
+  quieter and smaller. Bulk salvage still routes through the store's
+  `salvageAllAmbient`, so OTA-1231's never-scrap-a-catalog-item guard keeps
+  applying instead of being re-implemented. Action row is now one `take / salvage`
+  button, and BOTH tutorial overrides drive it.
+  ⚠⚠ **THE REAL LESSON OF THIS PAIR, worth carrying forward:** OTA-1232 added row
+  icons at 13px in the same muted tan as the text beside them. Every source-pin
+  passed, the component rendered them, the bundle shipped — and the owner played a
+  full session and said *"nothing looks different"*. **The mark was built and then
+  hidden.** Marks are now 18px/bold with the upgrade tinting the whole ROW, and
+  **ota1233OnePicker RENDERS the component and asserts visible output** rather
+  than grepping source. **A source pin proves a line exists; it cannot prove a
+  player can see it.** Icon size is pinned as a number (≥16); SALVAGE ALL's
+  subordinate weight is pinned as a comparison against TAKE ALL's.
+  ⚠ Preserved and asserted: both tutorial beats still show their prop alone, the
+  elevation filter survives, and `isSalvageable` stays imported for the
+  action-button count — the component is retired, not orphaned. New suite
+  ota1233OnePicker (12). Full story: the VERSION.md 4.29.161 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE LOOT/SHOP TRIAL (2026-08-12). GOLEM
   ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1232. Owner: *"let's try this setup
   for the golem line only, I'll take it for a spin."*
   ⚠⚠ **THIS BREAKS THE SAME-PASS PARITY RULE ON PURPOSE, AND IT CARRIES A

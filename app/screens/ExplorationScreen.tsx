@@ -13,9 +13,12 @@ import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { playerPowerScore, enemyPowerScore } from '../engine/powerRating';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
-import { SalvageModal, isSalvageable as isSalvageableForModal } from '../components/SalvageModal';
+// ⚠ OTA-1233 — SalvageModal's COMPONENT is retired (GatherModal replaces both
+// pickers); its `isSalvageable` predicate is still the source of truth for the
+// action-button count, so the module stays and only the component import goes.
+import { isSalvageable as isSalvageableForModal } from '../components/SalvageModal';
 import { BrandedModal } from '../components/BrandedModal';
-import { TakeModal } from '../components/TakeModal';
+import { GatherModal } from '../components/GatherModal'; // OTA-1233 — one picker, both verbs
 import { ClimbModal } from '../components/ClimbModal';
 import { TorchProbeModal } from '../components/TorchProbeModal';
 import { HookContinueModal } from '../components/HookContinueModal';
@@ -1782,122 +1785,85 @@ export function ExplorationScreen() {
         onCancel={() => setSearchOpen(false)}
       />
 
-      <TakeModal
+      {/* ⚠⚠ OTA-1233 — ONE PICKER. TakeModal + SalvageModal were two modals over the
+          SAME `displayedAmbientNouns`, each with its own consumed-predicate — the
+          seam OTA-1231's bugs lived in. GatherModal shows the room once and picks
+          the verb per row: catalog items TAKE, everything else SALVAGES.
+
+          ⚠ BOTH TUTORIAL BEATS SURVIVE, and each still shows its prop ALONE. The
+          'cudgel' beat used to be a take-only picker and 'scrap' a salvage-only
+          one; with a single picker each beat narrows the whole list to its own
+          prop, which preserves the original fix (the guided beat must not offer
+          the room's real nouns alongside the demo one — playtest: "neither of
+          those are the cudgel"). */}
+      <GatherModal
         visible={takeOpen}
-        // During the cudgel beat, show ONLY the demo prop. Playtest: the
-        // cudgel was appended after the room's real takeable nouns, so the
-        // picker offered actual items first and the player took the wrong
-        // things ("neither of those are the cudgel"). The guided beat must
-        // present the prop alone; the normal scene nouns return after.
-        takeable={
+        player={player}
+        chips={
           tutBeat === 'cudgel'
             ? [{ noun: 'cudgel', consumed: false }]
-            : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
-                .filter((n) => findCatalogItem(n) !== null && !isOversized(n))
-                .map((n) => ({ noun: n, consumed: isAmbientConsumed(n) }))
+            : tutBeat === 'scrap'
+              ? [{ noun: 'broken chest plate', consumed: false }]
+              // ⚠ ONE list, unfiltered by kind — the merge is the point. The
+              // elevation filter still applies: while up a climb the picker lists
+              // only what is actually reachable (OTA-948), rather than ground
+              // nouns every tap would be refused on.
+              : reachableWhileElevated(
+                  currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
+                  currentScene?.elevatedOn?.noun ?? null,
+                  !!currentScene?.elevatedOverlayMeta,
+                  currentScene?.nounPlacements ?? null,
+                  currentScene?.elevatedOn?.tier ?? 0,
+                )
+                  .filter((n) => !isOversized(n) || findCatalogItem(n) === null)
+                  // ⚠⚠ OTA-1233 — `isExhaustedHookNoun` IS PART OF THE CONSUMED
+                  // TEST, and it nearly went missing in the merge. The old salvage
+                  // picker consulted it (OTA-1211: a spent hook noun must grey, or
+                  // the chip stays lit forever and every tap earns a refusal), and
+                  // retiring that picker took its call site with it. ota1211's
+                  // suite counts these call sites for exactly this reason and
+                  // failed the moment it dropped — the pin worked.
+                  .map((n) => ({
+                    noun: n,
+                    consumed: isAmbientConsumed(n) || isExhaustedHookNoun(n),
+                  }))
         }
         onTake={(noun) => {
-          // Dismiss the keyboard as the modal closes so RN can't restore
-          // focus to the underlying command field and re-raise it.
           Keyboard.dismiss();
           setTakeOpen(false);
-          if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') {
-            submit('take cudgel');
-            return;
-          }
+          if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') { submit('take cudgel'); return; }
           takeAmbientNoun(noun);
         }}
-        // ⚠ OTA-1229 — the toggle only exists when a vendor is here to steal
-        // from. `stealthTakeAmbientNoun` routes to `stealFromVendor` on exactly
-        // this condition; without a vendor it fell through to a sleight-of-hand
-        // roll against nobody, which could only lose the player the item.
+        onSalvage={(noun) => {
+          Keyboard.dismiss();
+          setTakeOpen(false);
+          // Routed through the parser exactly as the old salvage picker did, so
+          // the hook system and scene-noun matcher see the same input they always
+          // have (OTA-117 made 'salvage' an investigate verb synonym for that).
+          submit(`salvage ${noun}`);
+        }}
+        // ⚠ OTA-1229 — only meaningful with a vendor present, where it is a THEFT.
         stealthMeaningful={!!currentScene?.vendor}
-        // ⚠ OTA-1232 — drives the ★ upgrade mark, compared against what is
-        // equipped right now rather than a snapshot taken when the room spawned.
-        player={player}
         onStealthTake={(noun) => {
           Keyboard.dismiss();
           setTakeOpen(false);
           stealthTakeAmbientNoun(noun);
         }}
         onTakeAll={(nouns) => {
-          // OTA 222 — fire each take in sequence then close. Each
-          // takeAmbientNoun call runs through the same gating
-          // (already-taken dedup, inventory cap, etc.) that an
-          // individual chip tap would, so partial success is
-          // handled per-item by the store.
           Keyboard.dismiss();
           setTakeOpen(false);
           for (const n of nouns) takeAmbientNoun(n);
         }}
+        onSalvageAll={(nouns) => {
+          Keyboard.dismiss();
+          setTakeOpen(false);
+          // The store's bulk path — which since OTA-1231 skips catalog items, so
+          // this can never scrap something the player could have pocketed.
+          useGameStore.getState().salvageAllAmbient(nouns);
+        }}
         onCancel={() => { Keyboard.dismiss(); setTakeOpen(false); }}
       />
 
-      <SalvageModal
-        visible={salvageOpen}
-        // During the scrap beat, show ONLY the demo prop (the broken chest
-        // plate) so the picker can't surface the room's real salvageables —
-        // same confusion fix as the TAKE picker above.
-        chips={
-          tutBeat === 'scrap'
-            ? [{ noun: 'broken chest plate', consumed: false }]
-            // OTA-948 — same elevation filter as the button count above: while up
-            // on a climb the picker lists only what you can actually reach,
-            // instead of ground nouns every tap would get refused on.
-            : reachableWhileElevated(
-                currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
-                currentScene?.elevatedOn?.noun ?? null,
-                !!currentScene?.elevatedOverlayMeta,
-                currentScene?.nounPlacements ?? null,
-                currentScene?.elevatedOn?.tier ?? 0,
-              ).map((n) => ({
-                noun: n,
-                // OTA-167 — salvage chip greys on the engine's per-room consumed
-                // state directly, NOT isAmbientConsumed's self-heal, which
-                // fuzzy-matched catalog items the player didn't own and kept
-                // chips lit.
-                // ⚠⚠ OTA-1231 — `isNounFlavorExhausted` REMOVED from this predicate.
-                // A noun you read for lore is not a noun you have broken down for
-                // parts, and greying it here was the VISIBLE half of the owner's
-                // "investigate kills salvage": the chip went dead, and typing the
-                // word instead hit the matching engine gate (fixed in the same OTA,
-                // in gameStore's investigate handler). Salvage's real consumption
-                // marker is `searchedAmbientNouns` — the first term below — and it
-                // is written where the pool actually rolls.
-                // ⚠ The SEARCH picker above KEEPS its flavor check, and that is the
-                // point of the split: investigate is the one verb the flavor list
-                // was ever meant to gate.
-                consumed:
-                  isFuzzyConsumed(n, productivelyConsumedSet) ||
-                  isExhaustedHookNoun(n),
-              }))
-        }
-        onSubmit={(target) => {
-          setSalvageOpen(false);
-          // Submit raw target — the modal's chip text already includes
-          // a definite article when appropriate ("the construct"), and
-          // typed text is passed through verbatim. The investigate
-          // intent picks up 'salvage' as a verb synonym (OTA 140) and
-          // routes through the hook system + scene-noun matcher.
-          submit(`salvage ${target}`);
-        }}
-        onSalvageAll={(nouns) => {
-          // 2026-05-25 — route through the bulk salvageAllAmbient
-          // action so all narration lines fire FIRST (one per noun
-          // in tap order) and the aggregated haul prints as the
-          // last block. Per playtester: "hit salvage all, it shows
-          // the text for every salvage task and then what was
-          // recovered if anything, and then shows the next ... it
-          // should print all the item.salvage text in a row, and
-          // then everything you found together after all of the
-          // texts print." Previously this loop submit()'d each
-          // noun individually, which interleaved text + reward
-          // pairs.
-          setSalvageOpen(false);
-          useGameStore.getState().salvageAllAmbient(nouns);
-        }}
-        onCancel={() => setSalvageOpen(false)}
-      />
 
       {/* arb135 — Mission Board screen: open postings with tappable ACCEPT. */}
       <MissionBoardModal
