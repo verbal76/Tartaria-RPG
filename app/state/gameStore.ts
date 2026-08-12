@@ -22431,7 +22431,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const investPrior = investRoom?.flavorExhaustedNouns ?? [];
             // OTA-953 — word-level match (was raw bidirectional substrings, which refused
             // "cracked terminal" after a mere "rack" was flavor-exhausted).
-            const alreadyExamined = investPrior.some((n) => nounTokensMatch(n, focusKey));
+            // ⚠⚠ OTA-1254 — SALVAGE IS NOT INVESTIGATE, AND THIS GATE COULD NOT TELL
+            // THEM APART. Owner: *"investigate kills salvage sometimes."* It did, and
+            // the contract it broke is written down one file over, on
+            // `flavorExhaustedNouns` itself:
+            //
+            //     "Kept SEPARATE from searchedAmbientNouns so other verbs (take,
+            //      salvage, break) can still act on these nouns — ONLY the investigate
+            //      verb consults this list."
+            //
+            // `salvage <noun>` parses to intent=investigate (OTA-140 made salvage a
+            // verb synonym so it could reuse this handler's noun matcher), so it
+            // arrived here and hit a gate meant for repeat LORE reads. Measured from
+            // the owner's device log:
+            //     [player] investigate brick   → "Tartarian stone. Granular…"
+            //     [player] take the brick      → "…Leave it. Or salvage it."
+            //     [player] salvage the brick   → "You've already examined the brick."
+            // The game told him to salvage it and then refused — and `brick` is a real
+            // salvage yield — the brick sits in the RUBBLE pool for 5 Worn Tartarian
+            // Coin — so this cost him the loot it had just pointed at.
+            //
+            // ⚠ That yield is named in prose deliberately. Writing the salvage-pool
+            // call out here trips ota1014's exploit guard, which counts occurrences
+            // of that call in this file to prove every grant site routes through
+            // `ledgeredSalvage`. A comment that reads like a second call site would
+            // mean weakening a real check in order to decorate this one.
+            //
+            // ⚠ Salvage has its OWN consumption marker (`searchedAmbientNouns`, checked
+            // further down where the pool actually rolls). Nothing here was protecting
+            // it; this gate only ever protected repeat flavor text.
+            const isSalvageVerb = (reparsed.matchedVerb ?? '').toLowerCase() === 'salvage';
+            const alreadyExamined = !isSalvageVerb && investPrior.some((n) => nounTokensMatch(n, focusKey));
             if (alreadyExamined) {
               // OTA-084 refuseAmbient pattern — atomic log +
               // dedup mark, idempotent on the second touch.
@@ -30378,6 +30408,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let hoursAdded = 0;
     const consumedNouns: string[] = [];
     const skippedAlready: string[] = [];
+    // ⚠ OTA-1254 — its OWN bucket, not skippedAlready. These nouns were not
+    // "already worked over" — they were deliberately left intact because they are
+    // things the player can pick up, and saying otherwise would be the exact class
+    // of lie this project keeps hunting: a message that describes a state the game
+    // is not in. They get their own line, which names the verb that DOES work.
+    const skippedTakeable: string[] = [];
     // 2026-05-25 OTA-037 — track nouns that the modal surfaced but
     // rollSalvagePool didn't recognize. Previously these were swallowed
     // silently, so a SALVAGE ALL where every chip was unmatched
@@ -30409,6 +30445,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       if (alreadyDoneFromPrior || alreadyDoneFromBatch) {
         skippedAlready.push(noun);
+        continue;
+      }
+
+      // ⚠⚠ OTA-1254 — SALVAGE ALL NEVER SCRAPS SOMETHING YOU COULD HAVE POCKETED.
+      // Owner: *"salvage can kill items in take."* It could, and the overlap is not
+      // theoretical — measured across the catalog and the salvage pools:
+      //     Aetheric Torch   takeable ✓  salvage pool ✓
+      //     Rusty Shortbow   takeable ✓  salvage pool ✓
+      //     Small Rock       takeable ✓  salvage pool ✓
+      //     lantern          takeable ✓  salvage pool ✓ (and offered as a chip)
+      // Salvage writes `searchedAmbientNouns`; TAKE reads it. So one tap of SALVAGE
+      // ALL turned a real item lying on the ground into two Aether Dust and removed
+      // it from the take list — silently, in a batch the player fired at the
+      // scenery.
+      //
+      // ⚠ A TYPED `salvage lantern` IS STILL HONOURED, and that distinction is the
+      // whole rule: breaking down an item you can see is a legitimate choice, made
+      // deliberately, one noun at a time. A bulk sweep is not that choice — it is
+      // aimed at the room's furniture, and it must not quietly spend the loot.
+      if (findCatalogItem(noun) !== null) {
+        skippedTakeable.push(noun);
         continue;
       }
 
@@ -30569,6 +30626,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const overflow = skippedAlready.length > 4 ? ` and ${skippedAlready.length - 4} more` : '';
       get().appendLog('world', `Already worked over: ${names}${overflow}.`);
     }
+    // ⚠ OTA-1254 — and the honest line for the ones left whole on purpose. It names
+    // TAKE, because that is the verb that works on them, and it says they are still
+    // there — a player who tapped SALVAGE ALL and saw nothing about these would
+    // reasonably assume they were gone.
+    if (skippedTakeable.length > 0) {
+      const names = skippedTakeable.slice(0, 4).join(', ');
+      const overflow = skippedTakeable.length > 4 ? ` and ${skippedTakeable.length - 4} more` : '';
+      get().appendLog('world', `Left whole — worth more in your pack than in pieces: ${names}${overflow}. (TAKE them.)`);
+    }
     // Emit the aggregated reward summary as the last block.
     if (itemTotals.size > 0 || tcGained > 0) {
       // One header line so the haul reads as one event, not a
@@ -30596,7 +30662,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Surface them whenever there WAS other output; the all-empty case below still
     // owns the nothing-at-all batch.
     const hadOtherOutput =
-      narrationLines.length > 0 || skippedAlready.length > 0 || itemTotals.size > 0 || tcGained > 0;
+      narrationLines.length > 0 || skippedAlready.length > 0 || skippedTakeable.length > 0
+      || itemTotals.size > 0 || tcGained > 0;
     if (unmatchedNouns.length > 0 && hadOtherOutput) {
       get().appendLog(
         'world',
@@ -30606,6 +30673,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (
       narrationLines.length === 0
       && skippedAlready.length === 0
+      && skippedTakeable.length === 0
       && itemTotals.size === 0
       && tcGained === 0
     ) {
