@@ -1427,8 +1427,8 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-11-1252`**,
-**golem-line `2026-08-11-1229`** (parity offset still HAL − 23 — every gameplay
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-12-1253`**,
+**golem-line `2026-08-12-1230`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
 tuning or content the engine already has natively — the escort feature was
@@ -1437,7 +1437,7 @@ ported FROM engine_Dev, not to it))
 **GAME VERSION (player-facing):** `DISPLAY_VERSION` in `app/buildInfo.ts`, shown
 on the character-select screen. It is a KNOWLEDGE version, not a build number:
 **PATCH +1 on every OTA**, MINOR on a feature wave, MAJOR on a systems
-re-architecture. Currently **4.29.157**; ledger in `VERSION.md`.
+re-architecture. Currently **4.29.158**; ledger in `VERSION.md`.
 
 ### ⚠ OPEN ITEMS — THE LLM-HEADROOM TRACK (owner-approved, 2026-08-05)
 
@@ -1644,7 +1644,35 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE DESKTOP BATCH (2026-08-11, latest). HAL + GOLEM (batch ran
+- **⚠⚠ THE NAME LINE, AND THE INJECTION AUDIT (2026-08-12, latest). HAL + GOLEM
+  (batch ran 2026-08-12).** Golem OTA-1230, ported from HAL 1253. Owner asked
+  whether emoji and special characters can be kept out of the name line, then
+  whether anything typed there could be malicious. OTA-612 already stripped to
+  letters + space / hyphen / apostrophe and capped at 24 — but **the filter had
+  never been RUN**, and running it found two faults pointing opposite ways.
+  (1) **"Letters" is a far bigger category than it sounds.** Math script,
+  fullwidth, circled, fraktur and superscript blocks are all Unicode category L,
+  so a name written in any of them sailed through. Fixed by normalising **NFKC
+  instead of NFC** — one letter of source, closes the whole class — plus a hand
+  table for Latin small-caps, which has no compatibility decomposition.
+  (2) ⚠⚠ **Combining marks were being stripped as "not letters"** — and the
+  virama in a Devanagari name JOINS two letters, so a real name was silently
+  broken. Marks are kept now; zalgo is bounded at two marks per base character.
+  **A quantity rule, not a category one — banning the category is what broke
+  Devanagari in the first place.** Also: hyphen/apostrophe runs collapse, and
+  the strip no longer happens in silence — the Arbiter says so once, only when
+  the text actually changed.
+  ⚠⚠ **THE AUDIT, GREPPED NOT ASSUMED:** no `eval` / `new Function` /
+  `innerHTML` / `dangerouslySetInnerHTML` anywhere in the tree; no WebView; the
+  only `Linking.openURL` targets are fixed URLs or `encodeURIComponent`-wrapped
+  mailto; storage is AsyncStorage + `JSON.stringify` (no SQL, no shell, no path
+  built from the name); rendering is `<Text>`, which has no markup path; and
+  **the name never reaches the LLM prompt** — `LlmContext` has no name field.
+  ⚠ The sanitizer is READABILITY, not a security boundary, and `playerName.ts`
+  now says that outright. New suite ota1230NameHygiene (9). Full story: the
+  VERSION.md 4.29.158 row.
+
+- **⚠⚠ THE DESKTOP BATCH (2026-08-11). HAL + GOLEM (batch ran
   2026-08-12).** Golem OTA-1227 / 1228 / 1229, ported from HAL 1250 / 1251 /
   1252. All of it is `Platform.OS === 'web'`-guarded desktop work — **inert on
   this line by construction**, and it ships here anyway so the branches cannot
