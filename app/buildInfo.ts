@@ -15107,6 +15107,40 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resumed save is past first-run onboarding. Fix: loadSlotIntoGame now clears tutorialStep/awaitingTutorialName/
 // tutorialExploreChosen and sets hasSeenIntro:true; saveAndExitToTitle clears the same on the way out. Locked by
 // sessionResume tests. JS-only → 290. app/state/gameStore.ts.
+// COMBAT-PARITY I (Tartaria-native, no JSON plumbing) — STAT GLOSSARY: the built-in catalog authored
+// ~100 stat bonuses with names the engine doesn't track (constitution / acrobatics / investigation /
+// aetheria / perception …) that were silently dropped. equipment.canonicalStatKey now maps those
+// synonyms to the real engine stat (or the hp pool) at every equipped stat-read, so the bonuses
+// finally count. Plus a stat floor (effectiveStats clamped ≥1) so stacked debuffs can't zero a roll.
+// Hardcoded — no contentPack/JSON getters added. (Dev: set official OTA number/codename.)
+// COMBAT-PARITY II (Tartaria-native, no JSON plumbing) — TYPED DAMAGE-TYPE PROCS: each built-in
+// damage type (piercing/slashing/bludgeoning/electrical/aetheric/stun/burn/poison/radiation/…) now
+// carries a small on-hit bonus or a timed DOT, gated by an apply chance (raised vs a target WEAK to
+// the type, lowered vs RESISTANT), mirroring how Dev-engine author damageTypes behave — hardcoded as
+// BUILTIN_DT_COMBAT, reusing the existing coating-DOT (enemyStatuses) + enemyArmorShred infra. Both
+// directions: player→enemy folds an on-hit bonus / seeds a typed_dot and an on-hit debuff becomes an
+// "exposed" AC shred (easier to hit); enemy→player lands only the on-hit/DOT bonus (no player stat
+// penalty), at full chance for EXPLICITLY-typed enemies and 0.4× for inferred bare-dice types so the
+// ~95 untyped enemies don't silently tax the player. Damage-type aliases (force/psychic→aetheric,
+// frost→cold, shock→electrical) via canonDT. Post-audit (multi-agent stress + balance probe) fixes:
+// (1) added the `cold` proc entry so the frost→cold alias isn't dead; (2) the player→enemy "exposed"
+// AC shred now shares the proc-chance roll (was applied every hit); (3) enemy→player bonus is 1d3 vs
+// the player's 1d4 — a player-favoring asymmetry, since the probe showed symmetric procs convert
+// stalls into deaths at the Uncommon tier; (4) the stat glossary now also covers the durability
+// instance-perk roll (acrobatics/aetheria synonyms were dropped from rolled perks); (5) effectiveStats
+// floors stealth at 0 (untrained), not 1. Common tier (real early-game) holds ~90% win. (Dev: OTA #.)
+// COMBAT-PARITY III (companions) — the dog's bite and the golem's INNATE attack were typeless flat
+// damage: a pierce-resistant enemy soaked nothing off the dog, a slash-weak one took no extra off the
+// golem, and neither rolled the typed on-hit proc. Now both route their hit through
+// applyDamageTypeModifier + traitDamageMultiplier (the same resist/weak/creature-trait math the
+// player's swing uses) and roll the on-hit typed proc for their damage type — closing the companion
+// half of the typed-combat parity. (The golem's coating bonus already respected resists; untouched.)
+// tsc clean; dogGolemCombatStress 9/9, golemCompanion + combat + coating suites green. (Dev: OTA #.)
+//
+// 2026-06-30 — steam_Dev brought current with HaL2001 (Tartaria OTA-624..646: coatings
+// system, coatings inventory section, armor-coating + coated-resist preview, coating-
+// landing rule, range badge, …) for a desktop/Steam .exe playtest. The combat-parity
+// I/II/III work above (steam_Dev-native) is retained; the HaL2001 build log follows.
 // OTA-624 (Bibiquadium Amber) — [bug · playtester] tapped "salvage scraps of cloth" a dozen times; it kept replying
 // "already examined… nothing more to find" while the SALVAGE and INVESTIGATE buttons stayed green ("live") and never
 // dropped to amber, blocking both slots. Cause: the engine records the noun consumed/flavor-exhausted under the

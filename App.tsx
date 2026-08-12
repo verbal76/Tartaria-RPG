@@ -34,6 +34,7 @@ import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
 import { ContractsScreen } from './app/screens/ContractsScreen';
 import { WorldScreen } from './app/screens/WorldScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
+import { GamepadNav } from './app/components/GamepadNav';
 import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
@@ -932,22 +933,25 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           the bars. Umber base (styles.root) → faint tiled parchment (~5%) →
           radial vignette that darkens the margins but keeps the center clear.
           pointerEvents none so it never eats a touch. */}
-      {/* arb84 — parchment tiles via ImageBackground (a plain <Image> with
-          resizeMode="repeat" does NOT tile — it draws ONE 256px copy in the
-          top-left corner, which read as a hard-edged lighter rectangle / the
-          "color split"). ImageBackground tiles reliably; opacity goes on the
-          CONTAINER style (not imageStyle, which iOS ignored) so it dims
-          reliably AND repeats. */}
-      <ImageBackground
-        source={require('./assets/textures/parchment.png')}
-        resizeMode="repeat"
-        style={[StyleSheet.absoluteFill, { opacity: display.textureOpacity }]}
-      />
-      <Image
-        source={require('./assets/textures/vignette.png')}
-        resizeMode="stretch"
-        style={[StyleSheet.absoluteFill, { opacity: display.vignetteStrength }]}
-      />
+      {/* The parchment grain + vignette give MOBILE its "aged paper" look, but
+          react-native-web mis-renders them: resizeMode="repeat" draws ONE copy in
+          the corner (a hard-edged square) and the stretched vignette reads as a
+          crisp colour split. On web/desktop we drop both and show only the solid
+          base colour the player picked in Settings — clean, no artifacts. */}
+      {Platform.OS !== 'web' && (
+        <>
+          <ImageBackground
+            source={require('./assets/textures/parchment.png')}
+            resizeMode="repeat"
+            style={[StyleSheet.absoluteFill, { opacity: display.textureOpacity }]}
+          />
+          <Image
+            source={require('./assets/textures/vignette.png')}
+            resizeMode="stretch"
+            style={[StyleSheet.absoluteFill, { opacity: display.vignetteStrength }]}
+          />
+        </>
+      )}
       <View style={[styles.safe, { paddingTop: top, paddingBottom: bottomPad, paddingLeft: insets.left, paddingRight: insets.right }]}>
         <StatusBar style="light" hidden />
         <View
@@ -979,6 +983,9 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           padding + scale transform), so it's full-bleed with no parchment
           margins. Self-dismisses after ~2s on first launch. */}
       <SplashOverlay />
+      {/* PC / Steam Deck controller navigation. Renders nothing on phones
+          (native stub); on web it drives the on-screen-button highlight. */}
+      <GamepadNav />
     </View>
   );
 }

@@ -1,0 +1,31 @@
+{
+  "name": "tartaria-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron + Steam desktop wrapper for Tartaria Realms. Loads the Expo web export (react-native-web) and adds Steamworks (achievements/overlay). Separate npm package from the mobile app so it never affects the RN build.",
+  "main": "main.js",
+  "scripts": {
+    "_comment": "From repo root: `npx expo export --platform web` produces dist/. Copy/symlink it to desktop/web-build, then run these.",
+    "start": "electron .",
+    "start:dev": "cross-env TARTARIA_DEV_URL=http://localhost:8081 electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+    "comment_optionalDependencies": "Steam is optional so a failed steamworks.js install never blocks the FIRST playable .exe; main.js guards its require. Promote to a hard dependency once achievements are wired.",
+  "optionalDependencies": {
+    "steamworks.js": "^0.4.0"
+  },
+  "build": {
+    "appId": "com.hotatticgames.tartaria.steam",
+    "productName": "Tartaria Realms",
+    "directories": { "output": "release" },
+    "files": ["main.js", "preload.js", "web-build/**/*"],
+    "win": { "target": "portable" },
+    "mac": { "target": "dir" },
+    "linux": { "target": "dir" }
+  }
+}
