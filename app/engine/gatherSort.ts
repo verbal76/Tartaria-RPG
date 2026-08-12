@@ -25,7 +25,7 @@ import type { PlayerCharacter, InventoryItem, EquipSlot } from './types';
 import { WEAPONS, ARMOR, findCatalogItem } from './crafting';
 import { resolveEquippedItem } from './equipment';
 
-export type GatherKind = 'weapon' | 'armor' | 'other' | 'scenery';
+export type GatherKind = 'weapon' | 'armor' | 'other' | 'scenery' | 'inert';
 
 /** Mean roll of an NdM dice string ("2d6" → 7). Returns 0 on anything
  *  unparseable, which keeps an unreadable weapon out of the upgrade lane
@@ -51,11 +51,41 @@ function armorByName(name: string): (typeof ARMOR)[number] | null {
   return ARMOR.find((a) => a.name.toLowerCase() === lower) ?? null;
 }
 
-/** ⚠ Which lane a scene noun belongs in. 'scenery' means the catalog does not
- *  know it — those are the salvage fodder, and they sort last precisely because
- *  they are the ones SALVAGE ALL is going to sweep anyway. */
+/** ⚠⚠ Which lane a scene noun belongs in — and the distinction OTA-1233 GOT WRONG.
+ *
+ *  It had two answers for a non-catalog noun: scenery, meaning scrap. But
+ *  "the catalog does not know it" and "it can be pried apart" are DIFFERENT
+ *  QUESTIONS, and the owner's device log is what proved it:
+ *
+ *      tap "take / salvage"
+ *      You look the firepit, marker, sack over and find nothing your tools
+ *        can break down here.
+ *      salvageAllAmbient: no pool matched for 4 noun(s) — firepit, marker,
+ *        sack, stall.
+ *
+ *  The picker had counted those four as fixtures and offered
+ *  "⚒ SALVAGE 4 FIXTURES". The button promised, the sweep delivered nothing,
+ *  and because nothing was consumed the count never dropped — so it could be
+ *  tapped forever. Owner: *"still showed salvage at 4 items but never let me
+ *  salvage."*
+ *
+ *  ⚠ THE GALLING PART: `hasSalvageYield` was written in the PREVIOUS OTA for
+ *  exactly this distinction, to stop the refusal lines advertising SALVAGE on
+ *  nouns with no pool — and then this function did not consult it. The refusal
+ *  copy knew the difference; the picker did not.
+ *
+ *  'inert' is a noun that is neither takeable NOR salvageable — a firepit, a
+ *  signpost, a tent. INVESTIGATE is its verb, and it has its own picker. These
+ *  are dropped from the loot list rather than shown greyed: a row you cannot act
+ *  on is an invitation to the tap that fails. */
 export function classifyGatherNoun(noun: string): GatherKind {
-  if (findCatalogItem(noun) === null) return 'scenery';
+  if (findCatalogItem(noun) === null) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { hasSalvageYield } = require('./salvagePools') as typeof import('./salvagePools');
+    let yields = false;
+    try { yields = hasSalvageYield(noun); } catch { yields = false; }
+    return yields ? 'scenery' : 'inert';
+  }
   if (weaponByName(noun)) return 'weapon';
   if (armorByName(noun)) return 'armor';
   return 'other';
@@ -132,7 +162,7 @@ export interface GatherRow {
  *  half-looted room does not reshuffle under the player's thumb between taps.
  *  Ties break alphabetically so the list is STABLE — a picker that reorders
  *  itself while you read it is worse than one sorted badly. */
-const KIND_RANK: Record<GatherKind, number> = { weapon: 1, armor: 2, other: 3, scenery: 4 };
+const KIND_RANK: Record<GatherKind, number> = { weapon: 1, armor: 2, other: 3, scenery: 4, inert: 5 };
 
 export function sortGatherRows(rows: readonly GatherRow[]): GatherRow[] {
   return [...rows].sort((a, b) => {
@@ -151,5 +181,40 @@ export function gatherIcon(row: { kind: GatherKind; upgrade: boolean }): string 
   if (row.kind === 'weapon') return '⚔';
   if (row.kind === 'armor') return '🛡';
   if (row.kind === 'other') return '◆';
+  if (row.kind === 'inert') return '·';
   return '⚒';
+}
+
+/** ⚠⚠ Can this row be ACTED ON in the loot picker at all? The picker filters on
+ *  this, so a noun that neither takes nor salvages never reaches a button that
+ *  would promise something it cannot deliver. */
+export function isActionableGatherKind(kind: GatherKind): boolean {
+  return kind !== 'inert';
+}
+
+/** ⚠⚠ OTA-1235 — THE LANE IS THE COLOUR IS THE BUTTON.
+ *
+ *  Owner, after playing OTA-1233: *"it shouldn't be gated it should be a layout
+ *  like here is everything, what do you want to do. we could make the items
+ *  blocks color coded like orange squares for gear with a matching orange button
+ *  for take all gear, green for takable items with a matching button, and yellow
+ *  for salvageable items with a matching color button."*
+ *
+ *  The old picker had ONE list and TWO bulk buttons, so a player had to read each
+ *  row's tail text to work out which button would sweep it — which read as a
+ *  gated flow even though nothing was gated. Three lanes, three colours, three
+ *  buttons: the block you are looking at is the colour of the button that will
+ *  take it. Nothing to deduce.
+ *
+ *  ⚠ GEAR AND ITEMS ARE SPLIT even though both are "take", because they are
+ *  different decisions. Gear is a comparison — is this better than what I have.
+ *  An item is not; it just goes in the pack. Sweeping the second is free, and
+ *  sweeping the first is what makes a player miss an upgrade. */
+export type GatherLane = 'gear' | 'items' | 'scrap';
+
+export function laneForKind(kind: GatherKind): GatherLane | null {
+  if (kind === 'weapon' || kind === 'armor') return 'gear';
+  if (kind === 'other') return 'items';
+  if (kind === 'scenery') return 'scrap';
+  return null; // inert — no lane, no colour, no button
 }

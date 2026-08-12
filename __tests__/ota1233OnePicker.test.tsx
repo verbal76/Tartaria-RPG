@@ -27,6 +27,9 @@ const renderer = require('react-test-renderer') as {
   create(el: React.ReactElement): { toJSON(): unknown };
 };
 import { GatherModal } from '../app/components/GatherModal';
+import { classifyGatherNoun, isActionableGatherKind, laneForKind } from '../app/engine/gatherSort';
+import { hasSalvageYield } from '../app/engine/salvagePools';
+import { findCatalogItem } from '../app/engine/crafting';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -66,48 +69,98 @@ const ROOM = [
   { noun: 'rusted royal vault pedestal' },
 ];
 
-describe('OTA-1233 — one picker shows the whole room', () => {
-  it('⚠⚠ RENDERED: loot and scrap appear in ONE list, sorted, verb per row', () => {
+describe('OTA-1235 — three lanes, three colours, all visible at once', () => {
+  it('⚠⚠ RENDERED: every lane heading, every block and every button is present together', () => {
     const text = renderRoom(ROOM).join('|');
-    // Takeables first, in kind order, each headed for the pack...
-    expect(text).toContain('⚔|Compact Blaster|→ pack');
-    expect(text).toContain('🛡|Aetherbound Mask|→ pack');
-    expect(text).toContain('◆|Aetheric Torch|→ pack');
-    // ...then scenery, marked as scrap.
-    expect(text).toContain('⚒|bench|scrap');
-    expect(text).toContain('⚒|rusted royal vault pedestal|scrap');
-    // And the order really is loot-then-scrap, not interleaved.
-    expect(text.indexOf('Compact Blaster')).toBeLessThan(text.indexOf('bench'));
+    // Nothing waits on anything. The whole room is on screen in one pass —
+    // that is the complaint this redesign answers.
+    expect(text).toContain('GEAR');
+    expect(text).toContain('ITEMS');
+    expect(text).toContain('SCRAP');
+    expect(text).toContain('⚔|Compact Blaster');
+    expect(text).toContain('🛡|Aetherbound Mask');
+    expect(text).toContain('◆|Aetheric Torch');
+    expect(text).toContain('⚒|bench');
+    expect(text).toContain('⚒|rusted royal vault pedestal');
+    expect(text).toContain('TAKE ALL GEAR (2)');
+    expect(text).toContain('TAKE ALL ITEMS (1)');
+    expect(text).toContain('⚒ SALVAGE ALL (2)');
   });
 
-  it('⚠⚠ RENDERED: both bulk buttons COUNT, and count DIFFERENT things', () => {
+  it('⚠⚠ RENDERED: the lanes are ORDERED gear → items → scrap, and never interleaved', () => {
     const text = renderRoom(ROOM).join('|');
-    // 3 takeables, 2 fixtures — a bulk action whose size you learn only after
+    // A heading owns everything until the next heading. If a block landed under
+    // the wrong one, its colour would promise the wrong button.
+    const gearAt = text.indexOf('GEAR');
+    const itemsAt = text.indexOf('ITEMS');
+    const scrapAt = text.indexOf('SCRAP');
+    expect(gearAt).toBeLessThan(itemsAt);
+    expect(itemsAt).toBeLessThan(scrapAt);
+    expect(text.indexOf('Compact Blaster')).toBeLessThan(itemsAt);
+    expect(text.indexOf('Aetheric Torch')).toBeGreaterThan(itemsAt);
+    expect(text.indexOf('Aetheric Torch')).toBeLessThan(scrapAt);
+    expect(text.indexOf('bench')).toBeGreaterThan(scrapAt);
+  });
+
+  it('⚠⚠ RENDERED: each button counts ITS OWN lane — the count is the safety', () => {
+    // Gear 2, items 1, scrap 2. A bulk action whose size you learn only after
     // committing is one players stop trusting, and the count catches a mis-tap.
-    expect(text).toContain('TAKE ALL (|3|)');
-    expect(text).toContain('⚒ SALVAGE |2| |FIXTURES');
-  });
-
-  it('⚠ RENDERED: singular reads as a sentence, not as a template', () => {
-    const text = renderRoom([{ noun: 'bench' }]).join('|');
-    expect(text).toContain('⚒ SALVAGE |1| |FIXTURE');
-    expect(text).not.toContain('FIXTURES');
-  });
-
-  it('⚠ RENDERED: a picked-clean room says so instead of showing an empty list', () => {
-    const text = renderRoom([]).join('|');
-    expect(text).toContain('picked clean');
-    expect(text).not.toContain('TAKE ALL');
-    expect(text).not.toContain('SALVAGE');
-  });
-
-  it('⚠ RENDERED: a room of pure scrap offers no TAKE ALL, and vice versa', () => {
-    const scrapOnly = renderRoom([{ noun: 'bench' }, { noun: 'wall' }]).join('|');
+    const text = renderRoom(ROOM).join('|');
+    expect(text).toContain('(2)');
+    expect(text).toContain('TAKE ALL ITEMS (1)');
+    // ...and a lane with nothing in it contributes no button at all.
+    const scrapOnly = renderRoom([{ noun: 'bench' }]).join('|');
+    expect(scrapOnly).toContain('⚒ SALVAGE ALL (1)');
     expect(scrapOnly).not.toContain('TAKE ALL');
-    expect(scrapOnly).toContain('SALVAGE');
+    expect(scrapOnly).not.toContain('GEAR');
+    expect(scrapOnly).not.toContain('ITEMS');
+  });
+
+  it('⚠⚠ RENDERED: gear alone shows the gear lane and NOTHING about salvage', () => {
     const lootOnly = renderRoom([{ noun: 'Compact Blaster' }]).join('|');
-    expect(lootOnly).toContain('TAKE ALL');
-    expect(lootOnly).not.toContain('SALVAGE |');
+    expect(lootOnly).toContain('TAKE ALL GEAR (1)');
+    expect(lootOnly).not.toContain('SALVAGE');
+    expect(lootOnly).not.toContain('SCRAP');
+  });
+
+  it('⚠⚠ RENDERED: IGNORE is always offered, and it is named for what it does', () => {
+    // Owner: *"a red ignore button for when your done to dismiss the rest."*
+    // Leaving loot behind is a decision with a cost — the word says so, where
+    // "CLOSE" said you had opened something by accident.
+    expect(renderRoom(ROOM).join('|')).toContain('IGNORE THE REST');
+    // Including in a picked-clean room, so the way out never moves.
+    expect(renderRoom([]).join('|')).toContain('IGNORE THE REST');
+  });
+
+  it('⚠⚠ THE HUES ARE ONE-PER-LANE, and each is used on block, heading AND button', () => {
+    // The whole redesign is that you never have to work out which button owns
+    // which block. That only holds while each colour means exactly one thing.
+    const mod = src('app', 'components', 'GatherModal.tsx');
+    const hue = (name: string): string => {
+      const m = new RegExp(`^const ${name} = '(#[0-9a-f]{6})';`, 'm').exec(mod);
+      expect(m).not.toBeNull();
+      return m![1]!;
+    };
+    const gear = hue('GEAR'); const items = hue('ITEMS');
+    const scrap = hue('SCRAP'); const ignore = hue('IGNORE');
+    expect(new Set([gear, items, scrap, ignore]).size).toBe(4);
+    // Each lane hue is bound to a block border, a text colour and a button face.
+    expect(mod).toContain('blockGear: { borderColor: GEAR');
+    expect(mod).toContain('blockItems: { borderColor: ITEMS');
+    expect(mod).toContain('blockScrap: { borderColor: SCRAP');
+    expect(mod).toContain('sweepGear: { borderColor: GEAR');
+    expect(mod).toContain('sweepItems: { borderColor: ITEMS');
+    expect(mod).toContain('sweepScrap: { borderColor: SCRAP');
+    expect(mod).toContain('textGear: { color: GEAR }');
+    expect(mod).toContain('textItems: { color: ITEMS }');
+    expect(mod).toContain('textScrap: { color: SCRAP }');
+    expect(mod).toContain('ignoreText: { color: IGNORE');
+  });
+
+  it('⚠ BLOCKS, NOT ROWS — a grid says "pick one", a column says "work down me"', () => {
+    const mod = src('app', 'components', 'GatherModal.tsx');
+    expect(mod).toContain("flexDirection: 'row', flexWrap: 'wrap'");
+    expect(/block: \{[^}]*flexBasis: '30%'/.test(mod)).toBe(true);
   });
 
   it('⚠⚠ THE MARKS ARE BIG ENOUGH TO SEE — the OTA-1232 lesson, pinned as a number', () => {
@@ -184,5 +237,79 @@ describe('OTA-1233 — the merge did not cost anything that was already working'
     // ...but isSalvageable still drives the action-button count, so the module
     // stays imported for that and only that.
     expect(screen).toContain('isSalvageable as isSalvageableForModal');
+  });
+});
+
+describe('OTA-1234 — the picker never offers a verb that will find nothing', () => {
+  // ⚠⚠ THE BUG, FROM THE OWNER'S DEVICE LOG, five taps in a row:
+  //     tap "take / salvage"
+  //     You look the firepit, marker, sack over and find nothing your tools
+  //       can break down here.
+  //     salvageAllAmbient: no pool matched for 4 noun(s) — firepit, marker,
+  //       sack, stall.
+  // OTA-1233 classified every non-catalog noun as scrap, so the button read
+  // "⚒ SALVAGE 4 FIXTURES", the sweep found no pool, NOTHING was consumed, and
+  // the count never dropped — it could be tapped forever, promising each time.
+  // Owner: *"still showed salvage at 4 items but never let me salvage."*
+  //
+  // ⚠ `hasSalvageYield` was written the PREVIOUS OTA for exactly this
+  // distinction — to stop the refusal copy advertising SALVAGE on nouns with no
+  // pool — and the picker did not consult it. The prose knew; the button did not.
+  const INERT = ['firepit', 'marker', 'sack', 'stall', 'signpost', 'tent', 'ladder'];
+
+  it('⚠⚠ the four nouns from the log are not scrap, and not in the picker', () => {
+    for (const noun of INERT) {
+      expect(hasSalvageYield(noun)).toBe(false);
+      expect(classifyGatherNoun(noun)).toBe('inert');
+    }
+    const text = renderRoom(INERT.map((noun) => ({ noun }))).join('|');
+    // No blocks, no buttons, no lane headings, and the honest empty line instead.
+    expect(text).toContain('picked clean');
+    expect(text).not.toContain('SALVAGE');
+    expect(text).not.toContain('TAKE ALL');
+    for (const noun of INERT) expect(text).not.toContain(noun);
+  });
+
+  it('⚠⚠ RENDERED: the exact mixed room from the log counts 1 to salvage, not 4', () => {
+    const text = renderRoom([
+      { noun: 'firepit' }, { noun: 'marker' }, { noun: 'sack' }, { noun: 'stall' },
+      { noun: 'banner' }, { noun: 'Aetheric Torch' },
+    ]).join('|');
+    expect(text).toContain('◆|Aetheric Torch');
+    expect(text).toContain('⚒|banner');
+    expect(text).toContain('TAKE ALL ITEMS (1)');
+    expect(text).toContain('⚒ SALVAGE ALL (1)');
+    expect(text).not.toContain('firepit');
+  });
+
+  it('⚠⚠ OTA-1235: an inert noun has NO LANE, so it can never be given a colour', () => {
+    // In a colour-coded layout the inert bug would need a fourth hue that means
+    // "this one does nothing" — the lane is null instead, and a null lane has
+    // nowhere to render.
+    for (const noun of INERT) expect(laneForKind(classifyGatherNoun(noun))).toBeNull();
+    expect(laneForKind('weapon')).toBe('gear');
+    expect(laneForKind('armor')).toBe('gear');
+    expect(laneForKind('other')).toBe('items');
+    expect(laneForKind('scenery')).toBe('scrap');
+  });
+
+  it('⚠ real scrap still IS scrap — the filter must not swing the other way', () => {
+    for (const noun of ['bench', 'cart', 'banner', 'lamp', 'stone marker']) {
+      expect(hasSalvageYield(noun)).toBe(true);
+      expect(classifyGatherNoun(noun)).toBe('scenery');
+    }
+  });
+
+  it('⚠⚠ EVERY row the picker offers can actually be acted on', () => {
+    // The invariant, stated once: a row is present only if TAKE or SALVAGE will
+    // do something. Anything else is a button that lies.
+    const mixed = ['firepit', 'bench', 'Aetheric Torch', 'tent', 'Compact Blaster', 'cart'];
+    for (const noun of mixed) {
+      const kind = classifyGatherNoun(noun);
+      if (!isActionableGatherKind(kind)) continue;
+      const takeable = findCatalogItem(noun) !== null;
+      const salvageable = hasSalvageYield(noun);
+      expect(takeable || salvageable).toBe(true);
+    }
   });
 });

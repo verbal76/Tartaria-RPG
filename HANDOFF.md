@@ -1644,7 +1644,45 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — ONE PICKER (2026-08-12, latest). GOLEM ONLY, NOT
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE COLOUR-CODED ROOM (2026-08-12, latest).
+  GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1234 + OTA-1235, one push,
+  **same merge-or-revert decision point as 1232/1233 — now also covering
+  `gatherSort.ts`'s `'inert'` kind and `laneForKind`.**
+
+  **OTA-1234 — the button that lied.** `classifyGatherNoun` had two answers for a
+  non-catalog noun and scenery-means-scrap was one of them. But *"the catalog does
+  not know it"* and *"it can be pried apart"* are different questions. From the
+  owner's log, five taps in a row: the picker offered `⚒ SALVAGE 4 FIXTURES`,
+  `salvageAllAmbient` matched no pool for firepit/marker/sack/stall, **nothing was
+  consumed so the count never dropped**, and it stayed tappable forever. ⚠⚠ **THE
+  LESSON: `hasSalvageYield` had been written the PREVIOUS OTA for exactly this
+  distinction — and the picker did not consult it. The refusal copy knew the
+  difference; the button did not.** When you add a predicate to fix one surface,
+  grep for the other surfaces that ask the same question. New kind `'inert'` is
+  dropped from the picker (INVESTIGATE is its verb, and it has its own picker).
+
+  **OTA-1235 — three lanes, three colours, all at once.** Owner on 1233: *"it acts
+  like a progressive filter and 1 gates the other"*, then the design: *"it
+  shouldn't be gated it should be a layout like here is everything, what do you
+  want to do... orange squares for gear with a matching orange button... green for
+  takable items... yellow for salvageable... then a red ignore button."*
+  ⚠⚠ **NOTHING WAS GATED, AND THAT IS THE FINDING, NOT A DEFENCE.** One list with
+  two differently-worded buttons underneath made the player DEDUCE which button
+  owned which row, from 10px tail text. **A wrong deduction is indistinguishable
+  from a broken button** — so he reported it as broken, and he was right to.
+  🟧 GEAR / `TAKE ALL GEAR (n)`, 🟩 ITEMS / `TAKE ALL ITEMS (n)`, 🟨 SCRAP /
+  `⚒ SALVAGE ALL (n)`, 🟥 `IGNORE THE REST`. Gear and items are split because they
+  are different decisions (gear is a comparison; an item just goes in the pack).
+  Blocks in a wrapped grid, not rows — a grid says *pick one*. An upgrade brightens
+  its block **within the gear hue** plus a `BETTER` tag rather than taking a fourth
+  colour: the moment a hue means two things, tail text is back. Scrap's button face
+  stays smaller than the take ones (one-way door), and every button counts its own
+  lane. ⚠ The two OTAs are one story — an inert block would have needed a colour
+  meaning "this does nothing"; `laneForKind` returns `null` instead.
+  Suite ota1233OnePicker now 19, still RENDERING the component. Full story: the
+  VERSION.md 4.29.163 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — ONE PICKER (2026-08-12). GOLEM ONLY, NOT
   ON HAL, BY DECISION.** Golem OTA-1233, extending the same divergence as 1232 —
   **same merge-or-revert decision point, now covering `GatherModal` and
   `InputBox` as well.**
