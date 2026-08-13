@@ -1644,7 +1644,32 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ HOTFIX — I SHIPPED A RENDER CRASH (2026-08-13, latest).** Golem OTA-1246.
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE HINT FIRES WHERE IT SHOULD (2026-08-13,
+  latest).** Golem OTA-1247. Same merge-or-revert decision point.
+
+  The device run right after the crash fix was CLEAN — full tutorial, no errors,
+  and one picker session did four takes plus a six-noun sweep (OTA-1238 +
+  OTA-1242 both landing). **But the colour-lane hint never fired**, on his first
+  genuinely multi-lane room.
+
+  ⚠⚠ OTA-1245 gated it on `!tutBeat`. **`explore_or_leave` IS a beat** — the
+  free-roam phase where a new player first meets a real room. **The gate asked "is
+  the tutorial running" when the question is "is the picker NARROWED".** Only
+  `cudgel` and `scrap` narrow it. Now `PICKER_NARROWING_BEATS`, read by both the
+  chip memo and the gate, with a test asserting the two lists agree.
+
+  ⚠ **AND THE OTA-1245 TEST HAD PINNED THE WRONG PREMISE** — it asserted `!tutBeat`
+  as if that were the rule. **A test that locks in a gate's MECHANISM rather than
+  its INTENT will faithfully protect the mechanism's bug.**
+
+  ⚠ **OPEN, NOT DIAGNOSED:** ML health reported "recovering — detected a crash on
+  previous launch" after the JS RENDER crash. Likely the success breadcrumb had not
+  flushed before the JS thread died, so a screen bug reads as an engine crash.
+  Harmless at 0/2, but two JS crashes could auto-disable Qwen for an unrelated
+  reason. Worth a look before it bites.
+  Full story: the VERSION.md 4.29.175 row.
+
+- **⚠⚠⚠ HOTFIX — I SHIPPED A RENDER CRASH (2026-08-13).** Golem OTA-1246.
   Device, on the build pushed hours earlier: `screen-render · undefined is not a
   function · in ExplorationScreen`. Dead before the first frame.
 

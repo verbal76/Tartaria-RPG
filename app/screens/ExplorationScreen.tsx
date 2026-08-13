@@ -550,6 +550,19 @@ export function ExplorationScreen() {
   // the exact drift this session has now paid for three times (OTA-1236's guard vs
   // its firer, OTA-1241's matcher vs its census, OTA-1244's display guarantee vs
   // its recompute). One list, two readers.
+  // ⚠⚠ OTA-1247 — THE ONLY TWO BEATS THAT NARROW THE PICKER, NAMED ONCE. The chips
+  // memo below narrows for these; the colour-lane hint suppresses itself for these.
+  // OTA-1245's hint gated on `!tutBeat` instead — ANY beat — and `explore_or_leave`
+  // IS a beat, so the hint was suppressed during free roam inside the outpost.
+  // ⚠ From the owner's device log, the run right after the crash fix: at 18:53:33,
+  // still on `explore_or_leave`, he opened a room holding three gear pieces AND six
+  // salvageables, took four things and swept the rest — his FIRST genuinely
+  // multi-lane room, and the hint that exists to explain it never fired. The gate
+  // was written against "is the tutorial running" when the real question is "is the
+  // picker showing a narrowed list".
+  const PICKER_NARROWING_BEATS = ['cudgel', 'scrap'];
+  const pickerIsNarrowed = tutBeat !== null && PICKER_NARROWING_BEATS.includes(tutBeat);
+
   const gatherChips = useMemo(
     () =>
       tutBeat === 'cudgel'
@@ -708,7 +721,7 @@ export function ExplorationScreen() {
           that renders BELOW an RN Modal (OTA-234), so a hint raised over the open
           picker would be invisible. Teaching lands as the player walks into the
           room, one beat before they press the button. */}
-      {!tutBeat && gatherLaneCount >= 2 && (
+      {!pickerIsNarrowed && gatherLaneCount >= 2 && (
         <FirstTimeHint
           id="picker_colour_lanes"
           title="The room, by colour"

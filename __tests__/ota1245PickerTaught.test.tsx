@@ -87,15 +87,32 @@ describe('OTA-1245 — the gap, measured before it is filled', () => {
 });
 
 describe('OTA-1245 — taught where it is true', () => {
-  it('⚠⚠ the hint fires on a REAL multi-lane room and never during a beat', () => {
+  it('⚠⚠ the hint fires on any REAL multi-lane room, and hides only where the picker is NARROWED', () => {
+    // ⚠⚠ OTA-1247 CORRECTED THIS TEST'S PREMISE. It originally pinned `!tutBeat` —
+    // suppress during ANY tutorial beat — and that was wrong in a way the owner's
+    // very next device run exposed: `explore_or_leave` IS a beat, and it is the
+    // free-roam phase where the player meets their first real room. The log caught
+    // him doing four takes and a six-noun sweep there with the hint suppressed.
+    //
+    // ⚠ The right question is not "is the tutorial running" but "is the picker
+    // showing a narrowed list", and only two beats narrow it.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     expect(screen).toContain('id="picker_colour_lanes"');
-    const i = screen.indexOf('{!tutBeat && gatherLaneCount >= 2 && (');
-    expect(i).toBeGreaterThan(-1);
-    // ⚠ `!tutBeat` matters: during a beat the room is narrowed to one prop, so a
-    // hint promising colour groups would describe a card the player is not looking
-    // at — the same "describes a state the game is not in" rule this project runs
-    // on everywhere else.
+    expect(screen).toContain('{!pickerIsNarrowed && gatherLaneCount >= 2 && (');
+    expect(screen).not.toContain('{!tutBeat && gatherLaneCount >= 2 && (');
+  });
+
+  it('⚠⚠ the narrowing list is ONE constant, shared by the chips memo and the gate', () => {
+    // If the memo narrowed for a beat the gate did not know about, the hint would
+    // promise colour groups over a one-row card. Same one-source rule this session
+    // has now applied four times.
+    const screen = src('app', 'screens', 'ExplorationScreen.tsx');
+    expect(screen).toContain("const PICKER_NARROWING_BEATS = ['cudgel', 'scrap'];");
+    expect(screen).toContain('PICKER_NARROWING_BEATS.includes(tutBeat)');
+    // Those two names are exactly the beats the chip memo narrows for.
+    const chips = screen.slice(screen.indexOf('const gatherChips = useMemo('), screen.indexOf('const gatherLaneCount'));
+    const narrowed = [...chips.matchAll(/tutBeat === '([a-z_]+)'/g)].map((m) => m[1]);
+    expect(narrowed.sort()).toEqual(['cudgel', 'scrap']);
   });
 
   it('⚠⚠ the gate reads the SAME array the picker renders — not a second copy', () => {
