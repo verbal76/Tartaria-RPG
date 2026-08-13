@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.164';
+export const DISPLAY_VERSION = '4.29.165';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23383,7 +23383,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // accepted by that device; a fresh install was what broke the loop.
 // New suite ota1174BugReportLoads (10 tests).
 // DISPLAY_VERSION 4.29.107.
-export const OTA_BUILD_ID = '2026-08-12-1236-the-lead-is-never-swept';
+export const OTA_BUILD_ID = '2026-08-12-1237-outlines-and-the-intro';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-12-1236-the-lead-is-never-swept';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-12-1235-colour-coded-room';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-12-1233-one-picker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-12-1232-gather-sort-and-bulk-sell';

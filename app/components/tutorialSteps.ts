@@ -128,9 +128,16 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'quick-row',
     pulse: true,
     title: 'Take the Cudgel',
-    body: 'Tap TAKE in the quick-action row to pick up the cudgel at your feet.',
+    // ⚠⚠ OTA-1237 — THE INTRO TAUGHT TWO BUTTONS THAT NO LONGER EXIST. Owner: *"we
+    // have to rework the intro now to reflect the new system."* Since OTA-1233 the
+    // quick row carries ONE `take / salvage` button over ONE picker, and these beats
+    // still named the two retired labels one at a time — so a first-time player
+    // hunted the row for a word that is not on it. The overrides meant the beat WORKED
+    // when they found the right button, which is the worst kind of stale copy: not
+    // broken enough to fail a test, just wrong enough to strand someone on turn one.
+    body: 'Tap TAKE / SALVAGE in the quick-action row. It opens everything in the room at once — tap the cudgel at your feet to pick it up.',
     arbiter:
-      '"A cudgel, by your boots. Tap TAKE. You\'ll want a weapon."',
+      '"A cudgel, by your boots. Tap TAKE / SALVAGE — that button shows you the whole room — then tap the cudgel. You\'ll want a weapon."',
   },
   {
     id: 'rope',
@@ -150,9 +157,12 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'quick-row',
     pulse: true,
     title: 'Salvage the Broken Plate',
-    body: 'That broken chest plate has nothing left in it. Tap SALVAGE to break it down for parts.',
+    // ⚠ Same button as the cudgel beat, and saying so is the lesson: one picker
+    // holds both verbs, and the room tells you which one a thing answers to. The
+    // plate comes up in the yellow SCRAP lane, which is the whole teaching moment.
+    body: 'That broken chest plate has nothing left in it. Open TAKE / SALVAGE again — the plate is in the yellow SCRAP group. Tap it to break it down for parts.',
     arbiter:
-      '"That broken plate is worth more in pieces. Tap SALVAGE."',
+      '"That broken plate is worth more in pieces. Same button as before — TAKE / SALVAGE. The yellow ones are scrap. Tap the plate."',
   },
   {
     id: 'climb',

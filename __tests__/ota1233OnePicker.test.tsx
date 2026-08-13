@@ -80,7 +80,7 @@ describe('OTA-1235 — three lanes, three colours, all visible at once', () => {
     expect(text).toContain('SCRAP');
     expect(text).toContain('⚔|Compact Blaster');
     expect(text).toContain('🛡|Aetherbound Mask');
-    expect(text).toContain('◆|Aetheric Torch');
+    expect(text).toContain('▪|Aetheric Torch');
     expect(text).toContain('⚒|bench');
     expect(text).toContain('⚒|rusted royal vault pedestal');
     expect(text).toContain('TAKE ALL GEAR (2)');
@@ -146,9 +146,9 @@ describe('OTA-1235 — three lanes, three colours, all visible at once', () => {
     const scrap = hue('SCRAP'); const ignore = hue('IGNORE');
     expect(new Set([gear, items, scrap, ignore]).size).toBe(4);
     // Each lane hue is bound to a block border, a text colour and a button face.
-    expect(mod).toContain('blockGear: { borderColor: GEAR');
-    expect(mod).toContain('blockItems: { borderColor: ITEMS');
-    expect(mod).toContain('blockScrap: { borderColor: SCRAP');
+    expect(mod).toContain('rowGear: { borderColor: GEAR');
+    expect(mod).toContain('rowItems: { borderColor: ITEMS');
+    expect(mod).toContain('rowScrap: { borderColor: SCRAP');
     expect(mod).toContain('sweepGear: { borderColor: GEAR');
     expect(mod).toContain('sweepItems: { borderColor: ITEMS');
     expect(mod).toContain('sweepScrap: { borderColor: SCRAP');
@@ -158,10 +158,35 @@ describe('OTA-1235 — three lanes, three colours, all visible at once', () => {
     expect(mod).toContain('ignoreText: { color: IGNORE');
   });
 
-  it('⚠ BLOCKS, NOT ROWS — a grid says "pick one", a column says "work down me"', () => {
+  it('⚠⚠ OTA-1237: LINE RECTANGLES, OUTLINE ONLY — the colour is on the edge, not behind the text', () => {
+    // ⚠ THIS TEST USED TO ASSERT THE OPPOSITE, and the owner overruled it after
+    // playing the tiles: *"we don't need the item boxes to have internal glow just
+    // a colored border will work. also not actual boxes, line rectangles like
+    // before are still fine."* He is right — the tint sat behind the noun and
+    // fought it for contrast while adding nothing the border was not already
+    // saying. The LANE COLOUR was the part worth keeping; the grid and the fill
+    // were not. Pinned so the fill cannot creep back in.
     const mod = src('app', 'components', 'GatherModal.tsx');
-    expect(mod).toContain("flexDirection: 'row', flexWrap: 'wrap'");
-    expect(/block: \{[^}]*flexBasis: '30%'/.test(mod)).toBe(true);
+    expect(mod).not.toContain("flexWrap: 'wrap'");
+    expect(mod).not.toMatch(/flexBasis: '30%'/);
+    // Full-width rows again, and every lane style is a BORDER with no fill.
+    expect(/row: \{[^}]*flexDirection: 'row'[^}]*\}/s.test(mod)).toBe(true);
+    expect(mod).toContain("backgroundColor: 'transparent'");
+    for (const lane of ['Gear', 'Items', 'Scrap', 'Lead']) {
+      const m = new RegExp(`row${lane}: \\{ borderColor: [A-Z]+ \\}`).test(mod);
+      expect(m).toBe(true);   // borderColor ONLY — a backgroundColor here is the glow coming back
+    }
+  });
+
+  it('⚠⚠ OTA-1237: the card GROWS with the room instead of scrolling inside a fixed box', () => {
+    // Owner: *"we will have to make the layout popup taller when there are more
+    // items."* The scroll was pinned at 380px, so a four-noun room and a
+    // fourteen-noun room got the same window. flexShrink lets the list take what it
+    // needs and the card's own 86% ceiling do the bounding.
+    const mod = src('app', 'components', 'GatherModal.tsx');
+    expect(mod).toContain('scroll: { flexShrink: 1 }');
+    expect(mod).not.toMatch(/scroll: \{ maxHeight: \d+ \}/);
+    expect(mod).toContain("maxHeight: '86%'");
   });
 
   it('⚠⚠ THE MARKS ARE BIG ENOUGH TO SEE — the OTA-1232 lesson, pinned as a number', () => {
@@ -174,7 +199,7 @@ describe('OTA-1235 — three lanes, three colours, all visible at once', () => {
     expect(Number(m![1])).toBeGreaterThanOrEqual(16);
     // And an upgrade colours the ROW, not only the glyph.
     expect(mod).toContain('rowUpgrade:');
-    expect(mod).toContain('upgrade && styles.rowUpgrade');
+    expect(mod).toContain('styles.rowUpgrade');
   });
 
   it('⚠⚠ SALVAGE ALL is visually SUBORDINATE — take is reversible, salvage is not', () => {
@@ -230,6 +255,44 @@ describe('OTA-1233 — the merge did not cost anything that was already working'
     expect(input).not.toContain('label="salvage"');
   });
 
+  it('⚠⚠ OTA-1237: THE INTRO TEACHES THE BUTTON THAT EXISTS', () => {
+    // Owner: *"we have to rework the intro now to reflect the new system."* Since
+    // OTA-1233 the quick row carries ONE `take / salvage` button over ONE picker,
+    // and both tutorial beats still said "Tap TAKE" / "Tap SALVAGE" — labels that
+    // are not on the row. ⚠ The beats still WORKED, because the tutorial overrides
+    // drive the merged button either way, which is the worst kind of stale copy:
+    // not broken enough to fail anything, just wrong enough to strand a first-time
+    // player hunting for a button on turn one.
+    const steps = src('app', 'components', 'tutorialSteps.ts');
+    const cudgel = steps.slice(steps.indexOf("id: 'cudgel'"), steps.indexOf("id: 'rope'"));
+    const scrap = steps.slice(steps.indexOf("id: 'scrap'"), steps.indexOf("id: 'climb'"));
+    for (const beat of [cudgel, scrap]) {
+      expect(beat).toContain('TAKE / SALVAGE');
+      // No instruction to tap a button that is not on the row.
+      expect(beat).not.toMatch(/Tap TAKE\b(?! \/)/);
+      expect(beat).not.toMatch(/Tap SALVAGE\b/);
+    }
+    // ...and the same for the blocked-tutorial nudges, which are what a stuck
+    // player actually reads.
+    const store = src('app', 'state', 'gameStore.ts');
+    const hints = store.slice(store.indexOf('nudgeTutorialBlocked()'), store.indexOf('nudgeTutorialBlocked()') + 1400);
+    expect(hints).not.toContain('glowing TAKE button');
+    expect(hints).not.toContain('glowing SALVAGE button');
+    expect(hints).toContain('TAKE / SALVAGE');
+  });
+
+  it('⚠⚠ OTA-1237: no refusal line points at a button that was retired', () => {
+    // A refusal that names the wrong button is the same failure as the tutorial's,
+    // and these fire far more often than the tutorial does.
+    const port = src('app', 'engine', 'portability.ts');
+    const store = src('app', 'state', 'gameStore.ts');
+    for (const text of [port, store]) {
+      expect(text).not.toContain('Try the SALVAGE button');
+      expect(text).not.toContain('SALVAGE button.`');
+    }
+    expect(port).toContain('TAKE / SALVAGE');
+  });
+
   it('⚠ the retired picker is retired, not orphaned — its predicate still has a job', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     // The COMPONENT import is gone...
@@ -276,7 +339,7 @@ describe('OTA-1234 — the picker never offers a verb that will find nothing', (
       { noun: 'firepit' }, { noun: 'marker' }, { noun: 'sack' }, { noun: 'stall' },
       { noun: 'banner' }, { noun: 'Aetheric Torch' },
     ]).join('|');
-    expect(text).toContain('◆|Aetheric Torch');
+    expect(text).toContain('▪|Aetheric Torch');
     expect(text).toContain('⚒|banner');
     expect(text).toContain('TAKE ALL ITEMS (1)');
     expect(text).toContain('⚒ SALVAGE ALL (1)');

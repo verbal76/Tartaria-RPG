@@ -1644,7 +1644,47 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE LEAD IS NEVER SWEPT (2026-08-12, latest).
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — OUTLINES, AND THE INTRO CATCHES UP (2026-08-12,
+  latest). GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1237. **Same
+  merge-or-revert decision point — now also covering `tutorialSteps.ts` and the
+  portability / gameStore refusal copy.**
+
+  Four owner corrections off the OTA-1235/1236 build, and three of them are
+  variations on one mistake of mine:
+
+  · **Outline only, no fill** — the tinted block backgrounds fought the text they
+    sat behind. Lane styles are `borderColor` and nothing else now, pinned so a
+    `backgroundColor` cannot creep back onto a row.
+  · **Line rectangles, not tiles** — the wrapped grid is gone; full-width rows
+    again, carrying the lane hue on the outline. ⚠ The previous suite asserted the
+    OPPOSITE and is now inverted with his reason attached. The grid was my
+    inference from the word "squares"; he played it and disagreed.
+  · **The card grows with the room** — `scroll` was pinned at 380px, so every room
+    got the same window. `flexShrink: 1` + the card's 86% ceiling instead.
+  · **◆ was already spoken for three times** — the inventory's inferred-stats
+    marker (OTA-191), the contract map pin (OTA-569), and the PWR/CORES badge. The
+    items lane made a fourth. Now `▪`, which means nothing anywhere else.
+
+  ⚠⚠ **THE LESSON, AND IT IS EMBARRASSINGLY EXACT:** OTA-1235 wrote down
+  *"the moment a hue means two things the player is back to reading tail text"* —
+  and then I picked a GLYPH one OTA later without running the same check. **The
+  one-symbol-one-meaning rule applies to glyphs, and this codebase has a lot of
+  them.** Grep before assigning: ◆ ✦ ❖ ✶ ★ ⚔ 🛡 ⚒ ▪ are all in use now.
+
+  ⚠⚠ **AND THE INTRO REWORK, WHICH IS THE ONE THAT WOULD HAVE COST A NEW PLAYER.**
+  Since OTA-1233 the quick row has carried ONE `take / salvage` button, and both
+  tutorial beats still named the retired labels one at a time — as did the
+  blocked-tutorial nudges, two portability refusals and a gameStore refusal. **The
+  beats still WORKED, because the tutorial overrides drive the merged button
+  either way.** That is the worst kind of stale copy: not broken enough to fail a
+  test, just wrong enough to strand someone on turn one hunting for a word that is
+  not on the row. **⚠ WHEN A BUTTON IS MERGED OR RENAMED, THE COPY THAT NAMES IT
+  IS PART OF THE CHANGE — the tutorial, the nudges, AND the refusal lines, which
+  fire far more often than the tutorial does.** Pinned in ota1233OnePicker (22):
+  no beat, nudge or refusal may name a retired button again.
+  Full story: the VERSION.md 4.29.165 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE LEAD IS NEVER SWEPT (2026-08-12).
   GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1236. **Same merge-or-revert
   decision point — now also covering the new `engine/storyNouns.ts`,
   `SearchModal` and `salvageAllAmbient`.**

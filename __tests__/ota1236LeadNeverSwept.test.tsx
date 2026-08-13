@@ -208,7 +208,7 @@ describe('OTA-1236 — RENDERED: the lead is last, and no button touches it', ()
       const o = new RegExp(`^const ${other} = '(#[0-9a-f]{6})';`, 'm').exec(mod);
       expect(o![1]).not.toBe(m![1]);
     }
-    expect(mod).toContain('blockLead: { borderColor: LEAD');
+    expect(mod).toContain('rowLead: { borderColor: LEAD }');
     expect(mod).toContain('textLead: { color: LEAD }');
   });
 

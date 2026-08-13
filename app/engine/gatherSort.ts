@@ -195,7 +195,16 @@ export function gatherIcon(row: { kind: GatherKind; upgrade: boolean }): string 
   if (row.upgrade) return '★';
   if (row.kind === 'weapon') return '⚔';
   if (row.kind === 'armor') return '🛡';
-  if (row.kind === 'other') return '◆';
+  // ⚠⚠ OTA-1237 — NOT ◆. Owner: *"why did the take items get a diamond, I thought
+  // that was for upgraded armor items that you picked and equipped at the same
+  // time."* He is right that the glyph was already spoken for, and closer than he
+  // gave himself credit for: ◆ is the INVENTORY'S inferred-stats marker (OTA-191),
+  // and it is also the contract map pin and the PWR / CORES badge. Three meanings
+  // already, and this made a fourth. ▪ carries none anywhere in the app — which is
+  // the whole requirement, because the lane's colour and heading already say
+  // ITEMS. The glyph is only here so the column does not look like it failed to
+  // render next to ⚔ / 🛡 / ⚒ / ✦.
+  if (row.kind === 'other') return '▪';
   if (row.kind === 'inert') return '·';
   return '⚒';
 }

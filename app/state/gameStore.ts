@@ -9121,7 +9121,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!cat) {
       get().appendLog(
         'world',
-        `${theCap(ambientHit)} won't come loose silently. Try the SALVAGE button if you mean to break it down.`,
+        `${theCap(ambientHit)} won't come loose silently. Open TAKE / SALVAGE and tap it under SCRAP if you mean to break it down.`,
       );
       return;
     }
@@ -30000,9 +30000,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const hint: Record<string, string> = {
       name: 'type your name in the box, then tap ACT.',
       look: 'tap the glowing LOOK AROUND YOU button to get your bearings.',
-      cudgel: 'tap the glowing TAKE button and lift the cudgel.',
+      cudgel: 'tap the glowing TAKE / SALVAGE button, then tap the cudgel in the list.',
       rope: "type 'take rope' in the box, then tap ACT.",
-      scrap: 'tap the glowing SALVAGE button and break the chest plate.',
+      scrap: 'tap the glowing TAKE / SALVAGE button, then tap the chest plate under SCRAP.',
       climb: 'tap the glowing CLIMB button.',
       investigate: 'tap the glowing INVESTIGATE button and look at the door.',
       explore_or_leave: 'answer the prompt — stay and explore, or leave the outpost.',

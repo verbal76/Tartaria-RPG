@@ -146,22 +146,34 @@ export function GatherModal({
   const sweepable = (lane: GatherRow[]): string[] =>
     lane.filter((r) => !r.consumed).map((r) => r.noun);
 
-  const renderBlock = (row: GatherRow, lane: GatherLane) => {
+  // ⚠⚠ OTA-1237 — A LINE RECTANGLE, NOT A FILLED TILE. Owner: *"we don't need the
+  // item boxes to have internal glow just a colored border will work. also not
+  // actual boxes, line rectangles like before are still fine."* Both notes point
+  // the same way: the COLOUR is the signal, and a tinted fill behind it competes
+  // with the text sitting on top of it instead of adding anything. The row goes
+  // back to the full-width shape it had before OTA-1235 — only now its outline
+  // carries the lane hue, which is the part that was actually worth adding.
+  const renderRow = (row: GatherRow, lane: GatherLane) => {
     const { noun, kind, upgrade, consumed } = row;
+    const tail =
+      lane === 'lead' ? 'INVESTIGATE'
+        : upgrade ? 'BETTER'
+          : lane === 'scrap' ? 'scrap'
+            : '→ pack';
     return (
       <Pressable
         key={noun}
         style={({ pressed }) => [
-          styles.block,
-          lane === 'gear' && styles.blockGear,
-          lane === 'items' && styles.blockItems,
-          lane === 'scrap' && styles.blockScrap,
-          lane === 'lead' && styles.blockLead,
-          // ⚠ An upgrade brightens its block WITHIN the gear hue rather than
+          styles.row,
+          lane === 'gear' && styles.rowGear,
+          lane === 'items' && styles.rowItems,
+          lane === 'scrap' && styles.rowScrap,
+          lane === 'lead' && styles.rowLead,
+          // ⚠ An upgrade brightens its outline WITHIN the gear hue rather than
           // borrowing another lane's colour — the colour has one job here and
           // stealing it for a second meaning is how the code stops being read.
-          upgrade && styles.rowUpgrade,
-          consumed && styles.blockConsumed,
+          upgrade && lane !== 'lead' && styles.rowUpgrade,
+          consumed && styles.rowConsumed,
           pressed && !consumed && styles.rowPressed,
         ]}
         disabled={consumed}
@@ -190,13 +202,21 @@ export function GatherModal({
           {gatherIcon({ kind, upgrade })}
         </Text>
         <Text
-          style={[styles.blockText, consumed && styles.rowTextConsumed]}
-          numberOfLines={2}
+          style={[styles.rowText, consumed && styles.rowTextConsumed]}
+          numberOfLines={1}
         >
           {noun}
         </Text>
-        {upgrade && lane !== 'lead' && <Text style={styles.upgradeTag}>BETTER</Text>}
-        {lane === 'lead' && <Text style={styles.leadTag}>INVESTIGATE</Text>}
+        <Text style={[
+          styles.rowTail,
+          lane === 'gear' && styles.textGear,
+          lane === 'items' && styles.textItems,
+          lane === 'scrap' && styles.textScrap,
+          lane === 'lead' && styles.textLead,
+          upgrade && lane !== 'lead' && styles.tailUpgrade,
+        ]}>
+          {tail}
+        </Text>
       </Pressable>
     );
   };
@@ -223,7 +243,7 @@ export function GatherModal({
         ]}>
           {LANE_HEADING[lane]}
         </Text>
-        <View style={styles.grid}>{laneRows.map((r) => renderBlock(r, lane))}</View>
+        <View>{laneRows.map((r) => renderRow(r, lane))}</View>
         {/* ⚠⚠ OTA-1236 — THE LEAD LANE HAS NO BUTTON, and its absence is the
             message. Every other colour here promises a matching button will
             clear it; this colour promises nothing bulk will touch it. */}
@@ -267,7 +287,7 @@ export function GatherModal({
               <Text style={styles.title} accessibilityRole="header">THIS ROOM</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
-                Tap one block to take it. Or sweep a whole colour with its button.
+                Tap a line to act on it. Or clear a whole colour with its button.
               </Text>
 
               {stealthMeaningful && (
@@ -352,7 +372,14 @@ const styles = StyleSheet.create({
   rule: { height: 1, backgroundColor: '#3a342c', marginVertical: 10 },
   body: { color: '#a2977b', fontSize: 12, lineHeight: 17, marginBottom: 10 },
   empty: { color: '#a2977b', fontSize: 12, lineHeight: 17, marginVertical: 12, textAlign: 'center' },
-  scroll: { maxHeight: 380 },
+  // ⚠⚠ OTA-1237 — THE CARD GROWS WITH THE ROOM. Owner: *"we will have to make the
+  // layout popup taller when there are more items."* The scroll used to be pinned
+  // at 380px, so a four-noun room and a fourteen-noun room got the same window and
+  // the big one scrolled inside a box with empty space beneath it. `flexShrink`
+  // instead of a fixed height lets the list take what it needs and the card's own
+  // 86% ceiling do the bounding — small rooms sit compact, big rooms fill the
+  // screen, and only a genuinely oversized room scrolls.
+  scroll: { flexShrink: 1 },
   list: { paddingBottom: 4 },
 
   lane: { marginBottom: 12 },
@@ -362,47 +389,50 @@ const styles = StyleSheet.create({
   textScrap: { color: SCRAP },
   textLead: { color: LEAD },
 
-  // ⚠ A WRAPPED GRID, NOT A COLUMN. `flexBasis` at 30% with a minWidth floor
-  // gives three squares across on a phone and lets a long noun claim a wider
-  // block instead of truncating to nonsense.
-  grid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -3 },
-  block: {
-    borderWidth: 2, borderRadius: 4,
-    paddingVertical: 10, paddingHorizontal: 8,
-    marginHorizontal: 3, marginBottom: 6,
-    flexGrow: 1, flexBasis: '30%', minWidth: 96,
-    alignItems: 'center', justifyContent: 'center',
+  // ⚠⚠ OUTLINE ONLY — NO FILL. Owner: *"we don't need the item boxes to have
+  // internal glow just a colored border will work."* Right call: the tint sat
+  // behind the noun and fought it for contrast while adding nothing the border was
+  // not already saying. The hue lives on the edge, the text keeps the card's own
+  // background, and the lane still reads at a glance.
+  row: {
+    flexDirection: 'row', alignItems: 'center',
+    borderWidth: 1, borderRadius: 3,
+    paddingVertical: 10, paddingHorizontal: 10, marginBottom: 6,
+    backgroundColor: 'transparent',
   },
-  blockGear: { borderColor: GEAR, backgroundColor: '#2a1a0e' },
-  blockItems: { borderColor: ITEMS, backgroundColor: '#16210f' },
-  blockScrap: { borderColor: SCRAP, backgroundColor: '#221e0c' },
-  blockLead: { borderColor: LEAD, backgroundColor: '#1c1726' },
-  // ⚠⚠ THE UPGRADE BLOCK IS BRIGHTER GEAR, not a fourth colour.
-  rowUpgrade: { borderColor: '#ffb066', backgroundColor: '#3a2410' },
-  blockConsumed: { opacity: 0.35 },
+  rowGear: { borderColor: GEAR },
+  rowItems: { borderColor: ITEMS },
+  rowScrap: { borderColor: SCRAP },
+  rowLead: { borderColor: LEAD },
+  // ⚠ Brighter gear, and a heavier edge — still one hue, still no fill.
+  rowUpgrade: { borderColor: '#ffb066', borderWidth: 2 },
+  rowConsumed: { opacity: 0.35 },
   rowPressed: { opacity: 0.7 },
 
   // ⚠ 20px and bold. The OTA-1232 version was 13px in the same tan as the text
   // beside it, which is how a whole session went by without it registering.
-  icon: { fontSize: 20, fontWeight: '700', marginBottom: 3 },
+  icon: { fontSize: 20, fontWeight: '700', width: 28 },
   iconGear: { color: GEAR },
   iconItems: { color: ITEMS },
   iconScrap: { color: SCRAP },
   iconLead: { color: LEAD },
   iconUpgrade: { color: '#ffb066' },
 
-  blockText: { color: '#e6d8b3', fontSize: 12, fontWeight: '600', textAlign: 'center' },
+  rowText: { flex: 1, color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
   rowTextConsumed: { color: '#6f6759', textDecorationLine: 'line-through' },
-  upgradeTag: { color: '#ffb066', fontSize: 9, fontWeight: '700', letterSpacing: 1, marginTop: 3 },
-  leadTag: { color: LEAD, fontSize: 9, fontWeight: '700', letterSpacing: 1, marginTop: 3 },
+  rowTail: { fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
+  tailUpgrade: { color: '#ffb066' },
 
+  // ⚠ The sweep buttons keep a faint face — they are the one thing here that is
+  // pressed rather than read, and a bare outline at the bottom of a list of bare
+  // outlines stops reading as a button at all.
   sweep: {
     borderWidth: 1, borderRadius: 3, paddingVertical: 10,
     alignItems: 'center', marginTop: 2,
   },
-  sweepGear: { borderColor: GEAR, backgroundColor: '#241705' },
-  sweepItems: { borderColor: ITEMS, backgroundColor: '#131c0e' },
-  sweepScrap: { borderColor: SCRAP, backgroundColor: '#1e1a09' },
+  sweepGear: { borderColor: GEAR, backgroundColor: '#1a1208' },
+  sweepItems: { borderColor: ITEMS, backgroundColor: '#121808' },
+  sweepScrap: { borderColor: SCRAP, backgroundColor: '#181507' },
   takeAllText: { fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   salvageAllText: { fontSize: 12, fontWeight: '600', letterSpacing: 0.5 },
 
