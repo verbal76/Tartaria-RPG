@@ -13541,7 +13541,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const targetText = (parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase();
         const rescueId = matchRescueHookNoun(targetText);
         if (rescueId && currentScene.enemies.length === 0) {
-          tryFireRescueScenario(get, set, rescueId);
+          tryFireRescueScenario(get, set, rescueId, targetText);
           void get().persist();
           return;
         }
@@ -39969,17 +39969,43 @@ function tryFireRescueScenario(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   scenarioId: RescueScenarioId,
+  /** ⚠⚠ OTA-1241 — THE NOUN THE PLAYER ACTUALLY ENGAGED. Required, because the
+   *  intro used to name the scenario's OWN prop regardless of what was tapped, and
+   *  the census showed that prop is usually not the thing in the room. */
+  engagedNoun: string,
 ): void {
   const player = get().player;
   const scene = get().currentScene;
   if (!player || !scene) return;
   const scenario = RESCUE_SCENARIOS[scenarioId];
   const captor = spawnRescueCaptor(scenarioId, player.factionId);
+  // ⚠⚠ OTA-1241 — THE INTRO NAMES WHAT THE PLAYER LOOKED AT, NOT WHAT THE SCENARIO
+  // IS CALLED. From the owner's device log:
+  //
+  //     [player]    investigate firepit
+  //     [dog_quest] You crest the snare pit. ...
+  //
+  // He looked at a firepit and the game told him he was cresting a snare pit. The
+  // matcher bug that routed him there is fixed above — but ⚠⚠ THE CENSUS FOUND THE
+  // DEEPER PROBLEM: 13 of the 20 rescue hook nouns match NOTHING in the game's 975
+  // scene nouns. `snare pit`, `snare`, `trapper camp`, `cellar door`, `cellar`,
+  // `trapdoor`, `buried structure`, `smelter`, `forge ruin`, `anvil post` — none of
+  // them are things the world actually places. **The snare rescue fires on
+  // `mud pit` and `lobster trap`; the cellar rescue fires only on `hatch`.** So the
+  // loose matcher was not merely a bug, it was LOAD-BEARING, and an intro naming
+  // the scenario's own prop was always going to describe a room the player was not
+  // standing in.
+  //
+  // ⚠ Each line now leads with the engaged noun and lets the scene resolve OUT of
+  // it, so it reads true whether the player tapped a snare pit, a lobster trap or a
+  // firepit. This is the same rule the rest of the project runs on: never describe
+  // a state the game is not in.
+  const engaged = theLower(engagedNoun.trim() || 'it');
   const introLines: Record<RescueScenarioId, string> = {
-    smelter: `You step into the smelter's ruin. The ${scenario.captorName} is here, working a chain that ends in a dog's collar. ${scenario.captorName} sees you. "Walk on. This one's not yours."`,
-    wagon: `The overturned wagon shifts as you approach. The ${scenario.captorName} steps out from behind it, a leash in one hand, the shepherd lashed to the wheel snarling against the cord. "Walk on, stranger. Or stay, and lose."`,
-    cellar: `The cellar door clatters open under your hand. Up out of the dark comes the ${scenario.captorName}, lantern raised, hound chained at their heel. "Down door's closed to you. The dog stays."`,
-    snare: `You crest the snare pit. The ${scenario.captorName} is checking their lines — and one line holds a half-grown mutt, hung by a paw, growling weak. The poacher turns. "That's my catch. Walk."`,
+    smelter: `You come up on ${engaged}, and past it the slag-floor opens out. The ${scenario.captorName} is there, working a chain that ends in a dog's collar. ${scenario.captorName} sees you. "Walk on. This one's not yours."`,
+    wagon: `${theCap(engagedNoun.trim() || 'it')} shifts as you reach it — and behind it the ${scenario.captorName} steps out, a leash in one hand, a shepherd lashed to a wheel and snarling against the cord. "Walk on, stranger. Or stay, and lose."`,
+    cellar: `${theCap(engagedNoun.trim() || 'it')} gives under your hand, and the dark below gives back the ${scenario.captorName} — lantern raised, hound chained at their heel. "Down there's closed to you. The dog stays."`,
+    snare: `You work your way to ${engaged}, and past it a line of snares runs off into the scrub. The ${scenario.captorName} is checking them, and one holds a half-grown mutt, hung by a paw, growling weak. The poacher turns. "That's my catch. Walk."`,
   };
   set((s) => s.currentScene
     ? {

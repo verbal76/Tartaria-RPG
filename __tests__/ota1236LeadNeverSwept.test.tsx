@@ -77,7 +77,10 @@ describe('OTA-1236 — the exposure, measured from the shipped data', () => {
         if (hasSalvageYield(n)) salvageable.push(n);
       }
     }
-    expect(all.length).toBe(20);
+    // ⚠ 19, not 20: OTA-1241 dropped bare `pit` from the snare scenario — censused
+    // against the world's nouns it matched only `mud pit`, while costing `firepit`,
+    // `pulpit` and `climbing piton` under the old substring rule.
+    expect(all.length).toBe(19);
     // If this number moves, the pools or the scenarios changed — re-read the
     // guard below before assuming it still covers them.
     expect(salvageable.length).toBeGreaterThanOrEqual(10);

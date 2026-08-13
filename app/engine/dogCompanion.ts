@@ -33,6 +33,17 @@ export interface RescueScenario {
   /** The investigation hook noun the player must engage to fire the
    *  rescue. The hook nouns are added to roomInvestigationTable on
    *  matching scene archetypes. */
+  /** ⚠⚠ OTA-1241 — CENSUSED, AND MOSTLY ASPIRATIONAL. Measured against the 975
+   *  scene nouns the world can actually place, THIRTEEN of these twenty match
+   *  nothing: `snare pit`, `snare`, `trapper camp`, `cellar door`, `cellar`,
+   *  `trapdoor`, `buried structure`, `smelter`, `forge ruin`, `anvil post`,
+   *  `wagon wheel`, `roadside camp`, `overturned wagon`. The cellar rescue is
+   *  reachable ONLY through `hatch`; the snare rescue only through `trap`.
+   *  ⚠ So do not tighten these further without re-running that census — two of the
+   *  four scenarios are one noun away from being unreachable. The real repair is
+   *  to put these props into the location vocabulary; until then the intro copy
+   *  names the noun the player engaged rather than the prop this list wishes was
+   *  there. */
   hookNouns: string[];
   /** Captor faction template id when the player IS NOT this faction.
    *  Resolves to the unaligned poacher captor when the player IS
@@ -89,7 +100,12 @@ export const RESCUE_SCENARIOS: Record<RescueScenarioId, RescueScenario> = {
   },
   snare: {
     id: 'snare',
-    hookNouns: ['snare pit', 'snare', 'pit', 'trapper camp', 'trap'],
+    // ⚠ OTA-1241 — bare `pit` dropped. Censused against the game's 975 scene
+    // nouns it matched exactly one thing — `mud pit` — while costing `firepit`,
+    // `pulpit` and `climbing piton` under the old substring rule. `trap` still
+    // covers `lobster trap` and `trap`, which is what actually keeps this
+    // scenario reachable.
+    hookNouns: ['snare pit', 'snare', 'trapper camp', 'trap'],
     captorFactionId: null, // unaligned — always available as fallback
     defaultBreed: 'mutt',
     startingProfile: 'mutt',

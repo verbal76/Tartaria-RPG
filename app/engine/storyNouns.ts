@@ -33,19 +33,57 @@
 import { RESCUE_SCENARIOS, type RescueScenarioId } from './dogCompanion';
 import { matchAnyHookNoun, type Hook } from './hooks';
 
-/** ⚠ The rescue matcher, deliberately LOOSER than the hook matcher's word-boundary
- *  test: it is the same case-insensitive substring rule the engine's own dispatch
- *  uses (`matchRescueHookNoun` in gameStore), and it MUST stay the same rule. If
- *  this were stricter, a noun the engine treats as the dog hook could still be
- *  swept by the bulk guard below — protecting a set that does not match the set
- *  that fires is the same class of bug as not protecting at all. */
+/** ⚠⚠ OTA-1241 — WORD BOUNDARIES. THE OLD RULE MATCHED 35 OF THE GAME'S 975 SCENE
+ *  NOUNS, AND THE OWNER'S DEVICE LOG CAUGHT IT LIVE:
+ *
+ *      [player]    investigate firepit
+ *      [dog_quest] You crest the snare pit. The Unaligned Poacher is checking
+ *                  their lines...
+ *
+ *  He looked at a FIREPIT and got the SNARE PIT rescue, because `"firepit"`
+ *  contains `"pit"`.
+ *
+ *  ⚠⚠ AND THE COMPOUND CASE WAS THE MILD ONE. The old test ran BOTH directions —
+ *  `t.includes(nl) || nl.includes(t)` — and that second direction meant any short
+ *  noun that is a FRAGMENT of a hook phrase matched it:
+ *
+ *      door  -> cellar   (it sits inside "cellar door")
+ *      ruin  -> smelter  (inside "forge ruin")
+ *      camp  -> wagon    (inside "roadside camp")
+ *      anvil -> smelter  (inside "anvil post")
+ *
+ *  Every door, every ruin, every camp in the game was a dog-rescue trigger. Plus
+ *  `pulpit`, `climbing piton` and `mud pit` via "pit", eleven different chains,
+ *  three wheels, and `lobster trap`.
+ *
+ *  ⚠ AND ONE STRAIGHT MIS-ROUTE: `trap` matched CELLAR (through "trapdoor") before
+ *  SNARE, whose own noun list contains `trap` exactly. The wrong scenario fired.
+ *
+ *  ⚠⚠ THE GALLING PART, AGAIN: `engine/hooks.ts` FIXED THIS EXACT CLASS in OTA-432,
+ *  with this exact reasoning — *"a 2–3 char token could snag half the nouns in a
+ *  room."* The rescue matcher never got that fix, and OTA-1236 deliberately COPIED
+ *  its loose rule so the bulk-salvage guard would match the firer. Matching the
+ *  firer was right; what got propagated was the bug. **When you consolidate two
+ *  copies of a rule, check whether the surviving copy is the CORRECT one.**
+ *
+ *  THE RULE NOW: an exact match always wins; a multi-word hook noun must appear as
+ *  a PHRASE; a single-word hook noun must appear as a WHOLE WORD. ⚠ Deliberately
+ *  no prefix-overlap fuzz — hooks.ts allows a ≥4-char prefix overlap, and that is
+ *  precisely what let `trap` reach `trapdoor`. */
 export function rescueScenarioForNoun(noun: string): RescueScenarioId | null {
   const t = noun.toLowerCase().trim();
   if (!t) return null;
+  const words = t.split(/[^a-z0-9]+/).filter(Boolean);
   for (const id of Object.keys(RESCUE_SCENARIOS) as RescueScenarioId[]) {
     for (const n of RESCUE_SCENARIOS[id].hookNouns) {
       const nl = n.toLowerCase();
-      if (t.includes(nl) || nl.includes(t)) return id;
+      if (!nl) continue;
+      if (t === nl) return id;
+      if (nl.includes(' ')) {
+        if (t.includes(nl)) return id;   // multi-word: phrase containment
+        continue;
+      }
+      if (words.includes(nl)) return id; // single word: whole word only
     }
   }
   return null;

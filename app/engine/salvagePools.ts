@@ -93,6 +93,7 @@ const POOLS: SalvagePool[] = [
       'blade', 'sword', 'axe', 'pike', 'rifle', 'spear', 'rod',
       'knife', 'cleaver', 'maul', 'hammer', 'gun', 'gauntlet',
       'staff', 'bow', 'harpoon',
+      'dagger',   // ⚠ OTA-1242 — the census caught `ritual dagger` sitting homeless.
     ],
     items: [
       { name: 'Scrap Metal', rarity: 'Common', weight: 40, min: 1, max: 2 },
@@ -300,6 +301,162 @@ const POOLS: SalvagePool[] = [
       { name: 'Stick', rarity: 'Common', weight: 20, min: 1, max: 2 },
       { name: 'Smooth Stone', rarity: 'Common', weight: 15, min: 1, max: 2 },
       { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 10, min: 1, max: 2 },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ⚠⚠ OTA-1242 — THE CENSUS POOLS. Owner, working out the model out loud:
+  // *"take is for carryable items that might be scrapped later... all the rest
+  // are just smaller items that can be salvaged."*
+  //
+  // ⚠⚠ THAT RULE WAS NOT TRUE, AND THE CENSUS IS HOW WE FOUND OUT BY HOW MUCH.
+  // Measured across every noun the world can place — 975 of them from
+  // locations.json — the split was:
+  //
+  //     take (a real catalog item)   69
+  //     salvage (a pool matched)    453
+  //     climb                        44
+  //     water source                 15
+  //     NO HOME AT ALL              394     ← 40% of the vocabulary
+  //
+  // Those 394 were silently DROPPED from the loot picker by OTA-1234, which was
+  // the right call at the time (the SALVAGE button was promising to break them and
+  // finding nothing) but papered over the real problem: an anvil is a lump of iron
+  // and the game pretended it was not there.
+  //
+  // ⚠ THESE POOLS SIT LAST ON PURPOSE. `pickPool` walks top-down and stops at the
+  // first hit, so every pool above still wins its own nouns — these only catch what
+  // nothing else claimed. They are broad by design: patterns, not enumerations, so
+  // a noun added to the world next year lands somewhere instead of vanishing.
+  //
+  // ⚠⚠ WHAT IS DELIBERATELY *NOT* GIVEN A POOL, because the owner's rule has a real
+  // boundary: you cannot strip a stain, a footprint, an echo, a fog bank, a
+  // corridor or a vent. Those are places and traces, not objects, and handing them
+  // a material would be the "button that lies" all over again in the other
+  // direction. They stay out of the picker, and INVESTIGATE remains their verb.
+  {
+    id: 'fixture_metal',
+    // Ironmongery and instruments: the anvil that started this, plus everything
+    // bolted to a wall that is fundamentally a lump of worked metal.
+    patterns: [
+      'anvil', 'bell', 'bellows', 'chisel', 'grate', 'lever', 'lock', 'keyway',
+      'hinge', 'clamp', 'ring', 'hook', 'chandelier', 'sconce', 'kettle',
+      'pot', 'pan', 'gauge', 'meter', 'dial', 'siren', 'horn', 'drum',
+      'vane', 'tripod', 'clip', 'buckle', 'nail', 'bolt', 'screw', 'spring',
+      'sphere', 'weight', 'clock', 'compass', 'stabilizer', 'emitter',
+      'detector', 'sensor', 'scanner', 'filter', 'portcullis', 'harness',
+      // ⚠ SECOND PASS. The first census pass left 218 nouns homeless and the
+      // remainder was read by hand rather than declared finished — these are the
+      // obvious metal objects it had missed.
+      'armor', 'greaves', 'shield', 'glove', 'gauntlet', 'knuckles', 'plate',
+      'crown', 'necklace', 'pendant', 'insignia', 'badge', 'seal', 'coin',
+      'key', 'tank', 'vat', 'wheel', 'crampon', 'piton', 'stake', 'mask',
+      'knight', 'scale', 'grenade', 'elevator', 'platform', 'monitor',
+      'slide rule', 'shaft', 'spark', 'signal',
+    ],
+    items: [
+      { name: 'Scrap Metal', rarity: 'Common', weight: 40, min: 1, max: 3 },
+      { name: 'Bent Nail', rarity: 'Common', weight: 25, min: 1, max: 3 },
+      { name: 'Aether Dust', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 12, min: 1, max: 3 },
+      { name: 'Aether Crystal', rarity: 'Common', weight: 8, min: 1, max: 1 },
+    ],
+  },
+  {
+    id: 'stonework',
+    // Masonry and monuments. ⚠ These are the ones the portability rules already
+    // refuse to let you TAKE ("centuries-old stonework doesn't fit in any pack
+    // ever made") — so a refusal pointed at SALVAGE finally has somewhere to land.
+    patterns: [
+      'statue', 'idol', 'font', 'dais', 'plinth', 'pedestal', 'tile', 'mosaic',
+      'pavement', 'cairn', 'post', 'marker', 'step', 'fence', 'archway',
+      'barricade', 'fountain', 'stalactite', 'pebble', 'carving', 'engraving',
+      'plaque', 'throne', 'pew', 'kneeler', 'lectern', 'pulpit', 'stand',
+      'counter', 'masonry', 'obelisk', 'monument', 'waypoint',
+      // ⚠ Second pass — hearths, wells and the shaped-ground family.
+      'firepit', 'fire pit', 'hearth', 'well', 'cistern', 'reef', 'ridge',
+      'hatch',    // ⚠ a metal lid in a stone floor — `drain hatch` was homeless.
+      'circle', 'perch', 'sign', 'pier', 'seat', 'header', 'stall',
+    ],
+    items: [
+      { name: 'Smooth Stone', rarity: 'Common', weight: 35, min: 1, max: 3 },
+      { name: 'Mud Fragment', rarity: 'Common', weight: 25, min: 1, max: 3 },
+      { name: 'Scrap Metal', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Aether Crystal', rarity: 'Common', weight: 10, min: 1, max: 1 },
+    ],
+  },
+  {
+    id: 'textile',
+    // Cloth, cord and leather. Broader than the existing `fabric` pool, which
+    // only claims a handful of specific nouns.
+    patterns: [
+      'pack', 'bedroll', 'canvas', 'cord', 'line', 'net', 'tapestry', 'flag',
+      'cushion', 'vestment', 'leather', 'strap', 'sail', 'awning', 'tarp',
+      'blanket', 'wrapping', 'bandage', 'satchel', 'pouch', 'basket',
+      // ⚠ Second pass — sacks, tents and the paper family (paper is a fibre).
+      'sack', 'tent', 'toy', 'kit', 'papyrus', 'wares', 'cargo', 'flotsam',
+      'blackboard', 'loft', 'trellis', 'desk', 'skiff',
+    ],
+    items: [
+      { name: 'Cloth Scrap', rarity: 'Common', weight: 40, min: 1, max: 3 },
+      { name: 'Spider Silk', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Climbing Rope', rarity: 'Common', weight: 15, min: 1, max: 1 },
+      { name: 'Stick', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Aetheric Cloth', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
+    ],
+  },
+  {
+    id: 'glassware',
+    patterns: [
+      'glass', 'mirror', 'prism', 'vial', 'chalice', 'cup', 'basin', 'bowl',
+      'flask', 'lens', 'pane', 'bottle', 'jar', 'decanter', 'monstrance',
+      'censer', 'crucible',
+      // ⚠ Second pass — raw crystal is glassware's nearest family.
+      'crystal', 'rune glass', 'instrument',
+    ],
+    items: [
+      { name: 'Aether Crystal', rarity: 'Common', weight: 30, min: 1, max: 2 },
+      { name: 'Aether Dust', rarity: 'Common', weight: 25, min: 1, max: 3 },
+      { name: 'Smooth Stone', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Scrap Metal', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
+    ],
+  },
+  {
+    id: 'growth',
+    // Living matter — the one family whose yield is deliberately NOT metal.
+    patterns: [
+      'moss', 'fungus', 'fungal', 'mushroom', 'spore', 'root', 'bloom',
+      'blossom', 'kelp', 'seaweed', 'coral', 'tendril', 'bramble', 'vine',
+      'overgrowth', 'nest', 'shell', 'claw', 'tooth', 'anemone', 'lichen',
+      'weed', 'thicket', 'creeper', 'egg',
+      // ⚠ Second pass.
+      'crab', 'oyster', 'shedding', 'patch', 'bed',
+    ],
+    items: [
+      { name: 'Stick', rarity: 'Common', weight: 30, min: 1, max: 3 },
+      { name: 'Spider Silk', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Bone Sliver', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Mud Fragment', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Aether Crystal', rarity: 'Common', weight: 10, min: 1, max: 1 },
+    ],
+  },
+  {
+    id: 'devotional',
+    // Shrine goods. ⚠ Kept as its own pool rather than folded into stonework so
+    // the yields can read as offerings — wax, coin, a little worked metal — which
+    // is what a vigil-shrine actually leaves behind.
+    patterns: [
+      'candle', 'offering', 'beads', 'cross', 'reliquary', 'shrine ',
+      'prayer', 'votive', 'vigil', 'hymnal', 'missal', 'incense',
+    ],
+    items: [
+      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 30, min: 1, max: 4 },
+      { name: 'Cloth Scrap', rarity: 'Common', weight: 25, min: 1, max: 2 },
+      { name: 'Stick', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Scrap Metal', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Aether Dust', rarity: 'Common', weight: 10, min: 1, max: 2 },
     ],
   },
 ];

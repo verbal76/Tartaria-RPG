@@ -45,7 +45,12 @@ describe('OTA-137 — a refusal teaches SALVAGE wherever SALVAGE pays', () => {
   });
 
   it('⚠⚠ ...and NO line on a scenery-only noun names it, because it would not pay', () => {
-    for (const noun of ['sign', 'arch', 'wall']) {
+    // ⚠ OTA-1242 — FIXTURES MOVED, RULE UNCHANGED. `sign` and `arch` gained salvage
+    // pools in the census pass, which is the census WORKING — the owner's rule is
+    // that anything you cannot take, you can salvage. So this now asks the question
+    // of nouns that are pool-less BY NATURE: you cannot strip a stain, a fog bank or
+    // a corridor. Those cannot quietly become salvageable the way the old ones did.
+    for (const noun of ['blood stain', 'fog bank', 'corridor']) {
       expect(hasSalvageYield(noun)).toBe(false);
       const seen = new Set<string>();
       for (let i = 0; i < 200; i++) seen.add(portability.sceneFeatureRefusalLine(noun));
@@ -57,7 +62,7 @@ describe('OTA-137 — a refusal teaches SALVAGE wherever SALVAGE pays', () => {
   });
 
   it('⚠ both pools stayed eight deep — the variety is why a hoarder does not reread one sentence', () => {
-    for (const noun of ['brick', 'sign']) {
+    for (const noun of ['brick', 'blood stain']) {
       const seen = new Set<string>();
       for (let i = 0; i < 400; i++) seen.add(portability.sceneFeatureRefusalLine(noun));
       expect(seen.size).toBe(8);

@@ -317,7 +317,18 @@ describe('OTA-1234 — the picker never offers a verb that will find nothing', (
   // ⚠ `hasSalvageYield` was written the PREVIOUS OTA for exactly this
   // distinction — to stop the refusal copy advertising SALVAGE on nouns with no
   // pool — and the picker did not consult it. The prose knew; the button did not.
-  const INERT = ['firepit', 'marker', 'sack', 'stall', 'signpost', 'tent', 'ladder'];
+  // ⚠⚠ OTA-1242 — THE FIXTURES MOVED, AND THAT IS THE CENSUS WORKING. Every noun
+  // this list used to hold — firepit, marker, sack, stall, signpost, tent — now has
+  // a salvage pool, because the owner's rule is that anything you cannot take, you
+  // can salvage, and the census found 394 of 975 scene nouns falling through that
+  // rule. `ladder` moved too: CLIMB is its verb.
+  //
+  // ⚠ THE RULE THIS SUITE PROTECTS IS UNCHANGED and still load-bearing: the picker
+  // must never offer a verb that will find nothing. It now asks it of nouns that
+  // are actionless BY NATURE — you cannot take, salvage or climb a stain, a fog
+  // bank or a corridor — so unlike the old fixtures these cannot quietly acquire a
+  // pool and turn this test green for the wrong reason.
+  const INERT = ['blood stain', 'fog bank', 'corridor', 'footprint', 'chalk dust'];
 
   it('⚠⚠ the four nouns from the log are not scrap, and not in the picker', () => {
     for (const noun of INERT) {
@@ -334,14 +345,14 @@ describe('OTA-1234 — the picker never offers a verb that will find nothing', (
 
   it('⚠⚠ RENDERED: the exact mixed room from the log counts 1 to salvage, not 4', () => {
     const text = renderRoom([
-      { noun: 'firepit' }, { noun: 'marker' }, { noun: 'sack' }, { noun: 'stall' },
+      { noun: 'blood stain' }, { noun: 'fog bank' }, { noun: 'corridor' },
       { noun: 'banner' }, { noun: 'Aetheric Torch' },
     ]).join('|');
     expect(text).toContain('▪|Aetheric Torch');
     expect(text).toContain('⚒|banner');
     expect(text).toContain('TAKE ALL ITEMS (1)');
     expect(text).toContain('⚒ SALVAGE ALL (1)');
-    expect(text).not.toContain('firepit');
+    expect(text).not.toContain('blood stain');
   });
 
   it('⚠⚠ OTA-1235: an inert noun has NO LANE, so it can never be given a colour', () => {
@@ -365,7 +376,7 @@ describe('OTA-1234 — the picker never offers a verb that will find nothing', (
   it('⚠⚠ EVERY row the picker offers can actually be acted on', () => {
     // The invariant, stated once: a row is present only if TAKE or SALVAGE will
     // do something. Anything else is a button that lies.
-    const mixed = ['firepit', 'bench', 'Aetheric Torch', 'tent', 'Compact Blaster', 'cart'];
+    const mixed = ['blood stain', 'bench', 'Aetheric Torch', 'fog bank', 'Compact Blaster', 'cart'];
     for (const noun of mixed) {
       const kind = classifyGatherNoun(noun);
       if (!isActionableGatherKind(kind)) continue;

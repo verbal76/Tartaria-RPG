@@ -147,7 +147,9 @@ describe('OTA-1232 — the refusal stops sending players somewhere empty', () =>
   it('⚠⚠ SALVAGE is advertised only where there is something to salvage', () => {
     // sign / arch / wall match no pool. Sampled hard, because the line is
     // picked at random from eight and a single draw proves nothing.
-    for (const noun of ['sign', 'arch', 'wall']) {
+    // ⚠ OTA-1242 — fixtures moved, rule unchanged: `sign` and `arch` gained pools
+    // in the census pass. These are pool-less BY NATURE — you cannot strip a stain.
+    for (const noun of ['blood stain', 'fog bank', 'corridor']) {
       expect(hasSalvageYield(noun)).toBe(false);
       const seen = new Set<string>();
       for (let i = 0; i < 200; i++) seen.add(sceneFeatureRefusalLine(noun));
@@ -172,15 +174,15 @@ describe('OTA-1232 — the refusal stops sending players somewhere empty', () =>
 
   it('⚠ the scenery lines promise nothing, and never name a verb that will refuse', () => {
     const seen = new Set<string>();
-    for (let i = 0; i < 200; i++) seen.add(sceneFeatureRefusalLine('sign'));
+    for (let i = 0; i < 200; i++) seen.add(sceneFeatureRefusalLine('blood stain'));
     for (const line of seen) {
       expect(line).not.toContain('SALVAGE');
-      expect(line).toContain('sign');
+      expect(line).toContain('blood stain');
     }
   });
 
   it('⚠ hasSalvageYield is PURE — the refusal is a fact about the noun, not a dice throw', () => {
-    for (const noun of ['brick', 'sign', 'arch', 'bench']) {
+    for (const noun of ['brick', 'blood stain', 'fog bank', 'bench']) {
       const first = hasSalvageYield(noun);
       for (let i = 0; i < 50; i++) expect(hasSalvageYield(noun)).toBe(first);
     }

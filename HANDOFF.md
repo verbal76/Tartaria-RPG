@@ -1644,8 +1644,51 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — AN EMPTIED PICKER CLOSES ITSELF (2026-08-13,
-  latest). GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1240. **Same
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE NOUN CENSUS (2026-08-13, latest). GOLEM ONLY,
+  NOT ON HAL, BY DECISION.** Golem OTA-1241 + OTA-1242, one push. **Same
+  merge-or-revert decision point — now also covering `salvagePools.ts` (six new
+  pools) and the rescue intro copy.**
+
+  **OTA-1241 — the firepit that started the dog quest.** From the device log:
+  `investigate firepit` → `You crest the snare pit.` The matcher ran raw substring
+  BOTH ways, so `door`/`ruin`/`camp`/`anvil` were all rescue triggers (they sit
+  inside "cellar door"/"forge ruin"/"roadside camp"/"anvil post"). **35 of 975
+  scene nouns fired a rescue.** `trap` mis-routed to CELLAR. And `Aetheric
+  Chainmail` — a real item — was flagged as a lead, which since OTA-1236 meant it
+  rendered un-sweepable and TAKE ALL GEAR skipped it.
+
+  ⚠⚠ **`engine/hooks.ts` FIXED THIS EXACT CLASS IN OTA-432** and the rescue matcher
+  never got it; OTA-1236 then copied the loose rule deliberately so the guard would
+  match the firer. **When you consolidate two copies of a rule, check whether the
+  surviving copy is the CORRECT one** — matching the firer was right, propagating
+  its bug was not.
+
+  ⚠⚠ **AND THE CENSUS FOUND THE MATCHER WAS LOAD-BEARING: 13 of the 20 rescue hook
+  nouns match NOTHING the world places.** The cellar rescue is reachable only
+  through `hatch`, the snare only through `trap`. Tightening blind would have
+  closed two quest lines silently. **Before tightening a matcher, census what it is
+  actually catching** — there is now a reachability check in the suite. The intros
+  also stopped naming their own prop and name the ENGAGED noun instead.
+
+  **OTA-1242 — the salvage census.** Owner: *"all the rest are just smaller items
+  that can be salvaged."* Measured across all 975 nouns: take 69 · salvage 453 ·
+  climb 44 · water 15 · **no home 394 (40%)**. Those were dropped from the picker
+  by OTA-1234 — right at the time, but it papered over the real problem. Six new
+  pattern-based pools, placed LAST so `pickPool`'s first-hit rule leaves existing
+  pools intact. Two passes, 394 → 218 → **135**, the remainder read by hand.
+  ⚠⚠ The 135 that stay homeless are the point: stains, fog, corridors, vents, silt,
+  lore documents. **Giving a stain a material would be the button-that-lies in the
+  other direction.** Pinned as a FRACTION so world growth cannot fail it by
+  arithmetic.
+
+  ⚠ Four suites had fixtures the census moved (`sign`, `arch`, `firepit`, `sack`,
+  `tent`, `stall` all gained pools). Each re-pointed at nouns pool-less BY NATURE,
+  so they cannot go green for the wrong reason. **A test fixture chosen because it
+  happened to lack coverage will betray you the day someone adds coverage.**
+  Full story: the VERSION.md 4.29.170 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — AN EMPTIED PICKER CLOSES ITSELF (2026-08-13).
+  GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1240. **Same
   merge-or-revert decision point.**
 
   Owner: *"if there is nothing left, it doesn't need to wait for the ignore
