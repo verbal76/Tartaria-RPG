@@ -1112,14 +1112,15 @@ export function InventoryScreen() {
     if (canScrap(pending.item) && equippedInSlots.length === 0) {
       const stack = pending.item.quantity ?? 1;
       buttons.push({
-        label: stack > 1 ? `Scrap ×${Math.max(1, Math.min(scrapQty, stack))}` : 'Scrap',
+        // ⚠ OTA-1243 — one word for the breakdown verb everywhere: SALVAGE.
+        label: stack > 1 ? `Salvage ×${Math.max(1, Math.min(scrapQty, stack))}` : 'Salvage',
         onPress: () => doScrap(),
         tone: 'destructive',
       });
       // Scrap All — one tap to break down the whole stack (skips the stepper).
       if (stack > 1) {
         buttons.push({
-          label: `Scrap All (${stack})`,
+          label: `Salvage All (${stack})`,
           onPress: () => doScrap(stack),
           tone: 'destructive',
         });
@@ -1231,7 +1232,7 @@ export function InventoryScreen() {
     catch { modalPreview = null; }
   }
   const modalBody = pending && isQuestLockedItem(pending.item)
-    ? 'Reserved for your objective — this stays in your pack until you turn it in. It can\'t be dropped, scrapped, sold, or fused.'
+    ? 'Reserved for your objective — this stays in your pack until you turn it in. It can\'t be dropped, salvaged, sold, or fused.'
     // OTA-872 — a soft "Save for quest" earmark: explain that it's out of the sell
     // tab and filed under Quest Items, but still yours to use or drop.
     : pending && pending.item.reservedForQuest
@@ -1463,7 +1464,7 @@ export function InventoryScreen() {
       <FirstTimeHint
         id="inventory_first_open"
         title="Your pack"
-        body="Tap any item to equip, use, scrap, or drop. The green line shows damage; the diamond means engine-named."
+        body="Tap any item to equip, use, salvage, or drop. The green line shows damage; the diamond means engine-named."
       />
       <View style={styles.header}>
         <TouchableOpacity
@@ -1579,8 +1580,8 @@ export function InventoryScreen() {
                 </TouchableOpacity>
               )}
               {scrappable.length > 0 && (
-                <TouchableOpacity onPress={() => setInvGroupAction('scrap')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Scrap ${scrappable.length} items`}>
-                  <Text style={styles.groupActText}>SCRAP {scrappable.length}</Text>
+                <TouchableOpacity onPress={() => setInvGroupAction('scrap')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Salvage ${scrappable.length} items`}>
+                  <Text style={styles.groupActText}>SALVAGE {scrappable.length}</Text>
                 </TouchableOpacity>
               )}
               {reservable.length > 0 && (
@@ -1599,7 +1600,7 @@ export function InventoryScreen() {
             {droppable.length + scrappable.length + reservable.length + releasable.length
               + equipPlan.equip.length + unequippable.length === 0 && (
               <Text style={styles.groupBarNone}>
-                Nothing here can be worn, dropped, scrapped or reserved — quest-bound items stay with you.
+                Nothing here can be worn, dropped, salvaged or reserved — quest-bound items stay with you.
               </Text>
             )}
             {/* OTA-1114 — say WHY a piece you ticked isn't in the EQUIP count,
@@ -1754,7 +1755,7 @@ export function InventoryScreen() {
           && canScrap(pending.item)
           && !equippedItemIds.has(pending.item.id)
             ? {
-                label: 'Scrap how many?',
+                label: 'Salvage how many?',
                 value: Math.max(1, Math.min(scrapQty, pending.item.quantity)),
                 min: 1,
                 max: pending.item.quantity,

@@ -139,7 +139,9 @@ describe('OTA-1100 — the group can only do what one tap could', () => {
     expect(view).toContain('{droppable.length > 0 && (');
     expect(view).toContain('{scrappable.length > 0 && (');
     expect(view).toContain('DROP {droppable.length}');
-    expect(view).toContain('SCRAP {scrappable.length}');
+    // ⚠ OTA-1243 — the label reads SALVAGE now; the predicate names are code,
+    // not copy, and stay as they were.
+    expect(view).toContain('SALVAGE {scrappable.length}');
     // …and when NOTHING can act, the bar says why rather than going blank.
     expect(view).toContain('quest-bound items stay with you');
   });

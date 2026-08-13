@@ -857,7 +857,7 @@ export function CraftingScreen() {
       ) : (
         <>
           <Text style={styles.arbiterLine}>
-            The Arbiter takes the damaged piece. "Material cost is double what it'd give if you scrapped it. That's the trade."
+            The Arbiter takes the damaged piece. "Material cost is double what it'd give if you salvaged it. That's the trade."
           </Text>
 
           <SearchSortBar
@@ -1041,7 +1041,7 @@ export function CraftingScreen() {
                         </Text>
                       )}
                       {r.cost.length === 0 ? (
-                        <Text style={styles.recipeMissing}>No repair recipe — sell or scrap instead.</Text>
+                        <Text style={styles.recipeMissing}>No repair recipe — sell or salvage instead.</Text>
                       ) : r.available ? (
                         <>
                           <Text style={styles.recipeIng}>

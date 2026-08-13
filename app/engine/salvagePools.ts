@@ -353,6 +353,7 @@ const POOLS: SalvagePool[] = [
       'key', 'tank', 'vat', 'wheel', 'crampon', 'piton', 'stake', 'mask',
       'knight', 'scale', 'grenade', 'elevator', 'platform', 'monitor',
       'slide rule', 'shaft', 'spark', 'signal',
+      'cage',     // ⚠ OTA-1243 — the rescue prop; after the dog quest it is iron bars.
     ],
     items: [
       { name: 'Scrap Metal', rarity: 'Common', weight: 40, min: 1, max: 3 },

@@ -1644,7 +1644,36 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE NOUN CENSUS (2026-08-13, latest). GOLEM ONLY,
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — ONE WORD, PLACED PROPS (2026-08-13, latest).
+  GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1243. **Same merge-or-revert
+  decision point — now also covering the SALVAGE word sweep (picker, tutorial,
+  nudges, refusals, InventoryScreen, CraftingScreen, parser synonym) and the
+  rescue-prop injection in scene build.**
+
+  **One word: SALVAGE.** Owner: *"use salvage as the word on golem only."* The
+  picker's lane was headed SCRAP over a button reading SALVAGE ALL — two words for
+  one concept inside one card. Swept every player-facing surface; kept item NAMES
+  (`Scrap Metal` — renaming a noun a save holds is a migration, not a copy edit),
+  code identifiers, and one refusal's plain-English "scrap" (that pool is
+  forbidden from naming the verb). Typed `scrap` still accepted as a salvage
+  synonym. ⚠ That flipped a pinned accident: `scrap` used to parse to DIG via
+  prefix-matching 'scrape', and OTA-156's suite had locked it in as if chosen.
+  **A test that pins current behavior pins the accidents too — when one fails,
+  ask whether it guarded a decision or a coincidence.**
+
+  **The props are placed.** `RESCUE_SCENARIOS.archetypes` existed since OTA-120
+  and nothing consumed it. ⚠⚠ **And the archetype words were written against an
+  imagined world: `wagon` and `snare` matched ZERO locations** ('road', 'camp',
+  'wilderness' are not tags anything carries). Lists extended with real tags →
+  13/13/13/13 eligible locations. Scene build now seeds the scenario's own primary
+  prop on 22% of eligible tiles (tile-seeded, display-slot-guaranteed, gated on
+  the same no-dog/no-onboarding/not-hub conditions the dispatch checks). It rides
+  the existing lead lane: ✦ WORTH A LOOK, last, un-sweepable.
+  **⚠ THE LESSON: a config field nothing reads is not configuration, it is
+  documentation that lies — grep for consumers before trusting a schema comment.**
+  Full story: the VERSION.md 4.29.171 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE NOUN CENSUS (2026-08-13). GOLEM ONLY,
   NOT ON HAL, BY DECISION.** Golem OTA-1241 + OTA-1242, one push. **Same
   merge-or-revert decision point — now also covering `salvagePools.ts` (six new
   pools) and the rescue intro copy.**

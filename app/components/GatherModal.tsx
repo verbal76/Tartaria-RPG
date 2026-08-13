@@ -108,10 +108,18 @@ interface Props {
 
 /** ⚠ One place per lane for its colour, its heading and its button copy, so a
  *  block and the button that sweeps it can never drift apart. */
+// ⚠⚠ OTA-1243 — ONE WORD: SALVAGE. Owner: *"in my mind salvage and scrap are kind
+// of the right same thing"* — and this card was the worst offender, a lane headed
+// SCRAP with a button reading SALVAGE ALL. Two words for one concept inside a
+// single card is the place a player first learns to distrust the vocabulary. The
+// internal lane id stays `scrap` (code names are not player-facing); every string
+// a player reads says SALVAGE. "Scrap" survives only as ITEM names (Scrap Metal,
+// Cloth Scrap) and the inventory's breakdown verb copy, which OTA-1243 also
+// renames — see InventoryScreen.
 const LANE_HEADING: Record<GatherLane, string> = {
   gear: 'GEAR',
   items: 'ITEMS',
-  scrap: 'SCRAP',
+  scrap: 'SALVAGE',
   lead: 'WORTH A LOOK',
 };
 
@@ -215,7 +223,7 @@ export function GatherModal({
     const tail =
       lane === 'lead' ? 'INVESTIGATE'
         : upgrade ? 'BETTER'
-          : lane === 'scrap' ? 'scrap'
+          : lane === 'scrap' ? 'salvage'
             : '→ pack';
     return (
       <Pressable

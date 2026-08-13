@@ -160,9 +160,9 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     // ⚠ Same button as the cudgel beat, and saying so is the lesson: one picker
     // holds both verbs, and the room tells you which one a thing answers to. The
     // plate comes up in the yellow SCRAP lane, which is the whole teaching moment.
-    body: 'That broken chest plate has nothing left in it. Open TAKE / SALVAGE again — the plate is in the yellow SCRAP group. Tap it to break it down for parts.',
+    body: 'That broken chest plate has nothing left in it. Open TAKE / SALVAGE again — the plate is in the yellow SALVAGE group. Tap it to break it down for parts.',
     arbiter:
-      '"That broken plate is worth more in pieces. Same button as before — TAKE / SALVAGE. The yellow ones are scrap. Tap the plate."',
+      '"That broken plate is worth more in pieces. Same button as before — TAKE / SALVAGE. The yellow ones salvage. Tap the plate."',
   },
   {
     id: 'climb',

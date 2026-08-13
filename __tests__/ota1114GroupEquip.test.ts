@@ -173,7 +173,8 @@ describe('OTA-1114 — the screen wires both actions, and the destructive one is
 
   it('the "nothing here can be done" line now accounts for the gear actions too', () => {
     expect(screen).toContain('+ equipPlan.equip.length + unequippable.length === 0');
-    expect(screen).toContain('Nothing here can be worn, dropped, scrapped or reserved');
+    // ⚠ OTA-1243 — the breakdown verb is SALVAGE in all player copy now.
+    expect(screen).toContain('Nothing here can be worn, dropped, salvaged or reserved');
   });
 });
 

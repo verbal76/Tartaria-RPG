@@ -69,7 +69,9 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // construct" failing to advance the wreck_construct hook because
     // there was no salvage verb. Investigate is hook-eligible, so
     // mapping salvage here advances the hook with the right noun.
-    'salvage', 'strip', 'pry',
+    // ⚠ OTA-1243 — 'scrap' accepted as a synonym: the UI now says SALVAGE
+    // everywhere, but a player who thinks in the old word must not be refused.
+    'salvage', 'scrap', 'strip', 'pry',
     // From the track / translate / learn / gather cards.
     'track', 'translate', 'learn', 'gather',
     // 'open' belongs to the dedicated open intent — it persists

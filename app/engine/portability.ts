@@ -50,7 +50,7 @@ const RULES: PortabilityRule[] = [
       `The {target} is staying right where it is. Centuries-old stonework doesn't fit in any pack ever made.`,
       `The Arbiter raises an eyebrow. "The {target}? With what — a second {target} to carry it in?"`,
       `You eye the {target}. Whatever you'd need to move it, you do not have.`,
-      `The {target} is part of the building, not a thing you take. Open TAKE / SALVAGE and tap it under SCRAP if you want pieces of it.`,
+      `The {target} is part of the building, not a thing you take. Open TAKE / SALVAGE and tap it under SALVAGE if you want pieces of it.`,
     ],
   },
   {
@@ -75,7 +75,7 @@ const RULES: PortabilityRule[] = [
       'siege', 'experiment table', 'observation chair',
     ],
     refusals: [
-      `The {target} weighs more than you, by a wide margin. Strip parts off it instead — TAKE / SALVAGE, under SCRAP.`,
+      `The {target} weighs more than you, by a wide margin. Strip parts off it instead — TAKE / SALVAGE, under SALVAGE.`,
       `You set hands on the {target}. The {target} does not move. You let go before it notices.`,
     ],
   },

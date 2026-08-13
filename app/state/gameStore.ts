@@ -30,6 +30,7 @@ import {
   applyDogPronouns,
   trainDogStat,
   type RescueScenarioId,
+  type RescueScenario,
 } from '../engine/dogCompanion';
 // ⚠ OTA-1236 — ONE rule for "this noun carries a next step", shared by the engine
 // dispatch, the bulk-salvage guard, the loot picker's lead lane and the
@@ -10788,7 +10789,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const pool = ['rain pool', 'crevice-pool', 'puddle', 'shallow pool', 'standing water', 'cold spring', 'still pond'];
       return [pool[h % pool.length]!];
     })();
-    const ambientNouns = Array.from(new Set([...sceneGearNouns, ...waterSourceNouns, ...baseTakeable, ...allClimbablesPool, ...allSalvageablesPool]));
+    // ⚠⚠ OTA-1243 — THE DOG-RESCUE PROP IS PLACED, NOT HOPED FOR.
+    //
+    // `RESCUE_SCENARIOS` has carried an `archetypes` field since OTA-120 — "scene
+    // archetypes where this hook is eligible to spawn, matched against
+    // location.tags" — and NOTHING EVER CONSUMED IT. The rescue only fired when a
+    // player happened to engage a noun the matcher recognised, and the OTA-1241
+    // census measured what that meant: 13 of the scenarios' 19 hook nouns match
+    // nothing the world places. The cellar rescue was reachable only through
+    // `hatch`, the snare only through `trap` — the quest was riding on vocabulary
+    // accidents. This builds the injection that field always described: on an
+    // archetype-matching tile, while the rescue can still fire, the scenario's OWN
+    // primary prop is seeded into the scene.
+    //
+    // ⚠ Seeded by tile key like the water sources — stable per tile, not farmable
+    // by leave-and-return — and at 22% of eligible tiles so a wasteland walk reads
+    // as occasionally holding a story, not as a prop on every screen. ⚠ GATED on
+    // rescue eligibility (no dog, no onboarding pending), so once the quest is
+    // done the world stops staging it; a prop already locked into a visited tile's
+    // cache just becomes an ordinary noun.
+    const rescuePropNouns: string[] = (() => {
+      if (get().player?.hubRoomId) return []; // indoor outpost rooms — never
+      if (get().player?.dog || get().worldMemory.pendingDogOnboarding) return [];
+      const locTags = (location.tags ?? []).map((t) => String(t).toLowerCase());
+      const eligible = (Object.values(RESCUE_SCENARIOS) as RescueScenario[])
+        .filter((sc) => sc.archetypes.some((a) => locTags.includes(a)));
+      if (eligible.length === 0) return [];
+      let h = 0;
+      const seedStr = `dog-prop:${candidateKey}`;
+      for (let i = 0; i < seedStr.length; i++) h = (h * 31 + seedStr.charCodeAt(i)) >>> 0;
+      if (h % 100 >= 22) return [];
+      const sc = eligible[h % eligible.length]!;
+      // hookNouns[0] is each scenario's primary prop — cage / wagon / cellar
+      // door / snare pit — the noun its intro copy was written around.
+      return sc.hookNouns.length > 0 ? [sc.hookNouns[0]!] : [];
+    })();
+    const ambientNouns = Array.from(new Set([...sceneGearNouns, ...waterSourceNouns, ...rescuePropNouns, ...baseTakeable, ...allClimbablesPool, ...allSalvageablesPool]));
     // Lock the visible subset for THIS tile. Look-around and the chip pool
     // (Search/Approach/Salvage) BOTH read from this same cache — strict
     // match. If a noun isn't in your look-around, it isn't in your chips
@@ -10832,6 +10868,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // uncapped ambient pool the fill handler reads.
     if (waterSourceNouns.length > 0) {
       displayedAmbientNouns = Array.from(new Set([...waterSourceNouns, ...displayedAmbientNouns]));
+    }
+    // ⚠ OTA-1243 — same guarantee for the rescue prop: a story hook the display
+    // cap can silently drop is a story hook that does not exist.
+    if (rescuePropNouns.length > 0) {
+      displayedAmbientNouns = Array.from(new Set([...rescuePropNouns, ...displayedAmbientNouns]));
     }
     // arb39 — persistent-room emptiness for hub interiors (the tutorial
     // outpost rooms, capital halls, etc.). Once an interactable has been
@@ -12452,7 +12493,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // sentence, the reward, and straight on — the quip is gone; the
         // reward line already says ruins pay out.
         get().appendLog('world', 'You pop the rusted plate off its strap and it comes apart along old hammer-marks.');
-        get().appendLog('reward', '✦ Plate Fragment x2 (Common). [scrapped]');
+        get().appendLog('reward', '✦ Plate Fragment x2 (Common). [salvaged]');
         get().maybeAdvanceTutorial('scrap');
         return;
       }
@@ -29906,7 +29947,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       look: 'tap the glowing LOOK AROUND YOU button to get your bearings.',
       cudgel: 'tap the glowing TAKE / SALVAGE button, then tap the cudgel in the list.',
       rope: "type 'take rope' in the box, then tap ACT.",
-      scrap: 'tap the glowing TAKE / SALVAGE button, then tap the chest plate under SCRAP.',
+      scrap: 'tap the glowing TAKE / SALVAGE button, then tap the chest plate under SALVAGE.',
       climb: 'tap the glowing CLIMB button.',
       investigate: 'tap the glowing INVESTIGATE button and look at the door.',
       explore_or_leave: 'answer the prompt — stay and explore, or leave the outpost.',

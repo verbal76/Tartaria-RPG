@@ -75,7 +75,12 @@ describe('OTA-1235 — three lanes, three colours, all visible at once', () => {
     // that is the complaint this redesign answers.
     expect(text).toContain('GEAR');
     expect(text).toContain('ITEMS');
-    expect(text).toContain('SCRAP');
+    // ⚠ OTA-1243 — the lane heading reads SALVAGE now, matching its own button.
+    // Owner: "salvage and scrap are kind of the right same thing" — a lane headed
+    // SCRAP over a button reading SALVAGE ALL was two words for one concept inside
+    // one card.
+    expect(text).toContain('SALVAGE');
+    expect(text).not.toContain('SCRAP');
     expect(text).toContain('⚔|Compact Blaster');
     expect(text).toContain('🛡|Aetherbound Mask');
     expect(text).toContain('▪|Aetheric Torch');
@@ -92,7 +97,7 @@ describe('OTA-1235 — three lanes, three colours, all visible at once', () => {
     // the wrong one, its colour would promise the wrong button.
     const gearAt = text.indexOf('GEAR');
     const itemsAt = text.indexOf('ITEMS');
-    const scrapAt = text.indexOf('SCRAP');
+    const scrapAt = text.indexOf('SALVAGE'); // OTA-1243 — the heading renamed
     expect(gearAt).toBeLessThan(itemsAt);
     expect(itemsAt).toBeLessThan(scrapAt);
     expect(text.indexOf('Compact Blaster')).toBeLessThan(itemsAt);

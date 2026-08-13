@@ -71,7 +71,13 @@ export const RESCUE_SCENARIOS: Record<RescueScenarioId, RescueScenario> = {
     captorFactionId: 'reclaimers',
     defaultBreed: 'mongrel',
     startingProfile: 'mongrel',
-    archetypes: ['ruin', 'forge', 'industrial', 'wasteland'],
+    // ⚠⚠ OTA-1243 — CENSUSED AGAINST THE REAL TAG VOCABULARY. The original four
+    // words gave this scenario 3 eligible locations; `wagon` and `snare` had ZERO,
+    // because 'road', 'camp' and 'wilderness' are not tags any location carries.
+    // The field was written against an imagined world. The real vocabulary is
+    // open/mud/borderlands/buried/lost_capital/ruin — additions below are drawn
+    // from that list, originals kept in case the tags ever appear.
+    archetypes: ['ruin', 'forge', 'industrial', 'wasteland', 'lost_capital', 'buried'],
     captorName: 'Reclaimer Deserter',
     victoryLine:
       'The Reclaimer deserter falls into the slag. The dog is still chained, watching you with the wary level look of an animal that has read its odds. They were keeping the dog illegally. No faction reckoning falls on you for this.',
@@ -82,7 +88,7 @@ export const RESCUE_SCENARIOS: Record<RescueScenarioId, RescueScenario> = {
     captorFactionId: 'mud_monarchs',
     defaultBreed: 'shepherd',
     startingProfile: 'shepherd',
-    archetypes: ['road', 'wasteland', 'camp'],
+    archetypes: ['road', 'wasteland', 'camp', 'open', 'borderlands'],
     captorName: 'Mud Monarch Enforcer',
     victoryLine:
       'The enforcer breathes wet, then not at all. The shepherd lashed to the wheel finally stops growling at you — starts watching you instead. They were keeping the dog illegally. No faction reckoning falls on you for this.',
@@ -93,7 +99,7 @@ export const RESCUE_SCENARIOS: Record<RescueScenarioId, RescueScenario> = {
     captorFactionId: 'aetherborn',
     defaultBreed: 'hound',
     startingProfile: 'hound',
-    archetypes: ['ruin', 'dungeon', 'buried', 'wasteland'],
+    archetypes: ['ruin', 'dungeon', 'buried', 'wasteland', 'lost_capital'],
     captorName: 'Aetherborn Scavenger',
     victoryLine:
       'The scavenger crumples into the dark below. Up through the cellar floor comes a hound, lean and quiet, that pauses to look you over before it commits. They were keeping the dog illegally. No faction reckoning falls on you for this.',
@@ -109,7 +115,7 @@ export const RESCUE_SCENARIOS: Record<RescueScenarioId, RescueScenario> = {
     captorFactionId: null, // unaligned — always available as fallback
     defaultBreed: 'mutt',
     startingProfile: 'mutt',
-    archetypes: ['wilderness', 'wasteland', 'camp'],
+    archetypes: ['wilderness', 'wasteland', 'camp', 'mud', 'open'],
     captorName: 'Unaligned Poacher',
     victoryLine:
       'The poacher folds over the line of their own snare. The mutt in the pit stops snarling, settles. They were keeping the dog illegally. No faction reckoning falls on you for this.',
