@@ -230,6 +230,23 @@ export function ExplorationScreen() {
   const setVendorChipDismissedKey = useGameStore((s) => s.setVendorChipDismissedKey);
   const vendorChipDismissed = !!vendorDismissedKey && vendorDismissedKey === chipViewKey;
   const [takeOpen, setTakeOpen] = useState(false);
+  // ⚠⚠ OTA-1238 — THE ONE THING THAT CLOSES IT WITHOUT THE PLAYER ASKING.
+  //
+  // Now that the picker survives a selection (owner: *"the top hat should stay
+  // open ... until you hit the ignore button"*), it can outlive the room being
+  // safe. `salvage <noun>` routes through the investigate verb, which carries a
+  // 6% ambush roll, and a lead tap spawns a rescue captor outright. A loot list
+  // floating over a fight is not a choice the player made — every action behind
+  // it would be refused with "Not while X is on you", which is the "button did
+  // nothing" complaint wearing a different hat.
+  //
+  // ⚠ It closes on the ARRIVAL of an enemy, not on their presence: the picker is
+  // never openable mid-fight in the first place, so this fires exactly once, on
+  // the transition, and cannot fight the player for control of the screen.
+  const liveEnemyCount = currentScene?.enemies?.length ?? 0;
+  useEffect(() => {
+    if (takeOpen && liveEnemyCount > 0) setTakeOpen(false);
+  }, [takeOpen, liveEnemyCount]);
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
   // <noun>` which resolves one tier in the climb handler.
@@ -1880,15 +1897,31 @@ export function ExplorationScreen() {
                     consumed: isAmbientConsumed(n) || isExhaustedHookNoun(n),
                   }))
         }
+        // ⚠⚠ OTA-1238 — THE PICKER STAYS OPEN ACROSS SELECTIONS. Owner: *"the top
+        // hat should stay open during all of the selections until you hit the
+        // ignore button so you don't have to keep reopening it."* Every handler
+        // used to close it, so clearing a five-noun room was ten taps: act, reopen,
+        // act, reopen. The list is already reactive — the acted-on noun drops out
+        // of `chips` on the next store tick — so the popup just had to stop
+        // dismissing itself.
+        //
+        // ⚠ A TUTORIAL BEAT STILL CLOSES IT, and that is not an inconsistency: the
+        // next beat's target is the input row or a quick button, both of which sit
+        // BEHIND this modal. Leaving it open would put the pulse under the scrim
+        // and stall the tutorial on turn one — the exact failure the OTA-1237 copy
+        // pass was cleaning up after.
         onTake={(noun) => {
           Keyboard.dismiss();
-          setTakeOpen(false);
-          if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') { submit('take cudgel'); return; }
+          if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') {
+            setTakeOpen(false);
+            submit('take cudgel');
+            return;
+          }
           takeAmbientNoun(noun);
         }}
         onSalvage={(noun) => {
           Keyboard.dismiss();
-          setTakeOpen(false);
+          if (tutBeat === 'scrap') setTakeOpen(false);
           // Routed through the parser exactly as the old salvage picker did, so
           // the hook system and scene-noun matcher see the same input they always
           // have (OTA-117 made 'salvage' an investigate verb synonym for that).
@@ -1897,6 +1930,11 @@ export function ExplorationScreen() {
         // ⚠⚠ OTA-1236 — the lead lane's single tap INVESTIGATES. It is the only
         // verb that fires the dog rescue or opens a story hook; taking or salvaging
         // the noun spends it and takes the next step with it.
+        // ⚠⚠ THE LEAD IS THE ONE TAP THAT STILL CLOSES, ALWAYS. Investigating a
+        // lead is what fires the dog rescue (a captor spawns and a fight starts) or
+        // opens a story-hook popup. Neither is something to leave a loot list
+        // floating over — and the OTA-1236 sweep breaks on the same condition for
+        // the same reason.
         onInvestigate={(noun) => {
           Keyboard.dismiss();
           setTakeOpen(false);
@@ -1907,17 +1945,14 @@ export function ExplorationScreen() {
         stealthMeaningful={!!currentScene?.vendor}
         onStealthTake={(noun) => {
           Keyboard.dismiss();
-          setTakeOpen(false);
           stealthTakeAmbientNoun(noun);
         }}
         onTakeAll={(nouns) => {
           Keyboard.dismiss();
-          setTakeOpen(false);
           for (const n of nouns) takeAmbientNoun(n);
         }}
         onSalvageAll={(nouns) => {
           Keyboard.dismiss();
-          setTakeOpen(false);
           // The store's bulk path — which since OTA-1231 skips catalog items, so
           // this can never scrap something the player could have pocketed.
           useGameStore.getState().salvageAllAmbient(nouns);

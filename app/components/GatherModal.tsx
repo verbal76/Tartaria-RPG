@@ -353,14 +353,22 @@ export function GatherModal({
 // red ignore — each used on the block border, the heading, the icon and the
 // button face, and used for NOTHING ELSE in this modal. The moment a hue means
 // two things the player is back to reading tail text.
-const GEAR = '#e08a3c';
-const ITEMS = '#7fbf5f';
-const SCRAP = '#d8c04a';
-const IGNORE = '#b5533f';
+// ⚠⚠ OTA-1238 — DIMMED. Owner: *"dim the selections a bit, they glow when they
+// shouldn't."* He is describing a real effect, not a preference: a fully saturated
+// hue on a near-black card (#13110f) blooms on an OLED panel, and the outline-only
+// rework made it worse rather than better — with the fill gone, the border is the
+// only place the colour lives, so all of that saturation ended up on a 1px edge.
+// Each hue drops roughly a fifth of its lightness AND some saturation; the second
+// half is what actually kills the bloom. The lane is still readable at a glance,
+// which is the only job the colour has.
+const GEAR = '#b5773f';
+const ITEMS = '#6f9c58';
+const SCRAP = '#b0a04f';
+const IGNORE = '#94533f';
 // ⚠ The lead's hue is the ONE cool colour in a warm card, so it does not read as
 // a fourth thing you can sweep — and it is the same pale violet the Aetheric
 // Torch's ✦ already uses for "worth a look", so the player has met it before.
-const LEAD = '#b9a3e3';
+const LEAD = '#9a8cbb';
 
 const styles = StyleSheet.create({
   scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.72)', justifyContent: 'center', padding: 18 },
@@ -405,7 +413,7 @@ const styles = StyleSheet.create({
   rowScrap: { borderColor: SCRAP },
   rowLead: { borderColor: LEAD },
   // ⚠ Brighter gear, and a heavier edge — still one hue, still no fill.
-  rowUpgrade: { borderColor: '#ffb066', borderWidth: 2 },
+  rowUpgrade: { borderColor: '#d09a63', borderWidth: 2 },
   rowConsumed: { opacity: 0.35 },
   rowPressed: { opacity: 0.7 },
 
@@ -416,12 +424,12 @@ const styles = StyleSheet.create({
   iconItems: { color: ITEMS },
   iconScrap: { color: SCRAP },
   iconLead: { color: LEAD },
-  iconUpgrade: { color: '#ffb066' },
+  iconUpgrade: { color: '#d09a63' },
 
   rowText: { flex: 1, color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
   rowTextConsumed: { color: '#6f6759', textDecorationLine: 'line-through' },
   rowTail: { fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
-  tailUpgrade: { color: '#ffb066' },
+  tailUpgrade: { color: '#d09a63' },
 
   // ⚠ The sweep buttons keep a faint face — they are the one thing here that is
   // pressed rather than read, and a bare outline at the bottom of a list of bare

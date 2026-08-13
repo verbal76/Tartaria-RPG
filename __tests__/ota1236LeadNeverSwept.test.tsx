@@ -278,6 +278,81 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     expect(screen).toContain('leadNouns={leadNouns}');
   });
 
+  it('⚠⚠ OTA-1238: THE PICKER SURVIVES A SELECTION — take, salvage and both sweeps', () => {
+    // Owner: *"the top hat should stay open during all of the selections until you
+    // hit the ignore button so you don't have to keep reopening it."* Clearing a
+    // five-noun room used to be ten taps: act, reopen, act, reopen. The list is
+    // already reactive, so the popup only had to stop dismissing itself.
+    const screen = src('app', 'screens', 'ExplorationScreen.tsx');
+    const i = screen.indexOf('<GatherModal');
+    const j = screen.indexOf('<MissionBoardModal');
+    expect(i).toBeGreaterThan(-1);
+    expect(j).toBeGreaterThan(i);
+    const block = screen.slice(i, j);
+    // Exactly THREE closers survive in the picker block, and each is deliberate:
+    // the two tutorial beats, the lead tap, and IGNORE.
+    for (const handler of ['onStealthTake', 'onTakeAll', 'onSalvageAll']) {
+      const h = block.slice(block.indexOf(`${handler}={`), block.indexOf(`${handler}={`) + 320);
+      expect(h).not.toContain('setTakeOpen(false)');
+    }
+    // IGNORE still closes — the way out never moves.
+    expect(block).toContain('onCancel={() => { Keyboard.dismiss(); setTakeOpen(false); }}');
+  });
+
+  it('⚠⚠ OTA-1238: ...except a LEAD tap and a TUTORIAL beat, both for stated reasons', () => {
+    const screen = src('app', 'screens', 'ExplorationScreen.tsx');
+    const block = screen.slice(screen.indexOf('<GatherModal'), screen.indexOf('<MissionBoardModal'));
+    // A lead spawns the rescue captor / opens a hook popup — never leave a loot
+    // list floating over that.
+    const lead = block.slice(block.indexOf('onInvestigate={'), block.indexOf('onInvestigate={') + 220);
+    expect(lead).toContain('setTakeOpen(false)');
+    // A tutorial beat's NEXT target is the input row or a quick button, both of
+    // which sit behind this modal. Leaving it open puts the pulse under the scrim.
+    const take = block.slice(block.indexOf('onTake={'), block.indexOf('onTake={') + 400);
+    expect(take).toContain("tutBeat === 'cudgel'");
+    expect(take).toContain('setTakeOpen(false)');
+    const salv = block.slice(block.indexOf('onSalvage={'), block.indexOf('onSalvage={') + 300);
+    expect(salv).toContain("tutBeat === 'scrap'");
+  });
+
+  it('⚠⚠ OTA-1238: a fight closes it, because every action behind it would be refused', () => {
+    // `salvage <noun>` routes through the investigate verb, which carries a 6%
+    // ambush roll. A picker that survives a selection can now outlive the room
+    // being safe, and a loot list over a fight is the "button did nothing"
+    // complaint wearing a different hat.
+    const screen = src('app', 'screens', 'ExplorationScreen.tsx');
+    const i = screen.indexOf('const liveEnemyCount =');
+    expect(i).toBeGreaterThan(-1);
+    const block = screen.slice(i, i + 300);
+    expect(block).toContain('takeOpen && liveEnemyCount > 0');
+    expect(block).toContain('setTakeOpen(false)');
+  });
+
+  it('⚠⚠ OTA-1238: the lane hues are DIMMED — saturation on near-black is the glow', () => {
+    // Owner: *"dim the selections a bit, they glow when they shouldn't."* Real
+    // effect, not a preference: the outline-only rework left the border as the ONLY
+    // place the colour lives, so all of that saturation ended up on a 1px edge over
+    // #13110f. Pinned as a ceiling on both channels rather than as four exact
+    // strings, so the palette can be tuned without rewriting the test — but it
+    // cannot creep back up to full brightness.
+    const mod = src('app', 'components', 'GatherModal.tsx');
+    const chan = (hex: string, i: number): number => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
+    for (const name of ['GEAR', 'ITEMS', 'SCRAP', 'IGNORE', 'LEAD']) {
+      const m = new RegExp(`^const ${name} = '(#[0-9a-f]{6})';`, 'm').exec(mod);
+      expect(m).not.toBeNull();
+      const hex = m![1]!;
+      const [r, g, b] = [chan(hex, 0), chan(hex, 1), chan(hex, 2)];
+      // No channel pinned at/near full — that is what blooms on an OLED panel.
+      expect(Math.max(r, g, b)).toBeLessThanOrEqual(200);
+      // ...and still bright enough to read as a colour rather than as grey.
+      expect(Math.max(r, g, b)).toBeGreaterThanOrEqual(120);
+      // Not fully saturated: the darkest channel is never crushed to nothing.
+      expect(Math.min(r, g, b)).toBeGreaterThanOrEqual(40);
+    }
+    // The upgrade accent rides the same card and blooms the same way.
+    expect(mod).not.toContain('#ffb066');
+  });
+
   it('⚠ a SPENT lead stops being one — it must not pin scrap out of reach forever', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('const leadNouns = useMemo(');

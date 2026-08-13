@@ -1644,8 +1644,41 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — OUTLINES, AND THE INTRO CATCHES UP (2026-08-12,
-  latest). GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1237. **Same
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE PICKER STAYS OPEN (2026-08-13, latest).
+  GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1238. **Same merge-or-revert
+  decision point.**
+
+  **It stops dismissing itself.** Owner: *"the top hat should stay open during all
+  of the selections until you hit the ignore button."* Every handler closed it, so
+  clearing a five-noun room was ten taps. ⚠⚠ **THAT IS THE OTA-1233 COMPLAINT
+  REINTRODUCED ONE LAYER DOWN** — "two modals for one intention" became "one modal,
+  opened five times". **Merging two pickers does not help if the merged one still
+  closes after every act.** The list was already reactive; the popup just had to
+  stop closing.
+
+  Three closers survive, each pinned: **IGNORE** (the way out never moves), **a
+  tutorial beat** (the next beat's target is the input row or a quick button, both
+  BEHIND this modal — leaving it open puts the pulse under the scrim), and **a lead
+  tap** (it spawns the rescue captor or opens a hook popup).
+
+  ⚠⚠ **AND ONE THING CLOSES IT UNASKED: A FIGHT.** A picker that survives a
+  selection can outlive the room being safe — `salvage <noun>` routes through the
+  investigate verb and carries a 6% ambush roll. **Whenever you make a popup
+  persistent, ask what can change underneath it while it is open.** Closes on the
+  ARRIVAL of an enemy, not their presence, so it fires once on the transition and
+  cannot fight the player for the screen.
+
+  **The hues are dimmed.** Owner: *"dim the selections a bit, they glow when they
+  shouldn't."* ⚠ **OTA-1237's outline-only rework concentrated it** — a mechanism,
+  not a measured diagnosis: removing the fill left the border as the only place the
+  colour lives, so the same saturation now sits entirely on a 1px edge over a
+  near-black card. Owner's eyes on an OLED panel are the only evidence, and that is
+  enough for a look call. Each lane drops ~20% lightness and some saturation.
+  Pinned as channel CEILINGS, not exact strings, so the palette stays tunable.
+  Full story: the VERSION.md 4.29.166 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — OUTLINES, AND THE INTRO CATCHES UP (2026-08-12).
+  GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1237. **Same
   merge-or-revert decision point — now also covering `tutorialSteps.ts` and the
   portability / gameStore refusal copy.**
 
