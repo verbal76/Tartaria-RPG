@@ -1644,7 +1644,35 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — NO STEALTH TOGGLE (2026-08-13, latest). GOLEM
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — AN EMPTIED PICKER CLOSES ITSELF (2026-08-13,
+  latest). GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1240. **Same
+  merge-or-revert decision point.**
+
+  Owner: *"if there is nothing left, it doesn't need to wait for the ignore
+  button."* The tail OTA-1238 left behind — it made the picker survive a selection,
+  and then the last step was still a mandatory tap on an empty card. IGNORE means
+  *leave the rest*; there is no rest.
+
+  ⚠ **The 800ms hold is the investigate picker's OTA-257 beat, matched on purpose**
+  so the two feel like one thing: the last tap has to visibly land before the card
+  goes. Asserted with fake timers (nothing at 400ms, closed by 900ms), not by
+  grepping for a `setTimeout`.
+
+  ⚠⚠ **IT ONLY FIRES IF THE PICKER HAD ROWS.** A picker that opens empty and closes
+  instantly is indistinguishable from a button that did nothing — **the exact
+  complaint OTAs 1234–1239 have all been variations on.** Open-empty says the room
+  is picked clean and waits.
+
+  ⚠⚠ **AND THE ONE THAT WOULD HAVE BITTEN:** `onCancel` is an inline arrow, so its
+  identity changes every parent render. An effect depending on it restarts the
+  800ms timer on each render — **the picker would have closed reliably in a still
+  scene and never closed in a busy one.** The live closure rides a ref; the effect
+  depends only on `[visible, rowCount]`. **Any timer whose callback is an inline
+  prop needs this — and the failure mode is intermittent, which is why it is worth
+  writing down rather than rediscovering.**
+  Full story: the VERSION.md 4.29.168 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — NO STEALTH TOGGLE (2026-08-13). GOLEM
   ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1239. **Same merge-or-revert decision
   point — it also DELETES `app/components/TakeModal.tsx` and the
   `stealthTakeAmbientNoun` store action, so a HAL port must account for both.**

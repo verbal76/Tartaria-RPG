@@ -25,7 +25,8 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 import React from 'react';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const renderer = require('react-test-renderer') as {
-  create(el: React.ReactElement): { toJSON(): unknown };
+  act(cb: () => void): void;
+  create(el: React.ReactElement): { toJSON(): unknown; update(el: React.ReactElement): void };
 };
 import { GatherModal } from '../app/components/GatherModal';
 import { laneForKind, laneHasSweep } from '../app/engine/gatherSort';
@@ -349,6 +350,71 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     }
     // The upgrade accent rides the same card and blooms the same way.
     expect(mod).not.toContain('#ffb066');
+  });
+
+  it('⚠⚠ OTA-1240: an EMPTIED picker closes itself — no ceremonial tap on an empty card', () => {
+    // Owner: *"if there is nothing left, it doesn't need to wait for the ignore
+    // button."* OTA-1238 made the picker survive a selection so clearing a room is
+    // one visit instead of ten; the last step of that visit was still a mandatory
+    // tap on a card showing nothing. IGNORE means *leave the rest*, and there is
+    // no rest.
+    jest.useFakeTimers();
+    try {
+      let closed = 0;
+      const el = (chips: { noun: string }[]) => (
+        <GatherModal
+          visible player={null} chips={chips} leadNouns={[]}
+          onTake={() => {}} onSalvage={() => {}} onTakeAll={() => {}} onSalvageAll={() => {}}
+          onInvestigate={() => {}} onCancel={() => { closed += 1; }}
+        />
+      );
+      let tree!: { toJSON(): unknown; update(e: React.ReactElement): void };
+      renderer.act(() => { tree = renderer.create(el([{ noun: 'bench' }])); });
+      renderer.act(() => { tree.update(el([])); });
+      // ⚠ THE HOLD IS REAL AND IS ASSERTED AS SUCH — the same 800ms beat the
+      // investigate picker has used since OTA-257. The player taps the last row,
+      // and the card must still be there long enough for the tap to have visibly
+      // landed; snapping shut on the same frame reads as a crash, not as done.
+      renderer.act(() => { jest.advanceTimersByTime(400); });
+      expect(closed).toBe(0);
+      renderer.act(() => { jest.advanceTimersByTime(500); });
+      expect(closed).toBe(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('⚠⚠ OTA-1240: ...but a picker that OPENS empty explains itself and WAITS', () => {
+    // Opening onto an empty list and closing instantly is indistinguishable from a
+    // button that did nothing — the exact complaint this run of OTAs has been
+    // chasing. That player needs an explanation, not a dismissal.
+    jest.useFakeTimers();
+    try {
+      let closed = 0;
+      renderer.act(() => {
+        renderer.create(
+          <GatherModal
+            visible player={null} chips={[]} leadNouns={[]}
+            onTake={() => {}} onSalvage={() => {}} onTakeAll={() => {}} onSalvageAll={() => {}}
+            onInvestigate={() => {}} onCancel={() => { closed += 1; }}
+          />,
+        );
+      });
+      renderer.act(() => { jest.advanceTimersByTime(5000); });
+      expect(closed).toBe(0);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('⚠ the close timer does not depend on the inline onCancel, or it would never fire', () => {
+    // `onCancel` is an inline arrow at the call site, so its identity changes on
+    // every parent render. If the effect depended on it, each render would tear
+    // down and restart the 800ms timer and the picker would never close.
+    const mod = src('app', 'components', 'GatherModal.tsx');
+    expect(mod).toContain('const cancelRef = useRef(onCancel)');
+    expect(mod).toContain('setTimeout(() => cancelRef.current(), 800)');
+    expect(mod).toContain('}, [visible, rowCount]);');
   });
 
   it('⚠ a SPENT lead stops being one — it must not pin scrap out of reach forever', () => {

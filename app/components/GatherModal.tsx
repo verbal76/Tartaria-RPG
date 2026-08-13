@@ -61,7 +61,7 @@
 // **the OTA-1229 test that guarded it stayed pinned to TakeModal.tsx — a file
 // nothing has rendered since OTA-1233.** The pin kept passing against a corpse.
 // A source pin proves a line exists; it cannot prove anything renders it.
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Modal, View, Text, StyleSheet, ScrollView, TouchableWithoutFeedback, Pressable,
 } from 'react-native';
@@ -152,6 +152,47 @@ export function GatherModal({
       // that means nothing.
       .filter((r) => isActionableGatherKind(r.kind)),
   );
+
+  // ⚠⚠ OTA-1240 — AN EMPTY ROOM CLOSES ITSELF. Owner: *"if there is nothing left,
+  // it doesn't need to wait for the ignore button."* Right — OTA-1238 made the
+  // picker survive a selection so clearing a room is one visit instead of ten, and
+  // the last step of that visit was still a mandatory tap on a card showing
+  // nothing. IGNORE means *leave the rest*; when there is no rest, there is
+  // nothing to decide.
+  //
+  // ⚠ THE 800ms HOLD IS NOT A DELAY FOR ITS OWN SAKE — it is the same beat the
+  // investigate picker has used since OTA-257, for the same reason: the player
+  // taps the last row, and the card has to still be there long enough for that tap
+  // to have visibly landed. Snapping shut on the same frame reads as the popup
+  // crashing rather than as the room being finished. Matching the number keeps the
+  // two pickers feeling like one thing.
+  //
+  // ⚠⚠ AND IT ONLY FIRES IF THE PICKER HAD SOMETHING TO BEGIN WITH. Opening onto
+  // an empty list and closing instantly is indistinguishable from a button that
+  // did nothing — the exact complaint this whole run of OTAs has been chasing. If
+  // it opens empty, it SAYS the room is picked clean and waits, because that is a
+  // player who needs an explanation, not a dismissal.
+  const hadRowsThisOpen = useRef(false);
+  // ⚠ The callback lives in a ref, and the timer effect does NOT depend on it.
+  // `onCancel` is an inline arrow at the call site, so its identity changes on
+  // every parent render — depending on it would tear down and restart the 800ms
+  // timer on each one, and a picker whose close timer keeps resetting never
+  // closes. The ref keeps the LIVE closure without making it a dependency.
+  const cancelRef = useRef(onCancel);
+  cancelRef.current = onCancel;
+  const rowCount = rows.length;
+  useEffect(() => {
+    if (!visible) { hadRowsThisOpen.current = false; return undefined; }
+    if (rowCount > 0) { hadRowsThisOpen.current = true; return undefined; }
+    // Opened onto an empty room: explain, do not dismiss.
+    if (!hadRowsThisOpen.current) return undefined;
+    const t = setTimeout(() => cancelRef.current(), 800);
+    return () => clearTimeout(t);
+  }, [visible, rowCount]);
+  // Reading the ref during render is fine — it was last written by the PREVIOUS
+  // render's effect, so by the time the count reaches zero it already knows
+  // whether this picker ever had anything in it.
+  const emptiedByPlayer = visible && rowCount === 0 && hadRowsThisOpen.current;
 
   const inLane = (lane: GatherLane): GatherRow[] =>
     rows.filter((r) => laneForKind(r.kind) === lane);
@@ -307,7 +348,9 @@ export function GatherModal({
 
               {rows.length === 0 ? (
                 <Text style={styles.empty}>
-                  Nothing here to take or pry apart. The room is picked clean.
+                  {emptiedByPlayer
+                    ? 'That is everything. The room is picked clean.'
+                    : 'Nothing here to take or pry apart. The room is picked clean.'}
                 </Text>
               ) : (
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.list}>
