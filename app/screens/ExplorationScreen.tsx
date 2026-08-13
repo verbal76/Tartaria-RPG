@@ -569,13 +569,29 @@ export function ExplorationScreen() {
   // the owner's log shows LOOK listing the room without the cudgel in it. Dropping
   // the override would have deleted the demo prop from the picker entirely and
   // stalled the beat.
+  // ⚠⚠ OTA-1250 — HOISTED, BECAUSE IT NOW DRIVES TWO THINGS. The demo prop the
+  // beat is about is both the chip that gets merged in AND the ONE noun the picker
+  // will act on. Computing it twice is the drift this session has paid for six
+  // times over; the picker's lock and the picker's contents read the same value.
+  const tutorialProp: string | null =
+    tutBeat === 'cudgel' ? 'cudgel'
+      : tutBeat === 'armor' ? "Mud-Warden's Vest"
+        : tutBeat === 'scrap' ? 'broken chest plate'
+          : null;
+  // ⚠⚠ ...AND THE PROP GOES SPENT WHEN IT IS TAKEN. From the owner's log, the vest
+  // row paid out FIVE TIMES: `consumed` was hardcoded false, so the armor beat —
+  // the one beat that deliberately does NOT advance on the take (it advances on
+  // the equip) — left a row that could be tapped forever. `grantTutorialItem`
+  // early-returns once the prop is consumed, so only the FIRST tap was a real
+  // grant; the four after it printed the reward line over nothing. A log line
+  // claiming an item the engine did not hand over is worse than a dead button.
+  const propConsumed = useGameStore((s) =>
+    tutorialProp === null ? false
+      : tutBeat === 'cudgel' ? !!s.tutorialPropsConsumed.cudgel
+        : tutBeat === 'armor' ? !!s.tutorialPropsConsumed.vest
+          : !!s.tutorialPropsConsumed.chestPlate);
   const gatherChips = useMemo(
     () => {
-      const tutorialProp =
-        tutBeat === 'cudgel' ? 'cudgel'
-          : tutBeat === 'armor' ? "Mud-Warden's Vest"
-            : tutBeat === 'scrap' ? 'broken chest plate'
-              : null;
       const room =
           // ⚠ ONE list, unfiltered by kind — the merge is the point. The
           // elevation filter still applies: while up a climb the picker lists
@@ -604,11 +620,11 @@ export function ExplorationScreen() {
       // the room is fully populated, and the thing the Arbiter just named is still
       // the easiest row to find.
       return tutorialProp
-        ? [{ noun: tutorialProp, consumed: false }, ...room.filter((c) => c.noun !== tutorialProp)]
+        ? [{ noun: tutorialProp, consumed: propConsumed }, ...room.filter((c) => c.noun !== tutorialProp)]
         : room;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tutBeat, currentScene, productivelyConsumedSet],
+    [tutorialProp, propConsumed, currentScene, productivelyConsumedSet],
   );
 
   // ⚠⚠ OTA-1245 — HOW MANY COLOUR LANES THIS ROOM WOULD ACTUALLY SHOW. Derived
@@ -2007,16 +2023,27 @@ export function ExplorationScreen() {
           seam OTA-1231's bugs lived in. GatherModal shows the room once and picks
           the verb per row: catalog items TAKE, everything else SALVAGES.
 
-          ⚠ BOTH TUTORIAL BEATS SURVIVE, and each still shows its prop ALONE. The
-          'cudgel' beat used to be a take-only picker and 'scrap' a salvage-only
-          one; with a single picker each beat narrows the whole list to its own
-          prop, which preserves the original fix (the guided beat must not offer
-          the room's real nouns alongside the demo one — playtest: "neither of
-          those are the cudgel"). */}
+          ⚠⚠ OTA-1250 — THE OUTPOST LOCKDOWN REACHES INSIDE THE MODAL. Owner, from
+          a device run: *"I broke it by just grabbing stuff, you should only be able
+          to do what it says, the other button touches should buzz."* OTA-1248 filled
+          the tutorial picker with the whole room so the layout could be TAUGHT, and
+          the lockdown that dims the quick row stopped at the modal's edge — so the
+          beat that says "tap the cudgel" opened a board where every row and all
+          three sweep buttons were live. He took an axe, a bow, a torch and a second
+          vest, then swept six nouns of scenery, in about four taps.
+
+          ⚠ SHOW EVERYTHING, ALLOW ONE. Hiding the rest would teach the layout by
+          deleting it, which is the state OTA-1248 exists to end. `lockedNoun` dims
+          the rest and buzzes on tap, exactly like the quick row. */}
       <GatherModal
         visible={takeOpen}
         player={player}
         chips={gatherChips}
+        lockedNoun={tutLock ? tutorialProp : null}
+        onBlocked={() => {
+          try { Vibration.vibrate([0, 32, 45, 32]); } catch { /* ignore */ }
+          useGameStore.getState().nudgeTutorialBlocked();
+        }}
         // ⚠⚠ OTA-1238 — THE PICKER STAYS OPEN ACROSS SELECTIONS. Owner: *"the top
         // hat should stay open during all of the selections until you hit the
         // ignore button so you don't have to keep reopening it."* Every handler
@@ -2037,11 +2064,17 @@ export function ExplorationScreen() {
             submit('take cudgel');
             return;
           }
-          // ⚠ OTA-1248 — the vest routes through the tutorial branch so the beat
-          // sees it. It does NOT close the picker: the beat completes on the EQUIP,
-          // and closing here would hide the rest of the room the owner asked to be
-          // shown in the first place.
+          // ⚠⚠ OTA-1250 — AND NOW IT CLOSES, REVERSING OTA-1248's CALL ON THIS ONE
+          // LINE. That reasoning was "the beat completes on the EQUIP, so closing
+          // would hide the room the owner asked to be shown" — but the owner's next
+          // run said the opposite about what should happen while it is open: *"you
+          // should only be able to do what it says."* With the lock in place the
+          // vest is the only live row, so once it is taken the card has nothing the
+          // player may touch but IGNORE — and the next step (open your pack) sits
+          // BEHIND this modal. A card whose every control refuses is worse than a
+          // closed one.
           if (tutBeat === 'armor' && /vest|warden/i.test(noun)) {
+            setTakeOpen(false);
             submit(`take ${noun}`);
             return;
           }

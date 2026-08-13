@@ -12529,6 +12529,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     cudgel auto-equips, which is exactly why nobody learned this step.
       if (tStep?.id === 'armor' && /\b(take|grab|pick\s*up|get)\s+.*(vest|mud-warden|warden)/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
+        // ⚠⚠ OTA-1250 — SAY IT ONLY IF IT HAPPENED. From the owner's device log,
+        // this block printed "✦ Mud-Warden's Vest (Common)." FIVE TIMES in six
+        // seconds. `grantTutorialItem` early-returns once the prop is consumed, so
+        // exactly one of those was a real grant and the other four were reward
+        // lines over nothing. ⚠ This beat is the only one that can hit it: every
+        // other prop intercept ADVANCES the beat, which takes its own branch out
+        // of reach: `armor` deliberately waits for the equip. A log line claiming
+        // an item the engine did not hand over is worse than a dead button — the
+        // player has no way to tell which of the five they actually own.
+        if (get().tutorialPropsConsumed.vest) {
+          get().appendLog('arbiter', '"You have it already. Open your pack and put it on."');
+          return;
+        }
         grantTutorialItem(get, set, 'vest');
         get().appendLog('world', "You lift the vest. Mud-warden plate, laced onto a hide backing — heavier than it looks, and it has kept someone alive before.");
         get().appendLog('reward', "✦ Mud-Warden's Vest (Common).");

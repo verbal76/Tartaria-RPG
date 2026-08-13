@@ -32,12 +32,13 @@ const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p)
 describe('OTA-1248 — the tutorial picker is fully populated', () => {
   it('⚠⚠ each beat MERGES its prop into the real room instead of replacing it', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
-    const chips = screen.slice(screen.indexOf('const gatherChips = useMemo('), screen.indexOf('const gatherLaneCount'));
+    const chips = screen.slice(screen.indexOf('const tutorialProp: string | null ='), screen.indexOf('const gatherLaneCount'));
     // The real room is still computed, with its elevation + oversized filters.
     expect(chips).toContain('reachableWhileElevated');
     expect(chips).toContain('const room =');
     // ...and the prop is PREPENDED to it, never substituted for it.
-    expect(chips).toContain('[{ noun: tutorialProp, consumed: false }, ...room');
+    // ⚠ OTA-1250 — `consumed: propConsumed` now; see that suite for the five-vest bug.
+    expect(chips).toContain('[{ noun: tutorialProp, consumed: propConsumed }, ...room');
     // No beat returns a bare one-item array any more.
     expect(chips).not.toContain("? [{ noun: 'cudgel', consumed: false }]");
     expect(chips).not.toContain("? [{ noun: 'broken chest plate', consumed: false }]");
@@ -45,7 +46,7 @@ describe('OTA-1248 — the tutorial picker is fully populated', () => {
 
   it('⚠ the prop is de-duplicated — a room that already holds it must not list it twice', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
-    const chips = screen.slice(screen.indexOf('const gatherChips = useMemo('), screen.indexOf('const gatherLaneCount'));
+    const chips = screen.slice(screen.indexOf('const tutorialProp: string | null ='), screen.indexOf('const gatherLaneCount'));
     expect(chips).toContain('room.filter((c) => c.noun !== tutorialProp)');
   });
 
@@ -94,7 +95,9 @@ describe('OTA-1248 — the armor beat', () => {
     // The take branch grants and explicitly does NOT advance...
     const takeAt = store.indexOf("tStep?.id === 'armor'");
     expect(takeAt).toBeGreaterThan(-1);
-    const takeBranch = store.slice(takeAt, takeAt + 900);
+    // ⚠ OTA-1250 widened this branch with the already-consumed guard, so the
+    // window has to reach past that comment block to still see the grant.
+    const takeBranch = store.slice(takeAt, takeAt + 2000);
     expect(takeBranch).toContain("grantTutorialItem(get, set, 'vest')");
     expect(takeBranch).not.toContain("maybeAdvanceTutorial('armor')");
     // ...and equipItem does, from the top, so EVERY equip route counts.

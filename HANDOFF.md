@@ -1644,8 +1644,37 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE LOOK BEAT HAD NO LOCKDOWN (2026-08-13,
-  latest).** Golem OTA-1249. **⚠⚠ THE LOOK-BEAT HALF IS AUTHORIZED FOR HAL** —
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE PICKER NOW OBEYS THE BEAT (2026-08-13,
+  latest).** Golem OTA-1250. Same merge-or-revert decision point.
+
+  Owner, from a device run on the build shipped an hour earlier: *"I broke it by
+  just grabbing stuff, you should only be able to do what it says, the other button
+  touches should buzz."*
+
+  ⚠⚠ **THE LOCKDOWN STOPPED AT THE MODAL'S EDGE.** OTA-1249 dimmed the QUICK ROW;
+  the picker that row opens was untouched, and OTA-1248 had just filled it with the
+  whole room. Measured from his log: axe, bow, torch and a six-noun SALVAGE ALL, in
+  about four taps, inside the cudgel and armor beats.
+
+  ⚠⚠ **SHOW EVERYTHING, ALLOW ONE.** Hiding the rest would teach the layout by
+  deleting it. Refused rows and buttons stay rendered, dim, and BUZZ with the
+  Arbiter's nudge; IGNORE stays live, since a lock with no exit is a softlock
+  (ota1250 asserts it closes); and no sweep is ever the beat's answer, even when
+  the locked noun is its lane's only row.
+
+  ⚠⚠ **AND THE LOG CAUGHT A SECOND BUG THE FIRST WAS HIDING** — the vest row paid
+  out FIVE TIMES. `consumed` was hardcoded false and `armor` is the one beat that
+  does not advance on the take. **Only the first grant was real**;
+  `grantTutorialItem` early-returns, so four reward lines printed over nothing.
+  **A reward line for an item the engine did not hand over is worse than a dead
+  button.** ⚠ **CHECK THE SAME FLAG THE GRANT CHECKS BEFORE YOU NARRATE.**
+
+  ⚠ `tutorialProp` hoisted out of the chip memo — it drives what the picker SHOWS
+  and what it ALLOWS. Sixth one-source fix this session.
+  Full story: the VERSION.md 4.29.178 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE LOOK BEAT HAD NO LOCKDOWN (2026-08-13).**
+  Golem OTA-1249. **⚠⚠ THE LOOK-BEAT HALF IS AUTHORIZED FOR HAL** —
   owner: *"the look around you button fix can go to Hal."* The card-on-close half
   is picker work and stays golem-only.
 

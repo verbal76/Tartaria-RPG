@@ -234,14 +234,18 @@ describe('OTA-1233 — the merge did not cost anything that was already working'
     // memo so the colour-lane hint could read the same array the picker renders.
     // The rule is unchanged and still asserted; only its address moved. Anchoring
     // a test on a neighbouring construct is what bit ota1231 two OTAs ago.
+    // ⚠ OTA-1250 — and the PROP moved again, out of the memo to a const above it,
+    // because the picker's LOCK reads the same value. The slice starts there now.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
-    const block = screen.slice(screen.indexOf('const gatherChips = useMemo('), screen.indexOf('const gatherLaneCount'));
+    const block = screen.slice(screen.indexOf('const tutorialProp: string | null ='), screen.indexOf('const gatherLaneCount'));
     expect(block).toContain("tutBeat === 'cudgel'");
     expect(block).toContain("tutBeat === 'scrap'");
     expect(block).toContain("tutBeat === 'armor'");
     // The prop is prepended to the REAL room, never substituted for it.
     expect(block).toContain('const room =');
-    expect(block).toContain('[{ noun: tutorialProp, consumed: false }, ...room');
+    // ⚠ OTA-1250 — `consumed: propConsumed`, not a hardcoded false: the armor beat
+    // does not advance on the take, so a hardcoded row paid out five times.
+    expect(block).toContain('[{ noun: tutorialProp, consumed: propConsumed }, ...room');
     expect(block).toContain('reachableWhileElevated');
     // ...and the picker is fed by exactly that array, not a second copy.
     expect(screen).toContain('chips={gatherChips}');

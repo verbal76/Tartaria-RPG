@@ -84,8 +84,10 @@ describe('OTA-1245 — the gap, measured before it is filled', () => {
   it('⚠ the demo props are still IN the picker — merged, not dropped', () => {
     // OTA-1248 stopped narrowing, but the props are not scene nouns: dropping the
     // override would have removed them from the picker entirely.
+    // ⚠ OTA-1250 hoisted the prop above the memo (the picker's lock reads it too),
+    // so the slice starts at the const.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
-    const chips = screen.slice(screen.indexOf('const gatherChips = useMemo('), screen.indexOf('const gatherLaneCount'));
+    const chips = screen.slice(screen.indexOf('const tutorialProp: string | null ='), screen.indexOf('const gatherLaneCount'));
     expect(chips).toContain("'cudgel'");
     expect(chips).toContain("'broken chest plate'");
     expect(chips).toContain("Mud-Warden's Vest");

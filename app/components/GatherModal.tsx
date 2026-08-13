@@ -103,6 +103,18 @@ interface Props {
    *  component stays a renderer. They get their own lane, LAST, and no bulk button
    *  will ever touch them. */
   leadNouns?: readonly string[];
+  /** ⚠⚠ OTA-1250 — THE ONE NOUN THE TUTORIAL PERMITS RIGHT NOW, or null for free
+   *  play. Owner, from a device run: *"I broke it by just grabbing stuff, you
+   *  should only be able to do what it says, the other button touches should
+   *  buzz."* The outpost lockdown dimmed the quick row and stopped at the modal's
+   *  edge, so the beat that says "tap the cudgel" opened a board where every row
+   *  and every sweep button was live. He took an axe, a bow, a torch, a second
+   *  vest, and swept six nouns of scenery — mid-tutorial, in four taps. */
+  lockedNoun?: string | null;
+  /** Fired when a locked control is tapped. Buzz + the Arbiter's nudge, the same
+   *  feedback the quick row gives — a control that refuses in silence is the
+   *  OTA-1164 bug. */
+  onBlocked?: () => void;
   onCancel: () => void;
 }
 
@@ -125,8 +137,18 @@ const LANE_HEADING: Record<GatherLane, string> = {
 
 export function GatherModal({
   visible, chips, player, onTake, onSalvage, onTakeAll, onSalvageAll,
-  onInvestigate, leadNouns, onCancel,
+  onInvestigate, leadNouns, lockedNoun, onBlocked, onCancel,
 }: Props) {
+  // ⚠⚠ OTA-1250 — THE LOCK. Exactly one noun is actionable; everything else in
+  // the card refuses. ⚠ A REFUSED CONTROL IS STILL RENDERED AND STILL TAPPABLE —
+  // it dims and buzzes rather than disappearing or going inert, because the whole
+  // point of the fully-populated tutorial picker (OTA-1248) is that the player
+  // SEES the whole room. Hiding the rest would teach the layout by removing it,
+  // and `disabled` would make a wrong tap indistinguishable from a dead app.
+  const lockKey = lockedNoun ? lockedNoun.toLowerCase().trim() : null;
+  const isLocked = (noun: string): boolean =>
+    lockKey !== null && noun.toLowerCase().trim() !== lockKey;
+  const refuse = (): void => { onBlocked?.(); };
   // ⚠ Matched on the same case-insensitive substring rule the engine's rescue
   // dispatch uses, so a noun the engine treats as the dog hook is a noun this
   // picker treats as a lead. A protector matching a different set from the firer
@@ -220,6 +242,7 @@ export function GatherModal({
   // carries the lane hue, which is the part that was actually worth adding.
   const renderRow = (row: GatherRow, lane: GatherLane) => {
     const { noun, kind, upgrade, consumed } = row;
+    const locked = isLocked(noun);
     const tail =
       lane === 'lead' ? 'INVESTIGATE'
         : upgrade ? 'BETTER'
@@ -239,20 +262,26 @@ export function GatherModal({
           // stealing it for a second meaning is how the code stops being read.
           upgrade && lane !== 'lead' && styles.rowUpgrade,
           consumed && styles.rowConsumed,
+          locked && styles.rowLocked,
           pressed && !consumed && styles.rowPressed,
         ]}
         disabled={consumed}
         onPress={() => {
+          // ⚠ The refusal comes FIRST and returns. Falling through to the verb
+          // after buzzing would be a lock that complains and then complies.
+          if (locked) { refuse(); return; }
           if (lane === 'lead') { onInvestigate(noun); return; }
           if (lane === 'scrap') { onSalvage(noun); return; }
           onTake(noun);
         }}
         accessibilityRole="button"
-        accessibilityState={{ disabled: consumed }}
+        accessibilityState={{ disabled: consumed || locked }}
         accessibilityLabel={
-          lane === 'lead'
-            ? `${noun}. Worth a look. Tap to investigate. No bulk action will touch this.`
-            : `${upgrade ? 'Upgrade. ' : ''}${noun}. ${lane === 'scrap' ? 'Tap to salvage' : 'Tap to take'}`
+          locked
+            ? `${noun}. Not yet — the Arbiter has asked for something else first.`
+            : lane === 'lead'
+              ? `${noun}. Worth a look. Tap to investigate. No bulk action will touch this.`
+              : `${upgrade ? 'Upgrade. ' : ''}${noun}. ${lane === 'scrap' ? 'Tap to salvage' : 'Tap to take'}`
         }
       >
         <Text style={[
@@ -318,10 +347,16 @@ export function GatherModal({
               lane === 'gear' && styles.sweepGear,
               lane === 'items' && styles.sweepItems,
               lane === 'scrap' && styles.sweepScrap,
+              // ⚠⚠ OTA-1250 — A SWEEP IS NEVER THE BEAT'S ANSWER. Even a lane
+              // whose only row IS the locked noun: the beat teaches a single tap
+              // on a single line, and letting the bulk button stand in for it
+              // teaches the opposite. All three dim under a lock.
+              lockKey !== null && styles.sweepLocked,
               pressed && styles.rowPressed,
             ]}
-            onPress={() => onSweep(nouns)}
+            onPress={() => { if (lockKey !== null) { refuse(); return; } onSweep(nouns); }}
             accessibilityRole="button"
+            accessibilityState={{ disabled: lockKey !== null }}
             accessibilityLabel={buttonLabel(nouns.length)}
           >
             <Text style={[
@@ -350,8 +385,12 @@ export function GatherModal({
             <View style={styles.card}>
               <Text style={styles.title} accessibilityRole="header">THIS ROOM</Text>
               <View style={styles.rule} />
+              {/* ⚠ Under a lock the card says what the one live line IS, rather
+                  than describing freedoms the player does not have this beat. */}
               <Text style={styles.body}>
-                Tap a line to act on it. Or clear a whole colour with its button.
+                {lockedNoun
+                  ? `Tap the ${lockedNoun}. The rest of the room keeps.`
+                  : 'Tap a line to act on it. Or clear a whole colour with its button.'}
               </Text>
 
               {rows.length === 0 ? (
@@ -464,6 +503,11 @@ const styles = StyleSheet.create({
   // ⚠ Brighter gear, and a heavier edge — still one hue, still no fill.
   rowUpgrade: { borderColor: '#d09a63', borderWidth: 2 },
   rowConsumed: { opacity: 0.35 },
+  // ⚠⚠ OTA-1250 — LOCKED, NOT SPENT. Deliberately a LIGHTER dim than
+  // `rowConsumed` (0.35): a consumed row is finished forever and a locked one is
+  // coming back in a moment, and rendering them identically would tell the player
+  // the room had emptied. Still unmistakably not-now at a glance.
+  rowLocked: { opacity: 0.5 },
   rowPressed: { opacity: 0.7 },
 
   // ⚠ 20px and bold. The OTA-1232 version was 13px in the same tan as the text
@@ -490,6 +534,7 @@ const styles = StyleSheet.create({
   sweepGear: { borderColor: GEAR, backgroundColor: '#1a1208' },
   sweepItems: { borderColor: ITEMS, backgroundColor: '#121808' },
   sweepScrap: { borderColor: SCRAP, backgroundColor: '#181507' },
+  sweepLocked: { opacity: 0.4 },
   takeAllText: { fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   salvageAllText: { fontSize: 12, fontWeight: '600', letterSpacing: 0.5 },
 
