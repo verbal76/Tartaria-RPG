@@ -6747,13 +6747,14 @@ interface GameStore {
    *  Used by the TAKE quick-action chip modal so the player gets
    *  100% certainty their tap lands the thing in their pack. */
   takeAmbientNoun: (noun: string) => void;
-  /** Stealth variant of takeAmbientNoun — pickpocket / sleight of
-   *  hand. When a vendor is present, routes to stealFromVendor for
-   *  real theft. Otherwise rolls DEX vs DC 10 against the ambient
-   *  noun; success grants the catalog item silently AND marks
-   *  consumed; failure narrates the slip and leaves the noun on
-   *  the board for a normal take or another attempt. */
-  stealthTakeAmbientNoun: (noun: string) => void;
+  /** ⚠⚠ OTA-1239 — `stealthTakeAmbientNoun` WAS HERE AND IS GONE. It existed only
+   *  to serve the loot picker's stealth toggle, which the owner asked about twice
+   *  and which is now removed. Its work is covered by two live paths that were
+   *  always the better doors: PICKPOCKET (`pickpocketPerson`) for what is on a
+   *  PERSON, and the `steal` verb — nine synonyms — for things on tables and the
+   *  ground. ⚠ Its day/night cover bonus was NOT dropped with it; it moved onto the
+   *  `steal` case, which had drifted without it. Deleting the dead path blind would
+   *  have quietly removed a modifier from the game. */
   /** OTA-1078 — pickpocket a PERSON in the scene (vendor or wanderer) for
    *  what's actually in their pockets: TC, a collectable note, rarely a
    *  Legendary material or a tower map (engine/pocketLoot.ts). Stealing
@@ -9080,116 +9081,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  stealthTakeAmbientNoun(noun) {
-    const state = get();
-    const player = state.player;
-    const scene = state.currentScene;
-    if (!player || !scene) return;
-    const trimmed = noun.trim();
-    if (!trimmed) return;
-    // Vendor present → real theft from their offer list. Route to
-    // the existing stealFromVendor action which handles rep loss /
-    // getting caught / etc.
-    if (scene.vendor) {
-      get().stealFromVendor(trimmed);
-      return;
-    }
-    // No vendor — opportunistic grab against an ambient noun.
-    const ambientHit = matchAmbientNoun(trimmed, scene.ambientNouns ?? []);
-    if (!ambientHit) {
-      get().appendLog(
-        'arbiter',
-        `The Arbiter looks around. "I don't see ${trimmed} here to lift."`,
-      );
-      return;
-    }
-    const roomKey = makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
-    const room = state.worldMemory.visitedRooms?.[roomKey];
-    const ambientLower = ambientHit.toLowerCase();
-    const alreadyConsumed = nonClimbMarkers(room?.searchedAmbientNouns).some(
-      (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
-    );
-    if (alreadyConsumed) {
-      get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to lift.`);
-      return;
-    }
-    if (isOversized(ambientHit)) {
-      get().appendLog('arbiter', refusalLine(ambientHit), { skipDedup: true });
-      return;
-    }
-    const cat = findCatalogItem(ambientHit);
-    if (!cat) {
-      get().appendLog(
-        'world',
-        `${theCap(ambientHit)} won't come loose silently. Open TAKE / SALVAGE and tap it under SCRAP if you mean to break it down.`,
-      );
-      return;
-    }
-    // DEX vs DC 10 sleight-of-hand check, mirroring the existing
-    // steal-intent handler so success / failure feels consistent
-    // whether the player typed `steal X` or tapped TAKE+stealth.
-    // 2026-05-25 — apply day/night stealth modifier (+1 night, -1
-    // day). Per playtester: night = better cover, daytime = exposed.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { stealthTimeBonus } = require('../engine/timeOfDay');
-    const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerArmorResistKinds(player)));
-    const timeBonus = stealthTimeBonus(player.hoursElapsed);
-    const roll = rollDie(20);
-    // OTA-348 — pickpocket / sleight-of-hand now rolls Stealth (was DEX).
-    const total = roll + stats.stealth + timeBonus;
-    const success = total >= 10;
-    const timeNote = timeBonus !== 0 ? ` ${timeBonus > 0 ? '+' : ''}${timeBonus} (${timeBonus > 0 ? 'night' : 'day'})` : '';
-    set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
-    get().appendLog(
-      'combat',
-      `You — sleight of hand on ${ambientHit} → d20 ${roll} + STE ${stats.stealth}${timeNote} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
-    );
-    if (!success) {
-      // Failure narrates the slip; the noun stays available. Player
-      // can retry stealth OR take it openly.
-      get().appendLog('world', `Your hand slips on the ${ambientHit}. It stays where it was.`);
-      return;
-    }
-    // Success — grant the canonical catalog item AND mark consumed.
-    // Quieter narration than open take ('lifted into your pack with
-    // no one watching') so the stealth attempt reads as intentional.
-    const newItem: InventoryItem = stampDurability({
-      id: `lift_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-      name: cat.name,
-      kind: cat.kind,
-      rarity: cat.rarity,
-      quantity: 1,
-      tags: cat.tags,
-    });
-    const grantResult = grantItem(player.inventory, newItem);
-    set((s) => (s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s));
-    set((s) => {
-      const r = s.worldMemory.visitedRooms?.[roomKey] ?? {
-        firstVisitAt: Date.now(),
-        lastVisitAt: Date.now(),
-        visitCount: 1,
-      };
-      return {
-        worldMemory: {
-          ...s.worldMemory,
-          visitedRooms: {
-            ...(s.worldMemory.visitedRooms ?? {}),
-            [roomKey]: {
-              ...r,
-              searchedAmbientNouns: [...(r.searchedAmbientNouns ?? []), ambientLower],
-            },
-          },
-        },
-      };
-    });
-    if (grantResult.accepted > 0) {
-      get().appendLog('world', `You palm the ${cat.name}. It vanishes into your pack — quiet, clean.`);
-      get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}). [lifted]`);
-    } else {
-      get().appendLog('world', `Your fingers close on ${withArticle(cat.name.toLowerCase())}, but your pack is already full.`);
-    }
-    void get().persist();
-  },
 
   queueInputDraft(text) {
     set({ pendingInputDraft: text });
@@ -21361,11 +21252,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (ambient) {
           const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
           const roll = rollDie(20);
-          const total = roll + stats.stealth; // OTA-348 — sleight-of-hand rolls Stealth
+          // ⚠⚠ OTA-1239 — THE DAY/NIGHT COVER BONUS MOVED HERE, and finding it is
+          // why the retired toggle was CONSOLIDATED rather than just deleted. Two
+          // implementations of "quietly take a scene noun" had drifted: the
+          // picker's stealth path applied `stealthTimeBonus` (+1 at night, -1 by
+          // day — "night = better cover, daytime = exposed") and this typed-verb
+          // path never did. **Deleting the toggle blind would have removed the
+          // night bonus from the game entirely, because that path was the only
+          // place it lived.** The player would have lost a modifier nobody
+          // decided to remove. One path now, and it is the one that keeps it.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { stealthTimeBonus } = require('../engine/timeOfDay') as typeof import('../engine/timeOfDay');
+          const timeBonus = stealthTimeBonus(player.hoursElapsed);
+          const total = roll + stats.stealth + timeBonus; // OTA-348 — sleight-of-hand rolls Stealth
           const success = total >= 10;
+          const timeNote = timeBonus !== 0 ? ` ${timeBonus > 0 ? '+' : ''}${timeBonus} (${timeBonus > 0 ? 'night' : 'day'})` : '';
           get().appendLog(
             'combat',
-            `You — sleight of hand on ${ambient} → d20 ${roll} + STE ${stats.stealth} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
+            `You — sleight of hand on ${ambient} → d20 ${roll} + STE ${stats.stealth}${timeNote} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
           );
           if (success) {
             // Grant a small generic salvage item — represents whatever

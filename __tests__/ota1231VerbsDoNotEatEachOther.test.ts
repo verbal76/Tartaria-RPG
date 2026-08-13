@@ -70,7 +70,15 @@ describe('OTA-1231 — the marker contract', () => {
     // And the engine half of that claim, pinned so it stays true.
     const store = src('app', 'state', 'gameStore.ts');
     const take = store.slice(store.indexOf('  takeAmbientNoun(noun) {'));
-    const body = take.slice(0, take.indexOf('stealthTakeAmbientNoun'));
+    // ⚠ OTA-1239 — this used to slice up to `stealthTakeAmbientNoun`, the function
+    // that happened to follow. That function is now deleted, so the delimiter
+    // returned -1 and the "body" silently swelled to nearly the whole store —
+    // where `flavorExhaustedNouns` does legitimately appear, so the assertion
+    // failed for a reason that had nothing to do with the rule. **A neighbouring
+    // symbol is not a boundary.** Cut at the function's own closing brace instead.
+    const end = take.indexOf('\n  },\n');
+    expect(end).toBeGreaterThan(0);
+    const body = take.slice(0, end);
     expect(body).toContain('searchedAmbientNouns');
     expect(body).not.toContain('flavorExhaustedNouns');
   });
@@ -117,7 +125,9 @@ describe('OTA-1231 — the marker contract', () => {
     // guard exists because a batch fired at the room's furniture is not that
     // choice. If it ever moves into the single-noun path, this fails.
     const store = src('app', 'state', 'gameStore.ts');
-    const single = store.indexOf('stealthTakeAmbientNoun(noun) {');
+    // ⚠ OTA-1239 — was anchored on `stealthTakeAmbientNoun`, now deleted. The real
+    // single-noun path is `takeAmbientNoun`, which is what this always meant.
+    const single = store.indexOf('takeAmbientNoun(noun) {');
     const bulk = store.indexOf('salvageAllAmbient(nouns) {');
     const guardAt = store.indexOf('if (findCatalogItem(noun) !== null) {');
     expect(guardAt).toBeGreaterThan(bulk);

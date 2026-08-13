@@ -1644,7 +1644,50 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE PICKER STAYS OPEN (2026-08-13, latest).
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — NO STEALTH TOGGLE (2026-08-13, latest). GOLEM
+  ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1239. **Same merge-or-revert decision
+  point — it also DELETES `app/components/TakeModal.tsx` and the
+  `stealthTakeAmbientNoun` store action, so a HAL port must account for both.**
+
+  ⚠⚠ **THE OWNER ASKED THIS TWICE AND THE FIRST ANSWER WAS THE MISTAKE.** OTA-1229,
+  typed into the game: *"why do we still have use stealth in the take popup? thats
+  not how stealth works anymore."* I narrowed it to vendor-only and relabelled it
+  STE-not-DEX. He asked again six OTAs later. **A request repeated verbatim is not
+  new information to weigh — it is the same instruction, and narrowing it the first
+  time was negotiating instead of doing.**
+
+  ⚠⚠ **THE RULE WAS ALREADY IN THE CODEBASE**, in `PickpocketSheet`'s header
+  (OTA-847): *"pickpocket IS the stealth action, so there's no toggle."* Plus
+  OTA-1078's line — pickpocket is what is on a PERSON, `steal`/`take` own things on
+  tables and the ground — and `steal` is a live verb with nine synonyms. The toggle
+  was a third door onto an action with two better ones. **Before adding an
+  affordance, grep the modules that already own that verb; one of them may have
+  written down why it does not exist.**
+
+  ⚠⚠ **HOW IT SURVIVED: THE TEST WAS PINNED TO A CORPSE.** It came across in the
+  OTA-1233 merge, and the OTA-1229 suite guarding it kept reading `TakeModal.tsx` —
+  **a file nothing has rendered since that merge.** It passed for six OTAs against
+  a component that was not on screen. Same family as the OTA-1232 invisible-icon
+  miss. **When you retire a component, DELETE IT and grep the suites for its
+  path** — a source pin proves a line exists, never that anything renders it.
+  TakeModal.tsx is now gone and its absence is asserted.
+
+  ⚠⚠ **AND THE CONSOLIDATION THAT NEARLY DIDN'T HAPPEN.** The dead store action had
+  one caller, so it went too — **but the two "quietly take a scene noun"
+  implementations had drifted: the toggle's applied `stealthTimeBonus` (+1 night,
+  −1 day) and the typed `steal` verb never did.** That was the only place the
+  modifier lived for ambient nouns, so a blind delete would have removed day/night
+  cover from the game with nobody deciding to. **Read the dead path before deleting
+  it — a duplicate is not always a copy.** Measured carriers: `pickpocketPerson`,
+  the `steal` ambient branch, `concludeRolls`. Not `stealFromVendor`.
+
+  ⚠ Two suites were anchored on the deleted symbol. One mattered: ota1231 sliced a
+  function body *up to the next function's name*, so removing that neighbour made
+  the delimiter -1 and the "body" swelled to nearly the whole store. **A
+  neighbouring symbol is not a boundary.**
+  Full story: the VERSION.md 4.29.167 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE PICKER STAYS OPEN (2026-08-13).
   GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1238. **Same merge-or-revert
   decision point.**
 

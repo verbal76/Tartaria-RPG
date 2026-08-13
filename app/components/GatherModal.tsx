@@ -39,7 +39,29 @@
 // ⚠ IGNORE IS RED AND IT IS NOT "CLOSE". Red because leaving loot behind is a
 // real decision with a real cost, and the word is the owner's: you are dismissing
 // what is left, not closing a window you opened by accident.
-import React, { useState, useEffect } from 'react';
+//
+// ⚠⚠ OTA-1239 — NO STEALTH TOGGLE. THE OWNER ASKED THIS TWICE AND I ONLY HALF
+// ANSWERED THE FIRST TIME. In OTA-1229, typed into the game: *"why do we still
+// have use stealth in the take popup? thats not how stealth works anymore."* I
+// narrowed it (vendor-only) and relabelled it (STE, not DEX) instead of removing
+// it. He asked again: *"why did you add a stealth option to it, that's not how
+// the stealth is used anymore."* **Asking twice IS the answer — the first reply
+// was negotiating with the request instead of doing it.**
+//
+// ⚠⚠ AND THE CODEBASE ALREADY HAD THE RULE WRITTEN DOWN, in PickpocketSheet's own
+// header from OTA-847: *"pickpocket IS the stealth action, so there's no toggle."*
+// A toggle on a system whose design note says it has no toggle. OTA-1078 drew the
+// rest of the line — pickpocket is what is ON A PERSON, and *"items on tables and
+// the ground stay with the steal/take verbs"* — and `steal` is a live verb with
+// nine synonyms routing to the same `stealFromVendor`. So the toggle was a second
+// door onto an action that already had two better ones, in the picker that exists
+// to DELETE second doors.
+//
+// ⚠ HOW IT SURVIVED THE MERGE: it was carried over wholesale from TakeModal, and
+// **the OTA-1229 test that guarded it stayed pinned to TakeModal.tsx — a file
+// nothing has rendered since OTA-1233.** The pin kept passing against a corpse.
+// A source pin proves a line exists; it cannot prove anything renders it.
+import React from 'react';
 import {
   Modal, View, Text, StyleSheet, ScrollView, TouchableWithoutFeedback, Pressable,
 } from 'react-native';
@@ -81,9 +103,6 @@ interface Props {
    *  component stays a renderer. They get their own lane, LAST, and no bulk button
    *  will ever touch them. */
   leadNouns?: readonly string[];
-  /** Stealth take — only meaningful with a vendor present, where it is a THEFT. */
-  onStealthTake: (noun: string) => void;
-  stealthMeaningful: boolean;
   onCancel: () => void;
 }
 
@@ -98,7 +117,7 @@ const LANE_HEADING: Record<GatherLane, string> = {
 
 export function GatherModal({
   visible, chips, player, onTake, onSalvage, onTakeAll, onSalvageAll,
-  onInvestigate, leadNouns, onStealthTake, stealthMeaningful, onCancel,
+  onInvestigate, leadNouns, onCancel,
 }: Props) {
   // ⚠ Matched on the same case-insensitive substring rule the engine's rescue
   // dispatch uses, so a noun the engine treats as the dog hook is a noun this
@@ -109,9 +128,6 @@ export function GatherModal({
     const t = noun.toLowerCase();
     return leadSet.some((l) => t.includes(l) || l.includes(t));
   };
-  const [useStealth, setUseStealth] = useState(false);
-  useEffect(() => { if (visible) setUseStealth(false); }, [visible]);
-
   const rows: GatherRow[] = sortGatherRows(
     chips
       .filter((c) => !c.consumed || c.alwaysShow)
@@ -180,7 +196,6 @@ export function GatherModal({
         onPress={() => {
           if (lane === 'lead') { onInvestigate(noun); return; }
           if (lane === 'scrap') { onSalvage(noun); return; }
-          if (useStealth) { onStealthTake(noun); return; }
           onTake(noun);
         }}
         accessibilityRole="button"
@@ -289,23 +304,6 @@ export function GatherModal({
               <Text style={styles.body}>
                 Tap a line to act on it. Or clear a whole colour with its button.
               </Text>
-
-              {stealthMeaningful && (
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.stealthToggle,
-                    useStealth && styles.stealthToggleActive,
-                    pressed && styles.rowPressed,
-                  ]}
-                  onPress={() => setUseStealth((s) => !s)}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: useStealth }}
-                >
-                  <Text style={[styles.stealthToggleText, useStealth && styles.stealthToggleTextActive]}>
-                    {useStealth ? '✓ POCKET IT QUIETLY (STE roll — theft)' : 'POCKET IT QUIETLY (off)'}
-                  </Text>
-                </Pressable>
-              )}
 
               {rows.length === 0 ? (
                 <Text style={styles.empty}>
@@ -450,11 +448,4 @@ const styles = StyleSheet.create({
   },
   ignoreText: { color: IGNORE, fontSize: 12, fontWeight: '700', letterSpacing: 1.5 },
 
-  stealthToggle: {
-    borderWidth: 1, borderColor: '#3a342c', borderRadius: 3,
-    paddingVertical: 8, alignItems: 'center', marginBottom: 10,
-  },
-  stealthToggleActive: { borderColor: '#c9a86a', backgroundColor: '#241d13' },
-  stealthToggleText: { color: '#7d7361', fontSize: 11, letterSpacing: 0.5 },
-  stealthToggleTextActive: { color: '#e6d8b3', fontWeight: '700' },
 });

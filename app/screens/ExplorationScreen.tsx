@@ -349,7 +349,6 @@ export function ExplorationScreen() {
   // OTA-180 — appendFeedback selector dropped; store action still
   // exists for any non-UI emit site.
   const takeAmbientNoun = useGameStore((s) => s.takeAmbientNoun);
-  const stealthTakeAmbientNoun = useGameStore((s) => s.stealthTakeAmbientNoun);
   const worldMemory = useGameStore((s) => s.worldMemory);
 
   // OTA-930 — the old merged consumedAmbientNouns memo (searched + flavor in ONE set) is gone:
@@ -1941,12 +1940,11 @@ export function ExplorationScreen() {
           submit(`investigate ${noun}`);
         }}
         leadNouns={leadNouns}
-        // ⚠ OTA-1229 — only meaningful with a vendor present, where it is a THEFT.
-        stealthMeaningful={!!currentScene?.vendor}
-        onStealthTake={(noun) => {
-          Keyboard.dismiss();
-          stealthTakeAmbientNoun(noun);
-        }}
+        // ⚠⚠ OTA-1239 — NO STEALTH TOGGLE HERE ANY MORE. Owner, for the second
+        // time: *"why did you add a stealth option to it, that's not how the
+        // stealth is used anymore."* PICKPOCKET owns people, the `steal` verb owns
+        // things on tables and the ground, and this picker owns the open take. See
+        // GatherModal's header for the full history.
         onTakeAll={(nouns) => {
           Keyboard.dismiss();
           for (const n of nouns) takeAmbientNoun(n);
@@ -2000,10 +1998,11 @@ export function ExplorationScreen() {
       />
 
       {/* OTA-1077 — the PICKPOCKET picker moved out of the overlay stack into
-          the controls slot above (bottom sheet, dice-roller pattern). It
-          routes to stealthTakeAmbientNoun, which dispatches vendor theft
-          (Stealth vs the vendor's DC, high-STE quiet-fail) or a
-          sleight-of-hand grab. */}
+          the controls slot above (bottom sheet, dice-roller pattern).
+          ⚠ OTA-1239 — this comment used to say it routes to
+          `stealthTakeAmbientNoun`. It does not and never did: it calls
+          `pickpocketPerson`. The stale line is worth naming because it is part of
+          how a duplicate stealth path stayed invisible for six OTAs. */}
 
       {/* OTA 046 — CLIMB picker. Pull climbables from the same scene
           noun pool the other modals read (displayedAmbientNouns →

@@ -52,8 +52,6 @@ function renderRoom(chips: { noun: string }[], leadNouns: string[]) {
       onTakeAll={() => {}}
       onSalvageAll={() => {}}
       onInvestigate={() => {}}
-      onStealthTake={() => {}}
-      stealthMeaningful={false}
       onCancel={() => {}}
     />,
   );
