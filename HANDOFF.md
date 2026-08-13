@@ -1644,7 +1644,38 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — ONE WORD, PLACED PROPS (2026-08-13, latest).
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — PINS SURVIVE THE STEP (2026-08-13, latest).
+  GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1244. **⚠ THE FIX IS
+  LINE-AGNOSTIC AND HAL HAS THE SAME BUG** — the broken block is OTA-302
+  (2026-06-05), long predating the golem trial. It is filed here only because the
+  scene now also pins a dog-rescue prop (OTA-1243). **Port this one to HAL even if
+  the picker trial is reverted.**
+
+  Owner: *"I have not seen armor or weapons in the last few tiles, did anything
+  change on the drop rates?"* Neither drop rates nor the census — **the drops kept
+  happening and the display threw them away.**
+
+  Scene build force-prepends three placed things (spawned gear, water source,
+  rescue prop) so the 8-slot cap cannot crowd them out. The cardinal-step
+  re-shuffle replaced the whole window with a blind pick and re-applied NONE of
+  them. **Measured: on a 16-noun tile with 2 gear pieces, 76% of steps hid it.**
+  Gear was guaranteed on ARRIVAL and could vanish on the next step inside the
+  location — with no `spawn:` line to explain it, because steps do not respawn
+  gear, they only re-pick what shows.
+
+  ⚠⚠ **THE LESSON, AND IT IS THE THIRD TIME THIS SESSION IN A DIFFERENT COSTUME:**
+  a guarantee applied at ONE call site is not a guarantee, it is a coincidence that
+  holds until someone adds a second path. (OTA-1236: the salvage guard had to match
+  the firer. OTA-1241: the matcher fix had to match the census. Here: the display
+  guarantee had to survive every recompute.) **The fix records the intent ON THE
+  SCENE (`pinnedAmbientNouns`) rather than re-deriving it per call site** — pins
+  take their slots first, the shuffle fills the rest, the window stays exactly 8,
+  pins are capped at cap−2 so a future placer cannot starve the shuffle, and a pin
+  only applies while its noun is still in the pool (which makes consumption
+  self-healing). Rename carries the pins; a building interior clears them.
+  Full story: the VERSION.md 4.29.172 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — ONE WORD, PLACED PROPS (2026-08-13).
   GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1243. **Same merge-or-revert
   decision point — now also covering the SALVAGE word sweep (picker, tutorial,
   nudges, refusals, InventoryScreen, CraftingScreen, parser synonym) and the

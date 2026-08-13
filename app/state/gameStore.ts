@@ -1017,6 +1017,22 @@ interface CurrentScene {
    *  investigate keeps the same per-noun find chance, the odds of a
    *  given room showing the player SOMETHING actually hold up. */
   displayedAmbientNouns?: string[];
+  /** ⚠⚠ OTA-1244 — NOUNS THAT MUST STAY IN THE DISPLAY WINDOW HOWEVER IT IS
+   *  RECOMPUTED. Spawned gear, a water source, a dog-rescue prop: each is placed
+   *  deliberately and each was force-prepended at scene build so the 8-slot cap
+   *  could not crowd it out.
+   *
+   *  ⚠ The cardinal-step re-shuffle (OTA-302, 2026-06-05) then replaced
+   *  `displayedAmbientNouns` with a blind 8-from-pool pick and re-applied NONE of
+   *  them — so gear was guaranteed when you ARRIVED at a location and could vanish
+   *  on the next step inside it. Owner: *"I have not seen armor or weapons in the
+   *  last few tiles."* Not a drop-rate change and not a bad run: the drop happened,
+   *  the display threw it away.
+   *
+   *  Stamped ONCE at scene build and read by every later recompute, so the
+   *  guarantee lives in one place instead of being re-derived (and forgotten) at
+   *  each call site. */
+  pinnedAmbientNouns?: string[];
   /** OTA-950 — Phase A of real heights: optional per-noun elevation placements
    *  (noun → structure + tier). Absent/empty = everything is on the ground,
    *  which is every scene until the Phase-B seeder ships. */
@@ -6358,6 +6374,12 @@ function patchSceneForBuildingRoom(
         microMicroId: buildingRoomMicroId,
         ambientNouns: nouns,
         displayedAmbientNouns: nouns,
+        // ⚠ OTA-1244 — a building interior replaces the pool wholesale, so the
+        // outdoor tile's pins describe nouns that are not here. They would be
+        // filtered out harmlessly (pins only apply to nouns still in the pool),
+        // but leaving a stale list on the scene is how the next reader gets it
+        // wrong. Indoors shows every interactable anyway — no window to protect.
+        pinnedAmbientNouns: [],
         transitArea: `${b.name} · ${room.shortName}`,
         // Indoors is peaceful — clear any wilderness combat / hooks.
         ...FRESH_ENEMY_ARRAYS,
@@ -10874,6 +10896,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (rescuePropNouns.length > 0) {
       displayedAmbientNouns = Array.from(new Set([...rescuePropNouns, ...displayedAmbientNouns]));
     }
+    // ⚠⚠ OTA-1244 — AND RECORD THE GUARANTEE, so it survives every later recompute.
+    // Three prepends above; the cardinal-step re-shuffle honoured none of them.
+    const pinnedAmbientNouns = Array.from(new Set([
+      ...sceneGearNouns, ...waterSourceNouns, ...rescuePropNouns,
+    ]));
     // arb39 — persistent-room emptiness for hub interiors (the tutorial
     // outpost rooms, capital halls, etc.). Once an interactable has been
     // taken or salvaged in this room, it stays gone on re-entry — closing
@@ -11109,7 +11136,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
-      vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, microMicroId,
+      vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, pinnedAmbientNouns, microMicroId,
       nounPlacements: scenePerchPlacements,
       missionBoard,
       wanderer,
@@ -29008,7 +29035,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Cantor-pairing-style mix: hashes (x, y) → a single 32-bit
       // seed that distinguishes (-3, 5) from (5, -3) and from (3, 5).
       const seed = (((step.x + 1000) & 0xffff) * 65537) ^ ((step.y + 1000) & 0xffff);
-      const next = shuffleSliceSeeded(pool, AMBIENT_DISPLAY_CAP, seed);
+      // ⚠⚠ OTA-1244 — THE PINS SURVIVE THE RE-SHUFFLE. Owner: *"I have not seen
+      // armor or weapons in the last few tiles. Did anything change on the drop
+      // rates?"* Nothing did — the drops kept happening and this line threw them
+      // away. Scene build force-prepends spawned gear, a water source and the
+      // dog-rescue prop so the 8-slot cap cannot crowd them out; this re-shuffle
+      // (OTA-302) replaced the whole window with a blind pick and re-applied none
+      // of them. So gear was guaranteed on ARRIVAL at a location and could vanish
+      // on the very next step inside it, with no new spawn line in the log to
+      // explain where it went.
+      //
+      // ⚠ Pins take their slots FIRST and the shuffle fills what is left, so the
+      // variety this block exists for is preserved everywhere it does not conflict
+      // with something the scene placed on purpose. Pins are capped defensively:
+      // at most 3 gear + 1 water + 1 prop today, but a future placer must not be
+      // able to fill the window and starve the shuffle entirely.
+      const pins = (s.currentScene.pinnedAmbientNouns ?? []).filter((n) => pool.includes(n));
+      const pinned = pins.slice(0, Math.max(0, AMBIENT_DISPLAY_CAP - 2));
+      const rest = shuffleSliceSeeded(
+        pool.filter((n) => !pinned.includes(n)),
+        Math.max(0, AMBIENT_DISPLAY_CAP - pinned.length),
+        seed,
+      );
+      const next = Array.from(new Set([...pinned, ...rest])).slice(0, AMBIENT_DISPLAY_CAP);
       return { currentScene: { ...s.currentScene, displayedAmbientNouns: next } };
     });
     // Re-entry narration — when a cardinal step lands on a tile the
@@ -34292,12 +34341,18 @@ function resolveHookOneStep(
       };
       const newAmbient = replaceIn(s.currentScene.ambientNouns);
       const newDisplayed = replaceIn(s.currentScene.displayedAmbientNouns);
-      if (!newAmbient && !newDisplayed) return {};
+      // ⚠ OTA-1244 — the pins get renamed too. They are gated on membership of
+      // `ambientNouns`, so a pinned noun that was renamed here but not there would
+      // silently stop being pinned — the guarantee would survive the rename in
+      // name only.
+      const newPinned = replaceIn(s.currentScene.pinnedAmbientNouns);
+      if (!newAmbient && !newDisplayed && !newPinned) return {};
       return {
         currentScene: {
           ...s.currentScene,
           ...(newAmbient ? { ambientNouns: newAmbient } : {}),
           ...(newDisplayed ? { displayedAmbientNouns: newDisplayed } : {}),
+          ...(newPinned ? { pinnedAmbientNouns: newPinned } : {}),
         },
       };
     });
