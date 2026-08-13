@@ -134,6 +134,19 @@ beforeAll(async () => {
         continue;
       }
 
+      // ⚠⚠ OTA-1248 — the `armor` beat is TWO actions, and that is the whole point
+      // of it: the cudgel auto-equips, so nothing in the tutorial had ever taught a
+      // player to open their pack. Take, then WEAR — the beat completes on the
+      // equip, not the take, so a walk that only took it would stall here.
+      if (id === 'armor') {
+        const worn = useGameStore.getState().player?.equipped?.chest;
+        if (worn) { useGameStore.getState().maybeAdvanceTutorial('armor'); continue; }
+        const held = (useGameStore.getState().player?.inventory ?? [])
+          .some((i: { name: string }) => /vest/i.test(i.name));
+        if (!held) { useGameStore.getState().submitPlayerAction("take the Mud-Warden's Vest"); continue; }
+        useGameStore.getState().equipItem("Mud-Warden's Vest", 'chest');
+        continue;
+      }
       if (id === 'climb') {
         // The beat's own instruction: "you go up in stages... top out, then
         // climb back down" — completion fires on the way DOWN. State-aware

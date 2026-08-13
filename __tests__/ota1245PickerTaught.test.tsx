@@ -60,7 +60,12 @@ const lanes = (nouns: string[]): number =>
   new Set(nouns.map((n) => laneForKind(classifyGatherNoun(n))).filter(Boolean)).size;
 
 describe('OTA-1245 — the gap, measured before it is filled', () => {
-  it('⚠⚠ RENDERED: each tutorial beat really does show ONE lane, so the layout is unteachable there', () => {
+  it.skip('⚠⚠ SUPERSEDED BY OTA-1248 — the beats no longer show one lane', () => {
+    // ⚠ KEPT, SKIPPED, WITH THE REASON: this asserted the gap that justified the
+    // hint — each beat rendering a single lane. OTA-1248 fully populated the
+    // tutorial picker at the owner's direction, so the premise is gone. The hint
+    // still earns its place (it names the colours; the picker only shows them),
+    // and ota1248 now owns the "beats show the whole room" assertions.
     // This is the finding, kept as a live assertion rather than a claim in a
     // comment: if a future edit widens a beat, this fails and whoever wrote it
     // learns the hint may no longer be the only teacher.
@@ -76,13 +81,14 @@ describe('OTA-1245 — the gap, measured before it is filled', () => {
     expect(lanes(['broken chest plate'])).toBe(1);
   });
 
-  it('⚠ the beats still narrow to their own prop — the fix must not undo the OTA-1233 rule', () => {
-    // "Neither of those are the cudgel" was a real playtest failure. Teaching the
-    // layout must not come at the cost of a guided beat offering eight rows.
+  it('⚠ the demo props are still IN the picker — merged, not dropped', () => {
+    // OTA-1248 stopped narrowing, but the props are not scene nouns: dropping the
+    // override would have removed them from the picker entirely.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const chips = screen.slice(screen.indexOf('const gatherChips = useMemo('), screen.indexOf('const gatherLaneCount'));
-    expect(chips).toContain("noun: 'cudgel'");
-    expect(chips).toContain("noun: 'broken chest plate'");
+    expect(chips).toContain("'cudgel'");
+    expect(chips).toContain("'broken chest plate'");
+    expect(chips).toContain("Mud-Warden's Vest");
   });
 });
 
@@ -98,11 +104,13 @@ describe('OTA-1245 — taught where it is true', () => {
     // showing a narrowed list", and only two beats narrow it.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     expect(screen).toContain('id="picker_colour_lanes"');
-    expect(screen).toContain('{!pickerIsNarrowed && gatherLaneCount >= 2 && (');
+    // ⚠ OTA-1248: with the picker fully populated in every beat, the gate is the
+    // lane count alone — there is no longer a state where it would over-promise.
+    expect(screen).toContain('{gatherLaneCount >= 2 && (');
     expect(screen).not.toContain('{!tutBeat && gatherLaneCount >= 2 && (');
   });
 
-  it('⚠⚠ the narrowing list is ONE constant, shared by the chips memo and the gate', () => {
+  it.skip('⚠⚠ SUPERSEDED BY OTA-1248 — nothing narrows the picker any more', () => {
     // If the memo narrowed for a beat the gate did not know about, the hint would
     // promise colour groups over a one-row card. Same one-source rule this session
     // has now applied four times.

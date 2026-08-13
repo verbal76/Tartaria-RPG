@@ -145,6 +145,25 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       '"A cudgel, by your boots. Tap TAKE / SALVAGE, then tap the cudgel. You\'ll want a weapon."',
   },
   {
+    // ⚠⚠ OTA-1248 — THE EQUIP STEP, WHICH THE TUTORIAL HAD NEVER TAUGHT. Owner:
+    // *"we should also have them equip a piece of updated armor."* The cudgel
+    // AUTO-equips on grant, so a player could finish the whole tutorial having
+    // never once opened their pack — and then wander the wastes wearing nothing.
+    //
+    // ⚠ The vest is a REAL catalog piece against an EMPTY chest slot, so the
+    // picker marks it ★ BETTER on its own. The beat points at a mark the player is
+    // actually looking at rather than describing one.
+    id: 'armor',
+    remind: 'take the vest, then equip it from your pack',
+    screen: 'exploration',
+    area: 'quick-row',
+    pulse: true,
+    title: 'Wear Something',
+    body: 'A Mud-Warden\'s Vest is here, marked ★ BETTER — that mark means it beats what you have on. Take it, then open your pack and equip it.',
+    arbiter:
+      '"That vest is better than bare cloth, and the star says so. Take it — then put it on. Nothing equips itself but the blade in your hand."',
+  },
+  {
     id: 'rope',
     remind: 'type take rope, then tap ACT',
     screen: 'exploration',

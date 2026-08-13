@@ -136,7 +136,10 @@ const PEACE_QUICK_DIRECT: Array<{ label: string; submit: string }> = [
 // current beat's instructed control works; everything else buzzes. The lock
 // lifts once the player chooses (tutorialExploreChosen) or the beat advances
 // past explore_or_leave (main_quest / pick_city are post-choice).
-const TUT_LOCK_BEATS = ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'];
+// ⚠ OTA-1248 — 'armor' added. This list and ExplorationScreen's twin gate the
+// outpost lockdown; a beat missing from either lets out-of-band controls open
+// mid-tutorial.
+const TUT_LOCK_BEATS = ['name', 'cudgel', 'armor', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'];
 
 // arb132 — STABLE empty-array sentinel for the bandolier selector. A NEW character
 // has no `player.equipped.bandolierIds` yet, so `?? []` returned a FRESH array on
@@ -347,12 +350,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // had real nouns), and SALVAGE stayed green into the investigate beat.
   // green = the one thing to do now; the completed buttons drop to amber.
   const tutActionBeat =
-    currentBeatId === 'cudgel' || currentBeatId === 'rope'
+    currentBeatId === 'cudgel' || currentBeatId === 'armor' || currentBeatId === 'rope'
       || currentBeatId === 'scrap' || currentBeatId === 'climb'
       || currentBeatId === 'investigate'
       ? currentBeatId : null;
   const takeTone: 'ready' | undefined = tutActionBeat
-    ? (tutActionBeat === 'cudgel' || tutActionBeat === 'rope' ? 'ready' : undefined)
+    ? (tutActionBeat === 'cudgel' || tutActionBeat === 'armor' || tutActionBeat === 'rope' ? 'ready' : undefined)
     : (takeOverride || (takeableCount && takeableCount > 0) ? 'ready' : undefined);
   const salvageTone: 'ready' | undefined = tutActionBeat
     ? (tutActionBeat === 'scrap' ? 'ready' : undefined)
@@ -409,7 +412,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     && !tutorialExploreChosen;
   // The single button the current beat permits (null = none; type/choose).
   const tutInstructed: 'take' | 'salvage' | 'investigate' | 'climb' | null =
-    currentBeatId === 'cudgel' ? 'take'
+    // ⚠ OTA-1248 — 'armor' permits the same button as 'cudgel': the vest is TAKEN
+    // from the picker, and the beat then completes on the equip in the pack.
+    currentBeatId === 'cudgel' || currentBeatId === 'armor' ? 'take'
     : currentBeatId === 'scrap' ? 'salvage'
     : currentBeatId === 'investigate' ? 'investigate'
     : currentBeatId === 'climb' ? 'climb'

@@ -1644,8 +1644,39 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE HINT FIRES WHERE IT SHOULD (2026-08-13,
-  latest).** Golem OTA-1247. Same merge-or-revert decision point.
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — FULL TUTORIAL PICKER + THE ARMOR BEAT (2026-08-13,
+  latest).** Golem OTA-1248. Same merge-or-revert decision point — **now also
+  covering a NEW TUTORIAL BEAT (`armor`), which any HAL port must carry or the
+  beat-id lists diverge.**
+
+  Owner: *"the take/salvage popup should be fully populated so they understand it
+  shows all... and we should also have them equip a piece of updated armor."*
+
+  ⚠⚠ **REVERSES OTA-1233's NARROWING.** That rule came from a playtest —
+  *"neither of those are the cudgel"* — when a wrong tap CLOSED the picker. Since
+  OTA-1238 it STAYS OPEN, so the cost that justified narrowing is gone while the
+  cost of narrowing (an unteachable layout) is not. **A rule is only as good as the
+  condition that made it true — re-check the condition before defending the rule.**
+
+  ⚠⚠ **PROPS ARE MERGED, NOT DROPPED.** Tutorial props are NOT scene nouns (LOOK
+  lists the room without the cudgel), so removing the override would have deleted
+  the demo prop and stalled the beat. Prepended + de-duplicated.
+
+  ⚠⚠ **THE EQUIP STEP HAD NEVER BEEN TAUGHT** — the cudgel auto-equips, so a player
+  could finish the tutorial having never opened their pack. New `armor` beat: a
+  REAL catalog vest (so the ★ BETTER mark computes honestly against an empty chest
+  slot), no auto-equip, and **the beat completes on the EQUIP, not the take** —
+  advance placed at the top of `equipItem` so every equip route counts.
+
+  ⚠ **FOUR beat-aware lists had to learn the id** (ExplorationScreen lockdown,
+  InputBox TUT_LOCK_BEATS, InputBox instructed-button map, the stuck-player nudge).
+  **Adding a tutorial beat is never a one-file change — grep the beat id.**
+  The end-to-end `playtestTutorialWalk` caught it and was taught the two-action
+  step, which is the real proof it completes.
+  Full story: the VERSION.md 4.29.176 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE HINT FIRES WHERE IT SHOULD (2026-08-13).**
+  Golem OTA-1247. Same merge-or-revert decision point.
 
   The device run right after the crash fix was CLEAN — full tutorial, no errors,
   and one picker session did four takes plus a six-noun sweep (OTA-1238 +

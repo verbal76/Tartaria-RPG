@@ -217,10 +217,19 @@ describe('OTA-1235 — three lanes, three colours, all visible at once', () => {
 });
 
 describe('OTA-1233 — the merge did not cost anything that was already working', () => {
-  it('⚠⚠ BOTH tutorial beats still show their prop ALONE', () => {
-    // The guided beats must not offer the room's real nouns beside the demo one
-    // — playtest, pre-fix: "neither of those are the cudgel". Each beat used to
-    // own its own picker; with one picker each must narrow the WHOLE list.
+  it('⚠⚠ OTA-1248 REVERSED THIS: the beats show their prop PLUS the whole room', () => {
+    // ⚠⚠ THE ORIGINAL RULE, AND WHY IT NO LONGER HOLDS. It was written after a
+    // playtest — *"neither of those are the cudgel"* — back when a wrong tap CLOSED
+    // the picker and cost a reopen. Since OTA-1238 the picker STAYS OPEN, so a
+    // wrong tap just takes something else and leaves the beat's target sitting
+    // there. The cost that justified narrowing expired; the cost of narrowing did
+    // not (OTA-1245: the layout became unteachable). Owner: *"the take/salvage
+    // popup should be fully populated so they understand it shows all."*
+    //
+    // ⚠ WHAT STILL MUST HOLD, and is what this now asserts: the prop is MERGED IN
+    // rather than swapped for the room. Tutorial props are not scene nouns, so
+    // dropping the override entirely would delete the demo prop from the picker
+    // and stall the beat.
     // ⚠ OTA-1245 — the chip list was HOISTED out of the JSX into a `gatherChips`
     // memo so the colour-lane hint could read the same array the picker renders.
     // The rule is unchanged and still asserted; only its address moved. Anchoring
@@ -229,8 +238,11 @@ describe('OTA-1233 — the merge did not cost anything that was already working'
     const block = screen.slice(screen.indexOf('const gatherChips = useMemo('), screen.indexOf('const gatherLaneCount'));
     expect(block).toContain("tutBeat === 'cudgel'");
     expect(block).toContain("tutBeat === 'scrap'");
-    expect(block).toContain("noun: 'cudgel'");
-    expect(block).toContain("noun: 'broken chest plate'");
+    expect(block).toContain("tutBeat === 'armor'");
+    // The prop is prepended to the REAL room, never substituted for it.
+    expect(block).toContain('const room =');
+    expect(block).toContain('[{ noun: tutorialProp, consumed: false }, ...room');
+    expect(block).toContain('reachableWhileElevated');
     // ...and the picker is fed by exactly that array, not a second copy.
     expect(screen).toContain('chips={gatherChips}');
   });

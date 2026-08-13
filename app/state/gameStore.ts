@@ -6236,7 +6236,11 @@ function restoreStamina(player: PlayerCharacter, amount: number): PlayerCharacte
 // (broken chest plate), and the eventual note that points at the
 // Aetheric Cores. Each entry resolves to a pre-stamped InventoryItem
 // when the tutorial state machine grants it.
-type TutorialPropId = 'cudgel' | 'rope' | 'chestPlate' | 'note';
+// ⚠ OTA-1248 — `vest` added. Owner: *"we should also have them equip a piece of
+// updated armor."* The cudgel AUTO-equips (grantTutorialItem below), so nothing in
+// the tutorial ever taught the equip step — a player finished it having never
+// opened their pack. The vest deliberately does NOT auto-equip.
+type TutorialPropId = 'cudgel' | 'rope' | 'chestPlate' | 'note' | 'vest';
 
 function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
   switch (id) {
@@ -6276,6 +6280,18 @@ function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
         tags: ['armor', 'broken', 'plate', 'metal', 'fiber'],
         description: 'A rusted breastplate, snapped across the shoulder strap. The plate itself is salvageable for the metal.',
       });
+    case 'vest':
+      // ⚠ A REAL catalog piece (armor.json, chest, +1 AC), not a bespoke prop — so
+      // the picker's ★ BETTER mark computes honestly against the empty chest slot
+      // and the beat can point at a mark the player is actually looking at.
+      return stampDurability({
+        id: freshInstanceId('tutorial_vest'),
+        name: "Mud-Warden's Vest",
+        kind: 'armor',
+        rarity: 'Common',
+        quantity: 1,
+        tags: ['armor'],
+      } as InventoryItem);
     case 'note':
       return {
         id: freshInstanceId('tutorial_note'),
@@ -6654,6 +6670,8 @@ interface GameStore {
     rope: boolean;
     chestPlate: boolean;
     note: boolean;
+    /** ⚠ OTA-1248 — optional so saves written before this OTA still load. */
+    vest?: boolean;
   };
   /** Tungsten Spire — `maybeAdvanceTutorial(beatId)` advances the
    *  tutorial only if the current beat matches. Used by action
@@ -7890,7 +7908,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   activeBuildingRoomId: null,
   buildingRevealed: [],
   preBuildingScene: null,
-  tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
+  tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false, vest: false },
 
   slots: [],
   activeSlotId: null,
@@ -9840,7 +9858,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // character. Old characters loaded via loadSlotIntoGame don't
       // hit this path; their hasSeenIntro stays true and the tutorial
       // never fires.
-      tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
+      tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false, vest: false },
       awaitingTutorialName: false,
       tutorialExploreChosen: false,
       activeBuildingId: null,
@@ -12503,6 +12521,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('reward', "✦ Reclaimer's Rope (Common).");
         get().appendLog('arbiter', '"Good. That rope earns its keep."');
         get().maybeAdvanceTutorial('rope');
+        return;
+      }
+      // ⚠⚠ OTA-1248 — (b2) Tutorial TAKE of the vest. Deliberately does NOT advance
+      //     the beat: `armor` advances on the EQUIP, because taking a thing and
+      //     wearing it are the two halves the tutorial had never separated. The
+      //     cudgel auto-equips, which is exactly why nobody learned this step.
+      if (tStep?.id === 'armor' && /\b(take|grab|pick\s*up|get)\s+.*(vest|mud-warden|warden)/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        grantTutorialItem(get, set, 'vest');
+        get().appendLog('world', "You lift the vest. Mud-warden plate, laced onto a hide backing — heavier than it looks, and it has kept someone alive before.");
+        get().appendLog('reward', "✦ Mud-Warden's Vest (Common).");
+        get().appendLog('arbiter', '"In your pack. It does you no good in there — open the pack and put it on."');
         return;
       }
       // (c) Tutorial scrap of the chest plate. Mirrors the salvage
@@ -29996,6 +30026,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       look: 'tap the glowing LOOK AROUND YOU button to get your bearings.',
       cudgel: 'tap the glowing TAKE / SALVAGE button, then tap the cudgel in the list.',
       rope: "type 'take rope' in the box, then tap ACT.",
+      armor: 'take the vest from TAKE / SALVAGE, then open your pack and equip it.',
       scrap: 'tap the glowing TAKE / SALVAGE button, then tap the chest plate under SALVAGE.',
       climb: 'tap the glowing CLIMB button.',
       investigate: 'tap the glowing INVESTIGATE button and look at the door.',
@@ -30731,6 +30762,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   equipItem(itemName, slot, itemId) {
+    // ⚠ OTA-1248 — the `armor` beat completes on the EQUIP, not the take. Placed at
+    // the top so it fires for every route into equipping (inventory tap, typed
+    // `equip vest`, the group action) rather than only the one the beat suggested.
+    if (/vest|mud-warden|warden/i.test(itemName)) {
+      setTimeout(() => { try { get().maybeAdvanceTutorial('armor'); } catch { /* never block an equip */ } }, 0);
+    }
     const state = get();
     const player = state.player;
     if (!player) return;

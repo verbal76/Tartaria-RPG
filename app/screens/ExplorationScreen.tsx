@@ -132,7 +132,7 @@ export function ExplorationScreen() {
   // out-of-band controls buzz until the player makes the stay/leave choice.
   const tutLock =
     tutBeat !== null
-    && ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'].includes(tutBeat)
+    && ['name', 'cudgel', 'armor', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'].includes(tutBeat)
     && !tutorialExploreChosen;
   const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
@@ -550,30 +550,36 @@ export function ExplorationScreen() {
   // the exact drift this session has now paid for three times (OTA-1236's guard vs
   // its firer, OTA-1241's matcher vs its census, OTA-1244's display guarantee vs
   // its recompute). One list, two readers.
-  // ⚠⚠ OTA-1247 — THE ONLY TWO BEATS THAT NARROW THE PICKER, NAMED ONCE. The chips
-  // memo below narrows for these; the colour-lane hint suppresses itself for these.
-  // OTA-1245's hint gated on `!tutBeat` instead — ANY beat — and `explore_or_leave`
-  // IS a beat, so the hint was suppressed during free roam inside the outpost.
-  // ⚠ From the owner's device log, the run right after the crash fix: at 18:53:33,
-  // still on `explore_or_leave`, he opened a room holding three gear pieces AND six
-  // salvageables, took four things and swept the rest — his FIRST genuinely
-  // multi-lane room, and the hint that exists to explain it never fired. The gate
-  // was written against "is the tutorial running" when the real question is "is the
-  // picker showing a narrowed list".
-  const PICKER_NARROWING_BEATS = ['cudgel', 'scrap'];
-  const pickerIsNarrowed = tutBeat !== null && PICKER_NARROWING_BEATS.includes(tutBeat);
-
+  // ⚠⚠ OTA-1248 — THE TUTORIAL PICKER SHOWS THE WHOLE ROOM. Owner: *"even though
+  // we are doing just the cudgel for take, the take/salvage popup should be fully
+  // populated so they understand it shows all."*
+  //
+  // ⚠ THIS REVERSES OTA-1233's NARROWING, AND THE REASON THAT RULE EXISTED HAS
+  // EXPIRED. It was written after a playtest where a guided beat offered the room's
+  // real nouns beside the demo one — *"neither of those are the cudgel"* — back
+  // when a wrong tap CLOSED the picker and cost a reopen. Since OTA-1238 the picker
+  // STAYS OPEN, so a wrong tap now just takes something else and leaves the beat's
+  // target sitting right there. The cost that justified narrowing is gone; the cost
+  // of narrowing (OTA-1245: the layout is unteachable) is not.
+  //
+  // ⚠⚠ THE PROPS ARE MERGED IN, NOT SWAPPED FOR THE ROOM. The tutorial props are
+  // NOT scene nouns — they never appear in `displayedAmbientNouns`, which is why
+  // the owner's log shows LOOK listing the room without the cudgel in it. Dropping
+  // the override would have deleted the demo prop from the picker entirely and
+  // stalled the beat.
   const gatherChips = useMemo(
-    () =>
-      tutBeat === 'cudgel'
-        ? [{ noun: 'cudgel', consumed: false }]
-        : tutBeat === 'scrap'
-          ? [{ noun: 'broken chest plate', consumed: false }]
+    () => {
+      const tutorialProp =
+        tutBeat === 'cudgel' ? 'cudgel'
+          : tutBeat === 'armor' ? "Mud-Warden's Vest"
+            : tutBeat === 'scrap' ? 'broken chest plate'
+              : null;
+      const room =
           // ⚠ ONE list, unfiltered by kind — the merge is the point. The
           // elevation filter still applies: while up a climb the picker lists
           // only what is actually reachable (OTA-948), rather than ground
           // nouns every tap would be refused on.
-          : reachableWhileElevated(
+          reachableWhileElevated(
               currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
               currentScene?.elevatedOn?.noun ?? null,
               !!currentScene?.elevatedOverlayMeta,
@@ -591,7 +597,14 @@ export function ExplorationScreen() {
               .map((n) => ({
                 noun: n,
                 consumed: isAmbientConsumed(n) || isExhaustedHookNoun(n),
-              })),
+              }));
+      // ⚠ The prop goes FIRST so the beat's target is the top line of its lane —
+      // the room is fully populated, and the thing the Arbiter just named is still
+      // the easiest row to find.
+      return tutorialProp
+        ? [{ noun: tutorialProp, consumed: false }, ...room.filter((c) => c.noun !== tutorialProp)]
+        : room;
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [tutBeat, currentScene, productivelyConsumedSet],
   );
@@ -721,7 +734,7 @@ export function ExplorationScreen() {
           that renders BELOW an RN Modal (OTA-234), so a hint raised over the open
           picker would be invisible. Teaching lands as the player walks into the
           room, one beat before they press the button. */}
-      {!pickerIsNarrowed && gatherLaneCount >= 2 && (
+      {gatherLaneCount >= 2 && (
         <FirstTimeHint
           id="picker_colour_lanes"
           title="The room, by colour"
@@ -1996,6 +2009,14 @@ export function ExplorationScreen() {
           if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') {
             setTakeOpen(false);
             submit('take cudgel');
+            return;
+          }
+          // ⚠ OTA-1248 — the vest routes through the tutorial branch so the beat
+          // sees it. It does NOT close the picker: the beat completes on the EQUIP,
+          // and closing here would hide the rest of the room the owner asked to be
+          // shown in the first place.
+          if (tutBeat === 'armor' && /vest|warden/i.test(noun)) {
+            submit(`take ${noun}`);
             return;
           }
           takeAmbientNoun(noun);
