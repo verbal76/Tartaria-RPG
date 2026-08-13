@@ -135,9 +135,14 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     // hunted the row for a word that is not on it. The overrides meant the beat WORKED
     // when they found the right button, which is the worst kind of stale copy: not
     // broken enough to fail a test, just wrong enough to strand someone on turn one.
-    body: 'Tap TAKE / SALVAGE in the quick-action row. It opens everything in the room at once — tap the cudgel at your feet to pick it up.',
+    // ⚠ OTA-1245 — the claim trimmed to what the beat can SHOW. This picker is
+    // narrowed to the cudgel alone, so the old line's promise of the entire room in
+    // one card was contradicted by the very next frame. The full layout is taught by
+    // the `picker_colour_lanes` hint on the first real multi-lane room, where it is
+    // actually true.
+    body: 'Tap TAKE / SALVAGE in the quick-action row — it opens the room. Tap the cudgel at your feet to pick it up.',
     arbiter:
-      '"A cudgel, by your boots. Tap TAKE / SALVAGE — that button shows you the whole room — then tap the cudgel. You\'ll want a weapon."',
+      '"A cudgel, by your boots. Tap TAKE / SALVAGE, then tap the cudgel. You\'ll want a weapon."',
   },
   {
     id: 'rope',
@@ -159,8 +164,11 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Salvage the Broken Plate',
     // ⚠ Same button as the cudgel beat, and saying so is the lesson: one picker
     // holds both verbs, and the room tells you which one a thing answers to. The
-    // plate comes up in the yellow SCRAP lane, which is the whole teaching moment.
-    body: 'That broken chest plate has nothing left in it. Open TAKE / SALVAGE again — the plate is in the yellow SALVAGE group. Tap it to break it down for parts.',
+    // plate comes up under the yellow SALVAGE heading (OTA-1243 renamed the lane).
+    // ⚠ OTA-1245 — "group" implied neighbours the beat does not show. It DOES come
+    // up under a yellow SALVAGE heading, so the colour vocabulary is introduced
+    // truthfully here and pays off when the real board appears.
+    body: 'That broken chest plate has nothing left in it. Open TAKE / SALVAGE again — the plate comes up under yellow SALVAGE. Tap it to break it down.',
     arbiter:
       '"That broken plate is worth more in pieces. Same button as before — TAKE / SALVAGE. The yellow ones salvage. Tap the plate."',
   },

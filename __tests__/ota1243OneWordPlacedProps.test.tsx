@@ -76,8 +76,13 @@ describe('OTA-1243 — one word: SALVAGE', () => {
 
   it('⚠ the copy that points at the lane points at the word that is on it', () => {
     const steps = src('app', 'components', 'tutorialSteps.ts');
-    expect(steps).toContain('yellow SALVAGE group');
+    // ⚠ OTA-1245 trimmed "group" from this line: the beat narrows the picker to
+    // ONE prop, so there is no group on screen to point at. The RULE this test
+    // guards is unchanged and is what is asserted — the copy names the word that
+    // is actually on the lane heading, and that word is SALVAGE.
+    expect(steps).toContain('yellow SALVAGE');
     expect(steps).not.toContain('SCRAP group');
+    expect(steps).not.toContain('yellow SCRAP');
     const store = src('app', 'state', 'gameStore.ts');
     expect(store).toContain('under SALVAGE.');
     const port = src('app', 'engine', 'portability.ts');

@@ -433,6 +433,63 @@ export function ExplorationScreen() {
     }),
     [currentScene?.hooks, player?.dog, worldMemory.pendingDogOnboarding],
   );
+  // ⚠⚠ OTA-1245 — THE PICKER'S CHIP LIST, HOISTED. It used to be an inline JSX
+  // expression, which was fine while the picker was its only reader. The
+  // colour-lane teaching hint needs to know whether THIS room actually shows more
+  // than one lane — and computing that from a second copy of this filter chain is
+  // the exact drift this session has now paid for three times (OTA-1236's guard vs
+  // its firer, OTA-1241's matcher vs its census, OTA-1244's display guarantee vs
+  // its recompute). One list, two readers.
+  const gatherChips = useMemo(
+    () =>
+      tutBeat === 'cudgel'
+        ? [{ noun: 'cudgel', consumed: false }]
+        : tutBeat === 'scrap'
+          ? [{ noun: 'broken chest plate', consumed: false }]
+          // ⚠ ONE list, unfiltered by kind — the merge is the point. The
+          // elevation filter still applies: while up a climb the picker lists
+          // only what is actually reachable (OTA-948), rather than ground
+          // nouns every tap would be refused on.
+          : reachableWhileElevated(
+              currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
+              currentScene?.elevatedOn?.noun ?? null,
+              !!currentScene?.elevatedOverlayMeta,
+              currentScene?.nounPlacements ?? null,
+              currentScene?.elevatedOn?.tier ?? 0,
+            )
+              .filter((n) => !isOversized(n) || findCatalogItem(n) === null)
+              // ⚠⚠ OTA-1233 — `isExhaustedHookNoun` IS PART OF THE CONSUMED
+              // TEST, and it nearly went missing in the merge. The old salvage
+              // picker consulted it (OTA-1211: a spent hook noun must grey, or
+              // the chip stays lit forever and every tap earns a refusal), and
+              // retiring that picker took its call site with it. ota1211's
+              // suite counts these call sites for exactly this reason and
+              // failed the moment it dropped — the pin worked.
+              .map((n) => ({
+                noun: n,
+                consumed: isAmbientConsumed(n) || isExhaustedHookNoun(n),
+              })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tutBeat, currentScene, productivelyConsumedSet],
+  );
+
+  // ⚠⚠ OTA-1245 — HOW MANY COLOUR LANES THIS ROOM WOULD ACTUALLY SHOW. Derived
+  // from `gatherChips` — the same array the picker renders — so the teaching hint
+  // cannot fire over a room that turns out to have one lane, or stay silent over
+  // one that has three.
+  const gatherLaneCount = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { classifyGatherNoun: cls, laneForKind: lane } =
+      require('../engine/gatherSort') as typeof import('../engine/gatherSort');
+    const lanes = new Set<string>();
+    for (const c of gatherChips) {
+      if (c.consumed) continue;
+      const l = lane(cls(c.noun));
+      if (l) lanes.add(l);
+    }
+    return lanes.size;
+  }, [gatherChips]);
+
   const leadNouns = useMemo(
     () =>
       (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
@@ -618,6 +675,36 @@ export function ExplorationScreen() {
       // text line we are typing into?"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      {/* ⚠⚠ OTA-1245 — THE COLOUR SYSTEM, TAUGHT WHERE IT IS ACTUALLY VISIBLE.
+          Owner: *"have we addressed the tutorial yet where we need to go over this
+          new style of picker?"* No — and two copy passes had hidden that. The
+          tutorial's two picker beats each narrow the list to ONE prop (OTA-1233,
+          so a guided beat cannot offer the room's real nouns beside the demo one —
+          playtest: "neither of those are the cudgel"), so a first-timer sees a
+          single lane twice and never meets the layout at all. Rendered, the cudgel
+          beat is `GEAR | ⚔ cudgel | TAKE ALL GEAR (1)`. The redesign's whole idea —
+          here is everything, grouped by colour — is invisible.
+
+          ⚠ AND IT CANNOT BE TAUGHT INSIDE THE TUTORIAL WITHOUT LYING: there are
+          exactly four tutorial props (cudgel, rope, chest plate, note) and all are
+          spent or unavailable by the time the scrap beat runs. Faking a second lane
+          means inventing a prop that is not in the room, which is the class of
+          defect this whole run has been closing.
+
+          ⚠⚠ SO IT FIRES ON THE FIRST REAL MULTI-LANE ROOM — gated on
+          `gatherLaneCount >= 2` and computed from the SAME chip array the picker
+          renders, so the hint cannot promise a layout the room will not show. Fired
+          with the picker CLOSED, deliberately: FirstTimeHint is an absolute overlay
+          that renders BELOW an RN Modal (OTA-234), so a hint raised over the open
+          picker would be invisible. Teaching lands as the player walks into the
+          room, one beat before they press the button. */}
+      {!tutBeat && gatherLaneCount >= 2 && (
+        <FirstTimeHint
+          id="picker_colour_lanes"
+          title="The room, by colour"
+          body="TAKE / SALVAGE opens the whole room grouped by colour — orange gear, green items, yellow salvage. Sweep a colour with its button, or tap one line."
+        />
+      )}
       {/* OTA-860 — combat is where most of the un-tutorialized systems live (stealth,
           backstab, talking a foe down, parley). Fire this the first time a fight is
           actually on-screen, not on first exploration. */}
@@ -1867,35 +1954,7 @@ export function ExplorationScreen() {
       <GatherModal
         visible={takeOpen}
         player={player}
-        chips={
-          tutBeat === 'cudgel'
-            ? [{ noun: 'cudgel', consumed: false }]
-            : tutBeat === 'scrap'
-              ? [{ noun: 'broken chest plate', consumed: false }]
-              // ⚠ ONE list, unfiltered by kind — the merge is the point. The
-              // elevation filter still applies: while up a climb the picker lists
-              // only what is actually reachable (OTA-948), rather than ground
-              // nouns every tap would be refused on.
-              : reachableWhileElevated(
-                  currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
-                  currentScene?.elevatedOn?.noun ?? null,
-                  !!currentScene?.elevatedOverlayMeta,
-                  currentScene?.nounPlacements ?? null,
-                  currentScene?.elevatedOn?.tier ?? 0,
-                )
-                  .filter((n) => !isOversized(n) || findCatalogItem(n) === null)
-                  // ⚠⚠ OTA-1233 — `isExhaustedHookNoun` IS PART OF THE CONSUMED
-                  // TEST, and it nearly went missing in the merge. The old salvage
-                  // picker consulted it (OTA-1211: a spent hook noun must grey, or
-                  // the chip stays lit forever and every tap earns a refusal), and
-                  // retiring that picker took its call site with it. ota1211's
-                  // suite counts these call sites for exactly this reason and
-                  // failed the moment it dropped — the pin worked.
-                  .map((n) => ({
-                    noun: n,
-                    consumed: isAmbientConsumed(n) || isExhaustedHookNoun(n),
-                  }))
-        }
+        chips={gatherChips}
         // ⚠⚠ OTA-1238 — THE PICKER STAYS OPEN ACROSS SELECTIONS. Owner: *"the top
         // hat should stay open during all of the selections until you hit the
         // ignore button so you don't have to keep reopening it."* Every handler

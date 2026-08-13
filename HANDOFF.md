@@ -1644,7 +1644,38 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — PINS SURVIVE THE STEP (2026-08-13, latest).
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE PICKER IS TAUGHT (2026-08-13, latest). GOLEM
+  ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1245. **Same merge-or-revert decision
+  point — now also covering the `picker_colour_lanes` hint and the `gatherChips`
+  hoist in ExplorationScreen.**
+
+  Owner: *"have we addressed the tutorial yet where we need to go over this new
+  style of picker?"* **No — and two copy passes had disguised it.** OTA-1237
+  renamed the retired labels, OTA-1243 swapped SCRAP→SALVAGE; the tutorial READ
+  correct, so both felt like the job was done.
+
+  ⚠⚠ **BUT BOTH PICKER BEATS NARROW TO ONE PROP** (OTA-1233's rule — a guided beat
+  must not offer the room's real nouns beside the demo one). Rendered, that is one
+  lane, twice. **The layout is invisible during the only part of the game that
+  teaches.** ⚠ **THE LESSON: fixing the WORDS in a tutorial is not the same as
+  teaching the SYSTEM. Render the beat and look at it before calling a tutorial
+  pass finished.**
+
+  ⚠⚠ **AND IT CANNOT BE TAUGHT THERE WITHOUT LYING** — four tutorial props exist
+  (cudgel, rope, chest plate, note) and all are spent by the scrap beat. So the
+  teaching moved to the first REAL multi-lane room, as a one-time FirstTimeHint
+  gated on `!tutBeat && gatherLaneCount >= 2`. ⚠ Fired with the picker CLOSED
+  because FirstTimeHint renders BELOW an RN Modal (OTA-234) — a hint over the open
+  picker is invisible.
+
+  ⚠⚠ **THE CHIP LIST WAS HOISTED (`gatherChips`) so the hint reads the SAME array
+  the picker renders.** A second copy would have been the fourth time this session
+  paid for one rule computed twice (1236 guard/firer, 1241 matcher/census, 1244
+  guarantee/recompute). **One list, two readers — assume any new consumer of a
+  derived list is a drift risk until it shares the source.**
+  Full story: the VERSION.md 4.29.173 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — PINS SURVIVE THE STEP (2026-08-13).
   GOLEM ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1244. **⚠ THE FIX IS
   LINE-AGNOSTIC AND HAL HAS THE SAME BUG** — the broken block is OTA-302
   (2026-06-05), long predating the golem trial. It is filed here only because the

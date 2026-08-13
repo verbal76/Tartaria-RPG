@@ -221,17 +221,23 @@ describe('OTA-1233 — the merge did not cost anything that was already working'
     // The guided beats must not offer the room's real nouns beside the demo one
     // — playtest, pre-fix: "neither of those are the cudgel". Each beat used to
     // own its own picker; with one picker each must narrow the WHOLE list.
+    // ⚠ OTA-1245 — the chip list was HOISTED out of the JSX into a `gatherChips`
+    // memo so the colour-lane hint could read the same array the picker renders.
+    // The rule is unchanged and still asserted; only its address moved. Anchoring
+    // a test on a neighbouring construct is what bit ota1231 two OTAs ago.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
-    const block = screen.slice(screen.indexOf('<GatherModal'), screen.indexOf('onCancel={() => { Keyboard.dismiss(); setTakeOpen(false); }}'));
+    const block = screen.slice(screen.indexOf('const gatherChips = useMemo('), screen.indexOf('const gatherLaneCount'));
     expect(block).toContain("tutBeat === 'cudgel'");
     expect(block).toContain("tutBeat === 'scrap'");
     expect(block).toContain("noun: 'cudgel'");
     expect(block).toContain("noun: 'broken chest plate'");
+    // ...and the picker is fed by exactly that array, not a second copy.
+    expect(screen).toContain('chips={gatherChips}');
   });
 
   it('⚠ the elevation filter survived — while up a climb you only see what you can reach', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
-    const block = screen.slice(screen.indexOf('<GatherModal'), screen.indexOf('<GatherModal') + 2600);
+    const block = screen.slice(screen.indexOf('const gatherChips = useMemo('), screen.indexOf('const gatherLaneCount'));
     expect(block).toContain('reachableWhileElevated');
   });
 
