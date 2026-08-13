@@ -53,8 +53,10 @@ describe('OTA-1248 — the tutorial picker is fully populated', () => {
     // OTA-1245 suppressed it during beats (the picker was narrowed) and OTA-1247
     // narrowed that to the two narrowing beats. With nothing narrowed, the lane
     // count alone is the honest gate.
+    // ⚠ OTA-1249 moved WHEN it fires (arrival → picker close); the gate is still
+    // the lane count and nothing else. ota1249 owns the timing assertions.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
-    expect(screen).toContain('{gatherLaneCount >= 2 && (');
+    expect(screen).toContain('lanesWhileOpen.current >= 2');
     expect(screen).not.toContain('pickerIsNarrowed');
   });
 });
@@ -115,14 +117,21 @@ describe('OTA-1248 — the armor beat', () => {
   });
 
   it('⚠⚠ every beat-aware list learned the new id — a missed one breaks the lockdown', () => {
-    // Three separate lists gate on beat ids. A beat missing from any of them lets
-    // out-of-band controls open mid-tutorial, or greys the button the beat needs.
-    const screen = src('app', 'screens', 'ExplorationScreen.tsx');
+    // ⚠⚠ OTA-1249 REWROTE THIS, AND THE REASON IS THE FINDING. The three lists this
+    // test policed were three HAND-WRITTEN COPIES of the lock-beat array, and
+    // pinning all three is not a fix — it is a standing tax that gets paid wrong
+    // eventually. It already had been: the store's copy never got 'armor', so typed
+    // input ran unlocked for the whole beat while this test passed on the two UI
+    // copies. There is now ONE exported list, and ota1249 derives its contents from
+    // TUTORIAL_STEPS rather than restating them.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { TUT_LOCK_BEATS } = require('../app/components/tutorialSteps');
+    expect(TUT_LOCK_BEATS).toContain('armor');
     const input = src('app', 'components', 'InputBox.tsx');
     const store = src('app', 'state', 'gameStore.ts');
-    expect(screen).toContain("'cudgel', 'armor', 'rope'");
-    expect(input).toContain("'cudgel', 'armor', 'rope'");
+    // The beat still permits the TAKE button — that part is genuinely per-beat.
     expect(input).toContain("currentBeatId === 'cudgel' || currentBeatId === 'armor' ? 'take'");
+    expect(input).toContain("'cudgel' || tutActionBeat === 'armor'");
     // ...and the stuck-player nudge names the new step.
     expect(store).toContain('armor: ');
   });

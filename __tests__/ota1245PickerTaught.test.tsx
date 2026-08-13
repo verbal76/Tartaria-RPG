@@ -106,7 +106,10 @@ describe('OTA-1245 — taught where it is true', () => {
     expect(screen).toContain('id="picker_colour_lanes"');
     // ⚠ OTA-1248: with the picker fully populated in every beat, the gate is the
     // lane count alone — there is no longer a state where it would over-promise.
-    expect(screen).toContain('{gatherLaneCount >= 2 && (');
+    // ⚠ OTA-1249: and it is latched at picker CLOSE rather than on arrival, so
+    // the gate expression moved into the effect. Still the lane count, still one
+    // source; ota1249 pins the timing.
+    expect(screen).toContain('{pickerLanesTaught && (');
     expect(screen).not.toContain('{!tutBeat && gatherLaneCount >= 2 && (');
   });
 

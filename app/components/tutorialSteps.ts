@@ -90,6 +90,28 @@ export interface TutorialStep {
 export const TUTORIAL_SELF_DEFENCE =
   /\b(attack|strike|hit|swing|shoot|fire|stab|slash|punch|kick|throw|flee|run|escape|retreat|dodge|block|sneak|hide|use|drink|eat|equip|wield|talk|parley)\b/i;
 
+// arb108 — beats that hold the player in the OUTPOST tutorial lockdown: from the
+// name beat through the stay/leave choice. While locked, only the current beat's
+// instructed control works; everything else dims and buzzes. The lock lifts once
+// the player chooses (tutorialExploreChosen) or the beat advances past
+// explore_or_leave (main_quest / pick_city are post-choice).
+//
+// ⚠⚠ OTA-1249 — 'look' ADDED, AND THE LIST MOVED HERE. Owner: *"you should type
+// your name, then get the prompt for look around you, and it should be the only
+// button highlighted."* It was not the only one — it was one of eleven live
+// buttons, because 'look' was the one beat between 'name' and 'explore_or_leave'
+// missing from this list, so the lockdown simply switched off for the length of
+// it. The beat lit LOOK AROUND YOU green and left travel, investigate, take /
+// salvage, craft, inventory and the rest tappable beside it.
+//
+// ⚠ AND IT LIVED IN TWO PLACES — an identical literal array in InputBox and in
+// ExplorationScreen. That is the defect this session has now paid for five times
+// (OTA-1236, 1241, 1244, 1245): a rule computed twice drifts. One export, both
+// readers.
+export const TUT_LOCK_BEATS: readonly string[] = [
+  'name', 'look', 'cudgel', 'armor', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave',
+];
+
 // Tungsten Spire — the new 10-beat in-feed sequence. Each beat is
 // driven by a specific player action; the state machine in gameStore
 // advances when the action matches.

@@ -14,7 +14,7 @@ import {
 import { TutorialTarget } from './TutorialTarget';
 import { visibleBuildingRooms } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
-import { TUTORIAL_STEPS } from './tutorialSteps';
+import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from './tutorialSteps';
 import { playerWeaponReach, useGameStore, logUiTap } from '../state/gameStore';
 import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
@@ -130,16 +130,6 @@ const PEACE_QUICK_DIRECT: Array<{ label: string; submit: string }> = [
   { label: 'look around you', submit: 'look' },
   { label: 'rest', submit: 'rest' },
 ];
-
-// arb108 — beats that hold the player in the OUTPOST tutorial lockdown:
-// from the name beat through the stay/leave choice. While locked, only the
-// current beat's instructed control works; everything else buzzes. The lock
-// lifts once the player chooses (tutorialExploreChosen) or the beat advances
-// past explore_or_leave (main_quest / pick_city are post-choice).
-// ⚠ OTA-1248 — 'armor' added. This list and ExplorationScreen's twin gate the
-// outpost lockdown; a beat missing from either lets out-of-band controls open
-// mid-tutorial.
-const TUT_LOCK_BEATS = ['name', 'cudgel', 'armor', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'];
 
 // arb132 — STABLE empty-array sentinel for the bandolier selector. A NEW character
 // has no `player.equipped.bandolierIds` yet, so `?? []` returned a FRESH array on
@@ -411,10 +401,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     && TUT_LOCK_BEATS.includes(currentBeatId)
     && !tutorialExploreChosen;
   // The single button the current beat permits (null = none; type/choose).
-  const tutInstructed: 'take' | 'salvage' | 'investigate' | 'climb' | null =
+  const tutInstructed: 'look' | 'take' | 'salvage' | 'investigate' | 'climb' | null =
     // ⚠ OTA-1248 — 'armor' permits the same button as 'cudgel': the vest is TAKEN
     // from the picker, and the beat then completes on the equip in the pack.
-    currentBeatId === 'cudgel' || currentBeatId === 'armor' ? 'take'
+    currentBeatId === 'look' ? 'look'
+    : currentBeatId === 'cudgel' || currentBeatId === 'armor' ? 'take'
     : currentBeatId === 'scrap' ? 'salvage'
     : currentBeatId === 'investigate' ? 'investigate'
     : currentBeatId === 'climb' ? 'climb'
@@ -424,6 +415,13 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const investigateBlocked = tutLock && tutInstructed !== 'investigate';
   const climbBlocked = tutLock && tutInstructed !== 'climb';
   const approachBlocked = tutLock;
+  // ⚠⚠ OTA-1249 — the look beat's OWN button must survive its own lockdown.
+  // `blocked` beats `tone` inside QuickBtn, so a button that is both instructed
+  // and locked renders GREY: the beat would tell the player to tap the one
+  // control it had just dimmed. REST is the other direct quick button and stays
+  // blocked, which is the whole point — one lit button, nothing else live.
+  const lookBlocked = (submit: string): boolean =>
+    tutLock && !(tutInstructed === 'look' && submit === 'look');
 
   return (
     <View style={styles.container}>
@@ -483,19 +481,24 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           ) : sceneBuilding ? (
             // arb36 — a structure stands on this tile: offer ENTER alongside
             // the cardinals so the player can step inside what they found.
+            // ⚠ OTA-1249 — the cardinals carry the lock too. The outpost beats run
+            // in a hub, so today this branch never renders under a live lock; that
+            // is an assumption about spawn, not a guarantee, and it left the one
+            // row that can walk the player out of the tutorial unblocked. Outside
+            // the outpost `tutLock` is false and this costs nothing.
             <>
-              <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} />
-              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} />
-              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} />
-              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} />
-              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />
+              <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} blocked={tutLock} />
+              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} />
+              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} />
+              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} />
+              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} blocked={tutLock} />
             </>
           ) : (
             <>
-              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} />
-              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} />
-              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} />
-              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />            </>
+              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} />
+              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} />
+              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} />
+              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} blocked={tutLock} />            </>
           )}
         </TutorialTarget>
       )}
@@ -625,7 +628,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 // a static, unlit button with nothing drawing the player to
                 // it (playtest: "nothing's drawing you to that button").
                 tone={currentBeatId === 'look' && qa.submit === 'look' ? 'ready' : undefined}
-                blocked={tutLock}
+                blocked={lookBlocked(qa.submit)}
               />
             ))}
             {raceAbilityReady && onOpenRaceAbilities && !tutLock ? (

@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.176';
+export const DISPLAY_VERSION = '4.29.177';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23383,7 +23383,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // accepted by that device; a fresh install was what broke the loop.
 // New suite ota1174BugReportLoads (10 tests).
 // DISPLAY_VERSION 4.29.107.
-export const OTA_BUILD_ID = '2026-08-13-1248-full-picker-and-armor';
+export const OTA_BUILD_ID = '2026-08-13-1249-look-beat-lock-and-card-on-close';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-13-1247-hint-fires-when-it-should';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-13-1246-render-crash-fix';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-13-1245-the-picker-is-taught';

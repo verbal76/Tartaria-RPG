@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
@@ -56,7 +56,7 @@ import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
 import { profileOf } from '../engine/pressure';
 import { TutorialTarget } from '../components/TutorialTarget';
-import { TUTORIAL_STEPS } from '../components/tutorialSteps';
+import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from '../components/tutorialSteps';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
 import type { CombatRange } from '../engine/types';
 import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
@@ -130,9 +130,11 @@ export function ExplorationScreen() {
   const chooseTutorialExplore = useGameStore((s) => s.chooseTutorialExplore);
   // arb108 — outpost tutorial lockdown (mirrors InputBox): MAP + other
   // out-of-band controls buzz until the player makes the stay/leave choice.
+  // ⚠ OTA-1249 — reads the SAME exported list InputBox does. This was an
+  // identical literal array in both files, and 'look' was missing from both.
   const tutLock =
     tutBeat !== null
-    && ['name', 'cudgel', 'armor', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'].includes(tutBeat)
+    && TUT_LOCK_BEATS.includes(tutBeat)
     && !tutorialExploreChosen;
   const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
@@ -626,6 +628,30 @@ export function ExplorationScreen() {
     return lanes.size;
   }, [gatherChips]);
 
+  // ⚠⚠ OTA-1249 — THE CARD WAITS FOR THE PICKER TO CLOSE. Owner: *"when you hit
+  // the button, the new popup should jump in, then when you close it it should
+  // show the new card."* OTA-1245 fired it on ARRIVAL instead, one beat before the
+  // player pressed anything, on the reasoning that FirstTimeHint is an absolute
+  // overlay that renders BELOW an RN Modal (OTA-234) and so could not be raised
+  // over the open picker. That solved the wrong half: it explained a layout the
+  // player had not seen yet, and by the time they opened the picker the card was
+  // already dismissed and gone.
+  //
+  // ⚠ THE LANE COUNT IS SNAPSHOT WHILE OPEN, NOT READ AT CLOSE. Taking or
+  // sweeping empties lanes, so a player who cleared the room down to one lane —
+  // or to none, which auto-closes (OTA-1240) — would read zero at close and never
+  // be taught. The high-water mark is what they actually saw.
+  const [pickerLanesTaught, setPickerLanesTaught] = useState(false);
+  const lanesWhileOpen = useRef(0);
+  useEffect(() => {
+    if (takeOpen) {
+      lanesWhileOpen.current = Math.max(lanesWhileOpen.current, gatherLaneCount);
+      return;
+    }
+    if (lanesWhileOpen.current >= 2) setPickerLanesTaught(true);
+    lanesWhileOpen.current = 0;
+  }, [takeOpen, gatherLaneCount]);
+
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
   // the store's setActiveEnemyIdx so combat handlers always target the
   // enemy the player is currently looking at.
@@ -727,14 +753,14 @@ export function ExplorationScreen() {
           means inventing a prop that is not in the room, which is the class of
           defect this whole run has been closing.
 
-          ⚠⚠ SO IT FIRES ON THE FIRST REAL MULTI-LANE ROOM — gated on
-          `gatherLaneCount >= 2` and computed from the SAME chip array the picker
-          renders, so the hint cannot promise a layout the room will not show. Fired
-          with the picker CLOSED, deliberately: FirstTimeHint is an absolute overlay
-          that renders BELOW an RN Modal (OTA-234), so a hint raised over the open
-          picker would be invisible. Teaching lands as the player walks into the
-          room, one beat before they press the button. */}
-      {gatherLaneCount >= 2 && (
+          ⚠⚠ SO IT FIRES THE FIRST TIME THE PLAYER CLOSES A REAL MULTI-LANE PICKER
+          — `pickerLanesTaught`, latched from the SAME chip array the picker
+          renders, so the card cannot describe a layout the player was not just
+          shown. It lands AFTER the modal, not during: FirstTimeHint is an absolute
+          overlay that renders BELOW an RN Modal (OTA-234), so a card raised over
+          the open picker would be invisible. Naming the colours right after the
+          player has seen them is the whole point. */}
+      {pickerLanesTaught && (
         <FirstTimeHint
           id="picker_colour_lanes"
           title="The room, by colour"

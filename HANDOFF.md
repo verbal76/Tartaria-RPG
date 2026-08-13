@@ -1644,8 +1644,44 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — FULL TUTORIAL PICKER + THE ARMOR BEAT (2026-08-13,
-  latest).** Golem OTA-1248. Same merge-or-revert decision point — **now also
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE LOOK BEAT HAD NO LOCKDOWN (2026-08-13,
+  latest).** Golem OTA-1249. **⚠⚠ THE LOOK-BEAT HALF IS AUTHORIZED FOR HAL** —
+  owner: *"the look around you button fix can go to Hal."* The card-on-close half
+  is picker work and stays golem-only.
+
+  Owner: *"type your name, then get the prompt for look around you, and it should
+  be the only button highlighted... then when you close [the picker] it should show
+  the new card."*
+
+  ⚠⚠ **`look` WAS THE ONE BEAT MISSING FROM THE LOCK LIST** — the only gap between
+  `name` and `explore_or_leave` — so the outpost lockdown switched off for its
+  whole length. LOOK AROUND YOU was green with eleven other live buttons beside it.
+
+  ⚠⚠ **AND THE LIST EXISTED IN THREE PLACES, ALREADY DRIFTED.** Two literal arrays
+  (InputBox, ExplorationScreen) plus a third in the store's typed-input gate;
+  OTA-1248 added `armor` to the two UI copies and not the store's, so typed input
+  ran UNLOCKED for the whole armor beat. **A rule computed twice drifts — this
+  session has now paid for it five times.** One exported `TUT_LOCK_BEATS`, and the
+  test derives its contents from TUTORIAL_STEPS instead of restating them.
+
+  ⚠ **ADDING A BEAT TO THE LOCK LIST IS HALF A CHANGE** — the lock refuses anything
+  that is not the beat's instructed control, so a beat added without its allowance
+  refuses the very thing it asks for. `look` and `armor` got theirs.
+
+  ⚠ **`blocked` BEATS `tone` IN QuickBtn** (`blocked ? undefined : tone`), so a
+  naive lock would have greyed the button the beat tells you to press. The
+  exemption is per-submit: LOOK is live, REST beside it is not.
+
+  ⚠ **THE CARD NOW LATCHES ON PICKER CLOSE, NOT ARRIVAL**, with the lane count
+  taken as a HIGH-WATER MARK while open — an emptied picker auto-closes (OTA-1240),
+  so reading the count at close would skip the player who cleared the room.
+
+  ⚠ **RENDERED, NOT PINNED:** the suite mounts the real InputBox on the beat and
+  reads back each button's disabled state; verified by re-introducing both halves.
+  Full story: the VERSION.md 4.29.177 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — FULL TUTORIAL PICKER + THE ARMOR BEAT
+  (2026-08-13).** Golem OTA-1248. Same merge-or-revert decision point — **now also
   covering a NEW TUTORIAL BEAT (`armor`), which any HAL port must carry or the
   beat-id lists diverge.**
 
