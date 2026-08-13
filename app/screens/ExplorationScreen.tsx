@@ -433,63 +433,6 @@ export function ExplorationScreen() {
     }),
     [currentScene?.hooks, player?.dog, worldMemory.pendingDogOnboarding],
   );
-  // ⚠⚠ OTA-1245 — THE PICKER'S CHIP LIST, HOISTED. It used to be an inline JSX
-  // expression, which was fine while the picker was its only reader. The
-  // colour-lane teaching hint needs to know whether THIS room actually shows more
-  // than one lane — and computing that from a second copy of this filter chain is
-  // the exact drift this session has now paid for three times (OTA-1236's guard vs
-  // its firer, OTA-1241's matcher vs its census, OTA-1244's display guarantee vs
-  // its recompute). One list, two readers.
-  const gatherChips = useMemo(
-    () =>
-      tutBeat === 'cudgel'
-        ? [{ noun: 'cudgel', consumed: false }]
-        : tutBeat === 'scrap'
-          ? [{ noun: 'broken chest plate', consumed: false }]
-          // ⚠ ONE list, unfiltered by kind — the merge is the point. The
-          // elevation filter still applies: while up a climb the picker lists
-          // only what is actually reachable (OTA-948), rather than ground
-          // nouns every tap would be refused on.
-          : reachableWhileElevated(
-              currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
-              currentScene?.elevatedOn?.noun ?? null,
-              !!currentScene?.elevatedOverlayMeta,
-              currentScene?.nounPlacements ?? null,
-              currentScene?.elevatedOn?.tier ?? 0,
-            )
-              .filter((n) => !isOversized(n) || findCatalogItem(n) === null)
-              // ⚠⚠ OTA-1233 — `isExhaustedHookNoun` IS PART OF THE CONSUMED
-              // TEST, and it nearly went missing in the merge. The old salvage
-              // picker consulted it (OTA-1211: a spent hook noun must grey, or
-              // the chip stays lit forever and every tap earns a refusal), and
-              // retiring that picker took its call site with it. ota1211's
-              // suite counts these call sites for exactly this reason and
-              // failed the moment it dropped — the pin worked.
-              .map((n) => ({
-                noun: n,
-                consumed: isAmbientConsumed(n) || isExhaustedHookNoun(n),
-              })),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tutBeat, currentScene, productivelyConsumedSet],
-  );
-
-  // ⚠⚠ OTA-1245 — HOW MANY COLOUR LANES THIS ROOM WOULD ACTUALLY SHOW. Derived
-  // from `gatherChips` — the same array the picker renders — so the teaching hint
-  // cannot fire over a room that turns out to have one lane, or stay silent over
-  // one that has three.
-  const gatherLaneCount = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { classifyGatherNoun: cls, laneForKind: lane } =
-      require('../engine/gatherSort') as typeof import('../engine/gatherSort');
-    const lanes = new Set<string>();
-    for (const c of gatherChips) {
-      if (c.consumed) continue;
-      const l = lane(cls(c.noun));
-      if (l) lanes.add(l);
-    }
-    return lanes.size;
-  }, [gatherChips]);
-
   const leadNouns = useMemo(
     () =>
       (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
@@ -561,6 +504,7 @@ export function ExplorationScreen() {
     return true;
   };
 
+
   // 2026-05-26 OTA-070 — substring-fuzzy consumed check. Mirrors
   // the engine's alreadySearched logic at gameStore.ts:4189 so the
   // chip's gray-out state matches the engine's accept/refuse
@@ -589,6 +533,72 @@ export function ExplorationScreen() {
   // noun never substring-matched the live display noun.
   const isFuzzyConsumed = (chipNoun: string, pool: Set<string>): boolean =>
     isNounConsumed(chipNoun, pool);
+
+  // ⚠⚠ OTA-1246 — THIS BLOCK LIVES *BELOW* `isAmbientConsumed` AND MUST STAY THERE.
+  // OTA-1245 hoisted it out of the JSX to give the colour-lane hint the same array
+  // the picker renders — correct idea, placed 82 lines too early. A `useMemo`
+  // FACTORY RUNS DURING RENDER, so the memo called `isAmbientConsumed` while that
+  // const was still in its temporal dead zone. Under Hermes that reads as
+  // `undefined`, and the app died on the owner’s device with
+  // `undefined is not a function` in ExplorationScreen before a single frame drew.
+  // ⚠ Moving a computation earlier moves its DEPENDENCIES earlier too. Any new
+  // reader added between here and the JSX has to come after this, not before it.
+  // ⚠⚠ OTA-1245 — THE PICKER'S CHIP LIST, HOISTED. It used to be an inline JSX
+  // expression, which was fine while the picker was its only reader. The
+  // colour-lane teaching hint needs to know whether THIS room actually shows more
+  // than one lane — and computing that from a second copy of this filter chain is
+  // the exact drift this session has now paid for three times (OTA-1236's guard vs
+  // its firer, OTA-1241's matcher vs its census, OTA-1244's display guarantee vs
+  // its recompute). One list, two readers.
+  const gatherChips = useMemo(
+    () =>
+      tutBeat === 'cudgel'
+        ? [{ noun: 'cudgel', consumed: false }]
+        : tutBeat === 'scrap'
+          ? [{ noun: 'broken chest plate', consumed: false }]
+          // ⚠ ONE list, unfiltered by kind — the merge is the point. The
+          // elevation filter still applies: while up a climb the picker lists
+          // only what is actually reachable (OTA-948), rather than ground
+          // nouns every tap would be refused on.
+          : reachableWhileElevated(
+              currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
+              currentScene?.elevatedOn?.noun ?? null,
+              !!currentScene?.elevatedOverlayMeta,
+              currentScene?.nounPlacements ?? null,
+              currentScene?.elevatedOn?.tier ?? 0,
+            )
+              .filter((n) => !isOversized(n) || findCatalogItem(n) === null)
+              // ⚠⚠ OTA-1233 — `isExhaustedHookNoun` IS PART OF THE CONSUMED
+              // TEST, and it nearly went missing in the merge. The old salvage
+              // picker consulted it (OTA-1211: a spent hook noun must grey, or
+              // the chip stays lit forever and every tap earns a refusal), and
+              // retiring that picker took its call site with it. ota1211's
+              // suite counts these call sites for exactly this reason and
+              // failed the moment it dropped — the pin worked.
+              .map((n) => ({
+                noun: n,
+                consumed: isAmbientConsumed(n) || isExhaustedHookNoun(n),
+              })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tutBeat, currentScene, productivelyConsumedSet],
+  );
+
+  // ⚠⚠ OTA-1245 — HOW MANY COLOUR LANES THIS ROOM WOULD ACTUALLY SHOW. Derived
+  // from `gatherChips` — the same array the picker renders — so the teaching hint
+  // cannot fire over a room that turns out to have one lane, or stay silent over
+  // one that has three.
+  const gatherLaneCount = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { classifyGatherNoun: cls, laneForKind: lane } =
+      require('../engine/gatherSort') as typeof import('../engine/gatherSort');
+    const lanes = new Set<string>();
+    for (const c of gatherChips) {
+      if (c.consumed) continue;
+      const l = lane(cls(c.noun));
+      if (l) lanes.add(l);
+    }
+    return lanes.size;
+  }, [gatherChips]);
 
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
   // the store's setActiveEnemyIdx so combat handlers always target the

@@ -1644,7 +1644,33 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE PICKER IS TAUGHT (2026-08-13, latest). GOLEM
+- **⚠⚠⚠ HOTFIX — I SHIPPED A RENDER CRASH (2026-08-13, latest).** Golem OTA-1246.
+  Device, on the build pushed hours earlier: `screen-render · undefined is not a
+  function · in ExplorationScreen`. Dead before the first frame.
+
+  OTA-1245's `gatherChips` hoist was placed 82 lines above `isAmbientConsumed`.
+  ⚠⚠ **A `useMemo` FACTORY RUNS DURING RENDER**, so the memo called a `const` still
+  in its temporal dead zone; under Hermes that reads as `undefined`.
+  ⚠ **MOVING A COMPUTATION EARLIER MOVES ITS DEPENDENCIES EARLIER TOO.** The hoist
+  was reviewed for what it read, never for where those were declared.
+
+  ⚠⚠ **THE FIRST FIX WAS NOT ENOUGH AND THE RENDER TEST CAUGHT THE SECOND HOP** —
+  `isAmbientConsumed` itself calls `isFuzzyConsumed`, declared 132 lines lower.
+
+  ⚠⚠ **WHY NOTHING CAUGHT IT.** `tsc` cannot (a closure reference is legal).
+  `eslint` could — `no-use-before-define` is exactly this — but **measured: 2,869
+  pre-existing violations**, so it cannot block today. **And every suite touching
+  ExplorationScreen SOURCE-PINS it; none had ever rendered it.**
+
+  **NEW STANDING RULE: a screen with no render test has no guard at all.**
+  ota1246ExplorationRenders mounts it. ⚠ And it must mount a POPULATED room — the
+  first draft passed with the bug live, because an empty scene never CALLS the dead
+  reference. Verified by putting the bug back and watching it fail.
+  ⚠ `{ virtual: true }` on a real module holds only in isolation; the full run
+  loaded the real ONNX binding. Use the house mock pattern.
+  Full story: the VERSION.md 4.29.174 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE PICKER IS TAUGHT (2026-08-13). GOLEM
   ONLY, NOT ON HAL, BY DECISION.** Golem OTA-1245. **Same merge-or-revert decision
   point — now also covering the `picker_colour_lanes` hint and the `gatherChips`
   hoist in ExplorationScreen.**
