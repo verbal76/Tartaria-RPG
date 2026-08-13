@@ -1676,7 +1676,36 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THREE VERBS SHARING TWO MARKERS (2026-08-12, latest). HAL ONLY so far —
+- **⚠⚠ THE LOOK BEAT HAD NO LOCKDOWN (2026-08-13, latest). HAL — PORTED FROM
+  GOLEM.** HAL OTA-1255, from golem OTA-1249, at the owner's explicit direction:
+  *"the look around you button fix can go to Hal."* The loot-picker work it was
+  found alongside stays golem-only. **HAL had the identical bug.**
+
+  Owner: *"type your name, then get the prompt for look around you, and it should
+  be the only button highlighted."*
+
+  ⚠⚠ **`look` WAS THE ONE BEAT MISSING FROM THE LOCK LIST** — the only gap between
+  `name` and `explore_or_leave` — so the outpost lockdown switched off for its
+  whole length. LOOK AROUND YOU was green with eleven other live buttons beside it.
+
+  ⚠⚠ **AND THE LIST EXISTED IN THREE PLACES** (InputBox, ExplorationScreen, and the
+  store's typed-input gate), with `look` missing from all three. **A rule computed
+  three times drifts, and pinning all three copies in a test is a standing tax, not
+  a fix.** One exported `TUT_LOCK_BEATS`, and the test derives its contents from
+  TUTORIAL_STEPS instead of restating them.
+
+  ⚠ **ADDING A BEAT TO THE LOCK LIST IS HALF A CHANGE** — the lock refuses anything
+  that is not the beat's instructed control, so a beat added without its allowance
+  refuses the very thing it asks for. `look` got its allowance and its nudge line.
+
+  ⚠ **`blocked` BEATS `tone` IN QuickBtn** (`blocked ? undefined : tone`), so a
+  naive lock would have greyed the button the beat tells you to press. The
+  exemption is per-submit: LOOK is live, REST beside it is not.
+
+  ⚠ **RENDERED, NOT PINNED:** the suite mounts the real InputBox on the beat and
+  reads back each button's disabled state. Full story: the VERSION.md 4.29.160 row.
+
+- **⚠⚠ THREE VERBS SHARING TWO MARKERS (2026-08-12). HAL ONLY so far —
   golem batch pending.** HAL OTA-1254. Owner, from a phone session:
   *"investigate kills salvage sometimes, salvage can kill items in take."* Both
   true, and **the contract is written down in `app/engine/types.ts` on the marker

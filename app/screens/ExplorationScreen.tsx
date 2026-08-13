@@ -53,7 +53,7 @@ import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
 import { profileOf } from '../engine/pressure';
 import { TutorialTarget } from '../components/TutorialTarget';
-import { TUTORIAL_STEPS } from '../components/tutorialSteps';
+import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from '../components/tutorialSteps';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
 import type { CombatRange } from '../engine/types';
 import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1250 — one column width, platform-aware
@@ -126,7 +126,9 @@ export function ExplorationScreen() {
   // out-of-band controls buzz until the player makes the stay/leave choice.
   const tutLock =
     tutBeat !== null
-    && ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'].includes(tutBeat)
+    // ⚠ OTA-1255 — reads the SAME exported list InputBox does. This was an
+    // identical literal array in both files, and 'look' was missing from both.
+    && TUT_LOCK_BEATS.includes(tutBeat)
     && !tutorialExploreChosen;
   const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);

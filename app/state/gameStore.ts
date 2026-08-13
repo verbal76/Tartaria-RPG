@@ -426,7 +426,7 @@ import {
   makeStolenDiscs,
   describeWhisperStage,
 } from '../engine/whispers';
-import { TUTORIAL_STEPS, TUTORIAL_SELF_DEFENCE, type TutorialStep } from '../components/tutorialSteps';
+import { TUTORIAL_STEPS, TUTORIAL_SELF_DEFENCE, TUT_LOCK_BEATS, type TutorialStep } from '../components/tutorialSteps';
 import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome, storyCompletedBy, completedStoryCount, assembledStory, CHARACTER_STORIES } from '../engine/collectables';
 
 interface Concept {
@@ -12585,12 +12585,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     the right verb for cudgel/rope/scrap/investigate/name; the climb
       //     beat advances via the real climb handler (so climb commands pass
       //     through), and explore_or_leave lets the leave command through.
+      // ⚠⚠ OTA-1255 — READS THE SHARED LIST. This was a THIRD hand-written copy of
+      //     the lock-beat array (InputBox and ExplorationScreen held the other
+      //     two), and 'look' was missing from all three.
       const lockBeatId = tStep?.id ?? '';
       if (
-        ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'].includes(lockBeatId)
+        TUT_LOCK_BEATS.includes(lockBeatId)
         && !tState.tutorialExploreChosen
       ) {
         const isClimbCmd = /\bclimb\b/i.test(trimmed);
+        // ⚠ The look beat's own verb. Adding a beat to the lock list without its
+        // allowance would REFUSE the very command the beat asks for — the typed
+        // twin of the greyed-out button.
+        const isLookCmd = /^\s*(look|look\s+around(\s+you)?|examine\s+room|survey)\s*$/i.test(trimmed);
         const isLeaveCmd = isLeaveHubCommand(trimmed)
           || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed);
         // OTA-1063 — the lockdown must never outrank a live enemy. A summit
@@ -12602,7 +12609,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const enemiesLive = (get().currentScene?.enemies.length ?? 0) > 0;
         const isCombatCmd = TUTORIAL_SELF_DEFENCE.test(trimmed);
         const beatAllows =
-          (lockBeatId === 'climb' && isClimbCmd)
+          (lockBeatId === 'look' && isLookCmd)
+          || (lockBeatId === 'climb' && isClimbCmd)
           || (lockBeatId === 'explore_or_leave' && isLeaveCmd)
           || (enemiesLive && isCombatCmd);
         if (!beatAllows) {
@@ -30007,6 +30015,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const id = TUTORIAL_STEPS[state.tutorialStep]?.id ?? '';
     const hint: Record<string, string> = {
       name: 'type your name in the box, then tap ACT.',
+      look: 'tap the glowing LOOK AROUND YOU button to get your bearings.',
       cudgel: 'tap the glowing TAKE button and lift the cudgel.',
       rope: "type 'take rope' in the box, then tap ACT.",
       scrap: 'tap the glowing SALVAGE button and break the chest plate.',
