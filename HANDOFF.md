@@ -1783,8 +1783,32 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — EVERY MAIN SCREEN MOUNTS NOW (2026-08-14,
-  latest).** Golem OTA-1255. ⚠ **THE TEST IS LINE-AGNOSTIC AND HAL SHOULD HAVE ONE
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — NARRATION N1–N3 (2026-08-14, latest).** Golem
+  OTA-1258. ⚠ **THESE THREE ARE LINE-AGNOSTIC** — the bank, the idle trigger and
+  the preempt path all predate the picker work. HAL has all three bugs.
+
+  ⚠⚠ **N1 — the bank was keyed by LOCATION and every outpost room shares one**, so
+  a line written in the Atrium was spent at the Court. Keyed by room now; the
+  prefetch only targets tiles, so hub rooms fall through to the live path. **And a
+  banked line may not narrate a player ACTION** — true only in the instant it was
+  written, and the bank is the one channel where time passes.
+
+  ⚠⚠ **N2 — the trigger was SHORTER than the job it arms** (6s vs a measured ~9s),
+  so preemption was expected, not exceptional. The threshold reads the telemetry
+  now. ⚠ **A second constant restating a measured number always drifts from it.**
+
+  ⚠⚠ **N3 — the runtime always returned the partial text and this function binned
+  it** on the epoch check. A fill has nothing to speak, so late text is free text
+  later. ⚠ Guarded: a partial cut mid-sentence is still refused, because
+  `trimToLastSentence` returns its input unchanged when it finds no punctuation.
+
+  ⚠⚠ **THREE OLDER SUITES HAD PINNED MECHANISMS, NOT RULES.** ota1031 pinned "this
+  string does not appear here" when the rule is *spoken-now may narrate an action,
+  banked-for-later may not*. ota1124 sliced from a string that exists in two
+  functions, so its window started in the wrong one. **Anchor a slice to the
+  function you mean.** Full story: the VERSION.md 4.29.184 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — EVERY MAIN SCREEN MOUNTS NOW (2026-08-14).** Golem OTA-1255. ⚠ **THE TEST IS LINE-AGNOSTIC AND HAL SHOULD HAVE ONE
   TOO** — the crash class has nothing to do with the picker.
 
   ⚠⚠ **MEASURED: five of the six main screens had ZERO suites that mount them.**

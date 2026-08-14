@@ -74,10 +74,31 @@ describe('OTA-1031 — SOURCE LOCKS', () => {
     // Isolate the reactive narrator's own body — from its definition to the
     // ambient function's — so the shared import at the top of the file doesn't
     // count as a use.
+    //
+    // ⚠⚠ OTA-1258 CORRECTED THIS TEST'S PREMISE, and the distinction is the whole
+    // point of the rule. It pinned "the string does not appear in this function",
+    // which was a stand-in for the real rule: **a line SPOKEN NOW may narrate what
+    // just happened; a line BANKED FOR LATER may not.** Reactive narration is
+    // supposed to describe the action — filtering it there kills the feature. But
+    // the bank is the one channel where time passes between writing and speaking,
+    // and an unfiltered banked line produced the owner's *"You climb down the
+    // arch"* four rooms after the climb.
+    //
+    // So the assertion is now about WHERE the check sits, not whether the
+    // identifier occurs: it must be inside the `bankOnly` branch and nowhere else
+    // in this function.
     const start = store.indexOf('async function narrateViaArbiter');
     const end = store.indexOf('async function maybeGenerateAmbientArbiter');
     expect(start).toBeGreaterThan(0);
     expect(end).toBeGreaterThan(start);
-    expect(store.slice(start, end)).not.toMatch(/isSecondPersonActionOpener/);
+    const body = store.slice(start, end);
+    const uses = [...body.matchAll(/isSecondPersonActionOpener/g)].map((m) => m.index!);
+    expect(uses.length).toBe(1); // exactly one, and it is the bank's
+    const bankBranch = body.indexOf('if (opts?.bankOnly) {');
+    expect(bankBranch).toBeGreaterThan(0);
+    expect(uses[0]!).toBeGreaterThan(bankBranch);
+    // ...and the line that is SPOKEN is emitted without ever consulting it.
+    const speak = body.indexOf("get().appendLog('arbiter', finalText);");
+    expect(speak).toBeGreaterThan(uses[0]!); // the bank branch returns before this
   });
 });

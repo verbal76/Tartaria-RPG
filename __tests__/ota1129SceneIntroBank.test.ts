@@ -212,16 +212,29 @@ describe('OTA-1129 — ⚠ what a background fill must NOT do', () => {
     // usedFallback means the cleaned output was empty and the template carried
     // it — and the template is already free at arrival, so banking it would
     // spend a generation to store something we already had.
-    expect(fn).toContain('if (usedFallback || repDup) {');
+    // ⚠ OTA-1258 added two more refusal reasons to the same branch (an
+    // action-narrating line, and a preempted partial cut mid-sentence). The RULE
+    // is unchanged and is what is asserted: nothing unusable reaches the bank.
+    expect(fn).toContain('if (usedFallback || repDup || narratesAction || truncated) {');
     expect(fn).toContain("'intro-fill:∅'");
     expect(fn).toContain("'intro-fill:near-dup'");
   });
 
-  it('being cut short is reported as the ordinary outcome, not as a loss', () => {
+  it('being cut short no longer THROWS THE TEXT AWAY — but the live path still bails', () => {
+    // ⚠⚠ OTA-1258 (N3) REVERSED HALF OF THIS. Being cut short was reported as the
+    // ordinary outcome AND the partial text was binned on the spot, before any
+    // cleaning ran. `LlamaRuntime` had always returned the tokens already
+    // assembled; this function discarded them. **For a FILL there is nothing to
+    // speak** — it goes to the bank and is re-vetted at spend time — so late text
+    // is still free text later, which was the bank's entire premise.
     const fn = narrateFn();
-    expect(fn).toContain("'intro-fill:preempted'");
-    // …and the live path keeps its own, different reason.
+    expect(fn).toContain('const preemptedFill = opts?.bankOnly === true');
+    expect(fn).toContain('if (myEpoch !== arbiterGenerationEpoch && !preemptedFill) {');
+    // …and the LIVE path keeps its own reason and its own early return: the
+    // player has moved on and that line must never be spoken.
     expect(fn).toContain("'cancelled:player-acted-again'");
+    // A partial cut mid-sentence is still refused at the bank.
+    expect(fn).toContain("'intro-fill:preempted-partial'");
   });
 
   it('it rides the homework priority rather than competing with the player', () => {
@@ -261,7 +274,10 @@ describe('OTA-1129 — ⚠ a pre-written intro does not pretend to know the weat
 
 describe('OTA-1129 — the spend site, and the muzzles it inherits', () => {
   it('⚠ the bank is checked BEFORE a generation is started', () => {
-    const i = STORE.indexOf('takeBankedSceneIntro(get, location.id)');
+    // ⚠ OTA-1258 (N1) re-keyed the bank by ROOM, so the spend call now carries
+    // `introBankKey(...)`. The rule asserted — spend before you generate — is
+    // unchanged.
+    const i = STORE.indexOf('takeBankedSceneIntro(get, introBankKey(');
     const j = STORE.indexOf('void narrateViaArbiter(', i);
     expect(i).toBeGreaterThan(-1);
     expect(j).toBeGreaterThan(i);
@@ -272,7 +288,8 @@ describe('OTA-1129 — the spend site, and the muzzles it inherits', () => {
     // prose is wanted at all, and the line was written against a scene with no
     // enemies in it — spending it into an ambush would describe a room that is
     // no longer the situation.
-    expect(STORE).toContain('const banked = hasEnemies ? null : takeBankedSceneIntro(get, location.id);');
+    expect(STORE).toContain('const banked = hasEnemies');
+    expect(STORE).toContain(': takeBankedSceneIntro(get, introBankKey(location.id, inHub ? hubRoomId : null));');
   });
 
   it('the spend is logged so a device log can show the bank working', () => {
@@ -289,8 +306,11 @@ describe('OTA-1129 — the idle signal, and why it is a different one', () => {
     // uiIdleSince is stamped by the pack and the map — exactly right for item
     // descriptions and exactly wrong here, because a scene intro is needed
     // while the player is out walking, which is the one time it is never set.
+    // ⚠ OTA-1258 (N2) made the THRESHOLD dynamic — it reads the job's measured
+    // average instead of a fixed 6s that was shorter than the job it armed. The
+    // SIGNAL asserted here is unchanged: time since the last player action.
     expect(STORE).toContain('const lastAct = get().lastPlayerActionAt;');
-    expect(STORE).toContain('Date.now() - lastAct < INTRO_IDLE_MS');
+    expect(STORE).toContain('Date.now() - lastAct < idleNeeded');
   });
 
   it('the stamp is written at the one door every action passes through', () => {
