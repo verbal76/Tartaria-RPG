@@ -277,9 +277,16 @@ export interface QwenJobStats {
   avgPromptTokens: number;
   avgOutTokens: number;
   cachedTokens: number;
-  /** OTA-1108 — measured prefix reuse. Zero across a session means every call
-   *  re-reads its whole prompt, which is what makes a stable prompt PREFIX the
-   *  next prefill win rather than a guess. */
+  /** ⚠⚠ OTA-1259 (N4) — ALWAYS ZERO, AND NOT BECAUSE THE CACHE IS COLD. Kept as
+   *  a tombstone so nobody re-derives it: llama.rn reports `tokens_cached` as
+   *  `llama->n_past` (android/src/main/jni.cpp:748), which after a completion is
+   *  prompt tokens + generated tokens WHETHER OR NOT a prefix was reused — reuse
+   *  changes what must be computed, not what ends up in the cache. Subtracting
+   *  those two therefore yields ~0 by construction. **OTA-1108 read that zero as
+   *  "a stable prompt prefix is still on the table"; the premise was wrong.**
+   *  Prefix reuse is already ON (`common_part` in rn-llama.cpp) and our prompts
+   *  already share 53–85% of their text with the previous one. Read
+   *  `bestMsPerPromptTok` / `worstMsPerPromptTok` instead — that is the signal. */
   reusedTokens: number;
   cacheSamples: number;
   /** OTA-1127 — ms per prompt token, best and worst. The honest cache signal. */
@@ -340,14 +347,17 @@ export function qwenTelemetrySummary(): string {
       ? ` read${s(j.avgPrefillMs)}/write${s(j.avgDecodeMs)}`
       : '';
     const sizes = j.avgPromptTokens > 0 ? ` in${j.avgPromptTokens}t→out${j.avgOutTokens}t` : '';
-    // OTA-1108 — reuse, shown as a MEASURED zero when the field was reported.
-    // "no cache line" and "the cache saved us nothing" are different findings
-    // and the OTA-1107 rollup could not tell them apart.
-    // ⚠ OTA-1127 — `reuse` is kept but demoted, and the per-token RANGE is
-    // what the next log gets read for. Shown as best/worst so a warm call and
-    // a cold one stay visible as two different things instead of averaging
-    // into one number that describes neither.
-    const cached = j.cacheSamples > 0 ? ` reuse${j.reusedTokens}t` : '';
+    // ⚠⚠ OTA-1259 (N4) — `reuse` IS NO LONGER PRINTED. It was derived as
+    // `cachedTokens - promptTokens - outTokens`, and llama.rn reports
+    // `tokens_cached` as `n_past` — the sequence position after the call, i.e.
+    // prompt + generated, reuse or no reuse (jni.cpp:748). The subtraction is ~0
+    // BY CONSTRUCTION, so the number could never move and every log that showed
+    // `reuse 0t` was reporting arithmetic, not a cache miss. See `reusedTokens`.
+    // ⚠ OTA-1127's per-token RANGE is the real signal and now stands alone:
+    // best/worst rather than an average, so a warm call and a cold one stay
+    // visible as two different things instead of averaging into one number that
+    // describes neither.
+    const cached = '';
     const perTok = j.prefillSamples > 0
       ? ` ms/tok ${j.bestMsPerPromptTok.toFixed(1)}-${j.worstMsPerPromptTok.toFixed(1)}`
       : '';

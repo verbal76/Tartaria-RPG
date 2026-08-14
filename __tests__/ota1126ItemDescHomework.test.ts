@@ -160,11 +160,22 @@ describe('OTA-1127 — ⚠ the tracking that can answer the caching question', (
     expect(TEL).toContain('${cached}${perTok}');
   });
 
-  it('⚠ reuse is KEPT, not deleted — it is a fact about the field, not noise', () => {
-    // If cachedTokens ever starts reporting properly, the reuse figure becomes
-    // meaningful again. Removing it would destroy the only evidence that it
-    // was ever zero.
-    expect(TEL).toContain('reuse${j.reusedTokens}t');
+  it('⚠⚠ reuse is RETIRED from the display, and the reason is recorded in its place', () => {
+    // ⚠⚠ OTA-1259 (N4) REVERSED THIS ONE. OTA-1127 kept the figure on the reasoning
+    // that "if cachedTokens ever starts reporting properly, reuse becomes
+    // meaningful again" — which assumed the field was misreporting. **It is not.**
+    // llama.rn reports `tokens_cached` as `llama->n_past` (jni.cpp:748), the
+    // sequence position after the call: prompt + generated, reuse or no reuse.
+    // The derived remainder is ~0 BY CONSTRUCTION and there is no future build in
+    // which it starts to move.
+    //
+    // ⚠ The evidence is not destroyed by removing the display — it is PRESERVED,
+    // in the tombstone on the field itself, which is the place someone tempted to
+    // re-derive it will actually look. **A metric that cannot move is worse than
+    // no metric: it reads as evidence.**
+    expect(TEL).not.toContain('reuse${j.reusedTokens}t');
+    expect(TEL).toContain('jni.cpp:748');
+    expect(TEL).toContain('reusedTokens: number;');   // the field survives as a tombstone
   });
 
   it('a job with no measured prefill shows no range rather than a fake zero', () => {

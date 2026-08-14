@@ -8360,19 +8360,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? ` read ${r.prefillMs ?? '?'}ms/write ${r.decodeMs ?? '?'}ms`
         : '';
       const sizes = r.promptTokens != null ? ` in ${r.promptTokens}t→out ${r.outTokens ?? '?'}t` : '';
-      // ⚠ OTA-1108 — REUSE, derived, not the raw cache size. OTA-1107 printed
-      // `cachedTokens` and read it as "tokens llama.cpp reused". The first
-      // device log settled it: every row came back as exactly in+out (546+31,
-      // 542+31, 309+179, 127+22 …), i.e. the KV cache grew by what the call
-      // itself did and reused nothing. The honest number is the remainder, and
-      // a measured zero is the finding — it says a stable prompt PREFIX is
-      // still entirely on the table.
-      const reused = r.cachedTokens != null
-        ? Math.max(0, r.cachedTokens - (r.promptTokens ?? 0) - (r.outTokens ?? 0))
-        : null;
-      const cache = reused != null ? ` reuse ${reused}t` : '';
+      // ⚠⚠ OTA-1259 (N4) — THE `reuse Nt` NUMBER WAS STRUCTURALLY ZERO AND IS GONE.
+      //
+      // OTA-1108 derived it as `cachedTokens - promptTokens - outTokens` and read
+      // the resulting zero as a finding: "a stable prompt PREFIX is still entirely
+      // on the table." **That conclusion was built on a wrong premise about the
+      // field.** llama.rn reports `tokens_cached` as `llama->n_past`
+      // (android/src/main/jni.cpp:748), and after a completion `n_past` is the
+      // sequence position — prompt tokens PLUS generated tokens — whether or not
+      // any prefix was reused. Reuse changes what has to be COMPUTED, not what
+      // ends up in the cache. So the subtraction yields ~0 BY CONSTRUCTION and the
+      // metric could never have shown reuse, in any run, ever.
+      //
+      // ⚠⚠ AND THE UNDERLYING WORRY WAS BACKWARDS. llama.rn already does prefix
+      // reuse — `n_past = common_part(embd, prompt_tokens)` in rn-llama.cpp — and
+      // MEASURED, our prompts share 53–85% of their characters with the previous
+      // one (same room 84–85%, two rooms of one tile 53%, ambient-vs-ambient 71%).
+      // The owner's 2026-08-14 log shows two `scene_intro_fill` calls at
+      // 12.2 ms/prompt-token and 3.67 ms/prompt-token on near-identical prompt
+      // sizes: a 3.3× spread that is exactly what a warm prefix looks like.
+      //
+      // ⚠ THE HONEST SIGNAL IS PREFILL PER PROMPT TOKEN, so it rides every line
+      // now instead of only the ten-call rollup (OTA-1127 added it there). A cold
+      // call and a warm one are then two visibly different numbers.
+      // **A metric that cannot move is worse than no metric: it reads as evidence.**
+      const msPerTok = r.prefillMs != null && r.promptTokens
+        ? ` ${(r.prefillMs / r.promptTokens).toFixed(1)}ms/t`
+        : '';
       const stop = r.stop === 'limit' ? ' HIT-CAP' : '';
-      get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait}${split}${sizes}${cache}${stop} (${r.chars}ch)`);
+      get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait}${split}${sizes}${msPerTok}${stop} (${r.chars}ch)`);
       if (qwenCallCount() % 10 === 0) {
         get().appendLog('debug', `qwen⏱ stats — ${qwenTelemetrySummary()}`);
       }

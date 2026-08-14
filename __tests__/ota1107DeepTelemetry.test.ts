@@ -75,7 +75,13 @@ describe('OTA-1107 — read vs write, measured', () => {
   // the rollup now prints the derived remainder and calls it `reuse`. The
   // no-data case still stays quiet; a measured zero no longer does, because
   // "nothing was reused" is the finding.
-  it('prefix reuse is derived from the cache size, and a measured zero shows', () => {
+  // ⚠⚠ RETARGETED BY OTA-1259 (N4). This asserted that the derived `reuse` number
+  // reaches the rollup. It did — but the number is ~0 BY CONSTRUCTION: llama.rn
+  // reports `tokens_cached` as `n_past`, which after a completion is prompt +
+  // generated whether or not a prefix was reused (jni.cpp:748). A metric that
+  // cannot move is worse than no metric, so it is retired and the per-token
+  // prefill rate — which CAN move — carries the signal. See ota1108.
+  it.skip('SUPERSEDED BY OTA-1259 — the reuse number was structurally zero', () => {
     call('narration:travel', { cachedTokens: 1012, promptTokens: 180, outTokens: 20 });
     expect(qwenTelemetrySummary()).toContain('reuse812t');
     resetQwenTelemetry();

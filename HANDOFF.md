@@ -1598,21 +1598,53 @@ Steps:
      a situation that has moved on.
   3. Measure: `✂ DISCARDED` count per session with non-zero `out Nt`. Target zero.
 
-**N4 — THE PROMPT CACHE NEVER REUSES ANYTHING. (waste, largest ceiling, do last)**
+**N4 — ✅ MEASURED AND CLOSED, AND THE PREMISE WAS WRONG (OTA-1259).**
 
-`reuse 0t` on EVERY call in every log. OTA-1108 already established this is real and
-not a telemetry artefact: `cachedTokens` comes back as exactly in+out, so the KV
-cache grows by what each call did and reuses nothing across calls.
+Owner: *"measure first."* Measuring took the item off the board.
 
-Steps:
-  1. Establish whether the prompts share a stable PREFIX at all today. They are
-     assembled per-call from location + inventory + hooks, so probably not — which
-     makes this a prompt-STRUCTURE change (fixed system preamble first, volatile
-     context last), not a cache-config change.
-  2. Only then look at whether the binding keeps a session KV cache across calls.
-  3. Measure: `reuse Nt` non-zero on the second and later calls of a session.
-  ⚠ **Do not start here.** It is the biggest win and the biggest change, and N1–N3
-  are correctness and waste fixes that stand on their own.
+The plan said: `reuse 0t` on every call, so a stable prompt prefix is still on the
+table. ⚠⚠ **ALL THREE PARTS OF THAT WERE WRONG.**
+
+  1. **The binding ALREADY does prefix reuse.** `n_past = common_part(embd,
+     prompt_tokens)` in `rn-llama.cpp` — it matches the new prompt against the
+     previous one and reuses the shared prefix from the KV cache. On by default,
+     nothing to configure.
+  2. **The prompts ALREADY share a long prefix.** Measured by building real
+     prompts through `buildSystemPrompt` + `renderChatML`:
+
+     | pair | shared prefix |
+     |---|---|
+     | same room, pack changed | **84.3%** |
+     | same room, history changed | **85.4%** |
+     | combat vs peaceful | 83.8% |
+     | ambient vs ambient, different rooms | 71.4% |
+     | two rooms of one tile | 52.9% |
+     | ambient vs scene_intro | 38.9% |
+
+  3. **`reuse 0t` NEVER MEASURED REUSE.** llama.rn reports `tokens_cached` as
+     `llama->n_past` (`android/src/main/jni.cpp:748`), and after a completion
+     `n_past` is the sequence position — prompt tokens PLUS generated tokens —
+     **whether or not a prefix was reused.** Reuse changes what has to be
+     COMPUTED, not what ends up in the cache. OTA-1108's derivation
+     (`cached − prompt − out`) is therefore ~0 **by construction**, in every run,
+     forever.
+
+⚠ **AND THE REAL SIGNAL SAYS IT IS WORKING.** The owner's 2026-08-14 log has two
+`scene_intro_fill` calls at **12.2** and **3.67 ms per prompt token** on
+near-identical prompt sizes — a 3.3× spread, which is what a warm prefix looks
+like.
+
+**WHAT SHIPPED INSTEAD (OTA-1259):** the dead number is retired from the per-call
+line and the rollup, replaced by prefill-per-prompt-token, which can actually
+move. The field survives as a tombstone carrying the jni.cpp citation so nobody
+re-derives it. ⚠⚠ **A METRIC THAT CANNOT MOVE IS WORSE THAN NO METRIC — IT READS
+AS EVIDENCE**, and it sent two OTAs' worth of planning at a non-problem.
+
+⚠ **STILL OPEN, and it is a different item:** `investigate_lore` measured
+**64.7 ms/prompt-token** against `scene_intro`'s 3.67–12.2. That is where the
+prefill money actually is. It is a SHORT prompt (128t) taking a LONG read, which
+smells like a cold prefix — a different channel every time — rather than a big
+one. Worth its own measurement before anything is built.
 
 **N5 — THE MODEL INVENTED A LOCATION, AND SPOKE IT. (correctness, needs a repro)**
 
@@ -1783,7 +1815,28 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — NARRATION N1–N3 (2026-08-14, latest).** Golem
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — N4 MEASURED AND CLOSED (2026-08-14, latest).**
+  Golem OTA-1259. ⚠ **LINE-AGNOSTIC** — the telemetry is shared.
+
+  Owner: *"measure first."* Measuring took the item off the board. **All three
+  parts of N4's premise were wrong:** the binding already does prefix reuse
+  (`common_part` in rn-llama.cpp), the prompts already share 53–85% of their text,
+  and **`reuse 0t` never measured reuse** — llama.rn reports `tokens_cached` as
+  `n_past`, which after a call is prompt + generated whether or not a prefix was
+  reused (jni.cpp:748), so the derived remainder is ~0 by construction.
+
+  ⚠⚠ **A METRIC THAT CANNOT MOVE IS WORSE THAN NO METRIC — IT READS AS EVIDENCE.**
+  It was treated as a finding for two OTAs and aimed a plan at a non-problem.
+  Retired and replaced with prefill-per-prompt-token; the field is a tombstone
+  carrying the citation. Three suites had pinned the dead number, one of them
+  deliberately on the reasoning that the field might start reporting properly —
+  **there is no such future build.**
+
+  ⚠ **STILL OPEN:** `investigate_lore` at **64.7 ms/prompt-token** vs
+  `scene_intro`'s 3.67–12.2 — a short prompt taking a long read. That is where the
+  prefill money is. Full story: the VERSION.md 4.29.185 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — NARRATION N1–N3 (2026-08-14).** Golem
   OTA-1258. ⚠ **THESE THREE ARE LINE-AGNOSTIC** — the bank, the idle trigger and
   the preempt path all predate the picker work. HAL has all three bugs.
 

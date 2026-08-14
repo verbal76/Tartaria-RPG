@@ -79,38 +79,68 @@ const ambientSystem = (): string => buildSystemPrompt(ambientCtx())[0]!.content;
 describe('OTA-1108 — the cache number was being read backwards', () => {
   beforeEach(() => resetQwenTelemetry());
 
-  it('⚠ the device-log shape (cache === in + out) reports as ZERO reuse', () => {
-    // Every single row in the log had this shape. Read as "reuse", it says the
-    // model reused more tokens than the prompt even had.
+  // ⚠⚠ OTA-1259 (N4) OVERTURNED THIS WHOLE BLOCK'S PREMISE, AND THE ORIGINAL
+  // FINDING WAS HALF RIGHT. OTA-1108 was correct that OTA-1107 read the raw cache
+  // size as "tokens reused" and that this was backwards. It then derived
+  // `cachedTokens - promptTokens - outTokens` and read the resulting zero as a
+  // REAL measurement — "a stable prompt prefix is still entirely on the table".
+  //
+  // ⚠⚠ THAT NUMBER CANNOT MOVE. llama.rn reports `tokens_cached` as
+  // `llama->n_past` (android/src/main/jni.cpp:748), which after a completion is
+  // the sequence position — prompt tokens PLUS generated tokens — whether or not
+  // any prefix was reused. **Reuse changes what has to be COMPUTED, not what ends
+  // up in the cache.** So the subtraction yields ~0 by construction in every run.
+  //
+  // ⚠ AND THE WORRY WAS BACKWARDS TOO: llama.rn already does prefix reuse
+  // (`n_past = common_part(embd, prompt_tokens)`), and measured, our prompts share
+  // 53–85% of their text with the previous one. The 2026-08-14 device log shows
+  // two `scene_intro_fill` calls at 12.2 and 3.67 ms/prompt-token on near-identical
+  // prompt sizes — a 3.3× spread, which is what a warm prefix looks like.
+  //
+  // **A METRIC THAT CANNOT MOVE IS WORSE THAN NO METRIC: IT READS AS EVIDENCE.**
+  // The tests below now pin the retirement so the number cannot come back.
+
+  it('⚠⚠ the derived remainder is ZERO for the shape the device ACTUALLY reports', () => {
+    // cache === in + out is not "a cold cache" — it is the only shape this field
+    // can ever have. Both rows are verbatim from the OTA-1107 log.
     call('ambient', { promptTokens: 546, outTokens: 31, cachedTokens: 577 });
     call('flourish', { promptTokens: 127, outTokens: 22, cachedTokens: 149 });
     const byJob = Object.fromEntries(qwenJobStats().map((j) => [j.job, j]));
     expect(byJob.ambient!.reusedTokens).toBe(0);
     expect(byJob.flourish!.reusedTokens).toBe(0);
-    expect(qwenTelemetrySummary()).toContain('reuse0t');
   });
 
-  it('real reuse — a cache larger than this call\'s own contribution — is counted', () => {
-    call('narration:travel', { promptTokens: 300, outTokens: 40, cachedTokens: 1000 });
-    expect(qwenJobStats()[0]!.reusedTokens).toBe(660);
-    expect(qwenTelemetrySummary()).toContain('reuse660t');
-  });
-
-  it('a build that reports the field differently can never show a negative saving', () => {
-    call('ambient', { promptTokens: 546, outTokens: 31, cachedTokens: 12 });
-    expect(qwenJobStats()[0]!.reusedTokens).toBe(0);
-  });
-
-  it('no cache field at all stays quiet — absent data is not a measured zero', () => {
-    call('ambient', { promptTokens: 546, outTokens: 31 });
-    expect(qwenJobStats()[0]!.cacheSamples).toBe(0);
+  it('⚠⚠ ...and it is NO LONGER PRINTED, in the rollup or the per-call line', () => {
+    call('ambient', { promptTokens: 546, outTokens: 31, cachedTokens: 577 });
     expect(qwenTelemetrySummary()).not.toContain('reuse');
+    const store = src('app/state/gameStore.ts');
+    expect(store).not.toContain('reuse ${reused}t');
+    expect(store).not.toContain('r.cachedTokens - (r.promptTokens ?? 0) - (r.outTokens ?? 0)');
   });
 
-  it('the store logs the derived remainder, not the raw cache size', () => {
+  it('⚠⚠ the per-call line carries PREFILL PER PROMPT TOKEN instead — the real signal', () => {
+    // A cold call and a warm one are two visibly different numbers here, which is
+    // the whole point: this one CAN move.
     const store = src('app/state/gameStore.ts');
-    expect(store).toContain('reuse ${reused}t');
-    expect(store).toContain('r.cachedTokens - (r.promptTokens ?? 0) - (r.outTokens ?? 0)');
+    expect(store).toContain('(r.prefillMs / r.promptTokens).toFixed(1)');
+    expect(store).toContain('${msPerTok}');
+  });
+
+  it('⚠ the tombstone explains itself, so nobody re-derives it', () => {
+    const tel = src('app/ai/generation/qwenTelemetry.ts');
+    expect(tel).toContain('jni.cpp:748');
+    expect(tel).toContain('bestMsPerPromptTok');
+  });
+
+  it('⚠ the best/worst per-token range still rides the rollup', () => {
+    // ⚠ prefill must be <= totalMs or OTA-1139's sanity guard rejects the sample
+    // — a physically impossible prefill must never move the range. Both rows here
+    // are shaped like real calls.
+    call('ambient', { totalMs: 8000, promptTokens: 500, outTokens: 30, prefillMs: 6000 });
+    call('ambient', { totalMs: 2500, promptTokens: 500, outTokens: 30, prefillMs: 1500 });
+    expect(qwenTelemetrySummary()).toContain('ms/tok');
+    const j = qwenJobStats()[0]!;
+    expect(j.bestMsPerPromptTok).toBeLessThan(j.worstMsPerPromptTok);
   });
 });
 
