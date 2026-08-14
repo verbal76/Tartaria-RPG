@@ -1644,8 +1644,29 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — EITHER HAND (2026-08-14, latest).** Golem
-  OTA-1252. Same merge-or-revert decision point.
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE ARMOR BEAT IS PLAYED, NOT PINNED (2026-08-14,
+  latest).** Golem OTA-1253. Same merge-or-revert decision point.
+
+  Owner: *"and we fixed the tutorial? no heading to the inventory."*
+
+  ⚠⚠ **THE COPY WAS ALREADY CLEAN AND THAT WAS NOT ENOUGH.** A beat that says the
+  right thing and then STALLS is the worse bug — OTA-1250 shipped correct copy over
+  a permitted action that lived on another screen, and it cost fourteen refusals in
+  ninety seconds. A test that only reads words passes through all of that.
+
+  ⚠⚠ **AND `playtestTutorialWalk` DOES NOT COVER THE PICKER'S ROUTE** — it drives
+  this beat by calling `equipItem` directly, a thumb in the inventory, which is the
+  screen this work exists to stop needing. **When a walk "covers" a beat, check
+  WHICH ROUTE it walks.**
+
+  ⚠ The new suite mounts the real ExplorationScreen, presses TAKE / SALVAGE, finds
+  the vest row in the rendered picker and presses it — two presses, no store calls.
+  ⚠ **Verified by mutation** (deleting the screen's equip call fails two of five).
+  A first draft mirrored the handler's calls instead of pressing the row: that
+  asserts the code I wrote, not the screen the player touches.
+  Full story: the VERSION.md 4.29.181 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — EITHER HAND (2026-08-14).** Golem OTA-1252. Same merge-or-revert decision point.
 
   Owner: *"isn't there an option to equip a picked up weapon to any empty hand?"*
 
