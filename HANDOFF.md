@@ -1676,7 +1676,18 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ NARRATION N1–N3 (2026-08-14, latest). HAL — PORTED FROM GOLEM.** HAL
+- **⚠⚠ A JS CRASH IS NOT AN ML CRASH (2026-08-14, latest). HAL — PORTED FROM
+  GOLEM.** HAL OTA-1262, from golem OTA-1261. `mlHealth` is shared code; the bug
+  was identical here.
+
+  ⚠⚠ The init breadcrumb says only "attempted, never succeeded", which is true
+  whenever the process died in that window for ANY reason. **The threshold is 2**,
+  so two unrelated JS bugs would auto-disable on-device generation for the install.
+  Fixed with evidence: a FATAL JS crash recorded AFTER the attempt explains it.
+  Fatal-only and ordered-only; the excused breadcrumb is cleared; and the summary
+  says so out loud. Full story: the VERSION.md 4.29.164 row.
+
+- **⚠⚠ NARRATION N1–N3 (2026-08-14). HAL — PORTED FROM GOLEM.** HAL
   OTA-1260, from golem OTA-1258. Owner: *"measure first, then port n1-n3 to hal."*
   All three predate every picker change; HAL carried all three bugs unchanged.
 
