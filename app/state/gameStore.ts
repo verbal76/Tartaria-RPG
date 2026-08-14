@@ -167,6 +167,10 @@ import {
   getLocationFlavors,
 } from '../engine/narrativeGenerator';
 import { parseInput, splitClauses, mentionsWaitVerb, type ParseContext } from '../engine/parser';
+// ⚠ OTA-1265 — describeIssues has existed since OTA-205 and nothing has
+// ever called it; a demoted parse just fell through to the generic
+// refusal. The negated-command reply is its first real consumer.
+import { describeIssues } from '../engine/parseValidator';
 import { parseInputViaLLM } from '../engine/llmParser';
 import {
   classifyContainer,
@@ -13811,6 +13815,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (noun && noun.trim().length > 0) {
         set({ lastInteractedNoun: noun.trim() });
       }
+    }
+
+    // ⚠⚠ OTA-1265 — A NEGATION IS NOT A MISSED PARSE, SO IT MUST NOT GO
+    // TO THE RESOLVER. Every other demotion below means "I could not
+    // work out what you wanted", and handing those to Qwen is right.
+    // `negated_command` means the opposite: the player was perfectly
+    // clear, and the clear thing they said was DON'T. Sending that to a
+    // resolver whose whole job is to find an actionable verb in the
+    // sentence is how "do not open the chest" comes back as `open` —
+    // the fix would have shipped inert.
+    if ((parsed.validationIssues ?? []).includes('negated_command')) {
+      get().appendLog(
+        'debug',
+        `parser: negated command refused — "${trimmed}"`,
+      );
+      get().appendLog('arbiter', describeIssues(['negated_command']));
+      return;
     }
 
     if (parsed.intent === 'unknown' || parsed.confidence < 0.5) {

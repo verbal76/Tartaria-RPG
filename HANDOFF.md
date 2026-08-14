@@ -1676,7 +1676,56 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ A JS CRASH IS NOT AN ML CRASH (2026-08-14, latest). HAL — PORTED FROM
+- **⚠⚠⚠ "DO NOT OPEN THE CHEST" WAS OPENING THE CHEST (2026-08-14, latest).
+  HAL — PORTED FROM GOLEM.** HAL OTA-1265, from golem OTA-1264. The parser is
+  shared code; the bug was identical here, and nothing in it moves toward
+  golem's picker direction.
+
+  The thread started from a note on the golem 4.29.186 log: the owner's typed
+  sentence *"and I have to hit ignore rest to close it."* parsed as `rest` at
+  confidence 1.00 and cost 8 game hours. He was talking to me, not the game, so
+  I had filed it as a curiosity. **Measuring it turned up something much worse
+  underneath.**
+
+  ⚠⚠ **THE OBVIOUS FIX WAS THE WRONG ONE, AND MEASURING FIRST IS WHAT STOPPED
+  IT.** The natural read is "the verb was buried mid-sentence and position is
+  not a factor in confidence" — true, the scan takes the first minimum-distance
+  hit anywhere in the token stream. But `parserHitRate`'s corpus **deliberately
+  expects that**: twenty rows under `category: 'verbose'`, including *"maybe I
+  should rest for a while and recover"* → rest. A positional penalty would have
+  broken a well-tested product decision. The measurement killed that fix before
+  it was built.
+
+  ⚠⚠ **WHAT THE MEASUREMENT ACTUALLY FOUND — 10 OF 10 NEGATED COMMANDS EXECUTED
+  THE NEGATED ACTION, AT FULL CONFIDENCE.** `do not open the chest` → open.
+  `dont attack the guard` → attack. `never eat the strange fungus` → rest (8
+  game hours + an ambush roll). `I would rather not fight` → attack. There was
+  **no negation handling anywhere in the parser or the validator** — not a weak
+  rule, no rule. Unlike the verbose case, this contradicts the design rather
+  than expressing it. New validator rule `negated_command`: scan backward from
+  the verb, stop at a coordinating conjunction (negation does not scope across
+  "so"/"but"/"and", so *"I have nothing SO I will attack"* is still an attack),
+  window 4 — **measured, not picked**: the longest real distance is 3.
+
+  ⚠⚠ **SECOND FIND, FROM READING THE LIST:** `where` and `when` were **missing**
+  from the `ask` synonyms while `what`/`who`/`how`/`why` were all present, so a
+  question that named an action performed it — *"where can I sleep"* slept eight
+  hours. Restoring the two words is the whole fix; **no new mechanism**, because
+  the wh-word sits at index 0 and the scan already takes the FIRST hit. Corpus
+  `question` 14/15 → **15/15**, dictionary-domain 98.3% → **99.2%**.
+
+  ⚠⚠ **THIRD, AND THE ONE THAT WOULD HAVE SHIPPED THIS INERT:** a demoted parse
+  falls through to the **Qwen resolver**, whose entire job is to find an
+  actionable verb. Handing it *"do not open the chest"* is asking for `open`
+  back. It is answered in the store and **stopped before the fallback gate** —
+  and the test pins the ORDERING, because the ordering IS the fix.
+
+  ⚠ **`describeIssues` HAS ITS FIRST CALLER since OTA-205.** The remaining issue
+  codes **still have no consumer** — a live gap, not a finished job.
+
+  New suite ota1265NegationAndQuestions (34). 794 suites / 7447 tests.
+
+- **⚠⚠ A JS CRASH IS NOT AN ML CRASH (2026-08-14). HAL — PORTED FROM
   GOLEM.** HAL OTA-1262, from golem OTA-1261. `mlHealth` is shared code; the bug
   was identical here.
 

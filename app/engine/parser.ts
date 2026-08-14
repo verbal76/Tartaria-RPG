@@ -145,7 +145,13 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   wait: ['wait', 'stay', 'hold', 'pause', 'still', 'linger', 'tarry', 'idle', 'bide', 'remain'],
   // OTA-241 — 'ask' moved here from diplomacy. The verb is
   // informational ("ask about X", "ask the arbiter") not negotiation.
-  ask: ['ask', 'what', 'explain', 'define', 'who', 'how', 'why', 'tell', 'describe', 'clarify', 'mean'],
+  // ⚠⚠ OTA-1265 — 'where' and 'when' were MISSING from this list while
+  // their four siblings were present, so a question that named an action
+  // performed it: "where can I sleep" slept 8 hours, "when does the shop
+  // open" opened the chest. The wh-word sits at index 0 and the verb scan
+  // takes the FIRST minimum-distance hit, so restoring them is enough to
+  // let the question win the race — no new mechanism required.
+  ask: ['ask', 'what', 'explain', 'define', 'who', 'how', 'why', 'where', 'when', 'tell', 'describe', 'clarify', 'mean'],
   craft: [
     // 'construct' removed — playtest caught "salvage the construct"
     // routing to craft because 'construct' matched as a verb here,
@@ -1440,6 +1446,10 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     ambientNouns: context.ambientNouns,
     vendorName: context.vendorName,
     enemyNames: context.enemyNames,
+    // ⚠⚠ OTA-1265 — the negation rule needs the verb's real position.
+    // `matchedVerb` cannot supply it: on a fuzzy hit ("attck" → 'attack')
+    // the canonical synonym never appears in `normalized` at all.
+    verbTokenIndex: bestMatch.index,
   });
   if (shouldRejectParse(issues)) {
     return {

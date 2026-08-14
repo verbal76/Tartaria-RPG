@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.164';
+export const DISPLAY_VERSION = '4.29.165';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24536,7 +24536,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New tests folded into ota1198MemoryInterlock (15 total). ota1195
 // assertions RETARGETED, not weakened - both came out stronger.
 // DISPLAY_VERSION 4.29.109.
-export const OTA_BUILD_ID = '2026-08-14-1262-js-crash-is-not-an-ml-crash';
+// ⚠⚠ OTA-1265 — PORT OF GOLEM'S OTA-1264. "do not open the chest" was
+// OPENING the chest, and HAL had the bug identically — the parser is shared
+// and nothing here touches golem's picker direction.
+// Measured before the fix: 10 of 10 negated phrasings executed the negated
+// action at confidence 1.00. No negation handling existed anywhere in the
+// parser or the validator — not a weak rule, no rule.
+// ⚠ The obvious fix was the wrong one. "The verb was buried mid-sentence" is
+// true but is DESIGNED behaviour: the hit-rate corpus has twenty `verbose`
+// rows expecting exactly that ("maybe I should rest for a while" → rest).
+// ⚠ `where`/`when` were also missing from the `ask` synonyms while their four
+// siblings were present, so "where can I sleep" slept 8 game hours.
+// Corpus question 14/15 → 15/15; dictionary-domain 98.3% → 99.2%.
+// ⚠ The negated branch sits BEFORE the Qwen fallback gate, or the resolver
+// hands `open` straight back and the fix ships inert.
+// New suite ota1265NegationAndQuestions (34). 794 suites / 7447 tests.
+// DISPLAY_VERSION 4.29.165.
+export const OTA_BUILD_ID = '2026-08-14-1265-negation-and-questions';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1262-js-crash-is-not-an-ml-crash';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-12-1253-name-hygiene';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1252-desktop-controls';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1251-desktop-first-run';
