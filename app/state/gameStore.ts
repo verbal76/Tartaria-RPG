@@ -286,6 +286,9 @@ import {
 import {
   raiseMenace, decayedMenace, menaceIntimidateDcBonus, menaceEncounterBonus,
 } from '../engine/menace';
+// OTA-1254 — the cudgel beat readies the cudgel through the SAME comparison the
+// loot picker's ★ uses, rather than its own hand-rolled guess. See grantTutorialItem.
+import { isUpgradeOverEquipped, upgradeEquipSlot } from '../engine/gatherSort';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc, standingAc, equippedGearAc } from '../engine/equipment';
 // OTA-1161 — the milestone step lives with the code that EXPLAINS it on the sheet,
 // so the award and the explanation can never quote different numbers.
@@ -6305,31 +6308,57 @@ function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
   }
 }
 
+// ⚠⚠ OTA-1254 — RETURNS THE SLOT IT READIED, OR NULL, BECAUSE THE CALLER NARRATES
+// THE RESULT. It used to return void and the cudgel beat printed "[equipped]"
+// unconditionally — see the intercept for the measurement.
 function grantTutorialItem(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   id: TutorialPropId,
-): void {
+): EquipSlot | null {
   const player = get().player;
-  if (!player) return;
-  if (get().tutorialPropsConsumed[id]) return;
+  if (!player) return null;
+  if (get().tutorialPropsConsumed[id]) return null;
   const item = makeTutorialItem(id);
-  if (!item) return;
+  if (!item) return null;
+  // ⚠⚠ OTA-1254 — THE OLD GUARD WAS A NAME CHECK ON A TAG CONCEPT, AND IT NEVER
+  // FIRED ONCE. It substring-matched the equipped weapon's NAME against the word
+  // barehand — but the barehanded starter is called "Mud-fist Wraps", and
+  // barehanded is a TAG, not part of any name. Measured against RACE_PRIMARY: not one of the seven starting weapons
+  // (Mud-fist Wraps, Rusted Blade, Tartarian Spear, Pyric Wand) contains that
+  // substring, so the branch was unreachable for EVERY race since it was written —
+  // while the beat announced "[equipped]" to all of them.
+  //
+  // ⚠ AND FIVE OF THE SEVEN SHOULD HAVE GOT IT: the Cudgel is 1d8, against Rusted
+  // Blade 1d6 and Pyric Wand 1d6. Only the Spear (2d6) and the Wraps (1d10) out-hit
+  // it — and since OTA-1252 those two ready it in the EMPTY OFF HAND instead, which
+  // every race starts with, so the beat's promise ("you'll want a weapon") now holds
+  // for all seven without ever downgrading anyone.
+  //
+  // ⚠ ONE COMPARISON, SHARED WITH THE PICKER'S ★. A second opinion about what
+  // counts as better is how the mark and the behaviour drift apart.
+  const readied = id === 'cudgel' && isUpgradeOverEquipped(player, 'Cudgel')
+    ? upgradeEquipSlot(player, 'Cudgel')
+    : null;
   set((s) => {
     if (!s.player) return {};
     // Add to inventory + mark consumed.
     const inventory = [...s.player.inventory, item];
-    let equipped = s.player.equipped;
-    // Auto-equip the cudgel to weapon slot if the player has nothing
-    // better there. Keeps the post-tutorial player combat-ready.
-    if (id === 'cudgel' && (!equipped?.main || equipped.main.includes('barehand'))) {
-      equipped = { ...(equipped ?? {}), main: 'Cudgel' };
-    }
+    const equipped = readied
+      ? {
+        ...(s.player.equipped ?? {}),
+        [readied.slot]: readied.name,
+        // ⚠ The id too — the old line set the NAME alone, so the slot pointed at
+        // "first item called Cudgel" rather than the instance just granted.
+        [SLOT_ID_KEY[readied.slot]]: item.id,
+      }
+      : s.player.equipped;
     return {
       player: { ...s.player, inventory, equipped },
       tutorialPropsConsumed: { ...s.tutorialPropsConsumed, [id]: true },
     };
   });
+  return readied?.slot ?? null;
 }
 
 // arb25 — patch the live scene to reflect a building room: its interactables
@@ -12503,9 +12532,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     same verb under the hood.
       if (tStep?.id === 'cudgel' && /\btake\s+.*cudgel\b/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
-        grantTutorialItem(get, set, 'cudgel');
-        get().appendLog('world', 'You stoop and lift the cudgel. The lashing is loose but the head is solid. You equip it without thinking.');
-        get().appendLog('reward', '✦ Cudgel (Common). [equipped]');
+        // ⚠⚠ OTA-1254 — SAY WHERE IT WENT, BECAUSE IT DID NOT ALWAYS GO ANYWHERE.
+        // From the owner's device log, a Tartarian Giant one line apart:
+        //     [reward] ✦ Cudgel (Common). [equipped]
+        //     [debug] stats: ... worn: main=Mud-fist Wraps chest=Mud-Warden's Vest
+        // The mark said equipped and the hand held the starter. Both lines here
+        // were unconditional, and the auto-equip guard they described never fired
+        // for any race (see grantTutorialItem). Third time this session that a log
+        // line has claimed something the engine did not do — the five-vest reward,
+        // the "open your pack" chore, and now this.
+        const readiedIn = grantTutorialItem(get, set, 'cudgel');
+        get().appendLog('world', readiedIn
+          ? `You stoop and lift the cudgel. The lashing is loose but the head is solid. It settles into your ${readiedIn === 'off' ? 'off hand' : 'grip'} without thinking.`
+          : 'You stoop and lift the cudgel. The lashing is loose but the head is solid. It goes into your pack — what you are already swinging hits harder.');
+        get().appendLog('reward', readiedIn ? '✦ Cudgel (Common). [equipped]' : '✦ Cudgel (Common).');
         // Acknowledge the pickup before the next instruction — a beat of
         // pacing so the Arbiter doesn't snap straight into "now salvage".
         get().appendLog('arbiter', '"Good. Keep it close."');

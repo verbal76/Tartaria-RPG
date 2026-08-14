@@ -85,14 +85,20 @@ describe('OTA-1248 — the armor beat', () => {
     expect(arbiter.toLowerCase()).toMatch(/put it on|straight onto|equip/);
   });
 
-  it('⚠⚠ the vest does NOT auto-equip — that is the entire lesson', () => {
-    // grantTutorialItem auto-equips the cudgel. If it did the same here the beat
-    // would complete itself and teach nothing.
+  it('⚠⚠ the vest does NOT auto-equip on GRANT — that is the entire lesson', () => {
+    // grantTutorialItem readies the cudgel. If it did the same for the vest the
+    // beat would complete itself and teach nothing — the player would never see
+    // the ★ row do its work.
+    // ⚠ OTA-1254 rewrote how the cudgel half decides (a shared upgrade comparison
+    // instead of a name check that never fired) and grew the function past the old
+    // 1400-char window. The RULE asserted is unchanged: cudgel yes, vest no.
     const store = src('app', 'state', 'gameStore.ts');
     const i = store.indexOf('function grantTutorialItem(');
-    const fn = store.slice(i, i + 1400);
-    expect(fn).toContain("if (id === 'cudgel'");
+    const fn = store.slice(i, store.indexOf('\n}', i));
+    expect(fn).toContain("id === 'cudgel'");
     expect(fn).not.toContain("id === 'vest'");
+    // The vest reaches its slot through the PICKER's tap, which is the lesson.
+    expect(src('app', 'screens', 'ExplorationScreen.tsx')).toContain(`equipItem("Mud-Warden's Vest", 'chest')`);
   });
 
   it('⚠⚠ the beat completes on the EQUIP, not the take', () => {

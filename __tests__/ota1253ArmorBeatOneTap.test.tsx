@@ -117,6 +117,10 @@ describe('OTA-1253 — the armor beat completes inside the picker', () => {
     useGameStore.getState().submitPlayerAction('look around');       // look
     useGameStore.getState().submitPlayerAction('take the cudgel');   // cudgel
     expect(beat()).toBe('armor');
+    // ⚠⚠ OTA-1254 — THE CUDGEL IS ACTUALLY IN A HAND. A reclaimer starts with a
+    // Rusted Blade (1d6) and the Cudgel is 1d8, so it wins the MAIN hand. The
+    // shipped build printed "[equipped]" here and equipped nothing, for every race.
+    expect(useGameStore.getState().player?.equipped?.main).toBe('Cudgel');
 
     const before = useGameStore.getState().gameLog.length;
     // ⚠⚠ THE REAL SCREEN, AND THE REAL ROW. Mount ExplorationScreen at the armor

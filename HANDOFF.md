@@ -1644,8 +1644,43 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE ARMOR BEAT IS PLAYED, NOT PINNED (2026-08-14,
-  latest).** Golem OTA-1253. Same merge-or-revert decision point.
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE CUDGEL ACTUALLY EQUIPS NOW (2026-08-14,
+  latest).** Golem OTA-1254. Same merge-or-revert decision point. **⚠ THE GUARD BUG
+  IS LINE-AGNOSTIC AND HAL HAS IT TOO** — the dead barehand check predates the
+  picker work entirely.
+
+  From the device log, a Tartarian Giant one line apart: `✦ Cudgel (Common).
+  [equipped]` then `worn: main=Mud-fist Wraps`.
+
+  ⚠⚠ **A NAME CHECK ON A TAG CONCEPT, UNREACHABLE FOR EVERY RACE.** The auto-equip
+  fired only when the equipped weapon's NAME contained the word barehand; the
+  barehanded starter is called Mud-fist Wraps and barehanded is a TAG. **Measured
+  against RACE_PRIMARY, and asserted in `ota1254CudgelActuallyEquips`: zero of the
+  four starters carry that substring.** Five of seven races should have had the
+  cudgel (1d8 beats Rusted Blade / Pyric Wand 1d6) and were quietly denied it.
+
+  ⚠ Fixed with the SAME comparison the picker's ★ uses, so the two races it does
+  not beat ready it in the empty off hand (OTA-1252). All seven get a weapon; none
+  get a downgrade.
+
+  ⚠⚠ **AND THE NARRATION IS CONDITIONAL NOW** — `grantTutorialItem` returns the
+  slot it readied. **THIRD TIME THIS SESSION A LOG LINE CLAIMED SOMETHING THE
+  ENGINE DID NOT DO** (five-vest reward, "open your pack", this). ⚠ **The pattern
+  is always the same: the narration is unconditional and the action is not.**
+  Full story: the VERSION.md 4.29.182 row.
+
+- **⚠ OPEN, REPORTED, NOT COMMISSIONED — STALE BANKED SCENE INTRO (2026-08-14).**
+  `"You climb down the arch, feeling the weight of the city's collapse before you"`
+  was spoken on ARRIVAL at the Court of Standards — four rooms and forty seconds
+  after the climb, which happened in the Atrium. `sceneIntroBank` is keyed by
+  LOCATION id and every outpost hub room shares `monarch_waystation`, so a line
+  written about one room is spent in another, and a banked line can narrate a past
+  action as if it were happening now. Same log: `scene_intro_fill` 9009ms for 33
+  tokens, one preempted at 5555ms and discarded, `ambient` discarded after 30783ms
+  with `model-returned-nothing`, `reuse 0t` on every call.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE ARMOR BEAT IS PLAYED, NOT PINNED
+  (2026-08-14).** Golem OTA-1253. Same merge-or-revert decision point.
 
   Owner: *"and we fixed the tutorial? no heading to the inventory."*
 
