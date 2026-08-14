@@ -1839,8 +1839,49 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠ GOLEM — A RETIRED FILE KEPT ALIVE BY A FALSE CLAIM OF MINE (2026-08-14,
+  latest).** Golem OTA-1266. Found while auditing golem against the owner's bar:
+  *"golem is the newest version of the game, golem must be 100%... we need to
+  improve golem until it's playtestable."*
+
+  **OTA-1263 deleted the `salvageableCount` predicate — the only caller of
+  SalvageModal's `isSalvageable` — and left the import behind**, under a comment
+  reading *"its `isSalvageable` predicate is still the source of truth for the
+  action-button count, so the module stays."* **Both halves of that sentence had
+  gone false in the same commit that wrote them.** A second dead salvage
+  predicate (`isSalvageable` from `interactionTags`) sat in the same file, also
+  unused — two competing answers to "is this salvageable?", neither of them the
+  picker's own `classifyGatherNoun` / `laneForKind`.
+
+  ⚠⚠ **THE GATE GAP IS THE REAL FINDING, AND IT IS MEASURED.**
+  `@typescript-eslint/no-unused-vars` is **OFF by design** (churn rule,
+  `eslint.config.js:85`), so **nothing in the gate set catches a dead import**. A
+  one-off `noUnusedLocals` pass reports **65** across `app/`. **Deliberately not
+  cleaned wholesale** — that is scope nobody asked for, and most are harmless RN
+  imports — but the number is recorded rather than guessed, so a future decision
+  about adding a gate starts from evidence.
+
+  ⚠ **A FALSE LEAD, CHECKED AND DROPPED RATHER THAN SHIPPED AS A FINDING.**
+  `inventorySnapshot` imports `isInferredItem`/`isInferredInventoryItem` unused
+  and marks ◆ via `isForgeReservableItem`, whose comment calls it the "inferred
+  diamond" — which looked like the diagnostic mismarking inferred gear, and would
+  have mattered given the owner's question about inferred items. **It is not a
+  bug:** `InventoryScreen:2304` uses the SAME predicate, so screen and snapshot
+  agree and only the naming is stale. Recorded because *not* filing it is the
+  finding — same discipline that withdrew the 64.7 ms/t claim at OTA-1263.
+
+  ⚠⚠ **AND A TEST WAS HOLDING THE DEAD IMPORT IN PLACE.** `ota1233OnePicker`
+  asserted `toContain('isSalvageable as isSalvageableForModal')` under the reason
+  *"its predicate still has a job"* — so when the job disappeared at OTA-1263,
+  **the suite actively REQUIRED the dead reference to stay.** A test pinned to a
+  MECHANISM faithfully protecting that mechanism's rot. Re-pinned to the RULE:
+  retired pickers are not rendered, and nothing imports their module.
+
+  ⚠ `SalvageModal.tsx` now has **ZERO importers** anywhere. **Left on disk, not
+  deleted**, while the picker trial's merge-or-revert is the owner's open call.
+
 - **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — "DO NOT OPEN THE CHEST" WAS OPENING THE CHEST
-  (2026-08-14, latest).** Golem OTA-1264.
+  (2026-08-14).** Golem OTA-1264.
 
   Owner, on a note from the 4.29.186 log: *"so this still needs addressed?"* The
   note said his typed sentence — *"and I have to hit ignore rest to close it."* —

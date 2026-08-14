@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.188';
+export const DISPLAY_VERSION = '4.29.189';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23399,7 +23399,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // answered in the store and stopped before it gets there.
 // New suite ota1264NegationAndQuestions (34 tests). 806 suites / 7588 tests.
 // DISPLAY_VERSION 4.29.188. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-14-1264-negation-and-questions';
+// ⚠⚠ OTA-1266 — A RETIRED FILE WAS BEING KEPT ALIVE BY A CLAIM ABOUT A
+// CONSUMER THAT NO LONGER EXISTED, AND THE CLAIM WAS MINE.
+// OTA-1263 deleted the `salvageableCount` predicate — the only caller of
+// SalvageModal's `isSalvageable` — and left the import behind, under a comment
+// reading "still the source of truth for the action-button count, so the module
+// stays." Both halves had gone false in the same commit that wrote them.
+// ⚠ A SECOND dead salvage predicate (`isSalvageable` from interactionTags) was
+// imported in the same file and also unused: two competing answers to "is this
+// salvageable?", neither of them the picker's own `classifyGatherNoun`.
+// ⚠⚠ MEASURED, AND THE GATE GAP IS THE REAL FINDING: `no-unused-vars` is OFF by
+// design (churn rule), so NOTHING catches a dead import. A one-off run with
+// `noUnusedLocals` reports 65 across app/. Not cleaned wholesale — that is scope
+// nobody asked for — but recorded so the number is known rather than guessed.
+// ⚠⚠ AND A TEST WAS HOLDING THE DEAD IMPORT IN PLACE. ota1233OnePicker asserted
+// `toContain('isSalvageable as isSalvageableForModal')` under the reason "its
+// predicate still has a job" — so when the job disappeared at OTA-1263, the
+// suite actively REQUIRED the dead reference to stay. A test pinned to a
+// MECHANISM faithfully protecting that mechanism's rot, for the Nth time this
+// session. Re-pinned to the RULE (retired pickers are not rendered and nothing
+// imports their module) — what it should have asserted from the start.
+// ⚠ SalvageModal.tsx now has ZERO importers. Left on disk, not deleted, while
+// the picker trial's merge-or-revert is the owner's open call.
+// DISPLAY_VERSION 4.29.189. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-14-1266-dead-salvage-predicates';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1264-negation-and-questions';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1263-green-light-and-paced-sweep';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-13-1247-hint-fires-when-it-should';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-13-1246-render-crash-fix';

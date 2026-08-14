@@ -318,14 +318,32 @@ describe('OTA-1233 — the merge did not cost anything that was already working'
     expect(port).toContain('TAKE / SALVAGE');
   });
 
-  it('⚠ the retired picker is retired, not orphaned — its predicate still has a job', () => {
+  it('⚠⚠ OTA-1266: the retired picker is now FULLY orphaned — its predicate lost its job', () => {
+    // ⚠⚠ THIS TEST PINNED A MECHANISM AND THEN PROTECTED A STALE ONE — the same
+    // failure this session has corrected repeatedly. It originally asserted
+    // `toContain('isSalvageable as isSalvageableForModal')`, under the reason
+    // *"isSalvageable still drives the action-button count, so the module stays
+    // imported for that and only that."*
+    //
+    // ⚠⚠ THAT REASON DIED AT OTA-1263, when the `salvageableCount` predicate —
+    // the import's only caller — was deleted and the green light re-pointed at
+    // `gatherRowCount`. The import survived with nothing calling it, and **THIS
+    // ASSERTION IS PART OF WHY**: it actively required the dead reference to
+    // stay, and `no-unused-vars` is off by design, so nothing else was looking.
+    //
+    // ⚠ The RULE this should have pinned all along is below: the retired pickers
+    // must not be rendered, and nothing may quietly depend on their module. That
+    // rule is stable — the import was never the point.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
-    // The COMPONENT import is gone...
     expect(screen).not.toContain('<TakeModal');
     expect(screen).not.toContain('<SalvageModal');
-    // ...but isSalvageable still drives the action-button count, so the module
-    // stays imported for that and only that.
-    expect(screen).toContain('isSalvageable as isSalvageableForModal');
+    // No import of the retired module survives, aliased or otherwise.
+    expect(screen).not.toContain("from '../components/SalvageModal'");
+    // ⚠ And the OTHER dead salvage predicate went with it — two competing
+    // answers to "is this salvageable?" lived in this file, neither of them the
+    // picker's own classifier, which is the one that actually decides lanes.
+    expect(screen).not.toContain('isClimbable, isSalvageable');
+    expect(screen).toContain('classifyGatherNoun');
   });
 });
 

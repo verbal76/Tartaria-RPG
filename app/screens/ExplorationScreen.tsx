@@ -13,10 +13,16 @@ import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { playerPowerScore, enemyPowerScore } from '../engine/powerRating';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
-// ⚠ OTA-1233 — SalvageModal's COMPONENT is retired (GatherModal replaces both
-// pickers); its `isSalvageable` predicate is still the source of truth for the
-// action-button count, so the module stays and only the component import goes.
-import { isSalvageable as isSalvageableForModal } from '../components/SalvageModal';
+// ⚠⚠ OTA-1266 — THE SALVAGEMODAL IMPORT IS GONE, AND THE COMMENT THAT STOOD HERE
+// WAS MINE AND HAD GONE FALSE. It read: *"its `isSalvageable` predicate is still
+// the source of truth for the action-button count, so the module stays."* That
+// stopped being true at OTA-1263, when I deleted the `salvageableCount` predicate
+// that was its only caller and left the import behind — so a retired file was
+// being kept alive by a claim about a consumer that no longer existed.
+// ⚠ `app/components/SalvageModal.tsx` now has ZERO importers in app/, __tests__/
+// or scripts/. It is left on disk rather than deleted while the picker trial's
+// merge-or-revert is the owner's open call; git makes the deletion a one-liner
+// once that is decided.
 import { BrandedModal } from '../components/BrandedModal';
 import { GatherModal } from '../components/GatherModal'; // OTA-1233 — one picker, both verbs
 
@@ -32,7 +38,11 @@ import { HookContinueModal } from '../components/HookContinueModal';
 import { WhisperCompleteModal } from '../components/WhisperCompleteModal';
 // OTA-180 — FeedbackModal import dropped along with the 📝 button.
 // The component file stays on disk for potential re-introduction.
-import { isClimbable, isSalvageable } from '../engine/interactionTags';
+// ⚠ OTA-1266 — `isSalvageable` dropped from this import too: it was the OTHER
+// dead salvage predicate in this file, unused since the pickers merged. Two
+// competing "is this salvageable?" answers lived here; the picker's own
+// `classifyGatherNoun` / `laneForKind` is the surviving one.
+import { isClimbable } from '../engine/interactionTags';
 import { climbBlockReason } from '../engine/climbReadiness';
 import { isNounConsumed, isNounFlavorExhausted } from '../engine/ambientNounMatch';
 import { getLocationById } from '../engine/encounter';
