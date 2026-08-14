@@ -1659,19 +1659,37 @@ Steps:
      then replay. ⚠ This one is thin on evidence — ONE sighting — so it deserves a
      second log before implementing, not a speculative filter.
 
-**N6 — ML HEALTH BLAMED A JS CRASH ON THE MODEL. (diagnostic honesty)**
+**N6 — ✅ DONE (OTA-1261). ML HEALTH BLAMED A JS CRASH ON THE MODEL.**
 
 After the OTA-1245 render crash, ML health reported *"recovering — detected a crash
-on previous launch"*. Likely the success breadcrumb had not flushed before the JS
-thread died, so a SCREEN bug reads as an ENGINE crash. Harmless at 0/2 — but the
-threshold is 2, and two JS crashes would auto-disable Qwen for an unrelated reason.
+on previous launch"*. ⚠ **The breadcrumb cannot tell the two apart on its own:** it
+says only "init was attempted and never marked succeeded", which is true whenever
+the process died in that window, for ANY reason — a JS bug, an OS kill, a
+force-quit. ⚠⚠ **AND IT IS NOT COSMETIC — the threshold is 2**, so two unrelated JS
+bugs would auto-disable on-device generation for the whole install and drop the
+player to template narration because of a screen bug. Same class as arb124's
+false-disable (a Pixel benched at 74 "crashes" with zero real failures), by a
+different door.
 
-Steps:
-  1. Stamp the breadcrumb as soon as the model reports ready, not at the end of the
-     first successful generation.
-  2. Distinguish a JS-thread crash from a native one before counting it toward the
-     disable threshold.
-  3. Measure: force a JS crash and confirm the ML crash counter does NOT move.
+  1. ⚠ **ALREADY DONE — checked instead of re-implemented.** The step asked to stamp
+     success when the model reports ready rather than after a first generation. It
+     already does: `markMLInitSucceeded()` fires on `qwenStatus === 'ready'`, which
+     OTA-1180 tightened when it found `bootQwen()` resolving on FAILURE and being
+     recorded as a success.
+  2. ✅ **The discrimination is evidence, not a guess.** The global ErrorUtils
+     handler already stashes a fatal JS crash with a timestamp
+     (`@tartaria/lastCrash`). If one is on record from AFTER the init attempt, the
+     dangling breadcrumb is accounted for and the native guard does not take the
+     blame. ⚠ FATAL only (a caught error did not kill the process, so it explains
+     nothing) and ORDERED only (a crash from before the attempt is no alibi) — both
+     hold open the door for a real native crash to hide behind an unrelated one.
+     ⚠ The excused breadcrumb is CLEARED, or it would be re-examined every boot —
+     the phantom-recount shape arb125 fixed on the counted path.
+  3. ✅ **Said out loud, not swallowed.** The summary reads *"active — an init
+     breadcrumb was explained by a JS crash, not counted against ML"*. "We found one
+     and chose not to count it" is a different fact from "nothing happened", and
+     hiding it is how a real native crash would later read as a quiet boot.
+     Verified by mutation: making the alibi unconditional fails four of the nine.
 
 ### ⚠ WATCH LIST — SEEN IN A LOG, NOT YET ACTED ON
 
@@ -1815,7 +1833,26 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — N4 MEASURED AND CLOSED (2026-08-14, latest).**
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — N6, A JS CRASH IS NOT AN ML CRASH (2026-08-14,
+  latest).** Golem OTA-1261. ⚠ **LINE-AGNOSTIC** — mlHealth is shared.
+
+  The 4.29.173 report showed a JS render crash beside `ML runtime health: recovering
+  — detected a crash on previous launch`. ⚠⚠ **The breadcrumb cannot tell them apart
+  on its own** — "attempted, never succeeded" is true whenever the process died in
+  that window, for any reason. ⚠⚠ **The threshold is 2, so two unrelated JS bugs
+  would auto-disable on-device generation for the install.**
+
+  ⚠ Fixed with evidence: a FATAL JS crash recorded AFTER the init attempt explains
+  the breadcrumb, so it is not counted. Fatal-only and ordered-only, both to stop a
+  real native crash hiding behind an unrelated one. The excused breadcrumb is
+  cleared (arb125's phantom-recount shape). ⚠ **And it is said out loud** — "found
+  one, did not count it" is a different fact from "nothing happened".
+
+  ⚠⚠ **PLAN STEP 1 WAS ALREADY DONE, AND CHECKING BEAT RE-IMPLEMENTING** —
+  `markMLInitSucceeded()` already fires on `qwenStatus === 'ready'` (OTA-1180).
+  Full story: the VERSION.md 4.29.186 row. **N1–N6 now complete.**
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — N4 MEASURED AND CLOSED (2026-08-14).**
   Golem OTA-1259. ⚠ **LINE-AGNOSTIC** — the telemetry is shared.
 
   Owner: *"measure first."* Measuring took the item off the board. **All three

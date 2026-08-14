@@ -125,6 +125,12 @@ interface MLHealthState {
   /** True if we DETECTED a previous-session crash on THIS load
    *  (informational; affects what the summary line reads). */
   detectedCrashThisBoot: boolean;
+  /** ⚠⚠ OTA-1261 (N6) — the dangling init breadcrumb was EXPLAINED by a JS-thread
+   *  crash recorded after it, so it was NOT counted against the native ML guard.
+   *  Surfaced rather than swallowed: "we found a breadcrumb and decided not to
+   *  count it" is a different fact from "nothing happened", and hiding it is how
+   *  a real native crash would later look like a quiet boot. */
+  initCrashExplainedByJsThisBoot: boolean;
   // OTA-351 — Qwen completion-crash guard (independent of the init guard above).
   qwenCompletionCrashCount: number;
   qwenDisabledByCrash: boolean;
@@ -215,8 +221,49 @@ export async function loadMLHealth(): Promise<MLHealthState> {
 
   // Detect previous-session crash: attempted exists and either
   // succeeded doesn't exist, OR succeeded predates attempted.
+  // ⚠⚠ OTA-1261 (N6) — A JS CRASH IS NOT AN ML CRASH, AND THIS COULD NOT TELL
+  // THEM APART. The breadcrumb says only "init was attempted and never marked
+  // succeeded", which is true whenever the process died in that window — for ANY
+  // reason. The owner's 4.29.173 report showed ML health reporting *"recovering —
+  // detected a crash on previous launch"* immediately after the OTA-1245 JS RENDER
+  // crash, which had nothing to do with the native libraries.
+  //
+  // ⚠ AND IT IS NOT COSMETIC: the threshold is 2. Two unrelated JS bugs would
+  // auto-disable on-device generation for the install, and the player would be
+  // dropped to template narration by a screen bug.
+  //
+  // The discrimination is evidence, not a guess: the global ErrorUtils handler
+  // already stashes a fatal JS crash with a timestamp. If one is on record from
+  // AFTER the init attempt, the dangling breadcrumb is accounted for and the
+  // native guard must not take the blame.
+  let jsFatalAt: number | null = null;
+  try {
+    const rawCrash = await AsyncStorage.getItem('@tartaria/lastCrash');
+    if (rawCrash) {
+      const rec = JSON.parse(rawCrash) as { timestamp?: number; isFatal?: boolean };
+      // ⚠ FATAL ONLY. A caught-and-logged error did not kill the process, so it
+      // explains nothing — treating it as an alibi would let a real native crash
+      // hide behind an unrelated handled error.
+      if (rec?.isFatal && typeof rec.timestamp === 'number') jsFatalAt = rec.timestamp;
+    }
+  } catch {
+    // Unreadable / absent — no alibi, and the guard behaves exactly as before.
+  }
   let detectedCrashThisBoot = false;
+  let initCrashExplainedByJsThisBoot = false;
   if (attempted && (!succeeded || succeeded < attempted)) {
+    const attemptedAt = Date.parse(attempted);
+    const explained = jsFatalAt !== null
+      && Number.isFinite(attemptedAt)
+      && jsFatalAt >= attemptedAt;
+    if (explained) {
+      // Clear the breadcrumb so the same dangling record cannot be re-examined
+      // on every later boot — the same phantom-recount arb125 fixed.
+      initCrashExplainedByJsThisBoot = true;
+      try { await AsyncStorage.removeItem(KEY_ATTEMPTED); } catch { /* best effort */ }
+    }
+  }
+  if (attempted && (!succeeded || succeeded < attempted) && !initCrashExplainedByJsThisBoot) {
     detectedCrashThisBoot = true;
     crashCount += 1;
     try {
@@ -406,6 +453,7 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     crashCount,
     disabledByCrash,
     detectedCrashThisBoot,
+    initCrashExplainedByJsThisBoot,
     qwenCompletionCrashCount,
     qwenDisabledByCrash,
     detectedQwenCompletionCrashThisBoot,
@@ -679,6 +727,12 @@ export function mlHealthSummary(): string {
     status = `auto-disabled after ${state.crashCount} crashes (template narration in use)`;
   } else if (state.detectedCrashThisBoot) {
     status = `recovering — detected a crash on previous launch (${state.crashCount}/${MAX_CRASHES_BEFORE_DISABLE} before auto-disable)`;
+  } else if (state.initCrashExplainedByJsThisBoot) {
+    // ⚠ OTA-1261 (N6) — SAID OUT LOUD, not swallowed. The breadcrumb was found and
+    // deliberately not counted, and a reader of this report needs to know both.
+    status = state.crashCount > 0
+      ? `active — an init breadcrumb was explained by a JS crash, not counted (${state.crashCount}/${MAX_CRASHES_BEFORE_DISABLE} from earlier)`
+      : `active — an init breadcrumb was explained by a JS crash, not counted against ML`;
   } else if (state.crashCount > 0) {
     status = `degraded — ${state.crashCount}/${MAX_CRASHES_BEFORE_DISABLE} crashes detected this install`;
   } else {
